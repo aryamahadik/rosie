@@ -964,6 +964,247 @@ export function unmappedEndAsked(exchange) {
   return problems;
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// v1.9 (T-054): journey 7 and the fee door (README "v1.9"; drafted in round 1 as v1.5 and frozen as v1.9 on top of
+// v1.8: DL-471). Added beside the rules above, which stay as they are. Like v1.6's and v1.8's rules it reads only the
+// contracts' own files beside this one, synchronously: K-04's seeds, for a named booking's business.
+
+/**
+ * The calls that may state each step of journey 7 and of the fee door (README "v1.9", "Every in-scope step"). Journey 7
+ * gives no key: every gives column of A-J7.md, B-J7.md and A-S11.md's S11-22 to S11-28 and S11-35 is empty (A-keys.md,
+ * B-keys.md). A step whose walk offers new times also names moveBooking, whose offer and pick state it.
+ */
+export const J7_STEP_CALLS = Object.freeze({
+  "A7-01": ["remindBeforeVisit"],
+  "B7-01": ["remindBeforeVisit"],
+  "A7-03": ["moveBooking"],
+  "B7-07": ["moveBooking"],
+  "A7-05": ["cancelBooking"],
+  "B7-08": ["cancelBooking"],
+  "B7-09": ["cancelBooking"],
+  "A7-06": ["cancelBooking"],
+  "B7-10": ["cancelBooking"],
+  "A7-31": ["changeWhatsBooked"],
+  "B7-31": ["changeWhatsBooked"],
+  "A7-70": ["customerRunsLate", "moveBooking"],
+  "B7-27": ["customerRunsLate", "moveBooking"],
+  "A7-32": ["changePlan"],
+  "B7-32": ["changePlan"],
+  "A7-15": ["proCantCome"],
+  "B7-19": ["proCantCome"],
+  "A7-17": ["proCantCome"],
+  "B7-20": ["proCantCome"],
+  "A7-19": ["proCantCome", "moveBooking"],
+  "B7-65": ["proCantCome", "moveBooking"],
+  "A7-21": ["proCantCome", "moveBooking"],
+  "B7-22": ["proCantCome", "moveBooking"],
+  "A7-14": ["proRunsLate", "moveBooking"],
+  "B7-18": ["proRunsLate", "moveBooking"],
+  "A7-23": ["ownerChangesIt", "moveBooking"],
+  "B7-28": ["ownerChangesIt", "moveBooking"],
+  "S12-33": ["ownerChangesIt"],
+  "A7-66": ["ownerChangesIt"],
+  "B7-43": ["ownerChangesIt"],
+  "A7-88": ["ownerChangesIt"],
+  "B7-71": ["ownerChangesIt"],
+  "A7-68": ["classTooFew"],
+  "B7-62": ["classTooFew"],
+  "A7-69": ["classTooFew", "moveBooking"],
+  "B7-63": ["classTooFew", "moveBooking"],
+  "A7-54": ["changePlan"],
+  "B7-52": ["changePlan"],
+  "A7-91": ["changePlan"],
+  "B7-86": ["changePlan"],
+  "A7-55": ["changePlan"],
+  "B7-51": ["changePlan"],
+  "A7-89": ["finalCount"],
+  "B7-77": ["finalCount"],
+  "A7-74": ["firstStepsDue", "moveBooking"],
+  "B7-61": ["firstStepsDue", "moveBooking"],
+  "A7-12": ["relayQuestion"],
+  "B7-16": ["relayQuestion"],
+  "A7-13": ["relayQuestion", "moveBooking"],
+  "B7-17": ["relayQuestion", "moveBooking"],
+  "A7-98": ["moveUpdates"],
+  "B7-88": ["moveUpdates"],
+  "A7-83": ["passOnNote"],
+  "B7-79": ["passOnNote"],
+  "A7-80": ["someoneElseAsks"],
+  "B7-72": ["someoneElseAsks"],
+  "A7-81": ["someoneElseAsks"],
+  "B7-73": ["someoneElseAsks"],
+  "S11-22": ["feeDoor"],
+  "S11-25": ["feeDoor"],
+  "S11-26": ["feeDoor"],
+});
+
+/** The results each stage of each journey 7 call may answer (README "v1.9", "The calls v1.9 adds"). */
+export const J7_STAGE_RESULTS = Object.freeze({
+  remindBeforeVisit: {
+    remind: ["reminded", "madeAfterReminder", "cancelled", "paused", "deceased", "sentNow", "safetyOpen"],
+  },
+  moveBooking: {
+    offer: ["offered", "noTimeKeepsGap"],
+    pick: ["moved", "askedOwner"],
+    ownerAnswer: ["moved", "offered", "declined"],
+  },
+  cancelBooking: { ask: ["askedOnce", "warnedFee"], confirm: ["cancelled", "cancelledLate"] },
+  feeDoor: {
+    open: ["noFeeMayBeAsked", "nothingTaken", "askedOwner"],
+    ownerAnswer: ["charged", "charging", "dropped"],
+    chargeResult: ["charged", "payLinkSent"],
+  },
+  proCantCome: {
+    report: ["ownerAsked", "customerOffered"],
+    ownerAnswer: ["standInAsked", "ownerReaches"],
+    standInAnswer: ["customerOffered"],
+    customerAnswer: ["standIn", "offerTimes", "cancelled"],
+  },
+  proRunsLate: { late: ["told"], customerAnswer: ["kept", "offerTimes", "cancelled"] },
+  ownerChangesIt: {
+    moveCommand: ["readBack"],
+    moveYes: ["customerAsked"],
+    callOffCommand: ["readBack"],
+    callOffYes: ["cancelled", "kept"],
+    customerAnswer: ["moved", "offerTimes", "cancelled"],
+  },
+  classTooFew: {
+    count: ["ownerAsked"],
+    ownerAnswer: ["runs", "calledOff"],
+    customerAnswer: ["offerTimes", "refunded"],
+  },
+  changeWhatsBooked: { price: ["priced", "noTime", "notOffered"], answer: ["changed", "unchanged"] },
+  customerRunsLate: { notice: ["asked"], answer: ["shorter", "offerTimes"] },
+  changePlan: {
+    ask: ["asked"],
+    answer: ["skipped", "paused", "ended"],
+    chargeNotice: ["notified", "ridesOnReminder"],
+    renewNotice: ["asked"],
+    renewAnswer: ["kept", "ending"],
+    priceNotice: ["asked"],
+    priceAnswer: ["newPriceAgreed", "ending"],
+  },
+  finalCount: { remind: ["reminded"], count: ["readBack", "toOwner"], yes: ["changed", "unchanged"] },
+  firstStepsDue: { remind: ["reminded"], check: ["stands", "offered"] },
+  relayQuestion: {
+    ask: [
+      "answered",
+      "relayed",
+      "waitsForMorning",
+      "proLine",
+      "cannotAdvise",
+      "urgentOnCall",
+      "toTeam",
+      "notPassedOn",
+    ],
+    staffAnswer: ["relayed", "staffCalls"],
+    worse: ["staffAsked"],
+    worseAnswer: ["kept", "offerSooner", "offerTimes", "staffCalls"],
+  },
+  moveUpdates: { ask: ["codeSent"], switch: ["switched"] },
+  passOnNote: { note: ["readBack", "backToOwner"], send: ["sent", "notSent"] },
+  someoneElseAsks: { asks: null, death: null },
+});
+
+/** contracts/db-schema/, whose parts hold the seeds a fixture's given.seeds name as "<part>/<file>". */
+const DB_SCHEMA = new URL("db-schema/", CONTRACTS);
+
+/**
+ * The rows of one table that a fixture's given.seeds hold, each seed's "after" files read first: a seed "<part>/<file>"
+ * is contracts/db-schema/<part>/fixtures/<file>, and its "after" entries are paths from its own folder, as the database
+ * parts' contract tests load them. Each file is read once.
+ */
+export function seededRows(seeds, table) {
+  const rows = [];
+  const read = new Set();
+  const load = (url) => {
+    if (read.has(url.href)) return;
+    read.add(url.href);
+    const seed = JSON.parse(readFileSync(url, "utf8"));
+    for (const after of seed.after ?? []) load(new URL(after, url));
+    for (const row of seed.rows ?? []) {
+      if (row.table === table) rows.push(row.values);
+    }
+  };
+  for (const seed of seeds) {
+    const at = seed.indexOf("/");
+    load(new URL(`${seed.slice(0, at)}/fixtures/${seed.slice(at + 1)}`, DB_SCHEMA));
+  }
+  return rows;
+}
+
+/**
+ * A someoneElseAsks request's named booking (stage.bookingId; README default 171) is the caller's business's: a K-04
+ * bookings row the fixture's seeds hold whose business_id is caller.businessId. Decide names it only from a choice the
+ * frontier built under that business, and the action layer reads it under row-level security, so a request naming
+ * another business's booking, or one the seeds do not hold, is no request K-09 v1.9 makes. A request naming none passes.
+ */
+function namedBookingProblems(exchange) {
+  const named = exchange.request?.stage?.bookingId;
+  if (named === undefined || named === null) return [];
+  const booking = seededRows(exchange.given?.seeds ?? [], "bookings").find((row) => row.id === named);
+  if (booking === undefined) return [`stage.bookingId ${named} is no booking the given seeds hold`];
+  const business = exchange.request.caller?.businessId;
+  return booking.business_id === business
+    ? []
+    : [
+        `stage.bookingId ${named} is a booking of ${booking.business_id}, not of the caller's business ${business}`,
+      ];
+}
+
+/**
+ * journeySevenGivesNone: an exchange that states a step of journey 7 or of the fee door (J7_STEP_CALLS) states no key,
+ * since journey 7 gives none (02-contracts K-09, "Keys written: none"; section 8), and its outcome wrote none; its call
+ * is one that serves that step (or gateAndCommit, in a turn); its request's stage names that step; a response answers
+ * the stage it was sent, with a result that stage gives (J7_STAGE_RESULTS); every change the customer asked for is bound
+ * to the consent the same commit wrote from their own yes (README default 147: the change's approvedBy names the
+ * answer's consentId); and, from round 2, a someoneElseAsks request names only a booking of the caller's business
+ * (README default 171; namedBookingProblems).
+ */
+export function journeySevenGivesNone(exchange) {
+  const stated = exchange.given?.stated;
+  if (stated === null || stated === undefined || stated.step === undefined) {
+    return ["given.stated names no step"];
+  }
+  const calls = J7_STEP_CALLS[stated.step];
+  if (calls === undefined) return [`${stated.step} is no step of journey 7 or of the fee door`];
+  const problems = [];
+  if (stated.gives.length > 0) {
+    problems.push(`${stated.step} gives no key (journey 7 gives none), not [${stated.gives.join(", ")}]`);
+  }
+  const written = keysWritten(exchange);
+  if (written.length > 0) problems.push(`the outcome wrote [${written.join(", ")}]; journey 7 gives none`);
+  if (exchange.call !== "gateAndCommit" && !calls.includes(exchange.call)) {
+    problems.push(`${stated.step} is served by ${calls.join(" or ")}, not ${exchange.call}`);
+  }
+  const stage = exchange.request?.stage;
+  if (stage?.step !== undefined && stage.step !== stated.step) {
+    problems.push(`the request's stage names ${stage.step}, not the stated ${stated.step}`);
+  }
+  const outcome = exchange.outcome ?? {};
+  const stageResults = J7_STAGE_RESULTS[exchange.call];
+  if (stageResults !== undefined && typeof outcome.stage === "string") {
+    if (outcome.stage !== stage?.kind) {
+      problems.push(
+        `the response answers stage ${outcome.stage}, but the request was sent as ${stage?.kind}`,
+      );
+    }
+    const allowed = stageResults[outcome.stage];
+    if (Array.isArray(allowed) && !allowed.includes(outcome.result)) {
+      problems.push(`stage ${outcome.stage} answers ${allowed.join(", ")}, not ${outcome.result}`);
+    }
+  }
+  for (const change of outcome.changes ?? []) {
+    if (change.askedBy === "customer" && change.approvedBy?.consentId !== outcome.consentId) {
+      problems.push(
+        `change ${change.changeId} the customer asked for names consent ${change.approvedBy?.consentId}, not the ${outcome.consentId} this commit wrote`,
+      );
+    }
+  }
+  if (exchange.call === "someoneElseAsks") problems.push(...namedBookingProblems(exchange));
+  return problems;
+}
+
 export const rules = Object.freeze({
   statedOutcome,
   givesStepKeys,
@@ -977,4 +1218,5 @@ export const rules = Object.freeze({
   termFactsFromCard,
   inputIsK03Fixture,
   unmappedEndAsked,
+  journeySevenGivesNone,
 });

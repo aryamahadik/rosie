@@ -1,0 +1,87 @@
+{
+  "call": "proCantCome",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json", "people-access/seed-staff-joined.json"],
+    "after": ["j7-pro-out-turn.json"],
+    "now": "2026-10-23T15:10:00Z",
+    "stated": { "step": "A7-17", "gives": [] },
+    "note": "A7-17's '1 The stand-in instead', then A7-18: Sam asked Avery in, Avery said yes first, and Alex was offered 'Avery can come in early to do your visit, same time and price. ... Reply 1 Avery instead, 2 Another time, 3 Call off, no fee.'. Alex replies '1' in his own chat. In his turn's commit: his yes written as a K-29 ticked_terms consent with the words shown (README default 147); the visit moved to Avery at the same time and price ('The same code'): Avery's time reserved and Riley's released, the visit's reservation updated; one booking_changes row stand_in, asked by Alex, approved by that consent; Alex's 'Done. Your Sat 11:00am visit is now with Avery. Give this code at the chair.' (quick_reply; the code only through the slot filler) and Avery's 'Confirmed: come in early Sat Oct 24 for Alex M. at 11:00am, moved from Riley.' (routine); a calendar_update effect. No key. The ids are examples."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-avery-instead-oct23",
+      "requestId": "turn-alex-avery-instead-oct23",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-avery-instead-oct23"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": {
+      "kind": "customerAnswer",
+      "step": "A7-17",
+      "answer": "standIn",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-alex-stand-in-oct23", "yesEventId": "evt-alex-0560" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "customerAnswer",
+    "step": "A7-18",
+    "result": "standIn",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A7-18",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-alex-with-avery-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      },
+      {
+        "to": "staff",
+        "personId": "person-avery",
+        "step": "A7-18",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-avery-alex-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [
+      {
+        "changeId": "chg-alex-haircut-stand-in-oct23",
+        "bookingId": "booking-alex-haircut",
+        "visitId": "visit-alex-haircut-1",
+        "kind": "stand_in",
+        "askedBy": "customer",
+        "afterFreeCancel": false,
+        "approvedBy": { "kind": "consentRow", "consentId": "consent-alex-avery-oct23" }
+      }
+    ],
+    "consentId": "consent-alex-avery-oct23",
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [{ "effectId": "eff-alex-haircut-calendar-avery", "kind": "calendar_update" }],
+    "moneyWords": [],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-alex-haircut-avery", "version": 1 },
+      { "table": "reservations", "rowId": "rsv-alex-haircut", "version": 3 },
+      { "table": "booking_visits", "rowId": "visit-alex-haircut-1", "version": 2 },
+      { "table": "bookings", "rowId": "booking-alex-haircut", "version": 6 },
+      { "table": "outbox_rows", "rowId": "out-alex-with-avery-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-avery-alex-oct23", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "call": "feeDoor",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": ["j7-late-cancel-confirm-turn.json"],
+    "now": "2026-10-24T12:30:00Z",
+    "stated": { "step": "S11-25", "gives": [] },
+    "note": "S11-25's '2 No fee or refund', then S11-27: Sam taps '2 No fee' on Needs you (K-21), with the words the page server showed. In the page's commit: the fee answered no_fee in K-08's ownerYes shape and dropped (K-32 booking_fees.dropped_at, set once); the card saved only for this booking, which nothing needs now, removed (S13-55); S11-27's line to Alex by a clock row due at once (the master's 'Lee's Barbershop won't charge a fee for the missed 1:00pm visit. {{pay.back}}', with this booking's cancelled Sat 11:00am visit), pay.back reading the card's removal; nothing was paid, so nothing is refunded. No key. The ids are examples."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-needs-you-sam-fee-0001",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam",
+      "traceId": "trace-needs-you-sam-0001"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": {
+      "kind": "ownerAnswer",
+      "step": "S11-25",
+      "bookingFeeId": "fee-alex-haircut-late-cancel",
+      "answer": "noFee",
+      "yes": {
+        "kind": "page",
+        "exactWords": "Alex M. cancelled the Sat 11:00am late. Charge or keep the late-cancel fee? / Alex agreed to it when booking / $20 from the card saved for it / No answer by 2:05pm Sat: no fee / 1 Charge or keep it, 2 No fee",
+        "yesEventId": "evt-page-sam-fee-0001"
+      },
+      "expectVersion": 1
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "ownerAnswer",
+    "step": "S11-27",
+    "result": "dropped",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "S11-27",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-fee-alex-no-fee",
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [],
+    "consentId": null,
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.back", "table": "saved_cards", "column": "removed_at", "rowId": "card-alex-haircut-fee" }
+    ],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "booking_fees", "rowId": "fee-alex-haircut-late-cancel", "version": 2 },
+      { "table": "open_questions", "rowId": "oq-sam-fee-alex-oct23", "version": 2 },
+      { "table": "saved_cards", "rowId": "card-alex-haircut-fee", "version": 2 },
+      { "table": "clock_rows", "rowId": "clock-fee-alex-no-fee", "version": 1 }
+    ],
+    "repeated": false
+  }
+}
