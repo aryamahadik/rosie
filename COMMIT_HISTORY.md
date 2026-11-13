@@ -2,9 +2,55 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 557, [`25912cb`](https://github.com/aryamahadik/rosie/commit/25912cb), 2026-11-13 13:43:10 UTC.
+- **Through:** commit 559, [`c290f4f`](https://github.com/aryamahadik/rosie/commit/c290f4f), 2026-11-13 15:40:17 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 559. docs: COMMIT\_HISTORY.md through commit 557 (25912cb, \#565) (\#567)
+
+- **Commit:** [`c290f4f`](https://github.com/aryamahadik/rosie/commit/c290f4f), by Arya Mahadik, 2026-11-13 15:40:17 UTC
+- **Pull request:** [#567](https://github.com/aryamahadik/rosie/pull/567) from `task/commit-history-85`, merged 2026-11-13 15:40:17 UTC. It squashed 1 branch commit:
+  - `6979edb` docs: COMMIT\_HISTORY.md through commit 557 (25912cb, \#565)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 558. T-1359: no listed 555 number in a real area code; the 555 and wrong-length kinds tightened; FICTIONAL\_PHONE refuses toll-free codes (\#566)
+
+- **Commit:** [`e3dcc16`](https://github.com/aryamahadik/rosie/commit/e3dcc16), by Arya Mahadik, 2026-11-13 15:40:13 UTC
+- **Pull request:** [#566](https://github.com/aryamahadik/rosie/pull/566) from `task/T-1359`, merged 2026-11-13 15:40:13 UTC. It squashed 2 branch commits:
+  - `72183bd` T-1359: the five listed 555 lines in real area codes move to area cod…
+  - `7758594` T-1359: the wrong-length shapes' comment says exactly which first dig…
+- **Files changed:** 7 (+181 −61), by folder:
+  - `adapters/src/linq/double-webhooks/` webhooks.test.ts +2 −2
+  - `adapters/src/shared/` samples.test.ts +5 −5
+  - `infra/ci/` README.md +2 −2, phone-scan-exceptions.mjs +16 −13, phone-scan.mjs +20 −8, phone-scan.test.mjs +134 −29
+  - `tests/contract/` data-access.v1.test.ts +2 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1359: the five listed 555 lines in real area codes move to area code 555 with the expectations built from them; the exceptions' 555 exchange kind takes area code 555 only, wrong length takes only a fiction-block prefix that no real number begins with, and FICTIONAL_PHONE refuses a 555-01xx line in a toll-free area code; the README's phone scan paragraphs and the exceptions header say so
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1359: the wrong-length shapes' comment says exactly which first digits they take (a fiction number, or one under area code 555, begins with them)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 557. docs: COMMIT\_HISTORY.md through commit 555 (4d46a6c, \#563) (\#565)
 
