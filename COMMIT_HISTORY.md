@@ -2,9 +2,76 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 500, [`0858e4b`](https://github.com/aryamahadik/rosie/commit/0858e4b), 2026-11-13 02:02:42 UTC.
+- **Through:** commit 503, [`ff4e7e2`](https://github.com/aryamahadik/rosie/commit/ff4e7e2), 2026-11-13 03:43:38 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 503. docs: COMMIT\_HISTORY.md through commit 500 (0858e4b, \#508) (\#511)
+
+- **Commit:** [`ff4e7e2`](https://github.com/aryamahadik/rosie/commit/ff4e7e2), by Arya Mahadik, 2026-11-13 03:43:38 UTC
+- **Pull request:** [#511](https://github.com/aryamahadik/rosie/pull/511) from `task/commit-history-62`, merged 2026-11-13 03:43:38 UTC. It squashed 1 branch commit:
+  - `ad43c90` docs: COMMIT\_HISTORY.md through commit 500 (0858e4b, \#508)
+- **Files changed:** 1 (+60 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +60 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 502. T-1329: typecheck refuses, in db/'s non-test files, syntax Node's type stripping cannot run (db/tsconfig.erasable.json) (\#509)
+
+- **Commit:** [`7e46278`](https://github.com/aryamahadik/rosie/commit/7e46278), by Arya Mahadik, 2026-11-13 03:43:34 UTC
+- **Pull request:** [#509](https://github.com/aryamahadik/rosie/pull/509) from `task/T-1329`, merged 2026-11-13 03:43:34 UTC. It squashed 5 branch commits:
+  - `40aad65` T-1329: db/tsconfig.json checks db/ again with erasableSyntaxOnly, ru…
+  - `ada97b6` Merge branch 'main' into task/T-1329
+  - `1f66186` T-1329: db/tsconfig.json leaves out db/'s \*.test.ts files, which Vite…
+  - `2eeef6b` Merge branch 'main' into task/T-1329
+  - `03e5edd` T-1329: the erasable-syntax program moves to db/tsconfig.erasable.jso…
+- **Files changed:** 5 (+180 −7), by folder:
+  - `db/repo/` chat-open.ts +10 −5
+  - `db/` tsconfig.erasable.json +19 −0
+  - `infra/ci/` db-erasable-syntax.test.mjs +147 −0
+  - `/` package.json +1 −1, tsconfig.json +3 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1329: db/tsconfig.json checks db/ again with erasableSyntaxOnly, run by npm run typecheck; planted-line test in infra/ci (typecheck waits for the db/ cleanup: chat-open.ts and the RolledBack class of 19 integration tests)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1329: db/tsconfig.json leaves out db/'s *.test.ts files, which Vitest runs (DL-625); OpenChatOnTextDatabaseError takes plain fields set in its constructor (same fields, order, message and name); the planted-line test adds a db/ test file holding the syntax, not refused. Typecheck passes, both programs; lint runs out of heap with this layout (see the round 2 report)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1329: the erasable-syntax program moves to db/tsconfig.erasable.json, a name no tool takes up by itself (DL-631). typecheck runs tsc on the root, then on that file; db/tsconfig.json leaves the branch, so ESLint, Vitest and wrangler see main's layout and lint passes. The planted-line test names the new file and pins that db/tsconfig.json is gone; the comments in tsconfig.json and chat-open.ts name the new file. OpenChatOnTextDatabaseError keeps round 2's plain fields
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 501. T-1317: no tracked file holds a real phone number: the scan reads every tracked file, each deliberate out-of-range test input named, public service lines allowed only at their own files, Ofcom's current UK drama blocks read as fiction (rounds 1 to 3, published as one commit of 0efeb1d's six files; DL-632) (\#510)
+
+- **Commit:** [`cec6186`](https://github.com/aryamahadik/rosie/commit/cec6186), by Arya Mahadik, 2026-11-13 03:43:30 UTC
+- **Pull request:** [#510](https://github.com/aryamahadik/rosie/pull/510) from `task/T-1317-squash`, merged 2026-11-13 03:43:31 UTC. It squashed 1 branch commit:
+  - `9d1aa93` T-1317: no tracked file holds a real phone number: the scan reads eve…
+- **Files changed:** 6 (+851 −44), by folder:
+  - `infra/ci/` README.md +7 −1, phone-scan-exceptions.mjs +352 −0, phone-scan.mjs +177 −0, phone-scan.test.mjs +307 −0, rosfield-test-route.test.mjs +5 −15, wrangler-env.test.mjs +3 −28
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 500. docs: docs/professions.md lists all 243 professions with each one's id and style (\#508)
 
