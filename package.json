@@ -41,6 +41,7 @@
     "pretest:e2e": "npm run build:validators",
     "test:e2e": "vitest run --project e2e --project e2e-workers",
     "test:scripts": "node --test \"infra/scripts/*.test.mjs\"",
+    "pretest:ci-scripts": "npm run build:validators",
     "test:ci-scripts": "node --test \"infra/ci/*.test.mjs\"",
     "pretest:count": "npm run build:validators",
     "test:count": "node infra/scripts/test-count.mjs",

@@ -352,9 +352,12 @@ function filesHolding(dir, values, except) {
 const made = (names) => names.map((name) => `${name} made and set\n`).join("");
 const ALL_MADE = made(NAMES);
 const ALREADY = (name) => `${name} already set\n`;
-const LEFT = (name) => `${name} has a value in .dev.vars: use secrets:staging\n`;
+// A name with a value in .dev.vars (T-1310): that value is never used, since secrets:staging never puts a name made here
+// (T-1261; DL-549), so the run says so, says the name is made in place, and asks for the line to go, never showing it.
+const LEFT = (name) =>
+  `${name} has a value in .dev.vars, which is not used: the name is made in place, so remove its line from .dev.vars\n`;
 const leftNote = (left, of) =>
-  `make-staging-secrets.sh: a value in .dev.vars for ${String(left)} of the ${String(of)} names, each printed with use secrets:staging: nothing was made for such a name, and staging does not hold it yet. npm run secrets:staging puts the value .dev.vars has.\n`;
+  `make-staging-secrets.sh: a value in .dev.vars for ${String(left)} of the ${String(of)} names, each printed with remove its line from .dev.vars: no such value is ever used (secrets:staging never puts a name made in place), so nothing was made for such a name, and staging does not hold it yet. Remove each such line from .dev.vars, then run this again: the name is then made in place.\n`;
 
 /** Fails unless a run made and put every name, each in its form, on standard input alone. Returns the values. */
 function assertAllMade(rig, result, what) {
@@ -588,7 +591,8 @@ describe("make-staging-secrets.sh leaves a name alone", () => {
       assertNoValueShown(again, [value], `${what}, again`);
       assertNothingHandedOn(rig, `${what}, both runs`);
     }
-    // A value for the new name in .dev.vars leaves it to secrets:staging; the two held names are still left alone.
+    // A value for the new name in .dev.vars is not used, and the name is not made while its line is there; the two held
+    // names are still left alone.
     const rig = checkout(t, {
       devVars: devVars({ PROOF_CODE_HASH_KEY: DEV_VALUES.PROOF_CODE_HASH_KEY }),
       staging: HELD_NOW,
@@ -624,7 +628,7 @@ describe("make-staging-secrets.sh leaves a name alone", () => {
     assertNothingHandedOn(rig, "both runs");
   });
 
-  it("a name with a value in .dev.vars is left to secrets:staging: nothing is made for it, and that value goes nowhere (exit 3)", (t) => {
+  it("a name with a value in .dev.vars is not made, and the run says that value is not used: nothing is made for it, and that value goes nowhere (exit 3)", (t) => {
     // [the names .dev.vars has a value for, the names given as arguments]
     for (const [inFile, args] of [
       [["SEALING_WRAP_KEY"], []],
@@ -668,6 +672,38 @@ describe("make-staging-secrets.sh leaves a name alone", () => {
       assertNoValueShown(result, puts, what);
       assertNothingHandedOn(rig, what);
       assert.deepEqual(rig.held(), [MODEL_KEY, ...toMake], `${what}: staging holds only what was made`);
+    }
+  });
+
+  it("a value in .dev.vars for a made name never sends the user to secrets:staging: its line says the value is not used, the name is made in place and the line should go, showing no value; once the line goes, the next run makes the name (T-1310)", (t) => {
+    for (const name of NAMES) {
+      const rig = checkout(t, { devVars: devVars({ [name]: DEV_VALUES[name] }) });
+      const result = rig.run([name]);
+      assert.equal(result.status, 3, `${name}: ${result.output}`);
+      assert.equal(result.stdout, LEFT(name), name);
+      assert.equal(result.stderr, leftNote(1, 1), name);
+      // secrets:staging never puts a name made here (T-1261; DL-549), so neither stream sends the user there.
+      assert.doesNotMatch(result.output, /use secrets:staging|secrets:staging puts/, name);
+      assertNoValueShown(result, [], name);
+      assert.deepEqual(
+        rig.calls().map((call) => call.args),
+        [listArgs(rig)],
+        `${name}: wrangler must not be given a put`,
+      );
+      assert.equal(rig.generated(), 0, `${name}: a value was made`);
+      // The line removed, as the run asks: the next run makes the name in place, never from the removed value.
+      write(rig.devVarsFile, devVars());
+      const again = rig.run([name]);
+      assert.equal(again.status, 0, `${name}, again: ${again.output}`);
+      assert.equal(again.stdout, made([name]), `${name}, again`);
+      assert.equal(again.stderr, "", `${name}, again`);
+      const puts = rig.puts().map((call) => call.stdin);
+      assert.equal(puts.length, 1, `${name}, again: puts`);
+      assertForm(name, puts[0]);
+      assert.equal(GIVEN_VALUES.includes(puts[0]), false, `${name}: a value of .dev.vars was put`);
+      assertNoValueShown(again, puts, `${name}, again`);
+      assertNothingHandedOn(rig, `${name}, both runs`);
+      assert.deepEqual(rig.held(), [MODEL_KEY, name], name);
     }
   });
 
@@ -1352,7 +1388,8 @@ describe("make-staging-secrets.sh's names are staging's own, and the ones the ru
         ]),
       ].sort(),
     );
-    // "use secrets:staging" holds for each: put-staging-secrets.sh puts the name when .dev.vars has a value for it.
+    // Each is on put-staging-secrets.sh's list too, which prints it as made in place, never put, and never takes its
+    // value from .dev.vars (T-1261; DL-549): so a value there is not used, as this script says (T-1310).
     const block = /^SECRETS=\(\n([\s\S]*?)\n\)$/m.exec(
       readFileSync(path.join(SCRIPTS, "put-staging-secrets.sh"), "utf8"),
     );

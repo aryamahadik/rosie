@@ -8,7 +8,16 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash, randomBytes } from "node:crypto";
-import { chmodSync, lstatSync, mkdirSync, readdirSync, readFileSync, statSync, symlinkSync } from "node:fs";
+import {
+  chmodSync,
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  symlinkSync,
+} from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
 
@@ -413,5 +422,127 @@ describe("make-check-tester-token.mjs follows a link and starts no command", () 
   it("npm run check-tester:token:make runs the script", () => {
     const scripts = JSON.parse(readFileSync(path.join(REPO, "package.json"), "utf8")).scripts;
     assert.equal(scripts["check-tester:token:make"], `node infra/scripts/${SCRIPT}`);
+  });
+});
+
+// T-1310 (DL-586; T-1303's security review, note b): a run killed between its write and its rename leaves its temporary
+// file, which holds the new token. The next run removes such files, matched by the script's own name pattern alone,
+// before it writes. Each leftover here is planted as such a run leaves it: .dev.vars' whole text with a made-up token,
+// under the name writeWhole gives its file.
+describe("make-check-tester-token.mjs removes the temporary files an earlier run left (T-1310)", () => {
+  const NOTE = (n) =>
+    `${SCRIPT}: removed ${String(n)} leftover temporary file${n === 1 ? "" : "s"} beside .dev.vars (a run stopped between its write and its rename leaves one); what ${n === 1 ? "it" : "they"} held is not shown\n`;
+  /** A leftover's name beside the file called `name`: <name>.<12 lower-case hex>.tmp. */
+  const leftoverName = (name) => `${name}.${randomBytes(6).toString("hex")}.tmp`;
+  // Names that only look like a leftover's, each kept as it is: no signs, 11 and 13 signs, capitals, a sign that is not
+  // hex, other endings, and other files' names.
+  const LOOK_ALIKES = [
+    ".dev.vars.tmp",
+    `.dev.vars.${"a1".repeat(5)}a.tmp`,
+    `.dev.vars.${"a1".repeat(6)}a.tmp`,
+    `.dev.vars.${"A1".repeat(6)}.tmp`,
+    `.dev.vars.${"g1".repeat(6)}.tmp`,
+    `.dev.vars.${"a1".repeat(6)}.tmp.bak`,
+    `.dev.vars.${"a1".repeat(6)}.temp`,
+    `.dev.vars.local.${"a1".repeat(6)}.tmp`,
+    `x.dev.vars.${"a1".repeat(6)}.tmp`,
+  ];
+  const KEPT = "t1310 not a leftover\n";
+
+  it("a leftover holding a token is removed on the next run, before it writes; every look-alike, and a folder or a link under a leftover's name, stays; no token is shown", (t) => {
+    const old = madeUpToken();
+    const rig = checkout(t, { devVars: OTHER_TEXT });
+    const leftover = path.join(rig.root, leftoverName(".dev.vars"));
+    write(leftover, `${OTHER_TEXT}${NAME}=${old}\n`, 0o600);
+    for (const name of LOOK_ALIKES) write(path.join(rig.root, name), KEPT);
+    // Not files the script writes, so never removed: a folder, and a link to a file outside.
+    const folder = path.join(rig.root, leftoverName(".dev.vars"));
+    mkdirSync(folder);
+    const outside = path.join(rig.dir, "outside.txt");
+    write(outside, KEPT);
+    const link = path.join(rig.root, leftoverName(".dev.vars"));
+    symlinkSync(outside, link);
+    const before = rootNames(rig);
+    const result = rig.run();
+    assert.equal(result.status, 0, `exit ${String(result.status)}`);
+    assert.equal(result.stdout, MADE);
+    assert.equal(result.stderr, NOTE(1));
+    assert.equal(existsSync(leftover), false, "the leftover is still there");
+    assert.deepEqual(
+      rootNames(rig),
+      before.filter((name) => name !== path.basename(leftover)),
+    );
+    for (const name of LOOK_ALIKES) assert.equal(readFileSync(path.join(rig.root, name), "utf8"), KEPT, name);
+    assert.ok(statSync(folder).isDirectory(), "the folder was removed");
+    assert.ok(lstatSync(link).isSymbolicLink(), "the link was removed");
+    assert.equal(readFileSync(outside, "utf8"), KEPT, "the file the link names changed");
+    const token = tokenIn(rig.read());
+    assertMadeForm(token, "the token");
+    assert.notEqual(token, old, "the leftover's token was kept");
+    assertNoValueShown(result, [token, old], "a leftover");
+    assert.deepEqual(filesHolding(rig.dir, old, []), [], "a file still holds the leftover's token");
+  });
+
+  it("with the token already set the run writes nothing, and still removes the leftovers: two beside the file a link names, one beside the link", (t) => {
+    const token = madeUpToken();
+    const rig = checkout(t);
+    const real = path.join(rig.dir, "keys", "staging.vars");
+    const text = `${OTHER_TEXT}${NAME}=${token}\n`;
+    write(real, text, 0o600);
+    symlinkSync(real, rig.file);
+    const olds = [madeUpToken(), madeUpToken(), madeUpToken()];
+    const leftovers = [
+      path.join(path.dirname(real), leftoverName("staging.vars")),
+      path.join(path.dirname(real), leftoverName("staging.vars")),
+      // Left while .dev.vars was a file of its own, before it became a link.
+      path.join(rig.root, leftoverName(".dev.vars")),
+    ];
+    for (const [index, file] of leftovers.entries())
+      write(file, `${OTHER_TEXT}${NAME}=${olds[index]}\n`, 0o600);
+    const written = statSync(real);
+    const result = rig.run();
+    assert.equal(result.status, 0, `exit ${String(result.status)}`);
+    assert.equal(result.stdout, ALREADY);
+    assert.equal(result.stderr, NOTE(3));
+    for (const file of leftovers) assert.equal(existsSync(file), false, "a leftover is still there");
+    assert.deepEqual(readdirSync(path.dirname(real)), ["staging.vars"]);
+    assert.deepEqual(rootNames(rig), [".dev.vars", "infra"]);
+    assert.equal(readFileSync(real, "utf8"), text);
+    assert.equal(statSync(real).mtimeMs, written.mtimeMs, "the file was written");
+    assertNoValueShown(result, [token, ...olds], "the token already set");
+  });
+
+  it("a leftover it cannot remove, or a folder it cannot read, stops the run before anything is written (exit 1), never showing what the leftover holds", (t) => {
+    const old = madeUpToken();
+    const rig = checkout(t, { devVars: OTHER_TEXT });
+    const name = leftoverName(".dev.vars");
+    write(path.join(rig.root, name), `${OTHER_TEXT}${NAME}=${old}\n`, 0o600);
+    // [the root folder's mode, the reason]: one it cannot write in, then one it can search but not read.
+    for (const [mode, reason] of [
+      [
+        0o555,
+        `${SCRIPT}: refused: a temporary file an earlier run left beside .dev.vars, ${name}, which may hold a token, cannot be removed (EACCES); remove it (its contents are never shown), then run this again; nothing was made or written\n`,
+      ],
+      [
+        0o311,
+        `${SCRIPT}: refused: the folder of .dev.vars cannot be read (EACCES), so a temporary file an earlier run left there, which may hold a token, cannot be removed; nothing was made or written\n`,
+      ],
+    ]) {
+      chmodSync(rig.root, mode);
+      try {
+        for (const args of [[], ["--rotate"]]) {
+          const what = `mode ${mode.toString(8)}, ${JSON.stringify(args)}`;
+          const result = rig.run(args);
+          assert.equal(result.status, 1, `${what}: exit ${String(result.status)}`);
+          assert.equal(result.stdout, "", what);
+          assert.equal(result.stderr, reason, what);
+          assertNoValueShown(result, [old], what);
+        }
+      } finally {
+        chmodSync(rig.root, 0o755);
+      }
+    }
+    assert.equal(rig.read(), OTHER_TEXT);
+    assert.deepEqual(rootNames(rig), [".dev.vars", name, "infra"]);
   });
 });

@@ -15,7 +15,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash, randomBytes } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { registerHooks } from "node:module";
 import path from "node:path";
 import { after, before, describe, it } from "node:test";
@@ -88,9 +88,9 @@ const PRODUCTION_URL =
 const OTHER_LOCAL_URL = "postgres://rosie:rosie@127.0.0.1:54329/t571_not_staging";
 
 // The names seed-staging.sh, and lib.sh's load_dev_var that reads .dev.vars for it, keep variables of their own under:
-// token and hash hold the token and its sha256, line and value a line of .dev.vars, ends the session's end; the others
-// hold names, counts, the sets and the script's fixed texts (the ones in capitals). The last describe below reads them
-// from the two files.
+// token and hash hold the token and its sha256, line and value a line of .dev.vars, ends the session's end, db_url the
+// staging database's URL and caller_url the caller's DATABASE_URL (T-1310); the others hold names, counts, the sets and
+// the script's fixed texts (the ones in capitals). The last describe below reads them from the two files.
 const OWN_NAMES = [
   "BASE64URL_SIGNS",
   "CHECK_TESTER_SET",
@@ -102,6 +102,8 @@ const OWN_NAMES = [
   "SET_NAME",
   "SHA256_OF_INPUT",
   "USAGE",
+  "caller_url",
+  "db_url",
   "ends",
   "file",
   "hash",
@@ -1001,6 +1003,212 @@ describe("seed-staging.sh with the token npm run check-tester:token:make makes",
   });
 });
 
+// T-1310 (DL-586; T-1303's security review, note c): no command seed-staging.sh starts gets a database URL it does not
+// use. A recorder stands in front of every command it starts by name (node, dirname, date and basename) and of bash,
+// which the test starts; PATH holds nothing else, so none starts unseen. Each keeps a copy of its environment and its
+// arguments, and then runs the real command (node with the stand-in above loaded first). Every run of the seed runner
+// gets the URL by name, as DATABASE_URL and as STAGING_DATABASE_URL (how T-201's runner knows staging); the read of the
+// session's end gets it as DATABASE_URL alone, since it reads the database too; no other command gets any, the token's
+// hasher among them.
+describe("seed-staging.sh hands the staging database's URL to the commands that use the database alone (T-1310)", () => {
+  const cleanups = [];
+  const t = { after: (fn) => cleanups.push(fn) };
+  let db;
+  const token = madeUpToken();
+  // Made up: a .invalid host never resolves (RFC 6761), and no such login, password or database exists.
+  const OTHER_URL =
+    "postgres://t1310_seed_other:t1310-made-up-password@db-t1310-seed.example.invalid:5432/t1310_other";
+  const CALLER_TEXT = "t1310 made-up caller text";
+  // Every command seed-staging.sh and lib.sh start by name, and bash, which the test starts the script with.
+  const COMMANDS = ["basename", "bash", "date", "dirname"];
+
+  before(async () => {
+    db = await createThrowawayDatabase("staging_urls");
+  });
+
+  after(async () => {
+    for (const cleanup of cleanups.reverse()) cleanup();
+    await db?.drop();
+  });
+
+  const shellQuoted = (text) => `'${text.replaceAll("'", `'\\''`)}'`;
+
+  /** The real program of that name: the first on this shell's PATH. */
+  function program(command) {
+    const file = (process.env.PATH ?? "")
+      .split(path.delimiter)
+      .map((folder) => path.join(folder, command))
+      .find((candidate) => existsSync(candidate) && statSync(candidate).isFile());
+    assert.ok(file, `${command} is not on PATH`);
+    return file;
+  }
+
+  /** A recorder: keeps its environment and its arguments in spy/<name>.<pid>.*, then becomes `command`. */
+  function recorder(spy, name, command) {
+    const record = `${shellQuoted(path.join(spy, name))}.$$`;
+    return [
+      "#!/bin/sh",
+      `/usr/bin/env >>${record}.env`,
+      `printf '%s\\n' \${1+"$@"} >>${record}.argv`,
+      `exec ${command.map(shellQuoted).join(" ")} \${1+"$@"}`,
+      "",
+    ].join("\n");
+  }
+
+  /** A seed root whose PATH, for seed(), holds the recorders alone; children() reads what they kept. */
+  function spiedRoot(options) {
+    const rig = seedRoot(t, options);
+    const spy = path.join(rig.dir, "spy");
+    const bin = path.join(rig.dir, "spy-bin");
+    mkdirSync(spy);
+    const stand = [process.execPath, "--require", path.join(rig.dir, "fake", "node.cjs")];
+    write(path.join(bin, "node"), recorder(spy, "node", stand), 0o755);
+    for (const command of COMMANDS)
+      write(path.join(bin, command), recorder(spy, command, [program(command)]), 0o755);
+    return {
+      seed: (args, extra = {}, watch = {}) => {
+        rmSync(spy, { recursive: true, force: true });
+        mkdirSync(spy);
+        return rig.seed(args, { ...extra, PATH: bin }, watch);
+      },
+      children: () =>
+        readdirSync(spy)
+          .filter((file) => file.endsWith(".env"))
+          .map((file) => {
+            const record = file.slice(0, -".env".length);
+            return {
+              name: record.split(".")[0],
+              argv: readFileSync(path.join(spy, `${record}.argv`), "utf8"),
+              env: readFileSync(path.join(spy, file), "utf8"),
+            };
+          }),
+    };
+  }
+
+  /** What a recorded command is: the script itself, a run of the seed runner, the session's end, the hasher or other. */
+  function kindOf(child) {
+    if (child.name === "bash" && child.argv.split("\n")[0].endsWith("/infra/scripts/seed-staging.sh"))
+      return "script";
+    if (child.name !== "node") return child.name;
+    if (child.argv.includes("/db/seeds/run.mjs")) return "runner";
+    if (child.argv.includes("--input-type=module")) return "session end";
+    if (child.argv.includes("createHash")) return "hasher";
+    return "node";
+  }
+
+  /** The names of an environment's variables whose value holds one of the texts. */
+  function holders(env, texts) {
+    const names = new Set();
+    let name = "(no variable)";
+    for (const line of env.split("\n")) {
+      name = /^([A-Za-z_][A-Za-z0-9_]*)=/.exec(line)?.[1] ?? name;
+      if (texts.some((text) => line.includes(text))) names.add(name);
+    }
+    return [...names].sort();
+  }
+
+  /**
+   * Fails unless the URL reached the runs of the seed runner (as DATABASE_URL and STAGING_DATABASE_URL) and the read of
+   * the session's end (as DATABASE_URL) alone, and no command at all holds one of `others` or has a variable of either
+   * name otherwise. The script itself is left out: its environment is what the test gave it. Returns the kinds seen.
+   */
+  function assertUrlWhereUsed(rig, url, what, others = []) {
+    const watched = [url, new URL(url).pathname.slice(1)];
+    const kinds = [];
+    for (const child of rig.children()) {
+      const kind = kindOf(child);
+      kinds.push(kind);
+      if (kind === "script") continue;
+      const which = `${what}, ${kind}`;
+      const lines = child.env.split("\n");
+      const named = ["DATABASE_URL", "STAGING_DATABASE_URL"].filter((name) =>
+        lines.some((line) => line.startsWith(`${name}=`)),
+      );
+      assert.deepEqual(holders(child.env, others), [], `${which}: a variable holds a text it must not`);
+      if (kind === "runner" || kind === "session end") {
+        const given = kind === "runner" ? ["DATABASE_URL", "STAGING_DATABASE_URL"] : ["DATABASE_URL"];
+        assert.deepEqual(holders(child.env, watched), given, `${which}: where the URL is`);
+        for (const name of given)
+          assert.ok(lines.includes(`${name}=${url}`), `${which}: ${name} is not the URL`);
+        assert.deepEqual(named, given, `${which}: the database URLs' names`);
+      } else {
+        assert.deepEqual(holders(child.env, watched), [], `${which}: a variable holds the URL`);
+        assert.deepEqual(named, [], `${which}: a database URL's name is in its environment`);
+      }
+    }
+    assert.deepEqual(
+      kinds.filter((kind) => kind === "script"),
+      ["script"],
+      `${what}: the script's own bash, once`,
+    );
+    return kinds;
+  }
+
+  const count = (kinds, kind) => kinds.filter((each) => each === kind).length;
+
+  it("from the caller's environment, with DATABASE_URL the same URL: the hasher, dirname and date get none, each run of the seed runner and the session's end get it by name", () => {
+    const rig = spiedRoot();
+    const result = rig.seed(["--set", "core", "--set", "check-tester"], {
+      STAGING_DATABASE_URL: db.url,
+      DATABASE_URL: db.url,
+      [TOKEN_NAME]: token,
+    });
+    assert.equal(result.status, 0, result.output);
+    assert.deepEqual(kindsOf(result), ["hasher", "runner core", "runner check-tester", "session end"]);
+    const kinds = assertUrlWhereUsed(rig, db.url, "from the environment");
+    assert.equal(count(kinds, "hasher"), 1, "the hasher was recorded");
+    assert.equal(count(kinds, "runner"), 2, "both runs of the seed runner were recorded");
+    assert.equal(count(kinds, "session end"), 1, "the session's end was recorded");
+    assert.ok(count(kinds, "dirname") >= 1 && count(kinds, "date") >= 1, "dirname and date were recorded");
+    assertNothingShown(result, db.url, [], "from the environment");
+    assertNoTokenShown(result, [token], "from the environment");
+  });
+
+  it("from the checkout's .dev.vars: the same", () => {
+    const rig = spiedRoot({ devVars: `STAGING_DATABASE_URL=${db.url}\n  export ${TOKEN_NAME}='${token}'\n` });
+    const result = rig.seed(["--set", "check-tester"], {}, { tokens: [token] });
+    assert.equal(result.status, 0, result.output);
+    assert.deepEqual(kindsOf(result), ["hasher", "runner check-tester", "session end"]);
+    const kinds = assertUrlWhereUsed(rig, db.url, "from .dev.vars");
+    assert.equal(count(kinds, "hasher"), 1, "the hasher was recorded");
+    assertNothingShown(result, db.url, [], "from .dev.vars");
+    assertNoTokenShown(result, [token], "from .dev.vars");
+  });
+
+  it("allexport from the caller, and the caller's variables of the script's own URL names: no command gets the URL or that text but the ones above", () => {
+    const rig = spiedRoot();
+    const result = rig.seed(["--set", "check-tester"], {
+      STAGING_DATABASE_URL: db.url,
+      [TOKEN_NAME]: token,
+      SHELLOPTS: "allexport",
+      db_url: CALLER_TEXT,
+      caller_url: CALLER_TEXT,
+    });
+    assert.equal(result.status, 0, result.output);
+    assert.deepEqual(kindsOf(result), ["hasher", "runner check-tester", "session end"]);
+    assertUrlWhereUsed(rig, db.url, "allexport", [CALLER_TEXT]);
+    assertNoTokenShown(result, [token], "allexport");
+  });
+
+  it("a DATABASE_URL that names another database is refused (exit 1) with neither URL in any command's environment", () => {
+    const rig = spiedRoot();
+    const result = rig.seed(["--set", "check-tester"], {
+      STAGING_DATABASE_URL: db.url,
+      DATABASE_URL: OTHER_URL,
+      [TOKEN_NAME]: token,
+    });
+    assert.equal(result.status, 1, result.output);
+    assert.match(
+      result.stderr,
+      /refused: DATABASE_URL is set and names a database other than STAGING_DATABASE_URL's/,
+    );
+    assert.deepEqual(result.calls, [], "node was started");
+    const kinds = assertUrlWhereUsed(rig, db.url, "another database", [OTHER_URL, "t1310_other"]);
+    assert.equal(count(kinds, "basename"), 1, "the refusal's basename was recorded");
+    assertNothingShown(result, OTHER_URL, [], "another database");
+  });
+});
+
 describe("seed-staging.sh keeps the token and its hash in variables of its own", () => {
   // The names given to one command alone, on its command line: the seed runner's and the session end's environment.
   const ONE_COMMAND = ["DATABASE_URL", HASH_NAME];
@@ -1043,7 +1251,8 @@ describe("seed-staging.sh keeps the token and its hash in variables of its own",
       ["set +x", "set +a", "set +k", "set -euo pipefail"],
       "the first commands",
     );
-    // After the four set lines: the unset lines, the token taken from the environment, its names dropped, then lib.sh.
+    // After the four set lines: the unset lines, the token taken from the environment, its names dropped, the database
+    // URLs taken from the environment and their names dropped (T-1310), then lib.sh.
     const unsets = [];
     let at = 4;
     for (; /^unset -v [A-Za-z_][A-Za-z0-9_ ]*$/.test(lines[at]); at += 1) {
@@ -1056,10 +1265,13 @@ describe("seed-staging.sh keeps the token and its hash in variables of its own",
     );
     assert.equal(new Set(unsets).size, unsets.length, "a name is on the unset lines twice");
     assert.deepEqual(
-      lines.slice(at, at + 3),
+      lines.slice(at, at + 6),
       [
         'token="${STAGING_CHECK_TESTER_TOKEN:-}"',
         `unset -v ${TOKEN_NAME} ${HASH_NAME}`,
+        'db_url="${STAGING_DATABASE_URL:-}"',
+        'caller_url="${DATABASE_URL:-}"',
+        "unset -v STAGING_DATABASE_URL DATABASE_URL",
         'source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"',
       ],
       "what follows the unset lines",
