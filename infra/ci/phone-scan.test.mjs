@@ -68,9 +68,10 @@ const PAST_BLOCK = "0200";
 const ten = (line) => `${FIVES}${FIVES}${line}`;
 
 /**
- * The first digits after +1 that only a fiction-block number begins with (T-1359): area code 555 and exchange 555,
- * then the line's 01 and one more digit, or fewer; or an area code, exchange 555 and the line's 01, with one more
- * digit or none, which is a fiction-block prefix only where FICTIONAL_PHONE takes that area code.
+ * "wrong length"'s two shapes after +1 (T-1359): the first digits of a fiction-block number that only a fiction
+ * number, or one under area code 555 (no area), begins with. Area code 555 and exchange 555, alone or with the line's
+ * 01 and one more digit or none; or another area code, exchange 555 and the line's 01, with one more digit or none,
+ * a fiction-block prefix only where FICTIONAL_PHONE takes that area code.
  */
 const PREFIX_UNDER_555 = /^555555(?:01[0-9]?)?$/;
 const PREFIX_WITH_01 = /^[0-9]{3}55501[0-9]?$/;
