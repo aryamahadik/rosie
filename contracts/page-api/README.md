@@ -622,7 +622,7 @@ Beside v1's, v1.1's and v1.2's lists, and under the same rule (BP rule 7; RULES 
 - a pay link's code (`payCode`, in no answer: only the browser sends it; K-32 keeps only its sha256);
 - a client secret (only in `moneyCard`'s form answer, only while Stripe's form has something to do) and the business's Stripe account id (only beside a client secret, for Stripe's form: open gap 56);
 - the card's brand and last four (only in `moneyStep`'s `card` and `moneyCard`'s answers), and never a card number, an expiry, a CVC or a bank's decline code anywhere (no field takes or gives one);
-- co-signers' names and a typed signature name, before and after the swap (in no answer; a typed name is sealed under the signer's key), and each co-signer's link (only in `moneyConfirm`'s sendDocument answer, once);
+- co-signers' names, before and after the swap (only in the sendDocument read-back's words, shown back on the same page, as v1.2's names are), a typed signature name (in no answer: sealed under the signer's key), and each co-signer's link (only in `moneyConfirm`'s sendDocument answer, once);
 - K-04's booking id, a line, pack, membership, credit, payment, saved card, effect, pay link, document, signer or signature id, a money word's row, the keys given and `written` (in no customer page's answer; the console names a document and an owner's ask by id to name the row back);
 - the words a money step, a read-back and a document show (only on that page, where they are the words agreed to; the consent rows and the signatures keep them, never a span).
 
