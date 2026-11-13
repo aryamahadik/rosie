@@ -2,9 +2,47 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 575, [`fb1dc53`](https://github.com/aryamahadik/rosie/commit/fb1dc53), 2026-11-13 20:28:55 UTC.
+- **Through:** commit 577, [`0ef3a02`](https://github.com/aryamahadik/rosie/commit/0ef3a02), 2026-11-13 21:35:57 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 577. docs: COMMIT\_HISTORY.md through commit 575 (fb1dc53, \#583) (\#585)
+
+- **Commit:** [`0ef3a02`](https://github.com/aryamahadik/rosie/commit/0ef3a02), by Arya Mahadik, 2026-11-13 21:35:57 UTC
+- **Pull request:** [#585](https://github.com/aryamahadik/rosie/pull/585) from `task/commit-history-93`, merged 2026-11-13 21:35:57 UTC. It squashed 1 branch commit:
+  - `80e3e03` docs: COMMIT\_HISTORY.md through commit 575 (fb1dc53, \#583)
+- **Files changed:** 1 (+85 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +85 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 576. T-1022: the Tool API base's lane door (DL-728) and journey 5's call folders registered through it: each K-09 v1.3 call in j5/\<call\>/index.ts answers notBuilt and writes nothing; j5/index.ts registers each call's name, K-08 hop, frozen K-09 version (v1.8, read from its root by the call's own name) and handler; the base answers a lane call by steps 1 to 7 and refuses a v1 name or a duplicate at registration. Proofs in j5/j5.test.ts and j5/j5.worker.test.ts. (\#586)
+
+- **Commit:** [`a6e41ed`](https://github.com/aryamahadik/rosie/commit/a6e41ed), by Arya Mahadik, 2026-11-13 21:35:53 UTC
+- **Pull request:** [#586](https://github.com/aryamahadik/rosie/pull/586) from `task/T-1022`, merged 2026-11-13 21:35:53 UTC. It squashed 1 branch commit:
+  - `221e830` T-1022: the Tool API base's lane door (DL-728) and journey 5's call f…
+- **Files changed:** 12 (+1320 −41), by folder:
+  - `actions/src/tool-api/` calls.ts +16 −3, index.ts +15 −1, tool-api.ts +232 −36, validator.ts +159 −1
+  - `actions/src/tool-api/j5/` index.ts +37 −0, j5.test.ts +753 −0, j5.worker.test.ts +43 −0
+  - `actions/src/tool-api/j5/refundAtOnce/` index.ts +12 −0
+  - `actions/src/tool-api/j5/settleOffer/` index.ts +13 −0
+  - `actions/src/tool-api/j5/showMoneyBefore/` index.ts +13 −0
+  - `actions/src/tool-api/j5/signDocument/` index.ts +13 −0
+  - `actions/src/tool-api/j5/takeMoneyBefore/` index.ts +14 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 575. docs: COMMIT\_HISTORY.md through commit 572 (d601db5, \#580) (\#583)
 
