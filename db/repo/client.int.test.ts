@@ -1,5 +1,7 @@
 // T-180: the database client, the business scope and the test-database helper, against local PostgreSQL
 // (`npm run db:up`; `npm run test:integration -- db/repo/client`).
+import net from "node:net";
+import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { createClient, type DbClient, type LogEntry, redact, resolvePrimaryUrl } from "./client";
 import { readBusinessScope, setBusinessScope, withBusiness } from "./scope";
@@ -313,5 +315,394 @@ describe("the connection string is never logged", () => {
   it("redacts a URL, and its user and password, from any text", () => {
     const text = `could not connect to ${LEAK_URL} as ${LEAK_USER} with ${LEAK_PASSWORD}`;
     expect(redact(text, [LEAK_URL])).toBe("could not connect to [redacted] as [redacted] with [redacted]");
+  });
+});
+
+// ---- T-1314: the ping's log line, and redact's host and port ------------------------------------------------------
+//
+// Each failure is raised for real on this Mac: a closed port (ECONNREFUSED), a host under .invalid (ENOTFOUND), a server
+// that never answers the startup (CONNECT_TIMEOUT), a login the local database refuses (class 28, naming the user), and
+// localhost on a closed port, whose error names an address the URL never does. The raw error of each is checked to hold
+// what it names, so the check means something; the ping's line holds none of it. Rule 9: the probe's user, password,
+// database and hosts are made up here (.invalid names). A check names what leaked, never its value.
+
+describe("T-1314: the ping's log line holds no host, port, user or password", () => {
+  const PROBE_USER = "t1314_ping_user";
+  const PROBE_PASSWORD = "t1314-ping-password";
+  const PROBE_DATABASE = "t1314_ping_db";
+  /** RFC 6761: no name under .invalid ever resolves. */
+  const UNRESOLVABLE_HOST = "rosie-t1314-ping.invalid";
+  /** The port named with the host that never resolves: never dialled. */
+  const SOME_PORT = 65125;
+
+  const probeUrl = (host: string, port: number): string =>
+    `postgres://${PROBE_USER}:${PROBE_PASSWORD}@${host}:${String(port)}/${PROBE_DATABASE}`;
+
+  type Parts = Readonly<Record<string, string | number>>;
+
+  /** Every text `value` holds, deeply: its own property names and values, enumerable or not (an error's stack too). */
+  function textsOf(value: unknown, seen = new Set<object>()): string[] {
+    if (typeof value === "string") {
+      return [value];
+    }
+    if (typeof value === "number" || typeof value === "bigint" || typeof value === "boolean") {
+      return [String(value)];
+    }
+    if (typeof value !== "object" || value === null || seen.has(value)) {
+      return [];
+    }
+    seen.add(value);
+    const texts: string[] = [];
+    for (const key of Object.getOwnPropertyNames(value)) {
+      texts.push(key, ...textsOf((value as Record<string, unknown>)[key], seen));
+    }
+    return texts;
+  }
+
+  /** The names of the parts `value` holds anywhere: a text wherever it appears, a number (a port) as a whole number. */
+  function leaksOf(value: unknown, parts: Parts): string[] {
+    const texts = textsOf(value);
+    return Object.entries(parts)
+      .filter(([, part]) => {
+        const pattern =
+          typeof part === "number"
+            ? new RegExp(`(^|[^0-9])${String(part)}([^0-9]|$)`)
+            : new RegExp(part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+        return texts.some((text) => pattern.test(text));
+      })
+      .map(([name]) => name);
+  }
+
+  /** A local port nothing listens on: one the system just handed out and took back. */
+  async function closedPort(): Promise<number> {
+    const server = net.createServer();
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const address = server.address();
+    const port = typeof address === "object" && address !== null ? address.port : 0;
+    await new Promise<void>((resolve) => {
+      server.close(() => {
+        resolve();
+      });
+    });
+    return port;
+  }
+
+  /** A local server that takes each connection and never answers it, as a host gone silent would. */
+  async function silentServer(): Promise<{ port: number; close: () => Promise<void> }> {
+    const sockets = new Set<net.Socket>();
+    const server = net.createServer((socket) => {
+      sockets.add(socket);
+      socket.on("error", () => undefined);
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const address = server.address();
+    return {
+      port: typeof address === "object" && address !== null ? address.port : 0,
+      close: () =>
+        new Promise<void>((resolve) => {
+          for (const socket of sockets) {
+            socket.destroy();
+          }
+          server.close(() => {
+            resolve();
+          });
+        }),
+    };
+  }
+
+  /** The error postgres.js rejects `select 1` with on `url` (it must reject). */
+  async function rawFailureOf(url: string, connectTimeoutSeconds: number): Promise<unknown> {
+    const sql = postgres(url, { max: 1, connect_timeout: connectTimeoutSeconds, onnotice: () => undefined });
+    try {
+      await sql`select 1`;
+    } catch (error) {
+      return error;
+    } finally {
+      await sql.end({ timeout: 0 });
+    }
+    throw new Error("select 1 was answered");
+  }
+
+  /**
+   * The same failure through a client's ping: one line, the handle and the code alone (one of `codes`), holding none of
+   * `parts`; the raw error holds each of `holds`, so the check means something.
+   */
+  async function expectCodeAlone(
+    url: string,
+    parts: Parts,
+    holds: readonly string[],
+    codes: readonly string[],
+    connectTimeoutSeconds = 3,
+  ): Promise<void> {
+    const raw = await rawFailureOf(url, connectTimeoutSeconds);
+    expect(leaksOf(raw, parts)).toEqual(expect.arrayContaining([...holds]));
+    const entries: LogEntry[] = [];
+    const client = createClient({
+      primaryUrl: url,
+      max: 1,
+      connectTimeoutSeconds,
+      env: {},
+      log: (entry) => entries.push(entry),
+    });
+    try {
+      expect(await client.ping()).toEqual({ ok: false });
+    } finally {
+      await client.close();
+    }
+    expect(entries).toHaveLength(1);
+    const [entry] = entries;
+    expect(Object.keys(entry ?? {}).sort()).toEqual(["code", "event", "handle", "message"]);
+    expect(codes).toContain(entry?.code);
+    expect(entry).toMatchObject({
+      event: "db.ping_failed",
+      handle: "primary",
+      message: `the ping failed (code ${entry?.code ?? ""})`,
+    });
+    expect(leaksOf(entry, parts)).toEqual([]);
+  }
+
+  it("a closed port (ECONNREFUSED): the line holds no host or port", async () => {
+    const port = await closedPort();
+    const parts = { host: "127.0.0.1", port, user: PROBE_USER, password: PROBE_PASSWORD };
+    await expectCodeAlone(probeUrl("127.0.0.1", port), parts, ["host", "port"], ["ECONNREFUSED"]);
+  });
+
+  it("an unresolvable .invalid host (ENOTFOUND, or EAI_AGAIN with no resolver): the line holds no host", async () => {
+    const parts = { host: UNRESOLVABLE_HOST, port: SOME_PORT, user: PROBE_USER, password: PROBE_PASSWORD };
+    await expectCodeAlone(
+      probeUrl(UNRESOLVABLE_HOST, SOME_PORT),
+      parts,
+      ["host"],
+      ["ENOTFOUND", "EAI_AGAIN"],
+    );
+  });
+
+  it("a server that never answers (postgres.js's CONNECT_TIMEOUT, write <host>:<port>): the line holds neither", async () => {
+    const server = await silentServer();
+    try {
+      const parts = { host: "127.0.0.1", port: server.port, user: PROBE_USER, password: PROBE_PASSWORD };
+      await expectCodeAlone(
+        probeUrl("127.0.0.1", server.port),
+        parts,
+        ["host", "port"],
+        ["CONNECT_TIMEOUT"],
+        1,
+      );
+    } finally {
+      await server.close();
+    }
+  });
+
+  it("a login the local database refuses (class 28, naming the user): the line holds no user", async () => {
+    const url = new URL(resolvePrimaryUrl());
+    url.username = PROBE_USER;
+    url.password = PROBE_PASSWORD;
+    const port = url.port === "" ? 5432 : Number(url.port);
+    const parts = { host: url.hostname, port, user: PROBE_USER, password: PROBE_PASSWORD };
+    await expectCodeAlone(url.toString(), parts, ["user"], ["28P01", "28000"]);
+  });
+
+  it("localhost on a closed port: its error names an address the URL never does, and the line holds none of it", async () => {
+    const port = await closedPort();
+    const url = probeUrl("localhost", port);
+    // The address localhost resolved to is in the raw error, and no redaction of the URL could know it.
+    expect(leaksOf(await rawFailureOf(url, 3), { ipv4: "127.0.0.1", ipv6: "::1" }).length).toBeGreaterThan(0);
+    const parts = {
+      host: "localhost",
+      ipv4: "127.0.0.1",
+      ipv6: "::1",
+      port,
+      user: PROBE_USER,
+      password: PROBE_PASSWORD,
+    };
+    await expectCodeAlone(url, parts, ["port"], ["ECONNREFUSED"]);
+  });
+
+  // The ping's other branch (client.ts: a failure with no code, or a code that is not plain), round 2 (DL-647, the
+  // security review's finding 1). A local stand-in for PostgreSQL refuses the login as a server, or a proxy before it,
+  // might: its ErrorResponse has no C field, or a C field holding the host it names, and its M and D fields name that
+  // host and port, and the user and password the client sent it (postgres.js src/connection.js ErrorResponse makes it a
+  // PostgresError with no SQLSTATE, or with that C field as its code). The host and port it names are made up and never
+  // dialled; the user and password are the probe's.
+
+  /** The host and port the stand-in names in its refusal: made up (RFC 6761), never dialled. */
+  const NAMED_HOST = "db-t1314-ping-named.example.invalid";
+  const NAMED_PORT = 65126;
+
+  /** A PostgreSQL ErrorResponse: the byte E, its length (its own 4 bytes included), each field and its text, a zero. */
+  function errorResponse(fields: readonly (readonly [string, string])[]): Uint8Array {
+    const body = new TextEncoder().encode(`${fields.map(([type, text]) => `${type}${text}\0`).join("")}\0`);
+    const message = new Uint8Array(5 + body.length);
+    const view = new DataView(message.buffer);
+    view.setUint8(0, "E".charCodeAt(0));
+    view.setUint32(1, 4 + body.length);
+    message.set(body, 5);
+    return message;
+  }
+
+  /**
+   * A local stand-in for PostgreSQL that refuses every login: it answers an SSLRequest with N, the startup message with
+   * AuthenticationCleartextPassword, and the password message with a FATAL ErrorResponse (C field `code`, none when
+   * undefined) whose M field names the user the client sent and NAMED_HOST:NAMED_PORT, and whose D field names the
+   * password the client sent; then it ends the connection.
+   */
+  async function refusingServer(
+    code: string | undefined,
+  ): Promise<{ port: number; close: () => Promise<void> }> {
+    const sockets = new Set<net.Socket>();
+    const server = net.createServer((socket) => {
+      sockets.add(socket);
+      socket.on("error", () => undefined);
+      let received = new Uint8Array(0);
+      let user: string | undefined;
+      socket.on("data", (chunk: Uint8Array) => {
+        const joined = new Uint8Array(received.length + chunk.length);
+        joined.set(received);
+        joined.set(chunk, received.length);
+        received = joined;
+        for (;;) {
+          const view = new DataView(received.buffer, received.byteOffset, received.byteLength);
+          if (user === undefined) {
+            // The startup message (or an SSLRequest): its length (its own 4 bytes included), then its body.
+            if (received.length < 8 || received.length < view.getUint32(0)) {
+              return;
+            }
+            const length = view.getUint32(0);
+            if (length === 8 && view.getUint32(4) === 80877103) {
+              socket.write("N");
+            } else {
+              const words = new TextDecoder().decode(received.subarray(8, length)).split("\0");
+              user = words[words.indexOf("user") + 1] ?? "";
+              const cleartext = new Uint8Array(9);
+              const out = new DataView(cleartext.buffer);
+              out.setUint8(0, "R".charCodeAt(0));
+              out.setUint32(1, 8);
+              out.setUint32(5, 3);
+              socket.write(cleartext);
+            }
+            received = received.subarray(length);
+          } else {
+            // The password message: the byte p, its length (its own 4 bytes included), the password and a zero.
+            if (received.length < 5 || received.length < 1 + view.getUint32(1)) {
+              return;
+            }
+            const password = new TextDecoder()
+              .decode(received.subarray(5, 1 + view.getUint32(1)))
+              .replace(/\0$/, "");
+            socket.end(
+              errorResponse([
+                ["S", "FATAL"],
+                ["V", "FATAL"],
+                ...(code === undefined ? [] : [["C", code] as const]),
+                [
+                  "M",
+                  `password authentication failed for user "${user}" at ${NAMED_HOST}:${String(NAMED_PORT)}`,
+                ],
+                ["D", `the password "${password}" was refused`],
+              ]),
+            );
+            return;
+          }
+        }
+      });
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const address = server.address();
+    return {
+      port: typeof address === "object" && address !== null ? address.port : 0,
+      close: () =>
+        new Promise<void>((resolve) => {
+          for (const socket of sockets) {
+            socket.destroy();
+          }
+          server.close(() => {
+            resolve();
+          });
+        }),
+    };
+  }
+
+  /**
+   * The stand-in's refusal (C field `code`) through a client's ping: one line, the handle and "no code" alone, holding
+   * none of the named host and port, the user, the password, or the URL's own host and port; the raw error is a
+   * PostgresError whose code is `code` and which holds each of the first four, so the check means something.
+   */
+  async function expectNoCode(code: string | undefined): Promise<void> {
+    const server = await refusingServer(code);
+    try {
+      const url = probeUrl("127.0.0.1", server.port);
+      const parts = {
+        host: NAMED_HOST,
+        port: NAMED_PORT,
+        user: PROBE_USER,
+        password: PROBE_PASSWORD,
+        urlHost: "127.0.0.1",
+        urlPort: server.port,
+      };
+      const raw = await rawFailureOf(url, 3);
+      expect(raw).toBeInstanceOf(Error);
+      expect((raw as Error).name).toBe("PostgresError");
+      expect((raw as { code?: unknown }).code).toBe(code);
+      expect(leaksOf(raw, parts)).toEqual(expect.arrayContaining(["host", "port", "user", "password"]));
+      const entries: LogEntry[] = [];
+      const client = createClient({
+        primaryUrl: url,
+        max: 1,
+        connectTimeoutSeconds: 3,
+        env: {},
+        log: (entry) => entries.push(entry),
+      });
+      try {
+        expect(await client.ping()).toEqual({ ok: false });
+      } finally {
+        await client.close();
+      }
+      expect(entries).toEqual([
+        { event: "db.ping_failed", handle: "primary", message: "the ping failed (no code)" },
+      ]);
+      expect(leaksOf(entries, parts)).toEqual([]);
+    } finally {
+      await server.close();
+    }
+  }
+
+  it("a refusal with no SQLSTATE (an ErrorResponse with no C field, naming the host, port, user and password): the line says no code and holds none of them", async () => {
+    await expectNoCode(undefined);
+  });
+
+  it("a refusal whose code is not plain (a C field holding the named host and port): the line says no code and holds none of them", async () => {
+    await expectNoCode(`${NAMED_HOST}:${String(NAMED_PORT)}`);
+  });
+
+  it("redact removes a user and a password of digits alone wherever they appear, inside a longer run of digits too; the port still only as a whole number", () => {
+    const url = "postgres://4242:73019@db-t1314.example.invalid:6545/t1314_db";
+    const text =
+      "user 4242, password 73019; in longer runs 142420 and 7301955; the port 6545, while 16545 stays";
+    expect(redact(text, [url])).toBe(
+      "user [redacted], password [redacted]; in longer runs 1[redacted]0 and [redacted]55; the port [redacted], " +
+        "while 16545 stays",
+    );
+    // A password that is also the port is removed wherever it appears, as a password is.
+    expect(
+      redact("6545 and 16545", ["postgres://t1314_user:6545@db-t1314.example.invalid:6545/t1314_db"]),
+    ).toBe("[redacted] and 1[redacted]");
+  });
+
+  it("redact takes out the host and the port too, the port only where it stands as a whole number", () => {
+    const url = "postgres://t1314_user:t1314%2Fpw@db-t1314.example.invalid:6543/t1314_db";
+    const text =
+      "connect ECONNREFUSED db-t1314.example.invalid:6543; getaddrinfo ENOTFOUND db-t1314.example.invalid; " +
+      "write CONNECT_TIMEOUT on 6543; user t1314_user, password t1314/pw; 16543 and 65430 stay";
+    expect(redact(text, [url])).toBe(
+      "connect ECONNREFUSED [redacted]; getaddrinfo ENOTFOUND [redacted]; write CONNECT_TIMEOUT on [redacted]; " +
+        "user [redacted], password [redacted]; 16543 and 65430 stay",
+    );
+  });
+
+  it("redact takes out an IPv6 host with and without its brackets", () => {
+    const url = "postgres://t1314_v6_user:t1314-v6-pw@[fd00::7]:6544/t1314_db";
+    expect(redact("connect ECONNREFUSED fd00::7:6544, then [fd00::7]:6544", [url])).toBe(
+      "connect ECONNREFUSED [redacted]:[redacted], then [redacted]",
+    );
   });
 });

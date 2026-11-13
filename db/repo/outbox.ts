@@ -185,9 +185,13 @@
 //      against one outbox: the dispatcher (T-562) calls the v1.2 calls only.
 //  21. markPartV12 reads repeatedDelivery (K-05 v1.9 item 48) only for a delivery receipt that repeats a recorded
 //      delivery, from the delivered_at of the row's part tries, whatever their state. A delivered part try of the row
-//      that holds no delivered_at (no K-05 call writes one, and K-04 v1 has no CHECK against it), the repeated one or
-//      another, is thrown with nothing written: which delivery was the row's first cannot be read from it, and it is
-//      never answered by a guess (T-1226's reviews). The v1 call reads none of this and answers as before.
+//      that holds no delivered_at, the repeated one or another, is thrown with nothing written: which delivery was the
+//      row's first cannot be read from it, and it is never answered by a guess (T-1226's reviews). No K-05 call writes
+//      such a part, and since K-04 v1.1 the database refuses one: migration 0032 adds and validates the CHECK
+//      outbox_parts_delivered_has_time (state <> 'delivered' or delivered_at is not null; CQ-211). So
+//      repeatedDeliveryOf's guard ("a delivered part holds no delivered_at") is a second guard, which that CHECK makes
+//      unreachable on a migrated database; its code stays (DL-584). The v1 call reads none of this and answers as
+//      before.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1";
 import type * as K05v11 from "../../contracts/generated/data-access/data-access.v1.1";
 import type * as K05v12 from "../../contracts/generated/data-access/data-access.v1.2";
@@ -1758,7 +1762,9 @@ interface PartMarked {
  * them, locked: `part` is the delivered part try the receipt names, `parts` every part try of its row. firstOfRow: no
  * other part try of the row, of either part and any try, holds a delivered_at earlier than this one's, a tie counting
  * as first (K-05 default 85). deliveredAt: this part try's delivered_at as stored, never the repeat's own time (default
- * 86). A delivered part try that holds no delivered_at is thrown, never answered by a guess (default 21 above).
+ * 86). A delivered part try that holds no delivered_at is thrown, never answered by a guess (default 21 above): a
+ * second guard, which K-04 v1.1's CHECK outbox_parts_delivered_has_time (migration 0032) makes unreachable on a
+ * migrated database. Its code stays.
  */
 function repeatedDeliveryOf(part: PartRow, parts: readonly PartRow[]): RepeatedDelivery {
   const deliveredAt = part.delivered_at;
