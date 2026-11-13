@@ -14,6 +14,11 @@ export type PaymentRefusal =
   | "yesNotThatBusiness"
   /** The yes is not the booker's own: a relayed yes never counts (RULES 3.6, 3.13). */
   | "yesNotTheirOwn"
+  /**
+   * A card charge for a payer who is not the booker: the payer approves nothing and is asked money only by a pay link for
+   * the rest (RULES 3.13), and no money moves without the person's own yes (RULES 1.10).
+   */
+  | "payerNotBooker"
   /** A second charge or pay link for one booking in one turn (S12-26: a customer pays only what they agreed to, once). */
   | "secondChargeInTurn"
   /** A hold, an authorization or a later capture asked for in any form: nothing is ever held on a card (RULES 3.2; D65). */
@@ -26,7 +31,10 @@ export type PaymentRefusal =
   | "nothingDue"
   /** Money now with no card from the page: no card that works (A5-31). */
   | "noCard"
-  /** A way that keeps the card (a deposit: A5-13 "the card stays saved") charged on a card not saved for the booking. */
+  /**
+   * A charge that must go on a card saved for the booking, on one that is not: a way that keeps the card (a deposit: A5-13
+   * "the card stays saved"), or any charge with the person not on the page (service.ts default 5).
+   */
   | "cardNotKept"
   /** The card is not one this charge may go on: removed, replaced by the network, another booking's, or another person's. */
   | "cardNotUsable"

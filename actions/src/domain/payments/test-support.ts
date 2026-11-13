@@ -6,6 +6,8 @@
 //     what each way takes now;
 //   - the cast and the Lee's Barbershop rows are K-14 v1's, K-32 v1's and K-07 v1's fixtures' (Alex M., Sam, the $140
 //     Groom's package with its $40 deposit, the $55 Signature cut); Stripe ids are their placeholders or the double's;
+//     Riley (K-04 v1 seed-person-roles) stands in as a payer who is not the booker, with a customer and card in the
+//     same placeholder form;
 //   - the Stripe port is the Stripe double (T-422) under the effects runner (T-323) with the Stripe kinds (T-326), through
 //     T-326's own harness, so the effect rows the service builds run exactly as the commit's rows will.
 
@@ -22,6 +24,7 @@ import { claimedRowOf, withMoney } from "./rows";
 import type {
   Booking,
   BookingLine,
+  BookingPurpose,
   Card,
   ExactYes,
   MoneyEffect,
@@ -29,6 +32,7 @@ import type {
   PayLinkCodes,
   PayingBusiness,
   PaymentsDeps,
+  Share,
 } from "./types";
 
 const ROOT = fileURLToPath(new URL("../../../../", import.meta.url));
@@ -54,6 +58,11 @@ export const ALEX = "person-alex";
 export const SAM = "person-sam";
 export const ALEX_CUSTOMER = "stripe-customer-demo-alex";
 export const ALEX_CARD = "stripe-card-demo-alex";
+
+/** A payer who is not the booker (RULES 3.13: "Someone else pays"), and Riley's customer and card on the shop's account. */
+export const RILEY = "person-riley";
+export const RILEY_CUSTOMER = "stripe-customer-demo-riley";
+export const RILEY_CARD = "stripe-card-demo-riley";
 
 /** The deps of one turn at Lee's Barbershop. */
 export function lees(overrides: Partial<PaymentsDeps> = {}): PaymentsDeps {
@@ -110,6 +119,34 @@ export function alexTypedCard(): Card {
     savedCard: null,
   };
 }
+
+/** Riley's card saved for a booking Riley pays, saved and usable. */
+export function rileySavedCard(booking: Booking, id = `card-riley-${booking.id}`): Card {
+  return {
+    personId: RILEY,
+    stripeCustomerId: RILEY_CUSTOMER,
+    stripePaymentMethodId: RILEY_CARD,
+    savedCard: { id, bookingId: booking.id, saved: true, replaced: false, removed: false },
+  };
+}
+
+/** Riley's card typed on the page for one payment only. */
+export function rileyTypedCard(): Card {
+  return {
+    personId: RILEY,
+    stripeCustomerId: RILEY_CUSTOMER,
+    stripePaymentMethodId: RILEY_CARD,
+    savedCard: null,
+  };
+}
+
+/** K-32 v1 payment_items.share for each purpose a booking's money takes. */
+export const SHARE_OF: Readonly<Record<BookingPurpose, Share>> = {
+  deposit: "deposit",
+  full_price: "full",
+  rest: "rest",
+  extra: "extra",
+};
 
 /**
  * The pay link codes' port for tests: a 43-character base64url code made from the link's id with a fixed test prefix

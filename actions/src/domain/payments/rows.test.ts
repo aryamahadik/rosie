@@ -13,6 +13,7 @@ import { contractChecks } from "../../commit/test-support";
 import { contractChecks as effectChecks } from "../../effects/runner/test-support";
 import { k14, readExchange } from "../../effects/stripe/test-support";
 import {
+  BOOKING_PURPOSES,
   PaymentRefusedError,
   appendLine,
   appendTo,
@@ -22,6 +23,9 @@ import {
   descriptionOf,
   takenFromEvent,
   type Booking,
+  type BookingPurpose,
+  type Card,
+  type ChargeInput,
   type LedgerLine,
   type LedgerPayment,
   type MoneyWrites,
@@ -36,6 +40,7 @@ import {
   CLAIMED_AT,
   LEES,
   LEES_ACCOUNT,
+  SHARE_OF,
   TEST_CODES,
   TURN_ID,
   alexBooking,
@@ -293,6 +298,80 @@ describe("a booking's money step (A5-04)", () => {
   });
 });
 
+// ---- a charge off the page ---------------------------------------------------------------------------------------------
+
+describe("off the page, a charge goes only on a card saved for this booking (service.ts defaults 5 and 6)", () => {
+  const booking = alexBooking("booking-alex-signature-cut");
+  const line = { id: "line-alex-signature-1", version: 1 };
+  const signature = (
+    card: Card,
+    customerPresent: boolean,
+    purpose: BookingPurpose = "full_price",
+  ): ChargeInput => ({
+    booking,
+    lines: [line],
+    purpose,
+    items: [{ lineId: line.id, share: SHARE_OF[purpose], amount: { cents: 5500, currency: "USD" } }],
+    card,
+    customerPresent,
+    yes: alexYes(booking),
+    what: "Signature cut and hot towel shave",
+  });
+
+  it("a card typed for this payment only is charged with the person on the page (K-14 full-price.json), and refused off it whatever the purpose, building nothing", async () => {
+    const onPage = createPayments(lees()).charge(signature(alexTypedCard(), true));
+    expect(onPage.writes.effects[0]?.portRequest).toEqual(readExchange("full-price.json").request.port);
+    expect(valuesOf(onPage.writes, "payments")[0]).toMatchObject({
+      purpose: "full_price",
+      saved_card_id: null,
+    });
+    expectContractRows(onPage.writes);
+    for (const purpose of BOOKING_PURPOSES)
+      expect(
+        await refusalOf(() => createPayments(lees()).charge(signature(alexTypedCard(), false, purpose))),
+        purpose,
+      ).toBe("cardNotKept");
+    // The refused charge built nothing: the same turn then charges the booking once, with the person on the page.
+    const payments = createPayments(lees());
+    expect(await refusalOf(() => payments.charge(signature(alexTypedCard(), false)))).toBe("cardNotKept");
+    expect(payments.charge(signature(alexTypedCard(), true)).writes.effects).toHaveLength(1);
+  });
+
+  it("off the page, a card saved for this booking is charged (K-14 charge-at-owner-ok.json), and one replaced, removed, not saved or another booking's never is", async () => {
+    const wedding = alexBooking("booking-alex-wedding-party");
+    const atOk = (card: Card): ChargeInput => ({
+      booking: wedding,
+      lines: [{ id: "line-alex-wedding-party-1", version: 1 }],
+      purpose: "deposit",
+      items: [
+        { lineId: "line-alex-wedding-party-1", share: "deposit", amount: { cents: 16000, currency: "USD" } },
+      ],
+      card,
+      customerPresent: false,
+      yes: alexYes(wedding, { answeredIn: "turn-alex-wedding-party-request" }),
+      what: "wedding party grooming",
+    });
+    const saved = alexSavedCard(wedding, "card-alex-wedding-party");
+    const charged = createPayments(lees()).charge(atOk(saved));
+    const fixture = readExchange("charge-at-owner-ok.json").request;
+    expect(charged.writes.effects[0]?.amount).toEqual(fixture.amount);
+    expect(charged.writes.effects[0]?.portRequest).toEqual(fixture.port);
+    expect(valuesOf(charged.writes, "payments")[0]).toMatchObject({
+      saved_card_id: "card-alex-wedding-party",
+    });
+    expectContractRows(charged.writes);
+    const savedCard = saved.savedCard;
+    if (savedCard === null) throw new Error("a saved card");
+    for (const card of [
+      { ...saved, savedCard: { ...savedCard, replaced: true } },
+      { ...saved, savedCard: { ...savedCard, removed: true } },
+      { ...saved, savedCard: { ...savedCard, saved: false } },
+      { ...saved, savedCard: { ...savedCard, bookingId: "booking-other" } },
+    ])
+      expect(await refusalOf(() => createPayments(lees()).charge(atOk(card)))).toBe("cardNotUsable");
+  });
+});
+
 // ---- the business's own account ----------------------------------------------------------------------------------------
 
 describe("every charge lands in the business's own Stripe account (RULES 3.1)", () => {
@@ -331,7 +410,7 @@ describe("every charge lands in the business's own Stripe account (RULES 3.1)", 
       ),
     ).toBe("badInput");
     // An account id that reads as a card number is never sent.
-    const odd = createPayments(lees({ business: { ...LEES, stripeAccountId: "4242 4242 4242 4242" } }));
+    const odd = createPayments(lees({ business: { ...LEES, stripeAccountId: "0000 1111 2222 3333" } }));
     expect(
       await refusalOf(() => odd.saveCard({ booking: alexBooking(), personId: ALEX, stripeCustomerId: null })),
     ).toBe("badInput");
@@ -347,7 +426,7 @@ describe("every charge lands in the business's own Stripe account (RULES 3.1)", 
     expect(descriptionOf(LEES, "rest", "home grooming visit, Thu Nov 5")).toBe(
       "Lee's Barbershop: home grooming visit, Thu Nov 5",
     );
-    expect(() => descriptionOf(LEES, "deposit", "card 4242 4242 4242 4242")).toThrow(PaymentRefusedError);
+    expect(() => descriptionOf(LEES, "deposit", "card 0000 1111 2222 3333")).toThrow(PaymentRefusedError);
     expect(() => descriptionOf(LEES, "deposit", "  ")).toThrow(PaymentRefusedError);
     expect(() => descriptionOf(LEES, "deposit", "two\nlines")).toThrow(PaymentRefusedError);
   });
@@ -616,7 +695,7 @@ describe("the ledger is append-only (arch 09 line 492; K-32 ledger_lines)", () =
     ).toBe("ledgerMismatch");
     expect(
       await refusalOf(() =>
-        chargeLine(deposit, { ...taken, payload: { ...taken.payload, chargeId: "4242424242424242" } }),
+        chargeLine(deposit, { ...taken, payload: { ...taken.payload, chargeId: "0000111122223333" } }),
       ),
     ).toBe("ledgerMismatch");
   });

@@ -16,13 +16,17 @@
 //              the booking yet (A5-07; and on a request, RULES 3.11: "the card is saved, then charged at the OK"); else the
 //              one charge for all that is due now, with the person on the page (A5-13, A5-16).
 //   saveCard   A5-07: the card goes on file through Stripe, in the business's own account; nothing is charged.
-//   charge     All that is due now, on a card the person typed in Stripe's own form, captured at once: never a hold.
-//   payLink    The payment Rosie's own pay page takes (A6-32, A9-05, MC C3), with its link row keeping only its code's hash.
+//   charge     What the booker owes, on the booker's own card typed in Stripe's own form, captured at once: never a hold;
+//              off the page, only on a card saved for this booking (defaults 4 to 6).
+//   payLink    The payment Rosie's own pay page takes (A6-32, A9-05, MC C3), with its link row keeping only its code's hash;
+//              the only way a payer who is not the booker is asked money (default 4).
 // A charge's and a pay link's items name only the lines the booking was read with, and add up to the payment (K-32 rule
 // 10); the booking and those lines are the versions the commit compares (limit 4).
 //
 // The hard invariants, each refused before anything is built (PaymentRefusedError, nothing written):
 //   - no charge without a committed exact yes bound to that booking (yes.ts): every charge, pay link and money step;
+//   - no card charged for anyone but the booker, whose own yes it is (default 4): a payer who is not the booker approves
+//     nothing and is asked money only by a pay link for the rest (RULES 3.13, 1.10);
 //   - never a hold: no input names one, no state, purpose or way can hold one, and every effect row is held to K-14 v1 as
 //     the effects runner holds it, so a port request with a hold's captureMethod is refused (rows.ts checkEffect;
 //     RULES 3.2; D65; refuse-card-hold.json);
@@ -46,10 +50,19 @@
 //      event_log.kind), and K-08 v1.2 has no money kind yet (K-32 README open gaps, "K-08 event kinds ... a K-08 minor
 //      version before C-101 commits them"), so none is made up here. The effect row's own `effect.created` entry, which
 //      the commit writes with the answer as approvedBy (T-305 build.ts), is the audit line meanwhile.
-//   4. A charge at booking (deposit, full price) goes on the booker's own card (RULES 3.13: the person booking pays what
-//      is due at booking); the rest and an extra on the payer's. A pay link is for that same person.
+//   4. A card is charged only for the booker, on the booker's own card and the booker's own yes (RULES 1.10: no money
+//      without the person's own yes): what is due at booking (deposit, full price) always (RULES 3.13: the person
+//      booking pays what is due at booking, on the page), and the rest or an extra only when the booker is the payer
+//      too. A payer who is not the booker approves nothing and is asked money only by a pay link for the rest (RULES
+//      3.13: "The payer gets a pay link only for the rest, at DONE or on the bill, and approves nothing"), so a charge
+//      for them is refused (payerNotBooker), whatever its purpose, whether the person is on the page and whatever yes is
+//      given. A pay link is for the person who pays it: the booker for what is due at booking, the payer for the rest
+//      and an extra.
 //   5. A deposit keeps the card (A5-13: "the card stays saved"; the record's deposit way saves one), so its charge goes
-//      on a card saved for this booking; the full price may go on a card typed for this payment only (K-32 default 15).
+//      on a card saved for this booking; the full price may go on a card typed for this payment only (K-32 default 15)
+//      while the person is on the page. Off the page (at the OK, at DONE: K-14 customerPresent false) only a card saved
+//      for this booking is charged (cardNotKept), so default 6 holds for every such charge, whatever the caller calls
+//      the card.
 //   6. A card the network replaced, or one removed, is never charged (A9-14: "Nothing goes on a new card without
 //      asking"; S13-55); a card saved for another booking neither (A5-07: "It's there only for what the customer ticks").
 
@@ -125,8 +138,12 @@ export interface ChargeInput {
   readonly purpose: BookingPurpose;
   /** What it pays toward each booking line, adding up to the charge (RULES 3.2: one payment for all that is due now). */
   readonly items: readonly PaymentItem[];
+  /** The booker's own card (default 4): saved for this booking, or typed for this payment with the person on the page. */
   readonly card: Card;
-  /** The person is on the page while it is charged (K-14 customerPresent): at booking yes; at the OK or at DONE no. */
+  /**
+   * The person is on the page while it is charged (K-14 customerPresent): at booking yes; at the OK or at DONE no, when
+   * only a card saved for this booking is charged (default 5).
+   */
   readonly customerPresent: boolean;
   readonly yes: ExactYes | null;
   /** What it is for, as the charge says it (RULES 3.14), made by code from the services' names. */
@@ -208,14 +225,25 @@ function shareOf(way: string, index: number): Share {
   return refuse("badInput", [`lines.${String(index)}.way`]);
 }
 
-/** A card the charge may go on: a card of this booking's (or typed for this payment), not removed or replaced. */
-function usableCard(card: Card, booking: Booking, personId: string, keepsCard: boolean): Card {
+/**
+ * A card the charge may go on: the person's own, saved for this booking and not removed or replaced (default 6), or typed
+ * for this payment only while the person is on the page (default 5). Off the page, a card not saved for this booking is
+ * never charged, so the saved card's checks hold for every charge made without the person.
+ */
+function usableCard(
+  card: Card,
+  booking: Booking,
+  personId: string,
+  keepsCard: boolean,
+  present: boolean,
+): Card {
   requireStripeId(card.stripeCustomerId, "card.stripeCustomerId");
   requireStripeId(card.stripePaymentMethodId, "card.stripePaymentMethodId");
   if (card.personId !== personId) refuse("cardNotUsable", ["card.personId"]);
   const saved = card.savedCard;
   if (saved === null) {
     if (keepsCard) refuse("cardNotKept", ["card.savedCard"]);
+    if (!present) refuse("cardNotKept", ["card.savedCard", "customerPresent"]);
     return card;
   }
   requireId(saved.id, "card.savedCard.id");
@@ -245,7 +273,10 @@ function itemsOnLines(items: readonly PaymentItem[], lines: readonly LineRead[])
   });
 }
 
-/** Who pays what (default 4): the booker at booking, the payer for the rest and an extra (RULES 3.13). */
+/**
+ * Who pays what (default 4): the booker at booking, the payer for the rest and an extra (RULES 3.13). A card is charged
+ * only when this is the booker; a payer who is not the booker pays by pay link.
+ */
 function payerFor(booking: Booking, purpose: BookingPurpose): string {
   return purpose === "deposit" || purpose === "full_price" ? booking.bookerPersonId : booking.payerPersonId;
 }
@@ -317,19 +348,22 @@ export function createPayments(deps: PaymentsDeps): Payments {
     };
   }
 
-  /** A charge, given its card is already checked for the way (usableCard). */
+  /** A charge on the booker's own card: one saved for the booking when the way keeps it or the person is off the page. */
   function chargeOn(input: ChargeInput, keepsCard: boolean): PaymentAsked {
     const booking = ownBooking(input.booking);
     requireBoundYes(input.yes, booking);
     const purpose = checkPurpose(input.purpose);
+    // Only the booker is charged, on their own yes (RULES 1.10). A payer who is not the booker approves nothing and is
+    // asked money only by a pay link for the rest (RULES 3.13; default 4): refused whatever the purpose, presence or yes.
+    const payerId = payerFor(booking, purpose);
+    if (payerId !== booking.bookerPersonId) refuse("payerNotBooker", ["purpose", "booking.payerPersonId"]);
     const currency = input.items[0]?.amount.currency ?? "";
     const amount = itemsTotal(input.items, currency);
     itemsOnLines(input.items, input.lines);
     const versionsRead = versionsOf(booking, input.lines);
-    const payerId = payerFor(booking, purpose);
-    const card = usableCard(input.card, booking, payerId, keepsCard);
     const present: unknown = input.customerPresent;
     if (typeof present !== "boolean") refuse("badInput", ["customerPresent"]);
+    const card = usableCard(input.card, booking, payerId, keepsCard, present);
     charges.check(booking.id);
     const effectId = rowId("eff-charge", booking.id, turnKey);
     const paymentId = rowId("pay", booking.id, turnKey);

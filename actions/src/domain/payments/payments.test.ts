@@ -16,18 +16,21 @@ import { k14, readExchange } from "../../effects/stripe/test-support";
 import { MoneyHomeError, readMoneyRecord } from "../../homes/money";
 import { sources } from "../../homes/money/test-support";
 import {
+  BOOKING_PURPOSES,
   PaymentRefusedError,
   chargeLine,
   checkEffect,
   checkTurnCharges,
   createPayments,
   isChargeKind,
+  rowId,
   takenFromEvent,
   yesBinds,
   yesRefusal,
   type Booking,
   type BookingLine,
   type Card,
+  type ChargeInput,
   type ExactYes,
   type LedgerLine,
   type MoneyEffect,
@@ -44,7 +47,11 @@ import {
   CLAIMED_AT,
   LEES,
   LEES_ACCOUNT,
+  RILEY,
+  RILEY_CARD,
+  RILEY_CUSTOMER,
   SAM,
+  SHARE_OF,
   TURN_ID,
   alexBooking,
   alexSavedCard,
@@ -56,6 +63,8 @@ import {
   lineOf,
   moneyRecords,
   pick,
+  rileySavedCard,
+  rileyTypedCard,
   runEffects,
   scenarios,
   seeded,
@@ -75,6 +84,19 @@ function refusalOf(action: () => unknown): PaymentRefusal | null {
     return null;
   } catch (error) {
     if (error instanceof PaymentRefusedError) return error.reason;
+    throw error;
+  }
+}
+
+/** What a charge or pay link built, or, when it was refused, its refusal and nothing at all. */
+async function attempt(
+  action: () => PaymentAsked | Promise<PaymentAsked>,
+): Promise<{ refusal: PaymentRefusal | null; writes: MoneyWrites }> {
+  try {
+    return { refusal: null, writes: (await action()).writes };
+  } catch (error) {
+    if (error instanceof PaymentRefusedError)
+      return { refusal: error.reason, writes: { versionsRead: [], state: [], effects: [] } };
     throw error;
   }
 }
@@ -579,6 +601,226 @@ describe("2. hard invariant: no charge row is built without a committed exact ye
       } else expect(binds).toBe(false);
     }
     expect(built).toBeGreaterThan(100);
+  });
+
+  // A card is charged only for the booker (service.ts default 4): RULES 3.13, "The payer gets a pay link only for the rest,
+  // at DONE or on the bill, and approves nothing"; RULES 1.10, no money without the person's own yes.
+
+  it("a payer who is not the booker is never charged on a card: the rest on their saved card off the page on the booker's yes, the same on the page and for an extra, are refused and build no effect row, payment or ledger line; a pay link for the rest still builds theirs", async () => {
+    // Alex books the Groom's package, and Riley pays the rest (RULES 3.13: "Someone else pays").
+    const booking = alexBooking("booking-alex-grooms-package", { payerPersonId: RILEY });
+    const forRiley = (purpose: "rest" | "extra", customerPresent: boolean): ChargeInput => ({
+      booking,
+      lines: [GROOMS_LINE],
+      purpose,
+      items: [{ lineId: GROOMS_LINE.id, share: purpose, amount: { cents: 10000, currency: "USD" } }],
+      card: rileySavedCard(booking),
+      customerPresent,
+      yes: alexYes(booking),
+      what: "the Groom's package",
+    });
+    // The payment and effect the charge would have been (service.ts default 1), to read the double's events against.
+    const wouldBe = {
+      id: rowId("pay", booking.id, TURN_ID),
+      businessId: LEES.id,
+      bookingId: booking.id,
+      effectId: rowId("eff-charge", booking.id, TURN_ID),
+      cents: 10000,
+    };
+    const payments = createPayments(lees());
+    const cases = [
+      ["rest", false],
+      ["rest", true],
+      ["extra", false],
+      ["extra", true],
+    ] as const;
+    for (const [purpose, customerPresent] of cases) {
+      const label = `${purpose}, on the page ${String(customerPresent)}`;
+      const tried = await attempt(() => payments.charge(forRiley(purpose, customerPresent)));
+      expect(tried.refusal, label).toBe("payerNotBooker");
+      expect(tried.writes.effects, label).toEqual([]);
+      expect(paymentsRows(tried.writes), label).toEqual([]);
+      // On the Stripe double, with Riley's card on file there: no request reaches Stripe, nothing is taken, no line.
+      const h = harnessFor(LEES_ACCOUNT);
+      h.double.seedCard({ paymentMethodId: RILEY_CARD, account: LEES_ACCOUNT, customerId: RILEY_CUSTOMER });
+      await runEffects(h, tried.writes.effects);
+      expect(h.double.requests(), label).toEqual([]);
+      expect(
+        h.double.listMoney({
+          account: LEES_ACCOUNT,
+          from: "2026-11-07T00:00:00Z",
+          to: "2026-11-08T00:00:00Z",
+        }),
+        label,
+      ).toMatchObject({ result: "listed", items: [] });
+      expect(linesFromEvents(h.double.events(), wouldBe), label).toEqual([]);
+    }
+    // Riley's own yes changes nothing: the payer approves nothing.
+    const rileysYes = alexYes(booking, { personId: RILEY });
+    expect(
+      (await attempt(() => payments.charge({ ...forRiley("rest", true), yes: rileysYes }))).refusal,
+    ).toBe("yesNotTheirOwn");
+    // Riley is asked the rest only by a pay link: in the same turn, after the refused charges, it is built.
+    const link = await payments.payLink({
+      booking,
+      lines: [GROOMS_LINE],
+      purpose: "rest",
+      items: [{ lineId: GROOMS_LINE.id, share: "rest", amount: { cents: 10000, currency: "USD" } }],
+      personId: RILEY,
+      stripeCustomerId: RILEY_CUSTOMER,
+      saveCardForLater: false,
+      givenVia: ["text"],
+      dueAt: null,
+      yes: alexYes(booking),
+      what: "the Groom's package",
+    });
+    expect(link.writes.effects.map((effect) => [effect.kind, effect.personId])).toEqual([
+      ["stripe_pay_link", RILEY],
+    ]);
+    expect(tableOf(link.writes)).toEqual(["payments", "payment_items", "pay_links"]);
+    expect(paymentsRows(link.writes)).toMatchObject([
+      { payer_person_id: RILEY, purpose: "rest", amount_cents: 10000, saved_card_id: null },
+    ]);
+    // What is due at booking stays the booker's, on his own card: Alex's deposit is K-14 deposit.json's charge, though
+    // Riley pays the rest.
+    const deposit = createPayments(lees()).charge({
+      ...forRiley("rest", true),
+      purpose: "deposit",
+      items: [{ lineId: GROOMS_LINE.id, share: "deposit", amount: { cents: 4000, currency: "USD" } }],
+      card: alexSavedCard(booking),
+    });
+    expect(deposit.writes.effects[0]?.portRequest).toEqual(readExchange("deposit.json").request.port);
+    expect(paymentsRows(deposit.writes)).toMatchObject([{ payer_person_id: ALEX, purpose: "deposit" }]);
+  });
+
+  it("the booker who pays the rest too is charged it at DONE on the card saved for the booking, off the page: K-14 off-session-at-done.json's request exactly", () => {
+    const booking = alexBooking("booking-alex-haircut-done");
+    const line = { id: "line-alex-haircut-done-1", version: 1 };
+    const asked = createPayments(lees()).charge({
+      booking,
+      lines: [line],
+      purpose: "rest",
+      items: [{ lineId: line.id, share: "rest", amount: { cents: 3500, currency: "USD" } }],
+      card: alexSavedCard(booking, "card-alex-haircut-done"),
+      customerPresent: false,
+      yes: alexYes(booking, { answeredIn: "turn-alex-haircut-book" }),
+      what: "haircut with Riley, Sat Oct 24",
+    });
+    const done = readExchange("off-session-at-done.json").request;
+    const [effect] = asked.writes.effects;
+    expect(effect?.amount).toEqual(done.amount);
+    expect(effect?.portRequest).toEqual(done.port);
+    expect(
+      k14("charge.request", {
+        effect: { effectId: effect?.effectId, idempotencyKey: effect?.idempotencyKey },
+        amount: effect?.amount,
+        port: effect?.portRequest,
+      }),
+    ).toEqual([]);
+    expect(effect?.personId).toBe(ALEX);
+    expect(paymentsRows(asked.writes)).toMatchObject([
+      { payer_person_id: ALEX, purpose: "rest", saved_card_id: "card-alex-haircut-done" },
+    ]);
+  });
+
+  it("charge and payLink alone, the payer not the booker (2,000 seeded bookings): no card is ever charged for that payer, whatever the purpose, presence or yes, and they are asked only by a pay link, for the rest, on the booker's bound yes", async () => {
+    const random = seeded(313);
+    const seen = {
+      payerRefused: 0,
+      bookerCharged: 0,
+      linked: 0,
+      byYes: new Map<YesCase, number>(),
+      purposes: new Set<string>(),
+    };
+    for (let n = 0; n < 2000; n += 1) {
+      const turnId = `turn-payer-${String(n)}`;
+      const booking = alexBooking(`booking-payer-${String(n)}`, { payerPersonId: RILEY });
+      // Half the bookings take a bound yes, so the refusals the payer alone causes are many.
+      const yesCase = random() < 0.5 ? pick(random, BOUND_CASES) : pick(random, YES_CASES);
+      const yes = yesOf(yesCase, booking, turnId);
+      const binds = yesBinds(yes, booking);
+      seen.byYes.set(yesCase, (seen.byYes.get(yesCase) ?? 0) + 1);
+      const purpose = pick(random, BOOKING_PURPOSES);
+      seen.purposes.add(purpose);
+      const lineId = `line-payer-${String(n)}`;
+      const lines = [{ id: lineId, version: 1 }];
+      const cents = 100 + Math.floor(random() * 50_000);
+      const items = [{ lineId, share: SHARE_OF[purpose], amount: { cents, currency: "USD" } }];
+      const payments = createPayments(lees({ turnId }));
+      const label = `case ${String(n)}: ${purpose}, yes ${yesCase}`;
+      if (random() < 0.5) {
+        // A charge on Riley's card or Alex's, saved for the booking or typed, with the person on the page or not.
+        const card = pick(random, [
+          rileySavedCard(booking),
+          rileyTypedCard(),
+          alexSavedCard(booking),
+          alexTypedCard(),
+        ]);
+        const customerPresent = random() < 0.5;
+        const tried = await attempt(() =>
+          payments.charge({ booking, lines, purpose, items, card, customerPresent, yes, what: "the visit" }),
+        );
+        if (!binds) expect(tried.refusal, label).toBe(yesRefusal(yes, booking));
+        else if (purpose === "rest" || purpose === "extra")
+          expect(tried.refusal, label).toBe("payerNotBooker");
+        if (tried.refusal === "payerNotBooker") seen.payerRefused += 1;
+        // A charge that is built is the booker's: what is due at booking, on his own card, on his bound yes.
+        if (tried.refusal === null) {
+          seen.bookerCharged += 1;
+          expect(binds, label).toBe(true);
+          expect(["deposit", "full_price"], label).toContain(purpose);
+          expect(
+            tried.writes.effects.map((effect) => [effect.kind, effect.personId]),
+            label,
+          ).toEqual([["stripe_charge", ALEX]]);
+          expect(tried.writes.effects[0]?.portRequest, label).toMatchObject({
+            customerId: ALEX_CUSTOMER,
+            paymentMethodId: ALEX_CARD,
+          });
+          expect(paymentsRows(tried.writes), label).toMatchObject([{ payer_person_id: ALEX }]);
+        }
+      } else {
+        // A pay link for Riley, the payer.
+        const tried = await attempt(() =>
+          payments.payLink({
+            booking,
+            lines,
+            purpose,
+            items,
+            personId: RILEY,
+            stripeCustomerId: RILEY_CUSTOMER,
+            saveCardForLater: random() < 0.5,
+            givenVia: ["text"],
+            dueAt: null,
+            yes,
+            what: "the visit",
+          }),
+        );
+        if (!binds) expect(tried.refusal, label).toBe(yesRefusal(yes, booking));
+        // What is due at booking is never the payer's: the booker pays it, on the page.
+        else if (purpose === "deposit" || purpose === "full_price")
+          expect(tried.refusal, label).toBe("badInput");
+        // The rest is theirs, by pay link, on the booker's bound yes.
+        else if (purpose === "rest") expect(tried.refusal, label).toBeNull();
+        // Whatever is built for the payer is a pay link, never a charge on a card.
+        if (tried.refusal === null) {
+          if (purpose === "rest") seen.linked += 1;
+          expect(
+            tried.writes.effects.map((effect) => [effect.kind, effect.personId]),
+            label,
+          ).toEqual([["stripe_pay_link", RILEY]]);
+          expect(paymentsRows(tried.writes), label).toMatchObject([
+            { payer_person_id: RILEY, saved_card_id: null },
+          ]);
+        }
+      }
+    }
+    // Not vacuous: every yes case and purpose was tried; payer charges were refused, booker charges and links built.
+    for (const yesCase of YES_CASES) expect(seen.byYes.get(yesCase) ?? 0).toBeGreaterThan(30);
+    expect([...seen.purposes].sort()).toEqual(["deposit", "extra", "full_price", "rest"]);
+    expect(seen.payerRefused).toBeGreaterThan(200);
+    expect(seen.bookerCharged).toBeGreaterThan(50);
+    expect(seen.linked).toBeGreaterThan(100);
   });
 });
 
