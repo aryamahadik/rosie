@@ -133,9 +133,9 @@ So even a one-word town, which K-08 alone would take as a label, is refused (`re
 
 How a test drives the double:
 
-- **A search:** the double answers a request equal to an accepted search fixture's request (exactly, as written there) with that fixture's outcome; any other search answers `noMatch` (`no-match.json`: the test shop with no listing in fixture set v1), never an error.
+- **A search:** the double answers a request equal to an accepted answer fixture's request (exactly, as written there) with that fixture's outcome; any other search answers `noMatch` (`no-match.json`: the test shop with no listing in fixture set v1), never an error.
 - **Details:** the reference of one of its three listings answers `found` with that listing, as its details fixture holds it; any other reference answers `notFound` (`details-not-found.json`).
-- **An error:** the test sets the double, before the call, to fail its next call with an error fixture's outcome (`error-unavailable.json`, `error-rate-limited.json`, or `badRequest`); that call returns the error and writes its span with the error code, and later calls answer as before. The setting is the double's test-only option, never a field of the port's request.
+- **An error:** the test sets the double, before the call, to fail its next call with an error fixture's outcome (`error-unavailable.json`, `error-rate-limited.json`, or `badRequest`); that call returns the error and writes its span with the error code, and later calls answer as before. The setting is the double's test-only option, never a field of the port's request. The error fixtures' requests are the calls a test makes with that setting on: they share theirs with `search-by-name.json` and `details.json`, which answer them when it is off.
 - **Spans:** the double writes each call's span as the adapter would.
 
 Phone numbers are the cast's listing numbers, (555) 010-0177 and (555) 010-0142, kept in E.164 by their last four digits as +15555550177 and +15555550142, as K-23 v1's seed and README keep them; both are in the fiction range 555-0100 to 555-0199. The website is the demo shops' reserved `example.com`. Listing and photo references are made up in K-08 v1's form (`places-demo-...`, as K-08 v1's `span-places-call.json` names Lee's Barbershop).
