@@ -8,9 +8,12 @@
 // which phone-scan.test.mjs checks against the digits:
 //   - "impossible code": +1, then an area code or an exchange that starts with 0 or 1, which the plan never gives;
 //   - "555 exchange": +1, then exchange 555 with a line outside the fiction block: the plan keeps exchange 555 for
-//     directory and information services, never a person's line, and area code 555 serves no area at all;
-//   - "wrong length": +1 with other than ten digits after it, such as the fiction block's first digits written
-//     before a template's last four;
+//     directory and information services, never a person's line, and area code 555 serves no area at all. Never
+//     the directory-assistance line or the one national-use line NANPA kept, and never in a Nevada area code
+//     (DL-632) or a toll-free one, where 555 is not reserved (T-1344);
+//   - "wrong length": +1 with fewer than ten digits after it, such as the fiction block's first digits written
+//     before a template's last four. Never seven, a local number's length (DL-636), and never more than ten, a real
+//     number with a digit added (T-1344);
 //   - "not a phone number": digits that are no number in their file (an integer, a digest, a coordinate, a count),
 //     each named in its why;
 //   - "public line" (DL-616): one of PUBLIC_LINES below, a published public service line, never a person's number,
