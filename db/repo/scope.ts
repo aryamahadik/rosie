@@ -11,6 +11,7 @@
 // such as handles or phones) would fail open. Such a path calls requireBusinessScope() inside its transaction before
 // its first read, and withBusiness() refuses a callback that ends with its scope emptied or changed.
 import type postgres from "postgres";
+import type { TransientError } from "./targets";
 
 export type Sql = postgres.Sql;
 export type Tx = postgres.TransactionSql;
@@ -108,22 +109,54 @@ export async function requireBusinessScope(tx: Sql | Tx): Promise<string> {
  * read only. Before the commit the scope must still be `businessId`: a callback that emptied it (rosie_job then reads
  * every business's rows) or changed it is refused with BusinessScopeError, the transaction rolls back, and nothing it
  * read is returned.
+ *
+ * The start (T-1331; T-1315's handoff b; K-05 README: `transient`; ADR-014 section 2): a failure before `fn` begins (the
+ * connect and begin of sql.begin, then the scope's set_config) goes to clocks.ts's transientOrScrubbed (targets.ts's
+ * transientOrThrow, whatever it throws scrubbed) under the name of the call the transaction is opened for
+ * (`options.call`; "withBusiness" when none is named), and `fn` never runs:
+ *   - a connection that never opened (08001: a closed port, a name that never resolves, postgres.js's CONNECT_TIMEOUT)
+ *     or was lost (08006, 57P01 to 57P03) is K-05's `transient`: nothing was written and the same request may be sent
+ *     again. Where the call's contract has that answer, the caller passes `options.transient` and withBusiness resolves
+ *     with what it gives for the answer; otherwise the failure is thrown scrubbed, as clocks.ts's DataAccessDatabaseError
+ *     with the call's name and that SQLSTATE alone;
+ *   - every other failure of the start is thrown scrubbed (clocks.ts's scrubbed: the call's name and the code alone, a
+ *     PostgresError as DataAccessDatabaseError with its SQLSTATE), and is never K-05's `transient`, the caller's answer
+ *     or not: a session refused at its start (PostgreSQL's class 28 and 53300, a TLS or certificate error, EACCES,
+ *     postgres.js's SASL_SIGNATURE_MISMATCH; and PostgreSQL's 3D000, 42501 and 55000, whose messages name the database),
+ *     and a set_config refused with any other SQLSTATE (57014, a statement timeout or a cancel), whose statement holds
+ *     the business id.
+ * Neither the answer nor a scrubbed error holds the original's message, host, port, user, password, database, statement
+ * or values. Once `fn` has begun, what it throws, and the end's scope check and commit, leave as they always have.
+ * clocks.ts (and targets.ts through it) is imported only when a start fails, never when this file loads: both import
+ * this file in turn, and every script that runs db/ under Node loads this file (db/tsconfig.erasable.json).
  */
 export async function withBusiness<T>(
   sql: Sql,
   businessId: string,
   fn: (tx: Tx) => Promise<T>,
-  options: { readOnly?: boolean } = {},
+  options: { readOnly?: boolean; call?: string; transient?: (answer: TransientError) => T } = {},
 ): Promise<T> {
   assertBusinessId(businessId);
+  // Whether `fn` has begun: until it has, a failure is the start's.
+  const progress = { started: false };
   const run = async (tx: Tx): Promise<T> => {
     await setBusinessScope(tx, businessId);
+    progress.started = true;
     const result = await fn(tx);
     if ((await requireBusinessScope(tx)) !== businessId) {
       throw new BusinessScopeError("a Tool API call must end under the business scope it began with");
     }
     return result;
   };
-  const result = options.readOnly === true ? await sql.begin("read only", run) : await sql.begin(run);
-  return result as T;
+  try {
+    const result = options.readOnly === true ? await sql.begin("read only", run) : await sql.begin(run);
+    return result as T;
+  } catch (error) {
+    if (progress.started) throw error;
+    const call = options.call ?? "withBusiness";
+    const { DataAccessDatabaseError, transientOrScrubbed } = await import("./clocks");
+    const answer = transientOrScrubbed(call, error);
+    if (options.transient !== undefined) return options.transient(answer);
+    throw new DataAccessDatabaseError(call, answer.sqlstate, null, null);
+  }
 }
