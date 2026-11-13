@@ -2,9 +2,68 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 497, [`3d6b3d9`](https://github.com/aryamahadik/rosie/commit/3d6b3d9), 2026-11-12 23:36:34 UTC.
+- **Through:** commit 500, [`0858e4b`](https://github.com/aryamahadik/rosie/commit/0858e4b), 2026-11-13 02:02:42 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 500. docs: docs/professions.md lists all 243 professions with each one's id and style (\#508)
+
+- **Commit:** [`0858e4b`](https://github.com/aryamahadik/rosie/commit/0858e4b), by Arya Mahadik, 2026-11-13 02:02:42 UTC
+- **Pull request:** [#508](https://github.com/aryamahadik/rosie/pull/508) from `task/docs-professions`, merged 2026-11-13 02:02:42 UTC. It squashed 2 branch commits:
+  - `78f46d9` docs: docs/professions.md lists all 243 professions from the master's…
+  - `9ec188f` docs: docs/professions.md in Prettier's format (the table's columns a…
+- **Files changed:** 1 (+249 −0), by folder:
+  - `docs/` professions.md +249 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* docs: docs/professions.md lists all 243 professions from the master's profession files, with each one's id and style
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* docs: docs/professions.md in Prettier's format (the table's columns aligned; content unchanged)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 499. docs: the deploy-staging skill's step 5 names the post-deploy check's host-rule POST (T-1321) (\#507)
+
+- **Commit:** [`1dfba45`](https://github.com/aryamahadik/rosie/commit/1dfba45), by Arya Mahadik, 2026-11-13 02:02:38 UTC
+- **Pull request:** [#507](https://github.com/aryamahadik/rosie/pull/507) from `task/docs-deploy-skill-host-rule`, merged 2026-11-13 02:02:39 UTC. It squashed 1 branch commit:
+  - `f71bda5` docs: the deploy-staging skill's step 5 names the post-deploy check's…
+- **Files changed:** 1 (+1 −1), by folder:
+  - `.claude/skills/deploy-staging/` SKILL.md +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 498. docs: COMMIT\_HISTORY.md through commit 497 (3d6b3d9, \#504) (\#506)
+
+- **Commit:** [`21ab5fb`](https://github.com/aryamahadik/rosie/commit/21ab5fb), by Arya Mahadik, 2026-11-13 02:02:34 UTC
+- **Pull request:** [#506](https://github.com/aryamahadik/rosie/pull/506) from `task/commit-history-61`, merged 2026-11-13 02:02:35 UTC. It squashed 1 branch commit:
+  - `fce0813` docs: COMMIT\_HISTORY.md through commit 497 (3d6b3d9, \#504)
+- **Files changed:** 1 (+50 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +50 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 497. docs: COMMIT\_HISTORY.md through commit 494 (ab1b5b4, \#502) (\#504)
 
