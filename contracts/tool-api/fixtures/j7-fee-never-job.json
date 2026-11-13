@@ -1,0 +1,66 @@
+{
+  "call": "feeDoor",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": [],
+    "now": "2026-10-27T17:45:00Z",
+    "stated": { "step": "S11-22", "gives": [] },
+    "note": "S11-22, then S11-35: Ben T. missed the Tue Oct 27 1:00pm haircut with Riley and didn't answer in 30 minutes (A8-16; journey 8's no-show, whose own call is journey 8's K-09 freeze, the plan's v1.6 row, after v1.9: README open gap 139). K-31's no-show clock, a job, opens the fee door. No welfare check applies to a haircut. Ben is fee-free (Sam marked him so: S11-57), so 'Never: no fee may be asked': Sam is not asked and nothing is charged; S11-35's one line to Sam by a clock row due at once ('Ben T. missed the Tue 1:00pm with Riley. Ben is fee-free, so no fee is asked.'); anything paid for the visit would go back by what was taken (nothing was). No key. Ben's booking and visit ids are examples (README default 48's rule)."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-noshow-ben-oct27-0001",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-noshow-ben-oct27"
+    },
+    "bookingId": "booking-ben-oct27",
+    "stage": {
+      "kind": "open",
+      "step": "S11-22",
+      "visitId": "visit-ben-oct27-1",
+      "reason": "no_show",
+      "from": "A8-16",
+      "shownCutoffAt": null,
+      "setOnSilence": false,
+      "cancelYesConsentId": null,
+      "welfareFoundSafeAt": null,
+      "personReachedAt": null
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-ben-oct27",
+    "stage": "open",
+    "step": "S11-35",
+    "result": "noFeeMayBeAsked",
+    "messages": [
+      {
+        "to": "owner",
+        "personId": "person-sam",
+        "step": "S11-35",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-fee-ben-never",
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [],
+    "consentId": null,
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [],
+    "moneyWords": [],
+    "next": "none",
+    "gives": [],
+    "written": [{ "table": "clock_rows", "rowId": "clock-fee-ben-never", "version": 1 }],
+    "repeated": false
+  }
+}

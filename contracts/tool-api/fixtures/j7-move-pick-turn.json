@@ -1,0 +1,90 @@
+{
+  "call": "moveBooking",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": ["j7-move-offer-turn.json"],
+    "now": "2026-10-23T14:07:00Z",
+    "stated": { "step": "A7-03", "gives": [] },
+    "note": "A7-03: Alex replies 'A' in his own chat, before free cancel ends, so the move is free. In his turn's commit: his yes written as a K-29 ticked_terms consent with the words shown (the question's stored words) and their sha256 (README default 147); Sat 3:00pm reserved for Riley and the 11:00am hold released (K-05 v1 reserve, release); the visit's reservation and free-cancel time moved with it ('The code stays the same: it's still the same visit'; K-30 rule 6); one booking_changes row moved, asked by Alex, approved by that consent; a calendar_update effect for Riley's calendar; Alex's 'Moved: ...' reply (quick_reply) and Riley's 'Change: Alex M. moved the Sat 11:00am to Sat Oct 24 · 3:00pm.' (routine). No key. The ids are examples."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-pick-a-oct23",
+      "requestId": "turn-alex-pick-a-oct23",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-pick-a-oct23"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": {
+      "kind": "pick",
+      "step": "A7-03",
+      "visitId": "visit-alex-haircut-1",
+      "optionId": "A7-03/A",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-alex-new-times-oct23", "yesEventId": "evt-alex-0512" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "pick",
+    "step": "A7-03",
+    "result": "moved",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A7-03",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-alex-moved-oct23",
+        "clockRowId": null,
+        "openQuestionId": "oq-alex-moved-oct23"
+      },
+      {
+        "to": "staff",
+        "personId": "person-riley",
+        "step": "A7-03",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-riley-alex-moved-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [
+      {
+        "changeId": "chg-alex-haircut-moved-oct23",
+        "bookingId": "booking-alex-haircut",
+        "visitId": "visit-alex-haircut-1",
+        "kind": "moved",
+        "askedBy": "customer",
+        "afterFreeCancel": false,
+        "approvedBy": { "kind": "consentRow", "consentId": "consent-alex-move-oct23" }
+      }
+    ],
+    "consentId": "consent-alex-move-oct23",
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [{ "effectId": "eff-alex-haircut-calendar-move", "kind": "calendar_update" }],
+    "moneyWords": [
+      { "slot": "pay.cancel", "table": "booking_visits", "column": "cutoff_at", "rowId": "visit-alex-haircut-1" }
+    ],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-alex-haircut-sat-3pm", "version": 1 },
+      { "table": "reservations", "rowId": "rsv-alex-haircut", "version": 3 },
+      { "table": "booking_visits", "rowId": "visit-alex-haircut-1", "version": 2 },
+      { "table": "bookings", "rowId": "booking-alex-haircut", "version": 6 },
+      { "table": "outbox_rows", "rowId": "out-alex-moved-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-riley-alex-moved-oct23", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

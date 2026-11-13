@@ -1,0 +1,87 @@
+{
+  "call": "changeWhatsBooked",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": ["j7-reminder-job.json"],
+    "now": "2026-10-22T23:05:00Z",
+    "stated": { "step": "A7-31", "gives": [] },
+    "note": "A7-31: Alex asked 'Can I add a beard trim on Saturday?'; Riley has the time, so the change was priced first: 'Riley has time for it. Add a beard trim to your Sat 11:00am visit? / Beard trim · $20 / Added to Sat Oct 24 · 11:00am · Riley / Paid with the rest of your visit / Reply 1 Add it, 2 No thanks.' Alex replies '1' in his own chat ('A new or higher amount: the customer's own yes in their own chat'). In his turn's commit: his yes written as a K-29 ticked_terms consent with those words and their sha256 (README default 147); a new booking line for the beard trim with its $20 copied in (K-30 booking_lines, paid with the rest); one booking_changes row what_changed, asked by Alex, approved by that consent; Riley's 'Change: Alex M. added a beard trim to the Sat 11:00am.' (routine); Alex's short reply (quick_reply). Nothing is charged now; nothing is refunded. No key. The ids are examples."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-add-trim-oct22",
+      "requestId": "turn-alex-add-trim-oct22",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-add-trim-oct22"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": {
+      "kind": "answer",
+      "step": "A7-31",
+      "answer": "yes",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-alex-add-trim-oct22", "yesEventId": "evt-alex-0501" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "answer",
+    "step": "A7-31",
+    "result": "changed",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A7-31",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-alex-trim-added-oct22",
+        "clockRowId": null,
+        "openQuestionId": null
+      },
+      {
+        "to": "staff",
+        "personId": "person-riley",
+        "step": "A7-31",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-riley-trim-added-oct22",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [
+      {
+        "changeId": "chg-alex-haircut-add-trim-oct22",
+        "bookingId": "booking-alex-haircut",
+        "visitId": "visit-alex-haircut-1",
+        "kind": "what_changed",
+        "askedBy": "customer",
+        "afterFreeCancel": false,
+        "approvedBy": { "kind": "consentRow", "consentId": "consent-alex-add-trim-oct22" }
+      }
+    ],
+    "consentId": "consent-alex-add-trim-oct22",
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.price", "table": "booking_lines", "column": "price_cents", "rowId": "line-alex-haircut-2" }
+    ],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "booking_lines", "rowId": "line-alex-haircut-2", "version": 1 },
+      { "table": "bookings", "rowId": "booking-alex-haircut", "version": 6 },
+      { "table": "outbox_rows", "rowId": "out-alex-trim-added-oct22", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-riley-trim-added-oct22", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "call": "moveBooking",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": [],
+    "now": "2026-10-23T17:10:00Z",
+    "stated": { "step": "A7-03", "gives": [] },
+    "note": "A7-03 after free cancel ends: Fri Oct 23 at 1:10pm Alex picks 'B' (Sun Oct 25 at 11:00am) from a question that showed 'No free cancel' before the yes ('Booked after the free-cancel time: No free cancel shows before the yes'). 'After free cancel ends, a move is a request to Sam: accept, another time, or decline. Silence keeps the booking as it is.' In his turn's commit: his yes written as a K-29 ticked_terms consent with the words shown (README default 147); one K-30 owner_oks row about late_move with its question to Sam ('1 Accept', '2 Another time', '3 Decline') and its deadline; Alex told that Sam decides. Nothing moves yet, and his Sat 11:00am stays booked. No key. The ids are examples."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-pick-b-late-oct23",
+      "requestId": "turn-alex-pick-b-late-oct23",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-pick-b-late-oct23"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": {
+      "kind": "pick",
+      "step": "A7-03",
+      "visitId": "visit-alex-haircut-1",
+      "optionId": "A7-03/late-B",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-alex-late-times-oct23", "yesEventId": "evt-alex-0533" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "pick",
+    "step": "A7-03",
+    "result": "askedOwner",
+    "messages": [
+      {
+        "to": "owner",
+        "personId": "person-sam",
+        "step": "A7-03",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-sam-late-move-alex-oct23",
+        "clockRowId": null,
+        "openQuestionId": "oq-sam-late-move-alex-oct23"
+      },
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A7-03",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-alex-late-move-asked-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": "2026-10-23T21:10:00Z",
+    "changes": [],
+    "consentId": "consent-alex-late-move-oct23",
+    "ownerOkId": "ownerok-alex-late-move-oct23",
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [],
+    "moneyWords": [],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "owner_oks", "rowId": "ownerok-alex-late-move-oct23", "version": 1 },
+      { "table": "open_questions", "rowId": "oq-sam-late-move-alex-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-sam-late-move-alex-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-alex-late-move-asked-oct23", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

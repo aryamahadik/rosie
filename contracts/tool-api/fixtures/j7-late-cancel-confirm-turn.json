@@ -1,0 +1,108 @@
+{
+  "call": "cancelBooking",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": ["j7-reminder-job.json"],
+    "now": "2026-10-23T18:05:00Z",
+    "stated": { "step": "A7-06", "gives": [] },
+    "note": "A7-06's '2 Cancel anyway': Fri Oct 23 at 2:00pm, after free cancel ended (Fri 11am, the clock Alex was shown), Alex asked to cancel and heard 'It's past the free-cancel time (Fri 11am). So Lee's Barbershop {{pay.late}}. Cancel anyway? / Reply 1 Keep it, 2 Call it off anyway.'; at 2:05pm he replies '2' in his own chat. In his turn's commit: his yes written as a K-29 ticked_terms consent with those words shown and their sha256 (README default 147); the head cancelled, the hold released, one booking_changes row cancelled, after free cancel, approved by that consent; a calendar_delete effect. Nothing is charged here ('Never: charge on this text'): the walk goes on through the fee door in the same commit (README default 152): S11-22, a fee may be asked (Alex is not fee-free, the time was not set on silence); S11-23, this booking took a card saved for its $20 fee (K-30 line-alex-haircut-1 fee_cents 2000; nothing paid now); S11-25, one K-32 booking_fees row asked, late_cancel, $20 from the card, Sam's question in this commit ('... Charge or keep the late-cancel fee? / Alex agreed to it when booking / ... / No answer by 2:05pm Sat: no fee / Reply 1 Charge or keep it, 2 No fee.'), its deadline 24 hours later and one reminder's clock row in his text hours. Alex's reply: 'Cancelled: your Sat 11:00am visit. Lee's Barbershop decides about the fee by Sat 2:05pm, and we'll text you.' Riley told. The card stays: the fee may need it. No key. The ids are examples."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-cancel-anyway-oct23",
+      "requestId": "turn-alex-cancel-anyway-oct23",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-cancel-anyway-oct23"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": {
+      "kind": "confirm",
+      "step": "A7-06",
+      "visitId": "visit-alex-haircut-1",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-alex-fee-warning-oct23", "yesEventId": "evt-alex-0541" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "confirm",
+    "step": "A7-06",
+    "result": "cancelledLate",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A7-06",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-alex-cancelled-late-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      },
+      {
+        "to": "staff",
+        "personId": "person-riley",
+        "step": "A7-06",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-riley-alex-cancelled-late-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      },
+      {
+        "to": "owner",
+        "personId": "person-sam",
+        "step": "S11-25",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-sam-fee-alex-oct23",
+        "clockRowId": null,
+        "openQuestionId": "oq-sam-fee-alex-oct23"
+      }
+    ],
+    "timesOffered": [],
+    "deadline": "2026-10-24T18:05:00Z",
+    "changes": [
+      {
+        "changeId": "chg-alex-haircut-cancelled-late-oct23",
+        "bookingId": "booking-alex-haircut",
+        "visitId": "visit-alex-haircut-1",
+        "kind": "cancelled",
+        "askedBy": "customer",
+        "afterFreeCancel": true,
+        "approvedBy": { "kind": "consentRow", "consentId": "consent-alex-cancel-anyway-oct23" }
+      }
+    ],
+    "consentId": "consent-alex-cancel-anyway-oct23",
+    "ownerOkId": null,
+    "fee": {
+      "bookingFeeId": "fee-alex-haircut-late-cancel",
+      "kind": "late_cancel",
+      "amount": { "cents": 2000, "currency": "USD" },
+      "comesFrom": "card",
+      "answerBy": "2026-10-24T18:05:00Z",
+      "reminderClockRowId": "clock-fee-alex-reminder"
+    },
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [{ "effectId": "eff-alex-haircut-calendar-delete-late", "kind": "calendar_delete" }],
+    "moneyWords": [
+      { "slot": "pay.late", "table": "booking_lines", "column": "fee_cents", "rowId": "line-alex-haircut-1" }
+    ],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "bookings", "rowId": "booking-alex-haircut", "version": 6 },
+      { "table": "reservations", "rowId": "rsv-alex-haircut", "version": 3 },
+      { "table": "booking_fees", "rowId": "fee-alex-haircut-late-cancel", "version": 1 },
+      { "table": "open_questions", "rowId": "oq-sam-fee-alex-oct23", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-fee-alex-reminder", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-alex-cancelled-late-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-riley-alex-cancelled-late-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-sam-fee-alex-oct23", "version": 1 }
+    ],
+    "repeated": false
+  }
+}
