@@ -2,9 +2,77 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 521, [`1b5846d`](https://github.com/aryamahadik/rosie/commit/1b5846d), 2026-11-13 07:45:54 UTC.
+- **Through:** commit 525, [`d0b54e7`](https://github.com/aryamahadik/rosie/commit/d0b54e7), 2026-11-13 08:13:06 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 525. docs: COMMIT\_HISTORY.md through commit 521 (1b5846d, \#528) (\#533)
+
+- **Commit:** [`d0b54e7`](https://github.com/aryamahadik/rosie/commit/d0b54e7), by Arya Mahadik, 2026-11-13 08:13:06 UTC
+- **Pull request:** [#533](https://github.com/aryamahadik/rosie/pull/533) from `task/commit-history-71`, merged 2026-11-13 08:13:06 UTC. It squashed 1 branch commit:
+  - `066e9aa` docs: COMMIT\_HISTORY.md through commit 521 (1b5846d, \#528)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 524. T-1339: commitTurn's and openChatOnText's own scrubbed() turn a postgres.js statement error (UNDEFINED\_VALUE, a serialize TypeError, any error carrying query, parameters, args or types) into an error with the call's name and code alone, as clocks.ts's scrubbed does; a PostgresError with a SQLSTATE still leaves as each call's own database error, and the constraint and transient answers are unchanged (\#532)
+
+- **Commit:** [`9aa532f`](https://github.com/aryamahadik/rosie/commit/9aa532f), by Arya Mahadik, 2026-11-13 08:13:02 UTC
+- **Pull request:** [#532](https://github.com/aryamahadik/rosie/pull/532) from `task/T-1339`, merged 2026-11-13 08:13:03 UTC. It squashed 1 branch commit:
+  - `661edd3` T-1339: commitTurn's and openChatOnText's own scrubbed() turn a postg…
+- **Files changed:** 4 (+445 −16), by folder:
+  - `db/repo/` chat-open.int.test.ts +186 −0, chat-open.ts +46 −9, commit-turn.int.test.ts +170 −0, commit-turn.ts +43 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 523. T-1335: the PostgreSQL-down path's outage line asks the one reading right before each text's line, not once per pass; a true answer or a throw withholds that line and every later one of the pass (stopped, not asked again); real-actor proofs: a STOP taken while the first line is out holds the second, the boundary, two fail-closed cases, and a danger line still goes (\#531)
+
+- **Commit:** [`a066123`](https://github.com/aryamahadik/rosie/commit/a066123), by Arya Mahadik, 2026-11-13 08:12:58 UTC
+- **Pull request:** [#531](https://github.com/aryamahadik/rosie/pull/531) from `task/T-1335`, merged 2026-11-13 08:12:58 UTC. It squashed 1 branch commit:
+  - `399ae07` T-1335: the PostgreSQL-down path's outage line asks the one reading r…
+- **Files changed:** 2 (+241 −6), by folder:
+  - `runtime/src/outage/db/` outage.ts +23 −5, outage.worker.test.ts +218 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 522. T-1337: the dispatcher asks the recipient actor's one reading right before an outage line's row goes (DL-656): only exactly false sends; true, a throw, no answer, a non-boolean, no actor or no port drops the row as stopped; the root joins the port by the row's recipient K-04 id (actorOf's route); HandleActor.mayHaveStoppedNow (\#530)
+
+- **Commit:** [`25c3748`](https://github.com/aryamahadik/rosie/commit/25c3748), by Arya Mahadik, 2026-11-13 08:12:54 UTC
+- **Pull request:** [#530](https://github.com/aryamahadik/rosie/pull/530) from `task/T-1337`, merged 2026-11-13 08:12:54 UTC. It squashed 1 branch commit:
+  - `d8aebd4` T-1337: the dispatcher asks the recipient actor's one reading right b…
+- **Files changed:** 7 (+1432 −13), by folder:
+  - `runtime/src/actor/` handle-actor.ts +8 −0
+  - `runtime/src/clocks/` types.ts +6 −0
+  - `runtime/src/dispatch/` actor-reading.worker.test.ts +415 −0, dispatcher.ts +105 −3
+  - `runtime/src/outage/ai/` lease.worker.test.ts +617 −7
+  - `runtime/src/wiring/` root.test.ts +254 −2, root.ts +27 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 521. docs: COMMIT\_HISTORY.md through commit 519 (93c981f, \#527) (\#528)
 
