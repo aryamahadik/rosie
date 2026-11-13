@@ -3,13 +3,16 @@
 // gateway's door; the safety read, the shared core, the Linq send and the clock are the doubles of ./test-support, and a
 // turn's commit goes through the actor's own lease to K-05's double, as in ./store.worker.test.ts. Each test proves a line
 // of the record's section 3, card H, "Proves it with", or a point of its section 2 that the card gives; the two blocks
-// after them prove T-1318's card (T-1312's security notes b and a), and the last two T-1348's (T-1318's new tasks 1 and 2:
-// a danger whose pending note was never written is read again until its hold is written, and a cut-off resume never
-// clears a danger flag the first read set). Where a test makes a write (or a read) throw, the actor's own storage call
-// throws for it, picked by its table and its order (a SQLite trigger that refuses a write cannot also count it: its abort
-// undoes the count); where it makes a seal fail, it does so at the platform's WebCrypto encrypt, for one text's result
-// only. `closeResults` is reached on the actor's own safety read, inside a storage transaction, as the lease's end of a
-// turn calls it. Test values only (rule 9).
+// after them prove T-1318's card (T-1312's security notes b and a), the two after those T-1348's (T-1318's new tasks 1 and
+// 2: a danger whose pending note was never written is read again until its hold is written, and a cut-off resume never
+// clears a danger flag the first read set), and the last T-1364's (T-1348's new task B and its security note a: a danger
+// whose line is not done keeps a lasting mark, so its line is tried again until it goes, however its note's writes fail).
+// Where a test makes a write (or a read) throw, the actor's own storage call throws for it, picked by its table and its
+// order (a SQLite trigger that refuses a write cannot also count it: its abort undoes the count); T-1364's refuse every
+// write of a pending note with such a trigger instead, since it is kept in the storage and so refuses a resumed
+// instance's writes too. Where a test makes a seal fail, it does so at the platform's WebCrypto encrypt, for one text's
+// result only. `closeResults` is reached on the actor's own safety read, inside a storage transaction, as the lease's end
+// of a turn calls it. Test values only (rule 9).
 import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -1401,5 +1404,615 @@ describe("a cut-off danger whose pending note was never written resumes as a dan
         await vi.waitFor(noSafetyEntry, WAIT);
       },
     );
+  });
+});
+
+// ---- T-1364: T-1348's new task B and its security reviewer's note a ----------------------------------------------------
+
+/**
+ * Makes the actor's storage refuse every write of a pending note (an insert into safety_pending), in this instance and in
+ * each one after an eviction: a SQLite trigger kept in the storage refuses it, so `markDangerPending` throws however
+ * often it is tried, a resume's included. Clearing a note (a delete) still runs.
+ */
+function refuseNotes(): Promise<void> {
+  return exec(
+    `CREATE TRIGGER refuse_note BEFORE INSERT ON safety_pending
+     BEGIN SELECT RAISE(ABORT, 'the storage refused'); END`,
+  );
+}
+
+/** A text's line mark as its row keeps it: 1 while its danger line is not done, 0 once it is, null when never set. */
+function lineMarkOf(eventId: string): Promise<number | null> {
+  return runInDurableObject(stub(), (_, state) => {
+    const row = state.storage.sql
+      .exec<{ line_open: number | null }>("SELECT line_open FROM safety_events WHERE event_id = ?", eventId)
+      .toArray()[0];
+    return row === undefined ? null : row.line_open;
+  });
+}
+
+/** Linq's double for the direct line, keeping each send tried (its time and key), whether Linq takes it or refuses it. */
+function triedDirect(h: Harness, tries: [number, string][]): SafetyDeps["direct"] {
+  return {
+    send(request) {
+      tries.push([h.clock.now(), request.idempotencyKey]);
+      return h.direct.send(request);
+    },
+  };
+}
+
+/**
+ * Makes the actor's storage throw, inside the actor, at the first write that sets a text's danger flag on its own
+ * (`markDanger`'s, which carries the line mark in the same statement); every other statement runs as it is. Returns how
+ * many it refused.
+ */
+async function refuseFirstFlag(): Promise<() => number> {
+  let refused = 0;
+  await runInDurableObject(stub(), (_, state) => {
+    const { sql } = state.storage;
+    const run = sql.exec.bind(sql);
+    const faulted = (
+      query: string,
+      ...bindings: SqlStorageValue[]
+    ): SqlStorageCursor<Record<string, SqlStorageValue>> => {
+      if (refused === 0 && query.includes("SET danger = 1")) {
+        refused += 1;
+        throw new Error("the storage refused");
+      }
+      return run(query, ...bindings);
+    };
+    vi.spyOn(sql, "exec").mockImplementation(faulted);
+  });
+  return () => refused;
+}
+
+/** Linq's double that keeps each send tried and never answers: a cut comes during it. */
+function hangingDirect(h: Harness, tries: [number, string][]): SafetyDeps["direct"] {
+  return {
+    send(request) {
+      tries.push([h.clock.now(), request.idempotencyKey]);
+      return new Promise(() => undefined);
+    },
+  };
+}
+
+/** evt-1's hold as a danger's step 1 writes it from An emergency's read: its rule, no id, the booking block. */
+const STEP_ONE_HOLD: HoldEntry = {
+  eventId: "evt-1",
+  holdId: null,
+  rule: "after_safe",
+  blocksBooking: true,
+  released: false,
+};
+
+describe("a danger whose line is not done keeps a lasting mark, however its pending note's writes fail, so its line is tried again on the read's schedule until it goes, once (T-1364)", () => {
+  it("task B, its first case: with markDangerPending throwing at every write, the hold written and Linq refusing the line, the danger's line mark is set with its flag; it is read again every 30 s, a No is not used, and its line is tried again under the same key at each read that finds danger until Linq takes it, once; then the mark clears and nothing is read or sent again", async () => {
+    const tries: [number, string][] = [];
+    const rereads = rereadSpans();
+    // On arrival and at every re-read but the first, which says No, the read finds An emergency.
+    const read = readsBy((eventId, nth) => (nth === 2 ? no(eventId) : emergency(eventId)));
+    await withActor(
+      {},
+      { deps: (h) => ({ ...h.deps, read, direct: triedDirect(h, tries) }) },
+      async (run) => {
+        run.h.core.down = true;
+        run.h.direct.fail = true;
+        await refuseNotes();
+        await arrive("evt-1", SMOKE_TEXT);
+        await run.settle();
+
+        // 0 s: the note's write threw; the hold, the flag with its line mark, the labels and the result were written. The
+        // line was tried once, straight through Linq under its noted key, and refused.
+        expect(tries).toEqual([[0, LINE_KEY]]);
+        expect(run.h.direct.sent).toEqual([]);
+        expect(await idsIn("safety_pending")).toEqual([]);
+        expect(await actorOf().readHolds()).toEqual([STEP_ONE_HOLD]);
+        expect(await keptResults("evt-1")).toEqual([emergency("evt-1")]);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "lineFailed", danger: true },
+        ]);
+        expect(await lineMarkOf("evt-1")).toBe(1);
+        expect(await notedLineOf("evt-1")).toBe("safetyEmergency");
+        await vi.waitFor(async () => {
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 30_000 });
+        }, WAIT);
+
+        // 30 s: read again, No: not used (the first verdict stands), and no line is tried. Still no note; the flag, the
+        // labels, the kept result and the mark stay, and the next read is 30 s on.
+        await run.h.clock.advance(30_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(rereads()).toBe(1);
+        }, WAIT);
+        expect(read.requests).toHaveLength(2);
+        expect(tries).toHaveLength(1);
+        expect(await idsIn("safety_pending")).toEqual([]);
+        expect(await labelsOf("evt-1")).toEqual(["An emergency"]);
+        expect(await keptResults("evt-1")).toEqual([emergency("evt-1")]);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "lineFailed", danger: true },
+        ]);
+        expect(await lineMarkOf("evt-1")).toBe(1);
+        await vi.waitFor(async () => {
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 60_000 });
+        }, WAIT);
+
+        // 60 s: An emergency: applied again, its line is tried again under the same key, and Linq still refuses it.
+        await run.h.clock.advance(30_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(tries).toEqual([
+            [0, LINE_KEY],
+            [60_000, LINE_KEY],
+          ]);
+        }, WAIT);
+        await vi.waitFor(async () => {
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 90_000 });
+        }, WAIT);
+        expect(run.h.direct.sent).toEqual([]);
+        expect(await lineMarkOf("evt-1")).toBe(1);
+
+        // Linq takes sends again. 90 s: An emergency: the line goes, once, under the same key, and its record is queued;
+        // the mark clears, and nothing is left to read.
+        run.h.direct.fail = false;
+        await run.h.clock.advance(30_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(run.h.direct.sent).toHaveLength(1);
+        }, WAIT);
+        await run.settle();
+        expect(run.h.direct.sent.map((send) => [send.at, send.idempotencyKey, send.overrideOptout])).toEqual([
+          [90_000, LINE_KEY, true],
+        ]);
+        expect(await lineMarkOf("evt-1")).toBe(0);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "done", danger: true, path: "direct", lineId: "safetyEmergency" },
+        ]);
+        expect((await actorOf().readCopies()).returns).toMatchObject([
+          { key: "recordSafetyOutcome:evt-1", call: "recordSafetyOutcome", rank: "danger" },
+        ]);
+        await vi.waitFor(noSafetyEntry, WAIT);
+
+        // A danger whose line went is not sent again: 30 s and 60 s on, nothing is read or tried.
+        await run.h.clock.advance(60_000);
+        await run.wake();
+        await run.settle();
+        expect(read.requests).toHaveLength(4);
+        expect(tries).toHaveLength(3);
+        expect(run.h.direct.sent).toHaveLength(1);
+      },
+    );
+  });
+
+  it("task B, its second case: cut off during its direct line, then resumed while markDangerPending still throws: its flag and line mark stay, the resume's No is not used, and its line is tried again under the same key at each read that finds danger until Linq takes it, once", async () => {
+    const tries: [number, string][] = [];
+    const rereads = rereadSpans();
+    // After the cut: the resume's read says No, and each later read finds An emergency.
+    const after = readsBy((eventId, nth) => (nth === 1 ? no(eventId) : emergency(eventId)));
+    await withActor(
+      { "evt-1": emergency("evt-1") },
+      { deps: (h) => ({ ...h.deps, direct: hangingDirect(h, tries) }) },
+      async (run) => {
+        run.h.core.down = true;
+        await refuseNotes();
+        await arrive("evt-1", SMOKE_TEXT);
+
+        // 0 s: the read finds An emergency. The note's write throws; the hold, the flag with its line mark, the labels and
+        // the result are written; the line is handed to Linq, which never answers.
+        await vi.waitFor(() => {
+          expect(tries).toEqual([[0, LINE_KEY]]);
+        }, WAIT);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "reading", danger: true },
+        ]);
+        expect(await lineMarkOf("evt-1")).toBe(1);
+        expect(await idsIn("safety_pending")).toEqual([]);
+        expect(await actorOf().readHolds()).toEqual([STEP_ONE_HOLD]);
+        expect(await keptResults("evt-1")).toEqual([emergency("evt-1")]);
+
+        // 1 s: the cut, during the send. 3 s: a new instance resumes it, the core not answering and Linq refusing.
+        await run.h.clock.advance(1000);
+        run.h.direct.fail = true;
+        await run.evict({ ...run.h.deps, read: after, direct: triedDirect(run.h, tries) });
+        await run.h.clock.advance(2000);
+        await run.wake();
+
+        // Resumed as a danger in application: its note's write throws again, and it is read again at once. The No is not
+        // used: still no note, and the hold, the flag, the labels, the kept result and the mark stay; next read 30 s on.
+        await vi.waitFor(() => {
+          expect(rereads()).toBe(1);
+        }, WAIT);
+        expect(after.requests).toHaveLength(1);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "lineFailed", danger: true },
+        ]);
+        expect(await idsIn("safety_pending")).toEqual([]);
+        expect(await lineMarkOf("evt-1")).toBe(1);
+        expect(await actorOf().readHolds()).toEqual([STEP_ONE_HOLD]);
+        expect(await labelsOf("evt-1")).toEqual(["An emergency"]);
+        expect(await keptResults("evt-1")).toEqual([emergency("evt-1")]);
+        expect(tries).toHaveLength(1);
+        await vi.waitFor(async () => {
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 33_000 });
+        }, WAIT);
+
+        // 33 s: An emergency: applied again, its line is tried under the noted key, and Linq refuses it.
+        await run.h.clock.advance(30_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(tries).toEqual([
+            [0, LINE_KEY],
+            [33_000, LINE_KEY],
+          ]);
+        }, WAIT);
+        await vi.waitFor(async () => {
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 63_000 });
+        }, WAIT);
+        expect(await lineMarkOf("evt-1")).toBe(1);
+
+        // Linq takes sends again. 63 s: An emergency: the line goes, once, under the same key; the mark clears.
+        run.h.direct.fail = false;
+        await run.h.clock.advance(30_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(run.h.direct.sent).toHaveLength(1);
+        }, WAIT);
+        await run.settle();
+        expect(run.h.direct.sent.map((send) => [send.at, send.idempotencyKey, send.overrideOptout])).toEqual([
+          [63_000, LINE_KEY, true],
+        ]);
+        expect(await lineMarkOf("evt-1")).toBe(0);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "done", danger: true, path: "direct", lineId: "safetyEmergency" },
+        ]);
+        await vi.waitFor(noSafetyEntry, WAIT);
+
+        // Its line went: 30 s and 60 s on, nothing is read or tried again.
+        await run.h.clock.advance(60_000);
+        await run.wake();
+        await run.settle();
+        expect(after.requests).toHaveLength(3);
+        expect(tries).toHaveLength(3);
+        expect(run.h.direct.sent).toHaveLength(1);
+      },
+    );
+  });
+
+  it("note a: a danger with no note cut off during the core's call, after its result was kept, with its hold's write refused, then resumed while safety_pending's writes keep failing and every other write succeeds: the resume writes its hold from the kept labels, and its line mark alone keeps it in application, so the read that finds it again sends its line, tried at each such read until it goes, once", async () => {
+    const attempts: RecordSafetyOutcomeRequest[] = [];
+    const tries: [number, string][] = [];
+    // After the cut, every read finds An emergency.
+    const after = readsBy((eventId) => emergency(eventId));
+    await withActor(
+      { "evt-1": emergency("evt-1") },
+      { deps: (h) => ({ ...h.deps, core: hangingCore(h, attempts) }) },
+      async (run) => {
+        await refuseNotes();
+        const faults = await faultWrites({ safety_holds: () => true });
+        await arrive("evt-1", SMOKE_TEXT);
+
+        // 0 s: the read finds An emergency. The note's and the hold's writes throw; the flag with its line mark, the
+        // labels and the result are written; the core is called and never answers.
+        await vi.waitFor(() => {
+          expect(attempts.map((request) => request.caller.requestId)).toEqual(["safety:evt-1"]);
+        }, WAIT);
+        expect(faults.refused("safety_holds")).toBe(1);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "reading", danger: true },
+        ]);
+        expect(await lineMarkOf("evt-1")).toBe(1);
+        expect(await idsIn("safety_pending")).toEqual([]);
+        expect(await actorOf().readHolds()).toEqual([]);
+        expect(await keptResults("evt-1")).toEqual([emergency("evt-1")]);
+
+        // 1 s: the cut, during the core's call; the hold's writes go in again, the note's still throw. The core is not
+        // answering and Linq refuses at first. 3 s: a new instance resumes it.
+        faults.lift();
+        await run.h.clock.advance(1000);
+        run.h.core.down = true;
+        run.h.direct.fail = true;
+        await run.evict({ ...run.h.deps, read: after, direct: triedDirect(run.h, tries) });
+        await run.h.clock.advance(2000);
+        await run.wake();
+
+        // Resumed: its note's write throws again, its hold is written from the kept labels and its result is kept, so
+        // only its line mark says it is open. Read again at once, An emergency: applied again, its line is tried straight
+        // through Linq, which refuses it; next read 30 s on.
+        await vi.waitFor(() => {
+          expect(tries).toEqual([[3000, LINE_KEY]]);
+        }, WAIT);
+        await vi.waitFor(async () => {
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 33_000 });
+        }, WAIT);
+        expect(await idsIn("safety_pending")).toEqual([]);
+        expect(await actorOf().readHolds()).toEqual([STEP_ONE_HOLD]);
+        expect(await keptResults("evt-1")).toEqual([emergency("evt-1")]);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "lineFailed", danger: true },
+        ]);
+        expect(await lineMarkOf("evt-1")).toBe(1);
+        expect(run.h.direct.sent).toEqual([]);
+
+        // Linq takes sends again. 33 s: An emergency: the line goes, once, under the same key; the mark clears.
+        run.h.direct.fail = false;
+        await run.h.clock.advance(30_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(run.h.direct.sent).toHaveLength(1);
+        }, WAIT);
+        await run.settle();
+        expect(run.h.direct.sent.map((send) => [send.at, send.idempotencyKey, send.overrideOptout])).toEqual([
+          [33_000, LINE_KEY, true],
+        ]);
+        expect(await lineMarkOf("evt-1")).toBe(0);
+        await vi.waitFor(noSafetyEntry, WAIT);
+
+        // Its line went: 30 s and 60 s on, nothing is read or tried again, and the core was asked only on arrival.
+        await run.h.clock.advance(60_000);
+        await run.wake();
+        await run.settle();
+        expect(after.requests).toHaveLength(2);
+        expect(tries).toEqual([
+          [3000, LINE_KEY],
+          [33_000, LINE_KEY],
+        ]);
+        expect(run.h.direct.sent).toHaveLength(1);
+        expect(attempts).toHaveLength(1);
+      },
+    );
+  });
+
+  it("a danger a late verdict finds, with markDangerPending throwing at every write, cut off during its direct line: no resume takes it (its row is no longer being read), so its line mark alone has it read again on the read's schedule, and its line goes, once", async () => {
+    const tries: [number, string][] = [];
+    await withActor(
+      {},
+      {
+        deps: (h) => ({
+          ...h.deps,
+          // The read on arrival answers An emergency at 5 s, past the 4 s deadline.
+          read: {
+            async read(request) {
+              await h.clock.after(5000);
+              return verdict(emergency(request.eventId));
+            },
+          },
+          direct: hangingDirect(h, tries),
+        }),
+      },
+      async (run) => {
+        run.h.core.down = true;
+        await refuseNotes();
+        await arrive("evt-1", SMOKE_TEXT);
+
+        // 4 s: no verdict and no danger word: the timeout rule's unread hold, read again 30 s on.
+        await run.h.clock.advance(4000);
+        await vi.waitFor(async () => {
+          expect(await actorOf().readHolds()).toMatchObject([{ eventId: "evt-1", rule: "unread" }]);
+        }, WAIT);
+
+        // 5 s: the late verdict, An emergency: the note's write throws; the flag with its line mark is written and the
+        // hold takes the unread hold's place; the line is handed to Linq, which never answers.
+        await run.h.clock.advance(1000);
+        await vi.waitFor(() => {
+          expect(tries).toEqual([[5000, LINE_KEY]]);
+        }, WAIT);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "done", danger: true },
+        ]);
+        expect(await lineMarkOf("evt-1")).toBe(1);
+        expect(await idsIn("safety_pending")).toEqual([]);
+        expect(await actorOf().readHolds()).toEqual([STEP_ONE_HOLD]);
+
+        // 6 s: the cut, during the send. A new instance resumes nothing (no row is being read), but the text waits by its
+        // mark: read again 30 s after the timeout rule took it.
+        await run.h.clock.advance(1000);
+        await run.evict({
+          ...run.h.deps,
+          read: readsBy((eventId) => emergency(eventId)),
+          direct: triedDirect(run.h, tries),
+        });
+        await run.wake();
+        await vi.waitFor(async () => {
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 34_000 });
+        }, WAIT);
+        expect(tries).toHaveLength(1);
+
+        // 34 s: An emergency: applied again, its line goes, once, under the same key; the mark clears.
+        await run.h.clock.advance(28_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(run.h.direct.sent).toHaveLength(1);
+        }, WAIT);
+        await run.settle();
+        expect(run.h.direct.sent.map((send) => [send.at, send.idempotencyKey, send.overrideOptout])).toEqual([
+          [34_000, LINE_KEY, true],
+        ]);
+        expect(await lineMarkOf("evt-1")).toBe(0);
+        await vi.waitFor(noSafetyEntry, WAIT);
+        expect(tries).toHaveLength(2);
+      },
+    );
+  });
+
+  it("with the write that sets the flag and its line mark refused as well as the note's, and the line failing: the step that writes what the application came to writes the flag with the mark, so the danger is read again 30 s on and its line goes at the read that finds danger, once", async () => {
+    const tries: [number, string][] = [];
+    await withActor(
+      { "evt-1": emergency("evt-1") },
+      { deps: (h) => ({ ...h.deps, direct: triedDirect(h, tries) }) },
+      async (run) => {
+        run.h.core.down = true;
+        run.h.direct.fail = true;
+        await refuseNotes();
+        const refused = await refuseFirstFlag();
+        await arrive("evt-1", SMOKE_TEXT);
+        await run.settle();
+
+        // 0 s: the note's write and step 1's write of the flag with its mark threw; the line was tried and refused. The
+        // flag and the mark are written together after the send, and the next read is 30 s on.
+        expect(refused()).toBe(1);
+        expect(tries).toEqual([[0, LINE_KEY]]);
+        expect(await idsIn("safety_pending")).toEqual([]);
+        expect(await actorOf().readHolds()).toEqual([STEP_ONE_HOLD]);
+        expect(await actorOf().readSafety()).toMatchObject([
+          { eventId: "evt-1", state: "lineFailed", danger: true },
+        ]);
+        expect(await lineMarkOf("evt-1")).toBe(1);
+        await vi.waitFor(async () => {
+          expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 30_000 });
+        }, WAIT);
+
+        // Linq takes sends again. 30 s: An emergency: the line goes, once, under the same key; the mark clears.
+        run.h.direct.fail = false;
+        await run.h.clock.advance(30_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(run.h.direct.sent).toHaveLength(1);
+        }, WAIT);
+        await run.settle();
+        expect(run.h.direct.sent.map((send) => [send.at, send.idempotencyKey, send.overrideOptout])).toEqual([
+          [30_000, LINE_KEY, true],
+        ]);
+        expect(await lineMarkOf("evt-1")).toBe(0);
+        await vi.waitFor(noSafetyEntry, WAIT);
+        expect(tries).toHaveLength(2);
+      },
+    );
+  });
+
+  it.each(["direct", "outbox"] as const)(
+    "a danger whose line went is not sent again: with markDangerPending throwing at every write, the line goes on its first application (%s), its mark clears with it, and 30 s and 60 s on nothing is read, tried or recorded again",
+    async (path) => {
+      const tries: [number, string][] = [];
+      const calls: RecordSafetyOutcomeRequest[] = [];
+      await withActor(
+        { "evt-1": emergency("evt-1") },
+        { deps: (h) => ({ ...h.deps, core: countingCore(h, calls), direct: triedDirect(h, tries) }) },
+        async (run) => {
+          run.h.core.down = path === "direct";
+          await refuseNotes();
+          await arrive("evt-1", SMOKE_TEXT);
+          await run.settle();
+
+          expect(await idsIn("safety_pending")).toEqual([]);
+          expect(await lineMarkOf("evt-1")).toBe(0);
+          expect(await actorOf().readSafety()).toMatchObject([
+            { eventId: "evt-1", state: "done", danger: true, path, lineId: "safetyEmergency" },
+          ]);
+          expect(calls).toHaveLength(1);
+          expect(tries).toEqual(path === "direct" ? [[0, LINE_KEY]] : []);
+          await vi.waitFor(noSafetyEntry, WAIT);
+
+          for (const at of [30_000, 60_000]) {
+            await run.h.clock.advance(at - run.h.clock.now());
+            await run.wake();
+            await run.settle();
+          }
+          expect(run.h.read.requests).toHaveLength(1);
+          expect(calls).toHaveLength(1);
+          expect(tries).toHaveLength(path === "direct" ? 1 : 0);
+          expect(run.h.direct.sent).toHaveLength(path === "direct" ? 1 : 0);
+          expect(await lineMarkOf("evt-1")).toBe(0);
+        },
+      );
+    },
+  );
+
+  it("a danger whose line went, applied again for its missing hold while Linq refuses the repeat: its line mark stays clear, so once its hold is written nothing is read or tried again", async () => {
+    const tries: [number, string][] = [];
+    await withActor(
+      { "evt-1": emergency("evt-1") },
+      { deps: (h) => ({ ...h.deps, direct: triedDirect(h, tries) }) },
+      async (run) => {
+        run.h.core.down = true;
+        await refuseNotes();
+        const faults = await faultWrites({ safety_holds: () => true });
+        await arrive("evt-1", SMOKE_TEXT);
+        await run.settle();
+
+        // 0 s: no note and no hold; the line went, once, and its mark cleared with it.
+        expect(run.h.direct.sent.map((send) => [send.at, send.idempotencyKey])).toEqual([[0, LINE_KEY]]);
+        expect(await actorOf().readHolds()).toEqual([]);
+        expect(await lineMarkOf("evt-1")).toBe(0);
+
+        // 30 s: Linq refuses sends now. The hold's write still throws, so the danger is read again and applied again for
+        // its hold (T-1348); its line is tried under the same key and refused, and its mark stays clear.
+        run.h.direct.fail = true;
+        await run.h.clock.advance(30_000);
+        await run.wake();
+        await vi.waitFor(() => {
+          expect(tries).toEqual([
+            [0, LINE_KEY],
+            [30_000, LINE_KEY],
+          ]);
+        }, WAIT);
+        await run.settle();
+        expect(await lineMarkOf("evt-1")).toBe(0);
+        expect(await actorOf().readHolds()).toEqual([]);
+
+        // The storage takes the hold's writes again. 60 s: the danger lacks only its hold: written from the kept labels,
+        // it is complete, with no read sent. 90 s and 120 s: nothing is read or tried again.
+        faults.lift();
+        for (const at of [60_000, 90_000, 120_000]) {
+          await run.h.clock.advance(at - run.h.clock.now());
+          await run.wake();
+          await run.settle();
+        }
+        expect(await actorOf().readHolds()).toEqual([KEPT_HOLD]);
+        await vi.waitFor(noSafetyEntry, WAIT);
+        expect(run.h.read.requests).toHaveLength(2);
+        expect(tries).toHaveLength(2);
+        expect(run.h.direct.sent).toHaveLength(1);
+        expect(await lineMarkOf("evt-1")).toBe(0);
+      },
+    );
+  });
+
+  it("an actor whose safety_events table was made before the line mark gains its column as it starts, its rows unmarked; a danger read after that gets its mark in the write that sets its flag", async () => {
+    const attempts: RecordSafetyOutcomeRequest[] = [];
+    await withActor({ "evt-2": emergency("evt-2") }, {}, async (run) => {
+      // The table as it was made before T-1364, holding a danger from then.
+      await runInDurableObject(stub(), (_, state) => {
+        const { sql } = state.storage;
+        sql.exec("DROP TABLE safety_events");
+        sql.exec(
+          `CREATE TABLE safety_events (
+             event_id TEXT PRIMARY KEY,
+             arrived_ms INTEGER NOT NULL,
+             state TEXT NOT NULL,
+             danger INTEGER NOT NULL DEFAULT 0,
+             path TEXT,
+             line_id TEXT,
+             handed_after_ms INTEGER
+           )`,
+        );
+        sql.exec(
+          `INSERT INTO safety_events (event_id, arrived_ms, state, danger, path, line_id, handed_after_ms)
+           VALUES ('evt-old', 0, 'done', 1, 'outbox', 'safetyEmergency', 10)`,
+        );
+        sql.exec(
+          `INSERT INTO safety_holds (event_id, hold_id, rule, blocks_booking, released)
+           VALUES ('evt-old', 'hold-old', 'after_safe', 0, 1)`,
+        );
+      });
+
+      // A new instance starts over that storage: the column is added, and the old row reads unmarked.
+      await run.evict({ ...run.h.deps, core: hangingCore(run.h, attempts) });
+      expect(await lineMarkOf("evt-old")).toBeNull();
+      expect(await actorOf().readSafety()).toMatchObject([
+        { eventId: "evt-old", state: "done", danger: true, path: "outbox" },
+      ]);
+
+      // A danger read now, its core call never answered: step 1 has written its flag and its mark together.
+      await arrive("evt-2", SMOKE_TEXT);
+      await vi.waitFor(() => {
+        expect(attempts.map((request) => request.caller.requestId)).toEqual(["safety:evt-2"]);
+      }, WAIT);
+      expect(await actorOf().readSafety()).toMatchObject([
+        { eventId: "evt-old", danger: true },
+        { eventId: "evt-2", state: "reading", danger: true },
+      ]);
+      expect(await lineMarkOf("evt-2")).toBe(1);
+      expect(await lineMarkOf("evt-old")).toBeNull();
+    });
   });
 });

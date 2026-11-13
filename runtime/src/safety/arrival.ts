@@ -77,6 +77,13 @@
 // when such a danger is resumed or its re-read's answer lands, so from then on it is a noted danger in every step. Once a
 // read has found danger in a text, only a danger is applied to it again until its outcome is complete: a later No never
 // clears its flag or replaces its labels or kept result.
+//
+// A danger whose line is not done keeps a lasting mark that does not hang on its pending note (T-1364, T-1348's new task B
+// and its security note a; RULES 4.12): its row's `line_open`, set in the very write that sets its danger flag and
+// cleared only once its line is done, sent or handed to the core's row, with its record kept (`dangerSent`). While it is
+// set the text waits for a read and is a danger in application, however its note's writes fail: it is read again on the
+// read's own schedule, only a danger is applied to it, and its line is tried again under the same key until it goes. A
+// line that went is done for good: no later application sets the mark again.
 
 import { openWords, sealWords, type SealedBox, type SealedWords, type SealingKey } from "../gateway/seal";
 import type { SealedEvent, SealedHandoff } from "../gateway/types";
@@ -291,9 +298,19 @@ export function createSafetyTables(sql: SqlStorage): void {
        danger INTEGER NOT NULL DEFAULT 0,
        path TEXT,
        line_id TEXT,
-       handed_after_ms INTEGER
+       handed_after_ms INTEGER,
+       line_open INTEGER
      )`,
   );
+  // `line_open` is a danger's lasting "line not done" mark (T-1364): null until a read finds danger in the text; 1 from
+  // the write that sets its danger flag (the same statement: `markDanger`, or `finish` when that write was lost) until its
+  // line is done, sent or handed to the core's row, with its record kept (`dangerSent`); then 0, for good. A table made
+  // before it gains the column as the actor starts, its rows unmarked (null), as they were read before.
+  const columns = sql
+    .exec<{ name: string }>("PRAGMA table_info(safety_events)")
+    .toArray()
+    .map((column) => column.name);
+  if (!columns.includes("line_open")) sql.exec("ALTER TABLE safety_events ADD COLUMN line_open INTEGER");
   sql.exec("CREATE TABLE IF NOT EXISTS safety_meta (k TEXT PRIMARY KEY, v TEXT NOT NULL)");
   sql.exec(
     `CREATE TABLE IF NOT EXISTS safety_holds (
@@ -534,7 +551,9 @@ export class SafetyOnArrival {
         // outcomes, written again here if the cut came before it was).
         // Its row's danger flag says so when its pending note's write threw (T-1348): read as a fresh text, a No would
         // clear its flag and replace its labels and kept result. Its note is written now (guarded), so it is read again
-        // until its line and record are done, its result settled and its hold written, as a noted danger is.
+        // until its line and record are done, its result settled and its hold written, as a noted danger is. Should that
+        // write throw again, its line's lasting mark (T-1364), written with its flag, keeps it in application until its
+        // line is done, its hold and result in place or not.
         if (!noted) this.markDangerPending(eventId);
         this.finish(eventId, "lineFailed", true, "none", null, null);
         this.holdFromKept(eventId);
@@ -643,7 +662,9 @@ export class SafetyOnArrival {
    * re-read until its result is kept. A text whose danger flag is set and whose hold is not written (no hold with an
    * outcome's rule, released or not: ADR-018 section 2) waits whether or not its pending note was written (T-1348), so a
    * replay or an outbox path whose write of the hold threw is tried again on the read's own schedule until the hold is
-   * written. This feeds only the re-reads and the alarm, never the batch.
+   * written. So does a danger whose line is not done (its row's lasting mark, T-1364), whatever its note's writes did, so
+   * its line is tried again at each re-read that finds danger until it goes. This feeds only the re-reads and the alarm,
+   * never the batch.
    */
   private waiting(): HeldRow[] {
     return this.host.storage.sql
@@ -657,8 +678,9 @@ export class SafetyOnArrival {
                 AND (EXISTS (SELECT 1 FROM safety_pending p WHERE p.event_id = e.event_id)
                      OR EXISTS (SELECT 1 FROM safety_results o WHERE o.event_id = e.event_id AND o.box IS NULL)
                      OR (e.danger = 1
-                         AND NOT EXISTS (SELECT 1 FROM safety_holds h
-                                         WHERE h.event_id = e.event_id AND h.rule <> 'unread'))))
+                         AND (e.line_open = 1
+                              OR NOT EXISTS (SELECT 1 FROM safety_holds h
+                                             WHERE h.event_id = e.event_id AND h.rule <> 'unread')))))
          ORDER BY e.rowid`,
       )
       .toArray();
@@ -1213,8 +1235,9 @@ export class SafetyOnArrival {
    * re-reads go on while the result is still owed. Each result applied replaces the one kept before (open point 3: the
    * row holds the result applied last, a danger word's stand-in included); an answer not used leaves the row as it was.
    * An open danger is one whose pending note is written, or, its note's write having thrown, whose row's danger flag is
-   * set with its hold not written or its result owed (`dangerOpen`, T-1348): so once a read has found danger in a text, a
-   * later answer that is no danger never clears its flag or replaces its labels or kept result.
+   * set with its line not done (its lasting mark, T-1364), its hold not written or its result owed (`dangerOpen`,
+   * T-1348): so once a read has found danger in a text, a later answer that is no danger never clears its flag or
+   * replaces its labels or kept result, and a danger answer while its line is not done sends it.
    */
   private async applyLate(
     set: SafetyDeps,
@@ -1315,9 +1338,10 @@ export class SafetyOnArrival {
 
   /**
    * True while this text's danger is in application (T-1348): its pending note is written, or its row's danger flag is
-   * set and its outcome is not complete with no note to say so, its hold not written (no hold with an outcome's rule,
-   * released or not: ADR-018 section 2) or its result owed (ADR-015 section 2), as when `markDangerPending` threw. Until
-   * then only a danger is applied to it again (the first verdict stands).
+   * set and its outcome is not complete with no note to say so, as when `markDangerPending` threw: its line not done (its
+   * lasting mark, written with the flag: T-1364), its hold not written (no hold with an outcome's rule, released or not:
+   * ADR-018 section 2) or its result owed (ADR-015 section 2). Until then only a danger is applied to it again (the
+   * first verdict stands).
    */
   private dangerOpen(eventId: string): boolean {
     return (
@@ -1326,8 +1350,9 @@ export class SafetyOnArrival {
           `SELECT 1 WHERE EXISTS (SELECT 1 FROM safety_pending WHERE event_id = ?)
                        OR EXISTS (SELECT 1 FROM safety_events e
                                   WHERE e.event_id = ? AND e.danger = 1
-                                    AND (NOT EXISTS (SELECT 1 FROM safety_holds h
-                                                     WHERE h.event_id = e.event_id AND h.rule <> 'unread')
+                                    AND (e.line_open = 1
+                                         OR NOT EXISTS (SELECT 1 FROM safety_holds h
+                                                        WHERE h.event_id = e.event_id AND h.rule <> 'unread')
                                          OR EXISTS (SELECT 1 FROM safety_results o
                                                     WHERE o.event_id = e.event_id AND o.box IS NULL)))`,
           eventId,
@@ -1338,10 +1363,28 @@ export class SafetyOnArrival {
   }
 
   /**
+   * True while this text's danger line is not done (T-1364): its row's danger flag and its line's lasting mark are set,
+   * whatever its pending note's writes did. A read that throws answers true: the text is set to be read again 30 s on
+   * (fails closed).
+   */
+  private lineOpen(eventId: string): boolean {
+    try {
+      return (
+        this.host.storage.sql
+          .exec("SELECT 1 FROM safety_events WHERE event_id = ? AND danger = 1 AND line_open = 1", eventId)
+          .toArray().length > 0
+      );
+    } catch {
+      return true;
+    }
+  }
+
+  /**
    * Writes the pending note of a danger in application that has none (T-1348: `markDangerPending` threw when it was
    * applied), so from here on it is a noted danger in every step: read again until its line and record are done, its
    * result settled and its hold written. Guarded: a storage that throws here leaves it as it was, still open by its flag
-   * (`dangerOpen`) and read again 30 s on.
+   * (`dangerOpen`) while its line is not done (its lasting mark, T-1364), its hold not written or its result owed, and so
+   * read again 30 s on; one whose line is done, its hold written and its result kept lacks nothing but the note.
    */
   private noteOpenDanger(eventId: string): void {
     try {
@@ -1453,7 +1496,8 @@ export class SafetyOnArrival {
    * Notes, before the hold or any send, that this text's danger outcome is not complete, so an eviction from here on
    * leaves it scheduled. A storage that fails here must not keep the line from going. With no note, a danger whose hold
    * is missing too still names itself among the texts not read, by its danger flag (`unreadTexts`, T-1318), and is read
-   * again until its hold is written; its note is written when it is resumed or its re-read's answer lands (T-1348).
+   * again until its hold is written; its note is written when it is resumed or its re-read's answer lands (T-1348); and
+   * its line's lasting mark, written with its flag (`markDanger`), has it read again until its line is done (T-1364).
    */
   private markDangerPending(eventId: string): void {
     try {
@@ -1469,10 +1513,17 @@ export class SafetyOnArrival {
    * (CQ-65 as DL-119). On the late path the row may say lineFailed already (the timeout rule's outage line failed), and an
    * eviction during the line's send leaves it so, as `finish` comes only after the send. A storage that fails here must
    * not keep the line from going: `finish` notes it once the send ends.
+   *
+   * The same write sets its line's lasting mark (T-1364), unless its line is done already (an earlier application sent
+   * it, or handed it to the core's row): the flag and the mark are one statement, so neither is ever written without the
+   * other, and from here on the text is read again until its line is done, however its pending note's writes fail.
    */
   private markDanger(eventId: string): void {
     try {
-      this.host.storage.sql.exec("UPDATE safety_events SET danger = 1 WHERE event_id = ?", eventId);
+      this.host.storage.sql.exec(
+        "UPDATE safety_events SET danger = 1, line_open = COALESCE(line_open, 1) WHERE event_id = ?",
+        eventId,
+      );
     } catch {
       // Not noted: `finish` notes it after the send; a row left lineFailed until then keeps its batch back (fails closed).
     }
@@ -1486,9 +1537,14 @@ export class SafetyOnArrival {
    * the note stays, and its re-reads apply only a danger again; that only its result or its hold is left is noted, so the
    * note goes when its text is closed with its hold written (`closeResults`, DL-508), or once a re-read, resume or late
    * answer writes its hold with its result settled (`completeWithHold`).
+   *
+   * Its line is done, so its lasting mark clears here, before the note (T-1364). A storage that throws at that write
+   * leaves the mark, and the line counts as not done: the note, its noted line and its line done are left as they are, so
+   * the text is read again and a read that finds danger sends its line again under the same key, then clears the mark.
    */
   private dangerSent(eventId: string): void {
     this.holdFromKept(eventId);
+    if (!this.markLineDone(eventId)) return;
     if (this.resultSettled(eventId) && this.holdWritten(eventId)) {
       this.clearDangerPending(eventId);
       return;
@@ -1497,6 +1553,20 @@ export class SafetyOnArrival {
       this.host.storage.sql.exec("INSERT OR IGNORE INTO safety_line_done (event_id) VALUES (?)", eventId);
     } catch {
       // Not noted: the note stays, its text closed or not, until a re-read that finds danger again sends its line.
+    }
+  }
+
+  /**
+   * Clears this text's lasting "line not done" mark (T-1364): its danger line is done, for good, so no later application
+   * sets it again (`markDanger` keeps a cleared mark). True once written; a storage that throws answers false and leaves
+   * the mark as it was (fails closed: the line counts as not done).
+   */
+  private markLineDone(eventId: string): boolean {
+    try {
+      this.host.storage.sql.exec("UPDATE safety_events SET line_open = 0 WHERE event_id = ?", eventId);
+      return true;
+    } catch {
+      return false;
     }
   }
 
@@ -1722,18 +1792,29 @@ export class SafetyOnArrival {
       state = "lineFailed";
     }
 
-    // A danger whose line or record is not done stays scheduled: it is read again 30 s on and its line tried again, with
-    // the same idempotency key. So does one whose hold is not written, its pending note written or not (T-1348): its
-    // re-read 30 s on writes the hold.
-    if (dangers.length > 0 && (this.dangerPending(eventId) || !this.holdWritten(eventId))) {
-      this.nextReread(set, eventId);
-    }
     if (via !== "late" || dangers.length > 0) {
       this.finish(eventId, state, dangers.length > 0, path, lineId, handedAfter);
+    }
+    // A danger whose line or record is not done stays scheduled: it is read again 30 s on and its line tried again, with
+    // the same idempotency key. So does one whose hold is not written, its pending note written or not (T-1348): its
+    // re-read 30 s on writes the hold. And so does one whose line's lasting mark is still set, its note written or not
+    // (T-1364): its line is tried again at each re-read that finds danger until it goes. Read once `finish` has run, in
+    // the same synchronous step, since `finish` writes the mark when the write that set the flag first was lost.
+    if (
+      dangers.length > 0 &&
+      (this.dangerPending(eventId) || !this.holdWritten(eventId) || this.lineOpen(eventId))
+    ) {
+      this.nextReread(set, eventId);
     }
     this.recordSpan(set, handoff, arrivedAt, result, modelCalls, via, path, lineId, failure);
   }
 
+  /**
+   * Writes what a text's safety work came to on its row. A danger whose line is not done (lineFailed: the line failed, a
+   * step after it threw, or its work was cut off) gets its line's lasting mark in this same write when the write that set
+   * its flag first was lost, so the flag is never written without the mark (T-1364); a mark already set stays, and one
+   * cleared stays clear (its line went). Any other write leaves the mark as it is.
+   */
   private finish(
     eventId: string,
     state: EventState,
@@ -1743,12 +1824,16 @@ export class SafetyOnArrival {
     handedAfterMs: number | null,
   ): void {
     this.host.storage.sql.exec(
-      "UPDATE safety_events SET state = ?, danger = ?, path = ?, line_id = ?, handed_after_ms = ? WHERE event_id = ?",
+      `UPDATE safety_events
+       SET state = ?, danger = ?, path = ?, line_id = ?, handed_after_ms = ?,
+           line_open = CASE WHEN ? = 1 THEN COALESCE(line_open, 1) ELSE line_open END
+       WHERE event_id = ?`,
       state,
       danger ? 1 : 0,
       path,
       lineId,
       handedAfterMs,
+      danger && state === "lineFailed" ? 1 : 0,
       eventId,
     );
   }
