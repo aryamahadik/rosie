@@ -42,7 +42,9 @@
 // T-270 adds the keyword list and the stop and start replies (`refreshKeywords`): K-01 v1 `lists.keywords` and the
 // `stopReply` and `startReply` fixed lines, copied from the manifest of each bundle a turn pins, so the actor reads a STOP or
 // a START by the bundle's own words, and replies with the bundle's words (or Q-01's drafted ones while Jay's wait), while
-// PostgreSQL is down. A list the guard could not read is never copied: the copy keeps the list it had.
+// PostgreSQL is down. A list the guard could not read is never copied: the copy keeps the list it had. Before a handle's
+// first pin, while no list is held, the actor copies the list of the bundle a text arrived under the same way, from that
+// bundle's manifest as its BUNDLES binding holds it (T-1324, ../handle-actor.ts).
 //
 // The queue of writes to replay when PostgreSQL returns is ./return-queue.ts. Sending from the copies while PostgreSQL is
 // down, and firing a timer from its copy, are runtime/src/outage/db's (T-270). Never logged, put in a span or an error: a
