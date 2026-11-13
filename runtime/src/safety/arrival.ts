@@ -322,9 +322,26 @@ export function createSafetyTables(sql: SqlStorage): void {
 /** The kinds of event whose words are read: a customer's text, a caption, a vote's words, an edit. */
 const READ_KINDS: readonly string[] = ["text", "photo", "pollVote", "edit"];
 
-/** True when the safety read reads this stored event's words. */
+/**
+ * True when the safety read reads this stored event's words: one of those kinds with its words in a box. Since K-06 v1.2
+ * the gateway seals a vote's option words with the rest (T-1297), so a vote is read on arrival like a text (DL-540); a
+ * vote kept before v1.2 has no box, and stays a text with no words to read, as it was kept.
+ */
 export function isReadableEvent(event: SealedEvent): boolean {
   return READ_KINDS.includes(event.kind) && event.sealed !== null && event.fromRosie !== true;
+}
+
+/**
+ * The words the safety read reads of an opened box, in the read's own two fields (SafetyReadRequest.words; K-02's text and
+ * subject): the body, with a vote's option words read as its text (K-02: a vote's words are its option's; arch 07 line
+ * 379: an option someone added reads as typed words), and an email's subject. Every word in the box is read: a body and
+ * option words both there (no K-06 v1.2 event has both) are read together, a line apart.
+ */
+function wordsToRead(words: SealedWords): SealedWords {
+  const option = words.optionWords ?? null;
+  const body = words.body;
+  if (option === null) return { body, subject: words.subject };
+  return { body: body === null || body === "" ? option : `${body}\n${option}`, subject: words.subject };
 }
 
 export function isReadable(handoff: SealedHandoff): boolean {
@@ -995,9 +1012,10 @@ export class SafetyOnArrival {
   /**
    * Opens the box and starts the read, behind the earlier texts' starts, so the port is called in arrival order. Never
    * throws: a key store that throws, at once or later, makes the words unreadable (no verdict can come, so the timeout
-   * rule applies at once; T-1088 security note d). The key the words open under goes with them, held in memory only
-   * while the read is out: a result applied is sealed under it (ADR-015 section 2, step 2), so no key call comes before
-   * a danger's line.
+   * rule applies at once; T-1088 security note d), and so does a box that does not open or whose members are not its
+   * form's (K-06 v1.2 item 6). The words are read by the box's form, a vote's option words as its text (`wordsToRead`).
+   * The key the words open under goes with them, held in memory only while the read is out: a result applied is sealed
+   * under it (ADR-015 section 2, step 2), so no key call comes before a danger's line.
    */
   private queueRead(set: SafetyDeps, handoff: SealedHandoff): Promise<Started | "unreadable"> {
     const { event } = handoff;
@@ -1008,7 +1026,10 @@ export class SafetyOnArrival {
         : Promise.resolve()
             .then(() => set.keys.getOrCreateKey(event.handle))
             .then(
-              async (key) => ({ words: await openWords(sealed, key, this.actorName, event.eventId), key }),
+              async (key) => ({
+                words: wordsToRead(await openWords(sealed, key, this.actorName, event.eventId)),
+                key,
+              }),
               () => "unreadable" as const,
             );
     const started = this.launch.then(async (): Promise<Started | "unreadable"> => {

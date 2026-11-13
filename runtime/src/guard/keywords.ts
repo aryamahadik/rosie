@@ -97,15 +97,22 @@ export function keywordsOf(manifest: Readonly<Record<string, unknown>>): Keyword
   ]);
 }
 
-/** The K-06 kinds whose words a person typed: a text (an email's too), a photo's caption, an edit's new words. */
-const TYPED_KINDS: readonly string[] = ["text", "photo", "edit"];
+/**
+ * The K-06 kinds whose words a person typed: a text (an email's too), a photo's caption, an edit's new words, and a poll
+ * vote's option words (DL-540: once K-06 v1.2 seals them in the box, T-1297, a vote is checked for STOP too).
+ */
+const TYPED_KINDS: readonly string[] = ["text", "photo", "edit", "pollVote"];
 
 /**
- * The keyword a text is, or null. Only typed words count: a reaction or a poll vote is never a keyword (a vote answers its
- * own poll: arch 03 line 187). The body is read; an email whose body holds no letter or digit is read by its subject.
+ * The keyword a text is, or null. Only typed words count: a reaction or a vote taken back is never a keyword. A poll vote
+ * is read by its option's words (K-02: a vote's words are its option's; an option someone added reads as typed words, arch
+ * 07 line 379), never by a body, which a vote does not have (K-06 v1.2 sealedWords), so a vote for an option that reads
+ * STOP is a stop (DL-540). Any other text's body is read; an email whose body holds no letter or digit is read by its
+ * subject.
  */
 export function keywordOf(text: GuardText, list: KeywordList): Keyword | null {
   if (!TYPED_KINDS.includes(text.kind) || text.words === null) return null;
+  if (text.kind === "pollVote") return list.match(text.words.optionWords ?? "");
   const body = text.words.body ?? "";
   const read = keyOf(body) === "" ? (text.words.subject ?? "") : body;
   return list.match(read);

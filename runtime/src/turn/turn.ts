@@ -72,7 +72,14 @@ import type {
   LeasedTurn,
   LeaseHooks,
 } from "../actor";
-import { actorNameOf, openWords, type HandleRef, type SealedWords, type SealingKey } from "../gateway/seal";
+import {
+  actorNameOf,
+  openWords,
+  wordsOfEvent,
+  type HandleRef,
+  type SealedWords,
+  type SealingKey,
+} from "../gateway/seal";
 import type { SealedEvent } from "../gateway/types";
 import {
   guardTurn,
@@ -485,13 +492,18 @@ export const turnHooks: Required<LeaseHooks> = {
 
 // ---- 1. opening the texts ---------------------------------------------------------------------------------------
 
-/** Opens each text's sealed words with the handle's key and reads its K-02 form, in arrival order. */
+/**
+ * Opens each text's sealed words with the handle's key and reads its K-02 form, in arrival order. The words are read by
+ * the box's form (K-06 v1.2 items 5 and 6, `wordsOfEvent`): a form 2 box gives every word, a vote's option words among
+ * them, and only the box; an event kept before v1.2 gives its form 1 box's body and subject and a vote's plain option
+ * words. A box that does not open, or whose members are not its form's, throws, and the run fails closed.
+ */
 async function openTexts(turn: LeasedTurn, set: TurnDeps, zone: string): Promise<OpenedText[]> {
   const keys = new Map<string, SealingKey>();
   const opened: OpenedText[] = [];
   for (const entry of turn.entries) {
     const event = entry.event;
-    let words: SealedWords | null = null;
+    let box: SealedWords | null = null;
     if (event.sealed !== null) {
       const name = actorNameOf(event.handle);
       let key = keys.get(name);
@@ -499,8 +511,9 @@ async function openTexts(turn: LeasedTurn, set: TurnDeps, zone: string): Promise
         key = await set.keys.getOrCreateKey(event.handle);
         keys.set(name, key);
       }
-      words = await openWords(event.sealed, key, name, event.eventId);
+      box = await openWords(event.sealed, key, name, event.eventId);
     }
+    const words = wordsOfEvent(event, box);
     opened.push({
       eventId: event.eventId,
       kind: event.kind,
@@ -532,7 +545,8 @@ function attachmentsOf(value: unknown): TurnText["attachments"] {
 
 /**
  * K-02's text for one stored event (K-06): a text, a photo's caption or an edit's new words is a text; a vote is a
- * pollVote with its option's words; a reaction is a tapback named by its reaction. Its send time is the sender's (K-06
+ * pollVote with its option's words, as `wordsOfEvent` read them (from a form 2 box only; a vote kept before K-06 v1.2
+ * from its plain poll.optionWords); a reaction is a tapback named by its reaction. Its send time is the sender's (K-06
  * sentAt), with the zone dates resolve in. Null for an event K-02 has no text for.
  */
 function turnTextOf(event: SealedEvent, words: SealedWords | null, zone: string): TurnText | null {
@@ -548,10 +562,11 @@ function turnTextOf(event: SealedEvent, words: SealedWords | null, zone: string)
       return { ...base, kind: "text", words: wordsOf(words), poll: null, tapback: null };
     case "pollVote": {
       const poll = event.poll;
-      if (!isRecord(poll) || !isText(poll.pollId) || !isText(poll.optionId) || !isText(poll.optionWords))
+      const optionWords = words?.optionWords ?? null;
+      if (!isRecord(poll) || !isText(poll.pollId) || !isText(poll.optionId) || !isText(optionWords))
         return null;
       const vote = { pollId: poll.pollId, optionId: poll.optionId };
-      return { ...base, kind: "pollVote", words: poll.optionWords, poll: vote, tapback: null };
+      return { ...base, kind: "pollVote", words: optionWords, poll: vote, tapback: null };
     }
     case "reaction": {
       const reaction = event.reaction;
