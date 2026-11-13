@@ -2,9 +2,50 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 553, [`84538c7`](https://github.com/aryamahadik/rosie/commit/84538c7), 2026-11-13 13:05:03 UTC.
+- **Through:** commit 555, [`4d46a6c`](https://github.com/aryamahadik/rosie/commit/4d46a6c), 2026-11-13 13:24:24 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 555. docs: COMMIT\_HISTORY.md through commit 553 (84538c7, \#561) (\#563)
+
+- **Commit:** [`4d46a6c`](https://github.com/aryamahadik/rosie/commit/4d46a6c), by Arya Mahadik, 2026-11-13 13:24:24 UTC
+- **Pull request:** [#563](https://github.com/aryamahadik/rosie/pull/563) from `task/commit-history-83`, merged 2026-11-13 13:24:25 UTC. It squashed 1 branch commit:
+  - `e00bba4` docs: COMMIT\_HISTORY.md through commit 553 (84538c7, \#561)
+- **Files changed:** 1 (+62 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +62 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 554. T-1348: a danger whose pending note was never written is read again until its hold is written, and a cut-off resume never clears a danger flag the first read set (\#562)
+
+- **Commit:** [`827922e`](https://github.com/aryamahadik/rosie/commit/827922e), by Arya Mahadik, 2026-11-13 13:24:20 UTC
+- **Pull request:** [#562](https://github.com/aryamahadik/rosie/pull/562) from `task/T-1348`, merged 2026-11-13 13:24:21 UTC. It squashed 1 branch commit:
+  - `442e9a5` T-1348: a danger whose pending note was never written is read again u…
+- **Files changed:** 2 (+451 −26), by folder:
+  - `runtime/src/safety/` arrival.ts +100 −20, hold.worker.test.ts +351 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+waiting() names a text whose danger flag is set and whose hold is not written, its note or not, and the
+danger's first application sets its re-read 30 s on, so a replay or an outbox path whose hold write threw
+is tried again on the read's own schedule. resumeCutOff treats a cut-off text whose flag is set as a
+danger in application and writes its missing note; applyLate does the same when such a danger's re-read
+answers. applyLate, keepLabels and onReturn read dangerOpen (the note, or the flag with the hold not
+written or the result owed), so a later No never clears the flag or replaces the labels or kept result.
+onlyHoldLeft takes the flag in place of a missing note. The line, the at-once release, sendDanger and
+sendOutage are unchanged.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 553. docs: COMMIT\_HISTORY.md through commit 550 (6b9227c, \#557) (\#561)
 
