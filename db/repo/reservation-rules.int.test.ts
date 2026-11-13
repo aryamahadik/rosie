@@ -3,12 +3,14 @@
 // test schema. The K-04 seeds are loaded by the tables' owner; the calls run as the Tool API's role, rosie_app (T-191),
 // through a client whose connections take that role, so row-level security binds them as it will bind the Worker
 // (T-1093), except where a test says it runs as the tables' owner.
+import { once } from "node:events";
 import { readdirSync, readFileSync } from "node:fs";
+import { type AddressInfo, createServer } from "node:net";
 import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createClient, type DbClient, resolvePrimaryUrl } from "./client";
-import { DataAccessDatabaseError } from "./clocks";
+import { DataAccessDatabaseError, transientOrScrubbed } from "./clocks";
 import {
   doorMinutes,
   EXTEND_MINUTES,
@@ -2472,5 +2474,155 @@ describe("extend: a statement's own refusal and postgres.js's statement errors l
       code: expected.client,
       message: `${call}: the database call failed (code ${expected.client})`,
     });
+  });
+});
+
+// ---- T-1334: inBusinessTransaction reserves through reserveConnection (T-1314's handoff, Gives 3) ----------------------
+//
+// extend's transaction start reserves its connection through bundles.ts's reserveConnection, so a reserve() that never
+// connects leaves as the code 08001 alone, which extend answers transient, never as postgres.js raises it. Raised for real
+// through postgres.js's own socket option on the client reserve() opens its connection on, while the pre-probe answers
+// on this file's Tool API client: the Workers build's failure, with no code and no statement (cf/polyfills.js;
+// connection.js queryError), the made-up connection string in its message; and Node's ECONNREFUSED on a closed port.
+// Rule 9: the probe's user, password, database, host and port are made up here (a .invalid name). A check names what
+// leaked, never its value.
+
+describe("extend: a reserve() that never connects answers 08001, never as postgres.js raises it (T-1334)", () => {
+  const PROBE_USER = "t1334_probe_user";
+  const PROBE_PASSWORD = "t1334-probe-password";
+  const PROBE_DATABASE = "t1334_probe_db";
+  const HOST = "db-t1334.example.invalid";
+  const PORT = 65134;
+  const NEVER_OPENED = { error: "transient", sqlstate: "08001" };
+  const REQUEST: ExtendRequest = {
+    reservationId: "rsv-t1334",
+    businessId: LEES,
+    expectVersion: 1,
+    door: "standard",
+    at: "2026-11-09T15:00:00Z",
+  };
+
+  type Secrets = Readonly<Record<string, RegExp>>;
+  type Settled = { answer: unknown } | { thrown: unknown };
+
+  const probeUrl = (host: string, port: number): string =>
+    `postgres://${PROBE_USER}:${PROBE_PASSWORD}@${host}:${String(port)}/${PROBE_DATABASE}`;
+
+  /** The secrets by name: a text wherever it appears, a number (a port) as a whole number. */
+  function secretsOf(values: Readonly<Record<string, string | number>>): Secrets {
+    const secrets: Record<string, RegExp> = {};
+    for (const [name, value] of Object.entries(values)) {
+      secrets[name] =
+        typeof value === "number"
+          ? new RegExp(`(^|[^0-9])${String(value)}([^0-9]|$)`)
+          : new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    }
+    return secrets;
+  }
+
+  const SHAPE_SECRETS = secretsOf({
+    host: HOST,
+    port: PORT,
+    user: PROBE_USER,
+    password: PROBE_PASSWORD,
+    database: PROBE_DATABASE,
+  });
+
+  /** Every text `value` holds, deeply: its own property names and values, enumerable or not (an error's stack too). */
+  function textsOf(value: unknown, seen = new Set<object>()): string[] {
+    if (typeof value === "string") {
+      return [value];
+    }
+    if (typeof value === "number" || typeof value === "bigint" || typeof value === "boolean") {
+      return [String(value)];
+    }
+    if (typeof value !== "object" || value === null || seen.has(value)) {
+      return [];
+    }
+    seen.add(value);
+    return Object.getOwnPropertyNames(value).flatMap((key) => [
+      key,
+      ...textsOf((value as Record<string, unknown>)[key], seen),
+    ]);
+  }
+
+  /** The names of the secrets `value` holds anywhere, never their values. */
+  function leaksOf(value: unknown, secrets: Secrets): string[] {
+    const texts = textsOf(value);
+    return Object.entries(secrets)
+      .filter(([, secret]) => texts.some((text) => secret.test(text)))
+      .map(([name]) => name);
+  }
+
+  async function settledOf(run: () => Promise<unknown>): Promise<Settled> {
+    try {
+      return { answer: await run() };
+    } catch (error) {
+      return { thrown: error };
+    }
+  }
+
+  /**
+   * `statements` with `reserving`'s reserve(): the pre-probe answers on `statements`, and only reserve() opens a
+   * connection, as when the probe's connection was taken meanwhile and the one reserve() opens never connects.
+   */
+  function reserveFrom(statements: Sql, reserving: Sql): Sql {
+    return new Proxy(statements, {
+      get: (target, key, receiver): unknown =>
+        key === "reserve" ? () => reserving.reserve() : (Reflect.get(target, key, receiver) as unknown),
+    });
+  }
+
+  it("as the Workers build passes it up (no code, no statement), the made-up connection string in it: 08001, holding none of it", async () => {
+    const raw = new Error(`Network connection lost: ${probeUrl(HOST, PORT)}`);
+    // A client on the made-up connection whose socket fails with `raw` before it opens (postgres.js's own socket option).
+    const options = { max: 1, onnotice: () => undefined, socket: () => Promise.reject(raw) };
+    const reserving = postgres(probeUrl(HOST, PORT), options);
+    let outcome: Settled;
+    try {
+      outcome = await settledOf(() => extend(reserveFrom(toolApi, reserving), REQUEST));
+    } finally {
+      await reserving.end({ timeout: 0 });
+    }
+    expect(outcome).toEqual({ answer: NEVER_OPENED });
+    expect(leaksOf(outcome, SHAPE_SECRETS)).toEqual([]);
+    // postgres.js passed the socket's error up as it is: no code, no statement, the made-up connection in its message.
+    expect((raw as { code?: unknown }).code).toBeUndefined();
+    expect(Object.hasOwn(raw, "query") || Object.hasOwn(raw, "parameters")).toBe(false);
+    expect(leaksOf(raw, SHAPE_SECRETS)).toEqual(
+      expect.arrayContaining(["host", "port", "user", "password", "database"]),
+    );
+    // extend's own answer to a failure (clocks.ts transientOrScrubbed) would throw it as it is: only reserveConnection
+    // makes it a connection that never opened.
+    let direct: Settled;
+    try {
+      direct = { answer: transientOrScrubbed("extend", raw) };
+    } catch (error) {
+      direct = { thrown: error };
+    }
+    expect("thrown" in direct && direct.thrown === raw).toBe(true);
+  });
+
+  it("for real on a closed port (Node's ECONNREFUSED, on no statement): 08001, holding none of it", async () => {
+    const server = createServer();
+    server.listen(0, "127.0.0.1");
+    await once(server, "listening");
+    const { port } = server.address() as AddressInfo;
+    server.close();
+    await once(server, "close");
+    const reserving = postgres(probeUrl("127.0.0.1", port), { max: 1, onnotice: () => undefined });
+    let outcome: Settled;
+    try {
+      outcome = await settledOf(() => extend(reserveFrom(toolApi, reserving), REQUEST));
+    } finally {
+      await reserving.end({ timeout: 0 });
+    }
+    expect(outcome).toEqual({ answer: NEVER_OPENED });
+    expect(
+      leaksOf(
+        outcome,
+        secretsOf({ port, user: PROBE_USER, password: PROBE_PASSWORD, database: PROBE_DATABASE }),
+      ),
+    ).toEqual([]);
   });
 });

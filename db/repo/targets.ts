@@ -33,7 +33,7 @@
 //
 // This file also holds the runtime side's one transaction and its transient answer, which send-state.ts and
 // handle-keys.ts use too (the same rules as bundles.ts's, whose helpers are not exported).
-import { isLostConnection } from "./bundles";
+import { isLostConnection, reserveConnection } from "./bundles";
 import { scrubbed, transientOrScrubbed } from "./clocks";
 import { readBusinessScope, SCOPE_SETTING, type Sql, type Tx } from "./scope";
 
@@ -240,12 +240,40 @@ export function transientOrThrow(error: unknown, call: string = UNNAMED_CALL): T
 }
 
 /**
+ * True when an error inRuntimeTransaction meets says its connection is gone (DL-649, T-1330's finding a), so no rollback
+ * is written to it and it is never released: postgres.js 3.4.9 writes a statement on a connection whose socket has
+ * closed to no socket at all, from a timer, which throws outside any promise, and the statement never settles. Gone is
+ * isLostConnection's rule as T-1314 left it (bundles.ts: a lost connection's code, ECONNABORTED among them, 08xxx, 57P01
+ * to 57P03, or a socket's failure with no code on a statement), and a statement's failure that is a session's failure
+ * (isSessionFailure: a TLS or certificate error, EACCES, PostgreSQL's class 28 and 53300, a client's error with a
+ * connection's marks) or that transientOrThrow answers 08001 (NEVER_CONNECTED_CODES, a name lookup's failure). A
+ * statement's failure is one postgres.js rejected a statement with: its queryError puts the statement on it (query and
+ * parameters, own properties). An error fn makes itself, on no statement, found no connection gone, whatever its code:
+ * its connection is still open, so it is rolled back and released as before.
+ */
+function foundGone(error: unknown): boolean {
+  if (isLostConnection(error)) {
+    return true;
+  }
+  if (!(error instanceof Error) || !(Object.hasOwn(error, "query") || Object.hasOwn(error, "parameters"))) {
+    return false;
+  }
+  const code = (error as { code?: unknown }).code;
+  return (
+    isSessionFailure(error) ||
+    (typeof code === "string" && (NEVER_CONNECTED_CODES.has(code) || NAME_LOOKUP_FAILED.test(code)))
+  );
+}
+
+/**
  * One transaction of the runtime side (K-05 "Scope": runtime) on one reserved connection of `sql`, the primary: a
  * read-only one at repeatable read (`readOnly`, every read one moment), or a read committed one that writes. The
  * business scope is cleared at its start ('' reads as none, as an unset scope does), so a setting a connection kept
- * never narrows it. As bundles.ts's: a lost connection is rethrown without a rollback (the server rolled the
- * transaction back when the backend went) and is never released, and the stale error a killed connection keeps is
- * taken first by an ordinary query.
+ * never narrows it. As bundles.ts's: a connection found gone (foundGone) is rethrown without a rollback (the server
+ * rolled the transaction back when the backend went) and is never released, and the stale error a killed connection
+ * keeps is taken first by an ordinary query. The connection is reserved through bundles.ts's reserveConnection (T-1334),
+ * so a reserve() that never connects leaves as a connection that never opened, the code 08001 alone, which
+ * transientOrThrow answers transient, never as postgres.js raises it.
  */
 export async function inRuntimeTransaction<T>(
   sql: Sql,
@@ -253,7 +281,7 @@ export async function inRuntimeTransaction<T>(
   fn: (tx: Sql) => Promise<T>,
 ): Promise<T> {
   await sql`select 1`;
-  const reserved = await sql.reserve();
+  const reserved = await reserveConnection(sql);
   let lost = false;
   try {
     await reserved.unsafe(options.readOnly ? "begin isolation level repeatable read read only" : "begin");
@@ -262,7 +290,7 @@ export async function inRuntimeTransaction<T>(
       await reserved`select set_config(${SCOPE_SETTING}, '', true)`;
       result = await fn(reserved);
     } catch (error) {
-      if (!isLostConnection(error)) {
+      if (!foundGone(error)) {
         await reserved`rollback`;
       }
       throw error;
@@ -270,7 +298,7 @@ export async function inRuntimeTransaction<T>(
     await reserved`commit`;
     return result;
   } catch (error) {
-    lost = isLostConnection(error);
+    lost = foundGone(error);
     throw error;
   } finally {
     if (!lost) {

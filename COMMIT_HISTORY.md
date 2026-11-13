@@ -2,9 +2,90 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 525, [`d0b54e7`](https://github.com/aryamahadik/rosie/commit/d0b54e7), 2026-11-13 08:13:06 UTC.
+- **Through:** commit 530, [`806b881`](https://github.com/aryamahadik/rosie/commit/806b881), 2026-11-13 09:16:37 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 530. docs: COMMIT\_HISTORY.md through commit 528 (8edd689, \#536) (\#537)
+
+- **Commit:** [`806b881`](https://github.com/aryamahadik/rosie/commit/806b881), by Arya Mahadik, 2026-11-13 09:16:37 UTC
+- **Pull request:** [#537](https://github.com/aryamahadik/rosie/pull/537) from `task/commit-history-73`, merged 2026-11-13 09:16:37 UTC. It squashed 1 branch commit:
+  - `d2a83ae` docs: COMMIT\_HISTORY.md through commit 528 (8edd689, \#536)
+- **Files changed:** 1 (+50 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +50 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 529. T-1318: a danger the read found (its danger flag) with no outcome hold, released or not, is among unreadTexts and keeps routineHeld true whether or not its pending note was written, so a note and a hold whose writes all fail together still hold every routine part in every commit until a hold is written (T-1312's security note b); holdOnReturn checks for a hold and writes the core's in one guarded step, so a read that throws then succeeds can never reopen a released hold (note a); the line's 5 s, the outbox path's writeHold, the at-once release, sendDanger and sendOutage unchanged; proofs in hold.worker.test.ts (\#538)
+
+- **Commit:** [`2a1bd45`](https://github.com/aryamahadik/rosie/commit/2a1bd45), by Arya Mahadik, 2026-11-13 09:16:33 UTC
+- **Pull request:** [#538](https://github.com/aryamahadik/rosie/pull/538) from `task/T-1318`, merged 2026-11-13 09:16:34 UTC. It squashed 1 branch commit:
+  - `b08da85` T-1318: a danger the read found (its danger flag) with no outcome hol…
+- **Files changed:** 2 (+224 −25), by folder:
+  - `runtime/src/safety/` arrival.ts +50 −18, hold.worker.test.ts +174 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 528. docs: COMMIT\_HISTORY.md through commit 525 (d0b54e7, \#533) (\#536)
+
+- **Commit:** [`8edd689`](https://github.com/aryamahadik/rosie/commit/8edd689), by Arya Mahadik, 2026-11-13 08:31:43 UTC
+- **Pull request:** [#536](https://github.com/aryamahadik/rosie/pull/536) from `task/commit-history-72`, merged 2026-11-13 08:31:44 UTC. It squashed 1 branch commit:
+  - `559791f` docs: COMMIT\_HISTORY.md through commit 525 (d0b54e7, \#533)
+- **Files changed:** 1 (+69 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +69 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 527. T-1340: errorLabelOf labels db/repo's scrubbed DataAccessDatabaseError and CommitTurnDatabaseError by their SQLSTATE and constraint, as it labels a PostgresError: \<Name\>:\<SQLSTATE\>\[:\<constraint\>\], read by name, code and the name's constraint field alone (postgres.js's constraint\_name, db/repo's constraint), with no db/repo import. labels.worker.test.ts: both errors with and without a constraint; a bad code or constraint falls back for all three names alike; each name reads only its own field; values planted in the message, call, table and other fields never reach the label; a send whose door throws sendState's refusal carries the label to the next message and the log (\#535)
+
+- **Commit:** [`e90dad8`](https://github.com/aryamahadik/rosie/commit/e90dad8), by Arya Mahadik, 2026-11-13 08:31:40 UTC
+- **Pull request:** [#535](https://github.com/aryamahadik/rosie/pull/535) from `task/T-1340`, merged 2026-11-13 08:31:40 UTC. It squashed 1 branch commit:
+  - `204362a` T-1340: errorLabelOf labels db/repo's scrubbed DataAccessDatabaseErro…
+- **Files changed:** 2 (+277 −5), by folder:
+  - `runtime/src/queues/` labels.worker.test.ts +258 −2, message.ts +19 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 526. T-1338: a vote's STOP or START keeps the option's words as recordStopOrStart's words (the consent row's exact words), as the PostgreSQL-down path keeps them: guard/replies typedWords reads a vote by its option words, as keywordOf does; a body, then an email's subject, as before; words with no letter or digit still take the list's word. Tests: replies.worker.test.ts (a vote's STOP, START and CANCELAR through the real guard; a typed body and an email's subject unchanged), vote-words.worker.test.ts (one sealed vote through the turn loop and the actor's down path keeps the same words), replies.test.ts (K-09 v1 schema, the list word for blank words); keywords.test.ts renames one title, its assertions unchanged (\#534)
+
+- **Commit:** [`371fee9`](https://github.com/aryamahadik/rosie/commit/371fee9), by Arya Mahadik, 2026-11-13 08:31:36 UTC
+- **Pull request:** [#534](https://github.com/aryamahadik/rosie/pull/534) from `task/T-1338`, merged 2026-11-13 08:31:36 UTC. It squashed 1 branch commit:
+  - `9a631ca` T-1338: a vote's STOP or START keeps the option's words as recordStop…
+- **Files changed:** 5 (+554 −6), by folder:
+  - `runtime/src/guard/` keywords.test.ts +1 −1
+  - `runtime/src/guard/replies/` replies.test.ts +35 −0, replies.ts +19 −4, replies.worker.test.ts +151 −1, vote-words.worker.test.ts +348 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 525. docs: COMMIT\_HISTORY.md through commit 521 (1b5846d, \#528) (\#533)
 
