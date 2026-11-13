@@ -77,7 +77,7 @@ import {
   type Ports,
   type Root,
 } from "./index";
-import { BUNDLE_V0, skeletonFakes } from "./test-support";
+import { BUNDLE_V0, fakeHandleKeys, skeletonFakes } from "./test-support";
 
 const VARS = { ENVIRONMENT: "staging", GIT_SHA: "test-sha" };
 
@@ -717,11 +717,16 @@ describe("the dispatcher's port to the recipient actor's one reading (T-1337; DL
    * K-05 v1.2's outbox calls over one row for Sam: claim-in-order-with-port.json's row as the core writes an outage line's
    * (send class quick_reply, the line's id among its fixed lines, its one words part, no version read), each mark kept,
    * and each claim's recipient (T-1341; null: none named). The row is ROW unless another id is given, on the fixture's
-   * trace id unless another is given.
+   * trace id unless another is given; a danger line's row (T-1352) gives its own class, fixed lines and words.
    */
   function outboxCalls(
     row: string = ROW,
     traceId: string = CLAIMED.traceId,
+    line: { sendClass: string; fixedLines: string[]; text: string } = {
+      sendClass: CLAIMED.sendClass,
+      fixedLines: ["outage"],
+      text: "Rosie is down for a few minutes. If anyone is in danger, call 911.",
+    },
   ): OutboxCalls & { readonly rowMarks: string[]; readonly claims: (string | null)[] } {
     const rowMarks: string[] = [];
     const claims: (string | null)[] = [];
@@ -740,6 +745,7 @@ describe("the dispatcher's port to the recipient actor's one reading (T-1337; DL
               recipientHandleId: "handle-sam",
               recipientPersonId: "person-sam",
               bookingId: null,
+              sendClass: line.sendClass,
               versionsRead: [],
               finalParts: {
                 ...structuredClone(CLAIMED.finalParts),
@@ -747,13 +753,13 @@ describe("the dispatcher's port to the recipient actor's one reading (T-1337; DL
                 sends: [
                   {
                     kind: "words",
-                    text: "Rosie is down for a few minutes. If anyone is in danger, call 911.",
+                    text: line.text,
                     calendarFile: "none",
                     options: [],
                     link: null,
                   },
                 ],
-                fixedLines: ["outage"],
+                fixedLines: line.fixedLines,
                 slotValues: [],
               },
               parts: [{ partNo: 1, tryNo: 1, idempotencyKey: `${row}/1/1`, attempts: 1, sent: false }],
@@ -1110,6 +1116,181 @@ describe("the dispatcher's port to the recipient actor's one reading (T-1337; DL
         expect(actors.asked).toEqual([SAM_ACTOR]);
         expect(sent.map((request) => request.idempotencyKey)).toEqual([`${row}/1/1`]);
         expect(fakes.direct.sent).toEqual([]);
+      } finally {
+        restore();
+      }
+    });
+  });
+
+  // ---- T-1352 (DL-687): the danger line's own wake --------------------------------------------------------------------
+
+  describe("the danger line's own wake (T-1352; DL-687; K-05 v1.14 item 67), joined as SafetyDeps.wakeSafety", () => {
+    /** The trace id the claimed row carries (one id from the webhook to the receipt), in K-08's form. */
+    const ROW_TRACE = "33333333-4444-4555-8666-777777777777";
+    /** A danger line's row, as the core writes it for a text's danger (K-09 recordSafetyOutcome's safetyLine). */
+    const DANGER_ROW = "out-evt-sam-1352-1";
+    const SAFETY_LINE = {
+      sendClass: "safety",
+      fixedLines: ["safetyEmergency"],
+      text: "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.",
+    };
+    const OUTAGE_LINE = {
+      sendClass: "quick_reply",
+      fixedLines: ["outage"],
+      text: "Rosie is down for a few minutes. If anyone is in danger, call 911.",
+    };
+
+    /** The root's safety deps' danger wake, which the root must join: called through them. */
+    function dangerWake(root: Root): NonNullable<SafetyDeps["wakeSafety"]> {
+      return (request) => {
+        if (root.safety.wakeSafety === undefined)
+          throw new Error("the root's safety deps carry no danger wake");
+        return root.safety.wakeSafety(request);
+      };
+    }
+
+    /**
+     * The root under test with the HandleActor namespace given, K-05 v1.2's outbox calls over one row of `line`'s class
+     * for Sam on ROW_TRACE (the real outbox port drops `sendClass` until T-1356 binds v1.14's claim, so this claim, like
+     * v1.13's, can hand back a row of any class), and each part Linq got kept.
+     */
+    function dangerRoot(
+      actors: HandleActors,
+      line: typeof SAFETY_LINE,
+      options: { handleKey?: ReturnType<typeof fakeHandleKeys>["call"]; row?: string } = {},
+    ) {
+      const row = options.row ?? DANGER_ROW;
+      const fakes = skeletonFakes();
+      const outbox = outboxCalls(row, ROW_TRACE, line);
+      const sent: LinqSendRequest[] = [];
+      const root = composeRoot({
+        environment: "test",
+        sets: { fake: fakes.ports },
+        actors,
+        vars: VARS,
+        // No deadline ever comes: a text's read fails at once (no safety reader is handed in), so its timeout rule applies.
+        clock: {
+          now: () => Date.parse("2026-11-07T15:06:35Z"),
+          after: () => new Promise<void>(() => undefined),
+        },
+        ...(options.handleKey === undefined ? {} : { handleKey: options.handleKey }),
+        outboxCalls: outbox,
+        sendStateCall: sendStateOf(row),
+        linqSendCall: (request) => {
+          sent.push(request);
+          return Promise.resolve({
+            result: "accepted",
+            providerMessageId: "linq-msg-test-1352",
+            providerOptionIds: null,
+            chatId: "linq-chat-demo-sam",
+            service: "imessage",
+            acceptedAt: "2026-11-07T15:06:36Z",
+          });
+        },
+        armingCalls: armingCalls(SAM_ACTOR),
+      });
+      return { root, fakes, outbox, sent };
+    }
+
+    /** The log lines the root's own traces write (logSink), kept from the console for each test here. */
+    let log: MockInstance<typeof console.log>;
+    beforeEach(() => {
+      log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    });
+    afterEach(() => {
+      log.mockRestore();
+    });
+
+    /** The dispatch spans the root's traces wrote: each one's trace id, outcome and error code. */
+    const dispatched = (): unknown[] =>
+      spansOfLogLines(log.mock.calls.map((call: unknown[]) => call[0]))
+        .filter((span) => span.hop === "dispatch")
+        .map((span) => [span.trace_id, span.outcome, span.error_code ?? null]);
+
+    it("the root's safety deps carry the danger line's own wake, apart from the outage lines' wake: one safety run for the recipient the wake names, on the same ports; its claimed safety row goes once under its key, past an opt-out only as limit 8 says, with no reading asked (the actor would say stopped), on the row's own trace id", async () => {
+      const actors = actorsAnswering(() => Promise.resolve(true));
+      const run = dangerRoot(actors, SAFETY_LINE);
+
+      await dangerWake(run.root)({ handleId: "handle-sam", outboxRowIds: [DANGER_ROW] });
+
+      expect(run.outbox.claims).toEqual(["handle-sam"]);
+      expect(actors.asked).toEqual([]);
+      expect(run.sent.map((request) => [request.idempotencyKey, request.overrideOptout])).toEqual([
+        [`${DANGER_ROW}/1/1`, false],
+      ]);
+      expect(run.outbox.rowMarks).toEqual([]);
+      expect(dispatched()).toEqual([[ROW_TRACE, "ok", null]]);
+    });
+
+    it("fails closed while the real outbox port drops the field (until T-1356): a row of another class its claim hands back is never sent, read or marked, its claim left to lapse; the outage lines' wake, a run of every class, would send that row", async () => {
+      const actors = actorsAnswering(() => Promise.resolve(false));
+      const run = dangerRoot(actors, OUTAGE_LINE);
+
+      await dangerWake(run.root)({ handleId: "handle-sam", outboxRowIds: [DANGER_ROW] });
+
+      expect(run.outbox.claims).toEqual(["handle-sam"]);
+      expect(run.sent).toEqual([]);
+      expect(run.outbox.rowMarks).toEqual([]);
+      expect(actors.asked).toEqual([]);
+      expect(dispatched()).toEqual([[ROW_TRACE, "refused", "notSafetyClass"]]);
+
+      // The same row, on the outage lines' wake: a run of every class, which asks the reading (false) and sends it.
+      if (run.root.safety.wake === undefined) throw new Error("the root's safety deps carry no wake");
+      await run.root.safety.wake({ handleId: "handle-sam", outboxRowIds: [DANGER_ROW] });
+      expect(actors.asked).toEqual([SAM_ACTOR]);
+      expect(run.sent.map((request) => request.idempotencyKey)).toEqual([`${DANGER_ROW}/1/1`]);
+    });
+
+    it("install() puts the safety deps carrying the danger wake in place (setSafetyDeps): a text whose words hold a danger word gets no verdict, so its timeout rule records the danger through the core, which names its line's row; the writer wakes it, never gated, and the root's safety run claims it for the line's recipient and sends it once, with no reading asked", async () => {
+      const EVENT = "evt-sam-1352-1";
+      const row = `out-${EVENT}`;
+      const keys = fakeHandleKeys();
+      const actors = actorsAnswering(() => Promise.resolve(true));
+      const run = dangerRoot(actors, SAFETY_LINE, { handleKey: keys.call, row });
+      const restore = run.root.install();
+      try {
+        const safety = new SafetyOnArrival({
+          storage: sqlStorage(),
+          spanSink: () => () => undefined,
+          storedTexts: () => [],
+          returns: { enqueue: () => undefined },
+          // The actor's reading says stopped: the danger line never asks it.
+          stopped: () => true,
+        });
+        // Sealed with the root's own sealing port, so the actor's read opens the words with the same key.
+        const prepared = await prepareHandoff(
+          {
+            event: {
+              ...textImessage,
+              eventId: EVENT,
+              body: "Test words: my lips are swelling",
+              traceId: ROW_TRACE,
+            },
+            partKey: null,
+            traceId: ROW_TRACE,
+            bundleId: BUNDLE_V0,
+          },
+          run.root.gateway.keys,
+        );
+        if (prepared.door !== "actor") throw new Error("not an actor event");
+
+        await safety.arrive(prepared.handoff);
+        await safety.idle();
+
+        expect(
+          run.fakes.core.recorded.map((call) => [
+            call.request.caller.requestId,
+            call.request.safety.outcomes,
+            "error" in call.response ? null : call.response.safetyLine,
+          ]),
+        ).toEqual([[`safety:${EVENT}`, ["Unsure"], { fixedLineId: "safetyEmergency", outboxRowId: row }]]);
+        expect(safety.readSafety()).toEqual([
+          expect.objectContaining({ eventId: EVENT, state: "done", danger: true, path: "outbox" }),
+        ]);
+        expect(run.outbox.claims).toEqual(["handle-sam"]);
+        expect(actors.asked).toEqual([]);
+        expect(run.sent.map((request) => request.idempotencyKey)).toEqual([`${row}/1/1`]);
+        expect(run.fakes.direct.sent).toEqual([]);
       } finally {
         restore();
       }

@@ -104,6 +104,13 @@ export interface ClaimOutboxRequest {
   recipientHandleId?: string;
   now: Utc;
   limit: number;
+  /**
+   * K-05 v1.14 `claimOutbox.request.sendClass` (item 67; T-1352): the safety-only claim of a danger line's own wake, its
+   * one value `safety`, sent only with `recipientHandleId` (default 134). It waits for the recipient's lock rather than
+   * skip it (default 129) and walks only the recipient's safety rows, passing one it cannot claim (defaults 130 to 132),
+   * so no row of another class is read, taken or counted toward `limit`. Left out: v1.13's claim of every class.
+   */
+  sendClass?: "safety";
 }
 
 export interface ClaimOutboxResponse {

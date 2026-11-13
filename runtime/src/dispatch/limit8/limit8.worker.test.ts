@@ -490,9 +490,14 @@ describe("a mobile with no open chat gets no text and no clock (mark-waiting-cha
 
     const report = await runDispatch(t.deps());
 
+    // Restated by T-1352 (DL-687, the lead's OK; rule 7.9): the run takes its safety row first, then the reminder.
     expect(report.rows.map((row) => [row.outboxRowId, row.outcome])).toEqual([
-      ["out-ben-reminder", "waitingChat"],
       ["out-ben-safety", "waitingChat"],
+      ["out-ben-reminder", "waitingChat"],
+    ]);
+    expect(t.store.rowMarks.map((mark) => [mark.request.outboxRowId, mark.answer])).toEqual([
+      ["out-ben-safety", "waitingChat"],
+      ["out-ben-reminder", "waitingChat"],
     ]);
     expect(t.linq.requests).toEqual([]);
   });
