@@ -2,11 +2,12 @@
 // until the hold is written. Run inside the Workers runtime: the actor is the real Durable Object reached through the
 // gateway's door; the safety read, the shared core, the Linq send and the clock are the doubles of ./test-support, and a
 // turn's commit goes through the actor's own lease to K-05's double, as in ./store.worker.test.ts. Each test proves a line
-// of the record's section 3, card H, "Proves it with", or a point of its section 2 that the card gives. Where a test makes
-// a write throw, the actor's own storage call throws for it, picked by its table and its order (a SQLite trigger that
-// refuses a write cannot also count it: its abort undoes the count); where it makes a seal fail, it does so at the
-// platform's WebCrypto encrypt, for one text's result only. `closeResults` is reached on the actor's own safety read,
-// inside a storage transaction, as the lease's end of a turn calls it. Test values only (rule 9).
+// of the record's section 3, card H, "Proves it with", or a point of its section 2 that the card gives; the last two blocks
+// prove T-1318's card (T-1312's security notes b and a). Where a test makes a write (or a read) throw, the actor's own
+// storage call throws for it, picked by its table and its order (a SQLite trigger that refuses a write cannot also count
+// it: its abort undoes the count); where it makes a seal fail, it does so at the platform's WebCrypto encrypt, for one
+// text's result only. `closeResults` is reached on the actor's own safety read, inside a storage transaction, as the
+// lease's end of a turn calls it. Test values only (rule 9).
 import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -269,10 +270,10 @@ function exec(query: string, ...bindings: SqlStorageValue[]): Promise<void> {
 }
 
 /** The tables whose writes a test makes the storage refuse. */
-type FaultTable = "safety_holds" | "safety_outcomes";
+type FaultTable = "safety_holds" | "safety_outcomes" | "safety_pending";
 
 const isFaultTable = (name: string | undefined): name is FaultTable =>
-  name === "safety_holds" || name === "safety_outcomes";
+  name === "safety_holds" || name === "safety_outcomes" || name === "safety_pending";
 
 interface WriteFault {
   /** How many writes of this table the storage refused. */
@@ -321,6 +322,41 @@ async function faultWrites(
       lifted = true;
     },
   };
+}
+
+const READ = /^\s*SELECT\b[\s\S]*?\bFROM\s+(\w+)/i;
+
+/**
+ * Makes the actor's storage throw, inside the actor, at each read of a table (a SELECT whose first table it is) that names
+ * this event id among its bindings and that `refuse` picks by the read's order, the first being 1. Every other statement
+ * runs as it is. Returns how many reads the storage refused.
+ */
+async function faultReads(
+  table: string,
+  eventId: string,
+  refuse: (nth: number) => boolean,
+): Promise<() => number> {
+  let seen = 0;
+  let refused = 0;
+  await runInDurableObject(stub(), (_, state) => {
+    const { sql } = state.storage;
+    const run = sql.exec.bind(sql);
+    const faulted = (
+      query: string,
+      ...bindings: SqlStorageValue[]
+    ): SqlStorageCursor<Record<string, SqlStorageValue>> => {
+      if (READ.exec(query)?.[1] === table && bindings.includes(eventId)) {
+        seen += 1;
+        if (refuse(seen)) {
+          refused += 1;
+          throw new Error("the storage refused");
+        }
+      }
+      return run(query, ...bindings);
+    };
+    vi.spyOn(sql, "exec").mockImplementation(faulted);
+  });
+  return () => refused;
 }
 
 /**
@@ -888,6 +924,137 @@ describe("the outbox path's write of the core's hold, unchanged (ADR-018 section
         { eventId: "evt-1", state: "done", danger: true, path: "outbox" },
       ]);
       expect(await actorOf().markHoldReleased("hold-evt-1")).toBe("released");
+    });
+  });
+});
+
+// ---- T-1318: T-1312's security notes b and a ---------------------------------------------------------------------------
+
+describe("a danger with no hold names itself among the texts not read, its pending note written or not (T-1318, note b)", () => {
+  it.each([
+    {
+      then: "the replay's write of the core's hold throwing too: the lease's commit is handed the text as unread, and it stays unread with no hold written",
+      replayWrites: false,
+    },
+    {
+      then: "the storage taking the replay's write: the replay's hold clears it, and the lease's commit is handed that hold, with the core's id, and nothing unread",
+      replayWrites: true,
+    },
+  ])(
+    "with markDangerPending and every hold write throwing, the line goes once on that application and the text is among unreadTexts, routine work held, until a hold is written; then $then",
+    async ({ replayWrites }) => {
+      await withActor({ "evt-1": emergency("evt-1") }, { lease: true }, async (run) => {
+        run.h.core.down = true;
+        const faults = await faultWrites({ safety_holds: () => true, safety_pending: () => true });
+        await arrive("evt-1", SMOKE_TEXT);
+        await run.settle();
+
+        // The pending note and the three writes of the hold (step 1's, the direct path's and dangerSent's) each threw;
+        // the line went all the same, once, at once, under the key of the line noted for the text; its record waits.
+        expect(faults.refused("safety_pending")).toBe(1);
+        expect(faults.refused("safety_holds")).toBe(3);
+        expect(run.h.direct.sent.map((send) => [send.at, send.idempotencyKey, send.overrideOptout])).toEqual([
+          [0, LINE_KEY, true],
+        ]);
+        expect(await actorOf().readSafety()).toMatchObject([
+          {
+            eventId: "evt-1",
+            state: "done",
+            danger: true,
+            path: "direct",
+            lineId: "safetyEmergency",
+            handedAfterMs: 0,
+          },
+        ]);
+        expect((await actorOf().readCopies()).returns).toMatchObject([
+          { key: "recordSafetyOutcome:evt-1", call: "recordSafetyOutcome", rank: "danger" },
+        ]);
+
+        // No note and no hold, its result kept: the danger names itself among the texts not read, routine work held.
+        expect(await idsIn("safety_pending")).toEqual([]);
+        expect(await actorOf().readHolds()).toEqual([]);
+        expect(await unreadTexts()).toEqual(["evt-1"]);
+        expect(await actorOf().routineHeld()).toBe(true);
+
+        // Its batch closed at once on the danger and reached the lease.
+        await vi.waitFor(() => {
+          expect(run.lease.turns.map((turn) => turn.eventIds)).toEqual([["evt-1"]]);
+        }, WAIT);
+        const turn = present(run.lease.turns[0], "the turn");
+        expect(turn.holds).toEqual([]);
+        // While the core is not answering for the queued danger record, the lease sends no commit (CQ-104 (f)).
+        expect(await commitOf(turn)).toEqual({ error: "transient" });
+        expect(run.lease.contexts).toEqual([]);
+        expect(await unreadTexts()).toEqual(["evt-1"]);
+
+        // The core answers: the lease's commit replays the record first, and the core takes it.
+        if (replayWrites) faults.lift();
+        run.h.core.down = false;
+        expect(await commitOf(turn)).toMatchObject({ result: "committed" });
+        expect(run.h.core.recorded.map((call) => call.request.caller.kind)).toEqual(["actorOnReturn"]);
+        if (replayWrites) {
+          // The replay's hold, the core's with its id, clears it: the commit is handed that hold and nothing unread.
+          const hold = { eventId: "evt-1", holdId: "hold-evt-1", rule: "after_safe", blocksBooking: true };
+          expect(run.lease.contexts).toEqual([
+            { holds: [{ ...hold, outcomes: ["An emergency"] }], unread: [] },
+          ]);
+          expect(await actorOf().readHolds()).toEqual([{ ...hold, released: false }]);
+          expect(await unreadTexts()).toEqual([]);
+        } else {
+          // The replay's write threw too (guarded): the commit is handed the text among the texts not read, and with no
+          // hold written it stays there, routine work held.
+          expect(faults.refused("safety_holds")).toBe(4);
+          expect(run.lease.contexts).toEqual([{ holds: [], unread: ["evt-1"] }]);
+          expect(await actorOf().readHolds()).toEqual([]);
+          expect(await unreadTexts()).toEqual(["evt-1"]);
+          expect(await actorOf().routineHeld()).toBe(true);
+        }
+        expect(run.h.direct.sent).toHaveLength(1);
+      });
+    },
+  );
+});
+
+describe("the replay's check for a hold and its write are one guarded step (T-1318, note a)", () => {
+  it("holdOnReturn with its first read throwing and a released hold present: the hold stays released", async () => {
+    await withActor({ "evt-1": emergency("evt-1") }, {}, async (run) => {
+      // The seal fails, so the result is owed and the danger stays pending after its line: it is read again 30 s on.
+      failSeal("evt-1");
+      // The core is not answering: the line goes straight through Linq, step 1's hold stands, and the record waits.
+      run.h.core.down = true;
+      await arrive("evt-1", SMOKE_TEXT);
+      await run.settle();
+      expect(run.h.direct.sent.map((send) => send.idempotencyKey)).toEqual([LINE_KEY]);
+      expect((await actorOf().readCopies()).returns).toMatchObject([{ key: "recordSafetyOutcome:evt-1" }]);
+      const stepOne: HoldEntry = {
+        eventId: "evt-1",
+        holdId: null,
+        rule: "after_safe",
+        blocksBooking: true,
+        released: false,
+      };
+      expect(await actorOf().readHolds()).toEqual([stepOne]);
+
+      // The core answers again. 30 s: the re-read finds danger, applied again through the core: its id lands on the hold.
+      run.h.core.down = false;
+      await run.h.clock.advance(30_000);
+      await run.wake();
+      await vi.waitFor(async () => {
+        expect(await actorOf().readHolds()).toEqual([{ ...stepOne, holdId: "hold-evt-1" }]);
+      }, WAIT);
+      await run.settle();
+      // The core released it: the actor is told by its id (the turn's gate or the console).
+      expect(await actorOf().markHoldReleased("hold-evt-1")).toBe("released");
+      const released: HoldEntry = { ...stepOne, holdId: "hold-evt-1", released: true };
+      expect(await actorOf().readHolds()).toEqual([released]);
+
+      // The queued record replays and the core takes it; holdOnReturn's first read of the text's hold throws. Nothing
+      // is written on it: the released hold stays released.
+      const refused = await faultReads("safety_holds", "evt-1", (nth) => nth === 1);
+      expect(await actorOf().writeSafetyOnReturn()).toBe(1);
+      expect(run.h.core.recorded.map((call) => call.request.caller.kind)).toEqual(["job", "actorOnReturn"]);
+      expect(refused()).toBe(1);
+      expect(await actorOf().readHolds()).toEqual([released]);
     });
   });
 });
