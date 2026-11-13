@@ -45,7 +45,7 @@
 // writes it reads the handle's id alone through handles_id_of_mobile (T-1094). The commit confirms a held row
 // (db/repo/commit-turn.ts, T-195).
 import type postgres from "postgres";
-import { isLostConnection, reserveConnection } from "./bundles";
+import { reserveConnection } from "./bundles";
 import { assertBusinessId, SCOPE_SETTING } from "./scope";
 import type { Sql, Tx } from "./scope";
 import { foundGone, transientOrThrow } from "./targets";
@@ -331,8 +331,13 @@ let savepointCount = 0;
 
 /**
  * Runs `fn` inside a savepoint of the open transaction (the reserved connection has no `savepoint` method of its own):
- * on a failure the savepoint is rolled back, so the transaction can go on; on a lost connection nothing is written to
- * the dead connection.
+ * on a failure the savepoint is rolled back, so the transaction can go on. A connection found gone (targets.ts's
+ * foundGone, as inScopedTransaction decides it: a lost connection, or a statement's failure that is a session's failure
+ * or answers 08001; T-1362) is sent no `rollback to savepoint` and no other statement: postgres.js 3.4.9 would queue it
+ * behind the statement the failure rejected and never settle it (it goes to the destroyed socket, or to none), so
+ * reserve or release would never answer. The failure leaves as it is, through the transaction, which writes no rollback
+ * to that connection and never releases it. Every other failure (a statement's own refusal, such as EXCLUDE's 23P01 or
+ * the seat counter's 23514, or an error fn makes itself on no statement) is rolled back to the savepoint as before.
  */
 async function inSavepoint<T>(tx: Conn, fn: () => Promise<T>): Promise<T> {
   savepointCount += 1;
@@ -343,7 +348,7 @@ async function inSavepoint<T>(tx: Conn, fn: () => Promise<T>): Promise<T> {
     await tx.unsafe(`release savepoint ${name}`);
     return result;
   } catch (error) {
-    if (!isLostConnection(error)) {
+    if (!foundGone(error)) {
       await tx.unsafe(`rollback to savepoint ${name}`);
     }
     throw error;

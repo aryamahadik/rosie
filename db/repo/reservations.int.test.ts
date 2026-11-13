@@ -2809,4 +2809,432 @@ describe("T-1350: inScopedTransaction writes no rollback to a connection fn foun
       await client.sql.end({ timeout: 0 });
     }
   });
+
+  // ---- T-1362: inSavepoint decides by foundGone too (T-1350's builder handoff b, its security review's new task a) ----
+  //
+  // reserveIn and releaseIn do part of their work inside a savepoint (inSavepoint): reserveIn its insert (a held row; a
+  // class seat with its counter; or, once EXCLUDE refused the held row in the transaction's first savepoint, a waiting
+  // row in its second), releaseIn its promotion of the next in line. A connection the savepoint's work found gone
+  // (foundGone) is sent no `rollback to savepoint` and no other statement: postgres.js 3.4.9 would queue it behind the
+  // statement the failure rejected and never settle it. The failure then leaves through inScopedTransaction as above.
+  // The same rosie_job client has its socket cut the same 8 ways at the same 2 points, now at the savepoint's first
+  // statement: as it is written; and at the first turn of the event loop after it is answered, by which time the
+  // savepoint's next statement (its release, or the class seat's counter) is in flight. Each call settles within
+  // SETTLES_WITHIN; nothing is built after the statement in flight; nothing is thrown outside a promise; the outcome is
+  // scrubbed; a statement sent at once is answered on a new connection (another backend), so the dead one was never
+  // released; and the call then answers on the same client as it would have, so the cut call wrote nothing. A failure
+  // the savepoint's work meets on a live connection is still rolled back to the savepoint: a statement's own refusal
+  // (EXCLUDE's 23P01, the statement put on it), after which the transaction goes on; and an error the work makes itself
+  // on no statement, in the shape of Node's EACCES, after which the transaction is rolled back and the connection
+  // released.
+  //
+  // Rule 9: the rows are fixture set v1's (seed-reservation.json), and the other rows and ids are made up here.
+
+  describe("T-1362: inSavepoint writes no `rollback to savepoint` to a connection the savepoint's work found gone (targets.ts foundGone)", () => {
+    const LEES = "biz-lees-barbershop";
+    const YOGA = "biz-yoga-studio";
+    /** A class session with room, made here: seed-class-seats.json loads its resources again beside seed-reservation. */
+    const CLASS = "res-t1362-class";
+    /** The start of a savepoint, as inSavepoint builds it, and its name. */
+    const SAVEPOINT = /^savepoint (rosie_sp_\d+)$/;
+
+    const HELD_ASKED = request({ reservationId: "rsv-t1362-held" });
+    const SEAT_ASKED = request({
+      reservationId: "rsv-t1362-seat",
+      businessId: YOGA,
+      resourceId: CLASS,
+      during: { start: "2026-12-05T17:00:00Z", end: "2026-12-05T18:00:00Z" },
+    });
+    /** Riley's Dec 2 time, which another agent token holds (seed below), so EXCLUDE refuses the held row first. */
+    const WAITING_ASKED = request({
+      reservationId: "rsv-t1362-waiting",
+      during: { start: "2026-12-02T16:00:00Z", end: "2026-12-02T16:30:00Z" },
+      waitIfSaved: true,
+    });
+    const WAITING_ANSWER: ReserveOutcome = {
+      result: "waiting",
+      reservationId: "rsv-t1362-waiting",
+      version: 1,
+      resourceId: "res-riley",
+      during: { start: "2026-12-02T16:00:00Z", end: "2026-12-02T16:30:00Z" },
+      queuedAt: "2026-11-07T15:05:00Z",
+      repeated: false,
+    };
+    /** Alex's saved time with Avery (seed-reservation.json), let go: the agent token first in line is promoted. */
+    const RELEASE_ASKED: Parameters<typeof release>[1] = {
+      reservationId: "rsv-alex-saved-avery",
+      businessId: LEES,
+      expectVersion: 1,
+      why: "let_go",
+      at: "2026-11-07T15:06:00Z",
+    };
+
+    /** Fixture set v1's reservations, a class session of 20 seats, and Riley's Dec 2 time held by another agent token. */
+    async function seed(): Promise<void> {
+      await emptyTables(db.sql);
+      await loadFixture(db.sql, "seed-reservation.json");
+      await createResource(db.sql, {
+        id: CLASS,
+        businessId: YOGA,
+        kind: "class_session",
+        name: "T-1362 class",
+      });
+      await createClassSeats(db.sql, { resourceId: CLASS, businessId: YOGA, capacity: 20 });
+      await db.sql`insert into reservations ${db.sql({
+        id: "rsv-t1362-taken",
+        business_id: LEES,
+        resource_id: "res-riley",
+        resource_kind: "worker",
+        worker_person_id: "person-riley",
+        during: "[2026-12-02T16:00:00Z,2026-12-02T16:30:00Z)",
+        state: "held",
+        held_until: "2026-11-07T15:15:00Z",
+        for_agent_token: "agent-t1362-taken",
+      })}`;
+    }
+
+    /** The index of the last savepoint's start among `sent`, or -1. */
+    function lastSavepoint(sent: readonly string[]): number {
+      for (let k = sent.length - 1; k >= 0; k -= 1) {
+        if (SAVEPOINT.test(sent[k] ?? "")) {
+          return k;
+        }
+      }
+      return -1;
+    }
+
+    /** The statement built right after the `nth` savepoint of the transaction under way: that savepoint's work's first. */
+    const savepointsFirst =
+      (nth: number) =>
+      (sent: readonly string[]): boolean => {
+        const scope = sent.lastIndexOf(SCOPE);
+        return (
+          scope !== -1 &&
+          SAVEPOINT.test(sent.at(-2) ?? "") &&
+          sent.slice(scope).filter((text) => SAVEPOINT.test(text)).length === nth
+        );
+      };
+
+    /** The savepoint's release: its next statement when its work has one statement. */
+    const releaseOf = (savepoint: string): RegExp => new RegExp(`^release savepoint ${savepoint}$`);
+
+    interface SavepointCall {
+      name: string;
+      /** The K-05 call's name, which a scrubbed error carries. */
+      call: "reserve" | "release";
+      run: (sql: Sql) => Promise<unknown>;
+      /** The savepoint of the call's transaction whose work is cut: its first, or its second. */
+      nth: number;
+      /** The savepoint's statement after its work's first, in flight at the "answered" cut. */
+      next: (savepoint: string) => RegExp;
+      /** What the call answers on a working connection, as the first to write it. */
+      answers: ReserveOutcome | ReleaseOutcome;
+    }
+
+    const SAVEPOINT_CALLS: SavepointCall[] = [
+      {
+        name: "reserveIn's held row (reserve)",
+        call: "reserve",
+        run: (sql) => reserve(sql, HELD_ASKED),
+        nth: 1,
+        next: releaseOf,
+        answers: {
+          result: "held",
+          reservationId: "rsv-t1362-held",
+          version: 1,
+          resourceId: "res-riley",
+          during: { start: "2026-12-01T16:00:00Z", end: "2026-12-01T16:30:00Z" },
+          heldUntil: "2026-11-07T15:15:00Z",
+          savedTimeClockId: "rsv-t1362-held/saved-time",
+          repeated: false,
+        },
+      },
+      {
+        name: "reserveIn's class seat and its counter (reserve)",
+        call: "reserve",
+        run: (sql) => reserve(sql, SEAT_ASKED),
+        nth: 1,
+        next: () => /^update class_seats set taken = taken \+ \$1, version = version \+ 1\s/,
+        answers: {
+          result: "held",
+          reservationId: "rsv-t1362-seat",
+          version: 1,
+          resourceId: CLASS,
+          during: { start: "2026-12-05T17:00:00Z", end: "2026-12-05T18:00:00Z" },
+          heldUntil: "2026-11-07T15:15:00Z",
+          savedTimeClockId: "rsv-t1362-seat/saved-time",
+          repeated: false,
+        },
+      },
+      {
+        name: "reserveIn's waiting row, in its second savepoint once EXCLUDE refused the held row (reserve)",
+        call: "reserve",
+        run: (sql) => reserve(sql, WAITING_ASKED),
+        nth: 2,
+        next: releaseOf,
+        answers: WAITING_ANSWER,
+      },
+      {
+        name: "releaseIn's promotion of the next in line (release)",
+        call: "release",
+        run: (sql) => release(sql, RELEASE_ASKED),
+        nth: 1,
+        next: releaseOf,
+        answers: {
+          result: "released",
+          reservationId: "rsv-alex-saved-avery",
+          version: 2,
+          releasedAt: "2026-11-07T15:06:00Z",
+          why: "let_go",
+          promoted: {
+            reservationId: "rsv-agent-waiting-avery",
+            version: 2,
+            heldUntil: "2026-11-07T15:16:00Z",
+            forPhoneNumber: null,
+            forAgentToken: "agent-token-demo-2",
+            bookingId: null,
+            savedTimeClockId: "rsv-agent-waiting-avery/saved-time",
+          },
+          skipped: [],
+          repeated: false,
+        },
+      },
+    ];
+
+    /** The call cut inside its savepoint as the shape and `when` say: see the top of this block. */
+    async function expectSavepointCut(
+      { call, run, nth, next, answers }: SavepointCall,
+      shape: (typeof CUTS)[number],
+      when: Cut["when"],
+    ): Promise<void> {
+      await seed();
+      await expectProbeHolds(shape.raw(), shape.holds);
+      const raw = shape.raw();
+      const client = cutClient({ on: savepointsFirst(nth), when, raw });
+      try {
+        const [before] = await client.sql<{ pid: number }[]>`select pg_backend_pid() as pid`;
+        const watchedRun = await watched(async () => {
+          const called = await outcomeOf(() => run(client.sql));
+          const builtBefore = client.sent.length;
+          // At once, as above: a dead connection released to the pool would take this statement and never answer it.
+          const followed = await outcomeOf(async () => {
+            const [row] = await client.sql<
+              { n: number; pid: number }[]
+            >`select 2 as n, pg_backend_pid() as pid`;
+            return { n: row?.n, newBackend: row !== undefined && row.pid !== before?.pid };
+          });
+          return { called, builtBefore, followed };
+        });
+        expect(watchedRun.outcome, call).not.toBe("never settled");
+        expect(watchedRun.uncaught, call).toEqual([]);
+        const { called, builtBefore, followed } = (
+          watchedRun.outcome as { answer: { called: Outcome; builtBefore: number; followed: Outcome } }
+        ).answer;
+        // The statement in flight at the cut: the savepoint's work's first (write), or the savepoint's next statement,
+        // already built when the connection, idle after that first was answered, closed (answered). It is the last one
+        // built: no `rollback to savepoint`, no rollback, no commit.
+        const built = client.sent.slice(0, builtBefore);
+        const savepoint = lastSavepoint(built);
+        const name = SAVEPOINT.exec(built[savepoint] ?? "")?.[1] ?? "";
+        const inFlight = when === "write" ? savepoint + 1 : savepoint + 2;
+        expect(savepoint, call).toBeGreaterThan(built.lastIndexOf(SCOPE));
+        if (when === "answered") {
+          expect(built[inFlight], call).toMatch(next(name));
+        }
+        expect(client.builtAtCut(), call).toBe(inFlight + 1);
+        expect(builtBefore, call).toBe(inFlight + 1);
+        expect(built, call).not.toContain(`rollback to savepoint ${name}`);
+        // Neither the connection's details nor any value the call's statements carried leaves.
+        const first = built.lastIndexOf(SCOPE) + 1;
+        const carried = valueSecrets(client.values.slice(first, inFlight + 1));
+        expect(Object.keys(carried).length, call).toBeGreaterThan(0);
+        expect(leaksOf(called, { ...cutSecrets(), ...carried }), call).toEqual([]);
+        expectOutcome(called, shape.expected, call);
+        if (raw !== null) {
+          // postgres.js rejected the statement in flight with the raw error, that statement and its values put on it.
+          expect(Object.hasOwn(raw, "query"), call).toBe(true);
+          const inFlightValues = valueSecrets(client.values.slice(inFlight, inFlight + 1));
+          expect(leaksOf(raw, inFlightValues), call).toEqual(Object.keys(inFlightValues));
+        }
+        // The dead connection was never released: the next statement waited for a new connection, another backend.
+        expect(followed, call).toEqual({ answer: { n: 2, newBackend: true } });
+        // And the call answers on the same client as the first to write it: the cut call wrote nothing.
+        const again = await watched(() => run(client.sql));
+        expect(again.uncaught, call).toEqual([]);
+        expect(again.outcome, call).toEqual({ answer: answers });
+      } finally {
+        await client.sql.end({ timeout: 0 });
+      }
+    }
+
+    describe.each(SAVEPOINT_CALLS)("$name", (savepointCall) => {
+      it.each(CUTS)(
+        "the savepoint's first statement cut as it is written ($name): no `rollback to savepoint`, nothing thrown outside a promise, the error that leaves scrubbed; the same client then answers",
+        async (shape) => {
+          await expectSavepointCut(savepointCall, shape, "write");
+        },
+        CUT_TIMEOUT,
+      );
+
+      it.each(CUTS)(
+        "the connection closing while idle after the savepoint's first statement is answered ($name): the savepoint's next statement is in flight, so the same holds",
+        async (shape) => {
+          await expectSavepointCut(savepointCall, shape, "answered");
+        },
+        CUT_TIMEOUT,
+      );
+    });
+
+    /**
+     * The transaction's first savepoint was rolled back right after its work's first statement was refused, and the
+     * transaction went on: its second savepoint's work, then that savepoint's release, then the commit, last.
+     */
+    function expectRolledBackAndOn(sent: readonly string[]): void {
+      const scope = sent.lastIndexOf(SCOPE);
+      const names = sent.slice(scope).flatMap((text) => SAVEPOINT.exec(text)?.slice(1, 2) ?? []);
+      expect(names).toHaveLength(2);
+      const [first = "", second = ""] = names;
+      const started = sent.indexOf(`savepoint ${first}`, scope);
+      expect(sent[started + 2]).toBe(`rollback to savepoint ${first}`);
+      expect(sent.slice(-2)).toEqual([`release savepoint ${second}`, "commit"]);
+    }
+
+    it("a statement's own refusal in the savepoint is rolled back to it and the transaction goes on: reserveIn's held row refused by EXCLUDE (23P01), then its waiting row saved", async () => {
+      await seed();
+      const client = cutClient(null);
+      try {
+        const { outcome, uncaught } = await watched(() => reserve(client.sql, WAITING_ASKED));
+        expect(uncaught).toEqual([]);
+        expect(outcome).toEqual({ answer: WAITING_ANSWER });
+        expectRolledBackAndOn(client.sent);
+        expect(await getReservation(db.sql, "rsv-t1362-waiting")).toMatchObject({
+          state: "waiting",
+          version: 1,
+        });
+      } finally {
+        await client.sql.end({ timeout: 0 });
+      }
+    });
+
+    it("a statement's own refusal in the savepoint is rolled back to it and the transaction goes on: releaseIn's promotion refused by EXCLUDE (23P01), then the next in line promoted", async () => {
+      await seed();
+      // Another saved time covers the second half of the first waiting row's time (made longer), so its promotion is
+      // refused, as in "a waiting row whose time another held row now covers is skipped for overlap" above.
+      await db.sql`insert into reservations ${db.sql({
+        id: "rsv-t1362-cover",
+        business_id: LEES,
+        resource_id: "res-avery",
+        resource_kind: "worker",
+        worker_person_id: "person-avery",
+        during: "[2026-11-14T15:30:00Z,2026-11-14T16:00:00Z)",
+        state: "held",
+        held_until: "2026-11-07T16:00:00Z",
+        for_agent_token: "agent-t1362-cover",
+      })}`;
+      await db.sql`update reservations set during = '[2026-11-14T15:00:00Z,2026-11-14T15:45:00Z)', version = version + 1 where id = 'rsv-agent-waiting-avery'`;
+      const client = cutClient(null);
+      try {
+        const { outcome, uncaught } = await watched(() => release(client.sql, RELEASE_ASKED));
+        expect(uncaught).toEqual([]);
+        expect(outcome).toEqual({
+          answer: {
+            result: "released",
+            reservationId: "rsv-alex-saved-avery",
+            version: 2,
+            releasedAt: "2026-11-07T15:06:00Z",
+            why: "let_go",
+            promoted: {
+              reservationId: "rsv-agent-waiting-avery-second",
+              version: 2,
+              heldUntil: "2026-11-07T15:16:00Z",
+              forPhoneNumber: null,
+              forAgentToken: "agent-token-demo-3",
+              bookingId: null,
+              savedTimeClockId: "rsv-agent-waiting-avery-second/saved-time",
+            },
+            skipped: [{ reservationId: "rsv-agent-waiting-avery", reason: "overlap" }],
+            repeated: false,
+          },
+        });
+        expectRolledBackAndOn(client.sent);
+        expect(await getReservation(db.sql, "rsv-agent-waiting-avery")).toMatchObject({
+          state: "waiting",
+          version: 2,
+        });
+      } finally {
+        await client.sql.end({ timeout: 0 });
+      }
+    });
+
+    /** Each call with the request's `at` read through `readAt`, which its savepoint's work reads for its first statement. */
+    const OWN_ERROR_CALLS: {
+      call: "reserve" | "release";
+      run: (sql: Sql, readAt: (at: string) => string) => Promise<unknown>;
+    }[] = [
+      {
+        call: "reserve",
+        run: (sql, readAt) =>
+          reserve(sql, {
+            ...HELD_ASKED,
+            get at(): string {
+              return readAt(HELD_ASKED.at);
+            },
+          }),
+      },
+      {
+        call: "release",
+        run: (sql, readAt) =>
+          release(sql, {
+            ...RELEASE_ASKED,
+            get at(): string {
+              return readAt(RELEASE_ASKED.at);
+            },
+          }),
+      },
+    ];
+
+    it.each(OWN_ERROR_CALLS)(
+      "an error the savepoint's work makes itself, on no statement, found no connection gone, whatever its code ($call): rolled back to the savepoint, then the transaction rolled back and the connection released",
+      async ({ call, run }) => {
+        await seed();
+        const own = socketError("connect", "EACCES", -13);
+        expect(leaksOf(own, SHAPE_SECRETS)).toEqual(expect.arrayContaining(["address", "port"]));
+        const client = cutClient(null);
+        // The savepoint's work reads the request's `at` for its first statement, after the savepoint is answered, and
+        // that read throws; every read before the savepoint answers.
+        const readAt = (at: string): string => {
+          if (SAVEPOINT.test(client.sent.at(-1) ?? "")) {
+            throw own;
+          }
+          return at;
+        };
+        try {
+          const [before] = await client.sql<{ pid: number }[]>`select pg_backend_pid() as pid`;
+          const { outcome, uncaught } = await watched(() => run(client.sql, readAt));
+          expect(uncaught).toEqual([]);
+          // Rolled back to the savepoint at once, with no statement of its work built, then the transaction rolled back.
+          const savepoint = lastSavepoint(client.sent);
+          const name = SAVEPOINT.exec(client.sent[savepoint] ?? "")?.[1] ?? "";
+          expect(savepoint).toBeGreaterThan(client.sent.lastIndexOf(SCOPE));
+          expect(client.sent.slice(savepoint)).toEqual([
+            `savepoint ${name}`,
+            `rollback to savepoint ${name}`,
+            "rollback",
+          ]);
+          // The call answers it as targets.ts's transientOrThrow does: a session's failure, thrown scrubbed.
+          expect(leaksOf(outcome, cutSecrets())).toEqual([]);
+          expectOutcome(outcome, { code: "EACCES" }, call);
+          // Released: the client's one connection, the same backend, answers the next statement, its scope gone.
+          const next = await watched(async () => [
+            ...(await client.sql<{ pid: number; scope: string | null }[]>`
+              select pg_backend_pid() as pid, nullif(current_setting(${SCOPE_SETTING}, true), '') as scope
+            `),
+          ]);
+          expect(next.outcome).toEqual({ answer: [{ pid: before?.pid, scope: null }] });
+        } finally {
+          await client.sql.end({ timeout: 0 });
+        }
+      },
+    );
+  });
 });
