@@ -1581,8 +1581,8 @@ describe("data-access fixtures: what the schema leaves to the fixtures, each che
     expect(castProblems({ for: { phoneNumber: "+15555550200" } })).toEqual([
       "for.phoneNumber: +15555550200 is not in the 555-01xx range",
     ]);
-    expect(castProblems({ note: "her mobile is +12025550143, not +12025551234." })).toEqual([
-      "note: +12025551234 is not in the 555-01xx range",
+    expect(castProblems({ note: "her mobile is +12025550143, not +15555551234." })).toEqual([
+      "note: +15555551234 is not in the 555-01xx range",
     ]);
     expect(castProblems({ handle: { address: "alex@example.org" } })).toEqual([
       "handle.address: alex@example.org is not at example.com",
