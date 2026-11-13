@@ -84,6 +84,19 @@ export interface ClaimedRow {
   traceId: string;
   claim: OutboxClaim;
   claimedFrom: "checked" | "held" | "sending";
+  /**
+   * K-05 v1.13 `claimedRow.emailPurpose` (item 64; T-1277): K-04 v1.1 outbox_rows.email_purpose as stored, K-12 v1's
+   * purpose of an email row, from which the email port takes the row's K-12 purpose (ADR-016 section 5); null for a row
+   * that names none, which a text row always is. Left out by an answer before v1.13. Limit 8 reads one value of it: a
+   * `code` row always has its `notAfter` (K-04 v1.1 outbox_rows_code_has_not_after), so one claimed without it never goes.
+   */
+  emailPurpose?: "confirmation" | "copy" | "emailWay" | "nextWay" | "code" | "notice" | null;
+  /**
+   * K-05 v1.13 `claimedRow.notAfter` (item 64; T-1277): K-04 v1.1 outbox_rows.not_after as stored. No part of the row is
+   * sent at or after it: limit 8 withdraws the row, unsent, at any try at or after it (ADR-016 section 3). A code row's is
+   * its code's expires_at. Null for a row with no end, and left out by an answer before v1.13: no end.
+   */
+  notAfter?: Utc | null;
 }
 
 export interface ClaimOutboxRequest {
