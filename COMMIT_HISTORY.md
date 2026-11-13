@@ -2,9 +2,70 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 550, [`6b9227c`](https://github.com/aryamahadik/rosie/commit/6b9227c), 2026-11-13 12:40:25 UTC.
+- **Through:** commit 553, [`84538c7`](https://github.com/aryamahadik/rosie/commit/84538c7), 2026-11-13 13:05:03 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 553. docs: COMMIT\_HISTORY.md through commit 550 (6b9227c, \#557) (\#561)
+
+- **Commit:** [`84538c7`](https://github.com/aryamahadik/rosie/commit/84538c7), by Arya Mahadik, 2026-11-13 13:05:03 UTC
+- **Pull request:** [#561](https://github.com/aryamahadik/rosie/pull/561) from `task/commit-history-82`, merged 2026-11-13 13:05:03 UTC. It squashed 1 branch commit:
+  - `f716c88` docs: COMMIT\_HISTORY.md through commit 550 (6b9227c, \#557)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 552. T-1291: K-22's contract test covers v1.2, its fixtures and database side, selecting only its own versions (\#559)
+
+- **Commit:** [`6055b48`](https://github.com/aryamahadik/rosie/commit/6055b48), by Arya Mahadik, 2026-11-13 13:04:58 UTC
+- **Pull request:** [#559](https://github.com/aryamahadik/rosie/pull/559) from `task/T-1291`, merged 2026-11-13 13:04:59 UTC. It squashed 2 branch commits:
+  - `843506a` T-1291: K-22's contract test covers v1.2 (tests/contract/db-schema.pe…
+  - `f35ff85` T-1291: K-22's v1.2 contract test reads only the part at v1.2 from th…
+- **Files changed:** 1 (+2384 −0), by folder:
+  - `tests/contract/` db-schema.people-access.v1.2.test.ts +2384 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1291: K-22's contract test covers v1.2 (tests/contract/db-schema.people-access.v1.2.test.ts): every v1.2 fixture selected by version and checked in the README's format; each refused one refused by PostgreSQL for its one reason (of every CHECK, its row breaks only the one it names), put right as README line 225 says and passing; its CHECKs pinned at their edges and outcome_known held to K-21 v1's eight labels; T-1278's sign_in_attempts and its three calls against the v1.2 list and rule 9 (catalog, grants, policy, trigger, signatures, FOR UPDATE lock); DL-526's race with each check on its own clock (equal counts, outcomes and pause rule); every v1 and v1.1 fixture still holds with 0034 applied
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1291: K-22's v1.2 contract test reads only the part at v1.2 from the shared index (the architect's gap 1; DL-125, DL-124, DL-181): partTables and the all-seeds case take v1, v1.1 and v1.2 entries by version (major 1, minor <= 2, as earlierEntries does), never a later version's, so the file keeps working on the branch that freezes K-22's next minor version before its migration; a new case feeds the selectors a copy of the index with v1.3, v1.10 and v2 entries added and shows they skip them and still take every v1, v1.1 and v1.2 entry
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 551. T-1353: K-05 v1.14, frozen: claimOutbox takes the optional sendClass safety, with a named recipient only; the safety-only claim waits for the recipient lock instead of skipping it and walks only the recipient safety rows in commit order, claiming each it can and passing each it cannot (DL-687), never reading or counting a row of another class, passedHeld empty; README item 67, defaults 129 to 135, open gaps 74 to 76, items 3 and 13 state the one exception; 5 accepted and 4 refused fixtures; startSignIn.errors names migration 0034 keys (CQ-292) (\#560)
+
+- **Commit:** [`4644bd7`](https://github.com/aryamahadik/rosie/commit/4644bd7), by Arya Mahadik, 2026-11-13 13:04:54 UTC
+- **Pull request:** [#560](https://github.com/aryamahadik/rosie/pull/560) from `task/T-1353`, merged 2026-11-13 13:04:55 UTC. It squashed 1 branch commit:
+  - `85458f2` T-1353: K-05 v1.14, frozen: claimOutbox takes the optional sendClass …
+- **Files changed:** 13 (+1495 −11), by folder:
+  - `contracts/data-access/` README.md +84 −10, data-access.v1.14.schema.json +630 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` claim-safety-past-held-row.json +73 −0, claim-safety-past-live-safety-claim.json +73 −0, claim-safety-past-planned-row.json +73 −0, claim-safety-past-routine-live-claim.json +73 −0, claim-safety-past-ten-checked-rows.json +73 −0, index.json +72 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-claim-safety-no-recipient.json +72 −0, refuse-claim-safety-other-class.json +73 −0, refuse-safety-claim-lists-held-row.json +73 −0, refuse-safety-claim-takes-routine-row.json +124 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 550. docs: COMMIT\_HISTORY.md through commit 548 (f0b7af2, \#556) (\#557)
 
