@@ -830,18 +830,36 @@ export class DbOutage {
   /**
    * The outage line, once, to each text waiting 20 s, never to a stopped number; a text the safety read's timeout rule
    * gave it already gets none. A send that fails is tried again 5 s on.
+   *
+   * The handle actor takes a text during every await here (handle-actor.ts `accept` writes it and opens its batch window
+   * in one synchronous step), so a STOP can come while an earlier text's line is out. So the one reading (`stoppedNow`,
+   * whose `stopPending` asks `mayHoldStop`) is asked right before each text's line, not once per pass (the first text's
+   * ask is the one the pass began with), with nothing awaited between its answer and that line's send (T-1335; RULES 7.2:
+   * "It stops texts from the number it answers, at once"). From its first true answer on, no further line of the pass
+   * goes: that text and every later one are withheld (`stopped`, not asked again), as a true answer at the pass's start
+   * withholds them all, and as the AI-down path's try ends its lines (../ai/outage.ts sendLines). It fails closed as
+   * T-1313 does: a reading that throws counts as a stop.
    */
   private async sendLines(set: DbOutageDeps): Promise<void> {
     const now = this.host.now();
     const due = this.dueTexts(now);
     if (due.length === 0) return;
-    if (this.stoppedNow()) {
-      for (const row of due) this.setLine(row.event_id, "stopped");
-      return;
-    }
+    const mayBeStopped = (): boolean => {
+      try {
+        return this.stoppedNow();
+      } catch {
+        return true;
+      }
+    };
     const line = this.outageLine();
     const entries = new Map(this.host.texts(due.map((row) => row.event_id)).map((e) => [e.event.eventId, e]));
-    for (const row of due) {
+    for (const [index, row] of due.entries()) {
+      // Asked afresh right before this text's line: a STOP the actor took while an earlier text's line was out holds this
+      // line and every later one of the pass. Nothing from here to the line's send waits.
+      if (mayBeStopped()) {
+        for (const held of due.slice(index)) this.setLine(held.event_id, "stopped");
+        return;
+      }
       if (this.lineWent(row.event_id)) {
         this.setLine(row.event_id, "went");
         continue;

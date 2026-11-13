@@ -19,6 +19,7 @@ import {
   setLeaseHooks,
   setSafetyDeps,
   turnIdOf,
+  type BatchEntry,
   type CommitTurnRequest,
   type CopiesView,
   type HandleActor,
@@ -40,7 +41,7 @@ import {
 import { fakeKeyStore } from "../../gateway/test-support";
 import { Q01_DRAFTED } from "../../guard/replies/words";
 import type { SafetyResult } from "../../safety/types";
-import { SAM, safetyNoFor, storedText, until } from "../../turn/test-support";
+import { SAM, hold, safetyNoFor, storedText, until, type Hold } from "../../turn/test-support";
 import {
   OUTAGE_WAIT_MS,
   PROBE_MS,
@@ -98,6 +99,7 @@ interface Rpc {
   readCopies(): Promise<CopiesView>;
   readOutage(): Promise<OutageView>;
   readTurns(): Promise<TurnEntry[]>;
+  readBatches(): Promise<BatchEntry[]>;
   readWaitingBatches(): Promise<number[]>;
   readSafety(): Promise<SafetyEntry[]>;
   writeOnReturn(): Promise<ReplayReport>;
@@ -1331,5 +1333,220 @@ describe("a vote's words, once in its box, are read for a STOP (DL-540; T-1297)"
       ["stop", VOTE, "Stop"],
     ]);
     expect(rig.f.log.filter((call) => call.startsWith("commit:"))).toEqual([]);
+  });
+});
+
+describe("the down path's own outage line asks the one reading right before each text's line, not once per pass, so a STOP the actor takes while an earlier line is out holds every later line of the pass (T-1335; RULES 7.2), while a danger line still goes (RULES 4.12)", () => {
+  const A = "evt-sam-0430";
+  const B = "evt-sam-0431";
+  const STOP = "evt-sam-0432";
+  const LATE = "evt-sam-0433";
+  const DANGER = "evt-sam-0434";
+
+  /** The safety read answers No for each text and finds danger in DANGER. */
+  const answers = (): Record<string, SafetyResult> => ({
+    [PRIME]: safetyNoFor(PRIME),
+    [A]: safetyNoFor(A),
+    [B]: safetyNoFor(B),
+    [STOP]: safetyNoFor(STOP),
+    [LATE]: safetyNoFor(LATE),
+    [DANGER]: emergencyFor(DANGER),
+  });
+
+  /**
+   * Linq's answers to the outage lines held while `gate` is closed: Linq takes each line at once (it is noted in
+   * `direct.sent`) and answers once the gate opens, as a Linq slow to answer while the actor goes on taking texts, the way
+   * T-1323's `holdAnswers` holds K-09's. A stop reply and a safety line are answered at once.
+   */
+  function holdLineAnswers(rig: Rig, gate: Hold): void {
+    const send = rig.f.direct.send.bind(rig.f.direct);
+    rig.f.direct.send = async (request) => {
+      const answer = await send(request);
+      if (request.fixedLineId === "outage") await gate.wait();
+      return answer;
+    };
+  }
+
+  /** The actor's one answer now (handle-actor.ts `mayHaveStopped`: its copy of the flag, or the down path's `stopPending`). */
+  const actorAnswer = (): Promise<boolean> =>
+    runInDurableObject(stub(), (instance) =>
+      (instance as unknown as { mayHaveStopped(): boolean }).mayHaveStopped(),
+    );
+
+  /** The outage line the down path sends for a text: K-01's words straight through Linq, not past an opt-out, under its key. */
+  const lineFor = (eventId: string, at: number): DbFakes["direct"]["sent"][number] => ({
+    actorName: SAM_ACTOR,
+    fixedLineId: "outage",
+    text: OUTAGE_TEXT,
+    overrideOptout: false,
+    idempotencyKey: `safety:${eventId}:outage`,
+    at,
+  });
+
+  /**
+   * Sam's first turn has committed (its pin copied bundle A's keyword list, through ActorCopies.refreshKeywords), then
+   * PostgreSQL goes down. A and B arrive together and the real classify reads each as another text; their batch closes at
+   * 3 s and goes to the lease, whose turn cannot pin its bundle. At 20 s the down path asks PostgreSQL, which does not
+   * answer, and its pass sends A's line first: Linq takes it and holds its answer. Returns the 20 s mark, with A's line out
+   * and the pass waiting on it (so nothing here waits for the down path's work to settle).
+   */
+  async function firstLineOut(rig: Rig, gate: Hold): Promise<number> {
+    await prime(rig);
+    rig.f.down = true;
+    holdLineAnswers(rig, gate);
+    const dueAt = rig.f.clock.now() + OUTAGE_WAIT_MS;
+    await rig.arrive(A, "Test words: can I come Friday at 3?");
+    await rig.arrive(B, "Test words: also, is parking free?");
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: A, kind: "other", line: null }),
+      expect.objectContaining({ eventId: B, kind: "other", line: null }),
+    ]);
+    expect(await actorAnswer()).toBe(false);
+    await rig.tick(3000);
+    expect(outageSends(rig)).toEqual([]);
+    await rig.f.clock.advance(OUTAGE_WAIT_MS - 3000);
+    await runDurableObjectAlarm(stub());
+    await until(() => outageSends(rig).length === 1, "the first line's send");
+    expect(rig.f.probes).toEqual([dueAt]);
+    expect(outageSends(rig)).toEqual([lineFor(A, dueAt)]);
+    return dueAt;
+  }
+
+  it("a STOP the actor takes while the pass's first line is out (its reading waits behind the pass, so it counts as a possible STOP, T-1313): no second line, then or later; the next check reads it as a STOP and takes it; a danger verdict's safety line still goes, past the opt-out", async () => {
+    const rig = rigFor(answers());
+    const gate = hold(true);
+    const dueAt = await firstLineOut(rig, gate);
+
+    // The STOP comes now: the actor stores it, opens a batch window with it and follows it, in the one step of `accept`.
+    // Its reading waits behind the pass, so the actor's answer turns to a possible STOP.
+    await rig.arrive(STOP, "STOP", false);
+    expect((await rig.actor.readBatches()).at(-1)).toMatchObject({ reason: null, eventIds: [STOP] });
+    expect((await rig.actor.readOutage()).texts).toContainEqual(
+      expect.objectContaining({ eventId: STOP, kind: null }),
+    );
+    expect(await actorAnswer()).toBe(true);
+    expect(outageSends(rig)).toEqual([lineFor(A, dueAt)]);
+
+    // Linq answers A's line: the pass asks again right before B's line, and the answer holds it.
+    gate.closed = false;
+    await rig.settle();
+    expect(outageSends(rig)).toEqual([lineFor(A, dueAt)]);
+    // The next check reads the STOP as a STOP and takes it: the flag copied, its reply straight through Linq.
+    expect(rig.f.direct.sent.map((send) => [send.idempotencyKey, send.overrideOptout])).toEqual([
+      [`safety:${A}:outage`, false],
+      [`keyword:${STOP}:stopReply`, true],
+    ]);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: A, kind: "other", line: "sent" }),
+      expect.objectContaining({ eventId: B, kind: "other", line: "stopped" }),
+      expect.objectContaining({ eventId: STOP, kind: "stop", keyword: "handled" }),
+    ]);
+    let copies = await rig.actor.readCopies();
+    expect(copies.stopped).toMatchObject({ stopped: true });
+    // A's line went, so its record waits for the return; B's never went, so none waits for it.
+    expect(copies.returns.map((entry) => [entry.rank, entry.key])).toEqual([
+      ["stop", `recordStopOrStart:${STOP}`],
+      ["rest", `sendFixedLine:${A}`],
+    ]);
+
+    // PostgreSQL stays down: B's line is not asked again.
+    await rig.tick(PROBE_MS);
+    await rig.tick(PROBE_MS);
+    expect(outageSends(rig)).toEqual([lineFor(A, dueAt)]);
+
+    // A danger verdict now, from the number whose STOP was just taken: its safety line goes at once, straight through Linq
+    // past the opt-out (arch 02 line 111), and its record waits in the danger rank. It gets no outage line.
+    const dangerAt = rig.f.clock.now();
+    await rig.arrive(DANGER, "Test words: my lips are swelling");
+    expect(rig.f.direct.sent.filter((send) => send.fixedLineId === "safetyEmergency")).toEqual([
+      expect.objectContaining({
+        actorName: SAM_ACTOR,
+        overrideOptout: true,
+        idempotencyKey: `safety:${DANGER}:safetyEmergency`,
+        at: dangerAt,
+      }),
+    ]);
+    copies = await rig.actor.readCopies();
+    expect(copies.returns.map((entry) => [entry.rank, entry.key])).toEqual([
+      ["danger", `recordSafetyOutcome:${DANGER}`],
+      ["stop", `recordStopOrStart:${STOP}`],
+      ["rest", `sendFixedLine:${A}`],
+    ]);
+    await rig.tick(OUTAGE_WAIT_MS);
+    expect(outageSends(rig)).toEqual([lineFor(A, dueAt)]);
+    expect((await rig.actor.readOutage()).texts).toContainEqual(
+      expect.objectContaining({ eventId: DANGER, kind: "other", line: "stopped" }),
+    );
+  });
+
+  it("the boundary: nothing comes while the pass's first line is out, every text no commit has taken read as another text and the copy not stopped: the reading asked again right before B's line answers no, and each text's line goes once", async () => {
+    const rig = rigFor(answers());
+    const gate = hold(true);
+    const dueAt = await firstLineOut(rig, gate);
+    expect(await actorAnswer()).toBe(false);
+
+    gate.closed = false;
+    await rig.settle();
+    expect(outageSends(rig)).toEqual([lineFor(A, dueAt), lineFor(B, dueAt)]);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: A, kind: "other", line: "sent" }),
+      expect.objectContaining({ eventId: B, kind: "other", line: "sent" }),
+    ]);
+    expect((await rig.actor.readCopies()).returns.map((entry) => [entry.rank, entry.key])).toEqual([
+      ["rest", `sendFixedLine:${A}`],
+      ["rest", `sendFixedLine:${B}`],
+    ]);
+
+    // Once: no second line for either, however long PostgreSQL stays down.
+    await rig.tick(PROBE_MS);
+    await rig.tick(PROBE_MS);
+    expect(outageSends(rig)).toEqual([lineFor(A, dueAt), lineFor(B, dueAt)]);
+  });
+
+  it("fails closed as T-1313 does (CQ-282's accepted cost, pinned): a text of other words the actor takes while the first line is out has no reading yet either, so it holds B's line too, which is not asked again once that text reads as another text (a withheld line is final, as CQ-283's default has it for the safety read's line); the late text gets its own line once, at its 20 s", async () => {
+    const rig = rigFor(answers());
+    const gate = hold(true);
+    const dueAt = await firstLineOut(rig, gate);
+    await rig.arrive(LATE, "Test words: thanks!", false);
+    expect((await rig.actor.readOutage()).texts).toContainEqual(
+      expect.objectContaining({ eventId: LATE, kind: null }),
+    );
+    expect(await actorAnswer()).toBe(true);
+
+    gate.closed = false;
+    await rig.settle();
+    expect(outageSends(rig)).toEqual([lineFor(A, dueAt)]);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: A, kind: "other", line: "sent" }),
+      expect.objectContaining({ eventId: B, kind: "other", line: "stopped" }),
+      expect.objectContaining({ eventId: LATE, kind: "other", line: null }),
+    ]);
+    expect((await rig.actor.readCopies()).stopped?.stopped ?? false).toBe(false);
+    expect(await actorAnswer()).toBe(false);
+
+    await rig.tick(OUTAGE_WAIT_MS);
+    expect(outageSends(rig)).toEqual([lineFor(A, dueAt), lineFor(LATE, dueAt + OUTAGE_WAIT_MS)]);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: A, line: "sent" }),
+      expect.objectContaining({ eventId: B, line: "stopped" }),
+      expect.objectContaining({ eventId: LATE, line: "sent" }),
+    ]);
+  });
+
+  it("fails closed as T-1313 does: the actor's copy of the stopped flag cannot be read when B's line is asked (a reading that throws counts as a stop), so no second line goes", async () => {
+    const rig = rigFor(answers());
+    const gate = hold(true);
+    const dueAt = await firstLineOut(rig, gate);
+    await runInDurableObject(stub(), (_, state) => {
+      state.storage.sql.exec("DROP TABLE copy_stopped");
+    });
+
+    gate.closed = false;
+    await rig.settle();
+    expect(outageSends(rig)).toEqual([lineFor(A, dueAt)]);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: A, kind: "other", line: "sent" }),
+      expect.objectContaining({ eventId: B, kind: "other", line: "stopped" }),
+    ]);
   });
 });
