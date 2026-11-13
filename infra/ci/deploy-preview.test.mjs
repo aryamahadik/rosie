@@ -1213,4 +1213,68 @@ console.log("migrate: up to date (the fake migrate.mjs of deploy-preview.test.mj
       "one command holds the URL: migrate.mjs's node",
     );
   });
+
+  // T-1349 (T-1343's security review, new task b): a DATABASE_REPLICA_URL in the caller's environment (db/repo/client.ts
+  // reads it) leaves the script's environment before anything is started, as STAGING_DATABASE_URL and DATABASE_URL do:
+  // no command the preview starts gets it, migrate.mjs and the branch's install and build included. Made up, as the
+  // other URLs.
+  const REPLICA_URL =
+    "postgres://t1349_replica_login:t1349-made-up-replica-password@db-t1349-replica.example.invalid:5432/t1349_replica";
+  const REPLICA_PARTS = [
+    "t1349_replica_login",
+    "t1349-made-up-replica-password",
+    "db-t1349-replica.example.invalid",
+    "t1349_replica",
+  ];
+
+  it("a DATABASE_REPLICA_URL of the caller's reaches no command, in its environment or its arguments, under allexport, bash -a -k or bash -x (T-1349)", () => {
+    for (const [what, extra, bash] of [
+      ["no option", {}, []],
+      ["SHELLOPTS=allexport", { SHELLOPTS: "allexport" }, []],
+      ["bash -a -k", {}, ["-a", "-k"]],
+      ["bash -x", {}, ["-x"]],
+    ]) {
+      const result = fixture.run({
+        extra: { STAGING_DATABASE_URL: STAGING_URL, DATABASE_REPLICA_URL: REPLICA_URL, ...extra },
+        bash,
+      });
+      assertUrlToMigrateAlone(result, what, REPLICA_PARTS);
+      for (const child of result.children) {
+        assert.equal(
+          child.env.split("\n").some((line) => line.startsWith("DATABASE_REPLICA_URL=")),
+          false,
+          `${what}, ${child.name}: DATABASE_REPLICA_URL is in its environment`,
+        );
+      }
+      if (bash.includes("-x")) {
+        assert.equal(result.stderr, "+ set +x\n", `${what}: the trace went on after set +x`);
+      }
+    }
+  });
+
+  it("a recorder keeps a DATABASE_REPLICA_URL in a command's environment or arguments, and the checks find it (the control for T-1349's checks)", (t) => {
+    const dir = tempDir(t, "preview-replica-control");
+    const spy = path.join(dir, "spy");
+    mkdirSync(spy);
+    write(path.join(dir, "bin", "date"), recorder(spy, "date", [program("date")]), 0o755);
+    spawnSync(path.join(dir, "bin", "date"), ["-u", `/made-up/${REPLICA_URL}`], {
+      env: { PATH: path.join(dir, "bin"), DATABASE_REPLICA_URL: REPLICA_URL },
+      encoding: "utf8",
+    });
+    const [record] = readdirSync(spy)
+      .filter((file) => file.endsWith(".env"))
+      .map((file) => file.slice(0, -".env".length));
+    const env = readFileSync(path.join(spy, `${record}.env`), "utf8");
+    const argv = readFileSync(path.join(spy, `${record}.argv`), "utf8");
+    assert.deepEqual(holders(env, REPLICA_PARTS), ["DATABASE_REPLICA_URL"]);
+    assert.ok(
+      env.split("\n").some((line) => line.startsWith("DATABASE_REPLICA_URL=")),
+      "the name is recorded",
+    );
+    assert.equal(
+      REPLICA_PARTS.some((part) => argv.includes(part)),
+      true,
+      "an argument holding the URL is recorded",
+    );
+  });
 });

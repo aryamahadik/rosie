@@ -50,7 +50,7 @@ set -euo pipefail
 unset -v staging_url local_url db_url LOCAL_DATABASE_URL
 staging_url="${STAGING_DATABASE_URL:-}"
 local_url="${DATABASE_URL:-}"
-unset -v STAGING_DATABASE_URL DATABASE_URL
+unset -v STAGING_DATABASE_URL DATABASE_URL DATABASE_REPLICA_URL
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 # The local Docker database (factory spec 4): local only, not a secret.
