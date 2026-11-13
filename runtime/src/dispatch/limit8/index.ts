@@ -1,9 +1,12 @@
-// Limit 8 at send (T-259, T-1099; C-125, C-241). See limit8.ts.
+// Limit 8 at send (T-259, T-1099, T-1283; C-125, C-241). See limit8.ts.
 
 export {
   CUSTOMER_OPENS,
   STAFF_OPENS,
   decideLimit8,
+  emailStopped,
+  endPassed,
+  isEmailRow,
   isSafety,
   isSmsPort,
   isStopReply,
