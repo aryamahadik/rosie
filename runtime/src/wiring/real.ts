@@ -1994,7 +1994,10 @@ export interface OutboxCalls {
   readonly markRowV12: (request: MarkRowV12Request) => Promise<MarkRowV12Outcome>;
 }
 
-/** What the real outbox port is fed: K-05's four calls with their database bound, or null where none is bound. */
+/**
+ * What the real outbox port is fed: K-05's four calls, and v1.14's claim where it is bound, with their database bound, or
+ * null where none is bound.
+ */
 export interface OutboxInputs {
   readonly calls: OutboxCalls | null;
 }
