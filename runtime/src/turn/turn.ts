@@ -1199,7 +1199,7 @@ async function finishCommitted(
 /**
  * True when step 7 has ended for the commit (T-253): the turn's rows with no plan were read, and none of them was left
  * with no plan (each was composed, copied, found planned or closed). The dispatcher's wake counts as given either way: a
- * wake not taken leaves the rows to the minute sweep.
+ * wake not taken leaves the rows for the recipient's next dispatcher run (no sweep runs).
  */
 export function replyEnded(report: ComposeReport): boolean {
   return report.rowsError === null && report.rows.every((row) => row.result !== "left");

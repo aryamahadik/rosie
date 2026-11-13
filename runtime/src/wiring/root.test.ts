@@ -6,12 +6,15 @@
 // reads and the guard's targets, T-557 the frontier, T-558 decide, T-559 the gate, T-560 compose input and the composer,
 // T-561 finalize, T-562 the outbox and the send state, T-1213 the chat open, T-563 the Linq send and the dispatcher's
 // retries, T-564 the clock arming, T-1242 staging's state reads and plan calls; production takes no join yet).
+import { DatabaseSync, type SQLInputValue } from "node:sqlite";
+
 import joinComposeInput from "@rosie/ai/recordings/composer-inputs/join-s1-02.json";
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import claimInOrderWithPort from "@rosie/contracts/data-access/fixtures/claim-in-order-with-port.json";
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
 import renewClaimReadsPhone from "@rosie/contracts/data-access/fixtures/renew-claim-reads-phone.json";
 import sendStateOwner from "@rosie/contracts/data-access/fixtures/send-state-owner.json";
+import textImessage from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
 import planS102 from "@rosie/contracts/message-plan/fixtures/plan-s1-02.json";
 import sendText from "@rosie/contracts/port-linq/fixtures/send-text.json";
 import buildFrontierS101 from "@rosie/contracts/tool-api/fixtures/build-frontier-s1-01.json";
@@ -25,12 +28,17 @@ import type {
   RenewClaimOutcome,
 } from "@rosie/db/repo/outbox";
 import type { SendStateResponse } from "@rosie/db/repo/send-state";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 import { turnIdOf } from "../actor/lease";
 import type { LinqAccepted, LinqSendRequest } from "../dispatch/types";
+import { prepareHandoff } from "../gateway/hand-off";
+import { fakeKeyStore } from "../gateway/test-support";
 import { queueDeps, type JobTry } from "../queues";
+import { SafetyOnArrival } from "../safety";
+import type { SafetyDeps } from "../safety/types";
 import { openTrace, type Span } from "../trace";
+import { spansOfLogLines } from "../trace/hop-check";
 import type {
   BuildFrontierRequest,
   ComposeInput,
@@ -67,6 +75,7 @@ import {
   type PortName,
   type PortPick,
   type Ports,
+  type Root,
 } from "./index";
 import { BUNDLE_V0, skeletonFakes } from "./test-support";
 
@@ -706,26 +715,35 @@ describe("the dispatcher's port to the recipient actor's one reading (T-1337; DL
 
   /**
    * K-05 v1.2's outbox calls over one row for Sam: claim-in-order-with-port.json's row as the core writes an outage line's
-   * (send class quick_reply, the line's id among its fixed lines, its one words part, no version read), each mark kept.
+   * (send class quick_reply, the line's id among its fixed lines, its one words part, no version read), each mark kept,
+   * and each claim's recipient (T-1341; null: none named). The row is ROW unless another id is given, on the fixture's
+   * trace id unless another is given.
    */
-  function outboxCalls(): OutboxCalls & { readonly rowMarks: string[] } {
+  function outboxCalls(
+    row: string = ROW,
+    traceId: string = CLAIMED.traceId,
+  ): OutboxCalls & { readonly rowMarks: string[]; readonly claims: (string | null)[] } {
     const rowMarks: string[] = [];
+    const claims: (string | null)[] = [];
     return {
       rowMarks,
-      claimOutboxV12: () =>
-        Promise.resolve({
+      claims,
+      claimOutboxV12: (request) => {
+        claims.push(request.recipientHandleId ?? null);
+        return Promise.resolve({
           result: "claimed",
           claimed: [
             {
               ...structuredClone(CLAIMED),
-              outboxRowId: ROW,
+              traceId,
+              outboxRowId: row,
               recipientHandleId: "handle-sam",
               recipientPersonId: "person-sam",
               bookingId: null,
               versionsRead: [],
               finalParts: {
                 ...structuredClone(CLAIMED.finalParts),
-                row: ROW,
+                row,
                 sends: [
                   {
                     kind: "words",
@@ -738,20 +756,21 @@ describe("the dispatcher's port to the recipient actor's one reading (T-1337; DL
                 fixedLines: ["outage"],
                 slotValues: [],
               },
-              parts: [{ partNo: 1, tryNo: 1, idempotencyKey: `${ROW}/1/1`, attempts: 1, sent: false }],
+              parts: [{ partNo: 1, tryNo: 1, idempotencyKey: `${row}/1/1`, attempts: 1, sent: false }],
             },
           ],
           passedHeld: [],
-        } as unknown as ClaimOutboxV12Outcome),
+        } as unknown as ClaimOutboxV12Outcome);
+      },
       renewClaim: () =>
         Promise.resolve({
           ...structuredClone(renewClaimReadsPhone.outcome),
-          outboxRowId: ROW,
+          outboxRowId: row,
         } as unknown as RenewClaimOutcome),
       markPartV12: (request) =>
         Promise.resolve({
           result: "marked",
-          outboxRowId: ROW,
+          outboxRowId: row,
           partNo: 1,
           tryNo: 1,
           attempts: 1,
@@ -766,7 +785,7 @@ describe("the dispatcher's port to the recipient actor's one reading (T-1337; DL
         rowMarks.push(request.outcome);
         return Promise.resolve({
           result: "marked",
-          outboxRowId: ROW,
+          outboxRowId: row,
           version: request.expectVersion + 1,
           outcome: request.outcome,
         } as unknown as MarkRowV12Outcome);
@@ -774,14 +793,15 @@ describe("the dispatcher's port to the recipient actor's one reading (T-1337; DL
     };
   }
 
-  /** send-state-owner.json for Sam with his Linq chat: not stopped, the chat open, no version read. */
-  const sendState = (): Promise<SendStateResponse> =>
+  /** send-state-owner.json for Sam's row with his Linq chat: not stopped, the chat open, no version read. */
+  const sendStateOf = (row: string) => (): Promise<SendStateResponse> =>
     Promise.resolve({
       ...(structuredClone(sendStateOwner.outcome) as unknown as SendStateResponse),
-      outboxRowId: ROW,
+      outboxRowId: row,
       chat: { threadId: "thread-s1-01-sam-1", linqChatId: "linq-chat-demo-sam", version: 1 },
       currentVersions: [],
     });
+  const sendState = sendStateOf(ROW);
 
   /** The arming's calls: only the directory is read here, naming Sam's actor for his K-04 handle id (or none). */
   const armingCalls = (named: string | null): ArmingCalls & { readonly named: string[] } => {
@@ -823,9 +843,12 @@ describe("the dispatcher's port to the recipient actor's one reading (T-1337; DL
     };
   }
 
-  /** The root under test with these actors and that directory answer; each part Linq got is kept. */
-  function rootWith(actors: HandleActors | null, named: string | null = SAM_ACTOR) {
-    const outbox = outboxCalls();
+  /**
+   * The root under test with these actors and that directory answer, its claimed row on `traceId` (the fixture's when left
+   * out); each part Linq got is kept.
+   */
+  function rootWith(actors: HandleActors | null, named: string | null = SAM_ACTOR, traceId?: string) {
+    const outbox = outboxCalls(ROW, traceId);
     const arming = armingCalls(named);
     const sent: LinqSendRequest[] = [];
     const accepted: LinqAccepted = {
@@ -932,4 +955,179 @@ describe("the dispatcher's port to the recipient actor's one reading (T-1337; DL
       expect(run.outbox.rowMarks).toEqual(["droppedStopped"]);
     },
   );
+
+  // ---- T-1341 (DL-669): the outage lines' writers' wake ------------------------------------------------------------
+
+  describe("the outage lines' writers' wake (T-1341; DL-669), joined as SafetyDeps.wake", () => {
+    /** The trace id the claimed row carries (one id from the webhook to the receipt), in K-08's form. */
+    const ROW_TRACE = "22222222-3333-4444-8555-666666666666";
+
+    /** The root's safety deps' wake, which the root must join: called through them. */
+    function writersWake(root: Root): NonNullable<SafetyDeps["wake"]> {
+      return (request) => {
+        if (root.safety.wake === undefined) throw new Error("the root's safety deps carry no wake");
+        return root.safety.wake(request);
+      };
+    }
+
+    /** The log lines the root's own traces write (logSink), kept from the console for each test here. */
+    let log: MockInstance<typeof console.log>;
+    beforeEach(() => {
+      log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    });
+    afterEach(() => {
+      log.mockRestore();
+    });
+
+    it("the root's safety deps carry the outage lines' writers' wake: one dispatcher run for the recipient the wake names, on the same ports, so T-1337's reading is asked right before the outage part goes; a row this isolate sent on no trace goes on a trace opened under its own trace id", async () => {
+      let says = false;
+      const actors = actorsAnswering(() => Promise.resolve(says));
+      const run = rootWith(actors, SAM_ACTOR, ROW_TRACE);
+      const wake = writersWake(run.root);
+
+      // False: the one run's claim names the recipient; the part goes once, under its key, on the row's own trace id.
+      await wake({ handleId: "handle-sam", outboxRowIds: [ROW] });
+      expect(run.outbox.claims).toEqual(["handle-sam"]);
+      expect(run.arming.named).toEqual(["handle-sam"]);
+      expect(actors.asked).toEqual([SAM_ACTOR]);
+      expect(run.sent.map((request) => request.idempotencyKey)).toEqual([`${ROW}/1/1`]);
+      const dispatched = (): unknown[] =>
+        spansOfLogLines(log.mock.calls.map((call: unknown[]) => call[0]))
+          .filter((span) => span.hop === "dispatch")
+          .map((span) => [span.trace_id, span.outcome]);
+      expect(dispatched()).toEqual([[ROW_TRACE, "ok"]]);
+
+      // True, at a later wake: its run asks again, nothing more goes, and the row is dropped as stopped.
+      says = true;
+      await wake({ handleId: "handle-sam", outboxRowIds: [ROW] });
+      expect(run.outbox.claims).toEqual(["handle-sam", "handle-sam"]);
+      expect(actors.asked).toEqual([SAM_ACTOR, SAM_ACTOR]);
+      expect(run.sent).toHaveLength(1);
+      expect(run.outbox.rowMarks).toEqual(["droppedStopped"]);
+      expect(dispatched()).toEqual([
+        [ROW_TRACE, "ok"],
+        [ROW_TRACE, "dropped"],
+      ]);
+    });
+
+    it("the writers' wake keeps a row this isolate sent on the trace it was sent on, as the retry door's run does", async () => {
+      const actors = actorsAnswering(() => Promise.resolve(false));
+      const run = rootWith(actors, SAM_ACTOR, ROW_TRACE);
+      const spans: Span[] = [];
+      const turnTrace = openTrace({
+        openedBy: "textWebhook",
+        bundleId: BUNDLE_V0,
+        sink: (span) => spans.push(span),
+      });
+
+      await run.root.dispatcher.wake(
+        { turnId: "turn-t1341", handleId: "handle-sam", outboxRowIds: [ROW] },
+        turnTrace,
+      );
+      await writersWake(run.root)({ handleId: "handle-sam", outboxRowIds: [ROW] });
+
+      expect(run.outbox.claims).toEqual(["handle-sam", "handle-sam"]);
+      expect(spans.filter((span) => span.hop === "dispatch").map((span) => span.trace_id)).toEqual([
+        turnTrace.traceId,
+        turnTrace.traceId,
+      ]);
+      expect(
+        spansOfLogLines(log.mock.calls.map((call: unknown[]) => call[0])).filter(
+          (span) => span.hop === "dispatch",
+        ),
+      ).toEqual([]);
+    });
+
+    it("install() puts the safety deps carrying the writers' wake in place (setSafetyDeps): a text whose words cannot be read gets the timeout rule's outage line through the core, the writer wakes its row while the host's reading says false, and the root's run claims it for the line's recipient and sends it once", async () => {
+      const EVENT = "evt-sam-1341-1";
+      const row = `out-fixed-safety:${EVENT}`;
+      const fakes = skeletonFakes();
+      const outbox = outboxCalls(row);
+      const sent: LinqSendRequest[] = [];
+      const actors = actorsAnswering(() => Promise.resolve(false));
+      const root = composeRoot({
+        environment: "test",
+        sets: { fake: fakes.ports },
+        actors,
+        vars: VARS,
+        // No deadline ever comes: the text's words cannot be opened (no database is bound for the sealing port), so the
+        // timeout rule applies at once.
+        clock: {
+          now: () => Date.parse("2026-11-07T15:06:35Z"),
+          after: () => new Promise<void>(() => undefined),
+        },
+        outboxCalls: outbox,
+        sendStateCall: sendStateOf(row),
+        linqSendCall: (request) => {
+          sent.push(request);
+          return Promise.resolve({
+            result: "accepted",
+            providerMessageId: "linq-msg-test-1341",
+            providerOptionIds: null,
+            chatId: "linq-chat-demo-sam",
+            service: "imessage",
+            acceptedAt: "2026-11-07T15:06:36Z",
+          });
+        },
+        armingCalls: armingCalls(SAM_ACTOR),
+      });
+      const keys = fakeKeyStore();
+      const restore = root.install();
+      try {
+        const safety = new SafetyOnArrival({
+          storage: sqlStorage(),
+          spanSink: () => () => undefined,
+          storedTexts: () => [],
+          returns: { enqueue: () => undefined },
+          stopped: () => false,
+        });
+        const prepared = await prepareHandoff(
+          {
+            event: {
+              ...textImessage,
+              eventId: EVENT,
+              body: "Test words: is Saturday open?",
+              traceId: ROW_TRACE,
+            },
+            partKey: null,
+            traceId: ROW_TRACE,
+            bundleId: BUNDLE_V0,
+          },
+          keys,
+        );
+        if (prepared.door !== "actor") throw new Error("not an actor event");
+
+        await safety.arrive(prepared.handoff);
+        await safety.idle();
+
+        expect(
+          fakes.core.fixed.map((call) => [call.request.caller.requestId, call.request.fixedLineId]),
+        ).toEqual([[`safety:${EVENT}`, "outage"]]);
+        expect(safety.readSafety()).toEqual([
+          expect.objectContaining({ eventId: EVENT, state: "done", path: "outbox", lineId: "outage" }),
+        ]);
+        expect(outbox.claims).toEqual(["handle-sam"]);
+        expect(actors.asked).toEqual([SAM_ACTOR]);
+        expect(sent.map((request) => request.idempotencyKey)).toEqual([`${row}/1/1`]);
+        expect(fakes.direct.sent).toEqual([]);
+      } finally {
+        restore();
+      }
+    });
+  });
 });
+
+/**
+ * The Durable Object's SQL storage for a Node test: an in-memory SQLite database (as ../safety/partial-bundle.test.ts
+ * makes it). The actor's safety read uses only `sql.exec(...).toArray()`.
+ */
+function sqlStorage(): DurableObjectStorage {
+  const db = new DatabaseSync(":memory:");
+  const sql = {
+    exec(query: string, ...bindings: SQLInputValue[]) {
+      const rows = db.prepare(query).all(...bindings);
+      return { toArray: () => rows };
+    },
+  };
+  return { sql } as unknown as DurableObjectStorage;
+}
