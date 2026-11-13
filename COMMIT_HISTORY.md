@@ -2,9 +2,52 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 561, [`3158351`](https://github.com/aryamahadik/rosie/commit/3158351), 2026-11-13 16:17:51 UTC.
+- **Through:** commit 563, [`89cc67b`](https://github.com/aryamahadik/rosie/commit/89cc67b), 2026-11-13 16:39:08 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 563. docs: COMMIT\_HISTORY.md through commit 561 (3158351, \#569) (\#571)
+
+- **Commit:** [`89cc67b`](https://github.com/aryamahadik/rosie/commit/89cc67b), by Arya Mahadik, 2026-11-13 16:39:08 UTC
+- **Pull request:** [#571](https://github.com/aryamahadik/rosie/pull/571) from `task/commit-history-87`, merged 2026-11-13 16:39:09 UTC. It squashed 1 branch commit:
+  - `a6aa087` docs: COMMIT\_HISTORY.md through commit 561 (3158351, \#569)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 562. T-1364: a danger whose line is not done keeps a lasting mark, so its safety line is always retried (\#570)
+
+- **Commit:** [`a210e53`](https://github.com/aryamahadik/rosie/commit/a210e53), by Arya Mahadik, 2026-11-13 16:39:04 UTC
+- **Pull request:** [#570](https://github.com/aryamahadik/rosie/pull/570) from `task/T-1364`, merged 2026-11-13 16:39:04 UTC. It squashed 2 branch commits:
+  - `1ca7007` T-1364: a danger whose line is not done keeps a lasting mark, written…
+  - `1073a47` T-1364: a mark that cannot be cleared keeps the noted line, so a repe…
+- **Files changed:** 2 (+766 −28), by folder:
+  - `runtime/src/safety/` arrival.ts +106 −21, hold.worker.test.ts +660 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1364: a danger whose line is not done keeps a lasting mark, written with its danger flag and cleared once its line is done, so its line is tried again on the read's schedule however its pending note's writes fail
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1364: a mark that cannot be cleared keeps the noted line, so a repeat goes under the same key; one refusal helper for both fault cases
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 561. docs: COMMIT\_HISTORY.md through commit 559 (c290f4f, \#567) (\#569)
 
