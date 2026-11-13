@@ -2,9 +2,43 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 514, [`debb0cf`](https://github.com/aryamahadik/rosie/commit/debb0cf), 2026-11-13 06:29:10 UTC.
+- **Through:** commit 516, [`a879c2c`](https://github.com/aryamahadik/rosie/commit/a879c2c), 2026-11-13 06:55:02 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 516. docs: COMMIT\_HISTORY.md through commit 514 (debb0cf, \#521) (\#524)
+
+- **Commit:** [`a879c2c`](https://github.com/aryamahadik/rosie/commit/a879c2c), by Arya Mahadik, 2026-11-13 06:55:02 UTC
+- **Pull request:** [#524](https://github.com/aryamahadik/rosie/pull/524) from `task/commit-history-68`, merged 2026-11-13 06:55:02 UTC. It squashed 1 branch commit:
+  - `0d600a0` docs: COMMIT\_HISTORY.md through commit 514 (debb0cf, \#521)
+- **Files changed:** 1 (+53 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +53 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 515. T-1310: a made name's vars-file value is named as not used, never sent to secrets:staging; deploy-preview.sh and seed-staging.sh give a database URL only to the commands that use the database; deploy-staging.sh switches tracing off; cleanEnv drops ROSIE\_NUMBER; the token maker removes its leftover temp files; pretest:ci-scripts builds the validators (\#523)
+
+- **Commit:** [`b162c4a`](https://github.com/aryamahadik/rosie/commit/b162c4a), by Arya Mahadik, 2026-11-13 06:54:58 UTC
+- **Pull request:** [#523](https://github.com/aryamahadik/rosie/pull/523) from `task/T-1310`, merged 2026-11-13 06:54:58 UTC. It squashed 1 branch commit:
+  - `e7efdb5` T-1310: a made name's vars-file value is named as not used, never sen…
+- **Files changed:** 13 (+999 −57), by folder:
+  - `infra/ci/` README.md +2 −0, deploy-preview.test.mjs +349 −2, deploy-staging.test.mjs +85 −1, make-check-tester-token.test.mjs +132 −1, make-staging-secrets.test.mjs +42 −5, script-harness.mjs +5 −3, seed-staging.test.mjs +218 −6
+  - `infra/scripts/` deploy-preview.sh +33 −4, deploy-staging.sh +12 −5, make-check-tester-token.mjs +66 −4, make-staging-secrets.sh +19 −15, seed-staging.sh +35 −11
+  - `/` package.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 514. docs: COMMIT\_HISTORY.md through commit 512 (0a0b002, \#520) (\#521)
 
