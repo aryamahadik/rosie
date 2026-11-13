@@ -2,9 +2,58 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 494, [`ab1b5b4`](https://github.com/aryamahadik/rosie/commit/ab1b5b4), 2026-11-12 22:14:16 UTC.
+- **Through:** commit 497, [`3d6b3d9`](https://github.com/aryamahadik/rosie/commit/3d6b3d9), 2026-11-12 23:36:34 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 497. docs: COMMIT\_HISTORY.md through commit 494 (ab1b5b4, \#502) (\#504)
+
+- **Commit:** [`3d6b3d9`](https://github.com/aryamahadik/rosie/commit/3d6b3d9), by Arya Mahadik, 2026-11-12 23:36:34 UTC
+- **Pull request:** [#504](https://github.com/aryamahadik/rosie/pull/504) from `task/commit-history-60`, merged 2026-11-12 23:36:35 UTC. It squashed 1 branch commit:
+  - `d24f794` docs: COMMIT\_HISTORY.md through commit 494 (ab1b5b4, \#502)
+- **Files changed:** 1 (+99 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +99 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 496. T-1315: the frontier's transaction start fails scrubbed: pgFrontierScope hands a failure before work gets its repo to transientOrThrow under readTurnState, so a connection that never opens or is lost answers transient (work runs once on a repo that reads nothing and answers it, and buildFrontier answers K-09's transient) and a refused session is thrown scrubbed with the call's name and code alone; pgFrontierRepo's read names readTurnState too; frontier.int.test.ts proves it through the scope and buildFrontier (closed-port ECONNREFUSED, postgres.js's and Node's constructed connection errors, PostgreSQL's class 28 and 53300 at the start) (\#505)
+
+- **Commit:** [`46d320d`](https://github.com/aryamahadik/rosie/commit/46d320d), by Arya Mahadik, 2026-11-12 23:36:31 UTC
+- **Pull request:** [#505](https://github.com/aryamahadik/rosie/pull/505) from `task/T-1315`, merged 2026-11-12 23:36:31 UTC. It squashed 1 branch commit:
+  - `3e6b5f3` T-1315: the frontier's transaction start fails scrubbed: pgFrontierSc…
+- **Files changed:** 2 (+578 −12), by folder:
+  - `actions/src/tool-api/turn-face/pg/` frontier.int.test.ts +526 −0, frontier.ts +52 −12
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 495. T-1321: the post-deploy check sends one form POST to \<base\>/sign-in on the workers.dev address, from the site's own origin with a small form and its own trace id, and passes only the guard's 403 page (T-1237's host rule on the edge); any other answer or none fails the check, so the deploy rolls back; no POST to any other address (a NOTICE line); tests with a curl stand-in (\#503)
+
+- **Commit:** [`81cd711`](https://github.com/aryamahadik/rosie/commit/81cd711), by Arya Mahadik, 2026-11-12 23:36:27 UTC
+- **Pull request:** [#503](https://github.com/aryamahadik/rosie/pull/503) from `task/T-1321`, merged 2026-11-12 23:36:27 UTC. It squashed 1 branch commit:
+  - `5be2dc9` T-1321: the post-deploy check sends one form POST to \<base\>/sign-in o…
+- **Files changed:** 2 (+411 −20), by folder:
+  - `infra/ci/` post-deploy-check.test.mjs +323 −13
+  - `infra/scripts/` post-deploy-check.sh +88 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 494. docs: COMMIT\_HISTORY.md through commit 491 (1e30dc8, \#498) (\#502)
 
