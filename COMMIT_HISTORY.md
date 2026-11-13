@@ -2,9 +2,96 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 582, [`58c3677`](https://github.com/aryamahadik/rosie/commit/58c3677), 2026-11-13 22:35:16 UTC.
+- **Through:** commit 585, [`59a2ee0`](https://github.com/aryamahadik/rosie/commit/59a2ee0), 2026-11-13 23:21:38 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 585. docs: COMMIT\_HISTORY.md through commit 582 (58c3677, \#590) (\#592)
+
+- **Commit:** [`59a2ee0`](https://github.com/aryamahadik/rosie/commit/59a2ee0), by Arya Mahadik, 2026-11-13 23:21:38 UTC
+- **Pull request:** [#592](https://github.com/aryamahadik/rosie/pull/592) from `task/commit-history-96`, merged 2026-11-13 23:21:39 UTC. It squashed 1 branch commit:
+  - `20bc87c` docs: COMMIT\_HISTORY.md through commit 582 (58c3677, \#590)
+- **Files changed:** 1 (+53 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +53 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 584. T-062: K-21 page and console calls v1.3 frozen with journey 5's screens: the money step, the card, the yes, read-backs, documents and the owner's ask (\#594)
+
+- **Commit:** [`1284256`](https://github.com/aryamahadik/rosie/commit/1284256), by Arya Mahadik, 2026-11-13 23:21:35 UTC
+- **Pull request:** [#594](https://github.com/aryamahadik/rosie/pull/594) from `task/T-062`, merged 2026-11-13 23:21:35 UTC. It squashed 5 branch commits:
+  - `8fbfff4` T-062: K-21 v1.3, journey 5's screens: the money step, card form, yes…
+  - `c367bb0` T-062: v1.3 README and schema wording: why the money step runs on the…
+  - `f6bea90` T-062: v1.3 README: co-signers' names show only in the sendDocument r…
+  - `b0dfe2f` T-062: v1.3 round 2 (DL-737): moneyYes, moneyCard, moneyConfirm and o…
+  - `e9abc17` T-062: v1.3 README default 77: on Needs you cantTakeIt tells the owne…
+- **Files changed:** 63 (+4061 −3), by folder:
+  - `contracts/page-api/` README.md +133 −1, frozen.json +1 −1, page-api.v1.3.schema.json +2164 −0
+  - `contracts/page-api/fixtures/` document-read.json +29 −0, document-send-confirm.json +23 −0, document-send-read-back.json +28 −0, document-sign.json +25 −0, documents-page-open.json +57 −0, documents-page.json +52 −0, index.json +60 −1, money-ask-owner-confirm.json +23 −0, money-ask-owner-read-back.json +28 −0, money-buy-pack-confirm.json +28 −0, money-buy-pack-read-back.json +28 −0, money-card-buy-pack.json +26 −0, money-card-form.json +26 −0, money-card-saved.json +22 −0, money-card-try-another.json +19 −0, money-credit-confirm.json +23 −0, money-credit-read-back.json +28 −0, money-let-go-confirm.json +23 −0, money-let-go-read-back.json +28 −0, money-plan-confirm.json +23 −0, money-plan-read-back.json +28 −0, money-step-card.json +56 −0, money-step-document.json +65 −0, money-step-offers.json +82 −0, money-yes-card.json +27 −0, money-yes-customer-blocked.json +18 −0, money-yes-deposit.json +27 −0, money-yes-nothing-texts-off.json +27 −0, money-yes-safety-held.json +18 −0, money-yes-time-taken.json +18 −0, owner-ask-confirm-customer-blocked.json +19 −0, owner-ask-confirm-safety-held.json +19 −0, owner-ask-confirm-time-taken.json +19 −0, owner-ask-confirm.json +26 −0, owner-ask-read-back.json +30 −0, owner-asks.json +42 −0, pay-page-card.json +26 −0, pay-page-step.json +59 −0, pay-page-yes.json +27 −0, swap-co-signer-name.json +6 −0
+  - `contracts/page-api/fixtures/invalid/` refuse-document-read-typed-name.json +29 −0, refuse-document-sign-names-signer.json +11 −0, refuse-documents-typed-name.json +40 −0, refuse-money-buy-confirm-no-consent.json +23 −0, refuse-money-buy-read-back-committed.json +29 −0, refuse-money-card-decline-reason.json +19 −0, refuse-money-card-number.json +10 −0, refuse-money-card-restricted-key.json +26 −0, refuse-money-card-secret-card-number.json +26 −0, refuse-money-card-secret-key.json +26 −0, refuse-money-card-webhook-secret.json +26 −0, refuse-money-step-hold.json +52 −0, refuse-money-yes-card-no-consent.json +27 −0, refuse-money-yes-time-taken-with-card.json +32 −0, refuse-money-yes-words-from-browser.json +9 −0, refuse-owner-ask-answer-silence.json +11 −0, refuse-owner-ask-confirm-names-answer.json +10 −0, refuse-owner-ask-silence-books.json +42 −0, refuse-pay-page-offers.json +71 −0, refuse-unscrubbed-co-signer-name.json +6 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-062: K-21 v1.3, journey 5's screens: the money step, card form, yes and offers on the secure page and C3's pay page, the document read and signed, the owner console's Documents and Needs you's answer to A5-08; 33 accepted and 15 refused fixtures; freeze record; frozen.json v1.3
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-062: v1.3 README and schema wording: why the money step runs on the secure page, the card stage changes nothing on anyone's word, a co-signer's link opens with documentRead, holdEnded cites K-09's default 104
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-062: v1.3 README: co-signers' names show only in the sendDocument read-back on the same page; a typed name in no answer
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-062: v1.3 round 2 (DL-737): moneyYes, moneyCard, moneyConfirm and ownerAskConfirm answer K-09 v1.3 takeMoneyBefore's customerBlocked and safetyHeld with cantTakeIt and its timeTaken with timeTaken, card null (moneyTimeTakenError), ownerAskConfirm naming wordsDiffer; the page's clientSecret refuses sk_, rk_ and whsec_ prefixes and 13+ digit runs; 6 accepted and 5 refused fixtures; README errors table, defaults 77 and 78, open gap 60
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-062: v1.3 README default 77: on Needs you cantTakeIt tells the owner the booking can't be made now, with no reason; the ask still waits for its deadline
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 583. T-1356: the real outbox port carries sendClass to db/repo's v1.14 claim and never drops it; a binding that cannot carry it refuses the claim (\#593)
+
+- **Commit:** [`54fc39e`](https://github.com/aryamahadik/rosie/commit/54fc39e), by Arya Mahadik, 2026-11-13 23:21:31 UTC
+- **Pull request:** [#593](https://github.com/aryamahadik/rosie/pull/593) from `task/T-1356`, merged 2026-11-13 23:21:31 UTC. It squashed 2 branch commits:
+  - `651ebc4` T-1356: the real outbox port carries sendClass to db/repo's claimOutb…
+  - `545f692` T-1356: OutboxInputs' doc names v1.14's claim beside K-05's four outb…
+- **Files changed:** 2 (+375 −57), by folder:
+  - `runtime/src/wiring/` real.ts +84 −17, root.test.ts +291 −40
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1356: the real outbox port carries sendClass to db/repo's claimOutboxV114 and never drops it; with v1.14's claim bound every claim goes there (one without the field is v1.13's, unchanged), and where only claimOutboxV12 is bound a claim with the field is refused before any call (SendClassNotCarriedError), never made as a claim of every class. root.test.ts proves the bind through root.install(), the refusal, the transient repeat and the ordinary run unchanged; the fail-closed test now drops the field in a wrapper.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1356: OutboxInputs' doc names v1.14's claim beside K-05's four outbox calls
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 582. docs: COMMIT\_HISTORY.md through commit 579 (335d87c, \#587) (\#590)
 
