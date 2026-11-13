@@ -365,9 +365,11 @@ describe("what stays as it was (T-1337)", () => {
 
     const report = await runDispatch(t.deps(reading));
 
+    // Restated by T-1352 (DL-687, the lead's OK; rule 7.9): the run sends its safety row first (RULES 4.12: "the safety
+    // message first"), then the rest in commit order, so the outage row is asked and dropped after the safety line went.
     expect(outcomes(report)).toEqual([
-      ["out-safety-evt-sam-0001-outage", "droppedStopped", 0],
       ["out-sam-safety", "sent", 1],
+      ["out-safety-evt-sam-0001-outage", "droppedStopped", 0],
       ["out-sam-stop-reply", "sent", 1],
     ]);
     expect(t.linq.requests.map((request) => request.idempotencyKey)).toEqual([
@@ -375,6 +377,11 @@ describe("what stays as it was (T-1337)", () => {
       "out-sam-stop-reply/1/1",
     ]);
     expect(reading.asked).toEqual(["handle-sam"]);
+    expect(t.log).toEqual([
+      ...["sendState", "renewClaim", "sendState", "sendPart"],
+      ...["sendState", "renewClaim", "sendState", "mayHaveStopped", "markRow:droppedStopped"],
+      ...["sendState", "renewClaim", "sendState", "sendPart"],
+    ]);
 
     // Once the STOP has committed (the stopped flag set), the safety line goes with the opt-out override, as today.
     const stopped = setup([

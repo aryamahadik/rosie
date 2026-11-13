@@ -21,7 +21,9 @@
 //     by T-559), the Durable Object reading each at use;
 //   - the outbox dispatcher (T-257), which the turn wakes once its rows are composed (T-252): one claim-and-send run for
 //     the turn's recipient, each claimed row on the turn's trace; and which an outage line's writer wakes once the core
-//     names its row (T-1341, SafetyDeps.wake): one run for the line's recipient, each claimed row on its own trace;
+//     names its row (T-1341, SafetyDeps.wake): one run for the line's recipient, each claimed row on its own trace; and
+//     which a danger line's writer wakes the same way, never gated (T-1352, SafetyDeps.wakeSafety): one safety run for the
+//     line's recipient, K-05 v1.14's safety-only claim;
 //   - the receipt door: a delivery receipt marks its part delivered and arms its question's clock (T-255) through the
 //     arming port (T-564), on the trace its row was sent on when this isolate knows it (./row-traces.ts), else on the
 //     receipt's own;
@@ -527,6 +529,25 @@ export function composeRoot(options: RootOptions): Root {
     await runDispatch(dispatchDeps(traceFor), { recipientHandleId: request.handleId });
   };
 
+  // The danger line's own wake (T-1352; DL-687; K-05 v1.14 item 67): one safety run for the recipient the wake names, on
+  // the same ports, so its claim is the safety-only claim (waiting for the recipient's lock, passing every row of another
+  // class and every safety row it cannot claim) and no claimed row of another class is sent in it. The safety read's
+  // sendDanger takes it as SafetyDeps.wakeSafety, never gated: no reading is asked before it, and no safety row is asked
+  // in its run. Each claimed row goes on the trace this isolate sent it on, else on a trace opened under the row's own
+  // trace id, with the active bundle id read once for the run, as the outage lines' wake does. A claim that fails is not
+  // reported: the row waits for the recipient's next run.
+  const dangerWake: NonNullable<SafetyDeps["wakeSafety"]> = async (request) => {
+    const known = request.outboxRowIds.map((row) => rowTraces.forRow(row)).find((trace) => trace !== null);
+    const bundleId =
+      known?.bundleId ?? (await readBundleId({ bundleId: () => activeBundleId(ports.bundles.registry) }));
+    const traceFor = (row: ClaimedRow): TraceContext => {
+      const trace = rowTraces.forRow(row.outboxRowId) ?? rowTraceOf(row, bundleId, log, now);
+      rowTraces.keep(row.outboxRowId, trace);
+      return trace;
+    };
+    await runDispatch(dispatchDeps(traceFor), { recipientHandleId: request.handleId, sendClass: "safety" });
+  };
+
   // The retry queue's door to the dispatcher (T-258's dispatchSendDoor; DL-315): a due send job runs its recipient's rows
   // again with the same ports, each claimed row on the trace this isolate sent it on, else on a trace opened under the
   // row's own trace id (one trace id from the webhook to the delivery receipt), with the active bundle id read once for
@@ -596,6 +617,8 @@ export function composeRoot(options: RootOptions): Root {
     isStopped: (actorName) => ports.stateReads.safety.isStopped(actorName),
     // The outage line's row, woken at once by its writer (T-1341; DL-669).
     wake: outageWake,
+    // The danger line's row, woken at once by its writer on a safety run, never gated (T-1352; DL-687).
+    wakeSafety: dangerWake,
   };
 
   // What the turn's pin reads through: where the state reads are real, behind the bundle's safety lines' check, so a bundle

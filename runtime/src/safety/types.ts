@@ -258,6 +258,21 @@ export interface SafetyDeps {
    * or failing, the row waits for the recipient's next dispatcher run (no sweep runs), and the line's result stands.
    */
   wake?(request: { readonly handleId: string; readonly outboxRowIds: readonly string[] }): Promise<void>;
+  /**
+   * Wakes the danger line's own row once the core's `recordSafetyOutcome` answer names it (safetyLine.outboxRowId), first
+   * or repeated (T-1352; DL-687): one safety run of the recipient's dispatcher, which makes K-05 v1.14's safety-only claim
+   * (item 67), waiting for the recipient's lock and passing every row of another class and every safety row it cannot
+   * claim, and sends no claimed row of another class, so no other row's claim, plan or hold holds the danger line back
+   * (RULES 4.12; arch 04 line 211) and the run carries nothing a STOP binds (RULES 7.2). It is never gated: no reading,
+   * stopped flag or copy is asked before it or in its run, since a safety line goes past any opt-out (arch 02 line 111).
+   * Kept apart from `wake`, row S's gated wake, whose run claims every sendable row of the recipient: the danger path never
+   * reaches that claim. The root joins it (../wiring/root.ts). Left out, not called, or failing, the row waits for the
+   * recipient's next dispatcher run, and the line's result stands.
+   */
+  wakeSafety?(request: {
+    readonly handleId: string;
+    readonly outboxRowIds: readonly string[];
+  }): Promise<void>;
 }
 
 /** How long the actor waits for a verdict: 2 s a model, 4 s in all, from arrival (arch 02 line 111). */

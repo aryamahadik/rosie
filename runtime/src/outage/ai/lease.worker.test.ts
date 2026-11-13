@@ -23,14 +23,19 @@
 // reading says exactly false. Where a test joins it, the writers' wake is one run of that real dispatcher for the recipient
 // the wake names, as the root builds it, joined as the safety read's SafetyDeps.wake and as the AI-down path's
 // OutageDeps.wake; no test runs the dispatcher unless it says so.
+//
+// T-1352 (DL-687, DL-698): the danger line's row is woken by its own writer at once, never gated and never awaited. Where a
+// test joins it, the danger wake is one safety run of that real dispatcher for the recipient the wake names (K-05 v1.14's
+// safety-only claim, which the outbox double answers), as the root builds it, joined as SafetyDeps.wakeSafety.
 import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import fixedLinesFixture from "../../../../contracts/bundle/fixtures/fixed-lines.json";
 import buildFrontierS102 from "../../../../contracts/tool-api/fixtures/build-frontier-s1-02.json";
 import commitS102 from "../../../../contracts/tool-api/fixtures/commit-s1-02.json";
 import decideS102 from "../../../../contracts/model/fixtures/decide-s1-02-choose.json";
+import safetyChildOrElder from "../../../../contracts/model/fixtures/safety-child-or-elder.json";
 import safetyEmergencyNow from "../../../../contracts/model/fixtures/safety-emergency-now.json";
 import {
   setBatchHooks,
@@ -59,6 +64,7 @@ import {
   words,
   type SeedRow,
 } from "../../dispatch/test-support";
+import type { LinqFailed } from "../../dispatch/types";
 import { actorNameOf, durableObjectActor, type ActorNamespace, type HandleActorRpc } from "../../gateway";
 import { fakeKeyStore } from "../../gateway/test-support";
 import { setGuardDeps } from "../../guard";
@@ -246,7 +252,9 @@ interface DownRig extends Rig {
  * text, with the key store the gateway sealed it under. `wiring` (T-1337) names the handle's ids the safety read's calls
  * use (TEST_IDS's when left out) and the turn's dispatcher (the turn's doubles' when left out); and (T-1341) the outage
  * lines' writers' wake, joined as the root joins it, as the safety read's `SafetyDeps.wake` and, after the AI-down path's
- * own record of each wake (`o.wakes`), as its `OutageDeps.wake` (none when left out: the rows wait for a run).
+ * own record of each wake (`o.wakes`), as its `OutageDeps.wake` (none when left out: the rows wait for a run); and
+ * (T-1352) the danger line's own wake, joined as the root joins it, as the safety read's `SafetyDeps.wakeSafety` (none
+ * when left out: the danger line's row waits for the recipient's next run).
  */
 async function downRigFor(
   who: Party,
@@ -258,6 +266,7 @@ async function downRigFor(
     ids?: HandleIds;
     dispatcher?: TurnDeps["dispatcher"];
     wake?: (request: OutageWake) => Promise<void>;
+    wakeSafety?: (request: OutageWake) => Promise<void>;
   } = {},
 ): Promise<DownRig> {
   const all: Record<string, SafetyResult> = {
@@ -268,6 +277,7 @@ async function downRigFor(
   const read = fakeRead(f.clock, all);
   const stopped = { value: false };
   const wake = wiring.wake;
+  const wakeSafety = wiring.wakeSafety;
   const h: Harness = {
     clock: f.clock,
     core: f.core,
@@ -279,6 +289,7 @@ async function downRigFor(
       read,
       isStopped: () => stopped.value,
       ...(wake === undefined ? {} : { wake }),
+      ...(wakeSafety === undefined ? {} : { wakeSafety }),
     },
   };
   const o = outageHarness(f.clock);
@@ -952,6 +963,21 @@ describe("an outage line's row written before a STOP that has not committed is n
      * dispatcher for the recipient the wake names, on these ports, the root's port to the real actor among them.
      */
     wake(request: OutageWake): Promise<void>;
+    /**
+     * The danger line's own wake as the root builds it (../../wiring/root.ts `dangerWake`, T-1352): one safety run of the
+     * real dispatcher for the recipient the wake names (sendClass "safety": K-05 v1.14's safety-only claim), on these ports.
+     */
+    wakeSafety(request: OutageWake): Promise<void>;
+    /** Each danger wake the danger line's writer made, in order (T-1352). */
+    readonly dangerWoken: OutageWake[];
+    /** How each next danger wake fails before its run starts: a throw at the call, or a rejection (T-1352). */
+    dangerWakeFails: ("throws" | "rejects")[];
+    /** How many danger wakes' runs have ended (T-1352). */
+    dangerEnded: number;
+    /** The row whose part's renewal the next run waits at behind `runGate`: a point only that row's run reaches (T-1352). */
+    heldRenewalOf: string | null;
+    /** While true, every claim reaches the outbox double without `sendClass`: a store or wrapper that drops it (T-1352). */
+    dropsSendClass: boolean;
   }
 
   function sends(): Sends {
@@ -986,10 +1012,18 @@ describe("an outage line's row written before a STOP that has not committed is n
       store: {
         claimOutbox: (request) => {
           to.claims.push(request.recipientHandleId ?? null);
-          return store.claimOutbox(request);
+          if (!to.dropsSendClass) return store.claimOutbox(request);
+          const dropped = { ...request };
+          delete dropped.sendClass;
+          return store.claimOutbox(dropped);
         },
         renewClaim: async (request) => {
           await holdAt("the claim's renewal");
+          if (to.heldRenewalOf !== null && to.heldRenewalOf === request.outboxRowId) {
+            to.heldRenewalOf = null;
+            to.reached = true;
+            await to.runGate.wait();
+          }
           return store.renewClaim(request);
         },
         markPart: (request) => store.markPart(request),
@@ -1046,6 +1080,21 @@ describe("an outage line's row written before a STOP that has not committed is n
         await runDispatch(deps(), { recipientHandleId: request.handleId });
         to.ended += 1;
       },
+      dangerWoken: [],
+      dangerWakeFails: [],
+      dangerEnded: 0,
+      heldRenewalOf: null,
+      dropsSendClass: false,
+      wakeSafety(request) {
+        to.dangerWoken.push(structuredClone(request));
+        const fails = to.dangerWakeFails.shift();
+        if (fails === "throws") throw new Error("the danger wake failed");
+        if (fails === "rejects") return Promise.reject(new Error("the danger wake's run failed"));
+        // As the root's run: a safety run for the named recipient; its report is not read.
+        return runDispatch(deps(), { recipientHandleId: request.handleId, sendClass: "safety" }).then(() => {
+          to.dangerEnded += 1;
+        });
+      },
     };
     return to;
   }
@@ -1088,8 +1137,12 @@ describe("an outage line's row written before a STOP that has not committed is n
     const record = core.recordSafetyOutcome.bind(core);
     core.recordSafetyOutcome = async (request) => {
       const answer = await record(request);
-      const line = "error" in answer ? null : answer.safetyLine;
+      if ("error" in answer) return answer;
+      const line = answer.safetyLine;
       if (line?.outboxRowId != null) {
+        // A repeat of a record whose row is written already writes nothing and answers repeated, naming the same row, as
+        // the core answers its request id again (T-1352).
+        if (to.written.includes(line.outboxRowId)) return { ...answer, repeated: true };
         to.write({
           id: line.outboxRowId,
           recipient: SAM_HANDLE_ID,
@@ -1508,9 +1561,11 @@ describe("an outage line's row written before a STOP that has not committed is n
 
     const report = await runDispatch(to.deps(), { recipientHandleId: SAM_HANDLE_ID });
 
+    // Restated by T-1352 (DL-687, the lead's OK; rule 7.9): the run sends its safety row first (RULES 4.12: "the safety
+    // message first"), then the rest in commit order.
     expect(report.rows.map((row) => [row.outboxRowId, row.outcome, row.partsSent])).toEqual([
-      [rowOf(A), "droppedStopped", 0],
       [`out-${DANGER}`, "sent", 1],
+      [rowOf(A), "droppedStopped", 0],
       ["out-sam-stop-reply", "sent", 1],
     ]);
     expect(to.linq.requests.map((request) => request.idempotencyKey)).toEqual([
@@ -1881,6 +1936,601 @@ describe("an outage line's row written before a STOP that has not committed is n
       expect(to.woken).toEqual([]);
       expect(to.claims).toEqual([]);
       expect(await safetyOf(rig, S)).toMatchObject({ state: "done", path: "outage", lineId: "outage" });
+    });
+  });
+
+  // ---- T-1352: the danger line's row is woken by its writer at once, on a safety run nothing holds back or gates --------
+
+  describe("T-1352 (DL-687, DL-698; K-05 v1.14 item 67): the danger line's row is woken by its writer at once, never gated and never awaited, on a safety run of the real dispatcher that no other row's claim, plan or hold holds back, so it reaches Linq within its 5 s; a run's safety rows go first (RULES 4.12; RULES 7.2: the run takes nothing a STOP binds)", () => {
+    /** The danger line's row the core writes for a text's danger (the safety read's core double: `out-<event id>`). */
+    const dangerRowOf = (eventId: string): string => `out-${eventId}`;
+    /** Sam's routine row, written by an earlier commit. */
+    const ROUTINE = "out-sam-routine";
+
+    /** Both writers' wakes joined to the rig as the root joins them: SafetyDeps.wake and SafetyDeps.wakeSafety. */
+    const bothWakes = (
+      to: Sends,
+    ): {
+      ids: HandleIds;
+      wake: (request: OutageWake) => Promise<void>;
+      wakeSafety: (request: OutageWake) => Promise<void>;
+    } => ({
+      ids: SAM_IDS,
+      wake: (request) => to.wake(request),
+      wakeSafety: (request) => to.wakeSafety(request),
+    });
+
+    /** A verdict with danger under a text's own event id: safety-emergency-now.json, or the fixture given. */
+    const dangerOf = (eventId: string, fixture: unknown = safetyEmergencyNow): SafetyResult => ({
+      ...(fixture as SafetyResult),
+      eventId,
+    });
+
+    /** A text's safety read held while `gate` is closed; once it opens, `result` is its answer (on time, or late). */
+    function readHeld(rig: DownRig, eventId: string, gate: Hold, result: SafetyResult): void {
+      const answer = fakeRead(rig.f.clock, { [eventId]: result });
+      const read = rig.h.read.read.bind(rig.h.read);
+      rig.h.read.read = async (request) => {
+        if (request.eventId !== eventId) return read(request);
+        await gate.wait();
+        return answer.read(request);
+      };
+    }
+
+    /** Each claim the outbox double answered, in order: its class (null: every class) and the rows it took. */
+    const claimsOf = (to: Sends): unknown[] =>
+      to.store.claims.map((claim) => [claim.request.sendClass ?? null, claim.took]);
+
+    /** Each part Linq was handed, in order: its key, and whether it went past an opt-out. */
+    const linqOf = (to: Sends): unknown[] =>
+      to.linq.requests.map((request) => [request.idempotencyKey, request.overrideOptout]);
+
+    /** When each part reached Linq, on the actor's fake clock. */
+    function reachedLinqAt(rig: DownRig, to: Sends): Map<string, number> {
+      const reached = new Map<string, number>();
+      to.linq.beforeAnswer = (request) => {
+        reached.set(request.idempotencyKey, rig.f.clock.now());
+        return Promise.resolve();
+      };
+      return reached;
+    }
+
+    /**
+     * The turn a danger's batch opens waits in decide while a test runs (its decides held), so its models-down run asks for
+     * no outage line meanwhile; at the end its held decides answer, and what that run asks for is not the test's claim.
+     */
+    async function endTurns(rig: DownRig): Promise<void> {
+      rig.ai.decideHold.closed = false;
+      if ((await rig.actor.readTurns()).some((turn) => turn.state === "leased")) {
+        await until(() => rig.o.waits.length >= 1, "the turn's run's wait");
+      }
+    }
+
+    /**
+     * Makes the actor's storage refuse, once, the write of the core's hold for a text (writeHold's insert naming the core's
+     * hold id), as a storage that throws there does: the danger stays open and is read again 30 s on (ADR-018 section 2).
+     */
+    async function refuseCoreHold(eventId: string): Promise<() => number> {
+      let refused = 0;
+      await runInDurableObject(stubOf(SAM), (_, state) => {
+        const { sql } = state.storage;
+        const run = sql.exec.bind(sql);
+        const faulted = (
+          query: string,
+          ...bindings: SqlStorageValue[]
+        ): SqlStorageCursor<Record<string, SqlStorageValue>> => {
+          if (
+            refused === 0 &&
+            query.includes("INSERT OR REPLACE INTO safety_holds") &&
+            bindings.includes(`hold-${eventId}`)
+          ) {
+            refused += 1;
+            throw new Error("the storage refused");
+          }
+          return run(query, ...bindings);
+        };
+        vi.spyOn(sql, "exec").mockImplementation(faulted);
+      });
+      return () => refused;
+    }
+
+    /** Linq's reported failure of a part (K-11 refused, a status): its next try goes under a new key (K-07 rule 1). */
+    const REPORTED: LinqFailed = {
+      result: "failed",
+      kind: "refused",
+      httpStatus: 500,
+      code: "500",
+      reason: "a reported failure",
+      retryAfterSeconds: null,
+      providerMessageId: null,
+    };
+
+    /**
+     * Case 1's start (DL-679; T-1341 round 2's text): S, read as another text, gets no verdict in 4 s, so its timeout rule
+     * writes row S through the core and its writer's wake's run claims it and waits at S's own renewal, a point no other run
+     * reaches; B, read as No 2 s after S, keeps the batch window open at S's deadline. The turn the danger's batch opens
+     * waits in decide. Returns the gate of S's late verdict, a danger.
+     */
+    async function rowSHeld(rig: DownRig, to: Sends): Promise<Hold> {
+      writeRows(rig, to);
+      const verdict = hold(true);
+      readHeld(rig, S, verdict, dangerOf(S));
+      to.heldRenewalOf = rowSOf(S);
+      rig.ai.decideHold.closed = true;
+      await text(rig, S, false);
+      await rig.tick(2000);
+      await text(rig, B, false);
+      await lineDecided(rig, B);
+      expect(await stubSays()).toBe(false);
+      await rig.tick(2000);
+      await until(() => to.reached, "row S's run at S's renewal");
+      await lineDecided(rig, S);
+      expect(to.written).toEqual([rowSOf(S)]);
+      expect(claimsOf(to)).toEqual([[null, [rowSOf(S)]]]);
+      return verdict;
+    }
+
+    it("case 1 (DL-679): with row S's run holding S's live claim at S's own renewal, S's verdict comes late with danger at 4000: the danger line's row D goes at once on its own safety run, which took D alone past S's claim, the clock not moved past 4000 (S's arrival + 5000), with no reading asked; S is still sending under its run's claim; the danger's record, its hold in place of the unread one, the batch closed for danger and the leased turn are as T-1341 round 2 has them; then S goes once, after D, and a later run sends nothing more", async () => {
+      const to = sends();
+      const rig = await downRigFor(SAM, [B], 99, true, {}, bothWakes(to));
+      const reached = reachedLinqAt(rig, to);
+      const verdict = await rowSHeld(rig, to);
+      const rowS = rowSOf(S);
+      const rowD = dangerRowOf(S);
+
+      verdict.closed = false;
+      await until(() => to.dangerEnded === 1, "the danger run's end");
+
+      expect(rig.f.clock.now()).toBe(4000);
+      expect(to.written).toEqual([rowS, rowD]);
+      expect(to.dangerWoken).toEqual([{ handleId: SAM_HANDLE_ID, outboxRowIds: [rowD] }]);
+      expect(claimsOf(to)).toEqual([
+        [null, [rowS]],
+        ["safety", [rowD]],
+      ]);
+      expect(linqOf(to)).toEqual([[`${rowD}/1/1`, false]]);
+      expect(reached.get(`${rowD}/1/1`)).toBe(4000);
+      expect(to.store.row(rowD).state).toBe("sent");
+      expect(to.store.row(rowS)).toMatchObject({ state: "sending", claim: { claimNo: 1 } });
+      expect(to.answers).toEqual([]);
+
+      await until(() => rig.ai.decideCalls.length === 1, "the turn the danger's batch opens");
+      expect(
+        rig.f.core.recorded.map((call) => [
+          call.at,
+          call.request.safety.eventId,
+          "error" in call.response ? null : (call.response.safetyLine?.fixedLineId ?? null),
+        ]),
+      ).toEqual([[4000, S, "safetyEmergency"]]);
+      expect(await safetyOf(rig, S)).toMatchObject({
+        state: "done",
+        danger: true,
+        path: "outbox",
+        lineId: "safetyEmergency",
+        handedAfterMs: 4000,
+      });
+      expect(await rig.actor.readHolds()).toMatchObject([
+        { eventId: S, holdId: `hold-${S}`, rule: "after_safe", released: false },
+      ]);
+      expect(await rig.actor.readBatches()).toMatchObject([
+        { reason: "danger", handed: true, eventIds: [S, B] },
+      ]);
+      expect(await rig.actor.readTurns()).toMatchObject([{ eventIds: [S, B], state: "leased" }]);
+
+      // S's run goes on: the reading says exactly false (both texts read as other), so S's part goes once, after D's.
+      to.runGate.closed = false;
+      await until(() => to.ended === 1, "row S's run's end");
+      expect(linqOf(to)).toEqual([
+        [`${rowD}/1/1`, false],
+        [`${rowS}/1/1`, false],
+      ]);
+      expect(to.store.row(rowS).state).toBe("sent");
+      expect(to.answers).toEqual([false]);
+      expect((await runDispatch(to.deps(), { recipientHandleId: SAM_HANDLE_ID })).claimed).toBe(0);
+      expect(to.linq.requests).toHaveLength(2);
+
+      await endTurns(rig);
+    });
+
+    it("case 1's variant (never awaited, DL-679): with D's Linq answer held too, the danger's handling completes while D's run is out: the record, the hold in place of the unread hold (lifted), the batch closed for danger and handed on, the leased turn; the actor's safety work is idle only once D's run ends, after which S goes", async () => {
+      const to = sends();
+      const rig = await downRigFor(SAM, [B], 99, true, {}, bothWakes(to));
+      const verdict = await rowSHeld(rig, to);
+      const rowS = rowSOf(S);
+      const rowD = dangerRowOf(S);
+      const answerD = hold(true);
+      to.linq.beforeAnswer = async (request) => {
+        if (request.idempotencyKey === `${rowD}/1/1`) await answerD.wait();
+      };
+
+      verdict.closed = false;
+      await until(() => rig.ai.decideCalls.length === 1, "the turn the danger's batch opens");
+
+      // D's part is with Linq, its answer held, and its run is not over: the danger's handling did not wait for it.
+      expect(linqOf(to)).toEqual([[`${rowD}/1/1`, false]]);
+      expect(to.dangerEnded).toBe(0);
+      expect(to.store.row(rowD).state).toBe("sending");
+      expect(await safetyOf(rig, S)).toMatchObject({
+        state: "done",
+        danger: true,
+        path: "outbox",
+        lineId: "safetyEmergency",
+        handedAfterMs: 4000,
+      });
+      expect(await rig.actor.readHolds()).toMatchObject([
+        { eventId: S, holdId: `hold-${S}`, rule: "after_safe", released: false },
+      ]);
+      expect(await rig.actor.readBatches()).toMatchObject([
+        { reason: "danger", handed: true, eventIds: [S, B] },
+      ]);
+      expect(await rig.actor.readTurns()).toMatchObject([{ eventIds: [S, B], state: "leased" }]);
+
+      // S's run goes on and sends S; D's run is still out, so the actor's safety work is not idle until it ends.
+      to.runGate.closed = false;
+      await until(() => to.ended === 1, "row S's run's end");
+      let idle = false;
+      const idling = rig.actor.safetyIdle().then(() => {
+        idle = true;
+      });
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(idle).toBe(false);
+      answerD.closed = false;
+      await idling;
+      expect(to.dangerEnded).toBe(1);
+      expect(to.store.row(rowD).state).toBe("sent");
+      expect(linqOf(to)).toEqual([
+        [`${rowD}/1/1`, false],
+        [`${rowS}/1/1`, false],
+      ]);
+
+      await endTurns(rig);
+    });
+
+    it.each(["before D is written", "after D went"] as const)(
+      "case 2, a STOP that may wait: as case 1, with a STOP taken %s while row S's run is held, stored and read as a stop but not committed (no commit, limit 8's flag clear), and the deps' stopped flag set too: D still goes at once, with no gate and no reading asked; on release the reading answers true, S is dropped as stopped, and Linq holds D's part alone; T-1337's three later runs send nothing",
+      async (when) => {
+        const to = sends();
+        // No text here but S gets a verdict: the STOP's read gives none, so its unread hold keeps it from any turn.
+        const rig = await downRigFor(SAM, [], 99, true, {}, bothWakes(to));
+        writeRows(rig, to);
+        const verdict = hold(true);
+        readHeld(rig, S, verdict, dangerOf(S));
+        const rowS = rowSOf(S);
+        const rowD = dangerRowOf(S);
+        to.heldRenewalOf = rowS;
+        rig.ai.decideHold.closed = true;
+        await text(rig, S, false);
+        expect(await stubSays()).toBe(false);
+        await rig.tick(4000);
+        await until(() => to.reached, "row S's run at S's renewal");
+        await lineDecided(rig, S);
+        const stopWaits = async (): Promise<void> => {
+          await text(rig, STOP, false);
+          expect((await rig.actor.readOutage()).texts).toContainEqual(
+            expect.objectContaining({ eventId: STOP, kind: "stop" }),
+          );
+          expect(await stubSays()).toBe(true);
+          expect(rig.face.gateCalls).toEqual([]);
+          rig.h.stopped.value = true;
+        };
+        if (when === "before D is written") await stopWaits();
+
+        verdict.closed = false;
+        await until(() => to.dangerEnded === 1, "the danger run's end");
+        expect(to.dangerWoken).toEqual([{ handleId: SAM_HANDLE_ID, outboxRowIds: [rowD] }]);
+        expect(linqOf(to)).toEqual([[`${rowD}/1/1`, false]]);
+        expect(to.answers).toEqual([]);
+        if (when === "after D went") await stopWaits();
+
+        to.runGate.closed = false;
+        await until(() => to.ended === 1, "row S's run's end");
+        expect(to.store.row(rowS).state).toBe("dropped_stopped");
+        expect(to.answers).toEqual([true]);
+        expect(linqOf(to)).toEqual([[`${rowD}/1/1`, false]]);
+        for (const how of RUNS) await runBy(to, how, rowS);
+        expect(linqOf(to)).toEqual([[`${rowD}/1/1`, false]]);
+        expect(rig.face.gateCalls).toEqual([]);
+
+        await endTurns(rig);
+      },
+    );
+
+    it.each([
+      ["checked and not claimed", {}],
+      ["held for text hours and due now", { heldUntil: "2026-10-19T14:00:00.000Z" }],
+    ] as const)(
+      "case 3, nothing a STOP binds rides the danger wake: with a routine row %s and a STOP waiting, not committed, a danger verdict's row D is woken and goes alone; the routine row stays as it was, unread",
+      async (_how, routine) => {
+        const to = sends();
+        // The STOP's read gives no verdict, so its unread hold keeps it from any turn: stored, read as a stop, uncommitted.
+        const rig = await downRigFor(SAM, [], 99, true, DANGER_VERDICT, bothWakes(to));
+        writeRows(rig, to);
+        rig.ai.decideHold.closed = true;
+        to.write({
+          id: ROUTINE,
+          recipient: SAM_HANDLE_ID,
+          sendClass: "routine",
+          fixedLines: [],
+          ...routine,
+        });
+        const before = { state: to.store.row(ROUTINE).state, version: to.store.row(ROUTINE).version };
+        await text(rig, STOP, false);
+        expect((await rig.actor.readOutage()).texts).toContainEqual(
+          expect.objectContaining({ eventId: STOP, kind: "stop" }),
+        );
+        expect(await stubSays()).toBe(true);
+
+        // The danger text, its verdict on time: polled, as the STOP's own read keeps the safety work from being idle.
+        await text(rig, DANGER, false);
+        await until(() => to.dangerEnded === 1, "the danger run's end");
+
+        expect(rig.face.gateCalls).toEqual([]);
+        const rowD = dangerRowOf(DANGER);
+        expect(to.dangerWoken).toEqual([{ handleId: SAM_HANDLE_ID, outboxRowIds: [rowD] }]);
+        expect(claimsOf(to)).toEqual([["safety", [rowD]]]);
+        expect(linqOf(to)).toEqual([[`${rowD}/1/1`, false]]);
+        expect(to.store.row(ROUTINE)).toMatchObject({ ...before, claim: null });
+        expect(to.state.reads).toEqual([rowD, rowD]);
+        expect(to.answers).toEqual([]);
+
+        await endTurns(rig);
+      },
+    );
+
+    it("case 4: an earlier routine row's reported failure left it sending under a live claim, its retry job queued and no run in flight; a danger verdict at 1500 writes D, which reaches Linq at 1500, before its text's arrival + 5000; the routine row's claim and its job are untouched", async () => {
+      const to = sends();
+      const rig = await downRigFor(SAM, [], 99, true, {}, bothWakes(to));
+      writeRows(rig, to);
+      rig.ai.decideHold.closed = true;
+      to.write({ id: ROUTINE, recipient: SAM_HANDLE_ID, sendClass: "routine", fixedLines: [] });
+      to.linq.failures.set(`${ROUTINE}/1/1`, REPORTED);
+      const jobs: string[] = [];
+      const failed = await runDispatch(
+        {
+          ...to.deps(),
+          retries: {
+            schedule: (plan) => {
+              jobs.push(plan.job.key);
+              return Promise.resolve("queued");
+            },
+          },
+        },
+        { recipientHandleId: SAM_HANDLE_ID },
+      );
+      expect(failed.rows.map((row) => [row.outboxRowId, row.outcome, row.retry?.scheduled])).toEqual([
+        [ROUTINE, "failed", "queued"],
+      ]);
+      expect(jobs).toEqual([`retry-${ROUTINE}/1/1#1`]);
+      expect(to.store.row(ROUTINE)).toMatchObject({ state: "sending", claim: { claimNo: 1 } });
+      const claim = structuredClone(to.store.row(ROUTINE).claim);
+      const reached = reachedLinqAt(rig, to);
+
+      // A danger text arrives at 0; its verdict comes at 1500, with danger.
+      const verdict = hold(true);
+      readHeld(rig, DANGER, verdict, dangerOf(DANGER));
+      await text(rig, DANGER, false);
+      await rig.tick(1500);
+      verdict.closed = false;
+      await until(() => to.dangerEnded === 1, "the danger run's end");
+
+      const rowD = dangerRowOf(DANGER);
+      expect(claimsOf(to)).toEqual([
+        [null, [ROUTINE]],
+        ["safety", [rowD]],
+      ]);
+      expect(linqOf(to)).toEqual([
+        [`${ROUTINE}/1/1`, false],
+        [`${rowD}/1/1`, false],
+      ]);
+      expect(reached.get(`${rowD}/1/1`)).toBe(1500);
+      expect(to.store.row(rowD).state).toBe("sent");
+      expect(to.store.row(ROUTINE)).toMatchObject({ state: "sending", claim });
+      expect(jobs).toHaveLength(1);
+
+      await endTurns(rig);
+    });
+
+    it("case 5: a run of every class whose claim took [R, S, D] (the danger line's own wake not joined, so D waited) sends D first, then R and S in commit order; only S is asked", async () => {
+      const to = sends();
+      const rig = await downRigFor(SAM, [], 99, true, DANGER_VERDICT, {
+        ids: SAM_IDS,
+        wake: (request) => to.wake(request),
+      });
+      writeRows(rig, to);
+      rig.ai.decideHold.closed = true;
+      to.write({ id: ROUTINE, recipient: SAM_HANDLE_ID, sendClass: "routine", fixedLines: [] });
+      to.write({
+        id: rowOf(A),
+        recipient: SAM_HANDLE_ID,
+        sendClass: "quick_reply",
+        fixedLines: [OUTAGE_LINE_ID],
+      });
+      await text(rig, DANGER);
+      const rowD = dangerRowOf(DANGER);
+      expect(to.written).toEqual([ROUTINE, rowOf(A), rowD]);
+      expect(to.claims).toEqual([]);
+      expect(await stubSays()).toBe(false);
+
+      await runBy(to, "the root's wake", rowD);
+
+      expect(claimsOf(to)).toEqual([[null, [ROUTINE, rowOf(A), rowD]]]);
+      expect(linqOf(to)).toEqual([
+        [`${rowD}/1/1`, false],
+        [`${ROUTINE}/1/1`, false],
+        [`${rowOf(A)}/1/1`, false],
+      ]);
+      expect(to.answers).toEqual([false]);
+
+      await endTurns(rig);
+    });
+
+    it.each([
+      ["the danger wake throws at the call", "throws"],
+      ["the danger wake's run rejects", "rejects"],
+      ["no danger wake is joined", null],
+    ] as const)(
+      "case 6, a failed wake: %s, so the line's result stands (path outbox, its hand-off time), its hold is written and released at once as before, nothing goes to Linq or straight through it, and D stays checked; the recipient's next run sends D once",
+      async (_how, fails) => {
+        const to = sends();
+        const rig = await downRigFor(
+          SAM,
+          [],
+          99,
+          true,
+          { [DANGER]: dangerOf(DANGER, safetyChildOrElder) },
+          fails === null ? { ids: SAM_IDS, wake: (request) => to.wake(request) } : bothWakes(to),
+        );
+        writeRows(rig, to);
+        rig.ai.decideHold.closed = true;
+        if (fails !== null) to.dangerWakeFails.push(fails);
+
+        await text(rig, DANGER);
+
+        const rowD = dangerRowOf(DANGER);
+        expect(to.written).toEqual([rowD]);
+        expect(to.dangerWoken).toEqual(
+          fails === null ? [] : [{ handleId: SAM_HANDLE_ID, outboxRowIds: [rowD] }],
+        );
+        expect(to.claims).toEqual([]);
+        expect(to.linq.requests).toEqual([]);
+        expect(to.store.row(rowD).state).toBe("checked");
+        expect(await safetyOf(rig, DANGER)).toMatchObject({
+          state: "done",
+          danger: true,
+          path: "outbox",
+          lineId: "outcomeLine",
+          handedAfterMs: 0,
+        });
+        expect(await rig.actor.readHolds()).toMatchObject([
+          { eventId: DANGER, holdId: `hold-${DANGER}`, rule: "at_once", released: true },
+        ]);
+        expect(rig.f.core.released.map((release) => release.holdId)).toEqual([`hold-${DANGER}`]);
+        expect(rig.f.direct.sent).toEqual([]);
+
+        await runBy(to, "the root's wake", rowD);
+
+        expect(linqOf(to)).toEqual([[`${rowD}/1/1`, false]]);
+        expect(to.store.row(rowD).state).toBe("sent");
+
+        await endTurns(rig);
+      },
+    );
+
+    it("case 7, a repeated answer: the core's hold write is refused the first time, so the danger stays open and its re-read 30 s on applies it again; the core answers repeated, naming D, and its writer wakes D again; Linq gets D's part once in all", async () => {
+      const to = sends();
+      const rig = await downRigFor(SAM, [], 99, true, DANGER_VERDICT, bothWakes(to));
+      writeRows(rig, to);
+      rig.ai.decideHold.closed = true;
+      const refused = await refuseCoreHold(DANGER);
+      const rowD = dangerRowOf(DANGER);
+      const woken = { handleId: SAM_HANDLE_ID, outboxRowIds: [rowD] };
+
+      await text(rig, DANGER);
+
+      expect(refused()).toBe(1);
+      expect(to.dangerWoken).toEqual([woken]);
+      expect(linqOf(to)).toEqual([[`${rowD}/1/1`, false]]);
+      expect(await safetyOf(rig, DANGER)).toMatchObject({ state: "lineFailed", danger: true });
+
+      await rig.tick(30_000);
+      await until(() => to.dangerEnded === 2, "the second danger run's end");
+
+      expect(rig.f.core.recorded.map((call) => call.request.caller.requestId)).toEqual([
+        `safety:${DANGER}`,
+        `safety:${DANGER}`,
+      ]);
+      expect(to.written).toEqual([rowD]);
+      expect(to.dangerWoken).toEqual([woken, woken]);
+      expect(claimsOf(to)).toEqual([
+        ["safety", [rowD]],
+        ["safety", []],
+      ]);
+      expect(linqOf(to)).toEqual([[`${rowD}/1/1`, false]]);
+      await until(() => to.store.row(rowD).state === "sent", "D sent");
+
+      await endTurns(rig);
+    });
+
+    it("case 8, the run's guards: a transient safety claim is repeated, and D goes", async () => {
+      const to = sends();
+      const rig = await downRigFor(SAM, [], 99, true, DANGER_VERDICT, bothWakes(to));
+      writeRows(rig, to);
+      rig.ai.decideHold.closed = true;
+      to.store.transientClaims = 2;
+
+      await text(rig, DANGER);
+
+      const rowD = dangerRowOf(DANGER);
+      expect(claimsOf(to)).toEqual([
+        ["safety", "transient"],
+        ["safety", "transient"],
+        ["safety", [rowD]],
+      ]);
+      expect(linqOf(to)).toEqual([[`${rowD}/1/1`, false]]);
+
+      await endTurns(rig);
+    });
+
+    it("case 8, the run's guards: a store or wrapper that drops the field hands back a routine row with D; D goes, and the routine row is never read or sent, its claim left to lapse (RULES 7.2: fails closed)", async () => {
+      const to = sends();
+      const rig = await downRigFor(SAM, [], 99, true, DANGER_VERDICT, bothWakes(to));
+      writeRows(rig, to);
+      rig.ai.decideHold.closed = true;
+      to.write({ id: ROUTINE, recipient: SAM_HANDLE_ID, sendClass: "routine", fixedLines: [] });
+      to.dropsSendClass = true;
+
+      await text(rig, DANGER);
+
+      const rowD = dangerRowOf(DANGER);
+      expect(claimsOf(to)).toEqual([[null, [ROUTINE, rowD]]]);
+      expect(linqOf(to)).toEqual([[`${rowD}/1/1`, false]]);
+      expect(to.state.reads).toEqual([rowD, rowD]);
+      expect(to.store.row(ROUTINE)).toMatchObject({ state: "sending", claim: { claimNo: 1 } });
+      expect(to.store.rowMarks).toEqual([]);
+      expect(to.spans.filter((span) => span.hop === "dispatch")).toEqual([
+        expect.objectContaining({ outcome: "ok", rows: [{ table: "outbox_rows", id: rowD }] }),
+        expect.objectContaining({
+          outcome: "refused",
+          decided: expect.objectContaining({ result: "storeError" }) as unknown,
+          error_code: "notSafetyClass",
+          rows: [{ table: "outbox_rows", id: ROUTINE }],
+        }),
+      ]);
+
+      await endTurns(rig);
+    });
+
+    it("the architect's case 5, other blockers: a turn's planned row and ten checked routine rows written before D: D is claimed and sent, and none of them is read", async () => {
+      const to = sends();
+      const rig = await downRigFor(SAM, [], 99, true, DANGER_VERDICT, bothWakes(to));
+      writeRows(rig, to);
+      rig.ai.decideHold.closed = true;
+      to.write({
+        id: "out-sam-planned",
+        recipient: SAM_HANDLE_ID,
+        sendClass: "routine",
+        fixedLines: [],
+        planned: true,
+      });
+      for (let n = 1; n <= 10; n += 1) {
+        to.write({
+          id: `${ROUTINE}-${String(n)}`,
+          recipient: SAM_HANDLE_ID,
+          sendClass: "routine",
+          fixedLines: [],
+        });
+      }
+
+      await text(rig, DANGER);
+
+      const rowD = dangerRowOf(DANGER);
+      expect(claimsOf(to)).toEqual([["safety", [rowD]]]);
+      expect(linqOf(to)).toEqual([[`${rowD}/1/1`, false]]);
+      expect(to.state.reads).toEqual([rowD, rowD]);
+      expect(to.store.row("out-sam-planned").state).toBe("planned");
+      expect(to.store.row(`${ROUTINE}-10`).state).toBe("checked");
+
+      await endTurns(rig);
     });
   });
 });

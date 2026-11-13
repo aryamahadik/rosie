@@ -1931,6 +1931,19 @@ export class SafetyOnArrival {
    * pending until an application that finds danger writes it with its id. On the direct path the hold is written through
    * the guard, so no write before the line can stop it, and a text's line is chosen once: its first application notes it,
    * and every later one sends the noted line (ADR-015 section 2, open point 3).
+   *
+   * Once the core's answer names the line's row (safetyLine.outboxRowId, a non-empty string), first or repeated, and the
+   * actor knows the handle's ids, the actor starts the danger wake for it (`SafetyDeps.wakeSafety`; T-1352, DL-687) in
+   * that same synchronous step, right after the hand-off time is taken and before the hold is written, the line marked
+   * done and any at-once release, so no storage throw and no core call stops or delays it. Its run is a safety run of the
+   * recipient's dispatcher (K-05 v1.14's safety-only claim), which no other row's claim, plan or hold holds back, so the
+   * row reaches Linq within the line's 5 s (arch 04 line 211), not at the recipient's next run. The wake is never gated:
+   * no reading, stopped flag or copy is asked before it, since a safety line goes past any opt-out (RULES 4.12; arch 02
+   * line 111), and its run takes no row a STOP binds. It is never awaited: a throw at the call or a rejection is caught
+   * here, its run is kept with the in-flight safety work (`pending`, which `idle` awaits) until it ends, and the line's
+   * result stands (path outbox, the hand-off time as taken). It is not tried again, but a later application whose answer
+   * names the row again (repeated) wakes it again, and a second run sends nothing twice (one claim per row, one key per
+   * part). The direct path is unchanged: a core that does not answer names no row, so nothing is woken.
    */
   private async sendDanger(
     set: SafetyDeps,
@@ -1959,6 +1972,21 @@ export class SafetyOnArrival {
       .catch((): CoreError => ({ error: "transient" }));
     if (!isError(answer)) {
       const handedAfterMs = set.clock.now() - arrivedAt;
+      // The row the core named goes to its own safety run at once (T-1352; DL-687): started in this same step, before the
+      // hold is written, never gated and never awaited; its run is kept with the in-flight safety work until it ends, and a
+      // wake that fails changes nothing for the line.
+      const row: unknown = answer.safetyLine?.outboxRowId;
+      if (ids !== null && typeof row === "string" && row !== "" && set.wakeSafety !== undefined) {
+        try {
+          const run = set.wakeSafety({ handleId: ids.handleId, outboxRowIds: [row] }).catch(() => {
+            // Not woken: the row waits for the recipient's next dispatcher run.
+          });
+          this.pending.add(run);
+          void run.finally(() => this.pending.delete(run));
+        } catch {
+          // A wake that throws at once: the same.
+        }
+      }
       const hold = answer.hold;
       const kept =
         hold === null ? null : this.writeHold(eventId, hold.holdId, hold.releaseRule, hold.blocksBooking);
