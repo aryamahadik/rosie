@@ -77,6 +77,7 @@
 //      finalParts: the words first, then one poll or card).
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.3";
 import type * as K05v1dot6 from "../../contracts/generated/data-access/data-access.v1.6";
+import { transientOrScrubbed } from "./clocks";
 import {
   assertBusinessId,
   BusinessScopeError,
@@ -94,7 +95,6 @@ import {
   readMoment,
   type ReadOptions,
   type TransientError,
-  transientOrThrow,
   utc,
   utcOrNull,
 } from "./targets";
@@ -359,7 +359,9 @@ export async function readOpenHolds(
       readOpenHoldsIn(tx, request, options),
     );
   } catch (error) {
-    return transientOrThrow(error, "readOpenHolds");
+    // A statement's own refusal and postgres.js's statement errors leave scrubbed too: the call's name and the code
+    // alone, never the statement's values (T-1322; clocks.ts transientOrScrubbed).
+    return transientOrScrubbed("readOpenHolds", error);
   }
 }
 
@@ -774,7 +776,9 @@ export async function readOutboxRow(
       readOutboxRowIn(tx, request, options),
     );
   } catch (error) {
-    return transientOrThrow(error, "readOutboxRow");
+    // A statement's own refusal and postgres.js's statement errors leave scrubbed too: the call's name and the code
+    // alone, never the statement's values (T-1322; clocks.ts transientOrScrubbed).
+    return transientOrScrubbed("readOutboxRow", error);
   }
 }
 
@@ -861,6 +865,8 @@ export async function readFixedLineFacts(
       readFixedLineFactsIn(tx, request, options),
     );
   } catch (error) {
-    return transientOrThrow(error, "readFixedLineFacts");
+    // A statement's own refusal and postgres.js's statement errors leave scrubbed too: the call's name and the code
+    // alone, never the statement's values (T-1322; clocks.ts transientOrScrubbed).
+    return transientOrScrubbed("readFixedLineFacts", error);
   }
 }

@@ -34,7 +34,7 @@
 // This file also holds the runtime side's one transaction and its transient answer, which send-state.ts and
 // handle-keys.ts use too (the same rules as bundles.ts's, whose helpers are not exported).
 import { isLostConnection } from "./bundles";
-import { scrubbed } from "./clocks";
+import { scrubbed, transientOrScrubbed } from "./clocks";
 import { readBusinessScope, SCOPE_SETTING, type Sql, type Tx } from "./scope";
 
 type Db = Sql | Tx;
@@ -604,6 +604,8 @@ export async function handleTargets(
   try {
     return await inRuntimeTransaction(sql, { readOnly: true }, (tx) => handleTargetsIn(tx, request, options));
   } catch (error) {
-    return transientOrThrow(error, "handleTargets");
+    // A statement's own refusal and postgres.js's statement errors leave scrubbed too: the call's name and the code
+    // alone, never the statement's values (T-1322; clocks.ts transientOrScrubbed).
+    return transientOrScrubbed("handleTargets", error);
   }
 }

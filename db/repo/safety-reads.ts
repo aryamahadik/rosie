@@ -54,6 +54,7 @@
 //   2. A request whose business is not the transaction's own scope is refused (BusinessScopeError), never read: the
 //      security reviewer's note b on T-1160, as T-1138's In reads refuse it.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.4";
+import { transientOrScrubbed } from "./clocks";
 import {
   assertBusinessId,
   BusinessScopeError,
@@ -71,7 +72,6 @@ import {
   readMoment,
   type ReadOptions,
   type TransientError,
-  transientOrThrow,
   utc,
   utcOrNull,
 } from "./targets";
@@ -259,7 +259,9 @@ async function inOwnTransaction<T>(
       return outcome;
     });
   } catch (error) {
-    return transientOrThrow(error, call);
+    // A statement's own refusal and postgres.js's statement errors leave scrubbed too: the read's name and the code
+    // alone, never the statement's values (T-1322; clocks.ts transientOrScrubbed).
+    return transientOrScrubbed(call, error);
   }
 }
 

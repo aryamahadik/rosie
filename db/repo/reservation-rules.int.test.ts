@@ -8,6 +8,7 @@ import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createClient, type DbClient, resolvePrimaryUrl } from "./client";
+import { DataAccessDatabaseError } from "./clocks";
 import {
   doorMinutes,
   EXTEND_MINUTES,
@@ -2283,4 +2284,193 @@ describe("T-1134: one row per holder per slot: a save never waits behind its own
       }
     },
   );
+});
+
+// ---- T-1322: a statement's own refusal and postgres.js's statement errors leave scrubbed ------------------------------
+//
+// Five errors are made for real on local PostgreSQL by postgres.js as installed, four of them holding a made-up number
+// (rule 9: a 555-01xx number): PostgreSQL's refusal of a statement (22P02, the number in its message) and of a row (a
+// CHECK's 23514, the number in its detail, with its table's and constraint's names); postgres.js's UNDEFINED_VALUE (the
+// number among the statement's args) and the TypeError its bytea serializer throws (the number in its message); and a
+// serialization failure PostgreSQL raises (40001). postgres.js puts the statement on each, its values in args. Each
+// reaches the call as postgres.js rejects the call's first statement with it, on a client whose socket fails with it
+// (as connect-failures.int.test.ts delivers a socket's error). The first four leave scrubbed: the call's name and the
+// code alone, PostgreSQL's as DataAccessDatabaseError (a rule's table and constraint names kept), with the number in no
+// message, stack or other own property. 40001 still answers transient with its SQLSTATE.
+
+describe("extend: a statement's own refusal and postgres.js's statement errors leave scrubbed (T-1322)", () => {
+  type Kind = "refusal" | "rule" | "undefinedValue" | "serialization" | "serialize";
+  /** Thrown as DataAccessDatabaseError (its message's SQLSTATE and names: `shown`), as a client's code, or answered. */
+  type Expected =
+    | { database: { code: string; table: string | null; constraint: string | null; shown: string } }
+    | { client: string }
+    | { answer: unknown };
+  const NUMBER = "+15555550147";
+  const KINDS: { kind: Kind; name: string; expected: Expected }[] = [
+    {
+      kind: "refusal",
+      name: "PostgreSQL's 22P02, the number in its message, leaves as DataAccessDatabaseError",
+      expected: { database: { code: "22P02", table: null, constraint: null, shown: "22P02" } },
+    },
+    {
+      kind: "rule",
+      name: "a CHECK's 23514, the number in its detail, leaves as DataAccessDatabaseError, its names kept",
+      expected: {
+        database: {
+          code: "23514",
+          table: "t1322_numbers",
+          constraint: "t1322_numbers_short",
+          shown: "23514, table t1322_numbers, constraint t1322_numbers_short",
+        },
+      },
+    },
+    {
+      kind: "undefinedValue",
+      name: "postgres.js's UNDEFINED_VALUE, the number in its args, leaves with its code alone",
+      expected: { client: "UNDEFINED_VALUE" },
+    },
+    {
+      kind: "serialize",
+      name: "the TypeError of postgres.js's bytea serializer, the number in its message, leaves with its code alone",
+      expected: { client: "ERR_INVALID_ARG_TYPE" },
+    },
+    {
+      kind: "serialization",
+      name: "PostgreSQL's 40001 still answers transient with its SQLSTATE",
+      expected: { answer: { error: "transient", sqlstate: "40001" } },
+    },
+  ];
+  const CALLS: { call: string; run: (sql: Sql) => Promise<unknown> }[] = [
+    {
+      call: "extend",
+      run: (sql) =>
+        extend(sql, {
+          reservationId: "rsv-t1322",
+          businessId: LEES,
+          expectVersion: 1,
+          door: "standard",
+          at: "2026-11-09T15:00:00Z",
+        }),
+    },
+  ];
+  const CASES = CALLS.flatMap(({ call, run }) =>
+    KINDS.map(({ kind, name, expected }) => ({ call, run, kind, expected, name: `${call}: ${name}` })),
+  );
+  let made: Record<Kind, Error>;
+
+  /** Every text `value` holds, deeply: its own property names and values, enumerable or not, its stack among them. */
+  const textsOf = (value: unknown, seen = new Set<object>()): string[] => {
+    if (typeof value === "string") {
+      return [value];
+    }
+    if (typeof value === "number" || typeof value === "bigint" || typeof value === "boolean") {
+      return [String(value)];
+    }
+    if (typeof value !== "object" || value === null || seen.has(value)) {
+      return [];
+    }
+    seen.add(value);
+    return Object.getOwnPropertyNames(value).flatMap((key) => [
+      key,
+      ...textsOf((value as Record<string, unknown>)[key], seen),
+    ]);
+  };
+  const holdsNumber = (value: unknown): boolean =>
+    textsOf(value).some((text) => text.includes(NUMBER.slice(1)));
+
+  /** The error `statement` is refused with. */
+  const refusalOf = async (statement: Promise<unknown>): Promise<Error> => {
+    try {
+      await statement;
+    } catch (error) {
+      if (error instanceof Error) {
+        return error;
+      }
+    }
+    throw new Error("the statement was not refused with an error");
+  };
+
+  /** What `run` gives on a client whose socket fails with `raw`: postgres.js rejects its first statement with it. */
+  const outcomeOn = async (
+    raw: Error,
+    run: (sql: Sql) => Promise<unknown>,
+  ): Promise<{ answer: unknown } | { thrown: unknown }> => {
+    const options = { max: 1, onnotice: () => undefined, socket: () => Promise.reject(raw) };
+    const sql = postgres("postgres://t1322@db-t1322.example.invalid:65123/t1322", options);
+    try {
+      return { answer: await run(sql) };
+    } catch (error) {
+      return { thrown: error };
+    } finally {
+      await sql.end({ timeout: 0 });
+    }
+  };
+
+  beforeAll(async () => {
+    const sql = postgres(resolvePrimaryUrl(), { max: 1, onnotice: () => undefined });
+    try {
+      await sql`create temp table t1322_numbers (number text constraint t1322_numbers_short check (length(number) < 5))`;
+      made = {
+        refusal: await refusalOf(sql`select ${NUMBER}::uuid as id`),
+        rule: await refusalOf(sql`insert into t1322_numbers (number) values (${NUMBER})`),
+        undefinedValue: await refusalOf(
+          sql`select ${NUMBER}::text as number, ${undefined as never}::text as gone`,
+        ),
+        serialization: await refusalOf(
+          sql.unsafe(
+            "do $$ begin raise exception using errcode = '40001', message = 'could not serialize'; end $$",
+          ),
+        ),
+        serialize: await refusalOf(sql`select ${sql.typed(Number(NUMBER.slice(1)), 17)} as bytes`),
+      };
+    } finally {
+      await sql.end({ timeout: 5 });
+    }
+  });
+
+  it.each(CASES)("$name", async ({ call, run, kind, expected }) => {
+    const raw = made[kind];
+    const outcome = await outcomeOn(raw, run);
+    if ("answer" in expected) {
+      expect(outcome).toEqual({ answer: expected.answer });
+      return;
+    }
+    // The error holds the number, so the check means something; postgres.js put the statement on it.
+    expect(holdsNumber(raw)).toBe(true);
+    expect(Object.hasOwn(raw, "args")).toBe(true);
+    if (!("thrown" in outcome)) {
+      throw new Error(`${call} answered`);
+    }
+    // Booleans first, so a failing run prints neither error's text.
+    const { thrown } = outcome;
+    expect(thrown === raw).toBe(false);
+    expect(holdsNumber(thrown)).toBe(false);
+    if ("database" in expected) {
+      const { code, table, constraint, shown } = expected.database;
+      expect(thrown).toBeInstanceOf(DataAccessDatabaseError);
+      expect(Object.getOwnPropertyNames(thrown).sort()).toEqual([
+        "call",
+        "code",
+        "constraint",
+        "message",
+        "name",
+        "stack",
+        "table",
+      ]);
+      expect(thrown).toMatchObject({
+        call,
+        code,
+        table,
+        constraint,
+        message: `${call}: the database refused the call (SQLSTATE ${shown})`,
+      });
+      return;
+    }
+    expect(Object.getOwnPropertyNames(thrown).sort()).toEqual(["call", "code", "message", "stack"]);
+    expect(thrown).toMatchObject({
+      call,
+      code: expected.client,
+      message: `${call}: the database call failed (code ${expected.client})`,
+    });
+  });
 });
