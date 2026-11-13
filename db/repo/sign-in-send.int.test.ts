@@ -830,9 +830,11 @@ describe("ADR-016 card R1's cases", () => {
         ),
       );
       const before = await snapshot();
+      sent.length = 0;
       const outcome = await startSignIn(job, startRequest(contact));
       expect(answerErrors("startSignIn", outcome)).toEqual([]);
       expect(outcome).toEqual({ result: "paused", until: plus(now, -23 * 3600 + 24 * 3600), by: "dayCap" });
+      expect(sent.filter((statement) => /accounts|person_roles/.test(statement.text))).toEqual([]);
       expect(await snapshot()).toEqual(before);
     },
   );
@@ -890,12 +892,15 @@ describe("ADR-016 card R1's cases", () => {
         paused("sign-in-t1280-paused-someone", contactHashOf(someone), null),
       ]);
       const before = await snapshot();
+      sent.length = 0;
       const withAccount = await startSignIn(job, startRequest(SAM_BY_EMAIL));
       const withNone = await startSignIn(job, startRequest(someone));
       const expected = { result: "paused", until: plus(now, 14 * 60), by: "contactPause" };
       expect(withAccount).toEqual(expected);
       expect(withNone).toEqual(expected);
       expect(answerErrors("startSignIn", withAccount)).toEqual([]);
+      // Rules 0 to 3 read no account: a paused start never reaches the account's statement.
+      expect(sent.filter((statement) => /accounts|person_roles/.test(statement.text))).toEqual([]);
       expect(await snapshot()).toEqual(before);
     },
   );
@@ -916,9 +921,14 @@ describe("ADR-016 card R1's cases", () => {
         ),
       );
       const before = await snapshot();
+      sent.length = 0;
       const outcome = await startSignIn(job, startRequest(SAM_BY_EMAIL));
       expect(answerErrors("startSignIn", outcome)).toEqual([]);
       expect(outcome).toEqual({ result: "paused", until: plus(now, 60), by: "hourBound" });
+      // Rule 0 is read before any lock and any account.
+      expect(sent.filter((statement) => /pg_advisory|accounts|person_roles/.test(statement.text))).toEqual(
+        [],
+      );
       expect(await snapshot()).toEqual(before);
     },
   );
@@ -1357,6 +1367,20 @@ describe("the lead notes: one send per contact, one person's two lock keys, read
 // ---- the other answers, the role, and what never leaves -----------------------------------------------------------------
 
 describe("the other answers, the role, and what never leaves", () => {
+  it(
+    "a link start reads no account and names no person (K-05 item 58 rule 4; K-22 default 15)",
+    SLOW,
+    async () => {
+      await loadSeeds(SIGN_IN_SEEDS, 0);
+      sent.length = 0;
+      const request = startRequest({ kind: "link" });
+      const outcome = await startSignIn(job, request);
+      expect(answerErrors("startSignIn", outcome)).toEqual([]);
+      expect(outcome).toMatchObject({ result: "started", id: request.id, repeated: false, personId: null });
+      expect(sent.filter((statement) => /accounts|person_roles/.test(statement.text))).toEqual([]);
+    },
+  );
+
   it("answers notFound, attemptExpired, noProvenEmail and codePaused, writing nothing", SLOW, async () => {
     await loadSeeds(SIGN_IN_SEEDS, 0);
     const now = await secondNow();

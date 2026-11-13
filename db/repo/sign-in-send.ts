@@ -57,12 +57,14 @@
 // Read committed (DL-610; K-22 README rule 9, DL-526's ruling). A count read after a lock must see what the lock's last
 // holder committed, which only a statement's own snapshot gives: under repeatable read the snapshot would be taken
 // before the wait. Both calls run in targets.ts's inRuntimeTransaction, whose BEGIN takes the server's default level,
-// and their first statement checks that the level is read committed; at any other (a role or server whose
-// default_transaction_isolation was changed) they throw before anything is read or written. That level is kept.
+// and the first statement each sends in it, after that helper's scope reset, checks that the level is read committed;
+// at any other (a role or server whose default_transaction_isolation was changed) they throw before anything is read or
+// written. That level is kept.
 //
 // Times (K-05 default 112; DL-546). Every time either call reads or writes is its transaction's now(), never one from
 // the request, which carries none: started_at (its default) and expires_at, the counts' windows, the code's sent_at and
-// expires_at, the row's not_after (the code's stored expires_at itself) and the entries' at.
+// expires_at, the row's not_after (the code's stored expires_at itself) and the entries' at (the code's sent_at as the
+// insert returned it, to the millisecond).
 //
 // Role and scope (ADR-016 section 6; K-05 v1.13's calls table). Each runs on the client it is handed, the runtime
 // side's, as rosie_job (the role is the connection's: nothing here checks it), with rosie.business_id set empty for the
