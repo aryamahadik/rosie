@@ -228,14 +228,21 @@ function neverOpened(): Error {
 /**
  * One transaction on one reserved connection (read committed, like sql.begin). postgres.js's own `begin` answers a
  * failure with a `rollback` written to the connection even when that connection is gone, and that write throws from a
- * timer, outside any promise, which would end the process. Here a lost connection is rethrown without a rollback (the
- * server rolled the transaction back when the backend went). A lost connection is also never released: in postgres.js
- * 3.4.9 `release()` puts the connection back in the open queue even after it moved to the closed queue (or before the
- * socket's close event does), and the next query on that client is then written to a null socket. Left unreleased, the
- * connection stays where postgres.js's own close handling puts it and reconnects for the next query. Every other
- * outcome releases the connection.
+ * timer, outside any promise, which would end the process. Here a connection found gone (targets.ts's foundGone, as
+ * inRuntimeTransaction decides it: a lost connection, or a statement's failure that is a session's failure or answers
+ * 08001; T-1350) is rethrown without a rollback (the server rolled the transaction back when the backend went). Such a
+ * connection is also never released: in postgres.js 3.4.9 `release()` puts the connection back in the open queue even
+ * after it moved to the closed queue (or before the socket's close event does), and the next query on that client is
+ * then written to a null socket. Left unreleased, the connection stays where postgres.js's own close handling puts it
+ * and reconnects for the next query. Every other failure, an error fn makes itself among them, is rolled back, and
+ * every other outcome releases the connection. foundGone is imported as the transaction starts, before a connection is
+ * reserved (never when this file loads: see its top), so each decision is made at once, with no turn of the event loop
+ * between a failure and its rollback. A connection that closes while idle between fn's statements is met as a
+ * statement's failure too (T-1330's note d): fn awaits nothing but statements on this connection, so its next
+ * statement is in flight before Node delivers the socket's error or close, and postgres.js rejects it with that error.
  */
 async function inTransaction<T>(sql: Sql, fn: (tx: Sql) => Promise<T>): Promise<T> {
+  const { foundGone } = await import("./targets");
   // postgres.js 3.4.9 keeps a killed connection's last query and its FATAL, and the first query after the reconnect
   // fails with that stale error. A failed `reserve()` stays queued and strands the connection it was given, so the
   // stale error is taken here by an ordinary query (which is rejected cleanly) and `reserve()` then finds a
@@ -249,7 +256,7 @@ async function inTransaction<T>(sql: Sql, fn: (tx: Sql) => Promise<T>): Promise<
     try {
       result = await fn(reserved);
     } catch (error) {
-      if (!isLostConnection(error)) {
+      if (!foundGone(error)) {
         await reserved`rollback`;
       }
       throw error;
@@ -257,7 +264,7 @@ async function inTransaction<T>(sql: Sql, fn: (tx: Sql) => Promise<T>): Promise<
     await reserved`commit`;
     return result;
   } catch (error) {
-    lost = isLostConnection(error);
+    lost = foundGone(error);
     throw error;
   } finally {
     if (!lost) {

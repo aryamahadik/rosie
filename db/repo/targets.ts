@@ -249,9 +249,10 @@ export function transientOrThrow(error: unknown, call: string = UNNAMED_CALL): T
  * connection's marks) or that transientOrThrow answers 08001 (NEVER_CONNECTED_CODES, a name lookup's failure). A
  * statement's failure is one postgres.js rejected a statement with: its queryError puts the statement on it (query and
  * parameters, own properties). An error fn makes itself, on no statement, found no connection gone, whatever its code:
- * its connection is still open, so it is rolled back and released as before.
+ * its connection is still open, so it is rolled back and released as before. The one rule: bundles.ts's inTransaction,
+ * reservations.ts's inScopedTransaction and reservation-rules.ts's inBusinessTransaction decide by it too (T-1350).
  */
-function foundGone(error: unknown): boolean {
+export function foundGone(error: unknown): boolean {
   if (isLostConnection(error)) {
     return true;
   }
