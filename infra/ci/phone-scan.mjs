@@ -57,15 +57,41 @@ export function isFiction(number) {
 
 // The ways a number is written: a + and 7 to 15 digits, with spaces, dots, dashes or brackets between them; or a
 // North American number without the +: an area code (bracketed or not), an exchange and a line, with a 1 or none.
-export const PLUS_FORM = /(?<![0-9A-Za-z])\+[1-9](?:[ ().-]{0,2}[0-9]){6,14}(?![0-9])/g;
-export const NANP_FORM =
-  /(?<![0-9A-Za-z+])(?:1[ .-]?)?(?:\([2-9][0-9]{2}\)|[2-9][0-9]{2})[ .-]?[2-9][0-9]{2}[ .-]?[0-9]{4}(?![0-9A-Za-z])/g;
+// A URL-encoded plus, %2B (or %2b), is a + (T-1332).
+//
+// Where a number starts and ends. T-1304 reads no id as a number: a number starts only where no letter or digit
+// stands right before it, so never inside a hex id, a base64 blob, a sum or a longer run of digits, and ends only
+// where no digit follows; a North American number never starts right after a + (the + form reads that one) and
+// never ends right before a letter. T-1332 keeps each of those cases and reads two more (T-1317's security note b):
+//   - a number right after an escape or a URL-encoded character, whose last letter or digit ends no word: a
+//     backslash and b, f, n, r, t or v (as JSON writes a newline, \n), or % and two hex digits (as %0A, %20 or %3A).
+//     An escape that hex digits follow, as \u or \x, starts no number, and a North American number never starts
+//     right after %2B, the + form's own plus;
+//   - a separated North American number right before a letter: its area code bracketed, or a space, dot or dash
+//     between its groups. Ten digits in a row right before a letter stay an id's digits.
+const START = String.raw`(?:(?<![0-9A-Za-z])|(?<=\\[bfnrtv])|(?<=%[0-9A-Fa-f]{2}))`;
+/** A North American area code or exchange (neither starts with 0 or 1), the separator between groups, a line. */
+const CODE = "[2-9][0-9]{2}";
+const SEP = "[ .-]";
+const LINE = "[0-9]{4}";
+const SEPARATED = String.raw`(?:(?:\(${CODE}\)${SEP}?|${CODE}${SEP})${CODE}${SEP}?|${CODE}${CODE}${SEP})${LINE}(?![0-9])`;
+const IN_A_ROW = `${CODE}${CODE}${LINE}(?![0-9A-Za-z])`;
+
+/** The + form: its digits, from the first after the plus, are the match's group 1. */
+export const PLUS_FORM = new RegExp(
+  String.raw`${START}(?:\+|%2[Bb])([1-9](?:[ ().-]{0,2}[0-9]){6,14})(?![0-9])`,
+  "g",
+);
+export const NANP_FORM = new RegExp(
+  String.raw`${START}(?<!\+|%2[Bb])(?:1${SEP}?)?(?:${SEPARATED}|${IN_A_ROW})`,
+  "g",
+);
 
 /** Each number a text holds, in E.164 form, with the index it starts at: the + forms first, then the others. */
 function readings(text) {
   const found = [];
   for (const match of text.matchAll(PLUS_FORM)) {
-    found.push({ index: match.index, number: `+${match[0].replace(/[^0-9]/g, "")}` });
+    found.push({ index: match.index, number: `+${match[1].replace(/[^0-9]/g, "")}` });
   }
   for (const match of text.matchAll(NANP_FORM)) {
     found.push({ index: match.index, number: `+1${match[0].replace(/[^0-9]/g, "").slice(-10)}` });
