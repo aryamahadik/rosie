@@ -2,9 +2,70 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 567, [`1a97661`](https://github.com/aryamahadik/rosie/commit/1a97661), 2026-11-13 17:26:36 UTC.
+- **Through:** commit 570, [`a218f36`](https://github.com/aryamahadik/rosie/commit/a218f36), 2026-11-13 18:02:17 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 570. docs: COMMIT\_HISTORY.md through commit 567 (1a97661, \#575) (\#578)
+
+- **Commit:** [`a218f36`](https://github.com/aryamahadik/rosie/commit/a218f36), by Arya Mahadik, 2026-11-13 18:02:17 UTC
+- **Pull request:** [#578](https://github.com/aryamahadik/rosie/pull/578) from `task/commit-history-90`, merged 2026-11-13 18:02:17 UTC. It squashed 1 branch commit:
+  - `6387298` docs: COMMIT\_HISTORY.md through commit 567 (1a97661, \#575)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 569. T-1331: withBusiness's start goes through transientOrScrubbed, so no connect failure or refused session leaves raw (\#577)
+
+- **Commit:** [`bb21d62`](https://github.com/aryamahadik/rosie/commit/bb21d62), by Arya Mahadik, 2026-11-13 18:02:13 UTC
+- **Pull request:** [#577](https://github.com/aryamahadik/rosie/pull/577) from `task/T-1331`, merged 2026-11-13 18:02:13 UTC. It squashed 2 branch commits:
+  - `e4a8dc0` T-1331: withBusiness starts its transaction through transientOrThrow …
+  - `7d41244` T-1331: withBusiness's start throws every non-transient failure scrub…
+- **Files changed:** 2 (+922 −3), by folder:
+  - `db/repo/` scope.int.test.ts +886 −0, scope.ts +36 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1331: withBusiness starts its transaction through transientOrThrow under its call's name: a connect that never opened or was lost answers K-05's transient where the call has that answer, else it and a refused session are thrown scrubbed; tests on a closed port, constructed postgres.js errors and refusing sessions, through withBusiness, pgCallScope and the turn face's three calls
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1331: withBusiness's start throws every non-transient failure scrubbed through clocks.ts's transientOrScrubbed (round 3, DL-708, DL-710): PostgreSQL's 3D000, 42501 and 55000, naming the database, and a set_config refused with 57014, its statement holding the business id, leave as DataAccessDatabaseError with the call's name and SQLSTATE only, never transient; tests add the three refusals (round 1's titles unchanged) and a local server that accepts the session and begin, then refuses set_config with 57014, through withBusiness (answer or none, read only), pgCallScope and the turn face's three calls
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 568. T-1324: a keyword copy before a handle's first pin: while the copies hold no keyword list, a text the PostgreSQL-down path reads has the list of the bundle it arrived under copied first, from that bundle's manifest in the actor's own BUNDLES binding (checked against the id as the pin checks it), so a first text reads stop, start or other; a read that fails copies nothing and the text reads unknown. Proofs in outage.worker.test.ts through the real actor. (\#576)
+
+- **Commit:** [`5805e34`](https://github.com/aryamahadik/rosie/commit/5805e34), by Arya Mahadik, 2026-11-13 18:02:08 UTC
+- **Pull request:** [#576](https://github.com/aryamahadik/rosie/pull/576) from `task/T-1324`, merged 2026-11-13 18:02:09 UTC. It squashed 1 branch commit:
+  - `d7102e7` T-1324: a keyword copy before a handle's first pin: while the copies …
+- **Files changed:** 4 (+343 −10), by folder:
+  - `runtime/src/actor/copies/` copies.ts +3 −1, types.ts +4 −3
+  - `runtime/src/actor/` handle-actor.ts +72 −5
+  - `runtime/src/outage/db/` outage.worker.test.ts +264 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 567. docs: COMMIT\_HISTORY.md through commit 565 (9aeeba0, \#573) (\#575)
 
