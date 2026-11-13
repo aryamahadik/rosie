@@ -1,5 +1,6 @@
-// Which implementation each port takes in each environment (T-550): the one table the composition root reads and each
-// join (T-552 to T-564) edits, one line per port, in D-017's turn order (./ports.ts).
+// Which implementation each port takes in each environment (T-550): the table the composition root reads and each join
+// (T-552 to T-564) edits, one line per port, in D-017's turn order (./ports.ts), and the PostgreSQL-down path's own
+// (T-1363, below).
 //
 //   test        Vitest and CI: every port on its fake, the doubles the runtime's own tests use (./test-support.ts), but a
 //               joined port on its real package, fed by those doubles.
@@ -65,6 +66,14 @@
 // `unconfiguredGateway` did before, so a webhook that gets past the verify still answers 503. The fakes never reach a
 // Worker bundle: they are test code (the runtime's test-support files are "Not imported by the Worker"; the Linq double is
 // "test code only, never in a Worker bundle"), so only a test hands the root its fake set.
+//
+// The PostgreSQL-down path's two ports (T-1363; ./ports.ts DOWN_PATH_PORTS), which no D-017 hop runs, have a table of
+// their own (DOWN_PATH_PICKS), so D-017's stays as it is: each on its fake in a test (./test-support.ts: recordStopOrStart
+// kept and handed to the action layer's call where the test root holds one, each timer fired kept as the actor handed it)
+// and closed on staging and in production, so a STOP or START written on return is refused with nothing recorded (the
+// actor keeps it for its next try) and a safety timer due while PostgreSQL is down fires nothing, its sealed address never
+// opened (QUESTIONS.md CQ-101 (c) leaves the opening to the CTO with the security reviewer). T-1326 joins them, as they are
+// picked, into the PostgreSQL-down path.
 
 import type { PortName } from "./ports";
 
@@ -109,6 +118,15 @@ export const PICKS: readonly PortPick[] = [
   { port: "linqSend", test: "real", staging: "real", production: "closed" }, // T-563
   { port: "arming", test: "real", staging: "real", production: "closed" }, // T-564
   { port: "linqDirect", test: "fake", staging: "closed", production: "closed" }, // no D-017 hop
+];
+
+/**
+ * One line per port of the PostgreSQL-down path (./ports.ts DOWN_PATH_PORTS), in its order: no D-017 hop runs either, so
+ * each is on its fake in a test and closed on staging and in production until a card opens it (T-1363).
+ */
+export const DOWN_PATH_PICKS: readonly PortPick[] = [
+  { port: "stopOrStart", test: "fake", staging: "closed", production: "closed" }, // no D-017 hop (T-1363)
+  { port: "timerFire", test: "fake", staging: "closed", production: "closed" }, // no D-017 hop; CQ-101 (c)
 ];
 
 /**
