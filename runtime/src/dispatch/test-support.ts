@@ -7,7 +7,14 @@
 //                     claim-lapsed-reclaimed.json (a sending row whose claim lapsed is claimed again: claimNo + 1,
 //                     firstTryAt kept, the unsent part under its stored key with attempts + 1). A recipient whose lock
 //                     another claim holds is skipped (item 3: pg_try_advisory_xact_lock), and a sending row with a live
-//                     claim stops the walk (item 13).
+//                     claim stops the walk (item 13), as a planned or stale row does. With v1.14's sendClass "safety"
+//                     (item 67, defaults 129 to 135; T-1352), the safety-only claim: refused with no recipient or any
+//                     other value; the recipient's lock waited for, never skipped; under it only the recipient's open
+//                     safety rows, read then, in commit order: a checked row, a held row that is due and a sending row
+//                     whose claim has lapsed are taken; a live claim, waiting_chat, a planned or stale row, a held row
+//                     not yet due (not listed) and a row it cannot take as it stands are passed; finished rows skipped;
+//                     at most `limit` taken, counted among safety rows alone; passedHeld empty. Every claim is kept,
+//                     with the rows it took (`claims`).
 //   renewClaim        renew-claim-first-send.json (lapsesAt = at + 60 s, firstTryAt set once), renew-claim-lost.json
 //                     (another claim holds the row: claimLost), renew-claim-not-yet.json (a Retry-After still holds).
 //   markPart          mark-sent.json, mark-delivered.json (found by Linq's message id, firstDelivery on the row's
@@ -98,6 +105,17 @@ export interface SeedRow {
   bookingId?: string | null;
   versionsRead?: readonly VersionRef[];
   fixedLines?: readonly string[];
+  /**
+   * Written by its commit with no plan yet (K-04 `planned`: no final parts), as a turn's rows are until finalize writes
+   * them: every claim but the safety claim stops at it (K-05 items 3, 13); the safety claim passes it (item 67).
+   */
+  planned?: boolean;
+}
+
+/** One claimOutbox call as the double answered it: the request, and the rows it took or `transient`. */
+export interface ClaimSeen {
+  readonly request: ClaimOutboxRequest;
+  readonly took: readonly string[] | "transient";
 }
 
 type PartState = "pending" | "sent" | "failed" | "delivered";
@@ -126,7 +144,36 @@ function latestTries(parts: readonly FakePart[]): FakePart[] {
   }
   return [...latest.values()].sort((a, b) => a.partNo - b.partNo);
 }
+
+/** A claim's transient answer: nothing was written, and the same request may be sent again (K-05). */
+const TRANSIENT: TransientError = { error: "transient", sqlstate: "40001" };
+
+/**
+ * Whether the safety claim takes this safety row now (K-05 v1.14 item 67.3): a checked row; a held row whose time has
+ * come (at or before `now`); a sending row whose claim has lapsed (at or before `now`) or that has none (default 20).
+ * Each only as it stands (default 132): final parts of one or two sends, and no part whose latest try failed with no next
+ * try written (a 4001 or 4006 within its minute). Every other row is passed: a sending row with a live claim, which its
+ * claimer sends once (default 130); waiting_chat; planned or stale, with no final parts yet; a held row not yet due, not
+ * listed (default 131); and the finished rows, skipped as item 13 skips them.
+ */
+function safetyTakes(row: FakeRow, now: Utc): boolean {
+  const asItStands =
+    row.sends.length >= 1 &&
+    row.sends.length <= 2 &&
+    latestTries(row.parts).every((part) => part.state !== "failed");
+  switch (row.state) {
+    case "checked":
+      return asItStands;
+    case "held":
+      return asItStands && (row.heldUntil === null || !after(row.heldUntil, now));
+    case "sending":
+      return asItStands && (row.claim === null || !after(row.claim.lapsesAt, now));
+    default:
+      return false;
+  }
+}
 type RowState =
+  | "planned"
   | "checked"
   | "held"
   | "sending"
@@ -157,8 +204,16 @@ export class FakeOutboxStore implements OutboxStore {
   readonly renewals: { request: RenewClaimRequest; answer: string }[] = [];
   /** Recipients whose claim lock is held right now (an advisory transaction lock). */
   private readonly locks = new Set<string>();
+  /** The safety claims waiting for a recipient's lock (K-05 v1.14 item 67.1: its blocking form), woken as it is let go. */
+  private readonly lockWaiters = new Map<string, (() => void)[]>();
   /** Answers the next claimOutbox with this error instead (a lost connection). */
   failNextClaim: TransientError | null = null;
+  /** How many claims after it answer transient too (a lost connection, or a lock wait past db/repo's bound: DL-698). */
+  transientClaims = 0;
+  /** Every claimOutbox call answered, in the order answered, with the rows it took. */
+  readonly claims: ClaimSeen[] = [];
+  /** How many times a safety claim met its recipient's lock held by another claim and waited for it (never skipped). */
+  lockWaits = 0;
 
   constructor(seeds: readonly SeedRow[]) {
     for (const seed of seeds) {
@@ -166,7 +221,7 @@ export class FakeOutboxStore implements OutboxStore {
         seed,
         sends: seed.sends,
         versionsRead: seed.versionsRead ?? [],
-        state: seed.heldUntil === undefined ? "checked" : "held",
+        state: seed.planned === true ? "planned" : seed.heldUntil === undefined ? "checked" : "held",
         version: 3,
         heldUntil: seed.heldUntil ?? null,
         claim: null,
@@ -181,16 +236,99 @@ export class FakeOutboxStore implements OutboxStore {
     return row;
   }
 
+  /** Writes a row now, as a commit or the shared core writes one after the rows before it (its seed's commitSeq). */
+  write(seed: SeedRow): void {
+    if (this.rows.has(seed.id)) throw new Error(`row ${seed.id} is written already`);
+    this.rows.set(seed.id, new FakeOutboxStore([seed]).row(seed.id));
+  }
+
+  /**
+   * Holds a recipient's claim lock as another claim's open transaction would, until the returned function lets it go: an
+   * ordinary claim skips the recipient meanwhile, and a safety claim waits for it.
+   */
+  holdLock(recipient: string): () => void {
+    if (this.locks.has(recipient)) throw new Error(`the lock of ${recipient} is held already`);
+    this.locks.add(recipient);
+    return () => {
+      this.letGo(recipient);
+    };
+  }
+
   async claimOutbox(request: ClaimOutboxRequest): Promise<ClaimOutboxResponse | TransientError> {
-    if (this.failNextClaim !== null) {
-      const error = this.failNextClaim;
-      this.failNextClaim = null;
-      return error;
+    // K-05 v1.14 item 67: `safety` is the field's one value, sent only with a recipient; anything else is refused before
+    // anything is read (refuse-claim-safety-other-class, refuse-claim-safety-no-recipient), as db/repo's claim refuses it.
+    const sendClass: unknown = request.sendClass;
+    if (sendClass !== undefined && sendClass !== "safety") {
+      throw new TypeError("claimOutbox: sendClass can only be safety");
     }
+    const recipient = request.recipientHandleId;
+    if (sendClass === "safety" && recipient === undefined) {
+      throw new TypeError("claimOutbox: a safety claim names its recipient");
+    }
+    const transient = this.failNextClaim ?? (this.transientClaims > 0 ? TRANSIENT : null);
+    if (transient !== null) {
+      if (this.failNextClaim === null) this.transientClaims -= 1;
+      this.failNextClaim = null;
+      this.claims.push({ request, took: "transient" });
+      return transient;
+    }
+    const answer =
+      sendClass === "safety" && recipient !== undefined
+        ? await this.claimSafety(request, recipient)
+        : await this.claimEvery(request);
+    this.claims.push({ request, took: answer.claimed.map((row) => row.outboxRowId) });
+    return answer;
+  }
+
+  /**
+   * K-05 v1.14 item 67, the safety-only claim (defaults 129 to 135). The recipient's lock is waited for, never skipped
+   * (67.1); under it, the recipient's open rows of send class safety alone are read, then, in commit order (67.2); each is
+   * taken as item 13 takes a row when it can be claimed (`safetyTakes`), else passed with nothing written, until `limit`
+   * rows are taken, so no row of another class is read, waited for or counted (67.3); `passedHeld` is always empty (67.4).
+   */
+  private async claimSafety(request: ClaimOutboxRequest, recipient: string): Promise<ClaimOutboxResponse> {
+    await this.lockWaiting(recipient);
+    try {
+      await yieldToOthers(); // the transaction is open: an ordinary claim meets the lock and skips the recipient
+      const claimed: ClaimedRow[] = [];
+      const walk = [...this.rows.values()]
+        .filter((row) => row.seed.recipient === recipient && row.seed.sendClass === "safety")
+        .sort((a, b) => a.seed.commitSeq - b.seed.commitSeq);
+      for (const row of walk) {
+        if (claimed.length >= request.limit) break;
+        if (safetyTakes(row, request.now)) claimed.push(this.take(row, request));
+      }
+      return { result: "claimed", claimed, passedHeld: [] };
+    } finally {
+      this.letGo(recipient);
+    }
+  }
+
+  /** Takes a recipient's lock in its blocking form (K-05 v1.14 item 67.1): while another claim holds it, waits. */
+  private async lockWaiting(recipient: string): Promise<void> {
+    while (this.locks.has(recipient)) {
+      this.lockWaits += 1;
+      await new Promise<void>((resolve) => {
+        this.lockWaiters.set(recipient, [...(this.lockWaiters.get(recipient) ?? []), resolve]);
+      });
+    }
+    this.locks.add(recipient);
+  }
+
+  /** Lets a recipient's lock go, as its transaction ends, and wakes the claims waiting for it. */
+  private letGo(recipient: string): void {
+    this.locks.delete(recipient);
+    const waiting = this.lockWaiters.get(recipient) ?? [];
+    this.lockWaiters.delete(recipient);
+    for (const wake of waiting) wake();
+  }
+
+  /** v1.13's claim of every class (K-05 items 3, 13): each recipient tried, a held one skipped; each walk in commit order. */
+  private async claimEvery(request: ClaimOutboxRequest): Promise<ClaimOutboxResponse> {
     const claimed: ClaimedRow[] = [];
     const passedHeld: { outboxRowId: string; heldUntil: Utc }[] = [];
-    // Finished rows are skipped, a waiting_chat row is passed (K-05 v1.1 item 13), and a stale row (no final parts)
-    // stops its recipient's walk as a row with a live claim does.
+    // Finished rows are skipped, a waiting_chat row is passed (K-05 v1.1 item 13), and a planned or stale row (no final
+    // parts) stops its recipient's walk as a row with a live claim does.
     const open = [...this.rows.values()].filter(
       (row) =>
         !["sent", "delivered", "failed", "dropped_stopped", "withdrawn", "waiting_chat"].includes(row.state),
@@ -219,12 +357,12 @@ export class FakeOutboxStore implements OutboxStore {
             passedHeld.push({ outboxRowId: row.seed.id, heldUntil: row.heldUntil });
             continue;
           }
-          if (row.state === "stale") break;
+          if (row.state === "stale" || row.state === "planned") break;
           if (row.state === "sending" && row.claim !== null && after(row.claim.lapsesAt, request.now)) break;
           claimed.push(this.take(row, request));
         }
       } finally {
-        this.locks.delete(recipient);
+        this.letGo(recipient);
       }
     }
     return { result: "claimed", claimed, passedHeld };

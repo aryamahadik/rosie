@@ -19,6 +19,13 @@
 //      (`<row>/<part>/<try>`), and Linq answers a repeated key with the first message (K-11 'Repeating it'), so the
 //      person gets one message. `markPart` sent for a part already sent says `repeated` and changes nothing.
 //
+// Safety rows first (T-1352; RULES 4.12: "the safety message first"; NQ-RT-9): within a run, one recipient's claimed rows
+// of send class safety go before its other rows, each group in commit order. A danger line's own wake runs a safety run
+// (`sendClass` "safety"): K-05 v1.14's safety-only claim for its recipient (item 67), which waits for the recipient's lock
+// and passes every row of another class and every safety row it cannot claim, so no other row's claim, plan or hold holds
+// the danger line back. Its transient claim is repeated, and a claimed row of another class is never sent there (a store
+// fault, its claim left to lapse), so that wake, which nothing gates, sends nothing a STOP binds (RULES 7.2).
+//
 // Limit 8 (T-259, limit8/limit8.ts) runs before each send, ahead of the claim's renewal: a row it holds, drops, makes
 // stale or withdraws, or parks for a chat, is marked through K-05 `markRow` and nothing is sent; one it cannot read or
 // mark sends nothing and keeps its claim. A held row, a waiting row and a finished one let the recipient's later rows go.
@@ -132,11 +139,19 @@ export interface DispatchDeps {
 
 export interface DispatchOptions {
   /**
-   * One recipient, from a wake (a commit, a park, an outage or safety line's writer: T-1341) or a retry job. Left out, it
-   * means every recipient with sendable rows, a run no production code makes: no outbox sweep runs, and the Worker's cron
-   * runs only the clock rows' sweep (runtime/src/index.ts).
+   * One recipient, from a wake (a commit, a park, an outage or safety line's writer: T-1341, T-1352) or a retry job. Left
+   * out, it means every recipient with sendable rows, a run no production code makes: no outbox sweep runs, and the
+   * Worker's cron runs only the clock rows' sweep (runtime/src/index.ts).
    */
   recipientHandleId?: string;
+  /**
+   * K-05 v1.14's `sendClass` (item 67; T-1352): "safety" makes the run a safety run, a danger line's own wake's. Its claim
+   * is the safety-only claim for `recipientHandleId`, repeated while it answers transient, and a claimed row of another
+   * class is never sent in it (storeError, its claim left to lapse). Only with a recipient (default 134): a run asked for
+   * it with none, or for any other value, throws before anything is claimed, never runs as a run of every class. Left
+   * out: a run of every class.
+   */
+  sendClass?: "safety";
 }
 
 /** How a claimed row's run ended. */
@@ -236,17 +251,31 @@ export interface DispatchReport {
   rows: readonly RowReport[];
 }
 
-/** One run: claim, then send. Recipients go at once; one recipient's rows go one after another in commit order. */
+/**
+ * One run: claim, then send. Recipients go at once; one recipient's rows go one after another, its safety-class rows
+ * first, then the rest, each in commit order (`sendRecipient`).
+ *
+ * A safety run (`sendClass` "safety": a danger line's own wake, T-1352) makes K-05 v1.14's safety-only claim for its
+ * recipient (item 67) and repeats it while it answers transient (nothing was written; its wait for the recipient's lock
+ * may answer so), so a danger line is not left for the recipient's next run for a lost connection. A claimed row whose
+ * class is not safety is never sent in it: a store fault, reported as storeError with nothing sent or marked and its claim
+ * left to lapse, so a store or a wrapper that drops the field fails closed, and a wake that is never gated sends nothing a
+ * STOP binds (RULES 7.2; K-05 README "What the new tasks must hold to").
+ */
 export async function runDispatch(
   deps: DispatchDeps,
   options: DispatchOptions = {},
 ): Promise<DispatchReport> {
-  const claim = await deps.store.claimOutbox({
-    claimer: deps.claimer,
-    ...(options.recipientHandleId === undefined ? {} : { recipientHandleId: options.recipientHandleId }),
-    now: deps.now(),
-    limit: deps.limit ?? DEFAULT_LIMIT,
-  });
+  const safetyRun = isSafetyRun(options);
+  const claimOnce = () =>
+    deps.store.claimOutbox({
+      claimer: deps.claimer,
+      ...(options.recipientHandleId === undefined ? {} : { recipientHandleId: options.recipientHandleId }),
+      ...(safetyRun ? { sendClass: "safety" as const } : {}),
+      now: deps.now(),
+      limit: deps.limit ?? DEFAULT_LIMIT,
+    });
+  const claim = safetyRun ? await untilNotTransient(claimOnce) : await claimOnce();
   if ("error" in claim) return { claimError: claim.error, claimed: 0, passedHeld: [], rows: [] };
 
   const byRecipient = new Map<string, ClaimedRow[]>();
@@ -255,7 +284,9 @@ export async function runDispatch(
     if (rows === undefined) byRecipient.set(row.recipientHandleId, [row]);
     else rows.push(row);
   }
-  const reports = await Promise.all([...byRecipient.values()].map((rows) => sendRecipient(deps, rows)));
+  const reports = await Promise.all(
+    [...byRecipient.values()].map((rows) => sendRecipient(deps, rows, safetyRun)),
+  );
   return {
     claimError: null,
     claimed: claim.claimed.length,
@@ -264,10 +295,40 @@ export async function runDispatch(
   };
 }
 
-async function sendRecipient(deps: DispatchDeps, rows: readonly ClaimedRow[]): Promise<RowReport[]> {
+/**
+ * Whether a run is a safety run: `sendClass` "safety" with its recipient named. Any other value, or the field with no
+ * recipient, is refused before anything is claimed (K-05 v1.14 defaults 133 and 134: a safety claim names one recipient,
+ * and `safety` is the field's one value), never run as a claim of every class.
+ */
+function isSafetyRun(options: DispatchOptions): boolean {
+  const sendClass: unknown = options.sendClass;
+  if (sendClass === undefined) return false;
+  if (sendClass !== "safety") throw new TypeError("a dispatcher run's sendClass can only be safety");
+  if (options.recipientHandleId === undefined) throw new TypeError("a safety run names its recipient");
+  return true;
+}
+
+/**
+ * One recipient's claimed rows, one after another: its rows of send class safety first, then the rest, each group in the
+ * order the claim gave them, which is commit order (RULES 4.12: "Danger now: the safety message first"; arch 04 line 201;
+ * NQ-RT-9: a row of send class safety "which the dispatcher sends first, within 5 s"; T-1352's rulings, rule 3). This
+ * covers every run that claims more than one class: the commit's and the park's wakes, an outage line's writer's wake and
+ * the retry door's run. LETS_LATER_PASS runs along that order: a row that does not finish holds back every row after it,
+ * so a safety row that fails holds back the rest, as a first row does. In a safety run a row of another class is never
+ * sent (`refusedInSafetyRun`).
+ */
+async function sendRecipient(
+  deps: DispatchDeps,
+  rows: readonly ClaimedRow[],
+  safetyRun: boolean,
+): Promise<RowReport[]> {
   const reports: RowReport[] = [];
   let stopped = false;
-  for (const row of rows) {
+  for (const row of [...rows.filter(isSafety), ...rows.filter((row) => !isSafety(row))]) {
+    if (safetyRun && !isSafety(row)) {
+      reports.push(refusedInSafetyRun(deps, row));
+      continue;
+    }
     if (stopped) {
       reports.push(report(row, "notReached", 0));
       continue;
@@ -278,6 +339,28 @@ async function sendRecipient(deps: DispatchDeps, rows: readonly ClaimedRow[]): P
     stopped = !LETS_LATER_PASS.has(done.report.outcome);
   }
   return reports;
+}
+
+/** The label of a row a safety run never sends: the claim handed back a row whose send class is not safety. */
+export const NOT_SAFETY_CLASS = "notSafetyClass";
+
+/**
+ * A claimed row of another class in a safety run: a store fault (K-05 v1.14's safety claim takes safety rows alone; its
+ * exchange's `sendClass` const), so nothing is read, sent or marked for it, and its claim is left to lapse, after which a
+ * run of every class takes it with every check of its own (limit 8, T-1337's ask). Its dispatch span says so.
+ */
+function refusedInSafetyRun(deps: DispatchDeps, row: ClaimedRow): RowReport {
+  deps
+    .traceFor(row)
+    .start("dispatch")
+    .finish({
+      outcome: "refused",
+      got: { parts: row.parts.length, partsSent: 0 },
+      decided: { result: "storeError", claimNo: row.claim.claimNo },
+      rows: [{ table: "outbox_rows", id: row.outboxRowId }],
+      errorCode: NOT_SAFETY_CLASS,
+    });
+  return report(row, "storeError", 0);
 }
 
 const report = (row: ClaimedRow, outcome: RowOutcome, partsSent: number): RowReport => ({

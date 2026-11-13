@@ -642,16 +642,18 @@ describe("override_optout appears only on a stop reply or a safety line (hard in
 
     const report = await runDispatch(t.deps, { recipientHandleId: "handle-ben" });
 
+    // Restated by T-1352 (DL-687, the lead's OK; rule 7.9): the run sends its safety row first (RULES 4.12), then the
+    // rest in commit order; the stop reply is still the one send-override-optout.json shows, now the second request.
     expect(report.rows.map((row) => [row.outboxRowId, row.outcome])).toEqual([
+      ["out-ben-safety", "sent"],
       ["out-ben-reminder", "droppedStopped"],
       ["out-ben-quick", "droppedStopped"],
       ["out-ben-stop-later", "sent"],
-      ["out-ben-safety", "sent"],
     ]);
-    expect(t.linq.requests[0]).toEqual(sendOverrideOptout.request);
+    expect(t.linq.requests[1]).toEqual(sendOverrideOptout.request);
     expect(t.linq.requests.map((request) => [request.idempotencyKey, request.overrideOptout])).toEqual([
-      ["out-ben-stop-later/1/1", true],
       ["out-ben-safety/1/1", true],
+      ["out-ben-stop-later/1/1", true],
     ]);
     expectOverrideOnlyWhereAllowed(t, seeds);
   });
