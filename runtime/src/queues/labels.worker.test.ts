@@ -1,7 +1,8 @@
 // What a try's error leaves behind (T-256; STATE note 3): a dead letter's last error and every log line hold the error's
 // name and a label only, never a message's words, a phone number, a name or PostgresError.detail; and a body that is no
 // retry message is never run. A refused write's SQLSTATE and constraint reach the label from postgres.js's PostgresError
-// and from db/repo's scrubbed DataAccessDatabaseError and CommitTurnDatabaseError alike (T-1340). Run inside the Workers
+// and from db/repo's scrubbed DataAccessDatabaseError and CommitTurnDatabaseError alike (T-1340); a constraint the label
+// has no room for is left out, so the retry message carrying the label still runs (T-1347). Run inside the Workers
 // runtime with the runtime's own MessageBatch. Test values only (rule 9): the words and number below are made up, there
 // to prove they never get out.
 import type { DataAccessDatabaseError as RepoDataAccessDatabaseError } from "@rosie/db/repo/clocks";
@@ -64,6 +65,11 @@ class PostgresError extends Error {
 /** The table's and the constraint's names as db/repo's two scrubbed errors put them in their message. */
 const namesOf = (table: string | null, constraint: string | null): string =>
   `${table === null ? "" : `, table ${table}`}${constraint === null ? "" : `, constraint ${constraint}`}`;
+
+/** A constraint's name `length` characters long, as PostgreSQL could give one (63 at most): a-z, 0-9 and _ only. */
+const constraintOf = (length: number): string => "outbox_rows_recipient_handle_".padEnd(length, "x");
+/** A constraint's name as PostgreSQL spells one, up to its 63 characters (the CONSTRAINT pattern of message.ts). */
+const CONSTRAINT_NAME = /^[a-z_][a-z0-9_]{0,62}$/u;
 
 /**
  * db/repo's scrubbed refusal (clocks.ts, T-1322), built as its constructor builds it: the call's name, the SQLSTATE and
@@ -208,6 +214,41 @@ describe("the error label: the error's name and a label only", () => {
     }
   });
 
+  it("a constraint of 59 to 63 characters, which the label has no room for, is left out for each name, so isErrorLabel accepts the label; one of 58 still fits and is kept (T-1347)", () => {
+    // Each name's error, and the field that name keeps its constraint's name in.
+    const refusals: [string, string, () => Error][] = [
+      ["PostgresError", "constraint_name", () => new PostgresError()],
+      [
+        "DataAccessDatabaseError",
+        "constraint",
+        () => new DataAccessDatabaseError("sendState", "23514", "outbox_rows", null),
+      ],
+      [
+        "CommitTurnDatabaseError",
+        "constraint",
+        () => new CommitTurnDatabaseError("23514", "outbox_rows", null),
+      ],
+    ];
+    for (const [name, field, make] of refusals) {
+      const labelWith = (constraint: string): string =>
+        errorLabelOf(Object.assign(make(), { code: "23514", [field]: constraint }));
+      // `23514:` and 58 characters is 64, LABEL_MAX: the constraint fits and is kept, as before.
+      const fits = constraintOf(58);
+      expect(fits).toHaveLength(58);
+      expect(labelWith(fits)).toBe(`${name}:23514:${fits}`);
+      expect(isErrorLabel(labelWith(fits))).toBe(true);
+      for (const length of [59, 60, 61, 62, 63]) {
+        const constraint = constraintOf(length);
+        expect(constraint).toHaveLength(length);
+        expect(constraint).toMatch(CONSTRAINT_NAME);
+        // With the constraint, the label would be refused, and a retry message carrying it would never run.
+        expect(isErrorLabel(`${name}:23514:${constraint}`)).toBe(false);
+        expect(labelWith(constraint)).toBe(`${name}:23514`);
+        expect(isErrorLabel(labelWith(constraint))).toBe(true);
+      }
+    }
+  });
+
   it("a PostgresError reads only postgres.js's constraint_name, db/repo's errors only their constraint; any other error leaves threw", () => {
     const thrown: [unknown, string][] = [
       [new PostgresError(), "PostgresError:23514:dead_letters_after_five_tries"],
@@ -306,6 +347,26 @@ describe("the error label: the error's name and a label only", () => {
     }
   });
 
+  it("each field is read once, so the label is built from the values checked: a name, code or constraint that answers otherwise when read again never reaches it (T-1347)", () => {
+    /** A field that answers `first` when read the first time, and `then` every time after. */
+    const answers = (first: string, then: string): PropertyDescriptor => {
+      let reads = 0;
+      return {
+        get: () => {
+          reads += 1;
+          return reads === 1 ? first : then;
+        },
+      };
+    };
+    const fits = constraintOf(58);
+    const thrown = Object.defineProperties(new Error("x"), {
+      name: answers("DataAccessDatabaseError", "Riley +15555550103"),
+      code: answers("23514", "555-0103"),
+      constraint: answers(fits, constraintOf(63)),
+    });
+    expect(errorLabelOf(thrown)).toBe(`DataAccessDatabaseError:23514:${fits}`);
+  });
+
   it("a fifth try that throws a PostgresError leaves only its name, SQLSTATE and constraint in the dead letter and the logs", async () => {
     const dead = fakeDeadLetters();
     const poll = scriptedJob([
@@ -371,6 +432,55 @@ describe("the error label: the error's name and a label only", () => {
     ]);
     expect(leaks(JSON.stringify(queue.sent))).toEqual([]);
     expect(leaks(lines.join("\n"))).toEqual([]);
+  });
+
+  it("a send whose door throws a refusal with a constraint the label has no room for leaves <Name>:<SQLSTATE>, and the next retry message reads back and runs (T-1347)", async () => {
+    const refusals: [string, Error][] = [
+      ["PostgresError", Object.assign(new PostgresError(), { constraint_name: constraintOf(59) })],
+      [
+        "DataAccessDatabaseError",
+        new DataAccessDatabaseError("sendState", "23514", "outbox_rows", constraintOf(61)),
+      ],
+      ["CommitTurnDatabaseError", new CommitTurnDatabaseError("23514", "outbox_rows", constraintOf(63))],
+    ];
+    for (const [name, refusal] of refusals) {
+      const logged = lines.length;
+      const sends = scriptedSends([{ throw: refusal }, "done"]);
+      const clock = fakeClock("2026-11-07T19:00:05Z");
+      const queue = fakeQueue(clock);
+      const deps = depsOf({ sends: sends.run });
+
+      const queued = await enqueueRetry(
+        queue,
+        averySend(),
+        {
+          try: 1,
+          firstTriedAt: "2026-11-07T19:00:04Z",
+          failed: { at: clock.now(), error: "SendFailed:rateLimited", retryAfterSeconds: null },
+        },
+        clock.now(),
+      );
+      await pump(queue, clock, deps);
+
+      expect(queued).toMatchObject({ result: "queued" });
+      // Try 2 threw the refusal; the message for try 3 carries <Name>:<SQLSTATE>, reads back, and try 3 runs.
+      expect(queue.sent.map((sent) => sent.message.lastError)).toEqual([
+        "SendFailed:rateLimited",
+        `${name}:23514`,
+      ]);
+      const carried = queue.sent[1]?.message;
+      expect(readRetryMessage(carried)).toEqual({ message: carried });
+      expect(sends.calls.map((call) => call.try)).toEqual([2, 3]);
+      expect(
+        lines.slice(logged).map((line) => {
+          const logLine = JSON.parse(line) as { outcome: unknown; error_code: unknown };
+          return [logLine.outcome, logLine.error_code];
+        }),
+      ).toEqual([
+        ["queuedNext", `${name}:23514`],
+        ["done", null],
+      ]);
+    }
   });
 
   it("one JSON log line per message, on the job's own trace id, with labels and counts only", async () => {
