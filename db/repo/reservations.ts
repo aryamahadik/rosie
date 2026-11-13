@@ -48,7 +48,7 @@ import type postgres from "postgres";
 import { isLostConnection, reserveConnection } from "./bundles";
 import { assertBusinessId, SCOPE_SETTING } from "./scope";
 import type { Sql, Tx } from "./scope";
-import { transientOrThrow } from "./targets";
+import { foundGone, transientOrThrow } from "./targets";
 
 type Db = Sql | Tx;
 /** A transaction's connection: postgres.js's own Tx, or the reserved connection inScopedTransaction runs on. */
@@ -353,10 +353,15 @@ async function inSavepoint<T>(tx: Conn, fn: () => Promise<T>): Promise<T> {
 /**
  * One transaction on one reserved connection, scoped to `businessId` (set_config inside it, is_local), read committed
  * like sql.begin. postgres.js's own `begin` writes a `rollback` to a connection that is gone, from a timer outside any
- * promise (T-185), so a lost connection is rethrown here without a rollback (the server rolled the transaction back when
- * the backend went) and is never released (postgres.js 3.4.9 would put it back in the open queue). The same pre-probe as
- * bundles.ts takes the stale error a killed connection keeps, by an ordinary query, before a connection is reserved,
- * and a reserve() that never connects leaves as a connection that never opened (bundles.ts reserveConnection, T-1314).
+ * promise (T-185), so a connection found gone (targets.ts's foundGone, as inRuntimeTransaction decides it: a lost
+ * connection, or a statement's failure that is a session's failure or answers 08001; T-1350) is rethrown here without
+ * a rollback (the server rolled the transaction back when the backend went) and is never released (postgres.js 3.4.9
+ * would put it back in the open queue); an error fn makes itself is rolled back and released. A connection that closes
+ * while idle between fn's statements is met as a statement's failure too (T-1330's note d): fn awaits nothing but
+ * statements on this connection, so its next statement is in flight before Node delivers the socket's error or close,
+ * and postgres.js rejects it with that error. The same pre-probe as bundles.ts takes the stale error a killed
+ * connection keeps, by an ordinary query, before a connection is reserved, and a reserve() that never connects leaves
+ * as a connection that never opened (bundles.ts reserveConnection, T-1314).
  */
 async function inScopedTransaction<T>(
   sql: Sql,
@@ -374,7 +379,7 @@ async function inScopedTransaction<T>(
       await reserved`select set_config(${SCOPE_SETTING}, ${businessId}, true)`;
       result = await fn(reserved);
     } catch (error) {
-      if (!isLostConnection(error)) {
+      if (!foundGone(error)) {
         await reserved`rollback`;
       }
       throw error;
@@ -382,7 +387,7 @@ async function inScopedTransaction<T>(
     await reserved`commit`;
     return result;
   } catch (error) {
-    lost = isLostConnection(error);
+    lost = foundGone(error);
     throw error;
   } finally {
     if (!lost) {
