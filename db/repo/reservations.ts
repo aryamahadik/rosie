@@ -14,10 +14,10 @@
 // update raises the version by one (trigger from 0002).
 //
 // A failure of the database is answered by targets.ts's transientOrThrow under the call's K-05 name, reserve or release,
-// as every runtime-side call's is (T-1314): a serialization failure, a deadlock, a lost connection and a connection that
-// never opened (08001, a reserve() that never connects included: bundles.ts reserveConnection) answer transient; any
-// other failure to open or keep a session is thrown scrubbed, the call's name and the code alone, never a host, port,
-// user or password.
+// as extend's and the runtime side's calls' are (T-1314): a serialization failure, a deadlock, a lost connection and a
+// connection that never opened (08001, a reserve() that never connects included: bundles.ts reserveConnection) answer
+// transient; any other failure to open or keep a session is thrown scrubbed, the call's name and the code alone, never
+// a host, port, user or password.
 //
 // One row per holder per slot (T-1134, from T-744 round 1's security review, GAP 1; DL-292). A holder is who the cap of
 // 2 counts (holderOf, the one definition): a mobile, the same at every business, or an agent token at one business; a
