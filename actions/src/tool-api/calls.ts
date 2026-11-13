@@ -19,6 +19,10 @@
 //
 // The types are imported as types only, so nothing here loads the generated module at run time; the validator
 // (validator.ts) holds every value to the frozen schema itself, by the same v1.5 definitions (v1.6's for composeInput).
+//
+// The calls a later K-09 minor version adds are never CallNames: each is its journey lane's, registered through the
+// base's lane door (tool-api.ts Lane; T-1022, DL-728) with its own hop, which a page's and an agent's call replace as
+// they replace a v1 call's (callerHop).
 
 import type * as K09 from "../../../contracts/generated/tool-api/tool-api.v1.5";
 import type * as K09V16 from "../../../contracts/generated/tool-api/tool-api.v1.6";
@@ -215,12 +219,21 @@ export const CALL_HOPS: Readonly<Record<CallName, Hop>> = {
 };
 
 /**
+ * The hop of the span of a call whose own hop is `own`: a secure page's call is a pageRequest and an outside AI's an
+ * agentApiRequest, whatever the call (K-08 v1 hop table, arch 02 line 129); any other caller's takes `own`. A K-09 v1
+ * call's own hop is CALL_HOPS' (hopOf); a lane's call's is the one its lane registered (tool-api.ts Lane; T-1022).
+ */
+export function callerHop(own: Hop, callerKind: CallerKind | undefined): Hop {
+  if (callerKind === "page") return "pageRequest";
+  if (callerKind === "agent") return "agentApiRequest";
+  return own;
+}
+
+/**
  * The hop of one call's span: a secure page's call is a pageRequest and an outside AI's an agentApiRequest, whatever the
  * call (K-08 v1 hop table, arch 02 line 129); any other caller's takes the call's own hop. A name that is no call of v1
  * takes the commit hop, refused.
  */
 export function hopOf(call: CallName | undefined, callerKind: CallerKind | undefined): Hop {
-  if (callerKind === "page") return "pageRequest";
-  if (callerKind === "agent") return "agentApiRequest";
-  return call === undefined ? "commit" : CALL_HOPS[call];
+  return callerHop(call === undefined ? "commit" : CALL_HOPS[call], callerKind);
 }
