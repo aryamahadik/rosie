@@ -18,6 +18,11 @@
 // real runDispatch and limit 8 run over the dispatcher's doubles (../../dispatch/test-support.ts), K-09's doubles write
 // each row into the K-05 outbox double as the core does, and the root's own port (../../wiring/root.ts actorReadingPort)
 // asks this real actor, through its stub, right before the send; no outage_texts row is written by hand.
+//
+// T-1341 (DL-669): each outage row written outside a turn's commit is woken by its own writer, while the actor's one
+// reading says exactly false. Where a test joins it, the writers' wake is one run of that real dispatcher for the recipient
+// the wake names, as the root builds it, joined as the safety read's SafetyDeps.wake and as the AI-down path's
+// OutageDeps.wake; no test runs the dispatcher unless it says so.
 import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it } from "vitest";
@@ -1104,7 +1109,10 @@ describe("an outage line's row written before a STOP that has not committed is n
     await rig.actor.outageIdle();
   }
 
-  /** The three runs that can claim the row (DL-656: no outbox sweep exists, so "the sweep" is a run for the recipient). */
+  /**
+   * The three runs that can claim the row: the root's wake, the retry door's run, and a run with no recipient, which no
+   * production code makes (DL-656: no outbox sweep exists; T-1341).
+   */
   const RUNS = ["the root's wake", "the retry door's run", "a run with no recipient"] as const;
   type RunBy = (typeof RUNS)[number];
 

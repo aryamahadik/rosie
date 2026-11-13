@@ -21,8 +21,8 @@
 //      still says no word waits, so it goes, or is dropped by the dispatcher's own ask, at once (T-1341, DL-669); after
 //      its word none is woken (a wake runs every sendable row of the recipient, and a routine row is not asked: T-1342),
 //      and a row not woken, or whose wake fails, waits for the recipient's next dispatcher run, which asks the reading
-//      again; no sweep runs. A line held back here for a stop is not asked for
-//      again in that run (the turn's next run checks again). The request is the one the safety read's timeout rule sends
+//      again; no sweep runs. A line held back here for a stop is not asked for again in that run (the turn's next run
+//      checks again). The request is the one the safety read's timeout rule sends
 //      for the same text (kind job, request id `safety:<event id>`: runtime/src/safety), and K-09 sends a fixed line once
 //      per request id, so a text gets the line once whichever path asks first, a rerun of the turn included (it asks again
 //      and is answered `repeated`). A text the safety read already gave the line is not asked for at all. A line the core
