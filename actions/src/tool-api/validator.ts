@@ -26,6 +26,14 @@
 // request is v1.5's by reference. SCHEMA_FILES holds v1.6 and K-03 v1.1 beside v1.5's files, and build:validators
 // compiles composeInput's request, response and errors from v1.6 (its other calls' from v1.5), so the prebuilt code
 // holds exactly the definitions toolApiSchemaIdOf names.
+//
+// A lane's calls (T-1022, DL-728; tool-api.ts Lane) are checked apart from these: laneChecks gives one call's request,
+// response and errors by `$defs/<call>.<part>` of the frozen K-09 version its lane names, a version whose root carries
+// the call by $ref (`$defs/<call>.exchange` in its anyOf), each read by the call's own name, never by a generated
+// numbered one (DL-350). In Node they come from contracts/ on disk: the files that version's $refs reach, read the first
+// time a lane names it, in an Ajv instance of their own with the same options, so SCHEMA_FILES and the prebuilt code
+// stay exactly v1's. Inside workerd the prebuilt code holds no lane's definitions yet, so laneChecks refuses there and
+// no lane is registered (fail closed) until infra/build/tool-api-validators.mjs builds them too.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -108,6 +116,37 @@ const MAX_PROBLEMS = 20;
 /** The three definitions every call has under `$defs` (02-contracts section 2 item 2). */
 export type CallPart = "request" | "response" | "errors";
 
+/** The parts every call has, in the order of 02-contracts section 2 item 2. */
+const CALL_PARTS: readonly CallPart[] = ["request", "response", "errors"];
+
+/** A K-09 version a lane may name: v1, or a minor version v1.<n> (contracts/README.md convention 1). */
+const TOOL_API_VERSION = /^v1(?:\.[1-9][0-9]*)?$/u;
+
+/** K-09's frozen versions, relative to contracts/: `{"frozen": [...]}`, oldest first, only ever added (contracts/README.md). */
+const TOOL_API_FROZEN_FILE = "tool-api/frozen.json";
+
+/** The schema file of K-09 version `version`, relative to contracts/ (contracts/README.md convention 1). */
+function toolApiVersionFile(version: string): string {
+  return `tool-api/tool-api.${version}.schema.json`;
+}
+
+/** The $id of K-09 version `version` (contracts/README.md convention 2), as a lane names it (tool-api.ts Lane). */
+export function toolApiVersionSchemaId(version: string): string {
+  return `https://rosie.invalid/contracts/${toolApiVersionFile(version)}`;
+}
+
+/**
+ * One lane call's checks (T-1022, DL-728): its request, response and errors by `$defs/<call>.<part>` of the frozen K-09
+ * version its lane names, read by the call's own name (DL-350).
+ */
+export interface LaneChecks {
+  /** The K-09 version whose definitions check the call, as its lane names it (such as "v1.8"). */
+  readonly version: string;
+  readonly call: string;
+  /** The problems `$defs/<call>.<part>` of that version finds in `value`, one line each; empty when accepted. */
+  check(part: CallPart, value: unknown): string[];
+}
+
 export interface ToolApiValidator {
   /**
    * The problems `$defs/<call>.<part>` finds in `value`, one line each; empty when accepted: K-09 v1.5's, or v1.6's for
@@ -116,6 +155,13 @@ export interface ToolApiValidator {
   check(call: CallName, part: CallPart, value: unknown): string[];
   /** The problems K-08 v1.1's `span` finds in `value`, one line each; empty when accepted. */
   checkSpan(value: unknown): string[];
+  /**
+   * A lane call's checks (T-1022, DL-728; tool-api.ts Lane): `$defs/<call>.request`, `.response` and `.errors` of K-09
+   * `version`. Throws, so its lane is refused at registration, for a call of K-09 v1 (`check` holds those), a version that
+   * is not frozen (contracts/tool-api/frozen.json), one whose root does not carry the call by $ref or that lacks one of
+   * its three definitions, and inside workerd, whose prebuilt code holds no lane's definitions yet.
+   */
+  laneChecks(version: string, call: string): LaneChecks;
 }
 
 /** One definition's check, compiled or prebuilt: true when the value passes; when not, its errors are on `errors`. */
@@ -232,9 +278,110 @@ export function definitionChecks(schemas?: readonly object[]): DefinitionChecks 
   return prebuiltValidators();
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/** Every file a schema's $refs name, relative to contracts/ (a $ref inside the schema itself names none). */
+function referencedFiles(file: string, schema: object): string[] {
+  const files: string[] = [];
+  const walk = (value: unknown): void => {
+    if (Array.isArray(value)) {
+      for (const item of value) walk(item);
+    } else if (isRecord(value)) {
+      for (const [key, inner] of Object.entries(value)) {
+        if (key === "$ref" && typeof inner === "string") {
+          const target = inner.split("#")[0] ?? "";
+          if (target !== "") files.push(path.posix.join(path.posix.dirname(file), target));
+        } else {
+          walk(inner);
+        }
+      }
+    }
+  };
+  walk(schema);
+  return files;
+}
+
+/**
+ * The lane calls' checks, in Node (T-1022, DL-728): one strict Ajv 2020-12 instance with AJV_OPTIONS holding, for each
+ * K-09 version a lane names, every file that version's $refs reach, read from `contractsDir` the first time the version
+ * is named. A call's three definitions are compiled when its lane names it, so a definition that does not compile
+ * refuses the lane at registration, and they are kept.
+ */
+function laneDefinitionChecks(contractsDir: string): (version: string, call: string) => LaneChecks {
+  const ajv = new Ajv2020(AJV_OPTIONS);
+  /** Every file the instance holds, relative to contracts/, as read. */
+  const held = new Map<string, Record<string, unknown>>();
+  let frozen: readonly string[] | undefined;
+
+  const read = (file: string): Record<string, unknown> => {
+    const schema = JSON.parse(readFileSync(path.join(contractsDir, ...file.split("/")), "utf8")) as unknown;
+    if (!isRecord(schema)) throw new Error(`${file} is not a JSON object`);
+    return schema;
+  };
+  /** Adds `root` and every file its $refs reach that the instance does not hold yet; gives `root` as read. */
+  const hold = (root: string): Record<string, unknown> | undefined => {
+    const queue = [root];
+    for (let file = queue.shift(); file !== undefined; file = queue.shift()) {
+      if (held.has(file)) continue;
+      const schema = read(file);
+      ajv.addSchema(schema);
+      held.set(file, schema);
+      queue.push(...referencedFiles(file, schema));
+    }
+    return held.get(root);
+  };
+  /** K-09's frozen versions, read once (contracts/tool-api/frozen.json). */
+  const frozenVersions = (): readonly string[] => {
+    if (frozen === undefined) {
+      const list = read(TOOL_API_FROZEN_FILE).frozen;
+      frozen = Array.isArray(list) ? list.filter((item): item is string => typeof item === "string") : [];
+    }
+    return frozen;
+  };
+
+  return (version, call) => {
+    if ((CALL_NAMES as readonly string[]).includes(call)) {
+      throw new Error(`${call} is a call of K-09 v1: check() holds it, never a lane`);
+    }
+    // Checked before any file is read, so a version can name nothing but a K-09 schema file.
+    if (!TOOL_API_VERSION.test(version)) throw new Error("not a K-09 version (v1 or v1.<n>)");
+    if (!frozenVersions().includes(version)) throw new Error(`K-09 ${version} is not frozen`);
+    const schemaId = toolApiVersionSchemaId(version);
+    const root = hold(toolApiVersionFile(version));
+    if (root?.$id !== schemaId) throw new Error(`the file of K-09 ${version} has another $id`);
+    const carried =
+      Array.isArray(root.anyOf) &&
+      root.anyOf.some((branch) => isRecord(branch) && branch.$ref === `#/$defs/${call}.exchange`);
+    if (!carried) throw new Error(`K-09 ${version}'s root does not carry ${call} by $ref`);
+    const defs = isRecord(root.$defs) ? root.$defs : {};
+    const validators = new Map<CallPart, Validate>();
+    for (const part of CALL_PARTS) {
+      const definition = `${call}.${part}`;
+      const validate = Object.hasOwn(defs, definition)
+        ? ajv.getSchema(refOf(schemaId, definition))
+        : undefined;
+      if (validate === undefined) throw new Error(`K-09 ${version} has no ${definition}`);
+      validators.set(part, validate);
+    }
+    return {
+      version,
+      call,
+      check(part, value) {
+        const validate = validators.get(part);
+        if (validate === undefined) throw new Error(`a call has no part ${part}`);
+        return validate(value) ? [] : formatProblems(validate.errors);
+      },
+    };
+  };
+}
+
 /**
  * The one validator, over definitionChecks(schemas). Either way, a definition the validator does not hold throws, since
- * the call list and the contract must never drift apart; a name that is no call of K-09 v1 throws before any check.
+ * the call list and the contract must never drift apart; a name that is no call of K-09 v1 throws before any check. A
+ * lane's calls are checked by laneChecks, whose definitions are always the frozen files on disk, read when a lane first
+ * names its version (laneDefinitionChecks); inside workerd it refuses every lane.
  */
 export function createToolApiValidator(schemas?: readonly object[]): ToolApiValidator {
   if (RUNS_IN_WORKERD && schemas !== undefined) {
@@ -245,6 +392,7 @@ export function createToolApiValidator(schemas?: readonly object[]): ToolApiVali
   const validatorOf = definitionChecks(schemas);
   const problemsOf = (validate: Validate, value: unknown): string[] =>
     validate(value) ? [] : formatProblems(validate.errors);
+  let laneChecksOf: ((version: string, call: string) => LaneChecks) | undefined;
 
   return {
     check(call, part, value) {
@@ -253,6 +401,16 @@ export function createToolApiValidator(schemas?: readonly object[]): ToolApiVali
     },
     checkSpan(value) {
       return problemsOf(validatorOf(EVENT_TRACE_SCHEMA_ID, "span"), value);
+    },
+    laneChecks(version, call) {
+      if (RUNS_IN_WORKERD) {
+        throw new Error(
+          "the prebuilt validators hold no lane's definitions: no lane is registered inside workerd until " +
+            "infra/build/tool-api-validators.mjs builds them",
+        );
+      }
+      laneChecksOf ??= laneDefinitionChecks(CONTRACTS_DIR);
+      return laneChecksOf(version, call);
     },
   };
 }
