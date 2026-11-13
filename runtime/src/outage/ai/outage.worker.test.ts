@@ -23,7 +23,7 @@ import { setGuardDeps, setReplyDeps } from "../../guard";
 import { fakeCore as fakeReplyCore, phone, ROSIE_NUMBER } from "../../guard/replies/test-support";
 import { fakeTargets } from "../../guard/test-support";
 import { timeoutResult } from "../../safety";
-import type { SafetyResult } from "../../safety/types";
+import type { SafetyResult, SendFixedLineRequest } from "../../safety/types";
 import { spanProblems } from "../../trace";
 import { KEYWORD_RUNS, runTurnThroughOutage, setTurnDeps, turnReplyCore, type TurnOutcome } from "../../turn";
 import {
@@ -63,6 +63,7 @@ import {
   type OutageReport,
   type WaitingTurn,
 } from "./index";
+import { setOutageHost } from "./outage";
 import { outageHarness, type OutageHarness } from "./test-support";
 
 const keys = fakeKeyStore();
@@ -382,6 +383,258 @@ describe("never to a stopped phone", () => {
     expect(s.o.lines.rows.size).toBe(0);
     expect(report.lines).toEqual([]);
     expect(s.o.wakes).toEqual([]);
+  });
+
+  it("the handle actor that runs the turn says the number may have asked to stop, by a word no commit has recorded yet (T-1323; setOutageHost): no line goes to any waiting text, the stopped flag is not even read, and the turn still runs again every 30 s", async () => {
+    const s = await samTurn([S1_02_TEXT, LAWN_TEXT]);
+    const asked: number[] = [];
+    setOutageHost(s.turn.signal, {
+      stopped: () => {
+        asked.push(s.o.clock.now());
+        return true;
+      },
+    });
+    downThenBack(s, 2);
+
+    const report = await runWithRetries(s, 2);
+
+    expect(s.o.lines.requests).toEqual([]);
+    expect(report.lines).toEqual([]);
+    expect(s.o.wakes).toEqual([]);
+    expect(s.o.stoppedReads).toEqual([]);
+    // Asked before the run's first line; the texts are then done for the run, so the next try has none to ask for.
+    expect(asked).toEqual([0]);
+    expect(s.decidedAt).toEqual([0, RETRY_MS, 2 * RETRY_MS]);
+    expect(report.end).toBe("committed");
+  });
+
+  it('an actor that cannot say (its reading throws) is read as a stop (RULES 7.2: "Unsure: treat it as a stop"): no line goes, and the stopped flag is not read', async () => {
+    const s = await samTurn([S1_02_TEXT, LAWN_TEXT]);
+    setOutageHost(s.turn.signal, {
+      stopped: () => {
+        throw new Error("the actor's storage failed");
+      },
+    });
+    downThenBack(s, 1);
+
+    const report = await runWithRetries(s, 1);
+
+    expect(s.o.lines.requests).toEqual([]);
+    expect(report.lines).toEqual([]);
+    expect(s.o.stoppedReads).toEqual([]);
+    expect(report.end).toBe("committed");
+  });
+
+  it("an actor that says no word waits uncommitted leaves the line to the other checks: each waiting text gets it once, the stopped flag read before it goes", async () => {
+    const s = await samTurn([S1_02_TEXT, LAWN_TEXT]);
+    const asked: number[] = [];
+    setOutageHost(s.turn.signal, {
+      stopped: () => {
+        asked.push(s.o.clock.now());
+        return false;
+      },
+    });
+    downThenBack(s, 2);
+
+    const report = await runWithRetries(s, 2);
+
+    expect(s.o.lines.requests.map((sent) => sent.request)).toEqual([
+      samLine("evt-sam-0001"),
+      samLine("evt-sam-0002"),
+    ]);
+    expect(report.lines.map((line) => line.repeated)).toEqual([false, false]);
+    // Asked before the stopped flag is read, again right before each text's line, and before the try's rows are woken
+    // (round 2, DL-644: once per try was the security reviewer's finding 1).
+    expect(asked).toEqual([0, 0, 0, 0]);
+    expect(s.o.stoppedReads).toEqual([actorNameOf(SAM.handle)]);
+  });
+
+  it("a line the core left unanswered is asked for again at the next try only while the actor still says no word waits: a STOP stored behind the turn meanwhile holds it back (T-1323, DL-621)", async () => {
+    const s = await samTurn([S1_02_TEXT]);
+    s.o.lines.transient = 1;
+    let stopStored = false;
+    setOutageHost(s.turn.signal, { stopped: () => stopStored });
+    downThenBack(s, 2);
+
+    const running = runTurnThroughOutage(s.turn);
+    await until(() => s.o.waits.length === 1, "the first wait");
+    // The core answered transient, so the line is still to ask for; then a STOP is stored behind the turn.
+    expect(s.o.lines.requests.map((sent) => sent.at)).toEqual([0]);
+    stopStored = true;
+    await s.o.clock.advance(RETRY_MS);
+    await until(() => s.o.waits.length === 2, "the second wait");
+    await s.o.clock.advance(RETRY_MS);
+    const report = await running;
+
+    expect(s.o.lines.requests.map((sent) => sent.at)).toEqual([0]);
+    expect(s.o.lines.rows.size).toBe(0);
+    expect(report.lines).toEqual([]);
+    expect(report.end).toBe("committed");
+  });
+
+  // ---- round 2 (DL-644): the actor is asked right before each line, and before the try's wake ---------------------------
+
+  /** Where in a try one of the actor's answers came: after how many stopped-flag reads, line requests and wakes. */
+  const placeOf = (o: OutageHarness): { flagReads: number; lines: number; wakes: number } => ({
+    flagReads: o.stoppedReads.length,
+    lines: o.lines.requests.length,
+    wakes: o.wakes.length,
+  });
+
+  /** The core takes each line's request at once; `meanwhile` runs while it is out, before the core's answer comes back. */
+  function whileOut(o: OutageHarness, meanwhile: (request: SendFixedLineRequest) => void): void {
+    const send = o.lines.sendFixedLine.bind(o.lines);
+    o.lines.sendFixedLine = (request) => {
+      const answer = send(request);
+      meanwhile(request);
+      return answer;
+    };
+  }
+
+  it("a STOP the actor takes while the try reads the stopped flag holds every line of the try: the actor is asked again right before the first, and no line goes (round 2; RULES 7.2: at once)", async () => {
+    const s = await samTurn([S1_02_TEXT, LAWN_TEXT]);
+    const asked: ReturnType<typeof placeOf>[] = [];
+    let stopTaken = false;
+    setOutageHost(s.turn.signal, {
+      stopped: () => {
+        asked.push(placeOf(s.o));
+        return stopTaken;
+      },
+    });
+    // The flag is read (it says not stopped, no commit having recorded the STOP), and the actor takes the STOP meanwhile.
+    const deps = s.o.deps;
+    const read = deps.isStopped?.bind(deps);
+    if (read === undefined) throw new Error("no stopped-flag read");
+    deps.isStopped = (actorName) => {
+      const answer = read(actorName);
+      stopTaken = true;
+      return answer;
+    };
+    downThenBack(s, 1);
+
+    const report = await runWithRetries(s, 1);
+
+    expect(s.o.lines.requests).toEqual([]);
+    expect(report.lines).toEqual([]);
+    expect(s.o.wakes).toEqual([]);
+    expect(s.o.stoppedReads).toEqual([actorNameOf(SAM.handle)]);
+    // Asked before the flag read, then right before the first line, which its word held.
+    expect(asked).toEqual([
+      { flagReads: 0, lines: 0, wakes: 0 },
+      { flagReads: 1, lines: 0, wakes: 0 },
+    ]);
+    expect(report.end).toBe("committed");
+  });
+
+  it("a STOP the actor takes while the try's first line is out holds the second line back: the actor is asked again right before it, and the try wakes none of its rows (round 2; RULES 7.2: at once)", async () => {
+    const s = await samTurn([S1_02_TEXT, LAWN_TEXT]);
+    const asked: ReturnType<typeof placeOf>[] = [];
+    let stopTaken = false;
+    setOutageHost(s.turn.signal, {
+      stopped: () => {
+        asked.push(placeOf(s.o));
+        return stopTaken;
+      },
+    });
+    whileOut(s.o, () => {
+      stopTaken = true;
+    });
+    downThenBack(s, 2);
+
+    const report = await runWithRetries(s, 2);
+
+    // The first line was asked for before the STOP came, so the core wrote it; no second line, and no wake.
+    expect(s.o.lines.requests.map((sent) => sent.request)).toEqual([samLine("evt-sam-0001")]);
+    expect(report.lines).toEqual([
+      { eventId: "evt-sam-0001", outboxRowId: "out-safety-evt-sam-0001-outage", repeated: false },
+    ]);
+    expect(s.o.wakes).toEqual([]);
+    expect(s.o.stoppedReads).toEqual([actorNameOf(SAM.handle)]);
+    // Asked before the flag read, right before the first line, then right before the second, which its word held; both
+    // texts are then done for the run, so the next tries ask nothing.
+    expect(asked).toEqual([
+      { flagReads: 0, lines: 0, wakes: 0 },
+      { flagReads: 1, lines: 0, wakes: 0 },
+      { flagReads: 1, lines: 1, wakes: 0 },
+    ]);
+    expect(s.decidedAt).toEqual([0, RETRY_MS, 2 * RETRY_MS]);
+    expect(report.end).toBe("committed");
+  });
+
+  it('an actor whose reading throws right before a later line is read as a stop (RULES 7.2: "Unsure: treat it as a stop"): that line is held, and the try wakes none of its rows', async () => {
+    const s = await samTurn([S1_02_TEXT, LAWN_TEXT]);
+    let answers = 0;
+    setOutageHost(s.turn.signal, {
+      stopped: () => {
+        answers += 1;
+        // No word before the flag read or before the first line; before the second line, its storage fails.
+        if (answers > 2) throw new Error("the actor's storage failed");
+        return false;
+      },
+    });
+    downThenBack(s, 1);
+
+    const report = await runWithRetries(s, 1);
+
+    expect(s.o.lines.requests.map((sent) => sent.request)).toEqual([samLine("evt-sam-0001")]);
+    expect(report.lines.map((line) => line.eventId)).toEqual(["evt-sam-0001"]);
+    expect(s.o.wakes).toEqual([]);
+    expect(answers).toBe(3);
+    expect(report.end).toBe("committed");
+  });
+
+  it("a STOP the actor takes while the try's last line is out: that line was asked for before it and is written, but no row of the try is woken (limit 8 cannot see a STOP no commit has recorded), so the dispatcher's minute sweep is left to send or drop it", async () => {
+    const s = await samTurn([S1_02_TEXT, LAWN_TEXT]);
+    const asked: ReturnType<typeof placeOf>[] = [];
+    let stopTaken = false;
+    setOutageHost(s.turn.signal, {
+      stopped: () => {
+        asked.push(placeOf(s.o));
+        return stopTaken;
+      },
+    });
+    whileOut(s.o, (request) => {
+      if (request.caller.requestId === "safety:evt-sam-0002") stopTaken = true;
+    });
+    downThenBack(s, 1);
+
+    const report = await runWithRetries(s, 1);
+
+    expect(s.o.lines.requests.map((sent) => sent.request)).toEqual([
+      samLine("evt-sam-0001"),
+      samLine("evt-sam-0002"),
+    ]);
+    expect(report.lines.map((line) => line.eventId)).toEqual(["evt-sam-0001", "evt-sam-0002"]);
+    expect(s.o.wakes).toEqual([]);
+    // The last answer, before the wake, came after both lines.
+    expect(asked.at(-1)).toEqual({ flagReads: 1, lines: 2, wakes: 0 });
+  });
+
+  it("the boundary: an actor that says no word all through is asked before the flag read, right before each text's line and before the try's wake, and each line goes and the rows are woken at once", async () => {
+    const s = await samTurn([S1_02_TEXT, LAWN_TEXT]);
+    const asked: ReturnType<typeof placeOf>[] = [];
+    setOutageHost(s.turn.signal, {
+      stopped: () => {
+        asked.push(placeOf(s.o));
+        return false;
+      },
+    });
+    downThenBack(s, 1);
+
+    await runWithRetries(s, 1);
+
+    expect(asked).toEqual([
+      { flagReads: 0, lines: 0, wakes: 0 },
+      { flagReads: 1, lines: 0, wakes: 0 },
+      { flagReads: 1, lines: 1, wakes: 0 },
+      { flagReads: 1, lines: 2, wakes: 0 },
+    ]);
+    expect(s.o.wakes).toEqual([
+      {
+        handleId: "handle-sam",
+        outboxRowIds: ["out-safety-evt-sam-0001-outage", "out-safety-evt-sam-0002-outage"],
+      },
+    ]);
   });
 
   it("T-259's stopped check: limit 8 drops the outage line's row (quick_reply, the outage line) for a stopped phone at send", () => {
