@@ -2,9 +2,54 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 508, [`40ad7c9`](https://github.com/aryamahadik/rosie/commit/40ad7c9), 2026-11-13 05:18:50 UTC.
+- **Through:** commit 510, [`33d0ec5`](https://github.com/aryamahadik/rosie/commit/33d0ec5), 2026-11-13 05:35:53 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 510. docs: COMMIT\_HISTORY.md through commit 508 (40ad7c9, \#516) (\#518)
+
+- **Commit:** [`33d0ec5`](https://github.com/aryamahadik/rosie/commit/33d0ec5), by Arya Mahadik, 2026-11-13 05:35:53 UTC
+- **Pull request:** [#518](https://github.com/aryamahadik/rosie/pull/518) from `task/commit-history-65`, merged 2026-11-13 05:35:54 UTC. It squashed 1 branch commit:
+  - `92a5421` docs: COMMIT\_HISTORY.md through commit 508 (40ad7c9, \#516)
+- **Files changed:** 1 (+39 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +39 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 509. T-1333: migration 0035 grants the migrating role SET, without INHERIT, on rosie\_app and rosie\_job where it is no superuser (seed:staging's 42501) (\#517)
+
+- **Commit:** [`aee1532`](https://github.com/aryamahadik/rosie/commit/aee1532), by Arya Mahadik, 2026-11-13 05:35:49 UTC
+- **Pull request:** [#517](https://github.com/aryamahadik/rosie/pull/517) from `task/T-1333`, merged 2026-11-13 05:35:49 UTC. It squashed 2 branch commits:
+  - `55046d5` T-1333: migration 0035 grants the migrations' role SET, without INHER…
+  - `3e6dcf9` T-1333: 0035's header quotes why the SET option sits on a row of its …
+- **Files changed:** 3 (+702 −2), by folder:
+  - `db/migrations/` 0035\_core\_migrator\_set\_role.sql +73 −0
+  - `db/repo/` money.int.test.ts +5 −2
+  - `db/test/` core-migrator-set-role.int.test.ts +624 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1333: migration 0035 grants the migrations' role SET, without INHERIT, on rosie_app and rosie_job where it is no superuser and holds the maker's ADMIN row (PostgreSQL 16+ gives a CREATEROLE maker ADMIN only, so seed:staging's SET LOCAL ROLE rosie_job was refused, 42501, DL-634); a no-op for a superuser, for a role with no maker's row and on a server older than 16; db/test/core-migrator-set-role.int.test.ts migrates a throwaway schema as a non-superuser login (before 0035: SET ROLE and the core seed refused 42501; after: allowed, the seed runner's set core runs, no privilege or policy inherited, nothing granted to any other role, two runs at once add one row); money.int.test.ts's migration-list pin gains core_migrator_set_role
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1333: 0035's header quotes why the SET option sits on a row of its own (the maker cannot change the bootstrap superuser's row); the test opens its clients and folder before any statement, so its cleanup always runs
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 508. docs: COMMIT\_HISTORY.md through commit 506 (3963ee6, \#514) (\#516)
 
