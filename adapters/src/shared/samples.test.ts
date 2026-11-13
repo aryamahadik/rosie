@@ -36,12 +36,12 @@ beforeAll(() => {
   dir = mkdtempSync(path.join(tmpdir(), "rosie-samples-"));
   write("good.json", JSON.stringify({ id: "msg-1", to: "+14155550123", email: "a@example.com" }));
   write("raw/body.txt", '{"id":"evt-1","n":1}\n');
-  write("bad-phone.json", JSON.stringify({ to: "+14155559999" }));
+  write("bad-phone.json", JSON.stringify({ to: "+15555559999" }));
   write("bad-email.json", JSON.stringify({ email: "someone@gmail.com" }));
   write("bad-key.json", JSON.stringify({ auth: ["sk_", "live_", "0123456789abcdef"].join("") }));
   write("bad-bearer.json", JSON.stringify({ header: "Bearer abcdefgh01234567" }));
   write("broken.json", "{not json");
-  write("own-line.json", JSON.stringify({ from: "+12055550100", line: "+12055559999" }));
+  write("own-line.json", JSON.stringify({ from: "+12055550100", line: "+15555559999" }));
 });
 
 afterAll(() => {
@@ -87,12 +87,12 @@ describe("recorded-sample loader", () => {
   });
 
   it("lets the caller allow an exact value, such as Rosie's own line, and nothing near it", () => {
-    expect(loadRecordedSample(dir, "own-line.json", { allow: ["+12055550100", "+12055559999"] })).toEqual({
+    expect(loadRecordedSample(dir, "own-line.json", { allow: ["+12055550100", "+15555559999"] })).toEqual({
       from: "+12055550100",
-      line: "+12055559999",
+      line: "+15555559999",
     });
     expect(
-      problemsOf(() => loadRecordedSample(dir, "bad-phone.json", { allow: ["+14155559998"] })),
+      problemsOf(() => loadRecordedSample(dir, "bad-phone.json", { allow: ["+15555559998"] })),
     ).toHaveLength(1);
   });
 

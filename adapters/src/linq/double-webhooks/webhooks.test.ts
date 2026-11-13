@@ -360,7 +360,7 @@ describe("a request the double cannot sign names a label, never a value", () => 
   it.each([
     [
       "a number that is not fictional",
-      { handle: { kind: "phone" as const, address: "+14155551234" } },
+      { handle: { kind: "phone" as const, address: "+15555551234" } },
       null,
       "notFictionalPhone",
     ],
@@ -432,7 +432,7 @@ describe("a request the double cannot sign names a label, never a value", () => 
     await expect(
       createLinqWebhookDouble({ secret: "not-a-secret" }).sign({ event: text, partKey: null }),
     ).rejects.toThrow();
-    expect(() => createLinqWebhookDouble({ secret: SECRET, rosieLine: "+14155551234" })).toThrow(
+    expect(() => createLinqWebhookDouble({ secret: SECRET, rosieLine: "+15555551234" })).toThrow(
       LinqDoubleWebhookError,
     );
   });

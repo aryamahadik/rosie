@@ -8,7 +8,8 @@
 // glued-shape tests plant (T-1332): a number right after an escape's letter or a URL-encoded character, or a
 // separated one right before a letter, and the cases T-1304's reader keeps unread. And every number T-1344's tests
 // plant: after a whole \u or \x escape or an escaped plus, a 1 and a separator before ten digits right before a
-// letter, groups split by URL-encoded separators, and what stays unread.
+// letter, groups split by URL-encoded separators, and what stays unread. And every number T-1359's tests read: a 555
+// line and a wrong length's first digits in each area code, and a fiction-block line in each toll-free area code.
 
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -18,7 +19,9 @@ import { describe, it } from "node:test";
 
 import { EXCEPTIONS, PUBLIC_LINES } from "./phone-scan-exceptions.mjs";
 import {
+  FICTIONAL_PHONE,
   OFCOM_DRAMA,
+  TOLL_FREE_AREA_CODES,
   isFiction,
   listedNumber,
   phoneNumbersIn,
@@ -40,15 +43,9 @@ const PUBLIC_LINE_FILES =
 /** Nevada's area codes: 702, its overlay 725, and 775. A 555 line there is never of the kind "555 exchange". */
 const NEVADA_AREA_CODES = new Set(["702", "725", "775"]);
 
-/**
- * The toll-free area codes, where exchange 555 is not reserved (Wikipedia, 555 (North American Numbering Plan)): 800,
- * 833, 844, 855, 866, 877 and 888 in use, and 822, 880 to 887 and 889 kept for toll-free's growth (Wikipedia,
- * Toll-free telephone number). A 555 line there is never of the kind "555 exchange" (T-1317's verify note a).
- */
-const TOLL_FREE_AREA_CODES = new Set([
-  ...["800", "833", "844", "855", "866", "877", "888"],
-  ...["822", "880", "881", "882", "883", "884", "885", "886", "887", "889"],
-]);
+// The toll-free area codes, TOLL_FREE_AREA_CODES, are phone-scan.mjs's since T-1359: FICTIONAL_PHONE refuses a
+// 555-01xx line there, where 555 is not reserved. A 555 line there is never of the kind "555 exchange" (T-1317's
+// verify note a), nor its first digits of the kind "wrong length".
 
 /** The 555 exchange's directory-assistance line, built from its parts so this file never writes it whole. */
 const DIRECTORY_ASSISTANCE_LINE = "12".repeat(2);
@@ -70,31 +67,42 @@ const PAST_BLOCK = "0200";
 /** Ten digits in a row: area code and exchange 555, then the line. */
 const ten = (line) => `${FIVES}${FIVES}${line}`;
 
+/**
+ * "wrong length"'s two shapes after +1 (T-1359): the first digits of a fiction-block number that only a fiction
+ * number, or one under area code 555 (no area), begins with. Area code 555 and exchange 555, alone or with the line's
+ * 01 and one more digit or none; or another area code, exchange 555 and the line's 01, with one more digit or none,
+ * a fiction-block prefix only where FICTIONAL_PHONE takes that area code.
+ */
+const PREFIX_UNDER_555 = /^555555(?:01[0-9]?)?$/;
+const PREFIX_WITH_01 = /^[0-9]{3}55501[0-9]?$/;
+
 /** Whether a listed number (E.164) is of its entry's kind, so it can be no one's line. */
 function ofKind(kind, number) {
   const digits = number.slice(1);
   const northAmerican = digits.startsWith("1") && digits.length === 11;
   if (kind === "impossible code") return northAmerican && (/[01]/.test(digits[1]) || /[01]/.test(digits[4]));
   if (kind === "555 exchange") {
-    // Never the directory-assistance line, and never in a Nevada area code (the security review's note d, DL-632).
-    // Never the national-use line, and never in a toll-free area code, where 555 is not reserved (T-1317's verify
-    // note a, T-1344).
-    const area = digits.slice(1, 4);
+    // Area code 555 only, which serves no area: in a real area code a 555 line outside the fiction block may be a
+    // person's since NANPA's 2016 change (T-1344's security note a, T-1359), so never in a Nevada area code (the
+    // security review's note d, DL-632) or a toll-free one (T-1317's verify note a, T-1344) either. Never the
+    // directory-assistance line (DL-632) or the national-use line (T-1344).
     const line = digits.slice(7);
     return (
       northAmerican &&
-      /[2-9]/.test(digits[1]) &&
-      digits.slice(4, 7) === "555" &&
+      digits.slice(1, 7) === `${FIVES}${FIVES}` &&
       line !== DIRECTORY_ASSISTANCE_LINE &&
-      line !== NATIONAL_USE_LINE &&
-      !NEVADA_AREA_CODES.has(area) &&
-      !TOLL_FREE_AREA_CODES.has(area)
+      line !== NATIONAL_USE_LINE
     );
   }
   if (kind === "wrong length") {
-    // Fewer than ten digits after +1, and never seven: a local number's length, which an area code could complete
-    // (DL-636). Never more than ten: a real number with a digit added (T-1317's verify note a, T-1344).
-    return digits.startsWith("1") && digits.length < 11 && digits.length !== 8;
+    // The first 6, 8 or 9 digits after +1 of a fiction-block number, so only a fiction number, or one under area
+    // code 555, begins with them: never a real number's first digits (DL-636's reason, T-1359). So never seven, a
+    // local number's length, which an area code could complete (DL-636), and never ten or more, a real number or one
+    // with a digit added (T-1317's verify note a, T-1344).
+    const after = digits.slice(1);
+    if (!digits.startsWith("1")) return false;
+    if (PREFIX_UNDER_555.test(after)) return true;
+    return PREFIX_WITH_01.test(after) && FICTIONAL_PHONE.test(`+1${after.padEnd(10, "0")}`);
   }
   if (kind === "public line") return PUBLIC_NUMBERS.has(number);
   return kind === "not a phone number";
@@ -210,14 +218,16 @@ describe("the phone scan of every tracked file (T-1317)", () => {
       assert.ok(!ofKind(kind, ordinary), `${kind} refuses an ordinary number`);
     }
     // The 555 exchange refuses the directory-assistance line in any area code, and any line in Nevada's area codes
-    // (DL-632), while the same line in another area code stays of its kind. Each built here from its parts.
+    // (DL-632). Another line stays of its kind in area code 555 only (T-1359; until T-1359 it stayed of its kind in
+    // area code 222 too, which this loop asserted). Each built here from its parts.
     const exchange = "5".repeat(3);
     const otherLine = "0200";
     for (const area of ["2".repeat(3), exchange]) {
       const directory = `+1${area}${exchange}${DIRECTORY_ASSISTANCE_LINE}`;
       assert.ok(!ofKind("555 exchange", directory), `the directory-assistance line in area code ${area}`);
-      assert.ok(
+      assert.equal(
         ofKind("555 exchange", `+1${area}${exchange}${otherLine}`),
+        area === exchange,
         `another 555 line in area code ${area}`,
       );
     }
@@ -240,28 +250,31 @@ describe("the phone scan of every tracked file (T-1317)", () => {
     // one whole; then read as the entries' check reads it.
     const listed = (...groups) => listedNumber(`+1_${groups.join("_")}`);
     const other = "2".repeat(3);
-    // The national-use line, in area code 555 and in another one, while another line there stays of the kind.
+    // The national-use line, in area code 555 and in another one, while another line stays of the kind in area code
+    // 555 only (T-1359; until T-1359 it stayed of the kind in the other area code too, which this loop asserted).
     for (const area of [FIVES, other]) {
       assert.ok(
         !ofKind("555 exchange", listed(area, FIVES, NATIONAL_USE_LINE)),
         `the national-use line in ${area}`,
       );
-      assert.ok(
+      assert.equal(
         ofKind("555 exchange", listed(area, FIVES, PAST_BLOCK)),
+        area === FIVES,
         `another 555 line in area code ${area}`,
       );
     }
     // A 555 line in every toll-free area code, in use or kept for it: 555 is not reserved there.
-    assert.equal(TOLL_FREE_AREA_CODES.size, 17);
+    assert.equal(TOLL_FREE_AREA_CODES.length, 17);
     for (const area of TOLL_FREE_AREA_CODES) {
       assert.ok(!ofKind("555 exchange", listed(area, FIVES, PAST_BLOCK)), `a 555 line in area code ${area}`);
     }
-    // More than ten digits after +1: eleven, twelve and fifteen. Nine stay of the kind.
+    // More than ten digits after +1: eleven, twelve and fifteen. Nine stay of the kind when they begin a fiction-block
+    // number (T-1359; until T-1359 this line asserted it of nine past the block, which T-1359 refuses).
     for (const added of ["0", "00", "0".repeat(5)]) {
       const number = listed(FIVES, FIVES, PAST_BLOCK, added);
       assert.ok(!ofKind("wrong length", number), `${number.length - 2} digits after +1`);
     }
-    assert.ok(ofKind("wrong length", listed(FIVES, FIVES, PAST_BLOCK.slice(1))), "nine digits after +1");
+    assert.ok(ofKind("wrong length", listed(FIVES, FIVES, IN_BLOCK.slice(0, 3))), "nine digits after +1");
   });
 });
 
@@ -523,5 +536,97 @@ describe("the phone scan's last unread shapes: \\u and \\x escapes, a 1 and ten 
     for (const plus of ["\\u002B", "\\u002b", "\\x2B", "\\x2b"]) {
       assert.deepEqual(phoneNumbersIn(`"to ${plus}${ten(PAST_BLOCK)}"`), [`+${ten(PAST_BLOCK)}`], plus);
     }
+  });
+});
+
+describe("no listed 555 line in a real area code, a wrong length only a fiction-block prefix, no toll-free fiction (T-1359)", () => {
+  // Since NANPA's 2016 change a 555 line outside the fiction block in a real area code may be a person's (T-1344's
+  // security note a), while area code 555 serves no area. Every area code the plan may give, 200 to 999, is built
+  // here, and every number below from its parts when the test runs, so this file holds none of them whole.
+  const AREA_CODES = Array.from({ length: 800 }, (_, i) => String(200 + i));
+  /** A number as an entry lists it, with underscores, then read as the entries' check reads it. */
+  const listed = (...groups) => listedNumber(`+1_${groups.join("_")}`);
+
+  it("takes a 555 exchange entry under area code 555 only, and refuses one in every other area code", () => {
+    // The lines of T-1359's moved entries and the planted one: each of the kind under area code 555 only.
+    for (const area of AREA_CODES) {
+      for (const line of [PAST_BLOCK, "1234", "9998", "9999"]) {
+        assert.equal(
+          ofKind("555 exchange", listed(area, FIVES, line)),
+          area === FIVES,
+          `a 555 line in area code ${area}`,
+        );
+      }
+    }
+  });
+
+  it("takes as a wrong length only the first 6, 8 or 9 digits of a fiction-block number, never a real number's", () => {
+    // Under area code 555 and exchange 555: six digits, then the line's 01, then one more digit.
+    assert.ok(ofKind("wrong length", listed(FIVES, FIVES)), "six digits under area code 555");
+    assert.ok(ofKind("wrong length", listed(FIVES, FIVES, "01")), "eight digits under area code 555");
+    assert.ok(
+      ofKind("wrong length", listed(FIVES, FIVES, IN_BLOCK.slice(0, 3))),
+      "nine digits under area code 555",
+    );
+    // Seven, the block's own first seven too, is a local number's length, which an area code could complete
+    // (DL-636).
+    assert.ok(!ofKind("wrong length", listed(FIVES, FIVES, "0")), "seven digits");
+    for (const area of AREA_CODES) {
+      // Six digits: in a real area code, a person's line may begin with them.
+      assert.equal(
+        ofKind("wrong length", listed(area, FIVES)),
+        area === FIVES,
+        `six digits in area code ${area}`,
+      );
+      // Eight or nine with the line's 01: only a fiction-block number begins with them, where the fiction range
+      // takes the area code (never a toll-free one).
+      const fiction = !TOLL_FREE_AREA_CODES.includes(area);
+      assert.equal(
+        ofKind("wrong length", listed(area, FIVES, "01")),
+        fiction,
+        `eight digits in area code ${area}`,
+      );
+      assert.equal(
+        ofKind("wrong length", listed(area, FIVES, IN_BLOCK.slice(0, 3))),
+        fiction,
+        `nine digits in area code ${area}`,
+      );
+      // Before the block, past it, or in another exchange: never.
+      for (const first of ["00", "02", PAST_BLOCK.slice(0, 3), "1".repeat(3)]) {
+        assert.ok(
+          !ofKind("wrong length", listed(area, FIVES, first)),
+          `area code ${area}, exchange 555, ${first}`,
+        );
+      }
+      assert.ok(
+        !ofKind("wrong length", listed(area, "2".repeat(3), "01")),
+        `area code ${area}, another exchange`,
+      );
+    }
+  });
+
+  it("reads a 555-01xx line in a toll-free area code as no fiction: a planted one fails, by file and line only", (t) => {
+    assert.equal(TOLL_FREE_AREA_CODES.length, 17);
+    assert.ok(Object.isFrozen(TOLL_FREE_AREA_CODES), "the toll-free list cannot change at run time");
+    for (const area of AREA_CODES) {
+      const fiction = !TOLL_FREE_AREA_CODES.includes(area);
+      for (const line of ["0100", IN_BLOCK, "0199"]) {
+        const number = `+1${area}${FIVES}${line}`;
+        assert.equal(FICTIONAL_PHONE.test(number), fiction, `the fiction block in area code ${area}`);
+        assert.equal(isFiction(number), fiction, `the fiction block in area code ${area}`);
+      }
+    }
+    // The fiction line in each toll-free area code, written two ways, fails; the same line under area code 555 passes.
+    const written = (area) => `Call +1 ${area} ${FIVES} ${IN_BLOCK} or 1-${area}-${FIVES}-${IN_BLOCK}.`;
+    const { root } = repository(t, {
+      "fiction.md": `${written(FIVES)}\n`,
+      "toll-free.md": `${TOLL_FREE_AREA_CODES.map(written).join("\n")}\n`,
+    });
+    const { hits } = scanRepository(root);
+    assert.deepEqual(
+      hits,
+      TOLL_FREE_AREA_CODES.map((_, i) => `toll-free.md:${i + 1}`),
+    );
+    for (const hit of hits) assert.doesNotMatch(hit, /[0-9]{4}/, "a hit names no number");
   });
 });
