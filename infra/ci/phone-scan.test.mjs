@@ -326,9 +326,9 @@ describe("the phone scan on planted lines (T-1317)", () => {
 });
 
 describe("the phone scan of a number glued to a letter (T-1332)", () => {
-  // Each shape T-1332 reads (T-1317's security note b): a number right after the letter of an escape or of a
-  // URL-encoded character, and a separated North American number right before a letter. Each is written as a file
-  // would hold it, around a line under area code and exchange 555.
+  // Each shape T-1332 reads (T-1317's security note b): a number right after an escape or a URL-encoded character,
+  // whose last letter or digit ends no word, and a separated North American number right before a letter. Each is
+  // written as a file would hold it, around a line under area code and exchange 555.
   const GLUED = {
     "the + form after an escaped newline in JSON": (line) => `{"text": "Call us\\n+1${ten(line)}"}`,
     "the + form with spaces after an escaped tab": (line) => `"name\\t+1 ${FIVES} ${FIVES} ${line}"`,
