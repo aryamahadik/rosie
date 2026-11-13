@@ -10,6 +10,11 @@ import path from "node:path";
 import { describe, it } from "node:test";
 import { isDeepStrictEqual } from "node:util";
 
+// The shapes T-1304's scanner reads a number in, and its reader, as phone-scan.mjs holds them since T-1317 (DL-620):
+// a + and 7 to 15 digits, with spaces, dots, dashes or brackets between them; or a North American number without
+// the +: an area code (bracketed or not), an exchange and a line, with a 1 or none. Neither shape crosses a line
+// break, so reading a whole file finds what reading it line by line finds.
+import { NANP_FORM, PLUS_FORM, phoneNumbersIn } from "./phone-scan.mjs";
 import { REPO } from "./script-harness.mjs";
 
 const WANTED = ["rosfield.com/test", "rosfield.com/test/*"];
@@ -23,24 +28,9 @@ const PLACEHOLDER_LINE = 9;
 // A number in the fiction range (+1, an area code, then 555-0100 to 555-0199), written as the old line wrote its own.
 const FICTION_NUMBER = "+1 (555) 555-0142";
 
-// The shapes T-1304's scanner reads a number in, as infra/ci/wrangler-env.test.mjs writes them (copied, since that
-// file exports nothing): a + and 7 to 15 digits, with spaces, dots, dashes or brackets between them; or a North
-// American number without the +: an area code (bracketed or not), an exchange and a line, with a 1 or none. Neither
-// shape crosses a line break, so reading a whole file finds what reading it line by line finds.
-const PLUS_FORM = /(?<![0-9A-Za-z])\+[1-9](?:[ ().-]{0,2}[0-9]){6,14}(?![0-9])/g;
-const NANP_FORM =
-  /(?<![0-9A-Za-z+])(?:1[ .-]?)?(?:\([2-9][0-9]{2}\)|[2-9][0-9]{2})[ .-]?[2-9][0-9]{2}[ .-]?[0-9]{4}(?![0-9A-Za-z])/g;
 // An SVG path's d attribute: drawing coordinates, never a number to call. The site's wordmark path in assets/_,
 // _privacy and _terms holds digit runs these shapes read (T-1317 round 1: not a phone number).
 const PATH_DATA = /<path\b[^>]*?\sd="([^"]*)"/g;
-
-/** Every phone number a line holds, each once, in E.164 form, as T-1304's scanner reads them. */
-function phoneNumbersIn(line) {
-  const numbers = new Set();
-  for (const [match] of line.matchAll(PLUS_FORM)) numbers.add(`+${match.replace(/[^0-9]/g, "")}`);
-  for (const [match] of line.matchAll(NANP_FORM)) numbers.add(`+1${match.replace(/[^0-9]/g, "").slice(-10)}`);
-  return [...numbers];
-}
 
 /** "<file>:<line>" for each line of the files (name to text) holding a number outside path data, never the number. */
 function numberPlaces(files) {

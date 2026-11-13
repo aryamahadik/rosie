@@ -9,6 +9,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
 
+import { outsideFiction, phoneNumbersIn } from "./phone-scan.mjs";
 import { REPO, SCRIPTS } from "./script-harness.mjs";
 
 const ROSFIELD_ACCOUNT_ID = "ecb06e7bc9129fa81104d331e9652362";
@@ -294,34 +295,8 @@ describe("env.production checks catch a broken copy", () => {
 // the repository is public (DL-436) and no real phone number goes in it. So no section of wrangler.jsonc names
 // ROSIE_NUMBER, and no line of wrangler.jsonc, package.json or any infra/scripts file holds a phone number outside
 // the fiction range: +1, an area code, then 555-0100 to 555-0199, as adapters/src/shared/samples.ts and the Linq
-// double read it.
-const FICTIONAL_PHONE = /^\+1[2-9][0-9]{2}55501[0-9]{2}$/;
-// The ways a number is written: a + and 7 to 15 digits, with spaces, dots, dashes or brackets between them; or a
-// North American number without the +: an area code (bracketed or not), an exchange and a line, with a 1 or none.
-const PLUS_FORM = /(?<![0-9A-Za-z])\+[1-9](?:[ ().-]{0,2}[0-9]){6,14}(?![0-9])/g;
-const NANP_FORM =
-  /(?<![0-9A-Za-z+])(?:1[ .-]?)?(?:\([2-9][0-9]{2}\)|[2-9][0-9]{2})[ .-]?[2-9][0-9]{2}[ .-]?[0-9]{4}(?![0-9A-Za-z])/g;
-
-/** Every phone number a line holds, each once, in E.164 form. */
-function phoneNumbersIn(line) {
-  const numbers = new Set();
-  for (const [match] of line.matchAll(PLUS_FORM)) numbers.add(`+${match.replace(/[^0-9]/g, "")}`);
-  for (const [match] of line.matchAll(NANP_FORM)) numbers.add(`+1${match.replace(/[^0-9]/g, "").slice(-10)}`);
-  return [...numbers];
-}
-
-/** "<file>:<line>" for each line of the files (name to text) that holds a number outside the fiction range. */
-function outsideFiction(files) {
-  const found = [];
-  for (const [name, text] of Object.entries(files)) {
-    text.split("\n").forEach((line, index) => {
-      if (phoneNumbersIn(line).some((number) => !FICTIONAL_PHONE.test(number)))
-        found.push(`${name}:${index + 1}`);
-    });
-  }
-  return found;
-}
-
+// double read it. The number reader (phoneNumbersIn, outsideFiction) is phone-scan.mjs's since T-1317, whose
+// phone-scan.test.mjs reads every tracked file with it.
 describe("Rosie's own number in no tracked config (T-1304)", () => {
   it("is named in no section of wrangler.jsonc: no var and no secret, at the top level or in either environment", () => {
     for (const [where, section] of [
