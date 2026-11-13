@@ -3,17 +3,20 @@
 // bundle v0, then the replies; the shared core and its rows are fakes answering as K-09 v1 and v1.1 and K-05 v1 state
 // (./test-support.ts), and the rows the replies write go through the real dispatcher and limit 8 (T-257, T-259, T-1099;
 // imported read-only) to the dispatcher's own Linq fake. The hard invariant is also run through limit 8's own decision
-// function. Names are the master's sample cast; phones are 555-01xx, Rosie's line +1 555-555-0199 (rule 9). New York is on
+// function. A vote is scrubbed and sealed by the gateway's own hand-off and opened from its box, as the turn opens it
+// (T-1338). Names are the master's sample cast; phones are 555-01xx, Rosie's line +1 555-555-0199 (rule 9). New York is on
 // EDT (UTC-4) until 2026-11-01: 16:40Z is 12:40pm, inside every text hour.
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 
 import writePlanSafety from "../../../../contracts/data-access/fixtures/write-plan-alex-safety.json";
+import pollVote from "../../../../contracts/inbound-event/fixtures/poll-vote.json";
 import sendOverrideOptout from "../../../../contracts/port-linq/fixtures/send-override-optout.json";
 import stopTellsBusinesses from "../../../../contracts/tool-api/fixtures/j3-stop-tells-businesses.json";
 import startRecorded from "../../../../contracts/tool-api/fixtures/start-recorded.json";
 import stopRecorded from "../../../../contracts/tool-api/fixtures/stop-recorded.json";
 import fixedLinesFixture from "../../../../contracts/bundle/fixtures/fixed-lines.json";
 import type { Manifest } from "../../bundle";
+import { BUNDLE_A } from "../../bundle/test-support";
 import { runDispatch } from "../../dispatch";
 import { decideLimit8 } from "../../dispatch/limit8";
 import {
@@ -27,6 +30,8 @@ import {
   type SeedRow,
 } from "../../dispatch/test-support";
 import type { ChatTarget, ClaimedRow, LinqSendRequest, SendState } from "../../dispatch/types";
+import { actorNameOf, openWords, prepareHandoff, wordsOfEvent } from "../../gateway";
+import { fakeKeyStore } from "../../gateway/test-support";
 import type { Span } from "../../trace";
 import { guardTurn } from "../guard";
 import type { GuardText } from "../types";
@@ -505,6 +510,151 @@ describe("START clears the stopped flag for every business and gets one reply", 
     const [startReply] = linq.requests;
     expect(startReply).toMatchObject({ text: Q01_DRAFTED.startReply, overrideOptout: false });
     expect(Q01_DRAFTED.startReply).toMatch(/back on, for every business/u);
+  });
+});
+
+describe("a vote's STOP or START keeps its option's words as the consent row's exact words (T-1338; K-29)", () => {
+  const keys = fakeKeyStore();
+
+  /**
+   * A vote from this phone, for an option of these words, as the turn reads it: K-06's poll-vote.json scrubbed and sealed
+   * by the gateway's own hand-off (K-06 v1.2: the option's words in its form 2 box, none in the clear), then opened from
+   * its box by its form (`openWords`, `wordsOfEvent`), as the turn and the PostgreSQL-down path open a stored text.
+   */
+  async function boxedVote(who: FakePhone, eventId: string, optionWords: string): Promise<GuardText> {
+    const handle = { kind: "phone", address: who.number };
+    const prepared = await prepareHandoff(
+      {
+        event: {
+          ...pollVote,
+          eventId,
+          handle,
+          traceId: `trace-${eventId}`,
+          poll: { ...pollVote.poll, optionWords },
+        },
+        partKey: null,
+        traceId: `trace-${eventId}`,
+        bundleId: BUNDLE_A,
+      },
+      keys,
+    );
+    if (prepared.door !== "actor") throw new Error("not an actor event");
+    const stored = prepared.handoff.event;
+    expect(stored.poll).toEqual({ pollId: pollVote.poll.pollId, optionId: pollVote.poll.optionId });
+    if (stored.sealed?.v !== 2) throw new Error("the vote has no form 2 box");
+    const box = await openWords(
+      stored.sealed,
+      await keys.getOrCreateKey(handle),
+      actorNameOf(handle),
+      eventId,
+    );
+    return { eventId, kind: stored.kind, words: wordsOfEvent(stored, box) };
+  }
+
+  /** The words of each recordStopOrStart the core was asked for, in order. */
+  const recordedWords = (fake: FakeCore): string[] =>
+    fake.commits
+      .flatMap((commit) => commit.actions)
+      .flatMap((action) => (action.call === "recordStopOrStart" ? [action.request.words] : []));
+
+  it("a vote for an option that reads STOP commits stop-recorded.json's recordStopOrStart with the option's words, not the list's word", async () => {
+    const fake = fakeCore(stopRecorded.given.now, [ben()]);
+    fake.ids.set("turn-ben-stop", { consent: "consent-ben-stop", reply: "out-ben-stop-reply" });
+    wire(fake);
+    const vote = await boxedVote(ben(), "evt-ben-0007", "Stop!");
+
+    const { result } = await turn(ben(), "turn-ben-stop", [vote], { traceId: "trace-ben-0007" });
+
+    // The fixture's one core action under the turn's caller, but for its words: the option's as the person chose it,
+    // where the fixture's typed STOP keeps its own "STOP".
+    const [, stopAction] = stopRecorded.request.core;
+    expect(stopAction?.request).toMatchObject({ kind: "stop", words: "STOP" });
+    expect(fake.commits).toEqual([
+      {
+        caller: stopRecorded.request.caller,
+        actions: [{ ...stopAction, request: { ...stopAction?.request, words: "Stop!" } }],
+      },
+    ]);
+    expect(
+      result.replies.map((reply) => [reply.text.kind, reply.keyword.word, reply.outcome, reply.stopped]),
+    ).toEqual([["pollVote", "STOP", "replied", true]]);
+    // K-29: the row that withdraws texts keeps the option's words as its exact words.
+    expect(fake.consents.map((consent) => [consent.id, consent.revoked, consent.exactWords])).toEqual([
+      ["consent-ben-stop", true, "Stop!"],
+    ]);
+  });
+
+  it("a vote for an option that reads START commits start-recorded.json's START, in its turn, with the option's words", async () => {
+    const fake = fakeCore(stopRecorded.given.now, [ben()]);
+    wire(fake);
+    await turn(ben(), "turn-ben-stop", [typed("evt-ben-0007", "STOP")]);
+    fake.now = startRecorded.given.now;
+    const vote = await boxedVote(ben(), "evt-ben-0011", "start");
+
+    const { result } = await turn(ben(), "turn-ben-start", [vote], { traceId: "trace-ben-0011" });
+
+    const caller: TurnCaller = {
+      kind: "turn",
+      turnId: "turn-ben-start",
+      requestId: "turn-ben-start",
+      businessId: null,
+      personId: "person-ben",
+      traceId: startRecorded.request.caller.traceId,
+    };
+    expect(startRecorded.request.words).toBe("START");
+    expect(fake.commits[1]).toEqual({
+      caller,
+      actions: [
+        {
+          call: "recordStopOrStart",
+          request: { ...startRecorded.request, caller, words: "start", sentByActor: null },
+        },
+      ],
+    });
+    expect(result.replies[0]).toMatchObject({ outcome: "replied", line: "startReply", stopped: false });
+    expect(fake.phones.get("+15555550131")).toMatchObject({ stopped: false, chatOpen: true });
+    expect(fake.consents.map((consent) => [consent.revoked, consent.exactWords])).toEqual([
+      [true, "STOP"],
+      [false, "start"],
+    ]);
+  });
+
+  it("a vote for CANCELAR keeps the option's words and still flags the visit (RULES 7.4)", async () => {
+    const fake = fakeCore(stopTellsBusinesses.given.now, [alex()]);
+    wire(fake);
+    const vote = await boxedVote(alex(), "evt-alex-0291", "¡Cancelar!");
+
+    await turn(alex(), "turn-alex-vote-cancelar", [vote]);
+
+    expect(fake.commits[0]?.actions).toMatchObject([
+      {
+        call: "recordStopOrStart",
+        request: {
+          kind: "stop",
+          inboundEventId: "evt-alex-0291",
+          words: "¡Cancelar!",
+          alsoCancelVisit: true,
+        },
+      },
+    ]);
+    expect(fake.consents.map((consent) => consent.exactWords)).toEqual(["¡Cancelar!"]);
+  });
+
+  it("a typed STOP keeps its body, and an email's STOP in its subject alone keeps the subject, as before", async () => {
+    const fake = fakeCore(stopTellsBusinesses.given.now, [alex(), ben()]);
+    wire(fake);
+    // An email's words as its form 2 box opens them: a body with no word in it, the STOP in the subject.
+    const email: GuardText = {
+      eventId: "evt-alex-0292",
+      kind: "text",
+      words: { body: "\n", subject: "Stop.", optionWords: null },
+    };
+
+    await turn(ben(), "turn-ben-typed-stop", [typed("evt-ben-0292", "stop!")]);
+    await turn(alex(), "turn-alex-subject-stop", [email]);
+
+    expect(recordedWords(fake)).toEqual(["stop!", "Stop."]);
+    expect(fake.consents.map((consent) => consent.exactWords)).toEqual(["stop!", "Stop."]);
   });
 });
 

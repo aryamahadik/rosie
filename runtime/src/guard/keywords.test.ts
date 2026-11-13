@@ -227,7 +227,7 @@ describe("only typed words count", () => {
     expect(keywordOf(typed("", "photo"), list)).toBeNull();
   });
 
-  it("a reaction, a poll vote and a vote removed are never keywords (a vote answers its own poll)", () => {
+  it("a vote's body is never read for a keyword (DL-540: a vote is read by its option's words), and a reaction or a vote taken back is never a keyword", () => {
     for (const kind of ["reaction", "pollVote", "voteRemoved"]) {
       const text: GuardText = { eventId: `evt-${kind}`, kind, words: { body: "STOP", subject: null } };
       expect(keywordOf(text, list), kind).toBeNull();
