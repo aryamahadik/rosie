@@ -2,9 +2,52 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 565, [`9aeeba0`](https://github.com/aryamahadik/rosie/commit/9aeeba0), 2026-11-13 17:01:32 UTC.
+- **Through:** commit 567, [`1a97661`](https://github.com/aryamahadik/rosie/commit/1a97661), 2026-11-13 17:26:36 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 567. docs: COMMIT\_HISTORY.md through commit 565 (9aeeba0, \#573) (\#575)
+
+- **Commit:** [`1a97661`](https://github.com/aryamahadik/rosie/commit/1a97661), by Arya Mahadik, 2026-11-13 17:26:36 UTC
+- **Pull request:** [#575](https://github.com/aryamahadik/rosie/pull/575) from `task/commit-history-89`, merged 2026-11-13 17:26:36 UTC. It squashed 1 branch commit:
+  - `985c0e9` docs: COMMIT\_HISTORY.md through commit 565 (9aeeba0, \#573)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 566. T-1363: the root's two missing ports for the PostgreSQL-down path, closed on staging and in production, faked in tests (\#574)
+
+- **Commit:** [`d3fac27`](https://github.com/aryamahadik/rosie/commit/d3fac27), by Arya Mahadik, 2026-11-13 17:26:32 UTC
+- **Pull request:** [#574](https://github.com/aryamahadik/rosie/pull/574) from `task/T-1363`, merged 2026-11-13 17:26:32 UTC. It squashed 2 branch commits:
+  - `ff7a582` T-1363: the root's two ports for the PostgreSQL-down path, stopOrStar…
+  - `25eac48` T-1363: ports.ts says the down path's probe is read over the bundles …
+- **Files changed:** 6 (+460 −24), by folder:
+  - `runtime/src/wiring/` bind.ts +37 −19, closed.ts +7 −0, down-path-ports.worker.test.ts +255 −0, picks.ts +20 −2, ports.ts +42 −3, test-support.ts +99 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1363: the root's two ports for the PostgreSQL-down path, stopOrStart (K-09 recordStopOrStart for the actorOnReturn caller) and timerFire (TimerFirePort fireFromCopy), kept apart from D-017's twenty-one (DOWN_PATH_PORTS, DOWN_PATH_PICKS, BoundPorts.downPathBindings): fakes in a test root (fakeStopOrStart keeps each request and hands it to the action layer's recordStopOrStart where the test root holds one, refusing with nothing written while it holds none; fakeTimerFire keeps each fire as handed), closed on staging and in production (NotJoinedError naming the port: nothing recorded, nothing fired, no sealed address opened, CQ-101 (c)); nothing joined (T-1326 round 2). down-path-ports.worker.test.ts proves it; every existing wiring test unchanged
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1363: ports.ts says the down path's probe is read over the bundles port's readActiveBundle
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 565. docs: COMMIT\_HISTORY.md through commit 563 (89cc67b, \#571) (\#573)
 
