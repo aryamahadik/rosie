@@ -21,6 +21,7 @@ import {
   releaseRoot,
   v0WithBuild,
 } from "./release-harness.mjs";
+import { cleanEnv } from "./script-harness.mjs";
 
 const SHA = "5690000000000000000000000000000000000569";
 const LIVE = "00000000-0000-4000-8000-000000000569";
@@ -223,7 +224,8 @@ describe("deploy-staging.sh: steps 3 and 4", () => {
 // checkout's .dev.vars. These deploys run without STAGING_DATABASE_URL (steps 1, 3 and 4 are skipped), so they need
 // no database. Every number is a fiction-range one (+1 555 555-01xx), and no deploy's output may hold it. The wrangler
 // and curl stand-ins also note when ROSIE_NUMBER is in their environment, which the script empties before any command
-// runs, so only the deploy's arguments carry it.
+// of the deploy runs, so only the deploy's arguments carry it. DL-581 adds two: cleanEnv drops this shell's
+// ROSIE_NUMBER, and no trace a caller turns on prints the number.
 describe("deploy-staging.sh: Rosie's own number, ROSIE_NUMBER (T-1304)", () => {
   const NUMBER = "+15555550142";
   const GIVEN =
@@ -378,6 +380,88 @@ describe("deploy-staging.sh: Rosie's own number, ROSIE_NUMBER (T-1304)", () => {
     assert.deepEqual(numberLines(result.stdout), [MALFORMED]);
     assertNotPrinted(result, `${NUMBER} # Rosie's line`, "a commented .dev.vars line");
     assert.deepEqual([...rig.noted(), ...commented.noted()], []);
+  });
+
+  it("cleanEnv drops ROSIE_NUMBER: a deploy test that gives no number of its own never takes this shell's (DL-581)", (t) => {
+    // This process's own value, if any, is kept aside and put back unread: it may be Rosie's real number.
+    const had = Object.hasOwn(process.env, "ROSIE_NUMBER");
+    const kept = process.env.ROSIE_NUMBER;
+    process.env.ROSIE_NUMBER = NUMBER;
+    try {
+      const rig = rigOf(t);
+      const home = path.join(rig.dir, "home");
+      assert.equal(Object.hasOwn(cleanEnv(home), "ROSIE_NUMBER"), false, "cleanEnv kept ROSIE_NUMBER");
+      assert.equal(
+        cleanEnv(home, { ROSIE_NUMBER: NUMBER }).ROSIE_NUMBER,
+        NUMBER,
+        "a test still gives one by name",
+      );
+      const result = rig.deploy({});
+      assert.equal(result.status, 0, result.output);
+      assert.deepEqual(deployVars(result.calls), [`GIT_SHA:${SHA}`], "the deploy took this shell's number");
+      assert.deepEqual(numberLines(result.stdout), [MISSING]);
+      assert.deepEqual(rig.noted(), []);
+    } finally {
+      if (had) process.env.ROSIE_NUMBER = kept;
+      else delete process.env.ROSIE_NUMBER;
+    }
+  });
+
+  it("tracing from the caller (bash -x, xtrace handed down in SHELLOPTS, or a BASH_ENV that turns it on) never prints the number: the script switches it off first (DL-581)", (t) => {
+    // The stand-ins are bash scripts, as the real wrangler and curl are not: under BASH_ENV each would trace its own exec
+    // line, the deploy's arguments with it. So here they switch tracing off first, and only what the scripts under test
+    // (deploy-staging.sh, cf.sh, post-deploy-check.sh) trace reaches the output.
+    const quiet = (rig) => {
+      for (const file of rig.standIns) {
+        const [shebang, ...rest] = readFileSync(file, "utf8").split("\n");
+        writeFileSync(file, [shebang, "set +x", ...rest].join("\n"));
+      }
+      // bash -x for the script alone: rig.deploy starts bash on a script, so this one starts the deploy under -x.
+      writeFileSync(
+        path.join(rig.root, "infra", "scripts", "traced-deploy.sh"),
+        '#!/usr/bin/env bash\nexec bash -x "$(dirname "${BASH_SOURCE[0]}")/deploy-staging.sh" "$@"\n',
+      );
+      const traceOn = path.join(rig.dir, "trace-on.sh");
+      writeFileSync(traceOn, "set -x\n");
+      return traceOn;
+    };
+    // [title, a .dev.vars text (undefined: none), the variables, whether the deploy starts under bash -x]
+    const cases = [
+      ["bash -x", undefined, { ROSIE_NUMBER: NUMBER }, true],
+      ["SHELLOPTS=xtrace", undefined, { ROSIE_NUMBER: NUMBER, SHELLOPTS: "xtrace" }, false],
+      ["BASH_ENV turning tracing on", undefined, { ROSIE_NUMBER: NUMBER }, false],
+      [
+        "SHELLOPTS=xtrace, the number from .dev.vars",
+        `ROSIE_NUMBER=${NUMBER}\n`,
+        { SHELLOPTS: "xtrace" },
+        false,
+      ],
+      ["bash -x, the number from .dev.vars", `export ROSIE_NUMBER='${NUMBER}'\n`, {}, true],
+    ];
+    for (const [what, devVars, extra, traced] of cases) {
+      const rig = rigOf(t, devVars);
+      const traceOn = quiet(rig);
+      const variables = what.startsWith("BASH_ENV") ? { ...extra, BASH_ENV: traceOn } : extra;
+      const from = rig.calls().length;
+      const result = rig.run(traced ? "traced-deploy.sh" : "deploy-staging.sh", [], {
+        ...DEPLOY_ENV,
+        ...variables,
+      });
+      const calls = rig.calls().slice(from);
+      assert.equal(result.status, 0, `${what}: exit ${String(result.status)}`);
+      assert.deepEqual(deployVars(calls), [`GIT_SHA:${SHA}`, `ROSIE_NUMBER:${NUMBER}`], what);
+      assert.deepEqual(numberLines(result.stdout), [GIVEN], what);
+      assertNotPrinted(result, NUMBER, what);
+      assert.ok(
+        result.stderr.startsWith("+ set +x\n"),
+        `${what}: the trace does not begin at the script's set +x`,
+      );
+      if (!what.startsWith("BASH_ENV")) {
+        // No child traces: bash -x is the script's own, and SHELLOPTS hands down the switch-off.
+        assert.equal(result.stderr, "+ set +x\n", `${what}: the trace went on after set +x`);
+      }
+      assert.deepEqual(rig.noted(), [], what);
+    }
   });
 
   it("a stand-in notes ROSIE_NUMBER when its environment holds it (the control for the checks above)", (t) => {

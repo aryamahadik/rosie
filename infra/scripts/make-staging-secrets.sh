@@ -3,19 +3,22 @@
 # prompt rule 7: keys are named, never shown):
 #   npm run secrets:staging:make   (bash infra/scripts/make-staging-secrets.sh [--env staging] [NAME ...])
 # The secrets on MADE below are staging's own: no vendor issues them and nobody is given them, so
-# put-staging-secrets.sh (npm run secrets:staging) finds no value for them in .dev.vars and prints them as missing.
-# This script makes them where they are used. It first asks staging which names it holds
-# (`wrangler secret list --env staging --format json`, through cf.sh: names only). Then, for each name in MADE below,
-# or only for the names given (each must be on that list), standard output gets one line, in the list's order, and
-# nothing else:
+# put-staging-secrets.sh (npm run secrets:staging) never puts one, whatever .dev.vars holds for it, and prints it as
+# made in place, never put (T-1261; DL-549). This script makes them where they are used. It first asks staging which
+# names it holds (`wrangler secret list --env staging --format json`, through cf.sh: names only). Then, for each name
+# in MADE below, or only for the names given (each must be on that list), standard output gets one line, in the list's
+# order, and nothing else:
 #   <NAME> already set
 #       staging holds the name. It is left exactly as it is: a secret is never replaced from here. Replacing the sealing
 #       key would orphan everything sealed under it, and replacing the proof-code hash key would void every live sign-in
 #       code and restart every contact's day count and pause (ADR-016 section 4); rotation is a task of its own, never
 #       this script's (DL-495; CQ-218).
-#   <NAME> has a value in .dev.vars: use secrets:staging
-#       staging does not hold the name, and this checkout's .dev.vars has a value for it (read as put-staging-secrets.sh
-#       reads it): that value is the one to put, with npm run secrets:staging. Nothing is made for the name.
+#   <NAME> has a value in .dev.vars, which is not used: the name is made in place, so remove its line from .dev.vars
+#       staging does not hold the name, and this checkout's .dev.vars has a value for it (read as lib.sh's load_dev_var
+#       reads a name). That value is never used: this script never takes it, and secrets:staging never puts a name made
+#       here (T-1261; DL-549; T-1310). Nothing is made for the name while that line is there, since the line would read
+#       as staging's value, which it never is: remove it, then run this again, and the name is made in place. The value
+#       is never shown.
 #   <NAME> made and set
 #       staging did not hold the name and .dev.vars had no value for it: a fresh random value in the name's form went to
 #       `wrangler secret put <NAME> --env staging` through cf.sh, on standard input, and wrangler took it. Only
@@ -55,8 +58,8 @@
 # preview's is): deploy staging first (npm run deploy:staging), then run this again.
 # Afterwards, `npm run cf -- secret list --env staging` lists the names staging holds (names only).
 # Exit: 0 every name is on staging (made and set, or already set); 1 refused, or a list or a put failed; 2 misuse (an
-# option it does not take), found before anything is read; 3 one or more names were left to secrets:staging, the others
-# are on staging.
+# option it does not take), found before anything is read; 3 one or more names have a value in .dev.vars, which is not
+# used, and were not made (remove each such line, then run this again); the others are on staging.
 set +x
 set +a
 set +k
@@ -220,7 +223,7 @@ if [[ -e "$DEV_VARS" && ! -r "$DEV_VARS" ]]; then
 fi
 
 # dev_var_found <NAME>: sets `found` to 1 when .dev.vars holds a value for the name, to "" when it has none (no line, or
-# an empty one), read as put-staging-secrets.sh reads it. A variable of that name is dropped first, so only the file
+# an empty one), read as lib.sh's load_dev_var reads a name. A variable of that name is dropped first, so only the file
 # counts. lib.sh's load_dev_var exports what it reads, so the name is unset again at once, before any command is
 # started: the value is not kept, and no command started from here finds it in its environment.
 found=""
@@ -276,8 +279,8 @@ if [[ "$status" -ne 0 ]]; then
     "holds is not known, so nothing was made or put"
 fi
 
-# Every name's line is decided before the first value is made: held (staging holds it), left (to secrets:staging) or
-# make.
+# Every name's line is decided before the first value is made: held (staging holds it), left (.dev.vars has a value for
+# it, which is not used: its line goes first) or make.
 plan=()
 for name in "${wanted[@]}"; do
   dev_var_found "$name"
@@ -304,7 +307,8 @@ for name in "${wanted[@]}"; do
       printf '%s already set\n' "$name"
       ;;
     left)
-      printf '%s has a value in .dev.vars: use secrets:staging\n' "$name"
+      printf '%s has a value in .dev.vars, which is not used: the name is made in place, so remove its line from .dev.vars\n' \
+        "$name"
       left=$((left + 1))
       ;;
     make)
@@ -332,7 +336,7 @@ for name in "${wanted[@]}"; do
 done
 
 if [[ "$left" -gt 0 ]]; then
-  printf '%s: a value in .dev.vars for %s of the %s names, each printed with use secrets:staging: nothing was made for such a name, and staging does not hold it yet. npm run secrets:staging puts the value .dev.vars has.\n' \
+  printf '%s: a value in .dev.vars for %s of the %s names, each printed with remove its line from .dev.vars: no such value is ever used (secrets:staging never puts a name made in place), so nothing was made for such a name, and staging does not hold it yet. Remove each such line from .dev.vars, then run this again: the name is then made in place.\n' \
     "$(basename "$0")" "$left" "${#wanted[@]}" >&2
   exit 3
 fi

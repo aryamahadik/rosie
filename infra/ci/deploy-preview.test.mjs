@@ -5,11 +5,12 @@
 // (script-harness.mjs), and a fake validators' build in main's infra/build/ that records its run the same way
 // (FAKE_BUILD). No STAGING_DATABASE_URL is set, so no migration runs. The checkout's fake wrangler also keeps a
 // copy of the config cf.sh hands it, so a test reads exactly what an upload received (T-1256: a preview never
-// gets a Hyperdrive binding).
+// gets a Hyperdrive binding). The last describe (T-1310) sets a made-up one, with a fake migrate.mjs in main and a
+// recorder in front of every command, and shows the URL reaches migrate.mjs alone.
 
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, rmSync, symlinkSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, symlinkSync } from "node:fs";
 import path from "node:path";
 import { after, before, describe, it } from "node:test";
 
@@ -854,4 +855,350 @@ describe("deploy-preview.sh", () => {
       assertNoValuePrinted(result);
     });
   }
+});
+
+// T-1310 (T-1261's new task b): the staging database's URL reaches migrate.mjs alone, as DATABASE_URL, and no other
+// command the preview starts: not git, npm, the build, cf.sh, wrangler or any other. Read as create-staging-hyperdrive.sh
+// reads it: one variable, never marked for export, handed to that one process and then dropped. main holds a fake
+// migrate.mjs that records its run (never its URL), and a recorder stands in front of every command deploy-preview.sh,
+// lib.sh and cf.sh start by name, the checkout's wrangler and npm among them; PATH holds nothing else, so none starts
+// unseen. Each recorder keeps a copy of its environment and arguments in a spy folder of the run's own, then runs the
+// real command (npm and wrangler: the recorder of script-harness.mjs). Every URL is made up: a .invalid host never
+// resolves (RFC 6761), and no such login, password or database exists.
+describe("deploy-preview.sh hands the staging database's URL to migrate.mjs alone (T-1310)", () => {
+  const STAGING_URL =
+    "postgres://t1310_preview_login:t1310-made-up-staging-password@db-t1310-staging.example.invalid:5432/t1310_staging";
+  const STAGING_PARTS = [
+    "t1310_preview_login",
+    "t1310-made-up-staging-password",
+    "db-t1310-staging.example.invalid",
+    "t1310_staging",
+  ];
+  const OTHER_URL =
+    "postgres://t1310_other_login:t1310-made-up-other-password@db-t1310-other.example.invalid:5432/t1310_other";
+  const OTHER_PARTS = [
+    "t1310_other_login",
+    "t1310-made-up-other-password",
+    "db-t1310-other.example.invalid",
+    "t1310_other",
+  ];
+  const CALLER_TEXT = "t1310 made-up caller text";
+  const BRANCH = "task/T-1310-code";
+  const SLUG = "task-t-1310-code";
+  const SCHEMA = "preview_task_t_1310_code";
+  // Every command deploy-preview.sh, lib.sh and cf.sh start by name.
+  const COMMANDS = ["awk", "basename", "bash", "date", "dirname", "git", "mktemp", "rm", "sed", "tr"];
+  // main's infra/scripts/migrate.mjs in the throwaway origin: records its run, its folder and its schema, never a URL.
+  const FAKE_MIGRATE = String.raw`import { appendFileSync } from "node:fs";
+
+appendFileSync(
+  process.env.FAKE_LOG,
+  JSON.stringify({ tool: "migrate", cwd: process.cwd(), schema: process.env.DB_SCHEMA ?? null }) + "\n",
+);
+console.log("migrate: up to date (the fake migrate.mjs of deploy-preview.test.mjs)");
+`;
+
+  let fixture;
+
+  const shellQuoted = (text) => `'${text.replaceAll("'", `'\\''`)}'`;
+
+  /** The real program of that name: the first on this shell's PATH. */
+  function program(command) {
+    const file = (process.env.PATH ?? "")
+      .split(path.delimiter)
+      .map((folder) => path.join(folder, command))
+      .find((candidate) => existsSync(candidate) && statSync(candidate).isFile());
+    assert.ok(file, `${command} is not on PATH`);
+    return file;
+  }
+
+  /** A recorder: keeps its environment and its arguments in spy/<name>.<pid>.*, then becomes `command`. */
+  function recorder(spy, name, command) {
+    const record = `${shellQuoted(path.join(spy, name))}.$$`;
+    return [
+      "#!/bin/sh",
+      `/usr/bin/env >>${record}.env`,
+      `printf '%s\\n' \${1+"$@"} >>${record}.argv`,
+      `exec ${command.map(shellQuoted).join(" ")} \${1+"$@"}`,
+      "",
+    ].join("\n");
+  }
+
+  before(() => {
+    const cleanups = [];
+    const t = { after: (fn) => cleanups.push(fn) };
+    const dir = tempDir(t, "preview-url");
+    const home = path.join(dir, "home");
+    write(path.join(home, ".keep"), "");
+    const env = cleanEnv(home);
+    const git = (cwd, ...args) =>
+      execFileSync("git", args, { cwd, env, encoding: "utf8", stdio: "pipe" }).trim();
+
+    // origin: main, with the fake build and the fake migrate.mjs, and one branch that changes code alone.
+    const origin = path.join(dir, "origin.git");
+    git(dir, "init", "-q", "--bare", "-b", "main", origin);
+    const seed = path.join(dir, "seed");
+    git(dir, "init", "-q", "-b", "main", seed);
+    for (const script of ["deploy-preview.sh", "lib.sh", "cf.sh"]) copyScript(script, seed);
+    write(path.join(seed, "infra", "scripts", "migrate.mjs"), FAKE_MIGRATE);
+    write(path.join(seed, "infra", "build", "tool-api-validators.mjs"), FAKE_BUILD);
+    write(path.join(seed, CONTRACT), '{ "title": "K-09 v1.5, as the fixture holds it" }\n');
+    write(path.join(seed, "wrangler.jsonc"), WRANGLER_JSONC);
+    write(path.join(seed, "package.json"), '{ "name": "rosie", "private": true }\n');
+    write(
+      path.join(seed, "package-lock.json"),
+      '{ "name": "rosie", "lockfileVersion": 3, "packages": {} }\n',
+    );
+    write(path.join(seed, "runtime", "src", "index.ts"), "export default {};\n");
+    write(path.join(seed, ".gitignore"), "node_modules/\n");
+    git(seed, "add", "-A");
+    git(seed, "commit", "-q", "-m", "main");
+    git(seed, "remote", "add", "origin", origin);
+    git(seed, "push", "-q", "origin", "main");
+    git(seed, "switch", "-q", "-c", BRANCH);
+    write(
+      path.join(seed, "runtime", "src", "index.ts"),
+      "export default { fetch: () => new Response('T-1310') };\n",
+    );
+    git(seed, "add", "-A");
+    git(seed, "commit", "-q", "-m", BRANCH);
+    git(seed, "push", "-q", "origin", BRANCH);
+    const sha = git(seed, "rev-parse", "HEAD");
+
+    // The lead's checkout, whose wrangler is a recorder in front of script-harness.mjs's; npm is one too.
+    const main = path.join(dir, "rosie");
+    git(dir, "clone", "-q", origin, main);
+    fakeTools(dir);
+    const recordJs = path.join(dir, "fake", "record.cjs");
+    let runs = 0;
+
+    /**
+     * Runs the checkout's deploy-preview.sh on the branch with the variables given (none of this shell's database or
+     * Cloudflare ones), `bash` holding options for bash itself, and `devVars` the checkout's .dev.vars (left out: none).
+     * The script's own bash is the real one, named by its path; everything it starts goes through the recorders.
+     */
+    const run = ({ extra = {}, bash = [], devVars } = {}) => {
+      runs += 1;
+      const at = (...parts) => path.join(dir, `run-${String(runs)}`, ...parts);
+      for (const folder of ["spy", "bin", "tmp"]) mkdirSync(at(folder), { recursive: true });
+      write(at("bin", "node"), recorder(at("spy"), "node", [process.execPath]), 0o755);
+      write(at("bin", "npm"), recorder(at("spy"), "npm", [process.execPath, recordJs, "npm"]), 0o755);
+      for (const command of COMMANDS)
+        write(at("bin", command), recorder(at("spy"), command, [program(command)]), 0o755);
+      write(
+        path.join(main, "node_modules", ".bin", "wrangler"),
+        recorder(at("spy"), "wrangler", [process.execPath, recordJs, "main-wrangler"]),
+        0o755,
+      );
+      const dotDevVars = path.join(main, ".dev.vars");
+      rmSync(dotDevVars, { force: true });
+      if (devVars !== undefined) write(dotDevVars, devVars);
+      const log = at("calls.ndjson");
+      const result = spawnSync(
+        program("bash"),
+        [...bash, path.join(main, "infra", "scripts", "deploy-preview.sh"), BRANCH],
+        {
+          cwd: main,
+          encoding: "utf8",
+          env: cleanEnv(home, { PATH: at("bin"), TMPDIR: at("tmp"), FAKE_LOG: log, ...extra }),
+        },
+      );
+      const children = readdirSync(at("spy"))
+        .filter((file) => file.endsWith(".env"))
+        .map((file) => {
+          const record = file.slice(0, -".env".length);
+          return {
+            name: record.split(".")[0],
+            argv: readFileSync(at("spy", `${record}.argv`), "utf8"),
+            env: readFileSync(at("spy", file), "utf8"),
+          };
+        });
+      return { ...result, output: `${result.stdout}${result.stderr}`, calls: readLog(log), children };
+    };
+    fixture = { main, git, sha, run, cleanup: () => cleanups.forEach((fn) => fn()) };
+  });
+
+  after(() => fixture?.cleanup());
+
+  /** The names of an environment's variables whose value holds one of the texts. */
+  function holders(env, texts) {
+    const names = new Set();
+    let name = "(no variable)";
+    for (const line of env.split("\n")) {
+      name = /^([A-Za-z_][A-Za-z0-9_]*)=/.exec(line)?.[1] ?? name;
+      if (texts.some((text) => line.includes(text))) names.add(name);
+    }
+    return [...names].sort();
+  }
+
+  const isMigrate = (child) =>
+    child.name === "node" && child.argv.split("\n")[0] === "infra/scripts/migrate.mjs";
+
+  /**
+   * Fails unless the run previewed the branch, migrate.mjs ran once in the worktree with DATABASE_URL the staging URL
+   * and the branch's schema, no other command holds any part of a URL (or of `others`) or a variable of a database
+   * URL's name, and the output holds no part of either URL.
+   */
+  function assertUrlToMigrateAlone(result, what, others = []) {
+    assert.equal(result.status, 0, `${what}: exit ${String(result.status)}`);
+    assert.deepEqual(
+      result.calls.map(({ tool }) => tool),
+      ["npm", "tool-api-validators", "migrate", "main-wrangler"],
+      `${what}: npm ci, the build, the migration, then the upload`,
+    );
+    const [install, , migration] = result.calls;
+    assert.deepEqual(
+      migration,
+      { tool: "migrate", cwd: install.cwd, schema: SCHEMA },
+      `${what}: the migration`,
+    );
+    const migrations = result.children.filter(isMigrate);
+    assert.equal(migrations.length, 1, `${what}: migrate.mjs was recorded once`);
+    const lines = migrations[0].env.split("\n");
+    assert.deepEqual(
+      holders(migrations[0].env, [...STAGING_PARTS, ...OTHER_PARTS, ...others]),
+      ["DATABASE_URL"],
+      `${what}: migrate.mjs holds the URL in DATABASE_URL alone`,
+    );
+    assert.ok(
+      lines.includes(`DATABASE_URL=${STAGING_URL}`),
+      `${what}: migrate.mjs's DATABASE_URL is not the URL`,
+    );
+    assert.ok(lines.includes(`DB_SCHEMA=${SCHEMA}`), `${what}: migrate.mjs's schema`);
+    assert.equal(
+      lines.some((line) => line.startsWith("STAGING_DATABASE_URL=")),
+      false,
+      `${what}: migrate.mjs has STAGING_DATABASE_URL`,
+    );
+    const rest = result.children.filter((child) => !isMigrate(child));
+    for (const child of rest) {
+      const which = `${what}, ${child.name}`;
+      assert.deepEqual(
+        holders(child.env, [...STAGING_PARTS, ...OTHER_PARTS, ...others]),
+        [],
+        `${which}: a variable of its environment holds a part of a URL`,
+      );
+      assert.deepEqual(
+        ["STAGING_DATABASE_URL", "DATABASE_URL"].filter((name) =>
+          child.env.split("\n").some((line) => line.startsWith(`${name}=`)),
+        ),
+        [],
+        `${which}: a database URL's name is in its environment`,
+      );
+    }
+    const seen = new Set(rest.map((child) => child.name));
+    for (const name of [
+      "git",
+      "npm",
+      "node",
+      "bash",
+      "wrangler",
+      "date",
+      "dirname",
+      "mktemp",
+      "rm",
+      "sed",
+      "tr",
+    ]) {
+      assert.ok(seen.has(name), `${what}: no ${name} was recorded`);
+    }
+    for (const part of [...STAGING_PARTS, ...OTHER_PARTS, ...others]) {
+      assert.equal(result.output.includes(part), false, `${what}: the output holds a part of a URL`);
+    }
+    assert.match(
+      result.stdout,
+      new RegExp(`Preview URL: https://${SLUG}-rosie-staging\\.example\\.workers\\.dev`),
+    );
+  }
+
+  it("from the caller's environment, beside a DATABASE_URL of the caller's naming another database: migrate.mjs alone gets the staging one", () => {
+    const result = fixture.run({ extra: { STAGING_DATABASE_URL: STAGING_URL, DATABASE_URL: OTHER_URL } });
+    assertUrlToMigrateAlone(result, "from the environment");
+    assert.match(result.stdout, new RegExp(`\\] preview: migrate schema ${SCHEMA}\\n`));
+  });
+
+  it("from the checkout's .dev.vars, read by name at step 4: migrate.mjs alone gets it", () => {
+    for (const line of [
+      `STAGING_DATABASE_URL=${STAGING_URL}`,
+      `  export STAGING_DATABASE_URL="${STAGING_URL}"`,
+    ]) {
+      const result = fixture.run({ devVars: `# made up\n${line}\n` });
+      assertUrlToMigrateAlone(result, `.dev.vars line ${line.replace(STAGING_URL, "<url>")}`);
+    }
+  });
+
+  it("allexport and keyword from the caller, and a caller's variable of the script's own name: still migrate.mjs alone", () => {
+    for (const [what, extra, bash] of [
+      ["SHELLOPTS=allexport", { SHELLOPTS: "allexport" }, []],
+      ["bash -a -k", {}, ["-a", "-k"]],
+      ["SHELLOPTS=allexport:keyword", { SHELLOPTS: "allexport:keyword" }, []],
+      ["the caller's database_url", { database_url: CALLER_TEXT }, []],
+      [
+        "the caller's database_url under allexport",
+        { database_url: CALLER_TEXT, SHELLOPTS: "allexport" },
+        [],
+      ],
+    ]) {
+      const result = fixture.run({ extra: { STAGING_DATABASE_URL: STAGING_URL, ...extra }, bash });
+      assertUrlToMigrateAlone(result, what, [CALLER_TEXT]);
+    }
+    const fromFile = fixture.run({
+      extra: { SHELLOPTS: "allexport" },
+      devVars: `STAGING_DATABASE_URL=${STAGING_URL}\n`,
+    });
+    assertUrlToMigrateAlone(fromFile, "SHELLOPTS=allexport, the URL from .dev.vars");
+  });
+
+  it("tracing from the caller (bash -x, or handed down in SHELLOPTS) prints no part of the URL: the script switches it off first", () => {
+    for (const [what, extra, bash] of [
+      ["bash -x", {}, ["-x"]],
+      ["SHELLOPTS=xtrace", { SHELLOPTS: "xtrace" }, []],
+    ]) {
+      const result = fixture.run({ extra: { STAGING_DATABASE_URL: STAGING_URL, ...extra }, bash });
+      assertUrlToMigrateAlone(result, what);
+      assert.ok(
+        result.stderr.startsWith("+ set +x\n"),
+        `${what}: the trace does not begin at the script's set +x`,
+      );
+      assert.equal(result.stderr, "+ set +x\n", `${what}: the trace went on after set +x`);
+    }
+  });
+
+  it("with no staging URL, a DATABASE_URL of the caller's reaches no command, and nothing is migrated", () => {
+    const result = fixture.run({ extra: { DATABASE_URL: OTHER_URL } });
+    assert.equal(result.status, 0, result.output);
+    assert.deepEqual(
+      result.calls.map(({ tool }) => tool),
+      ["npm", "tool-api-validators", "main-wrangler"],
+    );
+    assert.match(
+      result.stdout,
+      /preview: NOTICE: STAGING_DATABASE_URL is not set, so no preview schema was migrated/,
+    );
+    assert.equal(result.children.filter(isMigrate).length, 0);
+    for (const child of result.children) {
+      assert.deepEqual(
+        holders(child.env, OTHER_PARTS),
+        [],
+        `${child.name}: a variable holds a part of the URL`,
+      );
+      assert.equal(
+        child.env.split("\n").some((line) => line.startsWith("DATABASE_URL=")),
+        false,
+        `${child.name}: DATABASE_URL is in its environment`,
+      );
+    }
+    for (const part of OTHER_PARTS) assert.equal(result.output.includes(part), false);
+  });
+
+  it("the recorders see what a command is given: the migration's DATABASE_URL is recorded (the control for the checks above)", () => {
+    const result = fixture.run({ extra: { STAGING_DATABASE_URL: STAGING_URL } });
+    assert.equal(result.status, 0, result.output);
+    const recorded = result.children.filter((child) => holders(child.env, STAGING_PARTS).length > 0);
+    assert.deepEqual(
+      recorded.map((child) => child.name),
+      ["node"],
+      "one command holds the URL: migrate.mjs's node",
+    );
+  });
 });

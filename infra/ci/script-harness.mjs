@@ -5,7 +5,8 @@
 // and sleep commands that only record how they were called (one JSON line each in $FAKE_LOG). HOME points at
 // an empty temp folder and the Cloudflare, wrangler, GitHub and database variables of this shell are dropped,
 // so no test can reach Cloudflare, npm's registry or a database, or read this Mac's Rosfield sign-in or
-// .dev.vars.
+// .dev.vars. So is ROSIE_NUMBER, Rosie's own number (DL-581): a deploy test that gives none of its own never
+// takes this shell's, so no real number reaches a stand-in's call log.
 
 import {
   chmodSync,
@@ -117,12 +118,13 @@ const DROPPED_NAMES = new Set([
   "STAGING_DATABASE_URL",
   "DATABASE_URL",
   "STAGING_BASE_URL",
+  "ROSIE_NUMBER",
 ]);
 
 /**
  * The environment of a script under test: this shell's, without the variables that could reach Cloudflare, a
- * database or this Mac's sign-in, with HOME at home, git isolated from the user's configuration, and extra on
- * top (an extra value of undefined removes the variable).
+ * database or this Mac's sign-in, or hold Rosie's own number, with HOME at home, git isolated from the user's
+ * configuration, and extra on top (an extra value of undefined removes the variable).
  */
 export function cleanEnv(home, extra = {}) {
   const kept = Object.entries(process.env).filter(([key]) => !DROPPED.test(key) && !DROPPED_NAMES.has(key));
