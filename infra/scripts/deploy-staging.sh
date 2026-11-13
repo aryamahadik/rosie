@@ -25,14 +25,12 @@
 # of env.staging in wrangler.jsonc).
 # Staging only: it takes no --env, and production deploys and flags run only from the protected release job.
 # Rosie's own number, staging's Linq line (T-1304; CQ-253 as DL-542 refines it): ROSIE_NUMBER is read
-# by name, from the environment, else from the git-ignored .dev.vars (load_dev_var), and then taken out of the
-# environment, so of the deploy's commands only step 2's wrangler deploy gets it, as --var ROSIE_NUMBER:<number>.
-# A value from the environment leaves it once lib.sh is sourced and the arguments are read (below): dirname runs
-# first, with it, to find lib.sh (twice), and so does basename when an argument is refused (the script then stops);
-# nothing else starts before it is gone. A value from .dev.vars leaves it as soon as load_dev_var has read it. It is
-# never written in wrangler.jsonc or any tracked file: the repository is public (DL-436). Tracing is switched off
-# first, whatever the caller's shell asked for (DL-581; as cf.sh does, T-1261), so bash -x, xtrace handed down in
-# SHELLOPTS, or a BASH_ENV that turns it on never prints it. Why a var given at deploy:
+# by name, from the environment, else from the git-ignored .dev.vars (load_dev_var), and kept in rosie_number, a
+# variable of the script's own that is never marked for export, so of the deploy's commands only step 2's wrangler
+# deploy gets it, as --var ROSIE_NUMBER:<number> (T-1343). A value from the environment leaves it before anything is
+# started (dirname, which finds lib.sh, included); a value from .dev.vars leaves it as soon as load_dev_var has read
+# it. It is never written in wrangler.jsonc or any tracked file: the repository is public (DL-436). Why a var given at
+# deploy:
 #  - it is no key: people text it, and every chat link carries it (K-09 issueChatLink's sms: form);
 #  - wrangler 4.158 prints a --var's value as "(hidden)" (D-000 check 5's log: env.GIT_SHA ("(hidden)")),
 #    and wrangler.jsonc's vars as they are, so the number stays out of the deploy's log;
@@ -43,8 +41,28 @@
 # Only a value in E.164 form is given (a + and 7 to 15 digits, nothing else: K-04's handles_address_form,
 # K-11's phone). A missing or malformed value deploys without it, and one line says chat links stay off
 # (K-05 default 109). The value itself is never printed.
+# The staging database's URL (T-1343; read as deploy-preview.sh reads it, T-1310): STAGING_DATABASE_URL, from the
+# environment, else from .dev.vars by name (load_dev_var, before step 1), never printed. It leaves this shell's
+# environment before anything is started, with DATABASE_URL, which this script never reads, and is kept in
+# database_url, never marked for export. Only the commands that use the database get it, each on its own command line:
+# step 1's migrate.mjs as DATABASE_URL, and publish-bundle.sh and flags.sh (steps 3 and 4, and their undo) as
+# STAGING_DATABASE_URL, which each of them hands on to its own database program alone. No other command gets any
+# database URL: git, cf.sh and wrangler, the check and the rollback among them.
+# Tracing, allexport and keyword are switched off first, whatever the caller's shell asked for (DL-581, T-1343; as
+# cf.sh does, T-1261): bash -x, xtrace handed down in SHELLOPTS, or a BASH_ENV that turns it on never prints the number
+# or the URL; allexport would mark rosie_number and database_url for export; and under keyword lib.sh's
+# `local name=...` would declare nothing.
 set +x
+set +a
+set +k
 set -euo pipefail
+# The variables that hold the number or the URL are dropped before they are set: bash marks every variable it inherits
+# for export, so one of the same name in the caller's environment would make it an exported one (rosie_number_var too,
+# which holds step 2's --var).
+unset -v rosie_number rosie_number_var database_url
+rosie_number="${ROSIE_NUMBER:-}"
+database_url="${STAGING_DATABASE_URL:-}"
+unset -v ROSIE_NUMBER STAGING_DATABASE_URL DATABASE_URL
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 bundle_dir="$ROOT/bundles/v0" # D-017's bundle v0 (T-163); --bundle names another bundle folder
@@ -73,14 +91,15 @@ if [[ "$bundle_dir" != /* ]]; then
 fi
 cd "$ROOT"
 
-# Rosie's own number (above): read by name, then taken out of the environment here. Of the commands before this line,
-# dirname (finding lib.sh) runs with a value from the environment, and basename too when an argument is refused and
-# the script stops; every other command starts after it is gone.
+# Rosie's own number (above), from .dev.vars by name when the environment gave none: load_dev_var exports what it
+# reads, so the name is unset again at once, before any command is started.
 # E164 is the form K-04's handles_address_form and K-11's phone write a number in.
 E164='^[+][1-9][0-9]{6,14}$'
-load_dev_var ROSIE_NUMBER
-rosie_number="${ROSIE_NUMBER:-}"
-unset ROSIE_NUMBER
+if [[ -z "$rosie_number" ]]; then
+  load_dev_var ROSIE_NUMBER
+  rosie_number="${ROSIE_NUMBER:-}"
+  unset -v ROSIE_NUMBER
+fi
 
 sha="$(git_sha)"
 log "deploy-staging: start, commit $sha"
@@ -149,14 +168,14 @@ record_field() {
 # undo_release: build prompt 5.4's "undo what can be undone" for steps 4 and 3, run from the exit trap before the
 # code goes back: each flag step 4 turned on goes off again (flag off), then the active bundle id goes back to the
 # one before step 3 (the previous bundle id). Returns non-zero when something could not be undone; each such line
-# says what to run.
+# says what to run. flags.sh and publish-bundle.sh get the staging database's URL on their command lines alone (above).
 undo_release() {
   local failed=0 flag id_before id_after
   if [[ -s "$flags_record" ]]; then
     while IFS= read -r flag; do
       [[ -n "$flag" ]] || continue
       log "undo: flag $flag off again (step 4 turned it on)"
-      if ! bash "$ROOT/infra/scripts/flags.sh" --env staging off "$flag"; then
+      if ! STAGING_DATABASE_URL="$database_url" bash "$ROOT/infra/scripts/flags.sh" --env staging off "$flag"; then
         log "undo: FAILED to turn the flag $flag off: run bash infra/scripts/flags.sh off $flag now"
         failed=1
       fi
@@ -174,7 +193,8 @@ undo_release() {
       failed=1
     elif [[ "$id_before" != "$id_after" ]]; then
       log "undo: the active bundle id goes back to $id_before (step 3 switched it to $id_after)"
-      if ! bash "$ROOT/infra/scripts/publish-bundle.sh" --env staging --activate "$id_before"; then
+      if ! STAGING_DATABASE_URL="$database_url" bash "$ROOT/infra/scripts/publish-bundle.sh" --env staging \
+        --activate "$id_before"; then
         log "undo: FAILED to switch the active bundle id back: run" \
           "bash infra/scripts/publish-bundle.sh --activate $id_before now"
         failed=1
@@ -194,6 +214,8 @@ finish() {
     roll_back || true
     status=1
   fi
+  # The undo above is the last use of the staging database's URL: it is dropped.
+  database_url=""
   rm -rf "$work"
   exit "$status"
 }
@@ -202,14 +224,20 @@ trap finish EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
-load_dev_var STAGING_DATABASE_URL
-if [[ -n "${STAGING_DATABASE_URL:-}" && ! -f "$bundle_dir/manifest.json" && ! -f "$bundle_dir/bundle/manifest.json" ]]
+# The staging database's URL (above), from .dev.vars by name when the environment gave none: load_dev_var exports what
+# it reads, so the name is unset again at once, before any command is started.
+if [[ -z "$database_url" ]]; then
+  load_dev_var STAGING_DATABASE_URL
+  database_url="${STAGING_DATABASE_URL:-}"
+  unset -v STAGING_DATABASE_URL
+fi
+if [[ -n "$database_url" && ! -f "$bundle_dir/manifest.json" && ! -f "$bundle_dir/bundle/manifest.json" ]]
 then
   die "$bundle_dir holds no bundle (no manifest.json in it or in its bundle/ folder): nothing was deployed"
 fi
-if [[ -n "${STAGING_DATABASE_URL:-}" ]]; then
+if [[ -n "$database_url" ]]; then
   log "step 1/4 migrate: start"
-  DATABASE_URL="$STAGING_DATABASE_URL" DB_SCHEMA="" node infra/scripts/migrate.mjs
+  DATABASE_URL="$database_url" DB_SCHEMA="" node infra/scripts/migrate.mjs
   log "step 1/4 migrate: done"
 else
   log "step 1/4 migrate: skipped (NOTICE: STAGING_DATABASE_URL is not set)"
@@ -253,12 +281,13 @@ if [[ -z "$base_url" ]]; then
   base_url="https://$host/test"
 fi
 
-if [[ -n "${STAGING_DATABASE_URL:-}" ]]; then
+if [[ -n "$database_url" ]]; then
   log "step 3/4 bundle: publish $bundle_dir, then switch the active bundle id"
-  bash "$ROOT/infra/scripts/publish-bundle.sh" --env staging --record "$bundle_record" "$bundle_dir"
+  STAGING_DATABASE_URL="$database_url" bash "$ROOT/infra/scripts/publish-bundle.sh" --env staging \
+    --record "$bundle_record" "$bundle_dir"
   log "step 3/4 bundle: done"
   log "step 4/4 flags: the staging flag set, infra/flags/staging.json"
-  bash "$ROOT/infra/scripts/flags.sh" --env staging apply --record "$flags_record"
+  STAGING_DATABASE_URL="$database_url" bash "$ROOT/infra/scripts/flags.sh" --env staging apply --record "$flags_record"
   log "step 4/4 flags: done"
 else
   log "step 3/4 bundle: skipped (NOTICE: STAGING_DATABASE_URL is not set; the staging database holds the active" \

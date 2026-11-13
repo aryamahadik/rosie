@@ -5,6 +5,8 @@
 // live version never changes, so the code's rollback has nothing to roll back), curl is a fake health check, and the
 // staging database is a throwaway local one, migrated as the staging database is. The last describe holds T-1304's
 // tests of Rosie's own number, ROSIE_NUMBER, which step 2 gives the Worker by name; those deploys need no database.
+// The last describe (T-1343) puts a recorder in front of every command the deploy starts, and shows which of them get
+// the staging database's URL and the number.
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -21,7 +23,7 @@ import {
   releaseRoot,
   v0WithBuild,
 } from "./release-harness.mjs";
-import { cleanEnv } from "./script-harness.mjs";
+import { cleanEnv, namedIn, program, spies, tempDir, whereHeld } from "./script-harness.mjs";
 
 const SHA = "5690000000000000000000000000000000000569";
 const LIVE = "00000000-0000-4000-8000-000000000569";
@@ -473,5 +475,326 @@ describe("deploy-staging.sh: Rosie's own number, ROSIE_NUMBER (T-1304)", () => {
     };
     for (const file of rig.standIns) spawnSync(file, [], { env, encoding: "utf8" });
     assert.deepEqual(rig.noted(), ["wrangler", "curl"]);
+  });
+});
+
+// T-1343 (T-1310's new tasks b and c, and its security review's): the staging database's URL reaches only the commands
+// that use the database, each by name on its own command line: step 1's migrate.mjs (DATABASE_URL), publish-bundle.sh
+// and flags.sh (STAGING_DATABASE_URL, at steps 3 and 4 and in the undo), and their own database programs (DATABASE_URL);
+// Rosie's own number reaches step 2's deploy alone, in its arguments (cf.sh's and wrangler's --var). A recorder
+// (script-harness.mjs's spies) stands in front of every command the deploy and the scripts it runs start by name, and of
+// the checkout's wrangler; PATH holds nothing else, so none starts unseen. Each keeps its environment and its arguments,
+// and both are checked. The staging database is a throwaway local one; the caller's other URL is made up (a .invalid
+// host never resolves, RFC 6761) and the number is in the fiction range.
+describe("deploy-staging.sh hands the staging database's URL to the commands that use it, and Rosie's number to the deploy alone (T-1343)", () => {
+  const NUMBER = "+15555550142";
+  const OTHER_URL =
+    "postgres://t1343_other_login:t1343-made-up-password@db-t1343-other.example.invalid:5432/t1343_other";
+  const OTHER_PARTS = ["t1343_other_login", "t1343-made-up-password", "db-t1343-other.example.invalid"];
+  const CALLER_TEXT = "t1343 made-up caller text";
+  // Every command deploy-staging.sh, lib.sh, cf.sh, publish-bundle.sh, flags.sh, post-deploy-check.sh and
+  // rollback-staging.sh start by name, but node, curl and sleep (below).
+  const COMMANDS = [
+    "basename",
+    "bash",
+    "date",
+    "dirname",
+    "git",
+    "grep",
+    "head",
+    "mktemp",
+    "rm",
+    "sed",
+    "tr",
+  ];
+  // The commands that use the database, and the name each gets the URL under.
+  const URL_HOLDERS = [
+    "flags.mjs: env DATABASE_URL",
+    "flags.sh: env STAGING_DATABASE_URL",
+    "migrate.mjs: env DATABASE_URL",
+    "publish-bundle.sh: env STAGING_DATABASE_URL",
+    "registry activate: env DATABASE_URL",
+    "registry active: env DATABASE_URL",
+    "registry publish: env DATABASE_URL",
+  ];
+  const named = (lines) => lines.map((line) => line.replace(": env ", ": ")).sort();
+  const cleanups = [];
+  const t = { after: (fn) => cleanups.push(fn) };
+  let db;
+  let watched;
+  let fromEnv;
+  let fromFile;
+
+  /** What a recorded command is: a script by its file (cf.sh and wrangler with their first word), a node program, or its name. */
+  const kindOf = (child) => {
+    const [first = ""] = child.args;
+    if (child.name === "bash") {
+      const script = /\/infra\/scripts\/([a-z-]+\.sh)$/.exec(first)?.[1] ?? "bash";
+      return script === "cf.sh" ? `cf.sh ${child.args[1] ?? ""}` : script;
+    }
+    if (child.name === "wrangler") return `wrangler ${child.args[2] ?? ""}`;
+    if (child.name !== "node") return child.name;
+    if (first === "infra/scripts/migrate.mjs") return "migrate.mjs";
+    if (child.args.some((arg) => arg.endsWith("/infra/flags/flags.mjs"))) return "flags.mjs";
+    if (child.args.some((arg) => arg.includes("registryCall"))) return `registry ${child.args[6] ?? ""}`;
+    return "node";
+  };
+
+  /** A release root (with a made-up .dev.vars when devVars is given) whose every command is spied (above). */
+  const spiedRig = (devVars) => {
+    const rig = releaseRoot(t, devVars === undefined ? {} : { devVars });
+    const fake = (name) => path.join(rig.dir, "fake", name);
+    const spy = spies(rig.dir, COMMANDS, {
+      node: [process.execPath],
+      curl: [process.execPath, fake("record.cjs"), "curl"],
+      sleep: [process.execPath, fake("record.cjs"), "sleep"],
+    });
+    spy.put(path.join(rig.root, "node_modules", ".bin", "wrangler"), "wrangler", [
+      process.execPath,
+      fake("wrangler.cjs"),
+    ]);
+    return {
+      ...rig,
+      /** Runs deploy-staging.sh under the real bash, `bash` holding its options, with DEPLOY_ENV and extra. */
+      deploy({ extra = {}, bash = [] } = {}) {
+        spy.clear();
+        const result = spawnSync(
+          program("bash"),
+          [...bash, path.join(rig.root, "infra", "scripts", "deploy-staging.sh")],
+          {
+            cwd: rig.root,
+            encoding: "utf8",
+            env: cleanEnv(path.join(rig.dir, "home"), {
+              PATH: spy.bin,
+              FAKE_LOG: path.join(rig.dir, "calls.ndjson"),
+              DB_SCHEMA: undefined,
+              ...DEPLOY_ENV,
+              ...extra,
+            }),
+          },
+        );
+        return { ...result, output: `${result.stdout}${result.stderr}`, children: spy.children() };
+      },
+    };
+  };
+
+  before(async () => {
+    db = await createThrowawayDatabase("deploy_urls");
+    watched = [db.url, new URL(db.url).pathname.slice(1)];
+    fromEnv = spiedRig();
+    fromFile = spiedRig(`# made up\nSTAGING_DATABASE_URL=${db.url}\n  export ROSIE_NUMBER='${NUMBER}'\n`);
+  });
+
+  after(async () => {
+    for (const cleanup of cleanups.reverse()) cleanup();
+    await db?.drop();
+  });
+
+  // [title, the rig, its variables]: the URL and the number from the caller's environment, beside a DATABASE_URL of
+  // the caller's that names another database, or from the checkout's .dev.vars.
+  const sources = () => [
+    [
+      "from the environment",
+      fromEnv,
+      { STAGING_DATABASE_URL: db.url, ROSIE_NUMBER: NUMBER, DATABASE_URL: OTHER_URL },
+    ],
+    ["from .dev.vars", fromFile, { DATABASE_URL: OTHER_URL }],
+  ];
+
+  /**
+   * Fails unless the deploy ran every step and the URL reached the commands that use the database alone (`holders`),
+   * each by name, the number reached the deploy's arguments alone, no command holds the caller's other URL or one of
+   * `others` or has ROSIE_NUMBER in its environment, and the output holds none of them.
+   */
+  function assertHandedOnAlone(result, what, { holders = URL_HOLDERS, others = [] } = {}) {
+    const kinds = new Set(result.children.map(kindOf));
+    for (const kind of [
+      "dirname",
+      "date",
+      "mktemp",
+      "rm",
+      "sed",
+      "tr",
+      "node",
+      "curl",
+      "migrate.mjs",
+      "cf.sh deployments",
+      "wrangler deployments",
+      "cf.sh deploy",
+      "wrangler deploy",
+      "publish-bundle.sh",
+      "registry manifest-id",
+      "cf.sh kv",
+      "wrangler kv",
+      "flags.sh",
+      "flags.mjs",
+      "post-deploy-check.sh",
+    ]) {
+      assert.ok(kinds.has(kind), `${what}: no ${kind} was recorded`);
+    }
+    assert.deepEqual(
+      whereHeld(result.children, watched, kindOf),
+      [...holders].sort(),
+      `${what}: where the URL is`,
+    );
+    assert.deepEqual(
+      namedIn(result.children, ["STAGING_DATABASE_URL", "DATABASE_URL"], kindOf),
+      named(holders),
+      `${what}: which commands have a database URL's name in their environment`,
+    );
+    for (const child of result.children) {
+      const name = /: env (\S+)$/.exec(
+        holders.find((line) => line.startsWith(`${kindOf(child)}: `)) ?? "",
+      )?.[1];
+      if (name !== undefined) {
+        assert.ok(child.env.split("\n").includes(`${name}=${db.url}`), `${what}: ${kindOf(child)}'s ${name}`);
+      }
+    }
+    assert.deepEqual(
+      whereHeld(result.children, [NUMBER, NUMBER.slice(1)], kindOf),
+      ["cf.sh deploy: args 1", "wrangler deploy: args 1"],
+      `${what}: where the number is`,
+    );
+    const [deploy] = result.children.filter((child) => kindOf(child) === "wrangler deploy");
+    assert.deepEqual(
+      deploy.args.filter((_, at) => deploy.args[at - 1] === "--var"),
+      [`GIT_SHA:${SHA}`, `ROSIE_NUMBER:${NUMBER}`],
+      `${what}: the deploy's vars`,
+    );
+    assert.deepEqual(namedIn(result.children, ["ROSIE_NUMBER"], kindOf), [], `${what}: ROSIE_NUMBER's name`);
+    assert.deepEqual(
+      whereHeld(result.children, [...OTHER_PARTS, ...others], kindOf),
+      [],
+      `${what}: a command holds the caller's other URL or text`,
+    );
+    for (const text of [...watched, ...OTHER_PARTS, ...others, NUMBER, NUMBER.slice(1)]) {
+      assert.equal(result.output.includes(text), false, `${what}: the output holds a value`);
+    }
+  }
+
+  /** The deploy's step lines, without their times. */
+  const stepLines = (stdout) =>
+    stdout
+      .split("\n")
+      .map((line) => line.replace(/^\[[^\]]+\] /, ""))
+      .filter((line) => /^(step \d\/4|undo:|rollback:|check:|deploy-staging:)/.test(line));
+
+  it("from the caller's environment, or from .dev.vars: each command that uses the database gets the URL by name, the deploy alone gets the number, and no other command gets either", () => {
+    for (const [what, rig, extra] of sources()) {
+      const result = rig.deploy({ extra });
+      assert.equal(result.status, 0, `${what}: ${result.output}`);
+      const lines = stepLines(result.stdout);
+      for (const step of ["step 1/4 migrate: done", "step 3/4 bundle: done", "step 4/4 flags: done"]) {
+        assert.ok(lines.includes(step), `${what}: ${lines.join("\n")}`);
+      }
+      assert.ok(
+        lines.includes(
+          "step 2/4 code: ROSIE_NUMBER goes to the Worker by name, as a var (wrangler prints its value as (hidden))",
+        ),
+        what,
+      );
+      assert.ok(
+        lines.includes(`deploy-staging: done, version ${LIVE} at ${DEPLOY_ENV.STAGING_BASE_URL}`),
+        what,
+      );
+      assertHandedOnAlone(result, what);
+    }
+  });
+
+  it("allexport and keyword from the caller, from either source: still each command that uses the database alone, and the deploy alone", () => {
+    for (const [source, rig, extra] of sources()) {
+      for (const [mode, variables, bash] of [
+        ["SHELLOPTS=allexport", { SHELLOPTS: "allexport" }, []],
+        ["bash -a -k", {}, ["-a", "-k"]],
+        ["SHELLOPTS=allexport:keyword", { SHELLOPTS: "allexport:keyword" }, []],
+      ]) {
+        const what = `${mode}, ${source}`;
+        const result = rig.deploy({ extra: { ...extra, ...variables }, bash });
+        assert.equal(result.status, 0, `${what}: ${result.output}`);
+        assertHandedOnAlone(result, what);
+      }
+    }
+  });
+
+  it("the caller's variables of the script's own names (database_url, rosie_number, rosie_number_var) hand nothing on, with allexport or without", () => {
+    const caller = { database_url: CALLER_TEXT, rosie_number: CALLER_TEXT, rosie_number_var: CALLER_TEXT };
+    for (const [what, variables] of [
+      ["the caller's variables", caller],
+      ["the caller's variables under allexport", { ...caller, SHELLOPTS: "allexport" }],
+    ]) {
+      const result = fromEnv.deploy({
+        extra: { STAGING_DATABASE_URL: db.url, ROSIE_NUMBER: NUMBER, ...variables },
+      });
+      assert.equal(result.status, 0, `${what}: ${result.output}`);
+      assertHandedOnAlone(result, what, { others: [CALLER_TEXT] });
+    }
+  });
+
+  it("tracing from the caller (bash -x, or handed down in SHELLOPTS), from either source, prints neither: the script switches it off first", () => {
+    for (const [source, rig, extra] of sources()) {
+      for (const [mode, variables, bash] of [
+        ["bash -x", {}, ["-x"]],
+        ["SHELLOPTS=xtrace", { SHELLOPTS: "xtrace" }, []],
+      ]) {
+        const what = `${mode}, ${source}`;
+        const result = rig.deploy({ extra: { ...extra, ...variables }, bash });
+        assert.equal(result.status, 0, `${what}: exit ${String(result.status)}`);
+        assertHandedOnAlone(result, what);
+        assert.equal(result.stderr, "+ set +x\n", `${what}: the trace went on after set +x`);
+      }
+    }
+  });
+
+  it("a failed check: the undo's flags.sh and publish-bundle.sh get the URL by name too, and nothing else does", async () => {
+    // Before this deploy: bundle v0 build 2 is active and the skeleton flag is off (unspied runs).
+    const build2 = v0WithBuild(t, 2);
+    const switched = fromEnv.run("publish-bundle.sh", [build2.dir], { STAGING_DATABASE_URL: db.url });
+    assert.equal(switched.status, 0, switched.output);
+    const off = fromEnv.run("flags.sh", ["off", "skeleton"], { STAGING_DATABASE_URL: db.url });
+    assert.equal(off.status, 0, off.output);
+    const result = fromEnv.deploy({
+      extra: { STAGING_DATABASE_URL: db.url, ROSIE_NUMBER: NUMBER, FAKE_CURL_MODE: "fail" },
+    });
+    assert.equal(result.status, 1, result.output);
+    const lines = stepLines(result.stdout);
+    assert.ok(lines.includes("undo: flag skeleton off again (step 4 turned it on)"), lines.join("\n"));
+    assert.ok(
+      lines.includes(`undo: the active bundle id goes back to ${build2.id} (step 3 switched it to ${V0_ID})`),
+      lines.join("\n"),
+    );
+    assert.equal(await readActive(db.sql), build2.id);
+    // Steps 1, 3 and 4, then the undo: flags.sh off (and its flags.mjs), then publish-bundle.sh --activate (and its
+    // registry's active and activate).
+    assertHandedOnAlone(result, "a failed check", {
+      holders: [
+        ...URL_HOLDERS,
+        "flags.sh: env STAGING_DATABASE_URL",
+        "flags.mjs: env DATABASE_URL",
+        "publish-bundle.sh: env STAGING_DATABASE_URL",
+        "registry active: env DATABASE_URL",
+        "registry activate: env DATABASE_URL",
+      ],
+    });
+  });
+
+  it("a recorder keeps a command's environment and arguments, and the checks find a value in either (the control for the checks above)", (t) => {
+    const dir = tempDir(t, "deploy-spy-control");
+    const spy = spies(dir, ["date"]);
+    const args = ["-u", `--var=ROSIE_NUMBER:${NUMBER}`, "two\nlines"];
+    spawnSync(path.join(spy.bin, "date"), args, {
+      env: { PATH: spy.bin, STAGING_DATABASE_URL: OTHER_URL },
+      encoding: "utf8",
+    });
+    const children = spy.children();
+    const name = (child) => child.name;
+    assert.deepEqual(
+      children.map((child) => child.args),
+      [args],
+    );
+    assert.deepEqual(whereHeld(children, OTHER_PARTS, name), ["date: env STAGING_DATABASE_URL"]);
+    assert.deepEqual(whereHeld(children, [NUMBER], name), ["date: args 1"]);
+    assert.deepEqual(namedIn(children, ["STAGING_DATABASE_URL", "ROSIE_NUMBER"], name), [
+      "date: STAGING_DATABASE_URL",
+    ]);
   });
 });

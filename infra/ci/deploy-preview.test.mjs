@@ -1037,9 +1037,16 @@ console.log("migrate: up to date (the fake migrate.mjs of deploy-preview.test.mj
   /**
    * Fails unless the run previewed the branch, migrate.mjs ran once in the worktree with DATABASE_URL the staging URL
    * and the branch's schema, no other command holds any part of a URL (or of `others`) or a variable of a database
-   * URL's name, and the output holds no part of either URL.
+   * URL's name, no command's arguments hold any part of either (T-1343), and the output holds no part of either URL.
    */
   function assertUrlToMigrateAlone(result, what, others = []) {
+    for (const child of result.children) {
+      assert.equal(
+        [...STAGING_PARTS, ...OTHER_PARTS, ...others].some((text) => child.argv.includes(text)),
+        false,
+        `${what}, ${child.name}: an argument holds a part of a URL`,
+      );
+    }
     assert.equal(result.status, 0, `${what}: exit ${String(result.status)}`);
     assert.deepEqual(
       result.calls.map(({ tool }) => tool),
@@ -1181,6 +1188,11 @@ console.log("migrate: up to date (the fake migrate.mjs of deploy-preview.test.mj
         holders(child.env, OTHER_PARTS),
         [],
         `${child.name}: a variable holds a part of the URL`,
+      );
+      assert.equal(
+        OTHER_PARTS.some((part) => child.argv.includes(part)),
+        false,
+        `${child.name}: an argument holds a part of the URL (T-1343)`,
       );
       assert.equal(
         child.env.split("\n").some((line) => line.startsWith("DATABASE_URL=")),

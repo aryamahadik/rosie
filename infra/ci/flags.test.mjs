@@ -4,14 +4,17 @@
 // migrated as the staging database is (release-harness.mjs). The Linq webhook route is the Worker's own
 // (runtime/src/wiring/skeleton.ts, T-552), reading the skeleton flag through T-185's readFlag on that database; only
 // the gateway's verify behind it is a stand-in, which turns every webhook away (401) once the route lets it through.
+// The last describe (T-1343) puts a recorder in front of every command flags.sh starts, and shows that flags.mjs alone
+// gets the database's URL.
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { registerHooks } from "node:module";
 import path from "node:path";
 import { after, before, describe, it } from "node:test";
 
 import { assertNoUrlPart, badUrlRunners, createThrowawayDatabase, releaseRoot } from "./release-harness.mjs";
-import { REPO } from "./script-harness.mjs";
+import { REPO, cleanEnv, namedIn, program, spies, tempDir, whereHeld } from "./script-harness.mjs";
 
 // runtime/src imports its neighbours without an extension, as the bundler resolves them: a relative import from a .ts
 // file is completed with .ts or /index.ts, as compiler/src/cli/commands/publish.ts does.
@@ -259,5 +262,152 @@ describe("flags.sh", () => {
         assert.deepEqual(await rows(), before, what);
       }
     }
+  });
+});
+
+// T-1343 (T-1310's new task b): flags.sh hands the database's URL to flags.mjs alone, as DATABASE_URL on its command
+// line, and no other command it starts gets any database URL, in its environment or its arguments. A recorder
+// (script-harness.mjs's spies) stands in front of every command it starts by name; PATH holds nothing else, so none
+// starts unseen. The database is a throwaway local one; the caller's other URL is made up (a .invalid host never
+// resolves, RFC 6761).
+describe("flags.sh hands the database's URL to flags.mjs alone (T-1343)", () => {
+  const OTHER_URL =
+    "postgres://t1343_other_login:t1343-made-up-password@db-t1343-other.example.invalid:5432/t1343_other";
+  const OTHER_PARTS = ["t1343_other_login", "t1343-made-up-password", "db-t1343-other.example.invalid"];
+  const CALLER_TEXT = "t1343 made-up caller text";
+  // Every command flags.sh and lib.sh start by name, but node (below).
+  const COMMANDS = ["basename", "bash", "date", "dirname"];
+  const cleanups = [];
+  const t = { after: (fn) => cleanups.push(fn) };
+  let db;
+  let watched;
+  let fromEnv;
+  let fromFile;
+
+  const kindOf = (child) =>
+    child.name === "node" && child.args.some((arg) => arg.endsWith("/infra/flags/flags.mjs"))
+      ? "flags.mjs"
+      : child.name;
+
+  /** A release root (with a made-up .dev.vars when devVars is given) whose every command is spied. */
+  const spiedRig = (devVars) => {
+    const rig = releaseRoot(t, devVars === undefined ? {} : { devVars });
+    const spy = spies(rig.dir, COMMANDS, { node: [process.execPath] });
+    return {
+      /** Runs flags.sh under the real bash, `bash` holding its options, with the variables given. */
+      flags(args, { extra = {}, bash = [] } = {}) {
+        spy.clear();
+        const result = spawnSync(
+          program("bash"),
+          [...bash, path.join(rig.root, "infra", "scripts", "flags.sh"), ...args],
+          {
+            cwd: rig.root,
+            encoding: "utf8",
+            env: cleanEnv(path.join(rig.dir, "home"), { PATH: spy.bin, DB_SCHEMA: undefined, ...extra }),
+          },
+        );
+        return { ...result, output: `${result.stdout}${result.stderr}`, children: spy.children() };
+      },
+    };
+  };
+
+  before(async () => {
+    db = await createThrowawayDatabase("flags_urls");
+    watched = [db.url, new URL(db.url).pathname.slice(1)];
+    fromEnv = spiedRig();
+    fromFile = spiedRig(`# made up\n  export STAGING_DATABASE_URL="${db.url}"\n`);
+  });
+
+  after(async () => {
+    for (const cleanup of cleanups.reverse()) cleanup();
+    await db?.drop();
+  });
+
+  /**
+   * Fails unless the run passed, flags.mjs alone holds the URL, as DATABASE_URL, no command holds it in an argument, no
+   * other command has a database URL's name in its environment, none holds the caller's other URL or one of `others`,
+   * and the output holds none of them.
+   */
+  function assertToFlagsAlone(result, what, others = []) {
+    assert.equal(result.status, 0, `${what}: ${result.output}`);
+    const kinds = new Set(result.children.map(kindOf));
+    for (const kind of ["dirname", "date", "flags.mjs"])
+      assert.ok(kinds.has(kind), `${what}: no ${kind} was recorded`);
+    assert.deepEqual(
+      whereHeld(result.children, watched, kindOf),
+      ["flags.mjs: env DATABASE_URL"],
+      `${what}: the URL`,
+    );
+    assert.deepEqual(
+      namedIn(result.children, ["STAGING_DATABASE_URL", "DATABASE_URL"], kindOf),
+      ["flags.mjs: DATABASE_URL"],
+      `${what}: a database URL's name`,
+    );
+    const [flags] = result.children.filter((child) => kindOf(child) === "flags.mjs");
+    assert.ok(flags.env.split("\n").includes(`DATABASE_URL=${db.url}`), `${what}: flags.mjs's DATABASE_URL`);
+    assert.deepEqual(
+      whereHeld(result.children, [...OTHER_PARTS, ...others], kindOf),
+      [],
+      `${what}: another text`,
+    );
+    for (const text of [...watched, ...OTHER_PARTS, ...others]) {
+      assert.equal(result.output.includes(text), false, `${what}: the output holds a value`);
+    }
+  }
+
+  it("--env staging, from the caller's environment beside a DATABASE_URL of another database, or from .dev.vars: flags.mjs alone gets the URL", () => {
+    const fromEnvironment = fromEnv.flags(["apply"], {
+      extra: { STAGING_DATABASE_URL: db.url, DATABASE_URL: OTHER_URL },
+    });
+    assertToFlagsAlone(fromEnvironment, "from the environment");
+    assert.match(fromEnvironment.stdout, /flags: on the staging database \(--env staging\)/);
+    assert.match(fromEnvironment.stdout, /flags: skeleton: on \(a new global row, version 1\)/);
+    assertToFlagsAlone(fromFile.flags(["list"], { extra: { DATABASE_URL: OTHER_URL } }), "from .dev.vars");
+  });
+
+  it("--env local: the caller's DATABASE_URL goes to flags.mjs alone, and a STAGING_DATABASE_URL to no command", () => {
+    const result = fromEnv.flags(["--env", "local", "list"], {
+      extra: { DATABASE_URL: db.url, STAGING_DATABASE_URL: OTHER_URL },
+    });
+    assertToFlagsAlone(result, "--env local");
+    assert.match(result.stdout, /flags: on the local database \(--env local\)/);
+    assert.match(result.stdout, /skeleton global: on \(version 1\)/);
+  });
+
+  it("allexport, keyword and tracing from the caller, and the caller's variables of the script's own names, from either source: flags.mjs alone", () => {
+    const caller = { staging_url: CALLER_TEXT, local_url: CALLER_TEXT, db_url: CALLER_TEXT };
+    for (const [source, rig, extra] of [
+      ["from the environment", fromEnv, { STAGING_DATABASE_URL: db.url, DATABASE_URL: OTHER_URL }],
+      ["from .dev.vars", fromFile, { DATABASE_URL: OTHER_URL }],
+    ]) {
+      // [mode, its variables, bash's options, what standard error holds: a trace begins and ends at set +x]
+      for (const [mode, variables, bash, stderr] of [
+        ["SHELLOPTS=allexport", { SHELLOPTS: "allexport" }, [], ""],
+        ["bash -a -k", {}, ["-a", "-k"], ""],
+        ["SHELLOPTS=allexport:keyword", { SHELLOPTS: "allexport:keyword" }, [], ""],
+        ["the caller's variables under allexport", { ...caller, SHELLOPTS: "allexport" }, [], ""],
+        ["bash -x", {}, ["-x"], "+ set +x\n"],
+        ["SHELLOPTS=xtrace", { SHELLOPTS: "xtrace" }, [], "+ set +x\n"],
+      ]) {
+        const what = `${mode}, ${source}`;
+        const result = rig.flags(["list"], { extra: { ...extra, ...variables }, bash });
+        assertToFlagsAlone(result, what, [CALLER_TEXT]);
+        assert.equal(result.stderr, stderr, `${what}: standard error`);
+      }
+    }
+  });
+
+  it("a recorder keeps a command's environment and arguments, and the checks find a URL in either (the control for the checks above)", (t) => {
+    const dir = tempDir(t, "flags-spy-control");
+    const spy = spies(dir, ["dirname"]);
+    spawnSync(path.join(spy.bin, "dirname"), [`/made-up/${OTHER_URL}`], {
+      env: { PATH: spy.bin, DATABASE_URL: OTHER_URL },
+      encoding: "utf8",
+    });
+    const children = spy.children();
+    assert.deepEqual(whereHeld(children, OTHER_PARTS, kindOf), ["dirname: env DATABASE_URL, args 1"]);
+    assert.deepEqual(namedIn(children, ["STAGING_DATABASE_URL", "DATABASE_URL"], kindOf), [
+      "dirname: DATABASE_URL",
+    ]);
   });
 });
