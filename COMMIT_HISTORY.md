@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 563, [`89cc67b`](https://github.com/aryamahadik/rosie/commit/89cc67b), 2026-11-13 16:39:08 UTC.
+- **Through:** commit 565, [`9aeeba0`](https://github.com/aryamahadik/rosie/commit/9aeeba0), 2026-11-13 17:01:32 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 565. docs: COMMIT\_HISTORY.md through commit 563 (89cc67b, \#571) (\#573)
+
+- **Commit:** [`9aeeba0`](https://github.com/aryamahadik/rosie/commit/9aeeba0), by Arya Mahadik, 2026-11-13 17:01:32 UTC
+- **Pull request:** [#573](https://github.com/aryamahadik/rosie/pull/573) from `task/commit-history-88`, merged 2026-11-13 17:01:32 UTC. It squashed 1 branch commit:
+  - `e65512d` docs: COMMIT\_HISTORY.md through commit 563 (89cc67b, \#571)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 564. T-1354: db/repo's K-05 v1.14 claim, claimOutboxV114: with sendClass safety it waits for the recipient's lock (pg\_advisory\_xact\_lock, item 3's key; default 129) under a 2 s lock\_timeout whose 55P03 it alone answers transient (DL-698), reads, locks and counts only the recipient's open safety rows in commit order, claims checked, due held and lapsed or unclaimed sending rows and passes the rest with nothing written (defaults 130 to 132), answering v1.13's full form with passedHeld empty; a request with sendClass and no recipient or another value is refused before any statement; without the field it runs claimOutboxV113 unchanged, and V12/V113 keep refusing sendClass. Tests: the five v1.14 fixtures with their noted rows, the four refused, the walk's claims and passes in commit order and the limit, row S's case, the wait on an open ordinary claim, the bound and the next try, 55P03 scrubbed for an ordinary claim, parallel claims, every v1 to v1.13 claim fixture through the new call (\#572)
+
+- **Commit:** [`2c11859`](https://github.com/aryamahadik/rosie/commit/2c11859), by Arya Mahadik, 2026-11-13 17:01:28 UTC
+- **Pull request:** [#572](https://github.com/aryamahadik/rosie/pull/572) from `task/T-1354`, merged 2026-11-13 17:01:28 UTC. It squashed 1 branch commit:
+  - `1afa9a2` T-1354: db/repo's K-05 v1.14 claim, claimOutboxV114: with sendClass s…
+- **Files changed:** 2 (+1568 −5), by folder:
+  - `db/repo/` outbox.int.test.ts +1339 −1, outbox.ts +229 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 563. docs: COMMIT\_HISTORY.md through commit 561 (3158351, \#569) (\#571)
 
