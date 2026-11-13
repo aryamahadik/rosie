@@ -22,6 +22,14 @@
 //              email port tells a code row by its purpose (ADR-016 sections 3 and 5; cards E1 and F). claimOutboxV12
 //              keeps answering v1.2's claimed row, which v1.2 closes, so its consumers are unchanged: a claimed row
 //              with neither field is a v1 to v1.12 answer. The claim writes the same rows either way.
+//   K-05 v1.14 claimOutboxV114 (T-1354; T-1352's rulings, DL-687, DL-698; README item 67): the claim that takes v1.14's
+//              optional sendClass. Without it the request is v1.2's and the call is claimOutboxV113's, unchanged (it
+//              runs that call). With sendClass safety, its only value, for a named recipient alone, it is the safety
+//              claim of a danger line's own wake: it waits for the recipient instead of skipping it, and walks only the
+//              recipient's open safety rows, taking what it can claim and passing what it cannot, so no row of another
+//              class, and no claim on one, holds a danger line back (RULES 4.12; arch 02 line 111; arch 04 lines 201
+//              and 211). It answers in v1.13's full form. claimOutboxV12 and claimOutboxV113 keep refusing sendClass
+//              (default 25).
 // writePlan and unplannedRows are the same in every version.
 //
 // A row with no turn (K-04 v1.1's job row: turn_id null and a job id in its place, such as a sign-in code's email row,
@@ -59,6 +67,26 @@
 //                  default 20), by compare-and-set on the row's version and the claim's claim_no: its unsent parts under
 //                  their stored keys with attempts raised, its accepted parts listed as sent. A sending row with a live
 //                  claim stops the walk. The sweep also walks a recipient whose first row not passed is such a row.
+//   claimOutboxV114  With sendClass safety (K-05 v1.14 item 67), in one transaction whose every lock wait is bounded
+//                  (lock_timeout, default 22): the recipient's lock in its blocking form (pg_advisory_xact_lock, the
+//                  same key as above: item 67.1, default 129), so the claim waits for another claim's walk of the
+//                  recipient and is never skipped; then, under it, only the recipient's open rows whose send_class is
+//                  safety, in commit_seq order, FOR UPDATE (item 67.2): a row of another class is never read, locked,
+//                  passed, listed, waited for or counted toward `limit`, whatever its state or claim. Among the safety
+//                  rows, until `limit` are taken (item 67.3): a checked row, a held row whose held_until is not ahead,
+//                  and a sending row whose claim lapsed or that has none are claimed as claimOutboxV12 claims a row
+//                  (the same moves, part keys and claim rows); a sending row with a live claim (its claimer sends it,
+//                  once: default 130), a waiting_chat, planned or stale row, a held row not yet due (not listed: default
+//                  131) and a row the claim cannot take as it stands (default 132) are passed, with nothing written,
+//                  where claimOutboxV12's walk stops or lists. The answer is claimOutboxV113's form, passedHeld always
+//                  empty (item 67.4, default 135). Its lock wait past the bound answers transient (default 22).
+//                  The wait: of the two the card allows, this claim waits for the recipient's lock rather than
+//                  taking none and waiting on the rows' own FOR UPDATE locks, because K-05 v1.14 froze it so (item
+//                  67.1, default 129) and because one key keeps two walks of a recipient one after the other: the
+//                  safety walk starts on a recipient no other walk is changing, so an ordinary claim that began first
+//                  has either taken a safety row (which the safety walk then passes, its claim live) or stopped before
+//                  it, and no interleaving of two walks on one recipient's rows needs reasoning. It cannot wait in a
+//                  circle: every other claim only tries the key, and a safety claim takes one recipient's key alone.
 //   renewClaim     The dispatcher's call just before each send of a part (v1.1 item 14; K-05 default 11). It locks the row
 //                  and its claim: the row must be sending and the claim the caller's (claimer and claimNo), or claimLost
 //                  (a lapsed claim nobody took again is still the caller's); the key a pending part of the row (notFound,
@@ -110,7 +138,9 @@
 // state the row or part stands in now.
 //
 // Locks: every call that writes a row's parts or its claim locks the outbox row first (FOR UPDATE), so two calls on one
-// row run one after the other and never wait on each other in a circle; renewClaim's phone read comes last.
+// row run one after the other and never wait on each other in a circle; renewClaim's phone read comes last. The safety
+// claim takes the recipient's lock first, waiting for it, then its safety rows' locks; every other holder of that key
+// only tries it (default 129).
 //
 // Side (K-05 README "Scope": runtime; T-191's roles): each call is one transaction on the primary, uncached, run as
 // rosie_job with no business scope (inRuntimeTransaction clears it; read committed for the writes, so a FOR SHARE read
@@ -121,8 +151,9 @@
 // Answers: K-05 v1's responses and errors, and K-05 v1.1's wrongState for a move K-07 does not allow (default 1); the
 // v1.2 calls K-05 v1.2's, with v1.1's claimLost and notYet. A serialization failure, a deadlock (a renewal's with a STOP
 // that is committing included: K-05 v1.2 item 32) or a lost connection answers transient: nothing was written, and the
-// same request may be sent again. A request a call cannot carry out throws a TypeError, a database refusal no K-05
-// answer names throws DataAccessDatabaseError (its SQLSTATE and names only), and nothing is written either way.
+// same request may be sent again; so does the safety claim's lock wait past its bound (55P03), that claim's alone
+// (default 22). A request a call cannot carry out throws a TypeError, a database refusal no K-05 answer names throws
+// DataAccessDatabaseError (its SQLSTATE and names only), and nothing is written either way.
 //
 // Nothing here logs. What it throws names a call, a field, a table or a state, never a value, a row id or a key (a key
 // carries its row id); a refusal never carries PostgresError.detail, which can hold a row's words (CQ-59; the security
@@ -206,10 +237,30 @@
 //      repeatedDeliveryOf's guard ("a delivered part holds no delivered_at") is a second guard, which that CHECK makes
 //      unreachable on a migrated database; its code stays (DL-584). The v1 call reads none of this and answers as
 //      before.
+//  22. The safety claim bounds its waits (DL-698, from the database engineer's note a and the security reviewer's note
+//      b on T-1353; K-05 v1.14 bounds none): its transaction's lock_timeout is 2 s, set for that transaction alone
+//      (set_config(..., true)) before the recipient's lock, so it bounds that wait and every row lock its walk then
+//      waits for, and a holder that hung never holds a danger line's run. A wait it ends fails with 55P03
+//      (lock_not_available), which this claim alone answers transient, its SQLSTATE alone: the transaction rolled back,
+//      nothing was written, and the same request may be sent again (K-05: every call may answer transient), as the
+//      danger wake does (untilNotTransient, three tries). 55P03 stays out of db/repo's transient set (targets.ts), and
+//      no other call sets a lock_timeout. 2 s, DL-698's most, rather than less: an ordinary claim's walk of ten rows
+//      through Hyperdrive makes a few round trips a row and may pass a second, and a shorter bound would answer
+//      transient where the lock was a moment away; with the wake's three tries, a hung holder holds the run about 6 s
+//      at most.
+//  23. A request with sendClass is checked whole before any statement is sent: the fields of v1.14's request alone,
+//      sendClass safety alone (K-05 default 133), a named recipient (default 134), then v1's fields as claimOutboxV12
+//      checks them. Each refusal is a TypeError naming the field, never its value, and nothing reaches the database.
+//  24. claimOutboxV114 without sendClass runs claimOutboxV113 as it is, so v1.13's claim, its walk, its statements and
+//      its answers, is unchanged by construction (K-05 v1.14 item 67: "Without it the call is v1.13's, unchanged").
+//  25. claimOutboxV12 and claimOutboxV113 keep refusing sendClass (their request is v1.2's: exactly its four fields),
+//      so a store bound to either that is handed the field refuses the claim, before any statement, rather than claim
+//      every class (T-1356's fail-closed store; DL-698 note c; RULES 7.2).
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1";
 import type * as K05v11 from "../../contracts/generated/data-access/data-access.v1.1";
 import type * as K05v12 from "../../contracts/generated/data-access/data-access.v1.2";
 import type * as K05v19 from "../../contracts/generated/data-access/data-access.v1.9";
+import type * as K05v114 from "../../contracts/generated/data-access/data-access.v1.14";
 import type * as K12 from "../../contracts/generated/port-email/port-email.v1";
 import { commitSeqOf, instantOf, transientOrScrubbed } from "./clocks";
 import type { Sql } from "./scope";
@@ -429,6 +480,17 @@ export interface ClaimOutboxV113Response {
 }
 export type ClaimOutboxV113Outcome = ClaimOutboxV113Response | K05.TransientError;
 
+// ---- the v1.14 claim's shapes (K-05 v1.14 item 67: its claimOutbox.request takes the optional sendClass; its answer is
+// v1.13's) ---------------------------------------------------------------------------------------------------------------
+
+/**
+ * K-05 v1.14 claimOutbox.request: v1's fields, and sendClass, whose only value is safety, allowed only with
+ * recipientHandleId (README item 67). Without sendClass it is v1.2's request.
+ */
+export type ClaimOutboxV114Request = K05v114.ClaimOutboxRequest;
+/** claimOutboxV114's answer: v1.13's in its full form, with or without sendClass (K-05 v1.14 default 135). */
+export type ClaimOutboxV114Outcome = ClaimOutboxV113Outcome;
+
 // ---- request checks: what the database cannot be trusted to refuse ---------------------------------------------------
 
 const WRITE_PLAN = "writePlan";
@@ -442,6 +504,12 @@ const MARK_ROW = "markRow";
 const MAX_LIMIT = 100;
 /** K-07 default 2: a claim lapses 60 s after it is taken or renewed. */
 const CLAIM_LAPSE_MS = 60_000;
+/** K-05 v1.14 claimOutbox.request.sendClass's only value, and K-04 outbox_rows.send_class's safety (default 133). */
+const SAFETY = "safety";
+/** The bound on every lock wait of the safety claim's transaction (default 22; DL-698: 2 s at most). */
+export const SAFETY_LOCK_TIMEOUT_MS = 2_000;
+/** lock_not_available: a lock wait the safety claim's lock_timeout ended, which that claim answers transient. */
+const LOCK_NOT_AVAILABLE = "55P03";
 /** K-04 outbox_parts_key_form as K-05 writes it: '<row>/<part>/<try>'. */
 const PART_KEY = /^.+\/[12]\/[1-9][0-9]*$/;
 const CHANNELS: ReadonlySet<string> = new Set<Channel>(["imessage", "rcs", "sms", "email"]);
@@ -646,6 +714,40 @@ function checkClaim(request: ClaimOutboxRequest): ClaimChecked {
     now: instantOf(CLAIM_OUTBOX, raw.now, "now"),
     limit,
   };
+}
+
+/** The safety claim's request, checked: v1's fields, with its one recipient named (K-05 v1.14 item 67). */
+interface SafetyClaimChecked extends ClaimChecked {
+  readonly recipientHandleId: string;
+}
+
+/**
+ * K-05 v1.14 claimOutbox.request (item 67; default 23): null for a request without sendClass, which is v1.2's and goes
+ * to claimOutboxV113 as it is; else the safety claim's request. sendClass is safety alone (K-05 default 133) and needs a
+ * named recipient (default 134); every refusal is thrown before any statement.
+ */
+function checkSafetyClaim(request: ClaimOutboxV114Request): SafetyClaimChecked | null {
+  assertRequestShape(request, CLAIM_OUTBOX, ["claimer", "recipientHandleId", "now", "limit", "sendClass"]);
+  const raw = request as unknown as Row;
+  if (!Object.hasOwn(raw, "sendClass")) {
+    return null;
+  }
+  if (raw.sendClass !== SAFETY) {
+    fail(CLAIM_OUTBOX, "sendClass is not safety, its only value (K-05 v1.14 default 133)");
+  }
+  if (!Object.hasOwn(raw, "recipientHandleId")) {
+    fail(
+      CLAIM_OUTBOX,
+      "sendClass is made for one named recipient: recipientHandleId is missing (default 134)",
+    );
+  }
+  const v1 = Object.fromEntries(Object.entries(raw).filter(([field]) => field !== "sendClass"));
+  const checked = checkClaim(v1 as unknown as ClaimOutboxRequest);
+  const { recipientHandleId } = checked;
+  if (recipientHandleId === null) {
+    fail(CLAIM_OUTBOX, "sendClass is made for one named recipient (default 134)");
+  }
+  return { ...checked, recipientHandleId };
 }
 
 interface RenewChecked {
@@ -1209,12 +1311,26 @@ async function claimableRecipientsV12(tx: Sql, now: Date): Promise<string[]> {
   return rows.map((row) => row.recipient_handle_id);
 }
 
+/** The text the recipient's lock is keyed on, hashed by hashtextextended (default 10; K-05 v1.14 item 67.1). */
+function recipientLockKey(recipientHandleId: string): string {
+  return `outbox-recipient:${recipientHandleId}`;
+}
+
 /** The recipient's transaction-level lock, or false when another claim holds it (default 10). */
 async function lockRecipient(tx: Sql, recipientHandleId: string): Promise<boolean> {
   const [lock] = await tx<{ taken: boolean }[]>`
-    select pg_try_advisory_xact_lock(hashtextextended(${`outbox-recipient:${recipientHandleId}`}, 0)) as taken
+    select pg_try_advisory_xact_lock(hashtextextended(${recipientLockKey(recipientHandleId)}, 0)) as taken
   `;
   return lock?.taken === true;
+}
+
+/**
+ * The same lock in its blocking form, the safety claim's (K-05 v1.14 item 67.1, default 129): it waits for a claim
+ * that holds it to end its transaction, within the transaction's lock_timeout (default 22), and never skips the
+ * recipient. Let go at the commit or the rollback, as lockRecipient's.
+ */
+async function waitForRecipient(tx: Sql, recipientHandleId: string): Promise<void> {
+  await tx`select pg_advisory_xact_lock(hashtextextended(${recipientLockKey(recipientHandleId)}, 0))`;
 }
 
 /** The latest try of each part number, by part number. */
@@ -1575,6 +1691,115 @@ export async function claimOutboxV113(
     );
   } catch (error) {
     return transientOrScrubbed(CLAIM_OUTBOX, error);
+  }
+}
+
+// ---- claimOutbox with sendClass safety (K-05 v1.14 item 67) -----------------------------------------------------------
+
+/**
+ * One of the recipient's safety rows, as the safety walk meets it (K-05 v1.14 item 67.3): claimed as claimRow claims a
+ * row of the walk of items 3 and 13, or null, passed with nothing written. A checked row, a held row whose held_until
+ * is not ahead (default 4) and a sending row whose claim lapsed or that has none (default 20) are claimed, the claim
+ * read under the row's lock (default 12). Passed where that walk stops or lists: a sending row with a live claim, which
+ * its claimer sends, once (K-05 default 130); a waiting_chat, planned or stale row; a held row not yet due, not listed
+ * (default 131); and a row claimRow cannot take as it stands (default 132).
+ */
+async function takeSafetyRow(tx: Sql, row: OpenRow, request: SafetyClaimChecked): Promise<Taken | null> {
+  const claimable =
+    row.state === "checked" ||
+    row.state === "sending" ||
+    (row.state === "held" && !heldAhead(row, request.now));
+  if (!claimable) {
+    return null;
+  }
+  const current = await lockClaim(tx, row.id);
+  if (
+    row.state === "sending" &&
+    current !== undefined &&
+    current.lapses_at.getTime() > request.now.getTime()
+  ) {
+    return null;
+  }
+  return claimRow(tx, row, request.recipientHandleId, {
+    claimer: request.claimer,
+    now: request.now,
+    current,
+  });
+}
+
+/**
+ * The safety claim's walk (K-05 v1.14 item 67): the transaction's lock waits bounded (default 22), the recipient's
+ * lock waited for (item 67.1, default 129), then only the recipient's open rows whose send_class is safety, FOR UPDATE
+ * in commit_seq order (item 67.2), each claimed or passed until `limit` of them are taken (item 67.3). No statement
+ * reads, locks or counts a row of another class.
+ */
+async function claimSafetyIn(tx: Sql, request: SafetyClaimChecked): Promise<Taken[]> {
+  await tx`select set_config('lock_timeout', ${`${String(SAFETY_LOCK_TIMEOUT_MS)}ms`}, true)`;
+  await waitForRecipient(tx, request.recipientHandleId);
+  const rows = await tx<OpenRow[]>`
+    select id, commit_seq, state, held_until, version, recipient_person_id, business_id, booking_id,
+           open_question_id, channel, send_class, versions_read, final_parts, trace_id, email_purpose, not_after
+    from outbox_rows
+    where recipient_handle_id = ${request.recipientHandleId} and send_class = ${SAFETY}
+      and state in ${tx(OPEN_STATES)}
+    order by commit_seq
+    for update
+  `;
+  const taken: Taken[] = [];
+  for (const row of rows) {
+    if (taken.length >= request.limit) {
+      break;
+    }
+    const one = await takeSafetyRow(tx, row, request);
+    if (one !== null) {
+      taken.push(one);
+    }
+  }
+  return taken;
+}
+
+/**
+ * The safety claim's failure as it leaves (default 22): a lock wait its lock_timeout ended (55P03) answers transient,
+ * with that SQLSTATE alone; any other failure leaves as every claim's does, transient or thrown scrubbed (clocks.ts).
+ */
+function safetyClaimFailure(error: unknown): K05.TransientError {
+  const code = (error as { code?: unknown } | null | undefined)?.code;
+  if (error instanceof Error && error.name === "PostgresError" && code === LOCK_NOT_AVAILABLE) {
+    return { error: "transient", sqlstate: LOCK_NOT_AVAILABLE };
+  }
+  return transientOrScrubbed(CLAIM_OUTBOX, error);
+}
+
+/**
+ * K-05 v1.14's claim (README item 67; T-1354; T-1352's rulings, DL-687, DL-698). Without sendClass it is
+ * claimOutboxV113, run as it is (default 24). With sendClass safety and a named recipient it is the safety claim of a
+ * danger line's own wake: one transaction on the primary, on the runtime side, its lock waits bounded (default 22),
+ * that waits for the recipient's lock and never skips the recipient (default 129), reads, locks and counts only the
+ * recipient's open safety rows, and claims each it can in commit order, passing each it cannot. Answers claimed in
+ * v1.13's full form, each claimed row of send class safety and passedHeld empty (default 135), or transient, a lock
+ * wait past the bound among them. A request it cannot carry out (sendClass with no recipient, any value but safety, a
+ * field v1.14 does not name) is thrown, a TypeError, before any statement (default 23). Pass the client's primary
+ * handle, run as rosie_job.
+ */
+export async function claimOutboxV114(
+  sql: Sql,
+  request: ClaimOutboxV114Request,
+): Promise<ClaimOutboxV114Outcome> {
+  const safety = checkSafetyClaim(request);
+  if (safety === null) {
+    return claimOutboxV113(sql, request);
+  }
+  try {
+    return await inRuntimeTransaction(
+      sql,
+      { readOnly: false },
+      async (tx): Promise<ClaimOutboxV113Response> => {
+        const taken = await claimSafetyIn(tx, safety);
+        return { result: "claimed", claimed: taken.map(claimedV113), passedHeld: [] };
+      },
+    );
+  } catch (error) {
+    return safetyClaimFailure(error);
   }
 }
 
