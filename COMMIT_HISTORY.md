@@ -2,9 +2,57 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 577, [`0ef3a02`](https://github.com/aryamahadik/rosie/commit/0ef3a02), 2026-11-13 21:35:57 UTC.
+- **Through:** commit 579, [`335d87c`](https://github.com/aryamahadik/rosie/commit/335d87c), 2026-11-13 22:07:49 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 579. docs: COMMIT\_HISTORY.md through commit 577 (0ef3a02, \#585) (\#587)
+
+- **Commit:** [`335d87c`](https://github.com/aryamahadik/rosie/commit/335d87c), by Arya Mahadik, 2026-11-13 22:07:49 UTC
+- **Pull request:** [#587](https://github.com/aryamahadik/rosie/pull/587) from `task/commit-history-94`, merged 2026-11-13 22:07:49 UTC. It squashed 1 branch commit:
+  - `c834ea4` docs: COMMIT\_HISTORY.md through commit 577 (0ef3a02, \#585)
+- **Files changed:** 1 (+39 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +39 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 578. T-763: the payments and ledger service base: four ways, one payment now on one card, never a hold, an append-only ledger, effect rows with keys; a payer who is not the booker gets only a pay link (\#584)
+
+- **Commit:** [`f02d23a`](https://github.com/aryamahadik/rosie/commit/f02d23a), by Arya Mahadik, 2026-11-13 22:07:45 UTC
+- **Pull request:** [#584](https://github.com/aryamahadik/rosie/pull/584) from `task/T-763`, merged 2026-11-13 22:07:46 UTC. It squashed 3 branch commits:
+  - `657041b` T-763: payments and ledger service base: a booking's money step as ex…
+  - `1ca39e5` T-763: round 2 (DL-727): a card is charged only for the booker, so ch…
+  - `cd42f7a` T-763: round 3 (DL-732): mulberry32's divisor in test-support.ts is w…
+- **Files changed:** 11 (+3830 −0), by folder:
+  - `actions/src/domain/payments/` errors.ts +76 −0, index.ts +69 −0, ledger.ts +201 −0, payments.test.ts +1095 −0, rows.test.ts +761 −0, rows.ts +279 −0, service.ts +573 −0, test-support.ts +393 −0, turn.ts +69 −0, types.ts +276 −0, yes.ts +38 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-763: payments and ledger service base: a booking's money step as exactly one Stripe effect row with its key (card save, deposit or full price on the business's own account), pay links, the append-only ledger; never a hold, no charge without a committed exact yes bound to that booking, two charges for one booking in one turn refused
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-763: round 2 (DL-727): a card is charged only for the booker, so charge() refuses a payer who is not the booker whatever the purpose, presence or yes (payerNotBooker; RULES 3.13, 1.10), and that payer is asked money only by a pay link for the rest; off the page only a card saved for this booking is charged (cardNotKept); default 4 and 5 reworded; rows.test.ts refuses K-32's non-card 0000 1111 2222 3333 in place of Stripe's test number; new tests: the reviewer's case and its variants, the booker paying the rest at DONE, a payer-not-booker property test for charge and payLink, both sides of the saved-card check
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-763: round 3 (DL-732): mulberry32's divisor in test-support.ts is written 2 ** 32, not as its ten digits, so the phone scan of every tracked file (T-1317) reads no number at line 384; the same value, so every seeded property test draws the same cases
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 577. docs: COMMIT\_HISTORY.md through commit 575 (fb1dc53, \#583) (\#585)
 
