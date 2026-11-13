@@ -19,6 +19,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import commitFirst from "../../../contracts/data-access/fixtures/commit-first.json";
 import textImessage from "../../../contracts/inbound-event/fixtures/text-imessage.json";
+import safetyCrisisWords from "../../../contracts/model/fixtures/safety-crisis-words.json";
 import safetyEmergencyNow from "../../../contracts/model/fixtures/safety-emergency-now.json";
 import safetyNo from "../../../contracts/model/fixtures/safety-no.json";
 import { fakeBundles } from "../bundle/test-support";
@@ -1442,11 +1443,11 @@ function triedDirect(h: Harness, tries: [number, string][]): SafetyDeps["direct"
 }
 
 /**
- * Makes the actor's storage throw, inside the actor, at the first write that sets a text's danger flag on its own
- * (`markDanger`'s, which carries the line mark in the same statement); every other statement runs as it is. Returns how
- * many it refused.
+ * Makes the actor's storage throw, inside the actor, at the first write whose statement holds `set`: "SET danger = 1" is
+ * `markDanger`'s alone (the danger flag with the line mark, one statement), "SET line_open = 0" the write that clears the
+ * mark once the line is done. Every other statement runs as it is. Returns how many it refused.
  */
-async function refuseFirstFlag(): Promise<() => number> {
+async function refuseFirstWrite(set: "SET danger = 1" | "SET line_open = 0"): Promise<() => number> {
   let refused = 0;
   await runInDurableObject(stub(), (_, state) => {
     const { sql } = state.storage;
@@ -1455,7 +1456,7 @@ async function refuseFirstFlag(): Promise<() => number> {
       query: string,
       ...bindings: SqlStorageValue[]
     ): SqlStorageCursor<Record<string, SqlStorageValue>> => {
-      if (refused === 0 && query.includes("SET danger = 1")) {
+      if (refused === 0 && query.includes(set)) {
         refused += 1;
         throw new Error("the storage refused");
       }
@@ -1465,6 +1466,8 @@ async function refuseFirstFlag(): Promise<() => number> {
   });
   return () => refused;
 }
+
+const crisis = (eventId: string): SafetyResult => ({ ...asResult(safetyCrisisWords), eventId });
 
 /** Linq's double that keeps each send tried and never answers: a cut comes during it. */
 function hangingDirect(h: Harness, tries: [number, string][]): SafetyDeps["direct"] {
@@ -1843,7 +1846,7 @@ describe("a danger whose line is not done keeps a lasting mark, however its pend
         run.h.core.down = true;
         run.h.direct.fail = true;
         await refuseNotes();
-        const refused = await refuseFirstFlag();
+        const refused = await refuseFirstWrite("SET danger = 1");
         await arrive("evt-1", SMOKE_TEXT);
         await run.settle();
 
@@ -1965,6 +1968,43 @@ describe("a danger whose line is not done keeps a lasting mark, however its pend
         expect(await lineMarkOf("evt-1")).toBe(0);
       },
     );
+  });
+
+  it("a danger whose line went but whose line mark could not be cleared counts its line as not done: its noted line stays, so the read that finds danger again, another danger this time, repeats the noted line under the same key, never another line, and then the mark clears", async () => {
+    const read = readsBy((eventId, nth) => (nth === 1 ? emergency(eventId) : crisis(eventId)));
+    await withActor({}, { deps: (h) => ({ ...h.deps, read }) }, async (run) => {
+      run.h.core.down = true;
+      await refuseNotes();
+      const refused = await refuseFirstWrite("SET line_open = 0");
+      await arrive("evt-1", SMOKE_TEXT);
+      await run.settle();
+
+      // 0 s: the line went, once, and its record is queued; the write that clears its mark threw, so the mark and the
+      // noted line stay, and it is read again 30 s on.
+      expect(refused()).toBe(1);
+      expect(run.h.direct.sent.map((send) => [send.at, send.idempotencyKey])).toEqual([[0, LINE_KEY]]);
+      expect(await lineMarkOf("evt-1")).toBe(1);
+      expect(await notedLineOf("evt-1")).toBe("safetyEmergency");
+      await vi.waitFor(async () => {
+        expect(await scheduleOf()).toContainEqual({ kind: "safetyRead", due_ms: 30_000 });
+      }, WAIT);
+
+      // 30 s: Crisis words, whose own line is another: the noted line goes again under its key, which Linq takes as one
+      // message, and the mark clears.
+      await run.h.clock.advance(30_000);
+      await run.wake();
+      await vi.waitFor(() => {
+        expect(run.h.direct.sent).toHaveLength(2);
+      }, WAIT);
+      await run.settle();
+      expect(run.h.direct.sent.map((send) => [send.at, send.idempotencyKey])).toEqual([
+        [0, LINE_KEY],
+        [30_000, LINE_KEY],
+      ]);
+      expect(await labelsOf("evt-1")).toEqual(["An emergency", "Crisis words"]);
+      expect(await lineMarkOf("evt-1")).toBe(0);
+      await vi.waitFor(noSafetyEntry, WAIT);
+    });
   });
 
   it("an actor whose safety_events table was made before the line mark gains its column as it starts, its rows unmarked; a danger read after that gets its mark in the write that sets its flag", async () => {
