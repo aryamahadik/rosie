@@ -1,0 +1,19 @@
+{
+  // T-1329 (DL-612, DL-617, DL-625, DL-631): `npm run typecheck` checks db/ a second time through this config, which
+  // adds erasableSyntaxOnly, so it refuses there any syntax Node's type stripping cannot run (parameter properties,
+  // enums, namespaces, `import =`). Node runs db/ straight from TypeScript, with no bundler (db/seeds/run.mjs,
+  // infra/flags/flags.mjs and the CI script tests that load db/seeds and db/repo), and stops at such a line with
+  // ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX (train 143). The rest of the repository is bundled by wrangler or run by Vitest,
+  // whose transform runs that syntax, so the root program (tsconfig.json) keeps it allowed there. db/'s own test files
+  // (*.test.ts, *.int.test.ts) are left out for the same reason: Vitest runs them (DL-625); the root program still
+  // type-checks them. Every other option is the root's.
+  // It is not named tsconfig.json (DL-631): typescript-eslint's projectService, Vitest and wrangler each take the
+  // nearest tsconfig.json, and with one in db/, ESLint typed db/ through two programs and ran out of heap. Only the
+  // typecheck script names this file, so every other tool sees db/ through the root tsconfig.json, as on main.
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "erasableSyntaxOnly": true
+  },
+  "include": ["**/*"],
+  "exclude": ["**/*.test.ts"]
+}

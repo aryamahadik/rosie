@@ -1,5 +1,7 @@
 {
-  // One program for every workspace (factory spec 2): `npm run typecheck` runs `tsc --noEmit -p .`.
+  // One program for every workspace (factory spec 2): `npm run typecheck` runs `tsc --noEmit -p .`, then
+  // `tsc --noEmit -p db/tsconfig.erasable.json`, which checks db/ but its test files again with erasableSyntaxOnly
+  // (T-1329). That file is not named tsconfig.json, so ESLint, Vitest and wrangler see db/ only through this one.
   // Node types load first, then the Workers types: unit tests run Workers code under Node, and the Worker runs with
   // nodejs_compat (Cloudflare's TypeScript guidance pairs its runtime types with @types/node). The two packages
   // declare some of the same globals; skipLibCheck (tsconfig.base.json) keeps that overlap out of the results.
