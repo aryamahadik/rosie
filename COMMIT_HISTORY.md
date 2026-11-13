@@ -2,9 +2,76 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 503, [`ff4e7e2`](https://github.com/aryamahadik/rosie/commit/ff4e7e2), 2026-11-13 03:43:38 UTC.
+- **Through:** commit 506, [`3963ee6`](https://github.com/aryamahadik/rosie/commit/3963ee6), 2026-11-13 04:46:15 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 506. docs: COMMIT\_HISTORY.md through commit 503 (ff4e7e2, \#511) (\#514)
+
+- **Commit:** [`3963ee6`](https://github.com/aryamahadik/rosie/commit/3963ee6), by Arya Mahadik, 2026-11-13 04:46:15 UTC
+- **Pull request:** [#514](https://github.com/aryamahadik/rosie/pull/514) from `task/commit-history-63`, merged 2026-11-13 04:46:15 UTC. It squashed 1 branch commit:
+  - `62ccf2f` docs: COMMIT\_HISTORY.md through commit 503 (ff4e7e2, \#511)
+- **Files changed:** 1 (+68 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +68 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 505. docs: infra/ci/README.md names the db/ syntax guard and its test (T-1329) (\#512)
+
+- **Commit:** [`46013a5`](https://github.com/aryamahadik/rosie/commit/46013a5), by Arya Mahadik, 2026-11-13 04:46:11 UTC
+- **Pull request:** [#512](https://github.com/aryamahadik/rosie/pull/512) from `task/docs-ci-readme-erasable`, merged 2026-11-13 04:46:12 UTC. It squashed 1 branch commit:
+  - `096c258` docs: infra/ci/README.md names the db/ syntax guard and its test (T-1…
+- **Files changed:** 1 (+6 −0), by folder:
+  - `infra/ci/` README.md +6 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 504. T-1323: the AI-outage line asks the actor's one STOP reading before each text's line, failing closed (\#513)
+
+- **Commit:** [`49c1ba9`](https://github.com/aryamahadik/rosie/commit/49c1ba9), by Arya Mahadik, 2026-11-13 04:46:07 UTC
+- **Pull request:** [#513](https://github.com/aryamahadik/rosie/pull/513) from `task/T-1323`, merged 2026-11-13 04:46:08 UTC. It squashed 5 branch commits:
+  - `5019744` T-1323: the AI-outage line asks the actor's one reading (copy or stop…
+  - `a04b7de` T-1323: OutageHost.stopped's comment says a true answer holds the run…
+  - `76d8df6` Merge branch 'main' into task/T-1323
+  - `4318479` Merge branch 'main' into task/T-1323
+  - `7e36ffe` T-1323: round 2 (DL-644, DL-645): the AI-outage path asks the actor's…
+- **Files changed:** 5 (+889 −20), by folder:
+  - `runtime/src/actor/` handle-actor.ts +21 −3
+  - `runtime/src/outage/ai/` lease.worker.test.ts +520 −3, outage.ts +74 −12, outage.worker.test.ts +254 −1, types.ts +20 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1323: the AI-outage line asks the actor's one reading (copy or stopPending) before it goes, failing closed; both ways proved unwired and wired, the claim test restated with its wired twin (DL-615)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1323: OutageHost.stopped's comment says a true answer holds the run's lines back, not only the try's
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1323: round 2 (DL-644, DL-645): the AI-outage path asks the actor's one reading right before each text's line and before the try's wake, so a STOP the actor takes while the flag is read or an earlier line is out holds every later line and wakes no row; the safety host's stopped and the AI host call mayHaveStopped; proved through the real actor (a STOP taken while the first line's answer is held: no second line, unwired and wired) and in unit tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 503. docs: COMMIT\_HISTORY.md through commit 500 (0858e4b, \#508) (\#511)
 
