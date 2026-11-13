@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 559, [`c290f4f`](https://github.com/aryamahadik/rosie/commit/c290f4f), 2026-11-13 15:40:17 UTC.
+- **Through:** commit 561, [`3158351`](https://github.com/aryamahadik/rosie/commit/3158351), 2026-11-13 16:17:51 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 561. docs: COMMIT\_HISTORY.md through commit 559 (c290f4f, \#567) (\#569)
+
+- **Commit:** [`3158351`](https://github.com/aryamahadik/rosie/commit/3158351), by Arya Mahadik, 2026-11-13 16:17:51 UTC
+- **Pull request:** [#569](https://github.com/aryamahadik/rosie/pull/569) from `task/commit-history-86`, merged 2026-11-13 16:17:52 UTC. It squashed 1 branch commit:
+  - `d0659f4` docs: COMMIT\_HISTORY.md through commit 559 (c290f4f, \#567)
+- **Files changed:** 1 (+47 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +47 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 560. T-1362: reservations.ts inSavepoint decides by targets.ts's foundGone, so a lost connection inside a savepoint gets no rollback to savepoint and reserve or release always settles; integration tests cut a rosie\_job socket 8 ways at 2 points inside reserveIn's three savepoints and releaseIn's, and show a live failure still rolled back to the savepoint (\#568)
+
+- **Commit:** [`bdc7ff3`](https://github.com/aryamahadik/rosie/commit/bdc7ff3), by Arya Mahadik, 2026-11-13 16:17:47 UTC
+- **Pull request:** [#568](https://github.com/aryamahadik/rosie/pull/568) from `task/T-1362`, merged 2026-11-13 16:17:47 UTC. It squashed 1 branch commit:
+  - `7004a92` T-1362: reservations.ts inSavepoint decides by targets.ts's foundGone…
+- **Files changed:** 2 (+437 −4), by folder:
+  - `db/repo/` reservations.int.test.ts +428 −0, reservations.ts +9 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 559. docs: COMMIT\_HISTORY.md through commit 557 (25912cb, \#565) (\#567)
 
