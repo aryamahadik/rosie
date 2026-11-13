@@ -1878,6 +1878,20 @@ export class SafetyOnArrival {
    * before the flag is read, and again right before each send, the core's and each one straight through Linq, with nothing
    * awaited between its answer and the send (T-1336; RULES 7.2: "It stops texts from the number it answers, at once"):
    * its word holds the line, as the core's `phoneStopped` does. The danger line (`sendDanger`) never asks it (RULES 4.12).
+   *
+   * Once the core's answer names the line's row, first or repeated, the actor starts a wake of the recipient's dispatcher
+   * for it at once (`SafetyDeps.wake`; T-1341, DL-669), after the hand-off time is taken and before this returns, so the row
+   * goes within the line's 5 s, or is dropped by the dispatcher's own ask: the dispatcher, not this writer, holds an outage
+   * row for a possible STOP, asking the recipient actor's one reading right before each part goes (T-1337). The wake is
+   * gated by that same reading, asked right before it with nothing awaited between, and starts in that same step: only
+   * exactly false lets it go (a host with no reading, a throw, true or any other answer makes none), since a wake runs every
+   * sendable row of the recipient and a routine row is not asked (T-1342). The wake is started, never awaited (DL-679):
+   * nothing here, in `applyResult` or in `settle` waits for its run, so the text's late read is set up as before and a late
+   * danger verdict's line never waits for a dispatcher run (RULES 4.12: "Danger now: the safety message first"; arch 04
+   * line 211). Its run is kept with the in-flight safety work (`pending`, beside the text's own work that `track` keeps and
+   * `idle` awaits) until it ends. Not woken, or a wake that fails (a throw or a rejection, caught here, never tried again),
+   * leaves the row for the recipient's next dispatcher run, which asks the reading again; no sweep runs. Either way the
+   * line's result stands.
    */
   private async sendOutage(
     set: SafetyDeps,
@@ -1919,7 +1933,29 @@ export class SafetyOnArrival {
       if (actorSaysStopped()) return { path: "none", lineId: line.id, handedAfterMs: null };
       const answer = await set.core.sendFixedLine(request).catch((): CoreError => ({ error: "transient" }));
       if (!isError(answer)) {
-        return { path: "outbox", lineId: line.id, handedAfterMs: set.clock.now() - arrivedAt };
+        const handedAfterMs = set.clock.now() - arrivedAt;
+        const row: unknown = answer.outboxRowId;
+        // The row the core named goes to the recipient's dispatcher at once, only while the reading, asked right before
+        // the wake, says exactly false (T-1341; DL-669). The wake starts in that same step and is never awaited (DL-679):
+        // its run is kept with the in-flight safety work until it ends, and a wake that fails changes nothing for the line.
+        if (
+          typeof row === "string" &&
+          row !== "" &&
+          set.wake !== undefined &&
+          this.host.stopped !== undefined &&
+          !actorSaysStopped()
+        ) {
+          try {
+            const run = set.wake({ handleId: ids.handleId, outboxRowIds: [row] }).catch(() => {
+              // Not woken: the row waits for the recipient's next dispatcher run, which asks the reading again.
+            });
+            this.pending.add(run);
+            void run.finally(() => this.pending.delete(run));
+          } catch {
+            // A wake that throws at once: the same.
+          }
+        }
+        return { path: "outbox", lineId: line.id, handedAfterMs };
       }
       if (answer.error === "phoneStopped") return { path: "none", lineId: line.id, handedAfterMs: null };
       // And right before the line goes straight through Linq: a STOP taken while the core was asked holds it too.

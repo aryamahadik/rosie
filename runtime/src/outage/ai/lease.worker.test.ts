@@ -18,6 +18,11 @@
 // real runDispatch and limit 8 run over the dispatcher's doubles (../../dispatch/test-support.ts), K-09's doubles write
 // each row into the K-05 outbox double as the core does, and the root's own port (../../wiring/root.ts actorReadingPort)
 // asks this real actor, through its stub, right before the send; no outage_texts row is written by hand.
+//
+// T-1341 (DL-669): each outage row written outside a turn's commit is woken by its own writer, while the actor's one
+// reading says exactly false. Where a test joins it, the writers' wake is one run of that real dispatcher for the recipient
+// the wake names, as the root builds it, joined as the safety read's SafetyDeps.wake and as the AI-down path's
+// OutageDeps.wake; no test runs the dispatcher unless it says so.
 import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it } from "vitest";
@@ -35,6 +40,8 @@ import {
   turnIdOf,
   type BatchEntry,
   type HandleActor,
+  type HoldEntry,
+  type SafetyEntry,
   type TurnEntry,
 } from "../../actor";
 import type { ActorCopies } from "../../actor/copies/copies";
@@ -97,6 +104,7 @@ import {
   RETRY_MS,
   outageLineRequest,
   setOutageDeps,
+  type OutageWake,
   type WaitingTurn,
 } from "./index";
 import { outageHarness, type OutageHarness } from "./test-support";
@@ -128,6 +136,8 @@ interface Party {
 /** The actor's reads over RPC, typed here. */
 interface ActorRpc {
   readTurns(): Promise<TurnEntry[]>;
+  readSafety(): Promise<SafetyEntry[]>;
+  readHolds(): Promise<HoldEntry[]>;
   readBatches(): Promise<BatchEntry[]>;
   readWaitingBatches(): Promise<number[]>;
   safetyIdle(): Promise<void>;
@@ -234,7 +244,9 @@ interface DownRig extends Rig {
  * otherwise. The handle's keyword copy is bundle A's, installed by the actor's own ActorCopies.refreshKeywords before any
  * text arrives (the call each turn's pin makes: handle-actor.ts pinAndCopy), so the down path's real classify reads each
  * text, with the key store the gateway sealed it under. `wiring` (T-1337) names the handle's ids the safety read's calls
- * use (TEST_IDS's when left out) and the turn's dispatcher (the turn's doubles' when left out).
+ * use (TEST_IDS's when left out) and the turn's dispatcher (the turn's doubles' when left out); and (T-1341) the outage
+ * lines' writers' wake, joined as the root joins it, as the safety read's `SafetyDeps.wake` and, after the AI-down path's
+ * own record of each wake (`o.wakes`), as its `OutageDeps.wake` (none when left out: the rows wait for a run).
  */
 async function downRigFor(
   who: Party,
@@ -242,7 +254,11 @@ async function downRigFor(
   down: number,
   downPath: boolean,
   answers: Record<string, SafetyResult> = {},
-  wiring: { ids?: HandleIds; dispatcher?: TurnDeps["dispatcher"] } = {},
+  wiring: {
+    ids?: HandleIds;
+    dispatcher?: TurnDeps["dispatcher"];
+    wake?: (request: OutageWake) => Promise<void>;
+  } = {},
 ): Promise<DownRig> {
   const all: Record<string, SafetyResult> = {
     ...Object.fromEntries(eventIds.map((eventId) => [eventId, safetyNoFor(eventId)])),
@@ -251,15 +267,31 @@ async function downRigFor(
   const f = dbFakes(keys, all, { start: 0, ids: wiring.ids ?? TEST_IDS });
   const read = fakeRead(f.clock, all);
   const stopped = { value: false };
+  const wake = wiring.wake;
   const h: Harness = {
     clock: f.clock,
     core: f.core,
     direct: f.direct,
     read,
     stopped,
-    deps: { ...f.safetyDeps, read, isStopped: () => stopped.value },
+    deps: {
+      ...f.safetyDeps,
+      read,
+      isStopped: () => stopped.value,
+      ...(wake === undefined ? {} : { wake }),
+    },
   };
   const o = outageHarness(f.clock);
+  const outageDeps =
+    wake === undefined
+      ? o.deps
+      : {
+          ...o.deps,
+          async wake(request: OutageWake): Promise<void> {
+            await o.deps.wake?.(request);
+            await wake(request);
+          },
+        };
   const face = fakeTurnFace();
   const ai = fakeDecide(face.log);
   const facts = fakeFacts(who.party, [buildFrontierS102.request.now, commitS102.request.now]);
@@ -281,7 +313,7 @@ async function downRigFor(
     setBundleDeps(f.bundleDeps),
     setTurnDeps(wiring.dispatcher === undefined ? turnSet : { ...turnSet, dispatcher: wiring.dispatcher }),
     setGuardDeps({ targets: targets.port }),
-    setOutageDeps(o.deps),
+    setOutageDeps(outageDeps),
   );
   if (downPath) restores.push(setDbOutageDeps(f.outageDeps));
   const copied = await runInDurableObject(stubOf(who), (instance) =>
@@ -399,7 +431,13 @@ describe("the AI-down path inside the real lease", () => {
     // Each text got the line once: one row per text, the rerun's asks answered repeated.
     expect([...rig.o.lines.rows.keys()]).toEqual(["safety:evt-sam-0001", "safety:evt-sam-0002"]);
     expect(rig.o.lines.requests).toHaveLength(4);
-    expect(rig.o.wakes).toHaveLength(1);
+    // The try that wrote the rows woke them, and the rerun, whose asks K-09 answered repeated with the same two rows, woke
+    // them again (T-1341: a first wake may have been lost); a second wake sends nothing twice (one claim, one key per part).
+    const woken = {
+      handleId: SAM.party.handleId,
+      outboxRowIds: ["out-safety-evt-sam-0001-outage", "out-safety-evt-sam-0002-outage"],
+    };
+    expect(rig.o.wakes).toEqual([woken, woken]);
   });
 
   it("the turn's outage line is the safety read's own request for the same text (its timeout rule's), so K-09 sends it once per text", async () => {
@@ -893,6 +931,27 @@ describe("an outage line's row written before a STOP that has not committed is n
     readonly dispatcher: TurnDeps["dispatcher"];
     /** Writes a sendable row, its one part the line's words, after the rows written before it (commit order). */
     write(seed: Omit<SeedRow, "commitSeq" | "sends">): void;
+    /** Each claim any run asked the outbox double for, by the recipient it named (null: none), in order (T-1341). */
+    readonly claims: (string | null)[];
+    /** Each wake an outage line's writer made, in order: the safety read's and the AI-down path's alike (T-1341). */
+    readonly woken: OutageWake[];
+    /** How many of the next wakes throw before their run starts (a wake that fails). */
+    wakeFails: number;
+    /** Where the next run waits behind `runGate` until the test opens it: its chat lookup or its claim's renewal. */
+    heldAt: "the chat lookup" | "the claim's renewal" | null;
+    readonly runGate: Hold;
+    /** True once a run reached the await it was held at. */
+    reached: boolean;
+    /**
+     * How many writers' wakes' runs have ended. The safety read's writer starts its wake and never awaits it (DL-679), so
+     * its line can be decided while the run is still out.
+     */
+    ended: number;
+    /**
+     * The outage lines' writers' wake as the root builds it (../../wiring/root.ts `outageWake`, T-1341): one run of the real
+     * dispatcher for the recipient the wake names, on these ports, the root's port to the real actor among them.
+     */
+    wake(request: OutageWake): Promise<void>;
   }
 
   function sends(): Sends {
@@ -916,10 +975,33 @@ describe("an outage line's row written before a STOP that has not committed is n
         throw error;
       }
     };
+    /** Holds the run behind `runGate` at `at` when the test asked for it there, once. */
+    const holdAt = async (at: Sends["heldAt"]): Promise<void> => {
+      if (to.heldAt !== at) return;
+      to.heldAt = null;
+      to.reached = true;
+      await to.runGate.wait();
+    };
     const deps = (port: DispatchDeps["mayHaveStopped"] | null = recorded): DispatchDeps => ({
-      store,
+      store: {
+        claimOutbox: (request) => {
+          to.claims.push(request.recipientHandleId ?? null);
+          return store.claimOutbox(request);
+        },
+        renewClaim: async (request) => {
+          await holdAt("the claim's renewal");
+          return store.renewClaim(request);
+        },
+        markPart: (request) => store.markPart(request),
+        markRow: (request) => store.markRow(request),
+      },
       linq,
-      recipients,
+      recipients: {
+        chatFor: async (handleId) => {
+          await holdAt("the chat lookup");
+          return recipients.chatFor(handleId);
+        },
+      },
       sendState: state,
       environment: "test",
       traceFor: traceCollector(spans),
@@ -928,7 +1010,7 @@ describe("an outage line's row written before a STOP that has not committed is n
       ...(port === null ? {} : { mayHaveStopped: port }),
     });
     let commitSeq = 0;
-    return {
+    const to: Sends = {
       store,
       linq,
       state,
@@ -947,7 +1029,25 @@ describe("an outage line's row written before a STOP that has not committed is n
         store.rows.set(row.id, new FakeOutboxStore([row]).row(row.id));
         written.push(row.id);
       },
+      claims: [],
+      woken: [],
+      wakeFails: 0,
+      heldAt: null,
+      runGate: hold(true),
+      reached: false,
+      ended: 0,
+      async wake(request) {
+        to.woken.push(structuredClone(request));
+        if (to.wakeFails > 0) {
+          to.wakeFails -= 1;
+          throw new Error("the wake failed");
+        }
+        // As the root's run: its report, a claim error included, is not read (the rows wait for the next run).
+        await runDispatch(deps(), { recipientHandleId: request.handleId });
+        to.ended += 1;
+      },
     };
+    return to;
   }
 
   /** A row K-09's sendFixedLine wrote now (not a repeat), sendable, with the request's send class and fixed line. */
@@ -1018,7 +1118,10 @@ describe("an outage line's row written before a STOP that has not committed is n
     await rig.actor.outageIdle();
   }
 
-  /** The three runs that can claim the row (DL-656: no outbox sweep exists, so "the sweep" is a run for the recipient). */
+  /**
+   * The three runs that can claim the row: the root's wake, the retry door's run, and a run with no recipient, which no
+   * production code makes (DL-656: no outbox sweep exists; T-1341).
+   */
   const RUNS = ["the root's wake", "the retry door's run", "a run with no recipient"] as const;
   type RunBy = (typeof RUNS)[number];
 
@@ -1079,14 +1182,18 @@ describe("an outage line's row written before a STOP that has not committed is n
 
   /**
    * Row A (the architect's case 1): the line for A asked while nothing waits, K-09's answer held while a STOP lands, so the
-   * row is written and the try wakes nothing (T-1323 round 2); the STOP stored, read as a STOP, and not committed.
+   * row is written and the try wakes nothing (T-1323 round 2); the STOP stored, read as a STOP, and not committed. The
+   * writers' wake is joined as the root joins it (T-1341), and the try's gate, the actor's word, leaves it unmade.
    */
   async function rowAWithStopWaiting(
     to: Sends,
     eventIds: string[] = [A, B, STOP],
     answers: Record<string, SafetyResult> = {},
   ): Promise<DownRig> {
-    const rig = await downRigFor(SAM, eventIds, 99, true, answers, { ids: SAM_IDS });
+    const rig = await downRigFor(SAM, eventIds, 99, true, answers, {
+      ids: SAM_IDS,
+      wake: (request) => to.wake(request),
+    });
     writeRows(rig, to);
     const gate = hold(true);
     holdLines(rig, gate);
@@ -1107,6 +1214,9 @@ describe("an outage line's row written before a STOP that has not committed is n
     // Row A is written, and no wake goes for it; the STOP is stored but not committed.
     expect(to.written).toEqual([rowOf(A)]);
     expect(rig.o.wakes).toEqual([]);
+    // No writer's wake reached a run, so nothing claimed the row (T-1341: the gate before the wake).
+    expect(to.woken).toEqual([]);
+    expect(to.claims).toEqual([]);
     expect(rig.face.gateCalls).toEqual([]);
     expect(await rig.actor.readTurns()).toMatchObject([{ eventIds: [A, B], state: "leased" }]);
     return rig;
@@ -1124,26 +1234,80 @@ describe("an outage line's row written before a STOP that has not committed is n
     },
   );
 
+  /** The row K-09's core double writes for a text's safety-read outage line (row S: ../../safety/test-support.ts). */
+  const rowSOf = (eventId: string): string => `out-fixed-safety:${eventId}`;
+
+  /** A text's safety entry, as the actor keeps it. */
+  const safetyOf = async (rig: DownRig, eventId: string): Promise<SafetyEntry | undefined> =>
+    (await rig.actor.readSafety()).find((entry) => entry.eventId === eventId);
+
+  /**
+   * Waits until a text's safety work has decided its line: its entry is done (the line handed on, its wake made or not).
+   * Polled, as a STOP's own read with no verdict keeps the actor's safety work from ever being idle here.
+   */
+  async function lineDecided(rig: DownRig, eventId: string): Promise<void> {
+    const started = Date.now();
+    while ((await safetyOf(rig, eventId))?.state !== "done") {
+      if (Date.now() - started > 3000) throw new Error(`gave up waiting for ${eventId}'s line`);
+      await new Promise((resolve) => setTimeout(resolve, 5));
+    }
+  }
+
+  /**
+   * K-09's answers to the safety read's outage line held while `gate` is closed: the core takes the request and writes
+   * its row at once (after `writeRows`), and answers once the gate opens. `asked` counts the requests taken.
+   */
+  function holdCoreAnswers(rig: DownRig, gate: Hold): { asked: number } {
+    const held = { asked: 0 };
+    const send = rig.f.core.sendFixedLine.bind(rig.f.core);
+    rig.f.core.sendFixedLine = async (request) => {
+      const answer = await send(request);
+      held.asked += 1;
+      await gate.wait();
+      return answer;
+    };
+    return held;
+  }
+
   it.each(RUNS)(
-    "case 2, row S: the safety read's timeout line, written through the core and never woken, then a STOP with no verdict either (the models down): %s sends nothing for row S",
+    "case 2, row S: the safety read's timeout line, written through the core while a STOP with no verdict either lands (the models down), is left unwoken by its writer's gate (T-1341; DL-669): %s sends nothing for row S",
     async (how) => {
       const to = sends();
-      // No text here gets a verdict: the safety read is down with the models.
-      const rig = await downRigFor(SAM, [], 99, true, {}, { ids: SAM_IDS });
+      // No text here gets a verdict: the safety read is down with the models. The writers' wake is joined as the root
+      // joins it (T-1341), and the core holds its answer to S's line.
+      const rig = await downRigFor(
+        SAM,
+        [],
+        99,
+        true,
+        {},
+        { ids: SAM_IDS, wake: (request) => to.wake(request) },
+      );
       writeRows(rig, to);
+      const gate = hold(true);
+      const held = holdCoreAnswers(rig, gate);
       await text(rig, S, false);
       expect((await rig.actor.readOutage()).texts).toEqual([
         expect.objectContaining({ eventId: S, kind: "other" }),
       ]);
-      // 4 s on, the timeout rule writes S's outage line through the core: row S, which its writer never wakes.
+      // 4 s on, the timeout rule asks the core for S's outage line: row S is written at once, the answer held.
       await rig.tick(4000);
-      await rig.actor.safetyIdle();
+      await until(() => held.asked === 1, "the core's answer to S's line");
       expect(rig.f.core.fixed.map((sent) => [sent.at, sent.request.fixedLineId])).toEqual([[4000, "outage"]]);
       const [rowS] = to.written;
       if (rowS === undefined) throw new Error("no row S");
       // Then the STOP, read as a STOP: its read gives no verdict either, so its unread hold keeps it from any turn.
       await text(rig, STOP, false);
+      expect((await rig.actor.readOutage()).texts).toContainEqual(
+        expect.objectContaining({ eventId: STOP, kind: "stop" }),
+      );
       expect(await stubSays()).toBe(true);
+      // The core answers: the writer's gate, the actor's word, makes no wake, so nothing claims row S; its result stands.
+      gate.closed = false;
+      await lineDecided(rig, S);
+      expect(to.woken).toEqual([]);
+      expect(to.claims).toEqual([]);
+      expect(await safetyOf(rig, S)).toMatchObject({ path: "outbox", lineId: "outage" });
       expect(await rig.actor.readTurns()).toEqual([]);
 
       await runBy(to, how, rowS);
@@ -1387,5 +1551,336 @@ describe("an outage line's row written before a STOP that has not committed is n
 
     expect(report.rows.map((row) => [row.outboxRowId, row.outcome])).toEqual([[rowOf(A), "droppedStopped"]]);
     droppedOnTheActorsWord(to, [rowOf(A)]);
+  });
+
+  // ---- T-1341: each outage row's own writer wakes the recipient's dispatcher; no sweep runs ----------------------------
+
+  describe("T-1341 (DL-669): an outage line's row written outside a turn's commit reaches a dispatcher run at once, by its own writer's wake (the safety read's SafetyDeps.wake, the AI-down path's OutageDeps.wake), joined as the root joins it, while the actor's one reading says exactly false; T-1337's ask decides it there", () => {
+    /** The writers' wake joined to the rig, as the root joins it to both ports. */
+    const joined = (to: Sends): { ids: HandleIds; wake: (request: OutageWake) => Promise<void> } => ({
+      ids: SAM_IDS,
+      wake: (request) => to.wake(request),
+    });
+
+    it("row S, sent by its writer alone: a text read as another text gets no verdict in 4 s, the core writes its outage line's row, and the writer's own wake sends it once, before the clock moves past the 4 s deadline; nothing else runs, and a later run sends nothing more", async () => {
+      const to = sends();
+      const rig = await downRigFor(SAM, [], 99, true, {}, joined(to));
+      writeRows(rig, to);
+      await text(rig, S, false);
+      expect((await rig.actor.readOutage()).texts).toEqual([
+        expect.objectContaining({ eventId: S, kind: "other" }),
+      ]);
+      expect(await stubSays()).toBe(false);
+
+      await rig.tick(4000);
+      await rig.actor.safetyIdle();
+
+      const rowS = rowSOf(S);
+      expect(to.written).toEqual([rowS]);
+      // The fake clock is still at the verdict deadline (arch 02 line 111): the line went in the same safety work.
+      expect(rig.f.clock.now()).toBe(4000);
+      expect(to.woken).toEqual([{ handleId: SAM_HANDLE_ID, outboxRowIds: [rowS] }]);
+      // One claim, the writer's, for the recipient it named; one part to Linq, under the row's part key, past no opt-out.
+      expect(to.claims).toEqual([SAM_HANDLE_ID]);
+      expect(
+        to.linq.requests.map((request) => [request.idempotencyKey, request.text, request.overrideOptout]),
+      ).toEqual([[`${rowS}/1/1`, OUTAGE_TEXT, false]]);
+      expect(to.store.row(rowS).state).toBe("sent");
+      // The real actor answered its own reading through its stub from inside its safety work (no deadlock: not noAnswer).
+      expect(to.answers).toEqual([false]);
+      expect(to.spans.filter((span) => span.hop === "dispatch")).toEqual([
+        expect.objectContaining({
+          outcome: "ok",
+          decided: expect.objectContaining({ result: "sent", actorReading: "notStopped" }) as unknown,
+        }),
+      ]);
+      expect(await safetyOf(rig, S)).toMatchObject({
+        state: "done",
+        path: "outbox",
+        lineId: "outage",
+        handedAfterMs: 4000,
+      });
+      // Nothing else ran: no turn (S's unread hold keeps its batch back), so no commit and no park; nothing went straight
+      // through Linq; and the test made no run.
+      expect(await rig.actor.readTurns()).toEqual([]);
+      expect(rig.f.direct.sent).toEqual([]);
+
+      // A later run for the recipient finds nothing to send.
+      expect((await runDispatch(to.deps(), { recipientHandleId: SAM_HANDLE_ID })).claimed).toBe(0);
+      expect(to.linq.requests).toHaveLength(1);
+    });
+
+    it.each(["the chat lookup", "the claim's renewal"] as const)(
+      "row S behind T-1337's hold: a STOP the actor takes while its writer's own run waits on %s is read by the ask right before the send, so nothing is sent and row S is dropped as stopped",
+      async (during) => {
+        const to = sends();
+        const rig = await downRigFor(SAM, [], 99, true, {}, joined(to));
+        writeRows(rig, to);
+        to.heldAt = during;
+        await text(rig, S, false);
+        expect(await stubSays()).toBe(false);
+        await rig.tick(4000);
+        await until(() => to.reached, `the writer's run at ${during}`);
+        // The STOP lands while the writer's run waits; its read gives no verdict, so it waits uncommitted.
+        await text(rig, STOP, false);
+        expect(await stubSays()).toBe(true);
+
+        to.runGate.closed = false;
+        await lineDecided(rig, S);
+        // The line was decided when the wake started (DL-679: never awaited); the run ends once it goes on.
+        await until(() => to.ended === 1, "the writer's run's end");
+
+        expect(to.woken).toEqual([{ handleId: SAM_HANDLE_ID, outboxRowIds: [rowSOf(S)] }]);
+        expect(to.claims).toEqual([SAM_HANDLE_ID]);
+        droppedOnTheActorsWord(to, [rowSOf(S)]);
+        expect(await safetyOf(rig, S)).toMatchObject({ state: "done", path: "outbox", lineId: "outage" });
+      },
+    );
+
+    /**
+     * A text's safety read held while `gate` is closed: no verdict in 4 s; once the gate opens, a verdict with danger
+     * (safety-emergency-now.json, under the text's own event id) as its late answer.
+     */
+    function lateDangerFor(rig: DownRig, eventId: string, gate: Hold): void {
+      const late = fakeRead(rig.f.clock, {
+        [eventId]: { ...(safetyEmergencyNow as unknown as SafetyResult), eventId },
+      });
+      const read = rig.h.read.read.bind(rig.h.read);
+      rig.h.read.read = async (request) => {
+        if (request.eventId !== eventId) return read(request);
+        await gate.wait();
+        return late.read(request);
+      };
+    }
+
+    it("row S's wake is started, never awaited (DL-679; RULES 4.12): a text read as another text gets no verdict in 4 s, and its outage line's row is written and its writer's wake started while that run is held; its verdict then comes late, with danger, and the danger line's handling (sendDanger's record and safety row, the danger's hold in place of the unread one, the open batch closed for danger and handed on) completes while the run is still held; then the run sends row S once", async () => {
+      const to = sends();
+      // B is read as No at once; S's read gives no verdict in 4 s, and answers with danger once `verdict` opens.
+      const rig = await downRigFor(SAM, [B], 99, true, {}, joined(to));
+      writeRows(rig, to);
+      const verdict = hold(true);
+      lateDangerFor(rig, S, verdict);
+      // The writer's run waits at its chat lookup, after its claim; the turn the danger's batch opens waits in decide.
+      to.heldAt = "the chat lookup";
+      rig.ai.decideHold.closed = true;
+      await text(rig, S, false);
+      // B comes 2 s on, so the batch window (3 s after the latest text) is still open at S's 4 s deadline.
+      await rig.tick(2000);
+      await text(rig, B, false);
+      await lineDecided(rig, B);
+      expect((await rig.actor.readOutage()).texts).toEqual([
+        expect.objectContaining({ eventId: S, kind: "other" }),
+        expect.objectContaining({ eventId: B, kind: "other" }),
+      ]);
+      expect(await stubSays()).toBe(false);
+
+      // 4 s from S's arrival, the timeout rule writes row S through the core and its writer starts the wake, whose run
+      // claims the row and waits at the chat lookup. The line's result is kept meanwhile: nothing waited for the run.
+      await rig.tick(2000);
+      await until(() => to.reached, "the writer's run at the chat lookup");
+      await lineDecided(rig, S);
+      const rowS = rowSOf(S);
+      expect(to.written).toEqual([rowS]);
+      expect(to.woken).toEqual([{ handleId: SAM_HANDLE_ID, outboxRowIds: [rowS] }]);
+      expect(to.claims).toEqual([SAM_HANDLE_ID]);
+      expect(await safetyOf(rig, S)).toMatchObject({
+        state: "done",
+        danger: false,
+        path: "outbox",
+        lineId: "outage",
+        handedAfterMs: 4000,
+      });
+      expect(await rig.actor.readHolds()).toEqual([
+        { eventId: S, holdId: null, rule: "unread", blocksBooking: false, released: false },
+      ]);
+      expect((await rig.actor.readBatches()).at(-1)).toMatchObject({ reason: null, eventIds: [S, B] });
+
+      // S's verdict comes now, late, with danger, while the writer's run is still held.
+      verdict.closed = false;
+      await until(() => rig.ai.decideCalls.length === 1, "the turn the danger's batch opens");
+
+      // sendDanger: the core recorded the danger at once, and its safety line's row (send class safety) is written.
+      expect(
+        rig.f.core.recorded.map((call) => [
+          call.at,
+          call.request.safety.eventId,
+          "error" in call.response ? null : (call.response.safetyLine?.fixedLineId ?? null),
+        ]),
+      ).toEqual([[4000, S, "safetyEmergency"]]);
+      expect(to.written).toEqual([rowS, `out-${S}`]);
+      expect(await safetyOf(rig, S)).toMatchObject({
+        state: "done",
+        danger: true,
+        path: "outbox",
+        lineId: "safetyEmergency",
+        handedAfterMs: 4000,
+      });
+      // The unread hold is lifted: the danger's own hold is in its place.
+      expect(await rig.actor.readHolds()).toMatchObject([
+        { eventId: S, holdId: `hold-${S}`, rule: "after_safe", released: false },
+      ]);
+      // The batch close for danger: the open window closed at once and went to the lease, whose turn waits in decide.
+      expect(await rig.actor.readBatches()).toMatchObject([
+        { reason: "danger", handed: true, eventIds: [S, B] },
+      ]);
+      expect(await rig.actor.readTurns()).toMatchObject([{ eventIds: [S, B], state: "leased" }]);
+      // All of it while the writer's run is still held: nothing has gone to Linq, and row S is still claimed by it.
+      expect(to.ended).toBe(0);
+      expect(to.linq.requests).toEqual([]);
+      expect(to.store.row(rowS).state).toBe("sending");
+      expect(to.claims).toEqual([SAM_HANDLE_ID]);
+
+      // The run goes on: the actor's reading still says false (both texts read as other), so row S goes once.
+      to.runGate.closed = false;
+      await until(() => to.ended === 1, "the writer's run's end");
+      expect(
+        to.linq.requests.map((request) => [request.idempotencyKey, request.text, request.overrideOptout]),
+      ).toEqual([[`${rowS}/1/1`, OUTAGE_TEXT, false]]);
+      expect(to.store.row(rowS).state).toBe("sent");
+      expect(to.answers).toEqual([false]);
+
+      // The turn's held decide answers (the models down), so nothing is left waiting when the test ends; what that run
+      // asks for and sends is not this test's claim.
+      rig.ai.decideHold.closed = false;
+      await until(() => rig.o.waits.length === 1, "the turn's run's wait");
+    });
+
+    it.each([
+      ["the writer's wake throws", true],
+      ["no wake is joined", false],
+    ] as const)(
+      "row S, a failed wake: %s, so the line's result stands (path outbox, its hand-off time, not lineFailed, nothing straight through Linq) and row S stays sendable; the recipient's next run sends it once",
+      async (_how, wired) => {
+        const to = sends();
+        to.wakeFails = 1;
+        const rig = await downRigFor(SAM, [], 99, true, {}, wired ? joined(to) : { ids: SAM_IDS });
+        writeRows(rig, to);
+        await text(rig, S, false);
+        await rig.tick(4000);
+        await rig.actor.safetyIdle();
+
+        const rowS = rowSOf(S);
+        expect(to.woken).toEqual(wired ? [{ handleId: SAM_HANDLE_ID, outboxRowIds: [rowS] }] : []);
+        expect(to.claims).toEqual([]);
+        expect(to.linq.requests).toEqual([]);
+        expect(to.store.row(rowS).state).toBe("checked");
+        expect(await safetyOf(rig, S)).toMatchObject({
+          state: "done",
+          path: "outbox",
+          lineId: "outage",
+          handedAfterMs: 4000,
+        });
+        expect(rig.f.direct.sent).toEqual([]);
+
+        // The recipient's next run (here the root's wake for a commit) sends it once: the reading says exactly false.
+        await runBy(to, "the root's wake", rowS);
+
+        expect(to.linq.requests.map((request) => request.idempotencyKey)).toEqual([`${rowS}/1/1`]);
+        expect(to.store.row(rowS).state).toBe("sent");
+        expect(to.answers).toEqual([false]);
+      },
+    );
+
+    it("a repeated answer to the safety read's outage line names a row an earlier ask wrote: the writer wakes it all the same, and it goes once", async () => {
+      const to = sends();
+      const rig = await downRigFor(SAM, [], 99, true, {}, joined(to));
+      writeRows(rig, to);
+      // The core wrote the row at an earlier ask (writeRows), and answers this one repeated, naming it.
+      const send = rig.f.core.sendFixedLine.bind(rig.f.core);
+      rig.f.core.sendFixedLine = async (request) => {
+        const answer = await send(request);
+        return "error" in answer ? answer : { ...answer, repeated: true };
+      };
+      await text(rig, S, false);
+      await rig.tick(4000);
+      await rig.actor.safetyIdle();
+
+      expect(to.woken).toEqual([{ handleId: SAM_HANDLE_ID, outboxRowIds: [rowSOf(S)] }]);
+      expect(to.linq.requests.map((request) => request.idempotencyKey)).toEqual([`${rowSOf(S)}/1/1`]);
+      expect(await safetyOf(rig, S)).toMatchObject({ state: "done", path: "outbox", lineId: "outage" });
+    });
+
+    it("row A, the boundary: a text read as another text, whose turn's decide answers modelsDown, gets its outage line's row sent once by the try's own wake, before the clock reaches the try's start plus 30 s; nothing else runs", async () => {
+      const to = sends();
+      const rig = await downRigFor(SAM, [A], 99, true, {}, joined(to));
+      writeRows(rig, to);
+      await text(rig, A);
+      expect(await stubSays()).toBe(false);
+
+      await rig.tick(3000);
+      await until(() => rig.o.waits.length === 1, "the try's wait");
+
+      expect(rig.decidedAt).toEqual([3000]);
+      expect(rig.f.clock.now()).toBeLessThan(3000 + RETRY_MS);
+      expect(to.written).toEqual([rowOf(A)]);
+      expect(rig.o.wakes).toEqual([{ handleId: SAM_HANDLE_ID, outboxRowIds: [rowOf(A)] }]);
+      expect(to.claims).toEqual([SAM_HANDLE_ID]);
+      expect(to.linq.requests.map((request) => [request.idempotencyKey, request.text])).toEqual([
+        [`${rowOf(A)}/1/1`, OUTAGE_TEXT],
+      ]);
+      expect(to.store.row(rowOf(A)).state).toBe("sent");
+      expect(to.answers).toEqual([false]);
+      // Nothing else ran: the turn is still leased (no commit, no park), and the test made no run.
+      expect(rig.face.gateCalls).toEqual([]);
+      expect(await rig.actor.readTurns()).toMatchObject([{ eventIds: [A], state: "leased", tries: 1 }]);
+    });
+
+    it("row A, a repeated answer: the first try's wake throws, so row A waits; the lease's lapse reruns the turn, the core answers repeated with row A's id, and the rerun's wake sends it once; nothing is sent twice", async () => {
+      const to = sends();
+      to.wakeFails = 1;
+      const rig = await downRigFor(SAM, [A], 99, true, {}, joined(to));
+      writeRows(rig, to);
+      await text(rig, A);
+
+      // The first try writes row A; its wake throws, and nothing claims the row.
+      await rig.tick(3000);
+      await until(() => rig.o.waits.length === 1, "the first try's wait");
+      expect(to.written).toEqual([rowOf(A)]);
+      expect(to.claims).toEqual([]);
+      expect(to.linq.requests).toEqual([]);
+      expect(to.store.row(rowOf(A)).state).toBe("checked");
+
+      // The next try at 33 s asks for no line (A's is done for the run); the lease lapses at 63 s and reruns the turn,
+      // which asks for A's line again: K-09 answers repeated with row A, and the rerun's wake sends it.
+      await rig.tick(RETRY_MS);
+      await until(() => rig.decidedAt.length === 2, "the second try");
+      await rig.tick(RETRY_MS);
+      await until(() => rig.o.waits.length === 2, "the rerun's wait");
+      expect(rig.decidedAt).toEqual([3000, 33_000, 63_000]);
+      expect(rig.o.lines.requests.map((sent) => [sent.at, sent.request.caller.requestId])).toEqual([
+        [3000, `safety:${A}`],
+        [63_000, `safety:${A}`],
+      ]);
+      expect(to.written).toEqual([rowOf(A)]);
+      expect(rig.o.wakes).toEqual([
+        { handleId: SAM_HANDLE_ID, outboxRowIds: [rowOf(A)] },
+        { handleId: SAM_HANDLE_ID, outboxRowIds: [rowOf(A)] },
+      ]);
+      expect(to.claims).toEqual([SAM_HANDLE_ID]);
+      expect(to.linq.requests.map((request) => request.idempotencyKey)).toEqual([`${rowOf(A)}/1/1`]);
+      expect(to.answers).toEqual([false]);
+
+      // A later run for the recipient finds nothing more to send.
+      expect((await runDispatch(to.deps(), { recipientHandleId: SAM_HANDLE_ID })).claimed).toBe(0);
+      expect(to.linq.requests).toHaveLength(1);
+    });
+
+    it("unchanged: with PostgreSQL down, the safety read's outage line goes straight through Linq, writes no row and wakes nothing", async () => {
+      const to = sends();
+      const rig = await downRigFor(SAM, [], 99, true, {}, joined(to));
+      writeRows(rig, to);
+      await text(rig, S, false);
+      rig.f.down = true;
+      await rig.tick(4000);
+      await rig.actor.safetyIdle();
+
+      expect(rig.f.direct.sent.map((sent) => [sent.fixedLineId, sent.overrideOptout])).toEqual([
+        ["outage", false],
+      ]);
+      expect(to.written).toEqual([]);
+      expect(to.woken).toEqual([]);
+      expect(to.claims).toEqual([]);
+      expect(await safetyOf(rig, S)).toMatchObject({ state: "done", path: "outage", lineId: "outage" });
+    });
   });
 });

@@ -294,8 +294,13 @@ describe("a decide fake returning provider-down: the outage line once per waitin
       "out-safety-evt-sam-0002-outage",
     ]);
     expect(report.lines.map((line) => line.repeated)).toEqual([true, true]);
-    // Nothing new was written, so the dispatcher was not woken again.
-    expect(first.o.wakes).toHaveLength(1);
+    // Nothing new was written, but the repeated answers name the same two rows, so the rerun wakes them again (T-1341: a
+    // first wake may have been lost); a second wake sends nothing twice (one claim, one key per part).
+    const woken = {
+      handleId: "handle-sam",
+      outboxRowIds: ["out-safety-evt-sam-0001-outage", "out-safety-evt-sam-0002-outage"],
+    };
+    expect(first.o.wakes).toEqual([woken, woken]);
   });
 
   it("a line the core does not answer for now is asked for again at the next run, and then goes once", async () => {
@@ -583,7 +588,7 @@ describe("never to a stopped phone", () => {
     expect(report.end).toBe("committed");
   });
 
-  it("a STOP the actor takes while the try's last line is out: that line was asked for before it and is written, but no row of the try is woken (limit 8 cannot see a STOP no commit has recorded), so the dispatcher's minute sweep is left to send or drop it", async () => {
+  it("a STOP the actor takes while the try's last line is out: that line was asked for before it and is written, but no row of the try is woken (a wake runs every sendable row of the recipient), so the recipient's next dispatcher run, which asks the actor again right before the send (T-1337), is left to drop it; no sweep runs (T-1341)", async () => {
     const s = await samTurn([S1_02_TEXT, LAWN_TEXT]);
     const asked: ReturnType<typeof placeOf>[] = [];
     let stopTaken = false;

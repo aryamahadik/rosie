@@ -45,8 +45,12 @@ export interface OutageDeps {
    */
   isStopped?(actorName: string): boolean | Promise<boolean>;
   /**
-   * Wakes the outbox dispatcher for the rows a try's lines wrote, so they go at once. Left out, the dispatcher's minute
-   * sweep sends them. A wake that fails changes nothing for the lines.
+   * Wakes the outbox dispatcher for the recipient of the rows a try's lines named, first or repeated (T-1341), while the
+   * actor that runs the turn still says no word waits, so each goes, or is dropped by the dispatcher's own ask of that
+   * reading (T-1337), at once. The root joins it to the same run as the safety read's `SafetyDeps.wake` (runDispatch for
+   * the handle, T-1337's reading included; ../../wiring/root.ts), handed in by the card that joins `setOutageDeps`. Left
+   * out, or when it throws, the rows wait for the recipient's next dispatcher run; no sweep runs. A wake that fails changes
+   * nothing for the lines.
    */
   wake?(request: OutageWake): Promise<void>;
 }
