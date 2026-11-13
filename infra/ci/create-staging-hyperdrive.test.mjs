@@ -2184,7 +2184,8 @@ describe("create-staging-hyperdrive.sh sends PostgreSQL each login's SCRAM-SHA-2
         "two salts are the same",
       );
       // What it refuses to make: a password SASLprep might change, a short salt, too few iterations.
-      assert.throws(() => scramVerifier("t1369 made up"), TypeError);
+      // A no-break space, which SASLprep maps to a space.
+      assert.throws(() => scramVerifier(`t1369 made${String.fromCharCode(0xa0)}up`), TypeError);
       assert.throws(() => scramVerifier(password, randomBytes(8)), TypeError);
       assert.throws(() => scramVerifier(password, salt, 4095), TypeError);
 
