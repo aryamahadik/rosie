@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 519, [`93c981f`](https://github.com/aryamahadik/rosie/commit/93c981f), 2026-11-13 07:16:28 UTC.
+- **Through:** commit 521, [`1b5846d`](https://github.com/aryamahadik/rosie/commit/1b5846d), 2026-11-13 07:45:54 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 521. docs: COMMIT\_HISTORY.md through commit 519 (93c981f, \#527) (\#528)
+
+- **Commit:** [`1b5846d`](https://github.com/aryamahadik/rosie/commit/1b5846d), by Arya Mahadik, 2026-11-13 07:45:54 UTC
+- **Pull request:** [#528](https://github.com/aryamahadik/rosie/pull/528) from `task/commit-history-70`, merged 2026-11-13 07:45:55 UTC. It squashed 1 branch commit:
+  - `3bb3a2f` docs: COMMIT\_HISTORY.md through commit 519 (93c981f, \#527)
+- **Files changed:** 1 (+60 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +60 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 520. T-1336: the safety read's own outage line (sendOutage) asks the actor's one reading again right before each send, the core's and each straight through Linq, with nothing awaited between, so a STOP the actor takes while it awaits the stopped flag, the handle's ids or the core holds the line by every path; a throw or any answer but false holds it (fails closed); sendDanger unchanged (RULES 7.2, 4.12; DL-647) (\#529)
+
+- **Commit:** [`f202f3a`](https://github.com/aryamahadik/rosie/commit/f202f3a), by Arya Mahadik, 2026-11-13 07:45:51 UTC
+- **Pull request:** [#529](https://github.com/aryamahadik/rosie/pull/529) from `task/T-1336`, merged 2026-11-13 07:45:51 UTC. It squashed 1 branch commit:
+  - `9b705d5` T-1336: the safety read's own outage line (sendOutage) asks the actor…
+- **Files changed:** 2 (+283 −2), by folder:
+  - `runtime/src/safety/` arrival.ts +27 −1, safety.worker.test.ts +256 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 519. docs: COMMIT\_HISTORY.md through commit 516 (a879c2c, \#524) (\#527)
 
