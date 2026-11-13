@@ -2,9 +2,68 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 516, [`a879c2c`](https://github.com/aryamahadik/rosie/commit/a879c2c), 2026-11-13 06:55:02 UTC.
+- **Through:** commit 519, [`93c981f`](https://github.com/aryamahadik/rosie/commit/93c981f), 2026-11-13 07:16:28 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 519. docs: COMMIT\_HISTORY.md through commit 516 (a879c2c, \#524) (\#527)
+
+- **Commit:** [`93c981f`](https://github.com/aryamahadik/rosie/commit/93c981f), by Arya Mahadik, 2026-11-13 07:16:28 UTC
+- **Pull request:** [#527](https://github.com/aryamahadik/rosie/pull/527) from `task/commit-history-69`, merged 2026-11-13 07:16:28 UTC. It squashed 1 branch commit:
+  - `b8dbc8a` docs: COMMIT\_HISTORY.md through commit 516 (a879c2c, \#524)
+- **Files changed:** 1 (+35 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +35 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 518. T-1322: db/repo's nine direct callers throw a statement's own refusal and postgres.js's statement errors scrubbed, through clocks.ts transientOrScrubbed: handleTargets, sendState, handleSealingKey (its constraint answer first, unchanged), readTurnState, extend, the seven safety reads, readOpenHolds, readOutboxRow and readFixedLineFacts. Each call's test file gets real 22P02, CHECK 23514, UNDEFINED\_VALUE, bytea TypeError and 40001 cases, each scrubbed to its call's name and code alone, or answered as before (\#526)
+
+- **Commit:** [`938559a`](https://github.com/aryamahadik/rosie/commit/938559a), by Arya Mahadik, 2026-11-13 07:16:24 UTC
+- **Pull request:** [#526](https://github.com/aryamahadik/rosie/pull/526) from `task/T-1322`, merged 2026-11-13 07:16:24 UTC. It squashed 1 branch commit:
+  - `4abb577` T-1322: db/repo's nine direct callers throw a statement's own refusal…
+- **Files changed:** 14 (+1350 −16), by folder:
+  - `db/repo/` handle-keys.int.test.ts +190 −0, handle-keys.ts +4 −2, reservation-rules.int.test.ts +190 −0, reservation-rules.ts +6 −2, safety-reads.int.test.ts +199 −0, safety-reads.ts +4 −2, send-state.int.test.ts +180 −0, send-state.ts +4 −2, targets.int.test.ts +180 −0, targets.ts +4 −2, turn-face-reads.int.test.ts +191 −0, turn-face-reads.ts +10 −4, turn-state.int.test.ts +184 −0, turn-state.ts +4 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 517. T-1332: the phone scan reads a number glued to a letter: after an escaped newline or %2B, and a separated North American number before a letter (\#525)
+
+- **Commit:** [`860a363`](https://github.com/aryamahadik/rosie/commit/860a363), by Arya Mahadik, 2026-11-13 07:16:19 UTC
+- **Pull request:** [#525](https://github.com/aryamahadik/rosie/pull/525) from `task/T-1332`, merged 2026-11-13 07:16:20 UTC. It squashed 2 branch commits:
+  - `f9d0eef` T-1332: the phone scan reads a number glued to an escape's letter or …
+  - `498431e` T-1332: the glued-shape suite's comment names an escape or a URL-enco…
+- **Files changed:** 2 (+117 −6), by folder:
+  - `infra/ci/` phone-scan.mjs +30 −4, phone-scan.test.mjs +87 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1332: the phone scan reads a number glued to an escape's letter or a URL-encoded character (%2B as its plus), and a separated North American number right before a letter; T-1304's id cases stay unread; ofKind's wrong length refuses seven digits after +1 (DL-636)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1332: the glued-shape suite's comment names an escape or a URL-encoded character, whose last letter or digit ends no word
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 516. docs: COMMIT\_HISTORY.md through commit 514 (debb0cf, \#521) (\#524)
 
