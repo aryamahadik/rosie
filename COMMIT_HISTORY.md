@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 528, [`8edd689`](https://github.com/aryamahadik/rosie/commit/8edd689), 2026-11-13 08:31:43 UTC.
+- **Through:** commit 530, [`806b881`](https://github.com/aryamahadik/rosie/commit/806b881), 2026-11-13 09:16:37 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 530. docs: COMMIT\_HISTORY.md through commit 528 (8edd689, \#536) (\#537)
+
+- **Commit:** [`806b881`](https://github.com/aryamahadik/rosie/commit/806b881), by Arya Mahadik, 2026-11-13 09:16:37 UTC
+- **Pull request:** [#537](https://github.com/aryamahadik/rosie/pull/537) from `task/commit-history-73`, merged 2026-11-13 09:16:37 UTC. It squashed 1 branch commit:
+  - `d2a83ae` docs: COMMIT\_HISTORY.md through commit 528 (8edd689, \#536)
+- **Files changed:** 1 (+50 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +50 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 529. T-1318: a danger the read found (its danger flag) with no outcome hold, released or not, is among unreadTexts and keeps routineHeld true whether or not its pending note was written, so a note and a hold whose writes all fail together still hold every routine part in every commit until a hold is written (T-1312's security note b); holdOnReturn checks for a hold and writes the core's in one guarded step, so a read that throws then succeeds can never reopen a released hold (note a); the line's 5 s, the outbox path's writeHold, the at-once release, sendDanger and sendOutage unchanged; proofs in hold.worker.test.ts (\#538)
+
+- **Commit:** [`2a1bd45`](https://github.com/aryamahadik/rosie/commit/2a1bd45), by Arya Mahadik, 2026-11-13 09:16:33 UTC
+- **Pull request:** [#538](https://github.com/aryamahadik/rosie/pull/538) from `task/T-1318`, merged 2026-11-13 09:16:34 UTC. It squashed 1 branch commit:
+  - `b08da85` T-1318: a danger the read found (its danger flag) with no outcome hol…
+- **Files changed:** 2 (+224 −25), by folder:
+  - `runtime/src/safety/` arrival.ts +50 −18, hold.worker.test.ts +174 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 528. docs: COMMIT\_HISTORY.md through commit 525 (d0b54e7, \#533) (\#536)
 
