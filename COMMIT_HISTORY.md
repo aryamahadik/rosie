@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 536, [`3d25bcd`](https://github.com/aryamahadik/rosie/commit/3d25bcd), 2026-11-13 09:55:31 UTC.
+- **Through:** commit 538, [`f2eef53`](https://github.com/aryamahadik/rosie/commit/f2eef53), 2026-11-13 10:19:38 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 538. docs: COMMIT\_HISTORY.md through commit 536 (3d25bcd, \#544) (\#546)
+
+- **Commit:** [`f2eef53`](https://github.com/aryamahadik/rosie/commit/f2eef53), by Arya Mahadik, 2026-11-13 10:19:38 UTC
+- **Pull request:** [#546](https://github.com/aryamahadik/rosie/pull/546) from `task/commit-history-76`, merged 2026-11-13 10:19:38 UTC. It squashed 1 branch commit:
+  - `a56dad2` docs: COMMIT\_HISTORY.md through commit 536 (3d25bcd, \#544)
+- **Files changed:** 1 (+49 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +49 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 537. T-1351: pgReadOnlySealer throws every failure of its transaction through db/repo's scrubbed under its call's name, seal: a socket cut or PostgreSQL's refusal at its sealing\_keys read leaves with no statement, person id or message value, and a connect that never opens with no host, port, user, password or database (PostgreSQL's as DataAccessDatabaseError, a client's as the call and the code alone); its own noSealingKey and SealingError leave as they are. sealer.int.test.ts, on a rosie\_job client with a fiction person id and a made-up host, port, user and password planted: 4 socket cuts at the read, PostgreSQL's own 22P02 at the read, and 5 connects that never open; each raw error holds what it names, and the thrown one none of it by a deep walk (\#545)
+
+- **Commit:** [`682c04b`](https://github.com/aryamahadik/rosie/commit/682c04b), by Arya Mahadik, 2026-11-13 10:19:34 UTC
+- **Pull request:** [#545](https://github.com/aryamahadik/rosie/pull/545) from `task/T-1351`, merged 2026-11-13 10:19:34 UTC. It squashed 1 branch commit:
+  - `df5001b` T-1351: pgReadOnlySealer throws every failure of its transaction thro…
+- **Files changed:** 2 (+638 −8), by folder:
+  - `actions/src/tool-api/turn-face/pg/` sealer.int.test.ts +599 −0, sealer.ts +39 −8
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 536. docs: COMMIT\_HISTORY.md through commit 533 (e745c35, \#541) (\#544)
 
