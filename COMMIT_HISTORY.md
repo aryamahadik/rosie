@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 555, [`4d46a6c`](https://github.com/aryamahadik/rosie/commit/4d46a6c), 2026-11-13 13:24:24 UTC.
+- **Through:** commit 557, [`25912cb`](https://github.com/aryamahadik/rosie/commit/25912cb), 2026-11-13 13:43:10 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 557. docs: COMMIT\_HISTORY.md through commit 555 (4d46a6c, \#563) (\#565)
+
+- **Commit:** [`25912cb`](https://github.com/aryamahadik/rosie/commit/25912cb), by Arya Mahadik, 2026-11-13 13:43:10 UTC
+- **Pull request:** [#565](https://github.com/aryamahadik/rosie/pull/565) from `task/commit-history-84`, merged 2026-11-13 13:43:10 UTC. It squashed 1 branch commit:
+  - `393a5a9` docs: COMMIT\_HISTORY.md through commit 555 (4d46a6c, \#563)
+- **Files changed:** 1 (+42 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +42 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 556. T-1283: limit 8 for email rows (ADR-016 card E1): a row tried at or after its notAfter is withdrawn, unsent, before anything but the SMS refusal is read, at every try (a code row with no end, or an end or clock that is not a time, is withdrawn too); an email row's stop is its address's newest texts consent row (revoked: droppedStopped, whatever its class; none read: unreadable), never the phone's stopped flag; the chat rule holds text rows only, so an email row goes on to the checks after it; an email row is one whose channel and port are both email. ClaimedRow gains K-05 v1.13's optional emailPurpose and notAfter. email-rows.worker.test.ts: the lead note's limit 8 cases on claim-sam-sign-in-code.json's row (at notAfter, a retry after a failed try at minute 9, the revoked contact, the 3:00am code row, the text row with no chat), every existing limit 8 test unchanged (\#564)
+
+- **Commit:** [`f6351ad`](https://github.com/aryamahadik/rosie/commit/f6351ad), by Arya Mahadik, 2026-11-13 13:43:06 UTC
+- **Pull request:** [#564](https://github.com/aryamahadik/rosie/pull/564) from `task/T-1283`, merged 2026-11-13 13:43:06 UTC. It squashed 1 branch commit:
+  - `062f3eb` T-1283: limit 8 for email rows (ADR-016 card E1): a row tried at or a…
+- **Files changed:** 4 (+744 −13), by folder:
+  - `runtime/src/dispatch/limit8/` email-rows.worker.test.ts +656 −0, index.ts +4 −1, limit8.ts +71 −12
+  - `runtime/src/dispatch/` types.ts +13 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 555. docs: COMMIT\_HISTORY.md through commit 553 (84538c7, \#561) (\#563)
 
