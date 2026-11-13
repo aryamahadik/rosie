@@ -2,9 +2,158 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 488, [`7c3fc58`](https://github.com/aryamahadik/rosie/commit/7c3fc58), 2026-11-12 21:19:34 UTC.
+- **Through:** commit 494, [`ab1b5b4`](https://github.com/aryamahadik/rosie/commit/ab1b5b4), 2026-11-12 22:14:16 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 494. docs: COMMIT\_HISTORY.md through commit 491 (1e30dc8, \#498) (\#502)
+
+- **Commit:** [`ab1b5b4`](https://github.com/aryamahadik/rosie/commit/ab1b5b4), by Arya Mahadik, 2026-11-12 22:14:16 UTC
+- **Pull request:** [#502](https://github.com/aryamahadik/rosie/pull/502) from `task/commit-history-59`, merged 2026-11-12 22:14:16 UTC. It squashed 1 branch commit:
+  - `d481ff4` docs: COMMIT\_HISTORY.md through commit 491 (1e30dc8, \#498)
+- **Files changed:** 1 (+52 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +52 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 493. T-1290: K-04's contract test covers v1.1: each twin refused by its one constraint on the model and on PostgreSQL, and every rule edge pinned (\#500)
+
+- **Commit:** [`693f935`](https://github.com/aryamahadik/rosie/commit/693f935), by Arya Mahadik, 2026-11-12 22:14:12 UTC
+- **Pull request:** [#500](https://github.com/aryamahadik/rosie/pull/500) from `task/T-1290`, merged 2026-11-12 22:14:12 UTC. It squashed 4 branch commits:
+  - `58b67fa` T-1290: K-04's contract test covers v1.1. The model (db-schema.core.v…
+  - `4fecf6b` T-1290: the database side loads each fixture's rows in order as the r…
+  - `b2ecf71` Merge branch 'main' into task/T-1290
+  - `176ac1c` T-1290: round 2 (DL-618): v1.1's CHECKs pinned at their edges. The mo…
+- **Files changed:** 3 (+1072 −1), by folder:
+  - `tests/contract/` db-schema.core.twins.ts +340 −0, db-schema.core.v1.db-side.test.ts +419 −0, db-schema.core.v1.test.ts +313 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1290: K-04's contract test covers v1.1. The model (db-schema.core.v1.test.ts, section 5): each v1.1 refused twin loads its chain, is refused for its one reason and, put right at one value as the README puts it (db-schema.core.twins.ts), passes; each constraint v1.1 adds is the one reason of exactly one twin and none is in v1's list; v1.1 only adds to v1 (columns, constraints, row-level security and versions kept, null dropped from outbox_rows.turn_id alone, added columns nullable with no default); every v1 refused fixture and its mend, every damaged copy, and the tour's row without its turn id hold under v1.1's list. The database side (db-schema.core.v1.db-side.test.ts, new): every v1.1 entry, selected by version, against a fresh schema with every migration (0032 and 0033 among them): each twin refused by PostgreSQL with 23514 and its named constraint as the runtime side (rosie_job), and put right the same action writes one row; each fixture in a rolled-back transaction, each action in a rolled-back savepoint; a self-check that the roles take effect and nothing is kept
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1290: the database side loads each fixture's rows in order as the runtime side (rosie_job with no business scope), as K-04's README file format has them, the role ending with the load; every chain the v1.1 twins name loads so on the migrated schema
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1290: round 2 (DL-618): v1.1's CHECKs pinned at their edges. The model pins outbox_rows_email_purpose_known's list to K-12 v1's six purposes (the README's six, K-12's enum, the CHECK's list; none passes, signIn, marketing and email_way are refused), as v1 pins outbox_rows_channel_known. Shared edges (db-schema.core.twins.ts EDGES_V1_1), each a twin's action with one value changed or the tour row's own update, run on the model and on PostgreSQL: each of the six purposes and none passes, a purpose outside them is refused; outbox_rows_code_has_not_after at its four edges (no purpose, or any purpose but code, with no not_after passes; code with its not_after passes; code without one is refused); a part in each K-07 state but delivered with no delivery time passes; a row carrying both a turn id and a job id passes (README default 15). The database side also reads the migrated CHECK's list (pg_get_constraintdef): exactly K-12's six. Round 1's tests and assertions are unchanged; putRight keeps its behavior and messages through a shared path helper.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 492. T-1313: the safety host counts a STOP stored but not yet committed (one reading, mayHoldStop; fail closed while the PostgreSQL-down path is unwired) (\#501)
+
+- **Commit:** [`90037cc`](https://github.com/aryamahadik/rosie/commit/90037cc), by Arya Mahadik, 2026-11-12 22:14:07 UTC
+- **Pull request:** [#501](https://github.com/aryamahadik/rosie/pull/501) from `task/T-1313`, merged 2026-11-12 22:14:08 UTC. It squashed 6 branch commits:
+  - `48604a1` T-1313 (work in progress, NEED a 6.6 grant): the safety host's stoppe…
+  - `3238789` T-1313 (work in progress, NEED a 6.6 grant): the down path's own outa…
+  - `7a4a81a` Merge branch 'main' into task/T-1313
+  - `c780ade` T-1313 round 2 (DL-615): the 23 tests restated by both rulings' metho…
+  - `da067c4` T-1313 round 2 (DL-615): the unwired restatements also assert the tim…
+  - `5e01b8d` T-1313 round 2 (DL-615): the unwired restatements of copies.worker 27…
+- **Files changed:** 11 (+1607 −86), by folder:
+  - `runtime/src/actor/` batch.worker.test.ts +58 −5, handle-actor.ts +3 −1
+  - `runtime/src/actor/copies/` copies.worker.test.ts +172 −4
+  - `runtime/src/bundle/` pin.ts +4 −1
+  - `runtime/src/outage/ai/` lease.worker.test.ts +34 −5
+  - `runtime/src/outage/db/` outage.ts +52 −26, outage.worker.test.ts +472 −1
+  - `runtime/src/safety/` resume.worker.test.ts +365 −17, safety.worker.test.ts +216 −11, store.worker.test.ts +67 −7
+  - `runtime/src/wiring/` hop3.worker.test.ts +164 −8
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1313 (work in progress, NEED a 6.6 grant): the safety host's stopped counts a STOP stored but not committed by the one reading the lease's stopAmong gives (DbOutage.mayHoldStop over outage_texts.kind: true while the down path is unwired, on a throw, for a text not found or with no reading); Workers tests prove the gap and the fix, unwired and wired, with the danger lines kept; pin.ts line 104's comment says either restart. 23 existing tests that pin the safety read's outage line while the down path is unwired fail until restated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1313 (work in progress, NEED a 6.6 grant): the down path's own outage line asks the same one reading too (stoppedNow adds stopPending: a text no commit has taken with no reading, or not found, withholds it), with its Workers test
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1313 round 2 (DL-615): the 23 tests restated by both rulings' method, the code rule kept as built. Each test whose claim is the safety read's outage line now runs unwired, as the root installs it today, asserting no line by any path (none through the core, none straight through Linq, no sendFixedLine record queued, the safety row path none with lineId outage) and every other effect, beside a wired twin that keeps every original assertion (dbFakes, PostgreSQL in the test's state, bundle A's keyword copy installed by the actor's own refreshKeywords, the real classify, outageIdle before the timeout). The setup-step tests run wired, two assertions changed by the wiring and named (an extra dbOutage schedule entry). hop3's test keeps what the root does today, its line claim moved to a twin as D-017 is to wire it. Wired twins of safety 329 and 342 and copies 391 (the architect's 5(f)). The proofs both rulings add, in outage.worker.test.ts: the wired boundary through the core and through Linq, the handled carve-out, the wired cost with no keyword copy, and a STOP in a committing turn. outage.ts's stopPending comment cites DL-615
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1313 round 2 (DL-615): the unwired restatements also assert the timeout rule's other effects, as the security reviewer's ruling asks: the unread hold open, the re-read set 30 s on (safety_reread where the actor's schedule runs on the real clock) and the batch kept back (safety.worker 310, 460, 474, 582; resume.worker 498, 566; copies.worker 2762)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1313 round 2 (DL-615): the unwired restatements of copies.worker 2762 and hop3 274 also assert the timed-out text's batch kept back, as the security reviewer's ruling asks
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 491. docs: COMMIT\_HISTORY.md through commit 488 (7c3fc58, \#496) (\#498)
+
+- **Commit:** [`1e30dc8`](https://github.com/aryamahadik/rosie/commit/1e30dc8), by Arya Mahadik, 2026-11-12 21:52:59 UTC
+- **Pull request:** [#498](https://github.com/aryamahadik/rosie/pull/498) from `task/commit-history-58`, merged 2026-11-12 21:52:59 UTC. It squashed 1 branch commit:
+  - `87bc581` docs: COMMIT\_HISTORY.md through commit 488 (7c3fc58, \#496)
+- **Files changed:** 1 (+57 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +57 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 490. T-1328: fill.test.ts line 282 takes a London number from Ofcom's drama range (T-1317's finding 2): only the input and its expected value change, in E.164 form; the test's name, claim and every other assertion unchanged (\#499)
+
+- **Commit:** [`db16c5f`](https://github.com/aryamahadik/rosie/commit/db16c5f), by Arya Mahadik, 2026-11-12 21:52:54 UTC
+- **Pull request:** [#499](https://github.com/aryamahadik/rosie/pull/499) from `task/T-1328`, merged 2026-11-12 21:52:55 UTC. It squashed 1 branch commit:
+  - `b227f95` T-1328: fill.test.ts line 282 takes a London number from Ofcom's dram…
+- **Files changed:** 1 (+1 −1), by folder:
+  - `actions/src/finalize/slots/` fill.test.ts +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 489. T-1327: the saved copy of the old /test page holds its iMessage number as one named placeholder, ROSFIELD\_TEST\_IMESSAGE\_NUMBER, at assets/\_assets\_chat.js line 9 (no other byte changed). SHA256SUMS re-pinned on that file's line only. Runbook steps 3 and 4 name the placeholder: the one expected difference, filled by the user outside the repository before a restore. rosfield-test-route.test.mjs proves it stands in one place, that T-1304's shapes read no number in the copy outside the wordmark's path data, and that a fiction fill changes only that value (T-1317's finding 1, DL-616) (\#497)
+
+- **Commit:** [`984ffee`](https://github.com/aryamahadik/rosie/commit/984ffee), by Arya Mahadik, 2026-11-12 21:52:51 UTC
+- **Pull request:** [#497](https://github.com/aryamahadik/rosie/pull/497) from `task/T-1327`, merged 2026-11-12 21:52:51 UTC. It squashed 1 branch commit:
+  - `bd9a7ae` T-1327: the saved copy of the old /test page holds its iMessage numbe…
+- **Files changed:** 4 (+135 −6), by folder:
+  - `infra/ci/` rosfield-test-route.test.mjs +131 −2
+  - `infra/rosfield-test-backup/` SHA256SUMS +1 −1
+  - `infra/rosfield-test-backup/assets/` \_assets\_chat.js +1 −1
+  - `infra/runbooks/` rosfield-test-route.md +2 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 488. docs: COMMIT\_HISTORY.md through commit 486 (91c8bf2, \#495) (\#496)
 

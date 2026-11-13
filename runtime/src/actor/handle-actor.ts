@@ -234,7 +234,9 @@ export class HandleActor extends DurableObject {
     this.returns = new ReturnQueue({ storage: ctx.storage, now: () => actorClock().now() });
     this.safety = new SafetyOnArrival({
       returns: this.returns,
-      // The copy of the stopped flag (T-269), or a STOP no commit has taken that the actor has not taken either (T-270).
+      // The copy of the stopped flag (T-269), or a text no commit has taken that may hold a stop word, the actor's own STOP
+      // and START aside (T-270): the down path's one reading, the lease's `stopAmong` too, true while that path is unwired,
+      // on a throw and for a text it cannot find or has no reading of (T-1313; RULES 7.2: "Unsure: treat it as a stop").
       stopped: () => this.copies.readStopped()?.stopped === true || this.outage.stopPending(),
       storage: ctx.storage,
       spanSink: () => this.spanSink(),
