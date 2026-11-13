@@ -28,10 +28,13 @@
 // checked safety lines, copied from the safety read's bundle each time a text is written; each live safety timer's due
 // time, address (as K-34 seals it) and emergency contact, reloaded after a commit that wrote a timer row; and the queue of
 // writes to replay when PostgreSQL returns (danger, stops, then the rest, each once), where the safety read's records
-// wait. Each bundle a turn pins gives the copies its keyword list and stop and start replies (T-270). A commit whose answer
-// was lost, which only a park's alreadyCommitted tells of (T-1206), is read again: before the next turn opens, the stopped
-// flag reads stopped and the timers' copy is marked stale; then the flag is read again from the handle's phone row and
-// the timers are reloaded, and each later commit tries again until each read succeeds (fails safe).
+// wait. Each bundle a turn pins gives the copies its keyword list and stop and start replies (T-270). Before the first pin,
+// while the copies hold no keyword list, a text the PostgreSQL-down path reads has the list of the bundle it arrived under
+// copied first, from that bundle's manifest in the actor's own BUNDLES binding, so the path reads the text by a list
+// (T-1324; a read that fails copies nothing, and the text reads unknown). A commit whose answer was lost, which only a
+// park's alreadyCommitted tells of (T-1206), is read again: before the next turn opens, the stopped flag reads stopped and
+// the timers' copy is marked stale; then the flag is read again from the handle's phone row and the timers are reloaded,
+// and each later commit tries again until each read succeeds (fails safe).
 //
 // PostgreSQL down (T-270, ../outage/db): the actor follows each text until a commit takes it. While PostgreSQL is known
 // down, closed batches stay with the batch window, in order, and the lease holds its turn as it is (a lapse is no crash);
@@ -63,7 +66,16 @@
 
 import { DurableObject } from "cloudflare:workers";
 
-import { BundlePins, bundleKvOf, type PinEntry, type PinRequest, type TurnPin } from "../bundle";
+import {
+  BundlePins,
+  bundleKvOf,
+  keyOf,
+  manifestOf,
+  type PinEntry,
+  type PinRequest,
+  type TurnPin,
+} from "../bundle";
+import { bundleIdOf } from "../bundle/values";
 import { ActorClocks, type DueClock, type FireBy, type FireReport } from "../clocks";
 import { RECEIPT_KINDS, ACTOR_KINDS } from "../gateway/hand-off";
 import type { SealedEvent, SealedHandoff, StoreAnswer } from "../gateway/types";
@@ -224,6 +236,8 @@ export class HandleActor extends DurableObject {
   private readonly returns: ReturnQueue;
   private readonly outage: DbOutage;
   private readonly batchWork = new Set<Promise<void>>();
+  /** The reads of a keyword list before the first pin, one after another (T-1324): each waits for the one before it. */
+  private keywordReads: Promise<void> = Promise.resolve();
 
   constructor(ctx: DurableObjectState, env: Cloudflare.Env) {
     super(ctx, env);
@@ -381,6 +395,11 @@ export class HandleActor extends DurableObject {
     const route = checkHandoff(handoff);
     let answer: StoreAnswer;
     if (route === "inbox") {
+      // A text the PostgreSQL-down path reads, while the copies hold no keyword list yet: the list of the bundle it arrived
+      // under is copied first (T-1324), so the path reads it by a list. Done before the write, so the steps below stay one
+      // run, as they were; a copy held already (any pin copies one) waits for nothing.
+      const copying = this.keywordsBeforePin(handoff);
+      if (copying !== null) await copying;
       // One synchronous step: the check and the write cannot be split by a concurrent retry.
       // The text joins the batch window in the same all-or-nothing step as its write (T-247).
       answer = this.ctx.storage.transactionSync(() => {
@@ -742,6 +761,54 @@ export class HandleActor extends DurableObject {
       }
     }
     return pinned;
+  }
+
+  /**
+   * A keyword copy before the handle's first pin (T-1324; QUESTIONS.md CQ-282): the read of the keyword list of the bundle
+   * this text arrived under, after any such read already running here, when the text is one the PostgreSQL-down path reads
+   * (`DbOutage.arrive`) and the copies hold no keyword list; null when there is nothing to wait for. Never rejects.
+   */
+  private keywordsBeforePin(handoff: SealedHandoff): Promise<void> | null {
+    const { event } = handoff;
+    if (!startsTurn(event) || !isReadableEvent(event) || this.keywordsHeld()) return null;
+    const run = this.keywordReads.then(() => this.copyKeywordsOf(handoff.bundleId));
+    this.keywordReads = run;
+    return run;
+  }
+
+  /** True when the copies hold a keyword list, or cannot say (their storage failed, so nothing could be copied either). */
+  private keywordsHeld(): boolean {
+    try {
+      return this.copies.readKeywords() !== null;
+    } catch {
+      return true;
+    }
+  }
+
+  /**
+   * Copies the keyword list and the stop and start replies of the bundle `named` (the hand-off's bundle id: the active id
+   * the gateway read at receipt, or bundle v0's stand-in when it could not read one: ../gateway/answer.ts readBundleId),
+   * unless the copies hold a list by then (a pin's, which is kept). The bundle's manifest is read where the pin reads it
+   * first, the actor's own BUNDLES binding, with no PostgreSQL (../bundle/pin.ts), and is checked against the id as the pin
+   * checks it (manifestOf); the copies then take its list as from a pin (`refreshKeywords`: a list the guard cannot read is
+   * not copied). A read that fails (no binding, an id that is not K-01's, a miss, a manifest that is not the bundle's own, a
+   * list the guard cannot read, a throw) copies nothing, so the text reads unknown and the stricter reading holds (RULES 7.2).
+   * PostgreSQL's copy of the manifest is not read here: the pin reads it on a miss. Never throws.
+   */
+  private async copyKeywordsOf(named: unknown): Promise<void> {
+    try {
+      if (this.keywordsHeld()) return;
+      const bundleId = bundleIdOf(named);
+      const kv = bundleKvOf(this.env.BUNDLES);
+      if (bundleId === null || kv === null) return;
+      const text = await kv.get(keyOf(bundleId, "manifest"));
+      if (typeof text !== "string") return;
+      const manifest = await manifestOf(text, bundleId);
+      if (manifest === null || this.keywordsHeld()) return;
+      this.copies.refreshKeywords(manifest);
+    } catch {
+      // Nothing copied: the text reads unknown, as with no copy.
+    }
   }
 
   /**

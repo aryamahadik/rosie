@@ -6,7 +6,7 @@
 // stored schedule's are one fake clock; the platform's alarm is run at each step. Test method: T-1128's. Test values only:
 // the master's sample cast (Sam), the frozen fixtures' ids, phones in the fictional 555-01xx range (rule 9).
 import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
-import { exports } from "cloudflare:workers";
+import { env, exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it } from "vitest";
 
 import fixedLines from "../../../../contracts/bundle/fixtures/fixed-lines.json";
@@ -31,6 +31,16 @@ import {
 import type { ActorCopies } from "../../actor/copies/copies";
 import type { LeaseHost } from "../../actor/lease";
 import { SAM_TIMER } from "../../actor/copies/test-support";
+import type { BundleId } from "../../bundle";
+import {
+  BUNDLE_A,
+  BUNDLE_B,
+  keyIn,
+  textAt,
+  WHOLE_A,
+  WHOLE_B,
+  type WholeBundle,
+} from "../../bundle/test-support";
 import {
   actorNameOf,
   durableObjectActor,
@@ -39,7 +49,9 @@ import {
   type HandleActorRpc,
 } from "../../gateway";
 import { fakeKeyStore } from "../../gateway/test-support";
+import { keywordsOf } from "../../guard/keywords";
 import { Q01_DRAFTED } from "../../guard/replies/words";
+import type { Keyword } from "../../guard/types";
 import type { SafetyResult } from "../../safety/types";
 import { SAM, hold, safetyNoFor, storedText, until, type Hold } from "../../turn/test-support";
 import {
@@ -1547,6 +1559,257 @@ describe("the down path's own outage line asks the one reading right before each
     expect((await rig.actor.readOutage()).texts).toEqual([
       expect.objectContaining({ eventId: A, kind: "other", line: "sent" }),
       expect.objectContaining({ eventId: B, kind: "other", line: "stopped" }),
+    ]);
+  });
+});
+
+describe("a keyword copy before a handle's first pin: the list of the bundle a text arrived under, copied on arrival from the actor's BUNDLES binding, so the PostgreSQL-down path reads a first text (T-1324; CQ-282)", () => {
+  const STOP = "evt-sam-0440";
+  const HI = "evt-sam-0441";
+  const WORD = "evt-sam-0442";
+  const MANIFEST_A = keyIn(BUNDLE_A, "manifest");
+  const MANIFEST_B = keyIn(BUNDLE_B, "manifest");
+
+  /** A value under its K-01 key in the pool's BUNDLES namespace (KV), as the deploy publishes a bundle's values there. */
+  async function publish(key: string, text: string): Promise<void> {
+    const bundles = env.BUNDLES;
+    if (bundles === undefined) throw new Error("the pool's staging environment binds BUNDLES (T-566)");
+    await bundles.put(key, text);
+  }
+
+  /** A sample bundle's manifest as the compiler stores it, its keyword list (K-01 v1 lists.keywords) as `change` makes it. */
+  function manifestWith(whole: WholeBundle, change: (keywords: Record<string, unknown>) => unknown): string {
+    const manifest = structuredClone(whole.manifest) as unknown as {
+      lists: { keywords: Record<string, unknown> };
+    };
+    manifest.lists.keywords = change(manifest.lists.keywords) as Record<string, unknown>;
+    return JSON.stringify(manifest);
+  }
+
+  /** A text of Sam's arrives through the gateway's door under `bundleId`: the active id the gateway read at receipt. */
+  async function arriveUnder(
+    rig: Rig,
+    bundleId: BundleId,
+    eventId: string,
+    body: string,
+    settle = true,
+  ): Promise<void> {
+    const entry = await storedText(
+      { eventId, body, sentAt: new Date(rig.f.clock.now()).toISOString(), traceId: TRACE },
+      SAM.handle,
+      keys,
+      bundleId,
+      0,
+    );
+    const handoff = { event: entry.event, partKey: null, traceId: TRACE, bundleId, actorName: SAM_ACTOR };
+    expect(await door().accept(handoff)).toBe("written");
+    if (settle) await rig.settle();
+  }
+
+  /** The actor's keyword copy, read inside the actor: its words in the list's order, its replies and when it was copied. */
+  const keywordCopy = (): Promise<{
+    words: Keyword[];
+    replies: Record<string, string | null>;
+    refreshedAt: number;
+  } | null> =>
+    runInDurableObject(stub(), (instance) => {
+      const copy = (instance as unknown as { copies: ActorCopies }).copies.readKeywords();
+      if (copy === null) return null;
+      return {
+        words: copy.list.all(),
+        replies: Object.fromEntries(copy.replies),
+        refreshedAt: copy.refreshedAt,
+      };
+    });
+
+  /** Bundle A's keyword list as the guard reads it from bundle A's manifest: what a pin of bundle A copies. */
+  const wordsOfA = (): Keyword[] => keywordsOf(WHOLE_A.manifest).all();
+
+  /** The host's `stopPending` now, inside the actor (what the safety host's `stopped` asks beside the copy). */
+  const stopPendingNow = (): Promise<boolean> =>
+    runInDurableObject(stub(), (instance) =>
+      (instance as unknown as { outage: DbOutage }).outage.stopPending(),
+    );
+
+  /** The safety read's state of one text. */
+  const safetyOf = async (rig: Rig, eventId: string): Promise<SafetyEntry | undefined> =>
+    (await rig.actor.readSafety()).find((entry) => entry.eventId === eventId);
+
+  /** A first text with no verdict in 4 s arrives under bundle A; the test waits for the down path's reading of it. */
+  async function firstTextHi(rig: Rig): Promise<number> {
+    const arrivedAt = rig.f.clock.now();
+    await arriveUnder(rig, BUNDLE_A, HI, "hi", false);
+    await rig.actor.outageIdle();
+    return arrivedAt;
+  }
+
+  it("a handle never pinned, PostgreSQL down: its first text, STOP, reads stop by the list of the bundle it arrived under (bundle A's, copied on arrival from KV, with no PostgreSQL); its reply goes at once past the opt-out, the flag reads stopped and its record waits in the stop rank, as T-270's STOP", async () => {
+    const rig = rigFor({ [STOP]: safetyNoFor(STOP) });
+    await publish(MANIFEST_A, textAt(MANIFEST_A));
+    expect(await keywordCopy()).toBeNull();
+    rig.f.down = true;
+    const arrivedAt = rig.f.clock.now();
+    await arriveUnder(rig, BUNDLE_A, STOP, "STOP");
+
+    // Copied as a pin of bundle A copies it: its list, and its stop and start replies (no words yet: Q-01's while Jay's wait).
+    expect(await keywordCopy()).toEqual({
+      words: wordsOfA(),
+      replies: { stopReply: null, startReply: null },
+      refreshedAt: arrivedAt,
+    });
+    // Read as a STOP, PostgreSQL asked and not answering: the reply goes at once, past the opt-out, in Q-01's drafted words.
+    expect(rig.f.probes).toEqual([arrivedAt]);
+    expect(rig.f.direct.sent).toEqual([
+      {
+        actorName: SAM_ACTOR,
+        fixedLineId: "stopReply",
+        text: Q01_DRAFTED.stopReply,
+        overrideOptout: true,
+        idempotencyKey: `keyword:${STOP}:stopReply`,
+        at: arrivedAt,
+      },
+    ]);
+    const copies = await rig.actor.readCopies();
+    expect(copies.stopped).toMatchObject({ stopped: true, phoneVersion: null });
+    expect(copies.returns).toEqual([
+      expect.objectContaining({ key: `recordStopOrStart:${STOP}`, call: "recordStopOrStart", rank: "stop" }),
+    ]);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: STOP, kind: "stop", keyword: "handled" }),
+    ]);
+    // Its batch closes and waits with the batch window: no turn opens while PostgreSQL is down, and no bundle is pinned.
+    await rig.tick(3000);
+    expect(await rig.actor.readTurns()).toEqual([]);
+    expect(await runInDurableObject(stub(), (instance) => instance.readPins())).toEqual([]);
+  });
+
+  it("a handle never pinned, PostgreSQL down: its first text, hi, with no verdict in 4 s, reads as another text by the list copied on arrival, so the timeout rule's outage line goes once, straight through Linq, not past an opt-out, its record queued; the down path's 20 s sends no second", async () => {
+    const rig = rigFor({});
+    await publish(MANIFEST_A, textAt(MANIFEST_A));
+    rig.f.down = true;
+    const arrivedAt = await firstTextHi(rig);
+    expect((await keywordCopy())?.words).toEqual(wordsOfA());
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: HI, kind: "other" }),
+    ]);
+    expect(await stopPendingNow()).toBe(false);
+
+    await rig.tick(4000);
+    expect(rig.f.core.fixed).toEqual([]);
+    expect(outageSends(rig)).toEqual([
+      {
+        actorName: SAM_ACTOR,
+        fixedLineId: "outage",
+        text: OUTAGE_TEXT,
+        overrideOptout: false,
+        idempotencyKey: `safety:${HI}:outage`,
+        at: arrivedAt + 4000,
+      },
+    ]);
+    expect(await safetyOf(rig, HI)).toMatchObject({ path: "outage", lineId: "outage", handedAfterMs: 4000 });
+    expect((await rig.actor.readCopies()).returns).toContainEqual(
+      expect.objectContaining({ key: `sendFixedLine:${HI}`, call: "sendFixedLine", rank: "rest" }),
+    );
+
+    // Once: the down path's own line at 20 s sees the timeout rule's, and sends none.
+    await rig.tick(OUTAGE_WAIT_MS);
+    expect(rig.f.probes).not.toEqual([]);
+    expect(outageSends(rig)).toHaveLength(1);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: HI, kind: "other", line: "went" }),
+    ]);
+  });
+
+  it("a handle never pinned, PostgreSQL answering (the AI-down timeout CQ-282 names): its first text, hi, with no verdict in 4 s, reads as another text by the list copied on arrival, so the timeout rule's outage line goes once, through the core's outbox row", async () => {
+    const rig = rigFor({});
+    await publish(MANIFEST_A, textAt(MANIFEST_A));
+    const arrivedAt = await firstTextHi(rig);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: HI, kind: "other" }),
+    ]);
+    expect(await stopPendingNow()).toBe(false);
+
+    await rig.tick(4000);
+    expect(rig.f.core.fixed).toEqual([
+      {
+        at: arrivedAt + 4000,
+        request: expect.objectContaining({
+          fixedLineId: "outage",
+          recipientHandleId: SAM.party.handleId,
+          sendClass: "quick_reply",
+          sentByActor: null,
+        }) as unknown,
+      },
+    ]);
+    expect(outageSends(rig)).toEqual([]);
+    expect(await safetyOf(rig, HI)).toMatchObject({ path: "outbox", lineId: "outage", handedAfterMs: 4000 });
+    await rig.tick(OUTAGE_WAIT_MS);
+    expect(rig.f.core.fixed).toHaveLength(1);
+    expect(outageSends(rig)).toEqual([]);
+  });
+
+  const failedReads: { fault: string; publishes: () => Promise<void> }[] = [
+    {
+      fault: "finds no manifest under the bundle's key (a miss: PostgreSQL's copy is not read from here)",
+      publishes: () => Promise.resolve(),
+    },
+    {
+      fault: "finds a manifest that is not the bundle's own (bundle B's, under bundle A's key)",
+      publishes: () => publish(MANIFEST_A, textAt(MANIFEST_B)),
+    },
+    {
+      fault: "finds bundle A's manifest with a keyword list the guard cannot read (no opt-out word)",
+      publishes: () =>
+        publish(
+          MANIFEST_A,
+          manifestWith(WHOLE_A, (keywords) => ({ ...keywords, optOut: [], flagsVisit: [] })),
+        ),
+    },
+  ];
+
+  it.each(failedReads)(
+    "a handle never pinned, PostgreSQL down: a keyword read that $fault copies nothing, so the first text reads unknown (it may be a stop word) and no outage line goes, the timeout rule's or the down path's",
+    async ({ publishes }) => {
+      const rig = rigFor({});
+      await publishes();
+      rig.f.down = true;
+      await firstTextHi(rig);
+      expect(await keywordCopy()).toBeNull();
+      expect((await rig.actor.readOutage()).texts).toEqual([
+        expect.objectContaining({ eventId: HI, kind: "unknown" }),
+      ]);
+      expect(await stopPendingNow()).toBe(true);
+
+      await rig.tick(4000);
+      expect(rig.f.core.fixed).toEqual([]);
+      expect(outageSends(rig)).toEqual([]);
+      expect(await safetyOf(rig, HI)).toMatchObject({ path: "none", lineId: "outage" });
+      await rig.tick(OUTAGE_WAIT_MS);
+      expect(rig.f.probes).not.toEqual([]);
+      expect(outageSends(rig)).toEqual([]);
+      expect((await rig.actor.readOutage()).texts).toEqual([
+        expect.objectContaining({ eventId: HI, kind: "unknown", line: "stopped" }),
+      ]);
+    },
+  );
+
+  it("a copy already held is kept: once a pin has copied bundle A's list, a text that arrives under bundle B, whose list in KV has one more opt-out word, copies nothing on arrival, and is read by bundle A's list", async () => {
+    const rig = rigFor({ [PRIME]: safetyNoFor(PRIME), [WORD]: safetyNoFor(WORD) });
+    await prime(rig);
+    const held = await keywordCopy();
+    expect(held?.words).toEqual(wordsOfA());
+    await publish(
+      MANIFEST_B,
+      manifestWith(WHOLE_B, (keywords) => ({
+        ...keywords,
+        optOut: [...(keywords.optOut as string[]), "TESTWORD"],
+      })),
+    );
+    rig.f.down = true;
+    await arriveUnder(rig, BUNDLE_B, WORD, "TESTWORD");
+    expect(await keywordCopy()).toEqual(held);
+    expect((await rig.actor.readOutage()).texts).toEqual([
+      expect.objectContaining({ eventId: WORD, kind: "other" }),
     ]);
   });
 });

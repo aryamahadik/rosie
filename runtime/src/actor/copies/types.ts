@@ -11,13 +11,14 @@
 //
 // T-270 adds one copy: the pinned bundle's keyword list (K-01 v1 `lists.keywords`) and the stop and start replies' words
 // (K-01 v1 fixed lines `stopReply` and `startReply`), copied from each bundle a turn pins, so the actor can read a STOP or
-// a START, and reply to it, while PostgreSQL is down.
+// a START, and reply to it, while PostgreSQL is down; before the first pin, from the bundle a text arrived under (T-1324).
 
 import type { KeywordList } from "../../guard/keywords";
 
 /**
- * The keyword list and the stop and start replies, as the actor last copied them from a pinned bundle (T-270): what it reads
- * a STOP or a START by, and replies with, while PostgreSQL is down. The words are the sources' fixed words, never a person's.
+ * The keyword list and the stop and start replies, as the actor last copied them from a pinned bundle (T-270), or before
+ * the first pin from the bundle a text arrived under (T-1324): what it reads a STOP or a START by, and replies with, while
+ * PostgreSQL is down. The words are the sources' fixed words, never a person's.
  */
 export interface KeywordCopy {
   /** K-01 v1 `lists.keywords`, as the guard reads it (runtime/src/guard/keywords.ts). */
