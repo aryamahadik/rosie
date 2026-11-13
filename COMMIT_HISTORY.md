@@ -2,9 +2,57 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 533, [`e745c35`](https://github.com/aryamahadik/rosie/commit/e745c35), 2026-11-13 09:37:45 UTC.
+- **Through:** commit 536, [`3d25bcd`](https://github.com/aryamahadik/rosie/commit/3d25bcd), 2026-11-13 09:55:31 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 536. docs: COMMIT\_HISTORY.md through commit 533 (e745c35, \#541) (\#544)
+
+- **Commit:** [`3d25bcd`](https://github.com/aryamahadik/rosie/commit/3d25bcd), by Arya Mahadik, 2026-11-13 09:55:31 UTC
+- **Pull request:** [#544](https://github.com/aryamahadik/rosie/pull/544) from `task/commit-history-75`, merged 2026-11-13 09:55:31 UTC. It squashed 1 branch commit:
+  - `cc3ee0f` docs: COMMIT\_HISTORY.md through commit 533 (e745c35, \#541)
+- **Files changed:** 1 (+61 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +61 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 535. T-1325: ADR-018 amended (2026-11-13; DL-615, DL-645, DL-656, DL-669), its original text kept: A, the one reading of a possible STOP (DbOutage.mayHoldStop), its answers and its callers (the lease's stopAmong; mayHaveStopped for the safety host, the AI-down host and, third, the dispatcher's port), replacing line 42's stopPending sentence; B, the accepted costs CQ-281, CQ-282, CQ-283 (an outage row dropped at send, never held), CQ-287 and CQ-288; C, T-1342's ruling (every routine row held at send, due again at once, while the reading says a STOP may wait; outage rows dropped), replacing line 16's acceptance and CQ-264's window for this case; D, T-1341's ruling (an outage row written outside a commit is woken by its writer, gated on the reading; no sweep); E, open points T-1324, T-1326, the T-1341 and T-1342 builds and the frozen descriptions of held; Status and Date lines point to it. Every line read on main 8edd689 (\#543)
+
+- **Commit:** [`a52d5d8`](https://github.com/aryamahadik/rosie/commit/a52d5d8), by Arya Mahadik, 2026-11-13 09:55:26 UTC
+- **Pull request:** [#543](https://github.com/aryamahadik/rosie/pull/543) from `task/T-1325`, merged 2026-11-13 09:55:27 UTC. It squashed 1 branch commit:
+  - `de3f154` T-1325: ADR-018 amended (2026-11-13; DL-615, DL-645, DL-656, DL-669),…
+- **Files changed:** 1 (+77 −2), by folder:
+  - `docs/adr/` 0018-stop-and-danger-line-at-once.md +77 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 534. T-1279: the readers that meet a row with no turn (ADR-016 card R0; K-05 v1.13 items 64 to 66): claimOutboxV113 claims as claimOutboxV12 does, each claimed row also naming emailPurpose and notAfter as stored (null where the column is null), while claimOutboxV12 still answers v1.2's closed claimed row; readOutboxRow answers notFound for a row with no turn as soon as the row is read, before its send class, its reader or its turn (default 4: a turnless safety row too). Tests: read-outbox-row-sign-in-code's noted rows (DL-610) with the statements the read sent (the row's select alone), job rows of a business and of class safety, the same row given a turn read as any row; claim-sam-sign-in-code by the sweep and by recipient, the v1.2 claim of it, rows of each channel as stored, the refused code row with no end, a re-claim and a claim at its notAfter withdrawn, and a failed mark with no follow-ups marked as for the same row with a turn (\#542)
+
+- **Commit:** [`faea582`](https://github.com/aryamahadik/rosie/commit/faea582), by Arya Mahadik, 2026-11-13 09:55:23 UTC
+- **Pull request:** [#542](https://github.com/aryamahadik/rosie/pull/542) from `task/T-1279`, merged 2026-11-13 09:55:23 UTC. It squashed 1 branch commit:
+  - `a077c59` T-1279: the readers that meet a row with no turn (ADR-016 card R0; K-…
+- **Files changed:** 4 (+805 −9), by folder:
+  - `db/repo/` outbox.int.test.ts +409 −0, outbox.ts +84 −3, turn-face-reads.int.test.ts +280 −0, turn-face-reads.ts +32 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 533. docs: COMMIT\_HISTORY.md through commit 530 (806b881, \#537) (\#541)
 
