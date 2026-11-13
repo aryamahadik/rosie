@@ -18,17 +18,28 @@
 //
 // Rule 9: the probe's user, password, database and hosts are made up here (.invalid names and RFC 5737's documentation
 // addresses). A check names what leaked, never its value, so a failing run prints no secret.
+//
+// T-1330 (T-1315's handoff a; DL-630): the transaction's end, once `work` has its repo, on local PostgreSQL in a schema of
+// this file's own, migrated and seeded as the turn face's tests do (test-support.ts openTurnFaceDatabase), so the frontier
+// reads Sam's real stored state and answers. Each call runs on a client as the runtime client is made (rosie_job, the
+// schema first) whose socket is cut just before one statement goes: the end's scope read, the commit, the rollback after
+// `work` threw, or `work`'s first read. The statement is never written; the socket is destroyed with an error built in the
+// shape postgres.js or Node gives it, which postgres.js passes up as the socket's own and rejects the statement with, or
+// with none, so postgres.js rejects it with its own CONNECTION_CLOSED, naming the server's host and port, as when the
+// server closes the connection. Each outcome (the thrown error's message, stack and own properties, the span and the log)
+// holds none of the connection, and no statement goes on a connection after it is cut.
 
 import { once } from "node:events";
-import { type AddressInfo, createServer, type Socket } from "node:net";
+import { type AddressInfo, createConnection, createServer, type Socket } from "node:net";
 import postgres from "postgres";
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { createClient, resolvePrimaryUrl } from "../../../../../db/repo/client";
 import { DataAccessDatabaseError } from "../../../../../db/repo/clocks";
 import type { Sql } from "../../../../../db/repo/scope";
 import type { TransientError } from "../../../../../db/repo/targets";
 import type { Span } from "../../../../../runtime/src/trace";
+import { RUNTIME_ROLE, type CommitDatabase } from "../../../commit/pg/test-support";
 import { frameFacts } from "../../../frontier/assemble/frame";
 import {
   captureLog,
@@ -43,7 +54,7 @@ import { traceFor } from "../../test-support";
 import { s101Exchange } from "../test-support";
 import type { BuildFrontierCallAnswer } from "../turn-face";
 import { pgFrontierRepo, pgFrontierScope, pgTurnFace } from "./frontier";
-import { BARBERSHOP, SAM, SAM_HANDLE } from "./test-support";
+import { BARBERSHOP, openTurnFaceDatabase, SAM, SAM_HANDLE } from "./test-support";
 
 /** The frontier's one K-05 call: the name every scrubbed error of its transaction carries. */
 const CALL = "readTurnState";
@@ -522,5 +533,378 @@ describe("the frontier's read and its work around the start (T-1315)", () => {
     } finally {
       await client.close();
     }
+  });
+});
+
+// ---- the transaction's end (T-1330) ---------------------------------------------------------------------------------------
+
+/** The local server (DATABASE_URL, else the local default): its connection string, host and port, never printed. */
+function server(): { url: string; host: string; port: number } {
+  const url = resolvePrimaryUrl();
+  const { hostname, port } = new URL(url);
+  return { url, host: hostname, port: port === "" ? 5432 : Number(port) };
+}
+
+/**
+ * What an outcome at the end must never hold: the made-up connection the built errors carry, and the server's host and
+ * port, which postgres.js's own CONNECTION_CLOSED names ("write CONNECTION_CLOSED <host>:<port>", both on it). The local
+ * login, password and database are `rosie`, this repository's own folder, which every stack's file paths name, so they
+ * are not listed: postgres.js's connection errors never carry them (errors.js connection: the code, the host, the port).
+ */
+function endSecrets(): Secrets {
+  const { host, port } = server();
+  return { ...SHAPE_SECRETS, ...secretsOf({ "server host": host, "server port": port }) };
+}
+
+/**
+ * Where a call's connection is cut: just before the statement `at` picks from those built so far (the last one is the one
+ * about to go), which is then never written. The socket is destroyed with `raw` (Node hands it to postgres.js as the
+ * socket's error, which rejects the statement with it), or with none (postgres.js rejects it with its own
+ * CONNECTION_CLOSED, as when the server closes the connection).
+ */
+interface Cut {
+  at: (sent: readonly string[]) => boolean;
+  raw: Error | null;
+}
+
+interface CutClient {
+  readonly sql: Sql;
+  /** Each statement's text as postgres.js built it, in order (its `debug` hook): never a value. */
+  readonly sent: string[];
+}
+
+/**
+ * A client on this file's schema as its runtime client is made (commit/pg/test-support.ts: rosie_job, the schema first),
+ * one connection, through a socket to the same server, cut as `cut` says (postgres.js's own `socket` option).
+ */
+function cutClient(schema: string, cut: Cut | null): CutClient {
+  const { url, host, port } = server();
+  const sent: string[] = [];
+  let cutNext = false;
+  const options = {
+    max: 1,
+    onnotice: () => undefined,
+    connection: {
+      application_name: "rosie-t1330-frontier-end",
+      search_path: `${schema}, public`,
+      role: RUNTIME_ROLE,
+    },
+    debug: (_connection: number, text: string) => {
+      sent.push(text);
+      if (cut?.at(sent) === true) cutNext = true;
+    },
+    socket: () => {
+      const socket = createConnection(port, host);
+      const write = socket.write.bind(socket);
+      socket.write = ((...args: Parameters<typeof write>) => {
+        if (!cutNext) return write(...args);
+        cutNext = false;
+        socket.destroy(cut?.raw ?? undefined);
+        return true;
+      }) as typeof socket.write;
+      return socket;
+    },
+  };
+  return { sql: postgres(url, options), sent };
+}
+
+/** The statement the last one built is: `commit`, `rollback`. */
+const lastIs =
+  (text: string) =>
+  (sent: readonly string[]): boolean =>
+    sent.at(-1)?.trim() === text;
+
+/** The frontier's own setting of its scope (the setting and the business), not the start's clearing of it. */
+const FRONTIER_SCOPE = /^select set_config\(\$1, \$2, true\)$/;
+
+/** `work`'s first read: the statement right after the frontier's setting of its scope. */
+const firstRead = (sent: readonly string[]): boolean => FRONTIER_SCOPE.test(sent.at(-2)?.trim() ?? "");
+
+/** Node's error for a connection the other end reset under a read: syscall read, and no address on it. */
+function resetError(): Error {
+  return Object.assign(new Error("read ECONNRESET"), { errno: -54, code: "ECONNRESET", syscall: "read" });
+}
+
+/**
+ * A socket error with no code, as postgres.js's Workers build passes its socket's failure up (targets.ts transientOrThrow
+ * reads it as a lost connection, 08006), its message naming the made-up connection string.
+ */
+function codelessSocketError(): Error {
+  return new Error(`the socket closed: ${probeUrl(HOST, PORT)}`);
+}
+
+/** The ways a connection is cut at the end: each one's error (null: the socket just closes), its code, what it holds. */
+const END_CUTS: {
+  name: string;
+  raw: () => Error | null;
+  code: string | null;
+  holds: readonly string[];
+}[] = [
+  {
+    name: "the socket closes: postgres.js's own CONNECTION_CLOSED, the server's host and port in it",
+    raw: () => null,
+    code: "CONNECTION_CLOSED",
+    holds: ["server host", "server port"],
+  },
+  {
+    name: "postgres.js's CONNECTION_CLOSED, the made-up host and port on it",
+    raw: () => connectionError("CONNECTION_CLOSED"),
+    code: "CONNECTION_CLOSED",
+    holds: ["host", "port"],
+  },
+  { name: "Node's ECONNRESET under a read", raw: resetError, code: "ECONNRESET", holds: [] },
+  {
+    name: "a socket error with no code, the made-up connection string in it",
+    raw: codelessSocketError,
+    code: null,
+    holds: ["host", "port", "user", "password", "database"],
+  },
+];
+
+/** What the frontier's end throws when `work` answered: its call's name and `code` alone (null: no code). */
+function expectEndScrubbed(thrown: unknown, code: string | null): void {
+  expect(thrown).toBeInstanceOf(Error);
+  expect(Object.getOwnPropertyNames(thrown).sort()).toEqual(["call", "code", "message", "stack"]);
+  expect(thrown).toMatchObject({
+    call: CALL,
+    code,
+    message: `${CALL}: the database call failed (${code === null ? "no code" : `code ${code}`})`,
+  });
+}
+
+/** What a call threw (it must have thrown). */
+function thrownOf(settled: Settled): unknown {
+  expect("thrown" in settled).toBe(true);
+  return (settled as { thrown: unknown }).thrown;
+}
+
+describe("the frontier's transaction end, once work has its repo (T-1330; local PostgreSQL)", () => {
+  let cdb: CommitDatabase;
+
+  beforeAll(async () => {
+    ({ cdb } = await openTurnFaceDatabase(1, [], "frontier_end"));
+  }, 120_000);
+
+  afterAll(async () => {
+    await cdb.close();
+  });
+
+  /** What postgres.js rejects a statement with when its socket is cut with `raw`: `raw` itself, or its own error. */
+  async function rejectionAtCut(raw: Error | null): Promise<unknown> {
+    const probe = cutClient(cdb.db.schema, { at: lastIs("select 1 as cut"), raw });
+    try {
+      return await rejectionOf(probe.sql`select 1 as cut`);
+    } finally {
+      await probe.sql.end({ timeout: 0 });
+    }
+  }
+
+  /** One call through the scope on a cut client: `work` reads Sam's state, then answers, or throws `throws`. */
+  async function scopeRun(
+    cut: Cut | null,
+    throws: Error | null = null,
+  ): Promise<{ settled: Settled; works: number; sent: string[] }> {
+    const client = cutClient(cdb.db.schema, cut);
+    try {
+      if (throws === null) return { ...(await throughScope(client.sql)), sent: client.sent };
+      let works = 0;
+      const settled = await settle(
+        pgFrontierScope(client.sql).withBusiness(BARBERSHOP, async (repo) => {
+          works += 1;
+          await repo.readTurnState(frontierRead(BARBERSHOP));
+          throw throws;
+        }),
+      );
+      return { settled, works, sent: client.sent };
+    } finally {
+      await client.sql.end({ timeout: 0 });
+    }
+  }
+
+  /** Turn 1's buildFrontier through the turn face on a cut client: bundle v0 (it answers), or none (bundleNotFound). */
+  async function faceRun(
+    cut: Cut | null,
+    bundled = true,
+  ): Promise<{ settled: Settled; spans: Span[]; log: LogCapture; sent: string[] }> {
+    const client = cutClient(cdb.db.schema, cut);
+    try {
+      if (bundled) return { ...(await throughFace(client.sql)), sent: client.sent };
+      const log = captureLog();
+      const face = pgTurnFace(client.sql, { bundles: fakeBundles(), validator, checker, log: log.sink });
+      const { request } = s101Exchange();
+      const { trace, spans } = traceFor(request);
+      const settled = await settle(face.buildFrontier(structuredClone(request), trace));
+      return { settled, spans, log, sent: client.sent };
+    } finally {
+      await client.sql.end({ timeout: 0 });
+    }
+  }
+
+  /** Where the end's scope read is among a call's statements, from a run with no cut: right before its commit. */
+  function endScopeRead(sent: readonly string[]): number {
+    const commit = sent.map((text) => text.trim()).lastIndexOf("commit");
+    expect(commit).toBe(sent.length - 1);
+    expect(sent[commit - 1]).toMatch(/current_setting/);
+    return commit - 1;
+  }
+
+  /** The raw error the cut raises holds what it names, so the checks on the outcome mean something. */
+  async function expectRawHolds(raw: Error | null, holds: readonly string[], secrets: Secrets): Promise<void> {
+    const rejected = await rejectionAtCut(raw);
+    if (raw !== null) expect(rejected).toBe(raw);
+    else expect(rejected).toMatchObject({ code: "CONNECTION_CLOSED" });
+    expect(leaksOf(rejected, secrets)).toEqual(expect.arrayContaining([...holds]));
+    // postgres.js put the statement it rejected on the error.
+    expect(Object.hasOwn(rejected as object, "query")).toBe(true);
+  }
+
+  /** Through the face: the end's scrubbed error thrown on, one frontier span failed with its name; nothing holds a secret. */
+  function expectFaceEnd(
+    outcome: { settled: Settled; spans: Span[]; log: LogCapture },
+    code: string | null,
+    secrets: Secrets,
+  ): void {
+    for (const seen of [outcome.settled, outcome.spans, outcome.log.lines]) {
+      expect(leaksOf(seen, secrets)).toEqual([]);
+    }
+    expectEndScrubbed(thrownOf(outcome.settled), code);
+    expect(outcome.spans).toHaveLength(1);
+    expect(outcome.spans[0]).toMatchObject({
+      hop: "frontier",
+      outcome: "failed",
+      error_code: "Error",
+      business_id: BARBERSHOP,
+    });
+  }
+
+  it("with no cut, the scope and the face answer and commit (the runs every cut below is placed by)", async () => {
+    const scoped = await scopeRun(null);
+    expect(scoped.settled).toMatchObject({ answer: { turnState: { result: "turnState" } } });
+    endScopeRead(scoped.sent);
+    const faced = await faceRun(null);
+    expect("answer" in faced.settled).toBe(true);
+    expect(faced.spans[0]).toMatchObject({ hop: "frontier", outcome: "ok", error_code: null });
+    endScopeRead(faced.sent);
+  });
+
+  it.each(END_CUTS)(
+    "work answered, then the scope read fails ($name): thrown scrubbed, never transient, nothing sent after it",
+    async ({ raw, code, holds }) => {
+      const secrets = endSecrets();
+      await expectRawHolds(raw(), holds, secrets);
+
+      const scopeAt = endScopeRead((await scopeRun(null)).sent);
+      const scoped = await scopeRun({ at: (sent) => sent.length - 1 === scopeAt, raw: raw() });
+      expect(scoped.sent).toHaveLength(scopeAt + 1);
+      expect(scoped.works).toBe(1);
+      expect(leaksOf(scoped.settled, secrets)).toEqual([]);
+      expectEndScrubbed(thrownOf(scoped.settled), code);
+
+      const faceAt = endScopeRead((await faceRun(null)).sent);
+      const faced = await faceRun({ at: (sent) => sent.length - 1 === faceAt, raw: raw() });
+      expect(faced.sent).toHaveLength(faceAt + 1);
+      expectFaceEnd(faced, code, secrets);
+    },
+  );
+
+  it.each(END_CUTS)(
+    "work answered, then the commit fails ($name): thrown scrubbed, never transient",
+    async ({ raw, code, holds }) => {
+      const secrets = endSecrets();
+      await expectRawHolds(raw(), holds, secrets);
+
+      const scoped = await scopeRun({ at: lastIs("commit"), raw: raw() });
+      expect(scoped.sent.at(-1)).toBe("commit");
+      expect(scoped.works).toBe(1);
+      expect(leaksOf(scoped.settled, secrets)).toEqual([]);
+      expectEndScrubbed(thrownOf(scoped.settled), code);
+
+      const faced = await faceRun({ at: lastIs("commit"), raw: raw() });
+      expect(faced.sent.at(-1)).toBe("commit");
+      expectFaceEnd(faced, code, secrets);
+    },
+  );
+
+  it.each(END_CUTS)(
+    "work threw, then the rollback fails ($name): work's own error leaves, never the rollback's",
+    async ({ raw, holds }) => {
+      const secrets = endSecrets();
+      await expectRawHolds(raw(), holds, secrets);
+
+      // Through the scope: work's own error, with nothing of a connection on it, leaves as it is.
+      const own = new Error("work's own error");
+      const scoped = await scopeRun({ at: lastIs("rollback"), raw: raw() }, own);
+      expect(scoped.sent.at(-1)).toBe("rollback");
+      expect(scoped.works).toBe(1);
+      expect(thrownOf(scoped.settled)).toBe(own);
+      expect(leaksOf(scoped.settled, secrets)).toEqual([]);
+
+      // Through the face: with no bundle the frontier answers bundleNotFound, which the base rolls back as its error
+      // answer (ErrorAnswer) and answers as it is; its span refused with that code.
+      const faced = await faceRun({ at: lastIs("rollback"), raw: raw() }, false);
+      expect(faced.sent.at(-1)).toBe("rollback");
+      for (const seen of [faced.settled, faced.spans, faced.log.lines]) {
+        expect(leaksOf(seen, secrets)).toEqual([]);
+      }
+      expect(faced.settled).toMatchObject({ answer: { error: "bundleNotFound" } });
+      const answer = (faced.settled as { answer: BuildFrontierCallAnswer }).answer;
+      expect(validator.check("buildFrontier", "errors", answer)).toEqual([]);
+      expect(faced.spans).toHaveLength(1);
+      expect(faced.spans[0]).toMatchObject({
+        hop: "frontier",
+        outcome: "refused",
+        error_code: "bundleNotFound",
+        business_id: BARBERSHOP,
+      });
+    },
+  );
+
+  it.each(END_CUTS)(
+    "the connection is lost under work's read ($name): transient to the read, and no rollback, scope read or commit is sent on it",
+    async ({ raw, holds }) => {
+      const secrets = endSecrets();
+      await expectRawHolds(raw(), holds, secrets);
+
+      // Through the face: the read answers transient, the frontier answers it, and the base answers K-09's transient
+      // (its error answer, ErrorAnswer, is what leaves the scope): the span failed. No rollback goes on the lost connection.
+      const faced = await faceRun({ at: firstRead, raw: raw() });
+      expect(faced.sent.at(-2)).toMatch(FRONTIER_SCOPE);
+      for (const seen of [faced.settled, faced.spans, faced.log.lines]) {
+        expect(leaksOf(seen, secrets)).toEqual([]);
+      }
+      expect(faced.settled).toEqual({ answer: LOST });
+      const answer = (faced.settled as { answer: BuildFrontierCallAnswer }).answer;
+      expect(validator.check("buildFrontier", "errors", answer)).toEqual([]);
+      expect(faced.spans).toHaveLength(1);
+      expect(faced.spans[0]).toMatchObject({
+        hop: "frontier",
+        outcome: "failed",
+        error_code: "transient",
+        business_id: BARBERSHOP,
+      });
+
+      // Through the scope: work reads the transient and answers anyway. The scope cannot be read on the lost connection, so
+      // the call is thrown scrubbed to the read's SQLSTATE, and nothing more is sent on it.
+      const scoped = await scopeRun({ at: firstRead, raw: raw() });
+      expect(scoped.sent.at(-2)).toMatch(FRONTIER_SCOPE);
+      expect(scoped.works).toBe(1);
+      expect(leaksOf(scoped.settled, secrets)).toEqual([]);
+      const thrown = thrownOf(scoped.settled);
+      expect(thrown).toBeInstanceOf(DataAccessDatabaseError);
+      expect(thrown).toMatchObject({ call: CALL, code: LOST.sqlstate, table: null, constraint: null });
+      expect((thrown as Error).message).toBe(
+        `${CALL}: the database refused the call (SQLSTATE ${LOST.sqlstate})`,
+      );
+    },
+  );
+
+  it("work's own error that carries a connection's detail is thrown scrubbed: the call's name and the code alone", async () => {
+    const raw = connectError("EACCES", -13);
+    expect(leaksOf(raw, SHAPE_SECRETS)).toEqual(expect.arrayContaining(["address", "port"]));
+    const scoped = await scopeRun(null, raw);
+    expect(scoped.works).toBe(1);
+    expect(scoped.sent.at(-1)).toBe("rollback");
+    expect(leaksOf(scoped.settled, endSecrets())).toEqual([]);
+    expectEndScrubbed(thrownOf(scoped.settled), "EACCES");
   });
 });
