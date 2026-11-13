@@ -23,6 +23,11 @@
 //
 // T-1227 adds, after them, the tests of K-05 v1.9 item 48: markPartV12's answer says what a repeated delivery receipt
 // repeats (repeatedDelivery). T-1135's tests run unchanged: its helpers now check markPartV12's answers against v1.9.
+//
+// T-1279 (ADR-016 card R0) adds, after those and before the last test, the tests of K-05 v1.13 items 64 and 66 for a row
+// with no turn, K-04 v1.1's job row: claimOutboxV113 claims it as any row, naming its purpose and its end
+// (emailPurpose, notAfter), claimOutboxV12 still answers it as v1.2 states a claimed row, and a failed mark with no
+// follow-ups marks it as any row. Every test above runs unchanged.
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
@@ -32,10 +37,12 @@ import { resolvePrimaryUrl } from "./client";
 import { commitTurn, type CommitTurnRequest } from "./commit-turn";
 import {
   claimOutbox,
+  claimOutboxV113,
   claimOutboxV12,
   type ClaimedRowV12,
   type ClaimOutboxRequest,
   type ClaimOutboxResponse,
+  type ClaimOutboxV113Response,
   type ClaimOutboxV12Response,
   markPart,
   type MarkPartOutcome,
@@ -3119,6 +3126,408 @@ describe("markPartV12: a repeated delivery receipt says what it repeats (T-1227;
         openQuestionId: null,
         nextKey: null,
       });
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+});
+
+// ==== T-1279: K-05 v1.13 items 64 and 66, a row with no turn (ADR-016 card R0) =========================================
+//
+// K-04 v1.1 lets work with no turn write an outbox row, a job row (turn_id null, a job id in its place), such as a
+// sign-in code's email row, which names its K-12 purpose and the time from which no part of it is sent (email_purpose,
+// not_after). K-05 v1.13's claim, claimOutboxV113, carries both on every claimed row, as stored, null where the column
+// is null; claimOutboxV12's answer stays v1.2's, which v1.2 closes. The code row's chain (startSignIn, sendSignInCode) is
+// R1's (T-1280) and not built, so these tests load claim-sam-sign-in-code's seeds, its part seeds among them, and write
+// the row as send-sign-in-code-sam leaves it (as read-outbox-row-sign-in-code's note lists it), as the tables' owner; of
+// what that chain writes, the claim and the marks read the outbox alone. The claim, the marks and limit 8's mark then run
+// for real, each v1.13 claim checked against data-access v1.13's claimOutbox.response.
+
+const V113_ID = schemaId("data-access/data-access.v1.13.schema.json");
+const DB_SCHEMA_DIR = new URL("db-schema/", CONTRACTS);
+const CODE_CLAIM = "claim-sam-sign-in-code.json";
+const CODE_SEND = "send-sign-in-code-sam.json";
+const CODE_MARK = "mark-sign-in-code-failed-no-turn.json";
+const CODE_ROW = "out-sam-sign-in-nov02-code";
+const CODE_KEY = `${CODE_ROW}/1/1`;
+/** A turn of Sam's phone, for the code row's twin with a turn (K-04 v1's shape). */
+const TWIN_TURN = "turn-sam-code-twin";
+
+/** A field an exchange's request or outcome holds; thrown when it holds none. */
+function fieldOf(record: Record<string, Json>, key: string): Json {
+  const value = record[key];
+  if (value === undefined) {
+    throw new Error(`the exchange holds no ${key}`);
+  }
+  return value;
+}
+
+/** `<part>/<file>`: a seed of another database part (K-05 given.partSeeds), in that part's fixtures folder. */
+function partSeedUrl(name: string): URL {
+  const slash = name.indexOf("/");
+  if (slash < 1) {
+    throw new Error(`partSeeds names <part>/<file>, not ${name}`);
+  }
+  return new URL(`${name.slice(0, slash)}/fixtures/${name.slice(slash + 1)}`, DB_SCHEMA_DIR);
+}
+
+/** A seed file's rows after those of its `after` chain, each file named relative to the file that names it. */
+function seedRowsAt(file: URL, seen: Set<string>): SeedFile["rows"] {
+  if (seen.has(file.href)) {
+    return [];
+  }
+  seen.add(file.href);
+  const seed = readJson(file) as SeedFile;
+  return [...seed.after.flatMap((before) => seedRowsAt(new URL(before, file), seen)), ...seed.rows];
+}
+
+/**
+ * The code row's world: claim-sam-sign-in-code's seeds, K-04's and its part seeds (K-22's chain, which holds Sam's email
+ * handle and his account), then his code row as send-sign-in-code-sam leaves it: no turn, its job id the attempt's, to
+ * his email handle and his person, no business, booking, question or copy, email, quick_reply, purpose code, not_after
+ * the code's end, no versions read, the send's bundle and trace, checked at version 2 with the plan and final parts
+ * the send holds. With `twinTurn`, the same row as a turn of Sam's phone would have written it (K-04 v1's shape): that
+ * turn's id in place of the job id, and nothing else changed.
+ */
+async function codeRowWritten(twinTurn: string | null = null): Promise<void> {
+  const { given: world } = exchangeOf(CODE_CLAIM);
+  const { request, outcome } = exchangeOf(CODE_SEND);
+  const bundle = fieldOf(request, "bundle") as { hash: Json; build: Json };
+  const seen = new Set<string>();
+  const rows = [
+    ...world.k04Seeds.map((seed) => new URL(seed, CORE_DIR)),
+    ...(world.partSeeds ?? []).map(partSeedUrl),
+  ].flatMap((file) => seedRowsAt(file, seen));
+  await reset();
+  await db.sql.begin(async (tx) => {
+    for (const row of rows) {
+      await insertRow(tx, row.table, row.values);
+    }
+    if (twinTurn !== null) {
+      await insertRow(tx, "turns", {
+        id: twinTurn,
+        handle_id: "handle-sam",
+        event_ids: [`evt-${twinTurn}`],
+        state: "committed",
+        bundle_hash: bundle.hash,
+        bundle_build: bundle.build,
+        trace_id: `trace-${twinTurn}`,
+        committed_at: "2026-11-02T12:59:58Z",
+      });
+    }
+    await insertRow(tx, "outbox_rows", {
+      id: fieldOf(request, "emailRowId"),
+      turn_id: twinTurn,
+      job_id: twinTurn === null ? fieldOf(request, "signInAttemptId") : null,
+      recipient_handle_id: "handle-sam-email",
+      recipient_person_id: "person-sam",
+      business_id: null,
+      booking_id: null,
+      open_question_id: null,
+      copy_of_row_id: null,
+      channel: "email",
+      send_class: "quick_reply",
+      email_purpose: "code",
+      not_after: fieldOf(outcome, "expiresAt"),
+      versions_read: [],
+      plan: fieldOf(request, "plan"),
+      final_parts: fieldOf(request, "finalParts"),
+      state: "checked",
+      bundle_hash: bundle.hash,
+      bundle_build: bundle.build,
+      trace_id: fieldOf(request, "traceId"),
+      version: fieldOf(outcome, "version"),
+    });
+  });
+}
+
+/** claimOutboxV113's answer, checked against data-access v1.13 (its claimOutbox.response, or its errors). */
+async function claimV113(request: ClaimOutboxRequest): Promise<ClaimOutboxV113Response> {
+  const outcome = await claimOutboxV113(runtime, request);
+  const def = "error" in outcome ? "claimOutbox.errors" : "claimOutbox.response";
+  expect(schemaErrors(V113_ID, def, outcome)).toEqual([]);
+  if ("error" in outcome) {
+    throw new Error(`claimOutboxV113 answered ${outcome.error}`);
+  }
+  return outcome;
+}
+
+/** claim-sam-sign-in-code's request: the sweep at 13:00:02Z, one second after the code was sent. */
+const codeClaimRequest = (): ClaimOutboxRequest =>
+  structuredClone(exchangeOf(CODE_CLAIM).request) as unknown as ClaimOutboxRequest;
+
+describe("claimOutboxV113: a row with no turn is claimed as any row, naming its purpose and its end (K-05 v1.13 item 64; T-1279)", () => {
+  it(
+    `${CODE_CLAIM}: the code row is claimed by the sweep and by its recipient alike, with its purpose and notAfter and no turn or job id, and written as any claim`,
+    SLOW,
+    async () => {
+      const exchange = exchangeOf(CODE_CLAIM);
+      expect(fixtureVersion(CODE_CLAIM)).toBe("v1.13");
+      // The fixture's sweep, and the dispatch the request runs for the row's recipient after the code's commit (ADR-016
+      // section 2), each on the row as the send leaves it.
+      for (const request of [
+        exchange.request,
+        { ...exchange.request, recipientHandleId: "handle-sam-email" },
+      ]) {
+        await codeRowWritten();
+        const answer = await claimV113(structuredClone(request) as unknown as ClaimOutboxRequest);
+        // The whole answer: the claimed row carries its purpose and end, and neither its turn id nor its job id.
+        expect(answer, JSON.stringify(request)).toEqual(exchange.outcome);
+        expect(
+          schemaErrors(V113_ID, "claimOutbox.exchange", { ...exchange, request, outcome: answer }),
+        ).toEqual([]);
+        expect(await rowNow(CODE_ROW)).toEqual({ state: "sending", version: 3, held_until: null });
+        expect(await partsNow(CODE_ROW)).toEqual([
+          {
+            idempotency_key: CODE_KEY,
+            kind: "words",
+            state: "pending",
+            attempts: 1,
+            linq_message_id: null,
+            linq_option_ids: null,
+            error_code: null,
+            sent: false,
+            delivered: false,
+            failed: false,
+          },
+        ]);
+        expect(await claimNow(CODE_ROW)).toEqual({
+          claimer: "dispatcher-1",
+          claimed_at: new Date("2026-11-02T13:00:02Z"),
+          lapses_at: new Date("2026-11-02T13:01:02Z"),
+          claim_no: 1,
+          first_try_at: null,
+          next_try_not_before: null,
+          version: 1,
+        });
+      }
+    },
+  );
+
+  it(
+    "claimOutboxV12 claims the same row as v1.2 states a claimed row, with neither field, valid at v1.2: its consumers see no change",
+    SLOW,
+    async () => {
+      const outcome = exchangeOf(CODE_CLAIM).outcome as { claimed: Fields[] };
+      await codeRowWritten();
+      expect(await claimV12(codeClaimRequest())).toEqual({
+        ...outcome,
+        claimed: outcome.claimed.map((row) => without(row, ["emailPurpose", "notAfter"])),
+      });
+    },
+  );
+
+  it(
+    "every claimed row states both as stored, null where the column is null: rows of each channel with and without a purpose or an end",
+    SLOW,
+    async () => {
+      await givenLatest("claim-in-order-with-port.json");
+      // Rows a turn wrote, planned for real (writePlan), then given a purpose and an end as K-04 v1.1 admits them, as the
+      // tables' owner: an end on a text row, a purpose alone, and a purpose with an end that has a fraction of a second.
+      await addChannelRow("out-riley-sms-ends", "handle-riley", "sms");
+      await addChannelRow("out-alex-email-confirm", "handle-alex-email", "email");
+      await addChannelRow("out-alex-email-notice", "handle-alex-email", "email");
+      await db.sql`
+        update outbox_rows set not_after = '2026-11-07T16:00:00Z', version = version + 1
+        where id = 'out-riley-sms-ends'
+      `;
+      await db.sql`
+        update outbox_rows set email_purpose = 'confirmation', version = version + 1
+        where id = 'out-alex-email-confirm'
+      `;
+      await db.sql`
+        update outbox_rows set email_purpose = 'notice', not_after = '2026-11-08T09:00:00.25Z', version = version + 1
+        where id = 'out-alex-email-notice'
+      `;
+      const now = "2026-11-07T15:07:00Z";
+      const stated: [string, string, string, unknown, unknown][] = [];
+      for (const recipientHandleId of ["handle-alex", "handle-riley", "handle-alex-email"]) {
+        const answer = await claimV113({ claimer: "dispatcher-1", recipientHandleId, now, limit: 10 });
+        stated.push(
+          ...answer.claimed.map((row): [string, string, string, unknown, unknown] => [
+            row.outboxRowId,
+            row.channel,
+            row.port,
+            row.emailPurpose,
+            row.notAfter,
+          ]),
+        );
+      }
+      expect(stated).toEqual([
+        [ALEX_ROW, "imessage", "linq", null, null],
+        ["out-riley-sms-ends", "sms", "linq", null, "2026-11-07T16:00:00Z"],
+        ["out-alex-email-confirm", "email", "email", "confirmation", null],
+        ["out-alex-email-notice", "email", "email", "notice", "2026-11-08T09:00:00.250Z"],
+      ]);
+    },
+  );
+
+  it(
+    "refuse-claimed-code-row-no-not-after.json: no claim answers a code row with no end, since the database holds none",
+    SLOW,
+    async () => {
+      const refused = readJson(new URL("invalid/refuse-claimed-code-row-no-not-after.json", ACCESS_DIR));
+      expect(schemaErrors(V113_ID, "claimOutbox.response", refused)).not.toEqual([]);
+      // Put right, it is claim-sam-sign-in-code's outcome: the same claimed row with its notAfter.
+      const outcome = exchangeOf(CODE_CLAIM).outcome as { claimed: Fields[] };
+      expect(refused).toEqual({
+        ...outcome,
+        claimed: outcome.claimed.map((row) => ({ ...row, notAfter: null })),
+      });
+      expect(schemaErrors(V113_ID, "claimOutbox.response", outcome)).toEqual([]);
+      // The database refuses a code row with no end (K-04 v1.1 outbox_rows_code_has_not_after), and nothing is written,
+      // so the claim answers the row with its end.
+      await codeRowWritten();
+      const before = await everythingNow();
+      await expect(
+        db.sql`update outbox_rows set not_after = null, version = version + 1 where id = ${CODE_ROW}`,
+      ).rejects.toMatchObject({ code: "23514", constraint_name: "outbox_rows_code_has_not_after" });
+      expect(await everythingNow()).toEqual(before);
+      expect(await claimV113(codeClaimRequest())).toEqual(outcome);
+    },
+  );
+
+  it(
+    "every claim of the code row names its end: the re-claim of its next try after a failed try, and a claim at its notAfter, which limit 8's withdrawal closes unsent",
+    SLOW,
+    async () => {
+      await codeRowWritten();
+      await claimV113(codeClaimRequest());
+      // Its first try fails and a next try follows, under a new key (K-07 rule 2's plain retry), as for any row.
+      expect(
+        await markV19({
+          outcome: "failed",
+          idempotencyKey: CODE_KEY,
+          errorCode: "500",
+          retry: true,
+          at: "2026-11-02T13:00:05Z",
+          providerMessageId: null,
+          nextTryNotBefore: null,
+        }),
+      ).toMatchObject({
+        result: "marked",
+        nextKey: `${CODE_ROW}/1/2`,
+        row: { state: "sending", version: 4 },
+      });
+      // The first claim lapses at 13:01:02Z; another dispatcher's sweep takes the row again, its next try with it, and
+      // the re-claimed row names its purpose and its end again.
+      const again = await claimV113({ claimer: "dispatcher-2", now: "2026-11-02T13:01:30Z", limit: 10 });
+      expect(again.claimed).toEqual([
+        expect.objectContaining({
+          outboxRowId: CODE_ROW,
+          version: 5,
+          claimedFrom: "sending",
+          parts: [{ partNo: 1, tryNo: 2, idempotencyKey: `${CODE_ROW}/1/2`, attempts: 2, sent: false }],
+          claim: expect.objectContaining({ claimer: "dispatcher-2", claimNo: 2 }) as unknown,
+          port: "email",
+          emailPurpose: "code",
+          notAfter: "2026-11-02T13:10:01Z",
+        }),
+      ]);
+
+      // A row whose dispatch never ran is claimed at its next wake, at or after its end (ADR-016 section 2): the claim
+      // decides nothing by notAfter and hands the row over with it, and limit 8's withdrawn closes it, nothing sent.
+      await codeRowWritten();
+      const late = await claimV113({ claimer: "dispatcher-3", now: "2026-11-02T13:10:01Z", limit: 10 });
+      expect(late.claimed).toEqual([
+        expect.objectContaining({ outboxRowId: CODE_ROW, version: 3, notAfter: "2026-11-02T13:10:01Z" }),
+      ]);
+      expect(
+        await limit8V12({
+          outboxRowId: CODE_ROW,
+          expectVersion: 3,
+          outcome: "withdrawn",
+          heldUntil: null,
+          at: "2026-11-02T13:10:01Z",
+        }),
+      ).toEqual({ result: "marked", outboxRowId: CODE_ROW, version: 4, outcome: "withdrawn" });
+      expect(await rowNow(CODE_ROW)).toEqual({ state: "withdrawn", version: 4, held_until: null });
+      expect(await partsNow(CODE_ROW)).toMatchObject([
+        { idempotency_key: CODE_KEY, state: "pending", sent: false },
+      ]);
+      // A withdrawn row is finished: no claim takes it again.
+      expect(await claimV113({ claimer: "dispatcher-3", now: "2026-11-02T13:12:00Z", limit: 10 })).toEqual({
+        result: "claimed",
+        claimed: [],
+        passedHeld: [],
+      });
+    },
+  );
+});
+
+describe("a failed mark with no follow-ups marks a row with no turn as any row (K-05 v1.13 item 66; DL-610; T-1279)", () => {
+  it(
+    `${CODE_MARK} with no follow-ups: the code row's part is marked failed as for any row, and as for the same row with a turn`,
+    SLOW,
+    async () => {
+      const fixture = exchangeOf(CODE_MARK);
+      expect(fixtureVersion(CODE_MARK)).toBe("v1.13");
+      // The fixture's mark without what only a safety line's first failure carries (README item 15).
+      const noFollowUps = without(fixture.request, ["followUps", "events"]);
+      expect(Object.keys(fixture.request).length - Object.keys(noFollowUps).length).toBe(2);
+      /** The code row claimed by the fixture's chain's claim, then that mark: its answer and what it wrote. */
+      const markedOnce = async (twinTurn: string | null): Promise<Fields> => {
+        await codeRowWritten(twinTurn);
+        await claimV113(codeClaimRequest());
+        const answer = await markV19(structuredClone(noFollowUps) as unknown as MarkPartV12Request);
+        return {
+          answer,
+          row: await rowNow(CODE_ROW),
+          parts: await partsNow(CODE_ROW),
+          claim: await claimNow(CODE_ROW),
+        };
+      };
+      const noTurn = await markedOnce(null);
+      expect(noTurn).toEqual({
+        answer: {
+          result: "marked",
+          outboxRowId: CODE_ROW,
+          partNo: 1,
+          tryNo: 1,
+          attempts: 1,
+          repeated: false,
+          firstDelivery: false,
+          openQuestionId: null,
+          nextKey: null,
+          row: { state: "sending", version: 4 },
+          repeatedDelivery: null,
+        },
+        // Its one part failed with no next try (retry false), so the row stays sending, its version raised by one.
+        row: { state: "sending", version: 4, held_until: null },
+        parts: [
+          {
+            idempotency_key: CODE_KEY,
+            kind: "words",
+            state: "failed",
+            attempts: 1,
+            linq_message_id: null,
+            linq_option_ids: null,
+            error_code: "500",
+            sent: false,
+            delivered: false,
+            failed: true,
+          },
+        ],
+        claim: expect.objectContaining({ claimer: "dispatcher-1", claim_no: 1 }) as unknown,
+      });
+      // The same row with a turn (K-04 v1's shape) gives the same answer and the same writes.
+      expect(await markedOnce(TWIN_TURN)).toEqual(noTurn);
+    },
+  );
+
+  it(
+    `${CODE_MARK} itself, with its follow-ups: refused before anything is written, the failure included`,
+    SLOW,
+    async () => {
+      // K-05 v1.13 answers it noTurn (item 66). Here every failure that carries followUps is refused with nothing
+      // written (default 19) until the task that writes follow-ups (T-1136) gives that refusal its answer: the card
+      // that builds each of the three gives its noTurn (item 66).
+      const fixture = exchangeOf(CODE_MARK);
+      await codeRowWritten();
+      await claimV113(codeClaimRequest());
+      const before = await everythingNow();
+      await expect(
+        markPartV12(runtime, structuredClone(fixture.request) as unknown as MarkPartV12Request),
+      ).rejects.toThrow("followUps");
       expect(await everythingNow()).toEqual(before);
     },
   );
