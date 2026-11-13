@@ -1,0 +1,5 @@
+{
+  "call": "details",
+  "request": { "listingRef": "places-demo-lees-barbershop" },
+  "outcome": { "error": "rateLimited", "retryAfterSeconds": 30 }
+}

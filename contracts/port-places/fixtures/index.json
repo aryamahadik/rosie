@@ -1,0 +1,148 @@
+{
+  "fixtures": [
+    {
+      "file": "search-by-name.json",
+      "version": "v1",
+      "def": "search.exchange",
+      "expect": "accept",
+      "shows": "Sam searches for his shop by name and town ('Lee's Barbershop', 'Springfield'), as registration screen 1 lets him and as S1-09 asks when a photo can't be read: the double gives one candidate, places-demo-lees-barbershop, with the fields the read-back shows: Lee's Barbershop LLC, 88 Elm St, Springfield, its phone in E.164 form and its website",
+      "source": "02-contracts K-15 Fixtures and Defines ('Search: by a business name and town'); S1-09 in master-A.json ('A photo that can't be read: Rosie asks for the business name'; the read-back 'Lee's Barbershop LLC / 88 Elm St, Springfield / (555) 010-0177'); FS section 6.1 screen 1 (B01, B03, B04, B05 [G]); SPEC-master 6 (the cast); K-23 v1 seed-business-demo-shop.json (+15555550177, https://example.com); K-08 v1 span-places-call.json (the listing's ref); K-09 v1 lookupListing (nameAndTown, at most 5 candidates)"
+    },
+    {
+      "file": "search-by-photo-text.json",
+      "version": "v1",
+      "def": "search.exchange",
+      "expect": "accept",
+      "shows": "S1-09's sample: Sam sends a photo of his shop front, and the text read from it (the name, address and phone the read-back shows) is the search: the double gives the same one candidate, which 'matches' what he sent",
+      "source": "02-contracts K-15 Fixtures and Defines ('or by the text read from a photo of a card, sign or listing (S1-09)'); 02-contracts K-02 (photo reading's card or listing kind: 'the business name, address and phone the read-back shows (S1-09's sample read-back), which also form the text for K-15's search by photo text'); S1-09 in master-A.json ('[photo: Shop front]'; 'Here's what I read, and your Google listing matches. / Lee's Barbershop LLC / 88 Elm St, Springfield / (555) 010-0177')"
+    },
+    {
+      "file": "search-yoga-studio.json",
+      "version": "v1",
+      "def": "search.exchange",
+      "expect": "accept",
+      "shows": "A demo shop found by name and town: the yoga studio at 123 Demo St, Anytown, one candidate whose phone is null, since the listing shows none in the double (the demo file names no number); the key is there with a null value",
+      "source": "02-contracts K-15 ('The double: a few fixed listings for the demo shops'); fixture set v1 test-kit/shops/yoga.json (google_prefill: '123 Demo St, Anytown (demo)', 'https://example.com (demo)', no number given); K-04 v1 seed-business-head.json ('Yoga studio'); FS row B04"
+    },
+    {
+      "file": "no-match.json",
+      "version": "v1",
+      "def": "search.exchange",
+      "expect": "accept",
+      "shows": "No listing matches 'Test Mixed Shop A' in Anytown: the answer is noMatch, not an error, and S1-09's 'No match, or already listed' takes S1-76 (Rosie's team checks within 1 business day; setup goes on saved; nothing goes live meanwhile)",
+      "source": "02-contracts K-15 Fixtures; S1-09 and S1-76 in master-A.json ('A listing that doesn't match, or a business already on Rosie, goes live only after Rosie's team checks it'); fixture set v1 test-kit/shops/test-mixed-A.json (a test shop with no google_prefill: no listing in the double); FS section 10"
+    },
+    {
+      "file": "details.json",
+      "version": "v1",
+      "def": "details.exchange",
+      "expect": "accept",
+      "shows": "The details of Lee's Barbershop's listing, offered as prefill Sam confirms: its name, address, phone and website; its opening hours as K-27's ISO-day spans (Mon to Fri 09:00 to 17:00, Sat 10:00 to 14:00); its category, Barber; and three photo references, each credited to the shop, from which S1-84 picks. No rating, review, email or map point",
+      "source": "02-contracts K-15 Fixtures and Defines ('Details of one candidate: name, address, phone, website, opening hours and categories (offered as prefill the owner confirms), and photos'); FS section 10 and row H01; fixture set v1 test-kit/shops/barber.json (google_prefill hours 'Mon-Fri 9am-5pm, Sat 10am-2pm (demo)', category 'Barber', website); S1-84 in master-A.json ('[photo: The shop front] [photo: The chairs] [photo: A chair, ready]'); K-23 v1 seed-business-demo-shop.json (business_photos came_from listing); K-27 v1 weekly_hours"
+    },
+    {
+      "file": "details-lee-home-services.json",
+      "version": "v1",
+      "def": "details.exchange",
+      "expect": "accept",
+      "shows": "S1-38's second company, Lee Home Services LLC, with its own listing: 1200 Main St, Springfield, its own phone, the demo hours and the category Plumber; no photos, so S1-84 asks Sam for his own",
+      "source": "S1-38 in master-A.json ('Its own company: its own listing, owner question and control, as at S1-09 and S1-75'; 'Lee Home Services is its own company. Send a photo of its card or listing'); SPEC-master 6 ('Lee Home Services LLC (plumbing and electrical; 1200 Main St, Springfield; (555) 010-0142)'); K-23 v1 README (+15555550142); fixture set v1 test-kit/shops/plumber.json (hours, category 'Plumber', website); S1-84 ('Nothing to read? Send a few photos from your phone')"
+    },
+    {
+      "file": "details-yoga-studio.json",
+      "version": "v1",
+      "def": "details.exchange",
+      "expect": "accept",
+      "shows": "The yoga studio's listing in the double: no phone (null), the demo hours, the category Yoga studio and no photos",
+      "source": "fixture set v1 test-kit/shops/yoga.json (google_prefill); K-04 v1 seed-business-head.json ('Yoga studio'); 02-contracts K-15 ('a few fixed listings for the demo shops'); FS rows B04, H01"
+    },
+    {
+      "file": "details-not-found.json",
+      "version": "v1",
+      "def": "details.exchange",
+      "expect": "accept",
+      "shows": "Details asked for a reference the provider does not know (in the double, any ref but its three listings): the answer is notFound, not an error; the caller searches again or the owner types the details",
+      "source": "Google Place IDs page [P5] ('The NOT_FOUND status code indicates that the specified place ID is obsolete'); S1-09 ('No photo? Type the details, or say them on a call'); fixture set v1 test-kit/shops/test-mixed-A.json (no listing)"
+    },
+    {
+      "file": "error-unavailable.json",
+      "version": "v1",
+      "def": "search.exchange",
+      "expect": "accept",
+      "shows": "Google fails while Sam's shop is searched by name and town: the error unavailable with no Retry-After. It never means no match; the owner types the details meanwhile (K-09 v1 placesUnavailable)",
+      "source": "arch 10 line 540; K-08 v1 span outcome failed; K-09 v1 lookupListing.errors ('The Places port did not answer (K-15): the owner types the details instead (S1-09)'); S1-09"
+    },
+    {
+      "file": "error-rate-limited.json",
+      "version": "v1",
+      "def": "details.exchange",
+      "expect": "accept",
+      "shows": "Google rate-limits a details call for Lee's Barbershop's listing and gives Retry-After 30 seconds: the error rateLimited with retryAfterSeconds 30",
+      "source": "arch 10 line 540 ('a rate limit with any Retry-After'); K-17 v1 geocode.errors (the same three errors)"
+    },
+    {
+      "file": "span-search.json",
+      "version": "v1",
+      "def": "search.span",
+      "expect": "accept",
+      "shows": "The K-08 portCall span of S1-09's search for Sam's shop by name and town, exactly K-08 v1's own example: provider google_places, call search, attempt 1; it got the step and how it searched and decided one candidate and its reference, with no name, town, address or phone in it",
+      "source": "K-08 v1 fixtures/span-places-call.json (word for word); K-08 v1 README ('portCall covers ... a Google Places search or details (K-15, C-218; S1-09)'; 'never the raw number or words'); arch 02 diagram line 105"
+    },
+    {
+      "file": "span-details.json",
+      "version": "v1",
+      "def": "details.span",
+      "expect": "accept",
+      "shows": "The K-08 portCall span of S1-84's details call for Lee's Barbershop's listing: provider google_places, call details, attempt 1; it got the step and the listing's reference and decided found with 3 photos, with no name, address, hours or photo credit in it",
+      "source": "K-08 v1 README ('portCall'; 'never the raw number or words'); S1-84 in master-A.json (Mon Oct 19, before the profile is confirmed at 18:14Z: K-23 v1 seed-business-demo-shop.json profile_confirmed_at); K-01 bundle v0's id"
+    },
+    {
+      "file": "invalid/refuse-reviews-field.json",
+      "version": "v1",
+      "def": "details.exchange",
+      "expect": "refuse",
+      "shows": "details.json's listing with Google's reviews added: refused, since Google's ratings and reviews are never used (without reviews it is details.json)",
+      "source": "02-contracts K-15 Fixtures ('Refused: refuse-reviews-field.json') and Defines ('Google's ratings and reviews are never used'); FS section 10 ('Ratings and reviews from Google are not used: reviews on the booking page come from Rosie's own rating (S1-84, A10-02)')"
+    },
+    {
+      "file": "invalid/refuse-rating-field.json",
+      "version": "v1",
+      "def": "search.exchange",
+      "expect": "refuse",
+      "shows": "search-by-name.json's candidate with Google's star rating added: refused, since ratings are never used either (without rating it is search-by-name.json)",
+      "source": "02-contracts K-15 Defines ('Google's ratings and reviews are never used'); FS section 10"
+    },
+    {
+      "file": "invalid/refuse-email-in-listing.json",
+      "version": "v1",
+      "def": "details.exchange",
+      "expect": "refuse",
+      "shows": "details.json's listing with an email added: refused, since a listing carries no email (Google's Place has no email field), so S1-75 takes Q-02's default (without email it is details.json)",
+      "source": "The spike (README; Google's Place reference [P1] and data fields [P2] name no email field); 02-contracts K-15 ('whether a listing ever carries an email; with none, S1-75 takes Q-02's default'); QUESTIONS.md Q-02; S1-75"
+    },
+    {
+      "file": "invalid/refuse-phone-national-form.json",
+      "version": "v1",
+      "def": "search.exchange",
+      "expect": "refuse",
+      "shows": "search-by-name.json's candidate with the phone in national form, (555) 010-0177, as Google's nationalPhoneNumber writes it: refused, since the port gives E.164 (with +15555550177 it is search-by-name.json)",
+      "source": "K-23 v1 business_setup_listing_phone_form; K-09 v1 lookupListing listingPhone (E.164); FS row B04; 02-contracts section 5 ('The vendor's wire format stays inside the adapter')"
+    },
+    {
+      "file": "invalid/refuse-vendor-hours.json",
+      "version": "v1",
+      "def": "details.exchange",
+      "expect": "refuse",
+      "shows": "details-lee-home-services.json's hours given as Google's own periods (open and close, each a day, hour and minute): refused, since the port gives K-27's spans, an ISO day with opensAt and closesAt (with the same hours as spans it is details-lee-home-services.json)",
+      "source": "02-contracts section 5 ('The vendor's wire format stays inside the adapter'); Google's Place reference [P1] (regularOpeningHours periods, Point day 0 to 6 from Sunday); K-27 v1 weekly_hours"
+    },
+    {
+      "file": "invalid/refuse-town-in-span.json",
+      "version": "v1",
+      "def": "search.span",
+      "expect": "refuse",
+      "shows": "span-search.json with the town searched, Springfield, added to what it got: refused by the span's closed list (K-08 alone would take the one word as a label), so no name, town or address enters a span or log line (without it, it is span-search.json)",
+      "source": "K-08 v1 ('never the raw number or words'); arch 02 diagram line 105; K-17 v1 refuse-town-in-span.json (the same rule)"
+    }
+  ]
+}

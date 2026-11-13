@@ -1,0 +1,16 @@
+{
+  "call": "search",
+  "request": { "by": "nameAndTown", "name": "Yoga studio", "town": "Anytown" },
+  "outcome": {
+    "result": "found",
+    "candidates": [
+      {
+        "listingRef": "places-demo-yoga-studio",
+        "name": "Yoga studio",
+        "address": "123 Demo St, Anytown",
+        "phone": null,
+        "website": "https://example.com"
+      }
+    ]
+  }
+}

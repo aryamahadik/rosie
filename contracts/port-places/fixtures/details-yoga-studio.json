@@ -1,0 +1,24 @@
+{
+  "call": "details",
+  "request": { "listingRef": "places-demo-yoga-studio" },
+  "outcome": {
+    "result": "found",
+    "listing": {
+      "listingRef": "places-demo-yoga-studio",
+      "name": "Yoga studio",
+      "address": "123 Demo St, Anytown",
+      "phone": null,
+      "website": "https://example.com",
+      "openingHours": [
+        { "weekday": 1, "opensAt": "09:00", "closesAt": "17:00" },
+        { "weekday": 2, "opensAt": "09:00", "closesAt": "17:00" },
+        { "weekday": 3, "opensAt": "09:00", "closesAt": "17:00" },
+        { "weekday": 4, "opensAt": "09:00", "closesAt": "17:00" },
+        { "weekday": 5, "opensAt": "09:00", "closesAt": "17:00" },
+        { "weekday": 6, "opensAt": "10:00", "closesAt": "14:00" }
+      ],
+      "categories": ["Yoga studio"],
+      "photos": []
+    }
+  }
+}
