@@ -1453,19 +1453,55 @@ function nameOrNull(value: unknown): string | null {
   return typeof value === "string" && NAME.test(value) ? value : null;
 }
 
-/** A PostgreSQL error as CommitTurnDatabaseError; any other error as it is. */
+/**
+ * An error the commit throws, as it leaves this call (T-1339, as clocks.ts's scrubbed does: T-1268): PostgreSQL's
+ * refusal (a PostgresError with a SQLSTATE) as CommitTurnDatabaseError, its SQLSTATE and the names of its table and
+ * constraint; an error of the database client as a new Error that carries the call's name and the client's code alone
+ * (`call`, `code`: a plain code such as UNDEFINED_VALUE or ERR_INVALID_ARG_TYPE, or null), with no message, stack,
+ * cause or property of the original's; db/repo's own errors as they are.
+ *
+ * The client's error is never passed on. postgres.js puts the statement on every error it rejects a statement with
+ * (query, parameters, args, types, and the statement's origin on its stack), and args holds the statement's values, a
+ * row's among them: its own UNDEFINED_VALUE (a value that is undefined) and the TypeError a serializer throws for a value
+ * it cannot send (the bytea serializer's message quotes the value) carry them, and transientOrThrow lets both through as
+ * it lets a statement's refusal through. Such an error is known by those properties or by a mark of a connection
+ * (address, port, hostname, host, cert, errors, syscall, errno), which db/repo's own errors never carry; a PostgresError
+ * with no SQLSTATE goes the same way. A session's failure never reaches here: transientOrThrow throws it scrubbed.
+ */
 function scrubbed(error: unknown): unknown {
-  if (!(error instanceof Error) || error.name !== "PostgresError") {
+  if (!(error instanceof Error)) {
     return error;
   }
   const failure = error as Error & { code?: unknown; table_name?: unknown; constraint_name?: unknown };
-  if (typeof failure.code !== "string" || !SQLSTATE.test(failure.code)) {
+  if (error.name === "PostgresError" && typeof failure.code === "string" && SQLSTATE.test(failure.code)) {
+    return new CommitTurnDatabaseError(
+      failure.code,
+      nameOrNull(failure.table_name),
+      nameOrNull(failure.constraint_name),
+    );
+  }
+  const clientFields = [
+    "query",
+    "parameters",
+    "args",
+    "types",
+    "address",
+    "port",
+    "hostname",
+    "host",
+    "cert",
+    "errors",
+    "syscall",
+    "errno",
+  ];
+  if (error.name !== "PostgresError" && !clientFields.some((field) => Object.hasOwn(error, field))) {
     return error;
   }
-  return new CommitTurnDatabaseError(
-    failure.code,
-    nameOrNull(failure.table_name),
-    nameOrNull(failure.constraint_name),
+  const code =
+    typeof failure.code === "string" && /^[A-Z0-9_]{1,64}$/.test(failure.code) ? failure.code : null;
+  return Object.assign(
+    new Error(`commitTurn: the database call failed (${code === null ? "no code" : `code ${code}`})`),
+    { call: "commitTurn", code },
   );
 }
 
