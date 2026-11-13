@@ -2,9 +2,69 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 530, [`806b881`](https://github.com/aryamahadik/rosie/commit/806b881), 2026-11-13 09:16:37 UTC.
+- **Through:** commit 533, [`e745c35`](https://github.com/aryamahadik/rosie/commit/e745c35), 2026-11-13 09:37:45 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 533. docs: COMMIT\_HISTORY.md through commit 530 (806b881, \#537) (\#541)
+
+- **Commit:** [`e745c35`](https://github.com/aryamahadik/rosie/commit/e745c35), by Arya Mahadik, 2026-11-13 09:37:45 UTC
+- **Pull request:** [#541](https://github.com/aryamahadik/rosie/pull/541) from `task/commit-history-74`, merged 2026-11-13 09:37:45 UTC. It squashed 1 branch commit:
+  - `0a50e98` docs: COMMIT\_HISTORY.md through commit 530 (806b881, \#537)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 532. T-1334: a reserve() that never connects answers 08001 on every runtime and business transaction, and no rollback is written on a dead connection (\#540)
+
+- **Commit:** [`3efc44b`](https://github.com/aryamahadik/rosie/commit/3efc44b), by Arya Mahadik, 2026-11-13 09:37:40 UTC
+- **Pull request:** [#540](https://github.com/aryamahadik/rosie/pull/540) from `task/T-1334`, merged 2026-11-13 09:37:41 UTC. It squashed 2 branch commits:
+  - `0042e21` T-1334: inRuntimeTransaction and inBusinessTransaction reserve throug…
+  - `ace680e` T-1334: the cut tests send a statement on the same client at once, be…
+- **Files changed:** 4 (+720 −13), by folder:
+  - `db/repo/` reservation-rules.int.test.ts +153 −1, reservation-rules.ts +5 −3, targets.int.test.ts +527 −2, targets.ts +35 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1334: inRuntimeTransaction and inBusinessTransaction reserve through reserveConnection, so a reserve() that never connects answers 08001 or is thrown scrubbed; inRuntimeTransaction writes no rollback to, and never releases, a connection fn found gone (isLostConnection's rule, or a statement's failure that is a session's failure or answers 08001: DL-649). Tests: a Workers-shape and a real refused reserve() at each start; fn's first statement cut eight ways on a rosie_job client through handleTargets, sendState and handleSealingKey; fn's own error on no statement still rolled back and released
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1334: the cut tests send a statement on the same client at once, before the socket's close event, so a dead connection released to the pool would never answer it: the release rule is tested, not only the rollback rule
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 531. T-1343: deploy-staging.sh, flags.sh, publish-bundle.sh and preview-cleanup.sh hand a database URL only to the commands that use it, on their command lines, with tracing, allexport and keyword off first; deploy-staging.sh clears rosie\_number before it sets it and gives Rosie's number to the deploy alone; seed-staging.sh hands STAGING\_TEST\_PHONES to staging-core's run alone; README line 7 says what a made name's line now gets; shared recorders in script-harness.mjs check each child's arguments as well as its environment, and T-1310's recorder checks do too (\#539)
+
+- **Commit:** [`fc9cf35`](https://github.com/aryamahadik/rosie/commit/fc9cf35), by Arya Mahadik, 2026-11-13 09:37:36 UTC
+- **Pull request:** [#539](https://github.com/aryamahadik/rosie/pull/539) from `task/T-1343`, merged 2026-11-13 09:37:36 UTC. It squashed 1 branch commit:
+  - `541f028` T-1343: deploy-staging.sh, flags.sh, publish-bundle.sh and preview-cl…
+- **Files changed:** 13 (+1362 −55), by folder:
+  - `infra/ci/` README.md +1 −1, deploy-preview.test.mjs +13 −1, deploy-staging.test.mjs +324 −1, flags.test.mjs +151 −1, preview-cleanup.test.mjs +196 −0, publish-bundle.test.mjs +197 −1, script-harness.mjs +111 −0, seed-staging.test.mjs +202 −6
+  - `infra/scripts/` deploy-staging.sh +53 −24, flags.sh +28 −6, preview-cleanup.sh +26 −3, publish-bundle.sh +36 −7, seed-staging.sh +24 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 530. docs: COMMIT\_HISTORY.md through commit 528 (8edd689, \#536) (\#537)
 
