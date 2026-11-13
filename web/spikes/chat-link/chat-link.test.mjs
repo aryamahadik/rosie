@@ -3,6 +3,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { FICTIONAL_PHONE, phoneNumbersIn } from "../../../infra/ci/phone-scan.mjs";
 import { decodeSvg } from "./decode.mjs";
 
 const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
@@ -43,20 +44,9 @@ test("page uses no real numbers and makes no network calls", () => {
 
 // No file of the spike holds a phone number outside the fiction range (T-1316): the repository is public (DL-436) and
 // no real phone number goes in it (DL-542). The range is +1, an area code, then 555-0100 to 555-0199, as
-// adapters/src/shared/samples.ts reads it. A number is found however it is written, as T-1304's scan finds it: a + and
-// 7 to 15 digits, with spaces, dots, dashes or brackets between them; or a North American number without the +.
-const FICTIONAL_PHONE = /^\+1[2-9][0-9]{2}55501[0-9]{2}$/;
-const PLUS_FORM = /(?<![0-9A-Za-z])\+[1-9](?:[ ().-]{0,2}[0-9]){6,14}(?![0-9])/g;
-const NANP_FORM =
-  /(?<![0-9A-Za-z+])(?:1[ .-]?)?(?:\([2-9][0-9]{2}\)|[2-9][0-9]{2})[ .-]?[2-9][0-9]{2}[ .-]?[0-9]{4}(?![0-9A-Za-z])/g;
-
-/** Every phone number a text holds, each once, in E.164 form. */
-function phoneNumbersIn(text) {
-  const numbers = new Set();
-  for (const [match] of text.matchAll(PLUS_FORM)) numbers.add(`+${match.replace(/[^0-9]/g, "")}`);
-  for (const [match] of text.matchAll(NANP_FORM)) numbers.add(`+1${match.replace(/[^0-9]/g, "").slice(-10)}`);
-  return [...numbers];
-}
+// adapters/src/shared/samples.ts reads it. A number is found however it is written, by the repository's own phone scan
+// (infra/ci/phone-scan.mjs: FICTIONAL_PHONE and phoneNumbersIn, with every shape it reads since T-1317, T-1332 and
+// T-1344), so the spike keeps no copy of the shapes to fall behind them (T-1344).
 
 /** The names of the files (name to text) that hold a number outside the fiction range, never the number itself. */
 const outsideFiction = (files) =>
