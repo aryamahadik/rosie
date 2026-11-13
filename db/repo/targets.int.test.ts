@@ -897,9 +897,10 @@ describe("handleTargets: a statement's own refusal and postgres.js's statement e
 // the shape Node, OpenSSL or postgres.js gives it, which postgres.js rejects the statement with, the statement put on it,
 // or with none (postgres.js's own CONNECTION_CLOSED, naming the server's host and port). Each raw error holds what it
 // names, so the checks mean something; each outcome holds none of it; nothing is sent after the cut, no rollback and no
-// commit; nothing is thrown outside a promise; and the same client then answers, so the dead connection was never
-// released. An error fn makes itself, on no statement, found no connection gone, whatever its code: it is rolled back and
-// released, as on main (frontier.int.test.ts's own error that carries a connection's detail).
+// commit; nothing is thrown outside a promise; a statement sent on the same client at once, before the socket's close
+// event, is answered on a new connection, so the dead connection was never released to the pool; and the call then
+// answers on the same client. An error fn makes itself, on no statement, found no connection gone, whatever its code: it
+// is rolled back and released, as on main (frontier.int.test.ts's own error that carries a connection's detail).
 //
 // Rule 9: the probe's user, password, database, host, address and port are made up here (a .invalid name, RFC 5737's
 // documentation address), and the number is a 555-01xx one. A check names what leaked, never its value.
@@ -1343,14 +1344,29 @@ describe("T-1334: inRuntimeTransaction reserves through reserveConnection and wr
       for (const { call, run, answers } of CALLS) {
         const client = cutClient({ at: fnsFirst, raw: raw() });
         try {
-          const { outcome, uncaught } = await watched(() => run(client.sql));
-          expect(outcome, call).not.toBe("never settled");
-          expect(uncaught, call).toEqual([]);
+          const watchedRun = await watched(async () => {
+            const called = await outcomeOf(() => run(client.sql));
+            const builtBefore = client.sent.length;
+            // At once, before the socket's close event comes (Node emits a destroyed socket's error first): a statement
+            // that a dead connection released to the pool would take and never answer (postgres.js 3.4.9 queues its
+            // write on that connection, and the close then drops it). Not released, it waits for the pool to reconnect.
+            const followed = await outcomeOf(async () => [
+              ...(await client.sql<{ n: number }[]>`select 2 as n`),
+            ]);
+            return { called, builtBefore, followed };
+          });
+          expect(watchedRun.outcome, call).not.toBe("never settled");
+          expect(watchedRun.uncaught, call).toEqual([]);
+          const { called, builtBefore, followed } = (
+            watchedRun.outcome as { answer: { called: Outcome; builtBefore: number; followed: Outcome } }
+          ).answer;
           // The cut statement, fn's first, is the last one built: no rollback and no commit after it.
-          expect(client.sent.length, call).toBe(client.sent.lastIndexOf(CLEAR_SCOPE) + 2);
-          expect(leaksOf(outcome, secrets), call).toEqual([]);
-          expectOutcome(outcome, expected, call);
-          // The dead connection was never released: the same client opens a new one and answers.
+          expect(builtBefore, call).toBe(client.sent.lastIndexOf(CLEAR_SCOPE) + 2);
+          expect(leaksOf(called, secrets), call).toEqual([]);
+          expectOutcome(called, expected, call);
+          // The dead connection was never released: the next statement waited for a new one, which answered it.
+          expect(followed, call).toEqual({ answer: [{ n: 2 }] });
+          // And the call itself answers on the same client.
           const again = await watched(() => run(client.sql));
           expect(again.uncaught, call).toEqual([]);
           expect(again.outcome, call).toMatchObject({ answer: answers });
