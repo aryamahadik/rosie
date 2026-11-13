@@ -76,20 +76,24 @@ const REFUSAL_CONSTRAINT_FIELD: ReadonlyMap<string, string> = new Map([
  * The label a thrown value leaves: the error's name, then `threw`; for a refused PostgreSQL write, its SQLSTATE and
  * constraint (STATE note 3), `<Name>:<SQLSTATE>[:<constraint>]`, whether postgres.js's PostgresError carries it or
  * db/repo's DataAccessDatabaseError or CommitTurnDatabaseError carries it scrubbed (T-1340). A code that is no SQLSTATE
- * gives `<Name>:threw`, as any other error does, and a constraint that is no constraint's name is left out. Never the
- * error's message, detail, call, table or any other field.
+ * gives `<Name>:threw`, as any other error does, and a constraint that is no constraint's name is left out. So is one
+ * the label has no room for (T-1347): where `<SQLSTATE>:<constraint>` would be longer than LABEL_MAX (a name of 59
+ * to 63 characters), which isErrorLabel refuses, the label is `<Name>:<SQLSTATE>`, so the next retry message still
+ * runs. Each field is read once, so the label is built from the very values checked. Never the error's message,
+ * detail, call, table or any other field.
  */
 export function errorLabelOf(thrown: unknown): string {
   if (!isRecord(thrown)) return "Thrown:threw";
-  const name = typeof thrown.name === "string" && ERROR_NAME.test(thrown.name) ? thrown.name : "Error";
+  const thrownName = thrown.name;
+  const name = typeof thrownName === "string" && ERROR_NAME.test(thrownName) ? thrownName : "Error";
   const constraintField = REFUSAL_CONSTRAINT_FIELD.get(name);
-  if (constraintField !== undefined && typeof thrown.code === "string" && SQLSTATE.test(thrown.code)) {
-    const constraint = thrown[constraintField];
-    return typeof constraint === "string" && CONSTRAINT.test(constraint)
-      ? `${name}:${thrown.code}:${constraint}`
-      : `${name}:${thrown.code}`;
-  }
-  return `${name}:threw`;
+  if (constraintField === undefined) return `${name}:threw`;
+  const code = thrown.code;
+  if (typeof code !== "string" || !SQLSTATE.test(code)) return `${name}:threw`;
+  const constraint = thrown[constraintField];
+  if (typeof constraint !== "string" || !CONSTRAINT.test(constraint)) return `${name}:${code}`;
+  const withConstraint = `${code}:${constraint}`;
+  return isShortLabel(withConstraint) ? `${name}:${withConstraint}` : `${name}:${code}`;
 }
 
 /** The label a failure answered with a code leaves: `<name>:<code>`, or `<name>:badCode` when the code is no label. */
