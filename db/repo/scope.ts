@@ -44,6 +44,34 @@ export async function setBusinessScope(tx: Tx, businessId: string): Promise<void
   await tx`select set_config(${SCOPE_SETTING}, ${businessId}, true)`;
 }
 
+/**
+ * The setting K-22's person policies read (K-22 README rule 4): `nullif(current_setting('rosie.person_id', true), '')`,
+ * the person a Tool API call acts for. Unset, or the '' an ended transaction leaves, matches no row.
+ */
+export const PERSON_SETTING = "rosie.person_id";
+
+/** Refuses an id that cannot be a person's; an empty one would read as "no person". Names no value. */
+function assertPersonId(personId: string): void {
+  if (personId.trim() === "" || personId.length > MAX_BUSINESS_ID_LENGTH || personId.includes("\u0000")) {
+    throw new TypeError("a call's person needs a non-empty person id of at most 128 characters");
+  }
+}
+
+/**
+ * Sets the person the rest of the transaction `tx` acts for (K-22 README rule 4; K-05 v1.13 "rosie.person_id per
+ * call"): set_config('rosie.person_id', <persons.id>, true), as setBusinessScope sets the business, so PostgreSQL drops
+ * it at COMMIT or ROLLBACK and the connection goes back to the pool acting for no one. K-05 v1.13 sets it in two calls
+ * only, each inside its own transaction: proveSignIn once check_proof_code answers right (the attempt's person), and
+ * endSession once session_for_token answers (that session's person). It takes a transaction's handle (`Tx`, from
+ * sql.begin) and nothing else, so it is never called on a pooled handle, where the setting would last one statement.
+ * Called outside a transaction it would fail closed: the next statement acts for no one, and K-22's policies show it
+ * no code or session and refuse its session insert (42501).
+ */
+export async function setPersonScope(tx: Tx, personId: string): Promise<void> {
+  assertPersonId(personId);
+  await tx`select set_config(${PERSON_SETTING}, ${personId}, true)`;
+}
+
 /** The scope the current transaction (or statement) sees, or null when there is none. */
 export async function readBusinessScope(sql: Sql | Tx): Promise<string | null> {
   const [row] = await sql<
