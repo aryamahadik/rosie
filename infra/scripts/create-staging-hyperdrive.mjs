@@ -3,16 +3,21 @@
 // T-1252's security review, notes a to e, and its database review, note a). The one Node process of
 // create-staging-hyperdrive.sh (npm run hyperdrive:staging:create): run it through that file, never on its own.
 // Its live run is the user's, while no agent runs (ADR-014 section 4, "Live steps"; DL-482, DL-486, DL-497): it sets
-// each login's password in PostgreSQL and stores it in Cloudflare.
+// each login's password in PostgreSQL, by its verifier alone, and stores the password in Cloudflare.
 //
 //   rosie-staging-hyperdrive-job  stores rosie_worker_job, which inherits rosie_job (the runtime side, HYPERDRIVE_JOB)
 //   rosie-staging-hyperdrive-app  stores rosie_worker_app, which inherits rosie_app (the Tool API, HYPERDRIVE_APP)
 //
 // A password lives in this process alone, from start to end. It is made here (32 random bytes from node's crypto, as 64
-// hex characters), sent to PostgreSQL in ALTER ROLE over this process's one database connection, then to Cloudflare's
-// API in the body of one HTTPS request (POST /accounts/{account_id}/hyperdrive/configs, whose origin.password is
-// write-only), and dropped. It is never in an argument, an environment variable, a file, a log or the output, and
-// wrangler never sees it (no --origin-password, no --connection-string).
+// hex characters) and is never sent to PostgreSQL in a statement (T-1369, on CQ-225's answer, DL-540, and the user's go
+// of Nov 13, DL-721): ALTER ROLE, over this process's one database connection, carries only its SCRAM-SHA-256
+// verifier, made here with node's crypto alone (scramVerifier below), which PostgreSQL stores as given. So whatever the
+// server log or pg_stat_statements keeps of it holds a verifier, which logs in as nobody, never the password. The
+// password itself then serves one login as its login (step 7's check, over TLS checked as for the run's own
+// connection) and goes to Cloudflare's API in the body of one HTTPS request (POST
+// /accounts/{account_id}/hyperdrive/configs, whose origin.password is write-only), and is dropped. It is never in an
+// argument, an environment variable, a file, a log or the output, and wrangler never sees it (no --origin-password, no
+// --connection-string). Nor is the verifier ever printed.
 //
 // In this order (each refusal exits 1 and says why, before anything after it is done):
 //  1. NODE_TLS_REJECT_UNAUTHORIZED=0 is refused before anything: it would turn off the certificate check of the API
@@ -35,30 +40,40 @@
 //     server log or keep it: log_statement other than none; log_min_error_statement other than fatal or panic (log
 //     too: QUIET_ERROR_LEVELS below); log_min_duration_statement 0 or more; log_min_duration_sample 0 or more with
 //     log_statement_sample_rate above 0; log_transaction_sample_rate above 0; debug_print_parse or
-//     debug_print_rewritten on; pg_stat_statements loaded and tracking utility statements (its
-//     pg_stat_statements.track not none and track_utility on); pgaudit loaded with a pgaudit.log that names role, ddl
-//     or all (AUDIT_CLASSES below).
+//     debug_print_rewritten on; pgaudit loaded with a pgaudit.log that names role, ddl or all (AUDIT_CLASSES below).
+//     Those rules stand as they were, though the text holds only a verifier now. pg_stat_statements loaded and
+//     tracking utility statements (its pg_stat_statements.track not none and track_utility on) no longer stops the run
+//     (T-1369): staging's does (CQ-225's answer), and its migrations' role cannot switch that off, but what it can keep
+//     of an ALTER ROLE is the verifier, never the password. Its two settings are printed with the rest.
 //  5. The API token: the Rosfield sign-in's, from `cf.sh auth token --json` (wrangler 4.158.0's auth token command),
 //     read from that child's standard output, a pipe, and held in memory only. Only the type oauth is taken: wrangler
 //     hands back CLOUDFLARE_API_TOKEN, or a key and an email, before the sign-in, so every child's environment goes
 //     without those names (and their old CF_ spellings) and without the database URL.
 //  6. Piece 1's file, infra/scripts/worker-logins.sql, on that connection: both logins made where missing, in their
 //     shape, or the run stops.
-//  7. For each missing configuration, in order: a fresh password; in one transaction on that connection, the session's
-//     backend and log settings read again, ALTER ROLE <login> PASSWORD '<hex>', and at once one more statement of its
-//     own (pg_stat_activity shows a session's most recent query until the next one); then the API's create with the
-//     host, port and database of STAGING_DATABASE_URL, the login as user, caching disabled; then
-//     "<name> created: id <id>, caching disabled". A failure there stops the run, with Cloudflare's words printed with
-//     the password, the token and the database URL's parts (its host among them) taken out of the whole text before it
-//     is cut to its length (ERROR_TEXT_CUT), so a cut never leaves part of one standing. It is safe to repeat: the
-//     login then holds a password nobody has, and the next run, finding no configuration, sets a fresh one; a create
-//     that reached Cloudflare but did not answer is found by the next run's list, and no new password is set for it.
+//  7. For each missing configuration, in order: a fresh password, and its SCRAM-SHA-256 verifier with a fresh salt of
+//     16 random bytes and 4096 iterations (scramVerifier below); in one transaction on that connection, the session's
+//     backend and log settings read again, ALTER ROLE <login> PASSWORD '<verifier>', and at once one more statement of
+//     its own (pg_stat_activity shows a session's most recent query until the next one). A failure there stops the run
+//     with nothing set (the transaction rolls back), and the password is never sent in the verifier's place: a server
+//     that takes only a plain password (Neon's roles page: "Hashed passwords are not supported", ADR-014 [N6]) stops
+//     the run here, before anything reaches Cloudflare. Then the login check: one more connection, as the login with
+//     the password, to the same server (STAGING_DATABASE_URL's host, port, database and parameters, TLS checked as
+//     for the run's own connection), which runs `select current_user`. A refusal, or another name, stops the run
+//     before the create, so Cloudflare never stores a password that cannot log in; its error is printed scrubbed.
+//     Then the API's create with the host, port and database of STAGING_DATABASE_URL, the login as user, caching
+//     disabled; then "<name> created: id <id>, caching disabled". A failure there stops the run, with Cloudflare's
+//     words printed with the password, the token and the database URL's parts (its host among them) taken out of the
+//     whole text before it is cut to its length (ERROR_TEXT_CUT), so a cut never leaves part of one standing. It is
+//     safe to repeat: the login then holds the verifier of a password nobody has, and the next run, finding no
+//     configuration, sets a fresh one; a create that reached Cloudflare but did not answer is found by the next run's
+//     list, and no new password is set for it.
 //  8. It ends the connection, lists again through cf.sh, and prints each name's id, caching and whether its stored
 //     user is its login: the ids T-567 binds as HYPERDRIVE_JOB and HYPERDRIVE_APP.
 // Exit: 0 both configurations exist, store their logins and have caching disabled (ADR-007); 1 refused, failed or
 // not so (a configuration left as it was with caching on is printed so, and T-567 waits); 2 misuse (any argument).
 import { spawn } from "node:child_process";
-import { randomBytes } from "node:crypto";
+import { createHash, createHmac, pbkdf2Sync, randomBytes } from "node:crypto";
 import { readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 
@@ -94,7 +109,8 @@ const DROPPED_NAMES = [
 // log_min_error_statement's levels that are taken: fatal and panic only. PostgreSQL 17 logs the current statement "for
 // any message of the specified severity or higher" and ranks the levels "... ERROR, LOG, FATAL, and PANIC" ("Error
 // Reporting and Logging"; the server's own pg_settings.enumvals, which a test reads), so at log any LOG message during
-// the ALTER ROLE (a lock wait with log_lock_waits on, a log_*_stats report) would log its text, password included.
+// the ALTER ROLE (a lock wait with log_lock_waits on, a log_*_stats report) would log its text, the verifier included
+// (the password itself before T-1369).
 // This is stricter than ADR-014 line 146's list, which names only error and the levels below it: T-1252's security
 // review asked it (note a; T-1271). At fatal only a statement that ends its session is logged, at panic only a panic.
 const QUIET_ERROR_LEVELS = new Set(["fatal", "panic"]);
@@ -121,6 +137,15 @@ const AUDIT_CLASSES = new Set([
 const AUDIT_REFUSED = new Set(["role", "ddl", "all"]);
 // How much of a text answer from Cloudflare's API a refusal shows, cut only after it is scrubbed (createConfiguration).
 const ERROR_TEXT_CUT = 1000;
+// Each login's SCRAM-SHA-256 verifier (T-1369): a fresh salt of 16 random bytes, the length PostgreSQL gives its own,
+// and 4096 iterations, PostgreSQL's own default (scram_iterations) and the least the card takes.
+const SCRAM_SALT_BYTES = 16;
+const SCRAM_ITERATIONS = 4096;
+// The verifier's form as sent, which PostgreSQL reads as a verifier (parse_scram_secret) and so stores as given: the
+// iterations, the 16-byte salt, then StoredKey and ServerKey of 32 bytes each, in base64. Checked before it is sent, so
+// nothing else is ever put between ALTER ROLE's quotes.
+const VERIFIER_FORM =
+  /^SCRAM-SHA-256\$[1-9][0-9]{3,9}:[A-Za-z0-9+/]{22}==\$[A-Za-z0-9+/]{43}=:[A-Za-z0-9+/]{43}=$/;
 // The session's settings that decide whether a statement's text reaches the server log, and its backend.
 const SESSION_QUERY = `select
   pg_catalog.current_setting('log_statement') as log_statement,
@@ -141,13 +166,16 @@ class Refusal extends Error {}
 /** A command line it does not take (exit 2). */
 class Misuse extends Error {}
 
-// What no printed line may hold: the database URL's parts, the token, and the password while one is held. Every text
-// that comes from outside (an error, wrangler's words, Cloudflare's) is scrubbed of them where it is put into a line;
-// the script's own lines hold names, ids, flags and settings only. `copies`: the URL as given and as Node writes it,
-// and its password, which no child's environment may hold under any name.
-const secrets = { url: [], copies: [], token: "", password: "" };
-const allSecrets = () => [...secrets.url, secrets.token, secrets.password].filter((part) => part !== "");
-printStrayErrors(PROGRAM, allSecrets);
+// What no printed line may hold: the database URL's parts, the token, and the password and its verifier while they are
+// held. Every text that comes from outside (an error, wrangler's words, Cloudflare's) is scrubbed of them where it is
+// put into a line; the script's own lines hold names, ids, flags and settings only. `copies`: the URL as given and as
+// Node writes it, and its password, which no child's environment may hold under any name.
+const secrets = { url: [], copies: [], token: "", password: "", verifier: "" };
+const allSecrets = () =>
+  [...secrets.url, secrets.token, secrets.password, secrets.verifier].filter((part) => part !== "");
+// Run as the program, and not imported (its test imports scramVerifier alone): only then does it catch stray errors.
+const AS_PROGRAM = process.argv[1] !== undefined && realpathSync(process.argv[1]) === import.meta.filename;
+if (AS_PROGRAM) printStrayErrors(PROGRAM, allSecrets);
 
 const say = (line) => {
   process.stdout.write(`${line}\n`);
@@ -252,19 +280,21 @@ function loggingFaults(settings) {
   for (const setting of ["debug_print_parse", "debug_print_rewritten"]) {
     if (settings[setting] !== "off") faults.push(`${setting} is ${settings[setting]}`);
   }
-  const track = settings.pg_stat_statements_track;
-  const utility = settings.pg_stat_statements_track_utility;
-  if ((track !== null || utility !== null) && (track ?? "top") !== "none" && (utility ?? "on") !== "off") {
-    faults.push(
-      `pg_stat_statements is loaded and keeps utility statements' text (pg_stat_statements.track ${track ?? "(not shown)"}, track_utility ${utility ?? "(not shown)"})`,
-    );
-  }
+  // pg_stat_statements keeping utility statements' text is no fault since T-1369 (keepsUtilityText below): of an
+  // ALTER ROLE it can keep only the verifier.
   if (typeof settings.pgaudit_log === "string" && auditNamesAlterRole(settings.pgaudit_log)) {
     faults.push(
       `pgaudit is loaded and pgaudit.log is ${settings.pgaudit_log} (it names role, ddl or all, or a class not known here: its audit log could keep the ALTER ROLE's text)`,
     );
   }
   return faults;
+}
+
+/** Whether pg_stat_statements is loaded and keeps utility statements' text (track not none, track_utility on). */
+function keepsUtilityText(settings) {
+  const track = settings.pg_stat_statements_track;
+  const utility = settings.pg_stat_statements_track_utility;
+  return (track !== null || utility !== null) && (track ?? "top") !== "none" && (utility ?? "on") !== "off";
 }
 
 /** Whether a pgaudit.log value names role, ddl or all, or a class not known here (AUDIT_CLASSES above). */
@@ -377,10 +407,38 @@ async function signInToken() {
 const quoteIdent = (name) => `"${name.replaceAll('"', '""')}"`;
 
 /**
- * Sets the login's password on the one connection, in one transaction: postgres.js keeps a transaction on its one
- * connection and never reconnects inside it, so the statements below run on one backend. First that backend and its
- * log settings are read again (it must be the backend whose settings were read before, and they must still be safe),
- * then ALTER ROLE, then at once one more statement. A refusal or an error rolls back and sets nothing.
+ * A password's SCRAM-SHA-256 verifier, in the form PostgreSQL stores and, given it in ALTER ROLE ... PASSWORD, stores
+ * as it is: SCRAM-SHA-256$<iterations>:<salt>$<StoredKey>:<ServerKey>, each part in base64 (RFC 5802 section 3, with
+ * RFC 7677's SHA-256; PostgreSQL's scram_build_secret). SaltedPassword = PBKDF2 with HMAC-SHA-256 (the password, the
+ * salt, the iterations, 32 bytes); ClientKey = HMAC(SaltedPassword, "Client Key"); StoredKey = SHA-256(ClientKey);
+ * ServerKey = HMAC(SaltedPassword, "Server Key"). Made in this process with node:crypto alone. It takes a password of
+ * printable ASCII only, which SASLprep (applied by PostgreSQL first) leaves as it is, so this is the verifier
+ * PostgreSQL itself makes from that password, salt and count (its test compares one PostgreSQL made). A verifier logs
+ * in as nobody: a client's proof needs ClientKey, which StoredKey does not give.
+ */
+export function scramVerifier(password, salt = randomBytes(SCRAM_SALT_BYTES), iterations = SCRAM_ITERATIONS) {
+  if (typeof password !== "string" || !/^[\x20-\x7e]+$/.test(password)) {
+    throw new TypeError("scramVerifier takes a password of printable ASCII only (it is not shown)");
+  }
+  if (!Buffer.isBuffer(salt) || salt.length < SCRAM_SALT_BYTES) {
+    throw new TypeError(`scramVerifier takes a salt of at least ${String(SCRAM_SALT_BYTES)} bytes`);
+  }
+  if (!Number.isInteger(iterations) || iterations < SCRAM_ITERATIONS) {
+    throw new TypeError(`scramVerifier takes at least ${String(SCRAM_ITERATIONS)} iterations`);
+  }
+  const salted = pbkdf2Sync(password, salt, iterations, 32, "sha256");
+  const clientKey = createHmac("sha256", salted).update("Client Key").digest();
+  const storedKey = createHash("sha256").update(clientKey).digest();
+  const serverKey = createHmac("sha256", salted).update("Server Key").digest();
+  return `SCRAM-SHA-256$${String(iterations)}:${salt.toString("base64")}$${storedKey.toString("base64")}:${serverKey.toString("base64")}`;
+}
+
+/**
+ * Sets the login's password on the one connection, in one transaction, by its SCRAM-SHA-256 verifier alone (T-1369):
+ * the password is never sent. postgres.js keeps a transaction on its one connection and never reconnects inside it, so
+ * the statements below run on one backend. First that backend and its log settings are read again (it must be the
+ * backend whose settings were read before, and they must still be safe), then ALTER ROLE with the verifier, then at
+ * once one more statement. A refusal or an error rolls back and sets nothing, and the password is never sent instead.
  */
 async function setPassword(sql, pair, password, pid) {
   if (!/^[0-9a-f]{64}$/.test(password)) {
@@ -388,23 +446,75 @@ async function setPassword(sql, pair, password, pid) {
       `the password made for ${pair.login} is not 64 hex characters (it is not shown); none was set`,
     );
   }
-  await sql.begin(async (tx) => {
-    const [now] = await tx.unsafe(SESSION_QUERY);
-    if (now.pid !== pid) {
-      throw new Refusal(
-        `the database session is not the one whose log settings were checked (another backend), so no password was set for ${pair.login}`,
-      );
-    }
-    const faults = loggingFaults(now);
-    if (faults.length > 0) {
-      throw new Refusal(
-        `the session's log settings changed before ${pair.login}'s password: ${faults.join("; ")}; no password was set`,
-      );
-    }
-    await tx.unsafe(`alter role ${quoteIdent(pair.login)} password '${password}'`);
-    // pg_stat_activity shows a session's most recent query until the next one: this is that next one.
-    await tx.unsafe("select pg_catalog.pg_backend_pid()::pg_catalog.text as pid");
+  const verifier = scramVerifier(password);
+  secrets.verifier = verifier;
+  if (!VERIFIER_FORM.test(verifier)) {
+    throw new Refusal(
+      `the verifier made for ${pair.login} is not in SCRAM-SHA-256's form (it is not shown); no password was set`,
+    );
+  }
+  try {
+    await sql.begin(async (tx) => {
+      const [now] = await tx.unsafe(SESSION_QUERY);
+      if (now.pid !== pid) {
+        throw new Refusal(
+          `the database session is not the one whose log settings were checked (another backend), so no password was set for ${pair.login}`,
+        );
+      }
+      const faults = loggingFaults(now);
+      if (faults.length > 0) {
+        throw new Refusal(
+          `the session's log settings changed before ${pair.login}'s verifier: ${faults.join("; ")}; no password was set`,
+        );
+      }
+      await tx.unsafe(`alter role ${quoteIdent(pair.login)} password '${verifier}'`);
+      // pg_stat_activity shows a session's most recent query until the next one: this is that next one.
+      await tx.unsafe("select pg_catalog.pg_backend_pid()::pg_catalog.text as pid");
+    });
+  } catch (error) {
+    if (error instanceof Refusal) throw error;
+    throw new Refusal(
+      `${pair.login}'s verifier was not set${describeError(error, allSecrets())}. Its transaction rolled back, so no password was set and Cloudflare was given nothing; the password is never sent in the verifier's place (CQ-225), so a server that takes only a plain password (Neon's roles page: "Hashed passwords are not supported") stops the run here`,
+    );
+  }
+}
+
+/**
+ * The login check (T-1369): one connection as the login, with its password, to the server the run's own connection
+ * reached (STAGING_DATABASE_URL's host, port, database and parameters, its user and password replaced; TLS with the
+ * certificate and name checked, as for the run's own), and `select current_user`. Anything but the login's own name
+ * stops the run before the API's create, so Cloudflare never stores a password that cannot log in. Its error is
+ * printed scrubbed of the password, the verifier, the token and the URL's parts.
+ */
+async function checkLogin(raw, pair, password) {
+  const login = postgres(raw, {
+    username: pair.login,
+    password,
+    max: 1,
+    ssl: { rejectUnauthorized: true },
+    prepare: false,
+    fetch_types: false,
+    debug: false,
+    onnotice: () => undefined,
+    connect_timeout: 30,
+    connection: { application_name: "rosie-create-staging-hyperdrive-login-check" },
   });
+  let who;
+  try {
+    const [row] = await login.unsafe("select current_user::pg_catalog.text as who");
+    who = row?.who;
+  } catch (error) {
+    throw new Refusal(
+      `the login check of ${pair.login} failed${describeError(error, allSecrets())}. ${pair.name} was not created, so Cloudflare holds no password that cannot log in. ${pair.login} now holds the verifier of a password nobody has, so this is safe to repeat: the next run, finding no configuration, sets a fresh one`,
+    );
+  } finally {
+    await login.end({ timeout: 5 });
+  }
+  if (who !== pair.login) {
+    throw new Refusal(
+      `the login check of ${pair.login} answered another role (not shown) as current_user. ${pair.name} was not created, and nothing more was done`,
+    );
+  }
 }
 
 /** The API's create for one configuration: its id. The password goes in the request body and nowhere else. */
@@ -576,7 +686,12 @@ async function main(args) {
     const faults = loggingFaults(settings);
     if (faults.length > 0) {
       throw new Refusal(
-        `this session would write the ALTER ROLE's text, password included, to the server log or keep it: ${faults.join("; ")}. No password was made (ADR-014, open question 3)`,
+        `this session would write the ALTER ROLE's text, its verifier included, to the server log or keep it: ${faults.join("; ")}. No password was made (ADR-014, open question 3)`,
+      );
+    }
+    if (keepsUtilityText(settings)) {
+      note(
+        "pg_stat_statements keeps utility statements' text: of each ALTER ROLE it can keep only the login's verifier, never its password (T-1369)",
       );
     }
 
@@ -592,20 +707,25 @@ async function main(args) {
     }
     note(`worker-logins.sql: ${PAIRS.map((pair) => pair.login).join(" and ")} are in their shape`);
 
-    // 7. Each missing configuration, in order.
+    // 7. Each missing configuration, in order: its verifier set, its login checked, then its create.
     for (const pair of missing) {
       secrets.password = randomBytes(32).toString("hex");
       try {
         await setPassword(sql, pair, secrets.password, settings.pid);
+        await checkLogin(raw, pair, secrets.password);
+        note(
+          `${pair.login}: its verifier is set, and a connection as it with its password answered current_user ${pair.login}`,
+        );
         const made = await createConfiguration(pair, secrets.password, secrets.token, origin);
         say(`${pair.name} created: id ${made.id}, caching ${made.caching}`);
       } catch (error) {
         // A refusal's outside text was scrubbed as it was put in; anything else is scrubbed here, while the password
-        // is still known.
+        // and its verifier are still known.
         if (error instanceof Refusal) throw error;
         throw new Refusal(`${pair.name} was not made${describeError(error, allSecrets())}`);
       } finally {
         secrets.password = "";
+        secrets.verifier = "";
       }
     }
   } finally {
@@ -641,7 +761,7 @@ function summarize(rows) {
   return complete ? 0 : 1;
 }
 
-if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === import.meta.filename) {
+if (AS_PROGRAM) {
   try {
     process.exitCode = await main(process.argv.slice(2));
   } catch (error) {
@@ -658,5 +778,6 @@ if (process.argv[1] !== undefined && realpathSync(process.argv[1]) === import.me
   } finally {
     secrets.token = "";
     secrets.password = "";
+    secrets.verifier = "";
   }
 }

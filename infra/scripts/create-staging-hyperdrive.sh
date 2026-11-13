@@ -8,8 +8,9 @@
 #   rosie-staging-hyperdrive-app  stores rosie_worker_app (inherits rosie_app), for HYPERDRIVE_APP
 # This file readies the shell and starts one Node process, create-staging-hyperdrive.mjs, which does the rest; its top
 # says what it does, prints and refuses. No password exists until that process makes one, and none ever leaves it but
-# in ALTER ROLE over its own database connection and in the body of one HTTPS request to Cloudflare's API: never in an
-# argument, an environment variable, a file, a log or the output.
+# in the body of one HTTPS request to Cloudflare's API: never in an argument, an environment variable, a file, a log or
+# the output. PostgreSQL gets only its SCRAM-SHA-256 verifier, in ALTER ROLE over the process's own connection, and the
+# process then signs in once as the login with it, to check it, before Cloudflare is given it (T-1369).
 # The database is staging's: STAGING_DATABASE_URL, from the environment, else from .dev.vars by name (lib.sh's
 # load_dev_var), never printed. It leaves this shell's environment before anything is started (dirname included), is
 # kept in one variable that is never marked for export, and goes to node alone, in its environment, as migrate.mjs and
