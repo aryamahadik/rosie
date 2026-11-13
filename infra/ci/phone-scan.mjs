@@ -5,7 +5,8 @@
 // and the Linq double read it, and Ofcom's UK numbers for drama (DL-616). A hit is named by its file and line, never
 // by its number. The deliberate inputs a file holds outside the ranges are listed in phone-scan-exceptions.mjs, each
 // with its file and why it is no real number, and pass only at that file. Not a test file itself;
-// wrangler-env.test.mjs and rosfield-test-route.test.mjs read numbers with it too.
+// wrangler-env.test.mjs, rosfield-test-route.test.mjs and web/spikes/chat-link/chat-link.test.mjs read numbers with
+// it too.
 
 import { spawnSync } from "node:child_process";
 import { lstatSync, readFileSync, readlinkSync } from "node:fs";
@@ -57,44 +58,62 @@ export function isFiction(number) {
 
 // The ways a number is written: a + and 7 to 15 digits, with spaces, dots, dashes or brackets between them; or a
 // North American number without the +: an area code (bracketed or not), an exchange and a line, with a 1 or none.
-// A URL-encoded plus, %2B (or %2b), is a + (T-1332).
+// A URL-encoded plus, %2B (or %2b), is a + (T-1332), and so is an escaped one, \u002B or \x2B (T-1344). A space,
+// dash or dot between groups may be URL-encoded too: %20, %2D or %2E (T-1344).
 //
 // Where a number starts and ends. T-1304 reads no id as a number: a number starts only where no letter or digit
 // stands right before it, so never inside a hex id, a base64 blob, a sum or a longer run of digits, and ends only
 // where no digit follows; a North American number never starts right after a + (the + form reads that one) and
-// never ends right before a letter. T-1332 keeps each of those cases and reads two more (T-1317's security note b):
+// never ends right before a letter. T-1332 and T-1344 keep each of those cases and read these too (T-1317's
+// security note b; T-1332's security notes a and c):
 //   - a number right after an escape or a URL-encoded character, whose last letter or digit ends no word: a
-//     backslash and b, f, n, r, t or v (as JSON writes a newline, \n), or % and two hex digits (as %0A, %20 or %3A).
-//     An escape that hex digits follow, as \u or \x, starts no number, and a North American number never starts
-//     right after %2B, the + form's own plus;
-//   - a separated North American number right before a letter: its area code bracketed, or a space, dot or dash
-//     between its groups. Ten digits in a row right before a letter stay an id's digits.
-const START = String.raw`(?:(?<![0-9A-Za-z])|(?<=\\[bfnrtv])|(?<=%[0-9A-Fa-f]{2}))`;
+//     backslash and b, f, n, r, t or v (as JSON writes a newline, \n); a backslash, u and four hex digits, or x and
+//     two (as \u000a, or \u003e for > as Go and Rails write it, or \x0a), the start after the whole escape, so never
+//     at one of its own hex digits; or % and two hex digits (as %0A, %20 or %3A). A North American number never
+//     starts right after %2B, \u002B or \x2B, the + form's own plus;
+//   - a separated North American number right before a letter: its area code bracketed, a space, dot or dash
+//     between its groups, or a 1 and a separator before ten digits in a row. Ten digits in a row right before a
+//     letter, with no 1 and separator before them, stay an id's digits.
+/** An escape a number may start right after: \ and b, f, n, r, t or v; \u and four hex digits; \x and two. */
+const ESCAPE = String.raw`\\(?:[bfnrtv]|u[0-9A-Fa-f]{4}|x[0-9A-Fa-f]{2})`;
+const START = String.raw`(?:(?<![0-9A-Za-z])|(?<=${ESCAPE})|(?<=%[0-9A-Fa-f]{2}))`;
+/** The + form's plus: itself, URL-encoded, or escaped as JSON or a string literal writes it. */
+const PLUS = String.raw`(?:\+|%2[Bb]|\\u002[Bb]|\\x2[Bb])`;
 /** A North American area code or exchange (neither starts with 0 or 1), the separator between groups, a line. */
 const CODE = "[2-9][0-9]{2}";
-const SEP = "[ .-]";
+const SEP = "(?:[ .-]|%2[0DdEe])";
 const LINE = "[0-9]{4}";
 const SEPARATED = String.raw`(?:(?:\(${CODE}\)${SEP}?|${CODE}${SEP})${CODE}${SEP}?|${CODE}${CODE}${SEP})${LINE}(?![0-9])`;
-const IN_A_ROW = `${CODE}${CODE}${LINE}(?![0-9A-Za-z])`;
+const IN_A_ROW = `${CODE}${CODE}${LINE}`;
 
 /** The + form: its digits, from the first after the plus, are the match's group 1. */
 export const PLUS_FORM = new RegExp(
-  String.raw`${START}(?:\+|%2[Bb])([1-9](?:[ ().-]{0,2}[0-9]){6,14})(?![0-9])`,
+  String.raw`${START}${PLUS}([1-9](?:(?:[ ().-]|%2[0DdEe]){0,2}[0-9]){6,14})(?![0-9])`,
   "g",
 );
+/**
+ * The North American form: after a 1 and a separator, a separated number or ten digits in a row, either ending
+ * before anything but a digit; otherwise, with a 1 or none, a separated number ending before anything but a digit,
+ * or ten digits in a row ending before neither a letter nor a digit.
+ */
 export const NANP_FORM = new RegExp(
-  String.raw`${START}(?<!\+|%2[Bb])(?:1${SEP}?)?(?:${SEPARATED}|${IN_A_ROW})`,
+  String.raw`${START}(?<!${PLUS})(?:1${SEP}(?:${SEPARATED}|${IN_A_ROW}(?![0-9]))|1?(?:${SEPARATED}|${IN_A_ROW}(?![0-9A-Za-z])))`,
   "g",
 );
+
+/** A match's digits: its URL-encoded characters (%20, %2D, %2E, %2B) taken out first, since each holds a 2. */
+function digitsOf(written) {
+  return written.replace(/%[0-9A-Fa-f]{2}/g, "").replace(/[^0-9]/g, "");
+}
 
 /** Each number a text holds, in E.164 form, with the index it starts at: the + forms first, then the others. */
 function readings(text) {
   const found = [];
   for (const match of text.matchAll(PLUS_FORM)) {
-    found.push({ index: match.index, number: `+${match[1].replace(/[^0-9]/g, "")}` });
+    found.push({ index: match.index, number: `+${digitsOf(match[1])}` });
   }
   for (const match of text.matchAll(NANP_FORM)) {
-    found.push({ index: match.index, number: `+1${match[0].replace(/[^0-9]/g, "").slice(-10)}` });
+    found.push({ index: match.index, number: `+1${digitsOf(match[0]).slice(-10)}` });
   }
   return found;
 }
