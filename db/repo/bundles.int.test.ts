@@ -1601,5 +1601,194 @@ describe("T-1314: a failure to reach the database answers as targets.ts's transi
       expect(answer).toEqual(LOST);
       expectResent(resends, { error: "notFound", table: "handles", rowId: request.handleId });
     }, 30_000);
+
+    // ---- round 2 (DL-649, T-1330's finding b): ECONNABORTED, and a lost connection at the commit or the rollback ----
+    //
+    // isLostConnection knows Node's ECONNABORTED, and a socket's failure with no code at a commit or a rollback as at any
+    // other statement (postgres.js puts the commit or the rollback in flight on it), so the dead connection is never sent
+    // a rollback nor released to the pool. Each cut is raised for real: the client's socket fails with the shape the
+    // moment the client writes the commit or the rollback, which never reaches the server.
+
+    /** Node's error for a connection its own side gave up, as a socket's write gives it, the made-up host and port on it. */
+    const abortedError = (): Error =>
+      Object.assign(new Error(`write ECONNABORTED ${SHAPE_HOST}:${String(SHAPE_PORT)}`), {
+        errno: -53,
+        code: "ECONNABORTED",
+        syscall: "write",
+        address: SHAPE_HOST,
+        port: SHAPE_PORT,
+      });
+
+    it("isLostConnection is true for Node's ECONNABORTED, on a statement or not; targets.ts's transientOrThrow still throws it scrubbed", () => {
+      for (const [name, error] of [
+        ["on no statement", abortedError()],
+        ["on a statement", onStatement(abortedError())],
+      ] as const) {
+        expect(isLostConnection(error), name).toBe(true);
+        const answered = syncOutcomeOf(() => transientOrThrow(error, "probeCall"));
+        expect("thrown" in answered && answered.thrown !== error, name).toBe(true);
+        expect("thrown" in answered ? fieldsOf(answered.thrown) : {}, name).toMatchObject({
+          call: "probeCall",
+          code: "ECONNABORTED",
+        });
+        expect(leaksOf(answered, SHAPE_SECRETS), name).toEqual([]);
+      }
+    });
+
+    /**
+     * A one-connection client of the test schema whose socket fails with `make()` the moment the client writes
+     * `statement` (its text, as postgres.js's Parse message holds it on a connection that has not prepared it), instead
+     * of writing it: the statement never reaches the server, which rolls the transaction back when the socket closes.
+     * `failed()` is the error the socket failed with, once it has.
+     */
+    function failingAtClient(
+      statement: string,
+      make: () => Error,
+    ): { sql: Sql; failed: () => Error | undefined } {
+      const url = new URL(resolvePrimaryUrl());
+      const marker = `\0${statement}\0`;
+      let failed: Error | undefined;
+      const options = {
+        max: 1,
+        onnotice: () => undefined,
+        connection: { search_path: `${db.schema}, public` },
+        socket: () => {
+          const socket = net.connect(Number(url.port === "" ? "5432" : url.port), url.hostname);
+          const write = socket.write.bind(socket) as (chunk: Uint8Array, ...rest: unknown[]) => boolean;
+          socket.write = (chunk: Uint8Array, ...rest: unknown[]): boolean => {
+            if (failed === undefined && new TextDecoder().decode(chunk).includes(marker)) {
+              failed = make();
+              socket.destroy(failed);
+              return false;
+            }
+            return write(chunk, ...rest);
+          };
+          return socket;
+        },
+      };
+      return { sql: postgres(url.toString(), options), failed: () => failed };
+    }
+
+    /**
+     * Runs `call` on a client whose socket fails with `make()` at `statement`, then `resend` on that same client: what the
+     * call answered or threw, the error the socket failed with, and the resend's answer. Were the dead connection released
+     * to the pool, the resend would be written to its null socket (postgres.js 3.4.9 connection.js nextWrite), throw
+     * outside any promise and never answer, and the test would fail by its timeout.
+     */
+    async function cutAt<T>(
+      statement: "commit" | "rollback",
+      make: () => Error,
+      call: (sql: Sql) => Promise<unknown>,
+      resend: (sql: Sql) => Promise<T>,
+    ): Promise<{ outcome: Outcome; failed: Error; resent: T }> {
+      const client = failingAtClient(statement, make);
+      try {
+        const outcome = await outcomeOf(() => call(client.sql));
+        const failed = client.failed();
+        if (failed === undefined) {
+          throw new Error(`the client never wrote ${statement}`);
+        }
+        return { outcome, failed, resent: await resend(client.sql) };
+      } finally {
+        await client.sql.end({ timeout: 0 });
+      }
+    }
+
+    /**
+     * The cut was at `statement` (postgres.js put it on the socket's error), the error is a lost connection and holds the
+     * made-up host and port, and the call's outcome is what targets.ts's transientOrThrow makes of it under `call`,
+     * holding none of them.
+     */
+    function expectCutAnswered(
+      cut: { outcome: Outcome; failed: Error },
+      statement: string,
+      call: string,
+    ): void {
+      expect(Object.getOwnPropertyDescriptor(cut.failed, "query")?.value, call).toBe(statement);
+      expect(isLostConnection(cut.failed), call).toBe(true);
+      expect(leaksOf(cut.failed, SHAPE_SECRETS), call).toEqual(expect.arrayContaining(["host", "port"]));
+      expectAsTargets(cut.outcome, cut.failed, call);
+      expect(leaksOf(cut.outcome, SHAPE_SECRETS), call).toEqual([]);
+    }
+
+    const CUTS: { name: string; make: () => Error; outcome: (call: string) => unknown }[] = [
+      {
+        name: "a socket's failure with no code (the Workers build's)",
+        make: workersSocketError,
+        outcome: () => ({ answer: LOST }),
+      },
+      {
+        name: "Node's ECONNABORTED",
+        make: abortedError,
+        outcome: (call) => ({ thrown: expect.objectContaining({ call, code: "ECONNABORTED" }) as unknown }),
+      },
+    ];
+
+    it.each(CUTS)(
+      "setActiveBundle (inTransaction), its socket failing at the commit with $name: lost, never released; the same client then switches",
+      async ({ make, outcome }) => {
+        await emptyTables(db.sql);
+        const [a, b] = [bundleOf("commit cut a", 1), bundleOf("commit cut b", 2)] as [
+          PublishBundleCopyRequest,
+          PublishBundleCopyRequest,
+        ];
+        await publishBundleCopy(db.sql, a);
+        await publishBundleCopy(db.sql, b);
+        await setActiveBundle(db.sql, { bundleId: idOf(a), expectActive: null, at: "2026-11-08T10:00:00Z" });
+        const request = { bundleId: idOf(b), expectActive: idOf(a), at: "2026-11-08T11:00:00Z" };
+        const cut = await cutAt(
+          "commit",
+          make,
+          (sql) => setActiveBundle(sql, request),
+          async (sql) => {
+            // The commit never reached the server: a is still the one active id.
+            expect(await activeIds(db.sql)).toEqual([idOf(a)]);
+            return setActiveBundle(sql, request);
+          },
+        );
+        expectCutAnswered(cut, "commit", "setActiveBundle");
+        expect(cut.outcome).toEqual(outcome("setActiveBundle"));
+        expect(cut.resent).toMatchObject({ result: "activated", repeated: false });
+        expect(await activeIds(db.sql)).toEqual([idOf(b)]);
+      },
+      30_000,
+    );
+
+    it.each(CUTS)(
+      "publishBundleCopy (inTransaction), its socket failing at the rollback of a refused insert with $name: lost, never released; the same client then publishes",
+      async ({ make, outcome }) => {
+        await emptyTables(db.sql);
+        const bundle = bundleOf("rollback cut", 3);
+        const cut = await cutAt(
+          "rollback",
+          make,
+          // A builtAt PostgreSQL cannot read refuses the insert (22007), so the transaction is rolled back.
+          (sql) => publishBundleCopy(sql, { ...bundle, builtAt: "not a time" }),
+          (sql) => publishBundleCopy(sql, bundle),
+        );
+        expectCutAnswered(cut, "rollback", "publishBundleCopy");
+        expect(cut.outcome).toEqual(outcome("publishBundleCopy"));
+        // Nothing was written before the cut: the same client publishes it for the first time.
+        expect(cut.resent).toMatchObject({ result: "published", repeated: false });
+      },
+      30_000,
+    );
+
+    it.each(CUTS)(
+      "handleTargets (targets.ts inRuntimeTransaction), its socket failing at the commit with $name: lost, never released; the same client then answers",
+      async ({ make, outcome }) => {
+        const request = exchange("targets-alex.json").request as { handleId: string };
+        const cut = await cutAt(
+          "commit",
+          make,
+          (sql) => handleTargets(sql, request),
+          (sql) => handleTargets(sql, request),
+        );
+        expectCutAnswered(cut, "commit", "handleTargets");
+        expect(cut.outcome).toEqual(outcome("handleTargets"));
+        expect(cut.resent).toMatchObject({ error: "notFound", table: "handles", rowId: request.handleId });
+      },
+      30_000,
+    );
   });
 });

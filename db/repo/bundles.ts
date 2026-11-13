@@ -131,6 +131,12 @@ const LOST_CONNECTION_CODES = new Set([
   "ETIMEDOUT",
 ]);
 /**
+ * Node's code for a connection its own side gave up (ECONNABORTED): gone too, so isLostConnection knows it and no
+ * rollback is written to it, nor is it released (T-1314 round 2, from T-1330's finding b; DL-649). It is not answered
+ * 08006: targets.ts's transientOrThrow throws it scrubbed, as T-1268 rules (a session that failed, not transient).
+ */
+const ABORTED_CONNECTION_CODE = "ECONNABORTED";
+/**
  * JavaScript's own errors for a value or a program at fault, the names of targets.ts's FAULT_NAMES: postgres.js rejects
  * a statement with one when it cannot build the statement or read its rows (a value it cannot send), never when its
  * socket fails, so the connection is still open.
@@ -162,18 +168,23 @@ function sameId(a: BundleId, b: BundleId): boolean {
 }
 
 /**
- * True for an error that says the connection the call ran on is gone or going (see the codes above), and for a socket's
- * failure with no code (T-1314): postgres.js's Workers build passes its socket's failure up as the socket gives it, with
- * no code (cf/polyfills.js), and rejects the statement in flight with it, the statement put on it as own properties
- * (connection.js queryError: query and parameters). That is targets.ts's transientOrThrow's own rule for a lost
- * connection with no code (08006), so inRuntimeTransaction and the transactions below never write a rollback to that
- * dead connection, and never release it. PostgreSQL's own errors and JavaScript's errors for a fault (FAULT_NAMES),
- * which postgres.js also rejects a statement with, are not: their connection is still open, and is rolled back.
+ * True for an error that says the connection the call ran on is gone or going (see the codes above, ECONNABORTED among
+ * them), and for a socket's failure with no code (T-1314): postgres.js's Workers build passes its socket's failure up as
+ * the socket gives it, with no code (cf/polyfills.js), and rejects the statement in flight with it, the statement put on
+ * it as own properties (connection.js queryError: query and parameters), a commit or a rollback as any other. That is
+ * targets.ts's transientOrThrow's own rule for a lost connection with no code (08006), so inRuntimeTransaction and the
+ * transactions below never write a rollback to that dead connection, and never release it. PostgreSQL's own errors and
+ * JavaScript's errors for a fault (FAULT_NAMES), which postgres.js also rejects a statement with, are not: their
+ * connection is still open, and is rolled back.
  */
 export function isLostConnection(error: unknown): boolean {
   const code = (error as { code?: unknown } | null | undefined)?.code;
   if (typeof code === "string") {
-    return LOST_CONNECTION_CODES.has(code) || /^(08[0-9A-Z]{3}|57P0[123])$/.test(code);
+    return (
+      LOST_CONNECTION_CODES.has(code) ||
+      code === ABORTED_CONNECTION_CODE ||
+      /^(08[0-9A-Z]{3}|57P0[123])$/.test(code)
+    );
   }
   return (
     error instanceof Error &&

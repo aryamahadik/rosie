@@ -72,8 +72,10 @@ export function resolvePrimaryUrl(options: ClientOptions = {}): string {
  * Removes each connection string, and its user, password, host and port, from `text`. The host and port since T-1314,
  * as infra/scripts/db-url.mjs's scrub takes them out: the host with its port, the host name (an IPv6 address with and
  * without its brackets) and the port. The user and password go as written and decoded, each decoded on its own, so one
- * that does not decode still leaves the other's forms to go. Each part goes before any part inside it, and a port only
- * where it stands as a whole number, so the other digits of the text are left alone.
+ * that does not decode still leaves the other's forms to go. Each part goes before any part inside it, and wherever it
+ * appears, the port alone excepted: it goes only where it stands as a whole number, so the other digits of the text are
+ * left alone. A user, password or host of digits alone is still removed wherever it appears, inside a longer run of
+ * digits too, as before T-1314 (round 2), even when it is also the port.
  */
 export function redact(text: string, urls: readonly string[]): string {
   const decoded = (part: string): string => {
@@ -85,22 +87,28 @@ export function redact(text: string, urls: readonly string[]): string {
   };
   let out = text;
   for (const url of urls) {
-    const secrets = [url];
+    const everywhere = [url];
+    let port = "";
     try {
       const parsed = new URL(url);
       const hostName = parsed.hostname;
       for (const part of [parsed.password, parsed.username]) {
-        secrets.push(part, decoded(part));
+        everywhere.push(part, decoded(part));
       }
-      secrets.push(parsed.host, hostName, hostName.replace(/^\[|\]$/g, ""), parsed.port);
+      everywhere.push(parsed.host, hostName, hostName.replace(/^\[|\]$/g, ""));
+      port = parsed.port;
     } catch {
       // Not a parsable URL: the whole string is still removed.
     }
-    const parts = [...new Set(secrets)].filter((part) => part !== "").sort((a, b) => b.length - a.length);
+    const parts = [...new Set([...everywhere, port])]
+      .filter((part) => part !== "")
+      .sort((a, b) => b.length - a.length);
     for (const part of parts) {
-      out = /^[0-9]+$/.test(part)
-        ? out.replace(new RegExp(`(?<![0-9])${part}(?![0-9])`, "g"), "[redacted]")
-        : out.split(part).join("[redacted]");
+      // A URL's port is digits alone (WHATWG URL), so it is safe inside the pattern as it is.
+      out =
+        part === port && !everywhere.includes(part)
+          ? out.replace(new RegExp(`(?<![0-9])${part}(?![0-9])`, "g"), "[redacted]")
+          : out.split(part).join("[redacted]");
     }
   }
   return out;
