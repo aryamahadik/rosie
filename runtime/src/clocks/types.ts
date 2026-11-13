@@ -191,6 +191,12 @@ export interface ClockActorRpc {
   fireClockRow(request: { row: DueClock; by: FireBy }): Promise<FireReport>;
   /** After an arming: fire the handle's due rows and keep the actor's one alarm at its earliest armed row (T-254). */
   syncClocks(handleId: string): Promise<FireReport[]>;
+  /**
+   * The actor's one reading of whether the number may have asked to stop by a word no commit has recorded yet
+   * (HandleActor.mayHaveStoppedNow), which the outbox dispatcher's port asks by the same route (T-1337). Optional: an
+   * actor that has none is read as stopped.
+   */
+  mayHaveStoppedNow?(): Promise<boolean>;
 }
 
 /** The slice of the HandleActor namespace the sweep, Fire now and the clock arming use. */

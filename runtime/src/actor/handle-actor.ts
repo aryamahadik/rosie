@@ -756,6 +756,14 @@ export class HandleActor extends DurableObject {
     return this.copies.readStopped()?.stopped === true || this.outage.stopPending();
   }
 
+  /**
+   * The same one reading, for the outbox dispatcher (T-1337; DL-656): its port asks it right before an outage line's row
+   * goes, through the actor of the row's recipient (../dispatch DispatchDeps.mayHaveStopped).
+   */
+  mayHaveStoppedNow(): boolean {
+    return this.mayHaveStopped();
+  }
+
   /** PostgreSQL is back and the queue's danger and stop writes are in (T-270): the held turn runs again, then the batches go on. */
   private async resumeAfterOutage(): Promise<void> {
     await this.lease.resume();

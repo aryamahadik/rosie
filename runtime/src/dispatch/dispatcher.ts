@@ -23,6 +23,15 @@
 // stale or withdraws, or parks for a chat, is marked through K-05 `markRow` and nothing is sent; one it cannot read or
 // mark sends nothing and keeps its claim. A held row, a waiting row and a finished one let the recipient's later rows go.
 //
+// An outage line's row (K-01 fixed line `outage` in its final parts: the AI-down path's line and the safety read's
+// timeout line, each written through K-09 sendFixedLine) also asks the recipient's handle actor its one reading (T-1337;
+// DL-656): whether the number may have asked to stop by a word no commit has recorded yet, which the stopped flag limit 8
+// reads cannot show (a STOP stored behind its unread hold while the models are down). Asked once per part, after limit 8
+// and the stopped flag's second read have let the part go, as the last await before the send: anything but exactly false
+// (true, a throw, no answer within ACTOR_READING_MS, an answer that is not a boolean, no actor named, no port joined)
+// sends nothing and drops the row as stopped, as the second read does (RULES 7.2: "Unsure: treat it as a stop"). No other
+// row is asked: a safety line, a stop reply and a routine row go as limit 8 decides (RULES 4.12).
+//
 // Retries (T-258, retry/rules.ts): Linq's reported failure picks the part's next try under K-07's key rules. No answer:
 // the same key. A reported failure: a new key, after any Retry-After. 4001 or 4006: a new key only if no receipt comes
 // within the minute. 403 code 2024: never again on Linq, and a row the stop binds is dropped as stopped. A run that leaves
@@ -37,6 +46,7 @@
 //
 // No words, number or key is logged: spans carry ids, counts and labels only (runtime/src/trace; K-08 v1).
 
+import { OUTAGE_LINE_ID } from "../outage/ai/outage";
 import { decideLimit8, isSafety, isSmsPort, isStopReply, type YesRefused } from "./limit8";
 import { retryPlanOf, type RetryChain, type RetryScheduler, type RetryWhy } from "./retry/plan";
 import {
@@ -75,6 +85,12 @@ type LimitResult = NonNullable<SpanFields["limits"]>[number];
 const TRANSIENT_TRIES = 3;
 /** The rows one claim takes at most (K-05 `claimOutbox.limit`, 1 to 100). */
 const DEFAULT_LIMIT = 10;
+/**
+ * How long a run waits for the recipient actor's reading of an outage line's row (T-1337) before it counts the reading as
+ * a stop: far below the claim's 60 s, which the renewal just before it started, so the send that follows still goes
+ * within the claim with Linq's own time limit (K-07 default 2).
+ */
+export const ACTOR_READING_MS = 5_000;
 
 export interface DispatchDeps {
   store: OutboxStore;
@@ -102,6 +118,16 @@ export interface DispatchDeps {
    * only reported, and the row waits for the next run that claims it.
    */
   retries?: RetryScheduler;
+  /**
+   * The recipient's handle actor's one reading (T-1337; DL-656; HandleActor.mayHaveStoppedNow), by the row's recipient K-04
+   * id: whether the number may have asked to stop by a word no commit has recorded yet (its copy of the stopped flag, or a
+   * text no commit has taken that may hold a stop word). Asked only for an outage line's row, once per part, as the last
+   * await before the part's send; only an answer of exactly false lets the part go. The composition root always joins it
+   * (../wiring/root.ts). Left out, every outage line's row is dropped at send, as for an actor that cannot be named.
+   */
+  mayHaveStopped?: (recipientHandleId: string) => Promise<boolean>;
+  /** How long the actor's reading is waited for: ACTOR_READING_MS when left out (a test's shorter wait). */
+  actorReadingMs?: number;
 }
 
 export interface DispatchOptions {
@@ -319,6 +345,8 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowDone> {
   let limit8: LimitResult | null = null;
   /** Why a stopped phone's newest texts yes did not lift the stop (T-1099): a label on the span. */
   let textsYes: YesRefused | null = null;
+  /** What the recipient actor's reading of an outage line's row said (T-1337): a label on the span. */
+  let actorReading: ActorReading | null = null;
   /** The claim as this run last knew it: its lapse bounds every wait, its first try starts the 15 minutes. */
   let lapsesAt: Utc = row.claim.lapsesAt;
   let firstTryAt: Utc | null = row.claim.firstTryAt;
@@ -359,6 +387,7 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowDone> {
         result: outcome,
         claimNo: row.claim.claimNo,
         ...(textsYes === null ? {} : { textsYes }),
+        ...(actorReading === null ? {} : { actorReading }),
         ...(waiting === null ? {} : { retry: waiting.why, waitSeconds: waiting.waitSeconds }),
       },
       rows: [{ table: "outbox_rows", id: row.outboxRowId }],
@@ -446,6 +475,20 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowDone> {
     // override_optout only on a safety line or a stop reply, whatever any read said (hard invariant: no routine text
     // after STOP; arch 10 line 524).
     const override = (request.overrideOptout || recheck.overrideOptout) && mayOverrideOptout(row);
+    // An outage line's row: the recipient actor's one reading, the last await before the send (T-1337), since a STOP
+    // stored behind its unread hold sets no stopped flag until it commits. Only exactly false lets the part go; anything
+    // else drops the row as stopped, with nothing sent (RULES 7.2), as the second read above does.
+    if (isOutageLine(row)) {
+      actorReading = await readActor(deps, row);
+      if (actorReading !== "notStopped") {
+        // Nothing went to Linq for this part: the span shows the drop, not a send.
+        attempted = null;
+        limit8 = limit8Failed("droppedStopped");
+        const dropped = await markDroppedStopped(deps, row, version);
+        errorCode = dropped.errorCode;
+        return end(dropped.outcome);
+      }
+    }
     const outcome = await deps.linq.sendPart(
       override === request.overrideOptout ? request : { ...request, overrideOptout: override },
     );
@@ -671,6 +714,20 @@ async function checkStoppedAgain(
   if (!state.stopped) return { go: true, overrideOptout: false };
   if (isSafety(row) || isStopReply(row)) return { go: true, overrideOptout: true };
 
+  const dropped = await markDroppedStopped(deps, row, version);
+  return { go: false, ...dropped, limit: limit8Failed("droppedStopped") };
+}
+
+/**
+ * Drops the row as stopped (K-05 markRow droppedStopped, compared on the run's version): its question takes the
+ * never-delivered path (T-255), and the recipient's later rows go. A mark the store does not take is storeError: nothing
+ * is sent, and the claim's lapse hands the row on.
+ */
+async function markDroppedStopped(
+  deps: DispatchDeps,
+  row: ClaimedRow,
+  version: number,
+): Promise<{ outcome: RowOutcome; errorCode: string | null }> {
   const marked = await untilNotTransient(() =>
     deps.store.markRow({
       outboxRowId: row.outboxRowId,
@@ -680,9 +737,54 @@ async function checkStoppedAgain(
       at: deps.now(),
     }),
   );
-  const limit = limit8Failed("droppedStopped");
-  if ("error" in marked) return { go: false, outcome: "storeError", errorCode: marked.error, limit };
-  return { go: false, outcome: "droppedStopped", errorCode: null, limit };
+  if ("error" in marked) return { outcome: "storeError", errorCode: marked.error };
+  return { outcome: "droppedStopped", errorCode: null };
+}
+
+/**
+ * True for a row that carries K-01's outage line (`outage` among its final parts' fixed lines; K-03 v1 finalParts
+ * .fixedLines, which the writer of a fixed line's row names: K-05 README item 38, K-09 README default 139): the AI-down
+ * path's line and the safety read's timeout line, both sent through K-09 sendFixedLine. Read as limit 8 reads a stop
+ * reply (limit8.ts isStopReply).
+ */
+export const isOutageLine = (row: ClaimedRow): boolean => row.finalParts.fixedLines.includes(OUTAGE_LINE_ID);
+
+/**
+ * What the recipient actor's reading said for an outage line's row (T-1337), a label for the span: notStopped (exactly
+ * false: the part goes) or why it counts as a stop: stopped (true), notBoolean, threw (a throw or a rejected call, an actor
+ * that cannot be named or reached among them), noAnswer (none within the wait), noPort (none joined).
+ */
+export type ActorReading = "notStopped" | "stopped" | "notBoolean" | "threw" | "noAnswer" | "noPort";
+
+/** The mark a reading that never came leaves: a value no actor can answer. */
+const NO_ANSWER = Symbol("noAnswer");
+
+/**
+ * Asks the recipient's handle actor its one reading for this row (DispatchDeps.mayHaveStopped), within the wait: only an
+ * answer of exactly false reads notStopped. Never throws.
+ */
+async function readActor(deps: DispatchDeps, row: ClaimedRow): Promise<ActorReading> {
+  const ask = deps.mayHaveStopped;
+  if (ask === undefined) return "noPort";
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const late = new Promise<typeof NO_ANSWER>((resolve) => {
+    timer = setTimeout(() => {
+      resolve(NO_ANSWER);
+    }, deps.actorReadingMs ?? ACTOR_READING_MS);
+  });
+  try {
+    const answer: unknown = await Promise.race([
+      Promise.resolve().then(() => ask(row.recipientHandleId)),
+      late,
+    ]);
+    if (answer === NO_ANSWER) return "noAnswer";
+    if (answer === false) return "notStopped";
+    return answer === true ? "stopped" : "notBoolean";
+  } catch {
+    return "threw";
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /** What Linq's failure is recorded as: its code, else its kind (K-04 `outbox_parts.error_code`, a label). */

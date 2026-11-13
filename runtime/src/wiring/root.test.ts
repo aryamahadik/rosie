@@ -8,18 +8,28 @@
 // retries, T-564 the clock arming, T-1242 staging's state reads and plan calls; production takes no join yet).
 import joinComposeInput from "@rosie/ai/recordings/composer-inputs/join-s1-02.json";
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
+import claimInOrderWithPort from "@rosie/contracts/data-access/fixtures/claim-in-order-with-port.json";
 import parkTurnJson from "@rosie/contracts/data-access/fixtures/park-turn.json";
+import renewClaimReadsPhone from "@rosie/contracts/data-access/fixtures/renew-claim-reads-phone.json";
+import sendStateOwner from "@rosie/contracts/data-access/fixtures/send-state-owner.json";
 import planS102 from "@rosie/contracts/message-plan/fixtures/plan-s1-02.json";
 import sendText from "@rosie/contracts/port-linq/fixtures/send-text.json";
 import buildFrontierS101 from "@rosie/contracts/tool-api/fixtures/build-frontier-s1-01.json";
 import commitS101 from "@rosie/contracts/tool-api/fixtures/commit-s1-01.json";
 import composeInputS102 from "@rosie/contracts/tool-api/fixtures/compose-input-s1-02.json";
 import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
+import type {
+  ClaimOutboxV12Outcome,
+  MarkPartV12Outcome,
+  MarkRowV12Outcome,
+  RenewClaimOutcome,
+} from "@rosie/db/repo/outbox";
+import type { SendStateResponse } from "@rosie/db/repo/send-state";
 import { describe, expect, it, vi } from "vitest";
 
 import { turnIdOf } from "../actor/lease";
-import type { LinqSendRequest } from "../dispatch/types";
-import { queueDeps } from "../queues";
+import type { LinqAccepted, LinqSendRequest } from "../dispatch/types";
+import { queueDeps, type JobTry } from "../queues";
 import { openTrace, type Span } from "../trace";
 import type {
   BuildFrontierRequest,
@@ -50,7 +60,10 @@ import {
   realPorts,
   WiringError,
   workerRoot,
+  type ArmingCalls,
+  type HandleActors,
   type ImplementationSets,
+  type OutboxCalls,
   type PortName,
   type PortPick,
   type Ports,
@@ -680,4 +693,243 @@ describe("a closed port", () => {
     await expect(closed.linqDirect.send({} as never)).rejects.toThrow(new NotJoinedError("linqDirect"));
     expect(() => closed.stateReads.safety.bundle.dangerWords()).toThrow(new NotJoinedError("stateReads"));
   });
+});
+
+describe("the dispatcher's port to the recipient actor's one reading (T-1337; DL-656)", () => {
+  const ROW = "out-safety-evt-sam-0001-outage";
+  const SAM_ACTOR = "phone:+15555550100";
+  const [first] = (
+    claimInOrderWithPort.outcome as unknown as Extract<ClaimOutboxV12Outcome, { result: "claimed" }>
+  ).claimed;
+  if (first === undefined) throw new Error("the fixture claims a row");
+  const CLAIMED = first;
+
+  /**
+   * K-05 v1.2's outbox calls over one row for Sam: claim-in-order-with-port.json's row as the core writes an outage line's
+   * (send class quick_reply, the line's id among its fixed lines, its one words part, no version read), each mark kept.
+   */
+  function outboxCalls(): OutboxCalls & { readonly rowMarks: string[] } {
+    const rowMarks: string[] = [];
+    return {
+      rowMarks,
+      claimOutboxV12: () =>
+        Promise.resolve({
+          result: "claimed",
+          claimed: [
+            {
+              ...structuredClone(CLAIMED),
+              outboxRowId: ROW,
+              recipientHandleId: "handle-sam",
+              recipientPersonId: "person-sam",
+              bookingId: null,
+              versionsRead: [],
+              finalParts: {
+                ...structuredClone(CLAIMED.finalParts),
+                row: ROW,
+                sends: [
+                  {
+                    kind: "words",
+                    text: "Rosie is down for a few minutes. If anyone is in danger, call 911.",
+                    calendarFile: "none",
+                    options: [],
+                    link: null,
+                  },
+                ],
+                fixedLines: ["outage"],
+                slotValues: [],
+              },
+              parts: [{ partNo: 1, tryNo: 1, idempotencyKey: `${ROW}/1/1`, attempts: 1, sent: false }],
+            },
+          ],
+          passedHeld: [],
+        } as unknown as ClaimOutboxV12Outcome),
+      renewClaim: () =>
+        Promise.resolve({
+          ...structuredClone(renewClaimReadsPhone.outcome),
+          outboxRowId: ROW,
+        } as unknown as RenewClaimOutcome),
+      markPartV12: (request) =>
+        Promise.resolve({
+          result: "marked",
+          outboxRowId: ROW,
+          partNo: 1,
+          tryNo: 1,
+          attempts: 1,
+          repeated: false,
+          firstDelivery: false,
+          openQuestionId: null,
+          nextKey: null,
+          row: { state: request.outcome === "sent" ? "sent" : "sending", version: 5 },
+          repeatedDelivery: null,
+        } as unknown as MarkPartV12Outcome),
+      markRowV12: (request) => {
+        rowMarks.push(request.outcome);
+        return Promise.resolve({
+          result: "marked",
+          outboxRowId: ROW,
+          version: request.expectVersion + 1,
+          outcome: request.outcome,
+        } as unknown as MarkRowV12Outcome);
+      },
+    };
+  }
+
+  /** send-state-owner.json for Sam with his Linq chat: not stopped, the chat open, no version read. */
+  const sendState = (): Promise<SendStateResponse> =>
+    Promise.resolve({
+      ...(structuredClone(sendStateOwner.outcome) as unknown as SendStateResponse),
+      outboxRowId: ROW,
+      chat: { threadId: "thread-s1-01-sam-1", linqChatId: "linq-chat-demo-sam", version: 1 },
+      currentVersions: [],
+    });
+
+  /** The arming's calls: only the directory is read here, naming Sam's actor for his K-04 handle id (or none). */
+  const armingCalls = (named: string | null): ArmingCalls & { readonly named: string[] } => {
+    const asked: string[] = [];
+    return {
+      named: asked,
+      armClock: () => Promise.reject(new Error("not used")),
+      cancelClock: () => Promise.reject(new Error("not used")),
+      questionFacts: () => Promise.reject(new Error("not used")),
+      actorNameOf: (handleId) => {
+        asked.push(handleId);
+        return Promise.resolve(handleId === "handle-sam" ? named : null);
+      },
+    };
+  };
+
+  /** A HandleActors namespace whose actors answer the reading as `answer` says; each actor asked is kept. */
+  function actorsAnswering(
+    answer: () => Promise<boolean>,
+    withCall = true,
+  ): HandleActors<string> & { readonly asked: string[] } {
+    const asked: string[] = [];
+    return {
+      asked,
+      idFromName: (name) => name,
+      get: (id) => ({
+        accept: () => Promise.reject(new Error("not used")),
+        fireClockRow: () => Promise.reject(new Error("not used")),
+        syncClocks: () => Promise.reject(new Error("not used")),
+        ...(withCall
+          ? {
+              mayHaveStoppedNow: () => {
+                asked.push(id);
+                return answer();
+              },
+            }
+          : {}),
+      }),
+    };
+  }
+
+  /** The root under test with these actors and that directory answer; each part Linq got is kept. */
+  function rootWith(actors: HandleActors | null, named: string | null = SAM_ACTOR) {
+    const outbox = outboxCalls();
+    const arming = armingCalls(named);
+    const sent: LinqSendRequest[] = [];
+    const accepted: LinqAccepted = {
+      result: "accepted",
+      providerMessageId: "linq-msg-test-0001",
+      providerOptionIds: null,
+      chatId: "linq-chat-demo-sam",
+      service: "imessage",
+      acceptedAt: "2026-11-07T15:06:36Z",
+    };
+    const root = composeRoot({
+      environment: "test",
+      sets: { fake: skeletonFakes().ports },
+      actors,
+      vars: VARS,
+      outboxCalls: outbox,
+      sendStateCall: sendState,
+      linqSendCall: (request) => {
+        sent.push(request);
+        return Promise.resolve(accepted);
+      },
+      armingCalls: arming,
+    });
+    const trace = openTrace({ openedBy: "textWebhook", bundleId: BUNDLE_V0, sink: () => undefined });
+    return {
+      root,
+      outbox,
+      arming,
+      sent,
+      wake: () =>
+        root.dispatcher.wake({ turnId: "turn-t1337", handleId: "handle-sam", outboxRowIds: [ROW] }, trace),
+      retry: () => {
+        const job: JobTry = {
+          key: `retry-${ROW}/1/1#1`,
+          kind: "send",
+          businessId: "biz-lees-barbershop",
+          traceId: "trace-sam-0001",
+          body: {
+            outboxRowId: ROW,
+            recipientHandleId: "handle-sam",
+            failedKey: `${ROW}/1/1`,
+            chain: "rerun",
+            code: "sameKey",
+          },
+          try: 2,
+          firstTriedAt: "2026-11-07T15:06:35Z",
+        };
+        return root.queue.sends.retrySend(job);
+      },
+    };
+  }
+
+  it("is joined into every run the root makes: the turn's wake and the retry door's run each ask the actor of the row's recipient, named by the arming port's directory and reached through the HandleActor namespace, right before an outage line's row goes", async () => {
+    let says = false;
+    const actors = actorsAnswering(() => Promise.resolve(says));
+    const run = rootWith(actors);
+
+    // False: the part goes once, under its key.
+    await run.wake();
+    expect(run.arming.named).toEqual(["handle-sam"]);
+    expect(actors.asked).toEqual([SAM_ACTOR]);
+    expect(run.sent.map((request) => request.idempotencyKey)).toEqual([`${ROW}/1/1`]);
+    expect(run.outbox.rowMarks).toEqual([]);
+
+    // True, on the retry door's run: nothing more goes, and the row is dropped as stopped.
+    says = true;
+    expect(await run.retry()).toEqual({ result: "done" });
+    expect(actors.asked).toEqual([SAM_ACTOR, SAM_ACTOR]);
+    expect(run.sent).toHaveLength(1);
+    expect(run.outbox.rowMarks).toEqual(["droppedStopped"]);
+  });
+
+  const FAILS: { why: string; actors: () => HandleActors | null; named: string | null }[] = [
+    {
+      why: "no HandleActor namespace is bound (the Worker's root where the environment has none)",
+      actors: () => null,
+      named: SAM_ACTOR,
+    },
+    {
+      why: "the directory names no actor for the recipient",
+      actors: () => actorsAnswering(() => Promise.resolve(false)),
+      named: null,
+    },
+    {
+      why: "the actor has no such call",
+      actors: () => actorsAnswering(() => Promise.resolve(false), false),
+      named: SAM_ACTOR,
+    },
+    {
+      why: "the actor's call rejects",
+      actors: () => actorsAnswering(() => Promise.reject(new Error("unreachable"))),
+      named: SAM_ACTOR,
+    },
+  ];
+
+  it.each(FAILS)(
+    "fails closed when $why: nothing is sent, and the row is dropped as stopped",
+    async ({ actors, named }) => {
+      const run = rootWith(actors(), named);
+
+      await run.wake();
+
+      expect(run.sent).toEqual([]);
+      expect(run.outbox.rowMarks).toEqual(["droppedStopped"]);
+    },
+  );
 });
