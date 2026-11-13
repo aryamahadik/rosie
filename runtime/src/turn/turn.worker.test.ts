@@ -13,11 +13,13 @@ import commitLimit6First from "../../../contracts/tool-api/fixtures/commit-limit
 import commitLimit6Fails from "../../../contracts/tool-api/fixtures/commit-limit-6-value-fails.json";
 import commitS102 from "../../../contracts/tool-api/fixtures/commit-s1-02.json";
 import stopRecorded from "../../../contracts/tool-api/fixtures/stop-recorded.json";
+import pollVote from "../../../contracts/inbound-event/fixtures/poll-vote.json";
 import decideDisagree from "../../../contracts/model/fixtures/decide-reads-disagree.json";
 import decideNoneFits from "../../../contracts/model/fixtures/decide-none-fits.json";
 import decideS102 from "../../../contracts/model/fixtures/decide-s1-02-choose.json";
-import type { CommitContext } from "../actor";
+import type { CommitContext, InboxEntry, LeasedTurn } from "../actor";
 import { BUNDLE_A, BUNDLE_B, WHOLE_A, WHOLE_B } from "../bundle/test-support";
+import { prepareHandoff, type HandleRef, type InboundEvent } from "../gateway";
 import { fakeKeyStore } from "../gateway/test-support";
 import { setGuardDeps, setReplyDeps } from "../guard";
 import { fakeCore as fakeReplyCore, phone, ROSIE_NUMBER, type FakeRow } from "../guard/replies/test-support";
@@ -114,6 +116,65 @@ async function setUp(spec: {
       spec.targets ?? { roles: [], openQuestionIds: [], bookingIds: [] },
     ),
   );
+  restores.push(setGuardDeps({ targets: targets.port }));
+  return { t, face, ai, facts };
+}
+
+/**
+ * A vote as the actor's inbox keeps it: K-06's poll-vote.json with this event's id, option words, send time and trace,
+ * scrubbed and sealed by the gateway's own hand-off (K-06 v1.2: the option's words in the box, none in the clear).
+ */
+async function storedVote(
+  spec: { eventId: string; optionWords: string; sentAt: string; traceId: string },
+  handle: HandleRef,
+  seq: number,
+): Promise<InboxEntry> {
+  const overrides: Json = {
+    eventId: spec.eventId,
+    handle,
+    sentAt: spec.sentAt,
+    traceId: spec.traceId,
+    poll: { ...pollVote.poll, optionWords: spec.optionWords },
+  };
+  const event = { ...(pollVote as Json), ...overrides } as InboundEvent;
+  const prepared = await prepareHandoff(
+    { event, partKey: null, traceId: spec.traceId, bundleId: BUNDLE_A },
+    keys,
+  );
+  if (prepared.door !== "actor") throw new Error("not an actor event");
+  return {
+    seq,
+    event: prepared.handoff.event,
+    partKey: null,
+    traceId: spec.traceId,
+    bundleId: BUNDLE_A,
+    startsTurn: true,
+  };
+}
+
+/** As `setUp`, for a turn of these stored entries on bundle A, each with safety-no.json as its safety result. */
+async function setUpEntries(spec: {
+  who: Party;
+  turnId: string;
+  traceId: string;
+  entries: InboxEntry[];
+  times: string[];
+}): Promise<Setup> {
+  const t = testTurn({
+    turnId: spec.turnId,
+    traceId: spec.traceId,
+    bundleId: BUNDLE_A,
+    manifest: await checkedManifest(WHOLE_A, BUNDLE_A),
+    entries: spec.entries,
+  });
+  const face = fakeTurnFace();
+  const ai = fakeDecide(face.log);
+  const facts = fakeFacts(spec.who.party, spec.times);
+  for (const entry of spec.entries) facts.safety.set(entry.event.eventId, safetyNoFor(entry.event.eventId));
+  restores.push(setTurnDeps(turnDeps(facts, face, ai, keys)));
+  const targets = fakeTargets();
+  const { handleId } = spec.who.party;
+  targets.answers.set(handleId, targetsAnswer(handleId, { roles: [], openQuestionIds: [], bookingIds: [] }));
   restores.push(setGuardDeps({ targets: targets.port }));
   return { t, face, ai, facts };
 }
@@ -646,6 +707,123 @@ describe("keyword texts (K-09 README default 35; T-267's replies)", () => {
     expect(KEYWORD_RUNS).toBeGreaterThanOrEqual(2);
   });
 
+  it("a vote for an option that reads STOP is a STOP too (DL-540): its words opened from its box, its own core-only turn, the commit request stop-recorded.json's", async () => {
+    const vote = await storedVote(
+      {
+        eventId: "evt-ben-0007",
+        optionWords: "STOP",
+        sentAt: "2026-10-21T19:30:00Z",
+        traceId: "trace-ben-0007",
+      },
+      BEN.handle,
+      1,
+    );
+    // The gateway sealed the option's words (K-06 v1.2): the stored vote holds them only in its form 2 box.
+    expect(vote.event.poll).toEqual({ pollId: pollVote.poll.pollId, optionId: pollVote.poll.optionId });
+    expect(vote.event.sealed?.v).toBe(2);
+    expect(JSON.stringify(vote.event)).not.toContain('"STOP"');
+    const { t, face, ai } = await setUpEntries({
+      who: BEN,
+      turnId: "turn-ben-stop",
+      traceId: "trace-ben-0007",
+      entries: [vote],
+      times: [stopRecorded.request.now],
+    });
+    const { core, gate } = gateOverReplyCore(stopRecorded.request.now);
+    face.gate = (request) => gate(request);
+    restores.push(setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER }));
+
+    const outcome = committed(await runTurnLoop(t.turn));
+
+    // The same one commit as a typed STOP's: the vote's safety record first (it is read on arrival now), then its STOP.
+    expect(requestsOf(face)).toEqual([stopRecorded.request]);
+    expect(face.frontierCalls).toEqual([]);
+    expect(ai.decideCalls).toEqual([]);
+    expect(
+      outcome.replies?.replies.map((reply) => [reply.text.kind, reply.outcome, reply.line, reply.stopped]),
+    ).toEqual([["pollVote", "replied", "stopReply", true]]);
+    expect(core.outbox.get("out-ben-stop-reply")?.finalParts?.fixedLines).toEqual(["stopReply"]);
+  });
+
+  it("a vote for an option of other words goes on to the frontier as K-02's pollVote text, its words opened from its box", async () => {
+    const vote = await storedVote(
+      {
+        eventId: pollVote.eventId,
+        optionWords: "Sat 2:00pm",
+        sentAt: pollVote.sentAt,
+        traceId: "trace-alex-0009",
+      },
+      ALEX.handle,
+      1,
+    );
+    expect(vote.event.poll).toEqual({ pollId: pollVote.poll.pollId, optionId: pollVote.poll.optionId });
+    const { t, face } = await setUpEntries({
+      who: ALEX,
+      turnId: "turn-alex-vote",
+      traceId: "trace-alex-0009",
+      entries: [vote],
+      times: ["2026-10-23T14:06:42Z"],
+    });
+
+    await runTurnLoop(t.turn);
+
+    expect(face.frontierCalls.map((request) => request.texts)).toEqual([
+      [
+        {
+          eventId: pollVote.eventId,
+          kind: "pollVote",
+          words: "Sat 2:00pm",
+          sentAt: { utc: pollVote.sentAt, zone: ALEX.party.zone },
+          attachments: [],
+          poll: { pollId: pollVote.poll.pollId, optionId: pollVote.poll.optionId },
+          tapback: null,
+        },
+      ],
+    ]);
+  });
+
+  it("a vote kept before K-06 v1.2 (no box, its option words plain) is read as it was kept: its words from its poll, a STOP among them", async () => {
+    const sealed = await storedVote(
+      {
+        eventId: "evt-ben-0007",
+        optionWords: "STOP",
+        sentAt: "2026-10-21T19:30:00Z",
+        traceId: "trace-ben-0007",
+      },
+      BEN.handle,
+      1,
+    );
+    // As T-243's gateway kept a vote: no box, the option's words in its plain poll (README item 5).
+    const kept: InboxEntry = {
+      ...sealed,
+      event: { ...sealed.event, sealed: null, poll: { ...pollVote.poll, optionWords: "STOP" } },
+    };
+    const { t, face, ai } = await setUpEntries({
+      who: BEN,
+      turnId: "turn-ben-stop",
+      traceId: "trace-ben-0007",
+      entries: [kept],
+      times: [stopRecorded.request.now],
+    });
+    const { core, gate } = gateOverReplyCore(stopRecorded.request.now);
+    face.gate = (request) => gate(request);
+    restores.push(setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER }));
+
+    const outcome = committed(await runTurnLoop(t.turn));
+
+    // Its STOP is the one core action: kept with no box, it was never read on arrival, so no safety record rides with it.
+    expect(requestsOf(face)).toEqual([
+      {
+        ...stopRecorded.request,
+        core: stopRecorded.request.core.filter((action) => action.call !== "recordSafetyOutcome"),
+      },
+    ]);
+    expect(ai.decideCalls).toEqual([]);
+    expect(outcome.replies?.replies.map((reply) => [reply.outcome, reply.stopped])).toEqual([
+      ["replied", true],
+    ]);
+  });
+
   it("a keyword text beside a decided one rides in that turn's one commit, after every text's safety record, and never reaches decide", async () => {
     const { t, face, ai } = await setUp({
       who: SAM,
@@ -839,26 +1017,536 @@ describe("a run that is no longer the turn's", () => {
       phone("+15555550131", "handle-ben", "person-ben", 3),
     ]);
     restores.push(setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER }));
-    // The run is replaced while it reads its texts' safety results, before the replies run.
-    const deps = turnDeps(facts, face, fakeDecide(face.log), keys);
-    restores.push(
-      setTurnDeps({
-        ...deps,
-        safety: {
-          resultsOf(eventIds) {
-            t.abort();
-            return deps.safety.resultsOf(eventIds);
-          },
-        },
-      }),
-    );
+    // The run is replaced while it reads its texts' safety results through its leased turn, before the replies run.
+    const turn: LeasedTurn = {
+      ...t.turn,
+      resultsOf: (eventIds) => {
+        t.abort();
+        return t.turn.resultsOf(eventIds);
+      },
+    };
 
-    const outcome = await runTurnLoop(t.turn);
+    const outcome = await runTurnLoop(turn);
 
     expect(outcome).toMatchObject({ result: "notCommitted", why: "replaced", gateCalls: 0 });
     expect(facts.asked).toEqual(["evt-ben-0007"]);
     expect(face.gateCalls).toEqual([]);
     expect(core.commits).toEqual([]);
     expect(t.commits).toEqual([]);
+  });
+});
+
+describe("keyword texts never wait for a missing safety result, and a STOP never waits for the decided part (ADR-015 card C; DL-508)", () => {
+  /** Sam's answer to S1-02 (decided); a text of his whose safety result the turn cannot read; his keyword text. */
+  const DECIDED = S1_02_TEXT;
+  const NO_RESULT = { eventId: "evt-sam-0002", body: "and lawn care", sentAt: "2026-10-19T14:05:01Z" };
+  const KEYWORD_ID = "evt-sam-0003";
+  const WORDS = ["STOP", "START", "HELP"] as const;
+  /** The steps before the gate that can fail on a run: the targets read, the frontier, decide and the one re-read. */
+  const FAILING = ["targets", "frontier", "decide", "reread"] as const;
+
+  type Word = (typeof WORDS)[number];
+  type Failing = (typeof FAILING)[number];
+
+  const keywordText = (word: Word): Omit<TextSpec, "traceId"> => ({
+    eventId: KEYWORD_ID,
+    body: word,
+    sentAt: "2026-10-19T14:05:02Z",
+  });
+
+  /** The keyword text's own core action: a STOP's or a START's record (K-09 recordStopOrStart), HELP's fixed line. */
+  const keywordAction = (word: Word): string[] =>
+    word === "HELP"
+      ? ["sendFixedLine", "helpReply", "handle-sam"]
+      : ["recordStopOrStart", word === "STOP" ? "stop" : "start", KEYWORD_ID];
+
+  interface ActionBody {
+    safety?: { eventId: string };
+    kind?: string;
+    inboundEventId?: string;
+    fixedLineId?: string;
+    recipientHandleId?: string;
+  }
+
+  /** A request's core actions, in order: each text's record by its event id, each keyword's action by what it names. */
+  function coreOf(request: GateAndCommitRequest | undefined): string[][] {
+    return (request?.core ?? []).map((action) => {
+      const body = action.request as ActionBody;
+      if (action.call === "recordSafetyOutcome") return [action.call, body.safety?.eventId ?? ""];
+      if (action.call === "recordStopOrStart")
+        return [action.call, body.kind ?? "", body.inboundEventId ?? ""];
+      return [action.call, body.fixedLineId ?? "", body.recipientHandleId ?? ""];
+    });
+  }
+
+  /**
+   * One run of Sam's turn over these texts. The safety port answers No for each text but `noResult`'s (left out, as
+   * `resultsOf` leaves out a result it cannot give: ADR-015 section 3). The frontier, decide and the gate answer the S1-02
+   * fixtures, unless `failing` names the step that fails on this run (the targets read and the frontier: transient;
+   * decide, or the one re-read after reads that disagree: the models down). A keyword text's core action goes to T-267's
+   * shared-core double over Sam's phone, behind the gate, after the records.
+   */
+  async function samTurn(
+    texts: Omit<TextSpec, "traceId">[],
+    noResult: readonly string[],
+    failing: Failing | null = null,
+  ): Promise<Setup> {
+    const setup = await setUp({
+      who: SAM,
+      turnId: "turn-s1-02-sam-kinds",
+      traceId: "trace-sam-0001",
+      texts,
+      times: [buildFrontierS102.request.now, commitS102.request.now],
+      targets: SAM_S1_02_TARGETS,
+    });
+    const { face, ai, facts } = setup;
+    for (const eventId of noResult) facts.safety.delete(eventId);
+    if (failing === "targets") {
+      const targets = fakeTargets();
+      targets.answers.set(SAM.party.handleId, { error: "transient", sqlstate: "40001" });
+      restores.push(setGuardDeps({ targets: targets.port }));
+    }
+    face.frontier = () =>
+      failing === "frontier"
+        ? { error: "transient", sqlstate: "40001" }
+        : structuredClone(buildFrontierS102.outcome);
+    ai.decide = () =>
+      failing === "decide"
+        ? { error: "modelsDown" }
+        : decided(failing === "reread" ? { ...decideS102, agreed: false } : decideS102);
+    ai.reread = () => ({ error: "modelsDown" });
+    const core = fakeReplyCore(commitS102.request.now, [
+      phone("+15555550100", "handle-sam", "person-sam", 3),
+    ]);
+    face.gate = async (request) => {
+      const records = request.core.filter((action) => action.call === "recordSafetyOutcome");
+      const answer = await core.core.commitCore({
+        caller: request.caller as never,
+        actions: request.core.slice(records.length) as never,
+      });
+      if ("error" in answer) return answer;
+      const outcome = structuredClone(commitS102.outcome);
+      return {
+        ...outcome,
+        parts: request.input.kind === "decided" ? outcome.parts : [],
+        core: [...records.map(() => outcome.core[0]), ...answer.core],
+      } as never;
+    };
+    restores.push(setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER }));
+    return setup;
+  }
+
+  const restoreAll = (): void => {
+    restores.splice(0).forEach((restore) => {
+      restore();
+    });
+  };
+
+  it("a decided text, a STOP and a text with no result commit on the turn's first run: the STOP's recordStopOrStart, the decided text's record, none for the text with no result, and the decided input; the same with START and with HELP", async () => {
+    for (const word of WORDS) {
+      const { t, face, ai, facts } = await samTurn(
+        [DECIDED, NO_RESULT, keywordText(word)],
+        [NO_RESULT.eventId],
+      );
+
+      const outcome = committed(await runTurnLoop(t.turn));
+
+      // The run went past the missing result: the frontier and decide ran, and the one commit carries the decided input.
+      expect(facts.asked).toEqual([DECIDED.eventId, NO_RESULT.eventId, KEYWORD_ID]);
+      expect(face.frontierCalls).toHaveLength(1);
+      expect(ai.decideCalls).toHaveLength(1);
+      expect(face.gateCalls).toHaveLength(1);
+      const request = requestsOf(face)[0];
+      expect(request?.input).toEqual(commitS102.request.input);
+      expect(request?.turn.eventIds).toEqual([DECIDED.eventId, NO_RESULT.eventId, KEYWORD_ID]);
+      // Each text's record but the one with no result, then the keyword text's own action.
+      expect(coreOf(request)).toEqual([
+        ["recordSafetyOutcome", DECIDED.eventId],
+        ["recordSafetyOutcome", KEYWORD_ID],
+        keywordAction(word),
+      ]);
+      expect(request?.core[0]).toEqual({
+        call: "recordSafetyOutcome",
+        request: {
+          caller: request?.caller,
+          safety: safetyNoFor(DECIDED.eventId),
+          handleId: "handle-sam",
+          bookingId: null,
+          sentByActor: null,
+        },
+      });
+      expect(outcome.answer.parts).toEqual(commitS102.outcome.parts);
+      expect(outcome.replies?.replies.map((reply) => [reply.keyword.kind, reply.outcome])).toEqual([
+        [word.toLowerCase(), "replied"],
+      ]);
+      // On its first run: one commit through the lease, and the lease told the reply ended, so no lapse reruns the turn
+      // and no park follows.
+      expect(t.commits.map((sent) => sent.answer)).toMatchObject([{ result: "committed" }]);
+      expect(t.replied.count).toBe(1);
+      restoreAll();
+    }
+  });
+
+  it("the same batch whose targets read, frontier, decide or re-read fails commits its keyword text core-only on its first run, with the records it has (STOP, START and HELP)", async () => {
+    for (const failing of FAILING) {
+      for (const word of WORDS) {
+        const { t, face, ai } = await samTurn(
+          [DECIDED, NO_RESULT, keywordText(word)],
+          [NO_RESULT.eventId],
+          failing,
+        );
+
+        const outcome = committed(await runTurnLoop(t.turn));
+
+        // The step failed on this run, and nothing after it ran.
+        expect(face.frontierCalls).toHaveLength(failing === "targets" ? 0 : 1);
+        expect(ai.decideCalls).toHaveLength(failing === "targets" || failing === "frontier" ? 0 : 1);
+        expect(ai.rereadCalls).toHaveLength(failing === "reread" ? 1 : 0);
+        // One core-only commit, as a turn of keyword texts alone makes, under the caller of every business.
+        expect(face.gateCalls).toHaveLength(1);
+        const request = requestsOf(face)[0];
+        expect(request?.input).toEqual({ kind: "coreOnly" });
+        expect(request?.caller.businessId).toBeNull();
+        expect(coreOf(request)).toEqual([
+          ["recordSafetyOutcome", DECIDED.eventId],
+          ["recordSafetyOutcome", KEYWORD_ID],
+          keywordAction(word),
+        ]);
+        expect(outcome.answer.parts).toEqual([]);
+        expect(outcome.replies?.replies.map((reply) => [reply.keyword.kind, reply.outcome])).toEqual([
+          [word.toLowerCase(), "replied"],
+        ]);
+        expect(t.commits.map((sent) => sent.answer)).toMatchObject([{ result: "committed" }]);
+        expect(t.replied.count).toBe(1);
+        restoreAll();
+      }
+    }
+  });
+
+  it("a batch with no keyword text and a missing result still ends noSafetyResult, with no frontier, decide or gate call", async () => {
+    const { t, face, ai, facts } = await samTurn([DECIDED, NO_RESULT], [NO_RESULT.eventId]);
+
+    const outcome = await runTurnLoop(t.turn);
+
+    expect(outcome).toEqual({ result: "notCommitted", why: "noSafetyResult", gateCalls: 0, replies: null });
+    expect(facts.asked).toEqual([DECIDED.eventId, NO_RESULT.eventId]);
+    expect(face.frontierCalls).toEqual([]);
+    expect(ai.decideCalls).toEqual([]);
+    expect(ai.rereadCalls).toEqual([]);
+    expect(face.gateCalls).toEqual([]);
+    expect(t.commits).toEqual([]);
+    expect(t.replied.count).toBe(0);
+  });
+
+  it("a turn of keyword texts alone is unchanged: with its result missing, a STOP, a START or HELP commits core-only with no record for it, never reaching the frontier or decide", async () => {
+    for (const word of WORDS) {
+      const { t, face, ai } = await samTurn([keywordText(word)], [KEYWORD_ID]);
+
+      const outcome = committed(await runTurnLoop(t.turn));
+
+      expect(face.frontierCalls).toEqual([]);
+      expect(ai.decideCalls).toEqual([]);
+      expect(face.gateCalls).toHaveLength(1);
+      const request = requestsOf(face)[0];
+      expect(request?.input).toEqual({ kind: "coreOnly" });
+      expect(request?.caller.businessId).toBeNull();
+      expect(coreOf(request)).toEqual([keywordAction(word)]);
+      expect(outcome.replies?.replies.map((reply) => reply.outcome)).toEqual(["replied"]);
+      expect(t.replied.count).toBe(1);
+      restoreAll();
+    }
+  });
+
+  it("every result present: a decided text and a STOP whose targets read fails, and separately whose frontier, decide or re-read fails, commit the STOP on the first run through keywordTurn, with every text's record", async () => {
+    for (const failing of FAILING) {
+      const { t, face, ai } = await samTurn([DECIDED, keywordText("STOP")], [], failing);
+
+      const outcome = committed(await runTurnLoop(t.turn));
+
+      expect(face.frontierCalls).toHaveLength(failing === "targets" ? 0 : 1);
+      expect(ai.rereadCalls).toHaveLength(failing === "reread" ? 1 : 0);
+      expect(face.gateCalls).toHaveLength(1);
+      const request = requestsOf(face)[0];
+      expect(request?.input).toEqual({ kind: "coreOnly" });
+      expect(request?.caller.businessId).toBeNull();
+      expect(coreOf(request)).toEqual([
+        ["recordSafetyOutcome", DECIDED.eventId],
+        ["recordSafetyOutcome", KEYWORD_ID],
+        keywordAction("STOP"),
+      ]);
+      expect(outcome.replies?.replies.map((reply) => [reply.outcome, reply.line, reply.stopped])).toEqual([
+        ["replied", "stopReply", true],
+      ]);
+      // On its first run, with no rerun and no park: the lease is told the reply ended.
+      expect(t.commits.map((sent) => sent.answer)).toMatchObject([{ result: "committed" }]);
+      expect(t.replied.count).toBe(1);
+      restoreAll();
+    }
+  });
+
+  it("every result present: the same batch with START, and with HELP, in place of the STOP keeps today's behaviour: the run ends with nothing sent, and the lease's retry runs it again", async () => {
+    const why: Record<Failing, string> = {
+      targets: "transient",
+      frontier: "transient",
+      decide: "modelsDown",
+      reread: "modelsDown",
+    };
+    for (const failing of FAILING) {
+      for (const word of ["START", "HELP"] as const) {
+        const { t, face, ai } = await samTurn([DECIDED, keywordText(word)], [], failing);
+
+        const outcome = await runTurnLoop(t.turn);
+
+        expect(outcome).toMatchObject({
+          result: "notCommitted",
+          why: why[failing],
+          gateCalls: 0,
+          replies: null,
+        });
+        // The models down: the AI-down path's waiting texts, as before (T-271).
+        expect("aiDown" in outcome).toBe(failing === "decide" || failing === "reread");
+        expect(face.frontierCalls).toHaveLength(failing === "targets" ? 0 : 1);
+        expect(ai.rereadCalls).toHaveLength(failing === "reread" ? 1 : 0);
+        expect(face.gateCalls).toEqual([]);
+        expect(t.commits).toEqual([]);
+        expect(t.replied.count).toBe(0);
+        restoreAll();
+      }
+    }
+  });
+
+  it("a STOP's run replaced while the decided part is made sends nothing: the run that has the turn now records it", async () => {
+    const { t, face, ai } = await samTurn([DECIDED, NO_RESULT, keywordText("STOP")], [NO_RESULT.eventId]);
+    ai.decide = () => {
+      t.abort();
+      return decided(decideS102);
+    };
+
+    const outcome = await runTurnLoop(t.turn);
+
+    expect(outcome).toMatchObject({ result: "notCommitted", why: "replaced", gateCalls: 0 });
+    expect(face.gateCalls).toEqual([]);
+    expect(t.commits).toEqual([]);
+  });
+
+  /**
+   * How the gate refuses the decided request on its tries (DL-521), while it commits a core-only request as before: limit
+   * 6 before the re-read (commit-limit-6-reread-first.json's refusal, naming part 0's field kinds), with the one re-read
+   * unable to run (the models down), so there is no second try; the same with the re-read run, and the database busy on
+   * its request and that request's one resend; and the database busy on the first request and its one resend.
+   */
+  const REFUSALS = ["valueFailsWords", "afterReread", "transient"] as const;
+  type Refusal = (typeof REFUSALS)[number];
+
+  function refuseDecided({ face, ai }: Setup, refusal: Refusal): void {
+    const commit = face.gate;
+    face.gate = (request, index) => {
+      if (request.input.kind !== "decided") {
+        return commit === null ? { error: "unwired" } : commit(request, index);
+      }
+      if (refusal === "transient" || request.input.decided.decide.reread) {
+        return { error: "transient", sqlstate: "40001" };
+      }
+      return structuredClone(commitLimit6First.outcome);
+    };
+    ai.reread = () =>
+      refusal === "afterReread"
+        ? decided({ ...decideS102, reread: true }, ONE_REREAD)
+        : { error: "modelsDown" };
+  }
+
+  it("every result present: a decided text and a STOP whose decided request the gate refuses on its tries commit the STOP core-only on that run, with no park (DL-521)", async () => {
+    // The decided request's tries: the first request, the re-read's request and its one resend, or one resend.
+    const decidedTries: Record<Refusal, number> = { valueFailsWords: 1, afterReread: 3, transient: 2 };
+    for (const refusal of REFUSALS) {
+      const setup = await samTurn([DECIDED, keywordText("STOP")], []);
+      refuseDecided(setup, refusal);
+      const { t, face, ai } = setup;
+
+      const outcome = committed(await runTurnLoop(t.turn));
+
+      // The decided input went to the gate on its tries only; then the keyword texts' core-only request, once.
+      const requests = requestsOf(face);
+      expect(requests.map((request) => request.input.kind)).toEqual([
+        ...Array<string>(decidedTries[refusal]).fill("decided"),
+        "coreOnly",
+      ]);
+      expect(requests[0]?.input).toEqual(commitS102.request.input);
+      expect(ai.rereadCalls.map((request) => [request.why, request.failing])).toEqual(
+        refusal === "transient" ? [] : [["valueFailsWords", [{ part: 0, fields: ["kinds"] }]]],
+      );
+      // Under the caller of every business, with every text's record, as a turn of keyword texts alone commits.
+      const coreOnly = requests.at(-1);
+      expect(coreOnly?.caller.businessId).toBeNull();
+      expect(coreOf(coreOnly)).toEqual([
+        ["recordSafetyOutcome", DECIDED.eventId],
+        ["recordSafetyOutcome", KEYWORD_ID],
+        keywordAction("STOP"),
+      ]);
+      expect(outcome.answer.parts).toEqual([]);
+      expect(outcome.replies?.replies.map((reply) => [reply.outcome, reply.line, reply.stopped])).toEqual([
+        ["replied", "stopReply", true],
+      ]);
+      expect(outcome.replies?.rerun).toBe(false);
+      // On its run, with no rerun and no park: the lease's last commit committed, and it is told the reply ended.
+      expect(t.commits.map((sent) => "result" in sent.answer)).toEqual([
+        ...Array<boolean>(decidedTries[refusal]).fill(false),
+        true,
+      ]);
+      expect(t.replied.count).toBe(1);
+      restoreAll();
+    }
+  });
+
+  it("every result present: the same batch with START, and with HELP, in place of the STOP keeps today's behaviour: the decided input on every commit the replies ask for, then the run ends with nothing committed, and the lease's retry", async () => {
+    // Each of the replies' runs sends the decided input on its tries; the one re-read runs once in the turn's run.
+    const decidedTries: Record<Refusal, number> = {
+      valueFailsWords: KEYWORD_RUNS,
+      afterReread: 3 + (KEYWORD_RUNS - 1),
+      transient: 2 * KEYWORD_RUNS,
+    };
+    const lastError: Record<Refusal, string> = {
+      valueFailsWords: "valueFailsWords",
+      afterReread: "valueFailsWords",
+      transient: "transient",
+    };
+    for (const refusal of REFUSALS) {
+      for (const word of ["START", "HELP"] as const) {
+        const setup = await samTurn([DECIDED, keywordText(word)], []);
+        refuseDecided(setup, refusal);
+        const { t, face, ai } = setup;
+
+        const outcome = await runTurnLoop(t.turn);
+
+        expect(outcome).toMatchObject({
+          result: "notCommitted",
+          why: "notRecorded",
+          gateCalls: decidedTries[refusal],
+        });
+        expect(
+          outcome.replies?.replies.map((reply) => [reply.keyword.kind, reply.outcome, reply.errorCode]),
+        ).toEqual([[word.toLowerCase(), "notRecorded", lastError[refusal]]]);
+        // The re-read that found the models down: the AI-down path's waiting texts, as before (T-271).
+        expect("aiDown" in outcome).toBe(refusal === "valueFailsWords");
+        expect(requestsOf(face).map((request) => request.input.kind)).toEqual(
+          Array<string>(decidedTries[refusal]).fill("decided"),
+        );
+        expect(ai.rereadCalls).toHaveLength(refusal === "transient" ? 0 : 1);
+        expect(t.commits.every((sent) => "error" in sent.answer)).toBe(true);
+        expect(t.replied.count).toBe(0);
+        restoreAll();
+      }
+    }
+  });
+
+  it("a STOP whose core-only commit is refused too gets no decided input again on that run: the replies' rerun commits it core-only at once", async () => {
+    const setup = await samTurn([DECIDED, keywordText("STOP")], []);
+    refuseDecided(setup, "valueFailsWords");
+    const { t, face } = setup;
+    const refusing = face.gate;
+    // The database busy on the first core-only request and on its one resend.
+    face.gate = (request, index) =>
+      index === 1 || index === 2 || refusing === null
+        ? { error: "transient", sqlstate: "40001" }
+        : refusing(request, index);
+
+    const outcome = committed(await runTurnLoop(t.turn));
+
+    expect(requestsOf(face).map((request) => request.input.kind)).toEqual([
+      "decided",
+      "coreOnly",
+      "coreOnly",
+      "coreOnly",
+    ]);
+    expect(outcome.replies?.replies.map((reply) => [reply.outcome, reply.line, reply.stopped])).toEqual([
+      ["replied", "stopReply", true],
+    ]);
+    expect(t.replied.count).toBe(1);
+  });
+
+  it("a STOP's run replaced while the gate refuses its decided request sends no core-only request: the run that has the turn now records it", async () => {
+    const setup = await samTurn([DECIDED, keywordText("STOP")], []);
+    refuseDecided(setup, "valueFailsWords");
+    const { t, face, ai } = setup;
+    ai.reread = () => {
+      t.abort();
+      return { error: "modelsDown" };
+    };
+
+    const outcome = await runTurnLoop(t.turn);
+
+    expect(outcome).toMatchObject({ result: "notCommitted", why: "replaced", gateCalls: 1 });
+    expect(requestsOf(face).map((request) => request.input.kind)).toEqual(["decided"]);
+    expect(t.commits).toHaveLength(1);
+    expect(t.replied.count).toBe(0);
+  });
+
+  it("a STOP turn whose replies run again after its decided commit went through: the rerun's core-only commit is answered repeated, as K-05 answers the first commit, and its gate span says so, not zero parts as if nothing committed", async () => {
+    const { t, face, ai } = await setUp({
+      who: SAM,
+      turnId: "turn-s1-02-sam-kinds",
+      traceId: "trace-sam-0001",
+      texts: [DECIDED, keywordText("STOP")],
+      times: [buildFrontierS102.request.now, commitS102.request.now],
+      targets: SAM_S1_02_TARGETS,
+    });
+    face.frontier = () => structuredClone(buildFrontierS102.outcome);
+    ai.decide = () => decided(decideS102);
+    const core = fakeReplyCore(commitS102.request.now, [
+      phone("+15555550100", "handle-sam", "person-sam", 3),
+    ]);
+    core.ids.set("turn-s1-02-sam-kinds", { reply: "out-sam-stop-reply" });
+    // The stop reply's words are left unwritten once (the answer lost on its way), so the replies ask for the turn to run
+    // again after the commit went through.
+    core.failPlanOnce.add("out-sam-stop-reply");
+    // K-09 gateAndCommit as the action layer answers it: one commit per turn id, the shared core behind it. A repeat
+    // writes nothing and answers the first commit (K-09 README: "a repeat returns the first commit"; K-05 v1 item 1): its
+    // rows, `repeated`, and the parts gated in this call, none for a core-only request.
+    face.gate = async (request) => {
+      const records = request.core.filter((action) => action.call === "recordSafetyOutcome");
+      const answer = await core.core.commitCore({
+        caller: request.caller as never,
+        actions: request.core.slice(records.length) as never,
+      });
+      if ("error" in answer) return answer;
+      const outcome = structuredClone(commitS102.outcome);
+      const results = [...records.map(() => outcome.core[0]), ...answer.core];
+      if (!answer.repeated) return { ...outcome, core: results } as never;
+      return {
+        ...outcome,
+        repeated: true,
+        parts: request.input.kind === "decided" ? outcome.parts : [],
+        core: results,
+        written: { written: [], outboxRows: outcome.written.outboxRows, promoted: [] },
+        openQuestions: { opened: [], closed: [] },
+      } as never;
+    };
+    restores.push(setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER }));
+
+    const outcome = committed(await runTurnLoop(t.turn));
+
+    // The decided commit went through on the replies' first run; their rerun sent the core-only repeat.
+    expect(requestsOf(face).map((request) => request.input.kind)).toEqual(["decided", "coreOnly"]);
+    expect(t.commits.map((sent) => sent.answer)).toMatchObject([
+      { result: "committed", repeated: false },
+      { result: "committed", repeated: true },
+    ]);
+    // The rerun's gate span says it was answered as a repeat of the turn's commit, beside the first commit's part.
+    const gates = t.spans.filter((span) => span.hop === "gate");
+    expect(gates.map((span) => [span.outcome, span.decided])).toEqual([
+      ["ok", { part: 0, result: "committed", choice: "c-01" }],
+      ["ok", { parts: 0, repeated: true }],
+    ]);
+    const commits = t.spans.filter((span) => span.hop === "commit");
+    expect(commits.map((span) => span.decided?.repeated)).toEqual([false, true]);
+    for (const span of t.spans) expect(spanProblems(span)).toEqual([]);
+    // The STOP was recorded once, and its reply's words written on the rerun.
+    expect(core.consents).toHaveLength(1);
+    expect(outcome.replies?.replies.map((reply) => [reply.outcome, reply.line, reply.stopped])).toEqual([
+      ["replied", "stopReply", true],
+    ]);
+    expect(outcome.replies?.rerun).toBe(false);
+    expect(core.outbox.get("out-sam-stop-reply")?.finalParts?.fixedLines).toEqual(["stopReply"]);
+    expect(t.replied.count).toBe(1);
   });
 });

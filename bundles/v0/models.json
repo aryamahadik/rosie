@@ -1,0 +1,17 @@
+{
+  "models": {
+    "haiku": "claude-haiku-5-5",
+    "sonnet": "claude-sonnet-5-5"
+  },
+  "policy": {
+    "low": {
+      "first": "haiku",
+      "second": "haiku"
+    },
+    "high": {
+      "first": "sonnet",
+      "second": "haiku"
+    },
+    "reread": "sonnet"
+  }
+}

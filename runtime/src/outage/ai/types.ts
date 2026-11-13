@@ -11,7 +11,8 @@
 //
 // Every outside call is a port (`OutageDeps`), set once per Worker isolate and joined at D-017: the shared core's
 // sendFixedLine (C-104, served by T-220), the clock the 30 s retries wait on, the handle's stopped flag and the outbox
-// dispatcher's wake. Never logged or put in a span: a text's words, a number. The ids and codes here are labels.
+// dispatcher's wake. The handle actor that runs the turn answers for itself (`OutageHost`, set for each run: T-1323).
+// Never logged or put in a span: a text's words, a number. The ids and codes here are labels.
 
 import type { SafetyCore } from "../../safety/types";
 
@@ -44,10 +45,32 @@ export interface OutageDeps {
    */
   isStopped?(actorName: string): boolean | Promise<boolean>;
   /**
-   * Wakes the outbox dispatcher for the rows a try's lines wrote, so they go at once. Left out, the dispatcher's minute
-   * sweep sends them. A wake that fails changes nothing for the lines.
+   * Wakes the outbox dispatcher for the recipient of the rows a try's lines named, first or repeated (T-1341), while the
+   * actor that runs the turn still says no word waits, so each goes, or is dropped by the dispatcher's own ask of that
+   * reading (T-1337), at once. The root joins it to the same run as the safety read's `SafetyDeps.wake` (runDispatch for
+   * the handle, T-1337's reading included; ../../wiring/root.ts), handed in by the card that joins `setOutageDeps`. Left
+   * out, or when it throws, the rows wait for the recipient's next dispatcher run; no sweep runs. A wake that fails changes
+   * nothing for the lines.
    */
   wake?(request: OutageWake): Promise<void>;
+}
+
+/**
+ * What the handle actor that runs a turn answers the AI-down path for that run (T-1323), set by the actor for the run
+ * (`setOutageHost`): whether the number may have asked to stop by a word no commit has recorded yet, which neither the
+ * turn's own texts nor the stopped flag the deps read can show (RULES 7.2: a stop works "at once").
+ */
+export interface OutageHost {
+  /**
+   * True when the actor's copy of the stopped flag says stopped, or a text of the handle that no commit has taken (with the
+   * batch window, its open window included, or with the lease: a turn leased, committing or being parked, and the batches
+   * waiting behind it) may hold a stop word, by the PostgreSQL-down path's one reading (`stopPending`, T-1313): the reading
+   * the safety read's own outage line asks too, true while that path is unwired. Asked before a try reads the stopped
+   * flag, again right before each text's line (the actor takes texts while a line is out) and before the try's rows are
+   * woken: true holds every later outage line of the run back (the turn's next run asks again) and wakes none of the
+   * try's rows; a throw reads as true (RULES 7.2: "Unsure: treat it as a stop").
+   */
+  stopped(): boolean;
 }
 
 /** One text of a turn waiting on the models, as the outage line reads it. */

@@ -5,7 +5,12 @@
 // and sleep commands that only record how they were called (one JSON line each in $FAKE_LOG). HOME points at
 // an empty temp folder and the Cloudflare, wrangler, GitHub and database variables of this shell are dropped,
 // so no test can reach Cloudflare, npm's registry or a database, or read this Mac's Rosfield sign-in or
-// .dev.vars.
+// .dev.vars. So is ROSIE_NUMBER, Rosie's own number (DL-581): a deploy test that gives none of its own never
+// takes this shell's, so no real number reaches a stand-in's call log.
+//
+// spies() (T-1343) puts a recorder in front of each command a script starts by name, for a run whose PATH holds them
+// alone, so none starts unseen; each keeps a copy of its environment and its arguments, and a test checks both
+// (whereHeld, namedIn), as the recorders T-1310 wrote do in deploy-preview.test.mjs and seed-staging.test.mjs.
 
 import {
   chmodSync,
@@ -13,9 +18,11 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   realpathSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
 import { devNull, tmpdir } from "node:os";
@@ -117,12 +124,13 @@ const DROPPED_NAMES = new Set([
   "STAGING_DATABASE_URL",
   "DATABASE_URL",
   "STAGING_BASE_URL",
+  "ROSIE_NUMBER",
 ]);
 
 /**
  * The environment of a script under test: this shell's, without the variables that could reach Cloudflare, a
- * database or this Mac's sign-in, with HOME at home, git isolated from the user's configuration, and extra on
- * top (an extra value of undefined removes the variable).
+ * database or this Mac's sign-in, or hold Rosie's own number, with HOME at home, git isolated from the user's
+ * configuration, and extra on top (an extra value of undefined removes the variable).
  */
 export function cleanEnv(home, extra = {}) {
   const kept = Object.entries(process.env).filter(([key]) => !DROPPED.test(key) && !DROPPED_NAMES.has(key));
@@ -138,4 +146,109 @@ export function cleanEnv(home, extra = {}) {
     ...extra,
   };
   return Object.fromEntries(Object.entries(env).filter(([, value]) => value !== undefined));
+}
+
+// The spies (T-1343; T-1310's recorders, which its security review's note a asked to check arguments too). A recorder is
+// a /bin/sh script that keeps env's output in <spy>/<name>.<pid>.env, and the count of its arguments then each argument,
+// every one ended by a NUL byte, in <spy>/<name>.<pid>.args, then becomes its command with the same arguments.
+
+const shellQuoted = (text) => `'${text.replaceAll("'", `'\\''`)}'`;
+
+/** The real program of that name: the first on this shell's PATH. */
+export function program(command) {
+  const file = (process.env.PATH ?? "")
+    .split(path.delimiter)
+    .map((folder) => path.join(folder, command))
+    .find((candidate) => existsSync(candidate) && statSync(candidate).isFile());
+  if (file === undefined) throw new Error(`${command} is not on PATH`);
+  return file;
+}
+
+/**
+ * Recorders under dir (see above): spy-bin/<command> in front of the real program of that name for each of `commands`,
+ * and spy-bin/<name> in front of its command line for each entry of `programs` ({name: [file, ...arguments]}).
+ * bin: the folder that is a spied run's whole PATH. put(file, name, command): one more recorder at any path, such as a
+ * checkout's node_modules/.bin/wrangler. clear(): empties the spy folder, before a run. children(): what the recorders
+ * kept, one {name, args, env} for each command started (env: env's output, one variable a line).
+ */
+export function spies(dir, commands, programs = {}) {
+  const spy = path.join(dir, "spy");
+  const bin = path.join(dir, "spy-bin");
+  mkdirSync(spy, { recursive: true });
+  const put = (file, name, command) => {
+    const record = `${shellQuoted(path.join(spy, name))}.$$`;
+    const text = [
+      "#!/bin/sh",
+      `/usr/bin/env >>${record}.env`,
+      `printf '%s\\0' "$#" \${1+"$@"} >>${record}.args`,
+      `exec ${command.map(shellQuoted).join(" ")} \${1+"$@"}`,
+      "",
+    ].join("\n");
+    write(file, text, 0o755);
+  };
+  for (const command of commands) put(path.join(bin, command), command, [program(command)]);
+  for (const [name, command] of Object.entries(programs)) put(path.join(bin, name), name, command);
+  return {
+    bin,
+    put,
+    clear() {
+      rmSync(spy, { recursive: true, force: true });
+      mkdirSync(spy);
+    },
+    children() {
+      return readdirSync(spy)
+        .filter((file) => file.endsWith(".env"))
+        .map((file) => {
+          const record = file.slice(0, -".env".length);
+          const [count, ...rest] = readFileSync(path.join(spy, `${record}.args`), "utf8").split("\0");
+          return {
+            name: record.slice(0, record.lastIndexOf(".")),
+            args: rest.slice(0, Number(count)),
+            env: readFileSync(path.join(spy, file), "utf8"),
+          };
+        });
+    },
+  };
+}
+
+/** The names of a recorded environment's variables whose value holds one of the texts, sorted. */
+export function envHolders(env, texts) {
+  const names = new Set();
+  let name = "(no variable)";
+  for (const line of env.split("\n")) {
+    name = /^([A-Za-z_][A-Za-z0-9_]*)=/.exec(line)?.[1] ?? name;
+    if (texts.some((text) => line.includes(text))) names.add(name);
+  }
+  return [...names].sort();
+}
+
+/**
+ * Where a run's children hold one of the texts, as "<kind>: env <names>" (the variables whose value holds one),
+ * "<kind>: args <n>" (how many arguments hold one) or both, one line for each child that holds any, sorted; kindOf names
+ * a child for the test. A child that holds none is left out, so an empty list means no child holds any.
+ */
+export function whereHeld(children, texts, kindOf) {
+  const lines = [];
+  for (const child of children) {
+    const names = envHolders(child.env, texts);
+    const args = child.args.filter((arg) => texts.some((text) => arg.includes(text))).length;
+    const where = [
+      ...(names.length > 0 ? [`env ${names.join(" ")}`] : []),
+      ...(args > 0 ? [`args ${String(args)}`] : []),
+    ];
+    if (where.length > 0) lines.push(`${kindOf(child)}: ${where.join(", ")}`);
+  }
+  return lines.sort();
+}
+
+/** The children whose environment has a variable of one of the names, whatever it holds, as "<kind>: <names>", sorted. */
+export function namedIn(children, names, kindOf) {
+  return children
+    .map((child) => {
+      const lines = child.env.split("\n");
+      const present = names.filter((name) => lines.some((line) => line.startsWith(`${name}=`)));
+      return present.length > 0 ? `${kindOf(child)}: ${present.join(" ")}` : "";
+    })
+    .filter((line) => line !== "")
+    .sort();
 }

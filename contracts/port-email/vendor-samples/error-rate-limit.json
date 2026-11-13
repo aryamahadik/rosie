@@ -1,0 +1,14 @@
+{
+  "status": 429,
+  "headers": {
+    "retry-after": "1",
+    "ratelimit-limit": "10",
+    "ratelimit-remaining": "0",
+    "ratelimit-reset": "1"
+  },
+  "body": {
+    "statusCode": 429,
+    "name": "rate_limit_exceeded",
+    "message": "Too many requests. You can only make 10 requests per second."
+  }
+}

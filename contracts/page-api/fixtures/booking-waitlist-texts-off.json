@@ -1,0 +1,31 @@
+{
+  "call": "bookingConfirm",
+  "given": {
+    "now": "2026-10-22T16:30:00Z",
+    "environment": "staging",
+    "after": ["booking-waitlist-ben-read-back.json"],
+    "note": "Ben T.'s yes on Lee's Barbershop's booking page, whose mobile sent STOP on Oct 20 (K-04 phones.stopped; K-29's stop row): his request gave that mobile on its reach card, and he says yes to its read-back (booking-waitlist-ben-read-back.json), whose words are word for word the ones Dee saw. The page entry calls K-09 v1.2 joinWaitlist with the yes as tool-api/fixtures/j4-join-waitlist-texts-off-page.json does: a tap on the page is neither START nor a fresh yes sent from that number (RULES 7.5; MC C1), so no consent and no entry are written (consentId null: STATE note 9; K-09 v1.2 README default 82, open gap 71), the request stays open, and the page shows K-01's stopLaterReply itself."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-ben-0004",
+      "traceId": "trace-page-ben-0004",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-ben-1",
+      "requestRef": "reqref-page-lees-0051"
+    },
+    "readBackId": "rb-page-ben-waitlist-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-ben-waitlist-1",
+    "yesEventId": "pageyes-ben-waitlist-1",
+    "served": {
+      "change": "waitlist",
+      "result": "textsOff",
+      "consentId": null,
+      "textsOffLine": "stopLaterReply",
+      "requestEnded": false
+    }
+  }
+}

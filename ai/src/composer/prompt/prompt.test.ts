@@ -609,7 +609,7 @@ describe("the prompt holds what the card gives", () => {
     expect(TERM_FACT_RULE.startsWith("The one exception is a <term> in <facts>: ")).toBe(true);
     expect(TERM_FACT_RULE).toContain("never as a slot, and never changed or translated");
     for (const words of [factsLine, TERM_FACT_RULE]) expect(words).not.toContain("source");
-    expect(COMPOSER_PROMPT_VERSION).toBe("composer-3");
+    expect(COMPOSER_PROMPT_VERSION).toBe("composer-4");
   });
 
   it("the language rule: never from a name; the example in another language is the language its reader wrote in", () => {

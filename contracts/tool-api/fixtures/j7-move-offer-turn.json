@@ -5,7 +5,7 @@
     "after": ["j7-reminder-job.json"],
     "now": "2026-10-23T14:05:00Z",
     "stated": { "step": "A7-03", "gives": [] },
-    "note": "A7-03: Fri Oct 23 at 10:05am, before free cancel ends (Fri 11am), Alex answers the reminder '1' in his own chat; decide picks '1 Change the time'. In his turn's commit: Riley's next open times that keep the plug-in's gap, at the line's $35 ('Only Riley's times are offered'; README default 132), as the options of one question, and the reply 'Sure. Pick a new time: / A) Sat Oct 24 · 3:00pm · Riley / B) Sun Oct 25 · 11:00am · Riley / Reply A or B.', quick_reply, with its clock: 24 hours ('silence keeps the time as booked'). Nothing moves yet. No key. The ids are examples."
+    "note": "A7-03: Fri Oct 23 at 10:05am, before free cancel ends (Fri 11am), Alex answers the reminder '1' in his own chat; decide picks '1 Change the time'. In his turn's commit: Riley's next open times that keep the plug-in's gap, at the line's $35 ('Only Riley's times are offered'; README default 150), as the options of one question, and the reply 'Sure. Pick a new time: / A) Sat Oct 24 · 3:00pm · Riley / B) Sun Oct 25 · 11:00am · Riley / Reply A or B.', quick_reply, with its clock: 24 hours ('silence keeps the time as booked'). Nothing moves yet. No key. The ids are examples."
   },
   "request": {
     "caller": {

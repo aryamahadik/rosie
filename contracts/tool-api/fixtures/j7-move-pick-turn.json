@@ -5,7 +5,7 @@
     "after": ["j7-move-offer-turn.json"],
     "now": "2026-10-23T14:07:00Z",
     "stated": { "step": "A7-03", "gives": [] },
-    "note": "A7-03: Alex replies 'A' in his own chat, before free cancel ends, so the move is free. In his turn's commit: his yes written as a K-29 ticked_terms consent with the words shown (the question's stored words) and their sha256 (README default 129); Sat 3:00pm reserved for Riley and the 11:00am hold released (K-05 v1 reserve, release); the visit's reservation and free-cancel time moved with it ('The code stays the same: it's still the same visit'; K-30 rule 6); one booking_changes row moved, asked by Alex, approved by that consent; a calendar_update effect for Riley's calendar; Alex's 'Moved: ...' reply (quick_reply) and Riley's 'Change: Alex M. moved the Sat 11:00am to Sat Oct 24 · 3:00pm.' (routine). No key. The ids are examples."
+    "note": "A7-03: Alex replies 'A' in his own chat, before free cancel ends, so the move is free. In his turn's commit: his yes written as a K-29 ticked_terms consent with the words shown (the question's stored words) and their sha256 (README default 147); Sat 3:00pm reserved for Riley and the 11:00am hold released (K-05 v1 reserve, release); the visit's reservation and free-cancel time moved with it ('The code stays the same: it's still the same visit'; K-30 rule 6); one booking_changes row moved, asked by Alex, approved by that consent; a calendar_update effect for Riley's calendar; Alex's 'Moved: ...' reply (quick_reply) and Riley's 'Change: Alex M. moved the Sat 11:00am to Sat Oct 24 · 3:00pm.' (routine). No key. The ids are examples."
   },
   "request": {
     "caller": {

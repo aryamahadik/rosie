@@ -80,7 +80,21 @@ export default defineConfig({
         ],
         test: {
           name: "workers",
-          include: ["runtime/src/**/*.worker.test.ts", "runtime/test/**/*.worker.test.ts"],
+          // T-1144: the action layer's checks that must hold inside the Workers runtime (the Tool API's validator).
+          include: [
+            "runtime/src/**/*.worker.test.ts",
+            "runtime/test/**/*.worker.test.ts",
+            "actions/src/**/*.worker.test.ts",
+          ],
+          // Holds a HandleActor's own wiring in the pool's one isolate (T-1243; that file's header says why).
+          setupFiles: ["runtime/test/hold-actor-wiring.ts"],
+          // No module cache on disk (T-1207, DL-420), so the pool sends the runner each module in a message of its own.
+          // With the cache, Vitest hands a new runner every module of its file's graph that the run has already
+          // transformed, and the pool sends all of that code in one WebSocket message; workerd closes the runner's
+          // socket on a message over 33,554,432 bytes ("Worker exited unexpectedly"). That message had reached
+          // 33,125,602 bytes; one module at a time, the largest is the Tool API's generated validators, 13,213,756.
+          // infra/ci/workers-pool-messages.test.mjs keeps every message under 24 MiB. Not part of any test's claim.
+          fsModuleCache: false,
         },
       },
       {
@@ -115,6 +129,29 @@ export default defineConfig({
         test: {
           name: "e2e",
           include: ["tests/e2e/**/*.test.ts"],
+          // The e2e files that run inside the Workers runtime are the next project's (T-1149).
+          exclude: ["**/node_modules/**", "**/*.worker.test.ts"],
+        },
+      },
+      {
+        // The walking skeleton's end-to-end test inside the Workers runtime (T-1149, DL-332): the local target posts
+        // through runtime/src/wiring's composition root with the HandleActor installed, as the workers project runs it.
+        // `npm run test:e2e` runs it with the e2e project.
+        plugins: [
+          cloudflareTest({
+            wrangler: { configPath: "./wrangler.jsonc", environment: "staging" },
+            miniflare: { bindings: { GIT_SHA: "test-sha" } },
+          }),
+        ],
+        test: {
+          name: "e2e-workers",
+          include: ["tests/e2e/**/*.worker.test.ts"],
+          // Reads SKELETON_UPTO and CONTRACT_REPORT in Node and provides them to the run (tests/e2e/skeleton/README.md).
+          globalSetup: ["tests/e2e/_driver/prefix/global-setup.ts"],
+          // Holds a HandleActor's own wiring in the pool's one isolate (T-1243; that file's header says why).
+          setupFiles: ["runtime/test/hold-actor-wiring.ts"],
+          // Each module in a message of its own to the runner, as in the workers project (T-1207).
+          fsModuleCache: false,
         },
       },
     ],

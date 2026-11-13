@@ -1,0 +1,29 @@
+{
+  "call": "signInEntries",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json", "prove-sign-in-sam-right.json"],
+    "now": "2026-11-02T13:01:31Z",
+    "note": "sign-in-entries-signed-in with the session's entry asked with values of its own, the token's sha256 among them: the call reads every value from the row and takes none from the caller, so no hash, token or code can reach an entry this way."
+  },
+  "request": {
+    "jobId": "sign-in-sam-nov02-1300",
+    "traceId": "trace-page-sam-nov02-1301",
+    "entries": [
+      { "kind": "proof_code.checked", "proofCodeId": "code-sam-sign-in-nov02" },
+      {
+        "kind": "session.started",
+        "sessionId": "session-sam-nov02",
+        "newValues": { "token_sha256": "b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90a1" }
+      }
+    ]
+  },
+  "outcome": {
+    "result": "logged",
+    "entries": [
+      { "id": "log-code-sam-sign-in-nov02-used", "kind": "proof_code.checked", "written": true },
+      { "id": "log-session-sam-nov02-started", "kind": "session.started", "written": true }
+    ]
+  }
+}

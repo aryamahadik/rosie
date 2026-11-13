@@ -16,6 +16,10 @@ coverage/
 # Contract types are generated in CI and never committed (ADR-005)
 /contracts/generated/
 
+# The Tool API's validators, compiled ahead of time from the contracts by `npm run build:validators` (T-1144):
+# generated before lint, the type check, the tests and any Worker bundle, and never committed (ADR-005)
+/actions/src/tool-api/generated/
+
 # Claude Code: builder worktrees, personal settings and the lead session's lock files (the rest of .claude/ is
 # committed by path)
 /.claude/worktrees/

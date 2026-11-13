@@ -1,0 +1,32 @@
+{
+  "call": "sendEmail",
+  "given": {
+    "now": "2026-10-19T14:30:21Z",
+    "note": "On S1-10's secure page Sam typed his owner email, so a code goes there to be typed back on the page (FS row B13; K-09 email-check-typed.json: out-sam-email-check-code). It is about no booking, so it carries no reply address, manage link or thread, and Rosie writes it, setting up Lee's Barbershop (S1-10's own line). The code lives 10 minutes (RULES 6.2). The address is on the reserved .example domain."
+  },
+  "request": {
+    "idempotencyKey": "out-sam-email-check-code/1/1",
+    "purpose": "code",
+    "bookingId": null,
+    "from": {
+      "name": "Rosie",
+      "address": "rosie@mail.rosfield.com"
+    },
+    "to": "sam@lees-barbershop.example",
+    "replyTo": null,
+    "subject": "Your Rosie code",
+    "text": "This is Rosie, an automated assistant, setting up Lee's Barbershop.\n\nCode 4829: type it on the page to prove this email. It works for 10 minutes.",
+    "assistantLine": "This is Rosie, an automated assistant, setting up Lee's Barbershop.",
+    "manageLink": null,
+    "chatLink": null,
+    "thread": {
+      "inReplyTo": null,
+      "references": []
+    }
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": "email-msg-demo-0003",
+    "acceptedAt": "2026-10-19T14:30:21Z"
+  }
+}

@@ -279,7 +279,7 @@ describe("value types", () => {
         facts: { ...source.facts, business: { name: "Lee's Barbershop", displayName: "Lee's", phone } },
       });
     expect(call("555-0177").ok).toBe(false);
-    expect(call("+442071838750").text).toBe("+442071838750");
+    expect(call("+442079460123").text).toBe("+442079460123");
   });
 
   it("refuses a link with a space and a blank name", () => {

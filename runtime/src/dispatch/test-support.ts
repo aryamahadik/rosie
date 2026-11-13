@@ -11,11 +11,21 @@
 //   renewClaim        renew-claim-first-send.json (lapsesAt = at + 60 s, firstTryAt set once), renew-claim-lost.json
 //                     (another claim holds the row: claimLost), renew-claim-not-yet.json (a Retry-After still holds).
 //   markPart          mark-sent.json, mark-delivered.json (found by Linq's message id, firstDelivery on the row's
-//                     first receipt, a second receipt says repeated), mark-failed-retry-after.json's failed mark
-//                     without a retry; a row moves to sent when every part is accepted and to delivered when every
-//                     part is delivered (item 15).
+//                     first receipt, a second receipt says repeated and, as K-05 v1.9 item 48 answers it, what it
+//                     repeats: mark-a7-03-delivered-repeat.json, mark-a7-03-poll-delivered-repeat.json; every other
+//                     answer states repeatedDelivery null), mark-delivered-by-key.json (v1.2 item 31: no part
+//                     holds the message id, so the part under the echoed key that holds none is the receipt's, failed
+//                     to delivered after a 4001 or 4006), mark-failed-4006.json (failed, no next try),
+//                     mark-failed-retry-after.json (failed with retry: the next try's key, try + 1, and the
+//                     Retry-After kept as the claim's nextTryNotBefore). A failed mark with retry on a part that already
+//                     failed with no next try writes it then (K-07 outbox-4006-new-key.json: try 2 written by markPart a
+//                     minute after try 1 failed, with no move of try 1); once the next try exists it says repeated with
+//                     its key; on a part delivered since, wrongState. The row follows each part's latest try (item 15):
+//                     every one accepted, sent; every one delivered, delivered (from sending after a 4001 or 4006).
 // `FakeLinq` answers `sendPart` as send-text.json, send-poll.json and send-link-card.json state (accepted, with a message
-// id, and option ids for a poll) and, like Linq, answers a repeated idempotency key with the first message (K-11).
+// id, and option ids for a poll) and, like Linq, answers a repeated idempotency key with the first message (K-11). A test
+// gives a key a fixed failure (`failures`: Linq answers that key so every time, as it replays a stored failure) or a
+// script of answers, one per call (`scripts`: a timeout, then the acceptance of the same key).
 
 import { openTrace, type Span, type TraceContext } from "../trace";
 import type {
@@ -39,6 +49,7 @@ import type {
   RecipientDirectory,
   RenewClaimRequest,
   RenewClaimResponse,
+  RepeatedDelivery,
   TransientError,
   Utc,
   WrongStateError,
@@ -90,6 +101,7 @@ export interface SeedRow {
 }
 
 type PartState = "pending" | "sent" | "failed" | "delivered";
+/** One try of a part (K-04 outbox_parts: one row per try, `<row>/<part>/<try>`). */
 interface FakePart {
   partNo: 1 | 2;
   tryNo: number;
@@ -97,7 +109,22 @@ interface FakePart {
   attempts: number;
   state: PartState;
   messageId: string | null;
+  /** When the try was written: by the claim (try 1), or by the failed mark that made it (a later try). */
+  writtenAt: Utc;
+  sentAt: Utc | null;
   deliveredAt: Utc | null;
+  failedAt: Utc | null;
+  errorCode: string | null;
+}
+
+/** Each part's latest try, by part number. */
+function latestTries(parts: readonly FakePart[]): FakePart[] {
+  const latest = new Map<number, FakePart>();
+  for (const part of parts) {
+    const known = latest.get(part.partNo);
+    if (known === undefined || part.tryNo > known.tryNo) latest.set(part.partNo, part);
+  }
+  return [...latest.values()].sort((a, b) => a.partNo - b.partNo);
 }
 type RowState =
   | "checked"
@@ -212,7 +239,8 @@ export class FakeOutboxStore implements OutboxStore {
       lapsesAt: addMs(request.now, CLAIM_MS),
       claimNo: old === null ? 1 : old.claimNo + 1,
       firstTryAt: old?.firstTryAt ?? null,
-      nextTryNotBefore: old?.nextTryNotBefore ?? row.seed.nextTryNotBefore ?? null,
+      // Kept across a re-claim (K-05 v1.1 item 13); a seed's Retry-After stands in for an earlier failure's.
+      nextTryNotBefore: old === null ? (row.seed.nextTryNotBefore ?? null) : old.nextTryNotBefore,
     };
     row.state = "sending";
     row.heldUntil = null;
@@ -227,11 +255,18 @@ export class FakeOutboxStore implements OutboxStore {
           attempts: 1,
           state: "pending",
           messageId: null,
+          writtenAt: request.now,
+          sentAt: null,
           deliveredAt: null,
+          failedAt: null,
+          errorCode: null,
         };
       });
     } else {
-      for (const part of row.parts) if (part.state === "pending") part.attempts += 1;
+      // A part the provider never accepted keeps its stored key with attempts raised (K-05 v1 item 3; arch 11 line 576).
+      for (const part of latestTries(row.parts)) {
+        if (part.state === "pending" || part.state === "failed") part.attempts += 1;
+      }
     }
     return {
       outboxRowId: row.seed.id,
@@ -253,7 +288,8 @@ export class FakeOutboxStore implements OutboxStore {
         fixedLines: row.seed.fixedLines ?? [],
         threadReplyTo: null,
       },
-      parts: row.parts.map((part) => ({
+      // Each part's latest try (claim-lapsed-reclaimed.json lists try 2 alone).
+      parts: latestTries(row.parts).map((part) => ({
         partNo: part.partNo,
         tryNo: part.tryNo,
         idempotencyKey: part.key,
@@ -392,65 +428,174 @@ export class FakeOutboxStore implements OutboxStore {
   ): Promise<MarkPartResponse | NotFoundError | WrongStateError | TransientError> {
     await yieldToOthers(1);
     this.marks.push(request);
-    if (request.outcome === "delivered") return this.markDelivered(request.providerMessageId, request.at);
+    if (request.outcome === "delivered") return this.markDelivered(request);
 
-    const row = [...this.rows.values()].find((candidate) =>
-      candidate.parts.some((part) => part.key === request.idempotencyKey),
-    );
-    const part = row?.parts.find((candidate) => candidate.key === request.idempotencyKey);
-    if (row === undefined || part === undefined) {
-      return { error: "notFound", table: "outbox_parts", rowId: request.idempotencyKey };
-    }
+    const found = this.partByKey(request.idempotencyKey);
+    if (found === null) return { error: "notFound", table: "outbox_parts", rowId: request.idempotencyKey };
+    const { row, part } = found;
     if (request.outcome === "sent") {
-      if (part.state !== "pending") return this.answer(row, part, true, false); // a second "sent": repeated
+      if (part.state !== "pending") return this.answer(row, part, { repeated: true }); // a second "sent"
       part.state = "sent";
       part.messageId = request.providerMessageId;
+      part.sentAt = request.at;
       row.version += 1;
-      if (row.parts.every((candidate) => candidate.state === "sent")) row.state = "sent";
-      return this.answer(row, part, false, false);
+      this.followParts(row);
+      return this.answer(row, part, {});
     }
-    if (part.state !== "pending") return this.answer(row, part, true, false);
-    if (request.retry) throw new Error("the fake does not build retries: T-258");
+
+    // failed (K-07 part moves: pending or sent → failed; a failed try's next try written by markPart).
+    if (part.state === "delivered") {
+      return { error: "wrongState", table: "outbox_parts", rowId: part.key, state: part.state };
+    }
+    if (part.state === "failed") {
+      if (!request.retry) return this.answer(row, part, { repeated: true });
+      const next = row.parts.find(
+        (candidate) => candidate.partNo === part.partNo && candidate.tryNo === part.tryNo + 1,
+      );
+      if (next !== undefined) return this.answer(row, part, { repeated: true, nextKey: next.key });
+      // A 4001 or 4006 whose minute passed with no receipt: its next try now (outbox-4006-new-key.json).
+      const written = this.writeNextTry(row, part, request.at, request.nextTryNotBefore ?? null);
+      row.version += 1;
+      return this.answer(row, part, { nextKey: written.key });
+    }
+    const wasSent = part.state === "sent";
     part.state = "failed";
+    part.failedAt = request.at;
+    part.errorCode = request.errorCode;
+    // Kept so a receipt after a 4001 or 4006 finds the part (K-05 v1.1 item 15: when the part has none).
+    if (part.messageId === null && request.providerMessageId !== undefined) {
+      part.messageId = request.providerMessageId;
+    }
+    let nextKey: string | null = null;
+    if (request.retry) {
+      nextKey = this.writeNextTry(row, part, request.at, request.nextTryNotBefore ?? null).key;
+      // An accepted part reported failed goes again: its row is open again (K-07 sent → checked).
+      if (wasSent && row.state === "sent") row.state = "checked";
+    }
     row.version += 1;
-    return this.answer(row, part, false, false);
+    return this.answer(row, part, { nextKey });
+  }
+
+  /** The try after `part`, pending under a new key; the provider's Retry-After goes on the claim (K-05 v1.1 item 15). */
+  private writeNextTry(row: FakeRow, part: FakePart, at: Utc, nextTryNotBefore: Utc | null): FakePart {
+    const tryNo = part.tryNo + 1;
+    const next: FakePart = {
+      partNo: part.partNo,
+      tryNo,
+      key: `${row.seed.id}/${String(part.partNo)}/${String(tryNo)}`,
+      attempts: 1,
+      state: "pending",
+      messageId: null,
+      writtenAt: at,
+      sentAt: null,
+      deliveredAt: null,
+      failedAt: null,
+      errorCode: null,
+    };
+    row.parts.push(next);
+    if (nextTryNotBefore !== null && row.claim !== null) row.claim = { ...row.claim, nextTryNotBefore };
+    return next;
+  }
+
+  /** The row follows each part's latest try (K-05 v1.1 item 15). */
+  private followParts(row: FakeRow): void {
+    const latest = latestTries(row.parts);
+    if (latest.every((part) => part.state === "delivered")) row.state = "delivered";
+    else if (latest.every((part) => part.state === "sent" || part.state === "delivered")) row.state = "sent";
+  }
+
+  private partByKey(key: string): { row: FakeRow; part: FakePart } | null {
+    for (const row of this.rows.values()) {
+      const part = row.parts.find((candidate) => candidate.key === key);
+      if (part !== undefined) return { row, part };
+    }
+    return null;
+  }
+
+  /** Every try of a row's parts, by part and then try (a test reads them against K-07's fixtures). */
+  tries(id: string): readonly FakePart[] {
+    return [...this.row(id).parts].sort((a, b) => a.partNo - b.partNo || a.tryNo - b.tryNo);
   }
 
   private markDelivered(
-    providerMessageId: string,
-    at: Utc,
+    request: Extract<MarkPartRequest, { outcome: "delivered" }>,
   ): MarkPartResponse | NotFoundError | WrongStateError {
-    const row = [...this.rows.values()].find((candidate) =>
-      candidate.parts.some((part) => part.messageId === providerMessageId),
-    );
-    const part = row?.parts.find((candidate) => candidate.messageId === providerMessageId);
-    if (row === undefined || part === undefined) {
-      return { error: "notFound", table: "outbox_parts", rowId: providerMessageId };
+    const byId = [...this.rows.values()]
+      .map((row) => ({
+        row,
+        part: row.parts.find((candidate) => candidate.messageId === request.providerMessageId),
+      }))
+      .find((entry) => entry.part !== undefined);
+    let found = byId?.part === undefined ? null : { row: byId.row, part: byId.part };
+    if (found === null && request.idempotencyKey !== undefined) {
+      // K-05 v1.2 item 31: the part under the echoed key is the receipt's only if it holds no message id of its own.
+      const byKey = this.partByKey(request.idempotencyKey);
+      if (byKey?.part.messageId === null) {
+        byKey.part.messageId = request.providerMessageId;
+        found = byKey;
+      }
     }
-    if (part.state === "delivered") return this.answer(row, part, true, false);
-    if (part.state !== "sent") {
+    if (found === null) return { error: "notFound", table: "outbox_parts", rowId: request.providerMessageId };
+    const { row, part } = found;
+    if (part.state === "delivered") {
+      // K-05 v1.9 item 48: a repeat writes nothing and says what it repeats, from the stored times.
+      return this.answer(row, part, { repeated: true, repeatedDelivery: this.repeatedDeliveryOf(row, part) });
+    }
+    // A receipt moves a sent part, or a failed one after a 4001 or 4006 that delivered anyway (K-07).
+    if (part.state !== "sent" && part.state !== "failed") {
       return { error: "wrongState", table: "outbox_parts", rowId: part.key, state: part.state };
     }
     const firstDelivery = row.parts.every((candidate) => candidate.state !== "delivered");
     part.state = "delivered";
-    part.deliveredAt = at;
+    part.deliveredAt = request.at;
     row.version += 1;
-    if (row.parts.every((candidate) => candidate.state === "delivered")) row.state = "delivered";
-    return this.answer(row, part, false, firstDelivery);
+    this.followParts(row);
+    return this.answer(row, part, { firstDelivery });
   }
 
-  private answer(row: FakeRow, part: FakePart, repeated: boolean, firstDelivery: boolean): MarkPartResponse {
+  /**
+   * What a repeated delivery receipt repeats (K-05 v1.9 item 48; mark-a7-03-delivered-repeat.json and
+   * mark-a7-03-poll-delivered-repeat.json): `firstOfRow` when no other part try of the row holds an earlier delivery
+   * time, a tie counting as first (default 85), and the part try's stored time, never the repeat's own (default 86). A
+   * delivered part try with no delivery time is thrown, never answered by a guess (db/repo outbox.ts default 21).
+   */
+  private repeatedDeliveryOf(row: FakeRow, part: FakePart): RepeatedDelivery {
+    const deliveredAt = part.deliveredAt;
+    if (
+      deliveredAt === null ||
+      row.parts.some((one) => one.state === "delivered" && one.deliveredAt === null)
+    ) {
+      throw new Error("markPart: a delivered part holds no delivered_at");
+    }
+    const firstOfRow = row.parts.every(
+      (one) => one.deliveredAt === null || !after(deliveredAt, one.deliveredAt),
+    );
+    return { firstOfRow, deliveredAt };
+  }
+
+  private answer(
+    row: FakeRow,
+    part: FakePart,
+    said: {
+      repeated?: boolean;
+      firstDelivery?: boolean;
+      nextKey?: string | null;
+      repeatedDelivery?: RepeatedDelivery;
+    },
+  ): MarkPartResponse {
     return {
       result: "marked",
       outboxRowId: row.seed.id,
       partNo: part.partNo,
       tryNo: part.tryNo,
       attempts: part.attempts,
-      repeated,
-      firstDelivery,
+      repeated: said.repeated ?? false,
+      firstDelivery: said.firstDelivery ?? false,
       openQuestionId: row.seed.openQuestionId ?? null,
-      nextKey: null,
+      nextKey: said.nextKey ?? null,
       row: { state: row.state, version: row.version },
+      // A v1.9 call always states it: null on every answer but a repeated delivery receipt's (default 87).
+      repeatedDelivery: said.repeatedDelivery ?? null,
     };
   }
 }
@@ -461,8 +606,10 @@ export class FakeLinq implements LinqPort {
   readonly requests: LinqSendRequest[] = [];
   /** The message each key got: one per key, however many calls named it. */
   readonly accepted = new Map<string, LinqAccepted>();
-  /** An answer for a key instead of an acceptance. */
+  /** An answer for a key instead of an acceptance, every time the key is named (a failure Linq stored for it). */
   readonly failures = new Map<string, LinqFailed>();
+  /** Answers for a key, one per call in order (a timeout, then the acceptance); used up, the key goes on as above. */
+  readonly scripts = new Map<string, (LinqFailed | LinqAccepted | "accept")[]>();
   /** Runs before each answer: a test holds a send in the air here. */
   beforeAnswer: ((request: LinqSendRequest) => Promise<void>) | null = null;
   private count = 0;
@@ -473,6 +620,11 @@ export class FakeLinq implements LinqPort {
     this.requests.push(request);
     await yieldToOthers(1);
     if (this.beforeAnswer !== null) await this.beforeAnswer(request);
+    const scripted = this.scripts.get(request.idempotencyKey)?.shift();
+    if (scripted !== undefined && scripted !== "accept") {
+      if (scripted.result === "accepted") this.accepted.set(request.idempotencyKey, scripted);
+      return scripted;
+    }
     const failure = this.failures.get(request.idempotencyKey);
     if (failure !== undefined) return failure;
     const first = this.accepted.get(request.idempotencyKey);

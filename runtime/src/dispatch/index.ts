@@ -1,4 +1,4 @@
-// The outbox dispatcher (T-257; C-124). See dispatcher.ts.
+// The outbox dispatcher (T-257, T-258; C-124). See dispatcher.ts.
 
 export {
   handleDeliveryReceipt,
@@ -9,6 +9,7 @@ export {
   type DispatchReport,
   type ReceiptDeps,
   type ReceiptResult,
+  type RetryReport,
   type RowOutcome,
   type RowReport,
 } from "./dispatcher";
@@ -21,4 +22,14 @@ export {
   type YesAfterStop,
   type YesRefused,
 } from "./limit8";
+export {
+  dispatchSendDoor,
+  mayOverrideOptout,
+  queueRetries,
+  retryRuleFor,
+  type DoorOutcome,
+  type RetryPlan,
+  type RetryRule,
+  type RetryScheduler,
+} from "./retry";
 export type * from "./types";

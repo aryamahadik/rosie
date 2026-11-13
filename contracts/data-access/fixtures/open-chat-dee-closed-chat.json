@@ -1,0 +1,44 @@
+{
+  "call": "openChatOnText",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["mark-waiting-chat.json"],
+    "now": "2026-11-10T13:59:59Z",
+    "note": "Dee W. sends the ready text her booking's chat link types (MC C9; RULES 4.1b: 'When they send it, the chat opens and is saved'), evt-dee-0001, by iMessage. Her phone row was written by Sam's booking with no chat open (commit-adds-dee-booking: version 1, chat_open false, never stopped, no time or way), and her booking notice waits for the chat (mark-waiting-chat). The row is closed and not stopped, so the call opens it: chat open since the text's receipt, by iMessage, the version raised to 2, and one phone.chat_opened entry with the closed chat's old values. The turn that answers her text then commits (commit-supersedes-waiting, trace-dee-0011, 14:00:02Z), and its answer supersedes the waiting notice (RULES 4.1b: 'Nothing sent before is sent again')."
+  },
+  "request": {
+    "eventId": "evt-dee-0001",
+    "handleId": "handle-dee",
+    "service": "imessage",
+    "receivedAt": "2026-11-10T13:59:59Z",
+    "traceId": "trace-dee-0011"
+  },
+  "outcome": {
+    "result": "opened",
+    "handleId": "handle-dee",
+    "phone": {
+      "chatOpen": true,
+      "chatOpenAt": "2026-11-10T13:59:59Z",
+      "chatWay": "imessage",
+      "stopped": false,
+      "version": 2
+    },
+    "event": {
+      "id": "evt-dee-0001/chat-opened",
+      "kind": "phone.chat_opened",
+      "zone": null,
+      "businessId": null,
+      "actorKind": "provider",
+      "actorPersonId": null,
+      "actorRole": null,
+      "tableName": "phones",
+      "rowId": "handle-dee",
+      "oldValues": { "chat_open": false, "chat_open_at": null, "chat_way": null },
+      "newValues": { "chat_open": true, "chat_open_at": "2026-11-10T13:59:59Z", "chat_way": "imessage" },
+      "sealed": null,
+      "why": { "provider_event": { "provider": "linq", "event_id": "evt-dee-0001" } },
+      "approvedBy": null,
+      "proofs": null
+    }
+  }
+}

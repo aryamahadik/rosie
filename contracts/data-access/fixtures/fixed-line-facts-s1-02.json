@@ -1,0 +1,23 @@
+{
+  "call": "readFixedLineFacts",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json", "seed-phone-chat-open.json"],
+    "after": ["commit-s1-01-sam.json"],
+    "now": "2026-10-19T18:05:07Z",
+    "note": "Finalize reads the fixed-line facts of S1-02's question to Sam (K-09 v1 finalize-pass.json): no opener mark for his handle at the barbershop, so this is Rosie's first text to him about it and it carries the opener (finalize-pass's fixedLines 'opener'); the STOP, HELP and rates line was delivered to his number before (K-04's seed), so it does not ride again."
+  },
+  "request": {
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "fixedLineFacts",
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "businessId": "biz-lees-barbershop",
+    "recipientHandleId": "handle-sam",
+    "readAt": "2026-10-19T18:05:07Z",
+    "textedAboutBusiness": false,
+    "openerRowId": null,
+    "optOutLineDeliveredAt": "2026-10-19T14:00:00Z"
+  }
+}

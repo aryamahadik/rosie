@@ -1,0 +1,58 @@
+{
+  "call": "sendState",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["commit-sam-enters-alex-yes.json"],
+    "now": "2026-11-07T15:06:41Z",
+    "note": "Limit 8's read for Alex's confirmation a second after Sam's '1 Yes, send the link' for the Nov 28 haircut he added. The newest texts row covering Alex's mobile at the barbershop is that yes: given by text, but written by Sam's turn, on Sam's handle, so it is the business's word, never Alex's own (fromContact false: README item 47, default 78), and it names the Nov 28 booking. Alex is not stopped, so limit 8 reads no yes here and checks the row as any other (a reply in the same turn, Q-15); were he stopped, this row would never turn his texts back on (T-1099: notFromContact; S13-32 lines 7214, 7215, 7242)."
+  },
+  "request": {
+    "outboxRowId": "out-alex-booked-riley"
+  },
+  "outcome": {
+    "result": "sendState",
+    "outboxRowId": "out-alex-booked-riley",
+    "rowState": "sending",
+    "rowVersion": 3,
+    "readAt": "2026-11-07T15:06:41Z",
+    "recipient": { "handleId": "handle-alex", "kind": "phone", "address": "+15555550101", "personId": "person-alex" },
+    "phone": {
+      "number": "+15555550101",
+      "stopped": false,
+      "stopAt": null,
+      "chatOpen": true,
+      "chatWay": "imessage",
+      "linqContactAddedAt": "2026-10-12T16:20:00Z",
+      "pollVotedAt": "2026-10-23T14:06:10Z",
+      "optoutLineDeliveredAt": "2026-10-12T16:20:00Z",
+      "version": 3
+    },
+    "chat": null,
+    "textsConsent": {
+      "consentId": "consent-alex-texts-nov28",
+      "businessId": "biz-lees-barbershop",
+      "revoked": false,
+      "at": "2026-11-07T15:06:40Z",
+      "fromContact": false,
+      "bookingId": "booking-alex-riley-nov28"
+    },
+    "audience": "customer",
+    "zone": "America/New_York",
+    "visitZone": null,
+    "businessZone": "America/New_York",
+    "textHours": { "start": "08:00", "end": "20:00" },
+    "textHoursOverride": false,
+    "currentVersions": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }],
+    "booking": {
+      "id": "booking-alex-riley-nov14",
+      "stage": "booked",
+      "servedPersonId": "person-alex",
+      "private": false,
+      "deceased": false,
+      "version": 1
+    },
+    "pauses": [],
+    "openQuestion": null,
+    "closed": { "booking": false, "question": false }
+  }
+}

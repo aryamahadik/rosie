@@ -5,7 +5,7 @@
     "after": [],
     "now": "2026-10-22T22:00:00Z",
     "stated": { "step": "A7-01", "gives": [] },
-    "note": "Refused: the reminder's answer carrying the check-in code: the code reaches only its person, through the slot filler (K-03 visit.code; v1.4 default 119; README default 131), never an answer. Without checkInCode it is j7-reminder-job, accepted."
+    "note": "Refused: the reminder's answer carrying the check-in code: the code reaches only its person, through the slot filler (K-03 visit.code; v1.4 default 119; README default 149), never an answer. Without checkInCode it is j7-reminder-job, accepted."
   },
   "request": {
     "caller": {

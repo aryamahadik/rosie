@@ -5,7 +5,7 @@
     "after": [],
     "now": "2026-10-24T14:30:00Z",
     "stated": { "step": "A7-14", "gives": [] },
-    "note": "A7-14: Sat Oct 24 at 10:30am, after the day list, Riley texts 'LATE 20'. In Riley's turn's commit: one K-31 late_reports row (20 minutes), fanned out by code to Riley's later visits that day (K-31 visit_events), here only Alex's 11:00am: Alex is told his own new start and nothing about anyone else's visit ('Riley is running about 20 minutes late, so your 11:00am starts about 11:20am. No reply means the later start is fine. Moving or cancelling is free. / Reply 1 That's fine, 2 Move my visit, 3 Call off, no fee.'), visit_now since the visit is today, its question clock the visit's start. bookingId is null: one LATE is about the worker's day (README default 137). No key. The ids are examples."
+    "note": "A7-14: Sat Oct 24 at 10:30am, after the day list, Riley texts 'LATE 20'. In Riley's turn's commit: one K-31 late_reports row (20 minutes), fanned out by code to Riley's later visits that day (K-31 visit_events), here only Alex's 11:00am: Alex is told his own new start and nothing about anyone else's visit ('Riley is running about 20 minutes late, so your 11:00am starts about 11:20am. No reply means the later start is fine. Moving or cancelling is free. / Reply 1 That's fine, 2 Move my visit, 3 Call off, no fee.'), visit_now since the visit is today, its question clock the visit's start. bookingId is null: one LATE is about the worker's day (README default 155). No key. The ids are examples."
   },
   "request": {
     "caller": {

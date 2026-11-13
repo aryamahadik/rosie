@@ -5,7 +5,7 @@
     "after": ["j7-cancel-ask-turn.json"],
     "now": "2026-10-23T13:32:00Z",
     "stated": { "step": "A7-05", "gives": [] },
-    "note": "Refused by journeySevenGivesNone alone: the cancel's change names the booking's old terms consent (consent-alex-ticked-terms-haircut), not the consent this commit wrote from Alex's second yes, so the change is not bound to the yes that made it (README default 129). With approvedBy consent-alex-cancel-oct23 it is j7-cancel-confirm-turn, accepted."
+    "note": "Refused by journeySevenGivesNone alone: the cancel's change names the booking's old terms consent (consent-alex-ticked-terms-haircut), not the consent this commit wrote from Alex's second yes, so the change is not bound to the yes that made it (README default 147). With approvedBy consent-alex-cancel-oct23 it is j7-cancel-confirm-turn, accepted."
   },
   "request": {
     "caller": {

@@ -1,0 +1,21 @@
+{
+  "call": "verifyWebhook",
+  "given": {
+    "now": "2026-10-23T18:30:04Z",
+    "note": "verify-reply-received.json's webhook with one byte of its signature changed: rejected badSignature, 401, dropped; no reply is read and no event is written (arch 02 line 109).",
+    "signing": "oneByteChanged"
+  },
+  "request": {
+    "webhookId": "evt-email-alex-0001",
+    "timestamp": "1792780203",
+    "signature": "v1,signed-at-test-time",
+    "raw": "{\"type\":\"email.received\",\"created_at\":\"2026-10-23T18:30:03.020Z\",\"data\":{\"email_id\":\"resend-in-demo-alex-0001\",\"created_at\":\"2026-10-23T18:30:00.412Z\",\"from\":\"alex@example.com\",\"to\":[\"booking-alex-haircut@reply.example.com\"],\"cc\":[],\"bcc\":[],\"received_for\":[\"booking-alex-haircut@reply.example.com\"],\"message_id\":\"email-msg-demo-alex-0001\",\"subject\":\"Re: Your haircut at Lee's Barbershop\",\"attachments\":[]}}",
+    "receivedAt": "2026-10-23T18:30:04Z",
+    "traceId": "trace-email-alex-0001"
+  },
+  "outcome": {
+    "result": "rejected",
+    "httpStatus": 401,
+    "reason": "badSignature"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "call": "sendEmail",
+  "given": {
+    "now": "2026-11-07T15:25:01Z",
+    "note": "Alex's S12-10 email (send-fallback-s12-10.json) on a day the account's daily quota is used up (Resend Free: 100 emails a day; J-14, Q-23): a 429 daily_quota_exceeded, which resets at midnight UTC, so no try within the 15 minutes clears it; the row fails and the next way follows, here none, so the owner gets the number to call (K-07 rule 5; S12-10)."
+  },
+  "request": {
+    "idempotencyKey": "out-alex-confirm-by-email/1/1",
+    "purpose": "nextWay",
+    "bookingId": "booking-alex-riley-nov14",
+    "from": {
+      "name": "Lee's Barbershop",
+      "address": "rosie@mail.rosfield.com"
+    },
+    "to": "alex@example.com",
+    "replyTo": "booking-alex-riley-nov14@reply.example.com",
+    "subject": "Booked: Sat Nov 14, 11:00am",
+    "text": "This is Rosie, the automated booking assistant for Lee's Barbershop.\n\nTexts are delayed, so this comes by email.\nYou're booked with Riley at Lee's Barbershop.\nSat Nov 14, 11:00am\n\nManage your booking: https://example.com/m/b14",
+    "assistantLine": "This is Rosie, the automated booking assistant for Lee's Barbershop.",
+    "manageLink": "https://example.com/m/b14",
+    "chatLink": null,
+    "thread": {
+      "inReplyTo": null,
+      "references": []
+    }
+  },
+  "outcome": {
+    "result": "failed",
+    "kind": "quotaReached",
+    "httpStatus": 429,
+    "code": "daily_quota_exceeded",
+    "reason": "The daily sending quota is used up; it resets at midnight UTC.",
+    "retryAfterSeconds": null
+  }
+}

@@ -9,7 +9,9 @@
 // checks only parts that carry values; what it returns holds no person's words; the shipped limit sits in slot 6 and
 // reads only through the call's database. Round 2 (DL-184): words cut out of a longer word or number are carried by no
 // text (the security review's six cases fail, their whole forms pass), and a value failing on a door, an any-time row or
-// a hub case changes nothing once its question was asked again.
+// a hub case changes nothing once its question was asked again. T-1183 (DL-364): K-02 v1.1's sign-up door, as K-09
+// v1.5's commit-s1-01.json gives it, passes with no value and nothing read; a field it carried would be re-parsed; each
+// of K-01's five doors with no field is still not checked.
 
 import { describe, expect, it } from "vitest";
 
@@ -35,6 +37,14 @@ import {
   twoRequests,
   type LimitCall,
 } from "../framework/test-support";
+import {
+  K01_DOORS,
+  SIGN_UP_FIXTURE,
+  enteringDoor,
+  k01Door,
+  signUpDoor,
+  unknownDoor,
+} from "../limit-1/test-support";
 import { LIMITS } from "../limits";
 import {
   limit6,
@@ -63,6 +73,7 @@ import {
   askedAbout,
   decidedIn,
   exchangeRequest,
+  field,
   groupRequest,
   haircutMoveRequest,
   limitIn,
@@ -491,6 +502,62 @@ describe("limit 6 checks only parts that carry values", () => {
         ["price", "noText"],
       ]),
     );
+  });
+});
+
+describe("T-1183: K-02 v1.1's sign-up door with no field passes limit 6, and every other door answers as before (DL-364)", () => {
+  it("commit-s1-01.json's part: Sam entering the sign-up door passes, as the fixture states, with no zone, place or photo read", async () => {
+    const zones: string[] = [];
+    const places: VisitRef[] = [];
+    const photos: FieldRef[] = [];
+    const world: World = {
+      zones: seedBusinessZones(zones),
+      places: placesOf({}, places),
+      photos: photosOf({}, photos),
+    };
+    const request = exchangeRequest(SIGN_UP_FIXTURE);
+    expect(await decision(world, request)).toEqual({ result: "pass" });
+    expect([zones, places, photos]).toEqual([[], [], []]);
+    // The shipped limit, over a repo that is no database: a read would throw.
+    expect(await limit6.decide(partOf(request), turnOf(request))).toEqual({ result: "pass" });
+    expect(await limit6.check(partOf(request), turnOf(request))).toEqual({ result: "pass" });
+    expect(committedOf(SIGN_UP_FIXTURE).parts[0]?.limits[5]).toEqual({
+      limit: 6,
+      result: "pass",
+      outcome: null,
+    });
+  });
+
+  it("a sign-up door that carried a field would have its value re-parsed as any part's: words the text does not carry fail, words it carries pass", async () => {
+    const citing = (cited: ReturnType<typeof field>): GateRequest => {
+      const request = enteringDoor({ ...signUpDoor(), fields: [{ name: "kinds", type: "text" }] });
+      const said = decidedIn(request).decide.parts.at(0)?.part;
+      if (said?.verb !== "enter") throw new Error("the door is entered");
+      said.fields = [cited];
+      return request;
+    };
+    expect(await decision({}, citing(field("kinds", "Plumbing", "plumbing")))).toEqual(
+      failed(oneQuestionOutcome(), [["kinds", "noText"]]),
+    );
+    expect(await decision({}, citing(field("kinds", "Barbershop", "barbershop")))).toEqual({
+      result: "pass",
+    });
+  });
+
+  it("each of K-01's five doors with no field, a door the gate does not know and a sign-up door on a booking are not checked, as before, with nothing read", async () => {
+    const door = signUpDoor();
+    const doors = [
+      ...K01_DOORS.map(([value, step]) => k01Door(value, step)),
+      unknownDoor(),
+      { ...door, target: { ...door.target, bookingId: HAIRCUT } },
+    ];
+    for (const each of doors) {
+      const request = enteringDoor(each);
+      expect({ door: each.door, decided: await limit6.decide(partOf(request), turnOf(request)) }).toEqual({
+        door: each.door,
+        decided: { result: "notChecked" },
+      });
+    }
   });
 });
 

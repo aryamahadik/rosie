@@ -1,7 +1,9 @@
-// Test support for decide's tests (T-368): the bundles they read on, with this task's decide prompt packed in; the K-02
-// v1 contexts the decide fixtures were read from; recordings for the recorded-model double (T-004); and a fake Messages
-// API that answers each step from the double's read, as the two-step wire form splits it. No network, no key, no live
-// call (J-02; DL-027: CI makes none). Never imported by the Worker.
+// Test support for decide's tests (T-368, T-369, T-370): the bundles they read on, with this task's decide prompt packed
+// in; the K-02 v1 contexts the decide fixtures were read from; recordings for the recorded-model double (T-004); a fake
+// Messages API that answers each step from the double's read, as the two-step wire form splits it; for the two reads,
+// each bundle's routing policy and a fake that answers each read from its own answers; and, for the re-read, a fake
+// that answers the two reads and then the re-read. No network, no key, no live call (J-02; DL-027: CI makes none).
+// Never imported by the Worker.
 //
 // K-02 v1 gives a context for two of its decide fixtures (context-s1-02.json, context-two-requests.json). For the others
 // this file writes the context each one's reads were made from: its turn id and bundle id (the double refuses a seed
@@ -16,14 +18,16 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { createPromptCache, type CacheBundle, type CacheFlow, type PromptCache } from "../cache";
-import { fakeCachingApi, type FakeCachingApi } from "../cache/test-support";
+import { fakeCachingApi, type FakeCachingApi, type FakeCall } from "../cache/test-support";
 import type { Choice, DecideContext, OpenQuestion, Target, TurnText } from "../context";
 import { escapeData } from "../context";
 import { KEY_VARIABLE, type FetchLike, type GatewayBundle } from "../gateway";
 import type { JsonObject } from "../recorded-double";
+import { createRouter, type RoutingBundle, type RoutingPolicy, type TurnRoute } from "../routing";
 import { DECIDE_PROMPT } from "./prompt";
 import { createDecideReader } from "./read";
-import type { DecideReader } from "./types";
+import { createDecider } from "./two-reads";
+import type { DecideReader, Decider } from "./types";
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 
@@ -90,6 +94,37 @@ export const ENV = Object.freeze({ [KEY_VARIABLE]: KEY });
 export function readerFor(context: DecideContext, fetch: FetchLike): DecideReader {
   const bundle = bundleOf(context);
   return createDecideReader({ bundle: gatewayBundle(bundle), prompts: promptsFor(bundle), env: ENV, fetch });
+}
+
+/** A sample bundle's K-01 v1 manifest as the router reads it: its id, its two model ids and its routing policy. */
+export function routingBundle(bundle: Bundle): RoutingBundle {
+  const manifest = bundle.manifest as Bundle["manifest"] & { policy?: RoutingPolicy };
+  if (manifest.policy === undefined)
+    throw new Error("a K-01 sample bundle's manifest holds its routing policy");
+  return { bundleId: manifest.bundleId, models: manifest.models, policy: manifest.policy };
+}
+
+/** Decide's two reads on a context's own bundle, sending through `fetch` (T-369). */
+export function deciderFor(context: DecideContext, fetch: FetchLike): Decider {
+  const bundle = bundleOf(context);
+  return createDecider({ bundle: routingBundle(bundle), prompts: promptsFor(bundle), env: ENV, fetch });
+}
+
+/** A seed source giving exactly these seeds, in order; a route that draws more fails the test. */
+export function drawFrom(seeds: readonly number[]): () => number {
+  let next = 0;
+  return () => {
+    const seed = seeds[next];
+    if (seed === undefined)
+      throw new Error(`the test gave ${String(seeds.length)} seeds and a route drew more`);
+    next += 1;
+    return seed;
+  };
+}
+
+/** The route decide's two reads take for a context with these seeds: the router gives one route for one draw. */
+export function routeOf(context: DecideContext, seeds: readonly number[]): TurnRoute {
+  return createRouter(routingBundle(bundleOf(context))).route(context, { draw: drawFrom(seeds) });
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -499,11 +534,11 @@ export const rolesOf = (fixture: { reads: { role: string }[] }): string[] =>
 
 /**
  * The double's recordings for the written contexts, each read seeded from its K-02 fixture, and the made-up reads given
- * as `output` (a live recording's form), each against its own context.
+ * as `output` (a live recording's form), each against its own context, in its role (first unless it names one).
  */
 export function writtenRecordings(
   roles: Readonly<Record<string, readonly string[]>>,
-  madeUp: readonly { id: string; context: DecideContext; output: JsonObject }[],
+  madeUp: readonly { id: string; context: DecideContext; output: JsonObject; role?: string }[],
 ): JsonObject {
   return {
     version: "v1",
@@ -517,10 +552,10 @@ export function writtenRecordings(
           seed: { fixture },
         })),
       ),
-      ...madeUp.map(({ id, context: own, output }) => ({
+      ...madeUp.map(({ id, context: own, output, role }) => ({
         id,
         kind: "decideRead",
-        request: { context: own as unknown as JsonObject, role: "first" },
+        request: { context: own as unknown as JsonObject, role: role ?? "first" },
         output,
       })),
     ],
@@ -576,17 +611,102 @@ export interface FakeDecideOptions {
   readonly write?: (answer: unknown) => unknown;
 }
 
+/** The answer to one request from a read's step answers: step 1's, or step 2's for its part. */
+function stepAnswer(answers: StepAnswers, body: Raw): unknown {
+  const step = stepOf(body);
+  if (step.n === 1) return answers.step1;
+  const answer = answers.step2[step.part - 1];
+  if (answer === undefined || answer === null) throw new Error(`no step 2 for part ${String(step.part)}`);
+  return answer;
+}
+
 /** A fake Messages API with Anthropic's prompt cache (T-364's), answering each step from `answers`. */
 export function fakeDecideApi(answers: StepAnswers, options: FakeDecideOptions = {}): FakeCachingApi {
   const write = options.write ?? ((answer: unknown): unknown => answer);
   return fakeCachingApi({
-    answer: (body) => {
-      const step = stepOf(body);
-      if (step.n === 1) return write(answers.step1);
-      const answer = answers.step2[step.part - 1];
-      if (answer === undefined || answer === null) throw new Error(`no step 2 for part ${String(step.part)}`);
-      return write(answer);
-    },
+    answer: (body) => write(stepAnswer(answers, body)),
     ...(options.fail !== undefined && { fail: options.fail }),
   });
+}
+
+/** The choice ids a request's per-turn part lists, in its order (T-367 writes each as `<choice id="...">`). */
+export const choiceIdsOf = (user: string): string[] =>
+  [...user.matchAll(/<choice id="([^"]*)"/gu)].map((match) => match[1] ?? "");
+
+/**
+ * Which of a route's two reads a request is for, told by the order its per-turn part lists the choices in: each read's
+ * own seed's order, which the router keeps apart for two choices or more (T-363). Throws for a request in neither.
+ */
+export function readOfRequest(route: TurnRoute, body: Raw): "first" | "check" {
+  const order = choiceIdsOf(userOf(body)).join(" ");
+  const [first, check] = route.reads;
+  const isFirst = order === first.choiceOrder.join(" ");
+  const isCheck = order === check.choiceOrder.join(" ");
+  if (isFirst === isCheck)
+    throw new Error("the request lists the choices in neither read's order, or in both");
+  return isFirst ? "first" : "check";
+}
+
+/** The step answers of each of a turn's two reads. */
+export interface TwoReadAnswers {
+  readonly first: StepAnswers;
+  readonly check: StepAnswers;
+}
+
+/** A fake Messages API with Anthropic's prompt cache, answering each request from the answers of the read it is for. */
+export function fakeTwoReadApi(
+  route: TurnRoute,
+  answers: TwoReadAnswers,
+  options: FakeDecideOptions = {},
+): FakeCachingApi {
+  const write = options.write ?? ((answer: unknown): unknown => answer);
+  return fakeCachingApi({
+    answer: (body) => write(stepAnswer(answers[readOfRequest(route, body)], body)),
+    ...(options.fail !== undefined && { fail: options.fail }),
+  });
+}
+
+/** A fake Messages API for a turn's decide stage: its two reads, then its one re-read (T-370). */
+export interface FakeTurnApi extends FakeCachingApi {
+  /** From now on every request is the turn's re-read, answered from these step answers. */
+  rereadWith(answers: StepAnswers): void;
+  /** From now on the requests are the two reads' again: decide reads the turn once more (a rerun of it). */
+  twoReadsAgain(): void;
+  /** The requests sent since `rereadWith`, in order: the re-read's; none before it is called. */
+  rereadCalls(): FakeCall[];
+}
+
+/**
+ * One fake Messages API with Anthropic's prompt cache for a whole decide stage, so the re-read meets the cache the two
+ * reads left: each request is answered from the answers of the read it is for (told apart by the order its per-turn part
+ * lists the choices in), until `rereadWith` names the re-read's answers; every request after it is the re-read's. The
+ * re-read runs only once both reads are back, so the two never mix.
+ */
+export function fakeTurnApi(
+  route: TurnRoute,
+  answers: TwoReadAnswers,
+  options: FakeDecideOptions = {},
+): FakeTurnApi {
+  const write = options.write ?? ((answer: unknown): unknown => answer);
+  let reread: StepAnswers | null = null;
+  let from = 0;
+  const api = fakeCachingApi({
+    answer: (body) =>
+      write(
+        reread === null ? stepAnswer(answers[readOfRequest(route, body)], body) : stepAnswer(reread, body),
+      ),
+    ...(options.fail !== undefined && { fail: options.fail }),
+  });
+  return {
+    fetch: api.fetch,
+    calls: api.calls,
+    rereadWith(next: StepAnswers): void {
+      reread = next;
+      from = api.calls.length;
+    },
+    twoReadsAgain(): void {
+      reread = null;
+    },
+    rereadCalls: (): FakeCall[] => (reread === null ? [] : api.calls.slice(from)),
+  };
 }

@@ -1,0 +1,31 @@
+{
+  "call": "bookingConfirm",
+  "given": {
+    "now": "2026-10-21T22:40:05Z",
+    "environment": "staging",
+    "after": ["booking-teen-read-back.json"],
+    "note": "The teen's yes: the page entry calls K-09 v1.2 setWhoFor alone (caller.kind page, personId null), A4-80's answer self, under_18, under13 false, as tool-api/fixtures/j4-who-for-teen-parent-link-agent.json does for a teen's AI: the barbershop's plug-in has no private teen booking (A4-90), so a parent must book: teenParentLink. Nothing about the teen is kept and the request ends (RULES 4.7; K-09 v1.2 README default 60). The parent's link, the business's booking page with no row, comes once in the answer (K-09 v1.2 README default 73; README default 62); Rosie never texts the parent. The page shows A4-96's own words: 'A parent or guardian needs to book this for you. Send them this link, and they can pick a time. Nothing was saved.' The link is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-teen-0004",
+      "traceId": "trace-page-teen-0004",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-teen-1",
+      "requestRef": "reqref-page-lees-0031"
+    },
+    "readBackId": "rb-page-teen-who-for-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-teen-who-for-1",
+    "yesEventId": "pageyes-teen-who-for-1",
+    "served": {
+      "change": "whoFor",
+      "outcome": "teenParentLink",
+      "private": false,
+      "parentLink": { "url": "rosfield.com/c/placeholder-parent-link" },
+      "requestEnded": true
+    }
+  }
+}

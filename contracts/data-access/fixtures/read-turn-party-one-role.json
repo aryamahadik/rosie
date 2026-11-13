@@ -1,0 +1,18 @@
+{
+  "call": "readTurnParty",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-10-21T13:00:03Z",
+    "note": "A person with one live role: Riley, a barber at Lee's Barbershop (K-04's seed-person-roles.json: role-riley-barber, staff, ended_at null), texts from handle-riley, which Riley alone writes from. That one live role names one business, and Riley owns no company, so the turn runs under the barbershop, with Riley as the person and the barbershop's zone (item 52, default 98)."
+  },
+  "request": {
+    "handle": { "kind": "phone", "address": "+15555550102" }
+  },
+  "outcome": {
+    "handleId": "handle-riley",
+    "businessId": "biz-lees-barbershop",
+    "personId": "person-riley",
+    "zone": "America/New_York"
+  }
+}

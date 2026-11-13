@@ -1,0 +1,7 @@
+{
+  "error": "businessUndecided",
+  "reason": "severalBusinesses",
+  "handleId": "handle-sam",
+  "personId": "person-sam",
+  "businessIds": ["biz-lees-barbershop", "biz-movers", "biz-yoga-studio"]
+}

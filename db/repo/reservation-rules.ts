@@ -70,7 +70,8 @@
 //      alreadyExtended (default 1); a time with 2 others is notHeld with its state, held (NotHeldError: "its end has
 //      passed").
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1";
-import { isLostConnection } from "./bundles";
+import { reserveConnection } from "./bundles";
+import { transientOrScrubbed } from "./clocks";
 import {
   holdMinutesFor,
   reserve as reserveSaving,
@@ -81,7 +82,7 @@ import {
   type ReserveRequest,
 } from "./reservations";
 import { assertBusinessId, SCOPE_SETTING, type Sql, type Tx } from "./scope";
-import { assertRequestShape, transientOrThrow, utc } from "./targets";
+import { assertRequestShape, foundGone, utc } from "./targets";
 
 export {
   getReservation,
@@ -330,9 +331,16 @@ export async function extendIn(tx: Conn, request: ExtendRequest): Promise<Extend
 
 /**
  * One transaction on one reserved connection, scoped to `businessId` (set_config inside it, is_local), read committed:
- * reservations.ts's inScopedTransaction. A lost connection is rethrown without a rollback (the server rolled the
- * transaction back when the backend went) and is never released (postgres.js 3.4.9 would put it back in the open
- * queue); the pre-probe takes the stale error a killed connection keeps before a connection is reserved.
+ * reservations.ts's inScopedTransaction. A connection found gone (targets.ts's foundGone, as inRuntimeTransaction
+ * decides it: a lost connection, or a statement's failure that is a session's failure or answers 08001; T-1350) is
+ * rethrown without a rollback (the server rolled the transaction back when the backend went) and is never released
+ * (postgres.js 3.4.9 would put it back in the open queue); an error fn makes itself is rolled back and released. A
+ * connection that closes while idle between fn's statements is met as a statement's failure too (T-1330's note d): fn
+ * awaits nothing but statements on this connection, so its next statement is in flight before Node delivers the
+ * socket's error or close, and postgres.js rejects it with that error. The pre-probe takes the stale error a killed
+ * connection keeps before a connection is reserved. The connection is reserved through bundles.ts's reserveConnection
+ * (T-1334), so a reserve() that never connects leaves as a connection that never opened, the code 08001 alone, which
+ * extend answers transient, never as postgres.js raises it.
  */
 async function inBusinessTransaction<T>(
   sql: Sql,
@@ -341,7 +349,7 @@ async function inBusinessTransaction<T>(
 ): Promise<T> {
   assertBusinessId(businessId);
   await sql`select 1`;
-  const reserved = await sql.reserve();
+  const reserved = await reserveConnection(sql);
   let lost = false;
   try {
     await reserved`begin`;
@@ -350,7 +358,7 @@ async function inBusinessTransaction<T>(
       await reserved`select set_config(${SCOPE_SETTING}, ${businessId}, true)`;
       result = await fn(reserved);
     } catch (error) {
-      if (!isLostConnection(error)) {
+      if (!foundGone(error)) {
         await reserved`rollback`;
       }
       throw error;
@@ -358,7 +366,7 @@ async function inBusinessTransaction<T>(
     await reserved`commit`;
     return result;
   } catch (error) {
-    lost = isLostConnection(error);
+    lost = foundGone(error);
     throw error;
   } finally {
     if (!lost) {
@@ -377,6 +385,9 @@ export async function extend(sql: Sql, request: ExtendRequest): Promise<ExtendOu
   try {
     return await inBusinessTransaction(sql, request.businessId, (tx) => extendIn(tx, request));
   } catch (error) {
-    return transientOrThrow(error);
+    // A statement's own refusal and postgres.js's statement errors leave scrubbed too: the call's name and the code
+    // alone (a database rule's refusal keeps its table's and constraint's names), never the statement's values (T-1322;
+    // clocks.ts transientOrScrubbed).
+    return transientOrScrubbed("extend", error);
   }
 }

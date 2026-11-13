@@ -1,6 +1,6 @@
 // The clock rows, run inside the Workers runtime (T-254). The handle actor is the real Durable Object
 // (`exports.HandleActor`, its alarm fired with `runDurableObjectAlarm`); the minute sweep is the Worker's own scheduled
-// handler (runtime/src/index.ts), handed the actor namespace, since env.staging has no HANDLE_ACTOR until T-566; the fake
+// handler (runtime/src/index.ts), handed the actor namespace (env.staging also binds HANDLE_ACTOR since T-566); the fake
 // clock is the actor's stored schedule's (`setBatchHooks`), so "due" is tested against it, and the sweep's now is the
 // cron's scheduled time. Doubles: src/clocks/test-support.ts (K-05 dueClocks, K-09 gateAndCommit over K-05 fireClock's
 // rules, readActiveBundle, the directory). Test method: T-1128's (runtime/src/spikes/do-test-pool/FINDINGS.md). Test

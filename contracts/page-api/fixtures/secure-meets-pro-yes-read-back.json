@@ -1,0 +1,27 @@
+{
+  "call": "secureReadBack",
+  "given": {
+    "now": "2026-11-02T15:20:00Z",
+    "environment": "staging",
+    "after": ["secure-meets-pro-confirm.json"],
+    "note": "B4-27 on the adult's own forwarded link (the code of secure-meets-pro-confirm.json's link): the page entry finds that link by its code's hash, so the call acts for that adult, never Alex (K-30 rule 5; README default 49), and their page asks only their mobile and their yes to texts. They type their mobile. Nothing is written: the read-back's words are the yes they are asked to give, which become the K-29 texts consent's exact words if they say yes (RULES 2.5, 7.1; README default 48), as K-09's j4-meets-pro-yes-page.json shows them. The mobile is K-09's example in the 555-01xx range; the read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-meets-pro-0001",
+      "traceId": "trace-page-meets-pro-0001",
+      "linkCode": "placeholder-meets-pro-code-0027"
+    },
+    "change": { "kind": "meetsProYes", "mobile": "+15555550147" }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-meets-pro-yes-1",
+    "stepId": "B4-27",
+    "questionId": null,
+    "words": "Get texts from Rosie about this visit from Lee Home Services, with the check-in code? Reply STOP to opt out. Msg & data rates may apply.",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-11-02T15:30:00Z"
+  }
+}

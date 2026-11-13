@@ -1,0 +1,25 @@
+{
+  "call": "bookingConfirm",
+  "given": {
+    "now": "2026-10-21T23:15:44Z",
+    "environment": "staging",
+    "after": ["booking-page-start.json", "booking-service-haircut.json", "booking-place-read-back.json"],
+    "note": "Alex's yes to the place read-back: the page entry makes the yes's event and calls K-09 v1.2 matchService alone (caller.kind page, personId null), place step A4-01 with the shop way and the head's version kept with the read-back, as tool-api/fixtures/j4-place-other-flow-agent.json picks a place for an AI. The way is flow A's, the request's own, so the flow does not change; the way is kept with requestRef (K-09 v1.2 README defaults 57, 75). No key. The yes event's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0014",
+      "traceId": "trace-page-lees-0014",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "readBackId": "rb-page-lees-place-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-lees-place-1",
+    "yesEventId": "pageyes-lees-place-1",
+    "served": { "change": "place", "flow": "A", "flowChanged": false }
+  }
+}

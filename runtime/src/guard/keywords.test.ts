@@ -227,7 +227,7 @@ describe("only typed words count", () => {
     expect(keywordOf(typed("", "photo"), list)).toBeNull();
   });
 
-  it("a reaction, a poll vote and a vote removed are never keywords (a vote answers its own poll)", () => {
+  it("a vote's body is never read for a keyword (DL-540: a vote is read by its option's words), and a reaction or a vote taken back is never a keyword", () => {
     for (const kind of ["reaction", "pollVote", "voteRemoved"]) {
       const text: GuardText = { eventId: `evt-${kind}`, kind, words: { body: "STOP", subject: null } };
       expect(keywordOf(text, list), kind).toBeNull();
@@ -251,5 +251,42 @@ describe("only typed words count", () => {
   it("no words, blank words or only punctuation are not a keyword", () => {
     for (const body of ["", "   ", "!!!", "🛑", "?"]) expect(kindOf(body), body).toBeNull();
     expect(keywordOf({ eventId: "evt-none", kind: "text", words: null }, list)).toBeNull();
+  });
+});
+
+describe("a poll vote is read by its option's words, from its box (DL-540; T-1297)", () => {
+  /** A vote as the turn and the down path open it: K-06 v1.2's box, its option's words and no body. */
+  const vote = (optionWords: string | null, kind = "pollVote"): GuardText => ({
+    eventId: `evt-vote-${kind}`,
+    kind,
+    words: { body: null, subject: null, optionWords },
+  });
+
+  it.each(OPT_OUT)(
+    "a vote for an option that reads %s, in any case and with trailing punctuation, is a stop",
+    (word) => {
+      for (const form of typedForms(word)) {
+        expect(keywordOf(vote(form), list), JSON.stringify(form)).toEqual({
+          kind: "stop",
+          word,
+          flagsVisit: FLAGS_VISIT.includes(word),
+        });
+      }
+    },
+  );
+
+  it("START and HELP as an option's words are read as START and HELP", () => {
+    expect(keywordOf(vote("Start"), list)?.kind).toBe("start");
+    expect(keywordOf(vote("help?"), list)?.kind).toBe("help");
+  });
+
+  it("an option of other words is not a keyword: Rosie's own (poll-vote.json's 'Sat 2:00pm'), or one with a stop word inside it", () => {
+    for (const words of ["Sat 2:00pm", "Please stop texting me", "cancel my 2pm haircut", "", "   ", null]) {
+      expect(keywordOf(vote(words), list), String(words)).toBeNull();
+    }
+  });
+
+  it("a vote taken back is never a keyword, whatever its option's words", () => {
+    expect(keywordOf(vote("STOP", "voteRemoved"), list)).toBeNull();
   });
 });

@@ -8,16 +8,20 @@
 //      frontier, or any other field, or a term whose words hold "{{" (DL-163), is a typed refusal before any call.
 //   2. One call through the AI gateway (T-361) with T-364's cache markers, Haiku first: the bundle's composer prompt
 //      (T-372, K-01 manifest.prompts.composer) is the cached system prompt, and the row's tagged input
-//      (composeInputText, every value escaped as data: S13-54 rule 67) is the per-turn part. The structured-output
-//      schema is K-03's plan, bundled and static (schema.ts). The gateway retries Haiku once, then asks Sonnet once,
-//      then answers modelsDown.
+//      (composeInputText, every value escaped as data: S13-54 rule 67; a person's private words only as "a private
+//      detail": T-375, ./relay/private.ts) is the per-turn part, with code's situation tag and language as they are.
+//      The structured-output schema is K-03's plan, bundled and static (schema.ts). The gateway retries Haiku once,
+//      then asks Sonnet once, then answers modelsDown.
 //   3. The answer is checked before it leaves the AI layer (check.ts): a K-03 v1 plan (v1.1 leaves the plan as it is);
 //      its formats from the row's allowedFormats; no number, date or price typed in its words, in digits or in words,
-//      that no fact of the row, a slot fact or a term fact, holds. Any failure is a typed refusal, never a plan.
+//      that no fact of the row, a slot fact or a term fact, holds; then what its reader must read (T-375, ./relay): a
+//      relayed sender quoted through {{relay.quote}} once, never typed; on a gentle row no sample service or name and
+//      no "!"; its words in the row's language. Any failure is a typed refusal, never a plan.
 //
 // Rows of one turn are composed side by side by calling compose once per row (each call is independent). An email copy
-// takes its text row's plan instead of a call (arch 07 line 397); filling slots, fixed lines, the message checks and the
-// one rewrite are the action layer's (C-088, C-089, C-091 to C-093).
+// takes its text row's plan instead of a call (arch 07 line 397); filling slots, fixed lines and the message checks are
+// the action layer's (C-088, C-089, C-091, C-092). The one rewrite, told what failed, is the composer's `rewrite`
+// (./rewrite, T-374), on the same gateway and layout; what follows a second failure is the action layer's (C-093).
 //
 // Each gateway attempt writes its own K-08 portCall span (labels and counts only); the composer writes none of its own,
 // and nothing here logs. A refusal names checks and places, never words (K-08 README line 75). The key is read from the
@@ -28,6 +32,7 @@ import { sameBundleId } from "../cache/bundle";
 import { GatewayConfigError, type GatewayEffort, type ModelRole } from "../gateway";
 import { inputProblems, planAgainstInput } from "./check";
 import { composeInputText } from "./prompt";
+import { createRewrite } from "./rewrite/rewrite";
 import { PLAN_SCHEMA } from "./schema";
 import type {
   ComposeAnswer,
@@ -56,8 +61,10 @@ export function createComposer(options: ComposerOptions): Composer {
   });
   if (!sameBundleId(prompts.bundleId, bundle.bundleId))
     throw new GatewayConfigError("the composer's prompts are of another bundle than its models");
+  const rewrite = createRewrite({ gateway, prompts, role: COMPOSE_ROLE, effort: COMPOSE_EFFORT });
 
   return {
+    rewrite,
     async compose(input: ComposeInput, callOptions: ComposeCallOptions = {}): Promise<ComposeAnswer> {
       // The types say K-03's input; a caller that casts is still refused before any call.
       const before = inputProblems(input);

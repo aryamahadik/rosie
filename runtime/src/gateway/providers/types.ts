@@ -201,12 +201,27 @@ export interface CalendarPort {
 
 // ---- the doors' dependencies --------------------------------------------------------------------------------------------
 
-/** The outside things the Stripe and calendar doors use. */
+/**
+ * The outside things the Stripe and calendar doors use, and each door's body cap. The gateway holds them as
+ * GatewayDeps.providers, so each cap is a config value of the gateway's, beside the page entry's and Linq's (T-1195).
+ */
 export interface ProviderDoors {
   stripe: StripePort;
   stripeBusinesses: StripeBusinessLookup;
   calendar: CalendarPort;
   events: ProviderEventStore;
+  /**
+   * The most bytes a Stripe webhook's body may have (a config value, T-1195; ../body.ts): over it, the webhook is answered
+   * 413 before its body is read whole and before any signature check, and nothing is verified or stored. Left out, or not
+   * a whole number from 0, it is STRIPE_BODY_LIMIT_BYTES (256 KiB).
+   */
+  stripeBodyLimitBytes?: number;
+  /**
+   * The most bytes a calendar push's body may have, at Google's door and Graph's (a config value, T-1195; ../body.ts):
+   * over it, the push is answered 413 before its body is read whole and before it is checked, and nothing is stored.
+   * Left out, or not a whole number from 0, it is CALENDAR_BODY_LIMIT_BYTES (256 KiB, T-1201).
+   */
+  calendarBodyLimitBytes?: number;
 }
 
 /** The doors with the trace's needs: the active bundle id read at receipt and the clock. */

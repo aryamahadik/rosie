@@ -1,30 +1,40 @@
 // T-220: K-05 v1.2's sendState, limit 8's read of a recipient's send state, against local PostgreSQL
 // (`npm run db:up`; `npm run test:integration -- db/repo/send-state`). The schema comes from migrating a fresh test
-// schema.
+// schema. T-1216: K-05 v1.8's item 47, the texts row's fromContact and bookingId (who gave the yes, and for which
+// booking), and every v1.8 sendState fixture.
 //
 // Every call runs on the runtime side as K-05 v1.2 states it (README line 153): through a client whose connections run
 // as rosie_job (T-191: the dispatcher's role) with no business scope, so the grants and row-level security are the
-// ones limit 8 meets. The tables' owner (the migrations' role) writes the seeds and the state a fixture's `given` names.
+// ones limit 8 meets. That client records every statement it sends (postgres.js `debug`: the text, never the values), so
+// a test reads what the call sent. The tables' owner (the migrations' role) writes the seeds and the state a fixture's
+// `given` names.
 //
 // A fixture's `given.after` names the exchanges that run first (each with its own `given`). reserve (T-187) runs for
-// real. The commit, plan and claim calls (T-195, T-196) are not built yet, so each of those steps writes, directly and
-// as the owner, the rows its exchange states in its request and its outcome: what the reads that follow see. A STOP is
-// committed the way the guard's path will (T-183's setPhoneStopped and T-192's appendConsent in one transaction).
+// real. Each commit, plan and claim step writes, directly and as the owner, the rows its exchange states in its request
+// and its outcome: what the reads that follow see (db/repo/commit-turn.int.test.ts runs every commit exchange through
+// the real commitTurn). A STOP is committed the way the guard's path will (T-183's setPhoneStopped and T-192's
+// appendConsent in one transaction).
+//
+// Every answer is checked against data-access v1.8's sendState.v1dot8Response (the answer a v1.8 call gives: fromContact
+// and bookingId always stated), with Ajv 2020-12, strict, as contracts:check runs it; each exchange against v1.8 and the
+// version its index entry lists.
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { resolvePrimaryUrl } from "./client";
-import { appendConsent } from "./consent";
+import { DataAccessDatabaseError } from "./clocks";
+import { appendConsent, type NewConsent } from "./consent";
 import { setPhoneStopped } from "./phones";
 import { reserve, type ReserveRequest } from "./reservations";
 import { type Sql, type Tx, withBusiness } from "./scope";
 import {
   sendState,
   sendStateIn,
-  type SendStateOutcome,
   type SendStateRequest,
-  type SendStateResponse,
+  type SendStateV1Dot8Outcome,
+  type SendStateV1Dot8Response,
+  type TextsConsentV1Dot8,
   VERSIONED_HOMES,
 } from "./send-state";
 import { createTestDatabase, type TestDatabase } from "./test-db";
@@ -36,10 +46,14 @@ type Step = (sql: Db, exchange: Exchange) => Promise<void>;
 const CONTRACTS = new URL("../../contracts/", import.meta.url);
 const ACCESS_DIR = new URL("data-access/fixtures/", CONTRACTS);
 const CORE_DIR = new URL("db-schema/core/fixtures/", CONTRACTS);
+/** K-29 v1's seeds (the conversations and consent part): each names its K-04 seeds by a path from its own folder. */
+const CONSENT_DIR = new URL("db-schema/conversations-consent/fixtures/", CONTRACTS);
 const RUNTIME_ROLE = "rosie_job";
 const HASH = "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037";
 const ALEX_MOBILE = "+15555550101";
 const ALEX_ROW = "out-alex-booked-riley";
+const BARBERSHOP = "biz-lees-barbershop";
+const NOV14 = "booking-alex-riley-nov14";
 const SLOW = { timeout: 60_000 };
 
 interface Given {
@@ -78,9 +92,8 @@ interface ContractTable {
 const readJson = (url: URL): unknown => JSON.parse(readFileSync(url, "utf8"));
 const exchangeOf = (file: string): Exchange => readJson(new URL(file, ACCESS_DIR)) as Exchange;
 const INDEX = (readJson(new URL("index.json", ACCESS_DIR)) as { fixtures: IndexEntry[] }).fixtures;
-const SEND_STATE_FIXTURES = INDEX.filter((entry) => entry.def === "sendState.exchange").map(
-  (entry) => entry.file,
-);
+const SEND_STATE_ENTRIES = INDEX.filter((entry) => entry.def === "sendState.exchange");
+const SEND_STATE_FIXTURES = SEND_STATE_ENTRIES.map((entry) => entry.file);
 
 const fromHex = (hex: string): Uint8Array =>
   Uint8Array.from((hex.match(/../g) ?? []).map((pair) => parseInt(pair, 16)));
@@ -99,14 +112,18 @@ const ajv = new Ajv2020({ strict: true, strictRequired: false, allErrors: true }
 for (const file of schemaFiles(CONTRACTS)) {
   ajv.addSchema(readJson(file) as object);
 }
-const V12_ID = (readJson(new URL("data-access/data-access.v1.2.schema.json", CONTRACTS)) as { $id: string })
-  .$id;
+/** The $id of data-access at one version (`data-access.<version>.schema.json`, the version an index entry lists). */
+function schemaIdOf(version: string): string {
+  return (readJson(new URL(`data-access/data-access.${version}.schema.json`, CONTRACTS)) as { $id: string })
+    .$id;
+}
+const V18_ID = schemaIdOf("v1.8");
 
-/** Checks `value` against one $defs entry of data-access v1.2, returning Ajv's errors (none when it passes). */
-function schemaErrors(def: string, value: unknown): string[] {
-  const validate = ajv.getSchema(`${V12_ID}#/$defs/${def}`);
+/** Checks `value` against one $defs entry of data-access v1.8, or of the schema given, returning Ajv's errors. */
+function schemaErrors(def: string, value: unknown, schemaId = V18_ID): string[] {
+  const validate = ajv.getSchema(`${schemaId}#/$defs/${def}`);
   if (validate === undefined) {
-    throw new Error(`data-access v1.2 has no $defs/${def}`);
+    throw new Error(`${schemaId} has no $defs/${def}`);
   }
   return validate(value)
     ? []
@@ -119,12 +136,17 @@ let db: TestDatabase;
 /** Connections that run as rosie_job, the runtime side, with this file's schema first. */
 let runtime: Sql;
 let typedColumns: Map<string, string>;
+/** Every statement the runtime client sent, in order (postgres.js debug: the text, never the values). */
+const sent: string[] = [];
 
 beforeAll(async () => {
   db = await createTestDatabase({ name: "send_state" });
   runtime = postgres(resolvePrimaryUrl(), {
     max: 10,
     onnotice: () => undefined,
+    debug: (_connection: number, query: string) => {
+      sent.push(query);
+    },
     connection: {
       application_name: "rosie-t220-send-state",
       search_path: `${db.schema}, public`,
@@ -163,13 +185,14 @@ async function insertRow(sql: Db, table: string, row: Record<string, Json>): Pro
   await sql`insert into ${sql(table)} ${sql(values)}`;
 }
 
-function seedRows(file: string, seen: Set<string>): SeedFile["rows"] {
-  if (seen.has(file)) {
+/** A seed's rows after those of the seeds its `after` names, each path read from the seed's own folder; each seed once. */
+function seedRows(seed: URL, seen: Set<string>): SeedFile["rows"] {
+  if (seen.has(seed.href)) {
     return [];
   }
-  seen.add(file);
-  const seed = readJson(new URL(file, CORE_DIR)) as SeedFile;
-  return [...seed.after.flatMap((before) => seedRows(before, seen)), ...seed.rows];
+  seen.add(seed.href);
+  const file = readJson(seed) as SeedFile;
+  return [...file.after.flatMap((before) => seedRows(new URL(before, seed), seen)), ...file.rows];
 }
 
 /** A fixture's chain: the K-04 seeds of every exchange in it, and the exchanges its `after` runs first, in order. */
@@ -367,20 +390,24 @@ async function claimStep(sql: Db, exchange: Exchange): Promise<void> {
   }
 }
 
-/** The chain steps of calls not built yet, by call: each writes what its exchange states. */
+/** The chain steps of calls this file writes as their exchanges state, by call. */
 const STEPS: Readonly<Record<string, Step>> = {
   commitTurn: commitStep,
   writePlan: writePlanStep,
   claimOutbox: claimStep,
 };
 
-/** Loads a fixture's seeds and runs its chain, so the database holds what its `given` says. */
-async function given(file: string): Promise<Exchange> {
+/**
+ * Loads a fixture's seeds and runs its chain, so the database holds what its `given` says. `partSeeds` are seeds of
+ * another part (K-29's), loaded after the fixture's own K-04 seeds, each seed once.
+ */
+async function given(file: string, partSeeds: readonly URL[] = []): Promise<Exchange> {
   const exchange = exchangeOf(file);
   const chain = chainOf(file);
   await reset();
   const seen = new Set<string>();
-  const rows = chain.seeds.flatMap((seed) => seedRows(seed, seen));
+  const seeds = [...chain.seeds.map((seed) => new URL(seed, CORE_DIR)), ...partSeeds];
+  const rows = seeds.flatMap((seed) => seedRows(seed, seen));
   await db.sql.begin(async (tx) => {
     for (const row of rows) {
       await insertRow(tx, row.table, row.values);
@@ -403,11 +430,12 @@ async function given(file: string): Promise<Exchange> {
   return exchange;
 }
 
-/** The answer, which must be a send state. */
-function stateOf(outcome: SendStateOutcome): SendStateResponse {
+/** The answer, which must be a send state, valid against v1.8's sendState.v1dot8Response (README item 47). */
+function stateOf(outcome: SendStateV1Dot8Outcome): SendStateV1Dot8Response {
   if (!("result" in outcome)) {
     throw new Error(`expected a send state, got ${JSON.stringify(outcome)}`);
   }
+  expect(schemaErrors("sendState.v1dot8Response", outcome)).toEqual([]);
   return outcome;
 }
 
@@ -417,7 +445,7 @@ async function addOutboxRow(values: Record<string, Json>): Promise<void> {
     turn_id: "turn-alex-book-1",
     recipient_handle_id: "handle-alex",
     recipient_person_id: "person-alex",
-    business_id: "biz-lees-barbershop",
+    business_id: BARBERSHOP,
     channel: "imessage",
     send_class: "routine",
     versions_read: [],
@@ -429,19 +457,115 @@ async function addOutboxRow(values: Record<string, Json>): Promise<void> {
   });
 }
 
+/** STOP (true) or START (false) on Alex's mobile, as the guard's path commits it: the flag and the consent row. */
+async function stopOrStart(sql: Db, stopped: boolean, at: string, id: string): Promise<void> {
+  const changed = await setPhoneStopped(sql, ALEX_MOBILE, stopped, { at: new Date(at) });
+  expect(changed?.changed).toBe(true);
+  await appendConsent(sql, {
+    id,
+    personId: "person-alex",
+    businessId: null,
+    kind: "texts",
+    revoked: stopped,
+    handleId: "handle-alex",
+    exactWords: stopped ? "STOP" : "START",
+    at: new Date(at),
+    channel: "text",
+  });
+}
+
+/** A committed turn of a handle, as a commit writes one (K-04 turns), for a consent row to name as its writer. */
+async function addTurn(id: string, handleId: string, at: string): Promise<void> {
+  await insertRow(db.sql, "turns", {
+    id,
+    handle_id: handleId,
+    event_ids: [`evt-${id}`],
+    state: "committed",
+    bundle_hash: HASH,
+    bundle_build: 1,
+    trace_id: `trace-${id}`,
+    committed_at: at,
+  });
+}
+
+/**
+ * Appends a texts consent row (K-29 v1 consents), by default Alex's yes for his mobile at the barbershop, given by text
+ * with no turn, booking or link, with the values given over these.
+ */
+async function addTextsRow(id: string, at: string, values: Partial<NewConsent> = {}): Promise<void> {
+  await appendConsent(db.sql, {
+    id,
+    personId: "person-alex",
+    businessId: BARBERSHOP,
+    kind: "texts",
+    handleId: "handle-alex",
+    exactWords: "Yes, text me about my booking",
+    channel: "text",
+    ...values,
+    at: new Date(at),
+  });
+}
+
+/** The texts row the read gives for an outbox row now (its whole answer checked by stateOf). */
+async function textsRowOf(outboxRowId: string): Promise<TextsConsentV1Dot8 | null> {
+  return stateOf(await sendState(runtime, { outboxRowId })).textsConsent;
+}
+
+/**
+ * The two fields a v1.8 call adds to the texts row of each sendState exchange listed before v1.8 (T-1216's card):
+ * send-state-stopped holds Alex's STOP for every business, which withdraws and names no booking (fromContact false,
+ * bookingId null); the other four hold no texts row, so their answer is their outcome as it stands.
+ */
+const ADDED_IN_V18: Readonly<Record<string, { fromContact: boolean; bookingId: string | null } | null>> = {
+  "send-state-booking-cancelled.json": null,
+  "send-state-customer.json": null,
+  "send-state-no-chat.json": null,
+  "send-state-owner.json": null,
+  "send-state-stopped.json": { fromContact: false, bookingId: null },
+};
+
+/** The answer a v1.8 call gives for an exchange: its outcome, with item 47's two fields added to one listed earlier. */
+function v1dot8AnswerOf(entry: IndexEntry, exchange: Exchange): Record<string, Json> {
+  if (entry.version === "v1.8") {
+    return exchange.outcome;
+  }
+  const added = ADDED_IN_V18[entry.file];
+  if (added === undefined) {
+    throw new Error(`${entry.file}: no v1.8 fields are pinned for this exchange`);
+  }
+  const consent = exchange.outcome.textsConsent;
+  if (added === null) {
+    expect(consent, `${entry.file} holds no texts row`).toBeNull();
+    return exchange.outcome;
+  }
+  if (typeof consent !== "object" || consent === null || Array.isArray(consent)) {
+    throw new Error(`${entry.file}: its outcome holds no texts row`);
+  }
+  return { ...exchange.outcome, textsConsent: { ...consent, ...added } };
+}
+
 // ---- the tests ------------------------------------------------------------------------------------------------------
 
-describe("sendState: each K-05 v1.2 fixture gives its response (K-05 item 28)", () => {
-  it("the index lists limit 8's five exchanges, each valid against data-access v1.2", () => {
+describe("sendState: each K-05 sendState fixture gives its response (v1.2 item 28; v1.8 item 47)", () => {
+  it("the index lists limit 8's nine exchanges, each valid against data-access v1.8 and the version it is listed under", () => {
     expect([...SEND_STATE_FIXTURES].sort()).toEqual([
       "send-state-booking-cancelled.json",
+      "send-state-business-yes.json",
       "send-state-customer.json",
       "send-state-no-chat.json",
+      "send-state-own-start.json",
+      "send-state-own-yes-one-booking.json",
       "send-state-owner.json",
+      "send-state-stop-row.json",
       "send-state-stopped.json",
     ]);
-    for (const file of SEND_STATE_FIXTURES) {
-      expect(schemaErrors("sendState.exchange", exchangeOf(file)), file).toEqual([]);
+    for (const { file, version } of SEND_STATE_ENTRIES) {
+      for (const schemaId of [V18_ID, schemaIdOf(version)]) {
+        expect(
+          schemaErrors("sendState.exchange", exchangeOf(file), schemaId),
+          `${file} at ${schemaId}`,
+        ).toEqual([]);
+      }
     }
   });
 
@@ -453,40 +577,23 @@ describe("sendState: each K-05 v1.2 fixture gives its response (K-05 item 28)", 
     expect(row?.scope ?? "").toBe("");
   });
 
-  for (const file of SEND_STATE_FIXTURES) {
+  for (const entry of SEND_STATE_ENTRIES) {
     it(
-      `${file}: as rosie_job with no business scope, the call answers the fixture's outcome`,
+      `${entry.file}: as rosie_job with no business scope, the call answers the fixture's outcome (${entry.version}), valid at sendState.v1dot8Response`,
       SLOW,
       async () => {
-        const exchange = await given(file);
+        const exchange = await given(entry.file);
         const outcome = await sendState(runtime, exchange.request as unknown as SendStateRequest, {
           now: new Date(exchange.given.now),
         });
-        expect(outcome).toEqual(exchange.outcome);
-        expect(schemaErrors("sendState.response", outcome)).toEqual([]);
+        expect(outcome).toEqual(v1dot8AnswerOf(entry, exchange));
+        expect(schemaErrors("sendState.v1dot8Response", outcome)).toEqual([]);
       },
     );
   }
 });
 
 describe("right after a STOP commits, send state says stopped (the primary, no cache)", () => {
-  /** STOP (true) or START (false) on Alex's mobile, as the guard's path commits it: the flag and the consent row. */
-  async function stopOrStart(sql: Db, stopped: boolean, at: string, id: string): Promise<void> {
-    const changed = await setPhoneStopped(sql, ALEX_MOBILE, stopped, { at: new Date(at) });
-    expect(changed?.changed).toBe(true);
-    await appendConsent(sql, {
-      id,
-      personId: "person-alex",
-      businessId: null,
-      kind: "texts",
-      revoked: stopped,
-      handleId: "handle-alex",
-      exactWords: stopped ? "STOP" : "START",
-      at: new Date(at),
-      channel: "text",
-    });
-  }
-
   it(
     "while the STOP's transaction is open the read sees the phone as it was; once it commits, the next read says stopped",
     SLOW,
@@ -518,14 +625,17 @@ describe("right after a STOP commits, send state says stopped (the primary, no c
         chatOpen: false,
         version: 4,
       });
+      // The STOP withdraws: no yes, so never the person's own (default 82), and it names no booking.
       expect(after.textsConsent).toEqual({
         consentId: "consent-alex-stop-t220",
         businessId: null,
         revoked: true,
         at: "2026-11-07T15:06:36Z",
+        fromContact: false,
+        bookingId: null,
       });
       expect(after.rowState).toBe("sending");
-      expect(schemaErrors("sendState.response", after)).toEqual([]);
+      expect(schemaErrors("sendState.v1dot8Response", after)).toEqual([]);
     },
   );
 
@@ -543,10 +653,14 @@ describe("right after a STOP commits, send state says stopped (the primary, no c
           [state.phone?.stopped, state.phone?.chatOpen, state.phone?.version],
           `round ${String(round)}`,
         ).toEqual([stopped, !stopped, 3 + round]);
+        // A START with no turn, written on return, is the number's own word (item 47); a STOP is no yes. Neither names
+        // a booking.
         expect(state.textsConsent, `round ${String(round)}`).toMatchObject({
           consentId: `consent-alex-round-${String(round)}`,
           businessId: null,
           revoked: stopped,
+          fromContact: !stopped,
+          bookingId: null,
         });
       }
     },
@@ -577,7 +691,7 @@ describe("sendState: what the fixtures leave out", () => {
   it("under a business scope the call refuses to run: a scope hides the STOP row, which has no business", async () => {
     await given("send-state-stopped.json");
     await expect(
-      withBusiness(runtime, "biz-lees-barbershop", (tx) => sendStateIn(tx, { outboxRowId: ALEX_ROW })),
+      withBusiness(runtime, BARBERSHOP, (tx) => sendStateIn(tx, { outboxRowId: ALEX_ROW })),
     ).rejects.toThrow("sendState runs on the runtime side, with no business scope");
   });
 
@@ -604,21 +718,21 @@ describe("sendState: what the fixtures leave out", () => {
           insertRow(tx, "pauses", { set_at: "2026-11-07T15:00:00Z", ...values });
         await pause({
           id: "pause-b-alex-phone",
-          business_id: "biz-lees-barbershop",
+          business_id: BARBERSHOP,
           target: "phone",
           phone_number: ALEX_MOBILE,
           set_by_turn_id: "turn-sam-pauses",
         });
         await pause({
           id: "pause-a-alex-person",
-          business_id: "biz-lees-barbershop",
+          business_id: BARBERSHOP,
           target: "person",
           person_id: "person-alex",
         });
         // Left out: a cleared pause, another business's pause, another person's, and an address pause.
         await pause({
           id: "pause-c-cleared",
-          business_id: "biz-lees-barbershop",
+          business_id: BARBERSHOP,
           target: "person",
           person_id: "person-alex",
           cleared_at: "2026-11-07T15:01:00Z",
@@ -632,13 +746,13 @@ describe("sendState: what the fixtures leave out", () => {
         });
         await pause({
           id: "pause-e-riley",
-          business_id: "biz-lees-barbershop",
+          business_id: BARBERSHOP,
           target: "person",
           person_id: "person-riley",
         });
         await pause({
           id: "pause-f-address",
-          business_id: "biz-lees-barbershop",
+          business_id: BARBERSHOP,
           target: "address",
           address: "\\x6b30342d7465737400",
           sealed_for_person_id: "person-alex",
@@ -678,7 +792,7 @@ describe("sendState: what the fixtures leave out", () => {
           version: 1,
         },
       ]);
-      expect(schemaErrors("sendState.response", state)).toEqual([]);
+      expect(schemaErrors("sendState.v1dot8Response", state)).toEqual([]);
     },
   );
 
@@ -726,12 +840,12 @@ describe("sendState: what the fixtures leave out", () => {
       await insertRow(db.sql, "person_roles", {
         id: "role-alex-barber-owner",
         person_id: "person-alex",
-        business_id: "biz-lees-barbershop",
+        business_id: BARBERSHOP,
         role: "owner",
       });
       expect(stateOf(await sendState(runtime, { outboxRowId: ALEX_ROW })).audience).toBe("owner");
       for (const state of [riley, none]) {
-        expect(schemaErrors("sendState.response", state)).toEqual([]);
+        expect(schemaErrors("sendState.v1dot8Response", state)).toEqual([]);
       }
     },
   );
@@ -747,7 +861,7 @@ describe("sendState: what the fixtures leave out", () => {
           { table: "phones", rowId: ALEX_MOBILE, version: 3 },
           { table: "persons", rowId: "person-gone", version: 1 },
           { table: "bookings", rowId: "booking-alex-riley-nov14", version: 1 },
-          { table: "businesses", rowId: "biz-lees-barbershop", version: 3 },
+          { table: "businesses", rowId: BARBERSHOP, version: 3 },
         ],
       });
       await db.sql`update businesses set display_name = 'Lee''s', version = version + 1 where id = 'biz-lees-barbershop'`;
@@ -755,7 +869,7 @@ describe("sendState: what the fixtures leave out", () => {
       expect(state.currentVersions).toEqual([
         { table: "phones", rowId: ALEX_MOBILE, version: 3 },
         { table: "bookings", rowId: "booking-alex-riley-nov14", version: 1 },
-        { table: "businesses", rowId: "biz-lees-barbershop", version: 4 },
+        { table: "businesses", rowId: BARBERSHOP, version: 4 },
       ]);
       await addOutboxRow({
         id: "out-t220-unknown-home",
@@ -783,7 +897,7 @@ describe("sendState: what the fixtures leave out", () => {
           turn_id: "turn-alex-book-1",
           handle_id: "handle-alex",
           person_id: "person-alex",
-          business_id: "biz-lees-barbershop",
+          business_id: BARBERSHOP,
           booking_id: "booking-alex-riley-nov14",
           step: "A7-03",
           options: [{ id: "A7-03/1", label: "Sat 12:00pm" }],
@@ -818,7 +932,7 @@ describe("sendState: what the fixtures leave out", () => {
       await appendConsent(db.sql, {
         id: "consent-alex-email-yes",
         personId: "person-alex",
-        businessId: "biz-lees-barbershop",
+        businessId: BARBERSHOP,
         kind: "texts",
         handleId: "handle-alex-email",
         exactWords: "Send my updates to my email",
@@ -838,12 +952,14 @@ describe("sendState: what the fixtures leave out", () => {
         textHoursOverride: false,
         textsConsent: {
           consentId: "consent-alex-email-yes",
-          businessId: "biz-lees-barbershop",
+          businessId: BARBERSHOP,
           revoked: false,
           at: "2026-11-01T10:00:00Z",
+          fromContact: false,
+          bookingId: null,
         },
       });
-      expect(schemaErrors("sendState.response", state)).toEqual([]);
+      expect(schemaErrors("sendState.v1dot8Response", state)).toEqual([]);
     },
   );
 
@@ -862,5 +978,409 @@ describe("sendState: what the fixtures leave out", () => {
       }
     }
     expect({ ...VERSIONED_HOMES }).toEqual(homes);
+  });
+});
+
+describe("K-05 v1.8 item 47: who gave the texts yes (fromContact), and for which booking (bookingId)", () => {
+  it(
+    "a yes by text in a turn of another handle reads false, another person's number or Alex's own email; in a turn of his mobile it reads true",
+    SLOW,
+    async () => {
+      await given("send-state-customer.json");
+      await addTurn("turn-t1216-riley", "handle-riley", "2026-11-07T16:00:00Z");
+      await addTurn("turn-t1216-alex-email", "handle-alex-email", "2026-11-07T16:00:00Z");
+      await addTurn("turn-t1216-alex", "handle-alex", "2026-11-07T16:00:00Z");
+      // Each row is newer than the one before, so each is in turn the covering row for Alex's confirmation.
+      const rows = [
+        ["consent-t1216-riley-turn", "turn-t1216-riley", "2026-11-07T16:00:01Z", false],
+        ["consent-t1216-email-turn", "turn-t1216-alex-email", "2026-11-07T16:00:02Z", false],
+        ["consent-t1216-own-turn", "turn-t1216-alex", "2026-11-07T16:00:03Z", true],
+      ] as const;
+      for (const [id, turnId, at, fromContact] of rows) {
+        await addTextsRow(id, at, { turnId, bookingId: NOV14 });
+        expect(await textsRowOf(ALEX_ROW), id).toEqual({
+          consentId: id,
+          businessId: BARBERSHOP,
+          revoked: false,
+          at,
+          fromContact,
+          bookingId: NOV14,
+        });
+      }
+    },
+  );
+
+  it(
+    "a yes given on a page, by an outside AI or by email reads false, even in a turn of his own mobile; by text it reads true",
+    SLOW,
+    async () => {
+      await given("send-state-customer.json");
+      await addTurn("turn-t1216-alex", "handle-alex", "2026-11-07T16:00:00Z");
+      const channels = [
+        ["page", "2026-11-07T16:00:01Z", false],
+        ["ai", "2026-11-07T16:00:02Z", false],
+        ["email", "2026-11-07T16:00:03Z", false],
+        ["text", "2026-11-07T16:00:04Z", true],
+      ] as const;
+      for (const [channel, at, fromContact] of channels) {
+        const id = `consent-t1216-${channel}`;
+        await addTextsRow(id, at, { channel, turnId: "turn-t1216-alex" });
+        expect(await textsRowOf(ALEX_ROW), channel).toEqual({
+          consentId: id,
+          businessId: BARBERSHOP,
+          revoked: false,
+          at,
+          fromContact,
+          bookingId: null,
+        });
+      }
+      // A page's yes as a page records it, with no turn behind it, reads false too.
+      await addTextsRow("consent-t1216-page-no-turn", "2026-11-07T16:00:05Z", { channel: "page" });
+      expect(await textsRowOf(ALEX_ROW)).toMatchObject({
+        consentId: "consent-t1216-page-no-turn",
+        fromContact: false,
+      });
+    },
+  );
+
+  it(
+    "an email contact's yes reads false (default 80), though given by text in its own handle's turn; the same row on his mobile reads true",
+    SLOW,
+    async () => {
+      await given("send-state-customer.json");
+      await addOutboxRow({
+        id: "out-t1216-email",
+        recipient_handle_id: "handle-alex-email",
+        channel: "email",
+      });
+      await addTurn("turn-t1216-alex-email", "handle-alex-email", "2026-11-07T16:00:00Z");
+      await addTurn("turn-t1216-alex", "handle-alex", "2026-11-07T16:00:00Z");
+      await addTextsRow("consent-t1216-email-own-turn", "2026-11-07T16:00:01Z", {
+        handleId: "handle-alex-email",
+        turnId: "turn-t1216-alex-email",
+      });
+      await addTextsRow("consent-t1216-mobile-own-turn", "2026-11-07T16:00:02Z", {
+        turnId: "turn-t1216-alex",
+      });
+      const yes = { businessId: BARBERSHOP, revoked: false, bookingId: null };
+      expect(await textsRowOf("out-t1216-email")).toEqual({
+        ...yes,
+        consentId: "consent-t1216-email-own-turn",
+        at: "2026-11-07T16:00:01Z",
+        fromContact: false,
+      });
+      expect(await textsRowOf(ALEX_ROW)).toEqual({
+        ...yes,
+        consentId: "consent-t1216-mobile-own-turn",
+        at: "2026-11-07T16:00:02Z",
+        fromContact: true,
+      });
+      // A row shaped as a START (no business, no turn) on the email handle reads false as well: START never comes by
+      // email, and only a phone carries the stopped flag.
+      await addTextsRow("consent-t1216-email-start", "2026-11-07T16:00:03Z", {
+        handleId: "handle-alex-email",
+        businessId: null,
+        exactWords: "START",
+      });
+      expect(await textsRowOf("out-t1216-email")).toMatchObject({
+        consentId: "consent-t1216-email-start",
+        fromContact: false,
+        bookingId: null,
+      });
+    },
+  );
+
+  it(
+    "a START with no turn, written on return, reads true with no booking; the stopped flag stays the phone's as stored (default 84)",
+    SLOW,
+    async () => {
+      await given("send-state-customer.json");
+      await db.sql.begin((tx) => stopOrStart(tx, true, "2026-11-07T16:00:00Z", "consent-t1216-stop"));
+      // His START, recorded on return by his actor with no turn, while the phone's flag is left as it stands: the read
+      // gives the row as the person's own word and the flag as the phone holds it, never one from the other.
+      await addTextsRow("consent-t1216-start", "2026-11-07T16:00:01Z", {
+        businessId: null,
+        exactWords: "START",
+      });
+      const state = stateOf(await sendState(runtime, { outboxRowId: ALEX_ROW }));
+      expect(state.textsConsent).toEqual({
+        consentId: "consent-t1216-start",
+        businessId: null,
+        revoked: false,
+        at: "2026-11-07T16:00:01Z",
+        fromContact: true,
+        bookingId: null,
+      });
+      expect(state.phone).toMatchObject({ stopped: true, stopAt: "2026-11-07T16:00:00Z", chatOpen: false });
+      expect(schemaErrors("sendState.v1dot8Response", state)).toEqual([]);
+    },
+  );
+
+  it(
+    "a yes no turn wrote that is not a START reads false (default 79): Ben T.'s ready-text yes as K-29's seed-chat-link writes it, its booking as stored; in a turn of his own number it reads true",
+    SLOW,
+    async () => {
+      await given("send-state-customer.json", [new URL("seed-chat-link.json", CONSENT_DIR)]);
+      await addOutboxRow({
+        id: "out-t1216-ben",
+        recipient_handle_id: "handle-ben",
+        recipient_person_id: "person-ben",
+        booking_id: "booking-ben-haircut",
+      });
+      const state = stateOf(await sendState(runtime, { outboxRowId: "out-t1216-ben" }));
+      expect(state.textsConsent).toEqual({
+        consentId: "consent-ben-texts-yes",
+        businessId: BARBERSHOP,
+        revoked: false,
+        at: "2026-10-05T17:00:00Z",
+        fromContact: false,
+        bookingId: "booking-ben-haircut",
+      });
+      // Ben's number is stopped in K-04's seed: the flag is the phone's, as stored, whatever the consent row says.
+      expect(state.phone?.stopped).toBe(true);
+      expect(schemaErrors("sendState.v1dot8Response", state)).toEqual([]);
+      // The same yes, the same link and booking, with a turn of Ben's own number behind it, is his own.
+      await addTurn("turn-t1216-ben", "handle-ben", "2026-11-07T16:00:00Z");
+      await addTextsRow("consent-t1216-ben-own-turn", "2026-11-07T16:00:01Z", {
+        personId: "person-ben",
+        handleId: "handle-ben",
+        bookingId: "booking-ben-haircut",
+        chatLinkId: "chatlink-ben-haircut",
+        exactWords: "Hey, send me further updates about my booking. Ref 4K7Q",
+        turnId: "turn-t1216-ben",
+      });
+      expect(await textsRowOf("out-t1216-ben")).toMatchObject({
+        consentId: "consent-t1216-ben-own-turn",
+        fromContact: true,
+        bookingId: "booking-ben-haircut",
+      });
+    },
+  );
+
+  it(
+    "a STOP reads false and names no booking (default 82), in a turn of his own mobile or with no turn",
+    SLOW,
+    async () => {
+      await given("send-state-customer.json");
+      await addTurn("turn-t1216-alex", "handle-alex", "2026-11-07T16:00:00Z");
+      const stops = [
+        ["consent-t1216-stop-own-turn", "2026-11-07T16:00:01Z", { turnId: "turn-t1216-alex" }],
+        ["consent-t1216-stop-no-turn", "2026-11-07T16:00:02Z", {}],
+      ] as const;
+      for (const [id, at, values] of stops) {
+        await addTextsRow(id, at, { ...values, businessId: null, revoked: true, exactWords: "STOP" });
+        expect(await textsRowOf(ALEX_ROW), id).toEqual({
+          consentId: id,
+          businessId: null,
+          revoked: true,
+          at,
+          fromContact: false,
+          bookingId: null,
+        });
+      }
+    },
+  );
+
+  it(
+    "no statement sendState sends names a consent row's words or a whole row: the covering row is read by its columns, then by its id",
+    SLOW,
+    async () => {
+      await given("send-state-customer.json");
+      await addTurn("turn-t1216-alex", "handle-alex", "2026-11-07T16:00:00Z");
+      await addTextsRow("consent-t1216-own-turn", "2026-11-07T16:00:01Z", {
+        turnId: "turn-t1216-alex",
+        bookingId: NOV14,
+      });
+      sent.length = 0;
+      expect(await textsRowOf(ALEX_ROW)).toMatchObject({ fromContact: true, bookingId: NOV14 });
+      const consentReads = sent.filter((query) => /\bconsents\b/.test(query));
+      expect(consentReads).toHaveLength(2);
+      expect(sent.filter((query) => /\bturns\b/.test(query))).toHaveLength(1);
+      for (const query of sent) {
+        expect(query).not.toMatch(/exact_words/);
+      }
+      for (const query of consentReads) {
+        expect(query).not.toMatch(/\*|to_jsonb|row_to_json/);
+      }
+    },
+  );
+});
+
+// ---- T-1322: a statement's own refusal and postgres.js's statement errors leave scrubbed ------------------------------
+//
+// Five errors are made for real on local PostgreSQL by postgres.js as installed, four of them holding a made-up number
+// (rule 9: a 555-01xx number): PostgreSQL's refusal of a statement (22P02, the number in its message) and of a row (a
+// CHECK's 23514, the number in its detail, with its table's and constraint's names); postgres.js's UNDEFINED_VALUE (the
+// number among the statement's args) and the TypeError its bytea serializer throws (the number in its message); and a
+// serialization failure PostgreSQL raises (40001). postgres.js puts the statement on each, its values in args. Each
+// reaches the call as postgres.js rejects the call's first statement with it, on a client whose socket fails with it
+// (as connect-failures.int.test.ts delivers a socket's error). The first four leave scrubbed: the call's name and the
+// code alone, PostgreSQL's as DataAccessDatabaseError (a rule's table and constraint names kept), with the number in no
+// message, stack or other own property. 40001 still answers transient with its SQLSTATE.
+
+describe("sendState: a statement's own refusal and postgres.js's statement errors leave scrubbed (T-1322)", () => {
+  type Kind = "refusal" | "rule" | "undefinedValue" | "serialization" | "serialize";
+  /** Thrown as DataAccessDatabaseError (its message's SQLSTATE and names: `shown`), as a client's code, or answered. */
+  type Expected =
+    | { database: { code: string; table: string | null; constraint: string | null; shown: string } }
+    | { client: string }
+    | { answer: unknown };
+  const NUMBER = "+15555550147";
+  const KINDS: { kind: Kind; name: string; expected: Expected }[] = [
+    {
+      kind: "refusal",
+      name: "PostgreSQL's 22P02, the number in its message, leaves as DataAccessDatabaseError",
+      expected: { database: { code: "22P02", table: null, constraint: null, shown: "22P02" } },
+    },
+    {
+      kind: "rule",
+      name: "a CHECK's 23514, the number in its detail, leaves as DataAccessDatabaseError, its names kept",
+      expected: {
+        database: {
+          code: "23514",
+          table: "t1322_numbers",
+          constraint: "t1322_numbers_short",
+          shown: "23514, table t1322_numbers, constraint t1322_numbers_short",
+        },
+      },
+    },
+    {
+      kind: "undefinedValue",
+      name: "postgres.js's UNDEFINED_VALUE, the number in its args, leaves with its code alone",
+      expected: { client: "UNDEFINED_VALUE" },
+    },
+    {
+      kind: "serialize",
+      name: "the TypeError of postgres.js's bytea serializer, the number in its message, leaves with its code alone",
+      expected: { client: "ERR_INVALID_ARG_TYPE" },
+    },
+    {
+      kind: "serialization",
+      name: "PostgreSQL's 40001 still answers transient with its SQLSTATE",
+      expected: { answer: { error: "transient", sqlstate: "40001" } },
+    },
+  ];
+  const CALLS: { call: string; run: (sql: Sql) => Promise<unknown> }[] = [
+    { call: "sendState", run: (sql) => sendState(sql, { outboxRowId: "row-t1322" }) },
+  ];
+  const CASES = CALLS.flatMap(({ call, run }) =>
+    KINDS.map(({ kind, name, expected }) => ({ call, run, kind, expected, name: `${call}: ${name}` })),
+  );
+  let made: Record<Kind, Error>;
+
+  /** Every text `value` holds, deeply: its own property names and values, enumerable or not, its stack among them. */
+  const textsOf = (value: unknown, seen = new Set<object>()): string[] => {
+    if (typeof value === "string") {
+      return [value];
+    }
+    if (typeof value === "number" || typeof value === "bigint" || typeof value === "boolean") {
+      return [String(value)];
+    }
+    if (typeof value !== "object" || value === null || seen.has(value)) {
+      return [];
+    }
+    seen.add(value);
+    return Object.getOwnPropertyNames(value).flatMap((key) => [
+      key,
+      ...textsOf((value as Record<string, unknown>)[key], seen),
+    ]);
+  };
+  const holdsNumber = (value: unknown): boolean =>
+    textsOf(value).some((text) => text.includes(NUMBER.slice(1)));
+
+  /** The error `statement` is refused with. */
+  const refusalOf = async (statement: Promise<unknown>): Promise<Error> => {
+    try {
+      await statement;
+    } catch (error) {
+      if (error instanceof Error) {
+        return error;
+      }
+    }
+    throw new Error("the statement was not refused with an error");
+  };
+
+  /** What `run` gives on a client whose socket fails with `raw`: postgres.js rejects its first statement with it. */
+  const outcomeOn = async (
+    raw: Error,
+    run: (sql: Sql) => Promise<unknown>,
+  ): Promise<{ answer: unknown } | { thrown: unknown }> => {
+    const options = { max: 1, onnotice: () => undefined, socket: () => Promise.reject(raw) };
+    const sql = postgres("postgres://t1322@db-t1322.example.invalid:65123/t1322", options);
+    try {
+      return { answer: await run(sql) };
+    } catch (error) {
+      return { thrown: error };
+    } finally {
+      await sql.end({ timeout: 0 });
+    }
+  };
+
+  beforeAll(async () => {
+    const sql = postgres(resolvePrimaryUrl(), { max: 1, onnotice: () => undefined });
+    try {
+      await sql`create temp table t1322_numbers (number text constraint t1322_numbers_short check (length(number) < 5))`;
+      made = {
+        refusal: await refusalOf(sql`select ${NUMBER}::uuid as id`),
+        rule: await refusalOf(sql`insert into t1322_numbers (number) values (${NUMBER})`),
+        undefinedValue: await refusalOf(
+          sql`select ${NUMBER}::text as number, ${undefined as never}::text as gone`,
+        ),
+        serialization: await refusalOf(
+          sql.unsafe(
+            "do $$ begin raise exception using errcode = '40001', message = 'could not serialize'; end $$",
+          ),
+        ),
+        serialize: await refusalOf(sql`select ${sql.typed(Number(NUMBER.slice(1)), 17)} as bytes`),
+      };
+    } finally {
+      await sql.end({ timeout: 5 });
+    }
+  });
+
+  it.each(CASES)("$name", async ({ call, run, kind, expected }) => {
+    const raw = made[kind];
+    const outcome = await outcomeOn(raw, run);
+    if ("answer" in expected) {
+      expect(outcome).toEqual({ answer: expected.answer });
+      return;
+    }
+    // The error holds the number, so the check means something; postgres.js put the statement on it.
+    expect(holdsNumber(raw)).toBe(true);
+    expect(Object.hasOwn(raw, "args")).toBe(true);
+    if (!("thrown" in outcome)) {
+      throw new Error(`${call} answered`);
+    }
+    // Booleans first, so a failing run prints neither error's text.
+    const { thrown } = outcome;
+    expect(thrown === raw).toBe(false);
+    expect(holdsNumber(thrown)).toBe(false);
+    if ("database" in expected) {
+      const { code, table, constraint, shown } = expected.database;
+      expect(thrown).toBeInstanceOf(DataAccessDatabaseError);
+      expect(Object.getOwnPropertyNames(thrown).sort()).toEqual([
+        "call",
+        "code",
+        "constraint",
+        "message",
+        "name",
+        "stack",
+        "table",
+      ]);
+      expect(thrown).toMatchObject({
+        call,
+        code,
+        table,
+        constraint,
+        message: `${call}: the database refused the call (SQLSTATE ${shown})`,
+      });
+      return;
+    }
+    expect(Object.getOwnPropertyNames(thrown).sort()).toEqual(["call", "code", "message", "stack"]);
+    expect(thrown).toMatchObject({
+      call,
+      code: expected.client,
+      message: `${call}: the database call failed (code ${expected.client})`,
+    });
   });
 });

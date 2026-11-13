@@ -1,0 +1,19 @@
+{
+  "version": "v1",
+  "contract": "message-plan.v1.1",
+  "about": "Recordings for the composer's call of the recorded-model double checked against K-03 v1.1 (T-1175; DL-355): composer inputs whose facts include term facts, Rosie's own fixed terms that the step's card states, each with its source line (contracts/message-plan/README.md 'v1.1'), which K-03 v1's schema refuses. Each is one plan answer keyed by the sha256 of its canonical composer input, its content, never a fixture's name, and seeded from K-03's plan-s1-02.json (every plan is v1's: v1.1 leaves the plan as it is), not recorded live: no model call is made (J-02a). composer-s1-02-v1.1: K-03 v1.1's input-s1-02-v1.1.json, input-s1-02.json with S1-02's four card terms as term facts, whose 15 and 2 hold plan-s1-02's (input-and-plan-s1-02.json). composer-join-s1-02, the walking skeleton's JOIN run's composer call (contracts/model/README.md 'v1.1', recording 4): K-09 v1.6's compose-input-s1-02-v1.6.json input (T-1173; input-s1-02-v1.1.json word for word) for that run's own row and turn, replying to the text JOIN at its time as tests/e2e/skeleton sends it (composer-inputs/join-s1-02.json): the turn id T-248's hash of the JOIN's event id evt-sam-0000 (runtime/src/actor/lease.ts turnIdOf), the row outbox-s1-02-<that turn id>-1 (actions/src/commit/walk/writes.ts, ADR-013 default 131), and the four term facts S1-02's card lines in bundle v0 as bundles/v0/bundle.kv.json publishes it, under the id its manifest pins; the double's test computes each id by its rule and reads the card from that bundle. A v1 input with no term facts is not here: the composer refuses plan-s1-02 on it (literalValue x2; K-03 v1.1's refuse-plan-s1-02-on-v1-input.json). The master's sample cast only; no real person or customer (rule 9).",
+  "recordings": [
+    {
+      "id": "composer-s1-02-v1.1",
+      "kind": "composerPlan",
+      "request": { "fixture": "input-s1-02-v1.1.json" },
+      "seed": { "fixture": "plan-s1-02.json" }
+    },
+    {
+      "id": "composer-join-s1-02",
+      "kind": "composerPlan",
+      "request": { "file": "composer-inputs/join-s1-02.json" },
+      "seed": { "fixture": "plan-s1-02.json" }
+    }
+  ]
+}

@@ -5,7 +5,7 @@
     "after": ["j7-late-cancel-confirm-turn.json"],
     "now": "2026-10-24T13:00:00Z",
     "stated": { "step": "S11-25", "gives": [] },
-    "note": "Refused: S11-26's $20 fee charged to the saved card with no bound yes behind it (no approvedBy), an unbound charge (K-32 v1 rule 10; README default 135). With approvedBy naming consent-alex-ticked-terms-haircut it is j7-fee-owner-charge-turn, accepted."
+    "note": "Refused: S11-26's $20 fee charged to the saved card with no bound yes behind it (no approvedBy), an unbound charge (K-32 v1 rule 10; README default 153). With approvedBy naming consent-alex-ticked-terms-haircut it is j7-fee-owner-charge-turn, accepted."
   },
   "request": {
     "caller": {

@@ -1,0 +1,28 @@
+{
+  "call": "secureReadBack",
+  "given": {
+    "now": "2026-11-02T15:20:00Z",
+    "environment": "staging",
+    "after": ["secure-meets-pro-confirm.json"],
+    "note": "Refused: secure-meets-pro-yes-read-back.json's request answered as if the adult's yes to texts were kept, a K-29 consent written, with no yes: a read-back writes nothing, and their yes is taken only by secureConfirm, on the read-back's exact words (RULES 2.5, 7.1; B4-27; README default 48). With the read-back's outcome the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-meets-pro-0001",
+      "traceId": "trace-page-meets-pro-0001",
+      "linkCode": "placeholder-meets-pro-code-0027"
+    },
+    "change": { "kind": "meetsProYes", "mobile": "+15555550147" }
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-meets-pro-yes-1",
+    "yesEventId": "evt-page-meets-pro-0001",
+    "served": {
+      "change": "meetsProYes",
+      "result": "textsYes",
+      "consentId": "consent-meets-pro-texts",
+      "textsOffLine": null
+    }
+  }
+}

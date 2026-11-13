@@ -1,9 +1,31 @@
 // The composition root in the Workers runtime (T-550; C-046, C-044; build prompt section 10, D-017: "the trace shows every
 // hop once, in order"; "a repeated webhook sends nothing twice"). The root is composed for the test environment, every
-// port on its fake (./test-support.ts), with the HandleActor namespace and one test clock; `install()` puts the actor's
-// ports in place; the webhooks go in through the Worker's own route under BASE_PATH (runtime/src/index.ts createWorker),
-// with the root's gateway. Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the root's
-// dispatcher, and the root's receipt door marks the part delivered and arms its clock.
+// port not joined yet on its fake (./test-support.ts) and the joined sealing port fed the K-05 double (T-553), with the
+// HandleActor namespace and one test clock; `install()` puts
+// the actor's ports in place; the webhooks go in through the Worker's own route under BASE_PATH (runtime/src/index.ts
+// createWorker), with the root's gateway. Since T-552 joined the Linq verify, each webhook is signed by the Linq double
+// (T-412) under the run's made-up secret and verified by the root's real verify (T-413), which is fed the same secret.
+// Since T-554 joined the safety read, each text's read on arrival goes through @rosie/ai's safety read over the
+// recorded-model double (./test-support.ts fakeSafetyModels, which holds each text these tests send); its model-call span
+// (a portCall to provider anthropic, one per try) sits in the text's trace beside the hops, is set aside from the hop
+// count as the actor's own receive span is, and is checked on its own. Since T-556 joined the bundle reads and the
+// guard's targets, the turn pins bundle v0 as bundles/v0 publishes it (./test-support.ts fakeBundleReads, a K-05
+// double), and the guard reads test owner 1's seeded targets (fakeHandleTargets, as targets-first-text.json answers).
+// Since T-557 joined the frontier, the turn's frontier is @rosie/actions' turn face over the bundle the turn pinned and
+// test owner 1's seeded stored state (fakeFrontierScope), whose Tool API base records the frontier span. Since T-558
+// joined decide, the turn's two reads go through @rosie/ai's decider over the recorded-model double (fakeDecideModels,
+// which holds the reads this test records for its turn), whose model-call spans sit in the trace beside the safety read's.
+// Since T-559 joined the gate, the turn's gate and one commit go through @rosie/actions' turn face over the gate's reads'
+// doubles (fakeGateReads), its commit through the turn-row port to the K-05 double (fakeTurnRows), whose rows the turn
+// then composes. Since T-560 joined compose input and the composer, each row's composer input comes from @rosie/actions'
+// turn face over a K-05 readOutboxRow double (fakeComposeReads), and its plan from @rosie/ai's composer over the
+// recorded-model double (fakeComposerModels, which holds the plan of the turn this test records), whose model-call span
+// sits in the trace beside decide's. Since T-561 joined finalize, each row's plan is finalized by @rosie/actions' turn
+// face over K-05 doubles of its row calls (fakeFinalizeData), which keep the plan and final parts written into the row.
+// Since T-564 joined the clock arming, the receipt door arms the question's clock row through the arming port, over K-05
+// doubles of armClock and cancelClock and the question's facts on the rows the commit wrote (fakeArmingCalls).
+// Nothing else is wired by the test: the lease runs the turn loop, the turn wakes the root's dispatcher, and the root's
+// receipt door marks the part delivered and arms its clock.
 //
 // The trace is judged as T-260's runtime trace test judges it (runtime/test/trace-e2e.worker.test.ts, which passes
 // unchanged beside this file), with T-260's hop check (runtime/src/trace/hop-check.ts) against K-08 v1's
@@ -23,16 +45,26 @@ import { createExecutionContext, reset, runDurableObjectAlarm } from "cloudflare
 import { env, exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
-import type { HandleActor } from "../actor";
-import { BUNDLE_A } from "../bundle/test-support";
+import { turnIdOf, type HandleActor } from "../actor";
 import { A7_03_DELIVERED } from "../clocks/arming-support";
-import { actorNameOf, type InboundEvent } from "../gateway";
+import { actorNameOf } from "../gateway";
 import { createWorker } from "../index";
 import { spanProblems, type Hop, type Span, type Trace } from "../trace";
 import { checkHops, hopsOfTrace, leaks, spansOfLogLines, spansOfTrace } from "../trace/hop-check";
 import { SAM, until } from "../turn/test-support";
 import { composeRoot, type HandleActors, type Root } from "./index";
-import { SAM_CHAT, SKELETON_ROW, skeletonFakes, type FakeWebhook, type SkeletonFakes } from "./test-support";
+import {
+  BUNDLE_V0,
+  SAM_CHAT,
+  SAM_TRADES_TEXT,
+  samPhoneRow,
+  skeletonFakes,
+  watchGate,
+  type LinqInboundEvent,
+  type SignedWebhook,
+  type SkeletonFakes,
+  type WatchedGateCall,
+} from "./test-support";
 
 type Json = Record<string, unknown>;
 
@@ -47,6 +79,9 @@ const NO_WRITER_YET: readonly Hop[] = ["scrub", "batch"];
 
 /** The handle actor's own receive span beside the gateway's (T-260's gap c, T-1108), set aside from the count. */
 const actorReceive = (span: Span): boolean => span.hop === "receive" && span.got?.door === "handleActor";
+
+/** A model call's own span beside the hops: a portCall to provider anthropic, one per try of the safety read (T-554). */
+const modelCall = (span: Span): boolean => span.hop === "portCall" && span.provider === "anthropic";
 
 /** The fictional numbers of the sample cast, in each form a number could leak in. */
 const CAST_NUMBERS = [
@@ -97,7 +132,7 @@ const SAM_ACTOR = actorNameOf(SAM.handle);
 // ---- the texts ------------------------------------------------------------------------------------------------------
 
 /** A text of Sam's: K-06's text-imessage.json with his handle, this event id and these words. */
-function samText(eventId: string, body: string): InboundEvent {
+function samText(eventId: string, body: string): LinqInboundEvent {
   return {
     ...(structuredClone(textFixture) as Json),
     eventId,
@@ -105,11 +140,11 @@ function samText(eventId: string, body: string): InboundEvent {
     body,
     chatId: SAM_CHAT,
     messageId: `linq-msg-demo-in-${eventId}`,
-  } as unknown as InboundEvent;
+  } as unknown as LinqInboundEvent;
 }
 
 /** The webhook request as it reaches the Worker's Linq route under BASE_PATH. */
-function webhookRequest(webhook: FakeWebhook): Request {
+function webhookRequest(webhook: SignedWebhook): Request {
   return new Request(`https://rosie.test${env.BASE_PATH}/webhooks/linq`, {
     method: "POST",
     headers: {
@@ -127,8 +162,10 @@ function webhookRequest(webhook: FakeWebhook): Request {
 interface Run {
   readonly fakes: SkeletonFakes;
   readonly root: Root;
-  /** Signs one K-06 event with the verify fake and posts it to the Worker's route; answers the trace id the gateway opened. */
-  post(event: InboundEvent, partKey?: string | null): Promise<string>;
+  /** Each gateAndCommit the turn handed the root, as the turn made it. */
+  readonly gateCalls: readonly WatchedGateCall[];
+  /** Signs one K-06 event with the Linq double and posts it to the Worker's route; answers the trace id the gateway opened. */
+  post(event: LinqInboundEvent, partKey?: string | null): Promise<string>;
   /** The spans logged so far. */
   spans(): Span[];
   /** Waits until the trace shows this hop; on a timeout, says which hops it shows and which calls the turn made. */
@@ -144,16 +181,50 @@ function rig(log: MockInstance): Run {
     actors: handleActors(),
     vars: env,
     clock: fakes.clock,
+    linq: fakes.linqInputs,
+    handleKey: fakes.handleKeys.call,
+    // The chat-open port (T-1213) over the dispatch double: each text opens its number's chat before the actor.
+    chatOpenCall: fakes.dispatch.openChat,
+    safetyReaders: fakes.models.readers,
+    // The bundle and targets ports (T-556) on their K-05 doubles: bundle v0 as bundles/v0 publishes it is active.
+    bundleReads: fakes.bundleReads.calls,
+    handleTargets: fakes.handleTargets.call,
+    // The frontier port (T-557) over its K-05 double: test owner 1's seeded rows, so the frontier's answer is turn 1's.
+    frontierScope: fakes.frontier.scope,
+    // The decide port (T-558): @rosie/ai's deciders over the recorded-model double, each test recording its turn's reads.
+    deciders: fakes.decide.deciders,
+    // The gate port (T-559) over its reads' doubles, its one commit through the turn-row port to the K-05 double.
+    turnRows: fakes.turnRows.calls,
+    gateReads: fakes.gate.reads,
+    // The compose-input and composer ports (T-560): compose input over its K-05 double, the composer over the
+    // recorded-model double, which holds the plan of the turn this test records.
+    composeReads: fakes.compose.reads,
+    composers: fakes.composer.composers,
+    // The finalize port (T-561) over its K-05 doubles: the row the commit wrote, and the plan written into it.
+    finalizeData: fakes.finalize.data,
+    // The outbox and send-state ports (T-562) over one K-05 double: the rows the commit wrote, with finalize's plans.
+    outboxCalls: fakes.dispatch.outbox,
+    sendStateCall: fakes.dispatch.sendState,
+    // The Linq send port (T-563) over @rosie/adapters' Linq double: each part the dispatcher sends reaches the double.
+    linqSendCall: fakes.linq.call,
+    // The arming port (T-564) over its K-05 doubles: the clock row and question the commit wrote, and Sam's actor.
+    armingCalls: fakes.arming.calls,
   });
-  const restore = root.install();
+  const restoreRoot = root.install();
+  const watched = watchGate(root);
+  const restore = (): void => {
+    watched.restore();
+    restoreRoot();
+  };
   const worker = createWorker(() => root.gateway);
   const spans = (): Span[] => spansOfLogLines(log.mock.calls.map((call: unknown[]) => call[0]));
   return {
     fakes,
     root,
+    gateCalls: watched.calls,
     async post(event, partKey = null) {
       const response = await worker.fetch(
-        webhookRequest(fakes.verify.sign(event, partKey)),
+        webhookRequest(await fakes.sign(event, partKey)),
         env,
         createExecutionContext(),
       );
@@ -204,8 +275,12 @@ describe("through the composition root, every port on its fake: a text's webhook
       const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
       const run = rig(log);
       try {
-        const words = "Barbershop, plumbing, electrical";
+        const words = SAM_TRADES_TEXT;
         run.fakes.known("evt-sam-0001");
+        run.fakes.decide.recordTurn(["evt-sam-0001"]);
+        // Sam's phone row as K-05 reads it (send-state-owner.json: chat open on iMessage, not stopped), so limit 8 lets the
+        // turn's reply go (T-562); his text's chat open at receipt (T-1213) finds it open and leaves it as it is.
+        run.fakes.dispatch.phones.set(SAM.party.handleId, samPhoneRow());
         const traceId = await run.post(samText("evt-sam-0001", words));
         await settle(SAM_ACTOR);
 
@@ -213,12 +288,22 @@ describe("through the composition root, every port on its fake: a text's webhook
         await run.fakes.clock.advance(3000);
         await runDurableObjectAlarm(stubOf(SAM_ACTOR));
         await run.untilHop(traceId, "providerAccepted");
-        const parts = finalizePass.outcome.finalParts.sends.map(
-          (_send, index) => `${SKELETON_ROW}/${String(index + 1)}/1`,
+        // The dispatcher claimed the row the turn committed (K-05 v1.2's claim, T-562) and sent the final parts finalize
+        // wrote into it, one part per send.
+        const row = `outbox-s1-02-${await turnIdOf(["evt-sam-0001"])}-1`;
+        const written = run.fakes.finalize.plans.get(row);
+        if (written === undefined) throw new Error("finalize wrote no final parts into the turn's row");
+        expect(run.fakes.linq.keysInOrder).toEqual(
+          written.finalParts.sends.map((_send, index) => `${row}/${String(index + 1)}/1`),
         );
-        expect(run.fakes.linq.keysInOrder).toEqual(parts);
-        const accepted = run.fakes.linq.accepted.get(`${SKELETON_ROW}/1/1`);
+        expect(run.fakes.linq.requests.map((request) => request.text)).toEqual(
+          written.finalParts.sends.map((send) => send.text),
+        );
+        const accepted = run.fakes.linq.accepted.get(`${row}/1/1`);
         if (accepted?.providerMessageId == null) throw new Error("Linq accepted no part");
+        // The question the row asks, and its clock row: the ones the commit made (waiting, on Sam's handle), which the
+        // joined arming port (T-564) reads and arms.
+        const question = `oq-s1-02-${await turnIdOf(["evt-sam-0001"])}-1`;
 
         // Linq's delivery receipt for that part: K-06 delivered.json with the part's message id, echoing its key.
         const receipt = {
@@ -227,8 +312,8 @@ describe("through the composition root, every port on its fake: a text's webhook
           handle: { ...SAM.handle },
           chatId: SAM_CHAT,
           status: { messageId: accepted.providerMessageId, at: A7_03_DELIVERED.deliveredAt, failure: null },
-        } as unknown as InboundEvent;
-        const receiptTraceId = await run.post(receipt, `${SKELETON_ROW}/1/1`);
+        } as unknown as LinqInboundEvent;
+        const receiptTraceId = await run.post(receipt, `${row}/1/1`);
 
         const spans = run.spans();
         const trace = spansOfTrace(spans, traceId);
@@ -237,7 +322,7 @@ describe("through the composition root, every port on its fake: a text's webhook
           traceId,
           expected: hopsOfTrace(SKELETON),
           notWritten: unwritten,
-          extra: actorReceive,
+          extra: (span) => actorReceive(span) || modelCall(span),
         });
         expect(report.problems).toEqual([]);
         expect(report.ok).toBe(true);
@@ -260,17 +345,57 @@ describe("through the composition root, every port on its fake: a text's webhook
             "clockArmed",
           ]),
         );
-        expect(report.extra.length).toBeLessThanOrEqual(1);
+        expect(report.extra.filter(actorReceive).length).toBeLessThanOrEqual(1);
+        // The text's safety read on arrival (T-554): one Haiku call, answered by the recorded-model double.
+        const calls = report.extra
+          .filter(modelCall)
+          .map((span) => [span.attempt, span.outcome, span.model_calls?.[0]?.purpose]);
+        expect(calls.filter((call) => call[2] === "safetyRead")).toEqual([[1, "ok", "safetyRead"]]);
+        expect(run.fakes.models.calls).toEqual([{ model: "claude-haiku-5-5", text: words }]);
+        // The turn's decide (T-558): two Haiku reads, each its step 1 and its one part's step 2, each call answered at
+        // its first attempt by the recorded-model double; then the composer's one Haiku call for the turn's row (T-560),
+        // answered by the same double; no other model call.
+        expect(
+          calls
+            .filter((call) => call[2] !== "safetyRead")
+            .map((call) => call.join())
+            .sort(),
+        ).toEqual([
+          "1,ok,compose",
+          "1,ok,decideCheck",
+          "1,ok,decideCheck",
+          "1,ok,decideFirst",
+          "1,ok,decideFirst",
+        ]);
+        expect(run.fakes.decide.misses).toEqual([]);
+        expect(run.fakes.composer.misses).toEqual([]);
 
-        // One bundle id: the root's active id at receipt is the one the turn pinned, on every span.
+        // One bundle id: the root's active id at receipt is the one the turn pinned, on every span (bundle v0's).
         expect(new Set(trace.map((span) => JSON.stringify(span.bundle_id)))).toEqual(
-          new Set([JSON.stringify(BUNDLE_A)]),
+          new Set([JSON.stringify(BUNDLE_V0)]),
         );
         // The gate request carries the text's trace id (one id from the webhook to the receipt).
-        expect(run.fakes.face.gateCalls.map((call) => call.request.turn.traceId)).toEqual([traceId]);
-        // The receipt marked the part delivered once and armed A7-03's clock once (K-05 armClock).
-        expect(run.fakes.store.marks.filter((mark) => mark.outcome === "delivered")).toHaveLength(1);
-        expect(run.fakes.arming.data.armAnswers).toMatchObject([{ result: "armed", repeated: false }]);
+        expect(run.gateCalls.map((call) => call.request.turn.traceId)).toEqual([traceId]);
+        // The receipt marked the part delivered once, through the outbox port's K-05 double (T-562), the row's first
+        // delivery, naming the question the turn committed.
+        const delivered = run.fakes.dispatch.partMarks.filter((mark) => mark.request.outcome === "delivered");
+        expect(delivered.map((mark) => mark.answer)).toMatchObject([
+          {
+            result: "marked",
+            outboxRowId: row,
+            repeated: false,
+            firstDelivery: true,
+            openQuestionId: question,
+            row: { state: "delivered" },
+          },
+        ]);
+        // And armed that question's clock once (K-05 armClock), the clock row the commit made.
+        expect(run.fakes.arming.arms.map((call) => call.answer)).toMatchObject([
+          { result: "armed", repeated: false, clock: { clockRowId: `clock-${question}` } },
+        ]);
+        expect(run.fakes.arming.arms.map((call) => call.request)).toMatchObject([
+          { openQuestionId: question },
+        ]);
         // The receipt's own webhook opened its own trace id: its receive hop alone.
         expect(receiptTraceId).not.toBe(traceId);
         const receiptReport = checkHops(spansOfTrace(spans, receiptTraceId), {
@@ -291,8 +416,8 @@ describe("through the composition root, a repeated webhook (trace-duplicate-webh
     const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
     const run = rig(log);
     try {
-      const first = structuredClone(textFixture) as unknown as InboundEvent;
-      const again = structuredClone(duplicateFixture) as unknown as InboundEvent;
+      const first = structuredClone(textFixture) as unknown as LinqInboundEvent;
+      const again = structuredClone(duplicateFixture) as unknown as LinqInboundEvent;
       expect(again.eventId).toBe(first.eventId);
       run.fakes.known(first.eventId);
       const firstTrace = await run.post(first);
@@ -313,10 +438,12 @@ describe("through the composition root, a repeated webhook (trace-duplicate-webh
       expect(dropped?.outcome).toBe(DUPLICATE.spans[0]?.outcome);
       expect(dropped?.decided).toMatchObject({ signatureValid: true, knownEventId: true, answered: 200 });
 
-      const firstHops = spansOfTrace(spans, firstTrace)
-        .filter((span) => !actorReceive(span))
-        .map((span) => span.hop);
+      const firstSpans = spansOfTrace(spans, firstTrace).filter((span) => !actorReceive(span));
+      const firstHops = firstSpans.filter((span) => !modelCall(span)).map((span) => span.hop);
       expect(firstHops.filter((hop) => !NO_WRITER_YET.includes(hop))).toEqual(["receive", "safetyRead"]);
+      // The first arrival's safety read made one model call (T-554); the repeat, dropped at receipt, made none.
+      expect(firstSpans.filter(modelCall)).toHaveLength(1);
+      expect(repeat.filter(modelCall)).toEqual([]);
       expectNoWords(spans, [String((textFixture as Json).body)]);
     } finally {
       run.restore();

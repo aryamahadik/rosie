@@ -1,7 +1,8 @@
-// Types of the recorded-model double (T-004, C-123). The double works at K-02 v1's level (contracts/model/README.md):
-// it replays the three model-facing outputs, decideRead, safetyRead and plannerOutput, and nothing else. The outputs
-// are typed as plain JSON here; their one definition is contracts/model/model.v1.schema.json, which the double checks
-// every recording against at load.
+// Types of the recorded-model double (T-004, C-123). The double works at K-02's level (contracts/model/README.md), v1
+// and v1.1: it replays the three model-facing outputs, decideRead, safetyRead and plannerOutput, and nothing else. The
+// outputs are typed as plain JSON here; their one definition is contracts/model/model.v1.schema.json (v1.1 holds v1's
+// model-facing definitions unchanged and adds only the sign-up door to the context), and the double checks every
+// recording at load against the K-02 version its file names.
 
 export type JsonObject = Record<string, unknown>;
 

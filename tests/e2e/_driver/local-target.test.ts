@@ -29,6 +29,7 @@ import {
   checkRepeat,
   checkRun,
   createLocalTarget,
+  k08TraceCheck,
   makeTestWebhookSecret,
   readReceipt,
   schemaProblems,
@@ -141,7 +142,7 @@ describe("the local target", () => {
 
     const trace = traceOf(await target.collect(sent.traceId));
     expect(trace.trace_id).toBe(sent.traceId);
-    expect(checkHops(trace, ["receive"]).problems).toEqual([]);
+    expect(checkHops(trace, ["receive", "scrub"]).problems).toEqual([]);
     expect(readReceipt(trace)).toMatchObject({
       eventId: "evt-alex-0001",
       outcome: "ok",
@@ -195,7 +196,7 @@ describe("the local target", () => {
     ]);
     expect(collected.outbox?.problems).toEqual([]);
     expect(collected.outbox?.rows.map((life) => life.row.traceId)).toEqual([sent.traceId]);
-    const report = checkRun(collected, ["receive"]);
+    const report = checkRun(collected, ["receive", "scrub"]);
     expect(report.problems).toEqual([]);
     expect([report.outboxRows, report.parts.sends]).toEqual([1, 1]);
   });
@@ -212,6 +213,32 @@ describe("the local target", () => {
       pollMs: 10,
     });
     expect(collected.parts).toHaveLength(1);
+  });
+
+  it("checks the trace with the check the caller gives (inside workerd, the prebuilt one), and by default with K-08's own", async () => {
+    const secret = makeTestWebhookSecret();
+    const checked: string[] = [];
+    target = createLocalTarget({
+      gateway: gatewayWith(secret).fetch,
+      webhookSecret: secret,
+      traceCheck: (trace) => {
+        checked.push(trace.trace_id);
+        return [`checked ${String(trace.spans.length)} spans`];
+      },
+    });
+    const sent = await target.sendEvent(text);
+    const given = await target.collect(sent.traceId);
+    expect(checked).toEqual([sent.traceId]);
+    expect(given.traceProblems).toEqual(["checked 2 spans"]);
+    expect(checkRun(given, ["receive", "scrub"]).problems).toEqual(["checked 2 spans"]);
+    target.close();
+
+    target = createLocalTarget({ gateway: gatewayWith(secret).fetch, webhookSecret: secret });
+    const own = await target.collect((await target.sendEvent(text)).traceId);
+    if (own.trace === null) throw new Error("no trace");
+    expect(own.traceProblems).toEqual(k08TraceCheck(own.trace));
+    expect(own.traceProblems).toEqual([]);
+    expect(k08TraceCheck({ ...own.trace, opened_by: "nobody" } as never)).not.toEqual([]);
   });
 
   it("puts console.log back when closed", () => {
@@ -265,7 +292,7 @@ describe("no key is read by the local target", () => {
       expect(sent.gatewayStatus).toBe(200);
       await target.sendEvent(text);
       target.linq.sendPart(sendTextRequest);
-      expect(checkRun(await target.collect(sent.traceId), ["receive"]).problems).toEqual([]);
+      expect(checkRun(await target.collect(sent.traceId), ["receive", "scrub"]).problems).toEqual([]);
     } finally {
       process.env = environment;
     }

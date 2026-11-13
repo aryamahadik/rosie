@@ -1,11 +1,14 @@
 // The safety read on arrival, run inside the Workers runtime (T-246). The actor is the real Durable Object reached through
 // the gateway's door; the safety read, the shared core, the Linq send and the clock are doubles that answer as the frozen
-// contracts state (src/safety/test-support.ts). Test method: T-1128's (runtime/src/spikes/do-test-pool/FINDINGS.md).
-// Test values only (rule 9).
-import { reset } from "cloudflare:test";
+// contracts state (src/safety/test-support.ts). The PostgreSQL-down path is unwired, as the composition root installs it
+// today, unless a test wires it as D-017 is to wire it (`withWiredSafety`, DL-615): unwired, the timeout rule's outage line
+// never goes (a text no commit has taken may hold a stop word: RULES 7.2). Test method: T-1128's
+// (runtime/src/spikes/do-test-pool/FINDINGS.md). Test values only (rule 9).
+import { reset, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import pollVote from "../../../contracts/inbound-event/fixtures/poll-vote.json";
 import textImessage from "../../../contracts/inbound-event/fixtures/text-imessage.json";
 import safetyCrisisWords from "../../../contracts/model/fixtures/safety-crisis-words.json";
 import safetyEmergencyNow from "../../../contracts/model/fixtures/safety-emergency-now.json";
@@ -24,10 +27,22 @@ import {
 import { fakeKeyStore } from "../gateway/test-support";
 import { decideLimit8 } from "../dispatch/limit8";
 import type { ClaimedRow, SendState } from "../dispatch/types";
-import { setSafetyDeps, type HandleActor, type HoldEntry, type SafetyEntry } from "../actor";
+import {
+  setSafetyDeps,
+  type BatchEntry,
+  type CopiesView,
+  type HandleActor,
+  type HoldEntry,
+  type SafetyEntry,
+} from "../actor";
+import type { ActorCopies } from "../actor/copies/copies";
+import { WHOLE_A } from "../bundle/test-support";
+import { setDbOutageDeps, type OutageView } from "../outage/db";
+import { dbFakes } from "../outage/db/test-support";
+import { hold, until, type Hold } from "../turn/test-support";
 import { matchDangerWords, normalizeWords, timeoutResult } from "./rules";
-import { FIXTURE_DANGER_WORDS, harness, type Harness } from "./test-support";
-import type { SafetyResult } from "./types";
+import { FIXTURE_DANGER_WORDS, fakeRead, harness, TEST_IDS, type Harness } from "./test-support";
+import type { SafetyDeps, SafetyResult, SendFixedLineRequest } from "./types";
 
 type Json = Record<string, unknown>;
 
@@ -59,9 +74,17 @@ interface SafetyRpc {
   markHoldReleased(holdId: string): Promise<"released" | "neverReleased" | "noSuchHold">;
   writeSafetyOnReturn(): Promise<number>;
   safetyIdle(): Promise<void>;
+  readCopies(): Promise<CopiesView>;
+  readOutage(): Promise<OutageView>;
+  outageIdle(): Promise<void>;
+  readBatches(): Promise<BatchEntry[]>;
 }
 
 function actorOf(name = ALEX): SafetyRpc {
+  return namespace().get(namespace().idFromName(name));
+}
+
+function stubOf(name = ALEX): DurableObjectStub<HandleActor> {
   return namespace().get(namespace().idFromName(name));
 }
 
@@ -94,6 +117,89 @@ async function withSafety(
   } finally {
     restore();
   }
+}
+
+/**
+ * As `withSafety`, with the PostgreSQL-down path wired as D-017 is to wire it (DL-615; the architect's 5(c)): the doubles are
+ * ../outage/db/test-support.ts's, whose one `down` switch is the core's here too (the probe and the bundle registry with
+ * it), so PostgreSQL is in whatever state the test sets the core to; the safety read answers `answers` after `delayMs` on
+ * their clock. No turn runs here, so the actor's keyword copy is bundle A's, installed by the actor's own
+ * ActorCopies.refreshKeywords, and the real classify reads each text with the key store the gateway sealed it under.
+ */
+async function withWiredSafety(
+  answers: Record<string, SafetyResult>,
+  options: { delayMs?: number },
+  body: (h: Harness) => Promise<void>,
+): Promise<void> {
+  const f = dbFakes(keys, answers, { start: 0, ids: TEST_IDS });
+  const read = fakeRead(f.clock, answers, options.delayMs ?? 0);
+  const stopped = { value: false };
+  const deps: SafetyDeps = { ...f.safetyDeps, read, isStopped: () => stopped.value };
+  const h: Harness = { clock: f.clock, core: f.core, direct: f.direct, read, stopped, deps };
+  const restoreSafety = setSafetyDeps(deps);
+  const restoreDown = setDbOutageDeps(f.outageDeps);
+  try {
+    const copied = await runInDurableObject(stubOf(), (instance) =>
+      (instance as unknown as { copies: ActorCopies }).copies.refreshKeywords(
+        WHOLE_A.manifest as unknown as Record<string, unknown>,
+      ),
+    );
+    expect(copied).toBe(true);
+    await body(h);
+  } finally {
+    restoreDown();
+    restoreSafety();
+  }
+}
+
+/** The down path has read each of these texts as another text (no stop word), before any timeout fires (DL-615). */
+async function readAsOther(...eventIds: string[]): Promise<void> {
+  await actorOf().outageIdle();
+  expect((await actorOf().readOutage()).texts).toEqual(
+    eventIds.map((eventId) => expect.objectContaining({ eventId, kind: "other" }) as unknown),
+  );
+}
+
+/**
+ * No outage line by any path (DL-615: unwired, a text no commit has taken may hold a stop word): none through the core,
+ * none straight through Linq, no record queued for one, and the text's safety row says the timeout rule withheld it.
+ */
+async function noOutageLine(h: Harness, eventId: string): Promise<void> {
+  expect(h.core.fixed).toEqual([]);
+  expect(h.direct.sent.filter((sent) => sent.fixedLineId === "outage")).toEqual([]);
+  expect((await actorOf().readCopies()).returns.map((entry) => entry.key)).not.toContain(
+    `sendFixedLine:${eventId}`,
+  );
+  expect((await actorOf().readSafety()).find((entry) => entry.eventId === eventId)).toMatchObject({
+    path: "none",
+    lineId: "outage",
+  });
+}
+
+/** The text's next re-read as the safety read stores it, on the safety clock (`safety_reread`), or none. */
+function rereadOf(eventId: string): Promise<{ event_id: string; due_ms: number }[]> {
+  return runInDurableObject(stubOf(), (_, state) =>
+    state.storage.sql
+      .exec<{
+        event_id: string;
+        due_ms: number;
+      }>("SELECT event_id, due_ms FROM safety_reread WHERE event_id = ?", eventId)
+      .toArray(),
+  );
+}
+
+/**
+ * The timeout rule's other effects, unchanged while its outage line is withheld (the security reviewer's DL-615 ruling):
+ * the text's unread hold open, its re-read set 30 s on, and its batch kept back (none of its batches handed on).
+ */
+async function timeoutRuleStill(eventId: string, rereadAt: number): Promise<void> {
+  expect(await actorOf().readHolds()).toContainEqual(
+    expect.objectContaining({ eventId, rule: "unread", released: false }),
+  );
+  expect(await rereadOf(eventId)).toEqual([{ event_id: eventId, due_ms: rereadAt }]);
+  expect(
+    (await actorOf().readBatches()).filter((batch) => batch.handed && batch.eventIds.includes(eventId)),
+  ).toEqual([]);
 }
 
 const asResult = (fixture: unknown): SafetyResult => fixture as SafetyResult;
@@ -303,9 +409,24 @@ describe("a read that never answers", () => {
     });
   });
 
-  it("at 4 s any other text gets the outage line, and routine work stays held", async () => {
+  it("with the down path unwired, as the root installs it today: at 4 s any other text gets no outage line (it may hold a stop word: DL-615), and routine work stays held", async () => {
     await withSafety({}, {}, async (h) => {
       await arrive("evt-quiet-1", PLAIN_TEXT);
+      await h.clock.advance(4000);
+      await actorOf().safetyIdle();
+
+      expect(h.core.recorded).toEqual([]);
+      await noOutageLine(h, "evt-quiet-1");
+      await timeoutRuleStill("evt-quiet-1", 34_000);
+      expect(await actorOf().readHolds()).toMatchObject([{ rule: "unread", released: false }]);
+      expect(await actorOf().routineHeld()).toBe(true);
+    });
+  });
+
+  it("with the down path wired, as D-017 is to wire it, the text read as another text (DL-615): at 4 s any other text gets the outage line, and routine work stays held", async () => {
+    await withWiredSafety({}, {}, async (h) => {
+      await arrive("evt-quiet-1", PLAIN_TEXT);
+      await readAsOther("evt-quiet-1");
       await h.clock.advance(4000);
       await actorOf().safetyIdle();
 
@@ -335,10 +456,66 @@ describe("a read that never answers", () => {
     });
   });
 
+  it("with the down path wired, as D-017 is to wire it, the text read as another text, so only its own reason withholds it (DL-615, the architect's 5(f)): the outage line is not sent to a stopped number", async () => {
+    await withWiredSafety({}, {}, async (h) => {
+      h.stopped.value = true;
+      await arrive("evt-quiet-2", PLAIN_TEXT);
+      await readAsOther("evt-quiet-2");
+      await h.clock.advance(4000);
+      await actorOf().safetyIdle();
+
+      expect(h.core.fixed).toEqual([]);
+      expect(h.direct.sent).toEqual([]);
+      expect(await actorOf().routineHeld()).toBe(true);
+    });
+  });
+
+  it("the outage line is withheld when the actor's own copy of the stopped flag cannot be read, even when the stopped flag the deps read says not (T-1208: fails closed)", async () => {
+    await withSafety({}, {}, async (h) => {
+      // The actor's copy throws on every read: its storage cannot answer for it (here, its table is gone).
+      await runInDurableObject(stubOf(), (_, state) => {
+        state.storage.sql.exec("DROP TABLE copy_stopped");
+      });
+      expect(h.stopped.value).toBe(false);
+      await arrive("evt-quiet-3", PLAIN_TEXT);
+      await h.clock.advance(4000);
+      await actorOf().safetyIdle();
+
+      // No verdict in 4 s and no danger word: the outage line's turn, but a copy that cannot be read reads stopped.
+      expect(h.core.fixed).toEqual([]);
+      expect(h.direct.sent).toEqual([]);
+      expect(await actorOf().readSafety()).toMatchObject([{ eventId: "evt-quiet-3", path: "none" }]);
+      expect(await actorOf().routineHeld()).toBe(true);
+    });
+  });
+
+  it("with the down path wired, as D-017 is to wire it, the text read as another text, so only its own reason withholds it (DL-615, the architect's 5(f); the security reviewer's (b)): the outage line is withheld when the actor's own copy of the stopped flag cannot be read, even when the stopped flag the deps read says not (T-1208: fails closed)", async () => {
+    await withWiredSafety({}, {}, async (h) => {
+      // The actor's copy throws on every read: its storage cannot answer for it (here, its table is gone).
+      await runInDurableObject(stubOf(), (_, state) => {
+        state.storage.sql.exec("DROP TABLE copy_stopped");
+      });
+      expect(h.stopped.value).toBe(false);
+      await arrive("evt-quiet-3", PLAIN_TEXT);
+      await readAsOther("evt-quiet-3");
+      await h.clock.advance(4000);
+      await actorOf().safetyIdle();
+
+      // No verdict in 4 s and no danger word: the outage line's turn, but a copy that cannot be read reads stopped.
+      expect(h.core.fixed).toEqual([]);
+      expect(h.direct.sent).toEqual([]);
+      expect(await actorOf().readSafety()).toMatchObject([{ eventId: "evt-quiet-3", path: "none" }]);
+      expect(await actorOf().routineHeld()).toBe(true);
+    });
+  });
+
   it("a verdict that arrives late lifts the hold of a text that got the outage line", async () => {
     const late = { ...asResult(safetyNo), eventId: "evt-late-1" };
-    await withSafety({ [late.eventId]: late }, { delayMs: 6000 }, async (h) => {
+    // The outage line is a step on the way here (DL-615, the architect's 5(b)): the down path runs wired, as D-017 is to
+    // wire it, and has read the text as another text.
+    await withWiredSafety({ [late.eventId]: late }, { delayMs: 6000 }, async (h) => {
       await arrive(late.eventId, PLAIN_TEXT);
+      await readAsOther(late.eventId);
       await h.clock.advance(4000);
       await actorOf().safetyIdle();
       expect(await actorOf().routineHeld()).toBe(true);
@@ -434,10 +611,26 @@ describe("a read that never answers", () => {
     });
   });
 
-  it("an answer marked timedOut before the deadline, with no danger word, gets the outage line and the unread hold, as the deadline does (DL-112)", async () => {
+  it("with the down path unwired, as the root installs it today: an answer marked timedOut before the deadline, with no danger word, gets the unread hold, as the deadline does (DL-112), and no outage line (DL-615)", async () => {
     const eventId = "evt-gave-up-1";
     await withSafety({ [eventId]: timeoutResult(eventId, []) }, { delayMs: 3999 }, async (h) => {
       await arrive(eventId, PLAIN_TEXT);
+      await h.clock.advance(3999);
+      await actorOf().safetyIdle();
+
+      expect(h.core.recorded).toEqual([]);
+      await noOutageLine(h, eventId);
+      await timeoutRuleStill(eventId, 33_999);
+      expect(await actorOf().readHolds()).toMatchObject([{ rule: "unread", released: false }]);
+      expect(await actorOf().routineHeld()).toBe(true);
+    });
+  });
+
+  it("with the down path wired, as D-017 is to wire it, the text read as another text (DL-615): an answer marked timedOut before the deadline, with no danger word, gets the outage line and the unread hold, as the deadline does (DL-112)", async () => {
+    const eventId = "evt-gave-up-1";
+    await withWiredSafety({ [eventId]: timeoutResult(eventId, []) }, { delayMs: 3999 }, async (h) => {
+      await arrive(eventId, PLAIN_TEXT);
+      await readAsOther(eventId);
       await h.clock.advance(3999);
       await actorOf().safetyIdle();
 
@@ -448,10 +641,31 @@ describe("a read that never answers", () => {
     });
   });
 
-  it("a read that fails counts as no verdict at once", async () => {
+  it("with the down path unwired, as the root installs it today: a read that fails counts as no verdict at once (the timeout rule's row at 0 ms, its outage line withheld: DL-615)", async () => {
     await withSafety({}, {}, async (h) => {
       h.deps.read.read = () => Promise.reject(new Error("model down"));
       await arrive("evt-failed-1", PLAIN_TEXT);
+      await actorOf().safetyIdle();
+
+      expect(h.clock.now()).toBe(0);
+      await noOutageLine(h, "evt-failed-1");
+      await timeoutRuleStill("evt-failed-1", 30_000);
+      expect(await actorOf().readSafety()).toMatchObject([{ eventId: "evt-failed-1", state: "done" }]);
+    });
+  });
+
+  it("with the down path wired, as D-017 is to wire it, the text read as another text (DL-615): a read that fails counts as no verdict at once", async () => {
+    await withWiredSafety({}, {}, async (h) => {
+      // The read fails with the fake clock still at 0, once the down path has read the text: a read failing before that
+      // reading is the accepted cost the architect's ruling names (section 3), whose line is withheld.
+      const read = { failNow: false };
+      h.deps.read.read = async () => {
+        while (!read.failNow) await new Promise((resolve) => setTimeout(resolve, 1));
+        throw new Error("model down");
+      };
+      await arrive("evt-failed-1", PLAIN_TEXT);
+      await readAsOther("evt-failed-1");
+      read.failNow = true;
       await actorOf().safetyIdle();
 
       expect(h.clock.now()).toBe(0);
@@ -556,10 +770,23 @@ describe("the safety line and a stopped number", () => {
     });
   });
 
-  it("with PostgreSQL down, the outage line goes straight through Linq (not past an opt-out) and a failed send keeps the text held", async () => {
+  it("with PostgreSQL down and the down path unwired, as the root installs it today: no outage line by any path (DL-615), and the text is kept held", async () => {
     await withSafety({}, {}, async (h) => {
       h.core.down = true;
       await arrive("evt-down-1", PLAIN_TEXT);
+      await h.clock.advance(4000);
+      await actorOf().safetyIdle();
+      await noOutageLine(h, "evt-down-1");
+      await timeoutRuleStill("evt-down-1", 34_000);
+      expect(await actorOf().routineHeld()).toBe(true);
+    });
+  });
+
+  it("with PostgreSQL down and the down path wired, as D-017 is to wire it, the text read as another text (DL-615): the outage line goes straight through Linq (not past an opt-out) and a failed send keeps the text held", async () => {
+    await withWiredSafety({}, {}, async (h) => {
+      h.core.down = true;
+      await arrive("evt-down-1", PLAIN_TEXT);
+      await readAsOther("evt-down-1");
       await h.clock.advance(4000);
       await actorOf().safetyIdle();
       expect(h.direct.sent).toMatchObject([{ fixedLineId: "outage", overrideOptout: false }]);
@@ -587,9 +814,12 @@ describe("texts that arrive during a read", () => {
   it("a second text is read on its own, in arrival order, and its line does not wait for the first read", async () => {
     const first = { ...asResult(safetyNo), eventId: "evt-seq-1" };
     const second = { ...asResult(safetyEmergencyNow), eventId: "evt-seq-2" };
-    await withSafety({ [second.eventId]: second }, {}, async (h) => {
+    // The first text's outage line is a step on the way here (DL-615, the architect's 5(b)): the down path runs wired, as
+    // D-017 is to wire it, and has read both texts as other texts before the first one's 4 s.
+    await withWiredSafety({ [second.eventId]: second }, {}, async (h) => {
       await arrive(first.eventId, "Is Thursday free?");
       await arrive(second.eventId, EMERGENCY_TEXT);
+      await readAsOther(first.eventId, second.eventId);
       await vi.waitFor(() => {
         expect(h.core.recorded).toHaveLength(1);
       });
@@ -700,4 +930,350 @@ describe("the rules", () => {
     expect(timeoutResult("evt-alex-0210", matches)).toEqual(safetyTimeoutDangerWord);
     expect(timeoutResult("evt-x", []).outcomes).toEqual([]);
   });
+});
+
+/**
+ * A vote of Alex's arrives through the gateway's door: K-06's poll-vote.json with this event id and option words, its
+ * words scrubbed and sealed in its form 2 box by the gateway's own hand-off (K-06 v1.2; T-1297), none in the clear.
+ */
+async function arriveVote(eventId: string, optionWords: string): Promise<SealedHandoff> {
+  const overrides: Json = { eventId, poll: { ...pollVote.poll, optionWords }, traceId: TRACE };
+  const prepared = await prepareHandoff(
+    {
+      event: { ...(pollVote as Json), ...overrides } as InboundEvent,
+      partKey: null,
+      traceId: TRACE,
+      bundleId: BUNDLE,
+    },
+    keys,
+  );
+  if (prepared.door !== "actor") throw new Error("not an actor event");
+  expect(prepared.handoff.event.poll).toEqual({
+    pollId: pollVote.poll.pollId,
+    optionId: pollVote.poll.optionId,
+  });
+  expect(prepared.handoff.event.sealed?.v).toBe(2);
+  expect(await door().accept(prepared.handoff)).toBe("written");
+  return prepared.handoff;
+}
+
+const noFor = (eventId: string): SafetyResult => ({ ...asResult(safetyNo), eventId });
+
+describe("a vote's words, once in its box, are read on arrival (DL-540; T-1297)", () => {
+  it("the safety read reads a vote's option words as its text, and the down path's keyword read reads them too: Rosie's option is another text, an option that reads STOP a stop", async () => {
+    const plain = "evt-alex-vote-0001";
+    const stop = "evt-alex-vote-0002";
+    await withWiredSafety({ [plain]: noFor(plain), [stop]: noFor(stop) }, {}, async (h) => {
+      await arriveVote(plain, "Sat 2:00pm");
+      await arriveVote(stop, "STOP");
+      await actorOf().safetyIdle();
+
+      expect(h.read.requests.map((request) => [request.eventId, request.words])).toEqual([
+        [plain, { body: "Sat 2:00pm", subject: null }],
+        [stop, { body: "STOP", subject: null }],
+      ]);
+      expect(
+        (await actorOf().readSafety()).map((entry) => [entry.eventId, entry.state, entry.danger]),
+      ).toEqual([
+        [plain, "done", false],
+        [stop, "done", false],
+      ]);
+      await actorOf().outageIdle();
+      expect((await actorOf().readOutage()).texts).toEqual([
+        expect.objectContaining({ eventId: plain, kind: "other" }),
+        expect.objectContaining({ eventId: stop, kind: "stop" }),
+      ]);
+    });
+  });
+
+  it("a vote whose option holds a danger word, with no verdict in 4 s, gets the safety line (911) by the timeout rule, as a text does", async () => {
+    const eventId = safetyTimeoutDangerWord.eventId;
+    await withSafety({}, {}, async (h) => {
+      await arriveVote(eventId, "Riley's cut won't stop bleeding, please help");
+      await h.clock.advance(4000);
+      await actorOf().safetyIdle();
+
+      expect(h.read.requests.map((request) => request.words)).toEqual([
+        { body: "Riley's cut won't stop bleeding, please help", subject: null },
+      ]);
+      expect(h.core.recorded).toHaveLength(1);
+      expect(h.core.recorded[0]?.request.safety).toEqual(asResult(safetyTimeoutDangerWord));
+      expect(h.core.recorded[0]?.response).toMatchObject({ safetyLine: { fixedLineId: "safetyEmergency" } });
+      expect(await actorOf().routineHeld()).toBe(true);
+    });
+  });
+
+  it("a vote kept before K-06 v1.2 (no box) has no words to read on arrival, as it was kept", async () => {
+    await withSafety({ "evt-alex-vote-0003": noFor("evt-alex-vote-0003") }, {}, async (h) => {
+      const { event } = await arriveVote("evt-alex-vote-0003", "Sat 2:00pm");
+      const kept = { ...event, eventId: "evt-alex-vote-0004", sealed: null, poll: { ...pollVote.poll } };
+      expect(
+        await door().accept({
+          event: kept,
+          partKey: null,
+          traceId: TRACE,
+          bundleId: BUNDLE,
+          actorName: ALEX,
+        }),
+      ).toBe("written");
+      await actorOf().safetyIdle();
+
+      expect(h.read.requests.map((request) => request.eventId)).toEqual(["evt-alex-vote-0003"]);
+      expect((await actorOf().readSafety()).map((entry) => entry.eventId)).toEqual(["evt-alex-vote-0003"]);
+    });
+  });
+});
+
+// ---- T-1336: a STOP the actor takes while the timeout rule's outage line awaits -------------------------------------
+
+describe("a STOP the actor takes while the safety read's own outage line awaits gets no line by any path (T-1336; RULES 7.2), while a text read as another text still gets its line once and a danger line still goes (RULES 4.12)", () => {
+  const FIRST = "evt-alex-1336-1";
+  const STOP = "evt-alex-1336-2";
+  const OTHER = "evt-alex-1336-3";
+  const DANGER = "evt-alex-1336-4";
+
+  /**
+   * The awaits sendOutage makes before its line goes, each held in turn while the actor takes a text: the stopped flag the
+   * deps read; the handle's ids, naming the handle (the line goes through the core's outbox row) or none (it goes straight
+   * through Linq); and the core's answer to the line, `transient` (it goes straight through Linq).
+   */
+  const AWAITS = [
+    "the stopped flag",
+    "the handle's ids",
+    "the handle's ids, which name none",
+    "the core's answer, which is transient",
+  ] as const;
+  type Await = (typeof AWAITS)[number];
+
+  /** True where the line, once let go, goes straight through Linq, not through the core's outbox row. */
+  const viaLinq = (at: Await): boolean =>
+    at === "the handle's ids, which name none" || at === "the core's answer, which is transient";
+
+  interface Held {
+    /** How many times sendOutage reached the await held. */
+    reached: number;
+    /** The outage lines the core was asked for, where its answer is the await held (it writes nothing: `transient`). */
+    asked: SendFixedLineRequest[];
+  }
+
+  /** Holds sendOutage at `at` behind `gate`, which the test opens from its own context (polled: T-1128's findings). */
+  function holdAt(h: Harness, at: Await, gate: Hold): Held {
+    const held: Held = { reached: 0, asked: [] };
+    if (at === "the stopped flag") {
+      h.deps.isStopped = async () => {
+        held.reached += 1;
+        await gate.wait();
+        return h.stopped.value;
+      };
+    } else if (at === "the core's answer, which is transient") {
+      const core = h.deps.core;
+      h.deps.core = {
+        recordSafetyOutcome: (request) => core.recordSafetyOutcome(request),
+        releaseSafetyHold: (request) => core.releaseSafetyHold(request),
+        async sendFixedLine(request) {
+          held.reached += 1;
+          held.asked.push(request);
+          await gate.wait();
+          return { error: "transient" };
+        },
+      };
+    } else {
+      const ids = at === "the handle's ids" ? TEST_IDS : null;
+      h.deps.directory = {
+        async idsOf() {
+          held.reached += 1;
+          await gate.wait();
+          return ids;
+        },
+      };
+    }
+    return held;
+  }
+
+  /** The actor's one reading now (handle-actor.ts `mayHaveStopped`, the safety host's `stopped`), inside the actor. */
+  const actorAnswer = (): Promise<boolean> =>
+    runInDurableObject(stubOf(), (instance) =>
+      (instance as unknown as { mayHaveStopped(): boolean }).mayHaveStopped(),
+    );
+
+  /**
+   * Alex's first text, read by the down path as another text, gets no verdict in 4 s: the timeout rule asks for the outage
+   * line, the actor's reading lets it on (no word waits), and sendOutage waits at `at`.
+   */
+  async function outageLineHeldAt(h: Harness, at: Await): Promise<{ gate: Hold; held: Held }> {
+    const gate = hold(true);
+    const held = holdAt(h, at, gate);
+    await arrive(FIRST, PLAIN_TEXT);
+    await readAsOther(FIRST);
+    expect(await actorAnswer()).toBe(false);
+    await h.clock.advance(4000);
+    await until(() => held.reached === 1, `the outage line's wait at ${at}`);
+    return { gate, held };
+  }
+
+  /** Waits until the first text's safety work has decided its line: its row is done (the line went, or it was held). */
+  async function lineDecided(): Promise<void> {
+    await vi.waitFor(
+      async () => {
+        expect((await actorOf().readSafety()).find((entry) => entry.eventId === FIRST)?.state).toBe("done");
+      },
+      { timeout: 3000 },
+    );
+  }
+
+  const safetyOf = async (eventId: string): Promise<SafetyEntry | undefined> =>
+    (await actorOf().readSafety()).find((entry) => entry.eventId === eventId);
+
+  it.each(AWAITS)(
+    "a STOP the actor takes while the outage line awaits %s: the reading, asked again right before the send, holds the line, so none goes by any path",
+    async (at) => {
+      await withWiredSafety({}, {}, async (h) => {
+        const { gate, held } = await outageLineHeldAt(h, at);
+
+        // The STOP comes now: the actor stores it and opens its batch window in one step (handle-actor.ts `accept`), so
+        // its reading is a possible STOP at once, then the down path's own reading of the word.
+        await arrive(STOP, "STOP");
+        expect(await actorAnswer()).toBe(true);
+        await actorOf().outageIdle();
+        expect((await actorOf().readOutage()).texts).toEqual([
+          expect.objectContaining({ eventId: FIRST, kind: "other" }),
+          expect.objectContaining({ eventId: STOP, kind: "stop" }),
+        ]);
+        expect(await actorAnswer()).toBe(true);
+
+        gate.closed = false;
+        await lineDecided();
+        // No line by any path: no row through the core, no Linq send, no record queued for one; the row says held.
+        await noOutageLine(h, FIRST);
+        expect(h.direct.sent).toEqual([]);
+        expect(held.reached).toBe(1);
+        // Only where the core's answer was the await held was the core asked, before the STOP came; it wrote nothing.
+        expect(held.asked.map((request) => request.caller.requestId)).toEqual(
+          at === "the core's answer, which is transient" ? [`safety:${FIRST}`] : [],
+        );
+        await timeoutRuleStill(FIRST, 34_000);
+      });
+    },
+  );
+
+  it.each(AWAITS)(
+    "a text read as another text, which the actor takes while the outage line awaits %s, does not hold it: the line goes once",
+    async (at) => {
+      await withWiredSafety({}, {}, async (h) => {
+        const { gate, held } = await outageLineHeldAt(h, at);
+
+        await arrive(OTHER, "Test words: thanks!");
+        await readAsOther(FIRST, OTHER);
+        expect(await actorAnswer()).toBe(false);
+
+        gate.closed = false;
+        await lineDecided();
+        expect(held.reached).toBe(1);
+        if (viaLinq(at)) {
+          expect(h.core.fixed).toEqual([]);
+          expect(h.direct.sent).toEqual([
+            expect.objectContaining({
+              fixedLineId: "outage",
+              overrideOptout: false,
+              idempotencyKey: `safety:${FIRST}:outage`,
+            }),
+          ]);
+          expect(await safetyOf(FIRST)).toMatchObject({ path: "outage", lineId: "outage" });
+        } else {
+          expect(
+            h.core.fixed.map((call) => [call.request.caller.requestId, call.request.fixedLineId]),
+          ).toEqual([[`safety:${FIRST}`, "outage"]]);
+          expect(h.direct.sent).toEqual([]);
+          expect(await safetyOf(FIRST)).toMatchObject({ path: "outbox", lineId: "outage" });
+        }
+        if (at === "the core's answer, which is transient") {
+          // The core was asked once and wrote nothing; the line's record waits for its return.
+          expect(held.asked.map((request) => request.caller.requestId)).toEqual([`safety:${FIRST}`]);
+          expect((await actorOf().readCopies()).returns.map((entry) => entry.key)).toContain(
+            `sendFixedLine:${FIRST}`,
+          );
+        }
+      });
+    },
+  );
+
+  it.each(AWAITS)(
+    "the reading asked again fails closed, as T-1313's ask does: the actor's copy of the stopped flag cannot be read once the outage line awaits %s, so the line is held",
+    async (at) => {
+      await withWiredSafety({}, {}, async (h) => {
+        const { gate, held } = await outageLineHeldAt(h, at);
+        // From now on the actor's copy throws on every read: its storage cannot answer for it (here, its table is gone).
+        await runInDurableObject(stubOf(), (_, state) => {
+          state.storage.sql.exec("DROP TABLE copy_stopped");
+        });
+
+        gate.closed = false;
+        await lineDecided();
+        expect(held.reached).toBe(1);
+        expect(h.core.fixed).toEqual([]);
+        expect(h.direct.sent).toEqual([]);
+        expect(await safetyOf(FIRST)).toMatchObject({ path: "none", lineId: "outage" });
+      });
+    },
+  );
+
+  it.each([
+    ["through the core's outbox row", false],
+    [
+      "straight through Linq, past any opt-out, the core answering its record `transient` (PostgreSQL still answering)",
+      true,
+    ],
+  ] as const)(
+    "a danger line still goes at once %s while a STOP the actor took holds the outage line (RULES 4.12: sendDanger never asks the reading)",
+    async (_how, viaLinqToo) => {
+      const danger: SafetyResult = { ...asResult(safetyEmergencyNow), eventId: DANGER };
+      await withWiredSafety({ [DANGER]: danger }, {}, async (h) => {
+        const { gate } = await outageLineHeldAt(h, "the stopped flag");
+        await arrive(STOP, "STOP");
+        expect(await actorAnswer()).toBe(true);
+        if (viaLinqToo) {
+          // K-09's own `transient` (nothing written): the core is not answering for this record, so the line goes direct.
+          h.deps.core = {
+            ...h.deps.core,
+            recordSafetyOutcome: () => Promise.resolve({ error: "transient" }),
+          };
+        }
+
+        // A danger text comes while the STOP waits uncommitted: its verdict's line goes at once, the STOP's reading aside.
+        await arrive(DANGER, EMERGENCY_TEXT);
+        if (viaLinqToo) {
+          await until(() => h.direct.sent.length === 1, "the danger line straight through Linq");
+          expect(h.direct.sent).toEqual([
+            expect.objectContaining({
+              fixedLineId: "safetyEmergency",
+              overrideOptout: true,
+              idempotencyKey: `safety:${DANGER}:safetyEmergency`,
+            }),
+          ]);
+        } else {
+          await until(() => h.core.recorded.length === 1, "the danger line through the core");
+          expect(h.core.recorded[0]?.request.safety.eventId).toBe(DANGER);
+          expect(h.core.recorded[0]?.response).toMatchObject({
+            safetyLine: { fixedLineId: "safetyEmergency" },
+          });
+        }
+        await vi.waitFor(
+          async () => {
+            expect(await safetyOf(DANGER)).toMatchObject({
+              danger: true,
+              path: viaLinqToo ? "direct" : "outbox",
+              lineId: "safetyEmergency",
+            });
+          },
+          { timeout: 3000 },
+        );
+        expect(await actorAnswer()).toBe(true);
+
+        // The outage line, let on before the STOP came, is held when the flag read ends.
+        gate.closed = false;
+        await lineDecided();
+        await noOutageLine(h, FIRST);
+      });
+    },
+  );
 });

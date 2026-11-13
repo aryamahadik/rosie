@@ -1,0 +1,44 @@
+{
+  "call": "openChatOnText",
+  "given": {
+    "k04Seeds": ["seed-phone-stopped.json"],
+    "after": [],
+    "now": "2026-11-10T16:30:01Z",
+    "note": "Refused: Ben T.'s text opens his stopped number's chat. K-04's phones_stop_closes_chat lets a chat open only on a row that is not stopped, so the call could open it only by clearing his stop, which its entry shows (stopped true to false). A text is not START: the call never writes stopped, and its entry names only chat_open, chat_open_at and chat_way (chatClosedValues, chatOpenValues). Put right, the call writes nothing, as open-chat-ben-stopped answers."
+  },
+  "request": {
+    "eventId": "evt-ben-0030",
+    "handleId": "handle-ben",
+    "service": "imessage",
+    "receivedAt": "2026-11-10T16:30:01Z",
+    "traceId": "trace-ben-0030"
+  },
+  "outcome": {
+    "result": "opened",
+    "handleId": "handle-ben",
+    "phone": {
+      "chatOpen": true,
+      "chatOpenAt": "2026-10-05T17:00:00Z",
+      "chatWay": "imessage",
+      "stopped": false,
+      "version": 4
+    },
+    "event": {
+      "id": "evt-ben-0030/chat-opened",
+      "kind": "phone.chat_opened",
+      "zone": null,
+      "businessId": null,
+      "actorKind": "provider",
+      "actorPersonId": null,
+      "actorRole": null,
+      "tableName": "phones",
+      "rowId": "handle-ben",
+      "oldValues": { "chat_open": false, "stopped": true },
+      "newValues": { "chat_open": true, "stopped": false },
+      "sealed": null,
+      "why": { "provider_event": { "provider": "linq", "event_id": "evt-ben-0030" } },
+      "approvedBy": null,
+      "proofs": null
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "call": "readPhoneState",
+  "given": {
+    "k04Seeds": ["seed-phone-chat-open.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:00Z",
+    "note": "Sam's phone after its chat opened (K-04's seed-phone-chat-open.json: chat open since Oct 19, never stopped): open, not stopped, no STOP in force; no K-29 chat link names the number, so none (README item 55)."
+  },
+  "request": {
+    "number": "+15555550100"
+  },
+  "outcome": {
+    "phone": {
+      "chatOpen": true,
+      "stopped": false,
+      "stoppedAt": null
+    },
+    "chatLink": null
+  }
+}

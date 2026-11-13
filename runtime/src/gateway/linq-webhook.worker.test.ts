@@ -1,6 +1,7 @@
 // The Linq webhook entry, run inside the Workers runtime (T-241). The Linq port is a double that answers exactly as
 // K-11's fixtures state (it knows no signature algorithm: that is the adapter's); the actor is a stub that models the
 // seen-event-id check. Fixtures: contracts/port-linq/fixtures and contracts/inbound-event/fixtures.
+// T-1180: a body over its own cap is answered 413 before it is read whole, with nothing verified or handed on.
 import { env } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -11,8 +12,10 @@ import deliveredAfter4006 from "../../../contracts/port-linq/fixtures/verify-del
 import verifyOk from "../../../contracts/port-linq/fixtures/verify-ok.json";
 import staleTimestamp from "../../../contracts/port-linq/fixtures/verify-stale-timestamp.json";
 import duplicateEvent from "../../../contracts/inbound-event/fixtures/duplicate-event.json";
+import { seqOf } from "../trace";
+import { LINQ_BODY_LIMIT_BYTES } from "./body";
 import { handleLinqWebhook } from "./linq-webhook";
-import { fakeKeyStore } from "./test-support";
+import { countedStream, fakeKeyStore, postOf, xBytes } from "./test-support";
 import type { SealingKeyStore } from "./seal";
 import type {
   ActorHandoff,
@@ -349,6 +352,285 @@ describe("POST /webhooks/linq", () => {
   });
 });
 
+describe("one receive span per inbound event, as K-08 states it, and the trace's places before the hand-off (T-1108)", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const spansOf = (lines: Record<string, unknown>[]): Record<string, unknown>[] =>
+    lines.filter((line) => line.msg === "span");
+
+  /** verify-ok's webhook again, as Linq's retry of it: the same event id under another body. */
+  const repeated: Fixture = {
+    request: { ...verifyOk.request, raw: `${verifyOk.request.raw} ` },
+    outcome: { result: "event", httpStatus: 200, event: duplicateEvent, partKey: null },
+  };
+
+  it("a text written to its actor: the receive span says sealedToActor at seq 1 (trace-skeleton.json), the scrub is seq 2, and the hand-off tells the actor the gateway took 2 places", async () => {
+    const logLines = captureLogLines();
+    const actor = actorStub();
+
+    const response = await handleLinqWebhook(webhookOf(verifyOk), depsOf(portDouble(ALL), actor), WHERE);
+
+    expect(response.status).toBe(200);
+    const spans = spansOf(logLines());
+    expect(spans.map((span) => [span.seq, span.hop, span.outcome])).toEqual([
+      [1, "receive", "ok"],
+      [2, "scrub", "ok"],
+    ]);
+    expect(spans[0]?.decided).toEqual({
+      signatureValid: true,
+      knownEventId: false,
+      sealedToActor: true,
+      answered: 200,
+    });
+    expect(actor.written.map((handoff) => handoff.seqBefore)).toEqual([2]);
+    // Linq's own event opened the trace's one count: a writer in this isolate goes on from the gateway's two places.
+    expect(seqOf(response.headers.get("x-trace-id") ?? "")).toBe(2);
+  });
+
+  it.each([
+    ["a bad signature", badSignature, 401],
+    ["a stale timestamp", staleTimestamp, 401],
+  ])(
+    "%s opens no count for its trace: only a signed event takes room in the isolate's memory of counts",
+    async (_name, fixture, status) => {
+      const logLines = captureLogLines();
+
+      const response = await handleLinqWebhook(
+        webhookOf(fixture),
+        depsOf(portDouble(ALL), actorStub()),
+        WHERE,
+      );
+
+      expect(response.status).toBe(status);
+      const traceId = response.headers.get("x-trace-id") ?? "";
+      expect(traceId).toMatch(UUID);
+      expect(seqOf(traceId)).toBeNull();
+      // Its one receive span still stands at place 1.
+      expect(spansOf(logLines()).map((span) => [span.seq, span.hop, span.outcome])).toEqual([
+        [1, "receive", "refused"],
+      ]);
+    },
+  );
+
+  it("a receipt has no words to seal and no actor: its receive span says neither, and its hand-off names no places", async () => {
+    const logLines = captureLogLines();
+    const actor = actorStub();
+    const receipts = receiptsStub();
+
+    await handleLinqWebhook(webhookOf(deliveredAfter4006), depsOf(portDouble(ALL), actor, receipts), WHERE);
+
+    const spans = spansOf(logLines());
+    expect(spans.map((span) => [span.seq, span.hop, span.outcome])).toEqual([[1, "receive", "ok"]]);
+    expect(spans[0]?.decided).toEqual({ signatureValid: true, knownEventId: false, answered: 200 });
+    expect(receipts.written).toHaveLength(1);
+    expect(receipts.written[0]).not.toHaveProperty("seqBefore");
+  });
+
+  it("a known event id: the dropped receive span names the trace the event first arrived under (trace-duplicate-webhook.json), as its actor's door answers it, and nothing follows it", async () => {
+    const logLines = captureLogLines();
+    const stub = actorStub();
+    const asked: string[] = [];
+    const actor: ActorStub = {
+      accept: (handoff) => stub.accept(handoff),
+      firstTrace(handoff) {
+        asked.push(handoff.event.eventId);
+        const stored = stub.written.find((one) => one.event.eventId === handoff.event.eventId);
+        return Promise.resolve(stored?.traceId ?? null);
+      },
+    };
+    const deps = depsOf(portDouble([...ALL, repeated]), actor);
+
+    const first = await handleLinqWebhook(webhookOf(verifyOk), deps, WHERE);
+    const second = await handleLinqWebhook(webhookOf(repeated), deps, WHERE);
+
+    expect([first.status, second.status]).toEqual([200, 200]);
+    const firstTrace = first.headers.get("x-trace-id");
+    const repeatTrace = second.headers.get("x-trace-id");
+    expect(repeatTrace).not.toBe(firstTrace);
+    const repeat = spansOf(logLines()).filter((span) => span.trace_id === repeatTrace);
+    expect(repeat.map((span) => [span.seq, span.hop, span.outcome])).toEqual([[1, "receive", "dropped"]]);
+    expect(repeat[0]?.decided).toEqual({
+      signatureValid: true,
+      knownEventId: true,
+      firstTrace,
+      answered: 200,
+    });
+    // Asked once, for the repeat only: an event its actor wrote has no first trace to ask for.
+    expect(asked).toEqual(["evt-alex-0001"]);
+  });
+
+  it.each([
+    ["has no such call", undefined],
+    ["cannot answer", (): Promise<string | null> => Promise.reject(new Error("the actor gave no answer"))],
+    ["holds no such event", (): Promise<string | null> => Promise.resolve(null)],
+    ["answers what is no label", (): Promise<string | null> => Promise.resolve("two words")],
+  ])(
+    "a known event id whose actor's door %s: the dropped span names no first trace, and the answer is 200 all the same",
+    async (_name, firstTrace) => {
+      const logLines = captureLogLines();
+      const stub = actorStub();
+      const actor: ActorStub = {
+        accept: (handoff) => stub.accept(handoff),
+        ...(firstTrace === undefined ? {} : { firstTrace }),
+      };
+      const deps = depsOf(portDouble([...ALL, repeated]), actor);
+
+      await handleLinqWebhook(webhookOf(verifyOk), deps, WHERE);
+      const second = await handleLinqWebhook(webhookOf(repeated), deps, WHERE);
+
+      expect(second.status).toBe(200);
+      const repeat = receiveSpans(logLines()).filter(
+        (span) => span.trace_id === second.headers.get("x-trace-id"),
+      );
+      expect(repeat.map((span) => span.outcome)).toEqual(["dropped"]);
+      expect(repeat[0]?.decided).toEqual({ signatureValid: true, knownEventId: true, answered: 200 });
+      expect(JSON.stringify(logLines())).not.toContain("two words");
+    },
+  );
+});
+
+describe("the Linq webhook's body cap (T-1180)", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  // The gateway never reads the context; the Workers runtime's own context has members this test cannot build.
+  const context = {
+    waitUntil: () => undefined,
+    passThroughOnException: () => undefined,
+    props: {},
+  } as unknown as ExecutionContext;
+
+  /** verify-ok's webhook, its raw body followed by spaces to exactly `bytes` bytes. */
+  function paddedWebhook(bytes: number): { request: Request; raw: string } {
+    const raw =
+      verifyOk.request.raw + " ".repeat(bytes - new TextEncoder().encode(verifyOk.request.raw).byteLength);
+    return { request: webhookOf({ ...verifyOk, request: { ...verifyOk.request, raw } }), raw };
+  }
+
+  /** verify-ok's headers on a streamed body, with these headers besides. */
+  function streamedWebhook(
+    stream: ReadableStream<Uint8Array>,
+    headers: Record<string, string> = {},
+  ): Request {
+    return postOf(
+      stream,
+      {
+        "webhook-id": verifyOk.request.webhookId,
+        "webhook-timestamp": verifyOk.request.timestamp,
+        "webhook-signature": verifyOk.request.signature,
+        ...headers,
+      },
+      "https://rosie.test/test/webhooks/linq",
+    );
+  }
+
+  it("a body one byte over its cap: 413 with the trace id, nothing verified, written or handed on, a refused receive span, nothing of the body logged", async () => {
+    const logLines = captureLogLines();
+    const linq = portDouble(ALL);
+    const actor = actorStub();
+    const receipts = receiptsStub();
+    const { request } = paddedWebhook(LINQ_BODY_LIMIT_BYTES + 1);
+
+    const response = await handleLinqWebhook(request, depsOf(linq, actor, receipts), WHERE);
+
+    expect(response.status).toBe(413);
+    const traceId = response.headers.get("x-trace-id");
+    expect(traceId).toMatch(UUID);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(await response.json()).toEqual({ ok: false, error: "payload_too_large", trace_id: traceId });
+    expect(linq.requests).toEqual([]);
+    expect(actor.calls).toEqual([]);
+    expect(receipts.written).toEqual([]);
+    const lines = logLines();
+    expect(lines).toHaveLength(1);
+    expect(receiveSpans(lines)).toMatchObject([
+      { trace_id: traceId, provider: "linq", outcome: "refused", error_code: "bodyTooLarge" },
+    ]);
+    const text = JSON.stringify(lines);
+    expect(text).not.toContain("Haircut");
+    expect(text).not.toContain("5555550101");
+    expect(text).not.toContain(verifyOk.request.signature);
+  });
+
+  it("a body exactly at its cap reaches the verify as sent", async () => {
+    captureLogLines();
+    const linq = portDouble(ALL);
+    const { request, raw } = paddedWebhook(LINQ_BODY_LIMIT_BYTES);
+
+    await handleLinqWebhook(request, depsOf(linq, actorStub()), WHERE);
+
+    expect(linq.requests).toHaveLength(1);
+    expect(linq.requests[0]?.raw).toBe(raw);
+  });
+
+  it("a declared length over its cap is answered 413 before a byte of the body is read", async () => {
+    captureLogLines();
+    const linq = portDouble(ALL);
+    const source = countedStream(1024, () => xBytes(1024));
+
+    const response = await handleLinqWebhook(
+      streamedWebhook(source.stream, { "content-length": String(LINQ_BODY_LIMIT_BYTES + 1) }),
+      depsOf(linq, actorStub()),
+      WHERE,
+    );
+
+    expect(response.status).toBe(413);
+    expect(source.pulled()).toBe(0);
+    expect(linq.requests).toEqual([]);
+  });
+
+  it("a body that declares no length is cut off at the chunk that takes it over its cap: a 1 GiB body is never read whole", async () => {
+    captureLogLines();
+    const linq = portDouble(ALL);
+    const source = countedStream(1024 * 1024, () => xBytes(1024));
+
+    const response = await handleLinqWebhook(
+      streamedWebhook(source.stream),
+      depsOf(linq, actorStub()),
+      WHERE,
+    );
+
+    expect(response.status).toBe(413);
+    expect(source.pulled()).toBeGreaterThan(LINQ_BODY_LIMIT_BYTES / 1024);
+    expect(source.pulled()).toBeLessThan((2 * LINQ_BODY_LIMIT_BYTES) / 1024);
+    expect(source.cancelled()).toBe(true);
+    expect(linq.requests).toEqual([]);
+  });
+
+  it("its cap is its own config value: GatewayDeps.linqBodyLimitBytes sets it, the page entry's cap does not, and a mistyped value leaves the default", async () => {
+    captureLogLines();
+    const answer = async (more: Partial<GatewayDeps>): Promise<number> => {
+      const deps = { ...depsOf(portDouble(ALL), actorStub()), ...more };
+      return (await handleLinqWebhook(webhookOf(verifyOk), deps, WHERE)).status;
+    };
+
+    expect(await answer({ linqBodyLimitBytes: 64 })).toBe(413);
+    expect(
+      await answer({ linqBodyLimitBytes: new TextEncoder().encode(verifyOk.request.raw).byteLength }),
+    ).toBe(200);
+    expect(await answer({ pageBodyLimitBytes: 1 })).toBe(200);
+    expect(await answer({ linqBodyLimitBytes: Number.NaN })).toBe(200);
+    expect(await answer({ linqBodyLimitBytes: -1 })).toBe(200);
+  });
+
+  it("through the Worker's route, a webhook over its cap is answered 413 and reaches no door", async () => {
+    captureLogLines();
+    const linq = portDouble(ALL);
+    const actor = actorStub();
+    const routed = createWorker(() => depsOf(linq, actor));
+
+    const response = await routed.fetch(paddedWebhook(LINQ_BODY_LIMIT_BYTES + 1).request, env, context);
+
+    expect(response.status).toBe(413);
+    expect(response.headers.get("x-trace-id")).toMatch(UUID);
+    expect(linq.requests).toEqual([]);
+    expect(actor.calls).toEqual([]);
+  });
+});
+
 describe("the Worker's webhook route", () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -385,12 +667,12 @@ describe("the Worker's webhook route", () => {
     expect(response.status).toBe(405);
   });
 
-  it("answers 503 while the Linq adapter and the actor are not connected", async () => {
+  it("answers 404 while the skeleton flag is off: the Worker's route is the composition root's, and no release flags are bound to it (T-553)", async () => {
     captureLogLines();
 
     const response = await worker.fetch(webhookOf(verifyOk), env, context);
 
-    expect(response.status).toBe(503);
+    expect(response.status).toBe(404);
     expect(response.headers.get("x-trace-id")).toMatch(UUID);
   });
 });

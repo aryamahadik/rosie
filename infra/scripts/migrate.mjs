@@ -6,6 +6,9 @@
 //
 // DATABASE_URL  the database. When DATABASE_URL and CI are both unset: the local Docker database
 //               (infra/docker-compose.yml). The URL is never printed. For a pooled host (Neon) use its direct URL.
+//               It is checked before the client is built (db-url.mjs, as publish-bundle.sh and flags.sh do): one that
+//               does not parse is refused with its fault named (exit 1), and an error printed holds no part of it
+//               (its user, password, host, port or database name).
 // DB_SCHEMA     optional schema, for example preview_<slug>: created when missing and searched first, then public.
 //
 // Each file runs in its own transaction, together with its row in <schema>.schema_migrations (version, name,
@@ -25,6 +28,8 @@ import { pathToFileURL } from "node:url";
 import { setTimeout as sleep } from "node:timers/promises";
 import postgres from "postgres";
 
+import { DatabaseUrlFault, checkDatabaseUrl, printStrayErrors, scrub } from "./db-url.mjs";
+
 const LOCAL_DATABASE_URL = "postgres://rosie:rosie@127.0.0.1:54329/rosie";
 const MIGRATIONS_DIR = process.env.MIGRATIONS_DIR
   ? pathToFileURL(`${process.env.MIGRATIONS_DIR.replace(/\/+$/, "")}/`)
@@ -38,6 +43,13 @@ const LOCK_WAIT_SECONDS = 120;
 const USAGE = "Usage: node infra/scripts/migrate.mjs [--status]";
 
 class UsageError extends Error {}
+/** A run refused before anything is read or written (exit 1). */
+class Refusal extends Error {}
+
+// The parts of the database URL taken out of every error printed (db-url.mjs; DL-363): the whole string until the URL
+// is checked, then each part. An error that no catch takes (a stray rejection) is printed the same way.
+let secrets = [process.env.DATABASE_URL ?? ""];
+printStrayErrors("migrate", () => secrets);
 
 function databaseTarget() {
   if (process.env.DATABASE_URL) {
@@ -47,6 +59,19 @@ function databaseTarget() {
     throw new UsageError("DATABASE_URL is not set (the local default is never used when CI is set)");
   }
   return { url: LOCAL_DATABASE_URL, label: "local database 127.0.0.1:54329/rosie" };
+}
+
+// The URL, checked before any client is built: one that does not parse is refused with its fault named and no part of
+// it, and from then on its parts are taken out of every error printed.
+function checkTarget(target) {
+  try {
+    secrets = checkDatabaseUrl(target.url);
+  } catch (error) {
+    if (!(error instanceof DatabaseUrlFault)) {
+      throw error;
+    }
+    throw new Refusal(`${target.label} does not parse: ${error.message}; nothing was read or written`);
+  }
 }
 
 function schemaName() {
@@ -281,9 +306,11 @@ async function applyFile(sql, schema, file) {
   });
 }
 
+// An error as printed: its message, code, detail, hint, where and position, with every part of the database URL taken
+// out; never another field (postgres.js keeps a URL it cannot read, password included, in `input`).
 function describeError(error) {
   if (!(error instanceof Error)) {
-    return String(error);
+    return scrub(String(error), secrets, error);
   }
   const details = [error.message];
   for (const key of ["code", "detail", "hint", "where", "position"]) {
@@ -291,7 +318,7 @@ function describeError(error) {
       details.push(`${key}: ${error[key]}`);
     }
   }
-  return details.join("\n  ");
+  return scrub(details.join("\n  "), secrets, error);
 }
 
 async function main(args) {
@@ -301,6 +328,7 @@ async function main(args) {
   }
   const statusOnly = args.includes("--status");
   const target = databaseTarget();
+  checkTarget(target);
   const schema = schemaName();
   const files = readMigrationFiles();
 
@@ -358,6 +386,11 @@ async function main(args) {
 try {
   process.exitCode = await main(process.argv.slice(2));
 } catch (error) {
-  console.error(`migrate: ${error instanceof UsageError ? error.message : describeError(error)}`);
-  process.exitCode = error instanceof UsageError ? 2 : 1;
+  if (error instanceof Refusal) {
+    console.error(`migrate: refused: ${error.message}`);
+    process.exitCode = 1;
+  } else {
+    console.error(`migrate: ${error instanceof UsageError ? error.message : describeError(error)}`);
+    process.exitCode = error instanceof UsageError ? 2 : 1;
+  }
 }

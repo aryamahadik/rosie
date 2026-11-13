@@ -1119,6 +1119,1542 @@
       "expect": "refuse",
       "shows": "A turn state under the barbershop's scope that carries, as a fact, whom Alex's report about staff names: a table only Rosie's team reads is never a fact, so its rows never reach the business, its owner included",
       "source": "S11-70; A3-49; K-34 v1 harm_reports, README rule 4, seed-harm-report; security review of T-072 round 2 (N3)"
+    },
+    {
+      "file": "read-open-holds-s1-02.json",
+      "version": "v1.3",
+      "def": "readOpenHolds.exchange",
+      "expect": "accept",
+      "shows": "The walking skeleton's commit reads what is open on Sam's handle at the barbershop: its one text's outcome rides in the commit's core, so no text is named, and with no hold nothing is open, so S1-02's part may commit",
+      "source": "K-09 v1 commit-s1-02.json; QUESTIONS.md CQ-65 (DL-119, DL-127, DL-128); actions/src/commit/types.ts OpenHolds; K-05 v1.3 item 34, closing v1.2 open gap 26"
+    },
+    {
+      "file": "read-open-holds-alex.json",
+      "version": "v1.3",
+      "def": "readOpenHolds.exchange",
+      "expect": "accept",
+      "shows": "Alex's open holds at the barbershop, oldest first, each with what it holds back in K-09 safetyHold's names (crisis words after-safe on the haircut, the threat's never), his released emergency hold left out; of the two texts named, the one with no safety row is unread",
+      "source": "arch 06 lines 315 to 329; A3-24, A3-25, A3-48; K-34 v1 safety_holds, safety_holds_open_handle_idx, safety_outcomes_event_key, seed-outcome-crisis, seed-threat-pause, seed-hold-released; CQ-65 (DL-127, DL-133); K-09 v1 safetyHold"
+    },
+    {
+      "file": "read-open-holds-other-business.json",
+      "version": "v1.3",
+      "def": "readOpenHolds.exchange",
+      "expect": "accept",
+      "shows": "The same handle under the yoga studio's scope sees none of the barbershop's holds, and a text whose safety row is the barbershop's counts as unread there: the read fails closed",
+      "source": "arch 10 line 546; K-04 v1 rule 4; K-34 v1 rule 4; CQ-65 (DL-127); K-05 v1.3 item 34, default 44"
+    },
+    {
+      "file": "commit-s1-01-sam.json",
+      "version": "v1.3",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "The walking skeleton's first turn: Sam's first text commits turn-s1-01-sam with S1-02's question to him, its question clock row waiting, and outbox-s1-02-sam-1 that asks it, with no plan, so the reads that follow have K-09's compose and finalize row",
+      "source": "K-09 v1 compose-input-s1-02.json, finalize-pass.json (outbox-s1-02-sam-1, turn-s1-01-sam); K-09 v1.5 commit-s1-01.json and default 131 (T-1142: the ids, evt-sam-s1-01, 18:05:05Z); ADR-013; S1-01, S1-02; 02-contracts K-05 item 1; arch 01 lines 39 to 41; arch 02 line 127; QUESTIONS.md CQ-156 (a)"
+    },
+    {
+      "file": "read-outbox-row-s1-02.json",
+      "version": "v1.3",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "Compose input's and finalize's row for S1-02's question to Sam: the row unplanned at version 1, its turn and bundle, S1-02's line 0 from its question, Sam the owner as reader with his phone's flags, the one text it answers by event id only, the business head and the question with its waiting clock as the slot source",
+      "source": "K-09 v1 compose-input-s1-02.json, finalize-pass.json; arch 07 line 397; QUESTIONS.md CQ-151 (a) and its default 2; actions/src/compose-input/types.ts ComposeRow; actions/src/finalize/rewrite/types.ts FinalizeRow; K-05 v1.3 item 35"
+    },
+    {
+      "file": "read-outbox-row-a7-03.json",
+      "version": "v1.3",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "The tour's A7-03 row to Alex as compose input reads it right after its commit: A7-03's line 0, Alex the customer as reader, the haircut's booking head with its flags, the question's options as sent, its 24-hour Clock line and its clock row",
+      "source": "tour lines 423 to 427; K-04 v1 outbox_rows, open_questions, clock_rows, bookings; K-03 v1 option; arch 07 lines 389, 397; K-05 v1.3 item 35"
+    },
+    {
+      "file": "read-outbox-row-no-question.json",
+      "version": "v1.3",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "A row that asks no question answers its line null, since K-04 v1 stores no step or line, so compose input and finalize refuse it rather than guess; the questions still open with the reader come with their words as sent",
+      "source": "QUESTIONS.md CQ-151 (a); K-04 v1 outbox_rows; arch 07 line 389; K-05 v1.2 item 26, default 41; K-05 v1.3 item 35, open gap 29"
+    },
+    {
+      "file": "read-outbox-row-other-business.json",
+      "version": "v1.3",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "A row of the barbershop read under the yoga studio's scope answers notFound and nothing of it",
+      "source": "arch 10 line 546; K-04 v1 rule 4; K-09 v1 composeInput.errors notFound"
+    },
+    {
+      "file": "read-outbox-row-safety-line.json",
+      "version": "v1.3",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "A safety line row is a fixed line: the read answers fixedLineRow and gives no compose or finalize view of it",
+      "source": "arch 07 line 347 ('Safety lines stay fixed text'); arch 02 line 111; STATE note 17; K-09 v1 open gap 16, recordSafetyOutcome safetyLine; K-07 v1 outbox-safety-retry"
+    },
+    {
+      "file": "fixed-line-facts-s1-02.json",
+      "version": "v1.3",
+      "def": "readFixedLineFacts.exchange",
+      "expect": "accept",
+      "shows": "S1-02's question is Rosie's first text to Sam about the barbershop (no opener mark), so it carries the opener; his number's opt-out line was delivered before, so it does not ride again",
+      "source": "arch 07 line 361; RULES 1.11, 4.3; Q-30; K-04 v1 openers_sent, phones.optout_line_delivered_at; K-09 v1 finalize-pass.json (fixedLines opener); actions/src/finalize/fixed-lines/types.ts FixedLineFacts"
+    },
+    {
+      "file": "fixed-line-facts-texted-before.json",
+      "version": "v1.3",
+      "def": "readFixedLineFacts.exchange",
+      "expect": "accept",
+      "shows": "A row to Alex at the barbershop after his first reply: the opener mark names another row, so Rosie texted him about it before and no opener rides",
+      "source": "arch 07 line 361; K-04 v1 openers_sent, seed-thread-messages; K-05 v1.3 item 36"
+    },
+    {
+      "file": "fixed-line-facts-opener-row.json",
+      "version": "v1.3",
+      "def": "readFixedLineFacts.exchange",
+      "expect": "accept",
+      "shows": "The row the opener mark names is the first text itself, so for it Rosie had not texted the handle about the business before, and it carries the opener again if finalized again",
+      "source": "arch 07 line 361; K-04 v1 openers_sent.outbox_row_id; K-05 v1.3 item 36, default 50"
+    },
+    {
+      "file": "fixed-line-facts-other-business.json",
+      "version": "v1.3",
+      "def": "readFixedLineFacts.exchange",
+      "expect": "accept",
+      "shows": "A row of the barbershop read under the yoga studio's scope answers notFound: nothing of its handle's opener mark or number",
+      "source": "arch 10 line 546; K-04 v1 rule 4; K-09 v1 finalizeMessage.errors notFound"
+    },
+    {
+      "file": "invalid/refuse-open-holds-hold-with-words.json",
+      "version": "v1.3",
+      "def": "readOpenHolds.response",
+      "expect": "refuse",
+      "shows": "An open hold that carries its outcome's sealed words: a hold says what it holds back, never what the person wrote",
+      "source": "arch 09 line 492; RULES 4.5; K-34 v1 safety_outcomes.sealed_words (sealed by person_id), default 5; BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-open-holds-no-scope.json",
+      "version": "v1.3",
+      "def": "readOpenHolds.request",
+      "expect": "refuse",
+      "shows": "A hold read that states no business: the scope is always named, a business or null, so the read never runs with no scope by omission",
+      "source": "arch 10 line 546; K-04 v1 rule 4; STATE note 22; QUESTIONS.md CQ-70; T-1094 note N2"
+    },
+    {
+      "file": "invalid/refuse-outbox-row-returns-inbound-words.json",
+      "version": "v1.3",
+      "def": "readOutboxRow.response",
+      "expect": "refuse",
+      "shows": "A row read that returns the words of the text it answers: the words stay sealed and the runtime caller hands them in, so no K-05 exchange ever carries them",
+      "source": "K-04 v1 messages.words (sealed: QUESTIONS.md CQ-54); arch 01 line 93; arch 09 line 492; K-05 v1.2 default 27; K-05 v1.3 item 35, default 47"
+    },
+    {
+      "file": "invalid/refuse-outbox-row-returns-address.json",
+      "version": "v1.3",
+      "def": "readOutboxRow.response",
+      "expect": "refuse",
+      "shows": "A row read that returns the recipient's number: compose input and finalize never need it, so the read never gives it",
+      "source": "K-04 v1 handles.address ('Traces never carry it'); K-08 v1; RULES 4.5"
+    },
+    {
+      "file": "invalid/refuse-fixed-line-facts-caller-handle.json",
+      "version": "v1.3",
+      "def": "readFixedLineFacts.request",
+      "expect": "refuse",
+      "shows": "A fixed-line facts request that names a handle: the read takes the handle and business from the row itself, so no caller can ask about another handle",
+      "source": "arch 07 line 361; K-04 v1 outbox_rows.recipient_handle_id; K-05 v1.2 refuse-send-state-caller-versions (the same rule)"
+    },
+    {
+      "file": "invalid/refuse-fixed-line-facts-returns-number.json",
+      "version": "v1.3",
+      "def": "readFixedLineFacts.response",
+      "expect": "refuse",
+      "shows": "Fixed-line facts that carry the phone's number: the inserter needs only when the opt-out line was delivered, never the number",
+      "source": "K-04 v1 phones.number; RULES 4.3, 4.5; K-08 v1"
+    },
+    {
+      "file": "read-safety-outcome-of-event-s1-01.json",
+      "version": "v1.4",
+      "def": "readSafetyOutcomeOfEvent.exchange",
+      "expect": "accept",
+      "shows": "The walking skeleton's turn 1: the No record of Sam's first text reads its own event under the barbershop's scope before its commit, finds no safety row yet, and answers null, so the record writes the row in that commit",
+      "source": "K-09 v1.5 commit-s1-01.json (core: recordSafetyOutcome for evt-sam-s1-01, read No); ADR-013; T-1140's handoff 1 (DL-344); actions/src/domain/safety/ports.ts SafetyReader.outcomeOfEvent; record.ts default 1; K-34 v1 safety_outcomes_event_key; K-05 v1.4 item 37"
+    },
+    {
+      "file": "read-safety-outcome-of-event-alex.json",
+      "version": "v1.4",
+      "def": "readSafetyOutcomeOfEvent.exchange",
+      "expect": "accept",
+      "shows": "A repeated record of Alex's crisis words finds the text's row under the barbershop's scope, labels, tenses, the danger word's kind and outcomes plain, never the sealed words",
+      "source": "K-34 v1 seed-outcome-crisis, safety_outcomes_event_key, README rule 6, default 5; K-09 v1 recordSafetyOutcome (the event id is the key); record.ts default 1; ids.ts; K-05 v1.4 item 37"
+    },
+    {
+      "file": "read-safety-outcome-of-event-other-business.json",
+      "version": "v1.4",
+      "def": "readSafetyOutcomeOfEvent.exchange",
+      "expect": "accept",
+      "shows": "The same text under the yoga studio's scope answers null: another business's safety row is never seen",
+      "source": "arch 10 line 546; K-04 v1 rule 4; K-34 v1 rule 4; K-05 v1.4 item 37, default 57"
+    },
+    {
+      "file": "read-safety-outcome-alex-safe.json",
+      "version": "v1.4",
+      "def": "readSafetyOutcome.exchange",
+      "expect": "accept",
+      "shows": "A release reads the 'we're safe' text's safety outcome by its id: No, over, from Alex's own chat in a turn",
+      "source": "A3-24; K-34 v1 seed-hold-released; K-09 v1 releaseSafetyHold.releasedByOutcomeId; release.ts defaults 12 and 13; K-05 v1.4 item 38"
+    },
+    {
+      "file": "read-safety-outcome-no-business.json",
+      "version": "v1.4",
+      "def": "readSafetyOutcome.exchange",
+      "expect": "accept",
+      "shows": "A read with no business runs on the runtime side and returns only rows with no business, so the barbershop's emergency read answers null",
+      "source": "K-05 v1.2 default 25; K-05 v1.3 item 34; K-04 v1 rule 4; K-05 v1.4 item 38, default 55"
+    },
+    {
+      "file": "read-safety-hold-alex-open.json",
+      "version": "v1.4",
+      "def": "readSafetyHold.exchange",
+      "expect": "accept",
+      "shows": "The hold a release names: Alex's crisis words hold the haircut after_safe, open, at version 1, every column under the port's names",
+      "source": "arch 06 lines 315 to 327; A3-25; K-34 v1 seed-outcome-crisis, safety_holds; actions/src/domain/safety/ports.ts StoredHold; release.ts; K-05 v1.4 item 39"
+    },
+    {
+      "file": "read-safety-hold-alex-released.json",
+      "version": "v1.4",
+      "def": "readSafetyHold.exchange",
+      "expect": "accept",
+      "shows": "Alex's emergency hold, released by a clear 'we're safe': the release time, safe_readback, the releasing turn and read, version 2, which a release named again answers as its first",
+      "source": "A3-24; K-34 v1 seed-hold-released, safety_holds_released_pair, safety_holds_safe_release_has_read; CQ-80; release.ts; K-05 v1.4 item 39"
+    },
+    {
+      "file": "read-safety-hold-other-business.json",
+      "version": "v1.4",
+      "def": "readSafetyHold.exchange",
+      "expect": "accept",
+      "shows": "The barbershop's hold named under the yoga studio's scope answers null, which a release answers notFound",
+      "source": "arch 10 line 546; K-34 v1 rule 4; release.ts; K-05 v1.4 item 39, default 57"
+    },
+    {
+      "file": "read-safety-hold-of-outcome-alex-threat.json",
+      "version": "v1.4",
+      "def": "readSafetyHoldOfOutcome.exchange",
+      "expect": "accept",
+      "shows": "A repeated record of Alex's threat reads the one hold its outcome set: never released",
+      "source": "A3-48; S13-10; K-34 v1 seed-threat-pause, safety_holds_one_per_outcome; record.ts default 1; K-05 v1.4 item 40"
+    },
+    {
+      "file": "read-safety-hold-of-outcome-none.json",
+      "version": "v1.4",
+      "def": "readSafetyHoldOfOutcome.exchange",
+      "expect": "accept",
+      "shows": "A No read held nothing, so the hold of its outcome is null and a repeat names no hold",
+      "source": "arch 06 lines 317 to 327; K-34 v1 seed-hold-released; K-09 v1 commit-s1-02.json (No holds nothing); record.ts default 1; K-05 v1.4 item 40"
+    },
+    {
+      "file": "outbox-row-written-alex-safety.json",
+      "version": "v1.4",
+      "def": "readOutboxRowWritten.exchange",
+      "expect": "accept",
+      "shows": "After the commit that wrote Alex's emergency line as a safety row, the row is written: true, its id alone read",
+      "source": "K-05 v1.1 commit-alex-safety; K-07 v1 outbox-safety-retry; record.ts repeatAnswer; ids.ts; K-05 v1.4 item 41"
+    },
+    {
+      "file": "outbox-row-written-not-yet.json",
+      "version": "v1.4",
+      "def": "readOutboxRowWritten.exchange",
+      "expect": "accept",
+      "shows": "The same row before any commit wrote it: false, so a repeated record names no row for its line",
+      "source": "record.ts repeatAnswer; K-09 v1 recordSafetyOutcome sentByActor; K-05 v1.4 item 41"
+    },
+    {
+      "file": "outbox-row-written-other-business.json",
+      "version": "v1.4",
+      "def": "readOutboxRowWritten.exchange",
+      "expect": "accept",
+      "shows": "The barbershop's safety row named under the yoga studio's scope: false, so not even its existence reaches another business",
+      "source": "arch 10 line 546; K-04 v1 rule 4; K-05 v1.4 item 41, default 57"
+    },
+    {
+      "file": "business-owner-barbershop.json",
+      "version": "v1.4",
+      "def": "readBusinessOwner.exchange",
+      "expect": "accept",
+      "shows": "The barbershop's one live owner, Sam, and the handle he writes from, by id: whom a checked line to the owner goes to",
+      "source": "A3-48; S13-10; S2-02 ('One account owner'); K-04 v1 person_roles, person_handles, seed-person-roles; record.ts lineRows; actions/src/domain/safety/ports.ts OwnerContact; K-05 v1.4 item 42"
+    },
+    {
+      "file": "business-owner-phone-first.json",
+      "version": "v1.4",
+      "def": "readBusinessOwner.exchange",
+      "expect": "accept",
+      "shows": "An owner who writes from a phone and an email gets the line on the phone handle: phone handles first, then email, each in handle id order",
+      "source": "FS row B12; K-22 v1 seed-owner-id-upload, accounts.mobile; arch 02 line 125; T-307's Reach (handle id order); CQ-09; K-05 v1.4 item 42, default 59"
+    },
+    {
+      "file": "business-owner-none.json",
+      "version": "v1.4",
+      "def": "readBusinessOwner.exchange",
+      "expect": "accept",
+      "shows": "A business with no live owner role answers null, so a line to the owner is not built and the record fails closed",
+      "source": "T-1148's skeleton seed (no role); K-04 v1 seed-business-head, person_roles; record.ts lineRows (safetyLineNotBuilt); K-05 v1.4 item 42"
+    },
+    {
+      "file": "business-zone-barbershop.json",
+      "version": "v1.4",
+      "def": "readBusinessZone.exchange",
+      "expect": "accept",
+      "shows": "The barbershop's time zone, which 'that day' is read in for a harm report",
+      "source": "A3-49; K-34 v1 harm_reports.day_zone, default 4; CQ-05; K-04 v1 businesses.time_zone, seed-business-head; record.ts default 10; K-05 v1.4 item 43"
+    },
+    {
+      "file": "business-zone-no-business-row.json",
+      "version": "v1.4",
+      "def": "readBusinessZone.exchange",
+      "expect": "accept",
+      "shows": "A business with no row answers notFound, never a null zone, so no harm report is filed with a zone made up",
+      "source": "A3-49 ('Never make up or guess'); record.ts default 10 (harmReportNeedsBusiness); K-04 v1 businesses; K-05 v1.4 item 43, default 56"
+    },
+    {
+      "file": "invalid/refuse-safety-outcome-with-sealed-words.json",
+      "version": "v1.4",
+      "def": "readSafetyOutcomeOfEvent.response",
+      "expect": "refuse",
+      "shows": "A safety record that carries its sealed words: the read gives the port's fields alone, never what the person wrote",
+      "source": "arch 09 line 492; RULES 4.5; A3-25 ('never the words'); K-34 v1 safety_outcomes.sealed_words, README rule 6; BP rule 7; K-05 v1.4 item 37, default 60"
+    },
+    {
+      "file": "invalid/refuse-safety-outcome-no-scope.json",
+      "version": "v1.4",
+      "def": "readSafetyOutcome.request",
+      "expect": "refuse",
+      "shows": "A safety outcome read that states no business: the scope is always named, a business or null, so no read runs with no scope by omission",
+      "source": "arch 10 line 546; K-04 v1 rule 4; STATE note 22; QUESTIONS.md CQ-70; K-05 v1.3 refuse-open-holds-no-scope (the same rule)"
+    },
+    {
+      "file": "invalid/refuse-safety-hold-released-without-why.json",
+      "version": "v1.4",
+      "def": "readSafetyHold.response",
+      "expect": "refuse",
+      "shows": "A hold answered released with no reason: a release time and its reason come together or not at all",
+      "source": "K-34 v1 safety_holds_released_pair, safety_holds_why_fits_rule; arch 06 lines 317 to 325; release.ts"
+    },
+    {
+      "file": "invalid/refuse-safety-hold-of-outcome-two-holds.json",
+      "version": "v1.4",
+      "def": "readSafetyHoldOfOutcome.response",
+      "expect": "refuse",
+      "shows": "Two holds answered for one outcome: K-34 holds one per outcome, with the strictest rule of its outcomes",
+      "source": "arch 06 line 327 ('Several at once: The strictest holds'); K-34 v1 safety_holds_one_per_outcome"
+    },
+    {
+      "file": "invalid/refuse-outbox-row-written-returns-words.json",
+      "version": "v1.4",
+      "def": "readOutboxRowWritten.response",
+      "expect": "refuse",
+      "shows": "A written answer that carries the row's final parts: the read says only whether the row is written, never its words",
+      "source": "actions/src/domain/safety/ports.ts SafetyReader.outboxRowWritten ('never its words'); K-04 v1 outbox_rows.final_parts; K-07 v1 outbox-safety-retry; BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-business-owner-returns-number.json",
+      "version": "v1.4",
+      "def": "readBusinessOwner.response",
+      "expect": "refuse",
+      "shows": "An owner answer that carries the owner's number: the line takes the handle by id, so the read never gives the address",
+      "source": "K-04 v1 handles.address ('Traces never carry it'); RULES 4.5; S2-06 ('Texts say on file, never a number'); K-08 v1; K-05 v1.4 item 42"
+    },
+    {
+      "file": "invalid/refuse-business-owner-no-business.json",
+      "version": "v1.4",
+      "def": "readBusinessOwner.request",
+      "expect": "refuse",
+      "shows": "An owner read with no business: an owner is a business's, and the read names the call's own business, never none",
+      "source": "K-04 v1 person_roles.business_id (not null); record.ts lineRows; K-05 v1.4 item 42"
+    },
+    {
+      "file": "invalid/refuse-business-zone-null.json",
+      "version": "v1.4",
+      "def": "readBusinessZone.response",
+      "expect": "refuse",
+      "shows": "A zone answer of null: K-04 keeps every business's zone, and a business the scope does not show is notFound, never a null zone",
+      "source": "K-04 v1 businesses.time_zone (not null), businesses_time_zone_form; record.ts default 10; K-05 v1.4 item 43, default 56"
+    },
+    {
+      "file": "row-reader-s1-02-no-role.json",
+      "version": "v1.5",
+      "def": "rowReader.exchange",
+      "expect": "accept",
+      "shows": "Turn 1's row, outbox-s1-02-sam-1, with recipient.roles empty as T-1148's seed leaves Sam: S1-02 is in section 1 of flow A and its one line from Rosie goes to the owner, so Sam, a person with no role, reads it as the owner by the sign-up line, as K-09's compose-input-s1-02.json and compose-input-s1-02-v1.6.json read him",
+      "source": "T-1141 round 1 Need 2; DL-364; QUESTIONS.md CQ-179; ADR-013 sections 3 and 4 (default 130); db/seeds/skeleton.ts (T-1148); K-05 v1.3 read-outbox-row-s1-02.json, item 35's table (role, FinalizeRow.reader); K-01 v1 bundle-v0-skeleton.json (flows.A.steps.S1-02: section 1, say[0] from san to owner); K-09 v1 compose-input-s1-02.json and v1.6 compose-input-s1-02-v1.6.json (audience.role owner); K-02 v1.1 default 9; K-05 v1.5 item 44"
+    },
+    {
+      "file": "row-reader-s1-02-owner.json",
+      "version": "v1.5",
+      "def": "rowReader.exchange",
+      "expect": "accept",
+      "shows": "The same row with Sam's owner role at the barbershop, as v1.3's read-outbox-row-s1-02.json reads it: he is read by his role (role-sam-barber), never by the line",
+      "source": "K-05 v1.3 read-outbox-row-s1-02.json, item 35's table (role, FinalizeRow.reader); K-04 v1 seed-person-roles.json; T-308 (S13-31: the role the message is for); actions/src/finalize/claim-check/audience.ts readerOf; K-05 v1.5 item 44"
+    },
+    {
+      "file": "row-reader-a5-05-tomas-no-role.json",
+      "version": "v1.5",
+      "def": "rowReader.exchange",
+      "expect": "accept",
+      "shows": "A row of A5-05 (flow A, section 5) to Tomás, who holds no role at the barbershop: outside section 1 the sign-up reading does not apply, so it is refused, noReader (noRole), never read as the customer by the line",
+      "source": "DL-364 ('every other row with no role is still refused'); K-05 v1.3 item 35's table ('with none, refused'); K-04 v1 seed-person-roles.json (Tomás: staff at the movers alone); K-01 v1 bundle-mini-a.json (flows.A.steps.A5-05: section 5, say[0] from san to cust); K-05 v1.5 item 44, open gap 44"
+    },
+    {
+      "file": "invalid/refuse-row-reader-no-role-outside-section-1.json",
+      "version": "v1.5",
+      "def": "rowReader.exchange",
+      "expect": "refuse",
+      "shows": "Tomás's A5-05 row read as the customer by the line: a recipient with no role is read by the line only on a section 1 step, so outside section 1 the row has no reader (put right, it is row-reader-a5-05-tomas-no-role)",
+      "source": "DL-364; QUESTIONS.md CQ-179; K-05 v1.3 item 35's table ('with none, refused'); K-01 v1 step.section; ADR-013 section 3 (the sign-up door enters section 1); K-05 v1.5 item 44"
+    },
+    {
+      "file": "invalid/refuse-row-reader-role-read-by-line.json",
+      "version": "v1.5",
+      "def": "rowReader.exchange",
+      "expect": "refuse",
+      "shows": "Sam's S1-02 row read by the sign-up line while he holds his owner role: a recipient who holds a role is read by it, never by the line (put right, it is row-reader-s1-02-owner)",
+      "source": "K-05 v1.3 item 35's table (role, FinalizeRow.reader: the one of recipient.roles the message is for); T-308; S13-31; the card's security line (a person with no role reads only their own sign-up rows); K-05 v1.5 item 44"
+    },
+    {
+      "file": "read-outbox-row-s1-02-not-sensitive.json",
+      "version": "v1.6",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "Turn 1's row, read as v1.3's read-outbox-row-s1-02 reads it, at a barbershop that holds its kinds of work (K-23's seed: one, barber, with no switch on in either flow): the business's sensitive switch is false, so S1-02's row, about no booking, is filled in its routine form, as K-09 v1.6's compose-input-s1-02-v1.6.json and T-1175's recording 4 have it",
+      "source": "DL-391; DL-373; RULES 4.6; K-23 v1 company_kinds (pf_switches_a, pf_switches_b), seed-company-two-kinds.json; K-26 v1 plugin_switches (sensitive; migration 0023); K-05 v1.3 read-outbox-row-s1-02.json, item 35's table (source: SlotSource.sensitive); K-05 v1.6 item 45, default 66"
+    },
+    {
+      "file": "read-outbox-row-s1-02-no-kinds.json",
+      "version": "v1.6",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "The same row with K-04's seeds alone: the barbershop holds no kinds of work yet (S1-04 writes them), as at the walking skeleton's start, so nothing is stored to read the switch from and the read answers null, never false, which the caller reads as on (fails closed)",
+      "source": "DL-391; DL-326 note b; RULES 4.6; S1-04; K-23 v1 company_kinds; db/seeds/skeleton.ts (T-1148); K-05 v1.3 read-outbox-row-s1-02.json; K-05 v1.6 item 45, default 67, open gap 47"
+    },
+    {
+      "file": "read-outbox-row-practice-sensitive.json",
+      "version": "v1.6",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "Alex's first reply from Lee Associates, a practice whose one kind of work, therapist, lists sensitive in flow A only: one flow is enough, so the business's switch is true; his roles and open questions at other businesses are not read",
+      "source": "DL-391; RULES 4.6; S13-22; SPEC-master 5b (a switch can differ by flow); K-23 v1 company_kinds; K-26 v1 plugin_switches (sensitive: health care, therapy and the rest; migration 0023); fixtures/v1/test-kit/shops/therapist.json (flows.A.business Lee Associates, facts, switches.sensitive); K-04 v1 seed-person-roles.json, seed-phone-chat-open.json; K-05 v1.6 item 45, default 66"
+    },
+    {
+      "file": "invalid/refuse-outbox-row-switch-left-out.json",
+      "version": "v1.6",
+      "def": "readOutboxRow.v1dot6Response",
+      "expect": "refuse",
+      "shows": "The practice's answer with its sensitive switch left out: a v1.6 read always states it, true, false or null, so no consumer takes a missing switch as off and fills a therapy practice's row in its routine form (put right, it is read-outbox-row-practice-sensitive's outcome)",
+      "source": "DL-391 (null and a read error never read as off); DL-326 note b; RULES 4.6; K-05 v1.6 item 45, default 67"
+    },
+    {
+      "file": "invalid/refuse-outbox-row-switch-per-flow.json",
+      "version": "v1.6",
+      "def": "readOutboxRow.response",
+      "expect": "refuse",
+      "shows": "The practice's switch answered per flow, as its kind of work stores it (on in flow A, off in flow B), instead of the business's one value: the read answers true, false or null, never a value a consumer could read as off for the flow a row is read in (put right, it is read-outbox-row-practice-sensitive's outcome)",
+      "source": "DL-391 (true when any kind of work lists it in either flow); K-23 v1 company_kinds pf_switches_a, pf_switches_b; SPEC-master 5b; RULES 4.6; K-05 v1.6 item 45, default 66"
+    },
+    {
+      "file": "open-chat-first-text-sam.json",
+      "version": "v1.7",
+      "def": "openChatOnText.exchange",
+      "expect": "accept",
+      "shows": "Turn 1's text from handle-sam, which holds no phone row (as test owner 1's seed holds it): the call inserts the row at receipt, before the text reaches the actor, its chat open since the text's receipt by iMessage, not stopped, version 1, with one phone.chat_opened entry (no old values, the event id as its job id, Linq's event as its why), so limit 8 finds the chat open when turn 1's reply is claimed",
+      "source": "T-562 handoff 1; DL-438; QUESTIONS.md CQ-194; RULES 4.1b; MC C9; K-04 v1 phones (0004: chat_open, chat_open_at, chat_way), seed-person-roles.json; db/seeds/skeleton.ts (T-1148); ADR-013 section 1 (evt-sam-s1-01, trace-sam-0000); K-06 v1 service, receivedAt, traceId; K-08 v1 phone.chat_opened, why.provider_event; K-05 v1.7 item 46"
+    },
+    {
+      "file": "open-chat-first-text-sam-repeat.json",
+      "version": "v1.7",
+      "def": "openChatOnText.exchange",
+      "expect": "accept",
+      "shows": "The same text again, as a webhook Linq sends twice: the call finds the text's own entry under the row's lock and answers repeated, the row as it stands, nothing written (no second row or entry, version 1)",
+      "source": "arch 02 line 109 (a write that fails answers 503; Linq retries for 30 minutes); CQ-194 (repeat-safe by the event id); K-05 v1.7 item 46, default 76"
+    },
+    {
+      "file": "open-chat-alex-already-open.json",
+      "version": "v1.7",
+      "def": "openChatOnText.exchange",
+      "expect": "accept",
+      "shows": "A later text on Alex's open chat: nothing written, the first text's time and the chat's way kept, the version unchanged",
+      "source": "K-04 v1 phones.chat_open_at ('When the mobile first texted Rosie's number'), seed-phone-chat-open.json; arch 07 line 365 (a reply's channel is its text's service); K-09 v1.5 default 132; K-05 v1.7 item 46, default 72"
+    },
+    {
+      "file": "open-chat-dee-closed-chat.json",
+      "version": "v1.7",
+      "def": "openChatOnText.exchange",
+      "expect": "accept",
+      "shows": "Dee W.'s first text, the ready text her booking's chat link types, on the phone row Sam's booking wrote with no chat open: the closed chat, not stopped, opens (version 2, her text's time and way), with one phone.chat_opened entry holding the closed chat's old values, before the turn that answers her supersedes her waiting notice",
+      "source": "RULES 4.1b ('When they send it, the chat opens and is saved'); MC C9; K-05 v1.1 commit-adds-dee-booking.json, mark-waiting-chat.json, commit-supersedes-waiting.json; K-07 v1 waiting_chat; K-05 v1.7 item 46, default 74"
+    },
+    {
+      "file": "open-chat-ben-stopped.json",
+      "version": "v1.7",
+      "def": "openChatOnText.exchange",
+      "expect": "accept",
+      "shows": "A text from Ben T.'s stopped number: a text is not START, so nothing is written in any column and the version stays 3; only START, through recordStopOrStart, clears the stop and opens the chat",
+      "source": "RULES 4.1b ('STOP clears it; turning texts back on (7.5) sets it again'), 7.5; K-04 v1 phones_stop_closes_chat, seed-phone-stopped.json; K-09 v1 recordStopOrStart; CQ-194; K-05 v1.7 item 46 ('The stop and the text')"
+    },
+    {
+      "file": "open-chat-apple-id-email.json",
+      "version": "v1.7",
+      "def": "openChatOnText.exchange",
+      "expect": "accept",
+      "shows": "A caller naming Sam's email handle, as for an Apple ID email that texts by iMessage: an email opens no mobile's chat and has no phone row, so the call answers notAPhone and writes nothing",
+      "source": "RULES 4.1b (a first text from an Apple ID email gets a code to the booking's mobile first); S13-45; K-04 v1 handles.kind; K-22 v1 seed-owner-id-upload.json (handle-sam-email); K-05 v1.7 item 46, default 77"
+    },
+    {
+      "file": "invalid/refuse-open-chat-stopped-number.json",
+      "version": "v1.7",
+      "def": "openChatOnText.exchange",
+      "expect": "refuse",
+      "shows": "A text that opens Ben T.'s stopped number's chat by clearing his stop: its entry names stopped, a column the call never writes, since only START clears a stop (put right, it is open-chat-ben-stopped's outcome: nothing written)",
+      "source": "RULES 4.1b, 7.5; K-04 v1 phones_stop_closes_chat; K-09 v1 recordStopOrStart; CQ-194 (it never touches a stopped row); T-1211's security review line; K-05 v1.7 item 46"
+    },
+    {
+      "file": "invalid/refuse-open-chat-no-event.json",
+      "version": "v1.7",
+      "def": "openChatOnText.request",
+      "expect": "refuse",
+      "shows": "A call naming no event: the text's event id is the key a repeat is known by and the entry's why, so a call without it is refused (put right, it is open-chat-first-text-sam's request)",
+      "source": "CQ-194 (repeat-safe by the event id); K-06 v1 eventId; K-08 v1 why.provider_event; K-05 v1.7 item 46"
+    },
+    {
+      "file": "invalid/refuse-open-chat-with-number.json",
+      "version": "v1.7",
+      "def": "openChatOnText.request",
+      "expect": "refuse",
+      "shows": "A call carrying the number beside the handle id: the request names the handle by its K-04 id and the call reads the number from K-04 handles, so no number travels in an exchange (put right, it is open-chat-first-text-sam's request)",
+      "source": "rule 7; arch 10 line 516; K-08 v1 default 3 (a phone row is named by its handle id, never its number); K-05 v1.2 item 28 (sendState reads everything else from the row); K-05 v1.7 item 46"
+    },
+    {
+      "file": "send-state-stop-row.json",
+      "version": "v1.8",
+      "def": "sendState.exchange",
+      "expect": "accept",
+      "shows": "send-state-stopped in its v1.8 form: after Alex's STOP the newest texts row covering him is the STOP for every business, which withdraws, so it is no yes (fromContact false) and names no booking; the stopped flag is the phone's, as stored",
+      "source": "T-1099's handoff; RULES 7.2; K-29 v1 consents (revoked, booking_id), seed-consent-stop-row.json; K-05 v1.2 send-state-stopped.json, item 28, default 35; STATE note 10; K-05 v1.8 item 47, defaults 82 and 84"
+    },
+    {
+      "file": "commit-sam-enters-alex-yes.json",
+      "version": "v1.8",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "A booking the business adds: Sam's '1 Yes, send the link' to A3-30's read-back writes Alex's Nov 28 haircut and Alex's texts yes for his mobile on it, given by text in Sam's turn on Sam's handle, the business's word for a mobile that is not stopped",
+      "source": "S13-32 line 7215 ('The business's word counts only for someone who gave the business their number for this booking'); K-09 v1.1 confirmBusinessBooking, j3-confirm-business-booking-yes.json, default 50; K-29 v1 consents (channel, turn_id, booking_id); K-08 v1 booking.created, consent.given, approvalOwnerYes; K-05 v1 item 1"
+    },
+    {
+      "file": "send-state-business-yes.json",
+      "version": "v1.8",
+      "def": "sendState.exchange",
+      "expect": "accept",
+      "shows": "Limit 8's read after Sam's '1 Yes': the newest texts row covering Alex is the business-entered yes for the Nov 28 booking, by text but from Sam's turn on Sam's handle, so fromContact is false and bookingId names Nov 28; Alex is not stopped, and were he, this yes would never turn his texts back on",
+      "source": "T-1099's handoff (notFromContact); RULES 7.1 ('Never on someone else's word'); S13-32 lines 7214, 7215; K-29 v1 consents.channel, turn_id, handle_id, booking_id; K-04 v1 turns.handle_id; K-05 v1.8 item 47, defaults 78 and 81"
+    },
+    {
+      "file": "commit-alex-start.json",
+      "version": "v1.8",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "Alex's own START from his number, committed in his turn after his STOP: the phone's flag cleared with its chat open again and its START time, the START row for every business with his own words, and the start reply, in one commit",
+      "source": "RULES 7.5, 4.1b ('turning texts back on sets it again'); MC C1; K-09 v1 recordStopOrStart (START only from the phone's own START text), README default 29; K-04 v1 phones.start_at; DL-193; K-29 v1 README ('START ... is a new row with revoked false'); K-08 v1 phone.started, consent.given; K-05 v1 item 1"
+    },
+    {
+      "file": "send-state-own-start.json",
+      "version": "v1.8",
+      "def": "sendState.exchange",
+      "expect": "accept",
+      "shows": "Limit 8's read after Alex's own START: not stopped, the chat open again, and the newest texts row covering him is the START, his own word from that number by text in his own turn (fromContact true), for every business, so it names no booking (bookingId null)",
+      "source": "RULES 7.5; S13-32 line 7242 ('Only START, or a fresh yes on a new booking sent from that number'); K-09 v1 start-recorded.json; K-29 v1 consents (business_id null only for a STOP or a START); K-04 v1 turns.handle_id; K-05 v1.8 item 47, defaults 78 and 81"
+    },
+    {
+      "file": "commit-sam-books-alex-nov21.json",
+      "version": "v1.8",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "A new booking after Alex's STOP: Sam's '1 Accept' to Alex's request walks to writeBooking, which writes the Nov 21 booking, its confirmation by email (his chat is closed by the STOP) and its chat link with the ready text and short code, and no texts consent, since nothing from Alex's own number has said yes",
+      "source": "K-09 v1.4 writeBooking, j6-write-booking-after-ok-turn.json, defaults 92 and 119; MC C9; RULES 4.1b, 7.5; K-29 v1 chat_links; K-08 v1 booking.created, K-08 v1.1 chat_link.issued; K-05 v1 item 1"
+    },
+    {
+      "file": "commit-alex-ready-text.json",
+      "version": "v1.8",
+      "def": "commitTurn.exchange",
+      "expect": "accept",
+      "shows": "Alex sends the Nov 21 link's ready text from his own number after his STOP: his turn records his fresh yes on that new booking as a texts row naming the booking and the link, with the ready text as the words shown, and the link's use; the phone is not written, so the STOP stands",
+      "source": "RULES 7.5, 7.1 ('a yes on a forwarded link'), 4.1b; S13-32 line 7242; MC C9; K-29 v1 README ('A ready text that gives a yes adds a consent row of kind texts naming the link'), chat_links.used_at; QUESTIONS.md CQ-74 (only START clears the flag); K-05 v1.7 item 46; K-05 v1 item 1"
+    },
+    {
+      "file": "send-state-own-yes-one-booking.json",
+      "version": "v1.8",
+      "def": "sendState.exchange",
+      "expect": "accept",
+      "shows": "Limit 8's read after Alex's own fresh yes for the new Nov 21 booking: still stopped, and the newest texts row covering him is that yes, his own word from that number (fromContact true) naming the one booking it covers (bookingId Nov 21), so the Nov 14 row stays dropped and only Nov 21's rows pass the stop check, to wait for the chat",
+      "source": "T-1099's handoff (otherBooking); RULES 7.5; S13-32 line 7242 ('turns that booking's texts back on'); K-04 v1 phones.stopped, phones_stop_closes_chat; QUESTIONS.md CQ-74; K-29 v1 consents.booking_id; K-05 v1.8 item 47, defaults 78, 81 and 83"
+    },
+    {
+      "file": "invalid/refuse-send-state-yes-source-left-out.json",
+      "version": "v1.8",
+      "def": "sendState.v1dot8Response",
+      "expect": "refuse",
+      "shows": "Sam's business-entered yes answered with who gave it left out: a v1.8 read always states fromContact, so no consumer meets a yes it cannot place (put right, it is send-state-business-yes's outcome)",
+      "source": "T-1099's handoff (a missing fromContact reads as notKnown); RULES 7.1; S13-32 line 7215; K-05 v1.8 item 47, default 78"
+    },
+    {
+      "file": "invalid/refuse-send-state-booking-left-out.json",
+      "version": "v1.8",
+      "def": "sendState.v1dot8Response",
+      "expect": "refuse",
+      "shows": "Alex's own fresh yes answered with its booking left out: a v1.8 read always states bookingId, null for a yes that names none, so no consumer meets a yes whose booking it cannot tell (put right, it is send-state-own-yes-one-booking's outcome)",
+      "source": "T-1099's handoff (a missing bookingId reads as notKnown); RULES 7.5; S13-32 line 7242; K-29 v1 consents.booking_id; K-05 v1.8 item 47, default 81"
+    },
+    {
+      "file": "invalid/refuse-send-state-stop-read-as-own-yes.json",
+      "version": "v1.8",
+      "def": "sendState.response",
+      "expect": "refuse",
+      "shows": "Alex's STOP row answered as his own yes (fromContact true): a row that withdraws is no yes, so it is never the person's own yes, and no reader that skips revoked could take a STOP for a yes that lifts it (put right, it is send-state-stop-row's outcome)",
+      "source": "RULES 7.2, 7.5; MC C1; K-29 v1 consents.revoked; T-1099 (limit 8 reads revoked first); K-05 v1.8 item 47, default 82"
+    },
+    {
+      "file": "mark-a7-03-delivered-repeat.json",
+      "version": "v1.9",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "A crash after A7-03's first delivery was marked and before its clock armed: Linq sends the words' receipt again, a repeat that writes nothing and says firstDelivery false, and names what it repeats, the row's first delivery at 14:05:04Z, so the caller hands it to the clock arming that the crash lost",
+      "source": "STATE note 38; join 13's round 1 Need 2 (T-564); QUESTIONS.md CQ-201; arch 02 lines 109 ('Linq retries for 30 minutes') and 127 ('arms at its first delivery receipt'); K-04 v1 outbox_parts.delivered_at; K-05 v1 items 4 and 5; K-05 v1.9 item 48, defaults 85 and 86"
+    },
+    {
+      "file": "mark-a7-03-poll-delivered.json",
+      "version": "v1.9",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "A7-03's poll is delivered after its words: the row's second delivery, so firstDelivery is false and the row moves sent to delivered; it records a delivery and repeats none, so repeatedDelivery is null",
+      "source": "arch 02 line 127; K-07 v1 partMove sent to delivered, rowMove sent to delivered, rule 4 (the second send waits for the words' receipt); K-05 v1 item 4, v1.1 item 15; K-05 v1.9 item 48, default 87"
+    },
+    {
+      "file": "mark-a7-03-poll-delivered-repeat.json",
+      "version": "v1.9",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "Linq sends the poll's receipt again: a repeat of a later part's delivery, at 14:05:06Z, after the words' at 14:05:04Z, so firstOfRow is false and nothing is handed to the clock arming",
+      "source": "arch 02 lines 109 and 127; K-04 v1 outbox_parts.delivered_at; K-05 v1 items 4 and 5; K-05 v1.9 item 48, default 85"
+    },
+    {
+      "file": "invalid/refuse-mark-repeat-delivery-left-out.json",
+      "version": "v1.9",
+      "def": "markPart.v1dot9Response",
+      "expect": "refuse",
+      "shows": "The words' repeated receipt answered with repeatedDelivery left out: a v1.9 call always states it, so no consumer meets a repeat whose delivery it cannot place and reads as not known (put right, it is mark-a7-03-delivered-repeat's outcome)",
+      "source": "STATE note 38; QUESTIONS.md CQ-201; K-05 v1.9 item 48, default 89"
+    },
+    {
+      "file": "invalid/refuse-mark-repeat-says-first-delivery.json",
+      "version": "v1.9",
+      "def": "markPart.response",
+      "expect": "refuse",
+      "shows": "The words' repeated receipt answered with firstDelivery true beside the delivery it repeats: firstDelivery keeps v1's meaning, the mark that records the row's first delivery, and a repeat records nothing, so it never says it (put right, it is mark-a7-03-delivered-repeat's outcome)",
+      "source": "K-05 v1 item 4 ('records delivered_at once and says firstDelivery when no part of the row was delivered before'), markPart.response; build prompt 6.4 (a changed meaning is a breaking change); K-05 v1.9 item 48, default 88"
+    },
+    {
+      "file": "invalid/refuse-mark-delivered-repeat-null.json",
+      "version": "v1.9",
+      "def": "markPart.exchange",
+      "expect": "refuse",
+      "shows": "The poll's repeated receipt answered with repeatedDelivery null: a delivery receipt answered repeated always states the delivery it repeats, so no v1.9 answer leaves the caller to guess whether to hand it to the clock arming (put right, its outcome is mark-a7-03-poll-delivered-repeat's)",
+      "source": "arch 02 line 127; STATE note 38; K-05 v1.9 item 48, default 87"
+    },
+    {
+      "file": "read-question-facts-s1-02.json",
+      "version": "v1.10",
+      "def": "readQuestionFacts.exchange",
+      "expect": "accept",
+      "shows": "The walking skeleton's turn 1: the clock arming reads S1-02's question to Sam as its first delivery receipt comes, by the id markPart answers: no Clock line, Lee's Barbershop's zone (America/New_York), no visit and no never-delivered row, so the due rule gives 8pm the day after delivery",
+      "source": "ADR-013; K-09 v1.5 default 134; arch 02 line 127; runtime/src/clocks/types.ts QuestionFacts; QUESTIONS.md CQ-200; STATE note 37; K-04 v1 open_questions.clock, businesses.time_zone; K-05 v1.10 item 49"
+    },
+    {
+      "file": "read-question-facts-a7-03.json",
+      "version": "v1.10",
+      "def": "readQuestionFacts.exchange",
+      "expect": "accept",
+      "shows": "A question about a booking: A7-03's 24-hour Clock line, the barbershop's zone and the haircut's visit, flow A, starting at its booked reservation's 15:00:00Z, the earliest of its held or booked times, with the saved and waiting times of no booking left out; so the clock arms 24 h from the delivery, as arm-clock-a7-03-after-4006 arms it",
+      "source": "tour lines 423 to 427; arch 02 line 127 ('the visit's start, which always comes first'); S13-35; RULES 2.1; K-04 v1 bookings.flow, reservations.during, reservations_booking_idx; K-05 v1.10 item 49, defaults 90 and 91"
+    },
+    {
+      "file": "read-question-facts-unknown.json",
+      "version": "v1.10",
+      "def": "readQuestionFacts.exchange",
+      "expect": "accept",
+      "shows": "A question no row holds is notFound, with nothing written, so the clock arming arms nothing and reports it",
+      "source": "runtime/src/clocks/arming.ts (questionNotFound); K-05 v1 notFoundError; K-05 v1.10 item 49"
+    },
+    {
+      "file": "read-handle-sam.json",
+      "version": "v1.10",
+      "def": "readHandle.exchange",
+      "expect": "accept",
+      "shows": "The handle of S1-02's clock row, test owner 1's handle-sam, read by id as K-04 stores it: a phone at tp-01's number, from which the directory names Sam's actor with the gateway's own rule (phone:+15555550100)",
+      "source": "QUESTIONS.md CQ-200; runtime/src/gateway/seal.ts actorNameOf; runtime/src/wiring/real.ts ArmingCalls.actorNameOf; K-04 v1 handles; K-06 v1 handle; K-05 v1.10 item 50, default 93"
+    },
+    {
+      "file": "read-handle-alex-email.json",
+      "version": "v1.10",
+      "def": "readHandle.exchange",
+      "expect": "accept",
+      "shows": "An email handle read by id: kind email and the lower-case address as K-04 stores them, so its actor is named email:alex@example.com, as the gateway names it",
+      "source": "arch 01 line 55; arch 10 line 502 (one actor per handle); K-04 v1 handles_address_form; K-06 v1 handle; K-05 v1.10 item 50, default 93"
+    },
+    {
+      "file": "read-handle-unknown.json",
+      "version": "v1.10",
+      "def": "readHandle.exchange",
+      "expect": "accept",
+      "shows": "An id no handle row holds answers handle null, never an error, which the directory reads as no actor, so the arming tells none and the minute sweep fires the row once it is missed",
+      "source": "runtime/src/wiring/real.ts ArmingCalls.actorNameOf ('null when K-04 holds no such handle'); runtime/src/clocks/arming.ts (noActor); K-05 v1.10 item 50, default 95"
+    },
+    {
+      "file": "read-chat-handle-sam.json",
+      "version": "v1.10",
+      "def": "readChatHandle.exchange",
+      "expect": "accept",
+      "shows": "The walking skeleton's turn 1: the receipt for Sam's reply carries the chat id turn 1's commit wrote on S1-01's thread, which names handle-sam and its number, the handle the receipt's event carries",
+      "source": "ADR-013 section 4; K-09 v1.5 commit-s1-01.json, default 135; QUESTIONS.md CQ-61; adapters/src/linq/webhook/parse.ts receiptHandle; K-04 v1 threads.linq_chat_id, threads_linq_chat_key; K-05 v1.10 item 51, default 94"
+    },
+    {
+      "file": "read-chat-handle-alex.json",
+      "version": "v1.10",
+      "def": "readChatHandle.exchange",
+      "expect": "accept",
+      "shows": "K-06's delivered receipt names linq-chat-demo-alex, the chat K-04's seed holds for Alex's phone: the read gives handle-alex and +15555550101, the handle that receipt's event carries",
+      "source": "K-06 v1 delivered.json; K-04 v1 seed-thread-messages.json (thread-alex-chat); QUESTIONS.md CQ-61; K-05 v1.10 item 51"
+    },
+    {
+      "file": "read-chat-handle-unknown.json",
+      "version": "v1.10",
+      "def": "readChatHandle.exchange",
+      "expect": "accept",
+      "shows": "A chat id no thread holds, as for a reply to someone whose first text wrote no chat thread: both fields null, so the gateway answers 503 and Linq retries, and the receipt is never placed on a guessed handle",
+      "source": "QUESTIONS.md CQ-61 ('the adapter answers 503 for a receipt it cannot place'); arch 02 line 109; K-05 open gap 48; K-05 v1.10 item 51, defaults 94 and 95"
+    },
+    {
+      "file": "invalid/refuse-question-facts-caller-business.json",
+      "version": "v1.10",
+      "def": "readQuestionFacts.exchange",
+      "expect": "refuse",
+      "shows": "A facts request naming a business beside the question: the read takes the business, its zone and the booking from the question's own row, so no caller names another business's (put right, with the question named alone, it is read-question-facts-s1-02)",
+      "source": "arch 10 line 546; K-04 v1 rule 4; K-05 v1.10 item 49"
+    },
+    {
+      "file": "invalid/refuse-question-facts-visit-address.json",
+      "version": "v1.10",
+      "def": "readQuestionFacts.response",
+      "expect": "refuse",
+      "shows": "A7-03's facts answered with a visit address: v1.10 reads no visit address or zone, K-30's tables not being migrated, and no K-05 answer carries an address (put right, it is read-question-facts-a7-03's outcome)",
+      "source": "rule 7; K-30 v1 (frozen, not migrated); K-05 v1.2 default 34; K-05 v1.10 item 49, default 91"
+    },
+    {
+      "file": "invalid/refuse-read-handle-phone-not-e164.json",
+      "version": "v1.10",
+      "def": "readHandle.response",
+      "expect": "refuse",
+      "shows": "Sam's phone handle answered with its number in another form than E.164: the answer is the address K-04 stores, the form the gateway names the actor by, so a number written another way would name an actor that holds none of his texts (put right, it is read-handle-sam's outcome)",
+      "source": "K-04 v1 handles_address_form; K-06 v1 handle; runtime/src/gateway/seal.ts actorNameOf; K-05 v1.10 item 50, default 93"
+    },
+    {
+      "file": "invalid/refuse-chat-handle-email.json",
+      "version": "v1.10",
+      "def": "readChatHandle.response",
+      "expect": "refuse",
+      "shows": "Alex's chat answered with his email handle: a Linq chat's handle is a phone, the number the receipt's event carries, so the answer names a phone handle or none (put right, it is read-chat-handle-alex's outcome)",
+      "source": "K-06 v1 ('A Linq event comes from a phone'); arch 01 line 55; adapters/src/linq/webhook/parse.ts receiptHandle; K-05 v1.10 item 51, default 94"
+    },
+    {
+      "file": "read-turn-party-test-owner-1.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "The walking skeleton's turn 1: test owner 1, who holds no role, owns the one company that names Lee's Barbershop, where no one holds the live owner role, so the turn runs under the barbershop with Sam as the person and its zone, as ADR-013 default 130 and K-09 v1.5's turn 1 fixtures have it",
+      "source": "ADR-013 sections 1 and 4; K-09 v1.5 default 130; T-1148 db/seeds/skeleton.ts; K-23 v1 companies.owner_person_id, README rule 5; K-04 v1 handles, person_handles, person_roles, businesses.time_zone; K-05 v1.11 item 52, defaults 96 to 99"
+    },
+    {
+      "file": "read-turn-party-one-role.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "A person with one live role: Riley, a barber at Lee's Barbershop, texts from Riley's own phone, so the turn runs under the barbershop with Riley as the person and the barbershop's zone",
+      "source": "K-04 v1 seed-person-roles.json (role-riley-barber); arch 02 line 115; K-09 v1 caller.businessId, caller.personId; K-05 v1.11 item 52, defaults 97 and 98"
+    },
+    {
+      "file": "read-turn-party-several-businesses.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "Sam with three live owner roles at three businesses: no row says which his texts are about, so none is picked or dropped: businessUndecided, severalBusinesses, with his handle and person, and no turn runs on a business picked for him",
+      "source": "K-04 v1 seed-person-roles.json; S13-27 rule 29; arch 02 line 115; arch 03 line 159; S11-15; QUESTIONS.md CQ-220; K-05 v1.11 item 52, defaults 98, 100 and 102"
+    },
+    {
+      "file": "read-turn-party-several-companies.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "Sam with no role and two companies, each a business of its own on the same login: no source orders an owner's businesses, so businessUndecided, severalBusinesses",
+      "source": "K-23 v1 companies ('a second company a second business on the same login'), seed-company-two-kinds.json; S1-04; S11-15 ('Pause which business?'); K-05 v1.11 item 52, defaults 98 and 100"
+    },
+    {
+      "file": "read-turn-party-sign-up-before-business.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "Sam's sign-up between S1-04 and S1-09: his two companies have no business yet, so no row names one and the turn runs with no business and no zone, on the runtime side, as sign-up's turns run",
+      "source": "K-09 README, the table of journeys 1 and 2 (S1-04 companies, S1-09 business); K-23 v1 README rule 5; K-09 v1 caller.businessId; K-05 v1.2 default 25; K-05 v1.11 item 52, defaults 98 and 101"
+    },
+    {
+      "file": "read-turn-party-first-text.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "A number's first text, after the gateway wrote its handle and person: no role and no company, so the turn runs with no business and no zone, and nothing on file is used",
+      "source": "K-05 v1.2 item 29 (handle-key-first-sight.json); RULES 6.3, 6.5; K-09 v1 caller.businessId ('Null only where no business exists yet'); K-05 v1.11 item 52, defaults 96 to 98 and 101"
+    },
+    {
+      "file": "read-turn-party-handed-over.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "An ex-owner after S11-100's hand-over to Hugo P., whose company row still names him: the barbershop's live owner role is another person's, so the company is not his to act on: businessUndecided, anotherOwner, and no turn runs under it",
+      "source": "S11-100 ('Sam's access ends at the handover time'); S2-02 ('One account owner'); RULES 6.8, 6.9; K-05 v1.4 default 58; K-05 v1.11 item 52, default 99"
+    },
+    {
+      "file": "read-turn-party-owner-role-ended.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "An ex-owner whose owner role ended at a hand-over Rosie's team made on papers, before the new owner confirmed, whose company row still names him: businessUndecided, roleEnded",
+      "source": "S11-100 ('Rosie's team hands it over only on papers'); RULES 8.7, 6.9; K-04 v1 person_roles.ended_at; K-05 v1.11 item 52, default 99"
+    },
+    {
+      "file": "read-turn-party-unknown.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "accept",
+      "shows": "A handle K-04 does not hold: every field null, which the directory reads as not known, so no turn or park runs",
+      "source": "runtime/src/turn/types.ts TurnDirectory ('Null: not known, so no turn runs'); K-05 v1.2 item 29; K-04 v1 handles_address_key; K-05 v1.11 item 52, default 96"
+    },
+    {
+      "file": "invalid/refuse-turn-party-caller-business.json",
+      "version": "v1.11",
+      "def": "readTurnParty.exchange",
+      "expect": "refuse",
+      "shows": "A party request naming the business it wants beside the handle: the business, the person and the zone are read from the rows, never handed in (put right, with the handle named alone, it is read-turn-party-test-owner-1)",
+      "source": "arch 10 line 546; K-04 v1 rule 4; QUESTIONS.md CQ-220; K-05 v1.11 item 52"
+    },
+    {
+      "file": "invalid/refuse-turn-party-undecided-names-businesses.json",
+      "version": "v1.11",
+      "def": "readTurnParty.errors",
+      "expect": "refuse",
+      "shows": "Sam's undecided party answered with the businesses it found: the error names its reason, the handle and the person, never a business, a role or a company (put right, it is read-turn-party-several-businesses's outcome)",
+      "source": "RULES 4.10 ('never joined across businesses'); K-05 v1.4 default 60's rule (each answer what its port reads); K-05 v1.11 item 52, default 102"
+    },
+    {
+      "file": "invalid/refuse-turn-party-business-zone-null.json",
+      "version": "v1.11",
+      "def": "readTurnParty.response",
+      "expect": "refuse",
+      "shows": "Test owner 1's party at the barbershop answered with no zone: a party at a business always carries that business's zone, which K-04 stores not null (put right, it is read-turn-party-test-owner-1's outcome)",
+      "source": "K-04 v1 businesses.time_zone (not null); S13-03; K-05 v1.11 item 52, default 101"
+    },
+    {
+      "file": "invalid/refuse-turn-party-no-business-zone-utc.json",
+      "version": "v1.11",
+      "def": "readTurnParty.response",
+      "expect": "refuse",
+      "shows": "A first text's party with no business answered with the zone UTC: no row stores a zone for a party with no business, so the answer gives none and UTC stays the consumer's reading (put right, it is read-turn-party-first-text's outcome)",
+      "source": "K-05 v1.3 default 52 (what K-04 stores is returned as stored); K-08 v1 eventLogRow.zone ('null means UTC'); K-05 v1.11 item 52, default 101"
+    },
+    {
+      "file": "read-tester-standing-check-tester.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.exchange",
+      "expect": "accept",
+      "shows": "Staging's check tester: its token's sha256 finds its live session, whose person holds a live team row as the test console's member, so the page may be used: tester, and nothing more",
+      "source": "QUESTIONS.md CQ-214 (a); K-22 v1 session_for_token, rule 5; K-36 v1 team_page_recipients; K-21 v1 'Staging only', 'The team console', defaults 2 and 14; K-05 v1.12 item 53, defaults 103 to 105"
+    },
+    {
+      "file": "read-tester-standing-removed-member.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.exchange",
+      "expect": "accept",
+      "shows": "The check tester after its team row was removed: the session is live but its person holds no live team row, so notTester",
+      "source": "K-36 v1 README ('a member leaves the list by removed_at'), team_page_recipients_one_live_per_person; K-05 v1.12 item 53, default 103"
+    },
+    {
+      "file": "read-tester-standing-not-tester.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.exchange",
+      "expect": "accept",
+      "shows": "Sam's live portal session: his person holds no team row, so notTester, and the answer names neither the session nor Sam",
+      "source": "K-22 v1 seed-session.json, session_for_token; K-21 v1 notTester; K-05 v1.12 item 53, default 103"
+    },
+    {
+      "file": "read-tester-standing-signed-out.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.exchange",
+      "expect": "accept",
+      "shows": "Sam's signed-out session, before its expiry: an ended session is no live session, so noSession, as an unknown token answers",
+      "source": "K-22 v1 seed-session.json, session_for_token (ended_at null); RULES 8.7; K-21 v1 signInNeeded; K-05 v1.12 item 53, default 104"
+    },
+    {
+      "file": "read-tester-standing-expired.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.exchange",
+      "expect": "accept",
+      "shows": "Sam's session read at its own expires_at: no longer live, so noSession",
+      "source": "K-22 v1 seed-session.json, session_for_token (expires_at after at); K-05 v1.12 item 53, default 104"
+    },
+    {
+      "file": "read-tester-standing-unknown-token.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.exchange",
+      "expect": "accept",
+      "shows": "A token hash no session holds: noSession, alike with an ended or expired session",
+      "source": "K-22 v1 session_for_token ('no row otherwise'); K-21 v1 signInNeeded; K-05 v1.12 item 53, default 104"
+    },
+    {
+      "file": "invalid/refuse-tester-standing-token-not-hash.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.exchange",
+      "expect": "refuse",
+      "shows": "A standing asked with the session token itself in place of its sha256: a token is a key and never leaves the page entry (put right, with the hash in its place, it is read-tester-standing-check-tester)",
+      "source": "K-22 v1 sessions_token_hash_form; K-21 v1 'Never in a span or a log'; BP rule 7; K-05 v1.12 item 53"
+    },
+    {
+      "file": "invalid/refuse-tester-standing-names-person.json",
+      "version": "v1.12",
+      "def": "readTesterStanding.response",
+      "expect": "refuse",
+      "shows": "Sam's notTester answered with his person: the answer is the standing alone, so a caller who is no tester learns nothing (put right, it is read-tester-standing-not-tester's outcome)",
+      "source": "K-21 v1 notTester; K-05 v1.12 item 53, default 104"
+    },
+    {
+      "file": "read-roster-phone-tp-01.json",
+      "version": "v1.12",
+      "def": "readRosterPhone.exchange",
+      "expect": "accept",
+      "shows": "Test owner 1's roster phone by the handle the roster's list names: the number the seed wrote, +15555550100, and no email on file",
+      "source": "T-1148 db/seeds/skeleton.ts TEST_OWNER_1; K-04 v1 seed-person-roles.json, handles, person_handles; K-21 v1 default 6; K-05 v1.12 item 54, defaults 106 and 107"
+    },
+    {
+      "file": "read-roster-phone-email-on-file.json",
+      "version": "v1.12",
+      "def": "readRosterPhone.exchange",
+      "expect": "accept",
+      "shows": "Sam's phone after S1-10 gave him one email handle: the phone handle's one person's one email is the email on file",
+      "source": "K-22 v1 seed-owner-id-upload.json, accounts_email_fk; S1-10; K-21 v1 testPhoneParts; K-05 v1.12 item 54, default 107"
+    },
+    {
+      "file": "read-roster-phone-unknown.json",
+      "version": "v1.12",
+      "def": "readRosterPhone.exchange",
+      "expect": "accept",
+      "shows": "tp-02 before seed:staging: no row holds its handle, so none, and the page answers notTestPhone with nothing signed",
+      "source": "T-202 db/seeds/staging-core.ts; K-21 v1 notTestPhone; K-05 v1.10 default 95's rule; K-05 v1.12 item 54, default 107"
+    },
+    {
+      "file": "read-roster-phone-not-a-phone.json",
+      "version": "v1.12",
+      "def": "readRosterPhone.exchange",
+      "expect": "accept",
+      "shows": "A roster entry naming an email handle: no phone the Linq double can sign as, so none",
+      "source": "K-04 v1 handles.kind; adapters/src/linq/double-webhooks/webhooks.ts; K-05 v1.12 item 54, default 107"
+    },
+    {
+      "file": "invalid/refuse-roster-phone-by-roster-id.json",
+      "version": "v1.12",
+      "def": "readRosterPhone.exchange",
+      "expect": "refuse",
+      "shows": "A roster phone asked by its roster id: the roster's list is staging's config and the read takes the K-04 handle id it gives (put right, it is read-roster-phone-tp-01)",
+      "source": "K-21 v1 default 6; the D-017 path audit's R5; K-05 v1.12 item 54, default 106"
+    },
+    {
+      "file": "invalid/refuse-roster-phone-names-person.json",
+      "version": "v1.12",
+      "def": "readRosterPhone.response",
+      "expect": "refuse",
+      "shows": "Test owner 1's roster phone answered with its person: the answer is the number and the email alone (put right, it is read-roster-phone-tp-01's outcome)",
+      "source": "actions/src/page-calls/staging/test-phone/types.ts RosterPhone; K-21 v1 rule 9 ('never who holds it'); K-05 v1.12 item 54"
+    },
+    {
+      "file": "read-phone-state-no-row.json",
+      "version": "v1.12",
+      "def": "readPhoneState.exchange",
+      "expect": "accept",
+      "shows": "tp-01 before its first text: no phone row and so no chat link, which the binding shows as chat closed and not stopped",
+      "source": "T-1148 db/seeds/skeleton.ts; K-05 v1.7 item 46; K-29 v1 chat_links_phone_fk; PhoneState.chatOpen; K-05 v1.12 item 55, default 108"
+    },
+    {
+      "file": "read-phone-state-chat-open.json",
+      "version": "v1.12",
+      "def": "readPhoneState.exchange",
+      "expect": "accept",
+      "shows": "Sam's phone with its chat open and never stopped: open, not stopped, no STOP in force, no chat link",
+      "source": "K-04 v1 seed-phone-chat-open.json, phones; K-05 v1.12 item 55, default 108"
+    },
+    {
+      "file": "read-phone-state-stopped.json",
+      "version": "v1.12",
+      "def": "readPhoneState.exchange",
+      "expect": "accept",
+      "shows": "Alex's phone after his STOP: stopped, its chat closed, and the STOP in force at its stop_at",
+      "source": "commit-alex-stop.json; K-04 v1 phones_stop_closes_chat, phones_stopped_has_time; RULES 7.2; K-05 v1.12 item 55, default 108"
+    },
+    {
+      "file": "read-phone-state-started-again.json",
+      "version": "v1.12",
+      "def": "readPhoneState.exchange",
+      "expect": "accept",
+      "shows": "Alex's phone after his own START: not stopped, so no STOP in force, though the row keeps the last STOP's time",
+      "source": "commit-alex-start.json; DL-193; PhoneState.stoppedAt ('When the STOP in force came, or null'); K-05 v1.12 item 55, default 108"
+    },
+    {
+      "file": "read-phone-state-chat-link.json",
+      "version": "v1.12",
+      "def": "readPhoneState.exchange",
+      "expect": "accept",
+      "shows": "Pat's phone with an unanswered staff invite: the chat not open, and the link's short code and ready text as stored",
+      "source": "K-29 v1 seed-chat-link.json, chat_links; MC C9; RULES 4.1b; K-21 v1 testPhoneParts; K-05 v1.12 item 55, default 109"
+    },
+    {
+      "file": "invalid/refuse-phone-state-stopped-at-after-start.json",
+      "version": "v1.12",
+      "def": "readPhoneState.response",
+      "expect": "refuse",
+      "shows": "Alex's phone after START answered with the last STOP's time as the STOP in force: a phone that is not stopped has none (put right, it is read-phone-state-started-again's outcome)",
+      "source": "DL-193; PhoneState.stoppedAt; K-05 v1.12 item 55, default 108"
+    },
+    {
+      "file": "invalid/refuse-phone-state-link-without-phone.json",
+      "version": "v1.12",
+      "def": "readPhoneState.response",
+      "expect": "refuse",
+      "shows": "A number with no phone row answered with a chat link: no link can name a number with no row (put right, it is read-phone-state-no-row's outcome)",
+      "source": "K-29 v1 chat_links_phone_fk; K-05 v1.12 item 55"
+    },
+    {
+      "file": "invalid/refuse-phone-state-answers-number.json",
+      "version": "v1.12",
+      "def": "readPhoneState.response",
+      "expect": "refuse",
+      "shows": "Sam's phone state answered with its number: the request holds the number and the answer names none (put right, it is read-phone-state-chat-open's outcome)",
+      "source": "BP rule 7; K-21 v1 ('in no answer but as its last four digits'); K-05 v1.12 item 55"
+    },
+    {
+      "file": "read-live-timers-sam.json",
+      "version": "v1.12",
+      "def": "readLiveTimers.exchange",
+      "expect": "accept",
+      "shows": "Sam's running safety timer on Alex's move survey: the thirteen columns the actor's copy keeps, the address sealed as stored",
+      "source": "K-34 v1 seed-safety-timer.json, safety_timers, safety_timers_worker_live_idx; arch 11 line 566; runtime/src/actor/copies/types.ts SafetyTimerRow; K-05 v1.12 item 56, default 110"
+    },
+    {
+      "file": "read-live-timers-none.json",
+      "version": "v1.12",
+      "def": "readLiveTimers.exchange",
+      "expect": "accept",
+      "shows": "The contact's own actor, the pro of no timer: an empty list, an answer",
+      "source": "K-34 v1 seed-safety-timer.json; K-05 v1.12 item 56, default 110"
+    },
+    {
+      "file": "invalid/refuse-live-timers-address-opened.json",
+      "version": "v1.12",
+      "def": "readLiveTimers.response",
+      "expect": "refuse",
+      "shows": "Sam's timer answered with the job's address in plain words: the address leaves PostgreSQL only sealed, as stored (put right, it is read-live-timers-sam's outcome)",
+      "source": "K-34 v1 rule 6 (safety_timers.address sealed); arch 09 line 492; RULES 4.5; K-05 v1.12 item 56, default 110"
+    },
+    {
+      "file": "invalid/refuse-live-timers-safe-listed.json",
+      "version": "v1.12",
+      "def": "readLiveTimers.response",
+      "expect": "refuse",
+      "shows": "Sam's timer answered as safe: a timer closed by SAFE is never live, so never answered (put right, it is read-live-timers-sam's outcome)",
+      "source": "K-34 v1 safety_timers_state_known, safety_timers_worker_live_idx; B8-86; K-05 v1.12 item 56"
+    },
+    {
+      "file": "invalid/refuse-live-timers-business-scope.json",
+      "version": "v1.12",
+      "def": "readLiveTimers.exchange",
+      "expect": "refuse",
+      "shows": "Sam's live timers asked under one business's scope: a scoped read would hide another business's timers and empty the copy of a live one (put right, with the handle alone, it is read-live-timers-sam)",
+      "source": "K-04 v1 rule 4; K-34 v1 safety_timers_runtime; arch 11 line 566; K-05 v1.12 item 56, default 110"
+    },
+    {
+      "file": "read-stopped-flag-alex-stopped.json",
+      "version": "v1.12",
+      "def": "readStoppedFlag.exchange",
+      "expect": "accept",
+      "shows": "Alex's stopped flag after his STOP's commit lost its answer: stopped, at version 4, read fresh",
+      "source": "commit-alex-stop.json; T-1206; DL-427; runtime/src/actor/copies/types.ts StoppedFlagSource; K-05 v1.12 item 57, default 111"
+    },
+    {
+      "file": "read-stopped-flag-alex-started.json",
+      "version": "v1.12",
+      "def": "readStoppedFlag.exchange",
+      "expect": "accept",
+      "shows": "Alex's stopped flag after his own START: not stopped, at version 5",
+      "source": "commit-alex-start.json; RULES 7.5; K-05 v1.12 item 57"
+    },
+    {
+      "file": "read-stopped-flag-no-phone.json",
+      "version": "v1.12",
+      "def": "readStoppedFlag.exchange",
+      "expect": "accept",
+      "shows": "A handle with no phone row: notFound, table phones, so the copy keeps the stricter reading, and it is never answered as not stopped",
+      "source": "runtime/src/actor/copies/copies.ts readStoppedAgain; K-05 v1.10 default 95's rule; K-05 v1.12 item 57, default 111"
+    },
+    {
+      "file": "invalid/refuse-stopped-flag-no-version.json",
+      "version": "v1.12",
+      "def": "readStoppedFlag.response",
+      "expect": "refuse",
+      "shows": "Alex's stopped flag answered with no version: the copy orders its writes by the row's version, so it never goes without one (put right, it is read-stopped-flag-alex-stopped's outcome)",
+      "source": "runtime/src/actor/copies/copies.ts stoppedFlagOf, keepsCopy; K-04 v1 rule 2; K-05 v1.12 item 57"
+    },
+    {
+      "file": "invalid/refuse-stopped-flag-by-number.json",
+      "version": "v1.12",
+      "def": "readStoppedFlag.exchange",
+      "expect": "refuse",
+      "shows": "A stopped flag asked by the number in place of the actor's handle id: the actor names its handle, and no number travels in the request (put right, it is read-stopped-flag-alex-stopped)",
+      "source": "runtime/src/actor/copies/types.ts StoppedFlagSource ({ handleId }); K-05 v1.7 item 46 (no number in a request); K-05 v1.12 item 57"
+    },
+    {
+      "file": "start-sign-in-sam.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "Sam starts an email sign-in from his laptop: no bound, repeat, pause or cap holds, one account names him, and the attempt is written with his person, its 10 minutes by the database's clock",
+      "source": "ADR-016 section 4 rules 0 to 5; K-22 v1.2 rule 9; K-21 v1 sign-in-request.json; S11-52; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-repeat.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "The same start sent again: its first attempt answered, repeated, nothing written and no code to follow",
+      "source": "ADR-016 section 4 rule 1; K-21 v1 schema line 688; K-22 v1.2 rule 9; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-no-account.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "A start for an email no account holds: the same started answer, the attempt with no person, no code to follow",
+      "source": "ADR-016 section 4 rules 4 and 5; S13-45; K-21 README line 114; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-two-accounts.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "Two accounts with one proven email: the start names no person and sends nothing, answering started all the same",
+      "source": "ADR-016 section 4 rule 4 and open point 14; 0020 lines 98 to 107; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-day-cap.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "A sixth start of one contact in 24 hours: paused until the earliest of the five plus 24 hours, nothing written",
+      "source": "ADR-016 section 4 rule 3 and open point 1; S13-45; K-22 v1.2 rule 9 and default 23; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-contact-paused.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "A new start for a contact whose attempt five wrong codes paused: paused until that pause ends, nothing written",
+      "source": "ADR-016 section 4 rule 2; K-22 v1.2 seed-sign-in-attempt.json; K-21 v1 sign-in-wrong-five.json; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-no-account-paused.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "The same paused answer for a contact no account holds, whose attempt was paused the same way",
+      "source": "ADR-016 section 4; K-21 v1 schema line 780; K-22 v1.2 seed-sign-in-attempt.json; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-hour-bound.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "The 101st start in an hour, of any contacts: paused until the oldest of the hour's 100 is an hour old, read before any lock or account, nothing written",
+      "source": "ADR-016 section 4 rule 0 and open point 13; K-22 v1.2 rule 9; K-05 v1.13 item 58"
+    },
+    {
+      "file": "start-sign-in-sam-new-device.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "accept",
+      "shows": "Sam starts from a browser none of his sessions used: started as from any device, the attempt bound to this one",
+      "source": "ADR-016 section 4; K-22 v1.2 sign_in_attempts.device_sha256; K-05 v1.13 item 58"
+    },
+    {
+      "file": "send-sign-in-code-sam.json",
+      "version": "v1.13",
+      "def": "sendSignInCode.exchange",
+      "expect": "accept",
+      "shows": "Sam's code after the answer, in one transaction under the contact's lock: the code row with only its keyed hash, the email row with no turn (job id, quick_reply, purpose code, not_after the code's end) written checked with its plan and final parts, three entries and the attempt's code id",
+      "source": "ADR-016 section 1; K-04 v1.1; K-22 v1.2 rule 9; K-12 v1 send-code.json; DL-546; K-05 v1.13 item 59"
+    },
+    {
+      "file": "send-sign-in-code-repeat.json",
+      "version": "v1.13",
+      "def": "sendSignInCode.exchange",
+      "expect": "accept",
+      "shows": "The send for the same attempt again: the first send answered, nothing written, no second code",
+      "source": "ADR-016 section 1; K-04 v1.1 outbox_rows_job_idx; K-05 v1.13 item 59"
+    },
+    {
+      "file": "send-sign-in-code-no-person.json",
+      "version": "v1.13",
+      "def": "sendSignInCode.exchange",
+      "expect": "accept",
+      "shows": "A send for an attempt with no person: notSent, nothing written or sent",
+      "source": "ADR-016 section 4; card R1; K-05 v1.13 item 59"
+    },
+    {
+      "file": "send-sign-in-code-sam-new-device.json",
+      "version": "v1.13",
+      "def": "sendSignInCode.exchange",
+      "expect": "accept",
+      "shows": "The code for Sam's start on a new browser, sent as any code is",
+      "source": "ADR-016 section 1; K-05 v1.13 item 59"
+    },
+    {
+      "file": "prove-sign-in-sam-right.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "Sam's right code on a device he used before: rosie.person_id set to his person, the session started naming the code, the attempt signed in",
+      "source": "ADR-016 sections 4 and 6; K-22 v1 rules 4 and 5; K-22 v1.2 rule 9's check; K-21 v1 signInCheck; K-05 v1.13 item 60"
+    },
+    {
+      "file": "prove-sign-in-repeat.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "The right check sent again: alreadySignedIn, no token, no second session, nothing counted",
+      "source": "K-21 README line 115; K-22 v1.2 rule 9's check, step 2; K-05 v1.13 item 60"
+    },
+    {
+      "file": "prove-sign-in-other-device.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "A check of Sam's attempt from another browser: attemptNotFound alone, nothing told, counted or written",
+      "source": "K-21 README line 117; K-22 v1.2 sign_in_attempt; K-05 v1.13 item 60"
+    },
+    {
+      "file": "prove-sign-in-wrong.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "A wrong code: one wrong try of the attempt, 4 left, read from the attempt and committed at once",
+      "source": "ADR-016 section 4; K-22 v1.2 rule 9's check, step 5; K-22 README line 212; K-05 v1.13 item 60"
+    },
+    {
+      "file": "prove-sign-in-sixth-check.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "A sixth check after five wrong ones: paused from the server, counting nothing, cookie or none",
+      "source": "STATE note 74; ADR-016 section 4; K-22 v1.2 seed-sign-in-attempt.json; K-05 v1.13 item 60"
+    },
+    {
+      "file": "prove-sign-in-sixth-check-no-account.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "The same sixth check of an attempt with no account and no code: the same paused answer",
+      "source": "ADR-016 section 4 (every answer to a code that is not right comes from the attempt); K-22 v1.2 seed-sign-in-attempt.json; K-05 v1.13 item 60"
+    },
+    {
+      "file": "prove-sign-in-expired.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "The right code at 10 minutes 1 second: expired, nothing counted, the code not used",
+      "source": "RULES 6.2; 05-deployments.md line 958; K-22 v1.2 rule 9's check, step 3; K-05 v1.13 item 60"
+    },
+    {
+      "file": "prove-sign-in-second-proof.json",
+      "version": "v1.13",
+      "def": "proveSignIn.exchange",
+      "expect": "accept",
+      "shows": "An owner's right code on a device none of his sessions used: secondProofNeeded, the code used, no session",
+      "source": "S13-45 row 8; K-21 README line 110; K-22 v1 rule 4; K-05 v1.13 item 60"
+    },
+    {
+      "file": "end-session-sam.json",
+      "version": "v1.13",
+      "def": "endSession.exchange",
+      "expect": "accept",
+      "shows": "Sam signs out: session_for_token finds his session, rosie.person_id is set to him, and only that live session ends, signed_out",
+      "source": "ADR-016 section 6; K-22 v1 rule 5; K-21 v1 sign-out.json; K-05 v1.13 item 61"
+    },
+    {
+      "file": "end-session-repeat.json",
+      "version": "v1.13",
+      "def": "endSession.exchange",
+      "expect": "accept",
+      "shows": "The sign-out again: repeated, nothing ended, no session named",
+      "source": "K-21 v1 signOut; K-05 v1.13 item 61"
+    },
+    {
+      "file": "person-standing-sam.json",
+      "version": "v1.13",
+      "def": "personStanding.exchange",
+      "expect": "accept",
+      "shows": "Sam's standing after his sign-in: his four live owner roles in role id order, no team row, not a tester",
+      "source": "ADR-016 section 6; K-21 v1 signedIn.person; K-04 seed-person-roles.json; K-23 seed-company-two-kinds.json; K-05 v1.13 item 62"
+    },
+    {
+      "file": "person-standing-alex.json",
+      "version": "v1.13",
+      "def": "personStanding.exchange",
+      "expect": "accept",
+      "shows": "Alex, a customer only: no role is a standing, so roles empty",
+      "source": "FS line 701; K-21 v1 SignedInRole; K-05 v1.13 item 62"
+    },
+    {
+      "file": "person-standing-check-tester.json",
+      "version": "v1.13",
+      "def": "personStanding.exchange",
+      "expect": "accept",
+      "shows": "Staging's check tester: no role, a live team row, so team and tester",
+      "source": "K-05 v1.12 defaults 103 and 105; K-21 v1 default 2; K-05 v1.13 item 62"
+    },
+    {
+      "file": "sign-in-entries-signed-in.json",
+      "version": "v1.13",
+      "def": "signInEntries.exchange",
+      "expect": "accept",
+      "shows": "Sam's check logged under the attempt's id: proof_code.checked for his code's use and session.started, values read from the rows",
+      "source": "ADR-016 section 6; K-08 v1.1 proof_code.checked; K-08 v1.2 session.started; CQ-258; K-05 v1.13 item 63"
+    },
+    {
+      "file": "sign-in-entries-wrong-try.json",
+      "version": "v1.13",
+      "def": "signInEntries.exchange",
+      "expect": "accept",
+      "shows": "A wrong code logged: proof_code.checked for the code's first wrong try",
+      "source": "K-08 v1.1 proof_code.checked; ADR-016 section 6; K-05 v1.13 item 63"
+    },
+    {
+      "file": "sign-in-entries-sign-out.json",
+      "version": "v1.13",
+      "def": "signInEntries.exchange",
+      "expect": "accept",
+      "shows": "Sam's sign-out logged: session.ended under the sign-out's own request id",
+      "source": "K-08 v1.2 session.ended and default 25; ADR-016 section 6; K-05 v1.13 item 63"
+    },
+    {
+      "file": "claim-sam-sign-in-code.json",
+      "version": "v1.13",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "Sam's code row claimed by the email port, naming its purpose code and its notAfter, with no business, turn or job id",
+      "source": "ADR-016 sections 2, 3 and 5; K-04 v1.1 email_purpose, not_after; card R0; K-05 v1.13 item 64"
+    },
+    {
+      "file": "read-outbox-row-sign-in-code.json",
+      "version": "v1.13",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "A read of the code row, which has no turn: notFound before any turn read, nothing of it returned",
+      "source": "ADR-016 section 1 (the reader table) and open point 12; K-04 v1.1; CQ-248; K-05 v1.13 item 65"
+    },
+    {
+      "file": "give-up-sign-in-code-no-turn.json",
+      "version": "v1.13",
+      "def": "dispatcherGivesUp.exchange",
+      "expect": "accept",
+      "shows": "A give-up of the code row: noTurn, nothing written, neither the move to failed nor a follow-up nor an entry",
+      "source": "ADR-016 section 3 (how a code row ends); K-07 retry rule 5; K-05 v1.13 item 66"
+    },
+    {
+      "file": "write-all-set-no-turn.json",
+      "version": "v1.13",
+      "def": "writeAllSet.exchange",
+      "expect": "accept",
+      "shows": "An 'all set' naming the code row: noTurn, nothing written",
+      "source": "ADR-016 section 3; K-05 v1.1 item 25; K-05 v1.13 item 66"
+    },
+    {
+      "file": "mark-sign-in-code-failed-no-turn.json",
+      "version": "v1.13",
+      "def": "markPart.exchange",
+      "expect": "accept",
+      "shows": "A failed mark of the code row's part carrying follow-ups: noTurn, nothing written, the failure included",
+      "source": "ADR-016 section 3; K-05 v1.1 item 15; K-05 v1.13 item 66"
+    },
+    {
+      "file": "invalid/refuse-start-sign-in-past-cap-wrote.json",
+      "version": "v1.13",
+      "def": "startSignIn.response",
+      "expect": "refuse",
+      "shows": "A sixth start in a day answered paused that names the attempt it wrote: a start past the cap writes nothing (put right, it is start-sign-in-day-cap's outcome)",
+      "source": "ADR-016 section 4 rule 3; K-22 v1.2 rule 9; card V3's refused twins; K-05 v1.13 item 58"
+    },
+    {
+      "file": "invalid/refuse-start-sign-in-text-way.json",
+      "version": "v1.13",
+      "def": "startSignIn.exchange",
+      "expect": "refuse",
+      "shows": "Sam's start by way text, which this lane does not serve (put right, by way email, it is start-sign-in-sam)",
+      "source": "ADR-016 section 5; CQ-244; K-05 v1.13 item 58"
+    },
+    {
+      "file": "invalid/refuse-send-sign-in-code-plain-code.json",
+      "version": "v1.13",
+      "def": "sendSignInCode.exchange",
+      "expect": "refuse",
+      "shows": "Sam's send with the code itself where its keyed hash goes: a code is never stored (put right, with its hash, it is send-sign-in-code-sam)",
+      "source": "K-22 v1 proof_codes_hash_form; BP rule 7; ADR-016 section 1; K-05 v1.13 item 59"
+    },
+    {
+      "file": "invalid/refuse-prove-sign-in-other-device-told.json",
+      "version": "v1.13",
+      "def": "proveSignIn.errors",
+      "expect": "refuse",
+      "shows": "A check from another device answered attemptNotFound that names the attempt: another browser learns nothing, not even that an attempt exists (put right, it is prove-sign-in-other-device's outcome)",
+      "source": "K-21 README line 117; K-21 v1 AttemptNotFoundError; card V3's refused twins; K-05 v1.13 item 60"
+    },
+    {
+      "file": "invalid/refuse-prove-sign-in-session-no-person.json",
+      "version": "v1.13",
+      "def": "proveSignIn.response",
+      "expect": "refuse",
+      "shows": "A session started with no person: a session starts only for the attempt's person, set as rosie.person_id (put right, with person-sam, it is prove-sign-in-sam-right's outcome)",
+      "source": "K-22 v1 rules 4 and 5 (refuse-sign-in-session-start); card V3's refused twins; K-05 v1.13 item 60"
+    },
+    {
+      "file": "invalid/refuse-end-session-token-not-hash.json",
+      "version": "v1.13",
+      "def": "endSession.exchange",
+      "expect": "refuse",
+      "shows": "A sign-out asked with the session token itself where its sha256 goes (put right, with the hash, it is end-session-sam)",
+      "source": "K-22 v1 sessions_token_hash_form; K-21 v1 opaqueToken; K-05 v1.13 item 61"
+    },
+    {
+      "file": "invalid/refuse-person-standing-customer-role.json",
+      "version": "v1.13",
+      "def": "personStanding.response",
+      "expect": "refuse",
+      "shows": "Alex's customer role answered as a standing: customers have no sign-in (put right, roles empty, it is person-standing-alex's outcome)",
+      "source": "FS line 701; K-21 v1 SignedInRole; K-05 v1.13 item 62"
+    },
+    {
+      "file": "invalid/refuse-sign-in-entries-caller-values.json",
+      "version": "v1.13",
+      "def": "signInEntries.exchange",
+      "expect": "refuse",
+      "shows": "A session's entry asked with the caller's own values, a token hash among them: every value is read from the row (put right, the ask alone, it is sign-in-entries-signed-in)",
+      "source": "K-08 v1.2 (never a token or device hash); K-21 v1 opaqueToken; K-05 v1.13 item 63"
+    },
+    {
+      "file": "invalid/refuse-claimed-code-row-no-not-after.json",
+      "version": "v1.13",
+      "def": "claimOutbox.response",
+      "expect": "refuse",
+      "shows": "Sam's code row claimed with no notAfter: a code row always carries its end, so no try sends a dead code (put right, it is claim-sam-sign-in-code's outcome)",
+      "source": "K-04 v1.1 outbox_rows_code_has_not_after; ADR-016 section 3; K-05 v1.13 item 64"
+    },
+    {
+      "file": "invalid/refuse-give-up-no-turn-wrote.json",
+      "version": "v1.13",
+      "def": "dispatcherGivesUp.errors",
+      "expect": "refuse",
+      "shows": "A give-up of a row with no turn answered noTurn that lists a follow-up row it wrote: noTurn writes nothing (put right, it is give-up-sign-in-code-no-turn's outcome)",
+      "source": "ADR-016 section 3; card V3's refused twins; K-05 v1.13 item 66"
+    },
+    {
+      "file": "claim-safety-past-live-safety-claim.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "Alex's second danger line claimed by its own wake with sendClass safety, past his first line, sending under another run's live claim: the safety walk passes a safety row it cannot claim and takes the next, so an earlier line that is stuck or failing never holds a later one past its 5 s",
+      "source": "T-1352's rulings and DL-687 (the walk passes a live-claimed safety row); RULES 4.12; arch 04 lines 201 and 211; NQ-RT-9; K-07 v1 outboxClaim (one claim per row); K-05 v1.14 item 67 and default 130"
+    },
+    {
+      "file": "claim-safety-past-routine-live-claim.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "Sam's danger line claimed by its wake past his routine notice, sending under the sweep's live claim, which the safety walk never reads; an ordinary claim of his rows stops there",
+      "source": "T-1352's rulings (the security reviewer's 'THE RUN'); RULES 4.12; arch 02 line 111; arch 04 line 201; K-05 v1.14 item 67"
+    },
+    {
+      "file": "claim-safety-past-planned-row.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "Alex's danger line claimed past his booking's confirmation, still planned while it is composed, at which an ordinary walk stops",
+      "source": "T-1352's rulings (a danger row behind a turn's planned rows); arch 04 lines 211 and 225; K-05 v1 item 3; K-05 v1.14 item 67"
+    },
+    {
+      "file": "claim-safety-past-held-row.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "Sam's danger line claimed at 8:31pm past his routine row held to 8am, with passedHeld empty: a safety claim reads, passes and lists no row of another class",
+      "source": "RULES 4.12 ('Safety beats text hours'); arch 02 lines 111 and 125; T-1352's rulings ('passedHeld is empty'); K-05 v1.14 item 67"
+    },
+    {
+      "file": "claim-safety-past-ten-checked-rows.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "accept",
+      "shows": "Sam's danger line claimed with limit 10 past ten checked routine notices, none of which a safety claim reads or counts toward its limit",
+      "source": "T-1352's rulings (the 10-row limit, runtime/src/dispatch/dispatcher.ts DEFAULT_LIMIT); arch 04 line 211; K-05 v1.14 item 67"
+    },
+    {
+      "file": "invalid/refuse-claim-safety-no-recipient.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "refuse",
+      "shows": "A safety claim made with no recipient: sendClass is allowed only with a named recipient (put right, with handle-alex, it is claim-safety-past-live-safety-claim's request)",
+      "source": "T-1353's card; T-1352's rulings ('That claim is made only with a named recipient'); K-05 v1.14 item 67 and default 134"
+    },
+    {
+      "file": "invalid/refuse-claim-safety-other-class.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "refuse",
+      "shows": "A claim asking for send class routine: sendClass takes safety alone (put right, safety, it is claim-safety-past-routine-live-claim's request)",
+      "source": "T-1353's card ('whose only value is safety'); arch 02 line 125; K-05 v1.14 item 67 and default 133"
+    },
+    {
+      "file": "invalid/refuse-safety-claim-takes-routine-row.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "refuse",
+      "shows": "A safety claim answered with a routine notice claimed ahead of the danger line: a safety claim never takes a row of another class (put right, the notice left out, it is claim-safety-past-ten-checked-rows's outcome)",
+      "source": "RULES 7.2; T-1352's rulings (a safety claim never takes a routine row); K-05 v1.14 item 67"
+    },
+    {
+      "file": "invalid/refuse-safety-claim-lists-held-row.json",
+      "version": "v1.14",
+      "def": "claimOutbox.exchange",
+      "expect": "refuse",
+      "shows": "A safety claim answered with Sam's held routine row in passedHeld: a safety claim lists no row it passed (put right, passedHeld empty, it is claim-safety-past-held-row's outcome)",
+      "source": "T-1352's rulings ('passedHeld is empty'); K-05 v1.14 item 67 and default 131"
     }
   ]
 }

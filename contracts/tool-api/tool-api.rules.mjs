@@ -2,6 +2,8 @@
 // added by T-051): what an exchange states that one JSON Schema cannot check across its parts.
 
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { isDeepStrictEqual } from "node:util";
 // `npm run contracts:check` runs the rule a fixtures/index.json entry names ("rule") on an exchange that has already
 // passed its schema (contracts/scripts/check-fixtures.mjs). QA's contract test (T-088) and the Tool API mock (C-186)
 // read the same statements. README "Named rules". Rules are only ever added: a later minor version adds a rule under a
@@ -774,10 +776,201 @@ export function givesJourneySixKeys(exchange) {
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// v1.5 (T-054): journey 7 and the fee door. Added beside the rules above, which stay as they are.
+// v1.6 (T-1173): compose input's term facts (README "v1.6"). These two read the contracts' own files beside this one:
+// K-01's bundle v0 (the bundle the skeleton's fixtures run on: README v1.5 "Scope") and K-03's fixtures, never anything
+// else, synchronously, so `npm run contracts:check` can load this file with require (scripts/check-fixtures.mjs).
+
+/** contracts/, the folder above this file's own. */
+const CONTRACTS = new URL("../", import.meta.url);
+
+/** A contracts-relative JSON file, parsed. */
+const contractJson = (file) => JSON.parse(readFileSync(new URL(file, CONTRACTS), "utf8"));
+
+/** K-01's bundle v0, whose step cards hold the lines a term fact copies (K-01 step.say[].elements.card.lines). */
+export const BUNDLE_V0_FILE = "bundle/fixtures/bundle-v0-skeleton.json";
+
+/** K-03's fixtures, and the K-03 version whose composeInput K-09 v1.6's compose input answers. */
+const K03_FIXTURES = "message-plan/fixtures";
+export const K03_VERSION = "v1.1";
+
+/** A slot as a compiled line writes it ({{name}}, {{name:example}}, {{name:example|other words}}: K-03 slottedText). */
+const NAMES_A_SLOT = /\{\{/;
+
+/** A term fact of K-03 v1.1's input (termFact): a value and its source line, never a slot. */
+const isTermFact = (fact) =>
+  fact !== null && typeof fact === "object" && Object.hasOwn(fact, "source") && !Object.hasOwn(fact, "slot");
 
 /**
- * The calls that may state each step of journey 7 and of the fee door (README "v1.5", "Every in-scope step"). Journey 7
+ * The lines of a step's card in a bundle: every line of every card its messages hold (K-01 step.say[].elements.card
+ * .lines), in order, from each of the bundle's flows that holds the step; undefined when none holds it.
+ */
+export function cardLinesOf(bundle, step) {
+  const holding = Object.values(bundle.flows ?? {}).filter((flow) => flow?.steps?.[step] !== undefined);
+  if (holding.length === 0) return undefined;
+  return holding.flatMap((flow) =>
+    (flow.steps[step].say ?? []).flatMap((message) => message?.elements?.card?.lines ?? []),
+  );
+}
+
+/** The input a composeInput exchange answered compose with, or undefined. */
+function composedInput(exchange) {
+  return exchange.call === "composeInput" && exchange.outcome?.result === "compose"
+    ? exchange.outcome.input
+    : undefined;
+}
+
+/**
+ * termFactsFromCard: a composeInput exchange answered compose gives a term fact only as its step's card states it.
+ * Each term fact's value is, word for word, a line of the card of the input's step (masterText.step) in bundle v0, and
+ * that line names no slot: a card line with a slot is no term fact, its values reach the composer as slot facts (CQ-86's
+ * default; README v1.6 default 137; K-03 README "v1.1": code copies the line word for word, with its source line, from
+ * the bundle the row was made with). The schema cannot see the bundle, so a term fact whose words differ from the
+ * card's line passes it; this rule refuses it. An input with no term fact passes.
+ */
+export function termFactsFromCard(exchange) {
+  const input = composedInput(exchange);
+  if (input === undefined) return ["termFactsFromCard reads a composeInput exchange answered compose"];
+  const terms = input.facts.map((fact, at) => ({ fact, at })).filter(({ fact }) => isTermFact(fact));
+  if (terms.length === 0) return [];
+  const step = input.masterText.step;
+  const lines = cardLinesOf(contractJson(BUNDLE_V0_FILE), step);
+  if (lines === undefined) return [`bundle v0 holds no step ${step}, so no card of its states a term`];
+  const problems = [];
+  for (const { fact, at } of terms) {
+    if (!lines.includes(fact.value)) {
+      problems.push(
+        `facts[${at}]: ${JSON.stringify(fact.value)} is no line of ${step}'s card in bundle v0, word for word`,
+      );
+    } else if (NAMES_A_SLOT.test(fact.value)) {
+      problems.push(
+        `facts[${at}]: ${step}'s card line ${JSON.stringify(fact.value)} names a slot, so it is no term fact`,
+      );
+    }
+  }
+  return problems;
+}
+
+/**
+ * inputIsK03Fixture: a composeInput exchange answered compose gives, word for word, K-03 v1.1's accepted composeInput
+ * fixture of the same row and turn (contracts/message-plan/fixtures/index.json): K-09's fixtures reuse K-03's inputs word
+ * for word (README "Fixtures"), and this compares the two files rather than trusting a copy: the same values, key for
+ * key in K-03's order. Exactly one such K-03 fixture must exist. Its term facts are held to the step's card too
+ * (termFactsFromCard).
+ */
+export function inputIsK03Fixture(exchange) {
+  const input = composedInput(exchange);
+  if (input === undefined) return ["inputIsK03Fixture reads a composeInput exchange answered compose"];
+  const problems = termFactsFromCard(exchange);
+  const twins = contractJson(`${K03_FIXTURES}/index.json`)
+    .fixtures.filter(
+      (entry) => entry.version === K03_VERSION && entry.def === "composeInput" && entry.expect === "accept",
+    )
+    .map((entry) => ({ file: entry.file, input: contractJson(`${K03_FIXTURES}/${entry.file}`) }))
+    .filter((twin) => twin.input.row === input.row && twin.input.turn === input.turn);
+  if (twins.length !== 1) {
+    problems.push(
+      `K-03 ${K03_VERSION} has ${twins.length} accepted composeInput fixtures of row ${input.row} and turn ${input.turn}, not one`,
+    );
+    return problems;
+  }
+  const [twin] = twins;
+  if (!isDeepStrictEqual(input, twin.input)) {
+    problems.push(`the input is not ${K03_FIXTURES}/${twin.file} word for word`);
+  } else if (JSON.stringify(input) !== JSON.stringify(twin.input)) {
+    problems.push(`the input holds ${K03_FIXTURES}/${twin.file}'s values, but not in its keys' order`);
+  }
+  return problems;
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// v1.8 (T-1219): an unmapped turn's end at the gate (README "v1.8"). This reads K-02's fixtures beside this file, as
+// v1.6's rules read K-01's and K-03's, synchronously.
+
+/** K-02's fixtures, and the K-02 version whose contextAndDecide K-09 v1.8's gateAndCommit takes. */
+const K02_FIXTURES = "model/fixtures";
+export const K02_VERSION = "v1.2";
+
+/** Limits 1 to 6, none run: what the gate logs for a part no limit ran for (K-08 v1 limitResult; README v1.8). */
+const noLimitRun = () => [1, 2, 3, 4, 5, 6].map((limit) => ({ limit, result: "notChecked", outcome: null }));
+
+/**
+ * unmappedEndAsked: a gateAndCommit exchange whose decided result holds K-02 v1.2's unmapped end (decideResult.end
+ * oneQuestion: CQ-162 (a), "a turn still unmapped ends in one question with nothing changed") is answered asked once
+ * for the turn (README v1.8 defaults 142 to 145): committed, with end asked, and one part result per part decide kept,
+ * in decide's order: `part` its index, `choiceId` the kept part's choice for choose and enter (else null), asked, with
+ * limits 1 to 6 each notChecked and no outcome (no limit ran), no stop, no key and nothing it depends on. Its decided
+ * pair is, word for word, K-02 v1.2's accepted contextAndDecide fixture of the same turn
+ * (contracts/model/fixtures/index.json; exactly one must exist), as K-09's fixtures carry K-02's: the same values, key
+ * for key in K-02's order.
+ * The schema ties end to the request's end and refuses a written row, a planner verb, a limit run or a part that goes on
+ * that end; it cannot count the answer's parts against decide's or read K-02's files, and this rule does.
+ */
+export function unmappedEndAsked(exchange) {
+  const decide = decideOf(exchange);
+  if (exchange.call !== "gateAndCommit" || decide?.end !== "oneQuestion") {
+    return ["unmappedEndAsked reads a gateAndCommit exchange whose decided result holds the unmapped end"];
+  }
+  const problems = [];
+  const decided = exchange.request.input.decided;
+  const twins = contractJson(`${K02_FIXTURES}/index.json`)
+    .fixtures.filter(
+      (entry) =>
+        entry.version === K02_VERSION && entry.def === "contextAndDecide" && entry.expect === "accept",
+    )
+    .map((entry) => ({ file: entry.file, pair: contractJson(`${K02_FIXTURES}/${entry.file}`) }))
+    .filter((twin) => twin.pair.context?.turnId === decided.context?.turnId);
+  if (twins.length !== 1) {
+    problems.push(
+      `K-02 ${K02_VERSION} has ${twins.length} accepted contextAndDecide fixtures of turn ${decided.context?.turnId}, not one`,
+    );
+  } else {
+    const [twin] = twins;
+    if (!isDeepStrictEqual(decided, twin.pair)) {
+      problems.push(`the decided pair is not ${K02_FIXTURES}/${twin.file} word for word`);
+    } else if (JSON.stringify(decided) !== JSON.stringify(twin.pair)) {
+      problems.push(
+        `the decided pair holds ${K02_FIXTURES}/${twin.file}'s values, but not in its keys' order`,
+      );
+    }
+  }
+  const outcome = exchange.outcome ?? {};
+  if (outcome.result !== "committed" || outcome.end !== "asked") {
+    problems.push("the unmapped end is answered committed, with end asked");
+    return problems;
+  }
+  const parts = Array.isArray(outcome.parts) ? outcome.parts : [];
+  if (parts.length !== decide.parts.length) {
+    problems.push(`${parts.length} part results answer the ${decide.parts.length} parts decide kept`);
+  }
+  decide.parts.forEach((kept, at) => {
+    const answered = parts[at];
+    if (answered === undefined) return;
+    const verb = kept.part?.verb;
+    const expected = {
+      part: at,
+      choiceId: verb === "choose" || verb === "enter" ? kept.part.choice : null,
+      result: "asked",
+      limits: noLimitRun(),
+      stoppedBy: null,
+      gives: [],
+      dependsOnPart: null,
+    };
+    if (!isDeepStrictEqual(answered, expected)) {
+      problems.push(
+        `parts[${at}] is not decide's part ${at} asked with no limit run: ${JSON.stringify(answered)}`,
+      );
+    }
+  });
+  return problems;
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// v1.9 (T-054): journey 7 and the fee door (README "v1.9"; drafted in round 1 as v1.5 and frozen as v1.9 on top of
+// v1.8: DL-471). Added beside the rules above, which stay as they are. Like v1.6's and v1.8's rules it reads only the
+// contracts' own files beside this one, synchronously: K-04's seeds, for a named booking's business.
+
+/**
+ * The calls that may state each step of journey 7 and of the fee door (README "v1.9", "Every in-scope step"). Journey 7
  * gives no key: every gives column of A-J7.md, B-J7.md and A-S11.md's S11-22 to S11-28 and S11-35 is empty (A-keys.md,
  * B-keys.md). A step whose walk offers new times also names moveBooking, whose offer and pick state it.
  */
@@ -845,7 +1038,7 @@ export const J7_STEP_CALLS = Object.freeze({
   "S11-26": ["feeDoor"],
 });
 
-/** The results each stage of each journey 7 call may answer (README "v1.5", "The calls v1.5 adds"). */
+/** The results each stage of each journey 7 call may answer (README "v1.9", "The calls v1.9 adds"). */
 export const J7_STAGE_RESULTS = Object.freeze({
   remindBeforeVisit: {
     remind: ["reminded", "madeAfterReminder", "cancelled", "paused", "deceased", "sentNow", "safetyOpen"],
@@ -906,20 +1099,67 @@ export const J7_STAGE_RESULTS = Object.freeze({
     ],
     staffAnswer: ["relayed", "staffCalls"],
     worse: ["staffAsked"],
-    worseAnswer: ["kept", "offerTimes", "staffCalls"],
+    worseAnswer: ["kept", "offerSooner", "offerTimes", "staffCalls"],
   },
   moveUpdates: { ask: ["codeSent"], switch: ["switched"] },
   passOnNote: { note: ["readBack", "backToOwner"], send: ["sent", "notSent"] },
   someoneElseAsks: { asks: null, death: null },
 });
 
+/** contracts/db-schema/, whose parts hold the seeds a fixture's given.seeds name as "<part>/<file>". */
+const DB_SCHEMA = new URL("db-schema/", CONTRACTS);
+
+/**
+ * The rows of one table that a fixture's given.seeds hold, each seed's "after" files read first: a seed "<part>/<file>"
+ * is contracts/db-schema/<part>/fixtures/<file>, and its "after" entries are paths from its own folder, as the database
+ * parts' contract tests load them. Each file is read once.
+ */
+export function seededRows(seeds, table) {
+  const rows = [];
+  const read = new Set();
+  const load = (url) => {
+    if (read.has(url.href)) return;
+    read.add(url.href);
+    const seed = JSON.parse(readFileSync(url, "utf8"));
+    for (const after of seed.after ?? []) load(new URL(after, url));
+    for (const row of seed.rows ?? []) {
+      if (row.table === table) rows.push(row.values);
+    }
+  };
+  for (const seed of seeds) {
+    const at = seed.indexOf("/");
+    load(new URL(`${seed.slice(0, at)}/fixtures/${seed.slice(at + 1)}`, DB_SCHEMA));
+  }
+  return rows;
+}
+
+/**
+ * A someoneElseAsks request's named booking (stage.bookingId; README default 171) is the caller's business's: a K-04
+ * bookings row the fixture's seeds hold whose business_id is caller.businessId. Decide names it only from a choice the
+ * frontier built under that business, and the action layer reads it under row-level security, so a request naming
+ * another business's booking, or one the seeds do not hold, is no request K-09 v1.9 makes. A request naming none passes.
+ */
+function namedBookingProblems(exchange) {
+  const named = exchange.request?.stage?.bookingId;
+  if (named === undefined || named === null) return [];
+  const booking = seededRows(exchange.given?.seeds ?? [], "bookings").find((row) => row.id === named);
+  if (booking === undefined) return [`stage.bookingId ${named} is no booking the given seeds hold`];
+  const business = exchange.request.caller?.businessId;
+  return booking.business_id === business
+    ? []
+    : [
+        `stage.bookingId ${named} is a booking of ${booking.business_id}, not of the caller's business ${business}`,
+      ];
+}
+
 /**
  * journeySevenGivesNone: an exchange that states a step of journey 7 or of the fee door (J7_STEP_CALLS) states no key,
- * since journey 7 gives none (02-contracts K-09 v1.5, "Keys written: none"; section 8), and its outcome wrote none; its
- * call is one that serves that step (or gateAndCommit, in a turn); its request's stage names that step; a response
- * answers the stage it was sent, with a result that stage gives (J7_STAGE_RESULTS); and every change the customer asked
- * for is bound to the consent the same commit wrote from their own yes (README default 129: the change's approvedBy
- * names the answer's consentId).
+ * since journey 7 gives none (02-contracts K-09, "Keys written: none"; section 8), and its outcome wrote none; its call
+ * is one that serves that step (or gateAndCommit, in a turn); its request's stage names that step; a response answers
+ * the stage it was sent, with a result that stage gives (J7_STAGE_RESULTS); every change the customer asked for is bound
+ * to the consent the same commit wrote from their own yes (README default 147: the change's approvedBy names the
+ * answer's consentId); and, from round 2, a someoneElseAsks request names only a booking of the caller's business
+ * (README default 171; namedBookingProblems).
  */
 export function journeySevenGivesNone(exchange) {
   const stated = exchange.given?.stated;
@@ -961,6 +1201,7 @@ export function journeySevenGivesNone(exchange) {
       );
     }
   }
+  if (exchange.call === "someoneElseAsks") problems.push(...namedBookingProblems(exchange));
   return problems;
 }
 
@@ -974,5 +1215,8 @@ export const rules = Object.freeze({
   givesJourneyFourKeys,
   givesJourneyFiveKeys,
   givesJourneySixKeys,
+  termFactsFromCard,
+  inputIsK03Fixture,
+  unmappedEndAsked,
   journeySevenGivesNone,
 });

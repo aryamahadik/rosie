@@ -1,0 +1,73 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-09T15:00:02Z",
+    "note": "Ten routine notices to Sam wait checked and unclaimed, as after a Linq outage, committed before his danger line, so an ordinary claim with limit 10 takes those ten and stops at its limit. No chain writes them, so this exchange's database side writes, before the claim and in this order: the turn turn-sam-notices-0070 (handle-sam, event evt-sam-0070, trace trace-sam-0070, committed at 14:50:00Z) with its ten rows out-sam-notice-01 to out-sam-notice-10 (send class routine, imessage, to handle-sam and person-sam at biz-lees-barbershop, no booking, question or copy, no versions read), each checked at version 2 with a plan of formats text and one line, 'Notice N of 10.' (role first; no question, page type or thread), and final parts of one words send of those words (no calendar file, option, link, fixed line or slot); then Sam's danger line, as commit-alex-safety's and write-plan-alex-safety's requests write Alex's, with Sam's ids: the turn turn-sam-safety-0064 (handle-sam, event evt-sam-0064, trace trace-sam-0064, committed at 15:00:01Z) and its one row out-sam-safety-0064 (send class safety, the same recipient, business and channel), checked at version 2 with the fixed line safetyEmergency as its plan and final parts, its own row id in both. The safety claim with limit 10 never reads the ten notices, so none counts toward its limit, and it takes the danger line (README item 67)."
+  },
+  "request": {
+    "claimer": "dispatcher-1",
+    "recipientHandleId": "handle-sam",
+    "now": "2026-11-09T15:00:02Z",
+    "limit": 10,
+    "sendClass": "safety"
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-sam-safety-0064",
+        "version": 3,
+        "commitSeq": 11,
+        "recipientHandleId": "handle-sam",
+        "recipientPersonId": "person-sam",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": null,
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "safety",
+        "versionsRead": [],
+        "finalParts": {
+          "row": "out-sam-safety-0064",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": ["safetyEmergency"],
+          "slotValues": [],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-sam-safety-0064/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-sam-0064",
+        "claim": {
+          "claimer": "dispatcher-1",
+          "claimedAt": "2026-11-09T15:00:02Z",
+          "lapsesAt": "2026-11-09T15:01:02Z",
+          "claimNo": 1,
+          "firstTryAt": null,
+          "nextTryNotBefore": null
+        },
+        "claimedFrom": "checked",
+        "port": "linq",
+        "emailPurpose": null,
+        "notAfter": null
+      }
+    ],
+    "passedHeld": []
+  }
+}

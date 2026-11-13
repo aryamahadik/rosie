@@ -1,0 +1,4952 @@
+// T-196: K-05 v1 items 2 to 4, write a plan, list the rows a crash left unplanned, claim outbox rows in commit order
+// and move a row's parts, against local PostgreSQL (`npm run db:up`; `npm run test:integration -- db/repo/outbox`). The
+// schema comes from migrating a fresh test schema (db/repo/test-db.ts); the public schema is never touched. T-1251: the
+// schema is in a database of this file's own, because the claim's recipient lock is an advisory lock, which PostgreSQL
+// keeps per database: a run sharing the database claimed the same fixture recipient at the same moment, and the claim
+// here skipped it. Its last test shows that a recipient's lock held in the shared database is not seen here, and held
+// in this file's database is.
+//
+// Every call runs as K-05 states it (README "Scope": runtime; T-191's roles): through a client whose connections run as
+// rosie_job with no business scope. The tables' owner (the migrations' role) loads K-04's seeds and the rows a test adds
+// for itself: an outbox row as a commit writes it (planned, no plan) and, for the parallel claim, its recipients' handles
+// and its rows already checked.
+//
+// A fixture's `given.after` names the exchanges that run first, each compared with its own outcome: commitTurn (T-195)
+// and reserve (T-187) for real, with the saved-time clock row K-05 item 8 says reserve makes (reservations.ts writes
+// none), and this task's calls for real.
+//
+// Each answer is checked against data-access v1 with Ajv 2020-12, strict, as contracts:check runs it; a wrongState
+// answer, which K-05 v1.1 adds, against v1.1.
+//
+// T-1135 adds the v1.2 outbox calls' tests at the end of this file (K-05 v1.1 items 13 to 16, v1.2 items 30 to 32): the
+// v1 tests above run unchanged.
+//
+// T-1227 adds, after them, the tests of K-05 v1.9 item 48: markPartV12's answer says what a repeated delivery receipt
+// repeats (repeatedDelivery). T-1135's tests run unchanged: its helpers now check markPartV12's answers against v1.9.
+//
+// T-1279 (ADR-016 card R0) adds, after those and before the last test, the tests of K-05 v1.13 items 64 and 66 for a row
+// with no turn, K-04 v1.1's job row: claimOutboxV113 claims it as any row, naming its purpose and its end
+// (emailPurpose, notAfter), claimOutboxV12 still answers it as v1.2 states a claimed row, and a failed mark with no
+// follow-ups marks it as any row. Every test above runs unchanged.
+//
+// T-1354 adds, after those and before the last test, the tests of K-05 v1.14 item 67: claimOutboxV114 with sendClass
+// safety, the safety claim of a danger line's own wake, which waits for the recipient's lock, reads only the
+// recipient's open safety rows, takes what it can claim and passes what it cannot; without the field, v1.13's claim.
+// Every test above runs unchanged.
+import { readdirSync, readFileSync } from "node:fs";
+import Ajv2020 from "ajv/dist/2020.js";
+import postgres from "postgres";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { armClock, type ArmClockRequest, DataAccessDatabaseError } from "./clocks";
+import { resolvePrimaryUrl } from "./client";
+import { commitTurn, type CommitTurnRequest } from "./commit-turn";
+import {
+  claimOutbox,
+  claimOutboxV113,
+  type ClaimOutboxV113Outcome,
+  claimOutboxV114,
+  type ClaimOutboxV114Request,
+  claimOutboxV12,
+  type ClaimedRowV12,
+  type ClaimOutboxRequest,
+  type ClaimOutboxResponse,
+  type ClaimOutboxV113Response,
+  type ClaimOutboxV12Response,
+  markPart,
+  type MarkPartOutcome,
+  type MarkPartRequest,
+  markPartV12,
+  type MarkPartV12Outcome,
+  type MarkPartV12Request,
+  markRow,
+  type MarkRowOutcome,
+  type MarkRowRequest,
+  markRowV12,
+  type MarkRowV12Outcome,
+  type MarkRowV12Request,
+  type Move,
+  PART_MOVES,
+  renewClaim,
+  type RenewClaimOutcome,
+  type RenewClaimRequest,
+  ROW_MOVES,
+  SAFETY_LOCK_TIMEOUT_MS,
+  unplannedRows,
+  type UnplannedRowsOutcome,
+  writePlan,
+  type WritePlanOutcome,
+  type WritePlanRequest,
+} from "./outbox";
+import { reserve, type ReserveRequest } from "./reservations";
+import type { Sql, Tx } from "./scope";
+import { createTestDatabase, type TestDatabase } from "./test-db";
+
+type Db = Sql | Tx;
+type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
+
+const CONTRACTS = new URL("../../contracts/", import.meta.url);
+const ACCESS_DIR = new URL("data-access/fixtures/", CONTRACTS);
+const CORE_DIR = new URL("db-schema/core/fixtures/", CONTRACTS);
+const RUNTIME_ROLE = "rosie_job";
+const SLOW = { timeout: 60_000 };
+const PARALLEL = { timeout: 240_000 };
+/** K-01's bundle-v0-skeleton id, the bundle K-04's seed-bundle-registry registers. */
+const BUNDLE_HASH = "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037";
+const OUTBOX_CALLS = ["writePlan", "unplannedRows", "claimOutbox", "markPart", "markRow"];
+/** The fixtures the card names (T-196 "Reads"). */
+const CARD_FIXTURES = [
+  "write-plan.json",
+  "claim-in-order.json",
+  "claim-held-lets-later-pass.json",
+  "mark-delivered.json",
+];
+
+interface Given {
+  k04Seeds: string[];
+  after: string[];
+  now: string;
+  note?: string;
+  partSeeds?: string[];
+}
+
+interface Exchange {
+  call: string;
+  given: Given;
+  request: Record<string, Json>;
+  outcome: Record<string, Json>;
+}
+
+interface SeedFile {
+  after: string[];
+  rows: { table: string; values: Record<string, Json> }[];
+}
+
+interface IndexEntry {
+  file: string;
+  version: string;
+  def?: string;
+  expect: string;
+}
+
+const readJson = (url: URL): unknown => JSON.parse(readFileSync(url, "utf8"));
+const exchangeOf = (file: string): Exchange => readJson(new URL(file, ACCESS_DIR)) as Exchange;
+const INDEX = (readJson(new URL("index.json", ACCESS_DIR)) as { fixtures: IndexEntry[] }).fixtures;
+/** K-05 v1's accepted exchanges of this task's five calls. */
+const OUTBOX_FIXTURES = INDEX.filter(
+  (entry) =>
+    entry.version === "v1" &&
+    entry.expect === "accept" &&
+    OUTBOX_CALLS.some((call) => entry.def === `${call}.exchange`),
+).map((entry) => entry.file);
+
+const fromHex = (hex: string): Uint8Array =>
+  Uint8Array.from((hex.match(/../g) ?? []).map((pair) => parseInt(pair, 16)));
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+// ---- the contract's own schema, for every answer (Ajv 2020-12, strict, as contracts:check runs it) -------------------
+
+function schemaFiles(dir: URL): URL[] {
+  return readdirSync(dir, { recursive: true, encoding: "utf8" })
+    .filter((file) => file.endsWith(".schema.json") && !file.endsWith(".meta.schema.json"))
+    .filter((file) => !file.startsWith("generated/") && !file.startsWith("scripts/"))
+    .filter((file) => !file.includes("node_modules"))
+    .map((file) => new URL(file, dir));
+}
+
+const ajv = new Ajv2020({ strict: true, strictRequired: false, allErrors: true });
+for (const file of schemaFiles(CONTRACTS)) {
+  ajv.addSchema(readJson(file) as object);
+}
+const schemaId = (file: string): string => (readJson(new URL(file, CONTRACTS)) as { $id: string }).$id;
+const V1_ID = schemaId("data-access/data-access.v1.schema.json");
+const V11_ID = schemaId("data-access/data-access.v1.1.schema.json");
+
+/** Checks `value` against one $defs entry of a data-access version, returning Ajv's errors (none when it passes). */
+function schemaErrors(id: string, def: string, value: unknown): string[] {
+  const validate = ajv.getSchema(`${id}#/$defs/${def}`);
+  if (validate === undefined) {
+    throw new Error(`${id} has no $defs/${def}`);
+  }
+  return validate(value)
+    ? []
+    : (validate.errors ?? []).map((error) => `${error.instancePath} ${error.message ?? ""}`);
+}
+
+/** An answer against its call's definition: data-access v1, or v1.1 for wrongState, which v1.1 adds. */
+function answerErrors(call: string, outcome: unknown): string[] {
+  const error = isRecord(outcome) ? outcome.error : undefined;
+  if (error === undefined) {
+    return schemaErrors(V1_ID, `${call}.response`, outcome);
+  }
+  return schemaErrors(error === "wrongState" ? V11_ID : V1_ID, `${call}.errors`, outcome);
+}
+
+// ---- databases and clients ------------------------------------------------------------------------------------------
+
+let db: TestDatabase;
+/** Connections that run as rosie_job, the runtime side, with this file's schema first. */
+let runtime: Sql;
+let typedColumns: Map<string, string>;
+
+beforeAll(async () => {
+  db = await createTestDatabase({ name: "outbox", database: "own" });
+  runtime = db.connect({
+    max: 20,
+    onnotice: () => undefined,
+    connection: {
+      application_name: "rosie-t196-outbox",
+      search_path: `${db.schema}, public`,
+      role: RUNTIME_ROLE,
+    },
+  });
+  const typed = await db.sql<{ key: string; type: string }[]>`
+    select table_name || '.' || column_name as key, data_type as type from information_schema.columns
+    where table_schema = ${db.schema} and data_type in ('jsonb', 'bytea')
+  `;
+  typedColumns = new Map(typed.map((column) => [column.key, column.type]));
+}, 60_000);
+
+afterAll(async () => {
+  await runtime.end({ timeout: 5 });
+  await db.drop();
+});
+
+/** Empties every table and restarts its identity (truncating the heads cascades to the rest; this file's schema only). */
+async function reset(): Promise<void> {
+  await db.sql`truncate businesses, persons, handles, bundles, release_flags restart identity cascade`;
+}
+
+async function insertRow(sql: Db, table: string, row: Record<string, Json>): Promise<void> {
+  const values: Record<string, never> = {};
+  for (const [column, value] of Object.entries(row)) {
+    const type = typedColumns.get(`${table}.${column}`);
+    let converted: unknown = value;
+    if (type === "jsonb" && value !== null) {
+      converted = sql.json(value);
+    } else if (type === "bytea" && typeof value === "string") {
+      converted = fromHex(value.replace(/^\\x/, ""));
+    }
+    values[column] = converted as never;
+  }
+  await sql`insert into ${sql(table)} ${sql(values)}`;
+}
+
+function seedRows(file: string, seen: Set<string>): SeedFile["rows"] {
+  if (seen.has(file)) {
+    return [];
+  }
+  seen.add(file);
+  const seed = readJson(new URL(file, CORE_DIR)) as SeedFile;
+  return [...seed.after.flatMap((before) => seedRows(before, seen)), ...seed.rows];
+}
+
+async function loadSeeds(seeds: readonly string[]): Promise<void> {
+  const seen = new Set<string>();
+  const rows = seeds.flatMap((seed) => seedRows(seed, seen));
+  await db.sql.begin(async (tx) => {
+    for (const row of rows) {
+      await insertRow(tx, row.table, row.values);
+    }
+  });
+}
+
+/** A fixture's chain: the K-04 seeds of every exchange in it, and the exchanges its `after` runs first, in order. */
+function chainOf(file: string, seen = new Set<string>()): { seeds: string[]; steps: string[] } {
+  const exchange = exchangeOf(file);
+  if (exchange.given.partSeeds !== undefined && exchange.given.partSeeds.length > 0) {
+    throw new Error(`${file}: partSeeds are not loaded by this test`);
+  }
+  const seeds = [...exchange.given.k04Seeds];
+  const steps: string[] = [];
+  for (const before of exchange.given.after) {
+    if (seen.has(before)) {
+      continue;
+    }
+    seen.add(before);
+    const inner = chainOf(before, seen);
+    seeds.push(...inner.seeds);
+    steps.push(...inner.steps, before);
+  }
+  return { seeds, steps };
+}
+
+/** The saved-time clock row K-05 item 8 gives a held row: armed at `at`, due at its end in its business's zone. */
+async function savedTimeClock(reservationId: string, heldUntil: string, at: string): Promise<void> {
+  const [row] = await db.sql<
+    { business_id: string; booking_id: string | null; handle_id: string | null; zone: string }[]
+  >`
+    select r.business_id, r.booking_id, p.handle_id, b.time_zone as zone
+    from reservations r
+    join businesses b on b.id = r.business_id
+    left join phones p on p.number = r.for_phone_number
+    where r.id = ${reservationId}
+  `;
+  if (row === undefined) {
+    throw new Error("savedTimeClock: no such reservation");
+  }
+  await insertRow(db.sql, "clock_rows", {
+    id: `${reservationId}/saved-time`,
+    kind: "saved_time",
+    reservation_id: reservationId,
+    handle_id: row.handle_id,
+    business_id: row.business_id,
+    booking_id: row.booking_id,
+    due_at: heldUntil,
+    due_zone: row.zone,
+    state: "armed",
+    armed_at: at,
+    fires: { release: reservationId, why: "expired" },
+  });
+}
+
+/** Runs one exchange's request: this task's calls, commitTurn and reserve, each for real. */
+async function runExchange(exchange: Exchange): Promise<unknown> {
+  const request: unknown = structuredClone(exchange.request);
+  switch (exchange.call) {
+    case "writePlan":
+      return writePlan(runtime, request as WritePlanRequest);
+    case "unplannedRows":
+      return unplannedRows(runtime, request as { turnId: string });
+    case "claimOutbox":
+      return claimOutbox(runtime, request as ClaimOutboxRequest);
+    case "markPart":
+      return markPart(runtime, request as MarkPartRequest);
+    case "markRow":
+      return markRow(runtime, request as MarkRowRequest);
+    case "commitTurn":
+      return commitTurn(runtime, request as CommitTurnRequest, { now: new Date(exchange.given.now) });
+    case "reserve": {
+      const reserveRequest = request as ReserveRequest;
+      const outcome = await reserve(db.sql, reserveRequest);
+      if ("result" in outcome && outcome.result === "held") {
+        await savedTimeClock(outcome.reservationId, outcome.heldUntil, reserveRequest.at);
+      }
+      return outcome;
+    }
+    default:
+      throw new Error(`this test runs no ${exchange.call} step`);
+  }
+}
+
+/** Loads a fixture's seeds and runs its chain, each step's answer its fixture's outcome. */
+async function given(file: string): Promise<Exchange> {
+  const exchange = exchangeOf(file);
+  const chain = chainOf(file);
+  await reset();
+  await loadSeeds(chain.seeds);
+  for (const step of chain.steps) {
+    const before = exchangeOf(step);
+    expect(await runExchange(before), step).toEqual(before.outcome);
+  }
+  return exchange;
+}
+
+/** Runs a fixture's own request after its chain, its answer its outcome. */
+async function ran(file: string): Promise<void> {
+  const exchange = await given(file);
+  expect(await runExchange(exchange), file).toEqual(exchange.outcome);
+}
+
+// ---- the calls, each answer checked against the contract ------------------------------------------------------------
+
+async function claim(request: ClaimOutboxRequest): Promise<ClaimOutboxResponse> {
+  const outcome = await claimOutbox(runtime, request);
+  expect(answerErrors("claimOutbox", outcome)).toEqual([]);
+  if ("error" in outcome) {
+    throw new Error(`claimOutbox answered ${outcome.error}`);
+  }
+  return outcome;
+}
+
+async function mark(request: MarkPartRequest): Promise<MarkPartOutcome> {
+  const outcome = await markPart(runtime, request);
+  expect(answerErrors("markPart", outcome)).toEqual([]);
+  return outcome;
+}
+
+async function limit8(request: MarkRowRequest): Promise<MarkRowOutcome> {
+  const outcome = await markRow(runtime, request);
+  expect(answerErrors("markRow", outcome)).toEqual([]);
+  return outcome;
+}
+
+async function plan(request: WritePlanRequest): Promise<WritePlanOutcome> {
+  const outcome = await writePlan(runtime, request);
+  expect(answerErrors("writePlan", outcome)).toEqual([]);
+  return outcome;
+}
+
+async function unplanned(turnId: string): Promise<UnplannedRowsOutcome> {
+  const outcome = await unplannedRows(runtime, { turnId });
+  expect(answerErrors("unplannedRows", outcome)).toEqual([]);
+  return outcome;
+}
+
+// ---- rows a test adds, and what the outbox holds --------------------------------------------------------------------
+
+const WORDS: Json = {
+  kind: "words",
+  text: "Your visit is confirmed.",
+  calendarFile: "none",
+  options: [],
+  link: null,
+};
+const POLL: Json = {
+  kind: "poll",
+  text: null,
+  calendarFile: "none",
+  options: [
+    { id: "opt-1", label: "Sat 12:00pm" },
+    { id: "opt-2", label: "Sat 2:00pm" },
+  ],
+  link: null,
+};
+const PLAN_BODY: Json = {
+  formats: ["text"],
+  lines: [{ role: "first", text: "Your visit is confirmed." }],
+  question: null,
+  pageType: null,
+  threadReplyTo: null,
+};
+
+/** A writePlan request for one of these test rows (K-03 rowPlan and finalParts of that row). */
+function planRequest(id: string, expectVersion: number, sends: Json[]): WritePlanRequest {
+  const request: Json = {
+    outboxRowId: id,
+    expectVersion,
+    plan: { row: id, channel: "imessage", copyOf: null, plan: PLAN_BODY },
+    finalParts: { row: id, channel: "imessage", sends, fixedLines: [], slotValues: [], threadReplyTo: null },
+  };
+  return request as unknown as WritePlanRequest;
+}
+
+/**
+ * An outbox row as a commit writes it (planned, no plan), as the owner, under a turn its chain committed:
+ * commit-first.json's by default.
+ */
+async function addRow(
+  id: string,
+  recipientHandleId: string,
+  turn = { id: "turn-alex-book-1", traceId: "trace-alex-0012" },
+): Promise<void> {
+  await insertRow(db.sql, "outbox_rows", {
+    id,
+    turn_id: turn.id,
+    recipient_handle_id: recipientHandleId,
+    business_id: "biz-lees-barbershop",
+    channel: "imessage",
+    send_class: "routine",
+    versions_read: [],
+    bundle_hash: BUNDLE_HASH,
+    bundle_build: 1,
+    trace_id: turn.traceId,
+  });
+}
+
+/** A test row planned with these sends and claimed by its recipient's own claim: its claimed row. */
+async function claimedRow(id: string, recipientHandleId: string, sends: Json[], now: string) {
+  await addRow(id, recipientHandleId);
+  expect(await plan(planRequest(id, 1, sends))).toEqual({ result: "written", outboxRowId: id, version: 2 });
+  const answer = await claim({ claimer: "dispatcher-1", recipientHandleId, now, limit: 10 });
+  const [row] = answer.claimed;
+  if (row === undefined || answer.claimed.length !== 1 || row.outboxRowId !== id) {
+    throw new Error("the test row is its recipient's one claimed row");
+  }
+  return row;
+}
+
+async function rowNow(id: string): Promise<{ state: string; version: number; held_until: Date | null }> {
+  const [row] = await db.sql<{ state: string; version: number; held_until: Date | null }[]>`
+    select state, version, held_until from outbox_rows where id = ${id}
+  `;
+  if (row === undefined) {
+    throw new Error("no such outbox row");
+  }
+  return row;
+}
+
+async function partsNow(rowId: string): Promise<Record<string, unknown>[]> {
+  return [
+    ...(await db.sql<Record<string, unknown>[]>`
+      select idempotency_key, kind, state, attempts, linq_message_id, linq_option_ids, error_code,
+             sent_at is not null as sent, delivered_at is not null as delivered, failed_at is not null as failed
+      from outbox_parts where outbox_row_id = ${rowId}
+      order by part_no, try_no
+    `),
+  ];
+}
+
+/** Everything the outbox holds: equal before and after = nothing was written. */
+async function outboxNow(): Promise<unknown> {
+  const rows = await db.sql`
+    select id, state, version, held_until, plan, final_parts from outbox_rows order by id collate "C"
+  `;
+  const parts = await db.sql`
+    select idempotency_key, kind, state, attempts, linq_message_id, linq_option_ids, sent_at, delivered_at, failed_at,
+           error_code, version
+    from outbox_parts order by idempotency_key collate "C"
+  `;
+  return { rows: [...rows], parts: [...parts] };
+}
+
+function marked(outcome: MarkPartOutcome) {
+  if (!("result" in outcome)) {
+    throw new Error(`markPart answered ${outcome.error}`);
+  }
+  return outcome;
+}
+
+// ---- K-05 v1's fixtures ---------------------------------------------------------------------------------------------
+
+describe("K-05 v1's outbox fixtures: each request gives its response", () => {
+  it("covers the four fixtures the card names, among K-05 v1's twelve exchanges of these calls", () => {
+    expect(OUTBOX_FIXTURES).toEqual(expect.arrayContaining(CARD_FIXTURES));
+    expect(OUTBOX_FIXTURES).toHaveLength(12);
+  });
+
+  for (const file of OUTBOX_FIXTURES) {
+    it(file, SLOW, async () => {
+      const exchange = await given(file);
+      const outcome = await runExchange(exchange);
+      expect(outcome).toEqual(exchange.outcome);
+      expect(answerErrors(exchange.call, outcome)).toEqual([]);
+    });
+  }
+
+  it(
+    "refuse-mark-held-without-time.json: held with no time is refused, and nothing is written",
+    SLOW,
+    async () => {
+      await given("mark-held-for-text-hours.json");
+      const request = readJson(
+        new URL("invalid/refuse-mark-held-without-time.json", ACCESS_DIR),
+      ) as MarkRowRequest;
+      expect(schemaErrors(V1_ID, "markRow.request", request)).not.toEqual([]);
+      const before = await outboxNow();
+      await expect(markRow(runtime, request)).rejects.toThrow(TypeError);
+      expect(await outboxNow()).toEqual(before);
+      expect(await rowNow("out-sam-passon-evening")).toMatchObject({ state: "sending", version: 3 });
+    },
+  );
+});
+
+// ---- K-07 v1's moves ------------------------------------------------------------------------------------------------
+
+interface MoveBranch {
+  properties: Record<"from" | "to" | "by", { const?: string; enum?: string[]; type?: string }>;
+}
+
+/** Every (from, to, by) a K-07 move definition allows, each branch's enums spread out. */
+function k07Moves(def: "rowMove" | "partMove"): string[] {
+  const schema = readJson(new URL("outbox-effects/outbox-effects.v1.schema.json", CONTRACTS)) as {
+    $defs: Record<string, { anyOf: MoveBranch[] }>;
+  };
+  const branches = schema.$defs[def]?.anyOf ?? [];
+  const values = (prop: MoveBranch["properties"]["from"]): (string | null)[] => {
+    if (prop.type === "null") {
+      return [null];
+    }
+    if (prop.const !== undefined) {
+      return [prop.const];
+    }
+    if (prop.enum !== undefined) {
+      return prop.enum;
+    }
+    throw new Error(`${def}: a branch names no value`);
+  };
+  return branches.flatMap((branch) =>
+    values(branch.properties.from).flatMap((from) =>
+      values(branch.properties.to).flatMap((to) =>
+        values(branch.properties.by).map((by) => `${from ?? "(new)"} -> ${to ?? ""} by ${by ?? ""}`),
+      ),
+    ),
+  );
+}
+
+const named = (moves: readonly Move<string>[]): string[] =>
+  moves.map((move) => `${move.from ?? "(new)"} -> ${move.to} by ${move.by}`);
+
+describe("K-07 v1's allowed moves", () => {
+  it("the row moves and part moves every call checks are K-07's lists, word for word", () => {
+    expect(k07Moves("rowMove")).toHaveLength(18);
+    expect([...named(ROW_MOVES)].sort()).toEqual([...k07Moves("rowMove")].sort());
+    expect(k07Moves("partMove")).toHaveLength(9);
+    expect([...named(PART_MOVES)].sort()).toEqual([...k07Moves("partMove")].sort());
+  });
+});
+
+// ---- claimOutbox --------------------------------------------------------------------------------------------------
+
+const RECIPIENTS = 25;
+const ROWS = 1000;
+const CLAIMERS = 20;
+const handleOf = (n: number): string => `handle-par-${String(n).padStart(2, "0")}`;
+
+/** 1,000 checked rows over 25 recipients, commit_seq interleaving the recipients; every third row has two parts. */
+async function parallelRows(): Promise<void> {
+  await reset();
+  await loadSeeds(["seed-bundle-registry.json"]);
+  await db.sql.begin(async (tx) => {
+    for (let n = 0; n < RECIPIENTS; n += 1) {
+      await insertRow(tx, "handles", {
+        id: handleOf(n),
+        kind: "phone",
+        address: `+1555555${String(150 + n).padStart(4, "0")}`,
+      });
+    }
+    await tx`
+      insert into turns (id, handle_id, event_ids, state, bundle_hash, bundle_build, trace_id, committed_at)
+      values ('turn-par', ${handleOf(0)}, ${["evt-par-1"]}, 'committed', ${BUNDLE_HASH}, 1, 'trace-par',
+              '2026-11-09T14:59:00Z')
+    `;
+    await tx`
+      insert into outbox_rows (
+        id, turn_id, recipient_handle_id, channel, send_class, versions_read, plan, final_parts, state,
+        bundle_hash, bundle_build, trace_id
+      )
+      select
+        'out-par-' || lpad(g::text, 4, '0'),
+        'turn-par',
+        'handle-par-' || lpad(((g * 7) % ${RECIPIENTS})::text, 2, '0'),
+        'imessage',
+        'routine',
+        '[]'::jsonb,
+        jsonb_build_object(
+          'row', 'out-par-' || lpad(g::text, 4, '0'), 'channel', 'imessage', 'copyOf', null,
+          'plan', ${tx.json(PLAN_BODY)}::jsonb
+        ),
+        jsonb_build_object(
+          'row', 'out-par-' || lpad(g::text, 4, '0'), 'channel', 'imessage',
+          'sends', case when g % 3 = 0 then ${tx.json([WORDS, POLL])}::jsonb else ${tx.json([WORDS])}::jsonb end,
+          'fixedLines', '[]'::jsonb, 'slotValues', '[]'::jsonb, 'threadReplyTo', null
+        ),
+        'checked',
+        ${BUNDLE_HASH},
+        1,
+        'trace-par'
+      from generate_series(0, ${ROWS - 1}) as g
+      order by g
+    `;
+  });
+}
+
+const pause = (ms: number): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+/** A call answered again while it answers transient (nothing was written: K-05), as the dispatcher repeats it. */
+async function settled<T>(call: () => Promise<T>): Promise<T> {
+  let answer = await call();
+  for (let tries = 1; tries < 10 && isRecord(answer) && answer.error === "transient"; tries += 1) {
+    answer = await call();
+  }
+  return answer;
+}
+
+describe("claimOutbox: each recipient's rows in commit order, each row to one sender", () => {
+  it(
+    "20 parallel claimers over 1,000 rows: every row is claimed exactly once and each recipient's rows come out in " +
+      "commit order",
+    PARALLEL,
+    async () => {
+      await parallelRows();
+      const now = "2026-11-09T15:00:00Z";
+      const log: { rowId: string; recipient: string; commitSeq: number; claimer: number }[] = [];
+      const unfinished = async (): Promise<number> => {
+        const [row] = await db.sql<{ n: number }[]>`
+          select count(*)::int as n from outbox_rows where state in ('checked', 'sending')
+        `;
+        return row?.n ?? -1;
+      };
+
+      // Each claimer is a dispatcher: claim, record the claim at once, then send every part (markPart sent), so the
+      // recipient's next rows become sendable only after these finish.
+      const dispatcher = async (claimer: number): Promise<void> => {
+        for (let round = 0; round < 5000; round += 1) {
+          const answer = await settled(() =>
+            claimOutbox(runtime, { claimer: `dispatcher-${String(claimer)}`, now, limit: 7 }),
+          );
+          if ("error" in answer) {
+            throw new Error(`claimOutbox answered ${answer.error} ten times`);
+          }
+          if (answer.claimed.length === 0) {
+            if ((await unfinished()) === 0) {
+              return;
+            }
+            await pause(5);
+            continue;
+          }
+          for (const row of answer.claimed) {
+            log.push({
+              rowId: row.outboxRowId,
+              recipient: row.recipientHandleId,
+              commitSeq: row.commitSeq,
+              claimer,
+            });
+          }
+          for (const row of answer.claimed) {
+            for (const part of row.parts) {
+              const sent = await settled(() =>
+                markPart(runtime, {
+                  outcome: "sent",
+                  idempotencyKey: part.idempotencyKey,
+                  providerMessageId: `linq-par-${part.idempotencyKey}`,
+                  providerOptionIds: null,
+                  at: now,
+                }),
+              );
+              expect(sent).toMatchObject({ result: "marked", repeated: false });
+            }
+          }
+        }
+        throw new Error("a claimer did not finish in 5,000 rounds");
+      };
+      await Promise.all(Array.from({ length: CLAIMERS }, (_, claimer) => dispatcher(claimer)));
+
+      // Exactly once: 1,000 claims of 1,000 distinct rows, and no part handed out twice (a second claim of a row would
+      // raise its parts' attempts).
+      expect(log).toHaveLength(ROWS);
+      expect(new Set(log.map((entry) => entry.rowId)).size).toBe(ROWS);
+      expect(new Set(log.map((entry) => entry.claimer)).size).toBeGreaterThan(1);
+      const parts = await db.sql<{ n: number; attempts: number; pending: number }[]>`
+        select count(*)::int as n, max(attempts)::int as attempts,
+               count(*) filter (where state <> 'sent')::int as pending
+        from outbox_parts
+      `;
+      expect(parts[0]).toEqual({ n: ROWS + Math.ceil(ROWS / 3), attempts: 1, pending: 0 });
+      const states = await db.sql<{ state: string; n: number }[]>`
+        select state, count(*)::int as n from outbox_rows group by state
+      `;
+      expect([...states]).toEqual([{ state: "sent", n: ROWS }]);
+
+      // Commit order: each recipient's claims are its rows, all of them, in commit_seq order.
+      const stored = await db.sql<{ recipient_handle_id: string; commit_seq: string }[]>`
+        select recipient_handle_id, commit_seq from outbox_rows order by commit_seq
+      `;
+      for (let n = 0; n < RECIPIENTS; n += 1) {
+        const recipient = handleOf(n);
+        const claimed = log.filter((entry) => entry.recipient === recipient).map((entry) => entry.commitSeq);
+        const committed = stored
+          .filter((row) => row.recipient_handle_id === recipient)
+          .map((row) => Number(row.commit_seq));
+        expect(committed).toHaveLength(ROWS / RECIPIENTS);
+        expect(claimed, recipient).toEqual(committed);
+      }
+    },
+  );
+
+  it(
+    "takes recipients earliest commit first, at most `limit` rows, and stops at a row claimed and not finished",
+    SLOW,
+    async () => {
+      await given("claim-in-order.json");
+      const now = "2026-11-07T15:06:35Z";
+      const first = await claim({ claimer: "dispatcher-1", now, limit: 1 });
+      expect(first.claimed.map((row) => row.outboxRowId)).toEqual(["out-alex-booked-riley"]);
+      // Alex's next row waits behind his sending row; Sam's goes to the next claim.
+      await addRow("out-alex-second", "handle-alex");
+      expect(await plan(planRequest("out-alex-second", 1, [WORDS]))).toMatchObject({ result: "written" });
+      const second = await claim({ claimer: "dispatcher-2", now, limit: 10 });
+      expect(second.claimed.map((row) => row.outboxRowId)).toEqual(["out-sam-booked-riley"]);
+      expect(
+        await claim({ claimer: "dispatcher-2", recipientHandleId: "handle-alex", now, limit: 10 }),
+      ).toEqual({
+        result: "claimed",
+        claimed: [],
+        passedHeld: [],
+      });
+      // Once Alex's first row is sent, his next one goes.
+      expect(
+        marked(
+          await mark({
+            outcome: "sent",
+            idempotencyKey: "out-alex-booked-riley/1/1",
+            providerMessageId: "linq-test-0001",
+            providerOptionIds: null,
+            at: now,
+          }),
+        ),
+      ).toMatchObject({ repeated: false });
+      const third = await claim({ claimer: "dispatcher-2", now, limit: 10 });
+      expect(third.claimed.map((row) => row.outboxRowId)).toEqual(["out-alex-second"]);
+    },
+  );
+});
+
+describe("a row held for text hours lets that recipient's later rows pass (arch 02 line 125, DD)", () => {
+  it("later rows pass it in commit order, and it is claimed again once its time passes", SLOW, async () => {
+    await ran("claim-held-lets-later-pass.json");
+    // A third row for Sam, after the quick reply: it waits behind the reply (sending), not behind the held row.
+    await addRow("out-sam-third", "handle-sam", { id: "turn-sam-evening-1", traceId: "trace-sam-0031" });
+    expect(await plan(planRequest("out-sam-third", 1, [WORDS]))).toMatchObject({ result: "written" });
+    const evening = "2026-11-08T01:32:00Z";
+    expect(
+      await claim({ claimer: "dispatcher-2", recipientHandleId: "handle-sam", now: evening, limit: 10 }),
+    ).toEqual({
+      result: "claimed",
+      claimed: [],
+      passedHeld: [{ outboxRowId: "out-sam-passon-evening", heldUntil: "2026-11-08T13:00:00Z" }],
+    });
+    marked(
+      await mark({
+        outcome: "sent",
+        idempotencyKey: "out-sam-reply-evening/1/1",
+        providerMessageId: "linq-test-0031",
+        providerOptionIds: null,
+        at: evening,
+      }),
+    );
+    const later = await claim({
+      claimer: "dispatcher-2",
+      recipientHandleId: "handle-sam",
+      now: evening,
+      limit: 10,
+    });
+    expect(later.claimed.map((row) => row.outboxRowId)).toEqual(["out-sam-third"]);
+    expect(later.passedHeld).toEqual([
+      { outboxRowId: "out-sam-passon-evening", heldUntil: "2026-11-08T13:00:00Z" },
+    ]);
+    marked(
+      await mark({
+        outcome: "sent",
+        idempotencyKey: "out-sam-third/1/1",
+        providerMessageId: "linq-test-0032",
+        providerOptionIds: null,
+        at: evening,
+      }),
+    );
+
+    // A minute before 8am in New York the sweep leaves it; at 8am it is claimed again, its part under its stored key.
+    expect(await claim({ claimer: "dispatcher-3", now: "2026-11-08T12:59:59Z", limit: 10 })).toEqual({
+      result: "claimed",
+      claimed: [],
+      passedHeld: [],
+    });
+    const morning = await claim({ claimer: "dispatcher-3", now: "2026-11-08T13:00:05Z", limit: 10 });
+    expect(morning.passedHeld).toEqual([]);
+    expect(morning.claimed).toHaveLength(1);
+    expect(morning.claimed[0]).toMatchObject({
+      outboxRowId: "out-sam-passon-evening",
+      version: 5,
+      commitSeq: 1,
+      parts: [
+        {
+          partNo: 1,
+          tryNo: 1,
+          idempotencyKey: "out-sam-passon-evening/1/1",
+          attempts: 2,
+          sent: false,
+        },
+      ],
+    });
+    expect(await rowNow("out-sam-passon-evening")).toEqual({
+      state: "sending",
+      version: 5,
+      held_until: new Date("2026-11-08T13:00:00Z"),
+    });
+  });
+});
+
+// ---- moves K-07 does not allow ----------------------------------------------------------------------------------------
+
+describe("a move K-07 v1 does not allow is refused, and nothing is written", () => {
+  it("a delivered row never goes back to sending, and no mark moves it", SLOW, async () => {
+    await ran("mark-delivered.json");
+    const id = "out-alex-booked-riley";
+    const key = "out-alex-booked-riley/1/1";
+    const at = "2026-11-07T15:06:40Z";
+    expect(await rowNow(id)).toMatchObject({ state: "delivered", version: 5 });
+    const before = await outboxNow();
+
+    expect(
+      await claim({ claimer: "dispatcher-2", recipientHandleId: "handle-alex", now: at, limit: 10 }),
+    ).toEqual({
+      result: "claimed",
+      claimed: [],
+      passedHeld: [],
+    });
+    for (const outcome of ["held", "droppedStopped", "stale", "withdrawn"] as const) {
+      expect(
+        await limit8({
+          outboxRowId: id,
+          expectVersion: 5,
+          outcome,
+          heldUntil: outcome === "held" ? "2026-11-08T14:00:00Z" : null,
+          at,
+        }),
+      ).toEqual({ error: "wrongState", table: "outbox_rows", rowId: id, state: "delivered" });
+    }
+    expect(await mark({ outcome: "attempt", idempotencyKey: key, at })).toEqual({
+      error: "wrongState",
+      table: "outbox_parts",
+      rowId: key,
+      state: "delivered",
+    });
+    expect(
+      await mark({ outcome: "failed", idempotencyKey: key, errorCode: "4001", retry: true, at }),
+    ).toEqual({
+      error: "wrongState",
+      table: "outbox_parts",
+      rowId: key,
+      state: "delivered",
+    });
+    // A second sent and a second receipt are repeats: they change nothing.
+    expect(
+      await mark({
+        outcome: "sent",
+        idempotencyKey: key,
+        providerMessageId: "linq-msg-demo-0101",
+        providerOptionIds: null,
+        at,
+      }),
+    ).toMatchObject({ result: "marked", repeated: true, firstDelivery: false, nextKey: null });
+    expect(await mark({ outcome: "delivered", providerMessageId: "linq-msg-demo-0101", at })).toMatchObject({
+      result: "marked",
+      repeated: true,
+      firstDelivery: false,
+    });
+    const again = exchangeOf("write-plan.json").request as unknown as WritePlanRequest;
+    expect(await plan({ ...again, expectVersion: 5 })).toEqual({
+      error: "alreadyPlanned",
+      outboxRowId: id,
+      version: 5,
+    });
+    expect(await outboxNow()).toEqual(before);
+  });
+
+  it("nothing moves out of dropped_stopped: no claim, no limit-8 outcome, no part mark", SLOW, async () => {
+    await given("claim-in-order.json");
+    const id = "out-riley-two";
+    const now = "2026-11-07T15:07:00Z";
+    const row = await claimedRow(id, "handle-riley", [WORDS, POLL], now);
+    expect(row).toMatchObject({ version: 3, parts: [{ attempts: 1 }, { attempts: 1 }] });
+    // The words go; then a STOP drops the row before the poll (limit 8 at the second send: arch 06 line 313).
+    marked(
+      await mark({
+        outcome: "sent",
+        idempotencyKey: `${id}/1/1`,
+        providerMessageId: "linq-test-0201",
+        providerOptionIds: null,
+        at: now,
+      }),
+    );
+    expect(
+      await limit8({
+        outboxRowId: id,
+        expectVersion: 4,
+        outcome: "droppedStopped",
+        heldUntil: null,
+        at: now,
+      }),
+    ).toEqual({ result: "marked", outboxRowId: id, version: 5, outcome: "droppedStopped" });
+    const before = await outboxNow();
+
+    const dropped = { error: "wrongState", table: "outbox_rows", rowId: id, state: "dropped_stopped" };
+    expect(await mark({ outcome: "delivered", providerMessageId: "linq-test-0201", at: now })).toEqual(
+      dropped,
+    );
+    expect(
+      await mark({
+        outcome: "sent",
+        idempotencyKey: `${id}/2/1`,
+        providerMessageId: "linq-test-0202",
+        providerOptionIds: ["linq-opt-1", "linq-opt-2"],
+        at: now,
+      }),
+    ).toEqual(dropped);
+    expect(await mark({ outcome: "attempt", idempotencyKey: `${id}/2/1`, at: now })).toEqual(dropped);
+    expect(
+      await mark({ outcome: "failed", idempotencyKey: `${id}/1/1`, errorCode: "4001", retry: true, at: now }),
+    ).toEqual(dropped);
+    expect(
+      await mark({
+        outcome: "failed",
+        idempotencyKey: `${id}/2/1`,
+        errorCode: "4001",
+        retry: false,
+        at: now,
+      }),
+    ).toEqual(dropped);
+    for (const outcome of ["held", "droppedStopped", "stale", "withdrawn"] as const) {
+      expect(
+        await limit8({
+          outboxRowId: id,
+          expectVersion: 5,
+          outcome,
+          heldUntil: outcome === "held" ? "2026-11-08T14:00:00Z" : null,
+          at: now,
+        }),
+      ).toEqual(dropped);
+    }
+    expect(
+      await claim({ claimer: "dispatcher-2", recipientHandleId: "handle-riley", now, limit: 10 }),
+    ).toEqual({
+      result: "claimed",
+      claimed: [],
+      passedHeld: [],
+    });
+    expect(await plan(planRequest(id, 5, [WORDS]))).toEqual({
+      error: "alreadyPlanned",
+      outboxRowId: id,
+      version: 5,
+    });
+    expect(await outboxNow()).toEqual(before);
+    // The sweep claims the other recipients' checked rows and never this one.
+    const sweep = await claim({ claimer: "dispatcher-3", now, limit: 10 });
+    expect(sweep.claimed.map((one) => one.outboxRowId)).toEqual([
+      "out-alex-booked-riley",
+      "out-sam-booked-riley",
+    ]);
+    expect(await rowNow(id)).toMatchObject({ state: "dropped_stopped", version: 5 });
+  });
+
+  it("limit 8's outcomes start only from sending, compared and set on the row's version", SLOW, async () => {
+    const exchange = await given("mark-held-for-text-hours.json");
+    const request = exchange.request as unknown as MarkRowRequest;
+    expect(await limit8({ ...request, expectVersion: 2 })).toEqual({
+      error: "versionChanged",
+      changed: [{ table: "outbox_rows", rowId: "out-sam-passon-evening", readVersion: 2, currentVersion: 3 }],
+    });
+    expect(await limit8(request)).toEqual(exchange.outcome);
+    expect(await limit8({ ...request, expectVersion: 4 })).toEqual({
+      error: "wrongState",
+      table: "outbox_rows",
+      rowId: "out-sam-passon-evening",
+      state: "held",
+    });
+    expect(await limit8({ ...request, outboxRowId: "out-none" })).toEqual({
+      error: "notFound",
+      table: "outbox_rows",
+      rowId: "out-none",
+    });
+    expect(await rowNow("out-sam-passon-evening")).toEqual({
+      state: "held",
+      version: 4,
+      held_until: new Date("2026-11-08T13:00:00Z"),
+    });
+  });
+
+  it("a part mark K-07's part moves do not list is refused", SLOW, async () => {
+    await ran("mark-sent.json");
+    const key = "out-sam-booked-riley/1/1";
+    const at = "2026-11-07T15:06:36Z";
+    expect(
+      marked(await mark({ outcome: "failed", idempotencyKey: key, errorCode: "4006", retry: false, at })),
+    ).toMatchObject({ repeated: false, nextKey: null });
+    const before = await outboxNow();
+    const failed = { error: "wrongState", table: "outbox_parts", rowId: key, state: "failed" };
+    expect(
+      await mark({
+        outcome: "sent",
+        idempotencyKey: key,
+        providerMessageId: "linq-test-0301",
+        providerOptionIds: null,
+        at,
+      }),
+    ).toEqual(failed);
+    expect(await mark({ outcome: "attempt", idempotencyKey: key, at })).toEqual(failed);
+    expect(await mark({ outcome: "delivered", providerMessageId: "linq-msg-none", at })).toEqual({
+      error: "notFound",
+      table: "outbox_parts",
+      rowId: "linq-msg-none",
+    });
+    expect(await mark({ outcome: "attempt", idempotencyKey: "out-none/1/1", at })).toEqual({
+      error: "notFound",
+      table: "outbox_parts",
+      rowId: "out-none/1/1",
+    });
+    expect(await outboxNow()).toEqual(before);
+    expect(await rowNow("out-sam-booked-riley")).toMatchObject({ state: "sending", version: 4 });
+  });
+});
+
+// ---- after a crash -------------------------------------------------------------------------------------------------
+
+describe("after a crash, only rows without a plan are returned for composing (arch 11 line 576)", () => {
+  it(
+    "a stale row is listed again, composed again from today's record and claimed under its stored key",
+    SLOW,
+    async () => {
+      await ran("claim-in-order.json");
+      const id = "out-alex-booked-riley";
+      const at = "2026-11-07T15:06:36Z";
+      expect(await unplanned("turn-alex-book-1")).toEqual({ result: "rows", rows: [] });
+      expect(
+        await limit8({ outboxRowId: id, expectVersion: 3, outcome: "stale", heldUntil: null, at }),
+      ).toEqual({
+        result: "marked",
+        outboxRowId: id,
+        version: 4,
+        outcome: "stale",
+      });
+      expect(await unplanned("turn-alex-book-1")).toEqual({
+        result: "rows",
+        rows: [
+          {
+            outboxRowId: id,
+            version: 4,
+            commitSeq: 1,
+            recipientHandleId: "handle-alex",
+            channel: "imessage",
+            copyOfRowId: null,
+          },
+        ],
+      });
+      // No final parts: the walk stops at it.
+      expect(
+        await claim({ claimer: "dispatcher-1", recipientHandleId: "handle-alex", now: at, limit: 10 }),
+      ).toEqual({
+        result: "claimed",
+        claimed: [],
+        passedHeld: [],
+      });
+      const again = exchangeOf("write-plan.json").request as unknown as WritePlanRequest;
+      expect(await plan({ ...again, expectVersion: 4 })).toEqual({
+        result: "written",
+        outboxRowId: id,
+        version: 5,
+      });
+      expect(await unplanned("turn-alex-book-1")).toEqual({ result: "rows", rows: [] });
+      const reclaimed = await claim({
+        claimer: "dispatcher-1",
+        recipientHandleId: "handle-alex",
+        now: at,
+        limit: 10,
+      });
+      expect(reclaimed.claimed).toHaveLength(1);
+      expect(reclaimed.claimed[0]).toMatchObject({
+        outboxRowId: id,
+        version: 6,
+        parts: [{ partNo: 1, tryNo: 1, idempotencyKey: `${id}/1/1`, attempts: 2, sent: false }],
+      });
+    },
+  );
+
+  it("a turn with no rows, or none unplanned, lists nothing", SLOW, async () => {
+    await given("write-plan-owner.json");
+    expect(await unplanned("turn-none")).toEqual({ result: "rows", rows: [] });
+    expect(await unplanned("turn-alex-book-1")).toEqual({
+      result: "rows",
+      rows: [
+        {
+          outboxRowId: "out-sam-booked-riley",
+          version: 1,
+          commitSeq: 2,
+          recipientHandleId: "handle-sam",
+          channel: "imessage",
+          copyOfRowId: null,
+        },
+      ],
+    });
+  });
+});
+
+// ---- markPart: the row follows its parts -----------------------------------------------------------------------------
+
+describe("markPart moves the row with its parts (K-07 'How K-05 v1's calls use them')", () => {
+  it(
+    "a two-part row: each part sent and delivered, the row following its latest tries, firstDelivery once",
+    SLOW,
+    async () => {
+      await given("claim-in-order.json");
+      const id = "out-avery-two";
+      const now = "2026-11-07T15:07:00Z";
+      const row = await claimedRow(id, "handle-avery", [WORDS, POLL], now);
+      expect(row.parts).toEqual([
+        { partNo: 1, tryNo: 1, idempotencyKey: `${id}/1/1`, attempts: 1, sent: false },
+        { partNo: 2, tryNo: 1, idempotencyKey: `${id}/2/1`, attempts: 1, sent: false },
+      ]);
+
+      expect(
+        await mark({
+          outcome: "sent",
+          idempotencyKey: `${id}/1/1`,
+          providerMessageId: "linq-test-0401",
+          providerOptionIds: null,
+          at: now,
+        }),
+      ).toEqual({
+        result: "marked",
+        outboxRowId: id,
+        partNo: 1,
+        tryNo: 1,
+        attempts: 1,
+        repeated: false,
+        firstDelivery: false,
+        openQuestionId: null,
+        nextKey: null,
+      });
+      expect(await rowNow(id)).toMatchObject({ state: "sending", version: 4 });
+      expect(
+        await mark({ outcome: "delivered", providerMessageId: "linq-test-0401", at: now }),
+      ).toMatchObject({
+        partNo: 1,
+        repeated: false,
+        firstDelivery: true,
+      });
+      expect(await rowNow(id)).toMatchObject({ state: "sending", version: 5 });
+      expect(
+        await mark({ outcome: "delivered", providerMessageId: "linq-test-0401", at: now }),
+      ).toMatchObject({
+        repeated: true,
+        firstDelivery: false,
+      });
+      expect(await rowNow(id)).toMatchObject({ state: "sending", version: 5 });
+
+      expect(
+        await mark({
+          outcome: "sent",
+          idempotencyKey: `${id}/2/1`,
+          providerMessageId: "linq-test-0402",
+          providerOptionIds: ["linq-opt-1", "linq-opt-2"],
+          at: now,
+        }),
+      ).toMatchObject({ partNo: 2, repeated: false });
+      expect(await rowNow(id)).toMatchObject({ state: "sent", version: 6 });
+      expect(
+        await mark({ outcome: "delivered", providerMessageId: "linq-test-0402", at: now }),
+      ).toMatchObject({
+        partNo: 2,
+        repeated: false,
+        firstDelivery: false,
+      });
+      expect(await rowNow(id)).toMatchObject({ state: "delivered", version: 7 });
+      expect(await partsNow(id)).toEqual([
+        {
+          idempotency_key: `${id}/1/1`,
+          kind: "words",
+          state: "delivered",
+          attempts: 1,
+          linq_message_id: "linq-test-0401",
+          linq_option_ids: null,
+          error_code: null,
+          sent: true,
+          delivered: true,
+          failed: false,
+        },
+        {
+          idempotency_key: `${id}/2/1`,
+          kind: "poll",
+          state: "delivered",
+          attempts: 1,
+          linq_message_id: "linq-test-0402",
+          linq_option_ids: ["linq-opt-1", "linq-opt-2"],
+          error_code: null,
+          sent: true,
+          delivered: true,
+          failed: false,
+        },
+      ]);
+    },
+  );
+
+  it(
+    "an accepted poll reported failed goes again plain: the next try as words, the row back to checked, then claimed",
+    SLOW,
+    async () => {
+      await given("claim-in-order.json");
+      const id = "out-maya-poll";
+      const now = "2026-11-07T15:07:00Z";
+      await claimedRow(id, "handle-maya", [WORDS, POLL], now);
+      for (const [partNo, message] of [
+        [1, "linq-test-0501"],
+        [2, "linq-test-0502"],
+      ] as const) {
+        marked(
+          await mark({
+            outcome: "sent",
+            idempotencyKey: `${id}/${String(partNo)}/1`,
+            providerMessageId: message,
+            providerOptionIds: null,
+            at: now,
+          }),
+        );
+      }
+      marked(await mark({ outcome: "delivered", providerMessageId: "linq-test-0501", at: now }));
+      expect(await rowNow(id)).toMatchObject({ state: "sent", version: 6 });
+
+      // K-07 outbox-poll-failed-plain: Linq reports the accepted poll failed; a refused part goes again plain.
+      expect(
+        await mark({
+          outcome: "failed",
+          idempotencyKey: `${id}/2/1`,
+          errorCode: "poll.failed",
+          retry: true,
+          at: now,
+        }),
+      ).toEqual({
+        result: "marked",
+        outboxRowId: id,
+        partNo: 2,
+        tryNo: 1,
+        attempts: 1,
+        repeated: false,
+        firstDelivery: false,
+        openQuestionId: null,
+        nextKey: `${id}/2/2`,
+      });
+      expect(await rowNow(id)).toMatchObject({ state: "checked", version: 7 });
+      expect(
+        await mark({
+          outcome: "failed",
+          idempotencyKey: `${id}/2/1`,
+          errorCode: "poll.failed",
+          retry: true,
+          at: now,
+        }),
+      ).toMatchObject({ repeated: true, nextKey: `${id}/2/2` });
+      expect(await rowNow(id)).toMatchObject({ state: "checked", version: 7 });
+
+      const again = await claim({
+        claimer: "dispatcher-2",
+        recipientHandleId: "handle-maya",
+        now,
+        limit: 10,
+      });
+      expect(again.claimed).toHaveLength(1);
+      expect(again.claimed[0]?.version).toBe(8);
+      expect(again.claimed[0]?.parts).toEqual([
+        { partNo: 1, tryNo: 1, idempotencyKey: `${id}/1/1`, attempts: 1, sent: true },
+        { partNo: 2, tryNo: 2, idempotencyKey: `${id}/2/2`, attempts: 2, sent: false },
+      ]);
+      marked(
+        await mark({
+          outcome: "sent",
+          idempotencyKey: `${id}/2/2`,
+          providerMessageId: "linq-test-0503",
+          providerOptionIds: null,
+          at: now,
+        }),
+      );
+      expect(await rowNow(id)).toMatchObject({ state: "sent", version: 9 });
+      expect(
+        await mark({ outcome: "delivered", providerMessageId: "linq-test-0503", at: now }),
+      ).toMatchObject({
+        repeated: false,
+        firstDelivery: false,
+      });
+      expect(await rowNow(id)).toMatchObject({ state: "delivered", version: 10 });
+      expect(
+        (await partsNow(id)).map((part) => [part.idempotency_key, part.kind, part.state, part.error_code]),
+      ).toEqual([
+        [`${id}/1/1`, "words", "delivered", null],
+        [`${id}/2/1`, "poll", "failed", "poll.failed"],
+        [`${id}/2/2`, "words", "delivered", null],
+      ]);
+    },
+  );
+
+  it("a 4006 waits for its receipt; a minute later the next try gets a new key, once", SLOW, async () => {
+    await given("claim-in-order.json");
+    const id = "out-tomas-4006";
+    const now = "2026-11-07T15:07:00Z";
+    await claimedRow(id, "handle-tomas", [WORDS], now);
+    const key = `${id}/1/1`;
+    // K-07 outbox-4006-new-key: no next try at once (rule 2), and a repeat of the failure changes nothing.
+    expect(
+      await mark({ outcome: "failed", idempotencyKey: key, errorCode: "4006", retry: false, at: now }),
+    ).toMatchObject({ result: "marked", repeated: false, nextKey: null });
+    expect(await rowNow(id)).toMatchObject({ state: "sending", version: 4 });
+    expect(
+      await mark({ outcome: "failed", idempotencyKey: key, errorCode: "4006", retry: false, at: now }),
+    ).toMatchObject({ repeated: true, nextKey: null });
+    const minute = "2026-11-07T15:08:00Z";
+    expect(
+      await mark({ outcome: "failed", idempotencyKey: key, errorCode: "4006", retry: true, at: minute }),
+    ).toMatchObject({ repeated: false, tryNo: 1, nextKey: `${id}/1/2` });
+    expect(await rowNow(id)).toMatchObject({ state: "sending", version: 5 });
+    expect(
+      await mark({ outcome: "failed", idempotencyKey: key, errorCode: "4006", retry: true, at: minute }),
+    ).toMatchObject({ repeated: true, nextKey: `${id}/1/2` });
+    expect(await mark({ outcome: "attempt", idempotencyKey: `${id}/1/2`, at: minute })).toMatchObject({
+      repeated: false,
+      tryNo: 2,
+      attempts: 2,
+    });
+    marked(
+      await mark({
+        outcome: "sent",
+        idempotencyKey: `${id}/1/2`,
+        providerMessageId: "linq-test-0601",
+        providerOptionIds: null,
+        at: minute,
+      }),
+    );
+    expect(await rowNow(id)).toMatchObject({ state: "sent", version: 7 });
+    marked(await mark({ outcome: "delivered", providerMessageId: "linq-test-0601", at: minute }));
+    expect(await rowNow(id)).toMatchObject({ state: "delivered", version: 8 });
+    expect((await partsNow(id)).map((part) => [part.idempotency_key, part.state, part.attempts])).toEqual([
+      [key, "failed", 1],
+      [`${id}/1/2`, "delivered", 2],
+    ]);
+  });
+
+  it(
+    "an accepted part reported failed with no next try may still deliver: its receipt moves it and the row",
+    SLOW,
+    async () => {
+      await given("claim-in-order.json");
+      const id = "out-riley-late";
+      const now = "2026-11-07T15:07:00Z";
+      await claimedRow(id, "handle-riley", [WORDS], now);
+      const key = `${id}/1/1`;
+      marked(
+        await mark({
+          outcome: "sent",
+          idempotencyKey: key,
+          providerMessageId: "linq-test-0701",
+          providerOptionIds: null,
+          at: now,
+        }),
+      );
+      expect(await rowNow(id)).toMatchObject({ state: "sent", version: 4 });
+      marked(
+        await mark({ outcome: "failed", idempotencyKey: key, errorCode: "4001", retry: false, at: now }),
+      );
+      // K-07 lists no move for the row here: it stays sent, its part failed (default 9).
+      expect(await rowNow(id)).toMatchObject({ state: "sent", version: 5 });
+      expect(
+        await mark({ outcome: "delivered", providerMessageId: "linq-test-0701", at: now }),
+      ).toMatchObject({
+        repeated: false,
+        firstDelivery: true,
+      });
+      expect(await rowNow(id)).toMatchObject({ state: "delivered", version: 6 });
+      expect(
+        (await partsNow(id)).map((part) => [part.state, part.error_code, part.failed, part.delivered]),
+      ).toEqual([["delivered", "4001", true, true]]);
+    },
+  );
+});
+
+// ---- writePlan ------------------------------------------------------------------------------------------------------
+
+describe("writePlan writes only this row's plan, at the version read", () => {
+  it(
+    "refuses another row's plan or channel, an unknown send kind, an unknown row and a changed version",
+    SLOW,
+    async () => {
+      await given("write-plan.json");
+      const request = exchangeOf("write-plan.json").request as unknown as WritePlanRequest;
+      const before = await outboxNow();
+      const otherRow = structuredClone(request);
+      otherRow.plan.row = "out-sam-booked-riley";
+      await expect(writePlan(runtime, otherRow)).rejects.toThrow("plan.row is not the row");
+      const otherParts = structuredClone(request);
+      otherParts.finalParts.channel = "sms";
+      await expect(writePlan(runtime, otherParts)).rejects.toThrow(
+        "finalParts.channel is not the plan's channel",
+      );
+      const email = structuredClone(request);
+      email.plan.channel = "email";
+      email.finalParts.channel = "email";
+      await expect(writePlan(runtime, email)).rejects.toThrow("is not the row's");
+      const photo = structuredClone(request) as unknown as { finalParts: { sends: Record<string, Json>[] } };
+      const [send] = photo.finalParts.sends;
+      if (send === undefined) {
+        throw new Error("the fixture sends words");
+      }
+      send.kind = "photo";
+      await expect(writePlan(runtime, photo as unknown as WritePlanRequest)).rejects.toThrow("send kinds");
+      expect(await outboxNow()).toEqual(before);
+
+      expect(await plan({ ...request, expectVersion: 2 })).toEqual({
+        error: "versionChanged",
+        changed: [
+          { table: "outbox_rows", rowId: "out-alex-booked-riley", readVersion: 2, currentVersion: 1 },
+        ],
+      });
+      const none = planRequest("out-none", 1, [WORDS]);
+      expect(await plan(none)).toEqual({ error: "notFound", table: "outbox_rows", rowId: "out-none" });
+      expect(await outboxNow()).toEqual(before);
+    },
+  );
+});
+
+// ==== T-1135: K-05 v1.1 items 13 to 16 and v1.2 items 30 to 32, the v1.2 outbox calls ================================
+//
+// claimOutboxV12, renewClaim, markPartV12 and markRowV12: the dispatcher's send loop, as runtime/src/dispatch/types.ts's
+// OutboxStore calls it, on this file's schema and as rosie_job. A fixture's chain runs through these calls (and
+// commitTurn, writePlan and armClock, each for real). Each step's answer, and the fixture's own, is compared with its
+// outcome as that step's version states it: the fields a later version adds are left out (v1.1's claim, claimedFrom and
+// row for a v1 exchange; v1.2's port and recipient for a v1.1 exchange), since every v1 and v1.1 exchange is a v1.2
+// exchange (K-05 v1.2). Each answer of these calls is checked against data-access v1.2 in full, the added fields with it.
+//
+// From T-1227 markPartV12 answers as K-05 v1.9 says (item 48): its answer also states repeatedDelivery. So each of its
+// answers is checked against v1.9's markPart.v1dot9Response in full, and repeatedDelivery is left out when an answer is
+// compared with an exchange of v1 to v1.8, as the other added fields are: every v1 to v1.8 exchange is a v1.9 one.
+
+const V12_ID = schemaId("data-access/data-access.v1.2.schema.json");
+const V19_ID = schemaId("data-access/data-access.v1.9.schema.json");
+const LATEST_CALLS = ["claimOutbox", "renewClaim", "markPart", "markRow"];
+/** The v1.1 and v1.2 fixtures T-1135's card names (its "Reads"). */
+const CARD_LATEST_FIXTURES = [
+  "claim-dee.json",
+  "renew-claim-first-send.json",
+  "renew-claim-not-yet.json",
+  "renew-claim-lost.json",
+  "renew-claim-dee-answer.json",
+  "claim-lapsed-reclaimed.json",
+  "mark-failed-retry-after.json",
+  "mark-row-wrong-state.json",
+  "renew-claim-reads-phone.json",
+  "renew-claim-stopped.json",
+];
+/** A failed safety line's followUps are T-1136's (the card's "Not here"); here they are refused (default 19). */
+const LATER_FIXTURES = ["mark-safety-failed-other-way.json"];
+const fixtureVersion = (file: string): string => INDEX.find((entry) => entry.file === file)?.version ?? "v1";
+/** K-05 v1.1's and v1.2's accepted exchanges of the four calls, but T-1136's. */
+const LATEST_FIXTURES = INDEX.filter(
+  (entry) =>
+    (entry.version === "v1.1" || entry.version === "v1.2") &&
+    entry.expect === "accept" &&
+    LATEST_CALLS.some((call) => entry.def === `${call}.exchange`) &&
+    !LATER_FIXTURES.includes(entry.file),
+).map((entry) => entry.file);
+
+type Fields = Record<string, unknown>;
+
+const without = (record: Fields, keys: readonly string[]): Fields =>
+  Object.fromEntries(Object.entries(record).filter(([key]) => !keys.includes(key)));
+
+/** A K-05 version's minor number: 0 for v1, 9 for v1.9. */
+const minorOf = (version: string): number => Number(version.split(".")[1] ?? "0");
+
+/**
+ * A v1.2 call's answer as an exchange of `version` states it: the fields a later version adds left out. markPartV12's
+ * answer is v1.9's (T-1227), so its repeatedDelivery is left out for an exchange of v1 to v1.8.
+ */
+function asVersion(call: string, answer: unknown, version: string): unknown {
+  if (!isRecord(answer) || "error" in answer) {
+    return answer;
+  }
+  if (call === "markPart") {
+    const added = minorOf(version) >= 9 ? [] : ["repeatedDelivery"];
+    return without(answer, version === "v1" ? ["row", ...added] : added);
+  }
+  if (version === "v1.2") {
+    return answer;
+  }
+  switch (call) {
+    case "claimOutbox": {
+      const added = version === "v1" ? ["claim", "claimedFrom", "port"] : ["port"];
+      return { ...answer, claimed: (answer.claimed as Fields[]).map((row) => without(row, added)) };
+    }
+    case "renewClaim":
+      return without(answer, ["recipient"]);
+    default:
+      return answer;
+  }
+}
+
+/**
+ * An answer against data-access v1.2: its call's response, or its errors. markPartV12's answer is checked against
+ * v1.9's markPart.v1dot9Response, the answer a v1.9 call gives (T-1227): row and repeatedDelivery always stated.
+ */
+function latestErrors(call: string, outcome: unknown): string[] {
+  const error = isRecord(outcome) ? outcome.error : undefined;
+  if (call === "markPart" && error === undefined) {
+    return schemaErrors(V19_ID, "markPart.v1dot9Response", outcome);
+  }
+  return schemaErrors(V12_ID, error === undefined ? `${call}.response` : `${call}.errors`, outcome);
+}
+
+/**
+ * A markPart request with its answer as one K-05 v1.9 exchange. markPart.v1dot9Response alone cannot see the request;
+ * markPart.exchange ties repeatedDelivery to it: a delivery receipt answered repeated states the delivery it repeats,
+ * never null, and a mark that is no delivery states none (T-1226's security note a).
+ */
+function markExchangeErrors(request: unknown, outcome: unknown): string[] {
+  const given: Given = { k04Seeds: [], after: [], now: "2026-11-07T15:07:00Z" };
+  return schemaErrors(V19_ID, "markPart.exchange", { call: "markPart", given, request, outcome });
+}
+
+/** Runs one exchange's request: the four v1.2 calls and armClock here, and the rest as runExchange runs them. */
+async function runLatest(exchange: Exchange): Promise<unknown> {
+  const request: unknown = structuredClone(exchange.request);
+  switch (exchange.call) {
+    case "claimOutbox":
+      return claimOutboxV12(runtime, request as ClaimOutboxRequest);
+    case "renewClaim":
+      return renewClaim(runtime, request as RenewClaimRequest);
+    case "markPart":
+      return markPartV12(runtime, request as MarkPartV12Request);
+    case "markRow":
+      return markRowV12(runtime, request as MarkRowV12Request);
+    case "armClock":
+      return armClock(runtime, request as ArmClockRequest);
+    default:
+      return runExchange(exchange);
+  }
+}
+
+/** Loads a fixture's seeds and runs its chain through the v1.2 calls, each step's answer its outcome at its version. */
+async function givenLatest(file: string): Promise<Exchange> {
+  const chain = chainOf(file);
+  await reset();
+  await loadSeeds(chain.seeds);
+  for (const step of chain.steps) {
+    const before = exchangeOf(step);
+    expect(asVersion(before.call, await runLatest(before), fixtureVersion(step)), step).toEqual(
+      before.outcome,
+    );
+  }
+  return exchangeOf(file);
+}
+
+/** Runs a fixture's own request after its chain, its answer its outcome at its version. */
+async function ranLatest(file: string): Promise<void> {
+  const exchange = await givenLatest(file);
+  const answer = await runLatest(exchange);
+  expect(asVersion(exchange.call, answer, fixtureVersion(file)), file).toEqual(exchange.outcome);
+}
+
+async function claimV12(request: ClaimOutboxRequest): Promise<ClaimOutboxV12Response> {
+  const outcome = await claimOutboxV12(runtime, request);
+  expect(latestErrors("claimOutbox", outcome)).toEqual([]);
+  if ("error" in outcome) {
+    throw new Error(`claimOutboxV12 answered ${outcome.error}`);
+  }
+  return outcome;
+}
+
+async function renew(request: RenewClaimRequest): Promise<RenewClaimOutcome> {
+  const outcome = await renewClaim(runtime, request);
+  expect(latestErrors("renewClaim", outcome)).toEqual([]);
+  return outcome;
+}
+
+/** markPartV12's answer in full, as K-05 v1.9 states it: checked against its answer's definition and as an exchange. */
+async function markV19(request: MarkPartV12Request): Promise<MarkPartV12Outcome> {
+  const outcome = await markPartV12(runtime, request);
+  expect(latestErrors("markPart", outcome)).toEqual([]);
+  expect(markExchangeErrors(request, outcome)).toEqual([]);
+  return outcome;
+}
+
+/**
+ * markPartV12's answer as K-05 v1.2 states it, for T-1135's tests: checked in full first (markV19), then v1.9's
+ * repeatedDelivery left out.
+ */
+async function markV12(request: MarkPartV12Request): Promise<unknown> {
+  return asVersion("markPart", await markV19(request), "v1.2");
+}
+
+async function limit8V12(request: MarkRowV12Request): Promise<MarkRowV12Outcome> {
+  const outcome = await markRowV12(runtime, request);
+  expect(latestErrors("markRow", outcome)).toEqual([]);
+  return outcome;
+}
+
+/** A row's claim as it stands, or undefined when it has none. */
+async function claimNow(rowId: string): Promise<Fields | undefined> {
+  const [claim] = await db.sql<Fields[]>`
+    select claimer, claimed_at, lapses_at, claim_no, first_try_at, next_try_not_before, version
+    from outbox_claims where outbox_row_id = ${rowId}
+  `;
+  return claim;
+}
+
+/** Everything the outbox and its claims hold: equal before and after = nothing was written. */
+async function everythingNow(): Promise<unknown> {
+  const claims = await db.sql`
+    select outbox_row_id, claimer, claimed_at, lapses_at, claim_no, first_try_at, next_try_not_before, version
+    from outbox_claims order by outbox_row_id collate "C"
+  `;
+  return { outbox: await outboxNow(), claims: [...claims] };
+}
+
+/** An outbox row as a commit writes it on any channel (planned, no plan), under commit-first.json's turn. */
+async function addChannelRow(id: string, recipientHandleId: string, channel: string): Promise<void> {
+  await insertRow(db.sql, "outbox_rows", {
+    id,
+    turn_id: "turn-alex-book-1",
+    recipient_handle_id: recipientHandleId,
+    business_id: "biz-lees-barbershop",
+    channel,
+    send_class: "routine",
+    versions_read: [],
+    bundle_hash: BUNDLE_HASH,
+    bundle_build: 1,
+    trace_id: "trace-alex-0012",
+  });
+  const request: Json = {
+    outboxRowId: id,
+    expectVersion: 1,
+    plan: { row: id, channel, copyOf: null, plan: PLAN_BODY },
+    finalParts: { row: id, channel, sends: [WORDS], fixedLines: [], slotValues: [], threadReplyTo: null },
+  };
+  expect(await plan(request as unknown as WritePlanRequest)).toEqual({
+    result: "written",
+    outboxRowId: id,
+    version: 2,
+  });
+}
+
+/** Waits until `check` holds, polling every 20 ms for at most 20 s. */
+async function until(check: () => Promise<boolean>, what: string): Promise<void> {
+  for (let tries = 0; tries < 1000; tries += 1) {
+    if (await check()) {
+      return;
+    }
+    await pause(20);
+  }
+  throw new Error(`waited 20 s, and still not ${what}`);
+}
+
+const ALEX_ROW = "out-alex-booked-riley";
+const ALEX_KEY = "out-alex-booked-riley/1/1";
+
+// ---- the fixtures -----------------------------------------------------------------------------------------------------
+
+describe("K-05 v1.1's and v1.2's outbox fixtures: each request gives its response (T-1135)", () => {
+  it("covers the fixtures the card names, among the 21 v1.1 and v1.2 exchanges of the four calls", () => {
+    expect(LATEST_FIXTURES).toEqual(expect.arrayContaining(CARD_LATEST_FIXTURES));
+    expect(LATEST_FIXTURES).toHaveLength(21);
+  });
+
+  for (const file of LATEST_FIXTURES) {
+    it(file, SLOW, async () => {
+      const exchange = await givenLatest(file);
+      const answer = await runLatest(exchange);
+      expect(asVersion(exchange.call, answer, fixtureVersion(file))).toEqual(exchange.outcome);
+      expect(latestErrors(exchange.call, answer)).toEqual([]);
+    });
+  }
+});
+
+describe("K-05 v1.1's and v1.2's refused outbox requests are refused, and nothing is written (T-1135)", () => {
+  const refused = (file: string): Fields => readJson(new URL(`invalid/${file}`, ACCESS_DIR)) as Fields;
+
+  it("refuse-mark-delivered-key-only.json: a receipt always carries its message id", SLOW, async () => {
+    await givenLatest("mark-delivered-by-key.json");
+    const request = refused("refuse-mark-delivered-key-only.json");
+    expect(schemaErrors(V12_ID, "markPart.request", request)).not.toEqual([]);
+    expect(
+      schemaErrors(V12_ID, "markPart.request", { ...request, providerMessageId: "linq-msg-demo-0101" }),
+    ).toEqual([]);
+    const before = await everythingNow();
+    await expect(markPartV12(runtime, request as unknown as MarkPartV12Request)).rejects.toThrow(TypeError);
+    expect(await everythingNow()).toEqual(before);
+  });
+
+  it(
+    "refuse-failed-no-retry-with-not-before.json: a Retry-After goes only with a next try",
+    SLOW,
+    async () => {
+      await givenLatest("mark-failed-retry-after.json");
+      const request = refused("refuse-failed-no-retry-with-not-before.json");
+      expect(schemaErrors(V12_ID, "markPart.request", request)).not.toEqual([]);
+      expect(schemaErrors(V12_ID, "markPart.request", { ...request, nextTryNotBefore: null })).toEqual([]);
+      const before = await everythingNow();
+      await expect(markPartV12(runtime, request as unknown as MarkPartV12Request)).rejects.toThrow(TypeError);
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+
+  it(
+    "refuse-mark-waiting-chat-with-time.json: a row waiting for the chat has no held_until",
+    SLOW,
+    async () => {
+      await givenLatest("mark-waiting-chat.json");
+      const request = refused("refuse-mark-waiting-chat-with-time.json");
+      expect(schemaErrors(V12_ID, "markRow.request", request)).not.toEqual([]);
+      expect(schemaErrors(V12_ID, "markRow.request", { ...request, heldUntil: null })).toEqual([]);
+      const before = await everythingNow();
+      await expect(markRowV12(runtime, request as unknown as MarkRowV12Request)).rejects.toThrow(TypeError);
+      expect(await everythingNow()).toEqual(before);
+      expect(await rowNow("out-dee-booked-riley")).toMatchObject({ state: "sending", version: 3 });
+    },
+  );
+
+  it(
+    "refuse-claimed-row-sms-port.json: no claimed row names an SMS port; sms and rcs rows go by linq, email by email",
+    SLOW,
+    async () => {
+      const smsPort = refused("refuse-claimed-row-sms-port.json");
+      expect(schemaErrors(V12_ID, "claimedRow", smsPort)).not.toEqual([]);
+      expect(schemaErrors(V12_ID, "claimedRow", { ...smsPort, port: "linq" })).toEqual([]);
+
+      await givenLatest("claim-in-order-with-port.json");
+      await addChannelRow("out-riley-sms", "handle-riley", "sms");
+      await addChannelRow("out-tomas-rcs", "handle-tomas", "rcs");
+      await addChannelRow("out-alex-email", "handle-alex-email", "email");
+      const now = "2026-11-07T15:07:00Z";
+      const ports: [string, string, string][] = [];
+      for (const recipientHandleId of ["handle-riley", "handle-tomas", "handle-alex-email"]) {
+        const answer = await claimV12({ claimer: "dispatcher-1", recipientHandleId, now, limit: 10 });
+        ports.push(
+          ...answer.claimed.map((row): [string, string, string] => [row.outboxRowId, row.channel, row.port]),
+        );
+      }
+      expect(ports).toEqual([
+        ["out-riley-sms", "sms", "linq"],
+        ["out-tomas-rcs", "rcs", "linq"],
+        ["out-alex-email", "email", "email"],
+      ]);
+
+      // The renewal reads the recipient's phone row; an email handle has none.
+      const renewal = (outboxRowId: string): RenewClaimRequest => ({
+        outboxRowId,
+        claimer: "dispatcher-1",
+        claimNo: 1,
+        idempotencyKey: `${outboxRowId}/1/1`,
+        at: now,
+      });
+      expect(await renew(renewal("out-alex-email"))).toMatchObject({ result: "renewed", recipient: null });
+      expect(await renew(renewal("out-riley-sms"))).toMatchObject({
+        result: "renewed",
+        recipient: { stopped: false, chatOpen: true, version: 2 },
+      });
+    },
+  );
+
+  it(
+    "a failed safety line's followUps are T-1136's: refused here, and nothing is written",
+    SLOW,
+    async () => {
+      const exchange = await givenLatest("mark-safety-failed-other-way.json");
+      const before = await everythingNow();
+      await expect(
+        markPartV12(runtime, structuredClone(exchange.request) as unknown as MarkPartV12Request),
+      ).rejects.toThrow("followUps");
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+});
+
+// ---- claimOutboxV12: the claim and the re-claim ---------------------------------------------------------------------
+
+const LAPSE_RECIPIENTS = 25;
+const LAPSE_ROWS = 1000;
+/** The claimers' now: the dead dispatcher's claims (taken 15:00:00) lapsed at 15:01:00; the live ones lapse 15:05:30. */
+const LAPSE_NOW = "2026-11-09T15:05:00Z";
+const lapseHandleOf = (n: number): string => `handle-lap-${String(n).padStart(2, "0")}`;
+
+type Hold = "lapsed" | "live" | "none";
+
+/** How a recipient's first row is held when the claimers start: a lapsed claim, a live claim, or no claim row. */
+function holdOf(n: number): Hold {
+  if (n % 3 === 0) {
+    return "lapsed";
+  }
+  return n % 3 === 1 ? "live" : "none";
+}
+
+/**
+ * 1,000 rows over 25 recipients, commit_seq interleaving them; every third row has two parts. Each recipient's first row
+ * is sending, its parts out as far as a two-part row's accepted words, under a claim a dead dispatcher took at 15:00:00
+ * (lapsed at 15:01:00), under a live claim taken at 15:04:30 (lapsing at 15:05:30), or with no claim row (a v1 claim),
+ * by recipient (holdOf). The rest are checked. Each recipient has a phone row.
+ */
+async function lapsedRows(): Promise<void> {
+  await reset();
+  await loadSeeds(["seed-bundle-registry.json"]);
+  await db.sql.begin(async (tx) => {
+    for (let n = 0; n < LAPSE_RECIPIENTS; n += 1) {
+      const address = `+1555555${String(150 + n).padStart(4, "0")}`;
+      await insertRow(tx, "handles", { id: lapseHandleOf(n), kind: "phone", address });
+      await insertRow(tx, "phones", { number: address, handle_id: lapseHandleOf(n) });
+    }
+    await tx`
+      insert into turns (id, handle_id, event_ids, state, bundle_hash, bundle_build, trace_id, committed_at)
+      values ('turn-lap', ${lapseHandleOf(0)}, ${["evt-lap-1"]}, 'committed', ${BUNDLE_HASH}, 1, 'trace-lap',
+              '2026-11-09T14:59:00Z')
+    `;
+    await tx`
+      insert into outbox_rows (
+        id, turn_id, recipient_handle_id, channel, send_class, versions_read, plan, final_parts, state, version,
+        bundle_hash, bundle_build, trace_id
+      )
+      select
+        'out-lap-' || lpad(g::text, 4, '0'),
+        'turn-lap',
+        'handle-lap-' || lpad(((g * 7) % ${LAPSE_RECIPIENTS})::text, 2, '0'),
+        'imessage',
+        'routine',
+        '[]'::jsonb,
+        jsonb_build_object(
+          'row', 'out-lap-' || lpad(g::text, 4, '0'), 'channel', 'imessage', 'copyOf', null,
+          'plan', ${tx.json(PLAN_BODY)}::jsonb
+        ),
+        jsonb_build_object(
+          'row', 'out-lap-' || lpad(g::text, 4, '0'), 'channel', 'imessage',
+          'sends', case when g % 3 = 0 then ${tx.json([WORDS, POLL])}::jsonb else ${tx.json([WORDS])}::jsonb end,
+          'fixedLines', '[]'::jsonb, 'slotValues', '[]'::jsonb, 'threadReplyTo', null
+        ),
+        case when g < ${LAPSE_RECIPIENTS} then 'sending' else 'checked' end,
+        case when g < ${LAPSE_RECIPIENTS} then 3 else 2 end,
+        ${BUNDLE_HASH},
+        1,
+        'trace-lap'
+      from generate_series(0, ${LAPSE_ROWS - 1}) as g
+      order by g
+    `;
+    // The first rows' parts: a two-part row's words were accepted and its poll was not; a one-part row's words were not.
+    await tx`
+      insert into outbox_parts (
+        outbox_row_id, part_no, try_no, idempotency_key, attempts, kind, state, linq_message_id, sent_at
+      )
+      select
+        'out-lap-' || lpad(g::text, 4, '0'), 1, 1, 'out-lap-' || lpad(g::text, 4, '0') || '/1/1', 1, 'words',
+        case when g % 3 = 0 then 'sent' else 'pending' end,
+        case when g % 3 = 0 then 'linq-lap-' || g::text else null end,
+        case when g % 3 = 0 then '2026-11-09T15:00:01Z'::timestamptz else null end
+      from generate_series(0, ${LAPSE_RECIPIENTS - 1}) as g
+    `;
+    await tx`
+      insert into outbox_parts (outbox_row_id, part_no, try_no, idempotency_key, attempts, kind, state)
+      select 'out-lap-' || lpad(g::text, 4, '0'), 2, 1, 'out-lap-' || lpad(g::text, 4, '0') || '/2/1', 1, 'poll',
+             'pending'
+      from generate_series(0, ${LAPSE_RECIPIENTS - 1}) as g
+      where g % 3 = 0
+    `;
+    // Their claims, by recipient (holdOf): the dead dispatcher's, lapsed; the live one's; or none.
+    await tx`
+      insert into outbox_claims (outbox_row_id, claimer, claimed_at, lapses_at, claim_no, first_try_at)
+      select
+        'out-lap-' || lpad(g::text, 4, '0'),
+        case when r % 3 = 0 then 'dispatcher-dead' else 'dispatcher-alive' end,
+        case when r % 3 = 0 then '2026-11-09T15:00:00Z'::timestamptz else '2026-11-09T15:04:30Z'::timestamptz end,
+        case when r % 3 = 0 then '2026-11-09T15:01:00Z'::timestamptz else '2026-11-09T15:05:30Z'::timestamptz end,
+        1,
+        case when r % 3 = 0 then '2026-11-09T15:00:01Z'::timestamptz else null end
+      from (
+        select g, (g * 7) % ${LAPSE_RECIPIENTS} as r from generate_series(0, ${LAPSE_RECIPIENTS - 1}) as g
+      ) as first_rows
+      where r % 3 <> 2
+    `;
+  });
+}
+
+interface Claimed {
+  rowId: string;
+  recipient: string;
+  commitSeq: number;
+  claimer: number;
+  claimedFrom: string;
+  claimNo: number;
+  firstTryAt: string | null;
+  port: string;
+  parts: ClaimedRowV12["parts"];
+}
+
+describe("claimOutboxV12: each row's claim, taken again once it lapses (T-1135)", () => {
+  it(
+    "20 parallel claimers: each lapsed claim is re-claimed exactly once, and a live claim stops the walk",
+    PARALLEL,
+    async () => {
+      await lapsedRows();
+      const recipients = Array.from({ length: LAPSE_RECIPIENTS }, (_, n) => n);
+      const claimable = recipients.filter((n) => holdOf(n) !== "live").map(lapseHandleOf);
+      const live = recipients.filter((n) => holdOf(n) === "live").map(lapseHandleOf);
+      const holdOfHandle = new Map(recipients.map((n) => [lapseHandleOf(n), holdOf(n)]));
+      const rowsEach = LAPSE_ROWS / LAPSE_RECIPIENTS;
+      const log: Claimed[] = [];
+      const unsent = async (): Promise<number> => {
+        const [row] = await db.sql<{ n: number }[]>`
+          select count(*)::int as n from outbox_rows where state <> 'sent' and recipient_handle_id = any(${claimable})
+        `;
+        return row?.n ?? -1;
+      };
+
+      // Each claimer is a dispatcher: claim, record the claim at once, then for each part not yet accepted renew the
+      // claim (reading the phone) and send it (markPartV12 sent), so a recipient's next rows become claimable only after
+      // these finish.
+      const dispatcher = async (claimer: number): Promise<void> => {
+        const name = `dispatcher-${String(claimer)}`;
+        for (let round = 0; round < 5000; round += 1) {
+          const answer = await settled(() =>
+            claimOutboxV12(runtime, { claimer: name, now: LAPSE_NOW, limit: 7 }),
+          );
+          if ("error" in answer) {
+            throw new Error(`claimOutboxV12 answered ${answer.error} ten times`);
+          }
+          if (answer.claimed.length === 0) {
+            if ((await unsent()) === 0) {
+              return;
+            }
+            await pause(5);
+            continue;
+          }
+          for (const row of answer.claimed) {
+            log.push({
+              rowId: row.outboxRowId,
+              recipient: row.recipientHandleId,
+              commitSeq: row.commitSeq,
+              claimer,
+              claimedFrom: row.claimedFrom,
+              claimNo: row.claim.claimNo,
+              firstTryAt: row.claim.firstTryAt,
+              port: row.port,
+              parts: row.parts,
+            });
+          }
+          for (const row of answer.claimed) {
+            for (const part of row.parts) {
+              if (part.sent) {
+                continue;
+              }
+              const renewed = await settled(() =>
+                renewClaim(runtime, {
+                  outboxRowId: row.outboxRowId,
+                  claimer: name,
+                  claimNo: row.claim.claimNo,
+                  idempotencyKey: part.idempotencyKey,
+                  at: LAPSE_NOW,
+                }),
+              );
+              expect(renewed).toMatchObject({
+                result: "renewed",
+                recipient: { stopped: false, chatOpen: false, version: 1 },
+              });
+              const sent = await settled(() =>
+                markPartV12(runtime, {
+                  outcome: "sent",
+                  idempotencyKey: part.idempotencyKey,
+                  providerMessageId: `linq-lap-${part.idempotencyKey}`,
+                  providerOptionIds: null,
+                  at: LAPSE_NOW,
+                }),
+              );
+              expect(sent).toMatchObject({ result: "marked", repeated: false });
+            }
+          }
+        }
+        throw new Error("a claimer did not finish in 5,000 rounds");
+      };
+      await Promise.all(Array.from({ length: CLAIMERS }, (_, claimer) => dispatcher(claimer)));
+
+      // Every row of the recipients with no live claim was claimed exactly once, each by one claimer, all by linq.
+      expect(log).toHaveLength(claimable.length * rowsEach);
+      expect(new Set(log.map((entry) => entry.rowId)).size).toBe(claimable.length * rowsEach);
+      expect(new Set(log.map((entry) => entry.claimer)).size).toBeGreaterThan(1);
+      expect(log.every((entry) => entry.port === "linq")).toBe(true);
+
+      // The first rows: each lapsed claim, or a row with none, taken again exactly once from sending, keeping its
+      // first try's time; its parts not accepted handed out again under their keys with attempts raised, an accepted
+      // part listed as sent. A first row under a live claim was never taken.
+      const firsts = await db.sql<{ id: string; recipient_handle_id: string; parts: number }[]>`
+        select distinct on (r.recipient_handle_id) r.id, r.recipient_handle_id,
+               (select count(*)::int from outbox_parts p where p.outbox_row_id = r.id) as parts
+        from outbox_rows r
+        order by r.recipient_handle_id, r.commit_seq
+      `;
+      expect(firsts).toHaveLength(LAPSE_RECIPIENTS);
+      for (const first of firsts) {
+        const hold = holdOfHandle.get(first.recipient_handle_id);
+        const taken = log.filter((entry) => entry.rowId === first.id);
+        const claim = await claimNow(first.id);
+        if (hold === "live") {
+          expect(taken, first.id).toEqual([]);
+          expect(claim, first.id).toMatchObject({ claimer: "dispatcher-alive", claim_no: 1, version: 1 });
+          expect(await rowNow(first.id)).toMatchObject({ state: "sending", version: 3 });
+          continue;
+        }
+        expect(taken, first.id).toHaveLength(1);
+        const [entry] = taken;
+        const reclaimed = { claimedFrom: "sending", claimNo: hold === "lapsed" ? 2 : 1 };
+        expect(entry, first.id).toMatchObject({
+          ...reclaimed,
+          firstTryAt: hold === "lapsed" ? "2026-11-09T15:00:01Z" : null,
+        });
+        expect(entry?.parts, first.id).toEqual(
+          first.parts === 2
+            ? [
+                { partNo: 1, tryNo: 1, idempotencyKey: `${first.id}/1/1`, attempts: 1, sent: true },
+                { partNo: 2, tryNo: 1, idempotencyKey: `${first.id}/2/1`, attempts: 2, sent: false },
+              ]
+            : [{ partNo: 1, tryNo: 1, idempotencyKey: `${first.id}/1/1`, attempts: 2, sent: false }],
+        );
+        expect(claim, first.id).toMatchObject({
+          claimer: `dispatcher-${String(entry?.claimer)}`,
+          claim_no: reclaimed.claimNo,
+          first_try_at: new Date(hold === "lapsed" ? "2026-11-09T15:00:01Z" : LAPSE_NOW),
+          next_try_not_before: null,
+        });
+      }
+      const firstIds = new Set(firsts.map((first) => first.id));
+      expect(
+        log.filter((entry) => !firstIds.has(entry.rowId)).every((entry) => entry.claimedFrom === "checked"),
+      ).toBe(true);
+      expect(log.filter((entry) => !firstIds.has(entry.rowId)).every((entry) => entry.claimNo === 1)).toBe(
+        true,
+      );
+      const [claims] = await db.sql<{ n: number; most: number }[]>`
+        select count(*)::int as n, max(claim_no)::int as most from outbox_claims
+      `;
+      expect(claims).toEqual({ n: claimable.length * rowsEach + live.length, most: 2 });
+
+      // Every part of theirs went once; a live claim's later rows were never claimed: no part, still checked.
+      const parts = await db.sql<{ recipient: string; state: string; n: number }[]>`
+        select r.recipient_handle_id as recipient, p.state, count(*)::int as n
+        from outbox_parts p join outbox_rows r on r.id = p.outbox_row_id
+        where p.state <> 'sent'
+        group by r.recipient_handle_id, p.state
+        order by r.recipient_handle_id collate "C", p.state
+      `;
+      expect(parts.every((part) => live.includes(part.recipient))).toBe(true);
+      const liveRows = await db.sql<{ state: string; n: number }[]>`
+        select state, count(*)::int as n from outbox_rows where recipient_handle_id = any(${live})
+        group by state order by state
+      `;
+      expect([...liveRows]).toEqual([
+        { state: "checked", n: live.length * (rowsEach - 1) },
+        { state: "sending", n: live.length },
+      ]);
+
+      // Commit order: each recipient's claims are its rows, all of them, in commit_seq order.
+      const stored = await db.sql<{ recipient_handle_id: string; commit_seq: string }[]>`
+        select recipient_handle_id, commit_seq from outbox_rows order by commit_seq
+      `;
+      for (const recipient of claimable) {
+        const claimed = log.filter((entry) => entry.recipient === recipient).map((entry) => entry.commitSeq);
+        const committed = stored
+          .filter((row) => row.recipient_handle_id === recipient)
+          .map((row) => Number(row.commit_seq));
+        expect(committed).toHaveLength(rowsEach);
+        expect(claimed, recipient).toEqual(committed);
+      }
+
+      // Once the live claim lapses, its row is taken again, once, and the recipient's rows behind it go with it.
+      const [liveHandle] = live;
+      if (liveHandle === undefined) {
+        throw new Error("a recipient holds a live claim");
+      }
+      const after = await claimV12({
+        claimer: "dispatcher-late",
+        recipientHandleId: liveHandle,
+        now: "2026-11-09T15:05:30Z",
+        limit: 100,
+      });
+      expect(after.claimed).toHaveLength(rowsEach);
+      expect(after.claimed.map((row) => [row.claimedFrom, row.claim.claimNo])).toEqual([
+        ["sending", 2],
+        ...Array.from({ length: rowsEach - 1 }, () => ["checked", 1]),
+      ]);
+      expect(
+        await claimV12({
+          claimer: "dispatcher-later",
+          recipientHandleId: liveHandle,
+          now: "2026-11-09T15:05:30Z",
+          limit: 100,
+        }),
+      ).toEqual({ result: "claimed", claimed: [], passedHeld: [] });
+    },
+  );
+
+  it("a held row keeps its claim through the night: its morning claim is claim 2", SLOW, async () => {
+    await ranLatest("claim-held-lets-later-pass.json");
+    const held = "out-sam-passon-evening";
+    expect(await claimNow(held)).toMatchObject({ claimer: "dispatcher-1", claim_no: 1, first_try_at: null });
+    // Sam's quick reply goes; the held row stays where it is.
+    expect(
+      await renew({
+        outboxRowId: "out-sam-reply-evening",
+        claimer: "dispatcher-1",
+        claimNo: 1,
+        idempotencyKey: "out-sam-reply-evening/1/1",
+        at: "2026-11-08T01:31:09Z",
+      }),
+    ).toMatchObject({ result: "renewed", claim: { claimNo: 1, firstTryAt: "2026-11-08T01:31:09Z" } });
+    expect(
+      await markV12({
+        outcome: "sent",
+        idempotencyKey: "out-sam-reply-evening/1/1",
+        providerMessageId: "linq-test-1201",
+        providerOptionIds: null,
+        at: "2026-11-08T01:31:10Z",
+      }),
+    ).toMatchObject({ result: "marked", row: { state: "sent", version: 4 } });
+    expect(
+      await claimV12({
+        claimer: "dispatcher-3",
+        recipientHandleId: "handle-sam",
+        now: "2026-11-08T12:59:59Z",
+        limit: 10,
+      }),
+    ).toEqual({
+      result: "claimed",
+      claimed: [],
+      passedHeld: [{ outboxRowId: held, heldUntil: "2026-11-08T13:00:00Z" }],
+    });
+    // At 8am the sweep takes it again: claim 2, from held, its part under its stored key.
+    const morning = await claimV12({ claimer: "dispatcher-3", now: "2026-11-08T13:00:05Z", limit: 10 });
+    expect(morning.claimed).toHaveLength(1);
+    expect(morning.claimed[0]).toMatchObject({
+      outboxRowId: held,
+      version: 5,
+      claimedFrom: "held",
+      port: "linq",
+      parts: [{ partNo: 1, tryNo: 1, idempotencyKey: `${held}/1/1`, attempts: 2, sent: false }],
+      claim: {
+        claimer: "dispatcher-3",
+        claimedAt: "2026-11-08T13:00:05Z",
+        lapsesAt: "2026-11-08T13:01:05Z",
+        claimNo: 2,
+        firstTryAt: null,
+        nextTryNotBefore: null,
+      },
+    });
+  });
+
+  it(
+    "a lapsed row whose part failed with no next try waits for its receipt: the walk stops at it (default 13)",
+    SLOW,
+    async () => {
+      await ranLatest("mark-failed-4006.json");
+      // Both claims lapsed at 15:07:35. Sam's row is taken again; Alex's, whose words failed with 4006 and wait for a
+      // receipt, stops his walk, unclaimed.
+      const sweep = await claimV12({ claimer: "dispatcher-2", now: "2026-11-07T15:08:00Z", limit: 10 });
+      expect(sweep.claimed.map((row) => [row.outboxRowId, row.claimedFrom, row.claim.claimNo])).toEqual([
+        ["out-sam-booked-riley", "sending", 2],
+      ]);
+      expect(await rowNow(ALEX_ROW)).toMatchObject({ state: "sending", version: 4 });
+      expect(await claimNow(ALEX_ROW)).toMatchObject({ claimer: "dispatcher-1", claim_no: 1 });
+      // Its receipt, found by its key, moves it.
+      const receipt = exchangeOf("mark-delivered-by-key.json");
+      expect(await markV12(structuredClone(receipt.request) as unknown as MarkPartV12Request)).toEqual(
+        receipt.outcome,
+      );
+      expect(await rowNow(ALEX_ROW)).toMatchObject({ state: "delivered", version: 5 });
+    },
+  );
+});
+
+// ---- renewClaim -------------------------------------------------------------------------------------------------------
+
+describe("renewClaim: the claim renewed just before a part goes, and the stop read with it (T-1135)", () => {
+  it("a STOP committing during a renewal is waited for and seen (FOR SHARE)", SLOW, async () => {
+    await ranLatest("claim-in-order-with-port.json");
+    const stop = await db.sql.reserve();
+    let open = false;
+    try {
+      // The STOP's commit (commit-alex-stop.json's phone write), held open before it commits.
+      await stop.unsafe("begin");
+      open = true;
+      await stop`
+        update phones set stopped = true, stop_at = ${"2026-11-07T15:06:36Z"}, chat_open = false,
+                          version = version + 1
+        where number = ${"+15555550101"}
+      `;
+      const [backend] = await stop<{ pid: number }[]>`select pg_backend_pid() as pid`;
+      if (backend === undefined) {
+        throw new Error("no backend pid");
+      }
+      let done = false;
+      const renewal = renew({
+        outboxRowId: ALEX_ROW,
+        claimer: "dispatcher-1",
+        claimNo: 1,
+        idempotencyKey: ALEX_KEY,
+        at: "2026-11-07T15:06:37Z",
+      }).finally(() => {
+        done = true;
+      });
+      // The renewal waits on the phone row the STOP is writing: a backend blocked by the STOP's.
+      await until(async () => {
+        const [blocked] = await db.sql<{ n: number }[]>`
+          select count(*)::int as n from pg_stat_activity where ${backend.pid}::int = any(pg_blocking_pids(pid))
+        `;
+        return (blocked?.n ?? 0) > 0;
+      }, "the renewal waits for the STOP");
+      expect(done).toBe(false);
+      await stop.unsafe("commit");
+      open = false;
+      expect(await renewal).toEqual({
+        result: "renewed",
+        outboxRowId: ALEX_ROW,
+        claim: {
+          claimer: "dispatcher-1",
+          claimedAt: "2026-11-07T15:06:35Z",
+          lapsesAt: "2026-11-07T15:07:37Z",
+          claimNo: 1,
+          firstTryAt: "2026-11-07T15:06:37Z",
+          nextTryNotBefore: null,
+        },
+        recipient: { stopped: true, chatOpen: false, version: 4 },
+      });
+      // Only the claim's version rose, not the row's.
+      expect(await rowNow(ALEX_ROW)).toMatchObject({ state: "sending", version: 3 });
+      expect(await claimNow(ALEX_ROW)).toMatchObject({ claim_no: 1, version: 2 });
+    } finally {
+      if (open) {
+        await stop.unsafe("rollback");
+      }
+      stop.release();
+    }
+  });
+
+  it("the stopped phone is no refusal: limit 8 drops the row, and its claim row stays", SLOW, async () => {
+    await ranLatest("renew-claim-stopped.json");
+    expect(
+      await limit8V12({
+        outboxRowId: ALEX_ROW,
+        expectVersion: 3,
+        outcome: "droppedStopped",
+        heldUntil: null,
+        at: "2026-11-07T15:06:37Z",
+      }),
+    ).toEqual({ result: "marked", outboxRowId: ALEX_ROW, version: 4, outcome: "droppedStopped" });
+    expect(await claimNow(ALEX_ROW)).toMatchObject({
+      claimer: "dispatcher-1",
+      claim_no: 1,
+      first_try_at: new Date("2026-11-07T15:06:37Z"),
+    });
+    expect(
+      await renew({
+        outboxRowId: ALEX_ROW,
+        claimer: "dispatcher-1",
+        claimNo: 1,
+        idempotencyKey: ALEX_KEY,
+        at: "2026-11-07T15:06:38Z",
+      }),
+    ).toEqual({
+      error: "claimLost",
+      table: "outbox_rows",
+      rowId: ALEX_ROW,
+      claimer: "dispatcher-1",
+      claimNo: 1,
+      state: "dropped_stopped",
+    });
+  });
+
+  it(
+    "refusals write nothing; a lapsed claim nobody took again is still the caller's, and only its version rises",
+    SLOW,
+    async () => {
+      await ranLatest("claim-in-order-with-port.json");
+      const at = "2026-11-07T15:06:36Z";
+      const request: RenewClaimRequest = {
+        outboxRowId: ALEX_ROW,
+        claimer: "dispatcher-1",
+        claimNo: 1,
+        idempotencyKey: ALEX_KEY,
+        at,
+      };
+      const lost = {
+        error: "claimLost",
+        table: "outbox_rows",
+        rowId: ALEX_ROW,
+        claimer: "dispatcher-1",
+        claimNo: 1,
+        state: "sending",
+      };
+      const before = await everythingNow();
+      expect(await renew({ ...request, claimer: "dispatcher-2" })).toEqual(lost);
+      expect(await renew({ ...request, claimNo: 2 })).toEqual(lost);
+      expect(await renew({ ...request, idempotencyKey: "out-sam-booked-riley/1/1" })).toEqual({
+        error: "wrongState",
+        table: "outbox_parts",
+        rowId: "out-sam-booked-riley/1/1",
+        state: "pending",
+      });
+      expect(await renew({ ...request, idempotencyKey: `${ALEX_ROW}/2/1` })).toEqual({
+        error: "notFound",
+        table: "outbox_parts",
+        rowId: `${ALEX_ROW}/2/1`,
+      });
+      expect(await renew({ ...request, outboxRowId: "out-none" })).toEqual({
+        error: "notFound",
+        table: "outbox_rows",
+        rowId: "out-none",
+      });
+      await expect(renewClaim(runtime, { ...request, claimNo: 0 })).rejects.toThrow(TypeError);
+      expect(await everythingNow()).toEqual(before);
+
+      // The claim lapsed at 15:07:35 and nobody took it again: at 15:08:00 it is still dispatcher-1's.
+      const renewed = {
+        result: "renewed",
+        outboxRowId: ALEX_ROW,
+        claim: {
+          claimer: "dispatcher-1",
+          claimedAt: "2026-11-07T15:06:35Z",
+          lapsesAt: "2026-11-07T15:09:00Z",
+          claimNo: 1,
+          firstTryAt: "2026-11-07T15:08:00Z",
+          nextTryNotBefore: null,
+        },
+        recipient: { stopped: false, chatOpen: true, version: 3 },
+      };
+      expect(await renew({ ...request, at: "2026-11-07T15:08:00Z" })).toEqual(renewed);
+      // A repeat renews again; firstTryAt is set once.
+      expect(await renew({ ...request, at: "2026-11-07T15:08:10Z" })).toEqual({
+        ...renewed,
+        claim: { ...renewed.claim, lapsesAt: "2026-11-07T15:09:10Z" },
+      });
+      expect(await rowNow(ALEX_ROW)).toMatchObject({ state: "sending", version: 3 });
+      expect(await claimNow(ALEX_ROW)).toMatchObject({ claim_no: 1, version: 3 });
+
+      // Once limit 8 holds the row, it is not sending: the claim is lost to its holder, and the claim row stays.
+      expect(
+        await limit8V12({
+          outboxRowId: ALEX_ROW,
+          expectVersion: 3,
+          outcome: "held",
+          heldUntil: "2026-11-08T14:00:00Z",
+          at: "2026-11-07T15:08:11Z",
+        }),
+      ).toEqual({ result: "marked", outboxRowId: ALEX_ROW, version: 4, outcome: "held" });
+      expect(await renew({ ...request, at: "2026-11-07T15:08:12Z" })).toEqual({ ...lost, state: "held" });
+      expect(await claimNow(ALEX_ROW)).toMatchObject({ claimer: "dispatcher-1", claim_no: 1 });
+    },
+  );
+
+  it("a part already accepted is not renewed: wrongState with its state", SLOW, async () => {
+    await givenLatest("claim-in-order-with-port.json");
+    const id = "out-avery-two";
+    const now = "2026-11-07T15:07:00Z";
+    await addRow(id, "handle-avery");
+    expect(await plan(planRequest(id, 1, [WORDS, POLL]))).toMatchObject({ result: "written", version: 2 });
+    const [row] = (
+      await claimV12({ claimer: "dispatcher-1", recipientHandleId: "handle-avery", now, limit: 10 })
+    ).claimed;
+    expect(row).toMatchObject({ outboxRowId: id, version: 3, claimedFrom: "checked", claim: { claimNo: 1 } });
+    const request = (key: string): RenewClaimRequest => ({
+      outboxRowId: id,
+      claimer: "dispatcher-1",
+      claimNo: 1,
+      idempotencyKey: key,
+      at: now,
+    });
+    expect(await renew(request(`${id}/1/1`))).toMatchObject({
+      result: "renewed",
+      recipient: { stopped: false, chatOpen: true, version: 2 },
+    });
+    expect(
+      await markV12({
+        outcome: "sent",
+        idempotencyKey: `${id}/1/1`,
+        providerMessageId: "linq-test-1301",
+        providerOptionIds: null,
+        at: now,
+      }),
+    ).toMatchObject({ result: "marked", row: { state: "sending", version: 4 } });
+    expect(await renew(request(`${id}/1/1`))).toEqual({
+      error: "wrongState",
+      table: "outbox_parts",
+      rowId: `${id}/1/1`,
+      state: "sent",
+    });
+    expect(await renew(request(`${id}/2/1`))).toMatchObject({ result: "renewed" });
+  });
+});
+
+// ---- markPartV12 and markRowV12 ---------------------------------------------------------------------------------------
+
+describe("markPartV12: the row moves with its parts, a failure keeps its message id and Retry-After (T-1135)", () => {
+  it("a receipt after a 4006 finds its part by key and moves failed to delivered", SLOW, async () => {
+    await ranLatest("mark-failed-4006.json");
+    const part = {
+      idempotency_key: ALEX_KEY,
+      kind: "words",
+      state: "failed",
+      attempts: 1,
+      linq_message_id: null,
+      linq_option_ids: null,
+      error_code: "4006",
+      sent: false,
+      delivered: false,
+      failed: true,
+    };
+    expect(await partsNow(ALEX_ROW)).toEqual([part]);
+    const exchange = exchangeOf("mark-delivered-by-key.json");
+    const request = exchange.request as unknown as {
+      outcome: "delivered";
+      providerMessageId: string;
+      at: string;
+      idempotencyKey: string;
+    };
+    const notFound = { error: "notFound", table: "outbox_parts", rowId: "linq-msg-demo-0101" };
+    const before = await everythingNow();
+    // With no key, or a key no part holds, no part holds the receipt.
+    expect(
+      await markV12({
+        outcome: "delivered",
+        providerMessageId: "linq-msg-demo-0101",
+        at: "2026-11-07T15:06:49Z",
+      }),
+    ).toEqual(notFound);
+    expect(await markV12({ ...request, idempotencyKey: "out-none/1/1" })).toEqual(notFound);
+    expect(await everythingNow()).toEqual(before);
+
+    // By its key: the part moves failed to delivered and keeps the receipt's message id; its acceptance was never
+    // recorded (sent_at null). The row moves sending to delivered: its first delivery.
+    expect(await markV12(structuredClone(request))).toEqual(exchange.outcome);
+    expect(await partsNow(ALEX_ROW)).toEqual([
+      { ...part, state: "delivered", linq_message_id: "linq-msg-demo-0101", delivered: true },
+    ]);
+    expect(await rowNow(ALEX_ROW)).toMatchObject({ state: "delivered", version: 5 });
+    // A second receipt finds it the first way, by its message id: a repeat, the row as it stands.
+    expect(
+      await markV12({
+        outcome: "delivered",
+        providerMessageId: "linq-msg-demo-0101",
+        at: "2026-11-07T15:06:51Z",
+      }),
+    ).toMatchObject({ repeated: true, firstDelivery: false, row: { state: "delivered", version: 5 } });
+    // A receipt with another message id under the same key is not this part's.
+    expect(await markV12({ ...request, providerMessageId: "linq-msg-demo-0199" })).toEqual({
+      ...notFound,
+      rowId: "linq-msg-demo-0199",
+    });
+  });
+
+  it(
+    "a receipt by key for a part never accepted is refused: K-07 has no pending to delivered",
+    SLOW,
+    async () => {
+      await ranLatest("renew-claim-reads-phone.json");
+      const before = await everythingNow();
+      expect(
+        await markV12({
+          outcome: "delivered",
+          providerMessageId: "linq-msg-demo-0121",
+          at: "2026-11-07T15:06:40Z",
+          idempotencyKey: ALEX_KEY,
+        }),
+      ).toEqual({ error: "wrongState", table: "outbox_parts", rowId: ALEX_KEY, state: "pending" });
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+
+  it("a failure's message id is kept, so its late receipt finds the part by it", SLOW, async () => {
+    await ranLatest("renew-claim-first-send.json");
+    expect(
+      await markV12({
+        outcome: "failed",
+        idempotencyKey: ALEX_KEY,
+        errorCode: "4001",
+        retry: false,
+        at: "2026-11-07T15:06:36Z",
+        providerMessageId: "linq-msg-demo-0111",
+      }),
+    ).toEqual({
+      result: "marked",
+      outboxRowId: ALEX_ROW,
+      partNo: 1,
+      tryNo: 1,
+      attempts: 1,
+      repeated: false,
+      firstDelivery: false,
+      openQuestionId: null,
+      nextKey: null,
+      row: { state: "sending", version: 4 },
+    });
+    expect(await partsNow(ALEX_ROW)).toMatchObject([
+      { state: "failed", linq_message_id: "linq-msg-demo-0111", error_code: "4001", sent: false },
+    ]);
+    expect(
+      await markV12({
+        outcome: "delivered",
+        providerMessageId: "linq-msg-demo-0111",
+        at: "2026-11-07T15:06:50Z",
+      }),
+    ).toMatchObject({ repeated: false, firstDelivery: true, row: { state: "delivered", version: 5 } });
+  });
+
+  it("the Retry-After waits in the claim across a re-claim; the try that goes clears it", SLOW, async () => {
+    await ranLatest("renew-claim-not-yet.json");
+    const key = `${ALEX_ROW}/1/2`;
+    expect(await claimNow(ALEX_ROW)).toMatchObject({
+      claimer: "dispatcher-2",
+      claim_no: 2,
+      first_try_at: new Date("2026-11-07T15:06:35Z"),
+      next_try_not_before: new Date("2026-11-07T15:08:36Z"),
+    });
+    expect(
+      await renew({
+        outboxRowId: ALEX_ROW,
+        claimer: "dispatcher-2",
+        claimNo: 2,
+        idempotencyKey: key,
+        at: "2026-11-07T15:08:36Z",
+      }),
+    ).toEqual({
+      result: "renewed",
+      outboxRowId: ALEX_ROW,
+      claim: {
+        claimer: "dispatcher-2",
+        claimedAt: "2026-11-07T15:07:40Z",
+        lapsesAt: "2026-11-07T15:09:36Z",
+        claimNo: 2,
+        firstTryAt: "2026-11-07T15:06:35Z",
+        nextTryNotBefore: null,
+      },
+      recipient: { stopped: false, chatOpen: true, version: 3 },
+    });
+    expect(
+      await markV12({
+        outcome: "sent",
+        idempotencyKey: key,
+        providerMessageId: "linq-test-1101",
+        providerOptionIds: null,
+        at: "2026-11-07T15:08:37Z",
+      }),
+    ).toMatchObject({
+      result: "marked",
+      tryNo: 2,
+      attempts: 2,
+      repeated: false,
+      row: { state: "sent", version: 6 },
+    });
+    expect(
+      await markV12({
+        outcome: "delivered",
+        providerMessageId: "linq-test-1101",
+        at: "2026-11-07T15:08:40Z",
+      }),
+    ).toMatchObject({ repeated: false, firstDelivery: true, row: { state: "delivered", version: 7 } });
+  });
+
+  it(
+    "a Retry-After needs a claim to wait in: a row a v1 claim took has none, so it is refused (default 18)",
+    SLOW,
+    async () => {
+      await given("claim-in-order.json");
+      const claimed = await claimOutbox(runtime, {
+        claimer: "dispatcher-1",
+        recipientHandleId: "handle-alex",
+        now: "2026-11-07T15:06:35Z",
+        limit: 10,
+      });
+      expect(claimed).toMatchObject({ claimed: [{ outboxRowId: ALEX_ROW, version: 3 }] });
+      expect(await claimNow(ALEX_ROW)).toBeUndefined();
+      const before = await everythingNow();
+      await expect(
+        markPartV12(runtime, {
+          outcome: "failed",
+          idempotencyKey: ALEX_KEY,
+          errorCode: "429",
+          retry: true,
+          at: "2026-11-07T15:06:36Z",
+          providerMessageId: null,
+          nextTryNotBefore: "2026-11-07T15:08:36Z",
+        }),
+      ).rejects.toThrow("no claim");
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+});
+
+describe("markRowV12: waitingChat lets the claim go; the other outcomes keep it (T-1135)", () => {
+  it(
+    "waitingChat: the row waits with no held_until and no claim, and no claim or renewal takes it",
+    SLOW,
+    async () => {
+      await ranLatest("mark-waiting-chat.json");
+      const id = "out-dee-booked-riley";
+      expect(await rowNow(id)).toEqual({ state: "waiting_chat", version: 4, held_until: null });
+      expect(await claimNow(id)).toBeUndefined();
+      const before = await everythingNow();
+      expect(
+        await claimV12({
+          claimer: "dispatcher-2",
+          recipientHandleId: "handle-dee",
+          now: "2026-11-09T15:02:00Z",
+          limit: 10,
+        }),
+      ).toEqual({ result: "claimed", claimed: [], passedHeld: [] });
+      expect(await claimV12({ claimer: "dispatcher-2", now: "2026-11-09T15:02:00Z", limit: 10 })).toEqual({
+        result: "claimed",
+        claimed: [],
+        passedHeld: [],
+      });
+      expect(
+        await renew({
+          outboxRowId: id,
+          claimer: "dispatcher-1",
+          claimNo: 1,
+          idempotencyKey: `${id}/1/1`,
+          at: "2026-11-09T15:02:00Z",
+        }),
+      ).toEqual({
+        error: "claimLost",
+        table: "outbox_rows",
+        rowId: id,
+        claimer: null,
+        claimNo: null,
+        state: "waiting_chat",
+      });
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+
+  it("waitingChat clears a held row's held_until once it is claimed again", SLOW, async () => {
+    await ranLatest("claim-held-lets-later-pass.json");
+    const held = "out-sam-passon-evening";
+    const [row] = (
+      await claimV12({
+        claimer: "dispatcher-3",
+        recipientHandleId: "handle-sam",
+        now: "2026-11-08T13:00:05Z",
+        limit: 1,
+      })
+    ).claimed;
+    expect(row).toMatchObject({ outboxRowId: held, claimedFrom: "held", claim: { claimNo: 2 } });
+    expect(await rowNow(held)).toMatchObject({ held_until: new Date("2026-11-08T13:00:00Z") });
+    expect(
+      await limit8V12({
+        outboxRowId: held,
+        expectVersion: 5,
+        outcome: "waitingChat",
+        heldUntil: null,
+        at: "2026-11-08T13:00:06Z",
+      }),
+    ).toEqual({ result: "marked", outboxRowId: held, version: 6, outcome: "waitingChat" });
+    expect(await rowNow(held)).toEqual({ state: "waiting_chat", version: 6, held_until: null });
+    expect(await claimNow(held)).toBeUndefined();
+  });
+});
+
+// ==== T-1227: K-05 v1.9 item 48, a repeated delivery receipt says what it repeats ====================================
+//
+// markPartV12 answers every mark with repeatedDelivery. On a delivery receipt that repeats a recorded delivery it is
+// { firstOfRow, deliveredAt }: firstOfRow is true when no other part try of the row holds an earlier delivered_at, a
+// tie counting as first (K-05 default 85), and deliveredAt is the part try's stored delivered_at, never the repeat's
+// own time (default 86). On every other answer it is null (default 87). A repeat writes nothing, and firstDelivery
+// keeps v1's meaning: false on every repeat (default 88). Each answer is checked against v1.9's
+// markPart.v1dot9Response and, with its request, as a v1.9 markPart.exchange (markV19), since the answer's definition
+// alone cannot see the request.
+
+/** K-05 v1.9's accepted markPart exchanges (T-1226), each on A7-03's two-part row. */
+const V19_FIXTURES = INDEX.filter(
+  (entry) => entry.version === "v1.9" && entry.expect === "accept" && entry.def === "markPart.exchange",
+).map((entry) => entry.file);
+/** K-05 v1.9's refused markPart fixtures (T-1226). */
+const V19_REFUSED = INDEX.filter(
+  (entry) =>
+    entry.version === "v1.9" && entry.expect === "refuse" && (entry.def ?? "").startsWith("markPart."),
+).map((entry) => entry.file);
+/** K-05 v1 to v1.8's accepted markPart exchanges, but T-1136's: none of them repeats a delivery. */
+const EARLIER_MARK_FIXTURES = INDEX.filter(
+  (entry) =>
+    minorOf(entry.version) < 9 &&
+    entry.expect === "accept" &&
+    entry.def === "markPart.exchange" &&
+    !LATER_FIXTURES.includes(entry.file),
+).map((entry) => entry.file);
+
+describe("K-05 v1.9's markPart fixtures: each request gives its response (T-1227)", () => {
+  const WORDS_REPEAT = "mark-a7-03-delivered-repeat.json";
+  const POLL_REPEAT = "mark-a7-03-poll-delivered-repeat.json";
+  const refusedAnswer = (file: string): Fields => readJson(new URL(`invalid/${file}`, ACCESS_DIR)) as Fields;
+
+  it("covers v1.9's three accepted and three refused markPart fixtures", () => {
+    expect(V19_FIXTURES).toEqual([WORDS_REPEAT, "mark-a7-03-poll-delivered.json", POLL_REPEAT]);
+    expect(V19_REFUSED).toEqual([
+      "invalid/refuse-mark-repeat-delivery-left-out.json",
+      "invalid/refuse-mark-repeat-says-first-delivery.json",
+      "invalid/refuse-mark-delivered-repeat-null.json",
+    ]);
+  });
+
+  for (const file of V19_FIXTURES) {
+    it(file, SLOW, async () => {
+      const exchange = await givenLatest(file);
+      const answer = await runLatest(exchange);
+      // The whole answer, repeatedDelivery with it: nothing is left out for a v1.9 exchange.
+      expect(fixtureVersion(file)).toBe("v1.9");
+      expect(asVersion(exchange.call, answer, fixtureVersion(file))).toEqual(answer);
+      expect(answer).toEqual(exchange.outcome);
+      expect(latestErrors(exchange.call, answer)).toEqual([]);
+      // As an exchange too, with the fixture's own request: is it a delivery receipt, and is the answer a repeat?
+      expect(schemaErrors(V19_ID, "markPart.exchange", { ...exchange, outcome: answer })).toEqual([]);
+    });
+  }
+
+  it(
+    "a repeat writes nothing: no row, part or claim changes, and it answers the same again",
+    SLOW,
+    async () => {
+      for (const file of [WORDS_REPEAT, POLL_REPEAT]) {
+        const exchange = await givenLatest(file);
+        const before = await everythingNow();
+        expect(await runLatest(exchange), file).toEqual(exchange.outcome);
+        expect(await runLatest(exchange), file).toEqual(exchange.outcome);
+        expect(await everythingNow(), file).toEqual(before);
+      }
+    },
+  );
+
+  it(
+    "refuse-mark-repeat-delivery-left-out.json: the call's answer to a repeat always states what it repeats",
+    SLOW,
+    async () => {
+      const leftOut = refusedAnswer("refuse-mark-repeat-delivery-left-out.json");
+      expect(schemaErrors(V19_ID, "markPart.v1dot9Response", leftOut)).not.toEqual([]);
+      const twin = await givenLatest(WORDS_REPEAT);
+      const answer = await runLatest(twin);
+      // Put right, it is its twin's outcome: what the call answers on that chain.
+      expect(answer).toEqual({
+        ...leftOut,
+        repeatedDelivery: { firstOfRow: true, deliveredAt: "2026-10-23T14:05:04Z" },
+      });
+      expect(answer).toEqual(twin.outcome);
+      expect(schemaErrors(V19_ID, "markPart.v1dot9Response", answer)).toEqual([]);
+    },
+  );
+
+  it(
+    "refuse-mark-repeat-says-first-delivery.json: a repeat of the row's first delivery never says firstDelivery",
+    SLOW,
+    async () => {
+      const saysFirst = refusedAnswer("refuse-mark-repeat-says-first-delivery.json");
+      expect(schemaErrors(V19_ID, "markPart.response", saysFirst)).not.toEqual([]);
+      const twin = await givenLatest(WORDS_REPEAT);
+      const answer = await runLatest(twin);
+      // Put right, it is its twin's outcome: firstDelivery false beside the first delivery it repeats.
+      expect(answer).toEqual({ ...saysFirst, firstDelivery: false });
+      expect(answer).toEqual(twin.outcome);
+      expect(schemaErrors(V19_ID, "markPart.response", answer)).toEqual([]);
+    },
+  );
+
+  it(
+    "refuse-mark-delivered-repeat-null.json: a repeated receipt is never answered null; only the exchange refuses it",
+    SLOW,
+    async () => {
+      const file = "invalid/refuse-mark-delivered-repeat-null.json";
+      const refused = exchangeOf(file);
+      expect(schemaErrors(V19_ID, "markPart.exchange", refused)).not.toEqual([]);
+      // Its answer alone passes markPart.v1dot9Response, which cannot see the request (T-1226's security note a): so
+      // every answer here is checked as an exchange too.
+      expect(schemaErrors(V19_ID, "markPart.v1dot9Response", refused.outcome)).toEqual([]);
+      const exchange = await givenLatest(file);
+      const answer = await runLatest(exchange);
+      // Put right, its outcome is its twin's: the poll's delivery, not the row's first.
+      expect(answer).not.toEqual(refused.outcome);
+      expect(answer).toEqual(exchangeOf(POLL_REPEAT).outcome);
+      expect(schemaErrors(V19_ID, "markPart.exchange", { ...refused, outcome: answer })).toEqual([]);
+    },
+  );
+});
+
+describe("K-05 v1 to v1.8's markPart fixtures: each answer is its outcome with repeatedDelivery null (T-1227)", () => {
+  it("covers every earlier accepted markPart exchange but T-1136's", () => {
+    expect([...EARLIER_MARK_FIXTURES].sort()).toEqual([
+      "mark-a7-03-delivered-by-key.json",
+      "mark-a7-03-failed-4006.json",
+      "mark-a7-03-poll-failed.json",
+      "mark-a7-03-poll-sent.json",
+      "mark-delivered-by-key.json",
+      "mark-delivered.json",
+      "mark-failed-4006.json",
+      "mark-failed-retry-after.json",
+      "mark-sent.json",
+    ]);
+  });
+
+  for (const file of EARLIER_MARK_FIXTURES) {
+    it(file, SLOW, async () => {
+      const exchange = await givenLatest(file);
+      const answer = await runLatest(exchange);
+      // None of them repeats a delivery: the field is stated, null. v1's exchanges have no row, which the call adds.
+      const stated = isRecord(answer) && fixtureVersion(file) === "v1" ? without(answer, ["row"]) : answer;
+      expect(stated).toEqual({ ...exchange.outcome, repeatedDelivery: null });
+      expect(latestErrors(exchange.call, answer)).toEqual([]);
+      expect(schemaErrors(V19_ID, "markPart.exchange", { ...exchange, outcome: answer })).toEqual([]);
+    });
+  }
+});
+
+describe("markPartV12: a repeated delivery receipt says what it repeats (T-1227; K-05 v1.9 item 48)", () => {
+  const NOW = "2026-11-07T15:07:00Z";
+  const id = "out-avery-repeat";
+  const WORDS_MESSAGE = "linq-test-1401";
+  const POLL_MESSAGE = "linq-test-1402";
+  const keyOf = (partNo: number, tryNo = 1): string => `${id}/${String(partNo)}/${String(tryNo)}`;
+
+  /** The test row, Avery's, with these sends: planned, then claimed by a v1.2 claim (sending, version 3, claim 1). */
+  async function claimedV12(sends: Json[]): Promise<void> {
+    await givenLatest("claim-in-order-with-port.json");
+    await addRow(id, "handle-avery");
+    expect(await plan(planRequest(id, 1, sends))).toMatchObject({ result: "written", version: 2 });
+    const { claimed } = await claimV12({
+      claimer: "dispatcher-1",
+      recipientHandleId: "handle-avery",
+      now: NOW,
+      limit: 10,
+    });
+    expect(claimed.map((row) => [row.outboxRowId, row.version, row.claim.claimNo])).toEqual([[id, 3, 1]]);
+  }
+
+  const sent = (partNo: number, providerMessageId: string, tryNo = 1): MarkPartV12Request => ({
+    outcome: "sent",
+    idempotencyKey: keyOf(partNo, tryNo),
+    providerMessageId,
+    providerOptionIds: null,
+    at: NOW,
+  });
+  /** A delivery receipt: Linq's message id and time, and the part's key when it echoes one. */
+  const receipt = (providerMessageId: string, at: string, idempotencyKey?: string): MarkPartV12Request =>
+    idempotencyKey === undefined
+      ? { outcome: "delivered", providerMessageId, at }
+      : { outcome: "delivered", providerMessageId, at, idempotencyKey };
+
+  /** markPartV12's whole answer for try 1 of a part of the test row, which asks no question; `fields` over it. */
+  const answerOf = (partNo: number, fields: Fields): Fields => ({
+    result: "marked",
+    outboxRowId: id,
+    partNo,
+    tryNo: 1,
+    attempts: 1,
+    repeated: false,
+    firstDelivery: false,
+    openQuestionId: null,
+    nextKey: null,
+    repeatedDelivery: null,
+    ...fields,
+  });
+  /** A repeated receipt's whole answer: repeated, never firstDelivery, the row as it stands, and what it repeats. */
+  const repeatOf = (
+    partNo: number,
+    row: Fields,
+    firstOfRow: boolean,
+    deliveredAt: string,
+    fields: Fields = {},
+  ): Fields =>
+    answerOf(partNo, { repeated: true, row, repeatedDelivery: { firstOfRow, deliveredAt }, ...fields });
+
+  it(
+    "a repeat of a row's only delivery: the row's first, at the stored time, never the repeat's own; nothing written",
+    SLOW,
+    async () => {
+      await claimedV12([WORDS]);
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toEqual(
+        answerOf(1, { row: { state: "sent", version: 4 } }),
+      );
+      const deliveredAt = "2026-11-07T15:07:04Z";
+      expect(await markV19(receipt(WORDS_MESSAGE, deliveredAt))).toEqual(
+        answerOf(1, { firstDelivery: true, row: { state: "delivered", version: 5 } }),
+      );
+      const before = await everythingNow();
+      const repeat = repeatOf(1, { state: "delivered", version: 5 }, true, deliveredAt);
+      // Linq's retry is the same event, with the same time (STATE note 38's crash before armClock).
+      expect(await markV19(receipt(WORDS_MESSAGE, deliveredAt))).toEqual(repeat);
+      // A second report of the part may carry another time, later or earlier: the answer is the record's.
+      expect(await markV19(receipt(WORDS_MESSAGE, "2026-11-07T15:09:30Z"))).toEqual(repeat);
+      expect(await markV19(receipt(WORDS_MESSAGE, "2026-11-07T15:00:00Z", keyOf(1)))).toEqual(repeat);
+      // Twenty at once: each answers the same, one after the other under the row's lock.
+      const together = await Promise.all(
+        Array.from({ length: 20 }, () =>
+          settled(() => markPartV12(runtime, receipt(WORDS_MESSAGE, "2026-11-07T15:09:31Z"))),
+        ),
+      );
+      expect(together).toEqual(Array.from({ length: 20 }, () => repeat));
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+
+  it(
+    "a repeat of a later part's delivery says firstOfRow false; the first part's repeat says true, before and after",
+    SLOW,
+    async () => {
+      await claimedV12([WORDS, POLL]);
+      const wordsAt = "2026-11-07T15:07:04Z";
+      const pollAt = "2026-11-07T15:07:06Z";
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toEqual(
+        answerOf(1, { row: { state: "sending", version: 4 } }),
+      );
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toEqual(
+        answerOf(1, { firstDelivery: true, row: { state: "sending", version: 5 } }),
+      );
+      // The words' receipt again while the poll is still to go: the row's first delivery.
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toEqual(
+        repeatOf(1, { state: "sending", version: 5 }, true, wordsAt),
+      );
+      expect(await markV19(sent(2, POLL_MESSAGE))).toEqual(
+        answerOf(2, { row: { state: "sent", version: 6 } }),
+      );
+      // The poll's delivery is recorded: the row's second, and no repeat.
+      expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toEqual(
+        answerOf(2, { row: { state: "delivered", version: 7 } }),
+      );
+      const before = await everythingNow();
+      const row = { state: "delivered", version: 7 };
+      expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toEqual(repeatOf(2, row, false, pollAt));
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toEqual(repeatOf(1, row, true, wordsAt));
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+
+  it("two parts delivered at one time: a tie counts as first for each", SLOW, async () => {
+    await claimedV12([WORDS, POLL]);
+    const at = "2026-11-07T15:07:04Z";
+    expect(await markV19(sent(1, WORDS_MESSAGE))).toMatchObject({ repeated: false, repeatedDelivery: null });
+    expect(await markV19(sent(2, POLL_MESSAGE))).toEqual(answerOf(2, { row: { state: "sent", version: 5 } }));
+    expect(await markV19(receipt(WORDS_MESSAGE, at))).toEqual(
+      answerOf(1, { firstDelivery: true, row: { state: "sent", version: 6 } }),
+    );
+    expect(await markV19(receipt(POLL_MESSAGE, at))).toEqual(
+      answerOf(2, { row: { state: "delivered", version: 7 } }),
+    );
+    const before = await everythingNow();
+    const row = { state: "delivered", version: 7 };
+    expect(await markV19(receipt(WORDS_MESSAGE, at))).toEqual(repeatOf(1, row, true, at));
+    expect(await markV19(receipt(POLL_MESSAGE, at))).toEqual(repeatOf(2, row, true, at));
+    expect(await everythingNow()).toEqual(before);
+  });
+
+  it(
+    "receipts recorded out of the order of their times: a repeat reads the row's first delivery from the times",
+    SLOW,
+    async () => {
+      await claimedV12([WORDS, POLL]);
+      const wordsAt = "2026-11-07T15:07:04Z";
+      const pollAt = "2026-11-07T15:07:16Z";
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toMatchObject({
+        repeated: false,
+        repeatedDelivery: null,
+      });
+      expect(await markV19(sent(2, POLL_MESSAGE))).toMatchObject({ repeated: false, repeatedDelivery: null });
+      // The poll's receipt is recorded first and says firstDelivery; the words' receipt, late, holds the earlier time.
+      expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toEqual(
+        answerOf(2, { firstDelivery: true, row: { state: "sent", version: 6 } }),
+      );
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toEqual(
+        answerOf(1, { row: { state: "delivered", version: 7 } }),
+      );
+      const before = await everythingNow();
+      const row = { state: "delivered", version: 7 };
+      // By the times the record holds (K-05 default 85; open gap 54): the earlier-timed delivery is the row's first.
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toEqual(repeatOf(1, row, true, wordsAt));
+      expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toEqual(repeatOf(2, row, false, pollAt));
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+
+  it(
+    "a late receipt of an earlier try after a 4006: each try's repeat is read by the times, across the part's tries",
+    SLOW,
+    async () => {
+      await claimedV12([WORDS]);
+      const minute = "2026-11-07T15:08:00Z";
+      const failure = { outcome: "failed", idempotencyKey: keyOf(1), errorCode: "4006" } as const;
+      expect(await markV19({ ...failure, retry: false, at: NOW })).toEqual(
+        answerOf(1, { row: { state: "sending", version: 4 } }),
+      );
+      // K-07 rule 2: no receipt within a minute, so the next try under a new key.
+      expect(await markV19({ ...failure, retry: true, at: minute })).toEqual(
+        answerOf(1, { nextKey: keyOf(1, 2), row: { state: "sending", version: 5 } }),
+      );
+      const retryMessage = "linq-test-1403";
+      const retryAt = "2026-11-07T15:08:10Z";
+      const lateAt = "2026-11-07T15:07:30Z";
+      expect(await markV19(sent(1, retryMessage, 2))).toEqual(
+        answerOf(1, { tryNo: 2, row: { state: "sent", version: 6 } }),
+      );
+      expect(await markV19(receipt(retryMessage, retryAt))).toEqual(
+        answerOf(1, { tryNo: 2, firstDelivery: true, row: { state: "delivered", version: 7 } }),
+      );
+      // The first try's receipt comes late, with its earlier time, found by its key (a 4006 gave no message id).
+      expect(await markV19(receipt(WORDS_MESSAGE, lateAt, keyOf(1)))).toEqual(
+        answerOf(1, { row: { state: "delivered", version: 8 } }),
+      );
+      const before = await everythingNow();
+      const row = { state: "delivered", version: 8 };
+      expect(await markV19(receipt(WORDS_MESSAGE, lateAt, keyOf(1)))).toEqual(repeatOf(1, row, true, lateAt));
+      expect(await markV19(receipt(retryMessage, retryAt))).toEqual(
+        repeatOf(1, row, false, retryAt, { tryNo: 2 }),
+      );
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+
+  it(
+    "an attempt, a sent mark and a failure, each also when repeated, state repeatedDelivery null",
+    SLOW,
+    async () => {
+      await claimedV12([WORDS, POLL]);
+      const sending = (version: number): Fields => ({ state: "sending", version });
+      expect(await markV19({ outcome: "attempt", idempotencyKey: keyOf(1), at: NOW })).toEqual(
+        answerOf(1, { attempts: 2, row: sending(4) }),
+      );
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toEqual(answerOf(1, { attempts: 2, row: sending(5) }));
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toEqual(
+        answerOf(1, { attempts: 2, repeated: true, row: sending(5) }),
+      );
+      const failure: MarkPartV12Request = {
+        outcome: "failed",
+        idempotencyKey: keyOf(2),
+        errorCode: "poll.failed",
+        retry: true,
+        at: NOW,
+      };
+      expect(await markV19(failure)).toEqual(answerOf(2, { nextKey: keyOf(2, 2), row: sending(6) }));
+      expect(await markV19(failure)).toEqual(
+        answerOf(2, { repeated: true, nextKey: keyOf(2, 2), row: sending(6) }),
+      );
+      expect(await markV19(receipt(WORDS_MESSAGE, "2026-11-07T15:07:04Z"))).toEqual(
+        answerOf(1, { attempts: 2, firstDelivery: true, row: sending(7) }),
+      );
+      // A sent mark repeated after its part's delivery is no delivery receipt: null, though the part is delivered.
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toEqual(
+        answerOf(1, { attempts: 2, repeated: true, row: sending(7) }),
+      );
+    },
+  );
+
+  it(
+    "a delivered part that holds no delivered_at fails loudly, never by a guess, and nothing is written",
+    SLOW,
+    async () => {
+      await claimedV12([WORDS, POLL]);
+      const wordsAt = "2026-11-07T15:07:04Z";
+      const pollAt = "2026-11-07T15:07:06Z";
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toMatchObject({
+        repeated: false,
+        repeatedDelivery: null,
+      });
+      expect(await markV19(sent(2, POLL_MESSAGE))).toMatchObject({ repeated: false, repeatedDelivery: null });
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toMatchObject({ firstDelivery: true });
+      expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toMatchObject({ row: { state: "delivered" } });
+      const before = await everythingNow();
+      // Restated by T-1278 (CQ-211; DL-545; the architect rules it in review, build prompt 6.6): no K-05 call leaves a
+      // delivered part without its time, and K-04 v1.1's validated CHECK outbox_parts_delivered_has_time now refuses
+      // one, so the tables' owner taking the poll's time away fails loudly (23514) and writes nothing. markPartV12's own
+      // throw for such a part ("a delivered part holds no delivered_at") stays in outbox.ts as the second guard, which
+      // no row can reach once the CHECK holds.
+      await expect(
+        db.sql`
+          update outbox_parts set delivered_at = null, version = version + 1 where idempotency_key = ${keyOf(2)}
+        `,
+      ).rejects.toMatchObject({ code: "23514", constraint_name: "outbox_parts_delivered_has_time" });
+      expect(await everythingNow()).toEqual(before);
+      // So every delivered part try holds its time, and each repeat answers by those times, never by a guess: the
+      // poll's is the row's second delivery, the words' its first.
+      const row = { state: "delivered", version: 7 };
+      expect(await markV19(receipt(POLL_MESSAGE, pollAt))).toEqual(repeatOf(2, row, false, pollAt));
+      expect(await markV19(receipt(WORDS_MESSAGE, wordsAt))).toEqual(repeatOf(1, row, true, wordsAt));
+      expect(await everythingNow()).toEqual(before);
+      // A mark that is no delivery receipt reads none of it, and v1's markPart answers its repeat as it always did.
+      expect(await markV19(sent(1, WORDS_MESSAGE))).toMatchObject({ repeated: true, repeatedDelivery: null });
+      expect(await mark({ outcome: "delivered", providerMessageId: POLL_MESSAGE, at: pollAt })).toEqual({
+        result: "marked",
+        outboxRowId: id,
+        partNo: 2,
+        tryNo: 1,
+        attempts: 1,
+        repeated: true,
+        firstDelivery: false,
+        openQuestionId: null,
+        nextKey: null,
+      });
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+});
+
+// ==== T-1279: K-05 v1.13 items 64 and 66, a row with no turn (ADR-016 card R0) =========================================
+//
+// K-04 v1.1 lets work with no turn write an outbox row, a job row (turn_id null, a job id in its place), such as a
+// sign-in code's email row, which names its K-12 purpose and the time from which no part of it is sent (email_purpose,
+// not_after). K-05 v1.13's claim, claimOutboxV113, carries both on every claimed row, as stored, null where the column
+// is null; claimOutboxV12's answer stays v1.2's, which v1.2 closes. The code row's chain (startSignIn, sendSignInCode) is
+// R1's (T-1280) and not built, so these tests load claim-sam-sign-in-code's seeds, its part seeds among them, and write
+// the row as send-sign-in-code-sam leaves it (as read-outbox-row-sign-in-code's note lists it), as the tables' owner; of
+// what that chain writes, the claim and the marks read the outbox alone. The claim, the marks and limit 8's mark then run
+// for real, each v1.13 claim checked against data-access v1.13's claimOutbox.response.
+
+const V113_ID = schemaId("data-access/data-access.v1.13.schema.json");
+const DB_SCHEMA_DIR = new URL("db-schema/", CONTRACTS);
+const CODE_CLAIM = "claim-sam-sign-in-code.json";
+const CODE_SEND = "send-sign-in-code-sam.json";
+const CODE_MARK = "mark-sign-in-code-failed-no-turn.json";
+const CODE_ROW = "out-sam-sign-in-nov02-code";
+const CODE_KEY = `${CODE_ROW}/1/1`;
+/** A turn of Sam's phone, for the code row's twin with a turn (K-04 v1's shape). */
+const TWIN_TURN = "turn-sam-code-twin";
+
+/** A field an exchange's request or outcome holds; thrown when it holds none. */
+function fieldOf(record: Record<string, Json>, key: string): Json {
+  const value = record[key];
+  if (value === undefined) {
+    throw new Error(`the exchange holds no ${key}`);
+  }
+  return value;
+}
+
+/** `<part>/<file>`: a seed of another database part (K-05 given.partSeeds), in that part's fixtures folder. */
+function partSeedUrl(name: string): URL {
+  const slash = name.indexOf("/");
+  if (slash < 1) {
+    throw new Error(`partSeeds names <part>/<file>, not ${name}`);
+  }
+  return new URL(`${name.slice(0, slash)}/fixtures/${name.slice(slash + 1)}`, DB_SCHEMA_DIR);
+}
+
+/** A seed file's rows after those of its `after` chain, each file named relative to the file that names it. */
+function seedRowsAt(file: URL, seen: Set<string>): SeedFile["rows"] {
+  if (seen.has(file.href)) {
+    return [];
+  }
+  seen.add(file.href);
+  const seed = readJson(file) as SeedFile;
+  return [...seed.after.flatMap((before) => seedRowsAt(new URL(before, file), seen)), ...seed.rows];
+}
+
+/**
+ * The code row's world: claim-sam-sign-in-code's seeds, K-04's and its part seeds (K-22's chain, which holds Sam's email
+ * handle and his account), then his code row as send-sign-in-code-sam leaves it: no turn, its job id the attempt's, to
+ * his email handle and his person, no business, booking, question or copy, email, quick_reply, purpose code, not_after
+ * the code's end, no versions read, the send's bundle and trace, checked at version 2 with the plan and final parts
+ * the send holds. With `twinTurn`, the same row as a turn of Sam's phone would have written it (K-04 v1's shape): that
+ * turn's id in place of the job id, and nothing else changed.
+ */
+async function codeRowWritten(twinTurn: string | null = null): Promise<void> {
+  const { given: world } = exchangeOf(CODE_CLAIM);
+  const { request, outcome } = exchangeOf(CODE_SEND);
+  const bundle = fieldOf(request, "bundle") as { hash: Json; build: Json };
+  const seen = new Set<string>();
+  const rows = [
+    ...world.k04Seeds.map((seed) => new URL(seed, CORE_DIR)),
+    ...(world.partSeeds ?? []).map(partSeedUrl),
+  ].flatMap((file) => seedRowsAt(file, seen));
+  await reset();
+  await db.sql.begin(async (tx) => {
+    for (const row of rows) {
+      await insertRow(tx, row.table, row.values);
+    }
+    if (twinTurn !== null) {
+      await insertRow(tx, "turns", {
+        id: twinTurn,
+        handle_id: "handle-sam",
+        event_ids: [`evt-${twinTurn}`],
+        state: "committed",
+        bundle_hash: bundle.hash,
+        bundle_build: bundle.build,
+        trace_id: `trace-${twinTurn}`,
+        committed_at: "2026-11-02T12:59:58Z",
+      });
+    }
+    await insertRow(tx, "outbox_rows", {
+      id: fieldOf(request, "emailRowId"),
+      turn_id: twinTurn,
+      job_id: twinTurn === null ? fieldOf(request, "signInAttemptId") : null,
+      recipient_handle_id: "handle-sam-email",
+      recipient_person_id: "person-sam",
+      business_id: null,
+      booking_id: null,
+      open_question_id: null,
+      copy_of_row_id: null,
+      channel: "email",
+      send_class: "quick_reply",
+      email_purpose: "code",
+      not_after: fieldOf(outcome, "expiresAt"),
+      versions_read: [],
+      plan: fieldOf(request, "plan"),
+      final_parts: fieldOf(request, "finalParts"),
+      state: "checked",
+      bundle_hash: bundle.hash,
+      bundle_build: bundle.build,
+      trace_id: fieldOf(request, "traceId"),
+      version: fieldOf(outcome, "version"),
+    });
+  });
+}
+
+/** claimOutboxV113's answer, checked against data-access v1.13 (its claimOutbox.response, or its errors). */
+async function claimV113(request: ClaimOutboxRequest): Promise<ClaimOutboxV113Response> {
+  const outcome = await claimOutboxV113(runtime, request);
+  const def = "error" in outcome ? "claimOutbox.errors" : "claimOutbox.response";
+  expect(schemaErrors(V113_ID, def, outcome)).toEqual([]);
+  if ("error" in outcome) {
+    throw new Error(`claimOutboxV113 answered ${outcome.error}`);
+  }
+  return outcome;
+}
+
+/** claim-sam-sign-in-code's request: the sweep at 13:00:02Z, one second after the code was sent. */
+const codeClaimRequest = (): ClaimOutboxRequest =>
+  structuredClone(exchangeOf(CODE_CLAIM).request) as unknown as ClaimOutboxRequest;
+
+describe("claimOutboxV113: a row with no turn is claimed as any row, naming its purpose and its end (K-05 v1.13 item 64; T-1279)", () => {
+  it(
+    `${CODE_CLAIM}: the code row is claimed by the sweep and by its recipient alike, with its purpose and notAfter and no turn or job id, and written as any claim`,
+    SLOW,
+    async () => {
+      const exchange = exchangeOf(CODE_CLAIM);
+      expect(fixtureVersion(CODE_CLAIM)).toBe("v1.13");
+      // The fixture's sweep, and the dispatch the request runs for the row's recipient after the code's commit (ADR-016
+      // section 2), each on the row as the send leaves it.
+      for (const request of [
+        exchange.request,
+        { ...exchange.request, recipientHandleId: "handle-sam-email" },
+      ]) {
+        await codeRowWritten();
+        const answer = await claimV113(structuredClone(request) as unknown as ClaimOutboxRequest);
+        // The whole answer: the claimed row carries its purpose and end, and neither its turn id nor its job id.
+        expect(answer, JSON.stringify(request)).toEqual(exchange.outcome);
+        expect(
+          schemaErrors(V113_ID, "claimOutbox.exchange", { ...exchange, request, outcome: answer }),
+        ).toEqual([]);
+        expect(await rowNow(CODE_ROW)).toEqual({ state: "sending", version: 3, held_until: null });
+        expect(await partsNow(CODE_ROW)).toEqual([
+          {
+            idempotency_key: CODE_KEY,
+            kind: "words",
+            state: "pending",
+            attempts: 1,
+            linq_message_id: null,
+            linq_option_ids: null,
+            error_code: null,
+            sent: false,
+            delivered: false,
+            failed: false,
+          },
+        ]);
+        expect(await claimNow(CODE_ROW)).toEqual({
+          claimer: "dispatcher-1",
+          claimed_at: new Date("2026-11-02T13:00:02Z"),
+          lapses_at: new Date("2026-11-02T13:01:02Z"),
+          claim_no: 1,
+          first_try_at: null,
+          next_try_not_before: null,
+          version: 1,
+        });
+      }
+    },
+  );
+
+  it(
+    "claimOutboxV12 claims the same row as v1.2 states a claimed row, with neither field, valid at v1.2: its consumers see no change",
+    SLOW,
+    async () => {
+      const outcome = exchangeOf(CODE_CLAIM).outcome as { claimed: Fields[] };
+      await codeRowWritten();
+      expect(await claimV12(codeClaimRequest())).toEqual({
+        ...outcome,
+        claimed: outcome.claimed.map((row) => without(row, ["emailPurpose", "notAfter"])),
+      });
+    },
+  );
+
+  it(
+    "every claimed row states both as stored, null where the column is null: rows of each channel with and without a purpose or an end",
+    SLOW,
+    async () => {
+      await givenLatest("claim-in-order-with-port.json");
+      // Rows a turn wrote, planned for real (writePlan), then given a purpose and an end as K-04 v1.1 admits them, as the
+      // tables' owner: an end on a text row, a purpose alone, and a purpose with an end that has a fraction of a second.
+      await addChannelRow("out-riley-sms-ends", "handle-riley", "sms");
+      await addChannelRow("out-alex-email-confirm", "handle-alex-email", "email");
+      await addChannelRow("out-alex-email-notice", "handle-alex-email", "email");
+      await db.sql`
+        update outbox_rows set not_after = '2026-11-07T16:00:00Z', version = version + 1
+        where id = 'out-riley-sms-ends'
+      `;
+      await db.sql`
+        update outbox_rows set email_purpose = 'confirmation', version = version + 1
+        where id = 'out-alex-email-confirm'
+      `;
+      await db.sql`
+        update outbox_rows set email_purpose = 'notice', not_after = '2026-11-08T09:00:00.25Z', version = version + 1
+        where id = 'out-alex-email-notice'
+      `;
+      const now = "2026-11-07T15:07:00Z";
+      const stated: [string, string, string, unknown, unknown][] = [];
+      for (const recipientHandleId of ["handle-alex", "handle-riley", "handle-alex-email"]) {
+        const answer = await claimV113({ claimer: "dispatcher-1", recipientHandleId, now, limit: 10 });
+        stated.push(
+          ...answer.claimed.map((row): [string, string, string, unknown, unknown] => [
+            row.outboxRowId,
+            row.channel,
+            row.port,
+            row.emailPurpose,
+            row.notAfter,
+          ]),
+        );
+      }
+      expect(stated).toEqual([
+        [ALEX_ROW, "imessage", "linq", null, null],
+        ["out-riley-sms-ends", "sms", "linq", null, "2026-11-07T16:00:00Z"],
+        ["out-alex-email-confirm", "email", "email", "confirmation", null],
+        ["out-alex-email-notice", "email", "email", "notice", "2026-11-08T09:00:00.250Z"],
+      ]);
+    },
+  );
+
+  it(
+    "refuse-claimed-code-row-no-not-after.json: no claim answers a code row with no end, since the database holds none",
+    SLOW,
+    async () => {
+      const refused = readJson(new URL("invalid/refuse-claimed-code-row-no-not-after.json", ACCESS_DIR));
+      expect(schemaErrors(V113_ID, "claimOutbox.response", refused)).not.toEqual([]);
+      // Put right, it is claim-sam-sign-in-code's outcome: the same claimed row with its notAfter.
+      const outcome = exchangeOf(CODE_CLAIM).outcome as { claimed: Fields[] };
+      expect(refused).toEqual({
+        ...outcome,
+        claimed: outcome.claimed.map((row) => ({ ...row, notAfter: null })),
+      });
+      expect(schemaErrors(V113_ID, "claimOutbox.response", outcome)).toEqual([]);
+      // The database refuses a code row with no end (K-04 v1.1 outbox_rows_code_has_not_after), and nothing is written,
+      // so the claim answers the row with its end.
+      await codeRowWritten();
+      const before = await everythingNow();
+      await expect(
+        db.sql`update outbox_rows set not_after = null, version = version + 1 where id = ${CODE_ROW}`,
+      ).rejects.toMatchObject({ code: "23514", constraint_name: "outbox_rows_code_has_not_after" });
+      expect(await everythingNow()).toEqual(before);
+      expect(await claimV113(codeClaimRequest())).toEqual(outcome);
+    },
+  );
+
+  it(
+    "every claim of the code row names its end: the re-claim of its next try after a failed try, and a claim at its notAfter, which limit 8's withdrawal closes unsent",
+    SLOW,
+    async () => {
+      await codeRowWritten();
+      await claimV113(codeClaimRequest());
+      // Its first try fails and a next try follows, under a new key (K-07 rule 2's plain retry), as for any row.
+      expect(
+        await markV19({
+          outcome: "failed",
+          idempotencyKey: CODE_KEY,
+          errorCode: "500",
+          retry: true,
+          at: "2026-11-02T13:00:05Z",
+          providerMessageId: null,
+          nextTryNotBefore: null,
+        }),
+      ).toMatchObject({
+        result: "marked",
+        nextKey: `${CODE_ROW}/1/2`,
+        row: { state: "sending", version: 4 },
+      });
+      // The first claim lapses at 13:01:02Z; another dispatcher's sweep takes the row again, its next try with it, and
+      // the re-claimed row names its purpose and its end again.
+      const again = await claimV113({ claimer: "dispatcher-2", now: "2026-11-02T13:01:30Z", limit: 10 });
+      expect(again.claimed).toEqual([
+        expect.objectContaining({
+          outboxRowId: CODE_ROW,
+          version: 5,
+          claimedFrom: "sending",
+          parts: [{ partNo: 1, tryNo: 2, idempotencyKey: `${CODE_ROW}/1/2`, attempts: 2, sent: false }],
+          claim: expect.objectContaining({ claimer: "dispatcher-2", claimNo: 2 }) as unknown,
+          port: "email",
+          emailPurpose: "code",
+          notAfter: "2026-11-02T13:10:01Z",
+        }),
+      ]);
+
+      // A row whose dispatch never ran is claimed at its next wake, at or after its end (ADR-016 section 2): the claim
+      // decides nothing by notAfter and hands the row over with it, and limit 8's withdrawn closes it, nothing sent.
+      await codeRowWritten();
+      const late = await claimV113({ claimer: "dispatcher-3", now: "2026-11-02T13:10:01Z", limit: 10 });
+      expect(late.claimed).toEqual([
+        expect.objectContaining({ outboxRowId: CODE_ROW, version: 3, notAfter: "2026-11-02T13:10:01Z" }),
+      ]);
+      expect(
+        await limit8V12({
+          outboxRowId: CODE_ROW,
+          expectVersion: 3,
+          outcome: "withdrawn",
+          heldUntil: null,
+          at: "2026-11-02T13:10:01Z",
+        }),
+      ).toEqual({ result: "marked", outboxRowId: CODE_ROW, version: 4, outcome: "withdrawn" });
+      expect(await rowNow(CODE_ROW)).toEqual({ state: "withdrawn", version: 4, held_until: null });
+      expect(await partsNow(CODE_ROW)).toMatchObject([
+        { idempotency_key: CODE_KEY, state: "pending", sent: false },
+      ]);
+      // A withdrawn row is finished: no claim takes it again.
+      expect(await claimV113({ claimer: "dispatcher-3", now: "2026-11-02T13:12:00Z", limit: 10 })).toEqual({
+        result: "claimed",
+        claimed: [],
+        passedHeld: [],
+      });
+    },
+  );
+});
+
+describe("a failed mark with no follow-ups marks a row with no turn as any row (K-05 v1.13 item 66; DL-610; T-1279)", () => {
+  it(
+    `${CODE_MARK} with no follow-ups: the code row's part is marked failed as for any row, and as for the same row with a turn`,
+    SLOW,
+    async () => {
+      const fixture = exchangeOf(CODE_MARK);
+      expect(fixtureVersion(CODE_MARK)).toBe("v1.13");
+      // The fixture's mark without what only a safety line's first failure carries (README item 15).
+      const noFollowUps = without(fixture.request, ["followUps", "events"]);
+      expect(Object.keys(fixture.request).length - Object.keys(noFollowUps).length).toBe(2);
+      /** The code row claimed by the fixture's chain's claim, then that mark: its answer and what it wrote. */
+      const markedOnce = async (twinTurn: string | null): Promise<Fields> => {
+        await codeRowWritten(twinTurn);
+        await claimV113(codeClaimRequest());
+        const answer = await markV19(structuredClone(noFollowUps) as unknown as MarkPartV12Request);
+        return {
+          answer,
+          row: await rowNow(CODE_ROW),
+          parts: await partsNow(CODE_ROW),
+          claim: await claimNow(CODE_ROW),
+        };
+      };
+      const noTurn = await markedOnce(null);
+      expect(noTurn).toEqual({
+        answer: {
+          result: "marked",
+          outboxRowId: CODE_ROW,
+          partNo: 1,
+          tryNo: 1,
+          attempts: 1,
+          repeated: false,
+          firstDelivery: false,
+          openQuestionId: null,
+          nextKey: null,
+          row: { state: "sending", version: 4 },
+          repeatedDelivery: null,
+        },
+        // Its one part failed with no next try (retry false), so the row stays sending, its version raised by one.
+        row: { state: "sending", version: 4, held_until: null },
+        parts: [
+          {
+            idempotency_key: CODE_KEY,
+            kind: "words",
+            state: "failed",
+            attempts: 1,
+            linq_message_id: null,
+            linq_option_ids: null,
+            error_code: "500",
+            sent: false,
+            delivered: false,
+            failed: true,
+          },
+        ],
+        claim: expect.objectContaining({ claimer: "dispatcher-1", claim_no: 1 }) as unknown,
+      });
+      // The same row with a turn (K-04 v1's shape) gives the same answer and the same writes.
+      expect(await markedOnce(TWIN_TURN)).toEqual(noTurn);
+    },
+  );
+
+  it(
+    `${CODE_MARK} itself, with its follow-ups: refused before anything is written, the failure included`,
+    SLOW,
+    async () => {
+      // K-05 v1.13 answers it noTurn (item 66). Here every failure that carries followUps is refused with nothing
+      // written (default 19) until the task that writes follow-ups (T-1136) gives that refusal its answer: the card
+      // that builds each of the three gives its noTurn (item 66).
+      const fixture = exchangeOf(CODE_MARK);
+      await codeRowWritten();
+      await claimV113(codeClaimRequest());
+      const before = await everythingNow();
+      await expect(
+        markPartV12(runtime, structuredClone(fixture.request) as unknown as MarkPartV12Request),
+      ).rejects.toThrow("followUps");
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+});
+
+// ==== T-1354: K-05 v1.14 item 67, the safety claim of a danger line's own wake =========================================
+//
+// claimOutboxV114 (T-1352's rulings, DL-687, DL-698), on this file's schema and as rosie_job. With sendClass safety it
+// waits for the recipient's lock (the key every other claim only tries), reads, locks and counts only the recipient's
+// open safety rows, takes what it can claim in commit order and passes what it cannot; without the field it is
+// claimOutboxV113. Each answer is checked against data-access v1.14's claimOutbox.exchange with its request, whose
+// if/then holds a safety claim's rows to send class safety in v1.13's full form, with passedHeld empty.
+//
+// A v1.14 fixture's chain runs through the v1.2 calls (givenLatest). The rows its note lists, which no K-05 exchange
+// writes (each danger line's turn and row, and the ten routine notices), are written by commitTurn and writePlan for
+// real, from commit-alex-safety's and write-plan-alex-safety's requests with the note's ids and times. The walk's own
+// worlds are written as the tables' owner. A lock is held by an open transaction of the tables' owner on a connection
+// of its own, always ended in a finally block; which session waits on what is read from pg_stat_activity, kept to this
+// file's own database.
+
+const V114_ID = schemaId("data-access/data-access.v1.14.schema.json");
+/** K-05 v1.14's accepted claim exchanges: the five safety claims. */
+const V114_CLAIMS = INDEX.filter(
+  (entry) => entry.version === "v1.14" && entry.expect === "accept" && entry.def === "claimOutbox.exchange",
+).map((entry) => entry.file);
+/** Every accepted claim exchange of v1 to v1.13: a claim without sendClass answers each as before. */
+const EARLIER_CLAIMS = INDEX.filter(
+  (entry) => minorOf(entry.version) < 14 && entry.expect === "accept" && entry.def === "claimOutbox.exchange",
+).map((entry) => entry.file);
+/** The fixtures where an ordinary claim at the same moment stops before the danger line and takes nothing. */
+const STOPS_ORDINARY = new Set([
+  "claim-safety-past-live-safety-claim.json",
+  "claim-safety-past-routine-live-claim.json",
+  "claim-safety-past-planned-row.json",
+]);
+const ALEX_FIRST_LINE = "out-alex-safety-emergency";
+const SAFETY_TEXT = "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.";
+/** K-01's fixed line outage as arch 11 line 564 words it: row S's line (K-09 sendFixedLine, send class quick_reply). */
+const OUTAGE_TEXT = "Rosie is down for a few minutes. If anyone is in danger, call 911.";
+
+/** A danger line as a v1.14 fixture's note lists it: its turn, and its one safety row. */
+interface DangerLine {
+  readonly turnId: string;
+  readonly handleId: string;
+  readonly personId: string;
+  readonly eventId: string;
+  readonly traceId: string;
+  readonly rowId: string;
+  /** When its turn committed. */
+  readonly at: string;
+}
+
+/** `value` with each string equal to a key of `swaps` put as that key's value: a fixture's request with other ids. */
+function swapped<T>(value: T, swaps: Record<string, string>): T {
+  let text = JSON.stringify(value);
+  for (const [from, to] of Object.entries(swaps)) {
+    text = text.replaceAll(JSON.stringify(from), JSON.stringify(to));
+  }
+  return JSON.parse(text) as T;
+}
+
+/**
+ * Writes a danger line as the safety core writes it, for real: commit-alex-safety's request with the line's turn,
+ * handle, person, event, trace and row, committed at its time, then write-plan-alex-safety's request for its row, so
+ * the row is checked at version 2 with the fixed line safetyEmergency as its plan and final parts.
+ */
+async function dangerLineWritten(line: DangerLine): Promise<void> {
+  const commit = swapped(exchangeOf("commit-alex-safety.json").request, {
+    "turn-alex-safety-1": line.turnId,
+    "handle-alex": line.handleId,
+    "person-alex": line.personId,
+    "evt-alex-0050": line.eventId,
+    "trace-alex-0050": line.traceId,
+    [ALEX_FIRST_LINE]: line.rowId,
+  });
+  expect(
+    await commitTurn(runtime, commit as unknown as CommitTurnRequest, { now: new Date(line.at) }),
+  ).toMatchObject({ result: "committed", turnId: line.turnId, repeated: false });
+  const write = swapped(exchangeOf("write-plan-alex-safety.json").request, { [ALEX_FIRST_LINE]: line.rowId });
+  expect(await plan(write as unknown as WritePlanRequest)).toEqual({
+    result: "written",
+    outboxRowId: line.rowId,
+    version: 2,
+  });
+}
+
+/**
+ * claim-safety-past-ten-checked-rows's ten routine notices to Sam, for real: one turn committed at 14:50:00Z with the
+ * ten rows, then each row's plan (formats text, one line 'Notice N of 10.', role first) and final parts (one words send
+ * of those words), so each is checked at version 2.
+ */
+async function tenNoticesWritten(): Promise<void> {
+  const ids = Array.from({ length: 10 }, (_, n) => `out-sam-notice-${String(n + 1).padStart(2, "0")}`);
+  const commit: Json = {
+    turn: {
+      id: "turn-sam-notices-0070",
+      handleId: "handle-sam",
+      eventIds: ["evt-sam-0070"],
+      bundleId: { hash: BUNDLE_HASH, build: 1 },
+      traceId: "trace-sam-0070",
+      joinedTraceIds: [],
+      tries: 1,
+    },
+    versionsRead: [],
+    writes: {
+      state: [],
+      openQuestions: { open: [], close: [] },
+      clockRows: { make: [], cancel: [] },
+      outboxRows: ids.map((id) => ({
+        id,
+        recipientHandleId: "handle-sam",
+        recipientPersonId: "person-sam",
+        businessId: "biz-lees-barbershop",
+        bookingId: null,
+        channel: "imessage",
+        sendClass: "routine",
+        openQuestionId: null,
+        copyOfRowId: null,
+        versionsRead: [],
+      })),
+      reservations: { confirm: [], release: [] },
+      events: [],
+    },
+  };
+  expect(
+    await commitTurn(runtime, commit as unknown as CommitTurnRequest, {
+      now: new Date("2026-11-09T14:50:00Z"),
+    }),
+  ).toMatchObject({ result: "committed", turnId: "turn-sam-notices-0070", repeated: false });
+  for (const [index, id] of ids.entries()) {
+    const words = `Notice ${String(index + 1)} of 10.`;
+    const request: Json = {
+      outboxRowId: id,
+      expectVersion: 1,
+      plan: {
+        row: id,
+        channel: "imessage",
+        copyOf: null,
+        plan: {
+          formats: ["text"],
+          lines: [{ role: "first", text: words }],
+          question: null,
+          pageType: null,
+          threadReplyTo: null,
+        },
+      },
+      finalParts: {
+        row: id,
+        channel: "imessage",
+        sends: [{ kind: "words", text: words, calendarFile: "none", options: [], link: null }],
+        fixedLines: [],
+        slotValues: [],
+        threadReplyTo: null,
+      },
+    };
+    expect(await plan(request as unknown as WritePlanRequest)).toEqual({
+      result: "written",
+      outboxRowId: id,
+      version: 2,
+    });
+  }
+}
+
+/** The rows each v1.14 claim fixture's note lists, which its chain does not write. */
+const NOTED_ROWS = new Map<string, () => Promise<void>>([
+  [
+    "claim-safety-past-live-safety-claim.json",
+    () =>
+      dangerLineWritten({
+        turnId: "turn-alex-safety-0051",
+        handleId: "handle-alex",
+        personId: "person-alex",
+        eventId: "evt-alex-0051",
+        traceId: "trace-alex-0051",
+        rowId: "out-alex-safety-0051",
+        at: "2026-11-07T16:00:02Z",
+      }),
+  ],
+  [
+    "claim-safety-past-routine-live-claim.json",
+    () =>
+      dangerLineWritten({
+        turnId: "turn-sam-safety-0062",
+        handleId: "handle-sam",
+        personId: "person-sam",
+        eventId: "evt-sam-0062",
+        traceId: "trace-sam-0062",
+        rowId: "out-sam-safety-0062",
+        at: "2026-11-07T15:06:36Z",
+      }),
+  ],
+  [
+    "claim-safety-past-planned-row.json",
+    () =>
+      dangerLineWritten({
+        turnId: "turn-alex-safety-0052",
+        handleId: "handle-alex",
+        personId: "person-alex",
+        eventId: "evt-alex-0052",
+        traceId: "trace-alex-0052",
+        rowId: "out-alex-safety-0052",
+        at: "2026-11-07T15:06:31Z",
+      }),
+  ],
+  [
+    "claim-safety-past-held-row.json",
+    () =>
+      dangerLineWritten({
+        turnId: "turn-sam-safety-0063",
+        handleId: "handle-sam",
+        personId: "person-sam",
+        eventId: "evt-sam-0063",
+        traceId: "trace-sam-0063",
+        rowId: "out-sam-safety-0063",
+        at: "2026-11-08T01:31:00Z",
+      }),
+  ],
+  [
+    "claim-safety-past-ten-checked-rows.json",
+    async () => {
+      await tenNoticesWritten();
+      await dangerLineWritten({
+        turnId: "turn-sam-safety-0064",
+        handleId: "handle-sam",
+        personId: "person-sam",
+        eventId: "evt-sam-0064",
+        traceId: "trace-sam-0064",
+        rowId: "out-sam-safety-0064",
+        at: "2026-11-09T15:00:01Z",
+      });
+    },
+  ],
+]);
+
+/** A v1.14 claim fixture's world: its seeds and its chain through the v1.2 calls, then the rows its note lists. */
+async function givenSafety(file: string): Promise<Exchange> {
+  const noted = NOTED_ROWS.get(file);
+  if (noted === undefined) {
+    throw new Error(`${file}: no noted rows`);
+  }
+  const exchange = await givenLatest(file);
+  await noted();
+  return exchange;
+}
+
+/** A claim request with its outcome as one K-05 v1.14 exchange: Ajv's errors, none when it passes. */
+function v114ExchangeErrors(request: unknown, outcome: unknown): string[] {
+  const given: Given = { k04Seeds: [], after: [], now: "2026-11-07T16:00:00Z" };
+  return schemaErrors(V114_ID, "claimOutbox.exchange", { call: "claimOutbox", given, request, outcome });
+}
+
+/** claimOutboxV114's answer on `client`, checked as one v1.14 exchange with its request: its claimed answer. */
+async function claimV114(
+  request: ClaimOutboxV114Request,
+  client: Sql = runtime,
+): Promise<ClaimOutboxV113Response> {
+  const outcome = await claimOutboxV114(client, request);
+  expect(v114ExchangeErrors(request, outcome)).toEqual([]);
+  if ("error" in outcome) {
+    throw new Error(`claimOutboxV114 answered ${outcome.error}`);
+  }
+  return outcome;
+}
+
+/** claimOutboxV114's answer as an exchange of `version` states it: the fields later versions add left out. */
+function asClaimVersion(answer: unknown, version: string): unknown {
+  if (!isRecord(answer) || "error" in answer || minorOf(version) >= 13) {
+    return answer;
+  }
+  const claimed = (answer.claimed as Fields[]).map((row) => without(row, ["emailPurpose", "notAfter"]));
+  return asVersion("claimOutbox", { ...answer, claimed }, version);
+}
+
+/** Every row of a class other than safety, with its parts and its claim: equal before and after = untouched. */
+async function otherClassesNow(): Promise<unknown> {
+  const rows = await db.sql`
+    select id, state, version, held_until, plan, final_parts from outbox_rows
+    where send_class <> 'safety' order by id collate "C"
+  `;
+  const parts = await db.sql`
+    select p.* from outbox_parts p join outbox_rows r on r.id = p.outbox_row_id
+    where r.send_class <> 'safety' order by p.idempotency_key collate "C"
+  `;
+  const claims = await db.sql`
+    select c.* from outbox_claims c join outbox_rows r on r.id = c.outbox_row_id
+    where r.send_class <> 'safety' order by c.outbox_row_id collate "C"
+  `;
+  return { rows: [...rows], parts: [...parts], claims: [...claims] };
+}
+
+/** These rows, their parts and their claims as they stand. */
+async function rowsWithPartsNow(ids: readonly string[]): Promise<unknown> {
+  const list = [...ids];
+  const rows = await db.sql`
+    select id, state, version, held_until, plan, final_parts from outbox_rows
+    where id = any(${list}) order by id collate "C"
+  `;
+  const parts = await db.sql`
+    select * from outbox_parts where outbox_row_id = any(${list}) order by idempotency_key collate "C"
+  `;
+  const claims = await db.sql`
+    select * from outbox_claims where outbox_row_id = any(${list}) order by outbox_row_id collate "C"
+  `;
+  return { rows: [...rows], parts: [...parts], claims: [...claims] };
+}
+
+/** A stand-in for the client that records each statement a call tries to send, and sends none. */
+function noStatements(sent: unknown[]): Sql {
+  return ((...statement: unknown[]) => {
+    sent.push(statement);
+    throw new Error("a statement was sent");
+  }) as unknown as Sql;
+}
+
+/** One row of a world written as the tables' owner, to one recipient, in commit order. */
+interface WorldRow {
+  readonly id: string;
+  readonly sendClass: "routine" | "quick_reply" | "visit_now" | "safety";
+  readonly state: string;
+  readonly version: number;
+  readonly heldUntil?: string;
+  /** No plan or final parts yet: a planned or stale row. */
+  readonly unplanned?: true;
+  /** Final parts with no send, which no claim can hand out (outbox.ts default 5). */
+  readonly noSends?: true;
+  /** The fixed line its one words send is (its words), or none: a composed row's own words. */
+  readonly fixedLine?: { readonly id: string; readonly text: string };
+  /** Its part 1, try 1. */
+  readonly part?: { readonly state: string; readonly attempts: number; readonly errorCode?: string };
+  /** Its outbox_claims row, claim 1. */
+  readonly claim?: {
+    readonly claimer: string;
+    readonly claimedAt: string;
+    readonly lapsesAt: string;
+    readonly firstTryAt: string | null;
+  };
+}
+
+/** Writes `rows` to one recipient, in their order, under one turn of theirs, as the tables' owner. */
+async function rowsWritten(
+  recipient: { handleId: string; personId: string },
+  rows: readonly WorldRow[],
+): Promise<void> {
+  await reset();
+  await loadSeeds(["seed-bundle-registry.json", "seed-person-roles.json"]);
+  await db.sql.begin(async (tx) => {
+    await insertRow(tx, "turns", {
+      id: "turn-t1354",
+      handle_id: recipient.handleId,
+      event_ids: ["evt-t1354-1"],
+      state: "committed",
+      bundle_hash: BUNDLE_HASH,
+      bundle_build: 1,
+      trace_id: "trace-t1354",
+      committed_at: "2026-11-07T15:59:00Z",
+    });
+    for (const row of rows) {
+      const send: Json =
+        row.fixedLine === undefined
+          ? WORDS
+          : { ...(WORDS as Record<string, Json>), text: row.fixedLine.text };
+      const unplanned = row.unplanned === true;
+      await insertRow(tx, "outbox_rows", {
+        id: row.id,
+        turn_id: "turn-t1354",
+        recipient_handle_id: recipient.handleId,
+        recipient_person_id: recipient.personId,
+        business_id: "biz-lees-barbershop",
+        channel: "imessage",
+        send_class: row.sendClass,
+        versions_read: [],
+        plan: unplanned ? null : { row: row.id, channel: "imessage", copyOf: null, plan: PLAN_BODY },
+        final_parts: unplanned
+          ? null
+          : {
+              row: row.id,
+              channel: "imessage",
+              sends: row.noSends === true ? [] : [send],
+              fixedLines: row.fixedLine === undefined ? [] : [row.fixedLine.id],
+              slotValues: [],
+              threadReplyTo: null,
+            },
+        state: row.state,
+        held_until: row.heldUntil ?? null,
+        version: row.version,
+        bundle_hash: BUNDLE_HASH,
+        bundle_build: 1,
+        trace_id: "trace-t1354",
+      });
+      if (row.part !== undefined) {
+        const failed = row.part.state === "failed";
+        await insertRow(tx, "outbox_parts", {
+          outbox_row_id: row.id,
+          part_no: 1,
+          try_no: 1,
+          idempotency_key: `${row.id}/1/1`,
+          attempts: row.part.attempts,
+          kind: "words",
+          state: row.part.state,
+          failed_at: failed ? "2026-11-09T15:00:02Z" : null,
+          error_code: row.part.errorCode ?? null,
+        });
+      }
+      if (row.claim !== undefined) {
+        await insertRow(tx, "outbox_claims", {
+          outbox_row_id: row.id,
+          claimer: row.claim.claimer,
+          claimed_at: row.claim.claimedAt,
+          lapses_at: row.claim.lapsesAt,
+          claim_no: 1,
+          first_try_at: row.claim.firstTryAt,
+        });
+      }
+    }
+  });
+}
+
+/** An open transaction of the tables' owner on a connection of its own, holding what `take` takes until `end`. */
+async function holding(take: (tx: Sql) => Promise<void>): Promise<() => Promise<void>> {
+  const reserved = await db.sql.reserve();
+  try {
+    await reserved.unsafe("begin");
+    await take(reserved);
+  } catch (error) {
+    await reserved.unsafe("rollback");
+    reserved.release();
+    throw error;
+  }
+  return async () => {
+    try {
+      await reserved.unsafe("commit");
+    } finally {
+      reserved.release();
+    }
+  };
+}
+
+/** The text a recipient's claim lock is keyed on (outbox.ts default 10; K-05 v1.14 item 67.1). */
+const lockKeyOf = (handleId: string): string => `outbox-recipient:${handleId}`;
+
+/** Whether a session of this database whose application is `application` waits on a lock (of `event`, if named). */
+async function waitingOnLock(application: string, event: string | null): Promise<boolean> {
+  const sessions = await db.sql<{ wait_event: string | null }[]>`
+    select wait_event from pg_stat_activity
+    where datname = current_database() and application_name = ${application} and wait_event_type = 'Lock'
+  `;
+  return sessions.some((session) => event === null || session.wait_event === event);
+}
+
+/** A call in flight, its answer awaited later, and when it settled (null while it is in flight). */
+interface InFlight<T> {
+  readonly done: Promise<T>;
+  settledAt(): number | null;
+}
+
+function inFlight<T>(call: Promise<T>): InFlight<T> {
+  let at: number | null = null;
+  const done = call.finally(() => {
+    at = Date.now();
+  });
+  // Handled here so a refusal waits for the test's own await, which throws it.
+  void done.catch(() => undefined);
+  return { done, settledAt: () => at };
+}
+
+/** One statement a client sent: its text and its parameters, as postgres.js's debug hook gives them. */
+interface Statement {
+  readonly query: string;
+  readonly parameters: readonly unknown[];
+}
+
+let ordinaryClaims: Sql;
+let safetyClaims: Sql;
+let recorder: Sql;
+let recording: Statement[] | null = null;
+const ORDINARY_APP = "rosie-t1354-ordinary";
+const SAFETY_APP = "rosie-t1354-safety";
+
+describe("claimOutboxV114 with sendClass safety (K-05 v1.14 item 67; T-1354)", () => {
+  beforeAll(() => {
+    const runtimeConnection = (application: string) => ({
+      application_name: application,
+      search_path: `${db.schema}, public`,
+      role: RUNTIME_ROLE,
+    });
+    ordinaryClaims = db.connect({
+      max: 2,
+      onnotice: () => undefined,
+      connection: runtimeConnection(ORDINARY_APP),
+    });
+    // One connection, so a read after a claim reads the session the claim ran on.
+    safetyClaims = db.connect({
+      max: 1,
+      onnotice: () => undefined,
+      connection: runtimeConnection(SAFETY_APP),
+    });
+    recorder = db.connect({
+      max: 1,
+      onnotice: () => undefined,
+      debug: (_connection: number, query: string, parameters: unknown[]) => {
+        recording?.push({ query, parameters: [...parameters] });
+      },
+      connection: runtimeConnection("rosie-t1354-recorder"),
+    });
+  });
+
+  afterAll(async () => {
+    await ordinaryClaims.end({ timeout: 5 });
+    await safetyClaims.end({ timeout: 5 });
+    await recorder.end({ timeout: 5 });
+  });
+
+  describe("K-05 v1.14's claim fixtures: each request gives its outcome", () => {
+    it("covers the five accepted v1.14 claim exchanges, each with the rows its note lists", () => {
+      expect(V114_CLAIMS).toHaveLength(5);
+      expect([...NOTED_ROWS.keys()].sort()).toEqual([...V114_CLAIMS].sort());
+    });
+
+    for (const file of V114_CLAIMS) {
+      it(file, SLOW, async () => {
+        expect(fixtureVersion(file)).toBe("v1.14");
+        const exchange = await givenSafety(file);
+        const request = structuredClone(exchange.request) as unknown as ClaimOutboxV114Request;
+        if (STOPS_ORDINARY.has(file)) {
+          // An ordinary claim at the same moment stops before the danger line and takes nothing (items 3 and 13).
+          const before = await everythingNow();
+          const ordinary = without(exchange.request, ["sendClass"]) as unknown as ClaimOutboxRequest;
+          expect(await claimV113(ordinary)).toEqual({ result: "claimed", claimed: [], passedHeld: [] });
+          expect(await everythingNow()).toEqual(before);
+        }
+        const others = await otherClassesNow();
+        const answer = await claimV114(request);
+        expect(answer).toEqual(exchange.outcome);
+        expect(schemaErrors(V114_ID, "claimOutbox.exchange", { ...exchange, outcome: answer })).toEqual([]);
+        // Not a row of another class moved, nor its parts or its claim.
+        expect(await otherClassesNow()).toEqual(others);
+      });
+    }
+  });
+
+  describe("refusals: before any statement, with nothing written", () => {
+    const refusedExchange = (file: string): Exchange =>
+      readJson(new URL(`invalid/${file}`, ACCESS_DIR)) as Exchange;
+
+    for (const [file, twin, mend] of [
+      [
+        "refuse-claim-safety-no-recipient.json",
+        "claim-safety-past-live-safety-claim.json",
+        { recipientHandleId: "handle-alex" },
+      ],
+      [
+        "refuse-claim-safety-other-class.json",
+        "claim-safety-past-routine-live-claim.json",
+        { sendClass: "safety" },
+      ],
+    ] as const) {
+      it(`${file}: refused before any statement; put right, it is ${twin}'s request`, SLOW, async () => {
+        const refused = refusedExchange(file);
+        expect(schemaErrors(V114_ID, "claimOutbox.request", refused.request)).not.toEqual([]);
+        const exchange = await givenSafety(twin);
+        const mended: Fields = { ...refused.request, ...mend };
+        expect(mended).toEqual(exchange.request);
+        const request = refused.request as unknown as ClaimOutboxV114Request;
+        const sent: unknown[] = [];
+        await expect(claimOutboxV114(noStatements(sent), request)).rejects.toThrow(TypeError);
+        expect(sent).toEqual([]);
+        const before = await everythingNow();
+        await expect(claimOutboxV114(runtime, request)).rejects.toThrow(TypeError);
+        expect(await everythingNow()).toEqual(before);
+        expect(await claimV114(mended as unknown as ClaimOutboxV114Request)).toEqual(exchange.outcome);
+      });
+    }
+
+    it(
+      "any other value of sendClass, sendClass with no recipient, and a field v1.14 does not name: each refused " +
+        "before any statement",
+      SLOW,
+      async () => {
+        const { request: base } = await givenSafety("claim-safety-past-live-safety-claim.json");
+        const wrong: Fields[] = [
+          ...["routine", "quick_reply", "visit_now", "Safety", "safety ", ""].map((sendClass) => ({
+            ...base,
+            sendClass,
+          })),
+          { ...base, sendClass: null },
+          { ...base, sendClass: true },
+          { ...base, sendClass: ["safety"] },
+          without(base, ["recipientHandleId"]),
+          { ...base, recipientHandleId: null },
+          { ...base, recipientHandleId: "" },
+          { ...base, limit: 0 },
+          { ...base, limit: 101 },
+          { ...base, now: "2026-11-07 16:00:03" },
+          { ...base, passedHeld: [] },
+          without({ ...base, sendClasses: ["safety"] }, ["sendClass"]),
+        ];
+        const before = await everythingNow();
+        for (const request of wrong) {
+          const sent: unknown[] = [];
+          await expect(
+            claimOutboxV114(noStatements(sent), request as unknown as ClaimOutboxV114Request),
+            JSON.stringify(request),
+          ).rejects.toThrow(TypeError);
+          expect(sent, JSON.stringify(request)).toEqual([]);
+        }
+        expect(await everythingNow()).toEqual(before);
+      },
+    );
+
+    it(
+      "claimOutboxV12 and claimOutboxV113 keep refusing sendClass before any statement, so a store bound to either " +
+        "never claims every class in its place (DL-698 note c)",
+      SLOW,
+      async () => {
+        const exchange = await givenSafety("claim-safety-past-live-safety-claim.json");
+        const request = exchange.request as unknown as ClaimOutboxRequest;
+        const before = await everythingNow();
+        for (const call of [claimOutboxV12, claimOutboxV113]) {
+          const sent: unknown[] = [];
+          await expect(call(noStatements(sent), request)).rejects.toThrow(TypeError);
+          expect(sent).toEqual([]);
+          await expect(call(runtime, request)).rejects.toThrow(TypeError);
+        }
+        expect(await everythingNow()).toEqual(before);
+      },
+    );
+
+    it(
+      "refuse-safety-claim-takes-routine-row.json: the claim never takes the routine notice; put right, it is " +
+        "claim-safety-past-ten-checked-rows's outcome, which the claim gives",
+      SLOW,
+      async () => {
+        const refused = refusedExchange("refuse-safety-claim-takes-routine-row.json");
+        expect(schemaErrors(V114_ID, "claimOutbox.exchange", refused)).not.toEqual([]);
+        const exchange = await givenSafety("claim-safety-past-ten-checked-rows.json");
+        expect(refused.request).toEqual(exchange.request);
+        const claimed = (refused.outcome.claimed as Fields[]).filter((row) => row.sendClass === "safety");
+        expect({ ...refused.outcome, claimed }).toEqual(exchange.outcome);
+        expect(await claimV114(refused.request as unknown as ClaimOutboxV114Request)).toEqual(
+          exchange.outcome,
+        );
+        expect(await rowNow("out-sam-notice-01")).toEqual({ state: "checked", version: 2, held_until: null });
+        expect(await claimNow("out-sam-notice-01")).toBeUndefined();
+        // An ordinary claim with the same limit takes the ten notices, in commit order, and stops at its limit.
+        const ordinary = await claimV113({
+          claimer: "dispatcher-1",
+          recipientHandleId: "handle-sam",
+          now: "2026-11-09T15:00:02Z",
+          limit: 10,
+        });
+        expect(ordinary.claimed.map((row) => row.outboxRowId)).toEqual(
+          Array.from({ length: 10 }, (_, n) => `out-sam-notice-${String(n + 1).padStart(2, "0")}`),
+        );
+      },
+    );
+
+    it(
+      "refuse-safety-claim-lists-held-row.json: the claim lists no held row; put right, it is " +
+        "claim-safety-past-held-row's outcome, which the claim gives, the held row as it was",
+      SLOW,
+      async () => {
+        const refused = refusedExchange("refuse-safety-claim-lists-held-row.json");
+        expect(schemaErrors(V114_ID, "claimOutbox.exchange", refused)).not.toEqual([]);
+        const exchange = await givenSafety("claim-safety-past-held-row.json");
+        expect(refused.request).toEqual(exchange.request);
+        expect({ ...refused.outcome, passedHeld: [] }).toEqual(exchange.outcome);
+        const held = await rowsWithPartsNow(["out-sam-passon-evening"]);
+        expect(await claimV114(refused.request as unknown as ClaimOutboxV114Request)).toEqual(
+          exchange.outcome,
+        );
+        expect(await rowsWithPartsNow(["out-sam-passon-evening"])).toEqual(held);
+        expect(await rowNow("out-sam-passon-evening")).toMatchObject({ state: "held" });
+      },
+    );
+  });
+
+  describe("the walk among the recipient's safety rows: claimed in commit order, or passed", () => {
+    const WALK_NOW = "2026-11-09T15:05:00Z";
+    const ALEX = { handleId: "handle-alex", personId: "person-alex" };
+    const PENDING = { state: "pending", attempts: 1 };
+    const LAPSED = {
+      claimer: "dispatcher-dead",
+      claimedAt: "2026-11-09T15:00:00Z",
+      lapsesAt: "2026-11-09T15:01:00Z",
+      firstTryAt: "2026-11-09T15:00:01Z",
+    };
+    const LIVE = {
+      claimer: "dispatcher-alive",
+      claimedAt: "2026-11-09T15:04:30Z",
+      lapsesAt: "2026-11-09T15:05:30Z",
+      firstTryAt: "2026-11-09T15:04:31Z",
+    };
+    /** Alex's rows in commit order: safety rows in every state a walk meets, between rows of the other classes. */
+    const WALK: readonly WorldRow[] = [
+      { id: "out-walk-s01", sendClass: "safety", state: "sending", version: 3, part: PENDING, claim: LAPSED },
+      { id: "out-walk-r01", sendClass: "routine", state: "checked", version: 2 },
+      { id: "out-walk-s02", sendClass: "safety", state: "sending", version: 3, part: PENDING, claim: LIVE },
+      {
+        id: "out-walk-q01",
+        sendClass: "quick_reply",
+        state: "sending",
+        version: 3,
+        part: PENDING,
+        claim: LIVE,
+      },
+      { id: "out-walk-s03", sendClass: "safety", state: "checked", version: 2 },
+      { id: "out-walk-s04", sendClass: "safety", state: "planned", version: 1, unplanned: true },
+      { id: "out-walk-s05", sendClass: "safety", state: "sending", version: 3, part: PENDING },
+      {
+        id: "out-walk-v01",
+        sendClass: "visit_now",
+        state: "held",
+        version: 4,
+        heldUntil: "2026-11-09T16:00:00Z",
+        part: PENDING,
+        claim: LAPSED,
+      },
+      {
+        id: "out-walk-s06",
+        sendClass: "safety",
+        state: "held",
+        version: 4,
+        heldUntil: "2026-11-09T15:00:00Z",
+        part: PENDING,
+        claim: LAPSED,
+      },
+      {
+        id: "out-walk-s07",
+        sendClass: "safety",
+        state: "held",
+        version: 4,
+        heldUntil: "2026-11-09T16:00:00Z",
+        part: PENDING,
+        claim: LAPSED,
+      },
+      { id: "out-walk-s08", sendClass: "safety", state: "waiting_chat", version: 4, part: PENDING },
+      {
+        id: "out-walk-s09",
+        sendClass: "safety",
+        state: "stale",
+        version: 4,
+        unplanned: true,
+        part: PENDING,
+        claim: LAPSED,
+      },
+      {
+        id: "out-walk-s10",
+        sendClass: "safety",
+        state: "sending",
+        version: 4,
+        part: { state: "failed", attempts: 1, errorCode: "4006" },
+        claim: LAPSED,
+      },
+      { id: "out-walk-s11", sendClass: "safety", state: "checked", version: 2, noSends: true },
+      { id: "out-walk-s12", sendClass: "safety", state: "checked", version: 2 },
+      { id: "out-walk-r02", sendClass: "routine", state: "checked", version: 2 },
+    ];
+    /** The safety rows the walk passes: a live claim, planned, held ahead, waiting, stale, failed with no next try, no sends. */
+    const PASSED = [
+      "out-walk-s02",
+      "out-walk-s04",
+      "out-walk-s07",
+      "out-walk-s08",
+      "out-walk-s09",
+      "out-walk-s10",
+      "out-walk-s11",
+    ];
+    const request = (limit: number): ClaimOutboxV114Request => ({
+      claimer: "dispatcher-2",
+      recipientHandleId: "handle-alex",
+      now: WALK_NOW,
+      limit,
+      sendClass: "safety",
+    });
+    const part = (rowId: string, attempts: number) => [
+      { partNo: 1, tryNo: 1, idempotencyKey: `${rowId}/1/1`, attempts, sent: false },
+    ];
+
+    it(
+      "takes the checked, lapsed, unclaimed and due held safety rows in commit order, and passes a live claim, a " +
+        "planned, held-ahead, waiting, stale or failed row and one it cannot take, writing nothing for them",
+      SLOW,
+      async () => {
+        await rowsWritten(ALEX, WALK);
+        const before = { others: await otherClassesNow(), passed: await rowsWithPartsNow(PASSED) };
+        const answer = await claimV114(request(10));
+        expect(answer.passedHeld).toEqual([]);
+        expect(
+          answer.claimed.map((row) => [
+            row.outboxRowId,
+            row.claimedFrom,
+            row.claim.claimNo,
+            row.version,
+            row.parts,
+          ]),
+        ).toEqual([
+          ["out-walk-s01", "sending", 2, 4, part("out-walk-s01", 2)],
+          ["out-walk-s03", "checked", 1, 3, part("out-walk-s03", 1)],
+          ["out-walk-s05", "sending", 1, 4, part("out-walk-s05", 2)],
+          ["out-walk-s06", "held", 2, 5, part("out-walk-s06", 2)],
+          ["out-walk-s12", "checked", 1, 3, part("out-walk-s12", 1)],
+        ]);
+        // Commit order, each a safety row, each claimed now by this claimer; a claim taken over keeps its first try.
+        const seqs = answer.claimed.map((row) => row.commitSeq);
+        expect(seqs).toEqual([...seqs].sort((a, b) => a - b));
+        expect(answer.claimed.every((row) => row.sendClass === "safety")).toBe(true);
+        expect(
+          answer.claimed.map((row) => [row.claim.claimer, row.claim.claimedAt, row.claim.lapsesAt]),
+        ).toEqual(answer.claimed.map(() => ["dispatcher-2", WALK_NOW, "2026-11-09T15:06:00Z"]));
+        expect(answer.claimed.map((row) => row.claim.firstTryAt)).toEqual([
+          LAPSED.firstTryAt,
+          null,
+          null,
+          LAPSED.firstTryAt,
+          null,
+        ]);
+        expect({ others: await otherClassesNow(), passed: await rowsWithPartsNow(PASSED) }).toEqual(before);
+        expect(await rowNow("out-walk-s01")).toEqual({ state: "sending", version: 4, held_until: null });
+        expect(await rowNow("out-walk-s06")).toMatchObject({ state: "sending", version: 5 });
+        // An ordinary claim that meets a safety row the safety claim holds stops there (item 67, as item 13 says).
+        expect(
+          await claimV113({
+            claimer: "dispatcher-3",
+            recipientHandleId: "handle-alex",
+            now: WALK_NOW,
+            limit: 10,
+          }),
+        ).toEqual({ result: "claimed", claimed: [], passedHeld: [] });
+      },
+    );
+
+    it(
+      "counts only safety rows toward limit: with limit 3 it takes the first three it can claim",
+      SLOW,
+      async () => {
+        await rowsWritten(ALEX, WALK);
+        const rest = [...PASSED, "out-walk-s06", "out-walk-s12"];
+        const before = { others: await otherClassesNow(), rest: await rowsWithPartsNow(rest) };
+        const answer = await claimV114(request(3));
+        expect(answer.claimed.map((row) => row.outboxRowId)).toEqual([
+          "out-walk-s01",
+          "out-walk-s03",
+          "out-walk-s05",
+        ]);
+        expect({ others: await otherClassesNow(), rest: await rowsWithPartsNow(rest) }).toEqual(before);
+        // limit 1: the first alone; and a claim with nothing left to take answers an empty list (item 67.4).
+        expect((await claimV114(request(1))).claimed.map((row) => row.outboxRowId)).toEqual(["out-walk-s06"]);
+        expect((await claimV114(request(10))).claimed.map((row) => row.outboxRowId)).toEqual([
+          "out-walk-s12",
+        ]);
+        expect(await claimV114(request(10))).toEqual({ result: "claimed", claimed: [], passedHeld: [] });
+      },
+    );
+  });
+
+  describe("row S's case: the outage line's live claim ahead of a danger line (DL-698)", () => {
+    const S_NOW = "2026-11-07T16:00:03Z";
+    const S_ROW = "out-alex-outage-s";
+    const D_ROW = "out-alex-danger-d";
+
+    it(
+      "a quick-reply outage row under a live claim, ahead of a safety row, is passed and never read or locked by " +
+        "the safety claim, which takes the safety row",
+      SLOW,
+      async () => {
+        await rowsWritten({ handleId: "handle-alex", personId: "person-alex" }, [
+          {
+            id: S_ROW,
+            sendClass: "quick_reply",
+            state: "sending",
+            version: 3,
+            fixedLine: { id: "outage", text: OUTAGE_TEXT },
+            part: { state: "pending", attempts: 1 },
+            claim: {
+              claimer: "dispatcher-1",
+              claimedAt: "2026-11-07T16:00:00Z",
+              lapsesAt: "2026-11-07T16:01:00Z",
+              firstTryAt: "2026-11-07T16:00:00Z",
+            },
+          },
+          {
+            id: D_ROW,
+            sendClass: "safety",
+            state: "checked",
+            version: 2,
+            fixedLine: { id: "safetyEmergency", text: SAFETY_TEXT },
+          },
+        ]);
+        const rowS = await rowsWithPartsNow([S_ROW]);
+        // An ordinary claim stops at row S and takes nothing, writing nothing (items 3 and 13).
+        const before = await everythingNow();
+        expect(
+          await claimV113({
+            claimer: "dispatcher-3",
+            recipientHandleId: "handle-alex",
+            now: S_NOW,
+            limit: 10,
+          }),
+        ).toEqual({ result: "claimed", claimed: [], passedHeld: [] });
+        expect(await everythingNow()).toEqual(before);
+
+        // R1's run holds row S, its claim and its part locked, as its renewal or its mark does while it runs. A walk
+        // that read row S FOR UPDATE would wait here, and its bound would answer transient.
+        const end = await holding(async (tx) => {
+          await tx`select id from outbox_rows where id = ${S_ROW} for update`;
+          await tx`select outbox_row_id from outbox_claims where outbox_row_id = ${S_ROW} for update`;
+          await tx`select idempotency_key from outbox_parts where outbox_row_id = ${S_ROW} for update`;
+        });
+        const sent: Statement[] = [];
+        let answer: ClaimOutboxV113Response;
+        let elapsed: number;
+        try {
+          recording = sent;
+          const started = Date.now();
+          answer = await claimV114(
+            {
+              claimer: "dispatcher-2",
+              recipientHandleId: "handle-alex",
+              now: S_NOW,
+              limit: 10,
+              sendClass: "safety",
+            },
+            recorder,
+          );
+          elapsed = Date.now() - started;
+        } finally {
+          recording = null;
+          await end();
+        }
+        expect(answer.claimed.map((row) => [row.outboxRowId, row.sendClass, row.claimedFrom])).toEqual([
+          [D_ROW, "safety", "checked"],
+        ]);
+        expect(answer.passedHeld).toEqual([]);
+        expect(elapsed).toBeLessThan(SAFETY_LOCK_TIMEOUT_MS);
+        expect(await rowsWithPartsNow([S_ROW])).toEqual(rowS);
+        // No statement the claim sent names row S; its one read of outbox rows asks for send class safety alone.
+        expect(sent.length).toBeGreaterThan(0);
+        expect(JSON.stringify(sent)).not.toContain(S_ROW);
+        const reads = sent.filter((statement) => /from outbox_rows\b[\s\S]*for update/.test(statement.query));
+        expect(reads).toHaveLength(1);
+        expect(reads[0]?.query).toMatch(/send_class = \$\d+/);
+        expect(reads[0]?.parameters).toContain("safety");
+      },
+    );
+  });
+
+  describe("the recipient's lock: waited for within its bound, never skipped", () => {
+    const NOW = "2026-11-07T16:00:03Z";
+    const SAM = { handleId: "handle-sam", personId: "person-sam" };
+
+    it(
+      "waits out the recipient's lock held by an open ordinary claim, then takes the safety row the ordinary walk " +
+        "stopped before; an ordinary claim meanwhile skips the recipient",
+      SLOW,
+      async () => {
+        await rowsWritten(SAM, [
+          { id: "out-sam-notice-r", sendClass: "routine", state: "checked", version: 2 },
+          {
+            id: "out-sam-outage-s",
+            sendClass: "quick_reply",
+            state: "sending",
+            version: 3,
+            fixedLine: { id: "outage", text: OUTAGE_TEXT },
+            part: { state: "pending", attempts: 1 },
+            claim: {
+              claimer: "dispatcher-0",
+              claimedAt: "2026-11-07T16:00:00Z",
+              lapsesAt: "2026-11-07T16:01:00Z",
+              firstTryAt: "2026-11-07T16:00:00Z",
+            },
+          },
+          {
+            id: "out-sam-danger-d",
+            sendClass: "safety",
+            state: "checked",
+            version: 2,
+            fixedLine: { id: "safetyEmergency", text: SAFETY_TEXT },
+          },
+        ]);
+        const safetyRequest: ClaimOutboxV114Request = {
+          claimer: "dispatcher-2",
+          recipientHandleId: "handle-sam",
+          now: NOW,
+          limit: 10,
+          sendClass: "safety",
+        };
+        // A send in flight holds the routine notice's row; an ordinary claim then takes Sam's lock and waits in its
+        // walk's read, an open ordinary claim holding the recipient's lock.
+        const end = await holding(async (tx) => {
+          await tx`select id from outbox_rows where id = 'out-sam-notice-r' for update`;
+        });
+        let ordinary: InFlight<ClaimOutboxV113Outcome>;
+        let safety: InFlight<ClaimOutboxV113Outcome>;
+        try {
+          ordinary = inFlight(
+            claimOutboxV113(ordinaryClaims, {
+              claimer: "dispatcher-1",
+              recipientHandleId: "handle-sam",
+              now: NOW,
+              limit: 10,
+            }),
+          );
+          await until(() => waitingOnLock(ORDINARY_APP, null), "the ordinary claim waiting in its walk");
+          safety = inFlight(claimOutboxV114(safetyClaims, safetyRequest));
+          await until(
+            () => waitingOnLock(SAFETY_APP, "advisory"),
+            "the safety claim waiting for the recipient's lock",
+          );
+          // A third claim, an ordinary one, skips the recipient whose lock is held (default 10), writing nothing.
+          expect(
+            await claimV113({
+              claimer: "dispatcher-3",
+              recipientHandleId: "handle-sam",
+              now: NOW,
+              limit: 10,
+            }),
+          ).toEqual({ result: "claimed", claimed: [], passedHeld: [] });
+          expect(safety.settledAt()).toBeNull();
+        } finally {
+          await end();
+        }
+        const ordinaryAnswer = await ordinary.done;
+        const safetyAnswer = await safety.done;
+        // The ordinary walk took the notice and stopped at row S's live claim; the safety claim then took the danger line.
+        expect(ordinaryAnswer).toMatchObject({ result: "claimed", passedHeld: [] });
+        expect("claimed" in ordinaryAnswer && ordinaryAnswer.claimed.map((row) => row.outboxRowId)).toEqual([
+          "out-sam-notice-r",
+        ]);
+        expect(v114ExchangeErrors(safetyRequest, safetyAnswer)).toEqual([]);
+        expect("claimed" in safetyAnswer && safetyAnswer.claimed.map((row) => row.outboxRowId)).toEqual([
+          "out-sam-danger-d",
+        ]);
+        expect(safety.settledAt() ?? 0).toBeGreaterThanOrEqual(
+          ordinary.settledAt() ?? Number.MAX_SAFE_INTEGER,
+        );
+        expect(await claimNow("out-sam-danger-d")).toMatchObject({ claimer: "dispatcher-2", claim_no: 1 });
+        expect(await claimNow("out-sam-notice-r")).toMatchObject({ claimer: "dispatcher-1", claim_no: 1 });
+      },
+    );
+
+    it(
+      "a holder that keeps the key past the bound: the claim answers transient (55P03) within it, writes nothing, " +
+        "leaves its connection with no bound, and the next try claims",
+      SLOW,
+      async () => {
+        expect(SAFETY_LOCK_TIMEOUT_MS).toBeLessThanOrEqual(2_000);
+        const exchange = await givenSafety("claim-safety-past-live-safety-claim.json");
+        const request = structuredClone(exchange.request) as unknown as ClaimOutboxV114Request;
+        const [setting] = await safetyClaims<
+          { value: string }[]
+        >`select current_setting('lock_timeout') as value`;
+        const before = await everythingNow();
+        // The key taken as an ordinary claim takes it (outbox.ts default 10), and held.
+        const end = await holding(async (tx) => {
+          const [lock] = await tx<{ taken: boolean }[]>`
+            select pg_try_advisory_xact_lock(hashtextextended(${lockKeyOf("handle-alex")}, 0)) as taken
+          `;
+          expect(lock?.taken).toBe(true);
+        });
+        let answer: ClaimOutboxV113Outcome;
+        let elapsed: number;
+        try {
+          const started = Date.now();
+          answer = await claimOutboxV114(safetyClaims, request);
+          elapsed = Date.now() - started;
+        } finally {
+          await end();
+        }
+        expect(answer).toEqual({ error: "transient", sqlstate: "55P03" });
+        expect(v114ExchangeErrors(request, answer)).toEqual([]);
+        expect(elapsed).toBeGreaterThanOrEqual(SAFETY_LOCK_TIMEOUT_MS);
+        expect(elapsed).toBeLessThan(SAFETY_LOCK_TIMEOUT_MS + 2_500);
+        expect(await everythingNow()).toEqual(before);
+        const [after] = await safetyClaims<
+          { value: string }[]
+        >`select current_setting('lock_timeout') as value`;
+        expect(after?.value).toBe(setting?.value);
+        // The holder gone, the next try claims the line as the fixture says.
+        expect(await claimV114(request, safetyClaims)).toEqual(exchange.outcome);
+      },
+    );
+
+    it(
+      "55P03 is transient for the safety claim alone: an ordinary claim that meets it throws it scrubbed, as before",
+      SLOW,
+      async () => {
+        await givenSafety("claim-safety-past-planned-row.json");
+        const bounded = db.connect({
+          max: 1,
+          onnotice: () => undefined,
+          connection: {
+            application_name: "rosie-t1354-bounded",
+            search_path: `${db.schema}, public`,
+            role: RUNTIME_ROLE,
+            lock_timeout: 300,
+          },
+        });
+        const end = await holding(async (tx) => {
+          await tx`select id from outbox_rows where id = 'out-alex-booked-riley' for update`;
+        });
+        let failure: unknown;
+        try {
+          failure = await claimOutboxV113(bounded, {
+            claimer: "dispatcher-1",
+            recipientHandleId: "handle-alex",
+            now: "2026-11-07T15:06:32Z",
+            limit: 10,
+          }).then(
+            () => null,
+            (error: unknown) => error,
+          );
+        } finally {
+          await end();
+          await bounded.end({ timeout: 5 });
+        }
+        expect(failure).toBeInstanceOf(DataAccessDatabaseError);
+        expect(failure).toMatchObject({ call: "claimOutbox", code: "55P03", table: null, constraint: null });
+      },
+    );
+  });
+
+  describe("parallel claims: one row to one claim", () => {
+    it(
+      "two safety claims at one moment: the line goes to one of them, and the other passes its live claim",
+      SLOW,
+      async () => {
+        const exchange = await givenSafety("claim-safety-past-live-safety-claim.json");
+        const request = exchange.request as unknown as ClaimOutboxV114Request;
+        const answers = await Promise.all(
+          ["dispatcher-2", "dispatcher-3"].map((claimer) => claimV114({ ...request, claimer })),
+        );
+        const claimed = answers.flatMap((answer) => answer.claimed);
+        expect(claimed.map((row) => row.outboxRowId)).toEqual(["out-alex-safety-0051"]);
+        expect(answers.filter((answer) => answer.claimed.length === 0)).toHaveLength(1);
+        expect(await claimNow("out-alex-safety-0051")).toMatchObject({
+          claimer: claimed[0]?.claim.claimer,
+          claim_no: 1,
+        });
+      },
+    );
+
+    it("a safety claim and an ordinary claim at one moment never both hold the line", SLOW, async () => {
+      const exchange = await givenSafety("claim-safety-past-held-row.json");
+      const request = exchange.request as unknown as ClaimOutboxV114Request;
+      const ordinaryRequest = { ...without(exchange.request, ["sendClass"]), claimer: "dispatcher-3" };
+      const [safe, ordinary] = await Promise.all([
+        claimV114(request),
+        claimV113(ordinaryRequest as unknown as ClaimOutboxRequest),
+      ]);
+      const holders = [...safe.claimed, ...ordinary.claimed].filter(
+        (row) => row.outboxRowId === "out-sam-safety-0063",
+      );
+      expect(holders).toHaveLength(1);
+      expect(await claimNow("out-sam-safety-0063")).toMatchObject({
+        claimer: holders[0]?.claim.claimer,
+        claim_no: 1,
+      });
+      expect(safe.claimed.every((row) => row.sendClass === "safety")).toBe(true);
+    });
+
+    it(
+      "8 safety claimers beside 6 ordinary claimers over 60 rows of every class: each row claimed once, each part " +
+        "sent once, and the safety claimers take safety rows alone",
+      PARALLEL,
+      async () => {
+        const recipients = 5;
+        const rows = 60;
+        const now = "2026-11-09T16:00:00Z";
+        const handleOf = (n: number): string => `handle-sfp-${String(n)}`;
+        await reset();
+        await loadSeeds(["seed-bundle-registry.json"]);
+        await db.sql.begin(async (tx) => {
+          for (let n = 0; n < recipients; n += 1) {
+            const address = `+1555555${String(180 + n).padStart(4, "0")}`;
+            await insertRow(tx, "handles", { id: handleOf(n), kind: "phone", address });
+            await insertRow(tx, "phones", { number: address, handle_id: handleOf(n) });
+          }
+          await tx`
+            insert into turns (id, handle_id, event_ids, state, bundle_hash, bundle_build, trace_id, committed_at)
+            values ('turn-sfp', ${handleOf(0)}, ${["evt-sfp-1"]}, 'committed', ${BUNDLE_HASH}, 1, 'trace-sfp',
+                    '2026-11-09T15:59:00Z')
+          `;
+          await tx`
+            insert into outbox_rows (
+              id, turn_id, recipient_handle_id, channel, send_class, versions_read, plan, final_parts, state,
+              version, bundle_hash, bundle_build, trace_id
+            )
+            select
+              'out-sfp-' || lpad(g::text, 3, '0'),
+              'turn-sfp',
+              'handle-sfp-' || (g % ${recipients})::text,
+              'imessage',
+              case g % 3 when 1 then 'safety' when 2 then 'quick_reply' else 'routine' end,
+              '[]'::jsonb,
+              jsonb_build_object(
+                'row', 'out-sfp-' || lpad(g::text, 3, '0'), 'channel', 'imessage', 'copyOf', null,
+                'plan', ${tx.json(PLAN_BODY)}::jsonb
+              ),
+              jsonb_build_object(
+                'row', 'out-sfp-' || lpad(g::text, 3, '0'), 'channel', 'imessage', 'sends', ${tx.json([WORDS])}::jsonb,
+                'fixedLines', '[]'::jsonb, 'slotValues', '[]'::jsonb, 'threadReplyTo', null
+              ),
+              'checked',
+              2,
+              ${BUNDLE_HASH},
+              1,
+              'trace-sfp'
+            from generate_series(0, ${rows - 1}) as g
+            order by g
+          `;
+        });
+        type Kind = "safety" | "ordinary" | "sweep";
+        const log: { rowId: string; sendClass: string; kind: Kind }[] = [];
+        const unsent = async (safetyOnly: boolean): Promise<number> => {
+          const [row] = await db.sql<{ n: number }[]>`
+            select count(*)::int as n from outbox_rows
+            where state <> 'sent' and (not ${safetyOnly} or send_class = 'safety')
+          `;
+          return row?.n ?? -1;
+        };
+        const claimFor = (kind: Kind, claimer: string, recipient: string): ClaimOutboxV114Request => {
+          if (kind === "safety") {
+            return { claimer, recipientHandleId: recipient, now, limit: 10, sendClass: "safety" };
+          }
+          return kind === "ordinary"
+            ? { claimer, recipientHandleId: recipient, now, limit: 2 }
+            : { claimer, now, limit: 3 };
+        };
+        const dispatcher = async (kind: Kind, index: number): Promise<void> => {
+          const claimer = `dispatcher-${kind}-${String(index)}`;
+          for (let round = 0; round < 3000; round += 1) {
+            const recipient = handleOf((index + round) % recipients);
+            const answer = await settled(() => claimOutboxV114(runtime, claimFor(kind, claimer, recipient)));
+            if ("error" in answer) {
+              throw new Error(`claimOutboxV114 answered ${answer.error} ten times`);
+            }
+            for (const row of answer.claimed) {
+              log.push({ rowId: row.outboxRowId, sendClass: row.sendClass, kind });
+            }
+            for (const row of answer.claimed) {
+              for (const one of row.parts) {
+                const renewed = await settled(() =>
+                  renewClaim(runtime, {
+                    outboxRowId: row.outboxRowId,
+                    claimer,
+                    claimNo: row.claim.claimNo,
+                    idempotencyKey: one.idempotencyKey,
+                    at: now,
+                  }),
+                );
+                expect(renewed).toMatchObject({ result: "renewed" });
+                const sent = await settled(() =>
+                  markPartV12(runtime, {
+                    outcome: "sent",
+                    idempotencyKey: one.idempotencyKey,
+                    providerMessageId: `linq-sfp-${one.idempotencyKey}`,
+                    providerOptionIds: null,
+                    at: now,
+                  }),
+                );
+                expect(sent).toMatchObject({ result: "marked", repeated: false });
+              }
+            }
+            if (answer.claimed.length === 0) {
+              if ((await unsent(kind === "safety")) === 0) {
+                return;
+              }
+              await pause(5);
+            }
+          }
+          throw new Error("a claimer did not finish in 3,000 rounds");
+        };
+        await Promise.all([
+          ...Array.from({ length: 8 }, (_, n) => dispatcher("safety", n)),
+          ...Array.from({ length: 3 }, (_, n) => dispatcher("ordinary", n)),
+          ...Array.from({ length: 3 }, (_, n) => dispatcher("sweep", n)),
+        ]);
+
+        expect(log).toHaveLength(rows);
+        expect(new Set(log.map((entry) => entry.rowId)).size).toBe(rows);
+        expect(
+          log.filter((entry) => entry.kind === "safety").every((entry) => entry.sendClass === "safety"),
+        ).toBe(true);
+        expect(log.some((entry) => entry.kind === "safety")).toBe(true);
+        expect(log.some((entry) => entry.kind !== "safety")).toBe(true);
+        const [parts] = await db.sql<{ n: number; attempts: number; unsent: number }[]>`
+          select count(*)::int as n, max(attempts)::int as attempts,
+                 count(*) filter (where state <> 'sent')::int as unsent
+          from outbox_parts
+        `;
+        expect(parts).toEqual({ n: rows, attempts: 1, unsent: 0 });
+        const [claims] = await db.sql<{ n: number; most: number }[]>`
+          select count(*)::int as n, max(claim_no)::int as most from outbox_claims
+        `;
+        expect(claims).toEqual({ n: rows, most: 1 });
+        expect(await unsent(false)).toBe(0);
+      },
+    );
+  });
+
+  describe("without sendClass it is claimOutboxV113, unchanged (default 24)", () => {
+    it("covers every accepted claim exchange of v1 to v1.13", () => {
+      expect(EARLIER_CLAIMS).toEqual(
+        expect.arrayContaining([
+          "claim-in-order.json",
+          "claim-alex-safety.json",
+          "claim-in-order-with-port.json",
+          CODE_CLAIM,
+        ]),
+      );
+      expect(EARLIER_CLAIMS.some((file) => V114_CLAIMS.includes(file))).toBe(false);
+    });
+
+    for (const file of EARLIER_CLAIMS) {
+      it(`${file}: answered as before, at its version`, SLOW, async () => {
+        let exchange: Exchange;
+        if (file === CODE_CLAIM) {
+          await codeRowWritten();
+          exchange = exchangeOf(file);
+        } else {
+          exchange = await givenLatest(file);
+        }
+        const answer = await claimOutboxV114(
+          runtime,
+          structuredClone(exchange.request) as unknown as ClaimOutboxV114Request,
+        );
+        expect(v114ExchangeErrors(exchange.request, answer)).toEqual([]);
+        expect(schemaErrors(V113_ID, "claimOutbox.response", answer)).toEqual([]);
+        expect(asClaimVersion(answer, fixtureVersion(file))).toEqual(exchange.outcome);
+      });
+    }
+  });
+});
+
+// ---- the claim's recipient lock, in this file's own database (T-1251) -------------------------------------------------
+
+describe("claimOutbox's recipient lock is this file's database's own, never another run's (T-1251, CQ-221)", () => {
+  it(
+    "a recipient's lock held in the shared database stops no claim here; held in this file's database, it does",
+    SLOW,
+    async () => {
+      // A recipient named after this run's schema, so its lock held in the shared database is no other run's; its one
+      // row checked, as the parallel claim's rows are written.
+      const recipient = `handle-${db.schema}`;
+      const rowId = `out-${db.schema}`;
+      const rowPlan = { row: rowId, channel: "imessage", copyOf: null, plan: PLAN_BODY };
+      const finalParts = {
+        row: rowId,
+        channel: "imessage",
+        sends: [WORDS],
+        fixedLines: [],
+        slotValues: [],
+        threadReplyTo: null,
+      };
+      await reset();
+      await loadSeeds(["seed-bundle-registry.json"]);
+      await db.sql.begin(async (tx) => {
+        await insertRow(tx, "handles", { id: recipient, kind: "phone", address: "+15555550198" });
+        await tx`
+          insert into turns (id, handle_id, event_ids, state, bundle_hash, bundle_build, trace_id, committed_at)
+          values ('turn-t1251', ${recipient}, ${["evt-t1251-1"]}, 'committed', ${BUNDLE_HASH}, 1, 'trace-t1251',
+                  '2026-11-09T14:59:00Z')
+        `;
+        await tx`
+          insert into outbox_rows (
+            id, turn_id, recipient_handle_id, channel, send_class, versions_read, plan, final_parts, state,
+            bundle_hash, bundle_build, trace_id
+          )
+          values (
+            ${rowId}, 'turn-t1251', ${recipient}, 'imessage', 'routine', '[]'::jsonb, ${tx.json(rowPlan)}::jsonb,
+            ${tx.json(finalParts)}::jsonb, 'checked', ${BUNDLE_HASH}, 1, 'trace-t1251'
+          )
+        `;
+      });
+      const request: ClaimOutboxRequest = {
+        claimer: "dispatcher-1",
+        recipientHandleId: recipient,
+        now: "2026-11-09T15:00:00Z",
+        limit: 10,
+      };
+      // A session in the database DATABASE_URL names, where another run's claims take their locks, and one in this
+      // file's own.
+      const shared = postgres(resolvePrimaryUrl(), { max: 1, onnotice: () => undefined });
+      const here = db.connect({ max: 1, onnotice: () => undefined });
+      /** The claim, run while `holder` holds the recipient's lock as the claim takes it (outbox.ts default 10). */
+      const claimWhileHeld = (holder: Sql): Promise<ClaimOutboxResponse> =>
+        holder.begin(async (tx) => {
+          const [lock] = await tx<{ taken: boolean }[]>`
+            select pg_try_advisory_xact_lock(hashtextextended(${`outbox-recipient:${recipient}`}, 0)) as taken
+          `;
+          expect(lock?.taken, "the holder takes the recipient's lock").toBe(true);
+          return claim(request);
+        });
+      try {
+        const [sharedDatabase] = await shared<{ name: string }[]>`select current_database() as name`;
+        const [ownDatabase] = await here<{ name: string }[]>`select current_database() as name`;
+        expect(db.database).not.toBeNull();
+        expect(ownDatabase?.name).toBe(db.database);
+        expect(sharedDatabase?.name).not.toBe(db.database);
+        // Held in this file's database, it is the claim's own lock: the recipient is skipped, nothing is written.
+        expect(await claimWhileHeld(here)).toEqual({ result: "claimed", claimed: [], passedHeld: [] });
+        expect(await rowNow(rowId)).toMatchObject({ state: "checked", version: 1 });
+        // Held in the shared database, as another run's claim of a recipient of the same id holds it: not seen here.
+        const taken = await claimWhileHeld(shared);
+        expect(taken.claimed.map((row) => [row.outboxRowId, row.version])).toEqual([[rowId, 2]]);
+        expect(await rowNow(rowId)).toMatchObject({ state: "sending", version: 2 });
+      } finally {
+        await shared.end({ timeout: 5 });
+        await here.end({ timeout: 5 });
+      }
+    },
+  );
+});

@@ -1,0 +1,31 @@
+{
+  "call": "bookingConfirm",
+  "given": {
+    "now": "2026-10-22T16:30:00Z",
+    "environment": "staging",
+    "after": ["booking-waitlist-ben-read-back.json"],
+    "note": "Refused: booking-waitlist-texts-off.json answered textsOff with a consent id: a stopped mobile gives no yes on a page (RULES 7.5; STATE note 9: no answer holds textsOff with a consent). With consentId null the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-ben-0004",
+      "traceId": "trace-page-ben-0004",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-ben-1",
+      "requestRef": "reqref-page-lees-0051"
+    },
+    "readBackId": "rb-page-ben-waitlist-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-ben-waitlist-1",
+    "yesEventId": "pageyes-ben-waitlist-1",
+    "served": {
+      "change": "waitlist",
+      "result": "textsOff",
+      "consentId": "consent-page-ben-waitlist-texts",
+      "textsOffLine": "stopLaterReply",
+      "requestEnded": false
+    }
+  }
+}

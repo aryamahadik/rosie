@@ -1,0 +1,28 @@
+{
+  "call": "secureConfirm",
+  "given": {
+    "now": "2026-11-02T14:06:30Z",
+    "environment": "staging",
+    "after": ["secure-page-read.json", "secure-street-read-back.json"],
+    "note": "Refused: secure-street-confirm.json answered with the address it checked: the address is sealed on write and never returned, logged or in a span (K-09 v1.2 checkPlace; K-17 v1 'No address in a span or log'; B4-30). Without it the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-drain2-0008",
+      "traceId": "trace-page-alex-drain2-0008",
+      "linkCode": "placeholder-drain2-secure-link-code"
+    },
+    "readBackId": "rb-page-alex-drain2-street-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-alex-drain2-street-1",
+    "yesEventId": "pageyes-alex-drain2-street-1",
+    "served": {
+      "change": "street",
+      "result": "inside",
+      "requestEnded": false,
+      "address": "42 Oak Street, Springfield"
+    }
+  }
+}

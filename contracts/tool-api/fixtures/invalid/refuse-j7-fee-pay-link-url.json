@@ -5,7 +5,7 @@
     "after": ["j7-fee-owner-charge-turn.json"],
     "now": "2026-10-24T13:00:20Z",
     "stated": { "step": "S11-26", "gives": [] },
-    "note": "Refused: the fee's one pay link answered with its url for the caller to hand on: the link goes only to the payer's own ways through its clock rows, never an AI, the owner or a pro (README default 134). Without payLinkUrl it is j7-fee-charge-declined-job, accepted."
+    "note": "Refused: the fee's one pay link answered with its url for the caller to hand on: the link goes only to the payer's own ways through its clock rows, never an AI, the owner or a pro (README default 152). Without payLinkUrl it is j7-fee-charge-declined-job, accepted."
   },
   "request": {
     "caller": {

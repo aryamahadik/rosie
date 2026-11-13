@@ -4,6 +4,8 @@ package-lock.json
 # Generated or checksummed files are never reformatted.
 bundles/
 fixtures/
+# The commit history, regenerated from git log after each merge (DL-436).
+COMMIT_HISTORY.md
 
 # Saved copy of the old /test page, pinned by SHA256SUMS (T-1052).
 infra/rosfield-test-backup/

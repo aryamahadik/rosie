@@ -1,7 +1,9 @@
 // T-291's proofs through the Tool API base (T-290): buildFrontier registered with its validation, business scope and
 // span, its repo a fake answering K-05 v1.2 readTurnState from seeded rows, the bundles K-01 v1's sample bundles.
-//   - build-frontier-s1-02.json gives exactly the fixture's choices: S1-02's three options with only the open questions
-//     built, and all five once stand-ins fill the hubs-and-doors and any-time slots with the fixture's own door and row;
+//   - build-frontier-s1-02.json gives exactly the fixture's choices: S1-02's three options with the registry's slots (the
+//     open questions, and the hubs and doors, T-293's source wired by T-1147, which offer Sam nothing on bundle v0: it
+//     holds no hub or door step of his), and all five once stand-ins fill the hubs-and-doors and any-time slots with the
+//     fixture's own door and row;
 //   - the output validates against K-02 v1's context schema (and the base holds it to K-09 v1's response);
 //   - the slots not built are logged, by labels only; nothing is written; the span carries no words or number.
 // Values come only from the contracts' fixtures and the master's sample cast (rule 9).
@@ -63,7 +65,7 @@ function wordsOf(exchange: { request: Json; outcome: Json }): string[] {
 }
 
 describe("build-frontier-s1-02.json through the Tool API base", () => {
-  it("with only the open questions built: exactly the fixture's three options of S1-02, the rest logged missing", async () => {
+  it("with the registry's slots: exactly the fixture's three options of S1-02, the slots not built logged missing", async () => {
     const exchange = s102Exchange();
     const called = await callFrontier(exchange.request);
     const context = contextOf(called.answer);
@@ -75,8 +77,9 @@ describe("build-frontier-s1-02.json through the Tool API base", () => {
     expect(context.cards).toEqual(exchange.outcome.context.cards);
     expect(checker.check("context", context)).toEqual([]);
 
+    // The hubs and doors are built (T-1147 wired T-293's source): only the branch gates and the any-time rows are not.
     expect(called.log.lines).toEqual(
-      ["branchGates", "hubsAndDoors", "anyTime"].map((source) => ({
+      ["branchGates", "anyTime"].map((source) => ({
         level: "warn",
         msg: "frontier_source_missing",
         trace_id: "trace-sam-0001",
@@ -212,7 +215,7 @@ describe("what buildFrontier answers when it cannot build the frontier", () => {
     expect(onlySpan(called.spans)).toMatchObject({ outcome: "failed", error_code: "FrontierError" });
   });
 
-  it("over 60 choices: tooManyChoices with the count (the collapse of other bookings is T-295's)", async () => {
+  it("still over 60 choices once every other booking collapsed (these rows are about no booking): tooManyChoices with the count", async () => {
     const exchange = s102Exchange();
     const danger = exchange.outcome.context.choices.filter((choice) => choice.kind === "anytime");
     const many = Array.from({ length: MAX_CHOICES }, () => danger).flat();
@@ -232,12 +235,12 @@ describe("what buildFrontier answers when it cannot build the frontier", () => {
 });
 
 describe("the registry", () => {
-  it("lists the four slots in frontier order; only the open questions are built (T-292 to T-294 fill the rest)", () => {
+  it("lists the four slots in frontier order; the open questions and the hubs and doors are built (T-292 and T-294 fill the rest)", () => {
     expect(FRONTIER_SOURCES.map((slot) => slot.name)).toEqual([...SLOT_NAMES]);
     expect(FRONTIER_SOURCES.map((slot) => slot.source?.name ?? null)).toEqual([
       "openQuestions",
       null,
-      null,
+      "hubsAndDoors",
       null,
     ]);
   });

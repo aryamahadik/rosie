@@ -3,11 +3,14 @@
 // test schema. The K-04 seeds are loaded by the tables' owner; the calls run as the Tool API's role, rosie_app (T-191),
 // through a client whose connections take that role, so row-level security binds them as it will bind the Worker
 // (T-1093), except where a test says it runs as the tables' owner.
+import { once } from "node:events";
 import { readdirSync, readFileSync } from "node:fs";
+import { type AddressInfo, createConnection, createServer, type Socket } from "node:net";
 import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createClient, type DbClient, resolvePrimaryUrl } from "./client";
+import { DataAccessDatabaseError, transientOrScrubbed } from "./clocks";
 import {
   doorMinutes,
   EXTEND_MINUTES,
@@ -2283,4 +2286,829 @@ describe("T-1134: one row per holder per slot: a save never waits behind its own
       }
     },
   );
+});
+
+// ---- T-1322: a statement's own refusal and postgres.js's statement errors leave scrubbed ------------------------------
+//
+// Five errors are made for real on local PostgreSQL by postgres.js as installed, four of them holding a made-up number
+// (rule 9: a 555-01xx number): PostgreSQL's refusal of a statement (22P02, the number in its message) and of a row (a
+// CHECK's 23514, the number in its detail, with its table's and constraint's names); postgres.js's UNDEFINED_VALUE (the
+// number among the statement's args) and the TypeError its bytea serializer throws (the number in its message); and a
+// serialization failure PostgreSQL raises (40001). postgres.js puts the statement on each, its values in args. Each
+// reaches the call as postgres.js rejects the call's first statement with it, on a client whose socket fails with it
+// (as connect-failures.int.test.ts delivers a socket's error). The first four leave scrubbed: the call's name and the
+// code alone, PostgreSQL's as DataAccessDatabaseError (a rule's table and constraint names kept), with the number in no
+// message, stack or other own property. 40001 still answers transient with its SQLSTATE.
+
+describe("extend: a statement's own refusal and postgres.js's statement errors leave scrubbed (T-1322)", () => {
+  type Kind = "refusal" | "rule" | "undefinedValue" | "serialization" | "serialize";
+  /** Thrown as DataAccessDatabaseError (its message's SQLSTATE and names: `shown`), as a client's code, or answered. */
+  type Expected =
+    | { database: { code: string; table: string | null; constraint: string | null; shown: string } }
+    | { client: string }
+    | { answer: unknown };
+  const NUMBER = "+15555550147";
+  const KINDS: { kind: Kind; name: string; expected: Expected }[] = [
+    {
+      kind: "refusal",
+      name: "PostgreSQL's 22P02, the number in its message, leaves as DataAccessDatabaseError",
+      expected: { database: { code: "22P02", table: null, constraint: null, shown: "22P02" } },
+    },
+    {
+      kind: "rule",
+      name: "a CHECK's 23514, the number in its detail, leaves as DataAccessDatabaseError, its names kept",
+      expected: {
+        database: {
+          code: "23514",
+          table: "t1322_numbers",
+          constraint: "t1322_numbers_short",
+          shown: "23514, table t1322_numbers, constraint t1322_numbers_short",
+        },
+      },
+    },
+    {
+      kind: "undefinedValue",
+      name: "postgres.js's UNDEFINED_VALUE, the number in its args, leaves with its code alone",
+      expected: { client: "UNDEFINED_VALUE" },
+    },
+    {
+      kind: "serialize",
+      name: "the TypeError of postgres.js's bytea serializer, the number in its message, leaves with its code alone",
+      expected: { client: "ERR_INVALID_ARG_TYPE" },
+    },
+    {
+      kind: "serialization",
+      name: "PostgreSQL's 40001 still answers transient with its SQLSTATE",
+      expected: { answer: { error: "transient", sqlstate: "40001" } },
+    },
+  ];
+  const CALLS: { call: string; run: (sql: Sql) => Promise<unknown> }[] = [
+    {
+      call: "extend",
+      run: (sql) =>
+        extend(sql, {
+          reservationId: "rsv-t1322",
+          businessId: LEES,
+          expectVersion: 1,
+          door: "standard",
+          at: "2026-11-09T15:00:00Z",
+        }),
+    },
+  ];
+  const CASES = CALLS.flatMap(({ call, run }) =>
+    KINDS.map(({ kind, name, expected }) => ({ call, run, kind, expected, name: `${call}: ${name}` })),
+  );
+  let made: Record<Kind, Error>;
+
+  /** Every text `value` holds, deeply: its own property names and values, enumerable or not, its stack among them. */
+  const textsOf = (value: unknown, seen = new Set<object>()): string[] => {
+    if (typeof value === "string") {
+      return [value];
+    }
+    if (typeof value === "number" || typeof value === "bigint" || typeof value === "boolean") {
+      return [String(value)];
+    }
+    if (typeof value !== "object" || value === null || seen.has(value)) {
+      return [];
+    }
+    seen.add(value);
+    return Object.getOwnPropertyNames(value).flatMap((key) => [
+      key,
+      ...textsOf((value as Record<string, unknown>)[key], seen),
+    ]);
+  };
+  const holdsNumber = (value: unknown): boolean =>
+    textsOf(value).some((text) => text.includes(NUMBER.slice(1)));
+
+  /** The error `statement` is refused with. */
+  const refusalOf = async (statement: Promise<unknown>): Promise<Error> => {
+    try {
+      await statement;
+    } catch (error) {
+      if (error instanceof Error) {
+        return error;
+      }
+    }
+    throw new Error("the statement was not refused with an error");
+  };
+
+  /** What `run` gives on a client whose socket fails with `raw`: postgres.js rejects its first statement with it. */
+  const outcomeOn = async (
+    raw: Error,
+    run: (sql: Sql) => Promise<unknown>,
+  ): Promise<{ answer: unknown } | { thrown: unknown }> => {
+    const options = { max: 1, onnotice: () => undefined, socket: () => Promise.reject(raw) };
+    const sql = postgres("postgres://t1322@db-t1322.example.invalid:65123/t1322", options);
+    try {
+      return { answer: await run(sql) };
+    } catch (error) {
+      return { thrown: error };
+    } finally {
+      await sql.end({ timeout: 0 });
+    }
+  };
+
+  beforeAll(async () => {
+    const sql = postgres(resolvePrimaryUrl(), { max: 1, onnotice: () => undefined });
+    try {
+      await sql`create temp table t1322_numbers (number text constraint t1322_numbers_short check (length(number) < 5))`;
+      made = {
+        refusal: await refusalOf(sql`select ${NUMBER}::uuid as id`),
+        rule: await refusalOf(sql`insert into t1322_numbers (number) values (${NUMBER})`),
+        undefinedValue: await refusalOf(
+          sql`select ${NUMBER}::text as number, ${undefined as never}::text as gone`,
+        ),
+        serialization: await refusalOf(
+          sql.unsafe(
+            "do $$ begin raise exception using errcode = '40001', message = 'could not serialize'; end $$",
+          ),
+        ),
+        serialize: await refusalOf(sql`select ${sql.typed(Number(NUMBER.slice(1)), 17)} as bytes`),
+      };
+    } finally {
+      await sql.end({ timeout: 5 });
+    }
+  });
+
+  it.each(CASES)("$name", async ({ call, run, kind, expected }) => {
+    const raw = made[kind];
+    const outcome = await outcomeOn(raw, run);
+    if ("answer" in expected) {
+      expect(outcome).toEqual({ answer: expected.answer });
+      return;
+    }
+    // The error holds the number, so the check means something; postgres.js put the statement on it.
+    expect(holdsNumber(raw)).toBe(true);
+    expect(Object.hasOwn(raw, "args")).toBe(true);
+    if (!("thrown" in outcome)) {
+      throw new Error(`${call} answered`);
+    }
+    // Booleans first, so a failing run prints neither error's text.
+    const { thrown } = outcome;
+    expect(thrown === raw).toBe(false);
+    expect(holdsNumber(thrown)).toBe(false);
+    if ("database" in expected) {
+      const { code, table, constraint, shown } = expected.database;
+      expect(thrown).toBeInstanceOf(DataAccessDatabaseError);
+      expect(Object.getOwnPropertyNames(thrown).sort()).toEqual([
+        "call",
+        "code",
+        "constraint",
+        "message",
+        "name",
+        "stack",
+        "table",
+      ]);
+      expect(thrown).toMatchObject({
+        call,
+        code,
+        table,
+        constraint,
+        message: `${call}: the database refused the call (SQLSTATE ${shown})`,
+      });
+      return;
+    }
+    expect(Object.getOwnPropertyNames(thrown).sort()).toEqual(["call", "code", "message", "stack"]);
+    expect(thrown).toMatchObject({
+      call,
+      code: expected.client,
+      message: `${call}: the database call failed (code ${expected.client})`,
+    });
+  });
+});
+
+// ---- T-1334: inBusinessTransaction reserves through reserveConnection (T-1314's handoff, Gives 3) ----------------------
+//
+// extend's transaction start reserves its connection through bundles.ts's reserveConnection, so a reserve() that never
+// connects leaves as the code 08001 alone, which extend answers transient, never as postgres.js raises it. Raised for real
+// through postgres.js's own socket option on the client reserve() opens its connection on, while the pre-probe answers
+// on this file's Tool API client: the Workers build's failure, with no code and no statement (cf/polyfills.js;
+// connection.js queryError), the made-up connection string in its message; and Node's ECONNREFUSED on a closed port.
+// Rule 9: the probe's user, password, database, host and port are made up here (a .invalid name). A check names what
+// leaked, never its value.
+
+describe("extend: a reserve() that never connects answers 08001, never as postgres.js raises it (T-1334)", () => {
+  const PROBE_USER = "t1334_probe_user";
+  const PROBE_PASSWORD = "t1334-probe-password";
+  const PROBE_DATABASE = "t1334_probe_db";
+  const HOST = "db-t1334.example.invalid";
+  const PORT = 65134;
+  const NEVER_OPENED = { error: "transient", sqlstate: "08001" };
+  const REQUEST: ExtendRequest = {
+    reservationId: "rsv-t1334",
+    businessId: LEES,
+    expectVersion: 1,
+    door: "standard",
+    at: "2026-11-09T15:00:00Z",
+  };
+
+  type Secrets = Readonly<Record<string, RegExp>>;
+  type Settled = { answer: unknown } | { thrown: unknown };
+
+  const probeUrl = (host: string, port: number): string =>
+    `postgres://${PROBE_USER}:${PROBE_PASSWORD}@${host}:${String(port)}/${PROBE_DATABASE}`;
+
+  /** The secrets by name: a text wherever it appears, a number (a port) as a whole number. */
+  function secretsOf(values: Readonly<Record<string, string | number>>): Secrets {
+    const secrets: Record<string, RegExp> = {};
+    for (const [name, value] of Object.entries(values)) {
+      secrets[name] =
+        typeof value === "number"
+          ? new RegExp(`(^|[^0-9])${String(value)}([^0-9]|$)`)
+          : new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    }
+    return secrets;
+  }
+
+  const SHAPE_SECRETS = secretsOf({
+    host: HOST,
+    port: PORT,
+    user: PROBE_USER,
+    password: PROBE_PASSWORD,
+    database: PROBE_DATABASE,
+  });
+
+  /** Every text `value` holds, deeply: its own property names and values, enumerable or not (an error's stack too). */
+  function textsOf(value: unknown, seen = new Set<object>()): string[] {
+    if (typeof value === "string") {
+      return [value];
+    }
+    if (typeof value === "number" || typeof value === "bigint" || typeof value === "boolean") {
+      return [String(value)];
+    }
+    if (typeof value !== "object" || value === null || seen.has(value)) {
+      return [];
+    }
+    seen.add(value);
+    return Object.getOwnPropertyNames(value).flatMap((key) => [
+      key,
+      ...textsOf((value as Record<string, unknown>)[key], seen),
+    ]);
+  }
+
+  /** The names of the secrets `value` holds anywhere, never their values. */
+  function leaksOf(value: unknown, secrets: Secrets): string[] {
+    const texts = textsOf(value);
+    return Object.entries(secrets)
+      .filter(([, secret]) => texts.some((text) => secret.test(text)))
+      .map(([name]) => name);
+  }
+
+  async function settledOf(run: () => Promise<unknown>): Promise<Settled> {
+    try {
+      return { answer: await run() };
+    } catch (error) {
+      return { thrown: error };
+    }
+  }
+
+  /**
+   * `statements` with `reserving`'s reserve(): the pre-probe answers on `statements`, and only reserve() opens a
+   * connection, as when the probe's connection was taken meanwhile and the one reserve() opens never connects.
+   */
+  function reserveFrom(statements: Sql, reserving: Sql): Sql {
+    return new Proxy(statements, {
+      get: (target, key, receiver): unknown =>
+        key === "reserve" ? () => reserving.reserve() : (Reflect.get(target, key, receiver) as unknown),
+    });
+  }
+
+  it("as the Workers build passes it up (no code, no statement), the made-up connection string in it: 08001, holding none of it", async () => {
+    const raw = new Error(`Network connection lost: ${probeUrl(HOST, PORT)}`);
+    // A client on the made-up connection whose socket fails with `raw` before it opens (postgres.js's own socket option).
+    const options = { max: 1, onnotice: () => undefined, socket: () => Promise.reject(raw) };
+    const reserving = postgres(probeUrl(HOST, PORT), options);
+    let outcome: Settled;
+    try {
+      outcome = await settledOf(() => extend(reserveFrom(toolApi, reserving), REQUEST));
+    } finally {
+      await reserving.end({ timeout: 0 });
+    }
+    expect(outcome).toEqual({ answer: NEVER_OPENED });
+    expect(leaksOf(outcome, SHAPE_SECRETS)).toEqual([]);
+    // postgres.js passed the socket's error up as it is: no code, no statement, the made-up connection in its message.
+    expect((raw as { code?: unknown }).code).toBeUndefined();
+    expect(Object.hasOwn(raw, "query") || Object.hasOwn(raw, "parameters")).toBe(false);
+    expect(leaksOf(raw, SHAPE_SECRETS)).toEqual(
+      expect.arrayContaining(["host", "port", "user", "password", "database"]),
+    );
+    // extend's own answer to a failure (clocks.ts transientOrScrubbed) would throw it as it is: only reserveConnection
+    // makes it a connection that never opened.
+    let direct: Settled;
+    try {
+      direct = { answer: transientOrScrubbed("extend", raw) };
+    } catch (error) {
+      direct = { thrown: error };
+    }
+    expect("thrown" in direct && direct.thrown === raw).toBe(true);
+  });
+
+  it("for real on a closed port (Node's ECONNREFUSED, on no statement): 08001, holding none of it", async () => {
+    const server = createServer();
+    server.listen(0, "127.0.0.1");
+    await once(server, "listening");
+    const { port } = server.address() as AddressInfo;
+    server.close();
+    await once(server, "close");
+    const reserving = postgres(probeUrl("127.0.0.1", port), { max: 1, onnotice: () => undefined });
+    let outcome: Settled;
+    try {
+      outcome = await settledOf(() => extend(reserveFrom(toolApi, reserving), REQUEST));
+    } finally {
+      await reserving.end({ timeout: 0 });
+    }
+    expect(outcome).toEqual({ answer: NEVER_OPENED });
+    expect(
+      leaksOf(
+        outcome,
+        secretsOf({ port, user: PROBE_USER, password: PROBE_PASSWORD, database: PROBE_DATABASE }),
+      ),
+    ).toEqual([]);
+  });
+});
+
+// ---- T-1350: inBusinessTransaction decides its rollback and its release by targets.ts's foundGone (T-1334's handoff a)
+//
+// extend runs inBusinessTransaction, which decides as inRuntimeTransaction does (T-1334, DL-649): a connection fn found
+// gone (a lost connection, or a statement's failure that is a session's failure or that transientOrThrow answers 08001)
+// is sent no rollback and is never released. A rosie_job client of this file's schema (one connection; the runtime
+// side's role holds the grants on reservations and clock_rows extend uses, behind the business's scope) has its socket
+// cut the 8 ways T-1334 cut inRuntimeTransaction's, under extend of Alex's saved time with Avery at a version it never
+// had, which writes nothing: as fn's first statement is written, which is then never written; and (T-1330's note d) at
+// the first turn of the event loop after fn's first statement is answered, the connection idle in its transaction, by
+// which time fn's next statement is already in flight, so postgres.js rejects it with the socket's error, or with its own
+// CONNECTION_CLOSED. The socket is destroyed with an error built in the shape Node, OpenSSL or postgres.js gives it, or
+// with none. A probe cut the same way shows each raw error holds what it names and the value of the statement it
+// rejected, so the checks mean something; each outcome holds none of it, nor any value fn's statements carried; nothing
+// is sent after the cut, no rollback and no commit; nothing is thrown outside a promise; a statement sent on the same
+// client at once is answered on a new connection, so the dead connection was never released to the pool; and extend
+// then answers on the same client. An error fn makes itself, on no statement (the request's `at`, which fn reads after
+// its first statement and which then throws in the shape of Node's EACCES, an address and a port on it), found no
+// connection gone, whatever its code: it is rolled back, and the connection is released.
+//
+// Rule 9: the probe's user, password, database, host, address and value are made up here (a .invalid name, RFC 5737's
+// documentation address). A check names what leaked, never its value.
+
+describe("T-1350: inBusinessTransaction writes no rollback to a connection fn found gone, and never releases it (targets.ts foundGone)", () => {
+  const PROBE_USER = "t1350_probe_user";
+  const PROBE_PASSWORD = "t1350-probe-password";
+  const PROBE_DATABASE = "t1350_probe_db";
+  const HOST = "db-t1350.example.invalid";
+  const ADDRESS = "203.0.113.50";
+  const PORT = 65150;
+  /** The runtime side's role (T-191). */
+  const RUNTIME_ROLE = "rosie_job";
+  const NEVER_OPENED = { error: "transient", sqlstate: "08001" };
+  const LOST = { error: "transient", sqlstate: "08006" };
+  /** The transaction's setting of its business scope: fn's first statement is the one built right after it. */
+  const SCOPE = "select set_config($1, $2, true)";
+  /** The probe's statement as postgres.js builds it, and the value it carries. */
+  const PROBE_STATEMENT = "select $1::text as t1350_cut";
+  const PROBE_VALUE = "t1350-probe-value";
+  /** How long a call may take before it counts as never settled (a statement written to no socket never settles). */
+  const SETTLES_WITHIN = 10_000;
+  const CUT_TIMEOUT = 60_000;
+
+  type Secrets = Readonly<Record<string, RegExp>>;
+  type Outcome = { answer: unknown } | { thrown: unknown };
+  /** What a call gives: K-05's answer, or an error thrown scrubbed to the call's name and this code alone. */
+  type Expected = { answer: unknown } | { code: string };
+
+  const probeUrl = (host: string, port: number): string =>
+    `postgres://${PROBE_USER}:${PROBE_PASSWORD}@${host}:${String(port)}/${PROBE_DATABASE}`;
+
+  /** The secrets by name: a text wherever it appears, a number (a port) as a whole number. */
+  function secretsOf(values: Readonly<Record<string, string | number>>): Secrets {
+    const secrets: Record<string, RegExp> = {};
+    for (const [name, value] of Object.entries(values)) {
+      secrets[name] =
+        typeof value === "number"
+          ? new RegExp(`(^|[^0-9])${String(value)}([^0-9]|$)`)
+          : new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    }
+    return secrets;
+  }
+
+  /** The made-up connection the built errors name. */
+  const SHAPE_SECRETS = secretsOf({
+    host: HOST,
+    address: ADDRESS,
+    port: PORT,
+    user: PROBE_USER,
+    password: PROBE_PASSWORD,
+    database: PROBE_DATABASE,
+  });
+
+  /**
+   * What an outcome must never hold: the made-up connection, and the local server's host and port, which postgres.js's
+   * own CONNECTION_CLOSED names. The local login, password and database are `rosie`, this repository's own folder, which
+   * every stack's file paths name, so they are not listed: postgres.js's connection errors never carry them.
+   */
+  function cutSecrets(): Secrets {
+    const url = new URL(resolvePrimaryUrl());
+    const port = url.port === "" ? 5432 : Number(url.port);
+    return { ...SHAPE_SECRETS, ...secretsOf({ "server host": url.hostname, "server port": port }) };
+  }
+
+  /** The texts of 8 characters or more among statements' values (their parameters), each named by its place alone. */
+  function valueSecrets(values: readonly (readonly unknown[])[]): Secrets {
+    const texts = values
+      .flat()
+      .filter((value): value is string => typeof value === "string" && value.length >= 8);
+    return secretsOf(Object.fromEntries(texts.map((text, index) => [`value ${String(index + 1)}`, text])));
+  }
+
+  /** Every text `value` holds, deeply: its own property names and values, enumerable or not (an error's stack too). */
+  function textsOf(value: unknown, seen = new Set<object>()): string[] {
+    if (typeof value === "string") {
+      return [value];
+    }
+    if (typeof value === "number" || typeof value === "bigint" || typeof value === "boolean") {
+      return [String(value)];
+    }
+    if (typeof value !== "object" || value === null || seen.has(value)) {
+      return [];
+    }
+    seen.add(value);
+    return Object.getOwnPropertyNames(value).flatMap((key) => [
+      key,
+      ...textsOf((value as Record<string, unknown>)[key], seen),
+    ]);
+  }
+
+  /** The names of the secrets `value` holds anywhere, never their values. */
+  function leaksOf(value: unknown, secrets: Secrets): string[] {
+    const texts = textsOf(value);
+    return Object.entries(secrets)
+      .filter(([, secret]) => texts.some((text) => secret.test(text)))
+      .map(([name]) => name);
+  }
+
+  async function outcomeOf(run: () => Promise<unknown>): Promise<Outcome> {
+    try {
+      return { answer: await run() };
+    } catch (error) {
+      return { thrown: error };
+    }
+  }
+
+  /**
+   * What `run` gives, or "never settled" after SETTLES_WITHIN, and every error thrown outside any promise meanwhile:
+   * postgres.js writes a statement from a timer, so a write to a connection with no socket throws there.
+   */
+  async function watched(
+    run: () => Promise<unknown>,
+  ): Promise<{ outcome: Outcome | "never settled"; uncaught: unknown[] }> {
+    const uncaught: unknown[] = [];
+    const note = (error: unknown): void => {
+      uncaught.push(error);
+    };
+    process.on("uncaughtException", note);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      const outcome = await Promise.race([
+        outcomeOf(run),
+        new Promise<"never settled">((resolve) => {
+          timer = setTimeout(() => {
+            resolve("never settled");
+          }, SETTLES_WITHIN);
+        }),
+      ]);
+      // A write postgres.js put on a timer has run by the next turn of the event loop.
+      await new Promise<void>((resolve) => {
+        setImmediate(resolve);
+      });
+      return { outcome, uncaught };
+    } finally {
+      clearTimeout(timer);
+      process.off("uncaughtException", note);
+    }
+  }
+
+  /** `outcome` is `expected`: the answer, or an error with the call's name and the code alone, nothing of the original. */
+  function expectOutcome(outcome: Outcome | "never settled", expected: Expected, call: string): void {
+    if ("answer" in expected) {
+      expect(outcome, call).toEqual({ answer: expected.answer });
+      return;
+    }
+    if (outcome === "never settled" || !("thrown" in outcome)) {
+      throw new Error(`${call} did not throw`);
+    }
+    const { thrown } = outcome;
+    expect(thrown, call).toBeInstanceOf(Error);
+    expect(Object.getOwnPropertyNames(thrown).sort(), call).toEqual(["call", "code", "message", "stack"]);
+    expect(thrown, call).toMatchObject({
+      call,
+      code: expected.code,
+      message: `${call}: the database call failed (code ${expected.code})`,
+    });
+  }
+
+  // The errors, in the shapes Node, OpenSSL and postgres.js give them, each naming the made-up connection.
+
+  /** postgres.js's own connection error (errors.js connection): "write <code> <host>:<port>". */
+  const connectionError = (code: string): Error =>
+    Object.assign(new Error(`write ${code} ${HOST}:${String(PORT)}`), {
+      code,
+      errno: code,
+      address: HOST,
+      port: PORT,
+    });
+  /** Node's error for a connection the other end reset under a read: syscall read, and no address on it. */
+  const resetError = (): Error =>
+    Object.assign(new Error("read ECONNRESET"), { errno: -54, code: "ECONNRESET", syscall: "read" });
+  /** A socket's failure with no code (the Workers build's), naming the made-up connection string. */
+  const codelessError = (): Error => new Error(`the socket closed: ${probeUrl(HOST, PORT)}`);
+  /** Node's error on a connected socket's read or write: the syscall, the address and the port. */
+  const socketError = (syscall: string, code: string, errno: number): Error =>
+    Object.assign(new Error(`${syscall} ${code} ${ADDRESS}:${String(PORT)}`), {
+      errno,
+      code,
+      syscall,
+      address: ADDRESS,
+      port: PORT,
+    });
+  /** OpenSSL's error for a record it could not decrypt, as Node's TLS socket gives it, the made-up host and port in it. */
+  const tlsRecordError = (): Error =>
+    Object.assign(
+      new Error(`error:0A000119:SSL routines::decryption failed or bad record mac (${HOST}:${String(PORT)})`),
+      {
+        library: "SSL routines",
+        reason: "decryption failed or bad record mac",
+        code: "ERR_SSL_DECRYPTION_FAILED_OR_BAD_RECORD_MAC",
+      },
+    );
+  /** A socket's error that no list names, known only by a connection's marks (syscall, errno), the made-up host on it. */
+  const ioError = (): Error =>
+    Object.assign(new Error(`read EIO ${HOST}`), { errno: -5, code: "EIO", syscall: "read", hostname: HOST });
+
+  /** T-1334's 8 ways: isLostConnection's own 4 (T-1330's), then DL-649's 4, which only foundGone knows. */
+  const CUTS: { name: string; raw: () => Error | null; holds: readonly string[]; expected: Expected }[] = [
+    {
+      name: "the socket closes: postgres.js's own CONNECTION_CLOSED, the server's host and port in it",
+      raw: () => null,
+      holds: ["server host", "server port"],
+      expected: { answer: LOST },
+    },
+    {
+      name: "postgres.js's CONNECTION_CLOSED, the made-up host and port on it",
+      raw: () => connectionError("CONNECTION_CLOSED"),
+      holds: ["host", "port"],
+      expected: { answer: LOST },
+    },
+    { name: "Node's ECONNRESET under a read", raw: resetError, holds: [], expected: { answer: LOST } },
+    {
+      name: "a socket's failure with no code (the Workers build's), the made-up connection string in it",
+      raw: codelessError,
+      holds: ["host", "port", "user", "password", "database"],
+      expected: { answer: LOST },
+    },
+    {
+      name: "Node's EHOSTUNREACH under a read, the made-up address and port on it (answered 08001)",
+      raw: () => socketError("read", "EHOSTUNREACH", -65),
+      holds: ["address", "port"],
+      expected: { answer: NEVER_OPENED },
+    },
+    {
+      name: "Node's EPERM on a write, the made-up address and port on it (a session's failure)",
+      raw: () => socketError("write", "EPERM", -1),
+      holds: ["address", "port"],
+      expected: { code: "EPERM" },
+    },
+    {
+      name: "OpenSSL's bad record MAC under a read, the made-up host and port in it (a TLS error)",
+      raw: tlsRecordError,
+      holds: ["host", "port"],
+      expected: { code: "ERR_SSL_DECRYPTION_FAILED_OR_BAD_RECORD_MAC" },
+    },
+    {
+      name: "Node's EIO under a read, known by a connection's marks alone, the made-up host on it",
+      raw: ioError,
+      holds: ["host"],
+      expected: { code: "EIO" },
+    },
+  ];
+
+  /**
+   * Where a client's socket is cut, with `raw` or none (it closes): `write`, as the statement `on` picks (the last built)
+   * is written, which is then never written; `answered`, at the first turn of the event loop after that statement's
+   * answer has come (its ReadyForQuery), the connection idle in its transaction.
+   */
+  interface Cut {
+    on: (sent: readonly string[]) => boolean;
+    when: "write" | "answered";
+    raw: Error | null;
+  }
+
+  /** A chunk the server sent that ends with ReadyForQuery ('Z', length 5, the transaction's status): an answer's end. */
+  function endsAnswer(chunk: unknown): boolean {
+    if (!(chunk instanceof Uint8Array) || chunk.length < 6) {
+      return false;
+    }
+    const at = chunk.length - 6;
+    return [0x5a, 0, 0, 0, 5].every((byte, index) => chunk[at + index] === byte);
+  }
+
+  /**
+   * A client of this file's schema as rosie_job (the schema first), one connection, through a socket to the same server
+   * that is cut once, as `cut` says (postgres.js's own socket option, as targets.int.test.ts cuts one for T-1334). `sent`
+   * holds each statement's text as postgres.js built it (its debug hook), in order, and `values` its parameters: a
+   * statement written to a connection with no socket is built, so it is listed too. `builtAtCut` is how many statements
+   * were built when the socket was cut.
+   */
+  function cutClient(cut: Cut | null): {
+    sql: Sql;
+    sent: string[];
+    values: unknown[][];
+    builtAtCut: () => number | undefined;
+  } {
+    const url = new URL(resolvePrimaryUrl());
+    const sent: string[] = [];
+    const values: unknown[][] = [];
+    let armed = false;
+    let builtAtCut: number | undefined;
+    const destroy = (socket: Socket): void => {
+      builtAtCut = sent.length;
+      socket.destroy(cut?.raw ?? undefined);
+    };
+    const options = {
+      max: 1,
+      onnotice: () => undefined,
+      connection: {
+        application_name: "rosie-t1350-reservation-rules-cut",
+        search_path: `${db.schema}, public`,
+        role: RUNTIME_ROLE,
+      },
+      debug: (_connection: number, text: string, parameters: unknown[]) => {
+        sent.push(text.trim());
+        values.push([...parameters]);
+        if (cut !== null && builtAtCut === undefined && !armed && cut.on(sent)) {
+          armed = true;
+        }
+      },
+      socket: () => {
+        const socket = createConnection(url.port === "" ? 5432 : Number(url.port), url.hostname);
+        const write = socket.write.bind(socket);
+        socket.write = ((...args: Parameters<typeof write>) => {
+          if (!armed || cut?.when !== "write") return write(...args);
+          armed = false;
+          destroy(socket);
+          return true;
+        }) as typeof socket.write;
+        const emit = socket.emit.bind(socket);
+        socket.emit = ((event: string | symbol, ...args: unknown[]) => {
+          const emitted = emit(event, ...args);
+          if (armed && cut?.when === "answered" && event === "data" && endsAnswer(args[0])) {
+            armed = false;
+            setImmediate(() => {
+              destroy(socket);
+            });
+          }
+          return emitted;
+        }) as typeof socket.emit;
+        return socket;
+      },
+    };
+    return { sql: postgres(resolvePrimaryUrl(), options), sent, values, builtAtCut: () => builtAtCut };
+  }
+
+  /** fn's first statement: the one built right after the transaction set its business scope. */
+  const fnsFirst = (sent: readonly string[]): boolean => sent.at(-2) === SCOPE;
+
+  // Alex's saved time with Avery at a version it never had: fn reads the row's slot, its clock row, the slot's locks and
+  // the row, then answers versionChanged, writing nothing, so every cut and every answer after it finds the seed as it is.
+  const EXTEND = extendRequest({ expectVersion: 7 });
+  const VERSION_CHANGED = {
+    error: "versionChanged",
+    changed: [{ table: "reservations", rowId: ALEX_AVERY, readVersion: 7, currentVersion: 1 }],
+  };
+
+  beforeAll(async () => {
+    await freshSeed();
+  });
+
+  /**
+   * The probe: a statement cut as `raw` makes it, as it is written, is rejected with an error that holds what the shape
+   * names and the statement's value, the statement put on it.
+   */
+  async function expectProbeHolds(raw: Error | null, holds: readonly string[]): Promise<void> {
+    const probe = cutClient({ on: (sent) => sent.at(-1) === PROBE_STATEMENT, when: "write", raw });
+    let rejected: Outcome;
+    try {
+      rejected = await outcomeOf(() => probe.sql`select ${PROBE_VALUE}::text as t1350_cut`);
+    } finally {
+      await probe.sql.end({ timeout: 0 });
+    }
+    if (!("thrown" in rejected)) {
+      throw new Error("the cut statement answered");
+    }
+    const secrets = { ...cutSecrets(), ...secretsOf({ value: PROBE_VALUE }) };
+    expect(leaksOf(rejected.thrown, secrets)).toEqual(expect.arrayContaining([...holds, "value"]));
+    expect(Object.hasOwn(rejected.thrown as object, "query")).toBe(true);
+  }
+
+  /** extend on a client cut as the shape and `when` say: see the top of this block. */
+  async function expectCut(shape: (typeof CUTS)[number], when: Cut["when"]): Promise<void> {
+    await expectProbeHolds(shape.raw(), shape.holds);
+    const raw = shape.raw();
+    const client = cutClient({ on: fnsFirst, when, raw });
+    try {
+      const watchedRun = await watched(async () => {
+        const called = await outcomeOf(() => extend(client.sql, EXTEND));
+        const builtBefore = client.sent.length;
+        // At once: a statement that a dead connection released to the pool would take and never answer (postgres.js
+        // 3.4.9 queues its write on that connection, and the close then drops it). Not released, it waits for the pool
+        // to reconnect.
+        const followed = await outcomeOf(async () => [...(await client.sql<{ n: number }[]>`select 2 as n`)]);
+        return { called, builtBefore, followed };
+      });
+      expect(watchedRun.outcome).not.toBe("never settled");
+      expect(watchedRun.uncaught).toEqual([]);
+      const { called, builtBefore, followed } = (
+        watchedRun.outcome as { answer: { called: Outcome; builtBefore: number; followed: Outcome } }
+      ).answer;
+      // The statement in flight at the cut: fn's first (write), or fn's second, already built when the connection, idle
+      // after fn's first was answered, closed (answered). It is the last one built: no rollback, no commit.
+      const first = client.sent.lastIndexOf(SCOPE) + 1;
+      const inFlight = when === "write" ? first : first + 1;
+      expect(client.builtAtCut()).toBe(inFlight + 1);
+      expect(builtBefore).toBe(inFlight + 1);
+      // Neither the connection's details nor any value fn's statements carried leaves.
+      const carried = valueSecrets(client.values.slice(first, inFlight + 1));
+      expect(Object.keys(carried).length).toBeGreaterThan(0);
+      expect(leaksOf(called, { ...cutSecrets(), ...carried })).toEqual([]);
+      expectOutcome(called, shape.expected, "extend");
+      if (raw !== null) {
+        // postgres.js rejected the statement in flight with the raw error, that statement and its values put on it.
+        expect(Object.hasOwn(raw, "query")).toBe(true);
+        const inFlightValues = valueSecrets(client.values.slice(inFlight, inFlight + 1));
+        expect(leaksOf(raw, inFlightValues)).toEqual(Object.keys(inFlightValues));
+      }
+      // The dead connection was never released: the next statement waited for a new one, which answered it.
+      expect(followed).toEqual({ answer: [{ n: 2 }] });
+      // And extend itself answers on the same client.
+      const again = await watched(() => extend(client.sql, EXTEND));
+      expect(again.uncaught).toEqual([]);
+      expect(again.outcome).toEqual({ answer: VERSION_CHANGED });
+    } finally {
+      await client.sql.end({ timeout: 0 });
+    }
+  }
+
+  it.each(CUTS)(
+    "fn's first statement cut as it is written ($name): no rollback, nothing thrown outside a promise, the error that leaves scrubbed; the same client then answers",
+    async (shape) => {
+      await expectCut(shape, "write");
+    },
+    CUT_TIMEOUT,
+  );
+
+  it.each(CUTS)(
+    "the connection closing while idle after fn's first statement is answered ($name): fn's next statement is in flight, so the same holds",
+    async (shape) => {
+      await expectCut(shape, "answered");
+    },
+    CUT_TIMEOUT,
+  );
+
+  it("an error fn makes itself, on no statement, found no connection gone, whatever its code: rolled back and released", async () => {
+    const own = socketError("connect", "EACCES", -13);
+    expect(leaksOf(own, SHAPE_SECRETS)).toEqual(expect.arrayContaining(["address", "port"]));
+    const client = cutClient(null);
+    // fn (extendIn) reads the request's `at` for the row's own read, after its first statements have been built, and
+    // that read throws.
+    const fnStarted = (): boolean => {
+      const scope = client.sent.lastIndexOf(SCOPE);
+      return scope !== -1 && scope < client.sent.length - 1;
+    };
+    const asked: ExtendRequest = {
+      ...EXTEND,
+      get at(): string {
+        if (fnStarted()) {
+          throw own;
+        }
+        return EXTEND.at;
+      },
+    };
+    try {
+      const [before] = await client.sql<{ pid: number }[]>`select pg_backend_pid() as pid`;
+      const { outcome, uncaught } = await watched(() => extend(client.sql, asked));
+      expect(uncaught).toEqual([]);
+      // Rolled back: the rollback is the last statement built, after fn's own.
+      expect(client.sent.at(-1)).toBe("rollback");
+      expect(client.sent.length - client.sent.lastIndexOf(SCOPE)).toBeGreaterThan(2);
+      // extend answers it as clocks.ts's transientOrScrubbed does: a session's failure, thrown scrubbed.
+      expect(leaksOf(outcome, cutSecrets())).toEqual([]);
+      expectOutcome(outcome, { code: "EACCES" }, "extend");
+      // Released: the client's one connection, the same backend, answers the next statement, its scope gone.
+      const next = await watched(async () => [
+        ...(await client.sql<{ pid: number; scope: string | null }[]>`
+          select pg_backend_pid() as pid, nullif(current_setting(${SCOPE_SETTING}, true), '') as scope
+        `),
+      ]);
+      expect(next.outcome).toEqual({ answer: [{ pid: before?.pid, scope: null }] });
+    } finally {
+      await client.sql.end({ timeout: 0 });
+    }
+  });
 });

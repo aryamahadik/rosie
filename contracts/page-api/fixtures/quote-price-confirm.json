@@ -1,0 +1,24 @@
+{
+  "call": "quoteConfirm",
+  "given": {
+    "now": "2026-11-03T00:30:04Z",
+    "environment": "staging",
+    "after": ["quotes-to-price.json", "quote-price-read-back.json"],
+    "note": "Jordan's yes: the page entry calls K-09 v1.2 quoteFromPhotos alone, stage price, step B4-09, caller.kind page for Jordan, on the quote's version the read-back kept, exactly as tool-api/fixtures/j4-quote-price-page.json: over Sam's $500 limit, so the quote goes with_owner with an owner_oks ask due in 4 of Sam's text hours and a clock row due at once that asks him; the pricing clock is cancelled. Gives quote. Nothing goes to Alex until someone OKs it, so setPrice is not called. The answer names no clock row, link or written."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-pricing-jordan-0103",
+      "traceId": "trace-pricing-jordan-0101",
+      "sessionToken": "placeholder-session-token-jordan-0001",
+      "linkCode": null
+    },
+    "readBackId": "rb-pricing-jordan-heater-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-pricing-jordan-heater-1",
+    "yesEventId": "pageyes-jordan-heater-price-1",
+    "served": { "change": "price", "state": "with_owner", "goodUntil": null }
+  }
+}

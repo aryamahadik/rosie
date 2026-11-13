@@ -7,6 +7,7 @@
 import type { PromptCache } from "../cache";
 import type { AttemptFailure, CallOptions, FetchLike, GatewayBundle, ModelCall, ModelRole } from "../gateway";
 import type { ComposeInput, MessagePlan } from "./prompt";
+import type { RewriteAnswer, RewriteRequest } from "./rewrite/types";
 
 export type { ComposeInput, MessagePlan, ModelCall, ModelRole };
 
@@ -24,7 +25,20 @@ export type { ComposeInput, MessagePlan, ModelCall, ModelRole };
  *   unknownSlot       a {{ that opens no slot of K-03's vocabulary;
  *   literalValue      a number, date or price typed in the plan's words, outside its slots, that no fact of the input
  *                     holds, a slot fact or a term fact (rule 4: code fills every value; arch 07 lines 403 and 409;
- *                     K-03 v1.1 README "v1.1"); dates and prices written in words among them (DL-163).
+ *                     K-03 v1.1 README "v1.1"); dates and prices written in words among them (DL-163);
+ *
+ * and the reader's checks (T-375, ./relay), on a plan that keeps to its formats and its facts:
+ *
+ *   relayQuote        a row that gives a relay's quote does not quote it through {{relay.quote}} exactly once, a row
+ *                     that gives none writes one, or the plan types the quote, or a sample quote, outside the slot
+ *                     (arch 07 line 359: "quote them in a code-filled slot, translated with the original kept"; S13-37;
+ *                     CQ-109: one relay.quote per plan);
+ *   sensitiveWork     on a gentle row (grief, safety or sensitive work; or a service limit 7 gave as nothing) the plan
+ *                     types a sample service or name, or gives a service slot words after "|" the master line does not
+ *                     (S13-22; RULES 4.6: never the service or the reason, and initials);
+ *   tone              on a gentle row the plan's own words hold "!" or "¡" (arch 07 line 357: "gentle, no '!'");
+ *   language          on an English or Spanish row a field of the plan reads as the other language (arch 06 line 341:
+ *                     the language of the text, else the stored one; S13-24 rule 12).
  */
 export const REFUSAL_CHECKS = [
   "input",
@@ -34,6 +48,10 @@ export const REFUSAL_CHECKS = [
   "holdSlot",
   "unknownSlot",
   "literalValue",
+  "relayQuote",
+  "sensitiveWork",
+  "tone",
+  "language",
 ] as const;
 export type RefusalCheck = (typeof REFUSAL_CHECKS)[number];
 
@@ -65,7 +83,10 @@ export interface ComposerOptions {
 /** Where the call's spans go: the turn's trace, as the AI gateway takes it (one portCall span per attempt). */
 export type ComposeCallOptions = CallOptions;
 
-/** The row's plan: a K-03 v1 plan that keeps to its input (allowed formats; no value typed that no fact holds). */
+/**
+ * The row's plan: a K-03 v1 plan that keeps to its input (allowed formats; no value typed that no fact holds) and to its
+ * reader (the relay's quote, sensitive work, the tone and the language: T-375).
+ */
 export interface ComposeOk {
   readonly status: "ok";
   readonly plan: MessagePlan;
@@ -101,7 +122,7 @@ export interface ComposeDown {
 
 export type ComposeAnswer = ComposeOk | ComposeRefused | ComposeDown;
 
-/** The composer (C-118): one Haiku call per outbox row, the row's message plan out. */
+/** The composer (C-118): one Haiku call per outbox row, the row's message plan out, and its one rewrite (T-374). */
 export interface Composer {
   /**
    * Composes one outbox row's message plan. Never rejects for a failed model call or a bad answer: those are
@@ -109,4 +130,11 @@ export interface Composer {
    * (MissingKeyError), a trace of another bundle (GatewayConfigError).
    */
   compose(input: ComposeInput, options?: ComposeCallOptions): Promise<ComposeAnswer>;
+  /**
+   * The one rewrite of a composed plan, told what failed (rewriteTold's shape): one call, purpose `rewrite`. A told from
+   * the rewrite's own failure, or a rewrite whose answer the AI layer refuses, is 'use the fallback' (the action layer's
+   * path), never a second rewrite. Never rejects for a failed model call or a bad answer or request; rejects, before any
+   * call, only as compose does (no key, a trace of another bundle).
+   */
+  rewrite(request: RewriteRequest, options?: ComposeCallOptions): Promise<RewriteAnswer>;
 }

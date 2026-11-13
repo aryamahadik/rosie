@@ -6,11 +6,18 @@
 //   1. Open: the handle's directory names the handle (K-04) and the zone its dates resolve in; the turn opens its sealed
 //      texts with the handle's key (the inbox never does) and reads each one as K-02's text.
 //   2. Guard (T-250, ../guard): keyword texts by code alone, then the handle's targets for the rest.
-//   3. Keyword texts alone (K-09 README default 35): T-267's `replyToKeywords` records them through `turnReplyCore`
-//      (./keywords), and their core actions ride in this turn's one commit, input coreOnly, after each text's
-//      recordSafetyOutcome. When its result says rerun, the turn runs them again (at most `KEYWORD_RUNS` in a run). A
-//      fixed line's row is never composed.
-//   4. Frontier (K-09 buildFrontier): the other texts, with the guard's targets, give K-02's context.
+//   3. Keyword texts (K-09 README defaults 10 and 35): T-267's `replyToKeywords` records them through `turnReplyCore`
+//      (./keywords), and their core actions ride in this turn's one commit after each text's recordSafetyOutcome: alone,
+//      input coreOnly; beside decided texts, with the decided input (step 6). When its result says rerun, the turn runs
+//      them again (at most `KEYWORD_RUNS` in a run). A fixed line's row is never composed. They never wait for a missing
+//      safety result (ADR-015 section 3): the run goes on with that text left out of the records. Nor does a STOP wait
+//      for the decided part (DL-508, DL-521; arch 06 line 329: a change that only protects commits at once), since a park
+//      records no core action (K-05 v1 parkTurn). So the keyword texts commit core-only on the run whose targets read,
+//      frontier, decide or re-read fails while a result is missing or one of them is a stop word, and on the run whose
+//      decided request the gate refuses on its tries when one of them is a stop word (`commitKeywords`). START and HELP
+//      alone, with every result present, keep the lease's retry, which may find the decided part ready.
+//   4. Frontier (K-09 buildFrontier): the other texts, with the guard's targets, give K-02's context. Its span is the
+//      turn's, unless the turn face records the hop itself (`recordsFrontierSpan`, CQ-159: the Tool API base's span).
 //   5. Decide (K-02, the AI layer's two reads). When the reads disagree on a part, or a part is unmapped, the one Sonnet
 //      re-read runs before anything goes to the gate (Q-41's default: one re-read, then one question; never a commit on a
 //      difference). When nothing fits, meaning search adds the closest entries (K-09 closestEntries) and the re-read runs
@@ -27,10 +34,11 @@
 //      line's row is never composed, and the dispatcher is woken once. A run no longer the turn's composes nothing: the
 //      run that has the turn now does it.
 //
-// Fails closed: a run that cannot finish one of steps 1 to 6 commits nothing and ends; the lease reruns the turn from its
-// sealed texts when its 60 s lapse, and parks it after a third lapse with no commit (T-253, ./park.ts: K-05 v1 parkTurn,
-// its one "nothing changed" row, the dispatcher woken). Never logged or put in a span: a text's words, a plan's words, a
-// number, a key (K-08 README line 79); the spans hold counts, labels and ids only.
+// Fails closed: a run that cannot finish one of steps 1 to 6 commits nothing and ends, but for the keyword texts step 3
+// commits core-only; the lease reruns the turn from its sealed texts when its 60 s lapse, and parks it after a third
+// lapse with no commit (T-253, ./park.ts: K-05 v1 parkTurn, its one "nothing changed" row, the dispatcher woken). Never
+// logged or put in a span: a text's words, a plan's words, a number, a key (K-08 README line 79); the spans hold counts,
+// labels and ids only.
 //
 // The crash path after the commit (T-253; arch 11 line 576): the commit goes through the lease with `reply`, so the
 // committed turn keeps its lease until step 7 has ended, when every row the commit wrote holds a plan or is closed and the
@@ -43,8 +51,13 @@
 // models are down (the AI gateway's `modelsDown`, after its own retry and the other model, T-361) and nothing has
 // committed, the run ends saying who waits (`aiDown`), and the lease's `runTurn` runs the turn through the AI-down path:
 // each waiting text gets the outage line once, never to a stopped number, and the turn runs again every 30 s until it
-// commits. Its one commit carries the core actions in the return order (`coreOf`): every text's safety record, the danger
-// texts' first, then the stop and start records, then the rest; the decided parts follow them (C-087). After the commit no
+// commits. Only a turn with no stop word waits there for the models' return. A turn holding one never does (DL-508,
+// DL-521; arch 06 line 329): whatever the models answer, its keyword texts commit on the run, core-only on the run that
+// finds the models down, with the safety records the run has (step 3). Such a turn waits only when that commit does not
+// go through, and then for the core, not the models: on a later try it commits core-only while they are still down, or
+// with the decided input once they are back (a run's first keyword commit carries it: `commitKeywords`). Either way its
+// one commit carries the core actions in the return order (`coreOf`): every text's safety record, the danger texts'
+// first, then the stop and start records, then the rest; the decided parts follow them (C-087). After the commit no
 // outage line goes: a model call that fails then takes step 7's path for its row (./compose.ts).
 //
 // Not here: the planner after meaning search (C-117: `planner` is null); the safety read (T-246); wiring the real Tool
@@ -59,7 +72,14 @@ import type {
   LeasedTurn,
   LeaseHooks,
 } from "../actor";
-import { actorNameOf, openWords, type HandleRef, type SealedWords } from "../gateway/seal";
+import {
+  actorNameOf,
+  openWords,
+  wordsOfEvent,
+  type HandleRef,
+  type SealedWords,
+  type SealingKey,
+} from "../gateway/seal";
 import type { SealedEvent } from "../gateway/types";
 import {
   guardTurn,
@@ -264,7 +284,10 @@ interface Run {
   committedCaller: TurnCaller | null;
   /** True once decide or the re-read answered that the models are down (`modelsDown`, T-271). */
   modelsDown: boolean;
-  /** True when one of the turn's keyword texts is a stop word: no outage line goes to the handle (T-271). */
+  /**
+   * True when one of the turn's keyword texts is a stop word: no outage line goes to the handle (T-271), and the keyword
+   * texts never wait for the decided part, committing core-only on the run that cannot make it (DL-508, DL-521).
+   */
   readonly stopAsked: boolean;
 }
 
@@ -366,7 +389,7 @@ export async function runTurnLoop(turn: LeasedTurn): Promise<TurnOutcome> {
 
   let safety: Map<string, SafetyResult>;
   try {
-    safety = await safetyOf(set, opened);
+    safety = await safetyOf(turn, opened);
   } catch {
     safety = new Map();
   }
@@ -419,15 +442,25 @@ export async function runTurnLoop(turn: LeasedTurn): Promise<TurnOutcome> {
     return outcomeOf(run, await commitCoreOnly(run, run.caller, []), null);
   }
 
-  // Every text of a turn that is decided carries its safety record in the commit (K-09 README default 5).
-  if (opened.some((text) => text.readable && !safety.has(text.eventId))) {
-    return notCommitted(run, "noSafetyResult");
-  }
+  // Every text of a turn that is decided carries its safety record in the commit (K-09 README default 5), so a turn with
+  // no keyword texts ends here while a result is missing. Keyword texts never wait for one (ADR-015 section 3): the run
+  // goes on with that text left out of the records, and the commit holds every routine part while it is unread.
+  const missing = opened.some((text) => text.readable && !safety.has(text.eventId));
+  if (missing && keywords.length === 0) return notCommitted(run, "noSafetyResult");
+  // When the decided part cannot be made on this run, the keyword texts commit at once through `keywordTurn` with no
+  // decided input (core-only, with the records the run has) if a result is missing, which a rerun would find missing
+  // again, or if one of them is a stop (DL-508; arch 06 line 329: a change that only protects commits at once), since a
+  // park records no core action (K-05 v1 parkTurn). Keyword texts that are START or HELP only, with every result
+  // present, keep the lease's retry, which may find the decided part ready. (A decided request the gate refuses on its
+  // tries is `commitKeywords`' to answer: a stop commits core-only there, DL-521.)
+  const keywordsAtOnce = keywords.length > 0 && (missing || run.stopAsked);
   // The targets read failed: nothing may reach decide on this run (the frontier needs the targets).
-  if (onward.read === "failed") return notCommitted(run, onward.errorCode);
+  if (onward.read === "failed") {
+    return keywordsAtOnce ? keywordTurn(run, keywords, null) : notCommitted(run, onward.errorCode);
+  }
 
   const prepared = await prepareDecided(run, texts, onward.targets);
-  if ("result" in prepared) return prepared;
+  if ("result" in prepared) return keywordsAtOnce ? keywordTurn(run, keywords, null) : prepared;
   // Keyword texts beside decided ones ride in the same one commit (K-09 README default 10).
   if (keywords.length > 0) return keywordTurn(run, keywords, prepared);
   return outcomeOf(run, await commitDecided(run, prepared, []), null);
@@ -459,13 +492,18 @@ export const turnHooks: Required<LeaseHooks> = {
 
 // ---- 1. opening the texts ---------------------------------------------------------------------------------------
 
-/** Opens each text's sealed words with the handle's key and reads its K-02 form, in arrival order. */
+/**
+ * Opens each text's sealed words with the handle's key and reads its K-02 form, in arrival order. The words are read by
+ * the box's form (K-06 v1.2 items 5 and 6, `wordsOfEvent`): a form 2 box gives every word, a vote's option words among
+ * them, and only the box; an event kept before v1.2 gives its form 1 box's body and subject and a vote's plain option
+ * words. A box that does not open, or whose members are not its form's, throws, and the run fails closed.
+ */
 async function openTexts(turn: LeasedTurn, set: TurnDeps, zone: string): Promise<OpenedText[]> {
-  const keys = new Map<string, Uint8Array>();
+  const keys = new Map<string, SealingKey>();
   const opened: OpenedText[] = [];
   for (const entry of turn.entries) {
     const event = entry.event;
-    let words: SealedWords | null = null;
+    let box: SealedWords | null = null;
     if (event.sealed !== null) {
       const name = actorNameOf(event.handle);
       let key = keys.get(name);
@@ -473,8 +511,9 @@ async function openTexts(turn: LeasedTurn, set: TurnDeps, zone: string): Promise
         key = await set.keys.getOrCreateKey(event.handle);
         keys.set(name, key);
       }
-      words = await openWords(event.sealed, key, name, event.eventId);
+      box = await openWords(event.sealed, key, name, event.eventId);
     }
+    const words = wordsOfEvent(event, box);
     opened.push({
       eventId: event.eventId,
       kind: event.kind,
@@ -506,7 +545,8 @@ function attachmentsOf(value: unknown): TurnText["attachments"] {
 
 /**
  * K-02's text for one stored event (K-06): a text, a photo's caption or an edit's new words is a text; a vote is a
- * pollVote with its option's words; a reaction is a tapback named by its reaction. Its send time is the sender's (K-06
+ * pollVote with its option's words, as `wordsOfEvent` read them (from a form 2 box only; a vote kept before K-06 v1.2
+ * from its plain poll.optionWords); a reaction is a tapback named by its reaction. Its send time is the sender's (K-06
  * sentAt), with the zone dates resolve in. Null for an event K-02 has no text for.
  */
 function turnTextOf(event: SealedEvent, words: SealedWords | null, zone: string): TurnText | null {
@@ -522,10 +562,11 @@ function turnTextOf(event: SealedEvent, words: SealedWords | null, zone: string)
       return { ...base, kind: "text", words: wordsOf(words), poll: null, tapback: null };
     case "pollVote": {
       const poll = event.poll;
-      if (!isRecord(poll) || !isText(poll.pollId) || !isText(poll.optionId) || !isText(poll.optionWords))
+      const optionWords = words?.optionWords ?? null;
+      if (!isRecord(poll) || !isText(poll.pollId) || !isText(poll.optionId) || !isText(optionWords))
         return null;
       const vote = { pollId: poll.pollId, optionId: poll.optionId };
-      return { ...base, kind: "pollVote", words: poll.optionWords, poll: vote, tapback: null };
+      return { ...base, kind: "pollVote", words: optionWords, poll: vote, tapback: null };
     }
     case "reaction": {
       const reaction = event.reaction;
@@ -538,12 +579,15 @@ function turnTextOf(event: SealedEvent, words: SealedWords | null, zone: string)
   }
 }
 
-/** Each readable text's safety result, by event id; a result for another text is not taken. */
-async function safetyOf(set: TurnDeps, opened: readonly OpenedText[]): Promise<Map<string, SafetyResult>> {
+/**
+ * Each readable text's safety result, by event id, read through the run's leased turn from the handle's own actor, where
+ * the read on arrival kept it (ADR-015 section 3); a result for another text is not taken.
+ */
+async function safetyOf(turn: LeasedTurn, opened: readonly OpenedText[]): Promise<Map<string, SafetyResult>> {
   const wanted = opened.filter((text) => text.readable).map((text) => text.eventId);
   const found = new Map<string, SafetyResult>();
   if (wanted.length === 0) return found;
-  for (const result of await set.safety.resultsOf(wanted)) {
+  for (const result of await turn.resultsOf(wanted)) {
     if (wanted.includes(result.eventId) && !found.has(result.eventId)) found.set(result.eventId, result);
   }
   return found;
@@ -592,11 +636,14 @@ function coreOf(run: Run, caller: TurnCaller, actions: readonly CoreAction[]): C
 
 /**
  * The guard's keyword texts through T-267's replies, their core actions committed by this turn (`commitKeywords`): alone,
- * input coreOnly (default 35); beside decided texts, in the same one commit (default 10). When the replies ask for the
- * turn to run again, they run again, at most `KEYWORD_RUNS` times in this run. If no keyword text could become a core
- * action at all (each one refused before any commit, such as a STOP from a handle with no number), the turn commits what
- * it has, so it still closes once. A reply that recorded nothing (the replies not wired, or no commit answered) never
- * lets the turn close without it: the run ends with nothing committed, and the lease runs the turn again.
+ * input coreOnly (default 35); beside decided texts, in the same one commit (default 10), or core-only with no decided
+ * input (`decided` null) when the run cannot make the decided part while a result is missing or one of them is a stop
+ * word (ADR-015 section 3; DL-508). A turn holding a stop word whose decided request the gate refuses on its tries
+ * commits them core-only on this run too (DL-521). When the replies ask for the turn to run again, they run again, at
+ * most `KEYWORD_RUNS` times in this run. If no keyword text could become a core action at all (each one refused before
+ * any commit, such as a STOP from a handle with no number), the turn commits what it has, so it still closes once. A
+ * reply that recorded nothing (the replies not wired, or no commit answered) never lets the turn close without it: the
+ * run ends with nothing committed, and the lease runs the turn again.
  */
 async function keywordTurn(
   run: Run,
@@ -640,7 +687,16 @@ const keywordCaller = (run: Run): TurnCaller => ({ ...run.caller, businessId: nu
 
 /**
  * The replies' commitCore for this turn: each text's recordSafetyOutcome first, then the keyword texts' core actions, in
- * one gateAndCommit through the lease. The replies are answered K-09's core results for their own actions only.
+ * one gateAndCommit through the lease, with the decided input when the turn has one. The replies are answered K-09's core
+ * results for their own actions only.
+ *
+ * A turn holding a stop word never waits on the decided part (DL-521, after DL-508; arch 06 line 329): when the gate
+ * refuses the decided request on its tries (its one resend, and for `valueFailsWords` the one re-read), the keyword
+ * texts commit core-only on this run instead, under the replies' own caller, as a turn of keyword texts alone does,
+ * since a park records no core action (K-05 v1 parkTurn). Such a turn sends its decided input on the run's first keyword
+ * commit only: a later one (the replies' rerun) follows either that refusal, so it never waits on the decided part again,
+ * or a commit, whose repeat answers the first commit whatever its body (K-05 v1 item 1); so it is core-only at once.
+ * START and HELP alone keep the decided input on every commit, and the lease's retry.
  */
 async function commitKeywords(
   run: Run,
@@ -648,11 +704,12 @@ async function commitKeywords(
   decided: DecidedInput | null,
 ): Promise<CoreCommitAnswer> {
   if (request.caller.turnId !== run.turn.turnId) return { error: "wrongTurn" };
+  const coreOnly = (): Promise<Sent> => commitCoreOnly(run, { ...request.caller }, request.actions);
+  const input = run.stopAsked && run.keywordCommits > 0 ? null : decided;
   run.keywordCommits += 1;
-  const sent =
-    decided === null
-      ? await commitCoreOnly(run, { ...request.caller }, request.actions)
-      : await commitDecided(run, decided, request.actions);
+  const first = input === null ? await coreOnly() : await commitDecided(run, input, request.actions);
+  const stopAtOnce = first.kind === "refused" && input !== null && run.stopAsked && !replaced(run.turn);
+  const sent = stopAtOnce ? await coreOnly() : first;
   if (sent.kind === "refused") return { error: sent.error };
   // K-09 answers each core action's result at its place in the request (the return order: `coreOf`), and the replies
   // read them in the order of their own actions.
@@ -723,9 +780,12 @@ function isContextOf(value: unknown, turnId: string): value is DecideContext {
   return isRecord(value) && value.turnId === turnId && Array.isArray(value.choices);
 }
 
-/** K-09 buildFrontier, with its span: the context, or why there is none (a label). */
+/**
+ * K-09 buildFrontier, with its span: the context, or why there is none (a label). A turn face that records the frontier
+ * span itself (`recordsFrontierSpan`, CQ-159) gets no second one from the turn.
+ */
 async function buildFrontier(run: Run, request: BuildFrontierRequest): Promise<DecideContext | string> {
-  const span = run.trace.start("frontier");
+  const span = run.set.toolApi.recordsFrontierSpan === true ? null : run.trace.start("frontier");
   const got: SpanFacts = {
     texts: request.texts.length,
     roles: request.targets.roles.length,
@@ -1029,10 +1089,20 @@ const NOT_CHECKED: LimitResult[] = [1, 2, 3, 4, 5, 6].map((limit) => ({
   outcome: null,
 }));
 
-/** One gate span per part, with that part's limits (a limit that fails stops only its choice); one for a core-only commit. */
+/**
+ * One gate span per part, with that part's limits (a limit that fails stops only its choice); one for a core-only commit,
+ * which says whether it was answered as a repeat. A later commit of the turn id writes nothing and answers the first
+ * (K-05 v1 item 1), so a repeat's no parts are this call's, never a turn that committed nothing.
+ */
 function recordGate(run: Run, first: Timer, got: SpanFacts, committed: GateCommitted): void {
   if (committed.parts.length === 0) {
-    finish(first, { outcome: "ok", ...businessOf(run), got, limits: NOT_CHECKED, decided: { parts: 0 } });
+    finish(first, {
+      outcome: "ok",
+      ...businessOf(run),
+      got,
+      limits: NOT_CHECKED,
+      decided: { parts: 0, repeated: committed.repeated },
+    });
     return;
   }
   committed.parts.forEach((part, index) => {
@@ -1129,7 +1199,7 @@ async function finishCommitted(
 /**
  * True when step 7 has ended for the commit (T-253): the turn's rows with no plan were read, and none of them was left
  * with no plan (each was composed, copied, found planned or closed). The dispatcher's wake counts as given either way: a
- * wake not taken leaves the rows to the minute sweep.
+ * wake not taken leaves the rows for the recipient's next dispatcher run (no sweep runs).
  */
 export function replyEnded(report: ComposeReport): boolean {
   return report.rowsError === null && report.rows.every((row) => row.result !== "left");
@@ -1150,8 +1220,12 @@ const FAILED_CODES: ReadonlySet<string> = new Set(["noAnswer", "transient", "bad
 
 const failedOrRefused = (code: string): Outcome => (FAILED_CODES.has(code) ? "failed" : "refused");
 
-/** Records a span; a span the trace refuses is not kept, and the turn goes on. */
-function finish(span: Timer, fields: Parameters<Timer["finish"]>[0]): void {
+/**
+ * Records a span; a span the trace refuses is not kept, and the turn goes on. No span (null): the hop's port records it
+ * itself (CQ-159).
+ */
+function finish(span: Timer | null, fields: Parameters<Timer["finish"]>[0]): void {
+  if (span === null) return;
   try {
     span.finish(fields);
   } catch {

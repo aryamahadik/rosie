@@ -1,0 +1,20 @@
+{
+  "call": "readOutboxRowWritten",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["commit-alex-safety.json"],
+    "now": "2026-11-07T15:59:59Z",
+    "note": "After the commit that wrote Alex's emergency line as a safety row (v1.1's commit-alex-safety; K-07 outbox-safety-retry), a repeated record of the same text names the line's row only when it is written: it is, so the answer is true. Only the row's id is read, never its plan or final parts."
+  },
+  "request": {
+    "outboxRowId": "out-alex-safety-emergency",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "outboxRowWritten",
+    "outboxRowId": "out-alex-safety-emergency",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-11-07T15:59:59Z",
+    "written": true
+  }
+}

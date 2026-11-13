@@ -1,15 +1,79 @@
-// Which implementation each port takes in each environment (T-550): the one table the composition root reads and each
-// join (T-552 to T-564) edits, one line per port, in D-017's turn order (./ports.ts).
+// Which implementation each port takes in each environment (T-550): the table the composition root reads and each join
+// (T-552 to T-564) edits, one line per port, in D-017's turn order (./ports.ts), and the PostgreSQL-down path's own
+// (T-1363, below).
 //
-//   test        Vitest and CI: every port on its fake, the doubles the runtime's own tests use (./test-support.ts).
+//   test        Vitest and CI: every port on its fake, the doubles the runtime's own tests use (./test-support.ts), but a
+//               joined port on its real package, fed by those doubles.
 //   staging     the Worker under env.staging (wrangler.jsonc vars: ENVIRONMENT "staging", BASE_PATH "/test").
 //   production  the Worker anywhere else (ENVIRONMENT "production", or a value the root does not know).
 //
-// No join has landed, so the Worker's environments keep every port closed: each call fails, as `unconfiguredGateway` did
-// before, and every webhook route still answers 503. The fakes never reach a Worker bundle: they are test code (the
-// runtime's test-support files are "Not imported by the Worker"; the Linq double is "test code only, never in a Worker
-// bundle"), so only a test hands the root its fake set. A join swaps one line's staging (later production) pick for the
-// real package's implementation, and adds that implementation's set to the root's.
+// A join swaps one line's test and staging picks for the real package's implementation (./real.ts, the set the root
+// builds itself); production's waits for the release that takes it there. Joined so far: linqVerify (T-552), the Linq
+// adapter's verify, fed by the Linq double's signer in a test and by LINQ_WEBHOOK_SECRET on staging, behind the skeleton
+// flag (./skeleton.ts); sealing (T-553), K-05 v1.2 handleSealingKey with its database bound, fed by the K-05 double in a
+// test and by no database on staging until T-567, so every seal there fails closed; safetyRead (T-554), @rosie/ai's
+// safety read, over the recorded-model double in a test and over no reader on staging until the bundle's manifest and
+// the model key can be read there, so every read there fails closed and the actor applies its no-verdict rule; turnRow
+// (T-555), K-05's commitTurn and parkTurn with their database bound, the two calls that write a turn's one row under the
+// turn id the lease hashed, fed by the K-05 double in a test and by no database on staging until T-567, so every commit
+// and park there fails closed; bundles and targets (T-556), K-05 v1 item 7's bundle reads and K-05 v1.2 handleTargets
+// with their database bound, the turn's pin (so the guard's keyword list is the pinned bundle's) and the guard's
+// targets, fed in a test by the K-05 doubles (bundle v0 as bundles/v0 publishes it; test owner 1's seeded rows answering
+// as targets-first-text.json) and by no database on staging until T-567 (and no BUNDLES until T-566), so every pin and
+// every targets read there fails closed; frontier (T-557), K-09 buildFrontier through @rosie/actions' turn face over the
+// turn's pinned bundle and K-05 v1.2 readTurnState as rosie_job under the call's business scope, fed in a test by the
+// K-05 double over test owner 1's seeded rows (T-1148) and by no database on staging until T-567, so every frontier
+// there fails closed; decide (T-558), @rosie/ai's two reads and its one Sonnet re-read, one decider per bundle, over the
+// recorded-model double in a test and over no decider on staging until the bundle's manifest and flows and the model key
+// can be read there (J-02), so every decide and re-read there fails closed before any model call; gate (T-559), K-09
+// gateAndCommit through @rosie/actions' turn face (the gate, then one K-05 commitTurn through the turn-row port, under the
+// turn id, on the turn's pinned bundle), its reads fed in a test by the K-05 doubles over test owner 1's seeded rows and
+// by no database on staging until T-567, so every gate there fails closed and nothing commits; composeInput (T-560), K-09
+// composeInput through @rosie/actions' turn face (each committed row's K-03 composer input from K-05 v1.6 readOutboxRow
+// and the row's pinned bundle, its inbound text the words the turn's gate request handed in), fed in a test by a K-05
+// double over the rows the commit wrote and test owner 1's seeded rows and by no database on staging until T-567, so
+// every compose input there fails closed; and composer (T-560), @rosie/ai's composer and its one rewrite, one per bundle,
+// over the recorded-model double in a test and over no composer on staging until the bundle's manifest and the model key
+// can be read there (J-02), so every compose and rewrite there fails closed before any model call; and finalize (T-561),
+// K-09 finalizeMessage through @rosie/actions' turn face (T-313's finalize with T-314's fixed lines, the claim check and
+// the message checks, over K-05 v1.6 readOutboxRow and v1.3 readFixedLineFacts and the row's pinned bundle, the plan and
+// final parts written into the row by T-196's writePlan), fed in a test by K-05 doubles over the rows the commit wrote and
+// test owner 1's seeded rows and by no database on staging until T-567, so every finalize there fails closed and nothing
+// is written; and outbox and sendState (T-562), the dispatcher's claim in commit order, its renewal and marks (the
+// receipt door's delivered mark with them) over K-05 v1.2's four outbox calls (claimOutboxV12, renewClaim, markPartV12,
+// markRowV12; never T-196's v1 calls), and limit 8's read of the recipient's send state at send over K-05 v1.2 sendState,
+// with the chat the send goes to, fed in a test by one K-05 double over the rows the commit wrote, the plans finalize
+// wrote into them and test owner 1's seeded rows, and by no database on staging until T-567, so every claim and every
+// send-state read there fails closed and nothing is sent; and chatOpen (T-1213), K-05 v1.7 openChatOnText with its
+// database bound, the gateway's call at receipt that opens a number's chat before its actor is reached, fed in a test by
+// the K-05 double over test owner 1's seeded handle and the handles the key call made (writing the phone row the outbox
+// and send-state doubles read), and by no database on staging until T-567, so every text that opens a chat there is
+// answered 503, as every seal there already is; and linqSend (T-563), K-11 sendPart for each part the dispatcher sends,
+// under its row-part-try key, fed in a test by @rosie/adapters' Linq double (T-411), which records each part once per
+// key, and by no Linq line on staging until one is handed in (staging's test-phone line, or J-08's real line), so every
+// send there fails closed and nothing leaves. The direct line (linqDirect), split from it by T-563, is no D-017 hop: on
+// its fake in a test and closed elsewhere. And arming (T-564), the clock arming at a part's first delivery receipt, split
+// from stateReads and dataAccess: K-05 v1 item 5's armClock and cancelClock with their database bound, the question's
+// facts the due rule reads and the actor name of a handle, fed in a test by K-05 doubles over the rows the commit wrote
+// (the question's clock row, waiting until its first receipt) and test owner 1's seeded rows, and by no database on
+// staging until T-567, so every arming there fails closed and nothing is armed. stateReads and dataAccess keep what is
+// not joined, on their fakes in a test and closed in production; on staging (T-1242, T-1154's part P1b) each is its real
+// port over its own RootOptions inputs (./real.ts realStateReads and realDataAccess: the bundle's safety lines with the
+// pin's check, the handle's ids and stopped flag, the turn's directory and each text's safety result; K-05 v1's
+// unplannedRows and writePlan), none of which is handed in until the part of T-1154 that binds it, so every read and
+// call there fails closed and no bundle is pinned. turnFace and linqDirect, which no D-017 hop runs, stay closed there.
+// Every other port of the Worker's environments stays closed: each call fails, as
+// `unconfiguredGateway` did before, so a webhook that gets past the verify still answers 503. The fakes never reach a
+// Worker bundle: they are test code (the runtime's test-support files are "Not imported by the Worker"; the Linq double is
+// "test code only, never in a Worker bundle"), so only a test hands the root its fake set.
+//
+// The PostgreSQL-down path's two ports (T-1363; ./ports.ts DOWN_PATH_PORTS), which no D-017 hop runs, have a table of
+// their own (DOWN_PATH_PICKS), so D-017's stays as it is: each on its fake in a test (./test-support.ts: recordStopOrStart
+// kept and handed to the action layer's call where the test root holds one, each timer fired kept as the actor handed it)
+// and closed on staging and in production, so a STOP or START written on return is refused with nothing recorded (the
+// actor keeps it for its next try) and a safety timer due while PostgreSQL is down fires nothing, its sealed address never
+// opened (QUESTIONS.md CQ-101 (c) leaves the opening to the CTO with the security reviewer). T-1326 joins them, as they are
+// picked, into the PostgreSQL-down path.
 
 import type { PortName } from "./ports";
 
@@ -17,8 +81,11 @@ export const ENVIRONMENTS = ["test", "staging", "production"] as const;
 
 export type Environment = (typeof ENVIRONMENTS)[number];
 
-/** fake: the test doubles. closed: not joined in this environment, so every call fails (./closed.ts). */
-export type ImplementationName = "fake" | "closed";
+/**
+ * fake: the test doubles. real: the real package, joined (./real.ts). closed: not joined in this environment, so every
+ * call fails (./closed.ts).
+ */
+export type ImplementationName = "fake" | "real" | "closed";
 
 /** One port's implementation in each environment. */
 export interface PortPick {
@@ -30,16 +97,36 @@ export interface PortPick {
 
 /** One line per port, in D-017's turn order; the join that swaps it is named beside it. */
 export const PICKS: readonly PortPick[] = [
-  { port: "linqVerify", test: "fake", staging: "closed", production: "closed" }, // T-552
-  { port: "sealing", test: "fake", staging: "closed", production: "closed" }, // T-553
-  { port: "safetyRead", test: "fake", staging: "closed", production: "closed" }, // T-554
-  { port: "stateReads", test: "fake", staging: "closed", production: "closed" }, // T-555 to T-557, T-562, T-564
-  { port: "turnFace", test: "fake", staging: "closed", production: "closed" }, // T-557, T-559, T-560
-  { port: "decide", test: "fake", staging: "closed", production: "closed" }, // T-558
-  { port: "composer", test: "fake", staging: "closed", production: "closed" }, // T-560
-  { port: "finalize", test: "fake", staging: "closed", production: "closed" }, // T-561
-  { port: "dataAccess", test: "fake", staging: "closed", production: "closed" }, // T-555, T-562, T-564
-  { port: "linqSend", test: "fake", staging: "closed", production: "closed" }, // T-563
+  { port: "linqVerify", test: "real", staging: "real", production: "closed" }, // T-552
+  { port: "sealing", test: "real", staging: "real", production: "closed" }, // T-553
+  { port: "chatOpen", test: "real", staging: "real", production: "closed" }, // T-1213
+  { port: "safetyRead", test: "real", staging: "real", production: "closed" }, // T-554
+  { port: "turnRow", test: "real", staging: "real", production: "closed" }, // T-555
+  { port: "bundles", test: "real", staging: "real", production: "closed" }, // T-556
+  { port: "targets", test: "real", staging: "real", production: "closed" }, // T-556
+  { port: "frontier", test: "real", staging: "real", production: "closed" }, // T-557
+  { port: "stateReads", test: "fake", staging: "real", production: "closed" }, // T-1242 (staging's seams; T-564: arming split off)
+  { port: "turnFace", test: "fake", staging: "closed", production: "closed" }, // no D-017 hop
+  { port: "decide", test: "real", staging: "real", production: "closed" }, // T-558
+  { port: "gate", test: "real", staging: "real", production: "closed" }, // T-559
+  { port: "composeInput", test: "real", staging: "real", production: "closed" }, // T-560
+  { port: "composer", test: "real", staging: "real", production: "closed" }, // T-560
+  { port: "finalize", test: "real", staging: "real", production: "closed" }, // T-561
+  { port: "outbox", test: "real", staging: "real", production: "closed" }, // T-562
+  { port: "sendState", test: "real", staging: "real", production: "closed" }, // T-562
+  { port: "dataAccess", test: "fake", staging: "real", production: "closed" }, // T-1242 (staging's seams; T-564: arming split off)
+  { port: "linqSend", test: "real", staging: "real", production: "closed" }, // T-563
+  { port: "arming", test: "real", staging: "real", production: "closed" }, // T-564
+  { port: "linqDirect", test: "fake", staging: "closed", production: "closed" }, // no D-017 hop
+];
+
+/**
+ * One line per port of the PostgreSQL-down path (./ports.ts DOWN_PATH_PORTS), in its order: no D-017 hop runs either, so
+ * each is on its fake in a test and closed on staging and in production until a card opens it (T-1363).
+ */
+export const DOWN_PATH_PICKS: readonly PortPick[] = [
+  { port: "stopOrStart", test: "fake", staging: "closed", production: "closed" }, // no D-017 hop (T-1363)
+  { port: "timerFire", test: "fake", staging: "closed", production: "closed" }, // no D-017 hop; CQ-101 (c)
 ];
 
 /**

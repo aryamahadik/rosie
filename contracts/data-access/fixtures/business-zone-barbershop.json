@@ -1,0 +1,18 @@
+{
+  "call": "readBusinessZone",
+  "given": {
+    "k04Seeds": ["seed-business-head.json"],
+    "after": [],
+    "now": "2026-10-27T09:00:04Z",
+    "note": "The zone 'that day' is read in for a harm report filed at the barbershop (K-34 v1 harm_reports.day_zone; CQ-05's default, K-34 default 4): its businesses.time_zone (K-04 seed-business-head)."
+  },
+  "request": {
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "businessZone",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-27T09:00:04Z",
+    "timeZone": "America/New_York"
+  }
+}

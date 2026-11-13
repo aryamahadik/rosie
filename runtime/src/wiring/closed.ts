@@ -2,6 +2,11 @@
 // (./picks.ts). Each call fails at once with `NotJoinedError`, naming the port and never a value, so a webhook route
 // answers 503 with nothing stored, as `unconfiguredGateway` did, and nothing waits on a port that cannot answer. Worker
 // code: no double, no fixture, no network call, no key.
+//
+// The PostgreSQL-down path's two (T-1363) fail closed the same way, before anything is read or sent: a closed
+// recordStopOrStart refuses the STOP or START written on return with nothing recorded (no answer, so the actor keeps the
+// record for its next try), and a closed fireFromCopy fires nothing: no alert goes, and the timer copy's sealed address is
+// never opened (QUESTIONS.md CQ-101 (c)); the down path tries the timer again 5 s on.
 
 import type { PortName, Ports } from "./ports";
 
@@ -26,15 +31,19 @@ const failNow = (port: PortName): never => {
 export function closedPorts(): Ports {
   return {
     linqVerify: { verifyWebhook: () => fail("linqVerify") },
-    sealing: { getOrCreateKey: () => fail("sealing") },
+    sealing: { getOrCreateKey: () => fail("sealing"), getOrCreateHandleKey: () => fail("sealing") },
+    chatOpen: { openChatOnText: () => fail("chatOpen") },
     safetyRead: { read: () => fail("safetyRead") },
-    stateReads: {
-      bundles: {
-        registry: {
-          readActiveBundle: () => fail("stateReads"),
-          readBundleValue: () => fail("stateReads"),
-        },
+    turnRow: { commitTurn: () => fail("turnRow"), parkTurn: () => fail("turnRow") },
+    bundles: {
+      registry: {
+        readActiveBundle: () => fail("bundles"),
+        readBundleValue: () => fail("bundles"),
       },
+    },
+    targets: { handleTargets: () => fail("targets") },
+    frontier: { buildFrontier: () => fail("frontier") },
+    stateReads: {
       safety: {
         directory: { idsOf: () => fail("stateReads") },
         bundle: {
@@ -44,25 +53,12 @@ export function closedPorts(): Ports {
         },
         isStopped: () => fail("stateReads"),
       },
-      targets: { handleTargets: () => fail("stateReads") },
       turn: {
         directory: { partyOf: () => fail("stateReads") },
-        safety: { resultsOf: () => fail("stateReads") },
-      },
-      dispatch: {
-        recipients: { chatFor: () => fail("stateReads") },
-        sendState: { sendStateFor: () => fail("stateReads") },
-      },
-      arming: {
-        facts: { questionFacts: () => fail("stateReads") },
-        directory: { actorNameOf: () => fail("stateReads") },
       },
     },
     turnFace: {
-      buildFrontier: () => fail("turnFace"),
       closestEntries: () => fail("turnFace"),
-      gateAndCommit: () => fail("turnFace"),
-      composeInput: () => fail("turnFace"),
       safetyCore: {
         recordSafetyOutcome: () => fail("turnFace"),
         sendFixedLine: () => fail("turnFace"),
@@ -70,25 +66,34 @@ export function closedPorts(): Ports {
       },
     },
     decide: { decide: () => fail("decide"), reread: () => fail("decide") },
+    gate: { gateAndCommit: () => fail("gate") },
+    composeInput: { composeInput: () => fail("composeInput") },
     composer: { compose: () => fail("composer"), rewrite: () => fail("composer") },
     finalize: { finalizeMessage: () => fail("finalize") },
+    outbox: {
+      markRow: () => fail("outbox"),
+      claimOutbox: () => fail("outbox"),
+      renewClaim: () => fail("outbox"),
+      markPart: () => fail("outbox"),
+    },
+    sendState: {
+      sendState: { sendStateFor: () => fail("sendState") },
+      recipients: { chatFor: () => fail("sendState") },
+    },
     dataAccess: {
       rows: {
         unplannedRows: () => fail("dataAccess"),
         writePlan: () => fail("dataAccess"),
-        parkTurn: () => fail("dataAccess"),
       },
-      outbox: {
-        markRow: () => fail("dataAccess"),
-        claimOutbox: () => fail("dataAccess"),
-        renewClaim: () => fail("dataAccess"),
-        markPart: () => fail("dataAccess"),
-      },
-      clocks: { armClock: () => fail("dataAccess"), cancelClock: () => fail("dataAccess") },
     },
-    linqSend: {
-      parts: { sendPart: () => fail("linqSend") },
-      direct: { send: () => fail("linqSend") },
+    linqSend: { parts: { sendPart: () => fail("linqSend") } },
+    arming: {
+      data: { armClock: () => fail("arming"), cancelClock: () => fail("arming") },
+      facts: { questionFacts: () => fail("arming") },
+      directory: { actorNameOf: () => fail("arming") },
     },
+    linqDirect: { send: () => fail("linqDirect") },
+    stopOrStart: { recordStopOrStart: () => fail("stopOrStart") },
+    timerFire: { fireFromCopy: () => fail("timerFire") },
   };
 }

@@ -69,12 +69,16 @@
 //   8. The sweep's missedBefore may not be after its now (a row is not missed before it is due); the limits are the
 //      schema's (1 to 100 for a handle, 1 to 1000 for the sweep). Rows of equal due time come in id order (collate "C",
 //      compared, never parsed: CQ-09).
+//   9. A firing's state write gives a bytea column (a sealed value) in K-04's text form, "\x" and hex digit pairs, and
+//      it is written as the bytes it spells, as commitTurn's are (commit-turn.ts default 11; bytea.ts; T-1185):
+//      postgres.js would store a string's own characters. A value in any other form throws, and nothing is written.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.1";
+import { byteaFromText } from "./bytea";
 import { NOT_STATE_TABLES } from "./commit-turn";
 import { appendEvent, type EventContext, type EventEntry as LogEntry } from "./event-log";
 import { releaseIn } from "./reservations";
 import { assertBusinessId, SCOPE_SETTING, type Sql } from "./scope";
-import { assertRequestShape, inRuntimeTransaction, transientOrThrow, utc } from "./targets";
+import { assertRequestShape, inRuntimeTransaction, isSessionFailure, transientOrThrow, utc } from "./targets";
 
 type Json = Parameters<Sql["json"]>[0];
 type Row = Record<string, unknown>;
@@ -289,17 +293,23 @@ export function checkEventEntry(call: string, entry: unknown): void {
  * table and constraint, never PostgresError's message, detail or query, which can hold a row's values.
  */
 export class DataAccessDatabaseError extends Error {
-  constructor(
-    readonly call: string,
-    readonly code: string,
-    readonly table: string | null,
-    readonly constraint: string | null,
-  ) {
+  // Plain fields set in the constructor, never parameter properties: Node's type stripping cannot run those, and the
+  // seed runner loads this file through targets.ts (T-1268 round 4).
+  readonly call: string;
+  readonly code: string;
+  readonly table: string | null;
+  readonly constraint: string | null;
+
+  constructor(call: string, code: string, table: string | null, constraint: string | null) {
     const names = [
       table === null ? "" : `, table ${table}`,
       constraint === null ? "" : `, constraint ${constraint}`,
     ];
     super(`${call}: the database refused the call (SQLSTATE ${code}${names.join("")})`);
+    this.call = call;
+    this.code = code;
+    this.table = table;
+    this.constraint = constraint;
     this.name = "DataAccessDatabaseError";
   }
 }
@@ -308,27 +318,68 @@ function nameOrNull(value: unknown): string | null {
   return typeof value === "string" && NAME.test(value) ? value : null;
 }
 
-/** A PostgreSQL error as DataAccessDatabaseError; any other error as it is. */
+/**
+ * A PostgreSQL error as DataAccessDatabaseError; an error of the database client or of its connection as a new Error
+ * that carries the call's name and the client's code alone (`call`, `code`: a plain code such as
+ * ERR_TLS_CERT_ALTNAME_INVALID or UNDEFINED_VALUE, or null), with no stack of the original's and no cause (T-1268);
+ * db/repo's own errors as they are.
+ *
+ * The client's error is never passed on. Its message names the host and the port (postgres.js's "write CONNECT_TIMEOUT
+ * host:port", Node's "connect ECONNREFUSED host:port" and "getaddrinfo ENOTFOUND host"), its properties hold them
+ * (address, port, hostname; host and cert from Node's TLS name check; errors, one per address, when every address of a
+ * name failed), and postgres.js puts the statement on every error it rejects a statement with (query, parameters, args,
+ * types, and the statement's origin on its stack; args holds the statement's values even when the connection never
+ * opened). It is known by those properties, which db/repo's own errors never carry, or by syscall and errno, Node's mark
+ * of a system error, or as a failure to open or keep a session (targets.ts isSessionFailure: a TLS or certificate error,
+ * postgres.js's SASL_SIGNATURE_MISMATCH, with no such property), which transientOrThrow throws through here (T-1268
+ * round 2).
+ */
 export function scrubbed(call: string, error: unknown): unknown {
-  if (!(error instanceof Error) || error.name !== "PostgresError") {
+  if (!(error instanceof Error)) {
     return error;
   }
   const failure = error as Error & { code?: unknown; table_name?: unknown; constraint_name?: unknown };
-  if (typeof failure.code !== "string" || !SQLSTATE.test(failure.code)) {
+  if (error.name === "PostgresError" && typeof failure.code === "string" && SQLSTATE.test(failure.code)) {
+    return new DataAccessDatabaseError(
+      call,
+      failure.code,
+      nameOrNull(failure.table_name),
+      nameOrNull(failure.constraint_name),
+    );
+  }
+  const clientFields = [
+    "query",
+    "parameters",
+    "args",
+    "types",
+    "address",
+    "port",
+    "hostname",
+    "host",
+    "cert",
+    "errors",
+    "syscall",
+    "errno",
+  ];
+  if (
+    error.name !== "PostgresError" &&
+    !clientFields.some((field) => Object.hasOwn(error, field)) &&
+    !isSessionFailure(error)
+  ) {
     return error;
   }
-  return new DataAccessDatabaseError(
-    call,
-    failure.code,
-    nameOrNull(failure.table_name),
-    nameOrNull(failure.constraint_name),
+  const code =
+    typeof failure.code === "string" && /^[A-Z0-9_]{1,64}$/.test(failure.code) ? failure.code : null;
+  return Object.assign(
+    new Error(`${call}: the database call failed (${code === null ? "no code" : `code ${code}`})`),
+    { call, code },
   );
 }
 
 /** The transient answer, or the error thrown on, scrubbed of any value (K-05 README: every call may answer transient). */
 export function transientOrScrubbed(call: string, error: unknown): K05.TransientError {
   try {
-    return transientOrThrow(error);
+    return transientOrThrow(error, call);
   } catch {
     throw scrubbed(call, error);
   }
@@ -349,8 +400,11 @@ function constraintOf(error: unknown): K05.ConstraintError | null {
 
 /** Thrown inside fireClock's transaction to roll it back and answer one of K-05's refusals. */
 class Refused extends Error {
-  constructor(readonly answer: FireClockError) {
+  readonly answer: FireClockError;
+
+  constructor(answer: FireClockError) {
     super("fireClock refused");
+    this.answer = answer;
   }
 }
 
@@ -866,9 +920,12 @@ function checkFire(request: FireClockRequest): Date {
 
 /** The business scope of the firing's transaction, set to each write's own business (null: the runtime side). */
 class Scope {
+  private readonly tx: Sql;
   private current: string | null = null;
 
-  constructor(private readonly tx: Sql) {}
+  constructor(tx: Sql) {
+    this.tx = tx;
+  }
 
   async to(businessId: string | null): Promise<void> {
     if (businessId === this.current) {
@@ -886,6 +943,8 @@ interface TableInfo {
   readonly name: string;
   readonly columns: ReadonlySet<string>;
   readonly jsonColumns: ReadonlySet<string>;
+  /** The columns of type bytea, whose values come in K-04's text form and are written as their bytes (default 9). */
+  readonly byteaColumns: ReadonlySet<string>;
   readonly key: readonly string[];
   readonly versioned: boolean;
   /** The column row-level security scopes the table by (K-04 rule 4), or null for a table with none. */
@@ -926,8 +985,8 @@ function eventContextOf(f: Firing): EventContext {
 }
 
 /**
- * A table's columns, its JSON columns, its primary key and its row-level security, from the catalog: an ordinary table
- * of this connection's search path (never one of PostgreSQL's own), or a throw. Read once per call.
+ * A table's columns, its JSON and bytea columns, its primary key and its row-level security, from the catalog: an
+ * ordinary table of this connection's search path (never one of PostgreSQL's own), or a throw. Read once per call.
  */
 async function tableInfo(f: Firing, table: string): Promise<TableInfo> {
   const known = f.tables.get(table);
@@ -935,7 +994,9 @@ async function tableInfo(f: Firing, table: string): Promise<TableInfo> {
     return known;
   }
   assertName(FIRE, table, "a table name");
-  const [row] = await f.tx<{ rls: boolean; columns: string[]; json_columns: string[]; key: string[] }[]>`
+  const [row] = await f.tx<
+    { rls: boolean; columns: string[]; json_columns: string[]; bytea_columns: string[]; key: string[] }[]
+  >`
     select c.relrowsecurity as rls,
            array(select a.attname::text from pg_attribute a
                  where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
@@ -944,6 +1005,10 @@ async function tableInfo(f: Firing, table: string): Promise<TableInfo> {
                  where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
                    and a.atttypid in ('json'::regtype, 'jsonb'::regtype)
                  order by a.attnum) as json_columns,
+           array(select a.attname::text from pg_attribute a
+                 where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
+                   and a.atttypid = 'bytea'::regtype
+                 order by a.attnum) as bytea_columns,
            array(select a.attname::text
                  from pg_index i
                  cross join lateral unnest(i.indkey::int2[]) with ordinality as k(attnum, ord)
@@ -969,6 +1034,7 @@ async function tableInfo(f: Firing, table: string): Promise<TableInfo> {
     name: table,
     columns,
     jsonColumns: new Set(row.json_columns),
+    byteaColumns: new Set(row.bytea_columns),
     key: row.key,
     versioned: columns.has("version"),
     scopeColumn,
@@ -1001,7 +1067,29 @@ function businessOf(info: TableInfo, row: Row): string | null {
   return value;
 }
 
-/** Column to value for an insert or an update: JSON columns as JSON, the rest as PostgreSQL text input (K-05 v1). */
+/**
+ * One column's value as postgres.js takes it: null as null, a JSON column's as JSON, a bytea column's as the bytes its
+ * text form spells (default 9: any other form throws, naming the column, never the value), the rest as PostgreSQL text
+ * input (K-05 v1).
+ */
+function columnValue(f: Firing, info: TableInfo, column: string, value: unknown, what: string): unknown {
+  if (value === null) {
+    return null;
+  }
+  if (info.jsonColumns.has(column)) {
+    return f.tx.json(value as Json);
+  }
+  if (info.byteaColumns.has(column)) {
+    const bytes = byteaFromText(value);
+    if (bytes === null) {
+      fail(FIRE, `${what} gives ${info.name}.${column} a value that is not "\\x" and hex digit pairs`);
+    }
+    return bytes;
+  }
+  return value;
+}
+
+/** Column to value for an insert or an update, each as columnValue gives it. */
 function columnValues(f: Firing, info: TableInfo, values: Row, what: string): Record<string, never> {
   const out: Record<string, never> = {};
   for (const [column, value] of Object.entries(values)) {
@@ -1012,9 +1100,7 @@ function columnValues(f: Firing, info: TableInfo, values: Row, what: string): Re
     if (!info.columns.has(column)) {
       fail(FIRE, `${what} names a column ${info.name} does not have`);
     }
-    out[column] = (
-      info.jsonColumns.has(column) && value !== null ? f.tx.json(value as Json) : value
-    ) as never;
+    out[column] = columnValue(f, info, column, value, what) as never;
   }
   if (Object.keys(out).length === 0) {
     fail(FIRE, `${what} writes no column`);

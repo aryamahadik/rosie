@@ -4,7 +4,8 @@
 // Answers follow T-241's rules (../answer.ts): 401 before any write; 200 for a duplicate, which the store itself says in
 // the same step as the write (T-241's and T-244's rule: a check apart from the write could let two retries both pass);
 // 503 when the write fails, so the provider retries; and 200 only on an answer the door positively knows, so a port or
-// store answer a later minor version adds is never read as a success.
+// store answer a later minor version adds is never read as a success. A body over its door's cap is 413, before any
+// check (T-1195; ../body.ts), as the page entry and the Linq webhook answer theirs (T-1180).
 
 import { scrub } from "../../scrub/scrub";
 import { isLabel, type SpanFacts } from "../../trace";
@@ -13,7 +14,7 @@ import type { ProviderEvent, ProviderEventStore } from "./types";
 
 /** How one request ends: its status, the span's outcome, a label naming a refusal or failure, and what was decided. */
 export interface Verdict {
-  status: 200 | 400 | 401 | 503;
+  status: 200 | 400 | 401 | 413 | 503;
   outcome: "ok" | "dropped" | "refused" | "failed";
   errorCode: string | null;
   decided: SpanFacts;
@@ -39,6 +40,14 @@ export function unreadableBody(decided: SpanFacts = {}): Verdict {
   return { status: 400, outcome: "refused", errorCode: "unreadableBody", decided };
 }
 
+/**
+ * 413 with nothing checked or stored: the body is over its door's cap (T-1195; ../body.ts), so it was never read whole.
+ * Its label is the page entry's and the Linq webhook's (T-1180).
+ */
+export function tooLarge(): Verdict {
+  return { status: 413, outcome: "refused", errorCode: "bodyTooLarge", decided: {} };
+}
+
 /** 503 with nothing stored, so the provider retries (arch 02 line 109: "Write fails: 503, and the provider retries"). */
 export function failed(code: string, decided: SpanFacts = {}): Verdict {
   return { status: 503, outcome: "failed", errorCode: labelOr(code, "failed"), decided };
@@ -53,6 +62,8 @@ export function answerOf(verdict: Verdict): Answer {
       return { status: 400, error: "bad_request" };
     case 401:
       return { status: 401, error: "unauthorized" };
+    case 413:
+      return { status: 413, error: "payload_too_large" };
     case 503:
       return { status: 503, error: "unavailable" };
   }

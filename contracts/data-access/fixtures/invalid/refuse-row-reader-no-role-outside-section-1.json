@@ -1,0 +1,25 @@
+{
+  "call": "rowReader",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-07T15:06:00Z",
+    "note": "Tomás holds no role at the barbershop (K-04's seed-person-roles.json gives him a staff role at the movers alone), and a row asks him A5-05's yes there ('Book this haircut?'), committed under K-01's bundle-mini-a.json, which holds A5-05 in flow A with step.section 5 and its one line from Rosie to the customer (flows.A.steps.A5-05.say[0], from san to cust). The step is outside section 1, so the sign-up reading does not apply, and the row is refused, noReader (noRole), as v1.3 refuses a row whose recipient holds no role: never read as the customer by the line (README item 44; open gap 44). outbox-a5-05-tomas-1 is an example row id in K-09 v1.5 default 131's form; no chain here writes it. Not a database call."
+  },
+  "request": {
+    "outboxRowId": "outbox-a5-05-tomas-1",
+    "bundleId": { "hash": "5bc63b09b605d99a676e32fd75a88ca0c72b921f3b5ccb50688db7a0e4f98f82", "build": 1 },
+    "line": { "step": "A5-05", "index": 0, "from": "openQuestion" },
+    "recipient": { "personId": "person-tomas", "roles": [] },
+    "flow": "A",
+    "section": 5,
+    "lineTo": "cust"
+  },
+  "outcome": {
+    "result": "reader",
+    "outboxRowId": "outbox-a5-05-tomas-1",
+    "reader": "customer",
+    "from": "signUpLine",
+    "roleId": null
+  }
+}

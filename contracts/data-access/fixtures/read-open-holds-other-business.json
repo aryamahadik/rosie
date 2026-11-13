@@ -1,0 +1,27 @@
+{
+  "call": "readOpenHolds",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": [
+      "safety-incidents/seed-hold-released.json",
+      "safety-incidents/seed-outcome-crisis.json",
+      "safety-incidents/seed-threat-pause.json"
+    ],
+    "after": [],
+    "now": "2026-10-27T09:00:04Z",
+    "note": "The same handle under the yoga studio's scope: the barbershop's holds are its own, so none is listed (K-34 v1 rule 4; nothing of another business reaches this one). evt-alex-0204's safety row is the barbershop's, which this scope does not show, so the text counts as unread here: the read fails closed, holding every part but a protective one, rather than trust a row it cannot see (README default 44)."
+  },
+  "request": {
+    "handleId": "handle-alex",
+    "businessId": "biz-yoga-studio",
+    "eventIds": ["evt-alex-0204"]
+  },
+  "outcome": {
+    "result": "openHolds",
+    "handleId": "handle-alex",
+    "businessId": "biz-yoga-studio",
+    "readAt": "2026-10-27T09:00:04Z",
+    "holds": [],
+    "unreadEventIds": ["evt-alex-0204"]
+  }
+}

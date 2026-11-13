@@ -29,7 +29,7 @@ Each step's log line goes in your report, for `ops/releases/D-xxx.md`.
 2. The code, flags off: `wrangler deploy --env staging` with `GIT_SHA`, inside the script.
 3. For a bundle (once bundles exist): publish it, then switch the active bundle id.
 4. The flags the approved cards name (once flags exist).
-5. `npm run check:staging <base-url>`: health, one traced request, the trace id printed.
+5. `npm run check:staging <base-url>`: health, one traced request, the trace id printed. On the workers.dev base it then sends one form POST to `/sign-in`, which must get the host guard's 403 with its own trace id sent back. Any other answer fails the check, so the deploy rolls back (T-1321). Put its "host rule OK" line and trace id in the release record. A version older than db9aadc4 answers that POST with 400, so a rollback that far fails the check: ask the lead first.
 
 ## If a step fails (5.4)
 

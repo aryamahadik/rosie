@@ -1,0 +1,32 @@
+{
+  "call": "sendEmail",
+  "given": {
+    "now": "2026-10-23T14:05:03Z",
+    "note": "send-copy-of-text.json turned into an offer to book again: refused, since an email's purpose is one of the transactional uses and there is none for marketing (RULES 4.1: 'Email is transactional only, never marketing'; RULES 4.4)."
+  },
+  "request": {
+    "idempotencyKey": "out-a7-03-alex-email/1/1",
+    "purpose": "offer",
+    "bookingId": "booking-alex-haircut",
+    "from": {
+      "name": "Lee's Barbershop",
+      "address": "rosie@mail.rosfield.com"
+    },
+    "to": "alex@example.com",
+    "replyTo": "booking-alex-haircut@reply.example.com",
+    "subject": "10% off your next haircut",
+    "text": "This is Rosie, the automated booking assistant for Lee's Barbershop.\n\nBook again this month and get 10% off your next haircut.\n\nManage your booking: https://example.com/m/a03",
+    "assistantLine": "This is Rosie, the automated booking assistant for Lee's Barbershop.",
+    "manageLink": "https://example.com/m/a03",
+    "chatLink": null,
+    "thread": {
+      "inReplyTo": "<rfc-demo-0005@email.example.com>",
+      "references": ["<rfc-demo-0005@email.example.com>"]
+    }
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": "email-msg-demo-0007",
+    "acceptedAt": "2026-10-23T14:05:03Z"
+  }
+}

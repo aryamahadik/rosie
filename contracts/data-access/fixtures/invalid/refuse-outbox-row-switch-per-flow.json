@@ -1,0 +1,52 @@
+{
+  "result": "outboxRow",
+  "outboxRowId": "out-alex-lee-associates-first",
+  "businessId": "biz-lee-associates",
+  "readAt": "2026-10-26T15:00:05Z",
+  "row": {
+    "turnId": "turn-alex-lee-associates-first",
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "state": "planned",
+    "version": 1,
+    "channel": "imessage",
+    "sendClass": "quick_reply",
+    "bookingId": null,
+    "openQuestionId": null,
+    "copyOfRowId": null,
+    "hasPlan": false,
+    "finalParts": null
+  },
+  "line": null,
+  "recipient": {
+    "handleId": "handle-alex",
+    "kind": "phone",
+    "personId": "person-alex",
+    "name": "Alex M.",
+    "storedLanguage": "en",
+    "roles": [],
+    "phone": {
+      "stopped": false,
+      "chatOpen": true,
+      "chatWay": "imessage",
+      "pollVotedAt": "2026-10-23T14:06:10Z",
+      "version": 3
+    }
+  },
+  "answers": {
+    "handleId": "handle-alex",
+    "texts": [{ "eventId": "evt-alex-lee-associates-0001", "outcomes": null, "tenses": null }]
+  },
+  "slotSource": {
+    "business": {
+      "id": "biz-lee-associates",
+      "name": "Lee Associates",
+      "displayName": "Lee Associates",
+      "timeZone": "America/New_York",
+      "version": 1
+    },
+    "booking": null,
+    "question": null
+  },
+  "businessSensitive": { "A": true, "B": false },
+  "openQuestions": []
+}

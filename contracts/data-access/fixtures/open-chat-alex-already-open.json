@@ -1,0 +1,28 @@
+{
+  "call": "openChatOnText",
+  "given": {
+    "k04Seeds": ["seed-phone-chat-open.json"],
+    "after": [],
+    "now": "2026-11-10T16:00:01Z",
+    "note": "A later text of Alex's on the chat K-04's seed-phone-chat-open.json holds open since his first text (2026-10-12T16:20:00Z, by iMessage, version 3). The chat is open, so nothing is written: the time stays the first text's, the way the one his chat opened with, and the version 3, so the call moves no phone row's version under a turn that read it (README defaults 72 and 76). evt-alex-0240 and trace-alex-0240 are example ids."
+  },
+  "request": {
+    "eventId": "evt-alex-0240",
+    "handleId": "handle-alex",
+    "service": "imessage",
+    "receivedAt": "2026-11-10T16:00:01Z",
+    "traceId": "trace-alex-0240"
+  },
+  "outcome": {
+    "result": "alreadyOpen",
+    "handleId": "handle-alex",
+    "phone": {
+      "chatOpen": true,
+      "chatOpenAt": "2026-10-12T16:20:00Z",
+      "chatWay": "imessage",
+      "stopped": false,
+      "version": 3
+    },
+    "event": null
+  }
+}

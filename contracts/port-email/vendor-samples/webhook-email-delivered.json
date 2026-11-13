@@ -1,0 +1,12 @@
+{
+  "type": "email.delivered",
+  "created_at": "2026-10-23T14:05:09.126Z",
+  "data": {
+    "created_at": "2026-10-23T14:05:03.402Z",
+    "email_id": "email-msg-demo-0007",
+    "message_id": "<rfc-demo-0007@email.example.com>",
+    "from": "Lee's Barbershop <rosie@mail.rosfield.com>",
+    "to": ["alex@example.com"],
+    "subject": "Your haircut at Lee's Barbershop"
+  }
+}

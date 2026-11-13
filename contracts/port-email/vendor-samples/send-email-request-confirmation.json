@@ -1,0 +1,13 @@
+{
+  "from": "Lee's Barbershop <rosie@mail.rosfield.com>",
+  "to": ["ben@example.com"],
+  "reply_to": "booking-ben-nov21@reply.example.com",
+  "subject": "Booked: Sat Nov 21, 2:00pm",
+  "text": "This is Rosie, the automated booking assistant for Lee's Barbershop.\n\nYou're booked! Give this code at the chair when you arrive.\nLee's Barbershop · Skin fade · $40\nSat Nov 21 · 2:00pm · Avery\n88 Elm St, Springfield\nYour check-in code: 4417\n\nManage your booking: https://example.com/m/b21\n\nGet updates by text: open this link on your phone and send the message it fills in, or scan the attached QR code.\nsms:+15555550188&body=Hey%2C%20send%20me%20further%20updates%20about%20my%20booking%20BEN21X",
+  "attachments": [
+    {
+      "filename": "chat-link-qr.png",
+      "content": "BASE64-PNG-DRAWN-FROM-QRTEXT-AT-SEND-TIME"
+    }
+  ]
+}

@@ -7,6 +7,8 @@
 // A3-48, A3-50, A3-51, A4-14, A4-24, A4-82; round 3: A10-09, A7-92, A7-93, A4-01, A4-09, A4-12, A4-28, A4-80, B4-92);
 // phone numbers in the 555-01xx range (rule 9). The turn's bundle (K-01 v1) is a double too: the steps the scenarios
 // reach, each with who it is from and to as the master writes it (MASTER_STEPS below), and K-01's own sample bundle.
+// T-1183 adds the doors: K-01 v1's five at their entry steps, K-02 v1.1's sign-up door as K-09 v1.5's commit-s1-01.json
+// offers it, and one door value no contract holds.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -1064,4 +1066,49 @@ export function whichBooking(bookingId: string = HAIRCUT): Choice {
     kind: "whichBooking",
     question: bookingId,
   };
+}
+
+// The doors (T-1183, DL-364): K-01 v1's five, K-02 v1.1's sign-up door and a door the gate does not know
+
+/** A door's value (K-02 v1.1 choice.door). */
+export type Door = NonNullable<Choice["door"]>;
+
+/** K-01 v1's five doors, each with its entry step in flow A (bundle-v0-skeleton.json routingTables.doors; arch 03 line 165). */
+export const K01_DOORS: readonly (readonly [Door, string])[] = [
+  ["newBooking", "A3-51"],
+  ["existingBooking", "A3-43"],
+  ["ownerCommand", "S11-12"],
+  ["teamChange", "S11-42"],
+  ["unclearOwnerOrHelp", "S11-21"],
+];
+
+/** One of K-01 v1's five doors at the barbershop, about no booking, as the frontier offers a door (arch 02 line 115). */
+export function k01Door(door: Door, step: string): Choice {
+  return doorOf(`c-${door}`, door, step, barbershop(null));
+}
+
+/** K-09 v1.5's turn 1 (ADR-013): Sam's first text enters the sign-up door, and the commit walks to S1-02's question. */
+export const SIGN_UP_FIXTURE = "commit-s1-01.json";
+
+/** K-02 v1.1's sign-up door (default 9) as commit-s1-01.json's frontier offers it: c-01, to S1-01, at the barbershop. */
+export function signUpDoor(): Choice {
+  const offered = decidedIn(exchangeRequest(SIGN_UP_FIXTURE)).context.choices;
+  const door = offered.find((choice) => choice.kind === "door" && choice.door === "signUp");
+  if (door === undefined) throw new Error(`${SIGN_UP_FIXTURE} offers no sign-up door`);
+  return door;
+}
+
+/** A door the gate does not know: a value no K-01 or K-02 version holds, at S1-01, about no booking. */
+export function unknownDoor(): Choice {
+  return doorOf("c-unknown-door", "laterDoor" as never, "S1-01", barbershop(null));
+}
+
+/**
+ * commit-s1-01.json's request with its one offered choice swapped for `door`, under the same id (c-01), so the same part
+ * enters it with Sam's same words, under the same caller and turn.
+ */
+export function enteringDoor(door: Choice): GateRequest {
+  const request = exchangeRequest(SIGN_UP_FIXTURE);
+  decidedIn(request).context.choices = [{ ...copy(door), choiceId: "c-01" }];
+  return request;
 }

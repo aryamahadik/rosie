@@ -8,6 +8,26 @@
 //
 // Never logged, put in a span or an error: a number, an address (sealed or not), a contact's name, a text's words. The ids,
 // kinds and codes here are labels.
+//
+// T-270 adds one copy: the pinned bundle's keyword list (K-01 v1 `lists.keywords`) and the stop and start replies' words
+// (K-01 v1 fixed lines `stopReply` and `startReply`), copied from each bundle a turn pins, so the actor can read a STOP or
+// a START, and reply to it, while PostgreSQL is down; before the first pin, from the bundle a text arrived under (T-1324).
+
+import type { KeywordList } from "../../guard/keywords";
+
+/**
+ * The keyword list and the stop and start replies, as the actor last copied them from a pinned bundle (T-270), or before
+ * the first pin from the bundle a text arrived under (T-1324): what it reads a STOP or a START by, and replies with, while
+ * PostgreSQL is down. The words are the sources' fixed words, never a person's.
+ */
+export interface KeywordCopy {
+  /** K-01 v1 `lists.keywords`, as the guard reads it (runtime/src/guard/keywords.ts). */
+  readonly list: KeywordList;
+  /** `stopReply` and `startReply` (K-01 ids), each with the bundle's words, or null while they wait for Jay (Q-01). */
+  readonly replies: ReadonlyMap<string, string | null>;
+  /** When they were copied, on the actor's clock. */
+  readonly refreshedAt: number;
+}
 
 /**
  * The handle's stopped flag as the actor last saw it written (K-04 v1 `phones.stopped`: one flag for every business), or
@@ -24,6 +44,19 @@ export interface StoppedCopy {
   readonly setAt: number;
   /** Set only while a refusal holds the stop rank: until every stop or start record queued is written in order. */
   readonly held?: StopHold;
+  /**
+   * Set only while a commit whose answer was lost may have written the flag (T-1206: a park answered alreadyCommitted),
+   * naming the lost commit noted last: until DL-427's rule 1 ends every lost commit's mark (a fresh read of the phone row,
+   * the actor's own note, or a committed answer from the lost turn or a turn opened after it).
+   */
+  readonly lost?: LostCommitHold;
+}
+
+/** A commit whose answer was lost, whose stopped flag the copy has not read (T-1206): its turn id (a label), since when. */
+export interface LostCommitHold {
+  readonly turnId: string;
+  /** Since the park told of it, on the actor's clock. */
+  readonly since: number;
 }
 
 /** The refusal holding the stop rank of the write-on-return queue: the refused write's key and code (labels), since when. */
@@ -39,6 +72,17 @@ export interface StoppedWrite {
   readonly stopped: boolean;
   readonly phoneVersion: number | null;
   readonly turnId: string | null;
+  /**
+   * For a commit's answer: the order the lease opened its turn in (../lease.ts lease_turns.seq), which says which lost
+   * commits' marks it may end (T-1206, DL-427). Left out for any other write.
+   */
+  readonly opened?: number | null;
+  /**
+   * The text it is for, by its event id (T-1208, DL-431): for the actor's own note, the text whose STOP or START it took;
+   * for the write-on-return replay's answer, the text whose queued record it wrote. Over the actor's own STOP note, a
+   * replay's answer is taken only when it is for the note's own text. Left out for any other write.
+   */
+  readonly eventId?: string | null;
 }
 
 /** One line as the safety read's bundle gives it now (K-01 v1 `fixedLine`, or an outcome step's checked `say`). */
@@ -122,16 +166,46 @@ export interface SafetyTimerSource {
   liveTimers(request: { handleId: string }): Promise<LiveTimersAnswer>;
 }
 
+/** The re-read's answer: the handle's K-04 v1 `phones` row's stopped flag and version, or a K-05 error such as `transient`. */
+export type StoppedFlagAnswer =
+  | { readonly result: "phone"; readonly stopped: boolean; readonly phoneVersion: number }
+  | { readonly error: string };
+
+/**
+ * The re-read of a handle's stopped flag (K-04 v1 `phones.stopped` and `phones.version`, for the handle's phone), after a
+ * commit whose answer was lost (T-1206). No frozen data-access call reads it for the actor yet: the adapter joins with the
+ * timers' at D-017, and a fake answers in tests. Unset, the copy keeps the stricter reading. The read must be fresh, from
+ * the primary and never a cache: a read the copy takes ends the lost commits' marks noted before it was sent (DL-427).
+ */
+export interface StoppedFlagSource {
+  stoppedFlag(request: { handleId: string }): Promise<StoppedFlagAnswer>;
+}
+
 /** What the copies reach outside the actor, set once per Worker isolate (`setCopyDeps`); joins at D-017. */
 export interface CopyDeps {
   readonly timers: SafetyTimerSource;
+  /** The stopped flag's re-read (T-1206); left out, a lost commit's flag is read as stopped until a later write. */
+  readonly phones?: StoppedFlagSource;
 }
 
 /** How a reload of the timers ended: copied; not wired; or failed (no answer, an error, a row that is not K-34's). */
 export type TimerRefresh = "refreshed" | "unwired" | "failed";
 
+/**
+ * How a re-read of the stopped flag ended (T-1206): read and copied; read but older than the copy, or than the actor's own
+ * note (kept as it was); not wired; or failed (no answer, an error, an answer that is not K-04's row). Only "copied" ends
+ * lost commits' marks: those noted before the read was sent (DL-427).
+ */
+export type StoppedRefresh = "copied" | "older" | "unwired" | "failed";
+
 /** What a committed answer gives the copies: the stopped flag a STOP or START wrote, and whether a safety timer was written. */
 export interface CommitCopies {
   readonly stopped: { readonly stopped: boolean; readonly phoneVersion: number } | null;
+  /**
+   * True when the commit may have written a K-34 safety_timers row: its rows name one, a core result may have written one
+   * (a core action K-09 does not list, which went through: its rows are not in K-09's `written`, T-1198), it is a repeat by
+   * K-09's flag or the lease's, whatever the answer's shape (its first answer, maybe lost, named the rows: T-1203, T-1204),
+   * or the answer cannot be read (fails safe, DL-413). The actor then reloads the timers.
+   */
   readonly timersWritten: boolean;
 }

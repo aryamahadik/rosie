@@ -5,7 +5,7 @@
     "after": [],
     "now": "2026-10-23T22:00:00Z",
     "stated": { "step": "A7-80", "gives": [] },
-    "note": "Refused: the reply to someone who is not Alex answered with the booking's id, which tells the asker a booking exists ('Never: confirm a name, a date, an address or that a booking exists'; README default 148). Without bookingId it is j7-someone-else-asks-turn, accepted."
+    "note": "Refused: the reply to someone who is not Alex answered with the booking's id, which tells the asker a booking exists ('Never: confirm a name, a date, an address or that a booking exists'; README default 166). Without bookingId it is j7-someone-else-asks-turn, accepted."
   },
   "request": {
     "caller": {

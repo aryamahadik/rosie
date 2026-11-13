@@ -16,9 +16,10 @@
 // Every outside call is a port (`TurnDeps`), set once per Worker isolate and joined at D-017 (T-552 onward): the Tool
 // API's turn face (C-074: the frontier is C-075's, the gate C-080's, the commit C-087's, the finalize call C-093's), the AI
 // layer's decide and its one Sonnet re-read (C-115, C-116: T-369, T-370) and its composer (C-118: T-373 to T-375), K-05's
-// plan calls (C-152: T-196), the outbox dispatcher (C-124), the handle's directory and sealing key, and each text's safety
-// result. Never logged or put in a span: a text's words, a plan's words, a number, a key. The ids, kinds and codes here
-// are labels.
+// plan calls (C-152: T-196), the outbox dispatcher (C-124), and the handle's directory and sealing key. Each text's safety
+// result is no port: the turn reads it from its leased turn (`LeasedTurn.resultsOf`; ADR-015 section 3, T-1264), which the
+// handle's own actor answers. Never logged or put in a span: a text's words, a plan's words, a number, a key. The ids,
+// kinds and codes here are labels.
 
 import type { CommitContext, CommitTurnRef } from "../actor";
 import type { HandleRef, SealingKeyStore } from "../gateway/seal";
@@ -371,9 +372,17 @@ export type FinalizeMessageAnswer = FinalizeMessageResponse | ToolApiError;
 /**
  * K-09 v1's turn face, as the turn reaches it (C-074, the Tool API; joined at D-017). Each call is handed the turn's trace;
  * the turn records the call's own span (frontier, search, gate and commit; after the commit fillAndChecks and
- * rewriteOrFallback), so a joined port records only what runs beneath it, never the same hop again.
+ * rewriteOrFallback), so a joined port records only what runs beneath it, never the same hop again. The one exception is
+ * a hop whose port records its own span, which says so with that hop's flag (one flag per hop: `recordsFrontierSpan`
+ * now), and then the turn starts none for it, so the hop is still recorded once (K-08).
  */
 export interface TurnFace {
+  /**
+   * True when buildFrontier records the call's frontier span itself (CQ-159, T-557): @rosie/actions' Tool API base does,
+   * on the trace it is handed, with the call's own fields. The turn then starts no frontier span of its own. Left out or
+   * false: the turn records it.
+   */
+  readonly recordsFrontierSpan?: boolean;
   buildFrontier(request: BuildFrontierRequest, trace: TraceContext): Promise<BuildFrontierAnswer>;
   closestEntries(request: ClosestEntriesRequest, trace: TraceContext): Promise<ClosestEntriesAnswer>;
   /**
@@ -629,19 +638,14 @@ export interface TurnDirectory {
 }
 
 /**
- * Each text's safety result (K-02 v1 `safetyResult`), as the safety read on arrival gave it: the turn's commit records it
- * (K-09 README default 5). The actor keeps only labels (runtime/src/safety), so the store behind this joins at D-017.
+ * Everything the turn reaches outside the actor, set once per Worker isolate (`setTurnDeps`); joined at D-017. Each text's
+ * safety result is not here: one actor's store is no isolate's, so the turn reads it from its leased turn (ADR-015
+ * section 3; `LeasedTurn.resultsOf`).
  */
-export interface TurnSafety {
-  resultsOf(eventIds: readonly string[]): Promise<readonly SafetyResult[]>;
-}
-
-/** Everything the turn reaches outside the actor, set once per Worker isolate (`setTurnDeps`); joined at D-017. */
 export interface TurnDeps {
   readonly directory: TurnDirectory;
   /** The handle's sealing key (NQ-RT-1): the turn opens its texts' sealed words, and only here. */
   readonly keys: SealingKeyStore;
-  readonly safety: TurnSafety;
   readonly toolApi: TurnFace;
   readonly ai: TurnDecide;
   /** The composer, after the commit (T-252). */

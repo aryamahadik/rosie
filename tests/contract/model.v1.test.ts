@@ -18,7 +18,12 @@
 //      messages, a fact once), the decide result (routing and reads in order, agreed read from the two reads, the
 //      re-read before the one question, each part from a read), a context with its decide result (same turn and bundle,
 //      the turn's stakes from the first read's pick), the safety result (tries, timeout marker, the lift of No to
-//      Unsure, the safety line a danger word's kind gives) and the hand-off `about` of decide and planner.
+//      Unsure, the safety line a danger word's kind gives) and the hand-off `about` of decide and planner;
+//   4. v1.2's unmapped end (T-1222; README "v1.2", "Contract test, v1.2"): a refused read keeps its place with no
+//      output, and the decide checks (checkDecide, the eight verbs, the hand-offs) read it; the refused pair is refused
+//      for its go part alone; both named rules hold on both v1.2 pairs; `end` is set exactly when a read is refused,
+//      after the re-read, with no part going, the kept parts by default 14, and agreed and language by default 15.
+//      Each check is also run on a damaged copy.
 //   What needs a producer or consumer side is on SIDE_CHECKS, not checked here (the gate, the frontier builder, the
 //   model double, the re-parse of a value from its words and the rest of README "Contract test").
 
@@ -144,8 +149,24 @@ interface Pair {
   context: Context;
   decide: Decide;
 }
+/** v1.2: a read the AI layer's validator refused, in its place among the reads, labels only (README v1.2, default 13). */
+interface RefusedRead {
+  model: string;
+  role: string;
+  refused: { unmappedParts: number[] };
+}
+/** A decide result as v1.2 writes it: a read may be refused, and an unmapped turn's end sets `end` (README "v1.2"). */
+interface DecideV12 extends Omit<Decide, "reads"> {
+  reads: (Read | RefusedRead)[];
+  end?: "oneQuestion";
+}
+interface PairV12 {
+  context: Context;
+  decide: DecideV12;
+}
 
-type Rule = (pair: Pair) => string[];
+// The rules read only a read's output (model.rules.mjs, partsOf), so they take a v1.2 pair: a refused read has none.
+type Rule = (pair: PairV12) => string[];
 const rulesFile = path.join(MODEL_DIR, "model.rules.mjs");
 const { rules } = (await import(pathToFileURL(rulesFile).href)) as { rules: Record<string, Rule> };
 const rule = (name: string): Rule => must(rules[name]);
@@ -274,11 +295,35 @@ function signature(part: DecidePart): unknown {
 const readsAgree = (a: Read, b: Read): boolean =>
   isDeepStrictEqual(a.output.parts.map(signature), b.output.parts.map(signature));
 
-/** Decide result: arch 02 line 119; arch 06 lines 285 to 289 (Q-26, Q-41); README "Verbs and what code checks". */
-export function checkDecide(decide: Decide): string[] {
+/** v1.2: a refused read holds `refused` and no output (README "What v1.2 adds"; the schema's `contains`). */
+const isRefused = (read: Read | RefusedRead): read is RefusedRead => "refused" in read;
+
+/** The parts a read returned: a K-02 read's own; none for a refused read, whose answer is never handed on. */
+const readParts = (read: Read | RefusedRead): DecidePart[] => (isRefused(read) ? [] : read.output.parts);
+
+/**
+ * The language a decide result gives: the one its first and check reads agree on, else null (CQ-07). A refused read
+ * reports none, so on a turn with one it is the language two K-02 reads agree on: the first and check reads', or the
+ * re-read's when it is one of theirs (README v1.2 default 15; T-370 default 4).
+ */
+function languageOf(decide: DecideV12): string | null {
+  const said = decide.reads.map((read) => (isRefused(read) ? null : read.output.language));
+  const [first = null, check = null, reread = null] = said;
+  if (first === check) return first;
+  if (!decide.reads.some(isRefused)) return null;
+  return reread !== null && (reread === first || reread === check) ? reread : null;
+}
+
+/**
+ * Decide result: arch 02 line 119; arch 06 lines 285 to 289 (Q-26, Q-41); README "Verbs and what code checks". v1.2
+ * (README "v1.2", "What code checks"; defaults 12 to 15): a refused read keeps its place with its model and role and
+ * no output, and a turn with one ends in one question.
+ */
+export function checkDecide(decide: DecideV12): string[] {
   const problems: string[] = [];
   const [first, check, reread] = decide.reads;
   if (first === undefined || check === undefined) return ["a decide result has fewer than two reads"];
+  const unmapped = decide.reads.some(isRefused);
 
   // Routing (arch 02 line 119): Haiku twice on low stakes; on high stakes Sonnet first with Haiku checking (Q-26's
   // default, which a later answer changes as data in new fixtures, never in these).
@@ -300,23 +345,28 @@ export function checkDecide(decide: Decide): string[] {
     problems.push("no re-read ran, but there are not two reads");
   }
 
-  // agreed is what the first and check reads really did, on every choice and every field value.
-  if (decide.agreed !== readsAgree(first, check))
+  // agreed is what the first and check reads really did, on every choice and every field value. A refused read agrees
+  // with nothing, so agreed is false when the first or check read is refused (v1.2 default 15).
+  if (isRefused(first) || isRefused(check)) {
+    if (decide.agreed) problems.push("agreed is true, but a refused read agrees with nothing");
+  } else if (decide.agreed !== readsAgree(first, check)) {
     problems.push(
       `agreed is ${String(decide.agreed)}, but the two reads ${decide.agreed ? "differ" : "agree"}`,
     );
+  }
   // A difference is never a commit: the re-read runs first (Q-41), so one question follows a re-read only.
   if (!decide.agreed && !decide.reread) problems.push("the reads differ and no re-read ran");
   if (decide.parts.some((entry) => entry.outcome === "oneQuestion") && !decide.reread)
     problems.push("a part ends in one question, but no re-read ran first");
 
-  // The language the reads agreed on, or null (CQ-07).
-  const language = first.output.language === check.output.language ? first.output.language : null;
+  // The language the reads agreed on, or null (CQ-07); with a refused read, by v1.2 default 15.
+  const language = languageOf(decide);
   if (decide.language !== language)
     problems.push(`the language is ${String(decide.language)}, the reads give ${String(language)}`);
 
-  // Each part is a part one of the reads returned; with no re-read the parts are the first read's, all going ahead.
-  const returned = decide.reads.flatMap((read) => read.output.parts);
+  // Each part is a part one of the reads returned (a refused read returned none); with no re-read the parts are the
+  // first read's, all going ahead.
+  const returned = decide.reads.flatMap(readParts);
   for (const [k, entry] of decide.parts.entries()) {
     if (!returned.some((part) => isDeepStrictEqual(part, entry.part)))
       problems.push(`parts[${String(k)}] is a part no read returned`);
@@ -325,12 +375,33 @@ export function checkDecide(decide: Decide): string[] {
     if (
       !isDeepStrictEqual(
         decide.parts.map((entry) => entry.part),
-        first.output.parts,
+        readParts(first),
       )
     )
       problems.push("with no re-read, the parts are not the reads' agreed parts");
     if (decide.parts.some((entry) => entry.outcome !== "go"))
       problems.push("with no re-read, a part does not go ahead");
+  }
+
+  // v1.2, an unmapped turn's end (defaults 12 and 14): end is set exactly when a read is refused, and only after the
+  // one re-read; no part goes, agreed parts included; the parts kept are those of the turn's last K-02 read (the
+  // re-read's, else the check read's, else the first read's), in its order, and none when every read was refused.
+  if (unmapped && decide.end !== "oneQuestion")
+    problems.push("a read is refused, but the turn does not end in one question (end)");
+  if (!unmapped && decide.end !== undefined)
+    problems.push("the turn ends in one question (end), but no read is refused");
+  if ((unmapped || decide.end !== undefined) && !decide.reread)
+    problems.push("an unmapped turn ends in one question only after the one re-read, but no re-read ran");
+  if (unmapped) {
+    for (const [k, entry] of decide.parts.entries()) {
+      if (entry.outcome !== "oneQuestion")
+        problems.push(`parts[${String(k)}] goes, but no part goes on a turn with a refused read`);
+    }
+    const last = [reread, check, first].find((read): read is Read => read !== undefined && !isRefused(read));
+    const kept = decide.parts.map((entry) => entry.part);
+    if (last === undefined && kept.length > 0) problems.push("every read was refused, but parts are kept");
+    if (last !== undefined && !isDeepStrictEqual(kept, last.output.parts))
+      problems.push(`the parts are not those of the turn's last K-02 read (${last.role}), in its order`);
   }
   return problems;
 }
@@ -417,13 +488,16 @@ export function checkSafety(result: SafetyResult): string[] {
   return problems;
 }
 
-/** Every hand_off of a decide result (the reads' and the parts') or planner output, with the `about` it carries. */
-export function handOffsOf(value: Decide | Planner): { where: string; about: string | undefined }[] {
+/**
+ * Every hand_off of a decide result (the reads' and the parts') or planner output, with the `about` it carries. A
+ * refused read (v1.2) holds no output, so it holds no hand-off.
+ */
+export function handOffsOf(value: DecideV12 | Planner): { where: string; about: string | undefined }[] {
   if ("action" in value)
     return value.action.verb === "hand_off" ? [{ where: "action", about: value.action.about }] : [];
   const found: { where: string; about: string | undefined }[] = [];
   value.reads.forEach((read, r) => {
-    read.output.parts.forEach((part, k) => {
+    readParts(read).forEach((part, k) => {
       if (part.verb === "hand_off")
         found.push({ where: `reads[${String(r)}].output.parts[${String(k)}]`, about: part.about });
     });
@@ -436,7 +510,7 @@ export function handOffsOf(value: Decide | Planner): { where: string; about: str
 }
 
 /** The hand-off code (C-104) routes on `about`, a closed list (arch 06 line 329; README "Verbs"). */
-export function checkHandOffs(value: Decide | Planner): string[] {
+export function checkHandOffs(value: DecideV12 | Planner): string[] {
   return handOffsOf(value)
     .filter((found) => found.about !== "ownerOrStaff" && found.about !== "other")
     .map((found) => `${found.where}: about is ${String(found.about)}, not ownerOrStaff or other`);
@@ -452,17 +526,26 @@ for (const folder of [path.join(CONTRACTS_ROOT, "common"), path.join(CONTRACTS_R
       ajv.addSchema(readJson(path.join(folder, entry.name)) as object);
   }
 }
-const schema = readJson(path.join(MODEL_DIR, SCHEMA_FILE)) as {
+interface ModelSchema {
   $id: string;
-  $defs: Record<string, { required?: string[] }>;
-};
+  $defs: Record<string, { required?: string[]; $ref?: string }>;
+}
+const schema = readJson(path.join(MODEL_DIR, SCHEMA_FILE)) as ModelSchema;
 
-function validatorOf(def: string): ValidateFunction {
-  const validate = ajv.getSchema(`${schema.$id}#/$defs/${def}`);
-  if (validate === undefined) throw new Error(`no schema for ${def}`);
+// K-02 is frozen at v1, v1.1 (T-1142) and v1.2 (T-1157), and one fixtures/index.json lists them all. Each entry is
+// checked against the schema its own `version` names (model.<version>.schema.json, its own file and $id), as DL-124
+// and DL-125 settled for K-06 and K-09; every other check of this file reads v1's schema, as before, except those of
+// section 4 (v1.2's unmapped end), which read v1.2's.
+const FROZEN = (readJson(path.join(MODEL_DIR, "frozen.json")) as { frozen: string[] }).frozen;
+const schemaOf = (version: string): ModelSchema =>
+  version === "v1" ? schema : (readJson(path.join(MODEL_DIR, `model.${version}.schema.json`)) as ModelSchema);
+
+function validatorOf(def: string, version = "v1"): ValidateFunction {
+  const validate = ajv.getSchema(`${schemaOf(version).$id}#/$defs/${def}`);
+  if (validate === undefined) throw new Error(`no schema for ${def} in ${version}`);
   return validate;
 }
-const accepts = (def: string, value: unknown): boolean => validatorOf(def)(value);
+const accepts = (def: string, value: unknown, version = "v1"): boolean => validatorOf(def, version)(value);
 
 // ---------------------------------------------------------------------------------------------------------------
 // 1. Every fixture of the index, checked by the T-003 harness, and the two refused by a named rule
@@ -515,7 +598,7 @@ describe("model.v1 fixtures: the index and the count", () => {
       "contextAndDecide",
     ])
       expect(defs.has(def), def).toBe(true);
-    expect(index.fixtures.every((entry) => entry.version === "v1")).toBe(true);
+    expect(index.fixtures.every((entry) => FROZEN.includes(entry.version))).toBe(true);
     expect(accepted.length).toBeGreaterThan(0);
     expect(refusedBySchema.length + refusedByRule.length).toBeGreaterThan(0);
   });
@@ -524,19 +607,19 @@ describe("model.v1 fixtures: the index and the count", () => {
 describe("model.v1 fixtures: each entry", () => {
   for (const entry of accepted) {
     it(`accepts ${entry.file} (${String(entry.def)})`, () => {
-      const validate = validatorOf(must(entry.def));
+      const validate = validatorOf(must(entry.def), entry.version);
       expect(validate(fixture(entry.file)), formatErrors(validate.errors).join("; ")).toBe(true);
     });
   }
   for (const entry of refusedBySchema) {
     it(`refuses ${entry.file} by the schema (${String(entry.def)})`, () => {
-      expect(accepts(must(entry.def), fixture(entry.file))).toBe(false);
+      expect(accepts(must(entry.def), fixture(entry.file), entry.version)).toBe(false);
     });
   }
   for (const entry of refusedByRule) {
     it(`refuses ${entry.file} by the rule ${String(entry.rule)}, after the schema takes it`, () => {
       const payload = fixture(entry.file) as Pair;
-      expect(accepts(must(entry.def), payload), "the pair is valid JSON Schema").toBe(true);
+      expect(accepts(must(entry.def), payload, entry.version), "the pair is valid JSON Schema").toBe(true);
       expect(rule(must(entry.rule))(payload).length).toBeGreaterThan(0);
     });
   }
@@ -647,17 +730,24 @@ describe("model.v1 fixtures: the named rules", () => {
 // ---------------------------------------------------------------------------------------------------------------
 // 2. The schema is not vacuous
 
-const required = (def: string): string[] => schema.$defs[def]?.required ?? [];
+/** The fields a version's $defs entry requires; a minor version's entry that is an earlier one's by $ref requires its. */
+function required(def: string, version = "v1"): string[] {
+  const entry = schemaOf(version).$defs[def];
+  if (entry?.required !== undefined) return entry.required;
+  const target = /^model\.(v[0-9.]+?)\.schema\.json#\/\$defs\/(\w+)$/.exec(entry?.$ref ?? "");
+  return target === null ? [] : required(must(target[2]), must(target[1]));
+}
 
 describe("model.v1 fixtures: removing a required field makes an accepted fixture refused", () => {
   for (const entry of accepted) {
     it(`${entry.file} (${String(entry.def)})`, () => {
       const def = must(entry.def);
-      const validate = validatorOf(def);
+      const validate = validatorOf(def, entry.version);
       const original = fixture(entry.file) as Record<string, unknown>;
       expect(validate(original), formatErrors(validate.errors).join("; ")).toBe(true);
-      expect(required(def).length, "the schema requires at least one field here").toBeGreaterThan(0);
-      for (const field of required(def)) {
+      const fields = required(def, entry.version);
+      expect(fields.length, "the schema requires at least one field here").toBeGreaterThan(0);
+      for (const field of fields) {
         expect(field in original, `${entry.file} has the required field ${field}`).toBe(true);
         const copy = Object.fromEntries(
           Object.entries(structuredClone(original)).filter(([key]) => key !== field),
@@ -773,15 +863,16 @@ describe("model.v1 fixtures: the contexts", () => {
 });
 
 describe("model.v1 fixtures: the decide results", () => {
-  it("shows seven of the eight verbs between the accepted decide fixtures (enter has none: a side task adds one)", () => {
+  it("shows all eight verbs between the accepted decide fixtures (enter in v1.1's decide-s1-01-enter.json)", () => {
     const verbs = new Set(
       DECIDES.flatMap((file) =>
-        decideOf(file).reads.flatMap((read) => read.output.parts.map((part) => part.verb)),
+        decideOf(file).reads.flatMap((read) => readParts(read).map((part) => part.verb)),
       ),
     );
     expect([...verbs].sort()).toEqual([
       "ask",
       "choose",
+      "enter",
       "hand_off",
       "no_op",
       "none_fits",
@@ -1140,6 +1231,328 @@ describe("model.v1 fixtures: each check fires on a damaged copy", () => {
     const verdict = safetyOf("safety-no.json");
     verdict.read = null;
     expect(accepts("safetyResult", verdict), "verdict with no read").toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// 4. v1.2: an unmapped turn's end (T-1222; README "v1.2": "What v1.2 adds", "What code checks", defaults 12 to 15,
+//    "Fixtures, v1.2", "Contract test, v1.2"). A read the AI layer's validator refused keeps its place among the reads
+//    as a refusedRead, with no output; the one re-read runs, and the turn then ends in one question with nothing
+//    changed. Each check holds on the two v1.2 pairs and fires on a damaged copy.
+
+const UNMAPPED_END = "pair-unmapped-all-refused.json";
+const GO_WITH_REFUSED = "invalid/refuse-go-with-refused-read.json";
+const V12_PAIRS = index.fixtures.filter(
+  (entry) => entry.version === "v1.2" && entry.def === "contextAndDecide",
+);
+const EIGHT_VERBS = ["ask", "choose", "enter", "hand_off", "no_op", "none_fits", "pass_on", "redact"];
+
+const pairV12Of = (file: string): PairV12 => structuredClone(fixture(file)) as PairV12;
+
+/** The refused pair mended: its go part's outcome is oneQuestion, default 14's kept part (README "Fixtures, v1.2"). */
+function mendedPair(): PairV12 {
+  const pair = pairV12Of(GO_WITH_REFUSED);
+  must(pair.decide.parts[0]).outcome = "oneQuestion";
+  return pair;
+}
+
+/** A read a test changes as a K-02 read; a refused one there is a broken test. */
+function k02(read: Read | RefusedRead | undefined): Read {
+  if (read === undefined || isRefused(read)) throw new Error("a K-02 read was expected here");
+  return read;
+}
+
+/** A refused read in the place of `read`: its model and role, part 0 unmapped (README v1.2 default 13). */
+const refusedIn = ({ model, role }: Read | RefusedRead): RefusedRead => ({
+  model,
+  role,
+  refused: { unmappedParts: [0] },
+});
+
+/**
+ * An unmapped end made from an accepted v1 decide result whose two reads agree and go: the one re-read ran and was
+ * refused, so the turn ends in one question with nothing changed, agreed parts included (default 12); the parts kept
+ * are the check read's, the turn's last K-02 read (default 14); agreed and language stay the first and check reads'
+ * (default 15).
+ */
+function refusedRereadOf(file: string): DecideV12 {
+  const decide: DecideV12 = decideOf(file);
+  decide.reads.push({ model: "sonnet", role: "reread", refused: { unmappedParts: [] } });
+  decide.reread = true;
+  decide.end = "oneQuestion";
+  decide.parts = k02(decide.reads[1]).output.parts.map((part) => ({
+    part: structuredClone(part),
+    outcome: "oneQuestion",
+  }));
+  return decide;
+}
+
+/** What the eight-verb check reads: the verbs of every read of the decide results, sorted; a refused read has none. */
+function verbsOf(decides: readonly DecideV12[]): string[] {
+  const verbs = decides.flatMap((decide) =>
+    decide.reads.flatMap((read) => readParts(read).map((part) => part.verb)),
+  );
+  return [...new Set(verbs)].sort();
+}
+
+describe("model.v1 fixtures, v1.2: the two pairs of an unmapped turn's end", () => {
+  it("lists two v1.2 pairs, each with a refused read: the end accepted, and a part that goes refused by the schema", () => {
+    expect(V12_PAIRS.map((entry) => `${entry.file} ${entry.expect}`)).toEqual([
+      `${UNMAPPED_END} accept`,
+      `${GO_WITH_REFUSED} refuse`,
+    ]);
+    for (const entry of V12_PAIRS) {
+      expect(entry.rule, `${entry.file} names no rule`).toBeUndefined();
+      expect(pairV12Of(entry.file).decide.reads.some(isRefused), entry.file).toBe(true);
+    }
+  });
+
+  it("refuse-go-with-refused-read.json is refused for its go part alone, and accepted once that part is oneQuestion", () => {
+    const validate = validatorOf("contextAndDecide", "v1.2");
+    const pair = pairV12Of(GO_WITH_REFUSED);
+    expect(must(pair.decide.parts[0]).outcome).toBe("go");
+    expect(validate(pair)).toBe(false);
+    // Each error is the go part's outcome (const oneQuestion), or the rule that holds it: the schema's dependentSchemas
+    // "reads", where a turn with a refused read lets no part go, whose `then` fails.
+    const errors = validate.errors ?? [];
+    const onGoPart = (error: (typeof errors)[number]): boolean =>
+      error.instancePath === "/decide/parts/0/outcome" ||
+      (error.instancePath === "/decide" && error.keyword === "if");
+    expect(
+      errors.some(
+        (error) =>
+          error.instancePath === "/decide/parts/0/outcome" &&
+          error.keyword === "const" &&
+          error.params.allowedValue === "oneQuestion",
+      ),
+    ).toBe(true);
+    for (const error of errors) expect(onGoPart(error), formatErrors([error]).join("")).toBe(true);
+    must(pair.decide.parts[0]).outcome = "oneQuestion";
+    expect(validate(pair), formatErrors(validate.errors).join("; ")).toBe(true);
+  });
+});
+
+describe("model.v1 fixtures, v1.2: both named rules hold on both pairs", () => {
+  for (const entry of V12_PAIRS) {
+    it(`optionOffered and quoteInText hold on ${entry.file}, whose refused reads hold no output`, () => {
+      const pair = pairV12Of(entry.file);
+      expect(rule("optionOffered")(pair)).toEqual([]);
+      expect(rule("quoteInText")(pair)).toEqual([]);
+    });
+  }
+
+  it("they hold on the refused pair once mended, which v1.2's schema accepts: the schema alone refuses it", () => {
+    const mended = mendedPair();
+    expect(accepts("contextAndDecide", mended, "v1.2")).toBe(true);
+    expect(rule("optionOffered")(mended)).toEqual([]);
+    expect(rule("quoteInText")(mended)).toEqual([]);
+  });
+
+  it("each fires on a copy that breaks it: the refused answer put back as a read, a choice not offered, a kept part's quote not in the texts", () => {
+    // The all-refused end with its first read as the answer the validator refused (refuse-option-not-offered.json's
+    // first read, which chooses c-99): the schema takes the pair and optionOffered refuses it, so a refused read
+    // holds no output (README v1.2 default 13).
+    const answered = pairV12Of(UNMAPPED_END);
+    answered.decide.reads[0] = must(
+      (fixture("invalid/refuse-option-not-offered.json") as Pair).decide.reads[0],
+    );
+    expect(accepts("contextAndDecide", answered, "v1.2")).toBe(true);
+    expect(rule("optionOffered")(answered)).toEqual([
+      "reads[0].output.parts[0]: chooses c-99, which the context's choices do not hold",
+    ]);
+    expect(rule("quoteInText")(answered)).toEqual([]);
+
+    const notOffered = mendedPair();
+    must(k02(notOffered.decide.reads[1]).output.parts[0]).choice = "c-99";
+    expect(rule("optionOffered")(notOffered)).toEqual([
+      "reads[1].output.parts[0]: chooses c-99, which the context's choices do not hold",
+    ]);
+    expect(rule("quoteInText")(notOffered)).toEqual([]);
+
+    const notInText = mendedPair();
+    must(notInText.decide.parts[0]).part.quote = "Barbershop and plumbing";
+    expect(rule("quoteInText")(notInText)).toEqual([
+      'parts[0].part: the quote "Barbershop and plumbing" is not in the turn\'s texts',
+    ]);
+    expect(rule("optionOffered")(notInText)).toEqual([]);
+  });
+});
+
+describe("model.v1 fixtures, v1.2: the decide checks read a refused read and hold on the unmapped end", () => {
+  it("checkDecide holds on the all-refused end and on the refused pair once mended, and refuses that pair for its go part alone", () => {
+    expect(checkDecide(pairV12Of(UNMAPPED_END).decide)).toEqual([]);
+    expect(checkDecide(mendedPair().decide)).toEqual([]);
+    expect(checkDecide(pairV12Of(GO_WITH_REFUSED).decide)).toEqual([
+      "parts[0] goes, but no part goes on a turn with a refused read",
+    ]);
+  });
+
+  it("the pairs show the end: set after the re-read, no part going, the kept parts by default 14, agreed and language by default 15", () => {
+    const all = pairV12Of(UNMAPPED_END).decide;
+    expect(all.reads.map(isRefused)).toEqual([true, true, true]);
+    expect([all.end, all.reread, all.parts, all.agreed, all.language]).toEqual([
+      "oneQuestion",
+      true,
+      [],
+      false,
+      null,
+    ]);
+    const mended = mendedPair().decide;
+    expect(mended.reads.map(isRefused)).toEqual([true, false, false]);
+    expect([mended.end, mended.reread, mended.agreed, mended.language]).toEqual([
+      "oneQuestion",
+      true,
+      false,
+      "en",
+    ]);
+    expect(mended.parts).toEqual(
+      k02(mended.reads[2]).output.parts.map((part) => ({ part, outcome: "oneQuestion" })),
+    );
+  });
+
+  it("checkDecide holds on an end whose re-read alone was refused: the agreed parts kept, agreed and language the first and check reads'", () => {
+    for (const file of ["decide-s1-02-choose.json", "decide-two-requests.json", "decide-hand-off.json"]) {
+      const decide = refusedRereadOf(file);
+      expect(accepts("decideResult", decide, "v1.2"), file).toBe(true);
+      expect(checkDecide(decide), file).toEqual([]);
+    }
+  });
+
+  it("the eight verbs hold with the unmapped end's decide results, and a refused read gives none", () => {
+    const ends = V12_PAIRS.map((entry) => pairV12Of(entry.file).decide);
+    expect(verbsOf([...DECIDES.map(decideOf), ...ends])).toEqual(EIGHT_VERBS);
+    expect(verbsOf([pairV12Of(UNMAPPED_END).decide])).toEqual([]);
+    expect(verbsOf([pairV12Of(GO_WITH_REFUSED).decide])).toEqual(["choose"]);
+  });
+
+  it("the hand-off checks read a refused read: neither pair holds one, and every hand-off of the K-02 reads beside one is found", () => {
+    for (const entry of V12_PAIRS) {
+      const decide = pairV12Of(entry.file).decide;
+      expect(handOffsOf(decide), entry.file).toEqual([]);
+      expect(checkHandOffs(decide), entry.file).toEqual([]);
+    }
+    const beside = refusedRereadOf("decide-hand-off.json");
+    expect(handOffsOf(beside)).toEqual([
+      { where: "reads[0].output.parts[0]", about: "other" },
+      { where: "reads[1].output.parts[0]", about: "other" },
+      { where: "parts[0].part", about: "other" },
+    ]);
+    expect(checkHandOffs(beside)).toEqual([]);
+  });
+});
+
+describe("model.v1 fixtures, v1.2: each check of the unmapped end fires on a damaged copy", () => {
+  it("end: missing on a turn with a refused read, set on a turn with none, set before the re-read", () => {
+    const noEnd = pairV12Of(UNMAPPED_END).decide;
+    delete noEnd.end;
+    expect(checkDecide(noEnd)).toEqual([
+      "a read is refused, but the turn does not end in one question (end)",
+    ]);
+
+    const noneRefused: DecideV12 = decideOf("decide-reads-disagree.json");
+    noneRefused.end = "oneQuestion";
+    expect(checkDecide(noneRefused)).toEqual(["the turn ends in one question (end), but no read is refused"]);
+
+    const early = pairV12Of(UNMAPPED_END).decide;
+    early.reads.pop();
+    early.reread = false;
+    expect(checkDecide(early)).toEqual([
+      "the reads differ and no re-read ran",
+      "an unmapped turn ends in one question only after the one re-read, but no re-read ran",
+    ]);
+  });
+
+  it("no part goes on a turn with a refused read, agreed parts included", () => {
+    const agreedGo = refusedRereadOf("decide-s1-02-choose.json");
+    expect(agreedGo.agreed).toBe(true);
+    must(agreedGo.parts[0]).outcome = "go";
+    expect(checkDecide(agreedGo)).toEqual(["parts[0] goes, but no part goes on a turn with a refused read"]);
+  });
+
+  it("the kept parts, by default 14: the turn's last K-02 read's, in its order, and none when every read was refused", () => {
+    const keptOnAll = pairV12Of(UNMAPPED_END).decide;
+    keptOnAll.parts = mendedPair().decide.parts;
+    expect(checkDecide(keptOnAll)).toEqual([
+      "parts[0] is a part no read returned",
+      "every read was refused, but parts are kept",
+    ]);
+
+    const none = mendedPair().decide;
+    none.parts = [];
+    expect(accepts("decideResult", none, "v1.2"), "the schema lets the end keep no part").toBe(true);
+    expect(checkDecide(none)).toEqual([
+      "the parts are not those of the turn's last K-02 read (reread), in its order",
+    ]);
+
+    const checkKept = mendedPair().decide;
+    must(k02(checkKept.reads[2]).output.parts[0]).choice = "c-02";
+    expect(checkDecide(checkKept)).toEqual([
+      "the parts are not those of the turn's last K-02 read (reread), in its order",
+    ]);
+    must(checkKept.parts[0]).part = structuredClone(must(k02(checkKept.reads[2]).output.parts[0]));
+    expect(checkDecide(checkKept)).toEqual([]);
+
+    const order = refusedRereadOf("decide-two-requests.json");
+    order.parts.reverse();
+    expect(checkDecide(order)).toEqual([
+      "the parts are not those of the turn's last K-02 read (check), in its order",
+    ]);
+  });
+
+  it("agreed and language, by default 15: a refused read agrees with nothing and reports no language", () => {
+    const agreed = pairV12Of(UNMAPPED_END).decide;
+    agreed.agreed = true;
+    expect(checkDecide(agreed)).toEqual(["agreed is true, but a refused read agrees with nothing"]);
+
+    const language = pairV12Of(UNMAPPED_END).decide;
+    language.language = "en";
+    expect(checkDecide(language)).toEqual(["the language is en, the reads give null"]);
+
+    const kept = mendedPair().decide;
+    kept.language = null;
+    expect(checkDecide(kept)).toEqual(["the language is null, the reads give en"]);
+
+    // The re-read's language counts when it is one of the first and check reads' (here the check read's).
+    const rereadOther = mendedPair().decide;
+    k02(rereadOther.reads[2]).output.language = "es";
+    expect(checkDecide(rereadOther)).toEqual(["the language is en, the reads give null"]);
+    rereadOther.language = null;
+    expect(checkDecide(rereadOther)).toEqual([]);
+
+    // With the re-read alone refused, agreed and language are the first and check reads', as in v1.
+    const agreedKept = refusedRereadOf("decide-s1-02-choose.json");
+    agreedKept.agreed = false;
+    expect(checkDecide(agreedKept)).toEqual(["agreed is false, but the two reads agree"]);
+    const differ = refusedRereadOf("decide-s1-02-choose.json");
+    k02(differ.reads[1]).output.language = "es";
+    expect(checkDecide(differ)).toEqual(["the language is en, the reads give null"]);
+  });
+
+  it("checkDecide reads a refused read's model and role in its place", () => {
+    const model = pairV12Of(UNMAPPED_END).decide;
+    must(model.reads[2]).model = "haiku";
+    expect(checkDecide(model)).toEqual(["a re-read is the third read, by Sonnet, in the role reread"]);
+    const role = pairV12Of(UNMAPPED_END).decide;
+    must(role.reads[1]).role = "first";
+    expect(checkDecide(role)).toEqual([
+      "the second read is not the routing's second model in the role check",
+    ]);
+  });
+
+  it("the eight verbs: a refused read's verbs never count", () => {
+    const decides: DecideV12[] = DECIDES.map(decideOf);
+    expect(verbsOf(decides)).toEqual(EIGHT_VERBS);
+    for (const decide of decides)
+      if (verbsOf([decide]).includes("enter")) decide.reads = decide.reads.map(refusedIn);
+    expect(verbsOf(decides)).toEqual(EIGHT_VERBS.filter((verb) => verb !== "enter"));
+  });
+
+  it("hand-offs: a K-02 read's hand-off beside a refused read, about neither ownerOrStaff nor other", () => {
+    const beside = refusedRereadOf("decide-hand-off.json");
+    must(k02(beside.reads[1]).output.parts[0]).about = "someone";
+    expect(checkHandOffs(beside)).toEqual([
+      "reads[1].output.parts[0]: about is someone, not ownerOrStaff or other",
+    ]);
   });
 });
 

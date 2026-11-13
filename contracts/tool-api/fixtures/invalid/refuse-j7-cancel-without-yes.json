@@ -5,7 +5,7 @@
     "after": ["j7-cancel-ask-turn.json"],
     "now": "2026-10-23T13:32:00Z",
     "stated": { "step": "A7-05", "gives": [] },
-    "note": "Refused: A7-05's cancel confirmed with no yes of the customer's own ('Never: cancel on a single tap or a slip, without the second yes'; README default 129). With the yes (Alex's answer to oq-alex-cancel-ask-oct23) it is j7-cancel-confirm-turn, accepted."
+    "note": "Refused: A7-05's cancel confirmed with no yes of the customer's own ('Never: cancel on a single tap or a slip, without the second yes'; README default 147). With the yes (Alex's answer to oq-alex-cancel-ask-oct23) it is j7-cancel-confirm-turn, accepted."
   },
   "request": {
     "caller": {

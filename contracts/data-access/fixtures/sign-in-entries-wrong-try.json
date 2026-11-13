@@ -1,0 +1,19 @@
+{
+  "call": "signInEntries",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json", "prove-sign-in-wrong.json"],
+    "now": "2026-11-02T13:00:41Z",
+    "note": "After Sam's mistyped check: the code row shows one wrong try, so the call writes proof_code.checked log-code-sam-sign-in-nov02-wrong-1 (old wrong_tries 0, new 1; actor Rosie, since who typed it is not known), under the attempt's id and the check's trace. The attempt row is its own record and gets no entry (ADR-016 section 6)."
+  },
+  "request": {
+    "jobId": "sign-in-sam-nov02-1300",
+    "traceId": "trace-page-sam-nov02-1300-check-0",
+    "entries": [{ "kind": "proof_code.checked", "proofCodeId": "code-sam-sign-in-nov02" }]
+  },
+  "outcome": {
+    "result": "logged",
+    "entries": [{ "id": "log-code-sam-sign-in-nov02-wrong-1", "kind": "proof_code.checked", "written": true }]
+  }
+}

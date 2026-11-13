@@ -13,6 +13,12 @@
 // (inScopedTransaction): a lost connection answers transient with no rollback written to the dead connection. Every row
 // update raises the version by one (trigger from 0002).
 //
+// A failure of the database is answered by targets.ts's transientOrThrow under the call's K-05 name, reserve or release,
+// as extend's and the runtime side's calls' are (T-1314): a serialization failure, a deadlock, a lost connection and a
+// connection that never opened (08001, a reserve() that never connects included: bundles.ts reserveConnection) answer
+// transient; any other failure to open or keep a session is thrown scrubbed, the call's name and the code alone, never
+// a host, port, user or password.
+//
 // One row per holder per slot (T-1134, from T-744 round 1's security review, GAP 1; DL-292). A holder is who the cap of
 // 2 counts (holderOf, the one definition): a mobile, the same at every business, or an agent token at one business; a
 // time saved for a booking has no holder. A slot is a resource's time that overlaps the asked or released one, as EXCLUDE
@@ -39,9 +45,10 @@
 // writes it reads the handle's id alone through handles_id_of_mobile (T-1094). The commit confirms a held row
 // (db/repo/commit-turn.ts, T-195).
 import type postgres from "postgres";
-import { isLostConnection } from "./bundles";
+import { reserveConnection } from "./bundles";
 import { assertBusinessId, SCOPE_SETTING } from "./scope";
 import type { Sql, Tx } from "./scope";
+import { foundGone, transientOrThrow } from "./targets";
 
 type Db = Sql | Tx;
 /** A transaction's connection: postgres.js's own Tx, or the reserved connection inScopedTransaction runs on. */
@@ -315,37 +322,22 @@ function ofHolder(tx: Conn, holder: Holder): postgres.Fragment {
     : tx`for_agent_token = ${holder.agentToken} and business_id = ${holder.businessId}`;
 }
 
-const transientCodes = new Set(["40001", "40P01"]);
-const LOST_CONNECTION_SQLSTATE = "08006";
-
 function sqlstateOf(error: unknown): { code: string | undefined; constraint: string | undefined } {
   const failure = error as { code?: string; constraint_name?: string };
   return { code: failure.code, constraint: failure.constraint_name };
-}
-
-/**
- * The transient answer for a serialization failure, a deadlock or a lost connection (K-05 README: nothing was written,
- * the same request may be sent again); any other error is thrown. The answer carries only a SQLSTATE: a lost connection
- * with no SQLSTATE of its own (postgres.js CONNECTION_*, ECONNRESET, EPIPE, ETIMEDOUT) is 08006.
- */
-function transientOrThrow(error: unknown): { error: "transient"; sqlstate: string } {
-  const { code } = sqlstateOf(error);
-  if (code !== undefined && transientCodes.has(code)) {
-    return { error: "transient", sqlstate: code };
-  }
-  if (isLostConnection(error)) {
-    const own = code !== undefined && /^(08[0-9A-Z]{3}|57P0[123])$/.test(code);
-    return { error: "transient", sqlstate: own ? code : LOST_CONNECTION_SQLSTATE };
-  }
-  throw error;
 }
 
 let savepointCount = 0;
 
 /**
  * Runs `fn` inside a savepoint of the open transaction (the reserved connection has no `savepoint` method of its own):
- * on a failure the savepoint is rolled back, so the transaction can go on; on a lost connection nothing is written to
- * the dead connection.
+ * on a failure the savepoint is rolled back, so the transaction can go on. A connection found gone (targets.ts's
+ * foundGone, as inScopedTransaction decides it: a lost connection, or a statement's failure that is a session's failure
+ * or answers 08001; T-1362) is sent no `rollback to savepoint` and no other statement: postgres.js 3.4.9 would queue it
+ * behind the statement the failure rejected and never settle it (it goes to the destroyed socket, or to none), so
+ * reserve or release would never answer. The failure leaves as it is, through the transaction, which writes no rollback
+ * to that connection and never releases it. Every other failure (a statement's own refusal, such as EXCLUDE's 23P01 or
+ * the seat counter's 23514, or an error fn makes itself on no statement) is rolled back to the savepoint as before.
  */
 async function inSavepoint<T>(tx: Conn, fn: () => Promise<T>): Promise<T> {
   savepointCount += 1;
@@ -356,7 +348,7 @@ async function inSavepoint<T>(tx: Conn, fn: () => Promise<T>): Promise<T> {
     await tx.unsafe(`release savepoint ${name}`);
     return result;
   } catch (error) {
-    if (!isLostConnection(error)) {
+    if (!foundGone(error)) {
       await tx.unsafe(`rollback to savepoint ${name}`);
     }
     throw error;
@@ -366,9 +358,15 @@ async function inSavepoint<T>(tx: Conn, fn: () => Promise<T>): Promise<T> {
 /**
  * One transaction on one reserved connection, scoped to `businessId` (set_config inside it, is_local), read committed
  * like sql.begin. postgres.js's own `begin` writes a `rollback` to a connection that is gone, from a timer outside any
- * promise (T-185), so a lost connection is rethrown here without a rollback (the server rolled the transaction back when
- * the backend went) and is never released (postgres.js 3.4.9 would put it back in the open queue). The same pre-probe as
- * bundles.ts takes the stale error a killed connection keeps, by an ordinary query, before a connection is reserved.
+ * promise (T-185), so a connection found gone (targets.ts's foundGone, as inRuntimeTransaction decides it: a lost
+ * connection, or a statement's failure that is a session's failure or answers 08001; T-1350) is rethrown here without
+ * a rollback (the server rolled the transaction back when the backend went) and is never released (postgres.js 3.4.9
+ * would put it back in the open queue); an error fn makes itself is rolled back and released. A connection that closes
+ * while idle between fn's statements is met as a statement's failure too (T-1330's note d): fn awaits nothing but
+ * statements on this connection, so its next statement is in flight before Node delivers the socket's error or close,
+ * and postgres.js rejects it with that error. The same pre-probe as bundles.ts takes the stale error a killed
+ * connection keeps, by an ordinary query, before a connection is reserved, and a reserve() that never connects leaves
+ * as a connection that never opened (bundles.ts reserveConnection, T-1314).
  */
 async function inScopedTransaction<T>(
   sql: Sql,
@@ -377,7 +375,7 @@ async function inScopedTransaction<T>(
 ): Promise<T> {
   assertBusinessId(businessId);
   await sql`select 1`;
-  const reserved = await sql.reserve();
+  const reserved = await reserveConnection(sql);
   let lost = false;
   try {
     await reserved`begin`;
@@ -386,7 +384,7 @@ async function inScopedTransaction<T>(
       await reserved`select set_config(${SCOPE_SETTING}, ${businessId}, true)`;
       result = await fn(reserved);
     } catch (error) {
-      if (!isLostConnection(error)) {
+      if (!foundGone(error)) {
         await reserved`rollback`;
       }
       throw error;
@@ -394,7 +392,7 @@ async function inScopedTransaction<T>(
     await reserved`commit`;
     return result;
   } catch (error) {
-    lost = isLostConnection(error);
+    lost = foundGone(error);
     throw error;
   } finally {
     if (!lost) {
@@ -578,8 +576,11 @@ function heldOutcome(row: Reservation, repeated: boolean): ReserveOutcome {
 
 /** Thrown inside a savepoint to undo it and leave with an answer. */
 class Refused extends Error {
-  constructor(readonly outcome: ReserveOutcome) {
+  readonly outcome: ReserveOutcome;
+
+  constructor(outcome: ReserveOutcome) {
     super("refused");
+    this.outcome = outcome;
   }
 }
 
@@ -754,7 +755,7 @@ export async function reserve(sql: Sql, request: ReserveRequest): Promise<Reserv
   try {
     return await inScopedTransaction(sql, request.businessId, (tx) => reserveIn(tx, request));
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "reserve");
   }
 }
 
@@ -929,6 +930,6 @@ export async function release(sql: Sql, request: ReleaseRequest): Promise<Releas
   try {
     return await inScopedTransaction(sql, request.businessId, (tx) => releaseIn(tx, request));
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "release");
   }
 }

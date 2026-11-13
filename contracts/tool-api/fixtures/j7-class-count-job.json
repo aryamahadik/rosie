@@ -5,7 +5,7 @@
     "after": [],
     "now": "2026-11-13T14:00:00Z",
     "stated": { "step": "A7-68", "gives": [] },
-    "note": "A7-68: Riley's Sat Nov 14 9:00am class needs 4 to run and its cutoff is 24 hours before. At Fri Nov 13 9:00am the class job counts: 2 booked. The minimum is set, so Sam alone decides: his question by a clock row due at once ('Sat Nov 14, 9:00am class: 2 booked of the 4 it needs. Run it, or cancel it? / Class check · Sat Nov 14 / 9:00am · Riley / 2 booked · needs 4 / No answer by 10:00am: it runs / Reply 1 Run it, 2 Call it off.'), routine, its clock 1 hour. No answer: it runs, and nobody is told anything new (the clock's). bookingId is null: the count is about the session (README default 139). The seed named is K-27's session seats seed; the session id is an example. No key."
+    "note": "A7-68: Riley's Sat Nov 14 9:00am class needs 4 to run and its cutoff is 24 hours before. At Fri Nov 13 9:00am the class job counts: 2 booked. The minimum is set, so Sam alone decides: his question by a clock row due at once ('Sat Nov 14, 9:00am class: 2 booked of the 4 it needs. Run it, or cancel it? / Class check · Sat Nov 14 / 9:00am · Riley / 2 booked · needs 4 / No answer by 10:00am: it runs / Reply 1 Run it, 2 Call it off.'), routine, its clock 1 hour. No answer: it runs, and nobody is told anything new (the clock's). bookingId is null: the count is about the session (README default 157). The seed named is K-27's session seats seed; the session id is an example. No key."
   },
   "request": {
     "caller": {

@@ -2,11 +2,16 @@
 
 export {
   TraceContext,
+  beginSeq,
   closeBatch,
   isValidTraceId,
   logSink,
   openTrace,
+  resumeSeq,
+  seqOf,
+  takeSeq,
   traceIdFromHeader,
+  type BatchClosedBy,
   type BatchResult,
   type BatchedText,
   type CloseBatchOptions,

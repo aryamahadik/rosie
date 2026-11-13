@@ -1,0 +1,23 @@
+{
+  "result": "outboxRowWritten",
+  "outboxRowId": "out-alex-safety-emergency",
+  "businessId": "biz-lees-barbershop",
+  "readAt": "2026-11-07T15:59:59Z",
+  "written": true,
+  "finalParts": {
+    "row": "out-alex-safety-emergency",
+    "channel": "imessage",
+    "sends": [
+      {
+        "kind": "words",
+        "text": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.",
+        "calendarFile": "none",
+        "options": [],
+        "link": null
+      }
+    ],
+    "fixedLines": ["safetyEmergency"],
+    "slotValues": [],
+    "threadReplyTo": null
+  }
+}

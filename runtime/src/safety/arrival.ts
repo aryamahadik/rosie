@@ -49,8 +49,43 @@
 //
 // This file keeps the hold's state and says so (`routineHeld`, `readSafety`, `unreadTexts`); it does not batch. Never
 // logged or put in a span: a word, an evidence quote, a number.
+//
+// Each result it applies to a text whose words were opened is kept until the text can reach no commit (ADR-015, T-1262):
+// the whole K-02 result, sealed under the handle's key with the actor name and `result:<event id>`, in the actor's own
+// storage (`safety_results`), for the turn's commit to record (`resultsOf`). It is owed first, in the step that notes the
+// danger, before any await; sealed in memory under the key the read opened the words with; then kept, before the line.
+// An owed result binds every commit (`unreadTexts`, `routineHeld`) and is read again, never the batch's hand-off
+// (`unreadAmong`). The step that ends the turn closes its texts (`closeResults`): nothing is kept for them again.
+//
+// A danger's direct line never waits for its hold (ADR-018 section 2, T-1312): the direct path writes the hold through
+// step 1's guard, so a storage that throws there stops no line, which goes on that application. A danger is complete only
+// once its hold is written too (its hold row holds an outcome's rule, released or not): until then its pending note
+// stays, so every commit is handed it among the texts not read and it is read again every 30 s. The hold is written again
+// from the labels kept for the text at `dangerSent`, at each re-read, resume or late answer, and the record's replay
+// writes the core's hold with its id when the actor holds none; a released hold stays released.
+//
+// A danger names itself (T-1318, T-1312's security notes a and b): a text the read found dangerous (its row's danger
+// flag set) with no outcome hold is among the texts not read whether or not its pending note was written, so a note and
+// a hold whose writes all fail together still hold every routine part of the handle in every commit until the hold is
+// written (fails closed). The replay's check for a hold and its write of the core's are one guarded step, so a read that
+// throws can never reopen a released hold.
+//
+// A danger whose pending note was never written is in application all the same (T-1348, T-1318's new tasks 1 and 2): a
+// text whose danger flag is set and whose hold is not written waits for a read with or without its note, so a replay or
+// an outbox path whose write of the hold threw is tried again on the read's own schedule until the hold is written; and a
+// cut-off read whose flag is set is resumed as a danger in application, never read as a fresh text. Its note is written
+// when such a danger is resumed or its re-read's answer lands, so from then on it is a noted danger in every step. Once a
+// read has found danger in a text, only a danger is applied to it again until its outcome is complete: a later No never
+// clears its flag or replaces its labels or kept result.
+//
+// A danger whose line is not done keeps a lasting mark that does not hang on its pending note (T-1364, T-1348's new task B
+// and its security note a; RULES 4.12): its row's `line_open`, set in the very write that sets its danger flag and
+// cleared only once its line is done, sent or handed to the core's row, with its record kept (`dangerSent`). While it is
+// set the text waits for a read and is a danger in application, however its note's writes fail: it is read again on the
+// read's own schedule, only a danger is applied to it, and its line is tried again under the same key until it goes. A
+// line that went is done for good: no later application sets the mark again.
 
-import { openWords, sealWords, type SealedWords } from "../gateway/seal";
+import { openWords, sealWords, type SealedBox, type SealedWords, type SealingKey } from "../gateway/seal";
 import type { SealedEvent, SealedHandoff } from "../gateway/types";
 import { isLabel, openTrace, type BundleId, type SpanSink } from "../trace";
 import type { ModelCall } from "../trace/types";
@@ -78,6 +113,7 @@ import {
   type RecordSafetyOutcomeResponse,
   type ReleaseRule,
   type SafetyDeps,
+  type SafetyHold,
   type SafetyOutcome,
   type SafetyReadAnswer,
   type SafetyResult,
@@ -180,20 +216,45 @@ interface HeldRow extends Record<string, SqlStorageValue> {
 interface LateAnswer {
   answer: SafetyReadAnswer | "failed" | "nothing";
   words: SealedWords | null;
+  /** The key the words were opened with (null when none were): a result applied is sealed under it, never stored. */
+  key: SealingKey | null;
 }
 
-/** What opening the words gave: nothing to read, or the words and the read in flight. */
+/**
+ * What opening the words gave: nothing to read, or the words, the key they were opened with and the read in flight. The
+ * key is held in memory only while the read is out, as the words are (ADR-015 section 2, step 2).
+ */
 type Started =
   | { kind: "nothing" }
-  | { kind: "reading"; words: SealedWords; verdict: Promise<SafetyReadAnswer | "failed"> };
+  | {
+      kind: "reading";
+      words: SealedWords;
+      key: SealingKey;
+      verdict: Promise<SafetyReadAnswer | "failed">;
+    };
 
 /** The answer a started read gives once the timeout rule has taken its text (or while its danger is open), with its words. */
 function lateOf(started: Started | "unreadable"): Promise<LateAnswer> {
-  if (started === "unreadable") return Promise.resolve<LateAnswer>({ answer: "failed", words: null });
-  if (started.kind === "nothing") return Promise.resolve<LateAnswer>({ answer: "nothing", words: null });
-  const { words, verdict } = started;
-  return verdict.then((answer): LateAnswer => ({ answer, words }));
+  if (started === "unreadable") {
+    return Promise.resolve<LateAnswer>({ answer: "failed", words: null, key: null });
+  }
+  if (started.kind === "nothing") {
+    return Promise.resolve<LateAnswer>({ answer: "nothing", words: null, key: null });
+  }
+  const { words, key, verdict } = started;
+  return verdict.then((answer): LateAnswer => ({ answer, words, key }));
 }
+
+/** The key a started read opened its words with, or null when none were opened (no result of it is kept). */
+function keyOf(started: Started | "unreadable"): SealingKey | null {
+  return started === "unreadable" || started.kind === "nothing" ? null : started.key;
+}
+
+/**
+ * The name a text's kept result is sealed under, beside the actor name (ADR-015 section 1): never a text's own words' name
+ * (its event id), so a box opens only as its own text's result.
+ */
+const resultName = (eventId: string): string => `result:${eventId}`;
 
 /**
  * The model calls of a timeout stand-in: the actor never saw the read's usage, so each try is a timed-out call of the
@@ -237,9 +298,19 @@ export function createSafetyTables(sql: SqlStorage): void {
        danger INTEGER NOT NULL DEFAULT 0,
        path TEXT,
        line_id TEXT,
-       handed_after_ms INTEGER
+       handed_after_ms INTEGER,
+       line_open INTEGER
      )`,
   );
+  // `line_open` is a danger's lasting "line not done" mark (T-1364): null until a read finds danger in the text; 1 from
+  // the write that sets its danger flag (the same statement: `markDanger`, or `finish` when that write was lost) until its
+  // line is done, sent or handed to the core's row, with its record kept (`dangerSent`); then 0, for good. A table made
+  // before it gains the column as the actor starts, its rows unmarked (null), as they were read before.
+  const columns = sql
+    .exec<{ name: string }>("PRAGMA table_info(safety_events)")
+    .toArray()
+    .map((column) => column.name);
+  if (!columns.includes("line_open")) sql.exec("ALTER TABLE safety_events ADD COLUMN line_open INTEGER");
   sql.exec("CREATE TABLE IF NOT EXISTS safety_meta (k TEXT PRIMARY KEY, v TEXT NOT NULL)");
   sql.exec(
     `CREATE TABLE IF NOT EXISTS safety_holds (
@@ -258,17 +329,50 @@ export function createSafetyTables(sql: SqlStorage): void {
   // When each text whose unread hold is open (or whose danger outcome is not complete) is next read again, on the safety
   // clock (DL-127; arch 11 line 564: every 30 s until a verdict lands). Stored, so an eviction cannot lose it.
   sql.exec("CREATE TABLE IF NOT EXISTS safety_reread (event_id TEXT PRIMARY KEY, due_ms INTEGER NOT NULL)");
-  // Each text whose danger outcome is not complete: its line has not gone (or is not known to have gone), or its record
-  // is not kept (T-1088 round 3, DL-132). Event ids only.
+  // Each text whose danger outcome is not complete: its line has not gone (or is not known to have gone), its record is
+  // not kept (T-1088 round 3, DL-132), its result is not settled (ADR-015 section 2), or its hold is not written (ADR-018
+  // section 2). Event ids only.
   sql.exec("CREATE TABLE IF NOT EXISTS safety_pending (event_id TEXT PRIMARY KEY)");
+  // Each text's K-02 result as the actor applied it last, one JSON text sealed under the handle's key with the actor name
+  // and `result:<event id>` (ADR-015 sections 1 and 2), kept until its text can reach no commit. A null box is owed: a
+  // result was applied and is not kept yet, so every commit holds its routine parts. Only the event id is plain.
+  sql.exec("CREATE TABLE IF NOT EXISTS safety_results (event_id TEXT PRIMARY KEY, box TEXT)");
+  // The texts that can reach no commit any more (their turn ended for good, or the PostgreSQL-down hand-off took them):
+  // nothing is kept for them again. Event ids only.
+  sql.exec("CREATE TABLE IF NOT EXISTS safety_closed (event_id TEXT PRIMARY KEY)");
+  // A danger's line as its first application on the direct path chose it, its K-01 id and the bundle's words for it (one
+  // JSON text): every later application sends this one, so its key never changes (ADR-015 section 2, open point 3).
+  // Cleared with the pending note. The bundle's words only, never the text's.
+  sql.exec("CREATE TABLE IF NOT EXISTS safety_noted_lines (event_id TEXT PRIMARY KEY, line TEXT NOT NULL)");
+  // A danger whose line has gone (or none is needed) and whose record is kept while its result is not settled or its hold
+  // is not written: its pending note waits for those alone, so it goes when its text is closed with its hold written
+  // (DL-508), or once a re-read, resume or late answer writes its hold with its result settled (ADR-018). Event ids only.
+  sql.exec("CREATE TABLE IF NOT EXISTS safety_line_done (event_id TEXT PRIMARY KEY)");
 }
 
 /** The kinds of event whose words are read: a customer's text, a caption, a vote's words, an edit. */
 const READ_KINDS: readonly string[] = ["text", "photo", "pollVote", "edit"];
 
-/** True when the safety read reads this stored event's words. */
+/**
+ * True when the safety read reads this stored event's words: one of those kinds with its words in a box. Since K-06 v1.2
+ * the gateway seals a vote's option words with the rest (T-1297), so a vote is read on arrival like a text (DL-540); a
+ * vote kept before v1.2 has no box, and stays a text with no words to read, as it was kept.
+ */
 export function isReadableEvent(event: SealedEvent): boolean {
   return READ_KINDS.includes(event.kind) && event.sealed !== null && event.fromRosie !== true;
+}
+
+/**
+ * The words the safety read reads of an opened box, in the read's own two fields (SafetyReadRequest.words; K-02's text and
+ * subject): the body, with a vote's option words read as its text (K-02: a vote's words are its option's; arch 07 line
+ * 379: an option someone added reads as typed words), and an email's subject. Every word in the box is read: a body and
+ * option words both there (no K-06 v1.2 event has both) are read together, a line apart.
+ */
+function wordsToRead(words: SealedWords): SealedWords {
+  const option = words.optionWords ?? null;
+  const body = words.body;
+  if (option === null) return { body, subject: words.subject };
+  return { body: body === null || body === "" ? option : `${body}\n${option}`, subject: words.subject };
 }
 
 export function isReadable(handoff: SealedHandoff): boolean {
@@ -294,7 +398,7 @@ export interface SafetyHost {
   returns: ReturnWrites;
   /**
    * The actor's own copy of the handle's stopped flag (T-269): true once it says stopped. The outage line never goes to a
-   * number it, or the stopped flag the deps read, says is stopped (arch 11 line 564).
+   * number it, or the stopped flag the deps read, says is stopped (arch 11 line 564); a throw reads stopped (T-1208).
    */
   stopped?: () => boolean;
 }
@@ -327,6 +431,11 @@ const OUTCOMES_WITH_LINES = SAFETY_OUTCOMES.filter((outcome) => outcome !== "No"
 interface CutOffRow extends Record<string, SqlStorageValue> {
   event_id: string;
   arrived_ms: number;
+}
+
+/** A cut-off text with its row's danger flag: 1 when its read had found danger before the cut (T-1348). */
+interface CutOffDangerRow extends CutOffRow {
+  danger: number;
 }
 
 export class SafetyOnArrival {
@@ -411,15 +520,17 @@ export class SafetyOnArrival {
    * the timeout rule applies at once, as for a read that fails on arrival. A resumed read whose work fails is left
    * unresolved (`lineFailed`), so routine work stays held and no alarm keeps trying it. A text whose read had found danger
    * before the cut, with its line or record not done, takes no timeout rule (a verdict came): it is read again at once and
-   * its danger verdict applied (round 3). Nothing is resumed while nothing is wired.
+   * its danger verdict applied (round 3). That is so whether its pending note says the danger or, its note's write having
+   * thrown, only its row's danger flag does (T-1348): such a text is never read as a fresh one. Nothing is resumed while
+   * nothing is wired.
    */
   resumeCutOff(): ResumedRead[] {
     const set = deps;
     if (set === null) return [];
     const { sql } = this.host.storage;
     const rows = sql
-      .exec<CutOffRow>(
-        "SELECT event_id, arrived_ms FROM safety_events WHERE state = 'reading' ORDER BY rowid",
+      .exec<CutOffDangerRow>(
+        "SELECT event_id, arrived_ms, danger FROM safety_events WHERE state = 'reading' ORDER BY rowid",
       )
       .toArray()
       .filter((row) => !this.inFlight.has(row.event_id));
@@ -431,14 +542,24 @@ export class SafetyOnArrival {
     for (const row of rows) {
       const eventId = row.event_id;
       const text = texts.get(eventId);
-      if (this.dangerPending(eventId)) {
+      const noted = this.dangerPending(eventId);
+      if (noted || row.danger === 1) {
         // Its read found danger before the cut, and the line or its record was not done (T-1088 round 3). No timeout
         // rule: a verdict came. It is no longer being read: it is read again now, and a danger verdict goes through the
         // same send path with the same idempotency key (`applyLate`), so the line goes once and its record is kept. Until
         // then it stays scheduled, as an unread hold's re-read is, among the holds (round 4: its hold from its kept
         // outcomes, written again here if the cut came before it was).
+        // Its row's danger flag says so when its pending note's write threw (T-1348): read as a fresh text, a No would
+        // clear its flag and replace its labels and kept result. Its note is written now (guarded), so it is read again
+        // until its line and record are done, its result settled and its hold written, as a noted danger is. Should that
+        // write throw again, its line's lasting mark (T-1364), written with its flag, keeps it in application until its
+        // line is done, its hold and result in place or not.
+        if (!noted) this.markDangerPending(eventId);
         this.finish(eventId, "lineFailed", true, "none", null, null);
         this.holdFromKept(eventId);
+        // Its line and record were done and its result settled before the cut: it lacked only its hold, written now from
+        // its kept labels, so it is complete and is not read again (ADR-018 section 2, point 2).
+        if (this.completeWithHold(eventId)) continue;
         this.nextReread(set, eventId);
         if (text !== undefined) this.reread(set, text, row.arrived_ms);
         continue;
@@ -471,8 +592,11 @@ export class SafetyOnArrival {
    * and whose next re-read is due (DL-127; arch 11 line 564), in arrival order, and sets each one's next re-read 30 s on
    * before its read is sent: a read that never answers is looked at again then, and nothing comes due again at once. A
    * text whose work still runs here, or whose read is out already, gets no second read (round 2 security note a: a read
-   * port that hangs adds no pending read every 30 s). The hold stays open until a verdict lands (`applyLate`). Nothing is
-   * read while nothing is wired.
+   * port that hangs adds no pending read every 30 s). The hold stays open until a verdict lands (`applyLate`). A pending
+   * danger whose line and record are done and whose result is settled lacks only its hold: it is written from the labels
+   * kept for the text before any read is sent, and once it is written the danger is complete and no read is sent for it
+   * (ADR-018 section 2, point 2). So is a danger whose note's write threw, by its danger flag (T-1348). Nothing is read
+   * while nothing is wired.
    */
   rereadDue(): void {
     const set = deps;
@@ -480,7 +604,12 @@ export class SafetyOnArrival {
     const waiting = this.waiting();
     if (waiting.length === 0) return;
     const now = set.clock.now();
-    const due = waiting.filter((row) => row.due_ms === null || row.due_ms <= now);
+    const due: HeldRow[] = [];
+    for (const row of waiting) {
+      if (row.due_ms !== null && row.due_ms > now) continue;
+      if (this.completeWithHold(row.event_id)) continue;
+      due.push(row);
+    }
     if (due.length === 0) return;
     for (const row of due) this.setReread(row.event_id, now + REREAD_MS);
     const ready = due.filter((row) => !this.busy(row.event_id));
@@ -528,8 +657,14 @@ export class SafetyOnArrival {
 
   /**
    * The texts that wait for a read, in arrival order, each with when it is next read again: an unread hold open (no
-   * verdict yet), or a danger outcome not complete once its first try ended or was cut off (a text still being read is
-   * `resumeCutOff`'s and the 4 s deadline's).
+   * verdict yet), or a danger outcome not complete or a result owed (ADR-015 section 2) once its first try ended or was
+   * cut off (a text still being read is `resumeCutOff`'s and the 4 s deadline's). An owed text is read again on its own
+   * re-read until its result is kept. A text whose danger flag is set and whose hold is not written (no hold with an
+   * outcome's rule, released or not: ADR-018 section 2) waits whether or not its pending note was written (T-1348), so a
+   * replay or an outbox path whose write of the hold threw is tried again on the read's own schedule until the hold is
+   * written. So does a danger whose line is not done (its row's lasting mark, T-1364), whatever its note's writes did, so
+   * its line is tried again at each re-read that finds danger until it goes. This feeds only the re-reads and the alarm,
+   * never the batch.
    */
   private waiting(): HeldRow[] {
     return this.host.storage.sql
@@ -539,7 +674,13 @@ export class SafetyOnArrival {
          LEFT JOIN safety_reread r ON r.event_id = e.event_id
          WHERE EXISTS (SELECT 1 FROM safety_holds h
                        WHERE h.event_id = e.event_id AND h.rule = 'unread' AND h.released = 0)
-            OR (e.state <> 'reading' AND EXISTS (SELECT 1 FROM safety_pending p WHERE p.event_id = e.event_id))
+            OR (e.state <> 'reading'
+                AND (EXISTS (SELECT 1 FROM safety_pending p WHERE p.event_id = e.event_id)
+                     OR EXISTS (SELECT 1 FROM safety_results o WHERE o.event_id = e.event_id AND o.box IS NULL)
+                     OR (e.danger = 1
+                         AND (e.line_open = 1
+                              OR NOT EXISTS (SELECT 1 FROM safety_holds h
+                                             WHERE h.event_id = e.event_id AND h.rule <> 'unread')))))
          ORDER BY e.rowid`,
       )
       .toArray();
@@ -640,15 +781,23 @@ export class SafetyOnArrival {
   /**
    * The texts not read yet, by event id in arrival order, beside the open holds (QUESTIONS.md CQ-65's addendum, DL-127):
    * still being read, never wired, given up with no hold open, or with a danger outcome not complete and no hold open (its
-   * hold could not be written: fails closed). A commit is handed them (CommitContext.unread), and T-252's gate counts each
-   * as an open hold. A text under an open hold (unread or an outcome's) is among `openHolds` instead; a text with no safety
-   * row at all is the actor's to find.
+   * hold could not be written: fails closed). A text whose result is owed is named whatever holds are open (ADR-015
+   * section 2): its result was applied and is not kept, so no commit can record it yet. A text the read found dangerous
+   * (its row's danger flag set) with no outcome hold, open or released, is named whether or not its pending note was ever
+   * written (T-1318, T-1312's security note b): when the note and every write of its hold failed together, every routine
+   * part stays held in every commit until a hold is written (ADR-018 section 2, failing closed for a missing hold). A
+   * commit is handed them (CommitContext.unread), and T-252's gate counts each as an open hold. Any other text under an
+   * open hold (unread or an outcome's) is among `openHolds` instead; a text with no safety row at all is the actor's to
+   * find.
    */
   unreadTexts(): string[] {
     return this.host.storage.sql
       .exec<{ event_id: string }>(
         `SELECT e.event_id FROM safety_events e
          WHERE e.state IN ('reading', 'unwired')
+            OR EXISTS (SELECT 1 FROM safety_results o WHERE o.event_id = e.event_id AND o.box IS NULL)
+            OR (e.danger = 1
+                AND NOT EXISTS (SELECT 1 FROM safety_holds h WHERE h.event_id = e.event_id AND h.rule <> 'unread'))
             OR (((e.state = 'lineFailed' AND e.danger = 0)
                  OR EXISTS (SELECT 1 FROM safety_pending p WHERE p.event_id = e.event_id))
                 AND NOT EXISTS (SELECT 1 FROM safety_holds h WHERE h.event_id = e.event_id AND h.released = 0))
@@ -658,7 +807,11 @@ export class SafetyOnArrival {
       .map((row) => row.event_id);
   }
 
-  /** True while routine work must wait: a text is unread, a danger outcome is not complete, or a hold is not released. */
+  /**
+   * True while routine work must wait: a text is unread, a danger outcome is not complete, a danger has no outcome hold
+   * (its pending note written or not: T-1318, as `unreadTexts` names it), a result is owed (ADR-015 section 2), or a hold
+   * is not released.
+   */
   routineHeld(): boolean {
     const { sql } = this.host.storage;
     const unread = sql
@@ -666,7 +819,91 @@ export class SafetyOnArrival {
       .toArray();
     if (unread.length > 0) return true;
     if (sql.exec("SELECT 1 FROM safety_pending LIMIT 1").toArray().length > 0) return true;
+    const unheld = sql
+      .exec(
+        `SELECT 1 FROM safety_events e
+         WHERE e.danger = 1
+           AND NOT EXISTS (SELECT 1 FROM safety_holds h WHERE h.event_id = e.event_id AND h.rule <> 'unread')
+         LIMIT 1`,
+      )
+      .toArray();
+    if (unheld.length > 0) return true;
+    if (sql.exec("SELECT 1 FROM safety_results WHERE box IS NULL LIMIT 1").toArray().length > 0) return true;
     return sql.exec("SELECT 1 FROM safety_holds WHERE released = 0 LIMIT 1").toArray().length > 0;
+  }
+
+  /**
+   * Each asked text's kept K-02 result, in the order asked (ADR-015 section 3), for the turn that carries the texts: for
+   * an id whose row's box opens under the handle's key, with the actor name and `result:<event id>`, to a result naming
+   * that same event, that result as kept. Any other id is left out: no row, an owed row, a box that does not open or
+   * parse, a result naming another event. Never a made-up result, a stand-in, a No by default or a second read. A read
+   * that cannot be done at all (nothing wired, the key store or the storage throws) throws, and the turn takes that as no
+   * results. Nothing of a result is logged, put in a span or thrown.
+   */
+  async resultsOf(eventIds: readonly string[]): Promise<readonly SafetyResult[]> {
+    const set = deps;
+    if (set === null) throw new Error("the safety read is not wired");
+    if (eventIds.length === 0) return [];
+    const boxes = new Map(
+      this.host.storage.sql
+        .exec<{ event_id: string; box: string }>(
+          `SELECT event_id, box FROM safety_results
+           WHERE event_id IN (SELECT value FROM json_each(?)) AND box IS NOT NULL`,
+          JSON.stringify(eventIds),
+        )
+        .toArray()
+        .map((row) => [row.event_id, row.box]),
+    );
+    if (boxes.size === 0) return [];
+    const key = await set.keys.getOrCreateKey(this.handleOf());
+    const results: SafetyResult[] = [];
+    for (const eventId of new Set(eventIds)) {
+      const box = boxes.get(eventId);
+      if (box === undefined) continue;
+      const result = await this.openResult(box, key, eventId);
+      if (result !== null) results.push(result);
+    }
+    return results;
+  }
+
+  /** A kept box opened as its own text's result, or null when it does not open, parse or name that text (never thrown). */
+  private async openResult(box: string, key: SealingKey, eventId: string): Promise<SafetyResult | null> {
+    try {
+      const opened = await openWords(JSON.parse(box) as SealedBox, key, this.actorName, resultName(eventId));
+      const result = JSON.parse(opened.body ?? "null") as Partial<SafetyResult> | null;
+      return result !== null && typeof result === "object" && result.eventId === eventId
+        ? (result as SafetyResult)
+        : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Removes the kept results of these texts and closes them (ADR-015 section 2), synchronously, inside the caller's storage
+   * transaction: the step that ends their turn for good, or the PostgreSQL-down hand-off for the texts that path took
+   * alone. A closed text never gets a row again, whatever is applied to it later. A danger among them whose line has gone
+   * (or none is needed), whose record is kept and whose hold is written has its pending note cleared too, its result being
+   * settled now (DL-508: else it would be read again every 30 s for good, holding every later commit's routine parts once
+   * its hold is released); one whose hold is not written keeps its note until the next re-read writes the hold from its
+   * kept labels and clears it (ADR-018 section 2, point 3), and one whose line or record is not done keeps its note, and is
+   * read again until its line has gone. The labels rows and holds are not touched (they serve the holds). Throws what the
+   * storage throws, so the caller's transaction keeps both the turn's end and the removal, or neither; called again with
+   * the same ids, it changes nothing more.
+   */
+  closeResults(eventIds: readonly string[]): void {
+    if (eventIds.length === 0) return;
+    const { sql } = this.host.storage;
+    const ids = JSON.stringify(eventIds);
+    sql.exec("DELETE FROM safety_results WHERE event_id IN (SELECT value FROM json_each(?))", ids);
+    sql.exec("INSERT OR IGNORE INTO safety_closed (event_id) SELECT value FROM json_each(?)", ids);
+    const done = sql
+      .exec<{ event_id: string }>(
+        "SELECT event_id FROM safety_line_done WHERE event_id IN (SELECT value FROM json_each(?))",
+        ids,
+      )
+      .toArray();
+    for (const row of done) if (this.holdWritten(row.event_id)) this.clearDangerPending(row.event_id);
   }
 
   readSafety(): SafetyEntry[] {
@@ -740,9 +977,10 @@ export class SafetyOnArrival {
   /**
    * Sends one of the safety read's queued records when the actor's write-on-return queue replays it (T-269; arch 11 line
    * 566): what the actor sent straight through Linq while PostgreSQL was down is written with `sentByActor`, caller kind
-   * actorOnReturn, and never as a new send. A record's hold id lands on its hold. The core not answering (a throw, or
-   * `transient`), or the handle's key not to be had, is `notBack`: the record waits, and nothing queued after it goes
-   * first. Any other error is the core's refusal, and a box that does not open is refused as `unopened`.
+   * actorOnReturn, and never as a new send. A record's hold id lands on its hold, or the core's hold is written as the
+   * actor's when the actor holds none for the text (`holdOnReturn`). The core not answering (a throw, or `transient`), or
+   * the handle's key not to be had, is `notBack`: the record waits, and nothing queued after it goes first. Any other
+   * error is the core's refusal, and a box that does not open is refused as `unopened`.
    */
   async replayOnReturn(write: ReturnedWrite): Promise<ReturnStep> {
     const set = deps;
@@ -752,7 +990,7 @@ export class SafetyOnArrival {
       return { refused: "notSafetyRecord" };
     }
     const eventId = write.key.slice(prefix.length);
-    let sealingKey: Uint8Array;
+    let sealingKey: SealingKey;
     try {
       sealingKey = await set.keys.getOrCreateKey(this.handleOf());
     } catch {
@@ -781,14 +1019,39 @@ export class SafetyOnArrival {
       return "notBack";
     }
     if (isError(answer)) return answer.error === "transient" ? "notBack" : { refused: answer.error };
-    if ("hold" in answer && answer.hold !== null) {
+    if ("hold" in answer && answer.hold !== null) this.holdOnReturn(eventId, answer.hold);
+    return "written";
+  }
+
+  /**
+   * The core's hold for a text whose queued record the core has taken (ADR-018 section 2, point 4). When the actor holds
+   * no outcome hold for the text (every write of it threw before its direct line went), the core's hold is written as the
+   * actor's, with its id, rule and booking block; else its id lands on the hold that has none, as before. So whichever
+   * comes first, the re-read's hold or the replay, the actor's hold carries the core's id once the core holds it, and
+   * `markHoldReleased` can find it. The check that a hold exists, released or not, and the write share one guarded step
+   * (T-1318, T-1312's security note a): a read that throws writes nothing and counts as not written, so it can never fall
+   * through to `writeHold`, whose own read sees open holds only, and reopen a hold the core released. The id's own write
+   * to a hold that exists is not guarded, as before: a storage that throws there leaves the record queued, and its next
+   * replay lands the id.
+   */
+  private holdOnReturn(eventId: string, hold: SafetyHold): void {
+    let held: boolean;
+    try {
+      held = this.outcomeHoldExists(eventId);
+      if (!held) this.writeHold(eventId, hold.holdId, hold.releaseRule, hold.blocksBooking);
+    } catch {
+      // Not written, nothing changed: a missing hold keeps its text among the texts not read (its pending note, or
+      // else its danger flag: `unreadTexts`) until a hold is written; a hold that exists keeps its state, released or
+      // not.
+      return;
+    }
+    if (held) {
       this.host.storage.sql.exec(
         "UPDATE safety_holds SET hold_id = ? WHERE event_id = ? AND hold_id IS NULL",
-        answer.hold.holdId,
+        hold.holdId,
         eventId,
       );
     }
-    return "written";
   }
 
   /**
@@ -828,23 +1091,31 @@ export class SafetyOnArrival {
   /**
    * Opens the box and starts the read, behind the earlier texts' starts, so the port is called in arrival order. Never
    * throws: a key store that throws, at once or later, makes the words unreadable (no verdict can come, so the timeout
-   * rule applies at once; T-1088 security note d).
+   * rule applies at once; T-1088 security note d), and so does a box that does not open or whose members are not its
+   * form's (K-06 v1.2 item 6). The words are read by the box's form, a vote's option words as its text (`wordsToRead`).
+   * The key the words open under goes with them, held in memory only while the read is out: a result applied is sealed
+   * under it (ADR-015 section 2, step 2), so no key call comes before a danger's line.
    */
   private queueRead(set: SafetyDeps, handoff: SealedHandoff): Promise<Started | "unreadable"> {
     const { event } = handoff;
     const sealed = event.sealed;
-    const opened: Promise<SealedWords | "unreadable"> =
+    const opened: Promise<{ words: SealedWords; key: SealingKey } | "nothing" | "unreadable"> =
       sealed === null
-        ? Promise.resolve({ body: null, subject: null })
+        ? Promise.resolve("nothing" as const)
         : Promise.resolve()
             .then(() => set.keys.getOrCreateKey(event.handle))
             .then(
-              (key) => openWords(sealed, key, this.actorName, event.eventId),
+              async (key) => ({
+                words: wordsToRead(await openWords(sealed, key, this.actorName, event.eventId)),
+                key,
+              }),
               () => "unreadable" as const,
             );
     const started = this.launch.then(async (): Promise<Started | "unreadable"> => {
-      const words = await opened.catch(() => "unreadable" as const);
-      if (words === "unreadable") return "unreadable";
+      const open = await opened.catch(() => "unreadable" as const);
+      if (open === "unreadable") return "unreadable";
+      if (open === "nothing") return { kind: "nothing" };
+      const { words, key } = open;
       if ((words.body ?? "").trim() === "" && (words.subject ?? "").trim() === "") return { kind: "nothing" };
       const verdict = Promise.resolve()
         .then(() =>
@@ -857,7 +1128,7 @@ export class SafetyOnArrival {
           }),
         )
         .catch(() => "failed" as const);
-      return { kind: "reading", words, verdict };
+      return { kind: "reading", words, key, verdict };
     });
     this.launch = started.catch(() => undefined);
     return started;
@@ -887,13 +1158,16 @@ export class SafetyOnArrival {
     // deadline: it takes the deadline's rule below, never the place of a verdict with no outcome (DL-112; T-365 note a).
     const gaveUp = first !== "failed" && first !== "deadline" && first.result.timedOut;
     if (first !== "failed" && first !== "deadline" && !gaveUp) {
-      await this.applyResult(set, handoff, arrivedAt, first.result, first.modelCalls, "verdict");
+      // The verdict came from the words opened, so the start has ended: its key seals the result kept (ADR-015 step 2).
+      const read = await started.catch(() => "unreadable" as const);
+      await this.applyResult(set, handoff, arrivedAt, first.result, first.modelCalls, "verdict", keyOf(read));
       this.onReturn(set, eventId);
       return;
     }
 
     // No verdict: the 4 s deadline passed, the read failed, or the read gave up. A danger word from the bundle's list
-    // counts as Unsure (988 and 911 for self-harm words, else 911); with none, the outage line goes.
+    // counts as Unsure (988 and 911 for self-harm words, else 911); with none, the outage line goes. The stand-in is kept
+    // as the text's result when its words were opened (ADR-015 section 2), and a late verdict replaces it.
     const opened = await started.catch(() => "unreadable" as const);
     const words = opened === "unreadable" || opened.kind === "nothing" ? null : opened.words;
     const matches =
@@ -901,10 +1175,10 @@ export class SafetyOnArrival {
     const stand = timeoutResult(eventId, matches);
     if (first !== "failed" && first !== "deadline") {
       // The read is over: its own model calls go in the span, and no late verdict can follow.
-      await this.applyResult(set, handoff, arrivedAt, stand, first.modelCalls, "readTimedOut");
+      await this.applyResult(set, handoff, arrivedAt, stand, first.modelCalls, "readTimedOut", keyOf(opened));
       return;
     }
-    await this.applyResult(set, handoff, arrivedAt, stand, timeoutCalls(), first);
+    await this.applyResult(set, handoff, arrivedAt, stand, timeoutCalls(), first, keyOf(opened));
 
     // A verdict that arrives late changes a timeout that found no danger word: it is applied then, and the unread hold lifts.
     // It is not waited for: a read that never answers must not keep the text's work open, and the stored re-read (every
@@ -956,7 +1230,14 @@ export class SafetyOnArrival {
    * danger): only a danger verdict is applied, through the same send path with the same idempotency key, so the line goes
    * once and the record is kept; any other answer is not used (the first verdict stands), except that a danger word still
    * gets its line by the timeout rule, as on arrival. The unread hold lifts only once the outcome is complete, so a danger
-   * text is always in the holds or unread (round 2 security note b).
+   * text is always in the holds or unread (round 2 security note b). A text whose result is owed is not complete either
+   * (ADR-015 section 2): without an open danger its verdict is applied as a late verdict is, and keeps its result; its
+   * re-reads go on while the result is still owed. Each result applied replaces the one kept before (open point 3: the
+   * row holds the result applied last, a danger word's stand-in included); an answer not used leaves the row as it was.
+   * An open danger is one whose pending note is written, or, its note's write having thrown, whose row's danger flag is
+   * set with its line not done (its lasting mark, T-1364), its hold not written or its result owed (`dangerOpen`,
+   * T-1348): so once a read has found danger in a text, a later answer that is no danger never clears its flag or
+   * replaces its labels or kept result, and a danger answer while its line is not done sends it.
    */
   private async applyLate(
     set: SafetyDeps,
@@ -966,11 +1247,19 @@ export class SafetyOnArrival {
   ): Promise<void> {
     const eventId = handoff.event.eventId;
     if (this.landing.has(eventId)) return;
-    const pending = this.dangerPending(eventId);
-    if (!pending && !this.unreadHoldOpen(eventId)) return;
+    const pending = this.dangerOpen(eventId);
+    // An owed result is not complete: its text's answer is used, never dropped (ADR-015 section 2), and a verdict is
+    // applied as a late verdict is, so its result is kept then.
+    if (!pending && !this.unreadHoldOpen(eventId) && !this.resultOwed(eventId)) return;
     // An open danger is among the holds whatever this answer says (round 4): its hold from its kept outcomes, written
-    // again here if the cut came before it was.
-    if (pending) this.holdFromKept(eventId);
+    // again here if the cut came before it was. One whose line and record are done and whose result is settled lacked only
+    // that hold: once it is written the danger is complete, and this answer is not used (ADR-018 section 2, point 2). One
+    // whose note's write threw gets its note first (T-1348), so it is a noted danger from here on.
+    if (pending) {
+      this.noteOpenDanger(eventId);
+      this.holdFromKept(eventId);
+      if (this.completeWithHold(eventId)) return;
+    }
     const { sql } = this.host.storage;
     const { answer } = late;
     const verdict = answer !== "failed" && answer !== "nothing" && !answer.result.timedOut ? answer : null;
@@ -1004,16 +1293,23 @@ export class SafetyOnArrival {
     this.landing.add(eventId);
     try {
       if (use !== "nothing") {
-        await this.applyResult(set, handoff, arrivedAt, use.result, use.calls, "late");
+        await this.applyResult(set, handoff, arrivedAt, use.result, use.calls, "late", late.key);
       }
-      // The danger's line or record is not done: the text stays held and scheduled (its next re-read is set).
-      if (this.dangerPending(eventId)) return;
+      // The danger's line or record is not done (or its hold, its note or not: T-1348): the text stays held and scheduled
+      // (its next re-read is set).
+      if (this.dangerOpen(eventId)) return;
       sql.exec("UPDATE safety_holds SET released = 1 WHERE event_id = ? AND rule = 'unread'", eventId);
       sql.exec(
         "UPDATE safety_events SET state = 'done' WHERE event_id = ? AND state = 'lineFailed' AND danger = 0",
         eventId,
       );
-      sql.exec("DELETE FROM safety_reread WHERE event_id = ?", eventId);
+      // Its re-reads stop, unless its result is still owed: then it is read again until the result is kept (ADR-015).
+      sql.exec(
+        `DELETE FROM safety_reread WHERE event_id = ?
+           AND NOT EXISTS (SELECT 1 FROM safety_results WHERE event_id = ? AND box IS NULL)`,
+        eventId,
+        eventId,
+      );
       if (verdict !== null) this.onReturn(set, eventId);
     } finally {
       this.landing.delete(eventId);
@@ -1029,7 +1325,10 @@ export class SafetyOnArrival {
     );
   }
 
-  /** True while this text's danger outcome is not complete: its line has not gone, or its record is not kept. */
+  /**
+   * True while this text's danger outcome is not complete: its line has not gone, its record is not kept, or its result
+   * is not settled.
+   */
   private dangerPending(eventId: string): boolean {
     return (
       this.host.storage.sql.exec("SELECT 1 FROM safety_pending WHERE event_id = ?", eventId).toArray()
@@ -1038,8 +1337,167 @@ export class SafetyOnArrival {
   }
 
   /**
+   * True while this text's danger is in application (T-1348): its pending note is written, or its row's danger flag is
+   * set and its outcome is not complete with no note to say so, as when `markDangerPending` threw: its line not done (its
+   * lasting mark, written with the flag: T-1364), its hold not written (no hold with an outcome's rule, released or not:
+   * ADR-018 section 2) or its result owed (ADR-015 section 2). Until then only a danger is applied to it again (the
+   * first verdict stands).
+   */
+  private dangerOpen(eventId: string): boolean {
+    return (
+      this.host.storage.sql
+        .exec(
+          `SELECT 1 WHERE EXISTS (SELECT 1 FROM safety_pending WHERE event_id = ?)
+                       OR EXISTS (SELECT 1 FROM safety_events e
+                                  WHERE e.event_id = ? AND e.danger = 1
+                                    AND (e.line_open = 1
+                                         OR NOT EXISTS (SELECT 1 FROM safety_holds h
+                                                        WHERE h.event_id = e.event_id AND h.rule <> 'unread')
+                                         OR EXISTS (SELECT 1 FROM safety_results o
+                                                    WHERE o.event_id = e.event_id AND o.box IS NULL)))`,
+          eventId,
+          eventId,
+        )
+        .toArray().length > 0
+    );
+  }
+
+  /**
+   * True while this text's danger line is not done (T-1364): its row's danger flag and its line's lasting mark are set,
+   * whatever its pending note's writes did. A read that throws answers true: the text is set to be read again 30 s on
+   * (fails closed).
+   */
+  private lineOpen(eventId: string): boolean {
+    try {
+      return (
+        this.host.storage.sql
+          .exec("SELECT 1 FROM safety_events WHERE event_id = ? AND danger = 1 AND line_open = 1", eventId)
+          .toArray().length > 0
+      );
+    } catch {
+      return true;
+    }
+  }
+
+  /**
+   * Writes the pending note of a danger in application that has none (T-1348: `markDangerPending` threw when it was
+   * applied), so from here on it is a noted danger in every step: read again until its line and record are done, its
+   * result settled and its hold written. Guarded: a storage that throws here leaves it as it was, still open by its flag
+   * (`dangerOpen`) while its line is not done (its lasting mark, T-1364), its hold not written or its result owed, and so
+   * read again 30 s on; one whose line is done, its hold written and its result kept lacks nothing but the note.
+   */
+  private noteOpenDanger(eventId: string): void {
+    try {
+      if (!this.dangerPending(eventId) && this.dangerOpen(eventId)) this.markDangerPending(eventId);
+    } catch {
+      // Not read: the text stays as it was.
+    }
+  }
+
+  /** True while this text's result is owed: applied, and not kept yet (ADR-015 section 2). */
+  private resultOwed(eventId: string): boolean {
+    return (
+      this.host.storage.sql
+        .exec("SELECT 1 FROM safety_results WHERE event_id = ? AND box IS NULL", eventId)
+        .toArray().length > 0
+    );
+  }
+
+  /**
+   * True once this text's result is settled (ADR-015 section 2): kept in its row, or its text closed, so no commit can
+   * be owed it. A storage that throws here reads unsettled: the danger stays pending and is read again (fails closed).
+   */
+  private resultSettled(eventId: string): boolean {
+    try {
+      return (
+        this.host.storage.sql
+          .exec(
+            `SELECT 1 WHERE EXISTS (SELECT 1 FROM safety_results WHERE event_id = ? AND box IS NOT NULL)
+                         OR EXISTS (SELECT 1 FROM safety_closed WHERE event_id = ?)`,
+            eventId,
+            eventId,
+          )
+          .toArray().length > 0
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Notes that this text's result is owed (ADR-015 section 2, step 1), unless it has a row already (an earlier result
+   * kept stays until a later one is) or is closed (its turn has ended: nothing is kept for it again). Guarded: with no
+   * row written, `resultsOf` leaves the text out, and the commit still names it among the texts with no record.
+   */
+  private oweResult(eventId: string): void {
+    try {
+      this.host.storage.sql.exec(
+        `INSERT OR IGNORE INTO safety_results (event_id, box)
+         SELECT ?, NULL WHERE NOT EXISTS (SELECT 1 FROM safety_closed WHERE event_id = ?)`,
+        eventId,
+        eventId,
+      );
+    } catch {
+      // Not written: the text has no row, so nothing is kept for it; a danger stays pending (its result is not settled).
+    }
+  }
+
+  /**
+   * Steps 2 and 3 of ADR-015 section 2. The whole K-02 result, as one JSON text, is sealed in memory as the words are
+   * (AES-256-GCM, a fresh IV per seal) under the key the read opened the words with, its additional data the actor name
+   * and `result:<event id>`: no key call and no network call, before a danger's line (RULES 4.12; arch 04 line 211). It
+   * is then kept in the text's row in one guarded write, or the row stays owed when the seal gave no box. The write
+   * fills only a row that exists, so a text closed since step 1 keeps nothing. Nothing of the result is logged or thrown.
+   */
+  private async keepResult(eventId: string, result: SafetyResult, key: SealingKey): Promise<void> {
+    let box: string | null = null;
+    try {
+      const sealed = await sealWords(
+        { body: JSON.stringify(result), subject: null },
+        key,
+        this.actorName,
+        resultName(eventId),
+      );
+      box = JSON.stringify(sealed);
+    } catch {
+      // No box: the row is owed, and binds every commit until a later application keeps the result.
+    }
+    try {
+      this.host.storage.sql.exec("UPDATE safety_results SET box = ? WHERE event_id = ?", box, eventId);
+    } catch {
+      // Not kept: the row stays as step 1 left it, and the line still goes.
+    }
+  }
+
+  /**
+   * Writes the outcome labels the hold (if any) is handed on with, guarded (ADR-015 step 1: the labels insert never stops
+   * a line); a late verdict's replace its stand-in's. A danger applied again (its first try was cut off, or its line
+   * failed; its pending note written or not, T-1348) keeps every label its reads found, as its hold keeps the strictest
+   * rule. Returns the labels, written or not.
+   */
+  private keepLabels(eventId: string, result: SafetyResult, danger: boolean): SafetyOutcome[] {
+    let outcomes = result.outcomes;
+    try {
+      if (danger && this.dangerOpen(eventId)) {
+        outcomes = [...new Set([...this.outcomesOf(eventId), ...result.outcomes])];
+      }
+      this.host.storage.sql.exec(
+        "INSERT OR REPLACE INTO safety_outcomes (event_id, outcomes) VALUES (?, ?)",
+        eventId,
+        JSON.stringify(outcomes),
+      );
+    } catch {
+      // Not written: the hold is still written from these outcomes, and the line still goes.
+    }
+    return outcomes;
+  }
+
+  /**
    * Notes, before the hold or any send, that this text's danger outcome is not complete, so an eviction from here on
-   * leaves it scheduled. A storage that fails here must not keep the line from going.
+   * leaves it scheduled. A storage that fails here must not keep the line from going. With no note, a danger whose hold
+   * is missing too still names itself among the texts not read, by its danger flag (`unreadTexts`, T-1318), and is read
+   * again until its hold is written; its note is written when it is resumed or its re-read's answer lands (T-1348); and
+   * its line's lasting mark, written with its flag (`markDanger`), has it read again until its line is done (T-1364).
    */
   private markDangerPending(eventId: string): void {
     try {
@@ -1055,22 +1513,134 @@ export class SafetyOnArrival {
    * (CQ-65 as DL-119). On the late path the row may say lineFailed already (the timeout rule's outage line failed), and an
    * eviction during the line's send leaves it so, as `finish` comes only after the send. A storage that fails here must
    * not keep the line from going: `finish` notes it once the send ends.
+   *
+   * The same write sets its line's lasting mark (T-1364), unless its line is done already (an earlier application sent
+   * it, or handed it to the core's row): the flag and the mark are one statement, so neither is ever written without the
+   * other, and from here on the text is read again until its line is done, however its pending note's writes fail.
    */
   private markDanger(eventId: string): void {
     try {
-      this.host.storage.sql.exec("UPDATE safety_events SET danger = 1 WHERE event_id = ?", eventId);
+      this.host.storage.sql.exec(
+        "UPDATE safety_events SET danger = 1, line_open = COALESCE(line_open, 1) WHERE event_id = ?",
+        eventId,
+      );
     } catch {
       // Not noted: `finish` notes it after the send; a row left lineFailed until then keeps its batch back (fails closed).
     }
   }
 
   /**
-   * The danger outcome is complete (the core answered, or the direct line went or none is needed, and its record is kept):
-   * its re-reads stop, unless the unread hold still waits for a verdict.
+   * The danger's line has gone (or none is needed) and its record is kept: the core answered, or the direct line went and
+   * its record is queued. A hold still missing (every write of it threw so far) is written first, from the labels kept for
+   * the text (ADR-018 section 2, point 1). Its outcome is complete once its result is settled too, kept or its text closed
+   * (ADR-015 section 2, DL-132 widened), and its hold is written (ADR-018), and then its pending note clears. Until then
+   * the note stays, and its re-reads apply only a danger again; that only its result or its hold is left is noted, so the
+   * note goes when its text is closed with its hold written (`closeResults`, DL-508), or once a re-read, resume or late
+   * answer writes its hold with its result settled (`completeWithHold`).
+   *
+   * Its line is done, so its lasting mark clears here, before the note (T-1364). A storage that throws at that write
+   * leaves the mark, and the line counts as not done: the note, its noted line and its line done are left as they are, so
+   * the text is read again and a read that finds danger sends its line again under the same key, then clears the mark.
+   */
+  private dangerSent(eventId: string): void {
+    this.holdFromKept(eventId);
+    if (!this.markLineDone(eventId)) return;
+    if (this.resultSettled(eventId) && this.holdWritten(eventId)) {
+      this.clearDangerPending(eventId);
+      return;
+    }
+    try {
+      this.host.storage.sql.exec("INSERT OR IGNORE INTO safety_line_done (event_id) VALUES (?)", eventId);
+    } catch {
+      // Not noted: the note stays, its text closed or not, until a re-read that finds danger again sends its line.
+    }
+  }
+
+  /**
+   * Clears this text's lasting "line not done" mark (T-1364): its danger line is done, for good, so no later application
+   * sets it again (`markDanger` keeps a cleared mark). True once written; a storage that throws answers false and leaves
+   * the mark as it was (fails closed: the line counts as not done).
+   */
+  private markLineDone(eventId: string): boolean {
+    try {
+      this.host.storage.sql.exec("UPDATE safety_events SET line_open = 0 WHERE event_id = ?", eventId);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * True once this text's hold is written (ADR-018 section 2): its hold row holds an outcome's rule (any but `unread`),
+   * released or not. A read that throws counts as not written, so the danger stays pending (fails closed).
+   */
+  private holdWritten(eventId: string): boolean {
+    try {
+      return this.outcomeHoldExists(eventId);
+    } catch {
+      return false;
+    }
+  }
+
+  /** True when this text has an outcome's hold, open or released (an unread hold is none). Throws what the storage throws. */
+  private outcomeHoldExists(eventId: string): boolean {
+    return (
+      this.host.storage.sql
+        .exec("SELECT 1 FROM safety_holds WHERE event_id = ? AND rule <> 'unread'", eventId)
+        .toArray().length > 0
+    );
+  }
+
+  /**
+   * A pending danger whose line and record are done and whose result is settled lacks only its hold (ADR-018 section 2,
+   * point 2): its hold is written from the labels kept for the text (`holdFromKept`), and once it is written the danger is
+   * complete and its note clears. True when so completed: no read is sent for it and no answer is used, so it is never
+   * applied again for its hold and no second line or core call comes of it. A read or write here that throws leaves the
+   * danger pending, read again 30 s on (fails closed).
+   */
+  private completeWithHold(eventId: string): boolean {
+    if (!this.onlyHoldLeft(eventId)) return false;
+    this.holdFromKept(eventId);
+    if (!this.holdWritten(eventId)) return false;
+    try {
+      this.clearDangerPending(eventId);
+    } catch {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * True when this text's danger is pending with its line and record done (`safety_line_done`) and its result settled:
+   * at most its hold is left. Its pending note may be missing, its write having thrown: its row's danger flag then says
+   * the danger (T-1348). A read that throws answers false.
+   */
+  private onlyHoldLeft(eventId: string): boolean {
+    try {
+      const lineDone = this.host.storage.sql
+        .exec(
+          `SELECT 1 FROM safety_line_done d
+           WHERE d.event_id = ?
+             AND (EXISTS (SELECT 1 FROM safety_pending p WHERE p.event_id = d.event_id)
+                  OR EXISTS (SELECT 1 FROM safety_events e WHERE e.event_id = d.event_id AND e.danger = 1))`,
+          eventId,
+        )
+        .toArray();
+      return lineDone.length > 0 && this.resultSettled(eventId);
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * The danger outcome is complete (its line went or none is needed, its record is kept, and its result is settled): its
+   * re-reads stop, unless the unread hold still waits for a verdict, and its noted line goes with its pending note.
    */
   private clearDangerPending(eventId: string): void {
     const { sql } = this.host.storage;
     sql.exec("DELETE FROM safety_pending WHERE event_id = ?", eventId);
+    sql.exec("DELETE FROM safety_noted_lines WHERE event_id = ?", eventId);
+    sql.exec("DELETE FROM safety_line_done WHERE event_id = ?", eventId);
     sql.exec(
       `DELETE FROM safety_reread WHERE event_id = ?
          AND NOT EXISTS (SELECT 1 FROM safety_holds WHERE event_id = ? AND rule = 'unread' AND released = 0)`,
@@ -1082,9 +1652,11 @@ export class SafetyOnArrival {
   /**
    * Writes a danger's hold from these outcomes (every outcome kept for the text: the strictest rule of them all, arch 06
    * line 327, so a re-applied danger never takes only its latest read's rule), in place of the text's unread hold, before
-   * the core is called (T-1088 round 4, DL-144; the architect's round 3 gap A and note a). It stands until the core's hold
-   * takes its place (`sendDanger`), never looser than the open one. A storage that fails here must not keep the line from
-   * going: the text then stays among the texts not read at commit time, and a resume or re-read writes the hold again.
+   * the core is called (T-1088 round 4, DL-144; the architect's round 3 gap A and note a), and again on the direct path
+   * before its line (ADR-018 section 2). It stands until the core's hold takes its place (`sendDanger`), never looser than
+   * the open one. A storage that fails here must not keep the line from going: the danger then stays among the texts not
+   * read at commit time (by its pending note, or by its danger flag when the note failed too: T-1318), until `dangerSent`,
+   * a resume, a re-read or the record's replay writes the hold.
    */
   private holdFromOutcomes(
     eventId: string,
@@ -1101,15 +1673,14 @@ export class SafetyOnArrival {
   }
 
   /**
-   * An open danger whose hold is missing (the cut came before it was written) gets it from the outcomes kept for it, on
-   * resume or re-read; one with its hold open keeps it as it is (never looser).
+   * A danger whose hold is missing (the cut came before it was written, or every write of it threw) gets it from the
+   * outcomes kept for it, at `dangerSent`, on resume or re-read. Only a missing hold is filled (ADR-018 section 2, point
+   * 5): one with an outcome's hold, open or released, keeps it as it is, never looser, and a hold the core released stays
+   * released. With no labels kept, no hold can be built: the danger stays pending until a read that finds danger again.
    */
   private holdFromKept(eventId: string): void {
     try {
-      const open = this.host.storage.sql
-        .exec("SELECT 1 FROM safety_holds WHERE event_id = ? AND released = 0 AND rule <> 'unread'", eventId)
-        .toArray();
-      if (open.length === 0) this.holdFromOutcomes(eventId, this.outcomesOf(eventId), false);
+      if (!this.outcomeHoldExists(eventId)) this.holdFromOutcomes(eventId, this.outcomesOf(eventId), false);
     } catch {
       // The storage failed: the text stays among the texts not read at commit time, and the next re-read tries again.
     }
@@ -1130,7 +1701,9 @@ export class SafetyOnArrival {
    * verdict lands, and the batches they kept back go on in order. Round 4 (the architect's round 3 gap B): only a text
    * that no longer waits does this (as in round 2), and a text whose danger's line or record is not done is never made due
    * here (its verdict came; what it waits for is its line, not the model). So two such texts never make each other due on
-   * every answer, and each keeps its own 30 s re-read (arch 11 line 564).
+   * every answer, and each keeps its own 30 s re-read (arch 11 line 564). A text whose result is owed is never made due
+   * here either, as a pending danger (ADR-015 section 2): what it waits for is its result kept, not the model. Nor is a
+   * danger whose note's write threw and whose hold is not written (`dangerOpen`, T-1348): it waits for its hold.
    */
   private onReturn(set: SafetyDeps, readNow: string): void {
     const waiting = this.waiting();
@@ -1138,11 +1711,21 @@ export class SafetyOnArrival {
     if (waiting.some((row) => row.event_id === readNow)) return;
     const now = set.clock.now();
     for (const row of waiting) {
-      if (row.event_id === readNow || this.busy(row.event_id) || this.dangerPending(row.event_id)) continue;
+      if (row.event_id === readNow || this.busy(row.event_id) || this.dangerOpen(row.event_id)) continue;
+      if (this.resultOwed(row.event_id)) continue;
       if (row.due_ms !== null && row.due_ms > now) this.setReread(row.event_id, now);
     }
   }
 
+  /**
+   * Applies a result to its text (on time, by the timeout rule, late, on a re-read, or a danger applied again), in ADR-015
+   * section 2's three steps before the line. Step 1 is one synchronous step with no await in it, each write guarded on its
+   * own, so a storage that throws at one stops none of the others and no line: the result owed (for a text whose words
+   * were opened: `key`), the outcome labels, and for a danger its pending note, its hold and its flag, in that order, so
+   * an eviction leaves all of them or none. Step 2 seals the result in memory under `key`; step 3 keeps it in the text's
+   * row. Then the line, as before: a danger's, or a timeout's unread hold and outage line. A result is so kept before its
+   * line is sent, and replaces the one kept before (the row holds the result applied last: open point 3).
+   */
   private async applyResult(
     set: SafetyDeps,
     handoff: SealedHandoff,
@@ -1150,6 +1733,7 @@ export class SafetyOnArrival {
     result: SafetyResult,
     modelCalls: ModelCall[],
     via: "verdict" | "deadline" | "failed" | "readTimedOut" | "late",
+    key: SealingKey | null,
   ): Promise<void> {
     const { sql } = this.host.storage;
     const eventId = handoff.event.eventId;
@@ -1160,30 +1744,26 @@ export class SafetyOnArrival {
     let state: EventState = "done";
     let failure = false;
 
-    // The outcome labels the hold (if any) is handed on with; a late verdict's replace its stand-in's. A danger applied
-    // again (its first try was cut off, or its line failed) keeps every label its reads found, as its hold keeps the
-    // strictest rule.
-    const again = dangers.length > 0 && this.dangerPending(eventId);
-    const outcomes = again
-      ? [...new Set([...this.outcomesOf(eventId), ...result.outcomes])]
-      : result.outcomes;
-    sql.exec(
-      "INSERT OR REPLACE INTO safety_outcomes (event_id, outcomes) VALUES (?, ?)",
-      eventId,
-      JSON.stringify(outcomes),
-    );
+    // Step 1: owed and noted, before any await or send. No row for a text with no result to keep (its words could not be
+    // opened, so no key: the stand-in keeps its unread hold until a read opens them).
+    if (key !== null) this.oweResult(eventId);
+    const outcomes = this.keepLabels(eventId, result, dangers.length > 0);
+    if (dangers.length > 0) {
+      // Noted before any send: until the line has gone and its record is kept, an eviction cannot lose it. Its hold is
+      // written in the same step, before the core is called (round 4), from every outcome kept for it: the text is among
+      // the holds from here on, whatever cuts the work off, so its batch goes on and its hold binds the commit.
+      this.markDangerPending(eventId);
+      this.holdFromOutcomes(
+        eventId,
+        outcomes,
+        result.dangerWords.some((match) => match.list === "plugin"),
+      );
+      this.markDanger(eventId);
+    }
+    // Steps 2 and 3: sealed in memory under the key the read opened the words with, then kept, before the line.
+    if (key !== null) await this.keepResult(eventId, result, key);
     try {
       if (dangers.length > 0) {
-        // Noted before any send: until the line has gone and its record is kept, an eviction cannot lose it. Its hold is
-        // written in the same step, before the core is called (round 4), from every outcome kept for it: the text is among
-        // the holds from here on, whatever cuts the work off, so its batch goes on and its hold binds the commit.
-        this.markDangerPending(eventId);
-        this.holdFromOutcomes(
-          eventId,
-          outcomes,
-          result.dangerWords.some((match) => match.list === "plugin"),
-        );
-        this.markDanger(eventId);
         const sent = await this.sendDanger(set, handoff, arrivedAt, result);
         path = sent.path;
         lineId = sent.lineId;
@@ -1212,15 +1792,29 @@ export class SafetyOnArrival {
       state = "lineFailed";
     }
 
-    // A danger whose line or record is not done stays scheduled: it is read again 30 s on and its line tried again, with
-    // the same idempotency key.
-    if (dangers.length > 0 && this.dangerPending(eventId)) this.nextReread(set, eventId);
     if (via !== "late" || dangers.length > 0) {
       this.finish(eventId, state, dangers.length > 0, path, lineId, handedAfter);
+    }
+    // A danger whose line or record is not done stays scheduled: it is read again 30 s on and its line tried again, with
+    // the same idempotency key. So does one whose hold is not written, its pending note written or not (T-1348): its
+    // re-read 30 s on writes the hold. And so does one whose line's lasting mark is still set, its note written or not
+    // (T-1364): its line is tried again at each re-read that finds danger until it goes. Read once `finish` has run, in
+    // the same synchronous step, since `finish` writes the mark when the write that set the flag first was lost.
+    if (
+      dangers.length > 0 &&
+      (this.dangerPending(eventId) || !this.holdWritten(eventId) || this.lineOpen(eventId))
+    ) {
+      this.nextReread(set, eventId);
     }
     this.recordSpan(set, handoff, arrivedAt, result, modelCalls, via, path, lineId, failure);
   }
 
+  /**
+   * Writes what a text's safety work came to on its row. A danger whose line is not done (lineFailed: the line failed, a
+   * step after it threw, or its work was cut off) gets its line's lasting mark in this same write when the write that set
+   * its flag first was lost, so the flag is never written without the mark (T-1364); a mark already set stays, and one
+   * cleared stays clear (its line went). Any other write leaves the mark as it is.
+   */
   private finish(
     eventId: string,
     state: EventState,
@@ -1230,12 +1824,16 @@ export class SafetyOnArrival {
     handedAfterMs: number | null,
   ): void {
     this.host.storage.sql.exec(
-      "UPDATE safety_events SET state = ?, danger = ?, path = ?, line_id = ?, handed_after_ms = ? WHERE event_id = ?",
+      `UPDATE safety_events
+       SET state = ?, danger = ?, path = ?, line_id = ?, handed_after_ms = ?,
+           line_open = CASE WHEN ? = 1 THEN COALESCE(line_open, 1) ELSE line_open END
+       WHERE event_id = ?`,
       state,
       danger ? 1 : 0,
       path,
       lineId,
       handedAfterMs,
+      danger && state === "lineFailed" ? 1 : 0,
       eventId,
     );
   }
@@ -1323,11 +1921,16 @@ export class SafetyOnArrival {
   }
 
   /**
-   * The checked line for danger: the core's outbox row when it answers, else straight through Linq. The outcome is
-   * complete (`clearDangerPending`) once the core has answered (it holds the record and the line's outbox row), or once
-   * the direct line has gone (or none is needed) and its record is kept; a line that fails leaves it open. The hold
-   * written before the call (`holdFromOutcomes`) stands until the core's hold takes its place, with the core's id and never
-   * looser; a core answer with no hold leaves it as it is (K-09 gives no hold only for No: fails closed).
+   * The checked line for danger: the core's outbox row when it answers, else straight through Linq. The line and record
+   * are done (`dangerSent`) once the core has answered (it holds the record and the line's outbox row), or once the direct
+   * line has gone (or none is needed) and its record is kept; the outcome is complete once its result is settled and its
+   * hold is written too (ADR-015 section 2; ADR-018 section 2). A line that fails leaves it open. The hold written before
+   * the call (`holdFromOutcomes`) stands until the core's hold takes its place, with the core's id and never looser; a
+   * core answer with no hold leaves it as it is (K-09 gives no hold only for No: fails closed). The core's hold is written
+   * unguarded: the core already holds the line's outbox row, so no line waits on it, and a throw there leaves the danger
+   * pending until an application that finds danger writes it with its id. On the direct path the hold is written through
+   * the guard, so no write before the line can stop it, and a text's line is chosen once: its first application notes it,
+   * and every later one sends the noted line (ADR-015 section 2, open point 3).
    */
   private async sendDanger(
     set: SafetyDeps,
@@ -1359,7 +1962,7 @@ export class SafetyOnArrival {
       const hold = answer.hold;
       const kept =
         hold === null ? null : this.writeHold(eventId, hold.holdId, hold.releaseRule, hold.blocksBooking);
-      this.clearDangerPending(eventId);
+      this.dangerSent(eventId);
       if (hold !== null && kept === "at_once") await this.releaseAtOnce(set, handoff, hold.holdId, eventId);
       return {
         path: answer.safetyLine === null ? "none" : "outbox",
@@ -1369,32 +1972,92 @@ export class SafetyOnArrival {
       };
     }
 
-    // The core is not answering: the line goes straight through Linq from the bundle's copy, and the record waits.
-    const rule = strictestHold(result.outcomes);
-    if (rule !== null) {
-      this.writeHold(
-        eventId,
-        null,
-        rule,
-        result.dangerWords.some((match) => match.list === "plugin"),
-      );
-    }
-    const line = checkedLineFor(result, set.bundle);
+    // The core is not answering: the line goes straight through Linq from the bundle's copy, and the record waits. The hold
+    // is written again first through step 1's guard (ADR-018 section 2): a storage that throws there stops no line, which
+    // goes on this application, and the danger stays pending until its hold is written (`dangerSent`).
+    this.holdFromOutcomes(
+      eventId,
+      result.outcomes,
+      result.dangerWords.some((match) => match.list === "plugin"),
+    );
+    // A text's danger line is chosen once: the line its first application noted, else this read's, noted before it goes.
+    // So its key (`safety:<event id>:<line id>`) never changes, whatever a later read chooses, and Linq takes a repeat as
+    // one message; the queued record names the line that went.
+    const line = this.notedLine(eventId) ?? checkedLineFor(result, set.bundle);
     if (line === null) {
       await this.keep(set, eventId, "record", request);
-      this.clearDangerPending(eventId);
+      this.dangerSent(eventId);
       return { path: "none", lineId: null, handedAfterMs: null, failed: false };
     }
+    this.noteLine(eventId, line);
     const sent = await this.sendDirect(set, eventId, line, true);
     const handedAfterMs = set.clock.now() - arrivedAt;
     // Not sent: the outcome stays open, so the text is read again and its line tried again with the same key.
     if (sent === null) return { path: "none", lineId: line.id, handedAfterMs: null, failed: true };
     await this.keep(set, eventId, "record", { ...request, sentByActor: sent });
-    this.clearDangerPending(eventId);
+    this.dangerSent(eventId);
     return { path: "direct", lineId: line.id, handedAfterMs, failed: false };
   }
 
-  /** The outage line to a text no verdict came for: never to a stopped number. */
+  /**
+   * The danger line noted for this text on the direct path, as its K-01 id and the bundle's words for it; null when none
+   * is noted or the note cannot be read (guarded: the line this read chooses then goes at once).
+   */
+  private notedLine(eventId: string): CheckedLine | null {
+    try {
+      const row = this.host.storage.sql
+        .exec<{ line: string }>("SELECT line FROM safety_noted_lines WHERE event_id = ?", eventId)
+        .toArray()[0];
+      if (row === undefined) return null;
+      const line = JSON.parse(row.line) as Partial<CheckedLine> | null;
+      return typeof line?.id === "string" && typeof line.text === "string"
+        ? { id: line.id, text: line.text }
+        : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Notes the danger line this text's first application on the direct path chose, before it is sent; a line noted
+   * already stays. Guarded: a storage that throws here stops no line, which goes at once, unnoted, never put off to the
+   * next re-read for the note's sake (a later application may then choose another: open point 6's default).
+   */
+  private noteLine(eventId: string, line: CheckedLine): void {
+    try {
+      this.host.storage.sql.exec(
+        "INSERT OR IGNORE INTO safety_noted_lines (event_id, line) VALUES (?, ?)",
+        eventId,
+        JSON.stringify({ id: line.id, text: line.text }),
+      );
+    } catch {
+      // Not noted: the line goes all the same.
+    }
+  }
+
+  /**
+   * The outage line to a text no verdict came for: never to a stopped number. The actor takes a text during every await
+   * here (handle-actor.ts `accept` writes it and opens its batch window in one synchronous step), so a STOP can come while
+   * the stopped flag or the handle's ids are read, or while the core is asked for the line. So the actor's one reading
+   * (`SafetyHost.stopped`: its copy of the stopped flag, or a text no commit has taken that may hold a stop word) is asked
+   * before the flag is read, and again right before each send, the core's and each one straight through Linq, with nothing
+   * awaited between its answer and the send (T-1336; RULES 7.2: "It stops texts from the number it answers, at once"):
+   * its word holds the line, as the core's `phoneStopped` does. The danger line (`sendDanger`) never asks it (RULES 4.12).
+   *
+   * Once the core's answer names the line's row, first or repeated, the actor starts a wake of the recipient's dispatcher
+   * for it at once (`SafetyDeps.wake`; T-1341, DL-669), after the hand-off time is taken and before this returns, so the row
+   * goes within the line's 5 s, or is dropped by the dispatcher's own ask: the dispatcher, not this writer, holds an outage
+   * row for a possible STOP, asking the recipient actor's one reading right before each part goes (T-1337). The wake is
+   * gated by that same reading, asked right before it with nothing awaited between, and starts in that same step: only
+   * exactly false lets it go (a host with no reading, a throw, true or any other answer makes none), since a wake runs every
+   * sendable row of the recipient and a routine row is not asked (T-1342). The wake is started, never awaited (DL-679):
+   * nothing here, in `applyResult` or in `settle` waits for its run, so the text's late read is set up as before and a late
+   * danger verdict's line never waits for a dispatcher run (RULES 4.12: "Danger now: the safety message first"; arch 04
+   * line 211). Its run is kept with the in-flight safety work (`pending`, beside the text's own work that `track` keeps and
+   * `idle` awaits) until it ends. Not woken, or a wake that fails (a throw or a rejection, caught here, never tried again),
+   * leaves the row for the recipient's next dispatcher run, which asks the reading again; no sweep runs. Either way the
+   * line's result stands.
+   */
   private async sendOutage(
     set: SafetyDeps,
     handoff: SealedHandoff,
@@ -1407,6 +2070,18 @@ export class SafetyOnArrival {
     const eventId = handoff.event.eventId;
     const line = set.bundle.fixedLine("outage");
     if (line === null) return { path: "none", lineId: null, handedAfterMs: null };
+    // The reading as it is asked right before a send: a throw, or any answer but false, holds the line, failing closed as
+    // T-1313's ask does (RULES 7.2: "Unsure: treat it as a stop"). A host with no reading wired says nothing, as
+    // `copySaysStopped` reads it.
+    const actorSaysStopped = (): boolean => {
+      if (this.host.stopped === undefined) return false;
+      try {
+        const answer: unknown = this.host.stopped();
+        return answer !== false;
+      } catch {
+        return true;
+      }
+    };
     if (this.copySaysStopped() || (await set.isStopped(this.actorName))) {
       return { path: "none", lineId: line.id, handedAfterMs: null };
     }
@@ -1419,28 +2094,60 @@ export class SafetyOnArrival {
         sendClass: "quick_reply",
         sentByActor: null,
       };
+      // Asked again right before the core's send: a STOP taken while the flag or the ids were read holds the line.
+      if (actorSaysStopped()) return { path: "none", lineId: line.id, handedAfterMs: null };
       const answer = await set.core.sendFixedLine(request).catch((): CoreError => ({ error: "transient" }));
       if (!isError(answer)) {
-        return { path: "outbox", lineId: line.id, handedAfterMs: set.clock.now() - arrivedAt };
+        const handedAfterMs = set.clock.now() - arrivedAt;
+        const row: unknown = answer.outboxRowId;
+        // The row the core named goes to the recipient's dispatcher at once, only while the reading, asked right before
+        // the wake, says exactly false (T-1341; DL-669). The wake starts in that same step and is never awaited (DL-679):
+        // its run is kept with the in-flight safety work until it ends, and a wake that fails changes nothing for the line.
+        if (
+          typeof row === "string" &&
+          row !== "" &&
+          set.wake !== undefined &&
+          this.host.stopped !== undefined &&
+          !actorSaysStopped()
+        ) {
+          try {
+            const run = set.wake({ handleId: ids.handleId, outboxRowIds: [row] }).catch(() => {
+              // Not woken: the row waits for the recipient's next dispatcher run, which asks the reading again.
+            });
+            this.pending.add(run);
+            void run.finally(() => this.pending.delete(run));
+          } catch {
+            // A wake that throws at once: the same.
+          }
+        }
+        return { path: "outbox", lineId: line.id, handedAfterMs };
       }
       if (answer.error === "phoneStopped") return { path: "none", lineId: line.id, handedAfterMs: null };
+      // And right before the line goes straight through Linq: a STOP taken while the core was asked holds it too.
+      if (actorSaysStopped()) return { path: "none", lineId: line.id, handedAfterMs: null };
       const sent = await this.sendDirect(set, eventId, line, false);
       if (sent === null) return { path: "none", lineId: line.id, handedAfterMs: null };
       await this.keep(set, eventId, "fixed", { ...request, sentByActor: sent });
       return { path: "outage", lineId: line.id, handedAfterMs: set.clock.now() - arrivedAt };
     }
+    // No ids to ask the core with: asked again right before the line goes straight through Linq.
+    if (actorSaysStopped()) return { path: "none", lineId: line.id, handedAfterMs: null };
     const sent = await this.sendDirect(set, eventId, line, false);
     return sent === null
       ? { path: "none", lineId: line.id, handedAfterMs: null }
       : { path: "outage", lineId: line.id, handedAfterMs: set.clock.now() - arrivedAt };
   }
 
-  /** True when the actor's own copy of the stopped flag says stopped (T-269); a copy that cannot be read says nothing. */
+  /**
+   * True when the actor's own copy of the stopped flag says stopped (T-269), or cannot be read (T-1208): it may hold a STOP
+   * the stopped flag the deps read has not seen yet, so a copy that throws reads stopped, failing closed, as the outage
+   * path's own line does (../outage/db `stoppedNow`). A copy not wired says nothing.
+   */
   private copySaysStopped(): boolean {
     try {
       return this.host.stopped?.() === true;
     } catch {
-      return false;
+      return true;
     }
   }
 

@@ -20,9 +20,13 @@ import {
   type InboundEvent,
   type SealedHandoff,
 } from "../gateway";
+import { WHOLE_A } from "../bundle/test-support";
 import { fakeKeyStore } from "../gateway/test-support";
-import { harness, type Harness } from "../safety/test-support";
-import type { SafetyResult } from "../safety/types";
+import { setDbOutageDeps, type OutageView } from "../outage/db";
+import { dbFakes, type DbFakes } from "../outage/db/test-support";
+import { fakeRead, harness, TEST_IDS, type Harness } from "../safety/test-support";
+import type { SafetyDeps, SafetyResult } from "../safety/types";
+import type { ActorCopies } from "./copies/copies";
 import {
   setBatchHooks,
   setSafetyDeps,
@@ -63,6 +67,8 @@ interface BatchRpc {
   markHoldReleased(holdId: string): Promise<"released" | "neverReleased" | "noSuchHold">;
   safetyIdle(): Promise<void>;
   batchIdle(): Promise<void>;
+  readOutage(): Promise<OutageView>;
+  outageIdle(): Promise<void>;
 }
 
 function stub(): DurableObjectStub<HandleActor> {
@@ -71,6 +77,41 @@ function stub(): DurableObjectStub<HandleActor> {
 
 function actorOf(): BatchRpc {
   return stub();
+}
+
+/**
+ * The doubles of ../outage/db/test-support.ts as this file's harness (DL-615; the architect's 5(c)): their one `down`
+ * switch, the core's, covers the probe and the bundle registry too; the safety read answers `answers` after `delayMs`.
+ */
+function dbHarness(f: DbFakes, answers: Record<string, SafetyResult>, delayMs: number): Harness {
+  const read = fakeRead(f.clock, answers, delayMs);
+  const stopped = { value: false };
+  const deps: SafetyDeps = { ...f.safetyDeps, read, isStopped: () => stopped.value };
+  return { clock: f.clock, core: f.core, direct: f.direct, read, stopped, deps };
+}
+
+/**
+ * Wires the PostgreSQL-down path as D-017 is to wire it (DL-615): its ports are the doubles', and, since no turn has pinned
+ * a bundle here, the actor's keyword copy is bundle A's, installed by its own ActorCopies.refreshKeywords, so the real
+ * classify reads each text with the key store the gateway sealed it under. Answers the function that unwires it.
+ */
+async function wireDownPath(f: DbFakes): Promise<() => void> {
+  const restore = setDbOutageDeps(f.outageDeps);
+  const copied = await runInDurableObject(stub(), (instance) =>
+    (instance as unknown as { copies: ActorCopies }).copies.refreshKeywords(
+      WHOLE_A.manifest as unknown as Record<string, unknown>,
+    ),
+  );
+  expect(copied).toBe(true);
+  return restore;
+}
+
+/** The down path has read each of these texts as another text (no stop word), before any timeout fires (DL-615). */
+async function readAsOther(...eventIds: string[]): Promise<void> {
+  await actorOf().outageIdle();
+  expect((await actorOf().readOutage()).texts).toEqual(
+    eventIds.map((eventId) => expect.objectContaining({ eventId, kind: "other" }) as unknown),
+  );
 }
 
 async function handoffOf(eventId: string, body: string): Promise<SealedHandoff> {
@@ -128,9 +169,15 @@ async function withBatch(
   answers: Record<string, SafetyResult>,
   body: (run: Run) => Promise<void>,
   lease: "wired" | "unwired" | "failsOnce" | "refusesThenCrashes" = "wired",
-  options: { restarts?: boolean; delayMs?: number } = {},
+  options: { restarts?: boolean; delayMs?: number; downPath?: boolean } = {},
 ): Promise<void> {
-  const h = harness(keys, answers, { delayMs: options.delayMs ?? 0 });
+  // With `downPath` (DL-615), the doubles are ../outage/db/test-support.ts's and the PostgreSQL-down path is wired as D-017
+  // is to wire it, before the first text arrives.
+  const db = options.downPath === true ? dbFakes(keys, answers, { start: 0, ids: TEST_IDS }) : null;
+  const h =
+    db === null
+      ? harness(keys, answers, { delayMs: options.delayMs ?? 0 })
+      : dbHarness(db, answers, options.delayMs ?? 0);
   const handed: ClosedBatch[] = [];
   let failed = false;
   let calls = 0;
@@ -185,9 +232,11 @@ async function withBatch(
       await actorOf().batchIdle();
     },
   };
+  const restoreDown = db === null ? null : await wireDownPath(db);
   try {
     await body(run);
   } finally {
+    restoreDown?.();
     restoreBatch();
     restoreSafety();
   }
@@ -644,14 +693,18 @@ describe("T-247's security notes, before the lease is wired (DL-110)", () => {
 
   it("note e: a late danger verdict after a no-match timeout closes the open batch at once, as an on-time one does", async () => {
     const late = { ...asResult(safetyEmergencyNow), eventId: "evt-1" };
+    // The outage line is a step on the way here (DL-615, the architect's 5(b)): the down path runs wired, as D-017 is to
+    // wire it, and has read both texts as other texts.
     await withBatch(
       { "evt-1": late, ...NO(["evt-2"]) },
       async (run) => {
         // Every read answers 5 s after its text: past the 4 s deadline. (Nothing here waits for the reads to settle: the
         // fake clock never reaches evt-2's.)
         await arrive("evt-1");
+        await readAsOther("evt-1");
         await run.tick(2900);
         await arrive("evt-2");
+        await readAsOther("evt-1", "evt-2");
         // 4 s: evt-1 has no verdict and no danger word, so the outage line goes and its batch stays open (it would close
         // at 5.9 s, 3 s after evt-2).
         await run.tick(1100);
@@ -673,7 +726,7 @@ describe("T-247's security notes, before the lease is wired (DL-110)", () => {
         expect(run.handed).toHaveLength(0);
       },
       "wired",
-      { delayMs: 5000 },
+      { delayMs: 5000, downPath: true },
     );
   });
 

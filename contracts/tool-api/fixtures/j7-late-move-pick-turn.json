@@ -5,7 +5,7 @@
     "after": [],
     "now": "2026-10-23T17:10:00Z",
     "stated": { "step": "A7-03", "gives": [] },
-    "note": "A7-03 after free cancel ends: Fri Oct 23 at 1:10pm Alex picks 'B' (Sun Oct 25 at 11:00am) from a question that showed 'No free cancel' before the yes ('Booked after the free-cancel time: No free cancel shows before the yes'). 'After free cancel ends, a move is a request to Sam: accept, another time, or decline. Silence keeps the booking as it is.' In his turn's commit: his yes written as a K-29 ticked_terms consent with the words shown (README default 129); one K-30 owner_oks row about late_move with its question to Sam ('1 Accept', '2 Another time', '3 Decline') and its deadline; Alex told that Sam decides. Nothing moves yet, and his Sat 11:00am stays booked. No key. The ids are examples."
+    "note": "A7-03 after free cancel ends: Fri Oct 23 at 1:10pm Alex picks 'B' (Sun Oct 25 at 11:00am) from a question that showed 'No free cancel' before the yes ('Booked after the free-cancel time: No free cancel shows before the yes'). 'After free cancel ends, a move is a request to Sam: accept, another time, or decline. Silence keeps the booking as it is.' In his turn's commit: his yes written as a K-29 ticked_terms consent with the words shown (README default 147); one K-30 owner_oks row about late_move with its question to Sam ('1 Accept', '2 Another time', '3 Decline') and its deadline; Alex told that Sam decides. Nothing moves yet, and his Sat 11:00am stays booked. No key. The ids are examples."
   },
   "request": {
     "caller": {

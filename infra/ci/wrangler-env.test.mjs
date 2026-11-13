@@ -1,15 +1,20 @@
 // Tests for wrangler.jsonc's env.production (T-1003): its own Worker and resource names (none shared with staging),
 // the pinned account, the same binding names as the top level, no route (it stays a comment until the user says yes),
-// and no key or secret value in the file. Run in ci.yml by `node --test "infra/ci/*.test.mjs"`.
+// and no key or secret value in the file. Also (T-1235) the link host, LINK_HOST, in each environment, and
+// env.staging's own FILES bucket; and (T-1304) Rosie's own number, which no section names and no tracked config or
+// script holds. Run in ci.yml by `node --test "infra/ci/*.test.mjs"`.
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
 
-import { REPO } from "./script-harness.mjs";
+import { outsideFiction, phoneNumbersIn } from "./phone-scan.mjs";
+import { REPO, SCRIPTS } from "./script-harness.mjs";
 
 const ROSFIELD_ACCOUNT_ID = "ecb06e7bc9129fa81104d331e9652362";
+// The host every link starts with (T-1235), set as the var LINK_HOST in each environment: a bare host, no scheme.
+const LINK_HOST = "rosfield.com";
 
 // Strip // and /* */ comments outside strings, then trailing commas, then parse.
 function parseJsonc(text) {
@@ -81,6 +86,8 @@ function productionProblems(config) {
   if (prod.routes !== undefined || prod.route !== undefined) problems.push("env.production has a route");
   if (prod.vars?.ENVIRONMENT !== "production")
     problems.push("env.production.vars.ENVIRONMENT is not production");
+  // The link host (T-1235): the bare host production's links start with (Q-51's default; DL-014).
+  if (prod.vars?.LINK_HOST !== LINK_HOST) problems.push(`env.production.vars.LINK_HOST is not ${LINK_HOST}`);
   if (JSON.stringify(prod.secrets) !== JSON.stringify({ required: [] }))
     problems.push("secrets.required is not []");
   for (const [k, v] of Object.entries(prod.vars ?? {})) {
@@ -159,12 +166,27 @@ describe("wrangler.jsonc env.production (T-1003)", () => {
   it("leaves staging's and the top level's own settings as they were", () => {
     assert.equal(config.name, "rosie");
     assert.equal(config.env.staging.name, "rosie-staging");
-    assert.equal(config.env.staging.kv_namespaces, undefined);
+    assert.deepEqual(
+      config.env.staging.kv_namespaces.map((kv) => kv.binding),
+      ["BUNDLES"],
+    );
     assert.equal(config.env.staging.hyperdrive, undefined);
     assert.deepEqual(
       config.env.staging.routes.map((r) => r.pattern),
       ["rosfield.com/test", "rosfield.com/test/*"],
     );
+  });
+
+  it("sets LINK_HOST in each environment, and gives env.staging its own FILES bucket, never production's (T-1235)", () => {
+    assert.equal(config.vars.LINK_HOST, LINK_HOST);
+    assert.equal(config.env.staging.vars.LINK_HOST, LINK_HOST);
+    assert.equal(config.env.production.vars.LINK_HOST, LINK_HOST);
+    assert.deepEqual(config.env.staging.r2_buckets, [
+      { binding: "FILES", bucket_name: "rosie-staging-files" },
+    ]);
+    assert.deepEqual(config.env.production.r2_buckets, [
+      { binding: "FILES", bucket_name: "rosie-production-files" },
+    ]);
   });
 
   it("holds no var that looks like a key and no secret value anywhere in the file", () => {
@@ -244,6 +266,18 @@ describe("env.production checks catch a broken copy", () => {
       [],
     );
   });
+  it("fail when production's LINK_HOST is missing, another host, or not a bare host", () => {
+    const problem = [`env.production.vars.LINK_HOST is not ${LINK_HOST}`];
+    assert.deepEqual(
+      broken((c) => delete c.env.production.vars.LINK_HOST),
+      problem,
+    );
+    assert.deepEqual(
+      broken((c) => (c.env.production.vars.LINK_HOST = "links.example.test")),
+      problem,
+    );
+    assert.ok(broken((c) => (c.env.production.vars.LINK_HOST = "https://rosfield.com")).includes(problem[0]));
+  });
   it("fail when a binding is missing", () => {
     assert.notDeepEqual(
       broken((c) => delete c.env.production.hyperdrive),
@@ -253,5 +287,76 @@ describe("env.production checks catch a broken copy", () => {
       broken((c) => delete c.env.production.r2_buckets),
       [],
     );
+  });
+});
+
+// Rosie's own number (T-1304; CQ-253 as DL-542 refines it): staging's Worker gets it only at deploy, by name
+// (infra/scripts/deploy-staging.sh's --var ROSIE_NUMBER, from the environment or the git-ignored .dev.vars), since
+// the repository is public (DL-436) and no real phone number goes in it. So no section of wrangler.jsonc names
+// ROSIE_NUMBER, and no line of wrangler.jsonc, package.json or any infra/scripts file holds a phone number outside
+// the fiction range: +1, an area code, then 555-0100 to 555-0199, as adapters/src/shared/samples.ts and the Linq
+// double read it. The number reader (phoneNumbersIn, outsideFiction) is phone-scan.mjs's since T-1317, whose
+// phone-scan.test.mjs reads every tracked file with it.
+describe("Rosie's own number in no tracked config (T-1304)", () => {
+  it("is named in no section of wrangler.jsonc: no var and no secret, at the top level or in either environment", () => {
+    for (const [where, section] of [
+      ["the top level", config],
+      ["env.staging", config.env.staging],
+      ["env.production", config.env.production],
+    ]) {
+      assert.ok(!Object.hasOwn(section.vars ?? {}, "ROSIE_NUMBER"), `${where}'s vars name ROSIE_NUMBER`);
+      assert.ok(
+        !(section.secrets?.required ?? []).includes("ROSIE_NUMBER"),
+        `${where} requires ROSIE_NUMBER`,
+      );
+    }
+  });
+
+  it("finds no phone number outside the fiction range in wrangler.jsonc, package.json or any infra/scripts file", () => {
+    const files = {
+      "wrangler.jsonc": raw,
+      "package.json": readFileSync(path.join(REPO, "package.json"), "utf8"),
+    };
+    for (const entry of readdirSync(SCRIPTS, { withFileTypes: true })) {
+      if (entry.isFile())
+        files[`infra/scripts/${entry.name}`] = readFileSync(path.join(SCRIPTS, entry.name), "utf8");
+    }
+    assert.ok("infra/scripts/deploy-staging.sh" in files);
+    assert.deepEqual(outsideFiction(files), []);
+  });
+
+  it("reads a number however it is written, as E.164, and no id as a number", () => {
+    for (const written of [
+      "+15555550142",
+      "+1 555 555 0142",
+      "+1-555-555-0142",
+      "+1 (555) 555-0142",
+      "(555) 555-0142",
+      "555-555-0142",
+      "555.555.0142",
+      "5555550142",
+      "1-555-555-0142",
+      "15555550142",
+    ]) {
+      assert.deepEqual(phoneNumbersIn(`ROSIE_NUMBER=${written} # Rosie's line`), ["+15555550142"], written);
+    }
+    assert.deepEqual(phoneNumbersIn('"+15555550199", "(555) 555-0100"'), ["+15555550199", "+15555550100"]);
+    assert.deepEqual(phoneNumbersIn(`"${ROSFIELD_ACCOUNT_ID}", "${"0".repeat(31)}1", "2026-11-01"`), []);
+  });
+
+  it("lets the fiction range pass, and names the file and line of any other number, never the number", () => {
+    assert.deepEqual(outsideFiction({ "a.sh": 'ROSIE_NUMBER="+15555550142"\necho "(555) 555-0199"\n' }), []);
+    // Outside the range, yet no one's number: no North American area code starts with 0 or 1, so each number below
+    // is a fiction-range line under an area code that cannot exist.
+    const copy = structuredClone(config);
+    copy.env.staging.vars.ROSIE_NUMBER = "+10555550142";
+    const text = JSON.stringify(copy, null, 2);
+    const at = text.split("\n").findIndex((line) => line.includes("ROSIE_NUMBER")) + 1;
+    const found = outsideFiction({
+      "wrangler.jsonc": text,
+      "deploy.sh": 'set -e\n--var "ROSIE_NUMBER:+1 155 555 0142"\n',
+    });
+    assert.deepEqual(found, [`wrangler.jsonc:${at}`, "deploy.sh:2"]);
+    assert.ok(found.every((place) => !place.includes("0142")));
   });
 });

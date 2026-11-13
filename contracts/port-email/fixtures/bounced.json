@@ -1,0 +1,56 @@
+{
+  "call": "verifyWebhook",
+  "given": {
+    "now": "2026-10-24T11:00:09Z",
+    "note": "Resend's email.bounced for Ben's confirmation (send-confirmation-with-chat-link.json): his mail server rejected it for good, so it is a K-06 failed event with the failure code bouncePermanent, which starts the channel fallback (02-contracts K-12; arch 02 line 125). Ben still has the chat link on the booking page that gave it first (K-09 chat-link-after-contact-add.json). The bounce's words are the adapter's reason, with no address in them.",
+    "signing": "valid"
+  },
+  "request": {
+    "webhookId": "evt-email-bounced-0021",
+    "timestamp": "1792839608",
+    "signature": "v1,signed-at-test-time",
+    "raw": "{\"type\":\"email.bounced\",\"created_at\":\"2026-10-24T11:00:08.511Z\",\"data\":{\"created_at\":\"2026-10-24T11:00:05.230Z\",\"email_id\":\"email-msg-demo-0021\",\"message_id\":\"<rfc-demo-0021@email.example.com>\",\"from\":\"Lee's Barbershop <rosie@mail.rosfield.com>\",\"to\":[\"ben@example.com\"],\"subject\":\"Booked: Sat Nov 21, 2:00pm\",\"bounce\":{\"message\":\"The recipient's mail server rejected the email because the mailbox does not exist.\",\"subType\":\"General\",\"type\":\"Permanent\"}}}",
+    "receivedAt": "2026-10-24T11:00:09Z",
+    "traceId": "trace-email-bounced-0021"
+  },
+  "outcome": {
+    "result": "event",
+    "httpStatus": 200,
+    "event": {
+      "eventId": "evt-email-bounced-0021",
+      "provider": "email",
+      "handle": {
+        "kind": "email",
+        "address": "ben@example.com"
+      },
+      "service": "email",
+      "kind": "failed",
+      "messageId": null,
+      "chatId": null,
+      "sentAt": null,
+      "receivedAt": "2026-10-24T11:00:09Z",
+      "body": null,
+      "scrubbed": {
+        "cards": 0,
+        "ssns": 0
+      },
+      "attachments": [],
+      "threadedReplyTo": null,
+      "poll": null,
+      "reaction": null,
+      "edit": null,
+      "status": {
+        "messageId": "email-msg-demo-0021",
+        "at": "2026-10-24T11:00:08Z",
+        "failure": {
+          "code": "bouncePermanent",
+          "reason": "The recipient's mail server rejected the email because the mailbox does not exist."
+        }
+      },
+      "fromRosie": false,
+      "email": null,
+      "traceId": "trace-email-bounced-0021"
+    },
+    "rfcMessageId": "<rfc-demo-0021@email.example.com>"
+  }
+}

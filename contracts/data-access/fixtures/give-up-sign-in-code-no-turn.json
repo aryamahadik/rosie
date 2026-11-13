@@ -1,0 +1,42 @@
+{
+  "call": "dispatcherGivesUp",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json", "send-sign-in-code-sam.json", "claim-sam-sign-in-code.json"],
+    "now": "2026-11-02T13:16:00Z",
+    "note": "A give-up asked for Sam's code row, which no dispatcher makes (its 15 minutes from the first try would come after its not_after, which withdraws it first: ADR-016 section 3). The row has no turn, under which the move to failed, any follow-up and the entries would be written, so the call answers noTurn as soon as it finds the row, before its claim, version or time, and writes nothing: the row stays sending, no follow-up row or entry exists (README item 66)."
+  },
+  "request": {
+    "outboxRowId": "out-sam-sign-in-nov02-code",
+    "expectVersion": 3,
+    "claimer": "dispatcher-1",
+    "claimNo": 1,
+    "at": "2026-11-02T13:16:00Z",
+    "followUps": [],
+    "events": [
+      {
+        "id": "log-out-sam-sign-in-nov02-code-failed",
+        "kind": "outbox_row.state_changed",
+        "zone": null,
+        "businessId": null,
+        "actorKind": "rosie",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "outbox_rows",
+        "rowId": "out-sam-sign-in-nov02-code",
+        "oldValues": { "state": "sending" },
+        "newValues": { "state": "failed" },
+        "sealed": null,
+        "why": { "sendsFailingSince": "2026-11-02T13:00:03Z", "minutes": 15 },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
+  },
+  "outcome": {
+    "error": "noTurn",
+    "table": "outbox_rows",
+    "rowId": "out-sam-sign-in-nov02-code"
+  }
+}

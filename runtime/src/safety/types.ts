@@ -249,6 +249,15 @@ export interface SafetyDeps {
   clock: SafetyClock;
   /** The handle's stopped flag, which the actor keeps (arch 11 line 566). Only the outage line asks it. */
   isStopped(actorName: string): boolean | Promise<boolean>;
+  /**
+   * Wakes the outbox dispatcher for the recipient of the row the outage line's core send just named, first or repeated
+   * (T-1341; DL-669), the shape of the AI-down path's `OutageWake`: one dispatcher run for that handle, which claims its
+   * sendable rows in commit order and asks the recipient actor's one reading right before each outage part goes, dropping
+   * the row on any answer but exactly false (T-1337). The actor calls it only while that reading says exactly false. The
+   * root joins it (../wiring/root.ts), the same run the AI-down path's `OutageDeps.wake` is to take. Left out, not called,
+   * or failing, the row waits for the recipient's next dispatcher run (no sweep runs), and the line's result stands.
+   */
+  wake?(request: { readonly handleId: string; readonly outboxRowIds: readonly string[] }): Promise<void>;
 }
 
 /** How long the actor waits for a verdict: 2 s a model, 4 s in all, from arrival (arch 02 line 111). */

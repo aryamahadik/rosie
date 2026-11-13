@@ -15,38 +15,40 @@
   "workers_dev": true,
   // Needed for branch previews (wrangler versions upload --preview-alias).
   "preview_urls": true,
-  // The HandleActor Durable Object (T-244 writes the class; env.staging's copies come in T-566). Used by local
-  // runs and the Vitest Workers pool. SQLite-backed, so the migration uses new_sqlite_classes.
+  // The HandleActor Durable Object (T-244 writes the class), for local runs; env.staging repeats it (T-566), and the
+  // Vitest Workers pool runs env.staging. SQLite-backed, so the migration uses new_sqlite_classes.
   "durable_objects": {
     "bindings": [{ "name": "HANDLE_ACTOR", "class_name": "HandleActor" }],
   },
   "migrations": [{ "tag": "v1-handle-actor", "new_sqlite_classes": ["HandleActor"] }],
   // The bundle KV namespace (T-249 reads the step graph from it). The id is a local placeholder, enough for local
-  // runs, the Vitest Workers pool and dry runs; no real namespace exists yet (a later staging task creates it and
-  // env.staging's copy, T-566).
+  // runs; env.staging names the real staging namespace (T-566).
   "kv_namespaces": [{ "binding": "BUNDLES", "id": "00000000000000000000000000000000" }],
-  // The clock sweep's one-minute cron (C-021). Used by local runs and the Vitest Workers pool only; env.staging's
-  // copy comes in T-566, so staging stays free of cron until then.
+  // The clock sweep's one-minute cron (C-021), for local runs; env.staging repeats it (T-566).
   "triggers": {
     "crons": ["* * * * *"],
   },
   // The retry queue (RETRY_QUEUE) with its dead-letter queue: 5 tries, then the message goes to rosie-retry-dlq.
-  // For local runs and the Vitest Workers pool; no real queue exists, and env.staging's copies come in T-566.
+  // For local runs; env.staging repeats it on the real rosie-retry and rosie-retry-dlq (T-566).
   "queues": {
     "producers": [{ "queue": "rosie-retry", "binding": "RETRY_QUEUE" }],
     "consumers": [{ "queue": "rosie-retry", "max_retries": 5, "dead_letter_queue": "rosie-retry-dlq" }],
   },
   // The private files bucket (FILES; the R2 adapter, T-438, reads and writes ID files through it; Master
   // Corrections C10). The bucket is rosie-staging-files, the only one that exists (infra/scripts/create-r2-bucket.sh
-  // makes it with no public access: no r2.dev URL, no custom domain). For local runs, the Vitest Workers pool and
-  // dry runs, which simulate it without touching the real bucket. No env.staging copy until T-566.
+  // makes it with no public access: no r2.dev URL, no custom domain). For local runs and dry runs, which simulate it
+  // without touching the real bucket. env.staging repeats it (T-1235), since wrangler does not pass it down.
   "r2_buckets": [{ "binding": "FILES", "bucket_name": "rosie-staging-files" }],
   // No Hyperdrive binding yet: it comes with the task that needs it.
   // GIT_SHA is not listed: deploys set it with --var GIT_SHA:<sha>.
+  // LINK_HOST is the host every link starts with (T-1235; the web shell reads it, T-511): a bare host, with no
+  // scheme and no path. A link is https://<LINK_HOST><BASE_PATH>/<short code>. The domain is rosfield.com (Q-51's
+  // default: the link host is a config value; DL-014). Not inherited: repeated in each environment.
   "vars": {
     "ENVIRONMENT": "production",
     "BASE_PATH": "",
     "DB_SCHEMA": "",
+    "LINK_HOST": "rosfield.com",
   },
   // The secrets the Worker needs, by name. Only these reach local runs and tests from .dev.vars; none in D-000,
   // so keys stay out of tests (build prompt 5.1). Not inherited: repeated in each environment.
@@ -57,10 +59,13 @@
     "staging": {
       "name": "rosie-staging",
       // DB_SCHEMA stays empty on staging; each branch preview sets it to preview_<slug> at upload.
+      // LINK_HOST with BASE_PATH is rosfield.com/test, the route below, so staging's links are
+      // https://rosfield.com/test/<short code> and come back to this Worker (DL-023, DL-036).
       "vars": {
         "ENVIRONMENT": "staging",
         "BASE_PATH": "/test",
         "DB_SCHEMA": "",
+        "LINK_HOST": "rosfield.com",
       },
       "secrets": {
         "required": [],
@@ -71,6 +76,37 @@
         { "pattern": "rosfield.com/test", "zone_name": "rosfield.com" },
         { "pattern": "rosfield.com/test/*", "zone_name": "rosfield.com" },
       ],
+      // The top level's bindings, repeated for staging (T-566), since wrangler does not pass bindings down to an
+      // environment. infra/scripts/create-staging-bindings.sh made the KV namespace and both queues on the Rosfield
+      // account through cf.sh; the deploy makes the HandleActor class (the top level's migration tag) and the cron.
+      // The Vitest Workers pool runs this environment, so its tests get these bindings, simulated locally.
+      // Staging alone also binds TEST_PHONE_LINE, the test-phone page's TestPhoneLine (T-1186, DL-379), with its own
+      // migration tag: never at the top level or in env.production, which never wire the test-phone page (DL-373 gap d).
+      "durable_objects": {
+        "bindings": [
+          { "name": "HANDLE_ACTOR", "class_name": "HandleActor" },
+          { "name": "TEST_PHONE_LINE", "class_name": "TestPhoneLine" },
+        ],
+      },
+      "migrations": [
+        { "tag": "v1-handle-actor", "new_sqlite_classes": ["HandleActor"] },
+        { "tag": "v2-test-phone-line", "new_sqlite_classes": ["TestPhoneLine"] },
+      ],
+      // rosie-staging-bundles, the staging bundle namespace (T-249's pin reads the step graph from it).
+      "kv_namespaces": [{ "binding": "BUNDLES", "id": "17ea09bea3b1445fad51c02dc6f37210" }],
+      // The clock sweep's minute (T-254).
+      "triggers": {
+        "crons": ["* * * * *"],
+      },
+      // The retries (T-256): 5 tries, then rosie-retry-dlq.
+      "queues": {
+        "producers": [{ "queue": "rosie-retry", "binding": "RETRY_QUEUE" }],
+        "consumers": [{ "queue": "rosie-retry", "max_retries": 5, "dead_letter_queue": "rosie-retry-dlq" }],
+      },
+      // Staging's private files bucket (T-1235; T-441 made it, DL-027): the staging Worker is the one the R2 adapter
+      // (T-438) stores ID files from, and the Vitest Workers pool runs this environment, so its tests get FILES too,
+      // simulated locally. Bound by name; the bucket has no r2.dev URL and no custom domain.
+      "r2_buckets": [{ "binding": "FILES", "bucket_name": "rosie-staging-files" }],
     },
     // The production environment (T-1003). Written, never deployed: no production deploy script, workflow or secret
     // exists, and nothing below is created on Cloudflare until the user says yes (Q-51: one account for now, so every
@@ -82,10 +118,13 @@
       // Not reachable on a workers.dev address or a preview URL; production answers only on its route once approved.
       "workers_dev": false,
       "preview_urls": false,
+      // LINK_HOST: production's links are https://rosfield.com/<short code> (Q-51; A4-42). A var only: it opens no
+      // route, and the route below stays a comment.
       "vars": {
         "ENVIRONMENT": "production",
         "BASE_PATH": "",
         "DB_SCHEMA": "",
+        "LINK_HOST": "rosfield.com",
       },
       // Names only, no values. Live keys are set by the CTO from his own login at M8 (none exists before then).
       "secrets": {

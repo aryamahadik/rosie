@@ -1,0 +1,18 @@
+{
+  "call": "readTurnParty",
+  "given": {
+    "k04Seeds": ["seed-business-head.json"],
+    "after": [],
+    "now": "2026-11-30T15:00:03Z",
+    "note": "S11-100's hand-over made by Rosie's team on papers ('Rosie's team hands it over only on papers'), before the new owner has confirmed with a code to their own phone: Sam's owner role at the barbershop ended at the handover time, and no one holds its live owner role yet. The database side writes test owner 1's rows as read-turn-party-test-owner-1's note lists them (T-1148's skeleton seed), then Sam's owner role as it stands after the hand-over: person_roles role-sam-barber (person-sam, biz-lees-barbershop, owner, ended_at 2026-11-30T14:00:00Z, version 2). company-lees-barbershop still names Sam (open gap 59). Sam holds no live role, and the one company that names a business for him names one at which his role ended ('Sam's access ends at the handover time'; RULES 8.7), with no live owner role of his there, so the company row is not his to act on: businessUndecided, roleEnded (item 52, default 99)."
+  },
+  "request": {
+    "handle": { "kind": "phone", "address": "+15555550100" }
+  },
+  "outcome": {
+    "error": "businessUndecided",
+    "reason": "roleEnded",
+    "handleId": "handle-sam",
+    "personId": "person-sam"
+  }
+}

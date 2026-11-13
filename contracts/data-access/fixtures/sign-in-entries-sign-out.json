@@ -1,0 +1,24 @@
+{
+  "call": "signInEntries",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": [
+      "start-sign-in-sam.json",
+      "send-sign-in-code-sam.json",
+      "prove-sign-in-sam-right.json",
+      "end-session-sam.json"
+    ],
+    "now": "2026-11-02T14:00:01Z",
+    "note": "After Sam's sign-out: session.ended log-session-sam-nov02-ended (old ended_at and ended_why null, new 14:00:00Z and signed_out; actor Sam, his own tap; why null, K-08 default 25), under the sign-out's own request id as the job id, since no attempt is part of it, and its trace."
+  },
+  "request": {
+    "jobId": "req-portal-sam-nov02-signout",
+    "traceId": "trace-page-sam-nov02-1400",
+    "entries": [{ "kind": "session.ended", "sessionId": "session-sam-nov02" }]
+  },
+  "outcome": {
+    "result": "logged",
+    "entries": [{ "id": "log-session-sam-nov02-ended", "kind": "session.ended", "written": true }]
+  }
+}

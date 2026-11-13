@@ -1,0 +1,46 @@
+{
+  "call": "readQuotes",
+  "given": {
+    "now": "2026-11-03T00:40:00Z",
+    "environment": "staging",
+    "after": ["quote-price-confirm.json"],
+    "note": "Needs you on Sam's portal (FS section 6.2: 'quotes over the owner's limit ... Each says what is decided, the money, the deadline, and what silence does. Silence never books or charges'; A4-09, B4-10): signed in, Sam may answer at Lee Home Services, so the list holds the quote with his ask waiting: version 2, Jordan's $640, the photo and the note (README default 60), the deadline (K-30 owner_oks.answer_by, 4 of his text hours: Tue 11:30am), and what silence does (B4-80: Alex is told it couldn't be priced). The photo address is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-heater-0001",
+      "traceId": "trace-portal-sam-heater-0001",
+      "sessionToken": "placeholder-session-token-sam-0101",
+      "linkCode": null
+    },
+    "list": "toOk"
+  },
+  "outcome": {
+    "result": "quotes",
+    "list": "toOk",
+    "quotes": [
+      {
+        "quoteId": "quote-alex-heater",
+        "version": 2,
+        "ownerOkId": "ok-alex-heater",
+        "businessName": "Lee Home Services",
+        "customerName": "Alex M.",
+        "service": "Water heater replacement",
+        "basis": "photos",
+        "area": "Springfield",
+        "photos": [
+          {
+            "photoId": "answer-alex-heater-photo-1",
+            "url": "https://files.example/placeholder-signed-read-heater-2",
+            "expiresAt": "2026-11-03T00:50:00Z"
+          }
+        ],
+        "answers": [{ "question": null, "words": "It's a 40-gallon gas heater in the basement" }],
+        "priced": [{ "label": null, "price": { "cents": 64000, "currency": "USD" }, "upTo": null }],
+        "askedAt": "2026-11-03T00:30:04Z",
+        "answerBy": "2026-11-03T16:30:00Z",
+        "silence": "No answer by Tue 11:30am: Alex is told it couldn't be priced. Nothing is booked or charged."
+      }
+    ]
+  }
+}

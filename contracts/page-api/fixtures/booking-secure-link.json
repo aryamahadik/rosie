@@ -1,0 +1,38 @@
+{
+  "call": "bookingSecureLink",
+  "given": {
+    "now": "2026-10-21T23:17:02Z",
+    "environment": "staging",
+    "after": [
+      "booking-page-start.json",
+      "booking-service-haircut.json",
+      "booking-place-confirm.json",
+      "booking-who-for-confirm.json",
+      "booking-reach-confirm.json",
+      "booking-name-confirm.json",
+      "booking-price-list.json",
+      "booking-times-card.json",
+      "booking-pick-time.json",
+      "db-schema/rules/fixtures/seed-rules-tap-list.json"
+    ],
+    "note": "A4-24 needs nothing (Alex books for himself, an adult), so the walk goes on to A4-42 (FS section 7 screen 11): the page entry calls K-09 v1.2 sendSecureLink alone (caller.kind page, personId null), for the booker, via page, as tool-api/fixtures/j4-secure-link-agent.json gives an AI the link: only the code's sha256 is kept, and the link comes back once in url; A4-43 puts no form on the page, and A4-98 decides once that Sam OKs it first (approval ownerok: Alex is new at the barbershop, K-26's new-customer OK rule). An automatic step on no one's word (README default 48); everything Alex then changes on the secure page is read back there. The link code is a placeholder; the host is a config value (Q-51)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0024",
+      "traceId": "trace-page-lees-0024",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "for": "booker"
+  },
+  "outcome": {
+    "result": "linkGiven",
+    "for": "booker",
+    "link": { "url": "rosfield.com/s/placeholder-link-code-0061" },
+    "approval": "ownerok",
+    "formsOnPage": false,
+    "ownCustomersOnly": false
+  }
+}

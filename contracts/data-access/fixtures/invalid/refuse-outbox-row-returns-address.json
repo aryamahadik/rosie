@@ -1,0 +1,56 @@
+{
+  "result": "outboxRow",
+  "outboxRowId": "outbox-s1-02-sam-1",
+  "businessId": "biz-lees-barbershop",
+  "readAt": "2026-10-19T18:05:05Z",
+  "row": {
+    "turnId": "turn-s1-01-sam",
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "state": "planned",
+    "version": 1,
+    "channel": "imessage",
+    "sendClass": "quick_reply",
+    "bookingId": null,
+    "openQuestionId": "oq-s1-02-sam-1",
+    "copyOfRowId": null,
+    "hasPlan": false,
+    "finalParts": null
+  },
+  "line": { "step": "S1-02", "index": 0, "from": "openQuestion" },
+  "recipient": {
+    "handleId": "handle-sam",
+    "kind": "phone",
+    "address": "+15555550100",
+    "personId": "person-sam",
+    "name": "Sam Lee",
+    "storedLanguage": "en",
+    "roles": [{ "roleId": "role-sam-barber", "role": "owner", "version": 1 }],
+    "phone": { "stopped": false, "chatOpen": true, "chatWay": "imessage", "pollVotedAt": null, "version": 2 }
+  },
+  "answers": {
+    "handleId": "handle-sam",
+    "texts": [{ "eventId": "evt-sam-s1-01", "outcomes": null, "tenses": null }]
+  },
+  "slotSource": {
+    "business": {
+      "id": "biz-lees-barbershop",
+      "name": "Lee's Barbershop",
+      "displayName": "Lee's Barbershop",
+      "timeZone": "America/New_York",
+      "version": 3
+    },
+    "booking": null,
+    "question": {
+      "id": "oq-s1-02-sam-1",
+      "step": "S1-02",
+      "status": "waiting",
+      "options": [],
+      "readback": null,
+      "clock": null,
+      "askCount": 1,
+      "version": 1,
+      "clockRow": { "id": "clock-oq-s1-02-sam-1", "state": "waiting", "dueAt": null, "dueZone": null, "version": 1 }
+    }
+  },
+  "openQuestions": []
+}

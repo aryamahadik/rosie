@@ -5,7 +5,7 @@
     "after": [],
     "now": "2026-10-24T14:30:00Z",
     "stated": { "step": "A7-70", "gives": [] },
-    "note": "A7-70: on the visit day Alex texts 'Running 15 minutes late, sorry!'. The owner's one rule applies; Sam set none, so 'Owner silent: a shorter visit in the time left, at the same price, or a later time' (README default 141). In Alex's turn's commit: 'No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut. / Reply 1 Shorter is fine, 2 A later time.' (quick_reply), its clock the start time; Riley told ('Alex M. (11:00am) is about 15 minutes late.'), visit_now since the visit is today. No change, no fee ('Never: a fee on silence for being late'), no key. The ids are examples."
+    "note": "A7-70: on the visit day Alex texts 'Running 15 minutes late, sorry!'. The owner's one rule applies; Sam set none, so 'Owner silent: a shorter visit in the time left, at the same price, or a later time' (README default 159). In Alex's turn's commit: 'No problem. Riley can do a shorter cut in the time left, at the same price, or you can move to a later time. No reply by 11:00am means the shorter cut. / Reply 1 Shorter is fine, 2 A later time.' (quick_reply), its clock the start time; Riley told ('Alex M. (11:00am) is about 15 minutes late.'), visit_now since the visit is today. No change, no fee ('Never: a fee on silence for being late'), no key. The ids are examples."
   },
   "request": {
     "caller": {

@@ -1,0 +1,1418 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/data-access/data-access.v1.5.schema.json",
+  "title": "DataAccessV1dot5",
+  "description": "K-05 v1.5, a minor version of the data-access calls (T-1184, from T-1141's round 1 NEED, item 2; DL-364; QUESTIONS.md CQ-179). It only adds to v1.4 (data-access.v1.4.schema.json, frozen and unchanged, referred to here, which refers on to v1.3, v1.2, v1.1 and v1): every v1.4 definition is here under its own name, by reference, and none changes, so every v1, v1.1, v1.2, v1.3 and v1.4 exchange is a v1.5 exchange. It adds no database call and changes no read: readOutboxRow reads as v1.3 says, its recipient's roles as stored. Added: rowReader, the consumers' mapping of README item 35's table row role and FinalizeRow.reader (README item 44), stated as an exchange so its fixtures check it. A row whose recipient holds a role at the row's business is read by that role, as v1.3 maps it; a row whose recipient, a person, holds no role is read by the audience of the step line the row carries when the row's step is in section 1 of its flow, the sign-up section the sign-up door enters (ADR-013 section 3); every other row whose recipient holds no role is still refused (noReader). Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/commitTurn.exchange"
+    },
+    {
+      "$ref": "#/$defs/writePlan.exchange"
+    },
+    {
+      "$ref": "#/$defs/unplannedRows.exchange"
+    },
+    {
+      "$ref": "#/$defs/claimOutbox.exchange"
+    },
+    {
+      "$ref": "#/$defs/markPart.exchange"
+    },
+    {
+      "$ref": "#/$defs/markRow.exchange"
+    },
+    {
+      "$ref": "#/$defs/armClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/cancelClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/dueClocks.exchange"
+    },
+    {
+      "$ref": "#/$defs/fireClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/reserve.exchange"
+    },
+    {
+      "$ref": "#/$defs/release.exchange"
+    },
+    {
+      "$ref": "#/$defs/extend.exchange"
+    },
+    {
+      "$ref": "#/$defs/readActiveBundle.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBundleValue.exchange"
+    },
+    {
+      "$ref": "#/$defs/publishBundleCopy.exchange"
+    },
+    {
+      "$ref": "#/$defs/setActiveBundle.exchange"
+    },
+    {
+      "$ref": "#/$defs/parkTurn.exchange"
+    },
+    {
+      "$ref": "#/$defs/renewClaim.exchange"
+    },
+    {
+      "$ref": "#/$defs/dispatcherGivesUp.exchange"
+    },
+    {
+      "$ref": "#/$defs/claimEffects.exchange"
+    },
+    {
+      "$ref": "#/$defs/recordEffectResult.exchange"
+    },
+    {
+      "$ref": "#/$defs/serviceBack.exchange"
+    },
+    {
+      "$ref": "#/$defs/recordProviderEvent.exchange"
+    },
+    {
+      "$ref": "#/$defs/reconciliationRefund.exchange"
+    },
+    {
+      "$ref": "#/$defs/writeAllSet.exchange"
+    },
+    {
+      "$ref": "#/$defs/readTurnState.exchange"
+    },
+    {
+      "$ref": "#/$defs/handleTargets.exchange"
+    },
+    {
+      "$ref": "#/$defs/sendState.exchange"
+    },
+    {
+      "$ref": "#/$defs/handleSealingKey.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOpenHolds.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOutboxRow.exchange"
+    },
+    {
+      "$ref": "#/$defs/readFixedLineFacts.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyOutcomeOfEvent.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyOutcome.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyHold.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyHoldOfOutcome.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOutboxRowWritten.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessOwner.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessZone.exchange"
+    },
+    {
+      "$ref": "#/$defs/rowReader.exchange"
+    }
+  ],
+  "$defs": {
+    "id": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/id"
+    },
+    "nullableId": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/nullableId"
+    },
+    "utc": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/utc"
+    },
+    "nullableUtc": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/nullableUtc"
+    },
+    "zone": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/zone"
+    },
+    "bundleId": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/bundleId"
+    },
+    "phoneNumber": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/phoneNumber"
+    },
+    "tableName": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/tableName"
+    },
+    "version": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/version"
+    },
+    "sqlstate": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/sqlstate"
+    },
+    "rowRef": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/rowRef"
+    },
+    "changedRow": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/changedRow"
+    },
+    "during": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/during"
+    },
+    "given": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/given"
+    },
+    "transientError": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/transientError"
+    },
+    "notFoundError": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/notFoundError"
+    },
+    "versionChangedError": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/versionChangedError"
+    },
+    "constraintError": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/constraintError"
+    },
+    "turn": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/turn"
+    },
+    "stateWrite": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/stateWrite"
+    },
+    "stateTable": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/stateTable"
+    },
+    "openQuestionNew": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/openQuestionNew"
+    },
+    "openQuestionClose": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/openQuestionClose"
+    },
+    "clockKind": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/clockKind"
+    },
+    "clockNew": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/clockNew"
+    },
+    "clockCancel": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/clockCancel"
+    },
+    "channel": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/channel"
+    },
+    "sendClass": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/sendClass"
+    },
+    "outboxRowNew": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/outboxRowNew"
+    },
+    "reservationConfirm": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/reservationConfirm"
+    },
+    "reservationLetGo": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/reservationLetGo"
+    },
+    "sealedValues": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/sealedValues"
+    },
+    "eventEntry": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/eventEntry"
+    },
+    "writes": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/writes"
+    },
+    "outboxRowWritten": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/outboxRowWritten"
+    },
+    "promotion": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/promotion"
+    },
+    "skippedInLine": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/skippedInLine"
+    },
+    "commitResult": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/commitResult"
+    },
+    "reservationLostError": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/reservationLostError"
+    },
+    "commitTurn.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/commitTurn.request"
+    },
+    "commitTurn.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/commitTurn.response"
+    },
+    "commitTurn.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/commitTurn.errors"
+    },
+    "commitTurn.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/commitTurn.exchange"
+    },
+    "writePlan.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/writePlan.request"
+    },
+    "writePlan.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/writePlan.response"
+    },
+    "writePlan.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/writePlan.errors"
+    },
+    "writePlan.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/writePlan.exchange"
+    },
+    "unplannedRows.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/unplannedRows.request"
+    },
+    "unplannedRows.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/unplannedRows.response"
+    },
+    "unplannedRows.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/unplannedRows.errors"
+    },
+    "unplannedRows.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/unplannedRows.exchange"
+    },
+    "claimOutbox.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/claimOutbox.request"
+    },
+    "claimedPart": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/claimedPart"
+    },
+    "claimedRow": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/claimedRow"
+    },
+    "claimOutbox.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/claimOutbox.response"
+    },
+    "claimOutbox.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/claimOutbox.errors"
+    },
+    "claimOutbox.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/claimOutbox.exchange"
+    },
+    "markPart.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/markPart.request"
+    },
+    "markPart.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/markPart.response"
+    },
+    "markPart.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/markPart.errors"
+    },
+    "markPart.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/markPart.exchange"
+    },
+    "markRow.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/markRow.request"
+    },
+    "markRow.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/markRow.response"
+    },
+    "markRow.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/markRow.errors"
+    },
+    "markRow.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/markRow.exchange"
+    },
+    "armClock.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/armClock.request"
+    },
+    "armedClock": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/armedClock"
+    },
+    "armClock.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/armClock.response"
+    },
+    "armClock.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/armClock.errors"
+    },
+    "armClock.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/armClock.exchange"
+    },
+    "cancelClock.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/cancelClock.request"
+    },
+    "cancelClock.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/cancelClock.response"
+    },
+    "cancelClock.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/cancelClock.errors"
+    },
+    "cancelClock.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/cancelClock.exchange"
+    },
+    "dueClocks.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/dueClocks.request"
+    },
+    "dueClock": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/dueClock"
+    },
+    "dueClocks.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/dueClocks.response"
+    },
+    "dueClocks.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/dueClocks.errors"
+    },
+    "dueClocks.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/dueClocks.exchange"
+    },
+    "fireClock.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/fireClock.request"
+    },
+    "fireClock.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/fireClock.response"
+    },
+    "fireClock.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/fireClock.errors"
+    },
+    "fireClock.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/fireClock.exchange"
+    },
+    "door": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/door"
+    },
+    "savedFor": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/savedFor"
+    },
+    "reserve.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/reserve.request"
+    },
+    "reserve.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/reserve.response"
+    },
+    "reserve.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/reserve.errors"
+    },
+    "reserve.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/reserve.exchange"
+    },
+    "release.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/release.request"
+    },
+    "release.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/release.response"
+    },
+    "release.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/release.errors"
+    },
+    "release.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/release.exchange"
+    },
+    "extend.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/extend.request"
+    },
+    "extend.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/extend.response"
+    },
+    "extend.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/extend.errors"
+    },
+    "extend.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/extend.exchange"
+    },
+    "readActiveBundle.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readActiveBundle.request"
+    },
+    "readActiveBundle.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readActiveBundle.response"
+    },
+    "readActiveBundle.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readActiveBundle.errors"
+    },
+    "readActiveBundle.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readActiveBundle.exchange"
+    },
+    "storedText": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/storedText"
+    },
+    "readBundleValue.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readBundleValue.request"
+    },
+    "readBundleValue.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readBundleValue.response"
+    },
+    "readBundleValue.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readBundleValue.errors"
+    },
+    "readBundleValue.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readBundleValue.exchange"
+    },
+    "publishBundleCopy.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/publishBundleCopy.request"
+    },
+    "publishBundleCopy.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/publishBundleCopy.response"
+    },
+    "publishBundleCopy.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/publishBundleCopy.errors"
+    },
+    "publishBundleCopy.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/publishBundleCopy.exchange"
+    },
+    "setActiveBundle.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/setActiveBundle.request"
+    },
+    "setActiveBundle.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/setActiveBundle.response"
+    },
+    "setActiveBundle.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/setActiveBundle.errors"
+    },
+    "setActiveBundle.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/setActiveBundle.exchange"
+    },
+    "parkTurn.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/parkTurn.request"
+    },
+    "parkTurn.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/parkTurn.response"
+    },
+    "parkTurn.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/parkTurn.errors"
+    },
+    "parkTurn.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/parkTurn.exchange"
+    },
+    "wrongStateError": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/wrongStateError"
+    },
+    "claimLostError": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/claimLostError"
+    },
+    "effectNew": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/effectNew"
+    },
+    "effectLetGo": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/effectLetGo"
+    },
+    "effectWrites": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/effectWrites"
+    },
+    "waitingChatWrites": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/waitingChatWrites"
+    },
+    "followUpRow": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/followUpRow"
+    },
+    "renewClaim.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/renewClaim.request"
+    },
+    "renewClaim.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/renewClaim.response"
+    },
+    "renewClaim.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/renewClaim.errors"
+    },
+    "renewClaim.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/renewClaim.exchange"
+    },
+    "dispatcherGivesUp.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/dispatcherGivesUp.request"
+    },
+    "dispatcherGivesUp.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/dispatcherGivesUp.response"
+    },
+    "dispatcherGivesUp.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/dispatcherGivesUp.errors"
+    },
+    "dispatcherGivesUp.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/dispatcherGivesUp.exchange"
+    },
+    "claimEvent": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/claimEvent"
+    },
+    "claimedEffect": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/claimedEffect"
+    },
+    "claimEffects.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/claimEffects.request"
+    },
+    "claimEffects.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/claimEffects.response"
+    },
+    "claimEffects.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/claimEffects.errors"
+    },
+    "claimEffects.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/claimEffects.exchange"
+    },
+    "serviceBack.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/serviceBack.request"
+    },
+    "serviceBack.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/serviceBack.response"
+    },
+    "serviceBack.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/serviceBack.errors"
+    },
+    "serviceBack.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/serviceBack.exchange"
+    },
+    "recordEffectResult.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/recordEffectResult.request"
+    },
+    "recordEffectResult.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/recordEffectResult.response"
+    },
+    "recordEffectResult.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/recordEffectResult.errors"
+    },
+    "recordEffectResult.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/recordEffectResult.exchange"
+    },
+    "recordProviderEvent.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/recordProviderEvent.request"
+    },
+    "recordProviderEvent.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/recordProviderEvent.response"
+    },
+    "recordProviderEvent.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/recordProviderEvent.errors"
+    },
+    "recordProviderEvent.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/recordProviderEvent.exchange"
+    },
+    "reconciliationRefund.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/reconciliationRefund.request"
+    },
+    "reconciliationRefund.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/reconciliationRefund.response"
+    },
+    "reconciliationRefund.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/reconciliationRefund.errors"
+    },
+    "reconciliationRefund.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/reconciliationRefund.exchange"
+    },
+    "writeAllSet.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/writeAllSet.request"
+    },
+    "writeAllSet.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/writeAllSet.response"
+    },
+    "writeAllSet.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/writeAllSet.errors"
+    },
+    "writeAllSet.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/writeAllSet.exchange"
+    },
+    "columnName": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/columnName"
+    },
+    "factTable": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/factTable"
+    },
+    "secretColumn": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/secretColumn"
+    },
+    "role": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/role"
+    },
+    "phoneFlags": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/phoneFlags"
+    },
+    "phoneRead": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/phoneRead"
+    },
+    "openQuestionRead": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/openQuestionRead"
+    },
+    "bookingHead": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/bookingHead"
+    },
+    "factRef": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/factRef"
+    },
+    "factValue": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/factValue"
+    },
+    "pauseRead": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/pauseRead"
+    },
+    "consentRead": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/consentRead"
+    },
+    "unknownFactError": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/unknownFactError"
+    },
+    "readTurnState.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readTurnState.request"
+    },
+    "readTurnState.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readTurnState.response"
+    },
+    "readTurnState.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readTurnState.errors"
+    },
+    "readTurnState.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readTurnState.exchange"
+    },
+    "handleTargets.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/handleTargets.request"
+    },
+    "handleTargets.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/handleTargets.response"
+    },
+    "handleTargets.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/handleTargets.errors"
+    },
+    "handleTargets.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/handleTargets.exchange"
+    },
+    "sendState.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/sendState.request"
+    },
+    "sendState.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/sendState.response"
+    },
+    "sendState.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/sendState.errors"
+    },
+    "sendState.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/sendState.exchange"
+    },
+    "handleSealingKey.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/handleSealingKey.request"
+    },
+    "handleSealingKey.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/handleSealingKey.response"
+    },
+    "handleSealingKey.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/handleSealingKey.errors"
+    },
+    "handleSealingKey.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/handleSealingKey.exchange"
+    },
+    "releaseRule": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/releaseRule"
+    },
+    "openHold": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/openHold"
+    },
+    "readOpenHolds.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readOpenHolds.request"
+    },
+    "readOpenHolds.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readOpenHolds.response"
+    },
+    "readOpenHolds.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readOpenHolds.errors"
+    },
+    "readOpenHolds.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readOpenHolds.exchange"
+    },
+    "rowLine": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/rowLine"
+    },
+    "answeredText": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/answeredText"
+    },
+    "rowRecipient": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/rowRecipient"
+    },
+    "businessHeadRead": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/businessHeadRead"
+    },
+    "rowQuestion": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/rowQuestion"
+    },
+    "questionAsSent": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/questionAsSent"
+    },
+    "fixedLineRowError": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/fixedLineRowError"
+    },
+    "readOutboxRow.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readOutboxRow.request"
+    },
+    "readOutboxRow.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readOutboxRow.response"
+    },
+    "readOutboxRow.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readOutboxRow.errors"
+    },
+    "readOutboxRow.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readOutboxRow.exchange"
+    },
+    "readFixedLineFacts.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readFixedLineFacts.request"
+    },
+    "readFixedLineFacts.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readFixedLineFacts.response"
+    },
+    "readFixedLineFacts.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readFixedLineFacts.errors"
+    },
+    "readFixedLineFacts.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readFixedLineFacts.exchange"
+    },
+    "nullableTurnId": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/nullableTurnId"
+    },
+    "storedOutcome": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/storedOutcome"
+    },
+    "storedHold": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/storedHold"
+    },
+    "ownerContact": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/ownerContact"
+    },
+    "moreThanOneOwnerError": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/moreThanOneOwnerError"
+    },
+    "readSafetyOutcomeOfEvent.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyOutcomeOfEvent.request"
+    },
+    "readSafetyOutcomeOfEvent.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyOutcomeOfEvent.response"
+    },
+    "readSafetyOutcomeOfEvent.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyOutcomeOfEvent.errors"
+    },
+    "readSafetyOutcomeOfEvent.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyOutcomeOfEvent.exchange"
+    },
+    "readSafetyOutcome.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyOutcome.request"
+    },
+    "readSafetyOutcome.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyOutcome.response"
+    },
+    "readSafetyOutcome.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyOutcome.errors"
+    },
+    "readSafetyOutcome.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyOutcome.exchange"
+    },
+    "readSafetyHold.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyHold.request"
+    },
+    "readSafetyHold.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyHold.response"
+    },
+    "readSafetyHold.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyHold.errors"
+    },
+    "readSafetyHold.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyHold.exchange"
+    },
+    "readSafetyHoldOfOutcome.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyHoldOfOutcome.request"
+    },
+    "readSafetyHoldOfOutcome.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyHoldOfOutcome.response"
+    },
+    "readSafetyHoldOfOutcome.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyHoldOfOutcome.errors"
+    },
+    "readSafetyHoldOfOutcome.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readSafetyHoldOfOutcome.exchange"
+    },
+    "readOutboxRowWritten.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readOutboxRowWritten.request"
+    },
+    "readOutboxRowWritten.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readOutboxRowWritten.response"
+    },
+    "readOutboxRowWritten.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readOutboxRowWritten.errors"
+    },
+    "readOutboxRowWritten.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readOutboxRowWritten.exchange"
+    },
+    "readBusinessOwner.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readBusinessOwner.request"
+    },
+    "readBusinessOwner.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readBusinessOwner.response"
+    },
+    "readBusinessOwner.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readBusinessOwner.errors"
+    },
+    "readBusinessOwner.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readBusinessOwner.exchange"
+    },
+    "readBusinessZone.request": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readBusinessZone.request"
+    },
+    "readBusinessZone.response": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readBusinessZone.response"
+    },
+    "readBusinessZone.errors": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readBusinessZone.errors"
+    },
+    "readBusinessZone.exchange": {
+      "$ref": "data-access.v1.4.schema.json#/$defs/readBusinessZone.exchange"
+    },
+    "rowReader.request": {
+      "title": "RowReaderRequest",
+      "description": "What the reader mapping reads (README item 44; item 35's table, row role and FinalizeRow.reader): from readOutboxRow's answer (v1.3 item 35), the row, its bundle, its line and its recipient, the person and their live roles at the row's business as stored; and from the row's bundle (K-01 v1, through the caller's own bundle port, as item 35's flow row reads it: README default 53), the flow the step is read in, the step's section in that flow and the lane of the step line the row carries. Not a database call: no K-05 read changes, and nothing here comes from PostgreSQL that readOutboxRow does not already answer. New in v1.5.",
+      "type": "object",
+      "properties": {
+        "outboxRowId": {
+          "description": "readOutboxRow.response outboxRowId: the row (K-04 v1 outbox_rows.id).",
+          "$ref": "#/$defs/id"
+        },
+        "bundleId": {
+          "description": "readOutboxRow.response row.bundleId: the bundle the row was committed under (outbox_rows.bundle_hash and bundle_build), whose flow graph the flow, section and line are read in (arch 10 line 548; README item 35's table, rows flow and allowedLinks).",
+          "$ref": "#/$defs/bundleId"
+        },
+        "line": {
+          "description": "readOutboxRow.response line: the step and line the row carries (rowLine). Never null here: a row whose line is null is refused before a reader is looked for (README item 35's table, rows step and line; default 48).",
+          "$ref": "#/$defs/rowLine"
+        },
+        "recipient": {
+          "description": "readOutboxRow.response recipient's person and live roles at the row's business, as stored (K-04 v1 outbox_rows.recipient_person_id; person_roles with ended_at null): the row's own recipient, never another person on the handle (S13-31: the role comes from what the message is about, never the phone alone).",
+          "type": "object",
+          "properties": {
+            "personId": {
+              "description": "recipient.personId: the person the row goes to, or null for a row to a handle with no person, which holds no role and stays refused (README default 64).",
+              "$ref": "#/$defs/nullableId"
+            },
+            "roles": {
+              "description": "recipient.roles: the person's live roles at the row's business, in role id order, as stored; empty for no live role there, no business yet or no person (v1.3 rowRecipient.roles).",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "roleId": {
+                    "description": "person_roles.id.",
+                    "$ref": "#/$defs/id"
+                  },
+                  "role": {
+                    "description": "person_roles.role (v1.2 role).",
+                    "$ref": "#/$defs/role"
+                  },
+                  "version": {
+                    "description": "person_roles.version.",
+                    "$ref": "#/$defs/version"
+                  }
+                },
+                "required": ["roleId", "role", "version"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["personId", "roles"],
+          "additionalProperties": false
+        },
+        "flow": {
+          "description": "The flow the row's step is read in (README item 35's table, row flow; default 53): an A or B step's own; a shared step's, the booking's for a row about a booking, else the first of A, then B, that the row's bundle lists whose graph holds the step (K-01 v1 flowLetter).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/flowLetter"
+        },
+        "section": {
+          "description": "The step's section in that flow's graph: K-01 v1 step.section, the n of the flow graph's section that holds it (flowGraph.sections; SPEC-master section 1: each flow is the 13 sections of LINES.md, in order). Section 1, '1. Business onboarding', is the sign-up section, which the sign-up door enters (K-02 v1.1 default 9; ADR-013 section 3); a shared step's section is the same in both flows (README default 65).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 13
+        },
+        "lineTo": {
+          "description": "The lane the step line the row carries goes to (K-01 v1 message.to, a lane), read with no role to tell it by (README default 62): when every line of the step from Rosie (its say messages from san, MC R1) goes to one lane, that lane; null when they go to two or more lanes, since the row's line.index counts the lines to its reader, which only a role names, or when the step has no line from Rosie at that index. S1-02's one line from Rosie goes to owner (K-01 bundle-v0-skeleton.json).",
+          "anyOf": [
+            {
+              "$ref": "../bundle/bundle.v1.schema.json#/$defs/lane"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["outboxRowId", "bundleId", "line", "recipient", "flow", "section", "lineTo"],
+      "additionalProperties": false
+    },
+    "rowReader.response": {
+      "title": "RowReaderResponse",
+      "description": "Who reads the row (README item 44): reader, the K-03 v1 readerRole the composer writes for (composeInput audience.role) and limit 7 checks every field against (FinalizeRow.reader; arch 06 line 311), and where it came from: from roles, the role the message is for among those the recipient holds (roleId; ComposeRow.role is that role: T-308; S13-31), as v1.3 maps it; or from signUpLine, the audience of the step line the row carries on the sign-up section, for a recipient who holds no role (roleId null; ComposeRow.role is the role of the reader's own name, never written or held: README default 63). New in v1.5.",
+      "oneOf": [
+        {
+          "title": "RowReaderByRole",
+          "description": "Read by a role the recipient holds at the row's business: the one the message is for (T-308; S13-31), through readerOf (owner and admin read as the owner, staff and customer as themselves: actions/src/finalize/claim-check/audience.ts), as v1.3 maps it. A role that reads as no one (own_business) gets noReader instead.",
+          "type": "object",
+          "properties": {
+            "result": {
+              "const": "reader"
+            },
+            "outboxRowId": {
+              "$ref": "#/$defs/id"
+            },
+            "reader": {
+              "description": "readerOf of the role the message is for (K-03 v1 readerRole).",
+              "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/readerRole"
+            },
+            "from": {
+              "description": "roles: read by a role the recipient holds.",
+              "const": "roles"
+            },
+            "roleId": {
+              "description": "person_roles.id of the role the message is for, one of the request's recipient.roles.",
+              "$ref": "#/$defs/id"
+            }
+          },
+          "required": ["result", "outboxRowId", "reader", "from", "roleId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "RowReaderBySignUpLine",
+          "description": "Read by the sign-up line: the recipient, a person, holds no role at the row's business, the row's step is in section 1 of its flow, and the step line the row carries goes to a reader lane: owner reads as the owner, staff as staff, cust as the customer (K-01 lane to K-03 readerRole: actions/src/compose-input/master-line.ts READER_LANES). README item 44.",
+          "type": "object",
+          "properties": {
+            "result": {
+              "const": "reader"
+            },
+            "outboxRowId": {
+              "$ref": "#/$defs/id"
+            },
+            "reader": {
+              "description": "The reader the line's lane names (K-03 v1 readerRole).",
+              "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/readerRole"
+            },
+            "from": {
+              "description": "signUpLine: read as the audience of the step line the row carries, on the sign-up section.",
+              "const": "signUpLine"
+            },
+            "roleId": {
+              "description": "None: the recipient holds no role, and the reading gives them none (README default 63).",
+              "type": "null"
+            }
+          },
+          "required": ["result", "outboxRowId", "reader", "from", "roleId"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "noReaderError": {
+      "title": "NoReaderError",
+      "description": "No one reads the row, so compose input and finalize refuse it, and nothing is composed or sent (README item 44; v1.3 item 35's table: 'with none, refused'; T-1141's noReader). why: noRole, the recipient holds no role at the row's business and the sign-up reading does not apply, since the row's step is outside section 1 of its flow or the row has no recipient person (README default 64); lineHasNoReader, the sign-up reading applies but the step line the row carries goes to no reader (a lane other than owner, staff and cust: K-01 lane) or cannot be told without a role (lineTo null: README default 62); roleReadsAsNoOne, the role the message is for reads as no one (own_business: readerOf). New in v1.5.",
+      "type": "object",
+      "properties": {
+        "error": {
+          "const": "noReader"
+        },
+        "outboxRowId": {
+          "$ref": "#/$defs/id"
+        },
+        "why": {
+          "enum": ["noRole", "lineHasNoReader", "roleReadsAsNoOne"]
+        }
+      },
+      "required": ["error", "outboxRowId", "why"],
+      "additionalProperties": false
+    },
+    "rowReader.errors": {
+      "title": "RowReaderErrors",
+      "description": "noReader, the mapping's one refusal. A row whose line is null, and one whose step the row's bundle does not hold, are refused before a reader is looked for (README item 35's table, rows step, line and flow), and a read's own errors (notFound, fixedLineRow, transient) are readOutboxRow's, not this mapping's. New in v1.5.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/noReaderError"
+        }
+      ]
+    },
+    "rowReader.exchange": {
+      "title": "RowReaderExchange",
+      "description": "README item 44, the consumers' reader mapping (compose input's ComposeRow.role and finalize's FinalizeRow.reader, bound in the Tool API turn face by T-1141), as one exchange so its fixtures check: not a database call, so no database test runs it, and its given says what the row's read assumed. Its rules (dependentSchemas, on outcome) tie the outcome to the request: a recipient who holds a role is read by it, never by the line; one with no role is read by the line's audience only as a person on a section 1 step whose line goes to owner, staff or cust; every other recipient with no role gets noReader. Which of several roles the message is for (T-308) is the caller's, as v1.3 says, and is not checked here. New in v1.5.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "rowReader"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/rowReader.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/rowReader.response"
+            },
+            {
+              "$ref": "#/$defs/rowReader.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "outcome": {
+          "description": "README item 44's rules, each tying the outcome to the request. Together they decide every recipient with no role, and leave a recipient with a role to v1.3's mapping by role.",
+          "type": "object",
+          "allOf": [
+            {
+              "description": "A recipient who holds a role at the row's business is read by it, never by the line: a reader from roles, or noReader when the role the message is for reads as no one (refuse-row-reader-role-read-by-line).",
+              "if": {
+                "type": "object",
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": {
+                      "recipient": {
+                        "type": "object",
+                        "properties": {
+                          "roles": {
+                            "type": "array",
+                            "minItems": 1
+                          }
+                        },
+                        "required": ["roles"]
+                      }
+                    },
+                    "required": ["recipient"]
+                  }
+                },
+                "required": ["request"]
+              },
+              "then": {
+                "type": "object",
+                "properties": {
+                  "outcome": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "from": {
+                            "const": "roles"
+                          }
+                        },
+                        "required": ["from"]
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "why": {
+                            "const": "roleReadsAsNoOne"
+                          }
+                        },
+                        "required": ["why"]
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "description": "A row with no recipient person holds no role and is no one's own sign-up: noReader, noRole (README default 64).",
+              "if": {
+                "type": "object",
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": {
+                      "recipient": {
+                        "type": "object",
+                        "properties": {
+                          "personId": {
+                            "type": "null"
+                          },
+                          "roles": {
+                            "type": "array",
+                            "maxItems": 0
+                          }
+                        },
+                        "required": ["personId", "roles"]
+                      }
+                    },
+                    "required": ["recipient"]
+                  }
+                },
+                "required": ["request"]
+              },
+              "then": {
+                "type": "object",
+                "properties": {
+                  "outcome": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "const": "noReader"
+                      },
+                      "why": {
+                        "const": "noRole"
+                      }
+                    },
+                    "required": ["error", "why"]
+                  }
+                }
+              }
+            },
+            {
+              "description": "A recipient who holds no role, on a step outside section 1 of its flow: still refused, as v1.3 refuses it (noReader, noRole; refuse-row-reader-no-role-outside-section-1).",
+              "if": {
+                "type": "object",
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": {
+                      "recipient": {
+                        "type": "object",
+                        "properties": {
+                          "roles": {
+                            "type": "array",
+                            "maxItems": 0
+                          }
+                        },
+                        "required": ["roles"]
+                      },
+                      "section": {
+                        "not": {
+                          "const": 1
+                        }
+                      }
+                    },
+                    "required": ["recipient", "section"]
+                  }
+                },
+                "required": ["request"]
+              },
+              "then": {
+                "type": "object",
+                "properties": {
+                  "outcome": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "const": "noReader"
+                      },
+                      "why": {
+                        "const": "noRole"
+                      }
+                    },
+                    "required": ["error", "why"]
+                  }
+                }
+              }
+            },
+            {
+              "description": "A person with no role, on a section 1 step whose line goes to the owner: read as the owner, by the sign-up line (row-reader-s1-02-no-role).",
+              "if": {
+                "type": "object",
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": {
+                      "recipient": {
+                        "type": "object",
+                        "properties": {
+                          "personId": {
+                            "type": "string"
+                          },
+                          "roles": {
+                            "type": "array",
+                            "maxItems": 0
+                          }
+                        },
+                        "required": ["personId", "roles"]
+                      },
+                      "section": {
+                        "const": 1
+                      },
+                      "lineTo": {
+                        "const": "owner"
+                      }
+                    },
+                    "required": ["recipient", "section", "lineTo"]
+                  }
+                },
+                "required": ["request"]
+              },
+              "then": {
+                "type": "object",
+                "properties": {
+                  "outcome": {
+                    "type": "object",
+                    "properties": {
+                      "result": {
+                        "const": "reader"
+                      },
+                      "reader": {
+                        "const": "owner"
+                      },
+                      "from": {
+                        "const": "signUpLine"
+                      }
+                    },
+                    "required": ["result", "reader", "from"]
+                  }
+                }
+              }
+            },
+            {
+              "description": "A person with no role, on a section 1 step whose line goes to staff: read as staff, by the sign-up line.",
+              "if": {
+                "type": "object",
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": {
+                      "recipient": {
+                        "type": "object",
+                        "properties": {
+                          "personId": {
+                            "type": "string"
+                          },
+                          "roles": {
+                            "type": "array",
+                            "maxItems": 0
+                          }
+                        },
+                        "required": ["personId", "roles"]
+                      },
+                      "section": {
+                        "const": 1
+                      },
+                      "lineTo": {
+                        "const": "staff"
+                      }
+                    },
+                    "required": ["recipient", "section", "lineTo"]
+                  }
+                },
+                "required": ["request"]
+              },
+              "then": {
+                "type": "object",
+                "properties": {
+                  "outcome": {
+                    "type": "object",
+                    "properties": {
+                      "result": {
+                        "const": "reader"
+                      },
+                      "reader": {
+                        "const": "staff"
+                      },
+                      "from": {
+                        "const": "signUpLine"
+                      }
+                    },
+                    "required": ["result", "reader", "from"]
+                  }
+                }
+              }
+            },
+            {
+              "description": "A person with no role, on a section 1 step whose line goes to the customer (lane cust): read as the customer, by the sign-up line.",
+              "if": {
+                "type": "object",
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": {
+                      "recipient": {
+                        "type": "object",
+                        "properties": {
+                          "personId": {
+                            "type": "string"
+                          },
+                          "roles": {
+                            "type": "array",
+                            "maxItems": 0
+                          }
+                        },
+                        "required": ["personId", "roles"]
+                      },
+                      "section": {
+                        "const": 1
+                      },
+                      "lineTo": {
+                        "const": "cust"
+                      }
+                    },
+                    "required": ["recipient", "section", "lineTo"]
+                  }
+                },
+                "required": ["request"]
+              },
+              "then": {
+                "type": "object",
+                "properties": {
+                  "outcome": {
+                    "type": "object",
+                    "properties": {
+                      "result": {
+                        "const": "reader"
+                      },
+                      "reader": {
+                        "const": "customer"
+                      },
+                      "from": {
+                        "const": "signUpLine"
+                      }
+                    },
+                    "required": ["result", "reader", "from"]
+                  }
+                }
+              }
+            },
+            {
+              "description": "A person with no role, on a section 1 step whose line goes to no reader lane (agent, pay, out, other or san) or cannot be told without a role (lineTo null): noReader, lineHasNoReader (README default 62).",
+              "if": {
+                "type": "object",
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": {
+                      "recipient": {
+                        "type": "object",
+                        "properties": {
+                          "personId": {
+                            "type": "string"
+                          },
+                          "roles": {
+                            "type": "array",
+                            "maxItems": 0
+                          }
+                        },
+                        "required": ["personId", "roles"]
+                      },
+                      "section": {
+                        "const": 1
+                      },
+                      "lineTo": {
+                        "not": {
+                          "enum": ["owner", "staff", "cust"]
+                        }
+                      }
+                    },
+                    "required": ["recipient", "section", "lineTo"]
+                  }
+                },
+                "required": ["request"]
+              },
+              "then": {
+                "type": "object",
+                "properties": {
+                  "outcome": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "const": "noReader"
+                      },
+                      "why": {
+                        "const": "lineHasNoReader"
+                      }
+                    },
+                    "required": ["error", "why"]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

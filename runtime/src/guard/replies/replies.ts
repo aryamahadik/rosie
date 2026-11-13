@@ -122,11 +122,26 @@ const isIdOrNull = (value: unknown): value is string | null => value === null ||
 /** An error code as a span may carry it: the code when it is a label, else badAnswer. */
 const codeOf = (error: unknown): string => (isLabel(error) ? error : "badAnswer");
 
-/** The words the person typed, as the guard read them: the body, or an email's subject when the body has none. */
-function typedWords<T extends GuardText>(found: KeywordText<T>): string {
-  const words = found.text.words;
+/**
+ * The words a text was read by for its keyword, as `keywordOf` reads them: a poll vote's option words (K-02: a vote's
+ * words are its option's; DL-540), which the gateway scrubbed and sealed in its box (K-06 v1.2), never a body, which a
+ * vote does not have; any other text's body, or an email's subject when the body has none.
+ */
+function readWords(text: GuardText): string {
+  const words = text.words;
+  if (text.kind === "pollVote") return words?.optionWords ?? "";
   const body = words?.body ?? "";
-  const read = keyOf(body) === "" ? (words?.subject ?? "") : body;
+  return keyOf(body) === "" ? (words?.subject ?? "") : body;
+}
+
+/**
+ * The person's own words, kept as the consent row's exact words (K-09 v1 recordStopOrStart `words`; K-29 v1
+ * consents.exact_words): the words the guard read the keyword in, as typed or as the option the person chose, so a vote's
+ * STOP or START keeps its option's words, as the PostgreSQL-down path keeps them (T-1338). Words with no letter or digit
+ * fall back to the list's word.
+ */
+function typedWords<T extends GuardText>(found: KeywordText<T>): string {
+  const read = readWords(found.text);
   return keyOf(read) === "" ? found.keyword.word : read;
 }
 

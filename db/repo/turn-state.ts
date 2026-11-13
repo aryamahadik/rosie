@@ -52,6 +52,7 @@
 // (collate "C"), never parsed (CQ-09). A serialization failure, a deadlock or a lost connection answers transient.
 // Nothing here logs, and an error names a field, a table or a column, never a value: addresses, names and words are
 // personal data.
+import { transientOrScrubbed } from "./clocks";
 import type { ConsentChannel, ConsentKind } from "./consent";
 import {
   assertBusinessId,
@@ -76,7 +77,6 @@ import {
   type ReadOptions,
   type Role,
   type TransientError,
-  transientOrThrow,
   utc,
   utcOrNull,
 } from "./targets";
@@ -928,6 +928,8 @@ export async function readTurnState(
       return outcome;
     });
   } catch (error) {
-    return transientOrThrow(error);
+    // A statement's own refusal and postgres.js's statement errors leave scrubbed too: the call's name and the code
+    // alone, never the statement's values (T-1322; clocks.ts transientOrScrubbed).
+    return transientOrScrubbed("readTurnState", error);
   }
 }

@@ -1,0 +1,58 @@
+{
+  "turnId": "turn-s1-01-sam",
+  "bundleId": {
+    "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+    "build": 1
+  },
+  "stakes": "low",
+  "routing": {
+    "first": "haiku",
+    "second": "haiku"
+  },
+  "reads": [
+    {
+      "model": "haiku",
+      "role": "first",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "enter",
+            "quote": "Hi, I want to put my barbershop on Rosie",
+            "choice": "c-01",
+            "fields": []
+          }
+        ]
+      }
+    },
+    {
+      "model": "haiku",
+      "role": "check",
+      "output": {
+        "language": "en",
+        "parts": [
+          {
+            "verb": "enter",
+            "quote": "Hi, I want to put my barbershop on Rosie",
+            "choice": "c-01",
+            "fields": []
+          }
+        ]
+      }
+    }
+  ],
+  "agreed": true,
+  "reread": false,
+  "language": "en",
+  "parts": [
+    {
+      "part": {
+        "verb": "enter",
+        "quote": "Hi, I want to put my barbershop on Rosie",
+        "choice": "c-01",
+        "fields": []
+      },
+      "outcome": "go"
+    }
+  ]
+}

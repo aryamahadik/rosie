@@ -1,0 +1,57 @@
+{
+  "call": "sendSignInCode",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json"],
+    "now": "2026-11-02T13:00:01Z",
+    "note": "send-sign-in-code-sam with the code itself where its keyed hash goes: a code is never stored or sent to the database, only its HMAC (K-22 proof_codes_hash_form; BP rule 7)."
+  },
+  "request": {
+    "signInAttemptId": "sign-in-sam-nov02-1300",
+    "traceId": "trace-page-sam-nov02-1300",
+    "bundle": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "code": {
+      "id": "code-sam-sign-in-nov02",
+      "codeHash": "482913",
+      "hashKeyName": "PROOF_CODE_HASH_KEY"
+    },
+    "emailRowId": "out-sam-sign-in-nov02-code",
+    "plan": {
+      "row": "out-sam-sign-in-nov02-code",
+      "channel": "email",
+      "copyOf": null,
+      "plan": { "formats": ["text"], "lines": [], "question": null, "pageType": null, "threadReplyTo": null }
+    },
+    "finalParts": {
+      "row": "out-sam-sign-in-nov02-code",
+      "channel": "email",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "Code 482913: type it on the sign-in page. It works for 10 minutes.",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [],
+      "threadReplyTo": null
+    }
+  },
+  "outcome": {
+    "result": "sent",
+    "proofCodeId": "code-sam-sign-in-nov02",
+    "outboxRowId": "out-sam-sign-in-nov02-code",
+    "commitSeq": 1,
+    "version": 2,
+    "expiresAt": "2026-11-02T13:10:01Z",
+    "entryIds": [
+      "log-out-sam-sign-in-nov02-code-created",
+      "log-out-sam-sign-in-nov02-code-planned",
+      "log-code-sam-sign-in-nov02-sent"
+    ],
+    "repeated": false
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "call": "startSignIn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "partSeeds": ["people-access/seed-sign-in-attempt.json"],
+    "after": ["start-sign-in-sam.json"],
+    "now": "2026-11-02T13:00:02Z",
+    "note": "The browser sends Sam's start again with the same page.requestId (a lost answer), so the same request key; the page call drew new ids for it. Rule 1 finds the attempt of that key and answers it again: its id, attempt id and expiry, repeated, writing nothing, and personId null, so no second code is sent (K-21 v1 schema line 688). The new ids are dropped."
+  },
+  "request": {
+    "id": "sign-in-sam-nov02-1300-again",
+    "attemptId": "attempt-sam-signin-nov02-again",
+    "requestSha256": "a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293",
+    "deviceSha256": "e28c360bbd60fac9cabe9778c941ca8e14aaca204d780bfd44982220825ea15c",
+    "contact": { "kind": "email", "address": "sam@example.com" },
+    "contactHash": "c1a2b3c4d5e6f708192a3b4c5d6e7f80c1a2b3c4d5e6f708192a3b4c5d6e7f80",
+    "hashKeyName": "PROOF_CODE_HASH_KEY",
+    "way": "email"
+  },
+  "outcome": {
+    "result": "started",
+    "id": "sign-in-sam-nov02-1300",
+    "attemptId": "attempt-sam-signin-nov02",
+    "expiresAt": "2026-11-02T13:10:00Z",
+    "repeated": true,
+    "personId": null
+  }
+}

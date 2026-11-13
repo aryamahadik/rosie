@@ -1,20 +1,34 @@
-// Loading the composer's recordings (T-1071): every recording is resolved, checked against K-03 v1 and keyed by its
-// input, and the whole file is refused (nothing loads) when any one of them fails. They sit in their own file,
-// ai/recordings/composer.v1.json, because the composer is K-03's and the file of recordings.v1.json is K-02's. A recording is
+// Loading the composer's recordings (T-1071; T-1175): every recording is resolved, checked against the K-03 version its
+// file names and keyed by its input, and the files are refused whole (nothing loads) when any one recording fails. They
+// sit in their own files, because the composer is K-03's and recordings.v1.json and recordings.v1.1.json are K-02's. A
+// file is
+//
+//   { version: "v1", contract: "message-plan.v1" | "message-plan.v1.1", recordings: [...] }
+//
+// and its contract is the K-03 version each of its recordings is checked against: composer.v1.json holds K-03 v1's,
+// composer.v1.1.json K-03 v1.1's, whose inputs carry term facts (Rosie's own fixed terms that the step's card states,
+// each with its source line: README "v1.1"), which v1's schema refuses. The double loads both into one lookup. A
+// recording is
 //
 //   { id, kind: "composerPlan", request, seed | output }
 //
-//   - request: the composer's input, `$defs/composeInput` of K-03 (inline), or { fixture } (a K-03 v1 fixture) or
-//     { file } (a path under ai/recordings): the answer is keyed by the sha256 of that input's canonical JSON;
-//   - seed: { fixture }, the K-03 v1 `plan` fixture the answer comes from. A live recording (after J-02a) gives `output`
-//     instead, the plan as the model returned it.
+//   - request: the composer's input, `$defs/composeInput` of the file's version (inline), or { fixture } (a K-03 fixture
+//     of the file's version or an earlier one) or { file } (a path under ai/recordings): the answer is keyed by the
+//     sha256 of that input's canonical JSON, its content, never a fixture's name;
+//   - seed: { fixture }, the K-03 `plan` fixture the answer comes from, of the file's version or an earlier one (every
+//     plan is v1's: v1.1 leaves the plan as it is). A live recording (after J-02a) gives `output` instead, the plan as
+//     the model returned it.
 //
-// What the loader refuses, all of it, with the recording's id in each line: any kind but composerPlan; an input the schema
-// refuses (a frontier field, for one); a plan the schema refuses ($defs/plan: a format outside the five, a {{hold}} slot);
-// a plan whose words open a slot that is not in K-03's vocabulary (slots.json: 52 slots, hold refused since D66), whatever
-// the schema's pattern says; a seed fixture that is not an accepted v1 `plan` fixture; two recordings with one input or one id.
-// That a plan stays inside its input's allowed formats, links, options, page types and threads is the message checks'
-// (C-092, C-128), not this loader's: a recording of a plan that breaks them is how a test gives those checks something to catch.
+// What the loader refuses, all of it, with the recording's id in each line: a file whose contract is not a K-03 version
+// the double reads; any kind but composerPlan; an input the schema refuses (a frontier field, for one, or a term fact in
+// a v1 file); a plan the schema refuses ($defs/plan: a format outside the five, a {{hold}} slot); a plan whose words open
+// a slot that is not in K-03's vocabulary (slots.json: 52 slots, hold refused since D66), whatever the schema's pattern
+// says; a seed fixture that is not an accepted `plan` fixture of the file's version or an earlier one; two recordings
+// with one input or one id, in one file or across the files loaded together.
+// That a plan stays inside its input's allowed formats, links, options, page types and threads, and states no number its
+// input's facts do not hold (K-03 v1.1's numbersHeldByFacts), is the composer's literal check and the message checks'
+// (C-118, C-092, C-128), not this loader's: a recording of a plan that breaks them is how a test gives those checks
+// something to catch (composer.v1.json's input-s1-02.json, no term facts, with plan-s1-02.json: literalValue x2).
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -24,7 +38,7 @@ import { COMPOSER_KIND, type RecordedComposer, type RecordedDouble } from "./com
 import { createRecordedComposer } from "./double";
 import { RecordingRefusedError } from "./errors";
 import { requestKey } from "./key";
-import { loadPlanContract, type PlanContract } from "./plan-contract";
+import { loadPlanContract, type PlanContract, type PlanVersion } from "./plan-contract";
 import {
   describe,
   isObject,
@@ -35,8 +49,21 @@ import {
 } from "./recordings";
 import type { JsonObject } from "./types";
 
-/** The composer's recordings file, inside the recordings folder. */
+/** K-03 v1's composer recordings file, inside the recordings folder. */
 export const COMPOSER_RECORDINGS_FILE = "composer.v1.json";
+/** K-03 v1.1's composer recordings file (inputs with term facts: S1-02's, the JOIN run's), inside the recordings folder. */
+export const COMPOSER_RECORDINGS_V1_1_FILE = "composer.v1.1.json";
+/** Every composer recordings file the double loads, in this order. */
+export const COMPOSER_RECORDINGS_FILES = [COMPOSER_RECORDINGS_FILE, COMPOSER_RECORDINGS_V1_1_FILE] as const;
+
+/** A composer recordings file's `contract`, and the K-03 version its recordings are checked against. */
+const FILE_CONTRACTS: ReadonlyMap<string, PlanVersion> = new Map([
+  ["message-plan.v1", "v1"],
+  ["message-plan.v1.1", "v1.1"],
+]);
+const FILE_SHAPE = `{ "version": "v1", "contract": ${[...FILE_CONTRACTS.keys()]
+  .map((name) => JSON.stringify(name))
+  .join(" or ")}, "recordings": [...] }`;
 
 interface ComposerRecording {
   readonly id: string;
@@ -137,7 +164,7 @@ function resolveRecording(
   } else {
     const seed = spec.seed;
     if (!isObject(seed) || Object.keys(seed).length !== 1 || typeof seed.fixture !== "string")
-      return fail('seed is not { "fixture": <a K-03 v1 plan fixture file> }');
+      return fail(`seed is not { "fixture": <a K-03 ${contract.version} plan fixture file> }`);
     let fixture: unknown;
     try {
       fixture = contract.fixtures.read(seed.fixture);
@@ -167,53 +194,89 @@ function resolveRecording(
   }
 }
 
-/**
- * Builds the composer's double from a recordings file already parsed (a test gives its own). Refuses it whole, with
- * every problem named, when any recording fails; never loads a plan the schema or the slot vocabulary refuses.
- */
-export function buildRecordedComposer(file: unknown, options: LoadOptions = {}): RecordedComposer {
-  const contract = loadPlanContract(options.contractsRoot ?? CONTRACTS_ROOT);
-  const recordingsRoot = options.recordingsRoot ?? RECORDINGS_ROOT;
-  if (
-    !isObject(file) ||
-    file.version !== "v1" ||
-    file.contract !== "message-plan.v1" ||
-    !Array.isArray(file.recordings)
-  )
-    throw new RecordingRefusedError([
-      'the file is not { "version": "v1", "contract": "message-plan.v1", "recordings": [...] }',
-    ]);
+/** The K-03 version a composer recordings file is checked against, by its contract; undefined when it is not a file's shape. */
+function versionOf(file: unknown): PlanVersion | undefined {
+  if (!isObject(file) || file.version !== "v1" || !Array.isArray(file.recordings)) return undefined;
+  return typeof file.contract === "string" ? FILE_CONTRACTS.get(file.contract) : undefined;
+}
 
+/** Every file's recordings checked by its own version, keyed together; refused whole with every problem named. */
+function buildFrom(
+  files: readonly (readonly [name: string | null, file: unknown])[],
+  options: LoadOptions,
+): RecordedComposer {
+  const contractsRoot = options.contractsRoot ?? CONTRACTS_ROOT;
+  const recordingsRoot = options.recordingsRoot ?? RECORDINGS_ROOT;
+  const contracts = new Map<PlanVersion, PlanContract>();
   const problems: string[] = [];
   const byKey = new Map<string, ComposerRecording>();
   const ids = new Set<string>();
-  for (const [position, spec] of (file.recordings as unknown[]).entries()) {
-    const resolved = resolveRecording(spec, position, contract, recordingsRoot);
-    if ("problems" in resolved) {
-      problems.push(...resolved.problems);
+  for (const [name, file] of files) {
+    const version = versionOf(file);
+    if (version === undefined) {
+      problems.push(`${name === null ? "" : `${name}: `}the file is not ${FILE_SHAPE}`);
       continue;
     }
-    const { recording } = resolved;
-    if (ids.has(recording.id)) problems.push(`${recording.id}: the id is used twice`);
-    ids.add(recording.id);
-    const same = byKey.get(recording.key);
-    if (same !== undefined) problems.push(`${recording.id}: has the same input as ${same.id}`);
-    else byKey.set(recording.key, recording);
+    let contract = contracts.get(version);
+    if (contract === undefined) {
+      contract = loadPlanContract(contractsRoot, version);
+      contracts.set(version, contract);
+    }
+    for (const [position, spec] of (file as { recordings: unknown[] }).recordings.entries()) {
+      const resolved = resolveRecording(spec, position, contract, recordingsRoot);
+      if ("problems" in resolved) {
+        problems.push(...resolved.problems);
+        continue;
+      }
+      const { recording } = resolved;
+      if (ids.has(recording.id)) problems.push(`${recording.id}: the id is used twice`);
+      ids.add(recording.id);
+      const same = byKey.get(recording.key);
+      if (same !== undefined) problems.push(`${recording.id}: has the same input as ${same.id}`);
+      else byKey.set(recording.key, recording);
+    }
   }
   if (problems.length > 0) throw new RecordingRefusedError(problems);
   return createRecordedComposer(byKey);
 }
 
-/** Loads ai/recordings/composer.v1.json (or the folder `recordingsRoot` names) into the composer's double. */
-export function loadRecordedComposer(options: LoadOptions = {}): RecordedComposer {
-  const recordingsRoot = options.recordingsRoot ?? RECORDINGS_ROOT;
-  const file = JSON.parse(
-    readFileSync(path.join(recordingsRoot, COMPOSER_RECORDINGS_FILE), "utf8"),
-  ) as unknown;
-  return buildRecordedComposer(file, options);
+/**
+ * Builds the composer's double from one recordings file already parsed (a test gives its own), checked against the K-03
+ * version its contract names. Refuses it whole, with every problem named, when any recording fails; never loads a plan
+ * the schema or the slot vocabulary refuses.
+ */
+export function buildRecordedComposer(file: unknown, options: LoadOptions = {}): RecordedComposer {
+  return buildFrom([[null, file]], options);
 }
 
-/** Loads both files: the three K-02 reads of recordings.v1.json and the composer of composer.v1.json, as one double. */
+/**
+ * Builds one composer double from several recordings files already parsed, by name, each checked against the K-03
+ * version its contract names. Refuses them all, with every problem named, when any recording fails, or when two
+ * recordings share an input or an id across the files.
+ */
+export function buildRecordedComposerFromFiles(
+  files: Readonly<Record<string, unknown>>,
+  options: LoadOptions = {},
+): RecordedComposer {
+  return buildFrom(Object.entries(files), options);
+}
+
+/**
+ * Loads ai/recordings/composer.v1.json and composer.v1.1.json (or those of the folder `recordingsRoot` names) into the
+ * composer's double.
+ */
+export function loadRecordedComposer(options: LoadOptions = {}): RecordedComposer {
+  const recordingsRoot = options.recordingsRoot ?? RECORDINGS_ROOT;
+  const files: Record<string, unknown> = {};
+  for (const name of COMPOSER_RECORDINGS_FILES)
+    files[name] = JSON.parse(readFileSync(path.join(recordingsRoot, name), "utf8")) as unknown;
+  return buildRecordedComposerFromFiles(files, options);
+}
+
+/**
+ * Loads every file: the three K-02 reads of recordings.v1.json and recordings.v1.1.json and the composer of
+ * composer.v1.json and composer.v1.1.json, as one double.
+ */
 export async function loadRecordedDouble(options: LoadOptions = {}): Promise<RecordedDouble> {
   const model = await loadRecordedModel(options);
   const composer = loadRecordedComposer(options);

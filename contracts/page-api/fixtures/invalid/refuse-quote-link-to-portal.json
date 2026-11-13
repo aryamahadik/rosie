@@ -1,0 +1,30 @@
+{
+  "call": "quoteConfirm",
+  "given": {
+    "now": "2026-11-03T00:41:15Z",
+    "environment": "staging",
+    "after": ["quotes-to-ok.json", "quote-owner-send-read-back.json", "db-schema/core/fixtures/seed-phone-chat-open.json"],
+    "note": "Refused: quote-owner-send-confirm.json answered with the customer's quote link: it goes only to the customer, never to the pricing page or the owner (K-09 v1.2 setPrice.response.quote.link: 'Never given to the pricing page or the owner: url is null'). Without it the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-heater-0003",
+      "traceId": "trace-portal-sam-heater-0001",
+      "sessionToken": "placeholder-session-token-sam-0101",
+      "linkCode": null
+    },
+    "readBackId": "rb-portal-sam-heater-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-portal-sam-heater-1",
+    "yesEventId": "pageyes-sam-heater-send-1",
+    "served": {
+      "change": "ownerAnswer",
+      "answer": "send",
+      "state": "sent",
+      "requestEnded": false,
+      "link": { "url": "rosfield.com/q/placeholder-heater-quote-link-code" }
+    }
+  }
+}

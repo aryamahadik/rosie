@@ -1,0 +1,32 @@
+{
+  "call": "bookingConfirm",
+  "given": {
+    "now": "2026-10-21T23:16:15Z",
+    "environment": "staging",
+    "after": [
+      "booking-page-start.json",
+      "booking-service-haircut.json",
+      "booking-place-confirm.json",
+      "booking-who-for-confirm.json",
+      "booking-reach-confirm.json",
+      "booking-name-read-back.json"
+    ],
+    "note": "Alex's yes to his name's read-back: the page entry calls K-09 v1.2 addCustomer alone (caller.kind page, personId null) with the name kept with the read-back, and the way (texts) and his own band (18_or_older) taken from what it keeps with requestRef, never from the browser (K-09 v1.2 README default 77), as tool-api/fixtures/j4-add-customer-agent.json does for his AI: the K-28 row, the customer role and persons.name. Gives customer. The answer never says whether he was already on the list (RULES 4.10)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0020",
+      "traceId": "trace-page-lees-0020",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "readBackId": "rb-page-lees-name-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-lees-name-1",
+    "yesEventId": "pageyes-lees-name-1",
+    "served": { "change": "name" }
+  }
+}

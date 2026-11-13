@@ -1,0 +1,32 @@
+{
+  "eventId": "evt-alex-0021",
+  "provider": "linq",
+  "handle": {
+    "kind": "phone",
+    "address": "+15555550101"
+  },
+  "service": "imessage",
+  "kind": "pollVote",
+  "messageId": null,
+  "chatId": "linq-chat-demo-alex",
+  "sentAt": "2026-10-23T14:20:00Z",
+  "receivedAt": "2026-10-23T14:20:01Z",
+  "body": null,
+  "scrubbed": {
+    "cards": 1,
+    "ssns": 0
+  },
+  "attachments": [],
+  "threadedReplyTo": null,
+  "poll": {
+    "pollId": "linq-msg-demo-0002",
+    "optionId": "linq-opt-demo-added-1",
+    "optionWords": "Charge my card [card number] instead"
+  },
+  "reaction": null,
+  "edit": null,
+  "status": null,
+  "fromRosie": false,
+  "email": null,
+  "traceId": "trace-alex-0021"
+}

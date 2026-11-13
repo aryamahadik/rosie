@@ -1,0 +1,22 @@
+{
+  "call": "readOpenHolds",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-10-19T14:05:06Z",
+    "note": "The walking skeleton's commit (K-09 v1 commit-s1-02.json, turn-s1-02-sam-kinds) reads what is open on Sam's handle at the barbershop: the turn's one text, evt-sam-0001, has its recordSafetyOutcome among the commit's core actions, so the caller names no text, and Sam has no hold, so nothing is open and S1-02's part may commit."
+  },
+  "request": {
+    "handleId": "handle-sam",
+    "businessId": "biz-lees-barbershop",
+    "eventIds": []
+  },
+  "outcome": {
+    "result": "openHolds",
+    "handleId": "handle-sam",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-19T14:05:06Z",
+    "holds": [],
+    "unreadEventIds": []
+  }
+}

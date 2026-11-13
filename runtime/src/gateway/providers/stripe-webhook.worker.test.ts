@@ -14,9 +14,9 @@ import billCardSaved from "../../../../contracts/port-stripe/fixtures/webhook-bi
 import cardDetails from "../../../../contracts/port-stripe/fixtures/webhook-card-details.json";
 import webhookEvent from "../../../../contracts/port-stripe/fixtures/webhook-event.json";
 import { unconfiguredGateway } from "..";
-import { present } from "../test-support";
+import { countedStream, postOf, present, xBytes } from "../test-support";
 import { unconfiguredProviders } from ".";
-import { handleStripeWebhook, MAX_SIGNATURE_ENTRIES } from "./stripe-webhook";
+import { handleStripeWebhook, MAX_SIGNATURE_ENTRIES, STRIPE_BODY_LIMIT_BYTES } from "./stripe-webhook";
 import {
   businessLookupDouble,
   captureLogLines,
@@ -685,5 +685,193 @@ describe("the Worker's Stripe routes", () => {
     expect(signed.status).toBe(503);
     expect(signed.headers.get("x-trace-id")).toMatch(UUID);
     expect(unsigned.status).toBe(401);
+  });
+});
+
+describe("the Stripe door's body cap (T-1195; ../body.ts, as the page entry and the Linq webhook since T-1180)", () => {
+  // The gateway never reads the context; the Workers runtime's own context has members this test cannot build.
+  const context = {
+    waitUntil: () => undefined,
+    passThroughOnException: () => undefined,
+    props: {},
+  } as unknown as ExecutionContext;
+
+  /** webhook-event with its raw body followed by spaces to exactly `bytes` bytes: still its JSON, signed over it whole. */
+  function paddedEvent(bytes: number): StripeExchange {
+    const { raw } = webhookEvent.request;
+    const padded = raw + " ".repeat(bytes - new TextEncoder().encode(raw).byteLength);
+    return { ...webhookEvent, request: { ...webhookEvent.request, raw: padded } };
+  }
+
+  /** webhook-event's signed header on a streamed body to the businesses endpoint, with these headers besides. */
+  async function streamedEvent(
+    stream: ReadableStream<Uint8Array>,
+    headers: Record<string, string> = {},
+  ): Promise<Request> {
+    return postOf(
+      stream,
+      { "stripe-signature": await signedHeaderOf(webhookEvent), ...headers },
+      `https://rosie.test${stripePath("businesses")}`,
+    );
+  }
+
+  it("a body one byte over its cap: 413 with the trace id, never verified, nothing stored, only a refused span logged", async () => {
+    const logLines = captureLogLines();
+    const over = paddedEvent(STRIPE_BODY_LIMIT_BYTES + 1);
+    const { port, store, businesses, deps } = worldAt(webhookEvent.given.now, [over]);
+
+    const response = await send(over, deps);
+
+    expect(response.status).toBe(413);
+    const traceId = response.headers.get("x-trace-id");
+    expect(traceId).toMatch(UUID);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(await response.json()).toEqual({ ok: false, error: "payload_too_large", trace_id: traceId });
+    expect(port.requests).toEqual([]);
+    expect(businesses.calls).toEqual([]);
+    expect(store.calls).toEqual([]);
+    const lines = logLines();
+    expect(lines).toHaveLength(1);
+    const spans = providerSpans(lines);
+    expect(spans).toMatchObject([
+      {
+        trace_id: traceId,
+        hop: "providerWebhook",
+        provider: "stripe",
+        call: "verifyWebhook",
+        outcome: "refused",
+        error_code: "bodyTooLarge",
+      },
+    ]);
+    expect(spans[0]?.got).toEqual({ endpoint: "businesses" });
+    expect(spans[0]?.decided).toEqual({ answered: 413 });
+    expect(spans[0]).not.toHaveProperty("event_id");
+    const text = JSON.stringify(lines);
+    const header = await signedHeaderOf(over);
+    expect(text).not.toContain(header.slice(header.indexOf("v1=") + 3));
+    expect(text).not.toContain("2026-10-28.endive");
+    expect(text).not.toMatch(/stripe-evt-demo-0001|stripe-customer-demo/);
+  });
+
+  it("a body exactly at its cap is verified as sent, its signature over the whole body, and stored", async () => {
+    captureLogLines();
+    const atCap = paddedEvent(STRIPE_BODY_LIMIT_BYTES);
+    const { port, store, deps } = worldAt(webhookEvent.given.now, [atCap]);
+
+    const response = await send(atCap, deps);
+
+    expect(response.status).toBe(200);
+    expect(port.requests).toHaveLength(1);
+    const raw = present(port.requests[0], "the verify request").raw;
+    expect(raw).toBe(atCap.request.raw);
+    expect(new TextEncoder().encode(raw).byteLength).toBe(STRIPE_BODY_LIMIT_BYTES);
+    expect(store.rows.map((row) => row.providerEventId)).toEqual(["stripe-evt-demo-0001"]);
+  });
+
+  it("a declared length over its cap is answered 413 before a byte of the body is read, never verified", async () => {
+    captureLogLines();
+    const { port, store, deps } = worldAt(webhookEvent.given.now);
+    const source = countedStream(1024, () => xBytes(1024));
+
+    const response = await handleStripeWebhook(
+      await streamedEvent(source.stream, { "content-length": String(STRIPE_BODY_LIMIT_BYTES + 1) }),
+      "businesses",
+      deps,
+      WHERE,
+    );
+
+    expect(response.status).toBe(413);
+    expect(source.pulled()).toBe(0);
+    expect(port.requests).toEqual([]);
+    expect(store.calls).toEqual([]);
+  });
+
+  it("a body that declares no length is cut off at the chunk that takes it over its cap: a 1 GiB body is never read whole", async () => {
+    captureLogLines();
+    const { port, store, deps } = worldAt(webhookEvent.given.now);
+    const source = countedStream(1024 * 1024, () => xBytes(1024));
+
+    const response = await handleStripeWebhook(await streamedEvent(source.stream), "businesses", deps, WHERE);
+
+    expect(response.status).toBe(413);
+    expect(source.pulled()).toBeGreaterThan(STRIPE_BODY_LIMIT_BYTES / 1024);
+    expect(source.pulled()).toBeLessThan((2 * STRIPE_BODY_LIMIT_BYTES) / 1024);
+    expect(source.cancelled()).toBe(true);
+    expect(port.requests).toEqual([]);
+    expect(store.calls).toEqual([]);
+  });
+
+  it("over its cap, 413 comes before every signature check: no header, a stale t= and a clock that is not a number are each 401 under it", async () => {
+    captureLogLines();
+    const t = timestampOf(webhookEvent);
+    const stale = String(Number(t) - 301);
+    const under = webhookEvent.request.raw;
+    const over = paddedEvent(STRIPE_BODY_LIMIT_BYTES + 1).request.raw;
+    const answer = async (raw: string, header: string | null, now?: () => number) => {
+      const world = worldAt(webhookEvent.given.now);
+      const deps = now === undefined ? world.deps : { ...world.deps, now };
+      const response = await handleStripeWebhook(
+        stripeRequest(stripePath("businesses"), header, raw),
+        "businesses",
+        deps,
+        WHERE,
+      );
+      return { status: response.status, verified: world.port.requests.length };
+    };
+    const staleHeader = async (raw: string): Promise<string> =>
+      `t=${stale},v1=${await stripeSignature(STRIPE_TEST_SECRETS.businesses, stale, raw)}`;
+    const goodHeader = async (raw: string): Promise<string> =>
+      `t=${t},v1=${await stripeSignature(STRIPE_TEST_SECRETS.businesses, t, raw)}`;
+    const notANumber = (): number => Number.NaN;
+
+    expect(await answer(under, null)).toEqual({ status: 401, verified: 0 });
+    expect(await answer(over, null)).toEqual({ status: 413, verified: 0 });
+    expect(await answer(under, await staleHeader(under))).toEqual({ status: 401, verified: 0 });
+    expect(await answer(over, await staleHeader(over))).toEqual({ status: 413, verified: 0 });
+    expect(await answer(under, await goodHeader(under), notANumber)).toEqual({ status: 401, verified: 0 });
+    expect(await answer(over, await goodHeader(over), notANumber)).toEqual({ status: 413, verified: 0 });
+  });
+
+  it("its cap is its own config value: ProviderDoors.stripeBodyLimitBytes sets it, the calendar doors' does not, and a mistyped value leaves the default", async () => {
+    captureLogLines();
+    const size = new TextEncoder().encode(webhookEvent.request.raw).byteLength;
+    const answer = async (more: Partial<ProviderDeps>): Promise<number> => {
+      const world = worldAt(webhookEvent.given.now);
+      return (await send(webhookEvent, { ...world.deps, ...more })).status;
+    };
+
+    expect(await answer({ stripeBodyLimitBytes: size - 1 })).toBe(413);
+    expect(await answer({ stripeBodyLimitBytes: size })).toBe(200);
+    expect(await answer({ calendarBodyLimitBytes: 1 })).toBe(200);
+    expect(await answer({ stripeBodyLimitBytes: Number.NaN })).toBe(200);
+    expect(await answer({ stripeBodyLimitBytes: -1 })).toBe(200);
+  });
+
+  it("through the Worker's routes: GatewayDeps.providers carries the cap, and the Worker with none set refuses a body one byte over 256 KiB", async () => {
+    captureLogLines();
+    const world = worldAt(webhookEvent.given.now);
+    const routed = createWorker(() => ({
+      ...unconfiguredGateway(),
+      now: () => Date.parse(webhookEvent.given.now),
+      providers: { ...world.deps, stripeBodyLimitBytes: 64 },
+    }));
+
+    const capped = await routed.fetch(
+      stripeRequest(stripePath("businesses"), await signedHeaderOf(webhookEvent), webhookEvent.request.raw),
+      env,
+      context,
+    );
+    const overDefault = await worker.fetch(
+      stripeRequest(stripePath("rosfield"), null, paddedEvent(STRIPE_BODY_LIMIT_BYTES + 1).request.raw),
+      env,
+      context,
+    );
+
+    expect(capped.status).toBe(413);
+    expect(capped.headers.get("x-trace-id")).toMatch(UUID);
+    expect(world.port.requests).toEqual([]);
+    expect(world.store.calls).toEqual([]);
+    expect(overDefault.status).toBe(413);
+    expect(await overDefault.json()).toMatchObject({ ok: false, error: "payload_too_large" });
   });
 });

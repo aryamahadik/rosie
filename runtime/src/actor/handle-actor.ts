@@ -6,7 +6,10 @@
 // (T-248, lease.ts) once each of their texts has been read; the open safety holds go with the turn to its commit
 // (QUESTIONS.md CQ-65 as DL-119 replaced it: holds bind commits, not hand-offs). Each run of a turn pins its bundle first
 // (T-249, ../bundle). A turn parked after its third lapse with no commit (T-253) has its park's span on the turn's trace,
-// under the bundle pinned for it (`parkTrace`).
+// under the bundle pinned for it (`parkTrace`). Each text's safety result, which the read on arrival keeps sealed in the
+// actor's storage (ADR-015, T-1262), is what each run of its turn reads through its leased turn, and the lease removes it,
+// closing the text, in the step that ends the turn for good (T-1264); the STOP and START texts the PostgreSQL-down path
+// took alone are closed at the hand-off, since no turn takes them.
 //
 // A safety read lives in memory, so the actor keeps a stored alarm at each read's 4 s deadline (T-1088): if the actor is
 // evicted mid-read (a deploy, a reset), the alarm brings a new instance, which resumes every read cut off, in arrival
@@ -25,17 +28,59 @@
 // checked safety lines, copied from the safety read's bundle each time a text is written; each live safety timer's due
 // time, address (as K-34 seals it) and emergency contact, reloaded after a commit that wrote a timer row; and the queue of
 // writes to replay when PostgreSQL returns (danger, stops, then the rest, each once), where the safety read's records
-// wait. Sending from the copies while PostgreSQL is down, and replaying on return, are T-270's.
+// wait. Each bundle a turn pins gives the copies its keyword list and stop and start replies (T-270). Before the first pin,
+// while the copies hold no keyword list, a text the PostgreSQL-down path reads has the list of the bundle it arrived under
+// copied first, from that bundle's manifest in the actor's own BUNDLES binding, so the path reads the text by a list
+// (T-1324; a read that fails copies nothing, and the text reads unknown). A commit whose answer was lost, which only a
+// park's alreadyCommitted tells of (T-1206), is read again: before the next turn opens, the stopped flag reads stopped and
+// the timers' copy is marked stale; then the flag is read again from the handle's phone row and the timers are reloaded,
+// and each later commit tries again until each read succeeds (fails safe).
 //
-// Not here: what runs inside a turn (T-251, T-252), edits and vote changes after a commit (T-245). The actor never opens
-// a sealed box. Never logged: a word, a phone number, a key, a sealed body.
+// PostgreSQL down (T-270, ../outage/db): the actor follows each text until a commit takes it. While PostgreSQL is known
+// down, closed batches stay with the batch window, in order, and the lease holds its turn as it is (a lapse is no crash);
+// a text waiting 20 s gets the outage line once, never to a stopped number; a STOP or a START is taken at once (the flag
+// copied, its reply straight through Linq, its record queued for the return, and it joins no turn); a running safety
+// timer due fires from the copy. On return the write-on-return queue replays danger, then stops, then the rest (the STOP
+// and START records through `recordStopOrStart`), and only then does the lease resume and the queued batches go on. Every
+// commit is preceded by that replay (QUESTIONS.md CQ-104 (f)). The lease asks the same path whether a batch waiting
+// behind a turn that has used its one restart may hold a stop word (ADR-018 section 1; T-1311): if so, that turn is
+// restarted a second time with it, so a STOP commits on the first run of the turn that takes it; while the path is
+// unwired, any such batch may. The AI-down path (T-271, ../outage/ai) asks the actor that runs a turn, right before each
+// outage line of the run goes, the very question the safety read's own outage line asks (T-1323), by the same function:
+// whether the copy says stopped or a text no commit has taken may hold a stop word, a STOP waiting behind the turn or in
+// its open batch window included, or one the actor took while an earlier line was out.
+//
+// The trace (T-1108; K-08 v1): the gateway writes each inbound event's one receive span, and the actor none of its own. A
+// text's trace is one run by seq whoever writes on it: as the actor stores a text it begins the trace's count after the
+// places the gateway took (the hand-off's `seqBefore`), so the safety read, the batch window and the turn go on from there
+// (runtime/src/trace beginSeq). The count is kept in the actor's storage as each span that goes through the actor's own
+// sink is written (the safety read's, the batch window's, the pin's and, on the pin's trace, the turn's), and a new
+// instance brings back the count of each trace that can still have a hop to come, so an eviction between two of those
+// hops never numbers a span twice. When the lease starts a run of a turn, the batch window takes the batch hop's places
+// before the bundle is pinned and writes its spans once the pin has answered (batch.ts beginSpans). For an event id it
+// already holds, the actor tells the gateway which trace the event first arrived under (`firstTraceOf`).
+//
+// Not here: what runs inside a turn (T-251, T-252), edits and vote changes after a commit (T-245). This file opens no
+// sealed box: the safety read does, and the PostgreSQL-down path, to read a STOP or a START, each with the handle's key.
+// Never logged: a word, a phone number, a key, a sealed body.
 
 import { DurableObject } from "cloudflare:workers";
 
-import { BundlePins, bundleKvOf, type PinEntry } from "../bundle";
+import {
+  BundlePins,
+  bundleKvOf,
+  keyOf,
+  manifestOf,
+  type PinEntry,
+  type PinRequest,
+  type TurnPin,
+} from "../bundle";
+import { bundleIdOf } from "../bundle/values";
 import { ActorClocks, type DueClock, type FireBy, type FireReport } from "../clocks";
 import { RECEIPT_KINDS, ACTOR_KINDS } from "../gateway/hand-off";
 import type { SealedEvent, SealedHandoff, StoreAnswer } from "../gateway/types";
+import { setOutageHost } from "../outage/ai/outage";
+import { DbOutage, STOP_OR_START_CALL, type OutageView } from "../outage/db";
 import {
   REREAD_MS,
   SAFETY_RETURN_CALLS,
@@ -45,7 +90,15 @@ import {
   type HoldEntry,
   type SafetyEntry,
 } from "../safety";
-import { isLabel, logSink, openTrace, type BundleId, type SpanSink, type TraceContext } from "../trace";
+import {
+  beginSeq,
+  logSink,
+  openTrace,
+  resumeSeq,
+  type BundleId,
+  type SpanSink,
+  type TraceContext,
+} from "../trace";
 import {
   actorClock,
   BatchWindow,
@@ -53,6 +106,7 @@ import {
   SCHEDULE_SAFETY,
   unscheduleEntry,
   type BatchEntry,
+  type ClosedBatch,
 } from "./batch";
 import {
   ActorCopies,
@@ -80,6 +134,7 @@ import {
   TurnLease,
   type CommitTurnCommitted,
   type CommitTurnRef,
+  type LostCommit,
   type ParkTraceRequest,
   type TurnEntry,
 } from "./lease";
@@ -140,6 +195,25 @@ export class ActorRefusal extends Error {
   }
 }
 
+/**
+ * How many traces' counts of places the actor keeps in its storage (T-1108): the newest, which are the ones whose texts
+ * can still have a hop to come (a handle's texts in flight are few). An older trace's writers count on in memory.
+ */
+export const TRACE_SEQ_KEPT = 64;
+
+/**
+ * Keeps the last place taken on a trace whose count the actor began, in the actor's storage; never lowers it. A span of a
+ * trace it did not begin changes nothing; nor does a write the storage refuses (a span written from outside the actor's
+ * own step: a delivery receipt's, on the turn's trace, from the gateway's request).
+ */
+function keepTraceSeq(sql: SqlStorage, traceId: string, seq: number): void {
+  try {
+    sql.exec("UPDATE trace_seq SET seq = MAX(seq, ?) WHERE trace_id = ?", seq, traceId);
+  } catch {
+    // Not kept: the count goes on in memory.
+  }
+}
+
 function checkHandoff(handoff: SealedHandoff): "inbox" | "receipt" {
   const { event } = handoff;
   if (typeof event.eventId !== "string" || event.eventId === "") throw new ActorRefusal("noEventId");
@@ -160,19 +234,30 @@ export class HandleActor extends DurableObject {
   private readonly clocks: ActorClocks;
   private readonly copies: ActorCopies;
   private readonly returns: ReturnQueue;
+  private readonly outage: DbOutage;
   private readonly batchWork = new Set<Promise<void>>();
+  /** The reads of a keyword list before the first pin, one after another (T-1324): each waits for the one before it. */
+  private keywordReads: Promise<void> = Promise.resolve();
 
   constructor(ctx: DurableObjectState, env: Cloudflare.Env) {
     super(ctx, env);
     createInboxTables(ctx.storage.sql);
     // The actor's own copies and its write-on-return queue (T-269), before the safety read, which queues its records there.
-    this.copies = new ActorCopies({ storage: ctx.storage, now: () => actorClock().now() });
+    // The copies weigh a turn's answer against the actor's own STOP note by the lease's turn order (T-1208).
+    this.copies = new ActorCopies({
+      storage: ctx.storage,
+      now: () => actorClock().now(),
+      turnsOpened: () => this.turnsOpened(),
+    });
     this.returns = new ReturnQueue({ storage: ctx.storage, now: () => actorClock().now() });
     this.safety = new SafetyOnArrival({
       returns: this.returns,
-      stopped: () => this.copies.readStopped()?.stopped === true,
+      // The copy of the stopped flag (T-269), or a text no commit has taken that may hold a stop word, the actor's own STOP
+      // and START aside (T-270): the down path's one reading, the lease's `stopAmong` too, true while that path is unwired,
+      // on a throw and for a text it cannot find or has no reading of (T-1313; RULES 7.2: "Unsure: treat it as a stop").
+      stopped: () => this.mayHaveStopped(),
       storage: ctx.storage,
-      spanSink: () => logSink({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
+      spanSink: () => this.spanSink(),
       // A late answer or a re-read's: danger closes the open batch at once, a lifted unread hold lets the waiting batches
       // go on, and a re-read moved 30 s on moves the safety alarm with it.
       afterLate: (eventId) => {
@@ -191,13 +276,14 @@ export class HandleActor extends DurableObject {
       held: (eventIds) => this.unreadAmong(eventIds),
       isDanger: (eventId) =>
         this.safety.readSafety().some((entry) => entry.eventId === eventId && entry.danger),
-      lease: (batch) => this.lease.take(batch),
+      lease: (batch) => this.handOff(batch),
+      spanSink: () => this.spanSink(),
     });
     this.pins = new BundlePins({
       storage: ctx.storage,
       now: () => actorClock().now(),
       kv: () => bundleKvOf(this.env.BUNDLES),
-      spanSink: () => logSink({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
+      spanSink: () => this.spanSink(),
     });
     this.lease = new TurnLease({
       storage: ctx.storage,
@@ -205,12 +291,28 @@ export class HandleActor extends DurableObject {
       lend: (work) => {
         this.lend(work);
       },
-      pin: (request, signal) => this.pins.pin(request, signal),
+      pin: (request, signal) => this.pinAndCopy(request, signal),
       holds: () => this.safety.openHolds(),
       unread: () => this.unreadTexts(),
       parkTrace: (request) => this.parkTrace(request),
-      committed: (turn, answer) => {
-        this.afterCommit(turn, answer);
+      committed: (turn, answer, opened) => {
+        this.afterCommit(turn, answer, opened);
+      },
+      commitLost: (lost) => {
+        this.afterLostCommit(lost);
+      },
+      // PostgreSQL down (T-270): the lease holds its turn as it is, and the queue is replayed before any commit.
+      held: () => this.outage.isDown(),
+      beforeCommit: () => this.outage.beforeCommit(),
+      // A batch that may hold a stop word restarts a turn that has used its one restart a second time (ADR-018 section 1):
+      // the down path's reading of each text, true while that path is unwired, on a throw, and for a readable text it
+      // cannot find or that has no reading (RULES 7.2: "Unsure: treat it as a stop").
+      stopAmong: (eventIds) => this.outage.stopAmong(eventIds),
+      // Each text's safety result as the read on arrival kept it (ADR-015; T-1264): a run reads its own texts' through its
+      // leased turn, and the step that ends the turn for good removes them and closes the texts, in its transaction.
+      resultsOf: (eventIds) => this.safety.resultsOf(eventIds),
+      closeResults: (eventIds) => {
+        this.safety.closeResults(eventIds);
       },
     });
     // The clock rows' part of the one alarm (T-254): a clock entry in the same stored schedule, at the handle's earliest
@@ -223,6 +325,30 @@ export class HandleActor extends DurableObject {
       logContext: () => ({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
       staging: () => this.env.ENVIRONMENT === "staging",
     });
+    // The PostgreSQL-down path (T-270), on the actor's own storage, copies and write-on-return queue.
+    this.outage = new DbOutage({
+      storage: ctx.storage,
+      now: () => actorClock().now(),
+      copies: this.copies,
+      returns: this.returns,
+      replay: () => this.writeOnReturn(),
+      texts: (eventIds) => readInboxEvents(ctx.storage.sql, eventIds),
+      pending: () => ({ window: this.batch.pendingEventIds(), lease: this.lease.pendingEventIds() }),
+      safetyEntry: (eventId) => this.safety.readSafety().find((entry) => entry.eventId === eventId),
+      resume: () => {
+        this.lend(this.resumeAfterOutage());
+      },
+      release: () => {
+        this.lend(this.batch.release().then(() => this.batch.arm()));
+      },
+      arm: () => this.batch.arm(),
+      lend: (work) => {
+        this.lend(work);
+      },
+    });
+    // The count of places of each trace that can still have a hop to come, brought back before any writer of this
+    // instance records a span (T-1108).
+    this.resumeTraceSeqs();
     // A new instance resumes at once every safety read the last one was cut off in (T-1088), before any new text's read,
     // and reads again every text whose re-read is due (DL-127). A failure here must not keep the actor from starting.
     this.resumeSafetyGuarded();
@@ -239,6 +365,9 @@ export class HandleActor extends DurableObject {
    */
   override async alarm(): Promise<void> {
     this.resumeSafetyGuarded();
+    // The PostgreSQL-down path's due work (T-270: a safety timer due, a text waiting 20 s, the next ask), lent: it never
+    // holds the lease and batch handlers back.
+    this.outage.wake();
     await this.lease.onAlarm();
     await this.batch.onAlarm();
     await this.clocks.onAlarm();
@@ -263,10 +392,14 @@ export class HandleActor extends DurableObject {
    * event id was known and nothing changed. A throw means nothing was kept: the gateway answers 503.
    */
   async accept(handoff: SealedHandoff): Promise<StoreAnswer> {
-    const started = Date.now();
     const route = checkHandoff(handoff);
     let answer: StoreAnswer;
     if (route === "inbox") {
+      // A text the PostgreSQL-down path reads, while the copies hold no keyword list yet: the list of the bundle it arrived
+      // under is copied first (T-1324), so the path reads it by a list. Done before the write, so the steps below stay one
+      // run, as they were; a copy held already (any pin copies one) waits for nothing.
+      const copying = this.keywordsBeforePin(handoff);
+      if (copying !== null) await copying;
       // One synchronous step: the check and the write cannot be split by a concurrent retry.
       // The text joins the batch window in the same all-or-nothing step as its write (T-247).
       answer = this.ctx.storage.transactionSync(() => {
@@ -276,6 +409,8 @@ export class HandleActor extends DurableObject {
         }
         return written;
       });
+      // The trace's count of places goes on after the gateway's, before any writer here records a span (T-1108).
+      if (answer === "written") this.beginTraceSeq(handoff);
       // The safety read starts in the same step as the write, before any batch (arch 02 step S): the 4 s deadline
       // begins now and the read is queued in arrival order. It runs on; the gateway is answered at once. The stored alarm
       // is set for its deadline, so an eviction mid-read cannot leave it unread (T-1088).
@@ -287,13 +422,23 @@ export class HandleActor extends DurableObject {
       }
       if (answer === "written") {
         this.refreshLines();
+        // Followed by the PostgreSQL-down path until a commit takes it (T-270).
+        if (startsTurn(handoff.event)) this.outage.arrive(handoff.event, this.seqOf(handoff.event.eventId));
         await this.batch.arm();
       }
     } else {
       answer = await this.passReceipt(handoff);
     }
-    this.recordSpan(handoff, route, answer, Date.now() - started);
     return answer;
+  }
+
+  /**
+   * The trace id a stored event first arrived under, or null when the inbox holds no such event (T-1108): the gateway
+   * asks after a "duplicate", for its dropped receive span's `firstTrace` (K-08 trace-duplicate-webhook.json).
+   */
+  firstTraceOf(eventId: string): string | null {
+    if (typeof eventId !== "string" || eventId === "") return null;
+    return readInboxEvents(this.ctx.storage.sql, [eventId])[0]?.traceId ?? null;
   }
 
   /** The inbox in arrival order (what a turn reads later). */
@@ -406,7 +551,7 @@ export class HandleActor extends DurableObject {
         openedBy: "textWebhook",
         bundleId,
         incomingTraceId: request.traceId,
-        sink: logSink({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" }),
+        sink: this.spanSink(),
         now: () => actorClock().now(),
       });
       trace.setTurn(request.turnId);
@@ -510,6 +655,18 @@ export class HandleActor extends DurableObject {
   }
 
   /**
+   * The order of the last turn the lease has opened (lease.ts lease_turns.seq, AUTOINCREMENT and never deleted; 0 when
+   * none), the order the lease hands with each committed answer: the copies weigh a turn's answer against the actor's own
+   * STOP note by it (T-1208). A throw is the copies' "not known".
+   */
+  private turnsOpened(): number {
+    const row = this.ctx.storage.sql
+      .exec<{ seq: number | null }>("SELECT MAX(seq) AS seq FROM lease_turns")
+      .one();
+    return row.seq ?? 0;
+  }
+
+  /**
    * Replays the write-on-return queue (T-269): what the actor sent by itself while PostgreSQL was down is written to the
    * shared core, danger first, then stops, then the rest, each in the order queued and each once; a write the core is not
    * answering yet for stops the replay there. T-270 calls it when PostgreSQL is back.
@@ -534,27 +691,214 @@ export class HandleActor extends DurableObject {
     };
   }
 
+  /** The PostgreSQL-down path's state, as labels and times only (T-270). */
+  readOutage(): OutageView {
+    return this.outage.read();
+  }
+
+  /** Resolves when the PostgreSQL-down path's work started so far is done (tests). */
+  outageIdle(): Promise<void> {
+    return this.outage.idle();
+  }
+
   /**
-   * Sends one queued write: the safety read's records through the safety read. A write of a call no sender is wired for
-   * yet (T-270's stop and start records) waits, and nothing queued after it goes before it.
+   * Sends one queued write: the safety read's records through the safety read, a STOP or START the actor took while
+   * PostgreSQL was down through the down path (T-270). A write of any other call waits, and nothing queued after it goes
+   * before it.
    */
   private replayWrite(write: QueuedWrite): Promise<ReplayStep> {
     if (SAFETY_RETURN_CALLS.includes(write.call)) return this.safety.replayOnReturn(write);
+    if (write.call === STOP_OR_START_CALL) return this.outage.replayStopOrStart(write);
     return Promise.resolve("notBack");
   }
 
   /**
-   * A commit came back committed (T-269; the lease calls this before the run that sent it is answered): the stopped flag a
-   * STOP or START wrote is copied at once, so it is set before that turn's reply can go; a commit that wrote a safety timer
-   * row, or any commit while the timers' copy is stale, reloads the handle's live timers (named by the turn's K-04 handle
-   * id), as work lent to the platform.
+   * The batch window's hand-off to the lease (T-270): kept back (as for no turn able to run, so the batch stays stored, in
+   * order) while PostgreSQL is known down or one of its texts is a STOP or START not decided on; otherwise taken, without
+   * the STOP and START texts the actor took while it was down. Those never join a turn, so no commit can record their kept
+   * safety results: the results go and the texts are closed first, in one transaction (ADR-015 section 2; T-1264). A crash
+   * before the batch is handed hands it again, and closing again changes nothing; a throw keeps the batch for its retry.
    */
-  private afterCommit(turn: CommitTurnRef, answer: CommitTurnCommitted): void {
-    const read = readCommit(answer.committed);
-    if (read.stopped !== null) this.copies.noteStopped({ ...read.stopped, turnId: turn.id });
-    if (read.timersWritten || this.copies.timersStale()) {
-      this.lend(this.copies.refreshTimers(turn.handleId).then(() => undefined));
+  private async handOff(batch: ClosedBatch): Promise<"taken" | "unwired"> {
+    const kept = this.outage.handOff(batch);
+    if (kept === null) return "unwired";
+    const joining = new Set(kept.entries.map((entry) => entry.event.eventId));
+    const takenAlone = batch.entries
+      .map((entry) => entry.event.eventId)
+      .filter((eventId) => !joining.has(eventId));
+    if (takenAlone.length > 0) {
+      this.ctx.storage.transactionSync(() => {
+        this.safety.closeResults(takenAlone);
+      });
     }
+    return this.lease.take(kept);
+  }
+
+  /**
+   * Pins a run's bundle (T-249), and copies its keyword list and stop and start replies (T-270); a copy that fails changes
+   * nothing. Around the pin, the batch window writes the batch hop's spans for the turn, once per turn id (T-1108): the
+   * turn is open and its texts are known, so their places are taken first and the pin's lease span comes after them; they
+   * are written once the pin has answered, the turn's under the bundle id it pinned (the id its first text arrived under
+   * when it pinned none), whatever the pin answered. First of all, the actor names itself the AI-down path's host for the
+   * run, by the run's signal, which the lease hands the run's work too (T-1323).
+   */
+  private async pinAndCopy(request: PinRequest, signal: AbortSignal): Promise<TurnPin | null> {
+    setOutageHost(signal, { stopped: () => this.mayHaveStopped() });
+    const batchSpans = signal.aborted
+      ? null
+      : this.batch.beginSpans(request.turnId, this.turnEventIds(request.turnId));
+    let pinned: TurnPin | null = null;
+    try {
+      pinned = await this.pins.pin(request, signal);
+    } finally {
+      batchSpans?.write(pinned?.bundleId ?? null);
+    }
+    if (pinned !== null) {
+      try {
+        this.copies.refreshKeywords(pinned.bundle.manifest);
+      } catch {
+        // The copy keeps the list it had.
+      }
+    }
+    return pinned;
+  }
+
+  /**
+   * A keyword copy before the handle's first pin (T-1324; QUESTIONS.md CQ-282): the read of the keyword list of the bundle
+   * this text arrived under, after any such read already running here, when the text is one the PostgreSQL-down path reads
+   * (`DbOutage.arrive`) and the copies hold no keyword list; null when there is nothing to wait for. Never rejects.
+   */
+  private keywordsBeforePin(handoff: SealedHandoff): Promise<void> | null {
+    const { event } = handoff;
+    if (!startsTurn(event) || !isReadableEvent(event) || this.keywordsHeld()) return null;
+    const run = this.keywordReads.then(() => this.copyKeywordsOf(handoff.bundleId));
+    this.keywordReads = run;
+    return run;
+  }
+
+  /** True when the copies hold a keyword list, or cannot say (their storage failed, so nothing could be copied either). */
+  private keywordsHeld(): boolean {
+    try {
+      return this.copies.readKeywords() !== null;
+    } catch {
+      return true;
+    }
+  }
+
+  /**
+   * Copies the keyword list and the stop and start replies of the bundle `named` (the hand-off's bundle id: the active id
+   * the gateway read at receipt, or bundle v0's stand-in when it could not read one: ../gateway/answer.ts readBundleId),
+   * unless the copies hold a list by then (a pin's, which is kept). The bundle's manifest is read where the pin reads it
+   * first, the actor's own BUNDLES binding, with no PostgreSQL (../bundle/pin.ts), and is checked against the id as the pin
+   * checks it (manifestOf); the copies then take its list as from a pin (`refreshKeywords`: a list the guard cannot read is
+   * not copied). A read that fails (no binding, an id that is not K-01's, a miss, a manifest that is not the bundle's own, a
+   * list the guard cannot read, a throw) copies nothing, so the text reads unknown and the stricter reading holds (RULES 7.2).
+   * PostgreSQL's copy of the manifest is not read here: the pin reads it on a miss. Never throws.
+   */
+  private async copyKeywordsOf(named: unknown): Promise<void> {
+    try {
+      if (this.keywordsHeld()) return;
+      const bundleId = bundleIdOf(named);
+      const kv = bundleKvOf(this.env.BUNDLES);
+      if (bundleId === null || kv === null) return;
+      const text = await kv.get(keyOf(bundleId, "manifest"));
+      if (typeof text !== "string") return;
+      const manifest = await manifestOf(text, bundleId);
+      if (manifest === null || this.keywordsHeld()) return;
+      this.copies.refreshKeywords(manifest);
+    } catch {
+      // Nothing copied: the text reads unknown, as with no copy.
+    }
+  }
+
+  /**
+   * The actor's one answer to whether the number may have asked to stop by a word no commit has recorded yet: the safety
+   * host's `stopped` (the safety read's own outage line, T-1313) and the AI-down path's host for a run of its turn (T-1323;
+   * ../outage/ai `OutageHost.stopped`) both call it, so the two answers cannot drift (DL-645). True when the copy of the
+   * stopped flag says stopped, or a text no commit has taken may hold a stop word, the actor's own STOP and START aside
+   * (the down path's `stopPending`: true while that path is unwired, on a throw, and for a text it cannot find or has no
+   * reading of; RULES 7.2: "Unsure: treat it as a stop"). A throw here is each caller's to read as stopped.
+   */
+  private mayHaveStopped(): boolean {
+    return this.copies.readStopped()?.stopped === true || this.outage.stopPending();
+  }
+
+  /**
+   * The same one reading, for the outbox dispatcher (T-1337; DL-656): its port asks it right before an outage line's row
+   * goes, through the actor of the row's recipient (../dispatch DispatchDeps.mayHaveStopped).
+   */
+  mayHaveStoppedNow(): boolean {
+    return this.mayHaveStopped();
+  }
+
+  /** PostgreSQL is back and the queue's danger and stop writes are in (T-270): the held turn runs again, then the batches go on. */
+  private async resumeAfterOutage(): Promise<void> {
+    await this.lease.resume();
+    await this.batch.release();
+    await this.batch.arm();
+  }
+
+  /**
+   * A commit came back committed (T-269; the lease calls this before the run that sent it is answered): the stopped flag a
+   * STOP or START wrote is copied at once, so it is set before that turn's reply can go; a commit that may have written a
+   * safety timer row, or any commit while the timers' copy is stale, reloads the handle's live timers (named by the turn's
+   * K-04 handle id), as work lent to the platform. The lease's own `repeated` goes with the answer (T-1204): K-05's
+   * commitResult has no flag of its own, and a repeat reloads whatever the answer's shape, since its first answer, maybe
+   * lost, named the rows. The flag goes with the order the lease opened the turn in (`opened`), so a late answer from a
+   * turn opened before a lost commit's never ends that commit's mark (DL-427), nor replaces the actor's own STOP note
+   * (T-1208). A STOP the copy cannot take (its storage write failed) is held as a lost commit's mark for this turn, in
+   * memory when the storage cannot keep it either (DL-427 ruling 4), so the flag reads stopped until DL-427's rule 1 ends
+   * the mark (T-1208). While a lost commit's stopped flag is still not read after this commit's own write of it, if any
+   * (T-1206), the flag is read again.
+   */
+  private afterCommit(turn: CommitTurnRef, answer: CommitTurnCommitted, opened: number): void {
+    const read = readCommit(answer.committed, { repeated: answer.repeated });
+    if (read.stopped !== null) {
+      try {
+        this.copies.noteStopped({ ...read.stopped, turnId: turn.id, opened });
+      } catch {
+        // Not copied: a STOP the copy never saw keeps the stricter reading as this turn's lost mark (a START not copied
+        // leaves the copy as it was, no looser), and the phone row is read again below.
+        if (read.stopped.stopped) this.copies.noteLostCommit(turn.id, opened);
+      }
+    }
+    // A lost commit's stopped flag still not read (T-1206; DL-427's rule 1 ends a mark): this commit's handle id reads it.
+    if (this.copies.stoppedUnread()) this.rereadStopped(turn.handleId);
+    if (read.timersWritten || this.copies.timersStale()) this.reloadTimers(turn.handleId);
+  }
+
+  /**
+   * A commit went through with its answer lost (T-1206; the lease calls this before the turn finishes, so before the next
+   * turn opens): the copies cannot read what it wrote, a STOP or START or a safety timer row. So, at once, the stopped flag
+   * reads stopped (the stricter reading) and the timers' copy is marked stale, which hold if nothing more can be done
+   * (no handle id, an eviction); then, as work lent to the platform, the flag is read again from the handle's phone row and
+   * the live timers are reloaded, named by the handle id the turn's last commit named. A read that fails leaves its mark,
+   * and each later commit tries it again. Each lost commit keeps its own mark, with the order its turn opened in (DL-427).
+   * With no handle id kept (a commit sent before the lease kept them, or a stored id that cannot be read), nothing can name
+   * the handle to either source (both read by K-04 handles.id, which the actor learns only from a commit), and the marks
+   * alone stand: a reload or a re-read sent before them can no longer end them (T-1208), so the next commit of any turn
+   * reads both again by its own handle id, as for a read that fails.
+   */
+  private afterLostCommit(lost: LostCommit): void {
+    this.copies.noteLostCommit(lost.turnId, lost.opened);
+    this.copies.markTimersStale();
+    if (lost.handleId === null) return;
+    this.rereadStopped(lost.handleId);
+    this.reloadTimers(lost.handleId);
+  }
+
+  /** Reads the handle's stopped flag again (T-1206), as work lent to the platform; it never throws. */
+  private rereadStopped(handleId: string): void {
+    this.lend(this.copies.rereadStopped(handleId).then(() => undefined));
+  }
+
+  /** Reloads the handle's live timers, as work lent to the platform; the PostgreSQL-down path's alarm follows (T-270). */
+  private reloadTimers(handleId: string): void {
+    this.lend(
+      this.copies.refreshTimers(handleId).then(() => {
+        this.outage.timersChanged();
+      }),
+    );
   }
 
   /**
@@ -593,40 +937,106 @@ export class HandleActor extends DurableObject {
     return "written";
   }
 
-  /** One K-08 `receive` span for the actor's part of the hop; a span the contract refuses is not logged and changes nothing. */
-  private recordSpan(
-    handoff: SealedHandoff,
-    route: "inbox" | "receipt",
-    answer: StoreAnswer,
-    ms: number,
-  ): void {
+  // ---- the trace's one count of places (T-1108) --------------------------------------------------------------------
+
+  /**
+   * Where the spans of the actor's writers go (the safety read, the batch window, the pin and the turn on its trace, a
+   * park): one JSON log line each, and the trace's count kept in the actor's storage as each is written. The sink holds
+   * the storage alone, never the actor: a turn's trace, and its sink with it, outlives the run (the composition root keeps
+   * each sent row's trace for its delivery receipt).
+   */
+  private spanSink(): SpanSink {
+    const log = logSink({ environment: this.env.ENVIRONMENT, version: this.env.GIT_SHA ?? "unknown" });
+    const sql = this.ctx.storage.sql;
+    return (span) => {
+      log(span);
+      keepTraceSeq(sql, span.trace_id, span.seq);
+    };
+  }
+
+  /**
+   * A text is stored: its trace's count begins after the places the gateway took (the hand-off's `seqBefore`; none for a
+   * hand-off built by hand), here and in the actor's storage. A trace this actor has begun already (a second event handed
+   * in under one trace id) goes on from the count kept for it, never back. Only the newest TRACE_SEQ_KEPT traces are kept.
+   */
+  private beginTraceSeq(handoff: SealedHandoff): void {
+    const before: unknown = handoff.seqBefore;
+    const taken = typeof before === "number" && Number.isInteger(before) && before > 0 ? before : 0;
     try {
-      const sink: SpanSink = logSink({
-        environment: this.env.ENVIRONMENT,
-        version: this.env.GIT_SHA ?? "unknown",
-      });
-      const context = openTrace({
-        openedBy: "textWebhook",
-        bundleId: handoff.bundleId,
-        incomingTraceId: handoff.traceId,
-        sink,
-      });
-      const eventId = handoff.event.eventId;
-      const stored = answer === "written" && route === "inbox";
-      context.record({
-        hop: "receive",
-        ms,
-        outcome: answer === "duplicate" ? "dropped" : "ok",
-        provider: "linq",
-        ...(isLabel(eventId) ? { eventId } : {}),
-        got: { door: "handleActor", route, kind: handoff.event.kind },
-        decided: {
-          stored: stored,
-          startsTurn: stored && startsTurn(handoff.event),
-        },
-      });
+      const sql = this.ctx.storage.sql;
+      const kept = sql
+        .exec<{ seq: number }>("SELECT seq FROM trace_seq WHERE trace_id = ?", handoff.traceId)
+        .toArray()[0];
+      if (kept !== undefined) {
+        resumeSeq(handoff.traceId, Math.max(kept.seq, taken));
+        return;
+      }
+      beginSeq(handoff.traceId, taken);
+      sql.exec("INSERT INTO trace_seq (trace_id, seq) VALUES (?, ?)", handoff.traceId, taken);
+      sql.exec(
+        "DELETE FROM trace_seq WHERE rowid NOT IN (SELECT rowid FROM trace_seq ORDER BY rowid DESC LIMIT ?)",
+        TRACE_SEQ_KEPT,
+      );
     } catch {
-      // No span for this call; the answer stands.
+      // Not kept: the count begins, and goes on, in memory.
+      beginSeq(handoff.traceId, taken);
+    }
+  }
+
+  /**
+   * Makes the table of kept counts, and brings back, for this instance's writers, the count of each trace that can still
+   * have a hop to come (`textsInFlight`). A trace whose turn is done is left where it is: every start of every actor
+   * would otherwise put its finished traces back into the isolate's memory of counts, and push live ones out of it. A
+   * failure here keeps nothing back.
+   */
+  private resumeTraceSeqs(): void {
+    try {
+      const sql = this.ctx.storage.sql;
+      sql.exec("CREATE TABLE IF NOT EXISTS trace_seq (trace_id TEXT PRIMARY KEY, seq INTEGER NOT NULL)");
+      const kept = sql
+        .exec<{ trace_id: string; seq: number }>("SELECT trace_id, seq FROM trace_seq")
+        .toArray();
+      if (kept.length === 0) return;
+      const live = new Set(readInboxEvents(sql, this.textsInFlight()).map((entry) => entry.traceId));
+      for (const row of kept) if (live.has(row.trace_id)) resumeSeq(row.trace_id, row.seq);
+    } catch {
+      // The actor starts all the same; its writers count from what this isolate holds.
+    }
+  }
+
+  /**
+   * The event ids of the texts that can still have a hop to come: not read yet or under a hold (the safety read reads
+   * them again), not handed to the lease yet, waiting there for the next turn, or in the turn that holds the lease
+   * (running, committing, replying or being parked).
+   */
+  private textsInFlight(): string[] {
+    const holder = this.ctx.storage.sql
+      .exec<{ items: string }>(
+        "SELECT t.items FROM turn_lease l JOIN lease_turns t ON t.turn_id = l.turn_id WHERE l.one = 1",
+      )
+      .toArray()
+      .flatMap((row) => (JSON.parse(row.items) as { eventId: string }[]).map((item) => item.eventId));
+    return [
+      ...new Set([
+        ...this.safety.unreadTexts(),
+        ...this.safety.openHolds().map((hold) => hold.eventId),
+        ...this.batch.pendingEventIds(),
+        ...this.lease.pendingEventIds(),
+        ...holder,
+      ]),
+    ];
+  }
+
+  /** The event ids of a turn's texts, as the lease keeps them (lease.ts lease_turns.items); none for a turn it does not hold. */
+  private turnEventIds(turnId: string): string[] {
+    try {
+      const row = this.ctx.storage.sql
+        .exec<{ items: string }>("SELECT items FROM lease_turns WHERE turn_id = ?", turnId)
+        .toArray()[0];
+      if (row === undefined) return [];
+      return (JSON.parse(row.items) as { eventId: string }[]).map((item) => item.eventId);
+    } catch {
+      return [];
     }
   }
 }

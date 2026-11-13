@@ -1,0 +1,6 @@
+{
+  "error": "noTurn",
+  "table": "outbox_rows",
+  "rowId": "out-sam-sign-in-nov02-code",
+  "followUpRows": [{ "id": "out-sam-sign-in-nov02-code-by-text", "commitSeq": 2 }]
+}

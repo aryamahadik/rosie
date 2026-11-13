@@ -4,7 +4,7 @@
 // Values come only from the contracts' fixtures (K-02 v1 and K-09 v1: the master's sample cast, the 555-01xx range;
 // rule 9).
 
-import type * as K09 from "../../../../contracts/generated/tool-api/tool-api.v1";
+import type * as K09 from "../../../../contracts/generated/tool-api/tool-api.v1.5";
 import { HANDLE_REF, contractFile, fixture } from "../../tool-api/test-support";
 import type { CallContext, SpanNotes } from "../../tool-api/tool-api";
 import { notBuiltLimit } from "./stub";
@@ -64,8 +64,12 @@ export function decidedOf(exchange: K09.GateAndCommitExchange): Decided {
   return input.decided;
 }
 
-/** K-09 v1's gate exchanges on decided texts, each answered per part or refused before any write. */
+/**
+ * K-09's gate exchanges on decided texts, each answered per part or refused before any write: v1's, and v1.5's turn 1
+ * (commit-s1-01.json: Sam's first text enters K-02 v1.1's sign-up door; T-1183).
+ */
 export const DECIDED_GATE_FIXTURES = [
+  "commit-s1-01.json",
   "commit-s1-02.json",
   "commit-limit-1-unproven-sender.json",
   "commit-limit-2-owner-rule.json",

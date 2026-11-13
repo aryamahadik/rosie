@@ -1,0 +1,18 @@
+{
+  "call": "readTurnParty",
+  "given": {
+    "k04Seeds": ["seed-business-head.json"],
+    "after": [],
+    "now": "2026-11-30T15:00:03Z",
+    "note": "S11-100's hand-over, 'Sam sells Lee's Barbershop to Hugo P.', with the handover time Mon Nov 30 at 9:00am (14:00Z): 'Sam's access ends at the handover time'. The database side writes test owner 1's rows as read-turn-party-test-owner-1's note lists them (T-1148's skeleton seed), then Hugo P.'s person and his owner role from the handover time: persons person-hugo (name 'Hugo P.', language null, version 1) and person_roles role-hugo-barber (person-hugo, biz-lees-barbershop, owner, ended_at null, version 1). The hand-over's writer started Hugo's role but left company-lees-barbershop naming Sam (open gap 59). Sam texts after the handover time: he holds no role, and the one company that names a business for him names one whose live owner role another person holds, so the rows do not say the barbershop is his to act for (S2-02: 'One account owner'; RULES 6.9). businessUndecided, anotherOwner (item 52, default 99): no turn runs under the barbershop, and none runs under no business in its place."
+  },
+  "request": {
+    "handle": { "kind": "phone", "address": "+15555550100" }
+  },
+  "outcome": {
+    "error": "businessUndecided",
+    "reason": "anotherOwner",
+    "handleId": "handle-sam",
+    "personId": "person-sam"
+  }
+}

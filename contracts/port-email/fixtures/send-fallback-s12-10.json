@@ -1,0 +1,32 @@
+{
+  "call": "sendEmail",
+  "given": {
+    "now": "2026-11-07T15:25:01Z",
+    "note": "S12-10: Alex's confirmation text still failed after 15 minutes of tries, so the next way he allows is his email (K-07 outbox-fallback-email.json: followUps nextWay out-alex-confirm-by-email). The subject and first line are S12-10's: the booking and its time, and why it comes by email. It is the first email of this booking, so it threads under nothing."
+  },
+  "request": {
+    "idempotencyKey": "out-alex-confirm-by-email/1/1",
+    "purpose": "nextWay",
+    "bookingId": "booking-alex-riley-nov14",
+    "from": {
+      "name": "Lee's Barbershop",
+      "address": "rosie@mail.rosfield.com"
+    },
+    "to": "alex@example.com",
+    "replyTo": "booking-alex-riley-nov14@reply.example.com",
+    "subject": "Booked: Sat Nov 14, 11:00am",
+    "text": "This is Rosie, the automated booking assistant for Lee's Barbershop.\n\nTexts are delayed, so this comes by email.\nYou're booked with Riley at Lee's Barbershop.\nSat Nov 14, 11:00am\n\nManage your booking: https://example.com/m/b14",
+    "assistantLine": "This is Rosie, the automated booking assistant for Lee's Barbershop.",
+    "manageLink": "https://example.com/m/b14",
+    "chatLink": null,
+    "thread": {
+      "inReplyTo": null,
+      "references": []
+    }
+  },
+  "outcome": {
+    "result": "accepted",
+    "providerMessageId": "email-msg-demo-0040",
+    "acceptedAt": "2026-11-07T15:25:01Z"
+  }
+}

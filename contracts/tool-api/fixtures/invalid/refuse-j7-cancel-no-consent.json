@@ -5,7 +5,7 @@
     "after": ["j7-cancel-ask-turn.json"],
     "now": "2026-10-23T13:32:00Z",
     "stated": { "step": "A7-05", "gives": [] },
-    "note": "Refused: A7-05's cancel answered with no consent written from Alex's yes (consentId null), so the commit binds no words shown to the change (README default 129). With consentId consent-alex-cancel-oct23 it is j7-cancel-confirm-turn, accepted."
+    "note": "Refused: A7-05's cancel answered with no consent written from Alex's yes (consentId null), so the commit binds no words shown to the change (README default 147). With consentId consent-alex-cancel-oct23 it is j7-cancel-confirm-turn, accepted."
   },
   "request": {
     "caller": {

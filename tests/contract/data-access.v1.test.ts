@@ -1,17 +1,26 @@
-// Contract test for K-05, the data-access calls: v1 and its additive minor versions v1.1 and v1.2 (T-084;
+// Contract test for K-05, the data-access calls: v1 and its additive minor versions v1.1 to v1.9 (T-084; T-1169, with
+// T-1188 folded in by DL-373; T-1199 for v1.6; T-1214 for v1.7; T-1218 for v1.8; T-1232 for v1.9;
 // ops/plan/02-contracts.md K-05 "Contract test" and section 2 item 12; contracts/data-access/README.md "Fixtures",
-// "Producers and consumers").
+// "Producers and consumers" and each version's "Consumers of" list).
 //
 // This is the fixture part. The contract test has two parts: this one, which reads only the committed schemas, fixtures
 // and README, and one part per producer or consumer side, added later by a QA side task that depends on this task and
-// on that side's build task. SIDE_CHECKS (at the end) is the list where each side is added.
+// on that side's build task. SIDE_CHECKS (at the end) is the list where each side is added. The producer's side of v1.3,
+// v1.4, v1.6, v1.7, v1.8 and v1.9, every fixture of the six run through db/repo's own calls against local PostgreSQL,
+// is data-access.v1.db-side.test.ts (T-1169; v1.6's by T-1199; v1.7's by T-1214; v1.8's by T-1218; v1.9's by T-1232);
+// v1.5 adds no database call.
 //
-// K-05 is frozen at v1, v1.1 and v1.2 (frozen.json), and fixtures/index.json lists every version's fixtures. Each entry
-// is checked against the schema its own `version` names, at the definition its `def` names (the T-003 harness:
+// K-05 is frozen at v1 to v1.9 (frozen.json), and fixtures/index.json lists every version's fixtures. Each entry is
+// checked against the schema its own `version` names, at the definition its `def` names (the T-003 harness:
 // data-access.<version>.schema.json #/$defs/<def>), and entries are selected by version, never by a pinned list or
 // count (DL-124, DL-125), so a later minor version's fixtures are checked by parts 1, 3 and 4 as they land. As DL-124
 // settled for K-06, this file holds v1 and its additive minor versions: the v1.2 fixture part the README plans as
-// T-128 ("every v1.2 fixture against its schema, refused ones refused") is covered here.
+// T-128 ("every v1.2 fixture against its schema, refused ones refused") is covered here, and so are the fixture parts of
+// v1.3, v1.4, v1.5, v1.6, v1.7, v1.8 and v1.9 (README: "may join tests/contract/data-access.v1.test.ts, as v1.2's did";
+// v1.6's "joins tests/contract/data-access.v1.test.ts as v1.5's did"; v1.7's, v1.8's and v1.9's "joins
+// tests/contract/data-access.v1.test.ts", "Consumers of v1.7", "Consumers of v1.8" and "Consumers of v1.9"), with part
+// 5, v1.5's rowReader read as README item 44 says and three faults no fixture shows refused (T-1188; T-1184's security
+// note b), and part 6, v1.7's chat-opened entry named by its text as item 46 says.
 //
 // What this part proves:
 //   1. every fixture in contracts/data-access/fixtures/index.json is checked against the schema of its version:
@@ -29,8 +38,17 @@
 //      fires: every `given` names fixtures and seeds that exist (accepted, of its own version or an earlier one, with no
 //      loop in a chain); the ids fixed by rule (a part's key and the next one, a saved time's clock row, the "all set"
 //      row, a claim's entry); the cast's phone numbers (555-01xx) and email addresses (example.com; rule 9).
+//   5. v1.5's rowReader (README item 44, a mapping, not a database call): the three accepted rows read as the README
+//      says (Sam with no role on S1-02 as the owner, by the sign-up line; Tomás's section 5 row noReader; a held role
+//      first), and three cases built from an accepted twin, each refused by the one rule its fault breaks and accepted
+//      once its outcome is put right: a row with no person, a line to no one (lineTo null) and a cust line, each read as
+//      the owner.
+//   6. v1.7's openChatOnText (README item 46, "The entry"): each answer names the request's handle, and each
+//      phone.chat_opened entry is the request's text's, its id '<event id>/chat-opened', its row the request's handle
+//      and its why the request's event, which the schema leaves to code (as a claim entry's id, item 33).
 //   What needs a producer or consumer side is on SIDE_CHECKS, not checked here: each fixture's request run against local
-//   PostgreSQL giving its outcome, 1,000 parallel reserves, a repeated commit, parallel claims, and each consumer
+//   PostgreSQL giving its outcome (v1.3's, v1.4's, v1.6's, v1.7's, v1.8's and v1.9's in
+//   data-access.v1.db-side.test.ts), 1,000 parallel reserves, a repeated commit, parallel claims, and each consumer
 //   accepting every valid fixture and refusing every invalid one.
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -52,7 +70,7 @@ const DB_SCHEMA_DIR = path.join(CONTRACTS_ROOT, "db-schema");
 const ID_BASE = "https://rosie.invalid/contracts/";
 
 /** The versions this file writes part 2's proofs and the side list for; a later minor version's QA task adds its own. */
-const WRITTEN_FOR = ["v1", "v1.1", "v1.2"];
+const WRITTEN_FOR = ["v1", "v1.1", "v1.2", "v1.3", "v1.4", "v1.5", "v1.6", "v1.7", "v1.8", "v1.9"];
 /** The fixture parts the README plans as tasks of their own that this file covers (DL-124). */
 const COVERED_HERE = ["T-128"];
 
@@ -656,6 +674,282 @@ const MENDS: Record<string, Mend[]> = {
       reason: "the fact's home table is harm_reports (factTable)",
       putRight: "with only that table changed to one a fact may read (persons)",
       changes: [{ at: "facts.0.table", to: "persons" }],
+    },
+  ],
+  // v1.3
+  "invalid/refuse-open-holds-hold-with-words.json": [
+    {
+      reason:
+        "an open hold carries its outcome's sealed words, and a hold says what it holds back, never what the person wrote",
+      putRight: "with the sealed words taken out",
+      changes: [{ at: "holds.0.sealedWords", remove: true }],
+      same: { file: "read-open-holds-alex.json", at: "outcome.holds.0", part: "holds.0" },
+    },
+  ],
+  "invalid/refuse-open-holds-no-scope.json": [
+    {
+      reason: "a hold read states no business, and the scope is always named, a business or null",
+      putRight: "with the barbershop named",
+      changes: [{ at: "businessId", to: "biz-lees-barbershop" }],
+      same: { file: "read-open-holds-alex.json", at: "request.businessId", part: "businessId" },
+    },
+    {
+      reason: "a hold read states no business, and the scope is always named, a business or null",
+      putRight: "with null named, the runtime side before there is a business",
+      changes: [{ at: "businessId", to: null }],
+    },
+  ],
+  "invalid/refuse-outbox-row-returns-inbound-words.json": [
+    {
+      reason:
+        "a row read returns the words of the text it answers, which the runtime caller hands in and no exchange carries",
+      putRight: "with the words taken out",
+      changes: [{ at: "answers.texts.0.words", remove: true }],
+      same: { file: "read-outbox-row-s1-02.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-outbox-row-returns-address.json": [
+    {
+      reason: "a row read returns the recipient's number, which compose input and finalize never need",
+      putRight: "with the address taken out",
+      changes: [{ at: "recipient.address", remove: true }],
+      same: { file: "read-outbox-row-s1-02.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-fixed-line-facts-caller-handle.json": [
+    {
+      reason: "a fixed-line facts request names a handle, and the read takes the handle from the row itself",
+      putRight: "with the row and its business alone",
+      changes: [{ at: "handleId", remove: true }],
+      same: { file: "fixed-line-facts-texted-before.json", at: "request" },
+    },
+  ],
+  "invalid/refuse-fixed-line-facts-returns-number.json": [
+    {
+      reason:
+        "fixed-line facts carry the phone's number, and the inserter needs only when the opt-out line was delivered",
+      putRight: "with the number taken out",
+      changes: [{ at: "phoneNumber", remove: true }],
+      same: { file: "fixed-line-facts-s1-02.json", at: "outcome" },
+    },
+  ],
+  // v1.4
+  "invalid/refuse-safety-outcome-with-sealed-words.json": [
+    {
+      reason: "a safety record carries its sealed words, and the read gives the port's fields alone",
+      putRight: "with the sealed words taken out",
+      changes: [{ at: "safetyOutcome.sealedWords", remove: true }],
+      same: { file: "read-safety-outcome-of-event-alex.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-safety-outcome-no-scope.json": [
+    {
+      reason: "a safety outcome read states no business, and the scope is always named, a business or null",
+      putRight: "with the barbershop named",
+      changes: [{ at: "businessId", to: "biz-lees-barbershop" }],
+      same: { file: "read-safety-outcome-alex-safe.json", at: "request" },
+    },
+  ],
+  "invalid/refuse-safety-hold-released-without-why.json": [
+    {
+      reason:
+        "a hold is answered released with no reason, and a release time and its reason come together or not at all",
+      putRight: "with its reason, a clear 'we're safe' read back",
+      changes: [{ at: "hold.releasedWhy", to: "safe_readback" }],
+      same: { file: "read-safety-hold-alex-released.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-safety-hold-of-outcome-two-holds.json": [
+    {
+      reason: "two holds are answered for one outcome, and K-34 holds one per outcome",
+      putRight: "with the first of them alone, the one its outcome set",
+      changes: [
+        {
+          at: "hold",
+          to: fromFixture("invalid/refuse-safety-hold-of-outcome-two-holds.json", "hold.0"),
+        },
+      ],
+      same: { file: "read-safety-hold-of-outcome-alex-threat.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-outbox-row-written-returns-words.json": [
+    {
+      reason:
+        "a written answer carries the row's final parts, and the read says only whether the row is written",
+      putRight: "with the final parts taken out",
+      changes: [{ at: "finalParts", remove: true }],
+      same: { file: "outbox-row-written-alex-safety.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-business-owner-returns-number.json": [
+    {
+      reason: "an owner answer carries the owner's number, and the line takes the handle by id",
+      putRight: "with the address taken out",
+      changes: [{ at: "owner.address", remove: true }],
+      same: { file: "business-owner-barbershop.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-business-owner-no-business.json": [
+    {
+      reason: "an owner read names no business, and an owner is a business's: the read names the call's own",
+      putRight: "with the barbershop named",
+      changes: [{ at: "businessId", to: "biz-lees-barbershop" }],
+      same: { file: "business-owner-barbershop.json", at: "request" },
+    },
+  ],
+  "invalid/refuse-business-zone-null.json": [
+    {
+      reason:
+        "a zone is answered null, and K-04 keeps every business's zone (one the scope hides is notFound)",
+      putRight: "with the barbershop's zone",
+      changes: [{ at: "timeZone", to: "America/New_York" }],
+      same: { file: "business-zone-barbershop.json", at: "outcome" },
+    },
+  ],
+  // v1.5
+  "invalid/refuse-row-reader-no-role-outside-section-1.json": [
+    {
+      reason:
+        "Tomás, who holds no role, is read as the customer by the line on a section 5 step, and the sign-up reading holds on section 1 alone",
+      putRight: "refused, noReader (noRole)",
+      changes: [
+        { at: "outcome", to: { error: "noReader", outboxRowId: "outbox-a5-05-tomas-1", why: "noRole" } },
+      ],
+      same: { file: "row-reader-a5-05-tomas-no-role.json", at: "" },
+    },
+  ],
+  "invalid/refuse-row-reader-role-read-by-line.json": [
+    {
+      reason: "Sam, who holds his owner role, is read by the sign-up line, and a held role always wins",
+      putRight: "read by his role, role-sam-barber",
+      changes: [
+        { at: "outcome.from", to: "roles" },
+        { at: "outcome.roleId", to: "role-sam-barber" },
+      ],
+      same: { file: "row-reader-s1-02-owner.json", at: "" },
+    },
+  ],
+  // v1.6
+  "invalid/refuse-outbox-row-switch-left-out.json": [
+    {
+      reason:
+        "the practice's answer leaves its sensitive switch out, and a v1.6 answer always states it, true, false or null, so no consumer reads a missing switch as off (readOutboxRow.v1dot6Response)",
+      putRight: "with the switch stated, true, as the practice's one kind of work lists it in flow A",
+      changes: [{ at: "businessSensitive", to: true }],
+      same: { file: "read-outbox-row-practice-sensitive.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-outbox-row-switch-per-flow.json": [
+    {
+      reason:
+        "the practice's switch is answered per flow (on in flow A, off in flow B), and the read answers the business's one value, true when any kind of work lists it in either flow (businessSensitive)",
+      putRight: "with that one value, true, the stricter of its two flows",
+      changes: [{ at: "businessSensitive", to: true }],
+      same: { file: "read-outbox-row-practice-sensitive.json", at: "outcome" },
+    },
+  ],
+  // v1.7: each refused fixture's twin as README "Consumers of v1.7" names it
+  "invalid/refuse-open-chat-stopped-number.json": [
+    {
+      reason:
+        "a text opens Ben T.'s stopped number's chat by clearing his stop, and only START clears a stop: the call never touches a stopped row",
+      putRight: "with nothing written, Ben's row as it stands (stopped)",
+      changes: [{ at: "outcome", to: fromFixture("open-chat-ben-stopped.json", "outcome") }],
+      same: { file: "open-chat-ben-stopped.json", at: "outcome", part: "outcome" },
+    },
+    {
+      reason:
+        "its entry names stopped, and a chat-opened entry names only chat_open, chat_open_at and chat_way (chatClosedValues, chatOpenValues)",
+      putRight:
+        "with only stopped taken out of the entry's old and new values (the schema cannot see that Ben's row is stopped: the database side answers his text stopped, writing nothing)",
+      changes: [
+        { at: "outcome.event.oldValues.stopped", remove: true },
+        { at: "outcome.event.newValues.stopped", remove: true },
+      ],
+    },
+  ],
+  "invalid/refuse-open-chat-no-event.json": [
+    {
+      reason:
+        "the call names no event, and the text's event id is the key a repeat is known by and its entry's why (openChatOnText.request)",
+      putRight: "with turn 1's text named, evt-sam-s1-01",
+      changes: [{ at: "eventId", to: "evt-sam-s1-01" }],
+      same: { file: "open-chat-first-text-sam.json", at: "request" },
+    },
+  ],
+  "invalid/refuse-open-chat-with-number.json": [
+    {
+      reason:
+        "the call carries the number beside the handle, and the request names the handle by its K-04 id alone: the call reads the number from K-04 handles (openChatOnText.request)",
+      putRight: "with the number taken out",
+      changes: [{ at: "phoneNumber", remove: true }],
+      same: { file: "open-chat-first-text-sam.json", at: "request" },
+    },
+  ],
+  // v1.8: each refused answer's twin as README "Consumers of v1.8" names it, its outcome
+  "invalid/refuse-send-state-yes-source-left-out.json": [
+    {
+      reason:
+        "Sam's business-entered yes is answered with who gave it left out, and a v1.8 answer always states fromContact, so no consumer meets a yes it cannot place (sendState.v1dot8Response, textsConsentV1dot8)",
+      putRight:
+        "with fromContact stated, false: the yes was given by text in Sam's turn, on Sam's handle, the business's word, never Alex's own (README item 47, default 78)",
+      changes: [{ at: "textsConsent.fromContact", to: false }],
+      same: { file: "send-state-business-yes.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-send-state-booking-left-out.json": [
+    {
+      reason:
+        "Alex's own fresh yes is answered with its booking left out, and a v1.8 answer always states bookingId, null for a yes that names none, so no consumer meets a yes whose booking it cannot tell (sendState.v1dot8Response, textsConsentV1dot8)",
+      putRight:
+        "with bookingId stated as consents.booking_id holds it, the new Nov 21 booking the yes was given for (README item 47, default 81)",
+      changes: [{ at: "textsConsent.bookingId", to: "booking-alex-riley-nov21" }],
+      same: { file: "send-state-own-yes-one-booking.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-send-state-stop-read-as-own-yes.json": [
+    {
+      reason:
+        "Alex's STOP row is answered as his own yes (fromContact true), and a row that withdraws is no yes, so never the person's own (textsConsentRead: revoked true, fromContact false)",
+      putRight: "with fromContact false, as a row that withdraws always reads (README default 82)",
+      changes: [{ at: "textsConsent.fromContact", to: false }],
+      same: { file: "send-state-stop-row.json", at: "outcome" },
+    },
+  ],
+  // v1.9: each refused answer's twin as README "Consumers of v1.9" names it, its outcome
+  "invalid/refuse-mark-repeat-delivery-left-out.json": [
+    {
+      reason:
+        "the words' repeated receipt is answered with what it repeats left out, and a v1.9 answer always states repeatedDelivery, so no consumer meets a repeat whose delivery it cannot place (markPart.v1dot9Response)",
+      putRight:
+        "with repeatedDelivery stated: the row's first delivery, at 14:05:04Z as the part holds it (README item 48, defaults 85 and 86)",
+      changes: [{ at: "repeatedDelivery", to: { firstOfRow: true, deliveredAt: "2026-10-23T14:05:04Z" } }],
+      same: { file: "mark-a7-03-delivered-repeat.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-mark-repeat-says-first-delivery.json": [
+    {
+      reason:
+        "the words' repeated receipt is answered with firstDelivery true beside the delivery it repeats, and a repeat records nothing, so it never says firstDelivery (markPart.response: repeatedDelivery an object, firstDelivery false)",
+      putRight:
+        "with firstDelivery false, v1's meaning kept: the first delivery it repeats is said in repeatedDelivery (README default 88)",
+      changes: [{ at: "firstDelivery", to: false }],
+      same: { file: "mark-a7-03-delivered-repeat.json", at: "outcome" },
+    },
+  ],
+  "invalid/refuse-mark-delivered-repeat-null.json": [
+    {
+      reason:
+        "the poll's repeated receipt is answered with repeatedDelivery null, and a delivery receipt answered repeated always states the delivery it repeats, never null (markPart.exchange)",
+      putRight:
+        "with the delivery it repeats stated: the poll's, at 14:05:06Z as the part holds it, not the row's first (README item 48, default 87)",
+      changes: [
+        {
+          at: "outcome.repeatedDelivery",
+          to: { firstOfRow: false, deliveredAt: "2026-10-23T14:05:06Z" },
+        },
+      ],
+      same: { file: "mark-a7-03-poll-delivered-repeat.json", at: "outcome", part: "outcome" },
     },
   ],
 };
@@ -1287,13 +1581,227 @@ describe("data-access fixtures: what the schema leaves to the fixtures, each che
     expect(castProblems({ for: { phoneNumber: "+15555550200" } })).toEqual([
       "for.phoneNumber: +15555550200 is not in the 555-01xx range",
     ]);
-    expect(castProblems({ note: "her mobile is +12025550143, not +12025551234." })).toEqual([
-      "note: +12025551234 is not in the 555-01xx range",
+    expect(castProblems({ note: "her mobile is +12025550143, not +15555551234." })).toEqual([
+      "note: +15555551234 is not in the 555-01xx range",
     ]);
     expect(castProblems({ handle: { address: "alex@example.org" } })).toEqual([
       "handle.address: alex@example.org is not at example.com",
     ]);
     expect(castProblems({ address: "alex@reply.example.com", base64: "bm90+12345678901x" })).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// 5. v1.5's rowReader: README item 44 (T-1188, folded into T-1169 by DL-373)
+
+const ROW_READER = "rowReader.exchange";
+const rowReaderErrors = must(
+  errorsAjv.getSchema(`${idOf("v1.5")}#/$defs/${ROW_READER}`),
+  "v1.5's rowReader.exchange",
+);
+const RULE_PATH = /\/dependentSchemas\/outcome\/allOf\/(\d+)\//;
+
+/** The rules of rowReader.exchange (its dependentSchemas on outcome, allOf by number) a value breaks, none when valid. */
+export function rulesBroken(value: unknown): number[] {
+  if (rowReaderErrors(value)) return [];
+  const rules = (rowReaderErrors.errors ?? []).flatMap((error) => {
+    const match = RULE_PATH.exec(error.schemaPath);
+    return match === null ? [] : [Number(match[1])];
+  });
+  return [...new Set(rules)].sort((a, b) => a - b);
+}
+
+/**
+ * T-1184's security note b, three rules no fixture shows (DL-370): each case is row-reader-s1-02-no-role.json, Sam with
+ * no role on S1-02's section 1 line to the owner, read as the owner by the sign-up line, with one fault in its request.
+ * Each is refused by the one rule its fault breaks (rowReader.exchange's allOf, by number) and accepted once its outcome
+ * is put right: the fault is in the reading, not in the row.
+ */
+const SIGN_UP_CASES: readonly { name: string; fault: Change[]; rule: number; putRight: Change[] }[] = [
+  {
+    name: "a row with no person read as the owner (README default 64: no person is no one's own sign-up)",
+    fault: [{ at: "request.recipient.personId", to: null }],
+    rule: 1,
+    putRight: [
+      { at: "outcome", to: { error: "noReader", outboxRowId: "outbox-s1-02-sam-1", why: "noRole" } },
+    ],
+  },
+  {
+    name: "lineTo null read as the owner (README default 62: a line that cannot be told without a role has no reader)",
+    fault: [{ at: "request.lineTo", to: null }],
+    rule: 6,
+    putRight: [
+      {
+        at: "outcome",
+        to: { error: "noReader", outboxRowId: "outbox-s1-02-sam-1", why: "lineHasNoReader" },
+      },
+    ],
+  },
+  {
+    name: "a cust line read as the owner (README item 44: the line's lane names the reader, cust the customer)",
+    fault: [{ at: "request.lineTo", to: "cust" }],
+    rule: 5,
+    putRight: [{ at: "outcome.reader", to: "customer" }],
+  },
+];
+
+describe("data-access v1.5: rowReader reads each row as README item 44 says, and refuses three faults no fixture shows", () => {
+  const exchange = validatorOf("v1.5", ROW_READER);
+  const noRole = "row-reader-s1-02-no-role.json";
+  const owner = "row-reader-s1-02-owner.json";
+  const tomas = "row-reader-a5-05-tomas-no-role.json";
+
+  it("reads the three accepted rows as the README says: S1-02 with no role as the owner, the section 5 row noReader, a held role first", () => {
+    for (const file of [noRole, owner, tomas]) {
+      const entry = entryOf(file);
+      expect([entry.version, entry.def, entry.expect], file).toEqual(["v1.5", ROW_READER, "accept"]);
+      expect(exchange(fixture(file)), `${file}: ${formatErrors(exchange.errors).join("; ")}`).toBe(true);
+      expect(rulesBroken(fixture(file)), file).toEqual([]);
+    }
+    // Sam holds no role, S1-02 is on section 1 of flow A and its line goes to the owner: the owner, by the sign-up line.
+    expect(fromFixture(noRole, "request.recipient")).toEqual({ personId: "person-sam", roles: [] });
+    expect([fromFixture(noRole, "request.section"), fromFixture(noRole, "request.lineTo")]).toEqual([
+      1,
+      "owner",
+    ]);
+    expect(fromFixture(noRole, "outcome")).toEqual({
+      result: "reader",
+      outboxRowId: "outbox-s1-02-sam-1",
+      reader: "owner",
+      from: "signUpLine",
+      roleId: null,
+    });
+    // Tomás holds no role at the barbershop and A5-05 is on section 5: refused, never read as the customer by the line.
+    expect(fromFixture(tomas, "request.recipient")).toEqual({ personId: "person-tomas", roles: [] });
+    expect([fromFixture(tomas, "request.section"), fromFixture(tomas, "request.lineTo")]).toEqual([
+      5,
+      "cust",
+    ]);
+    expect(fromFixture(tomas, "outcome")).toEqual({
+      error: "noReader",
+      outboxRowId: "outbox-a5-05-tomas-1",
+      why: "noRole",
+    });
+    // The same row with Sam's owner role: read by the role, though the line would read him as the owner too.
+    expect(fromFixture(owner, "outcome")).toEqual({
+      result: "reader",
+      outboxRowId: "outbox-s1-02-sam-1",
+      reader: "owner",
+      from: "roles",
+      roleId: "role-sam-barber",
+    });
+    expect(differences(fromFixture(noRole, "request"), fromFixture(owner, "request"))).toEqual([
+      "recipient.roles",
+    ]);
+    expect(differences(fromFixture(noRole, "outcome"), fromFixture(owner, "outcome"))).toEqual([
+      "from",
+      "roleId",
+    ]);
+  });
+
+  for (const { name, fault, rule, putRight } of SIGN_UP_CASES) {
+    it(`refuses ${name} by rule ${String(rule)} alone; with its outcome put right, it is accepted`, () => {
+      const twin = fixture(noRole);
+      const faulty = changed(twin, fault);
+      expect(differences(twin, faulty), "the case is its accepted twin with one fault").toEqual(
+        fault.map((change) => change.at),
+      );
+      expect(exchange(faulty), "the case as it stands").toBe(false);
+      expect(rulesBroken(faulty), "the one rule its fault breaks").toEqual([rule]);
+      expect(fromFixture(noRole, "outcome"), "still read as the owner by the line").toEqual(
+        valueAt(faulty, "outcome"),
+      );
+      const right = changed(faulty, putRight);
+      expect(exchange(right), `put right: ${formatErrors(exchange.errors).join("; ")}`).toBe(true);
+      expect(rulesBroken(right)).toEqual([]);
+    });
+  }
+
+  it("has the rule check fire: the accepted twin breaks none, and the two refused fixtures each break their own", () => {
+    expect(rulesBroken(fixture(noRole))).toEqual([]);
+    expect(rulesBroken(fixture("invalid/refuse-row-reader-role-read-by-line.json"))).toEqual([0]);
+    expect(rulesBroken(fixture("invalid/refuse-row-reader-no-role-outside-section-1.json"))).toEqual([2]);
+    // A case put right by a wrong reader is still refused, by the same rule.
+    const cust = must(SIGN_UP_CASES[2]);
+    const wrong = changed(changed(fixture(noRole), cust.fault), [{ at: "outcome.reader", to: "staff" }]);
+    expect(rulesBroken(wrong)).toEqual([cust.rule]);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// 6. v1.7's openChatOnText: each answer and its entry named by the request's text (README item 46; T-1214)
+
+/** The fields of a phone.chat_opened entry that name its text (chatOpenedEvent; K-08 v1 why.provider_event). */
+interface ChatOpenedEntry {
+  id: string;
+  rowId: string;
+  why: { provider_event: { provider: string; event_id: string } };
+}
+
+/**
+ * README item 46 ("The transaction" step 4, "The entry"): each answer names the request's handle, and the
+ * phone.chat_opened entry an answer appends is the request's text's: its id '<event id>/chat-opened', its row the
+ * request's handle (K-08 v1 default 3) and its why Linq's event, the request's. The schema leaves these to code, as it
+ * leaves a claim entry's id (item 33; chatOpenedEvent's description).
+ */
+export function chatEntryProblems(exchange: Exchange): string[] {
+  if (exchange.call !== "openChatOnText") return [];
+  const { request, outcome } = exchange;
+  const problems: string[] = [];
+  const handleId = String(request.handleId);
+  if (typeof outcome.handleId === "string" && outcome.handleId !== handleId) {
+    problems.push(`the answer names the handle ${outcome.handleId}, not ${handleId}`);
+  }
+  if (!isRecord(outcome.event)) return problems;
+  const event = outcome.event as unknown as ChatOpenedEntry;
+  const eventId = String(request.eventId);
+  const rule = `${eventId}/chat-opened`;
+  if (event.id !== rule) problems.push(`the chat-opened entry is ${event.id}, not ${rule}`);
+  if (event.rowId !== handleId)
+    problems.push(`the chat-opened entry names the row ${event.rowId}, not ${handleId}`);
+  if (event.why.provider_event.event_id !== eventId) {
+    problems.push(`the chat-opened entry's why is ${event.why.provider_event.event_id}, not ${eventId}`);
+  }
+  return problems;
+}
+
+describe("data-access v1.7: openChatOnText's answer and its entry are the request's text's, as README item 46 says", () => {
+  const opens = acceptedEntries.filter((entry) => exchangeOf(entry.file).call === "openChatOnText");
+
+  it("names each answer's handle, and each chat-opened entry by the request's event and handle: its id, row and why", () => {
+    expect(opens.length).toBeGreaterThan(0);
+    for (const entry of opens) expect(chatEntryProblems(exchangeOf(entry.file)), entry.file).toEqual([]);
+    const appending = opens
+      .map((entry) => exchangeOf(entry.file).outcome)
+      .filter((outcome) => isRecord(outcome.event))
+      .map((outcome) => String(outcome.result));
+    expect(
+      [...new Set(appending)].sort(),
+      "the answers that append an entry, each shown: an insert and an opening",
+    ).toEqual(["inserted", "opened"]);
+    // The refused opening of Ben T.'s stopped chat names its entry by rule: it is refused for its stopped alone (part 2).
+    expect(chatEntryProblems(exchangeOf("invalid/refuse-open-chat-stopped-number.json"))).toEqual([]);
+  });
+
+  it("has the check fire on a damaged copy: another handle, another entry id, another row, another event", () => {
+    const first = exchangeOf("open-chat-first-text-sam.json");
+    expect(chatEntryProblems(first)).toEqual([]);
+    first.outcome.handleId = "handle-alex";
+    const event = first.outcome.event as ChatOpenedEntry;
+    event.id = "evt-sam-s1-02/chat-opened";
+    event.rowId = "handle-alex";
+    event.why.provider_event.event_id = "evt-sam-s1-02";
+    expect(chatEntryProblems(first)).toEqual([
+      "the answer names the handle handle-alex, not handle-sam",
+      "the chat-opened entry is evt-sam-s1-02/chat-opened, not evt-sam-s1-01/chat-opened",
+      "the chat-opened entry names the row handle-alex, not handle-sam",
+      "the chat-opened entry's why is evt-sam-s1-02, not evt-sam-s1-01",
+    ]);
+    const email = exchangeOf("open-chat-apple-id-email.json");
+    email.outcome.handleId = "handle-sam";
+    expect(chatEntryProblems(email)).toEqual([
+      "the answer names the handle handle-sam, not handle-sam-email",
+    ]);
   });
 });
 
@@ -1327,7 +1835,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "C-151 migrating K-07's schema addition",
     ],
     needs:
-      "02-contracts K-05 \"Contract test\" and section 2 item 12, against local PostgreSQL with K-04 v1 migrated (K-07 v1's schema addition with it for v1.1, migrated by C-151; K-29 v1 and the other parts' seeds for v1.2's reads): each accepted fixture's request, run after its given (its k04Seeds and partSeeds loaded, each with its own after chain; its after exchanges run first, in order; the database's now() at given.now), gives its outcome, commitSeq values compared by their order, not their numbers; each refused fixture is refused and nothing is written; 1,000 parallel reserve calls on one slot give exactly one success (BP section 10, card T-041); a repeated commit writes nothing twice; parallel claims never hand one row to two senders. The README plans v1.1's database side as T-116 and v1.2's as T-478, on the database engineer's builds of C-152 (T-219 readTurnState; T-220 handleTargets, sendState and handleSealingKey; T-667 the setup-part facts readTurnState reads; and the tasks that build claimOutbox's port, markPart by key, renewClaim's phone read and the claim entries): 50 parallel first sights of one number give one handle, one person and one key (T-220); readTurnState with businessId null returns no row that has a business, a booking, a role, a pause, an open question or a consent row of a business included (T-219, T-478); and T-478 seeds a private booking, a deceased booking and a paused row, which no fixture sets, so sendState's record flags are tested.",
+      "02-contracts K-05 \"Contract test\" and section 2 item 12, against local PostgreSQL with K-04 v1 migrated (K-07 v1's schema addition with it for v1.1, migrated by C-151; K-29 v1 and the other parts' seeds for v1.2's reads): each accepted fixture's request, run after its given (its k04Seeds and partSeeds loaded, each with its own after chain; its after exchanges run first, in order; the database's now() at given.now), gives its outcome, commitSeq values compared by their order, not their numbers; each refused fixture is refused and nothing is written; 1,000 parallel reserve calls on one slot give exactly one success (BP section 10, card T-041); a repeated commit writes nothing twice; parallel claims never hand one row to two senders. The README plans v1.1's database side as T-116 and v1.2's as T-478, on the database engineer's builds of C-152 (T-219 readTurnState; T-220 handleTargets, sendState and handleSealingKey; T-667 the setup-part facts readTurnState reads; and the tasks that build claimOutbox's port, markPart by key, renewClaim's phone read and the claim entries): 50 parallel first sights of one number give one handle, one person and one key (T-220); readTurnState with businessId null returns no row that has a business, a booking, a role, a pause, an open question or a consent row of a business included (T-219, T-478); and T-478 seeds a private booking, a deceased booking and a paused row, which no fixture sets, so sendState's record flags are tested. v1.3's three turn-face reads (T-1138, db/repo/turn-face-reads.ts: readOpenHolds as rosie_app, readOutboxRow and readFixedLineFacts as rosie_job after requireBusinessScope()) and v1.4's seven safety reads (T-1161, db/repo/safety-reads.ts: the record reads and the zone as rosie_app, readBusinessOwner as rosie_job) run in data-access.v1.db-side.test.ts (T-1169): every v1.3 and v1.4 fixture, selected by its version, through db/repo in its role against local PostgreSQL, each accepted request giving its outcome, valid at its own version; each refused request refused before any statement reaches the database; each refused answer answered put right in its twin's state. v1.5 adds no database call. v1.6's businessSensitive on readOutboxRow (T-1197, db/repo/turn-face-reads.ts: company_kinds' two switch lists read in the call's own transaction as rosie_job under the row's business, true, false or null by README item 45) runs there too (T-1199): its three fixtures through db/repo, the practice's five rows written as its note lists them, since no frozen seed holds a sensitive kind of work; each earlier readOutboxRow answer is its fixture's outcome with businessSensitive null and nothing else changed (no seed of an earlier exchange holds a kind of work), valid at v1.6's readOutboxRow.v1dot6Response; and readOutboxRow.v1dot6Response is a refused answer's definition. v1.7's openChatOnText (T-1212, db/repo/chat-open.ts: item 46's one transaction as rosie_job with no business scope, a number's phone row and its one phone.chat_opened entry) runs there too (T-1214): every v1.7 fixture through db/repo after its given (Dee W.'s after v1.1's commit, plan, claim and waiting chat, each through db/repo, the claim answered as v1.2 answers it, each row's port added by its channel, never a field dropped), each accepted request giving its outcome, valid at v1.7, the row an answer gives and the one entry it appends being what the tables then hold, and nothing written where it appends none; each refused request refused before any statement reaches the database; and refuse-open-chat-stopped-number's text, in its own given, answered as its twin open-chat-ben-stopped answers it, nothing written. v1.8's sendState with item 47's fromContact and bookingId (T-1216, db/repo/send-state.ts: the covering texts consent row picked as v1.2 picks it, by default 35, then its channel, turn_id, handle_id and booking_id and its turn's handle_id, read in sendState's one read-only transaction as rosie_job with no business scope) runs there too (T-1218): every v1.8 fixture through db/repo after its given, the chains running v1's reserve, plan and claim steps as well as commitTurn, each answering its own fixture's outcome (the claim through K-05 v1's own claimOutbox, which answers v1's claimed rows, and after the held reserve the saved-time clock row item 8 gives it, which db/repo's reserve does not write yet); each accepted request giving its outcome, valid at v1.8, each sendState answer valid at sendState.v1dot8Response, fromContact and bookingId always stated; and each refused answer (who gave the yes left out, its booking left out, a STOP read as the person's own yes) answered put right in its twin's state. v1.9's markPart with item 48's repeatedDelivery (T-1227, db/repo/outbox.ts markPartV12: on a delivery receipt that repeats a recorded delivery, whether that delivery was the row's first, no other part try of the row holding an earlier delivered_at and a tie counting as first, and the part try's stored delivered_at, read in the mark's one transaction as rosie_job with no business scope from the part tries it locks, nothing written; null on every other answer) runs there too (T-1232): every v1.9 fixture through db/repo after its given, the chains running v1's commitTurn and v1.2's plan, claim, marks and armClock, each answering its own fixture's outcome (an earlier mark as v1.9 answers it, its outcome with repeatedDelivery null and nothing else changed); each accepted request giving its outcome, valid at v1.9 as a markPart.exchange, each answer valid at markPart.v1dot9Response, repeatedDelivery and row always stated; a repeat writing nothing, and the delivery it names being the part try's as the tables hold it; each refused answer (what a repeat repeats left out, a repeat that says firstDelivery) answered put right in its twin's state; and refuse-mark-delivered-repeat-null's receipt, in its own given, answered as its twin mark-a7-03-poll-delivered-repeat answers it, nothing written.",
   },
   {
     id: "consumer-action-layer",
@@ -1341,9 +1849,13 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "C-109 effects runner",
       "C-112 reconciliation job",
       "C-074 Tool API turn face",
+      "C-090 compose input",
+      "C-093 the finalize call",
+      "C-089 the fixed-line inserter",
+      "C-104 the safety and hand-offs service",
     ],
     needs:
-      "Accepts every valid fixture and refuses every invalid one, each at the newest frozen minor version its task needs: the commit sends one commitTurn per turn, takes versionChanged and reservationLost as limits 4 and 5 and a repeat as the first commit, and from v1.1 writes its effects and the waiting rows it ends (C-087); reserve, release and extend as the reservation and saved-time rules use them: at most two saved times, a third refused with each one's end, the next in line promoted with its own saved-time clock row, one extension and never for the customer's own AI (C-100, C-134); the effects runner claims, records each try with its effect.result entry and runs an effect in outage once more after serviceBack on the same key, with the claim entries from v1.2 (C-109, at least v1.1); the reconciliation writes only a stripe_refund (C-112, at least v1.1); the frontier and the Tool API turn face read readTurnState under one business, unknownFact and notFound failing closed (C-075, C-074: T-315).",
+      "Accepts every valid fixture and refuses every invalid one, each at the newest frozen minor version its task needs: the commit sends one commitTurn per turn, takes versionChanged and reservationLost as limits 4 and 5 and a repeat as the first commit, and from v1.1 writes its effects and the waiting rows it ends (C-087); reserve, release and extend as the reservation and saved-time rules use them: at most two saved times, a third refused with each one's end, the next in line promoted with its own saved-time clock row, one extension and never for the customer's own AI (C-100, C-134); the effects runner claims, records each try with its effect.result entry and runs an effect in outage once more after serviceBack on the same key, with the claim entries from v1.2 (C-109, at least v1.1); the reconciliation writes only a stripe_refund (C-112, at least v1.1); the frontier and the Tool API turn face read readTurnState under one business, unknownFact and notFound failing closed (C-075, C-074: T-315). From v1.3 the Tool API turn face (C-074) binds, in T-1141, readOpenHolds behind the commit's openHolds, naming the turn's unread texts and cutting each hold to K-09 safetyHold's three fields (C-087), readOutboxRow behind compose input's and finalize's readRow, refusing a row whose line is null and in finalize a question with no clock row, the flow read by item 35's rule (default 53), the words of answered texts only those the runtime hands in (C-090, C-093: T-313's port), and readFixedLineFacts behind the fixed-line inserter's readFixedLines (C-089: T-314's port), mapping fixedLineRow to the call's fixed-line refusal. From v1.4 the safety and hand-offs service (C-104, T-318) reads the seven safety reads as its SafetyReader through runCore (C-087, T-1140), bound by T-1141 on the call's own transaction and business, each answer handed on in the port's own shape, notFound, moreThanOneOwner and transient mapped to a thrown error that fails closed, never to null or false, and arrivedAt answering null until T-1155. From v1.5 compose input's ComposeRow.role and finalize's FinalizeRow.reader map the reader by item 44 exactly as the rowReader fixtures read (T-1141's round 2): a held role first; with none, the line's audience only for a person on a section 1 step whose line goes to owner, staff or cust; noReader otherwise, never written, cached or passed on as a role. From v1.6 the same row ports fill SlotSource.sensitive from readOutboxRow's businessSensitive for a row about no booking (C-074, C-090, C-093: T-1190): null and a missing field read as on, only false is off, a row about a booking stays on, and a read that fails fails the call, never read as off (README item 45, default 67).",
   },
   {
     id: "consumer-runtime",
@@ -1364,7 +1876,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "C-046 actor",
     ],
     needs:
-      "Accepts every valid fixture and refuses every invalid one: the bundle pin reads the active bundle and a value on a KV miss, with the actor and the frontier from the Tool API (C-050, C-046: T-557); clock rows arm at the first delivery receipt, the alarm and the sweep read the due rows, and each fires once, with a firing's effects (C-054, C-055); the dispatcher claims each recipient's rows in commit order, renews before each part, marks parts and rows, gives up after 15 minutes with the next way or the owner's number and writes the one all set, reading the claimed row's port and renewClaim's recipient, and treats a renewal with no recipient as unreadable and sends nothing, never as not stopped (C-124, C-125, C-126, C-127: T-562); a third crash before the commit parks the turn (C-180); the gateway records a provider event once and takes a handle's key from handleSealingKey as a key object that cannot be exported, never as bytes, as the actor does to open the sealed texts, with newHandleId and newPersonId new on every call, never built from the address (C-044, C-046: T-553); the outage paths call serviceBack (C-174 to C-176); the guard maps handleTargets to its targets (C-051: T-556).",
+      "Accepts every valid fixture and refuses every invalid one: the bundle pin reads the active bundle and a value on a KV miss, with the actor and the frontier from the Tool API (C-050, C-046: T-557); clock rows arm at the first delivery receipt, the alarm and the sweep read the due rows, and each fires once, with a firing's effects (C-054, C-055); the dispatcher claims each recipient's rows in commit order, renews before each part, marks parts and rows, gives up after 15 minutes with the next way or the owner's number and writes the one all set, reading the claimed row's port and renewClaim's recipient, and treats a renewal with no recipient as unreadable and sends nothing, never as not stopped (C-124, C-125, C-126, C-127: T-562); a third crash before the commit parks the turn (C-180); the gateway records a provider event once and takes a handle's key from handleSealingKey as a key object that cannot be exported, never as bytes, as the actor does to open the sealed texts, with newHandleId and newPersonId new on every call, never built from the address (C-044, C-046: T-553); the outage paths call serviceBack (C-174 to C-176); the guard maps handleTargets to its targets (C-051: T-556). From v1.7 the gateway calls openChatOnText at receipt, once for each text or photo from a phone handle, after handleSealingKey and before the actor's accept, with the key call's handle id and the event's id, service, receivedAt and trace, never the number and never for an email handle, a reaction, a vote, an edit or a receipt; it answers 503 on transient, nothing stored, and stores the text on notFound or notAPhone (C-044: T-1213); the dispatcher's chat check and limit 8 then find that number's chat open, with nothing of theirs to change (C-124, C-125). From v1.8 the dispatcher's send-state port (runtime/src/wiring/real.ts sendStateOf, T-562) maps textsConsent's fromContact and bookingId across unchanged when the answer holds them and leaves them out when it does not, never deriving stopped, or its end, from textsConsent (STATE note 10); limit 8 reads them as its yesAfterStop does: a yes lifts a stop for a row only when fromContact is true and the yes is newer than the stop, for every row when it names no business (START), else only for a row about the booking it names, and a missing field is not known and lifts nothing; through the port and limit 8, send-state-stop-row and send-state-own-yes-one-booking drop their row, and send-state-business-yes and send-state-own-start let it on to the other checks (C-124, C-125: T-1217). From v1.9 the dispatcher's receipt handling (runtime/src/dispatch/dispatcher.ts handleDeliveryReceipt, over the outbox port runtime/src/wiring/real.ts realOutbox, which maps repeatedDelivery across unchanged, as it maps row) hands a delivered mark to the clock arming when firstDelivery is true, as before, or when it is repeated and repeatedDelivery.firstOfRow is true, as a first delivery delivered at repeatedDelivery.deliveredAt, named by the answer's row, part, try and openQuestionId, never by the receipt; and nothing otherwise: a repeat of a later part's delivery, repeatedDelivery null, or an answer without the field, so a missing field is never read as a first delivery; through the port and the receipt handling, mark-a7-03-delivered-repeat arms the clock once, at the stored time, by arm-clock-a7-03-after-4006's request, and mark-a7-03-poll-delivered-repeat hands nothing on (C-124, C-055: T-1228).",
   },
   {
     id: "consumer-release",
@@ -1389,6 +1901,23 @@ const sectionStart = readme.indexOf("## Producers and consumers");
 const sectionEnd = readme.indexOf("\n## ", sectionStart + 1);
 const section = readme.slice(sectionStart, sectionEnd < 0 ? undefined : sectionEnd);
 const sectionLines = section.split("\n");
+
+/**
+ * A version's own list of consumers, the README's "### Consumers of <version>" (v1.3 on), up to the next heading, or ""
+ * for a version with none. The section's line for that version points to it: "Section "v1.3", "Consumers of v1.3",
+ * lists every consumer port with what each must hold to; that list joins this section with QA's v1.3 contract test task".
+ * Until the architect moves it there, this file reads it where it stands, as part of the section.
+ */
+function consumersListOf(version: string): string {
+  const heading = `\n### Consumers of ${version}\n`;
+  const start = readme.indexOf(heading);
+  if (start < 0) return "";
+  const rest = readme.slice(start + heading.length);
+  const end = rest.search(/\n#{2,3} /);
+  return end < 0 ? rest : rest.slice(0, end);
+}
+/** The section with each written-for version's own list of consumers: every producer and consumer the README names. */
+const producersAndConsumers = [section, ...WRITTEN_FOR.map(consumersListOf)].join("\n");
 
 /** The index of the parenthesis that closes the one opened at `open`. */
 function closingParen(text: string, open: number): number {
@@ -1466,6 +1995,41 @@ function consumerGroups(version: string): OwnerGroup[] {
   });
 }
 
+const LIST_BULLET = /^- \*\*([^*]+)\*\*(.*)$/;
+
+/**
+ * A version's own list of consumers (consumersListOf) as owner groups: each bullet whose bold name is an owner, such as
+ * "- **Action-layer engineer:** C-087 ..." or "- **Database engineer**, the producer: C-152 ...", the owner in lower
+ * case; a bullet that names a task ("- **T-1141** names ...", what a consumer must hold to) is not a group.
+ */
+function listGroups(version: string): OwnerGroup[] {
+  return consumersListOf(version)
+    .split("\n")
+    .flatMap((line) => {
+      const match = LIST_BULLET.exec(line);
+      if (match === null) return [];
+      const owner = must(match[1]).replace(/:$/, "").toLowerCase();
+      return /^T-\d+$/i.test(owner) ? [] : [{ owner, text: must(match[2]) }];
+    });
+}
+
+/** A version's owner groups: its own list of consumers when it has one (v1.3 on), else its line of the section. */
+const groupsOf = (version: string): OwnerGroup[] =>
+  consumersListOf(version) === "" ? consumerGroups(version) : listGroups(version);
+
+/** "the <owner>'s C-xxx" in a version's line of the section: each component the line ties to an owner by name. */
+function ownedMentions(version: string): { owner: string; id: string }[] {
+  const lead = `- **${version}'s consumers**`;
+  const line = must(
+    sectionLines.find((text) => text.startsWith(lead)),
+    `the README's ${lead} line`,
+  );
+  return [...line.matchAll(/\bthe ([a-z][a-z-]*(?: [a-z][a-z-]*)*)'s (C-\d{3})/g)].map((match) => ({
+    owner: must(match[1]),
+    id: must(match[2]),
+  }));
+}
+
 /** Each "**Producer:** <owner>: <components>" or "<owner>, <components>" note of the section, to its clause's end. */
 function producerNotes(): OwnerGroup[] {
   const mark = "**Producer:** ";
@@ -1524,41 +2088,79 @@ describe("data-access sides: the list where each producer and consumer side is a
     }
   });
 
+  it("reads each version's own list of consumers that the section points to, with the section", () => {
+    for (const version of WRITTEN_FOR) {
+      const line = must(
+        sectionLines.find((text) =>
+          text.startsWith(version === "v1" ? "- **Consumers**" : `- **${version}'s consumers**`),
+        ),
+        `the README's consumers line of ${version}`,
+      );
+      const pointed = line.includes(`"Consumers of ${version}"`);
+      expect(consumersListOf(version) !== "", `${version}: its line points to its own list`).toBe(pointed);
+    }
+    expect(
+      WRITTEN_FOR.filter((version) => consumersListOf(version) !== "").length,
+      "the versions with a list of their own",
+    ).toBeGreaterThan(0);
+  });
+
   it("names every component the README's producers and consumers name, and no other", () => {
     expect(sectionStart).toBeGreaterThan(-1);
-    const named = new Set(componentIds(section));
+    const named = new Set(componentIds(producersAndConsumers));
     expect(named.size).toBeGreaterThan(20);
     expect([...new Set(SIDE_CHECKS.flatMap(held))].sort()).toEqual([...named].sort());
+    for (const id of ["C-089", "C-090", "C-093", "C-104"]) expect([...named], id).toContain(id);
   });
 
   it("spells each side's owner and components as the README does", () => {
     for (const side of SIDE_CHECKS) {
       expect(section, side.id).toContain(side.owner);
-      for (const component of side.components) expect(section, side.id).toContain(component);
+      for (const component of side.components) expect(producersAndConsumers, side.id).toContain(component);
     }
   });
 
-  it("puts each component under its own owner, in each version's consumers line and each producer note", () => {
+  it("puts each component under its own owner, in each version's consumers line or list and each producer note", () => {
+    const allHeld = SIDE_CHECKS.flatMap(held);
     for (const version of WRITTEN_FOR) {
-      const groups = consumerGroups(version);
+      const groups = groupsOf(version);
       expect(groups.length, version).toBeGreaterThan(0);
       for (const group of groups) {
         const ids = componentIds(group.text);
         // v1.2's line lists the database engineer's own builds of C-152, the producer's component.
         const side = sideOf("consumer", group.owner) ?? sideOf("producer", group.owner);
-        if (side === undefined) {
+        if (side !== undefined) {
+          for (const id of ids) expect(held(side), `${version}: ${group.owner}`).toContain(id);
+        } else if (group.owner.toLowerCase() === "qa") {
+          // QA's own list line names the components its contract test adds to this side list.
+          for (const id of ids) expect(allHeld, `${version}: QA adds ${id} to the side list`).toContain(id);
+        } else {
           expect(ids, `${version}: ${group.owner} names tasks only`).toEqual([]);
-          continue;
         }
-        for (const id of ids) expect(held(side), `${version}: ${group.owner}`).toContain(id);
+      }
+      if (consumersListOf(version) === "") continue;
+      // From v1.3 the section's line names each owner's component in prose: "the action-layer engineer's C-087".
+      const mentions = ownedMentions(version);
+      expect(mentions.length, `${version}: the section's line ties components to owners`).toBeGreaterThan(0);
+      for (const { owner, id } of mentions) {
+        const side = must(
+          sideOf("consumer", owner) ?? sideOf("producer", owner),
+          `${version}: the side of ${owner}`,
+        );
+        expect(held(side), `${version}: the ${owner}'s ${id}`).toContain(id);
       }
     }
-    const owners = WRITTEN_FOR.flatMap((version) => consumerGroups(version).map((group) => group.owner));
+    const owners = WRITTEN_FOR.flatMap((version) => groupsOf(version).map((group) => group.owner));
     for (const side of SIDE_CHECKS.filter((each) => each.side === "consumer")) {
       expect(owners, `${side.id}'s owner is a consumer the README names`).toContain(side.owner);
     }
     const notes = producerNotes();
-    expect(notes.length).toBeGreaterThanOrEqual(WRITTEN_FOR.length);
+    const listedProducer = WRITTEN_FOR.filter(
+      (version) =>
+        consumersListOf(version) !== "" &&
+        listGroups(version).some((group) => group.owner === producer.owner),
+    );
+    expect(notes.length + listedProducer.length).toBeGreaterThanOrEqual(WRITTEN_FOR.length);
     for (const note of notes) {
       expect(note.owner).toBe(producer.owner);
       for (const id of componentIds(note.text)) expect(held(producer), note.text).toContain(id);
@@ -1568,7 +2170,7 @@ describe("data-access sides: the list where each producer and consumer side is a
   it("carries in each side's needs every task the README names for it, and covers here the fixture parts it says", () => {
     const allNeeds = SIDE_CHECKS.map((side) => side.needs).join(" ");
     for (const version of WRITTEN_FOR) {
-      for (const group of consumerGroups(version)) {
+      for (const group of groupsOf(version)) {
         const side = sideOf("consumer", group.owner) ?? sideOf("producer", group.owner);
         for (const task of taskIds(group.text)) {
           if (COVERED_HERE.includes(task)) continue;
@@ -1579,10 +2181,13 @@ describe("data-access sides: the list where each producer and consumer side is a
     for (const note of producerNotes()) {
       for (const task of taskIds(note.text)) expect(producer.needs, task).toContain(task);
     }
-    const named = WRITTEN_FOR.flatMap((version) =>
-      consumerGroups(version).flatMap((group) => taskIds(group.text)),
-    );
+    const named = WRITTEN_FOR.flatMap((version) => groupsOf(version).flatMap((group) => taskIds(group.text)));
     for (const task of COVERED_HERE) expect(named, task).toContain(task);
+    // The producer's database side of v1.3, v1.4, v1.6, v1.7, v1.8 and v1.9 names the builds it runs, beside this file.
+    for (const task of ["T-1138", "T-1161", "T-1197", "T-1212", "T-1216", "T-1227"]) {
+      expect(producer.needs, task).toContain(task);
+    }
+    expect(producer.needs).toContain("data-access.v1.db-side.test.ts");
   });
 
   for (const side of SIDE_CHECKS) {

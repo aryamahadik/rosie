@@ -63,6 +63,15 @@ export interface CollectedTrace {
   readonly problems: readonly string[];
 }
 
+/** How a trace is checked against K-08 v1: its problem lines, by place and rule, never a value; empty when it passes. */
+export type TraceCheck = (trace: Trace) => readonly string[];
+
+/**
+ * K-08 v1's `trace` definition, by Ajv's compiler over the schemas read from contracts/ (./contracts): Node only. Inside
+ * workerd, where Ajv's compiler cannot run and contracts/ is not on disk, a caller gives a prebuilt check (T-1149).
+ */
+export const k08TraceCheck: TraceCheck = (trace) => schemaProblems(K08, "trace", trace);
+
 function lastLabel(spans: readonly Span[], pick: (span: Span) => string | null | undefined): string | null {
   for (const span of [...spans].reverse()) {
     const value = pick(span);
@@ -74,12 +83,14 @@ function lastLabel(spans: readonly Span[], pick: (span: Span) => string | null |
 /**
  * The trace of `traceId` from `spans`: its spans in seq order, with the trace's own fields read from them (the bundle
  * id from the first span; the turn, handle and job as the spans name them; the other texts' traces a batch joined,
- * CQ-06). `openedBy` is read from the first hop when K-08 names one for it, else taken as given.
+ * CQ-06). `openedBy` is read from the first hop when K-08 names one for it, else taken as given. The trace is checked
+ * with `check`: by default K-08 v1's `trace`, by Ajv's compiler (k08TraceCheck).
  */
 export function traceOf(
   traceId: string,
   spans: readonly Span[],
   openedBy: Trace["opened_by"] = "textWebhook",
+  check: TraceCheck = k08TraceCheck,
 ): CollectedTrace {
   const own = spans.filter((span) => span.trace_id === traceId).sort((a, b) => a.seq - b.seq);
   const [first] = own;
@@ -96,7 +107,7 @@ export function traceOf(
     joined_trace_ids: Array.isArray(joined) ? [...joined] : [],
     spans: [first, ...own.slice(1)],
   };
-  return { trace, problems: schemaProblems(K08, "trace", trace) };
+  return { trace, problems: [...check(trace)] };
 }
 
 /** Reads `value` as a K-08 v1 trace document; throws with the schema's problem lines when it is not one. */

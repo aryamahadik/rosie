@@ -1,0 +1,31 @@
+{
+  "call": "bookingConfirm",
+  "given": {
+    "now": "2026-10-21T23:16:08Z",
+    "environment": "staging",
+    "after": [
+      "booking-page-start.json",
+      "booking-service-haircut.json",
+      "booking-place-confirm.json",
+      "booking-who-for-confirm.json",
+      "booking-reach-read-back.json"
+    ],
+    "note": "Alex's yes to the reach card's read-back: the page entry calls K-09 v1.2 setReachWay alone (caller.kind page, personId null), way texts with the mobile kept with the read-back, as tool-api/fixtures/j4-reach-card-agent.json does for his bound AI: the mobile becomes the new booker's own handle with its contacts/add effect (Q-03), and with no K-28 row yet the way is kept with requestRef (K-09 v1.2 README default 57). Gives reach_by. The answer is the way alone: never the handles, the effect or written, which differ when Rosie already knew a number (K-09 v1.2 setReachWay.response.effects; RULES 4.9, 6.5)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0018",
+      "traceId": "trace-page-lees-0018",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "readBackId": "rb-page-lees-reach-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-lees-reach-1",
+    "yesEventId": "pageyes-lees-reach-1",
+    "served": { "change": "reach", "way": "texts" }
+  }
+}

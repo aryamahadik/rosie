@@ -5,6 +5,11 @@
 // its JSON body) and the port's check answers it (K-16 `verifyNotification`: the adapters check each verifier, an HMAC
 // under CALENDAR_PUSH_SECRET, and name each provider event); the door holds no secret. Answers, after T-241's rules
 // (../answer.ts, ./common.ts):
+// - 413, nothing checked or stored: a body over the door's cap (T-1195; ../body.ts; ProviderDoors.calendarBodyLimitBytes,
+//   CALENDAR_BODY_LIMIT_BYTES by default), at Google's door and Graph's, refused before it is read whole and before the
+//   push is read or checked, with nothing logged but the span, as the page entry and the Linq webhook refuse theirs
+//   (T-1180). Google's push and Graph's handshake carry no body (K-16 spike rows 2 and 9), so only Graph's notifications
+//   use what is read; every other answer comes in the order it came before the cap, from the same headers, clock and text;
 // - 200, text/plain, the token: Graph's handshake (K-16 spike row 9), nothing stored;
 // - 401, nothing stored: a push the door cannot read into K-16's request, and every rejection the port gives (a verifier
 //   that does not match, a push it cannot read);
@@ -20,6 +25,7 @@
 
 import { isLabel, type Provider, type SpanFacts } from "../../trace";
 import { logFailure, openWebhookTrace, readBundleId, respond, type WebhookEnvironment } from "../answer";
+import { bodyLimitOf, readCappedText, type BodyRead } from "../body";
 import {
   answerOf,
   dropped,
@@ -30,6 +36,7 @@ import {
   recordOnce,
   refused,
   scrubPayload,
+  tooLarge,
   unreadableBody,
   written,
   type Verdict,
@@ -48,6 +55,16 @@ import type {
 
 /** The two calendar providers, each with its own door (K-16 v1: "One interface with two adapters"). */
 export type CalendarSource = "google" | "microsoft";
+
+/**
+ * The calendar doors' cap in bytes: 256 KiB, the Stripe door's and the Linq webhook's (T-1201; T-1195 had 64 KiB). K-16's
+ * spike findings from Google's and Microsoft's documents give no size (rows 2, 9 to 11). Google's push and Graph's
+ * handshake have no body, but Graph posts several notifications in one POST with no stated count, and sends again
+ * anything answered without a 2xx for up to 4 hours (row 10): a batch over the cap would be refused on every try and then
+ * lost, a calendar change missed. Rosie asks Graph for basic notifications only; K-16's largest push (two lifecycle
+ * notices) is under 3 KB, fixture whole.
+ */
+export const CALENDAR_BODY_LIMIT_BYTES = 256 * 1024;
 
 /** K-07 v1's provider for each source's events (K-16 `calendarProviderEvent.provider`). */
 const EVENT_PROVIDER = {
@@ -326,14 +343,19 @@ export async function handleCalendarWebhook(
   return respond(answerOf(verdict), context.traceId);
 }
 
-/** The push read into K-16's request, or null when it cannot be (answered 401), or "unreadableBody" (answered 400). */
-async function pushOf(
+/**
+ * The push read into K-16's request, or null when it cannot be (answered 401), or "unreadableBody" (answered 400). Only
+ * Graph's notifications are read from the body under the cap; Google's push and Graph's handshake from the headers and
+ * the address, whatever their body held, as before the cap.
+ */
+function pushOf(
   request: Request,
   source: CalendarSource,
+  body: Exclude<BodyRead, { problem: "tooLarge" }>,
   receivedAt: string,
   traceId: string,
   onError: (stage: string, error: unknown) => void,
-): Promise<CalendarPushRequest | null | "unreadableBody"> {
+): CalendarPushRequest | null | "unreadableBody" {
   if (source === "google") return googlePushOf(request.headers, receivedAt, traceId);
   const token = new URL(request.url).searchParams.get(GRAPH_VALIDATION_TOKEN);
   if (token !== null) {
@@ -341,14 +363,12 @@ async function pushOf(
       ? null
       : { provider: "microsoft", kind: "validation", validationToken: token, receivedAt, traceId };
   }
-  let raw: string;
-  try {
-    raw = await request.text();
-  } catch (error) {
-    onError("readBody", error);
+  if ("problem" in body) {
+    onError("readBody", body.error);
     return "unreadableBody";
   }
-  return graphNotificationsOf(raw, receivedAt, traceId);
+  // The text request.text() gave before the cap (../body.ts).
+  return graphNotificationsOf(body.text, receivedAt, traceId);
 }
 
 async function decide(
@@ -360,11 +380,19 @@ async function decide(
   onError: (stage: string, error: unknown) => void,
 ): Promise<Verdict> {
   const nowMs = (deps.now ?? Date.now)();
+  // The body under its cap (../body.ts), before the push is read or checked: one over it is never read whole or checked,
+  // and nothing but the span is logged.
+  const body = await readCappedText(
+    request,
+    bodyLimitOf(deps.calendarBodyLimitBytes, CALENDAR_BODY_LIMIT_BYTES),
+  );
+  if ("problem" in body && body.problem === "tooLarge") return tooLarge();
+
   // A clock that is not a number gives no receipt time for the request: nothing is checked or stored, and the provider retries.
   if (!Number.isFinite(nowMs)) return failed("badClock");
   const receivedAt = new Date(nowMs).toISOString();
 
-  const push = await pushOf(request, source, receivedAt, traceId, onError);
+  const push = pushOf(request, source, body, receivedAt, traceId, onError);
   if (push === "unreadableBody") return unreadableBody();
   if (push === null) return refused("unreadable", { result: "rejected", stored: 0 });
   if (push.kind === "push") {

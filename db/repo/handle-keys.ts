@@ -33,6 +33,7 @@
 // is already taken answers constraint (23505); a serialization failure, a deadlock or a lost connection answers
 // transient; nothing is written on either, and the gateway answers 503 (arch 02 line 109). Nothing here logs: an
 // error carries a code and a fixed message, never a key, an address or an id.
+import { transientOrScrubbed } from "./clocks";
 import { SealingError, type WrappingKeys } from "./sealing";
 import type { Sql, Tx } from "./scope";
 import {
@@ -41,7 +42,6 @@ import {
   assertRuntimeSide,
   inRuntimeTransaction,
   type TransientError,
-  transientOrThrow,
   utc,
 } from "./targets";
 
@@ -361,6 +361,8 @@ export async function handleSealingKey(
         dataKey: null,
       };
     }
-    return { outcome: transientOrThrow(error), dataKey: null };
+    // Any other statement's own refusal and postgres.js's statement errors leave scrubbed too: the call's name and the
+    // code alone, never the statement's values, the address among them (T-1322; clocks.ts transientOrScrubbed).
+    return { outcome: transientOrScrubbed("handleSealingKey", error), dataKey: null };
   }
 }

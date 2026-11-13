@@ -65,7 +65,11 @@
 //      provider through (null in (...) is unknown), so code holds the rule until K-07's minor version (CQ-76, DL-132).
 //  10. Every time the commit writes (committed_at, closed_at, cancelled_at, armed_at, released_at, an effect's
 //      created_at, each entry's at) is one moment, the transaction's now() (the test's clock when given).
+//  11. A state write's value for a bytea column (a sealed value, such as safety_outcomes.sealed_words or a pause's
+//      address) is K-04's text form, "\x" and hex digit pairs, and is written as the bytes it spells (bytea.ts; T-1185):
+//      postgres.js would store a string's own characters. A value in any other form throws, and nothing is written.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.1";
+import { byteaFromText } from "./bytea";
 import { appendEvent, type EventEntry as LogEntry } from "./event-log";
 import { releaseIn } from "./reservations";
 import { assertBusinessId, SCOPE_SETTING, type Sql } from "./scope";
@@ -123,8 +127,11 @@ const CALENDAR_PROVIDERS = new Set(["google", "microsoft"]);
 
 /** Thrown inside the transaction to roll it back and answer one of K-05's refusals. */
 class Refused extends Error {
-  constructor(readonly answer: CommitTurnError) {
+  readonly answer: CommitTurnError;
+
+  constructor(answer: CommitTurnError) {
     super("commitTurn refused");
+    this.answer = answer;
   }
 }
 
@@ -297,9 +304,12 @@ function checkRequest(request: CommitTurnRequest): void {
 
 /** The business scope of the commit's transaction, set to each write's own business (null: the runtime side). */
 class Scope {
+  private readonly tx: Sql;
   private current: string | null = null;
 
-  constructor(private readonly tx: Sql) {}
+  constructor(tx: Sql) {
+    this.tx = tx;
+  }
 
   async to(businessId: string | null): Promise<void> {
     if (businessId === this.current) {
@@ -319,6 +329,8 @@ interface TableInfo {
   readonly name: string;
   readonly columns: ReadonlySet<string>;
   readonly jsonColumns: ReadonlySet<string>;
+  /** The columns of type bytea, whose values come in K-04's text form and are written as their bytes (default 11). */
+  readonly byteaColumns: ReadonlySet<string>;
   readonly key: readonly string[];
   readonly versioned: boolean;
   /** The column row-level security scopes the table by (K-04 rule 4), or null for a table with none. */
@@ -336,8 +348,8 @@ interface Context {
 }
 
 /**
- * A table's columns, its JSON columns, its primary key and its row-level security, from the catalog: an ordinary table
- * of this connection's search path (never one of PostgreSQL's own), or a throw. Read once per call.
+ * A table's columns, its JSON and bytea columns, its primary key and its row-level security, from the catalog: an
+ * ordinary table of this connection's search path (never one of PostgreSQL's own), or a throw. Read once per call.
  */
 async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
   const known = ctx.tables.get(table);
@@ -345,7 +357,9 @@ async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
     return known;
   }
   assertName(table, "a table name");
-  const [row] = await ctx.tx<{ rls: boolean; columns: string[]; json_columns: string[]; key: string[] }[]>`
+  const [row] = await ctx.tx<
+    { rls: boolean; columns: string[]; json_columns: string[]; bytea_columns: string[]; key: string[] }[]
+  >`
     select c.relrowsecurity as rls,
            array(select a.attname::text from pg_attribute a
                  where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
@@ -354,6 +368,10 @@ async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
                  where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
                    and a.atttypid in ('json'::regtype, 'jsonb'::regtype)
                  order by a.attnum) as json_columns,
+           array(select a.attname::text from pg_attribute a
+                 where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
+                   and a.atttypid = 'bytea'::regtype
+                 order by a.attnum) as bytea_columns,
            array(select a.attname::text
                  from pg_index i
                  cross join lateral unnest(i.indkey::int2[]) with ordinality as k(attnum, ord)
@@ -379,6 +397,7 @@ async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
     name: table,
     columns,
     jsonColumns: new Set(row.json_columns),
+    byteaColumns: new Set(row.bytea_columns),
     key: row.key,
     versioned: columns.has("version"),
     scopeColumn,
@@ -411,7 +430,29 @@ function businessOf(info: TableInfo, row: Row): string | null {
   return value;
 }
 
-/** Column to value for an insert or an update: JSON columns as JSON, the rest as PostgreSQL text input (K-05 v1). */
+/**
+ * One column's value as postgres.js takes it: null as null, a JSON column's as JSON, a bytea column's as the bytes its
+ * text form spells (default 11: any other form throws, naming the column, never the value), the rest as PostgreSQL text
+ * input (K-05 v1).
+ */
+function columnValue(ctx: Context, info: TableInfo, column: string, value: unknown, what: string): unknown {
+  if (value === null) {
+    return null;
+  }
+  if (info.jsonColumns.has(column)) {
+    return ctx.tx.json(value as Json);
+  }
+  if (info.byteaColumns.has(column)) {
+    const bytes = byteaFromText(value);
+    if (bytes === null) {
+      fail(`${what} gives ${info.name}.${column} a value that is not "\\x" and hex digit pairs`);
+    }
+    return bytes;
+  }
+  return value;
+}
+
+/** Column to value for an insert or an update, each as columnValue gives it. */
 function columnValues(ctx: Context, info: TableInfo, values: Row, what: string): Record<string, never> {
   const out: Record<string, never> = {};
   for (const [column, value] of Object.entries(values)) {
@@ -422,9 +463,7 @@ function columnValues(ctx: Context, info: TableInfo, values: Row, what: string):
     if (!info.columns.has(column)) {
       fail(`${what} names a column ${info.name} does not have`);
     }
-    out[column] = (
-      info.jsonColumns.has(column) && value !== null ? ctx.tx.json(value as Json) : value
-    ) as never;
+    out[column] = columnValue(ctx, info, column, value, what) as never;
   }
   if (Object.keys(out).length === 0) {
     fail(`${what} writes no column`);
@@ -1391,16 +1430,19 @@ function constraintOf(error: unknown): K05.ConstraintError | null {
  * never PostgresError's message, detail or query, which can hold a row's values (STATE's notes for later cards, 3).
  */
 export class CommitTurnDatabaseError extends Error {
-  constructor(
-    readonly code: string,
-    readonly table: string | null,
-    readonly constraint: string | null,
-  ) {
+  readonly code: string;
+  readonly table: string | null;
+  readonly constraint: string | null;
+
+  constructor(code: string, table: string | null, constraint: string | null) {
     const names = [
       table === null ? "" : `, table ${table}`,
       constraint === null ? "" : `, constraint ${constraint}`,
     ];
     super(`commitTurn: the database refused the commit (SQLSTATE ${code}${names.join("")})`);
+    this.code = code;
+    this.table = table;
+    this.constraint = constraint;
     this.name = "CommitTurnDatabaseError";
   }
 }
@@ -1411,19 +1453,55 @@ function nameOrNull(value: unknown): string | null {
   return typeof value === "string" && NAME.test(value) ? value : null;
 }
 
-/** A PostgreSQL error as CommitTurnDatabaseError; any other error as it is. */
+/**
+ * An error the commit throws, as it leaves this call (T-1339, as clocks.ts's scrubbed does: T-1268): PostgreSQL's
+ * refusal (a PostgresError with a SQLSTATE) as CommitTurnDatabaseError, its SQLSTATE and the names of its table and
+ * constraint; an error of the database client as a new Error that carries the call's name and the client's code alone
+ * (`call`, `code`: a plain code such as UNDEFINED_VALUE or ERR_INVALID_ARG_TYPE, or null), with no message, stack,
+ * cause or property of the original's; db/repo's own errors as they are.
+ *
+ * The client's error is never passed on. postgres.js puts the statement on every error it rejects a statement with
+ * (query, parameters, args, types, and the statement's origin on its stack), and args holds the statement's values, a
+ * row's among them: its own UNDEFINED_VALUE (a value that is undefined) and the TypeError a serializer throws for a value
+ * it cannot send (the bytea serializer's message quotes the value) carry them, and transientOrThrow lets both through as
+ * it lets a statement's refusal through. Such an error is known by those properties or by a mark of a connection
+ * (address, port, hostname, host, cert, errors, syscall, errno), which db/repo's own errors never carry; a PostgresError
+ * with no SQLSTATE goes the same way. A session's failure never reaches here: transientOrThrow throws it scrubbed.
+ */
 function scrubbed(error: unknown): unknown {
-  if (!(error instanceof Error) || error.name !== "PostgresError") {
+  if (!(error instanceof Error)) {
     return error;
   }
   const failure = error as Error & { code?: unknown; table_name?: unknown; constraint_name?: unknown };
-  if (typeof failure.code !== "string" || !SQLSTATE.test(failure.code)) {
+  if (error.name === "PostgresError" && typeof failure.code === "string" && SQLSTATE.test(failure.code)) {
+    return new CommitTurnDatabaseError(
+      failure.code,
+      nameOrNull(failure.table_name),
+      nameOrNull(failure.constraint_name),
+    );
+  }
+  const clientFields = [
+    "query",
+    "parameters",
+    "args",
+    "types",
+    "address",
+    "port",
+    "hostname",
+    "host",
+    "cert",
+    "errors",
+    "syscall",
+    "errno",
+  ];
+  if (error.name !== "PostgresError" && !clientFields.some((field) => Object.hasOwn(error, field))) {
     return error;
   }
-  return new CommitTurnDatabaseError(
-    failure.code,
-    nameOrNull(failure.table_name),
-    nameOrNull(failure.constraint_name),
+  const code =
+    typeof failure.code === "string" && /^[A-Z0-9_]{1,64}$/.test(failure.code) ? failure.code : null;
+  return Object.assign(
+    new Error(`commitTurn: the database call failed (${code === null ? "no code" : `code ${code}`})`),
+    { call: "commitTurn", code },
   );
 }
 
@@ -1452,9 +1530,11 @@ export async function commitTurn(
       return refused;
     }
     try {
-      return transientOrThrow(error);
-    } catch {
-      throw scrubbed(error);
+      return transientOrThrow(error, "commitTurn");
+    } catch (thrown) {
+      // transientOrThrow throws a session's failure already scrubbed (T-1268): that goes on as it is. What it lets
+      // through unchanged (a statement's own refusal) is scrubbed here, as before.
+      throw thrown === error ? scrubbed(error) : thrown;
     }
   }
 }

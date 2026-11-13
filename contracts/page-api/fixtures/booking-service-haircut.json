@@ -1,0 +1,48 @@
+{
+  "call": "bookingService",
+  "given": {
+    "now": "2026-10-21T23:15:20Z",
+    "environment": "staging",
+    "after": ["booking-page-start.json"],
+    "note": "A4-81 on Lee's Barbershop's booking page, after v1.1's booking-page-start.json opened Alex's request (requestRef reqref-page-lees-0011, this browser's device token). He types 'a haircut' in the service box. The page entry checks the listing code (live, barber live), finds the request by requestRef and the device token's sha256, swaps (nothing to swap), reads the words for safety first (K-09 v1 recordSafetyOutcome alone, source page: No; README default 50), then calls K-09 v1.2 matchService with caller.kind page, personId null and the booking id it keeps with requestRef, as tool-api/fixtures/j4-match-service-agent.json does for Alex's AI: one listed service fits, svc-lees-haircut, offered at the shop (flow A, $35) and at the customer's place (flow B, $75), so both ways come back with their prices and money rules as the listing shows them (v1.1 listing-barbershop.json), and the page asks the place next (A4-01). Nothing is written: the page entry keeps the service and its ways with requestRef (K-09 v1.2 README default 57; README default 46)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0012",
+      "traceId": "trace-page-lees-0012",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "service": { "asTyped": "a haircut" }
+  },
+  "outcome": {
+    "result": "matched",
+    "serviceId": "svc-lees-haircut",
+    "name": "Haircut",
+    "ways": [
+      {
+        "wayId": "way-lees-haircut-shop",
+        "place": "business",
+        "locationId": "loc-lees-barbershop-shop",
+        "price": { "words": "$35", "amount": { "cents": 3500, "currency": "USD" } },
+        "moneyLines": [
+          "When you book: a card saved for the $20 fee, nothing charged",
+          "After the visit: paid at the counter",
+          "Free to cancel up to 24 hours before; a later cancel or a no-show: the $20 fee"
+        ]
+      },
+      {
+        "wayId": "way-lees-haircut-home",
+        "place": "customer",
+        "locationId": "loc-lees-barbershop-second-shop",
+        "price": { "words": "$75 at your place", "amount": { "cents": 7500, "currency": "USD" } },
+        "moneyLines": [
+          "When you book: the full $75",
+          "Free to cancel up to 24 hours before; a later cancel or a no-show: the $20 fee"
+        ]
+      }
+    ],
+    "flow": "A"
+  }
+}

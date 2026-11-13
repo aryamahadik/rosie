@@ -14,8 +14,14 @@
 // same bundle again writes nothing new. It never switches the active bundle id and never uploads to KV: the deploy
 // script uploads the file, then switches the id (its step 3: BP 5.4; C-020). The database is DATABASE_URL's, else the
 // local one when CI is unset, in the schema DB_SCHEMA names (db/repo/client.ts); no connection string is printed.
+// The client is built inside the publish's try (T-1179), where postgres.js parses each URL it reads: a URL that does
+// not parse is thrown as a DatabaseUrlError, which holds no part of it, never as Node's ERR_INVALID_URL, whose `input`
+// holds the whole string and is printed by Node when a caller that runs publish.run directly does not catch it.
+// Once the client is built, a publish that fails prints one line, naming only its error's kind and a fixed text
+// (T-1202): the error's message and fields can name the database's host, port, user and database name.
 //
-// Exit: 0 published, or already published with the same bytes; 1 refused or failed; 2 misuse.
+// Exit: 0 published, or already published with the same bytes; 1 refused or failed; 2 misuse. A database URL that
+// does not parse is thrown, and the CLI prints its message (exit 1).
 //
 // As `compiler build` does (build.ts), the compiler's and the database's modules are loaded only when the command runs,
 // after a resolve hook that completes a relative import from a compiler .ts file with `.ts` or `/index.ts`.
@@ -69,6 +75,47 @@ class UsageError extends Error {
   override name = "UsageError";
 }
 
+/** A database URL that does not parse (T-1179): a fixed message, and no `input`, cause or other part of the URL. */
+class DatabaseUrlError extends Error {
+  override name = "DatabaseUrlError";
+}
+
+/** An error of reading a URL: Node's ERR_INVALID_URL, or the URIError of a bad % escape that postgres.js decodes. */
+function isUrlError(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) return false;
+  const { code, name } = error as { code?: unknown; name?: unknown };
+  return code === "ERR_INVALID_URL" || name === "URIError";
+}
+
+/** The error for a URL the client could not build from, naming the settings it reads (db/repo/client.ts). */
+function urlRefusal(): DatabaseUrlError {
+  const replica = process.env.DATABASE_REPLICA_URL;
+  const names =
+    replica === undefined || replica === "" ? "DATABASE_URL" : "DATABASE_URL or DATABASE_REPLICA_URL";
+  return new DatabaseUrlError(`refused: ${names} does not parse as a URL; nothing was read or written`);
+}
+
+/** A code as Node, postgres.js and PostgreSQL write one (ENOTFOUND, CONNECT_TIMEOUT, a SQLSTATE such as 28P01). */
+const PLAIN_CODE = /^[0-9A-Z][0-9A-Z_]{0,39}$/;
+/** A name as an error class has one (Error, TypeError, PostgresError). */
+const PLAIN_NAME = /^[A-Za-z][A-Za-z0-9_]{0,39}$/;
+
+/**
+ * The kind of the error a publish failed with, the only part of it its line names (T-1202): its code when that is a
+ * plain code, else its name when that is a plain name, else "unknown". Its message and its other fields are never read.
+ * They name the database's host and port (getaddrinfo ENOTFOUND <host>, connect ECONNREFUSED <address>:<port>, the
+ * hostname, address and port fields) or its user and database name (PostgreSQL's own refusals, such as 28P01 and
+ * 28000). client.redact took out only the URL, its user and its password, and from a URL Node's parser refuses (a
+ * multi-host one postgres.js reads) only the whole string.
+ */
+function failureKind(error: unknown): string {
+  if (typeof error !== "object" || error === null) return "unknown";
+  const { code, name } = error as { code?: unknown; name?: unknown };
+  if (typeof code === "string" && PLAIN_CODE.test(code)) return code;
+  if (typeof name === "string" && PLAIN_NAME.test(name)) return name;
+  return "unknown";
+}
+
 const USAGE = "usage: publish <bundle dir> [--kv <file>]";
 
 interface Given {
@@ -104,7 +151,11 @@ function fromCaller(path: string): string {
   return isAbsolute(path) ? path : resolve(process.env.INIT_CWD ?? process.cwd(), path);
 }
 
-/** The lines of a publish K-05 refused or that failed its read back (exit 1). */
+/**
+ * The lines of a publish K-05 refused or that failed its read back (exit 1). A transient answer is named by its kind as
+ * a failure's line is (T-1202), the kind being its SQLSTATE (T-1314): since T-1314, db/repo answers a database that
+ * cannot be reached (ECONNREFUSED, ENOTFOUND, CONNECT_TIMEOUT) as transient, SQLSTATE 08001, which carries no OS code.
+ */
 function refusal(outcome: Exclude<Publish.PublishOutcome, { result: "published" }>, id: string): string[] {
   if (outcome.error === "valueMismatch")
     return [
@@ -113,7 +164,7 @@ function refusal(outcome: Exclude<Publish.PublishOutcome, { result: "published" 
     ];
   if (outcome.error === "transient")
     return [
-      `PostgreSQL could not answer now (K-05: transient, SQLSTATE ${outcome.sqlstate}): nothing was written; run the publish again`,
+      `the publish failed (${outcome.sqlstate}): PostgreSQL could not answer now (K-05: transient, SQLSTATE ${outcome.sqlstate}): nothing was written; run the publish again`,
     ];
   return [
     `PostgreSQL's copy read back by bundle id is not the bundle's: ${outcome.problems.slice(0, 5).join("; ")}`,
@@ -147,21 +198,26 @@ async function run(args: string[], io: CliIo): Promise<number> {
   }
 
   const client = await loadClient();
-  const db = client.createClient({ max: 2 });
+  let db: Client.DbClient | undefined;
   let outcome: Publish.PublishOutcome;
   try {
+    db = client.createClient({ max: 2 });
     outcome = await publisher.publishBundle(db.primary, bundle, kvFile);
   } catch (error) {
+    // No client was built: its error goes to the caller as before, except that a URL error becomes one holding no part
+    // of the URL.
+    if (db === undefined) throw isUrlError(error) ? urlRefusal() : error;
     if (error instanceof publisher.PublishError) {
       io.err(`refused: ${error.message}`);
       io.err("nothing was written");
       return 1;
     }
-    const message = error instanceof Error ? error.message : String(error);
-    io.err(`the publish failed: ${client.redact(message, [client.resolvePrimaryUrl()])}`);
+    io.err(
+      `the publish failed (${failureKind(error)}): its message is not printed, since it can name the database's host, port, user or database name`,
+    );
     return 1;
   } finally {
-    await db.close();
+    await db?.close();
   }
 
   const id = `${bundle.bundleId.hash}/${String(bundle.bundleId.build)}`;

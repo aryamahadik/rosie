@@ -556,21 +556,24 @@ describe("spans", () => {
         next.trace.record({ hop: "guard", ms: 3, outcome: "ok", decided: { keyword: null, targets: 0 } });
       });
 
+      // A turn's spans, read as K-08 reads a trace, in order by seq (README "Traces"). The first to carry the turn's id
+      // is the batch span, before the lease's (trace-skeleton.json: batch at seq 4, lease at seq 5; T-1108).
       const spans = spansOf(log);
-      const ofFirst = spans.filter((span) => span.turn_id === first.turnId);
-      expect(ofFirst.map((span) => span.hop)).toEqual(["lease", "guard", "frontier"]);
-      expect(ofFirst.map((span) => span.bundle_id)).toEqual([BUNDLE_A, BUNDLE_A, BUNDLE_A]);
-      expect(ofFirst.map((span) => span.trace_id)).toEqual([firstTrace, firstTrace, firstTrace]);
-      expect(ofFirst[0]).toMatchObject({
+      const bySeq = (list: Json[]): Json[] => [...list].sort((a, b) => Number(a.seq) - Number(b.seq));
+      const ofFirst = bySeq(spans.filter((span) => span.turn_id === first.turnId));
+      expect(ofFirst.map((span) => span.hop)).toEqual(["batch", "lease", "guard", "frontier"]);
+      expect(ofFirst.map((span) => span.bundle_id)).toEqual([BUNDLE_A, BUNDLE_A, BUNDLE_A, BUNDLE_A]);
+      expect(ofFirst.map((span) => span.trace_id)).toEqual([firstTrace, firstTrace, firstTrace, firstTrace]);
+      expect(ofFirst[1]).toMatchObject({
         hop: "lease",
         outcome: "ok",
         got: { texts: 1, manifestFrom: "kv" },
         decided: { leaseSeconds: 60, bundlePinned: true, bundleKept: false, tries: 1, restart: false },
       });
-      const ofNext = spans.filter((span) => span.turn_id === next.turnId);
-      expect(ofNext.map((span) => span.hop)).toEqual(["lease", "guard"]);
-      expect(ofNext.map((span) => span.bundle_id)).toEqual([BUNDLE_B, BUNDLE_B]);
-      expect(ofNext.map((span) => span.trace_id)).toEqual([nextTrace, nextTrace]);
+      const ofNext = bySeq(spans.filter((span) => span.turn_id === next.turnId));
+      expect(ofNext.map((span) => span.hop)).toEqual(["batch", "lease", "guard"]);
+      expect(ofNext.map((span) => span.bundle_id)).toEqual([BUNDLE_B, BUNDLE_B, BUNDLE_B]);
+      expect(ofNext.map((span) => span.trace_id)).toEqual([nextTrace, nextTrace, nextTrace]);
       for (const span of [...ofFirst, ...ofNext]) expect(spanProblems(span)).toEqual([]);
     });
     // No log line holds a text's words or the phone number.

@@ -5,7 +5,7 @@
     "after": [],
     "now": "2026-10-23T22:30:00Z",
     "stated": { "step": "A7-81", "gives": [] },
-    "note": "A7-81: someone texts that Alex M. has died. 'On anyone's word, reminders and sales texts about that person stop for that booking, and Sam is told. Sam cancels and refunds.' In the turn's commit, since a booking of Alex's exists at this business: its deceased flag set (K-04 bookings.deceased, as v1's setRecordFlag), so no reminder, rating or offer goes, nothing new is charged and a bill for work given waits for Sam; Sam told. The reply to the sender uses the same words whether or not a booking exists ('These replies use the same words whether or not a booking exists'), so the answer is only that reply, naming nothing (README default 148). No key. The ids are examples."
+    "note": "A7-81: someone texts 'My parent, Alex M., passed away on Tuesday. I think they had a haircut booked.' Decide enters the death row (any-time row 5), whose choice names Alex's haircut as its target (K-02 v1 choice.target.bookingId), and the walk copies that booking into stage.bookingId: decide fills it from its choice, never code from the words (README default 171). 'On anyone's word, reminders and sales texts about that person stop for that booking, and Sam is told. Sam cancels and refunds.' In the turn's commit, since the stage names a booking of this business: its deceased flag set (K-04 bookings.deceased, as v1's setRecordFlag), so no reminder, rating or offer goes, nothing new is charged and a bill for work given waits for Sam; Sam told. The reply to the sender uses the same words whether or not a booking exists ('These replies use the same words whether or not a booking exists'), so the answer is only that reply, naming nothing, never the booking the request named (README default 166). Which bookings the frontier offers as a target to a sender who holds none is open gap 141. No key. The ids are examples."
   },
   "request": {
     "caller": {
@@ -16,7 +16,7 @@
       "personId": null,
       "traceId": "trace-unknown-death-alex-oct23"
     },
-    "stage": { "kind": "death", "step": "A7-81" }
+    "stage": { "kind": "death", "step": "A7-81", "bookingId": "booking-alex-haircut" }
   },
   "outcome": {
     "stage": "death",

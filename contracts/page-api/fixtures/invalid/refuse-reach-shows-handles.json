@@ -1,0 +1,31 @@
+{
+  "call": "bookingConfirm",
+  "given": {
+    "now": "2026-10-21T23:16:08Z",
+    "environment": "staging",
+    "after": [
+      "booking-page-start.json",
+      "booking-service-haircut.json",
+      "booking-place-confirm.json",
+      "booking-who-for-confirm.json",
+      "booking-reach-read-back.json"
+    ],
+    "note": "Refused: booking-reach-confirm.json answered with the handles setReachWay linked, which differ when Rosie already knew a number and so would hint at something on file (K-09 v1.2 setReachWay.response.effects: K-21 never passes handles, effects or written to the browser; RULES 4.9, 6.5; S13-45). Without handles the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-lees-0018",
+      "traceId": "trace-page-lees-0018",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-lees-2",
+      "requestRef": "reqref-page-lees-0011"
+    },
+    "readBackId": "rb-page-lees-reach-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-lees-reach-1",
+    "yesEventId": "pageyes-lees-reach-1",
+    "served": { "change": "reach", "way": "texts", "handles": ["handle-page-alex-mobile"] }
+  }
+}

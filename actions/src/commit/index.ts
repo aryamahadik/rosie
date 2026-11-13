@@ -8,10 +8,12 @@ export {
   checkUnits,
   effectView,
   questionClock,
+  rowsNamedBy,
   type Answer,
   type BuildInput,
   type CommitUnit,
   type QuestionClock,
+  type RowName,
   type TurnActor,
 } from "./build";
 export {

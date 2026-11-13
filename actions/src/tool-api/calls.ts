@@ -1,14 +1,30 @@
-// The calls the Tool API registers (T-290; C-074): every call K-09 v1 holds (contracts/tool-api, `$defs/callName`), the
-// types the contract's generated module gives each call's request, response and errors (`npm run contracts:types`;
-// ADR-005: generated into contracts/generated/, never committed), and the K-08 hop each call's span takes.
+// The calls the Tool API registers (T-290, T-1150; C-074): every call K-09 v1 holds (contracts/tool-api, v1's
+// `$defs/callName`; the calls v1.1 to v1.4 add are their journey lanes'), each call's request, response and errors as
+// K-09 v1.5 defines them, from its generated module (`npm run contracts:types`; ADR-005: generated into
+// contracts/generated/, never committed), and the K-08 hop each call's span takes. v1.5 holds every v1 definition under
+// its own name and accepts every v1 exchange (README "v1.5"; DL-340), so gateAndCommit's turn may carry the service and
+// the chat id of the turn's last text (default 135) and buildFrontier's context may offer the sign-up door (K-02 v1.1).
+//
+// The generator names the first copy of a title plainly and numbers the later ones. Where v1.1 changed a definition,
+// recordSafetyOutcome's and releaseSafetyHold's requests (each also takes the handle actor's record or release on
+// arrival) and recordSafetyOutcome's and recordStopOrStart's responses (gives and hold.version; businessesTold), the plain
+// name is v1's copy and v1.5's own is numbered, a number that shifts between generations. So those four are read off the
+// call's v1.5 exchange, which has no numbered duplicate, never by a numbered name (DL-350), and calls.test.ts pins every
+// call's three types to its exchange's, so typecheck fails on a drift.
+//
+// composeInput alone is K-09 v1.6's (T-1174; README "v1.6"; DL-355): its answer is K-03 v1.1's composer input, whose facts
+// may also be term facts, or one of its errors, fixedLineRow and masterLineMissing among them. Its three types are read
+// off v1.6's own exchange, taken from v1.6's root by its call (DL-350's way: no generated name, plain or numbered, is
+// trusted), and calls.test.ts pins them there. Every other call keeps its v1.5 exchange.
 //
 // The types are imported as types only, so nothing here loads the generated module at run time; the validator
-// (validator.ts) holds every value to the frozen schema itself.
+// (validator.ts) holds every value to the frozen schema itself, by the same v1.5 definitions (v1.6's for composeInput).
 
-import type * as K09 from "../../../contracts/generated/tool-api/tool-api.v1";
+import type * as K09 from "../../../contracts/generated/tool-api/tool-api.v1.5";
+import type * as K09V16 from "../../../contracts/generated/tool-api/tool-api.v1.6";
 import type { Hop } from "../../../runtime/src/trace";
 
-/** Every call K-09 v1 holds, in the order of `$defs/callName` (a test holds this list to the schema's enum). */
+/** Every call K-09 v1 holds, in the order of v1's `$defs/callName` (a test holds this list to the schema's enum). */
 export const CALL_NAMES = [
   "buildFrontier",
   "closestEntries",
@@ -43,7 +59,10 @@ export const CALL_NAMES = [
 
 export type CallName = (typeof CALL_NAMES)[number];
 
-/** K-09 v1 `$defs/caller`: who calls, under which business, for whom, and the trace the call joins. */
+/**
+ * K-09 v1.5 `$defs/caller` (v1's, by reference): who calls, under which business, for whom, and the trace the call
+ * joins.
+ */
 export type Caller = K09.Caller;
 export type CallerKind = Caller["kind"];
 
@@ -59,8 +78,9 @@ export const CALLER_KINDS: readonly CallerKind[] = [
 ];
 
 /**
- * plannerVerbs' errors (`$defs/plannerVerbs.errors`). The generator writes no type for them: plannerVerbs has no exchange,
- * since it rides inside gateAndCommit, so the root never reaches its errors. The validator still holds them to the schema.
+ * plannerVerbs' errors (K-09 v1.5 `$defs/plannerVerbs.errors`, v1's by reference). The generator writes no type for them,
+ * in v1 or v1.5: plannerVerbs has no exchange, since it rides inside gateAndCommit, so the root never reaches its errors.
+ * The validator still holds them to the schema.
  */
 export interface PlannerVerbsErrors {
   error: "plannerRefused";
@@ -73,26 +93,36 @@ interface Shapes<Request, Response, Errors> {
   errors: Errors;
 }
 
-/** Each call's request, response and errors, as the contract's generated module names them. */
+/** composeInput's exchange in K-09 v1.6 (T-1174), read off v1.6's root by its call. */
+type ComposeInputV16Exchange = Extract<K09V16.ToolApiV1Dot6, { call: "composeInput" }>;
+
+/**
+ * Each call's request, response and errors: K-09 v1.5's, the four v1.1 changed read off their exchanges, and
+ * composeInput's K-09 v1.6's, read off its v1.6 exchange (each error an object with its own "error"; no response has one).
+ */
 export interface CallTypes {
   buildFrontier: Shapes<K09.BuildFrontierRequest, K09.BuildFrontierResponse, K09.BuildFrontierErrors>;
   closestEntries: Shapes<K09.ClosestEntriesRequest, K09.ClosestEntriesResponse, K09.ClosestEntriesErrors>;
   gateAndCommit: Shapes<K09.GateAndCommitRequest, K09.GateAndCommitResponse, K09.GateAndCommitErrors>;
-  composeInput: Shapes<K09.ComposeInputRequest, K09.ComposeInputResponse, K09.ComposeInputErrors>;
+  composeInput: Shapes<
+    ComposeInputV16Exchange["request"],
+    Exclude<ComposeInputV16Exchange["outcome"], { error: string }>,
+    Extract<ComposeInputV16Exchange["outcome"], { error: string }>
+  >;
   finalizeMessage: Shapes<K09.FinalizeMessageRequest, K09.FinalizeMessageResponse, K09.FinalizeMessageErrors>;
   recordSafetyOutcome: Shapes<
-    K09.RecordSafetyOutcomeRequest,
-    K09.RecordSafetyOutcomeResponse,
+    K09.RecordSafetyOutcomeExchange["request"],
+    Exclude<K09.RecordSafetyOutcomeExchange["outcome"], K09.RecordSafetyOutcomeErrors>,
     K09.RecordSafetyOutcomeErrors
   >;
   releaseSafetyHold: Shapes<
-    K09.ReleaseSafetyHoldRequest,
+    K09.ReleaseSafetyHoldExchange["request"],
     K09.ReleaseSafetyHoldResponse,
     K09.ReleaseSafetyHoldErrors
   >;
   recordStopOrStart: Shapes<
     K09.RecordStopOrStartRequest,
-    K09.RecordStopOrStartResponse,
+    Exclude<K09.RecordStopOrStartExchange["outcome"], K09.RecordStopOrStartErrors>,
     K09.RecordStopOrStartErrors
   >;
   setRecordFlag: Shapes<K09.SetRecordFlagRequest, K09.SetRecordFlagResponse, K09.SetRecordFlagErrors>;
@@ -148,7 +178,9 @@ export function isCallerKind(value: unknown): value is CallerKind {
  * The hop of each call's span when a turn, the console, a job, a clock's firing or the actor on return makes it (K-08 v1
  * hop table; K-09 v1 `caller.traceId` names the hops). A read of the turn face takes its own hop, gateAndCommit (with the
  * planner's verbs inside it) the gate, composeInput and finalizeMessage the code side of the reply (arch 02 line 123), and
- * every call that writes alone or rides in a turn's commit the commit (README defaults).
+ * every call that writes alone or rides in a turn's commit the commit (README defaults). The handle actor's turn records
+ * the gate and fillAndChecks hops itself, so the turn face's gateAndCommit, composeInput and finalizeMessage tell the base
+ * so, and the base records no span for them (tool-api.ts CallOptions; T-1193).
  */
 export const CALL_HOPS: Readonly<Record<CallName, Hop>> = {
   buildFrontier: "frontier",

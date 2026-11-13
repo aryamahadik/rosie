@@ -1,0 +1,17 @@
+{
+  "call": "readTesterStanding",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["people-access/seed-session.json"],
+    "after": [],
+    "now": "2026-10-26T09:00:00Z",
+    "note": "Sam's portal session of Oct 20, which he signed out of at 8:30am that day (K-22 v1 seed-session.json: session-sam-oct20, ended_why signed_out), read on Oct 26, before its expires_at: an ended session is no live session (session_for_token: ended_at null), so noSession, as an unknown token answers (README default 104)."
+  },
+  "request": {
+    "tokenSha256": "55c887c6a012afe4a89a3c2a798ec32f65a8e1a76d7acaf6338dd6dbcabc4267",
+    "at": "2026-10-26T09:00:00Z"
+  },
+  "outcome": {
+    "standing": "noSession"
+  }
+}

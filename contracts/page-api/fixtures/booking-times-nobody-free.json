@@ -1,0 +1,35 @@
+{
+  "call": "bookingTimes",
+  "given": {
+    "now": "2026-10-22T16:29:30Z",
+    "environment": "staging",
+    "after": [
+      "db-schema/services-prices/fixtures/seed-services-price-list.json",
+      "db-schema/availability/fixtures/seed-hours.json"
+    ],
+    "note": "A4-19 on Lee's Barbershop's booking page: Dee's request (opened as booking-page-start.json opens one, requestRef reqref-page-lees-0041 and her device token, placeholders) matched the skin fade at the shop and gave her mobile on the reach card. The page entry calls K-09 v1.2 showTimes alone for the soonest times: nobody is free this week, so the card is empty and gives no key, and the page says so plainly and offers the waitlist (A4-19: 'Says plainly that nobody is free'; bookingReadBack's waitlist). The card's money words are the skin fade's shop way's (list|card|counter: README default 55). The card's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-dee-0005",
+      "traceId": "trace-page-dee-0005",
+      "listingCode": { "business": "biz-lees-barbershop", "kind": "6032ba2577446134" },
+      "deviceToken": "placeholder-device-token-page-dee-1",
+      "requestRef": "reqref-page-lees-0041"
+    },
+    "quoteOptionId": null,
+    "filter": { "person": null, "fromDay": null, "needBy": null }
+  },
+  "outcome": {
+    "result": "card",
+    "cardId": "card-page-dee-0001",
+    "timesKind": "setstart",
+    "times": [],
+    "nobodyFree": true,
+    "sentNowOffered": false,
+    "takenNow": "A card is saved for the $20 fee; nothing is charged now",
+    "howPaid": "Paid at the counter after the visit",
+    "filter": { "with": null, "fromDay": null, "needBy": null },
+    "expiresAt": "2026-10-22T16:39:30Z"
+  }
+}

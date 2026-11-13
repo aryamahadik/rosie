@@ -219,7 +219,8 @@ export async function parkThroughRows(set: TurnDeps | null, turn: ParkingTurn): 
       );
       woken = true;
     } catch {
-      // Not taken: the minute sweep claims every recipient's sendable rows.
+      // Not taken: the row waits for the recipient's next dispatcher run (a later commit or park wake, an outage or
+      // safety-line wake, or the retry door); no sweep runs.
     }
   }
   return end(

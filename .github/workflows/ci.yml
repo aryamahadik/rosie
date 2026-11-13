@@ -41,6 +41,12 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 30
+    # T-1191: that service's DATABASE_URL for every step, as merge-check.yml's job sets it. npm test's contract project
+    # holds K-05's database-side test (T-1169), and with CI set db/repo never falls back to a local database, so that
+    # test needs this URL. infra/ci/ci-contract-database.test.mjs pins it for every step that runs the contract project.
+    env:
+      # The throwaway CI database (factory spec section 4: rosie/rosie is local only, not a secret).
+      DATABASE_URL: postgres://rosie:rosie@localhost:5432/rosie
     steps:
       - name: Check out (full history, so the guards can compare with origin/main)
         uses: actions/checkout@v7
@@ -78,9 +84,6 @@ jobs:
       # T-1078: the parity shards (the "parity" Vitest project, outside `npm test`) never run here; merge-check.yml
       # runs them, in parallel jobs, when a parity input changed.
       - name: CI script tests (the guards and the PreToolUse hook)
-        env:
-          # The throwaway CI database (factory spec section 4: rosie/rosie is local only, not a secret).
-          DATABASE_URL: postgres://rosie:rosie@localhost:5432/rosie
         run: node --test "infra/ci/*.test.mjs"
 
       - name: Test guard (no fewer tests, no new skip, todo or only)

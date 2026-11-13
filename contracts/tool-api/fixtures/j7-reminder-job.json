@@ -5,7 +5,7 @@
     "after": [],
     "now": "2026-10-22T22:00:00Z",
     "stated": { "step": "A7-01", "gives": [] },
-    "note": "A7-01: Alex M.'s haircut with Riley, Sat Oct 24 at 11:00am, free cancel until Fri at 11am (K-30 booking_visits.cutoff_at, seed-booking-flow-a). The reminder job sends one reminder at least 3 hours before free cancel ends, inside text hours: Thu Oct 22 at 6pm in New York. One clock row due at once on Alex's handle, whose clock turn writes A7-01's line ('Reminder: your visit is Sat at 11:00am with Riley. {{pay.cancel}}. Give this code at the chair. ... Reply 1 Change the time, 2 Call off the visit.') into his open chat, routine. The check-in code is not in this answer: only the slot filler puts it into Alex's own row (K-03 visit.code; README default 131). No plan charge rides on it. No key. The ids are examples (v1.3 default 48's rule)."
+    "note": "A7-01: Alex M.'s haircut with Riley, Sat Oct 24 at 11:00am, free cancel until Fri at 11am (K-30 booking_visits.cutoff_at, seed-booking-flow-a). The reminder job sends one reminder at least 3 hours before free cancel ends, inside text hours: Thu Oct 22 at 6pm in New York. One clock row due at once on Alex's handle, whose clock turn writes A7-01's line ('Reminder: your visit is Sat at 11:00am with Riley. {{pay.cancel}}. Give this code at the chair. ... Reply 1 Change the time, 2 Call off the visit.') into his open chat, routine. The check-in code is not in this answer: only the slot filler puts it into Alex's own row (K-03 visit.code; README default 149). No plan charge rides on it. No key. The ids are examples (v1.3 default 48's rule)."
   },
   "request": {
     "caller": {

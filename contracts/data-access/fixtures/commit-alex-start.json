@@ -1,0 +1,113 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["commit-alex-stop.json"],
+    "now": "2026-11-07T15:20:00Z",
+    "note": "Fourteen minutes after his STOP, Alex texts START from his own number. The guard's code path commits it in his turn (K-09 v1 recordStopOrStart: START only from the phone's own START text, in its turn or written on return by its actor; RULES 7.5): the phone's flag cleared with its chat open again and its START time (RULES 4.1b: 'turning texts back on sets it again'; DL-193: stop_at stays the last STOP's), the START row for every business with his own words, and the start reply as a reply in the same turn. Needs K-29's consents table migrated."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-alex-start-1",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0016"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0016",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [{ "table": "phones", "rowId": "+15555550101", "version": 4 }],
+    "writes": {
+      "state": [
+        {
+          "op": "update",
+          "table": "phones",
+          "key": { "number": "+15555550101" },
+          "expectVersion": 4,
+          "set": { "stopped": false, "start_at": "2026-11-07T15:20:00Z", "chat_open": true }
+        },
+        {
+          "op": "insert",
+          "table": "consents",
+          "values": {
+            "id": "consent-alex-start",
+            "person_id": "person-alex",
+            "business_id": null,
+            "kind": "texts",
+            "revoked": false,
+            "handle_id": "handle-alex",
+            "exact_words": "START",
+            "words_sha256": "39f17ec6ebcf3cec37a06d85dc61882be3898d7573f284b7b41222087b6b6a2c",
+            "at": "2026-11-07T15:20:00Z",
+            "channel": "text",
+            "turn_id": "turn-alex-start-1"
+          }
+        }
+      ],
+      "openQuestions": { "open": [], "close": [] },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [
+        {
+          "id": "out-alex-start-reply",
+          "recipientHandleId": "handle-alex",
+          "recipientPersonId": "person-alex",
+          "businessId": null,
+          "bookingId": null,
+          "channel": "imessage",
+          "sendClass": "quick_reply",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": [{ "table": "phones", "rowId": "+15555550101", "version": 5 }]
+        }
+      ],
+      "reservations": { "confirm": [], "release": [] },
+      "events": [
+        {
+          "id": "log-phone-alex-started-1",
+          "kind": "phone.started",
+          "zone": null,
+          "businessId": null,
+          "actorKind": "person",
+          "actorPersonId": "person-alex",
+          "actorRole": null,
+          "tableName": "phones",
+          "rowId": "handle-alex",
+          "oldValues": { "stopped": true, "chat_open": false, "start_at": null },
+          "newValues": { "stopped": false, "chat_open": true, "start_at": "2026-11-07T15:20:00Z" },
+          "sealed": null,
+          "why": { "step": "S13-32" },
+          "approvedBy": { "kind": "consentRow", "consent_id": "consent-alex-start" },
+          "proofs": null
+        },
+        {
+          "id": "log-consent-alex-start",
+          "kind": "consent.given",
+          "zone": null,
+          "businessId": null,
+          "actorKind": "person",
+          "actorPersonId": "person-alex",
+          "actorRole": null,
+          "tableName": "consents",
+          "rowId": "consent-alex-start",
+          "oldValues": null,
+          "newValues": { "kind": "texts", "revoked": false, "business_id": null, "channel": "text" },
+          "sealed": null,
+          "why": { "step": "S13-32" },
+          "approvedBy": null,
+          "proofs": null
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-alex-start-1",
+    "committedAt": "2026-11-07T15:20:00Z",
+    "repeated": false,
+    "committed": {
+      "written": [{ "table": "phones", "rowId": "+15555550101", "version": 5 }],
+      "outboxRows": [{ "id": "out-alex-start-reply", "commitSeq": 4 }],
+      "promoted": []
+    }
+  }
+}

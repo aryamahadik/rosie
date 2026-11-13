@@ -4,18 +4,23 @@
 // `runTurn` and commit hook are the turn loop's own (`turnHooks`). Doubles: the turn's ports (./test-support.ts) answering
 // the K-09 and K-02 fixtures with the running turn's own ids (the lease hashes the turn id from the event ids, CQ-09; the
 // trace id is the text's), the safety read's doubles (src/safety/test-support.ts), K-05's bundle reads
-// (src/bundle/test-support.ts), K-05 v1.2's targets for the guard, and T-267's shared-core double for a STOP. Spans are
-// read from the log lines (one JSON line each, ADR-009). Test method: T-1128's. Test values only (rule 9).
-import { reset, runDurableObjectAlarm } from "cloudflare:test";
+// (src/bundle/test-support.ts), K-05 v1.2's targets for the guard, and T-267's shared-core double for a STOP. The
+// PostgreSQL-down path is unwired, as the composition root installs it today, unless a test wires it with its doubles
+// (src/outage/db/test-support.ts, PostgreSQL answering). Spans are read from the log lines (one JSON line each, ADR-009).
+// Test method: T-1128's. Test values only (rule 9).
+import { heldParts } from "@rosie/actions/src/commit/hold";
+import { reset, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 import buildFrontierS102 from "../../../contracts/tool-api/fixtures/build-frontier-s1-02.json";
+import commitLimit6First from "../../../contracts/tool-api/fixtures/commit-limit-6-reread-first.json";
 import commitS102 from "../../../contracts/tool-api/fixtures/commit-s1-02.json";
 import stopRecorded from "../../../contracts/tool-api/fixtures/stop-recorded.json";
 import decideS102 from "../../../contracts/model/fixtures/decide-s1-02-choose.json";
 import safetyEmergencyNow from "../../../contracts/model/fixtures/safety-emergency-now.json";
 import {
+  LEASE_MS,
   setBatchHooks,
   setBundleDeps,
   setLeaseHooks,
@@ -27,10 +32,12 @@ import {
 } from "../actor";
 import { BUNDLE_A, fakeBundles } from "../bundle/test-support";
 import { actorNameOf, durableObjectActor, type ActorNamespace, type HandleActorRpc } from "../gateway";
-import { fakeKeyStore } from "../gateway/test-support";
+import { fakeKeyStore, present } from "../gateway/test-support";
 import { setGuardDeps, setReplyDeps } from "../guard";
 import { fakeCore as fakeReplyCore, phone, ROSIE_NUMBER } from "../guard/replies/test-support";
-import { fakeTargets } from "../guard/test-support";
+import { fakeTargets, type FakeTargets } from "../guard/test-support";
+import { setDbOutageDeps, type OutageView } from "../outage/db";
+import { dbFakes, idsOf } from "../outage/db/test-support";
 import { harness, type Harness } from "../safety/test-support";
 import type { SafetyResult } from "../safety/types";
 import { spanProblems } from "../trace";
@@ -50,6 +57,7 @@ import {
   turnDeps,
   until,
   type FakeDecide,
+  type FakeFacts,
   type FakeTurnFace,
 } from "./test-support";
 import type { BuildFrontierRequest, DecideContext, GateAndCommitRequest, TurnParty } from "./types";
@@ -84,6 +92,7 @@ interface ActorRpc {
   readTurns(): Promise<TurnEntry[]>;
   readWaitingBatches(): Promise<number[]>;
   readHolds(): Promise<HoldEntry[]>;
+  readOutage(): Promise<OutageView>;
   safetyIdle(): Promise<void>;
   batchIdle(): Promise<void>;
 }
@@ -107,10 +116,47 @@ async function arrive(who: Party, eventId: string, body: string, sentAt: string)
   expect(await door().accept(handoff)).toBe("written");
 }
 
+/**
+ * A text's kept safety result is gone from the actor's own storage (ADR-015 section 2: a storage that refused both of the
+ * read's writes keeps no row), after its read on arrival kept it: the row is deleted, nothing else.
+ */
+async function dropKeptResult(who: Party, eventId: string): Promise<void> {
+  const kept = await runInDurableObject(stubOf(who), (_actor: HandleActor, state) => {
+    const { sql } = state.storage;
+    const rows = sql.exec("SELECT 1 FROM safety_results WHERE event_id = ? AND box IS NOT NULL", eventId);
+    const had = rows.toArray().length;
+    sql.exec("DELETE FROM safety_results WHERE event_id = ?", eventId);
+    return had;
+  });
+  expect(kept).toBe(1);
+}
+
+/**
+ * The read on arrival cannot keep a text's result: every seal of it fails (the seal names the actor and
+ * `result:<event id>`, ADR-015 section 1), so its result stays owed (section 2): its leased turn reads none for it, and
+ * every commit is handed it among the texts not read. Every other seal goes through.
+ */
+function owedResult(who: Party, eventId: string): void {
+  const encrypt = crypto.subtle.encrypt.bind(crypto.subtle);
+  const name = `${actorNameOf(who.handle)}|result:${eventId}`;
+  vi.spyOn(crypto.subtle, "encrypt").mockImplementation(async (algorithm, key, data) => {
+    const named = typeof algorithm === "object" ? algorithm.additionalData : undefined;
+    if (named !== undefined && new TextDecoder().decode(named) === name) throw new Error("the seal failed");
+    return encrypt(algorithm, key, data);
+  });
+}
+
 interface Run {
   h: Harness;
   face: FakeTurnFace;
   ai: FakeDecide;
+  /**
+   * The turn's own facts: who the handle is and the times its requests name. Each run reads its texts' safety results
+   * through its leased turn, from what the read on arrival (answering from `h`) kept in the actor (ADR-015; T-1264).
+   */
+  facts: FakeFacts;
+  /** K-05 v1.2 handleTargets for the guard. */
+  targets: FakeTargets;
   /** The fake clock moves, then the alarm runs, as the platform would at the stored time. */
   tick(ms: number): Promise<void>;
   /** Settles the safety work, the batch work and the turns' work. */
@@ -128,7 +174,6 @@ async function withTurnLoop(
   const face = fakeTurnFace();
   const ai = fakeDecide(face.log);
   const facts = fakeFacts(who.party, times);
-  for (const [eventId, result] of Object.entries(answers)) facts.safety.set(eventId, result);
   const targets = fakeTargets();
   targets.answers.set(who.party.handleId, targetsAnswer(who.party.handleId, SAM_S1_02_TARGETS));
   const restores = [
@@ -143,6 +188,8 @@ async function withTurnLoop(
     h,
     face,
     ai,
+    facts,
+    targets,
     actor: actorOf(who),
     async tick(ms) {
       await h.clock.advance(ms);
@@ -227,8 +274,13 @@ describe("the turn loop as the lease's turn", () => {
         ]);
 
         // Every span of the turn carries its turn id and the pinned bundle id, passes K-08, and no line holds the words.
-        const spans = spansOf(log).filter((span) => span.turn_id === turnId);
+        // Read as K-08 reads a trace, in order by seq (README "Traces"): the first to carry the turn's id is the batch
+        // span, before the lease's (trace-skeleton.json: batch at seq 4, lease at seq 5; T-1108).
+        const spans = spansOf(log)
+          .filter((span) => span.turn_id === turnId)
+          .sort((a, b) => Number(a.seq) - Number(b.seq));
         expect(spans.map((span) => span.hop)).toEqual([
+          "batch",
           "lease",
           "guard",
           "frontier",
@@ -405,6 +457,297 @@ describe("the turn loop as the lease's turn", () => {
         expect(run.ai.decideCalls).toEqual([]);
         expect(core.outbox.get("out-ben-stop-reply")?.finalParts?.fixedLines).toEqual(["stopReply"]);
         expect(await run.actor.readTurns()).toMatchObject([{ turnId, state: "committed" }]);
+      },
+    );
+  });
+});
+
+describe("a STOP through the lease never waits for a missing result or the decided part (ADR-015 card C; DL-508)", () => {
+  const SAM_PHONE = "+15555550100";
+
+  /**
+   * The S1-02 answers under the running turn's id, with T-267's shared-core double over Sam's phone behind the gate (each
+   * commit's keyword actions, after the records), and the replies committing through the turn.
+   */
+  function gateOverSamCore(run: Run): { core: ReturnType<typeof fakeReplyCore>; restore: () => void } {
+    answerS102(run);
+    const core = fakeReplyCore(commitS102.request.now, [phone(SAM_PHONE, "handle-sam", "person-sam", 3)]);
+    run.face.gate = async (request: GateAndCommitRequest) => {
+      const records = request.core.filter((action) => action.call === "recordSafetyOutcome");
+      const answer = await core.core.commitCore({
+        caller: request.caller as never,
+        actions: request.core.slice(records.length) as never,
+      });
+      if ("error" in answer) return answer;
+      const outcome = forTurn(commitS102.outcome, S1_02, request.turn.id);
+      return {
+        ...outcome,
+        parts: request.input.kind === "decided" ? outcome.parts : [],
+        core: [...records.map(() => outcome.core[0]), ...answer.core],
+      } as never;
+    };
+    const restore = setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER });
+    return { core, restore };
+  }
+
+  /** A request's core actions, in order: each text's record by its event id, a STOP's record by its kind and event. */
+  const coreOf = (request: GateAndCommitRequest | undefined): string[][] =>
+    (request?.core ?? []).map((action) => {
+      const body = action.request as { safety?: { eventId: string }; kind?: string; inboundEventId?: string };
+      return action.call === "recordSafetyOutcome"
+        ? [action.call, body.safety?.eventId ?? ""]
+        : [action.call, body.kind ?? "", body.inboundEventId ?? ""];
+    });
+
+  /**
+   * The texts arrive, their batch goes to the lease, the turn makes its `gateCalls` gate calls (one unless given) and
+   * commits, and its lease's 60 s lapse then passes.
+   */
+  async function arriveAndRun(run: Run, texts: [string, string, string][], gateCalls = 1): Promise<void> {
+    for (const [eventId, body, sentAt] of texts) await arrive(SAM, eventId, body, sentAt);
+    await run.settle();
+    await run.tick(3000);
+    await run.settle();
+    await until(() => run.face.gateCalls.length >= gateCalls, "the turn's commit");
+    await run.settle();
+    await run.tick(61_000);
+    await run.settle();
+  }
+
+  it("a decided text, a text whose result the turn cannot read and a STOP, one batch, commit on the turn's first run with the decided input: no rerun at the lapse, no park", async () => {
+    const ids = ["evt-sam-0001", "evt-sam-0002", "evt-sam-0003"];
+    await withTurnLoop(
+      SAM,
+      Object.fromEntries(ids.map((eventId) => [eventId, safetyNoFor(eventId)])),
+      [buildFrontierS102.request.now, commitS102.request.now],
+      async (run) => {
+        const { core, restore } = gateOverSamCore(run);
+        try {
+          // The read on arrival read every text and kept each result, but the second's kept row is gone before the turn
+          // runs (the batch is still open: the third text closes it), so its leased turn reads no result for it (ADR-015
+          // section 3).
+          await arrive(SAM, "evt-sam-0001", "Barbershop, plumbing, electrical", "2026-10-19T14:05:00Z");
+          await arrive(SAM, "evt-sam-0002", "and lawn care", "2026-10-19T14:05:01Z");
+          await run.settle();
+          await dropKeptResult(SAM, "evt-sam-0002");
+          await arriveAndRun(run, [["evt-sam-0003", "STOP", "2026-10-19T14:05:02Z"]]);
+        } finally {
+          restore();
+        }
+
+        const turnId = await turnIdOf(ids);
+        expect(run.face.gateCalls).toHaveLength(1);
+        const request = run.face.gateCalls[0]?.request;
+        expect(request?.turn.id).toBe(turnId);
+        expect(request?.input).toEqual(forTurn(commitS102.request.input, S1_02, turnId));
+        expect(coreOf(request)).toEqual([
+          ["recordSafetyOutcome", "evt-sam-0001"],
+          ["recordSafetyOutcome", "evt-sam-0003"],
+          ["recordStopOrStart", "stop", "evt-sam-0003"],
+        ]);
+        expect(core.phones.get(SAM_PHONE)?.stopped).toBe(true);
+        expect(await run.actor.readTurns()).toEqual([
+          {
+            turnId,
+            eventIds: ids,
+            state: "committed",
+            restart: false,
+            tries: 1,
+            leaseUntil: null,
+            committedAt: commitS102.outcome.committedAt,
+          },
+        ]);
+      },
+    );
+  });
+
+  it("every result present: a decided text and a STOP whose targets read fails commit the STOP core-only on the turn's first run: no rerun at the lapse, no park", async () => {
+    const ids = ["evt-sam-0001", "evt-sam-0003"];
+    await withTurnLoop(
+      SAM,
+      Object.fromEntries(ids.map((eventId) => [eventId, safetyNoFor(eventId)])),
+      [commitS102.request.now],
+      async (run) => {
+        run.targets.answers.set(SAM.party.handleId, { error: "transient", sqlstate: "40001" });
+        const { core, restore } = gateOverSamCore(run);
+        try {
+          await arriveAndRun(run, [
+            ["evt-sam-0001", "Barbershop, plumbing, electrical", "2026-10-19T14:05:00Z"],
+            ["evt-sam-0003", "STOP", "2026-10-19T14:05:02Z"],
+          ]);
+        } finally {
+          restore();
+        }
+
+        const turnId = await turnIdOf(ids);
+        expect(run.face.frontierCalls).toEqual([]);
+        expect(run.ai.decideCalls).toEqual([]);
+        expect(run.face.gateCalls).toHaveLength(1);
+        const request = run.face.gateCalls[0]?.request;
+        expect(request?.input).toEqual({ kind: "coreOnly" });
+        expect(coreOf(request)).toEqual([
+          ["recordSafetyOutcome", "evt-sam-0001"],
+          ["recordSafetyOutcome", "evt-sam-0003"],
+          ["recordStopOrStart", "stop", "evt-sam-0003"],
+        ]);
+        expect(core.phones.get(SAM_PHONE)?.stopped).toBe(true);
+        expect(await run.actor.readTurns()).toEqual([
+          {
+            turnId,
+            eventIds: ids,
+            state: "committed",
+            restart: false,
+            tries: 1,
+            leaseUntil: null,
+            committedAt: commitS102.outcome.committedAt,
+          },
+        ]);
+      },
+    );
+  });
+
+  it("every result present: a decided text and a STOP whose decided request the gate refuses on its tries commit the STOP core-only on the turn's first run: no rerun at the lapse, no park (DL-521)", async () => {
+    const ids = ["evt-sam-0001", "evt-sam-0003"];
+    await withTurnLoop(
+      SAM,
+      Object.fromEntries(ids.map((eventId) => [eventId, safetyNoFor(eventId)])),
+      [buildFrontierS102.request.now, commitS102.request.now],
+      async (run) => {
+        const { core, restore } = gateOverSamCore(run);
+        // Limit 6 refuses the decided request before the re-read (commit-limit-6-reread-first.json's refusal), and the
+        // one re-read cannot run (the decide double's re-read answers the models down), so there is no second try.
+        const commit = run.face.gate;
+        run.face.gate = (request, index) => {
+          if (request.input.kind === "decided") return structuredClone(commitLimit6First.outcome);
+          return commit === null ? { error: "unwired" } : commit(request, index);
+        };
+        try {
+          await arriveAndRun(
+            run,
+            [
+              ["evt-sam-0001", "Barbershop, plumbing, electrical", "2026-10-19T14:05:00Z"],
+              ["evt-sam-0003", "STOP", "2026-10-19T14:05:02Z"],
+            ],
+            2,
+          );
+        } finally {
+          restore();
+        }
+
+        const turnId = await turnIdOf(ids);
+        expect(run.ai.decideCalls).toHaveLength(1);
+        expect(run.ai.rereadCalls).toHaveLength(1);
+        expect(run.face.gateCalls.map((call) => call.request.input.kind)).toEqual(["decided", "coreOnly"]);
+        const request = run.face.gateCalls[1]?.request;
+        expect(request?.turn.id).toBe(turnId);
+        expect(coreOf(request)).toEqual([
+          ["recordSafetyOutcome", "evt-sam-0001"],
+          ["recordSafetyOutcome", "evt-sam-0003"],
+          ["recordStopOrStart", "stop", "evt-sam-0003"],
+        ]);
+        expect(core.phones.get(SAM_PHONE)?.stopped).toBe(true);
+        expect(await run.actor.readTurns()).toEqual([
+          {
+            turnId,
+            eventIds: ids,
+            state: "committed",
+            restart: false,
+            tries: 1,
+            leaseUntil: null,
+            committedAt: commitS102.outcome.committedAt,
+          },
+        ]);
+      },
+    );
+  });
+
+  // ADR-018 section 1 (CQ-230; T-1311): a turn whose runs cannot commit (a result owed, no keyword text: each run ends
+  // noSafetyResult) holds its lease to its third lapse. A STOP batch behind it, once it has used its one restart,
+  // restarts it a second time, so the STOP commits on that turn's first run, never after those lapses.
+  describe("behind a turn that has restarted, which its runs cannot commit (ADR-018 section 1; CQ-230)", () => {
+    it.each([
+      ["not wired, as the root installs it today", false],
+      ["wired, with a keyword copy that reads STOP", true],
+    ] as const)(
+      "with the down path %s: a turn whose text's result is owed, with no keyword text, restarted by a second batch, then a STOP batch: the STOP's recordStopOrStart commits on the second restart's first run, its CommitContext.unread naming the owed text and every routine part held, before the fake clock reaches 60 s",
+      async (_how, wired) => {
+        const ids = ["evt-sam-0001", "evt-sam-0002", "evt-sam-0003"];
+        await withTurnLoop(
+          SAM,
+          Object.fromEntries(ids.map((eventId) => [eventId, safetyNoFor(eventId)])),
+          [buildFrontierS102.request.now, commitS102.request.now],
+          async (run) => {
+            const db = wired ? dbFakes(keys, {}, { start: run.h.clock.now(), ids: idsOf(SAM.party) }) : null;
+            const restoreDown = db === null ? (): void => undefined : setDbOutageDeps(db.outageDeps);
+            const { core, restore } = gateOverSamCore(run);
+            owedResult(SAM, "evt-sam-0001");
+            try {
+              // The first text is read (No), but its result cannot be kept: it is owed. Its turn opens at 3 s, and its run
+              // ends with no commit (noSafetyResult).
+              await arrive(SAM, "evt-sam-0001", "Barbershop, plumbing, electrical", "2026-10-19T14:05:00Z");
+              await run.settle();
+              await run.tick(3000);
+              await run.settle();
+              // A second batch restarts it at 6 s; the restart's run ends with no commit too.
+              await arrive(SAM, "evt-sam-0002", "and lawn care", "2026-10-19T14:05:03Z");
+              await run.settle();
+              await run.tick(3000);
+              await run.settle();
+              expect(run.face.gateCalls).toEqual([]);
+              expect(await run.actor.readTurns()).toMatchObject([
+                { eventIds: ["evt-sam-0001"], state: "replaced" },
+                { eventIds: ["evt-sam-0001", "evt-sam-0002"], state: "leased", restart: true },
+              ]);
+
+              // The STOP's batch closes at 9 s.
+              await arrive(SAM, "evt-sam-0003", "STOP", "2026-10-19T14:05:06Z");
+              await run.settle();
+              if (wired) {
+                expect(
+                  (await run.actor.readOutage()).texts.find((text) => text.eventId === "evt-sam-0003")?.kind,
+                ).toBe("stop");
+              }
+              await run.tick(3000);
+              await until(() => run.face.gateCalls.length === 1, "the STOP's commit");
+              await run.settle();
+            } finally {
+              restore();
+              restoreDown();
+            }
+
+            const turnId = await turnIdOf(ids);
+            // At once: the restarted turn's lease never lapsed.
+            expect(run.h.clock.now()).toBe(9000);
+            expect(run.h.clock.now()).toBeLessThan(LEASE_MS);
+            expect(run.face.gateCalls).toHaveLength(1);
+            const call = present(run.face.gateCalls[0], "the STOP's commit");
+            expect(call.request.turn).toMatchObject({ id: turnId, eventIds: ids, tries: 1 });
+            // The owed text is left out of the records and named among the texts not read.
+            expect(call.at).toEqual({ holds: [], unread: ["evt-sam-0001"] });
+            expect(coreOf(call.request)).toEqual([
+              ["recordSafetyOutcome", "evt-sam-0002"],
+              ["recordSafetyOutcome", "evt-sam-0003"],
+              ["recordStopOrStart", "stop", "evt-sam-0003"],
+            ]);
+            // So the gate's own hold rule (T-305) holds every part of the decided request but a protective one.
+            const { input } = call.request;
+            expect(input.kind).toBe("decided");
+            const parts = input.kind === "decided" ? input.decided.decide.parts : [];
+            expect(parts.length).toBeGreaterThan(0);
+            expect([
+              ...heldParts(call.request as unknown as Parameters<typeof heldParts>[0], {
+                holds: [],
+                unreadEventIds: call.at.unread,
+              }),
+            ]).toEqual(parts.map((_part, index) => index));
+            expect(core.phones.get(SAM_PHONE)?.stopped).toBe(true);
+            expect(await run.actor.readTurns()).toMatchObject([
+              { eventIds: ["evt-sam-0001"], state: "replaced", restart: false },
+              { eventIds: ["evt-sam-0001", "evt-sam-0002"], state: "replaced", restart: true },
+              { turnId, eventIds: ids, state: "committed", restart: true, tries: 1 },
+            ]);
+          },
+        );
       },
     );
   });
