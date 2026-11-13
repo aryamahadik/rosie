@@ -1,7 +1,10 @@
 // T-1284: K-05 v1.13's proveSignIn, endSession, personStanding and signInEntries (items 60 to 63; ADR-016 card R2;
 // DL-526, DL-610), with scope.ts's person setter, against local PostgreSQL (`npm run db:up`; `npm run test:integration
 // -- db/repo/sign-in-check`). The schema comes from migrating a fresh test schema (db/repo/test-db.ts), which is
-// dropped when the file ends; the public schema is never touched.
+// dropped when the file ends; the public schema is never touched. It is made in a pool database of its own
+// (`database: "own"`): the file holds an attempt's row lock while a check waits on it and reads pg_stat_activity for
+// that wait, and its migration's CREATE INDEX CONCURRENTLY (0033) waits out every older transaction of its database,
+// so no other run's long transaction in the shared database holds it up, and none of this file's holds up another's.
 //
 // The calls run as K-05 v1.13 names them (README "The calls v1.13 adds or changes"): proveSignIn and endSession through
 // a client whose connections run as rosie_app, the Tool API's role, and personStanding and signInEntries through one
@@ -26,6 +29,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { PERSON_SETTING, setPersonScope, type Sql, type Tx } from "./scope";
 import {
   endSession,
+  type EndSessionRequest,
   personStanding,
   type PersonStandingRequest,
   proveSignIn,
@@ -194,7 +198,11 @@ interface SeedFile {
 const fromHex = (text: string): Uint8Array =>
   Uint8Array.from((text.match(/../g) ?? []).map((pair) => parseInt(pair, 16)));
 
-async function insertRow(sql: Db, table: string, row: Row): Promise<void> {
+/**
+ * A seed row as the owner, its jsonb and bytea values as K-04's fixture format writes them; with `shiftMs`, every
+ * timestamptz value moved that far, so a fixture's world keeps its own times relative to the database's clock.
+ */
+async function insertRow(sql: Db, table: string, row: Row, shiftMs = 0): Promise<void> {
   const values: Record<string, never> = {};
   for (const [column, value] of Object.entries(row)) {
     const type = typedColumns.get(`${table}.${column}`);
@@ -203,6 +211,8 @@ async function insertRow(sql: Db, table: string, row: Row): Promise<void> {
       converted = sql.json(value);
     } else if (type === "bytea" && typeof value === "string") {
       converted = fromHex(value.replace(/^\\x/, ""));
+    } else if (type === "timestamp with time zone" && typeof value === "string") {
+      converted = new Date(Date.parse(value) + shiftMs);
     }
     values[column] = converted as never;
   }
@@ -287,12 +297,12 @@ const CHECK_TESTER_ROWS: TableRow[] = [
 ];
 
 beforeAll(async () => {
-  db = await createTestDatabase({ name: "sign_in_check" });
+  db = await createTestDatabase({ name: "sign_in_check", database: "own" });
   app = roleClient(APP_ROLE, APP_NAME, 4);
   job = roleClient(JOB_ROLE, JOB_NAME, 3);
   const typed = await db.sql<{ key: string; type: string }[]>`
     select table_name || '.' || column_name as key, data_type as type from information_schema.columns
-    where table_schema = ${db.schema} and data_type in ('jsonb', 'bytea')
+    where table_schema = ${db.schema} and data_type in ('jsonb', 'bytea', 'timestamp with time zone')
   `;
   typedColumns = new Map(typed.map((column) => [column.key, column.type]));
   const seen = new Set<string>();
@@ -1366,6 +1376,214 @@ describe("signInEntries", () => {
       }
     },
   );
+});
+
+// ---- the v1.13 fixtures, each in its own world on the database's clock ------------------------------------------------
+
+interface Exchange {
+  call: string;
+  given: { k04Seeds: string[]; partSeeds?: string[]; after: string[]; now: string; note?: string };
+  request: Row;
+  outcome: Row;
+}
+
+const exchangeOf = (file: string): Exchange => readJson(new URL(file, ACCESS_DIR)) as Exchange;
+const exchangeIn = (folder: string, file: string): Exchange =>
+  readJson(new URL(`${folder}/${file}`, ACCESS_DIR)) as Exchange;
+
+/** Each call through its db/repo function on its own side's client, the request handed on as given. */
+const CALLS: Readonly<Record<Call, (request: unknown) => Promise<unknown>>> = {
+  proveSignIn: (request) => proveSignIn(app, request as ProveSignInRequest),
+  endSession: (request) => endSession(app, request as EndSessionRequest),
+  personStanding: (request) => personStanding(job, request as PersonStandingRequest),
+  signInEntries: (request) => signInEntries(job, request as SignInEntriesRequest),
+};
+const isCall = (call: string): call is Call => Object.hasOwn(CALLS, call);
+
+/** The exchanges an exchange's `after` runs first, in order, each once, its own chain first. */
+function stepsOf(file: string, seen = new Set<string>()): string[] {
+  const steps: string[] = [];
+  for (const before of exchangeOf(file).given.after) {
+    if (!seen.has(before)) {
+      seen.add(before);
+      steps.push(...stepsOf(before, seen), before);
+    }
+  }
+  return steps;
+}
+
+/**
+ * The fixture's world: every table emptied (the heads' truncate cascades; this file's schema only), then its seeds as
+ * the owner with every time moved by `shiftMs`, the fake clock's `given.now` becoming the database's now.
+ */
+async function loadWorld(given: Exchange["given"], shiftMs: number): Promise<void> {
+  await db.sql`truncate businesses, persons, handles, bundles, release_flags restart identity cascade`;
+  const seen = new Set<string>();
+  const rows = [
+    ...given.k04Seeds.flatMap((seed) => seedRows(new URL(`core/fixtures/${seed}`, SCHEMA_DIR), seen)),
+    ...(given.partSeeds ?? []).flatMap((seed) => {
+      const [part, file] = seed.split("/");
+      return seedRows(new URL(`${part ?? ""}/fixtures/${file ?? ""}`, SCHEMA_DIR), seen);
+    }),
+  ];
+  await db.sql.begin(async (tx) => {
+    for (const row of rows) {
+      await insertRow(tx, row.table, row.values, shiftMs);
+    }
+  });
+}
+
+/** startSignIn's attempt, as start-sign-in-*'s request and outcome give it (README item 58, rule 5). */
+async function writeStart(step: Exchange, shiftMs: number): Promise<void> {
+  const request = step.request as Record<string, string>;
+  const personId = (step.outcome.personId ?? null) as string | null;
+  const startedAt = new Date(Date.parse(step.given.now) + shiftMs);
+  await db.sql`
+    insert into sign_in_attempts (
+      id, attempt_id, request_sha256, device_sha256, contact_hash, hash_key_name, way, person_id, owner_or_admin,
+      started_at, expires_at
+    ) values (
+      ${request.id ?? ""}, ${request.attemptId ?? ""}, ${request.requestSha256 ?? ""}, ${request.deviceSha256 ?? ""},
+      ${request.contactHash ?? ""}, ${request.hashKeyName ?? ""}, ${request.way ?? ""}, ${personId},
+      exists (
+        select 1 from person_roles
+        where person_id = ${personId} and role in ('owner', 'admin') and ended_at is null
+      ),
+      ${startedAt}, ${startedAt}::timestamptz + interval '10 minutes'
+    )
+  `;
+}
+
+/** sendSignInCode's code and the attempt's code id, as send-sign-in-code-*'s request gives them (README item 59). */
+async function writeSend(step: Exchange, shiftMs: number): Promise<void> {
+  const request = step.request as {
+    signInAttemptId: string;
+    code: { id: string; codeHash: string; hashKeyName: string };
+  };
+  const sentAt = new Date(Date.parse(step.given.now) + shiftMs);
+  await db.sql.begin(async (tx) => {
+    // The attempt's person and their account's proven email's handle, read from the rows (item 59, steps 2 and 3).
+    const written = await tx`
+      insert into proof_codes (
+        id, purpose, person_id, business_id, sent_to_handle_id, channel, code_hash, hash_key_name, sent_at, expires_at
+      )
+      select ${request.code.id}, 'sign_in', a.person_id, null, h.id, 'email', ${request.code.codeHash},
+             ${request.code.hashKeyName}, ${sentAt}, ${sentAt}::timestamptz + interval '10 minutes'
+      from sign_in_attempts a
+      join accounts c on c.person_id = a.person_id and c.email_proven_at is not null
+      join handles h on h.address = c.email and h.kind = 'email'
+      where a.id = ${request.signInAttemptId}
+      returning id
+    `;
+    expect(written).toHaveLength(1);
+    await tx`
+      update sign_in_attempts set proof_code_id = ${request.code.id}, version = version + 1
+      where id = ${request.signInAttemptId}
+    `;
+  });
+}
+
+/** An answer against a fixture's outcome: every field equal, each time within 5 s of the fixture's, moved. */
+function expectOutcome(file: string, actual: unknown, expected: Row, shiftMs: number): void {
+  const times = ["sessionExpiresAt", "until"];
+  const plain = (outcome: Row): Row =>
+    Object.fromEntries(Object.entries(outcome).filter(([field]) => !times.includes(field)));
+  expect(plain(actual as Row), file).toEqual(plain(expected));
+  for (const field of times) {
+    const want = expected[field];
+    if (typeof want === "string") {
+      const got = Date.parse(fieldOf(actual, field) as string);
+      expect(Math.abs(got - (Date.parse(want) + shiftMs)), `${file}: ${field}`).toBeLessThan(5000);
+    } else {
+      expect(fieldOf(actual, field), `${file}: ${field}`).toBeUndefined();
+    }
+  }
+}
+
+/**
+ * Replays an exchange: its world with every time moved so the fake clock of the first step this file's calls answer
+ * reads as the database's now; its chain's start and send as the rows those calls write, and its other steps through
+ * this file's calls, each answer checked against its own fixture; then the exchange itself.
+ */
+async function replay(file: string): Promise<{ outcome: unknown; shiftMs: number }> {
+  const exchange = exchangeOf(file);
+  const steps = stepsOf(file);
+  const anchor = [...steps, file].find((step) => isCall(exchangeOf(step).call)) ?? file;
+  const shiftMs = (await dbClock()).getTime() - Date.parse(exchangeOf(anchor).given.now);
+  await loadWorld(exchange.given, shiftMs);
+  for (const step of steps) {
+    const before = exchangeOf(step);
+    if (before.call === "startSignIn") {
+      await writeStart(before, shiftMs);
+    } else if (before.call === "sendSignInCode") {
+      await writeSend(before, shiftMs);
+    } else if (isCall(before.call)) {
+      const answer = await CALLS[before.call](before.request);
+      expectOutcome(step, answer, before.outcome, shiftMs);
+    } else {
+      throw new Error(`${file}: this file runs no ${before.call} step`);
+    }
+  }
+  if (!isCall(exchange.call)) {
+    throw new Error(`${file}: not one of this file's calls`);
+  }
+  const outcome = await CALLS[exchange.call](exchange.request);
+  expectValid(exchange.call, outcome);
+  expectNoHash(outcome);
+  return { outcome, shiftMs };
+}
+
+describe("the v1.13 fixtures", () => {
+  const files = [
+    "prove-sign-in-sam-right.json",
+    "prove-sign-in-repeat.json",
+    "prove-sign-in-other-device.json",
+    "prove-sign-in-wrong.json",
+    "prove-sign-in-sixth-check.json",
+    "prove-sign-in-sixth-check-no-account.json",
+    "prove-sign-in-expired.json",
+    "prove-sign-in-second-proof.json",
+    "end-session-sam.json",
+    "end-session-repeat.json",
+    "sign-in-entries-signed-in.json",
+    "sign-in-entries-wrong-try.json",
+    "sign-in-entries-sign-out.json",
+  ];
+
+  it("answers each accepted exchange's outcome on the database's clock", SLOW, async () => {
+    for (const file of files) {
+      const { outcome, shiftMs } = await replay(file);
+      expectOutcome(file, outcome, exchangeOf(file).outcome, shiftMs);
+    }
+  });
+
+  it("answers the sixth check alike with and without an account, as the two fixtures do", SLOW, async () => {
+    const withAccount = await replay("prove-sign-in-sixth-check.json");
+    const noAccount = await replay("prove-sign-in-sixth-check-no-account.json");
+    expect(pageParts(withAccount.outcome as ProveSignInOutcome)).toEqual(
+      pageParts(noAccount.outcome as ProveSignInOutcome),
+    );
+    // Both seed attempts were paused at the same moment (15:22:10Z), each now moved by its own replay's clock.
+    expect(Date.parse(fieldOf(withAccount.outcome, "until") as string) - withAccount.shiftMs).toBe(
+      Date.parse(fieldOf(noAccount.outcome, "until") as string) - noAccount.shiftMs,
+    );
+  });
+
+  it("refuses the refused exchanges' requests before any statement", SLOW, async () => {
+    await replay("sign-in-entries-signed-in.json");
+    for (const file of [
+      "refuse-end-session-token-not-hash.json",
+      "refuse-sign-in-entries-caller-values.json",
+    ]) {
+      const refused = exchangeIn("invalid", file);
+      expect(isCall(refused.call)).toBe(true);
+      const from = sent.length;
+      const thrown = await thrownBy(CALLS[refused.call as Call](refused.request));
+      expect(thrown, file).toBeInstanceOf(TypeError);
+      expect(sent.slice(from)).toEqual([]);
+      expect(String(thrown)).not.toContain("placeholder-session-token");
+    }
+  });
 });
 
 describe("no hash leaves a call", () => {
