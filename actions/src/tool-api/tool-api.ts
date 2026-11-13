@@ -21,8 +21,22 @@
 //
 // Steps 2 to 4 answer before anything is read or written. Each call's own logic is T-291 onward: until then every
 // handler is a stub that answers notBuilt (notBuiltHandlers).
+//
+// The lane door (T-1022; DL-728). The calls a later K-09 minor version adds are its journey lane's: a folder of the
+// lane's own (j5/ holds journey 5's, which K-09 v1.3 adds) whose index.ts gives the base, for each call, its name, its
+// K-08 hop, the frozen K-09 version whose definitions validate it and its handler (Lane). The base answers a lane's call
+// by the same steps 1 to 7, none skipped: step 1's own hop is the one its lane registered; step 2 finds the name among
+// the registered calls; steps 3 and 6 hold the call to its version's `$defs/<call>.request`, `.response` and `.errors`,
+// read by the call's own name from a version whose root carries it (validator.ts laneChecks; DL-350); steps 4, 5 and 7
+// are a v1 call's. A lane's handler not built yet throws LaneNotBuiltError, answered notBuilt with its transaction rolled
+// back, and an answer outside its version's definitions is rolled back and thrown (LaneContractError). Registration is
+// refused (LaneRegistrationError), so no base is made, for a K-09 v1 call's name, a name a lane registered already, a hop
+// K-08 does not name, and a version that is not frozen, does not carry the call by $ref from its root, or whose checks
+// are not held (inside workerd, none is yet). With no lane the base is exactly as before: every name outside K-09 v1
+// answers unknownCall.
 
 import {
+  HOPS,
   isLabel,
   type Hop,
   type SpanFacts,
@@ -31,7 +45,8 @@ import {
 } from "../../../runtime/src/trace";
 import type { LimitResult, RowRef } from "../../../runtime/src/trace/types";
 import {
-  hopOf,
+  CALL_HOPS,
+  callerHop,
   isCallName,
   isCallerKind,
   type AnswerOf,
@@ -39,16 +54,9 @@ import {
   type CallerKind,
   type RequestOf,
 } from "./calls";
-import {
-  NotBuiltError,
-  ToolApiContractError,
-  type BaseRefusal,
-  type InvalidRequestRefusal,
-  type NoBusinessScopeRefusal,
-  type NotBuiltRefusal,
-} from "./errors";
+import { NotBuiltError, ToolApiContractError, type BaseRefusal } from "./errors";
 import type { BusinessScope } from "./scope";
-import type { ToolApiValidator } from "./validator";
+import type { CallPart, LaneChecks, ToolApiValidator } from "./validator";
 
 /** The trace a call joins: the caller's own trace context (runtime/src/trace), whose id the request must name. */
 export type CallTrace = Pick<TraceContext, "traceId" | "start">;
@@ -78,8 +86,54 @@ export type Handler<C extends CallName, Repo> = (
 /** One handler for every call of K-09 v1. */
 export type Handlers<Repo> = { readonly [C in CallName]: Handler<C, Repo> };
 
-/** What a call answers: its handler's response or error, or the base's own refusal (errors.ts). */
-export type CallAnswer = AnswerOf<CallName> | BaseRefusal;
+/**
+ * One lane call's logic (T-1022, DL-728): its request, which the base held to its K-09 version's `$defs/<call>.request`
+ * first, in; its response or one of its errors out, which the base holds to `.response` or `.errors`. Its lane types
+ * both: the request comes as `unknown`, as K-09's generated types reach no lane's call by name.
+ */
+export type LaneHandler<Repo> = (request: unknown, context: CallContext<Repo>) => Promise<unknown>;
+
+/** One call a journey lane registers with the base (DL-728). */
+export interface LaneCall<Repo> {
+  /** The call's name in K-09: never a call of v1 (CALL_NAMES), never one another lane registered. */
+  readonly call: string;
+  /**
+   * The K-08 hop of the call's span when a turn, the console, a job, a clock's firing or the actor on return makes it; a
+   * page's call is a pageRequest and an agent's an agentApiRequest, as any call's (callerHop).
+   */
+  readonly hop: Hop;
+  /**
+   * The frozen K-09 version whose `$defs/<call>.request`, `.response` and `.errors` validate the call, as "v1.8": one
+   * whose root carries the call by $ref (validator.ts laneChecks).
+   */
+  readonly version: string;
+  readonly handler: LaneHandler<Repo>;
+}
+
+/** A journey lane: its name (a label, as its folder's: j5) and the calls it registers. */
+export interface Lane<Repo> {
+  readonly lane: string;
+  readonly calls: readonly LaneCall<Repo>[];
+}
+
+/** The base's own refusals of a lane's call: errors.ts's invalidRequest, noBusinessScope and notBuilt, naming that call. */
+export type LaneRefusal =
+  | { error: "invalidRequest"; call: string; problems: string[] }
+  | { error: "noBusinessScope"; call: string }
+  | { error: "notBuilt"; call: string };
+
+/**
+ * A lane's call's response or one of its errors: a JSON object the base held to its K-09 version's definitions. The base
+ * leaves it untyped (K-09's generated types reach no lane's call by name), so its lane types it. As `object`, it never
+ * passes an `in` check for a field, so a v1 answer narrows as it always has.
+ */
+export type LaneResponse = object;
+
+/** What a lane's call answers: its handler's response or one of its errors, or the base's own refusal of it. */
+export type LaneAnswer = LaneRefusal | LaneResponse;
+
+/** What a call answers: its handler's response or error, or the base's own refusal (errors.ts); a lane's call, LaneAnswer. */
+export type CallAnswer = AnswerOf<CallName> | BaseRefusal | LaneAnswer;
 
 /** How one call runs (T-1193; DL-376). Left out or empty, the base records the call's span, as it always has. */
 export interface CallOptions {
@@ -113,8 +167,66 @@ export interface ToolApiOptions<Repo> {
   validator: ToolApiValidator;
   scope: BusinessScope<Repo>;
   handlers: Handlers<Repo>;
+  /**
+   * The journey lanes whose calls the base also answers, each by steps 1 to 7 (T-1022, DL-728), registered when the base
+   * is made: a refused one throws LaneRegistrationError. Default: none, so every name outside K-09 v1 is unknownCall.
+   */
+  lanes?: readonly Lane<Repo>[];
   /** Told when the trace refuses a call's span; the answer never changes for it. Default: one JSON line on console.warn. */
   onSpanRefused?: (report: SpanRefusedReport) => void;
+}
+
+/** Why a lane's call is refused at registration (LaneRegistrationError). */
+export type LaneRefused = "lane" | "v1Call" | "registered" | "hop" | "version";
+
+/**
+ * A lane's call refused at registration (T-1022, DL-728): createToolApi throws it, so no base is made with that lane. It
+ * names the lane, the call and why (`why`), with what the check found.
+ */
+export class LaneRegistrationError extends Error {
+  override name = "LaneRegistrationError";
+  readonly lane: string;
+  readonly call: string;
+  readonly why: LaneRefused;
+
+  constructor(lane: string, call: string, why: LaneRefused, found: string) {
+    super(`lane ${lane} cannot register ${call} (${why}): ${found}`);
+    this.lane = lane;
+    this.call = call;
+    this.why = why;
+  }
+}
+
+/**
+ * What a lane's handler not built yet throws (T-1022, DL-728), as NotBuiltError is a v1 call's: the base answers notBuilt
+ * with the call's transaction rolled back, so nothing is written.
+ */
+export class LaneNotBuiltError extends Error {
+  override name = "LaneNotBuiltError";
+  readonly call: string;
+
+  constructor(call: string) {
+    super(`${call} has no handler yet (its journey lane's task)`);
+    this.call = call;
+  }
+}
+
+/**
+ * A lane's handler answered something its K-09 version's response and errors both refuse, as ToolApiContractError is a v1
+ * call's: never passed on, but rolled back and thrown. The problem lines name paths, never values.
+ */
+export class LaneContractError extends Error {
+  override name = "LaneContractError";
+  readonly call: string;
+  readonly version: string;
+  readonly problems: readonly string[];
+
+  constructor(call: string, version: string, problems: readonly string[]) {
+    super(`${call}'s handler answered outside K-09 ${version} (${String(problems.length)} problems)`);
+    this.call = call;
+    this.version = version;
+    this.problems = problems;
+  }
 }
 
 /** Limits 1 to 6, not checked: what a gate span logs when its call never reached the gate (K-08 v1: the gate lists its limits). */
@@ -130,14 +242,37 @@ const FAILED_ERRORS: ReadonlySet<string> = new Set(["transient", "bookingPaused"
 /** Thrown inside the scoped transaction to roll it back for an answer that is one of the call's errors. */
 class ErrorAnswer extends Error {
   override name = "ErrorAnswer";
-  readonly answer: AnswerOf<CallName>;
+  readonly answer: CallAnswer;
   readonly code: string;
 
-  constructor(answer: AnswerOf<CallName>, code: string) {
+  constructor(answer: CallAnswer, code: string) {
     super("the call answered one of its errors: nothing written");
     this.answer = answer;
     this.code = code;
   }
+}
+
+/**
+ * One call the base answers, a K-09 v1 call or a lane's: its name, the hop its span takes when no page or agent makes it,
+ * its checks, its handler, and the errors that say its handler is not built or answered outside its definitions.
+ */
+interface Entry<Repo> {
+  readonly call: string;
+  readonly hop: Hop;
+  /** K-09 v1.5's definitions (v1.6's for composeInput) for a v1 call, its version's for a lane's (validator.ts). */
+  check(part: CallPart, value: unknown): string[];
+  run(request: unknown, context: CallContext<Repo>): Promise<unknown>;
+  /** NotBuiltError naming a v1 call; LaneNotBuiltError naming a lane's. */
+  isNotBuilt(error: unknown): boolean;
+  /** ToolApiContractError for a v1 call; LaneContractError for a lane's. */
+  outsideContract(problems: readonly string[]): ToolApiContractError | LaneContractError;
+}
+
+/** A lane's call as registered: its lane, what the lane gave, and the checks of its version's definitions. */
+interface RegisteredLaneCall<Repo> {
+  readonly lane: string;
+  readonly laneCall: LaneCall<Repo>;
+  readonly checks: LaneChecks;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -169,6 +304,38 @@ function reportToConsole(report: SpanRefusedReport): void {
       error: report.error,
     }),
   );
+}
+
+/**
+ * Registers each lane's calls by name (T-1022, DL-728), each once, with the checks of its version's definitions. A call
+ * refused throws LaneRegistrationError, so no base is made with its lane.
+ */
+function registerLanes<Repo>(
+  lanes: readonly Lane<Repo>[],
+  validator: ToolApiValidator,
+): ReadonlyMap<string, RegisteredLaneCall<Repo>> {
+  const registered = new Map<string, RegisteredLaneCall<Repo>>();
+  for (const { lane, calls } of lanes) {
+    for (const laneCall of calls) {
+      const { call, hop, version } = laneCall;
+      const refused = (why: LaneRefused, found: string): LaneRegistrationError =>
+        new LaneRegistrationError(lane, call, why, found);
+      if (!isLabel(lane)) throw refused("lane", "a lane is named by a label, as j5");
+      if (isCallName(call))
+        throw refused("v1Call", "a call of K-09 v1, which the base's own handlers answer");
+      const first = registered.get(call);
+      if (first !== undefined) throw refused("registered", `lane ${first.lane} registered it already`);
+      if (!(HOPS as readonly string[]).includes(hop)) throw refused("hop", "not a hop K-08 names");
+      let checks: LaneChecks;
+      try {
+        checks = validator.laneChecks(version, call);
+      } catch (error) {
+        throw refused("version", error instanceof Error ? error.message : "its checks are not held");
+      }
+      registered.set(call, { lane, laneCall, checks });
+    }
+  }
+  return registered;
 }
 
 /**
@@ -236,17 +403,47 @@ export function createToolApi<Repo>(options: ToolApiOptions<Repo>): ToolApi {
     return handler(request, context);
   };
 
+  /** A K-09 v1 call: its CALL_HOPS hop, the validator's v1 checks, its handler in `handlers`. */
+  const v1Entry = (call: CallName): Entry<Repo> => ({
+    call,
+    hop: CALL_HOPS[call],
+    check: (part, value) => validator.check(call, part, value),
+    run: (request, context) => runHandler(call, request as RequestOf<CallName>, context),
+    isNotBuilt: (error) => error instanceof NotBuiltError && error.call === call,
+    outsideContract: (problems) => new ToolApiContractError(call, problems),
+  });
+
+  /** Every lane's call, registered when the base is made (DL-728). */
+  const laneEntries = new Map<string, Entry<Repo>>();
+  for (const [call, { laneCall, checks }] of registerLanes(options.lanes ?? [], validator)) {
+    laneEntries.set(call, {
+      call,
+      hop: laneCall.hop,
+      check: (part, value) => checks.check(part, value),
+      run: (request, context) => laneCall.handler(request, context),
+      isNotBuilt: (error) => error instanceof LaneNotBuiltError && error.call === call,
+      outsideContract: (problems) => new LaneContractError(call, checks.version, problems),
+    });
+  }
+
+  /** The call a name names: a call of K-09 v1, else a lane's registered call, else none (unknownCall). */
+  const entryOf = (name: unknown): Entry<Repo> | undefined => {
+    if (isCallName(name)) return v1Entry(name);
+    return typeof name === "string" ? laneEntries.get(name) : undefined;
+  };
+
   return {
     async call(name, request, trace, options) {
-      const call = isCallName(name) ? name : undefined;
+      const entry = entryOf(name);
       const rawKind = callerOf(request)?.kind;
       const callerKind: CallerKind | undefined = isCallerKind(rawKind) ? rawKind : undefined;
-      const hop: Hop = hopOf(call, callerKind);
+      // A name that is no call takes the commit hop, refused, as hopOf gives it.
+      const hop: Hop = callerHop(entry?.hop ?? "commit", callerKind);
       // The caller records this hop itself (CallOptions): the call has no span of the base's, so nothing is timed or kept.
       const timing = options?.callerRecordsHop === hop ? null : trace.start(hop);
       const notes: SpanNotes = { limits: [], rows: [] };
       const got: SpanFacts = {
-        ...(call === undefined ? {} : { toolCall: call }),
+        ...(entry === undefined ? {} : { toolCall: entry.call }),
         ...(callerKind === undefined ? {} : { callerKind }),
       };
       let spanBusinessId: string | undefined;
@@ -286,12 +483,12 @@ export function createToolApi<Repo>(options: ToolApiOptions<Repo>): ToolApi {
         } catch (error) {
           onSpanRefused({
             traceId: trace.traceId,
-            call: call ?? "unknown",
+            call: entry?.call ?? "unknown",
             error: error instanceof Error ? labelOr(error.name, "error") : "unknown",
           });
         }
       };
-      const refuse = <R extends BaseRefusal>(refusal: R, problems?: number): R => {
+      const refuse = <R extends BaseRefusal | LaneRefusal>(refusal: R, problems?: number): R => {
         finish({
           outcome: "refused",
           answered: refusal.error,
@@ -301,38 +498,37 @@ export function createToolApi<Repo>(options: ToolApiOptions<Repo>): ToolApi {
         return refusal;
       };
 
-      if (call === undefined) return refuse({ error: "unknownCall" });
+      if (entry === undefined) return refuse({ error: "unknownCall" });
+      // The base's refusals below are errors.ts's, each naming the call: a K-09 v1 call's name, or a lane's (LaneRefusal).
+      const { call } = entry;
 
-      const problems = validator.check(call, "request", request);
+      const problems = entry.check("request", request);
       const caller = callerOf(request);
       if (problems.length === 0 && caller !== undefined && caller.traceId !== trace.traceId) {
         problems.push("/caller/traceId is not the trace the call runs in");
       }
       if (problems.length > 0) {
-        const refusal: InvalidRequestRefusal = { error: "invalidRequest", call, problems };
+        const refusal: LaneRefusal = { error: "invalidRequest", call, problems };
         return refuse(refusal, problems.length);
       }
 
       const businessId = caller?.businessId;
       if (typeof businessId !== "string") {
-        const refusal: NoBusinessScopeRefusal = { error: "noBusinessScope", call };
+        const refusal: LaneRefusal = { error: "noBusinessScope", call };
         return refuse(refusal);
       }
       if (isLabel(businessId)) spanBusinessId = businessId;
 
       try {
         const answer = await scope.withBusiness(businessId, async (repo) => {
-          const answered = await runHandler(call, request as RequestOf<CallName>, {
-            repo,
-            businessId,
-            span: notes,
-          });
-          const asResponse = validator.check(call, "response", answered);
-          if (asResponse.length === 0) return answered;
-          const asError = validator.check(call, "errors", answered);
+          const answered = await entry.run(request, { repo, businessId, span: notes });
+          const asResponse = entry.check("response", answered);
+          // Held to the call's response or errors, an answer is one of the call's own (CallAnswer).
+          if (asResponse.length === 0) return answered as CallAnswer;
+          const asError = entry.check("errors", answered);
           const code = errorCodeOf(answered);
-          if (asError.length === 0) throw new ErrorAnswer(answered, code ?? "error");
-          throw new ToolApiContractError(call, code === undefined ? asResponse : asError);
+          if (asError.length === 0) throw new ErrorAnswer(answered as CallAnswer, code ?? "error");
+          throw entry.outsideContract(code === undefined ? asResponse : asError);
         });
         finish({ outcome: "ok", answered: "response", errorCode: null });
         return answer;
@@ -346,11 +542,11 @@ export function createToolApi<Repo>(options: ToolApiOptions<Repo>): ToolApi {
           });
           return error.answer;
         }
-        if (error instanceof NotBuiltError && error.call === call) {
-          const refusal: NotBuiltRefusal = { error: "notBuilt", call };
+        if (entry.isNotBuilt(error)) {
+          const refusal: LaneRefusal = { error: "notBuilt", call };
           return refuse(refusal);
         }
-        if (error instanceof ToolApiContractError) {
+        if (error instanceof ToolApiContractError || error instanceof LaneContractError) {
           finish({
             outcome: "failed",
             answered: "invalidResponse",

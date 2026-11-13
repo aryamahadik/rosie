@@ -1,10 +1,12 @@
 // The Tool API base (T-290; C-074): every K-09 v1 call registered with request and response validation, run under its
-// business scope, with one K-08 span each. See tool-api.ts.
+// business scope, with one K-08 span each. See tool-api.ts. Its lane door (T-1022; DL-728) registers a journey lane's
+// calls, each answered by the same steps, held to the frozen K-09 version its lane names (tool-api.ts Lane).
 
 export {
   CALLER_KINDS,
   CALL_HOPS,
   CALL_NAMES,
+  callerHop,
   hopOf,
   isCallName,
   isCallerKind,
@@ -31,6 +33,9 @@ export {
 } from "./errors";
 export { businessScopeOf, type BusinessScope } from "./scope";
 export {
+  LaneContractError,
+  LaneNotBuiltError,
+  LaneRegistrationError,
   createToolApi,
   notBuiltHandlers,
   type CallAnswer,
@@ -38,6 +43,13 @@ export {
   type CallTrace,
   type Handler,
   type Handlers,
+  type Lane,
+  type LaneAnswer,
+  type LaneCall,
+  type LaneHandler,
+  type LaneRefusal,
+  type LaneRefused,
+  type LaneResponse,
   type SpanNotes,
   type SpanRefusedReport,
   type ToolApi,
@@ -54,6 +66,8 @@ export {
   formatProblems,
   loadToolApiSchemas,
   toolApiSchemaIdOf,
+  toolApiVersionSchemaId,
   type CallPart,
+  type LaneChecks,
   type ToolApiValidator,
 } from "./validator";
