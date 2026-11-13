@@ -1486,3 +1486,173 @@ describe("a bytea value a commit writes: K-04's text form as its bytes (T-1185; 
     },
   );
 });
+
+// ---- T-1339: postgres.js's statement errors leave scrubbed (T-1322's handoff a; as clocks.ts's scrubbed, T-1268) ----
+//
+// Five errors are made for real on local PostgreSQL by postgres.js as installed, each around a made-up number (rule 9: a
+// 555-01xx number) that postgres.js keeps among the statement's values (args): its own UNDEFINED_VALUE; the TypeError its
+// bytea serializer throws, the number in its message too; PostgreSQL's refusal of a statement (22P02, the number in its
+// message); a unique constraint's refusal of a row (23505, the number in its detail, with its table's and constraint's
+// names); and a serialization failure (40001, raised with the number in its message). Each reaches commitTurn as
+// postgres.js rejects the call's first statement with it, on a client whose socket fails with it (as
+// connect-failures.int.test.ts delivers a socket's error), so the call's own catch meets it as it meets the error of any
+// statement of the commit. postgres.js's two leave as a new Error with the call's name and the code alone, and 22P02 as
+// CommitTurnDatabaseError with its SQLSTATE alone; 23505 still answers constraint with its SQLSTATE and the constraint's
+// name (K-05 item 1), and 40001 still answers transient. Nothing that leaves holds the number: not its message, its stack
+// or any other own property, walked deeply.
+
+describe("commitTurn: postgres.js's statement errors leave with the call's name and code alone (T-1339)", () => {
+  type Kind = "undefinedValue" | "serialize" | "refusal" | "unique" | "serialization";
+  /** Thrown with a client's code, thrown as CommitTurnDatabaseError (its message's SQLSTATE: `shown`), or answered. */
+  type Expected =
+    | { client: string }
+    | { database: { code: string; table: string | null; constraint: string | null; shown: string } }
+    | { answer: unknown };
+  const NUMBER = "+15555550139";
+  const KINDS: { kind: Kind; name: string; expected: Expected }[] = [
+    {
+      kind: "undefinedValue",
+      name: "postgres.js's UNDEFINED_VALUE, the number in its args, leaves with its code alone",
+      expected: { client: "UNDEFINED_VALUE" },
+    },
+    {
+      kind: "serialize",
+      name: "the TypeError of postgres.js's bytea serializer, the number in its message, leaves with its code alone",
+      expected: { client: "ERR_INVALID_ARG_TYPE" },
+    },
+    {
+      kind: "refusal",
+      name: "PostgreSQL's 22P02, the number in its message, still leaves as CommitTurnDatabaseError, its SQLSTATE alone",
+      expected: { database: { code: "22P02", table: null, constraint: null, shown: "22P02" } },
+    },
+    {
+      kind: "unique",
+      name: "a unique constraint's 23505, the number in its detail, still answers constraint with its SQLSTATE and name",
+      expected: { answer: { error: "constraint", sqlstate: "23505", constraint: "t1339_numbers_key" } },
+    },
+    {
+      kind: "serialization",
+      name: "PostgreSQL's 40001, the number in its message, still answers transient with its SQLSTATE",
+      expected: { answer: { error: "transient", sqlstate: "40001" } },
+    },
+  ];
+  let made: Record<Kind, Error>;
+
+  /** Every text `value` holds, deeply: its own keys and their values, enumerable or not, its stack among them. */
+  const textsOf = (value: unknown, seen = new Set<object>()): string[] => {
+    if (typeof value === "string") {
+      return [value];
+    }
+    if (typeof value === "number" || typeof value === "bigint" || typeof value === "boolean") {
+      return [String(value)];
+    }
+    if (typeof value !== "object" || value === null || seen.has(value)) {
+      return [];
+    }
+    seen.add(value);
+    return Reflect.ownKeys(value).flatMap((key) => [
+      String(key),
+      ...textsOf((value as Record<PropertyKey, unknown>)[key], seen),
+    ]);
+  };
+  const holdsNumber = (value: unknown): boolean =>
+    textsOf(value).some((text) => text.includes(NUMBER.slice(1)));
+
+  /** The error `statement` is refused with. */
+  const refusalOf = async (statement: Promise<unknown>): Promise<Error> => {
+    try {
+      await statement;
+    } catch (error) {
+      if (error instanceof Error) {
+        return error;
+      }
+    }
+    throw new Error("the statement was not refused with an error");
+  };
+
+  /** commitTurn's outcome on a client whose socket fails with `raw`, which rejects its first statement with it. */
+  const outcomeOn = async (raw: Error): Promise<{ answer: unknown } | { thrown: unknown }> => {
+    const options = { max: 1, onnotice: () => undefined, socket: () => Promise.reject(raw) };
+    const sql = postgres("postgres://t1339@db-t1339.example.invalid:65123/t1339", options);
+    try {
+      return { answer: await commitTurn(sql, requestOf("commit-first.json")) };
+    } catch (error) {
+      return { thrown: error };
+    } finally {
+      await sql.end({ timeout: 0 });
+    }
+  };
+
+  beforeAll(async () => {
+    const sql = postgres(resolvePrimaryUrl(), { max: 1, onnotice: () => undefined });
+    try {
+      await sql`create temp table t1339_numbers (number text constraint t1339_numbers_key unique)`;
+      await sql`insert into t1339_numbers (number) values (${NUMBER})`;
+      await sql.unsafe(`
+        create function pg_temp.t1339_serialization(number text) returns void language plpgsql as $$
+        begin
+          raise exception using errcode = '40001', message = 'could not serialize ' || number;
+        end $$
+      `);
+      made = {
+        refusal: await refusalOf(sql`select ${NUMBER}::uuid as id`),
+        unique: await refusalOf(sql`insert into t1339_numbers (number) values (${NUMBER})`),
+        undefinedValue: await refusalOf(
+          sql`select ${NUMBER}::text as number, ${undefined as never}::text as gone`,
+        ),
+        serialization: await refusalOf(sql`select pg_temp.t1339_serialization(${NUMBER})`),
+        serialize: await refusalOf(sql`select ${sql.typed(Number(NUMBER.slice(1)), 17)} as bytes`),
+      };
+    } finally {
+      await sql.end({ timeout: 5 });
+    }
+  });
+
+  it.each(KINDS)("$name", async ({ kind, expected }) => {
+    const raw = made[kind];
+    // The error holds the number, so the check means something; postgres.js put the statement on it.
+    expect(holdsNumber(raw)).toBe(true);
+    expect(Object.hasOwn(raw, "args")).toBe(true);
+    const outcome = await outcomeOn(raw);
+    // Booleans first, so a failing run prints neither error's text.
+    expect(holdsNumber(outcome)).toBe(false);
+    if ("answer" in expected) {
+      expect(outcome).toEqual({ answer: expected.answer });
+      return;
+    }
+    if (!("thrown" in outcome)) {
+      throw new Error("commitTurn answered");
+    }
+    const { thrown } = outcome;
+    expect(thrown === raw).toBe(false);
+    if ("database" in expected) {
+      const { code, table, constraint, shown } = expected.database;
+      expect(Object.getPrototypeOf(thrown) === CommitTurnDatabaseError.prototype).toBe(true);
+      expect(Object.getOwnPropertyNames(thrown).sort()).toEqual([
+        "code",
+        "constraint",
+        "message",
+        "name",
+        "stack",
+        "table",
+      ]);
+      expect(thrown).toMatchObject({
+        name: "CommitTurnDatabaseError",
+        code,
+        table,
+        constraint,
+        message: `commitTurn: the database refused the commit (SQLSTATE ${shown})`,
+      });
+      return;
+    }
+    // A plain Error of its own: no subclass, cause or property of the original's.
+    expect(Object.getPrototypeOf(thrown) === Error.prototype).toBe(true);
+    expect(Object.getOwnPropertyNames(thrown).sort()).toEqual(["call", "code", "message", "stack"]);
+    expect(thrown).toMatchObject({
+      name: "Error",
+      call: "commitTurn",
+      code: expected.client,
+      message: `commitTurn: the database call failed (code ${expected.client})`,
+    });
+  });
+});
