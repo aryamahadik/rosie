@@ -1,0 +1,19 @@
+{
+  "call": "ownerAskConfirm",
+  "given": {
+    "now": "2026-10-21T23:33:20Z",
+    "environment": "staging",
+    "after": ["owner-asks.json"],
+    "note": "Sam's yes on Needs you to '1 Book it' for Alex's skin fade, read back as owner-ask-read-back.json reads it back, under its own id, but an open block at Lee's Barbershop now holds Alex's number (K-28 v1 customer_blocks), set after the ask was sent. The page entry calls K-09 v1.3 takeMoneyBefore alone, stage ownerAnswer, as owner-ask-confirm.json does, and K-09 refuses it customerBlocked, writing nothing. The page answers cantTakeIt, one answer with no reason, as v1.2 maps a block (v1.2 cantTakeItError; README defaults 57, 77): nothing is booked, owner_oks still waits, and silence at the 7:55pm deadline lets the time go (K-09 v1.3 README default 99). The block's time, the read-back's id and the request's ids are examples."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-fade-0013",
+      "traceId": "trace-portal-sam-fade-0002",
+      "sessionToken": "placeholder-session-token-sam-0105",
+      "linkCode": null
+    },
+    "readBackId": "rb-portal-sam-fade-3"
+  },
+  "outcome": { "error": "cantTakeIt" }
+}

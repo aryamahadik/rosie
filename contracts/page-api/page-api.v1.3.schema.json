@@ -488,8 +488,23 @@
     },
     "clientSecret": {
       "title": "ClientSecret",
-      "description": "The client secret of one SetupIntent or PaymentIntent, for the page's Stripe form only (K-14 v1 clientSecret, by reference): read by the page entry at page time with K-14 v1 pageIntent, by the effect row's providerObjectId from Rosie's own record, and given out only while the form has something to do. Never in a log, a span, an event-log row, a message or a link (README 'Never in a span or a log', v1.3). Fixtures hold placeholders.",
-      "$ref": "../port-stripe/port-stripe.v1.schema.json#/$defs/clientSecret"
+      "description": "The client secret of one SetupIntent or PaymentIntent, for the page's Stripe form only: K-14 v1 clientSecret, by reference and unchanged, with two refusals of the page's own (round 2, DL-737 ruling 2; the security reviewer's N2 on f6bea90; README default 78), since K-14's takes any text: never a value that starts as a Stripe key does (sk_ a secret key, rk_ a restricted key, whsec_ a webhook signing secret; K-14 v1: 'Keys are named, never shown ... no request or response holds one'), and never 13 or more digits in a row, with spaces or dashes between them or not (a card number, as K-14 v1 stripeId refuses one: RULES 4.5). Read by the page entry at page time with K-14 v1 pageIntent, by the effect row's providerObjectId from Rosie's own record, and given out only while the form has something to do. Never in a log, a span, an event-log row, a message or a link (README 'Never in a span or a log', v1.3). Fixtures hold placeholders.",
+      "type": "string",
+      "allOf": [
+        { "$ref": "../port-stripe/port-stripe.v1.schema.json#/$defs/clientSecret" },
+        {
+          "not": {
+            "description": "A Stripe key's prefix: sk_ (a secret key), rk_ (a restricted key) or whsec_ (a webhook signing secret).",
+            "pattern": "^(sk|rk|whsec)_"
+          }
+        },
+        {
+          "not": {
+            "description": "Thirteen or more digits in a row read as a card number (RULES 4.5; arch 02 line 109: card numbers are 13 to 19 digits), as K-14 v1 stripeId refuses them.",
+            "pattern": "[0-9]([ -]?[0-9]){12,}"
+          }
+        }
+      ]
     },
     "stripeAccountId": {
       "title": "StripeAccountId",
@@ -539,6 +554,12 @@
       "properties": { "error": { "const": "noDocument" } },
       "required": ["error"],
       "additionalProperties": false
+    },
+    "moneyTimeTakenError": {
+      "title": "MoneyTimeTakenError",
+      "description": "v1.3's timeTakenError (v1.2's, by reference) as the money calls and Needs you answer K-09 v1.3 takeMoneyBefore's timeTaken (round 2, DL-737 ruling 1; README default 77): the saved time ended, and the time was taken first, by another customer or their AI (A5-05: 'A late yes is checked first: is the time still free?'; K-09 v1.3 README default 98: a late yes, an owner's answer or Stripe's return after the hold ended is checked against the times again, limit 5), so nothing was written. Its card is always null: neither the secure page, C3's pay page nor Needs you takes a pick (v1.2 bookingTimes and bookingPick take the booking page or a quote link's page only), so the page says the time was taken and offers another time as A5-06's own words do ('You can pick another time here'), and Needs you tells the owner nothing was booked.",
+      "type": "object",
+      "allOf": [{ "$ref": "#/$defs/timeTakenError" }, { "properties": { "card": { "type": "null" } } }]
     },
 
     "payLinkCode": {
@@ -1065,7 +1086,7 @@
     },
     "moneyCard.errors": {
       "title": "MoneyCardErrors",
-      "description": "Nothing was made. K-09 v1.3 takeMoneyBefore's errors map so: notAllowed gives notThisPage; notFound gives linkExpired; holdEnded as it is; constraint gives transient; bookingPaused and transient as they are. Stripe out of reach gives providerUnavailable (stripe): the card stage's effect waits in K-07's outage and runs once (K-09 v1.3 README default 100); the page says payments are down, never a decline.",
+      "description": "Nothing was made. K-09 v1.3 takeMoneyBefore's errors map so: notAllowed gives notThisPage; notFound gives linkExpired; holdEnded as it is; customerBlocked and safetyHeld give cantTakeIt, one answer with no reason, as v1.2 maps them (README defaults 57, 77); timeTaken gives timeTaken with its card null (moneyTimeTakenError: Stripe's return after the hold ended, K-09 v1.3 README default 98; README default 77); constraint gives transient; bookingPaused and transient as they are. Stripe out of reach gives providerUnavailable (stripe): the card stage's effect waits in K-07's outage and runs once (K-09 v1.3 README default 100); the page says payments are down, never a decline.",
       "anyOf": [
         { "$ref": "#/$defs/linkExpiredError" },
         { "$ref": "#/$defs/notThisPageError" },
@@ -1075,6 +1096,8 @@
         { "$ref": "#/$defs/noCardNeededError" },
         { "$ref": "#/$defs/notOfferedError" },
         { "$ref": "#/$defs/holdEndedError" },
+        { "$ref": "#/$defs/cantTakeItError" },
+        { "$ref": "#/$defs/moneyTimeTakenError" },
         { "$ref": "#/$defs/providerUnavailableError" },
         { "$ref": "#/$defs/bookingPausedError" },
         { "$ref": "#/$defs/transientError" }
@@ -1182,7 +1205,7 @@
     },
     "moneyYes.errors": {
       "title": "MoneyYesErrors",
-      "description": "Nothing was written. K-09 v1.3 takeMoneyBefore's errors map so: wordsDiffer and versionChanged give readBackChanged with a fresh step; cardNotReady and holdEnded as they are; documentUnsigned gives documentUnsigned without its id; ownYesNeeded cannot occur (a page's tap is the customer's own); notAllowed gives notThisPage; notFound gives linkExpired; constraint gives transient; bookingPaused and transient as they are. A step with payBy payLink confirmed on the secure page answers notThisPage: its yes is the pay page's.",
+      "description": "Nothing was written. K-09 v1.3 takeMoneyBefore's errors map so: wordsDiffer and versionChanged give readBackChanged with a fresh step; cardNotReady and holdEnded as they are; documentUnsigned gives documentUnsigned without its id; customerBlocked and safetyHeld give cantTakeIt, one answer with no reason, as v1.2's bookingPick and bookingConfirm map them (README defaults 57, 77); timeTaken gives timeTaken with its card null (moneyTimeTakenError: a late yes, K-09 v1.3 README default 98; README default 77); ownYesNeeded cannot occur (a page's tap is the customer's own); notAllowed gives notThisPage; notFound gives linkExpired; constraint gives transient; bookingPaused and transient as they are. A step with payBy payLink confirmed on the secure page answers notThisPage: its yes is the pay page's.",
       "anyOf": [
         { "$ref": "#/$defs/linkExpiredError" },
         { "$ref": "#/$defs/notThisPageError" },
@@ -1192,6 +1215,8 @@
         { "$ref": "#/$defs/cardNotReadyError" },
         { "$ref": "#/$defs/documentFirstError" },
         { "$ref": "#/$defs/holdEndedError" },
+        { "$ref": "#/$defs/cantTakeItError" },
+        { "$ref": "#/$defs/moneyTimeTakenError" },
         { "$ref": "#/$defs/bookingPausedError" },
         { "$ref": "#/$defs/transientError" }
       ]
@@ -1490,7 +1515,7 @@
     },
     "moneyConfirm.errors": {
       "title": "MoneyConfirmErrors",
-      "description": "Nothing was written. The K-09 v1.3 call's errors map so: versionChanged and wordsDiffer give readBackChanged with a fresh read-back; notOffered, creditsShort, cardNotReady and holdEnded as they are; ownYesNeeded cannot occur on a page; notAllowed gives notThisPage; notFound gives linkExpired; constraint gives transient; bookingPaused and transient as they are.",
+      "description": "Nothing was written. The K-09 v1.3 call's errors map so: versionChanged and wordsDiffer give readBackChanged with a fresh read-back; notOffered, creditsShort, cardNotReady and holdEnded as they are; takeMoneyBefore's customerBlocked and safetyHeld (letGo, askOwner) give cantTakeIt, one answer with no reason, as v1.2 maps them (README defaults 57, 77), and its timeTaken gives timeTaken with its card null (moneyTimeTakenError; README default 77), while settleOffer's and signDocument's errors hold none of the three (K-09 v1.3 settleOffer.errors, signDocument.errors); ownYesNeeded cannot occur on a page; notAllowed gives notThisPage; notFound gives linkExpired; constraint gives transient; bookingPaused and transient as they are.",
       "anyOf": [
         { "$ref": "#/$defs/linkExpiredError" },
         { "$ref": "#/$defs/notThisPageError" },
@@ -1501,6 +1526,8 @@
         { "$ref": "#/$defs/creditsShortError" },
         { "$ref": "#/$defs/cardNotReadyError" },
         { "$ref": "#/$defs/holdEndedError" },
+        { "$ref": "#/$defs/cantTakeItError" },
+        { "$ref": "#/$defs/moneyTimeTakenError" },
         { "$ref": "#/$defs/bookingPausedError" },
         { "$ref": "#/$defs/transientError" }
       ]
@@ -2101,7 +2128,7 @@
     },
     "ownerAskConfirm.errors": {
       "title": "OwnerAskConfirmErrors",
-      "description": "Nothing was written. K-09 v1.3 takeMoneyBefore ownerAnswer's errors map so: versionChanged gives readBackChanged with a fresh read-back; holdEnded as it is; notAllowed as it is; notFound gives readBackExpired; constraint gives transient; bookingPaused and transient as they are. An ask past its deadline answers requestEnded: silence already let the time go.",
+      "description": "Nothing was written. K-09 v1.3 takeMoneyBefore ownerAnswer's errors map so: versionChanged and wordsDiffer give readBackChanged with a fresh read-back (the ask moved, or the words code builds now from the rows read differ from the read-back's: K-09 v1.3 wordsDifferError); holdEnded as it is; customerBlocked and safetyHeld give cantTakeIt, one answer with no reason, as v1.2 maps them (README defaults 57, 77); timeTaken gives timeTaken with its card null (moneyTimeTakenError): the answer came after the saved time ended and the time was taken first (K-09 v1.3 README default 98: 'an owner's answer ... after it ended is checked against the times again'), so nothing is booked (README default 77); notAllowed as it is; notFound gives readBackExpired; constraint gives transient; bookingPaused and transient as they are. An ask past its deadline answers requestEnded: silence already let the time go.",
       "anyOf": [
         { "$ref": "#/$defs/signInNeededError" },
         { "$ref": "#/$defs/readBackChangedError" },
@@ -2109,6 +2136,8 @@
         { "$ref": "#/$defs/notAllowedError" },
         { "$ref": "#/$defs/requestEndedError" },
         { "$ref": "#/$defs/holdEndedError" },
+        { "$ref": "#/$defs/cantTakeItError" },
+        { "$ref": "#/$defs/moneyTimeTakenError" },
         { "$ref": "#/$defs/bookingPausedError" },
         { "$ref": "#/$defs/transientError" }
       ]

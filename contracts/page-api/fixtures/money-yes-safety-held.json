@@ -1,0 +1,18 @@
+{
+  "call": "moneyYes",
+  "given": {
+    "now": "2026-10-21T23:22:40Z",
+    "environment": "staging",
+    "after": ["money-step-card.json", "money-card-form.json", "money-card-saved.json"],
+    "note": "A5-07's yes as money-yes-card.json sends it, but a text Alex sent while the step was open was read as danger, and an open safety hold that blocks booking now holds his handle (K-34 v1 safety_holds; arch 02 line 129: 'Danger returns the safety message to the caller, and nothing books'). The page entry calls K-09 v1.3 takeMoneyBefore alone, stage yes, as there, and K-09 refuses it safetyHeld, naming only the outcome, writing nothing. The page answers cantTakeIt with no reason, the same answer a block gets; the safety message is the read's that set the hold, never this answer's (v1.2 cantTakeItError; README defaults 57, 77). Nothing is taken and nothing is booked. The text's time and the request's ids are examples."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-money-0022",
+      "traceId": "trace-page-alex-money-0003",
+      "linkCode": "placeholder-secure-alex-haircut-0031"
+    },
+    "moneyStepId": "ms-page-alex-haircut-1"
+  },
+  "outcome": { "error": "cantTakeIt" }
+}
