@@ -2,9 +2,61 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 512, [`0a0b002`](https://github.com/aryamahadik/rosie/commit/0a0b002), 2026-11-13 06:05:10 UTC.
+- **Through:** commit 514, [`debb0cf`](https://github.com/aryamahadik/rosie/commit/debb0cf), 2026-11-13 06:29:10 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 514. docs: COMMIT\_HISTORY.md through commit 512 (0a0b002, \#520) (\#521)
+
+- **Commit:** [`debb0cf`](https://github.com/aryamahadik/rosie/commit/debb0cf), by Arya Mahadik, 2026-11-13 06:29:10 UTC
+- **Pull request:** [#521](https://github.com/aryamahadik/rosie/pull/521) from `task/commit-history-67`, merged 2026-11-13 06:29:10 UTC. It squashed 1 branch commit:
+  - `9161170` docs: COMMIT\_HISTORY.md through commit 512 (0a0b002, \#520)
+- **Files changed:** 1 (+37 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +37 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 513. T-1314: db/repo's other raw paths carry no connection detail: the private error copies, the lost-connection check, a reserve that never connects, and the ping's log line (\#522)
+
+- **Commit:** [`64dc724`](https://github.com/aryamahadik/rosie/commit/64dc724), by Arya Mahadik, 2026-11-13 06:29:05 UTC
+- **Pull request:** [#522](https://github.com/aryamahadik/rosie/pull/522) from `task/T-1314`, merged 2026-11-13 06:29:06 UTC. It squashed 5 branch commits:
+  - `4dada2a` T-1314: db/repo's other raw paths carry no connection detail: bundles…
+  - `f9a4f64` T-1314: reservations.ts's header names whose answer reserve and relea…
+  - `4842d1c` Merge branch 'main' into task/T-1314
+  - `bb9f501` Merge branch 'main' into task/T-1314
+  - `a0fa8b3` T-1314: round 2 (DL-647, DL-648, DL-649): the ping's no-code branch p…
+- **Files changed:** 10 (+1907 −76), by folder:
+  - `compiler/src/cli/commands/` publish.test.ts +14 −5, publish.ts +6 −2
+  - `db/repo/` bundles.int.test.ts +795 −0, bundles.ts +102 −25, client.int.test.ts +391 −0, client.ts +45 −14, outbox.ts +10 −4, reservations.int.test.ts +524 −0, reservations.ts +13 −25
+  - `infra/ci/` publish-bundle.test.mjs +7 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1314: db/repo's other raw paths carry no connection detail: bundles.ts and reservations.ts answer through targets.ts's transientOrThrow under their K-05 names; isLostConnection knows a socket error with no code; reserveConnection answers a reserve() that never connects 08001; the ping logs the code alone and redact takes out the host and port; outbox.ts's CHECK comments (DL-584)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1314: reservations.ts's header names whose answer reserve and release now share (extend's and the runtime side's)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1314: round 2 (DL-647, DL-648, DL-649): the ping's no-code branch proved with a planted host, port, user and password (a local stand-in's ErrorResponse with no C field, or a C field that is not plain); redact's whole-number rule for the port alone; isLostConnection knows ECONNABORTED, with commit and rollback cuts; publish-bundle.test.mjs and compiler publish name readActiveBundle's transient 08001
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 512. docs: COMMIT\_HISTORY.md through commit 510 (33d0ec5, \#518) (\#520)
 
