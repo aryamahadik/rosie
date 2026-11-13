@@ -1,0 +1,6 @@
+{
+  "call": "moneyReadBack",
+  "field": "/change/coSigners/0/name",
+  "typed": "Jordan, card 4242 4242 4242 4242",
+  "passedOn": "Jordan, card [card number]"
+}

@@ -1,0 +1,19 @@
+{
+  "call": "moneyCard",
+  "given": {
+    "now": "2026-10-21T23:24:10Z",
+    "environment": "staging",
+    "after": [],
+    "note": "Refused by the schema: money-card-try-another.json's answer carrying the bank's decline code. A declined card says 'Try another card', never the bank's reason (RULES 3.11; A5-31; S12-25). Without the code the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-fade-0007",
+      "traceId": "trace-page-alex-fade-0001",
+      "linkCode": "placeholder-secure-alex-fade-0032"
+    },
+    "moneyStepId": "ms-page-alex-fade-1",
+    "buyOptionId": null
+  },
+  "outcome": { "result": "tryAnotherCard", "declineCode": "insufficient_funds" }
+}

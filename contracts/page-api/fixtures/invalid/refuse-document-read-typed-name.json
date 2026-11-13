@@ -1,0 +1,29 @@
+{
+  "call": "documentRead",
+  "given": {
+    "now": "2026-11-03T19:30:00Z",
+    "environment": "staging",
+    "after": ["document-send-confirm.json"],
+    "note": "Refused by the schema: document-read.json's signer shown with a typed name. A signer shows by role only, never a name or a typed name (K-35 v1: a typed name is sealed under the signer's key, 'a typed name only on the secure page', the signer's own). Without it the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-heater-0023",
+      "traceId": "trace-page-alex-heater-0023",
+      "linkCode": "placeholder-secure-alex-heater-0039"
+    },
+    "language": "en"
+  },
+  "outcome": {
+    "result": "document",
+    "documentReadId": "dr-page-alex-heater-1",
+    "kind": "contract",
+    "title": "Contract",
+    "language": "en",
+    "languages": ["en"],
+    "words": "Contract · Lee Home Services · Water heater replacement at your home, Fri Nov 6, arriving 8 to 10am, with Jordan. Price: $640, as quoted from your photos. A $160 deposit is taken as the booking is written and counts toward the price; the rest is billed after the visit. Lee Home Services sends this contract; your signature agrees to it.",
+    "signers": [{ "signsAs": "Customer", "you": true, "signed": false, "typedName": "Alex M." }],
+    "signedByAll": false,
+    "expiresAt": "2026-11-03T19:40:00Z"
+  }
+}

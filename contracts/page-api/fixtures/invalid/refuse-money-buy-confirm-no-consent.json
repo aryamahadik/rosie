@@ -1,0 +1,23 @@
+{
+  "call": "moneyConfirm",
+  "given": {
+    "now": "2026-11-05T15:00:00Z",
+    "environment": "staging",
+    "after": ["money-step-offers.json", "money-card-buy-pack.json", "money-buy-pack-read-back.json"],
+    "note": "Refused by the schema: money-buy-pack-confirm.json's buy answered with no consent. A pack or a membership is charged only on the customer's own yes to it, written as its K-29 consent in the buy's commit and answered (K-09 v1.3 README defaults 109, 110; K-32 v1 rule 10: no charge without a bound yes). With its consentId the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-yoga-0004",
+      "traceId": "trace-page-alex-yoga-0001",
+      "linkCode": "placeholder-secure-alex-yoga-0036"
+    },
+    "readBackId": "rb-page-alex-yoga-buy-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-alex-yoga-buy-1",
+    "yesEventId": "evt-page-alex-yoga-0003",
+    "served": { "change": "buy", "kind": "pack", "consentId": null, "payment": "pending" }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "call": "ownerAskConfirm",
+  "given": {
+    "now": "2026-10-21T23:31:20Z",
+    "environment": "staging",
+    "after": ["owner-asks.json", "owner-ask-read-back.json"],
+    "note": "Sam's yes on Needs you: the page entry makes the yes's event and calls K-09 v1.3 takeMoneyBefore alone, caller.kind page for Sam, stage ownerAnswer, step A5-08, the ask, answer book and expectVersion 1 from what it kept, the yes kind page with the read-back's exact words and this event: the same commit tool-api/fixtures/j5-owner-book-turn.json makes from Sam's own turn, from Needs you instead (K-09 v1.3 README default 99). owner_oks answered book in K-08's ownerYes shape (version 2) and booking_details.taken 'nothing', set once: booked with no money taken, so no fee can be charged; it gives money_before (A5-04's 'Nothing taken'), which stays on the server with written. Alex hears it is booked in the booking write's confirmation (A6-14, K-09 v1.4). The yes event's id is an example."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-fade-0003",
+      "traceId": "trace-portal-sam-fade-0001",
+      "sessionToken": "placeholder-session-token-sam-0105",
+      "linkCode": null
+    },
+    "readBackId": "rb-portal-sam-fade-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-portal-sam-fade-1",
+    "yesEventId": "evt-portal-sam-fade-0003",
+    "answer": "book",
+    "took": "nothing",
+    "requestEnded": null
+  }
+}

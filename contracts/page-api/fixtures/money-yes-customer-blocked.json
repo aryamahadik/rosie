@@ -1,0 +1,18 @@
+{
+  "call": "moneyYes",
+  "given": {
+    "now": "2026-10-21T23:22:40Z",
+    "environment": "staging",
+    "after": ["money-step-card.json", "money-card-form.json", "money-card-saved.json"],
+    "note": "A5-07's yes as money-yes-card.json sends it, but an open block at Lee's Barbershop now holds Alex's number (K-28 v1 customer_blocks), set after the step was shown. The page entry calls K-09 v1.3 takeMoneyBefore alone, stage yes, as there, and K-09 refuses it customerBlocked, its blockId null toward the customer's ways (S11-62), writing nothing. The page answers cantTakeIt, the one answer v1.2 gives a block, a pause, a limit and a safety hold alike, with no reason (S11-62: 'AI assistants hear that the business can't take their booking, with no reason given'; v1.2 cantTakeItError; README defaults 57, 77): nothing is taken, nothing is booked, and the page offers to text or call the business. The block's time and the request's ids are examples."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-money-0021",
+      "traceId": "trace-page-alex-money-0002",
+      "linkCode": "placeholder-secure-alex-haircut-0031"
+    },
+    "moneyStepId": "ms-page-alex-haircut-1"
+  },
+  "outcome": { "error": "cantTakeIt" }
+}

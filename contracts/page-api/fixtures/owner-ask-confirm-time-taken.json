@@ -1,0 +1,19 @@
+{
+  "call": "ownerAskConfirm",
+  "given": {
+    "now": "2026-10-21T23:44:00Z",
+    "environment": "staging",
+    "after": ["owner-asks.json"],
+    "note": "Sam answers late on Needs you: '1 Book it' for Alex's skin fade, read back at 7:43:30pm as owner-ask-read-back.json reads it back, under its own id. The saved time ended while his question waited, and the request stayed open for his 7:55pm deadline (K-09 v1.3 README default 98); another customer saved Riley's 1:00pm Saturday at 7:40pm. The page entry calls K-09 v1.3 takeMoneyBefore alone, stage ownerAnswer, as owner-ask-confirm.json does, which checks the times again before anything books (default 98: 'an owner's answer ... after it ended is checked against the times again'; limit 5) and answers timeTaken, writing nothing. The page answers timeTaken with its card null: Needs you takes no pick, and it tells Sam nothing was booked (README default 77). owner_oks still waits, and silence at its deadline lets the request go and tells Alex (A5-08's safe default; K-09 v1.3 README default 99). The times, the read-back's id and the request's ids are examples."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-fade-0015",
+      "traceId": "trace-portal-sam-fade-0004",
+      "sessionToken": "placeholder-session-token-sam-0105",
+      "linkCode": null
+    },
+    "readBackId": "rb-portal-sam-fade-2"
+  },
+  "outcome": { "error": "timeTaken", "card": null }
+}

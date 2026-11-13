@@ -1,0 +1,82 @@
+{
+  "call": "moneyStep",
+  "given": {
+    "now": "2026-11-05T14:58:00Z",
+    "environment": "staging",
+    "after": [],
+    "note": "FS section 7 screen 12 on Alex's secure page at the Yoga studio, booking a $35 Hot Flow class (an example class way, the full price now). K-09 v1.3 showMoneyBefore answers the branch full with nothing to credit yet (he holds no pack or membership here) and offers packs and memberships on this page; the page entry builds what is sold from the studio's settings and the plug-in's packs fact (K-09 v1.3 README default 95, open gap 92; README default 71): the pack of 5 visits for $160 that tool-api/fixtures/j5-buy-pack-page.json buys, and the monthly membership, $120 a month for 8 classes, that j5-buy-membership-page.json buys, each with an option id the page sends back (README default 68). No plan here and no discount code (A5-02 stays off). A pack or membership is bought with its own card (moneyCard with its option) and its own yes (moneyReadBack buy). The page's one clock is the time saved, held for Alex's mobile on file with one extension (K-09 v1.2 README default 61). Nothing is written. The class's time, way and cancel line, the membership's name and the ids are examples."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-yoga-0001",
+      "traceId": "trace-page-alex-yoga-0001",
+      "linkCode": "placeholder-secure-alex-yoga-0036"
+    }
+  },
+  "outcome": {
+    "result": "moneyStep",
+    "moneyStepId": "ms-page-alex-yoga-1",
+    "on": "securePage",
+    "request": {
+      "businessName": "Yoga studio",
+      "service": "Hot Flow",
+      "place": "business",
+      "timeSaved": {
+        "with": "Hot Flow",
+        "during": { "start": "2026-11-05T23:00:00Z", "end": "2026-11-06T00:00:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "heldUntil": "2026-11-05T15:08:00Z",
+        "extendable": true
+      },
+      "price": { "words": "$35", "amount": { "cents": 3500, "currency": "USD" } },
+      "takenNow": "The full $35",
+      "cancelWords": "Free cancel until Thu Nov 5, 4:00pm",
+      "approval": "now"
+    },
+    "branch": "full",
+    "takenNow": "The full $35, paid now into the Yoga studio's own Stripe",
+    "amountNow": { "cents": 3500, "currency": "USD" },
+    "fee": null,
+    "lines": [
+      { "service": "Hot Flow", "before": "full", "paidBy": "money", "dueNow": { "cents": 3500, "currency": "USD" } }
+    ],
+    "offers": {
+      "credits": [],
+      "buy": [
+        {
+          "optionId": "opt-yoga-buy-pack-5",
+          "kind": "pack",
+          "service": "Hot Flow",
+          "name": "Pack of 5 visits",
+          "price": { "cents": 16000, "currency": "USD" },
+          "creditsTotal": 5,
+          "unit": "visit",
+          "period": null,
+          "visitsPerPeriod": null
+        },
+        {
+          "optionId": "opt-yoga-buy-monthly",
+          "kind": "membership",
+          "service": "Hot Flow",
+          "name": "Monthly membership",
+          "price": { "cents": 12000, "currency": "USD" },
+          "creditsTotal": null,
+          "unit": null,
+          "period": "1 month",
+          "visitsPerPeriod": 8
+        }
+      ],
+      "plan": null,
+      "discountCodes": false
+    },
+    "document": null,
+    "stripeDown": false,
+    "payBy": "cardOnPage",
+    "card": null,
+    "askOwner": false,
+    "words": "Hot Flow class, Thu Nov 5 at 6:00pm, $35, paid in full now into the Yoga studio's own Stripe. Free cancel until Thu Nov 5, 4:00pm.",
+    "heldUntil": "2026-11-05T15:08:00Z",
+    "expiresAt": "2026-11-05T15:08:00Z"
+  }
+}

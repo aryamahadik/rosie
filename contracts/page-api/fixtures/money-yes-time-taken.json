@@ -1,0 +1,18 @@
+{
+  "call": "moneyYes",
+  "given": {
+    "now": "2026-10-21T23:42:00Z",
+    "environment": "staging",
+    "after": [],
+    "note": "A late yes (A5-05: 'A late yes is checked first: is the time still free?'). Stripe was down at Alex's money step for the haircut (S12-16), so Sam was asked at once (S12-17), and the time saved for it ended at 7:26:40pm while his question waited, leaving the request open for his deadline (K-09 v1.3 README defaults 98 and 100; the 2 hours are its open gap 93). Once Stripe was back, Alex's card was saved and the page showed the step again with no time held, kept as ms-page-alex-haircut-2. He taps Book it: the page entry calls K-09 v1.3 takeMoneyBefore alone, stage yes, which checks the times again before anything books (default 98; limit 5); another customer saved Riley's 11:00am at 7:31pm, so it answers timeTaken and writes nothing. The page answers timeTaken with its card null, since the secure page takes no pick: it says the time was taken and offers another time, as A5-06's own words do ('You can pick another time here'), and nothing is taken or booked (README default 77). The times, the second step's id and the request's ids are examples."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-money-0031",
+      "traceId": "trace-page-alex-money-0004",
+      "linkCode": "placeholder-secure-alex-haircut-0031"
+    },
+    "moneyStepId": "ms-page-alex-haircut-2"
+  },
+  "outcome": { "error": "timeTaken", "card": null }
+}

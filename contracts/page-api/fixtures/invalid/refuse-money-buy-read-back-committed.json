@@ -1,0 +1,29 @@
+{
+  "call": "moneyReadBack",
+  "given": {
+    "now": "2026-11-05T14:59:50Z",
+    "environment": "staging",
+    "after": ["money-step-offers.json", "money-card-buy-pack.json"],
+    "note": "Refused by the schema: money-buy-pack-read-back.json's request answered as the pack bought, its consent written, with no yes. A read-back writes nothing (FS line 630; DL-257's lesson); with the read-back's outcome the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-yoga-0003",
+      "traceId": "trace-page-alex-yoga-0001",
+      "linkCode": "placeholder-secure-alex-yoga-0036"
+    },
+    "moneyStepId": "ms-page-alex-yoga-1",
+    "change": { "kind": "buy", "optionId": "opt-yoga-buy-pack-5" }
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-alex-yoga-buy-1",
+    "yesEventId": "evt-page-alex-yoga-0003",
+    "served": {
+      "change": "buy",
+      "kind": "pack",
+      "consentId": "consent-alex-yoga-pack-terms",
+      "payment": "pending"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "call": "moneyStep",
+  "given": {
+    "now": "2026-10-21T23:21:00Z",
+    "environment": "staging",
+    "after": ["tool-api/fixtures/j4-secure-link-agent.json"],
+    "note": "Refused by the schema: money-step-card.json's step answered with a hold on the card. Never a hold: every charge is captured at once, and the money step is exactly one of nothing, a card saved, a deposit or the full price (RULES 3.2; D65; FS section 7 screen 13; K-09 v1.3 moneyBranch). With the branch card the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-money-0001",
+      "traceId": "trace-page-alex-money-0001",
+      "linkCode": "placeholder-secure-alex-haircut-0031"
+    }
+  },
+  "outcome": {
+    "result": "moneyStep",
+    "moneyStepId": "ms-page-alex-haircut-1",
+    "on": "securePage",
+    "request": {
+      "businessName": "Lee's Barbershop",
+      "service": "Haircut",
+      "place": "business",
+      "timeSaved": {
+        "with": "Riley",
+        "during": { "start": "2026-10-24T15:00:00Z", "end": "2026-10-24T15:30:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "heldUntil": "2026-10-21T23:26:40Z",
+        "extendable": false
+      },
+      "price": { "words": "$35", "amount": { "cents": 3500, "currency": "USD" } },
+      "takenNow": "A card is saved for the $20 fee; nothing is charged now",
+      "cancelWords": "Free cancel until Fri Oct 23, 11:00am; after that the $20 fee",
+      "approval": "ownerok"
+    },
+    "branch": "hold",
+    "takenNow": "A card is saved for the $20 fee; nothing is charged now",
+    "amountNow": null,
+    "fee": { "cents": 2000, "currency": "USD" },
+    "lines": [{ "service": "Haircut", "before": "card", "paidBy": "money", "dueNow": null }],
+    "offers": { "credits": [], "buy": [], "plan": null, "discountCodes": false },
+    "document": null,
+    "stripeDown": false,
+    "payBy": "cardOnPage",
+    "card": null,
+    "askOwner": false,
+    "words": "Haircut with Riley, Sat Oct 24 at 11:00am, $35, paid at Lee's Barbershop. Your card is saved only for the $20 late-cancel or no-show fee, which Lee's Barbershop confirms first. Nothing is charged now.",
+    "heldUntil": "2026-10-21T23:26:40Z",
+    "expiresAt": "2026-10-21T23:26:40Z"
+  }
+}

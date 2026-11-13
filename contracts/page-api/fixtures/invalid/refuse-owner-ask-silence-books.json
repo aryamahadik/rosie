@@ -1,0 +1,42 @@
+{
+  "call": "readOwnerAsks",
+  "given": {
+    "now": "2026-10-21T23:30:40Z",
+    "environment": "staging",
+    "after": ["money-ask-owner-confirm.json"],
+    "note": "Refused by the schema: owner-asks.json's ask answered as booking on silence. Silence never books or charges (FS section 6.2 Needs you; A5-08: 'Never: book it with no money taken on silence'; S13-55); no answer by the deadline lets the time go. With silence letGo the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-fade-0001",
+      "traceId": "trace-portal-sam-fade-0001",
+      "sessionToken": "placeholder-session-token-sam-0105",
+      "linkCode": null
+    }
+  },
+  "outcome": {
+    "result": "ownerAsks",
+    "asks": [
+      {
+        "ownerOkId": "ok-alex-skin-fade-nothing-taken",
+        "version": 1,
+        "businessName": "Lee's Barbershop",
+        "customerName": "Alex M.",
+        "service": "Skin fade",
+        "with": "Riley",
+        "start": "2026-10-24T17:00:00Z",
+        "zone": "America/New_York",
+        "asks": "A card saved for the $20 fee",
+        "why": "noCardWorks",
+        "question": "Alex M. can't pay what this booking asks now: no card that works, or a phone booking before keypad payment. Book it anyway? Then no fee can be charged. No answer by 7:55pm: the time is let go. / Alex M. · Skin fade · Sat Oct 24 · 1:00pm · Riley / What it asks: A card saved for the $20 fee / Reply 1 Book it, 2 Let it go.",
+        "options": [
+          { "answer": "book", "label": "1 Book it" },
+          { "answer": "letGo", "label": "2 Let it go, or no reply" }
+        ],
+        "askedAt": "2026-10-21T23:25:00Z",
+        "answerBy": "2026-10-21T23:55:00Z",
+        "silence": "book"
+      }
+    ]
+  }
+}

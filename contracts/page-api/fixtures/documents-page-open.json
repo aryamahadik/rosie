@@ -1,0 +1,57 @@
+{
+  "call": "readDocuments",
+  "given": {
+    "now": "2026-11-04T15:00:30Z",
+    "environment": "staging",
+    "after": ["documents-page.json"],
+    "note": "Sam opens Lee Nutrition Clinic's health privacy agreement on the Documents page: the page entry checks that he may read that business's documents (its owner), then reads its English words (K-35 document_texts: 'the owner in the portal'), K-35 seed-agreement-signed's words word for word. The list comes again with it."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-docs-0002",
+      "traceId": "trace-portal-sam-docs-0001",
+      "sessionToken": "placeholder-session-token-sam-0106",
+      "linkCode": null
+    },
+    "open": { "documentId": "doc-health-privacy-nutrition", "language": null }
+  },
+  "outcome": {
+    "result": "documents",
+    "documents": [
+      {
+        "documentId": "doc-alex-heater-contract",
+        "version": 2,
+        "businessName": "Lee Home Services",
+        "kind": "contract",
+        "title": "Contract",
+        "about": "booking",
+        "service": "Water heater replacement",
+        "booking": { "customerName": "Alex M.", "start": "2026-11-06T13:00:00Z", "zone": "America/New_York" },
+        "sentAt": "2026-11-03T19:20:00Z",
+        "signers": [{ "signsAs": "Customer", "signedAt": "2026-11-03T19:31:00Z", "how": "tap" }],
+        "signedByAllAt": "2026-11-03T19:31:00Z",
+        "withdrawn": null
+      },
+      {
+        "documentId": "doc-health-privacy-nutrition",
+        "version": 2,
+        "businessName": "Lee Nutrition Clinic",
+        "kind": "agreement",
+        "title": "Health privacy agreement",
+        "about": "business",
+        "service": null,
+        "booking": null,
+        "sentAt": "2026-10-20T15:05:00Z",
+        "signers": [{ "signsAs": "Owner", "signedAt": "2026-10-20T15:10:00Z", "how": "typedName" }],
+        "signedByAllAt": "2026-10-20T15:10:00Z",
+        "withdrawn": null
+      }
+    ],
+    "opened": {
+      "documentId": "doc-health-privacy-nutrition",
+      "language": "en",
+      "languages": ["en"],
+      "words": "Health privacy agreement / Signed once, on the secure page / Covers every booking and intake form / Not signed: that work stays offline, saved"
+    }
+  }
+}

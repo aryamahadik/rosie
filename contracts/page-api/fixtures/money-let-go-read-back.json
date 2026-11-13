@@ -1,0 +1,28 @@
+{
+  "call": "moneyReadBack",
+  "given": {
+    "now": "2026-10-22T18:04:50Z",
+    "environment": "staging",
+    "after": [],
+    "note": "A5-05's no ('A \"no\" lets the time go now') on Alex's secure page for the style consult: he reads the step's words (nothing taken) and taps No thanks instead of Book it. Nothing is written: the read-back says what the no does, and the page entry keeps it with the change and the K-09 v1.3 call that will make it, takeMoneyBefore letGo (README default 72). The time and words are tool-api/fixtures/j5-let-go-page.json's; the read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-consult-0004",
+      "traceId": "trace-page-alex-consult-0001",
+      "linkCode": "placeholder-secure-alex-consult-0035"
+    },
+    "moneyStepId": "ms-page-alex-consult-1",
+    "change": { "kind": "letGo" }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-alex-consult-no-1",
+    "stepId": "A5-05",
+    "questionId": null,
+    "words": "Let Fri Oct 23 at 3:00pm with Riley go? Your style consult is not booked, and nothing is charged.",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-10-22T18:14:50Z"
+  }
+}

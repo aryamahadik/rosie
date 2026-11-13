@@ -1,0 +1,40 @@
+{
+  "call": "readDocuments",
+  "given": {
+    "now": "2026-11-04T15:00:00Z",
+    "environment": "staging",
+    "after": ["document-sign.json", "db-schema/documents-licenses/fixtures/seed-agreement-signed.json"],
+    "note": "Refused by the schema: documents-page.json's health privacy agreement shown with the name Sam typed to sign it. The console shows when and how a signer signed, never the typed name, which is sealed and shown only on the signer's own secure page (K-35 v1 document_signatures.typed_name). Without it the same exchange is accepted."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-docs-0001",
+      "traceId": "trace-portal-sam-docs-0001",
+      "sessionToken": "placeholder-session-token-sam-0106",
+      "linkCode": null
+    },
+    "open": null
+  },
+  "outcome": {
+    "result": "documents",
+    "documents": [
+      {
+        "documentId": "doc-health-privacy-nutrition",
+        "version": 2,
+        "businessName": "Lee Nutrition Clinic",
+        "kind": "agreement",
+        "title": "Health privacy agreement",
+        "about": "business",
+        "service": null,
+        "booking": null,
+        "sentAt": "2026-10-20T15:05:00Z",
+        "signers": [
+          { "signsAs": "Owner", "signedAt": "2026-10-20T15:10:00Z", "how": "typedName", "typedName": "Sam Lee" }
+        ],
+        "signedByAllAt": "2026-10-20T15:10:00Z",
+        "withdrawn": null
+      }
+    ],
+    "opened": null
+  }
+}

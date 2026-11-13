@@ -1,0 +1,30 @@
+{
+  "call": "ownerAskReadBack",
+  "given": {
+    "now": "2026-10-21T23:31:00Z",
+    "environment": "staging",
+    "after": ["owner-asks.json"],
+    "note": "On Needs you Sam picks '1 Book it' for Alex's skin fade. Nothing is written: the read-back is A5-08's question with the answer picked, in the bundle's label word for word (v1.2 default 59's rule; README default 75), on the owner_oks row's version as read, and its words become the exact words of Sam's yes (K-08 ownerYes). There is no answer for silence (A5-08: 'Never: book it with no money taken on silence'). The read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-fade-0002",
+      "traceId": "trace-portal-sam-fade-0001",
+      "sessionToken": "placeholder-session-token-sam-0105",
+      "linkCode": null
+    },
+    "ownerOkId": "ok-alex-skin-fade-nothing-taken",
+    "version": 1,
+    "answer": "book"
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-portal-sam-fade-1",
+    "stepId": "A5-08",
+    "questionId": null,
+    "words": "Alex M. can't pay what this booking asks now. Book it anyway? Then no fee can be charged. Alex M. · Skin fade · Sat Oct 24 · 1:00pm · Riley. 1 Book it",
+    "shown": [{ "table": "owner_oks", "rowId": "ok-alex-skin-fade-nothing-taken", "version": 1 }],
+    "signature": "none",
+    "expiresAt": "2026-10-21T23:41:00Z"
+  }
+}
