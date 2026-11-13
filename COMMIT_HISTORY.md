@@ -2,9 +2,94 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 540, [`663739f`](https://github.com/aryamahadik/rosie/commit/663739f), 2026-11-13 10:55:21 UTC.
+- **Through:** commit 543, [`3e785b0`](https://github.com/aryamahadik/rosie/commit/3e785b0), 2026-11-13 11:23:10 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 543. docs: COMMIT\_HISTORY.md through commit 540 (663739f, \#547) (\#551)
+
+- **Commit:** [`3e785b0`](https://github.com/aryamahadik/rosie/commit/3e785b0), by Arya Mahadik, 2026-11-13 11:23:10 UTC
+- **Pull request:** [#551](https://github.com/aryamahadik/rosie/pull/551) from `task/commit-history-78`, merged 2026-11-13 11:23:11 UTC. It squashed 1 branch commit:
+  - `2c7daec` docs: COMMIT\_HISTORY.md through commit 540 (663739f, \#547)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 542. T-1341: every outage row written outside a turn's commit is woken by its writer, gated on the reading and never awaited; no sweep (\#550)
+
+- **Commit:** [`890102c`](https://github.com/aryamahadik/rosie/commit/890102c), by Arya Mahadik, 2026-11-13 11:23:06 UTC
+- **Pull request:** [#550](https://github.com/aryamahadik/rosie/pull/550) from `task/T-1341`, merged 2026-11-13 11:23:06 UTC. It squashed 4 branch commits:
+  - `090cf6b` T-1341: each outage row written outside a turn's commit is woken by i…
+  - `3f0b66f` T-1341: comments only: lease.worker.test.ts names T-1341's writers' w…
+  - `aeb834e` Merge branch 'main' into task/T-1341
+  - `b68eaaf` T-1341: round 2 (DL-679): sendOutage starts row S's wake in the gate'…
+- **Files changed:** 14 (+1171 −63), by folder:
+  - `runtime/src/dispatch/` dispatcher.ts +5 −1
+  - `runtime/src/outage/ai/` lease.worker.test.ts +511 −16, outage.ts +24 −13, outage.worker.test.ts +8 −3, types.ts +6 −2
+  - `runtime/src/safety/` arrival.ts +37 −1, outage-wake.test.ts +316 −0, types.ts +9 −0
+  - `runtime/src/turn/` compose.ts +6 −2, crash.worker.test.ts +8 −4, park.ts +2 −1, turn.ts +1 −1
+  - `runtime/src/wiring/` root.test.ts +216 −18, root.ts +22 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1341: each outage row written outside a turn's commit is woken by its own writer (DL-669): SafetyDeps gains an optional wake (OutageWake's shape); arrival.ts sendOutage, once the core's answer names a row (first or repeated), takes the hand-off time and wakes the recipient's dispatcher only while the actor's one reading, asked right before with nothing awaited between, says exactly false (a host with no reading, a throw, true or any other answer: no wake), catching its own failure; outage.ts sendLines collects every row its lines named, first or repeated, behind its unchanged gate; root.ts joins one run (runDispatch for the named recipient on dispatchDeps, T-1337's port included, the retry door's trace rule) as safety.wake. Comments that promised a minute sweep now say the row waits for the recipient's next dispatcher run (outage.ts, types.ts, dispatcher.ts 134, park.ts, compose.ts, turn.ts, crash.worker.test.ts). Tests: lease.worker.test.ts (T-1337's rig, the real actor and runDispatch: row S and row A each sent once by their writer's wake, behind T-1337's hold, failed wake, repeated answers, the gate; T-1337 case 2 restated so its row is left unwoken by the gate; the wired test's two wakes), outage.worker.test.ts (two wakes at a rerun), safety/outage-wake.test.ts (the gate and failures in Node), wiring/root.test.ts (the root's wake, its traces, install())
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1341: comments only: lease.worker.test.ts names T-1341's writers' wake in its header and calls the third run a run with no recipient, which no production code makes (no outbox sweep exists); outage.ts's header step 2 reflowed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1341: round 2 (DL-679): sendOutage starts row S's wake in the gate's synchronous step and never awaits it, so nothing in sendOutage, applyResult or settle waits for the dispatcher run: the late read is set up as before and a late danger verdict's line never waits for that run (RULES 4.12; arch 04 line 211). The gate is unchanged; a throw at the call or a rejection is caught and changes nothing for the line; the run's promise joins pending (beside the text's own work, which idle awaits) until it ends. Tests: lease.worker.test.ts, through the real actor, a text read as other times out at 4 s, row S is written and its wake's run held at the chat lookup, then its verdict comes late with danger and sendDanger's record and row, the danger's hold in place of the unread one and the batch closed for danger and handed on all complete while the run is held, then row S goes once; the writers' runs are counted (Sends.ended) and the T-1337 hold case waits for its run's end (no assertion changed); ActorRpc gains readHolds. outage-wake.test.ts: a held wake, the text's work ends first and idle waits for the run
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 541. T-1280: db/repo: the sign-in send side, startSignIn and sendSignInCode (ADR-016 card R1) (\#549)
+
+- **Commit:** [`fb21d64`](https://github.com/aryamahadik/rosie/commit/fb21d64), by Arya Mahadik, 2026-11-13 11:23:01 UTC
+- **Pull request:** [#549](https://github.com/aryamahadik/rosie/pull/549) from `task/T-1280`, merged 2026-11-13 11:23:02 UTC. It squashed 3 branch commits:
+  - `c251e31` T-1280: db/repo/sign-in-send.ts, K-05 v1.13's startSignIn and sendSig…
+  - `136161f` T-1280: sign-in-send.int.test.ts: a paused start (hourBound, contactP…
+  - `5f793b1` T-1280: sign-in-send.ts: assertReadCommitted's comment says it runs b…
+- **Files changed:** 2 (+2469 −0), by folder:
+  - `db/repo/` sign-in-send.int.test.ts +1618 −0, sign-in-send.ts +851 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1280: db/repo/sign-in-send.ts, K-05 v1.13's startSignIn and sendSignInCode (ADR-016 card R1) on the runtime side's client: rules 0 to 5 under K-22 rule 9's contact lock, and the code row, the turnless email row written checked with its plan and final parts, the attempt's code id and the three entries in one transaction; DL-546 (the lock before the counts, every time the database's, 128-bit ids, no 25-minute narrowing) and DL-610 (a second lock on the email handle before proof_code_limits; read committed checked as each call's first statement). sign-in-send.int.test.ts: the 13 v1.13 fixtures replayed on the database's clock, the card's cases, the two lead-note races, refusals, the Tool API's 42501, statement order and what never leaves
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1280: sign-in-send.int.test.ts: a paused start (hourBound, contactPause, dayCap) sends no account statement and the hour's bound no lock; a link start reads no account and names no person. sign-in-send.ts: the header states where the read committed check runs and what the entries' at is
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1280: sign-in-send.ts: assertReadCommitted's comment says it runs before the call reads anything (inRuntimeTransaction's scope reset comes first)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 540. docs: COMMIT\_HISTORY.md through commit 538 (f2eef53, \#546) (\#547)
 
