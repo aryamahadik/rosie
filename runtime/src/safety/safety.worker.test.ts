@@ -39,9 +39,10 @@ import type { ActorCopies } from "../actor/copies/copies";
 import { WHOLE_A } from "../bundle/test-support";
 import { setDbOutageDeps, type OutageView } from "../outage/db";
 import { dbFakes } from "../outage/db/test-support";
+import { hold, until, type Hold } from "../turn/test-support";
 import { matchDangerWords, normalizeWords, timeoutResult } from "./rules";
 import { FIXTURE_DANGER_WORDS, fakeRead, harness, TEST_IDS, type Harness } from "./test-support";
-import type { SafetyDeps, SafetyResult } from "./types";
+import type { SafetyDeps, SafetyResult, SendFixedLineRequest } from "./types";
 
 type Json = Record<string, unknown>;
 
@@ -1021,4 +1022,258 @@ describe("a vote's words, once in its box, are read on arrival (DL-540; T-1297)"
       expect((await actorOf().readSafety()).map((entry) => entry.eventId)).toEqual(["evt-alex-vote-0003"]);
     });
   });
+});
+
+// ---- T-1336: a STOP the actor takes while the timeout rule's outage line awaits -------------------------------------
+
+describe("a STOP the actor takes while the safety read's own outage line awaits gets no line by any path (T-1336; RULES 7.2), while a text read as another text still gets its line once and a danger line still goes (RULES 4.12)", () => {
+  const FIRST = "evt-alex-1336-1";
+  const STOP = "evt-alex-1336-2";
+  const OTHER = "evt-alex-1336-3";
+  const DANGER = "evt-alex-1336-4";
+
+  /**
+   * The awaits sendOutage makes before its line goes, each held in turn while the actor takes a text: the stopped flag the
+   * deps read; the handle's ids, naming the handle (the line goes through the core's outbox row) or none (it goes straight
+   * through Linq); and the core's answer to the line, `transient` (it goes straight through Linq).
+   */
+  const AWAITS = [
+    "the stopped flag",
+    "the handle's ids",
+    "the handle's ids, which name none",
+    "the core's answer, which is transient",
+  ] as const;
+  type Await = (typeof AWAITS)[number];
+
+  /** True where the line, once let go, goes straight through Linq, not through the core's outbox row. */
+  const viaLinq = (at: Await): boolean =>
+    at === "the handle's ids, which name none" || at === "the core's answer, which is transient";
+
+  interface Held {
+    /** How many times sendOutage reached the await held. */
+    reached: number;
+    /** The outage lines the core was asked for, where its answer is the await held (it writes nothing: `transient`). */
+    asked: SendFixedLineRequest[];
+  }
+
+  /** Holds sendOutage at `at` behind `gate`, which the test opens from its own context (polled: T-1128's findings). */
+  function holdAt(h: Harness, at: Await, gate: Hold): Held {
+    const held: Held = { reached: 0, asked: [] };
+    if (at === "the stopped flag") {
+      h.deps.isStopped = async () => {
+        held.reached += 1;
+        await gate.wait();
+        return h.stopped.value;
+      };
+    } else if (at === "the core's answer, which is transient") {
+      const core = h.deps.core;
+      h.deps.core = {
+        recordSafetyOutcome: (request) => core.recordSafetyOutcome(request),
+        releaseSafetyHold: (request) => core.releaseSafetyHold(request),
+        async sendFixedLine(request) {
+          held.reached += 1;
+          held.asked.push(request);
+          await gate.wait();
+          return { error: "transient" };
+        },
+      };
+    } else {
+      const ids = at === "the handle's ids" ? TEST_IDS : null;
+      h.deps.directory = {
+        async idsOf() {
+          held.reached += 1;
+          await gate.wait();
+          return ids;
+        },
+      };
+    }
+    return held;
+  }
+
+  /** The actor's one reading now (handle-actor.ts `mayHaveStopped`, the safety host's `stopped`), inside the actor. */
+  const actorAnswer = (): Promise<boolean> =>
+    runInDurableObject(stubOf(), (instance) =>
+      (instance as unknown as { mayHaveStopped(): boolean }).mayHaveStopped(),
+    );
+
+  /**
+   * Alex's first text, read by the down path as another text, gets no verdict in 4 s: the timeout rule asks for the outage
+   * line, the actor's reading lets it on (no word waits), and sendOutage waits at `at`.
+   */
+  async function outageLineHeldAt(h: Harness, at: Await): Promise<{ gate: Hold; held: Held }> {
+    const gate = hold(true);
+    const held = holdAt(h, at, gate);
+    await arrive(FIRST, PLAIN_TEXT);
+    await readAsOther(FIRST);
+    expect(await actorAnswer()).toBe(false);
+    await h.clock.advance(4000);
+    await until(() => held.reached === 1, `the outage line's wait at ${at}`);
+    return { gate, held };
+  }
+
+  /** Waits until the first text's safety work has decided its line: its row is done (the line went, or it was held). */
+  async function lineDecided(): Promise<void> {
+    await vi.waitFor(
+      async () => {
+        expect((await actorOf().readSafety()).find((entry) => entry.eventId === FIRST)?.state).toBe("done");
+      },
+      { timeout: 3000 },
+    );
+  }
+
+  const safetyOf = async (eventId: string): Promise<SafetyEntry | undefined> =>
+    (await actorOf().readSafety()).find((entry) => entry.eventId === eventId);
+
+  it.each(AWAITS)(
+    "a STOP the actor takes while the outage line awaits %s: the reading, asked again right before the send, holds the line, so none goes by any path",
+    async (at) => {
+      await withWiredSafety({}, {}, async (h) => {
+        const { gate, held } = await outageLineHeldAt(h, at);
+
+        // The STOP comes now: the actor stores it and opens its batch window in one step (handle-actor.ts `accept`), so
+        // its reading is a possible STOP at once, then the down path's own reading of the word.
+        await arrive(STOP, "STOP");
+        expect(await actorAnswer()).toBe(true);
+        await actorOf().outageIdle();
+        expect((await actorOf().readOutage()).texts).toEqual([
+          expect.objectContaining({ eventId: FIRST, kind: "other" }),
+          expect.objectContaining({ eventId: STOP, kind: "stop" }),
+        ]);
+        expect(await actorAnswer()).toBe(true);
+
+        gate.closed = false;
+        await lineDecided();
+        // No line by any path: no row through the core, no Linq send, no record queued for one; the row says held.
+        await noOutageLine(h, FIRST);
+        expect(h.direct.sent).toEqual([]);
+        expect(held.reached).toBe(1);
+        // Only where the core's answer was the await held was the core asked, before the STOP came; it wrote nothing.
+        expect(held.asked.map((request) => request.caller.requestId)).toEqual(
+          at === "the core's answer, which is transient" ? [`safety:${FIRST}`] : [],
+        );
+        await timeoutRuleStill(FIRST, 34_000);
+      });
+    },
+  );
+
+  it.each(AWAITS)(
+    "a text read as another text, which the actor takes while the outage line awaits %s, does not hold it: the line goes once",
+    async (at) => {
+      await withWiredSafety({}, {}, async (h) => {
+        const { gate, held } = await outageLineHeldAt(h, at);
+
+        await arrive(OTHER, "Test words: thanks!");
+        await readAsOther(FIRST, OTHER);
+        expect(await actorAnswer()).toBe(false);
+
+        gate.closed = false;
+        await lineDecided();
+        expect(held.reached).toBe(1);
+        if (viaLinq(at)) {
+          expect(h.core.fixed).toEqual([]);
+          expect(h.direct.sent).toEqual([
+            expect.objectContaining({
+              fixedLineId: "outage",
+              overrideOptout: false,
+              idempotencyKey: `safety:${FIRST}:outage`,
+            }),
+          ]);
+          expect(await safetyOf(FIRST)).toMatchObject({ path: "outage", lineId: "outage" });
+        } else {
+          expect(
+            h.core.fixed.map((call) => [call.request.caller.requestId, call.request.fixedLineId]),
+          ).toEqual([[`safety:${FIRST}`, "outage"]]);
+          expect(h.direct.sent).toEqual([]);
+          expect(await safetyOf(FIRST)).toMatchObject({ path: "outbox", lineId: "outage" });
+        }
+        if (at === "the core's answer, which is transient") {
+          // The core was asked once and wrote nothing; the line's record waits for its return.
+          expect(held.asked.map((request) => request.caller.requestId)).toEqual([`safety:${FIRST}`]);
+          expect((await actorOf().readCopies()).returns.map((entry) => entry.key)).toContain(
+            `sendFixedLine:${FIRST}`,
+          );
+        }
+      });
+    },
+  );
+
+  it.each(AWAITS)(
+    "the reading asked again fails closed, as T-1313's ask does: the actor's copy of the stopped flag cannot be read once the outage line awaits %s, so the line is held",
+    async (at) => {
+      await withWiredSafety({}, {}, async (h) => {
+        const { gate, held } = await outageLineHeldAt(h, at);
+        // From now on the actor's copy throws on every read: its storage cannot answer for it (here, its table is gone).
+        await runInDurableObject(stubOf(), (_, state) => {
+          state.storage.sql.exec("DROP TABLE copy_stopped");
+        });
+
+        gate.closed = false;
+        await lineDecided();
+        expect(held.reached).toBe(1);
+        expect(h.core.fixed).toEqual([]);
+        expect(h.direct.sent).toEqual([]);
+        expect(await safetyOf(FIRST)).toMatchObject({ path: "none", lineId: "outage" });
+      });
+    },
+  );
+
+  it.each([
+    ["through the core's outbox row", false],
+    [
+      "straight through Linq, past any opt-out, the core answering its record `transient` (PostgreSQL still answering)",
+      true,
+    ],
+  ] as const)(
+    "a danger line still goes at once %s while a STOP the actor took holds the outage line (RULES 4.12: sendDanger never asks the reading)",
+    async (_how, viaLinqToo) => {
+      const danger: SafetyResult = { ...asResult(safetyEmergencyNow), eventId: DANGER };
+      await withWiredSafety({ [DANGER]: danger }, {}, async (h) => {
+        const { gate } = await outageLineHeldAt(h, "the stopped flag");
+        await arrive(STOP, "STOP");
+        expect(await actorAnswer()).toBe(true);
+        if (viaLinqToo) {
+          // K-09's own `transient` (nothing written): the core is not answering for this record, so the line goes direct.
+          h.deps.core = {
+            ...h.deps.core,
+            recordSafetyOutcome: () => Promise.resolve({ error: "transient" }),
+          };
+        }
+
+        // A danger text comes while the STOP waits uncommitted: its verdict's line goes at once, the STOP's reading aside.
+        await arrive(DANGER, EMERGENCY_TEXT);
+        if (viaLinqToo) {
+          await until(() => h.direct.sent.length === 1, "the danger line straight through Linq");
+          expect(h.direct.sent).toEqual([
+            expect.objectContaining({
+              fixedLineId: "safetyEmergency",
+              overrideOptout: true,
+              idempotencyKey: `safety:${DANGER}:safetyEmergency`,
+            }),
+          ]);
+        } else {
+          await until(() => h.core.recorded.length === 1, "the danger line through the core");
+          expect(h.core.recorded[0]?.request.safety.eventId).toBe(DANGER);
+          expect(h.core.recorded[0]?.response).toMatchObject({
+            safetyLine: { fixedLineId: "safetyEmergency" },
+          });
+        }
+        await vi.waitFor(
+          async () => {
+            expect(await safetyOf(DANGER)).toMatchObject({
+              danger: true,
+              path: viaLinqToo ? "direct" : "outbox",
+              lineId: "safetyEmergency",
+            });
+          },
+          { timeout: 3000 },
+        );
+        expect(await actorAnswer()).toBe(true);
+
+        // The outage line, let on before the STOP came, is held when the flag read ends.
+        gate.closed = false;
+        await lineDecided();
+        await noOutageLine(h, FIRST);
+      });
+    },
+  );
 });
