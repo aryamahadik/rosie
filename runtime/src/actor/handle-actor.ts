@@ -42,9 +42,10 @@
 // commit is preceded by that replay (QUESTIONS.md CQ-104 (f)). The lease asks the same path whether a batch waiting
 // behind a turn that has used its one restart may hold a stop word (ADR-018 section 1; T-1311): if so, that turn is
 // restarted a second time with it, so a STOP commits on the first run of the turn that takes it; while the path is
-// unwired, any such batch may. The AI-down path (T-271, ../outage/ai) asks the actor that runs a turn, before any outage
-// line of the run goes, the very question the safety read's own outage line asks (T-1323): whether the copy says stopped
-// or a text no commit has taken may hold a stop word, a STOP waiting behind the turn or in its open batch window included.
+// unwired, any such batch may. The AI-down path (T-271, ../outage/ai) asks the actor that runs a turn, right before each
+// outage line of the run goes, the very question the safety read's own outage line asks (T-1323), by the same function:
+// whether the copy says stopped or a text no commit has taken may hold a stop word, a STOP waiting behind the turn or in
+// its open batch window included, or one the actor took while an earlier line was out.
 //
 // The trace (T-1108; K-08 v1): the gateway writes each inbound event's one receive span, and the actor none of its own. A
 // text's trace is one run by seq whoever writes on it: as the actor stores a text it begins the trace's count after the
@@ -240,7 +241,7 @@ export class HandleActor extends DurableObject {
       // The copy of the stopped flag (T-269), or a text no commit has taken that may hold a stop word, the actor's own STOP
       // and START aside (T-270): the down path's one reading, the lease's `stopAmong` too, true while that path is unwired,
       // on a throw and for a text it cannot find or has no reading of (T-1313; RULES 7.2: "Unsure: treat it as a stop").
-      stopped: () => this.copies.readStopped()?.stopped === true || this.outage.stopPending(),
+      stopped: () => this.mayHaveStopped(),
       storage: ctx.storage,
       spanSink: () => this.spanSink(),
       // A late answer or a re-read's: danger closes the open batch at once, a lifted unread hold lets the waiting batches
@@ -744,12 +745,12 @@ export class HandleActor extends DurableObject {
   }
 
   /**
-   * The actor's answer to the AI-down path for a run of its turn (T-1323; ../outage/ai `OutageHost.stopped`): the number
-   * may have asked to stop by a word no commit has recorded yet. It is the one reading the safety read's own outage line
-   * asks (the safety host's `stopped`, above): the copy of the stopped flag says stopped, or a text no commit has taken may
-   * hold a stop word, the actor's own STOP and START aside (the down path's `stopPending`: true while that path is unwired,
-   * on a throw, and for a text it cannot find or has no reading of; RULES 7.2: "Unsure: treat it as a stop"). A throw here
-   * is the AI-down path's to read as stopped.
+   * The actor's one answer to whether the number may have asked to stop by a word no commit has recorded yet: the safety
+   * host's `stopped` (the safety read's own outage line, T-1313) and the AI-down path's host for a run of its turn (T-1323;
+   * ../outage/ai `OutageHost.stopped`) both call it, so the two answers cannot drift (DL-645). True when the copy of the
+   * stopped flag says stopped, or a text no commit has taken may hold a stop word, the actor's own STOP and START aside
+   * (the down path's `stopPending`: true while that path is unwired, on a throw, and for a text it cannot find or has no
+   * reading of; RULES 7.2: "Unsure: treat it as a stop"). A throw here is each caller's to read as stopped.
    */
   private mayHaveStopped(): boolean {
     return this.copies.readStopped()?.stopped === true || this.outage.stopPending();

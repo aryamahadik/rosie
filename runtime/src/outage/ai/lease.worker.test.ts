@@ -50,6 +50,7 @@ import {
   fakeDecide,
   fakeFacts,
   fakeTurnFace,
+  hold,
   retarget,
   safetyNoFor,
   storedText,
@@ -58,6 +59,7 @@ import {
   until,
   type FakeDecide,
   type FakeTurnFace,
+  type Hold,
 } from "../../turn/test-support";
 import type { TurnParty } from "../../turn/types";
 import { MODELS_DOWN, RETRY_MS, outageLineRequest, setOutageDeps, type WaitingTurn } from "./index";
@@ -677,6 +679,103 @@ describe("a STOP stored behind the turn, or in its open batch window, gets no AI
 
       await modelsDownNow(rig);
       noOutageLine(rig);
+    },
+  );
+
+  // ---- round 2 (DL-644): a STOP the actor takes while an earlier line of the try is out -------------------------------
+
+  /**
+   * K-09's answers held while `gate` is closed: the core takes each outage line's request at once (it is noted, and its row
+   * written) and answers once the gate opens, as a core slow to answer while the actor goes on taking texts, the way
+   * `lateInWindow` lands a text while a run waits in decide.
+   */
+  function holdAnswers(rig: DownRig, gate: Hold): void {
+    const send = rig.o.lines.sendFixedLine.bind(rig.o.lines);
+    rig.o.lines.sendFixedLine = async (request) => {
+      const answer = await send(request);
+      await gate.wait();
+      return answer;
+    };
+  }
+
+  /**
+   * The first text's line, asked for before the STOP came, is the only outage line by any path: none after it from the
+   * turn's outage path (the stopped flag read once, before the first line), no wake for its row, none by the safety read's
+   * timeout rule through the core, none straight through Linq.
+   */
+  function onlyTheFirstLine(rig: DownRig): void {
+    expect(rig.o.lines.requests.map((sent) => [sent.at, sent.request.caller.requestId])).toEqual([
+      [3000, `safety:${A}`],
+    ]);
+    expect([...rig.o.lines.rows.keys()]).toEqual([`safety:${A}`]);
+    expect(rig.o.wakes).toEqual([]);
+    expect(rig.o.stoppedReads).toEqual([actorNameOf(SAM.handle)]);
+    expect(rig.f.core.fixed).toEqual([]);
+    expect(rig.f.direct.sent.filter((send) => send.fixedLineId === "outage")).toEqual([]);
+  }
+
+  it.each([
+    [
+      "unwired, as the root installs it today: the actor's reading holds even the first line, so no request is out when the STOP comes, and no line goes by any path",
+      false,
+    ],
+    [
+      "wired, as D-017 is to wire it, each text read by the real classify (the first two as other texts, the STOP as a STOP): the first line's request is out when the STOP comes, and no line after it goes",
+      true,
+    ],
+  ] as const)(
+    "a STOP the actor takes while the run's first outage line is out (round 2; RULES 7.2), with the down path %s; the try wakes no row, and the restart the STOP makes sends none",
+    async (_how, downPath) => {
+      const rig = await downRigFor(SAM, [A, B, STOP], 99, downPath);
+      const gate = hold(true);
+      holdAnswers(rig, gate);
+      // Sam's two texts in one batch window, which closes at 3 s: the turn's run finds the models down and asks for the
+      // outage line text by text, the core holding its answer to the first.
+      await text(rig, A);
+      await text(rig, B);
+      if (downPath) {
+        expect((await rig.actor.readOutage()).texts).toEqual([
+          expect.objectContaining({ eventId: A, kind: "other" }),
+          expect.objectContaining({ eventId: B, kind: "other" }),
+        ]);
+        expect(await actorAnswer()).toBe(false);
+      }
+      await rig.tick(3000);
+      if (downPath) {
+        await until(() => rig.o.lines.requests.length === 1, "the first line's request");
+        expect(rig.o.waits).toEqual([]);
+      } else {
+        await until(() => rig.o.waits.length === 1, "the run's wait");
+        expect(rig.o.lines.requests).toEqual([]);
+      }
+
+      // The STOP comes now: the actor takes it into its open 3 s batch window, and its answer turns to a possible STOP.
+      await text(rig, STOP);
+      expect((await rig.actor.readBatches()).at(-1)).toMatchObject({ reason: null, eventIds: [STOP] });
+      if (downPath) {
+        expect((await rig.actor.readOutage()).texts).toContainEqual(
+          expect.objectContaining({ eventId: STOP, kind: "stop", keyword: "left" }),
+        );
+      }
+      expect(await actorAnswer()).toBe(true);
+
+      // The core answers the first line; the try asks the actor again right before the second, and its word holds that
+      // line and the wake.
+      gate.closed = false;
+      await until(() => rig.o.waits.length === 1, "the run's wait");
+      if (downPath) onlyTheFirstLine(rig);
+      else noOutageLine(rig);
+
+      // The window closes at 6 s: the STOP's batch restarts the turn (the one restart), whose run holds the STOP and sends
+      // none.
+      await rig.tick(3000);
+      await until(() => rig.o.waits.length === 2, "the restart's wait");
+      expect(await rig.actor.readTurns()).toMatchObject([
+        { eventIds: [A, B], state: "replaced" },
+        { eventIds: [A, B, STOP], state: "leased", restart: true, tries: 1 },
+      ]);
+      if (downPath) onlyTheFirstLine(rig);
+      else noOutageLine(rig);
     },
   );
 });

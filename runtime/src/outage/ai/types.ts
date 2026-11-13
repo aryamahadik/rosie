@@ -61,8 +61,10 @@ export interface OutageHost {
    * True when the actor's copy of the stopped flag says stopped, or a text of the handle that no commit has taken (with the
    * batch window, its open window included, or with the lease: a turn leased, committing or being parked, and the batches
    * waiting behind it) may hold a stop word, by the PostgreSQL-down path's one reading (`stopPending`, T-1313): the reading
-   * the safety read's own outage line asks too, true while that path is unwired. True holds every outage line of the run
-   * back (the turn's next run asks again); a throw reads as true (RULES 7.2: "Unsure: treat it as a stop").
+   * the safety read's own outage line asks too, true while that path is unwired. Asked before a try reads the stopped
+   * flag, again right before each text's line (the actor takes texts while a line is out) and before the try's rows are
+   * woken: true holds every later outage line of the run back (the turn's next run asks again) and wakes none of the
+   * try's rows; a throw reads as true (RULES 7.2: "Unsure: treat it as a stop").
    */
   stopped(): boolean;
 }

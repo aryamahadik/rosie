@@ -13,13 +13,15 @@
 //      actor that runs the turn says the number may have asked to stop by a word no commit has recorded yet (T-1323: its
 //      copy of the flag, or a text no commit has taken that may hold a stop word, such as a STOP waiting behind a turn that
 //      has used its second restart or one in its open batch window, by the one reading the safety read's own outage line
-//      asks, T-1313); not when the handle's stopped flag says stopped; not after the core answers `phoneStopped`; and
-//      limit 8 drops the row at send for a stopped phone (T-259). A line held back here for a stop is not asked for again
-//      in that run (the turn's next run checks again). The request is the one the safety read's timeout rule sends for the
-//      same text (kind job, request id `safety:<event id>`: runtime/src/safety), and K-09 sends a fixed line once per
-//      request id, so a text gets the line once whichever path asks first, a rerun of the turn included (it asks again and
-//      is answered `repeated`). A text the safety read already gave the line is not asked for at all. A line the core does
-//      not answer for now is asked for again on the next retry.
+//      asks, T-1313), asked right before each text's line, since the actor takes texts while a line is out, and before
+//      the try's rows are woken (after its word they wait for the dispatcher's minute sweep: limit 8 cannot see a STOP no
+//      commit has recorded); not when the handle's stopped flag says stopped; not after the core answers `phoneStopped`;
+//      and limit 8 drops the row at send for a stopped phone (T-259). A line held back here for a stop is not asked for
+//      again in that run (the turn's next run checks again). The request is the one the safety read's timeout rule sends
+//      for the same text (kind job, request id `safety:<event id>`: runtime/src/safety), and K-09 sends a fixed line once
+//      per request id, so a text gets the line once whichever path asks first, a rerun of the turn included (it asks again
+//      and is answered `repeated`). A text the safety read already gave the line is not asked for at all. A line the core
+//      does not answer for now is asked for again on the next retry.
 //   3. The turn runs again 30 s after the last try began, and every 30 s while the models are down, until it commits (a
 //      try the gateway's own timeouts made slow does not push the next one back). The retry its lease would not outlast
 //      is not run: the lease's lapse reruns the turn then (T-248; its 60 s lease is two tries), 30 s after the last try
@@ -88,8 +90,8 @@ const hosts = new WeakMap<AbortSignal, OutageHost>();
 
 /**
  * Names the handle actor that runs a turn as the AI-down path's host for one run, by the run's signal (the actor does this
- * at the run's pin, before the run's work starts): before any outage line of that run goes, the path asks it whether the
- * number may have asked to stop (`OutageHost.stopped`; T-1323).
+ * at the run's pin, before the run's work starts): right before each outage line of that run goes, and before the run's
+ * rows are woken, the path asks it whether the number may have asked to stop (`OutageHost.stopped`; T-1323).
  */
 export function setOutageHost(signal: AbortSignal, host: OutageHost): void {
   hosts.set(signal, host);
@@ -179,6 +181,13 @@ function actorSaysStopped(host: OutageHost | null): boolean {
 /**
  * Sends the outage line to each waiting text that has not had it (`done` holds the texts this run is finished with: the
  * line went, or it never will). Never throws.
+ *
+ * The handle actor that runs the turn takes a text during every await here (handle-actor.ts `accept` writes it and opens
+ * its batch window in one synchronous step), so a STOP can come while the stopped flag is read or an earlier text's line is
+ * out. So the actor's word (T-1323) is asked before the flag is read, again right before each text's line, with nothing
+ * awaited between its answer and the line's request, and once more before the try's rows are woken: from its first true
+ * answer on, no later line of the try is asked for (as after the core's `phoneStopped`), and none of the try's rows is
+ * woken.
  */
 async function sendLines(
   set: OutageDeps,
@@ -190,7 +199,7 @@ async function sendLines(
   const pending = waiting.texts.filter((text) => !text.lined && !done.has(text.eventId));
   if (pending.length === 0) return;
   // Never to a stopped number: a stop word among the turn's own texts; the actor's word that the number may have asked to
-  // stop, which no commit has recorded yet (T-1323), asked before each try's first line; or the stopped flag.
+  // stop, which no commit has recorded yet (T-1323; when it holds the lines, the flag is not read); or the stopped flag.
   const stopped =
     waiting.stopAsked || actorSaysStopped(host) ? true : await stoppedNow(set, waiting.actorName);
   if (stopped === null) return;
@@ -199,7 +208,15 @@ async function sendLines(
     return;
   }
   const rows: string[] = [];
+  let held = false;
   for (const text of pending) {
+    // Asked again right before this line: a STOP the actor took while the flag was read or an earlier line was out holds
+    // this line and every later one of the try (RULES 7.2: "It stops texts from the number it answers, at once").
+    if (actorSaysStopped(host)) {
+      held = true;
+      for (const other of pending) done.add(other.eventId);
+      break;
+    }
     let answer: unknown;
     try {
       answer = await set.lines.sendFixedLine(outageLineRequest(waiting, text));
@@ -223,7 +240,11 @@ async function sendLines(
     // No such handle: nothing to send to. Anything else (transient, a bad answer): asked for again on the next retry.
     if (code === "notFound") done.add(text.eventId);
   }
-  if (rows.length > 0 && set.wake !== undefined) {
+  // The rows the try wrote go at once only while the actor still says no word waits (asked again here too, for a STOP taken
+  // while the try's last line was out). After its word, a wake would send them before any commit records the STOP, which
+  // limit 8 cannot see at send; unwoken, they wait for the dispatcher's minute sweep, by which time the STOP's commit may
+  // have set the stopped flag that drops them at send (T-259).
+  if (rows.length > 0 && set.wake !== undefined && !held && !actorSaysStopped(host)) {
     try {
       await set.wake({ handleId: waiting.handleId, outboxRowIds: rows });
     } catch {
