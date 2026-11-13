@@ -504,6 +504,11 @@ describe("the phone scan's last unread shapes: \\u and \\x escapes, a 1 and ten 
       shapes.map((_, i) => `past.json:${i + 1}`),
     );
     for (const hit of hits) assert.doesNotMatch(hit, /[0-9]{4}/, "a hit names no number");
+    // A + form that is no North American number, which only the + form reads, reads its URL-encoded groups too.
+    for (const separator of ["%20", "%2D", "%2e"]) {
+      const written = `to=%2B${[FIVES, FIVES, PAST_BLOCK].join(separator)}&x=y`;
+      assert.deepEqual(phoneNumbersIn(written), [`+${ten(PAST_BLOCK)}`], separator);
+    }
   });
 
   it("keeps an id's ten digits after an escape or a glued 1, an escaped plus in a word, a longer run unread", (t) => {
