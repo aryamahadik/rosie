@@ -127,7 +127,13 @@
 //                wrote, its port (K-05 v1.2 item 30) and its claim; K-03's options ({id, label}) go as their labels.
 //                The phone row renewClaim reads with each renewal (K-05 v1.2 item 32) must be there: with none (an email
 //                handle, or a number whose first turn wrote none) the renewal is answered notFound (the phone row), so
-//                nothing is sent, never read as not stopped (K-05 README's consumer note for T-562).
+//                nothing is sent, never read as not stopped (K-05 README's consumer note for T-562). T-1356: K-05 v1.14's
+//                claim beside them (T-1354, db/repo/outbox.ts claimOutboxV114, OutboxCalls.claimOutboxV114), the one
+//                call that carries the claim's sendClass (item 67: a danger line's safety run, T-1352). Bound, every claim
+//                goes to it, the field as the dispatcher sent it and never dropped, and a claim without it is v1.13's,
+//                unchanged (db/repo default 24). Where it is not bound, a claim with the field is refused before any call
+//                (SendClassNotCarriedError), so nothing is claimed, never a claim of every class in its place (RULES 7.2;
+//                T-1352's rulings, condition 3; K-05 README "What the new tasks must hold to", v1.14).
 //   sendState    T-562: limit 8's read of the recipient's send state at send, and the chat the send goes to, over K-05
 //                v1.2 sendState (T-220, db/repo/send-state.ts; item 28; NQ-RT-2), which since v1.8 also says who gave the
 //                texts yes and for which booking (T-1216; item 47), with its database bound, handed in by the root
@@ -233,6 +239,8 @@ import type {
   ClaimedRowV12,
   ClaimOutboxRequest as K05ClaimOutboxRequest,
   ClaimOutboxV12Outcome,
+  ClaimOutboxV114Outcome,
+  ClaimOutboxV114Request,
   MarkPartV12Outcome,
   MarkPartV12Request,
   MarkRowV12Outcome,
@@ -439,8 +447,9 @@ export interface RealInputs {
    */
   readonly finalize?: Omit<FinalizeInputs, "held" | "now"> | undefined;
   /**
-   * K-05 v1.2's four outbox calls with their database bound (T-562): null or left out where none is bound (the Worker
-   * until T-567), so every claim and mark fails closed and nothing is sent.
+   * K-05 v1.2's four outbox calls with their database bound (T-562), and v1.14's claim beside them where it is bound
+   * (T-1356): null or left out where none is bound (the Worker until T-567), so every claim and mark fails closed and
+   * nothing is sent.
    */
   readonly outbox?: OutboxCalls | null | undefined;
   /**
@@ -1964,12 +1973,22 @@ export function realFinalize(inputs: FinalizeInputs): FinalizePort {
 /**
  * K-05 v1.2's four outbox calls (T-1135, db/repo/outbox.ts) with their database bound, each one transaction on the primary
  * as rosie_job with no business scope: `(request) => claimOutboxV12(sql, request)`, and so on, `sql` a rosie_job client
- * (T-567 binds them). Only these four: T-196's v1 claimOutbox, markPart and markRow write no claim row and answer v1's
- * shapes, so a v1 call beside them would let a v1.2 claim take a row again at once (K-05 default 20; DL-317). Each call's
- * answer type is the v1.2 call's own, so a v1 call cannot be bound here.
+ * (T-567 binds them). Only these four, and v1.14's claim beside them: T-196's v1 claimOutbox, markPart and markRow write no
+ * claim row and answer v1's shapes, so a v1 call beside them would let a v1.2 claim take a row again at once (K-05 default
+ * 20; DL-317). Each call's answer type is the v1.2 call's own, so a v1 call cannot be bound here.
+ *
+ * claimOutboxV114 is K-05 v1.14's claim (T-1354, db/repo/outbox.ts; README item 67), bound as `(request) =>
+ * claimOutboxV114(sql, request)` on the same client (T-1356): the one call that carries the claim's sendClass, the
+ * safety-only claim of a danger line's own wake (T-1352). It writes what claimOutboxV12 writes (the same moves, part keys
+ * and claim rows), so it is no v1 call. Bound, the port makes every claim through it, and a claim without the field is
+ * v1.13's, which is claimOutboxV12's claim with each row's emailPurpose and notAfter added (db/repo default 24: it runs
+ * claimOutboxV113 as it is); claimOutboxV12 is then not called. Left out, a claim without the field goes to
+ * claimOutboxV12 as before, and a claim with it is refused, since claimOutboxV12 cannot carry it (realOutbox).
  */
 export interface OutboxCalls {
   readonly claimOutboxV12: (request: K05ClaimOutboxRequest) => Promise<ClaimOutboxV12Outcome>;
+  readonly claimOutboxV114?:
+    ((request: ClaimOutboxV114Request) => Promise<ClaimOutboxV114Outcome>) | undefined;
   readonly renewClaim: (request: K05RenewClaimRequest) => Promise<RenewClaimOutcome>;
   readonly markPartV12: (request: MarkPartV12Request) => Promise<MarkPartV12Outcome>;
   readonly markRowV12: (request: MarkRowV12Request) => Promise<MarkRowV12Outcome>;
@@ -1986,6 +2005,46 @@ export class ClaimedRowError extends Error {
     super(`a claimed row cannot go to the dispatcher: ${what}`);
     this.name = "ClaimedRowError";
   }
+}
+
+/**
+ * A claim that names a send class (K-05 v1.14 item 67's sendClass: a danger line's safety run, T-1352) where the bound
+ * calls cannot carry it: no v1.14 claim is bound (OutboxCalls.claimOutboxV114). It is refused before any call, so nothing
+ * is claimed; it is never made without the field, as a claim of every class (RULES 7.2; T-1352's rulings, condition 3).
+ * Names the field, never a value.
+ */
+export class SendClassNotCarriedError extends Error {
+  constructor() {
+    super(
+      "the bound outbox calls cannot carry the claim's sendClass (no K-05 v1.14 claim): nothing is claimed",
+    );
+    this.name = "SendClassNotCarriedError";
+  }
+}
+
+/**
+ * The bound claim a dispatcher's claim goes to (T-562, T-1356), its four v1.2 fields as they came: claimOutboxV114 where
+ * it is bound, with the request's sendClass as it came whenever the request carries one (any value: db/repo refuses one
+ * that is not safety, default 133), so the field is never dropped; else claimOutboxV12, for a claim without the field
+ * alone. A claim with the field and no v1.14 claim bound is refused (SendClassNotCarriedError) before any call. v1.13's
+ * answer is v1.2's with two fields added to each row, so it is read as v1.2's here.
+ */
+function claimThrough(
+  calls: OutboxCalls,
+  request: Parameters<OutboxStore["claimOutbox"]>[0],
+): Promise<ClaimOutboxV12Outcome> {
+  const v12: K05ClaimOutboxRequest = {
+    claimer: request.claimer,
+    ...(request.recipientHandleId === undefined ? {} : { recipientHandleId: request.recipientHandleId }),
+    now: request.now,
+    limit: request.limit,
+  };
+  const { sendClass } = request;
+  if (calls.claimOutboxV114 !== undefined) {
+    return calls.claimOutboxV114(sendClass === undefined ? v12 : { ...v12, sendClass });
+  }
+  if (sendClass === undefined) return calls.claimOutboxV12(v12);
+  return Promise.reject(new SendClassNotCarriedError());
 }
 
 /** A K-03 send option as Linq takes it: its words (K-03 v1 option {id, label}: the label is what the person sees). */
@@ -2086,10 +2145,20 @@ function markPartRequestOf(request: Parameters<OutboxStore["markPart"]>[0]): Mar
 }
 
 /**
- * The outbox port (T-562): the dispatcher's OutboxStore (runtime/src/dispatch) over K-05 v1.2's four outbox calls. Each
- * request goes to its v1.2 call as it is; each answer comes back in the dispatcher's shapes:
- *   - claimOutbox: claimOutboxV12. Each claimed row is handed on with its claim, the state it was claimed from, its port
- *     (linq or email: v1.2 item 30), and the final parts finalize wrote into it (K-03's options as their labels);
+ * The outbox port (T-562): the dispatcher's OutboxStore (runtime/src/dispatch) over K-05 v1.2's four outbox calls, and
+ * v1.14's claim where it is bound (T-1356). Each request goes to its call as it is; each answer comes back in the
+ * dispatcher's shapes:
+ *   - claimOutbox: claimOutboxV114 where it is bound, else claimOutboxV12 (claimThrough). A claim with K-05 v1.14's
+ *     sendClass (item 67: a danger line's safety run, T-1352) goes to claimOutboxV114 with the field as it came, never
+ *     without it; where no v1.14 claim is bound it is refused before any call (SendClassNotCarriedError), so nothing is
+ *     claimed, never a claim of every class in its place (RULES 7.2; T-1352's rulings, condition 3). A claim without the
+ *     field goes as v1.2's request, its four fields as they came: through claimOutboxV114 it is v1.13's claim, unchanged
+ *     (db/repo default 24). A transient answer comes back as it is, the safety claim's lock wait past its bound (55P03,
+ *     db/repo default 22) among them, so the danger wake repeats it (the dispatcher's untilNotTransient). Each claimed row
+ *     is handed on with its claim, the state it was claimed from, its port (linq or email: v1.2 item 30), and the final
+ *     parts finalize wrote into it (K-03's options as their labels); a v1.13 row's emailPurpose and notAfter are not
+ *     mapped here (T-1288 maps them), so the dispatcher reads both as missing, no purpose and no end, as from
+ *     claimOutboxV12;
  *   - renewClaim: renewClaim, whose answer also holds the recipient's phone row as the renewal read it, FOR SHARE (v1.2
  *     item 32). A renewal that read no phone row (an email handle, or a number whose first turn wrote none) is answered
  *     notFound for the phone row: the dispatcher sends nothing and keeps no part out, never reading it as not stopped
@@ -2105,12 +2174,7 @@ export function realOutbox(inputs: OutboxInputs): OutboxStore {
   return {
     async claimOutbox(request) {
       if (calls === null) return none("claimOutbox");
-      const answer = await calls.claimOutboxV12({
-        claimer: request.claimer,
-        ...(request.recipientHandleId === undefined ? {} : { recipientHandleId: request.recipientHandleId }),
-        now: request.now,
-        limit: request.limit,
-      });
+      const answer = await claimThrough(calls, request);
       if ("error" in answer) return answer;
       return {
         result: "claimed",
