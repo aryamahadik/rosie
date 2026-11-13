@@ -13,11 +13,13 @@ import commitLimit6First from "../../../contracts/tool-api/fixtures/commit-limit
 import commitLimit6Fails from "../../../contracts/tool-api/fixtures/commit-limit-6-value-fails.json";
 import commitS102 from "../../../contracts/tool-api/fixtures/commit-s1-02.json";
 import stopRecorded from "../../../contracts/tool-api/fixtures/stop-recorded.json";
+import pollVote from "../../../contracts/inbound-event/fixtures/poll-vote.json";
 import decideDisagree from "../../../contracts/model/fixtures/decide-reads-disagree.json";
 import decideNoneFits from "../../../contracts/model/fixtures/decide-none-fits.json";
 import decideS102 from "../../../contracts/model/fixtures/decide-s1-02-choose.json";
-import type { CommitContext, LeasedTurn } from "../actor";
+import type { CommitContext, InboxEntry, LeasedTurn } from "../actor";
 import { BUNDLE_A, BUNDLE_B, WHOLE_A, WHOLE_B } from "../bundle/test-support";
+import { prepareHandoff, type HandleRef, type InboundEvent } from "../gateway";
 import { fakeKeyStore } from "../gateway/test-support";
 import { setGuardDeps, setReplyDeps } from "../guard";
 import { fakeCore as fakeReplyCore, phone, ROSIE_NUMBER, type FakeRow } from "../guard/replies/test-support";
@@ -114,6 +116,65 @@ async function setUp(spec: {
       spec.targets ?? { roles: [], openQuestionIds: [], bookingIds: [] },
     ),
   );
+  restores.push(setGuardDeps({ targets: targets.port }));
+  return { t, face, ai, facts };
+}
+
+/**
+ * A vote as the actor's inbox keeps it: K-06's poll-vote.json with this event's id, option words, send time and trace,
+ * scrubbed and sealed by the gateway's own hand-off (K-06 v1.2: the option's words in the box, none in the clear).
+ */
+async function storedVote(
+  spec: { eventId: string; optionWords: string; sentAt: string; traceId: string },
+  handle: HandleRef,
+  seq: number,
+): Promise<InboxEntry> {
+  const overrides: Json = {
+    eventId: spec.eventId,
+    handle,
+    sentAt: spec.sentAt,
+    traceId: spec.traceId,
+    poll: { ...pollVote.poll, optionWords: spec.optionWords },
+  };
+  const event = { ...(pollVote as Json), ...overrides } as InboundEvent;
+  const prepared = await prepareHandoff(
+    { event, partKey: null, traceId: spec.traceId, bundleId: BUNDLE_A },
+    keys,
+  );
+  if (prepared.door !== "actor") throw new Error("not an actor event");
+  return {
+    seq,
+    event: prepared.handoff.event,
+    partKey: null,
+    traceId: spec.traceId,
+    bundleId: BUNDLE_A,
+    startsTurn: true,
+  };
+}
+
+/** As `setUp`, for a turn of these stored entries on bundle A, each with safety-no.json as its safety result. */
+async function setUpEntries(spec: {
+  who: Party;
+  turnId: string;
+  traceId: string;
+  entries: InboxEntry[];
+  times: string[];
+}): Promise<Setup> {
+  const t = testTurn({
+    turnId: spec.turnId,
+    traceId: spec.traceId,
+    bundleId: BUNDLE_A,
+    manifest: await checkedManifest(WHOLE_A, BUNDLE_A),
+    entries: spec.entries,
+  });
+  const face = fakeTurnFace();
+  const ai = fakeDecide(face.log);
+  const facts = fakeFacts(spec.who.party, spec.times);
+  for (const entry of spec.entries) facts.safety.set(entry.event.eventId, safetyNoFor(entry.event.eventId));
+  restores.push(setTurnDeps(turnDeps(facts, face, ai, keys)));
+  const targets = fakeTargets();
+  const { handleId } = spec.who.party;
+  targets.answers.set(handleId, targetsAnswer(handleId, { roles: [], openQuestionIds: [], bookingIds: [] }));
   restores.push(setGuardDeps({ targets: targets.port }));
   return { t, face, ai, facts };
 }
@@ -644,6 +705,123 @@ describe("keyword texts (K-09 README default 35; T-267's replies)", () => {
     expect(outcome.replies?.replies.map((reply) => reply.outcome)).toEqual(["replied"]);
     expect(core.outbox.get("out-ben-stop-reply")?.finalParts?.fixedLines).toEqual(["stopReply"]);
     expect(KEYWORD_RUNS).toBeGreaterThanOrEqual(2);
+  });
+
+  it("a vote for an option that reads STOP is a STOP too (DL-540): its words opened from its box, its own core-only turn, the commit request stop-recorded.json's", async () => {
+    const vote = await storedVote(
+      {
+        eventId: "evt-ben-0007",
+        optionWords: "STOP",
+        sentAt: "2026-10-21T19:30:00Z",
+        traceId: "trace-ben-0007",
+      },
+      BEN.handle,
+      1,
+    );
+    // The gateway sealed the option's words (K-06 v1.2): the stored vote holds them only in its form 2 box.
+    expect(vote.event.poll).toEqual({ pollId: pollVote.poll.pollId, optionId: pollVote.poll.optionId });
+    expect(vote.event.sealed?.v).toBe(2);
+    expect(JSON.stringify(vote.event)).not.toContain('"STOP"');
+    const { t, face, ai } = await setUpEntries({
+      who: BEN,
+      turnId: "turn-ben-stop",
+      traceId: "trace-ben-0007",
+      entries: [vote],
+      times: [stopRecorded.request.now],
+    });
+    const { core, gate } = gateOverReplyCore(stopRecorded.request.now);
+    face.gate = (request) => gate(request);
+    restores.push(setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER }));
+
+    const outcome = committed(await runTurnLoop(t.turn));
+
+    // The same one commit as a typed STOP's: the vote's safety record first (it is read on arrival now), then its STOP.
+    expect(requestsOf(face)).toEqual([stopRecorded.request]);
+    expect(face.frontierCalls).toEqual([]);
+    expect(ai.decideCalls).toEqual([]);
+    expect(
+      outcome.replies?.replies.map((reply) => [reply.text.kind, reply.outcome, reply.line, reply.stopped]),
+    ).toEqual([["pollVote", "replied", "stopReply", true]]);
+    expect(core.outbox.get("out-ben-stop-reply")?.finalParts?.fixedLines).toEqual(["stopReply"]);
+  });
+
+  it("a vote for an option of other words goes on to the frontier as K-02's pollVote text, its words opened from its box", async () => {
+    const vote = await storedVote(
+      {
+        eventId: pollVote.eventId,
+        optionWords: "Sat 2:00pm",
+        sentAt: pollVote.sentAt,
+        traceId: "trace-alex-0009",
+      },
+      ALEX.handle,
+      1,
+    );
+    expect(vote.event.poll).toEqual({ pollId: pollVote.poll.pollId, optionId: pollVote.poll.optionId });
+    const { t, face } = await setUpEntries({
+      who: ALEX,
+      turnId: "turn-alex-vote",
+      traceId: "trace-alex-0009",
+      entries: [vote],
+      times: ["2026-10-23T14:06:42Z"],
+    });
+
+    await runTurnLoop(t.turn);
+
+    expect(face.frontierCalls.map((request) => request.texts)).toEqual([
+      [
+        {
+          eventId: pollVote.eventId,
+          kind: "pollVote",
+          words: "Sat 2:00pm",
+          sentAt: { utc: pollVote.sentAt, zone: ALEX.party.zone },
+          attachments: [],
+          poll: { pollId: pollVote.poll.pollId, optionId: pollVote.poll.optionId },
+          tapback: null,
+        },
+      ],
+    ]);
+  });
+
+  it("a vote kept before K-06 v1.2 (no box, its option words plain) is read as it was kept: its words from its poll, a STOP among them", async () => {
+    const sealed = await storedVote(
+      {
+        eventId: "evt-ben-0007",
+        optionWords: "STOP",
+        sentAt: "2026-10-21T19:30:00Z",
+        traceId: "trace-ben-0007",
+      },
+      BEN.handle,
+      1,
+    );
+    // As T-243's gateway kept a vote: no box, the option's words in its plain poll (README item 5).
+    const kept: InboxEntry = {
+      ...sealed,
+      event: { ...sealed.event, sealed: null, poll: { ...pollVote.poll, optionWords: "STOP" } },
+    };
+    const { t, face, ai } = await setUpEntries({
+      who: BEN,
+      turnId: "turn-ben-stop",
+      traceId: "trace-ben-0007",
+      entries: [kept],
+      times: [stopRecorded.request.now],
+    });
+    const { core, gate } = gateOverReplyCore(stopRecorded.request.now);
+    face.gate = (request) => gate(request);
+    restores.push(setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER }));
+
+    const outcome = committed(await runTurnLoop(t.turn));
+
+    // Its STOP is the one core action: kept with no box, it was never read on arrival, so no safety record rides with it.
+    expect(requestsOf(face)).toEqual([
+      {
+        ...stopRecorded.request,
+        core: stopRecorded.request.core.filter((action) => action.call !== "recordSafetyOutcome"),
+      },
+    ]);
+    expect(ai.decideCalls).toEqual([]);
+    expect(outcome.replies?.replies.map((reply) => [reply.outcome, reply.stopped])).toEqual([
+      ["replied", true],
+    ]);
   });
 
   it("a keyword text beside a decided one rides in that turn's one commit, after every text's safety record, and never reaches decide", async () => {

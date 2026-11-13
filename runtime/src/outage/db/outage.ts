@@ -66,6 +66,7 @@ import {
   actorNameOf,
   openWords,
   sealWords,
+  wordsOfEvent,
   type HandleRef,
   type SealedWords,
   type SealingKey,
@@ -634,12 +635,19 @@ export class DbOutage {
     }
   }
 
-  /** A stored text's words, opened with the handle's key (never logged); null for a text with none. */
+  /**
+   * A stored text's words, opened with the handle's key and read by the box's form (never logged): since K-06 v1.2 a
+   * vote's option words are in its box (T-1297), so a vote is read for a STOP or a START like a text (DL-540). Null for a
+   * text with none; a box that does not open, or whose members are not its form's, throws (the text reads `unknown`).
+   */
   private async open(set: DbOutageDeps, entry: InboxEntry): Promise<SealedWords | null> {
     const sealed = entry.event.sealed;
     if (sealed === null) return null;
     const key = await set.keys.getOrCreateKey(entry.event.handle);
-    return openWords(sealed, key, actorNameOf(entry.event.handle), entry.event.eventId);
+    return wordsOfEvent(
+      entry.event,
+      await openWords(sealed, key, actorNameOf(entry.event.handle), entry.event.eventId),
+    );
   }
 
   private keywordCopy(): KeywordCopy | null {
@@ -799,7 +807,10 @@ export class DbOutage {
     return true;
   }
 
-  /** The person's own words as the guard reads them (T-267's form), and whether the word flags the visit. Never logged. */
+  /**
+   * The person's own words as the guard reads them (T-267's form; a vote's option words, DL-540), and whether the word
+   * flags the visit. Never logged.
+   */
   private async typed(
     set: DbOutageDeps,
     entry: InboxEntry,
@@ -808,7 +819,7 @@ export class DbOutage {
   ): Promise<{ words: string; flagsVisit: boolean }> {
     const words = await this.open(set, entry);
     const keyword = keywordOf({ eventId: entry.event.eventId, kind: entry.event.kind, words }, copy.list);
-    const body = words?.body ?? "";
+    const body = (entry.event.kind === "pollVote" ? words?.optionWords : words?.body) ?? "";
     const read = keyOf(body) === "" ? (words?.subject ?? "") : body;
     const fallback = keyword?.word ?? kind.toUpperCase();
     return { words: keyOf(read) === "" ? fallback : read, flagsVisit: keyword?.flagsVisit === true };

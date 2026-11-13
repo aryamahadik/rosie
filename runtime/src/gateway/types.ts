@@ -7,7 +7,7 @@ import type { BundleId } from "../trace";
 import type { EmailPort } from "./email/types";
 import type { PageHandlers } from "./pages/types";
 import type { ProviderDoors } from "./providers/types";
-import type { HandleRef, SealedBox, SealingKeyStore } from "./seal";
+import type { EventBox, HandleRef, SealingKeyStore } from "./seal";
 
 /** K-06 v1's inbound event, as far as the gateway reads it; the rest rides through untouched (the gateway seals the words, T-243). */
 export interface InboundEvent {
@@ -61,9 +61,11 @@ export interface ActorHandoff {
 }
 
 /**
- * K-06's event as the actor stores it: the scrubbed event with its words (`body`, and an email's `email.subject`)
- * taken out and sealed into `sealed` (null when the event has no words). Every other field is K-06's, in the clear:
- * the actor orders, dedupes and routes on them.
+ * K-06's event as the actor stores it (K-06 v1.2 `#/$defs/sealedEvent`; T-1297): the scrubbed event with every word a
+ * person typed (`body`, an email's `email.subject` and a poll's `poll.optionWords`) taken out and sealed into `sealed`, a
+ * box of form 2 (null for a reaction, which has none). Every other field is K-06's, in the clear: the actor orders,
+ * dedupes and routes on them. An event kept before v1.2 (`sealedEventV1`) holds a form 1 box, and a vote of it no box and
+ * its option words plain; it is read as it is (`wordsOfEvent` in ./seal.ts).
  */
 export interface SealedEvent {
   eventId: string;
@@ -73,7 +75,7 @@ export interface SealedEvent {
   traceId: string;
   handle: HandleRef;
   /** `scrubbed`'s counts are in the event's own field of that name; the words are only here, sealed. */
-  sealed: SealedBox | null;
+  sealed: EventBox | null;
   readonly [field: string]: unknown;
 }
 
