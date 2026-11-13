@@ -1,0 +1,23 @@
+{
+  "call": "moneyConfirm",
+  "given": {
+    "now": "2026-11-03T19:20:00Z",
+    "environment": "staging",
+    "after": ["money-step-document.json", "document-send-read-back.json"],
+    "note": "Alex's yes: the page entry makes the yes's event and calls K-09 v1.3 signDocument alone, caller.kind page for the link's person (the head's booker), stage send, step B5-34, coSigners none, via page, exactly as tool-api/fixtures/j5-document-send-page.json: in one commit the contract built from the price and the parts the plug-in and the owner require (K-35 documents, origin built, kind contract, of this booking), its English words from a checked text with their sha256, and one signer, Alex (signs_as Customer). With a co-signer each would get their own link here, given once for Alex to forward, never texted (MC C9); there is none. The document and signer ids stay on the server. Alex reads and signs it next (documentRead, documentSign)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-heater-0022",
+      "traceId": "trace-page-alex-heater-0020",
+      "linkCode": "placeholder-secure-alex-heater-0039"
+    },
+    "readBackId": "rb-page-alex-heater-send-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-alex-heater-send-1",
+    "yesEventId": "evt-page-alex-heater-0021",
+    "served": { "change": "sendDocument", "coSignerLinks": [] }
+  }
+}

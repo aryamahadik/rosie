@@ -1,0 +1,52 @@
+{
+  "call": "readDocuments",
+  "given": {
+    "now": "2026-11-04T15:00:00Z",
+    "environment": "staging",
+    "after": ["document-sign.json", "db-schema/documents-licenses/fixtures/seed-agreement-signed.json"],
+    "note": "The owner console's Documents page (FS section 6.2: 'signed agreements (Q02)'), for Sam, signed in: the documents Rosie built at each business he owns, newest first (README default 74): Alex's water heater contract at Lee Home Services, a booking's, signed by Alex with a tap and so signed by all; and Lee Nutrition Clinic's health privacy agreement, the business's own, signed by Sam as Owner with a typed name (K-35 seed-agreement-signed). Each with its id and version, its signers by role with when and how they signed, never the typed name itself (K-35 v1: 'a typed name only on the secure page'), a contact, a number or a file. A page-only read, each business's under its own scope. The visit's start is money-step-document.json's example."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-portal-sam-docs-0001",
+      "traceId": "trace-portal-sam-docs-0001",
+      "sessionToken": "placeholder-session-token-sam-0106",
+      "linkCode": null
+    },
+    "open": null
+  },
+  "outcome": {
+    "result": "documents",
+    "documents": [
+      {
+        "documentId": "doc-alex-heater-contract",
+        "version": 2,
+        "businessName": "Lee Home Services",
+        "kind": "contract",
+        "title": "Contract",
+        "about": "booking",
+        "service": "Water heater replacement",
+        "booking": { "customerName": "Alex M.", "start": "2026-11-06T13:00:00Z", "zone": "America/New_York" },
+        "sentAt": "2026-11-03T19:20:00Z",
+        "signers": [{ "signsAs": "Customer", "signedAt": "2026-11-03T19:31:00Z", "how": "tap" }],
+        "signedByAllAt": "2026-11-03T19:31:00Z",
+        "withdrawn": null
+      },
+      {
+        "documentId": "doc-health-privacy-nutrition",
+        "version": 2,
+        "businessName": "Lee Nutrition Clinic",
+        "kind": "agreement",
+        "title": "Health privacy agreement",
+        "about": "business",
+        "service": null,
+        "booking": null,
+        "sentAt": "2026-10-20T15:05:00Z",
+        "signers": [{ "signsAs": "Owner", "signedAt": "2026-10-20T15:10:00Z", "how": "typedName" }],
+        "signedByAllAt": "2026-10-20T15:10:00Z",
+        "withdrawn": null
+      }
+    ],
+    "opened": null
+  }
+}

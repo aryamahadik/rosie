@@ -1,0 +1,28 @@
+{
+  "call": "moneyReadBack",
+  "given": {
+    "now": "2026-11-05T14:59:50Z",
+    "environment": "staging",
+    "after": ["money-step-offers.json", "money-card-buy-pack.json"],
+    "note": "A5-22: Stripe's form saved the card Alex typed for the pack (cardSaved on eff-alex-hot-flow-card), and he taps to buy the pack of 5 visits. Nothing is written: the read-back's words are his own yes to the pack, the pack, its service, its credits and its price charged now, as code builds them from the offer the step kept (K-09 v1.3 PackItem termsYes; README default 71), and they become the exact words of the K-29 ticked_terms consent the buy's commit writes (K-09 v1.3 README default 109). The words are tool-api/fixtures/j5-buy-pack-page.json's; the read-back's id is a placeholder."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-yoga-0003",
+      "traceId": "trace-page-alex-yoga-0001",
+      "linkCode": "placeholder-secure-alex-yoga-0036"
+    },
+    "moneyStepId": "ms-page-alex-yoga-1",
+    "change": { "kind": "buy", "optionId": "opt-yoga-buy-pack-5" }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-alex-yoga-buy-1",
+    "stepId": "A5-22",
+    "questionId": null,
+    "words": "Pack of 5 visits · Hot Flow / $160 charged today to the card you typed here / This class uses 1 of the 5 visits / If this booking isn't confirmed, the pack stays yours",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-11-05T15:08:00Z"
+  }
+}

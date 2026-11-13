@@ -1,0 +1,59 @@
+{
+  "call": "moneyStep",
+  "given": {
+    "now": "2026-11-03T16:02:40Z",
+    "environment": "staging",
+    "after": ["tool-api/fixtures/j5-pay-link-agent.json"],
+    "note": "C3's pay page (C-200; MC C3; K-09 v1.3 README default 104): Dee opens the pay link her own AI passed her (its code a placeholder). The page entry takes the code's sha256 and finds the live K-32 pay_links row on the runtime side (K-32 default 21), due at 11:13am in New York, and acts for the link's person, Dee, never a person the browser names (README default 70). It calls K-09 v1.3 showMoneyBefore alone, as tool-api/fixtures/j5-pay-page-money-before-page.json: the branch full, the $55 Signature cut and hot towel shave, all due now in one payment, payBy payLink, decided from the stored facts the pay link was made from. The pay page shows only this payment's step: no offers, no document, no owner's ask (MC C3: Sam's OK does not apply to this door). Her own yes comes first, then Stripe's form takes the card for the payment (moneyCard). The page's one clock is the pay link's deadline, the hold's own end, never extended. Nothing is written. The time with Riley, the visit's length, the cancel line and the step's id are examples."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-paypage-dee-sig-0001",
+      "traceId": "trace-paypage-dee-sig-0001",
+      "payCode": "placeholder-pay-dee-signature-0040"
+    }
+  },
+  "outcome": {
+    "result": "moneyStep",
+    "moneyStepId": "ms-paypage-dee-sig-1",
+    "on": "payPage",
+    "request": {
+      "businessName": "Lee's Barbershop",
+      "service": "Signature cut and hot towel shave",
+      "place": "business",
+      "timeSaved": {
+        "with": "Riley",
+        "during": { "start": "2026-11-07T19:00:00Z", "end": "2026-11-07T19:45:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "heldUntil": "2026-11-03T16:13:00Z",
+        "extendable": false
+      },
+      "price": { "words": "$55", "amount": { "cents": 5500, "currency": "USD" } },
+      "takenNow": "The full $55",
+      "cancelWords": "Free cancel until Fri Nov 6, 2:00pm; after that the $20 fee",
+      "approval": "now"
+    },
+    "branch": "full",
+    "takenNow": "The full $55, paid now into Lee's Barbershop's own Stripe",
+    "amountNow": { "cents": 5500, "currency": "USD" },
+    "fee": { "cents": 2000, "currency": "USD" },
+    "lines": [
+      {
+        "service": "Signature cut and hot towel shave",
+        "before": "full",
+        "paidBy": "money",
+        "dueNow": { "cents": 5500, "currency": "USD" }
+      }
+    ],
+    "offers": { "credits": [], "buy": [], "plan": null, "discountCodes": false },
+    "document": null,
+    "stripeDown": false,
+    "payBy": "payLink",
+    "card": null,
+    "askOwner": false,
+    "words": "Signature cut and hot towel shave, Sat Nov 7 at 2:00pm, $55, paid in full now into Lee's Barbershop's own Stripe. Pay by 11:13am today to book it. A late cancel or a no-show keeps only the $20 fee, which Lee's Barbershop confirms first.",
+    "heldUntil": "2026-11-03T16:13:00Z",
+    "expiresAt": "2026-11-03T16:12:40Z"
+  }
+}

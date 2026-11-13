@@ -1,0 +1,71 @@
+{
+  "call": "moneyStep",
+  "given": {
+    "now": "2026-11-03T16:02:40Z",
+    "environment": "staging",
+    "after": ["tool-api/fixtures/j5-pay-link-agent.json"],
+    "note": "Refused by the schema: pay-page-step.json's pay page offering a repeat plan. C3's pay page shows only its one payment's step (MC C3; K-09 v1.3 README default 104): A5-01's offers are the secure page's, where each is settled before anything is taken, and the pay page has no offer, no document and no owner's ask (README default 70). With plan null the same exchange is accepted. The plan offered is an example."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-paypage-dee-sig-0001",
+      "traceId": "trace-paypage-dee-sig-0001",
+      "payCode": "placeholder-pay-dee-signature-0040"
+    }
+  },
+  "outcome": {
+    "result": "moneyStep",
+    "moneyStepId": "ms-paypage-dee-sig-1",
+    "on": "payPage",
+    "request": {
+      "businessName": "Lee's Barbershop",
+      "service": "Signature cut and hot towel shave",
+      "place": "business",
+      "timeSaved": {
+        "with": "Riley",
+        "during": { "start": "2026-11-07T19:00:00Z", "end": "2026-11-07T19:45:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": null,
+        "heldUntil": "2026-11-03T16:13:00Z",
+        "extendable": false
+      },
+      "price": { "words": "$55", "amount": { "cents": 5500, "currency": "USD" } },
+      "takenNow": "The full $55",
+      "cancelWords": "Free cancel until Fri Nov 6, 2:00pm; after that the $20 fee",
+      "approval": "now"
+    },
+    "branch": "full",
+    "takenNow": "The full $55, paid now into Lee's Barbershop's own Stripe",
+    "amountNow": { "cents": 5500, "currency": "USD" },
+    "fee": { "cents": 2000, "currency": "USD" },
+    "lines": [
+      {
+        "service": "Signature cut and hot towel shave",
+        "before": "full",
+        "paidBy": "money",
+        "dueNow": { "cents": 5500, "currency": "USD" }
+      }
+    ],
+    "offers": {
+      "credits": [],
+      "buy": [],
+      "plan": {
+        "optionId": "opt-lees-plan-dee",
+        "name": "Signature cut plan · every 4 weeks",
+        "price": { "cents": 5500, "currency": "USD" },
+        "period": "28 days",
+        "billed": "per_visit",
+        "terms": "Signature cut plan · every 4 weeks / Saturdays · 2:00pm · Riley / Each visit: $55 / Each visit is booked and paid like this one / Skip, pause or end any time, by text"
+      },
+      "discountCodes": false
+    },
+    "document": null,
+    "stripeDown": false,
+    "payBy": "payLink",
+    "card": null,
+    "askOwner": false,
+    "words": "Signature cut and hot towel shave, Sat Nov 7 at 2:00pm, $55, paid in full now into Lee's Barbershop's own Stripe. Pay by 11:13am today to book it. A late cancel or a no-show keeps only the $20 fee, which Lee's Barbershop confirms first.",
+    "heldUntil": "2026-11-03T16:13:00Z",
+    "expiresAt": "2026-11-03T16:12:40Z"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "call": "moneyConfirm",
+  "given": {
+    "now": "2026-11-05T15:00:00Z",
+    "environment": "staging",
+    "after": ["money-step-offers.json", "money-card-buy-pack.json", "money-buy-pack-read-back.json"],
+    "note": "Alex's own yes to the pack: the page entry makes the yes's event and calls K-09 v1.3 settleOffer alone, offer buy, step A5-22, the pack item from the offer it kept with termsYes kind page carrying the read-back's exact words and this event, cardEffectId eff-alex-hot-flow-card and the class's line from what it kept, never the browser (README defaults 68, 71), exactly as tool-api/fixtures/j5-buy-pack-page.json: in one commit his yes as a K-29 ticked_terms consent with those words and their sha256, the pack, its payment pending with its stripe_charge effect (approved by that consent, so C-018 finds the charge bound: K-09 v1.3 README default 110), the visit's credit and the class's line paid by credit. The consent's id comes back; the pack, payment, credit, line and effect ids stay on the server. Only K-14's result makes the payment paid (K-32 rule 5), so the page reads it with moneyCard for this option (a bank's check, if any, comes there) and opens the step again, now nothing taken for the class (A5-04: 'A credit for the only service: Nothing taken')."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-yoga-0004",
+      "traceId": "trace-page-alex-yoga-0001",
+      "linkCode": "placeholder-secure-alex-yoga-0036"
+    },
+    "readBackId": "rb-page-alex-yoga-buy-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-alex-yoga-buy-1",
+    "yesEventId": "evt-page-alex-yoga-0003",
+    "served": {
+      "change": "buy",
+      "kind": "pack",
+      "consentId": "consent-alex-yoga-pack-terms",
+      "payment": "pending"
+    }
+  }
+}

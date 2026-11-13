@@ -1,0 +1,28 @@
+{
+  "call": "moneyReadBack",
+  "given": {
+    "now": "2026-11-12T14:09:50Z",
+    "environment": "staging",
+    "after": ["money-buy-pack-confirm.json"],
+    "note": "A5-03 a week later on Alex's secure page for another $35 Hot Flow class: the step offered his own pack of 5 visits, 4 left, by an option id (creditOffer; README default 68). He taps Use a credit. Nothing is written: the read-back says what the credit pays and what is left after this visit (A5-03: 'The page shows the credits left after this visit'), and the page entry keeps it with the change and K-09 v1.3 settleOffer credit, its pack, units, line and version from the step it kept. The class's time and the read-back's id are examples."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-yoga-0010",
+      "traceId": "trace-page-alex-yoga-0002",
+      "linkCode": "placeholder-secure-alex-yoga2-0037"
+    },
+    "moneyStepId": "ms-page-alex-yoga-2",
+    "change": { "kind": "credit", "optionId": "opt-yoga-credit-pack-1" }
+  },
+  "outcome": {
+    "result": "readBack",
+    "readBackId": "rb-page-alex-yoga-credit-1",
+    "stepId": "A5-03",
+    "questionId": null,
+    "words": "Use 1 of the 4 visits left on your Pack of 5 visits for this Hot Flow class on Thu Nov 12 at 6:00pm? 3 are left after it, and nothing is taken now for the class.",
+    "shown": [],
+    "signature": "none",
+    "expiresAt": "2026-11-12T14:19:50Z"
+  }
+}

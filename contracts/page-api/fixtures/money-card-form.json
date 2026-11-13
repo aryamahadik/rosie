@@ -1,0 +1,26 @@
+{
+  "call": "moneyCard",
+  "given": {
+    "now": "2026-10-21T23:21:20Z",
+    "environment": "staging",
+    "after": ["money-step-card.json"],
+    "note": "A5-07's card form on Alex's secure page (FS section 7 screen 11: 'Pay (card typed here, in the business's own Stripe)'). The first call for this step makes the card stage: the page entry calls K-09 v1.3 takeMoneyBefore alone, stage card, step A5-07, keep true (the booking keeps the card for the fee), as tool-api/fixtures/j5-card-form-page.json: the K-07 stripe_save_card effect eff-alex-haircut-save-card and the K-32 saved_cards row naming it, saved_at null until cardSaved. It keeps the effect with the step, then reads the card save by K-14 v1 pageIntent on the effect's providerObjectId, on Lee's Barbershop's own account from Rosie's record (K-14 v1 page-intent-card-saved.json's request, before it succeeded): it needs a card, so the answer carries the client secret and the shop's Stripe account, only for Stripe's own form, with Rosie's publishable key from the web app's config (README default 69). The card is typed into Stripe's form, so no card detail reaches Rosie, and nothing is charged. The client secret and the account id are placeholders, never logged."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-money-0002",
+      "traceId": "trace-page-alex-money-0001",
+      "linkCode": "placeholder-secure-alex-haircut-0031"
+    },
+    "moneyStepId": "ms-page-alex-haircut-1",
+    "buyOptionId": null
+  },
+  "outcome": {
+    "result": "form",
+    "purpose": "saveCard",
+    "state": "needsCard",
+    "clientSecret": "demo-client-secret-setup-alex-haircut-1",
+    "accountId": "stripe-acct-demo-lees-barbershop",
+    "amount": null
+  }
+}

@@ -1,0 +1,2135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/page-api/page-api.v1.3.schema.json",
+  "title": "PageApiV1dot3",
+  "description": "K-21 v1.3, a minor version for journey 5's screens (T-062; 02-contracts K-21 'Minor versions': customer screens 12 and 13 with journey 5, and the owner console's Documents with journeys 1 and 5; section 9 F16), with the journey 5 pages K-09 v1.3 names for K-21's journey 5 version (K-09 v1.3 README 'Producers and consumers of v1.3' and open gap 101: the secure page's money step, card form, offers and signing, C-199; C3's pay page, C-200; Needs you's answer, C-192). It only adds to v1.2 (page-api.v1.2.schema.json, frozen by T-061 and unchanged, referred to here, which refers to v1.1 and v1): every v1, v1.1 and v1.2 definition is here under its own name, all but two by reference; callName takes only the eleven new names, and pageWordsSwap only names them as calls whose typed words are swapped, so every v1, v1.1 and v1.2 exchange is a v1.3 exchange. Added: one envelope (payLinkPage, C3's pay page, found by its pay link's code), the shapes the money step shows (moneyStepShown with its lines, offers and document), and eleven calls, each served by a K-09 v1.3 call or a page-only read and named so in its request: moneyStep (showMoneyBefore), moneyCard (takeMoneyBefore card, with K-14 v1 pageIntent), moneyYes (takeMoneyBefore yes), moneyReadBack and moneyConfirm (the money step's changes: settleOffer credit, buy and plan; takeMoneyBefore letGo and askOwner; signDocument send), documentRead (page-only) and documentSign (signDocument sign), readDocuments (page-only), readOwnerAsks (page-only), ownerAskReadBack and ownerAskConfirm (takeMoneyBefore ownerAnswer). Every change a person's word makes is read back first and confirmed by its yes (FS line 630): the money step's words are the read-back the yes confirms, as v1.2's times card is the pick's, and the document's words the read-back its signature confirms; the offers, the no, the owner's ask, the document's sending and the owner's answer each have a read-back of their own. Never a hold, never a charge on silence, never money before the price and the yes to it (A5-04; S13-55); no card number reaches a page call and no bank's reason reaches a page (RULES 3.11, 3.12; S12-25). A request still never names the person or the business it acts for. contracts/page-api/README.md, section 'v1.3', states for each call who may call it, how it is bound, what serves it, what it changes and how that is read back, its repeat rule and its errors. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    { "$ref": "#/$defs/openLink.exchange" },
+    { "$ref": "#/$defs/signInStart.exchange" },
+    { "$ref": "#/$defs/signInCheck.exchange" },
+    { "$ref": "#/$defs/signOut.exchange" },
+    { "$ref": "#/$defs/codeStart.exchange" },
+    { "$ref": "#/$defs/codeCheck.exchange" },
+    { "$ref": "#/$defs/readRegistration.exchange" },
+    { "$ref": "#/$defs/answerOnPage.exchange" },
+    { "$ref": "#/$defs/confirmOnPage.exchange" },
+    { "$ref": "#/$defs/signedUpload.exchange" },
+    { "$ref": "#/$defs/finishUpload.exchange" },
+    { "$ref": "#/$defs/stripeOnboardingStart.exchange" },
+    { "$ref": "#/$defs/stripeOnboardingReturn.exchange" },
+    { "$ref": "#/$defs/billCard.exchange" },
+    { "$ref": "#/$defs/calendarConnectStart.exchange" },
+    { "$ref": "#/$defs/calendarConnectReturn.exchange" },
+    { "$ref": "#/$defs/readStaffPage.exchange" },
+    { "$ref": "#/$defs/teamConsole.exchange" },
+    { "$ref": "#/$defs/teamAcknowledgePage.exchange" },
+    { "$ref": "#/$defs/teamDecideReviewItem.exchange" },
+    { "$ref": "#/$defs/testRoster.exchange" },
+    { "$ref": "#/$defs/testPhoneSend.exchange" },
+    { "$ref": "#/$defs/testPhoneParts.exchange" },
+    { "$ref": "#/$defs/testClockRows.exchange" },
+    { "$ref": "#/$defs/fireNow.exchange" },
+    { "$ref": "#/$defs/textHoursOverride.exchange" },
+    { "$ref": "#/$defs/readListing.exchange" },
+    { "$ref": "#/$defs/startBookingRequest.exchange" },
+    { "$ref": "#/$defs/bookingCheckStart.exchange" },
+    { "$ref": "#/$defs/bookingCheckCode.exchange" },
+    { "$ref": "#/$defs/bookingService.exchange" },
+    { "$ref": "#/$defs/bookingPrice.exchange" },
+    { "$ref": "#/$defs/bookingTimes.exchange" },
+    { "$ref": "#/$defs/bookingPick.exchange" },
+    { "$ref": "#/$defs/bookingSecureLink.exchange" },
+    { "$ref": "#/$defs/bookingReadBack.exchange" },
+    { "$ref": "#/$defs/bookingConfirm.exchange" },
+    { "$ref": "#/$defs/secureRead.exchange" },
+    { "$ref": "#/$defs/secureReadBack.exchange" },
+    { "$ref": "#/$defs/secureConfirm.exchange" },
+    { "$ref": "#/$defs/secureUpload.exchange" },
+    { "$ref": "#/$defs/readQuotes.exchange" },
+    { "$ref": "#/$defs/quoteReadBack.exchange" },
+    { "$ref": "#/$defs/quoteConfirm.exchange" },
+    { "$ref": "#/$defs/moneyStep.exchange" },
+    { "$ref": "#/$defs/moneyCard.exchange" },
+    { "$ref": "#/$defs/moneyYes.exchange" },
+    { "$ref": "#/$defs/moneyReadBack.exchange" },
+    { "$ref": "#/$defs/moneyConfirm.exchange" },
+    { "$ref": "#/$defs/documentRead.exchange" },
+    { "$ref": "#/$defs/documentSign.exchange" },
+    { "$ref": "#/$defs/readDocuments.exchange" },
+    { "$ref": "#/$defs/readOwnerAsks.exchange" },
+    { "$ref": "#/$defs/ownerAskReadBack.exchange" },
+    { "$ref": "#/$defs/ownerAskConfirm.exchange" }
+  ],
+  "$defs": {
+    "id": { "$ref": "page-api.v1.2.schema.json#/$defs/id" },
+    "nullableId": { "$ref": "page-api.v1.2.schema.json#/$defs/nullableId" },
+    "utc": { "$ref": "page-api.v1.2.schema.json#/$defs/utc" },
+    "nullableUtc": { "$ref": "page-api.v1.2.schema.json#/$defs/nullableUtc" },
+    "version": { "$ref": "page-api.v1.2.schema.json#/$defs/version" },
+    "rowRef": { "$ref": "page-api.v1.2.schema.json#/$defs/rowRef" },
+    "traceId": { "$ref": "page-api.v1.2.schema.json#/$defs/traceId" },
+    "stepId": { "$ref": "page-api.v1.2.schema.json#/$defs/stepId" },
+    "opaqueToken": { "$ref": "page-api.v1.2.schema.json#/$defs/opaqueToken" },
+    "linkCode": { "$ref": "page-api.v1.2.schema.json#/$defs/linkCode" },
+    "httpsUrl": { "$ref": "page-api.v1.2.schema.json#/$defs/httpsUrl" },
+    "page": { "$ref": "page-api.v1.2.schema.json#/$defs/page" },
+    "linkPage": { "$ref": "page-api.v1.2.schema.json#/$defs/linkPage" },
+    "signedInPage": { "$ref": "page-api.v1.2.schema.json#/$defs/signedInPage" },
+    "signedInLinkPage": { "$ref": "page-api.v1.2.schema.json#/$defs/signedInLinkPage" },
+    "given": { "$ref": "page-api.v1.2.schema.json#/$defs/given" },
+    "signInNeededError": { "$ref": "page-api.v1.2.schema.json#/$defs/signInNeededError" },
+    "linkExpiredError": { "$ref": "page-api.v1.2.schema.json#/$defs/linkExpiredError" },
+    "notTeamError": { "$ref": "page-api.v1.2.schema.json#/$defs/notTeamError" },
+    "notTesterError": { "$ref": "page-api.v1.2.schema.json#/$defs/notTesterError" },
+    "stagingOnlyError": { "$ref": "page-api.v1.2.schema.json#/$defs/stagingOnlyError" },
+    "notTestPhoneError": { "$ref": "page-api.v1.2.schema.json#/$defs/notTestPhoneError" },
+    "notTestHandleError": { "$ref": "page-api.v1.2.schema.json#/$defs/notTestHandleError" },
+    "providerUnavailableError": { "$ref": "page-api.v1.2.schema.json#/$defs/providerUnavailableError" },
+    "notAllowedError": { "$ref": "page-api.v1.2.schema.json#/$defs/notAllowedError" },
+    "bookingPausedError": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingPausedError" },
+    "transientError": { "$ref": "page-api.v1.2.schema.json#/$defs/transientError" },
+    "versionChangedError": { "$ref": "page-api.v1.2.schema.json#/$defs/versionChangedError" },
+    "pageKind": { "$ref": "page-api.v1.2.schema.json#/$defs/pageKind" },
+    "pageSection": { "$ref": "page-api.v1.2.schema.json#/$defs/pageSection" },
+    "pageQuestion": { "$ref": "page-api.v1.2.schema.json#/$defs/pageQuestion" },
+    "readBack": { "$ref": "page-api.v1.2.schema.json#/$defs/readBack" },
+    "servedSetupStep": { "$ref": "page-api.v1.2.schema.json#/$defs/servedSetupStep" },
+    "uploadPurpose": { "$ref": "page-api.v1.2.schema.json#/$defs/uploadPurpose" },
+    "uploadRefusedErrors": { "$ref": "page-api.v1.2.schema.json#/$defs/uploadRefusedErrors" },
+    "calendarProvider": { "$ref": "page-api.v1.2.schema.json#/$defs/calendarProvider" },
+    "textHours": { "$ref": "page-api.v1.2.schema.json#/$defs/textHours" },
+    "textHoursOverrideState": { "$ref": "page-api.v1.2.schema.json#/$defs/textHoursOverrideState" },
+    "shownPhoto": { "$ref": "page-api.v1.2.schema.json#/$defs/shownPhoto" },
+    "registrationPreview": { "$ref": "page-api.v1.2.schema.json#/$defs/registrationPreview" },
+    "registrationSummary": { "$ref": "page-api.v1.2.schema.json#/$defs/registrationSummary" },
+    "stagingOnlyCall": { "$ref": "page-api.v1.2.schema.json#/$defs/stagingOnlyCall" },
+    "callName": {
+      "title": "PageCallName",
+      "description": "Every call v1.3 holds: v1.2's (page-api.v1.2.schema.json callName, unchanged) and the eleven v1.3 adds (moneyStep, moneyCard, moneyYes, moneyReadBack, moneyConfirm, documentRead, documentSign, readDocuments, readOwnerAsks, ownerAskReadBack, ownerAskConfirm), only by new enum values. Each has <call>.request, <call>.response, <call>.errors and <call>.exchange under $defs (02-contracts section 2 item 2). None of the eleven is staging-only (stagingOnlyCall is v1's, unchanged).",
+      "type": "string",
+      "enum": [
+        "openLink",
+        "signInStart",
+        "signInCheck",
+        "signOut",
+        "codeStart",
+        "codeCheck",
+        "readRegistration",
+        "answerOnPage",
+        "confirmOnPage",
+        "signedUpload",
+        "finishUpload",
+        "stripeOnboardingStart",
+        "stripeOnboardingReturn",
+        "billCard",
+        "calendarConnectStart",
+        "calendarConnectReturn",
+        "readStaffPage",
+        "teamConsole",
+        "teamAcknowledgePage",
+        "teamDecideReviewItem",
+        "testRoster",
+        "testPhoneSend",
+        "testPhoneParts",
+        "testClockRows",
+        "fireNow",
+        "textHoursOverride",
+        "readListing",
+        "startBookingRequest",
+        "bookingCheckStart",
+        "bookingCheckCode",
+        "bookingService",
+        "bookingPrice",
+        "bookingTimes",
+        "bookingPick",
+        "bookingSecureLink",
+        "bookingReadBack",
+        "bookingConfirm",
+        "secureRead",
+        "secureReadBack",
+        "secureConfirm",
+        "secureUpload",
+        "readQuotes",
+        "quoteReadBack",
+        "quoteConfirm",
+        "moneyStep",
+        "moneyCard",
+        "moneyYes",
+        "moneyReadBack",
+        "moneyConfirm",
+        "documentRead",
+        "documentSign",
+        "readDocuments",
+        "readOwnerAsks",
+        "ownerAskReadBack",
+        "ownerAskConfirm"
+      ]
+    },
+
+    "openLink.request": { "$ref": "page-api.v1.2.schema.json#/$defs/openLink.request" },
+    "openLink.response": { "$ref": "page-api.v1.2.schema.json#/$defs/openLink.response" },
+    "openLink.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/openLink.errors" },
+    "openLink.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/openLink.exchange" },
+    "signInStart.request": { "$ref": "page-api.v1.2.schema.json#/$defs/signInStart.request" },
+    "signInStart.response": { "$ref": "page-api.v1.2.schema.json#/$defs/signInStart.response" },
+    "signInStart.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/signInStart.errors" },
+    "signInStart.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/signInStart.exchange" },
+    "signInCheck.request": { "$ref": "page-api.v1.2.schema.json#/$defs/signInCheck.request" },
+    "signInCheck.response": { "$ref": "page-api.v1.2.schema.json#/$defs/signInCheck.response" },
+    "signInCheck.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/signInCheck.errors" },
+    "signInCheck.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/signInCheck.exchange" },
+    "signOut.request": { "$ref": "page-api.v1.2.schema.json#/$defs/signOut.request" },
+    "signOut.response": { "$ref": "page-api.v1.2.schema.json#/$defs/signOut.response" },
+    "signOut.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/signOut.errors" },
+    "signOut.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/signOut.exchange" },
+    "codeStart.request": { "$ref": "page-api.v1.2.schema.json#/$defs/codeStart.request" },
+    "codeStart.response": { "$ref": "page-api.v1.2.schema.json#/$defs/codeStart.response" },
+    "codeStart.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/codeStart.errors" },
+    "codeStart.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/codeStart.exchange" },
+    "codeCheck.request": { "$ref": "page-api.v1.2.schema.json#/$defs/codeCheck.request" },
+    "codeCheck.response": { "$ref": "page-api.v1.2.schema.json#/$defs/codeCheck.response" },
+    "codeCheck.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/codeCheck.errors" },
+    "codeCheck.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/codeCheck.exchange" },
+    "readRegistration.request": { "$ref": "page-api.v1.2.schema.json#/$defs/readRegistration.request" },
+    "readRegistration.response": { "$ref": "page-api.v1.2.schema.json#/$defs/readRegistration.response" },
+    "readRegistration.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/readRegistration.errors" },
+    "readRegistration.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/readRegistration.exchange" },
+    "answerOnPage.request": { "$ref": "page-api.v1.2.schema.json#/$defs/answerOnPage.request" },
+    "answerOnPage.response": { "$ref": "page-api.v1.2.schema.json#/$defs/answerOnPage.response" },
+    "answerOnPage.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/answerOnPage.errors" },
+    "answerOnPage.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/answerOnPage.exchange" },
+    "confirmOnPage.request": { "$ref": "page-api.v1.2.schema.json#/$defs/confirmOnPage.request" },
+    "confirmOnPage.response": { "$ref": "page-api.v1.2.schema.json#/$defs/confirmOnPage.response" },
+    "confirmOnPage.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/confirmOnPage.errors" },
+    "confirmOnPage.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/confirmOnPage.exchange" },
+    "signedUpload.request": { "$ref": "page-api.v1.2.schema.json#/$defs/signedUpload.request" },
+    "signedUpload.response": { "$ref": "page-api.v1.2.schema.json#/$defs/signedUpload.response" },
+    "signedUpload.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/signedUpload.errors" },
+    "signedUpload.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/signedUpload.exchange" },
+    "finishUpload.request": { "$ref": "page-api.v1.2.schema.json#/$defs/finishUpload.request" },
+    "finishUpload.response": { "$ref": "page-api.v1.2.schema.json#/$defs/finishUpload.response" },
+    "finishUpload.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/finishUpload.errors" },
+    "finishUpload.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/finishUpload.exchange" },
+    "stripeOnboardingStart.request": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/stripeOnboardingStart.request"
+    },
+    "stripeOnboardingStart.response": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/stripeOnboardingStart.response"
+    },
+    "stripeOnboardingStart.errors": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/stripeOnboardingStart.errors"
+    },
+    "stripeOnboardingStart.exchange": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/stripeOnboardingStart.exchange"
+    },
+    "stripeOnboardingReturn.request": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/stripeOnboardingReturn.request"
+    },
+    "stripeOnboardingReturn.response": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/stripeOnboardingReturn.response"
+    },
+    "stripeOnboardingReturn.errors": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/stripeOnboardingReturn.errors"
+    },
+    "stripeOnboardingReturn.exchange": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/stripeOnboardingReturn.exchange"
+    },
+    "billCard.request": { "$ref": "page-api.v1.2.schema.json#/$defs/billCard.request" },
+    "billCard.response": { "$ref": "page-api.v1.2.schema.json#/$defs/billCard.response" },
+    "billCard.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/billCard.errors" },
+    "billCard.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/billCard.exchange" },
+    "calendarConnectStart.request": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/calendarConnectStart.request"
+    },
+    "calendarConnectStart.response": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/calendarConnectStart.response"
+    },
+    "calendarConnectStart.errors": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/calendarConnectStart.errors"
+    },
+    "calendarConnectStart.exchange": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/calendarConnectStart.exchange"
+    },
+    "calendarConnectReturn.request": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/calendarConnectReturn.request"
+    },
+    "calendarConnectReturn.response": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/calendarConnectReturn.response"
+    },
+    "calendarConnectReturn.errors": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/calendarConnectReturn.errors"
+    },
+    "calendarConnectReturn.exchange": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/calendarConnectReturn.exchange"
+    },
+    "readStaffPage.request": { "$ref": "page-api.v1.2.schema.json#/$defs/readStaffPage.request" },
+    "readStaffPage.response": { "$ref": "page-api.v1.2.schema.json#/$defs/readStaffPage.response" },
+    "readStaffPage.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/readStaffPage.errors" },
+    "readStaffPage.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/readStaffPage.exchange" },
+    "teamConsole.request": { "$ref": "page-api.v1.2.schema.json#/$defs/teamConsole.request" },
+    "teamConsole.response": { "$ref": "page-api.v1.2.schema.json#/$defs/teamConsole.response" },
+    "teamConsole.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/teamConsole.errors" },
+    "teamConsole.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/teamConsole.exchange" },
+    "teamAcknowledgePage.request": { "$ref": "page-api.v1.2.schema.json#/$defs/teamAcknowledgePage.request" },
+    "teamAcknowledgePage.response": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/teamAcknowledgePage.response"
+    },
+    "teamAcknowledgePage.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/teamAcknowledgePage.errors" },
+    "teamAcknowledgePage.exchange": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/teamAcknowledgePage.exchange"
+    },
+    "teamDecideReviewItem.request": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/teamDecideReviewItem.request"
+    },
+    "teamDecideReviewItem.response": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/teamDecideReviewItem.response"
+    },
+    "teamDecideReviewItem.errors": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/teamDecideReviewItem.errors"
+    },
+    "teamDecideReviewItem.exchange": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/teamDecideReviewItem.exchange"
+    },
+    "testRoster.request": { "$ref": "page-api.v1.2.schema.json#/$defs/testRoster.request" },
+    "testRoster.response": { "$ref": "page-api.v1.2.schema.json#/$defs/testRoster.response" },
+    "testRoster.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/testRoster.errors" },
+    "testRoster.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/testRoster.exchange" },
+    "testPhoneSend.request": { "$ref": "page-api.v1.2.schema.json#/$defs/testPhoneSend.request" },
+    "testPhoneSend.response": { "$ref": "page-api.v1.2.schema.json#/$defs/testPhoneSend.response" },
+    "testPhoneSend.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/testPhoneSend.errors" },
+    "testPhoneSend.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/testPhoneSend.exchange" },
+    "testPhoneParts.request": { "$ref": "page-api.v1.2.schema.json#/$defs/testPhoneParts.request" },
+    "testPhoneParts.response": { "$ref": "page-api.v1.2.schema.json#/$defs/testPhoneParts.response" },
+    "testPhoneParts.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/testPhoneParts.errors" },
+    "testPhoneParts.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/testPhoneParts.exchange" },
+    "testClockRows.request": { "$ref": "page-api.v1.2.schema.json#/$defs/testClockRows.request" },
+    "testClockRows.response": { "$ref": "page-api.v1.2.schema.json#/$defs/testClockRows.response" },
+    "testClockRows.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/testClockRows.errors" },
+    "testClockRows.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/testClockRows.exchange" },
+    "fireNow.request": { "$ref": "page-api.v1.2.schema.json#/$defs/fireNow.request" },
+    "fireNow.response": { "$ref": "page-api.v1.2.schema.json#/$defs/fireNow.response" },
+    "fireNow.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/fireNow.errors" },
+    "fireNow.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/fireNow.exchange" },
+    "textHoursOverride.request": { "$ref": "page-api.v1.2.schema.json#/$defs/textHoursOverride.request" },
+    "textHoursOverride.response": { "$ref": "page-api.v1.2.schema.json#/$defs/textHoursOverride.response" },
+    "textHoursOverride.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/textHoursOverride.errors" },
+    "textHoursOverride.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/textHoursOverride.exchange" },
+
+    "listingCode": { "$ref": "page-api.v1.2.schema.json#/$defs/listingCode" },
+    "publicPage": { "$ref": "page-api.v1.2.schema.json#/$defs/publicPage" },
+    "notListedError": { "$ref": "page-api.v1.2.schema.json#/$defs/notListedError" },
+    "cannotBookHereError": { "$ref": "page-api.v1.2.schema.json#/$defs/cannotBookHereError" },
+    "notTakingNewBookingsError": { "$ref": "page-api.v1.2.schema.json#/$defs/notTakingNewBookingsError" },
+    "safetyFirstError": { "$ref": "page-api.v1.2.schema.json#/$defs/safetyFirstError" },
+    "goOnSafetyLine": { "$ref": "page-api.v1.2.schema.json#/$defs/goOnSafetyLine" },
+    "pageWordsSwap": {
+      "title": "PageWordsSwap",
+      "description": "v1.2's swap (page-api.v1.2.schema.json pageWordsSwap; README defaults 39 and 50), with one change: call may also name a v1.3 call (callName), since the page entry swaps every card number and Social Security number in v1.3's typed words too, first, before the safety read and before anything else reads them (README default 76): moneyReadBack's co-signers' names (/change/coSigners/0/name) and documentSign's typed name (/typedName). Every v1.2 pageWordsSwap is a v1.3 pageWordsSwap; the named rule scrubbedPassedOn (page-api.rules.mjs, unchanged) checks it.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "description": "The call whose request carries the field.",
+          "$ref": "#/$defs/callName"
+        },
+        "field": {
+          "description": "Where the field sits in that call's request, as a JSON pointer (RFC 6901), such as /typedName or /change/coSigners/0/name.",
+          "type": "string",
+          "pattern": "^(/[A-Za-z0-9]+)+$"
+        },
+        "typed": {
+          "description": "The field as the browser sent it. It lives only in the page entry's memory until the swap: never in a span, a log, an event-log row, a model call or any store.",
+          "type": "string",
+          "minLength": 1
+        },
+        "passedOn": {
+          "description": "The field after the swap: what the safety read and every later use read. It holds no card number and no Social Security number, and differs from typed only where typed held one (scrubbedPassedOn).",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["call", "field", "typed", "passedOn"],
+      "additionalProperties": false
+    },
+    "localDate": { "$ref": "page-api.v1.2.schema.json#/$defs/localDate" },
+    "money": { "$ref": "page-api.v1.2.schema.json#/$defs/money" },
+    "currency": { "$ref": "page-api.v1.2.schema.json#/$defs/currency" },
+    "listedPrice": { "$ref": "page-api.v1.2.schema.json#/$defs/listedPrice" },
+    "listedWay": { "$ref": "page-api.v1.2.schema.json#/$defs/listedWay" },
+    "listedLength": { "$ref": "page-api.v1.2.schema.json#/$defs/listedLength" },
+    "listedService": { "$ref": "page-api.v1.2.schema.json#/$defs/listedService" },
+    "listedLocation": { "$ref": "page-api.v1.2.schema.json#/$defs/listedLocation" },
+    "listedDocument": { "$ref": "page-api.v1.2.schema.json#/$defs/listedDocument" },
+    "listedPhoto": { "$ref": "page-api.v1.2.schema.json#/$defs/listedPhoto" },
+    "listedFaq": { "$ref": "page-api.v1.2.schema.json#/$defs/listedFaq" },
+    "readListing.request": { "$ref": "page-api.v1.2.schema.json#/$defs/readListing.request" },
+    "readListing.response": { "$ref": "page-api.v1.2.schema.json#/$defs/readListing.response" },
+    "readListing.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/readListing.errors" },
+    "readListing.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/readListing.exchange" },
+    "startBookingRequest.request": { "$ref": "page-api.v1.2.schema.json#/$defs/startBookingRequest.request" },
+    "startBookingRequest.response": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/startBookingRequest.response"
+    },
+    "startBookingRequest.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/startBookingRequest.errors" },
+    "startBookingRequest.exchange": {
+      "$ref": "page-api.v1.2.schema.json#/$defs/startBookingRequest.exchange"
+    },
+    "bookingCheckStart.request": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingCheckStart.request" },
+    "bookingCheckStart.response": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingCheckStart.response" },
+    "bookingCheckStart.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingCheckStart.errors" },
+    "bookingCheckStart.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingCheckStart.exchange" },
+    "bookingCheckCode.request": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingCheckCode.request" },
+    "bookingCheckCode.response": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingCheckCode.response" },
+    "bookingCheckCode.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingCheckCode.errors" },
+    "bookingCheckCode.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingCheckCode.exchange" },
+
+    "during": { "$ref": "page-api.v1.2.schema.json#/$defs/during" },
+    "zone": { "$ref": "page-api.v1.2.schema.json#/$defs/zone" },
+    "phoneNumber": { "$ref": "page-api.v1.2.schema.json#/$defs/phoneNumber" },
+    "emailAddress": { "$ref": "page-api.v1.2.schema.json#/$defs/emailAddress" },
+    "optionPrice": { "$ref": "page-api.v1.2.schema.json#/$defs/optionPrice" },
+    "wrongDetailsError": { "$ref": "page-api.v1.2.schema.json#/$defs/wrongDetailsError" },
+    "mobileRequiredError": { "$ref": "page-api.v1.2.schema.json#/$defs/mobileRequiredError" },
+    "geoUnavailableError": { "$ref": "page-api.v1.2.schema.json#/$defs/geoUnavailableError" },
+    "quoteStateError": { "$ref": "page-api.v1.2.schema.json#/$defs/quoteStateError" },
+    "readBackChangedError": { "$ref": "page-api.v1.2.schema.json#/$defs/readBackChangedError" },
+    "readBackExpiredError": { "$ref": "page-api.v1.2.schema.json#/$defs/readBackExpiredError" },
+    "fieldsInvalidError": { "$ref": "page-api.v1.2.schema.json#/$defs/fieldsInvalidError" },
+    "uploadNotFoundError": { "$ref": "page-api.v1.2.schema.json#/$defs/uploadNotFoundError" },
+    "requestNotFoundError": { "$ref": "page-api.v1.2.schema.json#/$defs/requestNotFoundError" },
+    "stepFirstError": { "$ref": "page-api.v1.2.schema.json#/$defs/stepFirstError" },
+    "cantTakeItError": { "$ref": "page-api.v1.2.schema.json#/$defs/cantTakeItError" },
+    "requestEndedError": { "$ref": "page-api.v1.2.schema.json#/$defs/requestEndedError" },
+    "timeTakenError": { "$ref": "page-api.v1.2.schema.json#/$defs/timeTakenError" },
+    "noMoreTimeError": { "$ref": "page-api.v1.2.schema.json#/$defs/noMoreTimeError" },
+    "notThisPageError": { "$ref": "page-api.v1.2.schema.json#/$defs/notThisPageError" },
+    "requestPage": { "$ref": "page-api.v1.2.schema.json#/$defs/requestPage" },
+    "secureLinkCode": { "$ref": "page-api.v1.2.schema.json#/$defs/secureLinkCode" },
+    "secureLinkPage": { "$ref": "page-api.v1.2.schema.json#/$defs/secureLinkPage" },
+    "timeShown": { "$ref": "page-api.v1.2.schema.json#/$defs/timeShown" },
+    "timesCard": { "$ref": "page-api.v1.2.schema.json#/$defs/timesCard" },
+    "linkGiven": { "$ref": "page-api.v1.2.schema.json#/$defs/linkGiven" },
+    "authorityKind": { "$ref": "page-api.v1.2.schema.json#/$defs/authorityKind" },
+    "authorityAsk": { "$ref": "page-api.v1.2.schema.json#/$defs/authorityAsk" },
+    "pageAsk": { "$ref": "page-api.v1.2.schema.json#/$defs/pageAsk" },
+    "pageAnswer": { "$ref": "page-api.v1.2.schema.json#/$defs/pageAnswer" },
+    "requestShown": { "$ref": "page-api.v1.2.schema.json#/$defs/requestShown" },
+    "quoteWaiting": { "$ref": "page-api.v1.2.schema.json#/$defs/quoteWaiting" },
+    "bookingService.request": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingService.request" },
+    "bookingService.response": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingService.response" },
+    "bookingService.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingService.errors" },
+    "bookingService.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingService.exchange" },
+    "bookingPrice.request": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingPrice.request" },
+    "bookingPrice.response": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingPrice.response" },
+    "bookingPrice.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingPrice.errors" },
+    "bookingPrice.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingPrice.exchange" },
+    "bookingTimes.request": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingTimes.request" },
+    "bookingTimes.response": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingTimes.response" },
+    "bookingTimes.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingTimes.errors" },
+    "bookingTimes.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingTimes.exchange" },
+    "bookingPick.request": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingPick.request" },
+    "bookingPick.response": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingPick.response" },
+    "bookingPick.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingPick.errors" },
+    "bookingPick.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingPick.exchange" },
+    "bookingSecureLink.request": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingSecureLink.request" },
+    "bookingSecureLink.response": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingSecureLink.response" },
+    "bookingSecureLink.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingSecureLink.errors" },
+    "bookingSecureLink.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingSecureLink.exchange" },
+    "bookingChange": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingChange" },
+    "bookingReadBack.request": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingReadBack.request" },
+    "bookingReadBack.response": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingReadBack.response" },
+    "bookingReadBack.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingReadBack.errors" },
+    "bookingReadBack.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingReadBack.exchange" },
+    "bookingConfirm.request": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingConfirm.request" },
+    "bookingConfirm.response": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingConfirm.response" },
+    "bookingServed": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingServed" },
+    "bookingConfirm.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingConfirm.errors" },
+    "bookingConfirm.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/bookingConfirm.exchange" },
+    "secureRead.request": { "$ref": "page-api.v1.2.schema.json#/$defs/secureRead.request" },
+    "secureRead.response": { "$ref": "page-api.v1.2.schema.json#/$defs/secureRead.response" },
+    "secureRead.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/secureRead.errors" },
+    "secureRead.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/secureRead.exchange" },
+    "secureChange": { "$ref": "page-api.v1.2.schema.json#/$defs/secureChange" },
+    "secureReadBack.request": { "$ref": "page-api.v1.2.schema.json#/$defs/secureReadBack.request" },
+    "secureReadBack.response": { "$ref": "page-api.v1.2.schema.json#/$defs/secureReadBack.response" },
+    "secureReadBack.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/secureReadBack.errors" },
+    "secureReadBack.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/secureReadBack.exchange" },
+    "secureConfirm.request": { "$ref": "page-api.v1.2.schema.json#/$defs/secureConfirm.request" },
+    "secureConfirm.response": { "$ref": "page-api.v1.2.schema.json#/$defs/secureConfirm.response" },
+    "secureServed": { "$ref": "page-api.v1.2.schema.json#/$defs/secureServed" },
+    "secureConfirm.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/secureConfirm.errors" },
+    "secureConfirm.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/secureConfirm.exchange" },
+    "secureUpload.request": { "$ref": "page-api.v1.2.schema.json#/$defs/secureUpload.request" },
+    "secureUpload.response": { "$ref": "page-api.v1.2.schema.json#/$defs/secureUpload.response" },
+    "secureUpload.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/secureUpload.errors" },
+    "secureUpload.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/secureUpload.exchange" },
+    "readQuotes.request": { "$ref": "page-api.v1.2.schema.json#/$defs/readQuotes.request" },
+    "readQuotes.response": { "$ref": "page-api.v1.2.schema.json#/$defs/readQuotes.response" },
+    "readQuotes.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/readQuotes.errors" },
+    "readQuotes.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/readQuotes.exchange" },
+    "quoteChange": { "$ref": "page-api.v1.2.schema.json#/$defs/quoteChange" },
+    "quoteReadBack.request": { "$ref": "page-api.v1.2.schema.json#/$defs/quoteReadBack.request" },
+    "quoteReadBack.response": { "$ref": "page-api.v1.2.schema.json#/$defs/quoteReadBack.response" },
+    "quoteReadBack.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/quoteReadBack.errors" },
+    "quoteReadBack.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/quoteReadBack.exchange" },
+    "quoteConfirm.request": { "$ref": "page-api.v1.2.schema.json#/$defs/quoteConfirm.request" },
+    "quoteConfirm.response": { "$ref": "page-api.v1.2.schema.json#/$defs/quoteConfirm.response" },
+    "quoteConfirm.errors": { "$ref": "page-api.v1.2.schema.json#/$defs/quoteConfirm.errors" },
+    "quoteConfirm.exchange": { "$ref": "page-api.v1.2.schema.json#/$defs/quoteConfirm.exchange" },
+
+    "moneyBranch": {
+      "title": "MoneyBranch",
+      "description": "What is taken now: exactly one of nothing, a card saved, a deposit or the full price, never a hold (FS section 7 screen 13: 'Exactly one of: nothing taken / card saved / deposit / full price'; A5-04; RULES 3.2; D65): K-09 v1.3 moneyBranch, by reference.",
+      "$ref": "../tool-api/tool-api.v1.3.schema.json#/$defs/moneyBranch"
+    },
+    "cardShown": {
+      "title": "CardShown",
+      "description": "What a page shows of a card: its brand and last four digits, as Stripe reports them (A5-07's 'Card •••• 4242'; K-14 v1 cardShown, by reference). Never the number, the expiry, the CVC or any other card detail: the card is typed into Stripe's own form and its details never reach Rosie (RULES 3.12, 4.5; BP rule 7).",
+      "$ref": "../port-stripe/port-stripe.v1.schema.json#/$defs/cardShown"
+    },
+    "clientSecret": {
+      "title": "ClientSecret",
+      "description": "The client secret of one SetupIntent or PaymentIntent, for the page's Stripe form only (K-14 v1 clientSecret, by reference): read by the page entry at page time with K-14 v1 pageIntent, by the effect row's providerObjectId from Rosie's own record, and given out only while the form has something to do. Never in a log, a span, an event-log row, a message or a link (README 'Never in a span or a log', v1.3). Fixtures hold placeholders.",
+      "$ref": "../port-stripe/port-stripe.v1.schema.json#/$defs/clientSecret"
+    },
+    "stripeAccountId": {
+      "title": "StripeAccountId",
+      "description": "The business's own Stripe account (K-23 v1 business_setup.stripe_account_id, read from Rosie's own record, never the browser), which the page's Stripe form takes with the client secret and Rosie's publishable key (K-14 v1 clientSecret: 'The page's Stripe form takes it, with the account's id and Rosie's publishable key'), since each card save and payment is the business's own, a direct charge on its account (K-14 v1 'Whose account'). Given only beside a client secret, for Stripe's form; the web app shows it nowhere (README default 69; open gap 56: K-23 marks the column audience never). An opaque Stripe id, never a card number (K-14 v1 stripeId, by reference).",
+      "$ref": "../port-stripe/port-stripe.v1.schema.json#/$defs/stripeId"
+    },
+    "notOfferedError": {
+      "title": "NotOfferedError",
+      "description": "K-09 v1.3's notOffered (A5-01: 'Sam turns each one on'; A5-22: 'A barbershop sells its packages only at the shop'): the option is not offered on this page (a credit, a pack, a membership or a plan the page entry did not offer on this money step, or a plan billed monthly: K-09 v1.3 README default 106). Nothing was written.",
+      "$ref": "../tool-api/tool-api.v1.3.schema.json#/$defs/notOfferedError"
+    },
+    "creditsShortError": {
+      "title": "CreditsShortError",
+      "description": "K-09 v1.3's creditsShort (A5-03: 'One that runs short shows the gap before the yes'): the pack or membership has too few credits left; the page shows the gap. Nothing was written.",
+      "$ref": "../tool-api/tool-api.v1.3.schema.json#/$defs/creditsShortError"
+    },
+    "cardNotReadyError": {
+      "title": "CardNotReadyError",
+      "description": "K-09 v1.3's cardNotReady: the card this yes or this buy needs is not saved yet (A5-07: 'The card goes on file through Stripe'); the page waits for Stripe's form (moneyCard). Never on the pay page, whose yes stands on its live pay link (K-09 v1.3 README default 104). Nothing was written.",
+      "$ref": "../tool-api/tool-api.v1.3.schema.json#/$defs/cardNotReadyError"
+    },
+    "holdEndedError": {
+      "title": "HoldEndedError",
+      "description": "K-09 v1.3's holdEnded: the saved time ended before this yes (A5-05: 'A late yes is checked first: is the time still free?'; K-09 v1.3 README default 98), or on the pay page the pay link closed at its deadline (README default 104). Nothing was written; the page says the time was let go and offers another time, as A5-06's own words do ('You can pick another time here').",
+      "$ref": "../tool-api/tool-api.v1.3.schema.json#/$defs/holdEndedError"
+    },
+    "documentFirstError": {
+      "title": "DocumentFirstError",
+      "description": "A document this booking needs is not signed by everyone yet (A5-20: 'The money step comes only once everyone has signed, so nothing for this visit is taken before'; K-09 v1.3 documentUnsigned, without its documentId, which stays on the server: README default 68). Nothing was written; the page shows the document first (documentRead).",
+      "type": "object",
+      "properties": { "error": { "const": "documentUnsigned" } },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "noCardNeededError": {
+      "title": "NoCardNeededError",
+      "description": "The money step takes no card, so none is made ready (A5-05: 'No money is asked, and no card'; a credit for the only service with nothing else asked: A5-04), or the buy option named is not this step's. Nothing was written.",
+      "type": "object",
+      "properties": { "error": { "const": "noCardNeeded" } },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "noDocumentError": {
+      "title": "NoDocumentError",
+      "description": "No document waits on this link for its person: none is needed (A5-19: 'Plug-in silent: no document, unless Sam set one for this service'), none was sent yet (moneyReadBack's sendDocument comes first), this person is none of its signers, or it was withdrawn (K-35 v1 documents.withdrawn_why not_signed_in_time: A5-23). Nothing was read beyond the link and nothing was written.",
+      "type": "object",
+      "properties": { "error": { "const": "noDocument" } },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+
+    "payLinkCode": {
+      "title": "PayLinkCode",
+      "description": "The short code of a pay link to Rosie's own pay page (A6-32: 'rosfield.com/p/f4'; MC C3; K-32 v1 pay_links.code_sha256): made from the link's id under a named secret and never stored (K-32 v1 default 21); the server keeps only its sha256 and finds the link by it. A bearer secret: never logged, never in a span, an event-log row or a message but the one that carries it (v1 default 30; README 'Never in a span or a log', v1.3). The pattern admits shorter strings only so that a stale or mistyped code still gets linkExpired. The fixtures' codes are placeholders.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9-]{3,64}$"
+    },
+    "payLinkPage": {
+      "title": "PayLinkPageEnvelope",
+      "description": "What a request from C3's pay page carries (C-200; MC C3: 'the AI gets the secure pay link for the customer, and so do their email and an open chat'; K-09 v1.3 README defaults 88 and 104): the page's own request id, the trace id and the pay link's short code (payCode). No session and no listing code: customers have no login (FS line 701). The page entry takes the code's sha256 and finds the K-32 v1 pay_links row by it on the runtime side, before any business is known (K-32 v1 README: 'the pay page's server (C-200), finding a link by its code's hash on the runtime side'); an unknown code, a link closed at its deadline and a link replaced answer alike (linkExpired, v1's), and a link ended paid answers only moneyCard, with the payment paid. Then the call acts for the pay link's person (K-32 pay_links.person_id: K-09 v1.3 showMoneyBefore 'on C3's pay page the pay link's person ... set by its server from the link found by its code's sha256'), under its business, on its payment's booking: K-09 v1.1's businessCaller kind page, businessId the link's business_id, personId the link's person_id, traceId as given and, for each K-09 call, a requestId of its own kept with this request's id and the link's id (README default 70). The pay page shows only this payment's booking and its money step, nothing else on file for the person, and sends nothing on its own (S13-45).",
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "description": "The page's own id for this submit: made once per form, never reused, the key a repeat is known by within the pay link it came with.",
+          "$ref": "#/$defs/id"
+        },
+        "traceId": {
+          "description": "The trace the request opens (CQ-06); each call adds its pageRequest span (K-08 v1) and passes it on as K-09 caller.traceId.",
+          "$ref": "#/$defs/traceId"
+        },
+        "payCode": { "$ref": "#/$defs/payLinkCode" }
+      },
+      "required": ["requestId", "traceId", "payCode"],
+      "additionalProperties": false
+    },
+
+    "moneyLineShown": {
+      "title": "MoneyLineShown",
+      "description": "One open line of the booking as the money step shows it (K-09 v1.3 showMoneyBefore.response.lines, with the service's name: K-25 v1 services.name, audience customer): its before (K-30 v1 booking_lines.path, its second part), how it is paid (money, or a credit for its own service: S13-55) and its share of what is taken now. Never the line's id, which stays on the server (README default 68).",
+      "type": "object",
+      "properties": {
+        "service": { "type": "string", "minLength": 1 },
+        "before": { "type": "string", "enum": ["none", "card", "deposit", "full"] },
+        "paidBy": { "type": "string", "enum": ["money", "credit"] },
+        "dueNow": { "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }] }
+      },
+      "required": ["service", "before", "paidBy", "dueNow"],
+      "additionalProperties": false
+    },
+    "creditOffer": {
+      "title": "CreditOffer",
+      "description": "A credit the person already has for a service on this booking (A5-03, B5-31: 'This booking uses one of them. The page shows the credits left after this visit'; K-09 v1.3 showMoneyBefore.response.offers.credits: K-32 v1 packs with credits_total less credits_used, memberships with visits_per_period), each for its own service only (S13-55). optionId is the page entry's own id for this offer on this money step (README default 68), which moneyReadBack sends back; the pack's or membership's id, its version and the line it would pay stay on the server.",
+      "type": "object",
+      "properties": {
+        "optionId": { "$ref": "#/$defs/id" },
+        "service": { "type": "string", "minLength": 1 },
+        "from": { "type": "string", "enum": ["pack", "membership"] },
+        "name": {
+          "description": "What the person holds, as the business named it when it was sold (the pack's or membership's name).",
+          "type": "string",
+          "minLength": 1
+        },
+        "unit": {
+          "description": "What a credit counts (K-32 v1 credits.units): a visit, or the minutes or cents a pack of hours or dollars draws down (A5-03).",
+          "type": "string",
+          "enum": ["visit", "minute", "cent"]
+        },
+        "unitsLeft": { "type": "integer", "minimum": 1 },
+        "unitsAfter": {
+          "description": "What is left after this visit if the credit is used (A5-03: 'The page shows the credits left after this visit').",
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["optionId", "service", "from", "name", "unit", "unitsLeft", "unitsAfter"],
+      "additionalProperties": false
+    },
+    "buyOffer": {
+      "title": "BuyOffer",
+      "description": "A pack or a membership sold on this page while booking (A5-22, B5-32: 'Where the plug-in sells packs or memberships while booking, like for classes, the customer buys one on the secure page. This visit then uses a credit from it'; FS row P01, P02), as the page entry builds it from the plug-in's packs fact and the owner's settings, never the browser (K-09 v1.3 README default 95, open gap 92; README default 71). A membership here is billed monthly, its first period charged as it is bought (K-09 v1.3 README default 105). optionId is the page entry's own id for it on this money step.",
+      "type": "object",
+      "properties": {
+        "optionId": { "$ref": "#/$defs/id" },
+        "kind": { "type": "string", "enum": ["pack", "membership"] },
+        "service": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "price": {
+          "description": "What is charged today when it is bought ('charged when bought, into the business's own Stripe': A5-22).",
+          "$ref": "#/$defs/money"
+        },
+        "creditsTotal": {
+          "description": "For a pack, how many credits it holds; null for a membership.",
+          "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }]
+        },
+        "unit": {
+          "description": "For a pack, what a credit counts; null for a membership.",
+          "anyOf": [{ "type": "string", "enum": ["visit", "minute", "cent"] }, { "type": "null" }]
+        },
+        "period": {
+          "description": "For a membership, how often it is charged (K-32 memberships.period, as an interval: '1 month'); null for a pack.",
+          "anyOf": [
+            { "type": "string", "pattern": "^[1-9][0-9]* (day|days|week|weeks|month|months|year|years)$" },
+            { "type": "null" }
+          ]
+        },
+        "visitsPerPeriod": {
+          "description": "For a membership, the visits a period holds, or null for no count; null for a pack.",
+          "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "null" }]
+        }
+      },
+      "required": [
+        "optionId",
+        "kind",
+        "service",
+        "name",
+        "price",
+        "creditsTotal",
+        "unit",
+        "period",
+        "visitsPerPeriod"
+      ],
+      "additionalProperties": false,
+      "if": { "properties": { "kind": { "const": "pack" } }, "required": ["kind"] },
+      "then": {
+        "properties": {
+          "creditsTotal": { "type": "integer" },
+          "unit": { "type": "string" },
+          "period": { "type": "null" },
+          "visitsPerPeriod": { "type": "null" }
+        }
+      },
+      "else": {
+        "properties": {
+          "creditsTotal": { "type": "null" },
+          "unit": { "type": "null" },
+          "period": { "type": "string" }
+        }
+      }
+    },
+    "planOffer": {
+      "title": "PlanOffer",
+      "description": "The repeat plan from before the times, with its own yes (A5-21, B5-21: 'Back to the plan from before the times. Its terms show with their own yes, before any card'; FS row P02), only where the plug-in's plans fact is on and the owner offers one, billed per visit (K-09 v1.3 README default 106: a plan billed monthly is not offered yet). terms is the plan's terms in the server's words as A5-21 lays them out ('The terms say how often, the price a visit, when each visit is paid, and how to skip, pause or end'), built by the page entry from what it keeps (K-09 v1.3 open gap 92); the read-back of the answer carries them as the yes's exact words. optionId is the page entry's own id for it.",
+      "type": "object",
+      "properties": {
+        "optionId": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "price": {
+          "description": "The price a visit.",
+          "$ref": "#/$defs/money"
+        },
+        "period": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]* (day|days|week|weeks|month|months|year|years)$"
+        },
+        "billed": { "const": "per_visit" },
+        "terms": { "type": "string", "minLength": 1 }
+      },
+      "required": ["optionId", "name", "price", "period", "billed", "terms"],
+      "additionalProperties": false
+    },
+    "documentState": {
+      "title": "DocumentState",
+      "description": "A5-19's document on the money step (A5-19, B5-34: 'Where the plug-in or the owner needs a document signed or OK'd, it's done on the page first. No money for this visit is taken before'; FS section 7 screen 11: 'forms and signatures'), from K-09 v1.3 showMoneyBefore.response.document and a page-only read of K-35 v1 documents, document_signers and document_signatures of the link's booking: toSend (needed, not built yet: the booker sends it, naming whoever the plug-in's roles in rolesToName ask: moneyReadBack's sendDocument), toSign (sent, and this link's person has not signed: documentRead, then documentSign), waitingForOthers (this person signed; a co-signer has not) or signedByAll ('All signed': the money step can come). Signers show by their role only (K-35 document_signers.signs_as, 'a role in the plug-in's or the owner's words ... never a name'), never a name, a typed name or an id.",
+      "type": "object",
+      "properties": {
+        "state": { "type": "string", "enum": ["toSend", "toSign", "waitingForOthers", "signedByAll"] },
+        "kind": {
+          "description": "K-35 v1 documents.kind of a built document: contract, estimate, proposal, design, form or agreement (A5-19: 'A document is a contract, a written estimate, a proposal or a design').",
+          "type": "string",
+          "enum": ["contract", "estimate", "proposal", "design", "form", "agreement"]
+        },
+        "title": {
+          "description": "K-35 v1 documents.title (the plug-in's or the kind's name, plain), or for toSend the name it will be built under.",
+          "type": "string",
+          "minLength": 1
+        },
+        "rolesToName": {
+          "description": "For toSend, the roles besides the booker the plug-in says must sign, each to be named by the booker (K-09 v1.3 signDocument send coSigners: 'each with the role the plug-in names'), as the page entry reads them from the pinned bundle (README default 73; open gap 51); empty when only the booker signs, and for every other state.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 100 },
+          "maxItems": 10
+        },
+        "signers": {
+          "description": "Once sent, each signer by role, whether it is this link's person, and whether they have signed; empty for toSend.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "signsAs": { "type": "string", "minLength": 1 },
+              "you": { "type": "boolean" },
+              "signed": { "type": "boolean" }
+            },
+            "required": ["signsAs", "you", "signed"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["state", "kind", "title", "rolesToName", "signers"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "state": { "const": "toSend" } }, "required": ["state"] },
+          "then": { "properties": { "signers": { "type": "array", "maxItems": 0 } } },
+          "else": {
+            "properties": {
+              "rolesToName": { "type": "array", "maxItems": 0 },
+              "signers": { "type": "array", "minItems": 1 }
+            }
+          }
+        }
+      ]
+    },
+    "moneyStepShown": {
+      "title": "MoneyStepShown",
+      "description": "The money step as the page shows it (FS section 7 screen 13: 'Exactly one of: nothing taken / card saved / deposit / full price. The exact words ticked are stored'; screen 12: 'Use a credit, buy one (charged when bought), a code, a plan's terms with their own yes'; screen 11: 'Pay (card typed here, in the business's own Stripe), forms and signatures'), built from K-09 v1.3 showMoneyBefore's answer with the words K-09 v1.3 open gap 101 leaves to K-21: the request as it stands, the branch, what is taken now with its words, the fee, each open line, the offers (each with an option id), the document, whether Stripe is down, how money is taken, the card already saved for it, whether 'Ask Sam first' is open, the words to tick and the page's one clock. It is the read-back of the money yes (FS line 630; README default 67), as v1.2's times card is the pick's: the page entry keeps it under moneyStepId with the words, the rows and versions they were built from (showMoneyBefore.versionsRead), the branch, the amount, payBy, the live pay link on the pay page, each option's offer and its rows, and the card stage's effect once made, so moneyYes and moneyReadBack send only its id and an option. Never a booking, line, pack, membership, payment, saved card, effect, pay link or document id, and never a money word's row (README default 68).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "moneyStep" },
+        "moneyStepId": {
+          "description": "The step the page entry keeps (README default 67), with at least 128 bits from a cryptographically secure random generator, bound to the link.",
+          "$ref": "#/$defs/id"
+        },
+        "on": {
+          "description": "securePage: the booker's own secure page (a K-30 secure_links row of purpose secure_page, for the head's booker); payPage: C3's pay page (README default 70).",
+          "type": "string",
+          "enum": ["securePage", "payPage"]
+        },
+        "request": {
+          "description": "The request as it stands (v1.2's requestShown: the business, the service, the place, the time saved, the price, what is taken now, the cancel line, the approval).",
+          "$ref": "#/$defs/requestShown"
+        },
+        "branch": { "$ref": "#/$defs/moneyBranch" },
+        "takenNow": {
+          "description": "What is taken now, in the server's plain words from the branch and the rows read ('Nothing is taken now'; 'A card is saved for the $20 fee; nothing is charged now'; 'A $40 deposit, taken as the booking is written'; 'The full $55'), never 'paid' before the record says it (S13-55; K-09 v1.3 README default 90).",
+          "type": "string",
+          "minLength": 1
+        },
+        "amountNow": {
+          "description": "What is taken now, in one payment on one card (RULES 3.2; K-09 v1.3 showMoneyBefore.response.amountNow): the deposits on a deposit, the prices on the full price; null for nothing and a card saved.",
+          "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }]
+        },
+        "fee": {
+          "description": "The booking's one late-cancel and no-show fee (S13-55; K-09 v1.3 showMoneyBefore.response.fee), taken only with the owner's yes, never on silence; null: none.",
+          "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }]
+        },
+        "lines": { "type": "array", "items": { "$ref": "#/$defs/moneyLineShown" }, "minItems": 1 },
+        "offers": {
+          "description": "A5-01's offers, each only where the plug-in and the owner turn it on (A5-01: 'Sam turns each one on. Each is settled before anything is taken'), never offered in a text; none on the pay page.",
+          "type": "object",
+          "properties": {
+            "credits": { "type": "array", "items": { "$ref": "#/$defs/creditOffer" } },
+            "buy": { "type": "array", "items": { "$ref": "#/$defs/buyOffer" } },
+            "plan": { "anyOf": [{ "$ref": "#/$defs/planOffer" }, { "type": "null" }] },
+            "discountCodes": {
+              "description": "Never, until K-23 holds codes (A5-02; K-32 v1 default 19; K-09 v1.3 README default 102).",
+              "const": false
+            }
+          },
+          "required": ["credits", "buy", "plan", "discountCodes"],
+          "additionalProperties": false
+        },
+        "document": {
+          "description": "A5-19's document, or null when none is needed (and always on the pay page).",
+          "anyOf": [{ "$ref": "#/$defs/documentState" }, { "type": "null" }]
+        },
+        "stripeDown": {
+          "description": "Card payments are down (S12-16; K-09 v1.3 showMoneyBefore.response.stripeDown): the page says 'Payments are down for a few minutes', never a decline (A6-32), and offers 'Ask Sam first' (S12-17).",
+          "type": "boolean"
+        },
+        "payBy": {
+          "description": "none for nothing; cardOnPage: the card typed into Stripe's form on this page (moneyCard), ready before the yes; payLink: C3's pay link, whose yes is given on the pay page before Stripe's form takes the payment (K-09 v1.3 README defaults 87, 88, 104).",
+          "type": "string",
+          "enum": ["none", "cardOnPage", "payLink"]
+        },
+        "card": {
+          "description": "The card already saved for this step, as K-14 v1 pageIntent reads it (brand and last four), or null: not saved yet, or none needed.",
+          "anyOf": [{ "$ref": "#/$defs/cardShown" }, { "type": "null" }]
+        },
+        "askOwner": {
+          "description": "A5-31's 'Ask Sam first' is open here: a card-saved service with no card that works, or Stripe down (K-09 v1.3 README defaults 99, 100); never on the pay page (MC C3).",
+          "type": "boolean"
+        },
+        "words": {
+          "description": "The words shown before the yes, which the yes binds to (K-09 v1.3 showMoneyBefore.response.words: built by code from the rows read, so the same versions give the same words; A5-05, A5-07, A5-13, A5-16). On the yes they become the K-29 consent's exact words (README default 67).",
+          "type": "string",
+          "minLength": 1
+        },
+        "heldUntil": {
+          "description": "The page's one clock, the saved time's end (A5-31: 'The page has one 10-minute clock, offered more time before it ends'; K-09 v1.3 showMoneyBefore.response.heldUntil); more time is v1.2's secureReadBack moreTime. Null when no time is held.",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "expiresAt": {
+          "description": "When this step lapses as a read-back: 10 minutes on the page (arch 06 line 307; v1's readBack.expiresAt), or heldUntil when that comes first; a yes after it answers readBackExpired.",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": [
+        "result",
+        "moneyStepId",
+        "on",
+        "request",
+        "branch",
+        "takenNow",
+        "amountNow",
+        "fee",
+        "lines",
+        "offers",
+        "document",
+        "stripeDown",
+        "payBy",
+        "card",
+        "askOwner",
+        "words",
+        "heldUntil",
+        "expiresAt"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "description": "Money is taken now only on a deposit or the full price.",
+          "if": { "properties": { "branch": { "enum": ["nothing", "card"] } }, "required": ["branch"] },
+          "then": { "properties": { "amountNow": { "type": "null" } } },
+          "else": { "properties": { "amountNow": { "$ref": "#/$defs/money" } } }
+        },
+        {
+          "description": "Nothing taken takes no card; a card saved is always typed on the page; C3's pay link is for money due now.",
+          "if": { "properties": { "branch": { "const": "nothing" } }, "required": ["branch"] },
+          "then": { "properties": { "payBy": { "const": "none" }, "card": { "type": "null" } } },
+          "else": {
+            "if": { "properties": { "branch": { "const": "card" } }, "required": ["branch"] },
+            "then": { "properties": { "payBy": { "const": "cardOnPage" } } },
+            "else": { "properties": { "payBy": { "enum": ["cardOnPage", "payLink"] } } }
+          }
+        },
+        {
+          "description": "The pay page shows only its payment's money step: no offers, no document, no ask, and the pay link.",
+          "if": { "properties": { "on": { "const": "payPage" } }, "required": ["on"] },
+          "then": {
+            "properties": {
+              "payBy": { "const": "payLink" },
+              "offers": {
+                "type": "object",
+                "properties": {
+                  "credits": { "type": "array", "maxItems": 0 },
+                  "buy": { "type": "array", "maxItems": 0 },
+                  "plan": { "type": "null" }
+                }
+              },
+              "document": { "type": "null" },
+              "askOwner": { "const": false },
+              "card": { "type": "null" }
+            }
+          }
+        }
+      ]
+    },
+    "moneyStepChangedError": {
+      "title": "MoneyStepChangedError",
+      "description": "A row the money step was built from moved, or the words code builds now differ from the ones shown (K-09 v1.3 wordsDiffer and versionChanged; limit 4: arch 06 line 305): nothing was written, and a fresh step comes with it for a fresh yes, as v1.2's bookingPick answers a fresh card.",
+      "type": "object",
+      "properties": {
+        "error": { "const": "readBackChanged" },
+        "step": { "$ref": "#/$defs/moneyStepShown" }
+      },
+      "required": ["error", "step"],
+      "additionalProperties": false
+    },
+
+    "moneyStep.request": {
+      "title": "MoneyStepRequest",
+      "description": "Open the money step (FS section 7 screens 12 and 13; A5-01, A5-19, A5-04, A5-31; B5-01, B5-34, B5-02, B5-43), on the booker's own secure page (secureLinkPage: a K-30 secure_links row of purpose secure_page whose person is the head's booker; any other link answers notThisPage) or on C3's pay page (payLinkPage). Served by K-09 v1.3 showMoneyBefore (caller.kind page, personId the link's person, bookingId the link's booking: never from the browser), with page-only reads for what showMoneyBefore leaves to the page server (K-09 v1.3 open gaps 92 and 101): the packs and memberships sold here and the plan offered, built from the plug-in's facts and the owner's settings (README default 71), the document's state and the roles to name (K-35 v1 rows of the link's booking; the pinned bundle: README default 73), the card saved for this step (K-14 v1 pageIntent on the card stage's effect, once made) and the names the page shows (K-25 v1 services.name, K-32 v1 packs and memberships). A read: nothing changes on anyone's word (README default 48's rule); the step is kept under moneyStepId as the yes's read-back (README default 67). The booking page's own money step is the secure page the web app opens from bookingSecureLink's link (README default 66). Who may call: anyone with the booker's secure link or the pay link, acting for its person. Reads: the primary, uncached. Repeat: safe: a read; the same versions give the same words. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": {
+          "description": "The booker's own secure page, or C3's pay page.",
+          "anyOf": [{ "$ref": "#/$defs/secureLinkPage" }, { "$ref": "#/$defs/payLinkPage" }]
+        }
+      },
+      "required": ["page"],
+      "additionalProperties": false
+    },
+    "moneyStep.response": {
+      "title": "MoneyStepResponse",
+      "description": "The money step (moneyStepShown).",
+      "$ref": "#/$defs/moneyStepShown"
+    },
+    "moneyStep.errors": {
+      "title": "MoneyStepErrors",
+      "description": "Nothing to show. K-09 v1.3 showMoneyBefore's errors map so: notAllowed gives notThisPage (not this booking's booker); notFound gives linkExpired; bookingPaused and transient as they are.",
+      "anyOf": [
+        { "$ref": "#/$defs/linkExpiredError" },
+        { "$ref": "#/$defs/notThisPageError" },
+        { "$ref": "#/$defs/requestEndedError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "moneyStep.exchange": {
+      "title": "MoneyStepExchange",
+      "description": "One moneyStep request with its outcome: the pay page answers a pay page's step.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "moneyStep" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/moneyStep.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/moneyStep.response" }, { "$ref": "#/$defs/moneyStep.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": { "page": { "type": "object", "required": ["payCode"] } },
+                "required": ["page"]
+              },
+              "outcome": { "type": "object", "required": ["result"] }
+            },
+            "required": ["request", "outcome"]
+          },
+          "then": {
+            "properties": { "outcome": { "type": "object", "properties": { "on": { "const": "payPage" } } } }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": { "page": { "type": "object", "required": ["linkCode"] } },
+                "required": ["page"]
+              },
+              "outcome": { "type": "object", "required": ["result"] }
+            },
+            "required": ["request", "outcome"]
+          },
+          "then": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "on": { "const": "securePage" } } }
+            }
+          }
+        }
+      ]
+    },
+
+    "moneyCard.request": {
+      "title": "MoneyCardRequest",
+      "description": "Stripe's form for this money step (FS section 7 screen 11: 'Pay (card typed here, in the business's own Stripe)'; A5-07: 'The card goes on file through Stripe, in Lee's Barbershop's own account'; A5-22: 'The card is typed on the page'; RULES 3.12), as it stands. On the secure page, with buyOptionId null: the step's own card (A5-07, A5-13, A5-16; B5-05, B5-11, B5-13, by the step's branch and the request's flow); the first call makes the card stage, K-09 v1.3 takeMoneyBefore card (keep as K-09 decides it: true for a card saved and a deposit, the stored approval's for the full price, README default 103 of K-09 v1.3), and the page entry keeps its effect with the step; every call reads its state by K-14 v1 pageIntent on that effect's providerObjectId, on the business's account (README default 69). With buyOptionId: A5-22's card for a pack or a membership bought here (takeMoneyBefore card, step A5-22 or B5-32, keep false), before the buy; after the buy, the same call reads that pack's or membership's payment (its K-07 stripe_charge effect), which a bank's check may stop on the page (K-14 v1 needsAuthentication). On the pay page (buyOptionId null): the pay link's payment, after the yes (A5-04: 'Never: take money before the price and the yes to it'; before it, stepFirst), by K-14 v1 pageIntent on the payment's stripe_pay_link effect (K-09 v1.3 README default 104). No card detail ever passes through this call: the card is typed into Stripe's own form, and the answer gives only the client secret and the account for that form, or the card as brand and last four. Who may call: anyone with the booker's secure link or the pay link, acting for its person. Changes: the card stage's effect row (and a kept card's saved_cards row) on the first call; nothing is charged (K-14 v1 saveCard). Reads: the primary, uncached; Stripe through K-14. Repeat: safe: the card stage is made once per step and purpose, and every later call reads it. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": {
+          "description": "The booker's own secure page, or C3's pay page.",
+          "anyOf": [{ "$ref": "#/$defs/secureLinkPage" }, { "$ref": "#/$defs/payLinkPage" }]
+        },
+        "moneyStepId": {
+          "description": "The money step this card is for (moneyStepShown.moneyStepId).",
+          "$ref": "#/$defs/id"
+        },
+        "buyOptionId": {
+          "description": "A pack or membership offered on that step (buyOffer.optionId), for A5-22's card; null for the step's own card or the pay link's payment.",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["page", "moneyStepId", "buyOptionId"],
+      "additionalProperties": false
+    },
+    "moneyCard.response": {
+      "title": "MoneyCardResponse",
+      "description": "The card save or the payment as Stripe's form needs it, by K-14 v1 pageIntent: the form while it has something to do, the card saved, the payment paid, still processing, or 'Try another card'.",
+      "oneOf": [
+        {
+          "title": "CardFormOnPage",
+          "description": "Stripe's form has something to do (K-14 v1 pageIntent needsCard, or needsAuthentication: the person's bank asks them to confirm): the client secret and the business's account, for that form only (K-14 v1 clientSecret), and for a payment its amount. saveCard: a card saved for later (the step's card, or A5-22's); payment: the pay link's payment, or a pack's or membership's charge awaiting the bank's check.",
+          "type": "object",
+          "properties": {
+            "result": { "const": "form" },
+            "purpose": { "type": "string", "enum": ["saveCard", "payment"] },
+            "state": { "type": "string", "enum": ["needsCard", "needsAuthentication"] },
+            "clientSecret": { "$ref": "#/$defs/clientSecret" },
+            "accountId": { "$ref": "#/$defs/stripeAccountId" },
+            "amount": { "anyOf": [{ "$ref": "#/$defs/money" }, { "type": "null" }] }
+          },
+          "required": ["result", "purpose", "state", "clientSecret", "accountId", "amount"],
+          "additionalProperties": false,
+          "if": { "properties": { "purpose": { "const": "saveCard" } }, "required": ["purpose"] },
+          "then": { "properties": { "amount": { "type": "null" } } },
+          "else": { "properties": { "amount": { "$ref": "#/$defs/money" } } }
+        },
+        {
+          "title": "CardSavedOnPage",
+          "description": "The card is saved (K-14 v1 cardSaved; pageIntent succeeded): no client secret goes out any more, and the page shows the card as brand and last four (A5-07: 'Card •••• 4242'). Nothing was charged.",
+          "type": "object",
+          "properties": {
+            "result": { "const": "saved" },
+            "card": { "$ref": "#/$defs/cardShown" }
+          },
+          "required": ["result", "card"],
+          "additionalProperties": false
+        },
+        {
+          "title": "PaymentPaidOnPage",
+          "description": "The payment succeeded (K-14 v1 paymentSucceeded, which alone makes it paid: K-32 v1 rule 5): the card that paid as brand and last four, and the amount. On the pay page the link has ended paid.",
+          "type": "object",
+          "properties": {
+            "result": { "const": "paid" },
+            "card": { "$ref": "#/$defs/cardShown" },
+            "amount": { "$ref": "#/$defs/money" }
+          },
+          "required": ["result", "card", "amount"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CardProcessingOnPage",
+          "description": "Stripe is still confirming it (K-14 v1 pageIntent processing): no client secret goes out; the page reads again.",
+          "type": "object",
+          "properties": { "result": { "const": "processing" } },
+          "required": ["result"],
+          "additionalProperties": false
+        },
+        {
+          "title": "TryAnotherCardOnPage",
+          "description": "The card could not be saved, or the payment failed on it (K-14 v1 cardSaveFailed, paymentFailed): 'Try another card' (RULES 3.11; A5-31: 'A card that's declined: \"Try another card\". Never the bank's reason'; S12-25). Never the decline code, the bank's words or anything about the card; the next call gives the form again.",
+          "type": "object",
+          "properties": { "result": { "const": "tryAnotherCard" } },
+          "required": ["result"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "moneyCard.errors": {
+      "title": "MoneyCardErrors",
+      "description": "Nothing was made. K-09 v1.3 takeMoneyBefore's errors map so: notAllowed gives notThisPage; notFound gives linkExpired; holdEnded as it is; constraint gives transient; bookingPaused and transient as they are. Stripe out of reach gives providerUnavailable (stripe): the card stage's effect waits in K-07's outage and runs once (K-09 v1.3 README default 100); the page says payments are down, never a decline.",
+      "anyOf": [
+        { "$ref": "#/$defs/linkExpiredError" },
+        { "$ref": "#/$defs/notThisPageError" },
+        { "$ref": "#/$defs/requestEndedError" },
+        { "$ref": "#/$defs/readBackExpiredError" },
+        { "$ref": "#/$defs/stepFirstError" },
+        { "$ref": "#/$defs/noCardNeededError" },
+        { "$ref": "#/$defs/notOfferedError" },
+        { "$ref": "#/$defs/holdEndedError" },
+        { "$ref": "#/$defs/providerUnavailableError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "moneyCard.exchange": {
+      "title": "MoneyCardExchange",
+      "description": "One moneyCard request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "moneyCard" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/moneyCard.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/moneyCard.response" }, { "$ref": "#/$defs/moneyCard.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "moneyYes.request": {
+      "title": "MoneyYesRequest",
+      "description": "The customer's own yes to the money step's words (A5-05 'One yes books it: the page's \"Book it\"'; A5-07, A5-13, A5-16; B5-03, B5-05, B5-11, B5-13; A5-31's 'Done: the yes'; FS section 7 screen 13: 'The exact words ticked are stored'), the confirm of the step's read-back (FS line 630; README default 67): it sends only the step's id, so nothing the step showed can change between the two calls, as v1.2's bookingPick sends only the card's id. The page entry makes the yes's event id when it arrives and calls K-09 v1.3 takeMoneyBefore alone, stage yes, with caller.kind page for the link's person, its step from the branch and the request's flow, and the branch, the amount, payBy, the live pay link (on the pay page) and the yes (kind page, exactWords the step's words as kept, yesEventId the event) all from what the page entry kept with the step, never from the browser (README defaults 67, 68). In one commit: K-30 booking_details.taken 'asked', set once, and the words ticked as the yes's K-29 consent, bound to them with their sha256: ticked_terms for a card, a deposit or the full price (A5-07), texts for nothing taken (A5-05: 'The yes records their OK to messages about this booking'), or none for a stopped mobile (RULES 7.5; K-09 v1.3 README default 92). No charge is written here: the deposit or the full price is charged as the booking is written or at the owner's OK (K-09 v1.4; K-09 v1.3 README default 87), and on the pay page by its payment, which Stripe's form takes next (moneyCard). Order: every document signed first (documentUnsigned), the card ready first on the standard door (cardNotReady), the time still held (holdEnded). Who may call: anyone with the booker's secure link or the pay link, for the step kept with that link. Reads: the primary, uncached; the step's rows compared and its words built again (limit 4; K-09 v1.3 wordsDiffer). Repeat: safe: page.requestId is the key, and a step is confirmed once; a repeat writes nothing and answers the first commit. Time budget: the step lapses after its 10 minutes or at the hold's end (readBackExpired).",
+      "type": "object",
+      "properties": {
+        "page": {
+          "description": "The booker's own secure page, or C3's pay page.",
+          "anyOf": [{ "$ref": "#/$defs/secureLinkPage" }, { "$ref": "#/$defs/payLinkPage" }]
+        },
+        "moneyStepId": {
+          "description": "The step the yes confirms (moneyStepShown.moneyStepId).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["page", "moneyStepId"],
+      "additionalProperties": false
+    },
+    "moneyYes.response": {
+      "title": "MoneyYesCommitted",
+      "description": "Committed: the yes's event, the branch, what the booking took, the yes's consent (or the texts-off line), and what comes next. Never the gives keys, the booking, a line, a saved card, an effect, the pay link, written or a money word's row.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "committed" },
+        "moneyStepId": { "$ref": "#/$defs/id" },
+        "yesEventId": {
+          "description": "The page's yes as an event, made by the server when it arrived (K-09 v1.3 readBackYes kind page, yesEventId).",
+          "$ref": "#/$defs/id"
+        },
+        "branch": { "$ref": "#/$defs/moneyBranch" },
+        "took": {
+          "description": "K-30 booking_details.taken as this commit set it, once: asked (K-09 v1.3 README default 89).",
+          "const": "asked"
+        },
+        "consentId": {
+          "description": "The K-29 consent the yes wrote with the words ticked (ticked_terms for a card, a deposit or the full price; texts for nothing taken), so the page shows the yes kept to the words it showed; null only for nothing taken from a stopped mobile.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "textsOffLine": {
+          "description": "For nothing taken from a stopped mobile, the fixed line the page shows itself (K-01 v1 stopLaterReply; K-09 v1.3 takeMoneyBefore.response.textsOff); null otherwise.",
+          "anyOf": [{ "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/fixedLineId" }, { "type": "null" }]
+        },
+        "next": {
+          "description": "What comes next: booking (approval now: the booking is written next, charging what is due now on the saved card while the customer is on the page: A6-01 'Right away', A6-10, K-09 v1.4); ownerOk (approval ownerok: the request goes to the owner, and nothing is charged for this visit until the OK: A6-01, A6-02); payOnPage (C3's pay page: Stripe's form takes the payment next, moneyCard; only paymentSucceeded makes it paid, within the link's deadline: K-09 v1.3 README default 104).",
+          "type": "string",
+          "enum": ["booking", "ownerOk", "payOnPage"]
+        }
+      },
+      "required": [
+        "result",
+        "moneyStepId",
+        "yesEventId",
+        "branch",
+        "took",
+        "consentId",
+        "textsOffLine",
+        "next"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "description": "A yes to a card, a deposit or the full price always answers its ticked_terms consent (K-09 v1.3 README 'Round 3', cheap note a).",
+          "if": {
+            "properties": { "branch": { "enum": ["card", "deposit", "full"] } },
+            "required": ["branch"]
+          },
+          "then": {
+            "properties": { "consentId": { "$ref": "#/$defs/id" }, "textsOffLine": { "type": "null" } }
+          }
+        },
+        {
+          "description": "No answer holds the texts-off line and a consent together (STATE note 9).",
+          "if": { "properties": { "textsOffLine": { "type": "string" } }, "required": ["textsOffLine"] },
+          "then": {
+            "properties": { "consentId": { "type": "null" }, "textsOffLine": { "const": "stopLaterReply" } }
+          },
+          "else": { "properties": { "consentId": { "$ref": "#/$defs/id" } } }
+        },
+        {
+          "description": "Only money due now goes on to the pay page's payment.",
+          "if": { "properties": { "next": { "const": "payOnPage" } }, "required": ["next"] },
+          "then": { "properties": { "branch": { "enum": ["deposit", "full"] } } }
+        }
+      ]
+    },
+    "moneyYes.errors": {
+      "title": "MoneyYesErrors",
+      "description": "Nothing was written. K-09 v1.3 takeMoneyBefore's errors map so: wordsDiffer and versionChanged give readBackChanged with a fresh step; cardNotReady and holdEnded as they are; documentUnsigned gives documentUnsigned without its id; ownYesNeeded cannot occur (a page's tap is the customer's own); notAllowed gives notThisPage; notFound gives linkExpired; constraint gives transient; bookingPaused and transient as they are. A step with payBy payLink confirmed on the secure page answers notThisPage: its yes is the pay page's.",
+      "anyOf": [
+        { "$ref": "#/$defs/linkExpiredError" },
+        { "$ref": "#/$defs/notThisPageError" },
+        { "$ref": "#/$defs/requestEndedError" },
+        { "$ref": "#/$defs/moneyStepChangedError" },
+        { "$ref": "#/$defs/readBackExpiredError" },
+        { "$ref": "#/$defs/cardNotReadyError" },
+        { "$ref": "#/$defs/documentFirstError" },
+        { "$ref": "#/$defs/holdEndedError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "moneyYes.exchange": {
+      "title": "MoneyYesExchange",
+      "description": "One moneyYes request with its outcome: a yes on the pay page goes on to its payment, and one on the secure page never does.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "moneyYes" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/moneyYes.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/moneyYes.response" }, { "$ref": "#/$defs/moneyYes.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "request": {
+                "type": "object",
+                "properties": { "page": { "type": "object", "required": ["payCode"] } },
+                "required": ["page"]
+              },
+              "outcome": { "type": "object", "required": ["result"] }
+            },
+            "required": ["request", "outcome"]
+          },
+          "then": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "next": { "const": "payOnPage" } } }
+            }
+          },
+          "else": {
+            "properties": {
+              "outcome": { "type": "object", "properties": { "next": { "enum": ["booking", "ownerOk"] } } }
+            }
+          }
+        }
+      ]
+    },
+
+    "moneyChange": {
+      "title": "MoneyChange",
+      "description": "A change on the money step the booker asks on their secure page, read back first (moneyReadBack) and made only on their yes (moneyConfirm), each by one K-09 v1.3 call (README 'v1.3', 'The changes and their read-backs'; FS line 630). Offers name only the option ids the step gave (README default 68).",
+      "oneOf": [
+        {
+          "title": "ChangeUseCredit",
+          "description": "Use a credit (A5-03, B5-31: 'This booking uses one of them'), by the step's credit offer. Served by K-09 v1.3 settleOffer credit, its line, pack or membership, units and expectVersion from what the page entry kept with the step (K-09 v1.3 README default 94). Gives no key.",
+          "type": "object",
+          "properties": {
+            "kind": { "const": "credit" },
+            "optionId": { "$ref": "#/$defs/id" }
+          },
+          "required": ["kind", "optionId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ChangeBuy",
+          "description": "Buy a pack or a membership on this page (A5-22, B5-32), by the step's buy offer, once its card is saved (moneyCard with that buyOptionId; cardNotReady otherwise). The read-back's words are its own yes (the pack, its service, its credits and its price charged now; a membership's price, when it is charged and how to pause or end it: A5-22), which the confirm passes as termsYes. Served by K-09 v1.3 settleOffer buy, its item, cardEffectId and lineId from what the page entry kept (K-09 v1.3 README defaults 95, 105, 109). Gives no key.",
+          "type": "object",
+          "properties": {
+            "kind": { "const": "buy" },
+            "optionId": { "$ref": "#/$defs/id" }
+          },
+          "required": ["kind", "optionId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ChangePlanAnswer",
+          "description": "The plan's own yes (A5-21, B5-21: 'Its terms show with their own yes, before any card'), by the step's plan offer: agree ('1 I agree': a clear yes to the plan's terms) or justThisVisit ('2 Just this visit': the visit still books, with no plan). The read-back's words are the plan's terms with the answer picked. Served by K-09 v1.3 settleOffer plan, the plan from what the page entry kept and the yes kind page with the read-back's words (K-09 v1.3 README default 96). Gives no key.",
+          "type": "object",
+          "properties": {
+            "kind": { "const": "plan" },
+            "optionId": { "$ref": "#/$defs/id" },
+            "answer": { "type": "string", "enum": ["agree", "justThisVisit"] }
+          },
+          "required": ["kind", "optionId", "answer"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ChangeLetGo",
+          "description": "The customer's no (A5-05: 'A \"no\" lets the time go now'; the page's No thanks). Served by K-09 v1.3 takeMoneyBefore letGo, its no kind page with the read-back's words: the hold released, the request ended dropped (K-09 v1.3 README default 107's walk, from the page). Gives no key; nothing is taken.",
+          "type": "object",
+          "properties": { "kind": { "const": "letGo" } },
+          "required": ["kind"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ChangeAskOwner",
+          "description": "A5-31's 'Ask Sam first' (A5-08, B5-06: 'The service asks money before, but this booking can take none. Sam is asked once, with the deadline and what silence does. The customer hears when they'll know'), only where the step offered it (moneyStepShown.askOwner; notOffered otherwise). Served by K-09 v1.3 takeMoneyBefore askOwner, why stripeDown while Stripe is down (S12-17), else noCardWorks, from stored facts, never the browser (README default 72). Gives no key.",
+          "type": "object",
+          "properties": { "kind": { "const": "askOwner" } },
+          "required": ["kind"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ChangeSendDocument",
+          "description": "Send A5-19's document (A5-19, B5-34: 'Yes: everyone signs'; A5-20: 'Everyone the plug-in says must sign does, each on their own link the customer forwards. Rosie never texts them itself'), naming a person for each role the step asks (documentState.rolesToName; fieldsInvalid for a role not asked or one left out). Served by K-09 v1.3 signDocument send, via page, its coSigners these names (swapped first and read for safety: README default 76) with their roles (README default 73). Gives no key.",
+          "type": "object",
+          "properties": {
+            "kind": { "const": "sendDocument" },
+            "coSigners": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "signsAs": { "type": "string", "minLength": 1, "maxLength": 100 },
+                  "name": {
+                    "description": "The co-signer's name as the booker typed it (swapped first), for their K-04 person and their own link.",
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  }
+                },
+                "required": ["signsAs", "name"],
+                "additionalProperties": false
+              },
+              "maxItems": 10
+            }
+          },
+          "required": ["kind", "coSigners"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "moneyReadBack.request": {
+      "title": "MoneyReadBackRequest",
+      "description": "The read-back of a change on the money step (FS line 630: 'every change is read back and confirmed first'; README default 48's rule): writes nothing and answers v1's readBack (its exact words, the step it serves, nothing shown by id, 10 minutes), which the page entry keeps with the link under readBackId, with the change, the K-09 v1.3 call that will make it and every value the server takes for it (README default 68). For a buy and the plan, its words are the yes's own exact words, which become the K-29 consent's (a pack's ticked_terms, a membership's or a plan's plan_terms). Typed names are swapped first and read for safety (README default 76; safetyFirst). Served by: page-only, with K-09 v1 recordSafetyOutcome for typed names; the change itself is made by moneyConfirm. Who may call: anyone with the booker's own secure link, for the step kept with it; never the pay page (MC C3: its one payment, with no offers or asks). Reads: the primary, uncached. Repeat: safe: writes nothing. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/secureLinkPage" },
+        "moneyStepId": {
+          "description": "The money step the change is on (moneyStepShown.moneyStepId), whose options it names.",
+          "$ref": "#/$defs/id"
+        },
+        "change": { "$ref": "#/$defs/moneyChange" }
+      },
+      "required": ["page", "moneyStepId", "change"],
+      "additionalProperties": false
+    },
+    "moneyReadBack.response": {
+      "title": "MoneyReadBackResponse",
+      "description": "The change's read-back (v1's readBack, signature none, questionId null, shown empty: the page holds no row id of the booking); nothing written.",
+      "$ref": "#/$defs/readBack"
+    },
+    "moneyReadBack.errors": {
+      "title": "MoneyReadBackErrors",
+      "description": "Nothing was written.",
+      "anyOf": [
+        { "$ref": "#/$defs/linkExpiredError" },
+        { "$ref": "#/$defs/notThisPageError" },
+        { "$ref": "#/$defs/requestEndedError" },
+        { "$ref": "#/$defs/readBackExpiredError" },
+        { "$ref": "#/$defs/notOfferedError" },
+        { "$ref": "#/$defs/creditsShortError" },
+        { "$ref": "#/$defs/cardNotReadyError" },
+        { "$ref": "#/$defs/safetyFirstError" },
+        { "$ref": "#/$defs/fieldsInvalidError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "moneyReadBack.exchange": {
+      "title": "MoneyReadBackExchange",
+      "description": "One moneyReadBack request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "moneyReadBack" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/moneyReadBack.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/moneyReadBack.response" }, { "$ref": "#/$defs/moneyReadBack.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "moneyConfirm.request": {
+      "title": "MoneyConfirmRequest",
+      "description": "The booker's yes to a money step read-back, which makes the change (FS line 630; arch 06 line 303): it sends only the read-back's id. The page entry makes the yes's event id and records it as the exact yes (K-08 v1 approved_by). Served by the K-09 v1.3 call the read-back names, made alone with caller.kind page for the link's person: credit, settleOffer (credit); buy, settleOffer (buy), termsYes kind page with the read-back's exact words and this event, so the K-29 consent of that yes is written in the same commit as the charge it binds (K-09 v1.3 README defaults 109, 110), its payment pending until K-14's result (K-32 v1 rule 5); plan, settleOffer (plan), its yes kind page with the read-back's words (agree writes the plan_terms consent bound to them; justThisVisit writes nothing); letGo, takeMoneyBefore (letGo), its no kind page with the read-back's words; askOwner, takeMoneyBefore (askOwner); sendDocument, signDocument (send, via page), each co-signer's own link given once in the answer to forward, never texted (MC C9). Who may call: anyone with the booker's own secure link, for the read-back of that same link. Reads: the primary, uncached; the read-back's rows compared and set (limit 4). Repeat: safe: readBackId is the key; a repeat writes nothing and answers the first commit, links null. Time budget: the read-back lapses after 10 minutes (readBackExpired).",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/secureLinkPage" },
+        "readBackId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["page", "readBackId"],
+      "additionalProperties": false
+    },
+    "moneyConfirm.response": {
+      "title": "MoneyChangeCommitted",
+      "description": "Committed: the yes's event and what the K-09 v1.3 call answered, as the page may see it: never a credit, pack, membership, payment, saved card, effect, line, document or signer id, written or a money word's row.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "committed" },
+        "readBackId": { "$ref": "#/$defs/id" },
+        "yesEventId": { "$ref": "#/$defs/id" },
+        "served": { "$ref": "#/$defs/moneyServed" }
+      },
+      "required": ["result", "readBackId", "yesEventId", "served"],
+      "additionalProperties": false
+    },
+    "moneyServed": {
+      "title": "MoneyServed",
+      "description": "The change made, by its kind. After it the page opens the money step again (moneyStep), whose branch, lines and words now read the change.",
+      "oneOf": [
+        {
+          "title": "CreditUsedOnPage",
+          "description": "settleOffer credit: the line now paid by a credit (K-09 v1.3 README default 94), and the credits left after this visit (A5-03).",
+          "type": "object",
+          "properties": {
+            "change": { "const": "credit" },
+            "unitsLeft": { "type": "integer", "minimum": 0 }
+          },
+          "required": ["change", "unitsLeft"],
+          "additionalProperties": false
+        },
+        {
+          "title": "BoughtOnPage",
+          "description": "settleOffer buy: the pack or membership bought, with the K-29 consent of the customer's own yes to it, written in the buy's commit (a pack's ticked_terms, a membership's plan_terms: K-09 v1.3 README defaults 105, 109), and its payment pending: charged at once with the customer present, and only K-14's result makes it paid (K-32 v1 rule 5); the page reads it with moneyCard (that buyOptionId), which a bank's check may stop on the page. A decline is 'Try another card' (RULES 3.11); 'If the booking isn't confirmed, the pack stays bought' (A5-22).",
+          "type": "object",
+          "properties": {
+            "change": { "const": "buy" },
+            "kind": { "type": "string", "enum": ["pack", "membership"] },
+            "consentId": { "$ref": "#/$defs/id" },
+            "payment": { "const": "pending" }
+          },
+          "required": ["change", "kind", "consentId", "payment"],
+          "additionalProperties": false
+        },
+        {
+          "title": "PlanAnsweredOnPage",
+          "description": "settleOffer plan: agree, with the K-29 plan_terms consent bound to the read-back's words (K-09 v1.3 README default 96); justThisVisit, nothing written, and the visit still books.",
+          "type": "object",
+          "properties": {
+            "change": { "const": "plan" },
+            "answer": { "type": "string", "enum": ["agree", "justThisVisit"] },
+            "consentId": { "$ref": "#/$defs/nullableId" }
+          },
+          "required": ["change", "answer", "consentId"],
+          "additionalProperties": false,
+          "if": { "properties": { "answer": { "const": "agree" } }, "required": ["answer"] },
+          "then": { "properties": { "consentId": { "$ref": "#/$defs/id" } } },
+          "else": { "properties": { "consentId": { "type": "null" } } }
+        },
+        {
+          "title": "LetGoOnPage",
+          "description": "takeMoneyBefore letGo: the time let go and the request ended (K-30 request_ended_why dropped); nothing was taken.",
+          "type": "object",
+          "properties": {
+            "change": { "const": "letGo" },
+            "requestEnded": { "const": true }
+          },
+          "required": ["change", "requestEnded"],
+          "additionalProperties": false
+        },
+        {
+          "title": "OwnerAskedOnPage",
+          "description": "takeMoneyBefore askOwner: the owner is asked once, and the customer hears on the page when they'll know (A5-08: 'The customer hears when they'll know'): the owner's deadline (K-30 owner_oks.answer_by: 30 minutes of the owner's text hours, or 5 minutes for work sent now). Silence never books: no answer by then, the time is let go and nothing is taken (A5-08's safe default).",
+          "type": "object",
+          "properties": {
+            "change": { "const": "askOwner" },
+            "answerBy": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["change", "answerBy"],
+          "additionalProperties": false
+        },
+        {
+          "title": "DocumentSentOnPage",
+          "description": "signDocument send: the document built and sent (A5-20: 'Rosie builds the document from the price and the parts the plug-in and the owner require'), and each co-signer's own link, by role, given once for the booker to forward (url null on a repeat: v1.2's linkGiven); empty when only the booker signs. The booker signs it next (documentRead, documentSign).",
+          "type": "object",
+          "properties": {
+            "change": { "const": "sendDocument" },
+            "coSignerLinks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "signsAs": { "type": "string", "minLength": 1 },
+                  "link": { "$ref": "#/$defs/linkGiven" }
+                },
+                "required": ["signsAs", "link"],
+                "additionalProperties": false
+              },
+              "maxItems": 10
+            }
+          },
+          "required": ["change", "coSignerLinks"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "moneyConfirm.errors": {
+      "title": "MoneyConfirmErrors",
+      "description": "Nothing was written. The K-09 v1.3 call's errors map so: versionChanged and wordsDiffer give readBackChanged with a fresh read-back; notOffered, creditsShort, cardNotReady and holdEnded as they are; ownYesNeeded cannot occur on a page; notAllowed gives notThisPage; notFound gives linkExpired; constraint gives transient; bookingPaused and transient as they are.",
+      "anyOf": [
+        { "$ref": "#/$defs/linkExpiredError" },
+        { "$ref": "#/$defs/notThisPageError" },
+        { "$ref": "#/$defs/requestEndedError" },
+        { "$ref": "#/$defs/readBackChangedError" },
+        { "$ref": "#/$defs/readBackExpiredError" },
+        { "$ref": "#/$defs/notOfferedError" },
+        { "$ref": "#/$defs/creditsShortError" },
+        { "$ref": "#/$defs/cardNotReadyError" },
+        { "$ref": "#/$defs/holdEndedError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "moneyConfirm.exchange": {
+      "title": "MoneyConfirmExchange",
+      "description": "One moneyConfirm request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "moneyConfirm" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/moneyConfirm.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/moneyConfirm.response" }, { "$ref": "#/$defs/moneyConfirm.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "documentLanguage": {
+      "title": "DocumentLanguage",
+      "description": "A language a document's words are read in (K-35 v1 document_texts.language; K-09 v1.3 signDocument sign language): a BCP 47 tag (A5-20: 'Each signer reads it in their own language, from a checked text').",
+      "type": "string",
+      "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]+)*$"
+    },
+    "builtDocumentKind": {
+      "title": "BuiltDocumentKind",
+      "description": "K-35 v1 documents.kind of a document Rosie built for its signers (origin built): contract, estimate, proposal, design, form or agreement (A5-19; A4-43; S1-72; FS row Q02).",
+      "type": "string",
+      "enum": ["contract", "estimate", "proposal", "design", "form", "agreement"]
+    },
+    "documentRead.request": {
+      "title": "DocumentReadRequest",
+      "description": "Read A5-19's document to sign or OK on a secure link's page (A5-20, B5-35: 'Each signer signs or OKs it on the secure page, and each gets a copy'; 'Each signer reads it in their own language, from a checked text'; FS section 7 screen 11: 'forms and signatures'), on the booker's own secure link or a co-signer's own link (the one signDocument send made for them: K-30 secure_links purpose secure_page, that person and this booking). Served by a page-only read of the action layer: no K-09 v1.3 call reads a document's words; the page entry finds the link, then reads, under its business, the K-35 v1 documents row of the link's booking (origin built, not withdrawn), its document_texts row in the language asked (else the business's own first language: README default 73), its document_signers and whether each has a document_signatures row; its reads by booking wait for a K-05 minor version (open gap 54). The words are the read-back the signature confirms (FS line 630; README default 73): the page entry keeps them under documentReadId with the text's sha256 and the document's version, so documentSign sends only that id. Who may call: anyone with a link of one of the document's signers, for that link's person. Changes nothing: a read. Reads: the primary, uncached. Repeat: safe: a read. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/secureLinkPage" },
+        "language": {
+          "description": "The language to read it in, or null for the business's own first one.",
+          "anyOf": [{ "$ref": "#/$defs/documentLanguage" }, { "type": "null" }]
+        }
+      },
+      "required": ["page", "language"],
+      "additionalProperties": false
+    },
+    "documentRead.response": {
+      "title": "DocumentShown",
+      "description": "The document as its signer reads it: its kind and title, its exact words in one language and the languages it has, each signer by role with whether it is this link's person and whether they have signed, and whether everyone has. Never a signer's name, a typed name, an id or anything else on file (K-35 v1: 'a typed name only on the secure page', the signer's own).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "document" },
+        "documentReadId": {
+          "description": "The read the page entry keeps (README default 73), bound to the link; at least 128 bits.",
+          "$ref": "#/$defs/id"
+        },
+        "kind": { "$ref": "#/$defs/builtDocumentKind" },
+        "title": { "type": "string", "minLength": 1 },
+        "language": { "$ref": "#/$defs/documentLanguage" },
+        "languages": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/documentLanguage" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "words": {
+          "description": "The document's exact words in that language (K-35 v1 document_texts.words), which the signature binds to by their sha256 (document_signatures.words_sha256).",
+          "type": "string",
+          "minLength": 1
+        },
+        "signers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "signsAs": { "type": "string", "minLength": 1 },
+              "you": { "type": "boolean" },
+              "signed": { "type": "boolean" }
+            },
+            "required": ["signsAs", "you", "signed"],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "signedByAll": { "type": "boolean" },
+        "expiresAt": {
+          "description": "When the read lapses as the signature's read-back: 10 minutes on the page (arch 06 line 307); a signature after it answers readBackExpired.",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": [
+        "result",
+        "documentReadId",
+        "kind",
+        "title",
+        "language",
+        "languages",
+        "words",
+        "signers",
+        "signedByAll",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "documentRead.errors": {
+      "title": "DocumentReadErrors",
+      "description": "Nothing to show.",
+      "anyOf": [
+        { "$ref": "#/$defs/linkExpiredError" },
+        { "$ref": "#/$defs/notThisPageError" },
+        { "$ref": "#/$defs/requestEndedError" },
+        { "$ref": "#/$defs/noDocumentError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "documentRead.exchange": {
+      "title": "DocumentReadExchange",
+      "description": "One documentRead request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "documentRead" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/documentRead.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/documentRead.response" }, { "$ref": "#/$defs/documentRead.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "documentSign.request": {
+      "title": "DocumentSignRequest",
+      "description": "The signature, the signer's yes to the words they read (A5-20, B5-35: 'A signature can be a tap or a typed name'; 'Never: sign for someone'; FS line 630), the confirm of documentRead's read-back: it sends only the read's id and how they sign. Served by K-09 v1.3 signDocument sign, made alone with caller.kind page for the link's own person (the signer, set by the page entry from the link found by its code's hash, never named in the request: K-35 v1 rule 9, 'the sign call ... takes the person from that link and never from the page'), its documentId and language from the read the page entry kept; K-35 document_signatures holds the hash of the exact words read, a typed name sealed under the signer's key. With the last signature the same commit sets documents.signed_by_all_at ('All signed'), and the money step can come (A5-20). Who may call: anyone with that signer's own link, for the read of that same link. Reads: the primary, uncached; the document's version compared and set (K-35 rule 9). Repeat: safe: page.requestId is the key, and each signer signs once (K-35 document_signatures_one_per_signer); a repeat answers the first signature. Time budget: the read lapses after 10 minutes (readBackExpired).",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/secureLinkPage" },
+        "documentReadId": {
+          "description": "The read the signature confirms (documentRead.response.documentReadId).",
+          "$ref": "#/$defs/id"
+        },
+        "how": { "type": "string", "enum": ["tap", "typedName"] },
+        "typedName": {
+          "description": "For typedName, the name as the signer typed it (swapped first and read for safety: README default 76), sealed under the signer's key on write and never returned (K-35 v1 document_signatures.typed_name); null for a tap.",
+          "anyOf": [{ "type": "string", "minLength": 1, "maxLength": 200 }, { "type": "null" }]
+        }
+      },
+      "required": ["page", "documentReadId", "how", "typedName"],
+      "additionalProperties": false,
+      "if": { "properties": { "how": { "const": "tap" } }, "required": ["how"] },
+      "then": { "properties": { "typedName": { "type": "null" } } },
+      "else": { "properties": { "typedName": { "type": "string" } } }
+    },
+    "documentSign.response": {
+      "title": "DocumentSigned",
+      "description": "Signed: whether everyone has now signed ('All signed'), and whether this answers an earlier signature. Never the signature's or the document's id, the typed name, or who else signed by name.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "signed" },
+        "documentReadId": { "$ref": "#/$defs/id" },
+        "signedByAll": { "type": "boolean" },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["result", "documentReadId", "signedByAll", "repeated"],
+      "additionalProperties": false
+    },
+    "documentSign.errors": {
+      "title": "DocumentSignErrors",
+      "description": "Nothing was written. K-09 v1.3 signDocument's errors map so: wordsDiffer and versionChanged give readBackChanged (the page reads it again); notAllowed gives notThisPage (this link's person signs none of it); notFound gives noDocument; constraint gives transient; bookingPaused and transient as they are. A document withdrawn because the saved time ended (A5-23) answers holdEnded.",
+      "anyOf": [
+        { "$ref": "#/$defs/linkExpiredError" },
+        { "$ref": "#/$defs/notThisPageError" },
+        { "$ref": "#/$defs/requestEndedError" },
+        { "$ref": "#/$defs/readBackChangedError" },
+        { "$ref": "#/$defs/readBackExpiredError" },
+        { "$ref": "#/$defs/noDocumentError" },
+        { "$ref": "#/$defs/holdEndedError" },
+        { "$ref": "#/$defs/safetyFirstError" },
+        { "$ref": "#/$defs/fieldsInvalidError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "documentSign.exchange": {
+      "title": "DocumentSignExchange",
+      "description": "One documentSign request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "documentSign" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/documentSign.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/documentSign.response" }, { "$ref": "#/$defs/documentSign.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "documentListed": {
+      "title": "DocumentListed",
+      "description": "One document on the owner console's Documents page (FS section 6.2 Documents: 'signed agreements (Q02)'; FS row Q02: 'Documents to sign or OK (a contract, a written estimate, a proposal, a design); the business's own standard agreement can be added once'; A5-19; S1-29; S1-72), a K-35 v1 documents row of origin built of a business where the session's person may read it, with its id and current version (frontend note 1 on K-09: the console names a row back by its id), what it is about, when it was sent, each signer by role with when and how they signed, when everyone had, and whether it was withdrawn and why (README default 74). Never a typed name (K-35 v1: 'a typed name only on the secure page'), a signer's contact, or a number, issuer or file.",
+      "type": "object",
+      "properties": {
+        "documentId": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/version" },
+        "businessName": { "type": "string", "minLength": 1 },
+        "kind": { "$ref": "#/$defs/builtDocumentKind" },
+        "title": { "type": "string", "minLength": 1 },
+        "about": {
+          "description": "business: the business's own (an agreement its work needs, S1-72; its own standard agreement for one service, S1-29); booking: a booking's document (A5-19, A4-43). K-35 v1 documents.owner_kind.",
+          "type": "string",
+          "enum": ["business", "booking"]
+        },
+        "service": {
+          "description": "For the business's own standard agreement, the one service whose contract step it turns on (K-35 documents.service_id, by K-25 v1 services.name); for a booking's document, the booking's service; null for an agreement the work needs.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "booking": {
+          "description": "For a booking's document: the customer's name on the business's list (K-28 v1 customers.name, or null when not listed yet) and the visit's start in its zone; null for the business's own.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "customerName": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+                "start": { "$ref": "#/$defs/utc" },
+                "zone": { "$ref": "#/$defs/zone" }
+              },
+              "required": ["customerName", "start", "zone"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "sentAt": {
+          "description": "When it was built and sent to its signers (K-35 documents.added_at).",
+          "$ref": "#/$defs/utc"
+        },
+        "signers": {
+          "description": "Each signer by role (K-35 document_signers.signs_as), when they signed and how (K-35 document_signatures.signed_at, how), or null twice while they have not.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "signsAs": { "type": "string", "minLength": 1 },
+              "signedAt": { "$ref": "#/$defs/nullableUtc" },
+              "how": { "anyOf": [{ "type": "string", "enum": ["tap", "typedName"] }, { "type": "null" }] }
+            },
+            "required": ["signsAs", "signedAt", "how"],
+            "additionalProperties": false,
+            "if": { "properties": { "signedAt": { "type": "null" } }, "required": ["signedAt"] },
+            "then": { "properties": { "how": { "type": "null" } } },
+            "else": { "properties": { "how": { "type": "string" } } }
+          },
+          "minItems": 1
+        },
+        "signedByAllAt": {
+          "description": "K-35 documents.signed_by_all_at: when the last signer signed ('All signed'), or null.",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "withdrawn": {
+          "description": "K-35 documents.withdrawn_at and withdrawn_why (taken_off, replaced, or not_signed_in_time: A5-23), or null while it stands.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "at": { "$ref": "#/$defs/utc" },
+                "why": { "type": "string", "enum": ["taken_off", "replaced", "not_signed_in_time"] }
+              },
+              "required": ["at", "why"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        }
+      },
+      "required": [
+        "documentId",
+        "version",
+        "businessName",
+        "kind",
+        "title",
+        "about",
+        "service",
+        "booking",
+        "sentAt",
+        "signers",
+        "signedByAllAt",
+        "withdrawn"
+      ],
+      "additionalProperties": false,
+      "if": { "properties": { "about": { "const": "booking" } }, "required": ["about"] },
+      "then": { "properties": { "booking": { "type": "object" } } },
+      "else": { "properties": { "booking": { "type": "null" } } }
+    },
+    "readDocuments.request": {
+      "title": "ReadDocumentsRequest",
+      "description": "The owner console's Documents page, journey 5's part (FS section 6.2 Documents; FS row Q02; A5-19, A5-20; README default 74): the documents Rosie built for signers at each business where the session's person may read them (the owner, or an admin the owner lets manage the team or settings: K-22 v1 team_powers; K-35 v1 documents' readers), newest first, and with open, one of them with its exact words in one language (K-35 v1 document_texts: 'the owner in the portal'). Served by a page-only read of the action layer (no K-09 v1.3 call lists a business's documents), each business's under its own scope (arch 10 line 546); its reads wait for a K-05 minor version (open gap 54). The given papers (FS row Q10) and the one-page summary (S1-79) are not in v1.3 (open gap 53). Who may call: a signed-in person (v1's signedInPage). Binds: the session's person (K-22 v1 rule 4); no business from the browser; an opened document is checked against that person (notAllowed). Changes nothing: a read. Reads: the primary, uncached. Repeat: safe: a read. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "open": {
+          "description": "One listed document to open with its words, or null for the list alone.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "documentId": { "$ref": "#/$defs/id" },
+                "language": { "anyOf": [{ "$ref": "#/$defs/documentLanguage" }, { "type": "null" }] }
+              },
+              "required": ["documentId", "language"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        }
+      },
+      "required": ["page", "open"],
+      "additionalProperties": false
+    },
+    "readDocuments.response": {
+      "title": "DocumentsPage",
+      "description": "The list, newest first, and the one opened with its words, or null.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "documents" },
+        "documents": { "type": "array", "items": { "$ref": "#/$defs/documentListed" } },
+        "opened": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "documentId": { "$ref": "#/$defs/id" },
+                "language": { "$ref": "#/$defs/documentLanguage" },
+                "languages": {
+                  "type": "array",
+                  "items": { "$ref": "#/$defs/documentLanguage" },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "words": { "type": "string", "minLength": 1 }
+              },
+              "required": ["documentId", "language", "languages", "words"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        }
+      },
+      "required": ["result", "documents", "opened"],
+      "additionalProperties": false
+    },
+    "readDocuments.errors": {
+      "title": "ReadDocumentsErrors",
+      "description": "Nothing to show: signInNeeded; notAllowed (a document of a business where the person may not read documents, or none they may: the answer never says whether it exists).",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "readDocuments.exchange": {
+      "title": "ReadDocumentsExchange",
+      "description": "One readDocuments request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readDocuments" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readDocuments.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/readDocuments.response" }, { "$ref": "#/$defs/readDocuments.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "ownerAskWaiting": {
+      "title": "OwnerAskWaiting",
+      "description": "One of Needs you's journey 5 asks (FS section 6.2 Needs you: 'Each says what is decided, the money, the deadline, and what silence does. Silence never books or charges'; A5-08, B5-06: 'Book it with nothing taken?'): a K-30 v1 owner_oks row about nothing_taken, waiting, with its id and current version, which ownerAskReadBack sends back (frontend note 1 on K-09), the booking it is about as the owner sees it, what the booking asks (K-03 pay.asks, from the line's path), why nothing can be taken, A5-08's question in its own words and its two options as the bundle labels them (K-09 v1.3 README default 93's table: '1 Book it', '2 Let it go, or no reply'), when it was asked and its deadline, and what silence does (README default 75).",
+      "type": "object",
+      "properties": {
+        "ownerOkId": { "$ref": "#/$defs/id" },
+        "version": {
+          "description": "K-30 v1 owner_oks.version, compared and set by the answer (limit 4; K-09 v1.3 takeMoneyBefore ownerAnswer.expectVersion).",
+          "$ref": "#/$defs/version"
+        },
+        "businessName": { "type": "string", "minLength": 1 },
+        "customerName": {
+          "description": "The name on the business's list (K-28 v1 customers.name), as A5-08's question names the customer ('Alex M. can't pay ...'), or null when not listed yet.",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "service": { "type": "string", "minLength": 1 },
+        "with": {
+          "description": "Who or what it is with (K-04 v1 resources.name), as A5-08's question shows it.",
+          "type": "string",
+          "minLength": 1
+        },
+        "start": { "$ref": "#/$defs/utc" },
+        "zone": { "$ref": "#/$defs/zone" },
+        "asks": {
+          "description": "What the booking asks, in the server's words from the line's path and amounts (K-03 pay.asks; A5-08: 'What it asks: {{pay.asks}}'), such as 'A card saved for the $20 fee'.",
+          "type": "string",
+          "minLength": 1
+        },
+        "why": {
+          "description": "noCardWorks (no card that works for a card-saved service: A5-31) or stripeDown (S12-17).",
+          "type": "string",
+          "enum": ["noCardWorks", "stripeDown"]
+        },
+        "question": {
+          "description": "A5-08's question as its clock turn wrote it to the owner (K-09 v1.3 README default 99), word for word.",
+          "type": "string",
+          "minLength": 1
+        },
+        "options": {
+          "description": "A5-08's two branches, each with its value and its label as the bundle holds it (master-A.json A5-08; K-09 v1.3 README default 93's table).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "answer": { "type": "string", "enum": ["book", "letGo"] },
+              "label": { "type": "string", "minLength": 1 }
+            },
+            "required": ["answer", "label"],
+            "additionalProperties": false
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "askedAt": { "$ref": "#/$defs/utc" },
+        "answerBy": {
+          "description": "K-30 v1 owner_oks.answer_by: 30 minutes of the owner's text hours, or 5 minutes at any hour for work sent now (B5-06).",
+          "$ref": "#/$defs/utc"
+        },
+        "silence": {
+          "description": "What silence does (FS section 6.2 Needs you): it lets the time go, never books and never charges (A5-08: 'Never: book it with no money taken on silence'). Always letGo: no ask on Needs you books or charges on silence.",
+          "const": "letGo"
+        }
+      },
+      "required": [
+        "ownerOkId",
+        "version",
+        "businessName",
+        "customerName",
+        "service",
+        "with",
+        "start",
+        "zone",
+        "asks",
+        "why",
+        "question",
+        "options",
+        "askedAt",
+        "answerBy",
+        "silence"
+      ],
+      "additionalProperties": false
+    },
+    "readOwnerAsks.request": {
+      "title": "ReadOwnerAsksRequest",
+      "description": "Needs you's journey 5 asks waiting on the owner (FS section 6.2 Needs you: 'requests waiting for the owner's yes'; A5-08, B5-06; K-09 v1.3 README default 99: 'ownerAnswer takes the owner's or a permitted admin's own answer in their turn or on Needs you'; open gap 101: 'how Needs you sends the owner's answer'): the K-30 v1 owner_oks rows about nothing_taken still waiting, at the businesses where the session's person may answer them (the owner, or an admin the owner lets answer: K-22), oldest ask first. Served by a page-only read of the action layer (no K-09 v1.3 call lists owner asks), each business's under its own scope (arch 10 line 546); its reads wait for a K-05 minor version (open gap 54). Needs you's other items are journey 6's and later (v1.2 open gap 48). Who may call: a signed-in person. Binds: the session's person (K-22 v1 rule 4); no business from the browser. Changes nothing: a read. Reads: the primary, uncached. Repeat: safe: a read. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" }
+      },
+      "required": ["page"],
+      "additionalProperties": false
+    },
+    "readOwnerAsks.response": {
+      "title": "OwnerAsksWaiting",
+      "description": "The asks, oldest first.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "ownerAsks" },
+        "asks": { "type": "array", "items": { "$ref": "#/$defs/ownerAskWaiting" } }
+      },
+      "required": ["result", "asks"],
+      "additionalProperties": false
+    },
+    "readOwnerAsks.errors": {
+      "title": "ReadOwnerAsksErrors",
+      "description": "Nothing to show.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "readOwnerAsks.exchange": {
+      "title": "ReadOwnerAsksExchange",
+      "description": "One readOwnerAsks request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readOwnerAsks" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readOwnerAsks.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/readOwnerAsks.response" }, { "$ref": "#/$defs/readOwnerAsks.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "ownerAskReadBack.request": {
+      "title": "OwnerAskReadBackRequest",
+      "description": "The read-back of the owner's answer to A5-08's ask on Needs you (FS line 630; FS section 6.2; v1.2 default 59's rule): writes nothing and answers v1's readBack, A5-08's question with the answer picked, in the bundle's label word for word, its rows the owner_oks row and its version, which the page entry keeps with the session under readBackId. There is no answer for silence (A5-08: 'Never: book it with no money taken on silence'; S13-55): no answer by the deadline is the question clock's firing, never a page call (K-09 v1.3 README default 99). Served by: page-only; the answer itself is made by ownerAskConfirm. Who may call: a signed-in person who may answer the ask at its business (the owner, or an admin the owner lets answer: K-22), notAllowed otherwise. Binds: the session's person; the business is the ask's, checked against that person (arch 10 line 546). Reads: the primary, uncached. Repeat: safe: writes nothing. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "ownerOkId": { "$ref": "#/$defs/id" },
+        "version": {
+          "description": "The ask's version as readOwnerAsks showed it (limit 4).",
+          "$ref": "#/$defs/version"
+        },
+        "answer": {
+          "description": "A5-08's branches as the owner picks: book ('1 Book it': booked with no money taken, so no fee can be charged) or letGo ('2 Let it go'). No value for silence.",
+          "type": "string",
+          "enum": ["book", "letGo"]
+        }
+      },
+      "required": ["page", "ownerOkId", "version", "answer"],
+      "additionalProperties": false
+    },
+    "ownerAskReadBack.response": {
+      "title": "OwnerAskReadBackResponse",
+      "description": "The answer's read-back (v1's readBack, its stepId A5-08 or B5-06, questionId null, shown the owner_oks row at the version read); nothing written.",
+      "$ref": "#/$defs/readBack"
+    },
+    "ownerAskReadBack.errors": {
+      "title": "OwnerAskReadBackErrors",
+      "description": "Nothing was written: signInNeeded; notAllowed (not the owner or a permitted admin there); versionChanged (the ask moved); requestEnded (the ask was answered, or its deadline passed and the time was let go).",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/requestEndedError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "ownerAskReadBack.exchange": {
+      "title": "OwnerAskReadBackExchange",
+      "description": "One ownerAskReadBack request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "ownerAskReadBack" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/ownerAskReadBack.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/ownerAskReadBack.response" },
+            { "$ref": "#/$defs/ownerAskReadBack.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "ownerAskConfirm.request": {
+      "title": "OwnerAskConfirmRequest",
+      "description": "The owner's yes to that read-back, which makes the answer (FS line 630; arch 06 line 303): it sends only the read-back's id. The page entry makes the yes's event and records it in K-08's ownerYes shape (K-30 v1 owner_oks' answer fields: person, role, question, option, event). Served by K-09 v1.3 takeMoneyBefore, stage ownerAnswer, made alone with caller.kind page for the session's person: step A5-08 or B5-06, the ask, the answer and expectVersion from what the page entry kept, and the yes kind page with the read-back's exact words and this event (K-09 v1.3 README default 99). book sets K-30 booking_details.taken 'nothing' and gives money_before (A5-04's 'Nothing taken'): booked with no money taken, so no fee can be charged; letGo ends the request declined, releases the hold and tells the customer. An answer after the saved time ended is checked against the times again (K-09 v1.3 README default 98; holdEnded). Who may call: the signed-in person the read-back was made for. Reads: the primary, uncached; the ask's version compared and set (limit 4). Repeat: safe: readBackId is the key; a repeat writes nothing and answers the first commit. Time budget: the read-back lapses after 10 minutes (readBackExpired).",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "readBackId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["page", "readBackId"],
+      "additionalProperties": false
+    },
+    "ownerAskConfirm.response": {
+      "title": "OwnerAskAnswered",
+      "description": "Committed: the yes's event and the answer made: book, with what the booking took (nothing), or letGo, with the request ended (declined). Never the booking, the hold, the customer's contact, clock rows or written.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "committed" },
+        "readBackId": { "$ref": "#/$defs/id" },
+        "yesEventId": { "$ref": "#/$defs/id" },
+        "answer": { "type": "string", "enum": ["book", "letGo"] },
+        "took": {
+          "description": "For book, K-30 booking_details.taken as this commit set it: nothing; null for letGo.",
+          "anyOf": [{ "const": "nothing" }, { "type": "null" }]
+        },
+        "requestEnded": {
+          "description": "For letGo, K-30 booking_details.request_ended_why: declined; null for book.",
+          "anyOf": [{ "const": "declined" }, { "type": "null" }]
+        }
+      },
+      "required": ["result", "readBackId", "yesEventId", "answer", "took", "requestEnded"],
+      "additionalProperties": false,
+      "if": { "properties": { "answer": { "const": "book" } }, "required": ["answer"] },
+      "then": { "properties": { "took": { "const": "nothing" }, "requestEnded": { "type": "null" } } },
+      "else": { "properties": { "took": { "type": "null" }, "requestEnded": { "const": "declined" } } }
+    },
+    "ownerAskConfirm.errors": {
+      "title": "OwnerAskConfirmErrors",
+      "description": "Nothing was written. K-09 v1.3 takeMoneyBefore ownerAnswer's errors map so: versionChanged gives readBackChanged with a fresh read-back; holdEnded as it is; notAllowed as it is; notFound gives readBackExpired; constraint gives transient; bookingPaused and transient as they are. An ask past its deadline answers requestEnded: silence already let the time go.",
+      "anyOf": [
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/readBackChangedError" },
+        { "$ref": "#/$defs/readBackExpiredError" },
+        { "$ref": "#/$defs/notAllowedError" },
+        { "$ref": "#/$defs/requestEndedError" },
+        { "$ref": "#/$defs/holdEndedError" },
+        { "$ref": "#/$defs/bookingPausedError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "ownerAskConfirm.exchange": {
+      "title": "OwnerAskConfirmExchange",
+      "description": "One ownerAskConfirm request with its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "ownerAskConfirm" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/ownerAskConfirm.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/ownerAskConfirm.response" },
+            { "$ref": "#/$defs/ownerAskConfirm.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    }
+  }
+}

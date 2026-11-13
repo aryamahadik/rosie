@@ -1,0 +1,65 @@
+{
+  "call": "moneyStep",
+  "given": {
+    "now": "2026-11-03T19:19:30Z",
+    "environment": "staging",
+    "after": [],
+    "note": "B5-34 on Alex's secure page at Lee Home Services for the $640 water heater replacement Sam OKed (flow B): jobs over the plug-in's amount need a contract first, so K-09 v1.3 showMoneyBefore answers a document needed and not built yet (document.documentId null), and the step shows it toSend, before any money ('No money for this visit is taken before': A5-19). The plug-in names no other signer for this work (tool-api/fixtures/j5-document-send-page.json), so there is no role to name. The money step itself, a deposit taken as the booking is written, waits until everyone has signed (documentUnsigned). The time was saved at 7:15:10pm and given its one 10 more minutes (v1.2's secureConfirm moreTime), so it is held until 7:35:10pm, the most K-05 v1 can hold it while he signs (K-09 v1.3 README default 98, open gap 93); the step lapses as a read-back 10 minutes after it was shown. The visit's time, its arrival window, the deposit's amount, the cancel line, the words and the ids are examples (README default 48's rule)."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-heater-0020",
+      "traceId": "trace-page-alex-heater-0020",
+      "linkCode": "placeholder-secure-alex-heater-0039"
+    }
+  },
+  "outcome": {
+    "result": "moneyStep",
+    "moneyStepId": "ms-page-alex-heater-1",
+    "on": "securePage",
+    "request": {
+      "businessName": "Lee Home Services",
+      "service": "Water heater replacement",
+      "place": "customer",
+      "timeSaved": {
+        "with": "Jordan",
+        "during": { "start": "2026-11-06T13:00:00Z", "end": "2026-11-06T18:00:00Z" },
+        "zone": "America/New_York",
+        "arrivalWindow": { "start": "2026-11-06T13:00:00Z", "end": "2026-11-06T15:00:00Z" },
+        "heldUntil": "2026-11-03T19:35:10Z",
+        "extendable": false
+      },
+      "price": { "words": "$640", "amount": { "cents": 64000, "currency": "USD" } },
+      "takenNow": "A $160 deposit",
+      "cancelWords": "Free cancel until Thu Nov 5, 8:00am",
+      "approval": "now"
+    },
+    "branch": "deposit",
+    "takenNow": "A $160 deposit, taken as the booking is written",
+    "amountNow": { "cents": 16000, "currency": "USD" },
+    "fee": null,
+    "lines": [
+      {
+        "service": "Water heater replacement",
+        "before": "deposit",
+        "paidBy": "money",
+        "dueNow": { "cents": 16000, "currency": "USD" }
+      }
+    ],
+    "offers": { "credits": [], "buy": [], "plan": null, "discountCodes": false },
+    "document": {
+      "state": "toSend",
+      "kind": "contract",
+      "title": "Contract",
+      "rolesToName": [],
+      "signers": []
+    },
+    "stripeDown": false,
+    "payBy": "cardOnPage",
+    "card": null,
+    "askOwner": false,
+    "words": "Water heater replacement with Jordan, Fri Nov 6, arriving 8 to 10am, $640. A $160 deposit is taken as the booking is written, into Lee Home Services' own Stripe, and counts toward the price; the rest is billed after the visit.",
+    "heldUntil": "2026-11-03T19:35:10Z",
+    "expiresAt": "2026-11-03T19:29:30Z"
+  }
+}

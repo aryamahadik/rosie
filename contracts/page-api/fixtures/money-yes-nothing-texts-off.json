@@ -1,0 +1,27 @@
+{
+  "call": "moneyYes",
+  "given": {
+    "now": "2026-10-22T16:41:00Z",
+    "environment": "staging",
+    "after": [],
+    "note": "A5-05 on the secure page the web app opened from Lee's Barbershop's booking page, for Ben T., whose mobile sent STOP on Oct 20 (K-04 phones.stopped; K-29's stop row): the style consult takes nothing, no money and no card, and his Book it tap on the step's words books it. The page entry calls K-09 v1.3 takeMoneyBefore alone, stage yes, step A5-05, branch nothing, payBy none, as tool-api/fixtures/j5-nothing-yes-texts-off-page.json: booking_details.taken 'asked', set once. A tap on a page is neither START nor a fresh yes sent from that number (RULES 7.5; MC C1), so no texts consent is written (consentId null: STATE note 9), and the page shows K-01's stopLaterReply itself (K-09 v1.3 README default 92). It books now, so the booking is written next (approval now: an example). The link's code and the step's id are placeholders."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-ben-0006",
+      "traceId": "trace-page-ben-0002",
+      "linkCode": "placeholder-secure-ben-consult-0034"
+    },
+    "moneyStepId": "ms-page-ben-consult-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "moneyStepId": "ms-page-ben-consult-1",
+    "yesEventId": "evt-page-ben-0006",
+    "branch": "nothing",
+    "took": "asked",
+    "consentId": null,
+    "textsOffLine": "stopLaterReply",
+    "next": "booking"
+  }
+}

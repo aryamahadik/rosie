@@ -1,0 +1,23 @@
+{
+  "call": "moneyConfirm",
+  "given": {
+    "now": "2026-10-21T23:25:00Z",
+    "environment": "staging",
+    "after": ["money-card-try-another.json", "money-ask-owner-read-back.json"],
+    "note": "Alex's yes to that read-back: the page entry makes the yes's event and calls K-09 v1.3 takeMoneyBefore alone, stage askOwner, step A5-08, why noCardWorks, exactly as tool-api/fixtures/j5-ask-owner-page.json: in one commit a K-30 owner_oks row about nothing_taken, answer_by 30 minutes of Sam's text hours (7:55pm in New York), and one clock row due at once on Sam's handle, whose clock turn writes A5-08's question (K-09 v1.3 README default 99). Alex hears on the page itself when he'll know (A5-08: 'The customer hears when they'll know'); the owner's row, the clock row and written stay on the server. Silence never books: no answer by 7:55pm, the time is let go. The yes event's id is an example."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-fade-0009",
+      "traceId": "trace-page-alex-fade-0001",
+      "linkCode": "placeholder-secure-alex-fade-0032"
+    },
+    "readBackId": "rb-page-alex-fade-ask-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "readBackId": "rb-page-alex-fade-ask-1",
+    "yesEventId": "evt-page-alex-fade-0009",
+    "served": { "change": "askOwner", "answerBy": "2026-10-21T23:55:00Z" }
+  }
+}

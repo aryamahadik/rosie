@@ -1,0 +1,25 @@
+{
+  "call": "documentSign",
+  "given": {
+    "now": "2026-11-03T19:31:00Z",
+    "environment": "staging",
+    "after": ["document-send-confirm.json", "document-read.json"],
+    "note": "B5-35: Alex signs with a tap. Only the read's id and how go up; the signer is the link's own person, set by the page entry from the link found by its code's hash, never named in the request (A5-20: 'Never: sign for someone'; K-35 v1 rule 9). The page entry calls K-09 v1.3 signDocument alone, caller.kind page for Alex, stage sign, step B5-35, the document and the language from the read it kept, how tap, typed name null, exactly as tool-api/fixtures/j5-document-sign-page.json: his K-35 signature with the sha256 of the words he read, and, as the last signer, documents.signed_by_all_at, raising the document's version (K-35 rule 9). 'All signed': the money step can come now. No signature or document id leaves the server."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-heater-0024",
+      "traceId": "trace-page-alex-heater-0023",
+      "linkCode": "placeholder-secure-alex-heater-0039"
+    },
+    "documentReadId": "dr-page-alex-heater-1",
+    "how": "tap",
+    "typedName": null
+  },
+  "outcome": {
+    "result": "signed",
+    "documentReadId": "dr-page-alex-heater-1",
+    "signedByAll": true,
+    "repeated": false
+  }
+}

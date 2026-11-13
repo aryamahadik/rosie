@@ -1,0 +1,27 @@
+{
+  "call": "moneyYes",
+  "given": {
+    "now": "2026-11-07T15:19:40Z",
+    "environment": "staging",
+    "after": [],
+    "note": "A5-13 on the secure page the web app opened from Lee's Barbershop's booking page (README default 66): the $140 Groom's package, way list|deposit|counter ($40 deposit, $40 fee). Alex's card was saved on this page at 3:19:10pm by the step's card stage (moneyCard: K-09 v1.3 takeMoneyBefore card, A5-13, keep true; K-32 v1 seed-payment-deposit's card-alex-grooms-package). He ticks the words the step showed and taps Book it; only the step's id goes up. The page entry calls K-09 v1.3 takeMoneyBefore alone, stage yes, step A5-13, branch deposit, the $40 and payBy cardOnPage from the step it kept, the yes kind page with the step's words and this event, as tool-api/fixtures/j5-deposit-yes-page.json: booking_details.taken 'asked' and his ticked words as a K-29 ticked_terms consent, in one commit. No charge is written here: the $40 is charged on that saved card as the booking is written, right after, while he is still on the page (A6-10, K-09 v1.4; K-09 v1.3 README default 87), so the answer's next is booking, and no word says the deposit is paid until the charge's result (K-32 rule 5). The link's code and the step's id are placeholders."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-page-alex-grooms-0003",
+      "traceId": "trace-page-alex-grooms-0001",
+      "linkCode": "placeholder-secure-alex-grooms-0033"
+    },
+    "moneyStepId": "ms-page-alex-grooms-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "moneyStepId": "ms-page-alex-grooms-1",
+    "yesEventId": "evt-page-alex-grooms-0003",
+    "branch": "deposit",
+    "took": "asked",
+    "consentId": "consent-alex-grooms-terms",
+    "textsOffLine": null,
+    "next": "booking"
+  }
+}
