@@ -131,7 +131,11 @@ export interface DispatchDeps {
 }
 
 export interface DispatchOptions {
-  /** One recipient (the actor's own after a commit); left out: every recipient with sendable rows (the sweep). */
+  /**
+   * One recipient, from a wake (a commit, a park, an outage or safety line's writer: T-1341) or a retry job. Left out, it
+   * means every recipient with sendable rows, a run no production code makes: no outbox sweep runs, and the Worker's cron
+   * runs only the clock rows' sweep (runtime/src/index.ts).
+   */
   recipientHandleId?: string;
 }
 

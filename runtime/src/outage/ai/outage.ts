@@ -14,9 +14,14 @@
 //      copy of the flag, or a text no commit has taken that may hold a stop word, such as a STOP waiting behind a turn that
 //      has used its second restart or one in its open batch window, by the one reading the safety read's own outage line
 //      asks, T-1313), asked right before each text's line, since the actor takes texts while a line is out, and before
-//      the try's rows are woken (after its word they wait for the dispatcher's minute sweep: limit 8 cannot see a STOP no
-//      commit has recorded); not when the handle's stopped flag says stopped; not after the core answers `phoneStopped`;
-//      and limit 8 drops the row at send for a stopped phone (T-259). A line held back here for a stop is not asked for
+//      the try's rows are woken; not when the handle's stopped flag says stopped; not after the core answers
+//      `phoneStopped`; at send, limit 8 drops the row for a stopped phone (T-259), and the dispatcher asks the recipient
+//      actor this same reading right before each part goes, dropping the row on any answer but exactly false (T-1337).
+//      Every row the try's lines named, first or repeated, is woken once the try's last line is asked, while the actor
+//      still says no word waits, so it goes, or is dropped by the dispatcher's own ask, at once (T-1341, DL-669); after
+//      its word none is woken (a wake runs every sendable row of the recipient, and a routine row is not asked: T-1342),
+//      and a row not woken, or whose wake fails, waits for the recipient's next dispatcher run, which asks the reading
+//      again; no sweep runs. A line held back here for a stop is not asked for
 //      again in that run (the turn's next run checks again). The request is the one the safety read's timeout rule sends
 //      for the same text (kind job, request id `safety:<event id>`: runtime/src/safety), and K-09 sends a fixed line once
 //      per request id, so a text gets the line once whichever path asks first, a rerun of the turn included (it asks again
@@ -185,9 +190,10 @@ function actorSaysStopped(host: OutageHost | null): boolean {
  * The handle actor that runs the turn takes a text during every await here (handle-actor.ts `accept` writes it and opens
  * its batch window in one synchronous step), so a STOP can come while the stopped flag is read or an earlier text's line is
  * out. So the actor's word (T-1323) is asked before the flag is read, again right before each text's line, with nothing
- * awaited between its answer and the line's request, and once more before the try's rows are woken: from its first true
- * answer on, no later line of the try is asked for (as after the core's `phoneStopped`), and none of the try's rows is
- * woken.
+ * awaited between its answer and the line's request, and once more right before the try's rows (every row its lines named,
+ * first or repeated: T-1341) are woken: from its first true answer on, no later line of the try is asked for (as after the
+ * core's `phoneStopped`), and none of the try's rows is woken; each waits for the recipient's next dispatcher run, whose
+ * own ask of the same reading drops it unless that says exactly false (T-1337).
  */
 async function sendLines(
   set: OutageDeps,
@@ -228,7 +234,9 @@ async function sendLines(
     if (written !== null) {
       done.add(text.eventId);
       lines.push({ eventId: text.eventId, outboxRowId: written.outboxRowId, repeated: written.repeated });
-      if (written.outboxRowId !== null && !written.repeated) rows.push(written.outboxRowId);
+      // First or repeated (T-1341): a repeated answer, at a rerun of the turn, names a row whose first wake may have been
+      // lost, so it is woken again; a second wake sends nothing twice (one claim, one key per part).
+      if (written.outboxRowId !== null) rows.push(written.outboxRowId);
       continue;
     }
     const code = errorOf(answer);
@@ -240,15 +248,18 @@ async function sendLines(
     // No such handle: nothing to send to. Anything else (transient, a bad answer): asked for again on the next retry.
     if (code === "notFound") done.add(text.eventId);
   }
-  // The rows the try wrote go at once only while the actor still says no word waits (asked again here too, for a STOP taken
-  // while the try's last line was out). After its word, a wake would send them before any commit records the STOP, which
-  // limit 8 cannot see at send; unwoken, they wait for the dispatcher's minute sweep, by which time the STOP's commit may
-  // have set the stopped flag that drops them at send (T-259).
+  // The rows the try's lines named go to the dispatcher at once only while the actor still says no word waits (asked again
+  // here, with nothing awaited before the wake, for a STOP taken while the try's last line was out: T-1341, DL-669). The
+  // dispatcher asks the same reading right before each outage part goes and drops the row unless it says exactly false
+  // (T-1337). After the actor's word no row is woken: a wake runs every sendable row of the recipient, and a routine row is
+  // not asked (T-1342). Unwoken, they wait for the recipient's next dispatcher run, which asks the reading again, and limit
+  // 8 drops them once the STOP commits (T-259); no sweep runs.
   if (rows.length > 0 && set.wake !== undefined && !held && !actorSaysStopped(host)) {
     try {
       await set.wake({ handleId: waiting.handleId, outboxRowIds: rows });
     } catch {
-      // Not woken: the dispatcher's minute sweep sends the rows.
+      // Not woken: the rows wait for the recipient's next dispatcher run (a commit or park wake, another outage or
+      // safety-line wake, or the retry door), which asks the same reading; no sweep runs. The lines stand.
     }
   }
 }

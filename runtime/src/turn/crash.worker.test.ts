@@ -185,7 +185,10 @@ interface Rig {
   settle(): Promise<void>;
   /** Cuts the actor off: its memory goes, its storage and its alarm stay; a new instance follows. */
   crash(): Promise<void>;
-  /** The minute sweep: a dispatcher run over every recipient's sendable rows. */
+  /**
+   * A dispatcher run with no recipient, over every recipient's sendable rows: a run no production code makes (no outbox
+   * sweep runs; T-1341), which this rig makes where a row's own writer wakes no dispatcher yet.
+   */
   sweep(): Promise<DispatchReport>;
   /** K-05 writes a row's plan and final parts once (writePlan; finalizeMessage writes through it). */
   writePlan(row: string, parts: FinalParts): "written" | "alreadyPlanned";
@@ -469,7 +472,8 @@ describe("a crash before the commit", { timeout: SLOW_MS }, () => {
           safetyLine: { fixedLineId: "safetyEmergency", outboxRowId: LINE_ROW },
         });
 
-        // The safety line goes (the minute sweep claims the safety row and sends it).
+        // The safety line goes: the test's run with no recipient claims the safety row and sends it, since the danger
+        // line's writer wakes no dispatcher yet (T-1341's new task 1).
         const swept = await rig.sweep();
         expect(swept.rows).toEqual([
           { outboxRowId: LINE_ROW, recipientHandleId: "handle-sam", outcome: "sent", partsSent: 1 },
@@ -563,8 +567,8 @@ describe("a crash after the commit", { timeout: SLOW_MS }, () => {
         expect(await rig.actor.readTurns()).toMatchObject([{ turnId, state: "committed", tries: 1 }]);
         expect((await rig.actor.readTurns())[0]?.leaseUntil).not.toBeNull();
 
-        // The minute sweep claims the ask (the note has no plan, so it waits) and sends its first part; the run is cut off
-        // before the second part reaches Linq.
+        // A run with no recipient (the rig's, standing in for the recipient's next dispatcher run) claims the ask (the note
+        // has no plan, so it waits) and sends its first part; the run is cut off before the second part reaches Linq.
         let cut = false;
         rig.linq.beforeAnswer = (request) => {
           if (request.idempotencyKey === `${ROW_ASK}/2/1` && !cut) {

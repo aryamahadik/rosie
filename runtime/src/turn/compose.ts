@@ -618,7 +618,10 @@ async function copyRow(
   return { report: reportOf(row, "copied", null, { ...facts, finalParts }), stored: null };
 }
 
-/** Wakes the dispatcher once for the committed turn; a dispatcher that does not take it leaves the rows to its sweep. */
+/**
+ * Wakes the dispatcher once for the committed turn; a dispatcher that does not take it leaves the rows for the
+ * recipient's next dispatcher run.
+ */
 async function wake(turn: CommittedTurn, outboxRowIds: readonly string[]): Promise<boolean> {
   const woken = await settled(() =>
     turn.set.dispatcher.wake(
@@ -626,7 +629,8 @@ async function wake(turn: CommittedTurn, outboxRowIds: readonly string[]): Promi
       turn.trace,
     ),
   );
-  // Not taken: the minute sweep claims every recipient's sendable rows (runtime/src/dispatch, no recipient named).
+  // Not taken: the rows wait for the recipient's next dispatcher run (the park's or a later commit's wake, an outage or
+  // safety-line wake, or the retry door); no sweep runs.
   return !woken.lost;
 }
 
