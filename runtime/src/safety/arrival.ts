@@ -1838,7 +1838,15 @@ export class SafetyOnArrival {
     }
   }
 
-  /** The outage line to a text no verdict came for: never to a stopped number. */
+  /**
+   * The outage line to a text no verdict came for: never to a stopped number. The actor takes a text during every await
+   * here (handle-actor.ts `accept` writes it and opens its batch window in one synchronous step), so a STOP can come while
+   * the stopped flag or the handle's ids are read, or while the core is asked for the line. So the actor's one reading
+   * (`SafetyHost.stopped`: its copy of the stopped flag, or a text no commit has taken that may hold a stop word) is asked
+   * before the flag is read, and again right before each send, the core's and each one straight through Linq, with nothing
+   * awaited between its answer and the send (T-1336; RULES 7.2: "It stops texts from the number it answers, at once"):
+   * its word holds the line, as the core's `phoneStopped` does. The danger line (`sendDanger`) never asks it (RULES 4.12).
+   */
   private async sendOutage(
     set: SafetyDeps,
     handoff: SealedHandoff,
@@ -1851,6 +1859,18 @@ export class SafetyOnArrival {
     const eventId = handoff.event.eventId;
     const line = set.bundle.fixedLine("outage");
     if (line === null) return { path: "none", lineId: null, handedAfterMs: null };
+    // The reading as it is asked right before a send: a throw, or any answer but false, holds the line, failing closed as
+    // T-1313's ask does (RULES 7.2: "Unsure: treat it as a stop"). A host with no reading wired says nothing, as
+    // `copySaysStopped` reads it.
+    const actorSaysStopped = (): boolean => {
+      if (this.host.stopped === undefined) return false;
+      try {
+        const answer: unknown = this.host.stopped();
+        return answer !== false;
+      } catch {
+        return true;
+      }
+    };
     if (this.copySaysStopped() || (await set.isStopped(this.actorName))) {
       return { path: "none", lineId: line.id, handedAfterMs: null };
     }
@@ -1863,16 +1883,22 @@ export class SafetyOnArrival {
         sendClass: "quick_reply",
         sentByActor: null,
       };
+      // Asked again right before the core's send: a STOP taken while the flag or the ids were read holds the line.
+      if (actorSaysStopped()) return { path: "none", lineId: line.id, handedAfterMs: null };
       const answer = await set.core.sendFixedLine(request).catch((): CoreError => ({ error: "transient" }));
       if (!isError(answer)) {
         return { path: "outbox", lineId: line.id, handedAfterMs: set.clock.now() - arrivedAt };
       }
       if (answer.error === "phoneStopped") return { path: "none", lineId: line.id, handedAfterMs: null };
+      // And right before the line goes straight through Linq: a STOP taken while the core was asked holds it too.
+      if (actorSaysStopped()) return { path: "none", lineId: line.id, handedAfterMs: null };
       const sent = await this.sendDirect(set, eventId, line, false);
       if (sent === null) return { path: "none", lineId: line.id, handedAfterMs: null };
       await this.keep(set, eventId, "fixed", { ...request, sentByActor: sent });
       return { path: "outage", lineId: line.id, handedAfterMs: set.clock.now() - arrivedAt };
     }
+    // No ids to ask the core with: asked again right before the line goes straight through Linq.
+    if (actorSaysStopped()) return { path: "none", lineId: line.id, handedAfterMs: null };
     const sent = await this.sendDirect(set, eventId, line, false);
     return sent === null
       ? { path: "none", lineId: line.id, handedAfterMs: null }
