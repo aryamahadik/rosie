@@ -1,19 +1,31 @@
 // The phone scan (T-1317): T-1304's number reader, widened from the deploy config and scripts to every tracked
 // file. The repository is public (DL-436) and no real phone number goes in it (DL-542, DL-581), so
 // phone-scan.test.mjs (`npm run test:ci-scripts`) reads every file `git ls-files` lists and fails on any phone
-// number outside the fiction ranges: +1, an area code, then 555-0100 to 555-0199, as adapters/src/shared/samples.ts
-// and the Linq double read it, and Ofcom's UK numbers for drama (DL-616). A hit is named by its file and line, never
-// by its number. The deliberate inputs a file holds outside the ranges are listed in phone-scan-exceptions.mjs, each
-// with its file and why it is no real number, and pass only at that file. Not a test file itself;
-// wrangler-env.test.mjs, rosfield-test-route.test.mjs and web/spikes/chat-link/chat-link.test.mjs read numbers with
-// it too.
+// number outside the fiction ranges: +1, an area code that is not toll-free, then 555-0100 to 555-0199 (T-1359;
+// adapters/src/shared/samples.ts and the Linq double keep their own copy, which still takes a toll-free one), and
+// Ofcom's UK numbers for drama (DL-616). A hit is named by its file and line, never by its number. The deliberate
+// inputs a file holds outside the ranges are listed in phone-scan-exceptions.mjs, each with its file and why it is
+// no real number, and pass only at that file. Not a test file itself; wrangler-env.test.mjs,
+// rosfield-test-route.test.mjs and web/spikes/chat-link/chat-link.test.mjs read numbers with it too.
 
 import { spawnSync } from "node:child_process";
 import { lstatSync, readFileSync, readlinkSync } from "node:fs";
 import path from "node:path";
 
-/** The +1 fiction range, in E.164: +1, an area code, then 555-0100 to 555-0199. */
-export const FICTIONAL_PHONE = /^\+1[2-9][0-9]{2}55501[0-9]{2}$/;
+/**
+ * The toll-free area codes, where exchange 555 is not reserved, so a 555-01xx line there is no fiction (Wikipedia, 555
+ * (North American Numbering Plan)): 800, 833, 844, 855, 866, 877 and 888 in use, and 822, 880 to 887 and 889 kept for
+ * toll-free's growth (Wikipedia, Toll-free telephone number). T-1344's builder handoff a, T-1359.
+ */
+export const TOLL_FREE_AREA_CODES = Object.freeze([
+  ...["800", "833", "844", "855", "866", "877", "888"],
+  ...["822", "880", "881", "882", "883", "884", "885", "886", "887", "889"],
+]);
+
+/** The +1 fiction range, in E.164: +1, an area code that is not toll-free, then 555-0100 to 555-0199 (T-1359). */
+export const FICTIONAL_PHONE = new RegExp(
+  String.raw`^\+1(?!(?:${TOLL_FREE_AREA_CODES.join("|")}))[2-9][0-9]{2}55501[0-9]{2}$`,
+);
 
 /**
  * Ofcom's UK numbers for drama, which it gives to no line: [area, first, last], in national form as Ofcom's table

@@ -7,13 +7,16 @@
 // its groups, so this file holds nothing the scan reads as a number (the scan reads this file too). The kinds,
 // which phone-scan.test.mjs checks against the digits:
 //   - "impossible code": +1, then an area code or an exchange that starts with 0 or 1, which the plan never gives;
-//   - "555 exchange": +1, then exchange 555 with a line outside the fiction block: the plan keeps exchange 555 for
-//     directory and information services, never a person's line, and area code 555 serves no area at all. Never
-//     the directory-assistance line or the one national-use line NANPA kept, and never in a Nevada area code
-//     (DL-632) or a toll-free one, where 555 is not reserved (T-1344);
-//   - "wrong length": +1 with fewer than ten digits after it, such as the fiction block's first digits written
-//     before a template's last four. Never seven, a local number's length (DL-636), and never more than ten, a real
-//     number with a digit added (T-1344);
+//   - "555 exchange": +1, area code 555, then exchange 555 with a line outside the fiction block. Area code 555
+//     serves no area at all, so no one's line is under it. In a real area code such a line may be a person's: since
+//     NANPA's 2016 change, a 555 line there outside the fiction block can be assigned (T-1344's security note a), so
+//     the kind takes area code 555 only (T-1359). Never the directory-assistance line or the one national-use line
+//     NANPA kept (DL-632, T-1344);
+//   - "wrong length": +1 and the first 6, 8 or 9 digits of a fiction-block number, such as the block's first digits
+//     written before a template's last ones, so only a fiction number, or one under area code 555, begins with them,
+//     never a real number's first digits (DL-636's reason, T-1359): area code 555 and exchange 555; or an area code
+//     the fiction range takes (not a toll-free one), exchange 555 and the line's 01, with one more digit or none.
+//     Never seven, a local number's length (DL-636), and never ten or more (T-1344);
 //   - "not a phone number": digits that are no number in their file (an integer, a digest, a coordinate, a count),
 //     each named in its why;
 //   - "public line" (DL-616): one of PUBLIC_LINES below, a published public service line, never a person's number,
@@ -88,8 +91,8 @@ export const EXCEPTIONS = [
   {
     file: "adapters/src/linq/double-webhooks/webhooks.test.ts",
     kind: "555 exchange",
-    numbers: ["+1_415_555_1234"],
-    why: "the webhook double's refusal tests: a line outside the fiction block, so the double answers notFictionalPhone",
+    numbers: ["+1_555_555_1234"],
+    why: "the webhook double's refusal tests: a line outside the fiction block under area code 555 (no area), so the double answers notFictionalPhone",
   },
   {
     file: "adapters/src/linq/double-webhooks/webhooks.test.ts",
@@ -106,8 +109,8 @@ export const EXCEPTIONS = [
   {
     file: "adapters/src/shared/samples.test.ts",
     kind: "555 exchange",
-    numbers: ["+1_415_555_9999", "+1_205_555_9999", "+1_415_555_9998"],
-    why: "the sample loader's refusal tests: lines outside the fiction block, refused unless the caller allows them",
+    numbers: ["+1_555_555_9999", "+1_555_555_9998"],
+    why: "the sample loader's refusal tests: lines outside the fiction block under area code 555 (no area), refused unless the caller allows them",
   },
   {
     file: "db/repo/phones.int.test.ts",
@@ -140,8 +143,8 @@ export const EXCEPTIONS = [
   {
     file: "tests/contract/data-access.v1.test.ts",
     kind: "555 exchange",
-    numbers: ["+1_555_555_0200", "+1_202_555_1234"],
-    why: "the cast check's refusal tests: lines outside the fiction block, which the check must name",
+    numbers: ["+1_555_555_0200", "+1_555_555_1234"],
+    why: "the cast check's refusal tests: lines outside the fiction block under area code 555 (no area), which the check must name",
   },
   {
     file: "tests/contract/db-schema.core.v1.test.ts",
