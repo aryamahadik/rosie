@@ -18,6 +18,10 @@
 //                       of the newest asking row that has gone (item 26's rule, default 41; default 51). A row of send
 //                       class safety answers fixedLineRow and nothing else (default 49). Every answer is v1.6's
 //                       readOutboxRow.v1dot6Response: businessSensitive is always stated, true, false or null.
+//                       A row with no turn (K-04 v1.1's job row, such as a sign-in code's email row: turn_id null, a job
+//                       id in its place) answers notFound, table outbox_rows, as soon as the row is read: before its
+//                       send class, its reader, its turn or anything else, and nothing of it is returned (K-05 v1.13
+//                       item 65; ADR-016 section 1's reader table and open point 12; card R0, T-1279; default 4).
 //   readFixedLineFacts  the fixed-line facts of a row's own handle and business (item 36): whether Rosie texted the handle
 //                       about the business before (K-04's opener mark naming another row; with no business, an earlier row
 //                       to the handle with no business whose final parts carry the opener: default 50), the row the opener
@@ -75,6 +79,11 @@
 //      question still open with the reader whose newest asking row that has gone carries no words part.
 //   3. "The words part" of an asking row's final parts is its first send of kind words with a non-empty text (K-03 v1
 //      finalParts: the words first, then one poll or card).
+//   4. A row with no turn answers notFound whatever its send class, a safety row's included (T-1279): item 65 is the
+//      rule for the kind of row v1.3 never held, while v1.3's rules, default 49's fixedLineRow among them, were made for
+//      the rows it held, every one with a turn. So the check comes before the send class's, and the answer holds
+//      nothing of the row, not even its class. A job row is never composed or finalized: no caller names one (the
+//      code row is written checked and never goes stale), and with no turn there are no texts to answer.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.3";
 import type * as K05v1dot6 from "../../contracts/generated/data-access/data-access.v1.6";
 import { transientOrScrubbed } from "./clocks";
@@ -369,7 +378,8 @@ export async function readOpenHolds(
 
 interface OutboxRowRow {
   id: string;
-  turn_id: string;
+  /** Null for a row with no turn (K-04 v1.1: its job id stands in its place), which the read answers notFound. */
+  turn_id: string | null;
   recipient_handle_id: string;
   recipient_person_id: string | null;
   business_id: string | null;
@@ -385,6 +395,12 @@ interface OutboxRowRow {
   bundle_build: number;
   version: number;
 }
+
+/** A row a turn committed: the only kind the read goes on to read (K-05 v1.13 item 65; default 4). */
+type TurnRow = OutboxRowRow & { turn_id: string };
+
+/** Whether a turn committed the row; a row with no turn (K-04 v1.1's job row) carries a job id in its place. */
+const hasTurn = (row: OutboxRowRow): row is TurnRow => row.turn_id !== null;
 
 interface PhoneRow {
   stopped: boolean;
@@ -489,8 +505,11 @@ async function recipientOf(db: Db, row: OutboxRowRow): Promise<RowRecipient> {
   };
 }
 
-/** The turn that committed the row: the handle its texts came from, each text by event id with its safety result. */
-async function answersOf(db: Db, row: OutboxRowRow): Promise<Answers> {
+/**
+ * The turn that committed the row: the handle its texts came from, each text by event id with its safety result. Only
+ * a row a turn committed reaches it (item 65: a row with no turn answers notFound first).
+ */
+async function answersOf(db: Db, row: TurnRow): Promise<Answers> {
   const [turn] = await db<{ handle_id: string; event_ids: string[] }[]>`
     select handle_id, event_ids from turns where id = ${row.turn_id}
   `;
@@ -715,6 +734,12 @@ export async function readOutboxRowIn(
   if (row === undefined) {
     return notFound("outbox_rows", outboxRowId);
   }
+  if (!hasTurn(row)) {
+    // A row with no turn (K-04 v1.1's job row) is a kind of row v1.3 never held: notFound, before its send class or
+    // anything else is read, so its turn is never looked for and nothing of it is returned (K-05 v1.13 item 65;
+    // ADR-016 section 1's reader table and open point 12; default 4).
+    return notFound("outbox_rows", outboxRowId);
+  }
   const sendClass = row.send_class;
   if (sendClass === "safety") {
     // A safety line stays fixed text (arch 07 line 347): no compose or finalize view of it (default 49).
@@ -761,9 +786,10 @@ export async function readOutboxRowIn(
  * An outbox row as compose input and finalize read it (K-05 v1.3 item 35), with its business's sensitive switch (v1.6
  * item 45): one read-only transaction at repeatable read on the primary, uncached. Pass the runtime's client (rosie_job):
  * with a business the read runs under its scope, set and confirmed before the first read; with businessId null on the
- * runtime side. notFound when there is no such row or the scope hides it; fixedLineRow for a safety row; transient on a
- * serialization failure, a deadlock or a lost connection. A request of the wrong shape throws a TypeError, a broken
- * record a BrokenRecordError, and any other failed read its own error: never an answer, so never a switch read as off.
+ * runtime side. notFound when there is no such row, the scope hides it, or it has no turn (K-04 v1.1's job row: K-05
+ * v1.13 item 65, before anything else of it is read); fixedLineRow for a safety row; transient on a serialization
+ * failure, a deadlock or a lost connection. A request of the wrong shape throws a TypeError, a broken record a
+ * BrokenRecordError, and any other failed read its own error: never an answer, so never a switch read as off.
  */
 export async function readOutboxRow(
   sql: Sql,
