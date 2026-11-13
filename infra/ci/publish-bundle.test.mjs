@@ -1,8 +1,10 @@
 // Tests for infra/scripts/publish-bundle.sh (T-569; build prompt 5.4, deploy step 3; K-05 v1 item 7, NQ-PB-5), run by
 // `node --test "infra/ci/*.test.mjs"`. The script runs in a throwaway checkout against a throwaway local database,
 // migrated as the staging database is (release-harness.mjs); on the staging path its wrangler is a fake that records
-// each call, so nothing reaches Cloudflare.
+// each call, so nothing reaches Cloudflare. The last describe (T-1343) puts a recorder in front of every command the
+// script starts, and shows that the registry program's database calls alone get the database's URL.
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { after, before, describe, it } from "node:test";
@@ -17,6 +19,7 @@ import {
   releaseRoot,
   v0WithBuild,
 } from "./release-harness.mjs";
+import { cleanEnv, namedIn, program, spies, tempDir, whereHeld } from "./script-harness.mjs";
 
 describe("publish-bundle.sh", () => {
   const cleanups = [];
@@ -291,5 +294,198 @@ describe("publish-bundle.sh", () => {
       assertNoUrlPart(result, refused, what);
     }
     assert.equal(await readActive(db.sql), active);
+  });
+});
+
+// T-1343 (T-1310's new task b): publish-bundle.sh hands the database's URL to the registry program's database calls
+// alone (active, publish, activate, status), as DATABASE_URL on each one's command line; manifest-id, cf.sh, wrangler and
+// every other command get no database URL, in their environment or their arguments. A recorder (script-harness.mjs's
+// spies) stands in front of every command the script, lib.sh and cf.sh start by name, and of the checkout's wrangler;
+// PATH holds nothing else, so none starts unseen. The database is a throwaway local one; the caller's other URL is made
+// up (a .invalid host never resolves, RFC 6761).
+describe("publish-bundle.sh hands the database's URL to the registry's database calls alone (T-1343)", () => {
+  const OTHER_URL =
+    "postgres://t1343_other_login:t1343-made-up-password@db-t1343-other.example.invalid:5432/t1343_other";
+  const OTHER_PARTS = ["t1343_other_login", "t1343-made-up-password", "db-t1343-other.example.invalid"];
+  const CALLER_TEXT = "t1343 made-up caller text";
+  // Every command publish-bundle.sh, lib.sh and cf.sh start by name, but node (below).
+  const COMMANDS = ["basename", "bash", "date", "dirname", "mktemp", "rm", "sed", "tr"];
+  // A publish on staging: the registry's calls that use the database, each with the URL as DATABASE_URL.
+  const PUBLISH = [
+    "registry activate: env DATABASE_URL",
+    "registry active: env DATABASE_URL",
+    "registry publish: env DATABASE_URL",
+  ];
+  const cleanups = [];
+  const t = { after: (fn) => cleanups.push(fn) };
+  let db;
+  let watched;
+  let fromEnv;
+  let fromFile;
+
+  /** What a recorded command is: a registry call by its command, cf.sh and wrangler with their first word, or its name. */
+  const kindOf = (child) => {
+    if (child.name === "node" && child.args.some((arg) => arg.includes("registryCall")))
+      return `registry ${child.args[6] ?? ""}`;
+    if (child.name === "bash" && (child.args[0] ?? "").endsWith("/infra/scripts/cf.sh"))
+      return `cf.sh ${child.args[1] ?? ""}`;
+    if (child.name === "wrangler") return `wrangler ${child.args[2] ?? ""}`;
+    return child.name;
+  };
+
+  /** A release root (with a made-up .dev.vars when devVars is given) whose every command is spied. */
+  const spiedRig = (devVars) => {
+    const rig = releaseRoot(t, devVars === undefined ? {} : { devVars });
+    const spy = spies(rig.dir, COMMANDS, { node: [process.execPath] });
+    spy.put(path.join(rig.root, "node_modules", ".bin", "wrangler"), "wrangler", [
+      process.execPath,
+      path.join(rig.dir, "fake", "wrangler.cjs"),
+    ]);
+    const v0 = path.join(rig.root, "bundles", "v0");
+    return {
+      v0,
+      /** Runs publish-bundle.sh under the real bash, `bash` holding its options, with the variables given. */
+      publish(args, { extra = {}, bash = [] } = {}) {
+        spy.clear();
+        const result = spawnSync(
+          program("bash"),
+          [...bash, path.join(rig.root, "infra", "scripts", "publish-bundle.sh"), ...args],
+          {
+            cwd: rig.root,
+            encoding: "utf8",
+            env: cleanEnv(path.join(rig.dir, "home"), {
+              PATH: spy.bin,
+              FAKE_LOG: path.join(rig.dir, "calls.ndjson"),
+              DB_SCHEMA: undefined,
+              ...extra,
+            }),
+          },
+        );
+        return { ...result, output: `${result.stdout}${result.stderr}`, children: spy.children() };
+      },
+    };
+  };
+
+  before(async () => {
+    db = await createThrowawayDatabase("publish_urls");
+    watched = [db.url, new URL(db.url).pathname.slice(1)];
+    fromEnv = spiedRig();
+    fromFile = spiedRig(`# made up\nSTAGING_DATABASE_URL=${db.url}\n`);
+  });
+
+  after(async () => {
+    for (const cleanup of cleanups.reverse()) cleanup();
+    await db?.drop();
+  });
+
+  /**
+   * Fails unless the run passed, the URL is held by the registry calls of `holders` alone, as DATABASE_URL, no command
+   * holds it in an argument, no other command has a database URL's name in its environment, none holds the caller's
+   * other URL or one of `others`, and the output holds none of them.
+   */
+  function assertToRegistryAlone(result, what, holders, others = []) {
+    assert.equal(result.status, 0, `${what}: ${result.output}`);
+    assert.ok(
+      result.children.some((child) => child.name === "dirname"),
+      `${what}: no dirname was recorded`,
+    );
+    assert.deepEqual(whereHeld(result.children, watched, kindOf), [...holders].sort(), `${what}: the URL`);
+    assert.deepEqual(
+      namedIn(result.children, ["STAGING_DATABASE_URL", "DATABASE_URL"], kindOf),
+      holders.map((line) => line.replace(": env ", ": ")).sort(),
+      `${what}: a database URL's name`,
+    );
+    for (const child of result.children.filter((each) => kindOf(each) !== "registry manifest-id")) {
+      if (kindOf(child).startsWith("registry ")) {
+        assert.ok(
+          child.env.split("\n").includes(`DATABASE_URL=${db.url}`),
+          `${what}: ${kindOf(child)}'s URL`,
+        );
+      }
+    }
+    assert.deepEqual(
+      whereHeld(result.children, [...OTHER_PARTS, ...others], kindOf),
+      [],
+      `${what}: another text`,
+    );
+    for (const text of [...watched, ...OTHER_PARTS, ...others]) {
+      assert.equal(result.output.includes(text), false, `${what}: the output holds a value`);
+    }
+  }
+
+  it("a publish on staging, from the caller's environment beside a DATABASE_URL of another database, or from .dev.vars: the registry's database calls alone get the URL; manifest-id, cf.sh and wrangler get none", () => {
+    for (const [what, rig, extra] of [
+      ["from the environment", fromEnv, { STAGING_DATABASE_URL: db.url, DATABASE_URL: OTHER_URL }],
+      ["from .dev.vars", fromFile, { DATABASE_URL: OTHER_URL }],
+    ]) {
+      const result = rig.publish([rig.v0], { extra });
+      assertToRegistryAlone(result, what, PUBLISH);
+      const kinds = new Set(result.children.map(kindOf));
+      for (const kind of [
+        "registry manifest-id",
+        "cf.sh kv",
+        "wrangler kv",
+        "date",
+        "mktemp",
+        "rm",
+        "sed",
+        "tr",
+      ]) {
+        assert.ok(kinds.has(kind), `${what}: no ${kind} was recorded`);
+      }
+      assert.match(result.stdout, /step 2\/3 KV: wrangler kv bulk put[\s\S]*publish-bundle: done/, what);
+    }
+  });
+
+  it("--status and --activate on staging, and --env local with the caller's DATABASE_URL: the registry's calls alone", () => {
+    const status = fromEnv.publish(["--status"], { extra: { STAGING_DATABASE_URL: db.url } });
+    assertToRegistryAlone(status, "--status", ["registry status: env DATABASE_URL"]);
+    assert.match(status.stdout, new RegExp(`active bundle id: ${V0_ID} \\(active since `));
+    const activate = fromFile.publish(["--activate", V0_ID], { extra: { DATABASE_URL: OTHER_URL } });
+    assertToRegistryAlone(activate, "--activate", [
+      "registry activate: env DATABASE_URL",
+      "registry active: env DATABASE_URL",
+    ]);
+    const local = fromEnv.publish(["--env", "local", "--status"], {
+      extra: { DATABASE_URL: db.url, STAGING_DATABASE_URL: OTHER_URL },
+    });
+    assertToRegistryAlone(local, "--env local", ["registry status: env DATABASE_URL"]);
+  });
+
+  it("allexport, keyword and tracing from the caller, and the caller's variables of the script's own names, from either source: the registry's calls alone", () => {
+    const caller = { staging_url: CALLER_TEXT, local_url: CALLER_TEXT, db_url: CALLER_TEXT };
+    for (const [source, rig, extra] of [
+      ["from the environment", fromEnv, { STAGING_DATABASE_URL: db.url, DATABASE_URL: OTHER_URL }],
+      ["from .dev.vars", fromFile, { DATABASE_URL: OTHER_URL }],
+    ]) {
+      // [mode, its variables, bash's options, what standard error holds: a trace begins and ends at set +x]
+      for (const [mode, variables, bash, stderr] of [
+        ["SHELLOPTS=allexport", { SHELLOPTS: "allexport" }, [], ""],
+        ["bash -a -k", {}, ["-a", "-k"], ""],
+        ["SHELLOPTS=allexport:keyword", { SHELLOPTS: "allexport:keyword" }, [], ""],
+        ["the caller's variables under allexport", { ...caller, SHELLOPTS: "allexport" }, [], ""],
+        ["bash -x", {}, ["-x"], "+ set +x\n"],
+        ["SHELLOPTS=xtrace", { SHELLOPTS: "xtrace" }, [], "+ set +x\n"],
+      ]) {
+        const what = `${mode}, ${source}`;
+        const result = rig.publish([rig.v0], { extra: { ...extra, ...variables }, bash });
+        assertToRegistryAlone(result, what, PUBLISH, [CALLER_TEXT]);
+        assert.equal(result.stderr, stderr, `${what}: standard error`);
+      }
+    }
+  });
+
+  it("a recorder keeps a command's environment and arguments, and the checks find a URL in either (the control for the checks above)", (t) => {
+    const dir = tempDir(t, "publish-spy-control");
+    const spy = spies(dir, ["mktemp"]);
+    spawnSync(path.join(spy.bin, "mktemp"), ["-d", `/made-up/${OTHER_URL}`], {
+      env: { PATH: spy.bin, STAGING_DATABASE_URL: OTHER_URL },
+      encoding: "utf8",
+    });
+    const children = spy.children();
+    assert.deepEqual(whereHeld(children, OTHER_PARTS, kindOf), ["mktemp: env STAGING_DATABASE_URL, args 1"]);
+    assert.deepEqual(namedIn(children, ["STAGING_DATABASE_URL", "DATABASE_URL"], kindOf), [
+      "mktemp: STAGING_DATABASE_URL",
+    ]);
   });
 });
