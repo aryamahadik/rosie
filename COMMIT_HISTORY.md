@@ -2,9 +2,47 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 506, [`3963ee6`](https://github.com/aryamahadik/rosie/commit/3963ee6), 2026-11-13 04:46:15 UTC.
+- **Through:** commit 508, [`40ad7c9`](https://github.com/aryamahadik/rosie/commit/40ad7c9), 2026-11-13 05:18:50 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 508. docs: COMMIT\_HISTORY.md through commit 506 (3963ee6, \#514) (\#516)
+
+- **Commit:** [`40ad7c9`](https://github.com/aryamahadik/rosie/commit/40ad7c9), by Arya Mahadik, 2026-11-13 05:18:50 UTC
+- **Pull request:** [#516](https://github.com/aryamahadik/rosie/pull/516) from `task/commit-history-64`, merged 2026-11-13 05:18:51 UTC. It squashed 1 branch commit:
+  - `53e16e0` docs: COMMIT\_HISTORY.md through commit 506 (3963ee6, \#514)
+- **Files changed:** 1 (+68 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +68 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 507. T-1330: the frontier's transaction end fails scrubbed: the scope read, the commit and a failed rollback carry no host, port, user or password (\#515)
+
+- **Commit:** [`f09ddf4`](https://github.com/aryamahadik/rosie/commit/f09ddf4), by Arya Mahadik, 2026-11-13 05:18:46 UTC
+- **Pull request:** [#515](https://github.com/aryamahadik/rosie/pull/515) from `task/T-1330`, merged 2026-11-13 05:18:47 UTC. It squashed 3 branch commits:
+  - `29b75e0` T-1330: frontier.int tests for the transaction end: the scope read, t…
+  - `b0e3b93` T-1330: the frontier's transaction end fails scrubbed: after work ans…
+  - `c39131c` T-1330: prettier on frontier.int.test.ts
+- **Files changed:** 2 (+501 −14), by folder:
+  - `actions/src/tool-api/turn-face/pg/` frontier.int.test.ts +391 −3, frontier.ts +110 −11
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1330: frontier.int tests for the transaction end: the scope read, the commit and the rollback cut, and a read's lost connection, through the scope and buildFrontier
+
+* T-1330: the frontier's transaction end fails scrubbed: after work answered, a failure of the scope read or the commit is thrown scrubbed under readTurnState; when work threw, its own error leaves scrubbed even when the rollback fails; a read that finds the connection gone stops the scope read, the commit and the rollback on it
+
+* T-1330: prettier on frontier.int.test.ts
+~~~
+
+</details>
 
 ## 506. docs: COMMIT\_HISTORY.md through commit 503 (ff4e7e2, \#511) (\#514)
 
