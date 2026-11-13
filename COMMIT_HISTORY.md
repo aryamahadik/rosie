@@ -2,9 +2,68 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 543, [`3e785b0`](https://github.com/aryamahadik/rosie/commit/3e785b0), 2026-11-13 11:23:10 UTC.
+- **Through:** commit 546, [`520d4bd`](https://github.com/aryamahadik/rosie/commit/520d4bd), 2026-11-13 11:48:27 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 546. docs: COMMIT\_HISTORY.md through commit 543 (3e785b0, \#551) (\#554)
+
+- **Commit:** [`520d4bd`](https://github.com/aryamahadik/rosie/commit/520d4bd), by Arya Mahadik, 2026-11-13 11:48:27 UTC
+- **Pull request:** [#554](https://github.com/aryamahadik/rosie/pull/554) from `task/commit-history-79`, merged 2026-11-13 11:48:28 UTC. It squashed 1 branch commit:
+  - `b7f1a5a` docs: COMMIT\_HISTORY.md through commit 543 (3e785b0, \#551)
+- **Files changed:** 1 (+86 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +86 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 545. T-1347: errorLabelOf never builds a label longer than LABEL\_MAX: where \<SQLSTATE\>:\<constraint\> would pass 64 characters (a constraint of 59 to 63), the label is \<Name\>:\<SQLSTATE\>, which isErrorLabel accepts, so the next retry message reads back and runs; every label that fits is unchanged, and each field is read once so the label is built from the values checked. labels.worker.test.ts: 58 kept and 59 to 63 left out on PostgresError, DataAccessDatabaseError and CommitTurnDatabaseError; a send door throwing each, its next message read back and try 3 run; a field answering otherwise on a second read never reaches the label (\#553)
+
+- **Commit:** [`21440c4`](https://github.com/aryamahadik/rosie/commit/21440c4), by Arya Mahadik, 2026-11-13 11:48:24 UTC
+- **Pull request:** [#553](https://github.com/aryamahadik/rosie/pull/553) from `task/T-1347`, merged 2026-11-13 11:48:24 UTC. It squashed 1 branch commit:
+  - `775a8f2` T-1347: errorLabelOf never builds a label longer than LABEL\_MAX: wher…
+- **Files changed:** 2 (+125 −11), by folder:
+  - `runtime/src/queues/` labels.worker.test.ts +111 −1, message.ts +14 −10
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 544. T-1284: db/repo: the sign-in check side, proveSignIn, endSession and personStanding (ADR-016 card R2) (\#552)
+
+- **Commit:** [`a1d09ac`](https://github.com/aryamahadik/rosie/commit/a1d09ac), by Arya Mahadik, 2026-11-13 11:48:20 UTC
+- **Pull request:** [#552](https://github.com/aryamahadik/rosie/pull/552) from `task/T-1284`, merged 2026-11-13 11:48:20 UTC. It squashed 2 branch commits:
+  - `6e85a9a` T-1284: db/repo sign-in check side: proveSignIn, endSession, personSt…
+  - `7f25063` T-1284: replay the v1.13 fixtures of proveSignIn, endSession and sign…
+- **Files changed:** 3 (+2512 −0), by folder:
+  - `db/repo/` scope.ts +28 −0, sign-in-check.int.test.ts +1642 −0, sign-in-check.ts +842 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1284: db/repo sign-in check side: proveSignIn, endSession, personStanding and signInEntries in sign-in-check.ts (K-05 v1.13 items 60 to 63), at READ COMMITTED (DL-610), and scope.ts's person setter; integration tests for card R2's proofs and DL-526's race
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1284: replay the v1.13 fixtures of proveSignIn, endSession and signInEntries on the database's clock (each answer against its fixture and its v1.13 definition), refuse the two refused requests before any statement, and run the file in its own pool database
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 543. docs: COMMIT\_HISTORY.md through commit 540 (663739f, \#547) (\#551)
 
