@@ -6,7 +6,7 @@
 // API path: finalize writes the final parts (C-087, join 10: T-561), and the dispatcher claims, renews, marks and
 // receives (C-124, C-125, join 11: T-562).
 //
-// The outbox calls come in two versions, each answering its own contract's shapes:
+// The outbox calls come in versions, each answering its own contract's shapes:
 //   K-05 v1    claimOutbox, markPart and markRow, as T-196 built them: a claim writes no outbox_claims row and never
 //              lapses (K-05 v1 open gap 1), and every answer is v1's.
 //   K-05 v1.2  claimOutboxV12, renewClaim, markPartV12 and markRowV12 (T-1135): the dispatcher's send loop, as
@@ -16,7 +16,21 @@
 //              the new fields, so it is a v1.1 answer with v1.2's fields added (K-05 v1.2: every v1.1 exchange is a
 //              v1.2 exchange). Only these write outbox_claims (default 20). markPartV12's answer is K-05 v1.9's from
 //              T-1227: it also states repeatedDelivery, what a repeated delivery receipt repeats (v1.9 item 48).
+//   K-05 v1.13 claimOutboxV113 (T-1279; ADR-016 card R0): claimOutboxV12's claim, each claimed row also carrying
+//              emailPurpose and notAfter, K-04 v1.1's outbox_rows.email_purpose and not_after as stored, null where the
+//              column is null (v1.13 item 64): limit 8 withdraws a row at or after its notAfter at every try, and the
+//              email port tells a code row by its purpose (ADR-016 sections 3 and 5; cards E1 and F). claimOutboxV12
+//              keeps answering v1.2's claimed row, which v1.2 closes, so its consumers are unchanged: a claimed row
+//              with neither field is a v1 to v1.12 answer. The claim writes the same rows either way.
 // writePlan and unplannedRows are the same in every version.
+//
+// A row with no turn (K-04 v1.1's job row: turn_id null and a job id in its place, such as a sign-in code's email row,
+// ADR-016 section 1) is written, claimed, renewed and marked as any row: no call here reads a row's turn, and only
+// unplannedRows names one, finding rows by it, so it never lists a job row (ADR-016 section 1's reader table). The
+// claimed row carries no turn id and no job id. A failed mark with no followUps on such a row is marked as for any
+// row (v1.13 item 66); one that carries followUps is refused before anything is written, the failure included
+// (default 19), which is what item 66's noTurn holds for it, until the task that writes follow-ups gives that refusal
+// its own answer (item 66: the refusal goes with the card that builds each of the three).
 //
 //   writePlan      Locks the row. A row that holds a plan answers alreadyPlanned, checked before its version (after a
 //                  crash "only rows without a plan are composed": arch 11 line 576); else the version is compared and the
@@ -196,6 +210,7 @@ import type * as K05 from "../../contracts/generated/data-access/data-access.v1"
 import type * as K05v11 from "../../contracts/generated/data-access/data-access.v1.1";
 import type * as K05v12 from "../../contracts/generated/data-access/data-access.v1.2";
 import type * as K05v19 from "../../contracts/generated/data-access/data-access.v1.9";
+import type * as K12 from "../../contracts/generated/port-email/port-email.v1";
 import { commitSeqOf, instantOf, transientOrScrubbed } from "./clocks";
 import type { Sql } from "./scope";
 import { assertRequestShape, inRuntimeTransaction, utc, utcOrNull } from "./targets";
@@ -391,6 +406,28 @@ export type MarkPartV12Outcome = MarkPartV12Response | MarkPartError;
 export type MarkRowV12Request = K05v12.MarkRowRequest;
 export type MarkRowV12Response = K05v12.MarkRowResponse;
 export type MarkRowV12Outcome = MarkRowV12Response | MarkRowError;
+
+// ---- the v1.13 claim's shapes (K-05 v1.13 item 64; its claimedRow takes two optional fields, which a v1.13 call always
+// writes, and its claimOutbox.request is v1.2's) ------------------------------------------------------------------------
+
+/** K-12 v1's purpose of an email row: K-04 v1.1 outbox_rows.email_purpose, which its CHECK holds to these six. */
+export type EmailPurpose = K12.EmailPurpose;
+
+/**
+ * K-05 v1.13 claimedRow as a v1.13 call always writes it (README item 64): v1.2's claimed row, and emailPurpose and
+ * notAfter, outbox_rows.email_purpose and not_after as stored, null where the column is null. K-04 v1.1's CHECKs hold a
+ * purpose to an email row and give a code row its notAfter (outbox_rows_email_purpose_is_email,
+ * outbox_rows_code_has_not_after). It carries no turn id and no job id (ADR-016 section 1's reader table).
+ */
+export type ClaimedRowV113 = ClaimedRowV12 & { emailPurpose: EmailPurpose | null; notAfter: string | null };
+
+/** K-05 v1.13 claimOutbox.response: each claimed row with its claim, port, purpose and end. */
+export interface ClaimOutboxV113Response {
+  result: "claimed";
+  claimed: ClaimedRowV113[];
+  passedHeld: PassedHeld[];
+}
+export type ClaimOutboxV113Outcome = ClaimOutboxV113Response | K05.TransientError;
 
 // ---- request checks: what the database cannot be trusted to refuse ---------------------------------------------------
 
@@ -1093,6 +1130,10 @@ interface OpenRow {
   versions_read: unknown;
   final_parts: unknown;
   trace_id: string;
+  /** K-04 v1.1: an email row's K-12 purpose, else null (outbox_rows_email_purpose_known and _is_email). */
+  email_purpose: EmailPurpose | null;
+  /** K-04 v1.1: no part of the row is sent at or after it; a code row always has one (outbox_rows_code_has_not_after). */
+  not_after: Date | null;
 }
 
 interface PartRow {
@@ -1295,13 +1336,18 @@ function claimedFromOf(state: RowState): ClaimedFrom {
   throw new Error(`claimOutbox: K-07 lets no claim move a ${state} row`);
 }
 
-/** One row a claim took: v1's claimed row, the state it was claimed from, its port and (v1.2) its claim. */
+/**
+ * One row a claim took: v1's claimed row, the state it was claimed from, its port, (v1.2) its claim, and (v1.13) its
+ * purpose and end as stored, which only a v1.13 claim answers.
+ */
 interface Taken {
   readonly row: ClaimedRow;
   readonly from: ClaimedFrom;
   readonly port: Port;
   /** The claim a v1.2 claim wrote; null under v1, which writes none. */
   readonly claim: OutboxClaim | null;
+  readonly emailPurpose: EmailPurpose | null;
+  readonly notAfter: Date | null;
 }
 
 /**
@@ -1362,6 +1408,8 @@ async function claimRow(
     from: claimedFromOf(row.state),
     port: portOf(row.channel),
     claim,
+    emailPurpose: row.email_purpose,
+    notAfter: row.not_after,
   };
 }
 
@@ -1379,7 +1427,7 @@ async function walkRecipient(
 ): Promise<void> {
   const rows = await tx<OpenRow[]>`
     select id, commit_seq, state, held_until, version, recipient_person_id, business_id, booking_id,
-           open_question_id, channel, send_class, versions_read, final_parts, trace_id
+           open_question_id, channel, send_class, versions_read, final_parts, trace_id, email_purpose, not_after
     from outbox_rows
     where recipient_handle_id = ${recipientHandleId} and state in ${tx(OPEN_STATES)}
     order by commit_seq
@@ -1490,6 +1538,39 @@ export async function claimOutboxV12(sql: Sql, request: ClaimOutboxRequest): Pro
       async (tx): Promise<ClaimOutboxV12Response> => {
         const { taken, passedHeld } = await claimIn(tx, checked, true);
         return { result: "claimed", claimed: taken.map(claimedV12), passedHeld };
+      },
+    );
+  } catch (error) {
+    return transientOrScrubbed(CLAIM_OUTBOX, error);
+  }
+}
+
+function claimedV113(one: Taken): ClaimedRowV113 {
+  return { ...claimedV12(one), emailPurpose: one.emailPurpose, notAfter: utcOrNull(one.notAfter) };
+}
+
+/**
+ * K-05 v1.13's claim (README item 64; ADR-016 card R0, T-1279): claimOutboxV12's claim, writing the same rows, each
+ * claimed row also carrying emailPurpose and notAfter, the row's email_purpose and not_after as stored (K-04 v1.1),
+ * null where the column is null, on every claim of the row, a re-claim's included. So limit 8 reads the time from
+ * which no part of the row is sent at every try, and the email port the row's K-12 purpose (ADR-016 sections 3 and 5).
+ * A row at or past its notAfter is claimed as any row, so that limit 8 can withdraw it (K-07: sending to withdrawn, by
+ * markRow): the claim decides nothing by notAfter. A row with no turn (K-04 v1.1's job row) is claimed as any row, and
+ * the claimed row carries neither its turn id nor its job id. One transaction on the primary, on the runtime side; pass
+ * the client's primary handle, run as rosie_job. Answers claimed or transient.
+ */
+export async function claimOutboxV113(
+  sql: Sql,
+  request: ClaimOutboxRequest,
+): Promise<ClaimOutboxV113Outcome> {
+  const checked = checkClaim(request);
+  try {
+    return await inRuntimeTransaction(
+      sql,
+      { readOnly: false },
+      async (tx): Promise<ClaimOutboxV113Response> => {
+        const { taken, passedHeld } = await claimIn(tx, checked, true);
+        return { result: "claimed", claimed: taken.map(claimedV113), passedHeld };
       },
     );
   } catch (error) {

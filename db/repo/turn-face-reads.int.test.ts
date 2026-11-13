@@ -22,6 +22,13 @@
 // fixture's with the switch as v1.6 reads the fixture's world: null, as no seed of a v1.3 chain holds a kind of work
 // (checked, not assumed). The rows a v1.6 fixture's note says its database side writes itself, since no frozen seed holds
 // them (read-outbox-row-practice-sensitive.json's five), are written as its note lists them, after its seeds and chain.
+//
+// T-1279 (ADR-016 card R0; K-05 v1.13 item 65): a row with no turn, K-04 v1.1's job row, answers notFound before any turn
+// is read. read-outbox-row-sign-in-code.json's note lists the three rows its database side writes, Sam's sign-in code's
+// email row among them as send-sign-in-code-sam leaves it: no frozen seed holds a row with no turn, and sendSignInCode is
+// R1's (T-1280). They are its NOTED_ROWS, so the read meets the job row itself (DL-610). The tests at the end read, from
+// the statements the read sent, that it read that row alone and never its turn, for a job row of a business and one of
+// class safety too, and that the same row given a turn is read as any row.
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
@@ -385,9 +392,56 @@ function practiceRows(): SeedRow[] {
   ];
 }
 
+/** K-05 v1.13's sign-in code row, as send-sign-in-code-sam.json leaves it and read-outbox-row-sign-in-code's note lists it. */
+const CODE_ROW = "out-sam-sign-in-nov02-code";
+const CODE_SEND = "send-sign-in-code-sam.json";
+
+/**
+ * read-outbox-row-sign-in-code.json's three rows, in its note's order and with its note's values (DL-610): Sam's email
+ * handle, his person's link to it, and his sign-in code's email row with no turn (its job id the attempt's), checked at
+ * version 2, with the plan and final parts send-sign-in-code-sam's request holds.
+ */
+function signInCodeRows(): SeedRow[] {
+  const { plan, finalParts } = exchangeOf(CODE_SEND).request;
+  if (plan === undefined || finalParts === undefined) {
+    throw new Error(`${CODE_SEND}'s request holds the row's plan and final parts`);
+  }
+  return [
+    { table: "handles", values: { id: "handle-sam-email", kind: "email", address: "sam@example.com" } },
+    { table: "person_handles", values: { person_id: "person-sam", handle_id: "handle-sam-email" } },
+    {
+      table: "outbox_rows",
+      values: {
+        id: CODE_ROW,
+        turn_id: null,
+        job_id: "sign-in-sam-nov02-1300",
+        recipient_handle_id: "handle-sam-email",
+        recipient_person_id: "person-sam",
+        business_id: null,
+        booking_id: null,
+        open_question_id: null,
+        copy_of_row_id: null,
+        channel: "email",
+        send_class: "quick_reply",
+        email_purpose: "code",
+        not_after: "2026-11-02T13:10:01Z",
+        versions_read: [],
+        plan,
+        final_parts: finalParts,
+        state: "checked",
+        bundle_hash: BUNDLE_HASH,
+        bundle_build: 1,
+        trace_id: "trace-page-sam-nov02-1300",
+        version: 2,
+      },
+    },
+  ];
+}
+
 /** By fixture file, the rows its note says its database side writes itself before the read: no frozen seed holds them. */
 const NOTED_ROWS: Readonly<Record<string, () => SeedRow[]>> = {
   "read-outbox-row-practice-sensitive.json": practiceRows,
+  "read-outbox-row-sign-in-code.json": signInCodeRows,
 };
 
 /** Loads a fixture's seeds, runs its chain's commits for real (commitTurn, T-195, as rosie_job), then its noted rows. */
@@ -2539,4 +2593,230 @@ describe("the three turn-face reads: a statement's own refusal and postgres.js's
       message: `${call}: the database call failed (code ${expected.client})`,
     });
   });
+});
+
+// ---- T-1279: a row with no turn (K-05 v1.13 item 65; ADR-016 card R0) ----------------------------------------------
+
+describe("a row with no turn answers notFound before any turn is read (K-05 v1.13 item 65; ADR-016 card R0; T-1279)", () => {
+  const FILE = "read-outbox-row-sign-in-code.json";
+  /** This file's schema's tables. */
+  let tables: ReadonlySet<string> = new Set();
+
+  beforeAll(async () => {
+    const rows = await db.sql<{ name: string }[]>`
+      select table_name as name from information_schema.tables where table_schema = ${db.schema}
+    `;
+    tables = new Set(rows.map((row) => row.name));
+  }, 60_000);
+
+  /** The tables of this file's schema a statement names: string literals dropped, quoted names unquoted, lower case. */
+  const tablesNamed = (statement: string): string[] =>
+    (
+      statement
+        .replace(/'(?:[^']|'')*'/g, " ")
+        .replaceAll('"', "")
+        .toLowerCase()
+        .match(/[a-z_][a-z0-9_$]*/g) ?? []
+    ).filter((name) => tables.has(name));
+
+  /** What `read` answers, and each table the statements the two role clients sent meanwhile name, in order. */
+  async function watched(read: () => Promise<unknown>): Promise<{ outcome: unknown; named: string[] }> {
+    sent.length = 0;
+    const outcome = await read();
+    return { outcome, named: sent.flatMap(tablesNamed) };
+  }
+
+  /** A job row to Alex (K-04 v1.1: no turn, a job id in its place), as a commit leaves a row: planned, no plan. */
+  const jobRow = (id: string, businessId: string | null, sendClass: string): Record<string, Json> => ({
+    id,
+    turn_id: null,
+    job_id: `job-${id}`,
+    recipient_handle_id: "handle-alex",
+    recipient_person_id: "person-alex",
+    business_id: businessId,
+    channel: "imessage",
+    send_class: sendClass,
+    versions_read: [],
+    bundle_hash: BUNDLE_HASH,
+    bundle_build: 1,
+    trace_id: `trace-${id}`,
+  });
+
+  /** A committed turn of `handleId`'s one text, as the tables' owner writes it. */
+  const turnRow = (id: string, handleId: string, eventId: string): Record<string, Json> => ({
+    id,
+    handle_id: handleId,
+    event_ids: [eventId],
+    state: "committed",
+    bundle_hash: BUNDLE_HASH,
+    bundle_build: 1,
+    trace_id: `trace-${id}`,
+    committed_at: "2026-11-02T12:59:58Z",
+  });
+
+  it(
+    `${FILE}: the code row is there as its note lists it and the read's role and side see it, and the read answers notFound having read that row alone, never its turn`,
+    SLOW,
+    async () => {
+      const exchange = await given(FILE);
+      const request = exchange.request as unknown as ReadOutboxRowRequest;
+      expect(request).toEqual({ outboxRowId: CODE_ROW, businessId: null });
+      // The read meets the job row itself (DL-610), as send-sign-in-code-sam leaves it: its id, its job id (the
+      // attempt's), its trace, its end (the code's expiresAt) and its version are that send's, and so are its plan and
+      // final parts; it has no turn, no business and no question.
+      const send = exchangeOf(CODE_SEND);
+      const { expiresAt } = send.outcome;
+      if (typeof expiresAt !== "string") {
+        throw new Error(`${CODE_SEND}'s outcome names the code's end`);
+      }
+      const [stored] = await db.sql<Record<string, unknown>[]>`
+        select id, turn_id, job_id, recipient_handle_id, recipient_person_id, business_id, booking_id,
+               open_question_id, channel, send_class, email_purpose, not_after, state, version, trace_id, plan,
+               final_parts
+        from outbox_rows where id = ${CODE_ROW}
+      `;
+      expect(stored).toEqual({
+        id: send.request.emailRowId,
+        turn_id: null,
+        job_id: send.request.signInAttemptId,
+        recipient_handle_id: "handle-sam-email",
+        recipient_person_id: "person-sam",
+        business_id: null,
+        booking_id: null,
+        open_question_id: null,
+        channel: "email",
+        send_class: "quick_reply",
+        email_purpose: "code",
+        not_after: new Date(expiresAt),
+        state: "checked",
+        version: send.outcome.version,
+        trace_id: send.request.traceId,
+        plan: send.request.plan,
+        final_parts: send.request.finalParts,
+      });
+      // The read's own role and side see it (rosie_job, no business scope): the answer is the guard's, not a policy's.
+      const visible = await inRuntimeTransaction(job, { readOnly: true }, async (tx) => [
+        ...(await tx<{ id: string }[]>`select id from outbox_rows where id = ${CODE_ROW}`),
+      ]);
+      expect(visible).toEqual([{ id: CODE_ROW }]);
+
+      const { outcome, named } = await watched(() => readOutboxRow(job, request, nowOf(exchange)));
+      expect(outcome).toEqual(exchange.outcome);
+      expect(outcomeErrors(exchange.call, outcome)).toEqual([]);
+      // One statement named a table: the row's own select. Its turn was never looked for, nor its reader, its slot
+      // source, its business's switch or the questions open with its reader.
+      expect(named).toEqual(["outbox_rows"]);
+      // Inside a caller's own transaction on the runtime side (readOutboxRowIn), the same.
+      expect(
+        await watched(() =>
+          inRuntimeTransaction(job, { readOnly: true }, (tx) =>
+            readOutboxRowIn(tx, request, nowOf(exchange)),
+          ),
+        ),
+      ).toEqual({ outcome: exchange.outcome, named: ["outbox_rows"] });
+    },
+  );
+
+  it(
+    "a job row of a business, read under its scope, and a job row of class safety answer notFound too: the row's select alone, and nothing of the row, not even its class (default 4)",
+    SLOW,
+    async () => {
+      const exchange = await given(FILE);
+      // Job rows no call writes yet (a clock's or a page's with no turn: CQ-28, CQ-44), as the tables' owner writes them.
+      await db.sql.begin(async (tx) => {
+        await insertRow(tx, "outbox_rows", jobRow("out-job-alex-barber", BARBERSHOP, "routine"));
+        await insertRow(tx, "outbox_rows", jobRow("out-job-alex-safety", null, "safety"));
+      });
+      const barber: ReadOutboxRowRequest = { outboxRowId: "out-job-alex-barber", businessId: BARBERSHOP };
+      const safety: ReadOutboxRowRequest = { outboxRowId: "out-job-alex-safety", businessId: null };
+      for (const request of [barber, safety]) {
+        const notFound = { error: "notFound", table: "outbox_rows", rowId: request.outboxRowId };
+        expect(
+          await watched(() => readOutboxRow(job, request, nowOf(exchange))),
+          request.outboxRowId,
+        ).toEqual({ outcome: notFound, named: ["outbox_rows"] });
+      }
+      // Under the business's own scope, as a caller of readOutboxRowIn holds it (withBusiness), the same.
+      expect(
+        await watched(() =>
+          withBusiness(job, BARBERSHOP, (tx) => readOutboxRowIn(tx, barber, nowOf(exchange))),
+        ),
+      ).toEqual({
+        outcome: { error: "notFound", table: "outbox_rows", rowId: "out-job-alex-barber" },
+        named: ["outbox_rows"],
+      });
+
+      // The same safety row given a turn is a row v1.3 held: fixedLineRow, as default 49 answers any safety row, and
+      // still nothing more is read. The turn is checked first, then the class.
+      await db.sql.begin(async (tx) => {
+        await insertRow(tx, "turns", turnRow("turn-alex-job-twin", "handle-alex", "evt-alex-job-twin"));
+        await tx`
+          update outbox_rows set turn_id = 'turn-alex-job-twin', job_id = null, version = version + 1
+          where id = 'out-job-alex-safety'
+        `;
+      });
+      expect(await watched(() => readOutboxRow(job, safety, nowOf(exchange)))).toEqual({
+        outcome: { error: "fixedLineRow", outboxRowId: "out-job-alex-safety", sendClass: "safety" },
+        named: ["outbox_rows"],
+      });
+    },
+  );
+
+  it(
+    "the turn is what the guard reads: the same code row given a turn is read as any row, its turn's texts with it",
+    SLOW,
+    async () => {
+      const exchange = await given(FILE);
+      const request = exchange.request as unknown as ReadOutboxRowRequest;
+      // As if a text from Sam's phone had written the row to his email, as a turn writes an email copy: K-04 v1's
+      // shape, a turn id and no job id. Nothing else of the row changes but its version.
+      await db.sql.begin(async (tx) => {
+        await insertRow(tx, "turns", turnRow("turn-sam-code-twin", "handle-sam", "evt-sam-code-twin"));
+        await tx`
+          update outbox_rows set turn_id = 'turn-sam-code-twin', job_id = null, version = version + 1
+          where id = ${CODE_ROW}
+        `;
+      });
+      const { outcome, named } = await watched(() => readOutboxRow(job, request, nowOf(exchange)));
+      expect(outcome).toEqual({
+        result: "outboxRow",
+        outboxRowId: CODE_ROW,
+        businessId: null,
+        readAt: exchange.given.now,
+        row: {
+          turnId: "turn-sam-code-twin",
+          bundleId: BUNDLE,
+          state: "checked",
+          version: 3,
+          channel: "email",
+          sendClass: "quick_reply",
+          bookingId: null,
+          openQuestionId: null,
+          copyOfRowId: null,
+          hasPlan: true,
+          finalParts: exchangeOf(CODE_SEND).request.finalParts,
+        },
+        line: null,
+        recipient: {
+          handleId: "handle-sam-email",
+          kind: "email",
+          personId: "person-sam",
+          name: "Sam Lee",
+          storedLanguage: "en",
+          roles: [],
+          phone: null,
+        },
+        answers: {
+          handleId: "handle-sam",
+          texts: [{ eventId: "evt-sam-code-twin", outcomes: null, tenses: null }],
+        },
+        slotSource: { business: null, booking: null, question: null },
+        businessSensitive: null,
+        openQuestions: [],
+      });
+      expect(outcomeErrors("readOutboxRow", outcome)).toEqual([]);
+      // Its turn was read this time.
+      expect(named).toContain("turns");
+    },
+  );
 });
