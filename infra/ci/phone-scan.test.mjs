@@ -4,7 +4,9 @@
 // one; each of their numbers is no one's (area code 055, or area code 555 with exchange 555), and this file is
 // listed for them. A drama-range UK number is fiction, so it needs no entry. A public line, a UK number outside
 // Ofcom's drama blocks, the directory-assistance line and a 555 line in a Nevada area code are built from their parts
-// when the test runs, so this file holds none of them.
+// when the test runs, so this file holds none of them. So is every number the glued-shape tests plant (T-1332): a
+// number right after an escape's letter or a URL-encoded character, or a separated one right before a letter, and
+// the cases T-1304's reader keeps unread.
 
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -17,6 +19,7 @@ import {
   OFCOM_DRAMA,
   isFiction,
   listedNumber,
+  phoneNumbersIn,
   scanRepository,
   scanTexts,
   trackedFiles,
@@ -38,6 +41,17 @@ const NEVADA_AREA_CODES = new Set(["702", "725", "775"]);
 /** The 555 exchange's directory-assistance line, built from its parts so this file never writes it whole. */
 const DIRECTORY_ASSISTANCE_LINE = "12".repeat(2);
 
+/**
+ * The parts of the numbers the glued-shape tests plant (T-1332), joined only when a test runs, so this file holds
+ * none of them whole: area code 555 (no area) and exchange 555, then a line in the fiction block or one past it.
+ */
+const FIVES = "5".repeat(3);
+const IN_BLOCK = "0142";
+const PAST_BLOCK = "0200";
+
+/** Ten digits in a row: area code and exchange 555, then the line. */
+const ten = (line) => `${FIVES}${FIVES}${line}`;
+
 /** Whether a listed number (E.164) is of its entry's kind, so it can be no one's line. */
 function ofKind(kind, number) {
   const digits = number.slice(1);
@@ -53,7 +67,10 @@ function ofKind(kind, number) {
       !NEVADA_AREA_CODES.has(digits.slice(1, 4))
     );
   }
-  if (kind === "wrong length") return digits.startsWith("1") && digits.length !== 11;
+  if (kind === "wrong length") {
+    // Never seven digits after +1: a local number's length, which an area code could complete (DL-636).
+    return digits.startsWith("1") && digits.length !== 11 && digits.length !== 8;
+  }
   if (kind === "public line") return PUBLIC_NUMBERS.has(number);
   return kind === "not a phone number";
 }
@@ -158,6 +175,8 @@ describe("the phone scan of every tracked file (T-1317)", () => {
     assert.ok(ofKind("555 exchange", listedNumber("+1_555_555_0200")));
     assert.ok(ofKind("wrong length", listedNumber("+1_555555")));
     assert.ok(ofKind("wrong length", listedNumber("+1_555_555_0142_0")));
+    // Seven digits after +1, a local number's length, are never of the kind (DL-636); built here from its parts.
+    assert.ok(!ofKind("wrong length", `+1${FIVES}${IN_BLOCK}`), "seven digits after +1");
     // A number whose area code and exchange the plan gives (built here from parts, never written whole).
     const ordinary = `+1${"2".repeat(3)}${"3".repeat(3)}${"4".repeat(4)}`;
     for (const kind of ["impossible code", "555 exchange", "wrong length", "public line"]) {
@@ -303,5 +322,71 @@ describe("the phone scan on planted lines (T-1317)", () => {
 
   it("refuses to scan outside a git repository", (t) => {
     assert.throws(() => scanRepository(tempDir(t, "phone-scan-no-git")), /git ls-files failed/);
+  });
+});
+
+describe("the phone scan of a number glued to a letter (T-1332)", () => {
+  // Each shape T-1332 reads (T-1317's security note b): a number right after the letter of an escape or of a
+  // URL-encoded character, and a separated North American number right before a letter. Each is written as a file
+  // would hold it, around a line under area code and exchange 555.
+  const GLUED = {
+    "the + form after an escaped newline in JSON": (line) => `{"text": "Call us\\n+1${ten(line)}"}`,
+    "the + form with spaces after an escaped tab": (line) => `"name\\t+1 ${FIVES} ${FIVES} ${line}"`,
+    "dashes after an escaped newline": (line) => `"Call us\\n${FIVES}-${FIVES}-${line}"`,
+    "a bracketed area code after an escaped carriage return": (line) => `"one\\r(${FIVES}) ${FIVES}-${line}"`,
+    "ten digits in a row after an escaped newline": (line) => `"one\\n${ten(line)}"`,
+    "a URL-encoded plus": (line) => `sms:%2B1${ten(line)}?body=hi`,
+    "a URL-encoded plus in lower case": (line) => `?To=%2b1${ten(line)}&From=rosie`,
+    "a URL-encoded plus after a URL-encoded colon": (line) => `tel%3A%2B1${ten(line)}`,
+    "ten digits in a row after a URL-encoded colon": (line) => `tel%3A${ten(line)}`,
+    "ten digits in a row after a URL-encoded space": (line) => `body=Call%20${ten(line)}`,
+    "dots after a URL-encoded newline": (line) => `body=one%0A${FIVES}.${FIVES}.${line}`,
+    "dashes right before a letter, as an extension": (line) => `${FIVES}-${FIVES}-${line}x12`,
+    "a bracketed area code right before a letter": (line) => `(${FIVES}) ${FIVES}-${line}ext`,
+    "a 1 and dots right before a letter": (line) => `1.${FIVES}.${FIVES}.${line}Call`,
+  };
+
+  // The cases T-1304's reader keeps unread ("no id as a number", wrangler-env.test.mjs), each still unread, and one
+  // that T-1332's escapes leave out. Each holds a line past the fiction block, so a reading would fail the scan.
+  const KEPT = {
+    "ten digits inside a hex id": (line) => `"id": "ab${ten(line)}cd"`,
+    "ten digits at a hex id's end, right after a letter": (line) => `"id": "abc${ten(line)}"`,
+    "ten digits in a row at an id's start, right before a letter": (line) => `"id": "${ten(line)}abc"`,
+    "a longer run of digits": (line) => `9${ten(line)} ${ten(line)}9 +1${ten(line)}${line}9`,
+    "a + inside a word, as base64 writes one, or in a sum": (line) => `"ab+1${ten(line)}" 2+1${ten(line)}`,
+    "a URL-encoded plus inside a word": (line) => `ab%2B1${ten(line)}`,
+    "an escape that hex digits follow, as \\u or \\x": (line) => `"\\u${ten(line)}" "\\x${ten(line)}"`,
+  };
+
+  it("reads each glued shape: a fiction number passes, one past the block fails, by file and line only", (t) => {
+    const shapes = Object.entries(GLUED);
+    for (const [shape, write] of shapes) {
+      assert.deepEqual(phoneNumbersIn(write(IN_BLOCK)), [`+1${ten(IN_BLOCK)}`], shape);
+      assert.deepEqual(phoneNumbersIn(write(PAST_BLOCK)), [`+1${ten(PAST_BLOCK)}`], shape);
+    }
+    const { root } = repository(t, {
+      "fiction.json": `${shapes.map(([, write]) => write(IN_BLOCK)).join("\n")}\n`,
+      "past.json": `${shapes.map(([, write]) => write(PAST_BLOCK)).join("\n")}\n`,
+    });
+    const { hits } = scanRepository(root);
+    assert.deepEqual(
+      hits,
+      shapes.map((_, i) => `past.json:${i + 1}`),
+    );
+    for (const hit of hits) assert.doesNotMatch(hit, /[0-9]{4}/, "a hit names no number");
+  });
+
+  it("keeps T-1304's cases unread: an id's digits, a longer run of digits, a + inside a word or a sum", (t) => {
+    const cases = Object.entries(KEPT);
+    for (const [kept, write] of cases) assert.deepEqual(phoneNumbersIn(write(PAST_BLOCK)), [], kept);
+    const { root } = repository(t, {
+      "ids.json": `${cases.map(([, write]) => write(PAST_BLOCK)).join("\n")}\n`,
+    });
+    assert.deepEqual(scanRepository(root).hits, []);
+    // A North American shape right after a + or a URL-encoded plus is the + form's number, read once, and never
+    // also as a +1 number (T-1304).
+    for (const plus of ["+", "%2B"]) {
+      assert.deepEqual(phoneNumbersIn(`to ${plus}${ten(PAST_BLOCK)}`), [`+${ten(PAST_BLOCK)}`], plus);
+    }
   });
 });
