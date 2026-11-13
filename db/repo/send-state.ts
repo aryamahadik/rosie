@@ -68,6 +68,7 @@
 // right after a STOP commits sees it. A serialization failure, a deadlock or a lost connection answers transient.
 // Nothing here logs: the address and the consent are personal data.
 import type * as K05v1dot8 from "../../contracts/generated/data-access/data-access.v1.8";
+import { transientOrScrubbed } from "./clocks";
 import { type ConsentChannel, newestTextsConsent, type TextsConsent } from "./consent";
 import {
   assertId,
@@ -80,7 +81,6 @@ import {
   type ReadOptions,
   type RowRef,
   type TransientError,
-  transientOrThrow,
   utc,
   utcOrNull,
 } from "./targets";
@@ -531,6 +531,8 @@ export async function sendState(
   try {
     return await inRuntimeTransaction(sql, { readOnly: true }, (tx) => sendStateIn(tx, request, options));
   } catch (error) {
-    return transientOrThrow(error, "sendState");
+    // A statement's own refusal and postgres.js's statement errors leave scrubbed too: the call's name and the code
+    // alone, never the statement's values (T-1322; clocks.ts transientOrScrubbed).
+    return transientOrScrubbed("sendState", error);
   }
 }

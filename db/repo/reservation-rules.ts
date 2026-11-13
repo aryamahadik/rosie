@@ -71,6 +71,7 @@
 //      passed").
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1";
 import { isLostConnection } from "./bundles";
+import { transientOrScrubbed } from "./clocks";
 import {
   holdMinutesFor,
   reserve as reserveSaving,
@@ -81,7 +82,7 @@ import {
   type ReserveRequest,
 } from "./reservations";
 import { assertBusinessId, SCOPE_SETTING, type Sql, type Tx } from "./scope";
-import { assertRequestShape, transientOrThrow, utc } from "./targets";
+import { assertRequestShape, utc } from "./targets";
 
 export {
   getReservation,
@@ -377,6 +378,9 @@ export async function extend(sql: Sql, request: ExtendRequest): Promise<ExtendOu
   try {
     return await inBusinessTransaction(sql, request.businessId, (tx) => extendIn(tx, request));
   } catch (error) {
-    return transientOrThrow(error, "extend");
+    // A statement's own refusal and postgres.js's statement errors leave scrubbed too: the call's name and the code
+    // alone (a database rule's refusal keeps its table's and constraint's names), never the statement's values (T-1322;
+    // clocks.ts transientOrScrubbed).
+    return transientOrScrubbed("extend", error);
   }
 }
