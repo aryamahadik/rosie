@@ -1,0 +1,73 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-in-order-with-port.json"],
+    "now": "2026-11-07T15:06:37Z",
+    "note": "claim-safety-past-routine-live-claim's claim asking for send class routine: sendClass names safety alone (README item 67; default 133). No source asks for a claim of one other class, and a routine, quick reply or visit-now row keeps commit order with the recipient's other rows (arch 02 line 125), so no claim may walk them apart."
+  },
+  "request": {
+    "claimer": "dispatcher-2",
+    "recipientHandleId": "handle-sam",
+    "now": "2026-11-07T15:06:37Z",
+    "limit": 10,
+    "sendClass": "routine"
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-sam-safety-0062",
+        "version": 3,
+        "commitSeq": 3,
+        "recipientHandleId": "handle-sam",
+        "recipientPersonId": "person-sam",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": null,
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "safety",
+        "versionsRead": [],
+        "finalParts": {
+          "row": "out-sam-safety-0062",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": ["safetyEmergency"],
+          "slotValues": [],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-sam-safety-0062/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-sam-0062",
+        "claim": {
+          "claimer": "dispatcher-2",
+          "claimedAt": "2026-11-07T15:06:37Z",
+          "lapsesAt": "2026-11-07T15:07:37Z",
+          "claimNo": 1,
+          "firstTryAt": null,
+          "nextTryNotBefore": null
+        },
+        "claimedFrom": "checked",
+        "port": "linq",
+        "emailPurpose": null,
+        "notAfter": null
+      }
+    ],
+    "passedHeld": []
+  }
+}

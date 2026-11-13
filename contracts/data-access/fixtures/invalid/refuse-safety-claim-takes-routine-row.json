@@ -1,0 +1,124 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-09T15:00:02Z",
+    "note": "claim-safety-past-ten-checked-rows answered with Sam's first routine notice claimed as well, ahead of the danger line: a safety claim never takes a row of another class (README item 67), so a wake that is never gated never sends a routine row while a STOP may wait (RULES 7.2; T-1352's rulings)."
+  },
+  "request": {
+    "claimer": "dispatcher-1",
+    "recipientHandleId": "handle-sam",
+    "now": "2026-11-09T15:00:02Z",
+    "limit": 10,
+    "sendClass": "safety"
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-sam-notice-01",
+        "version": 3,
+        "commitSeq": 1,
+        "recipientHandleId": "handle-sam",
+        "recipientPersonId": "person-sam",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": null,
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "routine",
+        "versionsRead": [],
+        "finalParts": {
+          "row": "out-sam-notice-01",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "Notice 1 of 10.",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": [],
+          "slotValues": [],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-sam-notice-01/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-sam-0070",
+        "claim": {
+          "claimer": "dispatcher-1",
+          "claimedAt": "2026-11-09T15:00:02Z",
+          "lapsesAt": "2026-11-09T15:01:02Z",
+          "claimNo": 1,
+          "firstTryAt": null,
+          "nextTryNotBefore": null
+        },
+        "claimedFrom": "checked",
+        "port": "linq",
+        "emailPurpose": null,
+        "notAfter": null
+      },
+      {
+        "outboxRowId": "out-sam-safety-0064",
+        "version": 3,
+        "commitSeq": 11,
+        "recipientHandleId": "handle-sam",
+        "recipientPersonId": "person-sam",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": null,
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "safety",
+        "versionsRead": [],
+        "finalParts": {
+          "row": "out-sam-safety-0064",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": ["safetyEmergency"],
+          "slotValues": [],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-sam-safety-0064/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-sam-0064",
+        "claim": {
+          "claimer": "dispatcher-1",
+          "claimedAt": "2026-11-09T15:00:02Z",
+          "lapsesAt": "2026-11-09T15:01:02Z",
+          "claimNo": 1,
+          "firstTryAt": null,
+          "nextTryNotBefore": null
+        },
+        "claimedFrom": "checked",
+        "port": "linq",
+        "emailPurpose": null,
+        "notAfter": null
+      }
+    ],
+    "passedHeld": []
+  }
+}

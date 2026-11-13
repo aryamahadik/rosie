@@ -1,0 +1,73 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-in-order-with-port.json"],
+    "now": "2026-11-07T15:06:37Z",
+    "note": "dispatcher-1's sweep claimed Sam's routine notice of Alex's booking, out-sam-booked-riley, at 15:06:35Z (claim-in-order-with-port; its claim lapses at 15:07:35Z), its send in flight. Sam's text at 15:06:36Z reads as danger (someone has collapsed in the shop), and the safety core writes his danger line, which no K-05 exchange writes here, so this exchange's database side writes it itself before the claim, as commit-alex-safety's and write-plan-alex-safety's requests write Alex's, with Sam's ids: the turn turn-sam-safety-0062 (handle-sam, event evt-sam-0062, trace trace-sam-0062, committed at 15:06:36Z) and its one row out-sam-safety-0062 (send class safety, imessage, to handle-sam and person-sam at biz-lees-barbershop, no booking, question or copy, no versions read; after the notice in commit order), checked at version 2 with the fixed line safetyEmergency as its plan and final parts, its own row id in both. The danger wake's claim (sendClass safety) never reads the routine notice, so the notice's live claim holds nothing back (README item 67); an ordinary claim of Sam's rows would stop at the notice and take nothing until its claim lapsed or its send finished."
+  },
+  "request": {
+    "claimer": "dispatcher-2",
+    "recipientHandleId": "handle-sam",
+    "now": "2026-11-07T15:06:37Z",
+    "limit": 10,
+    "sendClass": "safety"
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-sam-safety-0062",
+        "version": 3,
+        "commitSeq": 3,
+        "recipientHandleId": "handle-sam",
+        "recipientPersonId": "person-sam",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": null,
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "safety",
+        "versionsRead": [],
+        "finalParts": {
+          "row": "out-sam-safety-0062",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": ["safetyEmergency"],
+          "slotValues": [],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-sam-safety-0062/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-sam-0062",
+        "claim": {
+          "claimer": "dispatcher-2",
+          "claimedAt": "2026-11-07T15:06:37Z",
+          "lapsesAt": "2026-11-07T15:07:37Z",
+          "claimNo": 1,
+          "firstTryAt": null,
+          "nextTryNotBefore": null
+        },
+        "claimedFrom": "checked",
+        "port": "linq",
+        "emailPurpose": null,
+        "notAfter": null
+      }
+    ],
+    "passedHeld": []
+  }
+}
