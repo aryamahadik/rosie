@@ -1,0 +1,5 @@
+{
+  "call": "search",
+  "request": { "by": "nameAndTown", "name": "Test Mixed Shop A", "town": "Anytown" },
+  "outcome": { "result": "noMatch" }
+}

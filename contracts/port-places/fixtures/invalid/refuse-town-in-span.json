@@ -1,0 +1,20 @@
+{
+  "trace_id": "trace-sam-0009",
+  "span_id": "span-sam-0009-08",
+  "seq": 8,
+  "hop": "portCall",
+  "at": "2026-10-19T14:12:31.400Z",
+  "ms": 340,
+  "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "turn_id": "turn-s1-09-sam",
+  "job_id": null,
+  "handle_ref": "handle-sam",
+  "business_id": null,
+  "provider": "google_places",
+  "call": "search",
+  "attempt": 1,
+  "got": { "step": "S1-09", "searchBy": "nameAndTown", "town": "Springfield" },
+  "decided": { "candidates": 1, "listing": "places-demo-lees-barbershop" },
+  "outcome": "ok",
+  "error_code": null
+}

@@ -1,0 +1,38 @@
+{
+  "call": "details",
+  "request": { "listingRef": "places-demo-lees-barbershop" },
+  "outcome": {
+    "result": "found",
+    "listing": {
+      "listingRef": "places-demo-lees-barbershop",
+      "name": "Lee's Barbershop LLC",
+      "address": "88 Elm St, Springfield",
+      "phone": "+15555550177",
+      "website": "https://example.com",
+      "openingHours": [
+        { "weekday": 1, "opensAt": "09:00", "closesAt": "17:00" },
+        { "weekday": 2, "opensAt": "09:00", "closesAt": "17:00" },
+        { "weekday": 3, "opensAt": "09:00", "closesAt": "17:00" },
+        { "weekday": 4, "opensAt": "09:00", "closesAt": "17:00" },
+        { "weekday": 5, "opensAt": "09:00", "closesAt": "17:00" },
+        { "weekday": 6, "opensAt": "10:00", "closesAt": "14:00" }
+      ],
+      "categories": ["Barber"],
+      "photos": [
+        {
+          "photoRef": "places-demo-lees-barbershop/photos/shop-front",
+          "authors": [{ "name": "Lee's Barbershop LLC", "uri": null }]
+        },
+        {
+          "photoRef": "places-demo-lees-barbershop/photos/chairs",
+          "authors": [{ "name": "Lee's Barbershop LLC", "uri": null }]
+        },
+        {
+          "photoRef": "places-demo-lees-barbershop/photos/chair-ready",
+          "authors": [{ "name": "Lee's Barbershop LLC", "uri": null }]
+        }
+      ],
+      "email": "shop@example.com"
+    }
+  }
+}
