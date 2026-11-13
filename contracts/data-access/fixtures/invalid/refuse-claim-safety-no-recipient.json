@@ -1,0 +1,72 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["claim-alex-safety.json"],
+    "now": "2026-11-07T16:00:03Z",
+    "note": "claim-safety-past-live-safety-claim's safety claim made with no recipient: a claim with sendClass is made for one named recipient alone (README item 67; default 134), so the sweep never takes the safety walk and every safety claim waits for one recipient's lock, never for every recipient's."
+  },
+  "request": {
+    "claimer": "dispatcher-2",
+    "now": "2026-11-07T16:00:03Z",
+    "limit": 10,
+    "sendClass": "safety"
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-alex-safety-0051",
+        "version": 3,
+        "commitSeq": 2,
+        "recipientHandleId": "handle-alex",
+        "recipientPersonId": "person-alex",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": null,
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "safety",
+        "versionsRead": [],
+        "finalParts": {
+          "row": "out-alex-safety-0051",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": ["safetyEmergency"],
+          "slotValues": [],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-alex-safety-0051/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-alex-0051",
+        "claim": {
+          "claimer": "dispatcher-2",
+          "claimedAt": "2026-11-07T16:00:03Z",
+          "lapsesAt": "2026-11-07T16:01:03Z",
+          "claimNo": 1,
+          "firstTryAt": null,
+          "nextTryNotBefore": null
+        },
+        "claimedFrom": "checked",
+        "port": "linq",
+        "emailPurpose": null,
+        "notAfter": null
+      }
+    ],
+    "passedHeld": []
+  }
+}
