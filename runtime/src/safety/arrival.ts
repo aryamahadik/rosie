@@ -63,6 +63,12 @@
 // stays, so every commit is handed it among the texts not read and it is read again every 30 s. The hold is written again
 // from the labels kept for the text at `dangerSent`, at each re-read, resume or late answer, and the record's replay
 // writes the core's hold with its id when the actor holds none; a released hold stays released.
+//
+// A danger names itself (T-1318, T-1312's security notes a and b): a text the read found dangerous (its row's danger
+// flag set) with no outcome hold is among the texts not read whether or not its pending note was written, so a note and
+// a hold whose writes all fail together still hold every routine part of the handle in every commit until the hold is
+// written (fails closed). The replay's check for a hold and its write of the core's are one guarded step, so a read that
+// throws can never reopen a released hold.
 
 import { openWords, sealWords, type SealedBox, type SealedWords, type SealingKey } from "../gateway/seal";
 import type { SealedEvent, SealedHandoff } from "../gateway/types";
@@ -727,9 +733,13 @@ export class SafetyOnArrival {
    * The texts not read yet, by event id in arrival order, beside the open holds (QUESTIONS.md CQ-65's addendum, DL-127):
    * still being read, never wired, given up with no hold open, or with a danger outcome not complete and no hold open (its
    * hold could not be written: fails closed). A text whose result is owed is named whatever holds are open (ADR-015
-   * section 2): its result was applied and is not kept, so no commit can record it yet. A commit is handed them
-   * (CommitContext.unread), and T-252's gate counts each as an open hold. Any other text under an open hold (unread or an
-   * outcome's) is among `openHolds` instead; a text with no safety row at all is the actor's to find.
+   * section 2): its result was applied and is not kept, so no commit can record it yet. A text the read found dangerous
+   * (its row's danger flag set) with no outcome hold, open or released, is named whether or not its pending note was ever
+   * written (T-1318, T-1312's security note b): when the note and every write of its hold failed together, every routine
+   * part stays held in every commit until a hold is written (ADR-018 section 2, failing closed for a missing hold). A
+   * commit is handed them (CommitContext.unread), and T-252's gate counts each as an open hold. Any other text under an
+   * open hold (unread or an outcome's) is among `openHolds` instead; a text with no safety row at all is the actor's to
+   * find.
    */
   unreadTexts(): string[] {
     return this.host.storage.sql
@@ -737,6 +747,8 @@ export class SafetyOnArrival {
         `SELECT e.event_id FROM safety_events e
          WHERE e.state IN ('reading', 'unwired')
             OR EXISTS (SELECT 1 FROM safety_results o WHERE o.event_id = e.event_id AND o.box IS NULL)
+            OR (e.danger = 1
+                AND NOT EXISTS (SELECT 1 FROM safety_holds h WHERE h.event_id = e.event_id AND h.rule <> 'unread'))
             OR (((e.state = 'lineFailed' AND e.danger = 0)
                  OR EXISTS (SELECT 1 FROM safety_pending p WHERE p.event_id = e.event_id))
                 AND NOT EXISTS (SELECT 1 FROM safety_holds h WHERE h.event_id = e.event_id AND h.released = 0))
@@ -747,8 +759,9 @@ export class SafetyOnArrival {
   }
 
   /**
-   * True while routine work must wait: a text is unread, a danger outcome is not complete, a result is owed (ADR-015
-   * section 2), or a hold is not released.
+   * True while routine work must wait: a text is unread, a danger outcome is not complete, a danger has no outcome hold
+   * (its pending note written or not: T-1318, as `unreadTexts` names it), a result is owed (ADR-015 section 2), or a hold
+   * is not released.
    */
   routineHeld(): boolean {
     const { sql } = this.host.storage;
@@ -757,6 +770,15 @@ export class SafetyOnArrival {
       .toArray();
     if (unread.length > 0) return true;
     if (sql.exec("SELECT 1 FROM safety_pending LIMIT 1").toArray().length > 0) return true;
+    const unheld = sql
+      .exec(
+        `SELECT 1 FROM safety_events e
+         WHERE e.danger = 1
+           AND NOT EXISTS (SELECT 1 FROM safety_holds h WHERE h.event_id = e.event_id AND h.rule <> 'unread')
+         LIMIT 1`,
+      )
+      .toArray();
+    if (unheld.length > 0) return true;
     if (sql.exec("SELECT 1 FROM safety_results WHERE box IS NULL LIMIT 1").toArray().length > 0) return true;
     return sql.exec("SELECT 1 FROM safety_holds WHERE released = 0 LIMIT 1").toArray().length > 0;
   }
@@ -955,23 +977,31 @@ export class SafetyOnArrival {
   /**
    * The core's hold for a text whose queued record the core has taken (ADR-018 section 2, point 4). When the actor holds
    * no outcome hold for the text (every write of it threw before its direct line went), the core's hold is written as the
-   * actor's, with its id, rule and booking block, guarded; else its id lands on the hold that has none, as before. So
-   * whichever comes first, the re-read's hold or the replay, the actor's hold carries the core's id once the core holds
-   * it, and `markHoldReleased` can find it.
+   * actor's, with its id, rule and booking block; else its id lands on the hold that has none, as before. So whichever
+   * comes first, the re-read's hold or the replay, the actor's hold carries the core's id once the core holds it, and
+   * `markHoldReleased` can find it. The check that a hold exists, released or not, and the write share one guarded step
+   * (T-1318, T-1312's security note a): a read that throws writes nothing and counts as not written, so it can never fall
+   * through to `writeHold`, whose own read sees open holds only, and reopen a hold the core released. The id's own write
+   * to a hold that exists is not guarded, as before: a storage that throws there leaves the record queued, and its next
+   * replay lands the id.
    */
   private holdOnReturn(eventId: string, hold: SafetyHold): void {
-    if (this.holdWritten(eventId)) {
+    let held: boolean;
+    try {
+      held = this.outcomeHoldExists(eventId);
+      if (!held) this.writeHold(eventId, hold.holdId, hold.releaseRule, hold.blocksBooking);
+    } catch {
+      // Not written, nothing changed: a missing hold keeps its text among the texts not read (its pending note, or
+      // else its danger flag: `unreadTexts`) until a hold is written; a hold that exists keeps its state, released or
+      // not.
+      return;
+    }
+    if (held) {
       this.host.storage.sql.exec(
         "UPDATE safety_holds SET hold_id = ? WHERE event_id = ? AND hold_id IS NULL",
         hold.holdId,
         eventId,
       );
-      return;
-    }
-    try {
-      this.writeHold(eventId, hold.holdId, hold.releaseRule, hold.blocksBooking);
-    } catch {
-      // Not written: the danger stays pending, and its next re-read writes its hold from its kept labels (no id).
     }
   }
 
@@ -1349,7 +1379,8 @@ export class SafetyOnArrival {
 
   /**
    * Notes, before the hold or any send, that this text's danger outcome is not complete, so an eviction from here on
-   * leaves it scheduled. A storage that fails here must not keep the line from going.
+   * leaves it scheduled. A storage that fails here must not keep the line from going. With no note, a danger whose hold
+   * is missing too still names itself among the texts not read, by its danger flag (`unreadTexts`, T-1318).
    */
   private markDangerPending(eventId: string): void {
     try {
@@ -1477,8 +1508,9 @@ export class SafetyOnArrival {
    * line 327, so a re-applied danger never takes only its latest read's rule), in place of the text's unread hold, before
    * the core is called (T-1088 round 4, DL-144; the architect's round 3 gap A and note a), and again on the direct path
    * before its line (ADR-018 section 2). It stands until the core's hold takes its place (`sendDanger`), never looser than
-   * the open one. A storage that fails here must not keep the line from going: the danger then stays pending, among the
-   * texts not read at commit time, until `dangerSent`, a resume, a re-read or the record's replay writes the hold.
+   * the open one. A storage that fails here must not keep the line from going: the danger then stays among the texts not
+   * read at commit time (by its pending note, or by its danger flag when the note failed too: T-1318), until `dangerSent`,
+   * a resume, a re-read or the record's replay writes the hold.
    */
   private holdFromOutcomes(
     eventId: string,
