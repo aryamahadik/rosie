@@ -2,9 +2,53 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 546, [`520d4bd`](https://github.com/aryamahadik/rosie/commit/520d4bd), 2026-11-13 11:48:27 UTC.
+- **Through:** commit 548, [`f0b7af2`](https://github.com/aryamahadik/rosie/commit/f0b7af2), 2026-11-13 12:11:14 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 548. docs: COMMIT\_HISTORY.md through commit 546 (520d4bd, \#554) (\#556)
+
+- **Commit:** [`f0b7af2`](https://github.com/aryamahadik/rosie/commit/f0b7af2), by Arya Mahadik, 2026-11-13 12:11:14 UTC
+- **Pull request:** [#556](https://github.com/aryamahadik/rosie/pull/556) from `task/commit-history-80`, merged 2026-11-13 12:11:15 UTC. It squashed 1 branch commit:
+  - `636e2ca` docs: COMMIT\_HISTORY.md through commit 546 (520d4bd, \#554)
+- **Files changed:** 1 (+60 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +60 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 547. T-1344: the phone scan reads its last shapes (escapes, an escaped plus, URL-encoded separators) and tightens the 555 and wrong-length kinds (\#555)
+
+- **Commit:** [`be28ebc`](https://github.com/aryamahadik/rosie/commit/be28ebc), by Arya Mahadik, 2026-11-13 12:11:10 UTC
+- **Pull request:** [#555](https://github.com/aryamahadik/rosie/pull/555) from `task/T-1344`, merged 2026-11-13 12:11:10 UTC. It squashed 2 branch commits:
+  - `54693d9` T-1344: the phone scan reads a number right after a whole backslash-u…
+  - `8586c75` T-1344: phone-scan.test.mjs proves the + form reads URL-encoded group…
+- **Files changed:** 5 (+192 −45), by folder:
+  - `infra/ci/` README.md +2 −2, phone-scan-exceptions.mjs +6 −3, phone-scan.mjs +34 −15, phone-scan.test.mjs +146 −11
+  - `web/spikes/chat-link/` chat-link.test.mjs +4 −14
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1344: the phone scan reads a number right after a whole backslash-u or backslash-x escape or an escaped plus (the + form's plus, as %2B is), a 1 and a separator before ten digits in a row right before a letter, and groups split by %20, %2D or %2E in either form; an escape's own hex digits, an id's digits and a plus inside a word stay unread. The exceptions' 555 exchange kind refuses the national-use line and every toll-free area code, and wrong length refuses more than ten digits after +1; no entry changes. The README's two phone scan paragraphs and the exceptions' kinds say so, and the chat-link spike's test reads FICTIONAL_PHONE and phoneNumbersIn from phone-scan.mjs, its own copy of the shapes gone
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1344: phone-scan.test.mjs proves the + form reads URL-encoded groups of a number that is not North American, which only the + form reads (a mutation check survived without it)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 546. docs: COMMIT\_HISTORY.md through commit 543 (3e785b0, \#551) (\#554)
 
