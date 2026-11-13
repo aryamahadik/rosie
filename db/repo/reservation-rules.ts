@@ -70,7 +70,7 @@
 //      alreadyExtended (default 1); a time with 2 others is notHeld with its state, held (NotHeldError: "its end has
 //      passed").
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1";
-import { isLostConnection } from "./bundles";
+import { isLostConnection, reserveConnection } from "./bundles";
 import { transientOrScrubbed } from "./clocks";
 import {
   holdMinutesFor,
@@ -333,7 +333,9 @@ export async function extendIn(tx: Conn, request: ExtendRequest): Promise<Extend
  * One transaction on one reserved connection, scoped to `businessId` (set_config inside it, is_local), read committed:
  * reservations.ts's inScopedTransaction. A lost connection is rethrown without a rollback (the server rolled the
  * transaction back when the backend went) and is never released (postgres.js 3.4.9 would put it back in the open
- * queue); the pre-probe takes the stale error a killed connection keeps before a connection is reserved.
+ * queue); the pre-probe takes the stale error a killed connection keeps before a connection is reserved. The connection
+ * is reserved through bundles.ts's reserveConnection (T-1334), so a reserve() that never connects leaves as a connection
+ * that never opened, the code 08001 alone, which extend answers transient, never as postgres.js raises it.
  */
 async function inBusinessTransaction<T>(
   sql: Sql,
@@ -342,7 +344,7 @@ async function inBusinessTransaction<T>(
 ): Promise<T> {
   assertBusinessId(businessId);
   await sql`select 1`;
-  const reserved = await sql.reserve();
+  const reserved = await reserveConnection(sql);
   let lost = false;
   try {
     await reserved`begin`;
