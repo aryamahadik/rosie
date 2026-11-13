@@ -2,9 +2,45 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 510, [`33d0ec5`](https://github.com/aryamahadik/rosie/commit/33d0ec5), 2026-11-13 05:35:53 UTC.
+- **Through:** commit 512, [`0a0b002`](https://github.com/aryamahadik/rosie/commit/0a0b002), 2026-11-13 06:05:10 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 512. docs: COMMIT\_HISTORY.md through commit 510 (33d0ec5, \#518) (\#520)
+
+- **Commit:** [`0a0b002`](https://github.com/aryamahadik/rosie/commit/0a0b002), by Arya Mahadik, 2026-11-13 06:05:10 UTC
+- **Pull request:** [#520](https://github.com/aryamahadik/rosie/pull/520) from `task/commit-history-66`, merged 2026-11-13 06:05:10 UTC. It squashed 1 branch commit:
+  - `acbea49` docs: COMMIT\_HISTORY.md through commit 510 (33d0ec5, \#518)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 511. T-1297: the gateway scrubs a poll's option words and seals them with the body and subject in one form 2 box (K-06 v1.2 sealedEvent); the turn, the safety read on arrival and the PostgreSQL-down keyword read take a vote's words from the box by its form, form 1 boxes and plain kept votes still read as kept; pollVote is a guard keyword kind (DL-540) (\#519)
+
+- **Commit:** [`8552c80`](https://github.com/aryamahadik/rosie/commit/8552c80), by Arya Mahadik, 2026-11-13 06:05:06 UTC
+- **Pull request:** [#519](https://github.com/aryamahadik/rosie/pull/519) from `task/T-1297`, merged 2026-11-13 06:05:06 UTC. It squashed 1 branch commit:
+  - `e4809bb` T-1297: the gateway scrubs a poll's option words and seals them with …
+- **Files changed:** 16 (+1203 −90), by folder:
+  - `runtime/src/gateway/` hand-off.test.ts +177 −3, hand-off.ts +75 −37, hand-off.worker.test.ts +9 −2, index.ts +7 −0, seal.ts +167 −20, sealed-hand-off.worker.test.ts +313 −0, types.ts +7 −5
+  - `runtime/src/guard/` keywords.test.ts +37 −0, keywords.ts +11 −4, types.ts +4 −1
+  - `runtime/src/outage/db/` outage.ts +15 −4, outage.worker.test.ts +61 −1
+  - `runtime/src/safety/` arrival.ts +26 −5, safety.worker.test.ts +93 −0
+  - `runtime/src/turn/` turn.ts +22 −7, turn.worker.test.ts +179 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 510. docs: COMMIT\_HISTORY.md through commit 508 (40ad7c9, \#516) (\#518)
 
