@@ -15,10 +15,15 @@
 # not run. Once the cause is fixed, the same command runs again.
 #
 # The database is staging's alone: STAGING_DATABASE_URL, from the environment, else from .dev.vars by name, never
-# printed. The runner gets it as DATABASE_URL too, which is how it knows staging (T-201's handoff). The schema is
-# public, the one staging's Worker reads (DB_SCHEMA is empty in wrangler.jsonc's env.staging), named explicitly, since
-# the runner seeds public whenever DB_SCHEMA is unset (T-201's security review, note c). Refused before any set runs,
-# with the database untouched (exit 1):
+# printed. The runner gets it as DATABASE_URL too, which is how it knows staging (T-201's handoff). Only the commands
+# that use the database get a database URL (T-1310; T-1303's security review, note c): the URL leaves this shell's
+# environment before anything is started (dirname included), with the caller's DATABASE_URL, which is only compared
+# with it (below); it is kept in a variable of the script's own that is never exported, and handed by name to each run
+# of the seed runner, as both names, and to the read of the session's end (below), as DATABASE_URL, on those commands'
+# lines alone; then it is dropped. The token's hasher, and every other command, gets none. The schema is public, the
+# one staging's Worker reads (DB_SCHEMA is empty in wrangler.jsonc's env.staging), named explicitly, since the runner
+# seeds public whenever DB_SCHEMA is unset (T-201's security review, note c). Refused before any set runs, with the
+# database untouched (exit 1):
 #   - STAGING_DATABASE_URL is not set: staging has no database yet (J-06);
 #   - DATABASE_URL is set to another database: this script seeds staging's alone (a local database is seeded with
 #     node db/seeds/run.mjs; production never is: the sets are fixture data, rule 9);
@@ -82,7 +87,7 @@ set -euo pipefail
 # sourced or started (lib.sh's ROOT and CF with them). BASH_REMATCH, where load_dev_var's match leaves what it read, goes
 # too; bash never exports an array. A new variable, here or in load_dev_var, goes on these lines too:
 # seed-staging.test.mjs fails until it does.
-unset -v token hash ends status with_tester sets named name file list line value ROOT CF
+unset -v token hash ends status with_tester sets named name file list line value ROOT CF db_url caller_url
 unset -v D017_SETS CHECK_TESTER_SET SET_NAME USAGE BASE64URL_SIGNS LAST_SIGNS HEX_SIGNS ISO_TIME SHA256_OF_INPUT
 unset -v SESSION_END BASH_REMATCH
 # The check tester's token, when the caller's environment holds it, goes into a variable of the script's own, which is
@@ -90,6 +95,12 @@ unset -v SESSION_END BASH_REMATCH
 # (sourcing lib.sh runs dirname): no command started from here finds either in its environment, whatever the sets.
 token="${STAGING_CHECK_TESTER_TOKEN:-}"
 unset -v STAGING_CHECK_TESTER_TOKEN STAGING_CHECK_TESTER_TOKEN_SHA256
+# The staging database's URL and the caller's DATABASE_URL go the same way, before any command is started (T-1310):
+# db_url is handed on by name to the commands that use the database alone, and caller_url is only compared with it
+# (below), then dropped.
+db_url="${STAGING_DATABASE_URL:-}"
+caller_url="${DATABASE_URL:-}"
+unset -v STAGING_DATABASE_URL DATABASE_URL
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 # D-017's sets, in their order (STATE note 67; T-202's handoff; the check tester's, T-1302, last).
@@ -222,7 +233,7 @@ is_set() {
 # time alone). A read that fails, or prints anything else, stops the run.
 session_end() {
   status=0
-  ends="$(DATABASE_URL="$STAGING_DATABASE_URL" DB_SCHEMA="public" node --disable-warning=ExperimentalWarning \
+  ends="$(DATABASE_URL="$db_url" DB_SCHEMA="public" node --disable-warning=ExperimentalWarning \
     --input-type=module -e "$SESSION_END" "$ROOT")" || status=$?
   if [[ "$status" -ne 0 || ! "$ends" =~ $ISO_TIME ]]; then
     log "seed-staging: FAILED after set $CHECK_TESTER_SET: the end of the check tester's session could not be read" \
@@ -272,14 +283,23 @@ for name in "${sets[@]}"; do
   is_set "$name" || misuse "no set $name: there is no db/seeds/$name.ts; the sets: $(set_list)"
 done
 
-load_dev_var STAGING_DATABASE_URL
-[[ -n "${STAGING_DATABASE_URL:-}" ]] ||
+# The staging database's URL from .dev.vars by name, when the environment gave none (see the top of this file):
+# load_dev_var exports what it reads, so the value goes into the script's own variable and the name is dropped again at
+# once, before any command is started.
+if [[ -z "$db_url" ]]; then
+  load_dev_var STAGING_DATABASE_URL
+  db_url="${STAGING_DATABASE_URL:-}"
+  unset -v STAGING_DATABASE_URL
+fi
+[[ -n "$db_url" ]] ||
   die "refused: STAGING_DATABASE_URL is not set: staging has no database yet (J-06); nothing was read or written"
-if [[ -n "${DATABASE_URL:-}" && "$DATABASE_URL" != "$STAGING_DATABASE_URL" ]]; then
+if [[ -n "$caller_url" && "$caller_url" != "$db_url" ]]; then
+  caller_url=""
   die "refused: DATABASE_URL is set and names a database other than STAGING_DATABASE_URL's: this script seeds the" \
     "staging database alone (unset DATABASE_URL to seed it; node db/seeds/run.mjs seeds a local database); nothing" \
     "was read or written"
 fi
+caller_url=""
 if [[ -n "${DB_SCHEMA:-}" && "$DB_SCHEMA" != "public" ]]; then
   die "refused: DB_SCHEMA names a schema other than public: this script seeds the staging database's own schema," \
     "public, which staging's Worker reads (a preview's schema is deploy-preview's to seed, C-010); nothing was read" \
@@ -348,16 +368,19 @@ fi
 for name in "${sets[@]}"; do
   log "seed-staging: set $name"
   status=0
+  # The staging database's URL, by name, to the seed runner's run alone: as DATABASE_URL, and as STAGING_DATABASE_URL,
+  # the same URL, which is how the runner knows staging (T-201).
   if [[ "$name" == "$CHECK_TESTER_SET" ]]; then
     # The token's sha256, by name, to this run of the seed runner alone.
-    STAGING_CHECK_TESTER_TOKEN_SHA256="$hash" DATABASE_URL="$STAGING_DATABASE_URL" DB_SCHEMA="public" \
+    STAGING_CHECK_TESTER_TOKEN_SHA256="$hash" DATABASE_URL="$db_url" STAGING_DATABASE_URL="$db_url" DB_SCHEMA="public" \
       node --disable-warning=ExperimentalWarning "$ROOT/db/seeds/run.mjs" --set "$name" || status=$?
   else
-    DATABASE_URL="$STAGING_DATABASE_URL" DB_SCHEMA="public" \
+    DATABASE_URL="$db_url" STAGING_DATABASE_URL="$db_url" DB_SCHEMA="public" \
       node --disable-warning=ExperimentalWarning "$ROOT/db/seeds/run.mjs" --set "$name" || status=$?
   fi
   if [[ "$status" -ne 0 ]]; then
     hash=""
+    db_url=""
     log "seed-staging: FAILED at set $name (the seed runner's exit $status, for the reason above): nothing of set" \
       "$name was written; the sets before it stay seeded, and the ones after it did not run. Once the cause is fixed" \
       "(a missing migration: npm run deploy:staging migrates the staging database, step 1), run the same command" \
@@ -369,4 +392,5 @@ for name in "${sets[@]}"; do
   fi
 done
 hash=""
+db_url=""
 log "seed-staging: done: sets ${sets[*]} seeded into schema public on the staging database"

@@ -30,7 +30,7 @@
 #     HYPERDRIVE_APP reach the staging database, and the branch's code runs there unreviewed). The file is read
 #     back, and one that still names a Hyperdrive binding stops the preview: nothing is migrated or uploaded;
 #  4. migrations into the branch's own schema on the staging database, when STAGING_DATABASE_URL is set
-#     (skipped with a notice when it is not);
+#     (skipped with a notice when it is not): the URL goes to migrate.mjs alone (below);
 #  5. a Worker version of that commit uploaded to rosie-staging under the preview alias <slug> by THIS
 #     checkout's cf.sh and wrangler (never the branch's), with CF_BUILD_DIR=<worktree>: cf.sh checks the
 #     worktree's wrangler.jsonc (step 3's) as it checks its own, then uploads from there with DB_SCHEMA and
@@ -38,7 +38,24 @@
 #  6. the preview URL printed.
 # <slug>: the branch in lower case, [a-z0-9-] only, at most 40 characters. Schema: preview_<slug> with "_"
 # for "-".
+# The staging database's URL (T-1310; read as create-staging-hyperdrive.sh reads it): STAGING_DATABASE_URL, from the
+# environment, else from this checkout's .dev.vars by name (lib.sh's load_dev_var, at step 4), never printed. It
+# leaves this shell's environment before anything is started (dirname included), and DATABASE_URL, which this script
+# never reads, leaves with it, so no copy of a database URL reaches git, npm, node, cf.sh, wrangler or any other
+# command started here: the branch's install and build among them. It is kept in one variable that is never marked
+# for export, handed to step 4's migrate.mjs alone (as DATABASE_URL, on that command's line), and then dropped.
+# Tracing, allexport and keyword are switched off first, whatever the caller's shell asked for: a trace would print
+# the URL, allexport would mark the variable for export, and under keyword lib.sh's `local name=...` would declare
+# nothing (as make-staging-secrets.sh explains, T-1236).
+set +x
+set +a
+set +k
 set -euo pipefail
+# The variable is dropped before it is set: bash marks every variable it inherits for export, so one of that name in
+# the caller's environment would make it an exported one.
+unset -v database_url
+database_url="${STAGING_DATABASE_URL-}"
+unset -v STAGING_DATABASE_URL DATABASE_URL
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 cd "$ROOT"
 
@@ -280,10 +297,22 @@ if ! config_note="$(node -e '
 fi
 log "preview: $config_note"
 
-load_dev_var STAGING_DATABASE_URL
-if [[ -n "${STAGING_DATABASE_URL:-}" ]]; then
+# Step 4: the staging database's URL (see the top of this file), from .dev.vars by name when the environment gave none.
+# load_dev_var exports what it reads, so the name is unset again at once, before any command is started. The URL goes
+# to migrate.mjs alone, on its command line, and is dropped as soon as migrate.mjs has run, whatever its exit.
+if [[ -z "$database_url" ]]; then
+  load_dev_var STAGING_DATABASE_URL
+  database_url="${STAGING_DATABASE_URL-}"
+  unset -v STAGING_DATABASE_URL
+fi
+if [[ -n "$database_url" ]]; then
   log "preview: migrate schema $schema"
-  (cd "$tree" && DATABASE_URL="$STAGING_DATABASE_URL" DB_SCHEMA="$schema" node infra/scripts/migrate.mjs)
+  status=0
+  (cd "$tree" && DATABASE_URL="$database_url" DB_SCHEMA="$schema" node infra/scripts/migrate.mjs) || status=$?
+  database_url=""
+  if [[ "$status" -ne 0 ]]; then
+    exit "$status"
+  fi
 else
   log "preview: NOTICE: STAGING_DATABASE_URL is not set, so no preview schema was migrated"
 fi

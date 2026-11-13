@@ -10,6 +10,8 @@ The CI scripts: the guards `ci.yml` and `merge-check.yml` run (`test-guard.mjs`,
 
 `deploy-preview.test.mjs` tests `infra/scripts/deploy-preview.sh` (`npm run deploy:preview`) in a throwaway origin and checkout with stand-ins for npm, wrangler and the validators' build; the stand-in wrangler keeps a copy of the config `cf.sh` hands it. Since T-1256 (ADR-014 new task a) every upload's config is the worktree's `wrangler.jsonc` without env.staging's `hyperdrive` list and otherwise as it was (today's file, main's `HYPERDRIVE_JOB` and `HYPERDRIVE_APP`, a reviewed third binding), and a config that still names a Hyperdrive binding (an `unsafe` binding or metadata, a required secret named as a binding left out, a list at the top level) stops the preview before anything is migrated or uploaded, printing paths and never a value.
 
+`deploy-staging.test.mjs` also tests Rosie's own number, `ROSIE_NUMBER` (T-1304, DL-581): it is set by name before a deploy, in the shell or in `.dev.vars`, never in a tracked file, and reaches the Worker only as step 2's `--var`; without it, or in any form but E.164, the deploy goes on and chat links stay off. `cleanEnv` drops it, so no test takes this shell's number, and no trace of the deploy prints it.
+
 ## The local merge-check (T-1111, DL-190)
 
 GitHub Actions refuses to start jobs on this account (DL-165, DL-186), so the merge-check runs on the build Mac instead, with the same checks. The lead runs it once per branch before a merge (DL-063, DL-065), one run at a time and not beside heavy builder runs (DL-164):

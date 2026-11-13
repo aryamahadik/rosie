@@ -25,10 +25,14 @@
 # of env.staging in wrangler.jsonc).
 # Staging only: it takes no --env, and production deploys and flags run only from the protected release job.
 # Rosie's own number, staging's Linq line (T-1304; CQ-253 as DL-542 refines it): ROSIE_NUMBER is read
-# by name, from the environment, else from the git-ignored .dev.vars (load_dev_var), and taken out of the
-# environment before any command runs, so only step 2's wrangler deploy gets it, as
-# --var ROSIE_NUMBER:<number>. It is never written in wrangler.jsonc or any tracked file: the repository is
-# public (DL-436). Why a var given at deploy:
+# by name, from the environment, else from the git-ignored .dev.vars (load_dev_var), and then taken out of the
+# environment, so of the deploy's commands only step 2's wrangler deploy gets it, as --var ROSIE_NUMBER:<number>.
+# A value from the environment leaves it once lib.sh is sourced and the arguments are read (below): dirname runs
+# first, with it, to find lib.sh (twice), and so does basename when an argument is refused (the script then stops);
+# nothing else starts before it is gone. A value from .dev.vars leaves it as soon as load_dev_var has read it. It is
+# never written in wrangler.jsonc or any tracked file: the repository is public (DL-436). Tracing is switched off
+# first, whatever the caller's shell asked for (DL-581; as cf.sh does, T-1261), so bash -x, xtrace handed down in
+# SHELLOPTS, or a BASH_ENV that turns it on never prints it. Why a var given at deploy:
 #  - it is no key: people text it, and every chat link carries it (K-09 issueChatLink's sms: form);
 #  - wrangler 4.158 prints a --var's value as "(hidden)" (D-000 check 5's log: env.GIT_SHA ("(hidden)")),
 #    and wrangler.jsonc's vars as they are, so the number stays out of the deploy's log;
@@ -39,6 +43,7 @@
 # Only a value in E.164 form is given (a + and 7 to 15 digits, nothing else: K-04's handles_address_form,
 # K-11's phone). A missing or malformed value deploys without it, and one line says chat links stay off
 # (K-05 default 109). The value itself is never printed.
+set +x
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
@@ -68,7 +73,9 @@ if [[ "$bundle_dir" != /* ]]; then
 fi
 cd "$ROOT"
 
-# Rosie's own number (above): read by name, then taken out of the environment before any command runs.
+# Rosie's own number (above): read by name, then taken out of the environment here. Of the commands before this line,
+# dirname (finding lib.sh) runs with a value from the environment, and basename too when an argument is refused and
+# the script stops; every other command starts after it is gone.
 # E164 is the form K-04's handles_address_form and K-11's phone write a number in.
 E164='^[+][1-9][0-9]{6,14}$'
 load_dev_var ROSIE_NUMBER

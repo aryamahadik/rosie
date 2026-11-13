@@ -29,16 +29,24 @@
 // Every other line .dev.vars holds stays as it is, byte for byte, and the file keeps its mode. A changed .dev.vars is
 // written whole to a new file beside it, readable by its owner alone, which then takes its place (a rename), so a run
 // that stops part way leaves the old file as it was. Its name, .dev.vars.<random>.tmp, is git-ignored; it is removed if
-// the run fails before the rename.
+// the run fails before the rename. A run killed between the write and the rename cannot remove it, and it holds the new
+// token (T-1310; T-1303's security review, note b). So each run, once it has read .dev.vars and before it writes
+// anything, removes such files an earlier run left beside the file it writes (the file a link names) and beside
+// .dev.vars itself, matched by this script's own name pattern alone (that file's name, a dot, 12 lower-case hex signs,
+// .tmp; regular files only, so nothing else in the folder is touched), and standard error says how many, never what
+// they held. Two runs at once on one checkout could so remove each other's file: the later rename then fails, and
+// .dev.vars stays as it was.
 // When the caller's environment holds STAGING_CHECK_TESTER_TOKEN too, standard error says so (never its value):
 // seed:staging reads the environment before .dev.vars.
 // Exit: 0 .dev.vars holds a token in the made form (made now, or already there); 1 refused or failed (a .dev.vars that
-// cannot be read or written, a token already there that is not in the made form, a generator gone wrong), with
-// .dev.vars as it was; 2 misuse (an argument it does not take, never echoed), found before anything is read.
+// cannot be read or written, a leftover file that cannot be removed, a token already there that is not in the made form,
+// a generator gone wrong), with .dev.vars as it was; 2 misuse (an argument it does not take, never echoed), found before
+// anything is read.
 import { randomBytes } from "node:crypto";
 import {
   chmodSync,
   lstatSync,
+  readdirSync,
   readFileSync,
   realpathSync,
   renameSync,
@@ -53,6 +61,8 @@ import { fileURLToPath } from "node:url";
 const TOKEN_NAME = "STAGING_CHECK_TESTER_TOKEN";
 /** The token's random bytes (ADR-016 section 6: 256 bits; T-322's SESSION_TOKEN_BYTES). */
 const TOKEN_BYTES = 32;
+/** The random bytes in a temporary file's name, written as lower-case hex: <the file's name>.<hex>.tmp (writeWhole). */
+const TEMP_NAME_BYTES = 6;
 
 const SCRIPT = "make-check-tester-token.mjs";
 const USAGE = `usage: ${SCRIPT} [--rotate]`;
@@ -155,9 +165,54 @@ function newToken() {
   return token;
 }
 
+/** Whether a name is one writeWhole gives a temporary file beside the target: <its name>.<12 lower-case hex>.tmp. */
+function isTempName(name, target) {
+  const base = `${path.basename(target)}.`;
+  const middle = name.slice(base.length, -".tmp".length);
+  return (
+    name.startsWith(base) &&
+    name.endsWith(".tmp") &&
+    name.length === base.length + 2 * TEMP_NAME_BYTES + ".tmp".length &&
+    /^[0-9a-f]+$/.test(middle)
+  );
+}
+
+/**
+ * Removes the temporary files an earlier run left beside the target (see the top of this file): regular files whose
+ * name is this script's own pattern, and nothing else. Returns how many it removed. A folder that cannot be read, or a
+ * leftover that cannot be removed, stops the run before anything is written.
+ */
+function removeLeftovers(target) {
+  const folder = path.dirname(target);
+  let entries;
+  try {
+    entries = readdirSync(folder, { withFileTypes: true });
+  } catch (error) {
+    throw new Stop(
+      1,
+      `${SCRIPT}: refused: the folder of .dev.vars cannot be read (${codeOf(error)}), so a temporary file an earlier run left there, which may hold a token, cannot be removed; nothing was made or written`,
+    );
+  }
+  let removed = 0;
+  for (const entry of entries) {
+    if (!entry.isFile() || !isTempName(entry.name, target)) continue;
+    try {
+      rmSync(path.join(folder, entry.name));
+      removed += 1;
+    } catch (error) {
+      if (codeOf(error) === "ENOENT") continue;
+      throw new Stop(
+        1,
+        `${SCRIPT}: refused: a temporary file an earlier run left beside .dev.vars, ${entry.name}, which may hold a token, cannot be removed (${codeOf(error)}); remove it (its contents are never shown), then run this again; nothing was made or written`,
+      );
+    }
+  }
+  return removed;
+}
+
 /** Writes the text whole to a new file beside the target, with the target's mode, and renames it over the target. */
 function writeWhole(target, mode, text) {
-  const temp = `${target}.${randomBytes(6).toString("hex")}.tmp`;
+  const temp = `${target}.${randomBytes(TEMP_NAME_BYTES).toString("hex")}.tmp`;
   try {
     writeFileSync(temp, text, { flag: "wx", mode: 0o600 });
     chmodSync(temp, mode);
@@ -175,6 +230,13 @@ function writeWhole(target, mode, text) {
 function main(argv, env, out, err) {
   const rotate = parseArgs(argv);
   const { target, mode, lines, at, value } = readDevVars();
+  // Beside the file written (a link's target), and beside .dev.vars itself, where a run wrote while it was no link.
+  const removed = removeLeftovers(target) + (target === DEV_VARS ? 0 : removeLeftovers(DEV_VARS));
+  if (removed > 0) {
+    err(
+      `${SCRIPT}: removed ${String(removed)} leftover temporary file${removed === 1 ? "" : "s"} beside .dev.vars (a run stopped between its write and its rename leaves one); what ${removed === 1 ? "it" : "they"} held is not shown`,
+    );
+  }
   if (value !== "" && !rotate) {
     if (!isMadeForm(value)) {
       throw new Stop(
