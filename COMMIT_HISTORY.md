@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 538, [`f2eef53`](https://github.com/aryamahadik/rosie/commit/f2eef53), 2026-11-13 10:19:38 UTC.
+- **Through:** commit 540, [`663739f`](https://github.com/aryamahadik/rosie/commit/663739f), 2026-11-13 10:55:21 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 540. docs: COMMIT\_HISTORY.md through commit 538 (f2eef53, \#546) (\#547)
+
+- **Commit:** [`663739f`](https://github.com/aryamahadik/rosie/commit/663739f), by Arya Mahadik, 2026-11-13 10:55:21 UTC
+- **Pull request:** [#547](https://github.com/aryamahadik/rosie/pull/547) from `task/commit-history-77`, merged 2026-11-13 10:55:22 UTC. It squashed 1 branch commit:
+  - `37327b4` docs: COMMIT\_HISTORY.md through commit 538 (f2eef53, \#546)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 539. T-1349: preview-cleanup.sh's drop checks its URL with db-url.mjs and prints a failure as one scrubbed line (a URL that does not parse, a refused connection, a wrong password), exiting 1 as before; deploy-staging.sh, flags.sh, publish-bundle.sh, preview-cleanup.sh, seed-staging.sh and deploy-preview.sh unset a caller's DATABASE\_REPLICA\_URL before their first child; recorder cases under allexport, bash -a -k and bash -x with a control in each matching test file (\#548)
+
+- **Commit:** [`553abbe`](https://github.com/aryamahadik/rosie/commit/553abbe), by Arya Mahadik, 2026-11-13 10:55:17 UTC
+- **Pull request:** [#548](https://github.com/aryamahadik/rosie/pull/548) from `task/T-1349`, merged 2026-11-13 10:55:18 UTC. It squashed 1 branch commit:
+  - `dec574c` T-1349: preview-cleanup.sh's drop checks its URL with db-url.mjs and …
+- **Files changed:** 12 (+439 −12), by folder:
+  - `infra/ci/` deploy-preview.test.mjs +64 −0, deploy-staging.test.mjs +51 −0, flags.test.mjs +54 −0, preview-cleanup.test.mjs +125 −1, publish-bundle.test.mjs +54 −0, seed-staging.test.mjs +56 −3
+  - `infra/scripts/` deploy-preview.sh +1 −1, deploy-staging.sh +1 −1, flags.sh +1 −1, preview-cleanup.sh +30 −3, publish-bundle.sh +1 −1, seed-staging.sh +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 538. docs: COMMIT\_HISTORY.md through commit 536 (3d25bcd, \#544) (\#546)
 
