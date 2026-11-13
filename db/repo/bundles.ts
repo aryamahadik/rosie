@@ -7,16 +7,28 @@
 //                        with the earlier id: every published bundle stays readable for replay (tour line 658).
 //
 // Every call answers with the contract's outcome (contracts/data-access fixtures): a response, or an error shape such as
-// `notPublished`. A serialization failure (40001), a deadlock (40P01) or a lost connection (postgres.js's
-// CONNECTION_CLOSED, CONNECTION_DESTROYED, CONNECTION_ENDED and the socket's ECONNRESET, EPIPE and ETIMEDOUT as 08006;
-// SQLSTATE class 08; 57P01 to 57P03) answers
-// `transient`: nothing was written and the same request may be sent again. Times are UTC text ending in Z. Every value reaches the database as a bound parameter.
+// `notPublished`. A failure of the database is answered by targets.ts's transientOrThrow under the call's K-05 name, as
+// every runtime-side call's is (T-1314): a serialization failure (40001), a deadlock (40P01), a lost connection
+// (SQLSTATE class 08; 57P01 to 57P03; postgres.js's CONNECTION_CLOSED, CONNECTION_DESTROYED, CONNECTION_ENDED, the
+// socket's ECONNRESET, EPIPE and ETIMEDOUT, and a socket's failure with no code, as 08006) and a connection that never
+// opened (08001: CONNECT_TIMEOUT, ECONNREFUSED, ENOTFOUND and the others of T-1268; a reserve() that never connects,
+// below) answer `transient`: nothing was written and the same request may be sent again. Any other failure to open or
+// keep a session (a TLS or certificate error, EACCES, SASL_SIGNATURE_MISMATCH, PostgreSQL's class 28 and 53300) is
+// thrown scrubbed: the call's name and the code alone, never a host, port, user or password. Times are UTC text ending
+// in Z. Every value reaches the database as a bound parameter.
+//
+// This file imports none of its neighbours when it loads: infra/ci/release-harness.mjs imports it under Node with no
+// resolve hook, and Node finds a neighbour named without its extension (./targets) only through one. So targets.ts's
+// transientOrThrow is imported when a call fails (targets.ts imports this file in turn, for isLostConnection).
 //
 // Publishing never changes the active id. Switching serializes on one transaction-level advisory lock, then locks the
 // active row and the target row, so parallel switches run one after the other and exactly one id is active at any time
 // (the partial unique index bundles_one_active refuses a second one as a last guard).
 import { createHash } from "node:crypto";
 import type { Sql, Tx } from "./scope";
+
+/** A connection `sql.reserve()` gives: one transaction's own, until it is released. */
+type Reserved = Awaited<ReturnType<Sql["reserve"]>>;
 
 export interface BundleId {
   hash: string;
@@ -105,8 +117,6 @@ interface ValueRow {
   value: Uint8Array;
 }
 
-/** A serialization failure, a deadlock, and a server that shut down or dropped this backend (57P01 to 57P03). */
-const TRANSIENT_SQLSTATES = new Set(["40001", "40P01", "57P01", "57P02", "57P03"]);
 /**
  * postgres.js's own codes for a connection that is gone. They carry no SQLSTATE, so they answer 08006
  * (connection_failure), a default listed in the handoff.
@@ -120,7 +130,21 @@ const LOST_CONNECTION_CODES = new Set([
   "EPIPE",
   "ETIMEDOUT",
 ]);
-const LOST_CONNECTION_SQLSTATE = "08006";
+/**
+ * JavaScript's own errors for a value or a program at fault, the names of targets.ts's FAULT_NAMES: postgres.js rejects
+ * a statement with one when it cannot build the statement or read its rows (a value it cannot send), never when its
+ * socket fails, so the connection is still open.
+ */
+const FAULT_NAMES = new Set([
+  "TypeError",
+  "RangeError",
+  "SyntaxError",
+  "ReferenceError",
+  "EvalError",
+  "URIError",
+]);
+/** The SQLSTATE of a connection the client could not open: 08001, sqlclient_unable_to_establish_sqlconnection. */
+const NEVER_OPENED_SQLSTATE = "08001";
 /** Held for the length of a switch of the active bundle. */
 const ACTIVE_SWITCH_LOCK = "rosie.bundles.active";
 
@@ -137,11 +161,56 @@ function sameId(a: BundleId, b: BundleId): boolean {
   return a.hash === b.hash && a.build === b.build;
 }
 
-/** True for an error that says the connection the call ran on is gone or going (see the codes above). */
+/**
+ * True for an error that says the connection the call ran on is gone or going (see the codes above), and for a socket's
+ * failure with no code (T-1314): postgres.js's Workers build passes its socket's failure up as the socket gives it, with
+ * no code (cf/polyfills.js), and rejects the statement in flight with it, the statement put on it as own properties
+ * (connection.js queryError: query and parameters). That is targets.ts's transientOrThrow's own rule for a lost
+ * connection with no code (08006), so inRuntimeTransaction and the transactions below never write a rollback to that
+ * dead connection, and never release it. PostgreSQL's own errors and JavaScript's errors for a fault (FAULT_NAMES),
+ * which postgres.js also rejects a statement with, are not: their connection is still open, and is rolled back.
+ */
 export function isLostConnection(error: unknown): boolean {
   const code = (error as { code?: unknown } | null | undefined)?.code;
+  if (typeof code === "string") {
+    return LOST_CONNECTION_CODES.has(code) || /^(08[0-9A-Z]{3}|57P0[123])$/.test(code);
+  }
   return (
-    typeof code === "string" && (LOST_CONNECTION_CODES.has(code) || /^(08[0-9A-Z]{3}|57P0[123])$/.test(code))
+    error instanceof Error &&
+    error.name !== "PostgresError" &&
+    !FAULT_NAMES.has(error.name) &&
+    (Object.hasOwn(error, "query") || Object.hasOwn(error, "parameters"))
+  );
+}
+
+/**
+ * `sql.reserve()`, whose failure to connect never leaves raw (T-1314). A reserve() that never connects passes up the
+ * error its connect failed with as it is: postgres.js's connection.js queryError puts no statement on a reserve()'s
+ * error, and in its Workers build the socket's failure has no code (cf/polyfills.js), so transientOrThrow could tell it
+ * by nothing and would throw it as it is. Such a failure, with no code and not PostgreSQL's own, leaves here as a
+ * connection that never opened: a new error carrying the code 08001 and a fixed message, with no message, stack, cause
+ * or property of the original's, which transientOrThrow answers transient 08001, as T-1268 answers a connect that never
+ * opened (no statement went out: nothing was written, and the same request may be sent again). A failure with a code
+ * (Node's ECONNREFUSED, postgres.js's CONNECT_TIMEOUT, a TLS error) and PostgreSQL's refusal of the session are passed
+ * on as they are, for transientOrThrow to answer by its lists.
+ */
+export async function reserveConnection(sql: Sql): Promise<Reserved> {
+  try {
+    return await sql.reserve();
+  } catch (error) {
+    const code = (error as { code?: unknown } | null | undefined)?.code;
+    const postgresError = error instanceof Error && error.name === "PostgresError";
+    throw typeof code !== "string" && !postgresError ? neverOpened() : error;
+  }
+}
+
+/** A connection that never opened, as reserveConnection passes it on: the code 08001 alone. */
+function neverOpened(): Error {
+  return Object.assign(
+    new Error(`the database connection never opened (SQLSTATE ${NEVER_OPENED_SQLSTATE})`),
+    {
+      code: NEVER_OPENED_SQLSTATE,
+    },
   );
 }
 
@@ -161,7 +230,7 @@ async function inTransaction<T>(sql: Sql, fn: (tx: Sql) => Promise<T>): Promise<
   // stale error is taken here by an ordinary query (which is rejected cleanly) and `reserve()` then finds a
   // connection that has already answered once. The failure of this one query is a transient answer like any other.
   await sql`select 1`;
-  const reserved = await sql.reserve();
+  const reserved = await reserveConnection(sql);
   let lost = false;
   try {
     await reserved`begin`;
@@ -186,17 +255,14 @@ async function inTransaction<T>(sql: Sql, fn: (tx: Sql) => Promise<T>): Promise<
   }
 }
 
-function transientOrThrow(error: unknown): TransientError {
-  const code = (error as { code?: unknown } | null | undefined)?.code;
-  if (typeof code === "string") {
-    if (TRANSIENT_SQLSTATES.has(code) || /^08[0-9A-Z]{3}$/.test(code)) {
-      return { error: "transient", sqlstate: code };
-    }
-    if (LOST_CONNECTION_CODES.has(code)) {
-      return { error: "transient", sqlstate: LOST_CONNECTION_SQLSTATE };
-    }
-  }
-  throw error;
+/**
+ * A call's answer to a failure: targets.ts's transientOrThrow, under the K-05 call's name (T-1314; see the top of this
+ * file), so these calls answer exactly as the runtime side's do and their scrubbed errors carry their names. Imported
+ * here, when a call fails, never when this file loads (see the top of this file).
+ */
+async function transientOrThrow(error: unknown, call: string): Promise<TransientError> {
+  const targets = await import("./targets");
+  return targets.transientOrThrow(error, call);
 }
 
 const encoder = new TextEncoder();
@@ -232,7 +298,7 @@ export async function readActiveBundle(sql: Sql | Tx): Promise<ReadActiveBundleR
       activatedAt: utc(row.activated_at),
     };
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "readActiveBundle");
   }
 }
 
@@ -251,7 +317,7 @@ export async function readBundleValue(
     }
     return { result: "value", value: toStoredText(row) };
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "readBundleValue");
   }
 }
 
@@ -346,7 +412,7 @@ export async function publishBundleCopy(
       };
     });
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "publishBundleCopy");
   }
 }
 
@@ -413,6 +479,6 @@ export async function setActiveBundle(
       };
     });
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "setActiveBundle");
   }
 }

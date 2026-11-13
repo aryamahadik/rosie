@@ -46,7 +46,10 @@ export interface DbClient {
    * read only). The scope lasts only inside the transaction.
    */
   withBusiness<T>(businessId: string, fn: (tx: Tx) => Promise<T>, options?: { on?: ScopeHandle }): Promise<T>;
-  /** `select 1` on a handle: `{ ok: true }`, or `{ ok: false }` after one redacted log entry. Never throws. */
+  /**
+   * `select 1` on a handle: `{ ok: true }`, or `{ ok: false }` after one log entry that names the handle and the error's
+   * code alone, never its message (T-1314). Never throws.
+   */
   ping(handle?: ScopeHandle): Promise<{ ok: boolean }>;
   /** Ends both handles (once, when they are one). */
   close(): Promise<void>;
@@ -65,23 +68,39 @@ export function resolvePrimaryUrl(options: ClientOptions = {}): string {
   return LOCAL_DATABASE_URL;
 }
 
-/** Removes each connection string, and its user and password, from `text`. */
+/**
+ * Removes each connection string, and its user, password, host and port, from `text`. The host and port since T-1314,
+ * as infra/scripts/db-url.mjs's scrub takes them out: the host with its port, the host name (an IPv6 address with and
+ * without its brackets) and the port. The user and password go as written and decoded, each decoded on its own, so one
+ * that does not decode still leaves the other's forms to go. Each part goes before any part inside it, and a port only
+ * where it stands as a whole number, so the other digits of the text are left alone.
+ */
 export function redact(text: string, urls: readonly string[]): string {
+  const decoded = (part: string): string => {
+    try {
+      return decodeURIComponent(part);
+    } catch {
+      return part;
+    }
+  };
   let out = text;
   for (const url of urls) {
     const secrets = [url];
     try {
       const parsed = new URL(url);
-      for (const part of [parsed.password, decodeURIComponent(parsed.password), parsed.username]) {
-        if (part !== "") {
-          secrets.push(part);
-        }
+      const hostName = parsed.hostname;
+      for (const part of [parsed.password, parsed.username]) {
+        secrets.push(part, decoded(part));
       }
+      secrets.push(parsed.host, hostName, hostName.replace(/^\[|\]$/g, ""), parsed.port);
     } catch {
       // Not a parsable URL: the whole string is still removed.
     }
-    for (const secret of secrets) {
-      out = out.split(secret).join("[redacted]");
+    const parts = [...new Set(secrets)].filter((part) => part !== "").sort((a, b) => b.length - a.length);
+    for (const part of parts) {
+      out = /^[0-9]+$/.test(part)
+        ? out.replace(new RegExp(`(?<![0-9])${part}(?![0-9])`, "g"), "[redacted]")
+        : out.split(part).join("[redacted]");
     }
   }
   return out;
@@ -104,7 +123,6 @@ export function createClient(options: ClientOptions = {}): DbClient {
   const replicaSetting = options.replicaUrl ?? env.DATABASE_REPLICA_URL;
   const replicaUrl = replicaSetting !== undefined && replicaSetting !== "" ? replicaSetting : undefined;
   const schema = schemaFrom(options, env);
-  const urls = replicaUrl === undefined ? [primaryUrl] : [primaryUrl, replicaUrl];
   const log =
     options.log ??
     ((entry: LogEntry) => {
@@ -139,13 +157,18 @@ export function createClient(options: ClientOptions = {}): DbClient {
         await handles[handle]`select 1`;
         return { ok: true };
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        const code = (error as { code?: unknown }).code;
+        // The line names the handle and the error's code alone, when it is a plain code (Node's ECONNREFUSED,
+        // postgres.js's CONNECT_TIMEOUT, a SQLSTATE such as 28P01), never the error's message or its other fields
+        // (T-1314). The message names what no redaction of the URL can know: the address a host name resolved to
+        // (connect ECONNREFUSED <address>:<port>), a certificate's names, the client's own address in PostgreSQL's
+        // pg_hba refusal, or whatever a Worker's socket says.
+        const raw = (error as { code?: unknown } | null | undefined)?.code;
+        const code = typeof raw === "string" && /^[A-Z0-9_]{1,64}$/.test(raw) ? raw : undefined;
         log({
           event: "db.ping_failed",
           handle,
-          ...(typeof code === "string" ? { code } : {}),
-          message: redact(message, urls),
+          ...(code === undefined ? {} : { code }),
+          message: `the ping failed (${code === undefined ? "no code" : `code ${code}`})`,
         });
         return { ok: false };
       }

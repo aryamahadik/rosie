@@ -15,9 +15,12 @@ import {
   publishBundleCopy,
   readActiveBundle,
   readBundleValue,
+  reserveConnection,
   setActiveBundle,
 } from "./bundles";
+import { DataAccessDatabaseError } from "./clocks";
 import type { Sql } from "./scope";
+import { handleTargets, type TransientError, transientOrThrow } from "./targets";
 import { createTestDatabase, type TestDatabase } from "./test-db";
 
 const CORE_DIR = new URL("../../contracts/db-schema/core/", import.meta.url);
@@ -996,4 +999,607 @@ describe("a lost connection answers transient (K-05 README: every call)", () => 
     expect((value.answer as { sqlstate: string }).sqlstate).toMatch(lostConnection);
     expectResentOnTheKilledClient(value.resends, { result: "value" });
   }, 60_000);
+});
+
+// ---- T-1314: no failure to reach the database leaves raw --------------------------------------------------------------
+//
+// The four calls answer a failure exactly as targets.ts's transientOrThrow does, under their K-05 names (Gives 1 and 5);
+// isLostConnection knows a socket's failure with no code, so no rollback is written to a dead connection (Gives 2); a
+// reserve() that never connects answers 08001 (Gives 3). Each failure that can be made locally is raised for real: a
+// closed port, a .invalid host, a login the local database refuses, a socket cut under a statement. The rest are built
+// in postgres.js's and Node's shapes (node_modules/postgres/src/errors.js; cf/polyfills.js, whose socket errors carry no
+// code) and raised through postgres.js's own socket option, so postgres.js passes each up as it does a socket's error.
+// Each raw error is checked to hold what it names, and each outcome to hold none of it. Rule 9: the probe's user,
+// password, database and hosts are made up here (.invalid names). A check names what leaked, never its value.
+
+describe("T-1314: a failure to reach the database answers as targets.ts's transientOrThrow does, never raw", () => {
+  const PROBE_USER = "t1314_probe_user";
+  const PROBE_PASSWORD = "t1314-probe-password";
+  const PROBE_DATABASE = "t1314_probe_db";
+  /** RFC 6761: no name under .invalid ever resolves. */
+  const UNRESOLVABLE_HOST = "rosie-t1314.invalid";
+  /** The shapes' made-up host and port. */
+  const SHAPE_HOST = "db-t1314.example.invalid";
+  const SHAPE_PORT = 65124;
+  const NEVER_OPENED: TransientError = { error: "transient", sqlstate: "08001" };
+  const LOST: TransientError = { error: "transient", sqlstate: "08006" };
+  const SWITCH_LOCK = "rosie.bundles.active";
+  const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
+  /** postgres.js's own PostgresError, which its type file gives no constructor of fields. */
+  const { PostgresError } = postgres as unknown as {
+    PostgresError: new (fields: Record<string, unknown>) => Error;
+  };
+
+  const probeUrl = (host: string, port: number): string =>
+    `postgres://${PROBE_USER}:${PROBE_PASSWORD}@${host}:${String(port)}/${PROBE_DATABASE}`;
+
+  type Secrets = Readonly<Record<string, RegExp>>;
+
+  /** The secrets by name: a text wherever it appears, a number (a port) as a whole number. */
+  function secretsOf(values: Readonly<Record<string, string | number>>): Secrets {
+    const secrets: Record<string, RegExp> = {};
+    for (const [name, value] of Object.entries(values)) {
+      secrets[name] =
+        typeof value === "number"
+          ? new RegExp(`(^|[^0-9])${String(value)}([^0-9]|$)`)
+          : new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    }
+    return secrets;
+  }
+
+  /** A connection's own: its host, its port, the probe's user and its password. */
+  const connectionSecrets = (host: string, port: number): Secrets =>
+    secretsOf({ host, port, user: PROBE_USER, password: PROBE_PASSWORD });
+  const SHAPE_SECRETS = connectionSecrets(SHAPE_HOST, SHAPE_PORT);
+
+  /** Every text `value` holds, deeply: its own property names and values, enumerable or not (an error's stack too). */
+  function textsOf(value: unknown, seen = new Set<object>()): string[] {
+    if (typeof value === "string") {
+      return [value];
+    }
+    if (typeof value === "number" || typeof value === "bigint" || typeof value === "boolean") {
+      return [String(value)];
+    }
+    if (typeof value !== "object" || value === null || seen.has(value)) {
+      return [];
+    }
+    seen.add(value);
+    const texts: string[] = [];
+    for (const key of Object.getOwnPropertyNames(value)) {
+      texts.push(key, ...textsOf((value as Record<string, unknown>)[key], seen));
+    }
+    return texts;
+  }
+
+  /** The names of the secrets `value` holds anywhere, never their values. */
+  function leaksOf(value: unknown, secrets: Secrets): string[] {
+    const texts = textsOf(value);
+    return Object.entries(secrets)
+      .filter(([, secret]) => texts.some((text) => secret.test(text)))
+      .map(([name]) => name);
+  }
+
+  /** A local port nothing listens on: one the system just handed out and took back. */
+  async function closedPort(): Promise<number> {
+    const server = net.createServer();
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const address = server.address();
+    const port = typeof address === "object" && address !== null ? address.port : 0;
+    await new Promise<void>((resolve) => {
+      server.close(() => {
+        resolve();
+      });
+    });
+    return port;
+  }
+
+  type Outcome = { answer: unknown } | { thrown: unknown };
+
+  async function outcomeOf(run: () => Promise<unknown>): Promise<Outcome> {
+    try {
+      return { answer: await run() };
+    } catch (error) {
+      return { thrown: error };
+    }
+  }
+
+  function syncOutcomeOf(run: () => unknown): Outcome {
+    try {
+      return { answer: run() };
+    } catch (error) {
+      return { thrown: error };
+    }
+  }
+
+  /** What `promise` rejects with (it must reject). */
+  async function rejectionOf(promise: Promise<unknown>): Promise<unknown> {
+    const outcome = await outcomeOf(() => promise);
+    if (!("thrown" in outcome)) {
+      throw new Error("the promise was fulfilled");
+    }
+    return outcome.thrown;
+  }
+
+  /** An error's own fields but its stack, which says where it was made. */
+  function fieldsOf(error: unknown): Record<string, unknown> {
+    const fields: Record<string, unknown> = {};
+    for (const key of Object.getOwnPropertyNames(error)) {
+      if (key !== "stack") {
+        fields[key] = (error as Record<string, unknown>)[key];
+      }
+    }
+    return fields;
+  }
+
+  /**
+   * `outcome` is what targets.ts's transientOrThrow makes of `raw` under `call`: the same answer, the same error thrown
+   * as it is, or a scrubbed error of the same class with the same fields, the call's name among them.
+   */
+  function expectAsTargets(outcome: Outcome, raw: Error, call: string): void {
+    const expected = syncOutcomeOf(() => transientOrThrow(raw, call));
+    if ("answer" in expected) {
+      expect(outcome, call).toEqual(expected);
+      return;
+    }
+    const thrown = "thrown" in outcome ? outcome.thrown : undefined;
+    if (expected.thrown === raw) {
+      expect(thrown === raw, call).toBe(true);
+      return;
+    }
+    expect(thrown instanceof Error && thrown !== raw, call).toBe(true);
+    expect((thrown as Error).constructor, call).toBe((expected.thrown as Error).constructor);
+    expect(fieldsOf(thrown), call).toEqual(fieldsOf(expected.thrown));
+    expect(fieldsOf(thrown), call).toMatchObject({ call });
+  }
+
+  /**
+   * A client on the made-up connection whose socket fails with `raw` before it opens, as Node's socket or TLS would fail
+   * it (postgres.js's own socket option): postgres.js passes `raw` up as it does a socket's error.
+   */
+  function failingSocketClient(raw: Error): Sql {
+    const options = { max: 1, onnotice: () => undefined, socket: () => Promise.reject(raw) };
+    return postgres(probeUrl(SHAPE_HOST, SHAPE_PORT), options);
+  }
+
+  /**
+   * A client whose statements run on `statements` and whose reserve() is `reserving`'s: the pre-probe answers, and only
+   * reserve() opens a connection, as when the probe's connection was taken meanwhile and the one reserve() opens never
+   * connects.
+   */
+  function reserveFrom(statements: Sql, reserving: Sql): Sql {
+    return new Proxy(statements, {
+      get: (target, key, receiver): unknown =>
+        key === "reserve" ? () => reserving.reserve() : (Reflect.get(target, key, receiver) as unknown),
+    });
+  }
+
+  // The shapes, as postgres.js and Node give them.
+  /** postgres.js's own connection error (errors.js connection): "write <code> <host>:<port>". */
+  const clientError = (code: string): Error =>
+    Object.assign(new Error(`write ${code} ${SHAPE_HOST}:${String(SHAPE_PORT)}`), {
+      code,
+      errno: code,
+      address: SHAPE_HOST,
+      port: SHAPE_PORT,
+    });
+  /** Node's error for a connect its socket could not make: syscall connect, the address and the port. */
+  const connectError = (code: string, errno: number): Error =>
+    Object.assign(new Error(`connect ${code} ${SHAPE_HOST}:${String(SHAPE_PORT)}`), {
+      errno,
+      code,
+      syscall: "connect",
+      address: SHAPE_HOST,
+      port: SHAPE_PORT,
+    });
+  /** Node's error for a name its lookup could not resolve. */
+  const lookupError = (code: string, errno: number): Error =>
+    Object.assign(new Error(`getaddrinfo ${code} ${SHAPE_HOST}`), {
+      errno,
+      code,
+      syscall: "getaddrinfo",
+      hostname: SHAPE_HOST,
+    });
+  /** The Workers build's socket error (cf/polyfills.js passes the socket's own failure up): no code. */
+  const workersSocketError = (): Error =>
+    new Error(`Network connection lost to ${SHAPE_HOST}:${String(SHAPE_PORT)}`);
+  /** A socket's error whose code is a number, not a name (as a DOMException's is). */
+  const numberCodedError = (): Error =>
+    Object.assign(new Error(`connect to ${SHAPE_HOST} failed`), { name: "NetworkError", code: 19 });
+  /** Node's TLS name check: the host and the certificate on the error. */
+  const tlsNameError = (): Error =>
+    Object.assign(new Error(`Hostname/IP does not match certificate's altnames: Host: ${SHAPE_HOST}.`), {
+      code: "ERR_TLS_CERT_ALTNAME_INVALID",
+      host: SHAPE_HOST,
+      cert: { subject: { CN: "other.example.invalid" } },
+    });
+  /** postgres.js's generic error (errors.js generic): "<code>: <text>". */
+  const genericError = (code: string, text: string): Error =>
+    Object.assign(new Error(`${code}: ${text}`), { code });
+  const refusedPassword = `password authentication failed for user "${PROBE_USER}"`;
+
+  const SHAPES: { name: string; make: () => Error; holds: readonly string[] }[] = [
+    {
+      name: "postgres.js's CONNECT_TIMEOUT",
+      make: () => clientError("CONNECT_TIMEOUT"),
+      holds: ["host", "port"],
+    },
+    { name: "Node's ECONNREFUSED", make: () => connectError("ECONNREFUSED", -61), holds: ["host", "port"] },
+    { name: "Node's ENOTFOUND", make: () => lookupError("ENOTFOUND", -3008), holds: ["host"] },
+    { name: "Node's EAI_AGAIN", make: () => lookupError("EAI_AGAIN", -3001), holds: ["host"] },
+    { name: "Node's ECONNRESET", make: () => connectError("ECONNRESET", -54), holds: ["host", "port"] },
+    {
+      name: "postgres.js's CONNECTION_CLOSED",
+      make: () => clientError("CONNECTION_CLOSED"),
+      holds: ["host", "port"],
+    },
+    {
+      name: "a socket's failure with no code (the Workers build's)",
+      make: workersSocketError,
+      holds: ["host", "port"],
+    },
+    { name: "a socket's failure whose code is a number", make: numberCodedError, holds: ["host"] },
+    {
+      name: "PostgreSQL's 57P01",
+      make: () => new PostgresError({ severity: "FATAL", code: "57P01", message: "terminating connection" }),
+      holds: [],
+    },
+    { name: "Node's TLS name check", make: tlsNameError, holds: ["host"] },
+    { name: "Node's EACCES", make: () => connectError("EACCES", -13), holds: ["host", "port"] },
+    {
+      name: "postgres.js's SASL_SIGNATURE_MISMATCH",
+      make: () => genericError("SASL_SIGNATURE_MISMATCH", "The server did not return the correct signature"),
+      holds: [],
+    },
+    {
+      name: "PostgreSQL's 28P01, naming the user",
+      make: () => new PostgresError({ severity: "FATAL", code: "28P01", message: refusedPassword }),
+      holds: ["user"],
+    },
+    {
+      name: "a PostgresError with no SQLSTATE, naming the user",
+      make: () => new PostgresError({ severity: "FATAL", message: refusedPassword }),
+      holds: ["user"],
+    },
+    {
+      name: "a statement's own refusal (23505), thrown as it is",
+      make: () => new PostgresError({ severity: "ERROR", code: "23505", message: "duplicate key value" }),
+      holds: [],
+    },
+    {
+      name: "a TypeError for a value postgres.js cannot send, thrown as it is",
+      make: () => new TypeError("Do not know how to serialize a BigInt"),
+      holds: [],
+    },
+  ];
+
+  const CALLS: [string, (sql: Sql) => Promise<unknown>][] = [
+    ["readActiveBundle", (sql) => readActiveBundle(sql)],
+    [
+      "readBundleValue",
+      (sql) => readBundleValue(sql, exchange("bundle-value-on-miss.json").request as never),
+    ],
+    [
+      "publishBundleCopy",
+      (sql) => publishBundleCopy(sql, exchange("publish-bundle-copy.json").request as never),
+    ],
+    ["setActiveBundle", (sql) => setActiveBundle(sql, exchange("set-active-bundle.json").request as never)],
+  ];
+  /** The two calls that reserve a connection for their transaction (inTransaction). */
+  const RESERVING_CALLS = CALLS.filter(
+    ([call]) => call === "publishBundleCopy" || call === "setActiveBundle",
+  );
+
+  describe("Gives 1 and 5: each call answers as targets.ts's transientOrThrow does, under its own name", () => {
+    it.each(SHAPES)("$name", async ({ make, holds }) => {
+      for (const [call, run] of CALLS) {
+        const raw = make();
+        expect(leaksOf(raw, SHAPE_SECRETS), call).toEqual(expect.arrayContaining([...holds]));
+        const sql = failingSocketClient(raw);
+        let outcome: Outcome;
+        try {
+          outcome = await outcomeOf(() => run(sql));
+        } finally {
+          await sql.end({ timeout: 0 });
+        }
+        // postgres.js rejected the call's first statement with the socket's error, the statement put on it.
+        expect(Object.hasOwn(raw, "query"), call).toBe(true);
+        expectAsTargets(outcome, raw, call);
+        if (!("thrown" in outcome && outcome.thrown === raw)) {
+          expect(leaksOf(outcome, SHAPE_SECRETS), call).toEqual([]);
+        }
+      }
+    });
+
+    it("readActiveBundle on a closed port (ECONNREFUSED, the case found) and the others answer 08001, holding none of it", async () => {
+      const port = await closedPort();
+      for (const [call, run] of CALLS) {
+        const client = createClient({ primaryUrl: probeUrl("127.0.0.1", port), max: 1, env: {} });
+        try {
+          const outcome = await run(client.primary);
+          expect(outcome, call).toEqual(NEVER_OPENED);
+          expect(leaksOf(outcome, connectionSecrets("127.0.0.1", port)), call).toEqual([]);
+        } finally {
+          await client.close();
+        }
+      }
+    });
+
+    it("an unresolvable .invalid host (ENOTFOUND, or EAI_AGAIN with no resolver) answers 08001 from each call", async () => {
+      for (const [call, run] of CALLS) {
+        const client = createClient({ primaryUrl: probeUrl(UNRESOLVABLE_HOST, SHAPE_PORT), max: 1, env: {} });
+        try {
+          const outcome = await run(client.primary);
+          expect(outcome, call).toEqual(NEVER_OPENED);
+          expect(leaksOf(outcome, connectionSecrets(UNRESOLVABLE_HOST, SHAPE_PORT)), call).toEqual([]);
+        } finally {
+          await client.close();
+        }
+      }
+    });
+
+    it("a login the local database refuses (class 28, naming the user) is thrown as DataAccessDatabaseError under each call's name", async () => {
+      const url = new URL(resolvePrimaryUrl());
+      url.username = PROBE_USER;
+      url.password = PROBE_PASSWORD;
+      const secrets = connectionSecrets(url.hostname, url.port === "" ? 5432 : Number(url.port));
+      for (const [call, run] of CALLS) {
+        const client = createClient({ primaryUrl: url.toString(), max: 1, env: {} });
+        try {
+          const thrown = await rejectionOf(run(client.primary));
+          expect(thrown, call).toBeInstanceOf(DataAccessDatabaseError);
+          expect(thrown, call).toMatchObject({ call, table: null, constraint: null });
+          expect(["28P01", "28000"], call).toContain((thrown as { code: string }).code);
+          expect(leaksOf(thrown, secrets), call).toEqual([]);
+        } finally {
+          await client.close();
+        }
+      }
+    });
+  });
+
+  describe("Gives 3: a reserve() that never connects answers 08001", () => {
+    it("as the Workers build passes it up (no code, no statement): publishBundleCopy and setActiveBundle answer 08001", async () => {
+      for (const [call, run] of RESERVING_CALLS) {
+        const raw = workersSocketError();
+        const reserving = failingSocketClient(raw);
+        try {
+          const outcome = await run(reserveFrom(db.sql, reserving));
+          expect(outcome, call).toEqual(NEVER_OPENED);
+          expect(leaksOf(outcome, SHAPE_SECRETS), call).toEqual([]);
+        } finally {
+          await reserving.end({ timeout: 0 });
+        }
+        // postgres.js passed the socket's error up as it is (connection.js queryError: no statement on a reserve()'s
+        // error), with no code and its host and port in its message: targets.ts's transientOrThrow alone would throw it
+        // as it is.
+        expect((raw as { code?: unknown }).code, call).toBeUndefined();
+        expect(Object.hasOwn(raw, "query") || Object.hasOwn(raw, "parameters"), call).toBe(false);
+        expect(leaksOf(raw, SHAPE_SECRETS), call).toEqual(expect.arrayContaining(["host", "port"]));
+        expect(
+          syncOutcomeOf(() => transientOrThrow(raw, call)),
+          call,
+        ).toEqual({ thrown: raw });
+      }
+    });
+
+    it("for real on a closed port (Node's ECONNREFUSED, on no statement): publishBundleCopy and setActiveBundle answer 08001", async () => {
+      const port = await closedPort();
+      for (const [call, run] of RESERVING_CALLS) {
+        const reserving = postgres(probeUrl("127.0.0.1", port), { max: 1, onnotice: () => undefined });
+        try {
+          const outcome = await run(reserveFrom(db.sql, reserving));
+          expect(outcome, call).toEqual(NEVER_OPENED);
+          expect(leaksOf(outcome, connectionSecrets("127.0.0.1", port)), call).toEqual([]);
+        } finally {
+          await reserving.end({ timeout: 0 });
+        }
+      }
+    });
+
+    it("reserveConnection passes a failure with no code on as the code 08001 alone, and any other as it is", async () => {
+      const raw = workersSocketError();
+      const workers = failingSocketClient(raw);
+      try {
+        const thrown = await rejectionOf(reserveConnection(workers));
+        expect(thrown).not.toBe(raw);
+        expect(Object.getOwnPropertyNames(thrown).sort()).toEqual(["code", "message", "stack"]);
+        expect(thrown).toMatchObject({
+          code: "08001",
+          message: "the database connection never opened (SQLSTATE 08001)",
+        });
+        expect(leaksOf(thrown, SHAPE_SECRETS)).toEqual([]);
+        expect(transientOrThrow(thrown, "probeCall")).toEqual(NEVER_OPENED);
+      } finally {
+        await workers.end({ timeout: 0 });
+      }
+      // A failure with a code, or PostgreSQL's own, goes on as it is, for transientOrThrow's lists to answer.
+      for (const make of [
+        () => connectError("ECONNREFUSED", -61),
+        tlsNameError,
+        () => new PostgresError({ severity: "FATAL", message: refusedPassword }),
+      ]) {
+        const coded = make();
+        const client = failingSocketClient(coded);
+        try {
+          expect(await rejectionOf(reserveConnection(client))).toBe(coded);
+        } finally {
+          await client.end({ timeout: 0 });
+        }
+      }
+    });
+  });
+
+  describe("Gives 2: a socket's failure with no code is a lost connection, and no rollback is written to it", () => {
+    /** As postgres.js's queryError puts the statement it rejects on its error: unenumerable, unless its debug is on. */
+    function onStatement<T extends Error>(error: T, debug = false): T {
+      return Object.defineProperties(error, {
+        query: { value: "select * from bundles where active", enumerable: debug },
+        parameters: { value: [], enumerable: debug },
+        args: { value: [], enumerable: debug },
+        types: { value: [], enumerable: debug },
+      });
+    }
+
+    it("isLostConnection is true exactly where targets.ts's transientOrThrow answers an error with no code 08006", () => {
+      const cases: [string, Error, boolean][] = [
+        ["a socket's failure with no code (the Workers build's)", onStatement(workersSocketError()), true],
+        ["the same under postgres.js's debug", onStatement(workersSocketError(), true), true],
+        ["a socket's failure whose code is a number", onStatement(numberCodedError()), true],
+        [
+          "a TypeError for a value it cannot send",
+          onStatement(new TypeError("Do not know how to serialize")),
+          false,
+        ],
+        [
+          "a PostgresError with no SQLSTATE",
+          onStatement(new PostgresError({ message: refusedPassword })),
+          false,
+        ],
+        ["a reserve()'s socket failure, on no statement", workersSocketError(), false],
+        ["db/repo's own error", new Error("the bundle row is missing after a conflict"), false],
+      ];
+      for (const [name, error, lost] of cases) {
+        expect(isLostConnection(error), name).toBe(lost);
+        const answered = syncOutcomeOf(() => transientOrThrow(error, "probeCall"));
+        if (lost) {
+          expect(answered, name).toEqual({ answer: LOST });
+        } else {
+          expect(answered, name).not.toEqual({ answer: LOST });
+        }
+      }
+    });
+
+    /**
+     * A one-connection client of the test schema whose sockets the test holds, so it can fail the live one as the Workers
+     * build's socket fails: an error with no code (cf/polyfills.js), which postgres.js puts the statement in flight on.
+     */
+    function cuttableClient(): { sql: Sql; cut: () => void } {
+      const url = new URL(resolvePrimaryUrl());
+      const sockets: net.Socket[] = [];
+      const options = {
+        max: 1,
+        onnotice: () => undefined,
+        connection: { search_path: `${db.schema}, public` },
+        socket: () => {
+          const socket = net.connect(Number(url.port === "" ? "5432" : url.port), url.hostname);
+          sockets.push(socket);
+          return socket;
+        },
+      };
+      return {
+        sql: postgres(url.toString(), options),
+        cut: () => {
+          sockets.at(-1)?.destroy(workersSocketError());
+        },
+      };
+    }
+
+    /**
+     * Runs `call` on a cuttable client while another connection holds what the call waits on (`take`, in its own
+     * transaction), cuts the call's socket once its backend waits on that lock, and returns the call's answer and the
+     * same request sent again on that client once the lock is let go (after `beforeResend`, which reads what the cut call
+     * left), until one answers without transient (at most 4). Were a rollback written to the dead connection, the call
+     * would never answer (postgres.js keeps a write to a destroyed socket queued) and the test would time out.
+     */
+    async function answerAfterCut<T>(
+      take: (tx: postgres.TransactionSql) => Promise<unknown>,
+      call: (sql: Sql) => Promise<T>,
+      beforeResend: () => Promise<void>,
+    ): Promise<{ answer: T; resends: T[] }> {
+      const holder = postgres(resolvePrimaryUrl(), { max: 1, onnotice: () => undefined });
+      const victim = cuttableClient();
+      try {
+        let letGo: () => void = () => undefined;
+        const hold = new Promise<void>((resolve) => {
+          letGo = resolve;
+        });
+        let locked: () => void = () => undefined;
+        const isLocked = new Promise<void>((resolve) => {
+          locked = resolve;
+        });
+        const holding = holder.begin(async (tx) => {
+          await take(tx);
+          locked();
+          await hold;
+        });
+        await isLocked;
+        const [backend] = await victim.sql<{ pid: number }[]>`select pg_backend_pid() as pid`;
+        const pid = backend?.pid ?? 0;
+        const answering = call(victim.sql);
+        let waiting = false;
+        for (let attempt = 0; attempt < 100 && !waiting; attempt += 1) {
+          const [state] = await db.sql<{ waiting: boolean }[]>`
+            select (wait_event_type = 'Lock') as waiting from pg_stat_activity where pid = ${pid}
+          `;
+          waiting = state?.waiting === true;
+          if (!waiting) {
+            await sleep(50);
+          }
+        }
+        expect(waiting).toBe(true);
+        victim.cut();
+        const answer = await answering;
+        letGo();
+        await holding;
+        await beforeResend();
+        const resends: T[] = [];
+        for (let attempt = 0; attempt < 4; attempt += 1) {
+          const again = await call(victim.sql);
+          resends.push(again);
+          if ((again as { error?: string }).error !== "transient") {
+            break;
+          }
+        }
+        return { answer, resends };
+      } finally {
+        await victim.sql.end({ timeout: 0 });
+        await holder.end({ timeout: 5 });
+      }
+    }
+
+    /** At most one stale transient, then the answer the call gives on a working connection. */
+    function expectResent(resends: unknown[], expected: Record<string, unknown>): void {
+      expect(resends.length).toBeGreaterThanOrEqual(1);
+      expect(resends.length).toBeLessThanOrEqual(2);
+      for (const stale of resends.slice(0, -1)) {
+        expect(stale).toMatchObject({ error: "transient" });
+      }
+      expect(resends.at(-1)).toMatchObject(expected);
+    }
+
+    it("setActiveBundle (inTransaction) waiting on the switch lock, its socket failing with no code, answers 08006 and writes no rollback; the same client then switches", async () => {
+      await emptyTables(db.sql);
+      const [a, b] = [bundleOf("cut a", 1), bundleOf("cut b", 2)] as [
+        PublishBundleCopyRequest,
+        PublishBundleCopyRequest,
+      ];
+      await publishBundleCopy(db.sql, a);
+      await publishBundleCopy(db.sql, b);
+      await setActiveBundle(db.sql, { bundleId: idOf(a), expectActive: null, at: "2026-11-08T10:00:00Z" });
+      const { answer, resends } = await answerAfterCut(
+        (tx) => tx`select pg_advisory_xact_lock(hashtext(${SWITCH_LOCK}))`,
+        (sql) =>
+          setActiveBundle(sql, { bundleId: idOf(b), expectActive: idOf(a), at: "2026-11-08T11:00:00Z" }),
+        async () => {
+          // The cut switch wrote nothing: a is still the one active id.
+          expect(await activeIds(db.sql)).toEqual([idOf(a)]);
+        },
+      );
+      expect(answer).toEqual(LOST);
+      expectResent(resends, { result: "activated", repeated: false });
+      expect(await activeIds(db.sql)).toEqual([idOf(b)]);
+    }, 30_000);
+
+    it("handleTargets (targets.ts inRuntimeTransaction) waiting on a table lock, its socket failing with no code, answers 08006 and writes no rollback; the same client then answers", async () => {
+      const request = exchange("targets-alex.json").request as { handleId: string };
+      const { answer, resends } = await answerAfterCut(
+        (tx) => tx`lock table ${tx(db.schema)}.handles in access exclusive mode`,
+        (sql) => handleTargets(sql, request),
+        () => Promise.resolve(),
+      );
+      expect(answer).toEqual(LOST);
+      expectResent(resends, { error: "notFound", table: "handles", rowId: request.handleId });
+    }, 30_000);
+  });
 });

@@ -13,6 +13,12 @@
 // (inScopedTransaction): a lost connection answers transient with no rollback written to the dead connection. Every row
 // update raises the version by one (trigger from 0002).
 //
+// A failure of the database is answered by targets.ts's transientOrThrow under the call's K-05 name, reserve or release,
+// as every runtime-side call's is (T-1314): a serialization failure, a deadlock, a lost connection and a connection that
+// never opened (08001, a reserve() that never connects included: bundles.ts reserveConnection) answer transient; any
+// other failure to open or keep a session is thrown scrubbed, the call's name and the code alone, never a host, port,
+// user or password.
+//
 // One row per holder per slot (T-1134, from T-744 round 1's security review, GAP 1; DL-292). A holder is who the cap of
 // 2 counts (holderOf, the one definition): a mobile, the same at every business, or an agent token at one business; a
 // time saved for a booking has no holder. A slot is a resource's time that overlaps the asked or released one, as EXCLUDE
@@ -39,9 +45,10 @@
 // writes it reads the handle's id alone through handles_id_of_mobile (T-1094). The commit confirms a held row
 // (db/repo/commit-turn.ts, T-195).
 import type postgres from "postgres";
-import { isLostConnection } from "./bundles";
+import { isLostConnection, reserveConnection } from "./bundles";
 import { assertBusinessId, SCOPE_SETTING } from "./scope";
 import type { Sql, Tx } from "./scope";
+import { transientOrThrow } from "./targets";
 
 type Db = Sql | Tx;
 /** A transaction's connection: postgres.js's own Tx, or the reserved connection inScopedTransaction runs on. */
@@ -315,29 +322,9 @@ function ofHolder(tx: Conn, holder: Holder): postgres.Fragment {
     : tx`for_agent_token = ${holder.agentToken} and business_id = ${holder.businessId}`;
 }
 
-const transientCodes = new Set(["40001", "40P01"]);
-const LOST_CONNECTION_SQLSTATE = "08006";
-
 function sqlstateOf(error: unknown): { code: string | undefined; constraint: string | undefined } {
   const failure = error as { code?: string; constraint_name?: string };
   return { code: failure.code, constraint: failure.constraint_name };
-}
-
-/**
- * The transient answer for a serialization failure, a deadlock or a lost connection (K-05 README: nothing was written,
- * the same request may be sent again); any other error is thrown. The answer carries only a SQLSTATE: a lost connection
- * with no SQLSTATE of its own (postgres.js CONNECTION_*, ECONNRESET, EPIPE, ETIMEDOUT) is 08006.
- */
-function transientOrThrow(error: unknown): { error: "transient"; sqlstate: string } {
-  const { code } = sqlstateOf(error);
-  if (code !== undefined && transientCodes.has(code)) {
-    return { error: "transient", sqlstate: code };
-  }
-  if (isLostConnection(error)) {
-    const own = code !== undefined && /^(08[0-9A-Z]{3}|57P0[123])$/.test(code);
-    return { error: "transient", sqlstate: own ? code : LOST_CONNECTION_SQLSTATE };
-  }
-  throw error;
 }
 
 let savepointCount = 0;
@@ -368,7 +355,8 @@ async function inSavepoint<T>(tx: Conn, fn: () => Promise<T>): Promise<T> {
  * like sql.begin. postgres.js's own `begin` writes a `rollback` to a connection that is gone, from a timer outside any
  * promise (T-185), so a lost connection is rethrown here without a rollback (the server rolled the transaction back when
  * the backend went) and is never released (postgres.js 3.4.9 would put it back in the open queue). The same pre-probe as
- * bundles.ts takes the stale error a killed connection keeps, by an ordinary query, before a connection is reserved.
+ * bundles.ts takes the stale error a killed connection keeps, by an ordinary query, before a connection is reserved,
+ * and a reserve() that never connects leaves as a connection that never opened (bundles.ts reserveConnection, T-1314).
  */
 async function inScopedTransaction<T>(
   sql: Sql,
@@ -377,7 +365,7 @@ async function inScopedTransaction<T>(
 ): Promise<T> {
   assertBusinessId(businessId);
   await sql`select 1`;
-  const reserved = await sql.reserve();
+  const reserved = await reserveConnection(sql);
   let lost = false;
   try {
     await reserved`begin`;
@@ -757,7 +745,7 @@ export async function reserve(sql: Sql, request: ReserveRequest): Promise<Reserv
   try {
     return await inScopedTransaction(sql, request.businessId, (tx) => reserveIn(tx, request));
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "reserve");
   }
 }
 
@@ -932,6 +920,6 @@ export async function release(sql: Sql, request: ReleaseRequest): Promise<Releas
   try {
     return await inScopedTransaction(sql, request.businessId, (tx) => releaseIn(tx, request));
   } catch (error) {
-    return transientOrThrow(error);
+    return transientOrThrow(error, "release");
   }
 }
