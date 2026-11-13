@@ -1,0 +1,86 @@
+{
+  "call": "moveUpdates",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json", "customers/seed-customer-mobile-email.json"],
+    "after": [],
+    "now": "2026-10-23T17:20:00Z",
+    "stated": { "step": "A7-98", "gives": [] },
+    "note": "Refused: where Alex's updates go switched from a page, not his own chat ('In their own chat ... Asked from any other number, email or chat: nothing changes'; README default 164). From Alex's own turn, his code typed back there, it is j7-updates-switch-turn, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "page",
+      "turnId": null,
+      "requestId": "req-page-alex-switch-0001",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-code-typed-oct23"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": {
+      "kind": "switch",
+      "step": "A7-98",
+      "proofCodeId": "code-alex-new-email-oct23",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-alex-type-code-oct23", "yesEventId": "evt-alex-0588" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "switch",
+    "step": "A7-98",
+    "result": "switched",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A7-98",
+        "via": "email",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-alex-updates-email-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      },
+      {
+        "to": "owner",
+        "personId": "person-sam",
+        "step": "A7-98",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-sam-alex-contact-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      },
+      {
+        "to": "staff",
+        "personId": "person-riley",
+        "step": "A7-98",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-riley-alex-contact-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [],
+    "consentId": "consent-alex-texts-email-oct23",
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [],
+    "moneyWords": [],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "customers", "rowId": "cust-lees-alex", "version": 2 },
+      { "table": "secure_links", "rowId": "link-alex-haircut-page", "version": 2 },
+      { "table": "outbox_rows", "rowId": "out-alex-updates-email-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-sam-alex-contact-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-riley-alex-contact-oct23", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "call": "moveBooking",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": ["j7-move-offer-turn.json"],
+    "now": "2026-10-23T14:07:00Z",
+    "stated": { "step": "A7-03", "gives": ["booked"] },
+    "note": "Refused by journeySevenGivesNone alone: A7-03's move stated as giving booked. Journey 7 gives no key (A-J7.md: A7-03's gives column is empty; booked is A6-10's, writeBooking's), and the outcome wrote none. Stated with gives empty it is j7-move-pick-turn, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-alex-pick-a-oct23",
+      "requestId": "turn-alex-pick-a-oct23",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-pick-a-oct23"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": {
+      "kind": "pick",
+      "step": "A7-03",
+      "visitId": "visit-alex-haircut-1",
+      "optionId": "A7-03/A",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-alex-new-times-oct23", "yesEventId": "evt-alex-0512" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "pick",
+    "step": "A7-03",
+    "result": "moved",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "A7-03",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-alex-moved-oct23",
+        "clockRowId": null,
+        "openQuestionId": "oq-alex-moved-oct23"
+      },
+      {
+        "to": "staff",
+        "personId": "person-riley",
+        "step": "A7-03",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": "out-riley-alex-moved-oct23",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [
+      {
+        "changeId": "chg-alex-haircut-moved-oct23",
+        "bookingId": "booking-alex-haircut",
+        "visitId": "visit-alex-haircut-1",
+        "kind": "moved",
+        "askedBy": "customer",
+        "afterFreeCancel": false,
+        "approvedBy": { "kind": "consentRow", "consentId": "consent-alex-move-oct23" }
+      }
+    ],
+    "consentId": "consent-alex-move-oct23",
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [{ "effectId": "eff-alex-haircut-calendar-move", "kind": "calendar_update" }],
+    "moneyWords": [
+      { "slot": "pay.cancel", "table": "booking_visits", "column": "cutoff_at", "rowId": "visit-alex-haircut-1" }
+    ],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "reservations", "rowId": "rsv-alex-haircut-sat-3pm", "version": 1 },
+      { "table": "reservations", "rowId": "rsv-alex-haircut", "version": 3 },
+      { "table": "booking_visits", "rowId": "visit-alex-haircut-1", "version": 2 },
+      { "table": "bookings", "rowId": "booking-alex-haircut", "version": 6 },
+      { "table": "outbox_rows", "rowId": "out-alex-moved-oct23", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-riley-alex-moved-oct23", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "call": "finalCount",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": [],
+    "now": "2026-11-07T20:00:00Z",
+    "stated": { "step": "A7-89", "gives": [] },
+    "note": "A7-89's count: Omar S. booked a group visit at Lee's Barbershop for Sat Nov 14, 8 people at the contract's $25 each, its final count due Sat Nov 7 at 6pm; the one reminder went before ('Your group visit at Lee's Barbershop needs its final count by Sat Nov 7, 6pm. Reply with it here.'). At 3:00pm he texts 'We'll be 10' in his own chat; decide's field final_count, which code re-parses from his words under limit 6, gives the integer 10 (README default 161). In his turn's commit nothing changes yet: the count is read back first with the rest repriced by the contract's price per person, in the step's own words since A7-89 prints no read-back (README default 161; open gap 133): 'Final count · 10 people · $25 each / Reply 1 Yes, 2 No.', quick_reply, its money word read from the booking's line, its question clock the due time ('No count by then: 8 stands': a clock row, never this call; README default 169). No consent: nothing commits before his yes. 10 is within the owner's limit and the room's, so it does not go to Sam first. No key. Omar's booking, line, question and row ids are examples (v1.3 default 48's rule)."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-omar-final-count-nov07",
+      "requestId": "turn-omar-final-count-nov07",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-omar",
+      "traceId": "trace-omar-final-count-nov07"
+    },
+    "bookingId": "booking-omar-group",
+    "stage": { "kind": "count", "step": "A7-89", "count": 10, "words": "We'll be 10" }
+  },
+  "outcome": {
+    "bookingId": "booking-omar-group",
+    "stage": "count",
+    "step": "A7-89",
+    "result": "readBack",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-omar",
+        "step": "A7-89",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-omar-final-count-readback-nov07",
+        "clockRowId": null,
+        "openQuestionId": "oq-omar-final-count-nov07"
+      }
+    ],
+    "timesOffered": [],
+    "deadline": "2026-11-07T23:00:00Z",
+    "changes": [],
+    "consentId": null,
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.price", "table": "booking_lines", "column": "price_cents", "rowId": "line-omar-group-8" }
+    ],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "open_questions", "rowId": "oq-omar-final-count-nov07", "version": 1 },
+      { "table": "outbox_rows", "rowId": "out-omar-final-count-readback-nov07", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

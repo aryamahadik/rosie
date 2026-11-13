@@ -1,0 +1,78 @@
+{
+  "call": "finalCount",
+  "given": {
+    "seeds": ["core/seed-business-head.json"],
+    "after": ["j7-final-count-turn.json"],
+    "now": "2026-11-07T20:05:00Z",
+    "stated": { "step": "A7-89", "gives": [] },
+    "note": "Refused: A7-89's yes answered changed with no consent written from Omar's own yes (consentId null), so the new count's change is bound to no words he was shown (README default 147). With consentId consent-omar-final-count-nov07 it is j7-final-count-yes-turn, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "turn",
+      "turnId": "turn-omar-final-count-yes-nov07",
+      "requestId": "turn-omar-final-count-yes-nov07",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-omar",
+      "traceId": "trace-omar-final-count-yes-nov07"
+    },
+    "bookingId": "booking-omar-group",
+    "stage": {
+      "kind": "yes",
+      "step": "A7-89",
+      "answer": "yes",
+      "yes": { "kind": "openQuestion", "openQuestionId": "oq-omar-final-count-nov07", "yesEventId": "evt-omar-0302" }
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-omar-group",
+    "stage": "yes",
+    "step": "A7-89",
+    "result": "changed",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-omar",
+        "step": "A7-89",
+        "via": "chat",
+        "sendClass": "quick_reply",
+        "outboxRowId": "out-omar-final-count-ok-nov07",
+        "clockRowId": null,
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": null,
+    "changes": [
+      {
+        "changeId": "chg-omar-group-count-nov07",
+        "bookingId": "booking-omar-group",
+        "visitId": "visit-omar-group-1",
+        "kind": "what_changed",
+        "askedBy": "customer",
+        "afterFreeCancel": false,
+        "approvedBy": { "kind": "consentRow", "consentId": "consent-omar-final-count-nov07" }
+      }
+    ],
+    "consentId": null,
+    "ownerOkId": null,
+    "fee": null,
+    "payment": null,
+    "payLinkId": null,
+    "refunds": [],
+    "effects": [],
+    "moneyWords": [
+      { "slot": "pay.price", "table": "booking_lines", "column": "price_cents", "rowId": "line-omar-group-10" }
+    ],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "open_questions", "rowId": "oq-omar-final-count-nov07", "version": 2 },
+      { "table": "booking_lines", "rowId": "line-omar-group-10", "version": 1 },
+      { "table": "booking_lines", "rowId": "line-omar-group-8", "version": 2 },
+      { "table": "bookings", "rowId": "booking-omar-group", "version": 3 },
+      { "table": "outbox_rows", "rowId": "out-omar-final-count-ok-nov07", "version": 1 }
+    ],
+    "repeated": false
+  }
+}

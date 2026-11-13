@@ -1,0 +1,86 @@
+{
+  "call": "feeDoor",
+  "given": {
+    "seeds": ["bookings-changes/seed-booking-flow-a.json"],
+    "after": ["j7-fee-owner-charge-turn.json"],
+    "now": "2026-10-24T13:00:20Z",
+    "stated": { "step": "S11-26", "gives": [] },
+    "note": "S11-26's 'Declined: one pay link goes to the customer, and Sam is told. Rosie never retries on its own.' K-14's result declined made the charge's payment failed (never retried), and C-101's job calls feeDoor chargeResult. In its commit: one new K-32 payment of purpose fee, $20, pending, naming the same fee, with its one stripe_pay_link, bound to the same yes (consent-alex-ticked-terms-haircut: README default 153); its pay_links row; Alex's line with the link by a clock row due at once, only to his own ways (his open chat, his email; never an AI, the owner or a pro), and Sam told by another. The link's url is never in this answer. Unpaid by its deadline, its clock row closes it and the fee is dropped (K-32 closePayLink), never a call. No key. The ids are examples."
+  },
+  "request": {
+    "caller": {
+      "kind": "job",
+      "turnId": null,
+      "requestId": "job-c101-fee-alex-declined-0001",
+      "businessId": "biz-lees-barbershop",
+      "personId": null,
+      "traceId": "trace-c101-fee-alex-0002"
+    },
+    "bookingId": "booking-alex-haircut",
+    "stage": {
+      "kind": "chargeResult",
+      "step": "S11-26",
+      "bookingFeeId": "fee-alex-haircut-late-cancel",
+      "paymentId": "pay-alex-haircut-late-fee",
+      "result": "declined"
+    }
+  },
+  "outcome": {
+    "bookingId": "booking-alex-haircut",
+    "stage": "chargeResult",
+    "step": "S11-26",
+    "result": "payLinkSent",
+    "messages": [
+      {
+        "to": "customer",
+        "personId": "person-alex",
+        "step": "S11-26",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-fee-alex-pay-link",
+        "openQuestionId": null
+      },
+      {
+        "to": "owner",
+        "personId": "person-sam",
+        "step": "S11-26",
+        "via": "chat",
+        "sendClass": "routine",
+        "outboxRowId": null,
+        "clockRowId": "clock-fee-alex-declined-sam",
+        "openQuestionId": null
+      }
+    ],
+    "timesOffered": [],
+    "deadline": "2026-10-27T13:00:00Z",
+    "changes": [],
+    "consentId": null,
+    "ownerOkId": null,
+    "fee": null,
+    "payment": {
+      "paymentId": "pay-alex-haircut-late-fee-link",
+      "bookingFeeId": "fee-alex-haircut-late-cancel",
+      "amount": { "cents": 2000, "currency": "USD" },
+      "effectId": "eff-alex-haircut-late-fee-link",
+      "customerPresent": false,
+      "approvedBy": { "kind": "consentRow", "consentId": "consent-alex-ticked-terms-haircut" }
+    },
+    "payLinkId": "paylink-alex-haircut-late-fee",
+    "refunds": [],
+    "effects": [{ "effectId": "eff-alex-haircut-late-fee-link", "kind": "stripe_pay_link" }],
+    "moneyWords": [
+      { "slot": "pay.failed", "table": "payments", "column": "state", "rowId": "pay-alex-haircut-late-fee" },
+      { "slot": "clock.pay", "table": "pay_links", "column": "due_at", "rowId": "paylink-alex-haircut-late-fee" }
+    ],
+    "next": "none",
+    "gives": [],
+    "written": [
+      { "table": "payments", "rowId": "pay-alex-haircut-late-fee-link", "version": 1 },
+      { "table": "pay_links", "rowId": "paylink-alex-haircut-late-fee", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-fee-alex-pay-link", "version": 1 },
+      { "table": "clock_rows", "rowId": "clock-fee-alex-declined-sam", "version": 1 }
+    ],
+    "repeated": false
+  }
+}
