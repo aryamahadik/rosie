@@ -15,15 +15,17 @@
 //    127.0.0.1), which the script trusts only through NODE_EXTRA_CA_CERTS. So it connects as it would to staging, the
 //    certificate and its name checked, and the proxy counts its connections. It also records every byte each client
 //    sends it after TLS, read as PostgreSQL's messages (T-1369's recording database client: what the server got, each
-//    ALTER ROLE's text among it). For the older server, a stand-in that speaks just enough PostgreSQL, behind the same
-//    certificate, to report server_version_num 150004;
+//    call's Parse and Bind among it), and each message the server answers (T-1371: its errors' fields). It hands the
+//    server each client message whole, after a case's hook has seen it: a hook may hold one while it changes something
+//    on the server, or send another in its place (T-1371). For the older server, a stand-in that speaks just enough
+//    PostgreSQL, behind the same certificate, to report server_version_num 150004;
 //  - every command on PATH (bash, node, sed, tr, dirname, basename) and wrangler: a recorder that writes down its
 //    arguments and environment and then runs the real one, so no child starts unseen.
 // The logins: as worker-logins.test.mjs explains, never their own names here. In the copies, rosie_worker_job,
 // rosie_worker_app, rosie_job and rosie_app become names of this run's own (t1252_<6 hex><case>_...), and staging's
 // migrations' role is a login made here (CREATEROLE, not a superuser). Every role this run makes is dropped after it.
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { generateKeyPairSync, randomBytes, sign } from "node:crypto";
 import {
   accessSync,
@@ -49,7 +51,6 @@ import { after, before, describe, it } from "node:test";
 
 import postgres from "postgres";
 
-import { scramVerifier } from "../scripts/create-staging-hyperdrive.mjs";
 import { REPO, SCRIPTS, copyScript, tempDir, write } from "./script-harness.mjs";
 
 const SCRIPT = "create-staging-hyperdrive.sh";
@@ -84,6 +85,15 @@ const COMMANDS = ["bash", "sed", "tr", "dirname", "basename"];
 const ERROR_TEXT_CUT = Number(
   /^const ERROR_TEXT_CUT = (\d+);$/m.exec(readFileSync(path.join(SCRIPTS, PROGRAM), "utf8"))?.[1],
 );
+// The temporary function that sets each password, the words its handler raises, and the call that carries the password
+// as its second bound value (T-1371), read from the script's source.
+const FUNCTION = /^const PASSWORD_FUNCTION = "([a-z_]+)";$/m.exec(
+  readFileSync(path.join(SCRIPTS, PROGRAM), "utf8"),
+)?.[1];
+const FUNCTION_FAULT = /^const FUNCTION_FAULT =\s+"([^"]+)";$/m.exec(
+  readFileSync(path.join(SCRIPTS, PROGRAM), "utf8"),
+)?.[1];
+const CALL = `select pg_temp.${String(FUNCTION)}($1, $2)`;
 
 const quote = (name) => `"${name.replaceAll('"', '""')}"`;
 const shellQuoted = (text) => `'${text.replaceAll("'", `'\\''`)}'`;
@@ -208,12 +218,30 @@ const tick = () => (clock.n += 1);
 
 /**
  * What one client sent the proxy after TLS (T-1369's recording database client): every byte, the user its startup
- * message names, and each message after it (a type byte and a length), with the clock's reading when it was whole.
+ * message names, and each message after it (a type byte and a length), with the clock's reading and the time when it
+ * was whole. Each whole message goes on through `forward`, in order, after a case's hook (shared.hook, T-1371) has seen
+ * it: the hook may hold it (it goes on when the hook is done) or give a message to send in its place. `replies` holds
+ * what the server answered, read the same way (replyReader).
  */
-function recording(secure) {
-  const session = { at: tick(), user: "", bytes: [], messages: [] };
+function recording(secure, forward) {
+  const session = { at: tick(), user: "", bytes: [], messages: [], replies: [], hookErrors: [] };
   let buffer = Buffer.alloc(0);
   let started = false;
+  let chain = Promise.resolve();
+  const pass = (raw, sent) => {
+    chain = chain.then(async () => {
+      let out = raw;
+      if (sent !== undefined && shared.hook !== undefined) {
+        try {
+          out = (await shared.hook(session, sent)) ?? raw;
+        } catch (error) {
+          session.hookErrors.push(error);
+        }
+      }
+      forward(out);
+    });
+  };
+  session.drained = () => chain;
   secure.on("data", (chunk) => {
     session.bytes.push(Buffer.from(chunk));
     buffer = Buffer.concat([buffer, chunk]);
@@ -225,74 +253,162 @@ function recording(secure) {
         for (let at = 0; at + 1 < fields.length; at += 2) {
           if (fields[at] === "user") session.user = fields[at + 1];
         }
+        pass(Buffer.from(buffer.subarray(0, size)));
         buffer = buffer.subarray(size);
         started = true;
         continue;
       }
       if (buffer.length < 5 || buffer.length < 1 + buffer.readInt32BE(1)) return;
       const size = 1 + buffer.readInt32BE(1);
-      session.messages.push({
+      const sent = {
         at: tick(),
+        time: Date.now(),
         type: String.fromCharCode(buffer[0]),
         body: Buffer.from(buffer.subarray(5, size)),
-      });
+      };
+      session.messages.push(sent);
+      pass(Buffer.from(buffer.subarray(0, size)), sent);
       buffer = buffer.subarray(size);
     }
   });
   return session;
 }
 
+/** Reads what the server sends a recorded session into its `replies`, each message with the clock and the time. */
+function replyReader(session) {
+  let buffer = Buffer.alloc(0);
+  return (chunk) => {
+    buffer = Buffer.concat([buffer, chunk]);
+    while (buffer.length >= 5 && buffer.length >= 1 + buffer.readInt32BE(1)) {
+      const size = 1 + buffer.readInt32BE(1);
+      session.replies.push({
+        at: tick(),
+        time: Date.now(),
+        type: String.fromCharCode(buffer[0]),
+        body: Buffer.from(buffer.subarray(5, size)),
+      });
+      buffer = buffer.subarray(size);
+    }
+  };
+}
+
+/** A simple Query's or an extended Parse's text, or null for any other message. */
+function textOf(sent) {
+  if (sent.type === "Q") return sent.body.toString("utf8", 0, sent.body.length - 1);
+  if (sent.type === "P") {
+    const nameEnd = sent.body.indexOf(0);
+    return sent.body.toString("utf8", nameEnd + 1, sent.body.indexOf(0, nameEnd + 1));
+  }
+  return null;
+}
+
 /** The text of each query a recorded session sent, in order: a simple Query's, or an extended Parse's. */
 function queriesOf(session) {
-  return session.messages.flatMap((message) => {
-    if (message.type === "Q") {
-      return [{ at: message.at, text: message.body.toString("utf8", 0, message.body.length - 1) }];
-    }
-    if (message.type === "P") {
-      const nameEnd = message.body.indexOf(0);
-      return [
-        {
-          at: message.at,
-          text: message.body.toString("utf8", nameEnd + 1, message.body.indexOf(0, nameEnd + 1)),
-        },
-      ];
-    }
-    return [];
+  return session.messages.flatMap((sent) => {
+    const text = textOf(sent);
+    return text === null ? [] : [{ at: sent.at, text }];
   });
 }
 
 /** Every byte a recorded session sent. */
 const bytesOf = (session) => Buffer.concat(session.bytes);
 
-// A verifier as the script sends it: 4096 iterations, a 16-byte salt, StoredKey and ServerKey of 32 bytes (base64).
-const VERIFIER = /^SCRAM-SHA-256\$4096:([A-Za-z0-9+/]{22}==)\$[A-Za-z0-9+/]{43}=:[A-Za-z0-9+/]{43}=$/;
+/** How many times a text stands in a buffer (byte for byte). */
+const countIn = (buffer, text) => buffer.toString("latin1").split(text).length - 1;
 
-/** Each ALTER ROLE the recorded sessions sent: the login it names, what it set, its session and when. */
-function altersOf(sessions) {
-  return sessions.flatMap((session) =>
-    queriesOf(session)
-      .filter((query) => /^\s*alter\s+role\b/i.test(query.text))
-      .map((query) => {
-        const parts = /^alter role "([^"]+)" password '([^']*)'$/.exec(query.text);
-        assert.ok(parts, "an ALTER ROLE not in the script's one form (its text is not shown)");
-        return { at: query.at, login: parts[1], verifier: parts[2], session };
-      }),
-  );
+/** A Bind message's portal, statement and parameter values (each a Buffer, or null). */
+function bindOf(body) {
+  let at = 0;
+  const cstringAt = () => {
+    const end = body.indexOf(0, at);
+    const text = body.toString("utf8", at, end);
+    at = end + 1;
+    return text;
+  };
+  const portal = cstringAt();
+  const statement = cstringAt();
+  at += 2 + 2 * body.readInt16BE(at);
+  const count = body.readInt16BE(at);
+  at += 2;
+  const values = [];
+  for (let n = 0; n < count; n += 1) {
+    const size = body.readInt32BE(at);
+    at += 4;
+    if (size === -1) {
+      values.push(null);
+      continue;
+    }
+    values.push(Buffer.from(body.subarray(at, at + size)));
+    at += size;
+  }
+  return { portal, statement, values };
+}
+
+/**
+ * Each call of the password function the recorded sessions sent (T-1371): its Parse, the Bind that follows it, and the
+ * login and the password, its two bound values.
+ */
+function callsOf(sessions) {
+  return sessions.flatMap((session) => {
+    const calls = [];
+    let parse = null;
+    for (const sent of session.messages) {
+      if (sent.type === "P") parse = textOf(sent) === CALL ? sent : null;
+      else if (sent.type === "Q") parse = null;
+      else if (sent.type === "B" && parse !== null) {
+        const { values } = bindOf(sent.body);
+        calls.push({
+          at: sent.at,
+          time: sent.time,
+          session,
+          parse,
+          bind: sent,
+          values,
+          login: values[0]?.toString("utf8"),
+          password: values[1]?.toString("utf8"),
+        });
+        parse = null;
+      }
+    }
+    return calls;
+  });
+}
+
+/** The fields of each ErrorResponse the server sent a recorded session, by their one-letter codes, and when. */
+function errorsOf(session) {
+  return session.replies
+    .filter((reply) => reply.type === "E")
+    .map((reply) => {
+      const fields = {};
+      let at = 0;
+      while (at < reply.body.length && reply.body[at] !== 0) {
+        const end = reply.body.indexOf(0, at + 1);
+        fields[String.fromCharCode(reply.body[at])] = reply.body.toString("utf8", at + 1, end);
+        at = end + 1;
+      }
+      return { at: reply.at, time: reply.time, fields };
+    });
 }
 
 /** The local server behind TLS: what the script connects to as staging's database. */
 function tlsProxy(context, upstream, sessions) {
   return tlsServer(context, (secure) => {
-    sessions.push(recording(secure));
     const out = net.connect(upstream.port, upstream.host);
-    secure.pipe(out);
+    const session = recording(secure, (raw) => {
+      if (!out.destroyed) out.write(raw);
+    });
+    sessions.push(session);
+    out.on("data", replyReader(session));
     out.pipe(secure);
     const close = () => {
       secure.destroy();
       out.destroy();
     };
     out.on("error", close);
-    secure.on("close", close);
+    // What the client sent before it closed reaches the server first.
+    secure.on("close", () => {
+      void session.drained().then(close);
+    });
     out.on("close", close);
   });
 }
@@ -519,8 +635,11 @@ function swapped(text, names) {
 let admin;
 let shared;
 
-/** The case's database side: the two stand-in roles, and the maker (CREATEROLE, ADMIN OPTION on both). */
-async function database(names, { setPrivilege = true, settings = {} } = {}) {
+/**
+ * The case's database side: the two stand-in roles, and the maker (CREATEROLE, ADMIN OPTION on both). `databaseName`:
+ * a database of the case's own (ownDatabase) for the maker's URL, in place of the server URL's (T-1371).
+ */
+async function database(names, { setPrivilege = true, settings = {}, databaseName } = {}) {
   for (const part of ["job", "app"]) {
     await admin.unsafe(
       `create role ${quote(names[part])} nologin nosuperuser nocreatedb nocreaterole noreplication nobypassrls`,
@@ -539,7 +658,7 @@ async function database(names, { setPrivilege = true, settings = {} } = {}) {
   for (const [setting, value] of Object.entries(settings)) {
     await admin.unsafe(`alter role ${quote(names.maker)} set ${setting} = '${value}'`);
   }
-  const database = new URL(serverUrl()).pathname.slice(1);
+  const database = databaseName ?? new URL(serverUrl()).pathname.slice(1);
   const url = `postgres://${names.maker}:${password}@127.0.0.1:${String(shared.proxyPort)}/${database}?sslmode=require`;
   return { url, password, database };
 }
@@ -989,7 +1108,7 @@ async function assertRefusedBesideStatements(t, caseName, setPrivilege, settings
   const refused = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
   assert.match(
     refused.stderr,
-    /^create-staging-hyperdrive: refused: this session would write the ALTER ROLE's text, its verifier included, to the server log or keep it: .*No password was made \(ADR-014, open question 3\)$/m,
+    /^create-staging-hyperdrive: refused: this session would write the ALTER ROLE's text, password included, to the server log or keep it: .*No password was made \(ADR-014, open question 3\)$/m,
   );
   assert.match(refused.stderr, reason);
   assert.doesNotMatch(refused.stderr, /pg_stat_statements/, `${caseName}: pg_stat_statements was named`);
@@ -998,7 +1117,7 @@ async function assertRefusedBesideStatements(t, caseName, setPrivilege, settings
   assert.equal(refused.connections, 1);
   assert.deepEqual(wranglerCalls(rig), ["hyperdrive list"]);
   await assertNoPassword(stand, rig.names, refused, caseName);
-  assert.equal(altersOf(refused.sessions).length, 0, `${caseName}: an ALTER ROLE was sent`);
+  assert.equal(callsOf(refused.sessions).length, 0, `${caseName}: a password was sent`);
   assert.equal(await shapeOf(rig.names.worker_job), null, `${caseName}: a login was made`);
 }
 
@@ -1059,6 +1178,11 @@ after(async () => {
   }
   if (admin === undefined) return;
   try {
+    // The databases a case made for itself (T-1371) go first, with any connection still open to them.
+    const databases = await admin`select datname from pg_database where starts_with(datname, ${RUN})`;
+    for (const { datname } of databases) {
+      await admin.unsafe(`drop database if exists ${quote(datname)} with (force)`);
+    }
     const roles =
       await admin`select rolname from pg_roles where starts_with(rolname, ${RUN}) order by rolname`;
     for (const { rolname } of roles) {
@@ -1068,12 +1192,15 @@ after(async () => {
     const [{ left }] =
       await admin`select count(*)::int as left from pg_roles where starts_with(rolname, ${RUN})`;
     assert.equal(left, 0, `roles of this run are left on the server (${RUN}_*)`);
+    const [{ kept }] =
+      await admin`select count(*)::int as kept from pg_database where starts_with(datname, ${RUN})`;
+    assert.equal(kept, 0, `databases of this run are left on the server (${RUN}*)`);
   } finally {
     await admin.end({ timeout: 5 });
   }
 });
 
-describe("create-staging-hyperdrive.sh makes what is missing, and each password goes only to the API's body (ALTER ROLE gets its verifier: T-1369)", () => {
+describe("create-staging-hyperdrive.sh makes what is missing, and each password goes only to PostgreSQL as one bound value of one call, and to the API's body (T-1371)", () => {
   it("with neither configuration: one connection as the migrations' role and one check as each login, both logins in their shape, each with a password only the API got, both created with caching disabled and each id printed; then a second run connects to nothing", async (t) => {
     const rig = checkout(t, "a");
     // debug_print_parse and debug_print_rewritten on for the maker: the script sets them off for its session.
@@ -1087,31 +1214,60 @@ describe("create-staging-hyperdrive.sh makes what is missing, and each password 
     });
     assert.equal(result.status, 0, result.output);
     assert.equal(result.stderr, "");
-    // One connection as the migrations' role: the session whose log settings were checked set both verifiers. Then
-    // one connection as each login, its check (T-1369), and nothing else.
+    // One connection as the migrations' role: the session whose log settings were checked set both passwords, each
+    // through one call (T-1371). Then one connection as each login, its check (T-1369), and nothing else.
     assert.equal(result.connections, 3);
     assert.deepEqual(
       result.sessions.map((session) => session.user),
       [rig.names.maker, rig.names.worker_job, rig.names.worker_app],
     );
-    const alters = altersOf(result.sessions);
+    // Each session by its place, never whole (a failing deepEqual of recorded bytes builds a diff too large to print).
+    const calls = callsOf(result.sessions);
     assert.deepEqual(
-      alters.map((alter) => [alter.login, alter.session]),
+      calls.map((call) => [call.login, result.sessions.indexOf(call.session)]),
       [
-        [rig.names.worker_job, result.sessions[0]],
-        [rig.names.worker_app, result.sessions[0]],
+        [rig.names.worker_job, 0],
+        [rig.names.worker_app, 0],
       ],
     );
+    for (const login of [rig.names.worker_job, rig.names.worker_app]) {
+      for (const line of [
+        `${login}: its transaction held plan_cache_mode force_generic_plan, lock_timeout 500 ms, below deadlock_timeout 1000 ms, and transaction_timeout 0`,
+        `${login}: its password is set (the second bound value of one call of pg_temp.${String(FUNCTION)}, never a statement's text), and its shape after the commit is its own`,
+        `${login}: a connection as it with its password answered current_user ${login}`,
+        `${login}: the kept-text count: skipped (no pg_stat_statements view is readable in this database)`,
+      ]) {
+        assert.ok(
+          result.stdout.includes(`\ncreate-staging-hyperdrive: ${line}\n`),
+          `${line}\n${result.stdout}`,
+        );
+      }
+    }
     assert.match(
       result.stdout,
-      new RegExp(
-        `^create-staging-hyperdrive: ${rig.names.worker_job}: its verifier is set, and a connection as it with its password answered current_user ${rig.names.worker_job}$`,
-        "m",
-      ),
+      /^create-staging-hyperdrive: the database: server_version_num \d+, postmaster started \d{4}-\d\d-\d\d \d\d:\d\d:\d\d(\.\d+)?[+-]\d\d(:\d\d)?, max_connections \d+$/m,
     );
     assert.match(
       result.stdout,
-      /^create-staging-hyperdrive: the database: server_version_num \d+, max_connections \d+$/m,
+      /^create-staging-hyperdrive: this session's plans and bound values: debug_print_plan off, log_parameter_max_length_on_error 0, log_statement_stats off, log_parser_stats off, log_planner_stats off, log_executor_stats off, auto_explain not loaded, no pg_stat_monitor or pg_store_plans setting$/m,
+    );
+    assert.match(
+      result.stdout,
+      /^create-staging-hyperdrive: this session's temporary function: TEMPORARY on its database yes, plpgsql usable$/m,
+    );
+    // For the record, deciding nothing: shared_preload_libraries only where the role may read it (the maker may not).
+    // password_encryption is no longer among them: since T-1371's round 2 it is set and read back (N1).
+    assert.match(
+      result.stdout,
+      /^create-staging-hyperdrive: for the record: log_min_messages \w+, log_error_verbosity \w+, log_lock_waits (on|off), deadlock_timeout 1s, log_parameter_max_length -?\d+\w*, shared_preload_libraries \(not readable\)$/m,
+    );
+    assert.match(
+      result.stdout,
+      /^create-staging-hyperdrive: this session's password_encryption: scram-sha-256 \(set to scram-sha-256 for this session, then read back\)$/m,
+    );
+    assert.match(
+      result.stdout,
+      /^create-staging-hyperdrive: this session's transaction_timeout: 0 \(each password's transaction sets it to 0, then reads it back\)$/m,
     );
     assert.match(
       result.stdout,
@@ -1160,34 +1316,29 @@ describe("create-staging-hyperdrive.sh makes what is missing, and each password 
         },
       );
       assert.match(body.origin.password, /^[0-9a-f]{64}$/);
-      // The password the API received is the one ALTER ROLE set: it logs in as that login.
+      // The password the API received is the one the call set: it logs in as that login.
       assert.equal(
         await logsIn(login, body.origin.password),
         true,
         `${login}: the API's password does not log in`,
       );
+      assert.equal(calls[index].password, body.origin.password, `${login}: the call set another password`);
     }
     assert.notEqual(passwords[0], passwords[1]);
-    // For each login in turn: its verifier set, then its check (one query, as it), then its create (T-1369).
+    // For each login in turn: its call, then its check (one query, as it), then its create (T-1369, T-1371).
     for (const [index, login] of [rig.names.worker_job, rig.names.worker_app].entries()) {
       const check = result.sessions[index + 1];
       const checked = queriesOf(check);
       assert.equal(checked.length, 1, `${login}: its check sent another query`);
       assert.match(checked[0].text, /^select current_user\b/);
       assert.ok(
-        alters[index].at < check.at && checked[0].at < stand.posts[index].at,
-        `${login}: not its verifier, then its check, then its create`,
+        calls[index].at < check.at && checked[0].at < stand.posts[index].at,
+        `${login}: not its call, then its check, then its create`,
       );
     }
-    assert.ok(stand.posts[0].at < alters[1].at, "the app login's verifier was set before the job's create");
+    assert.ok(stand.posts[0].at < calls[1].at, "the app login's password was set before the job's create");
     await assertLogins(rig.names, "the first run");
-    assertNothingLeaked(
-      rig,
-      result,
-      db,
-      [...passwords, ...alters.map((alter) => alter.verifier)],
-      "the first run",
-    );
+    assertNothingLeaked(rig, result, db, passwords, "the first run");
 
     // A second run: both exist and store their logins, so it connects to nothing and makes no password.
     const again = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
@@ -1372,7 +1523,7 @@ describe("create-staging-hyperdrive.sh refuses before any password", () => {
       const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
       assert.match(
         result.stderr,
-        /^create-staging-hyperdrive: refused: this session would write the ALTER ROLE's text, its verifier included, to the server log or keep it: .*No password was made \(ADR-014, open question 3\)$/m,
+        /^create-staging-hyperdrive: refused: this session would write the ALTER ROLE's text, password included, to the server log or keep it: .*No password was made \(ADR-014, open question 3\)$/m,
       );
       assert.match(result.stderr, reason);
       assert.equal(result.connections, 1);
@@ -1384,7 +1535,7 @@ describe("create-staging-hyperdrive.sh refuses before any password", () => {
     });
   }
 
-  it("pg_stat_statements loaded and keeping utility statements' text no longer stops the run (T-1369: what it keeps holds each verifier, never a password); every other stop rule still stops beside it; with its tracking off it runs", async (t) => {
+  it("pg_stat_statements with track top and track_utility on runs through (T-1371: top keeps only each statement the run sends, and none holds a password; with no view in the database the kept-text count is skipped); every other stop rule still stops beside it; with its tracking off it runs", async (t) => {
     // The module is not loaded on the test server: its two settings, set for the maker as placeholders, stand in, as
     // staging's are (track top, track_utility on: CQ-225's answer, DL-540).
     const rig = checkout(t, "p");
@@ -1396,35 +1547,36 @@ describe("create-staging-hyperdrive.sh refuses before any password", () => {
     assert.equal(result.status, 0, result.output);
     assert.equal(result.stderr, "");
     assert.match(result.stdout, /pg_stat_statements\.track top, pg_stat_statements\.track_utility on$/m);
-    assert.match(
-      result.stdout,
-      /^create-staging-hyperdrive: pg_stat_statements keeps utility statements' text: of each ALTER ROLE it can keep only the login's verifier, never its password \(T-1369\)$/m,
-    );
+    for (const login of [rig.names.worker_job, rig.names.worker_app]) {
+      assert.ok(
+        result.stdout.includes(
+          `\ncreate-staging-hyperdrive: ${login}: the kept-text count: skipped (no pg_stat_statements view is readable in this database)\n`,
+        ),
+        result.stdout,
+      );
+    }
     assert.equal(stand.creates().length, 2);
     assert.match(result.stdout, summary(JOB, rig.names.worker_job));
     assert.match(result.stdout, summary(APP, rig.names.worker_app));
-    // What pg_stat_statements could keep: each ALTER ROLE's text, which holds the login's verifier and no password.
+    // What track top could keep: the text of each statement the run's own connection sent, and none holds a password;
+    // each password went as the second value of its call's Bind.
     const passwords = stand.creates().map((body) => body.origin.password);
-    const alters = altersOf(result.sessions);
+    const calls = callsOf(result.sessions);
     assert.deepEqual(
-      alters.map((alter) => alter.login),
-      [rig.names.worker_job, rig.names.worker_app],
+      calls.map((call) => [call.login, call.password]),
+      [
+        [rig.names.worker_job, passwords[0]],
+        [rig.names.worker_app, passwords[1]],
+      ],
     );
-    for (const alter of alters) {
-      assert.match(alter.verifier, VERIFIER);
+    for (const query of queriesOf(result.sessions[0])) {
       assert.equal(
-        passwords.some((password) => alter.verifier.includes(password)),
+        passwords.some((password) => query.text.includes(password)),
         false,
-        "an ALTER ROLE holds a password",
+        "a statement's text holds a password",
       );
     }
-    assertNothingLeaked(
-      rig,
-      result,
-      db,
-      [...passwords, ...alters.map((alter) => alter.verifier)],
-      "pg_stat_statements",
-    );
+    assertNothingLeaked(rig, result, db, passwords, "pg_stat_statements");
 
     // Beside it, the server log's rules still stop the run before any password, and name only their own. (pgaudit's
     // case beside it is the last suite's: a pgaudit.log placeholder set here would fail the T-1271 suite's first check.)
@@ -1447,7 +1599,7 @@ describe("create-staging-hyperdrive.sh refuses before any password", () => {
     const ran = await quiet.run(quietApi, { env: { STAGING_DATABASE_URL: quietDb.url } });
     assert.equal(ran.status, 0, ran.output);
     assert.match(ran.stdout, /pg_stat_statements\.track none, pg_stat_statements\.track_utility on$/m);
-    assert.doesNotMatch(ran.stdout, /pg_stat_statements keeps utility statements' text/);
+    assert.match(ran.stdout, /: the kept-text count: skipped \(no pg_stat_statements view is readable/);
     assert.equal(quietApi.creates().length, 2);
   });
 
@@ -1856,7 +2008,7 @@ describe("create-staging-hyperdrive's names, account, npm script and wrangler's 
 describe("create-staging-hyperdrive.sh, hardened before its live run (T-1271: T-1252's security review, notes a to e, and its database review, note a)", () => {
   const source = (file) => readFileSync(path.join(REPO, file), "utf8");
   const refusedForLogging =
-    /^create-staging-hyperdrive: refused: this session would write the ALTER ROLE's text, its verifier included, to the server log or keep it: .*No password was made \(ADR-014, open question 3\)$/m;
+    /^create-staging-hyperdrive: refused: this session would write the ALTER ROLE's text, password included, to the server log or keep it: .*No password was made \(ADR-014, open question 3\)$/m;
   const triedPanic =
     /^create-staging-hyperdrive: log_min_error_statement could not be set to panic for this session \(no SET privilege on it\); its value is read next$/m;
   /** Each recorded wrangler call's value of one variable. */
@@ -1989,11 +2141,10 @@ describe("create-staging-hyperdrive.sh, hardened before its live run (T-1271: T-
     });
   }
 
-  it("pgaudit loaded with pgaudit.log none, or with classes that leave ALTER ROLE out, runs", async (t) => {
-    for (const [caseName, value] of [
-      ["gn", "none"],
-      ["gm", "READ, write, Function, misc, misc_set, -role"],
-    ]) {
+  // Since T-1371 any class but none is refused (CQ-225's ruling): the classes that leave ALTER ROLE out, this test's
+  // second case before, are refused in the T-1371 suite.
+  it("pgaudit loaded with pgaudit.log none runs", async (t) => {
+    for (const [caseName, value] of [["gn", "none"]]) {
       const rig = checkout(t, caseName);
       const db = await database(rig.names, { settings: { "pgaudit.log": value } });
       const stand = await api(rig);
@@ -2110,27 +2261,42 @@ describe("create-staging-hyperdrive.sh, hardened before its live run (T-1271: T-
     assert.match(source(`infra/scripts/${PROGRAM}`), /\n {2}env\.WRANGLER_WRITE_LOGS = "false";\n/);
   });
 
-  // The database engineer's note a.
+  // The database engineer's note a, restated for T-1371's route: the ALTER ROLE runs only inside the temporary
+  // function, and the call that runs it is followed at once by statements of the script's own, the last of them the
+  // last of its transaction.
   it("each ALTER ROLE is followed at once by one more statement of the script's own, the last of its transaction", () => {
     const lines = source(`infra/scripts/${PROGRAM}`)
       .split("\n")
       .filter((line) => !/^\s*\/\//.test(line) && line.trim() !== "");
     const alters = lines.flatMap((line, at) => (/["'`]\s*alter\s+role\b/i.test(line) ? [at] : []));
-    // Since T-1369 it sends the login's verifier, never the password.
+    // Since T-1371 no statement the script sends holds an ALTER ROLE: the function's body builds it from its
+    // parameters, inside the server.
     assert.deepEqual(
       alters.map((at) => lines[at].trim()),
-      ["await tx.unsafe(`alter role ${quoteIdent(pair.login)} password '${verifier}'`);"],
+      ["execute pg_catalog.format('alter role %I password %L', login, secret);"],
     );
-    for (const at of alters) {
+    const calls = lines.flatMap((line, at) =>
+      /\bCALL_TEXT\b/.test(line) && /\brun\(/.test(line) ? [at] : [],
+    );
+    assert.deepEqual(
+      calls.map((at) => lines[at].trim()),
+      ['await run("the call", CALL_TEXT, [pair.login, password]);'],
+    );
+    for (const at of calls) {
       assert.equal(
         lines[at + 1]?.trim(),
-        'await tx.unsafe("select pg_catalog.pg_backend_pid()::pg_catalog.text as pid");',
-        "the statement after ALTER ROLE was taken out or moved",
+        'await run("drop function", DROP_TEXT);',
+        "drop function was taken out of its place after the call",
       );
       assert.equal(
         lines[at + 2]?.trim(),
+        'await run("the follow-up or commit", "select pg_catalog.pg_backend_pid()::pg_catalog.text as pid");',
+        "the statement after the call was taken out or moved",
+      );
+      assert.equal(
+        lines[at + 3]?.trim(),
         "});",
-        "the statement after ALTER ROLE is not the last of its transaction",
+        "the statement after the call is not the last of its transaction",
       );
     }
   });
@@ -2155,143 +2321,9 @@ async function loginAnswer(login, password) {
 /** piece 1's file, its four names swapped for the case's own. */
 const loginsSql = (names) => swapped(readFileSync(path.join(SCRIPTS, "worker-logins.sql"), "utf8"), names);
 
-describe("create-staging-hyperdrive.sh sends PostgreSQL each login's SCRAM-SHA-256 verifier, never its password, and checks the login before Cloudflare stores it (T-1369; CQ-225; DL-721)", () => {
-  it("for a fixed password and salt, the script's verifier equals what PostgreSQL makes; a throwaway login given one logs in with the password, is refused 28P01 with another, and is dropped after", async () => {
-    const password = `t1369-made-up-${randomBytes(12).toString("hex")}`;
-    const theirs = `${RUN}v_postgres`;
-    const ours = `${RUN}v_script`;
-    try {
-      // PostgreSQL makes one from the password, with a salt and a count of its own.
-      await admin.begin(async (tx) => {
-        await tx.unsafe("set local password_encryption = 'scram-sha-256'");
-        await tx.unsafe(`create role ${quote(theirs)} login password '${password}'`);
-      });
-      const [made] = await admin`select rolpassword as secret from pg_authid where rolname = ${theirs}`;
-      const parts = /^SCRAM-SHA-256\$(\d+):([A-Za-z0-9+/]+=*)\$[A-Za-z0-9+/]+=*:[A-Za-z0-9+/]+=*$/.exec(
-        String(made?.secret),
-      );
-      assert.ok(parts, "PostgreSQL's own verifier is not in SCRAM-SHA-256's form");
-      const salt = Buffer.from(parts[2], "base64");
-      assert.equal(salt.length, 16);
-      // The script's, for that password, salt and count: the very same text.
-      assert.equal(scramVerifier(password, salt, Number(parts[1])), made.secret);
-      // A fresh call takes a fresh salt.
-      const fresh = scramVerifier(password);
-      assert.match(fresh, VERIFIER);
-      assert.notEqual(
-        VERIFIER.exec(fresh)?.[1],
-        VERIFIER.exec(scramVerifier(password))?.[1],
-        "two salts are the same",
-      );
-      // What it refuses to make: a password SASLprep might change, a short salt, too few iterations.
-      // A no-break space, which SASLprep maps to a space.
-      assert.throws(() => scramVerifier(`t1369 made${String.fromCharCode(0xa0)}up`), TypeError);
-      assert.throws(() => scramVerifier(password, randomBytes(8)), TypeError);
-      assert.throws(() => scramVerifier(password, salt, 4095), TypeError);
-
-      // A login given the script's verifier: stored as given; the password logs in, another is refused 28P01.
-      await admin.unsafe(`create role ${quote(ours)} login password '${fresh}'`);
-      const [stored] = await admin`select rolpassword as secret from pg_authid where rolname = ${ours}`;
-      assert.equal(stored?.secret, fresh, "PostgreSQL did not store the verifier as given");
-      assert.equal(await loginAnswer(ours, password), ours);
-      assert.equal(await loginAnswer(ours, `${password}x`), "28P01");
-      assert.equal(await loginAnswer(ours, fresh), "28P01", "the verifier logs in");
-    } finally {
-      for (const role of [theirs, ours]) await admin.unsafe(`drop role if exists ${quote(role)}`);
-    }
-    const [{ left }] =
-      await admin`select count(*)::int as left from pg_roles where rolname in (${theirs}, ${ours})`;
-    assert.equal(left, 0, "a throwaway login was left");
-  });
-
-  it("a recording database client: each ALTER ROLE holds its login's verifier and never a password, PostgreSQL stores that verifier, and it is the password's", async (t) => {
-    const rig = checkout(t, "r");
-    const db = await database(rig.names);
-    const stand = await api(rig);
-    const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
-    assert.equal(result.status, 0, result.output);
-    const passwords = stand.creates().map((body) => body.origin.password);
-    assert.equal(passwords.length, 2);
-    const alters = altersOf(result.sessions);
-    assert.deepEqual(
-      alters.map((alter) => [alter.login, alter.session.user]),
-      [
-        [rig.names.worker_job, rig.names.maker],
-        [rig.names.worker_app, rig.names.maker],
-      ],
-    );
-    for (const [index, alter] of alters.entries()) {
-      const salt = VERIFIER.exec(alter.verifier)?.[1];
-      assert.ok(salt, `${alter.login}: not a verifier in the script's form`);
-      // Stored as sent, and made from the password the API got (with the salt it carries).
-      assert.equal(await secretOf(alter.login), alter.verifier, `${alter.login}: stored otherwise`);
-      assert.equal(scramVerifier(passwords[index], Buffer.from(salt, "base64")), alter.verifier);
-      assert.equal(await loginAnswer(alter.login, passwords[index]), alter.login);
-    }
-    assert.notEqual(VERIFIER.exec(alters[0].verifier)?.[1], VERIFIER.exec(alters[1].verifier)?.[1]);
-    // No password in any query, nor in any byte any connection sent: the run's own, or either login's check.
-    for (const session of result.sessions) {
-      for (const query of queriesOf(session)) {
-        assert.equal(
-          passwords.some((password) => query.text.includes(password)),
-          false,
-          "a query holds a password",
-        );
-      }
-      for (const password of passwords) {
-        assert.equal(
-          bytesOf(session).includes(password),
-          false,
-          `${session.user}: a password reached the server`,
-        );
-      }
-    }
-    assertNothingLeaked(
-      rig,
-      result,
-      db,
-      [...passwords, ...alters.map((alter) => alter.verifier)],
-      "recorded",
-    );
-  });
-
-  it("a recording API: each password reaches its own create's body and nothing else (no other request, header or address; no output, argument, environment or file; no byte the database got)", async (t) => {
-    const rig = checkout(t, "y");
-    const db = await database(rig.names);
-    const stand = await api(rig);
-    const result = await rig.run(stand, {
-      env: { STAGING_DATABASE_URL: db.url, DATABASE_URL: db.url, ...DECOYS },
-    });
-    assert.equal(result.status, 0, result.output);
-    assert.equal(stand.posts.length, 2);
-    const passwords = stand.creates().map((body) => body.origin.password);
-    for (const [index, post] of stand.posts.entries()) {
-      // Its own password, once, as origin.password.
-      assert.equal(
-        post.text.split(passwords[index]).length - 1,
-        1,
-        `create ${String(index)}: its password not once`,
-      );
-      assert.equal(JSON.parse(post.text).origin.password, passwords[index]);
-      for (const [other, password] of passwords.entries()) {
-        if (other !== index)
-          assert.equal(post.text.includes(password), false, "a body holds another password");
-        assert.equal(post.url.includes(password), false, "an address holds a password");
-        assert.equal(post.headers.includes(password), false, "a header holds a password");
-      }
-    }
-    for (const session of result.sessions) {
-      for (const password of passwords) {
-        assert.equal(
-          bytesOf(session).includes(password),
-          false,
-          `${session.user}: a password reached the server`,
-        );
-      }
-    }
-    assertNothingLeaked(rig, result, db, passwords, "the recording API");
-  });
-
+// T-1369's verifier tests left with the verifier (T-1371; CQ-225's ruling, DL-733): QA records them in
+// tests/QUARANTINE.md. Its login check stays, and so does its test, restated for the call.
+describe("create-staging-hyperdrive.sh checks each login with its password before Cloudflare stores it (T-1369)", () => {
   it("a login check the server refuses (28P01) stops the run before the create: Cloudflare is given nothing, and the next login is not touched", async (t) => {
     const rig = checkout(t, "lc");
     const db = await database(rig.names);
@@ -2308,27 +2340,32 @@ describe("create-staging-hyperdrive.sh sends PostgreSQL each login's SCRAM-SHA-2
     assert.match(
       result.stderr,
       new RegExp(
-        `^create-staging-hyperdrive: refused: the login check of ${rig.names.worker_job} failed \\(28P01\\): .+\\. ${JOB} was not created, so Cloudflare holds no password that cannot log in\\. ${rig.names.worker_job} now holds the verifier of a password nobody has, so this is safe to repeat: the next run, finding no configuration, sets a fresh one$`,
+        `^create-staging-hyperdrive: refused: the login check of ${rig.names.worker_job} failed \\(28P01\\): .+\\. ${JOB} was not created, so Cloudflare holds no password that cannot log in\\. ${rig.names.worker_job} now holds a password nobody has, so this is safe to repeat: the next run, finding no configuration, sets a fresh one$`,
         "m",
       ),
     );
     assert.deepEqual(stand.posts, [], "the API was called");
     assert.deepEqual(wranglerCalls(rig), ["hyperdrive list", "auth token --json"]);
-    // Its verifier was set and committed, then its check ran as it and was refused, and nothing came after.
-    const alters = altersOf(result.sessions);
+    // Its password was set through its call and committed, then its check ran as it and was refused, and nothing came
+    // after.
+    const calls = callsOf(result.sessions);
     assert.deepEqual(
-      alters.map((alter) => alter.login),
+      calls.map((call) => call.login),
       [rig.names.worker_job],
     );
-    assert.equal(await secretOf(rig.names.worker_job), alters[0].verifier);
+    assert.equal(
+      (await shapeOf(rig.names.worker_job))?.has_password,
+      true,
+      "the job login holds no password",
+    );
     assert.deepEqual(
       result.sessions.map((session) => session.user),
       [rig.names.maker, rig.names.worker_job],
     );
-    assert.ok(alters[0].at < result.sessions[1].at);
+    assert.ok(calls[0].at < result.sessions[1].at);
     assert.equal((await shapeOf(rig.names.worker_app))?.has_password, false, "the next login got a password");
     assert.doesNotMatch(result.output, /[0-9a-f]{64}/, "the output holds 64 hex characters");
-    assertNothingLeaked(rig, result, db, [alters[0].verifier], "a refused login check");
+    assertNothingLeaked(rig, result, db, [calls[0].password], "a refused login check");
   });
 
   it("beside pg_stat_statements keeping utility statements' text, pgaudit naming role still stops the run before any password (its placeholder set here, after the T-1271 suite's check that none is set)", async (t) => {
@@ -2340,39 +2377,858 @@ describe("create-staging-hyperdrive.sh sends PostgreSQL each login's SCRAM-SHA-2
       /pgaudit is loaded and pgaudit\.log is role/,
     );
   });
+});
 
-  it("an ALTER ROLE the server refuses stops the run with nothing set: no check, no create, and the password is never sent in the verifier's place", async (t) => {
-    const rig = checkout(t, "ar");
+/** Both logins made by the case's maker, as a run makes them: PostgreSQL then grants each back to it WITH ADMIN. */
+async function loginsByMaker(names) {
+  await admin.begin(async (tx) => {
+    await tx.unsafe(`set local role ${quote(names.maker)}`);
+    await tx.unsafe(loginsSql(names));
+  });
+}
+
+/**
+ * Runs `during` while another session holds the login's row of pg_authid: an ALTER ROLE of it in a transaction that is
+ * rolled back once `during` is done. Returns what `during` gave.
+ */
+async function whileRowHeld(login, during) {
+  const holder = postgres(serverUrl(), { max: 1, onnotice: () => undefined, connect_timeout: 15 });
+  const done = new Error("rolled back on purpose");
+  let result;
+  try {
+    await holder.begin(async (tx) => {
+      await tx.unsafe(`alter role ${quote(login)} valid until 'infinity'`);
+      result = await during();
+      throw done;
+    });
+  } catch (error) {
+    if (error !== done) throw error;
+  } finally {
+    await holder.end({ timeout: 5 });
+  }
+  return result;
+}
+
+/**
+ * A database of the case's own (T-1371), made by the superuser from template1 and dropped after the case: its name and
+ * a superuser client on it.
+ */
+async function ownDatabase(t, rig, part) {
+  const name = `${rig.names.maker.slice(0, -"_maker".length)}_${part}`;
+  await admin.unsafe(`create database ${quote(name)}`);
+  const url = new URL(serverUrl());
+  url.pathname = `/${name}`;
+  const client = postgres(url.href, { max: 1, onnotice: () => undefined, connect_timeout: 15 });
+  t.after(async () => {
+    await client.end({ timeout: 5 });
+    await admin.unsafe(`drop database if exists ${quote(name)} with (force)`);
+  });
+  return { name, client };
+}
+
+/**
+ * rosie-pg's own log since `since` (`docker compose -f infra/docker-compose.yml logs rosie-pg`), read again for up to 5
+ * seconds until it holds `expected`; or null where the server is not that container (CI's DATABASE_URL names a
+ * service of its own, whose log no test reads).
+ */
+async function serverLog(since, expected) {
+  if (serverUrl() !== LOCAL_URL) return null;
+  const docker = program("docker");
+  for (let tries = 0; ; tries += 1) {
+    const read = spawnSync(
+      docker,
+      [
+        "compose",
+        "-f",
+        path.join(REPO, "infra", "docker-compose.yml"),
+        "logs",
+        "--no-color",
+        "--since",
+        since,
+        "rosie-pg",
+      ],
+      { encoding: "utf8", maxBuffer: 512 * 1024 * 1024 },
+    );
+    assert.equal(read.status, 0, `docker compose logs rosie-pg ended ${String(read.status)}`);
+    const text = `${read.stdout}${read.stderr}`;
+    if (text.includes(expected) || tries >= 10) return text;
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+}
+
+describe("create-staging-hyperdrive.sh gives PostgreSQL each password only as the second bound value of one call of a temporary function that runs ALTER ROLE inside the server (T-1371; CQ-225's ruling, DL-733)", () => {
+  const refusedForLogging =
+    /^create-staging-hyperdrive: refused: this session would write the ALTER ROLE's text, password included, to the server log or keep it: .*No password was made \(ADR-014, open question 3\)$/m;
+
+  /** Fails unless a run was refused at step 4: one connection, no token, no login made, no call, no create. */
+  async function assertRefusedAtStep4(rig, stand, db, result, title) {
+    assert.equal(result.status, 1, `${title}: ${result.output}`);
+    assert.equal(result.connections, 1, `${title}: its connections`);
+    assert.deepEqual(wranglerCalls(rig), ["hyperdrive list"], `${title}: its wrangler calls`);
+    assert.equal(callsOf(result.sessions).length, 0, `${title}: a password was sent`);
+    await assertNoPassword(stand, rig.names, result, title);
+    assert.equal(await shapeOf(rig.names.worker_job), null, `${title}: a login was made`);
+    assertNothingLeaked(rig, result, db, [], title);
+  }
+
+  /** The faults a step-4 refusal names: exactly one when a stop rule stands alone. */
+  const faultsNamed = (stderr) =>
+    (/keep it: (.*)\. No password was made \(ADR-014, open question 3\)$/m.exec(stderr)?.[1] ?? "").split(
+      "; ",
+    );
+
+  it("a: the route sets each password: a connection as the login with it answers current_user as that login, a wrong one gets 28P01, and every role of the case is dropped after", async (t) => {
+    const rig = checkout(t, "ra");
     const db = await database(rig.names);
-    // Both logins made by the superuser in their shape, so the maker (CREATEROLE, with no ADMIN OPTION on them) may not
-    // alter them: PostgreSQL 16 and later refuse its ALTER ROLE (42501), as a server that takes no verifier refuses it.
-    await admin.unsafe(loginsSql(rig.names));
     const stand = await api(rig);
     const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+    assert.equal(result.status, 0, result.output);
+    const passwords = stand.creates().map((body) => body.origin.password);
+    assert.equal(passwords.length, 2);
+    for (const [index, login] of [rig.names.worker_job, rig.names.worker_app].entries()) {
+      const password = passwords[index];
+      assert.equal(await loginAnswer(login, password), login, `${login}: its password does not log in`);
+      const wrong = `${password.slice(0, -1)}${password.endsWith("0") ? "1" : "0"}`;
+      assert.equal(await loginAnswer(login, wrong), "28P01", `${login}: a wrong password was taken`);
+      // Stored by the server in its own form (password_encryption), never as the text it was given.
+      const secret = String(await secretOf(login));
+      assert.match(secret, /^SCRAM-SHA-256\$/);
+      assert.equal(secret.includes(password), false, `${login}: stored as given`);
+    }
+    // Every role of the case dropped: the two logins, the two stand-in roles and the maker.
+    for (const role of [
+      rig.names.worker_job,
+      rig.names.worker_app,
+      rig.names.job,
+      rig.names.app,
+      rig.names.maker,
+    ]) {
+      await admin.unsafe(`drop owned by ${quote(role)}`);
+      await admin.unsafe(`drop role ${quote(role)}`);
+    }
+    const [{ left }] =
+      await admin`select count(*)::int as left from pg_roles where starts_with(rolname, ${`${RUN}ra_`})`;
+    assert.equal(left, 0, "a role of the case was left");
+  });
+
+  it("b and e: each password is on the run's own connection once, as the second value of one Bind after its call's Parse, and in no Parse, Query or other message; never on a login check's connection; in the stand-in API only in its own create's body; in no output, argument, environment or file; each transaction sets plan_cache_mode and lock_timeout, reads them back, then makes, calls and drops the function", async (t) => {
+    const rig = checkout(t, "rb");
+    const db = await database(rig.names);
+    const stand = await api(rig);
+    const result = await rig.run(stand, {
+      env: { STAGING_DATABASE_URL: db.url, DATABASE_URL: db.url, ...DECOYS },
+    });
+    assert.equal(result.status, 0, result.output);
+    const passwords = stand.creates().map((body) => body.origin.password);
+    assert.equal(passwords.length, 2);
+    const logins = [rig.names.worker_job, rig.names.worker_app];
+    const [own, ...checks] = result.sessions;
+    assert.deepEqual(
+      result.sessions.map((session) => session.user),
+      [rig.names.maker, ...logins],
+    );
+    // Sessions are compared by their place, never whole: a failing deepEqual of their recorded bytes would build a
+    // diff too large to print.
+    const calls = callsOf(result.sessions);
+    assert.deepEqual(
+      calls.map((call) => [call.login, result.sessions.indexOf(call.session)]),
+      logins.map((login) => [login, 0]),
+    );
+    for (const [index, password] of passwords.entries()) {
+      const call = calls[index];
+      // The run's own connection: the password's bytes once, as the second of the call's two bound values.
+      assert.equal(countIn(bytesOf(own), password), 1, `${logins[index]}: not once on the run's connection`);
+      assert.equal(call.values.length, 2);
+      assert.equal(call.password, password);
+      assert.deepEqual(
+        own.messages.flatMap((sent, at) => (sent.body.includes(password) ? [at] : [])),
+        [own.messages.indexOf(call.bind)],
+        `${logins[index]}: a message other than its call's Bind holds its password`,
+      );
+      assert.equal(textOf(call.parse), CALL);
+      // Never on a login check's connection.
+      for (const check of checks) {
+        assert.equal(bytesOf(check).includes(password), false, `${check.user}'s check: a password`);
+      }
+      // The API: its own create's body, once, as origin.password; no other body, address or header.
+      const post = stand.posts[index];
+      assert.equal(post.text.split(password).length - 1, 1, `create ${String(index)}: its password not once`);
+      assert.equal(JSON.parse(post.text).origin.password, password);
+      for (const other of stand.posts) {
+        if (other !== post)
+          assert.equal(other.text.includes(password), false, "a body holds another password");
+        assert.equal(other.url.includes(password), false, "an address holds a password");
+        assert.equal(other.headers.includes(password), false, "a header holds a password");
+      }
+    }
+    // Each password's transaction, in order: begin; the session read again; plan_cache_mode, lock_timeout and (T-1371's
+    // round 2, N2) transaction_timeout set for the transaction and read back; the function made; the call; the function
+    // dropped; one more statement; commit.
+    const texts = queriesOf(own).map((query) => query.text);
+    const begins = texts.flatMap((text, at) => (/^begin\s*$/.test(text) ? [at] : []));
+    assert.equal(begins.length, 2, "not one transaction for each password");
+    // N1: password_encryption set for the session at step 4, before the first transaction.
+    const encryption = texts.indexOf("set password_encryption = 'scram-sha-256'");
+    assert.ok(
+      encryption >= 0 && encryption < begins[0],
+      "password_encryption was not set before any password",
+    );
+    const steps = [
+      /^begin\s*$/,
+      /^select\s+pg_catalog\.current_setting\('log_statement'\) as log_statement,/,
+      /^set local plan_cache_mode = force_generic_plan$/,
+      /^set local lock_timeout = '500ms'$/,
+      /^set local transaction_timeout = 0$/,
+      /^select\s+pg_catalog\.current_setting\('plan_cache_mode'\) as plan_cache_mode,/,
+      new RegExp(
+        `^create function pg_temp\\.${String(FUNCTION)}\\(login text, secret text\\) returns void\\nlanguage plpgsql set search_path = pg_catalog as \\$body\\$\\n`,
+      ),
+      new RegExp(`^${CALL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`),
+      new RegExp(`^drop function pg_temp\\.${String(FUNCTION)}\\(text, text\\)$`),
+      /^select pg_catalog\.pg_backend_pid\(\)::pg_catalog\.text as pid$/,
+      /^commit$/,
+    ];
+    for (const at of begins) {
+      const sent = texts.slice(at, at + steps.length);
+      assert.equal(sent.length, steps.length);
+      for (const [index, step] of steps.entries()) assert.match(sent[index], step);
+    }
+    // The function's text holds no value: neither login, no password; its handler raises the script's own words.
+    const made = texts.filter((text) => text.startsWith("create function"));
+    assert.equal(made.length, 2);
+    for (const text of made) {
+      for (const value of [...passwords, ...logins]) {
+        assert.equal(text.includes(value), false, "the function's text holds a value");
+      }
+      assert.ok(
+        text.includes(
+          `\n  execute pg_catalog.format('alter role %I password %L', login, secret);\nexception\n  when others or query_canceled then\n    raise exception using errcode = sqlstate, message = '${String(FUNCTION_FAULT)}';\nend\n`,
+        ),
+        text,
+      );
+    }
+    // e: what each transaction read back, as printed.
+    for (const login of logins) {
+      assert.ok(
+        result.stdout.includes(
+          `\ncreate-staging-hyperdrive: ${login}: its transaction held plan_cache_mode force_generic_plan, lock_timeout 500 ms, below deadlock_timeout 1000 ms, and transaction_timeout 0\n`,
+        ),
+        result.stdout,
+      );
+    }
+    assertNothingLeaked(rig, result, db, passwords, "recorded");
+  });
+
+  it("c: ALTER ROLE refused inside the function (42501: the maker's ADMIN on the login revoked) or cancelled there (57014: statement_timeout while another session holds the login's row) stops the run before the login check and the create, with nothing set and no function left; no field of the server's error, no printed line and no line of rosie-pg's own log holds the password", async (t) => {
+    const since = new Date(Date.now() - 60_000).toISOString();
+    const outcomes = [];
+
+    // 42501: the logins made by the maker, then the grant that gave it ADMIN on the job login taken back.
+    const refused = checkout(t, "ca");
+    const refusedDb = await database(refused.names);
+    await loginsByMaker(refused.names);
+    await admin.unsafe(`revoke ${quote(refused.names.worker_job)} from ${quote(refused.names.maker)}`);
+    const [{ admins }] = await admin`
+      select count(*)::int as admins from pg_auth_members m
+      where m.roleid = (select oid from pg_roles where rolname = ${refused.names.worker_job})
+        and m.member = (select oid from pg_roles where rolname = ${refused.names.maker}) and m.admin_option`;
+    assert.equal(admins, 0, "the maker still holds ADMIN on the job login");
+    const refusedApi = await api(refused);
+    outcomes.push({
+      rig: refused,
+      db: refusedDb,
+      stand: refusedApi,
+      code: "42501",
+      result: await refused.run(refusedApi, { env: { STAGING_DATABASE_URL: refusedDb.url } }),
+    });
+
+    // 57014: a statement_timeout of 3 s, below the 10 s lock_timeout the script sets from a deadlock_timeout of 20 s,
+    // while another session holds the job login's row.
+    const cancelled = checkout(t, "cc");
+    const cancelledDb = await database(cancelled.names, {
+      settings: { statement_timeout: "3s", deadlock_timeout: "20s" },
+    });
+    await loginsByMaker(cancelled.names);
+    const cancelledApi = await api(cancelled);
+    outcomes.push({
+      rig: cancelled,
+      db: cancelledDb,
+      stand: cancelledApi,
+      code: "57014",
+      result: await whileRowHeld(cancelled.names.worker_job, () =>
+        cancelled.run(cancelledApi, { env: { STAGING_DATABASE_URL: cancelledDb.url } }),
+      ),
+    });
+
+    const passwords = [];
+    for (const { rig, db, stand, code, result } of outcomes) {
+      assert.equal(result.status, 1, `${code}: ${result.output}`);
+      // The line printed: the SQLSTATE and the script's own words only.
+      assert.match(
+        result.stderr,
+        new RegExp(
+          `^create-staging-hyperdrive: refused: ${rig.names.worker_job}'s password was not set \\(${code}, at the call; the server's own words are not shown\\)\\. Its transaction rolled back, so nothing was set and no function is left, and Cloudflare was given nothing\\. Nothing is tried again, and the password is never put in a statement's text$`,
+          "m",
+        ),
+      );
+      // Before the login check and the create: no connection as either login, no create, one call and no other try.
+      assert.deepEqual(stand.posts, [], `${code}: the API was called`);
+      assert.deepEqual(
+        result.sessions.map((session) => session.user),
+        [rig.names.maker],
+        `${code}: a login check ran`,
+      );
+      const [own] = result.sessions;
+      const calls = callsOf(result.sessions);
+      assert.deepEqual(
+        calls.map((call) => call.login),
+        [rig.names.worker_job],
+        `${code}: not one call`,
+      );
+      const { password } = calls[0];
+      assert.match(password, /^[0-9a-f]{64}$/);
+      passwords.push(password);
+      // Nothing set: neither login holds a password. No function left: after the call its transaction rolled back,
+      // with no drop and no commit, and no function of that name is on the server.
+      for (const login of [rig.names.worker_job, rig.names.worker_app]) {
+        assert.equal((await shapeOf(login))?.has_password, false, `${code}: ${login} holds a password`);
+      }
+      assert.deepEqual(
+        queriesOf(own)
+          .filter((query) => query.at > calls[0].at)
+          .map((query) => query.text),
+        ["rollback"],
+        `${code}: after the call`,
+      );
+      const [{ functions }] =
+        await admin`select count(*)::int as functions from pg_proc where proname = ${String(FUNCTION)}`;
+      assert.equal(functions, 0, `${code}: a function is left`);
+      // The server's error: no field of any error holds the password (without the handler, the context, W, would);
+      // the call's holds the caught SQLSTATE and the function's own words.
+      const errors = errorsOf(own);
+      for (const error of errors) {
+        for (const [field, value] of Object.entries(error.fields)) {
+          assert.equal(
+            value.includes(password),
+            false,
+            `${code}: the error's field ${field} holds the password`,
+          );
+        }
+      }
+      const raised = errors.find((error) => error.at > calls[0].at);
+      assert.ok(raised, `${code}: no error answered the call`);
+      assert.equal(raised.fields.C, code);
+      assert.equal(raised.fields.M, FUNCTION_FAULT);
+      assert.equal(result.output.includes(password), false, `${code}: a printed line holds the password`);
+      assertNothingLeaked(rig, result, db, [password], code);
+    }
+
+    // rosie-pg's own log: it holds the function's words, and neither password.
+    const log = await serverLog(since, String(FUNCTION_FAULT));
+    if (log === null) {
+      t.diagnostic("rosie-pg's own log was not read: the server is DATABASE_URL's, not the local container");
+    } else {
+      assert.ok(log.includes(String(FUNCTION_FAULT)), "rosie-pg's log does not hold the function's error");
+      for (const password of passwords) {
+        assert.equal(log.includes(password), false, "rosie-pg's own log holds a password");
+      }
+    }
+  });
+
+  it("e: a wait on the login's row inside the function is cancelled by the transaction's lock_timeout (half of deadlock_timeout: 55P03), before deadlock_timeout, after which a lock wait could be logged", async (t) => {
+    const rig = checkout(t, "le");
+    const db = await database(rig.names, { settings: { deadlock_timeout: "4s" } });
+    await loginsByMaker(rig.names);
+    const stand = await api(rig);
+    const result = await whileRowHeld(rig.names.worker_job, () =>
+      rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } }),
+    );
     assert.equal(result.status, 1, result.output);
     assert.match(
       result.stderr,
       new RegExp(
-        `^create-staging-hyperdrive: refused: ${rig.names.worker_job}'s verifier was not set \\(42501\\): .+\\. Its transaction rolled back, so no password was set and Cloudflare was given nothing; the password is never sent in the verifier's place \\(CQ-225\\), so a server that takes only a plain password \\(Neon's roles page: "Hashed passwords are not supported"\\) stops the run here$`,
+        `^create-staging-hyperdrive: refused: ${rig.names.worker_job}'s password was not set \\(55P03, at the call; `,
         "m",
       ),
     );
-    assert.deepEqual(stand.posts, [], "the API was called");
-    // One ALTER ROLE, with the verifier, and no other try; no connection as either login.
-    const alters = altersOf(result.sessions);
-    assert.deepEqual(
-      alters.map((alter) => alter.login),
-      [rig.names.worker_job],
+    const [own] = result.sessions;
+    const calls = callsOf(result.sessions);
+    assert.equal(calls.length, 1);
+    const texts = queriesOf(own).map((query) => query.text);
+    assert.ok(texts.includes("set local lock_timeout = '2000ms'"), texts.join("\n"));
+    const raised = errorsOf(own).find((error) => error.at > calls[0].at);
+    assert.equal(raised?.fields.C, "55P03");
+    assert.equal(raised?.fields.M, FUNCTION_FAULT);
+    const waited = raised.time - calls[0].time;
+    assert.ok(waited >= 1900 && waited < 4000, `the wait lasted ${String(waited)} ms`);
+    assert.deepEqual(stand.posts, []);
+    for (const login of [rig.names.worker_job, rig.names.worker_app]) {
+      assert.equal((await shapeOf(login))?.has_password, false, `${login} holds a password`);
+    }
+    assertNothingLeaked(rig, result, db, [calls[0].password], "lock_timeout");
+  });
+
+  // d: each new stop rule alone. [case, title, the maker's settings (placeholders where the test server has no such
+  // module), what the refusal names]
+  const ALONE = [
+    [
+      "da",
+      "pg_stat_statements.track all",
+      { "pg_stat_statements.track": "all" },
+      /^pg_stat_statements\.track is all \(it keeps the text of the statements a function runs/,
+    ],
+    [
+      "db",
+      "auto_explain.log_min_duration 0",
+      { "auto_explain.log_min_duration": "0" },
+      /^auto_explain\.log_min_duration is 0 \(auto_explain would log the call's plan and values\)$/,
+    ],
+    [
+      "dc",
+      "a pg_stat_monitor setting",
+      { "pg_stat_monitor.pgsm_track": "top" },
+      /^pg_stat_monitor or pg_store_plans is there \(pg_stat_monitor\.pgsm_track\)/,
+    ],
+    [
+      "dd",
+      "a pg_store_plans setting",
+      { "pg_store_plans.track": "top" },
+      /^pg_stat_monitor or pg_store_plans is there \(pg_store_plans\.track\)/,
+    ],
+    ["de", "log_statement_stats on", { log_statement_stats: "on" }, /^log_statement_stats is on \(/],
+    ["df", "log_parser_stats on", { log_parser_stats: "on" }, /^log_parser_stats is on \(/],
+    ["dg", "log_planner_stats on", { log_planner_stats: "on" }, /^log_planner_stats is on \(/],
+    ["dh", "log_executor_stats on", { log_executor_stats: "on" }, /^log_executor_stats is on \(/],
+    [
+      "di",
+      'pgaudit.log "read"',
+      { "pgaudit.log": "read" },
+      /^pgaudit is loaded and pgaudit\.log is read \(any class but none could log the call/,
+    ],
+    [
+      "dj",
+      'pgaudit.log "READ, write, Function, misc, misc_set, -role" (which T-1271 let run)',
+      { "pgaudit.log": "READ, write, Function, misc, misc_set, -role" },
+      /^pgaudit is loaded and pgaudit\.log is READ, write, Function, misc, misc_set, -role \(any class but none/,
+    ],
+    [
+      "dk",
+      "pgaudit.log_parameter on (pgaudit.log none)",
+      { "pgaudit.log": "none", "pgaudit.log_parameter": "on" },
+      /^pgaudit\.log_parameter is on \(pgaudit would log the call's bound values\)$/,
+    ],
+  ];
+  for (const [caseName, title, settings, reason] of ALONE) {
+    it(`d: ${title}, alone, stops the run before any password`, async (t) => {
+      const rig = checkout(t, caseName);
+      const db = await database(rig.names, { settings });
+      const stand = await api(rig);
+      const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+      assert.match(result.stderr, refusedForLogging);
+      const named = faultsNamed(result.stderr);
+      assert.equal(named.length, 1, `${title}: ${named.join(" | ")}`);
+      assert.match(named[0], reason);
+      await assertRefusedAtStep4(rig, stand, db, result, title);
+    });
+  }
+
+  // [case, the setting, what the script sets it to, what the proxy turns that SET into, what the refusal names: the
+  // value as current_setting shows it, with its unit]
+  for (const [caseName, setting, from, to, reason] of [
+    [
+      "dl",
+      "log_parameter_max_length_on_error",
+      "0",
+      "64",
+      /^log_parameter_max_length_on_error is 64B after this session set it to 0 \(/,
+    ],
+    ["dm", "debug_print_plan", "off", "on", /^debug_print_plan is on \(each plan is logged\)$/],
+    // T-1371's round 2 (the security reviewer's N1, DL-742).
+    [
+      "dn",
+      "password_encryption",
+      "scram-sha-256",
+      "md5",
+      /^password_encryption is md5 after this session set it to scram-sha-256 \(with md5, PostgreSQL 18 warns on the ALTER ROLE the function runs, and that warning's context names the statement, password included\)$/,
+    ],
+  ]) {
+    it(`d: ${setting} reading ${to} after the script's own SET stops the run before any password (the proxy turns that SET into ${to}, as on a server where it does not hold)`, async (t) => {
+      const rig = checkout(t, caseName);
+      const db = await database(rig.names);
+      const stand = await api(rig);
+      let turned = 0;
+      shared.hook = (session, sent) => {
+        if (session.user !== rig.names.maker || textOf(sent) !== `set ${setting} = '${from}'`)
+          return undefined;
+        turned += 1;
+        return message("Q", cstring(`set ${setting} = '${to}'`));
+      };
+      t.after(() => {
+        shared.hook = undefined;
+      });
+      const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+      shared.hook = undefined;
+      assert.equal(turned, 1, `the script's SET of ${setting} was not seen once`);
+      assert.match(result.stderr, refusedForLogging);
+      const named = faultsNamed(result.stderr);
+      assert.equal(named.length, 1, named.join(" | "));
+      assert.match(named[0], reason);
+      await assertRefusedAtStep4(rig, stand, db, result, setting);
+    });
+  }
+
+  it("N1: a refused SET of password_encryption stops the run before any password, whatever the session then reads (the proxy turns the script's SET into one the server refuses, 22023)", async (t) => {
+    const rig = checkout(t, "dr");
+    const db = await database(rig.names);
+    const stand = await api(rig);
+    let turned = 0;
+    shared.hook = (session, sent) => {
+      if (session.user !== rig.names.maker || textOf(sent) !== "set password_encryption = 'scram-sha-256'")
+        return undefined;
+      turned += 1;
+      return message("Q", cstring("set password_encryption = 't1371-not-a-method'"));
+    };
+    t.after(() => {
+      shared.hook = undefined;
+    });
+    const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+    shared.hook = undefined;
+    assert.equal(turned, 1, "the script's SET of password_encryption was not seen once");
+    assert.ok(
+      result.stderr.includes(
+        "create-staging-hyperdrive: refused: password_encryption could not be set to scram-sha-256 for this session (22023; the server's own words are not shown), so the ALTER ROLE could store, and warn on, an md5 password; no password was made\n",
+      ),
+      result.stderr,
     );
-    assert.match(alters[0].verifier, VERIFIER);
+    // The session's default is scram-sha-256 (PostgreSQL 14 and later), so only the refused SET stopped it: nothing
+    // after the SET was sent on the run's connection.
+    const texts = queriesOf(result.sessions[0]).map((query) => query.text);
+    assert.equal(texts.at(-1), "set password_encryption = 'scram-sha-256'", texts.join("\n"));
+    assert.equal(result.output.includes("t1371-not-a-method"), false, "the server's own words were shown");
+    await assertRefusedAtStep4(rig, stand, db, result, "a refused SET of password_encryption");
+  });
+
+  it("N2: inside each password's transaction transaction_timeout is set to 0 and reads 0, beside plan_cache_mode and lock_timeout, so the maker's own 3 s does not end the session while its first call is held 4 s", async (t) => {
+    const rig = checkout(t, "tz");
+    const db = await database(rig.names, { settings: { transaction_timeout: "3s" } });
+    const stand = await api(rig);
+    let held = 0;
+    // The job login's call reaches the server 4 s late: past the maker's transaction_timeout, inside its transaction.
+    shared.hook = async (session, sent) => {
+      if (session.user !== rig.names.maker || held > 0 || textOf(sent) !== CALL) return undefined;
+      held += 1;
+      await new Promise((resolve) => setTimeout(resolve, 4000));
+      return undefined;
+    };
+    t.after(() => {
+      shared.hook = undefined;
+    });
+    const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+    shared.hook = undefined;
+    assert.equal(held, 1, "the job login's call was not held");
+    assert.equal(result.status, 0, result.output);
+    assert.match(
+      result.stdout,
+      /^create-staging-hyperdrive: this session's transaction_timeout: 3s \(each password's transaction sets it to 0, then reads it back\)$/m,
+    );
+    const logins = [rig.names.worker_job, rig.names.worker_app];
+    for (const login of logins) {
+      assert.ok(
+        result.stdout.includes(
+          `\ncreate-staging-hyperdrive: ${login}: its transaction held plan_cache_mode force_generic_plan, lock_timeout 500 ms, below deadlock_timeout 1000 ms, and transaction_timeout 0\n`,
+        ),
+        result.stdout,
+      );
+    }
+    // Each transaction's SET LOCAL of transaction_timeout comes after lock_timeout's and before the read-back.
+    const texts = queriesOf(result.sessions[0]).map((query) => query.text);
+    const sets = texts.flatMap((text, at) => (text === "set local transaction_timeout = 0" ? [at] : []));
+    assert.equal(sets.length, 2, texts.join("\n"));
+    for (const at of sets) {
+      assert.match(texts[at - 1], /^set local lock_timeout = '500ms'$/);
+      assert.match(
+        texts[at + 1],
+        /^select\s+pg_catalog\.current_setting\('plan_cache_mode'\) as plan_cache_mode,/,
+      );
+    }
+    // The held call reached the server past the maker's 3 s from its transaction's begin, and both passwords log in.
+    const calls = callsOf(result.sessions);
+    assert.deepEqual(
+      calls.map((call) => call.login),
+      logins,
+    );
+    const [firstBegin] = result.sessions[0].messages.filter((sent) => /^begin\s*$/.test(textOf(sent) ?? ""));
+    const called = result.sessions[0].replies.find((reply) => reply.type === "C" && reply.at > calls[0].at);
+    assert.ok(called, "the held call was not answered");
+    assert.ok(
+      called.time - firstBegin.time > 3000,
+      `the call was answered ${String(called.time - firstBegin.time)} ms after its begin`,
+    );
+    const passwords = stand.creates().map((body) => body.origin.password);
+    for (const [index, login] of logins.entries()) {
+      assert.equal(
+        await loginAnswer(login, passwords[index]),
+        login,
+        `${login}: its password does not log in`,
+      );
+    }
+    assertNothingLeaked(rig, result, db, passwords, "transaction_timeout 0");
+  });
+
+  it("N2: a transaction_timeout that does not read 0 inside the transaction stops the run before the function is made and called, with nothing set (the proxy turns the script's SET LOCAL into 5min)", async (t) => {
+    const rig = checkout(t, "tn");
+    const db = await database(rig.names);
+    const stand = await api(rig);
+    let turned = 0;
+    shared.hook = (session, sent) => {
+      if (session.user !== rig.names.maker || textOf(sent) !== "set local transaction_timeout = 0")
+        return undefined;
+      turned += 1;
+      return message("Q", cstring("set local transaction_timeout = '5min'"));
+    };
+    t.after(() => {
+      shared.hook = undefined;
+    });
+    const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+    shared.hook = undefined;
+    assert.equal(turned, 1, "the script's SET LOCAL of transaction_timeout was not seen once");
+    assert.equal(result.status, 1, result.output);
+    assert.ok(
+      result.stderr.includes(
+        `create-staging-hyperdrive: refused: inside ${rig.names.worker_job}'s transaction plan_cache_mode reads force_generic_plan, lock_timeout 500 ms against deadlock_timeout 1000 ms, and transaction_timeout 5min (force_generic_plan; above 0 and below deadlock_timeout; and 0, or absent where step 4 found no such setting, are taken); no password was set\n`,
+      ),
+      result.stderr,
+    );
+    // Before the call: no function made, no call, and the transaction rolled back right after its read-back.
+    const texts = queriesOf(result.sessions[0]).map((query) => query.text);
+    assert.equal(callsOf(result.sessions).length, 0, "a password was sent");
+    assert.equal(
+      texts.some((text) => text.startsWith("create function")),
+      false,
+      "the function was made",
+    );
+    assert.match(
+      texts.at(-2),
+      /^select\s+pg_catalog\.current_setting\('plan_cache_mode'\) as plan_cache_mode,/,
+    );
+    assert.equal(texts.at(-1), "rollback");
+    assert.deepEqual(stand.posts, [], "the API was called");
+    assert.deepEqual(wranglerCalls(rig), ["hyperdrive list", "auth token --json"]);
     assert.deepEqual(
       result.sessions.map((session) => session.user),
       [rig.names.maker],
+      "a login check ran",
     );
     for (const login of [rig.names.worker_job, rig.names.worker_app]) {
       assert.equal((await shapeOf(login))?.has_password, false, `${login} holds a password`);
     }
-    assert.doesNotMatch(result.output, /[0-9a-f]{64}/, "the output holds 64 hex characters");
-    assertNothingLeaked(rig, result, db, [alters[0].verifier], "a refused ALTER ROLE");
+    const [{ functions }] =
+      await admin`select count(*)::int as functions from pg_proc where proname = ${String(FUNCTION)}`;
+    assert.equal(functions, 0, "a function is left");
+    assertNothingLeaked(rig, result, db, [], "transaction_timeout 5min");
+  });
+
+  it("N2: a server without transaction_timeout (the proxy hides it, as before PostgreSQL 17) is printed so, and the run goes on with no SET of it", async (t) => {
+    const rig = checkout(t, "ta");
+    const db = await database(rig.names);
+    const stand = await api(rig);
+    const probe = "pg_catalog.current_setting('transaction_timeout', true)";
+    let turned = 0;
+    shared.hook = (session, sent) => {
+      const text = textOf(sent);
+      if (session.user !== rig.names.maker || sent.type !== "Q" || !text?.includes(probe)) return undefined;
+      turned += 1;
+      return message("Q", cstring(text.replace(probe, "pg_catalog.current_setting('t1371.absent', true)")));
+    };
+    t.after(() => {
+      shared.hook = undefined;
+    });
+    const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+    shared.hook = undefined;
+    // Step 4's read, then each transaction's re-read and read-back.
+    assert.equal(turned, 5, "the reads of transaction_timeout were not each seen");
+    assert.equal(result.status, 0, result.output);
+    assert.match(
+      result.stdout,
+      /^create-staging-hyperdrive: this session's transaction_timeout: absent on this server \(it came in PostgreSQL 17\), so each password's transaction goes on without it$/m,
+    );
+    for (const login of [rig.names.worker_job, rig.names.worker_app]) {
+      assert.ok(
+        result.stdout.includes(
+          `\ncreate-staging-hyperdrive: ${login}: its transaction held plan_cache_mode force_generic_plan, lock_timeout 500 ms, below deadlock_timeout 1000 ms, and no transaction_timeout (absent on this server)\n`,
+        ),
+        result.stdout,
+      );
+    }
+    const texts = queriesOf(result.sessions[0]).map((query) => query.text);
+    assert.equal(
+      texts.some((text) => text.includes("transaction_timeout =")),
+      false,
+      "transaction_timeout was set",
+    );
+    assert.equal(stand.creates().length, 2);
+    assertNothingLeaked(
+      rig,
+      result,
+      db,
+      stand.creates().map((body) => body.origin.password),
+      "no transaction_timeout",
+    );
+  });
+
+  it("d: a database where the maker has no TEMPORARY privilege, or with no plpgsql, stops the run before any password (each a database the test makes for itself)", async (t) => {
+    for (const [caseName, part, change, reason, line] of [
+      [
+        "dt",
+        "notemp",
+        (own) => admin.unsafe(`revoke temporary on database ${quote(own.name)} from public`),
+        "this role has no TEMPORARY privilege on its database (the function lives in pg_temp)",
+        "TEMPORARY on its database no, plpgsql usable",
+      ],
+      [
+        "dp",
+        "noplpgsql",
+        (own) => own.client.unsafe("drop extension plpgsql"),
+        "plpgsql is not in its database",
+        "TEMPORARY on its database yes, plpgsql not in its database",
+      ],
+    ]) {
+      const rig = checkout(t, caseName);
+      const own = await ownDatabase(t, rig, part);
+      await change(own);
+      const db = await database(rig.names, { databaseName: own.name });
+      const stand = await api(rig);
+      const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+      assert.ok(
+        result.stdout.includes(`\ncreate-staging-hyperdrive: this session's temporary function: ${line}\n`),
+        result.stdout,
+      );
+      assert.ok(
+        result.stderr.includes(
+          `create-staging-hyperdrive: refused: this session cannot make the temporary function that sets each password: ${reason}. No password was made\n`,
+        ),
+        result.stderr,
+      );
+      await assertRefusedAtStep4(rig, stand, db, result, part);
+    }
+  });
+
+  it("d: a login whose shape changes after its password's commit (a second membership, granted by another session) stops the run before its login check and its create", async (t) => {
+    const rig = checkout(t, "ws");
+    const db = await database(rig.names);
+    const stand = await api(rig);
+    let committed = false;
+    let granted = false;
+    // The first statement after the job login's commit is held until the grant is in: it is the shape's re-read.
+    shared.hook = async (session, sent) => {
+      const text = textOf(sent);
+      if (session.user !== rig.names.maker || text === null || granted) return undefined;
+      if (text === "commit" && callsOf([session]).length > 0) committed = true;
+      else if (committed) {
+        granted = true;
+        await admin.unsafe(`grant pg_read_all_data to ${quote(rig.names.worker_job)}`);
+      }
+      return undefined;
+    };
+    t.after(() => {
+      shared.hook = undefined;
+    });
+    const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+    shared.hook = undefined;
+    assert.equal(granted, true, "the statement after the commit was not seen");
+    assert.equal(result.status, 1, result.output);
+    assert.match(
+      result.stderr,
+      new RegExp(
+        `^create-staging-hyperdrive: refused: ${rig.names.worker_job} is not in its shape after its password's commit: its memberships are pg_read_all_data \\(inherit true, set true, admin false\\), ${rig.names.job} \\(inherit true, set false, admin false\\) where its one is ${rig.names.job} \\(inherit true, set false, admin false\\)\\. ${JOB} was not created, and Cloudflare was given nothing; the login is left as it is \\(never repaired here\\)$`,
+        "m",
+      ),
+    );
+    assert.deepEqual(stand.posts, [], "the API was called");
+    assert.deepEqual(
+      result.sessions.map((session) => session.user),
+      [rig.names.maker],
+      "a login check ran",
+    );
+    const calls = callsOf(result.sessions);
+    assert.deepEqual(
+      calls.map((call) => call.login),
+      [rig.names.worker_job],
+    );
+    assert.equal((await shapeOf(rig.names.worker_job))?.has_password, true);
+    assert.equal((await shapeOf(rig.names.worker_app))?.has_password, false, "the next login got a password");
+    assertNothingLeaked(rig, result, db, [calls[0].password], "a shape changed after the commit");
+  });
+
+  it("d: a readable pg_stat_statements view (a stand-in, in a database of the test's own) whose kept texts name each login without its password prints 0 and goes on; one that keeps a text holding the password stops the run after the login check and before the create", async (t) => {
+    const quiet = checkout(t, "k0");
+    const own = await ownDatabase(t, quiet, "kept");
+    await own.client.unsafe("create table public.t1371_kept (query text not null)");
+    await own.client.unsafe(
+      "create view public.pg_stat_statements as select k.query from public.t1371_kept k",
+    );
+    await own.client.unsafe("grant select on public.pg_stat_statements to public");
+    // On each call's Bind, before it reaches the server: the text a pg_stat_statements tracking all statements would
+    // keep of the ALTER ROLE the function runs, with the password, or with other words in its place.
+    const keeping = (maker, withPassword) => async (session, sent) => {
+      if (session.user !== maker || sent.type !== "B") return undefined;
+      const call = callsOf([session]).find((each) => each.bind === sent);
+      if (call === undefined) return undefined;
+      const secret = withPassword ? call.password : "not-the-password";
+      await own.client.unsafe("insert into public.t1371_kept (query) values ($1)", [
+        `alter role ${String(call.login)} password '${String(secret)}'`,
+      ]);
+      return undefined;
+    };
+    t.after(() => {
+      shared.hook = undefined;
+    });
+
+    const quietDb = await database(quiet.names, { databaseName: own.name });
+    const quietApi = await api(quiet);
+    shared.hook = keeping(quiet.names.maker, false);
+    const ran = await quiet.run(quietApi, { env: { STAGING_DATABASE_URL: quietDb.url } });
+    shared.hook = undefined;
+    assert.equal(ran.status, 0, ran.output);
+    for (const login of [quiet.names.worker_job, quiet.names.worker_app]) {
+      assert.ok(
+        ran.stdout.includes(
+          `\ncreate-staging-hyperdrive: ${login}: kept texts in pg_stat_statements that hold its password: 0\n`,
+        ),
+        ran.stdout,
+      );
+    }
+    assert.equal(quietApi.creates().length, 2);
+
+    const rig = checkout(t, "k1");
+    const db = await database(rig.names, { databaseName: own.name });
+    const stand = await api(rig);
+    shared.hook = keeping(rig.names.maker, true);
+    const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+    shared.hook = undefined;
+    assert.equal(result.status, 1, result.output);
+    assert.ok(
+      result.stdout.includes(
+        `\ncreate-staging-hyperdrive: ${rig.names.worker_job}: kept texts in pg_stat_statements that hold its password: 1\n`,
+      ),
+      result.stdout,
+    );
+    assert.match(
+      result.stderr,
+      new RegExp(
+        `^create-staging-hyperdrive: refused: pg_stat_statements keeps 1 text\\(s\\) that hold ${rig.names.worker_job}'s password \\(none is shown\\): ${JOB} was not created, and Cloudflare was given nothing\\. This goes back to the architect and the security reviewer \\(CQ-225\\) before any other run$`,
+        "m",
+      ),
+    );
+    assert.deepEqual(stand.posts, [], "the API was called");
+    // Its login check ran before the count, and nothing after it; the count sent the login, never the password.
+    assert.deepEqual(
+      result.sessions.map((session) => session.user),
+      [rig.names.maker, rig.names.worker_job],
+    );
+    const calls = callsOf(result.sessions);
+    assert.equal(calls.length, 1);
+    assert.equal(countIn(bytesOf(result.sessions[0]), calls[0].password), 1, "the password was sent again");
+    assertNothingLeaked(rig, result, db, [calls[0].password], "a kept text holding the password");
   });
 });
