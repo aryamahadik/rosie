@@ -39,21 +39,25 @@
 //     found (names and flags, never a value) are printed; then the logging. It first tries to set, for its own session
 //     only, log_statement to none and log_min_error_statement to panic (each needs a superuser or the SET privilege on
 //     it, so a refusal there changes nothing), debug_print_parse, debug_print_rewritten and debug_print_plan off, and
-//     log_parameter_max_length_on_error to 0. Then it reads the session's values and refuses to make a password when any
-//     would write the ALTER ROLE's text or the call's bound values to the server log or keep them: log_statement other
-//     than none; log_min_error_statement other than fatal or panic (log too: QUIET_ERROR_LEVELS below);
-//     log_min_duration_statement 0 or more; log_min_duration_sample 0 or more with log_statement_sample_rate above 0;
-//     log_transaction_sample_rate above 0; debug_print_parse, debug_print_rewritten or debug_print_plan on;
-//     log_parameter_max_length_on_error other than 0, read back after its own SET; pg_stat_statements.track all (top
-//     and none go on: top keeps only the call's text, and track_utility is printed and decides nothing); anything that
-//     could record the call's plan or values: auto_explain.log_min_duration set and not -1, any pg_stat_monitor or
-//     pg_store_plans setting present (PLAN_KEEPERS below, each read with missing_ok), or log_statement_stats,
-//     log_parser_stats, log_planner_stats or log_executor_stats on; pgaudit loaded with a pgaudit.log that names any
-//     class but none (role, ddl, all and a class not known here keep T-1271's words: AUDIT_CLASSES below), or with
-//     pgaudit.log_parameter on. It also refuses without the TEMPORARY privilege on its database or without plpgsql,
-//     which the temporary function needs. Printed for the record, deciding nothing: log_min_messages,
-//     log_error_verbosity, log_lock_waits, deadlock_timeout, log_parameter_max_length, password_encryption and, where
-//     this role may read it, shared_preload_libraries (names only).
+//     log_parameter_max_length_on_error to 0; and password_encryption to scram-sha-256 (T-1371's round 2, the security
+//     reviewer's N1, DL-742), which any role may set, so a refused SET of it stops the run. Then it reads the session's
+//     values and refuses to make a password when any would write the ALTER ROLE's text or the call's bound values to
+//     the server log or keep them: log_statement other than none; log_min_error_statement other than fatal or panic
+//     (log too: QUIET_ERROR_LEVELS below); log_min_duration_statement 0 or more; log_min_duration_sample 0 or more with
+//     log_statement_sample_rate above 0; log_transaction_sample_rate above 0; debug_print_parse, debug_print_rewritten
+//     or debug_print_plan on; log_parameter_max_length_on_error other than 0, read back after its own SET;
+//     password_encryption other than scram-sha-256, read back after its own SET (with md5, PostgreSQL 18 warns on the
+//     inner ALTER ROLE, and that warning's context names the statement, password included); pg_stat_statements.track
+//     all (top and none go on: top keeps only the call's text, and track_utility is printed and decides nothing);
+//     anything that could record the call's plan or values: auto_explain.log_min_duration set and not -1, any
+//     pg_stat_monitor or pg_store_plans setting present (PLAN_KEEPERS below, each read with missing_ok), or
+//     log_statement_stats, log_parser_stats, log_planner_stats or log_executor_stats on; pgaudit loaded with a
+//     pgaudit.log that names any class but none (role, ddl, all and a class not known here keep T-1271's words:
+//     AUDIT_CLASSES below), or with pgaudit.log_parameter on. It also refuses without the TEMPORARY privilege on its
+//     database or without plpgsql, which the temporary function needs. It reads transaction_timeout with missing_ok
+//     (null on a server before PostgreSQL 17, which is printed so and goes on). Printed for the record, deciding
+//     nothing: log_min_messages, log_error_verbosity, log_lock_waits, deadlock_timeout, log_parameter_max_length and,
+//     where this role may read it, shared_preload_libraries (names only).
 //  5. The API token: the Rosfield sign-in's, from `cf.sh auth token --json` (wrangler 4.158.0's auth token command),
 //     read from that child's standard output, a pipe, and held in memory only. Only the type oauth is taken: wrangler
 //     hands back CLOUDFLARE_API_TOKEN, or a key and an email, before the sign-in, so every child's environment goes
@@ -62,10 +66,13 @@
 //     shape, or the run stops.
 //  7. For each missing configuration, in order: a fresh password, then one transaction on that connection (setPassword
 //     below): the session's backend and every setting step 4 read, read again and unchanged; `set local plan_cache_mode
-//     = force_generic_plan` (no plan holds a bound value as a constant) and `set local lock_timeout` to half of
-//     deadlock_timeout (a lock wait is cancelled before it could log a line naming the inner statement), both read
-//     back; create function pg_temp.rosie_set_login_password (FUNCTION_TEXT below, which holds no value), whose handler
-//     re-raises any error, a cancel included, with its SQLSTATE and the script's own words only; the call, the login
+//     = force_generic_plan` (no plan holds a bound value as a constant), `set local lock_timeout` to half of
+//     deadlock_timeout (a lock wait is cancelled before it could log a line naming the inner statement) and, where the
+//     server has it, `set local transaction_timeout = 0` (T-1371's round 2, the security reviewer's N2: past it,
+//     PostgreSQL 17 ends the session with a FATAL no handler traps, whose context names the inner statement), all read
+//     back (a server without transaction_timeout is printed so, and the run goes on); create function
+//     pg_temp.rosie_set_login_password (FUNCTION_TEXT below, which holds no value), whose handler re-raises any error,
+//     a cancel included, with its SQLSTATE and the script's own words only; the call, the login
 //     and the password its two bound values; drop function; and at once one more statement of its own (pg_stat_activity
 //     shows a session's most recent query until the next one); then the commit. Any error rolls back, so nothing is set
 //     and no function is left, and stops the run: the line printed holds the SQLSTATE and the script's own words, never
@@ -210,8 +217,9 @@ $body$`;
 const CALL_TEXT = `select pg_temp.${PASSWORD_FUNCTION}($1, $2)`;
 const DROP_TEXT = `drop function pg_temp.${PASSWORD_FUNCTION}(text, text)`;
 // The session's settings that decide whether a statement's text, a plan or a bound value reaches the server log or is
-// kept, whether the temporary function can be made, and its backend: read before any password, and again, unchanged,
-// inside each password's transaction. Every value is text, or null where a setting is not there (missing_ok).
+// kept, whether the temporary function can be made, whether the server has transaction_timeout (T-1371's round 2), and
+// its backend: read before any password, and again, unchanged, inside each password's transaction. Every value is
+// text, or null where a setting is not there (missing_ok).
 const SESSION_QUERY = `select
   pg_catalog.current_setting('log_statement') as log_statement,
   pg_catalog.current_setting('log_min_error_statement') as log_min_error_statement,
@@ -227,6 +235,7 @@ const SESSION_QUERY = `select
   pg_catalog.current_setting('pgaudit.log_parameter', true) as pgaudit_log_parameter,
   pg_catalog.current_setting('debug_print_plan') as debug_print_plan,
   pg_catalog.current_setting('log_parameter_max_length_on_error') as log_parameter_max_length_on_error,
+  pg_catalog.current_setting('password_encryption') as password_encryption,
   pg_catalog.current_setting('log_statement_stats') as log_statement_stats,
   pg_catalog.current_setting('log_parser_stats') as log_parser_stats,
   pg_catalog.current_setting('log_planner_stats') as log_planner_stats,
@@ -242,16 +251,17 @@ const SESSION_QUERY = `select
   pg_catalog.has_database_privilege(pg_catalog.current_database(), 'TEMPORARY')::pg_catalog.text as temporary,
   (select pg_catalog.has_language_privilege(l.oid, 'USAGE')::pg_catalog.text
      from pg_catalog.pg_language l where l.lanname = 'plpgsql') as plpgsql,
+  pg_catalog.current_setting('transaction_timeout', true) as transaction_timeout,
   pg_catalog.pg_backend_pid()::pg_catalog.text as pid`;
 // Printed for the record, deciding nothing (T-1371): each read only where this role may see it (pg_settings lists no
-// setting a role may not read), else null.
+// setting a role may not read), else null. (password_encryption left this list in T-1371's round 2: it is set and read
+// back, in SESSION_QUERY.)
 const RECORD_SETTINGS = [
   "log_min_messages",
   "log_error_verbosity",
   "log_lock_waits",
   "deadlock_timeout",
   "log_parameter_max_length",
-  "password_encryption",
   "shared_preload_libraries",
 ];
 const RECORD_QUERY = `select ${RECORD_SETTINGS.map(
@@ -259,11 +269,14 @@ const RECORD_QUERY = `select ${RECORD_SETTINGS.map(
     `(select pg_catalog.current_setting(s.name) from pg_catalog.pg_settings s where s.name = '${name}') as ${name}`,
 ).join(",\n  ")},
   (select s.setting from pg_catalog.pg_settings s where s.name = 'deadlock_timeout') as deadlock_timeout_ms`;
-// Read inside each password's transaction, after its two SET LOCALs.
+// Read inside each password's transaction, after its SET LOCALs. transaction_timeout is null on a server without it.
 const TRANSACTION_QUERY = `select
   pg_catalog.current_setting('plan_cache_mode') as plan_cache_mode,
   (select s.setting from pg_catalog.pg_settings s where s.name = 'lock_timeout') as lock_timeout_ms,
-  (select s.setting from pg_catalog.pg_settings s where s.name = 'deadlock_timeout') as deadlock_timeout_ms`;
+  (select s.setting from pg_catalog.pg_settings s where s.name = 'deadlock_timeout') as deadlock_timeout_ms,
+  pg_catalog.current_setting('transaction_timeout', true) as transaction_timeout`;
+// The SET LOCAL of transaction_timeout (T-1371's round 2, the security reviewer's N2), run only where the server has it.
+const TRANSACTION_TIMEOUT_TEXT = "set local transaction_timeout = 0";
 
 /** A run stopped on purpose: its message says why and holds no value (outside text in it was scrubbed as put in). */
 class Refusal extends Error {}
@@ -393,6 +406,12 @@ function loggingFaults(settings) {
   if (settings.log_parameter_max_length_on_error !== "0") {
     faults.push(
       `log_parameter_max_length_on_error is ${settings.log_parameter_max_length_on_error} after this session set it to 0 (an error's context would carry the call's bound values, the password among them)`,
+    );
+  }
+  // T-1371's round 2 (the security reviewer's N1, DL-742).
+  if (settings.password_encryption !== "scram-sha-256") {
+    faults.push(
+      `password_encryption is ${String(settings.password_encryption)} after this session set it to scram-sha-256 (with md5, PostgreSQL 18 warns on the ALTER ROLE the function runs, and that warning's context names the statement, password included)`,
     );
   }
   if (settings.pg_stat_statements_track === "all") {
@@ -643,10 +662,11 @@ const codeOf = (error) =>
  * Sets the login's password on the one connection, in one transaction (T-1371; CQ-225's ruling, DL-733): the password
  * reaches PostgreSQL only as the second bound value of CALL_TEXT, never in a statement's text. postgres.js keeps a
  * transaction on its one connection and never reconnects inside it, so the statements below run on one backend: first
- * that backend and every setting step 4 read, read again and unchanged (T-1369's re-read); plan_cache_mode and
- * lock_timeout set for the transaction and read back; the function made; the call; the function dropped; at once one
- * more statement; the commit. Any error rolls back: nothing is set and no function is left. The refusal holds the
- * error's code and the script's own words only, and nothing is ever tried again. Returns what the read-back gave.
+ * that backend and every setting step 4 read, read again and unchanged (T-1369's re-read); plan_cache_mode,
+ * lock_timeout and, where the server has it, transaction_timeout (0) set for the transaction and read back; the
+ * function made; the call; the function dropped; at once one more statement; the commit. Any error rolls back:
+ * nothing is set and no function is left. The refusal holds the error's code and the script's own words only, and
+ * nothing is ever tried again. Returns what the read-back gave.
  */
 async function setPassword(sql, pair, password, checked, lockMs) {
   if (!/^[0-9a-f]{64}$/.test(password)) {
@@ -682,17 +702,25 @@ async function setPassword(sql, pair, password, checked, lockMs) {
       }
       await run("set local plan_cache_mode", "set local plan_cache_mode = force_generic_plan");
       await run("set local lock_timeout", `set local lock_timeout = '${String(lockMs)}ms'`);
-      [held] = await run("the read-back of plan_cache_mode and lock_timeout", TRANSACTION_QUERY);
+      // T-1371's round 2 (the security reviewer's N2): only where step 4 found the setting, which the re-read above
+      // found unchanged; a server without it (before PostgreSQL 17) goes on without, and says so.
+      const timeoutThere = checked.transaction_timeout !== null;
+      if (timeoutThere) await run("set local transaction_timeout", TRANSACTION_TIMEOUT_TEXT);
+      [held] = await run(
+        "the read-back of plan_cache_mode, lock_timeout and transaction_timeout",
+        TRANSACTION_QUERY,
+      );
       const lock = Number(held.lock_timeout_ms);
       const deadlock = Number(held.deadlock_timeout_ms);
       if (
         held.plan_cache_mode !== "force_generic_plan" ||
         !Number.isInteger(lock) ||
         !Number.isInteger(deadlock) ||
-        !(lock > 0 && lock < deadlock)
+        !(lock > 0 && lock < deadlock) ||
+        held.transaction_timeout !== (timeoutThere ? "0" : null)
       ) {
         throw new Refusal(
-          `inside ${pair.login}'s transaction plan_cache_mode reads ${String(held.plan_cache_mode)} and lock_timeout ${String(held.lock_timeout_ms)} ms against deadlock_timeout ${String(held.deadlock_timeout_ms)} ms (force_generic_plan, and above 0 and below deadlock_timeout, are taken); no password was set`,
+          `inside ${pair.login}'s transaction plan_cache_mode reads ${String(held.plan_cache_mode)}, lock_timeout ${String(held.lock_timeout_ms)} ms against deadlock_timeout ${String(held.deadlock_timeout_ms)} ms, and transaction_timeout ${held.transaction_timeout === null ? "absent" : String(held.transaction_timeout)} (force_generic_plan; above 0 and below deadlock_timeout; and 0, or absent where step 4 found no such setting, are taken); no password was set`,
         );
       }
       await run("create function", FUNCTION_TEXT);
@@ -970,12 +998,29 @@ async function main(args) {
         );
       }
     }
+    // T-1371's round 2 (the security reviewer's N1, DL-742): password_encryption, which any role may set, set for this
+    // session and read back with the rest (loggingFaults); a refused SET stops the run here, whatever the value read.
+    try {
+      await sql.unsafe("set password_encryption = 'scram-sha-256'");
+    } catch (error) {
+      throw new Refusal(
+        `password_encryption could not be set to scram-sha-256 for this session (${codeOf(error)}; the server's own words are not shown), so the ALTER ROLE could store, and warn on, an md5 password; no password was made`,
+      );
+    }
     const [settings] = await sql.unsafe(SESSION_QUERY);
     const [record] = await sql.unsafe(RECORD_QUERY);
     note(`this session's logging: ${describeSettings(settings)}`);
     note(`this session's plans and bound values: ${describePlans(settings)}`);
     note(`this session's audit logging: ${describeAudit(settings)}`);
     note(`this session's temporary function: ${describeFunction(settings)}`);
+    note(
+      `this session's password_encryption: ${String(settings.password_encryption)} (set to scram-sha-256 for this session, then read back)`,
+    );
+    note(
+      settings.transaction_timeout === null
+        ? "this session's transaction_timeout: absent on this server (it came in PostgreSQL 17), so each password's transaction goes on without it"
+        : `this session's transaction_timeout: ${settings.transaction_timeout} (each password's transaction sets it to 0, then reads it back)`,
+    );
     note(`for the record: ${describeRecord(record)}`);
     const faults = loggingFaults(settings);
     if (faults.length > 0) {
@@ -1018,7 +1063,7 @@ async function main(args) {
       try {
         const held = await setPassword(sql, pair, secrets.password, settings, lockMs);
         note(
-          `${pair.login}: its transaction held plan_cache_mode ${String(held.plan_cache_mode)} and lock_timeout ${String(held.lock_timeout_ms)} ms, below deadlock_timeout ${String(held.deadlock_timeout_ms)} ms`,
+          `${pair.login}: its transaction held plan_cache_mode ${String(held.plan_cache_mode)}, lock_timeout ${String(held.lock_timeout_ms)} ms, below deadlock_timeout ${String(held.deadlock_timeout_ms)} ms, and ${held.transaction_timeout === null ? "no transaction_timeout (absent on this server)" : `transaction_timeout ${String(held.transaction_timeout)}`}`,
         );
         await checkShapeAfter(sql, pair);
         note(

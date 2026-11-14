@@ -1232,7 +1232,7 @@ describe("create-staging-hyperdrive.sh makes what is missing, and each password 
     );
     for (const login of [rig.names.worker_job, rig.names.worker_app]) {
       for (const line of [
-        `${login}: its transaction held plan_cache_mode force_generic_plan and lock_timeout 500 ms, below deadlock_timeout 1000 ms`,
+        `${login}: its transaction held plan_cache_mode force_generic_plan, lock_timeout 500 ms, below deadlock_timeout 1000 ms, and transaction_timeout 0`,
         `${login}: its password is set (the second bound value of one call of pg_temp.${String(FUNCTION)}, never a statement's text), and its shape after the commit is its own`,
         `${login}: a connection as it with its password answered current_user ${login}`,
         `${login}: the kept-text count: skipped (no pg_stat_statements view is readable in this database)`,
@@ -1256,9 +1256,18 @@ describe("create-staging-hyperdrive.sh makes what is missing, and each password 
       /^create-staging-hyperdrive: this session's temporary function: TEMPORARY on its database yes, plpgsql usable$/m,
     );
     // For the record, deciding nothing: shared_preload_libraries only where the role may read it (the maker may not).
+    // password_encryption is no longer among them: since T-1371's round 2 it is set and read back (N1).
     assert.match(
       result.stdout,
-      /^create-staging-hyperdrive: for the record: log_min_messages \w+, log_error_verbosity \w+, log_lock_waits (on|off), deadlock_timeout 1s, log_parameter_max_length -?\d+\w*, password_encryption [\w-]+, shared_preload_libraries \(not readable\)$/m,
+      /^create-staging-hyperdrive: for the record: log_min_messages \w+, log_error_verbosity \w+, log_lock_waits (on|off), deadlock_timeout 1s, log_parameter_max_length -?\d+\w*, shared_preload_libraries \(not readable\)$/m,
+    );
+    assert.match(
+      result.stdout,
+      /^create-staging-hyperdrive: this session's password_encryption: scram-sha-256 \(set to scram-sha-256 for this session, then read back\)$/m,
+    );
+    assert.match(
+      result.stdout,
+      /^create-staging-hyperdrive: this session's transaction_timeout: 0 \(each password's transaction sets it to 0, then reads it back\)$/m,
     );
     assert.match(
       result.stdout,
@@ -2552,16 +2561,24 @@ describe("create-staging-hyperdrive.sh gives PostgreSQL each password only as th
         assert.equal(other.headers.includes(password), false, "a header holds a password");
       }
     }
-    // Each password's transaction, in order: begin; the session read again; plan_cache_mode and lock_timeout set
-    // for the transaction and read back; the function made; the call; the function dropped; one more statement; commit.
+    // Each password's transaction, in order: begin; the session read again; plan_cache_mode, lock_timeout and (T-1371's
+    // round 2, N2) transaction_timeout set for the transaction and read back; the function made; the call; the function
+    // dropped; one more statement; commit.
     const texts = queriesOf(own).map((query) => query.text);
     const begins = texts.flatMap((text, at) => (/^begin\s*$/.test(text) ? [at] : []));
     assert.equal(begins.length, 2, "not one transaction for each password");
+    // N1: password_encryption set for the session at step 4, before the first transaction.
+    const encryption = texts.indexOf("set password_encryption = 'scram-sha-256'");
+    assert.ok(
+      encryption >= 0 && encryption < begins[0],
+      "password_encryption was not set before any password",
+    );
     const steps = [
       /^begin\s*$/,
       /^select\s+pg_catalog\.current_setting\('log_statement'\) as log_statement,/,
       /^set local plan_cache_mode = force_generic_plan$/,
       /^set local lock_timeout = '500ms'$/,
+      /^set local transaction_timeout = 0$/,
       /^select\s+pg_catalog\.current_setting\('plan_cache_mode'\) as plan_cache_mode,/,
       new RegExp(
         `^create function pg_temp\\.${String(FUNCTION)}\\(login text, secret text\\) returns void\\nlanguage plpgsql set search_path = pg_catalog as \\$body\\$\\n`,
@@ -2594,7 +2611,7 @@ describe("create-staging-hyperdrive.sh gives PostgreSQL each password only as th
     for (const login of logins) {
       assert.ok(
         result.stdout.includes(
-          `\ncreate-staging-hyperdrive: ${login}: its transaction held plan_cache_mode force_generic_plan and lock_timeout 500 ms, below deadlock_timeout 1000 ms\n`,
+          `\ncreate-staging-hyperdrive: ${login}: its transaction held plan_cache_mode force_generic_plan, lock_timeout 500 ms, below deadlock_timeout 1000 ms, and transaction_timeout 0\n`,
         ),
         result.stdout,
       );
@@ -2826,6 +2843,14 @@ describe("create-staging-hyperdrive.sh gives PostgreSQL each password only as th
       /^log_parameter_max_length_on_error is 64B after this session set it to 0 \(/,
     ],
     ["dm", "debug_print_plan", "off", "on", /^debug_print_plan is on \(each plan is logged\)$/],
+    // T-1371's round 2 (the security reviewer's N1, DL-742).
+    [
+      "dn",
+      "password_encryption",
+      "scram-sha-256",
+      "md5",
+      /^password_encryption is md5 after this session set it to scram-sha-256 \(with md5, PostgreSQL 18 warns on the ALTER ROLE the function runs, and that warning's context names the statement, password included\)$/,
+    ],
   ]) {
     it(`d: ${setting} reading ${to} after the script's own SET stops the run before any password (the proxy turns that SET into ${to}, as on a server where it does not hold)`, async (t) => {
       const rig = checkout(t, caseName);
@@ -2851,6 +2876,205 @@ describe("create-staging-hyperdrive.sh gives PostgreSQL each password only as th
       await assertRefusedAtStep4(rig, stand, db, result, setting);
     });
   }
+
+  it("N1: a refused SET of password_encryption stops the run before any password, whatever the session then reads (the proxy turns the script's SET into one the server refuses, 22023)", async (t) => {
+    const rig = checkout(t, "dr");
+    const db = await database(rig.names);
+    const stand = await api(rig);
+    let turned = 0;
+    shared.hook = (session, sent) => {
+      if (session.user !== rig.names.maker || textOf(sent) !== "set password_encryption = 'scram-sha-256'")
+        return undefined;
+      turned += 1;
+      return message("Q", cstring("set password_encryption = 't1371-not-a-method'"));
+    };
+    t.after(() => {
+      shared.hook = undefined;
+    });
+    const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+    shared.hook = undefined;
+    assert.equal(turned, 1, "the script's SET of password_encryption was not seen once");
+    assert.ok(
+      result.stderr.includes(
+        "create-staging-hyperdrive: refused: password_encryption could not be set to scram-sha-256 for this session (22023; the server's own words are not shown), so the ALTER ROLE could store, and warn on, an md5 password; no password was made\n",
+      ),
+      result.stderr,
+    );
+    // The session's default is scram-sha-256 (PostgreSQL 14 and later), so only the refused SET stopped it: nothing
+    // after the SET was sent on the run's connection.
+    const texts = queriesOf(result.sessions[0]).map((query) => query.text);
+    assert.equal(texts.at(-1), "set password_encryption = 'scram-sha-256'", texts.join("\n"));
+    assert.equal(result.output.includes("t1371-not-a-method"), false, "the server's own words were shown");
+    await assertRefusedAtStep4(rig, stand, db, result, "a refused SET of password_encryption");
+  });
+
+  it("N2: inside each password's transaction transaction_timeout is set to 0 and reads 0, beside plan_cache_mode and lock_timeout, so the maker's own 3 s does not end the session while its first call is held 4 s", async (t) => {
+    const rig = checkout(t, "tz");
+    const db = await database(rig.names, { settings: { transaction_timeout: "3s" } });
+    const stand = await api(rig);
+    let held = 0;
+    // The job login's call reaches the server 4 s late: past the maker's transaction_timeout, inside its transaction.
+    shared.hook = async (session, sent) => {
+      if (session.user !== rig.names.maker || held > 0 || textOf(sent) !== CALL) return undefined;
+      held += 1;
+      await new Promise((resolve) => setTimeout(resolve, 4000));
+      return undefined;
+    };
+    t.after(() => {
+      shared.hook = undefined;
+    });
+    const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+    shared.hook = undefined;
+    assert.equal(held, 1, "the job login's call was not held");
+    assert.equal(result.status, 0, result.output);
+    assert.match(
+      result.stdout,
+      /^create-staging-hyperdrive: this session's transaction_timeout: 3s \(each password's transaction sets it to 0, then reads it back\)$/m,
+    );
+    const logins = [rig.names.worker_job, rig.names.worker_app];
+    for (const login of logins) {
+      assert.ok(
+        result.stdout.includes(
+          `\ncreate-staging-hyperdrive: ${login}: its transaction held plan_cache_mode force_generic_plan, lock_timeout 500 ms, below deadlock_timeout 1000 ms, and transaction_timeout 0\n`,
+        ),
+        result.stdout,
+      );
+    }
+    // Each transaction's SET LOCAL of transaction_timeout comes after lock_timeout's and before the read-back.
+    const texts = queriesOf(result.sessions[0]).map((query) => query.text);
+    const sets = texts.flatMap((text, at) => (text === "set local transaction_timeout = 0" ? [at] : []));
+    assert.equal(sets.length, 2, texts.join("\n"));
+    for (const at of sets) {
+      assert.match(texts[at - 1], /^set local lock_timeout = '500ms'$/);
+      assert.match(
+        texts[at + 1],
+        /^select\s+pg_catalog\.current_setting\('plan_cache_mode'\) as plan_cache_mode,/,
+      );
+    }
+    // The held call reached the server past the maker's 3 s from its transaction's begin, and both passwords log in.
+    const calls = callsOf(result.sessions);
+    assert.deepEqual(
+      calls.map((call) => call.login),
+      logins,
+    );
+    const [firstBegin] = result.sessions[0].messages.filter((sent) => /^begin\s*$/.test(textOf(sent) ?? ""));
+    const called = result.sessions[0].replies.find((reply) => reply.type === "C" && reply.at > calls[0].at);
+    assert.ok(called, "the held call was not answered");
+    assert.ok(
+      called.time - firstBegin.time > 3000,
+      `the call was answered ${String(called.time - firstBegin.time)} ms after its begin`,
+    );
+    const passwords = stand.creates().map((body) => body.origin.password);
+    for (const [index, login] of logins.entries()) {
+      assert.equal(
+        await loginAnswer(login, passwords[index]),
+        login,
+        `${login}: its password does not log in`,
+      );
+    }
+    assertNothingLeaked(rig, result, db, passwords, "transaction_timeout 0");
+  });
+
+  it("N2: a transaction_timeout that does not read 0 inside the transaction stops the run before the function is made and called, with nothing set (the proxy turns the script's SET LOCAL into 5min)", async (t) => {
+    const rig = checkout(t, "tn");
+    const db = await database(rig.names);
+    const stand = await api(rig);
+    let turned = 0;
+    shared.hook = (session, sent) => {
+      if (session.user !== rig.names.maker || textOf(sent) !== "set local transaction_timeout = 0")
+        return undefined;
+      turned += 1;
+      return message("Q", cstring("set local transaction_timeout = '5min'"));
+    };
+    t.after(() => {
+      shared.hook = undefined;
+    });
+    const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+    shared.hook = undefined;
+    assert.equal(turned, 1, "the script's SET LOCAL of transaction_timeout was not seen once");
+    assert.equal(result.status, 1, result.output);
+    assert.ok(
+      result.stderr.includes(
+        `create-staging-hyperdrive: refused: inside ${rig.names.worker_job}'s transaction plan_cache_mode reads force_generic_plan, lock_timeout 500 ms against deadlock_timeout 1000 ms, and transaction_timeout 5min (force_generic_plan; above 0 and below deadlock_timeout; and 0, or absent where step 4 found no such setting, are taken); no password was set\n`,
+      ),
+      result.stderr,
+    );
+    // Before the call: no function made, no call, and the transaction rolled back right after its read-back.
+    const texts = queriesOf(result.sessions[0]).map((query) => query.text);
+    assert.equal(callsOf(result.sessions).length, 0, "a password was sent");
+    assert.equal(
+      texts.some((text) => text.startsWith("create function")),
+      false,
+      "the function was made",
+    );
+    assert.match(
+      texts.at(-2),
+      /^select\s+pg_catalog\.current_setting\('plan_cache_mode'\) as plan_cache_mode,/,
+    );
+    assert.equal(texts.at(-1), "rollback");
+    assert.deepEqual(stand.posts, [], "the API was called");
+    assert.deepEqual(wranglerCalls(rig), ["hyperdrive list", "auth token --json"]);
+    assert.deepEqual(
+      result.sessions.map((session) => session.user),
+      [rig.names.maker],
+      "a login check ran",
+    );
+    for (const login of [rig.names.worker_job, rig.names.worker_app]) {
+      assert.equal((await shapeOf(login))?.has_password, false, `${login} holds a password`);
+    }
+    const [{ functions }] =
+      await admin`select count(*)::int as functions from pg_proc where proname = ${String(FUNCTION)}`;
+    assert.equal(functions, 0, "a function is left");
+    assertNothingLeaked(rig, result, db, [], "transaction_timeout 5min");
+  });
+
+  it("N2: a server without transaction_timeout (the proxy hides it, as before PostgreSQL 17) is printed so, and the run goes on with no SET of it", async (t) => {
+    const rig = checkout(t, "ta");
+    const db = await database(rig.names);
+    const stand = await api(rig);
+    const probe = "pg_catalog.current_setting('transaction_timeout', true)";
+    let turned = 0;
+    shared.hook = (session, sent) => {
+      const text = textOf(sent);
+      if (session.user !== rig.names.maker || sent.type !== "Q" || !text?.includes(probe)) return undefined;
+      turned += 1;
+      return message("Q", cstring(text.replace(probe, "pg_catalog.current_setting('t1371.absent', true)")));
+    };
+    t.after(() => {
+      shared.hook = undefined;
+    });
+    const result = await rig.run(stand, { env: { STAGING_DATABASE_URL: db.url } });
+    shared.hook = undefined;
+    // Step 4's read, then each transaction's re-read and read-back.
+    assert.equal(turned, 5, "the reads of transaction_timeout were not each seen");
+    assert.equal(result.status, 0, result.output);
+    assert.match(
+      result.stdout,
+      /^create-staging-hyperdrive: this session's transaction_timeout: absent on this server \(it came in PostgreSQL 17\), so each password's transaction goes on without it$/m,
+    );
+    for (const login of [rig.names.worker_job, rig.names.worker_app]) {
+      assert.ok(
+        result.stdout.includes(
+          `\ncreate-staging-hyperdrive: ${login}: its transaction held plan_cache_mode force_generic_plan, lock_timeout 500 ms, below deadlock_timeout 1000 ms, and no transaction_timeout (absent on this server)\n`,
+        ),
+        result.stdout,
+      );
+    }
+    const texts = queriesOf(result.sessions[0]).map((query) => query.text);
+    assert.equal(
+      texts.some((text) => text.includes("transaction_timeout =")),
+      false,
+      "transaction_timeout was set",
+    );
+    assert.equal(stand.creates().length, 2);
+    assertNothingLeaked(
+      rig,
+      result,
+      db,
+      stand.creates().map((body) => body.origin.password),
+      "no transaction_timeout",
+    );
+  });
 
   it("d: a database where the maker has no TEMPORARY privilege, or with no plpgsql, stops the run before any password (each a database the test makes for itself)", async (t) => {
     for (const [caseName, part, change, reason, line] of [
