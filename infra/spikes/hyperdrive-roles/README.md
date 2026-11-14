@@ -60,7 +60,9 @@ In order (each refusal exits 1 before anything after it starts):
 4. `cf.sh dev --env staging --remote --ip 127.0.0.1 --port=<port> --var PROBE_TOKEN:<a random token>` with `CF_BUILD_DIR` set to that folder, in its own process group. `/ready` must show both bindings within 120 s; then `/probe` once.
 5. The session is stopped, the serving version read again (it must be the one from before), and the folder removed. The folder is removed and the session stopped on failure too, Ctrl-C included.
 
-No child gets `STAGING_DATABASE_URL`, `DATABASE_URL`, `CLOUDFLARE_API_TOKEN`, a Cloudflare key or email (wrangler would take those before the sign-in), and wrangler writes no log file (`WRANGLER_WRITE_LOGS=false`). The run's token is in the session's arguments (as the spike's was) and in each request's header, in no environment, and never printed.
+No child gets `STAGING_DATABASE_URL`, `DATABASE_URL`, `CLOUDFLARE_API_TOKEN`, a Cloudflare key or email (wrangler would take those before the sign-in), and wrangler writes no log file (`WRANGLER_WRITE_LOGS=false`). The run's token is in the session's arguments (as the spike's was) and in each request's header, in no environment, and never printed; wrangler's own output, which may list it, goes only to the session's log in the temporary folder, shown after a failure with the token, the hosts and the other users taken out.
+
+A remote dev session may keep the deployed Worker's vars and secrets inside the preview (the spike's README, "Why the deployed rosie-staging Worker is not touched"). `worker.mjs` reads only `HYPERDRIVE_JOB`, `HYPERDRIVE_APP` and `PROBE_TOKEN` from its environment and returns none of their values (`/ready` says only whether each binding is there), so no other var or secret is read, logged or sent back.
 
 ## What it prints
 
