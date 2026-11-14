@@ -2,12 +2,15 @@
 //
 // The receipt path calls it: a delivery receipt (K-06 delivered.json) goes from the gateway to the dispatcher's receipt
 // handler (runtime/src/dispatch `handleDeliveryReceipt`), which marks the part delivered through K-05 markPart and hands
-// each part it newly marked to clock arming, once (`ClockArming.partDelivered`). `clockArming(options)` is that
-// ClockArming; D-017 joins it. For the row's first delivery (markPart's `firstDelivery`) of a row that asks a question:
+// each part it newly marked to clock arming (`ClockArming.partDelivered`). It hands a receipt that repeats the row's
+// first delivery on again, as that first delivery at its stored time (K-05 v1.9 item 48; T-1228), so one part can be
+// handed on more than once: step 1 keeps its clock armed once. `clockArming(options)` is that ClockArming; D-017 joins
+// it. For the row's first delivery (markPart's `firstDelivery`) of a row that asks a question:
 //
 //   1. This isolate's memory, keyed by the message part (<row>/<part>/<try>): a second receipt for a part already armed
 //      makes no call, and two receipts for one part at once share one arming. Across isolates, K-05 armClock's own repeat
-//      answer: a later receipt never moves the row, and a repeat returns the first arming.
+//      answer: a later receipt never moves the row, and a repeat returns the first arming. An arming that ended failed is
+//      not remembered, so the receipt sent again arms anew.
 //   2. The question's facts (a port: the Clock line as it applies, the visit's start and flow, the business's zone, a
 //      flow B visit address and its zone, its never-delivered row).
 //   3. The zone (./due.ts `zoneFor`): flow A the business's; flow B the visit address's, as stored with the visit or else
@@ -28,7 +31,17 @@
 // never_delivered), which the commit that opens the question makes armed at that time (K-05 clockNew with `due`; armClock
 // cannot arm it, since armClock also opens the question). No commit writes that row yet: the action layer's join.
 //
-// Never throws. Never logged, put in a span or returned: the due time, the zone, the Clock line's words, an address.
+// `armAtDelivery` never throws: its report says how the arming ended. `clockArming`'s partDelivered rejects
+// (`ArmingNotDone`) when the arming ended failed: a call that answered transient, or not at all, to its last try, an
+// answer it cannot read, or a read the arming needs that threw (T-1244). The receipt is then not done: the dispatcher's
+// receipt handler rejects, the gateway answers the provider 503, and the provider sends the receipt again (Linq retries
+// for 30 minutes: arch 02 line 109), a repeat of the row's first delivery that comes back here and arms the clock once.
+// Every other end resolves, since the receipt sent again could not change it: armed (also when the never-delivered row's
+// cancel or the actor's sync then failed: a repeat would find the clock armed and do neither, and the minute sweep fires
+// a row its actor missed), repeated, closed, not found, refused, or no clock to arm (not the row's first delivery, or no
+// question).
+//
+// Never logged, put in a span or returned: the due time, the zone, the Clock line's words, an address.
 
 import { isLabel, type LogContext, type Outcome, type SpanFacts, type TraceContext } from "../trace";
 import type { RowRef } from "../trace/types";
@@ -53,23 +66,41 @@ export const ARMING_TRIES = 3;
 export const PART_MEMORY = 1024;
 
 /**
- * One part newly marked delivered, as the dispatcher's receipt handler hands it on (runtime/src/dispatch `PartDelivered`,
- * from K-05 markPart's answer and the receipt's time).
+ * One part as the dispatcher's receipt handler hands it on (runtime/src/dispatch `PartDelivered`, from K-05 markPart's
+ * answer and the receipt's time): newly marked delivered, or a repeat of the row's first delivery (T-1228).
  */
 export interface DeliveredPart {
   outboxRowId: string;
   partNo: 1 | 2;
   tryNo: number;
-  /** K-05 markPart: true on the row's first delivery receipt, when the question's clock arms (arch 02 line 127). */
+  /**
+   * K-05 markPart: true on the row's first delivery receipt, when the question's clock arms (arch 02 line 127), and on a
+   * repeat of it that the dispatcher hands on (K-05 v1.9 item 48).
+   */
   firstDelivery: boolean;
   openQuestionId: string | null;
-  /** When the receipt says it was delivered (K-06 `status.at`), UTC. */
+  /** When the receipt says it was delivered (K-06 `status.at`), UTC; for a repeat, the first delivery's stored time. */
   deliveredAt: string;
 }
 
-/** The receipt path's door to clock arming: the same shape as the dispatcher's ClockArming. */
+/**
+ * The receipt path's door to clock arming: the same shape as the dispatcher's ClockArming. Its partDelivered rejects
+ * when the arming is not done (the file's header).
+ */
 export interface ClockArmingPort {
   partDelivered(delivered: DeliveredPart): Promise<void>;
+}
+
+/**
+ * The arming of a part handed on ended failed (T-1244): the receipt is not done, so the receipt path's port rejects with
+ * this and the provider is answered 503. Its message is fixed, with no id, time or code in it (the clockArmed span holds
+ * the code), and the gateway logs its name alone.
+ */
+export class ArmingNotDone extends Error {
+  constructor() {
+    super("the clock arming of a delivered part ended failed");
+    this.name = "ArmingNotDone";
+  }
 }
 
 interface Remembered {
@@ -424,8 +455,8 @@ function logLine(options: ArmingOptions, report: ArmReport): void {
 }
 
 /**
- * Arms the question's clock row for one part newly marked delivered (the file's header) and says how it ended. Never
- * throws.
+ * Arms the question's clock row for one part handed on (the file's header) and says how it ended. Never throws: a failed
+ * end is in the report, and `clockArming` rejects for it.
  */
 export async function armAtDelivery(part: DeliveredPart, options: ArmingOptions): Promise<ArmReport> {
   const timer = options.trace?.start("clockArmed");
@@ -454,11 +485,16 @@ export async function armAtDelivery(part: DeliveredPart, options: ArmingOptions)
   return report;
 }
 
-/** The receipt path's ClockArming (runtime/src/dispatch ReceiptDeps.clockArming), joined at D-017. */
+/**
+ * The receipt path's ClockArming (runtime/src/dispatch ReceiptDeps.clockArming), joined at D-017: resolves once the
+ * arming ended any way but failed, and rejects with ArmingNotDone when it ended failed, so the receipt is answered 503
+ * and the provider's retry arms the clock (T-1244; the file's header).
+ */
 export function clockArming(options: ArmingOptions): ClockArmingPort {
   return {
     async partDelivered(delivered) {
-      await armAtDelivery(delivered, options);
+      const report = await armAtDelivery(delivered, options);
+      if (report.outcome === "failed") throw new ArmingNotDone();
     },
   };
 }

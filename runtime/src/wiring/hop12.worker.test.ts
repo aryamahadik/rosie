@@ -150,7 +150,11 @@ function webhookRequest(webhook: SignedWebhook): Request {
   });
 }
 
-/** The root for "test", every joined port fed its double, the Linq send (T-563) and the retry queue among them. */
+/**
+ * The root for "test", every joined port fed its double, the Linq send (T-563) and the retry queue among them, and hop
+ * 13's arming (T-564), so a delivery receipt's arming arms and the receipt is answered 200: one whose arming fails is
+ * answered 503 (T-1244).
+ */
 function testRoot(fakes: SkeletonFakes, actors: HandleActors<DurableObjectId>): Root {
   return composeRoot({
     environment: "test",
@@ -177,6 +181,7 @@ function testRoot(fakes: SkeletonFakes, actors: HandleActors<DurableObjectId>): 
     // the retry queue.
     linqSendCall: fakes.linq.call,
     retryQueue: fakes.retryQueue,
+    armingCalls: fakes.arming.calls,
     flags: fakeFlags([SKELETON_FLAG]),
   });
 }

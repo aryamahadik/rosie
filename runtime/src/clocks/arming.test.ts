@@ -2,7 +2,8 @@
 // visit address's zone from the geo port, K-17; CQ-08), the never-delivered row cancelled once delivered, a question
 // closed before its receipt, transient answers, an actor it cannot reach, an input it cannot use, the clockArmed span and
 // what never reaches a log line, and the receipt path's join: the dispatcher's own receipt handler with this arming as
-// its ClockArming. Doubles: ./arming-support.ts. Test values only (rule 9).
+// its ClockArming, whose partDelivered rejects when the arming ended failed and resolves on every other end (T-1244).
+// Doubles: ./arming-support.ts. Test values only (rule 9).
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import activeBundle from "../../../contracts/data-access/fixtures/active-bundle.json";
@@ -13,7 +14,15 @@ import { handleDeliveryReceipt } from "../dispatch";
 import type { ClockArming, MarkPartRequest, OutboxStore } from "../dispatch/types";
 import { openTrace, type Span, type TraceContext } from "../trace";
 import { schemaErrors } from "../trace/test-support";
-import { armAtDelivery, clockArming, type DeliveredPart } from "./arming";
+import {
+  armAtDelivery,
+  ARMING_TRIES,
+  ArmingMemory,
+  ArmingNotDone,
+  clockArming,
+  type ArmingOptions,
+  type DeliveredPart,
+} from "./arming";
 import {
   A7_03_ARM_REQUEST,
   A7_03_CLOCK_ROW,
@@ -437,4 +446,173 @@ describe("the receipt path's join: the dispatcher's receipt handler with this ar
       ["clockArmed", trace.traceId],
     ]);
   });
+
+  it("an arming that ends failed rejects the receipt with ArmingNotDone after its part is marked (the root answers Linq 503)", async () => {
+    const wired = wireArming();
+    wired.data.armScript.push(TRANSIENT, TRANSIENT, TRANSIENT);
+    const { trace, spans } = receiptTrace();
+    const marks: MarkPartRequest[] = [];
+    const store: Pick<OutboxStore, "markPart"> = {
+      markPart(request) {
+        marks.push(request);
+        return Promise.resolve(markA703Delivered.outcome as Awaited<ReturnType<OutboxStore["markPart"]>>);
+      },
+    };
+
+    await expect(
+      handleDeliveryReceipt(
+        { store: store as OutboxStore, clockArming: clockArming({ ...wired.options, trace }), trace },
+        {
+          providerMessageId: markA703Delivered.request.providerMessageId,
+          partKey: markA703Delivered.request.idempotencyKey,
+          at: markA703Delivered.request.at,
+        },
+      ),
+    ).rejects.toThrow(ArmingNotDone);
+    expect(marks).toHaveLength(1);
+    expect(wired.data.rowOf(A7_03_CLOCK_ROW).state).toBe("waiting");
+    expect(spans.map((span) => [span.hop, span.outcome, span.error_code])).toEqual([
+      ["delivered", "ok", null],
+      ["clockArmed", "failed", "transient"],
+    ]);
+  });
+});
+
+describe("the receipt path's port: an arming that ended failed is not done (T-1244)", () => {
+  it("armClock transient on every try: partDelivered rejects with ArmingNotDone and nothing is remembered, so the receipt's repeat arms the clock once and is done", async () => {
+    const wired = wireArming();
+    const { trace, spans } = receiptTrace();
+    const arming = clockArming({ ...wired.options, trace });
+    wired.data.armScript.push(TRANSIENT, TRANSIENT, TRANSIENT);
+
+    const failed = arming.partDelivered(A7_03_DELIVERED);
+    await expect(failed).rejects.toThrow(ArmingNotDone);
+    // Its message is fixed: no id, time or code from the arming.
+    await expect(failed).rejects.toThrow(/^the clock arming of a delivered part ended failed$/u);
+    expect(wired.data.armRequests).toEqual(Array.from({ length: ARMING_TRIES }, () => A7_03_ARM_REQUEST));
+    expect(wired.data.rowOf(A7_03_CLOCK_ROW)).toMatchObject({ state: "waiting", version: 1 });
+    expect(wired.data.openedQuestions).toEqual([]);
+    expect(wired.actors.syncs).toEqual([]);
+
+    // The provider's repeat, handed on by the dispatcher as the same first delivery (T-1228): armed once, and done.
+    await expect(arming.partDelivered(A7_03_DELIVERED)).resolves.toBeUndefined();
+    expect(wired.data.armRequests).toEqual(Array.from({ length: ARMING_TRIES + 1 }, () => A7_03_ARM_REQUEST));
+    expect(wired.data.rowOf(A7_03_CLOCK_ROW)).toMatchObject({ state: "armed", version: 2 });
+    expect(wired.data.openedQuestions).toEqual([A7_03_QUESTION]);
+    expect(wired.actors.syncs).toEqual([{ actor: ALEX_ACTOR, handleId: ALEX_HANDLE }]);
+    expect(spans.map((span) => [span.hop, span.outcome, span.error_code])).toEqual([
+      ["clockArmed", "failed", "transient"],
+      ["clockArmed", "ok", null],
+    ]);
+  });
+
+  const failedEnds: readonly {
+    name: string;
+    code: string;
+    setUp: (wired: WiredArming) => Partial<ArmingOptions>;
+  }[] = [
+    {
+      name: "armClock gives no answer on any try (it throws)",
+      code: "noAnswer",
+      setUp: (wired) => {
+        wired.data.armScript.push("throw", "throw", "throw");
+        return {};
+      },
+    },
+    {
+      name: "the question's facts read answers transient on every try",
+      code: "transient",
+      setUp: (wired) => {
+        wired.facts.script.push(TRANSIENT, TRANSIENT, TRANSIENT);
+        return {};
+      },
+    },
+    {
+      name: "the question's facts read throws on every try (a read the arming needs)",
+      code: "noAnswer",
+      setUp: () => ({
+        facts: { questionFacts: () => Promise.reject(new Error("no database is bound")) },
+      }),
+    },
+  ];
+
+  it.each(failedEnds)("$name: rejects with ArmingNotDone, nothing armed", async ({ code, setUp }) => {
+    const wired = wireArming();
+    const { trace, spans } = receiptTrace();
+    const options = { ...wired.options, trace, ...setUp(wired) };
+
+    await expect(clockArming(options).partDelivered(A7_03_DELIVERED)).rejects.toThrow(ArmingNotDone);
+    expect(wired.data.rowOf(A7_03_CLOCK_ROW)).toMatchObject({ state: "waiting", version: 1 });
+    expect(spans).toMatchObject([
+      { hop: "clockArmed", outcome: "failed", error_code: code, decided: { result: "failed" } },
+    ]);
+  });
+
+  /** Arms A7-03 once before the part under test is handed on, in this isolate (`memory`) or another. */
+  const armedBefore = async (wired: WiredArming, memory: ArmingMemory): Promise<void> => {
+    await armAtDelivery(A7_03_DELIVERED, { ...wired.options, memory, trace: receiptTrace().trace });
+  };
+
+  const doneEnds: readonly {
+    name: string;
+    result: string;
+    part?: DeliveredPart;
+    setUp?: (wired: WiredArming) => Promise<void> | void;
+  }[] = [
+    { name: "armed", result: "armed" },
+    {
+      name: "armed, its actor unreachable (the minute sweep fires the row)",
+      result: "armed",
+      setUp: (wired) => {
+        wired.actors.failing = true;
+      },
+    },
+    {
+      name: "armed before in this isolate",
+      result: "repeated",
+      setUp: (wired) => armedBefore(wired, wired.options.memory ?? new ArmingMemory()),
+    },
+    {
+      name: "armed before in another isolate (K-05 armClock answers repeated)",
+      result: "repeated",
+      setUp: (wired) => armedBefore(wired, new ArmingMemory()),
+    },
+    {
+      name: "a question answered before its receipt (K-05 clockClosed)",
+      result: "closed",
+      setUp: (wired) => {
+        wired.data.move(A7_03_CLOCK_ROW, "cancelled", "2026-10-23T14:05:03Z");
+      },
+    },
+    {
+      name: "a question that does not exist",
+      result: "notFound",
+      part: { ...A7_03_DELIVERED, openQuestionId: "oq-unknown" },
+    },
+    {
+      name: "not the row's first delivery",
+      result: "notFirst",
+      part: { ...A7_03_DELIVERED, firstDelivery: false },
+    },
+    {
+      name: "a row that asks no question",
+      result: "noQuestion",
+      part: { ...A7_03_DELIVERED, openQuestionId: null },
+    },
+    { name: "an input it cannot use", result: "refused", part: { ...A7_03_DELIVERED, tryNo: 0 } },
+  ];
+
+  it.each(doneEnds)(
+    "$name: resolves, so the receipt is answered as before",
+    async ({ result, part, setUp }) => {
+      const wired = wireArming();
+      await setUp?.(wired);
+      const { trace, spans } = receiptTrace();
+
+      await expect(
+        clockArming({ ...wired.options, trace }).partDelivered(part ?? A7_03_DELIVERED),
+      ).resolves.toBeUndefined();
+      expect(spans).toMatchObject([{ hop: "clockArmed", decided: { result } }]);
+    },
+  );
 });

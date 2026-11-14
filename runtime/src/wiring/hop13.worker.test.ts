@@ -14,9 +14,17 @@
 //     under its trace id and bundle v0, after the part's providerAccepted span; the receipt's webhook has its own trace,
 //     its receive alone.
 //   - A second delivered event for the same part (Linq's retry of the webhook, and another event for the part) arms
-//     nothing more: K-05 answers it repeated, nothing is handed to the arming, and no clockArmed span is added.
+//     nothing more: K-05 answers it repeated, saying it repeats the row's first delivery at that delivery's stored time
+//     (K-05 v1.9 item 48), so the dispatcher hands it back to the arming (T-1228), whose memory of the armed part makes
+//     no K-05 call: its clockArmed span says repeated.
 //   - With no arming calls bound (the Worker until T-567), the part is still marked delivered and the arming fails
-//     closed: nothing is armed, and its span says it failed.
+//     closed: nothing is armed, its span says it failed, and the receipt is answered 503 (T-1244).
+//
+// T-1244: a receipt whose arming ends failed is not answered as done. The arming's port rejects (ArmingNotDone), the
+// gateway answers 503 with the part still marked delivered, and Linq sends the receipt again: a repeat of the row's first
+// delivery, handed back to the arming, which arms the clock once, and answered 200. A repeat after a completed arming is
+// answered 200 with no second clock row, in the isolate that armed it (its memory) or another (K-05 armClock answers it
+// repeated), and a receipt for a row that asks no question is answered 200 with nothing read or armed.
 //
 // Each test runs the JOIN on a fresh rig, and the Durable Objects' storage is reset after each (as hop 12's tests run it).
 // Test values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and the fixtures' own words.
@@ -27,12 +35,14 @@ import { env, exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 import { QUIET_MS, turnIdOf, type HandleActor } from "../actor";
+import { ARMING_TRIES } from "../clocks/arming";
 import { dueOf } from "../clocks/due";
 import { actorNameOf } from "../gateway";
 import type { Hop, Span } from "../trace";
 import { leaks, spansOfLogLines, spansOfTrace } from "../trace/hop-check";
 import { flush } from "../turn/test-support";
 import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "./index";
+import type { ArmingCalls, OutboxCalls } from "./real";
 import {
   BUNDLE_V0,
   fakeFlags,
@@ -136,8 +146,17 @@ function webhookRequest(webhook: SignedWebhook): Request {
   });
 }
 
-/** The root for "test", every joined port fed its double, this hop's arming among them unless `armed` is false. */
-function testRoot(fakes: SkeletonFakes, actors: HandleActors<DurableObjectId>, armed: boolean): Root {
+/**
+ * What the root's arming and outbox ports are fed: the doubles' own calls, or those calls wrapped by a test (T-1244), and
+ * for the arming null where no calls are bound (the Worker until T-567).
+ */
+interface Feeds {
+  readonly armingCalls: ArmingCalls | null;
+  readonly outboxCalls: OutboxCalls;
+}
+
+/** The root for "test", every joined port fed its double, this hop's arming and the outbox as `feeds` gives them. */
+function testRoot(fakes: SkeletonFakes, actors: HandleActors<DurableObjectId>, feeds: Feeds): Root {
   return composeRoot({
     environment: "test",
     sets: { fake: fakes.ports },
@@ -157,45 +176,118 @@ function testRoot(fakes: SkeletonFakes, actors: HandleActors<DurableObjectId>, a
     composeReads: fakes.compose.reads,
     composers: fakes.composer.composers,
     finalizeData: fakes.finalize.data,
-    outboxCalls: fakes.dispatch.outbox,
+    outboxCalls: feeds.outboxCalls,
     sendStateCall: fakes.dispatch.sendState,
     linqSendCall: fakes.linq.call,
     retryQueue: fakes.retryQueue,
     // This hop: the clock arming's K-05 calls and reads, over the rows the commit wrote and test owner 1's seeded rows.
-    armingCalls: armed ? fakes.arming.calls : null,
+    armingCalls: feeds.armingCalls,
     flags: fakeFlags([SKELETON_FLAG]),
   });
+}
+
+/** What the gateway answered a webhook: its status and the trace id it opened. */
+interface Answered {
+  readonly status: number;
+  readonly traceId: string;
 }
 
 interface Rig {
   readonly fakes: SkeletonFakes;
   readonly root: Root;
-  /** Posts a signed webhook through the root's Linq route; answers the trace id the gateway opened. */
+  /** Posts a signed webhook through the root's Linq route; answers the trace id the gateway opened, once it answered 200. */
   post(event: LinqInboundEvent, partKey?: string | null): Promise<string>;
+  /** Posts a signed webhook through the Linq route of `through` (the rig's root when left out), whatever it answers. */
+  send(event: LinqInboundEvent, partKey: string | null, through?: Root): Promise<Answered>;
+  /**
+   * Another Worker isolate: a root composed anew over the same doubles and feeds, with its own memories (the parts it
+   * armed, the rows' traces), as the one a crash or a new isolate gives Linq's retry (T-1244).
+   */
+  isolate(): Root;
   spans(): Span[];
   traceOf(traceId: string): Span[];
   restore(): void;
 }
 
-function rig(log: MockInstance, armed = true): Rig {
+/** A rig whose root is fed the doubles' own calls, or what `feedsOf` gives in their place. */
+function rig(log: MockInstance, feedsOf: (fakes: SkeletonFakes) => Partial<Feeds> = () => ({})): Rig {
   const fakes = skeletonFakes();
-  const root = testRoot(fakes, handleActors(), armed);
+  const feeds: Feeds = {
+    armingCalls: fakes.arming.calls,
+    outboxCalls: fakes.dispatch.outbox,
+    ...feedsOf(fakes),
+  };
+  const root = testRoot(fakes, handleActors(), feeds);
   const restore = root.install();
   const spans = (): Span[] => spansOfLogLines(log.mock.calls.map((call: unknown[]) => call[0]));
+  const send = async (
+    event: LinqInboundEvent,
+    partKey: string | null,
+    through: Root = root,
+  ): Promise<Answered> => {
+    const response = await through.linqWebhook(webhookRequest(await fakes.sign(event, partKey)));
+    const traceId = response.headers.get("x-trace-id");
+    if (traceId === null) throw new Error("the gateway answered with no trace id");
+    return { status: response.status, traceId };
+  };
   return {
     fakes,
     root,
     async post(event, partKey = null) {
-      const response = await root.linqWebhook(webhookRequest(await fakes.sign(event, partKey)));
-      if (response.status !== 200) throw new Error(`the gateway answered ${String(response.status)}`);
-      const traceId = response.headers.get("x-trace-id");
-      if (traceId === null) throw new Error("the gateway answered with no trace id");
+      const { status, traceId } = await send(event, partKey);
+      if (status !== 200) throw new Error(`the gateway answered ${String(status)}`);
       return traceId;
     },
+    send,
+    isolate: () => testRoot(fakes, handleActors(), feeds),
     spans,
     traceOf: (traceId) => spansOfTrace(spans(), traceId),
     restore,
   };
+}
+
+/** K-05's transient answer (db/repo TransientError: a serialization failure), as armClock gives it. */
+const TRANSIENT: Awaited<ReturnType<ArmingCalls["armClock"]>> = { error: "transient", sqlstate: "40001" };
+
+/**
+ * The arming's calls with armClock answering transient on its first `times` calls, then as the double answers, each
+ * request kept in `asked` in order (the double's own `arms` keeps only the calls it answered).
+ */
+function armClockFailing(calls: ArmingCalls, times: number, asked: unknown[]): ArmingCalls {
+  let left = times;
+  return {
+    ...calls,
+    armClock(request) {
+      asked.push(request);
+      if (left === 0) return calls.armClock(request);
+      left -= 1;
+      return Promise.resolve(TRANSIENT);
+    },
+  };
+}
+
+/**
+ * The outbox calls with markPartV12 answering each delivered mark as for a row that asks no question (K-05 markPart's
+ * openQuestionId null), every other answer as the double gives it.
+ */
+function askingNoQuestion(calls: OutboxCalls): OutboxCalls {
+  return {
+    ...calls,
+    async markPartV12(request) {
+      const answer = await calls.markPartV12(request);
+      return request.outcome === "delivered" && "result" in answer
+        ? { ...answer, openQuestionId: null }
+        : answer;
+    },
+  };
+}
+
+/** The gateway's failure lines (gateway/answer.ts logFailure), parsed, in order. */
+function failureLines(log: MockInstance): Json[] {
+  return log.mock.calls
+    .map((call: unknown[]) => call[0])
+    .filter((line): line is string => typeof line === "string" && line.includes('"gateway_failed"'))
+    .map((line) => JSON.parse(line) as Json);
 }
 
 /** The JOIN's turn, run on `run` to its reply: its turn id, trace id, the row its commit wrote and the row's question. */
@@ -403,7 +495,7 @@ describe("hop 13 joined: the double's delivery receipt reaches the gateway, the 
   );
 
   it(
-    "a second delivered event for the same part arms nothing more: Linq's retry of the webhook and another event for the part are each answered repeated by K-05, and nothing is handed to the arming",
+    "a second delivered event for the same part arms nothing more: Linq's retry of the webhook and another event for the part are each answered repeated by K-05, saying they repeat the row's first delivery (K-05 v1.9 item 48), and the arming they are handed back to asks K-05 nothing more",
     { timeout: TEST_MS },
     async () => {
       const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
@@ -413,6 +505,7 @@ describe("hop 13 joined: the double's delivery receipt reaches the gateway, the 
         const key = `${row}/1/1`;
         const { arming, dispatch } = run.fakes;
         const receipt = deliveredReceiptOf(run.fakes, key, "evt-linq-delivered-sam-0001");
+        const deliveredAt = String(receipt.status?.at);
         await run.post(receipt, key);
         expect(arming.arms).toHaveLength(1);
         const first = arming.clockRow(clock);
@@ -425,16 +518,19 @@ describe("hop 13 joined: the double's delivery receipt reaches the gateway, the 
           key,
         );
 
-        // K-05 answered each repeated, changing nothing; the arming was asked nothing more.
+        // K-05 answered each repeated, changing nothing, and said what each repeats: the row's first delivery, at the time
+        // it stored for it, never the repeat's own (K-05 v1.9 item 48, defaults 85 and 86).
+        const repeats = { firstOfRow: true, deliveredAt };
         expect(
           dispatch.partMarks
             .filter((call) => call.request.outcome === "delivered")
             .map((call) => call.answer),
         ).toMatchObject([
-          { result: "marked", repeated: false, firstDelivery: true },
-          { result: "marked", repeated: true, firstDelivery: false },
-          { result: "marked", repeated: true, firstDelivery: false },
+          { result: "marked", repeated: false, firstDelivery: true, repeatedDelivery: null },
+          { result: "marked", repeated: true, firstDelivery: false, repeatedDelivery: repeats },
+          { result: "marked", repeated: true, firstDelivery: false, repeatedDelivery: repeats },
         ]);
+        // Each repeat was handed back to the arming (T-1228), whose memory of the armed part asked K-05 nothing more.
         expect(arming.arms).toHaveLength(1);
         expect(arming.factReads).toHaveLength(1);
         expect(arming.cancels).toEqual([]);
@@ -445,13 +541,23 @@ describe("hop 13 joined: the double's delivery receipt reaches the gateway, the 
             { hop: "receive", outcome: "dropped", decided: { knownEventId: true, answered: 200 } },
           ]);
         }
-        // On the JOIN's trace: one clockArmed span; each receipt's delivered span, the repeats saying so.
+        // On the JOIN's trace: the one arming, then one repeated arming for each repeat, with no clock row of its own;
+        // each receipt's delivered span, the repeats saying so and that they repeat the row's first delivery.
         const trace = run.traceOf(traceId);
-        expect(spansOf(trace, "clockArmed")).toHaveLength(1);
+        expect(spansOf(trace, "clockArmed")).toMatchObject([
+          { outcome: "ok", decided: { result: "armed" } },
+          { outcome: "ok", decided: { result: "repeated" } },
+          { outcome: "ok", decided: { result: "repeated" } },
+        ]);
+        expect(spansOf(trace, "clockArmed").map((span) => span.rows ?? [])).toEqual([
+          [{ table: "clock_rows", id: clock }],
+          [],
+          [],
+        ]);
         expect(spansOf(trace, "delivered").map((span) => span.got)).toEqual([
           { firstDelivery: true, repeated: false },
-          { firstDelivery: false, repeated: true },
-          { firstDelivery: false, repeated: true },
+          { firstDelivery: false, repeated: true, firstOfRow: true },
+          { firstDelivery: false, repeated: true, firstOfRow: true },
         ]);
       } finally {
         run.restore();
@@ -460,16 +566,21 @@ describe("hop 13 joined: the double's delivery receipt reaches the gateway, the 
   );
 
   it(
-    "with no arming calls bound (the Worker until T-567) the part is still marked delivered and the arming fails closed: nothing is armed, and its span says it failed",
+    "with no arming calls bound (the Worker until T-567) the part is still marked delivered and the arming fails closed: nothing is armed, its span says it failed, and the receipt is answered 503 (T-1244)",
     { timeout: TEST_MS },
     async () => {
       const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
-      const run = rig(log, false);
+      const run = rig(log, () => ({ armingCalls: null }));
       try {
         const { traceId, row, clock, question } = await runJoin(run);
         const key = `${row}/1/1`;
-        await run.post(deliveredReceiptOf(run.fakes, key, "evt-linq-delivered-sam-0001"), key);
+        const answered = await run.send(
+          deliveredReceiptOf(run.fakes, key, "evt-linq-delivered-sam-0001"),
+          key,
+        );
 
+        // Not done: 503, so Linq sends the receipt again (T-1244).
+        expect(answered.status).toBe(503);
         expect(run.fakes.dispatch.row(row)).toMatchObject({ state: "delivered" });
         // Nothing reached the doubles: the clock row and its question stay as the commit wrote them.
         expect(run.fakes.arming.arms).toEqual([]);
@@ -482,6 +593,230 @@ describe("hop 13 joined: the double's delivery receipt reaches the gateway, the 
           error_code: "noAnswer",
           decided: { result: "failed", synced: false },
         });
+      } finally {
+        run.restore();
+      }
+    },
+  );
+});
+
+describe("T-1244: a receipt whose clock arming fails is answered 503, so Linq sends it again and its repeat arms the clock", () => {
+  it(
+    "a first delivery whose arming fails to the end (armClock transient on each of its tries) is answered 503 with the part still marked delivered; the same receipt again is handed back to the arming, which arms the clock once, and is answered 200",
+    { timeout: TEST_MS },
+    async () => {
+      const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+      const asked: unknown[] = [];
+      const run = rig(log, (fakes) => ({
+        armingCalls: armClockFailing(fakes.arming.calls, ARMING_TRIES, asked),
+      }));
+      try {
+        const { traceId, row, question, clock } = await runJoin(run);
+        const key = `${row}/1/1`;
+        const { arming, dispatch } = run.fakes;
+        const receipt = deliveredReceiptOf(run.fakes, key, "evt-linq-delivered-sam-0001");
+        const deliveredAt = String(receipt.status?.at);
+        const due = dueOf({ deliveredAt, clockLine: null, visitStartsAt: null, zone: BARBERSHOP_ZONE });
+        const request = { openQuestionId: question, deliveredAt, dueAt: due.dueAt, dueZone: BARBERSHOP_ZONE };
+        const deliveredMarks = (): unknown[] =>
+          dispatch.partMarks
+            .filter((call) => call.request.outcome === "delivered")
+            .map((call) => call.answer);
+
+        // The first receipt: the mark records the row's first delivery, then armClock answers transient on every try.
+        const first = await run.send(receipt, key);
+
+        expect(first.status).toBe(503);
+        // The part stays marked delivered.
+        expect(dispatch.row(row)).toMatchObject({ state: "delivered", parts: [{ key, state: "delivered" }] });
+        expect(deliveredMarks()).toMatchObject([
+          { result: "marked", repeated: false, firstDelivery: true, repeatedDelivery: null },
+        ]);
+        // Nothing armed: armClock was asked on each of the arming's tries, the same request each time, and answered
+        // transient each time; the clock row and its question stay as the commit wrote them, and no actor was told.
+        expect(arming.factReads).toEqual([question]);
+        expect(asked).toEqual(Array.from({ length: ARMING_TRIES }, () => request));
+        expect(arming.arms).toEqual([]);
+        expect(arming.clockRow(clock)).toMatchObject({ state: "waiting", version: 1, dueAt: null });
+        expect(arming.questionStatus(question)).toBe("waiting");
+        expect(arming.actorReads).toEqual([]);
+        // The JOIN's trace: the arming's span says it failed, transient.
+        expect(onlySpan(run.traceOf(traceId), "clockArmed")).toMatchObject({
+          outcome: "failed",
+          error_code: "transient",
+          decided: { result: "failed", synced: false },
+        });
+        // The receipt's own trace: its receive, answered 503. The gateway's one failure line names the error alone.
+        expect(run.traceOf(first.traceId)).toMatchObject([
+          {
+            hop: "receive",
+            outcome: "failed",
+            error_code: "handoffFailed",
+            decided: { signatureValid: true, answered: 503 },
+          },
+        ]);
+        expect(failureLines(log)).toEqual([
+          {
+            level: "error",
+            msg: "gateway_failed",
+            trace_id: first.traceId,
+            stage: "handoff",
+            error: "ArmingNotDone",
+          },
+        ]);
+
+        // Linq sends the same receipt again (the same event id).
+        const again = await run.send(receipt, key);
+
+        expect(again.status).toBe(200);
+        // K-05 answered it repeated, saying it repeats the row's first delivery, at the stored time (K-05 v1.9 item 48).
+        expect(deliveredMarks()).toMatchObject([
+          { result: "marked", repeated: false, firstDelivery: true, repeatedDelivery: null },
+          {
+            result: "marked",
+            repeated: true,
+            firstDelivery: false,
+            repeatedDelivery: { firstOfRow: true, deliveredAt },
+          },
+        ]);
+        // Handed back to the arming: the question's facts read again and armClock asked once more, with the same request,
+        // which armed the clock once, as the first receipt's arming would have.
+        expect(arming.factReads).toEqual([question, question]);
+        expect(asked).toEqual(Array.from({ length: ARMING_TRIES + 1 }, () => request));
+        expect(arming.arms.map((call) => call.request)).toEqual([request]);
+        expect(arming.arms.map((call) => call.answer)).toEqual([
+          {
+            result: "armed",
+            repeated: false,
+            clock: {
+              clockRowId: clock,
+              version: 2,
+              armedAt: deliveredAt,
+              dueAt: due.dueAt,
+              dueZone: BARBERSHOP_ZONE,
+              handleId: TEST_OWNER_1.handleId,
+            },
+          },
+        ]);
+        expect(arming.clockRow(clock)).toEqual({
+          state: "armed",
+          version: 2,
+          armedAt: deliveredAt,
+          dueAt: due.dueAt,
+          dueZone: BARBERSHOP_ZONE,
+          cancelledAt: null,
+        });
+        expect(arming.questionStatus(question)).toBe("open");
+        expect(arming.cancels).toEqual([]);
+        expect(arming.actorReads).toEqual([TEST_OWNER_1.handleId]);
+        // The JOIN's trace: the failed arming, then the repeat's; the repeat's delivered span says what it repeats.
+        const trace = run.traceOf(traceId);
+        expect(spansOf(trace, "clockArmed")).toMatchObject([
+          { outcome: "failed", decided: { result: "failed" } },
+          { outcome: "ok", decided: { result: "armed" }, rows: [{ table: "clock_rows", id: clock }] },
+        ]);
+        expect(spansOf(trace, "delivered").map((span) => span.got)).toEqual([
+          { firstDelivery: true, repeated: false },
+          { firstDelivery: false, repeated: true, firstOfRow: true },
+        ]);
+        // The retry's own trace: a known event, answered 200; no second failure line.
+        expect(run.traceOf(again.traceId)).toMatchObject([
+          { hop: "receive", outcome: "dropped", decided: { knownEventId: true, answered: 200 } },
+        ]);
+        expect(failureLines(log)).toHaveLength(1);
+        // No span holds the number, Sam's chat id, the due time or the zone.
+        expect(leaks(run.spans(), [...CAST_NUMBERS, SAM_CHAT, due.dueAt, BARBERSHOP_ZONE])).toEqual([]);
+      } finally {
+        run.restore();
+      }
+    },
+  );
+
+  it(
+    "a repeat after a completed arming is answered 200 with no second clock row: the isolate that armed it asks K-05 nothing, and in another isolate K-05 armClock answers it repeated with the first arming",
+    { timeout: TEST_MS },
+    async () => {
+      const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+      const run = rig(log);
+      try {
+        const { row, question, clock } = await runJoin(run);
+        const key = `${row}/1/1`;
+        const { arming } = run.fakes;
+        const receipt = deliveredReceiptOf(run.fakes, key, "evt-linq-delivered-sam-0001");
+        const deliveredAt = String(receipt.status?.at);
+        const due = dueOf({ deliveredAt, clockLine: null, visitStartsAt: null, zone: BARBERSHOP_ZONE });
+        const request = { openQuestionId: question, deliveredAt, dueAt: due.dueAt, dueZone: BARBERSHOP_ZONE };
+        const armedClock = {
+          clockRowId: clock,
+          version: 2,
+          armedAt: deliveredAt,
+          dueAt: due.dueAt,
+          dueZone: BARBERSHOP_ZONE,
+          handleId: TEST_OWNER_1.handleId,
+        };
+        expect((await run.send(receipt, key)).status).toBe(200);
+        const armed = arming.clockRow(clock);
+        expect(armed).toMatchObject({ state: "armed", version: 2 });
+
+        // The isolate that armed it: the repeat goes back to the arming, whose memory of the part makes no K-05 call.
+        expect((await run.send(receipt, key)).status).toBe(200);
+        expect(arming.factReads).toEqual([question]);
+        expect(arming.arms).toHaveLength(1);
+
+        // Another isolate, with no memory of the part: armClock is asked for the stored delivery, and K-05 answers it
+        // repeated with the first arming (K-05 v1 item 5).
+        const other = await run.send(receipt, key, run.isolate());
+
+        expect(other.status).toBe(200);
+        expect(arming.factReads).toEqual([question, question]);
+        expect(arming.arms.map((call) => call.request)).toEqual([request, request]);
+        expect(arming.arms.map((call) => call.answer)).toEqual([
+          { result: "armed", repeated: false, clock: armedClock },
+          { result: "armed", repeated: true, clock: armedClock },
+        ]);
+        // One clock row, as its one arming left it: no second row or write, no cancel, the actor told once.
+        expect(arming.clockRow(clock)).toEqual(armed);
+        expect(arming.questionStatus(question)).toBe("open");
+        expect(arming.cancels).toEqual([]);
+        expect(arming.actorReads).toEqual([TEST_OWNER_1.handleId]);
+        // The other isolate knows no row's trace: its arming's span is on the receipt's own trace, saying repeated.
+        expect(spansOf(run.traceOf(other.traceId), "clockArmed")).toMatchObject([
+          { outcome: "ok", decided: { result: "repeated" } },
+        ]);
+        expect(failureLines(log)).toEqual([]);
+      } finally {
+        run.restore();
+      }
+    },
+  );
+
+  it(
+    "a receipt for a row that asks no question is answered 200, with nothing read or armed",
+    { timeout: TEST_MS },
+    async () => {
+      const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+      const run = rig(log, (fakes) => ({ outboxCalls: askingNoQuestion(fakes.dispatch.outbox) }));
+      try {
+        const { traceId, row, question, clock } = await runJoin(run);
+        const key = `${row}/1/1`;
+        const { arming, dispatch } = run.fakes;
+        const answered = await run.send(
+          deliveredReceiptOf(run.fakes, key, "evt-linq-delivered-sam-0001"),
+          key,
+        );
+
+        expect(answered.status).toBe(200);
+        expect(dispatch.row(row)).toMatchObject({ state: "delivered" });
+        // No question to arm: no facts read, no armClock call, and the clock row as the commit wrote it.
+        expect(arming.factReads).toEqual([]);
+        expect(arming.arms).toEqual([]);
+        expect(arming.clockRow(clock)).toMatchObject({ state: "waiting", version: 1 });
+        expect(arming.questionStatus(question)).toBe("waiting");
+        expect(onlySpan(run.traceOf(traceId), "clockArmed")).toMatchObject({
+          outcome: "dropped",
+          decided: { result: "noQuestion" },
+        });
+        expect(failureLines(log)).toEqual([]);
       } finally {
         run.restore();
       }
