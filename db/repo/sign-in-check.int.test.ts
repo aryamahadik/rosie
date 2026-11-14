@@ -26,9 +26,9 @@
 // T-1402 (DL-757) adds K-05 v1.15's item 69, personStanding's tester widened to K-22 v1.3's staging_testers (migration
 // 0036): its two v1.15 exchanges, replayed after K-22 v1.3's seed-staging-tester.json; its refused answer (team true
 // with tester false) against the check tester's; a team row, a live listing, both, neither, an ended listing, an ended
-// listing with a later live one and a removed team row beside a live listing, each with the same fields, team the team
-// row's alone; the two lists read in one statement; and its answers also checked against v1.15. The people, handles,
-// team rows and listings a case adds carry example ids (t1402), no name and example.com addresses.
+// listing with a later live one, a removed team row beside a live listing and both ended, each with the same fields,
+// team the team row's alone; the two lists read in one statement; and its answers also checked against v1.15. The
+// people, handles, team rows and listings a case adds carry example ids (t1402), no name and example.com addresses.
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
