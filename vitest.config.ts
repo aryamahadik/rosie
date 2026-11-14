@@ -4,6 +4,8 @@
 import { cloudflareTest } from "@cloudflare/vitest-plugin";
 import { defineConfig } from "vitest/config";
 
+import { closedSocketFilter, droppedReport } from "./infra/test-rig/closed-socket.mjs";
+
 const workspaces = [
   "contracts",
   "compiler",
@@ -31,6 +33,39 @@ const databaseUrl = process.env.DATABASE_URL ?? (process.env.CI ? undefined : LO
 const workersSetting = Number(process.env.VITEST_MAX_WORKERS?.match(/^\d+$/)?.[0]);
 const MAX_WORKERS = Number.isSafeInteger(workersSetting) && workersSetting >= 1 ? workersSetting : 3;
 
+// The Workers test rig (T-1253; ADR-014 piece 5): both Workers projects run its globalSetup, which makes each named test
+// file's database (infra/test-rig/files.mjs) on the server of DATABASE_URL, else the local default, and drops them after.
+const RIG_SETUP = "infra/test-rig/global-setup.mjs";
+
+// The Workers pool's options, one function for both Workers projects (T-1253; ADR-014 section 4, "The Workers test pool,
+// local runs and CI"): wrangler.jsonc's staging environment, with every Hyperdrive binding's string fed from the rig's
+// globalSetup through inject. miniflare's hyperdrives win over wrangler.jsonc's local strings, so the pool's own
+// HYPERDRIVE_JOB and HYPERDRIVE_APP name rosie_rig_none, which is never made, each named file's pair names its own
+// database, and no test reaches the build Mac's rosie database. Every binding is a pool binding, so a test reaches
+// PostgreSQL through miniflare's Hyperdrive stand-in, as the Worker reaches it through Hyperdrive.
+const workersPool: Parameters<typeof cloudflareTest>[0] = ({ inject }) => {
+  const hyperdrives = inject("rosieRigHyperdrives");
+  if (hyperdrives === undefined) {
+    throw new Error(
+      `vitest.config.ts: the Workers test rig (${RIG_SETUP}) provided no Hyperdrive bindings, and the pool never runs ` +
+        "on wrangler.jsonc's local strings",
+    );
+  }
+  return {
+    wrangler: { configPath: "./wrangler.jsonc", environment: "staging" },
+    miniflare: { bindings: { GIT_SHA: "test-sha" }, hyperdrives },
+  };
+};
+
+// The one unhandled error a run drops (T-1253; the lead's ruling DL-758, option (a)): postgres.js's own rejection when it
+// reads a socket it has closed itself, which every postgres.js client ended inside workerd leaves. It is dropped only
+// when all four match (the name TypeError, the message "This socket has been closed." exactly, the type "Unhandled
+// Rejection", and the first stack frame in node_modules/postgres/cf/polyfills.js); anything else still fails the run.
+// The Workers projects carry the report, which prints the count once at the run's close (infra/test-rig/closed-socket.mjs
+// says why; infra/ci/closed-socket.test.mjs tests it).
+const closedSockets = closedSocketFilter();
+const closedSocketsReport = droppedReport(closedSockets);
+
 export default defineConfig({
   test: {
     passWithNoTests: true,
@@ -40,6 +75,13 @@ export default defineConfig({
     // test's claim. A project's own limits and a test's own longer limit still win.
     testTimeout: 30_000,
     hookTimeout: 30_000,
+    // How long Vitest waits for its close, globalSetup teardowns included, before it exits the process (Vitest's default
+    // is 10 s). The Workers test rig's teardown drops the run's databases (T-1253), and a DROP DATABASE waits for a
+    // checkpoint: one took 45 s on the build Mac's loaded, emulated PostgreSQL (Nov 14 2026), so at 10 s the run would
+    // exit mid-drop and leave its databases behind. A resource guard, not part of any test's claim.
+    teardownTimeout: 120_000,
+    // Drops postgres.js's closed-socket rejection alone, and counts it (closedSockets above).
+    onUnhandledError: closedSockets.onUnhandledError,
     projects: [
       {
         // Unit tests beside the code: each workspace's src/, plus db/repo/ and db/seeds/ (db's layout).
@@ -71,13 +113,8 @@ export default defineConfig({
         },
       },
       {
-        // Runs inside the Workers runtime with wrangler.jsonc's staging environment.
-        plugins: [
-          cloudflareTest({
-            wrangler: { configPath: "./wrangler.jsonc", environment: "staging" },
-            miniflare: { bindings: { GIT_SHA: "test-sha" } },
-          }),
-        ],
+        // Runs inside the Workers runtime with wrangler.jsonc's staging environment, on the rig's Hyperdrive bindings.
+        plugins: [cloudflareTest(workersPool), closedSocketsReport],
         test: {
           name: "workers",
           // T-1144: the action layer's checks that must hold inside the Workers runtime (the Tool API's validator).
@@ -86,6 +123,8 @@ export default defineConfig({
             "runtime/test/**/*.worker.test.ts",
             "actions/src/**/*.worker.test.ts",
           ],
+          // The Workers test rig's databases, logins and bindings (T-1253).
+          globalSetup: [RIG_SETUP],
           // Holds a HandleActor's own wiring in the pool's one isolate (T-1243; that file's header says why).
           setupFiles: ["runtime/test/hold-actor-wiring.ts"],
           // No module cache on disk (T-1207, DL-420), so the pool sends the runner each module in a message of its own.
@@ -137,17 +176,13 @@ export default defineConfig({
         // The walking skeleton's end-to-end test inside the Workers runtime (T-1149, DL-332): the local target posts
         // through runtime/src/wiring's composition root with the HandleActor installed, as the workers project runs it.
         // `npm run test:e2e` runs it with the e2e project.
-        plugins: [
-          cloudflareTest({
-            wrangler: { configPath: "./wrangler.jsonc", environment: "staging" },
-            miniflare: { bindings: { GIT_SHA: "test-sha" } },
-          }),
-        ],
+        plugins: [cloudflareTest(workersPool), closedSocketsReport],
         test: {
           name: "e2e-workers",
           include: ["tests/e2e/**/*.worker.test.ts"],
-          // Reads SKELETON_UPTO and CONTRACT_REPORT in Node and provides them to the run (tests/e2e/skeleton/README.md).
-          globalSetup: ["tests/e2e/_driver/prefix/global-setup.ts"],
+          // Reads SKELETON_UPTO and CONTRACT_REPORT in Node and provides them to the run (tests/e2e/skeleton/README.md);
+          // beside it, the Workers test rig's (T-1253), as in the workers project.
+          globalSetup: ["tests/e2e/_driver/prefix/global-setup.ts", RIG_SETUP],
           // Holds a HandleActor's own wiring in the pool's one isolate (T-1243; that file's header says why).
           setupFiles: ["runtime/test/hold-actor-wiring.ts"],
           // Each module in a message of its own to the runner, as in the workers project (T-1207).
