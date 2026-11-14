@@ -23,6 +23,14 @@
 // 9), and the check tester as default 105 and its fixture's note describe it. The people, handles, team rows, sessions,
 // codes and chat links a case adds carry example ids (t1300), no name, example.com addresses and numbers in the fiction
 // range 555-0100 to 555-0199; every hash is a stand-in, the sha256 of no token and no code.
+//
+// T-1402 (DL-757) adds K-05 v1.15's item 68, readTesterStanding widened to K-22 v1.3's staging_testers (migration
+// 0036): v1.15's two exchanges, run after K-22 v1.3's seed-staging-tester.json (Tester One listed, Tester Two whose
+// listing ended), and their two refused twins; the cases v1.15's "What the new tasks must hold to" lists (a person who
+// holds both rows, an ended listing beside a live team row, a listing ended a second before `at`, a person with an
+// ended listing and a later live one), with its two mirrors; step 2 as one statement over both lists; and every answer
+// also checked against its v1.15 definition. The listings a case adds carry example ids (t1402); the testers, their
+// ids, addresses and times are K-22 v1.3's examples, never a tester's real address or name.
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
@@ -98,6 +106,15 @@ const SECOND_TOKEN = "c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f
 const SECOND_CODE_HASH = "1e2d3c4b5a69788796a5b4c3d2e1f00f1e2d3c4b5a69788796a5b4c3d2e1f00f";
 /** A hash no session holds. */
 const UNKNOWN_TOKEN = "d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3";
+/**
+ * K-22 v1.3's two human testers (seed-staging-tester.json): Tester One, listed since 05:30Z, and Tester Two, whose
+ * listing ended at 07:00Z, each with a live session from a code to their own inbox, live until Dec 14. Stand-in hashes.
+ */
+const TESTER_ONE = "person-tester-one";
+const TESTER_TWO = "person-tester-two";
+const TESTER_TWO_TOKEN = "6a1f2e3d4c5b6a7f8e9dacbfc4d5e6f7a8b9cadb4c5d6e7f8a9bacbdc4d5e6f8";
+const TESTER_TWO_ENDED = "2026-11-14T07:00:00Z";
+const TESTERS_READ_AT = "2026-11-14T08:00:00Z";
 
 interface Given {
   k04Seeds: string[];
@@ -137,11 +154,11 @@ const INDEX = (readJson(new URL("index.json", ACCESS_DIR)) as { fixtures: IndexE
 /** The call a definition belongs to, when it is one of the three. */
 const callOfDef = (def: string | undefined): Call | undefined =>
   CALLS.find((call) => (def ?? "").startsWith(`${call}.`));
-/** Items 53 to 55's accepted exchanges, as the index lists them, each with its call. */
-const ACCEPTED: readonly { file: string; call: Call }[] = INDEX.flatMap((entry) => {
+/** Items 53 to 55's accepted exchanges, and item 68's (v1.15), as the index lists them, each with its call and version. */
+const ACCEPTED: readonly { file: string; call: Call; version: string }[] = INDEX.flatMap((entry) => {
   const call = callOfDef(entry.def);
   return entry.expect === "accept" && call !== undefined && entry.def === `${call}.exchange`
-    ? [{ file: entry.file, call }]
+    ? [{ file: entry.file, call, version: entry.version }]
     : [];
 });
 /** Their refused twins, each refused by one of the three reads' definitions. */
@@ -183,22 +200,32 @@ for (const file of schemaFiles(CONTRACTS)) {
 }
 const V112_ID = (readJson(new URL("data-access/data-access.v1.12.schema.json", CONTRACTS)) as { $id: string })
   .$id;
+/** K-05 v1.15 (T-1295), which restates item 68's request and response for their text alone (README item 68). */
+const V115_ID = (readJson(new URL("data-access/data-access.v1.15.schema.json", CONTRACTS)) as { $id: string })
+  .$id;
 
-/** Checks `value` against one $defs entry of data-access v1.12, returning Ajv's errors (none when it passes). */
-function schemaErrors(def: string, value: unknown): string[] {
-  const validate = ajv.getSchema(`${V112_ID}#/$defs/${def}`);
+/**
+ * Checks `value` against one $defs entry of data-access v1.12 (or of the version `schemaId` names), returning Ajv's
+ * errors (none when it passes).
+ */
+function schemaErrors(def: string, value: unknown, schemaId = V112_ID): string[] {
+  const validate = ajv.getSchema(`${schemaId}#/$defs/${def}`);
   if (validate === undefined) {
-    throw new Error(`data-access v1.12 has no $defs/${def}`);
+    throw new Error(`${schemaId} has no $defs/${def}`);
   }
   return validate(value)
     ? []
     : (validate.errors ?? []).map((error) => `${error.instancePath} ${error.message ?? ""}`);
 }
 
-/** An answer checked against its own definition: an error against <call>.errors, else <call>.response. */
+/**
+ * An answer checked against its own definition, in v1.12 and in v1.15: an error against <call>.errors, else
+ * <call>.response.
+ */
 function answerErrors(call: Call, outcome: unknown): string[] {
   const isError = typeof outcome === "object" && outcome !== null && "error" in outcome;
-  return schemaErrors(isError ? `${call}.errors` : `${call}.response`, outcome);
+  const def = isError ? `${call}.errors` : `${call}.response`;
+  return [...schemaErrors(def, outcome), ...schemaErrors(def, outcome, V115_ID)];
 }
 
 // ---- databases and clients ------------------------------------------------------------------------------------------
@@ -306,6 +333,7 @@ const PERSON_ROLES = coreSeed("seed-person-roles.json");
 const SESSIONS = partSeed("people-access/seed-session.json");
 const OWNER_EMAIL = partSeed("people-access/seed-owner-id-upload.json");
 const CHAT_LINKS = partSeed("conversations-consent/seed-chat-link.json");
+const STAGING_TESTERS = partSeed("people-access/seed-staging-tester.json");
 
 /** A seed's rows after those of the seeds its `after` names, each read from the seed's own folder; each seed once. */
 function seedRows(seed: URL, seen: Set<string>): TableRow[] {
@@ -560,6 +588,25 @@ const REMOVED_BEFORE: TableRow = {
   },
 };
 
+/**
+ * A K-22 v1.3 listing a case adds (example ids, t1402): live, or ended at `removedAt`, which raised its version to 2
+ * (README rule 10: a listing ends by removed_at and the version).
+ */
+function listing(id: string, personId: string, addedAt: string, removedAt: string | null = null): TableRow {
+  return {
+    table: "staging_testers",
+    values: {
+      id,
+      person_id: personId,
+      added_at: addedAt,
+      removed_at: removedAt,
+      version: removedAt === null ? 1 : 2,
+    },
+  };
+}
+/** The check tester's team row, removed at 04:04:00Z (as read-tester-standing-removed-member's note has it). */
+const TEAM_ROW_REMOVED: CheckTesterChange = { team: { removed_at: "2026-11-12T04:04:00Z", version: 2 } };
+
 /** Sam on Rosie's team, reached at his own phone: a live team row of his person. */
 const SAM_TEAM_ROW: TableRow = {
   table: "team_page_recipients",
@@ -684,6 +731,70 @@ const CASES: readonly Case[] = [
     rows: checkTesterRows(),
     request: standingAt(SAM_LIVE_TOKEN, SAM_READ_AT),
     outcome: { standing: "notTester" },
+  },
+  // readTesterStanding (item 68, v1.15's "What the new tasks must hold to", with two mirrors)
+  {
+    shows:
+      "readTesterStanding: a person who holds both a live team row and a live listing (the check tester, listed too): tester",
+    call: STANDING,
+    seeds: [],
+    rows: [...checkTesterRows(), listing("staging-tester-t1402-check-tester", CHECK_TESTER, SEEDED_AT)],
+    request: standingAt(CHECK_TESTER_TOKEN),
+    outcome: { standing: "tester" },
+  },
+  {
+    shows:
+      "readTesterStanding: an ended listing beside a live team row (the check tester's listing ended at 04:04:00Z): tester, by the team row",
+    call: STANDING,
+    seeds: [],
+    rows: [
+      ...checkTesterRows(),
+      listing("staging-tester-t1402-check-tester", CHECK_TESTER, SEEDED_AT, "2026-11-12T04:04:00Z"),
+    ],
+    request: standingAt(CHECK_TESTER_TOKEN),
+    outcome: { standing: "tester" },
+  },
+  {
+    shows:
+      "readTesterStanding: a live listing beside a removed team row (the mirror: the team row removed at 04:04:00Z): tester, by the listing",
+    call: STANDING,
+    seeds: [],
+    rows: [
+      ...checkTesterRows(TEAM_ROW_REMOVED),
+      listing("staging-tester-t1402-check-tester", CHECK_TESTER, SEEDED_AT),
+    ],
+    request: standingAt(CHECK_TESTER_TOKEN),
+    outcome: { standing: "tester" },
+  },
+  {
+    shows:
+      "readTesterStanding: a removed team row and an ended listing, the session live: neither stands, notTester",
+    call: STANDING,
+    seeds: [],
+    rows: [
+      ...checkTesterRows(TEAM_ROW_REMOVED),
+      listing("staging-tester-t1402-check-tester", CHECK_TESTER, SEEDED_AT, "2026-11-12T04:04:00Z"),
+    ],
+    request: standingAt(CHECK_TESTER_TOKEN),
+    outcome: { standing: "notTester" },
+  },
+  {
+    shows:
+      "readTesterStanding: a listing ended a second before at (Tester Two's, ended 07:00:00Z, read at 07:00:01Z, the session live): notTester",
+    call: STANDING,
+    seeds: [STAGING_TESTERS],
+    rows: [],
+    request: standingAt(TESTER_TWO_TOKEN, "2026-11-14T07:00:01Z"),
+    outcome: { standing: "notTester" },
+  },
+  {
+    shows:
+      "readTesterStanding: a person with an ended listing and a later live one (Tester Two listed again at 07:30Z): tester",
+    call: STANDING,
+    seeds: [STAGING_TESTERS],
+    rows: [listing("staging-tester-t1402-two-again", TESTER_TWO, "2026-11-14T07:30:00Z")],
+    request: standingAt(TESTER_TWO_TOKEN, TESTERS_READ_AT),
+    outcome: { standing: "tester" },
   },
   // readRosterPhone (item 54)
   {
@@ -909,11 +1020,12 @@ describe("the role the reads run as (README v1.12 'Where each read lives': rosie
   });
 
   it(
-    "a Tool API client's reads are refused by PostgreSQL's own privilege check (no grant on team_page_recipients, handles or phones: 0012, 0017), naming no value",
+    "a Tool API client's reads are refused by PostgreSQL's own privilege check (no grant on team_page_recipients, staging_testers, handles or phones: 0012, 0017, 0036), naming no value",
     SLOW,
     async () => {
       const refused: [Call, string][] = [
         [STANDING, "read-tester-standing-check-tester.json"],
+        [STANDING, "read-tester-standing-human-tester.json"],
         [ROSTER_PHONE, "read-roster-phone-email-on-file.json"],
         [PHONE_STATE, "read-phone-state-chat-link.json"],
       ];
@@ -926,6 +1038,8 @@ describe("the role the reads run as (README v1.12 'Where each read lives': rosie
         for (const value of [
           ...secretsOf(call, exchange.request, exchange.outcome),
           CHECK_TESTER,
+          TESTER_ONE,
+          TESTER_TWO,
           SAM,
           "@example.com",
         ]) {
@@ -955,8 +1069,8 @@ describe("the role the reads run as (README v1.12 'Where each read lives': rosie
   );
 });
 
-describe("each v1.12 fixture of items 53 to 55 gives its outcome (K-05 v1.12 items 53 to 55; defaults 103 to 109)", () => {
-  it("the index lists the fifteen exchanges of items 53 to 55, each valid against data-access v1.12, and their seven refused twins, each refused by its definition", () => {
+describe("each v1.12 fixture of items 53 to 55 and each v1.15 fixture of item 68 gives its outcome (K-05 v1.12 items 53 to 55, defaults 103 to 109; v1.15 item 68, defaults 136 to 139)", () => {
+  it("the index lists the seventeen exchanges of items 53 to 55 and 68 (v1.12's fifteen and v1.15's two), each valid against data-access v1.12 and v1.15, and their nine refused twins (v1.12's seven and v1.15's two), each refused by its definition in v1.12 and in v1.15", () => {
     expect(ACCEPTED.map(({ file }) => file).sort()).toEqual([
       "read-phone-state-chat-link.json",
       "read-phone-state-chat-open.json",
@@ -969,15 +1083,23 @@ describe("each v1.12 fixture of items 53 to 55 gives its outcome (K-05 v1.12 ite
       "read-roster-phone-unknown.json",
       "read-tester-standing-check-tester.json",
       "read-tester-standing-expired.json",
+      "read-tester-standing-human-tester.json",
+      "read-tester-standing-listing-ended.json",
       "read-tester-standing-not-tester.json",
       "read-tester-standing-removed-member.json",
       "read-tester-standing-signed-out.json",
       "read-tester-standing-unknown-token.json",
     ]);
+    const v115 = ACCEPTED.filter(({ version }) => version === "v1.15").map(({ file }) => file);
+    expect(v115.sort()).toEqual([
+      "read-tester-standing-human-tester.json",
+      "read-tester-standing-listing-ended.json",
+    ]);
     for (const { file, call } of ACCEPTED) {
       const exchange = exchangeOf(file);
       expect(exchange.call, file).toBe(call);
       expect(schemaErrors(`${call}.exchange`, exchange), file).toEqual([]);
+      expect(schemaErrors(`${call}.exchange`, exchange, V115_ID), file).toEqual([]);
     }
     expect(REFUSED.map((entry) => `${entry.file} by ${entry.def ?? ""}`).sort()).toEqual([
       "invalid/refuse-phone-state-answers-number.json by readPhoneState.response",
@@ -985,18 +1107,21 @@ describe("each v1.12 fixture of items 53 to 55 gives its outcome (K-05 v1.12 ite
       "invalid/refuse-phone-state-stopped-at-after-start.json by readPhoneState.response",
       "invalid/refuse-roster-phone-by-roster-id.json by readRosterPhone.exchange",
       "invalid/refuse-roster-phone-names-person.json by readRosterPhone.response",
+      "invalid/refuse-tester-standing-by-address.json by readTesterStanding.exchange",
+      "invalid/refuse-tester-standing-ended-listing-told.json by readTesterStanding.response",
       "invalid/refuse-tester-standing-names-person.json by readTesterStanding.response",
       "invalid/refuse-tester-standing-token-not-hash.json by readTesterStanding.exchange",
     ]);
     for (const entry of REFUSED) {
       const value = readJson(new URL(entry.file, ACCESS_DIR));
       expect(schemaErrors(entry.def ?? "", value), entry.file).not.toEqual([]);
+      expect(schemaErrors(entry.def ?? "", value, V115_ID), entry.file).not.toEqual([]);
     }
   });
 
   for (const { file, call } of ACCEPTED) {
     it(
-      `${file}: as rosie_job, ${call} answers the fixture's outcome, valid against its v1.12 definition`,
+      `${file}: as rosie_job, ${call} answers the fixture's outcome, valid against its v1.12 and v1.15 definitions`,
       SLOW,
       async () => {
         const exchange = await given(file);
@@ -1004,6 +1129,7 @@ describe("each v1.12 fixture of items 53 to 55 gives its outcome (K-05 v1.12 ite
         expect(outcome).toEqual(exchange.outcome);
         expect(answerErrors(call, outcome)).toEqual([]);
         expect(schemaErrors(`${call}.exchange`, { ...exchange, outcome })).toEqual([]);
+        expect(schemaErrors(`${call}.exchange`, { ...exchange, outcome }, V115_ID)).toEqual([]);
       },
     );
   }
@@ -1147,9 +1273,48 @@ describe("each v1.12 fixture of items 53 to 55 gives its outcome (K-05 v1.12 ite
       expect(numberPutRight).toEqual(open.outcome);
     },
   );
+
+  it(
+    "refuse-tester-standing-by-address (v1.15): a standing asked with the tester's inbox address beside the hash is refused before any statement, never echoing the address; put right, it is read-tester-standing-human-tester's request, and answers tester",
+    SLOW,
+    async () => {
+      const twin = await given("read-tester-standing-human-tester.json");
+      const refused = readJson(
+        new URL("invalid/refuse-tester-standing-by-address.json", ACCESS_DIR),
+      ) as Exchange;
+      sent.length = 0;
+      const error = await thrownBy(READS.readTesterStanding(job, refused.request));
+      expect(error).toBeInstanceOf(TypeError);
+      expect((error as Error).message).toBe("readTesterStanding: the request takes only tokenSha256, at");
+      const address = textOf(refused.request.email, "the refused request's address");
+      expect((error as Error).message.includes(address)).toBe(false);
+      expect(sent).toEqual([]);
+      const { email, ...putRight } = refused.request;
+      expect(email).toBe(address);
+      expect(putRight).toEqual(twin.request);
+      expect(await READS.readTesterStanding(job, putRight)).toEqual(twin.outcome);
+    },
+  );
+
+  it(
+    "refuse-tester-standing-ended-listing-told (v1.15): Tester Two's read answers notTester alone, never when the listing ended; the refused answer put right is read-tester-standing-listing-ended's outcome",
+    SLOW,
+    async () => {
+      const twin = await given("read-tester-standing-listing-ended.json");
+      const told = readJson(
+        new URL("invalid/refuse-tester-standing-ended-listing-told.json", ACCESS_DIR),
+      ) as Row;
+      const standing = await READS.readTesterStanding(job, twin.request);
+      expect(standing).toEqual(twin.outcome);
+      expect(standing).not.toEqual(told);
+      const { listingEndedAt, ...putRight } = told;
+      expect(listingEndedAt).toBe(TESTER_TWO_ENDED);
+      expect(putRight).toEqual(twin.outcome);
+    },
+  );
 });
 
-describe("beyond the fixtures (README v1.12 'What the new tasks must hold to'; defaults 103 to 109)", () => {
+describe("beyond the fixtures (README v1.12 and v1.15 'What the new tasks must hold to'; defaults 103 to 109 and 136 to 139)", () => {
   for (const spec of CASES) {
     it(spec.shows, SLOW, async () => {
       await givenCase(spec);
@@ -1425,12 +1590,13 @@ describe("one read-only transaction per read, and nothing written (README v1.12:
 
 /**
  * Each read's statements, in its item's order, as sent (whitespace folded, each parameter as `$`, a list of parameters,
- * session_for_token's two arguments among them, as `($...)`): one table or the one function each, no join, no `*`.
+ * session_for_token's two arguments among them, as `($...)`): one table or the one function each, but item 68's step 2,
+ * which reads the two tester lists in one statement (v1.15 default 136); no join, no `*`.
  */
 const STEP_STATEMENTS: Readonly<Record<Call, readonly string[]>> = {
   readTesterStanding: [
     "select person_id from session_for_token($...)",
-    "select person_id from team_page_recipients where person_id = $ and removed_at is null",
+    "select exists ( select 1 from team_page_recipients where person_id = $ and removed_at is null ) or exists ( select 1 from staging_testers where person_id = $ and removed_at is null ) as tester",
   ],
   readRosterPhone: [
     "select address from handles where id = $ and kind = 'phone'",
@@ -1448,8 +1614,18 @@ const STEP_STATEMENTS: Readonly<Record<Call, readonly string[]>> = {
 const NEVER_READ = ["sealing_keys", "messages", "consents", "proof_codes"];
 /** The hashes no statement may name, and the sessions table, which item 53 reads through K-22's function alone. */
 const NEVER_NAMED = ["token_sha256", "device_sha256", "code_hash", "sessions"];
-/** The tables the three reads read, whose columns a statement may name, and K-22's function. */
-const OWN_TABLES = ["team_page_recipients", "handles", "person_handles", "phones", "chat_links"];
+/**
+ * The tables the three reads read (K-22 v1.3's staging_testers by v1.15's item 68), whose columns a statement may name,
+ * and K-22's function.
+ */
+const OWN_TABLES = [
+  "team_page_recipients",
+  "staging_testers",
+  "handles",
+  "person_handles",
+  "phones",
+  "chat_links",
+];
 const FUNCTION = "session_for_token";
 
 /** A statement's tokens: comments, string literals and collations dropped, quoted names unquoted, lower case. */
@@ -1494,7 +1670,7 @@ function namedWrongly(statement: string): string[] {
 
 /** What no answer of each read may hold: an id of a person, a session, a team row, a code, a business or a link. */
 const NEVER_ANSWERED: Readonly<Record<Call, readonly string[]>> = {
-  readTesterStanding: ["person-", "session-", "team-", "code-", "handle-", "@", "+1555", "biz-"],
+  readTesterStanding: ["person-", "session-", "team-", "staging-", "code-", "handle-", "@", "+1555", "biz-"],
   readRosterPhone: ["person-", "session-", "team-", "code-", "biz-", "chatlink-", "role-", "Sam", "Alex"],
   readPhoneState: [
     "+1555",
@@ -1558,7 +1734,11 @@ describe("the statements the reads send: items 53 to 55's reads as written, thei
     // The reads' own statements pass, with parameters as postgres.js binds them, and each is canonical.
     const own: [Call, number, string][] = [
       [STANDING, 0, "select person_id from session_for_token($1, $2)"],
-      [STANDING, 1, "select person_id from team_page_recipients where person_id = $1 and removed_at is null"],
+      [
+        STANDING,
+        1,
+        "select exists (\n      select 1 from team_page_recipients where person_id = $1 and removed_at is null\n    ) or exists (\n      select 1 from staging_testers where person_id = $2 and removed_at is null\n    ) as tester",
+      ],
       [ROSTER_PHONE, 0, "select address from handles where id = $1 and kind = 'phone'"],
       [ROSTER_PHONE, 1, "select person_id from person_handles where handle_id = $1 limit 2"],
       [ROSTER_PHONE, 2, "select handle_id from person_handles where person_id = $1"],
@@ -1733,9 +1913,10 @@ describe("a lost connection answers transient, with no number, hash or connectio
     throw new Error(`waited 20 s, and ${applicationName} never waited on a lock`);
   }
 
-  /** Each read, with a table it reads and a fixture whose read reaches that table. */
+  /** Each read, with a table it reads and a fixture whose read reaches that table (item 68's listings among them). */
   const CUTS: readonly { call: Call; table: string; fixture: string }[] = [
     { call: STANDING, table: "team_page_recipients", fixture: "read-tester-standing-check-tester.json" },
+    { call: STANDING, table: "staging_testers", fixture: "read-tester-standing-human-tester.json" },
     { call: ROSTER_PHONE, table: "handles", fixture: "read-roster-phone-email-on-file.json" },
     { call: PHONE_STATE, table: "phones", fixture: "read-phone-state-chat-link.json" },
   ];
@@ -1750,6 +1931,7 @@ describe("a lost connection answers transient, with no number, hash or connectio
         const neverInAnswer = [
           ...secretsOf(cut.call, exchange.request, exchange.outcome),
           CHECK_TESTER,
+          TESTER_ONE,
           SAM,
           SAM_HANDLE,
           resolvePrimaryUrl(),

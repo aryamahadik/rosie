@@ -2,7 +2,9 @@
 // emergency_contacts, proof_codes, sessions, contact_changes and v1.1's page_links, with README rules 4, 5 and 8)
 // against local PostgreSQL (`npm run db:up`; `npm run test:integration -- db/repo/people-access`). The schema comes from
 // migrating a fresh test schema. T-1278 adds K-22 v1.2's sign_in_attempts with README rule 9 (migration 0034): its
-// list, its table class, its seed and refused rows, and its three calls.
+// list, its table class, its seed and refused rows, and its three calls. T-1402 adds K-22 v1.3's staging_testers with
+// README rule 10 (migration 0036): its list, its table class (rule 9's, with the runtime side's UPDATE a column grant
+// of removed_at and version), its seed and refused rows, and its grants as rule 10 lists them.
 //
 // The test's connection is the migrations' role, which owns the tables and is not bound by row-level security. A check
 // made as the Tool API (rosie_app) or the runtime side (rosie_job) runs in its own transaction under SET LOCAL ROLE,
@@ -30,7 +32,7 @@ const RUNTIME = "rosie_job";
 type Role = typeof TOOL_API | typeof RUNTIME;
 const ROLES: readonly Role[] = [TOOL_API, RUNTIME];
 const PRIVILEGES = ["SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "REFERENCES", "TRIGGER"];
-/** The twelve tables of K-22 v1, v1.1 and v1.2, in code-unit order (as PostgreSQL orders a relation's name). */
+/** The thirteen tables of K-22 v1, v1.1, v1.2 and v1.3, in code-unit order (as PostgreSQL orders a relation's name). */
 const OWN_TABLES = [
   "accounts",
   "contact_changes",
@@ -43,6 +45,7 @@ const OWN_TABLES = [
   "sign_in_attempts",
   "staff",
   "staff_skills",
+  "staging_testers",
   "team_powers",
 ];
 /** Scoped by business_id (README rules 4 and 8; the table lists' rowLevelSecurity). */
@@ -63,9 +66,9 @@ const PERSON_BOUND = ["proof_codes", "sessions"];
 const RUNTIME_ONLY = ["accounts", "id_uploads"];
 /**
  * Scope none with no Tool API grant at all, and row-level security on with the runtime side's one policy, so a grant
- * given by mistake would still show the Tool API no row (README rule 9, v1.2).
+ * given by mistake would still show the Tool API no row (README rule 9, v1.2; rule 10, v1.3).
  */
-const RUNTIME_POLICY_ONLY = ["sign_in_attempts"];
+const RUNTIME_POLICY_ONLY = ["sign_in_attempts", "staging_testers"];
 /** The tables every update of which raises the version (README rule 2), each with a one-column key. */
 const VERSIONED = [
   "accounts",
@@ -76,6 +79,7 @@ const VERSIONED = [
   "sessions",
   "sign_in_attempts",
   "staff",
+  "staging_testers",
   "team_powers",
 ];
 /** The six seeds 02-contracts' K-22 row names, which the card's proof loads. */
@@ -164,6 +168,7 @@ const TABLES = [
   ...(readJson(new URL("people-access.v1.tables.json", PART_DIR)) as { tables: ContractTable[] }).tables,
   ...(readJson(new URL("people-access.v1.1.tables.json", PART_DIR)) as { tables: ContractTable[] }).tables,
   ...(readJson(new URL("people-access.v1.2.tables.json", PART_DIR)) as { tables: ContractTable[] }).tables,
+  ...(readJson(new URL("people-access.v1.3.tables.json", PART_DIR)) as { tables: ContractTable[] }).tables,
 ];
 const INDEX = (readJson(new URL("index.json", FIXTURES_DIR)) as { fixtures: IndexEntry[] }).fixtures;
 const SEEDS = INDEX.filter((entry) => entry.expect === "accept").map((entry) => entry.file);
@@ -216,6 +221,11 @@ const PAGE_LINK_ISSUE = [
   "expires_at",
 ];
 const PAGE_LINK_END = ["ended_at", "ended_why", "ended_by_contact_change_id", "version"];
+/**
+ * What the runtime side may update of a listing (README rule 10): its end and its version, never its person or its
+ * start.
+ */
+const STAGING_TESTER_END = ["removed_at", "version"];
 
 const fixtureFile = (file: string): FixtureFile => readJson(new URL(file, FIXTURES_DIR)) as FixtureFile;
 
@@ -273,7 +283,7 @@ const standIn = (label: string): string => createHash("sha256").update(label).di
 const plus = (iso: string, minutes: number): string =>
   new Date(new Date(iso).getTime() + minutes * 60_000).toISOString();
 
-/** Every K-22 row of the ten seeds and their chains, in load order. */
+/** Every K-22 row of the eleven seeds and their chains, in load order. */
 const SEED_ROWS = ((): FixtureRow[] => {
   const seen = new Set<string>();
   return SEEDS.flatMap((file) => fixtureRows(new URL(file, FIXTURES_DIR), seen)).filter((row) =>
@@ -543,7 +553,7 @@ async function loadFixtures(files: readonly string[], own = true): Promise<Recor
 /** What is loaded now, so checks that share a state load it once. */
 let loadedState = "";
 
-/** Every K-04 v1 seed and every K-22 seed to v1.2 with its chain (K-23's and K-29's seeds among them). */
+/** Every K-04 v1 seed and every K-22 seed to v1.3 with its chain (K-23's and K-29's seeds among them). */
 async function loadEverySeed(): Promise<void> {
   if (loadedState !== "every seed") {
     await reset();
@@ -653,14 +663,14 @@ afterAll(async () => {
   await db.drop();
 });
 
-describe("the migration against the frozen table lists (K-22 v1, v1.1 and v1.2)", () => {
+describe("the migration against the frozen table lists (K-22 v1, v1.1, v1.2 and v1.3)", () => {
   /** The table list's types as format_type prints them; the others print as the list writes them. */
   const typeNames: Record<string, string> = {
     timestamptz: "timestamp with time zone",
     time: "time without time zone",
   };
 
-  it("the three lists name twelve tables: seven scoped by business on business_id, five scoped none; nine versioned", () => {
+  it("the four lists name thirteen tables: seven scoped by business on business_id, six scoped none; ten versioned", () => {
     expect(TABLES.map((table) => table.name).sort()).toEqual(OWN_TABLES);
     for (const table of TABLES) {
       const scoped = BUSINESS_SCOPED.includes(table.name);
@@ -793,7 +803,7 @@ describe("the migration against the frozen table lists (K-22 v1, v1.1 and v1.2)"
     });
   }
 
-  it("the nine versioned tables raise their version on every update (0002's rule): <table>_version_raised, and no other trigger on any of the twelve", async () => {
+  it("the ten versioned tables raise their version on every update (0002's rule): <table>_version_raised, and no other trigger on any of the thirteen", async () => {
     const triggers = await db.sql<{ table: string; name: string; definition: string }[]>`
       select c.relname as table, t.tgname as name, pg_get_triggerdef(t.oid) as definition
       from pg_trigger t join pg_class c on c.oid = t.tgrelid
@@ -846,6 +856,13 @@ describe("the migration against the frozen table lists (K-22 v1, v1.1 and v1.2)"
     const names = rows.map((row) => row.name);
     expect(names.filter((name) => name === "sign_in_attempts")).toHaveLength(1);
     expect(names.indexOf("sign_in_attempts")).toBeGreaterThan(names.indexOf("people_access"));
+  });
+
+  it("v1.3's staging_testers is recorded in schema_migrations as staging_testers, after sign_in_attempts (T-1402)", async () => {
+    const rows = await db.sql<{ name: string }[]>`select name from schema_migrations order by version`;
+    const names = rows.map((row) => row.name);
+    expect(names.filter((name) => name === "staging_testers")).toHaveLength(1);
+    expect(names.indexOf("staging_testers")).toBeGreaterThan(names.indexOf("sign_in_attempts"));
   });
 });
 
@@ -931,7 +948,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     order by tablename, policyname
   `;
 
-  it("row-level security is on for the seven business-scoped tables, the two bound to the call's person and sign_in_attempts (rule 9); off for accounts and id_uploads (no Tool API grant); none forced", async () => {
+  it("row-level security is on for the seven business-scoped tables, the two bound to the call's person, sign_in_attempts (rule 9) and staging_testers (rule 10); off for accounts and id_uploads (no Tool API grant); none forced", async () => {
     const flags = await db.sql<{ name: string; on: boolean; forced: boolean }[]>`
       select relname as name, relrowsecurity as on, relforcerowsecurity as forced from pg_class
       where relnamespace = ${db.schema}::regnamespace and relname in ${db.sql(OWN_TABLES)}
@@ -942,7 +959,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     );
   });
 
-  it("each table's policies, by name, role and command: 0012's two on the five plain tables; one per command for the Tool API and 0012's runtime policy on contact_changes and page_links; the person-bound ones on proof_codes and sessions, and every row for the runtime side; on sign_in_attempts the runtime side's one alone (rule 9)", async () => {
+  it("each table's policies, by name, role and command: 0012's two on the five plain tables; one per command for the Tool API and 0012's runtime policy on contact_changes and page_links; the person-bound ones on proof_codes and sessions, and every row for the runtime side; on sign_in_attempts and staging_testers the runtime side's one alone (rules 9 and 10)", async () => {
     const own = (await policiesIn(db.sql, db.schema)).filter((policy) => OWN_TABLES.includes(policy.table));
     const shape = own.map((policy) => [
       policy.table,
@@ -970,7 +987,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     expect(order(shape)).toEqual(order(expected));
   });
 
-  it("the plain tables' policies, and the runtime policies of contact_changes and page_links, are 0012's word for word (read from outbox_rows', which key on business_id); proof_codes', sessions' and sign_in_attempts' runtime policies admit every row", async () => {
+  it("the plain tables' policies, and the runtime policies of contact_changes and page_links, are 0012's word for word (read from outbox_rows', which key on business_id); proof_codes', sessions', sign_in_attempts' and staging_testers' runtime policies admit every row", async () => {
     const all = await policiesIn(db.sql, db.schema);
     const core = all.filter((policy) => policy.table === "outbox_rows");
     const of = (name: string): [string | null, string | null] => {
@@ -1017,7 +1034,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     expect(expressions(own)).toEqual(expressions(listed));
   });
 
-  it("table grants (DL-149, each to its named reader: the migration's header): both roles on the five plain tables and contact_changes; the runtime side alone on accounts, id_uploads and sign_in_attempts (rule 9: the Tool API none) and in full on proof_codes, sessions and page_links; the Tool API's table grant there only INSERT on sessions; no delete, truncate, references or trigger; nothing to PUBLIC", async () => {
+  it("table grants (DL-149, each to its named reader: the migration's header): both roles on the five plain tables and contact_changes; the runtime side alone on accounts, id_uploads and sign_in_attempts (rule 9: the Tool API none) and in full on proof_codes, sessions and page_links; on staging_testers the runtime side's SELECT and INSERT, its UPDATE a column grant (rule 10: the Tool API none); the Tool API's table grant there only INSERT on sessions; no delete, truncate, references or trigger; nothing to PUBLIC", async () => {
     const held = await db.sql<{ role: string; table: string; privilege: string }[]>`
       select r.role, c.relname as table, p.privilege
       from unnest(${[...ROLES]}::text[]) as r(role)
@@ -1050,6 +1067,8 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
         sign_in_attempts: full,
         staff: full,
         staff_skills: once,
+        // README rule 10: its UPDATE of removed_at and version alone is a column grant (the next check).
+        staging_testers: once,
         team_powers: full,
       },
     };
@@ -1069,7 +1088,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     expect(others).toEqual([]);
   });
 
-  it("column grants (rules 5 and 8): the Tool API reads every proof_codes column but code_hash and inserts a send's ten; reads every sessions column but the two hashes and updates four; reads every page_links column but code_sha256, inserts an issue's nine and updates the end; no other column grant (none on sign_in_attempts: rule 9), and no hash readable", async () => {
+  it("column grants (rules 5, 8 and 10): the Tool API reads every proof_codes column but code_hash and inserts a send's ten; reads every sessions column but the two hashes and updates four; reads every page_links column but code_sha256, inserts an issue's nine and updates the end; the runtime side updates staging_testers' removed_at and version alone (rule 10); no other column grant (none on sign_in_attempts: rule 9; none of the Tool API's on staging_testers: rule 10), and no hash readable", async () => {
     const granted = await db.sql<{ table: string; column: string; grantee: string; privilege: string }[]>`
       select c.relname as table, a.attname as column,
              case when g.grantee = 0 then 'PUBLIC' else pg_get_userbyid(g.grantee) end as grantee,
@@ -1089,16 +1108,36 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
       ["page_links", "INSERT", PAGE_LINK_ISSUE],
       ["page_links", "UPDATE", PAGE_LINK_END],
     ];
+    // README rule 10 (v1.3): the runtime side's UPDATE of a listing's end and version, its one column grant here.
+    const runtimeWant: [string, string, string[]][] = [["staging_testers", "UPDATE", STAGING_TESTER_END]];
     expect(granted.map((row) => `${row.table} ${row.column} ${row.grantee} ${row.privilege}`).sort()).toEqual(
-      want
-        .flatMap(([table, privilege, columns]) =>
+      [
+        ...want.flatMap(([table, privilege, columns]) =>
           columns.map((column) => `${table} ${column} ${TOOL_API} ${privilege}`),
-        )
-        .sort(),
+        ),
+        ...runtimeWant.flatMap(([table, privilege, columns]) =>
+          columns.map((column) => `${table} ${column} ${RUNTIME} ${privilege}`),
+        ),
+      ].sort(),
     );
     expect(PROOF_CODE_READ).toHaveLength(14);
     expect(SESSION_READ).toHaveLength(10);
     expect(PAGE_LINK_READ).toHaveLength(12);
+    // has_column_privilege agrees for staging_testers, column by column in the table's order: the runtime side updates
+    // removed_at and version alone, and the Tool API holds no privilege on any of its columns.
+    const listingColumns = await db.sql<{ role: string; column: string; privilege: string }[]>`
+      select r.role, a.attname as column, p.privilege
+      from unnest(${[...ROLES]}::text[]) as r(role)
+        cross join pg_attribute a
+        cross join unnest(${["SELECT", "INSERT", "UPDATE", "REFERENCES"]}::text[]) as p(privilege)
+      where a.attrelid = ${`${db.schema}.staging_testers`}::regclass and a.attnum > 0 and not a.attisdropped
+        and has_column_privilege(r.role, a.attrelid, a.attnum, p.privilege)
+      order by 1, a.attnum, 3
+    `;
+    expect(listingColumns.filter((row) => row.role === TOOL_API)).toEqual([]);
+    expect(
+      listingColumns.filter((row) => row.privilege === "UPDATE").map((row) => `${row.role} ${row.column}`),
+    ).toEqual(STAGING_TESTER_END.map((column) => `${RUNTIME} ${column}`));
     const hashes = await db.sql<{ readable: boolean }[]>`
       select has_column_privilege(${TOOL_API}, (${db.schema} || '.' || t.name)::regclass, t.col, 'SELECT') as readable
       from (values ('proof_codes', 'code_hash'), ('sessions', 'token_sha256'), ('sessions', 'device_sha256'),
@@ -1279,27 +1318,29 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
   });
 });
 
-describe("the seed fixtures load (fixtures/index.json): the six of 02-contracts' K-22 row, and on_call's, contact_changes', v1.1's page_links' and v1.2's sign_in_attempts'", () => {
+describe("the seed fixtures load (fixtures/index.json): the six of 02-contracts' K-22 row, and on_call's, contact_changes', v1.1's page_links', v1.2's sign_in_attempts' and v1.3's staging_testers'", () => {
   /**
-   * The K-22 rows the ten seeds give together, per table: every table gets rows. v1.2's seed-sign-in-attempt adds two
-   * of Sam's sign-in codes, the session the first started, and three attempts (T-1278).
+   * The K-22 rows the eleven seeds give together, per table: every table gets rows. v1.2's seed-sign-in-attempt adds
+   * two of Sam's sign-in codes, the session the first started, and three attempts (T-1278). v1.3's seed-staging-tester
+   * adds Tester One's and Tester Two's accounts, sign-in codes and sessions, and their two listings (T-1402).
    */
   const SEEDED = {
-    accounts: 1,
+    accounts: 3,
     contact_changes: 1,
     emergency_contacts: 2,
     id_uploads: 1,
     on_call: 3,
     page_links: 4,
-    proof_codes: 7,
-    sessions: 3,
+    proof_codes: 9,
+    sessions: 5,
     sign_in_attempts: 3,
     staff: 4,
     staff_skills: 6,
+    staging_testers: 2,
     team_powers: 1,
   };
 
-  it("the index lists ten seeds (the card's six among them) and thirty-seven refused rows (25 of v1, 6 of v1.1, 6 of v1.2), all on K-22's own tables", () => {
+  it("the index lists eleven seeds (the card's six among them) and forty-two refused rows (25 of v1, 6 of v1.1, 6 of v1.2, 5 of v1.3), all on K-22's own tables", () => {
     expect([...SEEDS].sort()).toEqual(
       [
         ...CARD_SEEDS,
@@ -1307,13 +1348,15 @@ describe("the seed fixtures load (fixtures/index.json): the six of 02-contracts'
         "seed-on-call.json",
         "seed-page-link.json",
         "seed-sign-in-attempt.json",
+        "seed-staging-tester.json",
       ].sort(),
     );
     const refused = INDEX.filter((entry) => entry.expect === "refuse");
     expect(refused.filter((entry) => entry.version === "v1")).toHaveLength(25);
     expect(refused.filter((entry) => entry.version === "v1.1")).toHaveLength(6);
     expect(refused.filter((entry) => entry.version === "v1.2")).toHaveLength(6);
-    expect(refused).toHaveLength(37);
+    expect(refused.filter((entry) => entry.version === "v1.3")).toHaveLength(5);
+    expect(refused).toHaveLength(42);
     expect(INDEX.every((entry) => OWN_TABLES.includes(entry.table))).toBe(true);
   });
 
@@ -1339,7 +1382,7 @@ describe("the seed fixtures load (fixtures/index.json): the six of 02-contracts'
     );
   }
 
-  it("all ten insert together, each after chain once, and no table is left empty", SLOW, async () => {
+  it("all eleven insert together, each after chain once, and no table is left empty", SLOW, async () => {
     await reset();
     loadedState = "";
     const loaded = await loadFixtures(SEEDS);
@@ -2262,6 +2305,44 @@ const REFUSED_CASES: { file: string; why?: Why; fixed: Fixed[] }[] = [
     why: "privilege",
     fixed: [runtimeSide],
   },
+  // v1.3 (README rule 10; T-1402): each passes once its one fault is put right, as the README's "Seeds and refused rows
+  // (v1.3)" says.
+  {
+    file: "invalid/refuse-staging-tester-tool-api-read.json",
+    why: "privilege",
+    fixed: [runtimeSide],
+  },
+  {
+    file: "invalid/refuse-staging-tester-listed-by-tool-api.json",
+    why: "privilege",
+    fixed: [runtimeSide],
+  },
+  {
+    file: "invalid/refuse-staging-tester-two-live-listings.json",
+    fixed: [
+      {
+        label: "the same row for Tester Two, whose listing ended",
+        change: { person_id: "person-tester-two" },
+        rows: 1,
+      },
+    ],
+  },
+  {
+    file: "invalid/refuse-staging-tester-ended-before-listed.json",
+    fixed: [{ label: "the same end at 08:00Z", change: { removed_at: "2026-11-14T08:00:00Z" }, rows: 1 }],
+  },
+  {
+    file: "invalid/refuse-staging-tester-moved-to-another-person.json",
+    why: "privilege",
+    fixed: [
+      {
+        label: "the same update setting removed_at to 08:00Z in place of person_id, ending the listing",
+        drop: ["person_id"],
+        change: { removed_at: "2026-11-14T08:00:00Z" },
+        rows: 1,
+      },
+    ],
+  },
 ];
 
 const roleOf = (role: Refused["role"]): Role => (role === "toolApi" ? TOOL_API : RUNTIME);
@@ -2302,8 +2383,8 @@ function actionOf(refused: Refused, fix: Fixed | null) {
   };
 }
 
-describe("every refused fixture is refused for its one reason, and passes without it (README rules 4, 5, 8 and 9 and the CHECKs)", () => {
-  it("the cases cover the index's thirty-seven refused fixtures, each once", () => {
+describe("every refused fixture is refused for its one reason, and passes without it (README rules 4, 5, 8, 9 and 10 and the CHECKs)", () => {
+  it("the cases cover the index's forty-two refused fixtures, each once", () => {
     expect(REFUSED_CASES.map((entry) => entry.file).sort()).toEqual(
       INDEX.filter((entry) => entry.expect === "refuse")
         .map((entry) => entry.file)
@@ -3239,6 +3320,94 @@ describe("sign-in attempts (rule 9, v1.2; T-1278): the Tool API reaches an attem
   });
 });
 
+describe("staging's testers (rule 10, v1.3; T-1402): the runtime side lists a person and ends a listing, never moving, re-dating or deleting one; the Tool API reaches no listing", () => {
+  beforeAll(loadEverySeed, 120_000);
+
+  it("the Tool API is refused every read and write of staging_testers (42501), in a sign-in call, in Tester One's own call and in Sam's call scoped to a business; the runtime side reads the two listings", async () => {
+    const listing: Values = {
+      id: "staging-tester-probe-tool-api",
+      person_id: SAM,
+      added_at: "2026-11-14T08:00:00Z",
+    };
+    const actions: [string, (tx: Tx) => Promise<unknown>][] = [
+      ["select", (tx) => countRows(tx, "staging_testers")],
+      ["insert", (tx) => insertRow(tx, "staging_testers", listing)],
+      [
+        "update",
+        (tx) => tx`
+          update staging_testers set removed_at = '2026-11-14T08:00:00Z', version = version + 1
+          where id = 'staging-tester-one'
+        `,
+      ],
+      ["delete", (tx) => tx`delete from staging_testers where id = 'staging-tester-one'`],
+    ];
+    const scopes: (Scope | null)[] = [
+      null,
+      { personId: "person-tester-one" },
+      { businessId: BARBERSHOP, personId: SAM },
+    ];
+    for (const scope of scopes) {
+      for (const [label, action] of actions) {
+        const refused = await refusal(as(TOOL_API, scope, action));
+        expect([refused.code, refused.message], `${label} ${JSON.stringify(scope)}`).toEqual([
+          "42501",
+          "permission denied for table staging_testers",
+        ]);
+      }
+    }
+    expect(await as(RUNTIME, null, (tx) => countRows(tx, "staging_testers"))).toBe(2);
+  });
+
+  it("the runtime side lists a person and ends the listing by removed_at and the version; listed again, the person gets a new row, which the partial unique index admits once the old one ended; moving a listing to another person, re-dating it, deleting it or truncating the table is refused (42501)", async () => {
+    const answer = await as(RUNTIME, null, async (tx) => {
+      const listed = await insertRow(tx, "staging_testers", {
+        id: "staging-tester-probe-sam",
+        person_id: SAM,
+        added_at: "2026-11-14T08:00:00Z",
+      });
+      const ended = await tx<{ version: number }[]>`
+        update staging_testers set removed_at = '2026-11-14T09:00:00Z', version = version + 1
+        where id = 'staging-tester-probe-sam'
+        returning version
+      `;
+      const again = await insertRow(tx, "staging_testers", {
+        id: "staging-tester-probe-sam-2",
+        person_id: SAM,
+        added_at: "2026-11-14T10:00:00Z",
+      });
+      const live = await tx<{ id: string }[]>`
+        select id from staging_testers where person_id = ${SAM} and removed_at is null
+      `;
+      return { listed, ended: [...ended], again, live: live.map((row) => row.id) };
+    });
+    expect(answer).toEqual({
+      listed: 1,
+      ended: [{ version: 2 }],
+      again: 1,
+      live: ["staging-tester-probe-sam-2"],
+    });
+    const refusedStatements: [string, string][] = [
+      [
+        "moved to another person",
+        "update staging_testers set person_id = 'person-tester-two', version = version + 1 where id = 'staging-tester-one'",
+      ],
+      [
+        "re-dated",
+        "update staging_testers set added_at = '2026-11-14T05:00:00Z', version = version + 1 where id = 'staging-tester-one'",
+      ],
+      ["deleted", "delete from staging_testers where id = 'staging-tester-one'"],
+      ["truncated", "truncate staging_testers"],
+    ];
+    for (const [label, statement] of refusedStatements) {
+      const refused = await refusal(as(RUNTIME, null, (tx) => tx.unsafe(statement)));
+      expect([refused.code, refused.message], label).toEqual([
+        "42501",
+        "permission denied for table staging_testers",
+      ]);
+    }
+  });
+});
+
 describe("row-level security per business on the seven business-scoped tables, every K-04 v1 and K-22 v1.1 seed loaded", () => {
   beforeAll(loadEverySeed, 120_000);
 
@@ -3280,7 +3449,7 @@ describe("row-level security per business on the seven business-scoped tables, e
     },
   );
 
-  it("the Tool API writes only its scope's rows: another business's insert is refused (42501), its update finds no row, a row cannot move to another business; neither role deletes a row of the twelve", async () => {
+  it("the Tool API writes only its scope's rows: another business's insert is refused (42501), its update finds no row, a row cannot move to another business; neither role deletes a row of the thirteen", async () => {
     const skill = {
       ...valuesOf("seed-staff-joined.json", "staff_skills", 1),
       id: "skill-jordan-electrician-2",
@@ -3316,6 +3485,8 @@ describe("row-level security per business on the seven business-scoped tables, e
   });
 
   it("accounts and id_uploads are the runtime side's alone: the Tool API is refused them (42501), scoped or not, and the runtime side reads them", async () => {
+    // Sam's account and ID upload; v1.3's seed-staging-tester adds Tester One's and Tester Two's accounts (T-1402).
+    const seeded: Record<string, number> = { accounts: 3, id_uploads: 1 };
     for (const table of RUNTIME_ONLY) {
       for (const scope of [{ businessId: BARBERSHOP, personId: SAM }, null]) {
         const refused = await refusal(as(TOOL_API, scope, (tx) => countRows(tx, table)));
@@ -3324,7 +3495,7 @@ describe("row-level security per business on the seven business-scoped tables, e
           `permission denied for table ${table}`,
         ]);
       }
-      expect(await as(RUNTIME, null, (tx) => countRows(tx, table)), table).toBe(1);
+      expect(await as(RUNTIME, null, (tx) => countRows(tx, table)), table).toBe(seeded[table]);
     }
   });
 });
@@ -3380,7 +3551,7 @@ describe("sealed fields (rule 6; T-182's sealing): the stored value is the seale
   });
 });
 
-describe("versions (rule 2): every update of the nine versioned tables raises the version by exactly one", () => {
+describe("versions (rule 2): every update of the ten versioned tables raises the version by exactly one", () => {
   beforeAll(loadEverySeed, 120_000);
 
   it("on the runtime side, an update that leaves it is refused (<table>_version_raised, 23514) and one that raises it passes", async () => {

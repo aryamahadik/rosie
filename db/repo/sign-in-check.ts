@@ -37,9 +37,12 @@
 //                   (unknown, ended or expired) answers signedOut repeated, naming nothing and changing nothing; else
 //                   rosie.person_id is set to its person and the session is ended now, signed_out, its version raised,
 //                   under rule 5's update policy (only that person's own live session).
-//   personStanding  the standing a signedIn answer gives (item 62), as rosie_job, in one read-only transaction: the
-//                   person's live roles at every business but customer, in role id order, in K-21's names (default
-//                   121); team, a live K-36 team row; tester, the same row (v1.12 default 103; default 122).
+//   personStanding  the standing a signedIn answer gives (item 62, widened by v1.15's item 69; T-1402, DL-535), as
+//                   rosie_job, in one read-only transaction: the person's live roles at every business but customer, in
+//                   role id order, in K-21's names (default 121); team, a live K-36 team row alone (default 137);
+//                   tester, a live team row or a live K-22 v1.3 staging_testers listing (0036), both lists read by
+//                   person_id and removed_at alone in one statement, as item 68 reads them (default 136). So a human
+//                   tester answers team false and tester true, and a team member team true and tester true.
 //   signInEntries   a check's or a sign-out's entries (item 63; DL-610: built here), as rosie_job, in one transaction:
 //                   from the ids it is asked, it reads every value from the rows (default 119), and writes one entry
 //                   per change of the row not yet logged, insert ... on conflict (id) do nothing, so a repeat writes
@@ -611,27 +614,34 @@ async function standingIn(tx: Sql, personId: string): Promise<PersonStandingResp
     where person_id = ${personId} and ended_at is null and role <> 'customer'
     order by id collate "C"
   `;
-  const [team] = await tx<{ live: boolean }[]>`
+  // The person's live team row and live listing (removed_at null on either), both lists in one statement, each by
+  // person_id and removed_at alone, as item 68 reads them (item 69; default 136).
+  const [rows] = await tx<{ team: boolean; listed: boolean }[]>`
     select exists (
       select 1 from team_page_recipients where person_id = ${personId} and removed_at is null
-    ) as live
+    ) as team, exists (
+      select 1 from staging_testers where person_id = ${personId} and removed_at is null
+    ) as listed
   `;
-  const onTeam = team?.live === true;
+  const onTeam = rows?.team === true;
   return {
     personId,
     roles: roles.map((row) => ({ role: standingRoleOf(row.role), businessId: row.business_id })),
+    // team is the team row's alone (default 137): a listing is no team row, so a human tester's is false.
     team: onTeam,
-    tester: onTeam,
+    // tester is a live team row or a live listing (default 136), so team true never comes with tester false.
+    tester: onTeam || rows?.listed === true,
   };
 }
 
 /**
- * The standing a signedIn answer gives (K-05 v1.13 item 62), read after proveSignIn commits, by the person it answered:
- * the person's live roles at every business but customer, in role id order, in K-21's names; team, a live K-36 team
- * row; tester, by v1.12's rule, the same row. One read-only transaction at repeatable read on the runtime side's client
- * (rosie_job), with no business scope, writing nothing. transient on a serialization failure, a deadlock or a lost
- * connection (the page call then answers roles empty and both flags false). Throws a TypeError for a request of the
- * wrong shape and any other database error scrubbed.
+ * The standing a signedIn answer gives (K-05 v1.13 item 62, widened by v1.15's item 69), read after proveSignIn commits,
+ * by the person it answered: the person's live roles at every business but customer, in role id order, in K-21's
+ * names; team, a live K-36 team row alone; tester, a live team row or a live K-22 v1.3 listing, read as item 68 reads
+ * them. One read-only transaction at repeatable read on the runtime side's client (rosie_job), with no business scope,
+ * writing nothing. transient on a serialization failure, a deadlock or a lost connection (the page call then answers
+ * roles empty and both flags false). Throws a TypeError for a request of the wrong shape and any other database error
+ * scrubbed.
  */
 export async function personStanding(
   sql: Sql,

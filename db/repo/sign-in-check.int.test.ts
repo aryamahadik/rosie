@@ -22,6 +22,13 @@
 // Names are the master's sample cast as the seeds hold them (rule 9); the attempts, codes, sessions and people a case
 // adds carry example ids (t1284), no name and example.com addresses; every hash is a stand-in, the sha256 of a label,
 // of no real device, code or token.
+//
+// T-1402 (DL-757) adds K-05 v1.15's item 69, personStanding's tester widened to K-22 v1.3's staging_testers (migration
+// 0036): its two v1.15 exchanges, replayed after K-22 v1.3's seed-staging-tester.json; its refused answer (team true
+// with tester false) against the check tester's; a team row, a live listing, both, neither, an ended listing, an ended
+// listing with a later live one, a removed team row beside a live listing and both ended, each with the same fields,
+// team the team row's alone; the two lists read in one statement; and its answers also checked against v1.15. The
+// people, handles, team rows and listings a case adds carry example ids (t1402), no name and example.com addresses.
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
@@ -94,6 +101,8 @@ for (const file of schemaFiles(CONTRACTS)) {
 }
 const idOf = (path: string): string => (readJson(new URL(path, CONTRACTS)) as { $id: string }).$id;
 const K05_V113 = idOf("data-access/data-access.v1.13.schema.json");
+/** K-05 v1.15 (T-1295): personStanding.response restated, a team member always a tester (README item 69). */
+const K05_V115 = idOf("data-access/data-access.v1.15.schema.json");
 const K08_V12 = idOf("event-trace/event-trace.v1.2.schema.json");
 
 function schemaErrors(schemaId: string, def: string, value: unknown): string[] {
@@ -106,10 +115,13 @@ function schemaErrors(schemaId: string, def: string, value: unknown): string[] {
     : (validate.errors ?? []).map((error) => `${error.instancePath} ${error.message ?? ""}`);
 }
 
-/** An answer checked against its own v1.13 definition: an error against <call>.errors, else <call>.response. */
-function expectValid(call: Call, outcome: unknown): void {
+/**
+ * An answer checked against its own v1.13 definition (or the version `schemaId` names): an error against
+ * <call>.errors, else <call>.response.
+ */
+function expectValid(call: Call, outcome: unknown, schemaId = K05_V113): void {
   const isError = typeof outcome === "object" && outcome !== null && "error" in outcome;
-  expect(schemaErrors(K05_V113, isError ? `${call}.errors` : `${call}.response`, outcome)).toEqual([]);
+  expect(schemaErrors(schemaId, isError ? `${call}.errors` : `${call}.response`, outcome)).toEqual([]);
 }
 
 /** Every string in a value, nested or not. */
@@ -1112,7 +1124,7 @@ describe("endSession", () => {
 });
 
 describe("personStanding", () => {
-  it("answers the v1.13 fixtures' standings", SLOW, async () => {
+  it("answers the v1.13 fixtures' standings, each valid against v1.13 and v1.15", SLOW, async () => {
     for (const file of [
       "person-standing-sam.json",
       "person-standing-alex.json",
@@ -1125,8 +1137,138 @@ describe("personStanding", () => {
       const outcome = await personStanding(job, exchange.request);
       expect(outcome, file).toEqual(exchange.outcome);
       expectValid("personStanding", outcome);
+      expectValid("personStanding", outcome, K05_V115);
     }
   });
+
+  it(
+    "refuse-person-standing-team-not-tester (v1.15): a team member is a tester, so v1.15 refuses team true with tester false; the check tester, on Rosie's team, answers team true and tester true, the refused answer put right",
+    SLOW,
+    async () => {
+      const refused = readJson(
+        new URL("invalid/refuse-person-standing-team-not-tester.json", ACCESS_DIR),
+      ) as Row;
+      expect(schemaErrors(K05_V115, "personStanding.response", refused)).not.toEqual([]);
+      const twin = readJson(new URL("person-standing-check-tester.json", ACCESS_DIR)) as {
+        request: PersonStandingRequest;
+        outcome: Row;
+      };
+      const outcome = await personStanding(job, twin.request);
+      expect(outcome).toEqual(twin.outcome);
+      expect(outcome).not.toEqual(refused);
+      expect({ ...refused, tester: true }).toEqual(twin.outcome);
+      expectValid("personStanding", outcome, K05_V115);
+    },
+  );
+
+  /** When a case's listings and team rows begin, and when an ended one ended (example times). */
+  const ADDED = "2026-11-14T05:30:00Z";
+  const ENDED = "2026-11-14T07:00:00Z";
+  /** A person a case adds (example ids, t1402): no name and no role, an email handle at example.com. */
+  const personRows = (key: string): TableRow[] => [
+    { table: "persons", values: { id: `person-t1402-${key}`, name: null, language: null, version: 1 } },
+    {
+      table: "handles",
+      values: { id: `handle-t1402-${key}-email`, kind: "email", address: `t1402-${key}@example.com` },
+    },
+    {
+      table: "person_handles",
+      values: { person_id: `person-t1402-${key}`, handle_id: `handle-t1402-${key}-email` },
+    },
+  ];
+  /** Its K-36 team row, reached at that email: live, or removed at `removedAt` (version 2). */
+  function teamRow(key: string, removedAt: string | null = null): TableRow {
+    return {
+      table: "team_page_recipients",
+      values: {
+        id: `team-t1402-${key}`,
+        person_id: `person-t1402-${key}`,
+        chat_handle_id: null,
+        email_handle_id: `handle-t1402-${key}-email`,
+        added_at: ADDED,
+        removed_at: removedAt,
+        version: removedAt === null ? 1 : 2,
+      },
+    };
+  }
+  /** Its `n`th K-22 v1.3 listing: live, or ended at `removedAt` (version 2). */
+  function listingRow(key: string, n: number, addedAt: string, removedAt: string | null = null): TableRow {
+    return {
+      table: "staging_testers",
+      values: {
+        id: `staging-tester-t1402-${key}-${String(n)}`,
+        person_id: `person-t1402-${key}`,
+        added_at: addedAt,
+        removed_at: removedAt,
+        version: removedAt === null ? 1 : 2,
+      },
+    };
+  }
+  /** Item 69's cases (the card's: a team row, a live listing, both, neither, an ended listing; and three more). */
+  const STANDING_CASES: { key: string; rows: TableRow[]; team: boolean; tester: boolean }[] = [
+    { key: "team-row", rows: [teamRow("team-row")], team: true, tester: true },
+    { key: "listed", rows: [listingRow("listed", 1, ADDED)], team: false, tester: true },
+    { key: "both", rows: [teamRow("both"), listingRow("both", 1, ADDED)], team: true, tester: true },
+    { key: "neither", rows: [], team: false, tester: false },
+    { key: "ended", rows: [listingRow("ended", 1, ADDED, ENDED)], team: false, tester: false },
+    {
+      key: "listed-again",
+      rows: [
+        listingRow("listed-again", 1, ADDED, ENDED),
+        listingRow("listed-again", 2, "2026-11-14T07:30:00Z"),
+      ],
+      team: false,
+      tester: true,
+    },
+    {
+      key: "team-row-removed",
+      rows: [teamRow("team-row-removed", ENDED), listingRow("team-row-removed", 1, ADDED)],
+      team: false,
+      tester: true,
+    },
+    {
+      key: "both-ended",
+      rows: [teamRow("both-ended", ENDED), listingRow("both-ended", 1, ADDED, ENDED)],
+      team: false,
+      tester: false,
+    },
+  ];
+
+  it(
+    "item 69 (v1.15): team is a live team row alone, tester a live team row or a live listing (removed_at null on either), each answer with the same four fields: a team row, a live listing, both, neither, an ended listing, an ended listing and a later live one, a removed team row beside a live listing, and both ended",
+    SLOW,
+    async () => {
+      await db.sql.begin(async (tx) => {
+        for (const row of STANDING_CASES.flatMap((one) => [...personRows(one.key), ...one.rows])) {
+          await insertRow(tx, row.table, row.values);
+        }
+      });
+      for (const { key, team, tester } of STANDING_CASES) {
+        const personId = `person-t1402-${key}`;
+        const outcome = await personStanding(job, { personId });
+        expect(outcome, key).toEqual({ personId, roles: [], team, tester });
+        expect(Object.keys(outcome as object).sort(), key).toEqual(["personId", "roles", "team", "tester"]);
+        expectValid("personStanding", outcome);
+        expectValid("personStanding", outcome, K05_V115);
+      }
+    },
+  );
+
+  it(
+    "item 69 (v1.15): one read-only transaction on the runtime side, the two lists read in one statement, each by person_id and removed_at alone",
+    SLOW,
+    async () => {
+      const from = sent.length;
+      expect(await personStanding(job, { personId: "person-check-tester" })).toMatchObject({ team: true });
+      const texts = sentSince(from, JOB_NAME).map((one) => one.text.replace(/\s+/g, " ").trim());
+      expect(texts.filter((text) => text.startsWith("begin"))).toEqual([
+        "begin isolation level repeatable read read only",
+      ]);
+      expect(texts.filter((text) => /team_page_recipients|staging_testers/.test(text))).toEqual([
+        "select exists ( select 1 from team_page_recipients where person_id = $1 and removed_at is null ) as team, exists ( select 1 from staging_testers where person_id = $2 and removed_at is null ) as listed",
+      ]);
+    },
+  );
 
   it(
     "lists live roles in role id order in K-21's names, never a customer's or an ended one",
@@ -1584,6 +1726,20 @@ describe("the v1.13 fixtures", () => {
       expect(String(thrown)).not.toContain("placeholder-session-token");
     }
   });
+});
+
+describe("the v1.15 fixtures (item 69), each replayed after K-22 v1.3's seed-staging-tester.json", () => {
+  it(
+    "answers each accepted exchange's outcome: Tester One, listed with no team row and no role, team false and tester true; Tester Two, whose listing ended, both false; each valid against v1.13 and v1.15",
+    SLOW,
+    async () => {
+      for (const file of ["person-standing-human-tester.json", "person-standing-listing-ended.json"]) {
+        const { outcome, shiftMs } = await replay(file);
+        expectOutcome(file, outcome, exchangeOf(file).outcome, shiftMs);
+        expectValid("personStanding", outcome, K05_V115);
+      }
+    },
+  );
 });
 
 describe("no hash leaves a call", () => {
