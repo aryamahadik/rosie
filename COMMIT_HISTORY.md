@@ -2,9 +2,52 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 612, [`bd3def9`](https://github.com/aryamahadik/rosie/commit/bd3def9), 2026-11-14 10:40:40 UTC.
+- **Through:** commit 614, [`e996837`](https://github.com/aryamahadik/rosie/commit/e996837), 2026-11-14 11:44:39 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 614. docs: COMMIT\_HISTORY.md through commit 612 (bd3def9, \#622) (\#624)
+
+- **Commit:** [`e996837`](https://github.com/aryamahadik/rosie/commit/e996837), by Arya Mahadik, 2026-11-14 11:44:39 UTC
+- **Pull request:** [#624](https://github.com/aryamahadik/rosie/pull/624) from `task/commit-history-108`, merged 2026-11-14 11:44:39 UTC. It squashed 1 branch commit:
+  - `85920eb` docs: COMMIT\_HISTORY.md through commit 612 (bd3def9, \#622)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 613. T-1254: the Worker's database handle and its guard in every call (ADR-014 piece 6) (\#623)
+
+- **Commit:** [`caf9cca`](https://github.com/aryamahadik/rosie/commit/caf9cca), by Arya Mahadik, 2026-11-14 11:44:35 UTC
+- **Pull request:** [#623](https://github.com/aryamahadik/rosie/pull/623) from `task/T-1254`, merged 2026-11-14 11:44:35 UTC. It squashed 2 branch commits:
+  - `5dc985a` T-1254: the Worker's database handle and its guard in every call (run…
+  - `13d48f7` T-1254: the handle's test also shows no role and no search path sent …
+- **Files changed:** 3 (+1640 −0), by folder:
+  - `runtime/src/wiring/staging/` db.ts +640 −0, db.worker.test.ts +968 −0, index.ts +32 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1254: the Worker's database handle and its guard in every call (runtime/src/wiring/staging/db.ts): one short-lived client per call from HYPERDRIVE_JOB or HYPERDRIVE_APP, staging only and no client while DB_SCHEMA is set, ADR-014 section 2's guard as the first statement, refusals and errors that carry no value, the connect and the guard timed apart with the login read (DL-757), and the quiet socket (DL-758); its Workers test on T-1253's rig
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1254: the handle's test also shows no role and no search path sent (role none, the server's default path), and DB_SCHEMA set to public opens no client either
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 612. docs: COMMIT\_HISTORY.md through commit 610 (79274be, \#620) (\#622)
 
