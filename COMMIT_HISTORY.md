@@ -2,9 +2,54 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 601, [`c22c937`](https://github.com/aryamahadik/rosie/commit/c22c937), 2026-11-14 07:53:42 UTC.
+- **Through:** commit 603, [`daf2aa6`](https://github.com/aryamahadik/rosie/commit/daf2aa6), 2026-11-14 08:13:32 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 603. docs: COMMIT\_HISTORY.md through commit 601 (c22c937, \#611) (\#613)
+
+- **Commit:** [`daf2aa6`](https://github.com/aryamahadik/rosie/commit/daf2aa6), by Arya Mahadik, 2026-11-14 08:13:32 UTC
+- **Pull request:** [#613](https://github.com/aryamahadik/rosie/pull/613) from `task/commit-history-103`, merged 2026-11-14 08:13:33 UTC. It squashed 1 branch commit:
+  - `df1da4e` docs: COMMIT\_HISTORY.md through commit 601 (c22c937, \#611)
+- **Files changed:** 1 (+35 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +35 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 602. T-1093: the deploy-time check of the Worker's two logins (ADR-014 piece 4); migrations set lock and statement timeouts (\#612)
+
+- **Commit:** [`d48abc3`](https://github.com/aryamahadik/rosie/commit/d48abc3), by Arya Mahadik, 2026-11-14 08:13:28 UTC
+- **Pull request:** [#612](https://github.com/aryamahadik/rosie/pull/612) from `task/T-1093`, merged 2026-11-14 08:13:29 UTC. It squashed 2 branch commits:
+  - `e59a2e8` T-1093: the deploy-time check of the Worker's two logins (ADR-014 pie…
+  - `1e24a3b` T-1093: worker-logins-check.mjs takes the database URLs out of its en…
+- **Files changed:** 8 (+1697 −13), by folder:
+  - `db/` README.md +8 −0
+  - `infra/ci/` deploy-staging.test.mjs +5 −1, release-harness.mjs +41 −8, worker-logins-check.test.mjs +921 −0
+  - `infra/scripts/` deploy-staging.sh +17 −3, migrate.mjs +22 −0, migrate.test.mjs +144 −1, worker-logins-check.mjs +539 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1093: the deploy-time check of the Worker's two logins (ADR-014 piece 4), run by deploy-staging.sh after step 1 and before the code; migrate.mjs sets lock_timeout 5s and statement_timeout 60s per file; db/README.md names each side's login
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1093: worker-logins-check.mjs takes the database URLs out of its environment by name (lint: no dynamic delete)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 601. docs: COMMIT\_HISTORY.md through commit 599 (1c5b398, \#608) (\#611)
 
