@@ -705,7 +705,8 @@ describe("a read that fails: the route answers 503, never 404 or 401, and nothin
 
 describe("the span and log capture", () => {
   it("no line written while this file ran holds a 555-01xx number, a scope or a flag's setting, and no rejection was left unhandled", async () => {
-    // Its own round, so the capture is never empty: a webhook on the route, then reads for a phone, one of them failing.
+    // Its own round, so the capture is never empty: a webhook on the route with the flag on, one with no flags bound,
+    // then reads for a phone, one of them failing, and a webhook whose read fails.
     await turn(SKELETON_FLAG, GLOBAL_SCOPE, true);
     const { env } = envOf({
       HYPERDRIVE_JOB: poolBinding(JOB),
@@ -713,6 +714,8 @@ describe("the span and log capture", () => {
       LINQ_WEBHOOK_SECRET: testWebhookSecret(),
     });
     expect((await post(workerRoot(env))).status).toBe(401);
+    const unbound = envOf({ LINQ_WEBHOOK_SECRET: testWebhookSecret() });
+    expect((await post(workerRoot(unbound.env))).status).toBe(404);
     // The root's own handle writes each call's timing on console.log.
     const flags = stagingFlags({ env, db: stagingDb(env) });
     if (flags === null) throw new Error("the binding is null on this file's pair");
