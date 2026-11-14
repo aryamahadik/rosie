@@ -2,9 +2,55 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 614, [`e996837`](https://github.com/aryamahadik/rosie/commit/e996837), 2026-11-14 11:44:39 UTC.
+- **Through:** commit 616, [`65d376a`](https://github.com/aryamahadik/rosie/commit/65d376a), 2026-11-14 12:56:18 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 616. docs: COMMIT\_HISTORY.md through commit 614 (e996837, \#624) (\#626)
+
+- **Commit:** [`65d376a`](https://github.com/aryamahadik/rosie/commit/65d376a), by Arya Mahadik, 2026-11-14 12:56:18 UTC
+- **Pull request:** [#626](https://github.com/aryamahadik/rosie/pull/626) from `task/commit-history-109`, merged 2026-11-14 12:56:18 UTC. It squashed 1 branch commit:
+  - `1e7773b` docs: COMMIT\_HISTORY.md through commit 614 (e996837, \#624)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 615. T-1257: stagingOptions(env) and the later parts' seams (the D-017 audit's P1a, its wiring part) (\#625)
+
+- **Commit:** [`c310948`](https://github.com/aryamahadik/rosie/commit/c310948), by Arya Mahadik, 2026-11-14 12:56:14 UTC
+- **Pull request:** [#625](https://github.com/aryamahadik/rosie/pull/625) from `task/T-1257`, merged 2026-11-14 12:56:15 UTC. It squashed 2 branch commits:
+  - `a5ab645` T-1257: stagingOptions(env) wires T-1254's handle into the root on st…
+  - `6d3da5e` T-1257: comment wording: workerRoot points at each part's own file fo…
+- **Files changed:** 21 (+1711 −96), by folder:
+  - `runtime/src/gateway/email/` resend-webhook.worker.test.ts +16 −4
+  - `runtime/src/` index.worker.test.ts +9 −1
+  - `runtime/src/wiring/` index.ts +20 −0, root.ts +47 −85, test-phone.worker.test.ts +11 −3
+  - `runtime/src/wiring/staging/` bundle-safety.ts +29 −0, copies.ts +18 −0, flags.ts +16 −0, index.ts +44 −3, k05-receipt.ts +30 −0, k05-turn.ts +37 −0, models.ts +49 −0, options.ts +210 −0, options.worker.test.ts +796 −0, part.ts +192 −0, secrets.ts +44 −0, send.ts +34 −0, state-reads.ts +35 −0, test-phone.ts +16 −0, tool-api-gate.ts +26 −0, tool-api-rows.ts +32 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1257: stagingOptions(env) wires T-1254's handle into the root on staging only (production reads no binding), one stub file per later part with its final signature (each null, failing closed as its port does), the SEALING_WRAP_KEY-only resolver and WorkerSecrets, the fetch seam, the copy deps' seam in install(), each database call's timing on its trace, and own envs for the three pool-env tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1257: comment wording: workerRoot points at each part's own file for what its null does; k05-turn.ts names both readers of its bundle reads
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 614. docs: COMMIT\_HISTORY.md through commit 612 (bd3def9, \#622) (\#624)
 
