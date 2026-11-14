@@ -673,6 +673,9 @@ export function composeRoot(options: RootOptions): Root {
     async accept(handoff) {
       const status = deliveredStatusOf(handoff);
       const trace = rowTraces.forPart(handoff.partKey) ?? receiptTraceOf(handoff, log, now);
+      // A store call that throws, and an arming not done (ArmingNotDone: it ended failed, T-1244), reject here, and the
+      // gateway answers 503, so Linq sends the receipt again. After an arming not done the part stays marked delivered,
+      // and the receipt's repeat of the row's first delivery goes back to the arming (T-1228), which arms the clock once.
       const result = await handleDeliveryReceipt(
         {
           // The store the dispatcher's parts were marked sent in: a receipt finds its part there (T-562).

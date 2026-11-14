@@ -3039,7 +3039,9 @@ export function seededHandles(seeded: readonly SeededHandle[] = [TEST_OWNER_1]):
  *                   the claim) while the row is sending, sent, checked or delivered; a failure for a part already failed
  *                   answers its next try's key, or with retry and none written writes it then (default 8: K-07
  *                   outbox-4006-new-key.json); any other repeat changes nothing; the row follows its parts' latest tries
- *                   and its version rises with each mark that changes a part;
+ *                   and its version rises with each mark that changes a part; each answer states K-05 v1.9's
+ *                   repeatedDelivery (item 48, mark-a7-03-delivered-repeat.json): on a delivered repeat, whether no try of
+ *                   the row was delivered earlier (a tie counting as first) and the try's stored time; null on any other;
  *   markRowV12      K-05 items 4 and 16 (mark-held-for-text-hours.json, mark-waiting-chat.json): only a sending row,
  *                   compare-and-set on its version; waitingChat also lets the claim go;
  *   sendState       K-05 item 28 (send-state-owner.json's form): the row's state and version now, the recipient (test
@@ -3269,6 +3271,33 @@ export function fakeDispatchData(
     };
   };
 
+  // markPart's record of when each part try was delivered (K-04 outbox_parts.delivered_at: the `at` of the mark that
+  // recorded it), by the try's key: what a repeated delivery receipt repeats (K-05 v1.9 item 48).
+  const deliveredAts = new Map<string, string>();
+  /**
+   * K-05 v1.9's repeatedDelivery for a delivered mark that repeats `part`'s, read from the row's own part tries as
+   * db/repo's markPartV12 reads them: firstOfRow when no part try of the row holds an earlier delivery time, a tie
+   * counting as first (default 85), and the try's stored time, never the repeat's own (default 86). A delivered try with
+   * no stored time is thrown, never answered by a guess (db/repo outbox.ts default 21).
+   */
+  const repeatedDeliveryOf = (
+    parts: readonly DispatchedPart[],
+    part: DispatchedPart,
+  ): { firstOfRow: boolean; deliveredAt: string } => {
+    const deliveredAt = deliveredAts.get(part.key);
+    if (
+      deliveredAt === undefined ||
+      parts.some((each) => each.state === "delivered" && !deliveredAts.has(each.key))
+    ) {
+      throw new Error("markPart: a delivered part holds no delivered_at");
+    }
+    const firstOfRow = parts.every((each) => {
+      const at = deliveredAts.get(each.key);
+      return at === undefined || Date.parse(at) >= Date.parse(deliveredAt);
+    });
+    return { firstOfRow, deliveredAt };
+  };
+
   const markPartOf = async (request: MarkPartV12Request): Promise<MarkPartV12Outcome> => {
     await yieldToOthers(1);
     const all = outboxRows().flatMap((row) =>
@@ -3312,6 +3341,7 @@ export function fakeDispatchData(
           firstDelivery = state.parts.every((each) => each.state !== "delivered");
           part.state = "delivered";
           part.messageId ??= request.providerMessageId;
+          deliveredAts.set(part.key, request.at);
         }
         break;
       case "failed": {
@@ -3384,6 +3414,9 @@ export function fakeDispatchData(
       openQuestionId: row.values.openQuestionId ?? null,
       nextKey,
       row: { state: state.state, version: state.version },
+      // K-05 v1.9 item 48: what a repeated delivery receipt repeats; null on every other answer (default 87).
+      repeatedDelivery:
+        request.outcome === "delivered" && repeated ? repeatedDeliveryOf(state.parts, part) : null,
     } as MarkPartV12Outcome;
   };
 
