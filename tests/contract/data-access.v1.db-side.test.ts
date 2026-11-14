@@ -1,7 +1,8 @@
-// Contract test for K-05, the data-access calls: the database side of v1.3, v1.4, v1.6, v1.7, v1.8 and v1.9 (T-1169;
-// T-1199 for v1.6; T-1214 for v1.7; T-1218 for v1.8; T-1232 for v1.9; DL-348, DL-373, DL-398, DL-444, DL-456, DL-474;
-// contracts/data-access/README.md sections "v1.3", "v1.4", "v1.6", "v1.7", "v1.8" and "v1.9", their "Consumers of"
-// lists, "Fixtures", and "Producers and consumers").
+// Contract test for K-05, the data-access calls: the database side of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9 and v1.10
+// (T-1169; T-1199 for v1.6; T-1214 for v1.7; T-1218 for v1.8; T-1232 for v1.9; T-1260 for v1.10, the D-017 path
+// audit's Q1; DL-348, DL-373, DL-398, DL-444, DL-456, DL-474, DL-506, DL-760, DL-766; contracts/data-access/README.md
+// sections "v1.3", "v1.4", "v1.6", "v1.7", "v1.8", "v1.9" and "v1.10", their "Consumers of" lists, "Fixtures", and
+// "Producers and consumers").
 //
 // The fixture part, data-access.v1.test.ts, checks every fixture against the schema of its version. This part is the
 // producer's side (C-152) for the versions whose calls the database engineer built: v1.3's three turn-face reads
@@ -10,11 +11,14 @@
 // from K-23's company_kinds; README item 45), v1.7's openChatOnText (T-1212, db/repo/chat-open.ts: a number's text
 // opens its chat, writing its phone row and one phone.chat_opened entry; README item 46), v1.8's sendState (T-1216,
 // db/repo/send-state.ts: limit 8's read, whose texts consent row says who gave the yes and for which booking,
-// fromContact and bookingId, read from K-29's consents and the turn that wrote the row; README item 47) and v1.9's
+// fromContact and bookingId, read from K-29's consents and the turn that wrote the row; README item 47), v1.9's
 // markPart (T-1227, db/repo/outbox.ts markPartV12: a delivery receipt that repeats a recorded delivery says what it
 // repeats, repeatedDelivery, whether that delivery was the row's first and when, read from the delivered_at of the
-// row's part tries with nothing written, and null on every other answer; README item 48: REPEAT, MARKS). v1.5 adds no
-// database call (README "v1.5": rowReader is the consumers' mapping), so it has no database side. Every entry of
+// row's part tries with nothing written, and null on every other answer; README item 48: REPEAT, MARKS) and v1.10's
+// three reads on the runtime side (T-1258, db/repo/arming-reads.ts: readQuestionFacts, the facts the clock arming's
+// due rule reads about one open question, and readHandle, a handle's kind and address by its id; T-1259,
+// db/repo/threads.ts: readChatHandle, the phone handle a Linq chat id names, or none; README items 49 to 51). v1.5 adds
+// no database call (README "v1.5": rowReader is the consumers' mapping), so it has no database side. Every entry of
 // fixtures/index.json whose version is one of DB_SIDE_VERSIONS runs here, selected by its version, never by a pinned
 // list or count (DL-124, DL-125), against local PostgreSQL with every migration applied to a fresh schema
 // (db/repo/test-db.ts), in a database of this file's own, so a claim in a chain never meets another run's lock on the
@@ -23,10 +27,12 @@
 //     exchanges its after chain names, run first through db/repo, each answering its own fixture's outcome, a call no
 //     side entry names through CHAIN_CALLS and a v1 claim through K-05 v1's own claimOutbox, V1_CHAIN_CALLS, with the
 //     saved-time clock row a held reserve gets, which db/repo's reserve does not write yet: SAVED_TIME; then the rows its
-//     note says its database side writes itself, where no frozen seed holds them: NOTED_ROWS); then its request goes
-//     through the db/repo call it names, in the role and on the side the README gives that call (items 28, 34 to 43, 46
-//     and 47; commitTurn per write, as rosie_job). The answer is the fixture's outcome, and the answer and the exchange
-//     that holds it are valid against the schema of the entry's own version, a v1.8 sendState answer against
+//     note says its database side writes itself, where no frozen seed holds them: NOTED_ROWS, the practice's five rows
+//     and, before read-chat-handle-sam, S1-01's thread, which K-09 v1.5's turn 1 commit writes and no K-05 exchange
+//     does); then its request goes through the db/repo call it names, in the role and on the side the README gives that
+//     call (items 28, 34 to 43, 46, 47 and 49 to 51; commitTurn per write, as rosie_job). The answer is the fixture's
+//     outcome, and the answer and the exchange that holds it are valid against the schema of the entry's own version (a
+//     v1.10 read's notFound, and a handle or a chat no row holds, among them), a v1.8 sendState answer against
 //     sendState.v1dot8Response, which states fromContact and bookingId always (CONSENT_SOURCE). For a call that writes
 //     (WRITERS: v1.7's openChatOnText), the tables then hold what the answer gives: the row as the call leaves it and
 //     the one entry it appends, or nothing written. A v1.9 markPart answer is judged by markPart.v1dot9Response, which
@@ -41,24 +47,31 @@
 //     valid at v1.2; and a mark of a version before v1.9 a chain runs first is answered as v1.9 does, its outcome with
 //     repeatedDelivery null and nothing else changed (REPEAT: none of them repeats a delivery), valid at v1.9;
 //   - each refused request: the db/repo call refuses it before any statement reaches the database, so nothing is read or
-//     written;
+//     written; a refused request its fixture holds in an exchange (REQUEST_TWINS: v1.10's
+//     refuse-question-facts-caller-business, a facts request naming a business beside the question) is refused the same
+//     way in its own given, its twin's but for its note, and with its one fault taken out, its twin's request, db/repo
+//     answers it the outcome the two fixtures share;
 //   - each refused answer (its definition a call's response, v1.6's readOutboxRow.v1dot6Response, v1.8's
 //     sendState.v1dot8Response or v1.9's markPart.v1dot9Response): in the state of the accepted exchange that answers
 //     the same read or mark (its twin), db/repo's answer is valid against the refused entry's own definition, at the
 //     version db/repo answers the twin, which refuses the fixture too, and it differs from the refused fixture only at
 //     the fault the fixture carries (and at businessSensitive alone where db/repo answers an earlier twin as v1.6): the
 //     repo answers it put right, never as it stands;
-//   - each refused exchange (v1.7's refuse-open-chat-stopped-number, v1.9's refuse-mark-delivered-repeat-null): in its
-//     own given, its twin's but for its note, db/repo answers its request with the twin's outcome, which differs from
-//     the refused one only at its fault, the exchange with that answer is accepted, and nothing is written (for a mark,
-//     to the outbox, its claims, the clock rows or the log: MARKS).
+//   - each refused exchange whose fault is its outcome (EXCHANGE_TWINS: v1.7's refuse-open-chat-stopped-number, v1.9's
+//     refuse-mark-delivered-repeat-null): in its own given, its twin's but for its note, db/repo answers its request
+//     with the twin's outcome, which differs from the refused one only at its fault, the exchange with that answer is
+//     accepted, and nothing is written (for a mark, to the outbox, its claims, the clock rows or the log: MARKS).
 // So a call of db/repo that drifts from the frozen contract fails this test. The repo's own tests (db/repo/*.int.test.ts)
 // hold the rest of the producer's side for these calls: other businesses' rows, the column lists, the roles refused,
 // for openChatOnText parallel texts, a STOP and a START around the call, and its transient answers, and for sendState
 // the rows no v1.8 fixture shows (a yes by text in another handle's turn, a page's yes, an email contact's yes, a START
 // with no turn beside a yes with no turn that is not one), and for markPart the repeats no v1.9 fixture shows (two parts
 // delivered at one time, a receipt recorded after a later-timed one, a second report at another time, a repeated sent
-// and failed mark: db/repo/outbox.int.test.ts, T-1227).
+// and failed mark: db/repo/outbox.int.test.ts, T-1227), and for v1.10's reads the rows no v1.10 fixture holds (the
+// never-delivered rows default 92 orders, the threads its cases add beside the seeds') and every statement each read
+// sends: its tables and columns, the question's own business named beside each key, no visit's address, no message's
+// words and no column of sealing_keys, and one read-only transaction per read (db/repo/arming-reads.int.test.ts,
+// T-1258; db/repo/threads-chat-handle.int.test.ts, T-1259).
 //
 // It needs PostgreSQL: `npm run db:up` locally (DATABASE_URL, else the local Docker database when CI is unset), and the
 // merge check's service database (DATABASE_URL) in CI.
@@ -71,6 +84,7 @@ import type { ValidateFunction } from "ajv";
 import Ajv2020 from "ajv/dist/2020.js";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { readHandle, readQuestionFacts } from "../../db/repo/arming-reads";
 import { openChatOnText } from "../../db/repo/chat-open";
 import { armClock } from "../../db/repo/clocks";
 import { commitTurn } from "../../db/repo/commit-turn";
@@ -88,6 +102,7 @@ import {
 import type { Sql, Tx } from "../../db/repo/scope";
 import { sendState } from "../../db/repo/send-state";
 import { createTestDatabase, type TestDatabase } from "../../db/repo/test-db";
+import { readChatHandle } from "../../db/repo/threads";
 import { readFixedLineFacts, readOpenHolds, readOutboxRow } from "../../db/repo/turn-face-reads";
 import { CONTRACTS_ROOT, REPO_ROOT, type FixtureEntry } from "./_harness";
 
@@ -101,15 +116,18 @@ const DATA_ACCESS_DIR = path.join(CONTRACTS_ROOT, "data-access");
 const FIXTURES_DIR = path.join(DATA_ACCESS_DIR, "fixtures");
 const DB_SCHEMA_DIR = path.join(CONTRACTS_ROOT, "db-schema");
 const CORE_SEEDS_DIR = path.join(DB_SCHEMA_DIR, "core", "fixtures");
+/** K-09's fixtures: turn 1's commit, whose stated writes hold S1-01's thread (README "Fixtures", v1.10). */
+const TOOL_API_FIXTURES_DIR = path.join(CONTRACTS_ROOT, "tool-api", "fixtures");
 /** Fixture set v1's demo shops (rule 9): a kind of work a note lists takes its facts from its shop. */
 const SHOPS_DIR = path.join(REPO_ROOT, "fixtures", "v1", "test-kit", "shops");
 const SLOW = { timeout: 60_000 };
 
 /**
- * The versions with a database side here: v1.3 (T-1138), v1.4 (T-1161), v1.6 (T-1197), v1.7 (T-1212), v1.8 (T-1216)
- * and v1.9 (T-1227). v1 to v1.2's database sides are tasks of their own (README: T-116, T-478), and v1.5 has none.
+ * The versions with a database side here: v1.3 (T-1138), v1.4 (T-1161), v1.6 (T-1197), v1.7 (T-1212), v1.8 (T-1216),
+ * v1.9 (T-1227) and v1.10 (T-1258, T-1259). v1 to v1.2's database sides are tasks of their own (README: T-116, T-478),
+ * and v1.5 has none. v1.11 on join with their own QA tasks (README "Consumers of v1.11": "after v1.10's task").
  */
-const DB_SIDE_VERSIONS = ["v1.3", "v1.4", "v1.6", "v1.7", "v1.8", "v1.9"];
+const DB_SIDE_VERSIONS = ["v1.3", "v1.4", "v1.6", "v1.7", "v1.8", "v1.9", "v1.10"];
 
 interface Given {
   k04Seeds: string[];
@@ -400,14 +418,17 @@ interface DbCall {
 const byBusiness = (request: Record<string, Json>): Role => (request.businessId === null ? "job" : "app");
 
 /**
- * The calls v1.3, v1.4 and v1.7 add, the calls v1.8 and v1.9 change, and the commit their chains run: items 34 to 36
- * (v1.3), 37 to 43 (v1.4), 46 (v1.7), 47 (v1.8) and 48 (v1.9), each in the role its row of the README's table names;
- * commitTurn per write, on the runtime side as rosie_job (README "Scope"). v1.6 adds no call: businessSensitive is
- * readOutboxRow's own (item 45, in item 35's transaction). openChatOnText runs on the runtime side, as rosie_job with no
- * business scope (item 46's table: phones and handles are scoped none), and so does sendState, item 47's read inside
- * item 28's read-only transaction (README "Consumers of v1.8"; v1.2 default 25). markPart is the dispatcher's
- * markPartV12, which answers as v1.9 does (T-1227), item 48 inside item 15's one transaction as rosie_job with no
- * business scope (README "Consumers of v1.9"); the v1.2 marks a chain runs first go through it too (REPEAT).
+ * The calls v1.3, v1.4, v1.7 and v1.10 add, the calls v1.8 and v1.9 change, and the commit their chains run: items 34
+ * to 36 (v1.3), 37 to 43 (v1.4), 46 (v1.7), 47 (v1.8), 48 (v1.9) and 49 to 51 (v1.10), each in the role its row of the
+ * README's table names; commitTurn per write, on the runtime side as rosie_job (README "Scope"). v1.6 adds no call:
+ * businessSensitive is readOutboxRow's own (item 45, in item 35's transaction). openChatOnText runs on the runtime
+ * side, as rosie_job with no business scope (item 46's table: phones and handles are scoped none), and so does
+ * sendState, item 47's read inside item 28's read-only transaction (README "Consumers of v1.8"; v1.2 default 25).
+ * markPart is the dispatcher's markPartV12, which answers as v1.9 does (T-1227), item 48 inside item 15's one
+ * transaction as rosie_job with no business scope (README "Consumers of v1.9"); the v1.2 marks a chain runs first go
+ * through it too (REPEAT). v1.10's three reads, items 49 to 51, run on the runtime side as rosie_job with no business
+ * scope (README "The calls v1.10 adds": the receipt path and the clock arming work across businesses by handle, and
+ * handles and threads are tables only rosie_job reads); each takes its request alone, and no time from its caller.
  */
 const DB_CALLS: Readonly<Record<string, DbCall>> = {
   commitTurn: { role: () => "job", run: commitTurn },
@@ -424,6 +445,9 @@ const DB_CALLS: Readonly<Record<string, DbCall>> = {
   openChatOnText: { role: () => "job", run: openChatOnText },
   sendState: { role: () => "job", run: sendState },
   markPart: { role: () => "job", run: markPartV12 },
+  readQuestionFacts: { role: () => "job", run: readQuestionFacts },
+  readHandle: { role: () => "job", run: readHandle },
+  readChatHandle: { role: () => "job", run: readChatHandle },
 };
 
 /**
@@ -555,12 +579,28 @@ const RESPONSE_TWINS: Readonly<Record<string, { twin: string; part?: string; fau
     twin: "mark-a7-03-delivered-repeat.json",
     faults: ["firstDelivery"],
   },
+  // v1.10: each is its twin's outcome, put right (README "Consumers of v1.10")
+  "invalid/refuse-question-facts-visit-address.json": {
+    twin: "read-question-facts-a7-03.json",
+    faults: ["visit.address"],
+  },
+  "invalid/refuse-read-handle-phone-not-e164.json": {
+    twin: "read-handle-sam.json",
+    faults: ["handle.address"],
+  },
+  // The one fault is the email handle the answer names, by its id, its kind and its address: the chat's handle is
+  // Alex's phone (item 51, default 94).
+  "invalid/refuse-chat-handle-email.json": {
+    twin: "read-chat-handle-alex.json",
+    faults: ["handleId", "handle.kind", "handle.address"],
+  },
 };
 
 /**
- * Each refused exchange of a version with a database side, with its twin: the accepted exchange whose given (but its
- * note) and request it shares, whose outcome db/repo answers in the refused fixture's own given (README "Fixtures": put
- * right, each is its accepted twin's); and `faults`, the places of the refused outcome that carry its one fault.
+ * Each refused exchange of a version with a database side whose one fault is its outcome, with its twin: the accepted
+ * exchange whose given (but its note) and request it shares, whose outcome db/repo answers in the refused fixture's own
+ * given (README "Fixtures": put right, each is its accepted twin's); and `faults`, the places of the refused outcome
+ * that carry its one fault. A refused exchange whose fault is its request is in REQUEST_TWINS.
  */
 const EXCHANGE_TWINS: Readonly<Record<string, { twin: string; faults: string[] }>> = {
   // v1.7: a text that opens Ben T.'s stopped chat by clearing his stop, which is its answer, its row and its entry; the
@@ -574,6 +614,22 @@ const EXCHANGE_TWINS: Readonly<Record<string, { twin: string; faults: string[] }
   "invalid/refuse-mark-delivered-repeat-null.json": {
     twin: "mark-a7-03-poll-delivered-repeat.json",
     faults: ["repeatedDelivery"],
+  },
+};
+
+/**
+ * Each refused exchange of a version with a database side whose one fault is its request, a refused request its
+ * fixture holds in an exchange, with its twin: the accepted exchange whose given (but its note) and outcome it shares,
+ * and whose request it is with the fault taken out (README "Fixtures", v1.10: "twin read-question-facts-s1-02, its
+ * request"); and `faults`, the places of the refused request that carry its one fault. db/repo refuses such a request
+ * before any statement reaches the database, as it refuses a refused request that stands alone.
+ */
+const REQUEST_TWINS: Readonly<Record<string, { twin: string; faults: string[] }>> = {
+  // v1.10: a facts request naming a business beside the question, which the read takes from the question's own row
+  // (README item 49; "Consumers of v1.10": twin read-question-facts-s1-02, its request)
+  "invalid/refuse-question-facts-caller-business.json": {
+    twin: "read-question-facts-s1-02.json",
+    faults: ["businessId"],
   },
 };
 
@@ -763,10 +819,60 @@ function practiceRows(): SeedRow[] {
   ];
 }
 
+/** v1.6's practice fixture, whose note lists five rows (README "Fixtures", v1.6). */
+const PRACTICE = "read-outbox-row-practice-sensitive.json";
+/** v1.10's turn 1 receipt, whose note lists one row, S1-01's thread (README "Fixtures", v1.10). */
+const CHAT_OF_TURN_1 = "read-chat-handle-sam.json";
+/** K-09's turn 1 commit, whose given.stated.writes holds S1-01's thread (K-09 v1.5 defaults 135 and 136). */
+const TURN_1_COMMIT = "commit-s1-01.json";
+
+/** What this test reads of K-09's turn 1 commit: the rows its walk states, and the rows its answer lists as written. */
+interface StatedCommit {
+  given: { stated: { writes: { state: { op: string; table: string; values: Record<string, Json> }[] } } };
+  outcome: { written: { written: { table: string; rowId: string; version: number }[] } };
+}
+
+/**
+ * read-chat-handle-sam.json's one row, with its note's columns and values in its note's order (README "Fixtures",
+ * v1.10: "No frozen seed holds S1-01's thread, which K-05's commit-s1-01-sam leaves to K-09 v1.5's commit-s1-01.json"):
+ * S1-01's thread, handle-sam's chat with Rosie's number, with the Linq chat id turn 1's commit writes on it, the id the
+ * receipt for Sam's reply carries. The row is that commit's stated write, at the version its answer lists.
+ */
+function chatThreadRows(): SeedRow[] {
+  return [
+    {
+      table: "threads",
+      values: {
+        id: "thread-s1-01-sam-1",
+        handle_id: "handle-sam",
+        kind: "chat",
+        booking_id: null,
+        linq_chat_id: "linq-chat-demo-sam",
+        reply_address: null,
+        version: 1,
+      },
+    },
+  ];
+}
+
 /** By fixture, the rows its note says its database side writes itself before the read: no frozen seed holds them. */
 const NOTED_ROWS: Readonly<Record<string, () => SeedRow[]>> = {
-  "read-outbox-row-practice-sensitive.json": practiceRows,
+  [PRACTICE]: practiceRows,
+  [CHAT_OF_TURN_1]: chatThreadRows,
 };
+
+/** A row value as a note spells it: a text or a number as it stands, and null as "null"; any other is a broken test. */
+function spelled(value: Json): string {
+  if (value === null) return "null";
+  if (typeof value === "string" || typeof value === "number") return String(value);
+  throw new Error("a note spells a text, a number or null, and no other value");
+}
+
+/** How a note that lists a row column by column writes it: "<table> <column> <value>, <column> <value>, ...". */
+const spelledAs = (row: SeedRow): string =>
+  `${row.table} ${Object.entries(row.values)
+    .map(([column, value]) => `${column} ${spelled(value)}`)
+    .join(", ")}`;
 
 /** How a note names a row it lists: "<table> <id>", and a kind of work "company_kinds <company> and <kind>". */
 const notedAs = (row: SeedRow): string =>
@@ -1183,7 +1289,7 @@ async function given(file: string): Promise<Exchange> {
 // The tests
 
 describe("data-access database side: the versions with one, each entry selected by its version", () => {
-  it("runs every entry of v1.3, v1.4, v1.6, v1.7, v1.8 and v1.9, accepted and refused, each against a db/repo call the README names", () => {
+  it("runs every entry of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9 and v1.10, accepted and refused, each against a db/repo call the README names", () => {
     for (const version of DB_SIDE_VERSIONS) {
       const ofVersion = sideEntries.filter((entry) => entry.version === version);
       expect(
@@ -1212,6 +1318,8 @@ describe("data-access database side: the versions with one, each entry selected 
       ...Object.values(RESPONSE_TWINS).map((twin) => twin.twin),
       ...Object.values(EXCHANGE_TWINS).map((twin) => twin.twin),
       ...Object.keys(EXCHANGE_TWINS),
+      ...Object.values(REQUEST_TWINS).map((twin) => twin.twin),
+      ...Object.keys(REQUEST_TWINS),
     ].flatMap((file) => chainOf(file).steps);
     const stepCalls = new Set(runFirst.map((step) => exchangeOf(step).call));
     for (const call of stepCalls) {
@@ -1267,8 +1375,16 @@ describe("data-access database side: the versions with one, each entry selected 
 
   it("has a twin for every refused exchange: an accepted exchange of its call with its given (but its note) and request", () => {
     const exchanges = sideRefused.filter((entry) => defOf(entry).part === "exchange");
-    expect(Object.keys(EXCHANGE_TWINS).sort()).toEqual(exchanges.map((entry) => entry.file).sort());
+    // Each refused exchange has one twin, by where its one fault is: its outcome (EXCHANGE_TWINS, checked here) or its
+    // request (REQUEST_TWINS, the next test); a file in both lists would be counted twice.
+    expect([...Object.keys(EXCHANGE_TWINS), ...Object.keys(REQUEST_TWINS)].sort()).toEqual(
+      exchanges.map((entry) => entry.file).sort(),
+    );
     expect(exchanges.length, "v1.7's refused exchange").toBeGreaterThan(0);
+    expect(
+      Object.keys(EXCHANGE_TWINS).length,
+      "a refused exchange whose fault is its outcome",
+    ).toBeGreaterThan(0);
     for (const [file, { twin, faults }] of Object.entries(EXCHANGE_TWINS)) {
       const refused = exchangeOf(file);
       const accepted = exchangeOf(twin);
@@ -1283,6 +1399,37 @@ describe("data-access database side: the versions with one, each entry selected 
       });
       expect(refused.request, `${file}: its twin's request`).toEqual(accepted.request);
       expect(twinProblems(refused.outcome, accepted.outcome, { faults }), `${file}: its fault`).toEqual([]);
+    }
+  });
+
+  it("has a twin for every refused exchange whose fault is its request: an accepted exchange of its call with its given (but its note) and outcome, and its request but for the fault", () => {
+    expect(Object.keys(REQUEST_TWINS).length, "v1.10's refused request, held in an exchange").toBeGreaterThan(
+      0,
+    );
+    for (const [file, { twin, faults }] of Object.entries(REQUEST_TWINS)) {
+      const entry = entryOf(file);
+      const refused = exchangeOf(file);
+      const accepted = exchangeOf(twin);
+      expect([entry.expect, defOf(entry).part, DB_SIDE_VERSIONS.includes(entry.version)], file).toEqual([
+        "refuse",
+        "exchange",
+        true,
+      ]);
+      expect([entryOf(twin).expect, entryOf(twin).def], `${file}'s twin`).toEqual(["accept", entry.def]);
+      expect(accepted.call, `${file}'s twin`).toBe(refused.call);
+      expect({ ...refused.given, note: null }, `${file}: its twin's given`).toEqual({
+        ...accepted.given,
+        note: null,
+      });
+      expect(refused.outcome, `${file}: its twin's outcome`).toEqual(accepted.outcome);
+      expect(twinProblems(refused.request, accepted.request, { faults }), `${file}: its fault`).toEqual([]);
+      // The exchange is refused for its request alone: its call's own request definition refuses it, and takes its
+      // twin's.
+      const request = validatorOf(entry.version, `${refused.call}.request`);
+      expect(errorsOf(request, refused.request), `${file}: its request, refused`).not.toEqual([]);
+      expect(errorsOf(request, accepted.request), `${file}: its twin's request`).toEqual([]);
+      const outcome = validatorOf(entry.version, answerDefOf(entry.version, refused.call, refused.outcome));
+      expect(errorsOf(outcome, refused.outcome), `${file}: its outcome, which is no fault`).toEqual([]);
     }
   });
 
@@ -1519,38 +1666,103 @@ describe("data-access database side: the versions with one, each entry selected 
   });
 
   it("writes the rows a fixture's note lists, each as the note names it, with its values and in its order", () => {
-    expect(Object.keys(NOTED_ROWS)).toEqual(["read-outbox-row-practice-sensitive.json"]);
-    const bundle = seedBundle();
-    for (const [file, rowsOf] of Object.entries(NOTED_ROWS)) {
+    expect(Object.keys(NOTED_ROWS)).toEqual([PRACTICE, CHAT_OF_TURN_1]);
+    for (const file of Object.keys(NOTED_ROWS)) {
       expect(
         sideAccepted.map((entry) => entry.file),
         file,
       ).toContain(file);
-      const note = must(exchangeOf(file).given.note, `${file}'s note`);
-      expect(note, file).toContain("writes these five rows itself before the read, in this order");
-      const rows = rowsOf();
-      expect(rows.map(notedAs), file).toHaveLength(5);
-      const places = rows.map((row) => note.indexOf(`${notedAs(row)} (`));
-      for (const [at, row] of rows.entries()) expect(places[at], notedAs(row)).toBeGreaterThanOrEqual(0);
-      expect(
-        [...places].sort((a, b) => a - b),
-        `${file}: in the note's order`,
-      ).toEqual(places);
-      // Each text written is one the note states, but the bundle, which it names as K-04's seed's.
-      for (const row of rows) {
-        for (const text of Object.values(row.values).flatMap(textsIn)) {
-          if (text !== bundle.hash) expect(note, `${notedAs(row)}: ${text}`).toContain(text);
-        }
-      }
-      expect(note, file).toContain("the bundle of K-04's seed-bundle-registry.json");
       // Written after the chain: no exchange runs one whose rows are noted first.
       for (const entry of sideAccepted)
         expect(exchangeOf(entry.file).given.after, entry.file).not.toContain(file);
     }
+    // v1.6's practice: five rows, each named "<table> <id> (" with its values after it. S1-01's thread, which its note
+    // lists column by column, is the next test's.
+    const bundle = seedBundle();
+    const file = PRACTICE;
+    const note = must(exchangeOf(file).given.note, `${file}'s note`);
+    expect(note, file).toContain("writes these five rows itself before the read, in this order");
+    const rows = must(NOTED_ROWS[file], `${file}'s noted rows`)();
+    expect(rows.map(notedAs), file).toHaveLength(5);
+    const places = rows.map((row) => note.indexOf(`${notedAs(row)} (`));
+    for (const [at, row] of rows.entries()) expect(places[at], notedAs(row)).toBeGreaterThanOrEqual(0);
+    expect(
+      [...places].sort((a, b) => a - b),
+      `${file}: in the note's order`,
+    ).toEqual(places);
+    // Each text written is one the note states, but the bundle, which it names as K-04's seed's.
+    for (const row of rows) {
+      for (const text of Object.values(row.values).flatMap(textsIn)) {
+        if (text !== bundle.hash) expect(note, `${notedAs(row)}: ${text}`).toContain(text);
+      }
+    }
+    expect(note, file).toContain("the bundle of K-04's seed-bundle-registry.json");
+  });
+
+  it("writes read-chat-handle-sam's one noted row, S1-01's thread: as its note lists it column by column, and as K-09 v1.5's turn 1 commit writes it", () => {
+    const file = CHAT_OF_TURN_1;
+    const exchange = exchangeOf(file);
+    const note = must(exchange.given.note, `${file}'s note`);
+    const rows = must(NOTED_ROWS[file], `${file}'s noted rows`)();
+    expect(
+      rows.map((row) => row.table),
+      "one row, a thread",
+    ).toEqual(["threads"]);
+    const thread = must(rows[0], `${file}'s thread`);
+    // The note lists the one row column by column, with each value, in this order.
+    expect(note, file).toContain(
+      `this exchange's database side writes it itself before the read: ${spelledAs(thread)}.`,
+    );
+    // The check reads each column and value: a row with another value, or with a column left out, is not the note's.
+    const emailThread = { ...thread, values: { ...thread.values, kind: "email" } };
+    expect(note, "a thread of another kind").not.toContain(spelledAs(emailThread));
+    const shorter = Object.fromEntries(
+      Object.entries(thread.values).filter(([column]) => column !== "reply_address"),
+    );
+    expect(note, "a row with a column left out").not.toContain(
+      `${spelledAs({ ...thread, values: shorter })}.`,
+    );
+    // The row is the exchange's own: the chat its request names, on the handle its outcome gives.
+    expect(thread.values.linq_chat_id, "the request's chat id").toBe(exchange.request.linqChatId);
+    expect(thread.values.handle_id, "the outcome's handle").toBe(exchange.outcome.handleId);
+    // It is S1-01's thread as K-09 v1.5's turn 1 commit states it, field for field (its given.stated.writes, which the
+    // note names), at the version that commit's answer lists.
+    const toolApi = readJson(path.join(TOOL_API_FIXTURES_DIR, "index.json")) as { fixtures: FixtureEntry[] };
+    const listed = must(
+      toolApi.fixtures.find((entry) => entry.file === TURN_1_COMMIT),
+      `K-09's index entry ${TURN_1_COMMIT}`,
+    );
+    expect([listed.version, listed.expect], `K-09's ${TURN_1_COMMIT}`).toEqual(["v1.5", "accept"]);
+    expect(note, file).toContain(`K-09 v1.5 ${TURN_1_COMMIT} given.stated.writes`);
+    const commit = readJson(path.join(TOOL_API_FIXTURES_DIR, TURN_1_COMMIT)) as StatedCommit;
+    const { version, ...stated } = thread.values;
+    expect(
+      commit.given.stated.writes.state.filter((write) => write.table === thread.table),
+      "the thread that commit states",
+    ).toEqual([{ op: "insert", table: thread.table, values: stated }]);
+    expect(
+      commit.outcome.written.written.filter((row) => row.table === thread.table),
+      "the thread that commit's answer lists",
+    ).toEqual([{ table: thread.table, rowId: thread.values.id, version }]);
+    // No K-05 exchange runs first, and no seed the fixture names holds the thread or its chat id: the row is written
+    // here or nowhere (README "Fixtures", v1.10: "No frozen seed holds S1-01's thread").
+    const chain = chainOf(file);
+    expect(chain.steps, `${file}: no exchange runs first`).toEqual([]);
+    const seen = new Set<string>();
+    const seeded = chain.seeds.flatMap((seed) => seedRows(seed, seen));
+    expect(seeded.length, `${file}: its seeds' rows`).toBeGreaterThan(0);
+    expect(
+      seeded.filter(
+        (row) =>
+          row.table === thread.table &&
+          (row.values.id === thread.values.id || row.values.linq_chat_id === thread.values.linq_chat_id),
+      ),
+      `${file}: no seed holds the thread`,
+    ).toEqual([]);
   });
 });
 
-describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6, v1.7, v1.8 and v1.9 gives its outcome through db/repo", () => {
+describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9 and v1.10 gives its outcome through db/repo", () => {
   for (const entry of sideAccepted) {
     it(
       `${entry.file} (${entry.version}): in its role and on its side, db/repo answers the fixture's outcome`,
@@ -1662,7 +1874,7 @@ describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6,
   );
 });
 
-describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v1.7, v1.8 and v1.9 is refused by db/repo", () => {
+describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9 and v1.10 is refused by db/repo", () => {
   for (const entry of sideRefused.filter((refused) => defOf(refused).part === "request")) {
     it(
       `${entry.file} (${entry.version}): db/repo refuses the request before any statement reaches the database`,
@@ -1713,7 +1925,38 @@ describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v
     );
   }
 
-  for (const entry of sideRefused.filter((refused) => defOf(refused).part === "exchange")) {
+  for (const entry of sideRefused.filter((refused) => Object.hasOwn(REQUEST_TWINS, refused.file))) {
+    it(
+      `${entry.file} (${entry.version}): in its own given db/repo refuses its request before any statement reaches the database, and answers it put right as its twin`,
+      SLOW,
+      async () => {
+        const twin = must(REQUEST_TWINS[entry.file], `${entry.file}'s twin`);
+        const validate = validatorOf(entry.version, must(entry.def));
+        expect(errorsOf(validate, exchangeOf(entry.file)), "refused by its definition").not.toEqual([]);
+        // In its own given, where the question it names is there to be read: the request is refused as it stands.
+        const exchange = await given(entry.file);
+        sent.length = 0;
+        await expect(runExchange(exchange)).rejects.toThrow(TypeError);
+        expect(sent, "no statement was sent: nothing read or written").toEqual([]);
+        // With its one fault taken out the request is its twin's, and db/repo answers it the outcome both state.
+        const right: Exchange = { ...exchange, request: exchangeOf(twin.twin).request };
+        const answer = await runExchange(right);
+        expect(answer, "the twin's outcome, which the refused fixture states too").toEqual(exchange.outcome);
+        expect(
+          answerErrors(entry.version, exchange.call, answer),
+          `db/repo's answer, at ${entry.version}`,
+        ).toEqual([]);
+        expect(errorsOf(validate, { ...right, outcome: answer }), "put right, with db/repo's answer").toEqual(
+          [],
+        );
+        expect(sent.length, "the request put right reached the database").toBeGreaterThan(0);
+      },
+    );
+  }
+
+  for (const entry of sideRefused.filter(
+    (refused) => defOf(refused).part === "exchange" && !Object.hasOwn(REQUEST_TWINS, refused.file),
+  )) {
     it(
       `${entry.file} (${entry.version}): in its own given db/repo answers its twin's outcome, never its own, and writes nothing`,
       SLOW,
