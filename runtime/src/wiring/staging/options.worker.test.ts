@@ -5,9 +5,10 @@
 //
 //   - production: stagingOptions reads ENVIRONMENT and nothing else, and gives every input null; the Worker's production
 //     root reads none of staging's bindings or secrets (critic_collisions N1);
-//   - staging, before any part binds its input: with every binding and secret present, stagingOptions reads ENVIRONMENT
-//     alone, every stub gives its port's nothing-bound input with no binding read and no database call, and through the
-//     Worker's root every port fails exactly as with nothing bound;
+//   - staging with no Hyperdrive binding (DL-768; every other var, binding and secret present): stagingOptions reads
+//     nothing but ENVIRONMENT and the presence of HYPERDRIVE_JOB and HYPERDRIVE_APP, every part gives its port's
+//     nothing-bound input with no database call, and through the Worker's root every port fails exactly as with nothing
+//     bound and the Linq route answers 404. What a part gives once its binding is there is its own test file's to show;
 //   - the seams (DL-757; critic_collisions B6): models.ts gets P2b's bundle reads, the actor's BUNDLES KV (read at each
 //     call) and the fetch seam (critic_size B9); tool-api-gate.ts gets the one BundleSafety adapter RootOptions.bundleSafety
 //     holds; every part gets the one handle and env; and install() sets the copies' sources where the root holds them;
@@ -290,19 +291,44 @@ describe("stagingOptions in production's environment (critic_collisions N1)", ()
   });
 });
 
-describe("stagingOptions on staging, before any part binds its input", () => {
-  it("reads ENVIRONMENT alone with every binding and secret present, and gives every input null: each stub's nothing-bound input", () => {
-    const { env, reads } = countingEnv("staging");
+describe("stagingOptions on staging with no Hyperdrive binding: nothing bound fails closed and reads nothing (DL-768)", () => {
+  /**
+   * What may be read as the inputs are built: the environment, and whether each of the two Hyperdrive bindings is there.
+   * Nothing else: no connection string, no secret, no BUNDLES, no other binding or var.
+   */
+  const PRESENCE_READS: readonly string[] = ["ENVIRONMENT", "HYPERDRIVE_JOB", "HYPERDRIVE_APP"];
+
+  /** The reads that are none of those. */
+  const otherReads = (reads: readonly string[]): string[] =>
+    reads.filter((read) => !PRESENCE_READS.includes(read));
+
+  /**
+   * Staging's env with neither HYPERDRIVE_JOB nor HYPERDRIVE_APP: countingEnv's, so every other var, binding and secret
+   * is present (env.production's placeholder HYPERDRIVE among them) and each read is counted. A read of either missing
+   * binding is counted too, and finds nothing.
+   */
+  function unboundStaging(): Counted {
+    const counted = countingEnv("staging");
+    for (const name of ["HYPERDRIVE_JOB", "HYPERDRIVE_APP"]) Reflect.deleteProperty(counted.env, name);
+    return counted;
+  }
+
+  it("reads nothing but ENVIRONMENT and the presence of HYPERDRIVE_JOB and HYPERDRIVE_APP, with every other var, binding and secret present, and gives every input null: each part's nothing-bound input", () => {
+    const { env, reads } = unboundStaging();
+    expect("HYPERDRIVE_JOB" in env || "HYPERDRIVE_APP" in env).toBe(false);
 
     const inputs = stagingOptions(env);
 
     expect(inputs).toEqual(NO_STAGING_INPUTS);
     expect(Object.keys(inputs).sort()).toEqual(Object.keys(NO_STAGING_INPUTS).sort());
-    expect(reads).toEqual(["ENVIRONMENT"]);
+    // The environment first, then at most the two bindings' presence: 0 reads of a connection string, a secret, BUNDLES
+    // or any other binding or var.
+    expect(reads[0]).toBe("ENVIRONMENT");
+    expect(otherReads(reads)).toEqual([]);
   });
 
-  it("each part's stub, built alone over every binding present, gives its port's nothing-bound input, reads no binding and makes no database call", () => {
-    const { env, reads } = countingEnv("staging");
+  it("each part's builder, built alone, gives its port's nothing-bound input, reads nothing but ENVIRONMENT and the two bindings' presence, and makes no database call", () => {
+    const { env, reads } = unboundStaging();
     const { db, calls } = recordingDb();
     const part: StagingPart = { env, db };
     const keys = sealingWrapKeys(env);
@@ -323,14 +349,14 @@ describe("stagingOptions on staging, before any part binds its input", () => {
     expect(stagingTestPhone(part)).toBeNull();
     expect(stagingCopies(part)).toBeNull();
 
-    expect(reads).toEqual([]);
+    expect(otherReads(reads)).toEqual([]);
     expect(calls).toEqual([]);
     expect(fetchDouble).not.toHaveBeenCalled();
   });
 
-  it("through the Worker's root, every port it feeds fails exactly as with nothing bound, the Linq route answers 404, the page calls stay unconfigured, and no binding or secret is read", async () => {
+  it("through the Worker's root, every port it feeds fails exactly as a root with nothing bound does, the Linq route answers 404, the page calls stay unconfigured, and of staging's bindings and secrets nothing is read but the two bindings' presence", async () => {
     vi.spyOn(console, "log").mockImplementation(() => undefined);
-    const { env, reads } = countingEnv("staging");
+    const { env, reads } = unboundStaging();
     const vars = { ENVIRONMENT: "staging", GIT_SHA: "test-sha" };
     // Nothing bound: the root with no input at all, as every staging port was before T-1257.
     const nothingBound = composeRoot({
@@ -361,7 +387,8 @@ describe("stagingOptions on staging, before any part binds its input", () => {
     expect((await root.linqWebhook(linqPost())).status).toBe(404);
     expect(root.gateway.pages).toBeUndefined();
     expect(root.copies).toBeNull();
-    expect(stagingReads(reads)).toEqual([]);
+    // Of staging's own names: no connection string, no secret, no BUNDLES, no other binding.
+    expect(otherReads(stagingReads(reads))).toEqual([]);
   });
 });
 

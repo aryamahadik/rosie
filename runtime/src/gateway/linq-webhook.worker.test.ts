@@ -669,8 +669,17 @@ describe("the Worker's webhook route", () => {
 
   it("answers 404 while the skeleton flag is off: the Worker's route is the composition root's, and no release flags are bound to it (T-553)", async () => {
     captureLogLines();
+    // Its own env (DL-768; T-1393), as index.worker.test.ts builds its Linq case's: staging's vars and no binding, so no
+    // release flag can be read and the skeleton flag reads off, whatever the pool binds (its HYPERDRIVE_JOB names a
+    // database that does not exist, and a flag read that fails is a 503).
+    const vars: Cloudflare.Env = {
+      ENVIRONMENT: "staging",
+      BASE_PATH: "/test",
+      DB_SCHEMA: "",
+      GIT_SHA: "test-sha",
+    };
 
-    const response = await worker.fetch(webhookOf(verifyOk), env, context);
+    const response = await worker.fetch(webhookOf(verifyOk), vars, context);
 
     expect(response.status).toBe(404);
     expect(response.headers.get("x-trace-id")).toMatch(UUID);
