@@ -2,9 +2,43 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 599, [`1c5b398`](https://github.com/aryamahadik/rosie/commit/1c5b398), 2026-11-14 07:00:31 UTC.
+- **Through:** commit 601, [`c22c937`](https://github.com/aryamahadik/rosie/commit/c22c937), 2026-11-14 07:53:42 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 601. docs: COMMIT\_HISTORY.md through commit 599 (1c5b398, \#608) (\#611)
+
+- **Commit:** [`c22c937`](https://github.com/aryamahadik/rosie/commit/c22c937), by Arya Mahadik, 2026-11-14 07:53:42 UTC
+- **Pull request:** [#611](https://github.com/aryamahadik/rosie/pull/611) from `task/commit-history-102`, merged 2026-11-14 07:53:42 UTC. It squashed 1 branch commit:
+  - `d5ec1cb` docs: COMMIT\_HISTORY.md through commit 599 (1c5b398, \#608)
+- **Files changed:** 1 (+63 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +63 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 600. T-1282: signInStart's server side: the same answer with or without an account, the code sent only after the answer (ADR-016 card B1) (\#610)
+
+- **Commit:** [`8dd0dc0`](https://github.com/aryamahadik/rosie/commit/8dd0dc0), by Arya Mahadik, 2026-11-14 07:53:39 UTC
+- **Pull request:** [#610](https://github.com/aryamahadik/rosie/pull/610) from `task/T-1282`, merged 2026-11-14 07:53:39 UTC. It squashed 1 branch commit:
+  - `b68027d` T-1282: signInStart's server side: the same answer with or without an…
+- **Files changed:** 10 (+2272 −0), by folder:
+  - `actions/src/page-calls/sign-in/` errors.ts +42 −0, hashes.ts +77 −0, index.ts +49 −0, request.test.ts +205 −0, request.ts +195 −0, sign-in-start.test.ts +763 −0, sign-in-start.worker.test.ts +128 −0, start.ts +267 −0, test-support.ts +441 −0, types.ts +105 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+K-21 v1 signInStart in actions/src/page-calls/sign-in over K-05 v1.13 startSignIn and sendSignInCode and T-322's proof-code domain: hand-written K-21 request checks, the contact read (email lower case, mobile E.164, a link by its code), the device and repeat sha256s and the contact's keyed hash through the root's port, two 128-bit ids from Web Crypto, paused and transient mapped to K-21, way text and an unreadable contact refused with no outcome, and the code drawn, hashed, worded and sent through a later port that runs after the answer, with labels-only spans.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 599. docs: COMMIT\_HISTORY.md through commit 596 (b381b5d, \#605) (\#608)
 
