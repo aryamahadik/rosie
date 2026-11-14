@@ -2,9 +2,71 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 596, [`b381b5d`](https://github.com/aryamahadik/rosie/commit/b381b5d), 2026-11-14 06:34:03 UTC.
+- **Through:** commit 599, [`1c5b398`](https://github.com/aryamahadik/rosie/commit/1c5b398), 2026-11-14 07:00:31 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 599. docs: COMMIT\_HISTORY.md through commit 596 (b381b5d, \#605) (\#608)
+
+- **Commit:** [`1c5b398`](https://github.com/aryamahadik/rosie/commit/1c5b398), by Arya Mahadik, 2026-11-14 07:00:31 UTC
+- **Pull request:** [#608](https://github.com/aryamahadik/rosie/pull/608) from `task/commit-history-101`, merged 2026-11-14 07:00:31 UTC. It squashed 1 branch commit:
+  - `ae70bbf` docs: COMMIT\_HISTORY.md through commit 596 (b381b5d, \#605)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 598. T-1255: the probe for the live check of staging's two Hyperdrive configurations (ADR-014 piece 7) (\#607)
+
+- **Commit:** [`0bf6d5b`](https://github.com/aryamahadik/rosie/commit/0bf6d5b), by Arya Mahadik, 2026-11-14 07:00:27 UTC
+- **Pull request:** [#607](https://github.com/aryamahadik/rosie/pull/607) from `task/T-1255`, merged 2026-11-14 07:00:28 UTC. It squashed 2 branch commits:
+  - `cd69af7` T-1255: the probe for the live check of staging's two Hyperdrive conf…
+  - `2e99be8` T-1255: README: what the Worker reads and returns in a remote session…
+- **Files changed:** 9 (+2888 −0), by folder:
+  - `infra/spikes/hyperdrive-roles/` README.md +89 −0, local-db.test.mjs +194 −0, probe.mjs +692 −0, probe.test.mjs +648 −0, run.mjs +560 −0, run.test.mjs +429 −0, standin-postgres.mjs +88 −0, standin-wrangler.mjs +107 −0, worker.mjs +81 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1255: the probe for the live check of staging's two Hyperdrive configurations (ADR-014 piece 7): run script through cf.sh, Worker, guard's reads 50 and 5 times per binding, crossed reads, DL-733 persistence proof; tested behind stand-ins and on the local PostgreSQL
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1255: README: what the Worker reads and returns in a remote session that may hold staging's vars and secrets, and where wrangler's own output (which may list the token) goes
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 597. T-1244: a delivery receipt whose clock arming ends failed is answered 503, so Linq sends it again and the repeat path arms the clock (\#606)
+
+- **Commit:** [`e73df83`](https://github.com/aryamahadik/rosie/commit/e73df83), by Arya Mahadik, 2026-11-14 07:00:23 UTC
+- **Pull request:** [#606](https://github.com/aryamahadik/rosie/pull/606) from `task/T-1244`, merged 2026-11-14 07:00:24 UTC. It squashed 1 branch commit:
+  - `d5c6117` T-1244: a delivery receipt whose clock arming ends failed is answered…
+- **Files changed:** 6 (+632 −42), by folder:
+  - `runtime/src/clocks/` arming.test.ts +180 −2, arming.ts +49 −13
+  - `runtime/src/wiring/` hop12.worker.test.ts +6 −1, hop13.worker.test.ts +360 −25, root.ts +3 −0, test-support.ts +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+clockArming's partDelivered rejects with ArmingNotDone when the arming ends failed (armAtDelivery still never throws); every other end resolves as before. The wiring K-05 double's markPart answers K-05 v1.9's repeatedDelivery, so hop 13's repeat test runs on v1.9. The arming's header says what is true now.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 596. docs: COMMIT\_HISTORY.md through commit 594 (edaf3e1, \#603) (\#605)
 
