@@ -2,9 +2,59 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 619, [`3709e90`](https://github.com/aryamahadik/rosie/commit/3709e90), 2026-11-14 16:47:05 UTC.
+- **Through:** commit 621, [`8f5e764`](https://github.com/aryamahadik/rosie/commit/8f5e764), 2026-11-14 23:31:54 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 621. docs: COMMIT\_HISTORY.md through commit 619 (3709e90, \#629) (\#631)
+
+- **Commit:** [`8f5e764`](https://github.com/aryamahadik/rosie/commit/8f5e764), by Arya Mahadik, 2026-11-14 23:31:54 UTC
+- **Pull request:** [#631](https://github.com/aryamahadik/rosie/pull/631) from `task/commit-history-111`, merged 2026-11-14 23:31:54 UTC. It squashed 1 branch commit:
+  - `1031775` docs: COMMIT\_HISTORY.md through commit 619 (3709e90, \#629)
+- **Files changed:** 1 (+64 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +64 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 620. T-1393: staging binds the release flags over readFlag through the job handle (the audit's P1c) (\#630)
+
+- **Commit:** [`4acfa87`](https://github.com/aryamahadik/rosie/commit/4acfa87), by Arya Mahadik, 2026-11-14 23:31:50 UTC
+- **Pull request:** [#630](https://github.com/aryamahadik/rosie/pull/630) from `task/T-1393`, merged 2026-11-14 23:31:50 UTC. It squashed 3 branch commits:
+  - `c7559a8` T-1393: staging binds RootOptions.flags over T-185's readFlag through…
+  - `f2a31b4` T-1393: the capture test makes its own 404 line, so it stands alone
+  - `9286705` T-1393: round 2 (DL-768): linq-webhook.worker.test.ts's 404 case runs…
+- **Files changed:** 6 (+911 −27), by folder:
+  - `runtime/src/gateway/` linq-webhook.worker.test.ts +10 −1
+  - `runtime/src/` index.worker.test.ts +16 −5
+  - `runtime/src/wiring/staging/` flags.seed.ts +49 −0, flags.ts +58 −8, flags.worker.test.ts +738 −0, options.worker.test.ts +40 −13
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1393: staging binds RootOptions.flags over T-185's readFlag through the job handle, enabled alone, scrubbed errors; its Workers test and seed; index.worker.test.ts's Linq 404 case on its own env (DL-761)
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1393: the capture test makes its own 404 line, so it stands alone
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1393: round 2 (DL-768): linq-webhook.worker.test.ts's 404 case runs on its own env (staging's vars, no binding), assertions unchanged; options.worker.test.ts's three staging cases are rewritten to the form true for every part: with no Hyperdrive binding, nothing but ENVIRONMENT and the two bindings' presence is read, every part gives its nothing-bound input, every port fails as a root with nothing bound does, the Linq route answers 404
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 619. docs: COMMIT\_HISTORY.md through commit 616 (65d376a, \#626) (\#629)
 
