@@ -2,9 +2,101 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 607, [`5ef2d69`](https://github.com/aryamahadik/rosie/commit/5ef2d69), 2026-11-14 09:37:26 UTC.
+- **Through:** commit 610, [`79274be`](https://github.com/aryamahadik/rosie/commit/79274be), 2026-11-14 09:58:47 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 610. docs: COMMIT\_HISTORY.md through commit 607 (5ef2d69, \#618) (\#620)
+
+- **Commit:** [`79274be`](https://github.com/aryamahadik/rosie/commit/79274be), by Arya Mahadik, 2026-11-14 09:58:47 UTC
+- **Pull request:** [#620](https://github.com/aryamahadik/rosie/pull/620) from `task/commit-history-106`, merged 2026-11-14 09:58:48 UTC. It squashed 1 branch commit:
+  - `9e02fd5` docs: COMMIT\_HISTORY.md through commit 607 (5ef2d69, \#618)
+- **Files changed:** 1 (+54 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +54 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 609. T-1402: the staging\_testers migration (0036) and db/repo's tester standing reads (K-05 v1.15 items 68 and 69); merges with T-1295 (\#619)
+
+- **Commit:** [`459a31e`](https://github.com/aryamahadik/rosie/commit/459a31e), by Arya Mahadik, 2026-11-14 09:58:44 UTC
+- **Pull request:** [#619](https://github.com/aryamahadik/rosie/pull/619) from `task/T-1402`, merged 2026-11-14 09:58:44 UTC. It squashed 5 branch commits:
+  - `13d6057` T-1295: K-22 v1.3 lists staging's human testers apart from Rosie's te…
+  - `f31e776` T-1295: the K-05 producers line names only side-listed components (th…
+  - `c250db2` T-1402: migration 0036 lists staging's human testers (K-22 v1.3 rule …
+  - `0434626` T-1402: sign-in-check.int.test.ts's header names item 69's both-ended…
+  - `242292e` T-1402: money.int.test.ts's migration-list pin gains staging\_testers …
+- **Files changed:** 8 (+847 −119), by folder:
+  - `db/migrations/` 0036\_staging\_testers.sql +61 −0
+  - `db/repo/` money.int.test.ts +4 −2, people-access.int.test.ts +203 −32, rls.int.test.ts +140 −12, sign-in-check.int.test.ts +160 −4, sign-in-check.ts +23 −13, test-phone-reads.int.test.ts +203 −21, test-phone-reads.ts +53 −35
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1295: K-22 v1.3 lists staging's human testers apart from Rosie's team (staging_testers, rule 10), and K-05 v1.15 reads a live listing beside the live team row in readTesterStanding and personStanding's tester; K-21 v1 default 2's line corrected (DL-535's reading (d), closing K-05 open gap 62)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1295: the K-05 producers line names only side-listed components (the new ones stay in section v1.15's consumers, as open gap 73 says), and both READMEs name the integration files that load every K-22 seed (people-access, availability, documents-licenses)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1402: migration 0036 lists staging's human testers (K-22 v1.3 rule 10: RLS on with one runtime policy, rosie_job SELECT, INSERT and UPDATE of removed_at and version, rosie_app nothing); readTesterStanding and personStanding's tester read a live team row or a live listing in one statement (K-05 v1.15 items 68 and 69), team the team row's alone; people-access and rls tests take v1.3's list, seed, refused cases and grants; the v1.15 fixtures and cases through both reads
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1402: sign-in-check.int.test.ts's header names item 69's both-ended case beside the others (comment only)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1402: money.int.test.ts's migration-list pin gains staging_testers (0036): slice(-7), its title and one T-1402 comment line (DL-759's grant, a pin-only edit of DL-455's kind, as T-1278 and T-1333 made theirs)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 608. T-1295: K-22 v1.3 and K-05 v1.15, where staging's human testers are listed (merges with T-1402) (\#609)
+
+- **Commit:** [`0a59ae7`](https://github.com/aryamahadik/rosie/commit/0a59ae7), by Arya Mahadik, 2026-11-14 09:58:41 UTC
+- **Pull request:** [#609](https://github.com/aryamahadik/rosie/pull/609) from `task/T-1295`, merged 2026-11-14 09:58:41 UTC. It squashed 2 branch commits:
+  - `13d6057` T-1295: K-22 v1.3 lists staging's human testers apart from Rosie's te…
+  - `f31e776` T-1295: the K-05 producers line names only side-listed components (th…
+- **Files changed:** 22 (+1304 −15), by folder:
+  - `contracts/data-access/` README.md +76 −10, data-access.v1.15.schema.json +614 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` index.json +56 −0, person-standing-human-tester.json +19 −0, person-standing-listing-ended.json +19 −0, read-tester-standing-human-tester.json +17 −0, read-tester-standing-listing-ended.json +17 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-person-standing-team-not-tester.json +6 −0, refuse-tester-standing-by-address.json +18 −0, refuse-tester-standing-ended-listing-told.json +4 −0
+  - `contracts/db-schema/people-access/` README.md +48 −2, frozen.json +1 −1, people-access.v1.3.tables.json +88 −0
+  - `contracts/db-schema/people-access/fixtures/` index.json +48 −0, seed-staging-tester.json +169 −0
+  - `contracts/db-schema/people-access/fixtures/invalid/` refuse-staging-tester-ended-before-listed.json +21 −0, refuse-staging-tester-listed-by-tool-api.json +21 −0, refuse-staging-tester-moved-to-another-person.json +20 −0, refuse-staging-tester-tool-api-read.json +19 −0, refuse-staging-tester-two-live-listings.json +20 −0
+  - `contracts/page-api/` README.md +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1295: K-22 v1.3 lists staging's human testers apart from Rosie's team (staging_testers, rule 10), and K-05 v1.15 reads a live listing beside the live team row in readTesterStanding and personStanding's tester; K-21 v1 default 2's line corrected (DL-535's reading (d), closing K-05 open gap 62)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1295: the K-05 producers line names only side-listed components (the new ones stay in section v1.15's consumers, as open gap 73 says), and both READMEs name the integration files that load every K-22 seed (people-access, availability, documents-licenses)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 607. docs: COMMIT\_HISTORY.md through commit 605 (507759c, \#615) (\#618)
 
