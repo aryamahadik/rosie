@@ -1,0 +1,18 @@
+{
+  "call": "readTesterStanding",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["people-access/seed-staging-tester.json"],
+    "after": [],
+    "now": "2026-11-14T08:00:00Z",
+    "note": "Tester One's standing, as read-tester-standing-human-tester reads it; the request also carries the tester's inbox address, as if the list were searched by a contact."
+  },
+  "request": {
+    "tokenSha256": "5f0e1d2c3b4a5f6e7f8e9dacbfce0d1e2f3a4b5c6d7e8f9aa1b2c3d4e5f6a7b8",
+    "at": "2026-11-14T08:00:00Z",
+    "email": "tester-one@example.com"
+  },
+  "outcome": {
+    "standing": "tester"
+  }
+}

@@ -197,7 +197,7 @@ Names and values come only from fixture set v1's demo shops (the barber as Lee's
 ## Defaults used (T-030)
 
 1. **Q-10:** calendars connect only on a page already open (registration screen 16, the owner console, the staff page); no text is sent to give a calendar link.
-2. **Q-18:** Rosie's team is Jay and the CTO until launch, read from K-36 v1's live `team_page_recipients` rows; on staging the roster's testers and the test console (BP 9.4).
+2. **Q-18:** Rosie's team is Jay and the CTO until launch, read from K-36 v1's live `team_page_recipients` rows; on staging the test console's member (K-05 v1.12 default 105). Staging's human testers, the roster's, are listed apart and never as team rows: K-22 v1.3's `staging_testers`, which K-05 v1.15's `readTesterStanding` and `personStanding`'s `tester` read beside the team row, so they use the staging-only calls and get no page (BP 9.4: no real person is alerted; ADR-016 section 5; DL-535). Section "The team console"'s "on staging the roster's testers and the test console" reads as this line (T-1295, through K-21's owner).
 3. **Q-46:** no owner console page reads in v1 and no Items tab: each page's reads come with its journey's version, the Items tab after the core journey 11 pages.
 4. **New, a first session:** a person with no session ever, live or ended, starts their first on the code alone, since there is no known device to compare (S13-45 row 8's "new device" presumes an earlier one; K-22 v1 `device_known` is false for anyone's first). An owner or admin who has had a session needs the second proof on an unknown device. For the security reviewer and the CTO (open gap 2).
 5. **Q-51:** the link host and Rosie's number in a link are config values; staging lives at rosfield.com/test (DL-014, DL-023).

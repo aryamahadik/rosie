@@ -1,0 +1,17 @@
+{
+  "call": "readTesterStanding",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["people-access/seed-staging-tester.json"],
+    "after": [],
+    "now": "2026-11-14T08:00:00Z",
+    "note": "Tester One as K-22 v1.3's seed-staging-tester.json holds them: listed by staging's testers' seed at 05:30Z (staging-tester-one, removed_at null), signed in by a code to their own inbox at 06:01:30Z (session-tester-one, live until Dec 14), with no K-36 team row and no role. Read at 08:00Z with that session's token hash: session_for_token finds the session and person-tester-one, who holds a live listing, so tester (README item 68). The answer names neither the session, the person nor the list. The hashes are stand-ins, the hash of no token; the ids and the address are examples."
+  },
+  "request": {
+    "tokenSha256": "5f0e1d2c3b4a5f6e7f8e9dacbfce0d1e2f3a4b5c6d7e8f9aa1b2c3d4e5f6a7b8",
+    "at": "2026-11-14T08:00:00Z"
+  },
+  "outcome": {
+    "standing": "tester"
+  }
+}

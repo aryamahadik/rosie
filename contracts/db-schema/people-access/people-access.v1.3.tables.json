@@ -1,0 +1,88 @@
+{
+  "part": "people-access",
+  "version": "v1.3",
+  "tables": [
+    {
+      "name": "staging_testers",
+      "description": "Staging's human testers (the people who run staging's human tests: the user and Jay, DL-011; DL-753's R5 (b)), one row per listing: the person, when they were listed and when the listing ended. A listed person's live session stands as a tester for staging's test tools (K-05 v1.15 readTesterStanding and personStanding's tester), beside the test console's member, who stands by a K-36 team row (K-05 v1.12 default 105). A listed person holds no K-36 team_page_recipients row, so no page to Rosie's team ever reaches them (build prompt 9.4; ADR-016 section 5), and no owner or admin role. Written only by staging's testers' seed (ADR-016 card H, T-1281), which runs as the runtime side (db/seeds/run.mjs); never written or read by the Tool API. It holds no address: the testers' addresses are read by name at run time (STAGING_TEST_INBOXES; ADR-016 section 5) and stay on K-04 handles and K-22 accounts. v1.3 only adds this table; v1's ten tables, v1.1's page_links and v1.2's sign_in_attempts stay as their lists give them, so the part at v1.3 is the four lists together.",
+      "source": "DL-535 (the lead's ruling on K-05 v1.12 open gap 62, reading (d)); DL-753 (R5 (b): people sign in by code to their own test inbox); ADR-016 section 5 ('The tester's standing ... card H writes the testers there'; 'a human tester gets no team_page_recipients row') and section 7 card H; build prompt 9.4 (line 490: 'every alert to Rosie's team go to test phones or the test console, so no real person is alerted'); K-21 v1 README 'Staging only' ('a signed-in roster tester or a person on Rosie's team'); K-36 v1 team_page_recipients (the list's shape: added, removed, one live row per person)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The listing's own id: an opaque string the seed makes and nothing parses (CQ-09).",
+          "source": "CQ-09; README rule 3"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The tester's person (K-04 persons.id): the person the testers' seed writes for one named inbox, with that inbox as an email handle and an account whose email is proven (ADR-016 card H). Never an address, a name or a number: the list is read by the session's person alone (K-05 v1.15).",
+          "source": "ADR-016 section 7 card H ('Per address: a person, an email handle, an account with the email proven, and T-1248's tester standing'); ADR-016 section 5; rule 9"
+        },
+        {
+          "name": "added_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the seed listed the person: the seed run's own time.",
+          "source": "ADR-016 section 7 card H; K-36 v1 team_page_recipients.added_at"
+        },
+        {
+          "name": "removed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the listing ended; null while the person is listed. A tester leaves the list by removed_at, never by a delete, and a listing that ended is never reopened: a person listed again gets a new row (README rule 10). The standing ends at once, whatever the person's sessions: K-05 v1.15 reads the list fresh, on the primary.",
+          "source": "K-36 v1 team_page_recipients.removed_at ('a member leaves the list by removed_at, never by a delete'); K-05 v1.12 README ('a team row removed ends the standing at once'); RULES 8.7"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: the update that ends a listing raises it by one (0002's trigger).",
+          "source": "arch 01 line 85; README rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "staging_testers_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "staging_testers_one_live_per_person",
+          "columns": ["person_id"],
+          "where": "removed_at is null",
+          "source": "K-36 v1 team_page_recipients_one_live_per_person (one live row per person); K-05 v1.15 reads the person's live listing by it"
+        }
+      ],
+      "checks": [
+        {
+          "name": "staging_testers_removed_after_added",
+          "expression": "removed_at is null or removed_at >= added_at",
+          "source": "K-36 v1 team_page_recipients_removed_after_added"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Not per business: a tester uses staging's test tools across every business staging seeds, and a listing names no business (DL-535: 'no business'). The runtime side (rosie_job) reads every row unscoped (K-05 v1.15 readTesterStanding and personStanding), inserts a listing (the testers' seed, which writes as rosie_job: db/seeds/run.mjs) and ends one (removed_at and version alone). The Tool API (rosie_app) holds no grant on the table, not even a column grant, so no page, turn or console call lists a person, reads the list or ends a listing. Row-level security is on with one policy, the runtime side's, so a grant given by mistake would still show the Tool API no row (README rule 10)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}
