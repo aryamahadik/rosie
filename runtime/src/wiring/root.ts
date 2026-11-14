@@ -463,6 +463,16 @@ export function composeRoot(options: RootOptions): Root {
       now,
       safetyRead: {
         readers: options.safetyReaders ?? null,
+        // The bundle's safety lines for the bundle each text names, awaited before its danger words are read (T-1397;
+        // DL-757, option (c)): the same check the pin asks (Root.pin), through the bound bundle port, so the first text
+        // into a fresh isolate, with no pin before it, has its lines; a bundle the check refuses or cannot read fails
+        // the read closed. Only where the state reads bind real and the lines are handed in: elsewhere nothing is
+        // awaited (the test environment's fake state reads; no lines bound, where the danger words' read fails closed).
+        checkedLines: async (bundleId) => {
+          const lines = options.bundleSafety ?? null;
+          if (lines === null || !bindsReal(bindings, "stateReads")) return;
+          await lines.checkPin({ bundleId, bundles: ports.bundles });
+        },
         // The bound bundle port's danger words, read at each read: the list the actor's no-verdict rule matches too.
         dangerWords: () => ports.stateReads.safety.bundle.dangerWords(),
         sink: logSink(log),
