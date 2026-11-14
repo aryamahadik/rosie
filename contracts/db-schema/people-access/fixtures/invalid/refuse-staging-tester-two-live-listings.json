@@ -1,0 +1,20 @@
+{
+  "after": ["seed-staging-tester.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": {},
+    "action": "insert",
+    "table": "staging_testers",
+    "values": {
+      "id": "staging-tester-one-again",
+      "person_id": "person-tester-one",
+      "added_at": "2026-11-14T08:00:00Z",
+      "removed_at": null
+    },
+    "expect": {
+      "sqlstate": "23505",
+      "constraintOneOf": ["staging_testers_one_live_per_person"]
+    }
+  }
+}

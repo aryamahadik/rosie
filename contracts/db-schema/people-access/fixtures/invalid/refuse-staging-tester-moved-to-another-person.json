@@ -1,0 +1,20 @@
+{
+  "after": ["seed-staging-tester.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": {},
+    "action": "update",
+    "table": "staging_testers",
+    "set": {
+      "person_id": "person-tester-two",
+      "version": 2
+    },
+    "where": {
+      "id": "staging-tester-one"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

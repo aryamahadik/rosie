@@ -1,0 +1,169 @@
+{
+  "after": [],
+  "rows": [
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-tester-one",
+        "name": null,
+        "language": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-tester-two",
+        "name": null,
+        "language": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-tester-one-email",
+        "kind": "email",
+        "address": "tester-one@example.com"
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-tester-two-email",
+        "kind": "email",
+        "address": "tester-two@example.com"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-tester-one",
+        "handle_id": "handle-tester-one-email"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-tester-two",
+        "handle_id": "handle-tester-two-email"
+      }
+    },
+    {
+      "table": "accounts",
+      "values": {
+        "person_id": "person-tester-one",
+        "mobile": null,
+        "mobile_proven_at": null,
+        "email": "tester-one@example.com",
+        "email_proven_at": "2026-11-14T05:30:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "accounts",
+      "values": {
+        "person_id": "person-tester-two",
+        "mobile": null,
+        "mobile_proven_at": null,
+        "email": "tester-two@example.com",
+        "email_proven_at": "2026-11-14T05:30:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "staging_testers",
+      "values": {
+        "id": "staging-tester-one",
+        "person_id": "person-tester-one",
+        "added_at": "2026-11-14T05:30:00Z",
+        "removed_at": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "staging_testers",
+      "values": {
+        "id": "staging-tester-two",
+        "person_id": "person-tester-two",
+        "added_at": "2026-11-14T05:30:00Z",
+        "removed_at": "2026-11-14T07:00:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "proof_codes",
+      "values": {
+        "id": "code-tester-one-sign-in",
+        "purpose": "sign_in",
+        "person_id": "person-tester-one",
+        "business_id": null,
+        "sent_to_handle_id": "handle-tester-one-email",
+        "channel": "email",
+        "code_hash": "7e1a5c3b9d2f4a6ea1b3c5d7e9f0ab35c6d87a9bcdef0a1bc2d3e4f5a6b7c8d9",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "sent_at": "2026-11-14T06:00:00Z",
+        "expires_at": "2026-11-14T06:10:00Z",
+        "wrong_tries": 0,
+        "last_wrong_at": null,
+        "paused_until": null,
+        "used_at": "2026-11-14T06:01:30Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "proof_codes",
+      "values": {
+        "id": "code-tester-two-sign-in",
+        "purpose": "sign_in",
+        "person_id": "person-tester-two",
+        "business_id": null,
+        "sent_to_handle_id": "handle-tester-two-email",
+        "channel": "email",
+        "code_hash": "8f2b6d4c0e3a5f7bb2c4d6e8f0a1c3e5a7b9cbdfe0f2a4b6c8dae0f2b4d6f8a0",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "sent_at": "2026-11-14T06:05:00Z",
+        "expires_at": "2026-11-14T06:15:00Z",
+        "wrong_tries": 0,
+        "last_wrong_at": null,
+        "paused_until": null,
+        "used_at": "2026-11-14T06:06:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "sessions",
+      "values": {
+        "id": "session-tester-one",
+        "person_id": "person-tester-one",
+        "token_sha256": "5f0e1d2c3b4a5f6e7f8e9dacbfce0d1e2f3a4b5c6d7e8f9aa1b2c3d4e5f6a7b8",
+        "device_sha256": "c0ffee0a1a2b3c4d5e6f7a8b9cadbecfd6e7f8a91b2c3d4e5f6a7b8c9dae0bf1",
+        "proven_via": "code",
+        "proof_code_id": "code-tester-one-sign-in",
+        "started_at": "2026-11-14T06:01:30Z",
+        "last_seen_at": "2026-11-14T06:01:30Z",
+        "expires_at": "2026-12-14T06:01:30Z",
+        "ended_at": null,
+        "ended_why": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "sessions",
+      "values": {
+        "id": "session-tester-two",
+        "person_id": "person-tester-two",
+        "token_sha256": "6a1f2e3d4c5b6a7f8e9dacbfc4d5e6f7a8b9cadb4c5d6e7f8a9bacbdc4d5e6f8",
+        "device_sha256": "d1ce0a0b2b3c4d5e6f7a8b9ca3b4c5d6e7f8a9ba2b3c4d5e6f7a8b9ca3b4c5d7",
+        "proven_via": "code",
+        "proof_code_id": "code-tester-two-sign-in",
+        "started_at": "2026-11-14T06:06:00Z",
+        "last_seen_at": "2026-11-14T06:06:00Z",
+        "expires_at": "2026-12-14T06:06:00Z",
+        "ended_at": null,
+        "ended_why": null,
+        "version": 1
+      }
+    }
+  ]
+}

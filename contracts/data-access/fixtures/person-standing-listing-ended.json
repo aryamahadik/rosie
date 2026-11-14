@@ -1,0 +1,19 @@
+{
+  "call": "personStanding",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["people-access/seed-staging-tester.json"],
+    "after": [],
+    "now": "2026-11-14T08:00:00Z",
+    "note": "The standing of Tester Two (K-22 v1.3's seed-staging-tester.json): no role, no live K-36 team row, and a listing that ended at 07:00Z, so team false and tester false (README item 69, default 138)."
+  },
+  "request": {
+    "personId": "person-tester-two"
+  },
+  "outcome": {
+    "personId": "person-tester-two",
+    "roles": [],
+    "team": false,
+    "tester": false
+  }
+}

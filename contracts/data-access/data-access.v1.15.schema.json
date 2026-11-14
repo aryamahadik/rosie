@@ -1,0 +1,614 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/data-access/data-access.v1.15.schema.json",
+  "title": "DataAccessV1dot15",
+  "description": "K-05 v1.15, a minor version of the data-access calls (T-1295: the lead's ruling on v1.12's open gap 62, DL-535's reading (d); ADR-016 section 5; DL-753's R5 (b)). It only adds to v1.14 (data-access.v1.14.schema.json, frozen and unchanged, referred to here, which refers on to every earlier version down to v1): every v1.14 definition is here under its own name, by reference, save the five restated: readTesterStanding.request, readTesterStanding.response and personStanding.response, each for its text (README items 68 and 69: the rows that make a person a tester), with personStanding.response also holding that a team member is a tester, and readTesterStanding.exchange and personStanding.exchange, to refer to them. So every v1 to v1.14 exchange is a v1.15 exchange. Widened: readTesterStanding (item 68) and personStanding's tester (item 69) read, beside the live K-36 v1 team row, a live listing in K-22 v1.3's staging_testers, where staging's human testers are listed apart from Rosie's team (build prompt 9.4: no team row, so no page reaches them), each answering with the same fields. No request or answer gains a field, and no state, move or call is added; the reads take K-22 v1.3's new table (its migration is the database engineer's card). Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    { "$ref": "#/$defs/commitTurn.exchange" },
+    { "$ref": "#/$defs/writePlan.exchange" },
+    { "$ref": "#/$defs/unplannedRows.exchange" },
+    { "$ref": "#/$defs/claimOutbox.exchange" },
+    { "$ref": "#/$defs/markPart.exchange" },
+    { "$ref": "#/$defs/markRow.exchange" },
+    { "$ref": "#/$defs/armClock.exchange" },
+    { "$ref": "#/$defs/cancelClock.exchange" },
+    { "$ref": "#/$defs/dueClocks.exchange" },
+    { "$ref": "#/$defs/fireClock.exchange" },
+    { "$ref": "#/$defs/reserve.exchange" },
+    { "$ref": "#/$defs/release.exchange" },
+    { "$ref": "#/$defs/extend.exchange" },
+    { "$ref": "#/$defs/readActiveBundle.exchange" },
+    { "$ref": "#/$defs/readBundleValue.exchange" },
+    { "$ref": "#/$defs/publishBundleCopy.exchange" },
+    { "$ref": "#/$defs/setActiveBundle.exchange" },
+    { "$ref": "#/$defs/parkTurn.exchange" },
+    { "$ref": "#/$defs/renewClaim.exchange" },
+    { "$ref": "#/$defs/dispatcherGivesUp.exchange" },
+    { "$ref": "#/$defs/claimEffects.exchange" },
+    { "$ref": "#/$defs/recordEffectResult.exchange" },
+    { "$ref": "#/$defs/serviceBack.exchange" },
+    { "$ref": "#/$defs/recordProviderEvent.exchange" },
+    { "$ref": "#/$defs/reconciliationRefund.exchange" },
+    { "$ref": "#/$defs/writeAllSet.exchange" },
+    { "$ref": "#/$defs/readTurnState.exchange" },
+    { "$ref": "#/$defs/handleTargets.exchange" },
+    { "$ref": "#/$defs/sendState.exchange" },
+    { "$ref": "#/$defs/handleSealingKey.exchange" },
+    { "$ref": "#/$defs/readOpenHolds.exchange" },
+    { "$ref": "#/$defs/readOutboxRow.exchange" },
+    { "$ref": "#/$defs/readFixedLineFacts.exchange" },
+    { "$ref": "#/$defs/readSafetyOutcomeOfEvent.exchange" },
+    { "$ref": "#/$defs/readSafetyOutcome.exchange" },
+    { "$ref": "#/$defs/readSafetyHold.exchange" },
+    { "$ref": "#/$defs/readSafetyHoldOfOutcome.exchange" },
+    { "$ref": "#/$defs/readOutboxRowWritten.exchange" },
+    { "$ref": "#/$defs/readBusinessOwner.exchange" },
+    { "$ref": "#/$defs/readBusinessZone.exchange" },
+    { "$ref": "#/$defs/rowReader.exchange" },
+    { "$ref": "#/$defs/openChatOnText.exchange" },
+    { "$ref": "#/$defs/readQuestionFacts.exchange" },
+    { "$ref": "#/$defs/readHandle.exchange" },
+    { "$ref": "#/$defs/readChatHandle.exchange" },
+    { "$ref": "#/$defs/readTurnParty.exchange" },
+    { "$ref": "#/$defs/readTesterStanding.exchange" },
+    { "$ref": "#/$defs/readRosterPhone.exchange" },
+    { "$ref": "#/$defs/readPhoneState.exchange" },
+    { "$ref": "#/$defs/readLiveTimers.exchange" },
+    { "$ref": "#/$defs/readStoppedFlag.exchange" },
+    { "$ref": "#/$defs/startSignIn.exchange" },
+    { "$ref": "#/$defs/sendSignInCode.exchange" },
+    { "$ref": "#/$defs/proveSignIn.exchange" },
+    { "$ref": "#/$defs/endSession.exchange" },
+    { "$ref": "#/$defs/personStanding.exchange" },
+    { "$ref": "#/$defs/signInEntries.exchange" }
+  ],
+  "$defs": {
+    "id": { "$ref": "data-access.v1.14.schema.json#/$defs/id" },
+    "nullableId": { "$ref": "data-access.v1.14.schema.json#/$defs/nullableId" },
+    "utc": { "$ref": "data-access.v1.14.schema.json#/$defs/utc" },
+    "nullableUtc": { "$ref": "data-access.v1.14.schema.json#/$defs/nullableUtc" },
+    "zone": { "$ref": "data-access.v1.14.schema.json#/$defs/zone" },
+    "bundleId": { "$ref": "data-access.v1.14.schema.json#/$defs/bundleId" },
+    "phoneNumber": { "$ref": "data-access.v1.14.schema.json#/$defs/phoneNumber" },
+    "tableName": { "$ref": "data-access.v1.14.schema.json#/$defs/tableName" },
+    "version": { "$ref": "data-access.v1.14.schema.json#/$defs/version" },
+    "sqlstate": { "$ref": "data-access.v1.14.schema.json#/$defs/sqlstate" },
+    "rowRef": { "$ref": "data-access.v1.14.schema.json#/$defs/rowRef" },
+    "changedRow": { "$ref": "data-access.v1.14.schema.json#/$defs/changedRow" },
+    "during": { "$ref": "data-access.v1.14.schema.json#/$defs/during" },
+    "given": { "$ref": "data-access.v1.14.schema.json#/$defs/given" },
+    "transientError": { "$ref": "data-access.v1.14.schema.json#/$defs/transientError" },
+    "notFoundError": { "$ref": "data-access.v1.14.schema.json#/$defs/notFoundError" },
+    "versionChangedError": { "$ref": "data-access.v1.14.schema.json#/$defs/versionChangedError" },
+    "constraintError": { "$ref": "data-access.v1.14.schema.json#/$defs/constraintError" },
+    "turn": { "$ref": "data-access.v1.14.schema.json#/$defs/turn" },
+    "stateWrite": { "$ref": "data-access.v1.14.schema.json#/$defs/stateWrite" },
+    "stateTable": { "$ref": "data-access.v1.14.schema.json#/$defs/stateTable" },
+    "openQuestionNew": { "$ref": "data-access.v1.14.schema.json#/$defs/openQuestionNew" },
+    "openQuestionClose": { "$ref": "data-access.v1.14.schema.json#/$defs/openQuestionClose" },
+    "clockKind": { "$ref": "data-access.v1.14.schema.json#/$defs/clockKind" },
+    "clockNew": { "$ref": "data-access.v1.14.schema.json#/$defs/clockNew" },
+    "clockCancel": { "$ref": "data-access.v1.14.schema.json#/$defs/clockCancel" },
+    "channel": { "$ref": "data-access.v1.14.schema.json#/$defs/channel" },
+    "sendClass": { "$ref": "data-access.v1.14.schema.json#/$defs/sendClass" },
+    "outboxRowNew": { "$ref": "data-access.v1.14.schema.json#/$defs/outboxRowNew" },
+    "reservationConfirm": { "$ref": "data-access.v1.14.schema.json#/$defs/reservationConfirm" },
+    "reservationLetGo": { "$ref": "data-access.v1.14.schema.json#/$defs/reservationLetGo" },
+    "sealedValues": { "$ref": "data-access.v1.14.schema.json#/$defs/sealedValues" },
+    "eventEntry": { "$ref": "data-access.v1.14.schema.json#/$defs/eventEntry" },
+    "writes": { "$ref": "data-access.v1.14.schema.json#/$defs/writes" },
+    "outboxRowWritten": { "$ref": "data-access.v1.14.schema.json#/$defs/outboxRowWritten" },
+    "promotion": { "$ref": "data-access.v1.14.schema.json#/$defs/promotion" },
+    "skippedInLine": { "$ref": "data-access.v1.14.schema.json#/$defs/skippedInLine" },
+    "commitResult": { "$ref": "data-access.v1.14.schema.json#/$defs/commitResult" },
+    "reservationLostError": { "$ref": "data-access.v1.14.schema.json#/$defs/reservationLostError" },
+    "commitTurn.request": { "$ref": "data-access.v1.14.schema.json#/$defs/commitTurn.request" },
+    "commitTurn.response": { "$ref": "data-access.v1.14.schema.json#/$defs/commitTurn.response" },
+    "commitTurn.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/commitTurn.errors" },
+    "commitTurn.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/commitTurn.exchange" },
+    "writePlan.request": { "$ref": "data-access.v1.14.schema.json#/$defs/writePlan.request" },
+    "writePlan.response": { "$ref": "data-access.v1.14.schema.json#/$defs/writePlan.response" },
+    "writePlan.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/writePlan.errors" },
+    "writePlan.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/writePlan.exchange" },
+    "unplannedRows.request": { "$ref": "data-access.v1.14.schema.json#/$defs/unplannedRows.request" },
+    "unplannedRows.response": { "$ref": "data-access.v1.14.schema.json#/$defs/unplannedRows.response" },
+    "unplannedRows.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/unplannedRows.errors" },
+    "unplannedRows.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/unplannedRows.exchange" },
+    "claimOutbox.request": { "$ref": "data-access.v1.14.schema.json#/$defs/claimOutbox.request" },
+    "claimedPart": { "$ref": "data-access.v1.14.schema.json#/$defs/claimedPart" },
+    "claimedRow": { "$ref": "data-access.v1.14.schema.json#/$defs/claimedRow" },
+    "claimOutbox.response": { "$ref": "data-access.v1.14.schema.json#/$defs/claimOutbox.response" },
+    "claimOutbox.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/claimOutbox.errors" },
+    "claimOutbox.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/claimOutbox.exchange" },
+    "markPart.request": { "$ref": "data-access.v1.14.schema.json#/$defs/markPart.request" },
+    "repeatedDelivery": { "$ref": "data-access.v1.14.schema.json#/$defs/repeatedDelivery" },
+    "markPart.response": { "$ref": "data-access.v1.14.schema.json#/$defs/markPart.response" },
+    "markPart.v1dot9Response": { "$ref": "data-access.v1.14.schema.json#/$defs/markPart.v1dot9Response" },
+    "markPart.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/markPart.errors" },
+    "markPart.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/markPart.exchange" },
+    "markRow.request": { "$ref": "data-access.v1.14.schema.json#/$defs/markRow.request" },
+    "markRow.response": { "$ref": "data-access.v1.14.schema.json#/$defs/markRow.response" },
+    "markRow.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/markRow.errors" },
+    "markRow.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/markRow.exchange" },
+    "armClock.request": { "$ref": "data-access.v1.14.schema.json#/$defs/armClock.request" },
+    "armedClock": { "$ref": "data-access.v1.14.schema.json#/$defs/armedClock" },
+    "armClock.response": { "$ref": "data-access.v1.14.schema.json#/$defs/armClock.response" },
+    "armClock.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/armClock.errors" },
+    "armClock.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/armClock.exchange" },
+    "cancelClock.request": { "$ref": "data-access.v1.14.schema.json#/$defs/cancelClock.request" },
+    "cancelClock.response": { "$ref": "data-access.v1.14.schema.json#/$defs/cancelClock.response" },
+    "cancelClock.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/cancelClock.errors" },
+    "cancelClock.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/cancelClock.exchange" },
+    "dueClocks.request": { "$ref": "data-access.v1.14.schema.json#/$defs/dueClocks.request" },
+    "dueClock": { "$ref": "data-access.v1.14.schema.json#/$defs/dueClock" },
+    "dueClocks.response": { "$ref": "data-access.v1.14.schema.json#/$defs/dueClocks.response" },
+    "dueClocks.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/dueClocks.errors" },
+    "dueClocks.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/dueClocks.exchange" },
+    "fireClock.request": { "$ref": "data-access.v1.14.schema.json#/$defs/fireClock.request" },
+    "fireClock.response": { "$ref": "data-access.v1.14.schema.json#/$defs/fireClock.response" },
+    "fireClock.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/fireClock.errors" },
+    "fireClock.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/fireClock.exchange" },
+    "door": { "$ref": "data-access.v1.14.schema.json#/$defs/door" },
+    "savedFor": { "$ref": "data-access.v1.14.schema.json#/$defs/savedFor" },
+    "reserve.request": { "$ref": "data-access.v1.14.schema.json#/$defs/reserve.request" },
+    "reserve.response": { "$ref": "data-access.v1.14.schema.json#/$defs/reserve.response" },
+    "reserve.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/reserve.errors" },
+    "reserve.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/reserve.exchange" },
+    "release.request": { "$ref": "data-access.v1.14.schema.json#/$defs/release.request" },
+    "release.response": { "$ref": "data-access.v1.14.schema.json#/$defs/release.response" },
+    "release.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/release.errors" },
+    "release.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/release.exchange" },
+    "extend.request": { "$ref": "data-access.v1.14.schema.json#/$defs/extend.request" },
+    "extend.response": { "$ref": "data-access.v1.14.schema.json#/$defs/extend.response" },
+    "extend.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/extend.errors" },
+    "extend.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/extend.exchange" },
+    "readActiveBundle.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readActiveBundle.request" },
+    "readActiveBundle.response": { "$ref": "data-access.v1.14.schema.json#/$defs/readActiveBundle.response" },
+    "readActiveBundle.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readActiveBundle.errors" },
+    "readActiveBundle.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/readActiveBundle.exchange" },
+    "storedText": { "$ref": "data-access.v1.14.schema.json#/$defs/storedText" },
+    "readBundleValue.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readBundleValue.request" },
+    "readBundleValue.response": { "$ref": "data-access.v1.14.schema.json#/$defs/readBundleValue.response" },
+    "readBundleValue.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readBundleValue.errors" },
+    "readBundleValue.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/readBundleValue.exchange" },
+    "publishBundleCopy.request": { "$ref": "data-access.v1.14.schema.json#/$defs/publishBundleCopy.request" },
+    "publishBundleCopy.response": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/publishBundleCopy.response"
+    },
+    "publishBundleCopy.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/publishBundleCopy.errors" },
+    "publishBundleCopy.exchange": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/publishBundleCopy.exchange"
+    },
+    "setActiveBundle.request": { "$ref": "data-access.v1.14.schema.json#/$defs/setActiveBundle.request" },
+    "setActiveBundle.response": { "$ref": "data-access.v1.14.schema.json#/$defs/setActiveBundle.response" },
+    "setActiveBundle.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/setActiveBundle.errors" },
+    "setActiveBundle.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/setActiveBundle.exchange" },
+    "parkTurn.request": { "$ref": "data-access.v1.14.schema.json#/$defs/parkTurn.request" },
+    "parkTurn.response": { "$ref": "data-access.v1.14.schema.json#/$defs/parkTurn.response" },
+    "parkTurn.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/parkTurn.errors" },
+    "parkTurn.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/parkTurn.exchange" },
+    "wrongStateError": { "$ref": "data-access.v1.14.schema.json#/$defs/wrongStateError" },
+    "claimLostError": { "$ref": "data-access.v1.14.schema.json#/$defs/claimLostError" },
+    "effectNew": { "$ref": "data-access.v1.14.schema.json#/$defs/effectNew" },
+    "effectLetGo": { "$ref": "data-access.v1.14.schema.json#/$defs/effectLetGo" },
+    "effectWrites": { "$ref": "data-access.v1.14.schema.json#/$defs/effectWrites" },
+    "waitingChatWrites": { "$ref": "data-access.v1.14.schema.json#/$defs/waitingChatWrites" },
+    "followUpRow": { "$ref": "data-access.v1.14.schema.json#/$defs/followUpRow" },
+    "renewClaim.request": { "$ref": "data-access.v1.14.schema.json#/$defs/renewClaim.request" },
+    "renewClaim.response": { "$ref": "data-access.v1.14.schema.json#/$defs/renewClaim.response" },
+    "renewClaim.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/renewClaim.errors" },
+    "renewClaim.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/renewClaim.exchange" },
+    "dispatcherGivesUp.request": { "$ref": "data-access.v1.14.schema.json#/$defs/dispatcherGivesUp.request" },
+    "dispatcherGivesUp.response": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/dispatcherGivesUp.response"
+    },
+    "dispatcherGivesUp.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/dispatcherGivesUp.errors" },
+    "dispatcherGivesUp.exchange": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/dispatcherGivesUp.exchange"
+    },
+    "claimEvent": { "$ref": "data-access.v1.14.schema.json#/$defs/claimEvent" },
+    "claimedEffect": { "$ref": "data-access.v1.14.schema.json#/$defs/claimedEffect" },
+    "claimEffects.request": { "$ref": "data-access.v1.14.schema.json#/$defs/claimEffects.request" },
+    "claimEffects.response": { "$ref": "data-access.v1.14.schema.json#/$defs/claimEffects.response" },
+    "claimEffects.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/claimEffects.errors" },
+    "claimEffects.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/claimEffects.exchange" },
+    "serviceBack.request": { "$ref": "data-access.v1.14.schema.json#/$defs/serviceBack.request" },
+    "serviceBack.response": { "$ref": "data-access.v1.14.schema.json#/$defs/serviceBack.response" },
+    "serviceBack.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/serviceBack.errors" },
+    "serviceBack.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/serviceBack.exchange" },
+    "recordEffectResult.request": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/recordEffectResult.request"
+    },
+    "recordEffectResult.response": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/recordEffectResult.response"
+    },
+    "recordEffectResult.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/recordEffectResult.errors" },
+    "recordEffectResult.exchange": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/recordEffectResult.exchange"
+    },
+    "recordProviderEvent.request": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/recordProviderEvent.request"
+    },
+    "recordProviderEvent.response": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/recordProviderEvent.response"
+    },
+    "recordProviderEvent.errors": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/recordProviderEvent.errors"
+    },
+    "recordProviderEvent.exchange": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/recordProviderEvent.exchange"
+    },
+    "reconciliationRefund.request": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/reconciliationRefund.request"
+    },
+    "reconciliationRefund.response": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/reconciliationRefund.response"
+    },
+    "reconciliationRefund.errors": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/reconciliationRefund.errors"
+    },
+    "reconciliationRefund.exchange": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/reconciliationRefund.exchange"
+    },
+    "writeAllSet.request": { "$ref": "data-access.v1.14.schema.json#/$defs/writeAllSet.request" },
+    "writeAllSet.response": { "$ref": "data-access.v1.14.schema.json#/$defs/writeAllSet.response" },
+    "writeAllSet.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/writeAllSet.errors" },
+    "writeAllSet.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/writeAllSet.exchange" },
+    "columnName": { "$ref": "data-access.v1.14.schema.json#/$defs/columnName" },
+    "factTable": { "$ref": "data-access.v1.14.schema.json#/$defs/factTable" },
+    "secretColumn": { "$ref": "data-access.v1.14.schema.json#/$defs/secretColumn" },
+    "role": { "$ref": "data-access.v1.14.schema.json#/$defs/role" },
+    "phoneFlags": { "$ref": "data-access.v1.14.schema.json#/$defs/phoneFlags" },
+    "phoneRead": { "$ref": "data-access.v1.14.schema.json#/$defs/phoneRead" },
+    "openQuestionRead": { "$ref": "data-access.v1.14.schema.json#/$defs/openQuestionRead" },
+    "bookingHead": { "$ref": "data-access.v1.14.schema.json#/$defs/bookingHead" },
+    "factRef": { "$ref": "data-access.v1.14.schema.json#/$defs/factRef" },
+    "factValue": { "$ref": "data-access.v1.14.schema.json#/$defs/factValue" },
+    "pauseRead": { "$ref": "data-access.v1.14.schema.json#/$defs/pauseRead" },
+    "consentRead": { "$ref": "data-access.v1.14.schema.json#/$defs/consentRead" },
+    "unknownFactError": { "$ref": "data-access.v1.14.schema.json#/$defs/unknownFactError" },
+    "readTurnState.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readTurnState.request" },
+    "readTurnState.response": { "$ref": "data-access.v1.14.schema.json#/$defs/readTurnState.response" },
+    "readTurnState.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readTurnState.errors" },
+    "readTurnState.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/readTurnState.exchange" },
+    "handleTargets.request": { "$ref": "data-access.v1.14.schema.json#/$defs/handleTargets.request" },
+    "handleTargets.response": { "$ref": "data-access.v1.14.schema.json#/$defs/handleTargets.response" },
+    "handleTargets.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/handleTargets.errors" },
+    "handleTargets.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/handleTargets.exchange" },
+    "textsConsentRead": { "$ref": "data-access.v1.14.schema.json#/$defs/textsConsentRead" },
+    "textsConsentV1dot8": { "$ref": "data-access.v1.14.schema.json#/$defs/textsConsentV1dot8" },
+    "sendState.request": { "$ref": "data-access.v1.14.schema.json#/$defs/sendState.request" },
+    "sendState.response": { "$ref": "data-access.v1.14.schema.json#/$defs/sendState.response" },
+    "sendState.v1dot8Response": { "$ref": "data-access.v1.14.schema.json#/$defs/sendState.v1dot8Response" },
+    "sendState.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/sendState.errors" },
+    "sendState.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/sendState.exchange" },
+    "handleSealingKey.request": { "$ref": "data-access.v1.14.schema.json#/$defs/handleSealingKey.request" },
+    "handleSealingKey.response": { "$ref": "data-access.v1.14.schema.json#/$defs/handleSealingKey.response" },
+    "handleSealingKey.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/handleSealingKey.errors" },
+    "handleSealingKey.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/handleSealingKey.exchange" },
+    "releaseRule": { "$ref": "data-access.v1.14.schema.json#/$defs/releaseRule" },
+    "openHold": { "$ref": "data-access.v1.14.schema.json#/$defs/openHold" },
+    "readOpenHolds.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readOpenHolds.request" },
+    "readOpenHolds.response": { "$ref": "data-access.v1.14.schema.json#/$defs/readOpenHolds.response" },
+    "readOpenHolds.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readOpenHolds.errors" },
+    "readOpenHolds.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/readOpenHolds.exchange" },
+    "rowLine": { "$ref": "data-access.v1.14.schema.json#/$defs/rowLine" },
+    "answeredText": { "$ref": "data-access.v1.14.schema.json#/$defs/answeredText" },
+    "rowRecipient": { "$ref": "data-access.v1.14.schema.json#/$defs/rowRecipient" },
+    "businessHeadRead": { "$ref": "data-access.v1.14.schema.json#/$defs/businessHeadRead" },
+    "rowQuestion": { "$ref": "data-access.v1.14.schema.json#/$defs/rowQuestion" },
+    "questionAsSent": { "$ref": "data-access.v1.14.schema.json#/$defs/questionAsSent" },
+    "fixedLineRowError": { "$ref": "data-access.v1.14.schema.json#/$defs/fixedLineRowError" },
+    "businessSensitive": { "$ref": "data-access.v1.14.schema.json#/$defs/businessSensitive" },
+    "readOutboxRow.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readOutboxRow.request" },
+    "readOutboxRow.response": { "$ref": "data-access.v1.14.schema.json#/$defs/readOutboxRow.response" },
+    "readOutboxRow.v1dot6Response": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readOutboxRow.v1dot6Response"
+    },
+    "readOutboxRow.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readOutboxRow.errors" },
+    "readOutboxRow.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/readOutboxRow.exchange" },
+    "readFixedLineFacts.request": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readFixedLineFacts.request"
+    },
+    "readFixedLineFacts.response": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readFixedLineFacts.response"
+    },
+    "readFixedLineFacts.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readFixedLineFacts.errors" },
+    "readFixedLineFacts.exchange": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readFixedLineFacts.exchange"
+    },
+    "nullableTurnId": { "$ref": "data-access.v1.14.schema.json#/$defs/nullableTurnId" },
+    "storedOutcome": { "$ref": "data-access.v1.14.schema.json#/$defs/storedOutcome" },
+    "storedHold": { "$ref": "data-access.v1.14.schema.json#/$defs/storedHold" },
+    "ownerContact": { "$ref": "data-access.v1.14.schema.json#/$defs/ownerContact" },
+    "moreThanOneOwnerError": { "$ref": "data-access.v1.14.schema.json#/$defs/moreThanOneOwnerError" },
+    "readSafetyOutcomeOfEvent.request": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyOutcomeOfEvent.request"
+    },
+    "readSafetyOutcomeOfEvent.response": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyOutcomeOfEvent.response"
+    },
+    "readSafetyOutcomeOfEvent.errors": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyOutcomeOfEvent.errors"
+    },
+    "readSafetyOutcomeOfEvent.exchange": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyOutcomeOfEvent.exchange"
+    },
+    "readSafetyOutcome.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyOutcome.request" },
+    "readSafetyOutcome.response": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyOutcome.response"
+    },
+    "readSafetyOutcome.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyOutcome.errors" },
+    "readSafetyOutcome.exchange": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyOutcome.exchange"
+    },
+    "readSafetyHold.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyHold.request" },
+    "readSafetyHold.response": { "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyHold.response" },
+    "readSafetyHold.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyHold.errors" },
+    "readSafetyHold.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyHold.exchange" },
+    "readSafetyHoldOfOutcome.request": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyHoldOfOutcome.request"
+    },
+    "readSafetyHoldOfOutcome.response": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyHoldOfOutcome.response"
+    },
+    "readSafetyHoldOfOutcome.errors": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyHoldOfOutcome.errors"
+    },
+    "readSafetyHoldOfOutcome.exchange": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readSafetyHoldOfOutcome.exchange"
+    },
+    "readOutboxRowWritten.request": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readOutboxRowWritten.request"
+    },
+    "readOutboxRowWritten.response": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readOutboxRowWritten.response"
+    },
+    "readOutboxRowWritten.errors": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readOutboxRowWritten.errors"
+    },
+    "readOutboxRowWritten.exchange": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readOutboxRowWritten.exchange"
+    },
+    "readBusinessOwner.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readBusinessOwner.request" },
+    "readBusinessOwner.response": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readBusinessOwner.response"
+    },
+    "readBusinessOwner.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readBusinessOwner.errors" },
+    "readBusinessOwner.exchange": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readBusinessOwner.exchange"
+    },
+    "readBusinessZone.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readBusinessZone.request" },
+    "readBusinessZone.response": { "$ref": "data-access.v1.14.schema.json#/$defs/readBusinessZone.response" },
+    "readBusinessZone.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readBusinessZone.errors" },
+    "readBusinessZone.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/readBusinessZone.exchange" },
+    "rowReader.request": { "$ref": "data-access.v1.14.schema.json#/$defs/rowReader.request" },
+    "rowReader.response": { "$ref": "data-access.v1.14.schema.json#/$defs/rowReader.response" },
+    "noReaderError": { "$ref": "data-access.v1.14.schema.json#/$defs/noReaderError" },
+    "rowReader.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/rowReader.errors" },
+    "rowReader.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/rowReader.exchange" },
+    "textService": { "$ref": "data-access.v1.14.schema.json#/$defs/textService" },
+    "chatPhoneOpen": { "$ref": "data-access.v1.14.schema.json#/$defs/chatPhoneOpen" },
+    "chatPhoneStopped": { "$ref": "data-access.v1.14.schema.json#/$defs/chatPhoneStopped" },
+    "chatOpenValues": { "$ref": "data-access.v1.14.schema.json#/$defs/chatOpenValues" },
+    "chatClosedValues": { "$ref": "data-access.v1.14.schema.json#/$defs/chatClosedValues" },
+    "chatOpenedEvent": { "$ref": "data-access.v1.14.schema.json#/$defs/chatOpenedEvent" },
+    "notAPhoneError": { "$ref": "data-access.v1.14.schema.json#/$defs/notAPhoneError" },
+    "openChatOnText.request": { "$ref": "data-access.v1.14.schema.json#/$defs/openChatOnText.request" },
+    "openChatOnText.inserted": { "$ref": "data-access.v1.14.schema.json#/$defs/openChatOnText.inserted" },
+    "openChatOnText.opened": { "$ref": "data-access.v1.14.schema.json#/$defs/openChatOnText.opened" },
+    "openChatOnText.alreadyOpen": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/openChatOnText.alreadyOpen"
+    },
+    "openChatOnText.stopped": { "$ref": "data-access.v1.14.schema.json#/$defs/openChatOnText.stopped" },
+    "openChatOnText.repeated": { "$ref": "data-access.v1.14.schema.json#/$defs/openChatOnText.repeated" },
+    "openChatOnText.response": { "$ref": "data-access.v1.14.schema.json#/$defs/openChatOnText.response" },
+    "openChatOnText.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/openChatOnText.errors" },
+    "openChatOnText.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/openChatOnText.exchange" },
+    "questionVisit": { "$ref": "data-access.v1.14.schema.json#/$defs/questionVisit" },
+    "neverDeliveredRow": { "$ref": "data-access.v1.14.schema.json#/$defs/neverDeliveredRow" },
+    "readQuestionFacts.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readQuestionFacts.request" },
+    "readQuestionFacts.response": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readQuestionFacts.response"
+    },
+    "readQuestionFacts.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readQuestionFacts.errors" },
+    "readQuestionFacts.exchange": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/readQuestionFacts.exchange"
+    },
+    "readHandle.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readHandle.request" },
+    "readHandle.response": { "$ref": "data-access.v1.14.schema.json#/$defs/readHandle.response" },
+    "readHandle.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readHandle.errors" },
+    "readHandle.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/readHandle.exchange" },
+    "chatPhoneHandle": { "$ref": "data-access.v1.14.schema.json#/$defs/chatPhoneHandle" },
+    "readChatHandle.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readChatHandle.request" },
+    "readChatHandle.found": { "$ref": "data-access.v1.14.schema.json#/$defs/readChatHandle.found" },
+    "readChatHandle.unknown": { "$ref": "data-access.v1.14.schema.json#/$defs/readChatHandle.unknown" },
+    "readChatHandle.response": { "$ref": "data-access.v1.14.schema.json#/$defs/readChatHandle.response" },
+    "readChatHandle.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readChatHandle.errors" },
+    "readChatHandle.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/readChatHandle.exchange" },
+    "readTurnParty.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readTurnParty.request" },
+    "readTurnParty.atBusiness": { "$ref": "data-access.v1.14.schema.json#/$defs/readTurnParty.atBusiness" },
+    "readTurnParty.noBusiness": { "$ref": "data-access.v1.14.schema.json#/$defs/readTurnParty.noBusiness" },
+    "readTurnParty.unknown": { "$ref": "data-access.v1.14.schema.json#/$defs/readTurnParty.unknown" },
+    "readTurnParty.response": { "$ref": "data-access.v1.14.schema.json#/$defs/readTurnParty.response" },
+    "businessUndecidedError": { "$ref": "data-access.v1.14.schema.json#/$defs/businessUndecidedError" },
+    "readTurnParty.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readTurnParty.errors" },
+    "readTurnParty.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/readTurnParty.exchange" },
+    "tokenSha256": { "$ref": "data-access.v1.14.schema.json#/$defs/tokenSha256" },
+    "readTesterStanding.request": {
+      "title": "ReadTesterStandingRequest",
+      "description": "The standing of the session a staging page call carries, for staging's test tools (README items 53 and 68; actions/src/page-calls/staging/test-phone/types.ts TesterAccess.standing; K-21 v1 README 'Staging only': 'a signed-in roster tester or a person on Rosie's team'). The page entry sends it after a request with a session token, before the roster or the phone is read (handlers.ts step 3). The request carries the token's sha256 and the time, never the token (refuse-tester-standing-token-not-hash), a person, or an address the testers' list could be searched by (refuse-tester-standing-by-address): the list is read by the session's person alone. Scope: the runtime side, as rosie_job with no business scope (K-22 v1 sessions, K-22 v1.3 staging_testers and K-36 v1 team_page_recipients are scoped none, and neither list grants rosie_app anything: 0017; K-22 v1.3 rule 10). Reads the primary, uncached: a session that ended, a team row removed or a listing ended ends the standing at once. Repeat: safe, a read. Time budget: none in the sources; once per staging test-tool call. Restated in v1.15 for its text alone: the shape is v1.12's. Changed in v1.15.",
+      "type": "object",
+      "properties": {
+        "tokenSha256": {
+          "description": "The sha256 of the session token the page sent (K-21 v1 signedInPage.sessionToken), never the token itself.",
+          "$ref": "#/$defs/tokenSha256"
+        },
+        "at": {
+          "description": "The moment the session must be live at: the page entry's own clock (handlers.ts: utcSeconds(now)), K-22 v1 session_for_token's at.",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["tokenSha256", "at"],
+      "additionalProperties": false
+    },
+    "readTesterStanding.response": {
+      "title": "ReadTesterStandingResponse",
+      "description": "The standing alone (README items 53 and 68; defaults 103, 104 and 136 to 138): never the session, the person, a hash, which row admitted the person, whether a person, a team row or a listing exists, or whether or when a listing ended, so a call that is no tester's learns only notTester (refuse-tester-standing-names-person; refuse-tester-standing-ended-listing-told), and a call with no live session only noSession (K-21 v1 notTester, signInNeeded). Restated in v1.15 for standing's text alone: the shape is v1.12's. Changed in v1.15.",
+      "type": "object",
+      "properties": {
+        "standing": {
+          "description": "tester: a live session (K-22 v1 session_for_token answers a row) whose person holds a live K-36 v1 team_page_recipients row or a live K-22 v1.3 staging_testers listing, removed_at null for either (README item 68; defaults 103 and 136); notTester: a live session whose person holds neither, a listing that ended included; noSession: no live session has the hash at the time, whether the hash is unknown, the session ended (signed out, contact changed, left, handed over) or it expired (README default 104).",
+          "type": "string",
+          "enum": ["tester", "notTester", "noSession"]
+        }
+      },
+      "required": ["standing"],
+      "additionalProperties": false
+    },
+    "readTesterStanding.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readTesterStanding.errors" },
+    "readTesterStanding.exchange": {
+      "title": "ReadTesterStandingExchange",
+      "description": "One readTesterStanding request with its outcome: the standing, or transient. Restated in v1.15 only to refer to v1.15's request and response. Changed in v1.15.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readTesterStanding" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readTesterStanding.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/readTesterStanding.response" },
+            { "$ref": "#/$defs/readTesterStanding.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "emailOnFile": { "$ref": "data-access.v1.14.schema.json#/$defs/emailOnFile" },
+    "rosterPhone": { "$ref": "data-access.v1.14.schema.json#/$defs/rosterPhone" },
+    "readRosterPhone.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readRosterPhone.request" },
+    "readRosterPhone.response": { "$ref": "data-access.v1.14.schema.json#/$defs/readRosterPhone.response" },
+    "readRosterPhone.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readRosterPhone.errors" },
+    "readRosterPhone.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/readRosterPhone.exchange" },
+    "phoneStateOpen": { "$ref": "data-access.v1.14.schema.json#/$defs/phoneStateOpen" },
+    "phoneStateStopped": { "$ref": "data-access.v1.14.schema.json#/$defs/phoneStateStopped" },
+    "chatLinkRead": { "$ref": "data-access.v1.14.schema.json#/$defs/chatLinkRead" },
+    "readPhoneState.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readPhoneState.request" },
+    "readPhoneState.noRow": { "$ref": "data-access.v1.14.schema.json#/$defs/readPhoneState.noRow" },
+    "readPhoneState.row": { "$ref": "data-access.v1.14.schema.json#/$defs/readPhoneState.row" },
+    "readPhoneState.response": { "$ref": "data-access.v1.14.schema.json#/$defs/readPhoneState.response" },
+    "readPhoneState.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readPhoneState.errors" },
+    "readPhoneState.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/readPhoneState.exchange" },
+    "sealedBytes": { "$ref": "data-access.v1.14.schema.json#/$defs/sealedBytes" },
+    "liveTimer": { "$ref": "data-access.v1.14.schema.json#/$defs/liveTimer" },
+    "readLiveTimers.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readLiveTimers.request" },
+    "readLiveTimers.response": { "$ref": "data-access.v1.14.schema.json#/$defs/readLiveTimers.response" },
+    "readLiveTimers.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readLiveTimers.errors" },
+    "readLiveTimers.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/readLiveTimers.exchange" },
+    "readStoppedFlag.request": { "$ref": "data-access.v1.14.schema.json#/$defs/readStoppedFlag.request" },
+    "readStoppedFlag.response": { "$ref": "data-access.v1.14.schema.json#/$defs/readStoppedFlag.response" },
+    "phoneNotFoundError": { "$ref": "data-access.v1.14.schema.json#/$defs/phoneNotFoundError" },
+    "readStoppedFlag.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/readStoppedFlag.errors" },
+    "readStoppedFlag.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/readStoppedFlag.exchange" },
+    "noTurnError": { "$ref": "data-access.v1.14.schema.json#/$defs/noTurnError" },
+    "sha256Hex": { "$ref": "data-access.v1.14.schema.json#/$defs/sha256Hex" },
+    "hashKeyName": { "$ref": "data-access.v1.14.schema.json#/$defs/hashKeyName" },
+    "signInContact": { "$ref": "data-access.v1.14.schema.json#/$defs/signInContact" },
+    "startSignIn.request": { "$ref": "data-access.v1.14.schema.json#/$defs/startSignIn.request" },
+    "startSignIn.started": { "$ref": "data-access.v1.14.schema.json#/$defs/startSignIn.started" },
+    "startSignIn.paused": { "$ref": "data-access.v1.14.schema.json#/$defs/startSignIn.paused" },
+    "startSignIn.response": { "$ref": "data-access.v1.14.schema.json#/$defs/startSignIn.response" },
+    "startSignIn.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/startSignIn.errors" },
+    "startSignIn.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/startSignIn.exchange" },
+    "codeRowPlan": { "$ref": "data-access.v1.14.schema.json#/$defs/codeRowPlan" },
+    "codeFinalParts": { "$ref": "data-access.v1.14.schema.json#/$defs/codeFinalParts" },
+    "sendSignInCode.request": { "$ref": "data-access.v1.14.schema.json#/$defs/sendSignInCode.request" },
+    "sendSignInCode.sent": { "$ref": "data-access.v1.14.schema.json#/$defs/sendSignInCode.sent" },
+    "sendSignInCode.repeated": { "$ref": "data-access.v1.14.schema.json#/$defs/sendSignInCode.repeated" },
+    "sendSignInCode.notSent": { "$ref": "data-access.v1.14.schema.json#/$defs/sendSignInCode.notSent" },
+    "sendSignInCode.response": { "$ref": "data-access.v1.14.schema.json#/$defs/sendSignInCode.response" },
+    "sendSignInCode.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/sendSignInCode.errors" },
+    "sendSignInCode.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/sendSignInCode.exchange" },
+    "proveSignIn.request": { "$ref": "data-access.v1.14.schema.json#/$defs/proveSignIn.request" },
+    "proveSignIn.signedIn": { "$ref": "data-access.v1.14.schema.json#/$defs/proveSignIn.signedIn" },
+    "proveSignIn.secondProofNeeded": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/proveSignIn.secondProofNeeded"
+    },
+    "proveSignIn.alreadySignedIn": {
+      "$ref": "data-access.v1.14.schema.json#/$defs/proveSignIn.alreadySignedIn"
+    },
+    "proveSignIn.wrong": { "$ref": "data-access.v1.14.schema.json#/$defs/proveSignIn.wrong" },
+    "proveSignIn.paused": { "$ref": "data-access.v1.14.schema.json#/$defs/proveSignIn.paused" },
+    "proveSignIn.expired": { "$ref": "data-access.v1.14.schema.json#/$defs/proveSignIn.expired" },
+    "proveSignIn.response": { "$ref": "data-access.v1.14.schema.json#/$defs/proveSignIn.response" },
+    "attemptNotFoundError": { "$ref": "data-access.v1.14.schema.json#/$defs/attemptNotFoundError" },
+    "proveSignIn.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/proveSignIn.errors" },
+    "proveSignIn.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/proveSignIn.exchange" },
+    "endSession.request": { "$ref": "data-access.v1.14.schema.json#/$defs/endSession.request" },
+    "endSession.ended": { "$ref": "data-access.v1.14.schema.json#/$defs/endSession.ended" },
+    "endSession.repeated": { "$ref": "data-access.v1.14.schema.json#/$defs/endSession.repeated" },
+    "endSession.response": { "$ref": "data-access.v1.14.schema.json#/$defs/endSession.response" },
+    "endSession.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/endSession.errors" },
+    "endSession.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/endSession.exchange" },
+    "personStanding.request": { "$ref": "data-access.v1.14.schema.json#/$defs/personStanding.request" },
+    "signedInRole": { "$ref": "data-access.v1.14.schema.json#/$defs/signedInRole" },
+    "personStanding.response": {
+      "title": "PersonStandingResponse",
+      "description": "The person's standing (README items 62 and 69): their live roles, whether they are on Rosie's team and whether they are a tester, as the rows say; the page call gives tester false outside staging (K-21 v1 schema line 853), and on a read that fails answers roles empty and both flags false, failing closed (ADR-016 section 6). Never a session, a hash, a contact, a name, or which row made the person a tester. A team member is a tester, so team true never comes with tester false (refuse-person-standing-team-not-tester); a listed human tester is a tester with no team row, team false and tester true (README item 69; default 137). Restated in v1.15 for tester's text and that rule: the shape is v1.13's. Changed in v1.15.",
+      "type": "object",
+      "properties": {
+        "personId": { "$ref": "#/$defs/id" },
+        "roles": {
+          "description": "K-04 person_roles of the person with ended_at null, but customer, at every business, in role id order (as db/repo/people.ts reads live roles).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/signedInRole" }
+        },
+        "team": {
+          "description": "true when the person holds a live K-36 v1 team_page_recipients row (removed_at null): Rosie's team (K-21 v1 signedIn.person.team; Q-18). A K-22 v1.3 staging_testers listing is no team row, so a human tester's is false (ADR-016 section 5: 'person.team ... false for them'; README default 137).",
+          "type": "boolean"
+        },
+        "tester": {
+          "description": "true when the person holds a live K-36 v1 team_page_recipients row or a live K-22 v1.3 staging_testers listing (removed_at null for either), read by person as v1.15's readTesterStanding reads them (README item 69, default 136; open gap 62, closed by v1.15).",
+          "type": "boolean"
+        }
+      },
+      "required": ["personId", "roles", "team", "tester"],
+      "additionalProperties": false,
+      "if": {
+        "type": "object",
+        "properties": { "team": { "const": true } },
+        "required": ["team"]
+      },
+      "then": {
+        "type": "object",
+        "properties": { "tester": { "const": true } },
+        "required": ["tester"]
+      }
+    },
+    "personStanding.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/personStanding.errors" },
+    "personStanding.exchange": {
+      "title": "PersonStandingExchange",
+      "description": "One personStanding request with its outcome. Restated in v1.15 only to refer to v1.15's personStanding.response. Changed in v1.15.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "personStanding" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/personStanding.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/personStanding.response" },
+            { "$ref": "#/$defs/personStanding.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "signInEntryAsk": { "$ref": "data-access.v1.14.schema.json#/$defs/signInEntryAsk" },
+    "signInEntries.request": { "$ref": "data-access.v1.14.schema.json#/$defs/signInEntries.request" },
+    "signInEntries.response": { "$ref": "data-access.v1.14.schema.json#/$defs/signInEntries.response" },
+    "signInEntries.errors": { "$ref": "data-access.v1.14.schema.json#/$defs/signInEntries.errors" },
+    "signInEntries.exchange": { "$ref": "data-access.v1.14.schema.json#/$defs/signInEntries.exchange" }
+  }
+}

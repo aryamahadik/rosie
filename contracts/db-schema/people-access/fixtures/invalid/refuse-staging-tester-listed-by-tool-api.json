@@ -1,0 +1,21 @@
+{
+  "after": ["seed-staging-tester.json", "../../core/fixtures/seed-person-roles.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-sam"
+    },
+    "action": "insert",
+    "table": "staging_testers",
+    "values": {
+      "id": "staging-tester-sam",
+      "person_id": "person-sam",
+      "added_at": "2026-11-14T08:00:00Z"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

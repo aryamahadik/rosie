@@ -375,6 +375,54 @@
       "expect": "refuse",
       "shows": "Sam's own call (rosie.person_id Sam) reading the paused attempt of Oct 28 is refused (no Tool API grant on sign_in_attempts, SQLSTATE 42501), even for columns that hold no hash: the Tool API reaches an attempt only through sign_in_attempt, sign_in_attempt_tried and sign_in_attempt_signed_in; the same read on the runtime side returns the row",
       "source": "README rule 9; ADR-016 section 4 ('rosie_app holds no grant'); K-22 v1 rule 5; BP rule 7"
+    },
+    {
+      "file": "seed-staging-tester.json",
+      "version": "v1.3",
+      "table": "staging_testers",
+      "expect": "accept",
+      "shows": "Staging's two human testers as the testers' seed lists them (ADR-016 card H), each a person with no name, role or team row, an email handle at example.com and an account with that email proven: Tester One listed and signed in by a code to their own inbox (a used sign-in code and a live session); Tester Two signed in the same way, whose listing ended at 07:00Z when their inbox left the list. The list names the person alone, never an address",
+      "source": "README rule 10; DL-535; DL-753 (R5 (b)); ADR-016 section 5 and section 7 card H; build prompt 9.4 (line 490); K-36 v1 team_page_recipients (the list's shape); rule 9"
+    },
+    {
+      "file": "invalid/refuse-staging-tester-tool-api-read.json",
+      "version": "v1.3",
+      "table": "staging_testers",
+      "expect": "refuse",
+      "shows": "Tester One's own call (rosie.person_id person-tester-one) reading their own listing is refused (no Tool API grant on staging_testers, SQLSTATE 42501): the Tool API never reads the testers' list, which only K-05's runtime reads answer, as a standing alone; the same read on the runtime side returns the row",
+      "source": "README rule 10; DL-535 ('the runtime side reads it; the Tool API does not'); K-22 v1.2 rule 9 (the same lock on sign_in_attempts)"
+    },
+    {
+      "file": "invalid/refuse-staging-tester-listed-by-tool-api.json",
+      "version": "v1.3",
+      "table": "staging_testers",
+      "expect": "refuse",
+      "shows": "Sam's own call scoped to Lee's Barbershop listing himself as a tester is refused (no Tool API grant on staging_testers, SQLSTATE 42501): no page, turn or console call makes a person a tester, which only the testers' seed does on the runtime side; the same insert on the runtime side passes",
+      "source": "README rule 10; ADR-016 section 7 card H (the seed writes the testers); DL-535; build prompt 9.4"
+    },
+    {
+      "file": "invalid/refuse-staging-tester-two-live-listings.json",
+      "version": "v1.3",
+      "table": "staging_testers",
+      "expect": "refuse",
+      "shows": "A second live listing for Tester One is refused by the unique index staging_testers_one_live_per_person (SQLSTATE 23505): a person is listed once at a time, so the seed run again adds nothing; the same row for Tester Two, whose listing ended, passes, as a person listed again gets a new row",
+      "source": "README rule 10; ADR-016 section 7 card H ('a second run adds nothing'); K-36 v1 team_page_recipients_one_live_per_person"
+    },
+    {
+      "file": "invalid/refuse-staging-tester-ended-before-listed.json",
+      "version": "v1.3",
+      "table": "staging_testers",
+      "expect": "refuse",
+      "shows": "Tester One's listing ended at 05:00Z, before it was made at 05:30Z, is refused by CHECK staging_testers_removed_after_added (SQLSTATE 23514); the same end at 08:00Z passes",
+      "source": "README rule 10; K-36 v1 team_page_recipients_removed_after_added"
+    },
+    {
+      "file": "invalid/refuse-staging-tester-moved-to-another-person.json",
+      "version": "v1.3",
+      "table": "staging_testers",
+      "expect": "refuse",
+      "shows": "The runtime side moving Tester One's live listing to Tester Two is refused (rosie_job holds UPDATE of removed_at and version only, SQLSTATE 42501): a listing is ended, never moved to another person or re-dated; the same update setting removed_at to 08:00Z in place of person_id, which ends the listing, passes",
+      "source": "README rule 10; K-36 v1 ('a member leaves the list by removed_at, never by a delete')"
     }
   ]
 }

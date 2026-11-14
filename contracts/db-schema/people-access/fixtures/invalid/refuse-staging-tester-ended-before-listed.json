@@ -1,0 +1,21 @@
+{
+  "after": ["seed-staging-tester.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": {},
+    "action": "update",
+    "table": "staging_testers",
+    "set": {
+      "removed_at": "2026-11-14T05:00:00Z",
+      "version": 2
+    },
+    "where": {
+      "id": "staging-tester-one"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["staging_testers_removed_after_added"]
+    }
+  }
+}
