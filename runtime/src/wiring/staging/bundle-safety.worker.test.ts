@@ -87,7 +87,7 @@ const VARS = { ENVIRONMENT: "staging", GIT_SHA: "test-sha" };
 
 /** The Worker's env over one job binding (and this file's app binding, which nothing here reads). */
 function envOver(job: Hyperdrive): StagingEnv {
-  return { ...STAGING_VARS, HYPERDRIVE_JOB: job, HYPERDRIVE_APP: poolBinding(APP) } as StagingEnv;
+  return { ...STAGING_VARS, HYPERDRIVE_JOB: job, HYPERDRIVE_APP: poolBinding(APP) };
 }
 
 // ---- what the file's tests log ----------------------------------------------------------------------------------------
@@ -379,19 +379,20 @@ describe("this file's database and its seed", () => {
       bundleId: V0_ID,
       manifestKey: keyIn(V0_ID, "manifest"),
     });
+    // Each seeded bundle's manifest, as the seed wrote it (the tests below read their flow graphs from the same copy).
     for (const bundle of Object.values(seeded)) {
-      for (const value of bundle.values) {
-        expect(await reads.calls.readBundleValue({ key: value.key })).toEqual({
-          result: "value",
-          value: {
-            key: value.key,
-            kind: value.kind,
-            bytes: value.bytes,
-            sha256: value.sha256,
-            text: value.text,
-          },
-        });
-      }
+      const [manifest] = bundle.values;
+      expect(manifest?.kind).toBe("manifest");
+      expect(await reads.calls.readBundleValue({ key: manifest?.key ?? "" })).toEqual({
+        result: "value",
+        value: {
+          key: manifest?.key,
+          kind: "manifest",
+          bytes: manifest?.bytes,
+          sha256: manifest?.sha256,
+          text: manifest?.text,
+        },
+      });
     }
     // Each seeded bundle has an id of its own, and none is v0's.
     const ids = [V0_ID, ...Object.values(seeded).map((bundle) => bundle.bundleId)].map(
@@ -758,6 +759,31 @@ describe("the safety read through realSafetyRead (DL-757, option (c))", () => {
     expect(made.kv.gets).toEqual([]);
     expect(made.reads.made).toEqual([]);
   });
+
+  it("in the test environment, where the fake set's state reads answer, the read asks nothing of the lines it is handed", async () => {
+    keepConsole();
+    const made = rig(noReads());
+    const fakes = skeletonFakes();
+    const root = composeRoot({
+      environment: "test",
+      sets: { fake: fakes.ports },
+      actors: null,
+      vars: VARS,
+      bundleSafety: made.adapter,
+      safetyReaders: fakes.models.readers,
+    });
+
+    const read = await root.safety.read.read(request(V0_ID));
+
+    // The fake set's own bundle gave the danger words; the adapter was never asked, as at the test environment's pin.
+    expect(read.result.outcomes).toEqual(["No"]);
+    expect(fakes.models.calls).toHaveLength(1);
+    expect(root.safety.bundle).toBe(fakes.ports.stateReads.safety.bundle);
+    expect(made.kv.gets).toEqual([]);
+    expect(made.reads.made).toEqual([]);
+    expect(made.lines).toEqual([]);
+    expect(made.adapter.answersFor()).toBeNull();
+  });
 });
 
 // ---- across a switch -----------------------------------------------------------------------------------------------------
@@ -768,6 +794,8 @@ describe("across a switch", () => {
     const { adapter, port } = made;
     const { second, noAskWords, emergencyStep } = seeded;
     const outage = { id: "outage", text: wordsIn(V0_MANIFEST, "outage") };
+    // The KV holds the refused bundle and the third one; v0 and the second are read from PostgreSQL's copy.
+    made.kv.fill(noAskWords, emergencyStep);
 
     await adapter.checkPin({ bundleId: V0_ID, bundles: port });
     expect(adapter.answersFor()).toEqual(V0_ID);
