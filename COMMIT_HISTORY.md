@@ -2,9 +2,54 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 585, [`59a2ee0`](https://github.com/aryamahadik/rosie/commit/59a2ee0), 2026-11-13 23:21:38 UTC.
+- **Through:** commit 587, [`1374c22`](https://github.com/aryamahadik/rosie/commit/1374c22), 2026-11-13 23:53:39 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 587. docs: COMMIT\_HISTORY.md through commit 585 (59a2ee0, \#592) (\#596)
+
+- **Commit:** [`1374c22`](https://github.com/aryamahadik/rosie/commit/1374c22), by Arya Mahadik, 2026-11-13 23:53:39 UTC
+- **Pull request:** [#596](https://github.com/aryamahadik/rosie/pull/596) from `task/commit-history-97`, merged 2026-11-13 23:53:40 UTC. It squashed 1 branch commit:
+  - `aae9375` docs: COMMIT\_HISTORY.md through commit 585 (59a2ee0, \#592)
+- **Files changed:** 1 (+88 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +88 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 586. T-024: K-15 v1, the Google Places port, frozen: search and details, no email, no key in the contract (\#595)
+
+- **Commit:** [`00f1f8d`](https://github.com/aryamahadik/rosie/commit/00f1f8d), by Arya Mahadik, 2026-11-13 23:53:32 UTC
+- **Pull request:** [#595](https://github.com/aryamahadik/rosie/pull/595) from `task/T-024`, merged 2026-11-13 23:53:33 UTC. It squashed 2 branch commits:
+  - `8c5f785` T-024: K-15 v1, the Google Places port, frozen: search and details (r…
+  - `ece9604` T-024: README: the double's error fixtures share their requests with …
+- **Files changed:** 22 (+1127 −0), by folder:
+  - `contracts/port-places/` README.md +188 −0, frozen.json +1 −0, port-places.v1.schema.json +444 −0
+  - `contracts/port-places/fixtures/` details-lee-home-services.json +24 −0, details-not-found.json +5 −0, details-yoga-studio.json +24 −0, details.json +37 −0, error-rate-limited.json +5 −0, error-unavailable.json +5 −0, index.json +148 −0, no-match.json +5 −0, search-by-name.json +16 −0, search-by-photo-text.json +16 −0, search-yoga-studio.json +16 −0, span-details.json +20 −0, span-search.json +20 −0
+  - `contracts/port-places/fixtures/invalid/` refuse-email-in-listing.json +38 −0, refuse-phone-national-form.json +16 −0, refuse-rating-field.json +17 −0, refuse-reviews-field.json +38 −0, refuse-town-in-span.json +20 −0, refuse-vendor-hours.json +24 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-024: K-15 v1, the Google Places port, frozen: search and details (requests, responses, errors, exchanges) and their K-08 spans; 12 accepted and 6 refused fixtures; the spike's findings from Google's public documents (no email on a listing, so S1-75 takes Q-02's default); README freeze record and frozen.json
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-024: README: the double's error fixtures share their requests with search-by-name.json and details.json, which answer them when the test's fail-next-call setting is off
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 585. docs: COMMIT\_HISTORY.md through commit 582 (58c3677, \#590) (\#592)
 
