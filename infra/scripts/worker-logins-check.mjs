@@ -434,8 +434,9 @@ async function main(args) {
 
   // 1. The database URL: out of this process's environment at once, so cf.sh never finds it.
   const raw = process.env.STAGING_DATABASE_URL ?? "";
-  for (const name of ["STAGING_DATABASE_URL", "DATABASE_URL", "DATABASE_REPLICA_URL"])
-    delete process.env[name];
+  delete process.env.STAGING_DATABASE_URL;
+  delete process.env.DATABASE_URL;
+  delete process.env.DATABASE_REPLICA_URL;
   if (raw === "") {
     throw new Refusal(
       "STAGING_DATABASE_URL is not set (from the environment, else from .dev.vars by name), so the catalog cannot be read as the migrations' role: the check cannot pass without it",
