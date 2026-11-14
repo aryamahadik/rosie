@@ -1,0 +1,80 @@
+{
+  "call": "recordSafetyOutcome",
+  "given": {
+    "seeds": ["core/seed-person-roles.json", "core/seed-phone-chat-open.json", "core/seed-bundle-registry.json"],
+    "after": ["j3-safety-arrival-threat.json"],
+    "now": "2026-10-23T14:42:32Z",
+    "stated": { "step": "A3-22", "gives": ["safe"] },
+    "note": "A3-48 again, v1.10: the handle actor records Alex's threat to Riley again after j3-safety-arrival-threat.json recorded it, under the same arrival turn (its 30-second re-read applies the danger again, or the first answer was lost: T-1352's case 9). The event id is the key (K-34 v1 safety_outcomes_event_key), so the call writes nothing and answers repeated with the first record (README default 175): the never hold at its stored version 1, the line, who was told and the same rows in the same order. A threat's line goes only to the owner (A3-48; S13-10: no safety message to the one who threatens; actions/src/commit/core/lines.ts), so safetyLine names Sam's handle, not the handle the text came from, which the danger wake has named alone (T-1358's finding a). Its rows: the line to Sam and the hand-off's alert to Sam, both send class safety (README defaults 174, 176); the actor wakes Sam's handle once for both (T-1375). Nothing goes twice: one claim per row, each part under its K-07 key."
+  },
+  "request": {
+    "caller": {
+      "kind": "actorOnArrival",
+      "turnId": "6fc1c513c069a30c23e91be4a9ae548433d793acb32cb68db621eb0dfbe20989",
+      "requestId": "6fc1c513c069a30c23e91be4a9ae548433d793acb32cb68db621eb0dfbe20989",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-0204"
+    },
+    "turn": {
+      "id": "6fc1c513c069a30c23e91be4a9ae548433d793acb32cb68db621eb0dfbe20989",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0204"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0204",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "safety": {
+      "eventId": "evt-alex-0204",
+      "source": "text",
+      "tries": [{ "model": "haiku", "result": "verdict" }],
+      "read": {
+        "labels": [
+          {
+            "outcome": "A threat to staff or others",
+            "tense": "now",
+            "evidence": "if Riley messes up my hair again I'll hurt him",
+            "atRisk": "Riley, staff",
+            "writer": "the person at the handle"
+          }
+        ]
+      },
+      "timedOut": false,
+      "dangerWords": [],
+      "outcomes": ["A threat to staff or others"],
+      "liftedToUnsure": false
+    },
+    "handleId": "handle-alex",
+    "bookingId": "booking-alex-riley-nov14",
+    "sentByActor": null
+  },
+  "outcome": {
+    "outcomeId": "safety-outcome-alex-0204",
+    "outcomes": ["A threat to staff or others"],
+    "hold": { "holdId": "hold-alex-0204", "releaseRule": "never", "blocksBooking": false, "version": 1 },
+    "safetyLine": {
+      "fixedLineId": "threatSafetyLine",
+      "outboxRowId": "out-alex-threat-line",
+      "recipientHandleId": "handle-sam"
+    },
+    "told": [{ "who": "owner", "via": "handOff", "id": "handoff-alex-threat" }],
+    "nothingBooks": true,
+    "repeated": true,
+    "gives": ["safe"],
+    "safetyRows": [
+      {
+        "outboxRowId": "out-alex-threat-line",
+        "recipientHandleId": "handle-sam",
+        "sendClass": "safety",
+        "writtenFor": "line"
+      },
+      {
+        "outboxRowId": "out-alert-handoff-alex-threat",
+        "recipientHandleId": "handle-sam",
+        "sendClass": "safety",
+        "writtenFor": "handOff"
+      }
+    ]
+  }
+}
