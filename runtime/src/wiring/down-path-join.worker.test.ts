@@ -85,8 +85,25 @@ const DANGER_WORDS = "Test words: my cut won't stop bleeding";
 /** The outage line's words as the fixture bundle writes them (K-01 fixed line `outage`), which both paths send. */
 const OUTAGE_TEXT = fixtureBundle().fixedLine("outage")?.text ?? "";
 
-/** One fictional number per handle (555-0170 to 555-0178), so no test's actor holds another's texts. */
-const handleOf = (line: number): Handle => ({ kind: "phone", address: `+155555501${String(line)}` });
+/** One fictional number per handle (555-0170 to 555-0178), each written out whole, so no test's actor holds another's texts. */
+const NUMBERS = new Map<number, string>([
+  [70, "+15555550170"],
+  [71, "+15555550171"],
+  [72, "+15555550172"],
+  [73, "+15555550173"],
+  [74, "+15555550174"],
+  [75, "+15555550175"],
+  [76, "+15555550176"],
+  [77, "+15555550177"],
+  [78, "+15555550178"],
+]);
+
+/** The handle of one of those numbers, by its last two digits. */
+function handleOf(line: number): Handle {
+  const address = NUMBERS.get(line);
+  if (address === undefined) throw new Error(`no fictional number ends in ${String(line)} here`);
+  return { kind: "phone", address };
+}
 
 /** Each number in every form one could leak in. */
 const formsOf = (handles: readonly Handle[]): string[] =>
