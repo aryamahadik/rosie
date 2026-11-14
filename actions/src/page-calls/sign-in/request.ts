@@ -1,17 +1,20 @@
-// K-21 v1's checks on signInStart's request (page-api.v1.schema.json `signInStart.request`, with its page envelope),
-// written out by hand so they run inside the Workers runtime, where no validator may be compiled at run time (workerd
-// allows no eval or Function). request.test.ts holds them to Ajv's verdict on the schema itself. Lengths count characters
-// as Ajv does (code points), and every pattern is the schema's own, with its u flag.
+// K-21 v1's checks on the sign-in calls' requests (page-api.v1.schema.json `signInStart.request`, T-1282;
+// `signInCheck.request` and `signOut.request`, T-1285; each with its page envelope), written out by hand so they run
+// inside the Workers runtime, where no validator may be compiled at run time (workerd allows no eval or Function).
+// request.test.ts and check-request.test.ts hold them to Ajv's verdict on the schema itself. Lengths count characters as
+// Ajv does (code points), and every pattern is the schema's own, with its u flag.
 //
 // Then the typed contact read as K-05 v1.13's signInContact needs it (ADR-016 section 4, "The key": an email in lower
 // case, a mobile in E.164), which is code's, not the schema's.
 //
-// A problem names a field, never a value: no contact, token, id or field name from the request is copied into one.
+// A problem names a field, never a value: no contact, code, token, id or field name from the request is copied into one.
 
 /** common/formats.v1 `id`: a string with a character that is not a line end. */
 const ID = /./u;
 /** K-21 v1 `linkCode`. */
 const LINK_CODE = /^[A-Za-z0-9-]{3,64}$/u;
+/** K-21 v1 `signInCheck.request.code`: the code as typed, 4 to 8 digits. */
+const CODE = /^[0-9]{4,8}$/u;
 
 /** K-21 v1 `opaqueToken`'s lengths, and `signInStart.request.account.typed`'s. */
 const TOKEN_LENGTH = { min: 16, max: 512 } as const;
@@ -21,6 +24,8 @@ const PAGE_FIELDS = ["requestId", "traceId", "sessionToken", "linkCode"] as cons
 const START_FIELDS = ["page", "account", "way", "deviceToken"] as const;
 const TYPED_FIELDS = ["from", "kind", "typed"] as const;
 const LINK_FIELDS = ["from"] as const;
+const CHECK_FIELDS = ["page", "attemptId", "code", "deviceToken"] as const;
+const SIGN_OUT_FIELDS = ["page"] as const;
 
 /** K-21 v1 `page`: the envelope every request carries. */
 export interface PageEnvelope {
@@ -41,6 +46,24 @@ export interface SignInStartRequest {
   readonly account: SignInAccount;
   readonly way: "email" | "text";
   readonly deviceToken: string;
+}
+
+/** K-21 v1 `signInCheck.request`: the attempt the page holds, the code as typed (null on the text way) and the device. */
+export interface SignInCheckRequest {
+  readonly page: PageEnvelope;
+  readonly attemptId: string;
+  readonly code: string | null;
+  readonly deviceToken: string;
+}
+
+/** K-21 v1 `signedInPage`: the envelope with a session, whose token is required. */
+export interface SignedInPageEnvelope extends PageEnvelope {
+  readonly sessionToken: string;
+}
+
+/** K-21 v1 `signOut.request`. */
+export interface SignOutRequest {
+  readonly page: SignedInPageEnvelope;
 }
 
 export const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -74,7 +97,15 @@ function hasFields(value: Record<string, unknown>, fields: readonly string[]): b
   return fields.every((field) => Object.hasOwn(value, field));
 }
 
-function pageProblems(page: unknown, problems: string[]): void {
+/**
+ * K-21 v1 `page` (a session token or null), or with `session` "required" its `signedInPage` (a session token, never
+ * null): the two envelopes differ in that field alone.
+ */
+function pageProblems(
+  page: unknown,
+  problems: string[],
+  session: "optional" | "required" = "optional",
+): void {
   if (!isRecord(page)) {
     problems.push("page is not an object");
     return;
@@ -83,7 +114,9 @@ function pageProblems(page: unknown, problems: string[]): void {
   if (!isId(own(page, "requestId"))) problems.push("page.requestId is not an id");
   if (!isId(own(page, "traceId"))) problems.push("page.traceId is not a trace id");
   const sessionToken = own(page, "sessionToken");
-  if (sessionToken !== null && !hasLength(sessionToken, TOKEN_LENGTH))
+  if (session === "required") {
+    if (!hasLength(sessionToken, TOKEN_LENGTH)) problems.push("page.sessionToken is not a session token");
+  } else if (sessionToken !== null && !hasLength(sessionToken, TOKEN_LENGTH))
     problems.push("page.sessionToken is not a session token or null");
   const linkCode = own(page, "linkCode");
   if (linkCode !== null && !(typeof linkCode === "string" && LINK_CODE.test(linkCode)))
@@ -136,6 +169,30 @@ export function signInStartProblems(request: unknown): string[] {
     own(page, "linkCode") === null
   )
     problems.push("an account from the link needs page.linkCode");
+  return problems;
+}
+
+/** Problems K-21 v1 finds in a `signInCheck.request`; none when it is one. */
+export function signInCheckProblems(request: unknown): string[] {
+  if (!isRecord(request)) return ["the request is not an object"];
+  const problems: string[] = [];
+  onlyFields("the request", request, CHECK_FIELDS, problems);
+  pageProblems(own(request, "page"), problems);
+  if (!isId(own(request, "attemptId"))) problems.push("attemptId is not an id");
+  const code = own(request, "code");
+  if (code !== null && !(typeof code === "string" && CODE.test(code)))
+    problems.push("code is not 4 to 8 digits or null");
+  if (!hasLength(own(request, "deviceToken"), TOKEN_LENGTH))
+    problems.push("deviceToken is not a device token");
+  return problems;
+}
+
+/** Problems K-21 v1 finds in a `signOut.request` (its page a `signedInPage`); none when it is one. */
+export function signOutProblems(request: unknown): string[] {
+  if (!isRecord(request)) return ["the request is not an object"];
+  const problems: string[] = [];
+  onlyFields("the request", request, SIGN_OUT_FIELDS, problems);
+  pageProblems(own(request, "page"), problems, "required");
   return problems;
 }
 
