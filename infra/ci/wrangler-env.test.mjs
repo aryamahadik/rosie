@@ -1,8 +1,9 @@
 // Tests for wrangler.jsonc's env.production (T-1003): its own Worker and resource names (none shared with staging),
 // the pinned account, the same binding names as the top level, no route (it stays a comment until the user says yes),
 // and no key or secret value in the file. Also (T-1235) the link host, LINK_HOST, in each environment, and
-// env.staging's own FILES bucket; and (T-1304) Rosie's own number, which no section names and no tracked config or
-// script holds. Run in ci.yml by `node --test "infra/ci/*.test.mjs"`.
+// env.staging's own FILES bucket; (T-1304) Rosie's own number, which no section names and no tracked config or
+// script holds; and (T-567) env.staging's two Hyperdrive bindings, each with its login's local string. Run in ci.yml
+// by `node --test "infra/ci/*.test.mjs"`.
 
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
@@ -15,6 +16,32 @@ import { REPO, SCRIPTS } from "./script-harness.mjs";
 const ROSFIELD_ACCOUNT_ID = "ecb06e7bc9129fa81104d331e9652362";
 // The host every link starts with (T-1235), set as the var LINK_HOST in each environment: a bare host, no scheme.
 const LINK_HOST = "rosfield.com";
+
+// env.staging's two Hyperdrive bindings (T-567; ADR-014 sections 1, 3 and 4). Each id is the configuration the user's
+// run of create-staging-hyperdrive.sh made (DL-754), which stores that binding's login, with caching disabled. Each
+// local string opens the local Docker database as that login, with its local password, the login's own name: local
+// only, not a secret. No real host, user or password is here.
+const STAGING_HYPERDRIVE = [
+  {
+    binding: "HYPERDRIVE_JOB",
+    id: "a4b3f2c61a6e42a78cc381cd61276d10",
+    localConnectionString: "postgres://rosie_worker_job:rosie_worker_job@127.0.0.1:54329/rosie",
+  },
+  {
+    binding: "HYPERDRIVE_APP",
+    id: "c4cb1720b94c4270a0166342cca2d394",
+    localConnectionString: "postgres://rosie_worker_app:rosie_worker_app@127.0.0.1:54329/rosie",
+  },
+];
+// Each binding's login (ADR-014 section 1): the runtime side's inherits rosie_job only, the Tool API's rosie_app only.
+const LOGINS = { HYPERDRIVE_JOB: "rosie_worker_job", HYPERDRIVE_APP: "rosie_worker_app" };
+// The spike's configuration, rosie-staging-hyperdrive (T-1124), stores the migrations' role, so its id is nowhere in
+// wrangler.jsonc, in a value or a comment (ADR-014 section 3).
+const SPIKE_HYPERDRIVE_ID = "68f4e670e62b41a99ab5a9ef0b176d2d";
+// env.production's placeholder (T-1003), unchanged until T-1006's own reviewed change (ADR-014 section 5).
+const PRODUCTION_HYPERDRIVE = [{ binding: "HYPERDRIVE", id: "00000000000000000000000000000002" }];
+// The loopback names a local string may use (ADR-014 section 4; T-1239's security note e), as Node's URL gives them.
+const LOOPBACK = new Set(["127.0.0.1", "[::1]", "localhost"]);
 
 // Strip // and /* */ comments outside strings, then trailing commas, then parse.
 function parseJsonc(text) {
@@ -125,6 +152,88 @@ function productionProblems(config) {
   return problems;
 }
 
+// The local Docker database of infra/docker-compose.yml, as db/repo/client.ts names it for Node. A local string
+// keeps its scheme, host, port and database (ADR-014 section 4).
+function localDatabaseUrl() {
+  const text = readFileSync(path.join(REPO, "db", "repo", "client.ts"), "utf8");
+  const found = /^const LOCAL_DATABASE_URL = "([^"]+)";$/m.exec(text);
+  if (found === null) throw new Error("db/repo/client.ts no longer names LOCAL_DATABASE_URL on one line");
+  return new URL(found[1]);
+}
+const LOCAL_DATABASE_URL = localDatabaseUrl();
+
+// The rules for one binding's local string (ADR-014 section 4; T-1239's security note e): LOCAL_DATABASE_URL's
+// scheme, host, port and database, on a loopback host, as the binding's own login with the login's own name as its
+// password, and nothing more. Each problem names the binding and the rule, never a value.
+function localStringProblems(where, login, text) {
+  if (typeof text !== "string") return [`${where} has no localConnectionString`];
+  let url;
+  try {
+    url = new URL(text);
+  } catch {
+    return [`${where}'s localConnectionString is not a URL`];
+  }
+  const problems = [];
+  if (url.protocol !== LOCAL_DATABASE_URL.protocol)
+    problems.push(`${where}'s local string's scheme is not LOCAL_DATABASE_URL's`);
+  if (!LOOPBACK.has(url.hostname)) problems.push(`${where}'s local string's host is not a loopback name`);
+  if (url.host !== LOCAL_DATABASE_URL.host)
+    problems.push(`${where}'s local string's host and port are not LOCAL_DATABASE_URL's`);
+  if (url.pathname !== LOCAL_DATABASE_URL.pathname)
+    problems.push(`${where}'s local string's database is not LOCAL_DATABASE_URL's`);
+  if (url.username !== login) problems.push(`${where}'s local string's user is not its login`);
+  if (url.password !== login)
+    problems.push(`${where}'s local string's password is not its login's local one`);
+  if (/[?#]/.test(text)) problems.push(`${where}'s local string holds a query or a fragment`);
+  return problems;
+}
+
+// Returns a list of problems with env.staging's Hyperdrive bindings (T-567); empty means ADR-014's piece 3 holds:
+// exactly HYPERDRIVE_JOB and HYPERDRIVE_APP, in that order, each with the id the user's run printed for it and its
+// login's local string and nothing else; no binding named HYPERDRIVE; the spike's id in no section; and
+// env.production's placeholder as it was.
+function stagingHyperdriveProblems(config) {
+  const problems = [];
+  const list = config.env?.staging?.hyperdrive;
+  if (!Array.isArray(list)) return ["env.staging has no hyperdrive list"];
+  const names = list.map((h) => h?.binding);
+  if (JSON.stringify(names) !== JSON.stringify(STAGING_HYPERDRIVE.map((h) => h.binding)))
+    problems.push("env.staging does not bind exactly HYPERDRIVE_JOB and HYPERDRIVE_APP");
+  if (names.includes("HYPERDRIVE")) problems.push("env.staging binds HYPERDRIVE");
+  for (const h of list) {
+    const want = STAGING_HYPERDRIVE.find((w) => w.binding === h?.binding);
+    if (want === undefined) continue;
+    const where = `env.staging's ${want.binding}`;
+    if (Object.keys(h).sort().join() !== "binding,id,localConnectionString")
+      problems.push(`${where}'s keys are not exactly binding, id and localConnectionString`);
+    if (h.id === SPIKE_HYPERDRIVE_ID) problems.push(`${where} binds the spike's configuration`);
+    else if (h.id !== want.id) problems.push(`${where}'s id is not the one the user's run printed for it`);
+    problems.push(...localStringProblems(where, LOGINS[want.binding], h.localConnectionString));
+  }
+  if (JSON.stringify(config).includes(SPIKE_HYPERDRIVE_ID))
+    problems.push("a section binds or names the spike's configuration");
+  if (JSON.stringify(config.env?.production?.hyperdrive) !== JSON.stringify(PRODUCTION_HYPERDRIVE))
+    problems.push("env.production's hyperdrive list is not its placeholder");
+  return problems;
+}
+
+/** Whether a text names the spike's configuration anywhere, in a value or a comment, in any letter case. */
+const namesSpike = (text) => text.toLowerCase().includes(SPIKE_HYPERDRIVE_ID);
+
+// wrangler.jsonc's text less staging's two local strings (T-567), each of which it must hold exactly once. They are
+// the one connection-string text the file may hold: each opens only the local Docker database, as a login whose
+// local password is its own name (ADR-014 section 4), and each is pinned whole (STAGING_HYPERDRIVE). The secret
+// scan reads the rest, so any other postgres:// text, in a value or a comment, still fails it.
+function withoutLocalStrings(text) {
+  let rest = text;
+  for (const { binding, localConnectionString } of STAGING_HYPERDRIVE) {
+    const count = text.split(localConnectionString).length - 1;
+    assert.equal(count, 1, `wrangler.jsonc holds ${binding}'s local string ${count} times, not once`);
+    rest = rest.replace(localConnectionString, "");
+  }
+  return rest;
+}
+
 const raw = readFileSync(path.join(REPO, "wrangler.jsonc"), "utf8");
 const config = parseJsonc(raw);
 
@@ -170,7 +279,7 @@ describe("wrangler.jsonc env.production (T-1003)", () => {
       config.env.staging.kv_namespaces.map((kv) => kv.binding),
       ["BUNDLES"],
     );
-    assert.equal(config.env.staging.hyperdrive, undefined);
+    assert.deepEqual(config.env.staging.hyperdrive, STAGING_HYPERDRIVE);
     assert.deepEqual(
       config.env.staging.routes.map((r) => r.pattern),
       ["rosfield.com/test", "rosfield.com/test/*"],
@@ -203,7 +312,214 @@ describe("wrangler.jsonc env.production (T-1003)", () => {
       /postgres(ql)?:\/\//i,
       /(api[_-]?key|secret|token|password)["']?\s*[:=]\s*["'][A-Za-z0-9_\-/+=]{16,}["']/i,
     ];
-    for (const re of patterns) assert.ok(!re.test(raw), `wrangler.jsonc matches ${re}`);
+    // Every pattern reads the whole file but staging's two local strings (T-567), each held once and pinned whole.
+    const scanned = withoutLocalStrings(raw);
+    for (const re of patterns) assert.ok(!re.test(scanned), `wrangler.jsonc matches ${re}`);
+  });
+});
+
+describe("wrangler.jsonc env.staging's Hyperdrive bindings (T-567)", () => {
+  it("binds exactly HYPERDRIVE_JOB and HYPERDRIVE_APP, with the ids the user's run printed and each login's local string", () => {
+    assert.deepEqual(stagingHyperdriveProblems(config), []);
+    assert.deepEqual(config.env.staging.hyperdrive, STAGING_HYPERDRIVE);
+  });
+
+  it("gives each a local string on a loopback host, as its own login with that login's local password only", () => {
+    for (const { binding, localConnectionString } of config.env.staging.hyperdrive) {
+      const url = new URL(localConnectionString);
+      assert.ok(LOOPBACK.has(url.hostname), `${binding}'s local string names a loopback host`);
+      assert.equal(
+        url.host,
+        LOCAL_DATABASE_URL.host,
+        `${binding}'s local string is on the local database's port`,
+      );
+      assert.equal(url.pathname, "/rosie", `${binding}'s local string opens the database rosie`);
+      assert.equal(url.username, LOGINS[binding], `${binding}'s local string's user is its login`);
+      assert.equal(url.password, LOGINS[binding], `${binding}'s local string's password is its login's name`);
+    }
+    // The database db/repo/client.ts names for Node: infra/docker-compose.yml's, on 127.0.0.1 only.
+    assert.equal(`${LOCAL_DATABASE_URL.host}${LOCAL_DATABASE_URL.pathname}`, "127.0.0.1:54329/rosie");
+  });
+
+  it("names no binding HYPERDRIVE in env.staging, and the spike's configuration nowhere in the file", () => {
+    assert.ok(!config.env.staging.hyperdrive.some(({ binding }) => binding === "HYPERDRIVE"));
+    assert.equal(namesSpike(raw), false, "wrangler.jsonc names the spike's configuration");
+  });
+
+  it("leaves env.production's placeholder as it was, and adds no Hyperdrive binding at the top level", () => {
+    assert.deepEqual(config.env.production.hyperdrive, PRODUCTION_HYPERDRIVE);
+    assert.equal(config.hyperdrive, undefined);
+  });
+});
+
+describe("env.staging's Hyperdrive checks catch a broken copy (T-567)", () => {
+  const broken = (change) => {
+    const copy = structuredClone(config);
+    change(copy);
+    return stagingHyperdriveProblems(copy);
+  };
+  const JOB = "env.staging's HYPERDRIVE_JOB";
+  const APP = "env.staging's HYPERDRIVE_APP";
+  const NOT_EXACTLY = "env.staging does not bind exactly HYPERDRIVE_JOB and HYPERDRIVE_APP";
+  const SPIKE_NAMED = "a section binds or names the spike's configuration";
+  /** HYPERDRIVE_JOB's local string set to a made-up one: no real host, user or password. */
+  const jobString = (text) => (c) => (c.env.staging.hyperdrive[0].localConnectionString = text);
+  const local = (user, password, hostAndPort = "127.0.0.1:54329", rest = "/rosie") =>
+    `postgres://${user}:${password}@${hostAndPort}${rest}`;
+
+  it("fail when the list is missing, binds one, three, the two in another order, or a HYPERDRIVE", () => {
+    assert.deepEqual(
+      broken((c) => delete c.env.staging.hyperdrive),
+      ["env.staging has no hyperdrive list"],
+    );
+    assert.deepEqual(
+      broken((c) => c.env.staging.hyperdrive.pop()),
+      [NOT_EXACTLY],
+    );
+    assert.deepEqual(
+      broken((c) => c.env.staging.hyperdrive.reverse()),
+      [NOT_EXACTLY],
+    );
+    assert.deepEqual(
+      broken((c) =>
+        c.env.staging.hyperdrive.push({
+          binding: "REPORTS",
+          id: "00112233445566778899aabbccddeeff",
+          localConnectionString: local("t567_made_up", "t567_made_up"),
+        }),
+      ),
+      [NOT_EXACTLY],
+    );
+    assert.deepEqual(
+      broken((c) => (c.env.staging.hyperdrive[0].binding = "HYPERDRIVE")),
+      [NOT_EXACTLY, "env.staging binds HYPERDRIVE"],
+    );
+  });
+
+  it("fail on the spike's id, the two ids swapped, or a key past binding, id and localConnectionString", () => {
+    assert.deepEqual(
+      broken((c) => (c.env.staging.hyperdrive[0].id = SPIKE_HYPERDRIVE_ID)),
+      [`${JOB} binds the spike's configuration`, SPIKE_NAMED],
+    );
+    assert.deepEqual(
+      broken((c) => (c.env.production.hyperdrive[0].id = SPIKE_HYPERDRIVE_ID)),
+      [SPIKE_NAMED, "env.production's hyperdrive list is not its placeholder"],
+    );
+    assert.deepEqual(
+      broken((c) => {
+        const [job, app] = c.env.staging.hyperdrive;
+        [job.id, app.id] = [app.id, job.id];
+      }),
+      [
+        `${JOB}'s id is not the one the user's run printed for it`,
+        `${APP}'s id is not the one the user's run printed for it`,
+      ],
+    );
+    // remote: true would point plain wrangler dev at the deployed configuration instead of the local database.
+    assert.deepEqual(
+      broken((c) => (c.env.staging.hyperdrive[1].remote = true)),
+      [`${APP}'s keys are not exactly binding, id and localConnectionString`],
+    );
+  });
+
+  it("fail on a local string that is missing, not a URL, another scheme, off the loopback, or on another port or database", () => {
+    assert.deepEqual(
+      broken((c) => delete c.env.staging.hyperdrive[0].localConnectionString),
+      [
+        `${JOB}'s keys are not exactly binding, id and localConnectionString`,
+        `${JOB} has no localConnectionString`,
+      ],
+    );
+    assert.deepEqual(broken(jobString("not a connection string")), [
+      `${JOB}'s localConnectionString is not a URL`,
+    ]);
+    assert.deepEqual(broken(jobString("mysql://rosie_worker_job:rosie_worker_job@127.0.0.1:54329/rosie")), [
+      `${JOB}'s local string's scheme is not LOCAL_DATABASE_URL's`,
+    ]);
+    assert.deepEqual(
+      broken(jobString(local("rosie_worker_job", "rosie_worker_job", "db.example.test:54329"))),
+      [
+        `${JOB}'s local string's host is not a loopback name`,
+        `${JOB}'s local string's host and port are not LOCAL_DATABASE_URL's`,
+      ],
+    );
+    assert.deepEqual(broken(jobString(local("rosie_worker_job", "rosie_worker_job", "localhost:54329"))), [
+      `${JOB}'s local string's host and port are not LOCAL_DATABASE_URL's`,
+    ]);
+    assert.deepEqual(broken(jobString(local("rosie_worker_job", "rosie_worker_job", "127.0.0.1:5432"))), [
+      `${JOB}'s local string's host and port are not LOCAL_DATABASE_URL's`,
+    ]);
+    assert.deepEqual(
+      broken(jobString(local("rosie_worker_job", "rosie_worker_job", "127.0.0.1:54329", "/rosie_rig_none"))),
+      [`${JOB}'s local string's database is not LOCAL_DATABASE_URL's`],
+    );
+    for (const rest of ["/rosie?sslmode=disable", "/rosie?options=-csearch_path%3Dx", "/rosie#x"]) {
+      assert.deepEqual(
+        broken(jobString(local("rosie_worker_job", "rosie_worker_job", "127.0.0.1:54329", rest))),
+        [`${JOB}'s local string holds a query or a fragment`],
+        rest,
+      );
+    }
+  });
+
+  it("fail on a local string as the other login or the superuser, or with any password but the login's own name", () => {
+    const wrongLogin = [
+      `${JOB}'s local string's user is not its login`,
+      `${JOB}'s local string's password is not its login's local one`,
+    ];
+    assert.deepEqual(broken(jobString(local("rosie_worker_app", "rosie_worker_app"))), wrongLogin);
+    assert.deepEqual(broken(jobString(local("rosie", "rosie"))), wrongLogin);
+    for (const password of ["t567-made-up-password", "rosie", ""]) {
+      assert.deepEqual(
+        broken(jobString(local("rosie_worker_job", password))),
+        [`${JOB}'s local string's password is not its login's local one`],
+        password,
+      );
+    }
+    assert.deepEqual(
+      broken(
+        (c) =>
+          (c.env.staging.hyperdrive[1].localConnectionString = local("rosie_worker_job", "rosie_worker_job")),
+      ),
+      [
+        `${APP}'s local string's user is not its login`,
+        `${APP}'s local string's password is not its login's local one`,
+      ],
+    );
+  });
+
+  it("fail when env.production's placeholder changes or goes", () => {
+    const changed = ["env.production's hyperdrive list is not its placeholder"];
+    assert.deepEqual(
+      broken((c) => (c.env.production.hyperdrive = structuredClone(STAGING_HYPERDRIVE))),
+      changed,
+    );
+    assert.deepEqual(
+      broken((c) => (c.env.production.hyperdrive[0].id = "0".repeat(31) + "3")),
+      changed,
+    );
+    assert.deepEqual(
+      broken((c) => delete c.env.production.hyperdrive),
+      changed,
+    );
+  });
+
+  it("find the spike's id in a comment too, in any letter case", () => {
+    assert.equal(namesSpike(`${raw}\n// ${SPIKE_HYPERDRIVE_ID.toUpperCase()}\n`), true);
+    assert.equal(namesSpike(`${raw}\n/* ${SPIKE_HYPERDRIVE_ID} */\n`), true);
+  });
+
+  it("leave any other connection string in the file to the secret scan, and refuse a local string held twice or not at all", () => {
+    const planted = `${raw}\n// "postgres://t567_made_up:t567-made-up-password@db.example.test:5432/t567_made_up"\n`;
+    assert.match(withoutLocalStrings(planted), /postgres(ql)?:\/\//i);
+    assert.throws(
+      () => withoutLocalStrings(`${raw}\n// ${STAGING_HYPERDRIVE[0].localConnectionString}\n`),
+      /HYPERDRIVE_JOB's local string 2 times, not once/,
+    );
+    assert.throws(
+      () => withoutLocalStrings(raw.replace(STAGING_HYPERDRIVE[1].localConnectionString, "")),
+      /HYPERDRIVE_APP's local string 0 times, not once/,
+    );
   });
 });
 

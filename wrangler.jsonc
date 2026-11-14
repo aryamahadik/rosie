@@ -39,7 +39,8 @@
   // makes it with no public access: no r2.dev URL, no custom domain). For local runs and dry runs, which simulate it
   // without touching the real bucket. env.staging repeats it (T-1235), since wrangler does not pass it down.
   "r2_buckets": [{ "binding": "FILES", "bucket_name": "rosie-staging-files" }],
-  // No Hyperdrive binding yet: it comes with the task that needs it.
+  // No Hyperdrive binding at the top level: wrangler does not pass one down, so env.staging binds staging's two
+  // (T-567) and env.production its own placeholder.
   // GIT_SHA is not listed: deploys set it with --var GIT_SHA:<sha>.
   // LINK_HOST is the host every link starts with (T-1235; the web shell reads it, T-511): a bare host, with no
   // scheme and no path. A link is https://<LINK_HOST><BASE_PATH>/<short code>. The domain is rosfield.com (Q-51's
@@ -107,6 +108,31 @@
       // (T-438) stores ID files from, and the Vitest Workers pool runs this environment, so its tests get FILES too,
       // simulated locally. Bound by name; the bucket has no r2.dev URL and no custom domain.
       "r2_buckets": [{ "binding": "FILES", "bucket_name": "rosie-staging-files" }],
+      // Staging's database (ADR-014 sections 1, 3 and 4; T-567): two Hyperdrive configurations, each storing one
+      // dedicated login and each with caching disabled (ADR-007: both sides make decision reads). HYPERDRIVE_JOB is
+      // rosie-staging-hyperdrive-job, storing rosie_worker_job, which inherits rosie_job only (the runtime side);
+      // HYPERDRIVE_APP is rosie-staging-hyperdrive-app, storing rosie_worker_app, which inherits rosie_app only (the
+      // Tool API). The ids are the ones the user's run of create-staging-hyperdrive.sh printed (DL-754): resource ids,
+      // not secrets; each login's password is stored only in its configuration. No binding is named HYPERDRIVE, and
+      // the spike's configuration, which stores the migrations' role, is bound nowhere.
+      // Each localConnectionString is for local runs only (never deployed, and not used with --remote): the Docker
+      // database of infra/docker-compose.yml, on LOCAL_DATABASE_URL's host and port (db/repo/client.ts), as that
+      // binding's login with its local password, the login's own name, as rosie's is rosie: local only, not a secret
+      // (ADR-014 section 4). The Vitest Workers pool runs this environment, so it gets both bindings on these strings
+      // until the Workers test rig gives it its own. Branch previews are uploaded without this list (deploy-preview.sh,
+      // T-1256).
+      "hyperdrive": [
+        {
+          "binding": "HYPERDRIVE_JOB",
+          "id": "a4b3f2c61a6e42a78cc381cd61276d10",
+          "localConnectionString": "postgres://rosie_worker_job:rosie_worker_job@127.0.0.1:54329/rosie",
+        },
+        {
+          "binding": "HYPERDRIVE_APP",
+          "id": "c4cb1720b94c4270a0166342cca2d394",
+          "localConnectionString": "postgres://rosie_worker_app:rosie_worker_app@127.0.0.1:54329/rosie",
+        },
+      ],
     },
     // The production environment (T-1003). Written, never deployed: no production deploy script, workflow or secret
     // exists, and nothing below is created on Cloudflare until the user says yes (Q-51: one account for now, so every
