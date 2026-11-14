@@ -12,8 +12,44 @@
 //
 // Every value reaches the database as a bound parameter. Updates are compare-and-set on the row's version like
 // people.ts; the database refuses any update that does not raise the version by one (trigger from 0002).
+//
+// readChatHandle is K-05 v1.10 item 51 (T-1259, the D-017 path audit's D1c; DL-492, DL-506; QUESTIONS.md CQ-61): the
+// phone handle a Linq chat id names, the number a delivery receipt, Rosie's own reaction or a failed poll belongs to.
+// Its caller is the gateway's Linq verify (C-044: adapters/src/linq/webhook/parse.ts ParseLookups.chatHandle, bound by
+// the audit's CHAT card), which takes the answer's number, or none: a null answer or a failed read throws
+// receiptHandleUnknown and the gateway answers 503, so Linq retries. It reads threads by linq_chat_id
+// (threads_linq_chat_key: one row at most), the columns kind and handle_id alone, then that thread's handle by its
+// primary key, the columns kind and address alone, and answers handleId and K-06 v1's handle (kind phone, the number in
+// E.164 form) when the thread is of kind chat and its handle of kind phone; else both fields null (default 94): no
+// thread holds the chat id, a thread of kind email holds it (threads_chat_or_email leaves linq_chat_id free), or the
+// chat's handle is an email handle. The chat id is compared as a whole, byte by byte, never parsed (CQ-09).
+//
+// Its role and scope (item 51; K-04 v1 rule 4; as arming-reads.ts's reads): it runs on the client it is handed, the
+// runtime side's, as rosie_job, in one read-only transaction at repeatable read on the primary, uncached (targets.ts
+// inRuntimeTransaction, which clears the business scope at its start), so the answer is one moment's and nothing is
+// written. threads and handles are scoped none, and rosie_job reads both through its own grants (0012), with no definer
+// function and no table owner's rights. rosie_app, the Tool API's role, holds no grant on either (0012), so a Tool API
+// client's call is refused by privilege (42501, thrown as DataAccessDatabaseError). The role is the connection's.
+//
+// What it never touches (the card's security review): no statement names a message's words or any column of
+// sealing_keys, and none selects `*` or a whole row; nothing of the thread's booking, reply address or version is read
+// or answered, and the answer never holds the chat id. The number is answered to its caller alone: nothing here logs it
+// or the chat id, or puts either in an error (K-09 v1.5 default 135). A serialization failure, a deadlock or a lost
+// connection answers transient with its SQLSTATE alone; any other database error is thrown scrubbed (clocks.ts's
+// transientOrScrubbed); a request of the wrong shape throws a TypeError naming the field, never a value, before any
+// statement. Its integration test (threads-chat-handle.int.test.ts) reads every statement it sends and checks it.
+//
+// Defaults used by readChatHandle (for ops/QUESTIONS.md; each where item 51 is silent):
+//   1. A thread of kind email answers both fields null before its handle is read: item 51 answers none for it whatever
+//      its handle is, so nothing of that handle, an address, is read.
+//   2. A chat thread whose handle row the read cannot see answers both fields null, as an unknown chat does: a receipt
+//      is never placed on a guessed handle (default 94). threads_handle_fk keeps the row, so only a role that is not
+//      shown it (row-level security) meets this.
+import type * as K05 from "../../contracts/generated/data-access/data-access.v1.10";
+import { transientOrScrubbed } from "./clocks";
 import { SealingError, type WrappingKeys, seal, unsealText } from "./sealing";
 import type { Sql, Tx } from "./scope";
+import { assertId, assertRequestShape, inRuntimeTransaction } from "./targets";
 
 type Db = Sql | Tx;
 
@@ -331,6 +367,88 @@ export async function setLinqChatId(
     return { ok: true, row: toThread(row) };
   }
   return { ok: false, current: await getThread(sql, id) };
+}
+
+// ---- the chat's phone handle (K-05 v1.10 item 51) -----------------------------------------------------------------
+
+/** K-05 v1.10 readChatHandle.request: Linq's chat id alone. */
+export type ReadChatHandleRequest = K05.ReadChatHandleRequest;
+/** K-05 v1.10 readChatHandle.response: the chat's phone handle, its id and its number, or both fields null. */
+export type ReadChatHandleResponse = K05.ReadChatHandleResponse;
+/** K-05 v1.10 readChatHandle.errors: transient alone; an unknown chat is an answer, not an error (default 95). */
+export type ReadChatHandleError = K05.ReadChatHandleErrors;
+export type ReadChatHandleOutcome = ReadChatHandleResponse | ReadChatHandleError;
+
+const READ_CHAT_HANDLE = "readChatHandle";
+
+/** The columns item 51 reads of the chat's thread: its kind and its handle, never its booking, address or version. */
+interface ChatThreadRow {
+  kind: ThreadKind;
+  handle_id: string;
+}
+
+/** The columns item 51 reads of the thread's handle: its kind and its address. */
+interface ChatHandleRow {
+  kind: "phone" | "email";
+  address: string;
+}
+
+/** The chat id: the request names it alone; a refusal names the call and the field, never a value. */
+function linqChatIdOf(request: unknown): string {
+  assertRequestShape(request, READ_CHAT_HANDLE, ["linqChatId"]);
+  const values = request as Record<string, unknown>;
+  if (!Object.hasOwn(values, "linqChatId")) {
+    throw new TypeError(`${READ_CHAT_HANDLE}: the request needs linqChatId`);
+  }
+  const linqChatId = values.linqChatId;
+  assertId(linqChatId, `${READ_CHAT_HANDLE}: linqChatId`);
+  return linqChatId;
+}
+
+/** No chat thread of a phone handle holds the chat id (default 94): both fields null. */
+function noChatHandle(): ReadChatHandleResponse {
+  return { handleId: null, handle: null };
+}
+
+/**
+ * The chat's phone handle inside the read's own transaction (item 51): the thread by its chat id, its kind and its
+ * handle alone; then, for a thread of kind chat, its handle by its key, its kind and its address alone (default 1: the
+ * handle of a thread of kind email is never read). A handle the read cannot see answers none (default 2).
+ */
+async function chatHandleIn(tx: Sql, linqChatId: string): Promise<ReadChatHandleResponse> {
+  const [thread] = await tx<ChatThreadRow[]>`
+    select kind, handle_id from threads where linq_chat_id = ${linqChatId}
+  `;
+  if (thread?.kind !== "chat") {
+    return noChatHandle();
+  }
+  const [handle] = await tx<ChatHandleRow[]>`
+    select kind, address from handles where id = ${thread.handle_id}
+  `;
+  if (handle?.kind !== "phone") {
+    return noChatHandle();
+  }
+  return { handleId: thread.handle_id, handle: { kind: "phone", address: handle.address } };
+}
+
+/**
+ * The phone handle a Linq chat id names (K-05 v1.10 item 51): its id and its number in E.164 form when a thread of
+ * kind chat holds the chat id and its handle is a phone; else both fields null (default 94), which the Linq verify
+ * answers 503. One read-only transaction at repeatable read on the primary, uncached, writing nothing. Pass the runtime
+ * side's client (rosie_job): the role is the connection's. transient on a serialization failure, a deadlock or a lost
+ * connection. Throws a TypeError for a request of the wrong shape, and any other database error scrubbed
+ * (DataAccessDatabaseError: the Tool API's role meets 42501). The number is a person's: never log it, nor the chat id.
+ */
+export async function readChatHandle(
+  sql: Sql,
+  request: ReadChatHandleRequest,
+): Promise<ReadChatHandleOutcome> {
+  const linqChatId = linqChatIdOf(request);
+  try {
+    return await inRuntimeTransaction(sql, { readOnly: true }, (tx) => chatHandleIn(tx, linqChatId));
+  } catch (error) {
+    return transientOrScrubbed(READ_CHAT_HANDLE, error);
+  }
 }
 
 // ---- the opener-sent mark -----------------------------------------------------------------------------------------
