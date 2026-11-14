@@ -2,9 +2,62 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 605, [`507759c`](https://github.com/aryamahadik/rosie/commit/507759c), 2026-11-14 09:13:27 UTC.
+- **Through:** commit 607, [`5ef2d69`](https://github.com/aryamahadik/rosie/commit/5ef2d69), 2026-11-14 09:37:26 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 607. docs: COMMIT\_HISTORY.md through commit 605 (507759c, \#615) (\#618)
+
+- **Commit:** [`5ef2d69`](https://github.com/aryamahadik/rosie/commit/5ef2d69), by Arya Mahadik, 2026-11-14 09:37:26 UTC
+- **Pull request:** [#618](https://github.com/aryamahadik/rosie/pull/618) from `task/commit-history-105`, merged 2026-11-14 09:37:26 UTC. It squashed 1 branch commit:
+  - `9cce906` docs: COMMIT\_HISTORY.md through commit 605 (507759c, \#615)
+- **Files changed:** 1 (+36 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +36 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 606. T-1253: the Workers test rig over PostgreSQL (ADR-014 piece 5) (\#617)
+
+- **Commit:** [`fb2fbff`](https://github.com/aryamahadik/rosie/commit/fb2fbff), by Arya Mahadik, 2026-11-14 09:37:22 UTC
+- **Pull request:** [#617](https://github.com/aryamahadik/rosie/pull/617) from `task/T-1253`, merged 2026-11-14 09:37:22 UTC. It squashed 3 branch commits:
+  - `712bf5c` T-1253: the Workers test rig over PostgreSQL: its globalSetup in both…
+  - `d1aabe2` T-1253: npm run db:logins tested as npm runs it: refused on a host th…
+  - `5379b79` T-1253: vitest.config.ts drops postgres.js's own closed-socket reject…
+- **Files changed:** 16 (+2156 −15), by folder:
+  - `infra/ci/` README.md +2 −0, closed-socket.test.mjs +240 −0, db-logins.test.mjs +121 −0, test-rig.test.mjs +621 −0
+  - `infra/test-rig/` closed-socket.d.mts +32 −0, closed-socket.mjs +112 −0, db-logins.mjs +63 −0, files.mjs +120 −0, global-setup.mjs +17 −0, local-url.mjs +41 −0, provided.d.ts +13 −0, rig.mjs +513 −0
+  - `/` package.json +1 −0, vitest.config.ts +50 −15
+  - `runtime/test/rig/` rig.seed.ts +45 −0, rig.worker.test.ts +165 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1253: the Workers test rig over PostgreSQL: its globalSetup in both Workers projects (refuses any server but a local or CI one, makes and migrates the run's template with bundle v0, the two logins with their local passwords, a database per named file with its seed, T-1254's wrong logins), the named files up front, the pool's Hyperdrive bindings through inject, npm run db:logins, the rig's first tests and its Node tests
+
+Work in progress (NEED): postgres.js 3.4.9's Workers build leaves an unhandled rejection after each client end inside workerd, so the rig's Workers run exits 1 with all its tests passed; the fix needs a ruling (rule 7.9) or a dependency change.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1253: npm run db:logins tested as npm runs it: refused on a host that is not a loopback name before it connects, and run twice on the test server, the second run changing no catalog row
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1253: vitest.config.ts drops postgres.js's own closed-socket rejection alone (DL-758 option (a)): test.onUnhandledError drops an error only when its name is TypeError, its message exactly "This socket has been closed.", its type "Unhandled Rejection" and its first stack frame in node_modules/postgres/cf/polyfills.js (infra/test-rig/closed-socket.mjs, pure); the Workers projects print the count as one line with no value at the run's close; infra/ci/closed-socket.test.mjs shows each field alone mismatched kept, by the function and through Vitest's resolved config
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 605. docs: COMMIT\_HISTORY.md through commit 603 (daf2aa6, \#613) (\#615)
 
