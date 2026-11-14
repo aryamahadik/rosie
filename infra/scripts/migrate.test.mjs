@@ -1,12 +1,13 @@
 // Tests for infra/scripts/migrate.mjs, against the local PostGIS container (127.0.0.1:54329), in a throwaway schema.
 // Run: node --test infra/scripts/migrate.test.mjs
 import assert from "node:assert/strict";
-import { execFileSync, spawnSync } from "node:child_process";
+import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { createHash, randomBytes } from "node:crypto";
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { after, before, describe, it } from "node:test";
+import { setTimeout as sleep } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 import postgres from "postgres";
 
@@ -241,6 +242,148 @@ describe("migrate.mjs: a database URL it cannot use (deploy step 1; T-569, DL-36
       const [row] = await sql`select count(*)::int as n from pg_namespace where nspname = ${schema}`;
       assert.equal(row.n, 0);
     });
+  });
+});
+
+// T-1093 (T-191's architect note c): a file waits at most lock_timeout (5 s) for a lock, so a migration that turns on
+// row-level security behind a long transaction fails fast instead of holding the queries behind it.
+describe("migrate.mjs waits for a lock only so long (T-1093)", () => {
+  /** Starts migrate.mjs on `dir` and resolves, once it ends, with its exit code, its output and when it ended. */
+  function start(dir) {
+    const env = { ...process.env, DATABASE_URL: url, DB_SCHEMA: schema, MIGRATIONS_DIR: dir };
+    delete env.CI;
+    const child = spawn(process.execPath, [migrate], { env });
+    let out = "";
+    child.stdout.on("data", (chunk) => (out += chunk));
+    child.stderr.on("data", (chunk) => (out += chunk));
+    return new Promise((resolve) => {
+      child.on("close", (code) => resolve({ code, out, ended: performance.now() }));
+    });
+  }
+  /** Resolves when a backend of this database waits for a lock on a statement holding `text` (at most 20 s). */
+  async function waitingOn(text) {
+    for (let tries = 0; tries < 400; tries += 1) {
+      const [row] = await sql`
+        select count(*)::int as n from pg_stat_activity
+        where datname = current_database() and wait_event_type = 'Lock' and query like ${`%${text}%`}`;
+      if (row.n > 0) return performance.now();
+      await sleep(50);
+    }
+    throw new Error(`no backend waited for a lock on "${text}"`);
+  }
+  const rowSecurity = async () => {
+    const [row] =
+      await sql`select c.relrowsecurity as on from pg_class c join pg_namespace s on s.oid = c.relnamespace
+      where s.nspname = ${schema} and c.relname = 'items'`;
+    return row.on;
+  };
+
+  it("each file's statements run with lock_timeout 5 s and statement_timeout 60 s", async () => {
+    freshSchema("timeouts");
+    const seen =
+      "create table seen as select\n" +
+      "  (select setting from pg_settings where name = 'lock_timeout') as lock_ms,\n" +
+      "  (select setting from pg_settings where name = 'statement_timeout') as statement_ms;\n";
+    const result = run(folder({ "0002_seen.sql": seen }));
+    assert.equal(result.code, 0, result.out);
+    const rows = await sql.unsafe(`select lock_ms, statement_ms from ${schema}.seen`);
+    assert.deepEqual(
+      Array.from(rows, (row) => ({ ...row })),
+      [{ lock_ms: "5000", statement_ms: "60000" }],
+    );
+  });
+
+  it("behind a long transaction, a file that turns on row-level security fails within lock_timeout, rolled back and not recorded, and a query queued behind it goes on", async () => {
+    freshSchema("held");
+    const base = { "0002_items.sql": TABLE };
+    const first = run(folder(base));
+    assert.equal(first.code, 0, first.out);
+    const dir = folder({ ...base, "0003_rls.sql": "alter table items enable row level security;\n" });
+    const holder = postgres(url, { max: 1, onnotice: () => undefined });
+    const reader = postgres(url, { max: 1, onnotice: () => undefined });
+    try {
+      // The long transaction: it has read items, so it holds ACCESS SHARE on it until it ends.
+      const held = await holder.reserve();
+      await held`begin`;
+      await held.unsafe(`select count(*) from ${schema}.items`);
+      const started = performance.now();
+      const migrating = start(dir);
+      const waiting = await waitingOn("enable row level security");
+      // A query that comes now queues behind the ALTER's request for ACCESS EXCLUSIVE.
+      const read = reader.unsafe(`select count(*)::int as n from ${schema}.items`);
+      const result = await migrating;
+      const [{ n }] = await read;
+      const readEnded = performance.now();
+      await held`rollback`;
+      held.release();
+      assert.notEqual(result.code, 0, result.out);
+      assert.match(result.out, /0003_rls\.sql failed and was not recorded/);
+      assert.match(result.out, /canceling statement due to lock timeout/);
+      assert.match(result.out, /code: 55P03/);
+      assert.match(result.out, /longer than lock_timeout 5s/);
+      const total = Math.round(result.ended - started);
+      assert.ok(total >= 4900, `it gave up after ${String(total)} ms, before lock_timeout`);
+      const afterWait = Math.round(result.ended - waiting);
+      assert.ok(afterWait < 15000, `it ended ${String(afterWait)} ms after its wait was seen`);
+      assert.equal(n, 2);
+      const queued = Math.round(readEnded - waiting);
+      assert.ok(
+        queued < 15000,
+        `the read queued behind it ended ${String(queued)} ms after the wait was seen`,
+      );
+    } finally {
+      await holder.end({ timeout: 5 });
+      await reader.end({ timeout: 5 });
+    }
+    assert.equal(await rowSecurity(), false);
+    assert.equal(
+      (await recorded()).some((row) => row.version === "0003"),
+      false,
+    );
+    // Once the long transaction has ended, the same file runs.
+    const again = run(dir);
+    assert.equal(again.code, 0, again.out);
+    assert.equal(await rowSecurity(), true);
+    assert.equal(
+      (await recorded()).some((row) => row.version === "0003"),
+      true,
+    );
+  });
+
+  it("a file outside a transaction (CREATE INDEX CONCURRENTLY) takes the lock_timeout too: behind an open write it fails within the limit, and runs once the write ends", async () => {
+    freshSchema("concurrent");
+    const base = { "0002_items.sql": TABLE };
+    const first = run(folder(base));
+    assert.equal(first.code, 0, first.out);
+    const dir = folder({
+      ...base,
+      "0003_idx.sql": "create index concurrently if not exists items_code_idx on items (code);\n",
+    });
+    const holder = postgres(url, { max: 1, onnotice: () => undefined });
+    try {
+      // An open write: the concurrent build waits for it to end before it builds.
+      const held = await holder.reserve();
+      await held`begin`;
+      await held.unsafe(`insert into ${schema}.items values (3, 'c')`);
+      const started = performance.now();
+      const result = await start(dir);
+      await held`rollback`;
+      held.release();
+      assert.notEqual(result.code, 0, result.out);
+      assert.match(result.out, /0003_idx\.sql failed and was not recorded/);
+      assert.match(result.out, /canceling statement due to lock timeout/);
+      const total = Math.round(result.ended - started);
+      assert.ok(total >= 4900 && total < 25000, `it gave up after ${String(total)} ms`);
+    } finally {
+      await holder.end({ timeout: 5 });
+    }
+    assert.equal(
+      (await recorded()).some((row) => row.version === "0003"),
+      false,
+    );
+    const again = run(dir);
+    assert.equal(again.code, 0, again.out);
+    assert.deepEqual(await indexState("items_code_idx"), [{ valid: true }]);
   });
 });
 

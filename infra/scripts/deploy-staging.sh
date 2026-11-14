@@ -5,6 +5,9 @@
 # ops/releases/D-xxx.md:
 #  1. migrate: the expanding migrations on the staging database, when STAGING_DATABASE_URL is set
 #     (guard:migrations has checked before the merge that they only expand);
+#  then logins: worker-logins-check.mjs, the check of the Worker's two logins and their Hyperdrive configurations
+#     (ADR-014 piece 4; T-1093), before any code. A refusal, or no STAGING_DATABASE_URL (the check cannot pass
+#     without the catalog), stops the deploy there with nothing deployed: step 2 never started, so nothing rolls back;
 #  2. code: wrangler deploy --env staging --var GIT_SHA:<sha>, with --var ROSIE_NUMBER:<number> when that is set
 #     in E.164 form (below), flags off;
 #  3. bundle: publish-bundle.sh publishes the bundle folder --bundle names (default bundles/v0, D-017's bundle v0):
@@ -45,9 +48,10 @@
 # environment, else from .dev.vars by name (load_dev_var, before step 1), never printed. It leaves this shell's
 # environment before anything is started, with DATABASE_URL, which this script never reads, and is kept in
 # database_url, never marked for export. Only the commands that use the database get it, each on its own command line:
-# step 1's migrate.mjs as DATABASE_URL, and publish-bundle.sh and flags.sh (steps 3 and 4, and their undo) as
-# STAGING_DATABASE_URL, which each of them hands on to its own database program alone. No other command gets any
-# database URL: git, cf.sh and wrangler, the check and the rollback among them.
+# step 1's migrate.mjs as DATABASE_URL; the logins' check, worker-logins-check.mjs, as STAGING_DATABASE_URL, which it
+# takes out of its own environment at once, so the cf.sh it starts gets none; and publish-bundle.sh and flags.sh (steps
+# 3 and 4, and their undo) as STAGING_DATABASE_URL, which each of them hands on to its own database program alone. No
+# other command gets any database URL: git, cf.sh and wrangler, the check and the rollback among them.
 # Tracing, allexport and keyword are switched off first, whatever the caller's shell asked for (DL-581, T-1343; as
 # cf.sh does, T-1261): bash -x, xtrace handed down in SHELLOPTS, or a BASH_ENV that turns it on never prints the number
 # or the URL; allexport would mark rosie_number and database_url for export; and under keyword lib.sh's
@@ -242,6 +246,16 @@ if [[ -n "$database_url" ]]; then
 else
   log "step 1/4 migrate: skipped (NOTICE: STAGING_DATABASE_URL is not set)"
 fi
+
+# The logins' check (ADR-014 section 4's piece 4, "before the first deploy whose Worker opens a client through either
+# binding"; T-1093): after the migrations, so it reads the catalog they leave, and before the code, so a refusal stops
+# the deploy before any traffic. It reads staging's catalog as the migrations' role, env.staging's two Hyperdrive
+# bindings and `cf.sh hyperdrive list`, changes nothing, and prints no host, password or connection string.
+log "logins: the check of the Worker's two logins and their Hyperdrive configurations: start"
+if ! STAGING_DATABASE_URL="$database_url" node infra/scripts/worker-logins-check.mjs; then
+  die "logins: refused (the lines above say why): nothing was deployed, and staging runs the version it ran"
+fi
+log "logins: done, both logins and both configurations are in their shape"
 
 before="$(live_version)"
 if [[ -n "$before" ]]; then
