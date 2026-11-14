@@ -5,12 +5,17 @@
 //                                 local Docker database (factory spec 4: rosie/rosie is local only, not a secret),
 //                                 migrated with infra/scripts/migrate.mjs into its public schema, as the staging
 //                                 database is. drop() removes it; only a t569_ database this helper made is dropped.
-//   releaseRoot(t, {devVars})     a throwaway checkout the scripts run in: copies of the scripts and flag sets under
+//   releaseRoot(t, {devVars, loginsCheck})
+//                                 a throwaway checkout the scripts run in: copies of the scripts and flag sets under
 //                                 test and of wrangler.jsonc; this repository's compiler/, db/, bundles/ and migrate.mjs
-//                                 linked in (the code the scripts run, read where it is); a fake wrangler that records
-//                                 each call and never reaches Cloudflare; fake curl and sleep (script-harness.mjs). Its
-//                                 HOME is empty, so no test reads this Mac's sign-in or keys. It holds no .dev.vars,
-//                                 unless devVars gives the text of a made-up one (BAD_DATABASE_URLS' commented line).
+//                                 linked in (the code the scripts run, read where it is), and node_modules/postgres; a
+//                                 fake wrangler that records each call and never reaches Cloudflare; fake curl and sleep
+//                                 (script-harness.mjs). Its HOME is empty, so no test reads this Mac's sign-in or keys.
+//                                 It holds no .dev.vars, unless devVars gives the text of a made-up one
+//                                 (BAD_DATABASE_URLS' commented line). The logins' check deploy-staging.sh runs
+//                                 (worker-logins-check.mjs, T-1093) is a stand-in that records its call and passes,
+//                                 unless loginsCheck gives the text of the program to put there:
+//                                 worker-logins-check.test.mjs gives the real one, with its names swapped for its own.
 //   v0WithBuild(t, n)             bundle v0 (bundles/v0/bundle) under another build number, v0's own plus n (so never
 //                                 v0's, whatever build bundles/v0 holds): the manifest's bundle id and keys rewritten as
 //                                 the compiler's withBundleId() does, the stored values byte for byte, so it is a second
@@ -23,7 +28,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { copyFileSync, cpSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { copyFileSync, cpSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import postgres from "postgres";
 
@@ -47,6 +52,7 @@ const SCRIPTS = [
   "publish-bundle.sh",
   "flags.sh",
   "db-url.mjs",
+  "hyperdrive-list.mjs",
   "lib.sh",
   "cf.sh",
   "post-deploy-check.sh",
@@ -56,7 +62,9 @@ const SCRIPTS = [
 // The fake wrangler (CommonJS). argv: wrangler's arguments, after cf.sh's --config <file>. Every call is one JSON line
 // in $FAKE_LOG; kv bulk put also logs the entries of its file. FAKE_KV=fail makes kv bulk put fail. deployments status
 // answers FAKE_LIVE_VERSION at 100%, and deploy writes a deploy entry with that version, so a deploy's rollback finds
-// staging still on the version it ran before and has nothing to roll back.
+// staging still on the version it ran before and has nothing to roll back. hyperdrive list (T-1093) prints the file
+// FAKE_HYPERDRIVE_LIST names (and fails when none is named), and logs which of its variables have a database URL's
+// name or hold a postgres:// URL.
 const FAKE_WRANGLER = String.raw`"use strict";
 const fs = require("node:fs");
 const args = process.argv.slice(2);
@@ -76,6 +84,18 @@ if (has("kv", "bulk", "put")) {
 } else if (has("deploy")) {
   const entry = { type: "deploy", version_id: process.env.FAKE_LIVE_VERSION, targets: [] };
   fs.appendFileSync(process.env.WRANGLER_OUTPUT_FILE_PATH, JSON.stringify(entry) + "\n");
+} else if (has("hyperdrive", "list")) {
+  const names = Object.keys(process.env).sort();
+  record({
+    tool: "hyperdrive-list",
+    databaseNames: names.filter((name) => name.includes("DATABASE")),
+    urlHolders: names.filter((name) => /postgres(ql)?:\/\//i.test(process.env[name])),
+  });
+  if (!process.env.FAKE_HYPERDRIVE_LIST) {
+    process.stderr.write("fake wrangler: hyperdrive list is not faked here (no FAKE_HYPERDRIVE_LIST)\n");
+    process.exit(1);
+  }
+  process.stdout.write(fs.readFileSync(process.env.FAKE_HYPERDRIVE_LIST, "utf8"));
 } else {
   process.stderr.write("fake wrangler: " + args.join(" ") + " is not faked\n");
   process.exit(1);
@@ -112,11 +132,21 @@ export async function createThrowawayDatabase(tag) {
   return { name, url: url.href, sql, drop };
 }
 
+// The logins' check's stand-in (ES module): it records its call, never its environment's values, and passes.
+const LOGINS_CHECK_STAND_IN = String.raw`import { appendFileSync } from "node:fs";
+if (process.env.FAKE_LOG) {
+  const entry = { tool: "worker-logins-check", args: process.argv.slice(2), url: process.env.STAGING_DATABASE_URL ? "set" : "unset" };
+  appendFileSync(process.env.FAKE_LOG, JSON.stringify(entry) + "\n");
+}
+process.stdout.write("worker-logins-check: the release harness's stand-in: passed\n");
+`;
+
 /** A throwaway checkout to run the release scripts in (see the top of this file). */
-export function releaseRoot(t, { devVars } = {}) {
+export function releaseRoot(t, { devVars, loginsCheck } = {}) {
   const dir = tempDir(t, "release");
   const root = path.join(dir, "rosie");
   for (const script of SCRIPTS) copyScript(script, root);
+  write(path.join(root, "infra", "scripts", "worker-logins-check.mjs"), loginsCheck ?? LOGINS_CHECK_STAND_IN);
   if (devVars !== undefined) write(path.join(root, ".dev.vars"), devVars);
   for (const file of ["flags.mjs", "staging.json", "production.json"]) {
     write(path.join(root, "infra", "flags", file), readFileSync(path.join(REPO, "infra", "flags", file)));
@@ -127,6 +157,9 @@ export function releaseRoot(t, { devVars } = {}) {
   }
   const recorder = path.join(dir, "fake", "wrangler.cjs");
   write(recorder, FAKE_WRANGLER);
+  // The database client the logins' check imports (a copy, not a link, finds node_modules from the root).
+  mkdirSync(path.join(root, "node_modules"), { recursive: true });
+  symlinkSync(path.join(REPO, "node_modules", "postgres"), path.join(root, "node_modules", "postgres"));
   write(
     path.join(root, "node_modules", ".bin", "wrangler"),
     `#!/usr/bin/env bash\nexec "${process.execPath}" "${recorder}" "$@"\n`,

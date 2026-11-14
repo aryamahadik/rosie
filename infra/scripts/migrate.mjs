@@ -22,6 +22,13 @@
 // before anything runs. A failed concurrent build leaves an invalid index: the next run drops it first, then builds again.
 // Write the statements with IF NOT EXISTS, so a rerun after a partial failure skips the ones already built.
 // The runner refuses to apply anything while an applied file has changed or is missing.
+// Locks (T-1093, from T-191's architect note c): a file waits at most LOCK_TIMEOUT for any lock (lock_timeout), and in a
+// transaction each of its statements runs at most STATEMENT_TIMEOUT (statement_timeout), both set for that file alone.
+// A statement that needs a table's ACCESS EXCLUSIVE lock (ALTER TABLE ... ENABLE ROW LEVEL SECURITY, CREATE POLICY)
+// behind a long transaction would otherwise wait, and every query on that table would queue behind its request; now
+// the file fails after LOCK_TIMEOUT, rolled back and not recorded, and the queue goes on. A file run outside a
+// transaction (concurrent index work) takes the lock_timeout alone: its statements hold no lock that keeps queries
+// out, and a large table's build may rightly run long. Run it again once the long transaction has ended.
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
@@ -40,6 +47,9 @@ const NO_TRANSACTION = /^--\s*migrate:no-transaction\s*$/;
 const CONCURRENT_INDEX =
   /^create\s+(?:unique\s+)?index\s+concurrently\s+(?:if\s+not\s+exists\s+)?((?:"(?:[^"]|"")+"|[a-z_][a-z0-9_$]*)(?:\s*\.\s*(?:"(?:[^"]|"")+"|[a-z_][a-z0-9_$]*))?)/i;
 const LOCK_WAIT_SECONDS = 120;
+// Each file's lock_timeout and, in a transaction, statement_timeout (the top of this file).
+const LOCK_TIMEOUT = "5s";
+const STATEMENT_TIMEOUT = "60s";
 const USAGE = "Usage: node infra/scripts/migrate.mjs [--status]";
 
 class UsageError extends Error {}
@@ -292,14 +302,19 @@ async function applyFile(sql, schema, file) {
   `;
   if (file.noTransaction) {
     await sql.unsafe(`set search_path to ${searchPath}`);
+    await sql.unsafe(`set lock_timeout = '${LOCK_TIMEOUT}'`);
     for (const statement of file.statements) {
       await dropInvalidIndex(sql, schema, statement);
       await sql.unsafe(statement);
     }
     await record(sql);
+    // The session's own value again: the lock_timeout above was this file's alone (a failure ends the run).
+    await sql.unsafe("reset lock_timeout");
     return;
   }
   await sql.begin(async (tx) => {
+    await tx.unsafe(`set local lock_timeout = '${LOCK_TIMEOUT}'`);
+    await tx.unsafe(`set local statement_timeout = '${STATEMENT_TIMEOUT}'`);
     await tx.unsafe(`set local search_path to ${searchPath}`);
     await tx.unsafe(file.text);
     await record(tx);
@@ -369,6 +384,13 @@ async function main(args) {
           await applyFile(sql, schema, file);
         } catch (error) {
           console.error(`migrate: ${file.file} failed and was not recorded:\n  ${describeError(error)}`);
+          if (error?.code === "55P03" || error?.code === "57014") {
+            console.error(
+              `migrate: it waited for a lock longer than lock_timeout ${LOCK_TIMEOUT}, or ran a statement longer than ` +
+                `statement_timeout ${STATEMENT_TIMEOUT}, so it stopped rather than hold other queries back; run it ` +
+                `again once the long transaction has ended`,
+            );
+          }
           return 1;
         }
         console.log(`migrate: applied ${file.file} (${Math.round(performance.now() - started)} ms)`);

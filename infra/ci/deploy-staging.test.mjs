@@ -507,7 +507,8 @@ describe("deploy-staging.sh hands the staging database's URL to the commands tha
     "sed",
     "tr",
   ];
-  // The commands that use the database, and the name each gets the URL under.
+  // The commands that use the database, and the name each gets the URL under. The logins' check (T-1093) is the release
+  // harness's stand-in here; worker-logins-check.test.mjs shows the real one hands the URL to no command it starts.
   const URL_HOLDERS = [
     "flags.mjs: env DATABASE_URL",
     "flags.sh: env STAGING_DATABASE_URL",
@@ -516,6 +517,7 @@ describe("deploy-staging.sh hands the staging database's URL to the commands tha
     "registry activate: env DATABASE_URL",
     "registry active: env DATABASE_URL",
     "registry publish: env DATABASE_URL",
+    "worker-logins-check.mjs: env STAGING_DATABASE_URL",
   ];
   const named = (lines) => lines.map((line) => line.replace(": env ", ": ")).sort();
   const cleanups = [];
@@ -535,6 +537,7 @@ describe("deploy-staging.sh hands the staging database's URL to the commands tha
     if (child.name === "wrangler") return `wrangler ${child.args[2] ?? ""}`;
     if (child.name !== "node") return child.name;
     if (first === "infra/scripts/migrate.mjs") return "migrate.mjs";
+    if (first === "infra/scripts/worker-logins-check.mjs") return "worker-logins-check.mjs";
     if (child.args.some((arg) => arg.endsWith("/infra/flags/flags.mjs"))) return "flags.mjs";
     if (child.args.some((arg) => arg.includes("registryCall"))) return `registry ${child.args[6] ?? ""}`;
     return "node";
@@ -618,6 +621,7 @@ describe("deploy-staging.sh hands the staging database's URL to the commands tha
       "node",
       "curl",
       "migrate.mjs",
+      "worker-logins-check.mjs",
       "cf.sh deployments",
       "wrangler deployments",
       "cf.sh deploy",
