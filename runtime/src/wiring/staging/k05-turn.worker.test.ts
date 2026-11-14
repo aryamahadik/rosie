@@ -3,9 +3,11 @@
 // bundle v0 published and active and test owner 1 seeded (./k05-turn.seed.ts: db/seeds/skeleton.ts), reached through its
 // own pool pair only, HYPERDRIVE_JOB_K05_TURN and HYPERDRIVE_APP_K05_TURN, handed in as the env's HYPERDRIVE_JOB and
 // HYPERDRIVE_APP behind doubles that count each read of a connection string (ADR-014 section 4). Each root here is built as
-// the Worker's is (../root.ts workerRoot: composeRoot over stagingOptions(env)), with the one seam stagingOptions names,
-// its handle (./part.ts stagingDb), so a test reads T-1254's counts and each call's timing line; one case goes through
-// workerRoot itself. Every database call a test makes of its own (the row counts) goes through the handle too.
+// the Worker's is (../root.ts workerRoot: composeRoot over stagingOptions(env)), through the two seams stagingOptions
+// names: its handle (./part.ts stagingDb), so a test reads T-1254's counts and each call's timing line, and its builders,
+// every part but this card's stood in by its nothing-bound answer, so a test sees this card's binding alone whatever the
+// other parts bind later. Two cases go through workerRoot itself, every part's own builder with it. Every database call
+// a test makes of its own (the row counts) goes through the handle too.
 //
 //   - bundles: readActiveBundle answers bundle v0 as active-bundle.json shapes it, and readBundleValue its manifest's
 //     stored text with its size and sha256, as bundle-value-on-miss.json; the pin's own reader (../../bundle/values.ts)
@@ -20,10 +22,11 @@
 //     naming another business is refused;
 //   - turn rows: commit-s1-01-sam.json's request on test owner 1's rows commits once and repeats with nothing written;
 //     park-turn.json's request on his ids parks once and repeats; a park of the committed turn is alreadyCommitted;
-//   - failing (the pool's own HYPERDRIVE_JOB, on rosie_rig_none; DB_SCHEMA set): each of the six calls fails as its port's
-//     contract says, by the call's name and SQLSTATE alone, with nothing of the binding's string in what is thrown, the
-//     reader gives no manifest, the gateway's trace takes the stand-in and the probe reads down; unbound (no
-//     HYPERDRIVE_JOB): NoDatabaseError for each; production: the four ports closed, no binding read. No row count moves;
+//   - failing (the pool's own HYPERDRIVE_JOB, on rosie_rig_none; the two bindings crossed; DB_SCHEMA set): each of the
+//     six calls fails as its port's contract says, by the call's name and SQLSTATE or the guard's labels alone, with
+//     nothing of the binding's string in what is thrown, the reader gives no manifest, the gateway's trace takes the
+//     stand-in and the probe reads down; unbound (no HYPERDRIVE_JOB): NoDatabaseError for each; production: the four
+//     ports closed, no binding read. No row count moves;
 //   - HYPERDRIVE_APP is read 0 times throughout, opened equals ended after every test, and no span or log line holds a
 //     555-01xx number or the text's words.
 // The writes come last: until then test owner 1's rows are as the seed left them (a first text).
@@ -61,10 +64,15 @@ import {
   type PortName,
   type Root,
 } from "../index";
-import { dbHandle, DbClosedError } from "./db";
+import { dbHandle, DbClosedError, DbGuardRefusal } from "./db";
+import { NO_RECEIPT_INPUTS } from "./k05-receipt";
 import { NO_TURN_CALL_INPUTS, stagingTurnCalls } from "./k05-turn";
-import { stagingOptions, type StagingInputs } from "./options";
+import { NO_MODEL_READER_INPUTS } from "./models";
+import { stagingOptions, type StagingBuilders, type StagingInputs } from "./options";
 import { stagingDb, type DbCallLine, type StagingDb, type StagingEnv } from "./part";
+import { NO_SEND_INPUTS } from "./send";
+import { NO_DIRECTORY_INPUTS } from "./state-reads";
+import { NO_ROW_INPUTS } from "./tool-api-rows";
 
 /** This file's key in the rig's list (infra/test-rig/files.mjs). */
 const KEY = "K05_TURN";
@@ -175,9 +183,30 @@ interface EnvOptions {
   readonly schema?: string;
 }
 
-/** Every env a test built, and every handle: checked after each test (HYPERDRIVE_APP never read; opened equals ended). */
+/**
+ * Every env a test built, the envs of the roots that bind this card's part alone, and every handle: checked after each
+ * test (HYPERDRIVE_APP's string never read; by this card's part, not by its name either; opened equals ended).
+ */
 const ENVS: TestEnv[] = [];
+const TURN_ONLY_ENVS: TestEnv[] = [];
 const HANDLES: StagingDb[] = [];
+
+/**
+ * Every part but this card's, stood in by its nothing-bound answer (each stub's own, as T-1257 made it), so a root built
+ * with these shows this card's binding alone, whatever the other parts bind once their cards land.
+ */
+const EVERY_OTHER_PART_UNBOUND: Partial<StagingBuilders> = {
+  receipt: () => NO_RECEIPT_INPUTS,
+  models: () => NO_MODEL_READER_INPUTS,
+  bundleSafety: () => null,
+  gate: () => null,
+  rows: () => NO_ROW_INPUTS,
+  directories: () => NO_DIRECTORY_INPUTS,
+  send: () => NO_SEND_INPUTS,
+  flags: () => null,
+  testPhone: () => null,
+  copies: () => null,
+};
 
 /** The Worker's env as wrangler.jsonc's vars give it, with this file's pair behind counting doubles. */
 function envOf(options: EnvOptions = {}): TestEnv {
@@ -220,7 +249,11 @@ interface Rooted {
   lines(): DbCallLine[];
 }
 
-/** A root built as workerRoot builds the Worker's, over the test's env, with its handle kept for the test to read. */
+/**
+ * A root built as workerRoot builds the Worker's (composeRoot over stagingOptions(env)), over the test's env, with its
+ * handle kept for the test to read, and this card's part (./k05-turn.ts stagingTurnCalls, as STAGING_BUILDERS holds it)
+ * the only one bound.
+ */
 function rootOver(testEnv: TestEnv): Rooted {
   const written: string[] = [];
   const db = stagingDb(testEnv.env, {
@@ -230,7 +263,8 @@ function rootOver(testEnv: TestEnv): Rooted {
     },
   });
   HANDLES.push(db);
-  const inputs = stagingOptions(testEnv.env, { db });
+  TURN_ONLY_ENVS.push(testEnv);
+  const inputs = stagingOptions(testEnv.env, { db, builders: EVERY_OTHER_PART_UNBOUND });
   const root = composeRoot({
     environment: environmentOf(testEnv.env),
     actors: null,
@@ -240,9 +274,9 @@ function rootOver(testEnv: TestEnv): Rooted {
   return { root, db, inputs, lines: () => written.map((line) => JSON.parse(line) as DbCallLine) };
 }
 
-/** The dbCall lines among a test's console lines, as the Worker's own root writes them (console.log). */
-function dbCallLinesOf(lines: readonly string[]): DbCallLine[] {
-  const found: DbCallLine[] = [];
+/** The JSON lines among a test's console lines whose `msg` is this one, in order. */
+function jsonLinesOf(lines: readonly string[], msg: string): Record<string, unknown>[] {
+  const found: Record<string, unknown>[] = [];
   for (const line of lines) {
     let value: unknown;
     try {
@@ -250,11 +284,16 @@ function dbCallLinesOf(lines: readonly string[]): DbCallLine[] {
     } catch {
       continue;
     }
-    if (typeof value === "object" && value !== null && (value as { msg?: unknown }).msg === "dbCall") {
-      found.push(value as DbCallLine);
+    if (typeof value === "object" && value !== null && (value as { msg?: unknown }).msg === msg) {
+      found.push(value as Record<string, unknown>);
     }
   }
   return found;
+}
+
+/** The dbCall lines among a test's console lines, as the Worker's own root writes them (console.log). */
+function dbCallLinesOf(lines: readonly string[]): DbCallLine[] {
+  return jsonLinesOf(lines, "dbCall") as unknown as DbCallLine[];
 }
 
 // ---- the requests -----------------------------------------------------------------------------------------------------
@@ -422,9 +461,14 @@ function textsOf(error: unknown): string[] {
     .split("\n")
     .filter((line) => !/^\s+at\s/u.test(line))
     .join("\n");
+  const fields = error as unknown as Record<string, unknown>;
   const own = Object.getOwnPropertyNames(error)
     .filter((name) => name !== "stack")
-    .map((name) => String(JSON.stringify((error as unknown as Record<string, unknown>)[name])));
+    .map((name) => {
+      // A property that holds no JSON value (undefined, a function) gives no text.
+      const text = JSON.stringify(fields[name]) as string | undefined;
+      return text ?? "";
+    });
   return [error.message, stack, JSON.stringify(error), String(error), ...own];
 }
 
@@ -490,12 +534,13 @@ afterEach(() => {
     expect(counts.ended).toBe(counts.opened);
     expect(counts.connectionsOpen).toBe(0);
   }
-  // The job side only: HYPERDRIVE_APP is never read for these calls, by name or by its connection string.
+  // The job side only: HYPERDRIVE_APP's connection string is never read for these calls, and this card's part never
+  // reads HYPERDRIVE_APP by its name either; no binding named HYPERDRIVE is read at all.
   for (const made of ENVS) {
     expect(made.app.reads.n).toBe(0);
-    expect(made.names).not.toContain("HYPERDRIVE_APP");
     expect(made.names).not.toContain("HYPERDRIVE");
   }
+  for (const made of TURN_ONLY_ENVS) expect(made.names).not.toContain("HYPERDRIVE_APP");
 });
 
 // ---- the rig ----------------------------------------------------------------------------------------------------------
@@ -588,10 +633,13 @@ describe("bundleReads: K-05 v1 item 7 through the job handle", () => {
       expect(fromKv.reads()).toEqual([{ key: MANIFEST.key, kind: "manifest", from: "kv" }]);
       expect(callsOf(lines())).toEqual(["readBundleValue"]);
 
-      // No BUNDLES at all (kv null): every value from PostgreSQL's copy, the manifest and the flow graph it lists.
+      // No BUNDLES at all (kv null): every value from PostgreSQL's copy. Bundle v0 holds two, its manifest and the one
+      // flow graph the manifest lists.
       expect(bundleKvOf(undefined)).toBeNull();
+      expect(bundleV0Kv.map((part) => part.key).sort()).toEqual([FLOW_A.key, MANIFEST.key].sort());
       const noKv = new BundleReader(registry, bundleKvOf(undefined));
       const again = await readManifest(noKv, V0);
+      expect(again.storage.values.map((entry) => entry.key)).toEqual([FLOW_A.key]);
       const listed = again.storage.values.find((entry) => entry.key === FLOW_A.key && entry.kind === "flow");
       if (listed === undefined) throw new Error("bundle v0's manifest lists no flow A");
       const graph = await noKv.read(FLOW_A.key, "flow", (read) =>
@@ -822,6 +870,34 @@ describe("bound but failing: each call answers as its port's contract says, and 
     expect(dbCallLinesOf(testLog)).toEqual([]);
     expect(db.counts()).toMatchObject({ opened: 10, ended: 10, connectionsOpen: 0 });
     expect(testEnv.job?.reads.n).toBe(10);
+    expect(await rowCounts()).toEqual(before);
+  });
+
+  it("the two bindings crossed (HYPERDRIVE_JOB holding the Tool API's login): the guard refuses each of the six calls before its code runs, so none ever runs as rosie_app, and no row count moves", async () => {
+    const before = await rowCounts();
+    const testEnv = envOf({ job: APP });
+    const { root, db, lines } = rootOver(testEnv);
+    const spans: Span[] = [];
+
+    for (const { call, run } of await sixCalls(root, spans)) {
+      const error = await rejectionOf(run());
+      expect(error, call).toBeInstanceOf(DbGuardRefusal);
+      expect(error, call).toMatchObject({ side: "runtime", binding: "HYPERDRIVE_JOB" });
+      expect((error as DbGuardRefusal).checks, call).toContain("session_user");
+      expectNothingOf(poolBinding(APP), textsOf(error));
+    }
+
+    expect(spans).toMatchObject([{ hop: "frontier", outcome: "failed", error_code: "DbGuardRefusal" }]);
+    // Each refusal's one log line: the side, the binding's name and the failed checks' labels (T-1254), no timing line.
+    const refusals = jsonLinesOf(testLog, "dbGuardRefused");
+    expect(refusals).toHaveLength(6);
+    for (const line of refusals) {
+      expect(line).toMatchObject({ level: "error", side: "runtime", binding: "HYPERDRIVE_JOB" });
+      expect(Object.keys(line).sort()).toEqual(["binding", "checks", "level", "msg", "side"]);
+    }
+    expect(lines()).toEqual([]);
+    expect(dbCallLinesOf(testLog)).toEqual([]);
+    expect(db.counts()).toMatchObject({ opened: 6, ended: 6, connectionsOpen: 0 });
     expect(await rowCounts()).toEqual(before);
   });
 
