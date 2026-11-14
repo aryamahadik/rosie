@@ -282,23 +282,27 @@ describe("the guard passes on each right login, through this file's pair", () =>
   it("each side's client reads as its own login, on this file's database, and its timing names that login", async () => {
     const { env: handleEnv } = envOf({ HYPERDRIVE_JOB: poolBinding(JOB), HYPERDRIVE_APP: poolBinding(APP) });
     const { handle, timings, lines } = handleOver(handleEnv);
+    // No role set (the session's role setting is none: no SET ROLE, no role startup parameter) and no search path sent
+    // (the session's path is the server's default).
     const whoAmI = async (sql: Sql): Promise<unknown> => {
       const [row] = await sql`
         select session_user::text as session_user, current_user::text as current_user,
-               current_database()::text as database, current_schema()::text as schema`;
+               current_database()::text as database, current_schema()::text as schema,
+               current_setting('role') as role, current_setting('search_path') as search_path`;
       return row;
     };
+    const unset = { schema: "public", role: "none", search_path: '"$user", public' };
     expect(await handle.runtime("whoAmI", whoAmI)).toEqual({
       session_user: "rosie_worker_job",
       current_user: "rosie_worker_job",
       database: DATABASE,
-      schema: "public",
+      ...unset,
     });
     expect(await handle.toolApi("whoAmI", whoAmI)).toEqual({
       session_user: "rosie_worker_app",
       current_user: "rosie_worker_app",
       database: DATABASE,
-      schema: "public",
+      ...unset,
     });
     expect(timings.map(({ call, side, binding, login }) => ({ call, side, binding, login }))).toEqual([
       { call: "whoAmI", side: "runtime", binding: "HYPERDRIVE_JOB", login: "rosie_worker_job" },
@@ -478,32 +482,34 @@ describe("each refusal of ADR-014 section 2, through the rig's pool bindings", (
     });
   }
 
-  it("DB_SCHEMA set: no client is opened through either binding (the counting doubles read 0 times), and the call fails closed", async () => {
+  it("DB_SCHEMA set (a preview's schema, or any value but empty, public too): no client is opened through either binding (the counting doubles read 0 times), and the call fails closed", async () => {
     const before = await rowCounts();
-    const job = counted(poolBinding(JOB));
-    const app = counted(poolBinding(APP));
-    const { env: handleEnv, read } = envOf({
-      DB_SCHEMA: "preview_t1254",
-      HYPERDRIVE_JOB: job.binding,
-      HYPERDRIVE_APP: app.binding,
-    });
-    const { handle, timings, lines } = handleOver(handleEnv);
-    const spy = spyCall();
-    for (const side of ["runtime", "toolApi"] as const) {
-      const closed = await rejectionOf(callOn(handle, side, "guardedCall", spy.fn));
-      expect(closed).toBeInstanceOf(DbClosedError);
-      expect(closed).toMatchObject({
-        call: "guardedCall",
-        side,
-        binding: DB_SIDES[side].binding,
-        reason: "dbSchemaSet",
+    for (const schema of ["preview_t1254", "public"]) {
+      const job = counted(poolBinding(JOB));
+      const app = counted(poolBinding(APP));
+      const { env: handleEnv, read } = envOf({
+        DB_SCHEMA: schema,
+        HYPERDRIVE_JOB: job.binding,
+        HYPERDRIVE_APP: app.binding,
       });
+      const { handle, timings, lines } = handleOver(handleEnv);
+      const spy = spyCall();
+      for (const side of ["runtime", "toolApi"] as const) {
+        const closed = await rejectionOf(callOn(handle, side, "guardedCall", spy.fn));
+        expect(closed).toBeInstanceOf(DbClosedError);
+        expect(closed).toMatchObject({
+          call: "guardedCall",
+          side,
+          binding: DB_SIDES[side].binding,
+          reason: "dbSchemaSet",
+        });
+      }
+      expect([job.reads.n, app.reads.n]).toEqual([0, 0]);
+      expect(read.filter((key) => key.startsWith("HYPERDRIVE"))).toEqual([]);
+      expect(spy.runs.n).toBe(0);
+      expect([timings, lines]).toEqual([[], []]);
+      expect(handle.counts()).toMatchObject({ opened: 0, ended: 0, connectionsOpen: 0 });
     }
-    expect([job.reads.n, app.reads.n]).toEqual([0, 0]);
-    expect(read.filter((key) => key.startsWith("HYPERDRIVE"))).toEqual([]);
-    expect(spy.runs.n).toBe(0);
-    expect([timings, lines]).toEqual([[], []]);
-    expect(handle.counts()).toMatchObject({ opened: 0, ended: 0, connectionsOpen: 0 });
     expect(await rowCounts()).toEqual(before);
   });
 
