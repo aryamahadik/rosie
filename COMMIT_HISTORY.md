@@ -2,9 +2,86 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 591, [`1d9c3d8`](https://github.com/aryamahadik/rosie/commit/1d9c3d8), 2026-11-14 04:53:27 UTC.
+- **Through:** commit 594, [`edaf3e1`](https://github.com/aryamahadik/rosie/commit/edaf3e1), 2026-11-14 05:29:17 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 594. docs: COMMIT\_HISTORY.md through commit 591 (1d9c3d8, \#599) (\#603)
+
+- **Commit:** [`edaf3e1`](https://github.com/aryamahadik/rosie/commit/edaf3e1), by Arya Mahadik, 2026-11-14 05:29:17 UTC
+- **Pull request:** [#603](https://github.com/aryamahadik/rosie/pull/603) from `task/commit-history-99`, merged 2026-11-14 05:29:17 UTC. It squashed 1 branch commit:
+  - `2546c58` docs: COMMIT\_HISTORY.md through commit 591 (1d9c3d8, \#599)
+- **Files changed:** 1 (+109 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +109 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 593. T-1376: ADR-019, the previous databases read only behind previous\_databases (off by default) (\#602)
+
+- **Commit:** [`dc53d22`](https://github.com/aryamahadik/rosie/commit/dc53d22), by Arya Mahadik, 2026-11-14 05:29:12 UTC
+- **Pull request:** [#602](https://github.com/aryamahadik/rosie/pull/602) from `task/T-1376`, merged 2026-11-14 05:29:13 UTC. It squashed 2 branch commits:
+  - `aa2f5e8` T-1376: ADR-019, the previous databases kept and read only behind the…
+  - `b53c032` T-1376: ADR-019 round 2: a flag read that throws or answers anything …
+- **Files changed:** 2 (+299 −0), by folder:
+  - `docs/adr/` 0019-previous-databases.md +298 −0, README.md +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1376: ADR-019, the previous databases kept and read only behind the previous_databases flag (off): staging-only bindings, a SELECT-only port, table-by-table reads, precedence, spans, and cards T-1378 to T-1385
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1376: ADR-019 round 2: a flag read that throws or answers anything malformed is unreadable, never off (no D1 call; routine rows wait, nothing dropped); T-1382 split one card per read with real files and dependencies (T-268, T-267); N1 stopAt, N2 replace() kept and replace into banned, N3 limit 8 in the stop card; cards T-1378 to T-1389 with estimates
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 592. T-1373: K-09 v1.10 frozen: recordSafetyOutcome names every outbox row the record's commit writes, each with its recipient and send class (\#601)
+
+- **Commit:** [`eec6532`](https://github.com/aryamahadik/rosie/commit/eec6532), by Arya Mahadik, 2026-11-14 05:29:08 UTC
+- **Pull request:** [#601](https://github.com/aryamahadik/rosie/pull/601) from `task/T-1373`, merged 2026-11-14 05:29:09 UTC. It squashed 3 branch commits:
+  - `8a7b0e1` T-1373: K-09 v1.10 frozen: recordSafetyOutcome's answer names every o…
+  - `9317097` T-1373: K-09 v1.10 round 2 (DL-751), README only: default 175 kept, a…
+  - `f93ae4b` T-1373: K-09 v1.10 round 2 README: the repeat rule quoted as K-09 v1'…
+- **Files changed:** 9 (+1367 −4), by folder:
+  - `contracts/tool-api/` README.md +67 −2, frozen.json +1 −1, tool-api.v1.10.schema.json +790 −0
+  - `contracts/tool-api/fixtures/` index.json +6 −1, j3-safety-arrival-crisis-rows.json +106 −0, j3-safety-arrival-threat-repeat.json +80 −0
+  - `contracts/tool-api/fixtures/invalid/` refuse-safety-row-alert-routine.json +106 −0, refuse-safety-row-recipient-not-handle.json +106 −0, refuse-safety-row-without-recipient.json +105 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1373: K-09 v1.10 frozen: recordSafetyOutcome's answer names every outbox row the record's commit writes with its recipient handle (safetyLine.recipientHandleId, safetyRows), on first and repeated answers alike; a record's hand-off alert and team page rows are send class safety (CQ-313 question 1); a call with no turn names no row; every v1.9 definition by $ref; 2 accepted and 3 refused fixtures; README defaults 174-178, open gaps 144-146 (CQ-313 question 2 left open with its source lines)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1373: K-09 v1.10 round 2 (DL-751), README only: default 175 kept, a repeat names the first record's rows with the recipients and send classes their stored rows hold (line ids from the event id, the telling port's from its repeat), never rebuilt from the reach card; new open gap 147 names the K-05 read it needs (next free minor version, v1.15 today: readOutboxRowWritten also returning recipientHandleId and sendClass) and its db/repo read, on which T-1374 depends; open gap 145 stays open, routed to Jay (CQ-316); schema and fixtures unchanged
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1373: K-09 v1.10 round 2 README: the repeat rule quoted as K-09 v1's schema states it
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 591. docs: COMMIT\_HISTORY.md through commit 587 (1374c22, \#596) (\#599)
 
