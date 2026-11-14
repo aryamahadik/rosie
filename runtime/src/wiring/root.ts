@@ -857,7 +857,7 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     // reports noQueue): a row the dispatcher leaves waiting goes on it, and its consumer runs it through the door.
     retryQueue: retryQueueOf(env),
     // Every other input (T-1257): in production none, with no binding read; on staging each later part of T-1154's own,
-    // over T-1254's handle, null until that part binds it (./staging/options.ts says what each null does).
+    // over T-1254's handle, null until that part binds it (its own file, ./staging/<part>.ts, says what its null does).
     ...stagingOptions(env),
   });
   workerRoots.set(env, root);

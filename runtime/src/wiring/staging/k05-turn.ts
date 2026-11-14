@@ -5,11 +5,11 @@
 // carries no KV: KV stays the actor's BUNDLES binding), handleTargets (K-05 v1.2 item 27), frontierScope (K-05 v1.2 item
 // 26's readTurnState under each call's business, @rosie/actions' pgFrontierScope over that call's own job client) and
 // turnRows (K-05 v1.1 commitTurn and v1 parkTurn), every call on one job-side client (part.db.runtime). ./options.ts hands
-// the bundle reads given here to the model readers (./models.ts: the manifest access, critic_collisions B6a), so no other
-// file reads the manifest another way. Until then each is null, as the Worker's root has always handed: no turn's bundle is
-// pinned, no targets are read, every frontier fails closed inside the Tool API base, every commit and park fails closed
-// (../real.ts NoDatabaseError naming the call), and the gateway's trace names bundle v0's stand-in. Nothing here reads a
-// binding.
+// the bundle reads given here to the model readers (./models.ts: their manifest access, critic_collisions B6a) and to the
+// bundle's safety lines (./bundle-safety.ts). Until then each is null, as the Worker's root has always handed: no turn's
+// bundle is pinned, no targets are read, every frontier fails closed inside the Tool API base, every commit and park fails
+// closed (../real.ts NoDatabaseError naming the call), and the gateway's trace names bundle v0's stand-in. Nothing here
+// reads a binding.
 
 import type { BundleReadCalls, FrontierScope, HandleTargetsCall, TurnRowCalls } from "../real";
 import type { StagingPart } from "./part";
