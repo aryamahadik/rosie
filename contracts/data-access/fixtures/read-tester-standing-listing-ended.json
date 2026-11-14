@@ -1,0 +1,17 @@
+{
+  "call": "readTesterStanding",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["people-access/seed-staging-tester.json"],
+    "after": [],
+    "now": "2026-11-14T08:00:00Z",
+    "note": "Tester Two as K-22 v1.3's seed-staging-tester.json holds them: signed in by a code to their own inbox at 06:06Z (session-tester-two, still live), whose listing ended at 07:00Z (staging-tester-two, removed_at set), with no K-36 team row. Read at 08:00Z with that session's token hash: session_for_token finds the session and person-tester-two, who holds no live listing and no live team row, so notTester (README item 68, default 138): the listing's end ends the standing at once, the session not, and the answer says nothing of the listing or when it ended."
+  },
+  "request": {
+    "tokenSha256": "6a1f2e3d4c5b6a7f8e9dacbfc4d5e6f7a8b9cadb4c5d6e7f8a9bacbdc4d5e6f8",
+    "at": "2026-11-14T08:00:00Z"
+  },
+  "outcome": {
+    "standing": "notTester"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "after": ["seed-staging-tester.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "personId": "person-tester-one"
+    },
+    "action": "select",
+    "table": "staging_testers",
+    "columns": ["id", "person_id", "removed_at"],
+    "where": {
+      "person_id": "person-tester-one"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

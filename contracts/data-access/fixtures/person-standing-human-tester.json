@@ -1,0 +1,19 @@
+{
+  "call": "personStanding",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["people-access/seed-staging-tester.json"],
+    "after": [],
+    "now": "2026-11-14T08:00:00Z",
+    "note": "The standing of Tester One's signedIn answer, read by the person the check set (K-22 v1.3's seed-staging-tester.json): no role, no live K-36 team row, and a live staging_testers listing, so team false and tester true (README item 69, default 137): a human tester uses staging's test tools and gets no page to Rosie's team."
+  },
+  "request": {
+    "personId": "person-tester-one"
+  },
+  "outcome": {
+    "personId": "person-tester-one",
+    "roles": [],
+    "team": false,
+    "tester": true
+  }
+}

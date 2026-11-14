@@ -2655,6 +2655,62 @@
       "expect": "refuse",
       "shows": "A safety claim answered with Sam's held routine row in passedHeld: a safety claim lists no row it passed (put right, passedHeld empty, it is claim-safety-past-held-row's outcome)",
       "source": "T-1352's rulings ('passedHeld is empty'); K-05 v1.14 item 67 and default 131"
+    },
+    {
+      "file": "read-tester-standing-human-tester.json",
+      "version": "v1.15",
+      "def": "readTesterStanding.exchange",
+      "expect": "accept",
+      "shows": "A human tester's live session (Tester One, listed in K-22 v1.3's staging_testers, with no K-36 team row and no role) stands as tester: the testers' list beside the team row, the answer the standing alone",
+      "source": "DL-535 (open gap 62, reading (d)); ADR-016 section 5 ('The tester's standing ... card H writes the testers there'); K-22 v1.3 seed-staging-tester.json; K-05 v1.15 item 68 and default 136"
+    },
+    {
+      "file": "read-tester-standing-listing-ended.json",
+      "version": "v1.15",
+      "def": "readTesterStanding.exchange",
+      "expect": "accept",
+      "shows": "A tester whose listing ended (Tester Two), with a session still live and no team row, is notTester at once: only a live listing or a live team row stands",
+      "source": "K-22 v1.3 seed-staging-tester.json and rule 10; K-05 v1.12 default 103 (a removed team row ends the standing); K-05 v1.15 item 68 and default 138"
+    },
+    {
+      "file": "person-standing-human-tester.json",
+      "version": "v1.15",
+      "def": "personStanding.exchange",
+      "expect": "accept",
+      "shows": "Tester One's signedIn standing: no role, team false (no K-36 row, so no page to Rosie's team) and tester true (a live listing)",
+      "source": "ADR-016 section 5 ('person.team is a live K-36 row ... false for them'); build prompt 9.4 (line 490); K-21 v1 signedIn.person; K-05 v1.15 item 69 and default 137"
+    },
+    {
+      "file": "person-standing-listing-ended.json",
+      "version": "v1.15",
+      "def": "personStanding.exchange",
+      "expect": "accept",
+      "shows": "Tester Two's standing after the listing ended: no role, team false, tester false",
+      "source": "K-22 v1.3 rule 10; K-05 v1.15 item 69 and default 138"
+    },
+    {
+      "file": "invalid/refuse-tester-standing-ended-listing-told.json",
+      "version": "v1.15",
+      "def": "readTesterStanding.response",
+      "expect": "refuse",
+      "shows": "A former tester's notTester answered with when their listing ended: a caller who is no tester learns notTester and nothing more (put right, the standing alone, it is read-tester-standing-listing-ended's outcome)",
+      "source": "K-05 v1.12 default 103 and item 53 ('It answers the standing alone'); K-05 v1.15 item 68; the card's security review ('a non-tester learns nothing')"
+    },
+    {
+      "file": "invalid/refuse-tester-standing-by-address.json",
+      "version": "v1.15",
+      "def": "readTesterStanding.exchange",
+      "expect": "refuse",
+      "shows": "A standing asked with the tester's inbox address beside the token's sha256: the list is read by the session's person alone and holds no address (put right, the address left out, it is read-tester-standing-human-tester's request)",
+      "source": "K-22 v1.3 rule 10 (the list names the person alone); ADR-016 section 5 (the addresses are read by name at run time, never kept); rule 9; K-05 v1.15 item 68"
+    },
+    {
+      "file": "invalid/refuse-person-standing-team-not-tester.json",
+      "version": "v1.15",
+      "def": "personStanding.response",
+      "expect": "refuse",
+      "shows": "The check tester, on Rosie's team, answered tester false: a team member is a tester, so team true never comes with tester false (put right, tester true, it is person-standing-check-tester's outcome)",
+      "source": "K-21 v1 README 'Staging only' ('a signed-in roster tester or a person on Rosie's team'); K-05 v1.12 default 103; K-05 v1.15 item 69"
     }
   ]
 }
