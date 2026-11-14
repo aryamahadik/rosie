@@ -39,7 +39,9 @@
 // manifest and the model key (J-02), so every safety read, decide and compose fails closed before any model call; the
 // Linq send, which no line feeds there yet; and the state reads and the plan calls (T-1242), which no reader feeds
 // there until those parts hand theirs in, so each read fails closed and no bundle is pinned) and the closed set are at
-// hand there, so every door not joined fails and a webhook that gets past the verify answers 503, as before. A test
+// hand there, so every door not joined fails and a webhook that gets past the verify answers 503, as before. Each of
+// those inputs is stagingOptions(env)'s (./staging/options.ts, T-1257): none in production, where no binding is read for
+// them, and on staging each part's own over T-1254's database handle, null until that part binds it. A test
 // composes the root with environment "test", the fakes (./test-support.ts), what the joined ports are fed
 // (the Linq double's made-up webhook secret, the K-05 double's handleSealingKey, commitTurn, parkTurn, bundle reads,
 // handleTargets and the frontier's readTurnState scope, @rosie/ai's deciders over the recorded-model double, and the
@@ -104,6 +106,8 @@
 // (notBack), so the handle stays known down; a timer fire refused fires nothing, its sealed address never opened.
 
 import { setBatchHooks } from "../actor/batch";
+import { setCopyDeps } from "../actor/copies/copies";
+import type { CopyDeps } from "../actor/copies/types";
 import { setLeaseHooks } from "../actor/lease";
 import { setBundleDeps } from "../bundle/pin";
 import type { BundleDeps, BundleRegistry } from "../bundle/types";
@@ -165,6 +169,8 @@ import {
 } from "./real";
 import { RowTraces } from "./row-traces";
 import { skeletonLinqRoute, type ReleaseFlags } from "./skeleton";
+// The file itself, never ./staging's index, which holds T-1254's handle (cloudflare:sockets): this graph loads under Node.
+import { stagingOptions } from "./staging/options";
 import { testPhonePages, type TestPhoneInputs } from "./test-phone";
 import { TurnChats } from "./turn-chats";
 
@@ -375,6 +381,14 @@ export interface RootOptions {
    * as {...unconfiguredPages(), testPhoneSend, testPhoneParts}; left out or null, every page call stays unconfigured.
    */
   readonly testPhone?: TestPhoneInputs | null;
+  /**
+   * What the actor's copies reach outside the actor (../actor/copies/types.ts CopyDeps: the live safety timers' reload and
+   * the stopped flag's re-read), which `install()` sets for the isolate with the actor's other ports (`setCopyDeps`):
+   * staging's, handed in by ./staging/copies.ts (T-1306) through stagingOptions, from the primary and never a cache
+   * (DL-427). Null or left out (every root until then), install() sets none, so each reload and re-read answers unwired
+   * and the copy keeps the stricter reading, as before.
+   */
+  readonly copies?: CopyDeps | null;
 }
 
 export interface Root {
@@ -419,9 +433,11 @@ export interface Root {
    * `directory`, the safety read's directory (the state reads'); `core`, the stopOrStart port; `timers`, the timerFire port.
    */
   readonly outage: DbOutageDeps;
+  /** What the actor's copies reach (`setCopyDeps`), as `install()` sets them: RootOptions.copies, or null for none. */
+  readonly copies: CopyDeps | null;
   /**
-   * Puts the actor's ports, the PostgreSQL-down path's and the retry queue's in place for this isolate; returns the
-   * function that puts the earlier ones back.
+   * Puts the actor's ports, the PostgreSQL-down path's, the copies' where the root holds them, and the retry queue's in
+   * place for this isolate; returns the function that puts the earlier ones back.
    */
   install(): () => void;
 }
@@ -707,6 +723,7 @@ export function composeRoot(options: RootOptions): Root {
   const linqWebhook = (request: Request): Promise<Response> =>
     skeletonLinqRoute(request, { gateway, flags, where });
   const testPhone = options.testPhone ?? null;
+  const copies = options.copies ?? null;
 
   const gateway: GatewayDeps = {
     linq: ports.linqVerify,
@@ -746,12 +763,15 @@ export function composeRoot(options: RootOptions): Root {
     dispatcher,
     queue,
     outage,
+    copies,
     install() {
       const restores = [
         setBatchHooks({ clock: { now } }),
         setSafetyDeps(safety),
         // The PostgreSQL-down path's six ports, as the root holds them (T-1326).
         setDbOutageDeps(outage),
+        // The copies' sources, only where the root holds them (staging's, ./staging/copies.ts): else none is set (T-1257).
+        ...(copies === null ? [] : [setCopyDeps(copies)]),
         setBundleDeps(pin),
         setGuardDeps({ targets: ports.targets }),
         setTurnDeps(turn),
@@ -794,23 +814,35 @@ export function actorReadingPort(
 
 const workerRoots = new WeakMap<Cloudflare.Env, Root>();
 
-/** The Worker's secrets the root reads, by name: none is in a file here; staging's are set by name (T-568). */
+/**
+ * The Worker's secrets the root reads, by name: none is in a file here; staging's are set by name (T-568; T-1236), and
+ * infra/ci/put-staging-secrets.test.mjs holds each name here to the names put-staging-secrets.sh puts.
+ */
 export interface WorkerSecrets {
   /** K-11's webhook secret (K-11 README default 1), read at each verify; missing until it is set. */
   readonly LINQ_WEBHOOK_SECRET?: string;
+  /**
+   * The wrapping key every handle's data key is wrapped under (NQ-DB-1), read by staging's resolver at each call and by
+   * no other name (./staging/secrets.ts; T-1257); missing, a key that must be made or opened fails closed.
+   */
+  readonly SEALING_WRAP_KEY?: string;
+  /** The model key (J-02), read by name at each model call by staging's model readers (./staging/models.ts, T-1396). */
+  readonly ANTHROPIC_API_KEY?: string;
 }
 
 /**
  * The Worker's root for its environment (ENVIRONMENT; ./picks.ts). The real set (./real.ts) and the closed set are the
  * ones at hand in a Worker: the Linq verify reads LINQ_WEBHOOK_SECRET by name at each call (missing, every verify fails,
- * so the gateway answers 503); every other joined port, and on staging the state reads and the plan calls (T-1242), is
- * handed no K-05 call, scope, reader or line yet (T-567 gives staging its Hyperdrive binding; T-1154's parts hand each
- * port its calls and readers), so every seal fails closed and the gateway answers 503 with nothing written, no turn's
- * bundle is pinned, no frontier runs, no safety read, decide or compose reaches a model, nothing commits, no row is
- * composed, finalized or sent, and nothing is armed. The gateway's door to the handle's actor is the HANDLE_ACTOR binding
- * where the environment has one (T-553; env.staging has it since T-566), and no release flags are handed in until the
- * part of T-1154 that binds T-185's flag read over the staging database (DL-356), so the skeleton flag reads off and
- * `linqWebhook` answers 404. One root per env object, so its memories (rows' traces, armed parts) last as long as the
+ * so the gateway answers 503). Every other input is stagingOptions(env)'s (./staging/options.ts, T-1257): in production
+ * none, and nothing is read for them; on staging each later part of T-1154 hands its port its calls and readers from its
+ * own file (./staging/<part>.ts) over T-1254's database handle (HYPERDRIVE_JOB and HYPERDRIVE_APP, read at each call),
+ * each null until that part binds it. While an input is null its port fails closed as before: every seal fails and the
+ * gateway answers 503 with nothing written, no turn's bundle is pinned, no frontier runs, no safety read, decide or
+ * compose reaches a model, nothing commits, no row is composed, finalized or sent, nothing is armed, the test-phone
+ * page's calls stay unconfigured, the copies' sources stay unwired, and with no release flags handed in (until T-1393
+ * binds T-185's flag read, DL-356) the skeleton flag reads off and `linqWebhook` answers 404. The gateway's door to the
+ * handle's actor is the HANDLE_ACTOR binding where the environment has one (T-553; env.staging has it since T-566). One
+ * root per env object, so its memories (rows' traces, armed parts) and its database handle's counts last as long as the
  * isolate does.
  */
 export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
@@ -821,82 +853,12 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     actors: handleActorsOf(env),
     vars: env,
     linq: { webhookSecret: () => env.LINQ_WEBHOOK_SECRET },
-    // No database client is handed in yet (a part of T-1154 binds handleSealingKey over T-567's Hyperdrive): the sealing
-    // port fails closed (./real.ts NoDatabaseError).
-    handleKey: null,
-    // No database client is handed in yet (its rosie_job client gives db/repo/chat-open.ts's openChatOnText): every call
-    // fails closed (./real.ts NoDatabaseError), so a text that opens a chat is answered 503 with nothing stored, as its
-    // seal already is.
-    chatOpenCall: null,
-    // No safety read until a part of T-1154 builds one from the bundle's manifest (the bundle reads; staging's BUNDLES,
-    // bound since T-566) and the model key (J-02; DL-027): every read fails closed (./real.ts NoSafetyReaderError), so the
-    // actor applies its no-verdict rule.
-    safetyReaders: null,
-    // No database client is handed in yet: every commit and park fails closed (./real.ts NoDatabaseError), so no turn row
-    // is written; a turn whose commit is not taken lapses and is parked, and its park is tried again (T-248, T-253).
-    turnRows: null,
-    // No database client is handed in yet (staging's BUNDLES is bound since T-566; a part of T-1154 binds the K-05 reads):
-    // every bundle read fails closed (./real.ts NoDatabaseError), so no turn's bundle is pinned and no turn's work starts,
-    // and the gateway's trace names bundle v0's stand-in (answer.ts).
-    bundleReads: null,
-    // No database client is handed in yet: every targets read fails closed, so the guard hands no text to the frontier.
-    handleTargets: null,
-    // No database client is handed in yet (its rosie_job client gives pgFrontierScope): every frontier fails closed inside
-    // the Tool API base, before anything is read, so no text reaches decide.
-    frontierScope: null,
-    // The state reads (T-1242): no reader is handed in yet. The part of T-1154 that binds each read hands it in here as
-    // its own field, typed as the seams' table in ./real.ts says, with no other change to this file: until then
-    // each read fails closed (./real.ts NoStateReadError), so no safety read reaches a model and the actor applies its
-    // no-verdict rule, the pin refuses every bundle, and a run of a turn ends noDirectory with nothing read or written.
-    bundleSafety: null,
-    handleDirectory: null,
-    stoppedFlags: null,
-    turnDirectory: null,
-    // No decide until a part of T-1154 builds one from the bundle's manifest and flows (the bundle reads; staging's
-    // BUNDLES) and the model key (J-02; smoke-size calls only, DL-027): every decide and re-read fails closed before any
-    // model call (./real.ts NoDeciderError), so no decided part reaches the gate.
-    deciders: null,
-    // No database client is handed in yet (its rosie_app and rosie_job clients give pgCallScope and the gate's reads):
-    // every gate fails closed inside the Tool API base, before anything is read or written, so nothing commits.
-    gateReads: null,
-    // No database client is handed in yet (its rosie_app and rosie_job clients give pgCallScope and readOutboxRow): every
-    // compose input fails closed inside the Tool API base, before anything is read, so no row is composed.
-    composeReads: null,
-    // No composer until a part of T-1154 builds one from the bundle's manifest (the bundle reads; staging's BUNDLES) and
-    // the model key (J-02; smoke-size calls only, DL-027): every compose and rewrite fails closed before any model call
-    // (./real.ts NoComposerError), so no row gets a plan and nothing is sent for it.
-    composers: null,
-    // No database client is handed in yet (its rosie_app and rosie_job clients give pgCallScope and pgRowData's four
-    // calls): every finalize fails closed inside the Tool API base, before anything is read or written, so no row gets its
-    // final parts and nothing is sent for it.
-    finalizeData: null,
-    // No database client is handed in yet (its rosie_job client gives db/repo/outbox.ts's four v1.2 calls and
-    // send-state.ts's sendState): every claim, mark and send-state read fails closed (./real.ts NoDatabaseError), so the
-    // dispatcher claims nothing and nothing is sent, and a receipt is not marked (answered 503, so Linq sends it again).
-    outboxCalls: null,
-    sendStateCall: null,
-    // The turn's plan calls (T-1242): no database client is handed in yet (a part of T-1154 binds db/repo/outbox.ts's
-    // unplannedRows and writePlan over a rosie_job client, as this field): every call fails closed (./real.ts
-    // NoDatabaseError), so no row of the turn is listed, composed or planned.
-    planCalls: null,
-    // No Linq line is handed in yet (T-563): every send fails closed (./real.ts NoLinqLineError) and nothing leaves. On
-    // staging the line is the test-phone line's Linq double (./test-phone lineLinqSend over testPhoneLineOf(env
-    // .TEST_PHONE_LINE)), which a part of T-1154 binds with the outbox calls; the real Linq line is J-08's. No row is
-    // claimed before then.
-    linqSendCall: null,
     // The RETRY_QUEUE binding where the environment has one (T-279; env.staging has it since T-566; with none, each wait
     // reports noQueue): a row the dispatcher leaves waiting goes on it, and its consumer runs it through the door.
     retryQueue: retryQueueOf(env),
-    // No database client is handed in yet (its rosie_job client gives db/repo/clocks.ts's armClock and cancelClock): every
-    // arming fails closed (./real.ts NoDatabaseError), so nothing is armed; and no receipt reaches it there yet, since
-    // the outbox port marks no part delivered with no database bound (the receipt is answered 503, and Linq sends it
-    // again).
-    armingCalls: null,
-    // The test-phone page's calls (T-1186) have nothing to read until a part of T-1154 binds the session, roster and phone
-    // reads, so the Worker leaves them unconfigured: both answer 503 (notConnected), as every page call does until its
-    // handler is joined. That part hands RootOptions.testPhone, with staging's test-phone line as
-    // testPhoneLineOf(env.TEST_PHONE_LINE), and the root binds both calls on staging.
-    testPhone: null,
+    // Every other input (T-1257): in production none, with no binding read; on staging each later part of T-1154's own,
+    // over T-1254's handle, null until that part binds it (its own file, ./staging/<part>.ts, says what its null does).
+    ...stagingOptions(env),
   });
   workerRoots.set(env, root);
   return root;

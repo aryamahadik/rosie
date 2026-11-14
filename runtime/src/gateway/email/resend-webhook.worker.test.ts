@@ -1035,13 +1035,25 @@ describe("the Worker's route: POST {BASE_PATH}/webhooks/resend", () => {
       receivedAt: new Date().toISOString(),
       traceId: delivered.request.traceId,
     });
-    const production = { ...env, ENVIRONMENT: "production", BASE_PATH: "" };
+    // Its own envs (the audit's R2; T-1257): each environment's vars and no binding, so no answer rests on what the pool
+    // binds (its HYPERDRIVE_JOB and HYPERDRIVE_APP name a database that does not exist).
+    const onStaging: Cloudflare.Env = {
+      ENVIRONMENT: "staging",
+      BASE_PATH: "/test",
+      DB_SCHEMA: "",
+      GIT_SHA: "test-sha",
+    };
+    const production: Cloudflare.Env = { ...onStaging, ENVIRONMENT: "production", BASE_PATH: "" };
     const deployed = createWorker((vars) => workerRoot(vars).gateway);
 
-    const staging = await worker.fetch(resendRequest(fresh), env, context);
+    const staging = await worker.fetch(resendRequest(fresh), onStaging, context);
     const live = await deployed.fetch(resendRequest(fresh, "/webhooks/resend"), production, context);
-    const stale = await worker.fetch(resendRequest(webhook), env, context);
-    const get = await worker.fetch(new Request("https://rosie.test/test/webhooks/resend"), env, context);
+    const stale = await worker.fetch(resendRequest(webhook), onStaging, context);
+    const get = await worker.fetch(
+      new Request("https://rosie.test/test/webhooks/resend"),
+      onStaging,
+      context,
+    );
 
     expect(staging.status).toBe(503);
     expect(staging.headers.get("x-trace-id")).toMatch(UUID);
