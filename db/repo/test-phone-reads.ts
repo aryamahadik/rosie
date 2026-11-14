@@ -1,20 +1,26 @@
 // Data-access v1.12: staging's test-phone page's three reads (K-05 v1.12 items 53, 54 and 55; T-1300, the D-017 path
-// audit's D2; DL-498, DL-542; QUESTIONS.md CQ-206 and CQ-214). Their caller is staging's test-phone page (C-205), through
-// its three ports (actions/src/page-calls/staging/test-phone/types.ts TesterAccess.standing, TestPhoneRoster.phone and
+// audit's D2; DL-498, DL-542; QUESTIONS.md CQ-206 and CQ-214), readTesterStanding widened by v1.15 (item 68; T-1402,
+// DL-535, DL-757). Their caller is staging's test-phone page (C-205), through its three ports
+// (actions/src/page-calls/staging/test-phone/types.ts TesterAccess.standing, TestPhoneRoster.phone and
 // PhoneStates.state), which the runtime engineer's binding maps (RootOptions.testPhone in runtime/src/wiring: the audit's
 // P6b, a part of T-1154). Items 56 and 57, the actor's copies' two reads, are db/repo/copy-reads.ts's (T-1301).
 //
 //   readTesterStanding  a session token's sha256 and a time give the standing of the call for staging's test tools (item
-//                       53), in item 53's order:
+//                       68, which widens item 53's step 2), in its order:
 //                         1. the session: K-22 v1's session_for_token(token_sha256, at) (0020), the session with that
 //                            hash that has not ended and has not expired at `at`, its person alone (sessions_token_key
 //                            makes it one row at most). None answers noSession, whether the hash is unknown, the session
 //                            ended or it expired (default 104), and nothing more is read;
-//                         2. the team row: K-36 v1's team_page_recipients of that person with removed_at null
-//                            (team_page_recipients_one_live_per_person). One answers tester, none notTester (default 103).
-//                       It answers the standing alone: never the session, the person, a hash or whether a person or a
-//                       team row exists. A roster tester who holds no team row answers notTester, the closed side, until
-//                       open gap 62 is ruled; the check tester holds one (default 105).
+//                         2. the tester rows of that person, in one statement: K-36 v1's team_page_recipients with
+//                            removed_at null (team_page_recipients_one_live_per_person), or K-22 v1.3's staging_testers
+//                            with removed_at null (staging_testers_one_live_per_person, 0036), each read by person_id and
+//                            removed_at alone. Either answers tester, neither notTester (default 136): live is removed_at
+//                            null, whatever added_at says, so a listing that ended ends the standing at once, the
+//                            session live or not (default 138).
+//                       It answers the standing alone: never the session, the person, a hash, which row stood, or
+//                       whether a person, a team row or a listing exists or when a listing ended (default 139). The
+//                       check tester stands by its team row (default 105); a human tester by a listing staging's
+//                       testers' seed writes (T-1281), with no team row.
 //   readRosterPhone     a roster phone's number and email on file, by the K-04 handle id the roster's list gives for its
 //                       roster id (item 54; default 106: the list is the seed's own, and the binding finds the id there):
 //                         1. the phone: handles by id, of kind phone, its address, the number in E.164 form
@@ -37,24 +43,27 @@
 //                            ready_text as stored, or null for none (default 109).
 //                       It answers no number, and of the link nothing but its code and its ready text.
 //
-// Role and scope (README v1.12 "Where each read lives"; K-04 v1 rule 4: sessions, team rows, handles and phones are scoped
-// none). Each read runs on the client it is handed, the runtime side's, as rosie_job (the role is the connection's:
-// nothing here checks it), in one read-only transaction at repeatable read on the primary, uncached (targets.ts
-// inRuntimeTransaction, which sets the business scope empty for the transaction, as the seeds set it), so the answer is
-// one moment's and nothing is written. rosie_job reads handles, person_handles and phones through its own grants (0012),
-// team_page_recipients through its own (0017), every business's chat links behind chat_links_runtime with no scope (0013),
-// and the session through session_for_token, which it may execute (0020): no other definer function and no table owner's
-// rights. rosie_app, the Tool API's role, holds no grant on handles, phones or team_page_recipients, so its call is
-// refused by PostgreSQL's privilege check (42501, thrown as DataAccessDatabaseError).
+// Role and scope (README v1.12 "Where each read lives", v1.15 item 68; K-04 v1 rule 4: sessions, team rows, listings,
+// handles and phones are scoped none). Each read runs on the client it is handed, the runtime side's, as rosie_job (the
+// role is the connection's: nothing here checks it), in one read-only transaction at repeatable read on the primary,
+// uncached (targets.ts inRuntimeTransaction, which sets the business scope empty for the transaction, as the seeds set
+// it), so the answer is one moment's and nothing is written. rosie_job reads handles, person_handles and phones through
+// its own grants (0012), team_page_recipients through its own (0017), staging_testers through its own behind its one
+// policy (0036; K-22 v1.3 rule 10), every business's chat links behind chat_links_runtime with no scope (0013), and the
+// session through session_for_token, which it may execute (0020): no other definer function and no table owner's
+// rights. rosie_app, the Tool API's role, holds no grant on handles, phones, team_page_recipients or staging_testers,
+// so its call is refused by PostgreSQL's privilege check (42501, thrown as DataAccessDatabaseError).
 //
-// What they read and answer (README v1.12 "What the new tasks must hold to"). Each statement reads one table or the one
-// function, joins none and selects no `*` and no whole row: session_for_token's person_id; team_page_recipients'
+// What they read and answer (README v1.12 and v1.15 "What the new tasks must hold to"). Each statement reads one table
+// or the one function, but item 68's step 2, which reads the two tester lists in one statement (default 136); none
+// joins, and none selects `*` or a whole row: session_for_token's person_id; team_page_recipients' and staging_testers'
 // person_id and removed_at; handles' id, kind and address and person_handles' two ids; phones' chat_open, stopped and
 // stop_at (by its key, number) and chat_links' id, short_code, ready_text and issued_at (by phone_number); and no other
 // column. No statement names token_sha256, device_sha256 or code_hash: the token's hash is session_for_token's first
 // argument, bound as a parameter and named nowhere. None reads a column of sealing_keys, messages, consents or
 // proof_codes. The request's hash, a number, an email address, a short code and a ready text are never logged or put in
-// an error. The integration test reads every statement the reads send and checks it.
+// an error. The integration test reads every statement the reads send and checks it. v1.15 restates item 68's request
+// and response for their text alone (the same shape), so the v1.12 types below stand for it.
 //
 // Errors (K-05 README: every call may answer transient). A serialization failure, a deadlock or a lost connection answers
 // transient, with only its SQLSTATE. Any other database error is thrown scrubbed, as DataAccessDatabaseError with its
@@ -84,9 +93,12 @@ import { BrokenRecordError } from "./turn-face-reads";
 
 // ---- the requests and the answers (data-access.v1.12.schema.json) ----------------------------------------------------
 
-/** K-05 v1.12 readTesterStanding.request: the session token's sha256 and the time, never the token or a person. */
+/**
+ * K-05 v1.12 readTesterStanding.request: the session token's sha256 and the time, never the token, a person or an
+ * address (v1.15 restates it for its text alone).
+ */
 export type ReadTesterStandingRequest = K05.ReadTesterStandingRequest;
-/** K-05 v1.12 readTesterStanding.response: the standing alone (tester, notTester or noSession). */
+/** K-05 v1.12 readTesterStanding.response: the standing alone (tester, notTester or noSession; v1.15's text, one shape). */
 export type ReadTesterStandingResponse = K05.ReadTesterStandingResponse;
 /** K-05 v1.12 readTesterStanding.errors: transient alone. */
 export type ReadTesterStandingError = K05.ReadTesterStandingErrors;
@@ -162,9 +174,9 @@ function numberOf(request: unknown): string {
   return number;
 }
 
-// ---- readTesterStanding (item 53) ---------------------------------------------------------------------------------------
+// ---- readTesterStanding (items 53 and 68) -------------------------------------------------------------------------------
 
-/** The standing inside the read's own transaction, on the runtime side: item 53's two reads in order, the second as needed. */
+/** The standing inside the read's own transaction, on the runtime side: item 68's two reads in order, the second as needed. */
 async function standingIn(tx: Sql, tokenSha256: string, at: Date): Promise<TesterStanding> {
   // Step 1: the live session with the hash at `at`, through K-22's own function; its person alone. None: noSession.
   const [session] = await tx<{ person_id: string }[]>`
@@ -173,21 +185,27 @@ async function standingIn(tx: Sql, tokenSha256: string, at: Date): Promise<Teste
   if (session === undefined) {
     return "noSession";
   }
-  // Step 2: the person's live team row (removed_at null). One: tester; none: notTester (default 103).
-  const [member] = await tx<{ person_id: string }[]>`
-    select person_id from team_page_recipients where person_id = ${session.person_id} and removed_at is null
+  // Step 2: the person's live team row or live listing (removed_at null on either), both lists in one statement, each by
+  // person_id and removed_at alone. Either: tester; neither: notTester (default 136).
+  const [rows] = await tx<{ tester: boolean }[]>`
+    select exists (
+      select 1 from team_page_recipients where person_id = ${session.person_id} and removed_at is null
+    ) or exists (
+      select 1 from staging_testers where person_id = ${session.person_id} and removed_at is null
+    ) as tester
   `;
-  return member === undefined ? "notTester" : "tester";
+  return rows?.tester === true ? "tester" : "notTester";
 }
 
 /**
- * The standing of the session a staging page call carries (K-05 v1.12 item 53): tester when a live session has the
- * token's sha256 at `at` and its person holds a live K-36 team row, notTester when its person holds none, noSession when
- * no live session has the hash, whatever the reason. One read-only transaction at repeatable read on the primary,
- * uncached, writing nothing. Pass the runtime side's client (rosie_job): the role is the connection's. transient on a
- * serialization failure, a deadlock or a lost connection. Throws a TypeError for a request of the wrong shape, and any
- * other database error scrubbed (DataAccessDatabaseError); nothing is written on any of them. The hash is the session's
- * key: it is never answered, logged or put in an error.
+ * The standing of the session a staging page call carries (K-05 v1.15 item 68, widening v1.12's item 53): tester when a
+ * live session has the token's sha256 at `at` and its person holds a live K-36 team row or a live K-22 v1.3 listing,
+ * notTester when its person holds neither (a listing that ended included), noSession when no live session has the
+ * hash, whatever the reason. One read-only transaction at repeatable read on the primary, uncached, writing nothing.
+ * Pass the runtime side's client (rosie_job): the role is the connection's. transient on a serialization failure, a
+ * deadlock or a lost connection. Throws a TypeError for a request of the wrong shape, and any other database error
+ * scrubbed (DataAccessDatabaseError); nothing is written on any of them. The hash is the session's key: it is never
+ * answered, logged or put in an error.
  */
 export async function readTesterStanding(
   sql: Sql,

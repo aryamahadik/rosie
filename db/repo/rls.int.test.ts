@@ -36,12 +36,15 @@ const CHAT_LINK_UPDATES = ["given_via", "owner_retold_at", "used_at", "version"]
 // people-access.int.test.ts checks each against the README word for word. v1.2 (T-1278; DL-538, DL-545) extends (a),
 // (b) and (d) by README rule 9: sign_in_attempts (scope none, row-level security on) holds only the runtime side's one
 // policy, the Tool API holds no grant on it at all (the generic grant rule gives exactly that), and three more
-// security-definer calls. Every other table and function stays held to this file's generic checks.
+// security-definer calls. v1.3 (T-1402; DL-757) extends (a) and (b) by README rule 10 the same way for staging_testers,
+// and adds (e): the runtime side's UPDATE of it is a column grant of removed_at and version alone, so on the whole
+// table it holds SELECT and INSERT. Every other table and function stays held to this file's generic checks.
 /**
- * (a), (b) The policies on K-22's five excepted tables, by table, in name order. README rule 4 (contact_changes) and
+ * (a), (b) The policies on K-22's six excepted tables, by table, in name order. README rule 4 (contact_changes) and
  * rule 8 (page_links): 0012's <table>_runtime beside one Tool API policy per command. Rule 5 (proof_codes, sessions:
  * scope none, row-level security on): Tool API rows bound to the call's person, beside a runtime policy on every row.
- * Rule 9 (sign_in_attempts: scope none, row-level security on): the runtime policy on every row alone.
+ * Rule 9 (sign_in_attempts) and rule 10 (staging_testers), each scope none with row-level security on: the runtime
+ * policy on every row alone.
  */
 const K22_POLICIES: Record<string, readonly string[]> = {
   contact_changes: [
@@ -63,6 +66,15 @@ const K22_POLICIES: Record<string, readonly string[]> = {
     "sessions_tool_api_update",
   ],
   sign_in_attempts: ["sign_in_attempts_runtime"],
+  staging_testers: ["staging_testers_runtime"],
+};
+/**
+ * (e) K-22 v1.3's runtime column grants, by table, in each table's column order. README rule 10: the runtime side
+ * updates a listing's removed_at and version alone, so a listing is ended, never moved to another person or re-dated;
+ * the Tool API holds no grant on the table, not even a column grant.
+ */
+const K22_RUNTIME_UPDATES: Record<string, readonly string[]> = {
+  staging_testers: ["removed_at", "version"],
 };
 /**
  * (c) rosie_app's 63 column grants on K-22's tables, never a hash. README rule 5: it reads every proof_codes column but
@@ -635,9 +647,9 @@ const TABLES = (readCore("core.v1.tables.json") as { tables: ContractTable[] }).
 /**
  * Every table the migrations make: K-04 v1 core, K-29 v1 conversations and consent (T-192), K-37 v1 platform and
  * review (T-193), K-07 v1's schema addition: effects, provider events and outbox claims (T-194), K-34 v1 safety and
- * incidents (T-580), K-36 v1 notifications (T-581), K-23 v1 business setup (T-203), K-22 v1.2 people and access
- * (T-204: v1's ten tables and v1.1's page_links; T-1278: v1.2's sign_in_attempts), K-24 v1 kinds of work (T-205), K-25
- * v1 services and prices
+ * incidents (T-580), K-36 v1 notifications (T-581), K-23 v1 business setup (T-203), K-22 v1.3 people and access
+ * (T-204: v1's ten tables and v1.1's page_links; T-1278: v1.2's sign_in_attempts; T-1402: v1.3's staging_testers), K-24
+ * v1 kinds of work (T-205), K-25 v1 services and prices
  * (T-206), K-26 v1 rules (T-207), K-27 v1 availability (T-208), K-33 v1 platform billing (T-209), K-35 v1
  * documents and licenses (T-210), K-28 v1 customers (T-211), K-30 v1 bookings and changes, part 1 (T-720: the five
  * tables of K30_PART_1) and part 2 (T-721: the eight of K30_PART_2), and K-32 v1 money, part 1 (T-722: the five of
@@ -719,6 +731,14 @@ const ALL_TABLES = [
     JSON.parse(
       readFileSync(
         new URL("../../contracts/db-schema/people-access/people-access.v1.2.tables.json", import.meta.url),
+        "utf8",
+      ),
+    ) as { tables: ContractTable[] }
+  ).tables,
+  ...(
+    JSON.parse(
+      readFileSync(
+        new URL("../../contracts/db-schema/people-access/people-access.v1.3.tables.json", import.meta.url),
         "utf8",
       ),
     ) as { tables: ContractTable[] }
@@ -815,8 +835,8 @@ const SCOPED = scopedOf(TABLES);
 const ALL_SCOPED = scopedOf(ALL_TABLES);
 /**
  * (a), (b) The tables with row-level security on and policies, in name order: every business-scoped table, K-22's
- * proof_codes and sessions, scoped none (README rule 5), and sign_in_attempts, scoped none (rule 9), and K-27's
- * calendar_links and busy_blocks, scoped none (K-27 rule 5; DL-247).
+ * proof_codes and sessions, scoped none (README rule 5), sign_in_attempts and staging_testers, scoped none (rules 9 and
+ * 10), and K-27's calendar_links and busy_blocks, scoped none (K-27 rule 5; DL-247).
  */
 const POLICY_TABLES = [
   ...new Set([
@@ -1012,7 +1032,7 @@ describe("the migration: row-level security on every business-scoped core table 
     expect(forced).toEqual([]);
   });
 
-  it("each business-scoped table has two policies on its business column: <table>_tool_api for rosie_app, <table>_runtime for rosie_job (but K-22's five of README rules 4, 5, 8 and 9, K-27's three of its rule 5, K-30's tables with booking_id of its rule 5, and K-32's part 1 and part 2 tables of its rule 5)", async () => {
+  it("each business-scoped table has two policies on its business column: <table>_tool_api for rosie_app, <table>_runtime for rosie_job (but K-22's six of README rules 4, 5, 8, 9 and 10, K-27's three of its rule 5, K-30's tables with booking_id of its rule 5, and K-32's part 1 and part 2 tables of its rule 5)", async () => {
     const policies = await db.sql<
       {
         table: string;
@@ -1032,8 +1052,8 @@ describe("the migration: row-level security on every business-scoped core table 
     `;
     expect([...new Set(policies.map((policy) => policy.table))]).toEqual(POLICY_TABLES);
     // (a) K-22's named exceptions: contact_changes (README rule 4), page_links (rule 8), proof_codes and sessions (rule
-    // 5) hold their own policies, and sign_in_attempts (rule 9, v1.2) its runtime policy alone, by name here;
-    // people-access.int.test.ts checks each word for word against the README.
+    // 5) hold their own policies, and sign_in_attempts (rule 9, v1.2) and staging_testers (rule 10, v1.3) each its
+    // runtime policy alone, by name here; people-access.int.test.ts checks each word for word against the README.
     for (const [table, names] of Object.entries(K22_POLICIES)) {
       expect(
         policies.filter((policy) => policy.table === table).map((policy) => policy.name),
@@ -1239,6 +1259,7 @@ describe("the two roles", () => {
         // (b) K-22's named exceptions: row-level security is on for proof_codes and sessions as well (README rule 5),
         // and its four excepted tables hold their own policies (rules 4, 5 and 8) in place of 0012's two. v1.2
         // (T-1278): row-level security is on for sign_in_attempts too, with its one runtime policy (rule 9): 1 more each.
+        // v1.3 (T-1402): and for staging_testers, with its one runtime policy (rule 10): 1 more each.
         expect(row).toEqual({
           // (b) K-27's named exception (K-27 rule 5; DL-247): row-level security is on for calendar_links and
           // busy_blocks, scoped none, as well: 2 more (56 to 58 with K-27).
@@ -1496,6 +1517,71 @@ describe("tables that span businesses: phones, handles and sealing keys stay the
   });
 });
 
+describe("staging_testers (K-22 v1.3 README rule 10; T-1402): the runtime side's alone, by rule 10's grants", () => {
+  /** A listing of Sam's, a stand-in for one staging's testers' seed writes (example ids and times). */
+  const listing = {
+    id: "staging-tester-rls-sam",
+    person_id: "person-sam",
+    added_at: "2026-11-14T08:00:00Z",
+  };
+  const list = (tx: Tx) => tx`insert into staging_testers ${tx(listing)}`;
+  const end = (tx: Tx) => tx`
+    update staging_testers set removed_at = '2026-11-14T09:00:00Z', version = version + 1
+    where id = ${listing.id}
+  `;
+
+  it("the Tool API role is refused its select, insert and update (42501), scoped to a business or not: no grant on the table, not even a column grant", async () => {
+    const actions: [string, (tx: Tx) => Promise<unknown>][] = [
+      ["select", (tx) => rowCount(tx, "staging_testers")],
+      ["insert", list],
+      ["update", end],
+    ];
+    for (const scope of ["biz-lees-barbershop", null]) {
+      for (const [label, action] of actions) {
+        const refused = await refusal(as(TOOL_API, scope, action));
+        expect([refused.code, refused.message], `${label} ${String(scope)}`).toEqual([
+          "42501",
+          "permission denied for table staging_testers",
+        ]);
+      }
+    }
+  });
+
+  it("the runtime side holds rule 10's grants: it reads, lists a person and ends the listing by removed_at and the version; moving it to another person, re-dating it, deleting it or truncating the table is refused (42501)", async () => {
+    const answer = await as(RUNTIME, null, async (tx) => {
+      const listed = (await list(tx)).count;
+      const seen = await rowCount(tx, "staging_testers");
+      const ended = (await end(tx)).count;
+      return { listed, seen, ended };
+    });
+    expect(answer).toEqual({ listed: 1, seen: 1, ended: 1 });
+    const refusedStatements: [string, string][] = [
+      [
+        "moved to another person",
+        "update staging_testers set person_id = 'person-alex', version = version + 1 where id = 'staging-tester-rls-sam'",
+      ],
+      [
+        "re-dated",
+        "update staging_testers set added_at = '2026-11-14T07:00:00Z', version = version + 1 where id = 'staging-tester-rls-sam'",
+      ],
+      ["deleted", "delete from staging_testers where id = 'staging-tester-rls-sam'"],
+      ["truncated", "truncate staging_testers"],
+    ];
+    for (const [label, statement] of refusedStatements) {
+      const refused = await refusal(
+        as(RUNTIME, null, async (tx) => {
+          await list(tx);
+          return tx.unsafe(statement);
+        }),
+      );
+      expect([refused.code, refused.message], label).toEqual([
+        "42501",
+        "permission denied for table staging_testers",
+      ]);
+    }
+  });
+});
+
 describe("grants: select and insert, update only on versioned tables, delete only of a person's handle link", () => {
   it("each role holds exactly the privileges the migration names, and no truncate, references or trigger anywhere", async () => {
     const expected = (role: Role, table: ContractTable): string[] => {
@@ -1605,6 +1691,12 @@ describe("grants: select and insert, update only on versioned tables, delete onl
       // versioned), as table grants, and never delete: the generic rule below, with no exception.
       // K-22 v1.2 README rule 9 (T-1278): sign_in_attempts (scope none, versioned) is the runtime side's SELECT, INSERT
       // and UPDATE, and the Tool API's nothing at all, not even a column grant: the generic rule below, with no exception.
+      // K-22 v1.3 README rule 10 (T-1402, exception (e)): staging_testers (scope none, versioned) is the runtime side's
+      // SELECT and INSERT, and its UPDATE of removed_at and version alone is a column grant (the column-grant check), so
+      // on the whole table it holds INSERT and SELECT; the Tool API's nothing at all: the generic rule below.
+      if (role === RUNTIME && Object.keys(K22_RUNTIME_UPDATES).includes(table.name)) {
+        return ["INSERT", "SELECT"];
+      }
       if (role === TOOL_API && table.rowLevelSecurity.scope !== "business") {
         return [];
       }
@@ -1641,7 +1733,7 @@ describe("grants: select and insert, update only on versioned tables, delete onl
     expect(held.filter((row) => row.table === "schema_migrations")).toEqual([]);
   });
 
-  it("column grants: both roles update chat_links' given_via, owner_retold_at, used_at and version only, and no other column of the schema holds a grant of its own but rosie_app's on K-22's proof_codes, sessions and page_links (T-1094; README rules 5 and 8), on K-27's calendar_links and calendar_link_shares (K-27 rule 5) and on K-33's bill_cards and monthly_bill_lines (K-33 rule 2), and both roles' on K-35's documents (K-35 rule 5) and on K-30's booking_lines, booking_visits, secure_links and waitlist_entries, with rosie_app's read of every secure_links column but its code hash (K-30 rule 6), both roles' on K-32's saved_cards, payments, refunds, memberships, pay_links, packs, credits, booking_fees and plan_charges and the runtime side's on reconciliation_runs, with rosie_app's read of every pay_links column but its code hash (K-32 rule 6), and rosie_app's read of effects' id and business_id alone (K-32 rule 5; DL-298)", async () => {
+  it("column grants: both roles update chat_links' given_via, owner_retold_at, used_at and version only, and no other column of the schema holds a grant of its own but rosie_app's on K-22's proof_codes, sessions and page_links (T-1094; README rules 5 and 8) and the runtime side's UPDATE of K-22's staging_testers' removed_at and version (README rule 10), on K-27's calendar_links and calendar_link_shares (K-27 rule 5) and on K-33's bill_cards and monthly_bill_lines (K-33 rule 2), and both roles' on K-35's documents (K-35 rule 5) and on K-30's booking_lines, booking_visits, secure_links and waitlist_entries, with rosie_app's read of every secure_links column but its code hash (K-30 rule 6), both roles' on K-32's saved_cards, payments, refunds, memberships, pay_links, packs, credits, booking_fees and plan_charges and the runtime side's on reconciliation_runs, with rosie_app's read of every pay_links column but its code hash (K-32 rule 6), and rosie_app's read of effects' id and business_id alone (K-32 rule 5; DL-298)", async () => {
     const columnGrants = await db.sql<
       { table: string; column: string; grantee: string; privilege: string }[]
     >`
@@ -1669,6 +1761,41 @@ describe("grants: select and insert, update only on versioned tables, delete onl
         columns.map((column) => key({ table, column, grantee: TOOL_API, privilege })),
       ).sort(),
     );
+    // (e) K-22 v1.3's named exception (README rule 10; T-1402): the runtime side's UPDATE of staging_testers'
+    // removed_at and version alone, every grantee's on that table held to exactly them, so a column grant of a
+    // listing's person or start to any role, or any column grant to the Tool API, fails here; people-access.int.test.ts
+    // checks them too.
+    const k22RuntimeTables = Object.keys(K22_RUNTIME_UPDATES);
+    const k22RuntimeGrants = Object.entries(K22_RUNTIME_UPDATES).flatMap(([table, columns]) =>
+      columns.map((column) => key({ table, column, grantee: RUNTIME, privilege: "UPDATE" })),
+    );
+    expect(
+      columnGrants
+        .filter((grant) => k22RuntimeTables.includes(grant.table))
+        .map(key)
+        .sort(),
+    ).toEqual(k22RuntimeGrants.sort());
+    // has_column_privilege agrees, column by column in the table's order: the runtime side updates those alone, and
+    // the Tool API holds no privilege on any column of the table.
+    for (const [table, columns] of Object.entries(K22_RUNTIME_UPDATES)) {
+      const runtimeColumns = await db.sql<{ role: string; column: string; privilege: string }[]>`
+        select r.role, a.attname as column, p.privilege
+        from unnest(${[...ROLES]}::text[]) as r(role)
+          cross join pg_attribute a
+          cross join unnest(${["SELECT", "INSERT", "UPDATE", "REFERENCES"]}::text[]) as p(privilege)
+        where a.attrelid = ${`${db.schema}.${table}`}::regclass and a.attnum > 0 and not a.attisdropped
+          and has_column_privilege(r.role, a.attrelid, a.attnum, p.privilege)
+        order by 1, a.attnum, 3
+      `;
+      expect(
+        runtimeColumns.filter((row) => row.role === TOOL_API),
+        table,
+      ).toEqual([]);
+      expect(
+        runtimeColumns.filter((row) => row.privilege === "UPDATE").map((row) => row.column),
+        table,
+      ).toEqual(columns);
+    }
     // (c) K-27's named exception (K-27 rule 5, with rule 6 for the sealed tokens; DL-247): rosie_app's 23 column grants
     // on calendar_links (every column but tokens) and calendar_link_shares (a share's five, and ended_at and version),
     // every grantee's on those two tables held to exactly them, so a column grant of tokens to any role fails here (the
@@ -1921,6 +2048,7 @@ describe("grants: select and insert, update only on versioned tables, delete onl
       columnGrants.filter(
         (grant) =>
           !k22Tables.includes(grant.table) &&
+          !k22RuntimeTables.includes(grant.table) &&
           !k27Tables.includes(grant.table) &&
           !k33Tables.includes(grant.table) &&
           !k35Tables.includes(grant.table) &&
