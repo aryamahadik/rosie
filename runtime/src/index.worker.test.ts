@@ -484,12 +484,23 @@ describe("health, the webhook doors, the page entry and the 404 answer as before
     "a POST on $path: the door's own $status, under a trace id of its own, the same bytes",
     async ({ path, status, error }) => {
       captureLogLines();
+      // The Linq route gets its own env (DL-761; T-1393), as the Linq case above builds it: staging's vars and no binding,
+      // so no release flag can be read and the skeleton flag reads off, whatever the pool binds (its HYPERDRIVE_JOB names
+      // a database that does not exist, and a flag read that fails is a 503). Every other door keeps the pool's env.
+      const vars: Cloudflare.Env =
+        path === "/test/webhooks/linq"
+          ? { ENVIRONMENT: "staging", BASE_PATH: "/test", DB_SCHEMA: "", GIT_SHA: "test-sha" }
+          : env;
 
-      const response = await sendLater(path, {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-trace-id": TRACE_ID },
-        body: "{}",
-      });
+      const response = await sendLater(
+        path,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-trace-id": TRACE_ID },
+          body: "{}",
+        },
+        vars,
+      );
       const traceId = response.headers.get("x-trace-id") ?? "";
 
       // A webhook opens a trace id of its own (runtime/src/gateway/answer.ts): the one sent is never kept.
