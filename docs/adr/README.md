@@ -35,6 +35,7 @@ A record that work is built on is never rewritten to say something else; it is s
 | [ADR-016](0016-sign-in-by-code-on-staging.md)        | Sign-in by code on staging         | Codes reach only the named testers by real email; a job id lets a call write an outbox row (K-04 v1.1); a pause per typed contact (K-22 v1.2)                  | proposed, default in use (T-1250) |
 | [ADR-017](0017-actor-storage-retention.md)           | Retention of the actor's storage   | Rows go once nothing reads them (ids kept 24 h); sealed words go with the key, poll option words plain and unscrubbed until CQ-58; `forget` for 45-day deletes | proposed, default in use (T-1265) |
 | [ADR-018](0018-stop-and-danger-line-at-once.md)      | A STOP and a danger line, at once  | A batch that may hold a STOP (any, while the down path is unwired) restarts a turn a second time; the danger line never waits for its hold; routine parts do   | proposed, default in use (T-1267) |
+| [ADR-019](0019-previous-databases.md)                | The previous databases             | rosfield-db and rosfield-demo-db bound on staging only; a SELECT-only port reads them only while the `previous_databases` flag is on (off by default)          | proposed, default in use (T-1376) |
 
 ## Short names used in the records
 
