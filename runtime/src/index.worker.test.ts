@@ -334,8 +334,16 @@ describe("the routes before web's pages answer as they did (T-1192 adds the page
 
   it("the Linq webhook: a POST takes the composition root's route, whose skeleton flag reads off with no release flags bound, so it answers its own 404 naming the flag", async () => {
     const logLines = captureLogLines();
+    // Its own env (the audit's R2; T-1257): staging's vars and no binding, so no database is bound and no release flag can
+    // be read, whatever the pool binds (its HYPERDRIVE_JOB and HYPERDRIVE_APP name a database that does not exist).
+    const vars: Cloudflare.Env = {
+      ENVIRONMENT: "staging",
+      BASE_PATH: "/test",
+      DB_SCHEMA: "",
+      GIT_SHA: "test-sha",
+    };
 
-    const response = await sendLater("/test/webhooks/linq", { method: "POST", body: "{}" });
+    const response = await sendLater("/test/webhooks/linq", { method: "POST", body: "{}" }, vars);
     const traceId = response.headers.get("x-trace-id");
 
     expect(response.status).toBe(404);

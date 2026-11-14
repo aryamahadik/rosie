@@ -121,6 +121,26 @@ export {
 } from "./root";
 export { ROW_MEMORY, RowTraces } from "./row-traces";
 export { SKELETON_FLAG, skeletonLinqRoute, type ReleaseFlags, type SkeletonRouteDeps } from "./skeleton";
+// Staging's inputs (T-1257), by file: ./staging's index also holds T-1254's handle, which loads only in the Workers runtime.
+export {
+  NO_STAGING_INPUTS,
+  STAGING_BUILDERS,
+  stagingOptions,
+  type StagingBuilders,
+  type StagingInputName,
+  type StagingInputs,
+  type StagingSeams,
+} from "./staging/options";
+export {
+  dbCallLine,
+  stagingDb,
+  type DbCallLine,
+  type StagingDb,
+  type StagingDbOptions,
+  type StagingEnv,
+  type StagingPart,
+} from "./staging/part";
+export { sealingWrapKeys, WrappingKeyNameError, type WrappingKeyEnv } from "./staging/secrets";
 export {
   NoTestPhoneLineError,
   TEST_PHONE_LINE_NAME,

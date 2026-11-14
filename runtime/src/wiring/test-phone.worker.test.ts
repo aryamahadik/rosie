@@ -608,9 +608,17 @@ describe("every other call, and the two calls with nothing behind them", () => {
     }
   });
 
-  it("on the Worker's own root, which has no database to read until T-567, both calls stay unconfigured: 503, not connected", async () => {
+  it("on the Worker's own root, with no database bound in its env, both calls stay unconfigured: 503, not connected", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
     const worker = createWorker((workerEnv) => workerRoot(workerEnv).gateway);
+    // Its own env (the audit's R2; T-1257): staging's vars and no binding, so the Worker's root has no database to read,
+    // whatever the pool binds (its HYPERDRIVE_JOB and HYPERDRIVE_APP name a database that does not exist).
+    const vars: Cloudflare.Env = {
+      ENVIRONMENT: "staging",
+      BASE_PATH: "/test",
+      DB_SCHEMA: "",
+      GIT_SHA: "test-sha",
+    };
     for (const [call, request] of [
       ["testPhoneSend", testPhoneSendJson.request],
       ["testPhoneParts", testPhonePartsJson.request],
@@ -618,8 +626,8 @@ describe("every other call, and the two calls with nothing behind them", () => {
       const traceId = crypto.randomUUID();
       const response = await Promise.resolve(
         worker.fetch(
-          pagePost(`${env.BASE_PATH}${pagePathOf(call)}`, request, { traceId }),
-          env,
+          pagePost(`${vars.BASE_PATH}${pagePathOf(call)}`, request, { traceId }),
+          vars,
           createExecutionContext(),
         ),
       );
