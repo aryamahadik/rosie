@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 610, [`79274be`](https://github.com/aryamahadik/rosie/commit/79274be), 2026-11-14 09:58:47 UTC.
+- **Through:** commit 612, [`bd3def9`](https://github.com/aryamahadik/rosie/commit/bd3def9), 2026-11-14 10:40:40 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 612. docs: COMMIT\_HISTORY.md through commit 610 (79274be, \#620) (\#622)
+
+- **Commit:** [`bd3def9`](https://github.com/aryamahadik/rosie/commit/bd3def9), by Arya Mahadik, 2026-11-14 10:40:40 UTC
+- **Pull request:** [#622](https://github.com/aryamahadik/rosie/pull/622) from `task/commit-history-107`, merged 2026-11-14 10:40:41 UTC. It squashed 1 branch commit:
+  - `6e0c137` docs: COMMIT\_HISTORY.md through commit 610 (79274be, \#620)
+- **Files changed:** 1 (+93 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +93 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 611. T-1259: db/repo's readChatHandle, the phone handle a Linq chat id names (K-05 v1.10 item 51): threads by linq\_chat\_id, then a chat thread's handle by its id, in one read-only transaction as rosie\_job; a phone answers its id and E.164 number, anything else both fields null (default 94); transient or a scrubbed error on a database failure; tested in db/repo/threads-chat-handle.int.test.ts (\#621)
+
+- **Commit:** [`e550d67`](https://github.com/aryamahadik/rosie/commit/e550d67), by Arya Mahadik, 2026-11-14 10:40:36 UTC
+- **Pull request:** [#621](https://github.com/aryamahadik/rosie/pull/621) from `task/T-1259`, merged 2026-11-14 10:40:36 UTC. It squashed 1 branch commit:
+  - `859b9c8` T-1259: db/repo's readChatHandle, the phone handle a Linq chat id nam…
+- **Files changed:** 2 (+1330 −0), by folder:
+  - `db/repo/` threads-chat-handle.int.test.ts +1212 −0, threads.ts +118 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 610. docs: COMMIT\_HISTORY.md through commit 607 (5ef2d69, \#618) (\#620)
 
