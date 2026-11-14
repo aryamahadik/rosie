@@ -2,9 +2,43 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 603, [`daf2aa6`](https://github.com/aryamahadik/rosie/commit/daf2aa6), 2026-11-14 08:13:32 UTC.
+- **Through:** commit 605, [`507759c`](https://github.com/aryamahadik/rosie/commit/507759c), 2026-11-14 09:13:27 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 605. docs: COMMIT\_HISTORY.md through commit 603 (daf2aa6, \#613) (\#615)
+
+- **Commit:** [`507759c`](https://github.com/aryamahadik/rosie/commit/507759c), by Arya Mahadik, 2026-11-14 09:13:27 UTC
+- **Pull request:** [#615](https://github.com/aryamahadik/rosie/pull/615) from `task/commit-history-104`, merged 2026-11-14 09:13:27 UTC. It squashed 1 branch commit:
+  - `61c0c84` docs: COMMIT\_HISTORY.md through commit 603 (daf2aa6, \#613)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 604. T-1285: signInCheck and signOut's server side: every wrong-code answer the same with or without an account, the session token in the first signedIn alone (ADR-016 card B2) (\#616)
+
+- **Commit:** [`f66da6a`](https://github.com/aryamahadik/rosie/commit/f66da6a), by Arya Mahadik, 2026-11-14 09:13:23 UTC
+- **Pull request:** [#616](https://github.com/aryamahadik/rosie/pull/616) from `task/T-1285-r2`, merged 2026-11-14 09:13:23 UTC. It squashed 1 branch commit:
+  - `e406922` T-1285: signInCheck and signOut's server side: every wrong-code answe…
+- **Files changed:** 13 (+3050 −24), by folder:
+  - `actions/src/page-calls/sign-in/` check-request.test.ts +141 −0, check-test-support.ts +614 −0, check.ts +260 −0, entries.ts +98 −0, errors.ts +15 −8, index.ts +51 −3, request.ts +64 −7, sign-in-check-spans.test.ts +274 −0, sign-in-check.test.ts +901 −0, sign-in-check.worker.test.ts +155 −0, sign-out.test.ts +229 −0, sign-out.ts +62 −0, types.ts +186 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+K-21 v1 signInCheck and signOut in actions/src/page-calls/sign-in over K-05 v1.13 proveSignIn and endSession (the Tool API's client) and personStanding and signInEntries (the runtime side's client): hand-written K-21 request checks held to Ajv; the device's sha256, the typed code's keyed hash (a null code as no digits) and a session drawn for every check (a 32-byte token, of which K-05 gets the sha256, and a 128-bit id); K-05's answers mapped to K-21's labels alone (never the code's id, the attempt's server id or the session's), the standing read after signedIn, tester only on staging, a failed read failing closed; secondProofNeeded with both of K-21's ways; the entries after the answer under the attempt's id or the sign-out's request id, none for an attempt with no code; labels-only spans. A double of K-05's check side over T-1282's attempts proves the fixtures, the twin with no account, the sixth check, another device, the 10 minutes, the token once and no value in a span or log.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 603. docs: COMMIT\_HISTORY.md through commit 601 (c22c937, \#611) (\#613)
 
@@ -13663,3 +13697,4 @@ Each was replaced by another pull request (a branch rebased or squashed under a 
 - [#345](https://github.com/aryamahadik/rosie/pull/345) T-560: join hop 9, compose input from the Tool API and the composer's message plan (`task/T-560`, 3 branch commits, closed 2026-11-11 01:25:04 UTC)
 - [#432](https://github.com/aryamahadik/rosie/pull/432) T-1241: design record ADR-015, where the arrival safety read's result is kept until its turn commits (`task/T-1241`, 4 branch commits, closed 2026-11-12 00:35:31 UTC)
 - [#589](https://github.com/aryamahadik/rosie/pull/589) T-054: K-09 Tool API v1.9 frozen with journey 7's 17 calls and the fee door, every v1.8 definition carried by reference (`task/T-054`, 2 branch commits, closed 2026-11-13 22:10:38 UTC)
+- [#614](https://github.com/aryamahadik/rosie/pull/614) T-1285: signInCheck and signOut's server side, every wrong-code answer the same with or without an account (ADR-016 card B2) (`task/T-1285`, 2 branch commits, closed 2026-11-14 08:45:15 UTC)
