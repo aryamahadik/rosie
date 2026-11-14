@@ -13,11 +13,19 @@
 //   - Through the pool's own HYPERDRIVE_JOB (and HYPERDRIVE_APP), the connect fails: code that reads the pool's env
 //     fails closed.
 // Every postgres.js client the file opens is ended, also when its test fails (opened equals ended, checked last).
+//
+// The sockets (DL-758, T-1403): every client is handed the Worker's database handle's own socket, QuietSocket
+// (runtime/src/wiring/staging/db.ts), as the handle hands it. postgres.js 3.4.9's own Workers socket leaves one unhandled
+// rejection after each client it ends ("This socket has been closed.": its pending read on the socket it closed itself);
+// the quiet socket ends that read quietly, and every failure before the socket has closed still reaches postgres.js.
+// Each client's end waits for its sockets' reads, so none is pending once a test has returned. vitest.config.ts drops no
+// unhandled error, so any rejection fails the run, and the file's last test reads its isolate's own: none.
 import { env } from "cloudflare:workers";
 import postgres from "postgres";
 import { afterAll, describe, expect, inject, it } from "vitest";
 
 import { withBusiness, type Sql, type Tx } from "../../../db/repo/scope";
+import { QuietSocket, quietTally, type QuietSocketTarget } from "../../src/wiring/staging/db";
 import { RIG_BUSINESSES, RIG_PERSONS } from "./rig.seed";
 
 /** This file's key in the rig's list (infra/test-rig/files.mjs). */
@@ -38,18 +46,45 @@ const APP = `HYPERDRIVE_APP_${KEY}`;
 let opened = 0;
 let ended = 0;
 
-/** Opens a postgres.js client on the binding, as the Worker would, runs `fn` on it, and ends it whatever happens. */
+/** What every client's sockets count (the handle's QuietSocket): opened, closed, and reads ended quietly. */
+const tally = quietTally();
+/** Sockets whose read had ended when their client's end returned. */
+let readsEnded = 0;
+
+/** Every unhandled rejection this file's isolate reports while it runs, whatever Vitest then does with it. */
+const rejections: unknown[] = [];
+addEventListener("unhandledrejection", (event) => {
+  rejections.push(event.reason);
+});
+
+/**
+ * Opens a postgres.js client on the binding, as the Worker's handle does (on the handle's QuietSocket), runs `fn` on it,
+ * and ends it whatever happens, then waits for each of its sockets' reads to end.
+ */
 async function through<T>(name: string, fn: (sql: Sql) => Promise<T>): Promise<T> {
-  const sql = postgres(binding(name).connectionString, {
+  const sockets: QuietSocket[] = [];
+  const options = {
     max: 1,
     connect_timeout: 15,
     onnotice: () => undefined,
-  });
+    socket: (target: QuietSocketTarget): QuietSocket => {
+      const socket = new QuietSocket(target, tally);
+      sockets.push(socket);
+      return socket;
+    },
+  };
+  const sql = postgres(binding(name).connectionString, options);
   opened += 1;
   try {
     return await fn(sql);
   } finally {
     await sql.end({ timeout: 5 });
+    // postgres.js ends only a socket that is open, so one it left opening is closed here, as the handle does.
+    for (const socket of sockets) {
+      if (socket.readyState !== "closed") socket.destroy();
+    }
+    await Promise.all(sockets.map((socket) => socket.done));
+    readsEnded += sockets.length;
     ended += 1;
   }
 }
@@ -162,4 +197,16 @@ describe("the pool's own pair names rosie_rig_none, which is never made", () => 
       await expect(through(name, (sql) => sql`select 1`)).rejects.toMatchObject({ code: "3D000" });
     });
   }
+});
+
+describe("the sockets (DL-758, T-1403): every client this file ended was on the handle's QuietSocket", () => {
+  it("each client's sockets closed and their reads ended, and no unhandled rejection reached this isolate", async () => {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0);
+    });
+    expect(tally.opened).toBeGreaterThanOrEqual(opened);
+    expect(tally.closed).toBe(tally.opened);
+    expect(readsEnded).toBe(tally.opened);
+    expect(rejections.map((reason) => String(reason))).toEqual([]);
+  });
 });
