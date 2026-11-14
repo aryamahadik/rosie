@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 594, [`edaf3e1`](https://github.com/aryamahadik/rosie/commit/edaf3e1), 2026-11-14 05:29:17 UTC.
+- **Through:** commit 596, [`b381b5d`](https://github.com/aryamahadik/rosie/commit/b381b5d), 2026-11-14 06:34:03 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 596. docs: COMMIT\_HISTORY.md through commit 594 (edaf3e1, \#603) (\#605)
+
+- **Commit:** [`b381b5d`](https://github.com/aryamahadik/rosie/commit/b381b5d), by Arya Mahadik, 2026-11-14 06:34:03 UTC
+- **Pull request:** [#605](https://github.com/aryamahadik/rosie/pull/605) from `task/commit-history-100`, merged 2026-11-14 06:34:03 UTC. It squashed 1 branch commit:
+  - `d24c08b` docs: COMMIT\_HISTORY.md through commit 594 (edaf3e1, \#603)
+- **Files changed:** 1 (+78 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +78 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 595. T-567: env.staging binds HYPERDRIVE\_JOB and HYPERDRIVE\_APP (ADR-014 piece 3), each with its login's local string; wrangler-env.test.mjs pins exactly the two, no HYPERDRIVE, the spike's id nowhere, production unchanged (\#604)
+
+- **Commit:** [`28c1e3e`](https://github.com/aryamahadik/rosie/commit/28c1e3e), by Arya Mahadik, 2026-11-14 06:33:59 UTC
+- **Pull request:** [#604](https://github.com/aryamahadik/rosie/pull/604) from `task/T-567`, merged 2026-11-14 06:33:59 UTC. It squashed 1 branch commit:
+  - `dbb11d0` T-567: env.staging binds HYPERDRIVE\_JOB and HYPERDRIVE\_APP (ADR-014 p…
+- **Files changed:** 2 (+347 −5), by folder:
+  - `infra/ci/` wrangler-env.test.mjs +320 −4
+  - `/` wrangler.jsonc +27 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 594. docs: COMMIT\_HISTORY.md through commit 591 (1d9c3d8, \#599) (\#603)
 
