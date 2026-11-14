@@ -1,0 +1,106 @@
+{
+  "call": "recordSafetyOutcome",
+  "given": {
+    "seeds": [
+      "core/seed-person-roles.json",
+      "core/seed-phone-chat-open.json",
+      "core/seed-bundle-registry.json",
+      "customers/seed-customer-mobile-email.json"
+    ],
+    "after": [],
+    "now": "2026-10-23T14:30:03Z",
+    "stated": { "step": "A3-22", "gives": ["safe"] },
+    "note": "j3-safety-arrival-crisis-rows.json with one fault: the hand-off's alert to Sam is send class routine, which would wait for text hours and for a wake of every class. Refused by the schema: a record tells only for crisis words, an emergency or a threat, so its alert and its page rows are send class safety, told at once and at any hour (README default 176; CQ-313 question 1; arch 06 line 329; RULES 4.12). With sendClass safety it is j3-safety-arrival-crisis-rows.json, accepted."
+  },
+  "request": {
+    "caller": {
+      "kind": "actorOnArrival",
+      "turnId": "6e21c94aa9b3a4b46ee177d6caed733ec5c0343ba64f203f27b428ce46427756",
+      "requestId": "6e21c94aa9b3a4b46ee177d6caed733ec5c0343ba64f203f27b428ce46427756",
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-alex",
+      "traceId": "trace-alex-0203"
+    },
+    "turn": {
+      "id": "6e21c94aa9b3a4b46ee177d6caed733ec5c0343ba64f203f27b428ce46427756",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0203"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0203",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "safety": {
+      "eventId": "evt-alex-0203",
+      "source": "text",
+      "tries": [{ "model": "haiku", "result": "verdict" }],
+      "read": {
+        "labels": [
+          {
+            "outcome": "Crisis words",
+            "tense": "now",
+            "evidence": "I don't want to be alive anymore",
+            "atRisk": "the writer",
+            "writer": "the person at the handle"
+          }
+        ]
+      },
+      "timedOut": false,
+      "dangerWords": [{ "words": "don't want to be alive", "list": "general", "kind": "selfHarm" }],
+      "outcomes": ["Crisis words"],
+      "liftedToUnsure": false
+    },
+    "handleId": "handle-alex",
+    "bookingId": null,
+    "sentByActor": null
+  },
+  "outcome": {
+    "outcomeId": "safety-outcome-alex-0203",
+    "outcomes": ["Crisis words"],
+    "hold": { "holdId": "hold-alex-0203", "releaseRule": "after_safe", "blocksBooking": false, "version": 1 },
+    "safetyLine": {
+      "fixedLineId": "safetyCrisis",
+      "outboxRowId": "out-alex-crisis-line",
+      "recipientHandleId": "handle-alex"
+    },
+    "told": [
+      { "who": "owner", "via": "handOff", "id": "handoff-alex-crisis" },
+      { "who": "team", "via": "teamPage", "id": "page-alex-crisis" }
+    ],
+    "nothingBooks": true,
+    "repeated": false,
+    "gives": ["safe"],
+    "safetyRows": [
+      {
+        "outboxRowId": "out-alex-crisis-line",
+        "recipientHandleId": "handle-alex",
+        "sendClass": "safety",
+        "writtenFor": "line"
+      },
+      {
+        "outboxRowId": "out-alex-crisis-line-email",
+        "recipientHandleId": "handle-alex-email",
+        "sendClass": "safety",
+        "writtenFor": "line"
+      },
+      {
+        "outboxRowId": "out-alert-handoff-alex-crisis",
+        "recipientHandleId": "handle-sam",
+        "sendClass": "routine",
+        "writtenFor": "handOff"
+      },
+      {
+        "outboxRowId": "out-page-alex-crisis-team-1",
+        "recipientHandleId": "handle-team-1",
+        "sendClass": "safety",
+        "writtenFor": "teamPage"
+      },
+      {
+        "outboxRowId": "out-page-alex-crisis-team-2",
+        "recipientHandleId": "handle-team-2",
+        "sendClass": "safety",
+        "writtenFor": "teamPage"
+      }
+    ]
+  }
+}
