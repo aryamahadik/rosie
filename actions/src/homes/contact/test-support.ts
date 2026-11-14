@@ -4,15 +4,18 @@
 // emittedFlows): S13-19's words and the record's rows come from them. People are read by T-307's own reach() (the
 // messages-and-consent service base) over the frozen contracts' seeds, through its test doubles: K-04 v1 core's people,
 // phones and threads (Sam, Alex, Riley with open chats; Alex's email; Ben's stopped phone) and K-29 v1's consent rows and
-// chat links (Ben's texts yes; Pat's phone, which never texted Rosie), plus the rows a test adds for its own example,
-// each named where it is made. Nothing is invented and no real person is named (rule 9).
+// chat links (Ben's texts yes and his STOP; Pat's phone, which never texted Rosie), plus the rows a test adds for its own
+// example, each named where it is made. Nothing is invented and no real person is named (rule 9).
 
 import { createMessagesConsent, type Reach, type ReachCard } from "../../domain/messages-consent";
 import {
+  SEEDS,
   cardsOf,
   phoneOf,
   readerOf,
+  recordOf,
   seedRecord,
+  seedRows,
   withRows,
   type ConsentRow,
   type TestRecord,
@@ -180,6 +183,22 @@ export function benWithThread(record: TestRecord = seedRecord()): TestRecord {
       },
     ],
   };
+}
+
+/** K-29 v1's seed of Ben's STOP (Oct 20): a withdrawn texts row for his mobile with no business, so for every business. */
+export const BEN_STOP_SEED = "db-schema/conversations-consent/fixtures/seed-consent-stop-row.json";
+
+/**
+ * Ben after his STOP, with an email on file: the seeds (K-04 seed-phone-stopped: his phone stopped on Oct 20; K-29
+ * seed-chat-link: his texts yes at this business on Oct 5, consent-ben-texts-yes) and K-29's own seed-consent-stop-row
+ * (consent-ben-stop), with his chat thread (benWithThread) and an email address of his: this test's own example rows.
+ */
+export function benStoppedWithEmail(): TestRecord {
+  const record = benWithThread(recordOf(seedRows([...SEEDS, BEN_STOP_SEED])));
+  return withRows(record, {
+    handles: [{ id: "handle-ben-email", kind: "email", address: "ben@example.com" }],
+    personHandles: [{ personId: "person-ben", handleId: "handle-ben-email" }],
+  });
 }
 
 /**

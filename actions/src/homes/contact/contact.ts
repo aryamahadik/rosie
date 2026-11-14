@@ -35,15 +35,26 @@
 //   1. With no reach card on file, the message goes back on the handle the person is writing from, and with none it
 //      goes nowhere (T-307 default 1; S13-19 "Default: the channel they're using").
 //   2. A business-added booking's "yes to messages" (A3-30) is a K-29 texts row for one of the person's contacts at this
-//      business that is not withdrawn; once there is one, their messages go their way. A safety line and the stop's one
-//      reply are not messages about the booking and go past this rule, as past a stop (S13-10: safety beats everything).
+//      business that is not withdrawn, on a contact that is not a stopped mobile; once there is one, their messages go
+//      their way. A stopped mobile holds no yes, whatever its texts row says: a STOP's row covers every business and has
+//      no business, so the call's business scope never reads it (K-29 rule 4), and the stopped flag is what tells it (T-307
+//      Mobile.texts; K-29 README: a STOP is a withdrawal row, and the newest row decides). Only START (which clears the
+//      flag) or a fresh yes turns texts back on (RULES 7.5); a fresh yes after a STOP is the stop home's (T-590) and limit
+//      8's. A safety line and the stop's one reply are not messages about the booking and go past this rule, as past a
+//      stop (S13-10: safety beats everything).
 //   3. A reply clock starts only on a delivery on the way's own contact (the open chat for the text way, the address for
 //      the email way); an email copy of a text delivered alone starts none: the safe side of "only once they were
 //      reached their way".
 //   4. The stop's one reply goes back on the handle the stop came from, whatever the card says, with no email copy (T-307
 //      default 3; RULES 7.3).
 
-import { REACH_WAYS, SEND_CLASSES, type Reach, type SendClass } from "../../domain/messages-consent";
+import {
+  REACH_WAYS,
+  SEND_CLASSES,
+  type Reach,
+  type SendClass,
+  type TextsStanding,
+} from "../../domain/messages-consent";
 import { bookingValue, readingProblem, type RecordReading } from "../../finalize/slots/record";
 import { ContactHomeError, handlingLineFor, type ContactRecord, type HandlingLine } from "./record";
 
@@ -166,9 +177,17 @@ function checkPerson(person: Reach): void {
 const pastStop = (message: ContactMessage): boolean =>
   message.sendClass === "safety" || message.stopReply === true;
 
-/** Whether one of the person's contacts holds a yes to messages at this business: a K-29 texts row not withdrawn. */
+/** A contact's K-29 texts row at this business that is not withdrawn. */
+const standingYes = (texts: TextsStanding | null): boolean => texts !== null && !texts.revoked;
+
+/**
+ * Whether one of the person's contacts holds a yes to messages at this business (default 2): a K-29 texts row not
+ * withdrawn, on an email address or on a mobile that is not stopped. A stopped mobile's texts row can still show the yes
+ * its STOP withdrew, since the STOP's row has no business and the business scope never reads it: `stopped` tells it.
+ */
 const holdsYes = (person: Reach): boolean =>
-  [...person.mobiles, ...person.emails].some((contact) => contact.texts !== null && !contact.texts.revoked);
+  person.mobiles.some((mobile) => !mobile.stopped && standingYes(mobile.texts)) ||
+  person.emails.some((email) => standingYes(email.texts));
 
 /** The mobile a text goes to, or null with why it does not. */
 function textTo(person: Reach, handleId: string, message: ContactMessage, held: Held[]): string | null {

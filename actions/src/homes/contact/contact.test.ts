@@ -1,7 +1,8 @@
 // The contact home (T-588; S13-19 with Master Corrections C2 and C9), on people T-307's reach() reads over the frozen
 // K-04 and K-29 seeds, and on both flows as the merged bundle emitter compiles them. The card's proofs: an email-way
 // person gets email only; a mobile with no open chat gets no text (C9); SMS is never returned (DL-012); a private
-// booking's owner message carries the handling line; a business-added booking with no yes gets no message; a reply clock
+// booking's owner message carries the handling line; a business-added booking with no yes gets no message, nor one whose
+// person's only yes their STOP withdrew (K-04 stopped, whatever the business-scoped texts row says); a reply clock
 // starts only once reached. Then a STOP or a withdrawn yes (K-29), calls only unreachable (C-237), the default way with
 // no card, the registry's S13-19 home, and a bundle the home cannot read.
 
@@ -41,7 +42,9 @@ import {
   S13_19_CALLS_ONLY,
   S13_19_PRIVATE_EXAMPLE,
   S13_19_RULES,
+  BUSINESS,
   alexNotTextedIn,
+  benStoppedWithEmail,
   benWithThread,
   bookingOf,
   cardOf,
@@ -232,6 +235,9 @@ describe("SMS is never returned (DL-012): no answer names a channel, and a text 
     const keys = ["email", "handling", "held", "replyClock", "text", "way"];
     const problems: string[] = [];
     let count = 0;
+    // The cases where a stopped mobile's texts row still shows a yes, as the business scope reads it (its STOP's row has
+    // no business), and nothing else holds one: a booking the shop made gets nothing there (default 2).
+    let stoppedYesHeld = 0;
     for (const state of states)
       for (const chatWay of chatWays)
         for (const texts of standings)
@@ -252,7 +258,8 @@ describe("SMS is never returned (DL-012): no answer names a channel, and a text 
                 mobiles: [mobile],
                 emails: email === null ? [] : [email],
               };
-              const yes = texts?.revoked === false || email?.texts?.revoked === false;
+              // A stopped mobile holds no yes, whatever its texts row says: its stopped flag tells the STOP (default 2).
+              const yes = (!state.stopped && texts?.revoked === false) || email?.texts?.revoked === false;
               for (const sendClass of classes)
                 for (const stopReply of [false, true])
                   for (const via of [null, "handle-alex"])
@@ -288,10 +295,14 @@ describe("SMS is never returned (DL-012): no answer names a channel, and a text 
                           fail("email past a withdrawn yes");
                         const shop = audience === "customer" && booking === bookings[2];
                         if (shop && !pastStop && !yes && decision.way !== "none") fail("no yes");
+                        if (shop && !pastStop && !yes && state.stopped && texts?.revoked === false)
+                          stoppedYesHeld += 1;
                       }
             }
     expect(problems.slice(0, 5)).toEqual([]);
     expect(count).toBe(57_600);
+    // 2 stopped states x 4 chat services x 3 emails holding no yes x 5 cards x 2 vias.
+    expect(stoppedYesHeld).toBe(240);
   });
 });
 
@@ -373,6 +384,72 @@ describe("a business-added booking with no yes to messages gets no message (S13-
     });
     const again = await reachOf("person-alex", { card: alexCard("texts"), record: withdrawn });
     expect(decide(again, message({ booking }))).toMatchObject({ way: "none", held: [{ why: "noYes" }] });
+  });
+
+  it("Ben's STOP withdrew his only yes: a booking the shop made gets nothing, though his email is on his card", async () => {
+    const record = benStoppedWithEmail();
+    // His yes at this business (K-29 seed-chat-link, Oct 5) and his STOP for every business (seed-consent-stop-row, Oct
+    // 20): the newest row decides (K-29 README), so he holds no yes to messages.
+    const rows = record.consents
+      .filter((row) => row.personId === "person-ben")
+      .map(({ id, businessId, revoked, at }) => ({ id, businessId, revoked, at: at.toISOString() }));
+    expect(rows).toEqual([
+      { id: "consent-ben-texts-yes", businessId: BUSINESS, revoked: false, at: "2026-10-05T17:00:00.000Z" },
+      { id: "consent-ben-stop", businessId: null, revoked: true, at: "2026-10-20T13:00:00.000Z" },
+    ]);
+    for (const way of ["texts", "textsonly", "email"] as const) {
+      const ben = await reachOf("person-ben", {
+        card: cardOf(way, "handle-ben", "handle-ben-email"),
+        record,
+      });
+      // The business scope never reads the STOP's row (it has no business), so his mobile's texts row still shows
+      // the yes the STOP withdrew; K-04's stopped flag is what tells the STOP (T-307 Mobile.texts).
+      expect(ben.mobiles).toEqual([
+        {
+          handleId: "handle-ben",
+          chatOpen: false,
+          chatWay: "imessage",
+          stopped: true,
+          chatThreadId: "thread-ben-chat",
+          texts: { consentId: "consent-ben-texts-yes", revoked: false },
+        },
+      ]);
+      expect(ben.emails).toEqual([{ handleId: "handle-ben-email", texts: null }]);
+      for (const flow of FLOWS) {
+        const booking = bookingOf(src, flow, { madeby: "shop" });
+        for (const sendClass of SEND_CLASSES.filter((each) => each !== "safety")) {
+          const decision = decide(ben, message({ sendClass, booking }), flow);
+          expect(decision, `${way} ${flow} ${sendClass}`).toEqual({
+            way: "none",
+            text: null,
+            email: null,
+            held: [{ medium: null, handleId: null, why: "noYes" }],
+            replyClock: "never",
+            handling: null,
+          });
+          for (const handleId of ["handle-ben", "handle-ben-email"])
+            expect(replyClockMayStart(decision, { handleId }), `${way} ${flow} ${sendClass}`).toBe(false);
+        }
+      }
+    }
+    // A safety line and his stop's one reply keep their exemption (default 2), into the chat his phone once opened.
+    const ben = await reachOf("person-ben", {
+      card: cardOf("texts", "handle-ben", "handle-ben-email"),
+      record,
+    });
+    const booking = bookingOf(src, "A", { madeby: "shop" });
+    expect(decide(ben, message({ sendClass: "safety", booking }))).toMatchObject({
+      way: "text",
+      text: "handle-ben",
+    });
+    expect(decide(ben, message({ stopReply: true, via: "handle-ben", booking }))).toEqual({
+      way: "text",
+      text: "handle-ben",
+      email: null,
+      held: [],
+      replyClock: "onceReached",
+      handling: null,
+    });
   });
 
   it("the owner still hears about it; a safety line and the stop's one reply still go (default 2)", async () => {
