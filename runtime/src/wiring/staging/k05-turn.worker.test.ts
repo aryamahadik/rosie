@@ -246,7 +246,7 @@ interface Rooted {
   /** What stagingOptions gave the root: each part's input. */
   readonly inputs: StagingInputs;
   /** Each call's timing line the handle wrote, in order. */
-  lines(): DbCallLine[];
+  readonly lines: () => DbCallLine[];
 }
 
 /**
@@ -376,7 +376,7 @@ async function parkRequest(turn?: {
 interface PortCall {
   readonly call: string;
   readonly port: PortName;
-  run(): Promise<unknown>;
+  readonly run: () => Promise<unknown>;
 }
 
 async function sixCalls(root: Root, spans: Span[] = []): Promise<PortCall[]> {
@@ -415,8 +415,14 @@ async function rejectionOf(promise: Promise<unknown>): Promise<unknown> {
   throw new Error("expected the call to fail");
 }
 
-const TABLES = ["turns", "outbox_rows", "open_questions", "clock_rows", "event_log"] as const;
-type RowCounts = Record<(typeof TABLES)[number], number>;
+/** The row count of each table a turn's commit or park writes. */
+interface RowCounts {
+  readonly turns: number;
+  readonly outbox_rows: number;
+  readonly open_questions: number;
+  readonly clock_rows: number;
+  readonly event_log: number;
+}
 
 /**
  * The row count of each table a turn's commit or park writes, in this file's database, read on the runtime side through
