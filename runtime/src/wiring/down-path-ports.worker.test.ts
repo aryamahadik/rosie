@@ -18,6 +18,7 @@ import type { SafetyTimerCopy } from "../actor/copies/types";
 import { actorNameOf } from "../gateway";
 import { dbFakes, idsOf } from "../outage/db/test-support";
 import type { StopOrStartCore, StopOrStartOnReturn, TimerFireRequest } from "../outage/db/types";
+import { fakeClock } from "../safety/test-support";
 import { SAM } from "../turn/test-support";
 import { bindPorts, type ImplementationSets } from "./bind";
 import { closedPorts, NotJoinedError } from "./closed";
@@ -25,7 +26,7 @@ import { DOWN_PATH_PICKS, PICKS, type Environment } from "./picks";
 import { DOWN_PATH_PORTS, PORTS } from "./ports";
 import { realPorts } from "./real";
 import { composeRoot, workerRoot, type Root } from "./root";
-import { skeletonFakes, type SkeletonFakes } from "./test-support";
+import { skeletonFakes, type SkeletonFakes, type TestClock } from "./test-support";
 
 /** Alex's STOP, which his handle actor took while PostgreSQL was down and writes on return (K-09 v1 actorOnReturn). */
 const STOP = stopOnReturn.request as unknown as StopOrStartOnReturn;
@@ -98,6 +99,16 @@ const deployed = (environment: (typeof WORKER_ENVIRONMENTS)[number]): Root =>
 const downPathDoubles = (root: Root, fakes: SkeletonFakes): ReturnType<typeof dbFakes> =>
   dbFakes(root.ports.sealing, {}, { start: fakes.clock.now(), ids: idsOf(SAM.party) });
 
+/**
+ * A test clock that reads one instant until a test moves it (T-1404; DL-760): the safety read's fake clock
+ * (../safety/test-support.ts fakeClock) started at `start`, with the UTC reading a TestClock adds. A time a fake keeps is
+ * then the very time the test read before the call, where two reads of the real clock may fall a millisecond apart.
+ */
+function stillClock(start: number): TestClock {
+  const clock = fakeClock(start);
+  return { ...clock, utc: () => new Date(clock.now()).toISOString() };
+}
+
 /** What a call through a port did: answered, or failed with this error's name and message. */
 async function outcomeOf(call: () => Promise<unknown>): Promise<unknown> {
   try {
@@ -141,7 +152,9 @@ describe("the PostgreSQL-down path's two root ports (T-1363)", () => {
   });
 
   it("binds each to its fake in a test root: the fake set's own objects, which keep what the actor hands them", async () => {
-    const fakes = skeletonFakes();
+    // On a clock that reads the seed timer's due time until a test moves it (T-1404): the time this case reads and the
+    // time the fake keeps the fire at are one reading.
+    const fakes = skeletonFakes(stillClock(Date.parse(TIMER.dueAt)));
     const root = rootFor(fakes, "test");
 
     expect(root.ports.stopOrStart).toBe(fakes.stopOrStart);
