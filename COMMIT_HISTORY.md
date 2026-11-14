@@ -2,9 +2,72 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 616, [`65d376a`](https://github.com/aryamahadik/rosie/commit/65d376a), 2026-11-14 12:56:18 UTC.
+- **Through:** commit 619, [`3709e90`](https://github.com/aryamahadik/rosie/commit/3709e90), 2026-11-14 16:47:05 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 619. docs: COMMIT\_HISTORY.md through commit 616 (65d376a, \#626) (\#629)
+
+- **Commit:** [`3709e90`](https://github.com/aryamahadik/rosie/commit/3709e90), by Arya Mahadik, 2026-11-14 16:47:05 UTC
+- **Pull request:** [#629](https://github.com/aryamahadik/rosie/pull/629) from `task/commit-history-110`, merged 2026-11-14 16:47:06 UTC. It squashed 1 branch commit:
+  - `8b5fe4e` docs: COMMIT\_HISTORY.md through commit 616 (65d376a, \#626)
+- **Files changed:** 1 (+47 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +47 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 618. T-1403: the rig test uses QuietSocket and the closed-socket filter is removed (\#628)
+
+- **Commit:** [`a0c9520`](https://github.com/aryamahadik/rosie/commit/a0c9520), by Arya Mahadik, 2026-11-14 16:47:01 UTC
+- **Pull request:** [#628](https://github.com/aryamahadik/rosie/pull/628) from `task/T-1403`, merged 2026-11-14 16:47:01 UTC. It squashed 2 branch commits:
+  - `2117742` T-1403: the rig test hands postgres.js the Worker handle's QuietSocke…
+  - `b7deb71` T-1403: tests/QUARANTINE.md names the 9 tests of the deleted infra/ci…
+- **Files changed:** 7 (+62 −403), by folder:
+  - `infra/ci/` README.md +1 −1, closed-socket.test.mjs +0 −240
+  - `infra/test-rig/` closed-socket.d.mts +0 −32, closed-socket.mjs +0 −112
+  - `runtime/test/rig/` rig.worker.test.ts +50 −3
+  - `tests/` QUARANTINE.md +9 −0
+  - `/` vitest.config.ts +2 −15
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1403: the rig test hands postgres.js the Worker handle's QuietSocket for every client and waits for each socket's read after end; T-1253's closed-socket filter is removed as its own commit 5379b79 added it (closed-socket.mjs, its .d.mts, its test, vitest.config.ts's import, onUnhandledError line and plugin entries, the README sentences), so no Workers run drops an error (DL-758 option (b), DL-760)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1403: tests/QUARANTINE.md names the 9 tests of the deleted infra/ci/closed-socket.test.mjs, as guard:tests prints them, each with the reason the filter it tested is removed: QuietSocket leaves no closed-socket rejection (T-1403, DL-758, DL-764), as T-1371's rows for T-1369's removed tests (the lead's grant DL-764)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 617. T-1404: down-path-ports.worker.test.ts's 'binds each to its fake' case runs its fake set on a clock that reads one instant (the safety read's fakeClock at the seed timer's due time), so the fire time it expects and the time fakeTimerFire keeps are one reading; every assertion unchanged (DL-760) (\#627)
+
+- **Commit:** [`ca9ca07`](https://github.com/aryamahadik/rosie/commit/ca9ca07), by Arya Mahadik, 2026-11-14 16:46:58 UTC
+- **Pull request:** [#627](https://github.com/aryamahadik/rosie/pull/627) from `task/T-1404`, merged 2026-11-14 16:46:58 UTC. It squashed 1 branch commit:
+  - `a71b498` T-1404: down-path-ports.worker.test.ts's 'binds each to its fake' cas…
+- **Files changed:** 1 (+15 −2), by folder:
+  - `runtime/src/wiring/` down-path-ports.worker.test.ts +15 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 616. docs: COMMIT\_HISTORY.md through commit 614 (e996837, \#624) (\#626)
 
