@@ -496,11 +496,27 @@ type Namespace = DurableObjectNamespace<HandleActor>;
 
 let actors = 0;
 
+/** Whole fiction-range numbers (555-01xx), one per actor, so each actor name is distinct. */
+const ACTOR_PHONES: readonly string[] = [
+  "+15555550130",
+  "+15555550131",
+  "+15555550132",
+  "+15555550133",
+  "+15555550134",
+  "+15555550135",
+  "+15555550136",
+  "+15555550137",
+  "+15555550138",
+  "+15555550139",
+];
+
 /** A HandleActor of its own for each pin, so no pin meets another's stored rows. */
 function actorStub(): DurableObjectStub<HandleActor> {
   const ns = (exports as unknown as { HandleActor: Namespace }).HandleActor;
+  const phone = ACTOR_PHONES[actors];
   actors += 1;
-  return ns.get(ns.idFromName(`phone:+1555555013${String(actors)}`));
+  if (phone === undefined) throw new Error("more pins than fiction-range numbers in ACTOR_PHONES");
+  return ns.get(ns.idFromName(`phone:${phone}`));
 }
 
 /** What the lease hands the pin when it starts a turn's first run (T-248), the turn's first text under bundle v0. */
