@@ -2,9 +2,117 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 587, [`1374c22`](https://github.com/aryamahadik/rosie/commit/1374c22), 2026-11-13 23:53:39 UTC.
+- **Through:** commit 591, [`1d9c3d8`](https://github.com/aryamahadik/rosie/commit/1d9c3d8), 2026-11-14 04:53:27 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 591. docs: COMMIT\_HISTORY.md through commit 587 (1374c22, \#596) (\#599)
+
+- **Commit:** [`1d9c3d8`](https://github.com/aryamahadik/rosie/commit/1d9c3d8), by Arya Mahadik, 2026-11-14 04:53:27 UTC
+- **Pull request:** [#599](https://github.com/aryamahadik/rosie/pull/599) from `task/commit-history-98`, merged 2026-11-14 04:53:27 UTC. It squashed 1 branch commit:
+  - `b602773` docs: COMMIT\_HISTORY.md through commit 587 (1374c22, \#596)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 590. T-1371: the Hyperdrive script sends each login's password only as a bound parameter of a temporary function running ALTER ROLE, never in a statement's text (CQ-225's ruling) (\#600)
+
+- **Commit:** [`cc74617`](https://github.com/aryamahadik/rosie/commit/cc74617), by Arya Mahadik, 2026-11-14 04:53:23 UTC
+- **Pull request:** [#600](https://github.com/aryamahadik/rosie/pull/600) from `task/T-1371`, merged 2026-11-14 04:53:24 UTC. It squashed 2 branch commits:
+  - `3287a0b` T-1371: the Hyperdrive script gives PostgreSQL each password only as …
+  - `ef384f6` T-1371: round 2 (DL-742): step 4 sets password\_encryption to scram-sh…
+- **Files changed:** 5 (+1665 −437), by folder:
+  - `docs/adr/` 0014-worker-database-roles.md +47 −33
+  - `infra/ci/` create-staging-hyperdrive.test.mjs +1115 −259
+  - `infra/scripts/` create-staging-hyperdrive.mjs +492 −138, create-staging-hyperdrive.sh +5 −3
+  - `tests/` QUARANTINE.md +6 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1371: the Hyperdrive script gives PostgreSQL each password only as the second bound value of one call of a temporary function that runs ALTER ROLE inside the server (CQ-225's ruling, DL-733); new step-4 stop rules, the shape re-read and the kept-text count before the create; the verifier and its tests leave; ADR-014 piece 2 restated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1371: round 2 (DL-742): step 4 sets password_encryption to scram-sha-256 for the session and reads it back, a refused SET or any other value stopping the run before any password (the security reviewer's N1); each password's transaction sets transaction_timeout to 0 and reads it back beside plan_cache_mode and lock_timeout, any other value stopping the run before the call, and a server without the setting is printed so and goes on (N2); tests/QUARANTINE.md rows for the four removed T-1369 verifier tests (ruling DL-733, CQ-225; replaced by cases a, b and c); ADR-014 line 146 names the two settings
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 589. T-1326: the root joins the PostgreSQL-down path: setDbOutageDeps with its six ports in install(), proved through the root, each port closed on staging (\#598)
+
+- **Commit:** [`0ad7041`](https://github.com/aryamahadik/rosie/commit/0ad7041), by Arya Mahadik, 2026-11-14 04:53:20 UTC
+- **Pull request:** [#598](https://github.com/aryamahadik/rosie/pull/598) from `task/T-1326`, merged 2026-11-14 04:53:20 UTC. It squashed 2 branch commits:
+  - `6799145` T-1326: root.install() joins the PostgreSQL-down path: setDbOutageDep…
+  - `59b45b7` T-1326: the join's test writes each fictional number out whole (555-0…
+- **Files changed:** 4 (+828 −16), by folder:
+  - `runtime/src/wiring/` down-path-join.worker.test.ts +755 −0, picks.ts +2 −2, ports.ts +11 −11, root.ts +60 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1326: root.install() joins the PostgreSQL-down path: setDbOutageDeps with its six ports as the root holds them (probe over the bundle port's readActiveBundle, sealing, linqDirect, the safety read's directory, stopOrStart, timerFire); Root.outage and Root.downPathBindings; proved through the root with PostgreSQL forced down, and the RULES 7.2 case with stopOrStart closed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1326: the join's test writes each fictional number out whole (555-0170 to 555-0178), so the phone scan of every tracked file reads no number outside the fiction range
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 588. T-588: the contact home (S13-19): every message the person's way, never SMS, reply clocks only once reached, the handling line; a STOP-withdrawn yes never counts (\#597)
+
+- **Commit:** [`a49a27f`](https://github.com/aryamahadik/rosie/commit/a49a27f), by Arya Mahadik, 2026-11-14 04:53:16 UTC
+- **Pull request:** [#597](https://github.com/aryamahadik/rosie/pull/597) from `task/T-588`, merged 2026-11-14 04:53:17 UTC. It squashed 4 branch commits:
+  - `8e43e87` T-588: temporary exploration of the compiled S13-19 (reverted by the …
+  - `790073c` Revert "T-588: temporary exploration of the compiled S13-19 (reverted…
+  - `c5ed4b4` T-588: the contact home (S13-19) as code: each message the person's w…
+  - `4161914` T-588: a stopped mobile holds no yes for a business-added booking (ro…
+- **Files changed:** 6 (+1605 −0), by folder:
+  - `actions/src/homes/contact/` contact.test.ts +776 −0, contact.ts +312 −0, home.ts +53 −0, index.ts +34 −0, record.ts +199 −0, test-support.ts +231 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-588: temporary exploration of the compiled S13-19 (reverted by the next commit)
+
+* Revert "T-588: temporary exploration of the compiled S13-19 (reverted by the next commit)"
+
+This reverts commit 8e43e8779e219ab506176ab093926ba5185bc69c.
+
+* T-588: the contact home (S13-19) as code: each message the person's way (a text only into the chat the mobile opened, else email, never SMS or a call), reply clocks only once reached, the private booking line from S13-19's own words, nothing for a business-added booking with no yes; registered with the home registry as the S13-19 home
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-588: a stopped mobile holds no yes for a business-added booking (round 2, gap 1): holdsYes and the sweep's oracle no longer count its business-scoped texts row; Ben's case (K-29 seed-chat-link and seed-consent-stop-row, K-04 seed-phone-stopped, an email on his card, a booking the shop made) gets way none, held noYes, clock never
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 587. docs: COMMIT\_HISTORY.md through commit 585 (59a2ee0, \#592) (\#596)
 
