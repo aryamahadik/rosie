@@ -1,12 +1,17 @@
-// What makes signInStart give no K-21 outcome at all: the handler throws one of these before any write, and the page
-// entry answers 503 with nothing sent, logging only the error's name (runtime/src/gateway/pages/entry.ts). Each names a
-// label, never a value: no contact, token, id, hash or code from the request or a port.
+// What makes a sign-in call (signInStart, T-1282; signInCheck and signOut, T-1285) give no K-21 outcome at all: the
+// handler throws one of these before any write, or after K-05 wrote nothing, and the page entry answers 503 with nothing
+// sent, logging only the error's name (runtime/src/gateway/pages/entry.ts). Each names a label, never a value: no
+// contact, token, id, hash or code from the request or a port.
 //
 // None of them depends on whether an account matches the typed contact: each is decided from the request alone, or from
-// the binding (no hashing key), before any port that reads an account is reached, so a 503 tells nothing of one.
+// the binding (no hashing key), before any port that reads an account is reached, or from a K-05 answer that is the same
+// on both paths, so a 503 tells nothing of one.
 
 export type SignInErrorCode =
-  /** The request is not K-21 v1's `signInStart.request` (the problems name its fields, never their values). */
+  /**
+   * The request is not K-21 v1's request of its call (`signInStart.request`, `signInCheck.request` or `signOut.request`):
+   * the problems name its fields, never their values.
+   */
   | "badRequest"
   /** The handler was handed another call's request: a wiring fault. */
   | "wrongCall"
@@ -17,14 +22,16 @@ export type SignInErrorCode =
   | "textWayNotServed"
   /**
    * The root bound no hashing port over PROOF_CODE_HASH_KEY, or one that names no secret or gives no HMAC-SHA-256 in
-   * hex: no contact can be hashed, so nothing is started (fail closed).
+   * hex: no contact and no typed code can be hashed, so nothing is started or checked (fail closed).
    */
   | "noHashKey"
   /** The typed email or mobile cannot be read as an address or an E.164 number (default 3 in start.ts). */
   | "contactNotReadable"
   /**
-   * K-05's startSignIn answered constraint: an id this call drew is taken, or a hash broke its form's CHECK. Nothing was
-   * written; the page's resend of the same requestId draws new ids (K-05 v1.13 startSignIn.errors).
+   * K-05's startSignIn answered constraint: an id this call drew is taken, or a hash broke its form's CHECK; or its
+   * proveSignIn did: the session this call drew (its id or its token's sha256) is taken. Nothing was written, the code's
+   * use included; the page's resend of the same requestId draws new ids and a new session (K-05 v1.13
+   * startSignIn.errors, proveSignIn.errors).
    */
   | "idTaken";
 
