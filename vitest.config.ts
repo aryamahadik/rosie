@@ -4,6 +4,8 @@
 import { cloudflareTest } from "@cloudflare/vitest-plugin";
 import { defineConfig } from "vitest/config";
 
+import { closedSocketFilter, droppedReport } from "./infra/test-rig/closed-socket.mjs";
+
 const workspaces = [
   "contracts",
   "compiler",
@@ -55,6 +57,15 @@ const workersPool: Parameters<typeof cloudflareTest>[0] = ({ inject }) => {
   };
 };
 
+// The one unhandled error a run drops (T-1253; the lead's ruling DL-758, option (a)): postgres.js's own rejection when it
+// reads a socket it has closed itself, which every postgres.js client ended inside workerd leaves. It is dropped only
+// when all four match (the name TypeError, the message "This socket has been closed." exactly, the type "Unhandled
+// Rejection", and the first stack frame in node_modules/postgres/cf/polyfills.js); anything else still fails the run.
+// The Workers projects carry the report, which prints the count once at the run's close (infra/test-rig/closed-socket.mjs
+// says why; infra/ci/closed-socket.test.mjs tests it).
+const closedSockets = closedSocketFilter();
+const closedSocketsReport = droppedReport(closedSockets);
+
 export default defineConfig({
   test: {
     passWithNoTests: true,
@@ -69,6 +80,8 @@ export default defineConfig({
     // checkpoint: one took 45 s on the build Mac's loaded, emulated PostgreSQL (Nov 14 2026), so at 10 s the run would
     // exit mid-drop and leave its databases behind. A resource guard, not part of any test's claim.
     teardownTimeout: 120_000,
+    // Drops postgres.js's closed-socket rejection alone, and counts it (closedSockets above).
+    onUnhandledError: closedSockets.onUnhandledError,
     projects: [
       {
         // Unit tests beside the code: each workspace's src/, plus db/repo/ and db/seeds/ (db's layout).
@@ -101,7 +114,7 @@ export default defineConfig({
       },
       {
         // Runs inside the Workers runtime with wrangler.jsonc's staging environment, on the rig's Hyperdrive bindings.
-        plugins: [cloudflareTest(workersPool)],
+        plugins: [cloudflareTest(workersPool), closedSocketsReport],
         test: {
           name: "workers",
           // T-1144: the action layer's checks that must hold inside the Workers runtime (the Tool API's validator).
@@ -163,7 +176,7 @@ export default defineConfig({
         // The walking skeleton's end-to-end test inside the Workers runtime (T-1149, DL-332): the local target posts
         // through runtime/src/wiring's composition root with the HandleActor installed, as the workers project runs it.
         // `npm run test:e2e` runs it with the e2e project.
-        plugins: [cloudflareTest(workersPool)],
+        plugins: [cloudflareTest(workersPool), closedSocketsReport],
         test: {
           name: "e2e-workers",
           include: ["tests/e2e/**/*.worker.test.ts"],
