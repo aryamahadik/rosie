@@ -90,6 +90,18 @@
 // never-delivered row is its commit's own (STATE note 37): the arming only cancels one the commit made. The checked safety
 // line the actor sends straight through Linq while PostgreSQL is down is a port of its own (linqDirect), which no hop
 // joins. Never logged by the root: a word, a number, a key, a chat id.
+//
+// The PostgreSQL-down path (T-270, ../outage/db; T-1326, T-270's handoff: "D-017 must call setDbOutageDeps with probe,
+// keys, direct, directory, core.recordStopOrStart and timers.fireFromCopy") is joined by `install()` with its six fields,
+// each a port as the root holds it in its environment (`Root.outage`): the probe, K-05 v1 readActiveBundle through the
+// bundle port (`postgresAnswers`); the sealing key store; the direct line (linqDirect); the safety read's directory
+// (stateReads); and the PostgreSQL-down path's own two ports (T-1363, kept apart from the twenty-one:
+// `Root.downPathBindings`), stopOrStart for each STOP or START the actor took, written on return, and timerFire for a
+// safety timer due while PostgreSQL is down. A closed or failing port reads as down or fails closed: a probe that throws
+// or is not answered is down; a key read that fails leaves the text read unknown, which may hold a stop word, so no
+// outage line goes to its number (RULES 7.2); a direct send that fails sends nothing and is tried again; a directory that
+// cannot say leaves the line's record waiting; a STOP or START record refused is kept with the actor for its next try
+// (notBack), so the handle stays known down; a timer fire refused fires nothing, its sealed address never opened.
 
 import { setBatchHooks } from "../actor/batch";
 import { setLeaseHooks } from "../actor/lease";
@@ -106,6 +118,7 @@ import { readBundleId, type WebhookEnvironment } from "../gateway/answer";
 import { unconfiguredPages } from "../gateway/pages";
 import type { ActorHandoff, ActorStub, GatewayDeps, ReceiptSink } from "../gateway/types";
 import { setGuardDeps } from "../guard/targets";
+import { setDbOutageDeps, type DbOutageDeps } from "../outage/db";
 import {
   JobMemory,
   retryQueueOf,
@@ -366,8 +379,13 @@ export interface RootOptions {
 
 export interface Root {
   readonly environment: Environment;
-  /** Each port and the implementation it took, in D-017's turn order. */
+  /** Each of D-017's twenty-one ports and the implementation it took, in D-017's turn order. */
   readonly bindings: readonly Binding[];
+  /**
+   * Each of the PostgreSQL-down path's two ports (stopOrStart, timerFire) and the implementation it took, in its order
+   * (T-1363; ./bind.ts BoundPorts.downPathBindings), kept apart from `bindings`, which stays D-017's twenty-one (T-1326).
+   */
+  readonly downPathBindings: readonly Binding[];
   readonly ports: Ports;
   /** The gateway's doors, for the Worker's webhook routes. */
   readonly gateway: GatewayDeps;
@@ -394,7 +412,17 @@ export interface Root {
    * writer is joined yet.
    */
   readonly queue: QueueDeps;
-  /** Puts the actor's ports and the retry queue's in place for this isolate; returns the function that puts the earlier ones back. */
+  /**
+   * What the PostgreSQL-down path reaches (`setDbOutageDeps`; T-1326): its six fields, each a port as the root holds it in
+   * its environment, so each closed or failing port reads as down or fails closed (RULES 7.2): `probe`, K-05 v1
+   * readActiveBundle through the bundle port (`postgresAnswers`); `keys`, the sealing port; `direct`, the direct line;
+   * `directory`, the safety read's directory (the state reads'); `core`, the stopOrStart port; `timers`, the timerFire port.
+   */
+  readonly outage: DbOutageDeps;
+  /**
+   * Puts the actor's ports, the PostgreSQL-down path's and the retry queue's in place for this isolate; returns the
+   * function that puts the earlier ones back.
+   */
   install(): () => void;
 }
 
@@ -410,7 +438,7 @@ export function composeRoot(options: RootOptions): Root {
   // bundle through; and each run's last text's service and chat id, for the gateAndCommit request's turn (T-559).
   const pinnedRuns = new PinnedRuns();
   const turnChats = new TurnChats();
-  const { ports, bindings } = bindPorts(PICKS, options.environment, {
+  const { ports, bindings, downPathBindings } = bindPorts(PICKS, options.environment, {
     ...options.sets,
     real: realPorts({
       linq: options.linq,
@@ -621,6 +649,19 @@ export function composeRoot(options: RootOptions): Root {
     wakeSafety: dangerWake,
   };
 
+  // The PostgreSQL-down path's six fields, each a port as the root holds it (T-1326; T-270's handoff; T-1363's two ports):
+  // in a test, each joined port's real package over its double and the fake set's others; on staging and in production,
+  // what the picks bind there, each failing closed until its part is bound (the probe and the key reads with no database,
+  // the direct line, stopOrStart and timerFire closed), so the path reads every text unknown and takes no STOP.
+  const outage: DbOutageDeps = {
+    probe: () => postgresAnswers(ports.bundles.registry),
+    keys: ports.sealing,
+    direct: ports.linqDirect,
+    directory: ports.stateReads.safety.directory,
+    core: ports.stopOrStart,
+    timers: ports.timerFire,
+  };
+
   // What the turn's pin reads through: where the state reads are real, behind the bundle's safety lines' check, so a bundle
   // they refuse (or any bundle while none are bound) is never pinned (DL-341, DL-351); elsewhere the bundle port itself,
   // so a test's fake state reads leave the pin as it was.
@@ -692,6 +733,7 @@ export function composeRoot(options: RootOptions): Root {
   return {
     environment: options.environment,
     bindings,
+    downPathBindings,
     ports,
     gateway,
     linqWebhook,
@@ -700,10 +742,13 @@ export function composeRoot(options: RootOptions): Root {
     pin,
     dispatcher,
     queue,
+    outage,
     install() {
       const restores = [
         setBatchHooks({ clock: { now } }),
         setSafetyDeps(safety),
+        // The PostgreSQL-down path's six ports, as the root holds them (T-1326).
+        setDbOutageDeps(outage),
         setBundleDeps(pin),
         setGuardDeps({ targets: ports.targets }),
         setTurnDeps(turn),
@@ -940,6 +985,18 @@ async function activeBundleId(registry: Pick<BundleRegistry, "readActiveBundle">
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
+
+/**
+ * The PostgreSQL-down path's probe (T-1326; DbOutageDeps.probe: "a read of the primary through K-05, such as
+ * readActiveBundle. False or a throw: down"): K-05 v1 item 7's readActiveBundle through the bundle port, primary and
+ * uncached. True when the database answered it: the active bundle, or noActiveBundle (read, with none active yet). False
+ * for K-05's transient (the database could not answer now) and for an answer that is not K-05's. A throw (no database
+ * bound, a closed port, the database unreachable) goes to the path as it is, which reads it as down.
+ */
+async function postgresAnswers(registry: Pick<BundleRegistry, "readActiveBundle">): Promise<boolean> {
+  const answer: unknown = await registry.readActiveBundle({});
+  return isRecord(answer) && (answer.result === "active" || answer.error === "noActiveBundle");
+}
 
 /**
  * A delivery receipt's K-06 status: Linq's message id and when it was delivered. A sent or failed receipt has no door yet
