@@ -72,8 +72,8 @@
 // kept and handed to the action layer's call where the test root holds one, each timer fired kept as the actor handed it)
 // and closed on staging and in production, so a STOP or START written on return is refused with nothing recorded (the
 // actor keeps it for its next try) and a safety timer due while PostgreSQL is down fires nothing, its sealed address never
-// opened (QUESTIONS.md CQ-101 (c) leaves the opening to the CTO with the security reviewer). T-1326 joins them, as they are
-// picked, into the PostgreSQL-down path.
+// opened (QUESTIONS.md CQ-101 (c) leaves the opening to the CTO with the security reviewer). The root's `install()` joins
+// them, as they are picked, into the PostgreSQL-down path (T-1326; ./root.ts Root.outage).
 
 import type { PortName } from "./ports";
 

@@ -58,9 +58,9 @@
 //
 // Beside them, the PostgreSQL-down path's two ports (T-1363; C-175; arch 11 'PostgreSQL down', line 566), kept apart from
 // the twenty-one (`DOWN_PATH_PORTS`) so that D-017's list and its turn order stay as they are. Each carries a field of
-// ../outage/db's DbOutageDeps that no port of the twenty-one carries; T-1326 joins them into `setDbOutageDeps` with the
-// four fields it takes from the twenty-one (the probe over the bundles port's readActiveBundle, the sealing key store,
-// the direct line and the safety read's directory):
+// ../outage/db's DbOutageDeps that no port of the twenty-one carries; the root's `install()` joins them into
+// `setDbOutageDeps` (T-1326; ./root.ts Root.outage) with the four fields it takes from the twenty-one (the probe over the
+// bundles port's readActiveBundle, the sealing key store, the direct line and the safety read's directory):
 //
 //   port         what it carries                                                   joined by
 //   stopOrStart  K-09 v1 recordStopOrStart for the actorOnReturn caller: each      no D-017 hop
@@ -74,9 +74,9 @@
 // Not ports: the HandleActor namespace (the gateway's door to each handle's actor and the clock arming's way to it, a
 // binding the root is handed), the clock, and the wiring between the parts the root builds (the lease runs the turn loop;
 // the turn wakes the dispatcher; the receipt door marks the part delivered and arms its clock). Not bound here: the
-// guard's fixed replies (`setReplyDeps`), the clock firing (`setClockDeps`), the actor's copies (`setCopyDeps`), the
-// PostgreSQL-down path's deps (`setDbOutageDeps`, until T-1326 joins them from the ports) and the Stripe and calendar
-// doors, none of which a D-017 hop runs.
+// guard's fixed replies (`setReplyDeps`), the clock firing (`setClockDeps`), the actor's copies (`setCopyDeps`) and the
+// Stripe and calendar doors, none of which a D-017 hop runs. The PostgreSQL-down path's deps (`setDbOutageDeps`) are
+// bound from the ports by the root's `install()` (T-1326).
 
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 
@@ -305,15 +305,15 @@ export interface Ports {
   /**
    * K-09 v1 recordStopOrStart for the actorOnReturn caller (T-1363; ../outage/db/types.ts StopOrStartCore): each STOP or
    * START the handle actor took while PostgreSQL was down, written once it answers again (the PostgreSQL-down path's
-   * `core`, which T-1326 joins). No D-017 hop. A call it does not take (a throw, or K-09's transient) leaves the record
-   * with the actor for its next try.
+   * `core`, which the root's `install()` joins: T-1326). No D-017 hop. A call it does not take (a throw, or K-09's
+   * transient) leaves the record with the actor for its next try.
    */
   readonly stopOrStart: StopOrStartCore;
   /**
    * The alerts of a safety timer due while PostgreSQL is down, fired from the actor's copy (T-1363; ../outage/db/types.ts
-   * TimerFirePort; the PostgreSQL-down path's `timers`, which T-1326 joins). No D-017 hop. The copy comes with the job's
-   * address still sealed under its person's key: opening it is the CTO's call with the security reviewer (QUESTIONS.md
-   * CQ-101 (c)). A throw: not fired, tried again 5 s on.
+   * TimerFirePort; the PostgreSQL-down path's `timers`, which the root's `install()` joins: T-1326). No D-017 hop. The
+   * copy comes with the job's address still sealed under its person's key: opening it is the CTO's call with the security
+   * reviewer (QUESTIONS.md CQ-101 (c)). A throw: not fired, tried again 5 s on.
    */
   readonly timerFire: TimerFirePort;
 }
