@@ -25,6 +25,14 @@
 // SASL_SIGNATURE_MISMATCH through each); Node's certificate codes OUT_OF_MEM and UNSPECIFIED (the code Node gives a
 // verify error it does not list), which carry no mark of a connection, are thrown scrubbed.
 //
+// T-1367 (T-1331's security review, new task a; DL-708): PostgreSQL's refusals of a session at its start that name the
+// database (3D000, 42501, 55000, raised FATAL) are a session's failure too, thrown scrubbed by transientOrThrow and found
+// gone by a transaction, while the same codes raised ERROR (a statement's own refusal: a privilege, a row-level security
+// policy) stay as they were. Every direct caller of transientOrThrow at a session's start (reserve, release,
+// publishBundleCopy, setActiveBundle, commitTurn, openChatOnText), and handleTargets through transientOrScrubbed, throws
+// each one from a local server that refuses its session as the call's name and the code alone, the planted database name
+// nowhere.
+//
 // Rule 9: the probe's user, password, database and hosts are made up here (.invalid names and documentation
 // addresses), and its one number is a 555-01xx number. A check names what leaked, never its value, so a failing run
 // prints no secret.
@@ -34,6 +42,7 @@ import { type AddressInfo, createServer, type Socket } from "node:net";
 import postgres from "postgres";
 import { describe, expect, it } from "vitest";
 import { readHandle, readQuestionFacts } from "./arming-reads";
+import { publishBundleCopy, setActiveBundle } from "./bundles";
 import { openChatOnText } from "./chat-open";
 import { createClient, resolvePrimaryUrl } from "./client";
 import {
@@ -48,10 +57,11 @@ import {
 import { commitTurn } from "./commit-turn";
 import { handleSealingKey } from "./handle-keys";
 import { parkTurn } from "./park";
+import { release, reserve } from "./reservations";
 import { BusinessScopeError, type Sql } from "./scope";
 import { SealingError } from "./sealing";
 import { sendState } from "./send-state";
-import { handleTargets, type TransientError, transientOrThrow } from "./targets";
+import { foundGone, handleTargets, isSessionFailure, type TransientError, transientOrThrow } from "./targets";
 import { readPhoneState, readRosterPhone, readTesterStanding } from "./test-phone-reads";
 import { BrokenRecordError } from "./turn-face-reads";
 import { readTurnParty } from "./turn-party";
@@ -1023,6 +1033,127 @@ describe("a session's failure through a direct caller of transientOrThrow, scrub
       await server.close();
     }
   });
+});
+
+describe("PostgreSQL's refusals of a session at its start that name the database: 3D000, 42501, 55000 (T-1367)", () => {
+  /** Each refusal as PostgreSQL's backend raises it as the session starts (postinit.c), the planted database in it. */
+  const REFUSED: { code: string; text: string }[] = [
+    { code: "3D000", text: `database "${PROBE_DATABASE}" does not exist` },
+    { code: "42501", text: `permission denied for database "${PROBE_DATABASE}"` },
+    { code: "55000", text: `database "${PROBE_DATABASE}" is not currently accepting connections` },
+  ];
+  const DATABASE: Secrets = secretsOf({ database: PROBE_DATABASE });
+
+  /** The thrown error is clocks.ts's DataAccessDatabaseError of `code` under `call`, holding none of `secrets`. */
+  function expectRefusedScrubbed(thrown: unknown, call: string, code: string, secrets: Secrets): void {
+    expect(thrown).toBeInstanceOf(DataAccessDatabaseError);
+    expect(Object.getOwnPropertyNames(thrown).sort()).toEqual([
+      "call",
+      "code",
+      "constraint",
+      "message",
+      "name",
+      "stack",
+      "table",
+    ]);
+    expect(thrown).toMatchObject({ call, code, table: null, constraint: null });
+    expect((thrown as Error).message).toBe(`${call}: the database refused the call (SQLSTATE ${code})`);
+    expect(leaksOf(thrown, secrets)).toEqual([]);
+  }
+
+  it.each(REFUSED)(
+    "$code raised FATAL, on the statement it rejects: a session's failure, found gone, and thrown scrubbed by both helpers",
+    ({ code, text }) => {
+      const raw = refusal({ code, message: text });
+      expect(leaksOf(raw, DATABASE)).toEqual(["database"]);
+      expect(isSessionFailure(raw)).toBe(true);
+      // A transaction meeting it writes no rollback to the connection and never releases it: the backend has ended.
+      expect(foundGone(raw)).toBe(true);
+      expectRefusedScrubbed(
+        thrownBy(() => transientOrThrow(raw, CALL)),
+        CALL,
+        code,
+        SHAPE_SECRETS,
+      );
+      expectRefusedScrubbed(
+        thrownBy(() => transientOrScrubbed(CALL, raw)),
+        CALL,
+        code,
+        SHAPE_SECRETS,
+      );
+      for (const outcome of [
+        thrownBy(() => transientOrThrow(raw, CALL)),
+        thrownBy(() => transientOrScrubbed(CALL, raw)),
+      ]) {
+        expect(leaksOf(outcome, DATABASE)).toEqual([]);
+      }
+      // Its local severity alone (a server that sends no V field) is the same refusal.
+      const local = rejecting(new PostgresError({ severity_local: "FATAL", code, message: text }));
+      expect(isSessionFailure(local)).toBe(true);
+      expectRefusedScrubbed(
+        thrownBy(() => transientOrThrow(local, CALL)),
+        CALL,
+        code,
+        DATABASE,
+      );
+    },
+  );
+
+  it.each(REFUSED)(
+    "$code raised ERROR (a statement's own refusal, on a session that goes on): no session's failure, not gone, and thrown by transientOrThrow as it is",
+    ({ code }) => {
+      // A privilege or row-level security refusal of a statement, as the policies give it (42501), and its kin.
+      const raw = refusal({ severity: "ERROR", code, message: `refused: ${NUMBER}` });
+      expect(isSessionFailure(raw)).toBe(false);
+      expect(foundGone(raw)).toBe(false);
+      expect(thrownBy(() => transientOrThrow(raw, CALL))).toBe(raw);
+      // transientOrScrubbed scrubs it, as it scrubs every statement's own refusal (T-1322).
+      expectRefusedScrubbed(
+        thrownBy(() => transientOrScrubbed(CALL, raw)),
+        CALL,
+        code,
+        SHAPE_SECRETS,
+      );
+    },
+  );
+
+  const startCallers: { call: string; run: Run }[] = [
+    // transientOrThrow's direct callers that open their own session.
+    { call: "reserve", run: fixtureCall(reserve, "reserve-10-min.json") },
+    { call: "release", run: fixtureCall(release, "release-expired-promotes.json") },
+    { call: "publishBundleCopy", run: fixtureCall(publishBundleCopy, "publish-bundle-copy.json") },
+    { call: "setActiveBundle", run: fixtureCall(setActiveBundle, "set-active-bundle.json") },
+    { call: "commitTurn", run: fixtureCall(commitTurn, "commit-first.json") },
+    { call: "openChatOnText", run: fixtureCall(openChatOnText, "open-chat-first-text-sam.json") },
+    // And one of transientOrScrubbed's, which scrubbed them before.
+    { call: "handleTargets", run: fixtureCall(handleTargets, "targets-alex.json") },
+  ];
+
+  it.each(REFUSED)(
+    "$code from a server that refuses the session, the database named: every start caller throws it scrubbed, its own name and the code alone",
+    async ({ code, text }) => {
+      const server = await refusingServer(code, text);
+      const secrets = probeSecrets("127.0.0.1", server.port);
+      try {
+        const url = probeUrl("127.0.0.1", server.port);
+        // What postgres.js rejects a client's first statement with: PostgreSQL's FATAL, the database named in it.
+        const raw = await failureOf(url);
+        expect(raw).toMatchObject({ name: "PostgresError", code, severity: "FATAL" });
+        expect(leaksOf(raw, secrets)).toEqual(expect.arrayContaining(["database"]));
+        for (const { call, run } of startCallers) {
+          const client = createClient({ primaryUrl: url, max: 1, env: {} });
+          try {
+            const rejected = await rejectionOf(run(client.primary));
+            expectRefusedScrubbed(rejected, call, code, secrets);
+          } finally {
+            await client.close();
+          }
+        }
+      } finally {
+        await server.close();
+      }
+    },
+  );
 });
 
 describe("K-05 calls of both helpers' kinds on a client that never connects (T-1268)", () => {

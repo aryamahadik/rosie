@@ -8,17 +8,13 @@
 // response status code), and both caught that throw as `network`. Every earlier test answered the model calls through a
 // double at the fetch seam, so workerd's fetch never saw the option. Here workerd's fetch builds and sends each request.
 //
-// How the calls are carried. The Workers pool (@cloudflare/vitest-plugin 1.6.0) gives a test no interception of the
-// global fetch: its cloudflare:test exports no fetchMock, its runner leaves the global fetch as workerd made it, and the
-// pool's Miniflare options (vitest.config.ts) name no outboundService. So this file uses the closest form: the global
-// fetch hands each call, with the url and every option the code gave it, to workerd's own fetch on a local service
-// binding, the pool's loopback to this Worker's default entrypoint (`exports.default` from cloudflare:workers), whose fetch
-// handler stands in for api.anthropic.com while this file runs. workerd's fetch is the same on a service binding as on the
-// global outbound, the channel aside: it builds the Request from the url and options (where it refuses "error"), sends it,
-// applies the redirect mode to the answer (under "follow" it asks for a 3xx's Location, through the same binding) and
-// hands the answer back. Nothing leaves the Mac: the stand-in runs in this isolate, and the global fetch reaches nothing
-// else. The code under test is not touched: each call goes through its own default path to the global fetch (the
-// gateway's own, and the safety wire's as the Worker's ../src/wiring/staging/options.ts hands it).
+// How the calls are carried (T-1411). The global fetch is workerd's own, untouched: it builds each Request from the url and
+// the options the code gave it (where it refuses "error"), sends it to the Workers pool's global outbound, the outbound
+// tripwire (./outbound.ts; vitest.config.ts), applies the redirect mode to the answer (under "follow" it asks for a 3xx's
+// Location, through the tripwire again) and hands the answer back. Each test claims api.anthropic.com and the Location's
+// host for this file's stand-in (claimHost), which answers in this isolate; any other host would get the tripwire's
+// failure, so nothing leaves the Mac. The code under test is not touched: each call goes through its own default path to
+// the global fetch (the gateway's own, and the safety wire's as the Worker's ../src/wiring/staging/options.ts hands it).
 //
 // What it shows:
 //   - workerd refuses `redirect: "error"` as it builds a request, with the TypeError staging met, and takes "manual";
@@ -28,14 +24,13 @@
 //   - a 301, 302, 303, 307 or 308 is a failure labelled by its status (`http_<status>`: the gateway's three attempts end
 //     in modelsDown, the exchange's one answer fails), and no request goes to its Location, so the key goes to
 //     Anthropic's address alone. The stand-in answers the Location with a 200, so a redirect followed would succeed;
-//   - a redirect workerd follows does reach the stand-in: with "follow" the same binding asks for the Location, so the
-//     check above can fail.
+//   - a redirect workerd follows does reach the stand-in: with "follow" workerd asks for the Location through the same
+//     outbound, so the check above can fail.
 // On today's main (`redirect: "error"`) the 200 and 3xx cases fail: workerd refuses each request, and each call comes
 // back `network` with nothing sent.
 //
 // No live model call (J-02; DL-027): the key is made up for this file, and no request goes anywhere but the stand-in.
-import { exports } from "cloudflare:workers";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import {
   API_URL,
@@ -52,7 +47,7 @@ import {
 import { SAFETY_TRY_MS } from "../../ai/src/safety/read";
 import { NO_USAGE, exchange } from "../../ai/src/safety/wire";
 import manifest from "../../contracts/bundle/fixtures/manifest.json";
-import worker from "../src/index";
+import { claimHost } from "./outbound";
 
 /** The model key of this file: made up for the run, never Anthropic's. */
 const MODEL_KEY = `t1408-made-up-model-key-${crypto.randomUUID()}`;
@@ -62,13 +57,6 @@ const LOCATION = "https://elsewhere.example/v1/messages";
 
 /** The Fetch standard's five redirect statuses. */
 const REDIRECTS = [301, 302, 303, 307, 308] as const;
-
-/** This Worker's default entrypoint through the pool's loopback service binding: workerd's own fetch, on a local channel. */
-const loopback = (exports as unknown as { readonly default: Fetcher }).default;
-
-/** The global fetch while a test runs: each call handed on, as the code made it, to workerd's fetch on that binding. */
-const viaWorkerd = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> =>
-  loopback.fetch(input, init);
 
 /** The safety wire's fetch, as the Worker hands it (../src/wiring/staging/options.ts): the global fetch, at each call. */
 const globalFetch: FetchLike = (url, init) => fetch(url, init);
@@ -123,8 +111,8 @@ function messagesAnswer(output: unknown): Response {
 }
 
 /**
- * The stand-in, in place of this Worker's own fetch handler while a test runs: it keeps each request it gets and answers
- * the Messages endpoint as the test says, the Location with a 200, and anything else with a 404.
+ * The stand-in for api.anthropic.com and the Location's host, claimed for each test (claimHost): it keeps each request it
+ * gets and answers the Messages endpoint as the test says, the Location with a 200, and anything else with a 404.
  */
 async function standIn(request: Request): Promise<Response> {
   const text = await request.text();
@@ -148,13 +136,9 @@ async function standIn(request: Request): Promise<Response> {
 beforeEach(() => {
   ARRIVED.length = 0;
   answer = { kind: "messages", output: OUTPUT };
-  vi.spyOn(worker, "fetch").mockImplementation(standIn);
-  vi.stubGlobal("fetch", viaWorkerd);
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
-  vi.restoreAllMocks();
+  // Each claim ends with its test (./outbound.ts's setup).
+  claimHost(new URL(API_URL).host, standIn);
+  claimHost(new URL(LOCATION).host, standIn);
 });
 
 // ---- the calls --------------------------------------------------------------------------------------------------------
@@ -291,7 +275,7 @@ describe("the stand-in sees a redirect workerd follows", () => {
     'a %i under "follow": the same binding asks for the Location, so the checks above would show one followed',
     async (status) => {
       answer = { kind: "redirect", status };
-      const response = await loopback.fetch(API_URL, {
+      const response = await fetch(API_URL, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(SAFETY_BODY),

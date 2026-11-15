@@ -2,9 +2,315 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 668, [`2930ce6`](https://github.com/aryamahadik/rosie/commit/2930ce6), 2026-11-15 16:34:44 UTC.
+- **Through:** commit 681, [`c2f36d6`](https://github.com/aryamahadik/rosie/commit/c2f36d6), 2026-11-15 20:34:46 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 681. docs: COMMIT\_HISTORY.md through commit 679 (2c90291, \#690) (\#692)
+
+- **Commit:** [`c2f36d6`](https://github.com/aryamahadik/rosie/commit/c2f36d6), by Arya Mahadik, 2026-11-15 20:34:46 UTC
+- **Pull request:** [#692](https://github.com/aryamahadik/rosie/pull/692) from `task/commit-history-135`, merged 2026-11-15 20:34:46 UTC. It squashed 1 branch commit:
+  - `044b017` docs: COMMIT\_HISTORY.md through commit 679 (2c90291, \#690)
+- **Files changed:** 1 (+47 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +47 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 228 (DL-847); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 680. T-1121 phase 1: the outbound Linq probe (allow-list refusals before any request, numbers masked, the key in one header), its dry run against a local stand-in, its test and findings (\#693)
+
+- **Commit:** [`b60b9bd`](https://github.com/aryamahadik/rosie/commit/b60b9bd), by Arya Mahadik, 2026-11-15 20:34:42 UTC
+- **Pull request:** [#693](https://github.com/aryamahadik/rosie/pull/693) from `task/T-1121`, merged 2026-11-15 20:34:43 UTC. It squashed 2 branch commits:
+  - `c5aa51b` T-1121: phase 1 of the outbound Linq probe: probe.sh and its Node pro…
+  - `80c28c4` T-1121: FINDINGS.md, the builder's text written by the lead (the harn…
+- **Files changed:** 7 (+1690 −0), by folder:
+  - `adapters/spikes/linq-live/` FINDINGS.md +57 −0, lib.mjs +566 −0, probe.mjs +12 −0, probe.sh +110 −0, probe.test.mjs +682 −0, stub.mjs +120 −0, wire.mjs +143 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1121: phase 1 of the outbound Linq probe: probe.sh and its Node probe (values by name on standard input alone), a dry run against a local stand-in on 127.0.0.1, and its node:test (refusals before any request, numbers masked to the last 2 digits, the key only in the Authorization header, one message a step, plainly a Rosie staging test)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1121: FINDINGS.md, the builder's text written by the lead (the harness refused the builder's write; DL-849)
+
+Exactly the builder's findings_text from wf_23110469-60b. prettier's check and the spike test (13/13, which scans the folder's files for numbers) pass on it.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 679. docs: COMMIT\_HISTORY.md through commit 677 (8b0a10d, \#688) (\#690)
+
+- **Commit:** [`2c90291`](https://github.com/aryamahadik/rosie/commit/2c90291), by Arya Mahadik, 2026-11-15 19:22:42 UTC
+- **Pull request:** [#690](https://github.com/aryamahadik/rosie/pull/690) from `task/commit-history-134`, merged 2026-11-15 19:22:43 UTC. It squashed 1 branch commit:
+  - `63fc850` docs: COMMIT\_HISTORY.md through commit 677 (8b0a10d, \#688)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 226 (DL-841); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 678. T-1411: the Workers test pool's outbound tripwire: no test's fetch leaves the Mac; claimed hosts answered by stand-ins (\#691)
+
+- **Commit:** [`5cbfcdf`](https://github.com/aryamahadik/rosie/commit/5cbfcdf), by Arya Mahadik, 2026-11-15 19:22:38 UTC
+- **Pull request:** [#691](https://github.com/aryamahadik/rosie/pull/691) from `task/T-1411`, merged 2026-11-15 19:22:39 UTC. It squashed 2 branch commits:
+  - `3f25251` T-1411: the Workers test pool's outbound tripwire: every global fetch…
+  - `ef29b36` T-1411: the helper's header states exactly what the connect() measure…
+- **Files changed:** 4 (+390 −38), by folder:
+  - `runtime/test/` model-fetch.worker.test.ts +17 −33, outbound.ts +121 −0, outbound.worker.test.ts +192 −0
+  - `/` vitest.config.ts +60 −5
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1411: the Workers test pool's outbound tripwire: every global fetch() lands in the test's own isolate, a claimed host's stand-in answers it, any other host gets a failure naming the host alone; model-fetch.worker.test.ts moves onto it
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1411: the helper's header states exactly what the connect() measurement showed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 677. docs: COMMIT\_HISTORY.md through commit 675 (cf47ff2, \#686) (\#688)
+
+- **Commit:** [`8b0a10d`](https://github.com/aryamahadik/rosie/commit/8b0a10d), by Arya Mahadik, 2026-11-15 18:27:31 UTC
+- **Pull request:** [#688](https://github.com/aryamahadik/rosie/pull/688) from `task/commit-history-133`, merged 2026-11-15 18:27:31 UTC. It squashed 1 branch commit:
+  - `c0b90bf` docs: COMMIT\_HISTORY.md through commit 675 (cf47ff2, \#686)
+- **Files changed:** 1 (+53 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +53 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 225 (DL-837); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 676. T-1365: a replay whose holdOnReturn throws keeps the core's hold id, so its hold can be released (\#687)
+
+- **Commit:** [`9ce25cd`](https://github.com/aryamahadik/rosie/commit/9ce25cd), by Arya Mahadik, 2026-11-15 18:27:26 UTC
+- **Pull request:** [#687](https://github.com/aryamahadik/rosie/pull/687) from `task/T-1365`, merged 2026-11-15 18:27:27 UTC. It squashed 2 branch commits:
+  - `322654e` T-1365: a replay whose write of the core's hold throws keeps that hol…
+  - `e9e52db` T-1365: holdOnReturn's comment no longer says a read that throws writ…
+- **Files changed:** 2 (+277 −25), by folder:
+  - `runtime/src/safety/` arrival.ts +103 −19, hold.worker.test.ts +174 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1365: a replay whose write of the core's hold throws keeps that hold (safety_core_holds), so the hold the actor writes later carries the core's id, never looser; a replay whose read threw lands the id on a hold that has none; a hold neither written nor kept leaves the record queued (notBack) for the core's repeated answer
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1365: holdOnReturn's comment no longer says a read that throws writes nothing (it keeps the core's hold and may land its id)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 675. docs: COMMIT\_HISTORY.md through commit 672 (c244c38, \#683) (\#686)
+
+- **Commit:** [`cf47ff2`](https://github.com/aryamahadik/rosie/commit/cf47ff2), by Arya Mahadik, 2026-11-15 17:46:54 UTC
+- **Pull request:** [#686](https://github.com/aryamahadik/rosie/pull/686) from `task/commit-history-132`, merged 2026-11-15 17:46:55 UTC. It squashed 1 branch commit:
+  - `9fc2313` docs: COMMIT\_HISTORY.md through commit 672 (c244c38, \#683)
+- **Files changed:** 1 (+117 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +117 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 224 (DL-831); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 674. T-1407: npm run staging:trace -- \<trace id\> \[--since \<time\>\]: a read-only report of what one trace wrote on staging's database (turns, event-log entries, outbox rows and parts, messages), labels, states and times alone; the URL loaded by name and handed to the reader alone, as seed-staging.sh does; one READ ONLY transaction as rosie\_job with an empty scope; its test on a throwaway schema of K-04 fixture rows with planted canaries (\#685)
+
+- **Commit:** [`58d3b2d`](https://github.com/aryamahadik/rosie/commit/58d3b2d), by Arya Mahadik, 2026-11-15 17:46:51 UTC
+- **Pull request:** [#685](https://github.com/aryamahadik/rosie/pull/685) from `task/T-1407`, merged 2026-11-15 17:46:51 UTC. It squashed 1 branch commit:
+  - `d1d65a9` T-1407: npm run staging:trace -- \<trace id\> \[--since \<time\>\]: a read-…
+- **Files changed:** 4 (+1455 −0), by folder:
+  - `infra/ci/` staging-trace.test.mjs +998 −0
+  - `infra/scripts/` staging-trace.mjs +310 −0, staging-trace.sh +146 −0
+  - `/` package.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 673. T-1405: readActiveBundle and readBundleValue answer a failure through clocks.ts transientOrScrubbed (imported when a call fails), so a statement's own refusal and postgres.js's statement errors leave scrubbed: the call's name and code alone, no statement text, value or key. bundles.int.test.ts: T-1314's Gives 1 and 5 hold the two reads to transientOrScrubbed (the 23505 and TypeError pins move from raw to scrubbed); a T-1405 block gives each read T-1322's five real errors (22P02, 23514, UNDEFINED\_VALUE, bytea TypeError scrubbed; 40001 still transient) and a real lock-timeout refusal (55P03) of its own statement (\#684)
+
+- **Commit:** [`61ae149`](https://github.com/aryamahadik/rosie/commit/61ae149), by Arya Mahadik, 2026-11-15 17:46:47 UTC
+- **Pull request:** [#684](https://github.com/aryamahadik/rosie/pull/684) from `task/T-1405`, merged 2026-11-15 17:46:48 UTC. It squashed 1 branch commit:
+  - `1949bf1` T-1405: readActiveBundle and readBundleValue answer a failure through…
+- **Files changed:** 2 (+328 −6), by folder:
+  - `db/repo/` bundles.int.test.ts +318 −4, bundles.ts +10 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 672. docs: COMMIT\_HISTORY.md through commit 668 (2930ce6, \#679) (\#683)
+
+- **Commit:** [`c244c38`](https://github.com/aryamahadik/rosie/commit/c244c38), by Arya Mahadik, 2026-11-15 17:13:10 UTC
+- **Pull request:** [#683](https://github.com/aryamahadik/rosie/pull/683) from `task/commit-history-131`, merged 2026-11-15 17:13:10 UTC. It squashed 1 branch commit:
+  - `2494273` docs: COMMIT\_HISTORY.md through commit 668 (2930ce6, \#679)
+- **Files changed:** 1 (+36 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +36 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 223 (DL-828); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 671. T-1409: K-05's database-side contract test covers v1.16 (\#682)
+
+- **Commit:** [`baa8f21`](https://github.com/aryamahadik/rosie/commit/baa8f21), by Arya Mahadik, 2026-11-15 17:13:06 UTC
+- **Pull request:** [#682](https://github.com/aryamahadik/rosie/pull/682) from `task/T-1409`, merged 2026-11-15 17:13:06 UTC. It squashed 4 branch commits:
+  - `c31ba21` T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row…
+  - `d783047` T-1391: README v1.16, the db/repo read's tests also show an email cop…
+  - `ac7afa6` T-1392: readOutboxRowWritten answers K-05 v1.16 (item 70): the writte…
+  - `2aa2036` T-1409: K-05's db-side contract test takes v1.16: each v1.4 readOutbo…
+- **Files changed:** 1 (+279 −33), by folder:
+  - `tests/contract/` data-access.v1.db-side.test.ts +279 −33
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row's recipientHandleId and sendClass, both null when not written (K-09 v1.10 open gap 147)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1391: README v1.16, the db/repo read's tests also show an email copy's and an outage line's stored recipient and class (gap 147's list)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1392: readOutboxRowWritten answers K-05 v1.16 (item 70): the written row's recipientHandleId and sendClass as stored, both null when the side shows no row, in one statement of id, recipient_handle_id and send_class; its tests run v1.16's three exchanges, each v1.4 exchange answered as its v1.16 twin, every side's scope, an email copy and an outage line
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1409: K-05's db-side contract test takes v1.16: each v1.4 readOutboxRowWritten exchange is answered as v1.16 answers it, its outcome with recipientHandleId and sendClass as its v1.16 twin's outcome states them (a written row's checked as stored), judged at readOutboxRowWritten.v1dot16Response (RECIPIENT); the twin check excuses exactly those two fields for such a twin (addedFieldsOf); DB_SIDE_VERSIONS gains v1.16, with a twin for each of its three refused answers; two new cases show the v1.16 answer rule and the twin check firing
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 670. T-1392: db/repo's readOutboxRowWritten answers K-05 v1.16 under v1.4's role and scope (\#681)
+
+- **Commit:** [`b63ef76`](https://github.com/aryamahadik/rosie/commit/b63ef76), by Arya Mahadik, 2026-11-15 17:13:03 UTC
+- **Pull request:** [#681](https://github.com/aryamahadik/rosie/pull/681) from `task/T-1392`, merged 2026-11-15 17:13:03 UTC. It squashed 3 branch commits:
+  - `c31ba21` T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row…
+  - `d783047` T-1391: README v1.16, the db/repo read's tests also show an email cop…
+  - `ac7afa6` T-1392: readOutboxRowWritten answers K-05 v1.16 (item 70): the writte…
+- **Files changed:** 2 (+339 −23), by folder:
+  - `db/repo/` safety-reads.int.test.ts +295 −12, safety-reads.ts +44 −11
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row's recipientHandleId and sendClass, both null when not written (K-09 v1.10 open gap 147)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1391: README v1.16, the db/repo read's tests also show an email copy's and an outage line's stored recipient and class (gap 147's list)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1392: readOutboxRowWritten answers K-05 v1.16 (item 70): the written row's recipientHandleId and sendClass as stored, both null when the side shows no row, in one statement of id, recipient_handle_id and send_class; its tests run v1.16's three exchanges, each v1.4 exchange answered as its v1.16 twin, every side's scope, an email copy and an outage line
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 669. T-1391: K-05 v1.16 frozen: readOutboxRowWritten also answers the stored row's recipient and send class (\#680)
+
+- **Commit:** [`2adbcae`](https://github.com/aryamahadik/rosie/commit/2adbcae), by Arya Mahadik, 2026-11-15 17:12:59 UTC
+- **Pull request:** [#680](https://github.com/aryamahadik/rosie/pull/680) from `task/T-1391`, merged 2026-11-15 17:13:00 UTC. It squashed 2 branch commits:
+  - `c31ba21` T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row…
+  - `d783047` T-1391: README v1.16, the db/repo read's tests also show an email cop…
+- **Files changed:** 10 (+851 −6), by folder:
+  - `contracts/data-access/` README.md +69 −5, data-access.v1.16.schema.json +639 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` index.json +48 −0, outbox-row-written-alex-safety-recipient.json +22 −0, outbox-row-written-not-yet-no-recipient.json +22 −0, outbox-row-written-other-business-no-recipient.json +22 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-outbox-row-written-no-recipient.json +9 −0, refuse-outbox-row-written-other-business-recipient.json +9 −0, refuse-outbox-row-written-recipient-number.json +9 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row's recipientHandleId and sendClass, both null when not written (K-09 v1.10 open gap 147)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1391: README v1.16, the db/repo read's tests also show an email copy's and an outage line's stored recipient and class (gap 147's list)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 668. docs: COMMIT\_HISTORY.md through commit 666 (5c9ad62, \#677) (\#679)
 

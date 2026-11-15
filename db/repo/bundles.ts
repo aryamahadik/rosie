@@ -316,7 +316,11 @@ export async function readActiveBundle(sql: Sql | Tx): Promise<ReadActiveBundleR
       activatedAt: utc(row.activated_at),
     };
   } catch (error) {
-    return transientOrThrow(error, "readActiveBundle");
+    // A statement's own refusal and postgres.js's statement errors leave scrubbed too: the call's name and the code
+    // alone, never the statement's text or values (T-1405, as T-1322's; clocks.ts transientOrScrubbed, imported when a
+    // call fails, never when this file loads: see its top).
+    const { transientOrScrubbed } = await import("./clocks");
+    return transientOrScrubbed("readActiveBundle", error);
   }
 }
 
@@ -335,7 +339,11 @@ export async function readBundleValue(
     }
     return { result: "value", value: toStoredText(row) };
   } catch (error) {
-    return transientOrThrow(error, "readBundleValue");
+    // A statement's own refusal and postgres.js's statement errors leave scrubbed too: the call's name and the code
+    // alone, never the statement's text, values or key (T-1405, as T-1322's; clocks.ts transientOrScrubbed, imported
+    // when a call fails, never when this file loads: see its top).
+    const { transientOrScrubbed } = await import("./clocks");
+    return transientOrScrubbed("readBundleValue", error);
   }
 }
 
