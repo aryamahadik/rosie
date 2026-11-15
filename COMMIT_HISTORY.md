@@ -2,9 +2,70 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 661, [`63167fa`](https://github.com/aryamahadik/rosie/commit/63167fa), 2026-11-15 13:32:08 UTC.
+- **Through:** commit 664, [`af601fc`](https://github.com/aryamahadik/rosie/commit/af601fc), 2026-11-15 15:02:28 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 664. docs: COMMIT\_HISTORY.md through commit 661 (63167fa, \#672) (\#675)
+
+- **Commit:** [`af601fc`](https://github.com/aryamahadik/rosie/commit/af601fc), by Arya Mahadik, 2026-11-15 15:02:28 UTC
+- **Pull request:** [#675](https://github.com/aryamahadik/rosie/pull/675) from `task/commit-history-128`, merged 2026-11-15 15:02:28 UTC. It squashed 1 branch commit:
+  - `87dd993` docs: COMMIT\_HISTORY.md through commit 661 (63167fa, \#672)
+- **Files changed:** 1 (+38 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +38 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 220 (DL-818); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 663. T-1293: K-08's contract test covers v1.2: the two refused twins mended into event-session-started.json and event-session-ended.json (each hash twin's one fault trips the name rule and the value rule, each alone); each session kind's values held to K-22 v1's sessions columns as README default 27 gives them, one value of the column's type each (a token under another name, a device id, a nested value refused); no 64-hex string anywhere in a session row but its turn id and bundle hash; the README's v1.2 tables held to the schema and to K-22; SIDE\_CHECKS gains the C-152 and C-193 sides from 'Writers and readers (v1.2)' (\#674)
+
+- **Commit:** [`3f113a2`](https://github.com/aryamahadik/rosie/commit/3f113a2), by Arya Mahadik, 2026-11-15 15:02:24 UTC
+- **Pull request:** [#674](https://github.com/aryamahadik/rosie/pull/674) from `task/T-1293`, merged 2026-11-15 15:02:24 UTC. It squashed 1 branch commit:
+  - `2d7f48c` T-1293: K-08's contract test covers v1.2: the two refused twins mende…
+- **Files changed:** 1 (+577 −35), by folder:
+  - `tests/contract/` event-trace.v1.test.ts +577 −35
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 662. T-1266: a turn with a customer's tapback still releases its routine parts: only texts the safety read reads are named as not read (\#673)
+
+- **Commit:** [`bddb151`](https://github.com/aryamahadik/rosie/commit/bddb151), by Arya Mahadik, 2026-11-15 15:02:20 UTC
+- **Pull request:** [#673](https://github.com/aryamahadik/rosie/pull/673) from `task/T-1266`, merged 2026-11-15 15:02:20 UTC. It squashed 2 branch commits:
+  - `5554d10` T-1266: a test that shows the hold: Sam's text with its record and hi…
+  - `b7f7695` T-1266: the commit names to readOpenHolds only the turn's texts the s…
+- **Files changed:** 2 (+200 −7), by folder:
+  - `actions/src/tool-api/turn-face/` commit.test.ts +166 −0, commit.ts +34 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1266: a test that shows the hold: Sam's text with its record and his tapback commit with the routine part held, because the commit names the tapback among the texts not read (fails here by design, as the card's first step; the fix is the next commit)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1266: the commit names to readOpenHolds only the turn's texts the safety read reads: an event decide's texts name only as a tapback is left out, so a turn with a customer's tapback and every text recorded releases its routine parts; a real text with no record still holds them, and every other event, the runtime's unread ids and a core-only turn's events stay named (fail closed; default 4)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 661. docs: COMMIT\_HISTORY.md through commit 659 (b86335f, \#670) (\#672)
 
