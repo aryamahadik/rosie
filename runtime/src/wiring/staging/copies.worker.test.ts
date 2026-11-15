@@ -3,16 +3,16 @@
 // T-1253's rig (infra/test-rig/files.mjs, key COPIES): this file's own database, migrated, with bundle v0 active and the
 // rows ./copies.seed.ts writes (four of the five named fixtures exactly, read-stopped-flag-alex-started on a stand-in in
 // its shape, a stand-in of Alex's phone row before his STOP, and one live timer whose id copies.ts's isLabel refuses),
-// reached through its own pool pair only,
-// HYPERDRIVE_JOB_COPIES and HYPERDRIVE_APP_COPIES, handed in as the env's HYPERDRIVE_JOB and HYPERDRIVE_APP behind doubles
-// that count each read of a connection string. Each root here is built as the Worker's is (../root.ts workerRoot:
-// composeRoot over stagingOptions(env)), through the two seams stagingOptions names: its handle (./part.ts stagingDb), so
-// a test reads T-1254's counts and each call's timing line, and its builders, every part but this card's stood in by its
-// nothing-bound answer, so a test sees this card's binding alone whatever the other parts bind (DL-776). The one case
-// through workerRoot itself, every part's own builder with it, asserts on this card's own reads and answers alone. The
-// reload and the re-read are the actor's own (../../actor/copies/copies.ts ActorCopies refreshTimers and rereadStopped),
-// over a HANDLE_ACTOR instance's own storage (as ./options.worker.test.ts reaches one), with the root's install() setting
-// the copy deps. Every database call a test makes of its own goes through T-1254's handle too.
+// reached through its own pool pair only, HYPERDRIVE_JOB_COPIES and HYPERDRIVE_APP_COPIES, handed in as the env's
+// HYPERDRIVE_JOB and HYPERDRIVE_APP behind doubles that count each read of a connection string. Each root here is built
+// as the Worker's is (../root.ts workerRoot: composeRoot over stagingOptions(env)), through the two seams stagingOptions
+// names: its handle (./part.ts stagingDb), so a test reads T-1254's counts and each call's timing line, and its builders,
+// every part but this card's stood in by its nothing-bound answer, so a test sees this card's binding alone whatever the
+// other parts bind (DL-776). The one case through workerRoot itself, every part's own builder with it, asserts on this
+// card's own reads and answers alone. The reload and the re-read are the actor's own (../../actor/copies/copies.ts
+// ActorCopies refreshTimers and rereadStopped), over a HANDLE_ACTOR instance's own storage (as ./options.worker.test.ts
+// reaches one), with the root's install() setting the copy deps. Every database call a test makes of its own goes through
+// T-1254's handle too.
 //
 //   - the mapping on each fixture's own answer, as K-05 v1.12's binding line says (README "Consumers of v1.12"): each
 //     timer column by column from item 56's names to K-34's column names, the address as given; the flag as
