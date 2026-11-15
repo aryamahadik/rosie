@@ -259,7 +259,7 @@ const FLAG_CASES: readonly FlagCase[] = [
   {
     name: "read-stopped-flag-alex-started.json",
     handleId: STARTED.handleId,
-    answer: { ...ALEX_STARTED.outcome, handleId: STARTED.handleId } as ReadStoppedFlagOutcome,
+    answer: { ...ALEX_STARTED.outcome, handleId: STARTED.handleId },
     port: { result: "phone", stopped: false, phoneVersion: 5 },
     standIn: true,
   },
