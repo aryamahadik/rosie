@@ -2,9 +2,54 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 675, [`cf47ff2`](https://github.com/aryamahadik/rosie/commit/cf47ff2), 2026-11-15 17:46:54 UTC.
+- **Through:** commit 677, [`8b0a10d`](https://github.com/aryamahadik/rosie/commit/8b0a10d), 2026-11-15 18:27:31 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 677. docs: COMMIT\_HISTORY.md through commit 675 (cf47ff2, \#686) (\#688)
+
+- **Commit:** [`8b0a10d`](https://github.com/aryamahadik/rosie/commit/8b0a10d), by Arya Mahadik, 2026-11-15 18:27:31 UTC
+- **Pull request:** [#688](https://github.com/aryamahadik/rosie/pull/688) from `task/commit-history-133`, merged 2026-11-15 18:27:31 UTC. It squashed 1 branch commit:
+  - `c0b90bf` docs: COMMIT\_HISTORY.md through commit 675 (cf47ff2, \#686)
+- **Files changed:** 1 (+53 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +53 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 225 (DL-837); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 676. T-1365: a replay whose holdOnReturn throws keeps the core's hold id, so its hold can be released (\#687)
+
+- **Commit:** [`9ce25cd`](https://github.com/aryamahadik/rosie/commit/9ce25cd), by Arya Mahadik, 2026-11-15 18:27:26 UTC
+- **Pull request:** [#687](https://github.com/aryamahadik/rosie/pull/687) from `task/T-1365`, merged 2026-11-15 18:27:27 UTC. It squashed 2 branch commits:
+  - `322654e` T-1365: a replay whose write of the core's hold throws keeps that hol…
+  - `e9e52db` T-1365: holdOnReturn's comment no longer says a read that throws writ…
+- **Files changed:** 2 (+277 −25), by folder:
+  - `runtime/src/safety/` arrival.ts +103 −19, hold.worker.test.ts +174 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1365: a replay whose write of the core's hold throws keeps that hold (safety_core_holds), so the hold the actor writes later carries the core's id, never looser; a replay whose read threw lands the id on a hold that has none; a hold neither written nor kept leaves the record queued (notBack) for the core's repeated answer
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1365: holdOnReturn's comment no longer says a read that throws writes nothing (it keeps the core's hold and may land its id)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 675. docs: COMMIT\_HISTORY.md through commit 672 (c244c38, \#683) (\#686)
 
