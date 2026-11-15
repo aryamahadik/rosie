@@ -851,7 +851,7 @@ function portCalls(root: Root, bundleId: BundleId): readonly (readonly [string, 
   ];
 }
 
-/** Each of the three factories, by its reader's name, with the bundle parts its build reads. */
+/** Each of the three factories staging bound, by its reader's name, called as its port calls it. */
 function factoriesOf(
   inputs: ModelReaderInputs,
 ): readonly (readonly ["safetyRead" | "decide" | "composer", (bundleId: BundleId) => Promise<unknown>])[] {
