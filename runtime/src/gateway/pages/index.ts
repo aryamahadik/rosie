@@ -19,7 +19,7 @@ export {
 } from "./calls";
 export { PAGE_ERRORS, UNKNOWN_PAGE_ERROR, isPageError, type PageErrorName } from "./errors";
 export { PageNotConnectedError, STAGING_ONLY_OUTCOME, handlePageCall } from "./entry";
-export type { PageDeps, PageHandler, PageHandlers, PageOutcome, PageRequest } from "./types";
+export type { PageCallContext, PageDeps, PageHandler, PageHandlers, PageOutcome, PageRequest } from "./types";
 
 /**
  * The handler stubs until the action layer's page entry (C-074) joins each call: every one answers by failing, so its

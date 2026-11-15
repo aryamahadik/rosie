@@ -345,3 +345,40 @@ describe("every span the page entry writes is a K-08 v1 span", () => {
     });
   });
 });
+
+describe("the request's waitUntil reaches the handler (T-1289; ADR-016 section 2)", () => {
+  it("with the request's execution context, the handler is handed its waitUntil, called on that context; with none, no waitUntil", async () => {
+    captureLogLines();
+    const kept: { context: unknown; work: Promise<unknown> }[] = [];
+    const context = {
+      waitUntil(this: unknown, work: Promise<unknown>): void {
+        kept.push({ context: this, work });
+      },
+    };
+    const work = Promise.resolve("t1289-after-the-answer");
+    const given: (((work: Promise<unknown>) => void) | undefined)[] = [];
+    const stubs = recordingPages((page) => {
+      given.push(page.waitUntil);
+      page.waitUntil?.(work);
+      return Promise.resolve({ result: "stub" });
+    });
+
+    const withContext = await handlePageCall(
+      pagePost(pagePathOf("signInStart"), REQUEST),
+      "signInStart",
+      depsWith(stubs.handlers),
+      STAGING,
+      context,
+    );
+    const without = await handlePageCall(
+      pagePost(pagePathOf("signInStart"), REQUEST),
+      "signInStart",
+      depsWith(stubs.handlers),
+      STAGING,
+    );
+
+    expect([withContext.status, without.status]).toEqual([200, 200]);
+    expect(given.map((each) => typeof each)).toEqual(["function", "undefined"]);
+    expect(kept).toEqual([{ context, work }]);
+  });
+});

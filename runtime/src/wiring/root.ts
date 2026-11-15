@@ -31,7 +31,10 @@
 //     receipt's own;
 //   - the gateway's page entry (T-266): on staging, when the root is handed their inputs, the test-phone page's two calls
 //     (T-1186, ./test-phone), T-565's handlers over the session, roster and phone reads and staging's test-phone line,
-//     which posts through the Linq route above; every other page call stays unconfigured (503).
+//     which posts through the Linq route above; and the three sign-in calls (T-1289, ./sign-in.ts; ADR-016 card D),
+//     T-1282's and T-1285's handlers over K-05's sign-in calls and the hashing port, whose code's send wakes the
+//     dispatcher once for the code row's recipient after the answer, in the request's waitUntil (ADR-016 section 2);
+//     every other page call stays unconfigured (503).
 //
 // The Worker (runtime/src/index.ts) takes its gateway from `workerRoot(env)`: the real set (./real.ts, what the joins
 // have bound: the Linq verify reading LINQ_WEBHOOK_SECRET by name; the ports K-05's calls feed, which no database client
@@ -122,7 +125,7 @@ import type { ClaimedRow } from "../dispatch/types";
 import type { EmailRowsDeps } from "../email";
 import { durableObjectActor, type HandleActorRpc } from "../gateway/actor-door";
 import { readBundleId, type WebhookEnvironment } from "../gateway/answer";
-import { unconfiguredPages } from "../gateway/pages";
+import { unconfiguredPages, type PageHandlers } from "../gateway/pages";
 import type { ActorHandoff, ActorStub, GatewayDeps, ReceiptSink } from "../gateway/types";
 import { setGuardDeps } from "../guard/targets";
 import { setDbOutageDeps, type DbOutageDeps } from "../outage/db";
@@ -172,6 +175,7 @@ import {
   type TurnRowCalls,
 } from "./real";
 import { RowTraces } from "./row-traces";
+import { signInPages, type SignInInputs } from "./sign-in";
 import { skeletonLinqRoute, type ReleaseFlags } from "./skeleton";
 // The file itself, never ./staging's index, which holds T-1254's handle (cloudflare:sockets): this graph loads under Node.
 import { stagingOptions } from "./staging/options";
@@ -394,6 +398,14 @@ export interface RootOptions {
    * as {...unconfiguredPages(), testPhoneSend, testPhoneParts}; left out or null, every page call stays unconfigured.
    */
   readonly testPhone?: TestPhoneInputs | null;
+  /**
+   * What the three sign-in calls reach (T-1289; ADR-016 card D; ./sign-in.ts): K-05 v1.13's sign-in calls with their
+   * database bound on each side's client, the hashing port over PROOF_CODE_HASH_KEY (read by name at each call) and the
+   * code row's recipient read. Bound into the gateway's page entry only where ENVIRONMENT is staging, beside the
+   * test-phone calls; a code's send then wakes the dispatcher once for the row's recipient, after the answer. Left out or
+   * null (production, until journey 1's flag: ADR-016 open point 9), the three calls stay unconfigured (503).
+   */
+  readonly signIn?: SignInInputs | null;
   /**
    * What the actor's copies reach outside the actor (../actor/copies/types.ts CopyDeps: the live safety timers' reload and
    * the stopped flag's re-read), which `install()` sets for the isolate with the actor's other ports (`setCopyDeps`):
@@ -627,6 +639,23 @@ export function composeRoot(options: RootOptions): Root {
     await runDispatch(dispatchDeps(traceFor), { recipientHandleId: request.handleId, sendClass: "safety" });
   };
 
+  // The sign-in code's own wake (T-1289; ADR-016 section 2): once sendSignInCode has committed the code's email row, one
+  // claim-and-send run for the row's recipient on the same ports, as a turn's wake makes it, in the page call's
+  // waitUntil (./sign-in.ts). The code row carries the page call's trace id, so it goes on that call's trace; a row this
+  // isolate sent before keeps the trace it went on; any other row the claim hands on goes on a trace opened under its own
+  // trace id, as the outage lines' wake does. A claim that fails is not reported here: the row waits for the recipient's
+  // next run, where limit 8 withdraws it once its notAfter has passed.
+  const signInWake = async (recipientHandleId: string, trace: TraceContext): Promise<void> => {
+    const traceFor = (row: ClaimedRow): TraceContext => {
+      const kept =
+        rowTraces.forRow(row.outboxRowId) ??
+        (row.traceId.toLowerCase() === trace.traceId ? trace : rowTraceOf(row, trace.bundleId, log, now));
+      rowTraces.keep(row.outboxRowId, kept);
+      return kept;
+    };
+    await runDispatch(dispatchDeps(traceFor), { recipientHandleId });
+  };
+
   // The retry queue's door to the dispatcher (T-258's dispatchSendDoor; DL-315): a due send job runs its recipient's rows
   // again with the same ports, each claimed row on the trace this isolate sent it on, else on a trace opened under the
   // row's own trace id (one trace id from the webhook to the delivery receipt), with the active bundle id read once for
@@ -758,7 +787,24 @@ export function composeRoot(options: RootOptions): Root {
   const linqWebhook = (request: Request): Promise<Response> =>
     skeletonLinqRoute(request, { gateway, flags, where });
   const testPhone = options.testPhone ?? null;
+  const signIn = options.signIn ?? null;
   const copies = options.copies ?? null;
+  const onStaging = options.vars.ENVIRONMENT === "staging";
+
+  // The page calls the root joins, on staging only: the test-phone page's two (T-1186), which anywhere else the page
+  // entry refuses first; and the three sign-in calls (T-1289), which anywhere else stay unconfigured. Every other call
+  // stays unconfigured (503).
+  const joinedPages: Partial<PageHandlers> = {
+    ...(testPhone !== null && onStaging
+      ? testPhonePages({
+          inputs: testPhone,
+          webhookSecret: () => options.linq?.webhookSecret(),
+          linqWebhook,
+          now,
+        })
+      : {}),
+    ...(signIn !== null && onStaging ? signInPages({ inputs: signIn, wake: signInWake, log }) : {}),
+  };
 
   const gateway: GatewayDeps = {
     linq: ports.linqVerify,
@@ -769,20 +815,7 @@ export function composeRoot(options: RootOptions): Root {
     chats: ports.chatOpen,
     bundleId: () => activeBundleId(ports.bundles.registry),
     now,
-    // The test-phone page's two calls, on staging only (T-1186): anywhere else the page entry refuses them first.
-    ...(testPhone !== null && options.vars.ENVIRONMENT === "staging"
-      ? {
-          pages: {
-            ...unconfiguredPages(),
-            ...testPhonePages({
-              inputs: testPhone,
-              webhookSecret: () => options.linq?.webhookSecret(),
-              linqWebhook,
-              now,
-            }),
-          },
-        }
-      : {}),
+    ...(Object.keys(joinedPages).length === 0 ? {} : { pages: { ...unconfiguredPages(), ...joinedPages } }),
   };
 
   return {
@@ -873,6 +906,13 @@ export interface WorkerSecrets {
    * staging's email port and T-419's adapter alike (readTestInboxes); missing, every email goes to the test-phone line.
    */
   readonly STAGING_TEST_INBOXES?: string;
+  /**
+   * The key a sign-in code's and a typed contact's keyed hash are made under (ADR-016 section 4; K-22 v1
+   * proof_codes.hash_key_name), 32 random bytes as base64, made in place on staging (ADR-016 card G): read by name at
+   * each signInStart and signInCheck by staging's hashing port (./staging/sign-in.ts, T-1289); missing, both answer 503
+   * with nothing written or counted.
+   */
+  readonly PROOF_CODE_HASH_KEY?: string;
 }
 
 /**
@@ -884,11 +924,11 @@ export interface WorkerSecrets {
  * each null until that part binds it. While an input is null its port fails closed as before: every seal fails and the
  * gateway answers 503 with nothing written, no turn's bundle is pinned, no frontier runs, no safety read, decide or
  * compose reaches a model, nothing commits, no row is composed, finalized or sent, nothing is armed, the test-phone
- * page's calls stay unconfigured, the copies' sources stay unwired, and with no release flags handed in (until T-1393
- * binds T-185's flag read, DL-356) the skeleton flag reads off and `linqWebhook` answers 404. The gateway's door to the
- * handle's actor is the HANDLE_ACTOR binding where the environment has one (T-553; env.staging has it since T-566). One
- * root per env object, so its memories (rows' traces, armed parts) and its database handle's counts last as long as the
- * isolate does.
+ * page's calls and the sign-in calls stay unconfigured, the copies' sources stay unwired, and with no release flags
+ * handed in (until T-1393 binds T-185's flag read, DL-356) the skeleton flag reads off and `linqWebhook` answers 404.
+ * The gateway's door to the handle's actor is the HANDLE_ACTOR binding where the environment has one (T-553;
+ * env.staging has it since T-566). One root per env object, so its memories (rows' traces, armed parts) and its
+ * database handle's counts last as long as the isolate does.
  */
 export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
   const known = workerRoots.get(env);

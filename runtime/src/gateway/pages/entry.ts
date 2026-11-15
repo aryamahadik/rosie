@@ -11,9 +11,11 @@
 //   3. The body is read under its cap (T-1180; ../body.ts; PageDeps.bodyLimitBytes, PAGE_BODY_LIMIT_BYTES by default): a
 //      body over it is answered 413 before it is read whole, and no handler runs. Then it must be one JSON object, or the
 //      answer is 400 and no handler runs. The gateway checks nothing else in it: the contract's checks are the handler's.
-//   4. The call's handler gets the request, the trace and the environment. Its outcome, a response or one of the call's
-//      errors, is sent as it is with 200. A handler that throws, or answers anything but an object JSON can send, gives
-//      503 with no outcome, and the web app may send the call again (each K-21 call is safe to repeat by its own rule).
+//   4. The call's handler gets the request, the trace and the environment, and the request's waitUntil when the Worker
+//      handed in its execution context (T-1289; ADR-016 section 2: work a handler hands on after its answer runs there).
+//      Its outcome, a response or one of the call's errors, is sent as it is with 200. A handler that throws, or answers
+//      anything but an object JSON can send, gives 503 with no outcome, and the web app may send the call again (each
+//      K-21 call is safe to repeat by its own rule).
 //
 // Every answer is JSON with the trace id in x-trace-id, never cached. A 200 carries the call's K-21 outcome and nothing
 // else, so the answers stay the contract's (the mock's, C-186); every other status is the edge's own answer, JSON
@@ -31,7 +33,7 @@ import { DEFAULT_BUNDLE_ID, readBundleId, respond, type WebhookEnvironment } fro
 import { PAGE_BODY_LIMIT_BYTES, bodyLimitOf, readCappedText } from "../body";
 import { isStagingOnly, type PageCallName } from "./calls";
 import { UNKNOWN_PAGE_ERROR, isPageError } from "./errors";
-import type { PageDeps, PageOutcome } from "./types";
+import type { PageCallContext, PageDeps, PageOutcome } from "./types";
 
 /** K-21's answer to a staging-only call anywhere but staging (K-21 v1 `$defs/stagingOnlyError`). */
 export const STAGING_ONLY_OUTCOME: PageOutcome = Object.freeze({ error: "stagingOnly" });
@@ -77,18 +79,22 @@ const EDGE_ERRORS = {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** Handles one page or console call at its route. The caller has checked the method (POST). */
+/**
+ * Handles one page or console call at its route. The caller has checked the method (POST). `context`, when given, is
+ * the request's execution context, whose waitUntil the handler is handed (PageRequest.waitUntil).
+ */
 export async function handlePageCall(
   request: Request,
   call: PageCallName,
   deps: PageDeps,
   where: WebhookEnvironment,
+  context?: PageCallContext,
 ): Promise<Response> {
   const bundleId = await readBundleId(deps);
   const trace = openPageTrace(deps, bundleId, where, request.headers.get("x-trace-id"));
   const timing = trace.start("pageRequest");
 
-  const ending = await answerOf(request, call, deps, where, trace);
+  const ending = await answerOf(request, call, deps, where, trace, context);
 
   try {
     timing.finish({
@@ -116,6 +122,7 @@ async function answerOf(
   deps: PageDeps,
   where: WebhookEnvironment,
   trace: TraceContext,
+  context: PageCallContext | undefined,
 ): Promise<Ending> {
   if (isStagingOnly(call) && where.environment !== STAGING) {
     return {
@@ -144,6 +151,14 @@ async function answerOf(
       request: body.request,
       trace,
       environment: where.environment,
+      // The request's own waitUntil, called on its context (a Workers method is never called detached).
+      ...(context === undefined
+        ? {}
+        : {
+            waitUntil: (work: Promise<unknown>) => {
+              context.waitUntil(work);
+            },
+          }),
     });
   } catch (error) {
     logPageFailure(trace.traceId, "pageHandler", error);
