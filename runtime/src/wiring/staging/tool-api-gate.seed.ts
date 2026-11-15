@@ -105,12 +105,15 @@ const OWNER_EMAIL_ROWS = rowsOf(seedOwnerIdUpload).filter(
   (row) => row.table === "handles" || row.table === "person_handles",
 );
 
+const EMAIL_HANDLE = need(
+  OWNER_EMAIL_ROWS.find((row) => row.table === "handles"),
+  "K-22's email handle",
+);
+
 /** Sam's email handle, K-22 seed-owner-id-upload.json's own (its address is the fixture's made-up one). */
 export const SAM_EMAIL = {
-  handleId: String(need(OWNER_EMAIL_ROWS.find((row) => row.table === "handles"), "K-22's email handle").values.id),
-  address: String(
-    need(OWNER_EMAIL_ROWS.find((row) => row.table === "handles"), "K-22's email handle").values.address,
-  ),
+  handleId: String(EMAIL_HANDLE.values.id),
+  address: String(EMAIL_HANDLE.values.address),
 } as const;
 
 /** One row as its fixture gives it, written only when its key is free. */

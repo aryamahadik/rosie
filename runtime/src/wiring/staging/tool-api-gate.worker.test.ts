@@ -292,7 +292,8 @@ function rootOn(testEnv: TestEnv, db: StagingDb, written: Json[]): Rooted {
   const inputs = stagingOptions(testEnv.env, { db, builders: OFF_THE_GATE_PATH });
   const root = composeRoot({ environment: "staging", actors: null, vars: testEnv.env, ...inputs });
   const { gateReads, bundleSafety } = inputs;
-  if (gateReads === null || bundleSafety === null) throw new Error("the gate's path is bound on this file's pair");
+  if (gateReads === null || bundleSafety === null)
+    throw new Error("the gate's path is bound on this file's pair");
   return { root, db, inputs, written, gate: gateReads, adapter: bundleSafety };
 }
 
@@ -434,7 +435,8 @@ function expectNothingOf(binding: { readonly connectionString: string }, texts: 
   const parts = placeOf(binding);
   expect(parts.length).toBeGreaterThanOrEqual(5);
   for (const text of texts) {
-    for (const part of parts) expect(holds(text, part), "a text holds a part of the binding's string").toBe(false);
+    for (const part of parts)
+      expect(holds(text, part), "a text holds a part of the binding's string").toBe(false);
   }
 }
 
@@ -591,7 +593,10 @@ async function committedFirstText(who: FirstTexter, turnId: string): Promise<Jso
     committedAt: expect.stringMatching(UTC_INSTANT) as string,
     written: {
       ...outcome.written,
-      outboxRows: outcome.written.outboxRows.map((row) => ({ ...row, commitSeq: expect.any(Number) as number })),
+      outboxRows: outcome.written.outboxRows.map((row) => ({
+        ...row,
+        commitSeq: expect.any(Number) as number,
+      })),
     },
   };
 }
@@ -634,7 +639,13 @@ async function firstTextStored(who: FirstTexter, turnId: string, traceId: string
       trace_id: traceId,
       ...V0,
     },
-    thread: { handle_id: who.handleId, kind: "chat", booking_id: null, linq_chat_id: who.chatId, reply_address: null },
+    thread: {
+      handle_id: who.handleId,
+      kind: "chat",
+      booking_id: null,
+      linq_chat_id: who.chatId,
+      reply_address: null,
+    },
     question: {
       status: "waiting",
       step: "S1-02",
@@ -762,9 +773,9 @@ const NUMBER_FORMS = [SAM, ...SIDE_BY_SIDE, ...SIX_AT_ONCE, NO_WRAP_KEY, NO_KEY]
 
 /** The words a text, a read or a seal holds here, and the fixed lines' words bundle v0 holds. */
 const WORDS = [
-  ...(S1_01.request.input as { decided: { context: { texts: { words: string }[] } } }).decided.context.texts.map(
-    (text) => text.words,
-  ),
+  ...(
+    S1_01.request.input as { decided: { context: { texts: { words: string }[] } } }
+  ).decided.context.texts.map((text) => text.words),
   ...safetyBusinessOwnLine.read.labels.map((label) => label.evidence),
   "t1398 words to seal",
   ...["safetyAsk", "safetyEmergency", "safetyCrisis", "outage"].map((id) => bundleV0FixedLine(id)),
@@ -773,7 +784,8 @@ const WORDS = [
 /** The sealed values read back in this file's tests, as base64 and hex: none may reach a line. */
 const SEALED: string[] = [];
 
-const hexOf = (bytes: Uint8Array): string => [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+const hexOf = (bytes: Uint8Array): string =>
+  [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 const base64Of = (bytes: Uint8Array): string => btoa(String.fromCharCode(...bytes));
 
 /** No text holds a word, a number, the address, the wrapping key, a chat id or a sealed value. */
@@ -812,7 +824,10 @@ describe("this file's database: the walking skeleton's rows, the made-up key's r
         select id, send_class from outbox_rows where turn_id = ${ASK_RECORD.turnId}
       `,
     }));
-    const keyed = [SAM.personId, ...[...SIDE_BY_SIDE, ...SIX_AT_ONCE, NO_WRAP_KEY].map((each) => each.personId)];
+    const keyed = [
+      SAM.personId,
+      ...[...SIDE_BY_SIDE, ...SIX_AT_ONCE, NO_WRAP_KEY].map((each) => each.personId),
+    ];
     expect(stored.keys).toEqual(
       keyed.sort().map((personId) => ({ person_id: personId, wrapping_key_name: WRAP_KEY_NAME })),
     );
@@ -820,8 +835,18 @@ describe("this file's database: the walking skeleton's rows, the made-up key's r
     // T-1148's Sam: no role, so turn 1 is a first text.
     expect(stored.samRoles).toEqual([]);
     expect(stored.records).toEqual([
-      { event_id: ASK_RECORD.eventId, business_id: BARBERSHOP, outcomes: [ASK_RECORD.outcome], tenses: ["unknown"] },
-      { event_id: OTHER_BUSINESS_RECORD.eventId, business_id: YOGA_STUDIO, outcomes: ["No"], tenses: ["now"] },
+      {
+        event_id: ASK_RECORD.eventId,
+        business_id: BARBERSHOP,
+        outcomes: [ASK_RECORD.outcome],
+        tenses: ["unknown"],
+      },
+      {
+        event_id: OTHER_BUSINESS_RECORD.eventId,
+        business_id: YOGA_STUDIO,
+        outcomes: ["No"],
+        tenses: ["now"],
+      },
     ]);
     expect(stored.lineRow).toEqual([
       { id: await KEYED_SAFETY_IDS.rowId("line", ASK_RECORD.eventId), send_class: "safety" },
@@ -842,13 +867,24 @@ describe("built on staging: the five pieces, and nothing read but the environmen
       dangerWords: () => [],
       checkPin: () => Promise.resolve(),
     };
-    const part: GatePart = { env: testEnv.env, db, keys: sealingWrapKeys(testEnv.env), bundleSafety: adapter };
+    const part: GatePart = {
+      env: testEnv.env,
+      db,
+      keys: sealingWrapKeys(testEnv.env),
+      bundleSafety: adapter,
+    };
 
     const reads = stagingGateReads(part);
 
     expect(testEnv.names).toEqual(["ENVIRONMENT", "HYPERDRIVE_JOB", "HYPERDRIVE_APP"]);
     expect([testEnv.job?.reads.n, testEnv.app?.reads.n]).toEqual([0, 0]);
-    expect(Object.keys(reads ?? {}).sort()).toEqual(["readOpenHolds", "safetyReads", "scope", "sealer", "words"]);
+    expect(Object.keys(reads ?? {}).sort()).toEqual([
+      "readOpenHolds",
+      "safetyReads",
+      "scope",
+      "sealer",
+      "words",
+    ]);
     expect(Object.keys(reads?.safetyReads ?? {}).sort()).toEqual([
       "businessOwner",
       "businessZone",
@@ -917,7 +953,12 @@ describe("built on staging: the five pieces, and nothing read but the environmen
     ]) {
       const testEnv = envOf(bindings);
       const db = handleOver(testEnv.env, []);
-      const reads = stagingGateReads({ env: testEnv.env, db, keys: sealingWrapKeys(testEnv.env), bundleSafety: null });
+      const reads = stagingGateReads({
+        env: testEnv.env,
+        db,
+        keys: sealingWrapKeys(testEnv.env),
+        bundleSafety: null,
+      });
       expect(reads, JSON.stringify(bindings)).toBeNull();
       expect(testEnv.names).toEqual(["ENVIRONMENT", "HYPERDRIVE_JOB", "HYPERDRIVE_APP"]);
       expect([testEnv.job?.reads.n ?? 0, testEnv.app?.reads.n ?? 0]).toEqual([0, 0]);
@@ -938,7 +979,10 @@ describe("the reads as their K-05 fixtures, before turn 1 commits", () => {
       `;
       return {
         who,
-        outcome: await gate.safetyReads.outcomeOfEvent(repo, structuredClone(readSafetyOutcomeOfEventS101.request)),
+        outcome: await gate.safetyReads.outcomeOfEvent(
+          repo,
+          structuredClone(readSafetyOutcomeOfEventS101.request),
+        ),
         zone: await gate.safetyReads.businessZone(repo, structuredClone(businessZoneBarbershop.request)),
         open: await gate.readOpenHolds(repo, {
           handleId: SAM.handleId,
@@ -955,7 +999,10 @@ describe("the reads as their K-05 fixtures, before turn 1 commits", () => {
       ...readSafetyOutcomeOfEventS101.outcome,
       readAt: expect.stringMatching(UTC_INSTANT) as string,
     });
-    expect(read.zone).toEqual({ ...businessZoneBarbershop.outcome, readAt: expect.stringMatching(UTC_INSTANT) as string });
+    expect(read.zone).toEqual({
+      ...businessZoneBarbershop.outcome,
+      readAt: expect.stringMatching(UTC_INSTANT) as string,
+    });
     // A text with no record is named to readOpenHolds and listed unread (ADR-015 line 113).
     expect(read.open).toEqual({
       result: "openHolds",
@@ -1079,7 +1126,11 @@ describe("turn 1's gate: K-09 v1.5 commit-s1-01.json's request commits once, thr
       // ADR-014 line 198: the commit's current_user is the login its client's guard read, rosie_worker_job.
       expect(gateLines.at(-1)?.login).toBe("rosie_worker_job");
       const counts = rooted.db.counts();
-      expect(counts).toMatchObject({ opened: rooted.written.length, ended: rooted.written.length, connectionsOpen: 0 });
+      expect(counts).toMatchObject({
+        opened: rooted.written.length,
+        ended: rooted.written.length,
+        connectionsOpen: 0,
+      });
       expect(counts.connectionsPeak).toBe(2 * CONNECTIONS_PER_CLIENT);
 
       // The same turn id again: K-05 answers the first commit, repeated, and nothing is written.
@@ -1117,7 +1168,10 @@ describe("after turn 1: another business's scope, a text whose outcome another b
   it("so every routine part is held: a gate whose text's outcome the yoga studio holds, its record not riding in the commit, answers its one part held (no limit checked) and writes its turn row alone", async () => {
     const before = await rowCounts();
     const { root } = rootOver(envOf());
-    const call = await firstTextGate({ ...TURN_ONE, eventId: OTHER_BUSINESS_RECORD.eventId }, { record: false });
+    const call = await firstTextGate(
+      { ...TURN_ONE, eventId: OTHER_BUSINESS_RECORD.eventId },
+      { record: false },
+    );
 
     const answer = await gateOn(root, call);
 
@@ -1248,7 +1302,11 @@ describe("gates side by side (the audit's two rows composed side by side; critic
       ]);
 
       const counts = rooted.db.counts();
-      expect(counts).toMatchObject({ opened: rooted.written.length, ended: rooted.written.length, connectionsOpen: 0 });
+      expect(counts).toMatchObject({
+        opened: rooted.written.length,
+        ended: rooted.written.length,
+        connectionsOpen: 0,
+      });
       expect(counts.connectionsPeak).toBe(2 * 2 * CONNECTIONS_PER_CLIENT);
       expect(counts.connectionsPeak).toBeLessThanOrEqual(WORKER_CONNECTIONS);
       await expectCountsAfter(
@@ -1287,7 +1345,11 @@ describe("gates side by side (the audit's two rows composed side by side; critic
       }
       expect(wrapper.toolApiPeak()).toBe(GATE_CLIENTS_AT_ONCE);
       const counts = rooted.db.counts();
-      expect(counts).toMatchObject({ opened: rooted.written.length, ended: rooted.written.length, connectionsOpen: 0 });
+      expect(counts).toMatchObject({
+        opened: rooted.written.length,
+        ended: rooted.written.length,
+        connectionsOpen: 0,
+      });
       expect(counts.connectionsPeak).toBeLessThanOrEqual(WORKER_CONNECTIONS);
       const sides = callsOf(rooted.written);
       expect(sides.filter(([name]) => name === GATE_CALLS.scope)).toHaveLength(SIX_AT_ONCE.length);
@@ -1341,7 +1403,9 @@ describe("failing closed: every gate fails inside the Tool API base, nothing wri
 
     expect(thrown).toBeInstanceOf(DataAccessDatabaseError);
     expect(thrown).toMatchObject({ call: GATE_CALLS.scope, code: "3D000", table: null, constraint: null });
-    expect((thrown as Error).message).toBe(`${GATE_CALLS.scope}: the database refused the call (SQLSTATE 3D000)`);
+    expect((thrown as Error).message).toBe(
+      `${GATE_CALLS.scope}: the database refused the call (SQLSTATE 3D000)`,
+    );
     expect(Object.keys(thrown as Error).sort()).toEqual(["call", "code", "constraint", "name", "table"]);
     for (const name of [POOL_APP, POOL_JOB, APP, JOB]) expectNothingOf(poolBinding(name), textsOf(thrown));
     // The guard never passed: no call was timed; the one client opened was ended.
@@ -1384,7 +1448,9 @@ describe("in production's environment the part builds nothing and reads no bindi
 
       const alone = envOf({ environment });
       const db = handleOver(alone.env, []);
-      expect(stagingGateReads({ env: alone.env, db, keys: sealingWrapKeys(alone.env), bundleSafety: null })).toBeNull();
+      expect(
+        stagingGateReads({ env: alone.env, db, keys: sealingWrapKeys(alone.env), bundleSafety: null }),
+      ).toBeNull();
       expect(alone.names, environment).toEqual(["ENVIRONMENT"]);
     }
 
@@ -1404,7 +1470,9 @@ describe("the span and log capture", () => {
   it("no line written while this file ran holds a text's words, a number, an address, the wrapping key, a sealed value, a chat id or a fixed line's words, and no rejection was left unhandled", async () => {
     // The capture is not empty: every call's timing line is in it.
     expect(turnOne).not.toBeNull();
-    const kinds = new Set(everyLine.flatMap((line) => (line.startsWith("{") ? [String(parsed(line).msg)] : [])));
+    const kinds = new Set(
+      everyLine.flatMap((line) => (line.startsWith("{") ? [String(parsed(line).msg)] : [])),
+    );
     expect([...kinds]).toEqual(expect.arrayContaining(["dbCall"]));
     expect(SEALED.length).toBeGreaterThanOrEqual(2);
     expectNoSecrets([...everyLine, ...SPANS.map((span) => JSON.stringify(span))]);
