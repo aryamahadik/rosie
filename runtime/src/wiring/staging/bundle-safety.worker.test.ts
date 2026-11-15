@@ -58,9 +58,14 @@ import {
   type SeedBundle,
   type SeedBundleName,
 } from "./bundle-safety.seed";
+import { NO_RECEIPT_INPUTS } from "./k05-receipt";
 import { NO_TURN_CALL_INPUTS } from "./k05-turn";
-import { NO_STAGING_INPUTS, stagingOptions } from "./options";
+import { NO_MODEL_READER_INPUTS } from "./models";
+import { NO_STAGING_INPUTS, stagingOptions, type StagingBuilders } from "./options";
 import { stagingDb, type StagingDb, type StagingEnv } from "./part";
+import { NO_SEND_INPUTS } from "./send";
+import { NO_DIRECTORY_INPUTS } from "./state-reads";
+import { NO_ROW_INPUTS } from "./tool-api-rows";
 
 type Json = Record<string, unknown>;
 
@@ -1272,6 +1277,24 @@ function countingEnv(environment: string): { env: StagingEnv; reads: string[]; k
   return { env: env as unknown as StagingEnv, reads, kvGets };
 }
 
+/**
+ * Every part but this card's, the turn's and the gate's, stood in by its nothing-bound answer (each stub's own, as T-1257
+ * made it; ./k05-turn.worker.test.ts stands the others in the same way), so inputs built with these show this card's
+ * binding alone, whatever the other parts read or bind as their cards land (DL-768: T-1393's flags part reads ENVIRONMENT
+ * and HYPERDRIVE_JOB's presence at build). The adapter's own builder is left out, so it is the real one; a case names the
+ * turn's and the gate's stand-ins itself.
+ */
+const EVERY_OTHER_PART_UNBOUND: Partial<StagingBuilders> = {
+  receipt: () => NO_RECEIPT_INPUTS,
+  models: () => NO_MODEL_READER_INPUTS,
+  rows: () => NO_ROW_INPUTS,
+  directories: () => NO_DIRECTORY_INPUTS,
+  send: () => NO_SEND_INPUTS,
+  flags: () => null,
+  testPhone: () => null,
+  copies: () => null,
+};
+
 describe("stagingOptions and the one adapter", () => {
   it("production builds none: stagingOptions reads ENVIRONMENT alone (0 binding reads), runs no builder and hands bundleSafety null", () => {
     for (const environment of ["production", "", "Staging", "preview"]) {
@@ -1305,6 +1328,7 @@ describe("stagingOptions and the one adapter", () => {
 
     const inputs = stagingOptions(env, {
       builders: {
+        ...EVERY_OTHER_PART_UNBOUND,
         turn: () => ({ ...NO_TURN_CALL_INPUTS, bundleReads: turn.calls }),
         gate: (part) => {
           handed.gate = part.bundleSafety;
