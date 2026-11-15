@@ -24,6 +24,21 @@ export interface PageRequest {
   readonly trace: TraceContext;
   /** Where the Worker runs: its ENVIRONMENT ("staging" on staging). */
   readonly environment: string;
+  /**
+   * The request's waitUntil, where the Worker handed the page entry the request's execution context (T-1289; ADR-016
+   * section 2): work a handler hands on to run after its answer (a sign-in code's send and its dispatch, a check's
+   * entries) is kept alive past the answer by it. Left out where no context was handed in (a call with none: a test's),
+   * and then such work runs with nothing keeping it alive.
+   */
+  readonly waitUntil?: (work: Promise<unknown>) => void;
+}
+
+/**
+ * The request's execution context as the page entry takes it (T-1289): its waitUntil alone. The Workers runtime's
+ * ExecutionContext is one.
+ */
+export interface PageCallContext {
+  waitUntil(work: Promise<unknown>): void;
 }
 
 /**

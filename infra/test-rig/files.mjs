@@ -97,6 +97,12 @@ export const RIG_FILES = Object.freeze([
     test: "runtime/src/wiring/staging/copies.worker.test.ts",
     seed: "runtime/src/wiring/staging/copies.seed.ts",
   },
+  // ADR-016 card D (T-1289): RootOptions.signIn, the sign-in calls on staging.
+  {
+    key: "SIGN_IN",
+    test: "runtime/src/wiring/staging/sign-in.worker.test.ts",
+    seed: "runtime/src/wiring/staging/sign-in.seed.ts",
+  },
 ]);
 
 // ADR-014 section 2's wrong logins, for T-1254's file only (the guard's refusals, piece 6), each behind a pool binding

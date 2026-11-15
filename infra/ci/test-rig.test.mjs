@@ -146,7 +146,8 @@ describe("local-url.mjs: one DATABASE_URL to a login's local string", () => {
 describe("files.mjs: the named files, up front", () => {
   it("names the rig's own file, T-1254's, and each W5 and W6 part's file at the audit's path, with a seed beside each", () => {
     // order_d017.txt lines 29 to 49: P1a db (T-1254), P1c flags, P2a k05-receipt, P2b k05-turn, P3a models, P3b
-    // bundle-safety, P4a tool-api-gate, P4b tool-api-rows, SR state-reads, P6b test-phone (T-1305), P5 send, P6c copies (T-1306).
+    // bundle-safety, P4a tool-api-gate, P4b tool-api-rows, SR state-reads, P6b test-phone (T-1305), P5 send, P6c copies (T-1306);
+    // then ADR-016 card D's sign-in (T-1289).
     const parts = [
       ["DB", "db"],
       ["FLAGS", "flags"],
@@ -160,6 +161,7 @@ describe("files.mjs: the named files, up front", () => {
       ["TEST_PHONE", "test-phone"],
       ["SEND", "send"],
       ["COPIES", "copies"],
+      ["SIGN_IN", "sign-in"],
     ];
     assert.deepEqual(RIG_FILES, [
       { key: "RIG", test: "runtime/test/rig/rig.worker.test.ts", seed: "runtime/test/rig/rig.seed.ts" },

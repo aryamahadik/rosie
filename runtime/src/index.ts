@@ -19,6 +19,9 @@
 // A page's K-21 calls reach the page entry in process, through the same answer the /page-api route gives, never by a
 // fetch back to the Worker: no address is fetched, so no redirect can be followed, and an answer that is not the
 // entry's 200 gives the page no outcome (T-511's security note a).
+// The page entry gets the request's execution context on both ways in (T-1289; ADR-016 section 2): the /page-api
+// route's own, and for a page's in-process calls the context of the page request it serves, so work a handler hands on
+// after its answer (a sign-in code's send and its dispatch) runs to its end in that request's waitUntil.
 // A page request the shell itself cannot answer gets a plain 500 with its trace id and that one log line: vars the
 // shell cannot be made from, or a failure outside a route's handler, where the shell has no 500 page of its own.
 // Every other request carries one trace id: the incoming x-trace-id when it is a valid id (a UUID), else a new one.
@@ -28,6 +31,8 @@
 // The scheduled handler is the clock rows' minute sweep (T-254, runtime/src/clocks), on T-278's one-minute cron.
 // The gateway's doors come from the composition root (T-550, runtime/src/wiring), which picks each port's implementation
 // for the Worker's environment. The Worker's Linq route is the root's, behind the skeleton flag (T-552, T-553).
+
+import { AsyncLocalStorage } from "node:async_hooks";
 
 import { pageEntryTransport, type PageApiTransport } from "@rosie/web/src/client/client";
 import { readWebConfig, WebConfigError, type WebConfig } from "@rosie/web/src/shell/config";
@@ -50,6 +55,7 @@ import {
   type GatewayDeps,
   type PageCallName,
 } from "./gateway";
+import type { PageCallContext } from "./gateway/pages";
 import { HandleActor as HandleActorBase } from "./actor";
 import { wireWorker, workerRoot } from "./wiring";
 
@@ -160,8 +166,16 @@ export interface RosieWorker {
 /** The Worker's answer to one POST on the Linq webhook path. */
 export type LinqWebhookRoute = (request: Request, env: Cloudflare.Env) => Promise<Response>;
 
-/** The Worker's answer to one K-21 call's POST on the page entry's path. */
-export type PageCallRoute = (request: Request, call: PageCallName, env: Cloudflare.Env) => Promise<Response>;
+/**
+ * The Worker's answer to one K-21 call's POST on the page entry's path. `context`, when given, is the execution context
+ * of the request the call serves (T-1289): the page entry hands its waitUntil to the call's handler.
+ */
+export type PageCallRoute = (
+  request: Request,
+  call: PageCallName,
+  env: Cloudflare.Env,
+  context?: PageCallContext,
+) => Promise<Response>;
 
 /**
  * What web's pages are served from beside the Worker's vars (T-1234). The Worker that is deployed hands in none of it,
@@ -198,11 +212,22 @@ export function createWorker(
 ): RosieWorker {
   const pageCall: PageCallRoute =
     web.pageCall ??
-    ((request, call, env) =>
-      handlePageCall(request, call, pageDepsOf(gatewayDeps(env)), {
-        environment: env.ENVIRONMENT,
-        version: env.GIT_SHA ?? "unknown",
-      }));
+    ((request, call, env, context) =>
+      handlePageCall(
+        request,
+        call,
+        pageDepsOf(gatewayDeps(env)),
+        { environment: env.ENVIRONMENT, version: env.GIT_SHA ?? "unknown" },
+        context,
+      ));
+
+  /**
+   * The execution context of the page request web's pages are serving, for the K-21 calls a page makes in process while
+   * it serves that request (T-1289): the shell is one per env, so its transport finds the request it serves here, kept
+   * through the page's own awaits, and hands that request's context to the page entry. None while no page request with
+   * a context is being served (a request made with no context), and then the call gets none.
+   */
+  const servedRequests = new AsyncLocalStorage<PageCallContext>();
 
   /**
    * How a page's K-21 calls reach the page entry (web/src/client/client.ts pageEntryTransport): in process, through
@@ -211,13 +236,14 @@ export function createWorker(
    * transport takes the entry's 200 alone as an outcome, and throws for any other status, a 3xx among them, as refused
    * at the edge. The address is built from the config alone (LINK_HOST and BASE_PATH), never from the page request.
    * A call's name is web's (web/src/client/calls.ts) handed to the gateway's as it is: both are K-21 v1's list, and the
-   * type check fails here if web ever names a call the gateway does not route.
+   * type check fails here if web ever names a call the gateway does not route. Each call carries the execution context
+   * of the page request it serves (`servedRequests`).
    */
   const pageTransport = (config: WebConfig, env: Cloudflare.Env): PageApiTransport => ({
     send: (call, request, traceId) =>
       pageEntryTransport({
         baseUrl: `https://${config.linkHost}${config.basePath}`,
-        send: (posted) => pageCall(posted, call, env),
+        send: (posted) => pageCall(posted, call, env, servedRequests.getStore()),
       }).send(call, request, traceId),
   });
 
@@ -276,7 +302,11 @@ export function createWorker(
       ),
     );
   };
-  const fetch = (request: Request, env: Cloudflare.Env): Response | Promise<Response> => {
+  const fetch = (
+    request: Request,
+    env: Cloudflare.Env,
+    context?: ExecutionContext,
+  ): Response | Promise<Response> => {
     const traceId = traceIdOf(request);
     const environment = env.ENVIRONMENT;
     const version = env.GIT_SHA ?? "unknown";
@@ -314,7 +344,7 @@ export function createWorker(
       if (request.method !== "POST") {
         return jsonResponse(405, { ok: false, error: "method_not_allowed", trace_id: traceId }, traceId);
       }
-      return pageCall(request, call, env);
+      return pageCall(request, call, env, context);
     }
 
     if (request.method === "GET" && pathname === `${basePath}/health`) {
@@ -326,8 +356,12 @@ export function createWorker(
       );
     }
 
-    // web's pages (T-1192, T-1234): the shell's answer, sent as it is; an address no route takes goes on to the 404.
-    const page = pageOf(request, env, traceId);
+    // web's pages (T-1192, T-1234): the shell's answer, sent as it is; an address no route takes goes on to the 404. A page
+    // is served inside its request's context, which its in-process K-21 calls carry to the page entry (T-1289).
+    const page =
+      context === undefined
+        ? pageOf(request, env, traceId)
+        : servedRequests.run(context, () => pageOf(request, env, traceId));
     if (page !== null) return page;
 
     console.log(JSON.stringify({ level: "info", msg: "not_found", trace_id: traceId, environment, version }));
