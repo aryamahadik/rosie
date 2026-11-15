@@ -2,7 +2,8 @@
 // readLiveTimers and readStoppedFlag (items 56 and 57) through the job handle (./copies.ts), inside the Workers runtime on
 // T-1253's rig (infra/test-rig/files.mjs, key COPIES): this file's own database, migrated, with bundle v0 active and the
 // rows ./copies.seed.ts writes (four of the five named fixtures exactly, read-stopped-flag-alex-started on a stand-in in
-// its shape, and one live timer whose id copies.ts's isLabel refuses), reached through its own pool pair only,
+// its shape, a stand-in of Alex's phone row before his STOP, and one live timer whose id copies.ts's isLabel refuses),
+// reached through its own pool pair only,
 // HYPERDRIVE_JOB_COPIES and HYPERDRIVE_APP_COPIES, handed in as the env's HYPERDRIVE_JOB and HYPERDRIVE_APP behind doubles
 // that count each read of a connection string. Each root here is built as the Worker's is (../root.ts workerRoot:
 // composeRoot over stagingOptions(env)), through the two seams stagingOptions names: its handle (./part.ts stagingDb), so
@@ -16,21 +17,25 @@
 //   - the mapping on each fixture's own answer, as K-05 v1.12's binding line says (README "Consumers of v1.12"): each
 //     timer column by column from item 56's names to K-34's column names, the address as given; the flag as
 //     { result: "phone", stopped, phoneVersion }; notFound and transient as { error } alone;
-//   - the bound ports by direct call (Root.copies, the object install() sets): each fixture's case on this file's rows,
-//     db/repo's own answer first, then the port's; one job-side client per call, its string read at that call; nothing
-//     remembered; the request handed on as the handle id alone;
+//   - the bound ports by direct call (Root.copies, the object install() sets): built on ENVIRONMENT and HYPERDRIVE_JOB's
+//     presence alone (DL-768); each fixture's case on this file's rows, db/repo's own answer first, then the port's; one
+//     job-side client per call, its string read at that call; nothing remembered; the request handed on as the handle id
+//     alone;
 //   - the reload and the re-read through install(): Sam's timer copied after a lost commit, its sealed address exactly as
 //     stored; Morgan Lee's copy empty; Alex's lost STOP read stopped at version 4 and the stand-in's lost START read at
-//     version 5, each ending the lost commit's mark; read-stopped-flag-no-phone and a transient answer (the read's
-//     connection cut under it) each a failed re-read, the stricter reading kept; a transient reload keeps the copy and
-//     marks it stale; a live timer whose id isLabel refuses fails the reload closed (T-1248's runtime note);
+//     version 5, each ending the lost commit's mark; the re-read fresh at each call (Alex's STOP written on a stand-in of
+//     his row between two re-reads is read by the next one: the one row a test changes); read-stopped-flag-no-phone and a
+//     transient answer (the read's connection cut under it) each a failed re-read, the stricter reading kept; a transient
+//     reload keeps the copy and marks it stale; a live timer whose id isLabel refuses fails the reload closed (T-1248's
+//     runtime note);
 //   - failing: the guard's refusal (the file's two bindings crossed), a database that is not there (the pool's own
 //     HYPERDRIVE_JOB) and DB_SCHEMA set each throw, by a call's name and SQLSTATE or the guard's labels alone, and the
 //     copy fails closed;
 //   - unbound (no HYPERDRIVE_JOB), production and the test environment: no copy deps, so install() sets none and each
 //     reload and re-read answers unwired, as before this card; production's builder reads ENVIRONMENT alone;
-//   - HYPERDRIVE_APP is read 0 times throughout, opened equals ended after every test, no row count moves, no unhandled
-//     rejection reaches the isolate, and no log line holds a 555-01xx number, a handle id or a sealed address in any form.
+//   - HYPERDRIVE_APP is read 0 times throughout, opened equals ended after every test, no row is added or removed, no
+//     unhandled rejection reaches the isolate, and no log line holds a 555-01xx number, a handle id or a sealed address in
+//     any form.
 // Test values only (rule 9): the contracts' fixtures, the master's sample cast and the fiction range's numbers.
 import commitAlexStart from "@rosie/contracts/data-access/fixtures/commit-alex-start.json";
 import commitAlexStop from "@rosie/contracts/data-access/fixtures/commit-alex-stop.json";
@@ -77,8 +82,11 @@ import {
 } from "./copies";
 import {
   ALEX_HANDLE,
+  ALEX_STOP_UPDATE,
   ALEX_STOPPED_PHONE,
   FIXTURE_ROWS,
+  FRESH,
+  FRESH_PHONE,
   ODD_ID_ADDRESS_WORDS,
   ODD_ID_TIMER,
   OWN_ROWS,
@@ -580,19 +588,22 @@ async function rowCounts(): Promise<RowCounts> {
   return { ...row };
 }
 
-/** What the seed wrote (./copies.seed.ts), and nothing since: no test of this file writes a row. */
+/**
+ * What the seed wrote (./copies.seed.ts), and nothing since: no test of this file adds or removes a row (the one write a
+ * test makes updates FRESH's phone row in place).
+ */
 const SEEDED_ROWS: RowCounts = {
   // K-04's three business heads.
   businesses: 3,
-  // K-04's six, Morgan Lee and the stand-in.
-  persons: 8,
-  // K-04's seven (Alex's email among them), Morgan Lee's and the stand-in's.
-  handles: 9,
-  person_handles: 9,
+  // K-04's six, Morgan Lee and the two stand-ins.
+  persons: 9,
+  // K-04's seven (Alex's email among them), Morgan Lee's and the two stand-ins'.
+  handles: 10,
+  person_handles: 10,
   // K-04's nine, and Alex's customer role at the movers.
   person_roles: 10,
-  // Morgan Lee's, Alex's (stopped at version 4) and the stand-in's (started, version 5).
-  phones: 3,
+  // Morgan Lee's, Alex's (stopped at version 4), STARTED's (version 5) and FRESH's (version 3 until the test's STOP).
+  phones: 4,
   bookings: 1,
   turns: 1,
   // Sam's timer's and Riley's.
@@ -641,6 +652,23 @@ async function cutUnder<T>(table: "phones" | "safety_timers", read: () => Promis
     }),
   );
   return started.reading;
+}
+
+/**
+ * Writes Alex's STOP on FRESH's phone row as commit-alex-stop.json's own state write sets his (its `set`: stopped, the
+ * STOP's time, the chat closed), on the version it read and at the next one, through a job-side client of the test's own
+ * (rosie_job holds UPDATE on phones: db/migrations/0012), committed before it answers: the one row a test of this file
+ * changes. Answers how many rows it updated.
+ */
+async function writeAlexStopOnFresh(): Promise<number> {
+  const { set, expectVersion } = ALEX_STOP_UPDATE;
+  const updated = await ownHandle().runtime(
+    "writeTheStop",
+    (sql) => sql`
+      update phones set ${sql(set as Record<string, never>)}, version = version + 1
+      where handle_id = ${FRESH.handleId} and version = ${expectVersion}`,
+  );
+  return updated.count;
 }
 
 /** Whether `text` holds `part` as a whole name (not inside a longer name, such as rosie inside rosie_job). */
@@ -798,9 +826,18 @@ describe("this file's database on the rig", () => {
       chat_open: true,
       version: 5,
     });
+    // FRESH's row is Alex's before his STOP, at the version commit-alex-stop.json's write reads.
+    expect(FRESH_PHONE).toMatchObject({
+      handle_id: FRESH.handleId,
+      number: FRESH.number,
+      stopped: false,
+      chat_open: true,
+      version: ALEX_STOP_UPDATE.expectVersion,
+    });
+    expect(ALEX_STOP_UPDATE).toMatchObject({ expectVersion: 3, set: { stopped: true, chat_open: false } });
     // Every number a whole one of the fiction range, each handle's own.
     expect(new Set(NUMBERS).size).toBe(NUMBERS.length);
-    expect(NUMBERS).toContain(STARTED.number);
+    expect(NUMBERS).toEqual(expect.arrayContaining([STARTED.number, FRESH.number]));
     for (const number of NUMBERS) expect(number).toMatch(/^\+1[0-9]{10}$/u);
   });
 
@@ -876,6 +913,19 @@ describe("the mapping: K-05 v1.12's binding line on each fixture's own answer", 
 // ---- the bound ports by direct call -----------------------------------------------------------------------------------
 
 describe("the copy deps of a root composed for staging (Root.copies, which install() sets): K-05 v1.12 items 56 and 57 through the job handle", () => {
+  it("are built on the environment and HYPERDRIVE_JOB's presence alone (DL-768): no connection string, no HYPERDRIVE_APP, no client; both sources bound", () => {
+    const testEnv = envOf();
+
+    const { inputs, db } = stagedOver(testEnv);
+
+    expect(inputs.copies).not.toBeNull();
+    expect(Object.keys(inputs.copies ?? {}).sort()).toEqual(["phones", "timers"]);
+    // stagingOptions' own check of the environment, then this part's: the environment and the binding's presence.
+    expect(testEnv.names).toEqual(["ENVIRONMENT", "ENVIRONMENT", "HYPERDRIVE_JOB"]);
+    expect([testEnv.job?.reads.n, testEnv.app.reads.n]).toEqual([0, 0]);
+    expect(db.counts()).toMatchObject({ opened: 0, ended: 0 });
+  });
+
   it.each(TIMER_CASES)(
     "$name: K-05 answers the fixture's answer on this file's rows, and the reload's source the binding line's mapping of it",
     async ({ name, handleId, answer, port }) => {
@@ -1106,6 +1156,41 @@ describe("the actor's reload and re-read through the root's install(), over a Du
       });
       expect(seen.unread).toBe(false);
       expectReads(lines(), [READ_STOPPED_FLAG_CALL]);
+    },
+    DB_CASE_MS,
+  );
+
+  it(
+    "the re-read is fresh at each call: Alex's STOP, written on a stand-in of his phone row between two re-reads (commit-alex-stop.json's own write), is read by the very next one: not stopped at version 3, then stopped at version 4; nothing is kept between calls",
+    async () => {
+      const before = await rowCounts();
+      const { root, lines } = rootOver(envOf());
+      const stub = actorStub("fresh");
+      const rereadAfterLost = (turnId: string, opened: number) =>
+        inCopies(stub, async (copies) => {
+          copies.noteLostCommit(turnId, opened);
+          return { result: await copies.rereadStopped(FRESH.handleId), after: copies.readStopped() };
+        });
+
+      const seen = await installed(root, async () => {
+        const first = await rereadAfterLost("turn-t1306-fresh-1", 1);
+        const written = await writeAlexStopOnFresh();
+        const second = await rereadAfterLost(STOP_TURN, 2);
+        return { first, written, second };
+      });
+
+      expect(seen.first).toEqual({
+        result: "copied",
+        after: { stopped: false, phoneVersion: 3, turnId: null, setAt: expect.any(Number) as number },
+      });
+      expect(seen.written).toBe(1);
+      expect(seen.second).toEqual({
+        result: "copied",
+        after: { stopped: true, phoneVersion: 4, turnId: null, setAt: expect.any(Number) as number },
+      });
+      // Two reads, each on its own client: the second read the row as the STOP left it, never the first's answer.
+      expectReads(lines(), [READ_STOPPED_FLAG_CALL, READ_STOPPED_FLAG_CALL]);
+      expect(await rowCounts()).toEqual(before);
     },
     DB_CASE_MS,
   );
@@ -1468,7 +1553,7 @@ describe("the log capture of every test above", () => {
     expect(copyLines.length).toBeGreaterThanOrEqual(20);
     expect(jsonLinesOf(LOGGED, "dbGuardRefused").length).toBeGreaterThanOrEqual(4);
 
-    expect(NUMBER_FORMS).toHaveLength(32);
+    expect(NUMBER_FORMS).toHaveLength(36);
     const lowered = LOGGED.map((line) => line.toLowerCase());
     for (const form of NUMBER_FORMS) {
       expect(

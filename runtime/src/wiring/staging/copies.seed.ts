@@ -29,9 +29,15 @@
 //     read-stopped-flag-alex-started  STARTED below: a person, a handle at a fictional number and their link, whose phone
 //                                     row is Alex's as commit-alex-start.json then leaves it (not stopped, the START's
 //                                     time, the chat open again, the STOP's time kept: DL-193) at version 5.
-//   and one timer of this file's own: ODD_ID_TIMER below, Riley's, live, whose own id holds a space. K-05 allows that id
-//   (formats.v1 id: any non-empty string) and copies.ts's isLabel refuses it, so the test shows the reload fail closed
-//   on it (T-1248's runtime note). No other row names Riley's handle as a pro.
+//   and two of this file's own:
+//     FRESH below                     a person, a handle and their link whose phone row is Alex's before his STOP (K-04's
+//                                     seed-phone-chat-open.json row, version 3): the test writes commit-alex-stop.json's
+//                                     own `set` on it between two re-reads, to show the re-read fresh at each call. It is
+//                                     the one row a test of this file changes, and no other test reads it.
+//     ODD_ID_TIMER below              Riley's live timer, whose own id holds a space. K-05 allows that id (formats.v1 id:
+//                                     any non-empty string) and copies.ts's isLabel refuses it, so the test shows the
+//                                     reload fail closed on it (T-1248's runtime note). No other row names Riley's handle
+//                                     as a pro.
 //
 // Every row is written in one transaction as the runtime side's role, rosie_job, with no business scope, through its own
 // grants and policies (db/migrations/0012 and 0016), as the other seeds write. Nothing is updated or deleted. A bytea value
@@ -83,7 +89,7 @@ export const FIXTURE_ROWS: readonly SeedRow[] = [
 export const ALEX_HANDLE = stoppedFixture.request.handleId;
 
 /** A commit's update of one phone row: the row it names by number, its `set`, and the version it read. */
-interface PhoneUpdate {
+export interface PhoneUpdate {
   readonly number: string;
   readonly set: Values;
   readonly expectVersion: number;
@@ -127,8 +133,11 @@ const ALEX_PHONE_BEFORE = need(
   "K-04's phone row for Alex",
 ).values;
 
+/** commit-alex-stop.json's update of Alex's phone row: stopped, the STOP's time, the chat closed, on version 3. */
+export const ALEX_STOP_UPDATE: PhoneUpdate = phoneUpdateOf(commitAlexStop);
+
 /** Alex's phone row as commit-alex-stop.json leaves it: stopped, its chat closed, at version 4. */
-export const ALEX_STOPPED_PHONE: Values = afterUpdate(ALEX_PHONE_BEFORE, phoneUpdateOf(commitAlexStop));
+export const ALEX_STOPPED_PHONE: Values = afterUpdate(ALEX_PHONE_BEFORE, ALEX_STOP_UPDATE);
 
 /** The same row as commit-alex-start.json then leaves it: not stopped, its chat open, the STOP's time kept, version 5. */
 const ALEX_STARTED_PHONE: Values = afterUpdate(ALEX_STOPPED_PHONE, phoneUpdateOf(commitAlexStart));
@@ -156,6 +165,24 @@ export const STARTED_PHONE: Values = {
   ...ALEX_STARTED_PHONE,
   number: STARTED.number,
   handle_id: STARTED.handleId,
+};
+
+/**
+ * Alex's phone row before his STOP, on this file's own ids, which the test stops between two re-reads with
+ * commit-alex-stop.json's own `set` (ALEX_STOP_UPDATE): the re-read is fresh at each call.
+ */
+export const FRESH: StandIn = {
+  fixture: "read-stopped-flag-alex-stopped.json",
+  personId: "person-t1306-fresh",
+  handleId: "handle-t1306-fresh",
+  number: "+15555550182",
+};
+
+/** The fresh stand-in's phone row: Alex's before his STOP (version 3), under the stand-in's number and handle. */
+export const FRESH_PHONE: Values = {
+  ...ALEX_PHONE_BEFORE,
+  number: FRESH.number,
+  handle_id: FRESH.handleId,
 };
 
 // ---- a live timer with an id copies.ts's isLabel refuses -------------------------------------------------------------
@@ -191,13 +218,23 @@ export const ODD_ID_TIMER = Object.freeze({
 /** What the odd-id timer's stand-in bytes spell: never in an answer's opened form, a span, a log line or an error. */
 export const ODD_ID_ADDRESS_WORDS = STAND_IN_WORDS;
 
-/** The rows of this file's own: the stand-in's, Alex's phone row, and Riley's odd-id timer with its clock row. */
+/** A stand-in's person (no name), its phone handle and their link. */
+const standInRows = (standIn: StandIn): readonly SeedRow[] => [
+  { table: "persons", values: { id: standIn.personId, name: null, language: null } },
+  { table: "handles", values: { id: standIn.handleId, kind: "phone", address: standIn.number } },
+  { table: "person_handles", values: { person_id: standIn.personId, handle_id: standIn.handleId } },
+];
+
+/**
+ * The rows of this file's own: Alex's phone row, the two stand-ins' rows and phone rows, and Riley's odd-id timer with
+ * its clock row.
+ */
 export const OWN_ROWS: readonly SeedRow[] = [
   { table: "phones", values: ALEX_STOPPED_PHONE },
-  { table: "persons", values: { id: STARTED.personId, name: null, language: null } },
-  { table: "handles", values: { id: STARTED.handleId, kind: "phone", address: STARTED.number } },
-  { table: "person_handles", values: { person_id: STARTED.personId, handle_id: STARTED.handleId } },
+  ...standInRows(STARTED),
   { table: "phones", values: STARTED_PHONE },
+  ...standInRows(FRESH),
+  { table: "phones", values: FRESH_PHONE },
   {
     table: "clock_rows",
     values: {
