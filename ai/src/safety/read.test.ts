@@ -559,6 +559,44 @@ describe("what one call sends", () => {
     expect(models(api.seen)).toEqual(["claude-haiku-5-5", "claude-sonnet-5-5"]);
     expect(api.seen.map((entry) => entry.url)).toEqual([API_URL, API_URL]);
   });
+
+  it.each([301, 302])(
+    'asks the fetch for redirect "manual" (workerd refuses "error"), and takes a %i as a failed try labelled by its status, never fetching its Location (T-1408)',
+    async (status) => {
+      const calls: { url: string; redirect: unknown }[] = [];
+      const redirecting: FetchLike = (url, init) => {
+        calls.push({ url, redirect: init.redirect });
+        return Promise.resolve(Response.redirect("https://elsewhere.example/v1/messages", status));
+      };
+      const context = openTrace({
+        openedBy: "textWebhook",
+        bundleId: BUNDLE.bundleId,
+        handleRef: "handle-alex",
+      });
+      const answer = await readThrough(readerOver({ fetch: redirecting }), inputOf("safety-no.json"), {
+        trace: context,
+      });
+
+      expect(calls).toEqual([
+        { url: API_URL, redirect: "manual" },
+        { url: API_URL, redirect: "manual" },
+      ]);
+      expect(answer.result).toMatchObject({
+        read: null,
+        timedOut: true,
+        tries: [
+          { model: "haiku", result: "error" },
+          { model: "sonnet", result: "error" },
+        ],
+      });
+      const code = `http_${String(status)}`;
+      expect(context.spans.map((span) => [span.attempt, span.outcome, span.error_code])).toEqual([
+        [1, "failed", code],
+        [2, "failed", code],
+      ]);
+      expectK02(answer);
+    },
+  );
 });
 
 describe("set-up and calls that cannot be made", () => {
