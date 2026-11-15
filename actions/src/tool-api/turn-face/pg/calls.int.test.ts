@@ -21,14 +21,34 @@
 // T-1190: the seed gives the barbershop its barber kind of work with no switch on (T-1197; CQ-185), so K-05 v1.6's
 // readOutboxRow reads the row's sensitive switch as false, and compose input gives compose-input-s1-02-v1.6.json's input
 // word for word, routine, as T-1175's recording 4 has it.
+//
+// T-1410 (T-1368's new task a; its architect's note a; DL-832): pgCallScope opens each call's transaction for the K-09
+// call the Tool API base names, handing its ScopeCall on to db/repo/scope.ts withBusiness (its `call` and `transient`).
+// Each of gateAndCommit, composeInput and finalizeMessage runs through pgTurnFace and pgTurnCalls as the turn makes it, on
+// a Tool API client whose transaction cannot start: lost as it starts (the socket destroyed just as the begin is to be
+// written, so postgres.js rejects it with its own CONNECTION_CLOSED, the server's host and port on it), never opened (a
+// local port nothing listens on), or refused at its start with the database named (a local server that answers each
+// session as PostgreSQL does with 3D000, 42501 or 55000, a planted database in its message). A lost or never opened start
+// answers the call's K-09 transient, and a refused one is thrown scrubbed under the call's own name, never transient and
+// never under "withBusiness"; where a call's errors had no transient (a validator that is the frozen contract's but for
+// that call's errors), a lost start is thrown scrubbed under its name too. Each time the handler never ran: nothing was
+// sent on the runtime side's client, and nothing of the connection is in the answer, the thrown error (message, stack and
+// own properties), a span or the face's log. The probe's user, password and database are made up here.
 
+import { once } from "node:events";
+import { type AddressInfo, createConnection, createServer, type Socket } from "node:net";
+import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { resolvePrimaryUrl } from "../../../../../db/repo/client";
+import { DataAccessDatabaseError } from "../../../../../db/repo/clocks";
 import { handleSealingKey } from "../../../../../db/repo/handle-keys";
+import type { Sql } from "../../../../../db/repo/scope";
 import { seal, unsealText, type WrappingKeys } from "../../../../../db/repo/sealing";
-import { inRuntimeTransaction } from "../../../../../db/repo/targets";
+import { inRuntimeTransaction, type TransientError } from "../../../../../db/repo/targets";
 import { readOutboxRow } from "../../../../../db/repo/turn-face-reads";
 import { TEST_OWNER_1 } from "../../../../../db/seeds/skeleton";
+import type { Span } from "../../../../../runtime/src/trace";
 import type { GateAndCommitRequest } from "../../../commit";
 import { S1_01_IDS } from "../../../commit/core/test-support";
 import { footprint, rowOf, snapshot, type CommitDatabase } from "../../../commit/pg/test-support";
@@ -39,8 +59,10 @@ import {
   fakeBundles,
   sampleBundle,
   type BundleDocument,
+  type LogCapture,
 } from "../../../frontier/assemble/test-support";
 import { fixture, traceFor } from "../../test-support";
+import type { ToolApiValidator } from "../../validator";
 import {
   SAM_KEY,
   commitRequestAfter,
@@ -396,6 +418,428 @@ describe("the safety record's sealer never makes a key (DL-344; the security rev
       await expect(
         inRuntimeTransaction(cdb.runtime, { readOnly: true }, (tx) => seal(tx, KEYS, NO_KEY, "words")),
       ).rejects.toMatchObject({ code: "25006" });
+    },
+  );
+});
+
+// ---- T-1410: each call's transaction is opened for the K-09 call the base names ---------------------------------------
+
+const PROBE_USER = "t1410_probe_user";
+const PROBE_PASSWORD = "t1410-probe-password";
+const PROBE_DATABASE = "t1410_probe_db";
+
+/** The three calls after the frontier, as the turn makes them: each one's K-09 errors have K-05's transient. */
+const START_CALLS = ["gateAndCommit", "composeInput", "finalizeMessage"] as const;
+type StartCall = (typeof START_CALLS)[number];
+
+/** K-05's transient as a call's start answers it: a connection lost as it starts, or one that never opened. */
+const LOST: TransientError = { error: "transient", sqlstate: "08006" };
+const NEVER_OPENED: TransientError = { error: "transient", sqlstate: "08001" };
+
+/**
+ * PostgreSQL's refusals of a session at its start that name the database (postinit.c), each with the planted database in
+ * its message as the server words it (as T-1368's frontier test plants it).
+ */
+const DATABASE_REFUSALS: readonly { code: string; text: string }[] = [
+  { code: "3D000", text: `database "${PROBE_DATABASE}" does not exist` },
+  { code: "42501", text: `permission denied for database "${PROBE_DATABASE}"` },
+  { code: "55000", text: `database "${PROBE_DATABASE}" is not currently accepting connections` },
+];
+
+/** Each call's request as the turn sends it: K-09 v1.5's commit-s1-01.json, compose-input-s1-02.json, finalize-pass.json. */
+function startRequest(call: StartCall): unknown {
+  if (call === "gateAndCommit") return commitRequestAfter(undefined);
+  const file = call === "composeInput" ? "compose-input-s1-02.json" : "finalize-pass.json";
+  return (fixture(file) as { request: Json }).request;
+}
+
+/**
+ * The frozen contract's checks but for `call`'s errors, which refuse K-05's transient: as K-09 would check a call whose
+ * errors had none (none of the three is one today).
+ */
+function noTransientFor(call: StartCall): ToolApiValidator {
+  return {
+    check: (name, part, value) =>
+      name === call && part === "errors" && (value as { error?: unknown } | null)?.error === "transient"
+        ? ["(root) this call's errors have no transient"]
+        : validator.check(name, part, value),
+    checkSpan: (value) => validator.checkSpan(value),
+    laneChecks: (version, name) => validator.laneChecks(version, name),
+  };
+}
+
+// What an outcome must never hold.
+
+type Secrets = Readonly<Record<string, RegExp>>;
+
+const escaped = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/** The secrets by name: a text wherever it appears, a number (a port) as a whole number. */
+function secretsOf(values: Readonly<Record<string, string | number>>): Secrets {
+  const secrets: Record<string, RegExp> = {};
+  for (const [name, value] of Object.entries(values)) {
+    secrets[name] =
+      typeof value === "number"
+        ? new RegExp(`(^|[^0-9])${String(value)}([^0-9]|$)`)
+        : new RegExp(escaped(value));
+  }
+  return secrets;
+}
+
+/** The probe's connection on a local port: the host, the port, the user, the password and the database. */
+const probeSecrets = (port: number): Secrets =>
+  secretsOf({
+    host: "127.0.0.1",
+    port,
+    user: PROBE_USER,
+    password: PROBE_PASSWORD,
+    database: PROBE_DATABASE,
+  });
+
+/** Every text `value` holds, deeply: its own property names and values, enumerable or not (an error's stack too). */
+function textsOf(value: unknown, seen = new Set<object>()): string[] {
+  if (typeof value === "string") return [value];
+  if (typeof value === "number" || typeof value === "bigint" || typeof value === "boolean") {
+    return [String(value)];
+  }
+  if (typeof value !== "object" || value === null || seen.has(value)) return [];
+  seen.add(value);
+  const texts: string[] = [];
+  for (const key of Object.getOwnPropertyNames(value)) {
+    texts.push(key, ...textsOf((value as Record<string, unknown>)[key], seen));
+  }
+  return texts;
+}
+
+/** The names of the secrets `value` holds anywhere, never their values. */
+function leaksOf(value: unknown, secrets: Secrets): string[] {
+  const texts = textsOf(value);
+  return Object.entries(secrets)
+    .filter(([, secret]) => texts.some((text) => secret.test(text)))
+    .map(([name]) => name);
+}
+
+// The clients and servers.
+
+/** The local server (DATABASE_URL, else the local default): its connection string, host and port, never printed. */
+function localServer(): { url: string; host: string; port: number } {
+  const url = resolvePrimaryUrl();
+  const { hostname, port } = new URL(url);
+  return { url, host: hostname, port: port === "" ? 5432 : Number(port) };
+}
+
+/** A client and each statement's text as postgres.js built it, in order (its `debug` hook): never a value. */
+interface WatchedClient {
+  readonly sql: Sql;
+  readonly sent: string[];
+}
+
+/**
+ * The runtime side's client for these calls: the local server, one connection, which postgres.js opens only once a
+ * statement is made, each statement written down. A call whose handler never ran sends nothing on it.
+ */
+function watchedRuntime(): WatchedClient {
+  const sent: string[] = [];
+  const options = {
+    max: 1,
+    onnotice: () => undefined,
+    debug: (_connection: number, text: string) => {
+      sent.push(text);
+    },
+  };
+  return { sql: postgres(localServer().url, options), sent };
+}
+
+/**
+ * A Tool API client of the local server, one connection, whose socket is destroyed just as its transaction's begin is to
+ * be written (postgres.js's `debug` hook sees each statement as it is built; its `socket` option gives the socket): the
+ * begin never goes, and postgres.js rejects it with its own CONNECTION_CLOSED (T-1368's tool-api.int.test.ts lostAtBegin).
+ */
+function lostAtBegin(): WatchedClient {
+  const { url, host, port } = localServer();
+  const sent: string[] = [];
+  let cutNext = false;
+  const options = {
+    max: 1,
+    onnotice: () => undefined,
+    connection: { application_name: "rosie-t1410-turn-face" },
+    debug: (_connection: number, text: string) => {
+      sent.push(text);
+      if (text.trim() === "begin") cutNext = true;
+    },
+    socket: () => {
+      const socket = createConnection(port, host);
+      const write = socket.write.bind(socket);
+      socket.write = ((...args: Parameters<typeof write>) => {
+        if (!cutNext) return write(...args);
+        cutNext = false;
+        socket.destroy();
+        return true;
+      }) as typeof socket.write;
+      return socket;
+    },
+  };
+  return { sql: postgres(url, options), sent };
+}
+
+/** A local port nothing listens on: one the system just handed out and took back. */
+async function closedPort(): Promise<number> {
+  const server = createServer();
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
+  const { port } = server.address() as AddressInfo;
+  server.close();
+  await once(server, "close");
+  return port;
+}
+
+/** PostgreSQL's ErrorResponse message ('E', its length, then each field's type byte and text, then a zero). */
+function errorResponse(fields: Readonly<Record<string, string>>): Uint8Array {
+  const texts = Object.entries(fields).map(([type, text]) => `${type}${text}\u0000`);
+  const body = new TextEncoder().encode(`${texts.join("")}\u0000`);
+  const message = new Uint8Array(body.length + 5);
+  const view = new DataView(message.buffer);
+  view.setUint8(0, "E".charCodeAt(0));
+  view.setUint32(1, body.length + 4);
+  message.set(body, 5);
+  return message;
+}
+
+/** A local server that refuses each session at its start, as PostgreSQL does, with `code` and `message`, then closes. */
+async function refusingServer(
+  code: string,
+  message: string,
+): Promise<{ port: number; close: () => Promise<void> }> {
+  const sockets = new Set<Socket>();
+  const server = createServer((socket) => {
+    sockets.add(socket);
+    socket.on("error", () => undefined);
+    socket.once("data", () => {
+      socket.end(errorResponse({ S: "FATAL", V: "FATAL", C: code, M: message }));
+    });
+  });
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
+  const { port } = server.address() as AddressInfo;
+  return {
+    port,
+    close: async () => {
+      for (const socket of sockets) socket.destroy();
+      server.close();
+      await once(server, "close");
+    },
+  };
+}
+
+/** The probe's connection string: the made-up user, password and database on a local port. */
+function probeUrl(port: number): string {
+  return `postgres://${PROBE_USER}:${PROBE_PASSWORD}@127.0.0.1:${String(port)}/${PROBE_DATABASE}`;
+}
+
+// One call through the face, and what it must leave.
+
+/** How one call ended through the face, the spans its trace kept, and the face's log. */
+interface StartRun {
+  readonly settled: { answer: unknown } | { thrown: unknown };
+  readonly spans: Span[];
+  readonly log: LogCapture;
+}
+
+/**
+ * One call through the turn face as the turn makes it: pgTurnFace with pgTurnCalls, the calls' scope pgCallScope over
+ * `toolApi` and the runtime side on `runtime`, the base checking by `checks`.
+ */
+async function callThroughFace(
+  call: StartCall,
+  runtime: Sql,
+  toolApi: Sql,
+  checks: ToolApiValidator = validator,
+): Promise<StartRun> {
+  const bundles = fakeBundles(sampleBundle("bundle-v0-skeleton.json"));
+  const log = captureLog();
+  const startFace = pgTurnFace(runtime, {
+    bundles,
+    validator: checks,
+    checker,
+    log: log.sink,
+    calls: pgTurnCalls(runtime, toolApi, {
+      bundles,
+      wrappingKeys: KEYS,
+      stopWords: PLUGIN_LISTS_NO_STOP_WORDS,
+      telling: NOT_TOLD_YET,
+    }),
+  });
+  const request = startRequest(call);
+  const { trace, spans } = traceFor(request);
+  const made: Promise<unknown> =
+    call === "gateAndCommit"
+      ? startFace.gateAndCommit(request, NOTHING_OPEN_AT, trace)
+      : call === "composeInput"
+        ? startFace.composeInput(request, trace)
+        : startFace.finalizeMessage(request, trace);
+  const settled = await made.then(
+    (answer) => ({ answer }),
+    (thrown: unknown) => ({ thrown }),
+  );
+  return { settled, spans, log };
+}
+
+/** The start's failure thrown scrubbed: the K-09 call's own name and the SQLSTATE alone, never "withBusiness". */
+function expectScrubbedUnder(thrown: unknown, call: StartCall, code: string): void {
+  expect(thrown, call).toBeInstanceOf(DataAccessDatabaseError);
+  expect(Object.getOwnPropertyNames(thrown).sort(), call).toEqual([
+    "call",
+    "code",
+    "constraint",
+    "message",
+    "name",
+    "stack",
+    "table",
+  ]);
+  expect(thrown, call).toMatchObject({ call, code, table: null, constraint: null });
+  expect((thrown as Error).message, call).toBe(`${call}: the database refused the call (SQLSTATE ${code})`);
+}
+
+/**
+ * What a start the database could not make, or refused, leaves for `call`: the transient `answer` (held to the call's
+ * K-09 errors), else `thrown` scrubbed to its SQLSTATE under the call's name; no span of the base's (the turn records the
+ * call's hop itself) and nothing logged; nothing of the connection anywhere.
+ */
+function expectStartOutcome(
+  run: StartRun,
+  call: StartCall,
+  expected: { answer: TransientError } | { thrown: string },
+  secrets: Secrets,
+): void {
+  for (const seen of [run.settled, run.spans, run.log.lines])
+    expect(leaksOf(seen, secrets), call).toEqual([]);
+  expect(run.spans, call).toEqual([]);
+  expect(run.log.lines, call).toEqual([]);
+  if ("answer" in expected) {
+    expect(run.settled, call).toEqual({ answer: expected.answer });
+    expect(validator.check(call, "errors", expected.answer), call).toEqual([]);
+    return;
+  }
+  expect("thrown" in run.settled, call).toBe(true);
+  expectScrubbedUnder((run.settled as { thrown: unknown }).thrown, call, expected.thrown);
+}
+
+describe("each call's transaction is opened for the K-09 call the Tool API base names (T-1410)", () => {
+  it(
+    "lost as it starts (postgres.js's CONNECTION_CLOSED, the server's host and port on it): gateAndCommit, composeInput and finalizeMessage each answer K-09's transient 08006, the handler never run and nothing sent on the runtime side",
+    SLOW,
+    async () => {
+      const { host, port } = localServer();
+      const secrets = secretsOf({ "server host": host, "server port": port });
+      // What postgres.js rejects the begin with on such a client: its own CONNECTION_CLOSED, the host and port in it.
+      const probe = lostAtBegin();
+      try {
+        const raw = await probe.sql
+          .begin(() => Promise.resolve("never"))
+          .then(
+            () => {
+              throw new Error("the begin went");
+            },
+            (error: unknown) => error,
+          );
+        expect(raw).toMatchObject({ code: "CONNECTION_CLOSED" });
+        expect(leaksOf(raw, secrets)).toEqual(expect.arrayContaining(["server host", "server port"]));
+        expect(probe.sent.at(-1)?.trim()).toBe("begin");
+      } finally {
+        await probe.sql.end({ timeout: 0 });
+      }
+
+      for (const call of START_CALLS) {
+        const runtime = watchedRuntime();
+        const toolApi = lostAtBegin();
+        try {
+          const run = await callThroughFace(call, runtime.sql, toolApi.sql);
+          expectStartOutcome(run, call, { answer: LOST }, secrets);
+          // The begin was the last statement built on the Tool API's client, and nothing went on the runtime side's.
+          expect(toolApi.sent.at(-1)?.trim(), call).toBe("begin");
+          expect(runtime.sent, call).toEqual([]);
+        } finally {
+          await Promise.all([toolApi.sql.end({ timeout: 0 }), runtime.sql.end({ timeout: 0 })]);
+        }
+      }
+    },
+  );
+
+  it(
+    "a connection that never opens (a closed port, Node's ECONNREFUSED): each call answers K-09's transient 08001, the handler never run",
+    SLOW,
+    async () => {
+      const port = await closedPort();
+      const secrets = probeSecrets(port);
+      for (const call of START_CALLS) {
+        const runtime = watchedRuntime();
+        const toolApi = postgres(probeUrl(port), { max: 1, onnotice: () => undefined });
+        try {
+          const run = await callThroughFace(call, runtime.sql, toolApi);
+          expectStartOutcome(run, call, { answer: NEVER_OPENED }, secrets);
+          expect(runtime.sent, call).toEqual([]);
+        } finally {
+          await Promise.all([toolApi.end({ timeout: 0 }), runtime.sql.end({ timeout: 0 })]);
+        }
+      }
+    },
+  );
+
+  it.each(DATABASE_REFUSALS)(
+    "a session PostgreSQL refuses at its start with $code, the planted database in its message, is never transient: each call throws it scrubbed under its own K-09 name, the handler never run",
+    async ({ code, text }) => {
+      const server = await refusingServer(code, text);
+      const secrets = probeSecrets(server.port);
+      try {
+        for (const call of START_CALLS) {
+          const runtime = watchedRuntime();
+          const toolApi = postgres(probeUrl(server.port), { max: 1, onnotice: () => undefined });
+          try {
+            // What postgres.js rejects the begin with on this client: PostgreSQL's refusal, the database in it.
+            const raw = await toolApi
+              .begin(() => Promise.resolve("never"))
+              .then(
+                () => {
+                  throw new Error("the begin went");
+                },
+                (error: unknown) => error,
+              );
+            expect(raw, call).toMatchObject({ name: "PostgresError", code });
+            expect(leaksOf(raw, secrets), call).toEqual(expect.arrayContaining(["database"]));
+
+            const run = await callThroughFace(call, runtime.sql, toolApi);
+            expectStartOutcome(run, call, { thrown: code }, secrets);
+            expect(runtime.sent, call).toEqual([]);
+          } finally {
+            await Promise.all([toolApi.end({ timeout: 0 }), runtime.sql.end({ timeout: 0 })]);
+          }
+        }
+      } finally {
+        await server.close();
+      }
+    },
+  );
+
+  it(
+    "where a call's errors had no transient, a start lost as it starts is thrown scrubbed under that call's own name (08006), never under withBusiness",
+    SLOW,
+    async () => {
+      const { host, port } = localServer();
+      const secrets = secretsOf({ "server host": host, "server port": port });
+      for (const call of START_CALLS) {
+        const checks = noTransientFor(call);
+        expect(checks.check(call, "errors", LOST), call).not.toEqual([]);
+        const runtime = watchedRuntime();
+        const toolApi = lostAtBegin();
+        try {
+          const run = await callThroughFace(call, runtime.sql, toolApi.sql, checks);
+          expectStartOutcome(run, call, { thrown: LOST.sqlstate }, secrets);
+          expect(toolApi.sent.at(-1)?.trim(), call).toBe("begin");
+          expect(runtime.sent, call).toEqual([]);
+        } finally {
+          await Promise.all([toolApi.sql.end({ timeout: 0 }), runtime.sql.end({ timeout: 0 })]);
+        }
+      }
     },
   );
 });

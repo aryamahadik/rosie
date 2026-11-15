@@ -11,7 +11,9 @@
 //   scope        @rosie/actions' pgCallScope over a Tool API client (part.db.toolApi: HYPERDRIVE_APP, the login
 //                rosie_worker_app, rosie_app's rights only), opened for that one gate call and held until its transaction
 //                ends, with rosie.business_id set to the caller's business first and checked again at the end. At most
-//                GATE_CLIENTS_AT_ONCE gate calls hold such a client at once; another waits for one to end (DL-761).
+//                GATE_CLIENTS_AT_ONCE gate calls hold such a client at once; another waits for one to end (DL-761). The
+//                call the Tool API base names (its ScopeCall: gateAndCommit, and its transient answer) is handed on to
+//                pgCallScope as it comes (T-1410).
 //   readOpenHolds  K-05 v1.3 item 34, db/repo's readOpenHoldsIn on the call's transaction (rosie_app), its eventIds copied
 //                as calls.ts line 100 copies them.
 //   safetyReads  K-05 v1.4's seven reads as pgSafetyReads binds them (calls.ts lines 45 to 55): items 37 to 41 and 43
@@ -61,7 +63,9 @@
 //            reads answer K-05's errors or throw scrubbed (the call's name and a SQLSTATE or the client's code), and the
 //            commit binding throws on every error answer, never reading one as none (K-05 v1.4 default 61; turn-face
 //            commit.ts lines 256 to 260); the sealer's errors leave scrubbed (its own noSealingKey, sealing.ts's
-//            SealingError with its code, a database's as the call's name and a code).
+//            SealingError with its code, a database's as the call's name and a code). The scope's start, once the guard
+//            has passed, is db/repo's withBusiness's for gateAndCommit (T-1410): a connection lost or never opened answers
+//            K-09's transient with nothing written, and any other failure of it is thrown scrubbed under gateAndCommit.
 //
 // Nothing is logged here, and nothing is put in a span: the handle writes each call's timing, labels and numbers only
 // (./part.ts dbCallLine; these seams carry no trace id, so each line's trace_id is null), and the guard's refusal its one
@@ -158,14 +162,18 @@ class ClientSlots {
 /**
  * The Tool API's own business scope for each gate call: pgCallScope over a Tool API client opened for that call
  * (HYPERDRIVE_APP, rosie_worker_app), which the handle guards first and ends once the call's transaction has ended, taken
- * only while one of the slots is free.
+ * only while one of the slots is free. The call the Tool API base names (its ScopeCall: K-09's gateAndCommit, and its
+ * transient answer) goes on to pgCallScope as it is handed (T-1410), so a start the database could not make once the
+ * guard has passed answers K-09's transient, and any other failure of the start is thrown scrubbed under that name.
  */
 function gateScope(db: StagingDb, slots: ClientSlots): BusinessScope<Tx> {
   return {
-    async withBusiness(businessId, work) {
+    async withBusiness(businessId, work, call) {
       const freeSlot = await slots.take();
       try {
-        return await db.toolApi(GATE_CALLS.scope, (sql) => pgCallScope(sql).withBusiness(businessId, work));
+        return await db.toolApi(GATE_CALLS.scope, (sql) =>
+          pgCallScope(sql).withBusiness(businessId, work, call),
+        );
       } finally {
         freeSlot();
       }
