@@ -112,6 +112,18 @@ const FAULT_NAMES = new Set([
  * 53300 is CQ-271's (until the architect rules, scrubbed and not transient).
  */
 const SESSION_REFUSED_SQLSTATE = /^(28[0-9A-Z]{3}|53300)$/;
+/**
+ * PostgreSQL's refusals of a session at its start whose message names the database (T-1367; T-1331's security review,
+ * new task a; postinit.c InitPostgres and CheckMyDatabase): 3D000 invalid_catalog_name ("database ... does not exist"),
+ * 42501 insufficient_privilege ("permission denied for database ...": no CONNECT privilege) and 55000
+ * object_not_in_prerequisite_state ("database ... is not currently accepting connections"). The backend raises each
+ * FATAL as it starts and ends the session, so a refused session, as SESSION_REFUSED_SQLSTATE's are. Raised ERROR, the same
+ * codes are a statement's own refusal on a session that goes on (42501 a privilege or a row-level security policy, 55000
+ * an object not in the state the statement needs, 3D000 a statement that names another database), and stay one.
+ */
+const START_REFUSED_SQLSTATE = /^(3D000|42501|55000)$/;
+/** The severity PostgreSQL ends a session with (its ErrorResponse's V field, and S, its local name, in English). */
+const ENDS_SESSION = "FATAL";
 const SQLSTATE = /^[0-9A-Z]{5}$/;
 /**
  * A client's own codes for a connect or a session that failed and is not answered transient (T-1268 round 2):
@@ -176,9 +188,10 @@ const UNNAMED_CALL = "a db/repo call";
 /**
  * A failure to open or keep a session that is not answered transient, and that transientOrThrow (and clocks.ts's
  * scrubbed) therefore throws scrubbed (T-1268 round 2): PostgreSQL's refusal of a session at its start
- * (SESSION_REFUSED_SQLSTATE), or a PostgresError with no SQLSTATE, which cannot be told apart from one; a client's error
- * with a code of SESSION_FAILED_CODES or TLS_CODE, or with a mark of a connection (CONNECTION_MARKS). Never db/repo's
- * own errors, a statement's own refusal of any other SQLSTATE, or one of JavaScript's own for a faulty value.
+ * (SESSION_REFUSED_SQLSTATE; and START_REFUSED_SQLSTATE raised FATAL, T-1367), or a PostgresError with no SQLSTATE, which
+ * cannot be told apart from one; a client's error with a code of SESSION_FAILED_CODES or TLS_CODE, or with a mark of a
+ * connection (CONNECTION_MARKS). Never db/repo's own errors, a statement's own refusal of any other SQLSTATE (3D000,
+ * 42501 and 55000 raised ERROR among them), or one of JavaScript's own for a faulty value.
  */
 export function isSessionFailure(error: unknown): boolean {
   if (!(error instanceof Error)) {
@@ -186,7 +199,11 @@ export function isSessionFailure(error: unknown): boolean {
   }
   const code = (error as { code?: unknown }).code;
   if (error.name === "PostgresError") {
-    return typeof code !== "string" || !SQLSTATE.test(code) || SESSION_REFUSED_SQLSTATE.test(code);
+    if (typeof code !== "string" || !SQLSTATE.test(code) || SESSION_REFUSED_SQLSTATE.test(code)) {
+      return true;
+    }
+    const { severity, severity_local: local } = error as { severity?: unknown; severity_local?: unknown };
+    return START_REFUSED_SQLSTATE.test(code) && (severity === ENDS_SESSION || local === ENDS_SESSION);
   }
   if (FAULT_NAMES.has(error.name)) {
     return false;
@@ -207,8 +224,9 @@ export function isSessionFailure(error: unknown): boolean {
  * own properties (query and parameters, empty for a statement it never built; args, its values).
  *
  * A failure to open or keep a session that is not transient (isSessionFailure: EACCES, a TLS or certificate error,
- * postgres.js's SASL_SIGNATURE_MISMATCH, PostgreSQL's class 28 and 53300) is thrown scrubbed, never as it is (T-1268
- * round 2): clocks.ts's scrubbed, with `call`, the K-05 call's name, and the code alone (a PostgresError as
+ * postgres.js's SASL_SIGNATURE_MISMATCH, PostgreSQL's class 28 and 53300, and its 3D000, 42501 and 55000 raised FATAL
+ * at a session's start, which name the database: T-1367) is thrown scrubbed, never as it is (T-1268 round 2):
+ * clocks.ts's scrubbed, with `call`, the K-05 call's name, and the code alone (a PostgresError as
  * DataAccessDatabaseError, any other as a new Error with no message, stack, cause or property of the original's). Every
  * other error is thrown as it is: db/repo's own, a statement's own refusal of any other SQLSTATE, and JavaScript's own
  * for a faulty value (postgres.js could not build or read a statement).
