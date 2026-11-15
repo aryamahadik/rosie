@@ -27,10 +27,11 @@
 //                  row out-sam-safety-0062, send class safety, checked at version 2 with the fixed line safetyEmergency
 //                  as its plan and final parts, through commitTurn and writePlan, after the JOIN's row in commit order.
 //
-// The picked rows and the thread are written in one transaction as the runtime side's role, rosie_job, with no business
-// scope, as the skeleton seed writes its own; each db/repo call runs as the connecting login, one transaction of its own.
-// Test values only (rule 9): the master's sample cast, the fixtures' ids and the fiction range's numbers, none of them
-// written here but the thread's row, which is its note's.
+// The picked rows, and later the thread, are each written in one transaction as the runtime side's role, rosie_job, with
+// no business scope, as the skeleton seed writes its own; each db/repo call runs as the connecting login, one
+// transaction of its own. Test values only (rule 9): the master's sample cast, the fixtures' ids and the fiction range's
+// numbers, none of them written here but the thread's row, which is its note's, and the danger line's ids, its note's
+// too.
 //
 // What the test file imports from here is constants, which load inside the Workers runtime; T-1148's seed is loaded at
 // `seed`, in Node, since db/seeds reads the fixture set from disk as it loads.
