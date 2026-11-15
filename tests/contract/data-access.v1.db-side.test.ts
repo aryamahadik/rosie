@@ -2950,6 +2950,13 @@ describe("data-access database side: the versions with one, each entry selected 
     );
     expect(exchange.given.after, `${file}: no chain writes them`).toEqual([]);
     expect(Date.parse(NOTICES_TURN.at), "committed before the danger line").toBeLessThan(Date.parse(line.at));
+    // The note lists the danger line's row as of "the same recipient, business and channel": the notices' own.
+    const danger = must(dangerLineRows(line)[1], "the danger line's row").values;
+    expect(
+      [danger.recipient_handle_id, danger.recipient_person_id, danger.business_id, danger.channel],
+      "the danger line's recipient, business and channel",
+    ).toEqual([handleId, personId, businessId, channel]);
+    expect(note, file).toContain(`its one row ${line.rowId} (send class safety, ${SAME_AS_NOTICES})`);
     const plan = validatorOf(V1, "writePlan.request");
     for (const [at, row] of notices.slice(1).entries()) {
       const place = at + 1;
