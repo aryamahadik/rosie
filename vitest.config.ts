@@ -2,6 +2,12 @@
 // own script (`npm run test:<project>`). A project with no test files passes. The parity project is outside
 // `npm test` (T-1067).
 import { cloudflareTest } from "@cloudflare/vitest-plugin";
+import {
+  kCurrentWorker,
+  type Miniflare,
+  type Request as OutboundRequest,
+  type Response as OutboundAnswer,
+} from "miniflare";
 import { defineConfig } from "vitest/config";
 
 const workspaces = [
@@ -35,12 +41,53 @@ const MAX_WORKERS = Number.isSafeInteger(workersSetting) && workersSetting >= 1 
 // file's database (infra/test-rig/files.mjs) on the server of DATABASE_URL, else the local default, and drops them after.
 const RIG_SETUP = "infra/test-rig/global-setup.mjs";
 
+// The Workers pool's outbound tripwire (T-1411, DL-832; T-1408's handoff): the pool's main and both Workers projects'
+// setup file. The file's header says how a test stands in for an outside host behind it.
+const OUTBOUND = "runtime/test/outbound.ts";
+
+/** The pool Worker's service binding to its own OutboundTripwire entrypoint (OUTBOUND). */
+const OUTBOUND_BINDING = "ROSIE_TEST_OUTBOUND";
+
+/** The binding as miniflare's getBindings hands it to Node: a fetch into the pool's Worker. */
+interface TripwireBinding {
+  fetch(request: OutboundRequest, init: { redirect: "manual" }): Promise<OutboundAnswer>;
+}
+
+/** Each pool's binding to its tripwire, read once per Miniflare instance. */
+const tripwires = new WeakMap<Miniflare, Promise<TripwireBinding>>();
+
+/**
+ * The pool's global outbound (miniflare.outboundService; miniflare 5 takes no entrypoint of the Worker itself there): it
+ * hands each request the pool's Worker sends with its global fetch(), as workerd built it, straight back into that
+ * Worker's own isolate, to OutboundTripwire, and returns its answer for workerd's fetch to finish (redirect "manual", so
+ * a 3xx goes back as it is and only the caller's own redirect mode applies). Nothing is sent anywhere else.
+ */
+function outbound(request: OutboundRequest, mf: Miniflare): Promise<OutboundAnswer> {
+  let tripwire = tripwires.get(mf);
+  if (tripwire === undefined) {
+    tripwire = mf.getBindings().then((bindings) => {
+      const binding = bindings[OUTBOUND_BINDING];
+      if (binding === undefined)
+        throw new Error(`vitest.config.ts: the pool's Worker has no ${OUTBOUND_BINDING}`);
+      return binding as TripwireBinding;
+    });
+    tripwires.set(mf, tripwire);
+  }
+  return tripwire.then((binding) => binding.fetch(request, { redirect: "manual" }));
+}
+
 // The Workers pool's options, one function for both Workers projects (T-1253; ADR-014 section 4, "The Workers test pool,
 // local runs and CI"): wrangler.jsonc's staging environment, with every Hyperdrive binding's string fed from the rig's
 // globalSetup through inject. miniflare's hyperdrives win over wrangler.jsonc's local strings, so the pool's own
 // HYPERDRIVE_JOB and HYPERDRIVE_APP name rosie_rig_none, which is never made, each named file's pair names its own
 // database, and no test reaches the build Mac's rosie database. Every binding is a pool binding, so a test reaches
 // PostgreSQL through miniflare's Hyperdrive stand-in, as the Worker reaches it through Hyperdrive.
+// The outbound (T-1411): the pool's main is OUTBOUND, which exports runtime/src/index.ts's exports unchanged and the
+// tripwire's entrypoint, OutboundTripwire, bound to the Worker itself as OUTBOUND_BINDING, and the pool's global outbound
+// is `outbound` below, which hands each request to that binding. So every global fetch() a Workers test's code makes is
+// built and sent by workerd's own fetch and answered in the test's own isolate, by a stand-in the test claimed or by the
+// tripwire's failure: none reaches the network. A raw socket (cloudflare:sockets connect()) does not pass through a
+// function outbound in miniflare 5 (OUTBOUND's header says what that leaves).
 const workersPool: Parameters<typeof cloudflareTest>[0] = ({ inject }) => {
   const hyperdrives = inject("rosieRigHyperdrives");
   if (hyperdrives === undefined) {
@@ -50,8 +97,14 @@ const workersPool: Parameters<typeof cloudflareTest>[0] = ({ inject }) => {
     );
   }
   return {
+    main: `./${OUTBOUND}`,
     wrangler: { configPath: "./wrangler.jsonc", environment: "staging" },
-    miniflare: { bindings: { GIT_SHA: "test-sha" }, hyperdrives },
+    miniflare: {
+      bindings: { GIT_SHA: "test-sha" },
+      serviceBindings: { [OUTBOUND_BINDING]: { name: kCurrentWorker, entrypoint: "OutboundTripwire" } },
+      outboundService: outbound,
+      hyperdrives,
+    },
   };
 };
 
@@ -112,8 +165,9 @@ export default defineConfig({
           ],
           // The Workers test rig's databases, logins and bindings (T-1253).
           globalSetup: [RIG_SETUP],
-          // Holds a HandleActor's own wiring in the pool's one isolate (T-1243; that file's header says why).
-          setupFiles: ["runtime/test/hold-actor-wiring.ts"],
+          // Holds a HandleActor's own wiring in the pool's one isolate (T-1243; that file's header says why); then the
+          // outbound tripwire's check after each test (T-1411).
+          setupFiles: ["runtime/test/hold-actor-wiring.ts", OUTBOUND],
           // No module cache on disk (T-1207, DL-420), so the pool sends the runner each module in a message of its own.
           // With the cache, Vitest hands a new runner every module of its file's graph that the run has already
           // transformed, and the pool sends all of that code in one WebSocket message; workerd closes the runner's
@@ -170,8 +224,9 @@ export default defineConfig({
           // Reads SKELETON_UPTO and CONTRACT_REPORT in Node and provides them to the run (tests/e2e/skeleton/README.md);
           // beside it, the Workers test rig's (T-1253), as in the workers project.
           globalSetup: ["tests/e2e/_driver/prefix/global-setup.ts", RIG_SETUP],
-          // Holds a HandleActor's own wiring in the pool's one isolate (T-1243; that file's header says why).
-          setupFiles: ["runtime/test/hold-actor-wiring.ts"],
+          // Holds a HandleActor's own wiring in the pool's one isolate (T-1243; that file's header says why); then the
+          // outbound tripwire's check after each test (T-1411).
+          setupFiles: ["runtime/test/hold-actor-wiring.ts", OUTBOUND],
           // Each module in a message of its own to the runner, as in the workers project (T-1207).
           fsModuleCache: false,
         },
