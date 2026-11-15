@@ -33,8 +33,8 @@
 //
 // What it does not cover: a raw socket. miniflare 5 sends a Worker's cloudflare:sockets connect() around a function
 // outbound, straight to the address (measured on T-1411's branch: a test's connect() to the rig's PostgreSQL server,
-// 127.0.0.1:54329, opened), and Hyperdrive's sockets, which the Workers tests' database calls use, go that way too. So
-// the tripwire holds every fetch(), and a test opens no socket of its own; tripping connect() is a later task.
+// 127.0.0.1:54329, opened), and the sockets of the Workers tests' database calls (Hyperdrive's bindings) do not pass
+// through it either. So the tripwire holds every fetch(), not a raw socket: tripping connect() is a later task.
 //
 // Not the Worker's: a deployed Worker never imports this file (wrangler.jsonc's main is runtime/src/index.ts), so nothing
 // here changes what a Worker sends in production.
