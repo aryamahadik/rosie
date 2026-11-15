@@ -19,17 +19,19 @@
 //   - nothing claimed: with no HYPERDRIVE_JOB, with no TEST_PHONE_LINE and with the two bindings crossed (the guard's
 //     refusal), a wake for handle-sam claims nothing (no row, version, part or claim row changes) and nothing reaches the
 //     line; a danger line's safety run whose calls hold no claimOutboxV114 is refused before any call;
-//   - the danger line: with claimOutboxV114 bound, a safety run claims the recipient's safety row through it, on the
-//     rows claim-safety-past-routine-live-claim.json's note lists, and sends it; the JOIN's row is not read;
-//   - the send: the dispatcher's wake for handle-sam claims outbox-s1-02-sam-1 once and reads its send state (the chat
-//     open, Linq's chat id: send-state-customer.json's shape); its one part reaches the test-phone line under its key,
-//     once; the row and the part are sent in PostgreSQL with the line's message id; a second wake claims nothing;
+//   - the danger line: with claimOutboxV114 bound, a safety run claims the recipient's safety row through it, with
+//     sendClass safety, on the rows claim-safety-past-routine-live-claim.json's note lists, and sends it; the JOIN's row
+//     is not read;
+//   - the send: the dispatcher's wake for handle-sam claims outbox-s1-02-sam-1 once, through claimOutboxV114 with no
+//     sendClass (K-05 v1.13's claim, DL-761; claimOutboxV12 is never called), and reads its send state (the chat open,
+//     Linq's chat id: send-state-customer.json's shape); its one part reaches the test-phone line under its key, once;
+//     the row and the part are sent in PostgreSQL with the line's message id; a second wake claims nothing;
 //   - a receipt not marked: with no HYPERDRIVE_JOB, with no TEST_PHONE_LINE and with the bindings crossed, the receipt
 //     door rejects a delivered event for the sent part, so the gateway answers 503, and no part is marked;
 //   - the receipt: Root.gateway.receipts.accept with a K-06 delivered event for that part answers written; the part and
 //     the row are delivered; S1-02's clock row is armed once, due 8pm the day after delivery in America/New_York, its
-//     question open; the actor double is told for Sam's actor; the same receipt again, and again in another isolate,
-//     answers duplicate with no second arming;
+//     question open; the actor double is told for Sam's actor, phone:+15555550100; the same receipt again, and again in
+//     another isolate, answers duplicate with no second arming;
 //   - the arming's reads by direct call: questionFacts as read-question-facts-s1-02.json, read-question-facts-a7-03.json
 //     (the visit's addressZone and address null) and read-question-facts-unknown.json (the port's NotFoundError);
 //     actorNameOf as the gateway's actorNameOf of read-handle-sam.json's handle, and null for read-handle-unknown.json's
@@ -71,7 +73,7 @@ import {
   type Root,
   type RootClock,
 } from "../index";
-import { SendClassNotCarriedError, type ArmingCalls } from "../real";
+import { SendClassNotCarriedError, type ArmingCalls, type OutboxCalls } from "../real";
 import { skeletonFakes } from "../test-support";
 import { dbHandle, DbGuardRefusal } from "./db";
 import { NO_RECEIPT_INPUTS } from "./k05-receipt";
@@ -266,6 +268,49 @@ const boundOf = (inputs: SendInputs): boolean[] =>
   [inputs.outboxCalls, inputs.sendStateCall, inputs.linqSendCall, inputs.armingCalls].map(
     (input) => input !== null,
   );
+
+/** One outbox call the port made, by its name in OutboxCalls, with a claim's sendClass as it came (null: none). */
+interface OutboxCallMade {
+  readonly name: keyof OutboxCalls;
+  readonly sendClass?: string | null;
+}
+
+/**
+ * The four as stagingOptions gave them, each outbox call recorded on its way to the bound call itself, which still makes
+ * it and answers it (nothing is answered here): so a test sees which of OutboxCalls the port called, and with what class.
+ */
+function recordingOutbox(made: OutboxCallMade[]): (inputs: SendInputs) => SendInputs {
+  return (inputs) => {
+    const calls = inputs.outboxCalls;
+    const claimV114 = calls?.claimOutboxV114;
+    if (calls === null || claimV114 === undefined) throw new Error("staging bound no v1.14 claim");
+    return {
+      ...inputs,
+      outboxCalls: {
+        claimOutboxV12: (request) => {
+          made.push({ name: "claimOutboxV12" });
+          return calls.claimOutboxV12(request);
+        },
+        claimOutboxV114: (request) => {
+          made.push({ name: "claimOutboxV114", sendClass: request.sendClass ?? null });
+          return claimV114(request);
+        },
+        renewClaim: (request) => {
+          made.push({ name: "renewClaim" });
+          return calls.renewClaim(request);
+        },
+        markPartV12: (request) => {
+          made.push({ name: "markPartV12" });
+          return calls.markPartV12(request);
+        },
+        markRowV12: (request) => {
+          made.push({ name: "markRowV12" });
+          return calls.markRowV12(request);
+        },
+      },
+    };
+  };
+}
 
 // ---- the HandleActor namespace double --------------------------------------------------------------------------------
 
@@ -860,10 +905,17 @@ describe("the send cannot go: a wake claims nothing, so no claim burns a try", (
 describe("claimOutboxV114 bound: a danger line's safety run", () => {
   it("claims the recipient's safety row through K-05 v1.14's claim, on the rows claim-safety-past-routine-live-claim.json's note lists, and sends it; the JOIN's row, of another send class, is not read, claimed or sent", async () => {
     const before = await stored();
-    const { root, db, calls, lines } = rootOver(envOf());
+    const made: OutboxCallMade[] = [];
+    const { root, db, calls, lines } = rootOver(envOf(), recordingOutbox(made));
 
     await wakeSafety(root);
 
+    // Through K-05 v1.14's claim with sendClass safety, never claimOutboxV12 (a claim of every class).
+    expect(made).toEqual([
+      { name: "claimOutboxV114", sendClass: "safety" },
+      { name: "renewClaim" },
+      { name: "markPartV12" },
+    ]);
     const after = await stored();
     // The safety row alone: claimed once by this root's dispatcher, its one part sent under its key.
     expect(after.claims).toEqual([
@@ -897,9 +949,16 @@ describe("claimOutboxV114 bound: a danger line's safety run", () => {
 
 describe("the send: the dispatcher's wake for handle-sam", () => {
   it("claims outbox-s1-02-sam-1 once, reads its send state, and its one part reaches the test-phone line under its key, once; the row and the part are sent in PostgreSQL with the line's message id; a second wake claims nothing", async () => {
+    // The card's names, as the seed's fixtures give them.
+    expect([JOIN.handleId, JOIN.row, JOIN.partKey]).toEqual([
+      "handle-sam",
+      "outbox-s1-02-sam-1",
+      "outbox-s1-02-sam-1/1/1",
+    ]);
     const before = await stored();
     const testEnv = envOf();
-    const { root, db, inputs, calls, lines } = rootOver(testEnv);
+    const made: OutboxCallMade[] = [];
+    const { root, db, inputs, calls, lines } = rootOver(testEnv, recordingOutbox(made));
     const spans: Span[] = [];
     // Nothing was read to build the root but the environment and the two bindings' presence: no connection string.
     expect(testEnv.job?.reads.n).toBe(0);
@@ -909,6 +968,12 @@ describe("the send: the dispatcher's wake for handle-sam", () => {
     // One claim (K-05 v1.13's, through claimOutboxV114: DL-761), limit 8's read, the renewal, the stopped flag's second
     // read and the sent mark, each on a job-side client of its own.
     expect(calls()).toEqual(["claimOutbox", "sendState", "renewClaim", "sendState", "markPart"]);
+    // The routine claim goes through claimOutboxV114 with no sendClass, so it is v1.13's: claimOutboxV12 is never called.
+    expect(made).toEqual([
+      { name: "claimOutboxV114", sendClass: null },
+      { name: "renewClaim" },
+      { name: "markPartV12" },
+    ]);
     expectJobSide(lines());
     expect(testEnv.job?.reads.n).toBe(5);
     expect(db.counts()).toMatchObject({ opened: 5, ended: 5, connectionsOpen: 0, connectionsPeak: 1 });
@@ -983,6 +1048,7 @@ describe("the send: the dispatcher's wake for handle-sam", () => {
       "sendState",
       "claimOutbox",
     ]);
+    expect(made.slice(3)).toEqual([{ name: "claimOutboxV114", sendClass: null }]);
     expect(await stored()).toEqual(after);
     expect((await lineParts()).map((one) => one.key)).toEqual([DANGER_LINE.partKey, JOIN.partKey]);
   });
@@ -1073,6 +1139,7 @@ describe("the receipt: Root.gateway.receipts.accept with a K-06 delivered event 
     expect(clockOf(after, JOIN.clock)).toEqual(armed);
     expect(questionOf(after, JOIN.question)).toMatchObject({ status: "open", version: 2 });
     // Sam's actor, named as the gateway names it, told once of the handle's newly armed row.
+    expect(SAM_ACTOR).toBe("phone:+15555550100");
     expect(actors.named).toEqual([SAM_ACTOR]);
     expect(actors.told).toEqual([[SAM_ACTOR, JOIN.handleId]]);
     // The receipt's own trace (this isolate did not send the row): delivered, then clockArmed; labels only.
