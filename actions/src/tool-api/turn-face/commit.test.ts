@@ -14,12 +14,19 @@
 //
 // T-1194: the answer's `written` leaves the safety record's row out, as commit-s1-01.json's does (K-09 v1.5 default 134),
 // so the whole answer equals the fixture's; K-05's one commit still writes the record.
+//
+// T-1266 (ADR-015's new task "The commit names every event of the turn"; DL-508): a customer's tapback joins the turn but
+// is never read by the safety read, so K-34 never holds a row for it. The commit names to readOpenHolds only the turn's
+// texts the safety read reads (K-05 item 34: "the turn's texts"), so a tapback beside a recorded text no longer holds every
+// routine part, while a real text with no record still does.
 
 import { describe, expect, it } from "vitest";
 
 import type { Span } from "../../../../runtime/src/trace";
+import type { GateAndCommitRequest } from "../../commit";
 import { BARBERSHOP, safetyWorldOf } from "../../domain/safety/test-support";
 import { BUNDLE_V0, fakeBundles, sampleBundle, withSteps } from "../../frontier/assemble/test-support";
+import type { Decided } from "../../gate/framework";
 import { NotBuiltError } from "../errors";
 import { traceFor } from "../test-support";
 import { createToolApi } from "../tool-api";
@@ -33,6 +40,7 @@ import {
   limitOneOnTurnOne,
   openHoldsOn,
   safetyReadsOn,
+  type OpenHoldsRead,
 } from "./calls-test-support";
 import {
   NOTHING_OPEN_AT,
@@ -284,6 +292,164 @@ describe("openHolds: K-05 readOpenHolds joined with the runtime's commit-time co
       read: "readOpenHolds",
       code: "notFound",
     });
+  });
+});
+
+/** One text of the turn as decide reads it (K-02 v1.1 context.texts). */
+type DecidedText = Decided["context"]["texts"][number];
+
+/** Sam's text of turn 1 (commit-s1-01.json): the event the safety record in its core actions names. */
+const SAM_TEXT = "evt-sam-s1-01";
+
+/**
+ * Sam's tapback in the batch of his first text (T-1266): a like on one of Rosie's messages, in K-06 v1
+ * reaction-from-customer.json's form, as the turn hands it to decide (runtime/src/turn/turn.ts turnTextOf: a reaction is
+ * a K-02 tapback named by its reaction). It has no words: the safety read never reads it (runtime/src/safety/arrival.ts
+ * READ_KINDS), so K-34 never holds an outcome row for it (0016: one row per read text).
+ */
+const SAM_TAPBACK: DecidedText = {
+  eventId: "evt-sam-s1-01-like",
+  kind: "tapback",
+  words: "like",
+  sentAt: { utc: "2026-10-19T18:05:02Z", zone: "America/New_York" },
+  attachments: [],
+  poll: null,
+  tapback: { reaction: "like", onMessageId: "linq-msg-demo-0001" },
+};
+
+/**
+ * The request with these texts joining its turn after its own, in arrival order: decide's texts, and each new event once
+ * among the turn's event ids.
+ */
+function joining(request: GateAndCommitRequest, ...texts: DecidedText[]): GateAndCommitRequest {
+  const next = structuredClone(request);
+  if (next.turn === null || next.input.kind !== "decided") throw new Error("turn 1 decides its texts");
+  const { decided } = next.input;
+  const own = next.turn.eventIds;
+  const added = texts
+    .map((text) => text.eventId)
+    .filter((id, at, ids) => !own.includes(id) && ids.indexOf(id) === at);
+  return {
+    ...next,
+    turn: { ...next.turn, eventIds: [...own, ...added] },
+    input: {
+      ...next.input,
+      decided: { ...decided, context: { ...decided.context, texts: [...decided.context.texts, ...texts] } },
+    },
+  };
+}
+
+describe("a turn with a customer's tapback: the texts not read are only those the safety read reads (T-1266)", () => {
+  it("Sam's text with its record and his tapback commit as turn 1 does: the tapback is never named among the texts not read, so the routine part is not held", async () => {
+    const exchange = commitS101();
+    const doubles = callDoubles();
+    const request = joining(commitRequestAfter(undefined), SAM_TAPBACK);
+    const result = committed((await commitThrough(doubles.calls, request)).answer);
+
+    // What the commit named to readOpenHolds, and what it answered for S1-01's door (a routine part). Naming the tapback,
+    // which no K-34 row can ever call read, held every routine part of the turn.
+    expect({
+      named: doubles.openHoldsReads.map((read) => read.request.eventIds),
+      parts: result.parts.map((part) => part.result),
+    }).toEqual({ named: [[]], parts: ["committed"] });
+    // Every field as commit-s1-01.json states it: the tapback changes nothing that commits.
+    expect(result).toEqual(exchange.outcome);
+
+    // One K-05 commit: its turn row names both events, and it writes the record, the thread, the question and the row.
+    expect(doubles.k05.requests).toHaveLength(1);
+    const [sent] = doubles.k05.requests;
+    expect(sent?.turn.eventIds).toEqual([SAM_TEXT, SAM_TAPBACK.eventId]);
+    expect(sent?.writes.outboxRows.map((row) => row.id)).toEqual(["outbox-s1-02-sam-1"]);
+    expect(doubles.k05.commits).toEqual([
+      {
+        turnId: "turn-s1-01-sam",
+        written: [
+          { table: "safety_outcomes", rowId: "safety-outcome-sam-s1-01", version: 1 },
+          ...exchange.outcome.written.written,
+        ],
+      },
+    ]);
+  });
+
+  it("Sam's text whose record is missing still holds every routine part beside his tapback: the text is named and unread, and nothing of the part is written", async () => {
+    const doubles = callDoubles();
+    const request: GateAndCommitRequest = {
+      ...joining(commitRequestAfter(undefined), SAM_TAPBACK),
+      core: [],
+    };
+    const result = committed((await commitThrough(doubles.calls, request)).answer);
+    expect(result.parts).toEqual([expect.objectContaining({ part: 0, result: "held", gives: [] })]);
+    const [read] = doubles.openHoldsReads;
+    expect(read?.request.eventIds).toContain(SAM_TEXT);
+    const [sent] = doubles.k05.requests;
+    expect(sent?.writes.state).toEqual([]);
+    expect(sent?.writes.outboxRows).toEqual([]);
+    expect(sent?.writes.openQuestions.open).toEqual([]);
+  });
+
+  it("openHolds names the turn's texts the safety read reads, never a tapback: with the record nothing is named; without it Sam's text alone, unread", async () => {
+    const request = joining(commitRequestAfter(undefined), SAM_TAPBACK);
+    const reads: OpenHoldsRead[] = [];
+    const port = openHoldsPort<unknown>(NOTHING_OPEN_AT, openHoldsOn(safetyWorldOf(), reads));
+    expect(await port(commitContextOf(request))).toEqual({ holds: [], unreadEventIds: [] });
+    expect(await port(commitContextOf({ ...request, core: [] }))).toEqual({
+      holds: [],
+      unreadEventIds: [SAM_TEXT],
+    });
+    expect(reads.map((read) => read.request.eventIds)).toEqual([[], [SAM_TEXT]]);
+  });
+
+  it("an event is left out only when decide's texts name it as a tapback and as nothing else: a vote, an event decide does not hold and every event of a core-only turn stay named (fail closed)", async () => {
+    const vote: DecidedText = {
+      eventId: "evt-sam-s1-01-vote",
+      kind: "pollVote",
+      words: "Barber",
+      sentAt: { utc: "2026-10-19T18:05:03Z", zone: "America/New_York" },
+      attachments: [],
+      poll: { pollId: "linq-poll-demo-0001", optionId: "linq-option-demo-0001" },
+      tapback: null,
+    };
+    // One event that decide's texts name twice, as a tapback and as a text: they do not agree that it is only a tapback.
+    const twice: DecidedText = {
+      ...SAM_TAPBACK,
+      eventId: "evt-sam-s1-01-twice",
+      kind: "text",
+      words: "like",
+      tapback: null,
+    };
+    const asTapback: DecidedText = { ...SAM_TAPBACK, eventId: twice.eventId };
+    const decided = joining(commitRequestAfter(undefined), SAM_TAPBACK, vote, asTapback, twice);
+    // A STOP beside the decided texts is a keyword text, which decide never reads: its event is in the turn alone.
+    const stop = "evt-sam-s1-01-stop";
+    if (decided.turn === null) throw new Error("turn 1 carries its turn");
+    const withStop: GateAndCommitRequest = {
+      ...decided,
+      turn: { ...decided.turn, eventIds: [...decided.turn.eventIds, stop] },
+    };
+    const reads: OpenHoldsRead[] = [];
+    const port = openHoldsPort<unknown>(NOTHING_OPEN_AT, openHoldsOn(safetyWorldOf(), reads));
+    const named = [vote.eventId, twice.eventId, stop];
+    expect(await port(commitContextOf(withStop))).toEqual({ holds: [], unreadEventIds: named });
+
+    // A core-only turn carries no texts of decide's, so nothing tells a tapback from a text with no record: it is named.
+    const coreOnly: GateAndCommitRequest = { ...withStop, input: { kind: "coreOnly" } };
+    expect(await port(commitContextOf(coreOnly))).toEqual({
+      holds: [],
+      unreadEventIds: [SAM_TAPBACK.eventId, ...named],
+    });
+    expect(reads.map((read) => read.request.eventIds)).toEqual([named, [SAM_TAPBACK.eventId, ...named]]);
+  });
+
+  it("the runtime's unread ids are kept whole, a tapback's included (DL-133): any unread id holds", async () => {
+    const request = joining(commitRequestAfter(undefined), SAM_TAPBACK);
+    const at: CommitAt = { holds: [], unread: [SAM_TAPBACK.eventId] };
+    const reads: OpenHoldsRead[] = [];
+    const port = openHoldsPort<unknown>(at, openHoldsOn(safetyWorldOf(), reads));
+    expect(await port(commitContextOf(request))).toEqual({
+      holds: [],
+      unreadEventIds: [SAM_TAPBACK.eventId],
+    });
+    expect(reads.map((read) => read.request.eventIds)).toEqual([[SAM_TAPBACK.eventId]]);
   });
 });
 
