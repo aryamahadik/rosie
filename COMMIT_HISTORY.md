@@ -2,9 +2,99 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 637, [`e0f6ee7`](https://github.com/aryamahadik/rosie/commit/e0f6ee7), 2026-11-15 04:19:44 UTC.
+- **Through:** commit 640, [`33933e9`](https://github.com/aryamahadik/rosie/commit/33933e9), 2026-11-15 07:57:39 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 640. docs: COMMIT\_HISTORY.md through commit 637 (e0f6ee7, \#648) (\#651)
+
+- **Commit:** [`33933e9`](https://github.com/aryamahadik/rosie/commit/33933e9), by Arya Mahadik, 2026-11-15 07:57:39 UTC
+- **Pull request:** [#651](https://github.com/aryamahadik/rosie/pull/651) from `task/commit-history-120`, merged 2026-11-15 07:57:40 UTC. It squashed 1 branch commit:
+  - `13152e3` docs: COMMIT\_HISTORY.md through commit 637 (e0f6ee7, \#648)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 639. T-1396: staging binds the safety read, decide and the composer from each bundle's own manifest (the audit's P3a) (\#650)
+
+- **Commit:** [`af8cac0`](https://github.com/aryamahadik/rosie/commit/af8cac0), by Arya Mahadik, 2026-11-15 07:57:35 UTC
+- **Pull request:** [#650](https://github.com/aryamahadik/rosie/pull/650) from `task/T-1396-r2`, merged 2026-11-15 07:57:36 UTC. It squashed 5 branch commits:
+  - `f44f1b1` T-1396: staging binds safetyReaders, deciders and composers from each…
+  - `4e088df` T-1396: a bundle id that is not K-01's is refused before the kept rea…
+  - `3274076` T-1396: the test's factories helper says what it gives (a comment only)
+  - `645dba1` T-1396: the test shows a step card laid out from the bundle's own flo…
+  - `9342ebf` T-1396: the test counts only this card's own reads and inputs where P…
+- **Files changed:** 2 (+2071 −23), by folder:
+  - `runtime/src/wiring/staging/` models.ts +315 −23, models.worker.test.ts +1756 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1396: staging binds safetyReaders, deciders and composers from each bundle's own manifest, with its Workers test
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1396: a bundle id that is not K-01's is refused before the kept readers are looked up
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1396: the test's factories helper says what it gives (a comment only)
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1396: the test shows a step card laid out from the bundle's own flow graph
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1396: the test counts only this card's own reads and inputs where P2b's or P3b's real builder runs (DL-776)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 638. T-1401: staging binds the send all or nothing: outbox, send state, arming and the test-phone line (the audit's P5) (\#649)
+
+- **Commit:** [`1c4894b`](https://github.com/aryamahadik/rosie/commit/1c4894b), by Arya Mahadik, 2026-11-15 07:57:32 UTC
+- **Pull request:** [#649](https://github.com/aryamahadik/rosie/pull/649) from `task/T-1401-r2`, merged 2026-11-15 07:57:32 UTC. It squashed 3 branch commits:
+  - `821a850` T-1401: staging binds the send all or nothing (outboxCalls, sendState…
+  - `cd3cea8` T-1401: the send's test also holds each bound call over a handle doub…
+  - `9eadf99` T-1401: the send's test also holds which outbox call the port makes (…
+- **Files changed:** 3 (+1964 −12), by folder:
+  - `runtime/src/wiring/staging/` send.seed.ts +274 −0, send.ts +191 −12, send.worker.test.ts +1499 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1401: staging binds the send all or nothing (outboxCalls, sendStateCall, armingCalls on the job handle; linqSendCall to the test-phone line), with its Workers test and seed
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1401: the send's test also holds each bound call over a handle double (K-05's transient as it is, a passed-through throw scrubbed)
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1401: the send's test also holds which outbox call the port makes (the routine claim through claimOutboxV114 with no sendClass, never claimOutboxV12; the safety claim with sendClass safety), the card's row, key and handle names, and Sam's actor as phone:+15555550100
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 637. docs: COMMIT\_HISTORY.md through commit 635 (b1e79f3, \#646) (\#648)
 
