@@ -13,14 +13,14 @@ For the frontend engineer and the CTO. Written under DL-794 from the records onl
 
 Read from `web/spikes/chat-link/build.mjs` (the page is `index.html`). Each form has a link and an inline QR code that encodes exactly that link, so the QR text is the link text. Fixture line `+15555550123`, ready text `Hi Rosie, I would like to book. Code ZX7Q4K`, encoded with `encodeURIComponent`.
 
-| Form id                 | Targets         | Link and QR text                                       |
-| ----------------------- | --------------- | ------------------------------------------------------ |
-| ios-ampersand           | iOS             | `sms:<line>&body=<encoded text>`                       |
-| android-question        | Android         | `sms:<line>?body=<encoded text>`                       |
-| both-question-ampersand | iOS and Android | `sms:<line>?&body=<encoded text>`                      |
-| ios-double-slash        | iOS             | `sms://<line>&body=<encoded text>`                     |
-| android-double-slash    | Android         | `sms://<line>?body=<encoded text>`                     |
-| number-only             | iOS and Android | `sms:<line>` (no body; the customer types the code)    |
+| Form id                 | Targets         | Link and QR text                                    |
+| ----------------------- | --------------- | --------------------------------------------------- |
+| ios-ampersand           | iOS             | `sms:<line>&body=<encoded text>`                    |
+| android-question        | Android         | `sms:<line>?body=<encoded text>`                    |
+| both-question-ampersand | iOS and Android | `sms:<line>?&body=<encoded text>`                   |
+| ios-double-slash        | iOS             | `sms://<line>&body=<encoded text>`                  |
+| android-double-slash    | Android         | `sms://<line>?body=<encoded text>`                  |
+| number-only             | iOS and Android | `sms:<line>` (no body; the customer types the code) |
 
 ## Device results
 
