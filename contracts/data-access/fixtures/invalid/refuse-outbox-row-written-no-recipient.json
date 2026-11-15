@@ -1,0 +1,9 @@
+{
+  "result": "outboxRowWritten",
+  "outboxRowId": "out-alex-safety-emergency",
+  "businessId": "biz-lees-barbershop",
+  "readAt": "2026-11-07T15:59:59Z",
+  "written": true,
+  "recipientHandleId": null,
+  "sendClass": "safety"
+}
