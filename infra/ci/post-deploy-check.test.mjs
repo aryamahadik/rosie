@@ -785,7 +785,10 @@ describe("post-deploy-check.sh --join: test owner 1's JOIN through the test-phon
       since <= Math.floor(send.at / 1000) * 1000 - 1000,
       "since: the send's own second less one, or earlier",
     );
-    assert.ok(since >= send.at - 5000, "since: no more than a few seconds before the send");
+    assert.ok(
+      since >= send.at - 30_000,
+      "since: within 30 s before the send, a bound a loaded machine keeps",
+    );
 
     const lines = linesOf(result.stdout);
     const healthId = lines

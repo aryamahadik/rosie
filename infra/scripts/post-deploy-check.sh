@@ -48,7 +48,8 @@
 #     32 bytes. It is never printed, logged or written to a file, and never in a command's arguments or environment:
 #     every name that could hold it is dropped before any command is started, and each page call's JSON body, the one
 #     place the token goes, reaches curl on its standard input alone (bash's printf, a builtin, writes it there). Each
-#     curl starts with --disable, so no ~/.curlrc can add a trace or a redirect. Refused before any request, exit 1:
+#     page call's curl starts with --disable, so no ~/.curlrc can add a trace or a redirect. Refused before any request,
+#     exit 1:
 #     no token (the line names the variable), a token not in that form (no part of it shown), and a <base-url> that is
 #     neither https nor http on this machine's own loopback (127.0.0.1, localhost or [::1], for wrangler dev), so the
 #     token never crosses a network unencrypted.
