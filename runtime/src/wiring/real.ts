@@ -724,6 +724,15 @@ export interface SafetyReadInputs {
   /** @rosie/ai's safety read for a text's bundle; null where none is bound, so every read fails closed. */
   readonly readers: SafetyReaders | null;
   /**
+   * The bundle's checked safety lines for the bundle a text names (T-1397; DL-757, option (c)): awaited at each read,
+   * once a reader is known to be bound and before the danger words are read, so the first text into a fresh isolate,
+   * with no pin before it, has its bundle's lines and gets a verdict. It resolves once the lines of that bundle are the
+   * ones the bundle port answers with (BundleSafetyLines.checkPin: read and checked once, then kept). It rejects for a
+   * bundle whose check fails or that cannot be read: no lines, so the read fails closed before any model call. Left out,
+   * nothing is awaited, and the danger words' own read decides, as before.
+   */
+  readonly checkedLines?: ((bundleId: BundleId) => Promise<void>) | undefined;
+  /**
    * The pinned bundle's danger words (K-01 shared lists), as the actor's own bundle port gives them
    * (`BundleSafety.dangerWords`), read at each read: the same list the actor's no-verdict rule matches.
    */
@@ -738,16 +747,20 @@ export interface SafetyReadInputs {
  * The actor's safety-read port (T-246's `SafetyReadPort`) bound to @rosie/ai's safety read: each raw text, as the actor
  * opened it on arrival, is read for danger by meaning (Haiku, then Sonnet, 2 s each) with the bundle's danger words, and
  * the K-02 v1 answer goes back to the actor as it is. The read's model-call spans (a portCall to provider anthropic per
- * try) go into the text's trace, under its trace id and bundle id. No reader bound, a danger-word list that cannot be
- * read, or a reader that cannot be built: the read fails before any model call, so the actor applies its no-verdict rule
- * (a danger word gets the safety line, any other text the outage line and its unread hold), and no verdict ever skips the
- * bundle's danger words. The words go to the read only: never into a span, a log or an error.
+ * try) go into the text's trace, under its trace id and bundle id. No reader bound, a bundle whose safety lines' check
+ * fails or cannot be read (`checkedLines`; DL-757, option (c)), a danger-word list that cannot be read, or a reader that
+ * cannot be built: the read fails before any model call, so the actor applies its no-verdict rule (a danger word gets the
+ * safety line, any other text the outage line and its unread hold), and no verdict ever skips the bundle's danger words.
+ * The words go to the read only: never into a span, a log or an error.
  */
 export function realSafetyRead(inputs: SafetyReadInputs): SafetyReadPort {
   return {
     async read(request) {
       const readers = inputs.readers;
       if (readers === null) throw new NoSafetyReaderError();
+      // The bundle's checked lines for this text's bundle first (DL-757, option (c)): with no pin before it, the first
+      // text into a fresh isolate still has them; a bundle the check refuses or cannot read rejects here, with no lines.
+      if (inputs.checkedLines !== undefined) await inputs.checkedLines(request.bundleId);
       const dangerWords = inputs.dangerWords();
       const reader = await readers(request.bundleId);
       const trace = openTrace({
