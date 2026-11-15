@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 # Staging's seeded state, from the build Mac (T-571; build prompt 9.4 'Seeded state'; C-202, C-011; QUESTIONS NQ-DB-2;
 # STATE note 67; DL-308; the check tester's set and its token's hash: T-1303, K-05 v1.12 default 105, QUESTIONS CQ-214
-# (a), DL-542, DL-561):
+# (a), DL-542, DL-561; the human testers' set and their inboxes: T-1287, ADR-016 section 5 and card S, DL-801):
 #   npm run seed:staging
 #       D-017's sets, in this order: core (T-200: the demo shops' core rows), staging-core (T-202: the test businesses,
 #       and a customer person, handle and phone row for each test phone but test owner 1), skeleton (T-1148: test
-#       owner 1, whose JOIN is a first text), then check-tester (T-1302: staging's check tester, a person with a live
-#       team row and a live session whose token_sha256 is its token's sha256, handed in by name: see below).
+#       owner 1, whose JOIN is a first text), staging-testers (T-1281: for each inbox on the testers' list, handed in
+#       by name, a person with an email handle, an account with that email proven and a live staging_testers listing,
+#       who signs in to staging by a code sent there: see below), then check-tester (T-1302: staging's check tester, a
+#       person with a live team row and a live session whose token_sha256 is its token's sha256, handed in by name: see
+#       below).
 #   npm run seed:staging -- --set <name> [--set <name>]...
 #       the sets named, in the order given: a later set (T-216's, T-218's) runs by its name, db/seeds/<name>.ts.
 # Each set is one run of T-201's seed runner (node db/seeds/run.mjs --set <name>), which writes it idempotently, in one
@@ -44,6 +47,20 @@
 # script's own that is never exported (T-1343): staging-core's run of the seed runner, the one set that reads it, gets it
 # by name, on that command's line alone, and no other command gets it.
 #
+# The testers' inboxes (T-1287; ADR-016 section 5 and card S; DL-011, DL-801): STAGING_TEST_INBOXES, from the
+# environment, else from .dev.vars by name, never printed: the addresses of the people who run staging's human tests,
+# separated by commas or white space, the list staging's Resend adapter holds as its allow-list (one source for both).
+# They are staff's own inboxes, not customer data (the user and Jay gave them for this test; ADR-016 open point 11), and
+# only the user puts them in .dev.vars. Like the URL, the list leaves this shell's environment before anything is
+# started and is kept in a variable of the script's own that is never exported. It is read only when staging-testers is
+# among the sets, and staging-testers' run of the seed runner, the one set that reads it, gets it by name, on that
+# command's line alone; no other command gets it, and a run without that set drops it unread. Unset or blank, it names
+# no inbox: the set seeds no tester and ends no listing (0 rows, exit 0), the run goes on, and the script says only that
+# the name is not set. An entry that is not an address makes the set refuse, writing nothing and naming the entry by its
+# place alone, which stops the run there as any set's failure does. The runner prints the set's row counts (one row a
+# table for each inbox), numbers alone; it does not print how many listings the set ended (an inbox taken off the list
+# ends its tester's listing, T-1281).
+#
 # The check tester's token (T-1303; CQ-214 (a); K-05 v1.12 default 105): the session token with which T-570's check and
 # T-467's run sign in to staging's test-phone page. It is made at random on the build Mac by
 # `npm run check-tester:token:make` (infra/scripts/make-check-tester-token.mjs: 32 random bytes written as 43 characters
@@ -68,9 +85,9 @@
 # `npm run check-tester:token:make -- --rotate`, then `npm run seed:staging -- --set check-tester`, which ends the old
 # token's session (T-1302). A lapsed or ended token's hash is refused by the set, so such a token is always replaced.
 #
-# Nothing here prints a database URL or any part of it, a phone number, the token or its hash: the runner prints the set,
-# the schema, "the staging database" and row counts, and a failure only as its code and its message with every part of
-# the URL taken out (infra/scripts/db-url.mjs), as does the read of the session's end.
+# Nothing here prints a database URL or any part of it, a phone number, an address of the testers' list, the token or
+# its hash: the runner prints the set, the schema, "the staging database" and row counts, and a failure only as its code
+# and its message with every part of the URL taken out (infra/scripts/db-url.mjs), as does the read of the session's end.
 # Exit: 0 every set seeded; 1 refused, or a set refused or failed (the runner's exit is passed on), or the check tester's
 # session end could not be read after its set; 2 misuse (an argument or a set name it does not take), found before
 # anything runs.
@@ -92,6 +109,7 @@ set -euo pipefail
 unset -v token hash ends status with_tester sets named name file list line value ROOT CF db_url caller_url
 unset -v D017_SETS CHECK_TESTER_SET SET_NAME USAGE BASE64URL_SIGNS LAST_SIGNS HEX_SIGNS ISO_TIME SHA256_OF_INPUT
 unset -v SESSION_END BASH_REMATCH TEST_PHONES_SET test_phones
+unset -v TEST_INBOXES_SET test_inboxes with_inboxes
 # The check tester's token, when the caller's environment holds it, goes into a variable of the script's own, which is
 # never exported, and the name is dropped from the environment at once, with its hash's, before any command is started
 # (sourcing lib.sh runs dirname): no command started from here finds either in its environment, whatever the sets.
@@ -106,14 +124,20 @@ unset -v STAGING_DATABASE_URL DATABASE_URL DATABASE_REPLICA_URL
 # The test phones' numbers go the same way (T-1343): test_phones is handed on by name to staging-core's run alone.
 test_phones="${STAGING_TEST_PHONES:-}"
 unset -v STAGING_TEST_PHONES
+# The testers' inboxes go the same way (T-1287): test_inboxes is handed on by name to staging-testers' run alone.
+test_inboxes="${STAGING_TEST_INBOXES:-}"
+unset -v STAGING_TEST_INBOXES
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-# D-017's sets, in their order (STATE note 67; T-202's handoff; the check tester's, T-1302, last).
-D017_SETS=(core staging-core skeleton check-tester)
+# D-017's sets, in their order (STATE note 67; T-202's handoff; the human testers', T-1281, after skeleton: T-1287,
+# ADR-016 card S; the check tester's, T-1302, last).
+D017_SETS=(core staging-core skeleton staging-testers check-tester)
 # The set that takes the check tester's token's sha256 (T-1302's db/seeds/check-tester.ts).
 CHECK_TESTER_SET="check-tester"
 # The set that reads the test phones' numbers, STAGING_TEST_PHONES (T-202's db/seeds/staging-core.ts).
 TEST_PHONES_SET="staging-core"
+# The set that reads the testers' inboxes, STAGING_TEST_INBOXES (T-1281's db/seeds/staging-testers.ts).
+TEST_INBOXES_SET="staging-testers"
 # A set's name, as the runner takes it (db/seeds/run.mjs SET_NAME): test files and lib/ are never sets.
 SET_NAME='^[a-z][a-z0-9]*(-[a-z0-9]+)*$'
 USAGE="usage: seed-staging.sh [--set <name>]... (with no --set: D-017's sets, ${D017_SETS[*]})"
@@ -313,12 +337,18 @@ if [[ -n "${DB_SCHEMA:-}" && "$DB_SCHEMA" != "public" ]]; then
     "or written"
 fi
 
-# The check tester's token, only when check-tester is among the sets (see the top of this file): read by name, its
-# form checked and its sha256 made, all before the first set runs. Otherwise it is dropped unread.
+# Whether check-tester, which takes the check tester's token's sha256, and staging-testers, which takes the testers'
+# inboxes (below), are among the sets. The check tester's token, only when check-tester is among them (see the top of
+# this file): read by name, its form checked and its sha256 made, all before the first set runs. Otherwise it is dropped
+# unread.
 with_tester=0
+with_inboxes=0
 for name in "${sets[@]}"; do
   if [[ "$name" == "$CHECK_TESTER_SET" ]]; then
     with_tester=1
+  fi
+  if [[ "$name" == "$TEST_INBOXES_SET" ]]; then
+    with_inboxes=1
   fi
 done
 hash=""
@@ -362,6 +392,17 @@ if [[ -z "$test_phones" ]]; then
   test_phones="${STAGING_TEST_PHONES:-}"
   unset -v STAGING_TEST_PHONES
 fi
+# The testers' inboxes, only when staging-testers is among the sets: from .dev.vars by name when the environment gave
+# none (see the top of this file), as the test phones' numbers above. Otherwise the list is dropped unread.
+if [[ "$with_inboxes" == 1 ]]; then
+  if [[ -z "$test_inboxes" ]]; then
+    load_dev_var STAGING_TEST_INBOXES
+    test_inboxes="${STAGING_TEST_INBOXES:-}"
+    unset -v STAGING_TEST_INBOXES
+  fi
+else
+  test_inboxes=""
+fi
 cd "$ROOT"
 
 log "seed-staging: sets ${sets[*]}, one run each in this order, into schema public on the staging database" \
@@ -373,6 +414,16 @@ if [[ "$test_phones" =~ [^[:space:]] ]]; then
 else
   log "seed-staging: STAGING_TEST_PHONES is not set: each test phone is seeded at its fixed fake handle (555-01xx)," \
     "the number the test-phone page sends as (J-08)"
+fi
+if [[ "$with_inboxes" == 1 ]]; then
+  if [[ "$test_inboxes" =~ [^[:space:],] ]]; then
+    log "seed-staging: STAGING_TEST_INBOXES is set: $TEST_INBOXES_SET gets it by name and seeds a tester for each" \
+      "inbox it names, who signs in to staging by a code sent there (no address is shown, and no other command gets" \
+      "the list)"
+  else
+    log "seed-staging: STAGING_TEST_INBOXES is not set: $TEST_INBOXES_SET seeds no tester, so no one signs in to" \
+      "staging by a code until the testers' inboxes are on that list (in .dev.vars, by name)"
+  fi
 fi
 if [[ "$with_tester" == 1 ]]; then
   log "seed-staging: $CHECK_TESTER_SET gets the sha256 of the check tester's token (STAGING_CHECK_TESTER_TOKEN)" \
@@ -392,6 +443,10 @@ for name in "${sets[@]}"; do
     # The test phones' numbers, by name, to this run of the seed runner alone (empty: the fixed fake handles).
     DATABASE_URL="$db_url" STAGING_DATABASE_URL="$db_url" STAGING_TEST_PHONES="$test_phones" DB_SCHEMA="public" \
       node --disable-warning=ExperimentalWarning "$ROOT/db/seeds/run.mjs" --set "$name" || status=$?
+  elif [[ "$name" == "$TEST_INBOXES_SET" ]]; then
+    # The testers' inboxes, by name, to this run of the seed runner alone (empty: no inbox, so no tester).
+    DATABASE_URL="$db_url" STAGING_DATABASE_URL="$db_url" STAGING_TEST_INBOXES="$test_inboxes" DB_SCHEMA="public" \
+      node --disable-warning=ExperimentalWarning "$ROOT/db/seeds/run.mjs" --set "$name" || status=$?
   else
     DATABASE_URL="$db_url" STAGING_DATABASE_URL="$db_url" DB_SCHEMA="public" \
       node --disable-warning=ExperimentalWarning "$ROOT/db/seeds/run.mjs" --set "$name" || status=$?
@@ -400,6 +455,7 @@ for name in "${sets[@]}"; do
     hash=""
     db_url=""
     test_phones=""
+    test_inboxes=""
     log "seed-staging: FAILED at set $name (the seed runner's exit $status, for the reason above): nothing of set" \
       "$name was written; the sets before it stay seeded, and the ones after it did not run. Once the cause is fixed" \
       "(a missing migration: npm run deploy:staging migrates the staging database, step 1), run the same command" \
@@ -413,4 +469,5 @@ done
 hash=""
 db_url=""
 test_phones=""
+test_inboxes=""
 log "seed-staging: done: sets ${sets[*]} seeded into schema public on the staging database"
