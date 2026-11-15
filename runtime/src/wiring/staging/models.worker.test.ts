@@ -26,6 +26,7 @@
 //     read of JOIN answers K-02's No, decide's two reads are recording 2's and the composer's call recording 4's, and each
 //     request on the wire is bundle v0's own: its model id, its prompt (named by its version) and, for decide, its rules;
 //   - a bundle with prompts of its own gets a reader of its own, whose requests carry that bundle's prompts, never code's;
+//     and a bundle whose flow graph holds a step with a card gets a decider that lays that card out as the bundle writes it;
 //   - one build per bundle id; a read in flight is not shared; the key is read by name at each call, never kept;
 //   - failing closed: nothing bound (each port's named error), the key left out (ANTHROPIC_API_KEY named, 0 fetches), the
 //     bindings left out, a manifest of another bundle id, a manifest with no prompt for the reader, a model id the gateway
@@ -68,6 +69,7 @@ import { NoRecordingError } from "@rosie/ai/src/recorded-double/errors";
 import { requestKey } from "@rosie/ai/src/recorded-double/key";
 import { turnStakes, type RoutingContext } from "@rosie/ai/src/routing/index";
 import { safetyReadTurn } from "@rosie/ai/src/safety/index";
+import bundleMiniA from "@rosie/contracts/bundle/fixtures/bundle-mini-a.json";
 import planS102 from "@rosie/contracts/message-plan/fixtures/plan-s1-02.json";
 import decideS101Enter from "@rosie/contracts/model/fixtures/decide-s1-01-enter.json";
 import safetyNo from "@rosie/contracts/model/fixtures/safety-no.json";
@@ -155,16 +157,21 @@ const V0: BundleId = { hash: V0_HASH, build: Number(V0_BUILD) };
 const V0_MANIFEST = JSON.parse(MANIFEST.value) as Json;
 const V0_FLOW_A = JSON.parse(FLOW_A.value) as Json;
 
-/** One bundle as a test holds it: its id, its manifest, and its stored values (key and text) as a publish writes them. */
+/**
+ * One bundle as a test holds it: its id, its manifest, its flow A graph, and its stored values (key and text) as a publish
+ * writes them.
+ */
 interface TestBundle {
   readonly bundleId: BundleId;
   readonly manifest: Json;
+  readonly flowA: Json;
   readonly values: readonly (readonly [string, string])[];
 }
 
 const V0_BUNDLE: TestBundle = {
   bundleId: V0,
   manifest: V0_MANIFEST,
+  flowA: V0_FLOW_A,
   values: [
     [MANIFEST.key, MANIFEST.value],
     [FLOW_A.key, FLOW_A.value],
@@ -207,6 +214,7 @@ function variantOf(build: number, change: (manifest: Json) => void): TestBundle 
   return {
     bundleId,
     manifest,
+    flowA: V0_FLOW_A,
     values: [
       [keyOf(bundleId, "manifest"), JSON.stringify(manifest)],
       [keyOf(bundleId, "flow/A"), FLOW_A.value],
@@ -262,6 +270,53 @@ const NO_MODELS_BUNDLE = variantOf(62, (manifest) => {
 /** A bundle the cases that swap a wrong copy for the right one use: v0's own parts, under a build of its own. */
 const LATER_BUNDLE = variantOf(71, () => undefined);
 
+/** K-01's bundle-mini-a.json flow A, which holds steps with cards (the JOIN turn shows none, so v0's cases lay none out). */
+const MINI_FLOW_A = (bundleMiniA as unknown as { flows: { A: Json } }).flows.A;
+
+/**
+ * That flow graph as a bundle of its own under bundle v0's manifest: its K-01 id is the hash of its one stored value's
+ * line ("<sha256>  <key part>", contracts/bundle README "Storage") under a build of its own.
+ */
+const CARD_BUNDLE: TestBundle = (() => {
+  const text = JSON.stringify(MINI_FLOW_A);
+  const sha256 = sha256Hex(text);
+  const bundleId: BundleId = { hash: sha256Hex(`${sha256}  flow/A\n`), build: 81 };
+  const manifest = structuredClone(V0_MANIFEST);
+  manifest.bundleId = { ...bundleId };
+  manifest.storage = {
+    manifestKey: keyOf(bundleId, "manifest"),
+    values: [
+      {
+        key: keyOf(bundleId, "flow/A"),
+        kind: "flow",
+        flow: "A",
+        bytes: new TextEncoder().encode(text).byteLength,
+        sha256,
+      },
+    ],
+  };
+  return {
+    bundleId,
+    manifest,
+    flowA: MINI_FLOW_A,
+    values: [
+      [keyOf(bundleId, "manifest"), JSON.stringify(manifest)],
+      [keyOf(bundleId, "flow/A"), text],
+    ],
+  };
+})();
+
+/** A step of that flow graph that holds a card, with the card as the bundle writes it (K-02's stepCard). */
+const CARD_STEP = (() => {
+  const steps = MINI_FLOW_A.steps as Record<string, { readonly card?: Json }>;
+  const found = Object.entries(steps).find(([, step]) => step.card !== undefined);
+  const card = found?.[1].card;
+  if (found === undefined || card === undefined) {
+    throw new Error("K-01's bundle-mini-a.json flow A holds no step with a card");
+  }
+  return { step: found[0], card };
+})();
+
 // ---- the JOIN run's recordings (ai/recordings; T-1145, T-1175) ---------------------------------------------------------
 
 /** Recording 2's request: the JOIN run's own context (K-02 README "v1.1"), on bundle v0's id and rules. */
@@ -297,11 +352,11 @@ const JOIN_PLAN_ID = "composer-join-s1-02";
 
 // ---- what a request must be on the wire, laid out from the bundle's own files by @rosie/ai's own layout ----------------
 
-/** A bundle's prompt layout, made here from the bundle's manifest and bundle v0's flow A: the oracle, never ./models.ts. */
+/** A bundle's prompt layout, made here from the bundle's manifest and its whole flow A: the oracle, never ./models.ts. */
 const layoutOf = (bundle: TestBundle): PromptCache =>
   createPromptCache({
     manifest: bundle.manifest as unknown as CacheBundle["manifest"],
-    flows: { A: V0_FLOW_A as unknown as CacheFlow },
+    flows: { A: bundle.flowA as unknown as CacheFlow },
   });
 
 /** The part of a Messages API request these tests compare: the model asked, the system blocks and the user message. */
@@ -898,8 +953,8 @@ function wordsIn(value: unknown, into: string[] = []): string[] {
 }
 
 /**
- * What no span, log line or error may hold: the model keys; the text's words; the start of each prompt of each bundle
- * here and of bundle v0's rules; and the words of the plan and of the composer's input.
+ * What no span, log line or error may hold: the model keys; the text's words; the start and end of each prompt of each
+ * bundle here and the start of each flow's rules; and the words of the card, of the plan and of the composer's input.
  */
 const NEVER_LOGGED: readonly string[] = [
   MODEL_KEY,
@@ -911,7 +966,10 @@ const NEVER_LOGGED: readonly string[] = [
       return [text.slice(0, 60), text.slice(-60)];
     }),
   ),
-  (V0_FLOW_A.routing as { alwaysOn: { prefixText: string } }).alwaysOn.prefixText.slice(0, 60),
+  ...[V0_FLOW_A, MINI_FLOW_A].map((flow) =>
+    (flow.routing as { alwaysOn: { prefixText: string } }).alwaysOn.prefixText.slice(0, 60),
+  ),
+  ...wordsIn(CARD_STEP.card),
   ...wordsIn(planS102),
   ...wordsIn(joinComposeInput),
 ];
@@ -1183,6 +1241,46 @@ describe("a bundle with prompts of its own", () => {
     expect(ownVersion("safetyRead")).toBe(`safetyRead@${promptIn(V0_MANIFEST, "safetyRead").version}-t1396`);
     // Every value came from the KV: K-05 was never asked.
     expect(rooted.lines()).toEqual([]);
+  });
+});
+
+describe("a bundle whose flow graph holds a step with a card", () => {
+  it("the decider lays a turn's card out from the bundle's own flow graph: each decide request carries that flow's rules and then the card, exactly as the bundle's whole graph gives them", async () => {
+    const kv = kvDouble();
+    kv.fill(CARD_BUNDLE);
+    const rooted = rootOver(envOf({ kv }));
+    const rules = (MINI_FLOW_A.routing as { alwaysOn: { prefixSha256: string } }).alwaysOn;
+    // The JOIN turn under this bundle, its rules named by this flow's hash, showing the card of a step the bundle holds.
+    // Its per-turn part is the JOIN turn's (a card is no part of it), so the double answers it from recording 2.
+    const context = {
+      ...contextUnder(CARD_BUNDLE.bundleId),
+      cards: [CARD_STEP],
+      alwaysOn: { flow: "A", prefixSha256: rules.prefixSha256 },
+    } as unknown as DecideContext;
+    const mark = rooted.mark();
+
+    const answer = decidedOf(
+      await rooted.root.ports.decide.decide(context, traceUnder(CARD_BUNDLE.bundleId, context.turnId)),
+    );
+
+    expect(answer.decide).toMatchObject({ agreed: true, reread: false });
+    // The oracle's layout holds the whole graph; the decider's requests equal it, cards segment and all.
+    const prompt = decidePrompt(CARD_BUNDLE, context);
+    expect(prompt.segments.map((segment) => segment.kind)).toEqual(["static", "cards"]);
+    expect(prompt.segments[1]?.text).toContain(`<card step="${CARD_STEP.step}">`);
+    const stepOne = wireFor(CARD_BUNDLE, prompt, stageOneTail());
+    const stepTwo = wireFor(CARD_BUNDLE, prompt, stageTwoTail(JOIN_PARTS, 0));
+    expect(rooted.models.misses).toEqual([]);
+    expect(rooted.models.requests.map((request) => request.wire)).toEqual([
+      stepOne,
+      stepOne,
+      stepTwo,
+      stepTwo,
+    ]);
+    expect(rooted.since(mark)).toEqual({
+      kv: [keyOf(CARD_BUNDLE.bundleId, "manifest"), keyOf(CARD_BUNDLE.bundleId, "flow/A")],
+      postgres: [],
+    });
   });
 });
 
