@@ -34,6 +34,9 @@
 //     (the visit's addressZone and address null) and read-question-facts-unknown.json (the port's NotFoundError);
 //     actorNameOf as the gateway's actorNameOf of read-handle-sam.json's handle, and null for read-handle-unknown.json's
 //     id, for which no actor is told while the arming still arms;
+//   - each bound call over a handle double that reaches no database: K-05's transient goes to its port as it is
+//     (actorNameOf, whose port has no place for one, throws the call's name and its SQLSTATE alone), and an error the
+//     handle passes through as it came leaves scrubbed, while the handle's own and db/repo's own leave as they are;
 //   - production: the builder reads no binding (a counting double: 0 reads), and the four ports stay closed;
 //   - HYPERDRIVE_APP is read 0 times throughout, opened equals ended after every test, and no span or log line holds the
 //     number in any form, the chat id, a part's words or a connection string.
@@ -46,6 +49,7 @@ import readQuestionFactsS102 from "@rosie/contracts/data-access/fixtures/read-qu
 import readQuestionFactsUnknown from "@rosie/contracts/data-access/fixtures/read-question-facts-unknown.json";
 import sendStateCustomer from "@rosie/contracts/data-access/fixtures/send-state-customer.json";
 import deliveredFixture from "@rosie/contracts/inbound-event/fixtures/delivered.json";
+import { DataAccessDatabaseError } from "@rosie/db/repo/clocks";
 import { env as poolEnv } from "cloudflare:workers";
 import { afterEach, beforeEach, describe, expect, inject, it, vi } from "vitest";
 
@@ -382,9 +386,9 @@ function wakeSam(root: Root, spans: Span[] = []): Promise<void> {
 
 /** The danger line's own wake for Sam's handle, as the safety read's sendDanger makes it. */
 function wakeSafety(root: Root): Promise<void> {
-  const wake = root.safety.wakeSafety;
-  if (wake === undefined) throw new Error("the root joined no safety wake");
-  return wake({ handleId: JOIN.handleId, outboxRowIds: [DANGER_LINE.row] });
+  const woken = root.safety.wakeSafety?.({ handleId: JOIN.handleId, outboxRowIds: [DANGER_LINE.row] });
+  if (woken === undefined) throw new Error("the root joined no safety wake");
+  return woken;
 }
 
 // ---- what PostgreSQL holds ---------------------------------------------------------------------------------------------
@@ -568,6 +572,27 @@ async function rejectionOf(promise: Promise<unknown>): Promise<unknown> {
   throw new Error("expected the call to fail");
 }
 
+/**
+ * The texts an error gives away: its message, its stack but for the frames (code locations), its own fields as JSON, each
+ * own property's value, and the error as a string.
+ */
+function textsOf(error: unknown): string[] {
+  if (!(error instanceof Error)) return [String(error)];
+  const stack = (error.stack ?? "")
+    .split("\n")
+    .filter((line) => !/^\s+at\s/u.test(line))
+    .join("\n");
+  const fields = error as unknown as Record<string, unknown>;
+  const own = Object.getOwnPropertyNames(error)
+    .filter((name) => name !== "stack")
+    .map((name) => {
+      // A property that holds no JSON value (undefined, a function) gives no text.
+      const text = JSON.stringify(fields[name]) as string | undefined;
+      return text ?? "";
+    });
+  return [error.message, stack, JSON.stringify(error), String(error), ...own];
+}
+
 /** The JSON lines among a test's console lines whose `msg` is this one, in order. */
 function jsonLinesOf(lines: readonly string[], msg: string): Record<string, unknown>[] {
   const found: Record<string, unknown>[] = [];
@@ -630,10 +655,15 @@ function dayAfter(date: string): string {
   return new Date(Date.parse(`${date}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
 }
 
+/** One call through a port this card's inputs feed. */
+interface PortCall {
+  readonly call: string;
+  readonly port: PortName;
+  readonly run: () => Promise<unknown>;
+}
+
 /** The four ports this card's inputs feed, each as its caller asks it. */
-function portCalls(
-  root: Root,
-): { readonly call: string; readonly port: PortName; run(): Promise<unknown> }[] {
+function portCalls(root: Root): PortCall[] {
   return [
     {
       call: "claimOutbox",
@@ -828,7 +858,7 @@ describe("the send cannot go: a wake claims nothing, so no claim burns a try", (
 // ---- the danger line: K-05 v1.14's safety claim -----------------------------------------------------------------------
 
 describe("claimOutboxV114 bound: a danger line's safety run", () => {
-  it("claims the recipient's safety row through K-05 v1.14's claim, on the rows claim-safety-past-routine-live-claim.json's note lists, and sends it; the JOIN's routine row is not read, claimed or sent", async () => {
+  it("claims the recipient's safety row through K-05 v1.14's claim, on the rows claim-safety-past-routine-live-claim.json's note lists, and sends it; the JOIN's row, of another send class, is not read, claimed or sent", async () => {
     const before = await stored();
     const { root, db, calls, lines } = rootOver(envOf());
 
@@ -1214,6 +1244,128 @@ describe("the arming's reads by direct call: K-05 v1.10 items 49 and 50 through 
       "readHandle",
     ]);
     expectJobSide(rooted.lines());
+  });
+});
+
+// ---- each answer as K-05 gives it; a throw with no value -------------------------------------------------------------------
+
+describe("each bound call over a handle double: K-05's answer goes to its port as it is, and a throw leaves with no value", () => {
+  /** A handle that reaches no database: each runtime-side call is answered as `answer` says, and its name kept. */
+  function handleDouble(answer: () => Promise<unknown>): { db: StagingDb; asked: string[] } {
+    const asked: string[] = [];
+    return {
+      db: {
+        runtime(call) {
+          asked.push(call);
+          return answer() as Promise<never>;
+        },
+        toolApi: () => Promise.reject(new Error("the send makes no Tool API call")),
+        counts: () => ({
+          opened: 0,
+          ended: 0,
+          connectionsOpen: 0,
+          connectionsPeak: 0,
+          quietReads: 0,
+          quietWrites: 0,
+        }),
+      },
+      asked,
+    };
+  }
+
+  /** One bound call: its name among the inputs, K-05's name for it on the handle, and the call itself. */
+  interface BoundCall {
+    readonly name: string;
+    readonly call: string;
+    readonly run: () => Promise<unknown>;
+  }
+
+  /**
+   * Every database call the four inputs make over `db`, each with K-05's name for it, the name it runs under on the
+   * handle. The double runs no call's code, so a request's shape is never read here.
+   */
+  function boundCalls(db: StagingDb): BoundCall[] {
+    const {
+      outboxCalls: outbox,
+      sendStateCall: sendState,
+      armingCalls: arming,
+    } = stagingSendCalls({
+      env: envOf().env,
+      db,
+    });
+    const claimV114 = outbox?.claimOutboxV114;
+    if (outbox === null || sendState === null || arming === null || claimV114 === undefined) {
+      throw new Error("staging bound no send");
+    }
+    return [
+      { name: "claimOutboxV12", call: "claimOutbox", run: () => outbox.claimOutboxV12({} as never) },
+      { name: "claimOutboxV114", call: "claimOutbox", run: () => claimV114({} as never) },
+      { name: "renewClaim", call: "renewClaim", run: () => outbox.renewClaim({} as never) },
+      { name: "markPartV12", call: "markPart", run: () => outbox.markPartV12({} as never) },
+      { name: "markRowV12", call: "markRow", run: () => outbox.markRowV12({} as never) },
+      { name: "sendState", call: "sendState", run: () => sendState({} as never) },
+      { name: "armClock", call: "armClock", run: () => arming.armClock({} as never) },
+      { name: "cancelClock", call: "cancelClock", run: () => arming.cancelClock({} as never) },
+      { name: "questionFacts", call: "readQuestionFacts", run: () => arming.questionFacts(JOIN.question) },
+      { name: "actorNameOf", call: "readHandle", run: () => arming.actorNameOf(JOIN.handleId) },
+    ];
+  }
+
+  it("K-05's transient goes to each port as it is, questionFacts' as the port's TransientError; actorNameOf, whose port has no place for one, throws the call's name and its SQLSTATE alone, never null", async () => {
+    const transient = { error: "transient", sqlstate: "40001" };
+    const { db, asked } = handleDouble(() => Promise.resolve({ ...transient }));
+    const calls = boundCalls(db);
+
+    for (const { name, run } of calls) {
+      if (name === "actorNameOf") continue;
+      expect(await run(), name).toEqual(transient);
+    }
+    const noAnswer = await rejectionOf(
+      calls.find((one) => one.name === "actorNameOf")?.run() ?? Promise.resolve(),
+    );
+
+    expect(noAnswer).toBeInstanceOf(DataAccessDatabaseError);
+    expect(noAnswer).toMatchObject({ call: "readHandle", code: "40001", table: null, constraint: null });
+    expect((noAnswer as Error).message).toBe("readHandle: the database refused the call (SQLSTATE 40001)");
+    // Each call ran once, under K-05's name for it.
+    expect(asked).toEqual(calls.map((one) => one.call));
+  });
+
+  it("an error the handle passes through as it came (postgres.js's, with its statement, its values and its address) leaves each call scrubbed, the call's name and the client's code alone; the handle's own and db/repo's own errors leave as they are", async () => {
+    const clientError = (): Error =>
+      Object.assign(new Error(`write CONNECT_TIMEOUT t1401-db.invalid:5432 for ${SAM_NUMBER}`), {
+        code: "CONNECT_TIMEOUT",
+        query: `select kind, address from handles where address = '${SAM_NUMBER}'`,
+        args: [SAM_NUMBER, SAM_CHAT],
+        address: "t1401-db.invalid",
+        port: 5432,
+      });
+    const failing = handleDouble(() => Promise.reject(clientError()));
+
+    for (const { name, call, run } of boundCalls(failing.db)) {
+      const thrown = await rejectionOf(run());
+      expect((thrown as Error).message, name).toBe(
+        `${call}: the database call failed (code CONNECT_TIMEOUT)`,
+      );
+      expect(thrown, name).toMatchObject({ call, code: "CONNECT_TIMEOUT" });
+      const texts = textsOf(thrown).join("\n");
+      for (const secret of [...NUMBER_FORMS, SAM_CHAT, "t1401-db.invalid", "select "]) {
+        expect(texts.includes(secret), `${name} gives away ${secret}`).toBe(false);
+      }
+    }
+
+    // What already names no value leaves as it is: the guard's refusal, db/repo's scrubbed refusal, a request's fault.
+    const own = [
+      new DbGuardRefusal("runtime", ["session_user"]),
+      new DataAccessDatabaseError("markPart", "42501", "outbox_parts", null),
+      new TypeError("markPart: the request needs outcome"),
+    ];
+    for (const error of own) {
+      const passing = handleDouble(() => Promise.reject(error));
+      for (const { name, run } of boundCalls(passing.db)) {
+        expect(await rejectionOf(run()), name).toBe(error);
+      }
+    }
   });
 });
 
