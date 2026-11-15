@@ -25,6 +25,9 @@
 //   ./flags.ts          T-1393 (P1c)  flags
 //   ./test-phone.ts     T-1305 (P6b)  testPhone
 //   ./copies.ts         T-1306 (P6c)  copies, which install() sets (`setCopyDeps`)
+//   ./email.ts          T-1288 (F)    emailRows, the email rows' port (ADR-016 card F); handed the test-phone part's
+//                                     line, where every email but a code to a listed inbox goes (no line, no port:
+//                                     DL-768)
 // The three seams critic_collisions B6 names are made here: the model readers' manifest access (P2b's bundle reads handed to
 // ./models.ts), the BundleSafety hook at the pin (RootOptions.bundleSafety, checked at each pin: ../real.ts checkedPin) and
 // the copy deps in install() (RootOptions.copies). The first text into a fresh isolate's lines (DL-757's option (c)) is
@@ -39,6 +42,7 @@ import { environmentOf } from "../picks";
 import type { RootOptions } from "../root";
 import { stagingBundleSafety } from "./bundle-safety";
 import { stagingCopies } from "./copies";
+import { stagingEmail } from "./email";
 import { stagingFlags } from "./flags";
 import { stagingReceiptCalls } from "./k05-receipt";
 import { stagingTurnCalls } from "./k05-turn";
@@ -76,7 +80,8 @@ export type StagingInputName =
   | "armingCalls"
   | "flags"
   | "testPhone"
-  | "copies";
+  | "copies"
+  | "emailRows";
 
 /** Each of those inputs, null where it is not bound. */
 export type StagingInputs = Required<Pick<RootOptions, StagingInputName>>;
@@ -107,6 +112,7 @@ export const NO_STAGING_INPUTS: StagingInputs = Object.freeze({
   flags: null,
   testPhone: null,
   copies: null,
+  emailRows: null,
 });
 
 /** Each part's builder, as its own file exports it. */
@@ -122,6 +128,7 @@ export interface StagingBuilders {
   readonly flags: typeof stagingFlags;
   readonly testPhone: typeof stagingTestPhone;
   readonly copies: typeof stagingCopies;
+  readonly email: typeof stagingEmail;
 }
 
 /** The parts' builders the Worker runs: each part's own. */
@@ -137,6 +144,7 @@ export const STAGING_BUILDERS: StagingBuilders = Object.freeze({
   flags: stagingFlags,
   testPhone: stagingTestPhone,
   copies: stagingCopies,
+  email: stagingEmail,
 });
 
 export interface StagingSeams {
@@ -180,6 +188,12 @@ export function stagingOptions(env: StagingEnv, seams: StagingSeams = {}): Stagi
   const rows = build.rows(part);
   const directories = build.directories(part);
   const send = build.send(part);
+  const flags = build.flags(part);
+  const testPhone = build.testPhone(part);
+  const copies = build.copies(part);
+  // The email rows' port: every email but a code to a listed inbox goes to the test-phone line, the one the page lists
+  // emails from, so with no line bound there is no email port (DL-768).
+  const emailRows = build.email({ ...part, line: testPhone?.line ?? null });
 
   return {
     handleKey: receipt.handleKey,
@@ -203,8 +217,9 @@ export function stagingOptions(env: StagingEnv, seams: StagingSeams = {}): Stagi
     planCalls: rows.planCalls,
     linqSendCall: send.linqSendCall,
     armingCalls: send.armingCalls,
-    flags: build.flags(part),
-    testPhone: build.testPhone(part),
-    copies: build.copies(part),
+    flags,
+    testPhone,
+    copies,
+    emailRows,
   };
 }

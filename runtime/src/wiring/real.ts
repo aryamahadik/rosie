@@ -124,10 +124,12 @@
 //                bound, handed in by the root (RootOptions.outboxCalls): in a test, the K-05 double over the rows the
 //                commit wrote and the plans finalize wrote into them; nothing in the Worker until T-567, so every claim
 //                there fails closed and nothing is sent. Each claimed row is handed on with the final parts finalize
-//                wrote, its port (K-05 v1.2 item 30) and its claim; K-03's options ({id, label}) go as their labels.
-//                The phone row renewClaim reads with each renewal (K-05 v1.2 item 32) must be there: with none (an email
-//                handle, or a number whose first turn wrote none) the renewal is answered notFound (the phone row), so
-//                nothing is sent, never read as not stopped (K-05 README's consumer note for T-562). T-1356: K-05 v1.14's
+//                wrote, its port (K-05 v1.2 item 30) and its claim; K-03's options ({id, label}) go as their labels;
+//                from a v1.13 answer, its emailPurpose and notAfter as stored (T-1288). The phone row renewClaim reads
+//                with each renewal (K-05 v1.2 item 32) must be there: with none (an email handle, or a number whose first
+//                turn wrote none) the renewal is answered notFound (the phone row), so nothing is sent, never read as not
+//                stopped (K-05 README's consumer note for T-562), but for a row this port claimed by the email port,
+//                whose stop is its address's texts row, never a phone's (T-1288; ADR-016 section 3). T-1356: K-05 v1.14's
 //                claim beside them (T-1354, db/repo/outbox.ts claimOutboxV114, OutboxCalls.claimOutboxV114), the one
 //                call that carries the claim's sendClass (item 67: a danger line's safety run, T-1352). Bound, every claim
 //                goes to it, the field as the dispatcher sent it and never dropped, and a claim without it is v1.13's,
@@ -143,7 +145,8 @@
 //                fromContact and bookingId with it (T-1217; left out when the answer has none, so limit 8 reads them as
 //                not known), and the stopped flag is never derived from a consent row (STATE note 10; T-1099). A number
 //                with no phone row has no open chat that Rosie knows of, so its rows wait for the chat (limit 8's
-//                waitingChat; MC C9).
+//                waitingChat; MC C9). An email row's address comes from the same read (emailFor beside chatFor, T-1288):
+//                an email handle's address, none for a phone.
 //   dataAccess   T-1242 (T-1154's part P1b): the turn's plan calls, K-05 v1's unplannedRows and writePlan (T-196,
 //                db/repo/outbox.ts, each called as (sql, request) as rosie_job), with their database bound, handed in by
 //                the root (RootOptions.planCalls): on staging nothing until the part of T-1154 that binds them, so every
@@ -237,6 +240,7 @@ import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit
 import type { HandleSealingKeyRequest, HandleSealingKeyResult } from "@rosie/db/repo/handle-keys";
 import type {
   ClaimedRowV12,
+  ClaimedRowV113,
   ClaimOutboxRequest as K05ClaimOutboxRequest,
   ClaimOutboxV12Outcome,
   ClaimOutboxV114Outcome,
@@ -2015,6 +2019,12 @@ export interface OutboxInputs {
   readonly calls: OutboxCalls | null;
 }
 
+/**
+ * How many rows claimed by the email port one isolate's outbox port keeps, for their renewals (T-1288); the oldest is
+ * forgotten first. A dispatcher run renews a row right after its own claim of it, in the same isolate.
+ */
+export const EMAIL_ROW_MEMORY = 1024;
+
 /** A claimed row the dispatcher cannot be handed as K-05 gave it (a send option it cannot read). Names no value. */
 export class ClaimedRowError extends Error {
   constructor(what: string) {
@@ -2043,12 +2053,13 @@ export class SendClassNotCarriedError extends Error {
  * it is bound, with the request's sendClass as it came whenever the request carries one (any value: db/repo refuses one
  * that is not safety, default 133), so the field is never dropped; else claimOutboxV12, for a claim without the field
  * alone. A claim with the field and no v1.14 claim bound is refused (SendClassNotCarriedError) before any call. v1.13's
- * answer is v1.2's with two fields added to each row, so it is read as v1.2's here.
+ * answer is v1.2's with two fields added to each row (emailPurpose and notAfter), which claimedRowOf maps through
+ * (T-1288); claimOutboxV12's rows have neither.
  */
 function claimThrough(
   calls: OutboxCalls,
   request: Parameters<OutboxStore["claimOutbox"]>[0],
-): Promise<ClaimOutboxV12Outcome> {
+): Promise<ClaimOutboxV12Outcome | ClaimOutboxV114Outcome> {
   const v12: K05ClaimOutboxRequest = {
     claimer: request.claimer,
     ...(request.recipientHandleId === undefined ? {} : { recipientHandleId: request.recipientHandleId }),
@@ -2096,8 +2107,21 @@ function finalPartsOf(parts: ClaimedRowV12["finalParts"]): DispatchFinalParts {
   };
 }
 
-/** K-05 v1.2's claimedRow (v1's fields, v1.1's claim and claimedFrom, v1.2's port) as the dispatcher reads it. */
-export function claimedRowOf(row: ClaimedRowV12): ClaimedRow {
+/**
+ * A claimed row as a claim answers it: K-05 v1.2's (claimOutboxV12), or v1.13's with its two fields (claimOutboxV114,
+ * which answers in v1.13's form: db/repo default 24).
+ */
+export type ClaimedRowAnswer = ClaimedRowV12 & Partial<Pick<ClaimedRowV113, "emailPurpose" | "notAfter">>;
+
+/**
+ * K-05 v1.2's claimedRow (v1's fields, v1.1's claim and claimedFrom, v1.2's port) as the dispatcher reads it, and v1.13's
+ * emailPurpose and notAfter (item 64; T-1279) mapped through as stored, null included, where the answer holds them
+ * (T-1288; ADR-016 card F): limit 8 withdraws a row at or after its notAfter at every try, and the email rows tell a code
+ * row by its purpose (ADR-016 sections 3 and 5). An answer before v1.13 holds neither, and both are left out, which the
+ * dispatcher reads as no purpose and no end, as before. Nothing is derived here: a value that is not a time or a K-12
+ * purpose goes across as it came, and limit 8 fails closed on it (endPassed: an end that is not a time has passed).
+ */
+export function claimedRowOf(row: ClaimedRowAnswer): ClaimedRow {
   return {
     outboxRowId: row.outboxRowId,
     version: row.version,
@@ -2126,6 +2150,9 @@ export function claimedRowOf(row: ClaimedRowV12): ClaimedRow {
     traceId: row.traceId,
     claim: { ...row.claim },
     claimedFrom: row.claimedFrom,
+    // K-05 v1.13 item 64, as stored, where the answer holds them (T-1288).
+    ...(row.emailPurpose === undefined ? {} : { emailPurpose: row.emailPurpose }),
+    ...(row.notAfter === undefined ? {} : { notAfter: row.notAfter }),
   };
 }
 
@@ -2171,14 +2198,19 @@ function markPartRequestOf(request: Parameters<OutboxStore["markPart"]>[0]): Mar
  *     field goes as v1.2's request, its four fields as they came: through claimOutboxV114 it is v1.13's claim, unchanged
  *     (db/repo default 24). A transient answer comes back as it is, the safety claim's lock wait past its bound (55P03,
  *     db/repo default 22) among them, so the danger wake repeats it (the dispatcher's untilNotTransient). Each claimed row
- *     is handed on with its claim, the state it was claimed from, its port (linq or email: v1.2 item 30), and the final
- *     parts finalize wrote into it (K-03's options as their labels); a v1.13 row's emailPurpose and notAfter are not
- *     mapped here (T-1288 maps them), so the dispatcher reads both as missing, no purpose and no end, as from
- *     claimOutboxV12;
+ *     is handed on with its claim, the state it was claimed from, its port (linq or email: v1.2 item 30), the final
+ *     parts finalize wrote into it (K-03's options as their labels), and, from a v1.13 answer, its emailPurpose and
+ *     notAfter as stored (claimedRowOf; T-1288); a row from claimOutboxV12 has neither, so the dispatcher reads it as no
+ *     purpose and no end. The id of each row claimed by the email port is kept for its renewals (below);
  *   - renewClaim: renewClaim, whose answer also holds the recipient's phone row as the renewal read it, FOR SHARE (v1.2
  *     item 32). A renewal that read no phone row (an email handle, or a number whose first turn wrote none) is answered
  *     notFound for the phone row: the dispatcher sends nothing and keeps no part out, never reading it as not stopped
- *     (the K-05 README's consumer note for T-562; DL-317);
+ *     (the K-05 README's consumer note for T-562; DL-317). One exception (T-1288; ADR-016 section 3): a row this port
+ *     claimed by the email port, whose renewal read no phone row at all (`recipient` null: "null for an email handle",
+ *     item 32), is renewed. An email address has no phone row and no stopped flag: its stop is its newest texts consent
+ *     row, which limit 8 reads at every try and the dispatcher reads again right before the send (stopStands), so the
+ *     phone read has nothing to tell it; refused, no email row could ever be sent. A text row keeps the rule, and so does
+ *     an email row this isolate did not claim (its port not known here: fails closed);
  *   - markPart: markPartV12, its answer with the row after the mark (v1.1 item 15), which the dispatcher compares;
  *   - markRow: markRowV12, limit 8's outcome, waitingChat among them (v1.1 item 16).
  * Errors pass through as K-05 gives them. With no calls bound every call fails closed (NoDatabaseError), so the dispatcher
@@ -2187,14 +2219,31 @@ function markPartRequestOf(request: Parameters<OutboxStore["markPart"]>[0]): Mar
 export function realOutbox(inputs: OutboxInputs): OutboxStore {
   const { calls } = inputs;
   const none = (call: string): Promise<never> => Promise.reject(new NoDatabaseError(call));
+  // The rows this port claimed by the email port, by id, for their renewals (bounded: the oldest is forgotten first, and
+  // a renewal of a row forgotten that read no phone row is refused, as a text row's is: fails closed).
+  const emailRows = new Set<string>();
+  const keepEmailRow = (outboxRowId: string): void => {
+    emailRows.delete(outboxRowId);
+    emailRows.add(outboxRowId);
+    while (emailRows.size > EMAIL_ROW_MEMORY) {
+      const oldest = emailRows.values().next().value;
+      if (oldest === undefined) break;
+      emailRows.delete(oldest);
+    }
+  };
   return {
     async claimOutbox(request) {
       if (calls === null) return none("claimOutbox");
       const answer = await claimThrough(calls, request);
       if ("error" in answer) return answer;
+      const claimed = answer.claimed.map(claimedRowOf);
+      // An email row, as limit 8 tells one (isEmailRow): the email channel by the email port.
+      for (const row of claimed) {
+        if (row.channel === "email" && row.port === "email") keepEmailRow(row.outboxRowId);
+      }
       return {
         result: "claimed",
-        claimed: answer.claimed.map(claimedRowOf),
+        claimed,
         passedHeld: answer.passedHeld.map((held) => ({
           outboxRowId: held.outboxRowId,
           heldUntil: held.heldUntil,
@@ -2211,13 +2260,20 @@ export function realOutbox(inputs: OutboxInputs): OutboxStore {
         at: request.at,
       });
       if ("error" in answer) return answer;
+      const renewed = {
+        result: "renewed" as const,
+        outboxRowId: answer.outboxRowId,
+        claim: { ...answer.claim },
+      };
       // No phone row read with the renewal (null, or no recipient at all, as a v1.1 answer has none): unreadable, so
-      // nothing is sent, never "not stopped" (the K-05 README's consumer note for T-562).
+      // nothing is sent, never "not stopped" (the K-05 README's consumer note for T-562); but an email row this port
+      // claimed has no phone row to read, and its stop is limit 8's texts row (T-1288; ADR-016 section 3).
       const phone: unknown = (answer as { readonly recipient?: unknown }).recipient;
+      if (phone === null && emailRows.has(answer.outboxRowId)) return renewed;
       if (phone === null || phone === undefined) {
         return { error: "notFound", table: "phones", rowId: answer.outboxRowId };
       }
-      return { result: "renewed", outboxRowId: answer.outboxRowId, claim: { ...answer.claim } };
+      return renewed;
     },
     async markPart(request) {
       if (calls === null) return none("markPart");
@@ -2284,7 +2340,10 @@ export class SendStateError extends Error {
   }
 }
 
-/** How many recipients' chats one isolate keeps between a send-state read and the dispatcher's chat lookup. */
+/**
+ * How many recipients' chats and addresses one isolate keeps between a send-state read and the dispatcher's lookup of the
+ * chat (a text row) or the address (an email row: T-1288).
+ */
 export const CHAT_MEMORY = 512;
 
 /** An instant K-05 gives no zone or text hours for (a row with no business): an empty value, which limit 8 cannot read. */
@@ -2355,24 +2414,44 @@ export function chatTargetOf(answer: SendStateResponse): ChatTarget | null {
 }
 
 /**
+ * The address an email row goes to, from the same read (T-1288; ADR-016 section 3; K-05 item 28: the recipient's handle,
+ * its kind and address), as chatTargetOf takes the chat from it: an email handle's address, as K-04 handles.address holds
+ * it (the dispatcher trims it, lower-cases it and checks its form: ../email emailAddressOf). None for a phone, or for a
+ * handle of any other kind: noAddress.
+ */
+export function emailTargetOf(answer: SendStateResponse): string | null {
+  const { recipient } = answer;
+  return recipient.kind === "email" ? recipient.address : null;
+}
+
+/** What one send-state read gave a recipient's sends: its chat (a text row) and its address (an email row). */
+interface RecipientTargets {
+  readonly chat: ChatTarget | null;
+  readonly email: string | null;
+}
+
+const NO_TARGETS: RecipientTargets = Object.freeze({ chat: null, email: null });
+
+/**
  * The send-state port (T-562): limit 8's SendStateReader and the dispatcher's RecipientDirectory over K-05 v1.2 sendState,
  * one primary read per call. The dispatcher reads a row's send state before each send (limit 8) and then asks for the
- * recipient's chat, so the chat is the one that read gave, kept for the recipient in this isolate (bounded, the oldest
- * forgotten first; a chat asked for with no read before it is none, so nothing is sent). A transient answer goes back as
- * it is (the dispatcher tries again, then sends nothing); notFound for a row it holds is thrown (SendStateError): nothing
- * is sent. With no call bound every read fails closed (NoDatabaseError). Nothing here logs: the number and the chat id
- * are personal data.
+ * recipient's chat, or for an email row its address (emailFor, T-1288), so each is the one that read gave, kept for the
+ * recipient in this isolate (bounded, the oldest forgotten first; a chat or an address asked for with no read before it
+ * is none, so nothing is sent). Neither lookup makes a call, so neither can fail. A transient answer goes back as it is
+ * (the dispatcher tries again, then sends nothing); notFound for a row it holds is thrown (SendStateError): nothing is
+ * sent. With no call bound every read fails closed (NoDatabaseError). Nothing here logs: the number, the chat id and the
+ * address are personal data.
  */
 export function realSendState(inputs: SendStateInputs): SendStatePort {
   const { call } = inputs;
-  const chats = new Map<string, ChatTarget | null>();
-  const keep = (handleId: string, chat: ChatTarget | null): void => {
-    chats.delete(handleId);
-    chats.set(handleId, chat);
-    while (chats.size > CHAT_MEMORY) {
-      const oldest = chats.keys().next().value;
+  const targets = new Map<string, RecipientTargets>();
+  const keep = (handleId: string, kept: RecipientTargets): void => {
+    targets.delete(handleId);
+    targets.set(handleId, kept);
+    while (targets.size > CHAT_MEMORY) {
+      const oldest = targets.keys().next().value;
       if (oldest === undefined) break;
-      chats.delete(oldest);
+      targets.delete(oldest);
     }
   };
   const sendState: SendStateReader = {
@@ -2383,17 +2462,23 @@ export function realSendState(inputs: SendStateInputs): SendStatePort {
         if (answer.error === "transient") return { error: "transient", sqlstate: answer.sqlstate };
         throw new SendStateError(answer.error);
       }
-      // The chat is the claimed row's recipient's only when K-05 read that same recipient: else none (fail closed).
+      // The chat and the address are the claimed row's recipient's only when K-05 read that same recipient: else none
+      // (fail closed).
       keep(
         row.recipientHandleId,
-        answer.recipient.handleId === row.recipientHandleId ? chatTargetOf(answer) : null,
+        answer.recipient.handleId === row.recipientHandleId
+          ? { chat: chatTargetOf(answer), email: emailTargetOf(answer) }
+          : NO_TARGETS,
       );
       return sendStateOf(answer);
     },
   };
   const recipients: RecipientDirectory = {
     chatFor(recipientHandleId) {
-      return Promise.resolve(chats.get(recipientHandleId) ?? null);
+      return Promise.resolve(targets.get(recipientHandleId)?.chat ?? null);
+    },
+    emailFor(recipientHandleId) {
+      return Promise.resolve(targets.get(recipientHandleId)?.email ?? null);
     },
   };
   return { sendState, recipients };

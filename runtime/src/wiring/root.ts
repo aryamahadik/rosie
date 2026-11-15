@@ -23,7 +23,9 @@
 //     the turn's recipient, each claimed row on the turn's trace; and which an outage line's writer wakes once the core
 //     names its row (T-1341, SafetyDeps.wake): one run for the line's recipient, each claimed row on its own trace; and
 //     which a danger line's writer wakes the same way, never gated (T-1352, SafetyDeps.wakeSafety): one safety run for the
-//     line's recipient, K-05 v1.14's safety-only claim;
+//     line's recipient, K-05 v1.14's safety-only claim; its email rows go by the email port it is handed
+//     (RootOptions.emailRows, T-1288: staging's router), on staging alone, behind the email door (./email-door.ts), so a
+//     send that throws or gives no answer in time is K-12's no answer, never a rejected run;
 //   - the receipt door: a delivery receipt marks its part delivered and arms its question's clock (T-255) through the
 //     arming port (T-564), on the trace its row was sent on when this isolate knows it (./row-traces.ts), else on the
 //     receipt's own;
@@ -117,6 +119,7 @@ import type { ClockActorRpc, ClockActors, ClockDirectory } from "../clocks/types
 import { handleDeliveryReceipt, runDispatch, type DispatchDeps } from "../dispatch/dispatcher";
 import { dispatchSendDoor, queueRetries, retryBodyOf } from "../dispatch/retry";
 import type { ClaimedRow } from "../dispatch/types";
+import type { EmailRowsDeps } from "../email";
 import { durableObjectActor, type HandleActorRpc } from "../gateway/actor-door";
 import { readBundleId, type WebhookEnvironment } from "../gateway/answer";
 import { unconfiguredPages } from "../gateway/pages";
@@ -139,6 +142,7 @@ import { setTurnDeps, turnHooks } from "../turn/turn";
 import type { TurnDeps, TurnDirectory, TurnDispatcher } from "../turn/types";
 import { bindPorts, WiringError, type Binding, type ImplementationSets } from "./bind";
 import { closedPorts } from "./closed";
+import { answeringRecipients, emailDoor } from "./email-door";
 import { LinqDoor } from "./linq-door";
 import { environmentOf, PICKS, type Environment } from "./picks";
 import type { PortName, Ports } from "./ports";
@@ -358,6 +362,15 @@ export interface RootOptions {
    */
   readonly linqSendCall?: LinqSendCall | null;
   /**
+   * The dispatcher's email port and From address (T-1288; ADR-016 card F; DispatchDeps.email, T-1286): every email row
+   * (channel and port both email) goes through it alone, behind the root's email door (./email-door.ts), so a send that
+   * throws or gives no answer in time is K-12's no answer and never a rejected run. On staging, staging's router
+   * (./staging/email.ts): a code to a listed inbox to Resend, every other email to the test-phone line's double. Bound
+   * where ENVIRONMENT is staging alone: anywhere else, or null or left out, none is (production binds no email port:
+   * STATE note 72), so every email row ends noEmailPort with nothing sent.
+   */
+  readonly emailRows?: EmailRowsDeps | null;
+  /**
    * The retry queue's producer (runtime/src/queues RetryQueue: the RETRY_QUEUE binding, retryQueueOf(env), in the Worker),
    * where a row the dispatcher leaves waiting for its next try is put (T-258; DL-315), and where the queue's consumer puts
    * each next try of a job. In a test, a double that keeps each message with its delay; null or left out where none is
@@ -539,11 +552,21 @@ export function composeRoot(options: RootOptions): Root {
   // The recipient actor's one reading, asked right before an outage line's row goes (T-1337): every run's, the wake's and
   // the retry door's alike, through the arming port's directory and the HandleActor namespace.
   const mayHaveStopped = actorReadingPort(ports.arming.directory, options.actors);
+  // The email rows' port, on staging alone (T-1288; STATE note 72: production binds none), behind the email door: a send
+  // that throws or gives no answer in time is K-12's no answer, never a rejected run (./email-door.ts). And the address
+  // lookup behind the same door: one that throws is no address known.
+  const emailRows = options.emailRows ?? null;
+  const email: EmailRowsDeps | null =
+    emailRows === null || options.vars.ENVIRONMENT !== "staging"
+      ? null
+      : { port: emailDoor(emailRows.port, { log }), fromAddress: emailRows.fromAddress };
+  const recipients = answeringRecipients(ports.sendState.recipients, { log });
   /** The dispatcher's ports for one run, each claimed row sent on the trace `traceFor` gives it. */
   const dispatchDeps = (traceFor: DispatchDeps["traceFor"]): DispatchDeps => ({
     store: dispatchStore,
     linq: dispatchLinq,
-    recipients: ports.sendState.recipients,
+    ...(email === null ? {} : { email }),
+    recipients,
     sendState: ports.sendState.sendState,
     environment: options.vars.ENVIRONMENT,
     traceFor,
@@ -838,6 +861,16 @@ export interface WorkerSecrets {
   readonly SEALING_WRAP_KEY?: string;
   /** The model key (J-02), read by name at each model call by staging's model readers (./staging/models.ts, T-1396). */
   readonly ANTHROPIC_API_KEY?: string;
+  /**
+   * Resend's send-only key (K-12 default 1; DL-022), read by name at each send by T-419's adapter behind staging's email
+   * port (./staging/email.ts, T-1288); missing, a code to a listed inbox is refused and sent no other way.
+   */
+  readonly RESEND_API_KEY?: string;
+  /**
+   * The named inboxes (ADR-016 section 5; K-12 default 19): addresses joined by commas, read by name at each send by
+   * staging's email port and T-419's adapter alike (readTestInboxes); missing, every email goes to the test-phone line.
+   */
+  readonly STAGING_TEST_INBOXES?: string;
 }
 
 /**
