@@ -12,6 +12,8 @@
 //   - P3b's own builder (./bundle-safety.ts, T-1397), only where a case goes through the safety-read port, which awaits
 //     that adapter's checked lines before it asks for a reader (../real.ts realSafetyRead). Such a case passes the
 //     adapter's check first, as a pin does, and counts the bundle reads made after it: this card's own.
+// Each case asserts only on this card's own reads and inputs (DL-776): the reads made after the root was built and,
+// where P3b runs, after its check; and what this card's builder was handed (the builders seam), never another part's.
 // The actor's BUNDLES KV is a double the test fills as a publish fills it, or leaves empty.
 //
 // No live model call (J-02; DL-027): the model key is made up for this file, the fetch seam is the double below, and a
@@ -108,6 +110,7 @@ import {
   NO_MODEL_READER_INPUTS,
   stagingModels,
   type ModelReaderInputs,
+  type ModelsPart,
 } from "./models";
 import { NO_STAGING_INPUTS, stagingOptions, type StagingBuilders, type StagingInputs } from "./options";
 import { stagingDb, type DbCallLine, type StagingDb, type StagingEnv } from "./part";
@@ -740,6 +743,8 @@ interface Rooted {
   readonly root: Root;
   /** What stagingOptions gave the root: each part's input. */
   readonly inputs: StagingInputs;
+  /** What this card's builder was handed, each time stagingOptions built it: its own inputs (DL-776). */
+  readonly handed: readonly ModelsPart[];
   readonly testEnv: TestEnv;
   readonly models: ModelDouble;
   /** Each call's timing line the handle wrote, in order. */
@@ -763,6 +768,7 @@ interface BundleReads {
  * A root built as workerRoot builds the Worker's (composeRoot over stagingOptions(env)), over the test's env, its handle's
  * timing lines kept and the recorded-model double behind its fetch seam. `safetyLines`: P3b's own builder too, for a case
  * through the safety-read port; else no safety lines, and the root shows this card's readers over P2b's reads alone.
+ * This card's own builder runs as the Worker runs it, watched through the builders seam for what it is handed.
  */
 function rootOver(testEnv: TestEnv, options: { readonly safetyLines?: boolean } = {}): Rooted {
   const written: string[] = [];
@@ -774,13 +780,18 @@ function rootOver(testEnv: TestEnv, options: { readonly safetyLines?: boolean } 
   });
   HANDLES.push(db);
   const models = modelDouble();
+  const handed: ModelsPart[] = [];
   const inputs = stagingOptions(testEnv.env, {
     db,
     fetch: models.fetch,
-    builders:
-      options.safetyLines === true
-        ? OTHER_PARTS_UNBOUND
-        : { ...OTHER_PARTS_UNBOUND, bundleSafety: () => null },
+    builders: {
+      ...OTHER_PARTS_UNBOUND,
+      ...(options.safetyLines === true ? {} : { bundleSafety: () => null }),
+      models: (part) => {
+        handed.push(part);
+        return stagingModels(part);
+      },
+    },
   });
   const root = composeRoot({
     environment: environmentOf(testEnv.env),
@@ -792,6 +803,7 @@ function rootOver(testEnv: TestEnv, options: { readonly safetyLines?: boolean } 
   return {
     root,
     inputs,
+    handed,
     testEnv,
     models,
     lines,
@@ -1184,18 +1196,20 @@ describe.each([
 describe("with no BUNDLES binding at all", () => {
   it("every value is read from PostgreSQL's copy through P2b's bundle reads, on the job side, and the three readers are built", async () => {
     const rooted = rootOver(envOf({ kv: null }));
+    const mark = rooted.mark();
+    const jobReads = rooted.testEnv.job?.reads.n ?? 0;
 
     for (const [name, factory] of factoriesOf(rooted.inputs)) {
       expect(await factory(V0), name).toBeDefined();
     }
 
     // The safety reader's manifest, the decider's manifest and flow A, the composer's manifest.
-    const lines = rooted.lines();
+    const lines = rooted.lines().slice(mark.lines);
     expect(lines.map((line) => line.call)).toEqual(Array.from({ length: 4 }, () => "readBundleValue"));
     expect(new Set(lines.map((line) => [line.side, line.binding, line.login].join()))).toEqual(
       new Set(["runtime,HYPERDRIVE_JOB,rosie_worker_job"]),
     );
-    expect(rooted.testEnv.job?.reads.n).toBe(4);
+    expect((rooted.testEnv.job?.reads.n ?? 0) - jobReads).toBe(4);
     expect(rooted.models.requests).toEqual([]);
   });
 });
@@ -1209,7 +1223,7 @@ describe("a bundle with prompts of its own", () => {
     const rooted = rootOver(envOf({ kv }), { safetyLines: true });
     const { root, models } = rooted;
     await withCheckedLines(rooted, V0);
-    await withCheckedLines(rooted, OWN_PROMPTS.bundleId);
+    const mark = await withCheckedLines(rooted, OWN_PROMPTS.bundleId);
     const input = structuredClone(JOIN_INPUT);
 
     const underV0 = await root.ports.safetyRead.read(safetyRequest(V0));
@@ -1239,8 +1253,9 @@ describe("a bundle with prompts of its own", () => {
       promptIn(V0_MANIFEST, "safetyRead").text,
     );
     expect(ownVersion("safetyRead")).toBe(`safetyRead@${promptIn(V0_MANIFEST, "safetyRead").version}-t1396`);
-    // Every value came from the KV: K-05 was never asked.
-    expect(rooted.lines()).toEqual([]);
+    // This card's own reads, after P3b's checks: each reader's manifest, every one from the KV; K-05 was never asked.
+    const ownManifest = keyOf(OWN_PROMPTS.bundleId, "manifest");
+    expect(rooted.since(mark)).toEqual({ kv: [MANIFEST.key, ownManifest, ownManifest], postgres: [] });
   });
 });
 
@@ -1289,6 +1304,7 @@ describe("a bundle whose flow graph holds a step with a card", () => {
 describe("one reader per bundle id", () => {
   it("each factory builds once across two calls and gives the same reader again, with nothing read for the second call", async () => {
     const rooted = rootOver(envOf());
+    const built = readsOf(rooted.testEnv, "BUNDLES");
     const expected: Readonly<Record<string, number>> = { safetyRead: 1, decide: 2, composer: 1 };
 
     for (const [name, factory] of factoriesOf(rooted.inputs)) {
@@ -1302,8 +1318,9 @@ describe("one reader per bundle id", () => {
       expect(afterFirst.postgres, name).toHaveLength(expected[name] ?? 0);
       expect(rooted.since(again), name).toEqual({ kv: [], postgres: [] });
     }
-    // BUNDLES was read from the env once for each build, never when the root was built and never for a kept reader.
-    expect(readsOf(rooted.testEnv, "BUNDLES")).toBe(3);
+    // BUNDLES was read from the env once for each build and never for a kept reader (and never at the builder's own
+    // build: "the builder alone", below).
+    expect(readsOf(rooted.testEnv, "BUNDLES") - built).toBe(3);
     expect(rooted.models.requests).toEqual([]);
   });
 
@@ -1396,14 +1413,17 @@ describe("the model key", () => {
 // ---- failing closed -----------------------------------------------------------------------------------------------------
 
 describe("nothing bound", () => {
-  it("with no HYPERDRIVE_JOB, P2b's bundle reads are null and so are the three inputs: each port fails with its named error, as a root with nothing bound does, and nothing is fetched", async () => {
-    const rooted = rootOver(envOf({ job: false }), { safetyLines: true });
+  it("with no HYPERDRIVE_JOB, P2b's builder hands this card's part no bundle reads, so the three inputs are null: each port fails with its named error, as a root with nothing bound does, and nothing is fetched", async () => {
+    // P2b's own builder answers for the missing binding; P3b's is stood in, as no read gets as far as its lines.
+    const rooted = rootOver(envOf({ job: false }));
     const { root, inputs, models } = rooted;
+    const mark = rooted.mark();
     const context = contextUnder(V0);
     const input = structuredClone(JOIN_INPUT);
     const trace = traceUnder(V0, context.turnId);
 
-    expect(inputs.bundleReads).toBeNull();
+    // This card's own input and inputs: handed null bundle reads, once, it gave null for each of the three.
+    expect(rooted.handed.map((part) => part.bundleReads)).toEqual([null]);
     expect([inputs.safetyReaders, inputs.deciders, inputs.composers]).toEqual([null, null, null]);
 
     expect(await rejectionOf(root.ports.safetyRead.read(safetyRequest(V0)))).toEqual(
@@ -1421,9 +1441,8 @@ describe("nothing bound", () => {
     ).toEqual(new NoComposerError());
 
     expect(models.requests).toEqual([]);
-    expect(rooted.testEnv.kv?.gets).toEqual([]);
-    expect(rooted.lines()).toEqual([]);
-    // Neither the key nor BUNDLES was read.
+    expect(rooted.since(mark)).toEqual({ kv: [], postgres: [] });
+    // Neither the key nor BUNDLES was read (on this root nothing but this card's part reads either).
     expect(readsOf(rooted.testEnv, KEY_VARIABLE) + readsOf(rooted.testEnv, "BUNDLES")).toBe(0);
   });
 
@@ -1470,6 +1489,8 @@ describe("a bundle no reader can be built from: the factory rejects before any f
   it("the bindings left out (no BUNDLES, and HYPERDRIVE_JOB gone when the read is made): each factory rejects, naming the manifest and no value; asked again it reads again; with the binding back it builds", async () => {
     const rooted = rootOver(envOf({ kv: null }));
     const { testEnv, models } = rooted;
+    const mark = rooted.mark();
+    const jobReads = testEnv.job?.reads.n ?? 0;
     const job = testEnv.values.HYPERDRIVE_JOB;
     delete testEnv.values.HYPERDRIVE_JOB;
 
@@ -1487,22 +1508,21 @@ describe("a bundle no reader can be built from: the factory rejects before any f
         expect(readsOf(testEnv, "BUNDLES") - before, name).toBe(attempt);
       }
     }
-    expect(testEnv.job?.reads.n).toBe(0);
-    expect(rooted.lines()).toEqual([]);
+    expect((testEnv.job?.reads.n ?? 0) - jobReads).toBe(0);
+    expect(rooted.since(mark).postgres).toEqual([]);
 
     testEnv.values.HYPERDRIVE_JOB = job;
     for (const [name, factory] of factoriesOf(rooted.inputs)) {
       expect(await factory(V0), name).toBeDefined();
     }
-    expect(rooted.lines().map((line) => line.call)).toEqual(
-      Array.from({ length: 4 }, () => "readBundleValue"),
-    );
+    expect(rooted.since(mark).postgres).toEqual(Array.from({ length: 4 }, () => "readBundleValue"));
     expect(models.requests).toEqual([]);
   });
 
   it("a manifest of another bundle id (bundle v0's, under the asked bundle's key): no copy is the bundle's own, so each factory rejects; once the bundle's own manifest is there, the next call builds", async () => {
     const kv = kvDouble();
     const rooted = rootOver(envOf({ kv }));
+    const mark = rooted.mark();
     const asked = LATER_BUNDLE.bundleId;
     const [[manifestKey], [flowKey, flowText]] = LATER_BUNDLE.values as [
       readonly [string, string],
@@ -1519,10 +1539,10 @@ describe("a bundle no reader can be built from: the factory rejects before any f
       expectNoWords(textsOf(failed));
     }
     // Each attempt asked the KV, refused its copy and asked PostgreSQL's: three attempts, none kept.
-    expect(kv.gets).toEqual([manifestKey, manifestKey, manifestKey]);
-    expect(rooted.lines().map((line) => line.call)).toEqual(
-      Array.from({ length: 3 }, () => "readBundleValue"),
-    );
+    expect(rooted.since(mark)).toEqual({
+      kv: [manifestKey, manifestKey, manifestKey],
+      postgres: Array.from({ length: 3 }, () => "readBundleValue"),
+    });
     // Through the ports the same refusal comes back, before any model call.
     for (const [name, call] of portCalls(rooted.root, asked).slice(1)) {
       expect(await rejectionOf(call()), name).toMatchObject({ code: "notFound", part: "manifest" });
@@ -1557,6 +1577,7 @@ describe("a bundle no reader can be built from: the factory rejects before any f
   it("a bundle id that is not K-01's: each factory rejects with nothing read", async () => {
     const kv = kvDouble();
     const rooted = rootOver(envOf({ kv }));
+    const mark = rooted.mark();
 
     for (const [name, factory] of factoriesOf(rooted.inputs)) {
       for (const bad of [
@@ -1567,8 +1588,7 @@ describe("a bundle no reader can be built from: the factory rejects before any f
         expect(failed, name).toMatchObject({ reader: name, code: "badBundleId", part: null });
       }
     }
-    expect(kv.gets).toEqual([]);
-    expect(rooted.lines()).toEqual([]);
+    expect(rooted.since(mark)).toEqual({ kv: [], postgres: [] });
   });
 
   it("a manifest with no prompt for the reader (no safetyRead prompt for the safety read, and so for each): the factory rejects, naming the prompt's kind and none of its words; a prompt of spaces alone is no prompt", async () => {
