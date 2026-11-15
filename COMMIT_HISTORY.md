@@ -2,9 +2,61 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 672, [`c244c38`](https://github.com/aryamahadik/rosie/commit/c244c38), 2026-11-15 17:13:10 UTC.
+- **Through:** commit 675, [`cf47ff2`](https://github.com/aryamahadik/rosie/commit/cf47ff2), 2026-11-15 17:46:54 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 675. docs: COMMIT\_HISTORY.md through commit 672 (c244c38, \#683) (\#686)
+
+- **Commit:** [`cf47ff2`](https://github.com/aryamahadik/rosie/commit/cf47ff2), by Arya Mahadik, 2026-11-15 17:46:54 UTC
+- **Pull request:** [#686](https://github.com/aryamahadik/rosie/pull/686) from `task/commit-history-132`, merged 2026-11-15 17:46:55 UTC. It squashed 1 branch commit:
+  - `9fc2313` docs: COMMIT\_HISTORY.md through commit 672 (c244c38, \#683)
+- **Files changed:** 1 (+117 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +117 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 224 (DL-831); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 674. T-1407: npm run staging:trace -- \<trace id\> \[--since \<time\>\]: a read-only report of what one trace wrote on staging's database (turns, event-log entries, outbox rows and parts, messages), labels, states and times alone; the URL loaded by name and handed to the reader alone, as seed-staging.sh does; one READ ONLY transaction as rosie\_job with an empty scope; its test on a throwaway schema of K-04 fixture rows with planted canaries (\#685)
+
+- **Commit:** [`58d3b2d`](https://github.com/aryamahadik/rosie/commit/58d3b2d), by Arya Mahadik, 2026-11-15 17:46:51 UTC
+- **Pull request:** [#685](https://github.com/aryamahadik/rosie/pull/685) from `task/T-1407`, merged 2026-11-15 17:46:51 UTC. It squashed 1 branch commit:
+  - `d1d65a9` T-1407: npm run staging:trace -- \<trace id\> \[--since \<time\>\]: a read-…
+- **Files changed:** 4 (+1455 −0), by folder:
+  - `infra/ci/` staging-trace.test.mjs +998 −0
+  - `infra/scripts/` staging-trace.mjs +310 −0, staging-trace.sh +146 −0
+  - `/` package.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 673. T-1405: readActiveBundle and readBundleValue answer a failure through clocks.ts transientOrScrubbed (imported when a call fails), so a statement's own refusal and postgres.js's statement errors leave scrubbed: the call's name and code alone, no statement text, value or key. bundles.int.test.ts: T-1314's Gives 1 and 5 hold the two reads to transientOrScrubbed (the 23505 and TypeError pins move from raw to scrubbed); a T-1405 block gives each read T-1322's five real errors (22P02, 23514, UNDEFINED\_VALUE, bytea TypeError scrubbed; 40001 still transient) and a real lock-timeout refusal (55P03) of its own statement (\#684)
+
+- **Commit:** [`61ae149`](https://github.com/aryamahadik/rosie/commit/61ae149), by Arya Mahadik, 2026-11-15 17:46:47 UTC
+- **Pull request:** [#684](https://github.com/aryamahadik/rosie/pull/684) from `task/T-1405`, merged 2026-11-15 17:46:48 UTC. It squashed 1 branch commit:
+  - `1949bf1` T-1405: readActiveBundle and readBundleValue answer a failure through…
+- **Files changed:** 2 (+328 −6), by folder:
+  - `db/repo/` bundles.int.test.ts +318 −4, bundles.ts +10 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 672. docs: COMMIT\_HISTORY.md through commit 668 (2930ce6, \#679) (\#683)
 
