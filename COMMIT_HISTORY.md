@@ -2,9 +2,125 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 668, [`2930ce6`](https://github.com/aryamahadik/rosie/commit/2930ce6), 2026-11-15 16:34:44 UTC.
+- **Through:** commit 672, [`c244c38`](https://github.com/aryamahadik/rosie/commit/c244c38), 2026-11-15 17:13:10 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 672. docs: COMMIT\_HISTORY.md through commit 668 (2930ce6, \#679) (\#683)
+
+- **Commit:** [`c244c38`](https://github.com/aryamahadik/rosie/commit/c244c38), by Arya Mahadik, 2026-11-15 17:13:10 UTC
+- **Pull request:** [#683](https://github.com/aryamahadik/rosie/pull/683) from `task/commit-history-131`, merged 2026-11-15 17:13:10 UTC. It squashed 1 branch commit:
+  - `2494273` docs: COMMIT\_HISTORY.md through commit 668 (2930ce6, \#679)
+- **Files changed:** 1 (+36 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +36 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 223 (DL-828); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 671. T-1409: K-05's database-side contract test covers v1.16 (\#682)
+
+- **Commit:** [`baa8f21`](https://github.com/aryamahadik/rosie/commit/baa8f21), by Arya Mahadik, 2026-11-15 17:13:06 UTC
+- **Pull request:** [#682](https://github.com/aryamahadik/rosie/pull/682) from `task/T-1409`, merged 2026-11-15 17:13:06 UTC. It squashed 4 branch commits:
+  - `c31ba21` T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row…
+  - `d783047` T-1391: README v1.16, the db/repo read's tests also show an email cop…
+  - `ac7afa6` T-1392: readOutboxRowWritten answers K-05 v1.16 (item 70): the writte…
+  - `2aa2036` T-1409: K-05's db-side contract test takes v1.16: each v1.4 readOutbo…
+- **Files changed:** 1 (+279 −33), by folder:
+  - `tests/contract/` data-access.v1.db-side.test.ts +279 −33
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row's recipientHandleId and sendClass, both null when not written (K-09 v1.10 open gap 147)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1391: README v1.16, the db/repo read's tests also show an email copy's and an outage line's stored recipient and class (gap 147's list)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1392: readOutboxRowWritten answers K-05 v1.16 (item 70): the written row's recipientHandleId and sendClass as stored, both null when the side shows no row, in one statement of id, recipient_handle_id and send_class; its tests run v1.16's three exchanges, each v1.4 exchange answered as its v1.16 twin, every side's scope, an email copy and an outage line
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1409: K-05's db-side contract test takes v1.16: each v1.4 readOutboxRowWritten exchange is answered as v1.16 answers it, its outcome with recipientHandleId and sendClass as its v1.16 twin's outcome states them (a written row's checked as stored), judged at readOutboxRowWritten.v1dot16Response (RECIPIENT); the twin check excuses exactly those two fields for such a twin (addedFieldsOf); DB_SIDE_VERSIONS gains v1.16, with a twin for each of its three refused answers; two new cases show the v1.16 answer rule and the twin check firing
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 670. T-1392: db/repo's readOutboxRowWritten answers K-05 v1.16 under v1.4's role and scope (\#681)
+
+- **Commit:** [`b63ef76`](https://github.com/aryamahadik/rosie/commit/b63ef76), by Arya Mahadik, 2026-11-15 17:13:03 UTC
+- **Pull request:** [#681](https://github.com/aryamahadik/rosie/pull/681) from `task/T-1392`, merged 2026-11-15 17:13:03 UTC. It squashed 3 branch commits:
+  - `c31ba21` T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row…
+  - `d783047` T-1391: README v1.16, the db/repo read's tests also show an email cop…
+  - `ac7afa6` T-1392: readOutboxRowWritten answers K-05 v1.16 (item 70): the writte…
+- **Files changed:** 2 (+339 −23), by folder:
+  - `db/repo/` safety-reads.int.test.ts +295 −12, safety-reads.ts +44 −11
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row's recipientHandleId and sendClass, both null when not written (K-09 v1.10 open gap 147)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1391: README v1.16, the db/repo read's tests also show an email copy's and an outage line's stored recipient and class (gap 147's list)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1392: readOutboxRowWritten answers K-05 v1.16 (item 70): the written row's recipientHandleId and sendClass as stored, both null when the side shows no row, in one statement of id, recipient_handle_id and send_class; its tests run v1.16's three exchanges, each v1.4 exchange answered as its v1.16 twin, every side's scope, an email copy and an outage line
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 669. T-1391: K-05 v1.16 frozen: readOutboxRowWritten also answers the stored row's recipient and send class (\#680)
+
+- **Commit:** [`2adbcae`](https://github.com/aryamahadik/rosie/commit/2adbcae), by Arya Mahadik, 2026-11-15 17:12:59 UTC
+- **Pull request:** [#680](https://github.com/aryamahadik/rosie/pull/680) from `task/T-1391`, merged 2026-11-15 17:13:00 UTC. It squashed 2 branch commits:
+  - `c31ba21` T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row…
+  - `d783047` T-1391: README v1.16, the db/repo read's tests also show an email cop…
+- **Files changed:** 10 (+851 −6), by folder:
+  - `contracts/data-access/` README.md +69 −5, data-access.v1.16.schema.json +639 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` index.json +48 −0, outbox-row-written-alex-safety-recipient.json +22 −0, outbox-row-written-not-yet-no-recipient.json +22 −0, outbox-row-written-other-business-no-recipient.json +22 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-outbox-row-written-no-recipient.json +9 −0, refuse-outbox-row-written-other-business-recipient.json +9 −0, refuse-outbox-row-written-recipient-number.json +9 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row's recipientHandleId and sendClass, both null when not written (K-09 v1.10 open gap 147)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1391: README v1.16, the db/repo read's tests also show an email copy's and an outage line's stored recipient and class (gap 147's list)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 668. docs: COMMIT\_HISTORY.md through commit 666 (5c9ad62, \#677) (\#679)
 
