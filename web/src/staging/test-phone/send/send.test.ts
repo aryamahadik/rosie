@@ -16,11 +16,16 @@ import { cookieNames } from "../../../auth/cookies";
 import { startHref } from "../../../auth/pages";
 import { hiddenFields } from "../../../auth/test-support";
 import type { OutcomeOf, RequestOf, ResponseOf } from "../../../client/calls";
+import { ROUTE_MODULES } from "../../../routes";
 import { readWebConfig } from "../../../shell/config";
 import { REFERENCE_LABEL } from "../../../shell/error-pages";
 import { escapeHtml } from "../../../shell/frame";
+import { routeTable } from "../../../shell/route";
 import { TEST_LINK_HOST, TRACE_ID, attributeValues, testVars } from "../../../shell/test-support";
 import { REFUSED_STATUS, REFUSED_WORDS } from "../../guard";
+import { PARTS_PATH, partsHref } from "../parts/page";
+import { PICKER_PATH, pickerHref } from "../picker/page";
+import { linksIn } from "../picker/test-support";
 import {
   GATEWAY_WORDS,
   PHONE_FIELD,
@@ -605,5 +610,28 @@ describe("every value from the request or the answer is escaped", () => {
     expect(html).toContain("<code>evt-&lt;i&gt;&amp;dummy</code>");
     expect(html).toContain("<code>linq-&lt;u&gt;dummy</code>");
     expect(hiddenFields(sendFormOf(html)).phone).toBe("tp-<b>");
+  });
+});
+
+describe("after a send, the page links to this phone's texts and to the picker (T-524; DL-807)", () => {
+  it("See this phone's texts opens the thread view for the same phone and Choose another phone opens the picker, each at a route web/src/routes.ts lists; the page before a send has neither", async () => {
+    const table = routeTable(ROUTE_MODULES.flatMap((module) => module.routes));
+    expect(table.match(PARTS_PATH)?.route.label).toBe("testPhone.parts");
+    expect(table.match(PICKER_PATH)?.route.label).toBe("testPhone.phones");
+    for (const phone of ["tp-04", 'tp-<b>&"0?#']) {
+      const { shell, config } = stubSendShell(SENT);
+      const opened = await (await shell.fetch(open(testPhoneHref(config, phone), sessionOf(config)))).text();
+      const before = linksIn(opened).map((link) => link.words);
+      expect(before, phone).not.toContain(WORDS.seeTexts);
+      expect(before, phone).not.toContain(WORDS.choosePhone);
+
+      const response = await shell.fetch(
+        sendPost(config, wholeForm(phone, "req-dummy-0001", { words: "JOIN" })),
+      );
+      expect(response.status, phone).toBe(200);
+      const links = linksIn(await response.text());
+      expect(links, phone).toContainEqual({ href: partsHref(config, phone), words: WORDS.seeTexts });
+      expect(links, phone).toContainEqual({ href: pickerHref(config), words: WORDS.choosePhone });
+    }
   });
 });
