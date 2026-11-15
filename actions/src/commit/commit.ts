@@ -14,7 +14,8 @@
 //      whole call (decideRefused, valueFailsWords) comes back as it is, and a limit not built yet throws (notBuilt);
 //   5. one question first: a passed part on the booking of a part decide ended in one question waits (CQ-73's default);
 //   6. the writes: each core action's (runCore), then each passed part's (writesOf), in decide's order; a part the gate
-//      stopped, held or asked writes no row of its own;
+//      stopped, held or asked writes no row of its own. A unit's writes carry its own clock rows (UnitWrites.clocks: a
+//      threat's pause call-offs, T-319's escalations; T-1156), which the commit writes with the rest;
 //   7. one K-05 commitTurn request under the turn id (build.ts), sent once. A repeated turn id returns the first commit and
 //      writes nothing (K-05 v1 item 1). A version or reservation conflict reloads once and gates again (arch 06 line 305;
 //      K-09 v1 gateAndCommit.request); a second one fails closed. A parked turn, a database rule and a transient failure
@@ -38,7 +39,9 @@
 //      code: K-09 v1 limitNOutcome) are each limit's own (T-299 to T-304) and need a port of their own, not built here.
 //   9. `written` lists the rows the walk and the parts wrote, as commit-s1-01.json's outcome does (K-09 v1.5 default 134;
 //      T-1194, DL-376): a row a core action's writes name (build.ts rowsNamedBy) is left out, its response naming it
-//      instead (the safety record's outcomeId and hold), although the one K-05 request writes it all the same. Kept whole:
+//      instead (the safety record's outcomeId and hold), although the one K-05 request writes it all the same. So are a
+//      core action's own clock rows (a threat's pause call-offs: build.ts default 8), which the safety record's response
+//      does not name; the call's span keeps them. Kept whole:
 //      `outboxRows` (a core action's line among them, as K-09 v1 stop-recorded.json lists its stop reply; the actor leaves
 //      a fixed line's row out of what it composes itself), `promoted` and the call's span (every row the call wrote).
 

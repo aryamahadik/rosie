@@ -7,10 +7,16 @@
 //   - one event-log entry per row it writes, in K-08 v1's kinds and shapes (arch 09 line 457: who, what, old and new, why,
 //     approved by), each with the unit's why; the state writes' entries come with them (UnitWrites.stateEvents).
 //
+// A unit's own clock rows (UnitWrites.clocks: a threat's pause call-offs, T-319's escalations; T-1156, DL-341) go in as
+// the unit gives them, in K-05 v1's clockNew shape, after the clock rows of the questions it asks, each once with its
+// K-08 v1 `clock_row.created` entry (default 6), so no clock row a core action arms is ever dropped.
+//
 // Before anything is sent, code checks what K-05 v1.1's schema holds and the database would refuse, so a malformed turn is
 // refused whole (fail closed: CommitRefusedError): no state write to a table with its own list; outbox rows with no plan
 // or final parts (words are written in after the commit: arch 01 line 41; K-07 v1); every effect row on its own
-// idempotency key (arch 10 line 542; K-07 v1 refuse-effect-without-key); no id given twice.
+// idempotency key (arch 10 line 542; K-07 v1 refuse-effect-without-key); no id given twice, every clock row the request
+// makes in one list (the questions' and the units' own). A unit's own clock row the commit cannot read in K-05 v1's form
+// is refused too, before anything is sent (default 7).
 //
 // The turn row is K-05 v1's `turn` with its seven fields alone (T-1150; K-09 v1.5 default 135): a gateAndCommit request's
 // turn may also carry the service and the Linq chat id of the turn's last text (K-09 v1.5 gateAndCommit.turn), which are
@@ -37,6 +43,19 @@
 //   5. A unit's state insert names its row by its K-04 `id` column (rowsNamedBy), the key of every table the built core
 //      actions insert into (K-34 safety_outcomes, safety_holds and harm_reports; hand_offs, team_pages; pauses); an update
 //      names it by its key's one column (K-05 stateWrite.key). An insert with no `id` names no row.
+//   6. A unit's own clock row's entry is K-08 v1's `clock_row.created`, id `log-<clock id>-created` (default 2's rule),
+//      Rosie's act with the unit's why and no approval, under the clock's own business. Its new values are the plain
+//      columns the commit writes: the kind and the state, armed with its due time and zone when the row carries `due`
+//      (K-05 v1 clockNew: written armed at the commit), else waiting; its old values null (K-04 v1 seed-event-log.json's
+//      clock_row.armed entry names state and due_at so; T-317's aloneWritesOf names the kind and state).
+//   7. A unit's own clock row whose id, kind, business or due time is not in K-05 v1's form (an id a non-empty string; the
+//      kind one of K-04 clock_rows.kind's five; the business an id or null; `due` left out, or its time and zone) throws a
+//      TypeError before anything is sent, as T-317's unitWritesOf refuses a clock row it cannot carry: CommitFault
+//      (errors.ts, another card's file) has no fault for it yet (a follow-up: clockNotWellFormed, as effectNotWellFormed).
+//      The rest of the row is K-05's schema's to refuse.
+//   8. rowsNamedBy names a unit's own clock rows with its other rows, so the commit's answer leaves a core action's clock
+//      rows out of `written` as it leaves its other rows out (commit.ts default 9); K-05's one commit writes them all the
+//      same, and the call's span keeps them.
 
 import { CommitRefusedError } from "./errors";
 import type {
@@ -195,6 +214,45 @@ export function effectView(effect: EffectNew): EffectView {
   return { effectId, kind, key, businessId: stringField(effect, "businessId") };
 }
 
+/** K-04 v1 clock_rows.kind, every one (K-05 v1 clockKind). */
+export const CLOCK_KINDS = ["question", "never_delivered", "saved_time", "step", "job"] as const;
+
+/** What the commit reads of a unit's own clock row: its id, kind and business, and its due time (null: written waiting). */
+export interface ClockView {
+  readonly id: string;
+  readonly kind: (typeof CLOCK_KINDS)[number];
+  readonly businessId: string | null;
+  readonly due: { readonly dueAt: string; readonly dueZone: string } | null;
+}
+
+/**
+ * Reads a unit's own clock row as K-05 v1 clockNew holds it (default 7): its id, its K-04 kind, its business or null, and,
+ * when it is armed at the commit, its due time and zone. One the commit cannot read so throws, before anything is sent.
+ */
+export function clockView(clock: ClockNew): ClockView {
+  const id = stringField(clock, "id");
+  const kind = CLOCK_KINDS.find((each) => each === clock.kind);
+  const businessId = stringField(clock, "businessId");
+  const due: unknown = clock.due;
+  const dueAt = isRecord(due) ? stringField(due, "dueAt") : null;
+  const dueZone = isRecord(due) ? stringField(due, "dueZone") : null;
+  const business = businessId !== null || clock.businessId === null;
+  const timed = due === undefined || (dueAt !== null && dueZone !== null);
+  if (id === null || kind === undefined || !business || !timed) {
+    throw new TypeError(
+      "gateAndCommit: a unit's clock row is not in K-05 v1's clockNew form; nothing was written",
+    );
+  }
+  return { id, kind, businessId, due: dueAt === null || dueZone === null ? null : { dueAt, dueZone } };
+}
+
+/** A unit's own clock row's new values in its entry (default 6): its kind and state, with its due time when armed. */
+function clockValues(view: ClockView): Record<string, unknown> {
+  return view.due === null
+    ? { kind: view.kind, state: "waiting" }
+    : { kind: view.kind, state: "armed", due_at: view.due.dueAt, due_zone: view.due.dueZone };
+}
+
 /** Refuses the first id two entries share. */
 function onceEach(ids: readonly string[]): void {
   const seen = new Set<string>();
@@ -206,7 +264,8 @@ function onceEach(ids: readonly string[]): void {
 
 /**
  * What code checks before anything is sent (fail closed: the whole turn is refused, nothing written): the state writes'
- * tables, plan-free outbox rows, every effect row on its own key, and no row id given twice in one list.
+ * tables, plan-free outbox rows, every effect row on its own key, every unit's own clock row readable (default 7), and no
+ * row id given twice in one list, every clock row the request makes in one.
  */
 export function checkUnits(units: readonly CommitUnit[]): void {
   const all = units.map((unit) => unit.writes);
@@ -228,6 +287,12 @@ export function checkUnits(units: readonly CommitUnit[]): void {
   }
   onceEach(effects.map((effect) => effect.effectId));
   onceEach(all.flatMap((writes) => writes.asks.map((ask) => ask.question.id)));
+  onceEach(
+    all.flatMap((writes) => [
+      ...writes.asks.map((ask) => questionClock(ask.question, ask.safeDefault).id),
+      ...(writes.clocks ?? []).map((clock) => clockView(clock).id),
+    ]),
+  );
   onceEach(all.flatMap((writes) => writes.closes.map((close) => close.id)));
   onceEach(all.flatMap((writes) => writes.messages.map((row) => row.id)));
 }
@@ -262,10 +327,10 @@ function stateRowId(write: StateWrite): string | null {
 
 /**
  * The rows one unit's writes name, by table and id, as K-05 names them in `written` (K-05 v1 commitResult): each state
- * write's row (stateRowId), each question it opens with the commit's clock row for it, each question it closes, each clock
- * row it cancels, each reservation it confirms or releases, each effect it writes or lets go. Its outbox rows are K-05's
- * `outboxRows`, never `written`; the rows K-05 adds of its own to a reservation (its saved-time clock row, its class seats,
- * the one promoted) are not the unit's to name.
+ * write's row (stateRowId), each question it opens with the commit's clock row for it, each clock row of its own (default
+ * 8), each question it closes, each clock row it cancels, each reservation it confirms or releases, each effect it writes
+ * or lets go. Its outbox rows are K-05's `outboxRows`, never `written`; the rows K-05 adds of its own to a reservation (its
+ * saved-time clock row, its class seats, the one promoted) are not the unit's to name.
  */
 export function rowsNamedBy(writes: UnitWrites): RowName[] {
   const named: RowName[] = [];
@@ -277,6 +342,7 @@ export function rowsNamedBy(writes: UnitWrites): RowName[] {
     name("open_questions", ask.question.id);
     name("clock_rows", questionClock(ask.question, ask.safeDefault).id);
   }
+  for (const clock of writes.clocks ?? []) name("clock_rows", clockView(clock).id);
   for (const close of writes.closes) name("open_questions", close.id);
   for (const cancel of writes.clockCancels) name("clock_rows", cancel.id);
   for (const confirm of writes.reservations.confirm) name("reservations", confirm.id);
@@ -415,6 +481,22 @@ function writeUnit(
       ownAct: false,
     });
   }
+  // The unit's own clock rows, as it gives them (K-05 v1 clockNew), each with its entry (defaults 6 and 7).
+  for (const clock of unitWrites.clocks ?? []) {
+    const view = clockView(clock);
+    writes.clockRows.make.push(copy(clock));
+    log({
+      table: "clock_rows",
+      rowId: view.id,
+      move: "created",
+      kind: "clock_row.created",
+      businessId: view.businessId,
+      old: null,
+      new: clockValues(view),
+      approved: false,
+      ownAct: false,
+    });
+  }
   for (const row of unitWrites.messages) {
     writes.outboxRows.push(copy(row));
     log({
@@ -490,8 +572,8 @@ function writeUnit(
 
 /**
  * The turn's one K-05 commitTurn request: the turn row (K-05's seven fields of the request's turn: k05TurnRow), every row
- * read, and every unit's writes in order with the rows the commit owns and the event-log entries. Checks the units first
- * (checkUnits): a fault refuses the whole turn.
+ * read, and every unit's writes in order (its own clock rows among them) with the rows the commit owns and the event-log
+ * entries. Checks the units first (checkUnits): a fault refuses the whole turn.
  */
 export function buildCommitRequest(input: BuildInput): CommitTurnRequest {
   checkUnits(input.units);

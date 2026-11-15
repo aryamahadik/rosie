@@ -12,12 +12,11 @@ import { CommitNotBuiltError } from "../errors";
  *   - noService: no shared-core service runs it yet (M3b's other core calls, each its own task), or its name is no K-09
  *     v1 call at all;
  *   - portNotWired: its service is built, but a port it reads is not wired yet (the service's own NotBuiltError: K-34's
- *     reads, the sealer, the plug-in's stop words, hand-offs and pages);
- *   - clockRows: its run arms clock rows no question owns (a threat's pause call-offs, T-319's escalations), which the
- *     turn's UnitWrites has no list for until T-1156; so it is not written at all rather than written without them
- *     (DL-341: no clock is ever dropped).
+ *     reads, the sealer, the plug-in's stop words, hand-offs and pages).
+ * A run that arms clock rows no question owns is no longer one (T-1156 retired T-1140's clockRows gap): its clock rows
+ * ride in its writes (UnitWrites.clocks), and the turn's commit writes each (DL-341: no clock is ever dropped).
  */
-export type CoreGap = "noService" | "portNotWired" | "clockRows";
+export type CoreGap = "noService" | "portNotWired";
 
 /** A core action that cannot ride in this turn's commit yet: gateAndCommit answers notBuilt, with nothing written. */
 export class CoreNotBuiltError extends CommitNotBuiltError {

@@ -53,9 +53,11 @@ import {
   type PortCalls,
 } from "./test-support";
 import type {
+  ClockNew,
   CommitDeps,
   CommitTurnError,
   CommitTurnRequest,
+  Committed,
   CoreRun,
   OutboxRowNew,
   SafetyHold,
@@ -471,6 +473,157 @@ describe("every effect row carries an idempotency key", () => {
       });
       expect(deps.k05.requests).toEqual([]);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// A core action's own clock rows (T-1156; DL-341: no clock row is ever dropped)
+
+/**
+ * A pause's call-off clock row as T-317's setRecordFlag arms it for Alex's threat (record-flag.ts; S11-62; K-34
+ * seed-threat-pause.json's pauses): K-05 v1 clockNew, a step clock the minute sweep owns, armed at the commit and due 7pm
+ * the day before Alex's Nov 14 visit in its zone.
+ */
+function callOffClock(pauseId: string): ClockNew {
+  return {
+    id: `clock-call-off-${pauseId}`,
+    kind: "step",
+    openQuestionId: null,
+    reservationId: null,
+    handleId: null,
+    businessId: "biz-lees-barbershop",
+    bookingId: "booking-alex-riley-nov14",
+    fires: { step: "S11-62", branch: "callOff", pause_id: pauseId, no_fee: true },
+    due: { dueAt: "2026-11-14T00:00:00Z", dueZone: "America/New_York" },
+  };
+}
+
+const CALL_OFF_IDS = [
+  "clock-call-off-pause-alex-threat-person",
+  "clock-call-off-pause-alex-threat-phone",
+] as const;
+
+/** S1-02's core action (Sam's text's safety outcome) as a run whose writes carry two clock rows of its own. */
+function clockingCoreRun(): CoreRun {
+  const run = s1_02CoreRun();
+  return {
+    ...run,
+    writes: {
+      ...run.writes,
+      clocks: [callOffClock("pause-alex-threat-person"), callOffClock("pause-alex-threat-phone")],
+    },
+  };
+}
+
+describe("a core action's own clock rows ride in the turn's one commit, once each, with their entries (T-1156; DL-341)", () => {
+  it("S1-02's turn: the request is commit-s1-02.json's with the core action's clock rows and their entries first; `written` leaves them out, the span keeps them", async () => {
+    const deps = s1_02Deps({ core: [clockingCoreRun()] });
+    const called = await callCommit(copy(gateExchange(S1_02).request), deps);
+    expect(called.answer).toMatchObject({
+      result: "committed",
+      repeated: false,
+      parts: [{ part: 0, result: "committed" }],
+    });
+    // Nothing else of the request changes: the core action's unit comes first, its clock rows and their entries with it.
+    const request = onlyRequest(deps.k05.requests);
+    const expected = expectedS1_02Request();
+    const clocks = clockingCoreRun().writes.clocks ?? [];
+    expect(request).toEqual({
+      ...expected,
+      writes: {
+        ...expected.writes,
+        clockRows: { ...expected.writes.clockRows, make: [...clocks, ...expected.writes.clockRows.make] },
+        events: [
+          ...CALL_OFF_IDS.map((id) => ({
+            ...S1_02_EVENT_BASE,
+            ...ROSIE,
+            id: `log-${id}-created`,
+            kind: "clock_row.created",
+            tableName: "clock_rows",
+            rowId: id,
+            oldValues: null,
+            newValues: {
+              kind: "step",
+              state: "armed",
+              due_at: "2026-11-14T00:00:00Z",
+              due_zone: "America/New_York",
+            },
+            why: { step: "A3-22" },
+          })),
+          ...expected.writes.events,
+        ],
+      },
+    });
+    // K-05 wrote each once; the answer's `written` leaves the core action's rows out (commit.ts default 9), and the
+    // call's span keeps every row the call wrote, the clock rows among them.
+    const written = deps.k05.commits[0]?.written ?? fail();
+    expect(written.filter((row) => row.table === "clock_rows").map((row) => row.rowId)).toEqual([
+      ...CALL_OFF_IDS,
+      "clock-oq-s1-04-sam",
+      "clock-oq-s1-02",
+    ]);
+    const answer = called.answer as Committed;
+    expect(answer.written.written).toEqual(
+      written.filter((row) => !(CALL_OFF_IDS as readonly string[]).includes(row.rowId)),
+    );
+    expect(called.spans[0]?.rows).toEqual(
+      expect.arrayContaining(CALL_OFF_IDS.map((id) => ({ table: "clock_rows", id }))),
+    );
+  });
+
+  it("the turn run again writes none twice: the same request, K-05's first commit back, each clock row written once", async () => {
+    const k05 = k05Fake();
+    const first = await callCommit(
+      copy(gateExchange(S1_02).request),
+      s1_02Deps({ k05, core: [clockingCoreRun()] }),
+    );
+    const again = await callCommit(
+      copy(gateExchange(S1_02).request),
+      s1_02Deps({ k05, core: [clockingCoreRun()] }),
+    );
+    expect(first.answer).toMatchObject({ result: "committed", repeated: false });
+    expect(again.answer).toMatchObject({ result: "committed", repeated: true, written: { written: [] } });
+    expect(k05.requests).toHaveLength(2);
+    expect(k05.requests[1]).toEqual(k05.requests[0]);
+    expect(k05.commits).toHaveLength(1);
+    const clockRows = (k05.commits[0]?.written ?? [])
+      .filter((row) => row.table === "clock_rows")
+      .map((row) => row.rowId);
+    expect(clockRows).toEqual([...CALL_OFF_IDS, "clock-oq-s1-04-sam", "clock-oq-s1-02"]);
+    expect(again.spans[0]?.rows).toBeUndefined();
+  });
+
+  it("a core run that hands over no clock row, its list left out or empty, writes none: the request is commit-s1-02.json's", async () => {
+    const empty: CoreRun = { ...s1_02CoreRun(), writes: { ...s1_02CoreRun().writes, clocks: [] } };
+    for (const run of [s1_02CoreRun(), empty]) {
+      const deps = s1_02Deps({ core: [run], k05: k05Fake({ answers: [s1_02K05Answer()] }) });
+      const called = await callCommit(copy(gateExchange(S1_02).request), deps);
+      expect(called.answer).toEqual(gateExchange(S1_02).outcome);
+      expect(onlyRequest(deps.k05.requests)).toEqual(expectedS1_02Request());
+    }
+  });
+
+  it("a core action's clock row the commit cannot read fails the turn before K-05 is called, and the call rolls back", async () => {
+    const run = s1_02CoreRun();
+    const unreadable: CoreRun = {
+      ...run,
+      writes: { ...run.writes, clocks: [{ ...callOffClock("pause-alex-threat-person"), kind: "callOff" }] },
+    };
+    const deps = s1_02Deps({ core: [unreadable] });
+    const scope = recordingScope();
+    const api = createToolApi({
+      validator,
+      scope,
+      handlers: recordingHandlers("gateAndCommit", (given, context) =>
+        gateAndCommit(given as GateRequest, context, deps),
+      ),
+    });
+    const request = copy(gateExchange(S1_02).request);
+    await expect(api.call("gateAndCommit", request, traceFor(request).trace)).rejects.toBeInstanceOf(
+      TypeError,
+    );
+    expect(whats(scope.events).at(-1)).toBe("rollback");
+    expect(deps.k05.requests).toEqual([]);
   });
 });
 
