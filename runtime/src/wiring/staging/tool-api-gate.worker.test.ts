@@ -383,7 +383,7 @@ function rowCounts(): Promise<RowCounts> {
 /** The counts after a commit that wrote these rows on top of `before`. */
 const plus = (before: RowCounts, more: Partial<RowCounts>): RowCounts => {
   const out = { ...before };
-  for (const [table, n] of Object.entries(more)) out[table as keyof RowCounts] += n ?? 0;
+  for (const [table, n] of Object.entries(more)) out[table as keyof RowCounts] += n;
   return out;
 };
 
@@ -1357,8 +1357,8 @@ describe("gates side by side (the audit's two rows composed side by side; critic
       await expectCountsAfter(
         before,
         Object.fromEntries(
-          Object.entries(FIRST_TEXT_ROWS).map(([table, n]) => [table, (n ?? 0) * SIX_AT_ONCE.length]),
-        ) as Partial<RowCounts>,
+          Object.entries(FIRST_TEXT_ROWS).map(([table, n]) => [table, n * SIX_AT_ONCE.length]),
+        ),
         "grows",
       );
     },
