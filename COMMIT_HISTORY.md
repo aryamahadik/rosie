@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 625, [`c1c9731`](https://github.com/aryamahadik/rosie/commit/c1c9731), 2026-11-15 00:42:34 UTC.
+- **Through:** commit 627, [`61ddecc`](https://github.com/aryamahadik/rosie/commit/61ddecc), 2026-11-15 01:20:54 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 627. docs: COMMIT\_HISTORY.md through commit 625 (c1c9731, \#636) (\#638)
+
+- **Commit:** [`61ddecc`](https://github.com/aryamahadik/rosie/commit/61ddecc), by Arya Mahadik, 2026-11-15 01:20:54 UTC
+- **Pull request:** [#638](https://github.com/aryamahadik/rosie/pull/638) from `task/commit-history-114`, merged 2026-11-15 01:20:55 UTC. It squashed 1 branch commit:
+  - `3cda9eb` docs: COMMIT\_HISTORY.md through commit 625 (c1c9731, \#636)
+- **Files changed:** 1 (+49 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +49 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 626. T-1394: staging binds the receipt's two K-05 calls through the job handle: handleKey over handleSealingKey with the SEALING\_WRAP\_KEY-only resolver and chatOpenCall over openChatOnText, one job-side client per call, null with no HYPERDRIVE\_JOB or outside staging; its Workers test on the rig and its seed (\#637)
+
+- **Commit:** [`43fad13`](https://github.com/aryamahadik/rosie/commit/43fad13), by Arya Mahadik, 2026-11-15 01:20:49 UTC
+- **Pull request:** [#637](https://github.com/aryamahadik/rosie/pull/637) from `task/T-1394`, merged 2026-11-15 01:20:50 UTC. It squashed 1 branch commit:
+  - `fb3759b` T-1394: staging binds the receipt's two K-05 calls through the job ha…
+- **Files changed:** 3 (+1513 −8), by folder:
+  - `runtime/src/wiring/staging/` k05-receipt.seed.ts +63 −0, k05-receipt.ts +83 −8, k05-receipt.worker.test.ts +1367 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 625. docs: COMMIT\_HISTORY.md through commit 623 (11c5c20, \#633) (\#636)
 
