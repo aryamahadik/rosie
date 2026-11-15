@@ -21,12 +21,24 @@
 // Rule 9: the probe's user, password, database and hosts are made up here (.invalid names and RFC 5737's documentation
 // addresses), and the turn face's requests are K-09's own fixtures. A check names what leaked, never its value, so a
 // failing run prints no secret.
+//
+// T-1367 (T-1331's DL-694 task 2; DL-708): a lost connection after the start, on local PostgreSQL (no table is read or
+// written). The transaction's connection closes while fn awaits other I/O (a timer standing in for the runtime client
+// and the bundles), with the server showing it idle in its transaction: the server ends the session (pg_terminate_backend
+// from another connection: FATAL 57P01, then the close), the socket closes with no error, or it is reset. Through
+// withBusiness and through pgCallScope: the outcome is thrown scrubbed (DataAccessDatabaseError, the call's name and
+// 08006 alone), whatever fn does next (a statement, which is refused unbuilt; an answer; its own error); nothing is built
+// on the connection after the close (postgres.js's `debug` hook sees every statement it builds: no statement of fn's, no
+// scope read, no commit, no rollback); nothing is thrown uncaught (Vitest fails the run on one, as a statement written to
+// no socket throws from a timer); and the same client answers next, on a new connection. And a connection lost under a
+// statement withBusiness sends itself (the socket closed as postgres.js builds it): the start's set_config, prepared, so
+// postgres.js would send its own rollback; the commit; and the rollback after fn's own error.
 
 import { once } from "node:events";
-import { type AddressInfo, createServer, type Socket } from "node:net";
+import { type AddressInfo, createConnection, createServer, type Socket } from "node:net";
 
 import postgres from "postgres";
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { NOT_TOLD_YET, PLUGIN_LISTS_NO_STOP_WORDS } from "../../actions/src/domain/safety";
 import {
@@ -48,6 +60,7 @@ import {
   SCOPE_SETTING,
   setBusinessScope,
   type Sql,
+  type Tx,
   withBusiness,
 } from "./scope";
 import type { WrappingKeys } from "./sealing";
@@ -882,5 +895,389 @@ describe("withBusiness once fn has begun, on local PostgreSQL: as before (T-1331
         ).resolves.toBe(BUSINESS);
       },
     );
+  });
+});
+
+// ---- T-1367: a lost connection after the start -------------------------------------------------------------------------
+
+/** How a test closes the transaction's connection while it waits idle in its transaction. */
+type IdleClose = "terminate" | "end" | "reset";
+
+const IDLE_CLOSES: { name: string; how: IdleClose }[] = [
+  {
+    name: "the server ends the session (pg_terminate_backend: FATAL 57P01, then the close)",
+    how: "terminate",
+  },
+  { name: "the socket closes with no error, as a pooler or the network would close it", how: "end" },
+  { name: "the socket is reset (Node's ECONNRESET)", how: "reset" },
+];
+
+/**
+ * What fn does once its other I/O after the close is done: a statement, an answer, or an error of its own; or a
+ * statement at once, in the same turn of the event loop as the close (no other I/O between them).
+ */
+type After = "statement" | "answer" | "own error" | "statement at once";
+
+/** The scope fn runs under: withBusiness named by CALL, or pgCallScope, which names no call. */
+type Through = "withBusiness" | "pgCallScope";
+
+/** The local server's host and port and the business id, which no outcome may hold (the URL is never printed). */
+function serverSecrets(): Secrets {
+  const { hostname, port } = new URL(resolvePrimaryUrl());
+  return secretsOf({
+    "server host": hostname,
+    "server port": port === "" ? 5432 : Number(port),
+    business: BUSINESS,
+  });
+}
+
+/** Node's error for a socket its peer reset: its code alone. */
+function resetError(): Error {
+  return Object.assign(new Error("read ECONNRESET"), { code: "ECONNRESET", errno: -54, syscall: "read" });
+}
+
+/** A client of the local server whose one connection's socket a test can close, and every statement it built. */
+interface ClosingClient {
+  readonly sql: Sql;
+  /** Each statement's text as postgres.js built it, in order (its `debug` hook): never a value. */
+  readonly sent: string[];
+  /** The application name its connection carries, its own (pg_stat_activity). */
+  readonly application: string;
+  /** Its sockets, in the order postgres.js asked for them (postgres.js's own `socket` option). */
+  readonly sockets: Socket[];
+}
+
+let closingClients = 0;
+
+/**
+ * A client of the local server with one connection. With `cut`, the socket is closed (with no error) just as postgres.js
+ * builds the first statement `cut.at` matches once `cut.armed()` says so: that statement is never written.
+ */
+function closingClient(cut?: { at: RegExp; armed: () => boolean }): ClosingClient {
+  const url = resolvePrimaryUrl();
+  const { hostname, port } = new URL(url);
+  closingClients += 1;
+  const application = `rosie-t1367-scope-${String(closingClients)}`;
+  const sent: string[] = [];
+  const sockets: Socket[] = [];
+  let cutDone = false;
+  const options = {
+    max: 1,
+    onnotice: () => undefined,
+    connection: { application_name: application },
+    debug: (_connection: number, text: string) => {
+      sent.push(text);
+      if (cut !== undefined && !cutDone && cut.armed() && cut.at.test(text)) {
+        cutDone = true;
+        sockets.at(-1)?.destroy();
+      }
+    },
+    socket: () => {
+      const socket = createConnection(port === "" ? 5432 : Number(port), hostname);
+      sockets.push(socket);
+      return socket;
+    },
+  };
+  return { sql: postgres(url, options), sent, application, sockets };
+}
+
+/** Waits `ms` milliseconds: the other I/O fn awaits (the runtime client, the bundles), or a turn for a late write. */
+const pause = (ms: number): Promise<void> =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+/** The statement texts a client built from `from` on: none may follow a close. */
+const builtSince = (client: ClosingClient, from: number): string[] => client.sent.slice(from);
+
+/** The watch went out ahead of the scope's set_config, in the same write. */
+function expectWatchBeforeSetting(sent: readonly string[]): void {
+  const setting = sent.findIndex((text) => text.includes("set_config"));
+  expect(setting).toBeGreaterThan(0);
+  expect(sent[setting - 1]?.trim()).toBe("select 1 as watch");
+}
+
+describe("withBusiness after its start, when the connection is lost (T-1367; local PostgreSQL)", () => {
+  let killer: Sql | undefined;
+
+  beforeAll(() => {
+    killer = postgres(resolvePrimaryUrl(), { max: 1, onnotice: () => undefined });
+  });
+
+  afterAll(async () => {
+    await killer?.end({ timeout: 5 });
+  });
+
+  /**
+   * Closes the client's connection as `how` says while its transaction waits, and resolves once postgres.js has heard
+   * the close (its own listener on the socket runs first). Gives the server's state of the backend just before.
+   */
+  async function closeWhileWaiting(client: ClosingClient, how: IdleClose): Promise<string | null> {
+    const socket = client.sockets.at(-1);
+    if (socket === undefined || killer === undefined) throw new Error("no socket, or no second connection");
+    const [backend] = await killer<{ pid: number; state: string | null }[]>`
+      select pid, state from pg_stat_activity where application_name = ${client.application}
+    `;
+    const closed = new Promise<void>((resolve) => {
+      socket.once("close", () => {
+        resolve();
+      });
+    });
+    if (how === "terminate") {
+      await killer`select pg_terminate_backend(${backend?.pid ?? 0})`;
+    } else {
+      socket.destroy(how === "reset" ? resetError() : undefined);
+    }
+    await closed;
+    return backend?.state ?? null;
+  }
+
+  interface IdleRun {
+    settled: Settled;
+    /** How fn's statement after the close settled (the "statement" case), else null. */
+    refused: Settled | null;
+    /** How many times fn ran. */
+    runs: number;
+    /** What was built on the client from the close until the same client's next call. */
+    builtAfterClose: string[];
+    sent: string[];
+    stateAtClose: string | null;
+    /** The same client's next call, and how many connections the client had opened by then. */
+    next: Settled;
+    sockets: number;
+  }
+
+  /**
+   * One call on a fresh closing client: fn sends a statement of its own, the connection closes `how` while fn waits, fn
+   * awaits other I/O and then does `after`; then the same client's next call.
+   */
+  async function idleCloseRun(how: IdleClose, after: After, through: Through): Promise<IdleRun> {
+    const client = closingClient();
+    const seen: { refused: Settled | null; runs: number; atClose: number; state: string | null } = {
+      refused: null,
+      runs: 0,
+      atClose: -1,
+      state: null,
+    };
+    let finish: () => void = () => undefined;
+    const finished = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    const fn = async (tx: Tx): Promise<string> => {
+      seen.runs += 1;
+      try {
+        await tx`select 1 as before_the_wait`;
+        seen.state = await closeWhileWaiting(client, how);
+        seen.atClose = client.sent.length;
+        if (after !== "statement at once") await pause(20);
+        if (after === "statement" || after === "statement at once") {
+          seen.refused = await settle(tx`select 2 as after_the_close`);
+        } else if (after === "own error") {
+          throw new Error("fn's own error, after the close");
+        }
+        return "fn answered";
+      } finally {
+        finish();
+      }
+    };
+    try {
+      const settled = await settle(
+        through === "withBusiness"
+          ? withBusiness<string>(client.sql, BUSINESS, fn, { call: CALL })
+          : pgCallScope(client.sql).withBusiness(BUSINESS, fn),
+      );
+      await finished;
+      // A turn for anything postgres.js would still build or write (a statement goes to its socket from a timer).
+      await pause(50);
+      const builtAfterClose = builtSince(client, seen.atClose);
+      const sent = [...client.sent];
+      const next = await settle(
+        withBusiness(client.sql, BUSINESS, (tx) => readBusinessScope(tx), { call: CALL }),
+      );
+      return {
+        settled,
+        refused: seen.refused,
+        runs: seen.runs,
+        builtAfterClose,
+        sent,
+        stateAtClose: seen.state,
+        next,
+        sockets: client.sockets.length,
+      };
+    } finally {
+      await client.sql.end({ timeout: 0 });
+    }
+  }
+
+  const cases = IDLE_CLOSES.flatMap(({ name, how }) =>
+    (["statement", "answer", "own error", "statement at once"] as const).flatMap((after) =>
+      (["withBusiness", "pgCallScope"] as const).map((through) => ({ name, how, after, through })),
+    ),
+  );
+
+  it.each(cases)(
+    "$name while fn awaits other I/O, then fn's $after, through $through: thrown scrubbed as 08006, nothing built after the close, nothing uncaught, and the same client answers next on a new connection",
+    async ({ how, after, through }) => {
+      const run = await idleCloseRun(how, after, through);
+      const call = through === "withBusiness" ? CALL : UNNAMED;
+      const secrets = serverSecrets();
+
+      // The close came while the transaction waited idle in it, after the watch and the scope's setting went.
+      expect(run.stateAtClose).toBe("idle in transaction");
+      expectWatchBeforeSetting(run.sent);
+      expect(run.runs).toBe(1);
+
+      // What leaves: the call's name and 08006 alone, never fn's answer or its error, and none of the connection.
+      expect(leaksOf(run.settled, secrets)).toEqual([]);
+      expect("thrown" in run.settled).toBe(true);
+      expectScrubbed((run.settled as { thrown: unknown }).thrown, call, "database", LOST.sqlstate);
+
+      // fn's statement after the close is refused at once, scrubbed the same way, and never built.
+      if (after === "statement" || after === "statement at once") {
+        expect(run.refused).not.toBeNull();
+        expect(leaksOf(run.refused, secrets)).toEqual([]);
+        expectScrubbed((run.refused as { thrown: unknown }).thrown, call, "database", LOST.sqlstate);
+      }
+      // No statement of fn's, no scope read, no commit and no rollback was built on the connection after the close.
+      expect(run.builtAfterClose).toEqual([]);
+
+      // The same client answers next, on a new connection.
+      expect(run.next).toEqual({ answer: BUSINESS });
+      expect(run.sockets).toBe(2);
+    },
+  );
+
+  it("with no close, fn's statements and the end go as before: the watch ahead of the setting, then the scope read and the commit", async () => {
+    const client = closingClient();
+    try {
+      const answer = await withBusiness(
+        client.sql,
+        BUSINESS,
+        async (tx) => {
+          await tx`select 1 as before_the_wait`;
+          await pause(20);
+          return readBusinessScope(tx);
+        },
+        { call: CALL },
+      );
+      expect(answer).toBe(BUSINESS);
+      expectWatchBeforeSetting(client.sent);
+      expect(client.sent.at(-1)?.trim()).toBe("commit");
+      expect(client.sockets).toHaveLength(1);
+    } finally {
+      await client.sql.end({ timeout: 0 });
+    }
+  });
+
+  /** A call on a client whose socket is cut as `at` is built (once `armed`), then the same client's next call. */
+  async function cutRun(
+    at: RegExp,
+    use: (sql: Sql) => Promise<unknown>,
+    prepare: boolean,
+  ): Promise<{ settled: Settled; builtAfterCut: string[]; next: Settled; sockets: number }> {
+    let armed = !prepare;
+    const client = closingClient({ at, armed: () => armed });
+    try {
+      if (prepare) {
+        // A first call on the same connection prepares the scope's set_config there, so postgres.js sends it as it
+        // is, with no describe first: a failure of it then leaves the connection where its rollback would be written.
+        await expect(withBusiness(client.sql, BUSINESS, (tx) => readBusinessScope(tx))).resolves.toBe(
+          BUSINESS,
+        );
+        armed = true;
+      }
+      const settled = await settle(use(client.sql));
+      await pause(50);
+      // The cut statement is the last one `at` matches: everything built after it came after the cut.
+      const matching = client.sent.flatMap((text, index) => (at.test(text) ? [index] : []));
+      const cutAt = matching.at(-1) ?? -1;
+      expect(cutAt).toBeGreaterThanOrEqual(0);
+      const builtAfterCut = builtSince(client, cutAt + 1);
+      const next = await settle(
+        withBusiness(client.sql, BUSINESS, (tx) => readBusinessScope(tx), { call: CALL }),
+      );
+      return { settled, builtAfterCut, next, sockets: client.sockets.length };
+    } finally {
+      await client.sql.end({ timeout: 0 });
+    }
+  }
+
+  it("a connection lost as the start's set_config goes (prepared on that connection): no rollback is built, the start answers transient 08006 or throws it scrubbed, fn never runs", async () => {
+    const secrets = serverSecrets();
+    for (const answers of [false, true]) {
+      let runs = 0;
+      const options = answers
+        ? { call: CALL, transient: (answer: TransientError): string | TransientError => answer }
+        : { call: CALL };
+      const run = await cutRun(
+        /set_config/,
+        (sql) =>
+          withBusiness<string | TransientError>(
+            sql,
+            BUSINESS,
+            () => {
+              runs += 1;
+              return Promise.resolve("fn answered");
+            },
+            options,
+          ),
+        true,
+      );
+      expect(runs).toBe(0);
+      expectOutcome(run.settled, { transient: LOST }, answers, CALL, secrets);
+      // postgres.js's own rollback after the failed setting (index.js 267-271) is never built, nor anything else.
+      expect(run.builtAfterCut).toEqual([]);
+      expect(run.next).toEqual({ answer: BUSINESS });
+      expect(run.sockets).toBe(2);
+    }
+  });
+
+  it("a connection lost as the commit goes: thrown scrubbed as 08006 (never fn's answer, never postgres.js's own error), nothing built after it", async () => {
+    let runs = 0;
+    const run = await cutRun(
+      /^\s*commit\s*$/,
+      (sql) =>
+        withBusiness(
+          sql,
+          BUSINESS,
+          async (tx) => {
+            runs += 1;
+            await tx`select 1 as before_the_commit`;
+            return "fn answered";
+          },
+          { call: CALL },
+        ),
+      false,
+    );
+    expect(runs).toBe(1);
+    expect(leaksOf(run.settled, serverSecrets())).toEqual([]);
+    expect("thrown" in run.settled).toBe(true);
+    expectScrubbed((run.settled as { thrown: unknown }).thrown, CALL, "database", LOST.sqlstate);
+    expect(run.builtAfterCut).toEqual([]);
+    expect(run.next).toEqual({ answer: BUSINESS });
+    expect(run.sockets).toBe(2);
+  });
+
+  it("a connection lost as postgres.js's rollback goes after fn's own error: fn's own error leaves as it is, nothing built after it", async () => {
+    const own = new Error("fn's own error");
+    const run = await cutRun(
+      /^\s*rollback\s*$/,
+      (sql) =>
+        withBusiness(
+          sql,
+          BUSINESS,
+          async (tx) => {
+            await tx`select 1 as before_the_error`;
+            throw own;
+          },
+          { call: CALL },
+        ),
+      false,
+    );
+    expect(run.settled).toEqual({ thrown: own });
+    expect((run.settled as { thrown: unknown }).thrown).toBe(own);
+    expect(run.builtAfterCut).toEqual([]);
+    expect(run.next).toEqual({ answer: BUSINESS });
+    expect(run.sockets).toBe(2);
   });
 });
