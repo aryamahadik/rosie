@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 621, [`8f5e764`](https://github.com/aryamahadik/rosie/commit/8f5e764), 2026-11-14 23:31:54 UTC.
+- **Through:** commit 623, [`11c5c20`](https://github.com/aryamahadik/rosie/commit/11c5c20), 2026-11-14 23:55:20 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 623. docs: COMMIT\_HISTORY.md through commit 621 (8f5e764, \#631) (\#633)
+
+- **Commit:** [`11c5c20`](https://github.com/aryamahadik/rosie/commit/11c5c20), by Arya Mahadik, 2026-11-14 23:55:20 UTC
+- **Pull request:** [#633](https://github.com/aryamahadik/rosie/pull/633) from `task/commit-history-112`, merged 2026-11-14 23:55:20 UTC. It squashed 1 branch commit:
+  - `188cd5c` docs: COMMIT\_HISTORY.md through commit 621 (8f5e764, \#631)
+- **Files changed:** 1 (+51 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +51 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 622. T-1260: K-05's contract test covers v1.10 (readQuestionFacts, readHandle, readChatHandle): the fixture part adds v1.10 to WRITTEN\_FOR with a mend for each of its 4 refused fixtures, put right to the twin the README names; the database side runs db/repo's three reads against every v1.10 fixture as rosie\_job, writing read-chat-handle-sam's one noted row, S1-01's thread, before its exchange, each refused answer answered put right in its twin's state and the refused facts request refused before any statement (\#632)
+
+- **Commit:** [`dfbd4eb`](https://github.com/aryamahadik/rosie/commit/dfbd4eb), by Arya Mahadik, 2026-11-14 23:55:16 UTC
+- **Pull request:** [#632](https://github.com/aryamahadik/rosie/pull/632) from `task/T-1260`, merged 2026-11-14 23:55:17 UTC. It squashed 1 branch commit:
+  - `4736651` T-1260: K-05's contract test covers v1.10 (readQuestionFacts, readHan…
+- **Files changed:** 2 (+377 −79), by folder:
+  - `tests/contract/` data-access.v1.db-side.test.ts +300 −57, data-access.v1.test.ts +77 −22
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 621. docs: COMMIT\_HISTORY.md through commit 619 (3709e90, \#629) (\#631)
 
