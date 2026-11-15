@@ -4,8 +4,9 @@
 // image file and no outside resource: the SVG is part of the page, so the frame's content security policy, which loads
 // nothing (shell/serve.ts), holds it as it is.
 //
-// The text goes to the encoder exactly as it is given (T-513's lead note 1). uqr writes a text that is not all digits or
-// all capitals in byte mode, as its UTF-8 bytes, and an sms: link always is (its scheme is lower case).
+// The text goes to the encoder exactly as it is given (T-513's lead note 1). uqr writes a text in byte mode, as its UTF-8
+// bytes, unless the text is all digits or all of the QR code's alphanumeric set (capitals, digits, space and $%*+-./:),
+// and an sms: link never is (its scheme is lower case).
 //
 // The options (QR_OPTIONS), as T-513's lead note asks them named:
 //   - error correction level L, never raised to a higher one (boostEcc off). L holds the most text in the fewest

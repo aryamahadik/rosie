@@ -12,7 +12,7 @@
 //     K-09 v1's qrText is ("The QR code's content: the same link (MC C9)");
 //   - the fallback in plain words (T-1043, web/spikes/chat-link/FINDINGS.md, "Fallback in plain words"): the note's
 //     sentence, with the short code, and the ready text as plain text a person can read and copy.
-// It never builds, re-encodes or decodes the link or the QR text, and never reads anything out of them.
+// It never builds, re-encodes, decodes or parses the link or the QR text; it only checks that each is an sms: link.
 //
 // What it never shows:
 //   - Rosie's number as text: neither K-09 v1's issueChatLink response nor K-21 v1's chatLink holds it in a field of its
