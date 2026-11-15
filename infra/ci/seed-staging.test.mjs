@@ -1,11 +1,12 @@
 // Tests for infra/scripts/seed-staging.sh, `npm run seed:staging` (T-571; build prompt 9.4 'Seeded state'; QUESTIONS
-// NQ-DB-2; STATE note 67; the check tester's token: T-1303, K-05 v1.12 default 105, CQ-214 (a), DL-561), run by
-// `node --test "infra/ci/*.test.mjs"`. The script runs in throwaway checkouts (release-harness.mjs's releaseRoot, with
-// this repository's db/ linked in, so T-201's runner and the seed sets run as they are) against throwaway local
-// databases migrated as the staging database is, each one standing in for staging's: the database STAGING_DATABASE_URL
-// names, from the environment or from the checkout's own made-up .dev.vars. No run gets this shell's
-// STAGING_TEST_PHONES, STAGING_CHECK_TESTER_TOKEN or STAGING_CHECK_TESTER_TOKEN_SHA256, and every value is made up: the
-// test phones' numbers are in the fiction range 555-0100 to 555-0199 (rule 9), every other database URL names a
+// NQ-DB-2; STATE note 67; the check tester's token: T-1303, K-05 v1.12 default 105, CQ-214 (a), DL-561; the human
+// testers' set and their inboxes: T-1287, ADR-016 card S, DL-801), run by `node --test "infra/ci/*.test.mjs"`. The
+// script runs in throwaway checkouts (release-harness.mjs's releaseRoot, with this repository's db/ linked in, so T-201's
+// runner and the seed sets run as they are) against throwaway local databases migrated as the staging database is, each
+// one standing in for staging's: the database STAGING_DATABASE_URL names, from the environment or from the checkout's own
+// made-up .dev.vars. No run gets this shell's STAGING_TEST_PHONES, STAGING_TEST_INBOXES, STAGING_CHECK_TESTER_TOKEN or
+// STAGING_CHECK_TESTER_TOKEN_SHA256, and every value is made up: the test phones' numbers are in the fiction range
+// 555-0100 to 555-0199 and the testers' inboxes are at example.com (rule 9; RFC 2606), every other database URL names a
 // .invalid host, port 1 of this machine or a local database that does not exist, and each check tester's token is 32
 // random bytes made in the run (or by the token's maker under test), so no key-shaped text sits in this file.
 // A stand-in for node, first on PATH, is the real node with a recorder loaded first (as make-staging-secrets.test.mjs's
@@ -67,9 +68,13 @@ const { TEST_OWNER_1 } = await import(new URL("../../db/seeds/skeleton.ts", impo
 const { CHECK_TESTER, SESSION_DAYS, TOKEN_HASH_VARIABLE } = await import(
   new URL("../../db/seeds/check-tester.ts", import.meta.url).href
 );
+const { INBOXES_VARIABLE, personIdOf } = await import(
+  new URL("../../db/seeds/staging-testers.ts", import.meta.url).href
+);
 
-// D-017's sets, in their order (STATE note 67), the check tester's last (T-1303).
-const D017 = ["core", "staging-core", "skeleton", "check-tester"];
+// D-017's sets, in their order (STATE note 67): the human testers' after skeleton (T-1287), the check tester's last
+// (T-1303).
+const D017 = ["core", "staging-core", "skeleton", "staging-testers", "check-tester"];
 const ON_STAGING = "public on the staging database (STAGING_DATABASE_URL)";
 // The name the check tester's token is kept under, and the one its sha256 is handed on under (T-1302's set reads it).
 const TOKEN_NAME = "STAGING_CHECK_TESTER_TOKEN";
@@ -92,6 +97,12 @@ const CONFIGURED = {
 const CONFIGURED_VALUE = Object.entries(CONFIGURED)
   .map(([id, number]) => `${id}=${number}`)
   .join(",");
+// The name the testers' inboxes are kept under (T-1281's set reads it), and STAGING_TEST_INBOXES in the build Mac's form:
+// made-up inboxes at example.com joined by commas with no space, the one form put-staging-secrets.sh takes for the same
+// line (DL-549); the set also takes white space between them.
+const INBOXES_NAME = "STAGING_TEST_INBOXES";
+const INBOXES = ["t1287-tester-a@example.com", "t1287-tester-b@example.com"];
+const INBOXES_VALUE = INBOXES.join(",");
 // Made up, as every URL here: a production database that does not exist (a .invalid host never resolves, RFC 6761),
 // and a local database that does not exist.
 const PRODUCTION_URL =
@@ -101,8 +112,8 @@ const OTHER_LOCAL_URL = "postgres://rosie:rosie@127.0.0.1:54329/t571_not_staging
 // The names seed-staging.sh, and lib.sh's load_dev_var that reads .dev.vars for it, keep variables of their own under:
 // token and hash hold the token and its sha256, line and value a line of .dev.vars, ends the session's end, db_url the
 // staging database's URL and caller_url the caller's DATABASE_URL (T-1310), test_phones the test phones' numbers
-// (T-1343); the others hold names, counts, the sets and the script's fixed texts (the ones in capitals). The last
-// describe below reads them from the two files.
+// (T-1343), test_inboxes the testers' inboxes (T-1287); the others hold names, counts, the sets and the script's fixed
+// texts (the ones in capitals). The last describe below reads them from the two files.
 const OWN_NAMES = [
   "BASE64URL_SIGNS",
   "CHECK_TESTER_SET",
@@ -113,6 +124,7 @@ const OWN_NAMES = [
   "SESSION_END",
   "SET_NAME",
   "SHA256_OF_INPUT",
+  "TEST_INBOXES_SET",
   "TEST_PHONES_SET",
   "USAGE",
   "caller_url",
@@ -126,9 +138,11 @@ const OWN_NAMES = [
   "named",
   "sets",
   "status",
+  "test_inboxes",
   "test_phones",
   "token",
   "value",
+  "with_inboxes",
   "with_tester",
 ];
 
@@ -193,9 +207,9 @@ function seedRoot(t, options) {
   return {
     ...rig,
     /**
-     * Runs seed-staging.sh with the variables given; this shell's STAGING_TEST_PHONES, token and hash never reach it.
-     * Every node it starts is asked about `tokens` (the token extra gives, too) and their hashes, and about `others`.
-     * The result's calls are the node calls of this run alone, in order.
+     * Runs seed-staging.sh with the variables given; this shell's STAGING_TEST_PHONES, STAGING_TEST_INBOXES, token and
+     * hash never reach it. Every node it starts is asked about `tokens` (the token extra gives, too) and their hashes,
+     * and about `others`. The result's calls are the node calls of this run alone, in order.
      */
     seed: (args, extra = {}, { tokens = [], others = [] } = {}) => {
       const watched = [
@@ -213,6 +227,7 @@ function seedRoot(t, options) {
       const from = nodeCalls().length;
       const result = rig.run("seed-staging.sh", args, {
         STAGING_TEST_PHONES: undefined,
+        [INBOXES_NAME]: undefined,
         [TOKEN_NAME]: undefined,
         [HASH_NAME]: undefined,
         FAKE_NODE_WATCH: watchFile,
@@ -305,6 +320,58 @@ async function liveTeamRows(sql) {
 async function sessionEndOf(sql, hash) {
   const [row] = await sql`select expires_at from sessions where token_sha256 = ${hash}`;
   return row?.expires_at.toISOString();
+}
+
+/**
+ * The tester each of `addresses` is now, in their order (T-1281's rows): "<person> proven <bool> listings <n>", the
+ * person whose account holds the address, whether it is proven, and that person's live staging_testers listings; or
+ * "none" for an address no account holds.
+ */
+async function testersAt(sql, addresses) {
+  const rows = await sql`
+    select a.email, a.person_id, a.email_proven_at is not null as proven,
+           (select count(*)::int from staging_testers s where s.person_id = a.person_id and s.removed_at is null)
+             as listings
+    from accounts a where a.email in ${sql(addresses)}
+  `;
+  return addresses.map((address) => {
+    const row = rows.find((each) => each.email === address);
+    return row === undefined
+      ? "none"
+      : `${row.person_id} proven ${String(row.proven)} listings ${String(row.listings)}`;
+  });
+}
+
+/** What testersAt answers once a run has seeded each of `addresses` as tester number 1, 2 and so on, in that order. */
+const seededTesters = (addresses) =>
+  addresses.map((_, index) => `${personIdOf(index + 1)} proven true listings 1`);
+
+/** The rows of T-1281's tables that a tester of the set may have, counted: none before the set first seeds one. */
+async function testerTables(sql) {
+  const [row] = await sql`
+    select (select count(*)::int from persons where id like 'person-staging-tester-%') as persons,
+           (select count(*)::int from handles where id like 'handle-staging-tester-%') as handles,
+           (select count(*)::int from accounts where person_id like 'person-staging-tester-%') as accounts,
+           (select count(*)::int from staging_testers) as listings
+  `;
+  return row;
+}
+
+/**
+ * Fails when a run's stdout or stderr holds an address: an @ with a sign other than white space next to it (the set's
+ * own refusal says "one @ with text on each side"), or any of `addresses` or its local part. The failure names the
+ * fault, never the text.
+ */
+function assertNoAddressShown(result, addresses, what) {
+  assert.equal(/\S@|@\S/.test(result.output), false, `${what}: the output holds an address`);
+  for (const address of addresses) {
+    const [local] = address.split("@");
+    assert.equal(
+      result.output.includes(address) || result.output.includes(local),
+      false,
+      `${what}: the output holds an address of the list or a part of one`,
+    );
+  }
 }
 
 /**
@@ -417,8 +484,12 @@ describe("seed-staging.sh (npm run seed:staging) on a local database standing in
     assert.equal(TOKEN_HASH_VARIABLE, HASH_NAME);
   });
 
-  it("seeds D-017's sets, core, staging-core, skeleton and check-tester, one run each in that order, into schema public; the check tester's session comes from the token's sha256, handed to that set alone, by name", async () => {
-    const result = onStaging([], { [TOKEN_NAME]: token });
+  it("the list's name is the one T-1281's set reads", () => {
+    assert.equal(INBOXES_VARIABLE, INBOXES_NAME);
+  });
+
+  it("seeds D-017's sets, core, staging-core, skeleton, staging-testers and check-tester, one run each in that order, into schema public; the check tester's session comes from the token's sha256, handed to that set alone, by name; each inbox on the list is a tester", async () => {
+    const result = onStaging([], { [TOKEN_NAME]: token, [INBOXES_NAME]: INBOXES_VALUE });
     assert.equal(result.status, 0, result.output);
     assert.deepEqual(startedOf(result), D017);
     assert.deepEqual(
@@ -430,16 +501,27 @@ describe("seed-staging.sh (npm run seed:staging) on a local database standing in
       done.map((run) => run.set),
       D017,
     );
-    // A fresh database: core, skeleton and check-tester write every row of theirs, and staging-core keeps core's
-    // business heads and writes the test phones' rows.
+    // A fresh database: core, skeleton, staging-testers and check-tester write every row of theirs, and staging-core
+    // keeps core's business heads and writes the test phones' rows.
     for (const run of done) assert.ok(run.inserted > 0, `${run.set} wrote rows: ${result.output}`);
-    assert.equal(done[0].kept, 0, result.output);
-    assert.ok(done[1].kept > 0, result.output);
-    assert.equal(done[2].kept, 0, result.output);
-    assert.equal(done[3].kept, 0, result.output);
+    const keptOf = (set) => done.find((run) => run.set === set)?.kept;
+    assert.equal(keptOf("core"), 0, result.output);
+    assert.ok(keptOf("staging-core") > 0, result.output);
+    assert.equal(keptOf("skeleton"), 0, result.output);
+    assert.equal(keptOf("staging-testers"), 0, result.output);
+    assert.equal(keptOf("check-tester"), 0, result.output);
+    // staging-testers: a person, an email handle, its link, an account and a listing for each inbox, five tables.
+    assert.deepEqual(
+      done.find((run) => run.set === "staging-testers"),
+      { set: "staging-testers", rows: 5 * INBOXES.length, inserted: 5 * INBOXES.length, kept: 0 },
+    );
     assert.match(
       result.stdout,
       /seed-staging: STAGING_TEST_PHONES is not set: each test phone is seeded at its fixed fake handle \(555-01xx\)/,
+    );
+    assert.match(
+      result.stdout,
+      /^\[[^\]]+\] seed-staging: STAGING_TEST_INBOXES is set: staging-testers gets it by name and seeds a tester for each inbox it names, who signs in to staging by a code sent there \(no address is shown, and no other command gets the list\)$/m,
     );
     assert.match(
       result.stdout,
@@ -447,13 +529,15 @@ describe("seed-staging.sh (npm run seed:staging) on a local database standing in
     );
     assert.match(
       result.stdout,
-      /seed-staging: done: sets core staging-core skeleton check-tester seeded into schema public on the staging database$/m,
+      /seed-staging: done: sets core staging-core skeleton staging-testers check-tester seeded into schema public on the staging database$/m,
     );
     assert.equal(result.stderr, "");
     // Each test phone but test owner 1 has a phone row at its fixed fake handle (staging-core); test owner 1's handle
     // is there with no phone row, so his JOIN is a first text (skeleton).
     assert.deepEqual(await phonesAt(db.sql, FAKE_HANDLES), CUSTOMER_FAKE_HANDLES);
     assert.deepEqual(await handlesAt(db.sql, OWNER_FAKE_HANDLE), [TEST_OWNER_1.handleId]);
+    // Each inbox is a tester, numbered in the list's order, with the email proven and one live listing (staging-testers).
+    assert.deepEqual(await testersAt(db.sql, INBOXES), seededTesters(INBOXES));
     // The token was hashed first, before any set ran; its hash went to check-tester's run alone, by name, and the
     // session's end was read back after it.
     assert.deepEqual(kindsOf(result), ["hasher", ...D017.map((set) => `runner ${set}`), "session end"]);
@@ -461,11 +545,12 @@ describe("seed-staging.sh (npm run seed:staging) on a local database standing in
     await assertCheckTesterSeeded(db.sql, result, token, "the first run");
     assertNoTokenShown(result, [token], "the first run");
     assertNothingShown(result, db.url, FAKE_HANDLES, "the first run");
+    assertNoAddressShown(result, INBOXES, "the first run");
   });
 
   it("a second run adds no rows and changes none: each set keeps every row of its own", async () => {
     const before = await snapshot(db.sql);
-    const result = onStaging([], { [TOKEN_NAME]: token });
+    const result = onStaging([], { [TOKEN_NAME]: token, [INBOXES_NAME]: INBOXES_VALUE });
     assert.equal(result.status, 0, result.output);
     const done = doneOf(result);
     assert.deepEqual(
@@ -477,10 +562,12 @@ describe("seed-staging.sh (npm run seed:staging) on a local database standing in
       assert.equal(run.kept, run.rows, `${run.set}: ${result.output}`);
     }
     assert.deepEqual(await snapshot(db.sql), before);
+    assert.deepEqual(await testersAt(db.sql, INBOXES), seededTesters(INBOXES));
     assertHandedOnByName(result, "the second run");
     await assertCheckTesterSeeded(db.sql, result, token, "the second run");
     assertNoTokenShown(result, [token], "the second run");
     assertNothingShown(result, db.url, FAKE_HANDLES, "the second run");
+    assertNoAddressShown(result, INBOXES, "the second run");
   });
 
   it("--set runs the sets named, one run each in the order given; DATABASE_URL equal to STAGING_DATABASE_URL and DB_SCHEMA public are taken", async () => {
@@ -529,7 +616,7 @@ describe("seed-staging.sh (npm run seed:staging) on a local database standing in
       assert.match(result.stderr, message, what);
       assert.match(
         result.stderr,
-        /^usage: seed-staging\.sh \[--set <name>\]\.\.\. \(with no --set: D-017's sets, core staging-core skeleton check-tester\)$/m,
+        /^usage: seed-staging\.sh \[--set <name>\]\.\.\. \(with no --set: D-017's sets, core staging-core skeleton staging-testers check-tester\)$/m,
         what,
       );
       assert.equal(result.stdout, "", `${what}: nothing ran`);
@@ -1287,6 +1374,7 @@ describe("seed-staging.sh hands the test phones' numbers to staging-core's run a
               PATH: spy.bin,
               DB_SCHEMA: undefined,
               STAGING_TEST_PHONES: undefined,
+              [INBOXES_NAME]: undefined,
               [TOKEN_NAME]: undefined,
               [HASH_NAME]: undefined,
               ...extra,
@@ -1455,6 +1543,323 @@ describe("seed-staging.sh hands the test phones' numbers to staging-core's run a
   });
 });
 
+// T-1287 (ADR-016 section 5 and card S; DL-801): seed:staging runs T-1281's set, staging-testers, after skeleton, and
+// hands it the testers' inboxes, STAGING_TEST_INBOXES, read by name from the environment, else from the checkout's
+// .dev.vars, on that run's command line alone. A recorder (script-harness.mjs's spies) stands in front of every command
+// the script and lib.sh start by name; PATH holds nothing else, so none starts unseen. Each keeps its environment and its
+// arguments, and both are checked: no other command (the other sets' runs, the token's hasher, the read of the session's
+// end, dirname, date) gets an address in either, and the output shows none. The inboxes are made up, at example.com
+// (rule 9); the database is a throwaway local one.
+describe("seed-staging.sh hands the testers' inboxes to staging-testers' run alone (T-1287)", () => {
+  const cleanups = [];
+  const t = { after: (fn) => cleanups.push(fn) };
+  const token = madeUpToken();
+  // Every command seed-staging.sh and lib.sh start by name, but node (below).
+  const COMMANDS = ["basename", "bash", "date", "dirname"];
+  const CALLER_TEXT = "t1287 made-up caller text";
+  // Made up, at example.com: a list line .dev.vars holds commented out, and one under another name; neither is a list.
+  const COMMENTED = "t1287-commented-out@example.com";
+  const OTHER_NAME = "t1287-other-name@example.com";
+  const LIST_HOLDER = ["runner staging-testers: env STAGING_TEST_INBOXES"];
+  const LIST_NAMED = ["runner staging-testers: STAGING_TEST_INBOXES"];
+  let db;
+  let fromEnv;
+  let fromFile;
+  let noList;
+
+  /** What a recorded command is: a run of the seed runner by its set, the hasher, the session's end, or its name. */
+  const kindOf = (child) => {
+    if (child.name !== "node") return child.name;
+    if (child.args.some((arg) => arg.endsWith("/db/seeds/run.mjs")))
+      return `runner ${child.args[child.args.indexOf("--set") + 1] ?? ""}`;
+    if (child.args.some((arg) => arg.includes("createHash"))) return "hasher";
+    if (child.args.includes("--input-type=module")) return "session end";
+    return "node";
+  };
+
+  /** A seed root (with a made-up .dev.vars when devVars is given) whose every command is spied. */
+  const spiedRoot = (devVars) => {
+    const rig = seedRoot(t, devVars === undefined ? {} : { devVars });
+    const spy = spies(rig.dir, COMMANDS, { node: [process.execPath] });
+    return {
+      /** Runs seed-staging.sh with `args` under the real bash, `bash` holding its options, with the variables given. */
+      seed({ args = [], extra = {}, bash = [] } = {}) {
+        spy.clear();
+        const result = spawnSync(
+          realProgram("bash"),
+          [...bash, path.join(rig.root, "infra", "scripts", "seed-staging.sh"), ...args],
+          {
+            cwd: rig.root,
+            encoding: "utf8",
+            env: cleanEnv(path.join(rig.dir, "home"), {
+              PATH: spy.bin,
+              DB_SCHEMA: undefined,
+              STAGING_TEST_PHONES: undefined,
+              [INBOXES_NAME]: undefined,
+              [TOKEN_NAME]: undefined,
+              [HASH_NAME]: undefined,
+              ...extra,
+            }),
+          },
+        );
+        return { ...result, output: `${result.stdout}${result.stderr}`, children: spy.children() };
+      },
+    };
+  };
+
+  before(async () => {
+    db = await createThrowawayDatabase("staging_testers");
+    fromEnv = spiedRoot();
+    // The build Mac's form: each read by name from the checkout's .dev.vars, as lib.sh's load_dev_var reads it (the
+    // list's line exported and quoted).
+    fromFile = spiedRoot(
+      `STAGING_DATABASE_URL=${db.url}\n  export ${INBOXES_NAME}="${INBOXES_VALUE}"\n  export ${TOKEN_NAME}='${token}'\n`,
+    );
+    // A .dev.vars with no list: a commented line and a line of another name, then the name with nothing after it.
+    noList = spiedRoot(
+      `STAGING_DATABASE_URL=${db.url}\n# ${INBOXES_NAME}=${COMMENTED}\n${INBOXES_NAME}_OLD=${OTHER_NAME}\n${INBOXES_NAME}=\n`,
+    );
+  });
+
+  after(async () => {
+    for (const cleanup of cleanups.reverse()) cleanup();
+    await db?.drop();
+  });
+
+  // [title, the root, its variables]: the URL, the list and the token from the caller's environment, or from the
+  // checkout's .dev.vars.
+  const sources = () => [
+    [
+      "from the environment",
+      fromEnv,
+      { STAGING_DATABASE_URL: db.url, [INBOXES_NAME]: INBOXES_VALUE, [TOKEN_NAME]: token },
+    ],
+    ["from .dev.vars", fromFile, {}],
+  ];
+
+  /** The run of staging-testers among a run's children. */
+  const testersRunOf = (result) =>
+    result.children.find((child) => kindOf(child) === "runner staging-testers");
+
+  // The line the script prints when the list names no inbox: the list's name, and no value.
+  const NOT_SET =
+    /^\[[^\]]+\] seed-staging: STAGING_TEST_INBOXES is not set: staging-testers seeds no tester, so no one signs in to staging by a code until the testers' inboxes are on that list \(in \.dev\.vars, by name\)$/m;
+
+  it("with the list missing, empty or blank, staging-testers seeds nothing (exit 0, 0 rows) and the output names only the missing name", async () => {
+    // A fresh database: no tester before the runs, and none after.
+    const before = await snapshot(db.sql);
+    for (const [title, root, extra] of [
+      ["unset, with no .dev.vars", fromEnv, { STAGING_DATABASE_URL: db.url }],
+      ["empty", fromEnv, { STAGING_DATABASE_URL: db.url, [INBOXES_NAME]: "" }],
+      ["blank: separators alone", fromEnv, { STAGING_DATABASE_URL: db.url, [INBOXES_NAME]: " ,  ,\t" }],
+      ["unset, .dev.vars' line commented, under another name or empty", noList, {}],
+    ]) {
+      const result = root.seed({ args: ["--set", "staging-testers"], extra });
+      assert.equal(result.status, 0, `${title}: ${result.output}`);
+      assert.deepEqual(startedOf(result), ["staging-testers"], title);
+      assert.deepEqual(
+        doneOf(result),
+        [{ set: "staging-testers", rows: 0, inserted: 0, kept: 0 }],
+        `${title}: ${result.output}`,
+      );
+      // One line names the list, to say it is not set; no line shows a value.
+      assert.match(result.stdout, NOT_SET, title);
+      assert.equal(
+        result.output.split("\n").filter((line) => line.includes(INBOXES_NAME)).length,
+        1,
+        `${title}: the lines that name ${INBOXES_NAME}`,
+      );
+      assert.equal(result.stderr, "", title);
+      // staging-testers' run gets the name alone (empty or blank, as given); no command gets the commented line's or
+      // the other name's text.
+      assert.deepEqual(namedIn(result.children, [INBOXES_NAME], kindOf), LIST_NAMED, title);
+      assert.deepEqual(whereHeld(result.children, [COMMENTED, OTHER_NAME], kindOf), [], title);
+      assertNoAddressShown(result, [COMMENTED, OTHER_NAME], title);
+    }
+    assert.deepEqual(await testerTables(db.sql), { persons: 0, handles: 0, accounts: 0, listings: 0 });
+    assert.deepEqual(await snapshot(db.sql), before);
+  });
+
+  it("with no --set, D-017's sets run in their order, staging-testers after skeleton; from the caller's environment or from .dev.vars, staging-testers' run alone gets the list, by name, and each inbox is a tester; no address is shown", async () => {
+    for (const [what, root, extra] of sources()) {
+      const result = root.seed({ extra });
+      assert.equal(result.status, 0, `${what}: ${result.output}`);
+      assert.deepEqual(startedOf(result), D017, what);
+      assert.deepEqual(
+        runsOf(result),
+        D017.map((set) => `${set} into ${ON_STAGING}`),
+        what,
+      );
+      // Five tables, a row in each for each inbox: the first source's run writes them, the second keeps them.
+      const testers = doneOf(result).find((run) => run.set === "staging-testers");
+      assert.equal(testers?.rows, 5 * INBOXES.length, `${what}: ${result.output}`);
+      assert.match(
+        result.stdout,
+        /seed-staging: STAGING_TEST_INBOXES is set: staging-testers gets it by name and seeds a tester/,
+        what,
+      );
+      assert.deepEqual(
+        whereHeld(result.children, INBOXES, kindOf),
+        LIST_HOLDER,
+        `${what}: where the list is`,
+      );
+      assert.deepEqual(
+        namedIn(result.children, [INBOXES_NAME], kindOf),
+        LIST_NAMED,
+        `${what}: the list's name`,
+      );
+      assert.ok(
+        testersRunOf(result).env.split("\n").includes(`${INBOXES_NAME}=${INBOXES_VALUE}`),
+        `${what}: the list's value`,
+      );
+      // The database's URL is where T-1310 put it: each run of the seed runner and the read of the session's end.
+      assert.deepEqual(
+        whereHeld(result.children, [db.url, new URL(db.url).pathname.slice(1)], kindOf),
+        [
+          ...D017.map((set) => `runner ${set}: env DATABASE_URL STAGING_DATABASE_URL`),
+          "session end: env DATABASE_URL",
+        ].sort(),
+        `${what}: where the URL is`,
+      );
+      assert.deepEqual(await testersAt(db.sql, INBOXES), seededTesters(INBOXES), what);
+      assert.equal(result.stderr, "", what);
+      assertNoAddressShown(result, INBOXES, what);
+      assertNothingShown(result, db.url, [], what);
+      assertNoTokenShown(result, [token], what);
+    }
+  });
+
+  it("an entry that is not an address stops the run at staging-testers (exit 1): nothing of that set is written, check-tester does not run, and no part of the list is shown", async () => {
+    const before = await snapshot(db.sql);
+    const BAD = "t1287-not-an-address";
+    const result = fromEnv.seed({
+      extra: {
+        STAGING_DATABASE_URL: db.url,
+        [INBOXES_NAME]: `${INBOXES[0]}, ${BAD}`,
+        [TOKEN_NAME]: token,
+      },
+    });
+    assert.equal(result.status, 1, result.output);
+    assert.deepEqual(startedOf(result), ["core", "staging-core", "skeleton", "staging-testers"]);
+    assert.deepEqual(
+      doneOf(result).map((run) => run.set),
+      ["core", "staging-core", "skeleton"],
+    );
+    assert.match(
+      result.stderr,
+      /^seed: failed: the staging testers seed refused, writing nothing: STAGING_TEST_INBOXES entry 2 is not an email address \(one @ with text on each side; entries are separated by commas or white space\) \(no part of its value is shown\)$/m,
+    );
+    assert.match(
+      result.stderr,
+      /seed-staging: FAILED at set staging-testers \(the seed runner's exit 1, for the reason above\): nothing of set staging-testers was written; the sets before it stay seeded, and the ones after it did not run/,
+    );
+    const kinds = result.children.map(kindOf);
+    assert.equal(kinds.includes("runner check-tester"), false, "check-tester ran");
+    assert.equal(kinds.includes("session end"), false, "the session's end was read");
+    assert.deepEqual(whereHeld(result.children, [INBOXES[0], BAD], kindOf), LIST_HOLDER);
+    assert.deepEqual(await snapshot(db.sql), before);
+    assertNoAddressShown(result, INBOXES, "a list with an entry that is not an address");
+    assert.equal(result.output.includes(BAD), false, "the output holds the entry that is not an address");
+  });
+
+  it("allexport, keyword and tracing from the caller, and the caller's variables of the script's own names, from either source: staging-testers' run alone gets the list", async () => {
+    const caller = {
+      test_inboxes: CALLER_TEXT,
+      TEST_INBOXES_SET: CALLER_TEXT,
+      with_inboxes: CALLER_TEXT,
+    };
+    const SETS = ["skeleton", "staging-testers", "check-tester"];
+    for (const [source, root, extra] of sources()) {
+      // [mode, its variables, bash's options, what standard error holds: a trace begins and ends at set +x]
+      for (const [mode, variables, bash, stderr] of [
+        ["SHELLOPTS=allexport", { SHELLOPTS: "allexport" }, [], ""],
+        ["bash -a -k", {}, ["-a", "-k"], ""],
+        ["the caller's variables under allexport", { ...caller, SHELLOPTS: "allexport" }, [], ""],
+        ["bash -x", {}, ["-x"], "+ set +x\n"],
+      ]) {
+        const what = `${mode}, ${source}`;
+        const result = root.seed({
+          args: SETS.flatMap((set) => ["--set", set]),
+          extra: { ...extra, ...variables },
+          bash,
+        });
+        assert.equal(result.status, 0, `${what}: ${result.output}`);
+        assert.deepEqual(startedOf(result), SETS, what);
+        assert.deepEqual(
+          whereHeld(result.children, INBOXES, kindOf),
+          LIST_HOLDER,
+          `${what}: where the list is`,
+        );
+        assert.deepEqual(
+          namedIn(result.children, [INBOXES_NAME], kindOf),
+          LIST_NAMED,
+          `${what}: the list's name`,
+        );
+        assert.deepEqual(whereHeld(result.children, [CALLER_TEXT], kindOf), [], `${what}: a caller's text`);
+        assert.deepEqual(await testersAt(db.sql, INBOXES), seededTesters(INBOXES), what);
+        assert.equal(result.stderr, stderr, `${what}: standard error`);
+        assertNoAddressShown(result, INBOXES, what);
+      }
+    }
+  });
+
+  it("a run without staging-testers reads no list: the caller's list and .dev.vars' line reach no command, and no line names the list", () => {
+    for (const [what, root, extra] of sources()) {
+      const result = root.seed({ args: ["--set", "skeleton", "--set", "check-tester"], extra });
+      assert.equal(result.status, 0, `${what}: ${result.output}`);
+      assert.deepEqual(startedOf(result), ["skeleton", "check-tester"], what);
+      assert.deepEqual(whereHeld(result.children, INBOXES, kindOf), [], `${what}: where the list is`);
+      assert.deepEqual(namedIn(result.children, [INBOXES_NAME], kindOf), [], `${what}: the list's name`);
+      assert.equal(result.output.includes(INBOXES_NAME), false, `${what}: a line names the list`);
+      assertNoAddressShown(result, INBOXES, what);
+    }
+  });
+
+  it("the environment's list goes before .dev.vars' line; an inbox taken off the list ends its tester's listing, and a run with it back lists that tester again; counts alone are shown", async () => {
+    const one = fromFile.seed({ args: ["--set", "staging-testers"], extra: { [INBOXES_NAME]: INBOXES[0] } });
+    assert.equal(one.status, 0, one.output);
+    assert.ok(
+      testersRunOf(one).env.split("\n").includes(`${INBOXES_NAME}=${INBOXES[0]}`),
+      "the environment's list",
+    );
+    assert.deepEqual(whereHeld(one.children, [INBOXES[1]], kindOf), [], ".dev.vars' list reached a command");
+    assert.deepEqual(doneOf(one), [{ set: "staging-testers", rows: 5, inserted: 0, kept: 5 }]);
+    assert.deepEqual(await testersAt(db.sql, INBOXES), [
+      `${personIdOf(1)} proven true listings 1`,
+      `${personIdOf(2)} proven true listings 0`,
+    ]);
+    assertNoAddressShown(one, INBOXES, "one inbox");
+
+    const back = fromFile.seed({ args: ["--set", "staging-testers"] });
+    assert.equal(back.status, 0, back.output);
+    assert.deepEqual(doneOf(back), [{ set: "staging-testers", rows: 10, inserted: 1, kept: 9 }]);
+    assert.deepEqual(await testersAt(db.sql, INBOXES), seededTesters(INBOXES));
+    assertNoAddressShown(back, INBOXES, "the inbox back");
+  });
+
+  it("a recorder keeps a command's environment and arguments, and the checks find an address in either or in the output (the control for the checks above)", (t) => {
+    const dir = tempDir(t, "seed-inbox-control");
+    const spy = spies(dir, ["date"]);
+    spawnSync(path.join(spy.bin, "date"), ["-u", INBOXES_VALUE], {
+      env: { PATH: spy.bin, [INBOXES_NAME]: INBOXES_VALUE },
+      encoding: "utf8",
+    });
+    const children = spy.children();
+    assert.deepEqual(whereHeld(children, INBOXES, kindOf), [`date: env ${INBOXES_NAME}, args 1`]);
+    assert.deepEqual(namedIn(children, [INBOXES_NAME], kindOf), [`date: ${INBOXES_NAME}`]);
+    // An address of no list is found by its @; a local part of the list's alone, by its text.
+    assert.throws(
+      () => assertNoAddressShown({ output: `seed: ${OTHER_NAME}\n` }, INBOXES, "control"),
+      /control: the output holds an address(?! of the list)/,
+    );
+    assert.throws(
+      () => assertNoAddressShown({ output: "seed: t1287-tester-b\n" }, INBOXES, "control"),
+      /control: the output holds an address of the list or a part of one/,
+    );
+    assertNoAddressShown({ output: "an entry is one @ with text on each side\n" }, INBOXES, "control");
+  });
+});
+
 describe("seed-staging.sh keeps the token and its hash in variables of its own", () => {
   // The names given to one command alone, on its command line: the seed runner's and the session end's environment.
   const ONE_COMMAND = ["DATABASE_URL", HASH_NAME];
@@ -1499,7 +1904,8 @@ describe("seed-staging.sh keeps the token and its hash in variables of its own",
     );
     // After the four set lines: the unset lines, the token taken from the environment, its names dropped, the database
     // URLs taken from the environment and their names dropped (T-1310) with a caller's DATABASE_REPLICA_URL (T-1349),
-    // the test phones' numbers taken and their name dropped (T-1343), then lib.sh.
+    // the test phones' numbers taken and their name dropped (T-1343), the testers' inboxes taken and their name dropped
+    // (T-1287), then lib.sh.
     const unsets = [];
     let at = 4;
     for (; /^unset -v [A-Za-z_][A-Za-z0-9_ ]*$/.test(lines[at]); at += 1) {
@@ -1512,7 +1918,7 @@ describe("seed-staging.sh keeps the token and its hash in variables of its own",
     );
     assert.equal(new Set(unsets).size, unsets.length, "a name is on the unset lines twice");
     assert.deepEqual(
-      lines.slice(at, at + 8),
+      lines.slice(at, at + 10),
       [
         'token="${STAGING_CHECK_TESTER_TOKEN:-}"',
         `unset -v ${TOKEN_NAME} ${HASH_NAME}`,
@@ -1521,6 +1927,8 @@ describe("seed-staging.sh keeps the token and its hash in variables of its own",
         "unset -v STAGING_DATABASE_URL DATABASE_URL DATABASE_REPLICA_URL",
         'test_phones="${STAGING_TEST_PHONES:-}"',
         "unset -v STAGING_TEST_PHONES",
+        'test_inboxes="${STAGING_TEST_INBOXES:-}"',
+        `unset -v ${INBOXES_NAME}`,
         'source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"',
       ],
       "what follows the unset lines",
