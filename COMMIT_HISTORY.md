@@ -2,9 +2,46 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 659, [`b86335f`](https://github.com/aryamahadik/rosie/commit/b86335f), 2026-11-15 13:04:19 UTC.
+- **Through:** commit 661, [`63167fa`](https://github.com/aryamahadik/rosie/commit/63167fa), 2026-11-15 13:32:08 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 661. docs: COMMIT\_HISTORY.md through commit 659 (b86335f, \#670) (\#672)
+
+- **Commit:** [`63167fa`](https://github.com/aryamahadik/rosie/commit/63167fa), by Arya Mahadik, 2026-11-15 13:32:08 UTC
+- **Pull request:** [#672](https://github.com/aryamahadik/rosie/pull/672) from `task/commit-history-127`, merged 2026-11-15 13:32:08 UTC. It squashed 1 branch commit:
+  - `2b5c6ef` docs: COMMIT\_HISTORY.md through commit 659 (b86335f, \#670)
+- **Files changed:** 1 (+37 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +37 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 219 (DL-816); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 660. T-524: the test-phone page's thread view (C-205): each part the Linq double sent, in order and by kind, the email double's output, the stop state and the chat link through T-513's component, at /staging/test-phone/parts; the send page links to it and to the picker after a send (\#671)
+
+- **Commit:** [`47411bc`](https://github.com/aryamahadik/rosie/commit/47411bc), by Arya Mahadik, 2026-11-15 13:32:03 UTC
+- **Pull request:** [#671](https://github.com/aryamahadik/rosie/pull/671) from `task/T-524`, merged 2026-11-15 13:32:04 UTC. It squashed 1 branch commit:
+  - `d30ba38` T-524: the test-phone page's thread view (C-205): each part the Linq …
+- **Files changed:** 10 (+1720 −5), by folder:
+  - `web/src/` routes.ts +2 −0
+  - `web/src/shell/` routes.test.ts +5 −2
+  - `web/src/staging/test-phone/parts/` page.ts +402 −0, parts.test.ts +842 −0, parts.ts +75 −0, routes.ts +11 −0, staging-only.test.ts +156 −0, test-support.ts +186 −0
+  - `web/src/staging/test-phone/send/` page.ts +13 −3, send.test.ts +28 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 659. docs: COMMIT\_HISTORY.md through commit 657 (4c48ae5, \#668) (\#670)
 
