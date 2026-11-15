@@ -2,9 +2,57 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 633, [`b9276f3`](https://github.com/aryamahadik/rosie/commit/b9276f3), 2026-11-15 02:48:54 UTC.
+- **Through:** commit 635, [`b1e79f3`](https://github.com/aryamahadik/rosie/commit/b1e79f3), 2026-11-15 03:56:40 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 635. docs: COMMIT\_HISTORY.md through commit 633 (b9276f3, \#644) (\#646)
+
+- **Commit:** [`b1e79f3`](https://github.com/aryamahadik/rosie/commit/b1e79f3), by Arya Mahadik, 2026-11-15 03:56:40 UTC
+- **Pull request:** [#646](https://github.com/aryamahadik/rosie/pull/646) from `task/commit-history-118`, merged 2026-11-15 03:56:41 UTC. It squashed 1 branch commit:
+  - `6debd4c` docs: COMMIT\_HISTORY.md through commit 633 (b9276f3, \#644)
+- **Files changed:** 1 (+55 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +55 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 634. T-1355: K-05's contract test covers v1.14, the safety-only claim's fixtures and its database side (\#645)
+
+- **Commit:** [`ce776bc`](https://github.com/aryamahadik/rosie/commit/ce776bc), by Arya Mahadik, 2026-11-15 03:56:36 UTC
+- **Pull request:** [#645](https://github.com/aryamahadik/rosie/pull/645) from `task/T-1355`, merged 2026-11-15 03:56:37 UTC. It squashed 3 branch commits:
+  - `9ff0547` T-1355: K-05's contract test covers v1.14, the safety-only claim: the…
+  - `b720f2c` T-1355: the ten notices' note check also holds the danger line's row …
+  - `1b92e60` T-1355: WRITTEN\_FOR's note names v1.13's task alone as T-1292
+- **Files changed:** 2 (+1396 −49), by folder:
+  - `tests/contract/` data-access.v1.db-side.test.ts +1264 −28, data-access.v1.test.ts +132 −21
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1355: K-05's contract test covers v1.14, the safety-only claim: the fixture part adds v1.14 to WRITTEN_FOR with a mend for each of its 4 refused fixtures and reads its consumers table; the database side runs claimOutboxV114 on every v1.14 fixture after its chain and the rows its note lists, with row S's case and a claim without sendClass answered as v1.13's
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1355: the ten notices' note check also holds the danger line's row to the notices' recipient, business and channel
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1355: WRITTEN_FOR's note names v1.13's task alone as T-1292
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 633. docs: COMMIT\_HISTORY.md through commit 631 (16e83a7, \#642) (\#644)
 
