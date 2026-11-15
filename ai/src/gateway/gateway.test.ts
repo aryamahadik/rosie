@@ -762,3 +762,49 @@ describe("the key", () => {
     }
   });
 });
+
+describe("redirects: none is ever followed, so the key goes to Anthropic's address alone (T-1408, DL-809)", () => {
+  const LOCATION = "https://elsewhere.example/v1/messages";
+
+  /** A fake fetch that keeps each call's address and redirect option, and answers each with `respond`. */
+  function keptApi(respond: () => Promise<Response>): {
+    fetch: FetchLike;
+    calls: { url: string; redirect: unknown }[];
+  } {
+    const calls: { url: string; redirect: unknown }[] = [];
+    const fetchFake: FetchLike = (url, init) => {
+      calls.push({ url, redirect: init.redirect });
+      return respond();
+    };
+    return { fetch: fetchFake, calls };
+  }
+
+  it('asks the fetch for redirect "manual", which workerd\'s fetch takes (it refuses "error"), and reads a 200 as before', async () => {
+    const api = keptApi(() => answer({ kind: "ok", output: { ok: true } }, undefined));
+    const result = await gatewayOver(api).call(request("decideFirst", "haiku"));
+    expect(result).toMatchObject({ status: "ok", output: { ok: true }, attempt: 1, failures: [] });
+    expect(api.calls).toEqual([{ url: API_URL, redirect: "manual" }]);
+  });
+
+  const redirects: [string, () => Response, string][] = [
+    ["a 301", () => Response.redirect(LOCATION, 301), "http_301"],
+    ["a 302", () => Response.redirect(LOCATION, 302), "http_302"],
+    // What a browser's fetch gives under "manual" in place of the 3xx (workerd's gives the 3xx itself).
+    ["an opaque redirect", () => ({ type: "opaqueredirect", status: 0 }) as unknown as Response, "http_0"],
+  ];
+
+  it.each(redirects)(
+    "takes %s as a failure labelled by its status on each attempt, and never fetches its Location",
+    async (_name, redirect, code) => {
+      const api = keptApi(() => Promise.resolve(redirect()));
+      const result = await gatewayOver(api).call(request("decideFirst", "haiku"));
+      expect(result.status).toBe("modelsDown");
+      expect(failures(result)).toEqual([code, code, code]);
+      expect(api.calls).toEqual([
+        { url: API_URL, redirect: "manual" },
+        { url: API_URL, redirect: "manual" },
+        { url: API_URL, redirect: "manual" },
+      ]);
+    },
+  );
+});

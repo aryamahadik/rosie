@@ -145,7 +145,8 @@ async function send(
         headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": API_VERSION },
         body,
         signal: controller.signal,
-        redirect: "error",
+        // Never follow a redirect: the key goes to Anthropic's address alone (workerd refuses "error").
+        redirect: "manual",
       });
       if (response.status !== 200) {
         return { ok: false, code: httpCode(response.status), usage: NO_USAGE };
