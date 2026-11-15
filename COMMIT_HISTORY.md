@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 629, [`f0d1c69`](https://github.com/aryamahadik/rosie/commit/f0d1c69), 2026-11-15 01:48:41 UTC.
+- **Through:** commit 631, [`16e83a7`](https://github.com/aryamahadik/rosie/commit/16e83a7), 2026-11-15 02:16:15 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 631. docs: COMMIT\_HISTORY.md through commit 629 (f0d1c69, \#640) (\#642)
+
+- **Commit:** [`16e83a7`](https://github.com/aryamahadik/rosie/commit/16e83a7), by Arya Mahadik, 2026-11-15 02:16:15 UTC
+- **Pull request:** [#642](https://github.com/aryamahadik/rosie/pull/642) from `task/commit-history-116`, merged 2026-11-15 02:16:15 UTC. It squashed 1 branch commit:
+  - `fc299b8` docs: COMMIT\_HISTORY.md through commit 629 (f0d1c69, \#640)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 630. T-1399: staging binds RootOptions.composeReads, finalizeData and planCalls through T-1254's handle (the Tool API's scope on HYPERDRIVE\_APP, K-05's row reads and plan calls on HYPERDRIVE\_JOB), with its Workers test and seed on T-1253's rig (\#641)
+
+- **Commit:** [`b6c55da`](https://github.com/aryamahadik/rosie/commit/b6c55da), by Arya Mahadik, 2026-11-15 02:16:10 UTC
+- **Pull request:** [#641](https://github.com/aryamahadik/rosie/pull/641) from `task/T-1399`, merged 2026-11-15 02:16:11 UTC. It squashed 1 branch commit:
+  - `ca0bfa1` T-1399: staging binds RootOptions.composeReads, finalizeData and plan…
+- **Files changed:** 3 (+2088 −10), by folder:
+  - `runtime/src/wiring/staging/` tool-api-rows.seed.ts +285 −0, tool-api-rows.ts +120 −10, tool-api-rows.worker.test.ts +1683 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 629. docs: COMMIT\_HISTORY.md through commit 627 (61ddecc, \#638) (\#640)
 
@@ -14221,3 +14253,4 @@ Each was replaced by another pull request (a branch rebased or squashed under a 
 - [#432](https://github.com/aryamahadik/rosie/pull/432) T-1241: design record ADR-015, where the arrival safety read's result is kept until its turn commits (`task/T-1241`, 4 branch commits, closed 2026-11-12 00:35:31 UTC)
 - [#589](https://github.com/aryamahadik/rosie/pull/589) T-054: K-09 Tool API v1.9 frozen with journey 7's 17 calls and the fee door, every v1.8 definition carried by reference (`task/T-054`, 2 branch commits, closed 2026-11-13 22:10:38 UTC)
 - [#614](https://github.com/aryamahadik/rosie/pull/614) T-1285: signInCheck and signOut's server side, every wrong-code answer the same with or without an account (ADR-016 card B2) (`task/T-1285`, 2 branch commits, closed 2026-11-14 08:45:15 UTC)
+- [#634](https://github.com/aryamahadik/rosie/pull/634) T-1397: staging binds the bundle-backed BundleSafety, with the safety read awaiting its bundle's checked lines (the audit's P3b) (`task/T-1397-r2`, 3 branch commits, closed 2026-11-15 02:06:24 UTC)
