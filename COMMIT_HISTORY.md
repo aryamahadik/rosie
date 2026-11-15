@@ -2,9 +2,63 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 631, [`16e83a7`](https://github.com/aryamahadik/rosie/commit/16e83a7), 2026-11-15 02:16:15 UTC.
+- **Through:** commit 633, [`b9276f3`](https://github.com/aryamahadik/rosie/commit/b9276f3), 2026-11-15 02:48:54 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 633. docs: COMMIT\_HISTORY.md through commit 631 (16e83a7, \#642) (\#644)
+
+- **Commit:** [`b9276f3`](https://github.com/aryamahadik/rosie/commit/b9276f3), by Arya Mahadik, 2026-11-15 02:48:54 UTC
+- **Pull request:** [#644](https://github.com/aryamahadik/rosie/pull/644) from `task/commit-history-117`, merged 2026-11-15 02:48:54 UTC. It squashed 1 branch commit:
+  - `887c5fb` docs: COMMIT\_HISTORY.md through commit 631 (16e83a7, \#642)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 632. T-1397: staging binds the bundle-backed BundleSafety, with the safety read awaiting its bundle's checked lines (the audit's P3b) (\#643)
+
+- **Commit:** [`859a65d`](https://github.com/aryamahadik/rosie/commit/859a65d), by Arya Mahadik, 2026-11-15 02:48:50 UTC
+- **Pull request:** [#643](https://github.com/aryamahadik/rosie/pull/643) from `task/T-1397-r3`, merged 2026-11-15 02:48:50 UTC. It squashed 4 branch commits:
+  - `a67534f` T-1397: staging's bundle-backed BundleSafety (the check at the pin: t…
+  - `02ef913` T-1397: the bundle-safety test's unnecessary cast removed (lint); one…
+  - `b6e9614` T-1397: the bundle-safety test's actor names are whole fiction-range …
+  - `646733f` T-1397: the bundle-safety test's stagingOptions case on staging stand…
+- **Files changed:** 5 (+2121 −18), by folder:
+  - `runtime/src/wiring/` real.ts +17 −4, root.ts +10 −0
+  - `runtime/src/wiring/staging/` bundle-safety.seed.ts +197 −0, bundle-safety.ts +480 −14, bundle-safety.worker.test.ts +1417 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1397: staging's bundle-backed BundleSafety (the check at the pin: the three safety lines' words, A3-49's step; the three reads from the bundle whose check passed last) and the ruled seam: realSafetyRead awaits the bundle's checked lines before the danger words (DL-757 option (c))
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1397: the bundle-safety test's unnecessary cast removed (lint); one test added: in the test environment the safety read asks nothing of the lines it is handed; the seed's check and the switch read fewer values from PostgreSQL's copy
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1397: the bundle-safety test's actor names are whole fiction-range numbers (the phone scan) (DL-771)
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+* T-1397: the bundle-safety test's stagingOptions case on staging stands every other part in unbound through the builders seam (receipt, models, rows, directories, send, flags, testPhone, copies), keeping its turn and gate stand-ins and the real bundleSafety builder; no assertion or title changed (DL-776, DL-777)
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 631. docs: COMMIT\_HISTORY.md through commit 629 (f0d1c69, \#640) (\#642)
 
