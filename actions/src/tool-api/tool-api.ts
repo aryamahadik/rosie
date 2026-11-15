@@ -10,7 +10,11 @@
 //   4. the request must name a business (noBusinessScope otherwise): row-level security scopes every call by it (arch 10
 //      line 546; K-04 v1 rule 4), so no call runs unscoped;
 //   5. the call's handler runs inside one transaction scoped to that business (scope.ts), which is set before the handler
-//      gets its repo, so nothing is read before the scope;
+//      gets its repo, so nothing is read before the scope. The scope is told the call (T-1368; scope.ts ScopeCall): its
+//      K-09 name, under which a failure of the transaction's start is thrown scrubbed, and, where the call's errors have
+//      K-05's `transient` (`$defs/<call>.errors` takes it), its answer to a start the database could not make (a
+//      connection that never opened or was lost). That start answers the call's own transient, its span failed, and the
+//      handler never runs; a call whose errors have no transient gets the start's failure thrown, scrubbed;
 //   6. the handler's answer must pass `$defs/<call>.response`, or `$defs/<call>.errors`, which the contract says are
 //      "Refused, nothing written", so an error answer rolls the transaction back; an answer that passes neither is the
 //      handler's fault, rolled back and thrown (ToolApiContractError), never passed on;
@@ -55,7 +59,7 @@ import {
   type RequestOf,
 } from "./calls";
 import { NotBuiltError, ToolApiContractError, type BaseRefusal } from "./errors";
-import type { BusinessScope } from "./scope";
+import type { BusinessScope, ScopeCall } from "./scope";
 import type { CallPart, LaneChecks, ToolApiValidator } from "./validator";
 
 /** The trace a call joins: the caller's own trace context (runtime/src/trace), whose id the request must name. */
@@ -238,6 +242,13 @@ const LIMITS_NOT_CHECKED: readonly LimitResult[] = [1, 2, 3, 4, 5, 6].map((limit
 
 /** Errors that say the database could not run the call, rather than that the call was refused (K-05 v1; arch 11 line 566). */
 const FAILED_ERRORS: ReadonlySet<string> = new Set(["transient", "bookingPaused"]);
+
+/**
+ * K-05 v1's transient as a call's error (data-access transientError: the code and a SQLSTATE, here a lost connection's):
+ * what the base holds a call's `$defs/<call>.errors` to, once per call, to know whether the call answers it (T-1368). The
+ * K-09 README says every call can also answer it; each call's errors are what the base keeps to.
+ */
+const TRANSIENT_ERROR = { error: "transient", sqlstate: "08006" } as const;
 
 /** Thrown inside the scoped transaction to roll it back for an answer that is one of the call's errors. */
 class ErrorAnswer extends Error {
@@ -432,6 +443,35 @@ export function createToolApi<Repo>(options: ToolApiOptions<Repo>): ToolApi {
     return typeof name === "string" ? laneEntries.get(name) : undefined;
   };
 
+  /** Whether each call's errors take K-05's transient (TRANSIENT_ERROR), by its own definitions: found once per call. */
+  const answersTransient = new Map<string, boolean>();
+  const hasTransient = (entry: Entry<Repo>): boolean => {
+    let has = answersTransient.get(entry.call);
+    if (has === undefined) {
+      has = entry.check("errors", TRANSIENT_ERROR).length === 0;
+      answersTransient.set(entry.call, has);
+    }
+    return has;
+  };
+
+  /**
+   * What the scope is told of a call (scope.ts ScopeCall; T-1368): its name, and, where its errors have K-05's transient,
+   * its answer to a start the database could not make, held to the call's errors as every answer is (one outside them is
+   * thrown, as the handler's would be) and noted in `start` so the call's span records it.
+   */
+  const scopeCallOf = (entry: Entry<Repo>, start: { transient: boolean }): ScopeCall<CallAnswer> => {
+    if (!hasTransient(entry)) return { call: entry.call };
+    return {
+      call: entry.call,
+      transient: (answer) => {
+        const problems = entry.check("errors", answer);
+        if (problems.length > 0) throw entry.outsideContract(problems);
+        start.transient = true;
+        return answer;
+      },
+    };
+  };
+
   return {
     async call(name, request, trace, options) {
       const entry = entryOf(name);
@@ -520,16 +560,26 @@ export function createToolApi<Repo>(options: ToolApiOptions<Repo>): ToolApi {
       if (isLabel(businessId)) spanBusinessId = businessId;
 
       try {
-        const answer = await scope.withBusiness(businessId, async (repo) => {
-          const answered = await entry.run(request, { repo, businessId, span: notes });
-          const asResponse = entry.check("response", answered);
-          // Held to the call's response or errors, an answer is one of the call's own (CallAnswer).
-          if (asResponse.length === 0) return answered as CallAnswer;
-          const asError = entry.check("errors", answered);
-          const code = errorCodeOf(answered);
-          if (asError.length === 0) throw new ErrorAnswer(answered as CallAnswer, code ?? "error");
-          throw entry.outsideContract(code === undefined ? asResponse : asError);
-        });
+        // Whether the transaction's start answered the call's transient (scopeCallOf): then the handler never ran.
+        const start = { transient: false };
+        const answer = await scope.withBusiness(
+          businessId,
+          async (repo) => {
+            const answered = await entry.run(request, { repo, businessId, span: notes });
+            const asResponse = entry.check("response", answered);
+            // Held to the call's response or errors, an answer is one of the call's own (CallAnswer).
+            if (asResponse.length === 0) return answered as CallAnswer;
+            const asError = entry.check("errors", answered);
+            const code = errorCodeOf(answered);
+            if (asError.length === 0) throw new ErrorAnswer(answered as CallAnswer, code ?? "error");
+            throw entry.outsideContract(code === undefined ? asResponse : asError);
+          },
+          scopeCallOf(entry, start),
+        );
+        if (start.transient) {
+          finish({ outcome: "failed", answered: "transient", errorCode: "transient" });
+          return answer;
+        }
         finish({ outcome: "ok", answered: "response", errorCode: null });
         return answer;
       } catch (error) {
