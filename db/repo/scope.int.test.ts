@@ -13,7 +13,11 @@
 // through withBusiness itself, for a call whose contract has K-05's transient answer and for one whose has none, and
 // through the turn face's three calls after the frontier, whose business scope is pgCallScope over withBusiness
 // (actions/src/tool-api/turn-face/pg/calls.ts): gateAndCommit, composeInput and finalizeMessage on the Tool API base, as
-// pgTurnFace and pgTurnCalls bind them. Each raw error is checked to hold what it names (so the check means something),
+// pgTurnFace and pgTurnCalls bind them. Since T-1410 (DL-832, DL-845) pgCallScope opens each one's transaction for the
+// K-09 call the base names, its `call` and `transient` handed on to withBusiness: a connection lost or never opened at
+// the start is the call's K-09 transient answer (each one's errors have it), never thrown, and every other failure of the
+// start is thrown scrubbed under the call's own K-09 name; pgCallScope called with no call named still throws each one
+// scrubbed under withBusiness's own name. Each raw error is checked to hold what it names (so the check means something),
 // and each outcome to hold none of the connection: neither the answer nor the thrown error's message, stack or other own
 // properties. On local PostgreSQL, where the start only sets the scope (no table is read or written), once fn has begun
 // what it throws leaves as it is, and fn runs once.
@@ -537,9 +541,12 @@ async function expectStart(make: () => Sql, expected: Expected, secrets: Secrets
 }
 
 /**
- * The failure on a fresh client from `make` each time through pgCallScope, which names no call and has no transient
- * answer (BusinessScope's withBusiness returns the base's own answer), and so through gateAndCommit, composeInput and
- * finalizeMessage: each throws it scrubbed, and no work runs.
+ * The failure on a fresh client from `make` each time. Through pgCallScope called with no call named, it has no
+ * transient answer and is thrown scrubbed under withBusiness's own name, and no work runs. Through gateAndCommit,
+ * composeInput and finalizeMessage, pgCallScope opens each one's transaction for the K-09 call the Tool API base names
+ * and hands withBusiness that call's name and its transient answer, which each one's K-09 errors have (T-1410): a
+ * failure that is transient (a connection lost or never opened) is the call's answer, K-09's transient with its
+ * SQLSTATE, never thrown; every other is thrown scrubbed under the call's own K-09 name, with its code or SQLSTATE.
  */
 async function expectCallScope(make: () => Sql, expected: Expected, secrets: Secrets): Promise<void> {
   let works = 0;
@@ -556,8 +563,9 @@ async function expectCallScope(make: () => Sql, expected: Expected, secrets: Sec
   for (const [call, run] of Object.entries(FACE_CALLS)) {
     const faced = await onFreshClient(make, (sql) => settle(run(faceOn(sql))));
     expect(leaksOf(faced, secrets), call).toEqual([]);
-    expect("thrown" in faced, call).toBe(true);
-    expectOutcome(faced, expected, false, UNNAMED, secrets);
+    // A transient failure is answered, never thrown; every other one is thrown.
+    expect("thrown" in faced, call).toBe(!("transient" in expected));
+    expectOutcome(faced, expected, true, call, secrets);
   }
 }
 
@@ -799,19 +807,22 @@ describe("withBusiness's start on a connection that never opens, is lost or is r
   });
 });
 
-describe("the turn face's three calls over pgCallScope, at the start of the Tool API's transaction (T-1331)", () => {
-  it("a closed port: gateAndCommit, composeInput and finalizeMessage each throw it scrubbed as 08001", async () => {
+describe("the turn face's three calls over pgCallScope, at the start of the Tool API's transaction (T-1331), opened for the K-09 call the base names (T-1410)", () => {
+  it("a closed port: gateAndCommit, composeInput and finalizeMessage each answer K-09's transient 08001, never thrown; pgCallScope with no call named throws it scrubbed as 08001", async () => {
     const port = await closedPort();
     const url = probeUrl("127.0.0.1", port);
     await expectCallScope(() => clientOn(url), { transient: NEVER_OPENED }, probeSecrets("127.0.0.1", port));
   });
 
-  it.each(shapes)("$name: each of the three calls throws it scrubbed", async ({ make, expected }) => {
-    await expectCallScope(() => failingSocketClient(make()), expected, SHAPE_SECRETS);
-  });
+  it.each(shapes)(
+    "$name: each of the three calls answers it as K-09's transient if it is one, never thrown, else throws it scrubbed under its own K-09 name",
+    async ({ make, expected }) => {
+      await expectCallScope(() => failingSocketClient(make()), expected, SHAPE_SECRETS);
+    },
+  );
 
   it.each(refusals)(
-    "a session refused at its start ($code): each of the three calls throws it scrubbed to its SQLSTATE",
+    "a session refused at its start ($code): each of the three calls throws it scrubbed to its SQLSTATE under its own K-09 name, never transient",
     async ({ code, text, secrets: more }) => {
       const server = await refusingServer(code, text);
       try {
@@ -824,7 +835,7 @@ describe("the turn face's three calls over pgCallScope, at the start of the Tool
     },
   );
 
-  it("a set_config refused with 57014: each of the three calls throws it scrubbed to its SQLSTATE, naming no business", async () => {
+  it("a set_config refused with 57014: each of the three calls throws it scrubbed to its SQLSTATE under its own K-09 name, never transient, naming no business", async () => {
     const server = await scopeRefusingServer();
     try {
       const url = probeUrl("127.0.0.1", server.port);
