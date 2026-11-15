@@ -350,6 +350,13 @@ export interface ChatTarget {
 /** Reads a recipient's chat (NQ-RT-2: K-05 v1.2's recipient send state; a fake until then). Null: no chat known. */
 export interface RecipientDirectory {
   chatFor(recipientHandleId: string): Promise<ChatTarget | null>;
+  /**
+   * The recipient's email address (T-1286; ADR-016 section 3): an email handle's address from the same send-state read,
+   * whose recipient carries its kind and address (K-05 item 28), as `chatFor` takes the chat from it; null for any other
+   * handle. An email row (channel and port both email) asks this and never `chatFor`, and goes by the email port alone.
+   * Left out, no address is known: every email row ends with nothing sent. The address is personal data: never logged.
+   */
+  emailFor?(recipientHandleId: string): Promise<string | null>;
 }
 
 /**
