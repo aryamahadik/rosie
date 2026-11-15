@@ -2,9 +2,43 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 681, [`c2f36d6`](https://github.com/aryamahadik/rosie/commit/c2f36d6), 2026-11-15 20:34:46 UTC.
+- **Through:** commit 683, [`dd2e62e`](https://github.com/aryamahadik/rosie/commit/dd2e62e), 2026-11-15 21:16:09 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 683. docs: COMMIT\_HISTORY.md through commit 681 (c2f36d6, \#692) (\#694)
+
+- **Commit:** [`dd2e62e`](https://github.com/aryamahadik/rosie/commit/dd2e62e), by Arya Mahadik, 2026-11-15 21:16:09 UTC
+- **Pull request:** [#694](https://github.com/aryamahadik/rosie/pull/694) from `task/commit-history-136`, merged 2026-11-15 21:16:09 UTC. It squashed 1 branch commit:
+  - `d3d3e97` docs: COMMIT\_HISTORY.md through commit 681 (c2f36d6, \#692)
+- **Files changed:** 1 (+48 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +48 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 229 (DL-851); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 682. T-1367: a refused session's 3D000, 42501 and 55000 (raised FATAL) leave every session start scrubbed, and withBusiness keeps every statement off a connection lost after its start (a close watch, a guarded transaction, a held callback), throwing it scrubbed as 08006 (\#695)
+
+- **Commit:** [`7babada`](https://github.com/aryamahadik/rosie/commit/7babada), by Arya Mahadik, 2026-11-15 21:16:05 UTC
+- **Pull request:** [#695](https://github.com/aryamahadik/rosie/pull/695) from `task/T-1367`, merged 2026-11-15 21:16:05 UTC. It squashed 1 branch commit:
+  - `8314e24` T-1367: a refused session's 3D000, 42501 and 55000 (raised FATAL) lea…
+- **Files changed:** 4 (+880 −27), by folder:
+  - `db/repo/` connect-failures.int.test.ts +132 −1, scope.int.test.ts +399 −2, scope.ts +325 −18, targets.ts +24 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 681. docs: COMMIT\_HISTORY.md through commit 679 (2c90291, \#690) (\#692)
 
