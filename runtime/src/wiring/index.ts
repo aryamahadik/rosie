@@ -35,6 +35,8 @@ export {
   ClaimedRowError,
   claimedRowOf,
   DeciderBundleError,
+  EMAIL_ROW_MEMORY,
+  emailTargetOf,
   LINQ_WEBHOOK_SECRET,
   MissingSecretError,
   NoComposerError,
@@ -71,6 +73,7 @@ export {
   type ArmingInputs,
   type BundleReadCalls,
   type ChatOpenInputs,
+  type ClaimedRowAnswer,
   type CommitTurnCall,
   type ComposeInputInputs,
   type ComposeReads,
@@ -104,6 +107,16 @@ export {
   type SendStateInputs,
   type TurnRowCalls,
 } from "./real";
+export {
+  answeringRecipients,
+  EMAIL_SEND_THREW,
+  EMAIL_SEND_TIMEOUT,
+  EMAIL_SEND_TIMEOUT_MS,
+  emailDoor,
+  type EmailDoorCall,
+  type EmailDoorOptions,
+  type EmailNoAnswerLine,
+} from "./email-door";
 export { LinqDoor, NOT_LINQ_PORT, PORT_MEMORY, SEND_TIMEOUT, SEND_TIMEOUT_MS } from "./linq-door";
 export {
   composeRoot,
