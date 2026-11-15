@@ -1,9 +1,9 @@
 // Contract test for K-05, the data-access calls: the database side of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10,
-// v1.11 and v1.14 (T-1169; T-1199 for v1.6; T-1214 for v1.7; T-1218 for v1.8; T-1232 for v1.9; T-1260 for v1.10, the
-// D-017 path audit's Q1; T-1270 for v1.11; T-1355 for v1.14; DL-348, DL-373, DL-398, DL-444, DL-456, DL-474, DL-506,
-// DL-511, DL-687, DL-698, DL-760, DL-761, DL-766, DL-775, DL-778; contracts/data-access/README.md sections "v1.3",
-// "v1.4", "v1.6", "v1.7", "v1.8", "v1.9", "v1.10", "v1.11" and "v1.14", their "Consumers of" lists, "Fixtures", and
-// "Producers and consumers").
+// v1.11, v1.14 and v1.16 (T-1169; T-1199 for v1.6; T-1214 for v1.7; T-1218 for v1.8; T-1232 for v1.9; T-1260 for
+// v1.10, the D-017 path audit's Q1; T-1270 for v1.11; T-1355 for v1.14; T-1409 for v1.16; DL-348, DL-373, DL-398,
+// DL-444, DL-456, DL-474, DL-506, DL-511, DL-687, DL-698, DL-760, DL-761, DL-766, DL-775, DL-778, DL-823;
+// contracts/data-access/README.md sections "v1.3", "v1.4", "v1.6", "v1.7", "v1.8", "v1.9", "v1.10", "v1.11", "v1.14"
+// and "v1.16", their "Consumers of" lists, "Fixtures", and "Producers and consumers").
 //
 // v1.14 (T-1355; README item 67): claimOutbox with sendClass safety, the safety-only claim of a danger line's own wake
 // (T-1354, db/repo/outbox.ts claimOutboxV114). Its nine fixtures run here as every side entry does, with what is its
@@ -17,6 +17,15 @@
 // and two cases no fixture shows end the file: row S's (a quick_reply outage row sending under a live claim, ahead of
 // a safety row, never read or locked) and a claim without sendClass through claimOutboxV114, answered in v1.13 item
 // 64's form with the rows and fields claimOutboxV113 gives (DL-761).
+//
+// v1.16 (T-1409; README item 70): readOutboxRowWritten's answer names the written row's recipientHandleId and
+// sendClass as the row stores them, and both null when it is not written (T-1392, db/repo/safety-reads.ts). Its six
+// fixtures run here as every side entry does: its three accepted exchanges give their outcomes, each answer judged by
+// readOutboxRowWritten.v1dot16Response, and its three refused answers are each answered put right in their twin's state
+// (README "Fixtures", v1.16). db/repo states the two fields for an exchange of every version, so each v1.4 exchange of
+// the call is answered as v1.16 answers it (RECIPIENT): its outcome with the two fields added and nothing else changed,
+// which is its v1.16 twin's outcome, the v1.16 exchange with its given (but its note) and its request (README "What the
+// new tasks must hold to"), valid at v1.16.
 //
 // The fixture part, data-access.v1.test.ts, checks every fixture against the schema of its version. This part is the
 // producer's side (C-152) for the versions whose calls the database engineer built: v1.3's three turn-face reads
@@ -59,12 +68,16 @@
 //     the one entry it appends, or nothing written. A v1.9 markPart answer is judged by markPart.v1dot9Response, which
 //     states repeatedDelivery and the row always (REPEAT), and the outbox then holds what it gives (MARKS): a repeat
 //     wrote nothing, the row is the answer's, a recorded delivery is the part try's at the receipt's time, and the
-//     delivery a repeat names is the part try's as stored, the row's first by the stored times. Three answers are
-//     compared otherwise, each with a field a later version adds, never with one dropped: db/repo answers a
+//     delivery a repeat names is the part try's as stored, the row's first by the stored times. Four answers are
+//     compared otherwise, each with what a later version adds, never with a field dropped: db/repo answers a
 //     readOutboxRow exchange of a version before v1.6 as v1.6 does, which always states businessSensitive (SWITCH), so
 //     its answer is the fixture's outcome, whole, with businessSensitive null and nothing else changed (the exchange's
 //     world holds no kind of work, checked before the read), valid at v1.6, whose readOutboxRow.v1dot6Response is a
-//     v1.6 answer; a v1.1 claim a chain runs first is answered as v1.2 does, each claimed row naming its port (PORT),
+//     v1.6 answer; it answers a readOutboxRowWritten exchange of a version before v1.16 as v1.16 does, which always
+//     states recipientHandleId and sendClass (RECIPIENT), so its answer is the fixture's outcome, whole, with the two
+//     fields its v1.16 twin's outcome states and nothing else changed (a written row's as the row stores them, checked
+//     before the read), valid at v1.16, whose readOutboxRowWritten.v1dot16Response is a v1.16 answer; a v1.1 claim a
+//     chain runs first is answered as v1.2 does, each claimed row naming its port (PORT),
 //     valid at v1.2; and a mark of a version before v1.9 a chain runs first is answered as v1.9 does, its outcome with
 //     repeatedDelivery null and nothing else changed (REPEAT: none of them repeats a delivery), valid at v1.9;
 //   - each refused request: the db/repo call refuses it before any statement reaches the database, so nothing is read or
@@ -80,7 +93,8 @@
 //     answers the same read or mark (its twin), db/repo's answer is valid against the refused entry's own definition,
 //     at the version db/repo answers the twin, which refuses the fixture too, and it differs from the refused fixture
 //     only at the fault the fixture carries (and at businessSensitive alone where db/repo answers an earlier twin as
-//     v1.6): the repo answers it put right, never as it stands;
+//     v1.6, or at recipientHandleId and sendClass alone where it answers one as v1.16): the repo answers it put right,
+//     never as it stands;
 //   - each refused exchange whose fault is its outcome (EXCHANGE_TWINS: v1.7's refuse-open-chat-stopped-number, v1.9's
 //     refuse-mark-delivered-repeat-null): in its own given, its twin's but for its note, db/repo answers its request
 //     with the twin's outcome, which differs from the refused one only at its fault, the exchange with that answer is
@@ -163,12 +177,13 @@ const SLOW = { timeout: 60_000 };
 
 /**
  * The versions with a database side here: v1.3 (T-1138), v1.4 (T-1161), v1.6 (T-1197), v1.7 (T-1212), v1.8 (T-1216),
- * v1.9 (T-1227), v1.10 (T-1258, T-1259), v1.11 (T-1269) and v1.14 (T-1354). v1 to v1.2's database sides are tasks of
- * their own (README: T-116, T-478), and v1.5 has none. v1.12, v1.13 and v1.15 join with their own QA tasks (README
- * "Consumers of v1.12": "after the database engineer's reads"; v1.13's is T-1292); v1.14 joined ahead of them
- * (T-1355), since the first text's send waits on its claim (DL-778).
+ * v1.9 (T-1227), v1.10 (T-1258, T-1259), v1.11 (T-1269), v1.14 (T-1354) and v1.16 (T-1392). v1 to v1.2's database
+ * sides are tasks of their own (README: T-116, T-478), and v1.5 has none. v1.12, v1.13 and v1.15 join with their own
+ * QA tasks (README "Consumers of v1.12": "after the database engineer's reads"; v1.13's is T-1292); v1.14 joined ahead
+ * of them (T-1355), since the first text's send waits on its claim (DL-778), and so did v1.16 (T-1409), whose read
+ * answers v1.4's exchanges too and merges with this side in one train (DL-823).
  */
-const DB_SIDE_VERSIONS = ["v1.3", "v1.4", "v1.6", "v1.7", "v1.8", "v1.9", "v1.10", "v1.11", "v1.14"];
+const DB_SIDE_VERSIONS = ["v1.3", "v1.4", "v1.6", "v1.7", "v1.8", "v1.9", "v1.10", "v1.11", "v1.14", "v1.16"];
 
 interface Given {
   k04Seeds: string[];
@@ -291,15 +306,99 @@ const SWITCH = {
 const addsSwitch = (entry: FixtureEntry, exchange: Exchange): boolean =>
   exchange.call === SWITCH.call && !isError(exchange.outcome) && isBefore(entry.version, SWITCH.version);
 
-/** The version db/repo answers an exchange at, whose schema judges its answer: v1.6 where it adds the switch. */
-const answeredAt = (entry: FixtureEntry, exchange: Exchange): string =>
-  addsSwitch(entry, exchange) ? SWITCH.version : entry.version;
-
 /** An earlier exchange's outcome as v1.6 answers it in a world with no kind of work: the switch null, added whole. */
 const withSwitch = (outcome: Record<string, Json>): Record<string, Json> => ({
   ...outcome,
   [SWITCH.field]: null,
 });
+
+// ---------------------------------------------------------------------------------------------------------------
+// v1.16's recipient and send class on every readOutboxRowWritten answer (README item 70; lead note DL-823)
+
+/**
+ * v1.16 (T-1391): readOutboxRowWritten's answer states recipientHandleId and sendClass, as the row stores them when it
+ * is written and both null when it is not, and a v1.16 producer checks every answer against
+ * readOutboxRowWritten.v1dot16Response, which requires both (README item 70, default 144). db/repo is that producer
+ * (T-1392), so it states both for an exchange of every version, and an exchange of an earlier version (v1.4's), whose
+ * outcome leaves them out and whose readOutboxRowWritten.response is closed, is answered as v1.16 answers it: "its
+ * fixture's outcome with the two fields added and nothing else changed, which is its v1.16 twin's outcome" (README
+ * "What the new tasks must hold to"; T-1392's defaults 1 and 2).
+ */
+const RECIPIENT = {
+  call: "readOutboxRowWritten",
+  version: "v1.16",
+  fields: ["recipientHandleId", "sendClass"],
+  answerDef: "readOutboxRowWritten.v1dot16Response",
+} as const;
+
+/**
+ * Whether db/repo answers an exchange with the two fields its version leaves out: a readOutboxRowWritten answer before
+ * v1.16.
+ */
+const addsRecipient = (entry: FixtureEntry, exchange: Exchange): boolean =>
+  exchange.call === RECIPIENT.call &&
+  !isError(exchange.outcome) &&
+  isBefore(entry.version, RECIPIENT.version);
+
+/**
+ * An earlier readOutboxRowWritten exchange's v1.16 twin: the one accepted v1.16 exchange of the call whose given (but
+ * its note) and request are the earlier exchange's, so that db/repo, reading the same row under the same scope in the
+ * same state, gives the two one answer (README "Fixtures", v1.16: "each a v1.4 exchange in its v1.16 form"). None, or
+ * more than one, is a broken test.
+ */
+function recipientTwinOf(file: string): string {
+  const { call, given: state, request } = exchangeOf(file);
+  const twins = sideAccepted
+    .filter((entry) => entry.version === RECIPIENT.version)
+    .map((entry) => entry.file)
+    .filter((twin) => {
+      const other = exchangeOf(twin);
+      return (
+        other.call === call &&
+        isDeepStrictEqual({ ...other.given, note: null }, { ...state, note: null }) &&
+        isDeepStrictEqual(other.request, request)
+      );
+    });
+  const [twin] = twins;
+  if (twins.length !== 1 || twin === undefined) {
+    throw new Error(`${file}: ${String(twins.length)} v1.16 exchanges share its given and request, not one`);
+  }
+  return twin;
+}
+
+/**
+ * An earlier readOutboxRowWritten exchange's outcome as v1.16 answers it: recipientHandleId and sendClass added whole,
+ * each as its v1.16 twin's outcome states it (as the row stores it when written, null when not), nothing else changed.
+ */
+function withRecipient(outcome: Record<string, Json>, twin: Record<string, Json>): Record<string, Json> {
+  const added = RECIPIENT.fields.map((field): [string, Json] => {
+    const value = twin[field];
+    if (value === undefined) throw new Error(`a v1.16 twin's outcome states no ${field}`);
+    return [field, value];
+  });
+  return { ...outcome, ...Object.fromEntries(added) };
+}
+
+/**
+ * The version db/repo answers an exchange at, whose schema judges its answer: v1.6 where it adds the switch, v1.16
+ * where it adds the recipient and class, and else the exchange's own.
+ */
+function answeredAt(entry: FixtureEntry, exchange: Exchange): string {
+  if (addsSwitch(entry, exchange)) return SWITCH.version;
+  if (addsRecipient(entry, exchange)) return RECIPIENT.version;
+  return entry.version;
+}
+
+/**
+ * The fields of the version db/repo answers an exchange at that the exchange's own version leaves out, which a twin
+ * check excuses where the refused fixture holds none (twinProblems' `added`): v1.6's businessSensitive where it adds
+ * the switch, v1.16's recipientHandleId and sendClass where it adds them, and none for every other exchange.
+ */
+function addedFieldsOf(entry: FixtureEntry, exchange: Exchange): readonly string[] {
+  if (addsSwitch(entry, exchange)) return [SWITCH.field];
+  if (addsRecipient(entry, exchange)) return RECIPIENT.fields;
+  return [];
+}
 
 // ---------------------------------------------------------------------------------------------------------------
 // v1.2's port on every claimed row (README v1.2 item 30; K-07 v1 outboxRow.port)
@@ -458,8 +557,8 @@ function errorsOf(validate: ValidateFunction, value: unknown): string[] {
 /**
  * The definition an answer is judged by at `version`: its call's errors when it is one, else the answer its call gives
  * there, which from v1.6 on is readOutboxRow.v1dot6Response for readOutboxRow (README item 45), from v1.8 on
- * sendState.v1dot8Response for sendState (item 47), from v1.9 on markPart.v1dot9Response for markPart (item 48), and
- * else its response.
+ * sendState.v1dot8Response for sendState (item 47), from v1.9 on markPart.v1dot9Response for markPart (item 48), from
+ * v1.16 on readOutboxRowWritten.v1dot16Response for readOutboxRowWritten (item 70), and else its response.
  */
 function answerDefOf(version: string, call: string, answer: unknown): string {
   if (isError(answer)) return `${call}.errors`;
@@ -468,6 +567,7 @@ function answerDefOf(version: string, call: string, answer: unknown): string {
     return CONSENT_SOURCE.answerDef;
   }
   if (call === REPEAT.call && !isBefore(version, REPEAT.version)) return REPEAT.answerDef;
+  if (call === RECIPIENT.call && !isBefore(version, RECIPIENT.version)) return RECIPIENT.answerDef;
   return `${call}.response`;
 }
 
@@ -732,6 +832,20 @@ const RESPONSE_TWINS: Readonly<Record<string, { twin: string; part?: string; fau
     twin: "read-turn-party-first-text.json",
     faults: ["zone"],
   },
+  // v1.16: each is its twin's outcome, put right (README "Fixtures", v1.16): the recipient a written row stores, by its
+  // handle's id, and none for a row the scope does not show (item 70, defaults 141 and 142)
+  "invalid/refuse-outbox-row-written-no-recipient.json": {
+    twin: "outbox-row-written-alex-safety-recipient.json",
+    faults: ["recipientHandleId"],
+  },
+  "invalid/refuse-outbox-row-written-recipient-number.json": {
+    twin: "outbox-row-written-alex-safety-recipient.json",
+    faults: ["recipientHandleId"],
+  },
+  "invalid/refuse-outbox-row-written-other-business-recipient.json": {
+    twin: "outbox-row-written-other-business-no-recipient.json",
+    faults: ["recipientHandleId"],
+  },
 };
 
 /**
@@ -842,8 +956,9 @@ const within = (place: string, at: string): boolean => place === at || place.sta
  * Each way db/repo's answer fails to be the refused answer put right, none when it is: they differ, and only at the
  * refused fixture's faults (compared at `part` when given), and each fault is a place they differ. `added` names the
  * fields of the answer's version that the refused fixture's version leaves out (v1.6's businessSensitive, where db/repo
- * answers an earlier twin as v1.6): such a field may differ only where the answer holds it and the refused fixture
- * holds none, and it excuses no other place.
+ * answers an earlier twin as v1.6, or v1.16's recipientHandleId and sendClass, where it answers one as v1.16:
+ * addedFieldsOf): such a field may differ only where the answer holds it and the refused fixture holds none, and it
+ * excuses no other place.
  */
 export function twinProblems(
   refused: unknown,
@@ -2091,10 +2206,13 @@ async function runExchange(exchange: Exchange, call = callOf(exchange.call)): Pr
 /**
  * What db/repo answers an exchange in its world: the fixture's outcome, compared whole; where it adds the port
  * (addsPort), that outcome with each claimed row's port and nothing else changed; where it adds what a mark repeats
- * (addsRepeat), that outcome with repeatedDelivery null and nothing else changed; where it adds the switch
- * (addsSwitch), that outcome with businessSensitive null and nothing else changed, never with the field dropped from
- * db/repo's answer. Null is item 45's answer for a business with no kinds of work, and the world of such an exchange
- * holds none (K-04's seeds hold no company_kinds row), which is checked here, as the tables' owner, whom no policy binds.
+ * (addsRepeat), that outcome with repeatedDelivery null and nothing else changed; where it adds the recipient and class
+ * (addsRecipient), that outcome with recipientHandleId and sendClass as its v1.16 twin's outcome states them and
+ * nothing else changed, which for a written row are the recipient and class the row stores (item 70, default 140),
+ * checked here as the tables' owner; where it adds the switch (addsSwitch), that outcome with businessSensitive null and
+ * nothing else changed, never with the field dropped from db/repo's answer. Null is item 45's answer for a business
+ * with no kinds of work, and the world of such an exchange holds none (K-04's seeds hold no company_kinds row), which
+ * is checked here, as the tables' owner, whom no policy binds.
  */
 async function answerOf(entry: FixtureEntry, exchange: Exchange): Promise<Record<string, Json>> {
   if (addsPort(entry, exchange)) {
@@ -2111,6 +2229,24 @@ async function answerOf(entry: FixtureEntry, exchange: Exchange): Promise<Record
       `${entry.file}'s outcome states no repeatedDelivery`,
     ).toBe(false);
     return withRepeat(exchange);
+  }
+  if (addsRecipient(entry, exchange)) {
+    expect(
+      RECIPIENT.fields.filter((field) => Object.hasOwn(exchange.outcome, field)),
+      `${entry.file}'s outcome states neither field`,
+    ).toEqual([]);
+    const answer = withRecipient(exchange.outcome, exchangeOf(recipientTwinOf(entry.file)).outcome);
+    if (answer.written === true) {
+      const id = textOf(exchange.request.outboxRowId, `${entry.file}'s row`);
+      const rows = await db.sql<{ recipient_handle_id: string; send_class: string }[]>`
+        select recipient_handle_id, send_class from outbox_rows where id = ${id}
+      `;
+      expect(
+        rows.map((row) => [row.recipient_handle_id, row.send_class]),
+        `${entry.file}: the recipient and class its row stores`,
+      ).toEqual([[answer.recipientHandleId, answer.sendClass]]);
+    }
+    return answer;
   }
   if (!addsSwitch(entry, exchange)) return exchange.outcome;
   expect(Object.hasOwn(exchange.outcome, SWITCH.field), `${entry.file}'s outcome states no switch`).toBe(
@@ -2164,7 +2300,7 @@ async function given(file: string): Promise<Exchange> {
 // The tests
 
 describe("data-access database side: the versions with one, each entry selected by its version", () => {
-  it("runs every entry of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10, v1.11 and v1.14, accepted and refused, each against a db/repo call the README names", () => {
+  it("runs every entry of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10, v1.11, v1.14 and v1.16, accepted and refused, each against a db/repo call the README names", () => {
     for (const version of DB_SIDE_VERSIONS) {
       const ofVersion = sideEntries.filter((entry) => entry.version === version);
       expect(
@@ -2564,10 +2700,15 @@ describe("data-access database side: the versions with one, each entry selected 
         `${entry.file}: v1.6 refuses its outcome with the switch left out`,
       ).not.toEqual([]);
     }
-    // Every other exchange, an error of readOutboxRow and v1.6's own among them, is judged at its own version.
+    // Every other exchange, an error of readOutboxRow and v1.6's own among them, is judged at its own version, but an
+    // earlier readOutboxRowWritten answer, which db/repo gives as v1.16 does (RECIPIENT: the next test).
     const others = sideAccepted.filter((entry) => !earlier.includes(entry));
-    for (const entry of others)
-      expect(answeredAt(entry, exchangeOf(entry.file)), entry.file).toBe(entry.version);
+    for (const entry of others) {
+      const exchange = exchangeOf(entry.file);
+      expect(answeredAt(entry, exchange), entry.file).toBe(
+        addsRecipient(entry, exchange) ? RECIPIENT.version : entry.version,
+      );
+    }
     expect(others.filter((entry) => entry.version === SWITCH.version).length).toBeGreaterThan(0);
     expect(
       others.filter(
@@ -2575,6 +2716,71 @@ describe("data-access database side: the versions with one, each entry selected 
       ).length,
       "an earlier readOutboxRow error",
     ).toBeGreaterThan(0);
+  });
+
+  it("answers an earlier readOutboxRowWritten exchange as v1.16 does: its outcome with recipientHandleId and sendClass added and nothing else changed, which is its v1.16 twin's outcome, valid at v1.16 alone", () => {
+    const earlier = sideAccepted.filter((entry) => addsRecipient(entry, exchangeOf(entry.file)));
+    expect(earlier.length, "earlier readOutboxRowWritten answers").toBeGreaterThan(0);
+    const asExchange = validatorOf(RECIPIENT.version, `${RECIPIENT.call}.exchange`);
+    const twins: string[] = [];
+    for (const entry of earlier) {
+      const exchange = exchangeOf(entry.file);
+      const twinFile = recipientTwinOf(entry.file);
+      twins.push(twinFile);
+      const twin = exchangeOf(twinFile);
+      // The twin is the earlier exchange in its v1.16 form, as its own note says (README "Fixtures", v1.16).
+      const name = entry.file.replace(/\.json$/, "");
+      const note = must(twin.given.note, `${twinFile}'s note`);
+      expect(
+        note.startsWith(`${entry.version}'s ${name} in its ${RECIPIENT.version} form. `),
+        `${twinFile}: ${name} in its v1.16 form`,
+      ).toBe(true);
+      const answer = withRecipient(exchange.outcome, twin.outcome);
+      expect([exchange.call, answeredAt(entry, exchange)], entry.file).toEqual([
+        RECIPIENT.call,
+        RECIPIENT.version,
+      ]);
+      expect(differences(exchange.outcome, answer), `${entry.file}: two fields more, none fewer`).toEqual([
+        ...RECIPIENT.fields,
+      ]);
+      expect(answer, `${entry.file}: its v1.16 twin's outcome`).toEqual(twin.outcome);
+      expect(answerErrors(RECIPIENT.version, exchange.call, answer), `${entry.file} at v1.16`).toEqual([]);
+      expect(
+        errorsOf(asExchange, { ...exchange, outcome: answer }),
+        `${entry.file}: the exchange with db/repo's answer, at v1.16`,
+      ).toEqual([]);
+      expect(
+        answerErrors(entry.version, exchange.call, answer),
+        `${entry.file} at ${entry.version}, whose answer is closed`,
+      ).not.toEqual([]);
+      expect(
+        answerErrors(RECIPIENT.version, exchange.call, exchange.outcome),
+        `${entry.file}: v1.16 refuses its outcome with the two fields left out`,
+      ).not.toEqual([]);
+      for (const field of RECIPIENT.fields) {
+        const leftOut = { ...answer };
+        Reflect.deleteProperty(leftOut, field);
+        expect(
+          answerErrors(RECIPIENT.version, exchange.call, leftOut),
+          `${entry.file} with ${field} left out`,
+        ).not.toEqual([]);
+      }
+    }
+    // Each accepted v1.16 exchange of the call is the twin of one earlier exchange, and no two share a twin.
+    const ofCall = (entry: FixtureEntry): boolean => exchangeOf(entry.file).call === RECIPIENT.call;
+    const v116 = sideAccepted.filter((entry) => entry.version === RECIPIENT.version && ofCall(entry));
+    expect(twins.sort(), "the v1.16 twins").toEqual(v116.map((entry) => entry.file).sort());
+    // Both answers are shown: a written row's, with the recipient and class it stores, and that of a row the call does
+    // not see written, with both null (defaults 140 and 141).
+    const shown = twins.map((file) => {
+      const { outcome } = exchangeOf(file);
+      return [outcome.written, outcome.recipientHandleId === null, outcome.sendClass === null];
+    });
+    expect(shown, "a written row").toContainEqual([true, false, false]);
+    expect(shown, "a row not written").toContainEqual([false, true, true]);
+    // Before v1.16 a readOutboxRowWritten answer is judged by its response, which has neither field.
+    expect(answerDefOf("v1.15", RECIPIENT.call, {})).toBe(`${RECIPIENT.call}.response`);
+    expect(answerDefOf(RECIPIENT.version, RECIPIENT.call, {})).toBe(RECIPIENT.answerDef);
   });
 
   it("writes the rows a fixture's note lists, each as the note names it, with its values and in its order", () => {
@@ -3147,7 +3353,7 @@ describe("data-access database side: the versions with one, each entry selected 
   });
 });
 
-describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10, v1.11 and v1.14 gives its outcome through db/repo", () => {
+describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10, v1.11, v1.14 and v1.16 gives its outcome through db/repo", () => {
   for (const entry of sideAccepted) {
     it(
       `${entry.file} (${entry.version}): in its role and on its side, db/repo answers the fixture's outcome`,
@@ -3319,7 +3525,7 @@ describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6,
   );
 });
 
-describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10, v1.11 and v1.14 is refused by db/repo", () => {
+describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10, v1.11, v1.14 and v1.16 is refused by db/repo", () => {
   for (const entry of sideRefused.filter((refused) => defOf(refused).part === "request")) {
     it(
       `${entry.file} (${entry.version}): db/repo refuses the request before any statement reaches the database`,
@@ -3364,7 +3570,7 @@ describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v
           [],
         );
         expect(answerErrors(version, exchange.call, answer), `db/repo's answer, at ${version}`).toEqual([]);
-        const added = addsSwitch(twinEntry, exchange) ? [SWITCH.field] : [];
+        const added = addedFieldsOf(twinEntry, exchange);
         expect(twinProblems(refused, answer, { ...twin, added })).toEqual([]);
       },
     );
@@ -3514,6 +3720,46 @@ describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v
     expect(twinProblems(address, withSwitch(address), twin), "the switch alone puts nothing right").toEqual([
       "db/repo answers the refused fixture as it stands",
       "the fault recipient.address is not where db/repo's answer differs",
+    ]);
+  });
+
+  it("has the twin check take v1.16's recipientHandleId and sendClass on an earlier twin's answer and nothing beside them: no other place, neither field alone, no field the refused one states", () => {
+    const words = fixture("invalid/refuse-outbox-row-written-returns-words.json") as Record<string, Json>;
+    const wordsTwin = "outbox-row-written-alex-safety.json";
+    const asV116 = withRecipient(
+      exchangeOf(wordsTwin).outcome,
+      exchangeOf(recipientTwinOf(wordsTwin)).outcome,
+    );
+    const twin = { faults: ["finalParts"], added: RECIPIENT.fields };
+    expect(twinProblems(words, asV116, twin)).toEqual([]);
+    expect(twinProblems(words, asV116, { faults: twin.faults }), "the two fields not taken").toEqual([
+      "db/repo's answer differs at recipientHandleId, which is not the fault",
+      "db/repo's answer differs at sendClass, which is not the fault",
+    ]);
+    const [recipientField, classField] = RECIPIENT.fields;
+    expect(twinProblems(words, asV116, { ...twin, added: [recipientField] }), "the recipient alone").toEqual([
+      "db/repo's answer differs at sendClass, which is not the fault",
+    ]);
+    expect(twinProblems(words, asV116, { ...twin, added: [classField] }), "the send class alone").toEqual([
+      "db/repo's answer differs at recipientHandleId, which is not the fault",
+    ]);
+    expect(twinProblems(words, { ...asV116, readAt: "2026-11-07T16:00:00Z" }, twin)).toEqual([
+      "db/repo's answer differs at readAt, which is not the fault",
+    ]);
+    const stated = { ...words, recipientHandleId: "handle-sam", sendClass: "safety" };
+    expect(twinProblems(stated, asV116, twin), "a recipient the refused one states").toEqual([
+      "db/repo's answer differs at recipientHandleId, which is not the fault",
+    ]);
+    expect(
+      twinProblems(words, withRecipient(words, asV116), twin),
+      "the two alone put nothing right",
+    ).toEqual([
+      "db/repo answers the refused fixture as it stands",
+      "the fault finalParts is not where db/repo's answer differs",
+    ]);
+    // v1.6's switch is no field of this call's, so it excuses nothing here.
+    expect(twinProblems(words, { ...asV116, businessSensitive: null }, twin)).toEqual([
+      "db/repo's answer differs at businessSensitive, which is not the fault",
     ]);
   });
 });
