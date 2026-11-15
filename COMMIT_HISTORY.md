@@ -2,9 +2,57 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 623, [`11c5c20`](https://github.com/aryamahadik/rosie/commit/11c5c20), 2026-11-14 23:55:20 UTC.
+- **Through:** commit 625, [`c1c9731`](https://github.com/aryamahadik/rosie/commit/c1c9731), 2026-11-15 00:42:34 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 625. docs: COMMIT\_HISTORY.md through commit 623 (11c5c20, \#633) (\#636)
+
+- **Commit:** [`c1c9731`](https://github.com/aryamahadik/rosie/commit/c1c9731), by Arya Mahadik, 2026-11-15 00:42:34 UTC
+- **Pull request:** [#636](https://github.com/aryamahadik/rosie/pull/636) from `task/commit-history-113`, merged 2026-11-15 00:42:35 UTC. It squashed 1 branch commit:
+  - `b76db2a` docs: COMMIT\_HISTORY.md through commit 623 (11c5c20, \#633)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 624. T-1395: staging binds the turn's K-05 calls through the job handle (bundleReads, handleTargets, frontierScope, turnRows; the audit's P2b) (\#635)
+
+- **Commit:** [`5cd4554`](https://github.com/aryamahadik/rosie/commit/5cd4554), by Arya Mahadik, 2026-11-15 00:42:31 UTC
+- **Pull request:** [#635](https://github.com/aryamahadik/rosie/pull/635) from `task/T-1395-r2`, merged 2026-11-15 00:42:31 UTC. It squashed 3 branch commits:
+  - `c441032` T-1395: staging binds the turn's K-05 calls through the job handle (b…
+  - `5eecd78` T-1395: the test binds this card's part alone (every other part stood…
+  - `10cc7ee` T-1395: the test's helper types pass lint (function-typed members, th…
+- **Files changed:** 3 (+1215 −11), by folder:
+  - `runtime/src/wiring/staging/` k05-turn.seed.ts +15 −0, k05-turn.ts +69 −11, k05-turn.worker.test.ts +1131 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1395: staging binds the turn's K-05 calls through the job handle (bundleReads, handleTargets, frontierScope, turnRows), with its Workers test on the rig and its seed
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1395: the test binds this card's part alone (every other part stood in unbound), reads bundle v0's every value with no BUNDLES, and adds the crossed-bindings refusal
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1395: the test's helper types pass lint (function-typed members, the row counts as an interface); no assertion changed
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 623. docs: COMMIT\_HISTORY.md through commit 621 (8f5e764, \#631) (\#633)
 
