@@ -1,8 +1,22 @@
-// Contract test for K-05, the data-access calls: the database side of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10 and
-// v1.11 (T-1169; T-1199 for v1.6; T-1214 for v1.7; T-1218 for v1.8; T-1232 for v1.9; T-1260 for v1.10, the D-017 path
-// audit's Q1; T-1270 for v1.11; DL-348, DL-373, DL-398, DL-444, DL-456, DL-474, DL-506, DL-511, DL-760, DL-766,
-// DL-775; contracts/data-access/README.md sections "v1.3", "v1.4", "v1.6", "v1.7", "v1.8", "v1.9", "v1.10" and
-// "v1.11", their "Consumers of" lists, "Fixtures", and "Producers and consumers").
+// Contract test for K-05, the data-access calls: the database side of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10,
+// v1.11 and v1.14 (T-1169; T-1199 for v1.6; T-1214 for v1.7; T-1218 for v1.8; T-1232 for v1.9; T-1260 for v1.10, the
+// D-017 path audit's Q1; T-1270 for v1.11; T-1355 for v1.14; DL-348, DL-373, DL-398, DL-444, DL-456, DL-474, DL-506,
+// DL-511, DL-687, DL-698, DL-760, DL-761, DL-766, DL-775, DL-778; contracts/data-access/README.md sections "v1.3",
+// "v1.4", "v1.6", "v1.7", "v1.8", "v1.9", "v1.10", "v1.11" and "v1.14", their "Consumers of" lists, "Fixtures", and
+// "Producers and consumers").
+//
+// v1.14 (T-1355; README item 67): claimOutbox with sendClass safety, the safety-only claim of a danger line's own wake
+// (T-1354, db/repo/outbox.ts claimOutboxV114). Its nine fixtures run here as every side entry does, with what is its
+// own: a claim of v1.14 runs through claimOutboxV114, while a claim of an earlier version a chain runs first keeps the
+// claim of its own version (SAFETY_CLAIM: v1's own, or v1.2's, as before); each fixture's note lists the rows its
+// database side writes itself before the claim, its danger line's turn and row, as commit-alex-safety's and
+// write-plan-alex-safety's requests write Alex's first line, and for claim-safety-past-ten-checked-rows the ten routine
+// notices too (DANGER_LINES, noticeRows; NOTED_ROWS); the outbox after a claim holds the claims its answer gives and
+// every other row as it was (claimProblems); two refused exchanges are refused for their request (REQUEST_TWINS: no
+// recipient, another class) and two for their outcome (EXCHANGE_TWINS: a routine row claimed too, a held row listed);
+// and two cases no fixture shows end the file: row S's (a quick_reply outage row sending under a live claim, ahead of
+// a safety row, never read or locked) and a claim without sendClass through claimOutboxV114, answered in v1.13 item
+// 64's form with the rows and fields claimOutboxV113 gives (DL-761).
 //
 // The fixture part, data-access.v1.test.ts, checks every fixture against the schema of its version. This part is the
 // producer's side (C-152) for the versions whose calls the database engineer built: v1.3's three turn-face reads
@@ -102,7 +116,16 @@ import { openChatOnText } from "../../db/repo/chat-open";
 import { armClock } from "../../db/repo/clocks";
 import { commitTurn } from "../../db/repo/commit-turn";
 import { handleSealingKey } from "../../db/repo/handle-keys";
-import { claimOutbox, claimOutboxV12, markPartV12, markRowV12, writePlan } from "../../db/repo/outbox";
+import {
+  claimOutbox,
+  claimOutboxV113,
+  claimOutboxV114,
+  claimOutboxV12,
+  markPartV12,
+  markRow,
+  markRowV12,
+  writePlan,
+} from "../../db/repo/outbox";
 import { reserve } from "../../db/repo/reservations";
 import {
   readBusinessOwner,
@@ -140,11 +163,12 @@ const SLOW = { timeout: 60_000 };
 
 /**
  * The versions with a database side here: v1.3 (T-1138), v1.4 (T-1161), v1.6 (T-1197), v1.7 (T-1212), v1.8 (T-1216),
- * v1.9 (T-1227), v1.10 (T-1258, T-1259) and v1.11 (T-1269). v1 to v1.2's database sides are tasks of their own (README:
- * T-116, T-478), and v1.5 has none. v1.12 on join with their own QA tasks (README "Consumers of v1.12": "after the
- * database engineer's reads").
+ * v1.9 (T-1227), v1.10 (T-1258, T-1259), v1.11 (T-1269) and v1.14 (T-1354). v1 to v1.2's database sides are tasks of
+ * their own (README: T-116, T-478), and v1.5 has none. v1.12, v1.13 and v1.15 join with their own QA tasks (README
+ * "Consumers of v1.12": "after the database engineer's reads"; v1.13's is T-1292); v1.14 joined ahead of them
+ * (T-1355), since the first text's send waits on its claim (DL-778).
  */
-const DB_SIDE_VERSIONS = ["v1.3", "v1.4", "v1.6", "v1.7", "v1.8", "v1.9", "v1.10", "v1.11"];
+const DB_SIDE_VERSIONS = ["v1.3", "v1.4", "v1.6", "v1.7", "v1.8", "v1.9", "v1.10", "v1.11", "v1.14"];
 
 interface Given {
   k04Seeds: string[];
@@ -376,6 +400,30 @@ function withRepeat(exchange: Exchange): Record<string, Json> {
 }
 
 // ---------------------------------------------------------------------------------------------------------------
+// v1.14's sendClass on claimOutbox, the safety-only claim (README item 67)
+
+/**
+ * v1.14 (T-1353): claimOutbox takes one optional field, sendClass, whose only value is safety, with a named recipient
+ * alone; with it the claim waits for the recipient and walks only the recipient's safety rows, and without it the call
+ * is v1.13's, answered in v1.13's form (`form`: item 64's emailPurpose and notAfter on every claimed row). db/repo's
+ * claimOutboxV114 is that claim (T-1354), so a claim exchange of v1.14 runs through it (DB_CALLS). A claim of an
+ * earlier version a chain runs first keeps the claim of its own version, K-05 v1's own (V1_CHAIN_CALLS) or v1.2's
+ * (CHAIN_CALLS), whose answers are the fixtures' (the card's lead note, DL-698: "The chains run existing v1, v1.1 and
+ * v1.2 exchanges (claim-alex-safety runs through claimOutboxV12)").
+ */
+const SAFETY_CLAIM = {
+  call: "claimOutbox",
+  version: "v1.14",
+  field: "sendClass",
+  value: "safety",
+  form: "v1.13",
+} as const;
+
+/** Whether an entry is a claim of a version before v1.14, which the claim of its own version answers (SAFETY_CLAIM). */
+const claimsBefore = (entry: FixtureEntry): boolean =>
+  defOf(entry).call === SAFETY_CLAIM.call && isBefore(entry.version, SAFETY_CLAIM.version);
+
+// ---------------------------------------------------------------------------------------------------------------
 // The schemas: every schema under contracts/, as contracts:check loads them, so each $ref resolves; one strict
 // validator (Ajv 2020-12), each definition taken from the schema of the version an entry lists
 
@@ -456,9 +504,13 @@ const byBusiness = (request: Record<string, Json>): Role => (request.businessId 
  * handles and threads are tables only rosie_job reads); each takes its request alone, and no time from its caller.
  * v1.11's readTurnParty, item 52, runs the same way, on the runtime side as rosie_job with no business scope (README
  * "The call v1.11 adds": the read decides which business a turn runs under, so it runs before there is a business
- * scope, and handles and person_handles are tables only rosie_job reads), with its request alone.
+ * scope, and handles and person_handles are tables only rosie_job reads), with its request alone. v1.14's claimOutbox,
+ * item 67, is the dispatcher's claimOutboxV114 (T-1354), one transaction on the runtime side as rosie_job with no
+ * business scope (README "The call v1.14 changes"), its time the request's own now; a claim of an earlier version a
+ * chain runs first does not run through it (SAFETY_CLAIM, stepCallOf).
  */
 const DB_CALLS: Readonly<Record<string, DbCall>> = {
+  claimOutbox: { role: () => "job", run: claimOutboxV114 },
   commitTurn: { role: () => "job", run: commitTurn },
   readOpenHolds: { role: byBusiness, run: readOpenHolds },
   readOutboxRow: { role: () => "job", run: readOutboxRow },
@@ -529,9 +581,13 @@ const CHAIN_CALLS: Readonly<Record<string, DbCall>> = {
  * claim, claimedFrom or port. So a v1 claim a chain runs first (claim-in-order, which claims Alex's confirmation before
  * every v1.8 read: README "Fixtures", v1.8) runs through it, on the runtime side as rosie_job (v1 item 3), and answers
  * its own fixture's outcome, whole, as no v1.2 claim could (PORT adds nothing to it); a v1.1 claim runs through v1.2's.
+ * So does a v1 mark of a row (mark-held-for-text-hours, limit 8's hold of Sam's evening notice to 8am, which runs
+ * after v1's claim-evening-notice and before v1.14's claim-safety-past-held-row: README "Fixtures", v1.14): K-05 v1's
+ * own markRow (v1 item 4), on the runtime side as rosie_job, which marks a row v1's claim took, with no claim row.
  */
 const V1_CHAIN_CALLS: Readonly<Record<string, DbCall>> = {
   claimOutbox: { role: () => "job", run: claimOutbox },
+  markRow: { role: () => "job", run: markRow },
 };
 
 /** The calls that write: an answer gives the row it leaves and the entry it appends (item 46 step 4), or none. */
@@ -543,12 +599,28 @@ const callOf = (call: string): DbCall => must(DB_CALLS[call], `a db/repo call fo
 const runsAtV1 = (step: string): boolean =>
   entryOf(step).version === V1 && Object.hasOwn(V1_CHAIN_CALLS, exchangeOf(step).call);
 
-/** The call a chain step runs through: one of DB_CALLS, else K-05 v1's own (runsAtV1), else one of CHAIN_CALLS. */
+/**
+ * The call a chain step runs through: one of DB_CALLS, else K-05 v1's own (runsAtV1), else one of CHAIN_CALLS. A claim
+ * of a version before v1.14 is not DB_CALLS', which is v1.14's claim: it runs through K-05 v1's own claim or, from
+ * v1.1, through v1.2's, as it did before v1.14 had a database side (claimsBefore).
+ */
 function stepCallOf(step: string): DbCall {
   const { call } = exchangeOf(step);
   const v1 = runsAtV1(step) ? V1_CHAIN_CALLS[call] : undefined;
-  return must(DB_CALLS[call] ?? v1 ?? CHAIN_CALLS[call], `a db/repo call for ${call}, run first`);
+  const side = claimsBefore(entryOf(step)) ? undefined : DB_CALLS[call];
+  return must(side ?? v1 ?? CHAIN_CALLS[call], `a db/repo call for ${call}, run first`);
 }
+
+/**
+ * The side entries a chain's call of that name would answer too: every side entry of the call, but for a claim those
+ * of v1.14 on, which DB_CALLS' claim answers (SAFETY_CLAIM). None, for every call of CHAIN_CALLS and V1_CHAIN_CALLS:
+ * a call is the side's own or a chain's at any one version, never both.
+ */
+const sideEntriesOfChainCall = (call: string): string[] =>
+  sideEntries
+    .filter((entry) => defOf(entry).call === call)
+    .filter((entry) => call !== SAFETY_CLAIM.call || claimsBefore(entry))
+    .map((entry) => entry.file);
 
 /**
  * Each refused answer of a version with a database side, with its twin: the accepted exchange that answers the same
@@ -681,6 +753,19 @@ const EXCHANGE_TWINS: Readonly<Record<string, { twin: string; faults: string[] }
     twin: "mark-a7-03-poll-delivered-repeat.json",
     faults: ["repeatedDelivery"],
   },
+  // v1.14: a safety claim answered with Sam's first routine notice claimed ahead of his danger line; the claimed list
+  // is one row longer, so it differs as a whole (README "Fixtures", v1.14: twin claim-safety-past-ten-checked-rows,
+  // its outcome)
+  "invalid/refuse-safety-claim-takes-routine-row.json": {
+    twin: "claim-safety-past-ten-checked-rows.json",
+    faults: ["claimed"],
+  },
+  // v1.14: a safety claim answered with Sam's held routine row listed, as an ordinary claim lists it (README
+  // "Fixtures", v1.14: twin claim-safety-past-held-row, its outcome)
+  "invalid/refuse-safety-claim-lists-held-row.json": {
+    twin: "claim-safety-past-held-row.json",
+    faults: ["passedHeld"],
+  },
 };
 
 /**
@@ -703,6 +788,19 @@ const REQUEST_TWINS: Readonly<Record<string, { twin: string; faults: string[] }>
   "invalid/refuse-turn-party-caller-business.json": {
     twin: "read-turn-party-test-owner-1.json",
     faults: ["businessId"],
+  },
+  // v1.14: a safety claim made with no recipient, and a claim with sendClass is made for one named recipient alone
+  // (README item 67, default 134; "Fixtures", v1.14: twin claim-safety-past-live-safety-claim, its request); its
+  // given's danger line is its twin's, written before it (notedRowsOf)
+  "invalid/refuse-claim-safety-no-recipient.json": {
+    twin: "claim-safety-past-live-safety-claim.json",
+    faults: ["recipientHandleId"],
+  },
+  // v1.14: a claim asking for send class routine, and sendClass names safety alone (README item 67, default 133;
+  // "Fixtures", v1.14: twin claim-safety-past-routine-live-claim, its request)
+  "invalid/refuse-claim-safety-other-class.json": {
+    twin: "claim-safety-past-routine-live-claim.json",
+    faults: ["sendClass"],
   },
 };
 
@@ -1087,18 +1185,368 @@ function partyRows(file: string): SeedRow[] {
   return [...(afterTestOwner ? testOwnerRows() : []), ...own()];
 }
 
+/** v1.1's commit of Alex's first danger line, whose request every v1.14 note has its danger line's rows written as. */
+const FIRST_LINE_COMMIT = "commit-alex-safety.json";
+/** v1.1's plan of that line: the fixed line safetyEmergency as its plan and final parts (README "Fixtures", v1.14). */
+const FIRST_LINE_PLAN = "write-plan-alex-safety.json";
+/** v1.14's claim past ten checked routine notices, whose note lists the ten and their turn before its danger line. */
+const PAST_TEN_NOTICES = "claim-safety-past-ten-checked-rows.json";
+
+/** A danger line as a v1.14 note lists it: its turn, with its handle, event, trace and commit time, and its one row. */
+interface DangerLine {
+  turnId: string;
+  handleId: string;
+  personId: string;
+  eventId: string;
+  traceId: string;
+  rowId: string;
+  /** When its turn committed: the note's time of day, on the day of the claim. */
+  at: string;
+}
+
+/**
+ * By v1.14 fixture, the danger line its note lists, with the note's ids and time (README "Fixtures", v1.14: "each note
+ * lists the two rows its database side writes itself before the claim: the turn and its one outbox row, as v1.1's
+ * commit-alex-safety and write-plan-alex-safety requests write Alex's first line, with the note's ids and times").
+ */
+const DANGER_LINES: Readonly<Record<string, DangerLine>> = {
+  "claim-safety-past-live-safety-claim.json": {
+    turnId: "turn-alex-safety-0051",
+    handleId: "handle-alex",
+    personId: "person-alex",
+    eventId: "evt-alex-0051",
+    traceId: "trace-alex-0051",
+    rowId: "out-alex-safety-0051",
+    at: "2026-11-07T16:00:02Z",
+  },
+  "claim-safety-past-routine-live-claim.json": {
+    turnId: "turn-sam-safety-0062",
+    handleId: "handle-sam",
+    personId: "person-sam",
+    eventId: "evt-sam-0062",
+    traceId: "trace-sam-0062",
+    rowId: "out-sam-safety-0062",
+    at: "2026-11-07T15:06:36Z",
+  },
+  "claim-safety-past-planned-row.json": {
+    turnId: "turn-alex-safety-0052",
+    handleId: "handle-alex",
+    personId: "person-alex",
+    eventId: "evt-alex-0052",
+    traceId: "trace-alex-0052",
+    rowId: "out-alex-safety-0052",
+    at: "2026-11-07T15:06:31Z",
+  },
+  "claim-safety-past-held-row.json": {
+    turnId: "turn-sam-safety-0063",
+    handleId: "handle-sam",
+    personId: "person-sam",
+    eventId: "evt-sam-0063",
+    traceId: "trace-sam-0063",
+    rowId: "out-sam-safety-0063",
+    at: "2026-11-08T01:31:00Z",
+  },
+  [PAST_TEN_NOTICES]: {
+    turnId: "turn-sam-safety-0064",
+    handleId: "handle-sam",
+    personId: "person-sam",
+    eventId: "evt-sam-0064",
+    traceId: "trace-sam-0064",
+    rowId: "out-sam-safety-0064",
+    at: "2026-11-09T15:00:01Z",
+  },
+};
+
+/** A value a request holds at a dotted path, as JSON; a missing step is a broken test. */
+const jsonAt = (value: unknown, at: string): Json => valueAt(value, at) as Json;
+
+/**
+ * Alex's first danger line as v1.1's two requests name it: the ids a note's danger line puts its own in place of, and
+ * the time its commit's exchange runs at.
+ */
+function firstLine(): DangerLine {
+  const { request, given: state } = exchangeOf(FIRST_LINE_COMMIT);
+  const rows = jsonAt(request, "writes.outboxRows");
+  if (!Array.isArray(rows) || rows.length !== 1)
+    throw new Error(`${FIRST_LINE_COMMIT} writes one outbox row`);
+  const text = (at: string): string => textOf(jsonAt(request, at), `${FIRST_LINE_COMMIT}'s ${at}`);
+  return {
+    turnId: text("turn.id"),
+    handleId: text("turn.handleId"),
+    personId: text("writes.outboxRows.0.recipientPersonId"),
+    eventId: text("turn.eventIds.0"),
+    traceId: text("turn.traceId"),
+    rowId: text("writes.outboxRows.0.id"),
+    at: state.now,
+  };
+}
+
+/** A request of Alex's first danger line with another line's ids: each text that is one of the first line's, swapped. */
+function withIdsOf(value: Json, line: DangerLine): Json {
+  const first = firstLine();
+  const swaps = new Map<string, string>([
+    [first.turnId, line.turnId],
+    [first.handleId, line.handleId],
+    [first.personId, line.personId],
+    [first.eventId, line.eventId],
+    [first.traceId, line.traceId],
+    [first.rowId, line.rowId],
+  ]);
+  const swap = (node: Json): Json => {
+    if (typeof node === "string") return swaps.get(node) ?? node;
+    if (Array.isArray(node)) return node.map(swap);
+    if (node === null || typeof node !== "object") return node;
+    return Object.fromEntries(Object.entries(node).map(([key, child]) => [key, swap(child)]));
+  };
+  return swap(value);
+}
+
+/**
+ * A danger line's two rows, in the note's order: its turn, committed at the line's time, and its one outbox row, "as
+ * commit-alex-safety's and write-plan-alex-safety's requests write Alex's first line", read from those two requests
+ * with the line's ids in place of Alex's first line's, so this test and the frozen requests cannot drift: the row as
+ * the commit writes it (send class safety, imessage, no booking, question or copy, no versions read, in the turn's
+ * bundle and trace), then as the plan leaves it, checked, one version on, with the plan and the final parts the plan's
+ * request holds (the fixed line safetyEmergency, the row's own id in both).
+ */
+function dangerLineRows(line: DangerLine): SeedRow[] {
+  const commit = withIdsOf(exchangeOf(FIRST_LINE_COMMIT).request, line);
+  const planned = withIdsOf(exchangeOf(FIRST_LINE_PLAN).request, line);
+  const expectVersion = jsonAt(planned, "expectVersion");
+  if (typeof expectVersion !== "number") throw new Error(`${FIRST_LINE_PLAN} names no version`);
+  if (jsonAt(planned, "outboxRowId") !== line.rowId) throw new Error(`${FIRST_LINE_PLAN} plans another row`);
+  return [
+    {
+      table: "turns",
+      values: {
+        id: jsonAt(commit, "turn.id"),
+        handle_id: jsonAt(commit, "turn.handleId"),
+        event_ids: jsonAt(commit, "turn.eventIds"),
+        state: "committed",
+        bundle_hash: jsonAt(commit, "turn.bundleId.hash"),
+        bundle_build: jsonAt(commit, "turn.bundleId.build"),
+        trace_id: jsonAt(commit, "turn.traceId"),
+        joined_trace_ids: jsonAt(commit, "turn.joinedTraceIds"),
+        tries: jsonAt(commit, "turn.tries"),
+        committed_at: line.at,
+        version: 1,
+      },
+    },
+    {
+      table: "outbox_rows",
+      values: {
+        id: jsonAt(commit, "writes.outboxRows.0.id"),
+        turn_id: jsonAt(commit, "turn.id"),
+        recipient_handle_id: jsonAt(commit, "writes.outboxRows.0.recipientHandleId"),
+        recipient_person_id: jsonAt(commit, "writes.outboxRows.0.recipientPersonId"),
+        business_id: jsonAt(commit, "writes.outboxRows.0.businessId"),
+        booking_id: jsonAt(commit, "writes.outboxRows.0.bookingId"),
+        channel: jsonAt(commit, "writes.outboxRows.0.channel"),
+        send_class: jsonAt(commit, "writes.outboxRows.0.sendClass"),
+        versions_read: jsonAt(commit, "writes.outboxRows.0.versionsRead"),
+        open_question_id: jsonAt(commit, "writes.outboxRows.0.openQuestionId"),
+        plan: jsonAt(planned, "plan"),
+        final_parts: jsonAt(planned, "finalParts"),
+        copy_of_row_id: jsonAt(commit, "writes.outboxRows.0.copyOfRowId"),
+        state: "checked",
+        bundle_hash: jsonAt(commit, "turn.bundleId.hash"),
+        bundle_build: jsonAt(commit, "turn.bundleId.build"),
+        trace_id: jsonAt(commit, "turn.traceId"),
+        version: expectVersion + 1,
+      },
+    },
+  ];
+}
+
+/** The ten routine notices' turn, as claim-safety-past-ten-checked-rows's note lists it. */
+const NOTICES_TURN = {
+  turnId: "turn-sam-notices-0070",
+  handleId: "handle-sam",
+  personId: "person-sam",
+  eventId: "evt-sam-0070",
+  traceId: "trace-sam-0070",
+  businessId: "biz-lees-barbershop",
+  channel: "imessage",
+  at: "2026-11-09T14:50:00Z",
+  count: 10,
+} as const;
+
+/** A notice's row id and its words, by its place of ten: out-sam-notice-01 and 'Notice 1 of 10.' */
+const noticeIdOf = (place: number): string => `out-sam-notice-${String(place).padStart(2, "0")}`;
+const noticeWordsOf = (place: number): string => `Notice ${String(place)} of ${String(NOTICES_TURN.count)}.`;
+
+/**
+ * claim-safety-past-ten-checked-rows's eleven rows before its danger line, in its note's order and with its note's
+ * values (no chain writes them): the turn of Sam's ten routine notices, in the bundle of K-04's
+ * seed-bundle-registry.json, then the ten, out-sam-notice-01 to out-sam-notice-10 (send class routine, imessage, to
+ * handle-sam and person-sam at the barbershop, no booking, question or copy, no versions read), each checked at version
+ * 2 with a plan of formats text and one line, 'Notice N of 10.' (role first; no question, page type or thread), and
+ * final parts of one words send of those words (no calendar file, option, link, fixed line or slot).
+ */
+function noticeRows(): SeedRow[] {
+  const bundle = seedBundle();
+  const { turnId, handleId, personId, eventId, traceId, businessId, channel, at, count } = NOTICES_TURN;
+  const notice = (place: number): SeedRow => {
+    const id = noticeIdOf(place);
+    const words = noticeWordsOf(place);
+    return {
+      table: "outbox_rows",
+      values: {
+        id,
+        turn_id: turnId,
+        recipient_handle_id: handleId,
+        recipient_person_id: personId,
+        business_id: businessId,
+        booking_id: null,
+        channel,
+        send_class: "routine",
+        versions_read: [],
+        open_question_id: null,
+        plan: {
+          row: id,
+          channel,
+          copyOf: null,
+          plan: {
+            formats: ["text"],
+            lines: [{ role: "first", text: words }],
+            question: null,
+            pageType: null,
+            threadReplyTo: null,
+          },
+        },
+        final_parts: {
+          row: id,
+          channel,
+          sends: [{ kind: "words", text: words, calendarFile: "none", options: [], link: null }],
+          fixedLines: [],
+          slotValues: [],
+          threadReplyTo: null,
+        },
+        copy_of_row_id: null,
+        state: "checked",
+        bundle_hash: bundle.hash,
+        bundle_build: bundle.build,
+        trace_id: traceId,
+        version: 2,
+      },
+    };
+  };
+  return [
+    {
+      table: "turns",
+      values: {
+        id: turnId,
+        handle_id: handleId,
+        event_ids: [eventId],
+        state: "committed",
+        bundle_hash: bundle.hash,
+        bundle_build: bundle.build,
+        trace_id: traceId,
+        joined_trace_ids: [],
+        tries: 1,
+        committed_at: at,
+        version: 1,
+      },
+    },
+    ...Array.from({ length: count }, (_, at0) => notice(at0 + 1)),
+  ];
+}
+
+/**
+ * A v1.14 fixture's noted rows, in its note's order: for claim-safety-past-ten-checked-rows the ten notices and their
+ * turn first, committed before the danger line, then, as for every v1.14 claim, its danger line's turn and row.
+ */
+function safetyClaimRows(file: string): SeedRow[] {
+  const line = must(DANGER_LINES[file], `${file}'s danger line`);
+  return [...(file === PAST_TEN_NOTICES ? noticeRows() : []), ...dangerLineRows(line)];
+}
+
+/**
+ * How a v1.14 note lists a danger line's turn, and the ten notices' turn: "the turn <id> (<handle>, event <event>,
+ * trace <trace>, committed at <time of day>)".
+ */
+const turnPhrase = (turn: Pick<DangerLine, "turnId" | "handleId" | "eventId" | "traceId" | "at">): string =>
+  `the turn ${turn.turnId} (${turn.handleId}, event ${turn.eventId}, trace ${turn.traceId}, committed at ${turn.at.slice(11)})`;
+
+/** K-01's fixed line every danger line is, word for word (write-plan-alex-safety's note; arch 07 line 361). */
+const FIXED_LINE = "safetyEmergency";
+/** How a v1.14 note says a danger line is written, and how it leaves its row: checked, with the fixed line. */
+const AS_FIRST_LINE = "as commit-alex-safety's and write-plan-alex-safety's requests write";
+const CHECKED_WITH_FIXED_LINE = `checked at version 2 with the fixed line ${FIXED_LINE} as its plan and final parts, its own row id in both`;
+/** How claim-safety-past-ten-checked-rows's note lists the danger line's row after the ten notices' own. */
+const SAME_AS_NOTICES = "the same recipient, business and channel";
+
+/**
+ * Each way a v1.14 note fails to list a danger line's two rows as they are written, none when it lists them: that its
+ * database side writes them itself, as v1.1's two requests write Alex's first; the turn, by its phrase (turnPhrase);
+ * after it the row, by its id, its send class, and its channel, recipient and business, spelled out or, after the ten
+ * notices' own, as "the same"; and after that, that it is checked at version 2 with the fixed line; and the rows hold
+ * what the phrases say (a committed turn at version 1 at the note's time on the claim's day; a checked row at version
+ * 2 with no booking, question or copy and no versions read).
+ */
+export function dangerNoteProblems(note: string, line: DangerLine, rows: readonly SeedRow[]): string[] {
+  const problems: string[] = [];
+  const [turn, row] = rows;
+  if (rows.length !== 2 || turn?.table !== "turns" || row?.table !== "outbox_rows") {
+    return ["a danger line is a turn and its one outbox row"];
+  }
+  if (!note.includes("this exchange's database side writes")) {
+    problems.push("the note does not say its database side writes the rows");
+  }
+  if (!note.includes(AS_FIRST_LINE)) problems.push("the note does not name the two requests");
+  const { values } = row;
+  const spelledOut = `${spelled(values.channel ?? null)}, to ${spelled(values.recipient_handle_id ?? null)} and ${spelled(values.recipient_person_id ?? null)} at ${spelled(values.business_id ?? null)}, no booking, question or copy, no versions read`;
+  const rowPhrase = (rest: string): string =>
+    `its one row ${line.rowId} (send class ${spelled(values.send_class ?? null)}, ${rest}`;
+  const phrases = [turnPhrase(line), rowPhrase(spelledOut), CHECKED_WITH_FIXED_LINE];
+  let from = 0;
+  for (const [at, phrase] of phrases.entries()) {
+    let place = note.indexOf(phrase, from);
+    if (place < 0 && at === 1) place = note.indexOf(rowPhrase(SAME_AS_NOTICES), from);
+    if (place < 0) problems.push(`"${phrase}" is not listed${note.includes(phrase) ? " in this order" : ""}`);
+    else from = place + 1;
+  }
+  const held = {
+    turn: [turn.values.id, turn.values.state, turn.values.committed_at, turn.values.version],
+    row: [
+      values.id,
+      values.turn_id,
+      values.state,
+      values.version,
+      values.booking_id,
+      values.open_question_id,
+      values.copy_of_row_id,
+      values.versions_read,
+      valueAt(values.plan, "row"),
+      valueAt(values.final_parts, "row"),
+      valueAt(values.final_parts, "fixedLines"),
+    ],
+  };
+  const said = {
+    turn: [line.turnId, "committed", line.at, 1],
+    row: [line.rowId, line.turnId, "checked", 2, null, null, null, [], line.rowId, line.rowId, [FIXED_LINE]],
+  };
+  for (const place of differences(held, said))
+    problems.push(`the rows do not hold what the note says at ${place}`);
+  return problems;
+}
+
 /** By fixture, the rows its note says its database side writes itself before the read: no frozen seed holds them. */
 const NOTED_ROWS: Readonly<Record<string, () => SeedRow[]>> = {
   [PRACTICE]: practiceRows,
   [CHAT_OF_TURN_1]: chatThreadRows,
   ...Object.fromEntries(Object.keys(PARTY_NOTES).map((file) => [file, (): SeedRow[] => partyRows(file)])),
+  ...Object.fromEntries(
+    Object.keys(DANGER_LINES).map((file) => [file, (): SeedRow[] => safetyClaimRows(file)]),
+  ),
 };
 
 /**
  * The rows written before a fixture's exchange, after its chain: those its own note lists (NOTED_ROWS), and for a
  * refused exchange, whose given is its twin's but for its note (EXCHANGE_TWINS, REQUEST_TWINS), those its twin's note
  * lists: v1.11's refuse-turn-party-caller-business reads test owner 1's first text "with its rows written as that
- * fixture's note lists them". None for every other fixture.
+ * fixture's note lists them", and each of v1.14's four refused claims is its twin's claim, whose danger line (and ten
+ * notices) its note lists. None for every other fixture.
  */
 function notedRowsOf(file: string): SeedRow[] {
   const twin = EXCHANGE_TWINS[file]?.twin ?? REQUEST_TWINS[file]?.twin;
@@ -1453,6 +1901,80 @@ export function markProblems(before: Marks, after: Marks, exchange: Exchange, an
   return problems;
 }
 
+/** A claim row as an answer's claimed row states it (v1.1 item 13), or none for a row with no claim row. */
+const claimOf = (claim: Row | undefined): Record<string, unknown> | undefined =>
+  claim === undefined
+    ? undefined
+    : {
+        claimer: claim.claimer,
+        claimedAt: utcOf(claim.claimed_at),
+        lapsesAt: utcOf(claim.lapses_at),
+        claimNo: claim.claim_no,
+        firstTryAt: utcOf(claim.first_try_at),
+        nextTryNotBefore: utcOf(claim.next_try_not_before),
+      };
+
+/**
+ * README items 3, 13 and 67, read from the tables (as MARKS reads them). Each way the tables after a claim differ from
+ * what its answer gives, none when they hold it: an error claimed nothing, so nothing changed; every row the answer does
+ * not claim, with its part tries and its claim, is as it was, and so are the clock rows and the log, which no claim
+ * writes; each claimed row is sending at the answer's version, under the claim the answer states, each part it lists
+ * under its key with its attempts. For a safety claim (sendClass safety), what the schema cannot hold (item 67.4: "the
+ * recipient and the limit are rules the schema cannot hold, which ... QA's database side hold"): each claimed row is
+ * the named recipient's, and of send class safety as the tables hold it, at most `limit` are claimed, and passedHeld
+ * is empty.
+ */
+export function claimProblems(before: Marks, after: Marks, exchange: Exchange, answer: unknown): string[] {
+  if (!isRecord(answer) || isError(answer)) {
+    return isDeepStrictEqual(after, before) ? [] : ["an answer that claims nothing wrote"];
+  }
+  const problems: string[] = [];
+  const claimed = (Array.isArray(answer.claimed) ? answer.claimed : []).filter(isRecord);
+  const ids = new Set(claimed.map((row) => row.outboxRowId));
+  const others = (held: Marks): Marks => ({
+    rows: held.rows.filter((row) => !ids.has(row.id)),
+    parts: held.parts.filter((part) => !ids.has(part.outbox_row_id)),
+    claims: held.claims.filter((claim) => !ids.has(claim.outbox_row_id)),
+    clocks: held.clocks,
+    log: held.log,
+  });
+  if (!isDeepStrictEqual(others(after), others(before))) {
+    problems.push("a row the answer does not claim, a clock row or an entry changed");
+  }
+  const { request } = exchange;
+  const safetyOnly = request[SAFETY_CLAIM.field] === SAFETY_CLAIM.value;
+  if (safetyOnly) {
+    if (typeof request.limit !== "number" || claimed.length > request.limit) {
+      problems.push(`${String(claimed.length)} rows are claimed, past the limit`);
+    }
+    if (!Array.isArray(answer.passedHeld) || answer.passedHeld.length > 0) {
+      problems.push("a safety claim lists a held row");
+    }
+  }
+  for (const row of claimed) {
+    const id = String(row.outboxRowId);
+    const stored = after.rows.find((each) => each.id === id);
+    if (stored?.state !== "sending" || stored.version !== row.version) {
+      problems.push(`${id} is not sending at the answer's version`);
+    }
+    if (safetyOnly && stored?.send_class !== SAFETY_CLAIM.value) {
+      problems.push(`${id}, which a safety claim took, is of send class ${String(stored?.send_class)}`);
+    }
+    if (safetyOnly && stored?.recipient_handle_id !== request.recipientHandleId) {
+      problems.push(`${id} is not the named recipient's`);
+    }
+    const claim = claimOf(after.claims.find((each) => each.outbox_row_id === id));
+    if (!isDeepStrictEqual(claim, row.claim)) problems.push(`${id}'s claim is not the answer's`);
+    for (const part of (Array.isArray(row.parts) ? row.parts : []).filter(isRecord)) {
+      const tried = after.parts.find((each) => each.idempotency_key === part.idempotencyKey);
+      if (tried?.outbox_row_id !== id || tried.attempts !== part.attempts) {
+        problems.push(`${id}'s part ${String(part.idempotencyKey)} is not the answer's`);
+      }
+    }
+  }
+  return problems;
+}
+
 const fromHex = (hex: string): Uint8Array =>
   Uint8Array.from((hex.match(/../g) ?? []).map((pair) => parseInt(pair, 16)));
 
@@ -1642,7 +2164,7 @@ async function given(file: string): Promise<Exchange> {
 // The tests
 
 describe("data-access database side: the versions with one, each entry selected by its version", () => {
-  it("runs every entry of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10 and v1.11, accepted and refused, each against a db/repo call the README names", () => {
+  it("runs every entry of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10, v1.11 and v1.14, accepted and refused, each against a db/repo call the README names", () => {
     for (const version of DB_SIDE_VERSIONS) {
       const ofVersion = sideEntries.filter((entry) => entry.version === version);
       expect(
@@ -1664,7 +2186,7 @@ describe("data-access database side: the versions with one, each entry selected 
     }
   });
 
-  it("runs each exchange a chain runs first through db/repo: a call of DB_CALLS, else K-05 v1's own for a v1 step (V1_CHAIN_CALLS), else of CHAIN_CALLS, which no side entry names", () => {
+  it("runs each exchange a chain runs first through db/repo: a call of DB_CALLS, else K-05 v1's own for a v1 step (V1_CHAIN_CALLS), else of CHAIN_CALLS, which no side entry names, but for the claim, v1.14's own from v1.14 and a chain's before it", () => {
     const sideCalls = new Set(sideEntries.map((entry) => defOf(entry).call));
     const runFirst = [
       ...sideAccepted.map((entry) => entry.file),
@@ -1678,21 +2200,58 @@ describe("data-access database side: the versions with one, each entry selected 
     for (const call of stepCalls) {
       expect([...Object.keys(DB_CALLS), ...Object.keys(CHAIN_CALLS)], `${call}, run first`).toContain(call);
     }
+    // A chain's call answers no side entry: no side entry names it, but the claim, which v1.14's entries name and
+    // DB_CALLS' claimOutboxV114 answers, while a chain's claim answers the claims before v1.14 alone (SAFETY_CLAIM).
     for (const call of Object.keys(CHAIN_CALLS)) {
       expect([...stepCalls], `${call} is run first`).toContain(call);
-      expect([...sideCalls], `${call} is no side entry's call`).not.toContain(call);
+      expect(
+        runFirst.filter((step) => stepCallOf(step) === CHAIN_CALLS[call]).length,
+        `${call}: a step runs through the chain's call`,
+      ).toBeGreaterThan(0);
+      expect(sideEntriesOfChainCall(call), `${call} is no side entry's call`).toEqual([]);
+      if (call !== SAFETY_CLAIM.call)
+        expect([...sideCalls], `${call} is no side entry's call`).not.toContain(call);
     }
     // K-05 v1's own calls run the v1 steps of theirs, and no other step.
     const v1Calls = new Set(runFirst.filter(runsAtV1).map((step) => exchangeOf(step).call));
     for (const call of Object.keys(V1_CHAIN_CALLS)) {
       expect([...v1Calls], `${call} runs a v1 step first`).toContain(call);
-      expect([...sideCalls], `${call} is no side entry's call`).not.toContain(call);
+      expect(sideEntriesOfChainCall(call), `${call} is no side entry's call`).toEqual([]);
+      if (call !== SAFETY_CLAIM.call)
+        expect([...sideCalls], `${call} is no side entry's call`).not.toContain(call);
     }
     for (const step of runFirst) {
       const v1Call = V1_CHAIN_CALLS[exchangeOf(step).call];
       expect(stepCallOf(step) === v1Call, `${step}: through K-05 v1's own call`).toBe(runsAtV1(step));
     }
     for (const call of WRITERS) expect(Object.keys(DB_CALLS), call).toContain(call);
+    // The claim is the one call both lists name (SAFETY_CLAIM): every side entry of it is of v1.14, a safety claim
+    // with its sendClass, and runs through claimOutboxV114; every claim a chain runs first is of an earlier version,
+    // states no sendClass, and runs through the claim of its own version, never through v1.14's.
+    const sideClaims = sideEntries.filter((entry) => defOf(entry).call === SAFETY_CLAIM.call);
+    expect(sideClaims.length, "v1.14's claims").toBeGreaterThan(0);
+    for (const entry of sideClaims) {
+      expect(entry.version, entry.file).toBe(SAFETY_CLAIM.version);
+      expect(claimsBefore(entry), entry.file).toBe(false);
+    }
+    expect(callOf(SAFETY_CLAIM.call).run, "a v1.14 claim runs through db/repo's v1.14 claim").toBe(
+      claimOutboxV114,
+    );
+    const claimSteps = [...new Set(runFirst)].filter((step) => exchangeOf(step).call === SAFETY_CLAIM.call);
+    expect(claimSteps.filter(runsAtV1).length, "v1 claims run first").toBeGreaterThan(0);
+    expect(
+      claimSteps.filter((step) => !runsAtV1(step)).length,
+      "v1.1 and v1.2 claims run first",
+    ).toBeGreaterThan(0);
+    for (const step of claimSteps) {
+      expect(claimsBefore(entryOf(step)), `${step}: a claim before v1.14`).toBe(true);
+      expect(Object.hasOwn(exchangeOf(step).request, SAFETY_CLAIM.field), `${step}: no sendClass`).toBe(
+        false,
+      );
+      expect(stepCallOf(step).run, `${step}: through the claim of its own version`).toBe(
+        runsAtV1(step) ? claimOutbox : claimOutboxV12,
+      );
+    }
   });
 
   it("has a twin for every refused answer, and none for a refused request", () => {
@@ -2027,6 +2586,11 @@ describe("data-access database side: the versions with one, each entry selected 
       PARTY_BEFORE_BUSINESS,
       PARTY_HANDED_OVER,
       PARTY_ROLE_ENDED,
+      "claim-safety-past-live-safety-claim.json",
+      "claim-safety-past-routine-live-claim.json",
+      "claim-safety-past-planned-row.json",
+      "claim-safety-past-held-row.json",
+      PAST_TEN_NOTICES,
     ]);
     for (const file of Object.keys(NOTED_ROWS)) {
       expect(
@@ -2038,8 +2602,8 @@ describe("data-access database side: the versions with one, each entry selected 
         expect(exchangeOf(entry.file).given.after, entry.file).not.toContain(file);
     }
     // v1.6's practice: five rows, each named "<table> <id> (" with its values after it. S1-01's thread, which its note
-    // lists column by column, is the next test's, and v1.11's five notes, each row in the note's own words, are the
-    // tests' after it.
+    // lists column by column, is the next test's, v1.11's five notes, each row in the note's own words, are the
+    // tests' after it, and v1.14's five, each danger line and the ten notices, the tests' after those.
     const bundle = seedBundle();
     const file = PRACTICE;
     const note = must(exchangeOf(file).given.note, `${file}'s note`);
@@ -2282,7 +2846,259 @@ describe("data-access database side: the versions with one, each entry selected 
     expect(() => partyNoteProblems(note, [{ table: "threads", values: {} }])).toThrow("threads");
   });
 
-  it("writes before a refused exchange the rows its twin's note lists, as its own note says: v1.11's refuse-turn-party-caller-business, test owner 1's", () => {
+  it("writes the rows v1.14's five notes list: each danger line's turn and its one row, as its note lists them and as its claim's answer gives the row, and before claim-safety-past-ten-checked-rows's the ten routine notices and their turn", () => {
+    // Every accepted v1.14 exchange is a safety claim whose note lists its danger line (README "Fixtures", v1.14: "each
+    // note lists the two rows its database side writes itself before the claim").
+    const noting = sideAccepted
+      .filter((entry) => entry.version === SAFETY_CLAIM.version)
+      .map((entry) => entry.file);
+    expect(Object.keys(DANGER_LINES)).toEqual(noting);
+    for (const file of noting) {
+      const line = must(DANGER_LINES[file], `${file}'s danger line`);
+      const exchange = exchangeOf(file);
+      const note = must(exchange.given.note, `${file}'s note`);
+      const rows = dangerLineRows(line);
+      expect(dangerNoteProblems(note, line, rows), file).toEqual([]);
+      // Written last, after the chain and, for the ten notices, the rows its note lists before it.
+      const written = notedRowsOf(file);
+      expect(written.slice(-rows.length), file).toEqual(rows);
+      expect(written.length, file).toBe(
+        rows.length + (file === PAST_TEN_NOTICES ? NOTICES_TURN.count + 1 : 0),
+      );
+      // The line is committed on the claim's day, before the claim and after every exchange its chain runs first.
+      expect(line.at.slice(0, 11), `${file}: on the claim's day`).toBe(exchange.given.now.slice(0, 11));
+      expect(Date.parse(line.at), `${file}: before the claim`).toBeLessThan(Date.parse(exchange.given.now));
+      const chain = chainOf(file);
+      for (const step of chain.steps) {
+        expect(Date.parse(exchangeOf(step).given.now), `${file}: after ${step}`).toBeLessThanOrEqual(
+          Date.parse(line.at),
+        );
+      }
+      // The row is the claim's own: the request names its recipient with sendClass safety, and the answer claims it
+      // alone, from checked, one version on, with the row's person, business, channel, class, trace and final parts.
+      const { values } = must(rows[1], `${file}'s danger row`);
+      expect(
+        [exchange.request.recipientHandleId, exchange.request[SAFETY_CLAIM.field]],
+        `${file}: the request's recipient and class`,
+      ).toEqual([line.handleId, SAFETY_CLAIM.value]);
+      expect(exchange.outcome.claimed, `${file}: one row claimed`).toHaveLength(1);
+      const claimed = valueAt(exchange.outcome, "claimed.0") as Record<string, Json>;
+      expect(
+        [
+          claimed.outboxRowId,
+          claimed.version,
+          claimed.claimedFrom,
+          claimed.recipientHandleId,
+          claimed.recipientPersonId,
+          claimed.businessId,
+          claimed.bookingId,
+          claimed.openQuestionId,
+          claimed.channel,
+          claimed.sendClass,
+          claimed.versionsRead,
+          claimed.finalParts,
+          claimed.traceId,
+        ],
+        `${file}: the claimed row is the danger line's`,
+      ).toEqual([
+        values.id,
+        (values.version as number) + 1,
+        values.state,
+        values.recipient_handle_id,
+        values.recipient_person_id,
+        values.business_id,
+        values.booking_id,
+        values.open_question_id,
+        values.channel,
+        SAFETY_CLAIM.value,
+        values.versions_read,
+        values.final_parts,
+        values.trace_id,
+      ]);
+      // No seed the fixture names and no exchange its chain runs first holds the line: it is written here or nowhere.
+      // Its recipient, handle and person, is the seeds'.
+      const seen = new Set<string>();
+      const seeded = JSON.stringify(chain.seeds.flatMap((seed) => seedRows(seed, seen)));
+      const ranFirst = JSON.stringify(chain.steps.map((step) => exchangeOf(step)));
+      for (const id of [line.turnId, line.rowId, line.eventId, line.traceId]) {
+        expect(seeded, `${file}: no seed holds ${id}`).not.toContain(JSON.stringify(id));
+        expect(ranFirst, `${file}: no exchange run first names ${id}`).not.toContain(JSON.stringify(id));
+      }
+      for (const id of [line.handleId, line.personId]) {
+        expect(seeded, `${file}: a seed holds ${id}`).toContain(JSON.stringify(id));
+      }
+    }
+    // The ten notices and their turn, which claim-safety-past-ten-checked-rows's note lists before its danger line, in
+    // the note's own words and with its values.
+    const file = PAST_TEN_NOTICES;
+    const exchange = exchangeOf(file);
+    const note = must(exchange.given.note, `${file}'s note`);
+    const line = must(DANGER_LINES[file], `${file}'s danger line`);
+    const notices = noticeRows();
+    const { handleId, personId, businessId, channel, traceId, count } = NOTICES_TURN;
+    expect(notices.map((row) => row.table)).toEqual([
+      "turns",
+      ...Array.from({ length: count }, () => "outbox_rows"),
+    ]);
+    expect(notedRowsOf(file).slice(0, notices.length), "written first, in the note's order").toEqual(notices);
+    const listed = `${turnPhrase(NOTICES_TURN)} with its ten rows ${noticeIdOf(1)} to ${noticeIdOf(count)} (send class routine, ${channel}, to ${handleId} and ${personId} at ${businessId}, no booking, question or copy, no versions read), each checked at version 2 with a plan of formats text and one line, 'Notice N of ${String(count)}.' (role first; no question, page type or thread), and final parts of one words send of those words (no calendar file, option, link, fixed line or slot)`;
+    expect(note, file).toContain(
+      `this exchange's database side writes, before the claim and in this order: ${listed}; then Sam's danger line`,
+    );
+    expect(note.indexOf(listed), "the notices before the danger line").toBeLessThan(
+      note.indexOf(turnPhrase(line)),
+    );
+    expect(exchange.given.after, `${file}: no chain writes them`).toEqual([]);
+    expect(Date.parse(NOTICES_TURN.at), "committed before the danger line").toBeLessThan(Date.parse(line.at));
+    const plan = validatorOf(V1, "writePlan.request");
+    for (const [at, row] of notices.slice(1).entries()) {
+      const place = at + 1;
+      const { values } = row;
+      const words = noticeWordsOf(place);
+      expect(
+        [
+          values.id,
+          values.turn_id,
+          values.send_class,
+          values.channel,
+          values.recipient_handle_id,
+          values.recipient_person_id,
+          values.business_id,
+          values.booking_id,
+          values.open_question_id,
+          values.copy_of_row_id,
+          values.versions_read,
+          values.state,
+          values.version,
+          values.trace_id,
+        ],
+        `notice ${String(place)}`,
+      ).toEqual([
+        noticeIdOf(place),
+        NOTICES_TURN.turnId,
+        "routine",
+        channel,
+        handleId,
+        personId,
+        businessId,
+        null,
+        null,
+        null,
+        [],
+        "checked",
+        2,
+        traceId,
+      ]);
+      // Its plan and final parts are a plan K-05's writePlan takes (K-03 v1 rowPlan and finalParts), with the note's
+      // one line and its one words send, and nothing else.
+      expect(
+        errorsOf(plan, {
+          outboxRowId: values.id,
+          expectVersion: 1,
+          plan: values.plan,
+          finalParts: values.final_parts,
+        }),
+        `notice ${String(place)}: a plan writePlan takes`,
+      ).toEqual([]);
+      expect(valueAt(values.plan, "plan"), `notice ${String(place)}: its plan`).toEqual({
+        formats: ["text"],
+        lines: [{ role: "first", text: words }],
+        question: null,
+        pageType: null,
+        threadReplyTo: null,
+      });
+      expect(
+        [valueAt(values.final_parts, "sends"), valueAt(values.final_parts, "fixedLines")],
+        `notice ${String(place)}: its final parts`,
+      ).toEqual([[{ kind: "words", text: words, calendarFile: "none", options: [], link: null }], []]);
+      expect(valueAt(values.final_parts, "slotValues"), `notice ${String(place)}: no slot`).toEqual([]);
+    }
+    // The first notice is the routine row refuse-safety-claim-takes-routine-row's answer claims: the frozen fixture
+    // states its final parts, its trace and its place in commit order, and the danger line's place after the ten.
+    const taken = valueAt(
+      exchangeOf("invalid/refuse-safety-claim-takes-routine-row.json").outcome,
+      "claimed.0",
+    ) as Record<string, Json>;
+    const firstNotice = must(notices[1], "the first notice").values;
+    expect([taken.outboxRowId, taken.sendClass, taken.finalParts, taken.traceId, taken.commitSeq]).toEqual([
+      firstNotice.id,
+      firstNotice.send_class,
+      firstNotice.final_parts,
+      firstNotice.trace_id,
+      1,
+    ]);
+    expect(valueAt(exchange.outcome, "claimed.0.commitSeq"), "the danger line, after the ten").toBe(
+      count + 1,
+    );
+    expect(exchange.request.limit, "the limit the ten would fill").toBe(count);
+  });
+
+  it(
+    "writes a danger line's rows as db/repo's commitTurn and writePlan write Alex's first: after v1.1's commit and plan through db/repo, the tables hold that line's turn and row as dangerLineRows builds them, column for column",
+    SLOW,
+    async () => {
+      // claim-alex-safety's given runs v1.1's commit and plan of Alex's first line through db/repo, and not its claim.
+      const claim = "claim-alex-safety.json";
+      expect(chainOf(claim).steps).toEqual([FIRST_LINE_COMMIT, FIRST_LINE_PLAN]);
+      await given(claim);
+      const first = firstLine();
+      const turns = await db.sql<Row[]>`select * from turns where id = ${first.turnId}`;
+      const rows = await db.sql<Row[]>`select * from outbox_rows where id = ${first.rowId}`;
+      /** A row's columns that hold a value, a time as an answer gives it; commit_seq is the database's own. */
+      const stated = (row: Row): Row =>
+        Object.fromEntries(
+          Object.entries(row)
+            .filter(([column, value]) => value !== null && column !== "commit_seq")
+            .map(([column, value]) => [column, utcOf(value)]),
+        );
+      const [turn, row] = dangerLineRows(first);
+      expect(turns.map(stated), "the turn db/repo's commit wrote").toEqual([
+        stated(must(turn, "the first line's turn").values),
+      ]);
+      expect(rows.map(stated), "the row db/repo's commit and plan wrote").toEqual([
+        stated(must(row, "the first line's row").values),
+      ]);
+      // The first line's own rows are the two requests', with no id swapped.
+      expect(withIdsOf(exchangeOf(FIRST_LINE_COMMIT).request, first)).toEqual(
+        exchangeOf(FIRST_LINE_COMMIT).request,
+      );
+    },
+  );
+
+  it("has the v1.14 note check fire: another commit time, a row not yet checked, another fixture's line, a row with no turn, a note that lists no rows", () => {
+    const file = "claim-safety-past-held-row.json";
+    const line = must(DANGER_LINES[file], `${file}'s danger line`);
+    const note = must(exchangeOf(file).given.note, `${file}'s note`);
+    const rows = dangerLineRows(line);
+    const [turn, row] = [must(rows[0], "the turn"), must(rows[1], "the row")];
+    expect(dangerNoteProblems(note, line, rows)).toEqual([]);
+    const later = { ...line, at: "2026-11-08T01:31:01Z" };
+    expect(dangerNoteProblems(note, later, dangerLineRows(later))).toEqual([
+      '"the turn turn-sam-safety-0063 (handle-sam, event evt-sam-0063, trace trace-sam-0063, committed at 01:31:01Z)" is not listed',
+    ]);
+    const planned: SeedRow = { ...row, values: { ...row.values, state: "planned", version: 1 } };
+    expect(dangerNoteProblems(note, line, [turn, planned])).toEqual([
+      "the rows do not hold what the note says at row.2",
+      "the rows do not hold what the note says at row.3",
+    ]);
+    const routine: SeedRow = { ...row, values: { ...row.values, send_class: "routine" } };
+    expect(dangerNoteProblems(note, line, [turn, routine])).toEqual([
+      '"its one row out-sam-safety-0063 (send class routine, imessage, to handle-sam and person-sam at biz-lees-barbershop, no booking, question or copy, no versions read" is not listed',
+    ]);
+    const other = must(DANGER_LINES["claim-safety-past-planned-row.json"], "another fixture's line");
+    expect(dangerNoteProblems(note, other, dangerLineRows(other)).length).toBeGreaterThan(0);
+    expect(dangerNoteProblems(note, line, [row])).toEqual(["a danger line is a turn and its one outbox row"]);
+    expect(dangerNoteProblems("Limit 8 holds the row to 8am.", line, rows)).toHaveLength(5);
+    // The ten notices' note lists its danger line's row after the notices' own, as "the same": a note with no such
+    // row before it does not.
+    const ten = must(DANGER_LINES[PAST_TEN_NOTICES], `${PAST_TEN_NOTICES}'s danger line`);
+    const tenNote = must(exchangeOf(PAST_TEN_NOTICES).given.note, `${PAST_TEN_NOTICES}'s note`);
+    expect(tenNote).toContain(SAME_AS_NOTICES);
+    expect(note).not.toContain(SAME_AS_NOTICES);
+    expect(dangerNoteProblems(tenNote, ten, dangerLineRows(ten))).toEqual([]);
+  });
+
+  it("writes before a refused exchange the rows its twin's note lists, as its own note says: v1.11's refuse-turn-party-caller-business, test owner 1's, and v1.14's four refused claims, their twins' danger lines", () => {
     const shared: string[] = [];
     for (const [file, { twin }] of [...Object.entries(EXCHANGE_TWINS), ...Object.entries(REQUEST_TWINS)]) {
       expect(Object.hasOwn(NOTED_ROWS, file), `${file}: a refused exchange lists no rows of its own`).toBe(
@@ -2294,20 +3110,37 @@ describe("data-access database side: the versions with one, each entry selected 
       }
       shared.push(file);
       const note = must(exchangeOf(file).given.note, `${file}'s note`);
-      expect(note, file).toContain(
-        `as ${twin.replace(/\.json$/, "")} reads it, with its rows written as that fixture's note lists them`,
-      );
+      const twinName = twin.replace(/\.json$/, "");
+      if (Object.hasOwn(DANGER_LINES, twin)) {
+        // A v1.14 refused claim's note opens with its twin's name, whose claim it is with one fault: "<twin>'s safety
+        // claim made with no recipient", "<twin> answered with ..." (README "Fixtures", v1.14: "put right, each is its
+        // accepted twin's"), so its given is its twin's, the danger line its twin's note lists with it.
+        expect(
+          note.startsWith(`${twinName}'s `) || note.startsWith(`${twinName} answered with `),
+          `${file}: its note opens with its twin's claim`,
+        ).toBe(true);
+      } else {
+        expect(note, file).toContain(
+          `as ${twinName} reads it, with its rows written as that fixture's note lists them`,
+        );
+      }
       expect(notedRowsOf(file), file).toEqual(notedRowsOf(twin));
       expect(notedRowsOf(file).length, file).toBeGreaterThan(0);
     }
-    expect(shared).toEqual(["invalid/refuse-turn-party-caller-business.json"]);
+    expect(shared).toEqual([
+      "invalid/refuse-safety-claim-takes-routine-row.json",
+      "invalid/refuse-safety-claim-lists-held-row.json",
+      "invalid/refuse-turn-party-caller-business.json",
+      "invalid/refuse-claim-safety-no-recipient.json",
+      "invalid/refuse-claim-safety-other-class.json",
+    ]);
     // An accepted fixture's rows are its own note's, and a fixture whose note lists none has none.
     expect(notedRowsOf(PARTY_OF_TURN_1)).toEqual(testOwnerRows());
     expect(notedRowsOf("read-turn-party-one-role.json")).toEqual([]);
   });
 });
 
-describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10 and v1.11 gives its outcome through db/repo", () => {
+describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10, v1.11 and v1.14 gives its outcome through db/repo", () => {
   for (const entry of sideAccepted) {
     it(
       `${entry.file} (${entry.version}): in its role and on its side, db/repo answers the fixture's outcome`,
@@ -2318,6 +3151,7 @@ describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6,
         const version = answeredAt(entry, exchange);
         const before = WRITERS.includes(exchange.call) ? await written() : null;
         const marked = exchange.call === REPEAT.call ? await marks() : null;
+        const unclaimed = exchange.call === SAFETY_CLAIM.call ? await marks() : null;
         sent.length = 0;
         const answer = await runExchange(exchange);
         expect(answer).toEqual(expected);
@@ -2338,9 +3172,68 @@ describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6,
             [],
           );
         }
+        if (unclaimed !== null) {
+          // A v1.14 claim: the outbox holds the claims the answer gives, and every other row as it was (item 67).
+          expect(
+            claimProblems(unclaimed, await marks(), exchange, answer),
+            "what the outbox then holds",
+          ).toEqual([]);
+        }
       },
     );
   }
+
+  it(
+    "has the claim check fire: a claim the tables do not hold, an error that wrote, a routine row a safety claim's answer names, a row past the limit, a held row listed",
+    SLOW,
+    async () => {
+      const exchange = await given(PAST_TEN_NOTICES);
+      const unclaimed = await marks();
+      const answer = await runExchange(exchange);
+      const claimedNow = await marks();
+      expect(answer).toEqual(exchange.outcome);
+      expect(claimedNow, "the claim wrote").not.toEqual(unclaimed);
+      expect(claimProblems(unclaimed, claimedNow, exchange, answer)).toEqual([]);
+      const line = must(DANGER_LINES[PAST_TEN_NOTICES], "the danger line").rowId;
+      expect(claimProblems(unclaimed, unclaimed, exchange, answer)).toEqual([
+        `${line} is not sending at the answer's version`,
+        `${line}'s claim is not the answer's`,
+        `${line}'s part ${line}/1/1 is not the answer's`,
+      ]);
+      const transient = { error: "transient", sqlstate: "55P03" };
+      expect(claimProblems(unclaimed, unclaimed, exchange, transient)).toEqual([]);
+      expect(claimProblems(unclaimed, claimedNow, exchange, transient)).toEqual([
+        "an answer that claims nothing wrote",
+      ]);
+      // The refused answer, with Sam's first routine notice claimed too: the tables hold no such claim, and the
+      // notice is no safety row.
+      const refused = exchangeOf("invalid/refuse-safety-claim-takes-routine-row.json").outcome;
+      const notice = noticeIdOf(1);
+      expect(claimProblems(unclaimed, claimedNow, exchange, refused)).toEqual([
+        `${notice} is not sending at the answer's version`,
+        `${notice}, which a safety claim took, is of send class routine`,
+        `${notice}'s claim is not the answer's`,
+        `${notice}'s part ${notice}/1/1 is not the answer's`,
+      ]);
+      // An answer that names no row leaves the claim the tables hold unaccounted for; a limit the answer passes and a
+      // held row it lists are a safety claim's faults.
+      const none = { ...exchange.outcome, claimed: [] };
+      expect(claimProblems(unclaimed, claimedNow, exchange, none)).toEqual([
+        "a row the answer does not claim, a clock row or an entry changed",
+      ]);
+      const noRoom = { ...exchange, request: { ...exchange.request, limit: 0 } };
+      expect(claimProblems(unclaimed, claimedNow, noRoom, answer)).toEqual([
+        "1 rows are claimed, past the limit",
+      ]);
+      const listing = {
+        ...exchange.outcome,
+        passedHeld: [{ outboxRowId: notice, heldUntil: "2026-11-10T13:00:00Z" }],
+      };
+      expect(claimProblems(unclaimed, claimedNow, exchange, listing)).toEqual([
+        "a safety claim lists a held row",
+      ]);
+    },
+  );
 
   it(
     "has the mark check fire: a repeat or an error that wrote, a row, a stored time and a first delivery other than the answer's",
@@ -2419,7 +3312,7 @@ describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6,
   );
 });
 
-describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10 and v1.11 is refused by db/repo", () => {
+describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10, v1.11 and v1.14 is refused by db/repo", () => {
   for (const entry of sideRefused.filter((refused) => defOf(refused).part === "request")) {
     it(
       `${entry.file} (${entry.version}): db/repo refuses the request before any statement reaches the database`,
@@ -2502,8 +3395,13 @@ describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v
   for (const entry of sideRefused.filter(
     (refused) => defOf(refused).part === "exchange" && !Object.hasOwn(REQUEST_TWINS, refused.file),
   )) {
+    // A text and a mark answered as their twins write nothing. A claim answered as its twin writes its twin's claim,
+    // the danger line's alone (v1.14): the routine notice the refused answer claims and the held row it lists are
+    // left as they were.
+    const claims = defOf(entry).call === SAFETY_CLAIM.call;
+    const writes = claims ? "claims the rows that outcome gives and no other" : "writes nothing";
     it(
-      `${entry.file} (${entry.version}): in its own given db/repo answers its twin's outcome, never its own, and writes nothing`,
+      `${entry.file} (${entry.version}): in its own given db/repo answers its twin's outcome, never its own, and ${writes}`,
       SLOW,
       async () => {
         const twin = must(EXCHANGE_TWINS[entry.file], `${entry.file}'s twin`);
@@ -2513,6 +3411,7 @@ describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v
         const exchange = await given(entry.file);
         const before = await written();
         const marked = exchange.call === REPEAT.call ? await marks() : null;
+        const unclaimed = claims ? await marks() : null;
         sent.length = 0;
         const answer = await runExchange(exchange);
         expect(answer, "the twin's outcome").toEqual(exchangeOf(twin.twin).outcome);
@@ -2533,6 +3432,36 @@ describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v
             marked,
           );
           expect(markProblems(marked, after, exchange, answer), "what the outbox holds").toEqual([]);
+        }
+        if (unclaimed !== null) {
+          const after = await marks();
+          expect(claimProblems(unclaimed, after, exchange, answer), "what the outbox holds").toEqual([]);
+          // What the refused answer gives beside its twin's is not in the tables: a row it claims that the twin's
+          // does not is as it was, unclaimed, and a row it lists as passed held was never read, so it too is as it was.
+          const idOf = (row: Record<string, Json>): string => textOf(row.outboxRowId, "a row's id");
+          const twins = new Set((exchangeOf(twin.twin).outcome.claimed as Record<string, Json>[]).map(idOf));
+          const extra = [
+            ...(refused.outcome.claimed as Record<string, Json>[]),
+            ...(refused.outcome.passedHeld as Record<string, Json>[]),
+          ]
+            .map(idOf)
+            .filter((id) => !twins.has(id));
+          expect(extra.length, "the refused answer names a row its twin's does not").toBeGreaterThan(0);
+          for (const id of extra) {
+            const held = (state: Marks): unknown => ({
+              row: state.rows.filter((row) => row.id === id),
+              parts: state.parts.filter((part) => part.outbox_row_id === id),
+              claims: state.claims.filter((claim) => claim.outbox_row_id === id),
+            });
+            expect(
+              unclaimed.rows.filter((row) => row.id === id),
+              `${id} is a row`,
+            ).toHaveLength(1);
+            expect(held(after), `${id} is as it was`).toEqual(held(unclaimed));
+            expect(after.rows.find((row) => row.id === id)?.send_class, `${id} is of another class`).not.toBe(
+              SAFETY_CLAIM.value,
+            );
+          }
         }
       },
     );
@@ -2579,5 +3508,305 @@ describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v
       "db/repo answers the refused fixture as it stands",
       "the fault recipient.address is not where db/repo's answer differs",
     ]);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// v1.14's claim where no fixture shows it (the card's two lead notes, DL-698 and DL-761)
+
+/**
+ * Row S (T-1341; T-1353's security note c: "Row S's own case (a quick_reply outage row under a live claim) has no
+ * fixture"): the outage line to Sam, K-01's fixed line outage in the words db/repo's own row S test gives it
+ * (db/repo/outbox.int.test.ts), send class quick_reply, committed after his danger line of
+ * claim-safety-past-ten-checked-rows and sending under dispatcher-1's live claim, its one part pending; and after it a
+ * second danger line, so row S is ahead of a safety row in commit order. Every id, trace and time is an example.
+ */
+const ROW_S = {
+  rowId: "out-sam-outage-s",
+  turnId: "turn-sam-outage-s",
+  eventId: "evt-sam-outage-s",
+  traceId: "trace-sam-outage-s",
+  fixedLine: "outage",
+  words: "Rosie is down for a few minutes. If anyone is in danger, call 911.",
+  committedAt: "2026-11-09T15:00:02Z",
+  claimer: "dispatcher-1",
+  claimedAt: "2026-11-09T15:00:03Z",
+  lapsesAt: "2026-11-09T15:01:03Z",
+} as const;
+
+/** The danger line written after row S: Sam's next text reads as danger too. */
+const LINE_AFTER_ROW_S: DangerLine = {
+  turnId: "turn-sam-safety-0065",
+  handleId: "handle-sam",
+  personId: "person-sam",
+  eventId: "evt-sam-0065",
+  traceId: "trace-sam-0065",
+  rowId: "out-sam-safety-0065",
+  at: "2026-11-09T15:00:04Z",
+};
+
+/** Row S's four rows, as the tables' owner writes them: its turn, the row, its one part try and its live claim. */
+function rowSRows(): SeedRow[] {
+  const bundle = seedBundle();
+  const { handleId, personId, businessId, channel } = NOTICES_TURN;
+  const { rowId, turnId, eventId, traceId, fixedLine, words, committedAt, claimer, claimedAt, lapsesAt } =
+    ROW_S;
+  return [
+    {
+      table: "turns",
+      values: {
+        id: turnId,
+        handle_id: handleId,
+        event_ids: [eventId],
+        state: "committed",
+        bundle_hash: bundle.hash,
+        bundle_build: bundle.build,
+        trace_id: traceId,
+        joined_trace_ids: [],
+        tries: 1,
+        committed_at: committedAt,
+        version: 1,
+      },
+    },
+    {
+      table: "outbox_rows",
+      values: {
+        id: rowId,
+        turn_id: turnId,
+        recipient_handle_id: handleId,
+        recipient_person_id: personId,
+        business_id: businessId,
+        booking_id: null,
+        channel,
+        send_class: "quick_reply",
+        versions_read: [],
+        open_question_id: null,
+        plan: {
+          row: rowId,
+          channel,
+          copyOf: null,
+          plan: { formats: ["text"], lines: [], question: null, pageType: null, threadReplyTo: null },
+        },
+        final_parts: {
+          row: rowId,
+          channel,
+          sends: [{ kind: "words", text: words, calendarFile: "none", options: [], link: null }],
+          fixedLines: [fixedLine],
+          slotValues: [],
+          threadReplyTo: null,
+        },
+        copy_of_row_id: null,
+        state: "sending",
+        bundle_hash: bundle.hash,
+        bundle_build: bundle.build,
+        trace_id: traceId,
+        version: 3,
+      },
+    },
+    {
+      table: "outbox_parts",
+      values: {
+        outbox_row_id: rowId,
+        part_no: 1,
+        try_no: 1,
+        idempotency_key: `${rowId}/1/1`,
+        attempts: 1,
+        kind: "words",
+        state: "pending",
+        version: 1,
+      },
+    },
+    {
+      table: "outbox_claims",
+      values: {
+        outbox_row_id: rowId,
+        claimer,
+        claimed_at: claimedAt,
+        lapses_at: lapsesAt,
+        claim_no: 1,
+        first_try_at: claimedAt,
+        next_try_not_before: null,
+        version: 1,
+      },
+    },
+  ];
+}
+
+/** A claim's request and db/repo's answer as one claimOutbox.exchange of `version`: Ajv's errors, none when valid. */
+function claimExchangeErrors(version: string, exchange: Exchange, answer: unknown): string[] {
+  return errorsOf(validatorOf(version, `${SAFETY_CLAIM.call}.exchange`), { ...exchange, outcome: answer });
+}
+
+/** The outbox tables alone, which a claim writes: the rows, their part tries and their claims. */
+const outboxOf = ({ rows, parts, claims }: Marks): Pick<Marks, "rows" | "parts" | "claims"> => ({
+  rows,
+  parts,
+  claims,
+});
+
+describe("data-access database side: v1.14's claim where no fixture shows it, row S's case and a claim without sendClass", () => {
+  it(
+    "row S's case: a quick_reply outage row sending under a live claim, ahead of a safety row, is passed, never read and never locked by the safety claim, which takes the recipient's safety rows in commit order and no row of another class",
+    SLOW,
+    async () => {
+      // Sam's world of claim-safety-past-ten-checked-rows: ten checked routine notices, then his danger line. After
+      // them, as the tables' owner: row S, sending under a live claim, and a second danger line behind it.
+      const base = await given(PAST_TEN_NOTICES);
+      const first = must(DANGER_LINES[PAST_TEN_NOTICES], "Sam's first danger line");
+      await db.sql.begin(async (tx) => {
+        for (const row of [...rowSRows(), ...dangerLineRows(LINE_AFTER_ROW_S)]) {
+          await insertRow(tx, row.table, row.values);
+        }
+      });
+      const now = "2026-11-09T15:00:05Z";
+      const exchange: Exchange = {
+        ...base,
+        given: { ...base.given, now },
+        request: { ...base.request, claimer: "dispatcher-2", now },
+      };
+      expect(
+        [exchange.request.recipientHandleId, exchange.request[SAFETY_CLAIM.field], exchange.request.limit],
+        "a safety claim of Sam's rows, with limit 10",
+      ).toEqual([first.handleId, SAFETY_CLAIM.value, NOTICES_TURN.count]);
+      const before = await marks();
+      // In commit order: the ten notices, the first danger line, row S, the second danger line; row S's claim is live.
+      const order = before.rows
+        .map((row) => ({ id: String(row.id), seq: Number(row.commit_seq), sendClass: row.send_class }))
+        .sort((a, b) => a.seq - b.seq);
+      expect(order.map((row) => row.id).slice(NOTICES_TURN.count)).toEqual([
+        first.rowId,
+        ROW_S.rowId,
+        LINE_AFTER_ROW_S.rowId,
+      ]);
+      expect(order.slice(0, NOTICES_TURN.count).map((row) => row.sendClass)).toEqual(
+        Array.from({ length: NOTICES_TURN.count }, () => "routine"),
+      );
+      expect(Date.parse(ROW_S.lapsesAt), "row S's claim is live at the claim").toBeGreaterThan(
+        Date.parse(now),
+      );
+      // Another run holds every row of another class locked, row S with its part and its claim, as its renewal or its
+      // mark does while it runs. A walk that read or locked one of them would wait here, past the claim's bounded lock
+      // wait, and answer transient: the safety claim answers the two danger lines.
+      let answer: unknown = null;
+      sent.length = 0;
+      await db.sql.begin(async (tx) => {
+        const locked = await tx<{ id: string }[]>`
+          select id from outbox_rows where send_class <> ${SAFETY_CLAIM.value} order by id for update
+        `;
+        expect(locked.length, "the ten notices and row S").toBe(NOTICES_TURN.count + 1);
+        await tx`select outbox_row_id from outbox_claims where outbox_row_id = ${ROW_S.rowId} for update`;
+        await tx`select idempotency_key from outbox_parts where outbox_row_id = ${ROW_S.rowId} for update`;
+        answer = await runExchange(exchange);
+      });
+      const claimSent = [...sent];
+      const after = await marks();
+      expect(isError(answer), "the claim did not wait on a row of another class").toBe(false);
+      const claimed = (answer as { claimed: Record<string, Json>[]; passedHeld: Json[] }).claimed;
+      expect(
+        claimed.map((row) => [row.outboxRowId, row.sendClass, row.claimedFrom, row.version]),
+        "the safety rows, in commit order",
+      ).toEqual([
+        [first.rowId, SAFETY_CLAIM.value, "checked", 3],
+        [LINE_AFTER_ROW_S.rowId, SAFETY_CLAIM.value, "checked", 3],
+      ]);
+      const seqs = claimed.map((row) => Number(row.commitSeq));
+      const seqOf = (id: string): number => must(order.find((row) => row.id === id)).seq;
+      expect(seqs, "each claimed row's place in commit order").toEqual([
+        seqOf(first.rowId),
+        seqOf(LINE_AFTER_ROW_S.rowId),
+      ]);
+      expect(seqOf(ROW_S.rowId), "row S is between them").toBeGreaterThan(must(seqs[0]));
+      expect(seqOf(ROW_S.rowId), "row S is ahead of a safety row").toBeLessThan(must(seqs[1]));
+      // The answer is a v1.14 safety claim's: in v1.13's full form, passedHeld empty, valid as an exchange.
+      expect(answerErrors(SAFETY_CLAIM.version, exchange.call, answer)).toEqual([]);
+      expect(claimExchangeErrors(SAFETY_CLAIM.version, exchange, answer)).toEqual([]);
+      // The tables hold the two claims and nothing else changed: row S, its part and its claim, and the ten notices.
+      expect(claimProblems(before, after, exchange, answer)).toEqual([]);
+      const rowS = (state: Marks): unknown => ({
+        rows: state.rows.filter((row) => row.id === ROW_S.rowId),
+        parts: state.parts.filter((part) => part.outbox_row_id === ROW_S.rowId),
+        claims: state.claims.filter((claim) => claim.outbox_row_id === ROW_S.rowId),
+      });
+      expect(rowS(after), "row S as it was").toEqual(rowS(before));
+      expect(
+        after.rows.filter((row) => row.id === ROW_S.rowId).map((row) => [row.state, row.version]),
+        "row S still sending under its own claim",
+      ).toEqual([["sending", 3]]);
+      // Never read: each statement the claim sent that reads outbox_rows asks for one send class.
+      const reads = claimSent.filter((query) => /\bfrom\s+outbox_rows\b/i.test(query));
+      expect(reads.length, "the claim's read of outbox_rows").toBeGreaterThan(0);
+      for (const query of reads) expect(query, "a read of one send class").toMatch(/send_class\s*=\s*\$\d+/);
+    },
+  );
+
+  // DL-761: the routine claim the first text's send binds (T-1401) is a claim without sendClass through
+  // claimOutboxV114. In each of two worlds, a sweep that claims two recipients' rows (v1.2's
+  // claim-in-order-with-port) and a named recipient's claim (v1.1's claim-alex-safety), it answers as
+  // claimOutboxV113 does.
+  for (const file of ["claim-in-order-with-port.json", "claim-alex-safety.json"]) {
+    it(
+      `a claim without sendClass through claimOutboxV114 is answered in v1.13 item 64's form, with the rows and fields claimOutboxV113 gives and the same rows written: ${file}'s claim`,
+      SLOW,
+      async () => {
+        const entry = entryOf(file);
+        expect([entry.expect, defOf(entry).call, claimsBefore(entry)], file).toEqual([
+          "accept",
+          SAFETY_CLAIM.call,
+          true,
+        ]);
+        // First through v1.13's own claim, in the fixture's given.
+        const exchange = await given(file);
+        expect(Object.hasOwn(exchange.request, SAFETY_CLAIM.field), `${file}: no sendClass`).toBe(false);
+        const unclaimed = await marks();
+        const byV113 = await claimOutboxV113(job, structuredClone(exchange.request) as never);
+        const afterV113 = await marks();
+        // Then through v1.14's, in the same given, built again.
+        await given(file);
+        expect(outboxOf(await marks()), "the same world again").toEqual(outboxOf(unclaimed));
+        sent.length = 0;
+        const answer = await runExchange(exchange);
+        const after = await marks();
+        expect(sent.length, "the call reached the database").toBeGreaterThan(0);
+        expect(answer, "the answer claimOutboxV113 gives").toEqual(byV113);
+        expect(outboxOf(after), "the rows claimOutboxV113 writes").toEqual(outboxOf(afterV113));
+        expect(outboxOf(after), "the claim wrote").not.toEqual(outboxOf(unclaimed));
+        expect(claimProblems(unclaimed, after, exchange, answer), "what the outbox then holds").toEqual([]);
+        // v1.13 item 64's form: valid as v1.13's answer and exchange, and as v1.14's, each claimed row stating its
+        // claim, claimedFrom and port and item 64's emailPurpose and notAfter, null for a row with a turn.
+        const form = SAFETY_CLAIM.form;
+        expect(answerErrors(form, exchange.call, answer), `the answer, at ${form}`).toEqual([]);
+        expect(claimExchangeErrors(form, exchange, answer), `the exchange, at ${form}`).toEqual([]);
+        expect(claimExchangeErrors(SAFETY_CLAIM.version, exchange, answer), "the exchange, at v1.14").toEqual(
+          [],
+        );
+        const claimed = (answer as { claimed: Record<string, Json>[] }).claimed;
+        expect(claimed.length, `${file}: rows claimed`).toBeGreaterThan(0);
+        for (const row of claimed) {
+          for (const field of ["claim", "claimedFrom", PORT.field, "emailPurpose", "notAfter"]) {
+            expect(Object.hasOwn(row, field), `${textOf(row.outboxRowId, "a row")}: ${field} stated`).toBe(
+              true,
+            );
+          }
+          expect([row.emailPurpose, row.notAfter]).toEqual([null, null]);
+        }
+        // The same rows and fields: the fixture's own outcome (a v1.1 claim's with each row's port, as v1.2 answers
+        // it), with item 64's two fields on each claimed row and nothing else changed.
+        const stated = addsPort(entry, exchange) ? withPorts(exchange.outcome) : exchange.outcome;
+        expect(answer, "the fixture's outcome, with item 64's fields").toEqual({
+          ...stated,
+          claimed: (stated.claimed as Record<string, Json>[]).map((row) => ({
+            ...row,
+            emailPurpose: null,
+            notAfter: null,
+          })),
+        });
+      },
+    );
+  }
+
+  it("runs the two cases through DB_CALLS' claim, db/repo's claimOutboxV114, as every v1.14 claim runs", () => {
+    expect(callOf(SAFETY_CLAIM.call).run).toBe(claimOutboxV114);
+    expect(SAFETY_CLAIM.form, "the form a claim without sendClass is answered in").toBe("v1.13");
+    expect(isBefore(SAFETY_CLAIM.form, SAFETY_CLAIM.version)).toBe(true);
   });
 });
