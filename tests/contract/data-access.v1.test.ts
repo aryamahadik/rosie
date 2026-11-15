@@ -75,7 +75,7 @@ const ID_BASE = "https://rosie.invalid/contracts/";
 
 /**
  * The versions this file writes part 2's proofs and the side list for; a later minor version's QA task adds its own
- * (v1.12's and v1.13's, T-1292, have not; v1.14's has, T-1355).
+ * (v1.12's task and v1.13's, T-1292, have not yet; v1.14's has, T-1355).
  */
 const WRITTEN_FOR = [
   "v1",
