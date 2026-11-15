@@ -223,11 +223,17 @@ const keyOfBundle = (bundleId: BundleId): string => `${bundleId.hash}/${String(b
 
 /**
  * One reader per bundle id (the top of this file): the reader kept for the bundle, else a build of this caller's own,
- * kept once it has finished unless another caller's finished first. A build that rejects keeps nothing.
+ * kept once it has finished unless another caller's finished first. A build that rejects keeps nothing. An id that is
+ * not K-01's (a 64-hex hash and a build from 1) is refused before anything is looked up or read.
  */
-function onePerBundle<T>(build: (bundleId: BundleId) => Promise<T>): (bundleId: BundleId) => Promise<T> {
+function onePerBundle<T>(
+  name: ModelReaderName,
+  build: (bundleId: BundleId) => Promise<T>,
+): (bundleId: BundleId) => Promise<T> {
   const kept = new Map<string, T>();
-  return async (bundleId) => {
+  return async (asked) => {
+    const bundleId = bundleIdOf(asked);
+    if (bundleId === null) throw new ModelReaderBundleError(name, "badBundleId", null);
     const key = keyOfBundle(bundleId);
     const known = kept.get(key);
     if (known !== undefined) return known;
@@ -253,9 +259,11 @@ function modelReaders(part: BoundModelsPart): ModelReaderInputs {
   });
 
   /** Reads the bundle's manifest, and with `withFlows` every flow graph it lists, and takes from them what a reader needs. */
-  const read = async (name: ModelReaderName, asked: BundleId, withFlows: boolean): Promise<BundleParts> => {
-    const bundleId = bundleIdOf(asked);
-    if (bundleId === null) throw new ModelReaderBundleError(name, "badBundleId", null);
+  const read = async (
+    name: ModelReaderName,
+    bundleId: BundleId,
+    withFlows: boolean,
+  ): Promise<BundleParts> => {
     // The actor's BUNDLES KV first, read from the env now; PostgreSQL's copy on a miss and where no KV is bound.
     const reader = new BundleReader(registry, part.kv());
     const flows: Partial<Record<FlowLetter, CacheFlow>> = {};
@@ -291,7 +299,7 @@ function modelReaders(part: BoundModelsPart): ModelReaderInputs {
   };
 
   return {
-    safetyReaders: onePerBundle(async (asked) => {
+    safetyReaders: onePerBundle("safetyRead", async (asked) => {
       const { bundleId, models, cache } = await read("safetyRead", asked, false);
       return createSafetyReader({
         bundle: { bundleId, models },
@@ -300,7 +308,7 @@ function modelReaders(part: BoundModelsPart): ModelReaderInputs {
         fetch: part.fetch,
       });
     }),
-    deciders: onePerBundle(async (asked) => {
+    deciders: onePerBundle("decide", async (asked) => {
       const { bundleId, models, policy, cache } = await read("decide", asked, true);
       return createDecider({
         // The policy as the manifest writes it: the router refuses, before any route, one that is not K-01 v1's.
@@ -310,7 +318,7 @@ function modelReaders(part: BoundModelsPart): ModelReaderInputs {
         fetch: part.fetch,
       });
     }),
-    composers: onePerBundle(async (asked) => {
+    composers: onePerBundle("composer", async (asked) => {
       const { bundleId, models, cache } = await read("composer", asked, false);
       return createComposer({
         bundle: { bundleId, models },
