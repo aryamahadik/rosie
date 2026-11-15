@@ -91,6 +91,12 @@ export const RIG_FILES = Object.freeze([
     test: "runtime/src/wiring/staging/send.worker.test.ts",
     seed: "runtime/src/wiring/staging/send.seed.ts",
   },
+  // P6c (T-1306): RootOptions.copies.
+  {
+    key: "COPIES",
+    test: "runtime/src/wiring/staging/copies.worker.test.ts",
+    seed: "runtime/src/wiring/staging/copies.seed.ts",
+  },
 ]);
 
 // ADR-014 section 2's wrong logins, for T-1254's file only (the guard's refusals, piece 6), each behind a pool binding
