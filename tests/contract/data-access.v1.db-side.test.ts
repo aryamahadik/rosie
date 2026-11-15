@@ -1,8 +1,8 @@
-// Contract test for K-05, the data-access calls: the database side of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9 and v1.10
-// (T-1169; T-1199 for v1.6; T-1214 for v1.7; T-1218 for v1.8; T-1232 for v1.9; T-1260 for v1.10, the D-017 path
-// audit's Q1; DL-348, DL-373, DL-398, DL-444, DL-456, DL-474, DL-506, DL-760, DL-766; contracts/data-access/README.md
-// sections "v1.3", "v1.4", "v1.6", "v1.7", "v1.8", "v1.9" and "v1.10", their "Consumers of" lists, "Fixtures", and
-// "Producers and consumers").
+// Contract test for K-05, the data-access calls: the database side of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10 and
+// v1.11 (T-1169; T-1199 for v1.6; T-1214 for v1.7; T-1218 for v1.8; T-1232 for v1.9; T-1260 for v1.10, the D-017 path
+// audit's Q1; T-1270 for v1.11; DL-348, DL-373, DL-398, DL-444, DL-456, DL-474, DL-506, DL-511, DL-760, DL-766,
+// DL-775; contracts/data-access/README.md sections "v1.3", "v1.4", "v1.6", "v1.7", "v1.8", "v1.9", "v1.10" and
+// "v1.11", their "Consumers of" lists, "Fixtures", and "Producers and consumers").
 //
 // The fixture part, data-access.v1.test.ts, checks every fixture against the schema of its version. This part is the
 // producer's side (C-152) for the versions whose calls the database engineer built: v1.3's three turn-face reads
@@ -14,25 +14,32 @@
 // fromContact and bookingId, read from K-29's consents and the turn that wrote the row; README item 47), v1.9's
 // markPart (T-1227, db/repo/outbox.ts markPartV12: a delivery receipt that repeats a recorded delivery says what it
 // repeats, repeatedDelivery, whether that delivery was the row's first and when, read from the delivered_at of the
-// row's part tries with nothing written, and null on every other answer; README item 48: REPEAT, MARKS) and v1.10's
+// row's part tries with nothing written, and null on every other answer; README item 48: REPEAT, MARKS), v1.10's
 // three reads on the runtime side (T-1258, db/repo/arming-reads.ts: readQuestionFacts, the facts the clock arming's
 // due rule reads about one open question, and readHandle, a handle's kind and address by its id; T-1259,
-// db/repo/threads.ts: readChatHandle, the phone handle a Linq chat id names, or none; README items 49 to 51). v1.5 adds
-// no database call (README "v1.5": rowReader is the consumers' mapping), so it has no database side. Every entry of
+// db/repo/threads.ts: readChatHandle, the phone handle a Linq chat id names, or none; README items 49 to 51) and
+// v1.11's party read on the runtime side (T-1269, db/repo/turn-party.ts: readTurnParty, the handle's party for a turn,
+// the handle's id, the one business its people may act for or none, the person and that business's zone, or
+// businessUndecided with its reason where the rows give no one business; README item 52). v1.5 adds no database call
+// (README "v1.5": rowReader is the consumers' mapping), so it has no database side. Every entry of
 // fixtures/index.json whose version is one of DB_SIDE_VERSIONS runs here, selected by its version, never by a pinned
 // list or count (DL-124, DL-125), against local PostgreSQL with every migration applied to a fresh schema
 // (db/repo/test-db.ts), in a database of this file's own, so a claim in a chain never meets another run's lock on the
 // same recipient (an advisory lock is per database; T-1251):
 //   - each accepted exchange: its given is loaded (its k04Seeds and partSeeds, each with its own after chain, and the
 //     exchanges its after chain names, run first through db/repo, each answering its own fixture's outcome, a call no
-//     side entry names through CHAIN_CALLS and a v1 claim through K-05 v1's own claimOutbox, V1_CHAIN_CALLS, with the
-//     saved-time clock row a held reserve gets, which db/repo's reserve does not write yet: SAVED_TIME; then the rows its
-//     note says its database side writes itself, where no frozen seed holds them: NOTED_ROWS, the practice's five rows
-//     and, before read-chat-handle-sam, S1-01's thread, which K-09 v1.5's turn 1 commit writes and no K-05 exchange
-//     does); then its request goes through the db/repo call it names, in the role and on the side the README gives that
-//     call (items 28, 34 to 43, 46, 47 and 49 to 51; commitTurn per write, as rosie_job). The answer is the fixture's
-//     outcome, and the answer and the exchange that holds it are valid against the schema of the entry's own version (a
-//     v1.10 read's notFound, and a handle or a chat no row holds, among them), a v1.8 sendState answer against
+//     side entry names through CHAIN_CALLS, the gateway's handleSealingKey before read-turn-party-first-text under a
+//     wrapping key made for this run among them, and a v1 claim through K-05 v1's own claimOutbox, V1_CHAIN_CALLS, with
+//     the saved-time clock row a held reserve gets, which db/repo's reserve does not write yet: SAVED_TIME; then the
+//     rows its note says its database side writes itself, where no frozen seed holds them: NOTED_ROWS, the practice's
+//     five rows, before read-chat-handle-sam S1-01's thread, which K-09 v1.5's turn 1 commit writes and no K-05 exchange
+//     does, and before five v1.11 reads the rows their notes list, PARTY_NOTES: test owner 1's as T-1148's
+//     SKELETON_ROWS, the second company and its business, the two companies with no business yet, Hugo P.'s person and
+//     owner role, and Sam's ended owner role); then its request goes through the db/repo call it names, in the role and
+//     on the side the README gives that call (items 28, 34 to 43, 46, 47 and 49 to 52; commitTurn per write, as
+//     rosie_job). The answer is the fixture's outcome, and the answer and the exchange that holds it are valid against
+//     the schema of the entry's own version (a v1.10 read's notFound, a handle or a chat no row holds, and v1.11's
+//     unknown handle and its undecided business, an error, among them), a v1.8 sendState answer against
 //     sendState.v1dot8Response, which states fromContact and bookingId always (CONSENT_SOURCE). For a call that writes
 //     (WRITERS: v1.7's openChatOnText), the tables then hold what the answer gives: the row as the call leaves it and
 //     the one entry it appends, or nothing written. A v1.9 markPart answer is judged by markPart.v1dot9Response, which
@@ -48,15 +55,18 @@
 //     repeatedDelivery null and nothing else changed (REPEAT: none of them repeats a delivery), valid at v1.9;
 //   - each refused request: the db/repo call refuses it before any statement reaches the database, so nothing is read or
 //     written; a refused request its fixture holds in an exchange (REQUEST_TWINS: v1.10's
-//     refuse-question-facts-caller-business, a facts request naming a business beside the question) is refused the same
-//     way in its own given, its twin's but for its note, and with its one fault taken out, its twin's request, db/repo
-//     answers it the outcome the two fixtures share;
+//     refuse-question-facts-caller-business, a facts request naming a business beside the question, and v1.11's
+//     refuse-turn-party-caller-business, a party request naming the business it wants beside the handle) is refused the
+//     same way in its own given, its twin's but for its note, with the rows its twin's note lists written before it
+//     (notedRowsOf), and with its one fault taken out, its twin's request, db/repo answers it the outcome the two
+//     fixtures share;
 //   - each refused answer (its definition a call's response, v1.6's readOutboxRow.v1dot6Response, v1.8's
-//     sendState.v1dot8Response or v1.9's markPart.v1dot9Response): in the state of the accepted exchange that answers
-//     the same read or mark (its twin), db/repo's answer is valid against the refused entry's own definition, at the
-//     version db/repo answers the twin, which refuses the fixture too, and it differs from the refused fixture only at
-//     the fault the fixture carries (and at businessSensitive alone where db/repo answers an earlier twin as v1.6): the
-//     repo answers it put right, never as it stands;
+//     sendState.v1dot8Response, v1.9's markPart.v1dot9Response, or a call's errors, v1.11's readTurnParty.errors, which
+//     refuses an undecided business answered with the businesses found): in the state of the accepted exchange that
+//     answers the same read or mark (its twin), db/repo's answer is valid against the refused entry's own definition,
+//     at the version db/repo answers the twin, which refuses the fixture too, and it differs from the refused fixture
+//     only at the fault the fixture carries (and at businessSensitive alone where db/repo answers an earlier twin as
+//     v1.6): the repo answers it put right, never as it stands;
 //   - each refused exchange whose fault is its outcome (EXCHANGE_TWINS: v1.7's refuse-open-chat-stopped-number, v1.9's
 //     refuse-mark-delivered-repeat-null): in its own given, its twin's but for its note, db/repo answers its request
 //     with the twin's outcome, which differs from the refused one only at its fault, the exchange with that answer is
@@ -71,11 +81,14 @@
 // never-delivered rows default 92 orders, the threads its cases add beside the seeds') and every statement each read
 // sends: its tables and columns, the question's own business named beside each key, no visit's address, no message's
 // words and no column of sealing_keys, and one read-only transaction per read (db/repo/arming-reads.int.test.ts,
-// T-1258; db/repo/threads-chat-handle.int.test.ts, T-1259).
+// T-1258; db/repo/threads-chat-handle.int.test.ts, T-1259), and for v1.11's read the cases no v1.11 fixture shows (two
+// people on one handle, a live role beside a company with no business yet, two reasons at once, a kind that is not the
+// stored handle's), every statement it sends and that nothing is written (db/repo/turn-party.int.test.ts, T-1269).
 //
 // It needs PostgreSQL: `npm run db:up` locally (DATABASE_URL, else the local Docker database when CI is unset), and the
 // merge check's service database (DATABASE_URL) in CI.
 
+import { randomBytes } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { isDeepStrictEqual } from "node:util";
@@ -88,6 +101,7 @@ import { readHandle, readQuestionFacts } from "../../db/repo/arming-reads";
 import { openChatOnText } from "../../db/repo/chat-open";
 import { armClock } from "../../db/repo/clocks";
 import { commitTurn } from "../../db/repo/commit-turn";
+import { handleSealingKey } from "../../db/repo/handle-keys";
 import { claimOutbox, claimOutboxV12, markPartV12, markRowV12, writePlan } from "../../db/repo/outbox";
 import { reserve } from "../../db/repo/reservations";
 import {
@@ -104,6 +118,8 @@ import { sendState } from "../../db/repo/send-state";
 import { createTestDatabase, type TestDatabase } from "../../db/repo/test-db";
 import { readChatHandle } from "../../db/repo/threads";
 import { readFixedLineFacts, readOpenHolds, readOutboxRow } from "../../db/repo/turn-face-reads";
+import { readTurnParty } from "../../db/repo/turn-party";
+import { SKELETON_ROWS } from "../../db/seeds/skeleton";
 import { CONTRACTS_ROOT, REPO_ROOT, type FixtureEntry } from "./_harness";
 
 type Db = Sql | Tx;
@@ -124,10 +140,11 @@ const SLOW = { timeout: 60_000 };
 
 /**
  * The versions with a database side here: v1.3 (T-1138), v1.4 (T-1161), v1.6 (T-1197), v1.7 (T-1212), v1.8 (T-1216),
- * v1.9 (T-1227) and v1.10 (T-1258, T-1259). v1 to v1.2's database sides are tasks of their own (README: T-116, T-478),
- * and v1.5 has none. v1.11 on join with their own QA tasks (README "Consumers of v1.11": "after v1.10's task").
+ * v1.9 (T-1227), v1.10 (T-1258, T-1259) and v1.11 (T-1269). v1 to v1.2's database sides are tasks of their own (README:
+ * T-116, T-478), and v1.5 has none. v1.12 on join with their own QA tasks (README "Consumers of v1.12": "after the
+ * database engineer's reads").
  */
-const DB_SIDE_VERSIONS = ["v1.3", "v1.4", "v1.6", "v1.7", "v1.8", "v1.9", "v1.10"];
+const DB_SIDE_VERSIONS = ["v1.3", "v1.4", "v1.6", "v1.7", "v1.8", "v1.9", "v1.10", "v1.11"];
 
 interface Given {
   k04Seeds: string[];
@@ -199,10 +216,18 @@ function defOf(entry: FixtureEntry): { call: string; part: string } {
  * The parts of a definition that name an answer: a call's response; v1.6's readOutboxRow.v1dot6Response, the answer a
  * v1.6 call gives (README item 45), which refuses refuse-outbox-row-switch-left-out; v1.8's
  * sendState.v1dot8Response, the answer a v1.8 call gives (item 47), which refuses refuse-send-state-yes-source-left-out
- * and refuse-send-state-booking-left-out; and v1.9's markPart.v1dot9Response, the answer a v1.9 call gives (item 48),
- * which refuses refuse-mark-repeat-delivery-left-out.
+ * and refuse-send-state-booking-left-out; v1.9's markPart.v1dot9Response, the answer a v1.9 call gives (item 48),
+ * which refuses refuse-mark-repeat-delivery-left-out; and a call's errors, an answer too (an exchange's outcome is its
+ * call's response or one of its errors): v1.11's readTurnParty.errors (item 52) refuses
+ * refuse-turn-party-undecided-names-businesses, an undecided business answered with the businesses found.
  */
-const ANSWER_PARTS: readonly string[] = ["response", "v1dot6Response", "v1dot8Response", "v1dot9Response"];
+const ANSWER_PARTS: readonly string[] = [
+  "response",
+  "v1dot6Response",
+  "v1dot8Response",
+  "v1dot9Response",
+  "errors",
+];
 const isAnswerDef = (entry: FixtureEntry): boolean => ANSWER_PARTS.includes(defOf(entry).part);
 
 /** A version's major and minor number: v1.3 is [1, 3]. */
@@ -418,17 +443,20 @@ interface DbCall {
 const byBusiness = (request: Record<string, Json>): Role => (request.businessId === null ? "job" : "app");
 
 /**
- * The calls v1.3, v1.4, v1.7 and v1.10 add, the calls v1.8 and v1.9 change, and the commit their chains run: items 34
- * to 36 (v1.3), 37 to 43 (v1.4), 46 (v1.7), 47 (v1.8), 48 (v1.9) and 49 to 51 (v1.10), each in the role its row of the
- * README's table names; commitTurn per write, on the runtime side as rosie_job (README "Scope"). v1.6 adds no call:
- * businessSensitive is readOutboxRow's own (item 45, in item 35's transaction). openChatOnText runs on the runtime
- * side, as rosie_job with no business scope (item 46's table: phones and handles are scoped none), and so does
- * sendState, item 47's read inside item 28's read-only transaction (README "Consumers of v1.8"; v1.2 default 25).
- * markPart is the dispatcher's markPartV12, which answers as v1.9 does (T-1227), item 48 inside item 15's one
+ * The calls v1.3, v1.4, v1.7, v1.10 and v1.11 add, the calls v1.8 and v1.9 change, and the commit their chains run:
+ * items 34 to 36 (v1.3), 37 to 43 (v1.4), 46 (v1.7), 47 (v1.8), 48 (v1.9), 49 to 51 (v1.10) and 52 (v1.11), each in the
+ * role its row of the README's table names; commitTurn per write, on the runtime side as rosie_job (README "Scope").
+ * v1.6 adds no call: businessSensitive is readOutboxRow's own (item 45, in item 35's transaction). openChatOnText runs
+ * on the runtime side, as rosie_job with no business scope (item 46's table: phones and handles are scoped none), and
+ * so does sendState, item 47's read inside item 28's read-only transaction (README "Consumers of v1.8"; v1.2 default
+ * 25). markPart is the dispatcher's markPartV12, which answers as v1.9 does (T-1227), item 48 inside item 15's one
  * transaction as rosie_job with no business scope (README "Consumers of v1.9"); the v1.2 marks a chain runs first go
  * through it too (REPEAT). v1.10's three reads, items 49 to 51, run on the runtime side as rosie_job with no business
  * scope (README "The calls v1.10 adds": the receipt path and the clock arming work across businesses by handle, and
  * handles and threads are tables only rosie_job reads); each takes its request alone, and no time from its caller.
+ * v1.11's readTurnParty, item 52, runs the same way, on the runtime side as rosie_job with no business scope (README
+ * "The call v1.11 adds": the read decides which business a turn runs under, so it runs before there is a business
+ * scope, and handles and person_handles are tables only rosie_job reads), with its request alone.
  */
 const DB_CALLS: Readonly<Record<string, DbCall>> = {
   commitTurn: { role: () => "job", run: commitTurn },
@@ -448,6 +476,21 @@ const DB_CALLS: Readonly<Record<string, DbCall>> = {
   readQuestionFacts: { role: () => "job", run: readQuestionFacts },
   readHandle: { role: () => "job", run: readHandle },
   readChatHandle: { role: () => "job", run: readChatHandle },
+  readTurnParty: { role: () => "job", run: readTurnParty },
+};
+
+/** The one secret name K-05's fixtures name for a handle's key (handle-key-first-sight.json's wrappingKeyName). */
+const WRAPPING_KEY_NAME = "SEALING_WRAP_KEY";
+
+/**
+ * The wrapping key a chain's handleSealingKey wraps a new handle's key under (K-05 v1.2 item 29: the request names the
+ * secret, and the caller's resolver gives its value): made for this run, random, never a real key and never read from
+ * the environment, as db/repo/turn-party.int.test.ts makes its own. The resolver answers it for that one name alone.
+ */
+const RUN_WRAPPING_KEY = new Uint8Array(randomBytes(32));
+const WRAPPING_KEYS = {
+  resolve: (name: string): Uint8Array | undefined =>
+    name === WRAPPING_KEY_NAME ? RUN_WRAPPING_KEY : undefined,
 };
 
 /**
@@ -461,7 +504,11 @@ const DB_CALLS: Readonly<Record<string, DbCall>> = {
  * v1 claim runs through K-05 v1's own (V1_CHAIN_CALLS). A7-03's chain, before every v1.9 exchange ("Consumers of v1.9":
  * "its chains running v1's commitTurn and v1.2's plan, claim and marks"), runs the plan and v1.2's claim the same way,
  * and before the poll goes the arming of the question's clock at the words' receipt (arm-clock-a7-03-after-4006: v1
- * item 5), armClock on the runtime side as rosie_job.
+ * item 5), armClock on the runtime side as rosie_job. And before read-turn-party-first-text (README "Fixtures", v1.11:
+ * "a number's first text after v1.2's handle-key-first-sight") goes the gateway's handleSealingKey, which writes the
+ * number's handle, its person with no name yet and their link at receipt (v1.2 item 29), on the runtime side as
+ * rosie_job, under this run's wrapping key (WRAPPING_KEYS); its answer is the call's outcome, compared with the
+ * fixture's, and the data key it hands back beside the answer is left unused.
  */
 const CHAIN_CALLS: Readonly<Record<string, DbCall>> = {
   reserve: { role: () => "app", run: reserve },
@@ -469,6 +516,11 @@ const CHAIN_CALLS: Readonly<Record<string, DbCall>> = {
   claimOutbox: { role: () => "job", run: claimOutboxV12 },
   markRow: { role: () => "job", run: markRowV12 },
   armClock: { role: () => "job", run: armClock },
+  handleSealingKey: {
+    role: () => "job",
+    run: async (sql, request, options) =>
+      (await handleSealingKey(sql, WRAPPING_KEYS, request, options)).outcome,
+  },
 };
 
 /**
@@ -594,6 +646,20 @@ const RESPONSE_TWINS: Readonly<Record<string, { twin: string; part?: string; fau
     twin: "read-chat-handle-alex.json",
     faults: ["handleId", "handle.kind", "handle.address"],
   },
+  // v1.11: each is its twin's outcome, put right (README "Consumers of v1.11"); the first is refused by its call's
+  // errors, an undecided business that names the businesses it found
+  "invalid/refuse-turn-party-undecided-names-businesses.json": {
+    twin: "read-turn-party-several-businesses.json",
+    faults: ["businessIds"],
+  },
+  "invalid/refuse-turn-party-business-zone-null.json": {
+    twin: "read-turn-party-test-owner-1.json",
+    faults: ["zone"],
+  },
+  "invalid/refuse-turn-party-no-business-zone-utc.json": {
+    twin: "read-turn-party-first-text.json",
+    faults: ["zone"],
+  },
 };
 
 /**
@@ -629,6 +695,13 @@ const REQUEST_TWINS: Readonly<Record<string, { twin: string; faults: string[] }>
   // (README item 49; "Consumers of v1.10": twin read-question-facts-s1-02, its request)
   "invalid/refuse-question-facts-caller-business.json": {
     twin: "read-question-facts-s1-02.json",
+    faults: ["businessId"],
+  },
+  // v1.11: a party request naming the business it wants the turn to run under beside the handle, which the read takes
+  // from the rows (README item 52; "Consumers of v1.11": twin read-turn-party-test-owner-1, its request); its given's
+  // rows are its twin's, written before it (notedRowsOf)
+  "invalid/refuse-turn-party-caller-business.json": {
+    twin: "read-turn-party-test-owner-1.json",
     faults: ["businessId"],
   },
 };
@@ -855,11 +928,183 @@ function chatThreadRows(): SeedRow[] {
   ];
 }
 
+/** v1.11's turn 1 party, whose note lists test owner 1's five rows (README "Fixtures", v1.11). */
+const PARTY_OF_TURN_1 = "read-turn-party-test-owner-1.json";
+/** Sam with no role and the two companies of his S1-04 answer, each with its business: its note lists the second. */
+const PARTY_TWO_COMPANIES = "read-turn-party-several-companies.json";
+/** The same two companies before S1-09, with no business yet: its note lists Sam's rows and both companies. */
+const PARTY_BEFORE_BUSINESS = "read-turn-party-sign-up-before-business.json";
+/** S11-100's hand-over to Hugo P.: its note lists Hugo's person and his live owner role. */
+const PARTY_HANDED_OVER = "read-turn-party-handed-over.json";
+/** The same hand-over made on papers, before Hugo confirms: its note lists Sam's ended owner role. */
+const PARTY_ROLE_ENDED = "read-turn-party-owner-role-ended.json";
+/** K-04's seed that holds the barbershop's business head, which test owner 1's note has loaded first. */
+const BUSINESS_HEAD_SEED = "seed-business-head.json";
+/** K-23's seed, which holds Sam's second company and its business (the note: "as K-23's ... holds it"). */
+const TWO_KINDS_SEED = "business-setup/seed-company-two-kinds.json";
+
+/**
+ * read-turn-party-test-owner-1.json's five rows, in its note's order (README "Fixtures", v1.11: "No frozen seed holds
+ * test owner 1 without K-04's three owner roles"): the rows of T-1148's db/seeds/skeleton.ts, "as that seed writes
+ * them (its SKELETON_ROWS)", taken from that seed's own list, so this test and the seed cannot drift: Sam, his phone
+ * handle, their link, the barbershop's company and its one kind of work, which the read does not read. The seed's
+ * sixth row, the barbershop's business head, is K-04's seed-business-head.json's, value for value, which the fixture's
+ * given loads first, so it is not written again. The note states the person's version, 1, which the seed leaves to the
+ * column's default.
+ */
+function testOwnerRows(): SeedRow[] {
+  const { persons, handles, person_handles: links, companies, company_kinds: kinds } = SKELETON_ROWS;
+  return [
+    ...persons.map((row): SeedRow => ({ table: "persons", values: { ...row, version: 1 } })),
+    ...handles.map((row): SeedRow => ({ table: "handles", values: { ...row } })),
+    ...links.map((row): SeedRow => ({ table: "person_handles", values: { ...row } })),
+    ...companies.map((row): SeedRow => ({ table: "companies", values: { ...row } })),
+    ...kinds.map((row): SeedRow => ({
+      table: "company_kinds",
+      values: {
+        ...row,
+        pf_facts: [...row.pf_facts],
+        pf_switches_a: [...row.pf_switches_a],
+        pf_switches_b: [...row.pf_switches_b],
+      },
+    })),
+  ];
+}
+
+/**
+ * read-turn-party-several-companies.json's own two rows, written after test owner 1's, with its note's values in its
+ * note's order: the business of Sam's second company from his S1-04 answer, and that company, "as K-23's
+ * seed-company-two-kinds.json holds it, without that seed's owner role".
+ */
+function secondCompanyRows(): SeedRow[] {
+  return [
+    {
+      table: "businesses",
+      values: {
+        id: "biz-lee-home-services",
+        name: "Lee Home Services",
+        display_name: "Lee Home Services",
+        status: "saved",
+        time_zone: "America/New_York",
+        text_hours_start: "08:00",
+        text_hours_end: "20:00",
+        version: 1,
+      },
+    },
+    {
+      table: "companies",
+      values: {
+        id: "company-lee-home-services",
+        owner_person_id: "person-sam",
+        name: "Lee Home Services LLC",
+        business_id: "biz-lee-home-services",
+        version: 2,
+      },
+    },
+  ];
+}
+
+/** The tables of Sam's own rows: the person, the handle and their link, before any company. */
+const SAM_TABLES: readonly string[] = ["persons", "handles", "person_handles"];
+
+/**
+ * read-turn-party-sign-up-before-business.json's five rows, in its note's order (its given names no seed): Sam, his
+ * phone handle and their link, "as T-1148's seed writes them", which are test owner 1's first three rows, then the two
+ * companies of his S1-04 answer with no business yet, each at version 1.
+ */
+function signUpRows(): SeedRow[] {
+  const company = (id: string, name: string): SeedRow => ({
+    table: "companies",
+    values: { id, owner_person_id: "person-sam", name, business_id: null, version: 1 },
+  });
+  return [
+    ...testOwnerRows().filter((row) => SAM_TABLES.includes(row.table)),
+    company("company-lee-home-services", "Lee Home Services LLC"),
+    company("company-lees-barbershop", "Lee's Barbershop LLC"),
+  ];
+}
+
+/**
+ * read-turn-party-handed-over.json's own two rows, written after test owner 1's, with its note's values in its note's
+ * order: Hugo P.'s person and his live owner role at the barbershop from the handover time (S11-100's own sample;
+ * person-hugo and role-hugo-barber are examples).
+ */
+function newOwnerRows(): SeedRow[] {
+  return [
+    { table: "persons", values: { id: "person-hugo", name: "Hugo P.", language: null, version: 1 } },
+    {
+      table: "person_roles",
+      values: {
+        id: "role-hugo-barber",
+        person_id: "person-hugo",
+        business_id: "biz-lees-barbershop",
+        role: "owner",
+        ended_at: null,
+        version: 1,
+      },
+    },
+  ];
+}
+
+/**
+ * read-turn-party-owner-role-ended.json's own row, written after test owner 1's, with its note's values: Sam's owner
+ * role at the barbershop as it stands after the hand-over, ended at the handover time, Mon Nov 30 at 9:00am in New York.
+ */
+function endedRoleRows(): SeedRow[] {
+  return [
+    {
+      table: "person_roles",
+      values: {
+        id: "role-sam-barber",
+        person_id: "person-sam",
+        business_id: "biz-lees-barbershop",
+        role: "owner",
+        ended_at: "2026-11-30T14:00:00Z",
+        version: 2,
+      },
+    },
+  ];
+}
+
+/**
+ * By v1.11 fixture, how its note lists the rows its database side writes itself (README "Fixtures", v1.11: "five
+ * fixtures' notes list the rows their database side writes itself before the read (T-1148's SKELETON_ROWS, the second
+ * company, the two companies with no business, Hugo's person and role, Sam's ended role)"): `afterTestOwner`, whether
+ * the note has test owner 1's rows written first, "as read-turn-party-test-owner-1's note lists them"; and `own`, the
+ * rows the note lists itself, in its order.
+ */
+const PARTY_NOTES: Readonly<Record<string, { afterTestOwner: boolean; own: () => SeedRow[] }>> = {
+  [PARTY_OF_TURN_1]: { afterTestOwner: false, own: testOwnerRows },
+  [PARTY_TWO_COMPANIES]: { afterTestOwner: true, own: secondCompanyRows },
+  [PARTY_BEFORE_BUSINESS]: { afterTestOwner: false, own: signUpRows },
+  [PARTY_HANDED_OVER]: { afterTestOwner: true, own: newOwnerRows },
+  [PARTY_ROLE_ENDED]: { afterTestOwner: true, own: endedRoleRows },
+};
+
+/** A v1.11 fixture's noted rows: test owner 1's first where its note has them written first, then its own. */
+function partyRows(file: string): SeedRow[] {
+  const { afterTestOwner, own } = must(PARTY_NOTES[file], `${file}'s noted rows`);
+  return [...(afterTestOwner ? testOwnerRows() : []), ...own()];
+}
+
 /** By fixture, the rows its note says its database side writes itself before the read: no frozen seed holds them. */
 const NOTED_ROWS: Readonly<Record<string, () => SeedRow[]>> = {
   [PRACTICE]: practiceRows,
   [CHAT_OF_TURN_1]: chatThreadRows,
+  ...Object.fromEntries(Object.keys(PARTY_NOTES).map((file) => [file, (): SeedRow[] => partyRows(file)])),
 };
+
+/**
+ * The rows written before a fixture's exchange, after its chain: those its own note lists (NOTED_ROWS), and for a
+ * refused exchange, whose given is its twin's but for its note (EXCHANGE_TWINS, REQUEST_TWINS), those its twin's note
+ * lists: v1.11's refuse-turn-party-caller-business reads test owner 1's first text "with its rows written as that
+ * fixture's note lists them". None for every other fixture.
+ */
+function notedRowsOf(file: string): SeedRow[] {
+  const twin = EXCHANGE_TWINS[file]?.twin ?? REQUEST_TWINS[file]?.twin;
+  const rows = NOTED_ROWS[file] ?? (twin === undefined ? undefined : NOTED_ROWS[twin]);
+  return rows?.() ?? [];
+}
 
 /** A row value as a note spells it: a text or a number as it stands, and null as "null"; any other is a broken test. */
 function spelled(value: Json): string {
@@ -883,6 +1128,113 @@ const notedAs = (row: SeedRow): string =>
 /** Every text a row value holds, in a list's items too. */
 const textsIn = (value: Json): string[] =>
   typeof value === "string" ? [value] : Array.isArray(value) ? value.flatMap(textsIn) : [];
+
+/**
+ * The columns a v1.11 note states of a row, by table (README "Fixtures", v1.11): every column the row is written with,
+ * but for a kind of work, which the note lists by its two keys alone, its other values being T-1148's seed's.
+ */
+const PARTY_COLUMNS: Readonly<Record<string, readonly string[]>> = {
+  businesses: [
+    "id",
+    "name",
+    "display_name",
+    "status",
+    "time_zone",
+    "text_hours_start",
+    "text_hours_end",
+    "version",
+  ],
+  persons: ["id", "name", "language", "version"],
+  handles: ["id", "kind", "address"],
+  person_handles: ["person_id", "handle_id"],
+  companies: ["id", "owner_person_id", "name", "business_id", "version"],
+  company_kinds: ["company_id", "kind_id"],
+  person_roles: ["id", "person_id", "business_id", "role", "ended_at", "version"],
+};
+
+/**
+ * How a v1.11 note lists a row after its table's name: its id, then its values in parentheses, in the note's own words
+ * for each table (a name in single quotes, or in double quotes when it holds one; a business's one name for both its
+ * names, its zone and its text hours); a link and a kind of work, which have no id, by their two keys. A table no
+ * v1.11 note lists, a column the row lacks, and a business whose two names differ are broken tests.
+ */
+function partyPhrase(row: SeedRow): string {
+  const { table, values } = row;
+  const value = (column: string): string => {
+    if (!Object.hasOwn(values, column)) throw new Error(`a ${table} row with no ${column}`);
+    return spelled(values[column] as Json);
+  };
+  const name = (): string => (value("name").includes("'") ? `"${value("name")}"` : `'${value("name")}'`);
+  switch (table) {
+    case "businesses":
+      if (values.name !== values.display_name) throw new Error("a business whose two names differ");
+      return `${value("id")} (name and display name ${name()}, status ${value("status")}, ${value("time_zone")}, text hours ${value("text_hours_start")} to ${value("text_hours_end")}, version ${value("version")})`;
+    case "persons":
+      return `${value("id")} (name ${name()}, language ${value("language")}, version ${value("version")})`;
+    case "handles":
+      return `${value("id")} (${value("kind")}, ${value("address")})`;
+    case "person_handles":
+      return `(${value("person_id")}, ${value("handle_id")})`;
+    case "companies":
+      return `${value("id")} (owner_person_id ${value("owner_person_id")}, name ${name()}, business_id ${value("business_id")}, version ${value("version")})`;
+    case "company_kinds":
+      return `(${value("company_id")}, ${value("kind_id")})`;
+    case "person_roles":
+      return `${value("id")} (${value("person_id")}, ${value("business_id")}, ${value("role")}, ended_at ${value("ended_at")}, version ${value("version")})`;
+    default:
+      throw new Error(`no v1.11 note lists a ${table} row`);
+  }
+}
+
+/** A row's table and key: its id, or for a link and a kind of work, which have none, their two key columns. */
+function rowKey(row: SeedRow): string {
+  const keys =
+    row.table === "person_handles"
+      ? ["person_id", "handle_id"]
+      : row.table === "company_kinds"
+        ? ["company_id", "kind_id"]
+        : ["id"];
+  return `${row.table} ${keys.map((column) => spelled(row.values[column] ?? null)).join(" and ")}`;
+}
+
+/** How a v1.11 note lists a person's link beside the person and the handle it has just listed, without its keys. */
+const THEIR_LINK = "and their person_handles row";
+
+/**
+ * Each way a v1.11 note fails to list `rows` as they are written, none when it lists them: each row by its table's name
+ * and its phrase (partyPhrase), a second row of one table after "and" with its table named once, each after the one
+ * before it, so in the rows' order; a link whose person and handle are the two rows before it may be listed as "their
+ * person_handles row"; and no row holds a column its note does not state (PARTY_COLUMNS), but a kind of work.
+ */
+export function partyNoteProblems(note: string, rows: readonly SeedRow[]): string[] {
+  const problems: string[] = [];
+  let from = 0;
+  for (const [at, row] of rows.entries()) {
+    const stated = must(PARTY_COLUMNS[row.table], `the columns a note states of a ${row.table} row`);
+    const unstated = Object.keys(row.values).filter((column) => !stated.includes(column));
+    if (row.table !== "company_kinds" && unstated.length > 0) {
+      problems.push(`the ${row.table} row holds ${unstated.join(", ")}, which no note states`);
+    }
+    const before = rows[at - 1];
+    const person = rows[at - 2];
+    const phrase = partyPhrase(row);
+    const listed = before?.table === row.table ? `and ${phrase}` : `${row.table} ${phrase}`;
+    const theirs =
+      row.table === "person_handles" &&
+      person?.table === "persons" &&
+      person.values.id === row.values.person_id &&
+      before?.table === "handles" &&
+      before.values.id === row.values.handle_id;
+    let place = note.indexOf(listed, from);
+    if (place < 0 && theirs) place = note.indexOf(THEIR_LINK, from);
+    if (place < 0) {
+      problems.push(`${listed} is not listed${note.includes(listed) ? " in this order" : ""}`);
+    } else {
+      from = place + 1;
+    }
+  }
+  return problems;
+}
 
 // ---------------------------------------------------------------------------------------------------------------
 // The database: one fresh schema for this file, in a database of its own (T-1251), the tables' owner for seeds, and a
@@ -1252,7 +1604,8 @@ async function answerOf(entry: FixtureEntry, exchange: Exchange): Promise<Record
  * transaction, then the exchanges of its after chain through db/repo (stepCallOf), each answering its own fixture's
  * outcome (as answerOf reads it; a claim answered as v1.2 does valid at v1.2, one answered by K-05 v1's own call
  * valid at v1, and an earlier mark answered as v1.9 does valid at v1.9), a held time followed by its saved-time clock
- * row (SAVED_TIME), then the rows its note lists (NOTED_ROWS), as the tables' owner, in one transaction.
+ * row (SAVED_TIME), then the rows its note lists, or for a refused exchange its twin's note (notedRowsOf), as the
+ * tables' owner, in one transaction.
  */
 async function given(file: string): Promise<Exchange> {
   const chain = chainOf(file);
@@ -1278,7 +1631,7 @@ async function given(file: string): Promise<Exchange> {
     }
     if (holdsTime(before)) await writeSavedTimeClock(before);
   }
-  const noted = NOTED_ROWS[file]?.() ?? [];
+  const noted = notedRowsOf(file);
   await db.sql.begin(async (tx) => {
     for (const row of noted) await insertRow(tx, row.table, row.values);
   });
@@ -1289,7 +1642,7 @@ async function given(file: string): Promise<Exchange> {
 // The tests
 
 describe("data-access database side: the versions with one, each entry selected by its version", () => {
-  it("runs every entry of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9 and v1.10, accepted and refused, each against a db/repo call the README names", () => {
+  it("runs every entry of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10 and v1.11, accepted and refused, each against a db/repo call the README names", () => {
     for (const version of DB_SIDE_VERSIONS) {
       const ofVersion = sideEntries.filter((entry) => entry.version === version);
       expect(
@@ -1666,7 +2019,15 @@ describe("data-access database side: the versions with one, each entry selected 
   });
 
   it("writes the rows a fixture's note lists, each as the note names it, with its values and in its order", () => {
-    expect(Object.keys(NOTED_ROWS)).toEqual([PRACTICE, CHAT_OF_TURN_1]);
+    expect(Object.keys(NOTED_ROWS)).toEqual([
+      PRACTICE,
+      CHAT_OF_TURN_1,
+      PARTY_OF_TURN_1,
+      PARTY_TWO_COMPANIES,
+      PARTY_BEFORE_BUSINESS,
+      PARTY_HANDED_OVER,
+      PARTY_ROLE_ENDED,
+    ]);
     for (const file of Object.keys(NOTED_ROWS)) {
       expect(
         sideAccepted.map((entry) => entry.file),
@@ -1677,7 +2038,8 @@ describe("data-access database side: the versions with one, each entry selected 
         expect(exchangeOf(entry.file).given.after, entry.file).not.toContain(file);
     }
     // v1.6's practice: five rows, each named "<table> <id> (" with its values after it. S1-01's thread, which its note
-    // lists column by column, is the next test's.
+    // lists column by column, is the next test's, and v1.11's five notes, each row in the note's own words, are the
+    // tests' after it.
     const bundle = seedBundle();
     const file = PRACTICE;
     const note = must(exchangeOf(file).given.note, `${file}'s note`);
@@ -1760,9 +2122,192 @@ describe("data-access database side: the versions with one, each entry selected 
       `${file}: no seed holds the thread`,
     ).toEqual([]);
   });
+
+  it("writes the rows v1.11's five notes list, each as its note lists it, with its values and in its order: test owner 1's first where the note has them, then the note's own", () => {
+    // The five are the v1.11 exchanges whose notes say their database side writes rows, and no other (README "Fixtures",
+    // v1.11: "five fixtures' notes list the rows their database side writes itself before the read").
+    const noting = sideAccepted
+      .filter((entry) => entry.version === "v1.11")
+      .map((entry) => entry.file)
+      .filter((file) => (exchangeOf(file).given.note ?? "").includes("database side writes"));
+    expect(noting).toEqual([
+      PARTY_OF_TURN_1,
+      PARTY_TWO_COMPANIES,
+      PARTY_BEFORE_BUSINESS,
+      PARTY_HANDED_OVER,
+      PARTY_ROLE_ENDED,
+    ]);
+    expect(Object.keys(PARTY_NOTES)).toEqual(noting);
+    const testOwnerFirst =
+      "writes test owner 1's rows as read-turn-party-test-owner-1's note lists them (T-1148's skeleton seed), then";
+    for (const file of noting) {
+      const { afterTestOwner, own } = must(PARTY_NOTES[file], `${file}'s noted rows`);
+      const exchange = exchangeOf(file);
+      const note = must(exchange.given.note, `${file}'s note`);
+      // Each row the note lists itself is listed with its values, in the order it is written.
+      const rows = own();
+      expect(rows.length, `${file}: the rows its note lists itself`).toBeGreaterThan(0);
+      expect(partyNoteProblems(note, rows), file).toEqual([]);
+      // A note that has test owner 1's rows written first says so, before the rows it lists itself; they need the
+      // barbershop's business head, which its given's seed holds.
+      expect(note.includes(testOwnerFirst), `${file}: test owner 1's rows first`).toBe(afterTestOwner);
+      if (afterTestOwner) {
+        expect(partyNoteProblems(note.slice(note.indexOf(testOwnerFirst)), rows), file).toEqual([]);
+        expect(exchange.given.k04Seeds, file).toEqual([BUSINESS_HEAD_SEED]);
+      }
+      const written = notedRowsOf(file);
+      expect(written, file).toEqual([...(afterTestOwner ? testOwnerRows() : []), ...rows]);
+      // The rows are the exchange's own: the handle its request names, and the handle and the person its answer gives.
+      const handle = must(
+        written.find((row) => row.table === "handles"),
+        `${file}'s handle`,
+      );
+      expect([handle.values.kind, handle.values.address], `${file}: the request's handle`).toEqual([
+        valueAt(exchange.request, "handle.kind"),
+        valueAt(exchange.request, "handle.address"),
+      ]);
+      const link = must(
+        written.find((row) => row.table === "person_handles"),
+        `${file}'s link`,
+      );
+      expect(
+        [link.values.handle_id, link.values.person_id],
+        `${file}: the answer's handle and person`,
+      ).toEqual([exchange.outcome.handleId, exchange.outcome.personId]);
+      // No exchange runs first, and no seed the fixture names holds a row its database side writes: each is written
+      // here or nowhere (README "Fixtures", v1.11: "No frozen seed holds test owner 1 without K-04's three owner
+      // roles, or Sam's companies without K-23's owner role").
+      const chain = chainOf(file);
+      expect(chain.steps, `${file}: no exchange runs first`).toEqual([]);
+      const seen = new Set<string>();
+      const seeded = chain.seeds.flatMap((seed) => seedRows(seed, seen)).map(rowKey);
+      for (const row of written) expect(seeded, `${file}: no seed holds it`).not.toContain(rowKey(row));
+    }
+  });
+
+  it("writes test owner 1's rows as T-1148's seed writes them (its SKELETON_ROWS), all but the business head K-04's seed holds, and each other note's rows as the source its note names holds them", () => {
+    const rows = testOwnerRows();
+    const turn1 = exchangeOf(PARTY_OF_TURN_1);
+    expect(must(turn1.given.note, `${PARTY_OF_TURN_1}'s note`)).toContain(
+      "this exchange's database side writes its rows itself after K-04's seed-business-head.json, as that seed writes them (its SKELETON_ROWS): ",
+    );
+    // Five rows, in the note's order: every row of the seed's list but its business head.
+    const tables = ["persons", "handles", "person_handles", "companies", "company_kinds"];
+    expect(rows.map((row) => row.table)).toEqual(tables);
+    expect(Object.keys(SKELETON_ROWS), "the seed's list, table by table").toEqual(["businesses", ...tables]);
+    expect(
+      Object.values(SKELETON_ROWS).map((list: readonly unknown[]) => list.length),
+      "one row of each",
+    ).toEqual([1, 1, 1, 1, 1, 1]);
+    // The business head is K-04's seed-business-head.json's, value for value, which the given loads first: the seed's
+    // list and the fixture's given make one state.
+    expect(turn1.given.k04Seeds).toEqual([BUSINESS_HEAD_SEED]);
+    const head = readJson(path.join(CORE_SEEDS_DIR, BUSINESS_HEAD_SEED)) as SeedFile;
+    const [business] = SKELETON_ROWS.businesses;
+    expect(
+      head.rows
+        .filter((row) => row.table === "businesses" && row.values.id === business?.id)
+        .map((row) => row.values),
+      "the barbershop's business head",
+    ).toEqual([business]);
+    // The company and its kind of work, whose values the note leaves to the seed, are K-23's seed-company-two-kinds.json
+    // rows for the barbershop, value for value (db/seeds/skeleton.ts: "K-23 v1 seed-company-two-kinds.json's row for
+    // tp-01's business"), and so are Sam's second company and its business, without that seed's owner role.
+    const twoKinds = readJson(partSeedFile(TWO_KINDS_SEED)) as SeedFile;
+    const inK23 = (row: SeedRow): SeedRow[] => twoKinds.rows.filter((held) => rowKey(held) === rowKey(row));
+    for (const row of [...rows.filter((each) => !SAM_TABLES.includes(each.table)), ...secondCompanyRows()]) {
+      expect(inK23(row), `K-23's ${rowKey(row)}`).toEqual([row]);
+    }
+    expect(must(exchangeOf(PARTY_TWO_COMPANIES).given.note, `${PARTY_TWO_COMPANIES}'s note`)).toContain(
+      "as K-23's seed-company-two-kinds.json holds it, without that seed's owner role",
+    );
+    expect(twoKinds.rows.filter((row) => row.table === "person_roles").length, "that seed's owner role").toBe(
+      1,
+    );
+    for (const file of Object.keys(PARTY_NOTES)) {
+      const roles = notedRowsOf(file).filter((row) => row.table === "person_roles");
+      const live = roles.filter(
+        (row) => row.values.person_id === "person-sam" && row.values.ended_at === null,
+      );
+      expect(live, `${file}: Sam holds no live role`).toEqual([]);
+    }
+    // Sam's sign-up before S1-09: his own three rows as the seed writes them, then both companies with no business yet,
+    // after no seed.
+    const signUp = signUpRows();
+    expect(signUp.map((row) => row.table)).toEqual([...SAM_TABLES, "companies", "companies"]);
+    expect(signUp.slice(0, SAM_TABLES.length)).toEqual(rows.slice(0, SAM_TABLES.length));
+    expect(signUp.slice(SAM_TABLES.length).map((row) => row.values.business_id)).toEqual([null, null]);
+    expect(exchangeOf(PARTY_BEFORE_BUSINESS).given.k04Seeds).toEqual([]);
+    // The hand-over: Hugo P.'s owner role is live, and Sam's ended at the handover time, before the read's now.
+    expect(
+      newOwnerRows()
+        .filter((row) => row.table === "person_roles")
+        .map((row) => [row.values.person_id, row.values.role, row.values.ended_at]),
+      "Hugo P.'s live owner role",
+    ).toEqual([["person-hugo", "owner", null]]);
+    const [ended] = endedRoleRows();
+    const endedAt = textOf(ended?.values.ended_at, "the time Sam's owner role ended");
+    expect(Date.parse(endedAt)).toBeLessThan(Date.parse(exchangeOf(PARTY_ROLE_ENDED).given.now));
+  });
+
+  it("has the v1.11 note check fire: a value other than the note's, rows out of the note's order, a column no note states, a link apart from its person and handle", () => {
+    const note = must(exchangeOf(PARTY_BEFORE_BUSINESS).given.note, `${PARTY_BEFORE_BUSINESS}'s note`);
+    const rows = signUpRows();
+    const at = (place: number): SeedRow => must(rows[place], `row ${String(place)} of the sign-up's`);
+    const [sam, handle, link, homeServices, barbershop] = [at(0), at(1), at(2), at(3), at(4)];
+    expect(partyNoteProblems(note, rows)).toEqual([]);
+    const withBusiness: SeedRow = {
+      ...homeServices,
+      values: { ...homeServices.values, business_id: "biz-lees-barbershop" },
+    };
+    expect(partyNoteProblems(note, [sam, handle, link, withBusiness, barbershop])).toEqual([
+      "companies company-lee-home-services (owner_person_id person-sam, name 'Lee Home Services LLC', business_id biz-lees-barbershop, version 1) is not listed",
+    ]);
+    // The same rows in another order: each is in the note, but not after the row before it.
+    expect(partyNoteProblems(note, [handle, sam, homeServices, barbershop])).toEqual([
+      "persons person-sam (name 'Sam Lee', language null, version 1) is not listed in this order",
+    ]);
+    const versioned: SeedRow = { ...handle, values: { ...handle.values, version: 1 } };
+    expect(partyNoteProblems(note, [sam, versioned, link, homeServices, barbershop])).toEqual([
+      "the handles row holds version, which no note states",
+    ]);
+    // "their person_handles row" lists a link only beside its own person and handle.
+    expect(partyNoteProblems(note, [sam, link])).toEqual([
+      "person_handles (person-sam, handle-sam) is not listed",
+    ]);
+    // Test owner 1's note spells the link out by its two keys, so there it is listed with no handle beside it.
+    const turn1 = must(exchangeOf(PARTY_OF_TURN_1).given.note, `${PARTY_OF_TURN_1}'s note`);
+    expect(partyNoteProblems(turn1, [sam, link])).toEqual([]);
+    // A table no v1.11 note lists is a broken test, never a row passed over.
+    expect(() => partyNoteProblems(note, [{ table: "threads", values: {} }])).toThrow("threads");
+  });
+
+  it("writes before a refused exchange the rows its twin's note lists, as its own note says: v1.11's refuse-turn-party-caller-business, test owner 1's", () => {
+    const shared: string[] = [];
+    for (const [file, { twin }] of [...Object.entries(EXCHANGE_TWINS), ...Object.entries(REQUEST_TWINS)]) {
+      expect(Object.hasOwn(NOTED_ROWS, file), `${file}: a refused exchange lists no rows of its own`).toBe(
+        false,
+      );
+      if (!Object.hasOwn(NOTED_ROWS, twin)) {
+        expect(notedRowsOf(file), `${file}: its twin's note lists no row`).toEqual([]);
+        continue;
+      }
+      shared.push(file);
+      const note = must(exchangeOf(file).given.note, `${file}'s note`);
+      expect(note, file).toContain(
+        `as ${twin.replace(/\.json$/, "")} reads it, with its rows written as that fixture's note lists them`,
+      );
+      expect(notedRowsOf(file), file).toEqual(notedRowsOf(twin));
+      expect(notedRowsOf(file).length, file).toBeGreaterThan(0);
+    }
+    expect(shared).toEqual(["invalid/refuse-turn-party-caller-business.json"]);
+    // An accepted fixture's rows are its own note's, and a fixture whose note lists none has none.
+    expect(notedRowsOf(PARTY_OF_TURN_1)).toEqual(testOwnerRows());
+    expect(notedRowsOf("read-turn-party-one-role.json")).toEqual([]);
+  });
 });
 
-describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9 and v1.10 gives its outcome through db/repo", () => {
+describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10 and v1.11 gives its outcome through db/repo", () => {
   for (const entry of sideAccepted) {
     it(
       `${entry.file} (${entry.version}): in its role and on its side, db/repo answers the fixture's outcome`,
@@ -1874,7 +2419,7 @@ describe("data-access database side: each accepted exchange of v1.3, v1.4, v1.6,
   );
 });
 
-describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9 and v1.10 is refused by db/repo", () => {
+describe("data-access database side: each refused fixture of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10 and v1.11 is refused by db/repo", () => {
   for (const entry of sideRefused.filter((refused) => defOf(refused).part === "request")) {
     it(
       `${entry.file} (${entry.version}): db/repo refuses the request before any statement reaches the database`,
