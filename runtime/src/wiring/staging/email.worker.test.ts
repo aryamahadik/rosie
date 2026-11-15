@@ -20,8 +20,8 @@
 //     the key kept and never a rejected run; an address lookup that throws is no address;
 //   - the part: no line, no port (DL-768), with nothing read; through stagingOptions every other part unbound, bound
 //     only beside the test-phone part's line; production and staging with no Hyperdrive binding give none.
-// Test values only (rule 9): the contracts' fixtures, the master's sample cast, made-up keys and ids, and addresses on
-// the reserved example domains.
+// Test values only (rule 9): the contracts' fixtures, the master's sample cast, made-up keys and ids, addresses on the
+// reserved example domains, and one whole fiction-range number (555-0101, Alex's in the fixtures).
 import { RESEND_EMAILS_URL } from "@rosie/adapters/email/resend-send";
 import claimInOrderWithPort from "@rosie/contracts/data-access/fixtures/claim-in-order-with-port.json";
 import claimSamSignInCode from "@rosie/contracts/data-access/fixtures/claim-sam-sign-in-code.json";
@@ -196,9 +196,7 @@ function resendDouble(): { fetch: (request: Request) => Promise<Response>; calls
 /** The emails the line keeps to an address under one key: what the test-phone page would list for this send. */
 async function listed(line: TestPhoneLinePort, address: string, key: string): Promise<EmailSendRequest[]> {
   const kept = await line.sentEmails({ to: address });
-  return kept.emails
-    .map((email) => email.request as EmailSendRequest)
-    .filter((request) => request.idempotencyKey === key);
+  return kept.emails.map((email) => email.request).filter((request) => request.idempotencyKey === key);
 }
 
 /** K-12 send-code.json's request (a code about no booking), to this address under a key of this test's own. */
@@ -560,11 +558,7 @@ describe("the claim's emailPurpose and notAfter, mapped through (K-05 v1.13 item
     expect(sam).toMatchObject({ port: "email", channel: "email", emailPurpose: "code", notAfter: NOT_AFTER });
     expect("emailPurpose" in alex || "notAfter" in alex).toBe(false);
     // A v1.13 text row names none: its nulls go across as they are.
-    const nulls = claimedRowOf({
-      ...ALEX_ROW,
-      emailPurpose: null,
-      notAfter: null,
-    } as unknown as ClaimedRowV12);
+    const nulls = claimedRowOf({ ...ALEX_ROW, emailPurpose: null, notAfter: null });
     expect([nulls.emailPurpose, nulls.notAfter]).toEqual([null, null]);
   });
 
@@ -768,16 +762,15 @@ describe("the email door (../email-door.ts): no answer is K-12's no answer, neve
       },
     };
     const rejecting: EmailSendPort = { sendEmail: () => Promise.reject(new Error(`gone: ${SAM_ADDRESS}`)) };
-    // A rejection that is no Error at all: no name to give.
-    const notAnError: EmailSendPort = {
-      sendEmail: () => Promise.reject(new Map([["to", SAM_ADDRESS]]) as unknown as Error),
-    };
+    // An error whose name is no label (here it holds an address): no name is written for it either.
+    const oddName = Object.assign(new Error("no answer"), { name: `gone ${SAM_ADDRESS}` });
+    const notALabel: EmailSendPort = { sendEmail: () => Promise.reject(oddName) };
     const written: string[] = [];
     const write = (line: string): void => {
       written.push(line);
     };
 
-    for (const port of [throwing, rejecting, notAnError]) {
+    for (const port of [throwing, rejecting, notALabel]) {
       expect(await emailDoor(port, { log, write }).sendEmail(code())).toEqual({
         result: "failed",
         kind: "transient",

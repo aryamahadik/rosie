@@ -553,14 +553,16 @@ export function composeRoot(options: RootOptions): Root {
   // the retry door's alike, through the arming port's directory and the HandleActor namespace.
   const mayHaveStopped = actorReadingPort(ports.arming.directory, options.actors);
   // The email rows' port, on staging alone (T-1288; STATE note 72: production binds none), behind the email door: a send
-  // that throws or gives no answer in time is K-12's no answer, never a rejected run (./email-door.ts). And the address
-  // lookup behind the same door: one that throws is no address known.
+  // that throws or gives no answer in time is K-12's no answer, never a rejected run (./email-door.ts). With it, the
+  // address lookup behind the same door: one that throws is no address known. With none, the directory as it was (no
+  // email row asks it for an address).
   const emailRows = options.emailRows ?? null;
   const email: EmailRowsDeps | null =
     emailRows === null || options.vars.ENVIRONMENT !== "staging"
       ? null
       : { port: emailDoor(emailRows.port, { log }), fromAddress: emailRows.fromAddress };
-  const recipients = answeringRecipients(ports.sendState.recipients, { log });
+  const recipients =
+    email === null ? ports.sendState.recipients : answeringRecipients(ports.sendState.recipients, { log });
   /** The dispatcher's ports for one run, each claimed row sent on the trace `traceFor` gives it. */
   const dispatchDeps = (traceFor: DispatchDeps["traceFor"]): DispatchDeps => ({
     store: dispatchStore,

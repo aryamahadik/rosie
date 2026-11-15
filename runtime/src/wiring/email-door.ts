@@ -24,9 +24,12 @@ import { isLabel, type LogContext } from "../trace";
 
 /** How long the door waits for the email port's answer to one send: far below the claim's 60 s (K-07 default 2). */
 export const EMAIL_SEND_TIMEOUT_MS = 15_000;
-/** The code of a send the email port threw on, answered as K-12's no answer (K-04 outbox_parts.error_code). */
+/**
+ * The code of a send the email port threw on, answered as K-12's no answer: the dispatch span's error code and its retry
+ * job's (no answer marks nothing, so no part holds it).
+ */
 export const EMAIL_SEND_THREW = "sendThrew";
-/** The code of a send the email port did not answer within the door's time limit. */
+/** The code of a send the email port did not answer within the door's time limit, as the same. */
 export const EMAIL_SEND_TIMEOUT = "sendTimeout";
 
 /** The calls the door stands in front of. */
