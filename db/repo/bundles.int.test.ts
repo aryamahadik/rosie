@@ -18,7 +18,7 @@ import {
   reserveConnection,
   setActiveBundle,
 } from "./bundles";
-import { DataAccessDatabaseError } from "./clocks";
+import { DataAccessDatabaseError, transientOrScrubbed } from "./clocks";
 import type { Sql } from "./scope";
 import { handleTargets, type TransientError, transientOrThrow } from "./targets";
 import { createTestDatabase, type TestDatabase } from "./test-db";
@@ -1011,6 +1011,9 @@ describe("a lost connection answers transient (K-05 README: every call)", () => 
 // code) and raised through postgres.js's own socket option, so postgres.js passes each up as it does a socket's error.
 // Each raw error is checked to hold what it names, and each outcome to hold none of it. Rule 9: the probe's user,
 // password, database and hosts are made up here (.invalid names). A check names what leaked, never its value.
+// Since T-1405 the two reads answer through clocks.ts's transientOrScrubbed, so Gives 1 and 5 hold them to that helper:
+// the same answers, but a statement's own refusal and postgres.js's statement errors leave scrubbed (the T-1405 block at
+// the end of this file).
 
 describe("T-1314: a failure to reach the database answers as targets.ts's transientOrThrow does, never raw", () => {
   const PROBE_USER = "t1314_probe_user";
@@ -1154,6 +1157,25 @@ describe("T-1314: a failure to reach the database answers as targets.ts's transi
   }
 
   /**
+   * `outcome` is what clocks.ts's transientOrScrubbed makes of `raw` under `call`, as the two reads answer since T-1405:
+   * the same answer, or a scrubbed error of the same class with the same fields, the call's name among them, never `raw`.
+   * That is transientOrThrow's outcome, but for a statement's own refusal and postgres.js's statement errors, which
+   * transientOrThrow throws as they are.
+   */
+  function expectAsScrubbed(outcome: Outcome, raw: Error, call: string): void {
+    const expected = syncOutcomeOf(() => transientOrScrubbed(call, raw));
+    if ("answer" in expected) {
+      expect(outcome, call).toEqual(expected);
+      return;
+    }
+    const thrown = "thrown" in outcome ? outcome.thrown : undefined;
+    expect(thrown instanceof Error && thrown !== raw, call).toBe(true);
+    expect((thrown as Error).constructor, call).toBe((expected.thrown as Error).constructor);
+    expect(fieldsOf(thrown), call).toEqual(fieldsOf(expected.thrown));
+    expect(fieldsOf(thrown), call).toMatchObject({ call });
+  }
+
+  /**
    * A client on the made-up connection whose socket fails with `raw` before it opens, as Node's socket or TLS would fail
    * it (postgres.js's own socket option): postgres.js passes `raw` up as it does a socket's error.
    */
@@ -1262,12 +1284,12 @@ describe("T-1314: a failure to reach the database answers as targets.ts's transi
       holds: ["user"],
     },
     {
-      name: "a statement's own refusal (23505), thrown as it is",
+      name: "a statement's own refusal (23505), thrown as it is (by the two reads scrubbed, T-1405)",
       make: () => new PostgresError({ severity: "ERROR", code: "23505", message: "duplicate key value" }),
       holds: [],
     },
     {
-      name: "a TypeError for a value postgres.js cannot send, thrown as it is",
+      name: "a TypeError for a value postgres.js cannot send, thrown as it is (by the two reads scrubbed, T-1405)",
       make: () => new TypeError("Do not know how to serialize a BigInt"),
       holds: [],
     },
@@ -1289,8 +1311,12 @@ describe("T-1314: a failure to reach the database answers as targets.ts's transi
   const RESERVING_CALLS = CALLS.filter(
     ([call]) => call === "publishBundleCopy" || call === "setActiveBundle",
   );
+  /** The two reads, which answer through clocks.ts's transientOrScrubbed since T-1405. */
+  const SCRUBBING_READS = new Set(["readActiveBundle", "readBundleValue"]);
 
   describe("Gives 1 and 5: each call answers as targets.ts's transientOrThrow does, under its own name", () => {
+    // The two reads answer as clocks.ts's transientOrScrubbed does (T-1405): as transientOrThrow, but a statement's own
+    // refusal (23505 here) and postgres.js's statement errors (the TypeError) leave scrubbed, never as they are.
     it.each(SHAPES)("$name", async ({ make, holds }) => {
       for (const [call, run] of CALLS) {
         const raw = make();
@@ -1304,7 +1330,11 @@ describe("T-1314: a failure to reach the database answers as targets.ts's transi
         }
         // postgres.js rejected the call's first statement with the socket's error, the statement put on it.
         expect(Object.hasOwn(raw, "query"), call).toBe(true);
-        expectAsTargets(outcome, raw, call);
+        if (SCRUBBING_READS.has(call)) {
+          expectAsScrubbed(outcome, raw, call);
+        } else {
+          expectAsTargets(outcome, raw, call);
+        }
         if (!("thrown" in outcome && outcome.thrown === raw)) {
           expect(leaksOf(outcome, SHAPE_SECRETS), call).toEqual([]);
         }
@@ -2287,4 +2317,288 @@ describe("T-1350: inTransaction writes no rollback to a connection fn found gone
       await client.sql.end({ timeout: 0 });
     }
   });
+});
+
+// ---- T-1405: the two reads let no statement text, value or key out (T-1395's security review, note a) ----------------
+//
+// readActiveBundle and readBundleValue answer a failure through clocks.ts's transientOrScrubbed, as T-1322's nine calls
+// do. T-1322's five errors are made for real on local PostgreSQL by postgres.js as installed, four of them on a statement
+// that carries a made-up number (rule 9: a 555-01xx number) and readBundleValue's bundle key among its values:
+// PostgreSQL's refusal of a statement (22P02, the number in its message) and of a row (a CHECK's 23514, the number and
+// the key in its detail, with its table's and constraint's names); postgres.js's UNDEFINED_VALUE (the number and the key
+// among the statement's args) and the TypeError its bytea serializer throws (the number in its message); and a
+// serialization failure PostgreSQL raises (40001). postgres.js puts the statement on each: its values in args, its text
+// in query once built. Each reaches the read as postgres.js rejects the read's statement with it, on a client whose
+// socket fails with it (as the T-1314 block above delivers a socket's error). The first four leave scrubbed: the call's
+// name and the code alone, PostgreSQL's as DataAccessDatabaseError (a rule's table and constraint names kept), with no
+// statement text, number or key in the message, the stack or any other own property. 40001 still answers transient with
+// its SQLSTATE.
+// Then each read's own statement is refused for real (55P03: its lock timeout ends it while another transaction locks
+// its table) and leaves the same way, holding none of the text or values postgres.js built for it.
+
+describe("T-1405: readActiveBundle and readBundleValue let no statement text, value or key out (clocks.ts transientOrScrubbed)", () => {
+  type Kind = "refusal" | "rule" | "undefinedValue" | "serialization" | "serialize";
+  /** Thrown as DataAccessDatabaseError (its message's SQLSTATE and names: `shown`), as a client's code, or answered. */
+  type Expected =
+    | { database: { code: string; table: string | null; constraint: string | null; shown: string } }
+    | { client: string }
+    | { answer: unknown };
+  const NUMBER = "+15555550147";
+  /** readBundleValue's key: bundle-value-on-miss.json's, the fixture bundle's manifest. */
+  const KEY = (exchange("bundle-value-on-miss.json").request as { key: string }).key;
+  const KINDS: { kind: Kind; name: string; expected: Expected }[] = [
+    {
+      kind: "refusal",
+      name: "PostgreSQL's 22P02, the number in its message, leaves as DataAccessDatabaseError",
+      expected: { database: { code: "22P02", table: null, constraint: null, shown: "22P02" } },
+    },
+    {
+      kind: "rule",
+      name: "a CHECK's 23514, the number and the key in its detail, leaves as DataAccessDatabaseError, its names kept",
+      expected: {
+        database: {
+          code: "23514",
+          table: "t1405_values",
+          constraint: "t1405_values_short",
+          shown: "23514, table t1405_values, constraint t1405_values_short",
+        },
+      },
+    },
+    {
+      kind: "undefinedValue",
+      name: "postgres.js's UNDEFINED_VALUE, the number and the key in its args, leaves with its code alone",
+      expected: { client: "UNDEFINED_VALUE" },
+    },
+    {
+      kind: "serialize",
+      name: "the TypeError of postgres.js's bytea serializer, the number in its message, leaves with its code alone",
+      expected: { client: "ERR_INVALID_ARG_TYPE" },
+    },
+    {
+      kind: "serialization",
+      name: "PostgreSQL's 40001 still answers transient with its SQLSTATE",
+      expected: { answer: { error: "transient", sqlstate: "40001" } },
+    },
+  ];
+  const CALLS: { call: string; run: (sql: Sql) => Promise<unknown> }[] = [
+    { call: "readActiveBundle", run: (sql) => readActiveBundle(sql) },
+    { call: "readBundleValue", run: (sql) => readBundleValue(sql, { key: KEY }) },
+  ];
+  const CASES = CALLS.flatMap(({ call, run }) =>
+    KINDS.map(({ kind, name, expected }) => ({ call, run, kind, expected, name: `${call}: ${name}` })),
+  );
+  let made: Record<Kind, Error>;
+
+  /** Every text `value` holds, deeply: its own property names and values, enumerable or not, its stack among them. */
+  const textsOf = (value: unknown, seen = new Set<object>()): string[] => {
+    if (typeof value === "string") {
+      return [value];
+    }
+    if (typeof value === "number" || typeof value === "bigint" || typeof value === "boolean") {
+      return [String(value)];
+    }
+    if (typeof value !== "object" || value === null || seen.has(value)) {
+      return [];
+    }
+    seen.add(value);
+    return Object.getOwnPropertyNames(value).flatMap((key) => [
+      key,
+      ...textsOf((value as Record<string, unknown>)[key], seen),
+    ]);
+  };
+  const holdsNumber = (value: unknown): boolean =>
+    textsOf(value).some((text) => text.includes(NUMBER.slice(1)));
+  const holdsKey = (value: unknown): boolean => textsOf(value).some((text) => text.includes(KEY));
+  /** The statement's text postgres.js put on an error it rejected a statement with, or null. */
+  const statementOf = (error: Error): string | null => {
+    const query: unknown = Object.getOwnPropertyDescriptor(error, "query")?.value;
+    return typeof query === "string" && query !== "" ? query : null;
+  };
+
+  /** The error `statement` is refused with. */
+  const refusalOf = async (statement: Promise<unknown>): Promise<Error> => {
+    try {
+      await statement;
+    } catch (error) {
+      if (error instanceof Error) {
+        return error;
+      }
+    }
+    throw new Error("the statement was not refused with an error");
+  };
+
+  /** What `run` gives on a client whose socket fails with `raw`: postgres.js rejects its first statement with it. */
+  const outcomeOn = async (
+    raw: Error,
+    run: (sql: Sql) => Promise<unknown>,
+  ): Promise<{ answer: unknown } | { thrown: unknown }> => {
+    const options = { max: 1, onnotice: () => undefined, socket: () => Promise.reject(raw) };
+    const sql = postgres("postgres://t1405@db-t1405.example.invalid:65125/t1405", options);
+    try {
+      return { answer: await run(sql) };
+    } catch (error) {
+      return { thrown: error };
+    } finally {
+      await sql.end({ timeout: 0 });
+    }
+  };
+
+  /** `thrown` is the scrubbed DataAccessDatabaseError `call` throws for a refusal of `code`: its fields and no others. */
+  const expectDatabaseError = (
+    thrown: unknown,
+    call: string,
+    expected: { code: string; table: string | null; constraint: string | null; shown: string },
+  ): void => {
+    expect(thrown, call).toBeInstanceOf(DataAccessDatabaseError);
+    expect(Object.getOwnPropertyNames(thrown).sort(), call).toEqual([
+      "call",
+      "code",
+      "constraint",
+      "message",
+      "name",
+      "stack",
+      "table",
+    ]);
+    expect(thrown, call).toMatchObject({
+      call,
+      code: expected.code,
+      table: expected.table,
+      constraint: expected.constraint,
+      message: `${call}: the database refused the call (SQLSTATE ${expected.shown})`,
+    });
+  };
+
+  beforeAll(async () => {
+    const sql = postgres(resolvePrimaryUrl(), { max: 1, onnotice: () => undefined });
+    try {
+      await sql`create temp table t1405_values (key text, number text constraint t1405_values_short check (length(number) < 5))`;
+      made = {
+        refusal: await refusalOf(sql`select ${KEY}::text as key, ${NUMBER}::uuid as id`),
+        rule: await refusalOf(sql`insert into t1405_values (key, number) values (${KEY}, ${NUMBER})`),
+        undefinedValue: await refusalOf(
+          sql`select ${KEY}::text as key, ${NUMBER}::text as number, ${undefined as never}::text as gone`,
+        ),
+        serialization: await refusalOf(
+          sql.unsafe(
+            "do $$ begin raise exception using errcode = '40001', message = 'could not serialize'; end $$",
+          ),
+        ),
+        serialize: await refusalOf(
+          sql`select ${KEY}::text as key, ${sql.typed(Number(NUMBER.slice(1)), 17)} as bytes`,
+        ),
+      };
+    } finally {
+      await sql.end({ timeout: 5 });
+    }
+  });
+
+  it.each(CASES)("$name", async ({ call, run, kind, expected }) => {
+    const raw = made[kind];
+    const outcome = await outcomeOn(raw, run);
+    if ("answer" in expected) {
+      expect(outcome).toEqual({ answer: expected.answer });
+      return;
+    }
+    // The error holds the number and the key, so the check means something. postgres.js put the statement on it: its
+    // values in args, and its text in query once it had built it (an UNDEFINED_VALUE stops the build: no text yet).
+    const statement = statementOf(raw);
+    expect(statement === null).toBe(kind === "undefinedValue");
+    expect(holdsNumber(raw)).toBe(true);
+    expect(holdsKey(raw)).toBe(true);
+    expect(Object.hasOwn(raw, "args")).toBe(true);
+    if (!("thrown" in outcome)) {
+      throw new Error(`${call} answered`);
+    }
+    // Booleans first, so a failing run prints neither error's text.
+    const { thrown } = outcome;
+    expect(thrown === raw).toBe(false);
+    expect(holdsNumber(thrown)).toBe(false);
+    expect(holdsKey(thrown)).toBe(false);
+    expect(textsOf(thrown).some((text) => statement !== null && text.includes(statement))).toBe(false);
+    if ("database" in expected) {
+      expectDatabaseError(thrown, call, expected.database);
+      return;
+    }
+    expect(Object.getOwnPropertyNames(thrown).sort()).toEqual(["call", "code", "message", "stack"]);
+    expect(thrown).toMatchObject({
+      call,
+      code: expected.client,
+      message: `${call}: the database call failed (code ${expected.client})`,
+    });
+  });
+
+  it("each read's own statement, refused for real (55P03: its lock timeout, its table locked by another transaction), leaves scrubbed, holding none of the text or values postgres.js built for it", async () => {
+    await emptyTables(db.sql);
+    await loadSeed(db.sql, "seed-bundle-registry.json");
+    /** Each statement postgres.js built on the reader: its text and its values. */
+    const built: { text: string; values: unknown[] }[] = [];
+    // No type fetch: the reader builds only the statements below.
+    const reader = postgres(resolvePrimaryUrl(), {
+      max: 1,
+      onnotice: () => undefined,
+      fetch_types: false,
+      connection: { search_path: `${db.schema}, public`, lock_timeout: 300 },
+      debug: (_connection: number, text: string, values: unknown[]) => {
+        built.push({ text, values });
+      },
+    });
+    const holder = postgres(resolvePrimaryUrl(), { max: 1, onnotice: () => undefined });
+    let letGo: () => void = () => undefined;
+    const hold = new Promise<void>((resolve) => {
+      letGo = resolve;
+    });
+    let locked: () => void = () => undefined;
+    const isLocked = new Promise<void>((resolve) => {
+      locked = resolve;
+    });
+    const holding = holder.begin(async (tx) => {
+      await tx`lock table ${tx(db.schema)}.bundles, ${tx(db.schema)}.bundle_values in access exclusive mode`;
+      locked();
+      await hold;
+    });
+    try {
+      await isLocked;
+      // Under this lock postgres.js raises a statement's refusal with the statement on it, the key among its values, as
+      // the reads let it out before T-1405: so the check means something.
+      const raw = await refusalOf(reader`select key from bundle_values where key = ${KEY}`);
+      expect((raw as { code?: unknown }).code).toBe("55P03");
+      expect(holdsKey(raw)).toBe(true);
+      expect(statementOf(raw) === null).toBe(false);
+      for (const { call, run } of CALLS) {
+        const from = built.length;
+        let thrown: unknown;
+        try {
+          await run(reader);
+        } catch (error) {
+          thrown = error;
+        }
+        const statements = built.slice(from);
+        // postgres.js built the read's statement, and readBundleValue's carries the key as its value.
+        expect(statements.length > 0, call).toBe(true);
+        expect(
+          statements.some(({ values }) => values.includes(KEY)),
+          call,
+        ).toBe(call === "readBundleValue");
+        // Booleans first, so a failing run prints no statement's text.
+        const texts = textsOf(thrown);
+        expect(
+          statements.some(
+            ({ text, values }) =>
+              texts.some((held) => held.includes(text)) ||
+              values.some(
+                (value) => String(value) !== "" && texts.some((held) => held.includes(String(value))),
+              ),
+          ),
+          call,
+        ).toBe(false);
+        expect(holdsKey(thrown), call).toBe(false);
+        expectDatabaseError(thrown, call, { code: "55P03", table: null, constraint: null, shown: "55P03" });
+      }
+    } finally {
+      letGo();
+      await holding;
+      await reader.end({ timeout: 5 });
+      await holder.end({ timeout: 5 });
+    }
+  }, 30_000);
 });
