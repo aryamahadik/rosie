@@ -115,6 +115,8 @@ export const WORDS = {
   repliedUnder: "As a reply under",
   traceLabel: "Trace id",
   eventLabel: "Event id",
+  seeTexts: "See this phone's texts",
+  choosePhone: "Choose another phone",
   badForm: "That form could not be read. Send it again from this page.",
   noPhone: "No test phone is chosen, so nothing was sent. Choose one first.",
   badPhone: "That is not a test phone's roster id. Type one such as tp-01.",
@@ -172,9 +174,15 @@ const hidden = (name: string, value: string): string =>
 const problemLine = (problem: Problem | null): string[] =>
   problem === null ? [] : [`<p role="alert">${escapeHtml(problem.words)}</p>`];
 
-/** What was sent and the gateway's answer, with the answer's trace id and event id. */
-function sentSection(sent: SentText): string[] {
+/**
+ * What was sent and the gateway's answer, with the answer's trace id and event id; then a link to this phone's texts
+ * (T-524's thread view, /staging/test-phone/parts) and one to choose another phone (T-525's picker,
+ * /staging/test-phone/phones), each built from this page's own path and field, since this folder imports neither.
+ */
+function sentSection(config: WebConfig, sent: SentText): string[] {
   const { answer } = sent;
+  const texts = new URLSearchParams();
+  texts.set(PHONE_FIELD, sent.testPhoneId);
   return [
     `<h2>${escapeHtml(answer.gatewayStatus === 200 ? WORDS.sentHeading : WORDS.notTakenHeading)}</h2>`,
     `<p>${escapeHtml(WORDS.sentAs)} ${code(sent.testPhoneId)}:</p>`,
@@ -185,6 +193,8 @@ function sentSection(sent: SentText): string[] {
     p(GATEWAY_WORDS[answer.gatewayStatus]),
     `<p>${escapeHtml(WORDS.traceLabel)}: ${code(answer.traceId)}</p>`,
     `<p>${escapeHtml(WORDS.eventLabel)}: ${code(answer.eventId)}</p>`,
+    `<p><a href="${escapeHtml(`${config.basePath}${TEST_PHONE_PATH}/parts?${texts.toString()}`)}">${escapeHtml(WORDS.seeTexts)}</a></p>`,
+    `<p><a href="${escapeHtml(`${config.basePath}${TEST_PHONE_PATH}/phones`)}">${escapeHtml(WORDS.choosePhone)}</a></p>`,
   ];
 }
 
@@ -199,7 +209,7 @@ export function testPhonePage(config: WebConfig, view: TestPhoneView): RoutePage
     `<h1>${escapeHtml(WORDS.title)}</h1>`,
     ...problemLine(view.problem),
     p(WORDS.intro),
-    ...(view.sent === null ? [] : sentSection(view.sent)),
+    ...(view.sent === null ? [] : sentSection(config, view.sent)),
     `<h2>${escapeHtml(WORDS.chooseHeading)}</h2>`,
     `<form method="get" action="${escapeHtml(`${config.basePath}${TEST_PHONE_PATH}`)}">`,
     `<p><label for="${PHONE_FIELD}">${escapeHtml(WORDS.phoneLabel)}</label><br>`,

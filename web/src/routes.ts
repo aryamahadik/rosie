@@ -22,6 +22,7 @@ import { renderPrivacyPage } from "./pages/privacy/page";
 import { ROUTES as secureRoutes } from "./pages/secure/routes";
 import { PRIVACY_PATH } from "./shell/frame";
 import type { RouteModule } from "./shell/route";
+import { ROUTES as testPhonePartsRoutes } from "./staging/test-phone/parts/routes";
 import { ROUTES as testPhonePickerRoutes } from "./staging/test-phone/picker/routes";
 import { ROUTES as testPhoneSendRoutes } from "./staging/test-phone/send/routes";
 
@@ -50,5 +51,6 @@ export const ROUTE_MODULES: readonly RouteModule[] = [
   { folder: "console/team/text-hours", stagingOnly: true, routes: textHoursRoutes },
   { folder: "staging/test-phone/send", stagingOnly: true, routes: testPhoneSendRoutes },
   { folder: "staging/test-phone/picker", stagingOnly: true, routes: testPhonePickerRoutes },
+  { folder: "staging/test-phone/parts", stagingOnly: true, routes: testPhonePartsRoutes },
   { folder: "link", stagingOnly: false, routes: linkRoutes },
 ];
