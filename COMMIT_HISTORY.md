@@ -2,9 +2,59 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 664, [`af601fc`](https://github.com/aryamahadik/rosie/commit/af601fc), 2026-11-15 15:02:28 UTC.
+- **Through:** commit 666, [`5c9ad62`](https://github.com/aryamahadik/rosie/commit/5c9ad62), 2026-11-15 15:28:15 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 666. docs: COMMIT\_HISTORY.md through commit 664 (af601fc, \#675) (\#677)
+
+- **Commit:** [`5c9ad62`](https://github.com/aryamahadik/rosie/commit/5c9ad62), by Arya Mahadik, 2026-11-15 15:28:15 UTC
+- **Pull request:** [#677](https://github.com/aryamahadik/rosie/pull/677) from `task/commit-history-129`, merged 2026-11-15 15:28:15 UTC. It squashed 1 branch commit:
+  - `77a6ec1` docs: COMMIT\_HISTORY.md through commit 664 (af601fc, \#675)
+- **Files changed:** 1 (+62 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +62 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 221 (DL-822); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 665. T-1289: staging binds the sign-in calls: a code emailed to a listed test inbox signs a tester in on the test-phone page (ADR-016 card D) (\#676)
+
+- **Commit:** [`f763cd0`](https://github.com/aryamahadik/rosie/commit/f763cd0), by Arya Mahadik, 2026-11-15 15:28:11 UTC
+- **Pull request:** [#676](https://github.com/aryamahadik/rosie/pull/676) from `task/T-1289`, merged 2026-11-15 15:28:12 UTC. It squashed 2 branch commits:
+  - `bfd7404` T-1289: staging binds signInStart, signInCheck and signOut over K-05'…
+  - `83507bf` T-1289: the sign-in test reads the code's expiry with a minute either…
+- **Files changed:** 17 (+1986 −45), by folder:
+  - `infra/ci/` test-rig.test.mjs +3 −1
+  - `infra/test-rig/` files.mjs +6 −0
+  - `runtime/src/gateway/pages/` entry.ts +21 −6, index.ts +1 −1, pages.test.ts +37 −0, types.ts +15 −0
+  - `runtime/src/` index.ts +47 −13
+  - `runtime/src/wiring/` index.ts +7 −0, root.ts +61 −21, sign-in.test.ts +349 −0, sign-in.ts +204 −0
+  - `runtime/src/wiring/staging/` email.worker.test.ts +5 −1, index.ts +13 −1, options.ts +11 −1, sign-in.seed.ts +79 −0, sign-in.ts +199 −0, sign-in.worker.test.ts +928 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1289: staging binds signInStart, signInCheck and signOut over K-05's sign-in calls on each side's client, the hashing port over PROOF_CODE_HASH_KEY read by name, and the code row's dispatch after its commit in the request's waitUntil (ADR-016 card D)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1289: the sign-in test reads the code's expiry with a minute either way for the database's and the Worker's clocks, and holds the log free of a code as a number of its own
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 664. docs: COMMIT\_HISTORY.md through commit 661 (63167fa, \#672) (\#675)
 
