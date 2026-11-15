@@ -2,9 +2,45 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 657, [`4c48ae5`](https://github.com/aryamahadik/rosie/commit/4c48ae5), 2026-11-15 12:38:34 UTC.
+- **Through:** commit 659, [`b86335f`](https://github.com/aryamahadik/rosie/commit/b86335f), 2026-11-15 13:04:19 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 659. docs: COMMIT\_HISTORY.md through commit 657 (4c48ae5, \#668) (\#670)
+
+- **Commit:** [`b86335f`](https://github.com/aryamahadik/rosie/commit/b86335f), by Arya Mahadik, 2026-11-15 13:04:19 UTC
+- **Pull request:** [#670](https://github.com/aryamahadik/rosie/pull/670) from `task/commit-history-126`, merged 2026-11-15 13:04:20 UTC. It squashed 1 branch commit:
+  - `0256aaa` docs: COMMIT\_HISTORY.md through commit 657 (4c48ae5, \#668)
+- **Files changed:** 1 (+81 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +81 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 218 (DL-813); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 658. T-1408: every model call's fetch asks for redirect "manual" (workerd refuses "error"); a 3xx fails by its status and is never followed; a Workers test carries both calls through workerd's own fetch (\#669)
+
+- **Commit:** [`b84d422`](https://github.com/aryamahadik/rosie/commit/b84d422), by Arya Mahadik, 2026-11-15 13:04:15 UTC
+- **Pull request:** [#669](https://github.com/aryamahadik/rosie/pull/669) from `task/T-1408`, merged 2026-11-15 13:04:16 UTC. It squashed 1 branch commit:
+  - `359976e` T-1408: every model call's fetch asks for redirect "manual" (workerd …
+- **Files changed:** 5 (+394 −2), by folder:
+  - `ai/src/gateway/` gateway.test.ts +46 −0, gateway.ts +2 −1
+  - `ai/src/safety/` read.test.ts +38 −0, wire.ts +2 −1
+  - `runtime/test/` model-fetch.worker.test.ts +306 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 657. docs: COMMIT\_HISTORY.md through commit 654 (7454283, \#665) (\#668)
 
