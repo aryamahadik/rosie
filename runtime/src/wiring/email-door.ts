@@ -11,8 +11,8 @@
 //     double's record by key), so the person gets one email.
 //   - An address lookup that throws (RecipientDirectory.emailFor) is no address known: none, so the row ends
 //     noAddress with nothing sent and its claim left to lapse. Never a rejected run. The send-state port's own emailFor
-//     reads only what its read kept (./real.ts realSendState) and makes no call; this holds for any directory the root
-//     is handed.
+//     reads only what its read kept (./real.ts realSendState) and makes no call; the root puts this door in front of
+//     any directory it is handed, wherever it binds the email port.
 //   - Each is one JSON line, labels only (K-12's rule; K-08 v1): the call, why, and the error's name when it is a
 //     label. Never the request, an address, a code, the words, a key or the error's message.
 //
