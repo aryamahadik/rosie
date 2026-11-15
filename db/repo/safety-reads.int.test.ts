@@ -14,6 +14,14 @@
 // references (a bare row alias, to_jsonb, row_to_json) and every sealed column, event_log.sealed_values and
 // harm_reports.sealed_details among them, and shows on statements made to fail that it catches each (DL-345, as T-1168
 // does for T-1138's reads).
+//
+// T-1392: readOutboxRowWritten answers K-05 v1.16 (item 70, defaults 140 to 144): beside written, the recipient and send
+// class a written row stores, both null when the call's side shows no such row. So every readOutboxRowWritten answer is
+// checked against v1.16's readOutboxRowWritten.v1dot16Response, which requires both, and every fixture of the call, v1.4
+// and v1.16, runs here, each valid at the version the index lists it under. A v1.4 fixture's outcome states neither
+// field; a v1.16 call always states both, so its answer is the fixture's outcome with the two fields added and nothing
+// else changed, which is its v1.16 twin's outcome (README "Consumers of v1.16"; ADDED_IN_V116, TWIN_V116). The read's
+// column list gains recipient_handle_id and send_class and no other column. The other six reads are checked as before.
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
@@ -130,14 +138,15 @@ const HOLD_COLUMNS = [
 
 /**
  * Each read's column list, and no other column of its tables (item 37: the barrier is the column list; DL-345): the
- * business's id and business_id, by which every read names the business, among them.
+ * business's id and business_id, by which every read names the business, among them. readOutboxRowWritten's, since
+ * K-05 v1.16, the row's recipient_handle_id and send_class too (item 70), never its plan or final parts (T-1392).
  */
 const COLUMNS_OF: Readonly<Record<Call, readonly string[]>> = {
   readSafetyOutcomeOfEvent: OUTCOME_COLUMNS,
   readSafetyOutcome: OUTCOME_COLUMNS,
   readSafetyHold: HOLD_COLUMNS,
   readSafetyHoldOfOutcome: HOLD_COLUMNS,
-  readOutboxRowWritten: ["business_id", "id"],
+  readOutboxRowWritten: ["business_id", "id", "recipient_handle_id", "send_class"],
   readBusinessOwner: ["business_id", "ended_at", "handle_id", "id", "kind", "person_id", "role"],
   readBusinessZone: ["id", "time_zone"],
 };
@@ -179,6 +188,14 @@ const exchangeOf = (file: string): Exchange => readJson(new URL(file, ACCESS_DIR
 const INDEX = (readJson(new URL("index.json", ACCESS_DIR)) as { fixtures: IndexEntry[] }).fixtures;
 const acceptedOf = (def: string): string[] =>
   INDEX.filter((entry) => entry.def === def && entry.expect === "accept").map((entry) => entry.file);
+/** The version the index lists a fixture under. */
+function versionOf(file: string): string {
+  const entry = INDEX.find((candidate) => candidate.file === file);
+  if (entry === undefined) {
+    throw new Error(`the index lists no ${file}`);
+  }
+  return entry.version;
+}
 const READ_FIXTURES = CALLS.flatMap((call) => acceptedOf(`${call}.exchange`));
 const fromHex = (hex: string): Uint8Array =>
   Uint8Array.from((hex.match(/../g) ?? []).map((pair) => parseInt(pair, 16)));
@@ -199,21 +216,35 @@ for (const file of schemaFiles(CONTRACTS)) {
 }
 const V14_ID = (readJson(new URL("data-access/data-access.v1.4.schema.json", CONTRACTS)) as { $id: string })
   .$id;
+/** The $id of data-access's schema at `version` (the index's v1.4 or v1.16). */
+const schemaIdOf = (version: string): string =>
+  (readJson(new URL(`data-access/data-access.${version}.schema.json`, CONTRACTS)) as { $id: string }).$id;
+const V116_ID = schemaIdOf("v1.16");
 
-/** Checks `value` against one $defs entry of data-access v1.4, returning Ajv's errors (none when it passes). */
-function schemaErrors(def: string, value: unknown): string[] {
-  const validate = ajv.getSchema(`${V14_ID}#/$defs/${def}`);
+/**
+ * Checks `value` against one $defs entry of data-access v1.4, or of the version whose $id is `schemaId`, returning Ajv's
+ * errors (none when it passes).
+ */
+function schemaErrors(def: string, value: unknown, schemaId = V14_ID): string[] {
+  const validate = ajv.getSchema(`${schemaId}#/$defs/${def}`);
   if (validate === undefined) {
-    throw new Error(`data-access v1.4 has no $defs/${def}`);
+    throw new Error(`${schemaId} has no $defs/${def}`);
   }
   return validate(value)
     ? []
     : (validate.errors ?? []).map((error) => `${error.instancePath} ${error.message ?? ""}`);
 }
 
-/** The outcome checked against the call's response, or its errors when it is one. */
+/**
+ * The outcome checked against the call's response, or its errors when it is one; a readOutboxRowWritten answer against
+ * v1.16's readOutboxRowWritten.v1dot16Response, the answer a v1.16 call gives, which requires recipientHandleId and
+ * sendClass (item 70; T-1392).
+ */
 function outcomeErrors(call: Call, outcome: unknown): string[] {
   const isError = typeof outcome === "object" && outcome !== null && "error" in outcome;
+  if (call === "readOutboxRowWritten" && !isError) {
+    return schemaErrors(`${call}.v1dot16Response`, outcome, V116_ID);
+  }
   return schemaErrors(isError ? `${call}.errors` : `${call}.response`, outcome);
 }
 
@@ -372,6 +403,48 @@ async function given(file: string): Promise<Exchange> {
 const nowOf = (exchange: Exchange): { now: Date } => ({ now: new Date(exchange.given.now) });
 const businessOf = (request: Request): string | null =>
   typeof request.businessId === "string" ? request.businessId : null;
+
+/**
+ * The two fields K-05 v1.16 adds to the answer of each readOutboxRowWritten exchange listed under v1.4 (item 70; README
+ * "Consumers of v1.16": "each v1.4 exchange's answer its fixture's outcome with the two fields added and nothing else
+ * changed"): the recipient and send class commit-alex-safety's row stores for the row written, and both null for the row
+ * not yet written and for that row under another business's scope (defaults 140 and 141).
+ */
+const ADDED_IN_V116: Readonly<
+  Record<string, { recipientHandleId: string | null; sendClass: string | null }>
+> = {
+  "outbox-row-written-alex-safety.json": { recipientHandleId: "handle-alex", sendClass: "safety" },
+  "outbox-row-written-not-yet.json": { recipientHandleId: null, sendClass: null },
+  "outbox-row-written-other-business.json": { recipientHandleId: null, sendClass: null },
+};
+
+/** Each v1.4 readOutboxRowWritten exchange's v1.16 twin: the same given and request, its outcome in v1.16's form. */
+const TWIN_V116: Readonly<Record<string, string>> = {
+  "outbox-row-written-alex-safety.json": "outbox-row-written-alex-safety-recipient.json",
+  "outbox-row-written-not-yet.json": "outbox-row-written-not-yet-no-recipient.json",
+  "outbox-row-written-other-business.json": "outbox-row-written-other-business-no-recipient.json",
+};
+
+/**
+ * What the call answers for a fixture's request in the fixture's world: the fixture's outcome, compared whole; for a
+ * readOutboxRowWritten exchange listed under v1.4, whose outcome states neither field, that outcome with the two fields
+ * v1.16 adds (ADDED_IN_V116) and nothing else changed, never with a field dropped.
+ */
+function v1dot16AnswerOf(file: string, exchange: Exchange): Record<string, Json> {
+  const { outcome } = exchange;
+  if (exchange.call !== "readOutboxRowWritten" || versionOf(file) !== "v1.4" || "error" in outcome) {
+    return outcome;
+  }
+  const added = ADDED_IN_V116[file];
+  if (added === undefined) {
+    throw new Error(`${file}: no v1.16 fields are pinned for this exchange`);
+  }
+  expect(
+    Object.hasOwn(outcome, "recipientHandleId") || Object.hasOwn(outcome, "sendClass"),
+    `${file}'s outcome states neither field`,
+  ).toBe(false);
+  return { ...outcome, ...added };
+}
 
 // ---- the reads, each in its role ------------------------------------------------------------------------------------
 
@@ -756,7 +829,7 @@ describe("the roles the reads run as (K-05 v1.4 items 37 to 43, default 55; T-19
 });
 
 describe("each v1.4 fixture of the seven reads gives its outcome (K-05 v1.4 items 37 to 43)", () => {
-  it("the index lists the seven reads' eighteen exchanges, each valid against data-access v1.4", SLOW, () => {
+  it("the index lists the seven reads' twenty-one exchanges, each valid at its listed version", SLOW, () => {
     expect(Object.fromEntries(CALLS.map((call) => [call, acceptedOf(`${call}.exchange`).sort()]))).toEqual({
       readSafetyOutcomeOfEvent: [
         "read-safety-outcome-of-event-alex.json",
@@ -774,8 +847,11 @@ describe("each v1.4 fixture of the seven reads gives its outcome (K-05 v1.4 item
         "read-safety-hold-of-outcome-none.json",
       ],
       readOutboxRowWritten: [
+        "outbox-row-written-alex-safety-recipient.json",
         "outbox-row-written-alex-safety.json",
+        "outbox-row-written-not-yet-no-recipient.json",
         "outbox-row-written-not-yet.json",
+        "outbox-row-written-other-business-no-recipient.json",
         "outbox-row-written-other-business.json",
       ],
       readBusinessOwner: [
@@ -785,10 +861,23 @@ describe("each v1.4 fixture of the seven reads gives its outcome (K-05 v1.4 item
       ],
       readBusinessZone: ["business-zone-barbershop.json", "business-zone-no-business-row.json"],
     });
-    expect(READ_FIXTURES).toHaveLength(18);
+    expect(READ_FIXTURES).toHaveLength(21);
+    // v1.16's three are readOutboxRowWritten's (T-1391); every other is v1.4's, checked at v1.4 as before.
+    expect(READ_FIXTURES.filter((file) => versionOf(file) === "v1.16").sort()).toEqual([
+      "outbox-row-written-alex-safety-recipient.json",
+      "outbox-row-written-not-yet-no-recipient.json",
+      "outbox-row-written-other-business-no-recipient.json",
+    ]);
+    expect(READ_FIXTURES.filter((file) => !["v1.4", "v1.16"].includes(versionOf(file)))).toEqual([]);
     for (const file of READ_FIXTURES) {
       const exchange = exchangeOf(file);
-      expect(schemaErrors(`${exchange.call}.exchange`, exchange), file).toEqual([]);
+      expect(schemaErrors(`${exchange.call}.exchange`, exchange, schemaIdOf(versionOf(file))), file).toEqual(
+        [],
+      );
+      if (exchange.call === "readOutboxRowWritten") {
+        // Every v1.4 exchange of the call is a v1.16 exchange too (README "v1.16", Kind).
+        expect(schemaErrors(`${exchange.call}.exchange`, exchange, V116_ID), `${file} at v1.16`).toEqual([]);
+      }
     }
   });
 
@@ -796,7 +885,7 @@ describe("each v1.4 fixture of the seven reads gives its outcome (K-05 v1.4 item
     it(`${file}: in its role and on its side, the call answers the fixture's outcome`, SLOW, async () => {
       const exchange = await given(file);
       const outcome = await runRead(exchange);
-      expect(outcome).toEqual(exchange.outcome);
+      expect(outcome).toEqual(v1dot16AnswerOf(file, exchange));
       expect(outcomeErrors(exchange.call as Call, outcome)).toEqual([]);
     });
   }
@@ -808,7 +897,7 @@ describe("each v1.4 fixture of the seven reads gives its outcome (K-05 v1.4 item
       for (const file of READ_FIXTURES) {
         const exchange = await given(file);
         const outcome = await runIn(exchange.call as Call, exchange.request, nowOf(exchange));
-        expect(outcome, file).toEqual(exchange.outcome);
+        expect(outcome, file).toEqual(v1dot16AnswerOf(file, exchange));
       }
     },
   );
@@ -975,6 +1064,163 @@ describe("one business's rows, never another's, and with no business only rows w
         const outcome = await OWN[call](clientFor(call, nobody), request as never);
         expect(outcome, call).toEqual({ error: "notFound", table: "businesses", rowId: nobody });
         expect(outcomeErrors(call, outcome), call).toEqual([]);
+      }
+    },
+  );
+});
+
+describe("readOutboxRowWritten at K-05 v1.16: a written row's recipient and send class as stored, both null when the side shows no row (item 70, defaults 140 to 144; T-1392)", () => {
+  /** A read moment of the test's own, so each answer is compared whole. */
+  const AT = { now: new Date("2026-10-26T12:00:00Z") };
+  const READ_AT = "2026-10-26T12:00:00Z";
+
+  it("each v1.4 exchange's v1.16 answer is its v1.16 twin's outcome: the same given and request, the fixture's outcome with the two fields added and nothing else changed", () => {
+    const v14 = acceptedOf("readOutboxRowWritten.exchange")
+      .filter((file) => versionOf(file) === "v1.4")
+      .sort();
+    expect(Object.keys(TWIN_V116).sort()).toEqual(v14);
+    expect(Object.keys(ADDED_IN_V116).sort()).toEqual(v14);
+    for (const [file, twinFile] of Object.entries(TWIN_V116)) {
+      const exchange = exchangeOf(file);
+      const twin = exchangeOf(twinFile);
+      expect(versionOf(twinFile), twinFile).toBe("v1.16");
+      expect(
+        [twin.given.k04Seeds, twin.given.after, twin.given.now, twin.given.partSeeds],
+        `${twinFile}'s given`,
+      ).toEqual([
+        exchange.given.k04Seeds,
+        exchange.given.after,
+        exchange.given.now,
+        exchange.given.partSeeds,
+      ]);
+      expect(twin.request, `${twinFile}'s request`).toEqual(exchange.request);
+      expect(v1dot16AnswerOf(file, exchange), file).toEqual(twin.outcome);
+      expect(schemaErrors("readOutboxRowWritten.v1dot16Response", twin.outcome, V116_ID), twinFile).toEqual(
+        [],
+      );
+      // v1.4's answer as its fixture states it is no v1.16 call's answer, which always states both (default 144).
+      expect(
+        schemaErrors("readOutboxRowWritten.v1dot16Response", exchange.outcome, V116_ID),
+        file,
+      ).not.toEqual([]);
+    }
+  });
+
+  it(
+    "under each side a written row answers the recipient and send class it stores, and a row the side does not show answers written false with both null, inside the call's own transaction too; by the tables' owner, whom row-level security does not bind, the same (the read's own filter)",
+    SLOW,
+    async () => {
+      await given("read-safety-outcome-of-event-alex.json");
+      await addRowsElsewhere();
+      for (const scope of SCOPES) {
+        for (const home of HOMES) {
+          const label = `${home.outboxRowId}, under ${scope ?? "no business"}`;
+          const request: Request = { outboxRowId: home.outboxRowId, businessId: scope };
+          const seen = home.businessId === scope;
+          const expected = {
+            result: "outboxRowWritten",
+            outboxRowId: home.outboxRowId,
+            businessId: scope,
+            readAt: READ_AT,
+            written: seen,
+            recipientHandleId: seen ? "handle-alex" : null,
+            sendClass: seen ? "safety" : null,
+          };
+          const outcome = await readOutboxRowWritten(
+            clientFor("readOutboxRowWritten", scope),
+            request as never,
+            AT,
+          );
+          expect(outcome, label).toEqual(expected);
+          expect(outcomeErrors("readOutboxRowWritten", outcome), label).toEqual([]);
+          expect(
+            await runIn("readOutboxRowWritten", request, AT),
+            `${label}, in the call's transaction`,
+          ).toEqual(expected);
+          expect(
+            await asTablesOwner("readOutboxRowWritten", request, scope, AT),
+            `${label}, by the owner`,
+          ).toEqual(expected);
+        }
+      }
+    },
+  );
+
+  it(
+    "a safety line's email copy answers its email handle's id and safety, and an outage line quick_reply, each as its row stores it; no answer holds the handle's number or address, and another business's scope sees none of them",
+    SLOW,
+    async () => {
+      const exchange = await given("outbox-row-written-alex-safety-recipient.json");
+      const line = "out-alex-safety-emergency";
+      const emailCopy = `${line}-email`;
+      const outageLine = "out-alex-outage-line";
+      await db.sql.begin(async (tx) => {
+        // The line's email copy (T-307's emailCopyId, `<row>-email`) to Alex's email handle (K-04 seed-person-roles).
+        await insertRow(tx, "outbox_rows", {
+          id: emailCopy,
+          turn_id: "turn-alex-safety-1",
+          recipient_handle_id: "handle-alex-email",
+          recipient_person_id: "person-alex",
+          business_id: BARBERSHOP,
+          channel: "email",
+          send_class: "safety",
+          email_purpose: "copy",
+          copy_of_row_id: line,
+          versions_read: [],
+          bundle_hash: BUNDLE_HASH,
+          bundle_build: 1,
+          trace_id: "trace-alex-0050",
+        });
+        // A timed-out read's outage line: a line row of send class quick_reply (K-09 v1.1 default 36).
+        await insertRow(tx, "outbox_rows", {
+          id: outageLine,
+          turn_id: "turn-alex-safety-1",
+          recipient_handle_id: "handle-alex",
+          recipient_person_id: "person-alex",
+          business_id: BARBERSHOP,
+          channel: "imessage",
+          send_class: "quick_reply",
+          versions_read: [],
+          bundle_hash: BUNDLE_HASH,
+          bundle_build: 1,
+          trace_id: "trace-alex-0050",
+        });
+      });
+      const rows: [string, string, string][] = [
+        [line, "handle-alex", "safety"],
+        [emailCopy, "handle-alex-email", "safety"],
+        [outageLine, "handle-alex", "quick_reply"],
+      ];
+      for (const [outboxRowId, recipientHandleId, sendClass] of rows) {
+        const request: Request = { outboxRowId, businessId: BARBERSHOP };
+        const expected = {
+          result: "outboxRowWritten",
+          outboxRowId,
+          businessId: BARBERSHOP,
+          readAt: exchange.given.now,
+          written: true,
+          recipientHandleId,
+          sendClass,
+        };
+        const outcome = await readOutboxRowWritten(app, request as never, nowOf(exchange));
+        expect(outcome, outboxRowId).toEqual(expected);
+        expect(outcomeErrors("readOutboxRowWritten", outcome), outboxRowId).toEqual([]);
+        expect(await runIn("readOutboxRowWritten", request, nowOf(exchange)), outboxRowId).toEqual(expected);
+        const text = JSON.stringify(outcome);
+        for (const value of ["+15555550101", "alex@example.com"]) {
+          expect(text.includes(value), `${outboxRowId}: ${value}`).toBe(false);
+        }
+        // Under the yoga studio's scope the row is not seen, nor whom it goes to or its class (default 141).
+        expect(
+          await readOutboxRowWritten(app, { outboxRowId, businessId: YOGA }, nowOf(exchange)),
+          `${outboxRowId}, under the yoga studio`,
+        ).toEqual({
+          ...expected,
+          businessId: YOGA,
+          written: false,
+          recipientHandleId: null,
+          sendClass: null,
+        });
       }
     },
   );
@@ -1477,6 +1723,17 @@ describe("sealed values: never selected, never answered, never logged (item 37; 
         "readSafetyHold",
         "a column never read: sealed_details",
       ],
+      // v1.16's read names the recipient by its handle id alone, never through a handles row (default 142; T-1392).
+      [
+        "select outbox_rows.id, handles.address from outbox_rows join handles on handles.id = outbox_rows.recipient_handle_id",
+        "readOutboxRowWritten",
+        "a table beyond its own: handles",
+      ],
+      [
+        "select outbox_rows.id, handles.address from outbox_rows join handles on handles.id = outbox_rows.recipient_handle_id",
+        "readOutboxRowWritten",
+        "a column never read: address",
+      ],
     ];
     for (const [statement, call, problem] of caught) {
       expect(problemsOf(statement, call), statement).toContain(problem);
@@ -1492,12 +1749,38 @@ describe("sealed values: never selected, never answered, never logged (item 37; 
         "readBusinessOwner",
       ],
       ["select id from outbox_rows where id = $1 and business_id is null", "readOutboxRowWritten"],
+      [
+        "select id, recipient_handle_id, send_class from outbox_rows where id = $1 and business_id = $2",
+        "readOutboxRowWritten",
+      ],
       ["select time_zone from businesses where id = $1", "readBusinessZone"],
     ];
     for (const [statement, call] of clean) {
       expect(problemsOf(statement, call), statement).toEqual([]);
     }
   });
+
+  it(
+    "readOutboxRowWritten reads the row in one statement naming its id, recipient_handle_id and send_class beside its business, and no other column, and reads no handles row (v1.16 item 70, default 142; T-1392)",
+    SLOW,
+    async () => {
+      const exchange = await given("outbox-row-written-alex-safety-recipient.json");
+      sent.length = 0;
+      expect(await runRead(exchange)).toEqual(exchange.outcome);
+      const reads = sent.filter((statement) => tablesOf(statement).includes("outbox_rows"));
+      expect(reads).toHaveLength(1);
+      const [read = ""] = reads;
+      expect(tablesOf(read)).toEqual(["outbox_rows"]);
+      expect([...new Set(columnsOf(read, "readOutboxRowWritten"))].sort()).toEqual([
+        "business_id",
+        "id",
+        "recipient_handle_id",
+        "send_class",
+      ]);
+      expect(problemsOf(read, "readOutboxRowWritten")).toEqual([]);
+      expect(sent.some((statement) => tablesOf(statement).includes("handles"))).toBe(false);
+    },
+  );
 
   it(
     "every statement the seven reads send, over every fixture, both other sides and the owner's cases, names only its read's tables and columns, no sealed column, no * and no whole row, and names the business; nothing is logged; no answer holds a sealed value",
