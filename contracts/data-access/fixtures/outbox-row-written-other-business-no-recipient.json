@@ -1,0 +1,22 @@
+{
+  "call": "readOutboxRowWritten",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["commit-alex-safety.json"],
+    "now": "2026-11-07T15:59:59Z",
+    "note": "v1.4's outbox-row-written-other-business in its v1.16 form. The barbershop's safety row named under the yoga studio's scope: the scope never shows another business's row (K-04 v1 rule 4), so written is false and the recipient and send class are both null: nothing of the row, not even that it exists or whom it goes to, reaches this business."
+  },
+  "request": {
+    "outboxRowId": "out-alex-safety-emergency",
+    "businessId": "biz-yoga-studio"
+  },
+  "outcome": {
+    "result": "outboxRowWritten",
+    "outboxRowId": "out-alex-safety-emergency",
+    "businessId": "biz-yoga-studio",
+    "readAt": "2026-11-07T15:59:59Z",
+    "written": false,
+    "recipientHandleId": null,
+    "sendClass": null
+  }
+}
