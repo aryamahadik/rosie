@@ -959,7 +959,10 @@ describe("this file's database on the rig", () => {
     // Each case asks about a handle of its own, every number a whole one of the fiction range.
     const numbers = CASES.map((each) => each.handle.address);
     expect(new Set(numbers).size).toBe(9);
-    for (const number of numbers) expect(number).toMatch(/^\+155555501[0-9]{2}$/u);
+    for (const number of numbers) {
+      expect(number).toMatch(/^\+1[0-9]{10}$/u);
+      expect(ANY_FICTION_NUMBER.test(number)).toBe(true);
+    }
     // A stand-in's fixture asks about test owner 1's number and answers his ids: what its stand-in differs in.
     for (const standIn of STAND_INS) {
       const fixture = fixtureOf(standIn.fixture);
