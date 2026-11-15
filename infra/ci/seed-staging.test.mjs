@@ -98,10 +98,11 @@ const CONFIGURED_VALUE = Object.entries(CONFIGURED)
   .map(([id, number]) => `${id}=${number}`)
   .join(",");
 // The name the testers' inboxes are kept under (T-1281's set reads it), and STAGING_TEST_INBOXES in the build Mac's form:
-// made-up inboxes at example.com, commas or white space between them.
+// made-up inboxes at example.com joined by commas with no space, the one form put-staging-secrets.sh takes for the same
+// line (DL-549); the set also takes white space between them.
 const INBOXES_NAME = "STAGING_TEST_INBOXES";
 const INBOXES = ["t1287-tester-a@example.com", "t1287-tester-b@example.com"];
-const INBOXES_VALUE = INBOXES.join(", ");
+const INBOXES_VALUE = INBOXES.join(",");
 // Made up, as every URL here: a production database that does not exist (a .invalid host never resolves, RFC 6761),
 // and a local database that does not exist.
 const PRODUCTION_URL =
@@ -1610,7 +1611,7 @@ describe("seed-staging.sh hands the testers' inboxes to staging-testers' run alo
     db = await createThrowawayDatabase("staging_testers");
     fromEnv = spiedRoot();
     // The build Mac's form: each read by name from the checkout's .dev.vars, as lib.sh's load_dev_var reads it (the
-    // list's line exported and quoted, a space after its comma).
+    // list's line exported and quoted).
     fromFile = spiedRoot(
       `STAGING_DATABASE_URL=${db.url}\n  export ${INBOXES_NAME}="${INBOXES_VALUE}"\n  export ${TOKEN_NAME}='${token}'\n`,
     );
