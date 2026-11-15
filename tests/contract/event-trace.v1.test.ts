@@ -1,18 +1,20 @@
-// Contract test for K-08, the event log and trace format (T-087; ops/plan/02-contracts.md K-08 "Contract test" and
-// section 2 item 12; contracts/event-trace/README.md "Producers and consumers (02-contracts K-08)", "Fixtures" and
-// section "v1.1").
+// Contract test for K-08, the event log and trace format (T-087; v1.2 by T-1293; ops/plan/02-contracts.md K-08
+// "Contract test" and section 2 item 12; contracts/event-trace/README.md "Producers and consumers (02-contracts K-08)",
+// "Fixtures", section "v1.1" and section "v1.2").
 //
 // This is the fixture part. The contract test has two parts: this one, which reads only the committed schemas, the
-// README and the fixtures, and one part per producer or consumer side, added later by a QA side task that depends on
-// this task and on that side's build task. SIDE_CHECKS (at the end) is the list where each side is added.
+// README and the fixtures (and, for v1.2, K-22 v1's tables file the README names), and one part per producer or consumer
+// side, added later by a QA side task that depends on this task and on that side's build task. SIDE_CHECKS (at the end)
+// is the list where each side is added.
 //
-// K-08 is frozen at v1 (T-017) and v1.1 (T-1077). One fixtures/index.json lists both versions' fixtures, each entry
-// naming its version. This file holds both, as DL-124 settled for K-06 (so the README's separately named
-// event-trace.v1.1 test is covered here): every entry is checked against the schema its own `version` names
-// (event-trace.<version>.schema.json, at its $defs entry `def`), and entries are selected by version and by what they
-// state, never by a pinned list or count (DL-124, DL-125), so a later minor version's fixtures join every generic check
-// when they land. The mends of part 2 are written for the refused fixtures of the versions frozen when this part was
-// written (v1 and v1.1); a later version's mends join MENDS with its QA task.
+// K-08 is frozen at v1 (T-017), v1.1 (T-1077) and v1.2 (T-1275). One fixtures/index.json lists every version's
+// fixtures, each entry naming its version. This file holds them all, as DL-124 settled for K-06 (so the README's
+// separately named event-trace.v1.1 test, and v1.2's contract test, T-1293, are covered here): every entry is checked
+// against the schema its own `version` names (event-trace.<version>.schema.json, at its $defs entry `def`), and entries
+// are selected by version and by what they state, never by a pinned list or count (DL-124, DL-125), so a later minor
+// version's fixtures join every generic check when they land. The mends of part 2 are written for the refused fixtures
+// of the versions whose QA task has run (v1 and v1.1 by T-087, v1.2 by T-1293); a later version's mends join MENDS with
+// its QA task.
 //
 // What this part proves:
 //   1. every fixture in contracts/event-trace/fixtures/index.json is checked against the schema its version names (the
@@ -22,7 +24,9 @@
 //   2. each refusal is tied to its reason (DL-124's mend-then-accept proof): each refused fixture is refused, the
 //      schema's errors name the one field the README names, and its copy with that one field put right (README
 //      "Fixtures": the handle id for the number, the words dropped, the bundle id added, open_questions for event_log;
-//      v1.1: the accepted row it names, its one fault removed) is accepted, and is that accepted row where one is named;
+//      v1.1 and v1.2: the accepted row it names, its one fault removed) is accepted, and is that accepted row where one
+//      is named; a hash twin's one fault (v1.1's code_hash, v1.2's device_sha256) trips both the name rule and the
+//      value rule, each of which refuses it alone;
 //   3. the schema is not vacuous: removing any one required field, at any depth, from a copy of an accepted fixture
 //      makes the copy refused, and so does one field the schema does not know (the required fields are read from the
 //      schemas' own `required` lists, along the branch of each anyOf, oneOf, if and dependentSchemas the fixture takes);
@@ -36,10 +40,16 @@
 //      no person's words, phone number or email address in a plain value at any depth; an export row is the stored row
 //      unchanged; an invariant run names each breach's trace; v1.1: the columns each added kind's values name (with the
 //      review item rows no fixture shows, which the README has this test build) and nothing that never appears inside
-//      sealed bytes.
+//      sealed bytes; v1.2 (README "What the schema checks for a session's row", "The contract test checks the rest";
+//      DL-544's lead note on T-1293): a session kind's subject matches its table, its values name only the K-22 v1
+//      sessions columns README default 27 gives the kind, each holding one value of that column's type (so a token
+//      under a column name the schema does not list, a device id and a value nested under a column are refused), and no
+//      string that reads as a hash stands anywhere in a session's row, at any depth.
 //   What needs a producer or consumer side is on SIDE_CHECKS, not checked here: the spans and rows each hop and commit
-//   writes, and each consumer reading them and refusing every invalid one.
+//   writes, and each consumer reading them and refusing every invalid one. The sides come from the README's "Producers
+//   and consumers (02-contracts K-08)" and from each later version's "Writers and readers" (v1.2: C-152, C-193).
 
+import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { isDeepStrictEqual } from "node:util";
@@ -374,10 +384,11 @@ const ADDED_KINDS_TABLE = tableAfter("### The added kinds").map((cells) => ({
   readBy: must(cells[3]),
 }));
 
-/** README v1.2 "The session kinds": each kind v1.2 adds and its table. */
+/** README v1.2 "The session kinds": each kind v1.2 adds, its table, and who reads it. */
 const V12_KINDS_TABLE = tableAfter("### The session kinds").map((cells) => ({
   kind: must(/`([a-z_]+\.[a-z_]+)`/.exec(must(cells[0]))?.[1], `a session kind in ${String(cells[0])}`),
   table: must(/`([a-z_]+)`/.exec(must(cells[1]))?.[1], `a table in ${String(cells[1])}`),
+  readBy: must(cells[3]),
 }));
 
 /** Each kind's subject (its part before the dot) and the table the README's kinds tables give it. */
@@ -592,6 +603,62 @@ const isCodeLike = must(strictAjv.getSchema(`${schemaIdOf("v1.1")}#/$defs/codeLi
   value: unknown,
 ) => boolean;
 const ADDED_KINDS = new Set(enumOf("v1.1", "addedEventKind"));
+
+/**
+ * README v1.2 "What each session kind holds" and default 27 ("The values carry K-22 v1's column names as frozen"): the
+ * columns each session kind's old and new values may name, and whether the kind inserts its row ("new: ..."), so it has
+ * no old values and names every column; the end names its columns old and new. Held in part 4 to the README's own
+ * words, to default 27's list and to K-22 v1's sessions table.
+ */
+const SESSION_KIND_COLUMNS: Record<string, { inserts: boolean; columns: readonly string[] } | undefined> = {
+  "session.started": {
+    inserts: true,
+    columns: ["person_id", "proven_via", "proof_code_id", "started_at", "last_seen_at", "expires_at"],
+  },
+  "session.ended": { inserts: false, columns: ["ended_at", "ended_why"] },
+};
+/** v1.2's session kinds (its sessionEventKind; README "The session kinds"). */
+const SESSION_KINDS = new Set(enumOf("v1.2", "sessionEventKind"));
+
+/** A table of a database part's tables file, as K-22 v1's gives it: each column's type and whether it takes null. */
+interface TablesFileTable {
+  name: string;
+  columns: { name: string; type: string; null: boolean }[];
+  checks?: { name: string; expression: string }[];
+}
+type TablesFileColumn = TablesFileTable["columns"][number];
+
+/**
+ * README v1.2 "No migration": "Their rows name K-22 v1's `sessions` table
+ * (`../db-schema/people-access/people-access.v1.tables.json`, frozen with T-031) by its own column names." The table,
+ * read from the file the README names.
+ */
+const K22_TABLES_FILE = must(
+  /K-22 v1's `sessions` table \(`([^`]+)`/.exec(
+    sectionOf("## v1.2 (T-1275)", "## Producers and consumers"),
+  )?.[1],
+  "the README's path to K-22 v1's tables file",
+);
+const K22_SESSIONS = must(
+  (
+    readJson(path.join(EVENT_TRACE_DIR, ...K22_TABLES_FILE.split("/"))) as { tables: TablesFileTable[] }
+  ).tables.find((table) => table.name === "sessions"),
+  "K-22 v1's sessions table",
+);
+
+/**
+ * The closed columns of K-22 v1's sessions table: each `<column> in ('a', 'b', ...)` its CHECKs hold
+ * (sessions_proven_via_known, sessions_ended_has_why), with the values it lists.
+ */
+const K22_SESSION_VALUES = new Map<string, string[]>();
+for (const check of K22_SESSIONS.checks ?? [])
+  for (const match of check.expression.matchAll(/\b([a-z_]+) in \(([^)]*)\)/g))
+    K22_SESSION_VALUES.set(
+      must(match[1]),
+      must(match[2])
+        .split(",")
+        .map((value) => value.trim().replace(/^'(.*)'$/, "$1")),
+    );
 
 // ---------------------------------------------------------------------------------------------------------------
 // Paths into a JSON value
@@ -1020,6 +1087,116 @@ export function checkSealedBytes(row: EventRow): string[] {
   return problems;
 }
 
+/** An instant in UTC, as the event log writes one ($defs/utc; CQ-09). */
+const isUtc = must(strictAjv.getSchema(`${schemaIdOf("v1.2")}#/$defs/utc`), "v1.2's utc") as (
+  value: unknown,
+) => boolean;
+
+/**
+ * Whether `value` is one value of a K-22 column: text a string (one its CHECK lists, for a closed column), timestamptz
+ * an instant in UTC, integer a whole number; null only where the column takes null.
+ */
+function columnTakes(column: TablesFileColumn, value: unknown): boolean {
+  if (value === null) return column.null;
+  if (column.type === "text")
+    return typeof value === "string" && (K22_SESSION_VALUES.get(column.name)?.includes(value) ?? true);
+  if (column.type === "timestamptz") return isUtc(value);
+  if (column.type === "integer") return Number.isInteger(value);
+  return false;
+}
+
+/**
+ * README v1.2 (the contract test checks "the columns each kind's values name, which is where a token under a column name
+ * the schema does not list is caught"; "What each session kind holds"; default 27) and DL-544's lead note on T-1293
+ * ("hold each session kind's values to K-22's scalar columns ... so a token under another column name, and device_id,
+ * are caught"): a session kind's old and new values name only the K-22 v1 sessions columns the kind holds, each with one
+ * value of that column's type, never a list or an object under it; the start inserts its row, so it has no old values
+ * and names every column; the end names its columns old and new, a live session (ended_at and ended_why null: K-22
+ * sessions_ended_has_why) that ends (both set). No problem repeats a value, since a value here may be a token.
+ */
+export function checkSessionColumns(row: EventRow): string[] {
+  const own = SESSION_KIND_COLUMNS[row.kind];
+  if (own === undefined) return [];
+  const problems: string[] = [];
+  for (const side of ["old_values", "new_values"] as const) {
+    for (const [name, value] of Object.entries(row[side] ?? {})) {
+      const column = own.columns.includes(name)
+        ? K22_SESSIONS.columns.find((candidate) => candidate.name === name)
+        : undefined;
+      if (column === undefined) problems.push(`${row.id}: ${row.kind} names no column ${name}`);
+      else if (typeof value === "object" && value !== null)
+        problems.push(`${row.id}/${side}/${name} holds a list or an object, not one value of K-22's ${name}`);
+      else if (!columnTakes(column, value))
+        problems.push(`${row.id}/${side}/${name} holds no value K-22's ${name} (${column.type}) takes`);
+    }
+  }
+  const oldNames = Object.keys(row.old_values ?? {});
+  const newNames = Object.keys(row.new_values ?? {});
+  if (own.inserts) {
+    if ((row.old_values ?? null) !== null)
+      problems.push(`${row.id}: ${row.kind} inserts its row, with no old values`);
+    for (const name of own.columns)
+      if (!newNames.includes(name)) problems.push(`${row.id}: ${row.kind} leaves out ${name}`);
+  } else {
+    for (const name of own.columns)
+      if (!oldNames.includes(name) || !newNames.includes(name))
+        problems.push(`${row.id}: ${row.kind} names ${name}, old and new`);
+  }
+  if (row.kind === "session.ended") {
+    const before = row.old_values ?? {};
+    const after = row.new_values ?? {};
+    if ((before.ended_at ?? null) !== null || (before.ended_why ?? null) !== null)
+      problems.push(`${row.id}: the session that ends was live, ended_at and ended_why null before`);
+    if ((after.ended_at ?? null) === null || (after.ended_why ?? null) === null)
+      problems.push(`${row.id}: the session ends, ended_at and ended_why set after`);
+  }
+  return problems;
+}
+
+/**
+ * A run of 64 hex digits: a sha256 in hex, the form of K-22 v1's token_sha256 and device_sha256
+ * (sessions_token_hash_form, sessions_device_hash_form), which v1.2's hashLike reads.
+ */
+const HASH_RUN = /[0-9a-fA-F]{64}/;
+
+/**
+ * The event log's own columns whose form is a sha256, the only places a session's row may hold one (T-1293's default,
+ * named in its report): the bundle's content hash (K-01 bundleId; K-04 event_log.bundle_hash) and the turn's id (K-04
+ * turns.id, a hash of its texts' event ids: CQ-09; runtime/src/actor/lease.ts turnIdOf, SHA-256 in lowercase hex).
+ * Neither is a value of the session, and an end a turn's commit writes for a person (README default 23) carries both.
+ */
+const ROW_HASH_COLUMNS: readonly string[] = ["turn_id", "bundle_hash"];
+
+/**
+ * DL-544's lead note on T-1293 (T-1275's security note a; CQ-258 (2) and (4)): no string that reads as a hash anywhere
+ * in a session's row, at any depth and in keys too: its id, row_id and job_id, its proofs, its old and new values below
+ * their top level, where v1.2's hashLike does not look (it reads only each value's own string). So neither the session's
+ * sha256 nor the device's sha256 stands anywhere in the row, alone or inside a longer string. A problem names the place,
+ * never the string.
+ */
+export function checkSessionNoHash(row: EventRow): string[] {
+  if (!SESSION_KINDS.has(row.kind)) return [];
+  const problems: string[] = [];
+  const visit = (value: unknown, where: Path): void => {
+    const at = `${row.kind}${pointerOf(where)}`;
+    if (typeof value === "string") {
+      if (HASH_RUN.test(value)) problems.push(`${at} holds a string that reads as a hash`);
+    } else if (Array.isArray(value)) {
+      value.forEach((item: unknown, k) => {
+        visit(item, [...where, k]);
+      });
+    } else if (isObj(value)) {
+      for (const [key, child] of Object.entries(value)) {
+        if (HASH_RUN.test(key)) problems.push(`${at} has a key that reads as a hash`);
+        else visit(child, [...where, key]);
+      }
+    }
+  };
+  for (const [column, value] of Object.entries(row))
+    if (!ROW_HASH_COLUMNS.includes(column)) visit(value, [column]);
+  return problems;
+}
+
 // ---------------------------------------------------------------------------------------------------------------
 // The required-field walk (part 3): the fields a schema requires of a value, read from the schemas' own `required`
 // lists along the branch the value takes at each anyOf, oneOf and if.
@@ -1334,15 +1511,17 @@ const from =
     structuredClone(getAt(fixture(file), where));
 
 /**
- * The mend of every refused fixture of the versions frozen when this part was written. README "Fixtures": "with that
- * one fault fixed (the handle id for the number, the words dropped, the bundle id added, the table open_questions for
- * event_log) it is accepted"; README v1.1: "Each refused fixture is the accepted row it names with one fault, and is
- * accepted once that fault is removed". The twins are the rows the entries name: the skeleton's receive span ("the
- * rest is the skeleton's receive span") and decide span, event-proof-code-sent.json, event-proof-code-checked.json and
- * event-harm-report.json's harm report row. A later minor version's refused fixtures are checked by part 1, and their
- * mends join this list with that version's QA task.
+ * The mend of every refused fixture of the versions whose QA task has run. README "Fixtures": "with that one fault
+ * fixed (the handle id for the number, the words dropped, the bundle id added, the table open_questions for event_log)
+ * it is accepted"; README v1.1: "Each refused fixture is the accepted row it names with one fault, and is accepted once
+ * that fault is removed"; README v1.2: "Each refused fixture is the accepted row it names with one fault, and is that row
+ * once the fault is removed". The twins are the rows the entries name: the skeleton's receive span ("the rest is the
+ * skeleton's receive span") and decide span, event-proof-code-sent.json, event-proof-code-checked.json,
+ * event-harm-report.json's harm report row, and v1.2's event-session-started.json (the token dropped) and
+ * event-session-ended.json (the device's hash dropped; DL-544's lead note on T-1293). A later minor version's refused
+ * fixtures are checked by part 1, and their mends join this list with that version's QA task.
  */
-const MENDED_VERSIONS = ["v1", "v1.1"];
+const MENDED_VERSIONS = ["v1", "v1.1", "v1.2"];
 const MENDS: Record<string, Mend | undefined> = {
   "invalid/refuse-raw-phone-in-span.json": {
     at: ["handle_ref"],
@@ -1369,6 +1548,28 @@ const MENDS: Record<string, Mend | undefined> = {
     put: from("event-harm-report.json", ["rows", 2, "business_id"]),
     twin: { file: "event-harm-report.json", part: ["rows", 2] },
   },
+  "invalid/refuse-session-token-in-clear.json": {
+    at: ["new_values", "token"],
+    twin: { file: "event-session-started.json", part: [] },
+  },
+  "invalid/refuse-session-device-hash-in-clear.json": {
+    at: ["new_values", "device_sha256"],
+    twin: { file: "event-session-ended.json", part: [] },
+  },
+};
+
+/**
+ * The hash twins: a refused fixture whose one fault is a never-logged column holding a hash, so it trips two rules, the
+ * name rule (neverLoggedColumn) and the value rule its kind keeps (v1.1's proof code values: codeLike; v1.2's session
+ * values: hashLike), as DL-544's lead note on T-1293 says of v1.2's device twin and v1.1's code_hash twin. Each with the
+ * $defs entry of its value rule.
+ */
+const HASH_TWINS: Record<string, { valueRule: string; otherName: string } | undefined> = {
+  "invalid/refuse-proof-code-hash-in-clear.json": { valueRule: "codeLike", otherName: "code_digest" },
+  "invalid/refuse-session-device-hash-in-clear.json": {
+    valueRule: "hashLike",
+    otherName: "device_fingerprint",
+  },
 };
 
 /** The copy of a refused fixture put right by its mend. */
@@ -1381,7 +1582,7 @@ function mended(file: string): unknown {
 }
 
 describe("event-trace fixtures: each refused fixture is refused for its one reason, and accepted put right", () => {
-  it("holds a mend for every refused fixture of v1 and v1.1, selected by version, and no other", () => {
+  it("holds a mend for every refused fixture of v1, v1.1 and v1.2, selected by version, and no other", () => {
     expect(sorted(Object.keys(MENDS))).toEqual(
       sorted(
         refusedEntries.filter((entry) => MENDED_VERSIONS.includes(entry.version)).map((entry) => entry.file),
@@ -1431,6 +1632,46 @@ describe("event-trace fixtures: each refused fixture is refused for its one reas
       expect(accepts(entryOf(file), broken), `${file} put right, with a field the schema does not know`).toBe(
         false,
       );
+    }
+  });
+
+  it("trips the name rule and the value rule with each hash twin's one fault, each rule refusing it alone", () => {
+    expect(Object.keys(HASH_TWINS).every((file) => MENDS[file] !== undefined)).toBe(true);
+    for (const [file, twin] of Object.entries(HASH_TWINS)) {
+      if (twin === undefined) continue;
+      const entry = entryOf(file);
+      const at = must(MENDS[file], `the mend of ${file}`).at;
+      const name = String(at.at(-1));
+      const value = getAt(fixture(file), at);
+      // The one fault: a column the name rule lists, holding a value the value rule reads as a hash.
+      expect(
+        validatorFor({ version: entry.version, def: "neverLoggedColumn" })(name),
+        `${file}: ${name}`,
+      ).toBe(true);
+      expect(validatorFor({ version: entry.version, def: twin.valueRule })(value), `${file}: its value`).toBe(
+        true,
+      );
+      // Refused at that column, with the schema's errors naming it there.
+      const refusedAt = (copy: unknown, where: Path): boolean => {
+        const explain = validatorFor(entry, explainAjv);
+        if (explain(copy)) return false;
+        const pointer = pointerOf(where);
+        return (explain.errors ?? []).some((error) =>
+          placesOf(error).some((place) => place === pointer || place.startsWith(`${pointer}/`)),
+        );
+      };
+      // The value rule alone: the same value under a column name no list holds.
+      const elsewhere = mended(file);
+      const otherAt = [...at.slice(0, -1), twin.otherName];
+      setAt(elsewhere, otherAt, value);
+      expect(refusedAt(elsewhere, otherAt), `${file}: the value under ${twin.otherName}`).toBe(true);
+      // The name rule alone: the column, holding a value of no hash's form.
+      const plain = structuredClone(fixture(file));
+      setAt(plain, at, "stand-in");
+      expect(validatorFor({ version: entry.version, def: twin.valueRule })("stand-in")).toBe(false);
+      expect(refusedAt(plain, at), `${file}: ${name} holding no hash`).toBe(true);
+      // Both gone, the twin is accepted (part 2's mend above).
+      expect(accepts(entry, mended(file)), `${file} put right`).toBe(true);
     }
   });
 });
@@ -1560,6 +1801,72 @@ describe("event-trace fixtures: the README's tables this test reads agree with t
     }
     for (const [kind, columns] of Object.entries(WORDS_COLUMNS))
       for (const column of columns ?? []) expect(ADDED_KIND_COLUMNS[kind]?.columns, kind).toContain(column);
+  });
+
+  it("lists v1.2's session kinds as added kinds only Rosie's team reads, on K-22 v1's sessions table", () => {
+    expect(sorted(V12_KINDS_TABLE.map((row) => row.kind))).toEqual(sorted([...SESSION_KINDS]));
+    expect(SESSION_KINDS.size).toBeGreaterThan(0);
+    const takes = (version: string, def: string, kind: string): boolean =>
+      validatorFor({ version, def })(kind);
+    for (const row of V12_KINDS_TABLE) {
+      expect(row.readBy, row.kind).toBe("team only");
+      expect(row.table, row.kind).toBe(K22_SESSIONS.name);
+      expect(TABLE_OF.get(must(row.kind.split(".")[0])), row.kind).toBe(row.table);
+      // v1.2 adds it to the added kinds and the team-only kinds; v1.1 has neither.
+      for (const def of ["eventKind", "addedEventKind", "teamOnlyEventKind"]) {
+        expect(takes("v1.2", def, row.kind), `${row.kind} in v1.2's ${def}`).toBe(true);
+        expect(takes("v1.1", def, row.kind), `${row.kind} in v1.1's ${def}`).toBe(false);
+      }
+    }
+    // v1.1's added kinds stay added under v1.2, and only its team-only ones are team-only there.
+    const teamOnly = new Set(enumOf("v1.1", "teamOnlyEventKind"));
+    for (const kind of ADDED_KINDS) {
+      expect(takes("v1.2", "addedEventKind", kind), kind).toBe(true);
+      expect(takes("v1.2", "teamOnlyEventKind", kind), kind).toBe(teamOnly.has(kind));
+    }
+  });
+
+  it("holds each session kind's columns to the README's own sentence, to default 27 and to K-22 v1's sessions table", () => {
+    expect(sorted(Object.keys(SESSION_KIND_COLUMNS))).toEqual(sorted([...SESSION_KINDS]));
+    const holds = sectionOf(
+      "### What each session kind holds",
+      "### What the schema checks for a session's row",
+    );
+    for (const [kind, own] of Object.entries(SESSION_KIND_COLUMNS)) {
+      if (own === undefined) continue;
+      const sentence = must(
+        holds.split("\n").find((line) => line.startsWith(`- **\`${kind}\`**`)),
+        `the README's sentence for ${kind}`,
+      );
+      for (const column of own.columns) expect(sentence, kind).toContain(`\`${column}\``);
+      expect(sentence.includes("new:"), `${kind} inserts its row`).toBe(own.inserts);
+      if (!own.inserts) expect(sentence, kind).toContain("old and new");
+      // A closed column's values, as K-22's CHECK lists them, are the ones the README's sentence gives.
+      for (const column of own.columns)
+        for (const value of K22_SESSION_VALUES.get(column) ?? [])
+          expect(sentence, `${kind} ${column}`).toContain(`\`${value}\``);
+    }
+    expect(sorted([...K22_SESSION_VALUES.keys()])).toEqual(["ended_why", "proven_via"]);
+    // Default 27 names exactly the kinds' columns; K-22 v1's sessions table holds each, and beside them only the
+    // columns default 27 keeps out of the values: the session's id (the row's row_id), the two hashes and the version.
+    const defaults = sectionOf("## Defaults used (T-1275, v1.2)", "## Open gaps");
+    const default27 = must(
+      defaults.split("\n").find((line) => line.startsWith("27. ")),
+      "README default 27",
+    );
+    const named = [
+      ...must(/\(([^)]*)\)/.exec(default27)?.[1], "default 27's list").matchAll(/`([a-z_]+)`/g),
+    ].map((match) => must(match[1]));
+    expect(sorted(Object.values(SESSION_KIND_COLUMNS).flatMap((own) => own?.columns ?? []))).toEqual(
+      sorted(named),
+    );
+    const k22 = K22_SESSIONS.columns.map((column) => column.name);
+    for (const name of named) expect(k22, name).toContain(name);
+    const kept = k22.filter((name) => !named.includes(name));
+    expect(sorted(kept)).toEqual(["device_sha256", "id", "token_sha256", "version"]);
+    for (const name of kept) expect(default27, name).toContain(`\`${name}\``);
+    // The two hashes are the never-logged columns of the README's "Never, plain or sealed".
+    for (const name of ["token_sha256", "device_sha256"]) expect(NEVER_LOGGED, name).toContain(name);
   });
 });
 
@@ -2049,6 +2356,190 @@ describe("event-trace fixtures: v1.1's added kinds", () => {
   });
 });
 
+describe("event-trace fixtures: v1.2's session kinds", () => {
+  const rows = inAccepted(rowsIn);
+  const sessions = rows.filter(({ item }) => SESSION_KINDS.has(item.kind));
+  const started = "event-session-started.json";
+  const ended = "event-session-ended.json";
+  const tokenTwin = "invalid/refuse-session-token-in-clear.json";
+  const deviceTwin = "invalid/refuse-session-device-hash-in-clear.json";
+  /** The refused twins' faults: the token placeholder and K-22's stand-in sha256 of Sam's device (README v1.2 "Fixtures"). */
+  const token = String(getAt(fixture(tokenTwin), ["new_values", "token"]));
+  const deviceHash = String(getAt(fixture(deviceTwin), ["new_values", "device_sha256"]));
+  /** A copy of an accepted session row with one change, which the schema still takes. */
+  const taken = (file: string, change: (copy: EventRow & Obj) => void): EventRow => {
+    const copy = damaged<EventRow & Obj>(file, change);
+    expect(accepts(entryOf(file), copy), "the schema takes it").toBe(true);
+    return copy;
+  };
+
+  it("names each session kind's table as the README's kinds table gives it", () => {
+    expect(new Set(sessions.map(({ item }) => item.kind))).toEqual(SESSION_KINDS);
+    for (const { file, item } of sessions) expect(checkKindTable(item), file).toEqual([]);
+    const other = taken(started, (row) => {
+      row.table_name = "proof_codes";
+    });
+    expect(checkKindTable(other)).toEqual([
+      "log-session-sam-oct26-started: session.started names the table proof_codes, not sessions",
+    ]);
+  });
+
+  it("names in each session kind's values only the K-22 columns it holds, one value of the column's type each", () => {
+    for (const { file, item } of sessions) expect(checkSessionColumns(item), file).toEqual([]);
+    // Each refused twin is refused here too, for its one fault, and put right it passes.
+    expect(checkSessionColumns(fixture(tokenTwin) as EventRow)).toEqual([
+      "log-session-sam-oct26-started: session.started names no column token",
+    ]);
+    expect(checkSessionColumns(fixture(deviceTwin) as EventRow)).toEqual([
+      "log-session-sam-oct20-ended: session.ended names no column device_sha256",
+    ]);
+    for (const file of [tokenTwin, deviceTwin])
+      expect(checkSessionColumns(mended(file) as EventRow), file).toEqual([]);
+  });
+
+  it("fires on damaged rows the schema still takes: a token under another name, a device id, a value nested or not K-22's", () => {
+    const cookie = taken(started, (row) => {
+      must(row.new_values).session_cookie = token;
+    });
+    expect(checkSessionColumns(cookie)).toEqual([
+      "log-session-sam-oct26-started: session.started names no column session_cookie",
+    ]);
+    const device = taken(started, (row) => {
+      must(row.new_values).device_id = "device-sam-phone";
+    });
+    expect(checkSessionColumns(device)).toEqual([
+      "log-session-sam-oct26-started: session.started names no column device_id",
+    ]);
+    const nested = taken(started, (row) => {
+      must(row.new_values).proven_via = { via: "code", token };
+    });
+    expect(checkSessionColumns(nested)).toEqual([
+      "log-session-sam-oct26-started/new_values/proven_via holds a list or an object, not one value of K-22's proven_via",
+    ]);
+    const unlisted = taken(started, (row) => {
+      must(row.new_values).proven_via = token;
+    });
+    expect(checkSessionColumns(unlisted)).toEqual([
+      "log-session-sam-oct26-started/new_values/proven_via holds no value K-22's proven_via (text) takes",
+    ]);
+    const instant = taken(started, (row) => {
+      must(row.new_values).expires_at = "in-30-days";
+    });
+    expect(checkSessionColumns(instant)).toEqual([
+      "log-session-sam-oct26-started/new_values/expires_at holds no value K-22's expires_at (timestamptz) takes",
+    ]);
+  });
+
+  it("fires on damaged rows the schema still takes: a start with a column left out or with old values, an end not old and new or of an ended session", () => {
+    const short = taken(started, (row) => {
+      dropAt(row, ["new_values", "expires_at"]);
+    });
+    expect(checkSessionColumns(short)).toEqual([
+      "log-session-sam-oct26-started: session.started leaves out expires_at",
+    ]);
+    const old = taken(started, (row) => {
+      row.old_values = { last_seen_at: "2026-10-26T08:00:00Z" };
+    });
+    expect(checkSessionColumns(old)).toEqual([
+      "log-session-sam-oct26-started: session.started inserts its row, with no old values",
+    ]);
+    const half = taken(ended, (row) => {
+      dropAt(row, ["old_values", "ended_why"]);
+    });
+    expect(checkSessionColumns(half)).toEqual([
+      "log-session-sam-oct20-ended: session.ended names ended_why, old and new",
+    ]);
+    const again = taken(ended, (row) => {
+      row.old_values = { ended_at: "2026-10-20T08:00:00Z", ended_why: "contact_changed" };
+    });
+    expect(checkSessionColumns(again)).toEqual([
+      "log-session-sam-oct20-ended: the session that ends was live, ended_at and ended_why null before",
+    ]);
+  });
+
+  it("holds no string that reads as a hash anywhere in a session's row", () => {
+    expect(sessions.length).toBeGreaterThan(0);
+    for (const { file, item } of sessions) expect(checkSessionNoHash(item), file).toEqual([]);
+    // The device twin is refused here too and passes put right; the token twin's placeholder is no hash.
+    expect(checkSessionNoHash(fixture(deviceTwin) as EventRow)).toEqual([
+      "session.ended/new_values/device_sha256 holds a string that reads as a hash",
+    ]);
+    expect(checkSessionNoHash(mended(deviceTwin) as EventRow)).toEqual([]);
+    expect(checkSessionNoHash(fixture(tokenTwin) as EventRow)).toEqual([]);
+    // Only a session's row: a v1 row keeps its proofs' hashes (README "The event log": proofs survive as hashes).
+    const commit = must(rowsIn("eventLogBatch", fixture("event-commit.json"))[0]);
+    expect(HASH_RUN.test(JSON.stringify(commit))).toBe(true);
+    expect(checkSessionNoHash(commit)).toEqual([]);
+  });
+
+  it("fires on damaged rows the schema still takes: a hash as the row's ids, in its proofs, deep in its values, as a key", () => {
+    const rowId = taken(ended, (row) => {
+      row.row_id = deviceHash;
+    });
+    expect(checkSessionNoHash(rowId)).toEqual(["session.ended/row_id holds a string that reads as a hash"]);
+    const jobId = taken(ended, (row) => {
+      row.job_id = `page-req-${deviceHash}`;
+    });
+    expect(checkSessionNoHash(jobId)).toEqual(["session.ended/job_id holds a string that reads as a hash"]);
+    const eventId = taken(ended, (row) => {
+      row.id = `log-${deviceHash}-ended`;
+    });
+    expect(checkSessionNoHash(eventId)).toEqual(["session.ended/id holds a string that reads as a hash"]);
+    const proofs = taken(ended, (row) => {
+      row.proofs = [
+        {
+          what: "consent",
+          text_hash: deviceHash,
+          words_shown: "Signed out.",
+          shown_at: "2026-10-20T08:30:00Z",
+          open_question_id: null,
+          fixed_line: null,
+        },
+      ];
+    });
+    expect(checkSessionNoHash(proofs)).toEqual([
+      "session.ended/proofs/0/text_hash holds a string that reads as a hash",
+    ]);
+    const deep = taken(ended, (row) => {
+      must(row.new_values).ended_why = ["signed_out", deviceHash];
+    });
+    expect(checkSessionNoHash(deep)).toEqual([
+      "session.ended/new_values/ended_why/1 holds a string that reads as a hash",
+    ]);
+    const key = taken(ended, (row) => {
+      must(row.new_values)[deviceHash] = "signed_out";
+    });
+    expect(checkSessionNoHash(key)).toEqual(["session.ended/new_values has a key that reads as a hash"]);
+  });
+
+  it("leaves a session row's turn id and bundle hash, the event log's own hash columns, to their own form", () => {
+    // An end a turn's commit writes for its person (README default 23: Rosie, for contact_changed, left or
+    // handed_over): the turn's id as runtime/src/actor/lease.ts turnIdOf forms it, and the turn's bundle.
+    const turnId = createHash("sha256").update(JSON.stringify("evt-sam-0001")).digest("hex");
+    const bundle = (fixture("trace-skeleton.json") as Trace).bundle_id;
+    const byTurn = taken(ended, (row) => {
+      row.turn_id = turnId;
+      row.job_id = null;
+      row.bundle_hash = bundle.hash;
+      row.bundle_build = bundle.build;
+      row.actor_kind = "rosie";
+      row.actor_person_id = null;
+      must(row.new_values).ended_why = "left";
+    });
+    expect(checkSessionNoHash(byTurn)).toEqual([]);
+    expect(checkSessionColumns(byTurn)).toEqual([]);
+    // Anywhere else in the row, the same hashes are refused.
+    const moved = taken(ended, (row) => {
+      row.job_id = turnId;
+      must(row.new_values).ended_why = ["left", bundle.hash];
+    });
+    expect(checkSessionNoHash(moved)).toEqual([
+      "session.ended/job_id holds a string that reads as a hash",
+      "session.ended/new_values/ended_why/1 holds a string that reads as a hash",
+    ]);
+  });
+});
+
 // ---------------------------------------------------------------------------------------------------------------
 // The sides: where each producer and consumer side is added
 
@@ -2058,6 +2549,11 @@ export interface SideCheck {
   owner: string;
   components: string[];
   needs: string;
+  /**
+   * The version whose README section "Writers and readers (<version>)" lists the side (v1.2 on); none for a side the
+   * README's "Producers and consumers (02-contracts K-08)" lists, with v1's and v1.1's writers and readers.
+   */
+  listedIn?: string;
   /** Added by the QA side task for this side; it returns one line per problem. */
   check?: () => string[];
 }
@@ -2066,9 +2562,11 @@ export interface SideCheck {
  * ops/plan/02-contracts.md K-08 and section 2 item 12: each producer's output is checked, and each consumer accepts
  * every valid fixture and refuses every invalid one. Each side's components under their owner as
  * contracts/event-trace/README.md names them ("Producers and consumers (02-contracts K-08)", with v1.1's writers and
- * readers). Each side is added later by a QA side task that depends on this task and on that side's build task: it
- * fills `check` (and moves its own test beside this one), reusing this file's checks on what the side writes or reads.
- * Until then the side is held here with what it must show, so none is forgotten.
+ * readers; v1.2's writers in its "Writers and readers (v1.2)", whose readers are v1.1's as they are: README "Open gaps
+ * (v1.2)", "the sides that write and read a session's rows join it with QA's task (T-1293)"). Each side is added later
+ * by a QA side task that depends on this task and on that side's build task: it fills `check` (and moves its own test
+ * beside this one), reusing this file's checks on what the side writes or reads. Until then the side is held here with
+ * what it must show, so none is forgotten.
  */
 export const SIDE_CHECKS: readonly SideCheck[] = [
   {
@@ -2128,6 +2626,24 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "Each secure page's call to the Tool API opens its own trace (opened_by pageRequest) whose pageRequest span passes `span`, under the page's request id as its job, never a raw number or words.",
   },
   {
+    id: "producer-sign-in-entries",
+    side: "producer",
+    owner: "database engineer",
+    components: ["C-152"],
+    listedIn: "v1.2",
+    needs:
+      "v1.2: db/repo's check side writes the entries K-05's sign-in version names (signInEntries; T-1277, T-1284): one session.started row after proveSignIn commits a right code's session, and one session.ended row after endSession or a commit that ends a person's sessions for them (contact_changed, left, handed_over). Each passes v1.2's eventLogRow with no business and nothing sealed, names sessions as its table (checkKindTable), holds in its values only the K-22 columns its kind holds, one value each (checkSessionColumns), and no string that reads as a hash anywhere (checkSessionNoHash): never the session's token, its sha256 or the device's sha256. A touch, a lapse at expires_at and a sign-in stopped at secondProofNeeded write no session entry.",
+  },
+  {
+    id: "producer-web-sign-in",
+    side: "producer",
+    owner: "frontend engineer",
+    components: ["C-193"],
+    listedIn: "v1.2",
+    needs:
+      "v1.2: the web sign-in's sign-in and sign-out (K-21 signInCheck, signOut) are page calls, so the session entries they lead to name the page's request id as job_id, no turn and no bundle, with the person who signed in or out as the actor; and nothing the page writes to a span or a log line carries the session's token, its sha256 or the device's sha256 (K-21 v1 opaqueToken: never logged, put in a span, an event-log row or a message).",
+  },
+  {
     id: "consumer-release",
     side: "consumer",
     owner: "release engineer",
@@ -2138,7 +2654,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "C-037 warehouse export",
     ],
     needs:
-      "The traces and dashboards read every accepted trace and trace set by trace_id ordered by seq, and filter by bundle and provider; the monitor reads reply time as the fixtures measure it and the hourly invariant run with each breach's trace id for the rollback alert; the export writes each stored row unchanged with sealed_key held or erased (checkExportRow), and v1.1's team-only rows carry no business; each refuses every invalid one.",
+      "The traces and dashboards read every accepted trace and trace set by trace_id ordered by seq, and filter by bundle and provider; the monitor reads reply time as the fixtures measure it and the hourly invariant run with each breach's trace id for the rollback alert; the export writes each stored row unchanged with sealed_key held or erased (checkExportRow), and v1.1's team-only rows and v1.2's session rows carry no business; each refuses every invalid one.",
   },
   {
     id: "consumer-qa",
@@ -2146,7 +2662,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
     owner: "QA",
     components: ["C-140 eval harness", "C-142 replay", "C-143 cost meter", "C-148 end-to-end tests"],
     needs:
-      "The eval harness and replay read the event log and traces in the fixtures' shapes, v1.1's added kinds included; the cost meter sums the spans' model calls (27300 micro-dollars for trace-model-call-cost.json); the end-to-end tests see every hop of D-017 once, in order, and a repeated webhook dropped at receipt; each refuses every invalid one.",
+      "The eval harness and replay read the event log and traces in the fixtures' shapes, v1.1's added kinds and v1.2's session kinds included; the cost meter sums the spans' model calls (27300 micro-dollars for trace-model-call-cost.json); the end-to-end tests see every hop of D-017 once, in order, and a repeated webhook dropped at receipt; each refuses every invalid one.",
   },
   {
     id: "consumer-frontend",
@@ -2154,7 +2670,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
     owner: "frontend engineer",
     components: ["C-194 team console", "C-192 owner console"],
     needs:
-      "The team console shows gap cases with their state, and v1.1's hand-offs, pages and review items, from rows in the fixtures' shapes; the owner console shows only the business's own hand-offs, never a team-only row; each refuses every invalid one.",
+      "The team console shows gap cases with their state, and v1.1's hand-offs, pages and review items and v1.2's session starts and ends, from rows in the fixtures' shapes; the owner console shows only the business's own hand-offs, never a team-only row (a session's row among them); each refuses every invalid one.",
   },
   {
     id: "consumer-database",
@@ -2162,12 +2678,23 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
     owner: "database engineer",
     components: ["C-156 per-person sealing keys", "C-151"],
     needs:
-      "Every accepted row, v1.1's added kinds included, lands in K-04 v1's event_log column for column, its sealed values under the key of sealed_for_person_id and unreadable once that key is erased, while the proofs stay; an edit of event_log itself is refused; it refuses every invalid one.",
+      "Every accepted row, v1.1's added kinds and v1.2's session kinds included, lands in K-04 v1's event_log column for column, its sealed values under the key of sealed_for_person_id and unreadable once that key is erased, while the proofs stay; an edit of event_log itself is refused; it refuses every invalid one.",
   },
 ];
 
 describe("event-trace sides: the list where each producer and consumer side is added", () => {
   const listed = sectionOf("## Producers and consumers (02-contracts K-08)", "## Fixtures");
+  /** Each later version's "Writers and readers (<version>)" section, which lists that version's sides (v1.2 on). */
+  const writersAndReaders = new Map(
+    [...README.matchAll(/^### Writers and readers \((v\d+(?:\.\d+)?)\)$/gm)].map(
+      (match) => [must(match[1]), sectionOf(match[0], "\n## ")] as const,
+    ),
+  );
+  /** The README's text that lists a side. */
+  const listingOf = (side: SideCheck): string =>
+    side.listedIn === undefined
+      ? listed
+      : must(writersAndReaders.get(side.listedIn), `the README's "Writers and readers (${side.listedIn})"`);
 
   it("names each side once, with the README's producers and consumers, each consumer refusing every invalid one", () => {
     const ids = SIDE_CHECKS.map((side) => side.id);
@@ -2183,7 +2710,9 @@ describe("event-trace sides: the list where each producer and consumer side is a
   });
 
   it("names every component the README's producers and consumers list, and no other", () => {
-    const named = new Set(listed.match(/C-\d{3}/g));
+    const named = new Set(
+      [listed, ...writersAndReaders.values()].flatMap((listing) => listing.match(/C-\d{3}/g) ?? []),
+    );
     const held = new Set(SIDE_CHECKS.flatMap((side) => side.components.join(" ").match(/C-\d{3}/g) ?? []));
     expect(named.size).toBeGreaterThan(20);
     expect(sorted([...held])).toEqual(sorted([...named]));
@@ -2191,9 +2720,22 @@ describe("event-trace sides: the list where each producer and consumer side is a
 
   it("spells each side's owner and components as the README does", () => {
     for (const side of SIDE_CHECKS) {
-      expect(listed, side.id).toContain(side.owner);
-      for (const component of side.components) expect(listed, side.id).toContain(component);
+      const listing = listingOf(side);
+      expect(listing, side.id).toContain(side.owner);
+      for (const component of side.components) expect(listing, side.id).toContain(component);
     }
+  });
+
+  it("holds v1.2's writers (C-152, C-193) as producer sides its 'Writers and readers (v1.2)' lists", () => {
+    const v12 = must(writersAndReaders.get("v1.2"), `the README's "Writers and readers (v1.2)"`);
+    const sides = SIDE_CHECKS.filter((side) => side.listedIn === "v1.2");
+    const held = sides.flatMap((side) => side.components.join(" ").match(/C-\d{3}/g) ?? []);
+    expect(sorted(held)).toEqual(["C-152", "C-193"]);
+    expect(sorted(held)).toEqual(sorted([...new Set(v12.match(/C-\d{3}/g))]));
+    // Its writers are producers; its readers are v1.1's as they are, already on the list.
+    for (const side of sides) expect(side.side, side.id).toBe("producer");
+    expect(v12).toContain("v1.1's readers as they are");
+    for (const side of sides) expect(listed, side.id).not.toContain(must(side.components[0]));
   });
 
   it("holds a producer side for every hop's lane and the consumers 02-contracts K-08 names", () => {
