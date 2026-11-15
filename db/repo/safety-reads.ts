@@ -10,7 +10,9 @@
 //                             (item 38).
 //   readSafetyHold            a safety hold by its id, open or released, with its version (item 39).
 //   readSafetyHoldOfOutcome   the one hold an outcome set, open or released (safety_holds_one_per_outcome; item 40).
-//   readOutboxRowWritten      whether an outbox row with this id is written: its id alone (item 41).
+//   readOutboxRowWritten      whether an outbox row with this id is written (item 41), and since K-05 v1.16 (item 70;
+//                             T-1392) the recipient and send class a written row stores: recipientHandleId and
+//                             sendClass, both null when the call's side shows no such row (defaults 140 to 144).
 //   readBusinessOwner         the business's one live owner and the handle they write from: their first phone handle,
 //                             else their first email handle, in handle id order (item 42, defaults 58 and 59).
 //   readBusinessZone          the business's time zone (item 43).
@@ -38,7 +40,9 @@
 // statement here names safety_outcomes.sealed_words, tries or danger_word_lists, outbox_rows.plan or final_parts (the
 // message's words), handles.address or any other sealed, personal or key column; none selects `*`, and none takes a
 // whole row (a bare row alias, to_jsonb, row_to_json). The integration test records every statement the seven reads
-// send, pins each read's tables and checks all of it (DL-345).
+// send, pins each read's tables and checks all of it (DL-345). readOutboxRowWritten names, of outbox_rows, its id,
+// recipient_handle_id and send_class in one statement (v1.16 item 70), and joins no handles row: the recipient is the
+// handle's id as the row stores it, never its number or address (default 142).
 //
 // Reads (arch 02 line 117; arch 10 lines 504, 538): the primary, uncached. An In read runs inside the caller's own
 // transaction, so a record or a release reads what its own commit then compares; the others open one read-only
@@ -54,6 +58,7 @@
 //   2. A request whose business is not the transaction's own scope is refused (BusinessScopeError), never read: the
 //      security reviewer's note b on T-1160, as T-1138's In reads refuse it.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.4";
+import type * as K05v1dot16 from "../../contracts/generated/data-access/data-access.v1.16";
 import { transientOrScrubbed } from "./clocks";
 import {
   assertBusinessId,
@@ -107,8 +112,18 @@ export type ReadSafetyHoldOfOutcomeResponse = K05.ReadSafetyHoldOfOutcomeRespons
 export type ReadSafetyHoldOfOutcomeOutcome = ReadSafetyHoldOfOutcomeResponse | NotFoundError | TransientError;
 
 export type ReadOutboxRowWrittenRequest = K05.ReadOutboxRowWrittenRequest;
-export type ReadOutboxRowWrittenResponse = K05.ReadOutboxRowWrittenResponse;
-export type ReadOutboxRowWrittenOutcome = ReadOutboxRowWrittenResponse | NotFoundError | TransientError;
+/**
+ * K-05 v1.16 readOutboxRowWritten.v1dot16Response (item 70): the answer this read gives, v1.4's five fields with
+ * recipientHandleId and sendClass always stated, as the written row stores them, or both null.
+ */
+export type ReadOutboxRowWrittenV1Dot16Response = K05v1dot16.ReadOutboxRowWrittenV1Dot16Response;
+/**
+ * K-05 v1.16 readOutboxRowWritten.response: the two fields optional, so it also takes a v1.4 to v1.15 answer, which
+ * states neither and is never read as a row with no recipient (default 144).
+ */
+export type ReadOutboxRowWrittenResponse = K05v1dot16.ReadOutboxRowWrittenResponse;
+export type ReadOutboxRowWrittenOutcome =
+  ReadOutboxRowWrittenV1Dot16Response | NotFoundError | TransientError;
 
 export type ReadBusinessOwnerRequest = K05.ReadBusinessOwnerRequest;
 export type ReadBusinessOwnerResponse = K05.ReadBusinessOwnerResponse;
@@ -526,17 +541,28 @@ export async function readSafetyHoldOfOutcome(
   );
 }
 
-// ---- an outbox row written (item 41) -------------------------------------------------------------------------------
+// ---- an outbox row written (item 41; v1.16 item 70) ----------------------------------------------------------------
+
+/** The three columns item 70 reads of an outbox row; never its plan or final parts (the message's words). */
+interface WrittenRow {
+  id: string;
+  recipient_handle_id: string;
+  send_class: K05v1dot16.SendClass;
+}
 
 /**
- * Whether an outbox row with this id is written (K-05 v1.4 item 41), inside the transaction `db`, on the request's side
- * as item 37's. Only the row's id is read, never its plan or final parts (the message's words), nor any other column.
+ * Whether an outbox row with this id is written (K-05 v1.4 item 41), and the recipient and send class a written row
+ * stores (v1.16 item 70), inside the transaction `db`, on the request's side as item 37's. One statement reads the
+ * row's id, recipient_handle_id and send_class, never its plan or final parts (the message's words) nor any other
+ * column, and no handles row: the recipient is the stored handle id, never a number or an address (defaults 140 and
+ * 142). A row the side does not show (never written, another business's, or one with a business read with no business)
+ * answers written false with both fields null, so nothing of it reaches the caller (default 141).
  */
 export async function readOutboxRowWrittenIn(
   db: Db,
   request: ReadOutboxRowWrittenRequest,
   options: ReadOptions = {},
-): Promise<ReadOutboxRowWrittenResponse | NotFoundError> {
+): Promise<ReadOutboxRowWrittenV1Dot16Response | NotFoundError> {
   checkKeyRequest(request, "readOutboxRowWritten", "outboxRowId");
   const { outboxRowId, businessId } = request;
   const missing = await openRecordRead(db, "readOutboxRowWritten", businessId);
@@ -544,8 +570,10 @@ export async function readOutboxRowWrittenIn(
     return missing;
   }
   const readAt = await readMoment(db, options);
-  const [row] = await db<{ id: string }[]>`
-    select id from outbox_rows where id = ${outboxRowId} and ${ofBusiness(db, businessId)}
+  const [row] = await db<WrittenRow[]>`
+    select id, recipient_handle_id, send_class
+    from outbox_rows
+    where id = ${outboxRowId} and ${ofBusiness(db, businessId)}
   `;
   return {
     result: "outboxRowWritten",
@@ -553,10 +581,15 @@ export async function readOutboxRowWrittenIn(
     businessId,
     readAt: utc(readAt),
     written: row !== undefined,
+    recipientHandleId: row === undefined ? null : row.recipient_handle_id,
+    sendClass: row === undefined ? null : row.send_class,
   };
 }
 
-/** Whether an outbox row is written (K-05 v1.4 item 41) in a read-only transaction of its own; as item 37's. */
+/**
+ * Whether an outbox row is written, with a written row's recipient and send class (K-05 v1.4 item 41, v1.16 item 70), in
+ * a read-only transaction of its own; clients and answers as item 37's.
+ */
 export async function readOutboxRowWritten(
   sql: Sql,
   request: ReadOutboxRowWrittenRequest,
