@@ -14,6 +14,7 @@ import { ROUTES as bookingRoutes } from "../pages/booking/routes";
 import { ROUTES as idUploadRoutes } from "../pages/id-upload/routes";
 import { ROUTES as secureRoutes } from "../pages/secure/routes";
 import { PAGE_ROUTES, ROUTE_MODULES } from "../routes";
+import { ROUTES as testPhonePickerRoutes } from "../staging/test-phone/picker/routes";
 import { ROUTES as testPhoneSendRoutes } from "../staging/test-phone/send/routes";
 import { routeTable, type ShellRoute } from "./route";
 import { TRACE_ID, get, testShell } from "./test-support";
@@ -29,12 +30,18 @@ const FOLDERS: Readonly<Record<string, readonly ShellRoute[]>> = {
   auth: authRoutes,
   "pages/id-upload": idUploadRoutes,
   "staging/test-phone/send": testPhoneSendRoutes,
+  "staging/test-phone/picker": testPhonePickerRoutes,
   "console/team/fire-now": fireNowRoutes,
   "console/team/text-hours": textHoursRoutes,
 };
 
 /** Staging's test tools among them (build prompt 9.4): the test-phone page, Fire now and the text-hours override. */
-const STAGING_ONLY = ["console/team/fire-now", "console/team/text-hours", "staging/test-phone/send"];
+const STAGING_ONLY = [
+  "console/team/fire-now",
+  "console/team/text-hours",
+  "staging/test-phone/send",
+  "staging/test-phone/picker",
+];
 
 const SRC = new URL("../", import.meta.url);
 const ROUTES_SOURCE = readFileSync(new URL("routes.ts", SRC), "utf8");
@@ -42,8 +49,8 @@ const ROUTES_SOURCE = readFileSync(new URL("routes.ts", SRC), "utf8");
 const sorted = (names: readonly string[]): string[] => [...names].sort((a, b) => a.localeCompare(b));
 
 describe("web/src/routes.ts imports the route module of every feature folder the plan names", () => {
-  it("lists each of the 11 folders once", () => {
-    expect(Object.keys(FOLDERS)).toHaveLength(11);
+  it("lists each of the 12 folders once", () => {
+    expect(Object.keys(FOLDERS)).toHaveLength(12);
     expect(sorted(ROUTE_MODULES.map((module) => module.folder))).toEqual(sorted(Object.keys(FOLDERS)));
   });
 

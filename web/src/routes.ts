@@ -22,6 +22,7 @@ import { renderPrivacyPage } from "./pages/privacy/page";
 import { ROUTES as secureRoutes } from "./pages/secure/routes";
 import { PRIVACY_PATH } from "./shell/frame";
 import type { RouteModule } from "./shell/route";
+import { ROUTES as testPhonePickerRoutes } from "./staging/test-phone/picker/routes";
 import { ROUTES as testPhoneSendRoutes } from "./staging/test-phone/send/routes";
 
 /** One static page: its path under BASE_PATH, its label in the shell's log line, and the whole HTML document it shows. */
@@ -48,5 +49,6 @@ export const ROUTE_MODULES: readonly RouteModule[] = [
   { folder: "console/team/fire-now", stagingOnly: true, routes: fireNowRoutes },
   { folder: "console/team/text-hours", stagingOnly: true, routes: textHoursRoutes },
   { folder: "staging/test-phone/send", stagingOnly: true, routes: testPhoneSendRoutes },
+  { folder: "staging/test-phone/picker", stagingOnly: true, routes: testPhonePickerRoutes },
   { folder: "link", stagingOnly: false, routes: linkRoutes },
 ];
