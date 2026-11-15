@@ -2,9 +2,80 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 649, [`19f574a`](https://github.com/aryamahadik/rosie/commit/19f574a), 2026-11-15 10:17:03 UTC.
+- **Through:** commit 652, [`d180e9c`](https://github.com/aryamahadik/rosie/commit/d180e9c), 2026-11-15 11:28:34 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 652. docs: COMMIT\_HISTORY.md through commit 649 (19f574a, \#660) (\#663)
+
+- **Commit:** [`d180e9c`](https://github.com/aryamahadik/rosie/commit/d180e9c), by Arya Mahadik, 2026-11-15 11:28:34 UTC
+- **Pull request:** [#663](https://github.com/aryamahadik/rosie/pull/663) from `task/commit-history-123`, merged 2026-11-15 11:28:34 UTC. It squashed 1 branch commit:
+  - `d17de71` docs: COMMIT\_HISTORY.md through commit 649 (19f574a, \#660)
+- **Files changed:** 1 (+52 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +52 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 215 (DL-802); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 651. T-525: the seeded test-state picker at /staging/test-phone/phones (K-21 v1 testRoster): each test phone with its role, business and seeded customer, linking to T-523's send page with ?phone=\<roster id\>; each business signed up or not yet as the answer gives it (CQ-14); staging only, behind the tester sign-in (\#661)
+
+- **Commit:** [`f023684`](https://github.com/aryamahadik/rosie/commit/f023684), by Arya Mahadik, 2026-11-15 11:28:30 UTC
+- **Pull request:** [#661](https://github.com/aryamahadik/rosie/pull/661) from `task/T-525`, merged 2026-11-15 11:28:31 UTC. It squashed 1 branch commit:
+  - `a1739c5` T-525: the seeded test-state picker at /staging/test-phone/phones (K-…
+- **Files changed:** 8 (+1165 −3), by folder:
+  - `web/src/` routes.ts +2 −0
+  - `web/src/shell/` routes.test.ts +10 −3
+  - `web/src/staging/test-phone/picker/` page.ts +205 −0, picker.test.ts +583 −0, picker.ts +55 −0, routes.ts +11 −0, staging-only.test.ts +154 −0, test-support.ts +145 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 650. T-570: check:staging's JOIN step: one traced test turn through test-phone-send, passing only on one reply to test phone 1 (D-017) (\#662)
+
+- **Commit:** [`1ae91ac`](https://github.com/aryamahadik/rosie/commit/1ae91ac), by Arya Mahadik, 2026-11-15 11:28:26 UTC
+- **Pull request:** [#662](https://github.com/aryamahadik/rosie/pull/662) from `task/T-570`, merged 2026-11-15 11:28:27 UTC. It squashed 3 branch commits:
+  - `65e9a6c` T-570: check:staging --join: test owner 1's JOIN through testPhoneSen…
+  - `4545e65` T-570: the JOIN test's lower bound on since holds on a loaded machine…
+  - `a8d5a42` T-570: --join also refuses before sending when tp-01's chat is alread…
+- **Files changed:** 2 (+1311 −12), by folder:
+  - `infra/ci/` post-deploy-check.test.mjs +925 −2
+  - `infra/scripts/` post-deploy-check.sh +386 −10
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-570: check:staging --join: test owner 1's JOIN through testPhoneSend, passing only on exactly one new reply part to tp-01 (DL-789's R6; DL-757's timing line); /health must report staging
+
+The JOIN step runs only with --join (deploy-staging.sh's automatic check stays health, the traced request and the host rule). Before sending it reads tp-01's parts through testPhoneParts and refuses, naming the reset (a fresh seed), when there are any; it sends JOIN as tp-01 through testPhoneSend, prints the trace id the answer carries and a named timing line against C-044's 1 s (a BREACH is a NEED for the architect, never a cache); then it reads the parts after the send's time at once and, without the reply, once more, ending within 30 s of the send. The check tester's token is read by name (STAGING_CHECK_TESTER_TOKEN, from the environment, else from the checkout's git-ignored vars file through lib.sh's load_dev_var, as seed-staging.sh reads it), held to its made form, and reaches curl on standard input alone; --join refuses no token, a malformed one, and a base URL that is neither https nor loopback http before any request. A /health answer from any environment but staging is refused at once, with no retry. The test runs the script against a stand-in Worker on 127.0.0.1 with the real curl, and spies every command for the token.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-570: the JOIN test's lower bound on since holds on a loaded machine (30 s, from 5 s); the header names the page calls' curl as the one that starts with --disable
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-570: --join also refuses before sending when tp-01's chat is already open with no part (testPhoneParts' phone.chatOpen): a JOIN that reached the gateway and got no reply leaves no part, but a second JOIN would be no first text; the header's refusal list reflowed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 649. docs: COMMIT\_HISTORY.md through commit 646 (11951ca, \#656) (\#660)
 
