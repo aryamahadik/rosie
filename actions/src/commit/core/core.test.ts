@@ -639,7 +639,7 @@ describe("a run's clock rows ride in its writes, and the turn's one commit write
     expect(planned.clocks).toHaveLength(2);
     expect(planned.run.writes.state.map((write) => write.table)).toContain("pauses");
     expect(planned.run.writes).not.toHaveProperty("clocks");
-    // runCore hands them over in the run's writes, as given, after nothing else, and changes nothing more of the run.
+    // runCore hands them over in the run's writes as given (its writes carried none), and changes nothing more of the run.
     const run = await createRunCore(deps)(action, turn, copy(NOTHING_OPEN));
     expect(run).toEqual({
       result: planned.run.result,
