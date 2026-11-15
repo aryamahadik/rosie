@@ -813,6 +813,14 @@ describe("the span takes a handler's error only when it is one of K-21 v1's name
 describe("the Worker as deployed (no page handler joined yet)", () => {
   it("routes every call to its not-connected stub: 503 with the trace id, and a failed span naming notConnected", async () => {
     const logLines = captureLogLines();
+    // Its own env (DL-768, DL-790; as T-1393 built linq-webhook.worker.test.ts's): staging's vars and no binding, so
+    // nothing is bound and every call reaches its not-connected stub, whatever the pool binds (its HYPERDRIVE_JOB).
+    const vars: Cloudflare.Env = {
+      ENVIRONMENT: "staging",
+      BASE_PATH: "/test",
+      DB_SCHEMA: "",
+      GIT_SHA: "test-sha",
+    };
 
     for (const call of PAGE_CALLS) {
       const given = ACCEPTED.find(
@@ -823,7 +831,7 @@ describe("the Worker as deployed (no page handler joined yet)", () => {
 
       const response = await worker.fetch(
         pagePost(`/test${PAGE_API_PATH}/${call}`, given.request, { traceId }),
-        env,
+        vars,
         context,
       );
 
