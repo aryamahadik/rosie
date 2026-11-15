@@ -86,8 +86,10 @@ const ATTEMPT_ID = /^attempt-[A-Za-z0-9_-]{22}$/u;
 const LOGGED: string[] = [];
 let testLog: string[] = [];
 
-/** Codes, tokens, attempt ids: each value a test met that no line may hold, beside the file's own below. */
+/** Tokens and attempt ids: each value a test met that no line may hold, beside the file's own below. */
 const MET: string[] = [];
+/** Each code a test met: no line may hold one as a number of its own. */
+const CODES: string[] = [];
 
 /** Every unhandled rejection this isolate reports while this file runs. */
 const rejections: unknown[] = [];
@@ -244,7 +246,7 @@ function codeIn(text: string): string {
   const found = /Code ([0-9]{6}): type it on the sign-in page\. It works for 10 minutes\./u.exec(text);
   const code = found?.[1];
   if (code === undefined) throw new Error("the email holds no code");
-  MET.push(code);
+  CODES.push(code);
   return code;
 }
 
@@ -529,9 +531,10 @@ describe("on staging, the three calls through the Worker's page entry (ADR-016 c
     });
     const attemptId = textOf(started.outcome, "attemptId");
     MET.push(attemptId);
+    // Ten minutes on the database's clock, read here on the Worker's: a minute either way for the two clocks.
     const expiresIn = Date.parse(textOf(started.outcome, "expiresAt")) - Date.now();
     expect(expiresIn).toBeGreaterThan(9 * 60_000);
-    expect(expiresIn).toBeLessThanOrEqual(10 * 60_000);
+    expect(expiresIn).toBeLessThan(11 * 60_000);
     // The code's send is handed to the request's waitUntil, once: the answer waited on nothing of it.
     expect(start.handed).toHaveLength(1);
 
@@ -888,14 +891,23 @@ describe("the part (./sign-in.ts stagingSignIn) and its place in stagingOptions 
 // ---- nothing leaks ------------------------------------------------------------------------------------------------------
 
 describe("the span and log capture of every test above", () => {
-  it("holds no code, token, key, address, device token or attempt id, and no hash of the key; no unhandled rejection", async () => {
+  it("holds no code, token, key, address, device token or attempt id; no unhandled rejection", async () => {
     await new Promise((resolve) => {
       setTimeout(resolve, 0);
     });
     // The capture is not empty: the page entry's spans, the dispatch's, and every call's timing line are in it.
     expect(jsonLinesOf(LOGGED, "span").length).toBeGreaterThanOrEqual(20);
     expect(jsonLinesOf(LOGGED, "dbCall").length).toBeGreaterThanOrEqual(10);
-    expect(MET.length).toBeGreaterThanOrEqual(5);
+    expect(MET.length).toBeGreaterThanOrEqual(3);
+    expect(CODES.length).toBeGreaterThanOrEqual(2);
+    // A code as a number of its own, never inside a longer run of letters and digits (a trace id may hold six digits).
+    for (const code of CODES) {
+      const standing = new RegExp(`(?<![0-9A-Za-z])${code}(?![0-9A-Za-z])`, "u");
+      expect(
+        LOGGED.filter((line) => standing.test(line)),
+        "a log line holds a code",
+      ).toEqual([]);
+    }
     const forbidden = [
       ...MET,
       MADE_UP_KEY,
