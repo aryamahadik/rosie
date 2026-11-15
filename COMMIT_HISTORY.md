@@ -2,9 +2,89 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 654, [`7454283`](https://github.com/aryamahadik/rosie/commit/7454283), 2026-11-15 12:00:59 UTC.
+- **Through:** commit 657, [`4c48ae5`](https://github.com/aryamahadik/rosie/commit/4c48ae5), 2026-11-15 12:38:34 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 657. docs: COMMIT\_HISTORY.md through commit 654 (7454283, \#665) (\#668)
+
+- **Commit:** [`4c48ae5`](https://github.com/aryamahadik/rosie/commit/4c48ae5), by Arya Mahadik, 2026-11-15 12:38:34 UTC
+- **Pull request:** [#668](https://github.com/aryamahadik/rosie/pull/668) from `task/commit-history-125`, merged 2026-11-15 12:38:34 UTC. It squashed 1 branch commit:
+  - `6727f51` docs: COMMIT\_HISTORY.md through commit 654 (7454283, \#665)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 217 (DL-810); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 656. T-1288: staging's email port: a sign-in code to a listed test inbox reaches Resend once, every other email the double (ADR-016 card F) (\#667)
+
+- **Commit:** [`ecf6e6a`](https://github.com/aryamahadik/rosie/commit/ecf6e6a), by Arya Mahadik, 2026-11-15 12:38:29 UTC
+- **Pull request:** [#667](https://github.com/aryamahadik/rosie/pull/667) from `task/T-1288`, merged 2026-11-15 12:38:29 UTC. It squashed 3 branch commits:
+  - `fadc268` T-1288: staging's email port: the router (a code to a listed inbox th…
+  - `cf239a4` T-1288: the root wraps the address lookup only where the email port i…
+  - `8c8aed7` T-1288: the email door's header says the root puts it in front of the…
+- **Files changed:** 9 (+1465 −40), by folder:
+  - `adapters/` package.json +1 −0
+  - `runtime/src/wiring/` email-door.ts +166 −0, index.ts +13 −0, real.ts +118 −33, root.ts +37 −2
+  - `runtime/src/wiring/staging/` email.ts +137 −0, email.worker.test.ts +964 −0, index.ts +10 −1, options.ts +19 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1288: staging's email port: the router (a code to a listed inbox through T-419's Resend adapter, every other email to the test-phone line's double), the claim's emailPurpose and notAfter mapped through, emailFor beside chatTargetOf, an email row's renewal with no phone row, the email door (a throw or no answer is K-12's no answer), bound on staging alone
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1288: the root wraps the address lookup only where the email port is bound; three test assertions lint found unneeded taken out, an error with a name that is no label in their place
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1288: the email door's header says the root puts it in front of the directory wherever it binds the email port
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 655. T-1287: seed:staging reads the testers' inbox list by name and runs the testers' set (ADR-016 card S) (\#666)
+
+- **Commit:** [`eee99a5`](https://github.com/aryamahadik/rosie/commit/eee99a5), by Arya Mahadik, 2026-11-15 12:38:24 UTC
+- **Pull request:** [#666](https://github.com/aryamahadik/rosie/pull/666) from `task/T-1287`, merged 2026-11-15 12:38:24 UTC. It squashed 2 branch commits:
+  - `05bb855` T-1287: seed:staging runs the testers' set (staging-testers) after sk…
+  - `c031834` T-1287: the tests' inbox list in the one form put-staging-secrets.sh …
+- **Files changed:** 2 (+502 −37), by folder:
+  - `infra/ci/` seed-staging.test.mjs +435 −27
+  - `infra/scripts/` seed-staging.sh +67 −10
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1287: seed:staging runs the testers' set (staging-testers) after skeleton and hands it STAGING_TEST_INBOXES by name, to that run alone (ADR-016 card S): read from the environment, else from the build Mac's vars file by name, only when that set runs; a missing list seeds no tester and names only the missing name; no address shown; its tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1287: the tests' inbox list in the one form put-staging-secrets.sh takes for the same line (addresses joined by commas with no space, DL-549)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 654. docs: COMMIT\_HISTORY.md through commit 652 (d180e9c, \#663) (\#665)
 
