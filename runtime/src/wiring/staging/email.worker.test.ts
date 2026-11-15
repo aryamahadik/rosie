@@ -876,7 +876,10 @@ describe("the email door (../email-door.ts): no answer is K-12's no answer, neve
 
 // ---- the part ---------------------------------------------------------------------------------------------------------
 
-/** Every part but this card's and the test-phone part's, stood in by its nothing-bound answer (DL-776). */
+/**
+ * Every part but this card's and the test-phone part's, stood in by its nothing-bound answer (DL-776): the sign-in part
+ * (T-1289) too, which is bound beside the email port.
+ */
 const EVERY_OTHER_PART_UNBOUND: Partial<StagingBuilders> = {
   receipt: () => NO_RECEIPT_INPUTS,
   turn: () => NO_TURN_CALL_INPUTS,
@@ -888,6 +891,7 @@ const EVERY_OTHER_PART_UNBOUND: Partial<StagingBuilders> = {
   send: () => NO_SEND_INPUTS,
   flags: () => null,
   copies: () => null,
+  signIn: () => null,
 };
 
 /** The test-phone part's input with a line and nothing else: the one input this card's part is handed. */

@@ -28,6 +28,8 @@
 //   ./email.ts          T-1288 (F)    emailRows, the email rows' port (ADR-016 card F); handed the test-phone part's
 //                                     line, where every email but a code to a listed inbox goes (no line, no port:
 //                                     DL-768)
+//   ./sign-in.ts        T-1289 (D)    signIn, the sign-in calls' inputs (ADR-016 card D); handed the email part's port,
+//                                     the one way a code goes out (no port, no sign-in: DL-768)
 // The three seams critic_collisions B6 names are made here: the model readers' manifest access (P2b's bundle reads handed to
 // ./models.ts), the BundleSafety hook at the pin (RootOptions.bundleSafety, checked at each pin: ../real.ts checkedPin) and
 // the copy deps in install() (RootOptions.copies). The first text into a fresh isolate's lines (DL-757's option (c)) is
@@ -50,6 +52,7 @@ import { stagingModels } from "./models";
 import { stagingDb, type StagingDb, type StagingEnv, type StagingPart } from "./part";
 import { sealingWrapKeys } from "./secrets";
 import { stagingSendCalls } from "./send";
+import { stagingSignIn } from "./sign-in";
 import { stagingDirectories } from "./state-reads";
 import { stagingTestPhone } from "./test-phone";
 import { stagingGateReads } from "./tool-api-gate";
@@ -81,7 +84,8 @@ export type StagingInputName =
   | "flags"
   | "testPhone"
   | "copies"
-  | "emailRows";
+  | "emailRows"
+  | "signIn";
 
 /** Each of those inputs, null where it is not bound. */
 export type StagingInputs = Required<Pick<RootOptions, StagingInputName>>;
@@ -113,6 +117,7 @@ export const NO_STAGING_INPUTS: StagingInputs = Object.freeze({
   testPhone: null,
   copies: null,
   emailRows: null,
+  signIn: null,
 });
 
 /** Each part's builder, as its own file exports it. */
@@ -129,6 +134,7 @@ export interface StagingBuilders {
   readonly testPhone: typeof stagingTestPhone;
   readonly copies: typeof stagingCopies;
   readonly email: typeof stagingEmail;
+  readonly signIn: typeof stagingSignIn;
 }
 
 /** The parts' builders the Worker runs: each part's own. */
@@ -145,6 +151,7 @@ export const STAGING_BUILDERS: StagingBuilders = Object.freeze({
   testPhone: stagingTestPhone,
   copies: stagingCopies,
   email: stagingEmail,
+  signIn: stagingSignIn,
 });
 
 export interface StagingSeams {
@@ -194,6 +201,8 @@ export function stagingOptions(env: StagingEnv, seams: StagingSeams = {}): Stagi
   // The email rows' port: every email but a code to a listed inbox goes to the test-phone line, the one the page lists
   // emails from, so with no line bound there is no email port (DL-768).
   const emailRows = build.email({ ...part, line: testPhone?.line ?? null });
+  // The sign-in calls: bound beside the email port, the one way a code goes out, so with no port none is (DL-768).
+  const signIn = build.signIn({ ...part, email: emailRows });
 
   return {
     handleKey: receipt.handleKey,
@@ -221,5 +230,6 @@ export function stagingOptions(env: StagingEnv, seams: StagingSeams = {}): Stagi
     testPhone,
     copies,
     emailRows,
+    signIn,
   };
 }

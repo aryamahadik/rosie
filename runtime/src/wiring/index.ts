@@ -133,6 +133,13 @@ export {
   type WorkerSecrets,
 } from "./root";
 export { ROW_MEMORY, RowTraces } from "./row-traces";
+export {
+  signInPages,
+  type SignInInputs,
+  type SignInPageDeps,
+  type SignInWakeLine,
+  type SignInWakeStage,
+} from "./sign-in";
 export { SKELETON_FLAG, skeletonLinqRoute, type ReleaseFlags, type SkeletonRouteDeps } from "./skeleton";
 // Staging's inputs (T-1257), by file: ./staging's index also holds T-1254's handle, which loads only in the Workers runtime.
 export {
