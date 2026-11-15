@@ -32,6 +32,11 @@
 //   - Failing closed: bindings left out (null input, inside the Tool API base, nothing read); the pool's own HYPERDRIVE_APP
 //     (the call's name and SQLSTATE only); a read's error answer thrown (a business this database does not hold); production
 //     (no binding read, the gate port closed).
+//   - The scope's start (T-1410), through a root with every other part stood in (DL-776): once the guard has passed, the
+//     scope's client lost under it (ended first: postgres.js's CONNECTION_ENDED) makes the gate answer K-09's transient,
+//     its handler never run and nothing written; a session refused at its start (3D000, 42501, 55000, as postgres.js rejects
+//     the begin with PostgreSQL's refusal naming this file's database) is thrown scrubbed under gateAndCommit, never
+//     transient and never under withBusiness.
 //   - No line written while this file runs holds a text's words, a number, an address, the wrapping key, a sealed value,
 //     a chat id or a fixed line's words, and no rejection is left unhandled.
 // Test values only (rule 9): the master's sample cast, the fixtures' ids and words, whole fiction-range 555-01xx numbers,
@@ -1422,6 +1427,132 @@ describe("failing closed: every gate fails inside the Tool API base, nothing wri
     );
     expect(thrown).toBeInstanceOf(TurnFaceReadError);
     expect(thrown).toMatchObject({ read: "readOpenHolds", code: "notFound" });
+    expect(await rowCounts()).toEqual(before);
+  });
+});
+
+// ---- the scope's start (T-1410) -----------------------------------------------------------------------------------
+
+/** K-05's transient for a connection lost at the start: nothing was written, and the same request may be sent again. */
+const LOST = { error: "transient", sqlstate: "08006" } as const;
+
+/**
+ * A handle whose Tool API calls lose their client once the guard has passed: each client, guarded and timed as every
+ * call's is, is ended before the call's own code gets it, so the scope's begin is refused by postgres.js as a connection
+ * that is gone (its CONNECTION_ENDED, the binding's host and port on it). Every call is the handle's own.
+ */
+function lostAfterGuard(db: StagingDb): StagingDb {
+  return {
+    toolApi<T>(call: string, fn: (sql: Sql) => Promise<T>, traceId?: string | null): Promise<T> {
+      return db.toolApi(
+        call,
+        async (sql) => {
+          await sql.end({ timeout: 5 });
+          return fn(sql);
+        },
+        traceId,
+      );
+    },
+    runtime: (call, fn, traceId) => db.runtime(call, fn, traceId),
+    counts: () => db.counts(),
+  };
+}
+
+/**
+ * A handle whose Tool API calls, once the guard has passed on the handle's own client, hand the call's code a client whose
+ * every transaction's start is refused with `refusal()`, as postgres.js rejects a begin whose session PostgreSQL refused.
+ */
+function refusedAfterGuard(db: StagingDb, refusal: () => Error): StagingDb {
+  const refusing = { begin: () => Promise.reject(refusal()) } as unknown as Sql;
+  return {
+    toolApi<T>(call: string, fn: (sql: Sql) => Promise<T>, traceId?: string | null): Promise<T> {
+      return db.toolApi(call, () => fn(refusing), traceId);
+    },
+    runtime: (call, fn, traceId) => db.runtime(call, fn, traceId),
+    counts: () => db.counts(),
+  };
+}
+
+/** A binding's database, as its connection string names it. */
+const databaseOf = (binding: { readonly connectionString: string }): string =>
+  decodeURIComponent(new URL(binding.connectionString).pathname.slice(1));
+
+/**
+ * PostgreSQL's refusals of a session at its start that name the database (postinit.c), as postgres.js rejects the begin
+ * with one: its PostgresError, FATAL, the SQLSTATE and the server's words.
+ */
+const DATABASE_REFUSALS: readonly { code: string; words: (database: string) => string }[] = [
+  { code: "3D000", words: (database) => `database "${database}" does not exist` },
+  { code: "42501", words: (database) => `permission denied for database "${database}"` },
+  { code: "55000", words: (database) => `database "${database}" is not currently accepting connections` },
+];
+
+/** One of those refusals, as postgres.js's PostgresError carries it: its name, its severity, its SQLSTATE and its words. */
+function sessionRefusal(code: string, text: string): Error {
+  return Object.assign(new Error(text), {
+    name: "PostgresError",
+    severity_local: "FATAL",
+    severity: "FATAL",
+    code,
+  });
+}
+
+/** A root with this card's part bound over `db` and every other part stood in by its nothing-bound answer (DL-776). */
+function gateRootOver(testEnv: TestEnv, db: StagingDb): Root {
+  const inputs = stagingOptions(testEnv.env, { db, builders: EVERY_OTHER_PART_UNBOUND });
+  if (inputs.gateReads === null) throw new Error("the gate's part is bound on this file's pair");
+  return composeRoot({ environment: "staging", actors: null, vars: testEnv.env, ...inputs });
+}
+
+describe("the scope's start: the gate's transaction is opened for the K-09 call the Tool API base names (T-1410)", () => {
+  it("lost once the guard has passed (the scope's client ended under it): the gate answers K-09's transient 08006, its handler never run: no runtime-side call, nothing written, the one client ended, nothing of the binding in the answer or a line", async () => {
+    const before = await rowCounts();
+    const testEnv = envOf();
+    const written: Json[] = [];
+    const db = handleOver(testEnv.env, written);
+    const root = gateRootOver(testEnv, lostAfterGuard(db));
+
+    const answer = await gateOn(root, await firstTextGate(NO_WRAP_KEY));
+
+    expect(answer).toEqual(LOST);
+    // The scope's one client, guarded and timed under gateAndCommit on the Tool API's side (its line labels and numbers
+    // only, the guard's login among them: DL-757); nothing followed it.
+    expect(callsOf(written)).toEqual([onApp(GATE_CALLS.scope)]);
+    expect(db.counts()).toMatchObject({ opened: 1, ended: 1, connectionsOpen: 0 });
+    expect(await rowCounts()).toEqual(before);
+    for (const name of [APP, JOB]) expectNothingOf(poolBinding(name), [JSON.stringify(answer), ...lines]);
+  });
+
+  it("refused at its start once the guard has passed (3D000, 42501 and 55000, this file's database in the server's words): the gate throws it scrubbed under gateAndCommit, the call's name and the SQLSTATE alone, never transient and never under withBusiness; nothing written", async () => {
+    const before = await rowCounts();
+    const database = databaseOf(poolBinding(APP));
+    expect(database).not.toBe("");
+    for (const { code, words } of DATABASE_REFUSALS) {
+      const testEnv = envOf();
+      const written: Json[] = [];
+      const db = handleOver(testEnv.env, written);
+      const refusal = (): Error => sessionRefusal(code, words(database));
+      expect(holds(refusal().message, database), code).toBe(true);
+      const root = gateRootOver(testEnv, refusedAfterGuard(db, refusal));
+
+      const thrown = await rejectionOf(gateOn(root, await firstTextGate(NO_WRAP_KEY)));
+
+      expect(thrown, code).toBeInstanceOf(DataAccessDatabaseError);
+      expect(thrown, code).toMatchObject({ call: GATE_CALLS.scope, code, table: null, constraint: null });
+      expect((thrown as Error).message, code).toBe(
+        `${GATE_CALLS.scope}: the database refused the call (SQLSTATE ${code})`,
+      );
+      expect(Object.keys(thrown as Error).sort(), code).toEqual([
+        "call",
+        "code",
+        "constraint",
+        "name",
+        "table",
+      ]);
+      for (const name of [APP, JOB]) expectNothingOf(poolBinding(name), textsOf(thrown));
+      expect(callsOf(written), code).toEqual([onApp(GATE_CALLS.scope)]);
+      expect(db.counts(), code).toMatchObject({ opened: 1, ended: 1, connectionsOpen: 0 });
+    }
     expect(await rowCounts()).toEqual(before);
   });
 });

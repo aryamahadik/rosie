@@ -40,8 +40,10 @@
 //            error): it throws, with nothing written. The handle's own errors name the call, the side, the binding and a
 //            reason, a check's label or a SQLSTATE (./db.ts). db/repo's five calls answer K-05's transient or throw
 //            scrubbed, the call's name and a SQLSTATE or the client's code alone (db/repo/clocks.ts transientOrScrubbed).
-//            A failure of the scope's own start, once the handle's guard has passed, is thrown scrubbed too, under
-//            db/repo's own name for it, withBusiness, since pgCallScope names no call (db/repo/scope.ts).
+//            The scope's own start, once the handle's guard has passed, is db/repo's withBusiness's for the call the Tool
+//            API base names (T-1410: composeInput or finalizeMessage): a connection lost or never opened answers K-09's
+//            transient with nothing read or written, and any other failure of it is thrown scrubbed under that name. A
+//            scope asked with no call named keeps db/repo's own name for it, withBusiness (db/repo/scope.ts).
 //
 // Nothing is logged here, and nothing is put in a span: the handle writes each call's timing, labels and numbers only
 // (./part.ts dbCallLine; these seams carry no trace id, so each line's trace_id is null), and the guard's refusal its one
@@ -94,12 +96,15 @@ const present = (binding: unknown): boolean => binding !== undefined && binding 
 
 /**
  * The Tool API's own business scope for one call: pgCallScope over a Tool API client opened for that call (HYPERDRIVE_APP,
- * rosie_worker_app), which the handle guards first and ends when the call's transaction has ended.
+ * rosie_worker_app), which the handle guards first and ends when the call's transaction has ended. The call the Tool API
+ * base names (its ScopeCall: composeInput or finalizeMessage, and its transient answer) goes on to pgCallScope as it is
+ * handed (T-1410), so a start the database could not make once the guard has passed answers K-09's transient, and any
+ * other failure of the start is thrown scrubbed under that name.
  */
 function scopeFor(db: StagingDb, call: string): BusinessScope<Tx> {
   return {
-    withBusiness: (businessId, work) =>
-      db.toolApi(call, (sql) => pgCallScope(sql).withBusiness(businessId, work)),
+    withBusiness: (businessId, work, scopeCall) =>
+      db.toolApi(call, (sql) => pgCallScope(sql).withBusiness(businessId, work, scopeCall)),
   };
 }
 

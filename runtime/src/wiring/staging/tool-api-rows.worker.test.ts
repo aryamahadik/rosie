@@ -29,6 +29,11 @@
 //     calls run, finish under the cap.
 //   - HYPERDRIVE_APP not bound, then HYPERDRIVE_JOB not bound: each input that needs it is null, and its port fails closed
 //     with nothing read or written. The two bindings crossed: the guard's refusal. Production: no binding read.
+//   - The scope's start through a root (T-1410): once the guard has passed, the scope's client lost under it (ended first:
+//     postgres.js's CONNECTION_ENDED) makes compose input and finalize each answer K-09's transient, their handlers never
+//     run and nothing read or written; a session refused at its start (3D000, 42501, 55000, as postgres.js rejects the
+//     begin with PostgreSQL's refusal naming this file's database) is thrown scrubbed under the call's own K-09 name,
+//     never transient and never under withBusiness.
 //   - No line written while this file runs holds a word of a plan or of the inbound text, a number, the chat id, or a
 //     binding's string, host or database.
 // The test's own clients go through T-1254's handle (its quiet socket), so none leaves a rejection behind (T-1403).
@@ -1616,6 +1621,144 @@ describe("a throw through the handle: the call fails closed with nothing read or
     expect([none.written, schema.written]).toEqual([[], []]);
     expect(none.db.counts()).toMatchObject({ opened: 6, ended: 6, connectionsOpen: 0 });
     expect(schema.db.counts()).toMatchObject({ opened: 0, ended: 0 });
+    expect(await snapshot()).toEqual(before);
+  });
+});
+
+// ---- the scope's start (T-1410) --------------------------------------------------------------------------------------
+
+/** K-05's transient for a connection lost at the start: nothing was written, and the same request may be sent again. */
+const LOST = { error: "transient", sqlstate: "08006" } as const;
+
+/**
+ * A handle whose Tool API calls lose their client once the guard has passed: each client, guarded and timed as every
+ * call's is, is ended before the call's own code gets it, so the scope's begin is refused by postgres.js as a connection
+ * that is gone (its CONNECTION_ENDED, the binding's host and port on it). Every call is the handle's own.
+ */
+function lostAfterGuard(db: StagingDb): StagingDb {
+  return {
+    toolApi<T>(call: string, fn: (sql: Sql) => Promise<T>, traceId?: string | null): Promise<T> {
+      return db.toolApi(
+        call,
+        async (sql) => {
+          await sql.end({ timeout: 5 });
+          return fn(sql);
+        },
+        traceId,
+      );
+    },
+    runtime: (call, fn, traceId) => db.runtime(call, fn, traceId),
+    counts: () => db.counts(),
+  };
+}
+
+/**
+ * A handle whose Tool API calls, once the guard has passed on the handle's own client, hand the call's code a client whose
+ * every transaction's start is refused with `refusal()`, as postgres.js rejects a begin whose session PostgreSQL refused.
+ */
+function refusedAfterGuard(db: StagingDb, refusal: () => Error): StagingDb {
+  const refusing = { begin: () => Promise.reject(refusal()) } as unknown as Sql;
+  return {
+    toolApi<T>(call: string, fn: (sql: Sql) => Promise<T>, traceId?: string | null): Promise<T> {
+      return db.toolApi(call, () => fn(refusing), traceId);
+    },
+    runtime: (call, fn, traceId) => db.runtime(call, fn, traceId),
+    counts: () => db.counts(),
+  };
+}
+
+/** A binding's database, as its connection string names it. */
+const databaseOf = (binding: { readonly connectionString: string }): string =>
+  decodeURIComponent(new URL(binding.connectionString).pathname.slice(1));
+
+/**
+ * PostgreSQL's refusals of a session at its start that name the database (postinit.c), as postgres.js rejects the begin
+ * with one: its PostgresError, FATAL, the SQLSTATE and the server's words.
+ */
+const DATABASE_REFUSALS: readonly { code: string; words: (database: string) => string }[] = [
+  { code: "3D000", words: (database) => `database "${database}" does not exist` },
+  { code: "42501", words: (database) => `permission denied for database "${database}"` },
+  { code: "55000", words: (database) => `database "${database}" is not currently accepting connections` },
+];
+
+/** One of those refusals, as postgres.js's PostgresError carries it: its name, its severity, its SQLSTATE and its words. */
+function sessionRefusal(code: string, text: string): Error {
+  return Object.assign(new Error(text), {
+    name: "PostgresError",
+    severity_local: "FATAL",
+    severity: "FATAL",
+    code,
+  });
+}
+
+/** Compose input and finalize through a root, each with the K-09 name its scope's transaction is opened for. */
+const START_CALLS: readonly (readonly [string, (root: Root) => Promise<unknown>])[] = [
+  ["composeInput", (root) => composeRow(root, TURNS.s101)],
+  ["finalizeMessage", (root) => finalizeRow(root, TURNS.s101)],
+];
+
+describe("the scope's start through a root: each transaction is opened for the K-09 call the Tool API base names (T-1410)", () => {
+  it("lost once the guard has passed (the scope's client ended under it): compose input and finalize each answer K-09's transient 08006, their handlers never run: no runtime-side call, nothing read or written, each client ended, nothing of a binding in an answer or a line", async () => {
+    const before = await snapshot();
+    const job = counted(poolBinding(JOB));
+    const app = counted(poolBinding(APP));
+    const { env } = envOf({ HYPERDRIVE_JOB: job.binding, HYPERDRIVE_APP: app.binding });
+    const written: Json[] = [];
+    const real = handleOver(env, written);
+    const root = stagingRoot(skeletonFakes(), stagingRowCalls({ env, db: lostAfterGuard(real) }));
+
+    const answers: unknown[] = [];
+    for (const [call, make] of START_CALLS) {
+      const answer = await make(root);
+      expect(answer, call).toEqual(LOST);
+      answers.push(answer);
+    }
+
+    // One client a call, each guarded and timed under the call's own K-09 name on the Tool API's side; nothing followed.
+    expect(callsOf(written)).toEqual([onApp(ROW_CALLS.composeScope), onApp(ROW_CALLS.finalizeScope)]);
+    expect(ROW_CALLS.composeScope).toBe("composeInput");
+    expect(ROW_CALLS.finalizeScope).toBe("finalizeMessage");
+    expect(real.counts()).toMatchObject({ opened: 2, ended: 2, connectionsOpen: 0 });
+    expect([job.reads.n, app.reads.n]).toEqual([0, 2]);
+    expect(await snapshot()).toEqual(before);
+    expectNoSecrets([JSON.stringify(answers), ...lines, ...written.map((line) => JSON.stringify(line))]);
+  });
+
+  it("refused at its start once the guard has passed (3D000, 42501 and 55000, this file's database in the server's words): compose input and finalize each throw it scrubbed under their own K-09 name, the name and the SQLSTATE alone, never transient and never under withBusiness; nothing read or written", async () => {
+    const before = await snapshot();
+    const database = databaseOf(poolBinding(APP));
+    expect(database).not.toBe("");
+    for (const { code, words } of DATABASE_REFUSALS) {
+      const { env } = envOf({ HYPERDRIVE_JOB: poolBinding(JOB), HYPERDRIVE_APP: poolBinding(APP) });
+      const written: Json[] = [];
+      const real = handleOver(env, written);
+      const refusal = (): Error => sessionRefusal(code, words(database));
+      expect(holds(refusal().message, database), code).toBe(true);
+      const root = stagingRoot(
+        skeletonFakes(),
+        stagingRowCalls({ env, db: refusedAfterGuard(real, refusal) }),
+      );
+
+      for (const [call, make] of START_CALLS) {
+        const thrown = await rejectionOf(make(root));
+
+        expect(thrown, call).toBeInstanceOf(DataAccessDatabaseError);
+        expect(thrown, call).toMatchObject({ call, code, table: null, constraint: null });
+        expect((thrown as Error).message, call).toBe(
+          `${call}: the database refused the call (SQLSTATE ${code})`,
+        );
+        expect(Object.keys(thrown as Error).sort(), call).toEqual([
+          "call",
+          "code",
+          "constraint",
+          "name",
+          "table",
+        ]);
+        for (const binding of [poolBinding(JOB), poolBinding(APP)]) expectNothingOf(binding, textsOf(thrown));
+      }
+      expect(callsOf(written), code).toEqual([onApp(ROW_CALLS.composeScope), onApp(ROW_CALLS.finalizeScope)]);
+      expect(real.counts(), code).toMatchObject({ opened: 2, ended: 2, connectionsOpen: 0 });
+    }
     expect(await snapshot()).toEqual(before);
   });
 });
