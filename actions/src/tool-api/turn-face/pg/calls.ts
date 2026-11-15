@@ -5,8 +5,8 @@
 // Who runs what (0012, 0016; K-05 v1.3 items 34 to 36 and v1.4 items 37 to 43):
 //   - the call's transaction: one per call on `toolApi`, whose connections run as rosie_app, with rosie.business_id set to
 //     the caller's business before the handler gets its repo and checked again at the end (db/repo/scope.ts
-//     withBusiness). Every limit, the walk's reads, readOpenHolds and six of the seven safety reads run on it, each naming
-//     the call's business;
+//     withBusiness), opened for the K-09 call the Tool API base names (T-1410: below). Every limit, the walk's reads,
+//     readOpenHolds and six of the seven safety reads run on it, each naming the call's business;
 //   - K-05's runtime-side calls on `runtime` (rosie_job), each its own transaction: commitTurn (T-306: unique on the turn
 //     id, all or nothing), readBusinessOwner (person_handles and handles are the runtime's tables), and the sealer's read
 //     of the person's key (sealing_keys is the runtime's table: sealer.ts), each scoped as its call says.
@@ -25,20 +25,48 @@ import {
 } from "../../../../../db/repo/safety-reads";
 import { withBusiness, type Sql, type Tx } from "../../../../../db/repo/scope";
 import type { WrappingKeys } from "../../../../../db/repo/sealing";
+import type { TransientError } from "../../../../../db/repo/targets";
 import { readFixedLineFacts, readOpenHoldsIn, readOutboxRow } from "../../../../../db/repo/turn-face-reads";
 import { pgCommitTurn } from "../../../commit/pg";
 import type { SafetyTelling, StopWords } from "../../../domain/safety";
 import type { FrontierBundles } from "../../../frontier";
-import type { BusinessScope } from "../../scope";
+import type { BusinessScope, ScopeCall } from "../../scope";
 import { turnCommitDeps, type SafetyReads, type TurnCommitBinding } from "../commit";
 import { HeldTurns } from "../held";
 import { composeInputDeps, finalizeDeps, type RowBinding, type RowData } from "../rows";
 import type { TurnFaceCalls } from "../turn-face";
 import { pgReadOnlySealer } from "./sealer";
 
-/** The Tool API's own business scope on `toolApi` (rosie_app): one transaction per call (db/repo/scope.ts withBusiness). */
+/** withBusiness's `call` and `transient` options (db/repo/scope.ts): the call its transaction is opened for. */
+interface StartOptions<T> {
+  readonly call?: string;
+  readonly transient?: (answer: TransientError) => T;
+}
+
+/**
+ * withBusiness's start options for the call the Tool API base names (scope.ts ScopeCall; T-1410): its K-09 name, and its
+ * transient answer only where the base gave one. Nothing else is taken from it: the transaction is the call's own on the
+ * primary, read-write, as it always was. With no call named, withBusiness keeps its own name.
+ */
+function startOf<T>(call: ScopeCall<T> | undefined): StartOptions<T> {
+  if (call === undefined) return {};
+  const { transient } = call;
+  return transient === undefined ? { call: call.call } : { call: call.call, transient };
+}
+
+/**
+ * The Tool API's own business scope on `toolApi` (rosie_app): one transaction per call (db/repo/scope.ts withBusiness),
+ * opened for the call the Tool API base names (T-1410; T-1368's new task a). Its ScopeCall goes on to withBusiness as its
+ * `call` and, where given, its `transient`: a start the database could not make (a connection that never opened or was
+ * lost) answers K-09's transient where that call's errors have it, and any other failure of the start (a session refused
+ * at its start, 3D000, 42501 and 55000 among them) is thrown scrubbed under the K-09 call's own name, never under
+ * "withBusiness". Once `work` has begun, nothing changes: what it throws, and the end's scope check and commit, leave as
+ * they always have.
+ */
 export function pgCallScope(toolApi: Sql): BusinessScope<Tx> {
-  return { withBusiness: (businessId, work) => withBusiness(toolApi, businessId, work) };
+  return {
+    withBusiness: (businessId, work, call) => withBusiness(toolApi, businessId, work, startOf(call)),
+  };
 }
 
 /** K-05 v1.4's safety reads (T-1161): the In reads on the call's transaction, the owner on the runtime side. */
