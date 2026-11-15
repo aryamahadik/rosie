@@ -1051,10 +1051,10 @@ export class SafetyOnArrival {
    * actor's, with its id, rule and booking block; else its id lands on the hold that has none, as before. So whichever
    * comes first, the re-read's hold or the replay, the actor's hold carries the core's id once the core holds it, and
    * `markHoldReleased` can find it. The check that a hold exists, released or not, and the write share one guarded step
-   * (T-1318, T-1312's security note a): a read that throws writes nothing and counts as not written, so it can never fall
-   * through to `writeHold`, whose own read sees open holds only, and reopen a hold the core released. The id's own write
-   * to a hold that exists is not guarded, as before: a storage that throws there leaves the record queued, and its next
-   * replay lands the id.
+   * (T-1318, T-1312's security note a): a read that throws counts as not written and never falls through to `writeHold`,
+   * whose own read sees open holds only, so it can never reopen a hold the core released. The id's own write to a hold
+   * that exists is not guarded, as before: a storage that throws there leaves the record queued, and its next replay
+   * lands the id.
    *
    * A throw in that step loses no id (T-1365): the core's hold is kept (`keepCoreHold`), so the hold the actor writes
    * later carries the core's id. True once the core's hold is the actor's, its id is on the actor's, or it is kept; false
