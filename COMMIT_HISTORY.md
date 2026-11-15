@@ -2,9 +2,54 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 652, [`d180e9c`](https://github.com/aryamahadik/rosie/commit/d180e9c), 2026-11-15 11:28:34 UTC.
+- **Through:** commit 654, [`7454283`](https://github.com/aryamahadik/rosie/commit/7454283), 2026-11-15 12:00:59 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 654. docs: COMMIT\_HISTORY.md through commit 652 (d180e9c, \#663) (\#665)
+
+- **Commit:** [`7454283`](https://github.com/aryamahadik/rosie/commit/7454283), by Arya Mahadik, 2026-11-15 12:00:59 UTC
+- **Pull request:** [#665](https://github.com/aryamahadik/rosie/pull/665) from `task/commit-history-124`, merged 2026-11-15 12:00:59 UTC. It squashed 1 branch commit:
+  - `3dc4f5b` docs: COMMIT\_HISTORY.md through commit 652 (d180e9c, \#663)
+- **Files changed:** 1 (+72 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +72 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 216 (DL-809); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 653. T-513: the chat link with its QR code (C9): the Tool API's link shown byte for byte with its QR, nothing when the contact add failed (\#664)
+
+- **Commit:** [`282322c`](https://github.com/aryamahadik/rosie/commit/282322c), by Arya Mahadik, 2026-11-15 12:00:55 UTC
+- **Pull request:** [#664](https://github.com/aryamahadik/rosie/pull/664) from `task/T-513`, merged 2026-11-15 12:00:56 UTC. It squashed 2 branch commits:
+  - `1bc7ca7` T-513: the chat-link component: the link with its QR code beside it (…
+  - `9295f6d` T-513: the component's notes: the one check on the link is its sms: s…
+- **Files changed:** 5 (+886 −0), by folder:
+  - `web/src/components/chat-link/` chat-link.test.ts +246 −0, chat-link.ts +103 −0, qr-code.test.ts +91 −0, qr-code.ts +78 −0, test-support.ts +368 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-513: the chat-link component: the link with its QR code beside it (uqr), the plain-words fallback, nothing when the contact add failed (Q-03); a test-only QR decoder from the T-1120 spike
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-513: the component's notes: the one check on the link is its sms: scheme; when uqr picks byte mode
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 652. docs: COMMIT\_HISTORY.md through commit 649 (19f574a, \#660) (\#663)
 
