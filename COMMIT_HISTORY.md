@@ -2,9 +2,60 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 646, [`11951ca`](https://github.com/aryamahadik/rosie/commit/11951ca), 2026-11-15 09:25:36 UTC.
+- **Through:** commit 649, [`19f574a`](https://github.com/aryamahadik/rosie/commit/19f574a), 2026-11-15 10:17:03 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 649. docs: COMMIT\_HISTORY.md through commit 646 (11951ca, \#656) (\#660)
+
+- **Commit:** [`19f574a`](https://github.com/aryamahadik/rosie/commit/19f574a), by Arya Mahadik, 2026-11-15 10:17:03 UTC
+- **Pull request:** [#660](https://github.com/aryamahadik/rosie/pull/660) from `task/commit-history-122`, merged 2026-11-15 10:17:04 UTC. It squashed 1 branch commit:
+  - `e2000a3` docs: COMMIT\_HISTORY.md through commit 646 (11951ca, \#656)
+- **Files changed:** 1 (+176 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +176 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 214 (DL-798); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 648. T-1286: the dispatcher's email branch: a code row sent through the email port alone, the chat step skipped, emailFor's address, the code email's subject and assistant line, the stop and the end read again before the send, and no give-up of a row with no turn (\#659)
+
+- **Commit:** [`8062b2b`](https://github.com/aryamahadik/rosie/commit/8062b2b), by Arya Mahadik, 2026-11-15 10:17:00 UTC
+- **Pull request:** [#659](https://github.com/aryamahadik/rosie/pull/659) from `task/T-1286`, merged 2026-11-15 10:17:00 UTC. It squashed 1 branch commit:
+  - `e967aa9` T-1286: the dispatcher's email branch: a code row sent through the em…
+- **Files changed:** 9 (+1722 −78), by folder:
+  - `runtime/src/dispatch/` dispatcher-email.worker.test.ts +895 −0, dispatcher.ts +343 −78, index.ts +3 −0, types.ts +7 −0
+  - `runtime/src/email/` index.ts +15 −0, rows.ts +117 −0, rows.worker.test.ts +207 −0, test-support.ts +44 −0, types.ts +91 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 647. T-1281: the human testers' seed (staging-testers): per inbox on STAGING\_TEST\_INBOXES a person, an email handle, a proven account and a K-22 v1.3 listing, no role and no team row; its integration test (\#658)
+
+- **Commit:** [`1367942`](https://github.com/aryamahadik/rosie/commit/1367942), by Arya Mahadik, 2026-11-15 10:16:56 UTC
+- **Pull request:** [#658](https://github.com/aryamahadik/rosie/pull/658) from `task/T-1281`, merged 2026-11-15 10:16:56 UTC. It squashed 1 branch commit:
+  - `16ff00b` T-1281: the human testers' seed (staging-testers): per inbox on STAGI…
+- **Files changed:** 2 (+1306 −0), by folder:
+  - `db/seeds/` staging-testers.int.test.ts +888 −0, staging-testers.ts +418 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 646. docs: COMMIT\_HISTORY.md through commit 640 (33933e9, \#651) (\#656)
 
