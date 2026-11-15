@@ -2,9 +2,44 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 666, [`5c9ad62`](https://github.com/aryamahadik/rosie/commit/5c9ad62), 2026-11-15 15:28:15 UTC.
+- **Through:** commit 668, [`2930ce6`](https://github.com/aryamahadik/rosie/commit/2930ce6), 2026-11-15 16:34:44 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 668. docs: COMMIT\_HISTORY.md through commit 666 (5c9ad62, \#677) (\#679)
+
+- **Commit:** [`2930ce6`](https://github.com/aryamahadik/rosie/commit/2930ce6), by Arya Mahadik, 2026-11-15 16:34:44 UTC
+- **Pull request:** [#679](https://github.com/aryamahadik/rosie/pull/679) from `task/commit-history-130`, merged 2026-11-15 16:34:44 UTC. It squashed 1 branch commit:
+  - `9f37a37` docs: COMMIT\_HISTORY.md through commit 666 (5c9ad62, \#677)
+- **Files changed:** 1 (+51 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +51 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 222 (DL-824); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 667. T-1368: the frontier's start throws every non-transient failure scrubbed (3D000, 42501, 55000, a refused setting), its transaction hears a close between statements and sends nothing after it, and the Tool API base names its K-09 call to the scope and answers K-09's transient where the call's errors have it (\#678)
+
+- **Commit:** [`fb393f8`](https://github.com/aryamahadik/rosie/commit/fb393f8), by Arya Mahadik, 2026-11-15 16:34:40 UTC
+- **Pull request:** [#678](https://github.com/aryamahadik/rosie/pull/678) from `task/T-1368`, merged 2026-11-15 16:34:40 UTC. It squashed 1 branch commit:
+  - `1b2b43a` T-1368: the frontier's start throws every non-transient failure scrub…
+- **Files changed:** 5 (+1395 −62), by folder:
+  - `actions/src/tool-api/` scope.ts +27 −3, tool-api.int.test.ts +594 −0, tool-api.ts +62 −12
+  - `actions/src/tool-api/turn-face/pg/` frontier.int.test.ts +577 −2, frontier.ts +135 −45
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 666. docs: COMMIT\_HISTORY.md through commit 664 (af601fc, \#675) (\#677)
 
