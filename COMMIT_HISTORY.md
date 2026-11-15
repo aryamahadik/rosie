@@ -2,9 +2,56 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 679, [`2c90291`](https://github.com/aryamahadik/rosie/commit/2c90291), 2026-11-15 19:22:42 UTC.
+- **Through:** commit 681, [`c2f36d6`](https://github.com/aryamahadik/rosie/commit/c2f36d6), 2026-11-15 20:34:46 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 681. docs: COMMIT\_HISTORY.md through commit 679 (2c90291, \#690) (\#692)
+
+- **Commit:** [`c2f36d6`](https://github.com/aryamahadik/rosie/commit/c2f36d6), by Arya Mahadik, 2026-11-15 20:34:46 UTC
+- **Pull request:** [#692](https://github.com/aryamahadik/rosie/pull/692) from `task/commit-history-135`, merged 2026-11-15 20:34:46 UTC. It squashed 1 branch commit:
+  - `044b017` docs: COMMIT\_HISTORY.md through commit 679 (2c90291, \#690)
+- **Files changed:** 1 (+47 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +47 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 228 (DL-847); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 680. T-1121 phase 1: the outbound Linq probe (allow-list refusals before any request, numbers masked, the key in one header), its dry run against a local stand-in, its test and findings (\#693)
+
+- **Commit:** [`b60b9bd`](https://github.com/aryamahadik/rosie/commit/b60b9bd), by Arya Mahadik, 2026-11-15 20:34:42 UTC
+- **Pull request:** [#693](https://github.com/aryamahadik/rosie/pull/693) from `task/T-1121`, merged 2026-11-15 20:34:43 UTC. It squashed 2 branch commits:
+  - `c5aa51b` T-1121: phase 1 of the outbound Linq probe: probe.sh and its Node pro…
+  - `80c28c4` T-1121: FINDINGS.md, the builder's text written by the lead (the harn…
+- **Files changed:** 7 (+1690 −0), by folder:
+  - `adapters/spikes/linq-live/` FINDINGS.md +57 −0, lib.mjs +566 −0, probe.mjs +12 −0, probe.sh +110 −0, probe.test.mjs +682 −0, stub.mjs +120 −0, wire.mjs +143 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1121: phase 1 of the outbound Linq probe: probe.sh and its Node probe (values by name on standard input alone), a dry run against a local stand-in on 127.0.0.1, and its node:test (refusals before any request, numbers masked to the last 2 digits, the key only in the Authorization header, one message a step, plainly a Rosie staging test)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1121: FINDINGS.md, the builder's text written by the lead (the harness refused the builder's write; DL-849)
+
+Exactly the builder's findings_text from wf_23110469-60b. prettier's check and the spike test (13/13, which scans the folder's files for numbers) pass on it.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 679. docs: COMMIT\_HISTORY.md through commit 677 (8b0a10d, \#688) (\#690)
 
