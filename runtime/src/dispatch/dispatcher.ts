@@ -47,14 +47,44 @@
 // then (commit order). override_optout goes only on a safety line or a stop reply (hard invariant: no routine text after
 // STOP; arch 10 line 524).
 //
+// Email rows (T-1286, "T-264a"; ADR-016 section 3; K-12 v1 sendEmail): a row whose channel and port are both email
+// (limit8 isEmailRow) goes by the email port alone (DispatchDeps.email), never by Linq. It has no chat step: after limit
+// 8 its request is built by the email rows (../email: a sign-in code row about no business, in K-12 send-code.json's form
+// with the subject and the assistant line; any other email row is not built yet, sends nothing and holds back no row
+// behind it) and goes to the recipient's address from `RecipientDirectory.emailFor`. Just before the send the stop is read again as limit 8 reads an
+// email row's (its address's newest texts row: stopStands), and the row's end with it (endPassed), so a stop or an end
+// that came meanwhile lets nothing out (DL-703). The port's failures follow K-07: no answer keeps the key, a reported
+// transient failure or a rate limit takes a new key after any Retry-After, and a refusal or a reached quota is not tried
+// again: the part is marked failed with no next try and the row waits for its end, when limit 8 withdraws it. A row with
+// no turn (a code row: K-04 v1.1 job_id) is never given up, never written "all set" and never followed up (K-05 v1.13
+// item 66): no path here asks dispatcherGivesUp, writeAllSet or a follow-up, and a code row ends sent, delivered,
+// droppedStopped, or withdrawn at its notAfter.
+//
 // Not here: the second part waiting for the first's receipt (T-262), a refused part's plain form (C-127, C-128), a failed
-// safety line's other ways and the row's end after 15 minutes of tries (C-126: T-273, T-1136's store calls), email
-// (T-264).
+// safety line's other ways and the row's end after 15 minutes of tries (C-126: T-273, T-1136's store calls), an email
+// row's copies, typed options, reply thread and its delivered receipt's clock (T-264).
 //
 // No words, number or key is logged: spans carry ids, counts and labels only (runtime/src/trace; K-08 v1).
 
+import {
+  codeEmailRequest,
+  emailAddressOf,
+  emailWordsOf,
+  type EmailFailed,
+  type EmailRowsDeps,
+} from "../email";
 import { OUTAGE_LINE_ID } from "../outage/ai/outage";
-import { decideLimit8, isSafety, isSmsPort, isStopReply, type YesRefused } from "./limit8";
+import {
+  decideLimit8,
+  emailStopped,
+  endPassed,
+  isEmailRow,
+  isSafety,
+  isSmsPort,
+  isStopReply,
+  stopStands,
+  type YesRefused,
+} from "./limit8";
 import { retryPlanOf, type RetryChain, type RetryScheduler, type RetryWhy } from "./retry/plan";
 import {
   mayOverrideOptout,
@@ -66,18 +96,18 @@ import {
   waitSecondsFor,
   type RetryRule,
 } from "./retry/rules";
-import type { Outcome, SpanFields, TraceContext } from "../trace";
+import { isLabel, type Outcome, type SpanFields, type TraceContext } from "../trace";
 import type {
   CalendarFileBuilder,
   ChatTarget,
   ClaimedPart,
   ClaimedRow,
   ClockArming,
-  LinqAccepted,
   LinqFailed,
   LinqPort,
   LinqSendRequest,
   MarkPartResponse,
+  MarkRowRequest,
   OutboxStore,
   PlannedSend,
   RecipientDirectory,
@@ -102,6 +132,12 @@ export const ACTOR_READING_MS = 5_000;
 export interface DispatchDeps {
   store: OutboxStore;
   linq: LinqPort;
+  /**
+   * The email port and the From address (T-1286; K-12 v1 sendEmail; ADR-016 sections 3 and 5): an email row (channel and
+   * port both email) goes through it alone, never through Linq. Left out (production binds none: STATE note 72), every
+   * email row ends `noEmailPort` with nothing sent, nothing marked and its claim left to lapse.
+   */
+  email?: EmailRowsDeps;
   recipients: RecipientDirectory;
   /** Limit 8's read of the recipient's send state, made before each send (NQ-RT-2; K-05 v1.2 later). */
   sendState: SendStateReader;
@@ -173,6 +209,16 @@ export type RowOutcome =
   | "awaitingRetry"
   /** No chat is known for the recipient: nothing was sent. */
   | "noChat"
+  /** An email row with no email port joined (DispatchDeps.email): nothing was sent (T-1286). */
+  | "noEmailPort"
+  /** An email row whose recipient has no email address known (`emailFor` gave none): nothing was sent (T-1286). */
+  | "noAddress"
+  /**
+   * An email row the email rows do not build yet (../email emailWordsOf: any purpose but a code about no business,
+   * booking or question, or final parts that are not one words send: T-264's): nothing was sent and nothing marked, and
+   * the recipient's later rows pass it, as they pass a refused SMS-port row (T-1286).
+   */
+  | "notBuilt"
   /** The store kept answering transient or an answer the run cannot use: the claim's lapse hands the row on. */
   | "storeError"
   /** The row's parts do not match its final parts: nothing was sent for the part. */
@@ -203,6 +249,9 @@ const LETS_LATER_PASS: ReadonlySet<RowOutcome> = new Set<RowOutcome>([
   "withdrawn",
   // A refused SMS-port row has no K-05 move (CQ-55 (1)), but it never holds back the recipient's later rows.
   "refusedSms",
+  // Nor does an email row the email rows do not build yet (T-264's): it never holds back one they build, such as a
+  // sign-in code behind it (T-1286).
+  "notBuilt",
   // A 2024 ends the row's tries on Linq: dropped as stopped, or a safety line left to its other ways (C-126).
   "optedOut",
 ]);
@@ -421,9 +470,24 @@ interface RowDone {
   wait: Wait | null;
 }
 
+/** The outside call a row's send goes by, as its dispatch span names it (K-08 v1 'Outside calls'; K-12 README line 25). */
+type SendWay = { provider: "linq"; call: "sendPart" } | { provider: "resend"; call: "sendEmail" };
+const LINQ_WAY: SendWay = { provider: "linq", call: "sendPart" };
+const EMAIL_WAY: SendWay = { provider: "resend", call: "sendEmail" };
+
+/** A provider's acceptance of a part, as markPart sent records it: Linq's (K-11 v1) or the email port's (K-12 v1). */
+interface Accepted {
+  providerMessageId: string | null;
+  providerOptionIds: readonly string[] | null;
+  acceptedAt: Utc;
+}
+
 async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowDone> {
   const trace = deps.traceFor(row);
   const timer = trace.start("dispatch");
+  /** An email row (channel and port both email) goes by the email port alone, with no chat step (T-1286). */
+  const emailRow = isEmailRow(row);
+  const way = emailRow ? EMAIL_WAY : LINQ_WAY;
   let attempted: ClaimedPart | null = null;
   let partsSent = 0;
   let errorCode: string | null = null;
@@ -438,8 +502,12 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowDone> {
   let lapsesAt: Utc = row.claim.lapsesAt;
   let firstTryAt: Utc | null = row.claim.firstTryAt;
   let wait: Wait | null = null;
-  /** No answer from Linq shows as timedOut, not failed (K-08 v1 outcomes). */
+  /** No answer from the provider shows as timedOut, not failed (K-08 v1 outcomes). */
   let timedOut = false;
+  /** A text row's chat, asked of the directory once per run. */
+  let chat: ChatTarget | null = null;
+  /** An email row's address, asked of the directory once per run (`emailFor`), as a text row's chat is. Never logged. */
+  let address: string | null = null;
 
   const leaveWaiting = (
     part: ClaimedPart,
@@ -466,9 +534,7 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowDone> {
     timer.finish({
       outcome: spanOutcome,
       ...(limit8 === null ? {} : { limits: [limit8] }),
-      ...(attempted === null
-        ? {}
-        : { provider: "linq" as const, call: "sendPart", attempt: attempted.tryNo }),
+      ...(attempted === null ? {} : { provider: way.provider, call: way.call, attempt: attempted.tryNo }),
       got: { parts: row.parts.length, partsSent },
       decided: {
         result: outcome,
@@ -483,32 +549,12 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowDone> {
     return { report: report(row, outcome, partsSent), wait: waiting };
   };
 
-  const parts = [...row.parts].sort((a, b) => a.partNo - b.partNo);
-  let chat: ChatTarget | null = null;
-  for (const part of parts) {
-    if (part.sent) continue;
-    const send = row.finalParts.sends[part.partNo - 1];
-    if (send === undefined) return end("badRow");
-
-    // Limit 8, before each send and before the claim is renewed (a held row must not start the 15 minutes of tries).
-    const gate = await checkLimit8(
-      deps,
-      row,
-      version,
-      parts.some((candidate) => candidate.sent) || partsSent > 0,
-    );
-    limit8 = gate.limit;
-    if (!gate.go) {
-      errorCode = gate.errorCode;
-      textsYes = gate.yesRefused ?? null;
-      return end(gate.outcome);
-    }
-    const { overrideOptout } = gate;
-
-    chat ??= await deps.recipients.chatFor(row.recipientHandleId);
-    if (chat === null) return end("noChat");
-
-    // The claim is renewed just before each send (K-05 v1.1 item 14): a run whose claim another run took stops here.
+  /**
+   * The claim renewed just before a part's send (K-05 v1.1 item 14): "go", with the claim as renewed; "skip" for a part
+   * that is no longer pending; else the run's end, when another run took the claim, a Retry-After still holds, the part's
+   * latest try failed with no next try yet, or the store faulted.
+   */
+  const renewForSend = async (part: ClaimedPart): Promise<"go" | "skip" | RowDone> => {
     const renewed = await untilNotTransient(() =>
       deps.store.renewClaim({
         outboxRowId: row.outboxRowId,
@@ -533,20 +579,151 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowDone> {
           if (renewed.state === "failed") {
             // The part's latest try failed and its next try is not written yet: a 4001 or 4006 within its minute, whose
             // own job writes it (K-07 rule 2), or a safety line Linq refused with 2024, whose other ways are C-126's. No
-            // new key is ever made here, so none can come before the minute is out.
+            // new key is ever made here, so none can come before the minute is out. An email part refused or past its
+            // quota never gets one (T-1286): its row waits for its end, when limit 8 withdraws it.
             const at = deps.now();
-            const seconds = Math.max(RETRY_SPACING_S, secondsBetween(at, lapsesAt));
+            const seconds = emailRow
+              ? secondsUntilEnd(row, at, lapsesAt)
+              : Math.max(RETRY_SPACING_S, secondsBetween(at, lapsesAt));
             leaveWaiting(part, "failedTry", "rerun", "failedTry", at, seconds);
             return end("awaitingRetry");
           }
           // The part is no longer pending: it was sent by the run that holds the claim, or is not this row's.
-          continue;
+          return "skip";
         default:
           return end("storeError");
       }
     }
     lapsesAt = renewed.claim.lapsesAt;
     firstTryAt = renewed.claim.firstTryAt ?? firstTryAt;
+    return "go";
+  };
+
+  /**
+   * Records a part the provider accepted (markPart sent) and its providerAccepted span. Null once recorded; else the run's
+   * end: the provider named no message id (the part is failed), or the store did not take the mark.
+   */
+  const recordAccepted = async (part: ClaimedPart, accepted: Accepted): Promise<RowDone | null> => {
+    const marked = await recordSent(deps, part, accepted);
+    if (marked === null) {
+      errorCode = "noMessageId";
+      await deps.store.markPart({
+        outcome: "failed",
+        idempotencyKey: part.idempotencyKey,
+        errorCode,
+        retry: false,
+        at: deps.now(),
+      });
+      return end("failed");
+    }
+    if ("error" in marked) return end("storeError");
+
+    version = marked.row?.version ?? version;
+    partsSent += 1;
+    trace.record({
+      hop: "providerAccepted",
+      ms: 0,
+      at: accepted.acceptedAt,
+      outcome: "ok",
+      provider: way.provider,
+      rows: [{ table: "outbox_parts", id: part.idempotencyKey }],
+    });
+    return null;
+  };
+
+  /**
+   * One part of an email row, once limit 8 let it go (T-1286; ADR-016 section 3): no chat step, and never Linq. The email
+   * port; the request the email rows build (a row they do not build yet sends nothing); the recipient's address from
+   * `emailFor`; the claim's renewal; the stop and the end read again; the send; and its outcome under K-07's rules. Null
+   * once the part is sent, "skip" for a part no longer pending, else the run's end.
+   */
+  const sendEmailPart = async (part: ClaimedPart): Promise<RowDone | "skip" | null> => {
+    const email = deps.email;
+    if (email === undefined) return end("noEmailPort");
+    const built = emailWordsOf(row);
+    if ("notBuilt" in built) {
+      errorCode = built.notBuilt;
+      return end("notBuilt");
+    }
+    address ??= emailAddressOf(await deps.recipients.emailFor?.(row.recipientHandleId));
+    const to = address;
+    if (to === null) return end("noAddress");
+
+    const renewal = await renewForSend(part);
+    if (renewal !== "go") return renewal;
+
+    const request = codeEmailRequest({
+      idempotencyKey: part.idempotencyKey,
+      words: built.words,
+      to,
+      fromAddress: email.fromAddress,
+    });
+    // The stop and the row's end again, the last read before the send (DL-703): an email row's stop is its address's
+    // newest texts row (stopStands), and a stop or an end that came during the lookup or the renewal lets nothing out.
+    const recheck = await checkStoppedAgain(deps, row, version);
+    if (!recheck.go) {
+      errorCode = recheck.errorCode;
+      limit8 = recheck.limit;
+      return end(recheck.outcome);
+    }
+    attempted = part;
+    const sent = await email.port.sendEmail(request);
+
+    if (sent.result === "failed") {
+      const code = emailFailureCode(sent);
+      errorCode = code;
+      const rule = emailRetryRuleFor(sent, code);
+      timedOut = rule?.rule === "sameKey";
+      const after =
+        rule === null
+          ? await afterRefusal(deps, row, part, code, lapsesAt)
+          : await afterFailure(deps, row, part, null, rule, version, lapsesAt);
+      if (after.wait !== null) {
+        leaveWaiting(part, after.wait.why, after.wait.chain, code, after.wait.at, after.wait.seconds);
+      }
+      return end(after.outcome);
+    }
+    return recordAccepted(part, {
+      providerMessageId: sent.providerMessageId,
+      providerOptionIds: null,
+      acceptedAt: sent.acceptedAt,
+    });
+  };
+
+  const parts = [...row.parts].sort((a, b) => a.partNo - b.partNo);
+  for (const part of parts) {
+    if (part.sent) continue;
+    const send = row.finalParts.sends[part.partNo - 1];
+    if (send === undefined) return end("badRow");
+
+    // Limit 8, before each send and before the claim is renewed (a held row must not start the 15 minutes of tries).
+    const gate = await checkLimit8(
+      deps,
+      row,
+      version,
+      parts.some((candidate) => candidate.sent) || partsSent > 0,
+    );
+    limit8 = gate.limit;
+    if (!gate.go) {
+      errorCode = gate.errorCode;
+      textsYes = gate.yesRefused ?? null;
+      return end(gate.outcome);
+    }
+    const { overrideOptout } = gate;
+
+    if (emailRow) {
+      const done = await sendEmailPart(part);
+      if (done === null || done === "skip") continue;
+      return done;
+    }
+
+    chat ??= await deps.recipients.chatFor(row.recipientHandleId);
+    if (chat === null) return end("noChat");
+
+    // The claim is renewed just before each send (K-05 v1.1 item 14): a run whose claim another run took stops here.
+    const renewal = await renewForSend(part);
+    if (renewal === "skip") continue;
+    if (renewal !== "go") return renewal;
 
     attempted = part;
     const request = await buildRequest(deps, row, part, send, chat, overrideOptout);
@@ -584,39 +761,91 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowDone> {
       errorCode = failureCode(outcome);
       const rule = retryRuleFor(outcome, row);
       timedOut = rule.rule === "sameKey";
-      const after = await afterFailure(deps, row, part, outcome, rule, version, lapsesAt);
+      const after = await afterFailure(deps, row, part, outcome.providerMessageId, rule, version, lapsesAt);
       if (after.wait !== null) {
         leaveWaiting(part, after.wait.why, after.wait.chain, rule.code, after.wait.at, after.wait.seconds);
       }
       return end(after.outcome);
     }
 
-    const marked = await recordSent(deps, part, outcome);
-    if (marked === null) {
-      errorCode = "noMessageId";
-      await deps.store.markPart({
-        outcome: "failed",
-        idempotencyKey: part.idempotencyKey,
-        errorCode,
-        retry: false,
-        at: deps.now(),
-      });
-      return end("failed");
-    }
-    if ("error" in marked) return end("storeError");
-
-    version = marked.row?.version ?? version;
-    partsSent += 1;
-    trace.record({
-      hop: "providerAccepted",
-      ms: 0,
-      at: outcome.acceptedAt,
-      outcome: "ok",
-      provider: "linq",
-      rows: [{ table: "outbox_parts", id: part.idempotencyKey }],
-    });
+    const done = await recordAccepted(part, outcome);
+    if (done !== null) return done;
   }
   return end("sent");
+}
+
+/**
+ * How long an email part with no next try waits (T-1286): until its row's end, when limit 8 withdraws the row unsent, and
+ * never less than the spacing or what is left of the claim its try went under. A row with no end waits as any failed try
+ * does.
+ */
+function secondsUntilEnd(row: ClaimedRow, at: Utc, lapsesAt: Utc): number {
+  const rowEnd = row.notAfter ?? null;
+  return Math.max(
+    RETRY_SPACING_S,
+    secondsBetween(at, lapsesAt),
+    rowEnd === null ? 0 : secondsBetween(at, rowEnd),
+  );
+}
+
+/** What the email port's failure is recorded as: its K-12 code when it is a label, else its kind (outbox_parts.error_code). */
+const emailFailureCode = (failed: EmailFailed): string =>
+  failed.code !== null && isLabel(failed.code) ? failed.code : failed.kind;
+
+/** A Retry-After as whole seconds from 0, or null when there is none or it cannot be read (as retry/rules.ts reads one). */
+const wholeSecondsOf = (value: number | null): number | null =>
+  value !== null && Number.isFinite(value) && value >= 0 ? Math.ceil(value) : null;
+
+/**
+ * K-07's rule for the email port's failure of a part (K-12 v1 'Outcomes of a send'; T-1286), or null when no next try
+ * goes. No answer (`transient` with no status: a timeout, a network error, an answer with no id) keeps the key (K-07 rule
+ * 1), so Resend's Idempotency-Key answers a send that did go with its first answer and sends nothing again. A reported
+ * `transient` (a 5xx, a 409) and `rateLimited` take a new key, after any Retry-After (K-07 rules 1 and 6; K-12 open gap
+ * 9). `refused` is not tried again as it was, and no try within the 15 minutes clears `quotaReached`: null, as for a
+ * kind K-12 does not name.
+ */
+function emailRetryRuleFor(failed: EmailFailed, code: string): RetryRule | null {
+  if (failed.kind === "rateLimited") {
+    return { rule: "newKey", code, retryAfterSeconds: wholeSecondsOf(failed.retryAfterSeconds) };
+  }
+  if (failed.kind !== "transient") return null;
+  return failed.httpStatus === null
+    ? { rule: "sameKey", code }
+    : { rule: "newKey", code, retryAfterSeconds: wholeSecondsOf(failed.retryAfterSeconds) };
+}
+
+/**
+ * An email part the port refused, or past its quota (K-12 v1: `refused` is not tried again as it was, and no try within
+ * the 15 minutes clears `quotaReached`; T-1286): the try is marked failed with no next try and nothing follows it up. Its
+ * row is never failed or given up (ADR-016 section 3: a code row ends sent, delivered, droppedStopped, or withdrawn at its
+ * notAfter; K-05 v1.13 item 66): it waits for its end, when the run its retry job starts finds limit 8 withdrawing it
+ * unsent. A mark the store does not take leaves the part pending under its key, as afterFailure's does.
+ */
+async function afterRefusal(
+  deps: DispatchDeps,
+  row: ClaimedRow,
+  part: ClaimedPart,
+  code: string,
+  lapsesAt: Utc,
+): Promise<AfterFailure> {
+  const at = deps.now();
+  const marked = await untilNotTransient(() =>
+    deps.store.markPart({
+      outcome: "failed",
+      idempotencyKey: part.idempotencyKey,
+      errorCode: code,
+      retry: false,
+      at,
+    }),
+  );
+  if ("error" in marked) {
+    const seconds = Math.max(RETRY_SPACING_S, secondsBetween(at, lapsesAt));
+    return { outcome: "storeError", wait: { why: "storeError", chain: "rerun", at, seconds } };
+  }
+  return {
+    outcome: "failed",
+    wait: { why: "failedTry", chain: "rerun", at, seconds: secondsUntilEnd(row, at, lapsesAt) },
+  };
 }
 
 interface AfterFailure {
@@ -625,15 +854,16 @@ interface AfterFailure {
 }
 
 /**
- * Carries out K-07's rule for Linq's reported failure of `part` (retry/rules.ts): the mark, the stop path for a 2024, and
- * the wait for the next try. A mark the store does not take leaves the part pending under its key, so the row goes again
- * after the claim lapses and Linq answers the same key the same way (K-11 'Repeating it').
+ * Carries out K-07's rule for a provider's reported failure of `part` (Linq's, retry/rules.ts; or the email port's, with
+ * no message id: emailRetryRuleFor, T-1286): the mark, the stop path for a 2024, and the wait for the next try. A mark the
+ * store does not take leaves the part pending under its key, so the row goes again after the claim lapses and the
+ * provider answers the same key the same way (K-11 'Repeating it'; K-12 'Repeating it').
  */
 async function afterFailure(
   deps: DispatchDeps,
   row: ClaimedRow,
   part: ClaimedPart,
-  failed: LinqFailed,
+  providerMessageId: string | null,
   rule: RetryRule,
   version: number,
   lapsesAt: Utc,
@@ -657,7 +887,7 @@ async function afterFailure(
         errorCode: rule.code,
         retry,
         at,
-        providerMessageId: failed.providerMessageId,
+        providerMessageId,
         ...(retry ? { nextTryNotBefore } : {}),
       }),
     );
@@ -783,8 +1013,13 @@ type StoppedRecheck =
   | { go: false; outcome: RowOutcome; errorCode: string | null; limit: LimitResult | null };
 
 /**
- * Reads the stopped flag once more just before a send. Stopped: only a safety line and a stop reply still go (with the
- * opt-out override); any other row is dropped as limit 8 drops it. A read that stays transient sends nothing.
+ * Reads the stop once more just before a send, and the row's end with it. A row whose end has come is withdrawn, as limit
+ * 8 withdraws it: no part goes at or after its end, so a code whose end came during the lookup, the renewal or this read
+ * is never sent (T-1286; ADR-016 section 3; DL-703). An email row's stop is its address's newest texts row, never the
+ * phone's flag (limit8 stopStands; DL-703): a stop that committed after limit 8 drops the row, and a read that holds no
+ * texts row cannot show the stop, so nothing is sent or marked (unreadable), as limit 8 answers it. A text row stopped:
+ * only a safety line and a stop reply still go (with the opt-out override); any other row is dropped as limit 8 drops it.
+ * A read that stays transient sends nothing.
  *
  * No texts yes counts here (T-1099): a row the person's own yes lifted past limit 8 waits for the chat, since a stopped
  * phone's chat is closed (K-04 phones_stop_closes_chat), so with the flag set it never reaches this read but by a part
@@ -798,6 +1033,23 @@ async function checkStoppedAgain(
   const state = await untilNotTransient(() => deps.sendState.sendStateFor(row));
   if ("error" in state)
     return { go: false, outcome: "storeError", errorCode: "sendStateUnavailable", limit: null };
+  if (endPassed(row, deps.now())) {
+    const withdrawn = await markClosed(deps, row, version, "withdrawn");
+    return { go: false, ...withdrawn, limit: limit8Failed("withdrawn") };
+  }
+  if (isEmailRow(row)) {
+    if (!stopStands(row, state)) return { go: true, overrideOptout: false };
+    if (emailStopped(state) === null) {
+      return {
+        go: false,
+        outcome: "unreadable",
+        errorCode: "sendStateInvalid",
+        limit: limit8Failed("unreadable"),
+      };
+    }
+    const dropped = await markDroppedStopped(deps, row, version);
+    return { go: false, ...dropped, limit: limit8Failed("droppedStopped") };
+  }
   if (!state.stopped) return { go: true, overrideOptout: false };
   if (isSafety(row) || isStopReply(row)) return { go: true, overrideOptout: true };
 
@@ -806,26 +1058,36 @@ async function checkStoppedAgain(
 }
 
 /**
- * Drops the row as stopped (K-05 markRow droppedStopped, compared on the run's version): its question takes the
- * never-delivered path (T-255), and the recipient's later rows go. A mark the store does not take is storeError: nothing
- * is sent, and the claim's lapse hands the row on.
+ * Closes the row as limit 8 closes it (K-05 markRow, compared on the run's version): droppedStopped, its question taking
+ * the never-delivered path (T-255), or withdrawn at its end (T-1286); either way the recipient's later rows go. A mark the
+ * store does not take is storeError: nothing is sent, and the claim's lapse hands the row on.
  */
-async function markDroppedStopped(
+async function markClosed(
   deps: DispatchDeps,
   row: ClaimedRow,
   version: number,
+  outcome: Extract<MarkRowRequest["outcome"], "droppedStopped" | "withdrawn">,
 ): Promise<{ outcome: RowOutcome; errorCode: string | null }> {
   const marked = await untilNotTransient(() =>
     deps.store.markRow({
       outboxRowId: row.outboxRowId,
       expectVersion: version,
-      outcome: "droppedStopped",
+      outcome,
       heldUntil: null,
       at: deps.now(),
     }),
   );
   if ("error" in marked) return { outcome: "storeError", errorCode: marked.error };
-  return { outcome: "droppedStopped", errorCode: null };
+  return { outcome, errorCode: null };
+}
+
+/** Drops the row as stopped (markClosed droppedStopped). */
+function markDroppedStopped(
+  deps: DispatchDeps,
+  row: ClaimedRow,
+  version: number,
+): Promise<{ outcome: RowOutcome; errorCode: string | null }> {
+  return markClosed(deps, row, version, "droppedStopped");
 }
 
 /**
@@ -877,11 +1139,14 @@ async function readActor(deps: DispatchDeps, row: ClaimedRow): Promise<ActorRead
 /** What Linq's failure is recorded as: its code, else its kind (K-04 `outbox_parts.error_code`, a label). */
 const failureCode = (failed: LinqFailed): string => failed.code ?? failed.kind;
 
-/** `markPart` sent for an accepted part; null when Linq named no message id, which a text, poll or card always has. */
+/**
+ * `markPart` sent for an accepted part; null when the provider named no message id, which a text, poll or card (Linq) and
+ * an email (Resend) always have.
+ */
 async function recordSent(
   deps: DispatchDeps,
   part: ClaimedPart,
-  accepted: LinqAccepted,
+  accepted: Accepted,
 ): Promise<MarkPartResponse | ReturnType<typeof storeFailure> | null> {
   if (accepted.providerMessageId === null) return null;
   const providerMessageId = accepted.providerMessageId;

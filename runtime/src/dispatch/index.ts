@@ -15,6 +15,9 @@ export {
 } from "./dispatcher";
 export {
   decideLimit8,
+  emailStopped,
+  endPassed,
+  isEmailRow,
   stopStands,
   yesAfterStop,
   type Limit8Decision,
