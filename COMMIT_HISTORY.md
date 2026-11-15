@@ -2,9 +2,55 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 677, [`8b0a10d`](https://github.com/aryamahadik/rosie/commit/8b0a10d), 2026-11-15 18:27:31 UTC.
+- **Through:** commit 679, [`2c90291`](https://github.com/aryamahadik/rosie/commit/2c90291), 2026-11-15 19:22:42 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 679. docs: COMMIT\_HISTORY.md through commit 677 (8b0a10d, \#688) (\#690)
+
+- **Commit:** [`2c90291`](https://github.com/aryamahadik/rosie/commit/2c90291), by Arya Mahadik, 2026-11-15 19:22:42 UTC
+- **Pull request:** [#690](https://github.com/aryamahadik/rosie/pull/690) from `task/commit-history-134`, merged 2026-11-15 19:22:43 UTC. It squashed 1 branch commit:
+  - `63fc850` docs: COMMIT\_HISTORY.md through commit 677 (8b0a10d, \#688)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 226 (DL-841); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 678. T-1411: the Workers test pool's outbound tripwire: no test's fetch leaves the Mac; claimed hosts answered by stand-ins (\#691)
+
+- **Commit:** [`5cbfcdf`](https://github.com/aryamahadik/rosie/commit/5cbfcdf), by Arya Mahadik, 2026-11-15 19:22:38 UTC
+- **Pull request:** [#691](https://github.com/aryamahadik/rosie/pull/691) from `task/T-1411`, merged 2026-11-15 19:22:39 UTC. It squashed 2 branch commits:
+  - `3f25251` T-1411: the Workers test pool's outbound tripwire: every global fetch…
+  - `ef29b36` T-1411: the helper's header states exactly what the connect() measure…
+- **Files changed:** 4 (+390 −38), by folder:
+  - `runtime/test/` model-fetch.worker.test.ts +17 −33, outbound.ts +121 −0, outbound.worker.test.ts +192 −0
+  - `/` vitest.config.ts +60 −5
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1411: the Workers test pool's outbound tripwire: every global fetch() lands in the test's own isolate, a claimed host's stand-in answers it, any other host gets a failure naming the host alone; model-fetch.worker.test.ts moves onto it
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1411: the helper's header states exactly what the connect() measurement showed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 677. docs: COMMIT\_HISTORY.md through commit 675 (cf47ff2, \#686) (\#688)
 
