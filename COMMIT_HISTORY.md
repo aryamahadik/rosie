@@ -2,9 +2,52 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 635, [`b1e79f3`](https://github.com/aryamahadik/rosie/commit/b1e79f3), 2026-11-15 03:56:40 UTC.
+- **Through:** commit 637, [`e0f6ee7`](https://github.com/aryamahadik/rosie/commit/e0f6ee7), 2026-11-15 04:19:44 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 637. docs: COMMIT\_HISTORY.md through commit 635 (b1e79f3, \#646) (\#648)
+
+- **Commit:** [`e0f6ee7`](https://github.com/aryamahadik/rosie/commit/e0f6ee7), by Arya Mahadik, 2026-11-15 04:19:44 UTC
+- **Pull request:** [#648](https://github.com/aryamahadik/rosie/pull/648) from `task/commit-history-119`, merged 2026-11-15 04:19:45 UTC. It squashed 1 branch commit:
+  - `2e4d929` docs: COMMIT\_HISTORY.md through commit 635 (b1e79f3, \#646)
+- **Files changed:** 1 (+49 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +49 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 636. T-1400: staging binds the turn's directory over readTurnParty; idsOf and isStopped stay closed (the audit's SR) (\#647)
+
+- **Commit:** [`31fe41d`](https://github.com/aryamahadik/rosie/commit/31fe41d), by Arya Mahadik, 2026-11-15 04:19:41 UTC
+- **Pull request:** [#647](https://github.com/aryamahadik/rosie/pull/647) from `task/T-1400`, merged 2026-11-15 04:19:41 UTC. It squashed 2 branch commits:
+  - `e6fbb27` T-1400: staging binds the turn's directory: RootOptions.turnDirectory…
+  - `446e789` T-1400: the test's number check holds no partial number (the phone sc…
+- **Files changed:** 3 (+1965 −10), by folder:
+  - `runtime/src/wiring/staging/` state-reads.seed.ts +268 −0, state-reads.ts +127 −10, state-reads.worker.test.ts +1570 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1400: staging binds the turn's directory: RootOptions.turnDirectory over K-05 v1.11's readTurnParty through the job handle, mapped by turnPartyOf as the binding line says; handleDirectory and stoppedFlags stay null; its Workers test on the rig and its seed
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1400: the test's number check holds no partial number (the phone scan read the regex as one): each case's number is 12 characters of E.164 and in the fiction range
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 635. docs: COMMIT\_HISTORY.md through commit 633 (b9276f3, \#644) (\#646)
 
