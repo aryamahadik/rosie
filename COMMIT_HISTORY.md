@@ -2,9 +2,184 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 640, [`33933e9`](https://github.com/aryamahadik/rosie/commit/33933e9), 2026-11-15 07:57:39 UTC.
+- **Through:** commit 646, [`11951ca`](https://github.com/aryamahadik/rosie/commit/11951ca), 2026-11-15 09:25:36 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 646. docs: COMMIT\_HISTORY.md through commit 640 (33933e9, \#651) (\#656)
+
+- **Commit:** [`11951ca`](https://github.com/aryamahadik/rosie/commit/11951ca), by Arya Mahadik, 2026-11-15 09:25:36 UTC
+- **Pull request:** [#656](https://github.com/aryamahadik/rosie/pull/656) from `task/commit-history-121`, merged 2026-11-15 09:25:37 UTC. It squashed 1 branch commit:
+  - `5e64620` docs: COMMIT\_HISTORY.md through commit 640 (33933e9, \#651)
+- **Files changed:** 1 (+91 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +91 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 645. T-1043: the chat-link device check's findings note, from the records (DL-794) (\#655)
+
+- **Commit:** [`125d1aa`](https://github.com/aryamahadik/rosie/commit/125d1aa), by Arya Mahadik, 2026-11-15 09:25:33 UTC
+- **Pull request:** [#655](https://github.com/aryamahadik/rosie/pull/655) from `task/T-1043`, merged 2026-11-15 09:25:33 UTC. It squashed 2 branch commits:
+  - `559f0d3` T-1043: the chat-link findings note, written from the records under D…
+  - `00843b7` T-1043: the findings note's tables in prettier's layout (whitespace o…
+- **Files changed:** 1 (+57 −0), by folder:
+  - `web/spikes/chat-link/` FINDINGS.md +57 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1043: the chat-link findings note, written from the records under DL-794 (the user's report quoted, every unknown not reported, K-09's form recommended, the plain-words fallback)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1043: the findings note's tables in prettier's layout (whitespace only)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 644. T-523: the test-phone page's send side: choose a test phone, send a text through K-21 testPhoneSend, show the trace id (\#654)
+
+- **Commit:** [`dbd0470`](https://github.com/aryamahadik/rosie/commit/dbd0470), by Arya Mahadik, 2026-11-15 09:25:28 UTC
+- **Pull request:** [#654](https://github.com/aryamahadik/rosie/pull/654) from `task/T-523`, merged 2026-11-15 09:25:29 UTC. It squashed 1 branch commit:
+  - `040ddc7` T-523: the test-phone page's send side: choose a test phone, send a t…
+- **Files changed:** 6 (+1370 −5), by folder:
+  - `web/src/staging/test-phone/send/` page.ts +261 −0, routes.ts +8 −5, send.test.ts +609 −0, send.ts +164 −0, staging-only.test.ts +173 −0, test-support.ts +155 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+The page at /staging/test-phone (the signed-in page's link for testers) takes the chosen
+phone by its roster id from the address, keeps send disabled until one is chosen, and posts
+the typed text (and an optional threaded reply) to /staging/test-phone/send, which makes the
+one K-21 v1 testPhoneSend call and shows the answer's trace id and event id. Every K-21 answer
+has its page; the routes sit behind the staging-only guard; the page never holds a secret,
+a signature or the session token.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 643. T-1306: staging binds the actor's copy sources (live timers and the stopped flag) on the job login (the audit's P6c) (\#657)
+
+- **Commit:** [`1c66504`](https://github.com/aryamahadik/rosie/commit/1c66504), by Arya Mahadik, 2026-11-15 09:25:24 UTC
+- **Pull request:** [#657](https://github.com/aryamahadik/rosie/pull/657) from `task/T-1306`, merged 2026-11-15 09:25:25 UTC. It squashed 5 branch commits:
+  - `f3a8948` T-1306: staging binds the actor's copy sources over readLiveTimers an…
+  - `29096c4` T-1306: the copies' test shows the build reads alone (DL-768) and the…
+  - `4a00433` T-1306: drop an unneeded type assertion in the copies' test (lint: no…
+  - `0872513` T-1306: rewrap the copies' test header comment (comment only)
+  - `1e511e5` T-1306: pin the COPIES entry in the rig's files.mjs case (DL-788)
+- **Files changed:** 5 (+2050 −11), by folder:
+  - `infra/ci/` test-rig.test.mjs +2 −1
+  - `infra/test-rig/` files.mjs +6 −0
+  - `runtime/src/wiring/staging/` copies.seed.ts +329 −0, copies.ts +132 −10, copies.worker.test.ts +1581 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1306: staging binds the actor's copy sources over readLiveTimers and readStoppedFlag through the job handle, with its Workers test, seed and rig entry
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1306: the copies' test shows the build reads alone (DL-768) and the re-read fresh at each call, on a stand-in of Alex's phone row before his STOP
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1306: drop an unneeded type assertion in the copies' test (lint: no-unnecessary-type-assertion)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1306: rewrap the copies' test header comment (comment only)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1306: pin the COPIES entry in the rig's files.mjs case (DL-788)
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 642. T-1305: staging binds the test-phone page's reads on the job login (the audit's P6b) (\#653)
+
+- **Commit:** [`3999f5d`](https://github.com/aryamahadik/rosie/commit/3999f5d), by Arya Mahadik, 2026-11-15 09:25:21 UTC
+- **Pull request:** [#653](https://github.com/aryamahadik/rosie/pull/653) from `task/T-1305`, merged 2026-11-15 09:25:21 UTC. It squashed 3 branch commits:
+  - `4dc11b3` T-1305: staging binds RootOptions.testPhone over K-05 v1.12 items 53 …
+  - `da03e9e` T-1305: the send case shows the signed text names tp-01's number from…
+  - `96fcafa` T-1305: the deployed Worker's not-connected case builds its own env (…
+- **Files changed:** 4 (+2280 −10), by folder:
+  - `runtime/src/gateway/pages/` pages.worker.test.ts +9 −1
+  - `runtime/src/wiring/staging/` test-phone.seed.ts +387 −0, test-phone.ts +253 −9, test-phone.worker.test.ts +1631 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1305: staging binds RootOptions.testPhone over K-05 v1.12 items 53 to 55 and the roster's one list, through the job handle only, with the line read at each call and the chat link from ROSIE_NUMBER checked as E.164; its Workers test and seed on T-1253's rig
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1305: the send case shows the signed text names tp-01's number from the database (a key-call double) and the session's event id; a wrong-shape request is refused by the read itself, naming the field; comments made exact
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1305: the deployed Worker's not-connected case builds its own env (DL-768, DL-790)
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 641. T-1398: staging binds the gate's reads, each on its own login, with the words from a checked bundle (the audit's P4a) (\#652)
+
+- **Commit:** [`e682a56`](https://github.com/aryamahadik/rosie/commit/e682a56), by Arya Mahadik, 2026-11-15 09:25:17 UTC
+- **Pull request:** [#652](https://github.com/aryamahadik/rosie/pull/652) from `task/T-1398`, merged 2026-11-15 09:25:17 UTC. It squashed 3 branch commits:
+  - `84f904e` T-1398: staging binds RootOptions.gateReads: pgCallScope on the Tool …
+  - `86b8347` T-1398: the gate test and seed in Prettier's form; the seed reads K-2…
+  - `99c3fc3` T-1398: the gate test drops three needless ?? and a cast that lint found
+- **Files changed:** 3 (+2038 −13), by folder:
+  - `runtime/src/wiring/staging/` tool-api-gate.seed.ts +324 −0, tool-api-gate.ts +230 −13, tool-api-gate.worker.test.ts +1484 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1398: staging binds RootOptions.gateReads: pgCallScope on the Tool API side (at most 3 gate calls hold a client at once), readOpenHoldsIn and K-05 v1.4's six In reads on the call's transaction, readBusinessOwner and the read-only sealer on the runtime side, SafetyDeps.words from T-1397's adapter; its Workers test on the rig and its seed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1398: the gate test and seed in Prettier's form; the seed reads K-22's email handle once
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1398: the gate test drops three needless ?? and a cast that lint found
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 640. docs: COMMIT\_HISTORY.md through commit 637 (e0f6ee7, \#648) (\#651)
 
