@@ -21,10 +21,10 @@
 //                  the wiring, never a default;
 //       telling    NOT_TOLD_YET until T-319, so an outcome that must tell someone answers notBuilt;
 //   - openHolds: K-05 v1.3 readOpenHolds on the call's transaction (rosie_app, the call's business), naming the turn's
-//     texts whose recordSafetyOutcome is not among the request's core actions and every unread id the runtime's
-//     CommitContext carries, each hold cut to K-09 safetyHold's three fields, joined with CommitContext.holds read at
-//     commit time, the actor's own hold included (DL-326 note c), and CommitContext.unread kept whole (DL-133; DL-326
-//     note e): any unread id holds;
+//     texts the safety read reads (never a tapback: default 4) whose recordSafetyOutcome is not among the request's core
+//     actions and every unread id the runtime's CommitContext carries, each hold cut to K-09 safetyHold's three fields,
+//     joined with CommitContext.holds read at commit time, the actor's own hold included (DL-326 note c), and
+//     CommitContext.unread kept whole (DL-133; DL-326 note e): any unread id holds;
 //   - commitTurn: K-05 v1.1 commitTurn, the wiring's (pg: T-306's pgCommitTurn, its own runtime transaction).
 //
 // Every port only reads, inside the call's business scope or in a read-only runtime transaction of its own, and hands back
@@ -40,6 +40,14 @@
 //      its danger words, and the outage line). A bundle that holds any step of section 3 (the safety steps, whose cards
 //      carry their own lines) answers notBuilt for a danger outcome's line, since their card lines are not read here yet
 //      (fail closed); bundle v0 holds none (S1-01 and S1-02 only).
+//   4. The texts named to readOpenHolds are the turn's texts the safety read reads (T-1266; K-05 item 34: "the turn's
+//      texts"): an event of the turn that decide's texts name only as a tapback (K-02 v1 text kind tapback, a K-06
+//      reaction) is left out, since the safety read never reads one (runtime/src/safety/arrival.ts READ_KINDS) and so no
+//      K-34 row can ever say it was read (0016: one outcome row per read text). Every other event whose record is not in
+//      the commit is named as before (fail closed): one decide's texts do not hold (a keyword text, or an event K-02 has
+//      no text for, such as a vote taken back), one they name as a text or a vote as well, and every event of a turn with
+//      no decided texts (input coreOnly), where nothing tells a tapback from a text with no record. The runtime's unread
+//      ids are kept whole (DL-133).
 
 import type { CommitContext } from "../../../../runtime/src/actor";
 import type {
@@ -47,6 +55,7 @@ import type {
   CommitPorts,
   CommitTurnContext,
   CoreAction,
+  GateAndCommitRequest,
   OpenHolds,
   SafetyHold,
 } from "../../commit";
@@ -200,6 +209,21 @@ function recordedInThisCommit(core: readonly CoreAction[]): ReadonlySet<string> 
   return recorded;
 }
 
+/**
+ * The turn's events the safety read never reads (default 4): each that decide's texts name as a tapback and as nothing
+ * else. None for a turn with no decided texts.
+ */
+function neverReadIn(request: GateAndCommitRequest): ReadonlySet<string> {
+  if (request.input.kind !== "decided") return new Set();
+  const { texts } = request.input.decided.context;
+  const textOrVote = new Set(texts.filter((text) => text.kind !== "tapback").map((text) => text.eventId));
+  return new Set(
+    texts
+      .filter((text) => text.kind === "tapback" && !textOrVote.has(text.eventId))
+      .map((text) => text.eventId),
+  );
+}
+
 /** The actor's holds as the commit reads them (defaults 1 and 2): K-34 holds by id, every other one as an unread text. */
 function actorHolds(at: CommitAt): { holds: SafetyHold[]; unread: string[] } {
   const holds: SafetyHold[] = [];
@@ -220,8 +244,9 @@ function actorHolds(at: CommitAt): { holds: SafetyHold[]; unread: string[] } {
 
 /**
  * The commit's openHolds port for one call: readOpenHolds on the call's transaction under its business, naming the
- * turn's texts whose outcome does not ride in this commit and the runtime's unread ids, joined with what the runtime
- * holds at commit time (`at`). A read that answers an error fails the call closed.
+ * turn's texts the safety read reads whose outcome does not ride in this commit (never a tapback: default 4) and the
+ * runtime's unread ids, joined with what the runtime holds at commit time (`at`). A read that answers an error fails the
+ * call closed.
  */
 export function openHoldsPort<Repo>(
   at: CommitAt,
@@ -229,7 +254,9 @@ export function openHoldsPort<Repo>(
 ): CommitPorts<Repo>["openHolds"] {
   return async (turn: CommitTurnContext<Repo>): Promise<OpenHolds> => {
     const recorded = recordedInThisCommit(turn.request.core);
-    const eventIds = unique([...turn.turn.eventIds.filter((id) => !recorded.has(id)), ...at.unread]);
+    const neverRead = neverReadIn(turn.request);
+    const texts = turn.turn.eventIds.filter((id) => !recorded.has(id) && !neverRead.has(id));
+    const eventIds = unique([...texts, ...at.unread]);
     const answer = await readOpenHolds(turn.repo, {
       handleId: turn.turn.handleId,
       businessId: turn.businessId,
