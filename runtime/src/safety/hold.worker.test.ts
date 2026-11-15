@@ -5,8 +5,10 @@
 // of the record's section 3, card H, "Proves it with", or a point of its section 2 that the card gives; the two blocks
 // after them prove T-1318's card (T-1312's security notes b and a), the two after those T-1348's (T-1318's new tasks 1 and
 // 2: a danger whose pending note was never written is read again until its hold is written, and a cut-off resume never
-// clears a danger flag the first read set), and the last T-1364's (T-1348's new task B and its security note a: a danger
-// whose line is not done keeps a lasting mark, so its line is tried again until it goes, however its note's writes fail).
+// clears a danger flag the first read set), then T-1364's (T-1348's new task B and its security note a: a danger whose
+// line is not done keeps a lasting mark, so its line is tried again until it goes, however its note's writes fail), and
+// the last T-1365's (T-1348's new task A: a replay whose write of the core's hold throws keeps that hold, so the hold the
+// actor writes later carries the core's id and the core can release it).
 // Where a test makes a write (or a read) throw, the actor's own storage call throws for it, picked by its table and its
 // order (a SQLite trigger that refuses a write cannot also count it: its abort undoes the count); T-1364's refuse every
 // write of a pending note with such a trigger instead, since it is kept in the storage and so refuses a resumed
@@ -255,6 +257,18 @@ const KEPT_HOLD: HoldEntry = {
   released: false,
 };
 
+/**
+ * evt-1's hold as the core holds it (fakeCore: An emergency's rule, the booking block of a plug-in danger word, and its id),
+ * as the record's replay writes it (T-1365: as the hold the actor writes later carries it, once the replay kept it).
+ */
+const CORE_HOLD: HoldEntry = {
+  eventId: "evt-1",
+  holdId: "hold-evt-1",
+  rule: "after_safe",
+  blocksBooking: true,
+  released: false,
+};
+
 // ---- inside the actor --------------------------------------------------------------------------------------------------
 
 /** The actor's own safety read, reached inside the actor. */
@@ -317,10 +331,13 @@ function exec(query: string, ...bindings: SqlStorageValue[]): Promise<void> {
 }
 
 /** The tables whose writes a test makes the storage refuse. */
-type FaultTable = "safety_holds" | "safety_outcomes" | "safety_pending";
+type FaultTable = "safety_holds" | "safety_outcomes" | "safety_pending" | "safety_core_holds";
 
 const isFaultTable = (name: string | undefined): name is FaultTable =>
-  name === "safety_holds" || name === "safety_outcomes" || name === "safety_pending";
+  name === "safety_holds" ||
+  name === "safety_outcomes" ||
+  name === "safety_pending" ||
+  name === "safety_core_holds";
 
 interface WriteFault {
   /** How many writes of this table the storage refused. */
@@ -1166,11 +1183,12 @@ describe("a danger whose hold is not written is read again on the read's own sch
           expect(await unreadTexts()).toEqual(["evt-1"]);
 
           // 30 s: its re-read is due. Its line and record done and its result kept, it lacks only its hold: written from
-          // the kept labels, the danger is complete, with no read sent (ADR-018 section 2, point 2).
+          // the kept labels, the danger is complete, with no read sent (ADR-018 section 2, point 2). After a replay that
+          // came first, that hold carries the core's hold the replay kept, its id among it (T-1365).
           await run.h.clock.advance(15_000);
           await run.wake();
           await vi.waitFor(async () => {
-            expect(await actorOf().readHolds()).toEqual([KEPT_HOLD]);
+            expect(await actorOf().readHolds()).toEqual([replayFirst ? CORE_HOLD : KEPT_HOLD]);
           }, WAIT);
           expect(await unreadTexts()).toEqual([]);
           expect(await idsIn("safety_pending")).toEqual([]);
@@ -2053,6 +2071,156 @@ describe("a danger whose line is not done keeps a lasting mark, however its pend
       ]);
       expect(await lineMarkOf("evt-2")).toBe(1);
       expect(await lineMarkOf("evt-old")).toBeNull();
+    });
+  });
+});
+
+// ---- T-1365: T-1348's new task A (T-1318's security note b) ------------------------------------------------------------
+
+describe("a replay whose write of the core's hold throws keeps that hold, so the hold the actor writes later carries the core's id (T-1365)", () => {
+  it.each([
+    { then: "in the same instance", evict: false },
+    { then: "in a new instance, after an eviction", evict: true },
+  ])(
+    "on the direct path, with markDangerPending and every hold write throwing, the record's replay is taken while its write of the core's hold throws once; once the storage recovers, the re-read writes the hold with the core's id, rule and booking block, markHoldReleased of that id answers released and routineHeld is false, and the line went once: $then",
+    async ({ evict }) => {
+      const calls: RecordSafetyOutcomeRequest[] = [];
+      await withActor(
+        { "evt-1": emergency("evt-1") },
+        { deps: (h) => ({ ...h.deps, core: countingCore(h, calls) }) },
+        async (run) => {
+          run.h.core.down = true;
+          const faults = await faultWrites({ safety_holds: () => true, safety_pending: () => true });
+          await arrive("evt-1", SMOKE_TEXT);
+          await run.settle();
+
+          // The note and the three writes of the hold threw; the line went once, at once, under its noted key, and its
+          // record waits. No hold: the text names itself among the texts not read.
+          expect(faults.refused("safety_holds")).toBe(3);
+          expect(run.h.direct.sent.map((send) => [send.at, send.idempotencyKey])).toEqual([[0, LINE_KEY]]);
+          expect(await actorOf().readHolds()).toEqual([]);
+          expect(await unreadTexts()).toEqual(["evt-1"]);
+
+          // The core answers again: the record replays and the core takes it, and the replay's write of the core's hold
+          // throws, once. The record leaves the queue, since the core has it; the text is still held, with no hold.
+          run.h.core.down = false;
+          expect(await actorOf().writeSafetyOnReturn()).toBe(1);
+          expect(faults.refused("safety_holds")).toBe(4);
+          expect((await actorOf().readCopies()).returns).toEqual([]);
+          expect(await actorOf().readHolds()).toEqual([]);
+          expect(await unreadTexts()).toEqual(["evt-1"]);
+          expect(await actorOf().routineHeld()).toBe(true);
+
+          // The storage recovers.
+          faults.lift();
+          if (evict) await run.evict();
+
+          // 30 s: the re-read is due. The danger lacks only its hold: written from the kept labels, it carries the hold
+          // the replay kept (the core's id, rule and booking block), and the danger is complete, with no read sent.
+          await run.h.clock.advance(30_000);
+          await run.wake();
+          await vi.waitFor(async () => {
+            expect(await actorOf().readHolds()).toEqual([CORE_HOLD]);
+          }, WAIT);
+          expect(await unreadTexts()).toEqual([]);
+          expect(await idsIn("safety_pending")).toEqual([]);
+          await vi.waitFor(noSafetyEntry, WAIT);
+          await run.settle();
+
+          // The core releases it (the turn's gate or the console names it by its id): found and released, and the
+          // routine parts go.
+          expect(await actorOf().markHoldReleased("hold-evt-1")).toBe("released");
+          expect(await actorOf().readHolds()).toEqual([{ ...CORE_HOLD, released: true }]);
+          expect(await actorOf().routineHeld()).toBe(false);
+
+          // The line went once and nothing sent it again: one send under its key, no read but the first, and the core
+          // had the danger's first try (refused) and the record's replay only.
+          expect(run.h.direct.sent.map((send) => [send.at, send.idempotencyKey])).toEqual([[0, LINE_KEY]]);
+          expect(run.h.read.requests).toHaveLength(1);
+          expect(calls.map((call) => call.caller.kind)).toEqual(["job", "actorOnReturn"]);
+        },
+      );
+    },
+  );
+
+  it("with the core's hold neither written nor kept (both writes throwing), the replay answers notBack: the record stays queued, and its next replay, once the storage recovers, writes the core's hold from the core's repeated answer; it is released by its id, and the line went once", async () => {
+    const rows: string[] = [];
+    await withActor(
+      { "evt-1": emergency("evt-1") },
+      { deps: (h) => ({ ...h.deps, core: repeatingCore(h, rows) }) },
+      async (run) => {
+        run.h.core.down = true;
+        const faults = await faultWrites({ safety_holds: () => true, safety_core_holds: () => true });
+        await arrive("evt-1", SMOKE_TEXT);
+        await run.settle();
+        expect(run.h.direct.sent.map((send) => [send.at, send.idempotencyKey])).toEqual([[0, LINE_KEY]]);
+        expect(await actorOf().readHolds()).toEqual([]);
+
+        // The core answers again and takes the record, but the replay can neither write its hold nor keep it: the record
+        // stays queued, as while the core is not answering, and the text stays held, with no hold.
+        run.h.core.down = false;
+        expect(await actorOf().writeSafetyOnReturn()).toBe(0);
+        expect(faults.refused("safety_holds")).toBe(4);
+        expect(faults.refused("safety_core_holds")).toBe(1);
+        expect((await actorOf().readCopies()).returns).toMatchObject([
+          { key: "recordSafetyOutcome:evt-1", rank: "danger", tries: 1, refused: null },
+        ]);
+        expect(await actorOf().readHolds()).toEqual([]);
+        expect(await unreadTexts()).toEqual(["evt-1"]);
+
+        // The storage recovers. The next replay sends the record again; the core answers the repeat with its hold, which
+        // becomes the actor's, with its id, and the record leaves the queue.
+        faults.lift();
+        expect(await actorOf().writeSafetyOnReturn()).toBe(1);
+        expect(await actorOf().readHolds()).toEqual([CORE_HOLD]);
+        expect((await actorOf().readCopies()).returns).toEqual([]);
+        expect(run.h.core.recorded.map((call) => call.request.caller.kind)).toEqual([
+          "actorOnReturn",
+          "actorOnReturn",
+        ]);
+
+        // 30 s: its hold written, the danger is complete, with no read sent. The core releases the hold by its id, and
+        // the routine parts go.
+        await run.h.clock.advance(30_000);
+        await run.wake();
+        await vi.waitFor(async () => {
+          expect(await idsIn("safety_pending")).toEqual([]);
+        }, WAIT);
+        await vi.waitFor(noSafetyEntry, WAIT);
+        await run.settle();
+        expect(await actorOf().markHoldReleased("hold-evt-1")).toBe("released");
+        expect(await actorOf().routineHeld()).toBe(false);
+        expect(run.h.direct.sent).toHaveLength(1);
+        expect(run.h.read.requests).toHaveLength(1);
+      },
+    );
+  });
+
+  it("a replay whose read of the actor's hold throws while that hold has no id: the core's id lands on it and changes nothing else, so markHoldReleased of that id answers released and routineHeld is false; the line went once", async () => {
+    await withActor({ "evt-1": emergency("evt-1") }, {}, async (run) => {
+      // The core is not answering: the line goes straight through Linq, step 1's hold stands with no id, and the record
+      // waits. The danger is complete: its line went, its record is queued, its result kept and its hold written.
+      run.h.core.down = true;
+      await arrive("evt-1", SMOKE_TEXT);
+      await run.settle();
+      expect(run.h.direct.sent.map((send) => [send.at, send.idempotencyKey])).toEqual([[0, LINE_KEY]]);
+      expect(await actorOf().readHolds()).toEqual([STEP_ONE_HOLD]);
+      expect(await idsIn("safety_pending")).toEqual([]);
+      expect(await actorOf().markHoldReleased("hold-evt-1")).toBe("noSuchHold");
+
+      // The core answers again: the record replays and the core takes it; holdOnReturn's first read of the text's hold
+      // throws. The core's id lands on the hold that has none; its rule, booking block and release stay as they were.
+      run.h.core.down = false;
+      const refused = await faultReads("safety_holds", "evt-1", (nth) => nth === 1);
+      expect(await actorOf().writeSafetyOnReturn()).toBe(1);
+      expect(refused()).toBe(1);
+      expect((await actorOf().readCopies()).returns).toEqual([]);
+      expect(await actorOf().readHolds()).toEqual([{ ...STEP_ONE_HOLD, holdId: "hold-evt-1" }]);
+
+      // The core releases it: found by its id and released, and the routine parts go.
+      expect(await actorOf().markHoldReleased("hold-evt-1")).toBe("released");
+      expect(await actorOf().routineHeld()).toBe(false);
+      expect(run.h.direct.sent).toHaveLength(1);
     });
   });
 });

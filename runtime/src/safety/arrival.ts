@@ -84,6 +84,15 @@
 // set the text waits for a read and is a danger in application, however its note's writes fail: it is read again on the
 // read's own schedule, only a danger is applied to it, and its line is tried again under the same key until it goes. A
 // line that went is done for good: no later application sets the mark again.
+//
+// A replay whose write of the core's hold throws keeps that hold all the same (T-1365, T-1348's new task A and T-1318's
+// security note b). The core has taken the record, so it leaves the queue, and the hold's id, rule and booking block are
+// kept in the actor's storage (`safety_core_holds`). So every hold the actor writes for the text later carries the core's
+// id and is never looser than its rule and booking block, in this instance or the next: a re-read's, a resume's, a late
+// answer's or a danger's applied again. A replay whose read of the hold threw also lands the id on a hold that has none,
+// and changes nothing else. Should the storage refuse those writes too, the record stays queued (`notBack`), and the
+// core's repeated answer brings the hold again at the next replay. Either way `markHoldReleased` finds the hold by the id
+// the core names, and the routine parts it holds go once the core releases it.
 
 import { openWords, sealWords, type SealedBox, type SealedWords, type SealingKey } from "../gateway/seal";
 import type { SealedEvent, SealedHandoff } from "../gateway/types";
@@ -348,6 +357,16 @@ export function createSafetyTables(sql: SqlStorage): void {
   // is not written: its pending note waits for those alone, so it goes when its text is closed with its hold written
   // (DL-508), or once a re-read, resume or late answer writes its hold with its result settled (ADR-018). Event ids only.
   sql.exec("CREATE TABLE IF NOT EXISTS safety_line_done (event_id TEXT PRIMARY KEY)");
+  // The core's hold for a text whose record's replay could not write it as the actor's (T-1365): its id, release rule and
+  // booking block, so every hold the actor writes for the text later carries that id, never looser. Labels only.
+  sql.exec(
+    `CREATE TABLE IF NOT EXISTS safety_core_holds (
+       event_id TEXT PRIMARY KEY,
+       hold_id TEXT NOT NULL,
+       rule TEXT NOT NULL,
+       blocks_booking INTEGER NOT NULL
+     )`,
+  );
 }
 
 /** The kinds of event whose words are read: a customer's text, a caption, a vote's words, an edit. */
@@ -978,9 +997,11 @@ export class SafetyOnArrival {
    * Sends one of the safety read's queued records when the actor's write-on-return queue replays it (T-269; arch 11 line
    * 566): what the actor sent straight through Linq while PostgreSQL was down is written with `sentByActor`, caller kind
    * actorOnReturn, and never as a new send. A record's hold id lands on its hold, or the core's hold is written as the
-   * actor's when the actor holds none for the text (`holdOnReturn`). The core not answering (a throw, or `transient`), or
-   * the handle's key not to be had, is `notBack`: the record waits, and nothing queued after it goes first. Any other
-   * error is the core's refusal, and a box that does not open is refused as `unopened`.
+   * actor's when the actor holds none for the text (`holdOnReturn`); where the storage throws there, the core's hold is
+   * kept for the hold the actor writes later (T-1365). The core not answering (a throw, or `transient`), the handle's key
+   * not to be had, or a core's hold the actor can neither write nor keep, is `notBack`: the record waits, nothing queued
+   * after it goes first, and its next replay brings the core's repeated answer, with the hold. Any other error is the
+   * core's refusal, and a box that does not open is refused as `unopened`.
    */
   async replayOnReturn(write: ReturnedWrite): Promise<ReturnStep> {
     const set = deps;
@@ -1019,7 +1040,8 @@ export class SafetyOnArrival {
       return "notBack";
     }
     if (isError(answer)) return answer.error === "transient" ? "notBack" : { refused: answer.error };
-    if ("hold" in answer && answer.hold !== null) this.holdOnReturn(eventId, answer.hold);
+    const hold = "hold" in answer ? answer.hold : null;
+    if (hold !== null && !this.holdOnReturn(eventId, hold)) return "notBack";
     return "written";
   }
 
@@ -1029,21 +1051,28 @@ export class SafetyOnArrival {
    * actor's, with its id, rule and booking block; else its id lands on the hold that has none, as before. So whichever
    * comes first, the re-read's hold or the replay, the actor's hold carries the core's id once the core holds it, and
    * `markHoldReleased` can find it. The check that a hold exists, released or not, and the write share one guarded step
-   * (T-1318, T-1312's security note a): a read that throws writes nothing and counts as not written, so it can never fall
-   * through to `writeHold`, whose own read sees open holds only, and reopen a hold the core released. The id's own write
-   * to a hold that exists is not guarded, as before: a storage that throws there leaves the record queued, and its next
-   * replay lands the id.
+   * (T-1318, T-1312's security note a): a read that throws counts as not written and never falls through to `writeHold`,
+   * whose own read sees open holds only, so it can never reopen a hold the core released. The id's own write to a hold
+   * that exists is not guarded, as before: a storage that throws there leaves the record queued, and its next replay
+   * lands the id.
+   *
+   * A throw in that step loses no id (T-1365): the core's hold is kept (`keepCoreHold`), so the hold the actor writes
+   * later carries the core's id. True once the core's hold is the actor's, its id is on the actor's, or it is kept; false
+   * when it could not be kept either, and the replay then answers `notBack`.
    */
-  private holdOnReturn(eventId: string, hold: SafetyHold): void {
+  private holdOnReturn(eventId: string, hold: SafetyHold): boolean {
     let held: boolean;
+    let looked = false;
     try {
       held = this.outcomeHoldExists(eventId);
+      looked = true;
       if (!held) this.writeHold(eventId, hold.holdId, hold.releaseRule, hold.blocksBooking);
     } catch {
-      // Not written, nothing changed: a missing hold keeps its text among the texts not read (its pending note, or
+      // Not written, nothing reopened: a missing hold keeps its text among the texts not read (its pending note, or
       // else its danger flag: `unreadTexts`) until a hold is written; a hold that exists keeps its state, released or
-      // not.
-      return;
+      // not. The core's hold is kept for the hold written later; when the read threw, its id lands on a hold that has
+      // none.
+      return this.keepCoreHold(eventId, hold, !looked);
     }
     if (held) {
       this.host.storage.sql.exec(
@@ -1052,6 +1081,56 @@ export class SafetyOnArrival {
         eventId,
       );
     }
+    return true;
+  }
+
+  /**
+   * Keeps the core's hold for a text whose replay could not make it the actor's (T-1365): its id, rule and booking block,
+   * in the actor's storage. Every hold the actor writes for the text later then carries that id and is never looser
+   * (`writeHold`), whoever writes it and in whichever instance. When the replay's read of the hold threw (`unseen`), a
+   * hold may exist with no id, and nothing may write it again: the id lands on it too, and only there (an outcome's hold
+   * whose id is null). Its rule, booking block and release are left as they are, so no hold reopens or loosens. True once
+   * kept; false when the storage throws here too, so the record stays queued and its next replay brings the core's
+   * repeated answer, with the hold.
+   */
+  private keepCoreHold(eventId: string, hold: SafetyHold, unseen: boolean): boolean {
+    const { sql } = this.host.storage;
+    try {
+      sql.exec(
+        "INSERT OR REPLACE INTO safety_core_holds (event_id, hold_id, rule, blocks_booking) VALUES (?, ?, ?, ?)",
+        eventId,
+        hold.holdId,
+        hold.releaseRule,
+        hold.blocksBooking ? 1 : 0,
+      );
+      if (unseen) {
+        sql.exec(
+          "UPDATE safety_holds SET hold_id = ? WHERE event_id = ? AND hold_id IS NULL AND rule <> 'unread'",
+          hold.holdId,
+          eventId,
+        );
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /** The core's hold kept for this text (`keepCoreHold`), or null when none is kept. Throws what the storage throws. */
+  private coreHoldOf(eventId: string): SafetyHold | null {
+    const row = this.host.storage.sql
+      .exec<{ hold_id: string; rule: string; blocks_booking: number }>(
+        "SELECT hold_id, rule, blocks_booking FROM safety_core_holds WHERE event_id = ?",
+        eventId,
+      )
+      .toArray()[0];
+    return row === undefined
+      ? null
+      : {
+          holdId: row.hold_id,
+          releaseRule: row.rule as ReleaseRule,
+          blocksBooking: row.blocks_booking === 1,
+        };
   }
 
   /**
@@ -1654,9 +1733,10 @@ export class SafetyOnArrival {
    * line 327, so a re-applied danger never takes only its latest read's rule), in place of the text's unread hold, before
    * the core is called (T-1088 round 4, DL-144; the architect's round 3 gap A and note a), and again on the direct path
    * before its line (ADR-018 section 2). It stands until the core's hold takes its place (`sendDanger`), never looser than
-   * the open one. A storage that fails here must not keep the line from going: the danger then stays among the texts not
-   * read at commit time (by its pending note, or by its danger flag when the note failed too: T-1318), until `dangerSent`,
-   * a resume, a re-read or the record's replay writes the hold.
+   * the open one; once the record's replay has kept the core's hold, it carries that hold's id (T-1365, `writeHold`). A
+   * storage that fails here must not keep the line from going: the danger then stays among the texts not read at commit
+   * time (by its pending note, or by its danger flag when the note failed too: T-1318), until `dangerSent`, a resume, a
+   * re-read or the record's replay writes the hold.
    */
   private holdFromOutcomes(
     eventId: string,
@@ -1894,7 +1974,9 @@ export class SafetyOnArrival {
    * Writes a danger outcome's hold in place of the text's unread hold. Written again for the same text (the core's hold
    * after the one written before its call, or its danger applied again after a cut or a failed line), it is never looser
    * than the open one: the stricter rule stays (a threat's is never released, A3-48), as do a hold id the core gave and a
-   * booking block. Returns the rule kept.
+   * booking block. A hold written with no id of its own or the open one's takes the core's hold kept for the text when
+   * the record's replay could not write it (T-1365, `keepCoreHold`): its id, and never looser than its rule and booking
+   * block. Returns the rule kept.
    */
   private writeHold(
     eventId: string,
@@ -1909,13 +1991,15 @@ export class SafetyOnArrival {
         eventId,
       )
       .toArray()[0];
-    const kept = open === undefined ? rule : stricterHold(open.rule as ReleaseRule, rule);
+    const core = holdId === null && (open?.hold_id ?? null) === null ? this.coreHoldOf(eventId) : null;
+    const stricter = open === undefined ? rule : stricterHold(open.rule as ReleaseRule, rule);
+    const kept = core === null ? stricter : stricterHold(stricter, core.releaseRule);
     sql.exec(
       "INSERT OR REPLACE INTO safety_holds (event_id, hold_id, rule, blocks_booking, released) VALUES (?, ?, ?, ?, 0)",
       eventId,
-      holdId ?? open?.hold_id ?? null,
+      holdId ?? open?.hold_id ?? core?.holdId ?? null,
       kept,
-      blocksBooking || open?.blocks_booking === 1 ? 1 : 0,
+      blocksBooking || open?.blocks_booking === 1 || core?.blocksBooking === true ? 1 : 0,
     );
     return kept;
   }
