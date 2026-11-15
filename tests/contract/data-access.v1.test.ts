@@ -1,28 +1,30 @@
-// Contract test for K-05, the data-access calls: v1 and its additive minor versions v1.1 to v1.11 (T-084; T-1169, with
-// T-1188 folded in by DL-373; T-1199 for v1.6; T-1214 for v1.7; T-1218 for v1.8; T-1232 for v1.9; T-1260 for v1.10,
-// the D-017 path audit's Q1; T-1270 for v1.11; ops/plan/02-contracts.md K-05 "Contract test" and section 2 item 12;
-// contracts/data-access/README.md "Fixtures", "Producers and consumers" and each version's "Consumers of" list).
+// Contract test for K-05, the data-access calls: v1 and its additive minor versions v1.1 to v1.11 and v1.14 (T-084;
+// T-1169, with T-1188 folded in by DL-373; T-1199 for v1.6; T-1214 for v1.7; T-1218 for v1.8; T-1232 for v1.9; T-1260
+// for v1.10, the D-017 path audit's Q1; T-1270 for v1.11; T-1355 for v1.14, the safety-only claim (DL-687, DL-698,
+// DL-761); ops/plan/02-contracts.md K-05 "Contract test" and section 2 item 12; contracts/data-access/README.md
+// "Fixtures", "Producers and consumers" and each version's "Consumers of" list).
 //
 // This is the fixture part. The contract test has two parts: this one, which reads only the committed schemas, fixtures
 // and README, and one part per producer or consumer side, added later by a QA side task that depends on this task and
 // on that side's build task. SIDE_CHECKS (at the end) is the list where each side is added. The producer's side of v1.3,
-// v1.4, v1.6, v1.7, v1.8, v1.9, v1.10 and v1.11, every fixture of the eight run through db/repo's own calls against
-// local PostgreSQL, is data-access.v1.db-side.test.ts (T-1169; v1.6's by T-1199; v1.7's by T-1214; v1.8's by T-1218;
-// v1.9's by T-1232; v1.10's by T-1260; v1.11's by T-1270); v1.5 adds no database call.
+// v1.4, v1.6, v1.7, v1.8, v1.9, v1.10, v1.11 and v1.14, every fixture of the nine run through db/repo's own calls
+// against local PostgreSQL, is data-access.v1.db-side.test.ts (T-1169; v1.6's by T-1199; v1.7's by T-1214; v1.8's by
+// T-1218; v1.9's by T-1232; v1.10's by T-1260; v1.11's by T-1270; v1.14's by T-1355); v1.5 adds no database call.
 //
 // K-05 is frozen at v1 to v1.15 (frozen.json), and fixtures/index.json lists every version's fixtures. Each entry is
 // checked against the schema its own `version` names, at the definition its `def` names (the T-003 harness:
 // data-access.<version>.schema.json #/$defs/<def>), and entries are selected by version, never by a pinned list or
-// count (DL-124, DL-125), so a later minor version's fixtures are checked by parts 1, 3 and 4 as they land: v1.12 to
-// v1.15's are today, and each of those versions joins part 2 and the side list (WRITTEN_FOR) with its own QA task. As
+// count (DL-124, DL-125), so a later minor version's fixtures are checked by parts 1, 3 and 4 as they land: v1.12's,
+// v1.13's and v1.15's are today, and each of those versions joins part 2 and the side list (WRITTEN_FOR) with its own
+// QA task (v1.14 joined ahead of v1.12 and v1.13, by T-1355: the first text's send waits on its claim, DL-778). As
 // DL-124 settled for K-06, this file holds v1 and its additive minor versions: the v1.2 fixture part the README plans
 // as T-128 ("every v1.2 fixture against its schema, refused ones refused") is covered here, and so are the fixture
-// parts of v1.3, v1.4, v1.5, v1.6, v1.7, v1.8, v1.9, v1.10 and v1.11 (README: "may join
+// parts of v1.3, v1.4, v1.5, v1.6, v1.7, v1.8, v1.9, v1.10, v1.11 and v1.14 (README: "may join
 // tests/contract/data-access.v1.test.ts, as v1.2's did"; v1.6's "joins tests/contract/data-access.v1.test.ts as v1.5's
-// did"; v1.7's, v1.8's, v1.9's, v1.10's and v1.11's "joins tests/contract/data-access.v1.test.ts", "Consumers of v1.7",
-// "Consumers of v1.8", "Consumers of v1.9", "Consumers of v1.10" and "Consumers of v1.11"), with part 5, v1.5's
-// rowReader read as README item 44 says and three faults no fixture shows refused (T-1188; T-1184's security note b),
-// and part 6, v1.7's chat-opened entry named by its text as item 46 says.
+// did"; v1.7's, v1.8's, v1.9's, v1.10's, v1.11's and v1.14's "joins tests/contract/data-access.v1.test.ts", "Consumers
+// of v1.7", "Consumers of v1.8", "Consumers of v1.9", "Consumers of v1.10", "Consumers of v1.11" and "Consumers of
+// v1.14"), with part 5, v1.5's rowReader read as README item 44 says and three faults no fixture shows refused
+// (T-1188; T-1184's security note b), and part 6, v1.7's chat-opened entry named by its text as item 46 says.
 //
 // What this part proves:
 //   1. every fixture in contracts/data-access/fixtures/index.json is checked against the schema of its version:
@@ -49,7 +51,7 @@
 //      phone.chat_opened entry is the request's text's, its id '<event id>/chat-opened', its row the request's handle
 //      and its why the request's event, which the schema leaves to code (as a claim entry's id, item 33).
 //   What needs a producer or consumer side is on SIDE_CHECKS, not checked here: each fixture's request run against local
-//   PostgreSQL giving its outcome (v1.3's, v1.4's, v1.6's, v1.7's, v1.8's, v1.9's, v1.10's and v1.11's in
+//   PostgreSQL giving its outcome (v1.3's, v1.4's, v1.6's, v1.7's, v1.8's, v1.9's, v1.10's, v1.11's and v1.14's in
 //   data-access.v1.db-side.test.ts), 1,000 parallel reserves, a repeated commit, parallel claims, and each consumer
 //   accepting every valid fixture and refusing every invalid one.
 
@@ -71,7 +73,10 @@ const FIXTURES_DIR = path.join(DATA_ACCESS_DIR, "fixtures");
 const DB_SCHEMA_DIR = path.join(CONTRACTS_ROOT, "db-schema");
 const ID_BASE = "https://rosie.invalid/contracts/";
 
-/** The versions this file writes part 2's proofs and the side list for; a later minor version's QA task adds its own. */
+/**
+ * The versions this file writes part 2's proofs and the side list for; a later minor version's QA task adds its own
+ * (v1.12's task and v1.13's, T-1292, have not yet; v1.14's has, T-1355).
+ */
 const WRITTEN_FOR = [
   "v1",
   "v1.1",
@@ -85,6 +90,7 @@ const WRITTEN_FOR = [
   "v1.9",
   "v1.10",
   "v1.11",
+  "v1.14",
 ];
 /** The fixture parts the README plans as tasks of their own that this file covers (DL-124). */
 const COVERED_HERE = ["T-128"];
@@ -1056,6 +1062,48 @@ const MENDS: Record<string, Mend[]> = {
       same: { file: "read-turn-party-first-text.json", at: "outcome" },
     },
   ],
+  // v1.14: each refused exchange's twin as README "Fixtures" (v1.14) names it, its request or its outcome
+  "invalid/refuse-claim-safety-no-recipient.json": [
+    {
+      reason:
+        "a safety claim names no recipient, and a claim with sendClass is made for one named recipient alone, so the sweep never takes the safety walk (claimOutbox.request: sendClass needs recipientHandleId, by claimOutbox.exchange)",
+      putRight: "with Alex's handle named, the danger line's own recipient (README item 67, default 134)",
+      changes: [{ at: "request.recipientHandleId", to: "handle-alex" }],
+      same: { file: "claim-safety-past-live-safety-claim.json", at: "request", part: "request" },
+    },
+  ],
+  "invalid/refuse-claim-safety-other-class.json": [
+    {
+      reason:
+        "a claim asks for send class routine, and sendClass names safety alone: no claim walks a routine, quick reply or visit-now row apart from the recipient's other rows (claimOutbox.request, by claimOutbox.exchange)",
+      putRight: "with the one class a claim may name, safety (README item 67, default 133)",
+      changes: [{ at: "request.sendClass", to: "safety" }],
+      same: { file: "claim-safety-past-routine-live-claim.json", at: "request", part: "request" },
+    },
+  ],
+  "invalid/refuse-safety-claim-takes-routine-row.json": [
+    {
+      reason:
+        "a safety claim is answered with Sam's first routine notice claimed ahead of his danger line, and a safety claim never takes a row of another class, so a wake that is never gated sends nothing a STOP binds (claimOutbox.exchange: with sendClass, each claimed row of send class safety)",
+      putRight: "with the danger line claimed alone, the answer's own second row (README item 67)",
+      changes: [
+        {
+          at: "outcome.claimed",
+          to: [fromFixture("invalid/refuse-safety-claim-takes-routine-row.json", "outcome.claimed.1")],
+        },
+      ],
+      same: { file: "claim-safety-past-ten-checked-rows.json", at: "outcome", part: "outcome" },
+    },
+  ],
+  "invalid/refuse-safety-claim-lists-held-row.json": [
+    {
+      reason:
+        "a safety claim is answered with Sam's held routine row listed in passedHeld, and a safety claim never reads a row of another class, so it lists none (claimOutbox.exchange: with sendClass, passedHeld empty)",
+      putRight: "with passedHeld empty (README item 67, default 131)",
+      changes: [{ at: "outcome.passedHeld", to: [] }],
+      same: { file: "claim-safety-past-held-row.json", at: "outcome", part: "outcome" },
+    },
+  ],
 };
 
 describe("data-access fixtures: each refusal tied to its reason (put right, the copy is accepted)", () => {
@@ -1939,7 +1987,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "C-151 migrating K-07's schema addition",
     ],
     needs:
-      "02-contracts K-05 \"Contract test\" and section 2 item 12, against local PostgreSQL with K-04 v1 migrated (K-07 v1's schema addition with it for v1.1, migrated by C-151; K-29 v1 and the other parts' seeds for v1.2's reads): each accepted fixture's request, run after its given (its k04Seeds and partSeeds loaded, each with its own after chain; its after exchanges run first, in order; the database's now() at given.now), gives its outcome, commitSeq values compared by their order, not their numbers; each refused fixture is refused and nothing is written; 1,000 parallel reserve calls on one slot give exactly one success (BP section 10, card T-041); a repeated commit writes nothing twice; parallel claims never hand one row to two senders. The README plans v1.1's database side as T-116 and v1.2's as T-478, on the database engineer's builds of C-152 (T-219 readTurnState; T-220 handleTargets, sendState and handleSealingKey; T-667 the setup-part facts readTurnState reads; and the tasks that build claimOutbox's port, markPart by key, renewClaim's phone read and the claim entries): 50 parallel first sights of one number give one handle, one person and one key (T-220); readTurnState with businessId null returns no row that has a business, a booking, a role, a pause, an open question or a consent row of a business included (T-219, T-478); and T-478 seeds a private booking, a deceased booking and a paused row, which no fixture sets, so sendState's record flags are tested. v1.3's three turn-face reads (T-1138, db/repo/turn-face-reads.ts: readOpenHolds as rosie_app, readOutboxRow and readFixedLineFacts as rosie_job after requireBusinessScope()) and v1.4's seven safety reads (T-1161, db/repo/safety-reads.ts: the record reads and the zone as rosie_app, readBusinessOwner as rosie_job) run in data-access.v1.db-side.test.ts (T-1169): every v1.3 and v1.4 fixture, selected by its version, through db/repo in its role against local PostgreSQL, each accepted request giving its outcome, valid at its own version; each refused request refused before any statement reaches the database; each refused answer answered put right in its twin's state. v1.5 adds no database call. v1.6's businessSensitive on readOutboxRow (T-1197, db/repo/turn-face-reads.ts: company_kinds' two switch lists read in the call's own transaction as rosie_job under the row's business, true, false or null by README item 45) runs there too (T-1199): its three fixtures through db/repo, the practice's five rows written as its note lists them, since no frozen seed holds a sensitive kind of work; each earlier readOutboxRow answer is its fixture's outcome with businessSensitive null and nothing else changed (no seed of an earlier exchange holds a kind of work), valid at v1.6's readOutboxRow.v1dot6Response; and readOutboxRow.v1dot6Response is a refused answer's definition. v1.7's openChatOnText (T-1212, db/repo/chat-open.ts: item 46's one transaction as rosie_job with no business scope, a number's phone row and its one phone.chat_opened entry) runs there too (T-1214): every v1.7 fixture through db/repo after its given (Dee W.'s after v1.1's commit, plan, claim and waiting chat, each through db/repo, the claim answered as v1.2 answers it, each row's port added by its channel, never a field dropped), each accepted request giving its outcome, valid at v1.7, the row an answer gives and the one entry it appends being what the tables then hold, and nothing written where it appends none; each refused request refused before any statement reaches the database; and refuse-open-chat-stopped-number's text, in its own given, answered as its twin open-chat-ben-stopped answers it, nothing written. v1.8's sendState with item 47's fromContact and bookingId (T-1216, db/repo/send-state.ts: the covering texts consent row picked as v1.2 picks it, by default 35, then its channel, turn_id, handle_id and booking_id and its turn's handle_id, read in sendState's one read-only transaction as rosie_job with no business scope) runs there too (T-1218): every v1.8 fixture through db/repo after its given, the chains running v1's reserve, plan and claim steps as well as commitTurn, each answering its own fixture's outcome (the claim through K-05 v1's own claimOutbox, which answers v1's claimed rows, and after the held reserve the saved-time clock row item 8 gives it, which db/repo's reserve does not write yet); each accepted request giving its outcome, valid at v1.8, each sendState answer valid at sendState.v1dot8Response, fromContact and bookingId always stated; and each refused answer (who gave the yes left out, its booking left out, a STOP read as the person's own yes) answered put right in its twin's state. v1.9's markPart with item 48's repeatedDelivery (T-1227, db/repo/outbox.ts markPartV12: on a delivery receipt that repeats a recorded delivery, whether that delivery was the row's first, no other part try of the row holding an earlier delivered_at and a tie counting as first, and the part try's stored delivered_at, read in the mark's one transaction as rosie_job with no business scope from the part tries it locks, nothing written; null on every other answer) runs there too (T-1232): every v1.9 fixture through db/repo after its given, the chains running v1's commitTurn and v1.2's plan, claim, marks and armClock, each answering its own fixture's outcome (an earlier mark as v1.9 answers it, its outcome with repeatedDelivery null and nothing else changed); each accepted request giving its outcome, valid at v1.9 as a markPart.exchange, each answer valid at markPart.v1dot9Response, repeatedDelivery and row always stated; a repeat writing nothing, and the delivery it names being the part try's as the tables hold it; each refused answer (what a repeat repeats left out, a repeat that says firstDelivery) answered put right in its twin's state; and refuse-mark-delivered-repeat-null's receipt, in its own given, answered as its twin mark-a7-03-poll-delivered-repeat answers it, nothing written. v1.10's three reads on the runtime side (T-1258, db/repo/arming-reads.ts: readQuestionFacts, item 49, the question first, then its business's zone, its visit and its never-delivered row, each read of a business-scoped table naming the question's own business, and readHandle, item 50, a handle's kind and address by its id; T-1259, db/repo/threads.ts: readChatHandle, item 51, the phone handle a Linq chat id names, or none; each in one read-only transaction as rosie_job with no business scope, writing nothing) run there too (T-1260): every v1.10 fixture through db/repo after its given, the question facts' chains running v1's and v1.3's commitTurn, and read-chat-handle-sam's one noted row, S1-01's thread as K-09 v1.5's commit-s1-01.json writes it, written before its exchange, since no frozen seed and no K-05 exchange holds it; each accepted request giving its outcome, valid at v1.10; refuse-question-facts-caller-business's request, in its own given, refused before any statement reaches the database, and with the question named alone answered as its twin read-question-facts-s1-02 answers it; and each refused answer (a visit answered with an address, a number in another form than E.164, a chat answered with an email handle) answered put right in its twin's state. v1.11's readTurnParty on the runtime side (T-1269, db/repo/turn-party.ts: item 52, the handle by the request's address, its people, their roles and companies, the live owner roles at the businesses those companies name and the one business's zone, each statement one table, in one read-only transaction as rosie_job with no business scope, writing nothing) runs there too (T-1270): every v1.11 fixture through db/repo after its given, read-turn-party-first-text's chain running v1.2's handleSealingKey under a wrapping key made for the run, and the rows five fixtures' notes list written before their exchanges, since no frozen seed holds them (test owner 1's as T-1148's SKELETON_ROWS, all but the business head K-04's seed holds; the second company with its business; the two companies with no business yet; Hugo P.'s person and owner role; Sam's ended owner role); each accepted request giving its outcome, valid at v1.11, an undecided business with its reason among them; refuse-turn-party-caller-business's request, in its own given, its twin's rows written before it, refused before any statement reaches the database, and with the handle named alone answered as its twin read-turn-party-test-owner-1 answers it; and each refused answer (an undecided business answered with the businesses found, a party at a business with no zone, a party with no business with the zone UTC) answered put right in its twin's state.",
+      "02-contracts K-05 \"Contract test\" and section 2 item 12, against local PostgreSQL with K-04 v1 migrated (K-07 v1's schema addition with it for v1.1, migrated by C-151; K-29 v1 and the other parts' seeds for v1.2's reads): each accepted fixture's request, run after its given (its k04Seeds and partSeeds loaded, each with its own after chain; its after exchanges run first, in order; the database's now() at given.now), gives its outcome, commitSeq values compared by their order, not their numbers; each refused fixture is refused and nothing is written; 1,000 parallel reserve calls on one slot give exactly one success (BP section 10, card T-041); a repeated commit writes nothing twice; parallel claims never hand one row to two senders. The README plans v1.1's database side as T-116 and v1.2's as T-478, on the database engineer's builds of C-152 (T-219 readTurnState; T-220 handleTargets, sendState and handleSealingKey; T-667 the setup-part facts readTurnState reads; and the tasks that build claimOutbox's port, markPart by key, renewClaim's phone read and the claim entries): 50 parallel first sights of one number give one handle, one person and one key (T-220); readTurnState with businessId null returns no row that has a business, a booking, a role, a pause, an open question or a consent row of a business included (T-219, T-478); and T-478 seeds a private booking, a deceased booking and a paused row, which no fixture sets, so sendState's record flags are tested. v1.3's three turn-face reads (T-1138, db/repo/turn-face-reads.ts: readOpenHolds as rosie_app, readOutboxRow and readFixedLineFacts as rosie_job after requireBusinessScope()) and v1.4's seven safety reads (T-1161, db/repo/safety-reads.ts: the record reads and the zone as rosie_app, readBusinessOwner as rosie_job) run in data-access.v1.db-side.test.ts (T-1169): every v1.3 and v1.4 fixture, selected by its version, through db/repo in its role against local PostgreSQL, each accepted request giving its outcome, valid at its own version; each refused request refused before any statement reaches the database; each refused answer answered put right in its twin's state. v1.5 adds no database call. v1.6's businessSensitive on readOutboxRow (T-1197, db/repo/turn-face-reads.ts: company_kinds' two switch lists read in the call's own transaction as rosie_job under the row's business, true, false or null by README item 45) runs there too (T-1199): its three fixtures through db/repo, the practice's five rows written as its note lists them, since no frozen seed holds a sensitive kind of work; each earlier readOutboxRow answer is its fixture's outcome with businessSensitive null and nothing else changed (no seed of an earlier exchange holds a kind of work), valid at v1.6's readOutboxRow.v1dot6Response; and readOutboxRow.v1dot6Response is a refused answer's definition. v1.7's openChatOnText (T-1212, db/repo/chat-open.ts: item 46's one transaction as rosie_job with no business scope, a number's phone row and its one phone.chat_opened entry) runs there too (T-1214): every v1.7 fixture through db/repo after its given (Dee W.'s after v1.1's commit, plan, claim and waiting chat, each through db/repo, the claim answered as v1.2 answers it, each row's port added by its channel, never a field dropped), each accepted request giving its outcome, valid at v1.7, the row an answer gives and the one entry it appends being what the tables then hold, and nothing written where it appends none; each refused request refused before any statement reaches the database; and refuse-open-chat-stopped-number's text, in its own given, answered as its twin open-chat-ben-stopped answers it, nothing written. v1.8's sendState with item 47's fromContact and bookingId (T-1216, db/repo/send-state.ts: the covering texts consent row picked as v1.2 picks it, by default 35, then its channel, turn_id, handle_id and booking_id and its turn's handle_id, read in sendState's one read-only transaction as rosie_job with no business scope) runs there too (T-1218): every v1.8 fixture through db/repo after its given, the chains running v1's reserve, plan and claim steps as well as commitTurn, each answering its own fixture's outcome (the claim through K-05 v1's own claimOutbox, which answers v1's claimed rows, and after the held reserve the saved-time clock row item 8 gives it, which db/repo's reserve does not write yet); each accepted request giving its outcome, valid at v1.8, each sendState answer valid at sendState.v1dot8Response, fromContact and bookingId always stated; and each refused answer (who gave the yes left out, its booking left out, a STOP read as the person's own yes) answered put right in its twin's state. v1.9's markPart with item 48's repeatedDelivery (T-1227, db/repo/outbox.ts markPartV12: on a delivery receipt that repeats a recorded delivery, whether that delivery was the row's first, no other part try of the row holding an earlier delivered_at and a tie counting as first, and the part try's stored delivered_at, read in the mark's one transaction as rosie_job with no business scope from the part tries it locks, nothing written; null on every other answer) runs there too (T-1232): every v1.9 fixture through db/repo after its given, the chains running v1's commitTurn and v1.2's plan, claim, marks and armClock, each answering its own fixture's outcome (an earlier mark as v1.9 answers it, its outcome with repeatedDelivery null and nothing else changed); each accepted request giving its outcome, valid at v1.9 as a markPart.exchange, each answer valid at markPart.v1dot9Response, repeatedDelivery and row always stated; a repeat writing nothing, and the delivery it names being the part try's as the tables hold it; each refused answer (what a repeat repeats left out, a repeat that says firstDelivery) answered put right in its twin's state; and refuse-mark-delivered-repeat-null's receipt, in its own given, answered as its twin mark-a7-03-poll-delivered-repeat answers it, nothing written. v1.10's three reads on the runtime side (T-1258, db/repo/arming-reads.ts: readQuestionFacts, item 49, the question first, then its business's zone, its visit and its never-delivered row, each read of a business-scoped table naming the question's own business, and readHandle, item 50, a handle's kind and address by its id; T-1259, db/repo/threads.ts: readChatHandle, item 51, the phone handle a Linq chat id names, or none; each in one read-only transaction as rosie_job with no business scope, writing nothing) run there too (T-1260): every v1.10 fixture through db/repo after its given, the question facts' chains running v1's and v1.3's commitTurn, and read-chat-handle-sam's one noted row, S1-01's thread as K-09 v1.5's commit-s1-01.json writes it, written before its exchange, since no frozen seed and no K-05 exchange holds it; each accepted request giving its outcome, valid at v1.10; refuse-question-facts-caller-business's request, in its own given, refused before any statement reaches the database, and with the question named alone answered as its twin read-question-facts-s1-02 answers it; and each refused answer (a visit answered with an address, a number in another form than E.164, a chat answered with an email handle) answered put right in its twin's state. v1.11's readTurnParty on the runtime side (T-1269, db/repo/turn-party.ts: item 52, the handle by the request's address, its people, their roles and companies, the live owner roles at the businesses those companies name and the one business's zone, each statement one table, in one read-only transaction as rosie_job with no business scope, writing nothing) runs there too (T-1270): every v1.11 fixture through db/repo after its given, read-turn-party-first-text's chain running v1.2's handleSealingKey under a wrapping key made for the run, and the rows five fixtures' notes list written before their exchanges, since no frozen seed holds them (test owner 1's as T-1148's SKELETON_ROWS, all but the business head K-04's seed holds; the second company with its business; the two companies with no business yet; Hugo P.'s person and owner role; Sam's ended owner role); each accepted request giving its outcome, valid at v1.11, an undecided business with its reason among them; refuse-turn-party-caller-business's request, in its own given, its twin's rows written before it, refused before any statement reaches the database, and with the handle named alone answered as its twin read-turn-party-test-owner-1 answers it; and each refused answer (an undecided business answered with the businesses found, a party at a business with no zone, a party with no business with the zone UTC) answered put right in its twin's state. v1.14's claimOutbox with item 67's sendClass (T-1354, db/repo/outbox.ts claimOutboxV114: with sendClass safety, for a named recipient alone, item 3's recipient lock taken in its blocking form under a bounded lock wait, then only the recipient's open safety rows in commit order, each claimed or passed, no row of another class read, locked, listed or counted, the answer in v1.13's full form with passedHeld empty; without the field, v1.13's claim as it is; one transaction as rosie_job with no business scope) runs there too (T-1355): every v1.14 fixture through db/repo after its given, the chains running v1's, v1.1's and v1.2's exchanges, a v1 claim and a v1 mark among them through K-05 v1's own calls and a v1.1 or v1.2 claim through v1.2's, never through v1.14's, each answering its own fixture's outcome (a v1.1 claim's as v1.2 answers it), and the rows each note lists written before its exchange, since no K-05 exchange writes them (each danger line's turn and its one row, as commit-alex-safety's and write-plan-alex-safety's requests write Alex's first line, and the ten routine notices of claim-safety-past-ten-checked-rows with their turn); each accepted claim giving its outcome, valid at v1.14 as a claimOutbox.exchange, each claimed row the named recipient's and of send class safety, at most limit of them, the tables then holding the claims the answer gives and every other row as it was; refuse-claim-safety-no-recipient's and refuse-claim-safety-other-class's requests, each in its own given, its twin's rows written before it, refused before any statement reaches the database, and put right answered as its twin answers it; refuse-safety-claim-takes-routine-row's and refuse-safety-claim-lists-held-row's claims, each in its own given, answered as its twin answers it, the routine notice never claimed and the held row never listed; row S's case, which no fixture shows (a quick_reply outage row sending under a live claim, ahead of a safety row: passed, never read and never locked, the safety rows taken in commit order and a checked routine row between them left as it was); and a claim without sendClass through claimOutboxV114 answered in v1.13 item 64's form, with the rows and fields claimOutboxV113 gives in the same world and the same rows written (the routine claim the first text's send binds: DL-761).",
   },
   {
     id: "consumer-action-layer",
@@ -1980,7 +2028,7 @@ export const SIDE_CHECKS: readonly SideCheck[] = [
       "C-046 actor",
     ],
     needs:
-      "Accepts every valid fixture and refuses every invalid one: the bundle pin reads the active bundle and a value on a KV miss, with the actor and the frontier from the Tool API (C-050, C-046: T-557); clock rows arm at the first delivery receipt, the alarm and the sweep read the due rows, and each fires once, with a firing's effects (C-054, C-055); the dispatcher claims each recipient's rows in commit order, renews before each part, marks parts and rows, gives up after 15 minutes with the next way or the owner's number and writes the one all set, reading the claimed row's port and renewClaim's recipient, and treats a renewal with no recipient as unreadable and sends nothing, never as not stopped (C-124, C-125, C-126, C-127: T-562); a third crash before the commit parks the turn (C-180); the gateway records a provider event once and takes a handle's key from handleSealingKey as a key object that cannot be exported, never as bytes, as the actor does to open the sealed texts, with newHandleId and newPersonId new on every call, never built from the address (C-044, C-046: T-553); the outage paths call serviceBack (C-174 to C-176); the guard maps handleTargets to its targets (C-051: T-556). From v1.7 the gateway calls openChatOnText at receipt, once for each text or photo from a phone handle, after handleSealingKey and before the actor's accept, with the key call's handle id and the event's id, service, receivedAt and trace, never the number and never for an email handle, a reaction, a vote, an edit or a receipt; it answers 503 on transient, nothing stored, and stores the text on notFound or notAPhone (C-044: T-1213); the dispatcher's chat check and limit 8 then find that number's chat open, with nothing of theirs to change (C-124, C-125). From v1.8 the dispatcher's send-state port (runtime/src/wiring/real.ts sendStateOf, T-562) maps textsConsent's fromContact and bookingId across unchanged when the answer holds them and leaves them out when it does not, never deriving stopped, or its end, from textsConsent (STATE note 10); limit 8 reads them as its yesAfterStop does: a yes lifts a stop for a row only when fromContact is true and the yes is newer than the stop, for every row when it names no business (START), else only for a row about the booking it names, and a missing field is not known and lifts nothing; through the port and limit 8, send-state-stop-row and send-state-own-yes-one-booking drop their row, and send-state-business-yes and send-state-own-start let it on to the other checks (C-124, C-125: T-1217). From v1.9 the dispatcher's receipt handling (runtime/src/dispatch/dispatcher.ts handleDeliveryReceipt, over the outbox port runtime/src/wiring/real.ts realOutbox, which maps repeatedDelivery across unchanged, as it maps row) hands a delivered mark to the clock arming when firstDelivery is true, as before, or when it is repeated and repeatedDelivery.firstOfRow is true, as a first delivery delivered at repeatedDelivery.deliveredAt, named by the answer's row, part, try and openQuestionId, never by the receipt; and nothing otherwise: a repeat of a later part's delivery, repeatedDelivery null, or an answer without the field, so a missing field is never read as a first delivery; through the port and the receipt handling, mark-a7-03-delivered-repeat arms the clock once, at the stored time, by arm-clock-a7-03-after-4006's request, and mark-a7-03-poll-delivered-repeat hands nothing on (C-124, C-055: T-1228). From v1.10 the clock arming's calls (runtime/src/wiring/real.ts ArmingCalls.questionFacts and ArmingCalls.actorNameOf, bound in the change that binds the outbox calls: DL-468) map readQuestionFacts's answer field by field to QuestionFacts, with visit.addressZone and visit.address null, notFound to the port's NotFoundError and transient to its TransientError, and name a handle's actor from readHandle's answer with the gateway's own actorNameOf (runtime/src/gateway/seal.ts), imported, never written again, and null when handle is null (C-055); the minute sweep's and staging's Fire now's clock directory names a row's actor through readHandle the same way once their binding is carded (C-054); and the gateway's Linq verify takes chatHandle over readChatHandle as handle.address when found, else null, a thrown error or transient also null, which the adapter answers 503 (C-044); none logs a number, an address or a chat id, or puts one in a span; hop 13 runs with answers shaped as read-question-facts-s1-02, read-handle-sam and read-chat-handle-sam (S1-02's clock armed once, due 8pm the day after delivery, Sam's actor synced, the receipt placed on Sam's number), read-chat-handle-unknown (503, nothing marked) and read-handle-unknown (no actor told; the arming still armed). From v1.11 the turn's directory (runtime/src/turn/types.ts TurnDirectory.partyOf, through the seam runtime/src/wiring/real.ts holds for it, StateReadInputs.turnDirectory) binds readTurnParty for a run of the handle actor's turn, and the park (runtime/src/turn/park.ts) asks the same directory and maps it the same way (C-046, C-180): the answer is mapped to TurnParty field by field, atBusiness as it stands, noBusiness with the zone UTC, unknown as the port's null, businessUndecided as the port's null, so no turn runs, until open gap 57's card (C-046, C-051 the guard, C-180), never a party with a business picked or with business null, and transient as a thrown error (the run ends noDirectory, nothing opened, read or written); the binding never logs the address, the actor's name or the request, or puts them in a span; a turn's first run is tested with answers shaped as read-turn-party-test-owner-1 (the JOIN turn under biz-lees-barbershop), read-turn-party-first-text (no business, the zone UTC), read-turn-party-unknown and each businessUndecided fixture (nothing opened, decided or written; the park refused the same way).",
+      "Accepts every valid fixture and refuses every invalid one: the bundle pin reads the active bundle and a value on a KV miss, with the actor and the frontier from the Tool API (C-050, C-046: T-557); clock rows arm at the first delivery receipt, the alarm and the sweep read the due rows, and each fires once, with a firing's effects (C-054, C-055); the dispatcher claims each recipient's rows in commit order, renews before each part, marks parts and rows, gives up after 15 minutes with the next way or the owner's number and writes the one all set, reading the claimed row's port and renewClaim's recipient, and treats a renewal with no recipient as unreadable and sends nothing, never as not stopped (C-124, C-125, C-126, C-127: T-562); a third crash before the commit parks the turn (C-180); the gateway records a provider event once and takes a handle's key from handleSealingKey as a key object that cannot be exported, never as bytes, as the actor does to open the sealed texts, with newHandleId and newPersonId new on every call, never built from the address (C-044, C-046: T-553); the outage paths call serviceBack (C-174 to C-176); the guard maps handleTargets to its targets (C-051: T-556). From v1.7 the gateway calls openChatOnText at receipt, once for each text or photo from a phone handle, after handleSealingKey and before the actor's accept, with the key call's handle id and the event's id, service, receivedAt and trace, never the number and never for an email handle, a reaction, a vote, an edit or a receipt; it answers 503 on transient, nothing stored, and stores the text on notFound or notAPhone (C-044: T-1213); the dispatcher's chat check and limit 8 then find that number's chat open, with nothing of theirs to change (C-124, C-125). From v1.8 the dispatcher's send-state port (runtime/src/wiring/real.ts sendStateOf, T-562) maps textsConsent's fromContact and bookingId across unchanged when the answer holds them and leaves them out when it does not, never deriving stopped, or its end, from textsConsent (STATE note 10); limit 8 reads them as its yesAfterStop does: a yes lifts a stop for a row only when fromContact is true and the yes is newer than the stop, for every row when it names no business (START), else only for a row about the booking it names, and a missing field is not known and lifts nothing; through the port and limit 8, send-state-stop-row and send-state-own-yes-one-booking drop their row, and send-state-business-yes and send-state-own-start let it on to the other checks (C-124, C-125: T-1217). From v1.9 the dispatcher's receipt handling (runtime/src/dispatch/dispatcher.ts handleDeliveryReceipt, over the outbox port runtime/src/wiring/real.ts realOutbox, which maps repeatedDelivery across unchanged, as it maps row) hands a delivered mark to the clock arming when firstDelivery is true, as before, or when it is repeated and repeatedDelivery.firstOfRow is true, as a first delivery delivered at repeatedDelivery.deliveredAt, named by the answer's row, part, try and openQuestionId, never by the receipt; and nothing otherwise: a repeat of a later part's delivery, repeatedDelivery null, or an answer without the field, so a missing field is never read as a first delivery; through the port and the receipt handling, mark-a7-03-delivered-repeat arms the clock once, at the stored time, by arm-clock-a7-03-after-4006's request, and mark-a7-03-poll-delivered-repeat hands nothing on (C-124, C-055: T-1228). From v1.10 the clock arming's calls (runtime/src/wiring/real.ts ArmingCalls.questionFacts and ArmingCalls.actorNameOf, bound in the change that binds the outbox calls: DL-468) map readQuestionFacts's answer field by field to QuestionFacts, with visit.addressZone and visit.address null, notFound to the port's NotFoundError and transient to its TransientError, and name a handle's actor from readHandle's answer with the gateway's own actorNameOf (runtime/src/gateway/seal.ts), imported, never written again, and null when handle is null (C-055); the minute sweep's and staging's Fire now's clock directory names a row's actor through readHandle the same way once their binding is carded (C-054); and the gateway's Linq verify takes chatHandle over readChatHandle as handle.address when found, else null, a thrown error or transient also null, which the adapter answers 503 (C-044); none logs a number, an address or a chat id, or puts one in a span; hop 13 runs with answers shaped as read-question-facts-s1-02, read-handle-sam and read-chat-handle-sam (S1-02's clock armed once, due 8pm the day after delivery, Sam's actor synced, the receipt placed on Sam's number), read-chat-handle-unknown (503, nothing marked) and read-handle-unknown (no actor told; the arming still armed). From v1.11 the turn's directory (runtime/src/turn/types.ts TurnDirectory.partyOf, through the seam runtime/src/wiring/real.ts holds for it, StateReadInputs.turnDirectory) binds readTurnParty for a run of the handle actor's turn, and the park (runtime/src/turn/park.ts) asks the same directory and maps it the same way (C-046, C-180): the answer is mapped to TurnParty field by field, atBusiness as it stands, noBusiness with the zone UTC, unknown as the port's null, businessUndecided as the port's null, so no turn runs, until open gap 57's card (C-046, C-051 the guard, C-180), never a party with a business picked or with business null, and transient as a thrown error (the run ends noDirectory, nothing opened, read or written); the binding never logs the address, the actor's name or the request, or puts them in a span; a turn's first run is tested with answers shaped as read-turn-party-test-owner-1 (the JOIN turn under biz-lees-barbershop), read-turn-party-first-text (no business, the zone UTC), read-turn-party-unknown and each businessUndecided fixture (nothing opened, decided or written; the park refused the same way). From v1.14 the dispatcher's danger wake (C-124: T-1352) claims with sendClass safety, sent only with a named recipient, reads the answer as v1.13's, never sends a claimed row of another class in a safety run (a store fault, its claim left to lapse), and models item 67's walk in the outbox doubles: the class read, the pass, the wait, passedHeld empty; the real outbox port (the composition root, for C-124: T-1356) maps the field across unchanged to db/repo's v1.14 claim, and a store or wrapper that cannot carry it refuses the claim rather than claim every class; and a failed safety line's retry takes the safety claim (C-126: T-1357).",
   },
   {
     id: "consumer-release",
@@ -2100,16 +2148,43 @@ function consumerGroups(version: string): OwnerGroup[] {
 }
 
 const LIST_BULLET = /^- \*\*([^*]+)\*\*(.*)$/;
+/** The first heading of a consumers table: "| Role | Card | Components | What it builds on v1.14 |" (v1.14). */
+const TABLE_OWNER_HEADING = "Role";
+
+/** A table line's cells, "| a | b |" as ["a", "b"]; null for a line that is no table line. */
+function tableCells(line: string): string[] | null {
+  if (!line.startsWith("|") || !line.trimEnd().endsWith("|")) return null;
+  return line
+    .trimEnd()
+    .slice(1, -1)
+    .split("|")
+    .map((cell) => cell.trim());
+}
 
 /**
  * A version's own list of consumers (consumersListOf) as owner groups: each bullet whose bold name is an owner, such as
  * "- **Action-layer engineer:** C-087 ..." or "- **Database engineer**, the producer: C-152 ...", the owner in lower
- * case; a bullet that names a task ("- **T-1141** names ...", what a consumer must hold to) is not a group.
+ * case; a bullet that names a task ("- **T-1141** names ...", what a consumer must hold to) is not a group. Where the
+ * list is a table whose first column is the role (v1.14: "| Role | Card | Components | What it builds on v1.14 |"),
+ * each row under that heading is a group too: its role the owner, in lower case, and its other cells the text, so the
+ * row's card and components are held to that owner's side as a bullet's are.
  */
 function listGroups(version: string): OwnerGroup[] {
+  let inRoleTable = false;
   return consumersListOf(version)
     .split("\n")
     .flatMap((line) => {
+      const cells = tableCells(line);
+      if (cells !== null) {
+        const [role, ...rest] = cells;
+        if (role === TABLE_OWNER_HEADING) {
+          inRoleTable = true;
+          return [];
+        }
+        if (!inRoleTable || role === undefined || /^:?-+:?$/.test(role)) return [];
+        return [{ owner: role.toLowerCase(), text: rest.join("; ") }];
+      }
+      inRoleTable = false;
       const match = LIST_BULLET.exec(line);
       if (match === null) return [];
       const owner = must(match[1]).replace(/:$/, "").toLowerCase();
@@ -2209,6 +2284,41 @@ describe("data-access sides: the list where each producer and consumer side is a
     ).toBeGreaterThan(0);
   });
 
+  it("reads v1.14's consumers table as owner groups, a role's row with its card and components, beside the bullets under it", () => {
+    const groups = listGroups("v1.14");
+    const rows = groups.filter((group) => group.text.startsWith("T-"));
+    expect(
+      rows.map((group) => [group.owner, taskIds(group.text), componentIds(group.text)]),
+      "each row of the table: its role, its card and its components",
+    ).toEqual([
+      ["database engineer", ["T-1354"], ["C-152"]],
+      ["runtime engineer", ["T-1352"], ["C-124"]],
+      ["runtime engineer", ["T-1356"], ["C-124"]],
+      ["runtime engineer", ["T-1357"], ["C-126"]],
+      ["qa", ["T-1355"], ["C-152"]],
+    ]);
+    // The heading and the rule under it are no group, and the bullets under the table are read as before.
+    expect(groups.map((group) => group.owner)).not.toContain("role");
+    expect(groups.filter((group) => /^[-: ]*$/.test(group.owner))).toEqual([]);
+    expect(groups.length, "the bullets of what the new tasks must hold to").toBeGreaterThan(rows.length);
+    // A table line is read by its cells; a line that is no table line is not.
+    expect(tableCells("| QA | T-1355 | the contract tests, for C-152 |")).toEqual([
+      "QA",
+      "T-1355",
+      "the contract tests, for C-152",
+    ]);
+    expect(tableCells("- **Database engineer**, the producer: C-152")).toBeNull();
+    // v1.14's is the one list with a table by role, so every other version's list is read as it was, by its bullets.
+    expect(
+      WRITTEN_FOR.filter((version) =>
+        consumersListOf(version)
+          .split("\n")
+          .some((line) => tableCells(line)?.[0] === TABLE_OWNER_HEADING),
+      ),
+      "the versions whose list is a table by role",
+    ).toEqual(["v1.14"]);
+  });
+
   it("names every component the README's producers and consumers name, and no other", () => {
     expect(sectionStart).toBeGreaterThan(-1);
     const named = new Set(componentIds(producersAndConsumers));
@@ -2287,8 +2397,8 @@ describe("data-access sides: the list where each producer and consumer side is a
     }
     const named = WRITTEN_FOR.flatMap((version) => groupsOf(version).flatMap((group) => taskIds(group.text)));
     for (const task of COVERED_HERE) expect(named, task).toContain(task);
-    // The producer's database side of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10 and v1.11 names the builds it runs,
-    // beside this file.
+    // The producer's database side of v1.3, v1.4, v1.6, v1.7, v1.8, v1.9, v1.10, v1.11 and v1.14 names the builds it
+    // runs, beside this file.
     for (const task of [
       "T-1138",
       "T-1161",
@@ -2299,6 +2409,7 @@ describe("data-access sides: the list where each producer and consumer side is a
       "T-1258",
       "T-1259",
       "T-1269",
+      "T-1354",
     ]) {
       expect(producer.needs, task).toContain(task);
     }
