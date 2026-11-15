@@ -490,6 +490,8 @@ function partAt(ms, name) {
  *   environment  what /health reports (default "staging"; null: no environment at all)
  *   token        the token the check tester's live session has
  *   before       how many parts tp-01 has before the send (default 0)
+ *   chatOpen     whether tp-01's chat is open before the send (default false); the send opens it, as the gateway does at
+ *                a text's receipt (T-1213)
  *   reply        when the JOIN's reply is recorded: "first" (default: at the send, so the first read after it finds it),
  *                "reread" (once the first read after the send is answered, so only the re-read finds it), "none" (the
  *                composer port forced to fail: no part ever), or "two" (two parts at the send)
@@ -503,11 +505,13 @@ async function stubWorker(t, options = {}) {
     environment = "staging",
     token,
     before = 0,
+    chatOpen = false,
     reply = "first",
     sendDelayMs = 0,
     answers = {},
   } = options;
   const requests = [];
+  let open = chatOpen;
   const parts = Array.from({ length: before }, (_, at) =>
     partAt(Date.parse("2026-11-14T12:00:00Z") + at * 1000, `before-${String(at + 1)}`),
   );
@@ -551,8 +555,10 @@ async function stubWorker(t, options = {}) {
         return;
       }
       counts[call] += 1;
-      if (call === "testPhoneSend") sent = true;
-      else if (sent) readsAfterSend += 1;
+      if (call === "testPhoneSend") {
+        sent = true;
+        open = true;
+      } else if (sent) readsAfterSend += 1;
       const given = answers[call]?.(body, counts[call]);
       if (given !== undefined) {
         const { status = 200, outcome, traceId = sentId } = given;
@@ -571,7 +577,7 @@ async function stubWorker(t, options = {}) {
         const since = body.since === null ? null : Date.parse(body.since);
         answer(200, {
           result: "parts",
-          phone: { testPhoneId: "tp-01", last4: "0100", chatOpen: sent, stopped: false, stoppedAt: null },
+          phone: { testPhoneId: "tp-01", last4: "0100", chatOpen: open, stopped: false, stoppedAt: null },
           chatLink: null,
           parts: parts.filter((part) => since === null || Date.parse(part.at) > since),
           emails: [],
@@ -944,6 +950,24 @@ describe("post-deploy-check.sh --join: test owner 1's JOIN through the test-phon
     }
   });
 
+  it("refuses before sending when tp-01's chat is already open with no part (a JOIN reached the gateway and got no reply): no first text, naming the reset; nothing is sent", async (t) => {
+    const token = madeToken();
+    const stub = await stubWorker(t, { token, chatOpen: true });
+    const result = await joinRig(t).run(["--join", stub.base], { STAGING_CHECK_TESTER_TOKEN: token });
+    assert.notEqual(result.status, 0, result.output);
+    assert.deepEqual(
+      stub.pageCalls().map((call) => call.call),
+      ["testPhoneParts"],
+      "no send",
+    );
+    assert.match(
+      result.stderr,
+      /refused: tp-01's chat is already open on staging \(a text from it reached the gateway since the seed, so its JOIN would be no first text, even with no reply part\): .*\(a fresh seed: .*nothing was sent/,
+    );
+    assert.doesNotMatch(result.stdout, /^(join_)?trace_id=/m);
+    assertNothingShown(result, token);
+  });
+
   it("refuses with no token, naming STAGING_CHECK_TESTER_TOKEN, before any request: none in the environment, none in .dev.vars", async (t) => {
     for (const devVars of [undefined, "# made up\nOTHER_NAME=1\n", "STAGING_CHECK_TESTER_TOKEN=\n"]) {
       const stub = await stubWorker(t, { token: madeToken() });
@@ -1206,6 +1230,23 @@ describe("post-deploy-check.sh --join: test owner 1's JOIN through the test-phon
         },
       },
       /the parts of a phone other than tp-01/,
+    ],
+    [
+      "no chat state for tp-01",
+      {
+        answers: {
+          testPhoneParts: () => ({
+            outcome: {
+              result: "parts",
+              phone: { testPhoneId: "tp-01", last4: "0100", stopped: false, stoppedAt: null },
+              chatLink: null,
+              parts: [],
+              emails: [],
+            },
+          }),
+        },
+      },
+      /the answer gives no chat state for the phone/,
     ],
   ]) {
     it(`a read of tp-01's parts before the send answered with ${title} fails, with its reason, and nothing is sent`, async (t) => {

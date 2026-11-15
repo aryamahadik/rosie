@@ -22,9 +22,11 @@
 #     turn"): test owner 1's JOIN, the walking skeleton's first text (tp-01 on K-21 v1 test-roster.json; S1-01), through
 #     staging's test-phone page calls, K-21 v1 testPhoneSend and testPhoneParts (each a POST to
 #     <base-url>/page-api/<call>, the page entry's route), signed in as the seeded check tester (T-1302, T-1303):
-#     a. before sending: tp-01's parts, read through testPhoneParts, must be none. JOIN is a first text once per schema
-#        (DL-451), and a part's record names no trace, so a tp-01 that already has parts is refused, naming the reset (a
-#        fresh seed), and nothing is sent;
+#     a. before sending: tp-01's parts, read through testPhoneParts, must be none, and its chat not yet open. JOIN is a
+#        first text once per schema (DL-451), and a part's record names no trace, so a tp-01 that already has parts is
+#        refused, naming the reset (a fresh seed), and nothing is sent. So is a tp-01 whose chat is open (K-04's phones
+#        row, which the gateway opens at a text's receipt, T-1213; the seed writes none for tp-01, db/seeds/skeleton.ts):
+#        a JOIN that reached the gateway since the seed and got no reply leaves no part, but its JOIN is no first text;
 #     b. the send: testPhoneSend with the words JOIN as tp-01. Its answer must carry the gateway's 200 and the trace id
 #        the gateway opened, which is printed (search it in Workers Logs). The time from the send to that answer, as curl
 #        measures it without the connection's setup, is a named timing line against C-044's 1 s (DL-757): OK, or BREACH,
@@ -49,10 +51,9 @@
 #     every name that could hold it is dropped before any command is started, and each page call's JSON body, the one
 #     place the token goes, reaches curl on its standard input alone (bash's printf, a builtin, writes it there). Each
 #     page call's curl starts with --disable, so no ~/.curlrc can add a trace or a redirect. Refused before any request,
-#     exit 1:
-#     no token (the line names the variable), a token not in that form (no part of it shown), and a <base-url> that is
-#     neither https nor http on this machine's own loopback (127.0.0.1, localhost or [::1], for wrangler dev), so the
-#     token never crosses a network unencrypted.
+#     exit 1: no token (the line names the variable), a token not in that form (no part of it shown), and a <base-url>
+#     that is neither https nor http on this machine's own loopback (127.0.0.1, localhost or [::1], for wrangler dev),
+#     so the token never crosses a network unencrypted.
 # Prints the trace id of the traced request (search it in Workers Logs), and with --join the JOIN's, last. EXPECT_VERSION,
 # when set, is the version (GIT_SHA) the health answer must report. Exits non-zero on failure.
 # Retries while a new deployment spreads, and gives up fast, so deploy-staging.sh's rollback after a failed
@@ -288,13 +289,14 @@ host_rule() {
   ' "$work/post-status" "$work/post-headers" "$work/post-body" "$sent"
 }
 
-# Check 4's verdict on one page call's answer (node program). Arguments: what the answer must be (send or parts), the
-# files curl wrote (its status line: the HTTP status and two times; the headers; the body), the x-trace-id sent, the
-# `since` sent (empty for none) and the phone. Prints one line and exits 0 when the call gave that outcome, else prints
-# why and exits 1. A send prints "<trace id> <ms> <event id>": the trace id the gateway opened, from the answer, and the
-# time from the send to the answer, without the connection's setup. A read prints the count of the parts after `since`
-# (every part with none), followed, when it is one, by that part's time, kind and outcome. Nothing of a part's words, a
-# number or a chat goes in a line: only ids, times, kinds, counts and K-21's own error names.
+# Check 4's verdict on one page call's answer (node program). Arguments: what the answer must be (send, before or
+# parts), the files curl wrote (its status line: the HTTP status and two times; the headers; the body), the x-trace-id
+# sent, the `since` sent (empty for none) and the phone. Prints one line and exits 0 when the call gave that outcome, else
+# prints why and exits 1. A send prints "<trace id> <ms> <event id>": the trace id the gateway opened, from the answer,
+# and the time from the send to the answer, without the connection's setup. The read before the send prints the count of
+# every part and the phone's chat, "open" or "closed". A read after it prints the count of the parts after `since`,
+# followed, when it is one, by that part's time, kind and outcome. Nothing of a part's words, a number or a chat id goes
+# in a line: only ids, times, kinds, counts, the chat's state and K-21's own error names.
 PAGE_VERDICT='
   const fs = require("node:fs");
   const [want, statusFile, headersFile, bodyFile, sent, since, phone] = process.argv.slice(1);
@@ -354,6 +356,11 @@ PAGE_VERDICT='
   const shown = body.phone;
   if (typeof shown !== "object" || shown === null || shown.testPhoneId !== phone)
     fail(`the parts of a phone other than ${phone}`);
+  if (want === "before") {
+    if (typeof shown.chatOpen !== "boolean") fail("the answer gives no chat state for the phone");
+    console.log(`${String(body.parts.length)} ${shown.chatOpen ? "open" : "closed"}`);
+    process.exit(0);
+  }
   const after = since === "" ? null : Date.parse(since);
   const fresh = body.parts.filter(
     (part) => after === null || (typeof part?.at === "string" && UTC.test(part.at) && Date.parse(part.at) > after),
@@ -385,9 +392,10 @@ parts_request() {
     "$request_id" "$page_trace_id" "$token" "$JOIN_PHONE" "$1"
 }
 
-# page_call <call> <send|parts> <name>: one K-21 call, POST <base-url>/page-api/<call>, its JSON body (`request`, which
-# holds the token) on curl's standard input alone, under page_trace_id, its answer in $work/<name>.*; prints the verdict
-# line (PAGE_VERDICT's) and returns 0 when it gave the outcome asked for, else prints why and returns 1. Never retried.
+# page_call <call> <send|before|parts> <name>: one K-21 call, POST <base-url>/page-api/<call>, its JSON body
+# (`request`, which holds the token) on curl's standard input alone, under page_trace_id, its answer in $work/<name>.*;
+# prints the verdict line (PAGE_VERDICT's) and returns 0 when it gave the outcome asked for, else prints why and returns
+# 1. Never retried.
 page_call() {
   local call="$1" want="$2" name="$3"
   if ! printf '%s' "$request" | curl --disable --silent --show-error --max-time "$join_timeout_s" --request POST \
@@ -428,20 +436,27 @@ if [[ "$join" == 1 ]]; then
   new_ids
   parts_request null
   status=0
-  verdict="$(page_call testPhoneParts parts before)" || status=$?
+  verdict="$(page_call testPhoneParts before before)" || status=$?
   if [[ "$status" != 0 ]]; then
     log "check: join FAILED: $JOIN_PHONE's parts could not be read before the send: $verdict," \
       "page trace_id=$page_trace_id"
     die "check failed at $base/page-api/testPhoneParts: the JOIN's read before the send failed; nothing was sent"
   fi
   count="${verdict%% *}"
+  chat="${verdict#* }"
   if [[ "$count" != 0 ]]; then
     die "refused: $JOIN_PHONE already has $count part(s) on staging's test-phone line, so its JOIN would be no first" \
       "text and a new reply could not be told apart: --join sends $JOIN_PHONE's JOIN once per reset of the test state" \
       "(a fresh seed: a fresh schema, then npm run seed:staging; DL-451, DL-789), and the test-phone line must hold" \
       "no part to $JOIN_PHONE (it keeps its parts across a seed: CQ-321); nothing was sent"
   fi
-  log "check: join: $JOIN_PHONE has no parts yet, so its JOIN is a first text (page trace_id=$page_trace_id)"
+  if [[ "$chat" != "closed" ]]; then
+    die "refused: $JOIN_PHONE's chat is already open on staging (a text from it reached the gateway since the seed, so" \
+      "its JOIN would be no first text, even with no reply part): --join sends $JOIN_PHONE's JOIN once per reset of" \
+      "the test state (a fresh seed: a fresh schema, then npm run seed:staging; DL-451, DL-789); nothing was sent"
+  fi
+  log "check: join: $JOIN_PHONE has no parts and its chat is not open yet, so its JOIN is a first text" \
+    "(page trace_id=$page_trace_id)"
 
   # 4b. The send. `since` is the send's second, less one: the parts' times are whole seconds.
   since="$(node -e '
@@ -457,7 +472,7 @@ if [[ "$join" == 1 ]]; then
   if [[ "$status" != 0 ]]; then
     log "check: join FAILED: testPhoneSend as $JOIN_PHONE: $verdict, page trace_id=$page_trace_id"
     die "check failed at $base/page-api/testPhoneSend: the JOIN did not get the gateway's 200 (with no answer at" \
-      "all it may still have been sent: a later --join reads $JOIN_PHONE's parts first)"
+      "all it may still have been sent: a later --join reads $JOIN_PHONE's parts and chat first)"
   fi
   join_trace_id="${verdict%% *}"
   verdict="${verdict#* }"
