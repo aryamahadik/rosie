@@ -7,9 +7,9 @@
 // staging/test-phone/types.ts), each read on the runtime side of the root's handle only (part.db.runtime: one short-lived
 // client per call from HYPERDRIVE_JOB, the login rosie_worker_job, which inherits rosie_job alone, guarded before the
 // read runs and ended after it; ADR-014). Never a Tool API client (DL-557): rosie_app may also execute session_for_token
-// (0020's grant), so a Tool API client would find a session for an unknown hash's caller before being refused at
-// team_page_recipients. HYPERDRIVE_APP is never read here. No answer is remembered: every call reads the rows as they
-// stand (K-21 v1 README "Who may call": every call; K-05 v1.12 "Why the primary, uncached").
+// (0020's grant), so a Tool API client asking about an unknown hash would answer noSession, and be refused only at
+// team_page_recipients (42501). HYPERDRIVE_APP is never read here. No answer is remembered: every call reads the rows
+// as they stand (K-21 v1 README "Who may call": every call; K-05 v1.12 "Why the primary, uncached").
 //
 //   access  K-05 v1.12 item 53, as v1.15's item 68 widens it (db/repo/test-phone-reads.ts readTesterStanding): the
 //           session token's sha256 and the handler's time, never the token. `standing` is mapped across unchanged

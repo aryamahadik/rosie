@@ -28,11 +28,11 @@
 //     the page's own:                one live session for each of three people, whose tokens this file makes up
 //                                    (PAGE_TOKENS): the check tester's, tester one's and Sam's, each with its own
 //                                    sign-in code, so the page's two calls carry a token and the handler hashes it as it
-//                                    hashes a cookie's. Each began an hour before the seed ran and ends 30 days after
-//                                    that (every staging session's length: QUESTIONS.md CQ-238's default), as
-//                                    db/seeds/check-tester.ts times its session, so it is live at the Workers clock the
-//                                    page entry reads, whatever day the file runs. NO_SESSION_TOKEN's sha256 no session
-//                                    holds.
+//                                    hashes a cookie's. Each began an hour before the seed ran and ends 30 days after it
+//                                    began (every staging session's length: QUESTIONS.md CQ-238's default), timed from
+//                                    the run as db/seeds/check-tester.ts times its own, so it is live at the Workers
+//                                    clock the page entry reads, whatever day the file runs. NO_SESSION_TOKEN's sha256 no
+//                                    session holds.
 // Two fixtures cannot stand beside these: read-tester-standing-unknown-token and -removed-member ask about the check
 // tester's hash on rows without its session or with its team row removed. The test maps their answers as given, and the
 // page's NO_SESSION_TOKEN stands in the first's shape. The fixtures' own values are proved on the database side by K-05's

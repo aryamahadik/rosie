@@ -8,8 +8,9 @@
 // handle (./part.ts stagingDb), so a test reads T-1254's counts and each call's timing line, and its builders, every part
 // but this card's stood in by its nothing-bound answer, so a test sees this card's binding alone whatever the other parts
 // bind (DL-776). The root is handed the skeleton flag on and a made-up webhook secret, so testPhoneSend's signed text
-// reaches the root's Linq route; nothing else. The one case through workerRoot itself, every part's own builder with it,
-// asserts on this card's reads and answers alone.
+// reaches the root's Linq route, and testPhoneSend's case a double of the receipt's key call that keeps the handle it is
+// asked for; nothing else. The one case through workerRoot itself, every part's own builder with it, asserts on this
+// card's reads and answers alone.
 //
 //   - the mapping on each accepted fixture's own answer, as the README's bindings line maps it: the standing across
 //     unchanged, a roster phone as { testPhoneId, number, email } or null, a phone row field by field and no row as a
@@ -67,7 +68,8 @@ import {
 } from "@rosie/db/repo/test-phone-reads";
 import { ROSTER } from "@rosie/db/seeds/lib/roster";
 import type { SendEmailRequest } from "@rosie/adapters/email/double";
-import { sha256Hex } from "@rosie/actions/src/page-calls/staging/test-phone/index";
+import { defaultSendIds, sha256Hex } from "@rosie/actions/src/page-calls/staging/test-phone/index";
+import type { HandleSealingKeyRequest } from "@rosie/db/repo/handle-keys";
 import { createExecutionContext, reset } from "cloudflare:test";
 import { env as poolEnv } from "cloudflare:workers";
 import { afterEach, beforeEach, describe, expect, inject, it, vi } from "vitest";
@@ -509,9 +511,13 @@ interface Rooted extends Staged {
 /**
  * A root built as workerRoot builds the Worker's (composeRoot over stagingOptions(env), on the Workers clock) with this
  * card's part alone bound, the skeleton flag on and a made-up webhook secret, so testPhoneSend's signed text reaches the
- * root's Linq route; and its page calls through the Worker's route.
+ * root's Linq route, and whatever double a test adds (`more`); and its page calls through the Worker's route.
  */
-function rootOver(testEnv: TestEnv, double?: StagingDb): Rooted {
+function rootOver(
+  testEnv: TestEnv,
+  double?: StagingDb,
+  more: Partial<Parameters<typeof composeRoot>[0]> = {},
+): Rooted {
   const staged = stagedOver(testEnv, double);
   const root = composeRoot({
     environment: environmentOf(testEnv.env),
@@ -520,6 +526,7 @@ function rootOver(testEnv: TestEnv, double?: StagingDb): Rooted {
     linq: { webhookSecret: () => WEBHOOK_SECRET },
     ...staged.inputs,
     flags: fakeFlags([SKELETON_FLAG]),
+    ...more,
   });
   return { ...staged, root, page: pagesOf(() => root.gateway) };
 }
@@ -1038,6 +1045,27 @@ describe("the three ports through the root's inputs, on this file's rows: K-05 v
     expect(testEnv.job?.reads.n).toBe(2);
     expect(db.counts()).toMatchObject({ opened: 2, ended: 2, connectionsOpen: 0, connectionsPeak: 1 });
   });
+
+  it("a request of the wrong shape is refused by the read itself before any statement of its own (DL-557), naming the field and never the value, and the binding hands the throw on", async () => {
+    const { testPhone, db } = stagedOver(envOf());
+    const hash = await sha256Hex(PAGE_TOKENS.checkTester);
+
+    const refused = [
+      // The token itself where its hash goes, a time that is no instant, and a number not in E.164 form.
+      await rejectionOf(testPhone.access?.standing(PAGE_TOKENS.checkTester, AT) ?? Promise.resolve()),
+      await rejectionOf(testPhone.access?.standing(hash, "the morning of Nov 14") ?? Promise.resolve()),
+      await rejectionOf(testPhone.phones?.state("+1 555 555 0188") ?? Promise.resolve()),
+    ];
+
+    expect(refused.map((error) => (error as Error).name)).toEqual(["TypeError", "TypeError", "TypeError"]);
+    expect((refused[0] as Error).message).toBe(
+      "readTesterStanding: tokenSha256 is the session token's sha256 in lower-case hex, never the token itself",
+    );
+    expect((refused[2] as Error).message).toBe("readPhoneState: number is a phone number in E.164 form");
+    for (const error of refused) expectNothingOf(poolBinding(JOB), error);
+    // Each call's client was opened and guarded, then ended with the refusal: nothing was read or written.
+    expect(db.counts()).toMatchObject({ opened: 3, ended: 3, connectionsOpen: 0 });
+  });
 });
 
 // ---- the page's two calls ---------------------------------------------------------------------------------------------
@@ -1224,20 +1252,34 @@ describe("the page's two calls through the Worker's page entry, with answers sha
 
   it("testPhoneSend for a tester on tp-01: the text is signed as the number the database holds and posted to the root's Linq route, which verifies it; the page answers sent with the gateway's trace and status", async () => {
     const testEnv = envOf();
-    const { page, lines } = rootOver(testEnv);
+    // The receipt's key call, as a double that keeps each request and answers none, so the gateway stops there.
+    const keyCalls: HandleSealingKeyRequest[] = [];
+    const { page, lines } = rootOver(testEnv, undefined, {
+      handleKey: (request) => {
+        keyCalls.push(request);
+        return Promise.reject(new Error("t1305: the key call stops here"));
+      },
+    });
 
     const answer = await page("testPhoneSend", sendRequest(PAGE_TOKENS.checkTester, "tp-01"));
 
     expect(answer.status).toBe(200);
+    const { eventId } = await defaultSendIds({
+      phone: { testPhoneId: "tp-01", number: TP_01.fakeNumber, email: null },
+      tokenSha256: await sha256Hex(PAGE_TOKENS.checkTester),
+      requestId: testPhoneSendJson.request.page.requestId,
+    });
     expect(answer.outcome).toEqual({
       result: "sent",
-      eventId: expect.any(String) as string,
+      eventId,
       traceId: expect.stringMatching(UUID) as string,
       gatewayStatus: 503,
     });
     expect(answer.outcome.traceId).not.toBe(answer.traceId);
-    // The gateway's own trace for the webhook: the signature verified, and the key call, which this root binds to no
-    // database (every other part unbound), failed closed, so the gateway answered 503 and Linq would send it again.
+    // The event was signed as tp-01's number as the database holds it (read-roster-phone-tp-01's answer): the gateway
+    // verified the signature and asked the key call for that handle alone; the key call failed closed, so the gateway
+    // answered 503 and Linq would send it again.
+    expect(keyCalls.map((request) => request.handle)).toEqual([{ kind: "phone", address: TP_01.fakeNumber }]);
     const receive = jsonLinesOf(testLog, "span").find(
       (line) => line.trace_id === answer.outcome.traceId && line.hop === "receive",
     );
@@ -1261,7 +1303,8 @@ describe("the page's two calls through the Worker's page entry, with answers sha
       phone: shownPhone(TP_05, { chatOpen: true, stopped: false, stoppedAt: null }),
       chatLink: { link: "sms:+15555550188&body=YES.%20Ref%20P5J3", shortCode: CHAT_LINK.shortCode },
     });
-    // This card's three reads, among whatever else the other parts read on the page's trace.
+    // This card's three reads, among whatever else the other parts read for the page call (the bundle id its trace opens
+    // under, by T-1395's reads).
     const ownCalls = (jsonLinesOf(testLog, "dbCall") as unknown as DbCallLine[]).filter((line) =>
       [READ_TESTER_STANDING_CALL, READ_ROSTER_PHONE_CALL, READ_PHONE_STATE_CALL].includes(String(line.call)),
     );
@@ -1283,9 +1326,10 @@ describe("the page's two calls through the Worker's page entry, with answers sha
  */
 function answeringDb(answers: Readonly<Record<string, unknown>>): { db: StagingDb; calls: string[] } {
   const calls: string[] = [];
-  const answer = <T>(side: string, call: string): Promise<T> => {
+  // Typed as the handle's generic answer: the double gives each read the K-05 answer the test names for it.
+  const answer = (side: string, call: string): Promise<never> => {
     calls.push(`${side}:${call}`);
-    if (side === "runtime" && Object.hasOwn(answers, call)) return Promise.resolve(answers[call] as T);
+    if (side === "runtime" && Object.hasOwn(answers, call)) return Promise.resolve(answers[call] as never);
     return Promise.reject(new Error(`the double has no answer for ${side}:${call}`));
   };
   return {
