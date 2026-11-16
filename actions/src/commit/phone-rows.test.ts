@@ -100,7 +100,8 @@ function coreResultOf(call: CoreRun["result"]["call"]): CoreRun["result"] {
 /** What stop-recorded.json's STOP answers: its STOP row, its reply's row and the phone's version after the commit. */
 function stopAnswered(): { consentId: string; replyId: string; phoneVersion: number } {
   const result = coreResultOf("recordStopOrStart");
-  if (result.call !== "recordStopOrStart" || result.response === null) throw new Error("the STOP is recorded");
+  if (result.call !== "recordStopOrStart" || result.response === null)
+    throw new Error("the STOP is recorded");
   const [consentId] = result.response.consentRowIds;
   const replyId = result.response.reply?.outboxRowId;
   if (consentId === undefined || typeof replyId !== "string") {
@@ -255,7 +256,11 @@ function handleIdProblems(request: unknown, outcome: CommitTurnAnswer, now: stri
 
 /** Each id K-08 v1's safeId refuses, with its problems: an id that is a number, an address or words. */
 function notSafeIds(ids: readonly string[]): string[] {
-  return ids.flatMap((id) => contractChecks().k08v1("safeId", id).map((problem) => `${id} ${problem}`));
+  return ids.flatMap((id) =>
+    contractChecks()
+      .k08v1("safeId", id)
+      .map((problem) => `${id} ${problem}`),
+  );
 }
 
 /**
@@ -444,9 +449,9 @@ describe("stop-recorded.json through gateAndCommit, K-05 answering as v1.17's st
     expect(notSafeIds(named)).toEqual([]);
     // The phones row is the row's own handle id, never a number wrapped in letters (T-1418's security review, 8a).
     expect(call.span.rows.filter((row) => row.table === "phones").map((row) => row.id)).toEqual([BEN_HANDLE]);
-    expect(committed.written.written.filter((row) => row.table === "phones").map((row) => row.rowId)).toEqual([
-      BEN_HANDLE,
-    ]);
+    expect(committed.written.written.filter((row) => row.table === "phones").map((row) => row.rowId)).toEqual(
+      [BEN_HANDLE],
+    );
     expect(numberIn(call.span, BEN)).toEqual([]);
     expect(numberIn(answer, BEN)).toEqual([]);
   });
@@ -560,7 +565,8 @@ describe("a version conflict on a phones row names it by its handle id, and ever
     const twin = phoneChangedTwin();
     const read = twin.request.versionsRead.find((row) => row.table === "phones");
     expect(read).toEqual({ table: "phones", rowId: ALEX, version: 3 });
-    if (read === undefined || !("error" in twin.outcome)) throw new Error("the twin reads Alex's phone, refused");
+    if (read === undefined || !("error" in twin.outcome))
+      throw new Error("the twin reads Alex's phone, refused");
     const refusal = twin.outcome;
     expect(refusal).toEqual({
       error: "versionChanged",
@@ -574,7 +580,10 @@ describe("a version conflict on a phones row names it by its handle id, and ever
       core: [s1_02CoreRun(), s1_02CoreRun()],
       k05,
     });
-    const deps: CommitDeps = { limits: scriptedLimits(fixtureScript(gateExchange(S1_02))), ports: ported.ports };
+    const deps: CommitDeps = {
+      limits: scriptedLimits(fixtureScript(gateExchange(S1_02))),
+      ports: ported.ports,
+    };
     const scope = recordingScope();
     const api = createToolApi({
       validator,
