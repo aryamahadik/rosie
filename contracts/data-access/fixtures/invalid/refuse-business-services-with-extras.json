@@ -1,0 +1,20 @@
+{
+  "result": "businessServices",
+  "businessId": "biz-lee-home-services",
+  "readAt": "2026-10-26T14:00:00Z",
+  "services": [
+    {
+      "id": "svc-lee-electric-wiring-repair",
+      "businessId": "biz-lee-home-services",
+      "kindId": "electrician",
+      "name": "Wiring repair (flickering lights, a dead circuit)",
+      "priceKind": "one_price",
+      "unit": null,
+      "lengthMinutes": 90,
+      "position": 1,
+      "active": true,
+      "version": 1,
+      "extras": "{\"pf.services\":{\"service\":\"Wiring repair (flickering lights, a dead circuit)\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 service call is promised\",\"length\":\"90 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 service call fee\",\"after\":\"Rosie texts the bill\"}}"
+    }
+  ]
+}

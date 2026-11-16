@@ -1,0 +1,24 @@
+{
+  "call": "readBusinessKinds",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": [
+      "business-setup/seed-business-demo-shop.json",
+      "business-setup/seed-company-two-kinds.json",
+      "kinds-of-work/seed-kinds-sample.json"
+    ],
+    "after": [],
+    "now": "2026-10-26T14:00:00Z",
+    "note": "The yoga studio, a business K-04's seed-business-head holds, with no kind of work placed on it and no business_setup row: K-24's catalog holds the yoga kind (seed-kinds-sample), but no company_kinds row names the studio. The business is found in its scope, so the answer is empty lists and setup null, never notFound (README item 72, default 153). The barbershop's and Lee Home Services' rows in the same seeds are other businesses' and are never read."
+  },
+  "request": {
+    "businessId": "biz-yoga-studio"
+  },
+  "outcome": {
+    "result": "businessKinds",
+    "businessId": "biz-yoga-studio",
+    "readAt": "2026-10-26T14:00:00Z",
+    "setup": null,
+    "kinds": []
+  }
+}

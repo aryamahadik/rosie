@@ -1,0 +1,128 @@
+{
+  "call": "readTermsSources",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["bookings-changes/seed-terms-snapshot.json", "rules/seed-price-ok-limit.json"],
+    "after": [],
+    "now": "2026-10-29T14:00:00Z",
+    "note": "The barbershop's sources a week later (README item 76): the no-show count Sam turned on from Oct 28 (K-30's seed-terms-snapshot: a count of 2) is now in force and answered with its value, and K-26's seed-price-ok-limit adds the barber kind's flow B limit for wedding party quotes. Rules and limits of every scope are answered, each in id order; a snapshot of a flow A booking keeps the flow A ones and the whole business's, and limit 2's evaluator reads them all. Lee Home Services' price OK limit in the same seed is another business's and is never read."
+  },
+  "request": {
+    "businessId": "biz-lees-barbershop",
+    "at": "2026-10-29T14:00:00Z"
+  },
+  "outcome": {
+    "result": "termsSources",
+    "businessId": "biz-lees-barbershop",
+    "at": "2026-10-29T14:00:00Z",
+    "readAt": "2026-10-29T14:00:00Z",
+    "flowDefaults": [
+      {
+        "rowId": "biz-lees-barbershop/A",
+        "businessId": "biz-lees-barbershop",
+        "flow": "A",
+        "cutoffBeforeMinutes": 1440,
+        "cutoffDayBeforeAt": null,
+        "version": 1
+      },
+      {
+        "rowId": "biz-lees-barbershop/B",
+        "businessId": "biz-lees-barbershop",
+        "flow": "B",
+        "cutoffBeforeMinutes": 1440,
+        "cutoffDayBeforeAt": null,
+        "version": 1
+      }
+    ],
+    "rules": [
+      {
+        "id": "rule-lees-barbershop-no-show-count",
+        "businessId": "biz-lees-barbershop",
+        "ruleKind": "no_show_count",
+        "valueType": "count",
+        "flow": null,
+        "kindId": null,
+        "valueOn": null,
+        "valueCents": null,
+        "valueCurrency": null,
+        "valueSpanMinutes": null,
+        "valueCount": 2,
+        "valueDates": null,
+        "effectiveFrom": "2026-10-28T13:00:00Z",
+        "effectiveTo": null,
+        "version": 1
+      },
+      {
+        "id": "rule-lees-barbershop-note-kids-cut",
+        "businessId": "biz-lees-barbershop",
+        "ruleKind": "note",
+        "valueType": "note",
+        "flow": null,
+        "kindId": "barber",
+        "valueOn": null,
+        "valueCents": null,
+        "valueCurrency": null,
+        "valueSpanMinutes": null,
+        "valueCount": null,
+        "valueDates": null,
+        "effectiveFrom": "2026-10-19T18:12:00Z",
+        "effectiveTo": null,
+        "version": 1
+      },
+      {
+        "id": "rule-lees-barbershop-ok-new-customer",
+        "businessId": "biz-lees-barbershop",
+        "ruleKind": "ok_new_customer",
+        "valueType": "on",
+        "flow": null,
+        "kindId": null,
+        "valueOn": true,
+        "valueCents": null,
+        "valueCurrency": null,
+        "valueSpanMinutes": null,
+        "valueCount": null,
+        "valueDates": null,
+        "effectiveFrom": "2026-10-19T18:12:00Z",
+        "effectiveTo": null,
+        "version": 1
+      },
+      {
+        "id": "rule-lees-barbershop-ok-same-day",
+        "businessId": "biz-lees-barbershop",
+        "ruleKind": "ok_same_day",
+        "valueType": "on",
+        "flow": null,
+        "kindId": null,
+        "valueOn": true,
+        "valueCents": null,
+        "valueCurrency": null,
+        "valueSpanMinutes": null,
+        "valueCount": null,
+        "valueDates": null,
+        "effectiveFrom": "2026-10-19T18:12:00Z",
+        "effectiveTo": null,
+        "version": 1
+      }
+    ],
+    "priceOkLimits": [
+      {
+        "id": "pok-lees-barbershop-barber-flow-b",
+        "businessId": "biz-lees-barbershop",
+        "flow": "B",
+        "kindId": "barber",
+        "effectiveFrom": "2026-10-19T18:12:00Z",
+        "effectiveTo": null,
+        "version": 1
+      },
+      {
+        "id": "pok-lees-barbershop-quotes",
+        "businessId": "biz-lees-barbershop",
+        "flow": "A",
+        "kindId": null,
+        "effectiveFrom": "2026-10-19T18:12:00Z",
+        "effectiveTo": null,
+        "version": 1
+      }
+    ]
+  }
+}

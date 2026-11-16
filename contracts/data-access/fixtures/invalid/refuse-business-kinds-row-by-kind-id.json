@@ -1,0 +1,58 @@
+{
+  "result": "businessKinds",
+  "businessId": "biz-lee-home-services",
+  "readAt": "2026-10-26T14:00:00Z",
+  "setup": null,
+  "kinds": [
+    {
+      "rowId": "company-lee-home-services/electrician",
+      "companyId": "company-lee-home-services",
+      "kindId": "electrician",
+      "businessId": "biz-lee-home-services",
+      "tradeName": "Lee Electric",
+      "facts": ["photos", "firststeps", "dropoff", "extrawork", "stages", "documents", "video"],
+      "switchesA": [],
+      "switchesB": [],
+      "version": 1,
+      "flows": [
+        {
+          "rowId": "electrician/A",
+          "flow": "A",
+          "combos": ["list|card|counter", "list|none|counter", "list|full|none", "photos|card|counter", "visit|card|counter"],
+          "version": 1
+        },
+        {
+          "rowId": "electrician/B",
+          "flow": "B",
+          "combos": ["list|card|bill", "list|none|bill", "list|card|card", "visit|card|bill", "visit|none|bill", "photos|deposit|bill", "list|full|none"],
+          "version": 1
+        }
+      ]
+    },
+    {
+      "rowId": "plumber",
+      "companyId": "company-lee-home-services",
+      "kindId": "plumber",
+      "businessId": "biz-lee-home-services",
+      "tradeName": "Lee Plumbing",
+      "facts": ["firststeps", "documents", "forms", "sentnow", "planbill", "dropoff", "extrawork", "photos", "video"],
+      "switchesA": [],
+      "switchesB": ["cancelright"],
+      "version": 1,
+      "flows": [
+        {
+          "rowId": "plumber/A",
+          "flow": "A",
+          "combos": ["list|card|counter", "list|none|counter", "list|deposit|counter", "list|full|none", "photos|card|counter", "visit|card|counter"],
+          "version": 1
+        },
+        {
+          "rowId": "plumber/B",
+          "flow": "B",
+          "combos": ["list|card|bill", "list|none|bill", "list|card|card", "visit|card|bill", "photos|deposit|bill", "list|full|none"],
+          "version": 1
+        }
+      ]
+    }
+  ]
+}

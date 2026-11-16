@@ -1,0 +1,63 @@
+{
+  "call": "readServicePriceRules",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["services-prices/seed-price-rule-dates.json"],
+    "after": [],
+    "now": "2026-11-03T14:00:00Z",
+    "note": "The same rules read the day after the raise took effect (README item 75): the $35 ended at the start of Mon Nov 2, before at, so it is not answered; the $40 and the home price are. A booking made before Nov 2 keeps the $35 it copied (K-30's booking line; RULES 3.7): this read prices nothing, it gives the rules a change closes or must not overlap."
+  },
+  "request": {
+    "businessId": "biz-lees-barbershop",
+    "serviceId": "svc-lees-haircut",
+    "at": "2026-11-03T14:00:00Z"
+  },
+  "outcome": {
+    "result": "servicePriceRules",
+    "businessId": "biz-lees-barbershop",
+    "serviceId": "svc-lees-haircut",
+    "at": "2026-11-03T14:00:00Z",
+    "readAt": "2026-11-03T14:00:00Z",
+    "rules": [
+      {
+        "id": "price-lees-haircut-40",
+        "businessId": "biz-lees-barbershop",
+        "serviceId": "svc-lees-haircut",
+        "conditions": {
+          "serviceMoneyId": null,
+          "workerResourceId": null,
+          "weekdays": null,
+          "fromTime": null,
+          "untilTime": null
+        },
+        "priceCents": 4000,
+        "fromCents": null,
+        "currency": "USD",
+        "setByPersonId": "person-sam",
+        "effectiveFrom": "2026-11-02T05:00:00Z",
+        "effectiveTo": null,
+        "version": 1
+      },
+      {
+        "id": "price-lees-haircut-home",
+        "businessId": "biz-lees-barbershop",
+        "serviceId": "svc-lees-haircut",
+        "conditions": {
+          "serviceMoneyId": "way-lees-haircut-home",
+          "workerResourceId": null,
+          "weekdays": null,
+          "fromTime": null,
+          "untilTime": null
+        },
+        "priceCents": 7500,
+        "fromCents": null,
+        "currency": "USD",
+        "setByPersonId": "person-sam",
+        "effectiveFrom": "2026-10-19T18:11:00Z",
+        "effectiveTo": null,
+        "version": 1
+      }
+    ],
+    "ties": []
+  }
+}

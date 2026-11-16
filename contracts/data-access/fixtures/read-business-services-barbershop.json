@@ -1,0 +1,140 @@
+{
+  "call": "readBusinessServices",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["services-prices/seed-services-price-list.json"],
+    "after": [],
+    "now": "2026-10-26T14:00:00Z",
+    "note": "Lee's Barbershop's services, the ten lines of Sam's price board read at S1-12 (K-25's seed-services-price-list), each offered and at version 1, answered in (position, id) order (README item 73): each with its kind of work, name, price kind, unit, length in whole minutes (the groom's package's 2 hours 30 minutes is 150; event hours' 1 hour is 60) and place in the list. Never their extras, the barber file's words about each line, which no code reads by sub-key. The wedding party is priced by the party's answers and event hours per hour; neither is per_unit, so no unit is set."
+  },
+  "request": {
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "businessServices",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-26T14:00:00Z",
+    "services": [
+      {
+        "id": "svc-lees-haircut",
+        "businessId": "biz-lees-barbershop",
+        "kindId": "barber",
+        "name": "Haircut",
+        "priceKind": "one_price",
+        "unit": null,
+        "lengthMinutes": 30,
+        "position": 1,
+        "active": true,
+        "version": 1
+      },
+      {
+        "id": "svc-lees-skin-fade",
+        "businessId": "biz-lees-barbershop",
+        "kindId": "barber",
+        "name": "Skin fade",
+        "priceKind": "one_price",
+        "unit": null,
+        "lengthMinutes": 45,
+        "position": 2,
+        "active": true,
+        "version": 1
+      },
+      {
+        "id": "svc-lees-beard-trim",
+        "businessId": "biz-lees-barbershop",
+        "kindId": "barber",
+        "name": "Beard trim",
+        "priceKind": "one_price",
+        "unit": null,
+        "lengthMinutes": 15,
+        "position": 3,
+        "active": true,
+        "version": 1
+      },
+      {
+        "id": "svc-lees-kids-cut",
+        "businessId": "biz-lees-barbershop",
+        "kindId": "barber",
+        "name": "Kids cut (12 and under)",
+        "priceKind": "one_price",
+        "unit": null,
+        "lengthMinutes": 30,
+        "position": 4,
+        "active": true,
+        "version": 1
+      },
+      {
+        "id": "svc-lees-signature-cut",
+        "businessId": "biz-lees-barbershop",
+        "kindId": "barber",
+        "name": "Signature cut and hot towel shave",
+        "priceKind": "one_price",
+        "unit": null,
+        "lengthMinutes": 60,
+        "position": 5,
+        "active": true,
+        "version": 1
+      },
+      {
+        "id": "svc-lees-grooms-package",
+        "businessId": "biz-lees-barbershop",
+        "kindId": "barber",
+        "name": "Groom's package (cut, shave, facial)",
+        "priceKind": "one_price",
+        "unit": null,
+        "lengthMinutes": 150,
+        "position": 6,
+        "active": true,
+        "version": 1
+      },
+      {
+        "id": "svc-lees-style-consult",
+        "businessId": "biz-lees-barbershop",
+        "kindId": "barber",
+        "name": "Style consult",
+        "priceKind": "one_price",
+        "unit": null,
+        "lengthMinutes": 15,
+        "position": 7,
+        "active": true,
+        "version": 1
+      },
+      {
+        "id": "svc-lees-home-grooming",
+        "businessId": "biz-lees-barbershop",
+        "kindId": "barber",
+        "name": "Home grooming visit (cut, beard trim, hot towel)",
+        "priceKind": "one_price",
+        "unit": null,
+        "lengthMinutes": 60,
+        "position": 8,
+        "active": true,
+        "version": 1
+      },
+      {
+        "id": "svc-lees-wedding-party",
+        "businessId": "biz-lees-barbershop",
+        "kindId": "barber",
+        "name": "Wedding party grooming",
+        "priceKind": "by_answers",
+        "unit": null,
+        "lengthMinutes": 35,
+        "position": 9,
+        "active": true,
+        "version": 1
+      },
+      {
+        "id": "svc-lees-event-hours",
+        "businessId": "biz-lees-barbershop",
+        "kindId": "barber",
+        "name": "Event hours (a barber on site at an event)",
+        "priceKind": "per_hour",
+        "unit": null,
+        "lengthMinutes": 60,
+        "position": 10,
+        "active": true,
+        "version": 1
+      }
+    ]
+  }
+}
