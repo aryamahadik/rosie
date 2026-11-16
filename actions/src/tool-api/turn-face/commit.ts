@@ -31,6 +31,21 @@
 // what the commit is to write: a repeated turn runs them all again before K-05 answers repeated (STATE note 1). Nothing
 // here logs; a throw names a read, a fault or a code, never a value.
 //
+// The keyword door's commit (T-1413; DL-864, DL-877; door.ts): keywordCommitDeps binds the same commit for a core-only
+// turn whose caller names no business, run inside the door's one runtime-side transaction (rosie_job, no business scope,
+// rosie.person_id unset), with the limits, writesOf, the sealer and commitTurn as above, and:
+//   - the safety reader in its no-business forms (noBusinessSafetyReaderOf; K-05 v1.4's five record reads with businessId
+//     null, db/repo/safety-reads.ts lines 24 to 27), on the door's transaction; the owner and the zone, which need a
+//     business, answer notBuilt (fails closed; DL-864 note 2);
+//   - the pinned bundle's lines with every danger outcome's line answering notBuilt (noBusinessSafetyLines): with no
+//     business no line row can be built and no owner told (default 5 below);
+//   - runCore's flags port (CoreDeps.flags: T-317's and T-307's readers, the ids, the event sources), by name, as the door
+//     binds it over its own transaction (DL-872 item 4; DL-877 C1, C2), and the safety service's own T-317 and T-307
+//     readers set to the same two (never a reader on any other side: C1);
+//   - openHolds with no business: K-05 v1.3 readOpenHolds with businessId null, on the door's transaction.
+// The business-scoped binding (turnCommitDeps) binds no flags port: in a business-scoped turn recordStopOrStart and
+// setRecordFlag stay notBuilt portNotWired (DL-877 C5; their scoped binding is a card of its own after K-05 v1.18).
+//
 // Defaults used (for ops/QUESTIONS.md):
 //   1. A hold the actor keeps that PostgreSQL has not recorded (CommitContext hold with no hold id), or one still waiting
 //      for its read (rule unread), holds as an unread text does: its event id joins unreadEventIds, so every part but a
@@ -48,6 +63,11 @@
 //      no text for, such as a vote taken back), one they name as a text or a vote as well, and every event of a turn with
 //      no decided texts (input coreOnly), where nothing tells a tapback from a text with no record. The runtime's unread
 //      ids are kept whole (DL-133).
+//   5. In the keyword door's commit a danger outcome answers notBuilt (DL-864 note 2's default, fails closed; the replies
+//      run the turn again): with no business the safety service builds no line row (T-307's rows need a business:
+//      domain/safety/record.ts lineRows) and tells no owner, and the owner's and zone's reads need one. So the door's lines
+//      answer notBuilt for every outcome but No, before any line row is planned; No sends no line, and the outage line is
+//      the bundle's, as the business-scoped binding's.
 
 import type { CommitContext } from "../../../../runtime/src/actor";
 import type {
@@ -59,7 +79,7 @@ import type {
   OpenHolds,
   SafetyHold,
 } from "../../commit";
-import { createRunCore, type CoreSafetyDeps } from "../../commit/core";
+import { createRunCore, type CoreDeps, type CoreFlagsDeps, type CoreSafetyDeps } from "../../commit/core";
 import { createWritesOf, type WalkDeps } from "../../commit/walk";
 import type {
   OwnerContact,
@@ -154,6 +174,36 @@ export interface SafetyReads<Repo> {
   businessOwner(request: { businessId: string }): Promise<{ owner: OwnerContact | null } | ErrorAnswer>;
 }
 
+/**
+ * K-05 v1.4's five record reads (items 37 to 41) in their no-business forms, as the keyword door's commit reads them
+ * (T-1413): each on the door's own runtime-side transaction (`repo`: rosie_job, no business scope) with businessId null,
+ * which reads only the rows with no business (db/repo/safety-reads.ts lines 24 to 27: the read names `business_id is
+ * null` itself, and refuses rosie_app before any read). The owner and the zone need a business, so the door has none of
+ * them (noBusinessSafetyReaderOf answers notBuilt). Each answers K-05's response or one of its errors.
+ */
+export interface NoBusinessSafetyReads<Repo> {
+  outcomeOfEvent(
+    repo: Repo,
+    request: { eventId: string; businessId: null },
+  ): Promise<{ safetyOutcome: StoredOutcome | null } | ErrorAnswer>;
+  outcome(
+    repo: Repo,
+    request: { outcomeId: string; businessId: null },
+  ): Promise<{ safetyOutcome: StoredOutcome | null } | ErrorAnswer>;
+  hold(
+    repo: Repo,
+    request: { holdId: string; businessId: null },
+  ): Promise<{ hold: StoredHold | null } | ErrorAnswer>;
+  holdOfOutcome(
+    repo: Repo,
+    request: { outcomeId: string; businessId: null },
+  ): Promise<{ hold: StoredHold | null } | ErrorAnswer>;
+  outboxRowWritten(
+    repo: Repo,
+    request: { outboxRowId: string; businessId: null },
+  ): Promise<{ written: boolean } | ErrorAnswer>;
+}
+
 /** Any K-05 error answer: an object with its own "error" code. */
 export interface ErrorAnswer {
   readonly error: string;
@@ -190,6 +240,14 @@ export interface TurnCommitBinding<Repo> {
   /** Limits 1 to 6 for a turn, given its bundle's step cards. Default: the registry with limit 1 given them. */
   readonly limits?: (steps: (bundleId: BundleId, flow: FlowLetter) => StepCards) => LimitRegistry<Repo>;
 }
+
+/**
+ * What the keyword door's commit binds (keywordCommitDeps; T-1413): the turn face's binding, with K-05 v1.4's record
+ * reads in their no-business forms in place of the business-scoped seven.
+ */
+export type KeywordCommitBinding<Repo> = Omit<TurnCommitBinding<Repo>, "safetyReads"> & {
+  readonly safetyReads: NoBusinessSafetyReads<Repo>;
+};
 
 // ---- openHolds: K-05 readOpenHolds joined with the runtime's commit-time context ------------------------------------
 
@@ -243,14 +301,15 @@ function actorHolds(at: CommitAt): { holds: SafetyHold[]; unread: string[] } {
 }
 
 /**
- * The commit's openHolds port for one call: readOpenHolds on the call's transaction under its business, naming the
- * turn's texts the safety read reads whose outcome does not ride in this commit (never a tapback: default 4) and the
- * runtime's unread ids, joined with what the runtime holds at commit time (`at`). A read that answers an error fails the
- * call closed.
+ * The commit's openHolds port for one call: readOpenHolds on the call's transaction under its business (`businessOf`:
+ * the call's own; the keyword door's, none), naming the turn's texts the safety read reads whose outcome does not ride in
+ * this commit (never a tapback: default 4) and the runtime's unread ids, joined with what the runtime holds at commit
+ * time (`at`). A read that answers an error fails the call closed.
  */
 export function openHoldsPort<Repo>(
   at: CommitAt,
   readOpenHolds: TurnCommitBinding<Repo>["readOpenHolds"],
+  businessOf: (turn: CommitTurnContext<Repo>) => string | null = (turn) => turn.businessId,
 ): CommitPorts<Repo>["openHolds"] {
   return async (turn: CommitTurnContext<Repo>): Promise<OpenHolds> => {
     const recorded = recordedInThisCommit(turn.request.core);
@@ -259,7 +318,7 @@ export function openHoldsPort<Repo>(
     const eventIds = unique([...texts, ...at.unread]);
     const answer = await readOpenHolds(turn.repo, {
       handleId: turn.turn.handleId,
-      businessId: turn.businessId,
+      businessId: businessOf(turn),
       eventIds,
     });
     if ("error" in answer) throw new TurnFaceReadError("readOpenHolds", answer.error);
@@ -322,6 +381,43 @@ export function safetyReaderOf<Repo>(reads: SafetyReads<Repo>, repo: Repo, busin
       if (asked !== businessId) throw new TurnFaceReadError("readBusinessZone", "otherBusiness");
       return answered("readBusinessZone", await reads.businessZone(repo, { businessId })).timeZone;
     },
+    arrivedAt: () => Promise.resolve(null),
+  };
+}
+
+/**
+ * The safety service's reader for one call of the keyword door (T-1413): K-05 v1.4's five record reads in their
+ * no-business forms (businessId null) on the door's own runtime-side transaction, `repo`, which reads only the rows with
+ * no business (db/repo/safety-reads.ts lines 24 to 27). The business's owner and zone need a business, so with none each
+ * answers notBuilt (fails closed; DL-864 note 2) and nothing is read; arrivedAt null until T-1155, as safetyReaderOf's.
+ */
+export function noBusinessSafetyReaderOf<Repo>(reads: NoBusinessSafetyReads<Repo>, repo: Repo): SafetyReader {
+  const businessId = null;
+  const needsBusiness = (): Promise<never> => Promise.reject(new NotBuiltError("recordSafetyOutcome"));
+  return {
+    async outcomeOfEvent(eventId) {
+      return answered("readSafetyOutcomeOfEvent", await reads.outcomeOfEvent(repo, { eventId, businessId }))
+        .safetyOutcome;
+    },
+    async outcome(outcomeId) {
+      return answered("readSafetyOutcome", await reads.outcome(repo, { outcomeId, businessId }))
+        .safetyOutcome;
+    },
+    async hold(holdId) {
+      return answered("readSafetyHold", await reads.hold(repo, { holdId, businessId })).hold;
+    },
+    async holdOfOutcome(outcomeId) {
+      return answered("readSafetyHoldOfOutcome", await reads.holdOfOutcome(repo, { outcomeId, businessId }))
+        .hold;
+    },
+    async outboxRowWritten(rowId) {
+      return answered(
+        "readOutboxRowWritten",
+        await reads.outboxRowWritten(repo, { outboxRowId: rowId, businessId }),
+      ).written;
+    },
+    ownerOf: needsBusiness,
+    businessZone: needsBusiness,
     arrivedAt: () => Promise.resolve(null),
   };
 }
@@ -392,6 +488,21 @@ export async function pinnedSafetyLines(bundles: FrontierBundles, bundleId: Bund
 }
 
 /**
+ * The keyword door's checked lines over the pinned bundle's (default 5): No sends nothing, as everywhere; every other
+ * outcome's line answers notBuilt, since with no business no line row is built and no owner is told; the outage line is
+ * the bundle's own.
+ */
+export function noBusinessSafetyLines(lines: SafetyLines): SafetyLines {
+  return {
+    lineOf(outcome) {
+      if (outcome === "No") return null;
+      throw new NotBuiltError("recordSafetyOutcome");
+    },
+    outageLine: () => lines.outageLine(),
+  };
+}
+
+/**
  * Limit 1's step cards for a turn (STATE note 65; T-299's Limit1Deps.steps): the turn's bundle's flow graphs it lists,
  * the context's flow first, read once when limit 1 first asks for a step. A bundle that cannot be read gives no card, so
  * every step's side is the business's (DL-188 ruling 1; fails closed).
@@ -423,10 +534,14 @@ export function turnLimits<Repo>(
 // ---- the commit's deps for one call -----------------------------------------------------------------------------------
 
 /**
- * The commit's deps for one gateAndCommit call, given the runtime's commit-time context: the limits, writesOf, runCore,
- * openHolds and commitTurn as the top of this file binds them.
+ * The commit's deps over one binding: the limits, writesOf and commitTurn as bound, runCore with the core's deps for the
+ * turn's pinned lines (built for each action: DL-864 note 4), and openHolds under the business `businessOf` names.
  */
-export function turnCommitDeps<Repo>(binding: TurnCommitBinding<Repo>): (at: CommitAt) => CommitDeps<Repo> {
+function commitDepsWith<Repo>(
+  binding: Omit<TurnCommitBinding<Repo>, "safetyReads">,
+  coreDeps: (lines: SafetyLines, turn: CommitTurnContext<Repo>) => CoreDeps<Repo>,
+  businessOf?: (turn: CommitTurnContext<Repo>) => string | null,
+): (at: CommitAt) => CommitDeps<Repo> {
   const { bundles } = binding;
   const steps = bundleStepCards(bundles);
   const writesOf = createWritesOf<Repo>({
@@ -437,16 +552,7 @@ export function turnCommitDeps<Repo>(binding: TurnCommitBinding<Repo>): (at: Com
   return (at) => {
     const runCore: CommitPorts<Repo>["runCore"] = async (action, turn, open) => {
       const lines = await pinnedSafetyLines(bundles, turn.turn.bundleId);
-      const run = createRunCore<Repo>({
-        safety: {
-          ...binding.safetyExtra,
-          reader: (repo) => safetyReaderOf(binding.safetyReads, repo, turn.businessId),
-          sealer: () => binding.sealer,
-          lines,
-          stopWords: binding.stopWords,
-          telling: binding.telling,
-        },
-      });
+      const run = createRunCore<Repo>(coreDeps(lines, turn));
       return run(action, turn, open);
     };
     return {
@@ -455,8 +561,56 @@ export function turnCommitDeps<Repo>(binding: TurnCommitBinding<Repo>): (at: Com
         commitTurn: binding.commitTurn,
         writesOf,
         runCore,
-        openHolds: openHoldsPort(at, binding.readOpenHolds),
+        openHolds: openHoldsPort(at, binding.readOpenHolds, businessOf),
       },
     };
   };
+}
+
+/**
+ * The commit's deps for one gateAndCommit call, given the runtime's commit-time context: the limits, writesOf, runCore,
+ * openHolds and commitTurn as the top of this file binds them. No flags port is bound, so in this business-scoped commit
+ * recordStopOrStart and setRecordFlag answer notBuilt portNotWired (DL-877 C5).
+ */
+export function turnCommitDeps<Repo>(binding: TurnCommitBinding<Repo>): (at: CommitAt) => CommitDeps<Repo> {
+  return commitDepsWith(binding, (lines, turn) => ({
+    safety: {
+      ...binding.safetyExtra,
+      reader: (repo) => safetyReaderOf(binding.safetyReads, repo, turn.businessId),
+      sealer: () => binding.sealer,
+      lines,
+      stopWords: binding.stopWords,
+      telling: binding.telling,
+    },
+  }));
+}
+
+/**
+ * The keyword door's commit deps for one call (T-1413; door.ts), given the runtime's commit-time context: the same commit
+ * as turnCommitDeps', on the runtime side with no business (the top of this file): the safety reader in its no-business
+ * forms, the door's lines (default 5), the flags port `flags` the door binds over its own transaction (DL-872 item 4:
+ * reader, messagesReader, ids, events, by name; runCore answers notBuilt portNotWired with any one missing), the safety
+ * service's T-317 and T-307 readers set to the same two (DL-877 C1), and openHolds with no business.
+ */
+export function keywordCommitDeps<Repo>(
+  binding: KeywordCommitBinding<Repo>,
+  flags: CoreFlagsDeps<Repo>,
+): (at: CommitAt) => CommitDeps<Repo> {
+  return commitDepsWith(
+    binding,
+    (lines) => ({
+      safety: {
+        ...binding.safetyExtra,
+        flagsReader: flags.reader,
+        messagesReader: flags.messagesReader,
+        reader: (repo) => noBusinessSafetyReaderOf(binding.safetyReads, repo),
+        sealer: () => binding.sealer,
+        lines: noBusinessSafetyLines(lines),
+        stopWords: binding.stopWords,
+        telling: binding.telling,
+      },
+      flags,
+    }),
+    () => null,
+  );
 }
