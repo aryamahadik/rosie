@@ -612,7 +612,7 @@ describe("every row is the call's business's (arch 10 line 546)", () => {
     await expect(catalog.ways("svc-lees-haircut")).rejects.toMatchObject({ reason: "badRead" });
   });
 
-  it("refuses to be built for no business, or with a now that is not UTC", () => {
+  it("refuses to be built for no call or business, or with a now that is not UTC", () => {
     const deps = {
       call: "saveSetupStep",
       businessId: BARBERSHOP,
@@ -620,6 +620,9 @@ describe("every row is the call's business's (arch 10 line 546)", () => {
       now: RAISE_DAY,
       turnKey: "turn-sam-0300",
     };
+    expect(() => createCatalog({ ...deps, call: " saveSetupStep" })).toThrow(
+      "catalog refused: badInput (call)",
+    );
     expect(() => createCatalog({ ...deps, businessId: "" })).toThrow(
       "catalog refused: badInput (businessId)",
     );

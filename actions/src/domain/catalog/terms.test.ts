@@ -15,6 +15,7 @@ import {
 import type { SnapshotInput } from "./terms";
 import {
   BARBERSHOP,
+  HOME_SERVICES,
   SEEDS,
   SKIN_FADE_WRITTEN,
   Store,
@@ -29,6 +30,7 @@ import {
 
 const SKIN_FADE_TERMS = "bookings-changes/fixtures/seed-terms-snapshot.json";
 const HAIRCUT_TERMS = "bookings-changes/fixtures/seed-booking-line-price-copied.json";
+const DRAIN_TERMS = "bookings-changes/fixtures/seed-booking-flow-b.json";
 
 function catalogAt(store: Store, now: string, more: Partial<CatalogDeps> = {}) {
   return createCatalog({
@@ -128,6 +130,28 @@ describe("a terms snapshot copies the cancel rule and names the rules in force (
     });
     expect(written.named.map(withoutId).sort(byRef)).toEqual(seeded.named.map(withoutId).sort(byRef));
     expect(snapshot.cutoff.from).toBe("flowDefault");
+  });
+
+  it("Alex's drain clearing at home (flow B) copies the way's own hour and names Lee Home Services' price OK limit alone", async () => {
+    const store = new Store(seedRows([...SEEDS, DRAIN_TERMS]));
+    const snapshot = await catalogAt(store, "2026-10-19T21:17:00Z", {
+      businessId: HOME_SERVICES,
+    }).takeTermsSnapshot({
+      ...skinFade,
+      bookingId: "booking-alex-drain",
+      flow: "B",
+      serviceId: "svc-lee-plumbing-drain-clearing",
+      serviceMoneyId: "way-lee-plumbing-drain-home",
+      termsConsentId: "consent-alex-ticked-terms-drain",
+    });
+    const seeded = seededTerms(DRAIN_TERMS, "booking-alex-drain");
+    const written = writtenTerms(snapshot);
+    expect({ ...written.terms, cutoff_before: spanOf(written.terms) }).toEqual({
+      ...seeded.terms,
+      cutoff_before: spanOf(seeded.terms),
+    });
+    expect(written.named.map(withoutId)).toEqual(seeded.named.map(withoutId));
+    expect([snapshot.ruleIds, snapshot.priceOkLimitIds]).toEqual([[], ["pok-lee-home-services"]]);
   });
 
   it("a clock time the day before names the zone it is read in", async () => {

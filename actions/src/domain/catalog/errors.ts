@@ -10,7 +10,7 @@ export type CatalogRefusal =
   | "badInput"
   /** A row of another business, given or read: every row is the call's business's (arch 10 line 546). */
   | "otherBusiness"
-  /** A read answered a row it was not asked for (another service's way or rule): never used. */
+  /** A read answered a row it was not asked for (another service's way or rule), which the service never uses. */
   | "badRead"
   /** No such kind, service, way, rule or tie of this business, as read. */
   | "notFound"

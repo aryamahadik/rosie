@@ -373,7 +373,7 @@ export function withCatalog(unit: UnitWrites, writes: CatalogWrites): UnitWrites
 
 /** The catalog and pricing service for one call, inside the call's business scope. */
 export function createCatalog(deps: CatalogDeps): Catalog {
-  const call = requireWords(deps.call, "call");
+  const call = requireId(deps.call, "call");
   const businessId = requireId(deps.businessId, "businessId");
   if (!isCurrency(deps.currency)) refuse("badInput", ["currency"]);
   const currency = deps.currency;
