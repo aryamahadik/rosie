@@ -4,8 +4,9 @@
 #   bash ai/spikes/model-times/run.sh --dry-run [--out <folder>]
 #       every unit against the local stub on 127.0.0.1 (stub.mjs): no key is read, nothing leaves the Mac.
 #   bash ai/spikes/model-times/run.sh --live
-#       the one live run: at most 40 smoke-size calls in all to Anthropic's Messages endpoint (run.mjs counts every call
-#       an earlier live run logged in runs/), never in CI.
+#       the one live run: at most 40 smoke-size calls in all to Anthropic's Messages endpoint, never in CI. run.mjs keeps
+#       the count on disk: it holds runs/ alone (runs/live.lock) and puts each call in runs/sent.jsonl before it goes
+#       out, so a run stopped at any point leaves every call it sent counted.
 #
 # The key, read by name and never printed (the lead note, item 1): ANTHROPIC_API_KEY from the environment, else (a live
 # run alone) from the git-ignored .dev.vars at the checkout's root through infra/scripts/lib.sh's load_dev_var, as
@@ -14,7 +15,8 @@
 # written there by printf, a builtin: never in any command's arguments or environment (no here-string: bash 3.2 makes
 # one a temporary file). A dry run reads no key at all and drops one the environment holds.
 #
-# Exit: run.mjs's (0 the run ran; 1 a dry run's unit did not answer; 2 refused: misuse, CI, no key, the cap).
+# Exit: run.mjs's (0 the run ran; 1 a dry run's unit did not answer; 2 refused: misuse, CI, no key, runs/ held, the
+# cap).
 set +x
 set +a
 set +k

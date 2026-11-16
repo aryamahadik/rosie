@@ -1,16 +1,29 @@
 // The real model times spike's own tests (T-362): its percentile and timing maths, the one way out (wire.mjs), a whole
-// dry run against the local stub, a whole live-mode run on a stand-in transport (never the network), the refusals, and
-// the staging capture's reader. No key, no network, no live call: CI never runs this file (it is not in a Vitest
-// project); run it with `node --test ai/spikes/model-times/model-times.test.mjs`. Every value is fiction.
+// dry run against the local stub, a whole live-mode run on a stand-in transport (never the network), the refusals, the
+// count kept on disk before each call goes out and the one live run's hold on runs/ (DL-870: a run killed mid-call, and
+// two runs started together, in one process and in two), and the staging capture's reader. No key, no network, no live
+// call: CI never runs this file (it is not in a Vitest project); run it with
+// `node --test ai/spikes/model-times/model-times.test.mjs`. Every value is fiction.
 
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync, mkdirSync } from "node:fs";
+import { spawn } from "node:child_process";
+import {
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+  mkdirSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { after, before, describe, test } from "node:test";
+import { pathToFileURL } from "node:url";
 
 import { formatMarkdown, renderRun } from "./report.mjs";
-import { liveCallsLogged, main, parseArgs } from "./run.mjs";
+import { HOLD_FILE, SENT_FILE, liveCallsLogged, main, parseArgs } from "./run.mjs";
 import {
   decideReads,
   modelCallRows,
@@ -496,6 +509,213 @@ describe("refusals before anything is read or sent", () => {
     writeFileSync(join(runsDir, "live-broken.json"), "{ not json");
     assert.equal(await main({ ...args, stdin: ["SOME-KEY-VALUE-0000\n"] }), 2);
     assert.match(lines.at(-1), /cannot be read/u);
+  });
+});
+
+describe("the count on disk before each call goes out, and the one live run's hold (DL-870)", () => {
+  const key = "TEST-KEY-NOT-REAL-FOR-THE-SPIKE-TEST";
+  const isResults = (name) => /^live-.*\.json$/u.test(name);
+  const request = {
+    method: "POST",
+    headers: { "x-api-key": DRY_KEY, "anthropic-version": "2026-10-21" },
+    body: JSON.stringify({ model: "claude-haiku-5-5", messages: [{ role: "user", content: "fiction" }] }),
+  };
+  let classify;
+  let answers;
+  let driver;
+  before(async () => {
+    const production = await loadProduction();
+    classify = classifier(production);
+    answers = fixtureAnswers(production, composerCases(production));
+    // A live run in a process of its own, on a stand-in transport that answers from the fixtures after `ms` and, on
+    // call `killOn`, kills its own process (SIGKILL: no finally, no exit handler), as Ctrl-C or a closed terminal stops
+    // a run. It prints its exit code and the calls that reached its transport.
+    const from = (name) => JSON.stringify(pathToFileURL(join(HERE, name)).href);
+    driver = join(temp, "driver.mjs");
+    writeFileSync(
+      driver,
+      [
+        `import { main } from ${from("run.mjs")};`,
+        `import { classifier, composerCases, loadProduction } from ${from("units.mjs")};`,
+        `import { answerFor, fixtureAnswers } from ${from("stub.mjs")};`,
+        "const [runsDir, killOn, ms] = process.argv.slice(2);",
+        "const production = await loadProduction();",
+        "const classify = classifier(production);",
+        "const answers = fixtureAnswers(production, composerCases(production));",
+        "let calls = 0;",
+        "const transport = async (_url, options) => {",
+        "  calls += 1;",
+        "  if (calls === Number(killOn)) process.kill(process.pid, 'SIGKILL');",
+        "  const found = answerFor(options.body, classify, answers);",
+        "  await new Promise((resolve) => setTimeout(resolve, Number(ms)));",
+        "  const answer = { type: 'text', text: JSON.stringify(found.output) };",
+        "  const usage = { input_tokens: 30, output_tokens: 40 };",
+        "  const body = JSON.stringify({ stop_reason: 'end_turn', content: [answer], usage });",
+        "  return new Response(body, { status: 200 });",
+        "};",
+        `const stdin = [${JSON.stringify(`${key}\n`)}];`,
+        "const code = await main({ argv: ['--live'], stdin, write: () => undefined, env: {}, transport, runsDir });",
+        "process.stdout.write(JSON.stringify({ code, calls }));",
+        "process.exitCode = code;",
+        "",
+      ].join("\n"),
+    );
+  });
+
+  /** A stand-in for Anthropic's endpoint, in this process: answers from the fixtures and counts what reached it. */
+  const standIn = () => {
+    const reached = { calls: 0 };
+    const transport = async (url, options) => {
+      assert.equal(url, API_URL);
+      reached.calls += 1;
+      const found = answerFor(options.body, classify, answers);
+      assert.notEqual(found, null);
+      await new Promise((resolve) => setTimeout(resolve, 2));
+      return new Response(
+        JSON.stringify({
+          stop_reason: "end_turn",
+          content: [{ type: "text", text: JSON.stringify(found.output) }],
+          usage: { input_tokens: 30, output_tokens: 40 },
+        }),
+        { status: 200 },
+      );
+    };
+    return { reached, transport };
+  };
+
+  const live = (runsDir, transport, lines) =>
+    main({
+      argv: ["--live"],
+      stdin: [`${key}\n`],
+      write: (line) => lines.push(line),
+      env: {},
+      transport,
+      runsDir,
+    });
+
+  /** Runs the driver in a process of its own; resolves with its exit code, signal and output. */
+  const liveProcess = (runsDir, killOn, ms) =>
+    new Promise((resolve, reject) => {
+      const child = spawn(process.execPath, [driver, runsDir, String(killOn), String(ms)], {
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+      let out = "";
+      let err = "";
+      child.stdout.on("data", (chunk) => {
+        out += String(chunk);
+      });
+      child.stderr.on("data", (chunk) => {
+        err += String(chunk);
+      });
+      child.on("error", reject);
+      child.on("close", (code, signal) => {
+        resolve({ code, signal, out, err });
+      });
+    });
+
+  test("the wire tells `count` of each call before it goes out, and sends no call it could not count", async () => {
+    const order = [];
+    const wire = createWire({
+      mode: "live",
+      transport: () => {
+        order.push("sent");
+        return Promise.resolve(new Response(JSON.stringify({ stop_reason: "end_turn" }), { status: 200 }));
+      },
+      transportUrl: API_URL,
+      limit: 40,
+      already: 2,
+      count: (record) => order.push(`counted ${String(record.n)}`),
+    });
+    assert.equal((await wire.fetch(API_URL, request)).status, 200);
+    assert.deepEqual(order, ["counted 3", "sent"]);
+
+    const failing = createWire({
+      mode: "live",
+      transport: noTransport,
+      transportUrl: API_URL,
+      limit: 40,
+      count: () => {
+        throw new Error("the disk is full");
+      },
+    });
+    await assert.rejects(failing.fetch(API_URL, request), /the disk is full/u);
+    assert.equal(failing.sent(), 0);
+    assert.deepEqual(failing.records(), []);
+  });
+
+  test("a live run killed during its 3rd call leaves 3 counted and its hold; once the hold is removed, the next run's cap is 40 less 3", async () => {
+    const runsDir = join(temp, "killed");
+    const killed = await liveProcess(runsDir, 3, 2);
+    assert.equal(killed.signal, "SIGKILL", killed.err);
+    assert.equal(liveCallsLogged(runsDir), 3, "the calls that reached the transport");
+    assert.ok(existsSync(join(runsDir, HOLD_FILE)), "a run stopped before its end leaves its hold");
+    assert.deepEqual(readdirSync(runsDir).filter(isResults), [], "and no results file");
+    const tally = readFileSync(join(runsDir, SENT_FILE), "utf8");
+    const counted = tally
+      .trimEnd()
+      .split("\n")
+      .map((line) => JSON.parse(line));
+    assert.deepEqual(
+      counted.map((line) => line.n),
+      [1, 2, 3],
+    );
+    assert.ok(
+      counted.every((line) => Object.keys(line).join(",") === "run,n,unit,kind,call,model,at"),
+      "a line holds labels and counts alone",
+    );
+    for (const word of [key, "x-api-key", "fiction", "Barbershop", "Avery"])
+      assert.ok(!tally.includes(word), `no key, header or message word (${word}) on disk`);
+
+    const held = [];
+    assert.equal(await live(runsDir, noTransport, held), 2, "refused while the hold is there");
+    assert.match(held.join("\n"), /runs\/live\.lock is held \(the run started .+, process \d+\)/u);
+    assert.equal(liveCallsLogged(runsDir), 3);
+
+    rmSync(join(runsDir, HOLD_FILE)); // as a person does once no live run is going
+    const { reached, transport } = standIn();
+    const next = [];
+    assert.equal(await live(runsDir, transport, next), 0, next.join("\n"));
+    assert.match(next[0], /35 calls planned; 3 logged before; the cap is 40\./u);
+    assert.equal(reached.calls, 35, "35 of the 37 left under the cap");
+    const [file] = readdirSync(runsDir).filter(isResults);
+    const results = JSON.parse(readFileSync(join(runsDir, file), "utf8"));
+    assert.equal(results.callsBefore, 3);
+    assert.equal(results.wire.find((record) => record.local === undefined).n, 4, "its calls go on from 3");
+    assert.equal(liveCallsLogged(runsDir), 38, "each call counted once, on disk and in the results");
+    assert.ok(!existsSync(join(runsDir, HOLD_FILE)), "a run that ends gives up its hold");
+
+    const third = [];
+    assert.equal(await live(runsDir, noTransport, third), 2);
+    assert.match(third.join("\n"), /logged 38 calls; this run plans 35/u);
+    assert.ok(!existsSync(join(runsDir, HOLD_FILE)), "a refused run gives up the hold it took");
+  });
+
+  test("two live runs started together cannot both send: one holds runs/, the other is refused before any call", async () => {
+    const runsDir = join(temp, "together");
+    const { reached, transport } = standIn();
+    const first = [];
+    const second = [];
+    const codes = await Promise.all([live(runsDir, transport, first), live(runsDir, transport, second)]);
+    assert.deepEqual([...codes].sort(), [0, 2], [...first, ...second].join("\n"));
+    const refused = codes[0] === 2 ? first : second;
+    assert.match(refused.join("\n"), /runs\/live\.lock is held/u);
+    assert.equal(reached.calls, 35, "one run's calls alone reached the endpoint");
+    assert.equal(liveCallsLogged(runsDir), 35);
+    assert.ok(!existsSync(join(runsDir, HOLD_FILE)));
+  });
+
+  test("two live run processes started together cannot both send", async () => {
+    const runsDir = join(temp, "two-processes");
+    const ends = await Promise.all([liveProcess(runsDir, 0, 10), liveProcess(runsDir, 0, 10)]);
+    for (const end of ends) assert.equal(end.signal, null, end.err);
+    const results = ends.map((end) => JSON.parse(end.out)).sort((a, b) => a.code - b.code);
+    assert.deepEqual(results, [
+      { code: 0, calls: 35 },
+      { code: 2, calls: 0 },
+    ]);
+    assert.deepEqual(ends.map((end) => end.code).sort(), [0, 2]);
+    assert.equal(liveCallsLogged(runsDir), 35);
+    assert.ok(!existsSync(join(runsDir, HOLD_FILE)));
   });
 });
 

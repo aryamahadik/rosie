@@ -85,7 +85,10 @@ is never counted, timed or charged.
 **The one way out** (`wire.mjs`): the `fetch` every reader is handed. It takes the gateway's Messages endpoint alone
 and sends to Anthropic (live) or to the stub on 127.0.0.1 (dry) alone. It times each call to its last byte without
 passing on the stage's abort signal, so a call its stage timed out still shows its real time (the "wire times"), and
-its records hold labels and counts alone: never a header, a prompt or an answer's words.
+its records hold labels and counts alone: never a header, a prompt or an answer's words. It counts each call before
+the call goes out: a live run puts it on disk first, one line in `runs/sent.jsonl` flushed to the disk, and a call
+that cannot be counted is not sent. With `runs/live.lock`, which one live run at a time holds, that keeps the cap of
+40 across runs, however a run ends ("How the count is kept", under "Source 1").
 
 **Warm and cold.** A call that wrote the prompt cache (`cache_write_tokens` above 0) found its prefix uncached: a cold
 call. A call that answered and wrote nothing read its prefix from the cache: a warm one. A call with no answer (timed
@@ -104,17 +107,39 @@ never an argument, never printed. `run.mjs` takes it on standard input alone and
 
 ## Source 1: the live run
 
-Not made yet. The one command, by the lead or the user's `!`, from the main checkout (whose `.dev.vars` holds
-`ANTHROPIC_API_KEY`; a worktree holds no key) once `task/T-362` is merged:
+Not made yet. The auto-mode classifier refused the builder's one live run (`bash ai/spikes/model-times/run.sh --live`,
+Nov 16 about 01:12Z), so, as the card's lead note (DL-860) says, it was not tried another way. The one command, by the
+lead or the user's `!`, from the main checkout (whose `.dev.vars` holds `ANTHROPIC_API_KEY`; a worktree holds no key)
+once `task/T-362` is merged:
 
 ```sh
 bash ai/spikes/model-times/run.sh --live
 ```
 
 It refuses with `CI` set or without a key, makes at most 40 calls (35 planned), prints its tables ready for this
-section, and writes `ai/spikes/model-times/runs/live-<time>.json` (commit it beside this file). The command
-`node ai/spikes/model-times/report.mjs <that file>` prints the same tables again. A second run is refused: it would
-pass 40.
+section, and writes `ai/spikes/model-times/runs/live-<time>.json` (commit it beside this file, with
+`runs/sent.jsonl`). The command `node ai/spikes/model-times/report.mjs <that file>` prints the same tables again.
+
+**How the count is kept** (DL-870): on disk, before any call goes out, so the cap of 40 holds across runs however a
+run ends.
+
+1. A live run first holds `runs/` alone: it creates `runs/live.lock` exclusively (`wx`). Of two runs started
+   together, one holds it and the other is refused before it reads the count or sends a call.
+2. Holding it, the run reads the calls made so far: for each earlier run, the larger of its lines in
+   `runs/sent.jsonl` and the calls its results file lists as gone out. If its 35 planned calls would pass 40, it is
+   refused.
+3. Before each call goes out, the run appends one line for it to `runs/sent.jsonl` and flushes it to the disk: the
+   run's start, the call's number in all, its unit, kind, call and model, and the time; never a header, a prompt, an
+   answer's words or the key. A call that cannot be counted is not sent.
+4. At its end the run writes its results file and gives up the hold; a run that ends by a throw gives it up too.
+
+So a run stopped at any point leaves every call it sent counted, the one going out included. One whose process is
+stopped (Ctrl-C, a closed terminal or session, a cut-off `!` command) also leaves `runs/live.lock`: the next run is
+refused until a person, once no live run is going, removes it. That run's cap is then 40 less every call counted, and
+it is refused if its 35 would pass 40; a second run after a whole one is refused (35 and 35 pass 40).
+`model-times.test.mjs` proves it: a run killed during its 3rd call (SIGKILL, as Ctrl-C stops it) leaves 3 counted
+and its hold, the next run is refused until the hold is removed and then starts from 3, and two runs started
+together, in one process or in two, never both send.
 
 The dry run (`bash ai/spikes/model-times/run.sh --dry-run`: the same 22 units against the stub on 127.0.0.1, no key,
 no network) walks every unit through the production readers: 35 calls out, 7 Haiku calls answered locally as the
@@ -187,13 +212,16 @@ version's first safety-read calls: Haiku timed out at 2,000 ms (17:43:03Z), then
 ## Files
 
 - `run.sh`: the entry point; reads the key by name and hands it over on standard input.
-- `run.mjs`: the run: refusals, the units, the results file and the tables.
+- `run.mjs`: the run: refusals, the hold on `runs/` and the count on disk, the units, the results file and the
+  tables.
 - `units.mjs`: the units, on the production readers and staging's bundle v0.
-- `wire.mjs`: the one way out (the endpoint, the cap, the fallback on purpose, the wire times).
+- `wire.mjs`: the one way out (the endpoint, the cap, each call counted before it goes out, the fallback on purpose,
+  the wire times).
 - `stub.mjs`: the dry run's stand-in on 127.0.0.1, answering from the contracts' fixtures.
 - `stats.mjs`: percentiles, arch 04's budgets and Q-41's path.
 - `report.mjs`: the tables (`node ai/spikes/model-times/report.mjs <results.json>`).
 - `staging-spans.mjs`: staging's spans from a tail capture.
-- `model-times.test.mjs`: 28 tests (`node --test ai/spikes/model-times/model-times.test.mjs`): the percentile and
+- `model-times.test.mjs`: 32 tests (`node --test ai/spikes/model-times/model-times.test.mjs`): the percentile and
   timing maths, the wire's refusals and cap, a whole dry run, a whole live-mode run on a stand-in transport, the
-  refusals, and the staging reader. No Vitest project includes it, so CI runs none of it.
+  refusals, the count on disk and the hold (a run killed during a call; two runs started together, in one process and
+  in two), and the staging reader. No Vitest project includes it, so CI runs none of it.

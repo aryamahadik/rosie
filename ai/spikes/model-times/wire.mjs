@@ -3,8 +3,12 @@
 //
 //   - Only the Messages endpoint the gateway names (API_URL) is accepted; the request goes on, unchanged, to the run's
 //     one transport address: Anthropic's endpoint itself (live), or the local stub on 127.0.0.1 (dry). Nothing else.
-//   - A cap: at most `limit` calls go out in all, counting `already` (the live calls earlier runs logged), so a second
-//     run can never pass the card's 40. Past the cap a call is answered here (HTTP 599) and never sent.
+//   - A cap: at most `limit` calls go out in all, counting `already` (the live calls earlier runs counted on disk), so a
+//     second run can never pass the card's 40. Past the cap a call is answered here (HTTP 599) and never sent.
+//   - Counted before it is sent: `count(record)` is handed each call's record (its number in all, the unit, the kind,
+//     the call, the model and the time: labels alone) before the call goes out; a live run puts it on disk there, one
+//     line in runs/sent.jsonl (run.mjs). If `count` throws, the call is not sent, so a run stopped at any point has
+//     counted every call it sent, the one going out included.
 //   - A fallback on purpose: while a unit names a model in `inject`, a call to that model is answered here with
 //     Anthropic's overloaded status (HTTP 529) and never sent, so the production path's own fallback (the safety read's
 //     Sonnet try, the gateway's other model) runs for real. Such a call costs nothing and is never counted or timed.
@@ -74,7 +78,8 @@ export function answerFacts(text) {
 
 /**
  * Builds the run's fetch. `transport` is the real fetch (globalThis.fetch); `classify(body)` names a call's kind for its
- * record (a label, or null); `now` gives milliseconds for timing (performance.now).
+ * record (a label, or null); `count(record)` is told of each call before it goes out (a throw sends nothing); `now`
+ * gives milliseconds for timing (performance.now).
  */
 export function createWire({
   mode,
@@ -83,6 +88,7 @@ export function createWire({
   limit,
   already = 0,
   classify = () => null,
+  count = () => undefined,
   now = () => performance.now(),
   clock = () => Date.now(),
 }) {
@@ -97,16 +103,18 @@ export function createWire({
   let sent = 0;
   let unit = { unit: null, kind: null, inject: [] };
 
-  /** One call that goes out: timed to its last byte, never handed the caller's abort signal. */
+  /** One call that goes out: counted first, timed to its last byte, never handed the caller's abort signal. */
   const goOut = (init, label) => {
-    sent += 1;
     const record = {
-      n: already + sent,
+      n: already + sent + 1,
       ...label,
       status: null,
       wireMs: null,
       at: new Date(clock()).toISOString(),
     };
+    // On disk before it is sent (a live run); a throw here leaves the call unsent and uncounted in memory too.
+    count({ ...record });
+    sent += 1;
     records.push(record);
     const started = now();
     const exchange = (async () => {
