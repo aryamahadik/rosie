@@ -2,9 +2,64 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 703, [`9a32ac9`](https://github.com/aryamahadik/rosie/commit/9a32ac9), 2026-11-16 09:56:35 UTC.
+- **Through:** commit 705, [`647ca13`](https://github.com/aryamahadik/rosie/commit/647ca13), 2026-11-16 10:34:08 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 705. docs: COMMIT\_HISTORY.md through commit 703 (9a32ac9, \#712) (\#715)
+
+- **Commit:** [`647ca13`](https://github.com/aryamahadik/rosie/commit/647ca13), by Arya Mahadik, 2026-11-16 10:34:08 UTC
+- **Pull request:** [#715](https://github.com/aryamahadik/rosie/pull/715) from `task/commit-history-146`, merged 2026-11-16 10:34:08 UTC. It squashed 1 branch commit:
+  - `67bf5be` docs: COMMIT\_HISTORY.md through commit 703 (9a32ac9, \#712)
+- **Files changed:** 1 (+85 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +85 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 239 (DL-887); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 704. T-1413: the guard's every-business keyword door: a core-only commit with no business on the runtime side, its SQL in db/repo (\#716)
+
+- **Commit:** [`dda7590`](https://github.com/aryamahadik/rosie/commit/dda7590), by Arya Mahadik, 2026-11-16 10:34:04 UTC
+- **Pull request:** [#716](https://github.com/aryamahadik/rosie/pull/716) from `task/T-1413`, merged 2026-11-16 10:34:05 UTC. It squashed 3 branch commits:
+  - `c4dd922` T-1413: the keyword door, the guard's every-business core-only turn c…
+  - `e10f2b1` Merge branch 'main' into task/T-1413
+  - `0b35c51` T-1413: round 2 (DL-883): the keyword door's side check and its read …
+- **Files changed:** 11 (+2608 −40), by folder:
+  - `actions/` README.md +1 −1
+  - `actions/src/tool-api/turn-face/` commit.ts +174 −20, door-test-support.ts +106 −0, door.test.ts +1060 −0, door.ts +369 −0, index.ts +22 −2
+  - `actions/src/tool-api/turn-face/pg/` calls.ts +173 −11, door.int.test.ts +428 −0, index.ts +13 −2
+  - `db/repo/` targets.int.test.ts +215 −2, targets.ts +47 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1413: the keyword door, the guard's every-business core-only turn committed on the runtime side
+
+turn-face/door.ts: createKeywordDoor checks the request against K-09, accepts only a turn caller naming no business with its turn row, coreOnly input and recordSafetyOutcome, recordStopOrStart or sendFixedLine under that same caller (else noBusinessScope or invalidRequest before a transaction opens), runs the turn face's commit in one runtime-side transaction with no business, holds the answer to K-09's response or errors, and writes the gate hop's span with no business label.
+
+commit.ts: keywordCommitDeps binds runCore's flags port by name, the no-business safety reader (owner and zone notBuilt), the door's lines (a danger outcome notBuilt) and openHolds with no business; turnCommitDeps unchanged, so a business-scoped turn keeps recordStopOrStart and setRecordFlag notBuilt portNotWired.
+
+pg/calls.ts: pgKeywordDoor over pgDoorRuntime (inRuntimeTransaction as rosie_job, rosie.business_id empty, rosie.person_id unset, assertRuntimeSide and the role checked first, then read only) and pgDoorFlags; README default 2 says where stop-recorded.json and start-recorded.json are answered now.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1413: round 2 (DL-883): the keyword door's side check and its read only move into db/repo (targets.ts enterKeywordDoorSide, beside inRuntimeTransaction, with its integration test), pgDoorRuntime calls it and sends no statement of its own; with main merged (T-1414), lead note 4's pin moves: HELP through the door commits one quick_reply row naming no business, and after a STOP answers phoneStopped, writing nothing
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 703. docs: COMMIT\_HISTORY.md through commit 700 (4dbb576, \#710) (\#712)
 
