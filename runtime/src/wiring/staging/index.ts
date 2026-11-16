@@ -56,6 +56,7 @@ export {
   NO_STAGING_INPUTS,
   STAGING_BUILDERS,
   stagingOptions,
+  stagingRosieNumber,
   type StagingBuilders,
   type StagingInputName,
   type StagingInputs,
