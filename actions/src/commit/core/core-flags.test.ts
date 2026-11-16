@@ -492,6 +492,8 @@ describe("start-recorded.json: Ben's START, carried in his own turn after his ST
     await stopCommitted(world);
     const start = startRecorded();
     const request = startTurn();
+    // His turn is a gateAndCommit request K-09 v1.5 takes, as stop-recorded.json's is.
+    expect(validator.check("gateAndCommit", "request", request)).toEqual([]);
     const run = await createRunCore(depsOn(world))(
       stopActionOf(request),
       turnContextOf(request),
@@ -564,6 +566,8 @@ describe("flag-paused.json: Sam's pause of Alex, carried in his own turn (A3-48;
   it("in Sam's turn it answers flag-paused.json, its call-off clock in the run's writes as the service armed it (withClocks)", async () => {
     const paused = flagPaused();
     const request = pauseTurn();
+    // Sam's turn is a gateAndCommit request K-09 v1.5 takes.
+    expect(validator.check("gateAndCommit", "request", request)).toEqual([]);
     const world = benWorld();
     const flags = portOn(world, { visits: NOV14_VISITS });
     const action = pauseActionOf(request);
