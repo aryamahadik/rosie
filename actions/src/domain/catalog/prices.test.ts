@@ -354,6 +354,32 @@ describe("overlapping effective dates are refused (K-25 price_rules_one_in_effec
     ).rejects.toMatchObject({ reason: "badInput", fields: ["fromCents"] });
     expect(catalog.written().state).toEqual([]);
   });
+
+  it("a price for the skin fade whose place is the haircut's home visit is refused; its own way passes (refuse-place-of-another-service.json)", async () => {
+    const { refused } = refusedFixture(
+      "services-prices/fixtures/invalid/refuse-place-of-another-service.json",
+    );
+    const values = refused.values;
+    const { catalog } = catalogAt(new Store(seedRows(SEEDS)), RAISE_DAY);
+    const price = {
+      id: String(values.id),
+      serviceId: String(values.service_id),
+      conditions: { ...NO_CONDITIONS, serviceMoneyId: String(values.service_money_id) },
+      priceCents: Number(values.price_cents),
+      fromCents: null,
+      setByPersonId: String(values.set_by_person_id),
+    };
+    await expect(catalog.addPrice(price)).rejects.toMatchObject({
+      reason: "notFound",
+      fields: ["conditions.serviceMoneyId"],
+    });
+    expect(catalog.written().state).toEqual([]);
+    const own = await catalog.addPrice({
+      ...price,
+      conditions: { ...NO_CONDITIONS, serviceMoneyId: "way-lees-skin-fade-shop" },
+    });
+    expect(own).toMatchObject({ openedRuleId: "price-lees-skin-fade-home", tieIds: [] });
+  });
 });
 
 describe("a price set for a later date is withdrawn before it starts (seed-price-withdrawn-before-start)", () => {

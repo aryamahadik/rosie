@@ -6,7 +6,8 @@
 import { describe, expect, it } from "vitest";
 
 import { LaneNotBuiltError, NotBuiltError } from "../../tool-api";
-import { noWrites } from "../../commit/test-support";
+import { buildCommitRequest, type TurnActor } from "../../commit";
+import { contractChecks, noWrites } from "../../commit/test-support";
 import {
   NO_CONDITIONS,
   createCatalog,
@@ -421,6 +422,83 @@ describe("services, ways and prices in one call (S1-12, S1-13)", () => {
     // Committed, the store holds them.
     store.apply(written.state);
     expect(store.row("services", "svc-turn-sam-0300-1")).toMatchObject({ version: 1, position: 11 });
+  });
+
+  it("its writes are K-05 v1 stateWrites: T-305's one commit request carries them whole, and K-05 v1.1 takes it", async () => {
+    const { catalog } = catalogAt(new Store(seedRows(SEEDS)));
+    await catalog.changePrice({
+      serviceId: "svc-lees-kids-cut",
+      conditions: NO_CONDITIONS,
+      priceCents: 3000,
+      fromCents: null,
+      setByPersonId: SAM,
+      effectiveFrom: NOV_2,
+    });
+    await catalog.updateWay({
+      wayId: "way-lees-haircut-shop",
+      serviceId: "svc-lees-haircut",
+      feeCents: 2500,
+    });
+    await catalog.addService({
+      kindId: "barber",
+      name: "Groom's cut at home",
+      priceKind: "one_price",
+      unit: null,
+      lengthMinutes: 60,
+    });
+    const written = catalog.written();
+    const owner: TurnActor = {
+      personId: SAM,
+      roleAt: (businessId) => (businessId === BARBERSHOP ? "owner" : null),
+    };
+    const request = buildCommitRequest({
+      turn: {
+        id: "turn-sam-0300",
+        handleId: "handle-sam",
+        eventIds: ["evt-sam-0300"],
+        bundleId: { hash: "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", build: 1 },
+        traceId: "trace-sam-0300",
+        joinedTraceIds: [],
+        tries: 1,
+      },
+      zone: ZONE,
+      businessId: BARBERSHOP,
+      actor: owner,
+      units: [{ writes: withCatalog(noWrites({ step: "S11-54", choice: null }), written), answer: null }],
+    });
+    expect(contractChecks().k05("commitTurn.request", request)).toEqual([]);
+    expect(request.writes.state).toEqual(written.state);
+    expect(request.writes.state.map((write) => [write.op, write.table])).toEqual([
+      ["update", "price_rules"],
+      ["insert", "price_rules"],
+      ["update", "service_money"],
+      ["insert", "services"],
+    ]);
+    expect(request.versionsRead).toEqual([
+      { table: "services", rowId: "svc-lees-kids-cut", version: 1 },
+      { table: "services", rowId: "svc-lees-haircut", version: 1 },
+    ]);
+  });
+
+  it("the haircut at the shop changed to nothing taken while it keeps its $20 fee is refused; clearing the fee too passes (refuse-fee-on-nothing-taken.json)", async () => {
+    const { catalog } = catalogAt(new Store(seedRows(SEEDS)));
+    // The fixture's change: the shop haircut's path to list|none|counter, its $20 fee kept.
+    const change = {
+      wayId: "way-lees-haircut-shop",
+      serviceId: "svc-lees-haircut",
+      path: "list|none|counter",
+    };
+    await expect(catalog.updateWay(change)).rejects.toMatchObject({ reason: "feeOnNothingTaken" });
+    const cleared = await catalog.updateWay({ ...change, feeCents: null });
+    expect(cleared.writes.state).toEqual([
+      {
+        op: "update",
+        table: "service_money",
+        key: { id: "way-lees-haircut-shop" },
+        expectVersion: 1,
+        set: { path: "list|none|counter", fee_cents: null, currency: null },
+      },
+    ]);
   });
 
   it("refuses a kind the business does not have, and a per-unit price with no unit", async () => {
