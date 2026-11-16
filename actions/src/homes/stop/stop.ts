@@ -19,8 +19,11 @@
 //   - textsYes: whether the person holds a yes to texts at the business: the person's own K-29 texts row that decides for
 //     this contact (K-29 README: the newest of the business's own rows and the rows for every business), not withdrawn;
 //     or, with none on file, the person texting in from this number in this turn (their own number, in the thread they
-//     opened: S13-19 "Default: the channel they're using"). A K-29 row is written only for a yes words.ts counts: T-307's
-//     yes() refuses someone else's word (notFromThem) and a contact that is not theirs (notTheirContact);
+//     opened: S13-19 "Default: the channel they're using"; a clock turn carries no text, so it never counts). K-29 v1
+//     has no column for whose word a yes was, so a row is read as the yes its writer let through: T-307's yes() refuses
+//     someone else's word by text or email (notFromThem) and a contact that is not theirs (notTheirContact), and a step
+//     that records a yes on a page or through an AI asks words.ts's yesCounts first, since there no handle shows whose
+//     word it is;
 //   - mayText: "texts" or "noTexts", with why. A safety line and the stop's one reply are never bound by a stop (RULES
 //     4.12, 7.3; arch 02 line 111); how they go is the contact home's and T-307's. Anything else to a stopped number is
 //     "noTexts", but a text about a new booking whose fresh yes came from that number (see default 3);
@@ -41,9 +44,10 @@
 //      in this number's own turn, for this business and booking, newer than the stop (T-317's stopped.ts default 1: the
 //      record does not say who gave an older yes or from where, as limit 8's notKnown). A stop whose time is not known
 //      lets no yes past it (T-317 default 2).
-//   4. Texting in counts as a yes only while no K-29 row decides for the contact: a withdrawn yes stays withdrawn when
-//      they text in (only START or a fresh yes turns it back on: RULES 7.5), and a stopped number's text gets only the
-//      guard's one fixed reply (RULES 7.3; T-268), which is a stop reply.
+//   4. Texting in is a turn of the contact's own handle that carries its texts, as the caller's turn says (TurnRef.texted;
+//      a clock turn never), and it counts as a yes only while no K-29 row decides for the contact: a withdrawn yes stays
+//      withdrawn when they text in (only START or a fresh yes turns it back on: RULES 7.5), and a stopped number's text
+//      gets only the guard's one fixed reply (RULES 7.3; T-268), which is a stop reply.
 //   5. The one case (RULES 7.4 [lawyer]; S13-32: "Inside a legal cancel period, a stop that replies to the cancel notice
 //      counts as the cancel. So does one that replies to a text about that sold work."): only the sold work it answers
 //      is cancelled, never a booked visit; whether the stop answers that notice or text, inside its legal cancel period,
@@ -91,10 +95,15 @@ export interface StopReading {
   readonly texts: readonly TextsRow[];
 }
 
-/** The turn a message answers: its id and the handle whose texts it batches (K-05 v1 turn). */
+/** The turn a message answers: its id, the handle it batches, and whether it carries texts from it (K-05 v1 turn). */
 export interface TurnRef {
   readonly id: string;
   readonly handleId: string;
+  /**
+   * The turn batches texts sent from that handle. A clock turn carries a clock row's firing and no text (K-05 v1 default
+   * 9), so it is never anyone texting in.
+   */
+  readonly texted: boolean;
 }
 
 /** One message the stop home rules on. */
@@ -266,9 +275,15 @@ function checkMessage(message: StopMessage): void {
     throw new StopHomeError("the message's stopReply is not true or false");
   if (bookingId !== null && !isId(bookingId)) throw new StopHomeError("the message's booking is not an id");
   if (turn === null) return;
-  const { id, handleId }: Record<string, unknown> = { ...message.turn };
+  const { id, handleId, texted }: Record<string, unknown> = { ...message.turn };
   if (!isId(id) || !isId(handleId)) throw new StopHomeError("the message's turn has no id or no handle");
+  if (typeof texted !== "boolean")
+    throw new StopHomeError("the message's turn's texted is not true or false");
 }
+
+/** The person texting in from this contact in this turn: a turn of its own handle that carries their texts. */
+const textingIn = (reading: StopReading, message: StopMessage): boolean =>
+  message.turn !== null && message.turn.texted && message.turn.handleId === reading.handleId;
 
 // ---- the rules -------------------------------------------------------------------------------------------------------
 
@@ -318,13 +333,13 @@ function yesOf(reading: StopReading, message: StopMessage): TextsYes {
     theirs.filter((row) => row.businessId === businessId || row.businessId === null),
   );
   if (deciding === null) {
-    return message.turn?.handleId === reading.handleId ? answer(true, "textingIn") : answer(false, "none");
+    return textingIn(reading, message) ? answer(true, "textingIn") : answer(false, "none");
   }
   if (deciding.revoked) return answer(false, "withdrawn", deciding.id);
   // A START turns back on a yes they gave here; it never makes one where they gave none (default 2).
   const isStart = deciding.businessId === null;
   if (isStart && !atBusiness.some((row) => !row.revoked)) {
-    return message.turn?.handleId === reading.handleId ? answer(true, "textingIn") : answer(false, "none");
+    return textingIn(reading, message) ? answer(true, "textingIn") : answer(false, "none");
   }
   return answer(true, "standingYes", deciding.id);
 }
@@ -343,9 +358,9 @@ const pastStop = (message: StopMessage): boolean =>
 /** Whether a fresh yes on this message's booking, from that number in this turn, lifts a stopped number (default 3). */
 function freshYesLifts(reading: StopReading, message: StopMessage, since: Date | null): boolean {
   const { turn, bookingId } = message;
-  const { personId, businessId, handleId } = reading;
+  const { personId, businessId } = reading;
   if (since === null || turn === null || bookingId === null || businessId === null) return false;
-  if (turn.handleId !== handleId) return false;
+  if (!textingIn(reading, message)) return false;
   return textsOf(reading).some(
     (row) =>
       !row.revoked &&

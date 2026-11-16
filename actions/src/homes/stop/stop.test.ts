@@ -101,9 +101,11 @@ const TEXTS: TextDecision = { ruling: "texts", why: "yes" };
 const STOPPED: TextDecision = { ruling: "noTexts", why: "stopped" };
 const NO_YES: TextDecision = { ruling: "noTexts", why: "noYes" };
 
-/** Alex's own turn (K-04 seed handle-alex) and Sam's, the barbershop owner's. */
-const ALEX_TURN: TurnRef = { id: "turn-alex-later", handleId: "handle-alex" };
-const SAM_TURN: TurnRef = { id: "turn-sam-later", handleId: "handle-sam" };
+/** Alex's own turn (K-04 seed handle-alex) and Sam's, the barbershop owner's, each carrying its own texts. */
+const ALEX_TURN: TurnRef = { id: "turn-alex-later", handleId: "handle-alex", texted: true };
+const SAM_TURN: TurnRef = { id: "turn-sam-later", handleId: "handle-sam", texted: true };
+/** A clock turn on Alex's handle: a clock row's firing, no text of his (K-05 v1 default 9). */
+const ALEX_CLOCK_TURN: TurnRef = { id: "turn-alex-clock", handleId: "handle-alex", texted: false };
 
 /**
  * The seeds with Alex's own yes to texts at both businesses he is a customer of (K-04 seed-booking-head: his haircut at
@@ -253,7 +255,7 @@ describe("a number given by someone else has no yes (S13-32; RULES 7.1)", () => 
     expect(mayText(maya, message({ bookingId: "booking-maya-haircut", turn: ALEX_TURN }))).toEqual(NO_YES);
 
     // Her own text from her mobile, in her own turn, is her own number given (S13-19: the channel they're using) ...
-    const mayaTurn: TurnRef = { id: "turn-maya-asks", handleId: "handle-maya" };
+    const mayaTurn: TurnRef = { id: "turn-maya-asks", handleId: "handle-maya", texted: true };
     expect(mayText(maya, message({ sendClass: "quick_reply", turn: mayaTurn }))).toEqual({
       ruling: "texts",
       why: "textingIn",
@@ -338,7 +340,7 @@ describe("a team join gives one (S13-32; S2-05 under MC C9)", () => {
 describe("Hard invariant: after STOP for business A, the module answers 'no texts' for business B too, until START (MC C1)", () => {
   const BUSINESSES = [BARBERSHOP, YOGA_STUDIO, MOVERS, null] as const;
   const BOOKINGS = [null, "booking-alex-haircut", "booking-alex-workshop"] as const;
-  const TURNS = [null, ALEX_TURN, SAM_TURN] as const;
+  const TURNS = [null, ALEX_TURN, ALEX_CLOCK_TURN, SAM_TURN] as const;
 
   it("before his STOP, Alex's yes stands at both businesses he gave it to", async () => {
     const world = await alexWithYeses();
@@ -397,8 +399,8 @@ describe("Hard invariant: after STOP for business A, the module answers 'no text
               });
             }
       }
-    // 4 businesses (and Rosie's own) x 2 sides x 3 classes x 3 bookings x 3 turns.
-    expect(count).toBe(216);
+    // 3 businesses and Rosie's own x 2 sides x 3 classes x 3 bookings x 4 turns.
+    expect(count).toBe(288);
   });
 
   it("until START: his START turns texts back on where he gave a yes, and makes none where he gave none", async () => {
@@ -427,6 +429,8 @@ describe("Hard invariant: after STOP for business A, the module answers 'no text
       ruling: "texts",
       why: "textingIn",
     });
+    // A clock turn on his handle carries no text of his: it is never him texting in.
+    expect(mayText(movers, message({ sendClass: "quick_reply", turn: ALEX_CLOCK_TURN }))).toEqual(NO_YES);
   });
 
   it("either the stopped flag or the K-29 STOP row alone reads as stopped (Ben: K-04 seed-phone-stopped, K-29 seed-consent-stop-row)", async () => {
@@ -456,7 +460,7 @@ describe("Hard invariant: after STOP for business A, the module answers 'no text
 
   it("a fresh yes on a new booking, sent from that number in its own turn, turns on that booking's texts only", async () => {
     const world = await alexStopped();
-    const turn: TurnRef = { id: "turn-alex-fresh", handleId: "handle-alex" };
+    const turn: TurnRef = { id: "turn-alex-fresh", handleId: "handle-alex", texted: true };
     const fresh = await recordYes(
       world,
       YOGA_STUDIO,
@@ -480,8 +484,11 @@ describe("Hard invariant: after STOP for business A, the module answers 'no text
       ruling: "texts",
       why: "freshYes",
     });
-    // Another booking, no booking, no turn or another turn: still stopped.
+    // Another booking, no booking, no turn, another turn, or the same turn read as carrying no text: still stopped.
     expect(mayText(yoga, message({ bookingId: "booking-alex-workshop", turn }))).toEqual(STOPPED);
+    expect(
+      mayText(yoga, message({ bookingId: "booking-alex-yoga-new", turn: { ...turn, texted: false } })),
+    ).toEqual(STOPPED);
     expect(mayText(yoga, message({ bookingId: null, turn }))).toEqual(STOPPED);
     expect(mayText(yoga, message({ bookingId: "booking-alex-yoga-new" }))).toEqual(STOPPED);
     expect(mayText(yoga, message({ bookingId: "booking-alex-yoga-new", turn: ALEX_TURN }))).toEqual(STOPPED);
@@ -626,7 +633,10 @@ describe("the stop home registers with the home registry as the S13-32 home", ()
     const context: StopHomeContext = {
       stop: {
         reading: sam,
-        message: message({ sendClass: "quick_reply", turn: { id: "turn-sam-join", handleId: "handle-sam" } }),
+        message: message({
+          sendClass: "quick_reply",
+          turn: { id: "turn-sam-join", handleId: "handle-sam", texted: true },
+        }),
         word: { bareCancel: false, answers: "visitText", inLegalCancelPeriod: false },
       },
     };
@@ -738,6 +748,9 @@ describe("a contact or a reading the home cannot text or read fails closed, nami
     for (const reading of bad) expect(() => mayText(reading, message())).toThrow(StopHomeError);
     const badMessage = { ...message(), sendClass: "marketing" } as unknown as StopMessage;
     expect(() => mayText(alex, badMessage)).toThrow(StopHomeError);
+    // A turn that does not say whether it carries texts is refused, never read as texting in.
+    const unsaidTurn = { ...message(), turn: { id: "turn-alex-later", handleId: "handle-alex" } };
+    expect(() => mayText(alex, unsaidTurn as unknown as StopMessage)).toThrow(StopHomeError);
     const badWord = {
       bareCancel: false,
       answers: "refund",
