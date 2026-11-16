@@ -1,17 +1,23 @@
 // T-140, C7: trade text that says Rosie or Rosie's team checks, looks up or has read a license, permit, certificate,
-// insurance or carrier status is the business's own word (MC C7; D96; RULES 10.1; S13-11). Proofs of the card that belong
-// to C7:
+// insurance or carrier status is the business's own word (MC C7; D96; RULES 10.1; S13-11); so is a free-text pf rule
+// that waits on a paper that "checks out", or says one is "checked like a license", and names no one who checks (the
+// lead's ruling on MC C7's count, DL-884). Proofs of the card that belong to C7:
 //   - over all 243 trades, C7 flags the texts in the snapshot below, MC C7's five examples among them (acupuncturist,
-//     camp, movers, tree, dog-walker); the count is 31 trade files, where MC C7 says the Nov 4 check listed 45 (how this
-//     build counts: c7.ts CLAIM_PATTERNS, each phrase with its trade file's example);
-//   - after it, no text a trade's compiled overlay holds says Rosie or Rosie's team checks a paper, and each text it
-//     flagged carries the C7 marker, the rest of each text as written; the business's own word ("Rosie never looks a
-//     license up") is left as it is;
-//   - in the bundle, the compiled overlays of the five example trades say no such thing, and each flagged pf block
-//     carries the marker;
+//     camp, movers, tree, dog-walker), in 59 trade files: 31 whose texts name Rosie or Rosie's team as the one who
+//     checks (c7.ts CLAIM_PATTERNS), and 28 more whose pf blocks wait on a paper no one named checks (c7.ts
+//     PASSIVE_PATTERNS: the pf.license blocks of 19 building trades; appraiser, energy-audit, home-engineer, inspector,
+//     surveyor, locksmith, towing, property-manager and gym). MC C7 says the Nov 4 check listed 45 such trade files; that
+//     list is not available, so this build pins its own count, 59, each phrase with its trade file's example in c7.ts;
+//   - after it, no text a trade's compiled overlay holds says Rosie or Rosie's team checks a paper, no pf block waits on
+//     a paper no one named checks, and each text it flagged carries the C7 marker, the rest of each text as written; the
+//     business's own word ("Rosie never looks a license up") is left as it is;
+//   - in the bundle, the compiled overlays of the five example trades and two passive ones (concrete, gym) say no such
+//     thing, and each flagged pf block carries the marker;
 //   - a rename's or swap's first side (the master's own line) and a branch label are never changed; a claim in a message
 //     a person reads stops the build;
 //   - every change is tagged MC:C7, and C7 changes no step in the frame.
+// Not here: an op's words that wait on a paper that checks out (movers' junk hauling, driving-school's learner's permit)
+// belong to a step that waits, CQ-347's; C7 reads a passive wait in the pf blocks alone.
 import { describe, expect, it, vi } from "vitest";
 import type { FlowLetter } from "../graph/types.ts";
 import { buildBundle } from "../emit";
@@ -21,11 +27,14 @@ import { applyTrade } from "../overlay/apply";
 import {
   C7ClaimError,
   C7_MARKER,
+  CLAIM_PATTERNS,
   OWN_WORD,
+  PF_CLAIM_PATTERNS,
   c7,
   findClaims,
   markClaims,
   ownWord,
+  patternsAt,
   renderMarks,
   type MarkedTrade,
 } from "./c7";
@@ -44,6 +53,44 @@ const EXAMPLES: readonly (readonly [trade: string, where: string])[] = [
   ["movers", "pluginText.pf.license.status_any_day"],
   ["tree", "pluginText.pf.license.trust"],
   ["dog-walker", "A ops[75].more[0]"],
+];
+
+/** Two pf rules that wait on a paper no one named checks (the lead's ruling, DL-884): the trade and the text. */
+const PASSIVE_EXAMPLES: readonly (readonly [trade: string, where: string])[] = [
+  ["concrete", "pluginText.pf.license.blocks[0]"],
+  ["gym", "pluginText.pf.license.coachCertificate"],
+];
+
+/** The 28 trade files C7 flags for a pf rule that waits on a paper no one named checks, and for nothing else. */
+const PASSIVE_ONLY: readonly string[] = [
+  "appraiser",
+  "closets",
+  "concrete",
+  "contractor",
+  "deck",
+  "demolition",
+  "drywall",
+  "energy-audit",
+  "excavation",
+  "foundation",
+  "glass-doors",
+  "gutters",
+  "gym",
+  "home-engineer",
+  "inspector",
+  "insulation",
+  "irrigation",
+  "locksmith",
+  "masonry",
+  "painter",
+  "paving",
+  "property-manager",
+  "radon",
+  "roofer",
+  "security",
+  "siding",
+  "surveyor",
+  "towing",
 ];
 
 const memo = new Map<string, { trade: LoadedTrade; done: MarkedTrade }>();
@@ -121,6 +168,48 @@ describe("what C7 counts as a claim", () => {
       expect(findClaims(text), text).toStrictEqual([]);
   });
 
+  it("reads a wait on a paper that checks out, or one checked like a license, as a claim in a pf block alone", () => {
+    const passive = [
+      "No concrete work goes live until the company's registration or license checks out, where one is required",
+      "A job above the owner's job-size limit is not offered until the firm's license checks out, where the state's form requires one",
+      "Where the state licenses appraisers: no appraisal is offered until the company's and the appraiser's numbers check out.",
+      "A person whose license doesn't check out is never sent.",
+      "Where the state's form says a license is needed and none checks out, the work stays offline in that state.",
+      "No moving goes live until the company's authority or permit checks out",
+      "a switch from the state's form: where the state requires a certificate for a fitness coach, it's asked and checked like a license;",
+      "the studio's number and each designer's are checked like any license.",
+    ];
+    for (const text of passive) {
+      expect(findClaims(text, PF_CLAIM_PATTERNS), text).toHaveLength(1);
+      expect(findClaims(text), text).toStrictEqual([]);
+    }
+    expect(patternsAt("pluginText.pf.license.blocks[0]")).toBe(PF_CLAIM_PATTERNS);
+    expect(patternsAt("A ops[11].does")).toBe(CLAIM_PATTERNS);
+    expect(patternsAt("B rename[7][1]")).toBe(CLAIM_PATTERNS);
+    // An op's words that wait on a permit belong to a step that waits (CQ-347's): read with CLAIM_PATTERNS, they stay.
+    expect(
+      findClaims(
+        "Junk hauling is set up, under the company's hauler permit. AI assistants can book it once the permit checks out.",
+        patternsAt("A ops[11].say[2][2]"),
+      ),
+    ).toStrictEqual([]);
+    for (const text of [
+      "Nothing. No license is checked, so nothing waits on one.",
+      "Nothing. No license is required and none is checked, so nothing waits on one.",
+      "For movers, a driver whose truck's weight needs a commercial license gives it here, shown as given like a license, not checked.",
+      "Any fact the state's rules require, like a license number, is on it.",
+      "Rosie never says a license, certificate or insurance is confirmed; anything shown is the business's own word.",
+      OWN_WORD,
+    ])
+      expect(findClaims(text, PF_CLAIM_PATTERNS), text).toStrictEqual([]);
+    expect(
+      ownWord(
+        "a switch from the state's form: where the state requires a certificate for a fitness coach, it's asked and checked like a license; otherwise a coach's certificate and CPR card are the business's word",
+        PF_CLAIM_PATTERNS,
+      ),
+    ).toBe(`${OWN_WORD} otherwise a coach's certificate and CPR card are the business's word`);
+  });
+
   it("replaces each run of claim sentences with OWN_WORD and keeps the text's other sentences", () => {
     expect(
       ownWord(
@@ -143,15 +232,23 @@ describe("what C7 counts as a claim", () => {
 });
 
 describe("C7 over all 243 trades", () => {
-  it("flags the texts below, MC C7's five examples among them, in 31 trade files (MC C7: the Nov 4 check listed 45)", () => {
+  it("flags the texts below, MC C7's five examples among them, in 59 trade files: 31 that name Rosie or Rosie's team, 28 more with a passive wait (MC C7: the Nov 4 check listed 45)", () => {
     expect(ALL).toHaveLength(243);
     const flagged: Record<string, string[]> = {};
+    const namesRosie: string[] = [];
     for (const id of ALL) {
-      const where = marked(id).done.marked.map((one) => one.where);
+      const { done } = marked(id);
+      const where = done.marked.map((one) => one.where);
       if (where.length > 0) flagged[id] = where;
+      if (done.marked.some((one) => findClaims(one.before, CLAIM_PATTERNS).length > 0)) namesRosie.push(id);
     }
-    for (const [id, where] of EXAMPLES) expect(flagged[id], id).toContain(where);
-    expect(Object.keys(flagged)).toHaveLength(31);
+    for (const [id, where] of [...EXAMPLES, ...PASSIVE_EXAMPLES]) expect(flagged[id], id).toContain(where);
+    // 31 trade files name Rosie or Rosie's team as the one who checks (run 1's count, unchanged); 28 more only wait on a
+    // paper no one named checks, in their pf blocks; 59 in all, pinned as this build counts them (never padded or trimmed
+    // to MC C7's 45, whose list is not available).
+    expect(namesRosie).toHaveLength(31);
+    expect(Object.keys(flagged).filter((id) => !namesRosie.includes(id))).toStrictEqual(PASSIVE_ONLY);
+    expect(Object.keys(flagged)).toHaveLength(59);
     expect(flagged).toMatchInlineSnapshot(`
       {
         "acupuncturist": [
@@ -160,6 +257,9 @@ describe("C7 over all 243 trades", () => {
         "appliance": [
           "A ops[2].more[0]",
           "B ops[10].more[0]",
+        ],
+        "appraiser": [
+          "pluginText.pf.license.blocks_live",
         ],
         "band": [
           "B rename[7][1]",
@@ -171,11 +271,21 @@ describe("C7 over all 243 trades", () => {
           "A ops[5].does",
           "B ops[5].does",
         ],
+        "closets": [
+          "pluginText.pf.license.blocks[0]",
+        ],
         "clown": [
           "B rename[5][1]",
         ],
         "comedian": [
           "B rename[5][1]",
+        ],
+        "concrete": [
+          "pluginText.pf.license.blocks[0]",
+        ],
+        "contractor": [
+          "pluginText.pf.license.blocks[0]",
+          "pluginText.pf.license.design_studio",
         ],
         "dance": [
           "A ops[70].does",
@@ -186,6 +296,12 @@ describe("C7 over all 243 trades", () => {
           "A ops[84].does",
           "B ops[6].does",
           "B ops[81].does",
+        ],
+        "deck": [
+          "pluginText.pf.license.blocks[0]",
+        ],
+        "demolition": [
+          "pluginText.pf.license.blocks[0]",
         ],
         "detailing": [
           "A ops[11].does",
@@ -200,19 +316,61 @@ describe("C7 over all 243 trades", () => {
           "B ops[25].does",
         ],
         "driving-school": [
+          "pluginText.pf.license.blocks",
           "A ops[103].does",
           "B ops[165].does",
+        ],
+        "drywall": [
+          "pluginText.pf.license.blocks[0]",
+        ],
+        "energy-audit": [
+          "pluginText.pf.license.blocks_live",
+        ],
+        "excavation": [
+          "pluginText.pf.license.blocks[0]",
         ],
         "farrier": [
           "A ops[45].does",
           "B ops[20].does",
         ],
+        "foundation": [
+          "pluginText.pf.license.blocks[0]",
+        ],
+        "glass-doors": [
+          "pluginText.pf.license.blocks[0]",
+        ],
+        "gutters": [
+          "pluginText.pf.license.blocks[0]",
+        ],
+        "gym": [
+          "pluginText.pf.license.coachCertificate",
+        ],
+        "home-engineer": [
+          "pluginText.pf.license.blocks_live",
+        ],
+        "inspector": [
+          "pluginText.pf.license.blocks_live",
+        ],
+        "insulation": [
+          "pluginText.pf.license.blocks[0]",
+        ],
         "interior": [
           "A rename[121][1]",
           "B rename[434][1]",
         ],
+        "irrigation": [
+          "pluginText.pf.license.blocks[0]",
+        ],
+        "locksmith": [
+          "pluginText.pf.license.blocks going live",
+        ],
+        "masonry": [
+          "pluginText.pf.license.blocks[0]",
+        ],
         "movers": [
           "pluginText.pf.license.status_any_day",
+          "pluginText.pf.license.blocks[0]",
+          "pluginText.pf.staff.licenses",
         ],
         "music": [
           "pluginText.pf.license.need",
@@ -220,8 +378,14 @@ describe("C7 over all 243 trades", () => {
         "orthopedist": [
           "B ops[63].does",
         ],
+        "painter": [
+          "pluginText.pf.license.blocks[0]",
+        ],
         "party-characters": [
           "B rename[5][1]",
+        ],
+        "paving": [
+          "pluginText.pf.license.blocks[0]",
         ],
         "pet-taxi": [
           "A ops[50].does",
@@ -239,6 +403,12 @@ describe("C7 over all 243 trades", () => {
           "A ops[62].does",
           "B ops[66].does",
         ],
+        "property-manager": [
+          "pluginText.pf.license.blocks going live",
+        ],
+        "radon": [
+          "pluginText.pf.license.blocks[0]",
+        ],
         "rentals": [
           "A ops[20].does",
           "B ops[20].does",
@@ -250,9 +420,21 @@ describe("C7 over all 243 trades", () => {
         "restoration": [
           "pluginText.pf.license.certifications",
         ],
+        "roofer": [
+          "pluginText.pf.license.blocks[0]",
+        ],
+        "security": [
+          "pluginText.pf.license.blocks[0]",
+        ],
+        "siding": [
+          "pluginText.pf.license.blocks[0]",
+        ],
         "sitter": [
           "A ops[3].does",
           "B ops[3].does",
+        ],
+        "surveyor": [
+          "pluginText.pf.license.blocks_live",
         ],
         "tax": [
           "A ops[80].does",
@@ -264,7 +446,11 @@ describe("C7 over all 243 trades", () => {
           "A ops[35].does",
           "B ops[75].does",
         ],
+        "towing": [
+          "pluginText.pf.license.blocks going live",
+        ],
         "tree": [
+          "pluginText.pf.license.blocks[0]",
           "pluginText.pf.license.trust",
         ],
         "tutor": [
@@ -277,16 +463,19 @@ describe("C7 over all 243 trades", () => {
     `);
   });
 
-  it("leaves no text the compiled overlay holds saying Rosie checks a paper, and marks each text it changed", () => {
+  it("leaves no text the compiled overlay holds saying Rosie checks a paper, no pf block waiting on a paper no one named checks, and marks each text it changed", () => {
     for (const id of ALL) {
       const { trade, done } = marked(id);
-      for (const leaf of tradeTexts(done.trade))
+      for (const leaf of tradeTexts(done.trade)) {
         expect(findClaims(leaf.text), `${id} ${leaf.path}`).toStrictEqual([]);
+        expect(findClaims(leaf.text, patternsAt(leaf.path)), `${id} ${leaf.path}`).toStrictEqual([]);
+      }
       for (const one of done.marked) {
+        const patterns = patternsAt(one.where);
         expect(one.tag).toBe("MC:C7");
-        expect(findClaims(one.before).length, `${id} ${one.where}`).toBeGreaterThan(0);
+        expect(findClaims(one.before, patterns).length, `${id} ${one.where}`).toBeGreaterThan(0);
         expect(one.after, `${id} ${one.where}`).toContain(C7_MARKER);
-        expect(one.after, `${id} ${one.where}`).toBe(ownWord(one.before));
+        expect(one.after, `${id} ${one.where}`).toBe(ownWord(one.before, patterns));
       }
       // Every text it did not flag is as the trade wrote it.
       const changed = done.marked.map((one) => one.after);
@@ -353,15 +542,19 @@ describe("C7 over all 243 trades", () => {
 });
 
 describe("C7 in the bundle", () => {
-  it("leaves no claim in the compiled overlays of MC C7's five example trades, and marks each flagged pf block", async () => {
-    const ids = EXAMPLES.map(([id]) => id);
+  it("leaves no claim in the compiled overlays of MC C7's five example trades and two passive ones, and marks each flagged pf block", async () => {
+    const ids = [...EXAMPLES, ...PASSIVE_EXAMPLES].map(([id]) => id);
     const built = await buildBundle({ trades: ids, master });
     for (const id of ids) {
       const overlay = built.bundle.trades[id] as {
         pluginText: Record<string, string>;
         flows: Record<FlowLetter, Record<string, unknown>>;
       };
-      for (const leaf of texts(overlay, id)) expect(findClaims(leaf.text), leaf.path).toStrictEqual([]);
+      for (const leaf of texts(overlay, id)) {
+        // A pf block is stored whole as one text (K-01 pluginText): read it with the pf blocks' patterns.
+        const patterns = leaf.path.startsWith(`${id}.pluginText.`) ? PF_CLAIM_PATTERNS : CLAIM_PATTERNS;
+        expect(findClaims(leaf.text, patterns), leaf.path).toStrictEqual([]);
+      }
       for (const one of marked(id).done.marked) {
         const block = /^pluginText\.(pf\.[a-z_]+)/.exec(one.where)?.[1];
         if (block !== undefined) expect(overlay.pluginText[block], `${id} ${block}`).toContain(C7_MARKER);

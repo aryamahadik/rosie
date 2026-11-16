@@ -183,7 +183,11 @@ function kvKey(id: BundleId, part: string): string {
  * Packs the inputs into a bundle: corrects each trade's words ops that would put back words a Master Correction replaced
  * (correctWordsOps), compiles both flows and each trade, writes the manifest, checks the whole bundle against K-01 v1
  * (BundleValidationError when it is refused) and serializes each stored value.
- * Before its words ops are corrected, each trade takes C5's fill (c5.ts correctTrade(): insurance's facts).
+ * Before its words ops are corrected, each trade takes the Master Corrections that act on the trade itself, in id order:
+ * C5's fill (c5.ts correctTrade(): insurance's facts), C7's marks (c7.ts markClaims(): a text that says Rosie checks a
+ * paper, or a pf rule that waits on a paper no one named checks, becomes the business's own word, tagged MC:C7) and C8's
+ * void offs (c8.ts voidOffs(): the whole-step D96 offs MC C8 voids are dropped before the applier; every other D96 off
+ * stays).
  */
 export function emitBundle(input: EmitInputs): EmitResult {
   const byId = new Map(input.trades.map((trade) => [trade.id, trade]));
