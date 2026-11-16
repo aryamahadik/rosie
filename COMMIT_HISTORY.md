@@ -2,9 +2,44 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 698, [`f17a5e3`](https://github.com/aryamahadik/rosie/commit/f17a5e3), 2026-11-16 07:00:57 UTC.
+- **Through:** commit 700, [`4dbb576`](https://github.com/aryamahadik/rosie/commit/4dbb576), 2026-11-16 07:42:16 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 700. docs: COMMIT\_HISTORY.md through commit 698 (f17a5e3, \#709) (\#710)
+
+- **Commit:** [`4dbb576`](https://github.com/aryamahadik/rosie/commit/4dbb576), by Arya Mahadik, 2026-11-16 07:42:16 UTC
+- **Pull request:** [#710](https://github.com/aryamahadik/rosie/pull/710) from `task/commit-history-144`, merged 2026-11-16 07:42:16 UTC. It squashed 1 branch commit:
+  - `54dfe7d` docs: COMMIT\_HISTORY.md through commit 698 (f17a5e3, \#709)
+- **Files changed:** 1 (+51 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +51 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 237 (DL-880); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 699. T-1414: sendFixedLine's core service (domain/fixed-lines) and runCore's sendFixedLine case: HELP's reply as one quick\_reply outbox row to the turn's own handle, no business, built through T-307's outboxRows and read only through CoreDeps.flags.messagesReader; a stopped phone answers phoneStopped and writes nothing; the row keyed by the caller's turn, the line and the recipient, a second HELP of the same commit answering the first's row as repeated (DL-871); no flags port answers portNotWired, any other line or send class or an actor's send noService; made alone notBuilt (CQ-44); T-1140's flagsCalls pin gains sendFixedLine (DL-872) (\#711)
+
+- **Commit:** [`b312417`](https://github.com/aryamahadik/rosie/commit/b312417), by Arya Mahadik, 2026-11-16 07:42:12 UTC
+- **Pull request:** [#711](https://github.com/aryamahadik/rosie/pull/711) from `task/T-1414`, merged 2026-11-16 07:42:13 UTC. It squashed 1 branch commit:
+  - `5cc4143` T-1414: sendFixedLine's core service (domain/fixed-lines) and runCore…
+- **Files changed:** 9 (+1599 −11), by folder:
+  - `actions/src/commit/core/` core-fixed-lines.test.ts +646 −0, core.test.ts +5 −4, core.ts +28 −2, errors.ts +3 −2, index.ts +4 −3
+  - `actions/src/domain/fixed-lines/` fixed-lines.test.ts +495 −0, fixed-lines.ts +311 −0, index.ts +30 −0, test-support.ts +77 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 698. docs: COMMIT\_HISTORY.md through commit 696 (e34bc58, \#707) (\#709)
 
