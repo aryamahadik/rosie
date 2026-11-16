@@ -94,8 +94,8 @@
 //                its side checked first, in one of the gate's client slots): the same commit with no business
 //                (keywordCommitDeps), the same turn-row port, sealer and bundles; the turn records the gate hop
 //                (TURN_RECORDS_GATE), so the door records none, and no words are held. Where no door is bound (a test's
-//                doubles, staging unbound, production's closed gate), such a call goes to the base, which refuses it
-//                (noBusinessScope) before anything is read, as it always has.
+//                doubles, staging unbound), such a call goes to the base, which refuses it (noBusinessScope) before
+//                anything is read, as it always has; in production the gate stays closed (./picks.ts).
 //   composeInput T-560: K-09 composeInput through @rosie/actions' turn face (T-1141, createTurnFace with its calls: the
 //                Tool API base with K-09 v1.6's checks and the call's own business scope; T-309's compose input with
 //                T-1174's term facts over T-1141's row binding). Its reads are handed in by the root
