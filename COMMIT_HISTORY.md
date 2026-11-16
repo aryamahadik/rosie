@@ -2,9 +2,148 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 700, [`4dbb576`](https://github.com/aryamahadik/rosie/commit/4dbb576), 2026-11-16 07:42:16 UTC.
+- **Through:** commit 705, [`647ca13`](https://github.com/aryamahadik/rosie/commit/647ca13), 2026-11-16 10:34:08 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 705. docs: COMMIT\_HISTORY.md through commit 703 (9a32ac9, \#712) (\#715)
+
+- **Commit:** [`647ca13`](https://github.com/aryamahadik/rosie/commit/647ca13), by Arya Mahadik, 2026-11-16 10:34:08 UTC
+- **Pull request:** [#715](https://github.com/aryamahadik/rosie/pull/715) from `task/commit-history-146`, merged 2026-11-16 10:34:08 UTC. It squashed 1 branch commit:
+  - `67bf5be` docs: COMMIT\_HISTORY.md through commit 703 (9a32ac9, \#712)
+- **Files changed:** 1 (+85 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +85 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 239 (DL-887); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 704. T-1413: the guard's every-business keyword door: a core-only commit with no business on the runtime side, its SQL in db/repo (\#716)
+
+- **Commit:** [`dda7590`](https://github.com/aryamahadik/rosie/commit/dda7590), by Arya Mahadik, 2026-11-16 10:34:04 UTC
+- **Pull request:** [#716](https://github.com/aryamahadik/rosie/pull/716) from `task/T-1413`, merged 2026-11-16 10:34:05 UTC. It squashed 3 branch commits:
+  - `c4dd922` T-1413: the keyword door, the guard's every-business core-only turn c…
+  - `e10f2b1` Merge branch 'main' into task/T-1413
+  - `0b35c51` T-1413: round 2 (DL-883): the keyword door's side check and its read …
+- **Files changed:** 11 (+2608 −40), by folder:
+  - `actions/` README.md +1 −1
+  - `actions/src/tool-api/turn-face/` commit.ts +174 −20, door-test-support.ts +106 −0, door.test.ts +1060 −0, door.ts +369 −0, index.ts +22 −2
+  - `actions/src/tool-api/turn-face/pg/` calls.ts +173 −11, door.int.test.ts +428 −0, index.ts +13 −2
+  - `db/repo/` targets.int.test.ts +215 −2, targets.ts +47 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1413: the keyword door, the guard's every-business core-only turn committed on the runtime side
+
+turn-face/door.ts: createKeywordDoor checks the request against K-09, accepts only a turn caller naming no business with its turn row, coreOnly input and recordSafetyOutcome, recordStopOrStart or sendFixedLine under that same caller (else noBusinessScope or invalidRequest before a transaction opens), runs the turn face's commit in one runtime-side transaction with no business, holds the answer to K-09's response or errors, and writes the gate hop's span with no business label.
+
+commit.ts: keywordCommitDeps binds runCore's flags port by name, the no-business safety reader (owner and zone notBuilt), the door's lines (a danger outcome notBuilt) and openHolds with no business; turnCommitDeps unchanged, so a business-scoped turn keeps recordStopOrStart and setRecordFlag notBuilt portNotWired.
+
+pg/calls.ts: pgKeywordDoor over pgDoorRuntime (inRuntimeTransaction as rosie_job, rosie.business_id empty, rosie.person_id unset, assertRuntimeSide and the role checked first, then read only) and pgDoorFlags; README default 2 says where stop-recorded.json and start-recorded.json are answered now.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1413: round 2 (DL-883): the keyword door's side check and its read only move into db/repo (targets.ts enterKeywordDoorSide, beside inRuntimeTransaction, with its integration test), pgDoorRuntime calls it and sends no statement of its own; with main merged (T-1414), lead note 4's pin moves: HELP through the door commits one quick_reply row naming no business, and after a STOP answers phoneStopped, writing nothing
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 703. docs: COMMIT\_HISTORY.md through commit 700 (4dbb576, \#710) (\#712)
+
+- **Commit:** [`9a32ac9`](https://github.com/aryamahadik/rosie/commit/9a32ac9), by Arya Mahadik, 2026-11-16 09:56:35 UTC
+- **Pull request:** [#712](https://github.com/aryamahadik/rosie/pull/712) from `task/commit-history-145`, merged 2026-11-16 09:56:36 UTC. It squashed 1 branch commit:
+  - `ab122b5` docs: COMMIT\_HISTORY.md through commit 700 (4dbb576, \#710)
+- **Files changed:** 1 (+36 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +36 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 238 (DL-882); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 702. T-161: the parity harness: compiled words against the vendored functions and step.js, path by path, every difference named (\#713)
+
+- **Commit:** [`08bef1d`](https://github.com/aryamahadik/rosie/commit/08bef1d), by Arya Mahadik, 2026-11-16 09:56:31 UTC
+- **Pull request:** [#713](https://github.com/aryamahadik/rosie/pull/713) from `task/T-161`, merged 2026-11-16 09:56:32 UTC. It squashed 3 branch commits:
+  - `dbd50a1` T-161: parity harness: the compiler's pre-correction words held again…
+  - `b4c60bf` T-161: the harness test also holds private-call and the compiler's ow…
+  - `8331d36` T-161: the aba test asserts its own switches on each of its six paths…
+- **Files changed:** 2 (+1254 −0), by folder:
+  - `compiler/src/parity/` harness.test.ts +404 −0, harness.ts +850 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-161: parity harness: the compiler's pre-correction words held against the vendored lib.js, overlay-core.js and msgtext.js, and against step.js where --path can say the path
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-161: the harness test also holds private-call and the compiler's own words against step.js, and checks that a split lights other branches on another path
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-161: the aba test asserts its own switches on each of its six paths, as its title says
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 701. T-1418: K-05 v1.17: commitTurn names a phones row by its handle id when the request asks (answerPhoneRowsBy), additive (\#714)
+
+- **Commit:** [`928ab31`](https://github.com/aryamahadik/rosie/commit/928ab31), by Arya Mahadik, 2026-11-16 09:56:24 UTC
+- **Pull request:** [#714](https://github.com/aryamahadik/rosie/pull/714) from `task/T-1418`, merged 2026-11-16 09:56:25 UTC. It squashed 3 branch commits:
+  - `6be48db` T-1418: K-05 v1.17, commitTurn names a phones row by its handle id wh…
+  - `973a13e` T-1418: README v1.17 refinements: an empty handle id throws, the cons…
+  - `1c915a9` T-1418: README v1.17 wording: the twins' given, and where the clock f…
+- **Files changed:** 9 (+1317 −7), by folder:
+  - `contracts/data-access/` README.md +83 −6, data-access.v1.17.schema.json +627 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` commit-adds-dee-booking-handle-id.json +105 −0, commit-alex-phone-changed-handle-id.json +118 −0, commit-alex-start-handle-id.json +114 −0, commit-alex-stop-handle-id.json +114 −0, index.json +40 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-commit-alex-stop-answers-number.json +114 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1418: K-05 v1.17, commitTurn names a phones row by its handle id when the request asks (answerPhoneRowsBy), with its fixtures, README section and freeze record
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1418: README v1.17 refinements: an empty handle id throws, the consumers' bullets, promoted's gap, versions_read's check
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1418: README v1.17 wording: the twins' given, and where the clock firing is not bound
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 700. docs: COMMIT\_HISTORY.md through commit 698 (f17a5e3, \#709) (\#710)
 
