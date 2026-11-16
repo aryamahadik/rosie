@@ -2,9 +2,61 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 694, [`32a2eee`](https://github.com/aryamahadik/rosie/commit/32a2eee), 2026-11-16 06:00:05 UTC.
+- **Through:** commit 696, [`e34bc58`](https://github.com/aryamahadik/rosie/commit/e34bc58), 2026-11-16 06:30:34 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 696. docs: COMMIT\_HISTORY.md through commit 694 (32a2eee, \#704) (\#707)
+
+- **Commit:** [`e34bc58`](https://github.com/aryamahadik/rosie/commit/e34bc58), by Arya Mahadik, 2026-11-16 06:30:34 UTC
+- **Pull request:** [#707](https://github.com/aryamahadik/rosie/pull/707) from `task/commit-history-142`, merged 2026-11-16 06:30:34 UTC. It squashed 1 branch commit:
+  - `ff940c1` docs: COMMIT\_HISTORY.md through commit 694 (32a2eee, \#704)
+- **Files changed:** 1 (+54 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +54 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 235 (DL-877); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 695. T-362: the real model times spike, phase 1: the harness (key by name, the 40-call cap on disk), the dry run, and staging's spans as source 2 (\#706)
+
+- **Commit:** [`966f788`](https://github.com/aryamahadik/rosie/commit/966f788), by Arya Mahadik, 2026-11-16 06:30:30 UTC
+- **Pull request:** [#706](https://github.com/aryamahadik/rosie/pull/706) from `task/T-362`, merged 2026-11-16 06:30:30 UTC. It squashed 3 branch commits:
+  - `61d22f6` T-362: the real model times spike: dry run against a local stub, the …
+  - `fcec2bc` T-362: FINDINGS.md, staging's spans as source 2 (Q-41 and DL-836 answ…
+  - `3912086` T-362: keep the 40-call cap on disk (DL-870): a live run holds runs/l…
+- **Files changed:** 10 (+2998 −0), by folder:
+  - `ai/spikes/model-times/` FINDINGS.md +227 −0, model-times.test.mjs +840 −0, report.mjs +285 −0, run.mjs +389 −0, run.sh +74 −0, staging-spans.mjs +277 −0, stats.mjs +135 −0, stub.mjs +118 −0, units.mjs +451 −0, wire.mjs +202 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-362: the real model times spike: dry run against a local stub, the one live run's harness (at most 40 calls), staging's spans reader, and their tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-362: FINDINGS.md, staging's spans as source 2 (Q-41 and DL-836 answered for a quiet bundle); source 1, the one live run, waits for the user's ! run after merge
+
+Written by the lead exactly from the builder's findings_text (the harness refused the builder's write: subagents return findings as text); prettier --check passed on the file.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-362: keep the 40-call cap on disk (DL-870): a live run holds runs/live.lock (wx) before it reads the count, puts each call in runs/sent.jsonl (flushed) before it goes out, and liveCallsLogged reads that count; tests for a run killed mid-call and two runs started together; FINDINGS.md Source 1 and The one way out
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 694. docs: COMMIT\_HISTORY.md through commit 692 (a4e6fd1, \#701) (\#704)
 
