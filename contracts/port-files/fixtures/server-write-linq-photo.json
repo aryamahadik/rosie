@@ -1,0 +1,24 @@
+{
+  "call": "serverWrite",
+  "given": {
+    "now": "2026-10-19T14:20:03Z",
+    "note": "S1-12: Sam texts his price list as a photo (K-06 photo.json: event evt-sam-0004, attachment att-sam-price-list, image/jpeg). The Linq side (C-207, photos in) takes the photo's bytes from Linq and writes them here as the business's file. The key is the file reference that K-02's photo reading takes (02-contracts K-02 'Photo reading', kind price list) and that K-11's photo fileId names. Size and hash are placeholders."
+  },
+  "request": {
+    "kind": "photo",
+    "owner": { "kind": "business", "businessId": "biz-lees-barbershop" },
+    "mediaType": "image/jpeg",
+    "sizeBytes": 1650000,
+    "sha256": "0f9e8d7c6b5a493827160f9e8d7c6b5a493827160f9e8d7c6b5a493827160f9e",
+    "writeId": "l4q9p2r7c6e1s8u3n0k5m2v9x3",
+    "day": "2026-10-19",
+    "visibility": "private",
+    "source": { "kind": "linq", "eventId": "evt-sam-0004", "attachmentId": "att-sam-price-list" }
+  },
+  "outcome": {
+    "result": "stored",
+    "objectKey": "photo/2026-10-19/l4q9p2r7c6e1s8u3n0k5m2v9x3",
+    "storedAt": "2026-10-19T14:20:03Z",
+    "repeated": false
+  }
+}

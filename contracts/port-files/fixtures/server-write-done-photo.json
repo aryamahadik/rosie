@@ -1,0 +1,29 @@
+{
+  "call": "serverWrite",
+  "given": {
+    "now": "2026-10-22T13:10:05Z",
+    "note": "B8-17's case: nobody needed to be home, so Jordan texts DONE with a photo of the finished work at Alex's (booking-alex-drain; K-31's visit-alex-drain-1). K-31's seed-done.json is the same visit with Alex home and no photo, so this is B8-17's variant, an example. The photo is the business's own record of the visit (personId null), which B10-14's record holds as 'the photos'; K-31's visit_marks.photo_key keeps its key. Event and attachment ids, size and hash are examples."
+  },
+  "request": {
+    "kind": "photo",
+    "owner": {
+      "kind": "booking",
+      "businessId": "biz-lee-home-services",
+      "bookingId": "booking-alex-drain",
+      "personId": null
+    },
+    "mediaType": "image/jpeg",
+    "sizeBytes": 2100000,
+    "sha256": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5",
+    "writeId": "d0n3p6h9t2o5j8r1x4a7c0e3g6",
+    "day": "2026-10-22",
+    "visibility": "private",
+    "source": { "kind": "linq", "eventId": "evt-jordan-0074", "attachmentId": "att-jordan-done-photo" }
+  },
+  "outcome": {
+    "result": "stored",
+    "objectKey": "photo/2026-10-22/d0n3p6h9t2o5j8r1x4a7c0e3g6",
+    "storedAt": "2026-10-22T13:10:05Z",
+    "repeated": false
+  }
+}

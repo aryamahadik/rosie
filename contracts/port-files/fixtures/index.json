@@ -1,0 +1,260 @@
+{
+  "fixtures": [
+    {
+      "file": "upload-id-document.json",
+      "version": "v1",
+      "def": "uploadLink.exchange",
+      "expect": "accept",
+      "shows": "A signed upload for Sam's ID document on S1-10's page: his own file with no business, private, a 15-minute link for one JPEG of at most 10 MiB, sent by PUT with its type; the port makes the object key, which stays on the server (K-21 v1 upload-id-document.json's address and end)",
+      "source": "02-contracts K-13 Fixtures and Defines ('A signed upload from a secure page: kind ..., owner ..., size and type, giving a short-lived upload link and the object key; every object private'); MC C10 ('The owner uploads a photo or file of an ID document on the secure page, never in the chat'); MC 8 'Files'; K-21 v1 signedUpload and default 12; K-22 v1 id_uploads"
+    },
+    {
+      "file": "upload-price-list-photo.json",
+      "version": "v1",
+      "def": "uploadLink.exchange",
+      "expect": "accept",
+      "shows": "A signed upload for Lee's Barbershop's price list photo on the registration page: the business's file, kind priceList (K-21's pricePhoto), a 15-minute link",
+      "source": "02-contracts K-13 Fixtures; S1-12 ('Sends the price list as a photo'); K-21 v1 uploadPurpose pricePhoto; MC 8 'Files'"
+    },
+    {
+      "file": "upload-too-large.json",
+      "version": "v1",
+      "def": "uploadLink.exchange",
+      "expect": "accept",
+      "shows": "A 12,000,000-byte photo on Alex's water heater photos page gets no link: tooLarge, with the 10 MiB limit, which K-21 answers as its tooLarge",
+      "source": "K-21 v1 uploadRefusedErrors tooLarge and default 12 (10 MiB); K-21 v1.2 secureUpload and default 61; A4-07; K-30 seed-quote-owner-ok.json (booking-alex-water-heater)"
+    },
+    {
+      "file": "check-upload-stored.json",
+      "version": "v1",
+      "def": "checkUpload.exchange",
+      "expect": "accept",
+      "shows": "The second half of Sam's signed upload: the file came at 14:30:41, its bytes show a JPEG of 2,400,000 bytes as asked, so it is stored, private, and K-21's finishUpload writes S1-10",
+      "source": "K-21 v1 finishUpload ('the server checks the stored file's size and type and keeps its object key with the upload') and upload-id-finished.json; MC C10; Q-31 (kept private in R2)"
+    },
+    {
+      "file": "check-upload-not-stored.json",
+      "version": "v1",
+      "def": "checkUpload.exchange",
+      "expect": "accept",
+      "shows": "No file came to the price-list link before it lapsed: notStored, so K-21 answers uploadNotFound and nothing is kept",
+      "source": "K-21 v1 finishUpload.errors uploadNotFound ('no file came to it before it lapsed'); 02-contracts K-13 ('a short-lived upload link')"
+    },
+    {
+      "file": "check-upload-wrong-type.json",
+      "version": "v1",
+      "def": "checkUpload.exchange",
+      "expect": "accept",
+      "shows": "A file sent to a JPEG link whose leading bytes are a PDF's: wrongType, and the file is removed before the answer, so nothing refused is kept",
+      "source": "K-21 v1 finishUpload's wrongType; K-21 v1.2 default 61; K-35 v1 default 20 (no file a browser runs as a page); README default 8"
+    },
+    {
+      "file": "read-link-logged.json",
+      "version": "v1",
+      "def": "readLink.exchange",
+      "expect": "accept",
+      "shows": "Sam, the owner, opens Riley's license photo in the portal after the page entry's check (ground business): a 5-minute link served as an attachment with nosniff; the call's span is the view's log line (span-read-link-logged.json)",
+      "source": "02-contracts K-13 Fixtures and Defines ('A short signed read link, given only after the caller has checked who may see the file; views logged where RULES 4.5 asks'); RULES 4.5 ('These stay on the secure page, each view logged'); K-35 v1 document_files readers and seed-license-as-given.json; K-35 v1 default 20"
+    },
+    {
+      "file": "read-link-listing-photo.json",
+      "version": "v1",
+      "def": "readLink.exchange",
+      "expect": "accept",
+      "shows": "The public listing shows Lee's Barbershop's shop-front photo to anyone (ground listing, no person): the object stays private and the page gets a 10-minute link",
+      "source": "FS row B07; FS 6.3; S1-84; K-21 v1.1 readListing and listing-barbershop.json (the photo links); K-23 v1 business_photos; MC 8 'Files' (private)"
+    },
+    {
+      "file": "read-link-not-found.json",
+      "version": "v1",
+      "def": "readLink.exchange",
+      "expect": "accept",
+      "shows": "After the erasure delete, a read link for Riley's license photo answers notFound, the one answer for a file never stored, refused or deleted",
+      "source": "RULES 4.10 (the 45-day delete); K-35 v1 rule 8 (the object deleted before the key); 02-contracts K-13 ('Delete, for erasure under RULES 4.10')"
+    },
+    {
+      "file": "server-write-sealed-trace.json",
+      "version": "v1",
+      "def": "serverWrite.exchange",
+      "expect": "accept",
+      "shows": "A server-side write of trace-sam-0009's full detail, sealed by its writer under Sam's key: Rosie's own object, application/octet-stream, stored once under sealedTrace/<day>/<writeId>",
+      "source": "02-contracts K-13 Fixtures and Defines ('A server-side write for system objects: sealed traces (arch 02 diagram line 105)'); arch 02 diagram line 105 ('R2 · photos · forms · sealed traces'); ADR-009; K-08 v1 span-places-call.json; arch 01 line 93"
+    },
+    {
+      "file": "error-unavailable.json",
+      "version": "v1",
+      "def": "serverWrite.exchange",
+      "expect": "accept",
+      "shows": "The first try of the sealed trace's write while R2 does not answer: unavailable, nothing known stored; the writer tries again with the same writeId",
+      "source": "arch 10 line 540 (other jobs get 5 tries, then the dead-letter queue); K-08 v1 span outcome failed or timedOut"
+    },
+    {
+      "file": "server-write-parquet.json",
+      "version": "v1",
+      "def": "serverWrite.exchange",
+      "expect": "accept",
+      "shows": "The event log's rows of one UTC day written as one Parquet object, Rosie's own, under eventLogExport/<the rows' day>/<writeId>, so reports and evals read a day by its prefix",
+      "source": "02-contracts K-13 Fixtures and Defines ('the event-log Parquet export (arch 10 line 544)'); arch 10 line 544 ('Event log to R2 Parquet. Reports and evals never touch the primary'); K-08 v1 exportRow and its open gap ('the R2 keys, partitions and cadence of the Parquet export wait for K-13')"
+    },
+    {
+      "file": "server-write-linq-photo.json",
+      "version": "v1",
+      "def": "serverWrite.exchange",
+      "expect": "accept",
+      "shows": "S1-12's price list photo that came in by text, written as the business's file from its K-06 event and attachment, so the attachment id becomes a file reference",
+      "source": "02-contracts K-13 Defines ('photos that arrive by Linq (S1-09, S1-12)'); S1-12; K-06 v1 photo.json and 'attachments as file references (K-13)'; K-02's photo reading's file reference (02-contracts K-02 'Photo reading'); K-11 v1 photo.fileId"
+    },
+    {
+      "file": "server-write-repeat.json",
+      "version": "v1",
+      "def": "serverWrite.exchange",
+      "expect": "accept",
+      "shows": "A retry of the Linq photo's write with the same writeId and bytes: stored with repeated true and the first storedAt; nothing is written twice",
+      "source": "arch 10 line 540 (retries); README 'Repeats' (default 10)"
+    },
+    {
+      "file": "server-write-done-photo.json",
+      "version": "v1",
+      "def": "serverWrite.exchange",
+      "expect": "accept",
+      "shows": "B8-17's DONE photo, texted by Jordan when nobody needed to be home, written as the booking's file and the business's own record of the visit (no one person's)",
+      "source": "02-contracts K-13 Defines ('DONE photos (B8-17)'); B8-17 ('Nobody home needed: DONE with a photo'); B10-14 (the record holds 'the photos'); K-31 v1 visit_marks.photo_key and seed-done.json"
+    },
+    {
+      "file": "server-write-report.json",
+      "version": "v1",
+      "def": "serverWrite.exchange",
+      "expect": "accept",
+      "shows": "B10-19's sewer camera report video, written as Alex's booking's file, for Alex alone, before Rosie texts its secure link",
+      "source": "02-contracts K-13 Defines ('reports (B10-19)'); B10-19 ('Video and Jordan's notes'); B10-25 ('each only to that person'); README default 6 (video types)"
+    },
+    {
+      "file": "server-read-photo.json",
+      "version": "v1",
+      "def": "serverRead.exchange",
+      "expect": "accept",
+      "shows": "C-120's photo reading reads Sam's price list photo by its file reference on the server: the bytes beside the answer, its type and size as stored; no person sees it, and its span logs the read",
+      "source": "02-contracts K-13 consumers ('C-120's photo reading inputs (AI engineer)'); 02-contracts K-02 'Photo reading' ('a K-13 file reference (the object key of a photo that came in by Linq or a signed upload)'); S1-12; README default 11"
+    },
+    {
+      "file": "delete-erasure.json",
+      "version": "v1",
+      "def": "deleteObject.exchange",
+      "expect": "accept",
+      "shows": "Riley's 45-day delete: the erasure job deletes his license photo, its key unsealed from K-35's row while his key still exists, before it deletes his key",
+      "source": "02-contracts K-13 Fixtures and Defines ('Delete, for erasure under RULES 4.10. How long ID files are kept follows Q-31's default (no deletion rule is invented)'); RULES 4.10 ('A copy or delete is done in 45 days after a check it is the person'); K-35 v1 rule 8; Q-31"
+    },
+    {
+      "file": "delete-already-gone.json",
+      "version": "v1",
+      "def": "deleteObject.exchange",
+      "expect": "accept",
+      "shows": "The same delete run again after a lost answer: deleted with alreadyGone true, so the job goes on to delete the key",
+      "source": "RULES 4.10; K-35 v1 rule 8; README 'Repeats'"
+    },
+    {
+      "file": "span-upload-link.json",
+      "version": "v1",
+      "def": "filesSpan",
+      "expect": "accept",
+      "shows": "The K-08 portCall span of Sam's upload link: provider r2, call uploadLink, attempt 1; it got the step, the kind, the owner's kind, the type and the size asked, and decided ready, with no key, link or file in it",
+      "source": "K-08 v1 (contracts/event-trace README: 'portCall covers ... an R2 upload link, read link, server-side write or delete (K-13, C-219)'; provider r2; 'never the raw number or words'); K-21 v1 upload-id-document.json's request and trace ids; K-01 bundle v0's id"
+    },
+    {
+      "file": "span-read-link-logged.json",
+      "version": "v1",
+      "def": "filesSpan",
+      "expect": "accept",
+      "shows": "The view's log line for read-link-logged.json: who saw it (Sam), on what ground (business), which row's file (document_files, Riley's license photo) and when, with no key or link in it",
+      "source": "RULES 4.5 ('each view logged'); 02-contracts K-13 ('views logged where RULES 4.5 asks'); K-08 v1 portCall span and its readLink call name; K-35 v1 document_files"
+    },
+    {
+      "file": "span-delete-erasure.json",
+      "version": "v1",
+      "def": "filesSpan",
+      "expect": "accept",
+      "shows": "The erasure job's span for Riley's delete: the row whose file went, whose erasure it is, deleted",
+      "source": "RULES 4.10; K-08 v1 portCall span (job id for a job); K-35 v1 rule 8"
+    },
+    {
+      "file": "invalid/refuse-public-object.json",
+      "version": "v1",
+      "def": "uploadLink.exchange",
+      "expect": "refuse",
+      "shows": "upload-price-list-photo.json asked as a public object: refused by visibility, which is always private (with private it is upload-price-list-photo.json)",
+      "source": "02-contracts K-13 Fixtures ('refuse-public-object.json') and Defines ('every object private'); MC 8 'Files' ('Uploads (ID documents, photos, forms) stay private'); MC C10; Q-31"
+    },
+    {
+      "file": "invalid/refuse-read-without-permission.json",
+      "version": "v1",
+      "def": "readLink.exchange",
+      "expect": "refuse",
+      "shows": "read-link-logged.json with no viewer, so no check of who may see the file and no view to log: refused (with Sam as the viewer on the ground business it is read-link-logged.json)",
+      "source": "02-contracts K-13 Fixtures ('refuse-read-without-permission.json') and Defines ('given only after the caller has checked who may see the file'); RULES 4.5"
+    },
+    {
+      "file": "invalid/refuse-upload-too-large-ready.json",
+      "version": "v1",
+      "def": "uploadLink.exchange",
+      "expect": "refuse",
+      "shows": "upload-too-large.json's 12,000,000-byte photo answered ready with a link: refused, since a file over 10 MiB gets no link (answered tooLarge it is upload-too-large.json)",
+      "source": "K-21 v1 default 12 (10 MiB) and uploadRefusedErrors; README default 4"
+    },
+    {
+      "file": "invalid/refuse-svg-upload.json",
+      "version": "v1",
+      "def": "uploadLink.exchange",
+      "expect": "refuse",
+      "shows": "upload-price-list-photo.json as an SVG (image/svg+xml asked and answered): refused, since an SVG can carry script (as image/jpeg it is upload-price-list-photo.json)",
+      "source": "K-35 v1 default 20 ('No file a browser runs as a page: image/svg+xml and application/xhtml+xml are refused'); K-21 v1 default 12 (photos and PDFs)"
+    },
+    {
+      "file": "invalid/refuse-listing-read-of-id-document.json",
+      "version": "v1",
+      "def": "readLink.exchange",
+      "expect": "refuse",
+      "shows": "read-link-listing-photo.json asking for Sam's ID document on the listing's ground: refused, since only a photo is shown by the listing (with the photo's key it is read-link-listing-photo.json)",
+      "source": "FS row B07 (photos on the listing page); FS row B14 (the ID check is 'not shown'); RULES 4.5 (ID numbers stay on the secure page); MC C10"
+    },
+    {
+      "file": "invalid/refuse-delete-without-erasure.json",
+      "version": "v1",
+      "def": "deleteObject.exchange",
+      "expect": "refuse",
+      "shows": "delete-erasure.json for another reason (a photo replaced): refused, since v1 deletes only for erasure and no deletion rule is invented (with reason erasure it is delete-erasure.json)",
+      "source": "02-contracts K-13 Defines ('Delete, for erasure under RULES 4.10. How long ID files are kept follows Q-31's default (no deletion rule is invented)'); Q-31"
+    },
+    {
+      "file": "invalid/refuse-caller-names-key.json",
+      "version": "v1",
+      "def": "uploadLink.exchange",
+      "expect": "refuse",
+      "shows": "upload-id-document.json with the caller naming its own object key, made from Sam's name: refused, since the port makes every key (without objectKey in the request it is upload-id-document.json)",
+      "source": "README 'The object key' (default 2); K-21 v1 default 12 (the page names an upload id, never an object key); rule 9 (no real data); RULES 4.5"
+    },
+    {
+      "file": "invalid/refuse-key-in-span.json",
+      "version": "v1",
+      "def": "filesSpan",
+      "expect": "refuse",
+      "shows": "span-read-link-logged.json with the object key in what it got: refused by the span's closed list (K-08 alone would take the key as a label), so no key enters a span or a log (without it, it is span-read-link-logged.json)",
+      "source": "K-08 v1 ('never the raw number or words'); K-22 v1 rule 6 and K-35 v1 rule 6 (the object key sealed in its row); arch 02 diagram line 105 (full detail only in sealed traces)"
+    },
+    {
+      "file": "invalid/refuse-read-link-inline.json",
+      "version": "v1",
+      "def": "readLink.exchange",
+      "expect": "refuse",
+      "shows": "read-link-logged.json's link served inline: refused, since every file is served as an attachment with nosniff (as an attachment it is read-link-logged.json)",
+      "source": "K-35 v1 default 20 ('K-13's read link still serves every file as an attachment') and its open gap ('with X-Content-Type-Options: nosniff, never inline')"
+    },
+    {
+      "file": "invalid/refuse-id-document-for-business.json",
+      "version": "v1",
+      "def": "uploadLink.exchange",
+      "expect": "refuse",
+      "shows": "upload-id-document.json with Sam's ID document owned by Lee's Barbershop: refused, since an ID document is always the person's own (as Sam's own, with no business, it is upload-id-document.json)",
+      "source": "MC C10; S1-10 ('Checks the owner's mobile and ID, once'); K-22 v1 id_uploads (per person across businesses, rule 4)"
+    }
+  ]
+}

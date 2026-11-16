@@ -1,0 +1,21 @@
+{
+  "call": "serverWrite",
+  "given": {
+    "now": "2026-10-19T14:12:35Z",
+    "note": "The first try of server-write-sealed-trace.json's write: R2 does not answer in time, so unavailable. Nothing is known to be stored; the writer tries again with the same writeId and bytes (arch 10 line 540), which server-write-sealed-trace.json shows stored. Size and hash are placeholders."
+  },
+  "request": {
+    "kind": "sealedTrace",
+    "owner": { "kind": "rosie" },
+    "mediaType": "application/octet-stream",
+    "sizeBytes": 18432,
+    "sha256": "5e2c9a1f7b3d6e8a0c4f2b9d7e1a3c5f8b0d2e4a6c8e0f1a3b5c7d9e1f3a5b7c",
+    "writeId": "t5r8c3s6q1w9e4a7d2f0g6h3j8",
+    "day": "2026-10-19",
+    "visibility": "private",
+    "source": { "kind": "rosie" }
+  },
+  "outcome": {
+    "error": "unavailable"
+  }
+}

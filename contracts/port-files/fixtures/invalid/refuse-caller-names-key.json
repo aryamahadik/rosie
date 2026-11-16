@@ -1,0 +1,25 @@
+{
+  "call": "uploadLink",
+  "given": {
+    "now": "2026-10-19T14:30:30Z",
+    "note": "upload-id-document.json with the caller naming its own object key, made from Sam's name: refused, since the port makes every key and no person's details are ever in one."
+  },
+  "request": {
+    "kind": "idDocument",
+    "owner": { "kind": "person", "personId": "person-sam", "businessId": null },
+    "mediaType": "image/jpeg",
+    "sizeBytes": 2400000,
+    "visibility": "private",
+    "lifeSeconds": 900,
+    "objectKey": "idDocument/2026-10-19/samleeidphotofrontpage001"
+  },
+  "outcome": {
+    "result": "ready",
+    "objectKey": "idDocument/2026-10-19/q7m2k9x4t8v1c6b3n5p0r2s4w6",
+    "url": "https://files.example.com/upload/placeholder-signed-sam-id-1",
+    "method": "PUT",
+    "contentType": "image/jpeg",
+    "maxBytes": 10485760,
+    "expiresAt": "2026-10-19T14:45:30Z"
+  }
+}

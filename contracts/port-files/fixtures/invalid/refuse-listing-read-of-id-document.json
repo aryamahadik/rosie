@@ -1,0 +1,20 @@
+{
+  "call": "readLink",
+  "given": {
+    "now": "2026-10-30T16:00:00Z",
+    "note": "read-link-listing-photo.json asking for Sam's ID document (upload-id-document.json's key) on the listing's ground: refused, since only a photo is ever shown by the listing."
+  },
+  "request": {
+    "objectKey": "idDocument/2026-10-19/q7m2k9x4t8v1c6b3n5p0r2s4w6",
+    "file": { "table": "business_photos", "id": "photo-lees-barbershop-front" },
+    "viewer": { "as": "listing", "personId": null },
+    "lifeSeconds": 600
+  },
+  "outcome": {
+    "result": "link",
+    "url": "https://files.example/placeholder-signed-read-front",
+    "expiresAt": "2026-10-30T16:10:00Z",
+    "disposition": "attachment",
+    "noSniff": true
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "call": "deleteObject",
+  "given": {
+    "now": "2026-11-02T09:16:00Z",
+    "note": "delete-erasure.json's answer was lost, so the erasure job runs the same delete again: nothing is under the key, so deleted with alreadyGone true, and the job goes on to delete Riley's key."
+  },
+  "request": {
+    "objectKey": "licenseFile/2026-10-19/r1l3y8b4r5l9c2n6s0p7h3t5k1",
+    "file": { "table": "document_files", "id": "docfile-riley-barber-license-photo" },
+    "reason": "erasure",
+    "erasure": { "personId": "person-riley", "checkedAt": "2026-10-26T15:00:00Z" }
+  },
+  "outcome": {
+    "result": "deleted",
+    "alreadyGone": true
+  }
+}

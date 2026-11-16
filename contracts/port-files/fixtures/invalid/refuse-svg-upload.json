@@ -1,0 +1,24 @@
+{
+  "call": "uploadLink",
+  "given": {
+    "now": "2026-10-19T14:40:00Z",
+    "note": "upload-price-list-photo.json with the price list as an SVG, asked and answered as image/svg+xml: refused, since an SVG can carry script and no file a browser runs as a page is taken (K-35 v1 default 20)."
+  },
+  "request": {
+    "kind": "priceList",
+    "owner": { "kind": "business", "businessId": "biz-lees-barbershop" },
+    "mediaType": "image/svg+xml",
+    "sizeBytes": 1800000,
+    "visibility": "private",
+    "lifeSeconds": 900
+  },
+  "outcome": {
+    "result": "ready",
+    "objectKey": "priceList/2026-10-19/h3n8c5v2x7m4k9q1t6b0p3r8s5",
+    "url": "https://files.example.com/upload/placeholder-signed-lees-price-list-1",
+    "method": "PUT",
+    "contentType": "image/svg+xml",
+    "maxBytes": 10485760,
+    "expiresAt": "2026-10-19T14:55:00Z"
+  }
+}

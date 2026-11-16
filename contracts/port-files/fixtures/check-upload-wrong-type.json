@@ -1,0 +1,17 @@
+{
+  "call": "checkUpload",
+  "given": {
+    "now": "2026-11-03T00:13:00Z",
+    "note": "A later photo link on the water heater's photos page (K-21 v1.2 secureUpload, one JPEG) received a file whose leading bytes are a PDF's (%PDF), not a JPEG's, though its Content-Type said image/jpeg: refused and removed before the answer, so nothing refused is kept; the page entry answers K-21's wrongType."
+  },
+  "request": {
+    "objectKey": "photo/2026-11-03/w2r4o6n8g0t1y3p5e7k9x2c4v6",
+    "mediaType": "image/jpeg",
+    "maxBytes": 10485760
+  },
+  "outcome": {
+    "error": "wrongType",
+    "allowed": ["image/jpeg"],
+    "removed": true
+  }
+}

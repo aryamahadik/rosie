@@ -1,0 +1,17 @@
+{
+  "call": "deleteObject",
+  "given": {
+    "now": "2026-11-02T09:15:00Z",
+    "note": "Riley asked for his records to be deleted, and the request was checked to be his on Mon Oct 26 (RULES 4.10: done within 45 days of that check). The erasure job (C-156) unseals the key of his license photo from K-35's document_files row while his key still exists, deletes the object here, and only then deletes his key (K-35 rule 8). Which records the trade's rules keep is the job's to decide before it calls (README open gaps); this photo is Riley's own paper. Dates are examples."
+  },
+  "request": {
+    "objectKey": "licenseFile/2026-10-19/r1l3y8b4r5l9c2n6s0p7h3t5k1",
+    "file": { "table": "document_files", "id": "docfile-riley-barber-license-photo" },
+    "reason": "erasure",
+    "erasure": { "personId": "person-riley", "checkedAt": "2026-10-26T15:00:00Z" }
+  },
+  "outcome": {
+    "result": "deleted",
+    "alreadyGone": false
+  }
+}

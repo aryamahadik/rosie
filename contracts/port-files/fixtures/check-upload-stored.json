@@ -1,0 +1,18 @@
+{
+  "call": "checkUpload",
+  "given": {
+    "now": "2026-10-19T14:31:00Z",
+    "note": "K-21 v1 finishUpload for upload-sam-id-1 (its upload-id-finished.json): the photo reached the link of upload-id-document.json at 14:30:41, and its leading bytes show a JPEG of 2,400,000 bytes, as asked. The page entry keeps the key with the upload, and the runtime side writes K-22's id_uploads row with the key sealed under Sam's key; S1-10 is written (the ID confirmed, accepted as given: MC C10)."
+  },
+  "request": {
+    "objectKey": "idDocument/2026-10-19/q7m2k9x4t8v1c6b3n5p0r2s4w6",
+    "mediaType": "image/jpeg",
+    "maxBytes": 10485760
+  },
+  "outcome": {
+    "result": "stored",
+    "sizeBytes": 2400000,
+    "mediaType": "image/jpeg",
+    "storedAt": "2026-10-19T14:30:41Z"
+  }
+}
