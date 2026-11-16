@@ -8,8 +8,10 @@
 //     transaction (C1, C2), the record and the STOP naming no business;
 //   - each other no-business shape is answered noBusinessScope or invalidRequest with no transaction opened and nothing
 //     read (C3); the base still answers stop-recorded.json noBusinessScope;
-//   - a sendFixedLine action passes the door and answers notBuilt until T-1414, with nothing written; so does a danger
-//     outcome (owner and zone need a business);
+//   - a sendFixedLine action (HELP's reply) passes the door and, with T-1414's service merged, commits one quick_reply row
+//     naming no business, its answer valid against K-09 v1's sendFixedLine response; after a STOP it answers phoneStopped
+//     and writes nothing (lead note 4's pin, moved: DL-881, DL-883; DL-845, no weaker);
+//   - a danger outcome answers notBuilt, with nothing written (owner and zone need a business);
 //   - a STOP and a START through the door put no run of the number's digits, no address and no consent words into any
 //     log line, span, thrown message or answer (C4, with a console spy as commit/core/core-flags.test.ts does);
 //   - in a business-scoped turn recordStopOrStart and setRecordFlag stay notBuilt portNotWired, as on main (C5).
@@ -23,6 +25,8 @@ import type { CommitTurnAnswer, CommitTurnResponse, Committed, GateAndCommitRequ
 import type { CoreFlagsDeps } from "../../commit/core";
 import { sameSealer, type SameSealer } from "../../commit/core/test-support";
 import { contractChecks, k05Fake, type K05Fake } from "../../commit/test-support";
+import { fixedLineKey, fixedLineRowId } from "../../domain/fixed-lines";
+import { helpAction } from "../../domain/fixed-lines/test-support";
 import { NO_EVENT_SOURCES, type RecordFlagRequest } from "../../domain/flags";
 import {
   fixtureIds,
@@ -685,33 +689,133 @@ describe("every other no-business shape is answered before a transaction opens, 
 
 // ---------------------------------------------------------------------------------------------------------------
 
-describe("what the door passes but the commit does not build yet answers notBuilt, with nothing written", () => {
-  it("a sendFixedLine action (HELP's reply) passes the door and answers notBuilt until T-1414: rolled back, nothing sent", async () => {
-    const request = stopWith((stop) => ({
-      ...stop,
-      core: [
-        ...stop.core.slice(0, 1),
-        {
-          call: "sendFixedLine",
-          request: {
-            caller: stop.caller,
-            fixedLineId: "helpReply",
-            recipientHandleId: "handle-ben",
-            sendClass: "quick_reply",
-            sentByActor: null,
-          },
-        },
-      ],
-    }));
+/** Ben's HELP text after his STOP: a turn of its own, its one text and its trace. */
+const AFTER_STOP = { turnId: "turn-ben-help", eventId: "evt-ben-help", traceId: "trace-ben-help" } as const;
+
+/**
+ * Ben's HELP text as a keyword turn, as the replies build it (T-1414: one sendFixedLine of helpReply, quick_reply, to the
+ * turn's own handle, under the turn's caller, which names no business): stop-recorded.json's turn with the HELP in his
+ * STOP's place, his text's record first; re-keyed to `own`'s turn, text and trace when given (a text of its own).
+ */
+function benHelpTurn(own?: typeof AFTER_STOP): GateAndCommitRequest {
+  const { request } = stopRecorded();
+  const [record] = request.core;
+  if (request.turn === null || record?.call !== "recordSafetyOutcome") {
+    throw new Error("stop-recorded.json carries Ben's turn and his text's record first");
+  }
+  const caller: K09.Caller =
+    own === undefined
+      ? request.caller
+      : { ...request.caller, turnId: own.turnId, requestId: own.turnId, traceId: own.traceId };
+  const eventId = own?.eventId ?? record.request.safety.eventId;
+  const safety = { ...record.request.safety, eventId };
+  return {
+    ...request,
+    caller,
+    turn: {
+      ...request.turn,
+      id: own?.turnId ?? request.turn.id,
+      eventIds: [eventId],
+      traceId: caller.traceId,
+    },
+    core: [
+      { call: "recordSafetyOutcome", request: { ...record.request, caller, safety } },
+      helpAction(caller, "handle-ben"),
+    ],
+  };
+}
+
+describe("HELP's reply through the door, with T-1414's sendFixedLine merged (lead note 4's pin, moved: DL-881, DL-883)", () => {
+  it("a sendFixedLine action (HELP's reply) passes the door and commits one quick_reply row to Ben's mobile, naming no business, its answer valid against K-09 v1", async () => {
+    const request = benHelpTurn();
     expect(validator.check("gateAndCommit", "request", request)).toEqual([]);
+    expect(isKeywordTurn(request)).toBe(true);
+    const help = request.core[1];
+    if (help?.call !== "sendFixedLine") throw new Error("the turn carries Ben's HELP");
+    const rowId = await fixedLineRowId(fixedLineKey("turn-ben-stop", help.request));
     const doubles = doorOn(benWorld(), k05Fake());
     const { answer, spans } = await through(doubles, request);
-    expect(answer).toEqual({ error: "notBuilt", call: "gateAndCommit" });
-    expect(doubles.events).toEqual(["begin gateAndCommit", "rollback"]);
-    expect(doubles.k05.requests).toEqual([]);
-    expect(onlySpan(spans)).toMatchObject({ outcome: "refused", error_code: "notBuilt" });
+    const result = committedOf(answer);
+    const [record, helped] = result.core;
+    expect(record).toMatchObject({
+      call: "recordSafetyOutcome",
+      response: { outcomes: ["No"], repeated: false },
+      error: null,
+    });
+    expect(helped).toEqual({
+      call: "sendFixedLine",
+      response: { outboxRowId: rowId, repeated: false },
+      error: null,
+    });
+    expect(validator.check("sendFixedLine", "response", helped?.response)).toEqual([]);
+
+    // One transaction of the runtime side, committed; the HELP's reads (T-307's, through the flags port) and every other
+    // read on its one repo while it was open (C1, C2).
+    expect(doubles.events).toEqual(["begin gateAndCommit", "commit"]);
+    expect(doubles.reads.some((read) => read.port === "messages")).toBe(true);
+    for (const read of doubles.reads) expect(read, read.read).toMatchObject({ repo: 1, open: true });
+
+    // One K-05 request under Ben's turn: his text's record and the HELP's one row back to his mobile, each naming no
+    // business, and no phone or consent write.
+    expect(doubles.k05.requests).toHaveLength(1);
+    const [sent] = doubles.k05.requests;
+    if (sent === undefined) throw new Error("one commit was sent");
+    expect(contractChecks().k05("commitTurn.request", sent)).toEqual([]);
+    expect(sent.writes.state.map((write) => write.table)).toEqual(["safety_outcomes"]);
+    expect(
+      sent.writes.outboxRows.map((row) => [row.id, row.recipientHandleId, row.businessId, row.sendClass]),
+    ).toEqual([[rowId, "handle-ben", null, "quick_reply"]]);
+    expect(sent.writes.events.map((entry) => [entry.kind, entry.businessId])).toEqual([
+      ["safety_outcome.recorded", null],
+      ["outbox_row.created", null],
+    ]);
+    expect(result.written.outboxRows.map((row) => row.id)).toEqual([rowId]);
+
+    // The gate hop's one span, with no business label.
+    const span = onlySpan(spans);
+    expect(span).toMatchObject({
+      hop: "gate",
+      outcome: "ok",
+      decided: { answered: "response" },
+      error_code: null,
+    });
+    expect(span).not.toHaveProperty("business_id");
+    expect(validator.checkSpan(span)).toEqual([]);
   });
 
+  it("after Ben's STOP his HELP answers phoneStopped, valid against K-09 v1, and the HELP writes nothing: no row, no entry", async () => {
+    const world = benWorld();
+    await stopCommitted(world);
+    const request = benHelpTurn(AFTER_STOP);
+    expect(validator.check("gateAndCommit", "request", request)).toEqual([]);
+    expect(isKeywordTurn(request)).toBe(true);
+    const doubles = doorOn(world, k05Fake());
+    const result = committedOf((await through(doubles, request)).answer);
+    const [record, helped] = result.core;
+    expect(record).toMatchObject({ call: "recordSafetyOutcome", error: null });
+    expect(helped).toEqual({
+      call: "sendFixedLine",
+      response: null,
+      error: { error: "phoneStopped", recipientHandleId: "handle-ben" },
+    });
+    expect(validator.check("sendFixedLine", "errors", helped?.error)).toEqual([]);
+    expect(doubles.events).toEqual(["begin gateAndCommit", "commit"]);
+
+    // The turn commits his HELP text's record alone: no outbox row and no entry for one, no phone or consent write.
+    expect(doubles.k05.requests).toHaveLength(1);
+    const [sent] = doubles.k05.requests;
+    if (sent === undefined) throw new Error("one commit was sent");
+    expect(contractChecks().k05("commitTurn.request", sent)).toEqual([]);
+    expect(sent.writes.outboxRows).toEqual([]);
+    expect(sent.writes.state.map((write) => write.table)).toEqual(["safety_outcomes"]);
+    expect(sent.writes.events.map((entry) => entry.kind)).toEqual(["safety_outcome.recorded"]);
+    expect(result.written.outboxRows).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+
+describe("what the door passes but the commit does not build yet answers notBuilt, with nothing written", () => {
   it("a danger outcome in a keyword turn answers notBuilt: with no business no line is built and no owner told (DL-864 note 2)", async () => {
     // Ben's text read as an emergency, its one label and its outcomes so (stop-recorded.json's record otherwise).
     const request = stopWith((stop) => {

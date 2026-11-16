@@ -24,8 +24,8 @@
 //      over that one transaction (DL-877 C1, C2), and commitTurn in its own transaction, as today;
 //   5. the answer is held to K-09's gateAndCommit.response or .errors; an error answer rolls the door's transaction back,
 //      and an answer that passes neither is thrown (ToolApiContractError), never passed on. A commit not built yet
-//      (notBuilt: a core action with no service, sendFixedLine until T-1414, a danger outcome: commit.ts default 5)
-//      answers the base's notBuilt;
+//      (notBuilt: a core action with no service, a danger outcome: commit.ts default 5) answers the base's notBuilt;
+//      HELP's sendFixedLine is T-1414's service, over the same flags port;
 //   6. the span records the outcome: labels and counts only, and no business label (Gives e).
 //
 // Nothing here logs but a span the trace refuses twice (one JSON line naming the call and the trace, as the base's);

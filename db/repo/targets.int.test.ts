@@ -22,9 +22,15 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { resolvePrimaryUrl } from "./client";
 import { DataAccessDatabaseError, transientOrScrubbed } from "./clocks";
 import { handleSealingKey, type HandleSealingKeyRequest } from "./handle-keys";
-import { type Sql, type Tx, withBusiness } from "./scope";
+import { BusinessScopeError, type Sql, type Tx, withBusiness } from "./scope";
 import { sendState } from "./send-state";
-import { handleTargets, handleTargetsIn, type HandleTargetsRequest, inRuntimeTransaction } from "./targets";
+import {
+  enterKeywordDoorSide,
+  handleTargets,
+  handleTargetsIn,
+  type HandleTargetsRequest,
+  inRuntimeTransaction,
+} from "./targets";
 import { createTestDatabase, type TestDatabase } from "./test-db";
 
 type Db = Sql | Tx;
@@ -1400,4 +1406,211 @@ describe("T-1334: inRuntimeTransaction reserves through reserveConnection and wr
       await client.sql.end({ timeout: 0 });
     }
   });
+});
+
+// ---- T-1413: the keyword door's side (DL-883: the database engineer's review of c4dd922) ------------------------------
+//
+// enterKeywordDoorSide runs as the first statements of the keyword door's runtime transaction (inRuntimeTransaction, read
+// committed, {readOnly: false}), before the door's first read: no business scope (assertRuntimeSide), then one statement
+// that reads no table (no person acted for; not the Tool API's role), then SET TRANSACTION READ ONLY. Each step runs only
+// once the one before it passed, so a refused side never reaches read only or fn's next statement; with all three passed
+// the transaction writes nothing (25006, read_only_sql_transaction), where the same write, which changes no row, runs in
+// the runtime transaction without them. Each client writes down every statement's text as it sends it (postgres.js's
+// debug option), never its values. Rule 9: the business and person ids are made up here, and no refusal names either.
+
+describe("T-1413: enterKeywordDoorSide checks the keyword door's side, then makes its transaction read only, before its first read", () => {
+  const TOOL_API_ROLE = "rosie_app";
+  const CALL = "gateAndCommit";
+  const BUSINESS = "biz-t1413-door-side";
+  const PERSON = "person-t1413-door-side";
+  /** inRuntimeTransaction's clearing of the business scope, its last statement before fn's first. */
+  const CLEAR_SCOPE = "select set_config($1, '', true)";
+  /** assertRuntimeSide's read of the scope (scope.ts readBusinessScope), the side's one statement, and read only. */
+  const SCOPE_READ = /^select current_setting\(\$1, true\) as scope$/u;
+  const SIDE_READ = /pg_has_role\(current_user, 'rosie_app', 'USAGE'\)/u;
+  const READ_ONLY = /^set transaction read only$/u;
+  /** A statement that names a table of the schema (postgres.js reads PostgreSQL's own type catalog as it connects). */
+  const NAMES_A_TABLE = /\b(from|join)\s+(?!pg_catalog\.)\S/iu;
+
+  /** A write that changes no row: rosie_job holds UPDATE on outbox_rows (0012), and its one trigger runs per row. */
+  const noRowWrite = (tx: Sql) => tx`update outbox_rows set state = state where false`;
+
+  /** One connection on this file's schema as `role`, writing down each statement's text as it sends it. */
+  function recordingClient(role: string, sent: string[]): Sql {
+    return postgres(resolvePrimaryUrl(), {
+      max: 1,
+      onnotice: () => undefined,
+      debug: (_connection: number, text: string) => {
+        sent.push(text.trim());
+      },
+      connection: { application_name: "rosie-t1413-door-side", search_path: `${db.schema}, public`, role },
+    });
+  }
+
+  /** What `run` threw; fails the test when it answered. */
+  async function thrownBy(run: () => Promise<unknown>): Promise<unknown> {
+    try {
+      await run();
+    } catch (error) {
+      return error;
+    }
+    throw new Error("it answered: nothing was refused");
+  }
+
+  const messageOf = (error: unknown): string => (error instanceof Error ? error.message : "");
+  const sentAny = (sent: readonly string[], pattern: RegExp): boolean =>
+    sent.some((text) => pattern.test(text));
+
+  it(
+    "as rosie_job with no business and no person: the scope, the side, then read only, each next, before fn's first read; then nothing is written",
+    SLOW,
+    async () => {
+      const sent: string[] = [];
+      const client = recordingClient(RUNTIME_ROLE, sent);
+      try {
+        // Without the door's side, the runtime transaction runs the write (it changes no row).
+        await inRuntimeTransaction(client, { readOnly: false }, async (tx) => {
+          await noRowWrite(tx);
+        });
+        sent.length = 0;
+        let seen: Record<string, unknown> | undefined;
+        const refused = await thrownBy(() =>
+          inRuntimeTransaction(client, { readOnly: false }, async (tx) => {
+            await enterKeywordDoorSide(tx, CALL);
+            [seen] = await tx<Record<string, unknown>[]>`
+            select current_setting('transaction_read_only') as read_only,
+                   current_setting('rosie.business_id', true) as scope,
+                   coalesce(current_setting('rosie.person_id', true), '') as person
+          `;
+            await noRowWrite(tx);
+            return "written";
+          }),
+        );
+        // Read only, on the runtime side, acting for no one; the write refused, and the transaction rolled back.
+        expect(seen).toEqual({ read_only: "on", scope: "", person: "" });
+        expect(refused).toMatchObject({ name: "PostgresError", code: "25006" });
+        expect(sent.at(-1)).toBe("rollback");
+        // Right after the scope's clearing: assertRuntimeSide's read, the side's one statement (no table), read only, and
+        // only then fn's first read.
+        const cleared = sent.indexOf(CLEAR_SCOPE);
+        expect(cleared).toBeGreaterThanOrEqual(0);
+        const [scope, side, readOnly, first] = sent.slice(cleared + 1, cleared + 5);
+        expect(scope).toMatch(SCOPE_READ);
+        expect(side).toMatch(SIDE_READ);
+        expect(side).toContain("current_setting($1, true) as person");
+        expect(side).not.toMatch(NAMES_A_TABLE);
+        expect(readOnly).toMatch(READ_ONLY);
+        expect(first).toContain("transaction_read_only");
+      } finally {
+        await client.end({ timeout: 5 });
+      }
+    },
+  );
+
+  it(
+    "a business scope on the transaction is refused by assertRuntimeSide, before the side's statement and read only",
+    SLOW,
+    async () => {
+      const sent: string[] = [];
+      const client = recordingClient(RUNTIME_ROLE, sent);
+      try {
+        const refused = await thrownBy(() =>
+          inRuntimeTransaction(client, { readOnly: false }, async (tx) => {
+            await tx`select set_config('rosie.business_id', ${BUSINESS}, true)`;
+            await enterKeywordDoorSide(tx, CALL);
+            return "entered";
+          }),
+        );
+        expect(refused).toBeInstanceOf(Error);
+        expect(refused).not.toBeInstanceOf(BusinessScopeError);
+        expect(messageOf(refused)).toContain(`${CALL} runs on the runtime side, with no business scope`);
+        expect(messageOf(refused)).not.toContain(BUSINESS);
+        expect(sentAny(sent, SCOPE_READ)).toBe(true);
+        expect(sentAny(sent, SIDE_READ)).toBe(false);
+        expect(sentAny(sent, READ_ONLY)).toBe(false);
+        expect(sent.at(-1)).toBe("rollback");
+      } finally {
+        await client.end({ timeout: 5 });
+      }
+    },
+  );
+
+  it(
+    "a person acted for is refused by the side's one statement, before read only; the '' an ended transaction leaves is no one",
+    SLOW,
+    async () => {
+      const sent: string[] = [];
+      const client = recordingClient(RUNTIME_ROLE, sent);
+      try {
+        const refused = await thrownBy(() =>
+          inRuntimeTransaction(client, { readOnly: false }, async (tx) => {
+            await tx`select set_config('rosie.person_id', ${PERSON}, true)`;
+            await enterKeywordDoorSide(tx, CALL);
+            return "entered";
+          }),
+        );
+        expect(refused).toBeInstanceOf(BusinessScopeError);
+        expect(messageOf(refused)).toContain(
+          `${CALL} on the keyword door acts for no one: rosie.person_id is never set`,
+        );
+        expect(messageOf(refused)).not.toContain(PERSON);
+        expect(sentAny(sent, SIDE_READ)).toBe(true);
+        expect(sentAny(sent, READ_ONLY)).toBe(false);
+        expect(sent.at(-1)).toBe("rollback");
+
+        sent.length = 0;
+        const entered = await inRuntimeTransaction(client, { readOnly: false }, async (tx) => {
+          await tx`select set_config('rosie.person_id', '', true)`;
+          await enterKeywordDoorSide(tx, CALL);
+          const [row] = await tx<{ read_only: string }[]>`
+          select current_setting('transaction_read_only') as read_only
+        `;
+          return row?.read_only;
+        });
+        expect(entered).toBe("on");
+        expect(sentAny(sent, READ_ONLY)).toBe(true);
+      } finally {
+        await client.end({ timeout: 5 });
+      }
+    },
+  );
+
+  it(
+    "rosie_app is refused by the side's one statement, before read only and before any table is read; the tables' owner runs",
+    SLOW,
+    async () => {
+      const sent: string[] = [];
+      const toolApi = recordingClient(TOOL_API_ROLE, sent);
+      try {
+        const [who] = await toolApi<{ who: string }[]>`select current_user as who`;
+        expect(who?.who).toBe(TOOL_API_ROLE);
+        sent.length = 0;
+        const refused = await thrownBy(() =>
+          inRuntimeTransaction(toolApi, { readOnly: false }, async (tx) => {
+            await enterKeywordDoorSide(tx, CALL);
+            return "entered";
+          }),
+        );
+        expect(refused).toBeInstanceOf(BusinessScopeError);
+        expect(messageOf(refused)).toContain(
+          `${CALL} on the keyword door runs on the runtime side, as rosie_job: rosie_app sees no row with no business`,
+        );
+        expect(sentAny(sent, SIDE_READ)).toBe(true);
+        expect(sentAny(sent, READ_ONLY)).toBe(false);
+        for (const text of sent) expect(text).not.toMatch(NAMES_A_TABLE);
+        expect(sent.at(-1)).toBe("rollback");
+      } finally {
+        await toolApi.end({ timeout: 5 });
+      }
+      // The tables' owner (a role that holds neither role's rights, or one that holds both) runs: safety-reads.ts default 1.
+      const owner = await inRuntimeTransaction(db.sql, { readOnly: false }, async (tx) => {
+        await enterKeywordDoorSide(tx, CALL);
+        const [row] = await tx<{ read_only: string }[]>`
+        select current_setting('transaction_read_only') as read_only
+      `;
+        return row?.read_only;
+      });
+      expect(owner).toBe("on");
+    },
+  );
 });

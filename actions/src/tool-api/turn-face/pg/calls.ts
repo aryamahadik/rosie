@@ -17,11 +17,12 @@
 //   - the transaction is db/repo's inRuntimeTransaction (as sign-in-send.ts's calls run): a reserved connection of the
 //     runtime client, on the primary, read committed (so the commit's one reload reads what changed, as the base's call
 //     transaction does), with rosie.business_id set empty for the transaction and rosie.person_id never set;
-//   - before the first read: assertRuntimeSide (db/repo/targets.ts: no business scope), then one statement that reads
-//     no table, which refuses a session acting for a person (rosie.person_id set) and a role that holds rosie_app's
-//     rights and not rosie_job's (rosie_app sees no row with no business and holds no grant on phones: K-05 v1.4 default
-//     1's rule, as the no-business safety reads and readOpenHolds refuse it), then SET TRANSACTION READ ONLY: every write
-//     is commitTurn's own transaction, so the door's never writes;
+//   - before the first read, db/repo's enterKeywordDoorSide (db/repo/targets.ts; DL-883: the door sends no statement of
+//     its own): assertRuntimeSide (no business scope), then one statement that reads no table, which refuses a session
+//     acting for a person (rosie.person_id set) and a role that holds rosie_app's rights and not rosie_job's (rosie_app
+//     sees no row with no business and holds no grant on phones: K-05 v1.4 default 1's rule, as the no-business safety
+//     reads and readOpenHolds refuse it), then SET TRANSACTION READ ONLY: every write is commitTurn's own transaction,
+//     so the door's never writes;
 //   - runCore's flags port (pgDoorFlags) and the safety and hold reads run on that one transaction, the repo the door
 //     hands the commit (C1, C2): T-317's flagsReaderOf and T-307's messagesReaderOf over it, never over a pooled
 //     connection or rosie_app; the sealer and commitTurn keep their own runtime transactions, as in the business-scoped
@@ -49,15 +50,13 @@ import {
   readSafetyOutcomeIn,
   readSafetyOutcomeOfEventIn,
 } from "../../../../../db/repo/safety-reads";
-import {
-  BusinessScopeError,
-  PERSON_SETTING,
-  withBusiness,
-  type Sql,
-  type Tx,
-} from "../../../../../db/repo/scope";
+import { withBusiness, type Sql, type Tx } from "../../../../../db/repo/scope";
 import type { WrappingKeys } from "../../../../../db/repo/sealing";
-import { assertRuntimeSide, inRuntimeTransaction, type TransientError } from "../../../../../db/repo/targets";
+import {
+  enterKeywordDoorSide,
+  inRuntimeTransaction,
+  type TransientError,
+} from "../../../../../db/repo/targets";
 import { readFixedLineFacts, readOpenHoldsIn, readOutboxRow } from "../../../../../db/repo/turn-face-reads";
 import type { CoreFlagsDeps } from "../../../commit/core";
 import { pgCommitTurn } from "../../../commit/pg";
@@ -235,33 +234,11 @@ export function pgTurnCalls(runtime: Sql, toolApi: Sql, options: PgTurnCallsOpti
 // ---- the keyword door on the runtime side (T-1413) ------------------------------------------------------------------
 
 /**
- * The door's side, checked inside its transaction before the first read (the top of this file): no business scope
- * (assertRuntimeSide), then, in one statement that reads no table, no person acted for and not the Tool API's role.
- * Each refusal names the call and the rule, never a value.
- */
-async function assertDoorSide(tx: Sql, call: string): Promise<void> {
-  await assertRuntimeSide(tx, call);
-  const [side] = await tx<{ person: string | null; app: boolean; job: boolean }[]>`
-    select current_setting(${PERSON_SETTING}, true) as person,
-           pg_has_role(current_user, 'rosie_app', 'USAGE') as app,
-           pg_has_role(current_user, 'rosie_job', 'USAGE') as job
-  `;
-  if (side === undefined) throw new BusinessScopeError(`${call}: the door's side could not be read`);
-  if (side.person !== null && side.person !== "") {
-    throw new BusinessScopeError(`${call} on the keyword door acts for no one: rosie.person_id is never set`);
-  }
-  if (side.app && !side.job) {
-    throw new BusinessScopeError(
-      `${call} on the keyword door runs on the runtime side, as rosie_job: rosie_app sees no row with no business`,
-    );
-  }
-}
-
-/**
  * The keyword door's one transaction on `runtime` (the top of this file): inRuntimeTransaction's reserved connection, read
  * committed, rosie.business_id set empty and rosie.person_id unset, its side checked and the transaction made read only
- * before `work` gets the connection. A start the database could not make answers `call.transient` where given, else is
- * thrown scrubbed; every other failure leaves scrubbed under `call.call`, the door's and db/repo's own errors as they are.
+ * by db/repo's enterKeywordDoorSide before `work` gets the connection. A start the database could not make answers
+ * `call.transient` where given, else is thrown scrubbed; every other failure leaves scrubbed under `call.call`, the door's
+ * and db/repo's own errors as they are.
  */
 export function pgDoorRuntime(runtime: Sql): DoorRuntime<Sql> {
   return {
@@ -269,8 +246,7 @@ export function pgDoorRuntime(runtime: Sql): DoorRuntime<Sql> {
       const state = { working: false };
       try {
         return await inRuntimeTransaction(runtime, { readOnly: false }, async (tx) => {
-          await assertDoorSide(tx, call.call);
-          await tx`set transaction read only`;
+          await enterKeywordDoorSide(tx, call.call);
           state.working = true;
           return work(tx);
         });
