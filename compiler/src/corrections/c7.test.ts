@@ -50,7 +50,7 @@ import {
   C7_MARKER,
   CLAIM_PATTERNS,
   OWN_WORD,
-  PF_CLAIM_PATTERNS,
+  WORD_PATTERNS,
   c7,
   findClaims,
   markClaims,
@@ -290,7 +290,7 @@ describe("what C7 counts as a claim", () => {
       "Sam sees the flag, and a person on Rosie's team checks it within 1 business day.",
       "Rosie looks nothing up, so no screenshot is kept.",
     ])
-      expect(findClaims(text, PF_CLAIM_PATTERNS), text).toStrictEqual([]);
+      expect(findClaims(text, WORD_PATTERNS), text).toStrictEqual([]);
   });
 
   it("leaves the business's own word, a negation, a check of no paper and a text that names no paper", () => {
@@ -322,10 +322,10 @@ describe("what C7 counts as a claim", () => {
       "the studio's number and each designer's are checked like any license.",
     ];
     for (const text of passive) {
-      expect(findClaims(text, PF_CLAIM_PATTERNS), text).toHaveLength(1);
+      expect(findClaims(text, WORD_PATTERNS), text).toHaveLength(1);
       expect(findClaims(text), text).toStrictEqual([]);
     }
-    expect(patternsAt("pluginText.pf.license.blocks[0]")).toBe(PF_CLAIM_PATTERNS);
+    expect(patternsAt("pluginText.pf.license.blocks[0]")).toBe(WORD_PATTERNS);
     expect(patternsAt("A ops[11].does")).toBe(CLAIM_PATTERNS);
     expect(patternsAt("B rename[7][1]")).toBe(CLAIM_PATTERNS);
     // An op's words that wait on a permit belong to a step that waits (CQ-347's): read with CLAIM_PATTERNS, they stay.
@@ -343,11 +343,11 @@ describe("what C7 counts as a claim", () => {
       "Rosie never says a license, certificate or insurance is confirmed; anything shown is the business's own word.",
       OWN_WORD,
     ])
-      expect(findClaims(text, PF_CLAIM_PATTERNS), text).toStrictEqual([]);
+      expect(findClaims(text, WORD_PATTERNS), text).toStrictEqual([]);
     expect(
       ownWord(
         "a switch from the state's form: where the state requires a certificate for a fitness coach, it's asked and checked like a license; otherwise a coach's certificate and CPR card are the business's word",
-        PF_CLAIM_PATTERNS,
+        WORD_PATTERNS,
       ),
     ).toBe(`${OWN_WORD} otherwise a coach's certificate and CPR card are the business's word`);
   });
@@ -373,11 +373,11 @@ describe("what C7 counts as a claim", () => {
       "identity checked; customers see no permit claim until it's confirmed",
     ];
     for (const text of passive) {
-      expect(findClaims(text, PF_CLAIM_PATTERNS), text).toHaveLength(1);
+      expect(findClaims(text, WORD_PATTERNS), text).toHaveLength(1);
       expect(findClaims(text), text).toStrictEqual([]);
     }
     expect(
-      ownWord("identity checked; customers see no permit claim until it's confirmed", PF_CLAIM_PATTERNS),
+      ownWord("identity checked; customers see no permit claim until it's confirmed", WORD_PATTERNS),
     ).toBe(`identity checked; ${OWN_WORD}`);
     // A negation takes the check back, and a check of no business paper (an identity, a customer's record or ID, a job
     // against the license, a staff skill) is no claim.
@@ -391,7 +391,7 @@ describe("what C7 counts as a claim", () => {
       "Where a license stops at a job size or a kind of work, each quote and extra job is checked against it before it's sent.",
       "Errands in a car, with an insured vehicle and a checked driver's license",
     ])
-      expect(findClaims(text, PF_CLAIM_PATTERNS), text).toStrictEqual([]);
+      expect(findClaims(text, WORD_PATTERNS), text).toStrictEqual([]);
   });
 
   it("replaces each run of claim sentences with OWN_WORD and keeps the text's other sentences", () => {
@@ -990,7 +990,7 @@ describe("C7 in the bundle", () => {
       };
       for (const leaf of texts(overlay, id)) {
         // A pf block is stored whole as one text (K-01 pluginText): read it with the pf blocks' patterns.
-        const patterns = leaf.path.startsWith(`${id}.pluginText.`) ? PF_CLAIM_PATTERNS : CLAIM_PATTERNS;
+        const patterns = leaf.path.startsWith(`${id}.pluginText.`) ? WORD_PATTERNS : CLAIM_PATTERNS;
         expect(findClaims(leaf.text, patterns), leaf.path).toStrictEqual([]);
       }
       for (const one of marked(id).done.marked) {
@@ -1019,5 +1019,392 @@ describe("C7's tags", () => {
     expect(c7.id).toBe("C7");
     expect(c7.source).toContain("Master Corrections C7");
     expect(c7.source).toContain("D96");
+  });
+});
+
+// TEMP SCAN4 (removed before the commit)
+import { writeFileSync as TMPW } from "node:fs";
+import { PASSIVE_PATTERNS as TMPP, PAPER as TMPPAPER } from "./c7";
+describe("SCAN5", () => {
+  it("dumps", () => {
+    const OUT =
+      "/private/tmp/claude-501/-Users-aryamahadik-Downloads-Rosfield-Main-rosie/d9982744-6798-4bc7-ad8e-3fc2a5092574/scratchpad/";
+    const NEG = /\b(?:never|not|no|nor|cannot|nothing|none|nobody)\b|n't\b/i;
+    const LISTNEG = /^\s*(?:never|none|no|not|nothing|nobody)\s*:/i;
+    const BRK = /[,;:.!?](?=\s|$)|[·•—–|/\n]/;
+    const SENT = /((?<=[.;!?])\s+|\s+[·•|]\s+|\s*\n\s*)/;
+    const wds = (s: string) => s.split(/\s+/).filter((w) => /[a-z]/i.test(w));
+    const negIn = (text: string, at: number, reach: number): boolean => {
+      const parts = text.split(SENT);
+      let pos = 0;
+      for (let k = 0; k < parts.length; k += 2) {
+        const s = parts[k] ?? "";
+        const sep = parts[k + 1] ?? "";
+        if (at < pos + s.length + sep.length || k + 2 >= parts.length) {
+          const rel = at - pos;
+          const lm = LISTNEG.exec(s);
+          if (lm !== null && lm[0].length <= rel) return true;
+          const cl = s.slice(0, Math.max(0, rel)).split(BRK);
+          const w = wds(cl[cl.length - 1] ?? "");
+          return w.slice(Math.max(0, w.length - reach)).some((x) => NEG.test(x));
+        }
+        pos += s.length + sep.length;
+      }
+      return false;
+    };
+    const negAcross = (s: string, at: number, n: number) =>
+      wds(s.slice(0, at))
+        .slice(-n)
+        .some((x) => NEG.test(x));
+    const WHO = String.raw`(?:a person on Rosie's team|Rosie's team|Rosie)`;
+    const NOPAPER_NEG = /^\s+(?:no|nothing|none)\b/i;
+    const NOPAPER_OTHER = /^\s+(?:each job|the job|the total|the date|(?:this|that) before|(?:it |them )?back)\b/i;
+    const SHAPES = [
+      ...CLAIM_PATTERNS.map((p, k) => ({ name: `C${String(k)}`, re: p.pattern, reach: p.reach })),
+      ...TMPP.map((p, k) => ({ name: `P${String(k)}`, re: p.pattern, reach: p.reach })),
+      {
+        name: "C0bare",
+        re: new RegExp(
+          String.raw`\b${WHO}\s+(?:(?:also|then|first|again|only|still)\s+)?(?:re-?checks|checks|looks\s+(?:[\w'-]+\s+){0,4}?up|has\s+read|reads|verifies|confirms)\b`,
+        ),
+        reach: 3,
+      },
+      { name: "C1bare", re: /\bRosie\s+[a-z]+s\b[^.;:]{0,80}?\band\s+(?:re-?)?checks\b/, reach: 3 },
+      {
+        name: "H4",
+        re: /\b(?:licen[cs]es?|permits?|certificates?|certifications?|insurance|registrations?|credentials?|bonds?|authority|papers?)\b[^.;:!?·•|]{0,40}?\b(?:(?:re-?)?checked|verified|confirmed|looked\s+up)\b(?!\s+by\b)/i,
+        reach: 3,
+      },
+    ];
+    const NOTW = new Set([
+      "id", "at", "op", "label", "who", "to", "via", "as", "line", "needs", "gives", "reads", "tells", "when", "sets",
+      "flow", "phase", "type", "kind", "slot", "link", "stop",
+    ]);
+    type Leaf = { path: string; text: string; side: string; msg: boolean };
+    const walk = (v: unknown, p: string, side: string, msg: boolean, out: Leaf[]): void => {
+      if (typeof v === "string") out.push({ path: p, text: v, side, msg });
+      else if (Array.isArray(v)) v.forEach((x, k) => walk(x, `${p}[${String(k)}]`, side, msg, out));
+      else if (typeof v === "object" && v !== null)
+        for (const [k, x] of Object.entries(v)) {
+          const q = p === "" ? k : `${p}.${k}`;
+          if ((k === "swap" || k === "rename") && Array.isArray(x))
+            x.forEach((pair, j) => {
+              if (Array.isArray(pair) && pair.length === 2) {
+                walk(pair[0], `${q}[${String(j)}][0]`, "first", msg, out);
+                walk(pair[1], `${q}[${String(j)}][1]`, side, msg, out);
+              } else walk(pair, `${q}[${String(j)}]`, side, msg, out);
+            });
+          else if (NOTW.has(k)) walk(x, q, "notWords", msg, out);
+          else if ((k === "say" || k === "addSay") && Array.isArray(x))
+            x.forEach((m, j) => walk(m, `${q}[${String(j)}]`, side, true, out));
+          else walk(x, q, side, msg, out);
+        }
+    };
+    const leavesOf = (t: LoadedTrade): Leaf[] => {
+      const out: Leaf[] = [];
+      for (const [name, block] of Object.entries(t.pluginText))
+        walk(JSON.parse(block) as unknown, `pluginText.${name}`, "new", false, out);
+      for (const f of FLOWS) {
+        const part = t.flows[f];
+        walk(part.ops, `${f} ops`, "new", false, out);
+        part.rename.forEach((pair, j) => {
+          walk(pair[0], `${f} rename[${String(j)}][0]`, "first", false, out);
+          walk(pair[1], `${f} rename[${String(j)}][1]`, "new", false, out);
+        });
+        walk(part.slotRows, `${f} slotRows`, "new", false, out);
+        walk(part.money, `${f} money`, "new", false, out);
+      }
+      return out;
+    };
+    const hitsOf = (s: string) => {
+      const hs: { name: string; phrase: string; at: number; reach: number }[] = [];
+      for (const sh of SHAPES) {
+        const g = new RegExp(sh.re.source, `${sh.re.flags.replace("g", "")}g`);
+        for (const m of s.matchAll(g)) hs.push({ name: sh.name, phrase: m[0], at: m.index, reach: sh.reach });
+      }
+      return hs;
+    };
+    const isP = (n: string) => n.startsWith("P") || n === "H4";
+    const VIN = /(?:re-?)?check(?:s|ed)?\b|verif(?:y|ies|ied)\b|confirm(?:s|ed)?\b|\blook(?:s|ed)?\b|\breads?\b|\bsaw\b|\bsees?\b|\bseen\b/gi;
+    const reasonOf = (h: { name: string; phrase: string; at: number; reach: number }, text: string, msg: boolean) => {
+      const vs = [...h.phrase.matchAll(VIN)].map((m) => m.index);
+      const firstV = vs[0] ?? 0;
+      const lastV = vs[vs.length - 1] ?? 0;
+      if (negIn(text, h.at, h.reach) || negIn(text, h.at + lastV, 3) || NEG.test(h.phrase.slice(firstV)))
+        return "negation";
+      const after = text.slice(h.at + h.phrase.length);
+      if (h.name.endsWith("bare") && NOPAPER_NEG.test(after)) return "negation";
+      if (h.name.endsWith("bare") && NOPAPER_OTHER.test(after)) return "guard";
+      if (msg && isP(h.name)) return "msg-wait";
+      if (!TMPPAPER.test(text)) return "nopaper";
+      return "REVIEW";
+    };
+    const all: string[] = [];
+    const notw: string[] = [];
+    const neg40 = new Set<string>();
+    const neg40lines: string[] = [];
+    const hitReasons: Record<string, number> = {};
+    const textReasons: Record<string, number> = {};
+    const filesReasons: Record<string, Set<string>> = {};
+    let firstHits = 0;
+    const firstFiles = new Set<string>();
+    let markedTexts = 0;
+    const per: { id: string; rl: Leaf[]; dl: Leaf[] }[] = [];
+    for (const id of ALL) {
+      const raw = loadTrade(id);
+      const done = markClaims(raw).trade;
+      const rl = leavesOf(raw);
+      const dl = leavesOf(done);
+      expect(dl.length).toBe(rl.length);
+      per.push({ id, rl, dl });
+      rl.forEach((r, i) => {
+        const d = dl[i] as Leaf;
+        expect(d.path).toBe(r.path);
+        if (r.text !== d.text) markedTexts++;
+        for (const h of hitsOf(r.text))
+          if (/^P(?:[0-9]|1[01])$/.test(h.name) && negAcross(r.text, h.at, 3)) neg40.add(id);
+        if (d.side === "first") {
+          const n = hitsOf(d.text).length;
+          firstHits += n;
+          if (n > 0) firstFiles.add(id);
+          return;
+        }
+        const scan = d.text.split(OWN_WORD).join(" § ");
+        const hs = hitsOf(scan);
+        if (hs.length === 0) return;
+        if (d.side === "notWords") {
+          notw.push(`${id} ${d.path} | ${hs.map((h) => `[${h.name}]«${h.phrase}»`).join(" ")} | ${scan}`);
+          return;
+        }
+        const rs = hs.map((h) => reasonOf(h, scan, d.msg));
+        rs.forEach((x) => (hitReasons[x] = (hitReasons[x] ?? 0) + 1));
+        const key = [...new Set(rs)].sort().join("+");
+        textReasons[key] = (textReasons[key] ?? 0) + 1;
+        (filesReasons[key] ??= new Set()).add(id);
+        all.push(
+          `${key} | ${id} ${d.path}${d.msg ? " (msg)" : ""} | ${hs.map((h, k) => `[${h.name}:${rs[k] ?? ""}]«${h.phrase}»`).join(" ")} | ${scan.length > 300 ? `${scan.slice(0, 300)}…` : scan}`,
+        );
+      });
+    }
+    const neg40reasons: Record<string, Record<string, number>> = {};
+    for (const { id, rl, dl } of per) {
+      if (!neg40.has(id)) continue;
+      rl.forEach((r, i) => {
+        const d = dl[i] as Leaf;
+        for (const h of hitsOf(r.text)) {
+          if (!isP(h.name) || !negAcross(r.text, h.at, 3)) continue;
+          let why: string;
+          if (r.side === "first") why = "first side";
+          else if (r.side === "notWords") why = "not words";
+          else if (r.text !== d.text && !d.text.includes(h.phrase)) why = "marked";
+          else why = reasonOf(h, r.text, r.msg);
+          const m = (neg40reasons[id] ??= {});
+          m[why] = (m[why] ?? 0) + 1;
+          neg40lines.push(`${why} | ${id} ${r.path} | [${h.name}]«${h.phrase}» | ${r.text.length > 240 ? `${r.text.slice(0, 240)}…` : r.text}`);
+        }
+      });
+    }
+    all.sort();
+    neg40lines.sort();
+    TMPW(`${OUT}t140r4b-all.txt`, all.join("\n"));
+    TMPW(`${OUT}t140r4b-review.txt`, all.filter((l) => /REVIEW|msg-wait/.test(l.split(" | ")[0] ?? "")).join("\n"));
+    TMPW(`${OUT}t140r4b-notwords.txt`, notw.join("\n"));
+    TMPW(`${OUT}t140r4b-neg40.txt`, neg40lines.filter((l) => !l.startsWith("first side")).join("\n"));
+    TMPW(
+      `${OUT}t140r4b-summary.json`,
+      JSON.stringify(
+        {
+          markedTexts,
+          firstHits,
+          firstFiles: firstFiles.size,
+          hitReasons,
+          textReasons,
+          filesReasons: Object.fromEntries(Object.entries(filesReasons).map(([k, v]) => [k, v.size])),
+          neg40: [...neg40],
+          neg40count: neg40.size,
+          neg40reasons,
+          notWords: notw.length,
+        },
+        null,
+        1,
+      ),
+    );
+  });
+});
+describe("SCANOLD", () => {
+  it("dumps", () => {
+    const OUT =
+      "/private/tmp/claude-501/-Users-aryamahadik-Downloads-Rosfield-Main-rosie/d9982744-6798-4bc7-ad8e-3fc2a5092574/scratchpad/";
+    const ALLP = [...CLAIM_PATTERNS, ...TMPP];
+    const NEG = /\b(?:never|not|no|nor|cannot|nothing|none)\b|n't\b/i;
+    const B_NEW = /[,;:.!?](?=\s|$)|[·•—–|/\n]/;
+    const B_NOCOLON = /[,;.!?](?=\s|$)|[·•—–|/\n]/;
+    const B_NOSLASH = /[,;:.!?](?=\s|$)|[·•—–|\n]/;
+    const B_R3 = /[,;.!?](?=\s|$)/;
+    const wds = (s: string) => s.split(/\s+/).filter((w) => /[a-z]/i.test(w));
+    const negIn = (s: string, at: number, reach: number, brk: RegExp) => {
+      const cl = s.slice(0, at).split(brk);
+      const w = wds(cl[cl.length - 1] ?? "");
+      return w.slice(Math.max(0, w.length - reach)).some((x) => NEG.test(x));
+    };
+    const negAcross = (s: string, at: number, n: number) =>
+      wds(s.slice(0, at))
+        .slice(-n)
+        .some((x) => NEG.test(x));
+    const WHO = String.raw`(?:a person on Rosie's team|Rosie's team|Rosie)`;
+    const NOPAPER_NEG = /^\s+(?:no|nothing|none)\b/i;
+    const NOPAPER_OTHER = /^\s+(?:each job|the job|the total|the date|(?:this|that) before|(?:it |them )?back)\b/i;
+    const SHAPES = [
+      ...CLAIM_PATTERNS.slice(2).map((p, k) => ({ name: `C${k + 2}`, re: p.pattern, reach: p.reach })),
+      ...TMPP.map((p, k) => ({ name: `P${k}`, re: p.pattern, reach: p.reach })),
+      {
+        name: "C0bare",
+        re: new RegExp(
+          String.raw`\b${WHO}\s+(?:(?:also|then|first|again|only|still)\s+)?(?:re-?checks|checks|looks\s+(?:[\w'-]+\s+){0,4}?up|has\s+read|reads|verifies|confirms)\b`,
+        ),
+        reach: 3,
+      },
+      { name: "C1bare", re: /\bRosie\s+[a-z]+s\b[^.;:]{0,80}?\band\s+(?:re-?)?checks\b/, reach: 3 },
+      {
+        name: "VERBneg",
+        re: /\b(?:re-?)?(?:check(?:s|ed|ing)?|verif(?:y|ies|ied)|confirm(?:s|ed)?)\b|\blook(?:s|ed)?\s+(?:[\w'-]+\s+){0,4}?up\b/i,
+        reach: 3,
+      },
+      {
+        name: "H4",
+        re: /\b(?:licen[cs]es?|permits?|certificates?|certifications?|insurance|registrations?|credentials?|bonds?|authority|papers?)\b[^.;:!?·•|]{0,40}?\b(?:(?:re-?)?checked|verified|confirmed|looked\s+up)\b(?!\s+by\b)/i,
+        reach: 3,
+      },
+    ];
+    const NOTW = new Set([
+      "id", "at", "op", "label", "who", "to", "via", "as", "line", "needs", "gives", "reads", "tells", "when", "sets",
+      "flow", "phase", "type", "kind", "slot", "link", "stop",
+    ]);
+    type Leaf = { path: string; text: string; side: string; msg: boolean };
+    const walk = (v: unknown, p: string, side: string, msg: boolean, out: Leaf[]): void => {
+      if (typeof v === "string") out.push({ path: p, text: v, side, msg });
+      else if (Array.isArray(v)) v.forEach((x, k) => walk(x, `${p}[${String(k)}]`, side, msg, out));
+      else if (typeof v === "object" && v !== null)
+        for (const [k, x] of Object.entries(v)) {
+          const q = p === "" ? k : `${p}.${k}`;
+          if ((k === "swap" || k === "rename") && Array.isArray(x))
+            x.forEach((pair, j) => {
+              if (Array.isArray(pair) && pair.length === 2) {
+                walk(pair[0], `${q}[${String(j)}][0]`, "first", msg, out);
+                walk(pair[1], `${q}[${String(j)}][1]`, side, msg, out);
+              } else walk(pair, `${q}[${String(j)}]`, side, msg, out);
+            });
+          else if (NOTW.has(k)) walk(x, q, "notWords", msg, out);
+          else if ((k === "say" || k === "addSay") && Array.isArray(x))
+            x.forEach((m, j) => walk(m, `${q}[${String(j)}]`, side, true, out));
+          else walk(x, q, side, msg, out);
+        }
+    };
+    const leavesOf = (t: LoadedTrade): Leaf[] => {
+      const out: Leaf[] = [];
+      for (const [name, block] of Object.entries(t.pluginText))
+        walk(JSON.parse(block) as unknown, `pluginText.${name}`, "new", false, out);
+      for (const f of FLOWS) {
+        const part = t.flows[f];
+        walk(part.ops, `${f} ops`, "new", false, out);
+        part.rename.forEach((pair, j) => {
+          walk(pair[0], `${f} rename[${String(j)}][0]`, "first", false, out);
+          walk(pair[1], `${f} rename[${String(j)}][1]`, "new", false, out);
+        });
+        walk(part.slotRows, `${f} slotRows`, "new", false, out);
+        walk(part.money, `${f} money`, "new", false, out);
+      }
+      return out;
+    };
+    const hitsOf = (s: string) => {
+      const hs: { name: string; phrase: string; at: number; reach: number }[] = [];
+      for (const sh of SHAPES) {
+        const g = new RegExp(sh.re.source, `${sh.re.flags.replace("g", "")}g`);
+        for (const m of s.matchAll(g)) {
+          if (sh.name === "VERBneg" && !negAcross(s, m.index, 3)) continue;
+          hs.push({ name: sh.name, phrase: m[0], at: m.index, reach: sh.reach });
+        }
+      }
+      return hs;
+    };
+    const lines: string[] = [];
+    const throws: string[] = [];
+    const diffs: string[] = [];
+    const negPassiveFilesA = new Set<string>();
+    const negPassiveFilesB = new Set<string>();
+    const opPassive: string[] = [];
+    const counts: Record<string, number> = {};
+    const filesByReason: Record<string, Set<string>> = {};
+    let rawHits = 0;
+    let markedTexts = 0;
+    for (const id of ALL) {
+      const trade = loadTrade(id);
+      for (const leaf of leavesOf(trade)) {
+        for (const h of hitsOf(leaf.text)) {
+          if (h.name.startsWith("P") && negAcross(leaf.text, h.at, 3)) negPassiveFilesA.add(id);
+          if (/checked|checks out|check out/i.test(h.phrase) && negAcross(leaf.text, h.at, 3)) negPassiveFilesB.add(id);
+        }
+        const pred = leaf.side === "new" ? ownWord(leaf.text, ALLP) : leaf.text;
+        const markedNow = pred !== leaf.text;
+        if (markedNow) markedTexts++;
+        if (markedNow && leaf.msg) throws.push(`${id} ${leaf.path} :: ${leaf.text}`);
+        if (markedNow && !leaf.path.startsWith("pluginText.") && ownWord(leaf.text, CLAIM_PATTERNS) === leaf.text)
+          opPassive.push(`${id} ${leaf.path} :: ${leaf.text}`);
+        const rawH = hitsOf(leaf.text);
+        rawHits += rawH.length;
+        for (const h of rawH) {
+          const a = negIn(leaf.text, h.at, h.reach, B_NEW);
+          const b = negIn(leaf.text, h.at, h.reach, B_NOCOLON);
+          const c = negIn(leaf.text, h.at, h.reach, B_NOSLASH);
+          const d = negIn(leaf.text, h.at, h.reach, B_R3);
+          if (a !== b || a !== c || a !== d)
+            diffs.push(
+              `${id} ${leaf.path} [${h.name}] new=${String(a)} nocolon=${String(b)} noslash=${String(c)} r3=${String(d)} «${h.phrase}» :: ${leaf.text.slice(Math.max(0, h.at - 90), h.at + h.phrase.length + 40)}`,
+            );
+        }
+        const scan = pred.split(OWN_WORD).join(" § ");
+        const hs = hitsOf(scan);
+        if (hs.length === 0) continue;
+        const reasons = hs.map((h) => {
+          if (leaf.side === "first") return "first-side";
+          if (leaf.side === "notWords") return "not-words";
+          if (negIn(scan, h.at, h.reach, B_NEW)) return "negation";
+          const after = scan.slice(h.at + h.phrase.length);
+          if (h.name.endsWith("bare") && NOPAPER_NEG.test(after)) return "negation";
+          if (h.name.endsWith("bare") && NOPAPER_OTHER.test(after)) return "nopaper-guard";
+          if (!TMPPAPER.test(pred)) return "nopaper-text";
+          return "REVIEW";
+        });
+        const rs = [...new Set(reasons)].sort().join("+");
+        counts[rs] = (counts[rs] ?? 0) + 1;
+        (filesByReason[rs] ??= new Set()).add(id);
+        lines.push(
+          `${rs} | ${id} ${leaf.path}${leaf.msg ? " (msg)" : ""} | ${hs.map((h) => `[${h.name}]«${h.phrase}»`).join(" ")} | ${scan.length > 400 ? `${scan.slice(0, 400)}…` : scan}`,
+        );
+      }
+    }
+    lines.sort();
+    TMPW(`${OUT}t140r4-unmarked.txt`, lines.join("\n"));
+    TMPW(`${OUT}t140r4-diffs.txt`, diffs.join("\n"));
+    TMPW(`${OUT}t140r4-throws.txt`, throws.join("\n"));
+    TMPW(`${OUT}t140r4-oppassive.txt`, opPassive.join("\n"));
+    TMPW(
+      `${OUT}t140r4-summary.json`,
+      JSON.stringify(
+        {
+          rawHits,
+          markedTexts,
+          counts,
+          filesByReason: Object.fromEntries(Object.entries(filesByReason).map(([k, v]) => [k, [...v].length])),
+          negPassiveFilesA: [...negPassiveFilesA],
+          negPassiveFilesB: [...negPassiveFilesB],
+          throws: throws.length,
+          diffs: diffs.length,
+          opPassive: opPassive.length,
+        },
+        null,
+        1,
+      ),
+    );
   });
 });

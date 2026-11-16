@@ -144,9 +144,11 @@ export const PASSIVE_PATTERNS: readonly ClaimPattern[] = [
   // say), "no appraisal is offered until the company's and the appraiser's numbers check out" (appraiser.json;
   // energy-audit, home-engineer, inspector, surveyor), "A person whose license doesn't check out is never sent"
   // (locksmith.json; towing), "Where the state's form says a license is needed and none checks out" (property-manager.json).
+  // A student's learner's permit is the customer's own paper, which the instructor checks in person (driving-school.json):
+  // no business paper.
   {
     pattern:
-      /\b(?:licen[cs]es?|registrations?|permits?|authority|certificates?|numbers?|none)\s+(?:checks?|(?:doesn't|does\s+not|don't|do\s+not)\s+check)\s+out\b/i,
+      /(?<!learner's\s)\b(?:licen[cs]es?|registrations?|permits?|authority|certificates?|numbers?|none)\s+(?:checks?|(?:doesn't|does\s+not|don't|do\s+not)\s+check)\s+out\b/i,
     reach: 3,
   },
   // A paper checked like a license, by no one named: "where the state requires a certificate for a fitness coach, it's
@@ -156,10 +158,11 @@ export const PASSIVE_PATTERNS: readonly ClaimPattern[] = [
   // The other passive wordings (the lead's ruling, DL-894): a paper checked, with no one named who checks.
   // A paper, or its number, that is checked: "the city's or county's license is checked, by the customer's address"
   // (hvac.json), "each one's number is checked" (contractor.json; interior), "its business registration is checked"
-  // (tree.json's wood yard).
+  // (tree.json's wood yard). A driver's license is a person's identity, and "checked by" names who checks ("their
+  // driver's license is checked by the business", pet-taxi.json).
   {
     pattern:
-      /\b(?:licen[cs]es?|registrations?|permits?|certificates?|credentials?|numbers?)\s+(?:is|are)\s+(?:re-?)?checked\b/i,
+      /(?<!driver's\s)\b(?:licen[cs]es?|registrations?|permits?|certificates?|credentials?|numbers?)\s+(?:is|are)\s+(?:re-?)?checked\b(?!\s+by\b)/i,
     reach: 3,
   },
   // The license that is the one checked: "the license for the job's address is the one checked" (electrician.json).
@@ -171,15 +174,19 @@ export const PASSIVE_PATTERNS: readonly ClaimPattern[] = [
   // A paper shown only once checked: "a certificate shows only once checked" (dog-trainer.json), "a national
   // certificate is shown only once checked" (speech-therapist.json), "shown only as 'checked' once it is"
   // (gunsmith.json).
-  { pattern: /\b(?:shows?|shown)\s+only\s+(?:once\s+checked|as\s+'checked'\s+once)\b/i, reach: 3 },
+  // "A certificate is a claim, shown only once it's checked" (dog-trainer.json's whys, DL-901).
+  {
+    pattern: /\b(?:shows?|shown)\s+only\s+(?:once\s+(?:it's\s+|it\s+is\s+)?checked|as\s+'checked'\s+once)\b/i,
+    reach: 3,
+  },
   // A person checked for the papers a form asks: "a threader is checked for what the form asks instead (an ID, a
   // course, insurance)" (lash-brow.json).
   { pattern: /\bchecked\s+for\s+what\s+the\s+form\s+asks\b/i, reach: 3 },
   // A rule that starts "Checked", its paper named by its block: "Checked on each renewal date from the state form"
   // (cpa.json; funeral, lawyer, mortgage, realtor), "Checked each year, and on the date from the state's form"
   // (advisor.json), "checked at sign-up and re-checked" (vehicle-inspection.json). "Checked by Rosie" is a phrase of
-  // CLAIM_PATTERNS.
-  { pattern: /^(?:re-?)?checked\b(?!\s+by\b)/i, reach: 3 },
+  // CLAIM_PATTERNS; "Checked in: Alex M., Sat 11:00am" (advisor.json and 60 more) is a customer's check-in.
+  { pattern: /^(?:re-?)?checked\b(?!\s+(?:by|in|out)\b)/i, reach: 3 },
   // Credentials shown as checked: "Credentials show exactly as checked" (tax.json).
   { pattern: /\b(?:shows?|shown)\s+(?:exactly\s+)?as\s+checked\b/i, reach: 3 },
   // The business's word unless checked: "shown as 'as stated' unless it's checked" (coach.json), "shown as the
@@ -191,18 +198,60 @@ export const PASSIVE_PATTERNS: readonly ClaimPattern[] = [
   // A wait on a paper confirmed by no one named: "customers see no permit claim until it's confirmed" (limo.json). No
   // word before "until" takes the wait back (reach 0): the "no" there is the claim's, not the check's.
   { pattern: /\buntil\s+(?:it's|it\s+is)\s+(?:confirmed|checked)\b/i, reach: 0 },
+  // A paper, or its number, shown as checked (the lead's ruling, DL-901): "None needed · registration 0628841, checked"
+  // (snow.json, the words op at S2-21, the staff table's "Licenses" cell), "None needed; registration checked Oct 19"
+  // (dj.json). "Checked by" names who checks; a driver's license checked is a driver's skill ("Driver's license checked
+  // · keys held", concierge.json), no business paper.
+  {
+    pattern:
+      /(?<!driver's\s)\b(?:licen[cs]es?|registrations?|permits?|certificates?|credentials?|insurance)(?:\s+#?[A-Z]{0,3}\d[\w-]*)?,?\s+(?:re-?)?checked\b(?!\s+by\b)/i,
+    reach: 3,
+  },
+  // The other passive wordings the exhaustive scan found (DL-901 item 16), each a paper checked or confirmed by no one
+  // named: "Where a state's form names a license for this work, it's asked and checked then" (coach.json;
+  // college-admissions, image-consultant, matchmaker, personal-shopper, psychic), "it's asked then and checked"
+  // (pet-waste.json), "its number is asked here and checked the same way" (tires.json).
+  { pattern: /\basked\s+(?:here\s+|then\s+)?and\s+checked\b/i, reach: 3 },
+  // "Where the city requires a permit to walk dogs in its parks, it's checked before Reese is offered for it"
+  // (dog-walker.json).
+  { pattern: /\b(?:it's|it\s+is)\s+checked\s+before\b/i, reach: 3 },
+  // "Mowing, cleanups and aeration go live on the business registration while it's checked" (lawn.json).
+  { pattern: /\bwhile\s+(?:it's|it\s+is)\s+checked\b/i, reach: 3 },
+  // A person checked for the license their work needs: "Massage licenses each therapist, so Kofi is checked"
+  // (cpr-training.json; gym, pilates, tours).
+  { pattern: /\bso\s+[A-Z][\w'.-]*(?:\s+[A-Z][\w'.-]*)?\s+(?:is|are)\s+checked\b/, reach: 3 },
+  // "Licenses already checked stay as they are" (daycare.json).
+  {
+    pattern: /\b(?:licen[cs]es?|registrations?|permits?|certificates?|credentials?)\s+already\s+checked\b/i,
+    reach: 3,
+  },
+  // A wait on a paper confirmed by no one named: "Nobody is offered to customers until any license they need is
+  // confirmed and Sam says yes" (restoration.json), "until their PTIN and credentials are confirmed" (tax.json). As in
+  // "until it's confirmed", no word before "until" takes the wait back (reach 0).
+  {
+    pattern:
+      /\buntil\s+[\w' ]{0,30}?\b(?:licen[cs]es?|credentials?|permits?|certificates?|registrations?)\b[\w' ]{0,20}?\s(?:is|are)\s+confirmed\b/i,
+    reach: 0,
+  },
+  // "Customers see each preparer's credential only as checked" (tax.json).
+  { pattern: /\bonly\s+as\s+checked\b/i, reach: 3 },
 ];
 
-/** The phrases read in a free-text pf block: CLAIM_PATTERNS, then PASSIVE_PATTERNS. */
-export const PF_CLAIM_PATTERNS: readonly ClaimPattern[] = [...CLAIM_PATTERNS, ...PASSIVE_PATTERNS];
+/** The phrases read in a trade's own words: CLAIM_PATTERNS, then PASSIVE_PATTERNS. */
+export const WORD_PATTERNS: readonly ClaimPattern[] = [...CLAIM_PATTERNS, ...PASSIVE_PATTERNS];
+
+/** A place inside a message a person reads: a say or addSay list (`A ops[11].say[2][0]`). */
+const IN_MESSAGE = /\.(?:say|addSay)\[/;
 
 /**
- * The phrases read in a text at its place (a ClaimMark's `where`): PF_CLAIM_PATTERNS in a free-text pf block
- * (`pluginText.pf.license.blocks[0]`), CLAIM_PATTERNS anywhere else (an op's words, a rename's new side, a slot row, a
- * money text), where a wait on a paper belongs to a step that waits (CQ-347's).
+ * The phrases read in a text at its place (a ClaimMark's `where`): WORD_PATTERNS in a pf block, an op's words, a
+ * rename's new side, a slot row or a money text (DL-901: a paper checked with no checker named is the business's own
+ * word in an op as in a pf block); CLAIM_PATTERNS alone in a message a person reads. Six such messages wait on a
+ * permit that "checks out" (movers.json's junk hauling, c7.test.ts's MESSAGES_WAITING); OWN_WORD is no word for a
+ * person, so marking them would stop the build (C7ClaimError), and they wait on the lead's ruling (DL-901 item 15).
  */
 export function patternsAt(where: string): readonly ClaimPattern[] {
-  return where.startsWith("pluginText.") ? PF_CLAIM_PATTERNS : CLAIM_PATTERNS;
+  return IN_MESSAGE.test(where) ? CLAIM_PATTERNS : WORD_PATTERNS;
 }
 
 /**
@@ -215,15 +264,25 @@ export function patternsAt(where: string): readonly ClaimPattern[] {
 export const PAPER =
   /licen[cs]|permit|certif|insur|registration|credential|\bbond|carrier|\bauthority|lookup|\bpapers?\b|\bdata\s+feed\b|\b(?:own|official)\s+site\b|\bstate's\s+records\b|\bwith\s+the\s+city\b/i;
 
-/** A word that negates the phrase after it: "not checked by Rosie", "never as checked by Rosie". */
-const NEGATION = /\b(?:never|not|no|nor|cannot|nothing|none)\b|n't\b/i;
+/** A word that negates the phrase after it: "not checked by Rosie", "never as checked by Rosie", "Nobody is shown as checked". */
+const NEGATION = /\b(?:never|not|no|nor|cannot|nothing|none|nobody)\b|n't\b/i;
 
 /**
- * A clause break: a comma, a semicolon or a sentence end (".", "!" or "?") before white space or the end. A negation
- * never reaches across one (DL-894): in "Where a lookup has no data feed, a person on Rosie's team checks within 1
- * business day" (movers.json), the "no" belongs to the first clause, and the second says Rosie's team checks.
+ * A sentence whose colon introduces a list after a lone negation: "Never: call a license checked, or let it stand for
+ * control (S1-75)." (aba.json), "Never: let a license stand for control (S1-75), or say a license is checked."
+ * (occupational-therapist.json). That colon is no clause break: the negation governs each item of its list, across the
+ * list's commas too (DL-901: a colon is kept out of the clause breaks only where it introduces a list).
  */
-const CLAUSE_BREAK = /[,;.!?](?=\s|$)/;
+const LIST_NEGATION = /^\s*(?:never|none|no|not|nothing|nobody)\s*:/i;
+
+/**
+ * A clause break: any separator (DL-901): a comma, a semicolon, a colon or a sentence end (".", "!" or "?") before white
+ * space or the end; a "·", "•", "—", "–", "|" or "/" anywhere; a line break. A negation never reaches across one
+ * (DL-894): in "Where a lookup has no data feed, a person on Rosie's team checks within 1 business day" (movers.json),
+ * the "no" belongs to the first clause, and the second says Rosie's team checks; in "None needed · registration checked
+ * on the state's lookup, Oct 19" (dance.json), the "None" belongs to the first item.
+ */
+const CLAUSE_BREAK = /[,;:.!?](?=\s|$)|[·•—–|/\n]/;
 
 /** One sentence and the separator after it, as a text splits (the separator is "" at the end). */
 interface Sentence {
@@ -231,9 +290,12 @@ interface Sentence {
   after: string;
 }
 
-/** A text's sentences: each ends at ".", ";", "!" or "?" before white space, or at the end. */
+/**
+ * A text's sentences: each ends at ".", ";", "!" or "?" before white space, at a "·", "•" or "|" between spaces (an
+ * item of a row: "None needed · registration 0628841, checked", snow.json), at a line break, or at the end.
+ */
 function sentences(text: string): Sentence[] {
-  const parts = text.split(/((?<=[.;!?])\s+)/);
+  const parts = text.split(/((?<=[.;!?])\s+|\s+[·•|]\s+|\s*\n\s*)/);
   const out: Sentence[] = [];
   for (let k = 0; k < parts.length; k += 2) out.push({ text: parts[k] ?? "", after: parts[k + 1] ?? "" });
   return out;
@@ -241,9 +303,12 @@ function sentences(text: string): Sentence[] {
 
 /**
  * Whether a negation comes within `reach` words (punctuation alone is no word) before `at`, in the clause `at` lies in:
- * the words looked at stop at the last clause break before it (CLAUSE_BREAK).
+ * the words looked at stop at the last clause break before it (CLAUSE_BREAK); or the phrase is an item of a list a lone
+ * negation's colon introduces (LIST_NEGATION).
  */
 function negated(sentence: string, at: number, reach: number): boolean {
+  const list = LIST_NEGATION.exec(sentence);
+  if (list !== null && list[0].length <= at) return true;
   const clauses = sentence.slice(0, at).split(CLAUSE_BREAK);
   const words = (clauses[clauses.length - 1] ?? "").split(/\s+/).filter((word) => /[a-z]/i.test(word));
   return words.slice(Math.max(0, words.length - reach)).some((word) => NEGATION.test(word));
