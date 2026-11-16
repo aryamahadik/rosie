@@ -11,9 +11,9 @@
 // The five trades are fixture set v1's own (rule 9):
 //   aba          switches sensitive and welfare; lists the header-only fact monthlybill, so step.js cannot say its paths
 //   lactation    switches sensitive and welfare in both flows; no header-only fact
-//   dietitian    sensitive in flow A, sensitive and welfare in flow B, whose paths start at a set start
-//   pet-waste    no switch; flow A starts at a set start, flow B at a set time with a window
-//   insurance    no facts list (before C5 gives it one): every fact-gated branch shows
+//   dietitian    sensitive in flow A, sensitive and welfare in flow B, where its paths start at a set start (booking=)
+//   pet-waste    no switch on, so step.js --path gets no pf=
+//   insurance    no facts list (before C5 gives it one): every fact-gated branch shows, and step.js gets no facts=
 // The three paths of each trade and flow: its first money path, the first booking value laid on it, and the record
 // fixture two-full where it rides (else its first fixture path).
 import { describe, expect, it } from "vitest";
@@ -21,7 +21,7 @@ import type { FlowLetter } from "../graph/types.ts";
 import { loadMaster } from "../load/flow";
 import { loadTrade } from "../load/trade";
 import { applyTrade, type AppliedTrade } from "../overlay/apply";
-import { stepOf, tradePaths, type TradePath } from "../path";
+import { pathName, stepOf, tradePaths, type TradePath } from "../path";
 import {
   Reference,
   compareStepJs,
@@ -103,11 +103,21 @@ describe("5 trades x 3 paths x both flows: the compiler's pre-correction words e
       const { walks, steps, words } = runMatrix(trade, {});
       expect(walks).toBe(6);
       expect(steps).toBeGreaterThan(600);
-      // the comparison is not empty-handed: messages carry their plain-text forms, and splits light some branches only
+      // the comparison is not empty-handed: messages carry their elements' plain-text forms (each on a line of its own),
+      // a vary key chooses some step's words, and a split lights other branches on another path of the same flow
       const all = words.flatMap((walk) => walk.steps);
       expect(all.some((step) => step.say.some((message) => message.includes("\n")))).toBe(true);
-      expect(all.some((step) => step.branches.length >= 2)).toBe(true);
       expect(all.some((step) => step.keys.length > 0)).toBe(true);
+      const lighting = new Map<string, Set<string>>();
+      for (const walk of words) {
+        for (const step of walk.steps) {
+          const key = `${walk.flow} ${step.id}`;
+          const seen = lighting.get(key) ?? new Set<string>();
+          seen.add(step.branches.map((branch) => branch.label).join(" | "));
+          lighting.set(key, seen);
+        }
+      }
+      expect([...lighting.values()].some((seen) => seen.size > 1)).toBe(true);
     }, 300_000);
   }
 
@@ -164,6 +174,24 @@ describe("5 trades x 3 paths x both flows: the compiler's pre-correction words e
     expect(parity.reference).toBeNull();
     expect(parity.differences).toHaveLength(1);
     expect(parity.differences[0]).toMatchObject({ trade: "lactation", flow: "A", step: "", field: "path" });
+  }, 120_000);
+
+  it("private-call, a fixture the vendored walk leaves out, is read as parsePath reads it, and is at parity", () => {
+    for (const flow of FLOWS) {
+      const path = tradePaths(applied("aba", flow), loadTrade("aba")).find(
+        (candidate) => candidate.fixture === "private-call",
+      );
+      if (path === undefined) throw new Error(`aba flow ${flow} has no private-call path`);
+      const name = pathName(path);
+      expect(
+        reference.paths("aba", flow).map((walked) => reference.nameOf("aba", flow, walked)),
+      ).not.toContain(name);
+      const parity = comparePath(reference, applied("aba", flow), path);
+      expect(lines(parity.differences), `aba flow ${flow} ${name}`).toEqual([]);
+      const made = parity.referencePath;
+      expect(made === null ? null : reference.nameOf("aba", flow, made)).toBe(name);
+      expect(parity.compiler.steps.length).toBeGreaterThan(100);
+    }
   }, 120_000);
 });
 
@@ -353,6 +381,12 @@ describe("the reference equals step.js's printout where step.js --path can say t
           expect(lines(compareStepJs(want, output)), `${trade} flow ${flow} --path "${said.text}"`).toEqual(
             [],
           );
+          // and the compiler's own words, held against the same printout
+          const compiler = compilerWords(applied(trade, flow), path);
+          expect(
+            lines(compareStepJs(compiler, output)),
+            `${trade} flow ${flow} the compiler's words`,
+          ).toEqual([]);
           if (path.switches.sensitive === true) expect(said.text).toContain("pf=sensitive");
           ran += 1;
         }
