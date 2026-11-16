@@ -87,6 +87,15 @@
 //                DL-344), and nobody is told until T-319 (NOT_TOLD_YET). The turn records the gate's and the commit's
 //                spans; the face tells the base so (TURN_RECORDS_GATE), and the base records none (T-1193; DL-376). The
 //                face holds each committed turn's words as its request handed them in (held.ts), for compose input.
+//                The guard's keyword turn whose caller names no business (a bare STOP, START or HELP: K-09 v1
+//                caller.businessId null, T-1413's isKeywordTurn) goes to T-1413's keyword door instead (T-1415; the
+//                CQ-335 ruling's NEW-3, DL-864, DL-877), where RootOptions.gateReads binds its runtime-side pieces
+//                (keywordDoor; on staging one runtime-side transaction for each call, rosie_job with no business scope,
+//                its side checked first, in one of the gate's client slots): the same commit with no business
+//                (keywordCommitDeps), the same turn-row port, sealer and bundles; the turn records the gate hop
+//                (TURN_RECORDS_GATE), so the door records none, and no words are held. Where no door is bound (a test's
+//                doubles, staging unbound, production's closed gate), such a call goes to the base, which refuses it
+//                (noBusinessScope) before anything is read, as it always has.
 //   composeInput T-560: K-09 composeInput through @rosie/actions' turn face (T-1141, createTurnFace with its calls: the
 //                Tool API base with K-09 v1.6's checks and the call's own business scope; T-309's compose input with
 //                T-1174's term facts over T-1141's row binding). Its reads are handed in by the root
@@ -174,6 +183,7 @@
 // names the secret by its name only. A text's words go to the safety read and decide only, never into a span, a log or
 // an error.
 
+import type { CoreFlagsDeps } from "@rosie/actions/src/commit/core";
 import type { FlagsReader } from "@rosie/actions/src/domain/flags/reads";
 import type { MessagesReader } from "@rosie/actions/src/domain/messages-consent/reads";
 import {
@@ -191,10 +201,19 @@ import type {
 import type { BusinessScope } from "@rosie/actions/src/tool-api/scope";
 import type { CallTrace } from "@rosie/actions/src/tool-api/tool-api";
 import {
+  keywordCommitDeps,
   turnCommitDeps,
+  type KeywordCommitBinding,
+  type NoBusinessSafetyReads,
   type SafetyReads,
   type TurnCommitBinding,
 } from "@rosie/actions/src/tool-api/turn-face/commit";
+import {
+  createKeywordDoor,
+  isKeywordTurn,
+  type DoorRuntime,
+  type KeywordDoor,
+} from "@rosie/actions/src/tool-api/turn-face/door";
 import type { FinalizeNote } from "@rosie/actions/src/finalize/rewrite/types";
 import { HeldTurns } from "@rosie/actions/src/tool-api/turn-face/held";
 import {
@@ -203,7 +222,7 @@ import {
   type RowBinding,
   type RowData,
 } from "@rosie/actions/src/tool-api/turn-face/rows";
-import { createTurnFace } from "@rosie/actions/src/tool-api/turn-face/turn-face";
+import { createTurnFace, TURN_RECORDS_GATE } from "@rosie/actions/src/tool-api/turn-face/turn-face";
 import { createToolApiValidator, type ToolApiValidator } from "@rosie/actions/src/tool-api/validator";
 import {
   createLinqWebhookVerifier,
@@ -1481,9 +1500,10 @@ export function realDecide(inputs: DecideInputs): TurnDecide {
  * readOpenHolds (readOpenHoldsIn) and K-05 v1.4's seven safety reads (pgSafetyReads: six on the call's transaction, the
  * business owner's on the runtime side in its own); the safety record's words are sealed by a sealer that only reads the
  * person's key, which the gateway made at first sight (pgReadOnlySealer). T-317's and T-307's reads (the flags and the
- * checked line's rows), left out, are the safety service's own on the call's transaction, a database's.
+ * checked line's rows), left out, are the safety service's own on the call's transaction, a database's. `DoorRepo` is the
+ * keyword door's transaction (KeywordDoorReads), which is never the call's.
  */
-export interface GateReads<Repo = unknown> {
+export interface GateReads<Repo = unknown, DoorRepo = unknown> {
   readonly scope: BusinessScope<Repo>;
   readonly readOpenHolds: TurnCommitBinding<Repo>["readOpenHolds"];
   readonly safetyReads: SafetyReads<Repo>;
@@ -1497,6 +1517,28 @@ export interface GateReads<Repo = unknown> {
    * never reads it.
    */
   readonly words?: SafetyWords;
+  /**
+   * The keyword door's runtime-side pieces (T-1415; KeywordDoorReads), for a keyword turn whose caller names no business.
+   * Left out (a test's doubles, and any binding that has no door), every call goes to the Tool API base, which refuses
+   * such a call (noBusinessScope) before anything is read.
+   */
+  readonly keywordDoor?: KeywordDoorReads<DoorRepo>;
+}
+
+/**
+ * The keyword door's runtime-side pieces (T-1415; T-1413's door, the CQ-335 ruling's NEW-1 and NEW-3, DL-864, DL-877), as
+ * @rosie/actions' turn-face/pg/calls.ts names each one on PostgreSQL, all on the door's own transaction (`Repo`): that one
+ * runtime-side transaction for each call (pgDoorRuntime: rosie_job, no business scope, no person, its side checked and
+ * the transaction made read only before the first read, db/repo/targets.ts enterKeywordDoorSide), K-05 v1.3 readOpenHolds
+ * and v1.4's five record reads in their no-business forms on it (readOpenHoldsIn, pgNoBusinessSafetyReads), and runCore's
+ * flags port over it (pgDoorFlags: T-317's and T-307's readers, keyed ids, no event sources). The door's sealer, its one
+ * commitTurn and its bundles are the gate's own (realGate).
+ */
+export interface KeywordDoorReads<Repo = unknown> {
+  readonly runtime: DoorRuntime<Repo>;
+  readonly readOpenHolds: KeywordCommitBinding<Repo>["readOpenHolds"];
+  readonly safetyReads: NoBusinessSafetyReads<Repo>;
+  readonly flags: CoreFlagsDeps<Repo>;
 }
 
 /** What the real gate port is fed. */
@@ -1544,6 +1586,12 @@ const NO_GATE_SCOPE: BusinessScope<unknown> = {
  * the base all the same and fails closed there, before anything is read or written. The validator is made at the first
  * call and kept: inside workerd, T-1144's prebuilt standalone code; under Node, Ajv over the frozen schemas. Nothing here
  * logs: the chat id goes to the walk only, never into a span, a log line, an error or an event-log entry's values.
+ *
+ * The one call the base never runs (T-1415): a keyword turn whose caller names no business (goesToDoor) goes to T-1413's
+ * keyword door where the reads bind its pieces (GateReads.keywordDoor; keywordDoorOf), with the same validator, bundles,
+ * turn-row port and sealer, and TURN_RECORDS_GATE, so the door records no span of its own either; it holds no words for
+ * compose input (a keyword turn's rows get their words from the guard's replies). Every other call goes to the base
+ * exactly as above, and so does every call while no door is bound.
  */
 export function realGate(inputs: GateInputs): GatePort {
   let validator: ToolApiValidator | null = null;
@@ -1552,6 +1600,17 @@ export function realGate(inputs: GateInputs): GatePort {
       validator ??= createToolApiValidator();
       const reads = inputs.reads;
       const bundles = new FrontierBundleReads(inputs.pinnedOf(trace), inputs.bundles());
+      const door = reads?.keywordDoor;
+      if (reads !== null && door !== undefined && goesToDoor(request, validator)) {
+        const answered = await keywordDoorOf(inputs, door, reads.sealer, bundles, validator).gateAndCommit(
+          request,
+          at,
+          trace,
+          TURN_RECORDS_GATE,
+        );
+        // The door's answer is K-09 gateAndCommit's, or one of the base's own refusals, as the face's is.
+        return answered as unknown as GateAndCommitAnswer;
+      }
       const binding: TurnCommitBinding<unknown> = {
         bundles,
         commitTurn: (commit) => inputs.commitTurn(commit),
@@ -1588,6 +1647,53 @@ export function realGate(inputs: GateInputs): GatePort {
       return answer as unknown as GateAndCommitAnswer;
     },
   };
+}
+
+/**
+ * Whether a gateAndCommit request goes to the keyword door (T-1415): its caller names no business (K-09 v1
+ * caller.businessId null: "a call that covers every business (a STOP)"), K-09 takes it, and it is the door's one shape
+ * (T-1413's isKeywordTurn: a turn's own core-only call carrying only recordSafetyOutcome, recordStopOrStart and
+ * sendFixedLine, each under that same caller). The caller's business is read first, so a call that names one is never
+ * checked here and goes to the base as it always has; so does every other request, which the base answers as before
+ * (invalidRequest for one K-09 refuses, noBusinessScope for any other that names no business).
+ */
+function goesToDoor(request: unknown, validator: ToolApiValidator): boolean {
+  if (typeof request !== "object" || request === null) return false;
+  const caller: unknown = (request as { readonly caller?: unknown }).caller;
+  if (typeof caller !== "object" || caller === null) return false;
+  if ((caller as { readonly businessId?: unknown }).businessId !== null) return false;
+  if (validator.check("gateAndCommit", "request", request).length > 0) return false;
+  return isKeywordTurn(request as Parameters<typeof isKeywordTurn>[0]);
+}
+
+/**
+ * T-1413's keyword door for one gate call (T-1415), over the pieces the reads bind (KeywordDoorReads) and, as the face's
+ * commit has them, the call's bundles (the run's pinned one, else the bundle port), the root's turn-row port's commitTurn
+ * (its turn id checked there), the gate's read-only sealer, the barbershop plug-in's stop words (DL-344) and nobody told
+ * until T-319: its commit is keywordCommitDeps' (no business: the record reads in their no-business forms, the door's
+ * lines, runCore's flags port over the door's transaction), and its checks are the gate's validator.
+ */
+function keywordDoorOf(
+  inputs: GateInputs,
+  door: KeywordDoorReads,
+  sealer: WordsSealer,
+  bundles: FrontierBundles,
+  validator: ToolApiValidator,
+): KeywordDoor {
+  const binding: KeywordCommitBinding<unknown> = {
+    bundles,
+    commitTurn: (commit) => inputs.commitTurn(commit),
+    readOpenHolds: door.readOpenHolds,
+    safetyReads: door.safetyReads,
+    sealer,
+    stopWords: PLUGIN_LISTS_NO_STOP_WORDS,
+    telling: NOT_TOLD_YET,
+  };
+  return createKeywordDoor<unknown>({
+    runtime: door.runtime,
+    commit: keywordCommitDeps(binding, door.flags),
+    validator,
+  });
 }
 
 /** A safety read where no database is bound: refused, so the call fails closed. */
