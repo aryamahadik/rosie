@@ -1767,11 +1767,18 @@ function fakeKeywordDoor(
   const onDoor = (repo: unknown, read: string, businessId: string | null = null): void => {
     seen.push({ read, businessId });
     if (businessId !== null || !isRecord(repo) || typeof repo.door !== "number" || repo.open !== true) {
-      throw new BusinessScopeError("a door read names a business, or is made off the door's open transaction");
+      throw new BusinessScopeError(
+        "a door read names a business, or is made off the door's open transaction",
+      );
     }
   };
   /** A read as a promise: the note's refusal rejects it, as a database call's would. */
-  const read = <T>(repo: unknown, name: string, answer: () => T, businessId: string | null = null): Promise<T> => {
+  const read = <T>(
+    repo: unknown,
+    name: string,
+    answer: () => T,
+    businessId: string | null = null,
+  ): Promise<T> => {
     try {
       onDoor(repo, name, businessId);
       return Promise.resolve(answer());
@@ -1827,7 +1834,8 @@ function fakeKeywordDoor(
     personExists: (personId) => read(repo, "personExists", () => personOf(personId) !== null),
     // Test owner 1 holds no role (T-1148), and no commit here writes one.
     liveRoles: () => read(repo, "liveRoles", () => []),
-    consentWritten: (id) => read(repo, "consentWritten", () => rowsOf("consents").some((row) => row.id === id)),
+    consentWritten: (id) =>
+      read(repo, "consentWritten", () => rowsOf("consents").some((row) => row.id === id)),
     consentsOfPersons: (personIds) => read(repo, "consentsOfPersons", () => consentsOf(personIds)),
     bookingHead: noDoorRead("bookingHead"),
     bookingsOfPerson: noDoorRead("bookingsOfPerson"),
