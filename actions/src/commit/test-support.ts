@@ -12,6 +12,7 @@ import type { ValidateFunction } from "ajv";
 import Ajv2020 from "ajv/dist/2020.js";
 
 import type * as K05 from "../../../contracts/generated/data-access/data-access.v1.1";
+import type * as K05V1dot17 from "../../../contracts/generated/data-access/data-access.v1.17";
 import { copy, gateExchange } from "../gate/framework/test-support";
 import type { Choice, SetupKey } from "../gate/framework";
 import { CONTRACTS_DIR, SCHEMA_FILES, formatProblems } from "../tool-api";
@@ -36,24 +37,61 @@ import type {
 // ---------------------------------------------------------------------------------------------------------------
 // The contracts' own schemas (Ajv 2020, strict), as the contract tests hold them
 
-const DATA_ACCESS_V1_1 = "https://rosie.invalid/contracts/data-access/data-access.v1.1.schema.json";
+/**
+ * K-05 v1.17 (T-1418), the version every turn's commit speaks (build.ts default 9; T-1419): it holds every v1.1
+ * definition under its own name, by reference, and restates commitTurn.request, which takes answerPhoneRowsBy, and
+ * commitTurn.exchange, which holds the answer of a request that asks (README item 71); commitTurn.handleIdExchange is that
+ * exchange with the field required. Without the field every request and exchange is v1.1's (README "v1.17": every v1 to
+ * v1.16 exchange is a v1.17 exchange).
+ */
+const DATA_ACCESS_V1_17_FILE = "data-access/data-access.v1.17.schema.json";
+const DATA_ACCESS_V1_17 = `https://rosie.invalid/contracts/${DATA_ACCESS_V1_17_FILE}`;
+const EVENT_TRACE_V1 = "https://rosie.invalid/contracts/event-trace/event-trace.v1.schema.json";
 const EVENT_TRACE_V1_1 = "https://rosie.invalid/contracts/event-trace/event-trace.v1.1.schema.json";
 
 export interface ContractChecks {
-  /** Problems K-05 v1.1 `$defs/<call>.<part>` finds, one line each (a path and what it wants, never a value). */
+  /**
+   * Problems K-05 v1.17 `$defs/<call>.<part>` finds, one line each (a path and what it wants, never a value): every v1.1
+   * definition by reference, commitTurn.request with answerPhoneRowsBy, and commitTurn.handleIdExchange.
+   */
   k05(definition: string, value: unknown): string[];
   /** Problems K-08 v1.1 `$defs/<definition>` finds (eventLogRow, eventLogBatch). */
   k08(definition: string, value: unknown): string[];
+  /** Problems K-08 v1 `$defs/<definition>` finds (safeId, handleRef, rowRef: a row id that is never a number). */
+  k08v1(definition: string, value: unknown): string[];
 }
 
 let checks: ContractChecks | undefined;
 
-/** One strict Ajv instance holding the frozen schemas the Tool API holds, and K-05 v1.1. */
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+/** Every file a schema's $refs name, relative to contracts/ (a $ref inside the schema itself names none). */
+function referencedFiles(file: string, schema: unknown): string[] {
+  if (Array.isArray(schema)) return schema.flatMap((item) => referencedFiles(file, item));
+  if (!isRecord(schema)) return [];
+  return Object.entries(schema).flatMap(([key, inner]) => {
+    if (key !== "$ref" || typeof inner !== "string") return referencedFiles(file, inner);
+    const target = inner.split("#")[0] ?? "";
+    return target === "" ? [] : [path.posix.join(path.posix.dirname(file), target)];
+  });
+}
+
+/**
+ * One strict Ajv instance holding the frozen schemas the Tool API holds, and K-05 v1.17 with every file its $refs reach
+ * (K-05 v1 to v1.16 among them), each file once.
+ */
 export function contractChecks(): ContractChecks {
   if (checks !== undefined) return checks;
   const ajv = new Ajv2020({ strict: true, strictRequired: false, allErrors: true });
-  for (const file of [...SCHEMA_FILES, "data-access/data-access.v1.1.schema.json"]) {
-    ajv.addSchema(JSON.parse(readFileSync(path.join(CONTRACTS_DIR, ...file.split("/")), "utf8")) as object);
+  const held = new Set<string>();
+  const queue: string[] = [...SCHEMA_FILES, DATA_ACCESS_V1_17_FILE];
+  for (let file = queue.shift(); file !== undefined; file = queue.shift()) {
+    if (held.has(file)) continue;
+    const schema = JSON.parse(readFileSync(path.join(CONTRACTS_DIR, ...file.split("/")), "utf8")) as object;
+    ajv.addSchema(schema);
+    held.add(file);
+    queue.push(...referencedFiles(file, schema));
   }
   const problems = (schemaId: string, definition: string, value: unknown): string[] => {
     const validate: ValidateFunction | undefined = ajv.getSchema(`${schemaId}#/$defs/${definition}`);
@@ -61,8 +99,9 @@ export function contractChecks(): ContractChecks {
     return validate(value) ? [] : formatProblems(validate.errors);
   };
   checks = {
-    k05: (definition, value) => problems(DATA_ACCESS_V1_1, definition, value),
+    k05: (definition, value) => problems(DATA_ACCESS_V1_17, definition, value),
     k08: (definition, value) => problems(EVENT_TRACE_V1_1, definition, value),
+    k08v1: (definition, value) => problems(EVENT_TRACE_V1, definition, value),
   };
   return checks;
 }
@@ -118,27 +157,34 @@ export interface K05FakeOptions {
 }
 
 export interface K05Fake {
-  /** K-05 v1.1 commitTurn, as the commit's port calls it. */
-  readonly commitTurn: CommitPorts["commitTurn"];
-  /** Every request sent, in order, as sent. */
-  readonly requests: CommitTurnRequest[];
+  /**
+   * K-05 v1.17 commitTurn (v1.1's, with answerPhoneRowsBy): any v1.17 request, the field set, as the commit's port sends
+   * every one (types.ts CommitPorts.commitTurn), or left out, as a K-05 v1.1 fixture's request is sent to it as it is.
+   */
+  readonly commitTurn: (
+    request: K05V1dot17.CommitTurnRequest,
+    call: Parameters<CommitPorts["commitTurn"]>[1],
+  ) => ReturnType<CommitPorts["commitTurn"]>;
+  /** Every request sent, in order, as sent: K-05 v1.17's, so a turn's answerPhoneRowsBy reads as it was sent. */
+  readonly requests: K05V1dot17.CommitTurnRequest[];
   /** What each first commit of a turn id wrote, in order: a repeat adds nothing. */
   readonly commits: { readonly turnId: string; readonly written: RowRef[] }[];
 }
 
 /**
- * A K-05 v1.1 commitTurn that commits into memory as K-05 v1 item 1 and v1.1 item 18 say: a request the schema refuses
- * throws (the commit sent what K-05 does not take); a turn id committed before writes nothing and returns the first commit
- * with `repeated` true and no rows, whatever the repeat's body; otherwise every row written with its version after the
- * commit (an insert 1, an update its read version plus one; a reservation booked also cancels its saved-time clock row)
- * and the outbox rows in commit order. The versions read are not compared (limit 4 runs on PostgreSQL: T-306).
+ * A K-05 v1.17 commitTurn that commits into memory as K-05 v1 item 1 and v1.1 item 18 say: a request K-05 v1.17's schema
+ * refuses throws (the commit sent what K-05 does not take); a turn id committed before writes nothing and returns the
+ * first commit with `repeated` true and no rows, whatever the repeat's body; otherwise every row written with its version
+ * after the commit (an insert 1, an update its read version plus one; a reservation booked also cancels its saved-time
+ * clock row) and the outbox rows in commit order. The versions read are not compared (limit 4 runs on PostgreSQL: T-306).
+ * It knows no phones row's handle id, so a turn that writes a phones row scripts K-05's answer (`answers`).
  */
 export function k05Fake(options: K05FakeOptions = {}): K05Fake {
   const now = options.now ?? "2026-10-19T14:05:06Z";
   let nextSeq = options.nextCommitSeq ?? 1;
   const answers = [...(options.answers ?? [])];
   const firsts = new Map<string, CommitTurnResponse>();
-  const requests: CommitTurnRequest[] = [];
+  const requests: K05V1dot17.CommitTurnRequest[] = [];
   const commits: { turnId: string; written: RowRef[] }[] = [];
 
   const remember = (answer: CommitTurnResponse): CommitTurnResponse => {
@@ -186,7 +232,7 @@ export function k05Fake(options: K05FakeOptions = {}): K05Fake {
       requests.push(copy(request));
       const problems = contractChecks().k05("commitTurn.request", request);
       if (problems.length > 0) {
-        return Promise.reject(new Error(`K-05 v1.1 refuses the request: ${problems.join("; ")}`));
+        return Promise.reject(new Error(`K-05 v1.17 refuses the request: ${problems.join("; ")}`));
       }
       const first = firsts.get(request.turn.id);
       if (first !== undefined) {
