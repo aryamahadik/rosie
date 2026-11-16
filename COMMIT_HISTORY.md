@@ -2,9 +2,55 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 685, [`8c7b071`](https://github.com/aryamahadik/rosie/commit/8c7b071), 2026-11-15 22:42:59 UTC.
+- **Through:** commit 687, [`8658b20`](https://github.com/aryamahadik/rosie/commit/8658b20), 2026-11-16 00:52:21 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 687. docs: COMMIT\_HISTORY.md through commit 685 (8c7b071, \#696) (\#697)
+
+- **Commit:** [`8658b20`](https://github.com/aryamahadik/rosie/commit/8658b20), by Arya Mahadik, 2026-11-16 00:52:21 UTC
+- **Pull request:** [#697](https://github.com/aryamahadik/rosie/pull/697) from `task/commit-history-138`, merged 2026-11-16 00:52:22 UTC. It squashed 1 branch commit:
+  - `0ec21cd` docs: COMMIT\_HISTORY.md through commit 685 (8c7b071, \#696)
+- **Files changed:** 1 (+49 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +49 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 231 (DL-855); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 686. T-1156: the commit writes a core action's clock rows (UnitWrites.clocks), once, with their entries under the turn id; runCore hands the safety service's clocks over (\#698)
+
+- **Commit:** [`c01a051`](https://github.com/aryamahadik/rosie/commit/c01a051), by Arya Mahadik, 2026-11-16 00:52:18 UTC
+- **Pull request:** [#698](https://github.com/aryamahadik/rosie/pull/698) from `task/T-1156`, merged 2026-11-16 00:52:18 UTC. It squashed 2 branch commits:
+  - `ef94abb` T-1156: the commit writes a core action's clock rows: UnitWrites.cloc…
+  - `f41ad48` T-1156: core.test.ts: a clearer comment on the clock rows runCore han…
+- **Files changed:** 8 (+690 −50), by folder:
+  - `actions/src/commit/` build.test.ts +196 −1, build.ts +90 −8, commit.test.ts +153 −0, commit.ts +5 −2, types.ts +12 −4
+  - `actions/src/commit/core/` core.test.ts +211 −21, core.ts +19 −9, errors.ts +4 −5
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1156: the commit writes a core action's clock rows: UnitWrites.clocks carries a unit's own clock rows beside an asked question's; buildCommitRequest writes each as given in K-05 v1's clockNew shape, once, with its K-08 clock_row.created entry under the turn id (no clock id twice, an unreadable one refused before anything is sent; rowsNamedBy names them); runCore hands the safety service's clocks over in the run's writes, lifting T-1140's clockRows rule (DL-341)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1156: core.test.ts: a clearer comment on the clock rows runCore hands over (comment only)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 685. docs: COMMIT\_HISTORY.md through commit 683 (dd2e62e, \#694) (\#696)
 
