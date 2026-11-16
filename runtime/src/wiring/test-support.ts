@@ -106,7 +106,9 @@
 // double come through npm's workspace links (@rosie/contracts, @rosie/adapters). Test values only: the master's sample
 // cast, the frozen fixtures' ids, the fictional 555-01xx numbers (rule 9) and a webhook secret made up for each run.
 
+import { KEYED_IDS } from "@rosie/actions/src/domain/flags/ids";
 import type { FlagsReader } from "@rosie/actions/src/domain/flags/reads";
+import { NO_EVENT_SOURCES } from "@rosie/actions/src/domain/flags/stop-start";
 import type { MessagesReader } from "@rosie/actions/src/domain/messages-consent/reads";
 import type { StoredHold, StoredOutcome } from "@rosie/actions/src/domain/safety/ports";
 import type {
@@ -116,6 +118,7 @@ import type {
   WritePlanRequest,
 } from "@rosie/actions/src/finalize/rewrite/types";
 import type { ReadTurnStateAnswer, ReadTurnStateRequest } from "@rosie/actions/src/frontier/assemble/types";
+import type { ScopeCall } from "@rosie/actions/src/tool-api/scope";
 import { TurnFaceRefusedError } from "@rosie/actions/src/tool-api/turn-face/errors";
 import type { FixedLineFactsRead, OutboxRowRead } from "@rosie/actions/src/tool-api/turn-face/rows";
 import { createLinqDouble, type LinqDouble } from "@rosie/adapters/linq/double";
@@ -170,6 +173,7 @@ import type {
   CancelClockRequest as K05CancelClockRequest,
 } from "@rosie/db/repo/clocks";
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
+import type { ConsentRead } from "@rosie/db/repo/consent";
 import type { FlagSubject } from "@rosie/db/repo/flags";
 import type { ConstraintError, HandleSealingKeyRequest } from "@rosie/db/repo/handle-keys";
 import type {
@@ -185,6 +189,8 @@ import type {
   RenewClaimRequest as K05RenewClaimRequest,
 } from "@rosie/db/repo/outbox";
 import type { ParkTurnOutcome, ParkTurnRequest as K05ParkTurnRequest } from "@rosie/db/repo/park";
+import type { Person } from "@rosie/db/repo/people";
+import type { Handle, Phone } from "@rosie/db/repo/phones";
 import type {
   PhoneRead,
   RowState as K07RowState,
@@ -248,6 +254,7 @@ import type {
   GateReads,
   HandleSealingKeyCall,
   HandleTargetsCall,
+  KeywordDoorReads,
   LinqSendCall,
   LinqVerifyInputs,
   OpenChatOnTextCall,
@@ -658,12 +665,24 @@ const parkAnswer = (value: unknown): Promise<ParkTurnOutcome> =>
 type K05Writes = CommitTurnRequest["writes"];
 type K05Committed = Extract<CommitTurnOutcome, { result: "committed" }>;
 
-/** The one id of a state update's key (K-04: a row is named by its primary key alone). */
-function keyIdOf(key: Readonly<Record<string, unknown>>): string {
+/**
+ * The one id a state update's row is named by (K-04: a row is named by its primary key alone); a phones row, whose key is
+ * its number, by the handle id the row holds when the request asks for it (`phoneOf`: K-05 v1.17 item 71's
+ * answerPhoneRowsBy "handleId", which every turn's commit sets since T-1419), as T-1417's producer answers it. A phones
+ * update whose number names no row the double holds is refused, nothing written: no handle id can name it.
+ */
+function keyIdOf(
+  table: string,
+  key: Readonly<Record<string, unknown>>,
+  phoneOf: ((number: string) => string | null) | null,
+): string {
   const values = Object.values(key);
   const [id] = values;
   if (values.length !== 1 || typeof id !== "string") throw new K05RefusedError("a state update's key");
-  return id;
+  if (table !== "phones" || phoneOf === null) return id;
+  const handleId = phoneOf(id);
+  if (handleId === null) throw new K05RefusedError("a phones update names no phone row the double holds");
+  return handleId;
 }
 
 /**
@@ -726,7 +745,10 @@ function turnsRowOf(turn: CommitTurnRequest["turn"], state: TurnsRow["state"], a
  * reservation confirmed or released, each effect, and one event-log row per entry with the turn's id, trace id and
  * bundle; it answers K-05's commitResult: the versioned rows in the order written (an insert at version 1, an update at
  * its read version plus one; a confirmed reservation also cancels its saved-time clock row) and the outbox rows with their
- * commit order, at commit-first.json's committedAt (so commit-first.json's own request gets its own outcome). A later
+ * commit order, at commit-first.json's committedAt (so commit-first.json's own request gets its own outcome). A phones
+ * row, which an update names by its number (its key), is kept and answered by the handle id it holds when the request
+ * asks (K-05 v1.17's answerPhoneRowsBy, which every turn's commit sets since T-1419), as T-1417's producer answers it, so
+ * the double holds a phones row (its number and handle_id among its values) before any update of it. A later
  * commit of a committed id writes nothing and answers the first commit, repeated, with no rows written (the repeat's body
  * is not read: commit-repeat-same-turn.json). A later park of a parked id answers its first park again, repeated; a commit
  * of a parked id turnParked; a park of a committed id alreadyCommitted. A parked row's time is the request's parkedAt.
@@ -759,6 +781,15 @@ export function fakeTurnRows(): FakeTurnRows {
       const stagedRow = [...staged].reverse().find((row) => row.table === table && row.id === id);
       return stagedRow?.values ?? rows.get(table)?.get(id)?.values ?? {};
     };
+    /** The handle id the phones row the double holds under this number holds, the newest first; null for none. */
+    const phoneByNumber = (number: string): string | null => {
+      const held =
+        [...staged].reverse().find((row) => row.table === "phones" && row.values.number === number) ??
+        [...(rows.get("phones")?.values() ?? [])].find((row) => row.values.number === number);
+      const handleId = held?.values.handle_id;
+      return typeof handleId === "string" ? handleId : null;
+    };
+    const phoneOf = request.answerPhoneRowsBy === "handleId" ? phoneByNumber : null;
     const put = (
       table: string,
       id: string,
@@ -774,7 +805,7 @@ export function fakeTurnRows(): FakeTurnRows {
         if (typeof id !== "string") throw new K05RefusedError(`a ${write.table} insert names no id`);
         put(write.table, id, write.values, 1);
       } else {
-        const id = keyIdOf(write.key);
+        const id = keyIdOf(write.table, write.key, phoneOf);
         put(write.table, id, { ...before(write.table, id), ...write.set }, write.expectVersion + 1);
       }
     }
@@ -1381,6 +1412,16 @@ export interface GateCallRepo {
   readonly scopedTo: string;
 }
 
+/**
+ * The repo of one keyword door call's transaction in the doubles (T-1415's door): the runtime side's, with no business and
+ * no person, open until the call's work has ended.
+ */
+export interface DoorCallRepo {
+  /** Which door call opened it, from 1. */
+  readonly door: number;
+  open: boolean;
+}
+
 /** One read the gate made through the doubles: its K-05 name and the business its request named. */
 export interface GateRead {
   readonly read: string;
@@ -1392,7 +1433,12 @@ export interface FakeGateReads {
   readonly reads: GateReads;
   /** Each gate call's business scope, in order (the Tool API's own: rosie_app on PostgreSQL). */
   readonly scopes: string[];
-  /** Every read, in order. */
+  /**
+   * Each keyword door call's transaction, by the K-09 call it was opened for, in order (T-1415: the runtime side's, with
+   * no business, never one of `scopes`).
+   */
+  readonly doors: string[];
+  /** Every read, in order: a door call's with no business. */
   readonly seen: GateRead[];
   /** Each seal, by the person whose key sealed it (the words are never kept). */
   readonly sealedFor: string[];
@@ -1492,7 +1538,9 @@ const MESSAGES_READS: readonly (keyof MessagesReader)[] = [
  *                   person's key, as the gateway's first sight of their number made it (one non-exportable key per seeded
  *                   person, made for the run), and refused (noSealingKey) for a person the seed does not hold: a key is
  *                   never made here;
- *   flags, messages T-317's and T-307's reads, each refused, naming the read: a No record reads none of them.
+ *   flags, messages T-317's and T-307's reads, each refused, naming the read: a No record reads none of them;
+ *   keywordDoor     the keyword door's runtime-side pieces (T-1415; fakeKeywordDoor), for a keyword turn whose call names
+ *                   no business, which the real gate port sends to T-1413's door, beside this same sealer.
  * Each read on the call's transaction refuses a request that names another business than the call's scope, before
  * anything is read (BusinessScopeError, as db/repo/scope.ts does).
  */
@@ -1501,6 +1549,7 @@ export function fakeGateReads(
   seeded: readonly SeededHandle[] = [TEST_OWNER_1],
 ): FakeGateReads {
   const scopes: string[] = [];
+  const doors: string[] = [];
   const seen: GateRead[] = [];
   const sealedFor: string[] = [];
   const rowsOf = (table: string): WrittenRow[] => [...(written.rows.get(table)?.values() ?? [])];
@@ -1632,8 +1681,257 @@ export function fakeGateReads(
     },
     flagsReader: () => refusingReader<FlagsReader>("flags", FLAGS_READS),
     messagesReader: () => refusingReader<MessagesReader>("messages", MESSAGES_READS),
+    // The keyword door's pieces (T-1415), composed as staging's binding composes them; its sealer is this one.
+    keywordDoor: fakeKeywordDoor(written, seeded, { seen, doors }),
   };
-  return { reads, scopes, seen, sealedFor };
+  return { reads, scopes, doors, seen, sealedFor };
+}
+
+/** Refused by the door's doubles: a read no keyword turn's call makes, named, so a call that makes one fails closed. */
+const noDoorRead = (read: string) => (): Promise<never> =>
+  Promise.reject(new Error(`the keyword door's double holds no ${read} read: no keyword turn makes one`));
+
+/** A K-04 time as the reads answer it (db/repo: a Date), or null. */
+const dateOf = (value: unknown): Date | null => (typeof value === "string" ? new Date(value) : null);
+
+/**
+ * A K-04 phones row as T-317's and T-307's reads answer it (db/repo/phones.ts Phone), from the row the double holds (K-04's
+ * column names, as a phones update sets them): its version the double's.
+ */
+function phoneOfRow(row: WrittenRow): Phone {
+  const values = row.values;
+  return {
+    number: String(values.number),
+    handleId: String(values.handle_id),
+    chatOpen: values.chat_open === true,
+    chatOpenAt: dateOf(values.chat_open_at),
+    chatWay: (values.chat_way ?? null) as Phone["chatWay"],
+    stopped: values.stopped === true,
+    stopAt: dateOf(values.stop_at),
+    startAt: dateOf(values.start_at),
+    linqContactAddedAt: dateOf(values.linq_contact_added_at),
+    pollVotedAt: dateOf(values.poll_voted_at),
+    optoutLineDeliveredAt: dateOf(values.optout_line_delivered_at),
+    version: row.version,
+  };
+}
+
+/** A K-29 consents row as the reads answer it (db/repo/consent.ts ConsentRead: never its words), from the row a commit wrote. */
+function consentOfRow(row: WrittenRow): ConsentRead {
+  const values = row.values;
+  const idOrNull = (value: unknown): string | null => (typeof value === "string" ? value : null);
+  return {
+    id: row.id,
+    personId: String(values.person_id),
+    businessId: idOrNull(values.business_id),
+    kind: values.kind as ConsentRead["kind"],
+    revoked: values.revoked === true,
+    handleId: idOrNull(values.handle_id),
+    bookingId: idOrNull(values.booking_id),
+    wordsSha256: String(values.words_sha256),
+    at: new Date(String(values.at)),
+    channel: values.channel as ConsentRead["channel"],
+    chatLinkId: idOrNull(values.chat_link_id),
+    turnId: idOrNull(values.turn_id),
+  };
+}
+
+/**
+ * The keyword door's runtime-side pieces (./real.ts KeywordDoorReads; T-1415) as doubles, composed as staging's binding
+ * composes them (./staging/tool-api-gate.ts keywordDoorOn, over @rosie/actions' pgDoorRuntime, readOpenHoldsIn,
+ * pgNoBusinessSafetyReads and pgDoorFlags), over test owner 1's seeded rows and the K-04 rows the K-05 commitTurn double
+ * holds (`written`):
+ *   runtime         one runtime-side transaction for each door call (noted in `doors` by the call's K-09 name), with no
+ *                   business and no person: its repo (DoorCallRepo) is open until the call's work has ended;
+ *   readOpenHolds   K-05 v1.3 with businessId null: the handle's holds with no business still open, and the asked texts
+ *                   with no outcome with no business;
+ *   safetyReads     K-05 v1.4's five record reads in their no-business forms: the outcomes and holds with no business the
+ *                   commits wrote, and whether an outbox row is written;
+ *   flags           runCore's flags port, as pgDoorFlags binds it: T-317's and T-307's reads on the door's transaction
+ *                   (test owner 1's seeded handle and person, with no role; the phones rows the double holds, by handle
+ *                   id, and the consent rows and open questions the commits wrote), the Worker's keyed ids (KEYED_IDS) and
+ *                   no event sources (NO_EVENT_SOURCES). A read no keyword turn's call makes (a booking, a pause, a thread)
+ *                   is refused, naming it, so a call that makes one fails closed.
+ * Every read is noted in `seen` with no business, and refused (BusinessScopeError, as db/repo refuses a read on the
+ * wrong side) when it names a business or is made off an open door transaction.
+ */
+function fakeKeywordDoor(
+  written: Pick<FakeTurnRows, "rows">,
+  seeded: readonly SeededHandle[],
+  noted: { readonly seen: GateRead[]; readonly doors: string[] },
+): KeywordDoorReads {
+  const { seen, doors } = noted;
+  const rowsOf = (table: string): WrittenRow[] => [...(written.rows.get(table)?.values() ?? [])];
+  const noBusiness = (row: WrittenRow): boolean => (row.values.business_id ?? null) === null;
+  /** Notes the read, and refuses it when it names a business or is made off an open door transaction. */
+  const onDoor = (repo: unknown, read: string, businessId: string | null = null): void => {
+    seen.push({ read, businessId });
+    if (businessId !== null || !isRecord(repo) || typeof repo.door !== "number" || repo.open !== true) {
+      throw new BusinessScopeError("a door read names a business, or is made off the door's open transaction");
+    }
+  };
+  /** A read as a promise: the note's refusal rejects it, as a database call's would. */
+  const read = <T>(repo: unknown, name: string, answer: () => T, businessId: string | null = null): Promise<T> => {
+    try {
+      onDoor(repo, name, businessId);
+      return Promise.resolve(answer());
+    } catch (error) {
+      return Promise.reject(error instanceof Error ? error : new Error(name));
+    }
+  };
+  const handles = (): Handle[] =>
+    seeded.map((entry) => ({
+      id: entry.handleId,
+      kind: entry.handle.kind as Handle["kind"],
+      address: entry.handle.address,
+    }));
+  const handleOf = (handleId: string): Handle | null =>
+    handles().find((handle) => handle.id === handleId) ?? null;
+  const handleIdsOf = (personId: string): string[] =>
+    seeded.filter((entry) => entry.personId === personId).map((entry) => entry.handleId);
+  const phones = (): Phone[] => rowsOf("phones").map(phoneOfRow);
+  const consentsOf = (personIds: readonly string[]): ConsentRead[] =>
+    rowsOf("consents")
+      .map(consentOfRow)
+      .filter((row) => personIds.includes(row.personId));
+  const personOf = (personId: string): Person | null => {
+    const row = SEEDED.persons.get(personId);
+    if (row === undefined) return null;
+    const { name, language } = row.values;
+    return {
+      id: personId,
+      name: typeof name === "string" ? name : null,
+      language: typeof language === "string" ? language : null,
+      version: row.version,
+    };
+  };
+  const outcomeWhere = (match: (row: WrittenRow) => boolean): StoredOutcome | null => {
+    const row = rowsOf("safety_outcomes").find((each) => match(each) && noBusiness(each));
+    return row === undefined ? null : storedOutcomeOf(row);
+  };
+  const holdWhere = (match: (row: WrittenRow) => boolean): StoredHold | null => {
+    const row = rowsOf("safety_holds").find((each) => match(each) && noBusiness(each));
+    return row === undefined ? null : storedHoldOf(row);
+  };
+
+  const flagsReader = (repo: unknown): FlagsReader => ({
+    handleOfAddress: (address) =>
+      read(repo, "handleOfAddress", () => handles().find((handle) => handle.address === address) ?? null),
+    handle: (handleId) => read(repo, "handle", () => handleOf(handleId)),
+    phone: (number) => read(repo, "phone", () => phones().find((phone) => phone.number === number) ?? null),
+    personIdsOfHandle: (handleId) =>
+      read(repo, "personIdsOfHandle", () =>
+        seeded.filter((entry) => entry.handleId === handleId).map((entry) => entry.personId),
+      ),
+    handleIdsOfPerson: (personId) => read(repo, "handleIdsOfPerson", () => handleIdsOf(personId)),
+    personExists: (personId) => read(repo, "personExists", () => personOf(personId) !== null),
+    // Test owner 1 holds no role (T-1148), and no commit here writes one.
+    liveRoles: () => read(repo, "liveRoles", () => []),
+    consentWritten: (id) => read(repo, "consentWritten", () => rowsOf("consents").some((row) => row.id === id)),
+    consentsOfPersons: (personIds) => read(repo, "consentsOfPersons", () => consentsOf(personIds)),
+    bookingHead: noDoorRead("bookingHead"),
+    bookingsOfPerson: noDoorRead("bookingsOfPerson"),
+    pause: noDoorRead("pause"),
+    openPausesOfPerson: noDoorRead("openPausesOfPerson"),
+    openPausesOfPhone: noDoorRead("openPausesOfPhone"),
+    // The handle's live questions the commits wrote (waiting or open), each with the turn that asked it, in id order.
+    openQuestionsOfHandle: (handleId) =>
+      read(repo, "openQuestionsOfHandle", () =>
+        rowsOf("open_questions")
+          .filter(
+            (row) =>
+              row.values.handleId === handleId &&
+              (row.values.status === "waiting" || row.values.status === "open"),
+          )
+          .map((row) => ({ id: row.id, turnId: row.turnId, step: String(row.values.step) }))
+          .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)),
+      ),
+  });
+
+  const messagesReader = (repo: unknown): MessagesReader => ({
+    person: (personId) => read(repo, "person", () => personOf(personId)),
+    handleIdsOfPerson: (personId) => read(repo, "handleIdsOfPerson", () => handleIdsOf(personId)),
+    handle: (handleId) => read(repo, "handle", () => handleOf(handleId)),
+    phoneOfHandle: (handleId) =>
+      read(repo, "phoneOfHandle", () => phones().find((phone) => phone.handleId === handleId) ?? null),
+    chatThreadOf: noDoorRead("chatThreadOf"),
+    consentsOfPersons: (personIds) => read(repo, "consentsOfPersons", () => consentsOf(personIds)),
+  });
+
+  return {
+    runtime: {
+      async withRuntime<T>(work: (repo: DoorCallRepo) => Promise<T>, call: ScopeCall<T>): Promise<T> {
+        doors.push(call.call);
+        const repo: DoorCallRepo = { door: doors.length, open: true };
+        try {
+          return await work(repo);
+        } finally {
+          repo.open = false;
+        }
+      },
+    },
+    readOpenHolds: (repo, request) =>
+      read(
+        repo,
+        "readOpenHolds",
+        () => ({
+          result: "openHolds" as const,
+          holds: rowsOf("safety_holds")
+            .filter(
+              (row) =>
+                row.values.handle_id === request.handleId &&
+                noBusiness(row) &&
+                (row.values.released_at ?? null) === null,
+            )
+            .map((row) => {
+              const hold = storedHoldOf(row);
+              return { holdId: hold.id, releaseRule: hold.releaseRule, blocksBooking: hold.blocksBooking };
+            }),
+          unreadEventIds: request.eventIds.filter(
+            (eventId) => outcomeWhere((row) => row.values.event_id === eventId) === null,
+          ),
+        }),
+        request.businessId,
+      ),
+    safetyReads: {
+      outcomeOfEvent: (repo, { eventId, businessId }) =>
+        read(
+          repo,
+          "readSafetyOutcomeOfEvent",
+          () => ({ safetyOutcome: outcomeWhere((row) => row.values.event_id === eventId) }),
+          businessId,
+        ),
+      outcome: (repo, { outcomeId, businessId }) =>
+        read(
+          repo,
+          "readSafetyOutcome",
+          () => ({ safetyOutcome: outcomeWhere((row) => row.id === outcomeId) }),
+          businessId,
+        ),
+      hold: (repo, { holdId, businessId }) =>
+        read(repo, "readSafetyHold", () => ({ hold: holdWhere((row) => row.id === holdId) }), businessId),
+      holdOfOutcome: (repo, { outcomeId, businessId }) =>
+        read(
+          repo,
+          "readSafetyHoldOfOutcome",
+          () => ({ hold: holdWhere((row) => row.values.safety_outcome_id === outcomeId) }),
+          businessId,
+        ),
+      outboxRowWritten: (repo, { outboxRowId, businessId }) =>
+        read(
+          repo,
+          "readOutboxRowWritten",
+          () => ({ written: written.rows.get("outbox_rows")?.has(outboxRowId) ?? false }),
+          businessId,
+        ),
+    },
+    flags: {
+      reader: flagsReader,
+      messagesReader,
+      ids: KEYED_IDS,
+      events: NO_EVENT_SOURCES,
+    },
+  };
 }
 
 // ---- @rosie/ai's decide over the recorded-model double (T-558) -----------------------------------------------------
