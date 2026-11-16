@@ -16,13 +16,17 @@
 //   6. the writes: each core action's (runCore), then each passed part's (writesOf), in decide's order; a part the gate
 //      stopped, held or asked writes no row of its own. A unit's writes carry its own clock rows (UnitWrites.clocks: a
 //      threat's pause call-offs, T-319's escalations; T-1156), which the commit writes with the rest;
-//   7. one K-05 commitTurn request under the turn id (build.ts), sent once. A repeated turn id returns the first commit and
-//      writes nothing (K-05 v1 item 1). A version or reservation conflict reloads once and gates again (arch 06 line 305;
-//      K-09 v1 gateAndCommit.request); a second one fails closed. A parked turn, a database rule and a transient failure
-//      come back as K-09's own errors;
+//   7. one K-05 commitTurn request under the turn id (build.ts), sent once, asking K-05 v1.17 to name every phones row it
+//      answers by its handle id (answerPhoneRowsBy: build.ts default 9; T-1419). A repeated turn id returns the first
+//      commit and writes nothing (K-05 v1 item 1). A version or reservation conflict reloads once and gates again (arch 06
+//      line 305; K-09 v1 gateAndCommit.request), its request built again from the turn's own reads, never from the rows
+//      the answer named (an answered phones row id is a name, never a key: K-05 v1.17 item 71.4); a second one fails
+//      closed (stillChanged, naming the rows the answer named: a phones row by its handle id). A parked turn, a database
+//      rule and a transient failure come back as K-09's own errors;
 //   8. the answer: each part as K-09 v1 partResult (partResultOf; held and waiting parts as below), the core results, what
 //      K-05 wrote (`written` without the core actions' rows: default 9), the effect rows and the questions opened and
-//      closed; the call's span keeps every row written (K-08 v1 rowRef: tables and ids, never a value).
+//      closed; the call's span keeps every row written (K-08 v1 rowRef: tables and ids, never a value; a phones row by
+//      its handle id, as K-05 v1.17 answers it, never by its number).
 //
 // Nothing here logs; what it returns or throws names parts, limits, faults and row ids, never a quote's or a value's words
 // (K-08 v1 README line 75).
@@ -44,6 +48,11 @@
 //      does not name; the call's span keeps them. Kept whole:
 //      `outboxRows` (a core action's line among them, as K-09 v1 stop-recorded.json lists its stop reply; the actor leaves
 //      a fixed line's row out of what it composes itself), `promoted` and the call's span (every row the call wrote).
+//      A core action's phones row is kept in `written` too (T-1419; the architect's ruling on CQ-342, item 4; K-05 v1.17
+//      README, its T-1419 line): the request names it by its number, the key it is written by, and so does rowsNamedBy,
+//      while K-05 v1.17 answers it by its handle id, as every turn's request asks (build.ts default 9). So writtenOf's
+//      filter never matches it, and `written` lists it as phones/<handle id>, exactly as K-09 v1 stop-recorded.json lists
+//      a STOP's phone (phones/handle-ben, version 4): the frozen fixture wins over this default for that row.
 
 import {
   partResultOf,
@@ -69,6 +78,7 @@ import {
   type CommitUnit,
   type RowName,
   type TurnActor,
+  type TurnCommitRequest,
 } from "./build";
 import { CommitNotBuiltError, CommitRefusedError } from "./errors";
 import { askedBookings, bookingKey, bundleMismatchOf, checkTurn, choiceOf, heldParts } from "./hold";
@@ -76,7 +86,6 @@ import type {
   CommitDeps,
   CommitPorts,
   CommitTurnContext,
-  CommitTurnRequest,
   CommitTurnResponse,
   Committed,
   CoreRun,
@@ -227,7 +236,9 @@ const rowKey = (row: RowName): string => JSON.stringify([row.table, row.rowId]);
 
 /**
  * The rows K-05 wrote that `written` lists (default 9): every one but the rows the turn's core actions' writes name, which
- * their responses name instead (K-09 v1.5 default 134). They are written all the same, in the same K-05 request.
+ * their responses name instead (K-09 v1.5 default 134). They are written all the same, in the same K-05 request. A core
+ * action's phones row is not filtered: rowsNamedBy names it by its number, K-05 v1.17 answers it by its handle id
+ * (default 9's T-1419 note), so it stays, named by its handle id.
  */
 function writtenOf(rows: readonly RowRef[], core: readonly CoreRun[]): RowRef[] {
   const coreRows = new Set(core.flatMap((run) => rowsNamedBy(run.writes)).map(rowKey));
@@ -237,7 +248,7 @@ function writtenOf(rows: readonly RowRef[], core: readonly CoreRun[]): RowRef[] 
 /** The answer of a committed turn (step 8), from K-05's answer and the request it answered. */
 function committedOf(
   answer: CommitTurnResponse,
-  request: CommitTurnRequest,
+  request: TurnCommitRequest,
   parts: readonly PartResult[],
   core: readonly CoreRun[],
 ): Committed {
@@ -270,7 +281,10 @@ function committedOf(
   };
 }
 
-/** The rows a commit wrote, for its span: tables and ids only (K-08 v1 rowRef). */
+/**
+ * The rows a commit wrote, for its span: tables and ids only (K-08 v1 rowRef), as K-05 v1.17 answered them, so a phones
+ * row by its handle id (the request asks: build.ts default 9), never by its number.
+ */
 function spanRowsOf(answer: CommitTurnResponse): SpanRowRef[] {
   return [
     ...answer.committed.written.map((row) => ({ table: row.table, id: row.rowId })),
@@ -334,6 +348,8 @@ async function gateAndCommitOnce<Repo>(
   const answer = await ports.commitTurn(commitRequest, call);
   if ("error" in answer) {
     switch (answer.error) {
+      // The rows that changed, by name only (a phones row by its handle id: the request asks), for stillChanged's
+      // message; the reload reads the turn again and never puts a row named here into its request.
       case "versionChanged":
         return { kind: "conflict", rows: answer.changed.map((row) => row.rowId) };
       case "reservationLost":

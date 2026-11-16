@@ -1,7 +1,8 @@
 // T-305: one commit per turn. gateAndCommit's commit half on the gate (T-298), through the Tool API base (T-290) with a
 // recording scope, the gate's scripted limits (never the stubs changed) and the commit's port doubles (test-support.ts),
-// with K-05 v1.1 commitTurn as an in-memory fake (T-306 runs it on PostgreSQL). Every K-05 request is held to K-05 v1.1's
-// schema, every event-log entry to K-08 v1.1's, and every answer to K-09 v1's by the base's own validator.
+// with K-05 commitTurn as an in-memory fake (T-306 runs it on PostgreSQL). Every K-05 request is held to K-05 v1.17's
+// schema (v1.1's request with answerPhoneRowsBy, which every turn's commit sets: T-1419), every event-log entry to K-08
+// v1.1's, and every answer to K-09 v1's by the base's own validator.
 
 import { performance } from "node:perf_hooks";
 
@@ -35,6 +36,7 @@ import {
   type ScopeEvent,
 } from "../tool-api/test-support";
 import { CommitNotBuiltError, CommitRefusedError, defaultCommitDeps, gateAndCommit } from "./index";
+import type { TurnCommitRequest } from "./build";
 import { holdClassOf, isHeld, letsThrough } from "./hold";
 import {
   S1_02,
@@ -50,6 +52,7 @@ import {
   s1_02SafetyOutcome,
   samKindsWrites,
   type Doubles,
+  type K05Fake,
   type PortCalls,
 } from "./test-support";
 import type {
@@ -87,12 +90,16 @@ async function callCommit(request: unknown, deps: CommitDeps): Promise<Called> {
 
 const whats = (events: readonly ScopeEvent[]): string[] => events.map((event) => event.what);
 
-/** The one K-05 request the fake was sent, checked against K-05 v1.1 and its entries against K-08 v1.1. */
-function onlyRequest(requests: readonly CommitTurnRequest[]): CommitTurnRequest {
+/**
+ * The one K-05 request the fake was sent, checked against K-05 v1.17, asking for phones rows by handle id as every turn's
+ * commit does (build.ts default 9), and its entries against K-08 v1.1.
+ */
+function onlyRequest(requests: K05Fake["requests"]): K05Fake["requests"][number] {
   expect(requests).toHaveLength(1);
   const [request] = requests;
   if (request === undefined) throw new Error("no request");
   expect(contractChecks().k05("commitTurn.request", request)).toEqual([]);
+  expect(request.answerPhoneRowsBy).toBe("handleId");
   const rows = eventLogRowsOf(request, "2026-10-19T14:05:06Z");
   for (const row of rows) expect(contractChecks().k08("eventLogRow", row), String(row.id)).toEqual([]);
   if (rows.length > 0) expect(contractChecks().k08("eventLogBatch", { rows })).toEqual([]);
@@ -137,9 +144,11 @@ const S1_02_EVENT_BASE = {
 } as const;
 const ROSIE = { actorKind: "rosie", actorPersonId: null, actorRole: null, approvedBy: null } as const;
 
-function expectedS1_02Request(): CommitTurnRequest {
+function expectedS1_02Request(): TurnCommitRequest {
   const writes = samKindsWrites();
   return {
+    // K-05 v1.17's field, which every turn's commit sets (build.ts default 9; T-1419).
+    answerPhoneRowsBy: "handleId",
     turn: copy(gateExchange(S1_02).request.turn ?? fail()),
     versionsRead: [],
     writes: {
@@ -252,9 +261,14 @@ describe("commit-s1-02.json: the passed part becomes exactly one K-05 commit req
     expect(writes.outboxRows.map((row) => row.id)).toEqual(["out-s1-04-sam"]);
     expect(writes.outboxRows[0]).not.toHaveProperty("plan");
     expect(writes).not.toHaveProperty("effects");
-    // K-05 commit-first.json's form: the same request and write lists.
+    // K-05 commit-first.json's form: the same write lists, and its request's fields with K-05 v1.17's answerPhoneRowsBy,
+    // as K-05 v1.17's twin of a turn's commit (commit-alex-stop-handle-id.json) holds them (T-1419).
     const commitFirst = k05Exchange("commit-first.json").request;
-    expect(Object.keys(request).sort()).toEqual(Object.keys(commitFirst).sort());
+    const v1dot17Twin = (
+      contractFile("data-access/fixtures/commit-alex-stop-handle-id.json") as { request: object }
+    ).request;
+    expect(Object.keys(request).sort()).toEqual([...Object.keys(commitFirst), "answerPhoneRowsBy"].sort());
+    expect(Object.keys(request).sort()).toEqual(Object.keys(v1dot17Twin).sort());
     expect(Object.keys(writes).sort()).toEqual(Object.keys(commitFirst.writes).sort());
 
     // The span keeps the rows written, tables and ids only, and no words of the text.
