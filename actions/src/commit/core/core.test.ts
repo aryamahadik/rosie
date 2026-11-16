@@ -443,15 +443,18 @@ describe("an unknown or unbuilt core action answers notBuilt and writes nothing"
     return schema.$defs.coreAction.oneOf.map((each) => each.properties.call.const);
   }
 
-  it("every K-09 v1 core action but the two safety calls answers notBuilt by its name, before anything is read", async () => {
+  it("every K-09 v1 core action but the two safety calls and the two flags calls answers notBuilt by its name, before anything is read", async () => {
     const { request } = s1_01();
     const turn = turnContextOf(request);
     const { deps } = coreDoublesOn(safetyWorldOf(), { reader: unread, sealer: unread, flagsReader: unread });
     const runCore = createRunCore(deps);
     const calls = k09CoreCalls();
     expect(calls).toHaveLength(15);
-    const unbuilt = calls.filter((call) => call !== "recordSafetyOutcome" && call !== "releaseSafetyHold");
-    expect(unbuilt).toHaveLength(13);
+    // T-1163 built recordStopOrStart and setRecordFlag (core-flags.test.ts: with no flags port bound, as here, each
+    // answers notBuilt portNotWired, before anything is read).
+    const built = ["recordSafetyOutcome", "releaseSafetyHold", "recordStopOrStart", "setRecordFlag"];
+    const unbuilt = calls.filter((call) => !built.includes(call));
+    expect(unbuilt).toHaveLength(11);
     for (const call of unbuilt) {
       const action = { call, request: { caller: copy(request.caller) } } as unknown as CoreAction;
       const refused = await runCore(action, turn, copy(NOTHING_OPEN)).catch((thrown: unknown) => thrown);
