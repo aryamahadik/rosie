@@ -50,7 +50,7 @@ export const NO_SETTINGS: readonly TradeId[] = [
 ];
 
 /** Where a trade with no pf.settings starts, in each flow (K-01 tradeSettings): arrive "window", the cutoff empty. */
-export const START_SETTINGS: { readonly arrive: Arrive; readonly cutoff: string | null } = {
+export const START_SETTINGS: { readonly arrive: Arrive; readonly cutoff: null } = {
   arrive: "window",
   cutoff: null,
 };
@@ -66,7 +66,7 @@ export interface Fill {
   /** The flow, for a setting. */
   flow?: FlowLetter;
   /** The value from then on: the facts, the arrive setting, or the cutoff (null: empty). */
-  value: Name[] | Arrive | string | null;
+  value: Name[] | Arrive | null;
 }
 
 /** A trade with C5's values: the loaded trade with its facts filled, and every value C5 filled. */
