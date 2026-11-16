@@ -2,17 +2,25 @@
 // The guard (../guard.ts) hands its keyword texts here: a stop word, START or HELP alone gets its fixed reply from code,
 // never from the model or the composer.
 //
-//   1. Each keyword text becomes one K-09 v1 core action, in arrival order, all carried in the keyword turn's one commit
-//      (a bare STOP runs in its own core-only turn: K-09 README default 35; stop-recorded.json):
-//        - a stop word (any of the bundle's 16 opt-out words) is `recordStopOrStart` kind stop. The core sets the phone's
-//          stopped flag, one flag for the number and so for every business (MC C1; D102), closes its chat, and adds K-29's
-//          texts row that withdraws texts with no business, so for every business. CANCEL and CANCELAR also flag the
-//          visit (`alsoCancelVisit`; RULES 7.4);
-//        - START is `recordStopOrStart` kind start, from that text's own number and event: only START clears the flag
-//          (RULES 7.5; MC C1; QUESTIONS.md CQ-74's default);
-//        - HELP is `sendFixedLine` helpReply, a reply in the same turn (quick_reply; Q-15), to everyone (QUESTIONS.md
-//          M3-M3b.2's default). From a stopped number the core refuses it (`phoneStopped`): that number's one reply to a
-//          later text is T-268's.
+//   1. The keyword texts become K-09 v1 core actions, in arrival order, all carried in the keyword turn's one commit (a
+//      bare STOP runs in its own core-only turn: K-09 README default 35; stop-recorded.json):
+//        - the turn's stop words and STARTs, all from its one number, become one `recordStopOrStart` (T-1416; T-317's
+//          security note N1), in the place of the first of them: the core keys a STOP or a START in a turn by that turn
+//          (K-09 v1: "the text's turn ... is the key"), so two of them would share their consent row id, reply row id and
+//          phone version, and the commit would refuse the turn on every run, the STOP never landing. The newest of them in
+//          arrival order decides, as the newest consent row does (K-29 README; DL-193): its kind, its event and its words
+//          (STOP then STOP is one stop, START then STOP a stop, STOP then START a start), while a CANCEL or CANCELAR among
+//          any of them still flags the visit. Each of those texts is answered from that one action's result;
+//        - a stop word (any of the bundle's 16 opt-out words) is kind stop. The core sets the phone's stopped flag, one
+//          flag for the number and so for every business (MC C1; D102), closes its chat, and adds K-29's texts row that
+//          withdraws texts with no business, so for every business. CANCEL and CANCELAR also flag the visit
+//          (`alsoCancelVisit`; RULES 7.4);
+//        - START is kind start, from that text's own number and event: only START clears the flag (RULES 7.5; MC C1;
+//          QUESTIONS.md CQ-74's default);
+//        - each HELP is its own `sendFixedLine` helpReply, a reply in the same turn (quick_reply; Q-15), to everyone
+//          (QUESTIONS.md M3-M3b.2's default). From a stopped number the core refuses it (`phoneStopped`): that number's one
+//          reply to a later text is T-268's. A HELP after the phone's first stop word or START meets the phone as its
+//          newest word leaves it.
 //      A STOP is a protective change: nothing here waits on a safety hold, and the gate commits it under any hold (DL-128;
 //      QUESTIONS.md CQ-65).
 //   2. The core writes each reply as an outbox row of send class quick_reply (K-09 README default 6) and, for a STOP, one
@@ -91,7 +99,10 @@ export interface KeywordReply<T extends GuardText> {
   readonly words: WordsFrom | null;
   /** The phone's stopped flag after a recorded STOP or START (K-04 phones.stopped, every business); else null. */
   readonly stopped: boolean | null;
-  /** The rows whose words this run wrote: the reply's, then each business's notice. */
+  /**
+   * The rows whose words this run wrote: the reply's, then each business's notice. The phone's stop words and STARTs
+   * share one action (T-1416): its rows are listed on the newest one's reply alone, so each row is counted once.
+   */
   readonly rowsWritten: readonly string[];
   /** The businesses told of a STOP (K-09 v1.1 `businessesTold`), whatever run wrote their rows. */
   readonly told: readonly string[];
@@ -178,6 +189,26 @@ export function actionFor<T extends GuardText>(
       sentByActor: null,
     },
   };
+}
+
+/**
+ * The turn's one K-09 v1 `recordStopOrStart` for its number (T-1416; T-317's security note N1), from its stop words and
+ * STARTs: the newest in arrival order gives the kind, the event and the words, since the newest word decides (K-29
+ * README; DL-193), and a CANCEL or CANCELAR among any of them still flags the visit (RULES 7.4). Null when the turn has no
+ * stop word or START, or no number. A HELP is never one of them: each is its own `sendFixedLine` (`actionFor`).
+ */
+export function stopOrStartFor<T extends GuardText>(
+  keywords: readonly KeywordText<T>[],
+  turn: Pick<ReplyTurn<T>, "handleId" | "phoneNumber">,
+  caller: TurnCaller,
+): ReplyCoreAction | null {
+  const said = keywords.filter((found) => found.keyword.kind !== "help");
+  const newest = said.at(-1);
+  if (newest === undefined) return null;
+  const action = actionFor(newest, turn, caller);
+  if (action?.call !== "recordStopOrStart") return null;
+  const alsoCancelVisit = said.some((found) => found.keyword.flagsVisit);
+  return { call: "recordStopOrStart", request: { ...action.request, alsoCancelVisit } };
 }
 
 // ---- reading the core's answer (K-09 v1 CoreResult) ----------------------------------------------------------------
@@ -365,11 +396,21 @@ export async function replyToKeywords<T extends GuardText>(turn: ReplyTurn<T>): 
     personId: turn.personId,
     traceId: turn.traceId,
   };
+  // The phone's stop words and STARTs, by their places: one record answers them all, from the newest (T-1416).
+  const said = turn.keywords.flatMap((found, at) => (found.keyword.kind === "help" ? [] : [at]));
+  const record = stopOrStartFor(turn.keywords, turn, caller);
+  const newest = said.at(-1);
   const acting: Acting<T>[] = [];
   const replies: KeywordReply<T>[] = turn.keywords.map((found, at) => {
-    const action = actionFor(found, turn, caller);
+    const help = found.keyword.kind === "help";
+    const action = help ? actionFor(found, turn, caller) : record;
     if (action === null) return replyOf(found, "refused", "noPhone");
-    acting.push({ at, found, action });
+    if (help) {
+      acting.push({ at, found, action, answers: [at] });
+    } else if (at === said[0] && newest !== undefined) {
+      // The one record goes in the place of the phone's first stop word or START, built from its newest.
+      acting.push({ at: newest, found: turn.keywords[newest] ?? found, action, answers: said });
+    }
     return replyOf(found, "notRecorded", "noAnswer");
   });
 
@@ -379,15 +420,35 @@ export async function replyToKeywords<T extends GuardText>(turn: ReplyTurn<T>): 
       set === null
         ? acting.map(({ found }) => replyOf(found, "notRecorded", "unwired"))
         : await commitAndFill(set, turn, caller, acting);
-    for (const [index, { at }] of acting.entries()) {
+    for (const [index, { at, answers }] of acting.entries()) {
       const reply = answered[index];
-      if (reply !== undefined) replies[at] = reply;
+      if (reply === undefined) continue;
+      for (const place of answers) {
+        const found = turn.keywords[place];
+        if (found !== undefined) replies[place] = place === at ? reply : answeredFrom(reply, found);
+      }
     }
   }
 
   for (const reply of replies) recordSpan(timer, reply);
   return { replies, rerun: replies.some(needsRerun) };
 }
+
+/**
+ * A stop word or START answered from the action the phone's newest word made in its turn (T-1416): that action's
+ * outcome, line, flag, businesses told and code. The rows and words that run wrote stay on the newest word's reply, so
+ * each row is counted once.
+ */
+const answeredFrom = <T extends GuardText>(
+  reply: KeywordReply<T>,
+  found: KeywordText<T>,
+): KeywordReply<T> => ({
+  ...reply,
+  text: found.text,
+  keyword: found.keyword,
+  words: null,
+  rowsWritten: [],
+});
 
 /**
  * Whether the turn must run again for this reply: nothing was recorded, or the words of its row or of a business's
@@ -400,11 +461,13 @@ const needsRerun = <T extends GuardText>(reply: KeywordReply<T>): boolean =>
     reply.errorCode !== null &&
     reply.errorCode !== "noWords");
 
-/** A keyword text with a core action, and its place among the turn's keyword texts. */
+/** A core action, the keyword text it is built from and that text's place, and the places of every text it answers. */
 interface Acting<T extends GuardText> {
   at: number;
   found: KeywordText<T>;
   action: ReplyCoreAction;
+  /** A HELP's own place; for the phone's one record, the place of each of its stop words and STARTs (T-1416). */
+  answers: readonly number[];
 }
 
 /** Each acting text's reply, in the same order as `acting`. */
