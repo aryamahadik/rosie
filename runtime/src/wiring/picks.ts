@@ -28,7 +28,9 @@
 // can be read there (J-02), so every decide and re-read there fails closed before any model call; gate (T-559), K-09
 // gateAndCommit through @rosie/actions' turn face (the gate, then one K-05 commitTurn through the turn-row port, under the
 // turn id, on the turn's pinned bundle), its reads fed in a test by the K-05 doubles over test owner 1's seeded rows and
-// by no database on staging until T-567, so every gate there fails closed and nothing commits; composeInput (T-560), K-09
+// by no database on staging until T-567, so every gate there fails closed and nothing commits (a keyword turn whose
+// caller names no business goes to T-1413's keyword door where staging's reads bind it, T-1415, and to the base's
+// noBusinessScope wherever none is bound, a test's doubles among them); composeInput (T-560), K-09
 // composeInput through @rosie/actions' turn face (each committed row's K-03 composer input from K-05 v1.6 readOutboxRow
 // and the row's pinned bundle, its inbound text the words the turn's gate request handed in), fed in a test by a K-05
 // double over the rows the commit wrote and test owner 1's seeded rows and by no database on staging until T-567, so

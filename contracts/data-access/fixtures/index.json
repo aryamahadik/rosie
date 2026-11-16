@@ -2759,6 +2759,46 @@
       "expect": "refuse",
       "shows": "The barbershop's row answered not written under the yoga studio's scope, yet with its recipient: nothing of a row the scope does not show reaches the caller (put right, recipientHandleId null, it is outbox-row-written-other-business-no-recipient's outcome)",
       "source": "arch 10 line 546; K-04 v1 rule 4; K-05 v1.4 default 57; K-05 v1.16 item 70 and default 141"
+    },
+    {
+      "file": "commit-alex-stop-handle-id.json",
+      "version": "v1.17",
+      "def": "commitTurn.handleIdExchange",
+      "expect": "accept",
+      "shows": "commit-alex-stop in its v1.17 form, run instead of it: Alex's STOP, its request asking for phones rows by handle id, answers his phone row as phones/handle-alex at version 4, never his number, while the request still names the row by its number",
+      "source": "ops/cards/T-1417.md (the NEED and the architect's ruling on CQ-342, option (d)); DL-876, DL-877; K-08 v1 README line 42 and default 3; K-09 v1 stop-recorded.json (phones/handle-ben); K-04 v1 phones.handle_id (0004); K-05 v1.2 commit-alex-stop; K-05 v1.17 item 71 and defaults 145 and 149"
+    },
+    {
+      "file": "commit-alex-start-handle-id.json",
+      "version": "v1.17",
+      "def": "commitTurn.handleIdExchange",
+      "expect": "accept",
+      "shows": "commit-alex-start in its v1.17 form, run instead of it after commit-alex-stop-handle-id: Alex's own START answers his phone row as phones/handle-alex at version 5, never his number",
+      "source": "ops/cards/T-1417.md (the architect's ruling on CQ-342); DL-876, DL-877; K-08 v1 default 3; K-04 v1 phones.handle_id; K-05 v1.8 commit-alex-start; K-05 v1.17 item 71"
+    },
+    {
+      "file": "commit-adds-dee-booking-handle-id.json",
+      "version": "v1.17",
+      "def": "commitTurn.handleIdExchange",
+      "expect": "accept",
+      "shows": "commit-adds-dee-booking in its v1.17 form, run instead of it: the phone row the commit inserts for Dee W. is answered by the handle id her chain writes, phones/handle-dee at version 1, never her number, and her person, role and booking by their primary keys",
+      "source": "ops/cards/T-1417.md (the architect's ruling on CQ-342: an insert answers the handle id from the write's own returning); DL-876, DL-877; K-04 v1 phones.handle_id and phones_handle_fk (0004); K-05 v1.1 commit-adds-dee-booking; K-05 v1.17 item 71 and default 145"
+    },
+    {
+      "file": "commit-alex-phone-changed-handle-id.json",
+      "version": "v1.17",
+      "def": "commitTurn.handleIdExchange",
+      "expect": "accept",
+      "shows": "Sam's turn read Alex's phone at version 3 and Alex's STOP has since moved it to 4: limit 4 refuses the commit, naming the changed row phones/handle-alex (read 3, now 4), never the number, and nothing is written",
+      "source": "arch 06 line 305 (limit 4: reload once, then say what changed); K-09 v1.1 default 50 (a stopped mobile gets no consent and no link); ops/cards/T-1417.md (the ruling: versionChanged's changed rows by handle id, from the row as locked); DL-876, DL-877; K-05 v1.8 commit-sam-enters-alex-yes; K-05 v1.17 item 71 and default 145"
+    },
+    {
+      "file": "invalid/refuse-commit-alex-stop-answers-number.json",
+      "version": "v1.17",
+      "def": "commitTurn.handleIdExchange",
+      "expect": "refuse",
+      "shows": "commit-alex-stop-handle-id answered with Alex's phone row named by his number, +15555550101, though its request asks for handle ids: an answered phones rowId is a K-08 handleRef and never has phoneNumber's shape (put right, handle-alex, it is commit-alex-stop-handle-id's outcome)",
+      "source": "K-08 v1 handleRef, safeId and default 3; 02-contracts K-08 ('never the raw number or words'); arch 10 line 516; BP rule 7; K-05 v1 phoneNumber; ops/cards/T-1418.md; K-05 v1.17 item 71 and default 149"
     }
   ]
 }

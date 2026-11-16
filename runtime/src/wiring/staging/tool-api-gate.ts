@@ -1,6 +1,7 @@
 // Staging's gate reads (the D-017 path audit's P4a: ops/reviews/D-017-path-audit/order_d017.txt line 35; T-1398; the
 // lead's notes DL-397, DL-757, DL-760, DL-761, DL-768 and DL-776; T-1242's architect's note N3). T-1257 made this file with
-// its final signature (DL-757); T-1398 binds it and edits nothing else (./options.ts hands it its part).
+// its final signature (DL-757); T-1398 binds it and edits nothing else (./options.ts hands it its part). T-1415 adds the
+// keyword door's runtime-side pieces beside it (the CQ-335 ruling's NEW-3; DL-864, DL-877, DL-883).
 //
 // RootOptions.gateReads (../real.ts GateReads) from @rosie/actions' PostgreSQL pieces, each on the side ADR-014 and
 // @rosie/actions' turn-face/pg/calls.ts lines 5 to 12 give it, every call through the root's handle (./part.ts StagingDb
@@ -38,6 +39,17 @@
 //                with nothing written, and one that asks nothing never reads it. No adapter: left out, the service's own
 //                default, notBuilt for such a record too.
 //   flagsReader and messagesReader are left out: the safety service's own, on the call's transaction (../real.ts GateReads).
+//   keywordDoor  the keyword door's runtime-side pieces (T-1415; ../real.ts KeywordDoorReads; T-1413's door, the CQ-335
+//                ruling's NEW-3, DL-864, DL-877), as @rosie/actions' pgKeywordDoor binds them, for a keyword turn whose
+//                caller names no business (../real.ts routes it there): its one transaction for each call on a
+//                runtime-side client opened for that call (part.db.runtime: HYPERDRIVE_JOB, rosie_worker_job, which
+//                inherits rosie_job), through pgDoorRuntime, which clears the business scope, checks the door's side and
+//                makes the transaction read only before the first read (db/repo/targets.ts enterKeywordDoorSide: no
+//                business scope, no person, not the Tool API's role), taken only while one of the gate's slots is free;
+//                readOpenHolds (readOpenHoldsIn, as pgKeywordDoor reads it) and K-05 v1.4's five record reads in their
+//                no-business forms (pgNoBusinessSafetyReads) on that transaction, and runCore's flags port over it
+//                (pgDoorFlags). Its sealer, its one commitTurn and its bundles are the gate's own (../real.ts). Nothing of
+//                a business-scoped call changes: its flags calls stay unbound (notBuilt portNotWired; DL-877 C5).
 //
 // The gate's one commitTurn (K-05 v1.1 item 1) is never this input's: it goes through the root's turn-row port, T-1395's
 // binding on the job side (./k05-turn.ts turnRows; critic_collisions N5), with ../real.ts's turn id check in front.
@@ -45,18 +57,21 @@
 // Connections (ADR-014 Consequences, "Connections inside one call"; critic_collisions N2; critic_size N6; DL-760, DL-761):
 // a gate call holds its Tool API client's one connection while each of its runtime-side calls (the bundle reads, the
 // owner's read, a seal, the commit) opens and ends a client of its own, one after another, so it holds 2 connections at
-// most. At most 3 gate calls hold a Tool API client at once, so the gates hold 6 at most, the Worker's limit
-// (infra/spikes/hyperdrive-host/worker.mjs line 77); a 4th waits for a slot before its client is opened, and nothing that
-// holds a slot ever waits for one, so no gate waits for a connection another gate holds while that gate waits for one.
+// most; a keyword door's call holds its runtime-side transaction's one connection the same way while its bundle reads,
+// seal and commit open theirs (T-1415), 2 at most too. At most 3 such calls, the gate's and the door's together, hold
+// their call's client at once, so the gates hold 6 at most, the Worker's limit (infra/spikes/hyperdrive-host/worker.mjs
+// line 77); a 4th waits for a slot before its client is opened, and nothing that holds a slot ever waits for one, so no
+// call waits for a connection another call holds while that call waits for one.
 //
-//   bound    staging, with both HYPERDRIVE_APP (the scope) and HYPERDRIVE_JOB (the owner's read, the sealer and the
-//            commit) present. Only their presence is read as the root is built (DL-768): no connection string, secret,
-//            KV or other binding. Each connection string is the handle's to read, and SEALING_WRAP_KEY the resolver's,
-//            at each call.
+//   bound    staging, with both HYPERDRIVE_APP (the scope) and HYPERDRIVE_JOB (the owner's read, the sealer, the keyword
+//            door and the commit) present. Only their presence is read as the root is built (DL-768): no connection
+//            string, secret, KV or other binding. Each connection string is the handle's to read, and SEALING_WRAP_KEY
+//            the resolver's, at each call.
 //   unbound  any environment but staging, checked before anything else is read, or a binding missing: null, as the
 //            Worker's root has always handed, so every gate fails closed inside the Tool API base before anything is read
-//            or written (../real.ts NO_GATE_SCOPE: NoDatabaseError naming gateAndCommit), and nothing commits. In
-//            production ./options.ts builds no part, and ../picks.ts keeps the gate closed besides.
+//            or written (../real.ts NO_GATE_SCOPE: NoDatabaseError naming gateAndCommit; a keyword turn naming no business
+//            the base's noBusinessScope, with no door), and nothing commits. In production ./options.ts builds no part,
+//            and ../picks.ts keeps the gate closed besides.
 //   failing  bound, and a call cannot be made (the handle's refusal, a connect that fails, DB_SCHEMA set, a database
 //            error, SEALING_WRAP_KEY missing): it throws, and the gate fails closed with nothing written. The handle's own
 //            errors name the call, the side, the binding and a reason, a check's label or a SQLSTATE (./db.ts); db/repo's
@@ -72,13 +87,19 @@
 // line. No word of a text or a fixed line, no number, address, key, wrapping key's value, token or hash is in a log line
 // or an error.
 //
-// pgCallScope and pgReadOnlySealer are imported by their own files, as ./tool-api-rows.ts imports pgCallScope (critic_size
-// N5): no change to @rosie/actions.
+// pgCallScope, the door's pieces and pgReadOnlySealer are imported by their own files, as ./tool-api-rows.ts imports
+// pgCallScope (critic_size N5): no change to @rosie/actions.
 
 import { NotBuiltError } from "@rosie/actions/src/tool-api/errors";
-import type { BusinessScope } from "@rosie/actions/src/tool-api/scope";
+import type { BusinessScope, ScopeCall } from "@rosie/actions/src/tool-api/scope";
 import type { SafetyReads } from "@rosie/actions/src/tool-api/turn-face/commit";
-import { pgCallScope } from "@rosie/actions/src/tool-api/turn-face/pg/calls";
+import type { DoorRuntime } from "@rosie/actions/src/tool-api/turn-face/door";
+import {
+  pgCallScope,
+  pgDoorFlags,
+  pgDoorRuntime,
+  pgNoBusinessSafetyReads,
+} from "@rosie/actions/src/tool-api/turn-face/pg/calls";
 import { pgReadOnlySealer } from "@rosie/actions/src/tool-api/turn-face/pg/sealer";
 import type { SafetyWords, WordsSealer } from "@rosie/actions/src/domain/safety";
 import {
@@ -90,12 +111,12 @@ import {
   readSafetyOutcomeIn,
   readSafetyOutcomeOfEventIn,
 } from "@rosie/db/repo/safety-reads";
-import type { Tx } from "@rosie/db/repo/scope";
+import type { Sql, Tx } from "@rosie/db/repo/scope";
 import type { WrappingKeys } from "@rosie/db/repo/sealing";
 import { readOpenHoldsIn } from "@rosie/db/repo/turn-face-reads";
 
 import { environmentOf } from "../picks";
-import { NoStateReadError, type BundleSafetyLines, type GateReads } from "../real";
+import { NoStateReadError, type BundleSafetyLines, type GateReads, type KeywordDoorReads } from "../real";
 import type { StagingDb, StagingPart } from "./part";
 
 /** What T-1398's builder is handed (DL-757): the env, the root's handle, the resolver and the one BundleSafety adapter. */
@@ -107,17 +128,20 @@ export interface GatePart extends StagingPart {
 }
 
 /**
- * How many gate calls may hold a Tool API client at once (DL-761): each holds 2 connections at most, so 3 hold the 6 a
- * Worker may hold open at once. A gate call past them waits until one has ended.
+ * How many gate calls may hold their call's client at once (DL-761; T-1415): a business-scoped call's Tool API client or
+ * a keyword door's runtime-side one, from the same slots. Each holds 2 connections at most, so 3 hold the 6 a Worker may
+ * hold open at once. A call past them waits until one has ended.
  */
 export const GATE_CLIENTS_AT_ONCE = 3;
 
 /**
- * Each call's name on the handle: on its timing line, and on every error of the handle's that leaves it. The scope's is
- * K-09's name for the call its transaction is opened for, the owner's K-05's, and the sealer's its own (sealer.ts).
+ * Each call's name on the handle: on its timing line, and on every error of the handle's that leaves it. The scope's and
+ * the keyword door's are K-09's name for the call their transaction is opened for (the scope's on the Tool API's side,
+ * the door's on the runtime side), the owner's K-05's, and the sealer's its own (sealer.ts).
  */
 export const GATE_CALLS = Object.freeze({
   scope: "gateAndCommit",
+  door: "gateAndCommit",
   businessOwner: "readBusinessOwner",
   seal: "seal",
 } as const);
@@ -126,9 +150,10 @@ export const GATE_CALLS = Object.freeze({
 const present = (binding: unknown): boolean => binding !== undefined && binding !== null;
 
 /**
- * The slots of the gate calls that may hold a Tool API client at once: `take` answers once one is free, with the
- * function that frees it again, in the order the calls asked. A slot is taken before the client is opened and freed once
- * the call's client has ended, whatever the call answered or threw.
+ * The slots of the gate calls that may hold their call's client at once, a Tool API client or a keyword door's
+ * runtime-side one: `take` answers once one is free, with the function that frees it again, in the order the calls asked.
+ * A slot is taken before the client is opened and freed once the call's client has ended, whatever the call answered or
+ * threw.
  */
 class ClientSlots {
   private free: number;
@@ -207,6 +232,40 @@ function sealerOn(db: StagingDb, keys: WrappingKeys): WordsSealer {
 }
 
 /**
+ * The keyword door's one transaction for each call (T-1415): @rosie/actions' pgDoorRuntime over a runtime-side client
+ * opened for that call (HYPERDRIVE_JOB, rosie_worker_job), which the handle guards first and ends once the transaction
+ * has ended, taken only while one of the gate's slots is free. pgDoorRuntime checks the door's side and makes the
+ * transaction read only before `work` gets it, and answers a start the database could not make as the call's transient
+ * (the door's ScopeCall, handed on as it comes); the handle's own refusal or failed connect leaves as the handle throws it.
+ */
+function doorRuntimeOn(db: StagingDb, slots: ClientSlots): DoorRuntime<Sql> {
+  return {
+    async withRuntime<T>(work: (repo: Sql) => Promise<T>, call: ScopeCall<T>): Promise<T> {
+      const freeSlot = await slots.take();
+      try {
+        return await db.runtime(GATE_CALLS.door, (sql) => pgDoorRuntime(sql).withRuntime(work, call));
+      } finally {
+        freeSlot();
+      }
+    },
+  };
+}
+
+/**
+ * The keyword door's runtime-side pieces (T-1415; ../real.ts KeywordDoorReads), as pgKeywordDoor binds them: the door's
+ * transaction for each call in one of the gate's slots, and on it readOpenHolds, the five record reads in their
+ * no-business forms and runCore's flags port.
+ */
+function keywordDoorOn(db: StagingDb, slots: ClientSlots): KeywordDoorReads<Sql> {
+  return {
+    runtime: doorRuntimeOn(db, slots),
+    readOpenHolds: (tx, request) => readOpenHoldsIn(tx, { ...request, eventIds: [...request.eventIds] }),
+    safetyReads: pgNoBusinessSafetyReads<Sql>(),
+    flags: pgDoorFlags<Sql>(),
+  };
+}
+
+/**
  * SafetyDeps.words over the one BundleSafety adapter, read at each call: the line's id and words from the bundle the
  * adapter's own check passed and answers for, a copy, or null for a line it holds no words for. Before any check passed
  * the adapter's read throws NoStateReadError: no bundle's words are known, which the record takes as its port not built.
@@ -226,14 +285,18 @@ function wordsOf(lines: BundleSafetyLines): SafetyWords {
   };
 }
 
-/** The gate's reads over db/repo's transaction, as ../real.ts takes them: the call's repo is the transaction its scope opened. */
-const asGateReads = (reads: GateReads<Tx>): GateReads => reads as GateReads;
+/**
+ * The gate's reads over db/repo's transactions, as ../real.ts takes them: the call's repo is the transaction its scope
+ * opened, and the keyword door's the connection its transaction holds.
+ */
+const asGateReads = (reads: GateReads<Tx, Sql>): GateReads => reads as GateReads;
 
 /**
  * RootOptions.gateReads for staging: the gate's reads and seals, each call on one guarded client of the root's handle, the
- * scope's on HYPERDRIVE_APP and the owner's and the sealer's on HYPERDRIVE_JOB, and SafetyDeps.words from the one
- * BundleSafety adapter. Null anywhere but staging (nothing read but ENVIRONMENT) and while either binding is missing, so
- * every gate fails closed.
+ * scope's on HYPERDRIVE_APP and the owner's, the sealer's and the keyword door's on HYPERDRIVE_JOB, the scope and the door
+ * sharing one set of slots, and SafetyDeps.words from the one BundleSafety adapter. Null anywhere but staging (nothing
+ * read but ENVIRONMENT) and while either binding is missing, so every gate fails closed, a keyword turn naming no
+ * business with the base's noBusinessScope.
  */
 export const stagingGateReads: (part: GatePart) => GateReads | null = ({ env, db, keys, bundleSafety }) => {
   if (environmentOf(env) !== "staging") return null;
@@ -241,11 +304,14 @@ export const stagingGateReads: (part: GatePart) => GateReads | null = ({ env, db
   const job = present(env.HYPERDRIVE_JOB);
   const app = present(env.HYPERDRIVE_APP);
   if (!job || !app) return null;
+  // One set of slots for the root: a business-scoped gate's Tool API client and a keyword door's runtime-side one alike.
+  const slots = new ClientSlots(GATE_CLIENTS_AT_ONCE);
   return asGateReads({
-    scope: gateScope(db, new ClientSlots(GATE_CLIENTS_AT_ONCE)),
+    scope: gateScope(db, slots),
     readOpenHolds: (tx, request) => readOpenHoldsIn(tx, { ...request, eventIds: [...request.eventIds] }),
     safetyReads: safetyReadsOn(db),
     sealer: sealerOn(db, keys),
+    keywordDoor: keywordDoorOn(db, slots),
     ...(bundleSafety === null ? {} : { words: wordsOf(bundleSafety) }),
   });
 };

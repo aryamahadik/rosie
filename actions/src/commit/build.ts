@@ -26,6 +26,15 @@
 // rowsNamedBy names the rows one unit's writes write, by table and id, so the commit's answer can tell a core action's
 // rows from the parts' (commit.ts default 9; K-09 v1.5 default 134).
 //
+// The request is K-05 v1.17's (T-1419; K-05 README item 71; the architect's ruling on CQ-342, DL-876, DL-877): every
+// turn's commit sets answerPhoneRowsBy to handleId, so every row reference K-05 answers (committed.written,
+// committed.waitingChat and versionChanged's changed) names a phones row by its handle id (K-04 phones.handle_id), never
+// by its number, and the turn's span, the stillChanged rows and K-09's written carry no number (commit.ts). It changes
+// only the answer: the request itself still names a phones row by its number (versionsRead, a state update's key, an
+// outbox row's and an open question's versionsRead), as K-05 v1.17 item 71.4 says every request does, so rowsNamedBy
+// names it by its number too, and an answered handle id is a name, never a key (no request here takes a row id from an
+// answer: versionsRead is the units' own reads).
+//
 // Nothing here logs, and what it throws names faults and row ids, never a value (K-08 v1 README line 75).
 //
 // Defaults used (for ops/QUESTIONS.md):
@@ -56,11 +65,15 @@
 //   8. rowsNamedBy names a unit's own clock rows with its other rows, so the commit's answer leaves a core action's clock
 //      rows out of `written` as it leaves its other rows out (commit.ts default 9); K-05's one commit writes them all the
 //      same, and the call's span keeps them.
+//   9. Every request sets answerPhoneRowsBy, whatever it writes, a repeat and a reload's second request among them
+//      (K-05 v1.17 README "Who calls commitTurn": "Sets the field on every request, from T-1419"; its T-1419 line: "never
+//      on some"), so no answer of a turn's commit names a phones row by its number. The request's type is K-05 v1.17's
+//      generated one with the field required (TurnCommitRequest), so the type check holds every built request to it.
 
+import type * as K05V1dot17 from "../../../contracts/generated/data-access/data-access.v1.17";
 import { CommitRefusedError } from "./errors";
 import type {
   ClockNew,
-  CommitTurnRequest,
   EffectKind,
   EffectNew,
   EventEntry,
@@ -71,6 +84,20 @@ import type {
   UnitWrites,
   Writes,
 } from "./types";
+
+/**
+ * The turn's one K-05 request: K-05 v1.17 `commitTurn.request` (T-1418), v1.1's turn row, versions read and writes (each
+ * by reference to v1.1's own definition, so types.ts's CommitTurnRequest holds the same three) with answerPhoneRowsBy,
+ * required here: every turn's commit sets it (default 9). A K-05 port typed by v1.1 takes it as it is.
+ */
+export type TurnCommitRequest = K05V1dot17.CommitTurnRequest &
+  Required<Pick<K05V1dot17.CommitTurnRequest, "answerPhoneRowsBy">>;
+
+/**
+ * What every turn's commit asks K-05 v1.17 for (README item 71; default 9): every row reference its answer names, a
+ * phones row by its handle id. The field's one value (data-access.v1.17.schema.json commitTurn.request).
+ */
+export const ANSWER_PHONE_ROWS_BY: TurnCommitRequest["answerPhoneRowsBy"] = "handleId";
 
 /** The roles K-04 v1 person_roles names, which an event-log entry's actor role takes (K-08 v1 `role`). */
 type ActorRole = NonNullable<EventEntry["actorRole"]>;
@@ -330,7 +357,9 @@ function stateRowId(write: StateWrite): string | null {
  * write's row (stateRowId), each question it opens with the commit's clock row for it, each clock row of its own (default
  * 8), each question it closes, each clock row it cancels, each reservation it confirms or releases, each effect it writes
  * or lets go. Its outbox rows are K-05's `outboxRows`, never `written`; the rows K-05 adds of its own to a reservation (its
- * saved-time clock row, its class seats, the one promoted) are not the unit's to name.
+ * saved-time clock row, its class seats, the one promoted) are not the unit's to name. A phones row is named as the
+ * request names it, by its number (its key's one column), which K-05 v1.17 answers by its handle id (the request asks:
+ * default 9), so a phones row named here never matches the answer's (commit.ts default 9's T-1419 note).
  */
 export function rowsNamedBy(writes: UnitWrites): RowName[] {
   const named: RowName[] = [];
@@ -573,9 +602,10 @@ function writeUnit(
 /**
  * The turn's one K-05 commitTurn request: the turn row (K-05's seven fields of the request's turn: k05TurnRow), every row
  * read, and every unit's writes in order (its own clock rows among them) with the rows the commit owns and the event-log
- * entries. Checks the units first (checkUnits): a fault refuses the whole turn.
+ * entries, asking K-05 v1.17 to answer every phones row by its handle id (default 9). The rows read are the units' own
+ * reads, never a row an answer named. Checks the units first (checkUnits): a fault refuses the whole turn.
  */
-export function buildCommitRequest(input: BuildInput): CommitTurnRequest {
+export function buildCommitRequest(input: BuildInput): TurnCommitRequest {
   checkUnits(input.units);
   const writes: Writes = {
     state: [],
@@ -596,5 +626,5 @@ export function buildCommitRequest(input: BuildInput): CommitTurnRequest {
 
   onceEach(writes.events.map((entry) => entry.id));
   if (effects.write.length > 0 || effects.letGo.length > 0) writes.effects = effects;
-  return { turn: k05TurnRow(input.turn), versionsRead, writes };
+  return { turn: k05TurnRow(input.turn), versionsRead, writes, answerPhoneRowsBy: ANSWER_PHONE_ROWS_BY };
 }

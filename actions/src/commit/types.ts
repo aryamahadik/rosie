@@ -15,6 +15,7 @@
 import type * as K05 from "../../../contracts/generated/data-access/data-access.v1.1";
 import type { Choice, GatedVerbPart, GateRequest, LimitRegistry, SetupKey } from "../gate/framework";
 import type { CallContext, ErrorsOf, RequestOf, ResponseOf } from "../tool-api";
+import type { TurnCommitRequest } from "./build";
 
 // ---- K-05 v1.1 commitTurn (contracts/data-access) -------------------------------------------------------------------
 
@@ -201,7 +202,7 @@ export interface CommitTurnContext<Repo = unknown> {
  * Each throws CommitNotBuiltError until its task lands (notBuiltPorts), so the commit fails closed.
  */
 export interface CommitPorts<Repo = unknown> {
-  commitTurn(request: CommitTurnRequest, call: CallContext<Repo>): Promise<CommitTurnAnswer>;
+  commitTurn(request: TurnCommitRequest, call: CallContext<Repo>): Promise<CommitTurnAnswer>;
   writesOf(part: PassedPart, turn: CommitTurnContext<Repo>, open: OpenHolds): Promise<UnitWrites>;
   runCore(action: CoreAction, turn: CommitTurnContext<Repo>, open: OpenHolds): Promise<CoreRun>;
   openHolds(turn: CommitTurnContext<Repo>): Promise<OpenHolds>;

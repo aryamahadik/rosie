@@ -393,7 +393,10 @@ describe("commit-reservation-lost.json gives its outcome", () => {
     // The first commit was the fixture's request, with the commit's own entry for the booking; K-05 refused it as stated.
     const [first, second] = fake.requests;
     if (first === undefined || second === undefined) throw new Error("two commits expected");
-    expect({ ...first, writes: { ...first.writes, events: [] } }).toEqual(exchange.request);
+    expect({ ...first, writes: { ...first.writes, events: [] } }).toEqual({
+      ...exchange.request,
+      answerPhoneRowsBy: "handleId",
+    });
     expect(first.writes.events.map((entry) => entry.kind)).toEqual(["reservation.booked"]);
     // Gated again: limit 5 read the time let go, so the second commit books nothing.
     expect(raced).toBe(1);

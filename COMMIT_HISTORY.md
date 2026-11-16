@@ -2,9 +2,393 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 696, [`e34bc58`](https://github.com/aryamahadik/rosie/commit/e34bc58), 2026-11-16 06:30:34 UTC.
+- **Through:** commit 711, [`7097400`](https://github.com/aryamahadik/rosie/commit/7097400), 2026-11-16 13:09:27 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 711. docs: COMMIT\_HISTORY.md through commit 707 (b07069f, \#718) (\#719)
+
+- **Commit:** [`7097400`](https://github.com/aryamahadik/rosie/commit/7097400), by Arya Mahadik, 2026-11-16 13:09:27 UTC
+- **Pull request:** [#719](https://github.com/aryamahadik/rosie/pull/719) from `task/commit-history-148`, merged 2026-11-16 13:09:28 UTC. It squashed 1 branch commit:
+  - `621104b` docs: COMMIT\_HISTORY.md through commit 707 (b07069f, \#718)
+- **Files changed:** 1 (+48 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +48 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 241 (DL-892); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 710. T-320: the catalog and pricing service base: kinds, services, ways, dated price rules and frozen terms snapshots, reads bound later (notBuilt until then) (\#721)
+
+- **Commit:** [`497256b`](https://github.com/aryamahadik/rosie/commit/497256b), by Arya Mahadik, 2026-11-16 13:09:23 UTC
+- **Pull request:** [#721](https://github.com/aryamahadik/rosie/pull/721) from `task/T-320`, merged 2026-11-16 13:09:24 UTC. It squashed 3 branch commits:
+  - `631b2f5` T-320: the catalog and pricing service base (C-096): kinds, services,…
+  - `3352450` T-320: a call's name is an id; a flow B snapshot test (seed-booking-f…
+  - `a8dcf7f` T-320: tests: the writes in T-305's one commit request, held to K-05 …
+- **Files changed:** 12 (+4484 −0), by folder:
+  - `actions/src/domain/catalog/` catalog.test.ts +712 −0, errors.ts +101 −0, index.ts +62 −0, prices.test.ts +568 −0, prices.ts +133 −0, reads.ts +35 −0, rows.ts +391 −0, service.ts +1216 −0, terms.test.ts +324 −0, terms.ts +174 −0, test-support.ts +535 −0, types.ts +233 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-320: the catalog and pricing service base (C-096): kinds, services, ways and price rules, where a price change closes one row and opens the next, overlaps are refused and a booking keeps its price (RULES 3.7); terms snapshots taken once and frozen; CQ-128's refusals; its five reads a port handed in by name, notBuilt with none bound (DL-888)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-320: a call's name is an id; a flow B snapshot test (seed-booking-flow-b); badRead's words
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-320: tests: the writes in T-305's one commit request, held to K-05 v1.1's commitTurn.request; K-25's refused place-of-another-service and fee-on-nothing-taken rows refused in code
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 709. T-1419: every turn commit asks K-05 v1.17 for phones rows by handle id, and fails closed on a number-shaped answer (\#722)
+
+- **Commit:** [`ea7421b`](https://github.com/aryamahadik/rosie/commit/ea7421b), by Arya Mahadik, 2026-11-16 13:09:19 UTC
+- **Pull request:** [#722](https://github.com/aryamahadik/rosie/pull/722) from `task/T-1419`, merged 2026-11-16 13:09:20 UTC. It squashed 4 branch commits:
+  - `f3c86f5` T-1419: buildCommitRequest asks K-05 v1.17 to name phones rows by han…
+  - `b0cbfd0` T-1419: phone-rows.test.ts formatted (prettier)
+  - `2222e61` Merge branch 'main' into task/T-1419
+  - `85b6fb4` T-1419: round 2: gateAndCommit fails closed when K-05 answers a phone…
+- **Files changed:** 8 (+978 −42), by folder:
+  - `actions/src/commit/` build.ts +35 −5, commit.test.ts +21 −7, commit.ts +62 −10, phone-rows.test.ts +790 −0, test-support.ts +63 −17, types.ts +2 −1
+  - `actions/src/gate/limit-4/` versions.test.ts +1 −1
+  - `actions/src/gate/limit-5/` reserved.test.ts +4 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1419: buildCommitRequest asks K-05 v1.17 to name phones rows by handle id on every turn commit; a STOP's phones row stays in K-09's written as phones/<handle id>; tests hold the span, the answer and stillChanged to no number
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1419: phone-rows.test.ts formatted (prettier)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1419: round 2: gateAndCommit fails closed when K-05 answers a phones row by its number (versionChanged: stillChanged with no id and no reload; committed or repeat: TypeError naming no id); CommitPorts.commitTurn takes TurnCommitRequest; the two gate pins compare with the field (DL-845, DL-893)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 708. T-1417: pgCommitTurn names a phones row by its handle id, never its number, when the request asks (K-05 v1.17) (\#720)
+
+- **Commit:** [`0d79c14`](https://github.com/aryamahadik/rosie/commit/0d79c14), by Arya Mahadik, 2026-11-16 13:09:15 UTC
+- **Pull request:** [#720](https://github.com/aryamahadik/rosie/pull/720) from `task/T-1417`, merged 2026-11-16 13:09:15 UTC. It squashed 3 branch commits:
+  - `b321c77` T-1417: WIP: commitTurn answers a phones row by its handle id (writte…
+  - `380872e` Merge branch 'main' into task/T-1417
+  - `9cf5eeb` T-1417: commitTurn names a phones row by its handle id only when the …
+- **Files changed:** 2 (+621 −19), by folder:
+  - `db/repo/` commit-turn.int.test.ts +484 −0, commit-turn.ts +137 −19
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1417: WIP: commitTurn answers a phones row by its handle id (written, versionChanged), fail closed; new tests pass, but three frozen K-05 fixtures answer the number, so 8 existing commit-turn tests fail (NEED: ruling)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1417: commitTurn names a phones row by its handle id only when the request asks (K-05 v1.17 answerPhoneRowsBy handleId); without the field the answer and statements are v1.16's; run 1's tests moved onto the v1.17 twins and checked against commitTurn.handleIdExchange, plus the stale write, a repeat, a handle id passed back, the twins without the field and a misspelt ask
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 707. docs: COMMIT\_HISTORY.md through commit 705 (647ca13, \#715) (\#718)
+
+- **Commit:** [`b07069f`](https://github.com/aryamahadik/rosie/commit/b07069f), by Arya Mahadik, 2026-11-16 11:09:39 UTC
+- **Pull request:** [#718](https://github.com/aryamahadik/rosie/pull/718) from `task/commit-history-147`, merged 2026-11-16 11:09:40 UTC. It squashed 1 branch commit:
+  - `c57ea52` docs: COMMIT\_HISTORY.md through commit 705 (647ca13, \#715)
+- **Files changed:** 1 (+56 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +56 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 240 (DL-891); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 706. T-631: the kind matcher spike (Q-42): plain text on K-24's name, style and pattern, no stored index, for S1-02 (\#717)
+
+- **Commit:** [`139dfd5`](https://github.com/aryamahadik/rosie/commit/139dfd5), by Arya Mahadik, 2026-11-16 11:09:34 UTC
+- **Pull request:** [#717](https://github.com/aryamahadik/rosie/pull/717) from `task/T-631`, merged 2026-11-16 11:09:35 UTC. It squashed 2 branch commits:
+  - `3074cab` T-631: the kind matcher spike (Q-42): plain text on K-24's names, sty…
+  - `0769be0` T-631: FINDINGS.md, method A (plain text on K-24's name, style and pa…
+- **Files changed:** 7 (+1311 −0), by folder:
+  - `actions/spikes/q42-kind-matcher/` FINDINGS.md +324 −0, catalog.mjs +71 −0, compare.mjs +219 −0, matchers.mjs +151 −0, q42-kind-matcher.test.mjs +218 −0, samples.mjs +206 −0, words.mjs +122 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-631: the kind matcher spike (Q-42): plain text on K-24's names, style and pattern (A, A0) against the trades' services and questions text (B) on 47 sample words from S1-02, A4-03, B4-04 and the master's cast, with the model read (C), vector index (D) and full-text index (E) described as not run; A named for S1-02's matchKinds with no stored index; FINDINGS.md's text returned to the lead (the harness refused the write)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-631: FINDINGS.md, method A (plain text on K-24's name, style and pattern; no stored index) for S1-02; the customer-side match is open question 1
+
+Written by the lead exactly from the builder's findings_text (the harness refused the builder's write: subagents return findings as text); prettier --check passed and the spike's test passes 13/13 with it.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 705. docs: COMMIT\_HISTORY.md through commit 703 (9a32ac9, \#712) (\#715)
+
+- **Commit:** [`647ca13`](https://github.com/aryamahadik/rosie/commit/647ca13), by Arya Mahadik, 2026-11-16 10:34:08 UTC
+- **Pull request:** [#715](https://github.com/aryamahadik/rosie/pull/715) from `task/commit-history-146`, merged 2026-11-16 10:34:08 UTC. It squashed 1 branch commit:
+  - `67bf5be` docs: COMMIT\_HISTORY.md through commit 703 (9a32ac9, \#712)
+- **Files changed:** 1 (+85 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +85 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 239 (DL-887); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 704. T-1413: the guard's every-business keyword door: a core-only commit with no business on the runtime side, its SQL in db/repo (\#716)
+
+- **Commit:** [`dda7590`](https://github.com/aryamahadik/rosie/commit/dda7590), by Arya Mahadik, 2026-11-16 10:34:04 UTC
+- **Pull request:** [#716](https://github.com/aryamahadik/rosie/pull/716) from `task/T-1413`, merged 2026-11-16 10:34:05 UTC. It squashed 3 branch commits:
+  - `c4dd922` T-1413: the keyword door, the guard's every-business core-only turn c…
+  - `e10f2b1` Merge branch 'main' into task/T-1413
+  - `0b35c51` T-1413: round 2 (DL-883): the keyword door's side check and its read …
+- **Files changed:** 11 (+2608 −40), by folder:
+  - `actions/` README.md +1 −1
+  - `actions/src/tool-api/turn-face/` commit.ts +174 −20, door-test-support.ts +106 −0, door.test.ts +1060 −0, door.ts +369 −0, index.ts +22 −2
+  - `actions/src/tool-api/turn-face/pg/` calls.ts +173 −11, door.int.test.ts +428 −0, index.ts +13 −2
+  - `db/repo/` targets.int.test.ts +215 −2, targets.ts +47 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1413: the keyword door, the guard's every-business core-only turn committed on the runtime side
+
+turn-face/door.ts: createKeywordDoor checks the request against K-09, accepts only a turn caller naming no business with its turn row, coreOnly input and recordSafetyOutcome, recordStopOrStart or sendFixedLine under that same caller (else noBusinessScope or invalidRequest before a transaction opens), runs the turn face's commit in one runtime-side transaction with no business, holds the answer to K-09's response or errors, and writes the gate hop's span with no business label.
+
+commit.ts: keywordCommitDeps binds runCore's flags port by name, the no-business safety reader (owner and zone notBuilt), the door's lines (a danger outcome notBuilt) and openHolds with no business; turnCommitDeps unchanged, so a business-scoped turn keeps recordStopOrStart and setRecordFlag notBuilt portNotWired.
+
+pg/calls.ts: pgKeywordDoor over pgDoorRuntime (inRuntimeTransaction as rosie_job, rosie.business_id empty, rosie.person_id unset, assertRuntimeSide and the role checked first, then read only) and pgDoorFlags; README default 2 says where stop-recorded.json and start-recorded.json are answered now.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1413: round 2 (DL-883): the keyword door's side check and its read only move into db/repo (targets.ts enterKeywordDoorSide, beside inRuntimeTransaction, with its integration test), pgDoorRuntime calls it and sends no statement of its own; with main merged (T-1414), lead note 4's pin moves: HELP through the door commits one quick_reply row naming no business, and after a STOP answers phoneStopped, writing nothing
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 703. docs: COMMIT\_HISTORY.md through commit 700 (4dbb576, \#710) (\#712)
+
+- **Commit:** [`9a32ac9`](https://github.com/aryamahadik/rosie/commit/9a32ac9), by Arya Mahadik, 2026-11-16 09:56:35 UTC
+- **Pull request:** [#712](https://github.com/aryamahadik/rosie/pull/712) from `task/commit-history-145`, merged 2026-11-16 09:56:36 UTC. It squashed 1 branch commit:
+  - `ab122b5` docs: COMMIT\_HISTORY.md through commit 700 (4dbb576, \#710)
+- **Files changed:** 1 (+36 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +36 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 238 (DL-882); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 702. T-161: the parity harness: compiled words against the vendored functions and step.js, path by path, every difference named (\#713)
+
+- **Commit:** [`08bef1d`](https://github.com/aryamahadik/rosie/commit/08bef1d), by Arya Mahadik, 2026-11-16 09:56:31 UTC
+- **Pull request:** [#713](https://github.com/aryamahadik/rosie/pull/713) from `task/T-161`, merged 2026-11-16 09:56:32 UTC. It squashed 3 branch commits:
+  - `dbd50a1` T-161: parity harness: the compiler's pre-correction words held again…
+  - `b4c60bf` T-161: the harness test also holds private-call and the compiler's ow…
+  - `8331d36` T-161: the aba test asserts its own switches on each of its six paths…
+- **Files changed:** 2 (+1254 −0), by folder:
+  - `compiler/src/parity/` harness.test.ts +404 −0, harness.ts +850 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-161: parity harness: the compiler's pre-correction words held against the vendored lib.js, overlay-core.js and msgtext.js, and against step.js where --path can say the path
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-161: the harness test also holds private-call and the compiler's own words against step.js, and checks that a split lights other branches on another path
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-161: the aba test asserts its own switches on each of its six paths, as its title says
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 701. T-1418: K-05 v1.17: commitTurn names a phones row by its handle id when the request asks (answerPhoneRowsBy), additive (\#714)
+
+- **Commit:** [`928ab31`](https://github.com/aryamahadik/rosie/commit/928ab31), by Arya Mahadik, 2026-11-16 09:56:24 UTC
+- **Pull request:** [#714](https://github.com/aryamahadik/rosie/pull/714) from `task/T-1418`, merged 2026-11-16 09:56:25 UTC. It squashed 3 branch commits:
+  - `6be48db` T-1418: K-05 v1.17, commitTurn names a phones row by its handle id wh…
+  - `973a13e` T-1418: README v1.17 refinements: an empty handle id throws, the cons…
+  - `1c915a9` T-1418: README v1.17 wording: the twins' given, and where the clock f…
+- **Files changed:** 9 (+1317 −7), by folder:
+  - `contracts/data-access/` README.md +83 −6, data-access.v1.17.schema.json +627 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` commit-adds-dee-booking-handle-id.json +105 −0, commit-alex-phone-changed-handle-id.json +118 −0, commit-alex-start-handle-id.json +114 −0, commit-alex-stop-handle-id.json +114 −0, index.json +40 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-commit-alex-stop-answers-number.json +114 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1418: K-05 v1.17, commitTurn names a phones row by its handle id when the request asks (answerPhoneRowsBy), with its fixtures, README section and freeze record
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1418: README v1.17 refinements: an empty handle id throws, the consumers' bullets, promoted's gap, versions_read's check
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1418: README v1.17 wording: the twins' given, and where the clock firing is not bound
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 700. docs: COMMIT\_HISTORY.md through commit 698 (f17a5e3, \#709) (\#710)
+
+- **Commit:** [`4dbb576`](https://github.com/aryamahadik/rosie/commit/4dbb576), by Arya Mahadik, 2026-11-16 07:42:16 UTC
+- **Pull request:** [#710](https://github.com/aryamahadik/rosie/pull/710) from `task/commit-history-144`, merged 2026-11-16 07:42:16 UTC. It squashed 1 branch commit:
+  - `54dfe7d` docs: COMMIT\_HISTORY.md through commit 698 (f17a5e3, \#709)
+- **Files changed:** 1 (+51 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +51 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 237 (DL-880); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 699. T-1414: sendFixedLine's core service (domain/fixed-lines) and runCore's sendFixedLine case: HELP's reply as one quick\_reply outbox row to the turn's own handle, no business, built through T-307's outboxRows and read only through CoreDeps.flags.messagesReader; a stopped phone answers phoneStopped and writes nothing; the row keyed by the caller's turn, the line and the recipient, a second HELP of the same commit answering the first's row as repeated (DL-871); no flags port answers portNotWired, any other line or send class or an actor's send noService; made alone notBuilt (CQ-44); T-1140's flagsCalls pin gains sendFixedLine (DL-872) (\#711)
+
+- **Commit:** [`b312417`](https://github.com/aryamahadik/rosie/commit/b312417), by Arya Mahadik, 2026-11-16 07:42:12 UTC
+- **Pull request:** [#711](https://github.com/aryamahadik/rosie/pull/711) from `task/T-1414`, merged 2026-11-16 07:42:13 UTC. It squashed 1 branch commit:
+  - `5cc4143` T-1414: sendFixedLine's core service (domain/fixed-lines) and runCore…
+- **Files changed:** 9 (+1599 −11), by folder:
+  - `actions/src/commit/core/` core-fixed-lines.test.ts +646 −0, core.test.ts +5 −4, core.ts +28 −2, errors.ts +3 −2, index.ts +4 −3
+  - `actions/src/domain/fixed-lines/` fixed-lines.test.ts +495 −0, fixed-lines.ts +311 −0, index.ts +30 −0, test-support.ts +77 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 698. docs: COMMIT\_HISTORY.md through commit 696 (e34bc58, \#707) (\#709)
+
+- **Commit:** [`f17a5e3`](https://github.com/aryamahadik/rosie/commit/f17a5e3), by Arya Mahadik, 2026-11-16 07:00:57 UTC
+- **Pull request:** [#709](https://github.com/aryamahadik/rosie/pull/709) from `task/commit-history-143`, merged 2026-11-16 07:00:58 UTC. It squashed 1 branch commit:
+  - `1aed179` docs: COMMIT\_HISTORY.md through commit 696 (e34bc58, \#707)
+- **Files changed:** 1 (+53 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +53 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 236 (DL-879); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 697. T-590: the stop home (S13-32) as code: a yes only from the person's own word; one number stops every business; a stop never cancels a visit (\#708)
+
+- **Commit:** [`3508bc8`](https://github.com/aryamahadik/rosie/commit/3508bc8), by Arya Mahadik, 2026-11-16 07:00:53 UTC
+- **Pull request:** [#708](https://github.com/aryamahadik/rosie/pull/708) from `task/T-590`, merged 2026-11-16 07:00:53 UTC. It squashed 3 branch commits:
+  - `535e24b` T-590: stop home (S13-32) as code: whose word gives a yes, one number…
+  - `e3b597a` T-590: texting in counts only on a turn that carries the person's tex…
+  - `963dd1a` T-590: numberStop reads the stopped phone row and the STOP row withou…
+- **Files changed:** 8 (+1679 −0), by folder:
+  - `actions/src/homes/stop/` errors.ts +12 −0, home.ts +61 −0, index.ts +47 −0, reads.ts +117 −0, stop.test.ts +782 −0, stop.ts +414 −0, test-support.ts +173 −0, words.ts +73 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-590: stop home (S13-32) as code: whose word gives a yes, one number stops every business until START, the opt-out line once, a stop word never cancels a visit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-590: texting in counts only on a turn that carries the person's texts (TurnRef.texted), never a clock turn; tests for it
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-590: numberStop reads the stopped phone row and the STOP row without aliased conditions (lint: no-unnecessary-condition)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 696. docs: COMMIT\_HISTORY.md through commit 694 (32a2eee, \#704) (\#707)
 
