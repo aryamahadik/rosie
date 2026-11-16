@@ -32,10 +32,18 @@
 // ids of people are personal data.
 //
 // This file also holds the runtime side's one transaction and its transient answer, which send-state.ts and
-// handle-keys.ts use too (the same rules as bundles.ts's, whose helpers are not exported).
+// handle-keys.ts use too (the same rules as bundles.ts's, whose helpers are not exported), and the keyword door's side
+// (enterKeywordDoorSide, T-1413): its checks and its read only, run inside that transaction before the door's first read.
 import { isLostConnection, reserveConnection } from "./bundles";
 import { scrubbed, transientOrScrubbed } from "./clocks";
-import { readBusinessScope, SCOPE_SETTING, type Sql, type Tx } from "./scope";
+import {
+  BusinessScopeError,
+  PERSON_SETTING,
+  readBusinessScope,
+  SCOPE_SETTING,
+  type Sql,
+  type Tx,
+} from "./scope";
 
 type Db = Sql | Tx;
 
@@ -333,6 +341,43 @@ export async function assertRuntimeSide(db: Db, call: string): Promise<void> {
       `${call} runs on the runtime side, with no business scope: a scope hides other businesses' rows`,
     );
   }
+}
+
+/**
+ * The keyword door's side (T-1413; DL-877 C1; DL-883, the database engineer's review of c4dd922: the door's statements
+ * live here, in db/repo), checked and made read only by its first statements: `tx` is the connection
+ * inRuntimeTransaction hands its fn, a read committed transaction that may write ({readOnly: false}), its business scope
+ * cleared, and this runs before the door's first read. In this order, each step only after the one before it passed:
+ *   1. no business scope (assertRuntimeSide: a scope hides other businesses' rows);
+ *   2. in one statement that reads no table: no person acted for (rosie.person_id unset, or the '' an ended transaction
+ *      leaves, as sign-in-send.ts's calls leave it), refused first, then not the Tool API's role: a role that holds
+ *      rosie_app's rights and not rosie_job's is refused (with no business rosie_app sees no business-scoped row and
+ *      holds no grant on phones), the rule safety-reads.ts holds as its default 1, as readOpenHolds (turn-face-reads.ts)
+ *      and the timers' reload (copy-reads.ts) do, so a role that holds neither (the tables' owner, until T-1093) runs;
+ *   3. SET TRANSACTION READ ONLY, so nothing the door runs in it writes: its every write is commitTurn's own
+ *      transaction. PostgreSQL lets a transaction become read only after its first statements, never the other way.
+ * Each refusal is thrown before the next step and names the call and the rule, never a value: assertRuntimeSide's Error,
+ * else BusinessScopeError. Only for a transaction's own connection: outside one, SET TRANSACTION changes nothing.
+ */
+export async function enterKeywordDoorSide(tx: Sql, call: string): Promise<void> {
+  await assertRuntimeSide(tx, call);
+  const [side] = await tx<{ person: string | null; app: boolean; job: boolean }[]>`
+    select current_setting(${PERSON_SETTING}, true) as person,
+           pg_has_role(current_user, 'rosie_app', 'USAGE') as app,
+           pg_has_role(current_user, 'rosie_job', 'USAGE') as job
+  `;
+  if (side === undefined) {
+    throw new BusinessScopeError(`${call}: the door's side could not be read`);
+  }
+  if (side.person !== null && side.person !== "") {
+    throw new BusinessScopeError(`${call} on the keyword door acts for no one: rosie.person_id is never set`);
+  }
+  if (side.app && !side.job) {
+    throw new BusinessScopeError(
+      `${call} on the keyword door runs on the runtime side, as rosie_job: rosie_app sees no row with no business`,
+    );
+  }
+  await tx`set transaction read only`;
 }
 
 /** UTC text ending in Z, without a zero fraction (the contract's form: 2026-11-07T08:06:00Z). */
