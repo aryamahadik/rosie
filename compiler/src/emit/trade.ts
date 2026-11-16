@@ -3,7 +3,7 @@
 // The overlay keeps the trade's ops in order rather than words applied per step (K-01 default 5), so a run applies them
 // with apply() as written (Q-35). What each part is and where it comes from:
 //   trade, facts, pluginText    the loaded trade file (T-133): its id, name, style and pattern; pf.facts as listed (null
-//                               when the file lists none: C5's fill is T-139's); the 11 free-text blocks whole (MC R3)
+//                               if none: emit.ts gives insurance C5's list); the 11 free-text blocks whole (MC R3)
 //   flows.<flow>.switches       the switches on in the flow: tradeSwitches() (T-136, overlay-core.js switchesOf; no2
 //                               from the $2 split)
 //   flows.<flow>.settings       pf.settings for the flow, typed: a value written per flow ({ A, B }) is split; a trade

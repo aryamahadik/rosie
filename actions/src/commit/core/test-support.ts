@@ -1,8 +1,11 @@
-// Doubles and fixtures for runCore's tests (T-1140). Never imported by the Worker. The doubles stand in for the safety
-// service's ports only (DL-341: K-34's reads, the sealer, the pinned bundle's lines, the stop words, who is told), never
-// for runCore or the service under test: T-318's in-memory world (domain/safety/test-support.ts), a sealer whose bytes
-// depend only on what it seals (DL-330), and the pinned bundle's checked lines read from bundle v0's own files. Values come
-// only from the contracts' fixtures, bundle v0 and the master's sample cast, in the 555-01xx range (rule 9).
+// Doubles and fixtures for runCore's tests (T-1140, T-1163). Never imported by the Worker. The doubles stand in for
+// the services' ports only, never for runCore or a service under test: for the safety service (DL-341: K-34's
+// reads, the sealer, the pinned bundle's lines, the stop words, who is told), T-318's in-memory world
+// (domain/safety/test-support.ts), a sealer whose bytes depend only on what it seals (DL-330), and the pinned
+// bundle's checked lines read from bundle v0's own files; for the flags service (DL-864: its reads, T-307's reads,
+// its ids, the handle actor's event sources), T-317's in-memory reads of the same world
+// (domain/flags/test-support.ts). Values come only from the contracts' fixtures, bundle v0 and the master's sample
+// cast, in the 555-01xx range (rule 9).
 
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -14,7 +17,8 @@ import {
   type SafetyOutcome,
   type WordsSealer,
 } from "../../domain/safety";
-import { flagsReaderOn, messagesReaderOn } from "../../domain/flags/test-support";
+import { KEYED_IDS, NO_EVENT_SOURCES } from "../../domain/flags";
+import { flagsReaderOn, messagesReaderOn, type World } from "../../domain/flags/test-support";
 import {
   BARBERSHOP,
   fakeTelling,
@@ -24,7 +28,7 @@ import {
 } from "../../domain/safety/test-support";
 import { copy, gateExchange } from "../../gate/framework/test-support";
 import type { CommitTurnContext, GateAndCommitRequest, TurnRow } from "../types";
-import type { CoreDeps, CoreSafetyDeps } from "./core";
+import type { CoreDeps, CoreFlagsDeps, CoreSafetyDeps } from "./core";
 
 // ---------------------------------------------------------------------------------------------------------------
 // The sealer
@@ -217,4 +221,26 @@ export function coreDoublesOn(world: SafetyWorld, extra: Partial<CoreSafetyDeps<
     ...extra,
   };
   return { deps: { safety }, sealer };
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// runCore's flags port over the same world (T-1163)
+
+/**
+ * The flags port as the wiring binds it (core.ts CoreFlagsDeps; DL-864 note 1), over T-317's in-memory reads of
+ * the world's K-04 and K-29 rows on the runtime side (no business scope: the only side a phone and a STOP row with
+ * no business show on), the Worker's keyed ids and no replayed text's handle known. `extra` adds or replaces any
+ * of its ports.
+ */
+export function flagsPortOn(
+  world: World,
+  extra: Partial<CoreFlagsDeps<unknown>> = {},
+): CoreFlagsDeps<unknown> {
+  return {
+    reader: () => flagsReaderOn(world, null),
+    messagesReader: () => messagesReaderOn(world, null),
+    ids: KEYED_IDS,
+    events: NO_EVENT_SOURCES,
+    ...extra,
+  };
 }

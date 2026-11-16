@@ -2,9 +2,318 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 687, [`8658b20`](https://github.com/aryamahadik/rosie/commit/8658b20), 2026-11-16 00:52:21 UTC.
+- **Through:** commit 700, [`4dbb576`](https://github.com/aryamahadik/rosie/commit/4dbb576), 2026-11-16 07:42:16 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 700. docs: COMMIT\_HISTORY.md through commit 698 (f17a5e3, \#709) (\#710)
+
+- **Commit:** [`4dbb576`](https://github.com/aryamahadik/rosie/commit/4dbb576), by Arya Mahadik, 2026-11-16 07:42:16 UTC
+- **Pull request:** [#710](https://github.com/aryamahadik/rosie/pull/710) from `task/commit-history-144`, merged 2026-11-16 07:42:16 UTC. It squashed 1 branch commit:
+  - `54dfe7d` docs: COMMIT\_HISTORY.md through commit 698 (f17a5e3, \#709)
+- **Files changed:** 1 (+51 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +51 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 237 (DL-880); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 699. T-1414: sendFixedLine's core service (domain/fixed-lines) and runCore's sendFixedLine case: HELP's reply as one quick\_reply outbox row to the turn's own handle, no business, built through T-307's outboxRows and read only through CoreDeps.flags.messagesReader; a stopped phone answers phoneStopped and writes nothing; the row keyed by the caller's turn, the line and the recipient, a second HELP of the same commit answering the first's row as repeated (DL-871); no flags port answers portNotWired, any other line or send class or an actor's send noService; made alone notBuilt (CQ-44); T-1140's flagsCalls pin gains sendFixedLine (DL-872) (\#711)
+
+- **Commit:** [`b312417`](https://github.com/aryamahadik/rosie/commit/b312417), by Arya Mahadik, 2026-11-16 07:42:12 UTC
+- **Pull request:** [#711](https://github.com/aryamahadik/rosie/pull/711) from `task/T-1414`, merged 2026-11-16 07:42:13 UTC. It squashed 1 branch commit:
+  - `5cc4143` T-1414: sendFixedLine's core service (domain/fixed-lines) and runCore…
+- **Files changed:** 9 (+1599 −11), by folder:
+  - `actions/src/commit/core/` core-fixed-lines.test.ts +646 −0, core.test.ts +5 −4, core.ts +28 −2, errors.ts +3 −2, index.ts +4 −3
+  - `actions/src/domain/fixed-lines/` fixed-lines.test.ts +495 −0, fixed-lines.ts +311 −0, index.ts +30 −0, test-support.ts +77 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 698. docs: COMMIT\_HISTORY.md through commit 696 (e34bc58, \#707) (\#709)
+
+- **Commit:** [`f17a5e3`](https://github.com/aryamahadik/rosie/commit/f17a5e3), by Arya Mahadik, 2026-11-16 07:00:57 UTC
+- **Pull request:** [#709](https://github.com/aryamahadik/rosie/pull/709) from `task/commit-history-143`, merged 2026-11-16 07:00:58 UTC. It squashed 1 branch commit:
+  - `1aed179` docs: COMMIT\_HISTORY.md through commit 696 (e34bc58, \#707)
+- **Files changed:** 1 (+53 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +53 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 236 (DL-879); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 697. T-590: the stop home (S13-32) as code: a yes only from the person's own word; one number stops every business; a stop never cancels a visit (\#708)
+
+- **Commit:** [`3508bc8`](https://github.com/aryamahadik/rosie/commit/3508bc8), by Arya Mahadik, 2026-11-16 07:00:53 UTC
+- **Pull request:** [#708](https://github.com/aryamahadik/rosie/pull/708) from `task/T-590`, merged 2026-11-16 07:00:53 UTC. It squashed 3 branch commits:
+  - `535e24b` T-590: stop home (S13-32) as code: whose word gives a yes, one number…
+  - `e3b597a` T-590: texting in counts only on a turn that carries the person's tex…
+  - `963dd1a` T-590: numberStop reads the stopped phone row and the STOP row withou…
+- **Files changed:** 8 (+1679 −0), by folder:
+  - `actions/src/homes/stop/` errors.ts +12 −0, home.ts +61 −0, index.ts +47 −0, reads.ts +117 −0, stop.test.ts +782 −0, stop.ts +414 −0, test-support.ts +173 −0, words.ts +73 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-590: stop home (S13-32) as code: whose word gives a yes, one number stops every business until START, the opt-out line once, a stop word never cancels a visit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-590: texting in counts only on a turn that carries the person's texts (TurnRef.texted), never a clock turn; tests for it
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-590: numberStop reads the stopped phone row and the STOP row without aliased conditions (lint: no-unnecessary-condition)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 696. docs: COMMIT\_HISTORY.md through commit 694 (32a2eee, \#704) (\#707)
+
+- **Commit:** [`e34bc58`](https://github.com/aryamahadik/rosie/commit/e34bc58), by Arya Mahadik, 2026-11-16 06:30:34 UTC
+- **Pull request:** [#707](https://github.com/aryamahadik/rosie/pull/707) from `task/commit-history-142`, merged 2026-11-16 06:30:34 UTC. It squashed 1 branch commit:
+  - `ff940c1` docs: COMMIT\_HISTORY.md through commit 694 (32a2eee, \#704)
+- **Files changed:** 1 (+54 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +54 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 235 (DL-877); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 695. T-362: the real model times spike, phase 1: the harness (key by name, the 40-call cap on disk), the dry run, and staging's spans as source 2 (\#706)
+
+- **Commit:** [`966f788`](https://github.com/aryamahadik/rosie/commit/966f788), by Arya Mahadik, 2026-11-16 06:30:30 UTC
+- **Pull request:** [#706](https://github.com/aryamahadik/rosie/pull/706) from `task/T-362`, merged 2026-11-16 06:30:30 UTC. It squashed 3 branch commits:
+  - `61d22f6` T-362: the real model times spike: dry run against a local stub, the …
+  - `fcec2bc` T-362: FINDINGS.md, staging's spans as source 2 (Q-41 and DL-836 answ…
+  - `3912086` T-362: keep the 40-call cap on disk (DL-870): a live run holds runs/l…
+- **Files changed:** 10 (+2998 −0), by folder:
+  - `ai/spikes/model-times/` FINDINGS.md +227 −0, model-times.test.mjs +840 −0, report.mjs +285 −0, run.mjs +389 −0, run.sh +74 −0, staging-spans.mjs +277 −0, stats.mjs +135 −0, stub.mjs +118 −0, units.mjs +451 −0, wire.mjs +202 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-362: the real model times spike: dry run against a local stub, the one live run's harness (at most 40 calls), staging's spans reader, and their tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-362: FINDINGS.md, staging's spans as source 2 (Q-41 and DL-836 answered for a quiet bundle); source 1, the one live run, waits for the user's ! run after merge
+
+Written by the lead exactly from the builder's findings_text (the harness refused the builder's write: subagents return findings as text); prettier --check passed on the file.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-362: keep the 40-call cap on disk (DL-870): a live run holds runs/live.lock (wx) before it reads the count, puts each call in runs/sent.jsonl (flushed) before it goes out, and liveCallsLogged reads that count; tests for a run killed mid-call and two runs started together; FINDINGS.md Source 1 and The one way out
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 694. docs: COMMIT\_HISTORY.md through commit 692 (a4e6fd1, \#701) (\#704)
+
+- **Commit:** [`32a2eee`](https://github.com/aryamahadik/rosie/commit/32a2eee), by Arya Mahadik, 2026-11-16 06:00:05 UTC
+- **Pull request:** [#704](https://github.com/aryamahadik/rosie/pull/704) from `task/commit-history-141`, merged 2026-11-16 06:00:05 UTC. It squashed 1 branch commit:
+  - `d71e550` docs: COMMIT\_HISTORY.md through commit 692 (a4e6fd1, \#701)
+- **Files changed:** 1 (+71 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +71 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 234 (DL-873); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 693. T-139: Master Corrections C3 (the own-AI door), C4 (switch verify off) and C5 (insurance facts, 12 trades' settings), with emitBundle's correctTrade line (\#705)
+
+- **Commit:** [`79b7daf`](https://github.com/aryamahadik/rosie/commit/79b7daf), by Arya Mahadik, 2026-11-16 05:59:57 UTC
+- **Pull request:** [#705](https://github.com/aryamahadik/rosie/pull/705) from `task/T-139`, merged 2026-11-16 05:59:58 UTC. It squashed 3 branch commits:
+  - `8eefffe` T-139: C3 (the own-AI door compiled, steps as written), C4 (switch ve…
+  - `b400d19` T-139: C5's fill holds an empty cutoff as null alone (lint: no redund…
+  - `efe21e1` T-139: emitBundle gives each trade C5's fill (c5.ts correctTrade()) b…
+- **Files changed:** 13 (+1201 −18), by folder:
+  - `compiler/src/corrections/` c3.test.ts +202 −0, c3.ts +178 −0, c4.test.ts +370 −0, c4.ts +111 −0, c5.test.ts +178 −0, c5.ts +131 −0, framework.test.ts +10 −2, framework.ts +4 −1
+  - `compiler/src/emit/` emit.test.ts +5 −9, emit.ts +3 −1, trade.ts +1 −1
+  - `compiler/src/load/` trade.ts +4 −3
+  - `compiler/src/path/` model.ts +4 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-139: C3 (the own-AI door compiled, steps as written), C4 (switch verify's branches and steps off, S2-11 kept) and C5 (insurance's facts, the 12 trades' start settings) in the corrections layer
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-139: C5's fill holds an empty cutoff as null alone (lint: no redundant union member)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-139: emitBundle gives each trade C5's fill (c5.ts correctTrade()) before correctWordsOps, so insurance's overlay and stop walks read cpa.json's facts; emit.test.ts's pin asserts C5's facts and start settings in flows A and B; the four 'C5's fill is T-139's' comments updated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 692. docs: COMMIT\_HISTORY.md through commit 689 (a9de0d1, \#699) (\#701)
+
+- **Commit:** [`a4e6fd1`](https://github.com/aryamahadik/rosie/commit/a4e6fd1), by Arya Mahadik, 2026-11-16 05:10:26 UTC
+- **Pull request:** [#701](https://github.com/aryamahadik/rosie/pull/701) from `task/commit-history-140`, merged 2026-11-16 05:10:26 UTC. It squashed 1 branch commit:
+  - `3d0f234` docs: COMMIT\_HISTORY.md through commit 689 (a9de0d1, \#699)
+- **Files changed:** 1 (+50 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +50 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 233 (DL-869); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 691. T-1416: one recordStopOrStart per phone per keyword turn, from the phone's newest word (T-317's N1) (\#702)
+
+- **Commit:** [`da58470`](https://github.com/aryamahadik/rosie/commit/da58470), by Arya Mahadik, 2026-11-16 05:10:22 UTC
+- **Pull request:** [#702](https://github.com/aryamahadik/rosie/pull/702) from `task/T-1416`, merged 2026-11-16 05:10:22 UTC. It squashed 1 branch commit:
+  - `74946b5` T-1416: one recordStopOrStart per phone per keyword turn, from the ph…
+- **Files changed:** 5 (+632 −50), by folder:
+  - `runtime/src/guard/replies/` index.ts +1 −0, replies.test.ts +407 −18, replies.ts +80 −17, replies.worker.test.ts +90 −7, test-support.ts +54 −8
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+replyToKeywords sends the turn's stop words and STARTs as one K-09 recordStopOrStart (stopOrStartFor), in the place of the first, built from the newest in arrival order; alsoCancelVisit is set when any of them was CANCEL or CANCELAR; every one of those texts is answered from that one action's result (its rows listed on the newest's reply alone). Each HELP stays its own sendFixedLine. So two words in one batch never share a consent row id, a reply row id or a phone version.
+
+Tests: replies.test.ts (the Proves-it cases, a core double keyed by the turn showing the old shape refused on every run); the spans test and the Workers STOP, HELP, START test updated to the new rule, with START, HELP, STOP and STOP, Stop! through the real dispatcher. test-support: an opt-in keyedByTurn double; CANCEL flags visits beside a START too, as the core does.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 690. T-1163: runCore dispatches setRecordFlag and recordStopOrStart to T-317's core functions through a flags port the wiring binds (\#703)
+
+- **Commit:** [`70e04e6`](https://github.com/aryamahadik/rosie/commit/70e04e6), by Arya Mahadik, 2026-11-16 05:10:18 UTC
+- **Pull request:** [#703](https://github.com/aryamahadik/rosie/pull/703) from `task/T-1163`, merged 2026-11-16 05:10:18 UTC. It squashed 3 branch commits:
+  - `5d48cf9` T-1163: runCore dispatches recordStopOrStart and setRecordFlag to T-3…
+  - `12bdb92` T-1163: T-1140's notBuilt test keeps every call it covered: the 11 ca…
+  - `68f0a2d` T-1163: the turns that carry start-recorded.json's START and flag-pau…
+- **Files changed:** 6 (+1063 −49), by folder:
+  - `actions/src/commit/core/` core-flags.test.ts +848 −0, core.test.ts +8 −4, core.ts +138 −26, errors.ts +30 −7, index.ts +6 −5, test-support.ts +33 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1163: runCore dispatches recordStopOrStart and setRecordFlag to T-317's core functions through CoreDeps.flags, the port the wiring binds by name (reader, messagesReader, ids, events); none bound or one left out answers notBuilt portNotWired, never the service's default reader; recordFlagCore's call-off clocks ride in the run's writes through withClocks; each is the turn's own call, its caller naming no business or the call's (otherBusiness refused); 19 tests on stop-recorded.json, start-recorded.json and flag-paused.json
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1163: T-1140's notBuilt test keeps every call it covered: the 11 calls with no service answer noService, recordStopOrStart and setRecordFlag with no flags port bound answer portNotWired, its title unchanged
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1163: the turns that carry start-recorded.json's START and flag-paused.json's pause are each held to K-09 v1.5's gateAndCommit request
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 689. docs: COMMIT\_HISTORY.md through commit 687 (8658b20, \#697) (\#699)
+
+- **Commit:** [`a9de0d1`](https://github.com/aryamahadik/rosie/commit/a9de0d1), by Arya Mahadik, 2026-11-16 03:43:34 UTC
+- **Pull request:** [#699](https://github.com/aryamahadik/rosie/pull/699) from `task/commit-history-139`, merged 2026-11-16 03:43:34 UTC. It squashed 1 branch commit:
+  - `5e3a143` docs: COMMIT\_HISTORY.md through commit 687 (8658b20, \#697)
+- **Files changed:** 1 (+47 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +47 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 232 (DL-863); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 688. T-022: freeze K-13 v1, the Files port (R2): six calls, the private object key, the K-08 span, 32 fixtures, the spike's read-only findings and the freeze record (\#700)
+
+- **Commit:** [`dc38981`](https://github.com/aryamahadik/rosie/commit/dc38981), by Arya Mahadik, 2026-11-16 03:43:29 UTC
+- **Pull request:** [#700](https://github.com/aryamahadik/rosie/pull/700) from `task/T-022`, merged 2026-11-16 03:43:29 UTC. It squashed 2 branch commits:
+  - `71c8292` T-022: freeze K-13 v1, the files port (R2): uploadLink, checkUpload, …
+  - `3e78ac4` T-022: the README's open gaps quote RULES 4.10 and B10-17 and K-15 v1…
+- **Files changed:** 36 (+2289 −0), by folder:
+  - `contracts/port-files/` README.md +200 −0, frozen.json +1 −0, port-files.v1.schema.json +1125 −0
+  - `contracts/port-files/fixtures/` check-upload-not-stored.json +15 −0, check-upload-stored.json +18 −0, check-upload-wrong-type.json +17 −0, delete-already-gone.json +17 −0, delete-erasure.json +17 −0, error-unavailable.json +21 −0, index.json +260 −0, read-link-listing-photo.json +20 −0, read-link-logged.json +20 −0, read-link-not-found.json +16 −0, server-read-photo.json +16 −0, server-write-done-photo.json +29 −0, server-write-linq-photo.json +24 −0, server-write-parquet.json +24 −0, server-write-repeat.json +24 −0, server-write-report.json +29 −0, server-write-sealed-trace.json +24 −0, span-delete-erasure.json +25 −0, span-read-link-logged.json +26 −0, span-upload-link.json +20 −0, upload-id-document.json +24 −0, upload-price-list-photo.json +24 −0, upload-too-large.json +24 −0
+  - `contracts/port-files/fixtures/invalid/` refuse-caller-names-key.json +25 −0, refuse-delete-without-erasure.json +17 −0, refuse-id-document-for-business.json +24 −0, refuse-key-in-span.json +27 −0, refuse-listing-read-of-id-document.json +20 −0, refuse-public-object.json +24 −0, refuse-read-link-inline.json +20 −0, refuse-read-without-permission.json +19 −0, refuse-svg-upload.json +24 −0, refuse-upload-too-large-ready.json +29 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-022: freeze K-13 v1, the files port (R2): uploadLink, checkUpload, readLink, serverWrite, serverRead and deleteObject, the object key, the K-08 span, 22 accepted and 10 refused fixtures, the spike's read-only findings, the freeze record and frozen.json
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-022: the README's open gaps quote RULES 4.10 and B10-17 and K-15 v1's 'What may be kept'; 'Frozen before it' adds the K-07 and K-08 lines
+
+The builder's three wording edits, left uncommitted when its run ended before its self-check finished (nothing failed); each citation checked against its source by the lead, and prettier --check passed on the file.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 687. docs: COMMIT\_HISTORY.md through commit 685 (8c7b071, \#696) (\#697)
 

@@ -36,6 +36,7 @@
 import { createHash } from "node:crypto";
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { correctTrade } from "../corrections/c5";
 import type { FlowLetter, MasterGraphs } from "../graph/types.ts";
 import { loadMaster } from "../load/flow";
 import { listTradeIds, loadTrade, type LoadedTrade, type TradeId } from "../load/trade";
@@ -180,13 +181,14 @@ function kvKey(id: BundleId, part: string): string {
  * Packs the inputs into a bundle: corrects each trade's words ops that would put back words a Master Correction replaced
  * (correctWordsOps), compiles both flows and each trade, writes the manifest, checks the whole bundle against K-01 v1
  * (BundleValidationError when it is refused) and serializes each stored value.
+ * Before its words ops are corrected, each trade takes C5's fill (c5.ts correctTrade(): insurance's facts).
  */
 export function emitBundle(input: EmitInputs): EmitResult {
   const byId = new Map(input.trades.map((trade) => [trade.id, trade]));
   if (byId.size !== input.trades.length) throw new Error("a trade is given twice");
   const sorted = [...byId]
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-    .map(([, trade]) => correctWordsOps(input.master, trade));
+    .map(([, trade]) => correctWordsOps(input.master, correctTrade(trade).trade));
   const stops = {} as Record<FlowLetter, StopMarks>;
   for (const flow of FLOWS)
     stops[flow] = placeStops(
