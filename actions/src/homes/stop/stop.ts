@@ -300,14 +300,12 @@ function later(a: Date | null, b: Date | null): Date | null {
 
 /** The number's stop, from its flag and its newest texts row for every business (MC C1; default 1). */
 function stopOf(reading: StopReading): NumberStop {
-  const flag = reading.phone?.stopped === true;
+  // The phones row when its stopped flag is set, and the newest every-business row when it is a STOP.
+  const flagged = reading.phone?.stopped === true ? reading.phone : null;
   const everyBusiness = newestDecides(textsOf(reading).filter((row) => row.businessId === null));
-  const byRow = everyBusiness?.revoked === true;
-  if (!flag && !byRow) return { stopped: false, since: null };
-  const since = later(
-    flag ? (reading.phone?.stopAt ?? null) : null,
-    byRow ? (everyBusiness?.at ?? null) : null,
-  );
+  const stopRow = everyBusiness?.revoked === true ? everyBusiness : null;
+  if (flagged === null && stopRow === null) return { stopped: false, since: null };
+  const since = later(flagged === null ? null : flagged.stopAt, stopRow === null ? null : stopRow.at);
   return { stopped: true, since };
 }
 
