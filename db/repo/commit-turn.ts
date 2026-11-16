@@ -87,12 +87,33 @@
 //      means to ask is never answered with a number in silence (fail closed).
 //  13. A table the answer names by a column other than its primary key (phones, by handle_id, when the request asks)
 //      that has no such column throws; its rows are never answered by their primary key instead.
+//  14. (T-667) A two-column key's version read is compared under the businesses the commit writes: those its request
+//      names (a state insert's business, an open question's, a clock row's, an outbox row's, an effect's, an event's) and
+//      those of the rows it updates, as they stand before its locks. With none, only a row with no business is found (a
+//      sign-up turn before there is a business). A table scoped none (kind_flows) has no business to compare.
+//  15. (T-667) K-22's sessions and K-27's calendar_links, which row-level security binds by person and which have no
+//      business column, are written on the runtime side, where their runtime policies give rosie_job every row.
+//
+// The setup tables (T-667; K-05 v1.18 item 77; DL-867, DL-911, DL-913): the state writes take every setup part's table
+// (K-22 to K-27, K-33, K-35) as any other domain table, an update naming the version it read. A table whose primary key is
+// two columns (K-23 company_kinds and flow_defaults, K-24 kind_flows, picked_kind_texts and new_work_draft_blocks) names
+// its row by item 77's name, the key's values joined by "/" in key order (setup/row-names.ts), which the database builds:
+//   - a state insert answers the row by the name its `returning` builds from the row's own columns;
+//   - a state update names the row by its key, column to value (K-05 v1 stateWrite), and is found by those columns; the
+//     name it is locked, compared and answered by is the one the database builds for that row, read before the locks;
+//   - a version read names the row by its name, which the SQL compares whole with the row's own name, never splitting the
+//     rowId (CQ-09), with business_id one of the businesses the commit writes (default 14; T-1427's security reviewer's N2,
+//     DL-913), so another business's name finds no row and the commit throws (default 1, fail closed), and the compare
+//     uses the business's index (T-1427's database engineer's N3);
+//   - versionChanged names a changed row by its name.
+// A table of one key column is named, locked, compared and answered as before, by the same statements.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.1";
 import type * as K05v117 from "../../contracts/generated/data-access/data-access.v1.17";
 import { byteaFromText } from "./bytea";
 import { appendEvent, type EventEntry as LogEntry } from "./event-log";
 import { releaseIn } from "./reservations";
 import { assertBusinessId, SCOPE_SETTING, type Sql } from "./scope";
+import { isNamedKey, rowNameSql, twoColumnKeyOf } from "./setup/row-names";
 import { inRuntimeTransaction, transientOrThrow, utc } from "./targets";
 
 /**
@@ -140,6 +161,13 @@ export const NOT_STATE_TABLES: ReadonlySet<string> = new Set([
   "provider_events",
   "outbox_claims",
 ]);
+
+/**
+ * The setup parts' tables that row-level security binds by person, with no business column, and whose runtime policy
+ * gives rosie_job every row (K-22 v1 rule 5's sessions; K-27 v1 rule 5's calendar_links): written on the runtime side
+ * (default 15; T-667).
+ */
+const PERSON_BOUND_TABLES: ReadonlySet<string> = new Set(["sessions", "calendar_links"]);
 
 /** A database rule that refuses a write answers `constraint` (K-05 README item 1). */
 const CONSTRAINT_SQLSTATES = new Set(["23P01", "23514", "23505", "23503"]);
@@ -378,6 +406,19 @@ interface Context {
    * none (v1.16's answer).
    */
   readonly answerNames: ReadonlyMap<string, string>;
+  /** Each state update of a two-column key, found once by its key's columns (T-667), by the write it is. */
+  readonly namedUpdates: Map<object, UpdateTarget>;
+}
+
+/**
+ * The row a state update names: its rowId (the one key column's value, or item 77's name the database built for the row
+ * a two-column key finds), the key's columns to values when it has two (null for one), and for two its business as read
+ * before the locks (undefined for one: read only when a compare needs it).
+ */
+interface UpdateTarget {
+  readonly rowId: string;
+  readonly keyValues: Row | null;
+  readonly business: string | null | undefined;
 }
 
 /**
@@ -421,8 +462,10 @@ async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
   const columns = new Set(row.columns);
   let scopeColumn: string | null = null;
   if (row.rls) {
-    scopeColumn = table === "businesses" ? "id" : "business_id";
-    if (!columns.has(scopeColumn)) {
+    const column = table === "businesses" ? "id" : "business_id";
+    if (columns.has(column)) {
+      scopeColumn = column;
+    } else if (!PERSON_BOUND_TABLES.has(table)) {
       fail(`${table} has row-level security but no business column this call can scope by`);
     }
   }
@@ -439,16 +482,35 @@ async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
   return info;
 }
 
-/** The one key column of a versioned table: a row reference names a row by one key as text (K-02 fact rowId). */
-function oneKey(info: TableInfo): string {
+/**
+ * The key columns of a versioned table, by which a row reference names its rows as one text (K-02 fact rowId): one
+ * column, or the two of a table K-05 v1.18 item 77 names (setup/row-names.ts TWO_COLUMN_KEYS; T-667), whose rows are
+ * named by the two values joined by "/". Any other key of more than one column names no row.
+ */
+function oneKey(info: TableInfo): readonly string[] {
   const [key, ...more] = info.key;
   if (!info.versioned) {
     fail(`${info.name} carries no version, so no commit compares or names its rows`);
   }
-  if (key === undefined || more.length > 0) {
+  if (key === undefined || (more.length > 0 && !isNamedKey(info.name, info.key))) {
     fail(`${info.name}'s primary key is not one column, so a row reference cannot name its rows`);
   }
-  return key;
+  return info.key;
+}
+
+/** The one column of a key of one column, or null for a key of two (item 77's name). */
+function singleColumn(key: readonly string[]): string | null {
+  const [column, ...more] = key;
+  return column !== undefined && more.length === 0 ? column : null;
+}
+
+/** A two-column key's columns, matched to the values its write names (setup/row-names.ts: one or two columns only). */
+function twoColumns(key: readonly string[]): readonly [string, string] {
+  const [first, second, ...more] = key;
+  if (first === undefined || second === undefined || more.length > 0) {
+    throw new Error("commitTurn: a row named by item 77's name has a key of two columns");
+  }
+  return [first, second];
 }
 
 function businessOf(info: TableInfo, row: Row): string | null {
@@ -572,14 +634,84 @@ function compareText(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
-async function lockRow(ctx: Context, table: string, rowId: string, mode: Mode): Promise<Locked> {
+/** A row the commit locks: by its rowId, or (a two-column row a state update names: T-667) by its key's columns. */
+interface LockTarget {
+  readonly table: string;
+  readonly rowId: string;
+  readonly mode: Mode;
+  /** The key's columns to values of a two-column row a state update names, found by them; null: found by its rowId. */
+  readonly keyValues: Row | null;
+  /** That row's business as read before the locks (undefined: not read). */
+  readonly business: string | null | undefined;
+}
+
+/** The key's columns to values of a two-column row a state update names (stateUpdateTarget set them). */
+function keyValuesOf(target: UpdateTarget): Row {
+  if (target.keyValues === null) {
+    throw new Error("commitTurn: a two-column row to update has no key's values");
+  }
+  return target.keyValues;
+}
+
+/** A two-column key's columns, each with the value a state update names it by (stateUpdateTarget checked each). */
+function keyWhere(ctx: Context, key: readonly string[], keyValues: Row) {
+  const { tx } = ctx;
+  const [first, second] = twoColumns(key);
+  return tx`${tx(first)} = ${keyValues[first] as string | number} and ${tx(second)} = ${keyValues[second] as string | number}`;
+}
+
+/**
+ * How a two-column row is found (T-667): a state update's by its key's columns; a version read's by item 77's name, the
+ * SQL's own name for the row compared whole with the rowId, of one of the businesses the commit writes (default 14; none:
+ * a row with no business), or of no business at all for a table scoped none.
+ */
+function namedRowWhere(
+  ctx: Context,
+  info: TableInfo,
+  target: LockTarget,
+  businesses: ReadonlySet<string> | null,
+) {
+  const { tx } = ctx;
+  if (target.keyValues !== null) {
+    return keyWhere(ctx, info.key, target.keyValues);
+  }
+  const name = rowNameSql(tx, info.key);
+  if (info.scopeColumn === null) {
+    return tx`${name} = ${target.rowId}`;
+  }
+  if (businesses === null) {
+    throw new Error(
+      "commitTurn: a two-column version read was compared before the commit's businesses were read",
+    );
+  }
+  return businesses.size === 0
+    ? tx`${name} = ${target.rowId} and ${tx(info.scopeColumn)} is null`
+    : tx`${name} = ${target.rowId} and ${tx(info.scopeColumn)} in ${tx([...businesses])}`;
+}
+
+async function lockRow(
+  ctx: Context,
+  target: LockTarget,
+  businesses: ReadonlySet<string> | null,
+): Promise<Locked> {
+  const { table, rowId, mode } = target;
   const info = await tableInfo(ctx, table);
   const key = oneKey(info);
+  const column = singleColumn(key);
   const { tx } = ctx;
-  const [row] =
-    mode === "update"
-      ? await tx<Row[]>`select * from ${tx(table)} where ${tx(key)} = ${rowId} for update`
-      : await tx<Row[]>`select * from ${tx(table)} where ${tx(key)} = ${rowId} for share`;
+  let row: Row | undefined;
+  if (column !== null) {
+    [row] =
+      mode === "update"
+        ? await tx<Row[]>`select * from ${tx(table)} where ${tx(column)} = ${rowId} for update`
+        : await tx<Row[]>`select * from ${tx(table)} where ${tx(column)} = ${rowId} for share`;
+  } else {
+    const where = namedRowWhere(ctx, info, target, businesses);
+    [row] =
+      mode === "update"
+        ? await tx<Row[]>`select * from ${tx(table)} where ${where} for update`
+        : await tx<Row[]>`select * from ${tx(table)} where ${where} for share`;
+  }
   if (row === undefined) {
     fail(`a row of ${table} the request names does not exist (default 1)`);
   }
@@ -646,25 +778,131 @@ interface Expectation {
   readonly version: number;
 }
 
-/** A state update's row id: its one key column's value, the key naming exactly the primary key (no wider update). */
+/**
+ * A state update's row, the key naming exactly the primary key (no wider update), each column with a value: a key of one
+ * column names the row by its value; a key of two (K-05 v1.18 item 77; T-667) by the name the database builds for the
+ * row those values find, with that row's business, read once per write before any lock (default 1 when there is none).
+ */
 async function stateUpdateTarget(
   ctx: Context,
   write: Extract<K05.StateWrite, { op: "update" }>,
-): Promise<string> {
+): Promise<UpdateTarget> {
+  const known = ctx.namedUpdates.get(write);
+  if (known !== undefined) {
+    return known;
+  }
   const info = await tableInfo(ctx, write.table);
   const key = oneKey(info);
   const named = Object.keys(write.key);
-  if (named.length !== 1 || named[0] !== key) {
+  const column = singleColumn(key);
+  if (column !== null) {
+    if (named.length !== 1 || named[0] !== column) {
+      fail(`a state update of ${write.table} must name the row by its primary key alone`);
+    }
+    const value = write.key[column];
+    if ((typeof value !== "string" && typeof value !== "number") || value === "") {
+      fail(`a state update of ${write.table} names its key with no value`);
+    }
+    if (Object.hasOwn(write.set, column)) {
+      fail(`a state update of ${write.table} may not change the row's key`);
+    }
+    return { rowId: String(value), keyValues: null, business: undefined };
+  }
+  if (named.length !== key.length || !key.every((keyColumn) => named.includes(keyColumn))) {
     fail(`a state update of ${write.table} must name the row by its primary key alone`);
   }
-  const value = write.key[key];
-  if ((typeof value !== "string" && typeof value !== "number") || value === "") {
-    fail(`a state update of ${write.table} names its key with no value`);
+  const keyValues: Row = {};
+  for (const keyColumn of key) {
+    const value = write.key[keyColumn];
+    if ((typeof value !== "string" && typeof value !== "number") || value === "") {
+      fail(`a state update of ${write.table} names its key with no value`);
+    }
+    if (Object.hasOwn(write.set, keyColumn)) {
+      fail(`a state update of ${write.table} may not change the row's key`);
+    }
+    keyValues[keyColumn] = value;
   }
-  if (Object.hasOwn(write.set, key)) {
-    fail(`a state update of ${write.table} may not change the row's key`);
+  const { tx } = ctx;
+  const where = keyWhere(ctx, key, keyValues);
+  const [row] =
+    info.scopeColumn === null
+      ? await tx<{ name: string; business: string | null }[]>`
+          select ${rowNameSql(tx, key)} as name, null::text as business from ${tx(write.table)} where ${where}
+        `
+      : await tx<{ name: string; business: string | null }[]>`
+          select ${rowNameSql(tx, key)} as name, ${tx(info.scopeColumn)} as business
+          from ${tx(write.table)} where ${where}
+        `;
+  if (row === undefined) {
+    fail(`a row of ${write.table} the request names does not exist (default 1)`);
   }
-  return String(value);
+  assertId(row.name, `${write.table}'s row name`);
+  assertNullableId(row.business, `${write.table}.${info.scopeColumn ?? "business"}`);
+  const target: UpdateTarget = { rowId: row.name, keyValues, business: row.business };
+  ctx.namedUpdates.set(write, target);
+  return target;
+}
+
+/**
+ * The businesses the commit writes (default 14; T-667): each one its request names (a state insert's business, an open
+ * question's, a clock row's, an outbox row's, an effect's, an event's) and each one of a row it updates, read now, before
+ * the locks, on the runtime side. Read only when a two-column version read of a business-scoped table needs it.
+ */
+async function writeBusinesses(
+  ctx: Context,
+  request: CommitTurnRequest,
+  targets: readonly LockTarget[],
+): Promise<ReadonlySet<string>> {
+  const businesses = new Set<string>();
+  const add = (value: unknown): void => {
+    if (typeof value === "string" && value !== "") {
+      businesses.add(value);
+    }
+  };
+  const { writes } = request;
+  for (const write of writes.state) {
+    if (write.op === "insert") {
+      const info = await tableInfo(ctx, write.table);
+      if (info.scopeColumn !== null) {
+        add(write.values[info.scopeColumn]);
+      }
+    }
+  }
+  const named: readonly unknown[] = [
+    ...writes.openQuestions.open,
+    ...writes.clockRows.make,
+    ...writes.outboxRows,
+    ...(writes.effects?.write ?? []),
+    ...writes.events,
+  ];
+  for (const write of named) {
+    if (isRecord(write)) {
+      add(write.businessId);
+    }
+  }
+  const { tx } = ctx;
+  for (const target of targets) {
+    if (target.mode !== "update") {
+      continue;
+    }
+    const info = await tableInfo(ctx, target.table);
+    if (info.scopeColumn === null) {
+      continue;
+    }
+    if (target.business !== undefined) {
+      add(target.business);
+      continue;
+    }
+    const column = singleColumn(oneKey(info));
+    if (column === null) {
+      throw new Error("commitTurn: a two-column row to update was not read before its business was asked");
+    }
+    const [row] = await tx<{ business: unknown }[]>`
+      select ${tx(info.scopeColumn)} as business from ${tx(target.table)} where ${tx(column)} = ${target.rowId}
+    `;
+    add(row?.business);
+  }
+  return businesses;
 }
 
 async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise<Compared> {
@@ -682,14 +920,27 @@ async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise
     releases.map((release) => release.id),
   );
 
-  // Every row compared or written, with the strongest lock it needs, and every version the request read or expects.
-  const modes = new Map<string, { table: string; rowId: string; mode: Mode }>();
+  // Every row compared or written, with the strongest lock it needs, and every version the request read or expects. A
+  // two-column row a state update names keeps the key it is found by (T-667).
+  const modes = new Map<string, LockTarget>();
   const expected: Expectation[] = [];
-  const want = (table: string, rowId: string, mode: Mode, version: number): void => {
+  const want = (
+    table: string,
+    rowId: string,
+    mode: Mode,
+    version: number,
+    update: UpdateTarget | null = null,
+  ): void => {
     const key = targetKey(table, rowId);
     const known = modes.get(key);
     if (known === undefined || (known.mode === "share" && mode === "update")) {
-      modes.set(key, { table, rowId, mode });
+      modes.set(key, {
+        table,
+        rowId,
+        mode,
+        keyValues: update === null ? (known?.keyValues ?? null) : update.keyValues,
+        business: update === null ? known?.business : update.business,
+      });
     }
     expected.push({ table, rowId, version });
   };
@@ -698,7 +949,8 @@ async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise
   }
   for (const write of writes.state) {
     if (write.op === "update") {
-      want(write.table, await stateUpdateTarget(ctx, write), "update", write.expectVersion);
+      const update = await stateUpdateTarget(ctx, write);
+      want(write.table, update.rowId, "update", write.expectVersion, update);
     }
   }
   for (const close of writes.openQuestions.close) {
@@ -722,16 +974,26 @@ async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise
     want("effects", letGo.effectId, "update", letGo.expectVersion);
   }
 
+  // A two-column version read of a business-scoped table is compared under the businesses the commit writes, read
+  // before any row is locked (default 14; T-667). A commit with none reads nothing more.
+  let businesses: ReadonlySet<string> | null = null;
+  for (const target of modes.values()) {
+    if (target.keyValues === null && twoColumnKeyOf(target.table) !== null) {
+      const info = await tableInfo(ctx, target.table);
+      if (info.scopeColumn !== null) {
+        businesses = await writeBusinesses(ctx, request, [...modes.values()]);
+        break;
+      }
+    }
+  }
+
   // Locked in one fixed order, so two commits never wait on each other in a circle.
   const rows = new Map<string, Locked>();
   const order = [...modes.values()].sort(
     (a, b) => compareText(a.table, b.table) || compareText(a.rowId, b.rowId),
   );
   for (const target of order) {
-    rows.set(
-      targetKey(target.table, target.rowId),
-      await lockRow(ctx, target.table, target.rowId, target.mode),
-    );
+    rows.set(targetKey(target.table, target.rowId), await lockRow(ctx, target, businesses));
   }
   const locked = (table: string, rowId: string): Locked => {
     const row = rows.get(targetKey(table, rowId));
@@ -840,17 +1102,23 @@ async function writeState(
         continue;
       }
       const key = oneKey(info);
+      const column = singleColumn(key);
       // The column the answer names the row by, when it is not the key, comes back with it (a phones row's handle id,
-      // when the request asks: T-1417); otherwise the insert returns what v1.16's returns.
+      // when the request asks: T-1417); otherwise the insert returns what v1.16's returns. A two-column row comes back
+      // with item 77's name, which the database builds from the row's own columns (T-667).
       const named = answerColumn(ctx, info);
       const [row] =
-        named === null
+        column === null
           ? await tx<(Row & { key: unknown; version: number })[]>`
-              insert into ${tx(write.table)} ${tx(values)} returning ${tx(key)} as key, version
+              insert into ${tx(write.table)} ${tx(values)} returning ${rowNameSql(tx, key)} as key, version
             `
-          : await tx<(Row & { key: unknown; version: number })[]>`
-              insert into ${tx(write.table)} ${tx(values)} returning ${tx(key)} as key, ${tx(named)}, version
-            `;
+          : named === null
+            ? await tx<(Row & { key: unknown; version: number })[]>`
+                insert into ${tx(write.table)} ${tx(values)} returning ${tx(column)} as key, version
+              `
+            : await tx<(Row & { key: unknown; version: number })[]>`
+                insert into ${tx(write.table)} ${tx(values)} returning ${tx(column)} as key, ${tx(named)}, version
+              `;
       if (row === undefined) {
         throw new Error(`commitTurn: ${what} returned no row`);
       }
@@ -861,25 +1129,34 @@ async function writeState(
       });
       continue;
     }
-    const rowId = await stateUpdateTarget(ctx, write);
+    const target = await stateUpdateTarget(ctx, write);
+    const { rowId } = target;
     const key = oneKey(info);
+    const column = singleColumn(key);
     const locked = lockedRow(compared, write.table, rowId);
     const set = columnValues(ctx, info, write.set, `a state update of ${write.table}`);
     await ctx.scope.to(locked.business);
-    // As the insert: the update returns the answer's column too only when the answer names the row by it (T-1417).
+    // As the insert: the update returns the answer's column too only when the answer names the row by it (T-1417). A
+    // two-column row is found by its key's columns, as the write names it, and answered by its name (T-667).
     const named = answerColumn(ctx, info);
     const [row] =
-      named === null
+      column === null
         ? await tx<(Row & { version: number })[]>`
             update ${tx(write.table)} set ${tx(set)}, version = ${write.expectVersion + 1}
-            where ${tx(key)} = ${rowId} and version = ${write.expectVersion}
+            where ${keyWhere(ctx, key, keyValuesOf(target))} and version = ${write.expectVersion}
             returning version
           `
-        : await tx<(Row & { version: number })[]>`
-            update ${tx(write.table)} set ${tx(set)}, version = ${write.expectVersion + 1}
-            where ${tx(key)} = ${rowId} and version = ${write.expectVersion}
-            returning ${tx(named)}, version
-          `;
+        : named === null
+          ? await tx<(Row & { version: number })[]>`
+              update ${tx(write.table)} set ${tx(set)}, version = ${write.expectVersion + 1}
+              where ${tx(column)} = ${rowId} and version = ${write.expectVersion}
+              returning version
+            `
+          : await tx<(Row & { version: number })[]>`
+              update ${tx(write.table)} set ${tx(set)}, version = ${write.expectVersion + 1}
+              where ${tx(column)} = ${rowId} and version = ${write.expectVersion}
+              returning ${tx(named)}, version
+            `;
     if (row === undefined) {
       throw new Error(`commitTurn: a state update of ${write.table} matched no row at its version`);
     }
@@ -1501,6 +1778,7 @@ async function commitIn(
     scope: new Scope(tx),
     tables: new Map(),
     answerNames: answerNamesOf(request),
+    namedUpdates: new Map(),
   };
   const compared = await lockAndCompare(ctx, request);
   const out: Written = { written: [], outboxRows: [], promoted: [], superseded: [], withdrawn: [] };
