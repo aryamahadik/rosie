@@ -450,12 +450,13 @@ describe("an unknown or unbuilt core action answers notBuilt and writes nothing"
     const runCore = createRunCore(deps);
     const calls = k09CoreCalls();
     expect(calls).toHaveLength(15);
-    // T-1163 built recordStopOrStart and setRecordFlag: with no flags port bound, as here, each still answers notBuilt
-    // by its name before anything is read, its gap portNotWired (core-flags.test.ts holds them with the port bound).
-    const flagsCalls = ["recordStopOrStart", "setRecordFlag"];
+    // T-1163 built recordStopOrStart and setRecordFlag, and T-1414 sendFixedLine on the same flags port: with no flags
+    // port bound, as here, each still answers notBuilt by its name before anything is read, its gap portNotWired
+    // (core-flags.test.ts and core-fixed-lines.test.ts hold them with the port bound).
+    const flagsCalls = ["recordStopOrStart", "setRecordFlag", "sendFixedLine"];
     const built = ["recordSafetyOutcome", "releaseSafetyHold", ...flagsCalls];
     const unbuilt = calls.filter((call) => !built.includes(call));
-    expect(unbuilt).toHaveLength(11);
+    expect(unbuilt).toHaveLength(10);
     for (const call of [...unbuilt, ...flagsCalls]) {
       const action = { call, request: { caller: copy(request.caller) } } as unknown as CoreAction;
       const refused = await runCore(action, turn, copy(NOTHING_OPEN)).catch((thrown: unknown) => thrown);

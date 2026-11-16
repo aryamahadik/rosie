@@ -12,6 +12,10 @@
 //     and recordFlagCore), with the flags port the wiring hands in by name (CoreDeps.flags; DL-864): a STOP or
 //     START text and a record flag commit in the turn's one commit, the STOP's reply row among its outbox rows
 //     (named by its result's reply), and a pause's call-off clock rows in its writes.
+//   - sendFixedLine goes through the fixed-lines service (T-1414, domain/fixed-lines: sendFixedLineCore), reading
+//     through the same flags port's T-307 reads (DL-864; default 8): a HELP text's reply row commits in the keyword
+//     turn's one commit, named by its result (outboxRowId), and a second HELP of the same turn answers the first's row
+//     as repeated, writing nothing (DL-871).
 //   - The clock rows a run arms that no question owns (a threat's pause call-offs, S11-62; a pause's,
 //     flag-paused.json; T-319's escalations), which a service hands back beside its writes, are handed over in
 //     them (UnitWrites.clocks; T-1156's withClocks), so the turn's one commit writes each with its event-log
@@ -56,6 +60,11 @@
 //   7. runCore hands back a flags call's result and writes alone (CoreRun): the STOP's reply row is named by its
 //      result (reply.outboxRowId), which is where the commit's stopped-flag check reads it (T-317 note b, outside
 //      this card).
+//   8. sendFixedLine (T-1414) is the turn's own call (default 3), naming no business or the call's (default 6), and
+//      reads through the flags port alone (default 5: T-1163's lead note 1, "T-1414 reuses flags.messagesReader"): with
+//      no flags port bound, or one of its four ports left out, it answers notBuilt (portNotWired) before anything is
+//      read. A line the fixed-lines service does not send in a turn (HELP's reply alone, as quick_reply), or a request
+//      carrying an actor's send, answers notBuilt (noService; fixed-lines.ts default 1). Its run arms no clock row.
 
 import type {
   SafetyDeps,
@@ -74,6 +83,7 @@ import {
   type FlagsDeps,
   type FlagsReader,
 } from "../../domain/flags";
+import { sendFixedLineCore, sendsInTurn } from "../../domain/fixed-lines";
 import type { MessagesReader } from "../../domain/messages-consent";
 import { NotBuiltError, isCallName, type CallName, type Caller } from "../../tool-api";
 import { CommitRefusedError } from "../errors";
@@ -120,8 +130,8 @@ export type CoreFlagsDeps<Repo> = FlagsDeps<Repo> & {
 export interface CoreDeps<Repo> {
   readonly safety: CoreSafetyDeps<Repo>;
   /**
-   * The flags service's ports (DL-864): none bound until the turn face binds them (T-1413), so
-   * recordStopOrStart and setRecordFlag answer notBuilt (portNotWired) and nothing is read or written (default 5).
+   * The flags service's ports (DL-864): none bound until the turn face binds them (T-1413), so recordStopOrStart,
+   * setRecordFlag and sendFixedLine answer notBuilt (portNotWired) and nothing is read or written (defaults 5 and 8).
    */
   readonly flags?: CoreFlagsDeps<Repo>;
 }
@@ -202,6 +212,15 @@ async function stopOrStartRun<Repo>(
   return { run: { result, writes }, clocks: [] };
 }
 
+/** A fixed line's run as the commit takes it (default 8): its result and writes, read through the flags port. */
+async function fixedLineRun<Repo>(
+  action: Extract<CoreAction, { call: "sendFixedLine" }>,
+  turn: CommitTurnContext<Repo>,
+  flags: FlagsDeps<Repo>,
+): Promise<ServiceRun> {
+  return { run: await sendFixedLineCore(action, turn, flags), clocks: [] };
+}
+
 /** The name of a core action K-09 v1 does not hold, or holds with no service yet: never the caller's own text. */
 function notBuilt(action: { readonly call: unknown }): never {
   throw new CoreNotBuiltError(isCallName(action.call) ? action.call : null, "noService");
@@ -233,6 +252,13 @@ export function createRunCore<Repo>(deps: CoreDeps<Repo>): CommitPorts<Repo>["ru
         checkBusiness(action.call, action.request.caller, turn);
         const flags = flagsPortOf(action.call, deps.flags);
         return await committable(action.call, () => recordFlagCore(action, turn, flags));
+      }
+      case "sendFixedLine": {
+        checkCaller(action.request.caller, turn);
+        checkBusiness(action.call, action.request.caller, turn);
+        const flags = flagsPortOf(action.call, deps.flags);
+        if (!sendsInTurn(action.request)) return notBuilt(action);
+        return await committable(action.call, () => fixedLineRun(action, turn, flags));
       }
       default:
         return notBuilt(action);
