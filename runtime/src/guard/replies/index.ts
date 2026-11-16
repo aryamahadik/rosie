@@ -6,6 +6,7 @@ export {
   fixedLinePlan,
   replyToKeywords,
   setReplyDeps,
+  stopOrStartFor,
   type KeywordReply,
   type RepliesResult,
   type ReplyTurn,

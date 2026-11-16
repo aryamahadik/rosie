@@ -5,9 +5,12 @@
 //     `recordStopOrStart` and `sendFixedLine` as K-09 v1 and v1.1 describe them: a STOP sets the flag for every business,
 //     closes the chat, adds a texts row with no business that withdraws texts, writes the stop reply's row (quick_reply,
 //     README default 6) and, for each business with an open booking for that phone, one row to its owner with
-//     `textsOffReachTheirWay` (v1.1 default 50); CANCEL and CANCELAR also flag those visits; a START clears the flag,
-//     reopens the chat, adds a texts row with no business and writes its reply's row; a fixed line to a stopped number
-//     is refused (`phoneStopped`). One commit per turn: a repeat of a turn id answers its first commit, `repeated`.
+//     `textsOffReachTheirWay` (v1.1 default 50); a START clears the flag, reopens the chat, adds a texts row with no
+//     business and writes its reply's row; CANCEL and CANCELAR (`alsoCancelVisit`) also flag the open visits, beside a
+//     STOP or a START alike, as the core's planStopOrStart flags them (actions/src/domain/flags, default 6); a fixed line
+//     to a stopped number is refused (`phoneStopped`). One commit per turn: a repeat of a turn id answers its first
+//     commit, `repeated`. With `keyedByTurn`, a STOP or a START is keyed by its turn as K-09 keys it, and a commit giving
+//     one id twice is refused whole, as the commit refuses it (T-317's security note N1).
 //   - `FakeCore.rows` answers K-05 v1 `unplannedRows` and `writePlan` over the same rows (writePlan: written, version + 1;
 //     alreadyPlanned for a row that holds a plan; versionChanged on another version; notFound).
 //   - `seedRowsOf` hands the rows with words to the dispatcher's fakes (../../dispatch/test-support.ts), as claimOutbox
@@ -126,6 +129,15 @@ export interface FakeCore {
   down: boolean;
   /** Answers the next commit with this error instead (nothing written). */
   failNextCommit: CoreError | null;
+  /**
+   * While true, a STOP or a START in a turn is keyed by that turn alone, as K-09 v1 keys it ("the text's turn ... is the
+   * key"; the core's keyOf, actions/src/domain/flags/stop-start.ts): its consent row is `consent-<turn>` and its reply
+   * row `out-<turn>-stopReply`, whatever its kind, each planned on the phone's version as read. So a commit carrying two
+   * of them gives one id to two rows and moves one phone twice from one version: it is refused whole, as the commit
+   * refuses an id given twice (CommitFault idTwice), with nothing written and no answer, on every run (T-317's security
+   * note N1). Off (the default): each action's ids are made up from its place, as before.
+   */
+  keyedByTurn: boolean;
   /** The next writePlan for each of these rows throws (no answer), as a crash before the words were written would. */
   readonly failPlanOnce: Set<string>;
   /** The clock, as a UTC string. */
@@ -162,6 +174,7 @@ export function fakeCore(now: string, phones: readonly FakePhone[], firstCommitS
     unplannedReads: [],
     down: false,
     failNextCommit: null,
+    keyedByTurn: false,
     failPlanOnce: new Set(),
     now,
     core: {
@@ -176,6 +189,16 @@ export function fakeCore(now: string, phones: readonly FakePhone[], firstCommitS
         const turnId = request.caller.turnId;
         const first = committed.get(turnId);
         if (first !== undefined) return answer({ ...structuredClone(first), repeated: true });
+        if (fake.keyedByTurn) {
+          const keyed = request.actions.flatMap((action, index) =>
+            action.call === "recordStopOrStart"
+              ? Object.values(stopOrStartIds(turnId, index, action.request))
+              : [],
+          );
+          if (new Set(keyed).size < keyed.length) {
+            return Promise.reject(new Error("the commit refused the turn (idTwice); nothing was written"));
+          }
+        }
         const core: ReplyCoreResult[] = request.actions.map((action, index) =>
           action.call === "recordStopOrStart"
             ? { call: "recordStopOrStart", ...stopOrStart(action.request, index) }
@@ -246,6 +269,27 @@ export function fakeCore(now: string, phones: readonly FakePhone[], firstCommitS
     return row.id;
   }
 
+  /**
+   * The consent row and reply row a STOP or a START writes: the turn's own ids when the test gave them; else, with
+   * `keyedByTurn`, by its turn alone, as K-09 keys it (one reply row id for either kind, as the core's rowId("stopReply",
+   * key)); else made up from its place in the commit.
+   */
+  function stopOrStartIds(
+    turnId: string,
+    index: number,
+    request: RecordStopOrStartRequest,
+  ): { consent: string; reply: string } {
+    const ids = fake.ids.get(turnId) ?? {};
+    if (fake.keyedByTurn) {
+      return { consent: ids.consent ?? `consent-${turnId}`, reply: ids.reply ?? `out-${turnId}-stopReply` };
+    }
+    const fixedLineId = request.kind === "stop" ? "stopReply" : "startReply";
+    return {
+      consent: ids.consent ?? `consent-${turnId}-${String(index + 1)}`,
+      reply: ids.reply ?? `out-${turnId}-${String(index + 1)}-${fixedLineId}`,
+    };
+  }
+
   function stopOrStart(
     request: RecordStopOrStartRequest,
     index: number,
@@ -256,12 +300,12 @@ export function fakeCore(now: string, phones: readonly FakePhone[], firstCommitS
     }
     const turnId = request.caller.turnId;
     const ids = fake.ids.get(turnId) ?? {};
+    const { consent: consentId, reply: replyRowId } = stopOrStartIds(turnId, index, request);
     const stop = request.kind === "stop";
     entry.stopped = stop;
     entry.stopAt = stop ? fake.now : entry.stopAt;
     entry.chatOpen = !stop;
     entry.version += 1;
-    const consentId = ids.consent ?? `consent-${turnId}-${String(index + 1)}`;
     fake.consents.push({
       id: consentId,
       personId: entry.personId,
@@ -276,7 +320,7 @@ export function fakeCore(now: string, phones: readonly FakePhone[], firstCommitS
     });
     const fixedLineId = stop ? "stopReply" : "startReply";
     const replyId = writeRow({
-      id: ids.reply ?? `out-${turnId}-${String(index + 1)}-${fixedLineId}`,
+      id: replyRowId,
       turnId,
       recipientHandleId: entry.handleId,
       businessId: null,
@@ -285,10 +329,12 @@ export function fakeCore(now: string, phones: readonly FakePhone[], firstCommitS
       sendClass: "quick_reply",
       fixedLineId,
     });
-    const open = stop ? (fake.openBookings.get(request.phoneNumber) ?? []) : [];
+    // CANCEL or CANCELAR flags every open visit, beside a STOP or a START; only a STOP tells the businesses.
+    const open = fake.openBookings.get(request.phoneNumber) ?? [];
+    const told = stop ? open : [];
     const businessesTold: BusinessTold[] = [];
-    for (const businessId of [...new Set(open.map((booking) => booking.businessId))]) {
-      const booking = open.find((candidate) => candidate.businessId === businessId);
+    for (const businessId of [...new Set(told.map((booking) => booking.businessId))]) {
+      const booking = told.find((candidate) => candidate.businessId === businessId);
       if (booking === undefined) continue;
       const rowId = writeRow({
         id: ids.notices?.[businessId] ?? `out-${turnId}-${businessId}-texts-off`,
