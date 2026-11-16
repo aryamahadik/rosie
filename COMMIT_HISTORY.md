@@ -2,9 +2,62 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 692, [`a4e6fd1`](https://github.com/aryamahadik/rosie/commit/a4e6fd1), 2026-11-16 05:10:26 UTC.
+- **Through:** commit 694, [`32a2eee`](https://github.com/aryamahadik/rosie/commit/32a2eee), 2026-11-16 06:00:05 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 694. docs: COMMIT\_HISTORY.md through commit 692 (a4e6fd1, \#701) (\#704)
+
+- **Commit:** [`32a2eee`](https://github.com/aryamahadik/rosie/commit/32a2eee), by Arya Mahadik, 2026-11-16 06:00:05 UTC
+- **Pull request:** [#704](https://github.com/aryamahadik/rosie/pull/704) from `task/commit-history-141`, merged 2026-11-16 06:00:05 UTC. It squashed 1 branch commit:
+  - `d71e550` docs: COMMIT\_HISTORY.md through commit 692 (a4e6fd1, \#701)
+- **Files changed:** 1 (+71 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +71 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 234 (DL-873); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 693. T-139: Master Corrections C3 (the own-AI door), C4 (switch verify off) and C5 (insurance facts, 12 trades' settings), with emitBundle's correctTrade line (\#705)
+
+- **Commit:** [`79b7daf`](https://github.com/aryamahadik/rosie/commit/79b7daf), by Arya Mahadik, 2026-11-16 05:59:57 UTC
+- **Pull request:** [#705](https://github.com/aryamahadik/rosie/pull/705) from `task/T-139`, merged 2026-11-16 05:59:58 UTC. It squashed 3 branch commits:
+  - `8eefffe` T-139: C3 (the own-AI door compiled, steps as written), C4 (switch ve…
+  - `b400d19` T-139: C5's fill holds an empty cutoff as null alone (lint: no redund…
+  - `efe21e1` T-139: emitBundle gives each trade C5's fill (c5.ts correctTrade()) b…
+- **Files changed:** 13 (+1201 −18), by folder:
+  - `compiler/src/corrections/` c3.test.ts +202 −0, c3.ts +178 −0, c4.test.ts +370 −0, c4.ts +111 −0, c5.test.ts +178 −0, c5.ts +131 −0, framework.test.ts +10 −2, framework.ts +4 −1
+  - `compiler/src/emit/` emit.test.ts +5 −9, emit.ts +3 −1, trade.ts +1 −1
+  - `compiler/src/load/` trade.ts +4 −3
+  - `compiler/src/path/` model.ts +4 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-139: C3 (the own-AI door compiled, steps as written), C4 (switch verify's branches and steps off, S2-11 kept) and C5 (insurance's facts, the 12 trades' start settings) in the corrections layer
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-139: C5's fill holds an empty cutoff as null alone (lint: no redundant union member)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-139: emitBundle gives each trade C5's fill (c5.ts correctTrade()) before correctWordsOps, so insurance's overlay and stop walks read cpa.json's facts; emit.test.ts's pin asserts C5's facts and start settings in flows A and B; the four 'C5's fill is T-139's' comments updated
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 692. docs: COMMIT\_HISTORY.md through commit 689 (a9de0d1, \#699) (\#701)
 
