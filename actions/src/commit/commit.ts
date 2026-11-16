@@ -21,8 +21,9 @@
 //      commit and writes nothing (K-05 v1 item 1). A version or reservation conflict reloads once and gates again (arch 06
 //      line 305; K-09 v1 gateAndCommit.request), its request built again from the turn's own reads, never from the rows
 //      the answer named (an answered phones row id is a name, never a key: K-05 v1.17 item 71.4); a second one fails
-//      closed (stillChanged, naming the rows the answer named: a phones row by its handle id). A parked turn, a database
-//      rule and a transient failure come back as K-09's own errors;
+//      closed (stillChanged, naming the rows the answer named: a phones row by its handle id). An answer that still names
+//      a phones row by its number fails closed, naming no id (default 10). A parked turn, a database rule and a transient
+//      failure come back as K-09's own errors;
 //   8. the answer: each part as K-09 v1 partResult (partResultOf; held and waiting parts as below), the core results, what
 //      K-05 wrote (`written` without the core actions' rows: default 9), the effect rows and the questions opened and
 //      closed; the call's span keeps every row written (K-08 v1 rowRef: tables and ids, never a value; a phones row by
@@ -53,6 +54,18 @@
 //      while K-05 v1.17 answers it by its handle id, as every turn's request asks (build.ts default 9). So writtenOf's
 //      filter never matches it, and `written` lists it as phones/<handle id>, exactly as K-09 v1 stop-recorded.json lists
 //      a STOP's phone (phones/handle-ben, version 4): the frozen fixture wins over this default for that row.
+//  10. Fail closed on a phones row named by its number (T-1419 round 2; the lead's ruling on its open question 1, DL-893):
+//      every request asks for handle ids, so an answer that names a phones row by an id K-08 v1's safeId refuses (K-05
+//      v1.17 phoneRowByHandleId: a number in any form, an address or words) comes from a producer that ignores the field,
+//      and none of it reaches the span, K-09's answer or an error message. A versionChanged naming one refuses the turn
+//      at once as stillChanged with no ids and no reload: it is the turn's refusal of a version conflict, and K-05 wrote
+//      nothing. A committed answer naming one, a repeat's among them, throws a TypeError with a fixed message naming no
+//      id (PHONE_ROW_BY_NUMBER) before the span is written, as build.ts default 7 throws for a clock row not in K-05's
+//      form. It is no CommitRefusedError, whose message says nothing was written: K-05's commit is its own transaction
+//      (pg/commit-turn.ts), which the call's rollback does not undo, and a rerun of the turn gets K-05's repeat, which
+//      names no phones row (K-05 v1.17 default 151). CommitFault (errors.ts, outside this card) has no fault for it yet
+//      (a follow-up: phoneRowByNumber, with a message of its own). reservationLost and wrongState name no phones row
+//      (K-05 v1.17 commitTurn.exchange), and waitingChat never leaves the commit (K-09 v1 open gap 22).
 
 import {
   partResultOf,
@@ -68,6 +81,7 @@ import {
 } from "../gate/framework";
 import { LIMITS } from "../gate/limits";
 import type { CallContext, Handler } from "../tool-api";
+import { isLabel } from "../../../runtime/src/trace";
 import type { RowRef as SpanRowRef } from "../../../runtime/src/trace/types";
 import {
   buildCommitRequest,
@@ -292,6 +306,23 @@ function spanRowsOf(answer: CommitTurnResponse): SpanRowRef[] {
   ];
 }
 
+/**
+ * Whether K-05's answer names a phones row by an id K-08 v1's safeId refuses: a number in any form (a +, a run of seven or
+ * more digits and phone punctuation), an address or words. Every request asks for a phones row's handle id (build.ts
+ * default 9), which K-05 v1.17 answers as a K-08 v1 handleRef, never in phoneNumber's shape (phoneRowByHandleId); a
+ * producer that ignores the field answers the number, as v1.16 does, and the commit fails closed on it (default 10).
+ */
+function namesPhoneByNumber(rows: readonly { readonly table: string; readonly rowId: string }[]): boolean {
+  return rows.some((row) => row.table === "phones" && !isLabel(row.rowId));
+}
+
+/**
+ * The message of the TypeError a committed answer that names a phones row by its number throws (default 10): no id and
+ * no value, and never "nothing was written", since K-05's commit is its own transaction (pg/commit-turn.ts).
+ */
+export const PHONE_ROW_BY_NUMBER =
+  "gateAndCommit: K-05 answered a phones row by its number, not by the handle id the request asked for; the answer is refused";
+
 type Ran =
   | { readonly kind: "answer"; readonly answer: GateAndCommitAnswer }
   | { readonly kind: "conflict"; readonly rows: string[] };
@@ -349,8 +380,10 @@ async function gateAndCommitOnce<Repo>(
   if ("error" in answer) {
     switch (answer.error) {
       // The rows that changed, by name only (a phones row by its handle id: the request asks), for stillChanged's
-      // message; the reload reads the turn again and never puts a row named here into its request.
+      // message; the reload reads the turn again and never puts a row named here into its request. A phones row named
+      // by its number refuses the turn at once, naming no row, with no reload (default 10).
       case "versionChanged":
+        if (namesPhoneByNumber(answer.changed)) throw new CommitRefusedError("stillChanged");
         return { kind: "conflict", rows: answer.changed.map((row) => row.rowId) };
       case "reservationLost":
         return { kind: "conflict", rows: answer.reservations.map((row) => row.id) };
@@ -360,6 +393,8 @@ async function gateAndCommitOnce<Repo>(
         return { kind: "answer", answer };
     }
   }
+  // A phones row named by its number, a repeat's too, never reaches the span or K-09's answer (default 10).
+  if (namesPhoneByNumber(answer.committed.written)) throw new TypeError(PHONE_ROW_BY_NUMBER);
   // The span keeps the rows this call wrote: none on a repeat.
   if (!answer.repeated) call.span.rows.splice(0, call.span.rows.length, ...spanRowsOf(answer));
   return { kind: "answer", answer: committedOf(answer, commitRequest, parts, core) };
@@ -368,7 +403,8 @@ async function gateAndCommitOnce<Repo>(
 /**
  * gateAndCommit for one turn (K-09 v1), inside the call's business scope: the gate, then one K-05 commit of what may go,
  * under the turn id. Answers committed (a repeat with `repeated` true), or one of K-09 v1's errors with nothing written.
- * Throws when it must fail closed: CommitNotBuiltError and the gate's LimitNotBuiltError (notBuilt), CommitRefusedError.
+ * Throws when it must fail closed: CommitNotBuiltError and the gate's LimitNotBuiltError (notBuilt), CommitRefusedError,
+ * and a TypeError when K-05's committed answer names a phones row by its number (PHONE_ROW_BY_NUMBER; default 10).
  */
 export async function gateAndCommit<Repo>(
   request: GateAndCommitRequest,

@@ -294,7 +294,7 @@ describe("commit-version-changed.json gives its outcome", () => {
   it("Alex's cancel: K-05 refuses the fixture's request as it states; the gate reloads once, the change is still possible: today's facts and a fresh yes, never an error", async () => {
     const { request: sent, outcome } = versionChangedExchange();
     const { request, fake, world, ran, answer } = await cancelRacedBy();
-    expect(fake.requests[0]).toEqual(sent);
+    expect(fake.requests[0]).toEqual({ ...sent, answerPhoneRowsBy: "handleId" });
     expect(fake.answers[0]).toEqual(outcome);
     // Reloaded once: the second run stops the part, so nothing of it is compared or written, and K-05 commits the turn.
     expect(fake.requests).toHaveLength(2);

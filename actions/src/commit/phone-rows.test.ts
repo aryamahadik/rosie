@@ -33,7 +33,7 @@ import {
   traceFor,
 } from "../tool-api/test-support";
 import { ANSWER_PHONE_ROWS_BY, buildCommitRequest, rowsNamedBy, type CommitUnit } from "./build";
-import { gateAndCommit } from "./commit";
+import { PHONE_ROW_BY_NUMBER, gateAndCommit } from "./commit";
 import { CommitRefusedError } from "./errors";
 import {
   S1_02,
@@ -614,5 +614,177 @@ describe("a version conflict on a phones row names it by its handle id, and ever
       expect(handleIdProblems(sent, refusal, twin.given.now)).toEqual([]);
     }
     expect(k05.commits).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// A producer that ignores the field: gateAndCommit fails closed (commit.ts default 10)
+
+/**
+ * Ben's phone as a K-05 that ignores answerPhoneRowsBy names it: by his number as K-04 stores it (v1.16's answer), and in
+ * other forms K-08 v1's safeId refuses (no plus, phone punctuation, a tel: prefix), each his whole number (555-01xx).
+ */
+const BEN_BY_NUMBER: readonly string[] = [BEN, "15555550131", "1-555-555-0131", "tel:+15555550131"];
+
+/** stillChanged's message with no row named: what a version conflict naming a phones row by its number throws. */
+const STILL_CHANGED_NO_ID = "gateAndCommit: the commit refused the turn (stillChanged); nothing was written";
+
+/** stop-recorded.json's K-05 answer as a producer that ignores the field gives it: Ben's phone named `byNumber`. */
+function stopAnsweredByNumber(byNumber: string, repeated = false): CommitTurnResponse {
+  const answer = stopTwinAnswer();
+  return {
+    ...answer,
+    repeated,
+    committed: {
+      ...answer.committed,
+      written: answer.committed.written.map((row) =>
+        row.table === "phones" ? { ...row, rowId: byNumber } : row,
+      ),
+    },
+  };
+}
+
+/** The error a call threw, or a failure when it answered. */
+async function thrownBy(call: Promise<unknown>): Promise<Error> {
+  const thrown = await call.then(
+    () => null,
+    (error: unknown) => error,
+  );
+  if (!(thrown instanceof Error)) throw new Error("the call answered; it was to throw");
+  return thrown;
+}
+
+describe("a K-05 that answers a phones row by its number, though every request asks for its handle id: gateAndCommit fails closed, naming no id (T-1419 round 2, DL-893)", () => {
+  it("the double is the producer the rule is for: K-05 v1.17 refuses each of its answers, by every form of Ben's number, where it takes the same answer by handle id", () => {
+    const { request, outcome } = stopRecorded();
+    const turn = request.turn;
+    if (turn === null) throw new Error(`${STOP_RECORDED} carries its turn`);
+    const sent = buildCommitRequest({
+      turn,
+      zone: null,
+      businessId: "biz-lees-barbershop",
+      actor: { personId: "person-ben", roleAt: () => null },
+      units: [
+        { writes: benRecordRun().writes, answer: null },
+        { writes: benStopRun().writes, answer: null },
+      ],
+    });
+    for (const byNumber of BEN_BY_NUMBER) {
+      const changed: CommitTurnError = {
+        error: "versionChanged",
+        changed: [{ table: "phones", rowId: byNumber, readVersion: 3, currentVersion: 4 }],
+      };
+      expect(
+        handleIdProblems(sent, stopAnsweredByNumber(byNumber), outcome.committedAt),
+        byNumber,
+      ).not.toEqual([]);
+      expect(handleIdProblems(sent, changed, outcome.committedAt), byNumber).not.toEqual([]);
+      expect(notSafeIds([byNumber]), byNumber).not.toEqual([]);
+    }
+    expect(handleIdProblems(sent, stopAnsweredByNumber(BEN_HANDLE), outcome.committedAt)).toEqual([]);
+  });
+
+  it("K-05 commits Ben's STOP and names his phone by his number: gateAndCommit throws PHONE_ROW_BY_NUMBER after one request, and the span, the message and the console hold no id of his", async () => {
+    const { request } = stopRecorded();
+    expect(PHONE_ROW_BY_NUMBER).not.toContain(BEN_HANDLE);
+    expect(PHONE_ROW_BY_NUMBER).not.toContain("nothing was written");
+    for (const byNumber of BEN_BY_NUMBER) {
+      for (const repeated of [false, true]) {
+        const what = `${byNumber}${repeated ? ", a repeat" : ""}`;
+        const deps = benDeps([stopAnsweredByNumber(byNumber, repeated)]);
+        const call = callContext();
+        const error = await thrownBy(gateAndCommit(copy(request), call, deps));
+
+        expect(error, what).toBeInstanceOf(TypeError);
+        expect(error.message, what).toBe(PHONE_ROW_BY_NUMBER);
+        expect(numberIn([error.name, error.message], BEN), what).toEqual([]);
+        expect(call.span.rows, what).toEqual([]);
+        expect(
+          deps.k05.requests.map((sent) => sent.answerPhoneRowsBy),
+          what,
+        ).toEqual(["handleId"]);
+      }
+    }
+  });
+
+  it("K-05 refuses Ben's commit, naming his changed phone by his number: stillChanged at once, with no id and no reload, though a reload would commit; K-05 wrote nothing", async () => {
+    const { request } = stopRecorded();
+    for (const byNumber of BEN_BY_NUMBER) {
+      const changed: CommitTurnError = {
+        error: "versionChanged",
+        changed: [{ table: "phones", rowId: byNumber, readVersion: 3, currentVersion: 4 }],
+      };
+      // A second pass is scripted to commit (the phone read anew at 4, K-05 answering by handle id): none runs.
+      const deps = benDeps([changed, stopTwinAnswer()], [3, 4]);
+      const call = callContext();
+      const error = await thrownBy(gateAndCommit(copy(request), call, deps));
+
+      expect(error, byNumber).toBeInstanceOf(CommitRefusedError);
+      expect(error, byNumber).toMatchObject({ fault: "stillChanged", ids: [] });
+      expect(error.message, byNumber).toBe(STILL_CHANGED_NO_ID);
+      expect(numberIn(error.message, BEN), byNumber).toEqual([]);
+      expect(deps.k05.requests, byNumber).toHaveLength(1);
+      expect(deps.k05.requests[0]?.answerPhoneRowsBy, byNumber).toBe("handleId");
+      expect(deps.k05.commits, byNumber).toEqual([]);
+      expect(call.span.rows, byNumber).toEqual([]);
+    }
+  });
+
+  it("through the Tool API base, Sam's turn at the barbershop that read Alex's phone: changed or written by his number, the call fails closed and rolls back; no span, thrown message or log line holds his number", async () => {
+    const twin = phoneChangedTwin();
+    const read = twin.request.versionsRead.find((row) => row.table === "phones");
+    const samTurn = gateExchange(S1_02).request.turn;
+    if (read === undefined || samTurn === null) throw new Error("Sam's turn reads Alex's phone");
+    const changedByNumber: CommitTurnError = {
+      error: "versionChanged",
+      changed: [{ table: "phones", rowId: ALEX, readVersion: 3, currentVersion: 4 }],
+    };
+    const writtenByNumber: CommitTurnResponse = {
+      result: "committed",
+      turnId: samTurn.id,
+      committedAt: twin.given.now,
+      repeated: false,
+      committed: { written: [{ table: "phones", rowId: ALEX, version: 4 }], outboxRows: [], promoted: [] },
+    };
+    const cases: [CommitTurnAnswer, string, string, string[] | undefined][] = [
+      [changedByNumber, "CommitRefusedError", STILL_CHANGED_NO_ID, []],
+      [writtenByNumber, "TypeError", PHONE_ROW_BY_NUMBER, undefined],
+    ];
+    for (const [answer, name, message, ids] of cases) {
+      const k05 = k05Fake({ answers: [answer] });
+      const ported = doublePorts({
+        writes: { 0: { ...samKindsWrites(), versionsRead: [read] } },
+        core: [s1_02CoreRun(), s1_02CoreRun()],
+        k05,
+      });
+      const deps: CommitDeps = {
+        limits: scriptedLimits(fixtureScript(gateExchange(S1_02))),
+        ports: ported.ports,
+      };
+      const scope = recordingScope();
+      const api = createToolApi({
+        validator,
+        scope,
+        handlers: recordingHandlers("gateAndCommit", (given, context) =>
+          gateAndCommit(given as GateRequest, context, deps),
+        ),
+      });
+      const request = copy(gateExchange(S1_02).request);
+      const { trace, spans } = traceFor(request);
+      const error = await thrownBy(api.call("gateAndCommit", request, trace));
+
+      expect(error.name, name).toBe(name);
+      expect(error.message, name).toBe(message);
+      expect((error as { ids?: unknown }).ids, name).toEqual(ids);
+      expect(scope.events.at(-1), name).toEqual({ what: "rollback" });
+      expect(spans, name).toHaveLength(1);
+      expect(spans[0], name).toMatchObject({ outcome: "failed", error_code: name });
+      expect(numberIn([spans, error.message], ALEX), name).toEqual([]);
+      expect(k05.requests, name).toHaveLength(1);
+      const [sent] = k05.requests;
+      if (sent === undefined) throw new Error("one commit was sent");
+      expect(sent.answerPhoneRowsBy, name).toBe("handleId");
+      expect(handleIdProblems(sent, answer, twin.given.now), name).not.toEqual([]);
+    }
   });
 });

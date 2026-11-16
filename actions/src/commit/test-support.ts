@@ -157,8 +157,14 @@ export interface K05FakeOptions {
 }
 
 export interface K05Fake {
-  /** K-05 v1.17 commitTurn (v1.1's, with answerPhoneRowsBy), as the commit's port calls it. */
-  readonly commitTurn: CommitPorts["commitTurn"];
+  /**
+   * K-05 v1.17 commitTurn (v1.1's, with answerPhoneRowsBy): any v1.17 request, the field set, as the commit's port sends
+   * every one (types.ts CommitPorts.commitTurn), or left out, as a K-05 v1.1 fixture's request is sent to it as it is.
+   */
+  readonly commitTurn: (
+    request: K05V1dot17.CommitTurnRequest,
+    call: Parameters<CommitPorts["commitTurn"]>[1],
+  ) => ReturnType<CommitPorts["commitTurn"]>;
   /** Every request sent, in order, as sent: K-05 v1.17's, so a turn's answerPhoneRowsBy reads as it was sent. */
   readonly requests: K05V1dot17.CommitTurnRequest[];
   /** What each first commit of a turn id wrote, in order: a repeat adds nothing. */
