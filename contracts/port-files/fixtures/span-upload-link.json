@@ -1,0 +1,20 @@
+{
+  "trace_id": "trace-page-sam-0006",
+  "span_id": "span-page-sam-0006-02",
+  "seq": 2,
+  "hop": "portCall",
+  "at": "2026-10-19T14:30:30.110Z",
+  "ms": 6,
+  "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "turn_id": null,
+  "job_id": "req-secure-sam-0006-upload",
+  "handle_ref": null,
+  "business_id": null,
+  "provider": "r2",
+  "call": "uploadLink",
+  "attempt": 1,
+  "got": { "step": "S1-10", "kind": "idDocument", "owner": "person", "mediaType": "image/jpeg", "sizeBytes": 2400000 },
+  "decided": { "result": "ready" },
+  "outcome": "ok",
+  "error_code": null
+}

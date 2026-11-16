@@ -1,0 +1,1125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/port-files/port-files.v1.schema.json",
+  "title": "PortFilesV1",
+  "description": "K-13 v1, the files port (R2) in Rosie's own terms (02-contracts K-13; MC C10 and 8 'Files'; arch 02 diagram line 105; arch 10 line 544; RULES 4.5, 4.10; DL-025, DL-027; Q-31): a signed upload from a secure page (uploadLink gives a short-lived link for one file and its object key; checkUpload reads what came), a short signed read link given only after the caller has checked who may see the file, each view written in the call's span (readLink), a server-side write for system objects (serverWrite) and Rosie's own read of an object's bytes (serverRead: README default 11), and the delete for erasure under RULES 4.10 (deleteObject). Every object is private: there is no public object and no public address. The port makes every object key, so no caller's words and no person's details are ever in one. Each call's request, response and errors are definitions under $defs named <call>.request, <call>.response and <call>.errors (02-contracts section 2 item 2), and <call>.exchange pairs one request with its outcome, which is what every exchange fixture is. filesSpan is the K-08 v1 portCall span each call writes, with no object key, address or file in it. The root is any one exchange or span, so the type generator writes a type for each (ADR-005). R2's own interface and the link's mechanism stay inside the adapter (02-contracts section 5). Keys are named, never shown (rule 7). Not model-facing, so number and length limits are schema rules here.",
+  "anyOf": [
+    { "$ref": "#/$defs/uploadLink.exchange" },
+    { "$ref": "#/$defs/checkUpload.exchange" },
+    { "$ref": "#/$defs/readLink.exchange" },
+    { "$ref": "#/$defs/serverWrite.exchange" },
+    { "$ref": "#/$defs/serverRead.exchange" },
+    { "$ref": "#/$defs/deleteObject.exchange" },
+    { "$ref": "#/$defs/filesSpan" }
+  ],
+  "$defs": {
+    "id": {
+      "title": "FilesId",
+      "description": "An opaque id code compares as a whole and never parses (CQ-09): a person, business, booking or row id, a K-06 event or attachment id.",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "utc": {
+      "title": "FilesUtc",
+      "description": "An instant in UTC (CQ-09).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+    },
+    "day": {
+      "title": "FilesDay",
+      "description": "A calendar day in UTC, YYYY-MM-DD (CQ-09: every time in UTC). Whether the day exists is a code check.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
+    },
+    "sha256": {
+      "title": "FilesSha256",
+      "description": "A sha256 in lowercase hex, as K-01 spells it (K-01 v1 sha256): the hash of a server write's bytes, so a retried write is told from a different one.",
+      "$ref": "../bundle/bundle.v1.schema.json#/$defs/sha256"
+    },
+    "rowRef": {
+      "title": "FilesRowRef",
+      "description": "The row that names the file: its table and its id, as K-08 v1 rowRef names a row, such as document_files (K-35), id_uploads (K-22), business_photos (K-23) or visit_marks (K-31). The object key itself stays sealed in that row where its part seals it (K-22 v1 rule 6; K-35 v1 rule 6), so a log names the row, never the key.",
+      "type": "object",
+      "properties": {
+        "table": {
+          "description": "The table, as its database part spells it (K-08 v1 tableName).",
+          "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/tableName"
+        },
+        "id": {
+          "description": "The row's id (K-08 v1 safeId: never a number, an address or words).",
+          "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/safeId"
+        }
+      },
+      "required": ["table", "id"],
+      "additionalProperties": false
+    },
+    "httpsUrl": {
+      "title": "FilesUrl",
+      "description": "A link's address, https only. Opaque to every caller: the adapter's mechanism makes it (README 'The link'), and it never enters a span, a log, an event-log row or a message (K-21 v1 README 'Never in a span or a log').",
+      "type": "string",
+      "pattern": "^https://[^\\s]+$"
+    },
+    "uploadKind": {
+      "title": "UploadKind",
+      "description": "What a signed upload is (02-contracts K-13 'kind (ID document, photo, price list, form, signed document, license file)'): idDocument, the owner's ID document, on the secure page, never in the chat, accepted as given (MC C10; S1-10; K-22 v1 id_uploads); photo, a photo given on a page (a card or listing photo, S1-09; About us, S1-84; a schedule or class timetable, S1-24, S1-83; a customer's photos, A4-07 and K-21 v1.2's photos page); priceList, the price list (S1-12); form, a form or paper a person fills or gives on their secure page (A4-43; MC 8 'Files': 'forms'; README default 5: a paper that shows authority, A4-64, B4-74, and a family's papers on file, A4-24, A4-25); signedDocument, a document already signed, given as a file (FS row Q02; K-35 v1 open gaps); licenseFile, a license, insurance, registration or other paper kept as given (S1-23, S1-61, S2-11, S2-29; MC C4, C7; K-35 v1 document_files). K-21 v1's upload purposes map onto these (README 'K-21's purposes').",
+      "type": "string",
+      "enum": ["idDocument", "photo", "priceList", "form", "signedDocument", "licenseFile"]
+    },
+    "writeKind": {
+      "title": "WriteKind",
+      "description": "What a server-side write is (02-contracts K-13 'A server-side write for system objects'): sealedTrace, a trace's full detail sealed by its writer under a person's key (arch 02 diagram line 105: 'sealed traces'; ADR-009); eventLogExport, the event log as Parquet for reports and evals (arch 10 line 544); export, the customer list the owner exports (S11-61); report, a result the business gives for the customer, such as B10-19's camera report ('Video and Jordan's notes'); photo, a photo that came in by text (S1-09, S1-12, S1-83; a DONE photo, B8-17; K-06 v1 photo events).",
+      "type": "string",
+      "enum": ["sealedTrace", "eventLogExport", "export", "report", "photo"]
+    },
+    "fileKind": {
+      "title": "FileKind",
+      "description": "Any file's kind: the upload kinds and the write kinds (photo is both). The first part of every object key.",
+      "type": "string",
+      "enum": [
+        "idDocument",
+        "photo",
+        "priceList",
+        "form",
+        "signedDocument",
+        "licenseFile",
+        "sealedTrace",
+        "eventLogExport",
+        "export",
+        "report"
+      ]
+    },
+    "imageType": {
+      "title": "ImageType",
+      "description": "The photo types K-21 v1 takes (K-21 v1 default 12: JPEG, PNG, HEIC, HEIF, WebP). Never image/svg+xml, which can carry script (K-35 v1 default 20).",
+      "type": "string",
+      "enum": ["image/jpeg", "image/png", "image/heic", "image/heif", "image/webp"]
+    },
+    "uploadMediaType": {
+      "title": "UploadMediaType",
+      "description": "The types a signed upload takes: a photo or a PDF (K-21 v1 default 12, signedUpload.request mediaType; MC C10 'a photo or file of an ID document'). A photo takes only the image types (the exchange's rule). Nothing a browser runs as a page: no SVG, no HTML or XHTML (K-35 v1 default 20).",
+      "type": "string",
+      "enum": ["image/jpeg", "image/png", "image/heic", "image/heif", "image/webp", "application/pdf"]
+    },
+    "mediaType": {
+      "title": "FilesMediaType",
+      "description": "Every type an object may have, the closed list (README 'Media types'): the upload types, and for server writes video/mp4 and video/quicktime (a report: B10-19 'Video and Jordan's notes'; default 6), text/csv (an export: S11-61; default 7), application/vnd.apache.parquet (the event-log export: arch 10 line 544) and application/octet-stream (a sealed trace's sealed bytes: arch 02 diagram line 105). Each write kind takes only its own (serverWrite.request's rules).",
+      "type": "string",
+      "enum": [
+        "image/jpeg",
+        "image/png",
+        "image/heic",
+        "image/heif",
+        "image/webp",
+        "application/pdf",
+        "video/mp4",
+        "video/quicktime",
+        "text/csv",
+        "application/vnd.apache.parquet",
+        "application/octet-stream"
+      ]
+    },
+    "objectKey": {
+      "title": "ObjectKey",
+      "description": "An object's key, which is the file reference other contracts store (K-02's photo reading, a later K-02 minor version: 02-contracts K-02 'a K-13 file reference'; K-06 v1 'K-13 turns the id into a file reference'; K-11 v1 photo.fileId; K-22 id_uploads.object_key and K-35 document_files.object_key, sealed; K-23 business_photos.object_key; K-31 visit_marks.photo_key and visit_price_lines.receipt_key; K-30 page_answers' paper, K-21 v1.2 default 65): <kind>/<day>/<id>. The kind is the file's kind; the day is the UTC day the key was made (for the event-log export, the day of the rows it holds); the id is 26 lowercase letters and digits from a cryptographically secure random source, at least 128 bits (README 'The object key'). The port makes every key (uploadLink makes the id; serverWrite takes the writer's writeId), so a key never holds a name, a number, an address or anyone's words, and is never guessable from a row id. It is never shown to a browser (K-21 v1 default 12) and never enters a span or a log.",
+      "type": "string",
+      "pattern": "^(idDocument|photo|priceList|form|signedDocument|licenseFile|sealedTrace|eventLogExport|export|report)/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])/[a-z0-9]{26}$"
+    },
+    "uploadObjectKey": {
+      "title": "UploadObjectKey",
+      "description": "The key of an upload kind's object (objectKey, its kind one of uploadKind).",
+      "type": "string",
+      "pattern": "^(idDocument|photo|priceList|form|signedDocument|licenseFile)/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])/[a-z0-9]{26}$"
+    },
+    "writeObjectKey": {
+      "title": "WriteObjectKey",
+      "description": "The key of a write kind's object (objectKey, its kind one of writeKind).",
+      "type": "string",
+      "pattern": "^(sealedTrace|eventLogExport|export|report|photo)/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])/[a-z0-9]{26}$"
+    },
+    "writeId": {
+      "title": "WriteId",
+      "description": "A server write's own id, the last part of its object key: 26 lowercase letters and digits the writer makes once per object from a cryptographically secure random source (at least 128 bits) and keeps for every retry, so a retried write lands on the same key and is never stored twice (README 'Repeats').",
+      "type": "string",
+      "pattern": "^[a-z0-9]{26}$"
+    },
+    "uploadMaxBytes": {
+      "title": "UploadMaxBytes",
+      "description": "The largest file a signed upload takes: 10 MiB, 10485760 bytes (K-21 v1 default 12's example limit, which K-13 v1 makes its own: README default 4).",
+      "type": "integer",
+      "const": 10485760
+    },
+    "visibility": {
+      "title": "Visibility",
+      "description": "Every object is private (MC 8 'Files': 'Uploads (ID documents, photos, forms) stay private'; MC C10; Q-31). v1 has no other value: no object is public and no key gets a public address (no r2.dev URL, no custom domain: README 'Spike findings'). A photo the business shows on its listing is shown through a read link, never as a public object (readLink, viewer as listing).",
+      "type": "string",
+      "const": "private"
+    },
+    "personOwner": {
+      "title": "PersonOwner",
+      "description": "A file that is one person's own (02-contracts K-13 'owner (business, person or booking)'): their ID document, which has no business (K-22 v1 id_uploads is per person across businesses: S1-10 'once'), or a team member's own paper at their business (K-35 v1 owner_kind staff).",
+      "type": "object",
+      "properties": {
+        "kind": { "const": "person" },
+        "personId": {
+          "description": "The person the file is about (K-04 persons.id): its erasure follows theirs (RULES 4.10).",
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "The business the file was given at, or null for a file that covers every business of the person (an ID document: K-22 v1 rule 4).",
+          "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+        }
+      },
+      "required": ["kind", "personId", "businessId"],
+      "additionalProperties": false
+    },
+    "businessOwner": {
+      "title": "BusinessOwner",
+      "description": "A file of the business itself: its photos (S1-84; FS row B07), its price list (S1-12), its own papers (K-35 v1 owner_kind business), the customer list it exports (S11-61).",
+      "type": "object",
+      "properties": {
+        "kind": { "const": "business" },
+        "businessId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["kind", "businessId"],
+      "additionalProperties": false
+    },
+    "bookingOwner": {
+      "title": "BookingOwner",
+      "description": "A file of one booking: a customer's photos and forms on their secure page (A4-07, A4-43; K-21 v1.2 secureUpload, bound to the link's booking), a paper that shows authority (A4-64), a DONE photo (B8-17), a report (B10-19).",
+      "type": "object",
+      "properties": {
+        "kind": { "const": "booking" },
+        "businessId": { "$ref": "#/$defs/id" },
+        "bookingId": {
+          "description": "The booking (K-04 bookings.id).",
+          "$ref": "#/$defs/id"
+        },
+        "personId": {
+          "description": "The one person the file is from or about, where it is one person's (the booker's photos or paper on their own link; the person a report is for: B10-25 'each only to that person'), so an erasure finds it; null where it is the business's own record of the visit (a DONE photo, B8-17, which B10-14's record holds as 'the photos').",
+          "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+        }
+      },
+      "required": ["kind", "businessId", "bookingId", "personId"],
+      "additionalProperties": false
+    },
+    "rosieOwner": {
+      "title": "RosieOwner",
+      "description": "A system object of Rosie's own, of no one business: a sealed trace (arch 02 diagram line 105) and the event-log export (arch 10 line 544). A sealed trace's detail is sealed by its writer under a person's key, so deleting that key erases it wherever it lies (arch 01 line 93; arch 10 line 516); the port never opens it.",
+      "type": "object",
+      "properties": {
+        "kind": { "const": "rosie" }
+      },
+      "required": ["kind"],
+      "additionalProperties": false
+    },
+    "uploadOwner": {
+      "title": "UploadOwner",
+      "description": "Whose an upload is: a person, the business or a booking (02-contracts K-13). Bound on the server from the page's session and link, never from the browser (K-21 v1 'No browser value says who anyone is').",
+      "oneOf": [
+        { "$ref": "#/$defs/personOwner" },
+        { "$ref": "#/$defs/businessOwner" },
+        { "$ref": "#/$defs/bookingOwner" }
+      ]
+    },
+    "owner": {
+      "title": "FileOwner",
+      "description": "Whose an object is: a person, the business, a booking, or Rosie for a system object.",
+      "oneOf": [
+        { "$ref": "#/$defs/personOwner" },
+        { "$ref": "#/$defs/businessOwner" },
+        { "$ref": "#/$defs/bookingOwner" },
+        { "$ref": "#/$defs/rosieOwner" }
+      ]
+    },
+    "ownerKind": {
+      "title": "OwnerKind",
+      "description": "The owner's kind, as a span names it.",
+      "type": "string",
+      "enum": ["person", "business", "booking", "rosie"]
+    },
+    "viewerGround": {
+      "title": "ViewerGround",
+      "description": "On what ground the caller let this viewer see the file, after its own check (02-contracts K-13 'given only after the caller has checked who may see the file'; C-094 identity and access, limit 7): self, the person the file is about, on their own secure page (RULES 4.5 'These stay on the secure page'; K-35 v1 document_files readers); business, an owner, admin or staff member the file's business lets see it, in the portal or on the job or pricing page (K-35 v1 'the owner, or an admin the owner lets manage the team or settings'; K-30 v1 page answers 'the job page opens it for the person on the job'; K-21 v1.2 default 60), never a customer of the business; rosieTeam, a person on Rosie's team, for a review item they work (S1-76's listing check; K-37 v1 review_items; K-36 v1 team_page_recipients; Q-18); listing, anyone, for a photo the business shows on its public listing (FS row B07; FS 6.3; S1-84; K-21 v1.1 readListing photos).",
+      "type": "string",
+      "enum": ["self", "business", "rosieTeam", "listing"]
+    },
+    "viewer": {
+      "title": "Viewer",
+      "description": "Who will see the file and on what ground, as the caller checked it before asking (02-contracts K-13). A read link without it is refused (refuse-read-without-permission.json). Every read link's span records the viewer, the ground and the file's row: that span is the view's log line (RULES 4.5 'each view logged'; README 'Each view logged').",
+      "type": "object",
+      "properties": {
+        "as": { "$ref": "#/$defs/viewerGround" },
+        "personId": {
+          "description": "The viewer (K-04 persons.id), whom the call acts for (K-21 v1: the session's or the link's person); null only for a listing photo, which anyone may see.",
+          "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+        }
+      },
+      "required": ["as", "personId"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "as": {
+          "description": "A listing view names no person; every other view names its viewer.",
+          "if": { "properties": { "as": { "const": "listing" } } },
+          "then": { "properties": { "personId": { "type": "null" } } },
+          "else": { "properties": { "personId": { "type": "string" } } }
+        }
+      }
+    },
+    "given": {
+      "title": "FilesGiven",
+      "description": "What a fixture assumes before the call: the moment it runs and a note. Fixtures only; never sent.",
+      "type": "object",
+      "properties": {
+        "now": { "$ref": "#/$defs/utc" },
+        "note": {
+          "description": "The case in plain words.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["now", "note"],
+      "additionalProperties": false
+    },
+    "unavailableError": {
+      "title": "FilesUnavailableError",
+      "description": "The call failed, so nothing is known and nothing changed: R2 failed, timed out, refused, or rate-limited it, or the adapter could not reach it (a 5xx, a 429 or a network error; the K-08 span's outcome failed or timedOut). The caller retries as arch 10 line 540 says for its job or turn; a page answers K-21's providerUnavailable meanwhile.",
+      "type": "object",
+      "properties": {
+        "error": { "const": "unavailable" }
+      },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+
+    "uploadLink.request": {
+      "title": "UploadLinkRequest",
+      "description": "A signed upload from a secure page (02-contracts K-13 'A signed upload from a secure page: kind, owner, size and type, giving a short-lived upload link and the object key'; MC C10: the ID upload goes on the secure page, never in the chat). Called by the page entry for K-21 v1 signedUpload and v1.2 secureUpload, after its own check that the page asks this purpose of this person (K-21 v1: notAllowed is the caller's). No object exists until the browser sends the file. Repeat: a new key and link each call; the caller keeps the first with its upload id and answers a repeat from it (K-21 v1: 'a repeat answers the same upload'). Primary or replica: neither; no database read. Time budget: none in the sources. Key: FILES_LINK_SECRET (README 'The link').",
+      "type": "object",
+      "properties": {
+        "kind": { "$ref": "#/$defs/uploadKind" },
+        "owner": { "$ref": "#/$defs/uploadOwner" },
+        "mediaType": {
+          "description": "The file's type as the browser reports it (K-21 v1 signedUpload.request mediaType); checked again on the stored bytes (checkUpload).",
+          "$ref": "#/$defs/uploadMediaType"
+        },
+        "sizeBytes": {
+          "description": "The file's size as the browser reports it (K-21 v1 signedUpload.request bytes); over uploadMaxBytes answers tooLarge, and the stored size is checked again (checkUpload).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "visibility": { "$ref": "#/$defs/visibility" },
+        "lifeSeconds": {
+          "description": "How long the link lasts, from 1 to 30 minutes, as the calling page asks (K-21 v1's signedUpload fixtures: 15 minutes; v1.2's secureUpload: 10; README default 3).",
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 1800
+        }
+      },
+      "required": ["kind", "owner", "mediaType", "sizeBytes", "visibility", "lifeSeconds"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "kind": {
+          "description": "An ID document is always a person's own, for every business of theirs (MC C10; S1-10 'once'; K-22 v1 id_uploads, per person with no business): never a business's or a booking's, and never tied to one business.",
+          "if": { "properties": { "kind": { "const": "idDocument" } } },
+          "then": {
+            "properties": {
+              "owner": {
+                "type": "object",
+                "properties": { "kind": { "const": "person" }, "businessId": { "type": "null" } },
+                "required": ["kind", "businessId"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "uploadLink.response": {
+      "title": "UploadLinkReady",
+      "description": "Ready: the browser sends the one file with method PUT, its Content-Type header the type asked (contentType), to url before expiresAt; the link takes at most maxBytes and one object, and nothing else (README 'The link'). The caller keeps objectKey on the server with its upload id and gives the page only url, expiresAt and maxBytes (K-21 v1 signedUpload.response uploadUrl, expiresAt, maxBytes; 'the page never names an object key'), then calls checkUpload once the page says the file is sent.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "ready" },
+        "objectKey": {
+          "description": "The key the file will be stored under, made by the port (README 'The object key').",
+          "$ref": "#/$defs/uploadObjectKey"
+        },
+        "url": {
+          "description": "The short-lived signed link for this one object (K-21 v1 signedUpload.response uploadUrl).",
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "method": {
+          "description": "The browser sends the file in one PUT (README 'The link').",
+          "const": "PUT"
+        },
+        "contentType": {
+          "description": "The Content-Type header the PUT carries: the type asked (request mediaType). Any other is refused by the link.",
+          "$ref": "#/$defs/uploadMediaType"
+        },
+        "maxBytes": { "$ref": "#/$defs/uploadMaxBytes" },
+        "expiresAt": {
+          "description": "When the link stops working: the request's lifeSeconds from now.",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["result", "objectKey", "url", "method", "contentType", "maxBytes", "expiresAt"],
+      "additionalProperties": false
+    },
+    "uploadLink.errors": {
+      "title": "UploadLinkErrors",
+      "description": "No link was made: the file is too large or not a type this kind takes (K-21 v1 uploadRefusedErrors: tooLarge, wrongType), or the port is unavailable.",
+      "anyOf": [
+        {
+          "title": "UploadLinkTooLarge",
+          "description": "The size asked is over uploadMaxBytes.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "tooLarge" },
+            "maxBytes": { "$ref": "#/$defs/uploadMaxBytes" }
+          },
+          "required": ["error", "maxBytes"],
+          "additionalProperties": false
+        },
+        {
+          "title": "UploadLinkWrongType",
+          "description": "The type asked is not one this kind takes: a photo takes the image types only. allowed lists the kind's types.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "wrongType" },
+            "allowed": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/uploadMediaType" },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "required": ["error", "allowed"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/unavailableError" }
+      ]
+    },
+    "uploadLink.exchange": {
+      "title": "UploadLinkExchange",
+      "description": "One uploadLink call and its outcome (02-contracts section 2 item 2).",
+      "type": "object",
+      "properties": {
+        "call": { "const": "uploadLink" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/uploadLink.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/uploadLink.response" }, { "$ref": "#/$defs/uploadLink.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "request": {
+          "description": "What the port answers is held to what was asked: the type is checked first, then the size (README 'The link').",
+          "allOf": [
+            {
+              "description": "A photo takes the image types only: a PDF asked as a photo answers wrongType.",
+              "if": {
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": {
+                      "kind": { "const": "photo" },
+                      "mediaType": { "const": "application/pdf" }
+                    },
+                    "required": ["kind", "mediaType"]
+                  }
+                },
+                "required": ["request"]
+              },
+              "then": {
+                "properties": {
+                  "outcome": {
+                    "type": "object",
+                    "properties": { "error": { "const": "wrongType" } },
+                    "required": ["error"]
+                  }
+                }
+              }
+            },
+            {
+              "description": "A file over uploadMaxBytes gets no link: it answers tooLarge (or wrongType, which the port checks first).",
+              "if": {
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": { "sizeBytes": { "type": "integer", "minimum": 10485761 } },
+                    "required": ["sizeBytes"]
+                  }
+                },
+                "required": ["request"]
+              },
+              "then": {
+                "properties": {
+                  "outcome": {
+                    "type": "object",
+                    "properties": { "error": { "enum": ["tooLarge", "wrongType"] } },
+                    "required": ["error"]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+
+    "checkUpload.request": {
+      "title": "CheckUploadRequest",
+      "description": "What came to an upload link: the second half of the signed upload. Called by the page entry for K-21 v1 finishUpload ('the server checks the stored file's size and type and keeps its object key with the upload') and when a v1.2 answer names an upload (K-21 v1.2 default 61). The port reads the stored object's size, and its type from its leading bytes, never from the browser's word alone (README 'What checkUpload reads'). Repeat: safe; a read, except that a refused file is removed (its errors). Primary or replica: neither; no database read. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "objectKey": {
+          "description": "The key uploadLink gave, kept on the server with the upload id (K-21 v1 finishUpload: 'all from the upload id, on the server').",
+          "$ref": "#/$defs/uploadObjectKey"
+        },
+        "mediaType": {
+          "description": "The type the upload was asked as (uploadLink.request mediaType).",
+          "$ref": "#/$defs/uploadMediaType"
+        },
+        "maxBytes": { "$ref": "#/$defs/uploadMaxBytes" }
+      },
+      "required": ["objectKey", "mediaType", "maxBytes"],
+      "additionalProperties": false
+    },
+    "checkUpload.response": {
+      "title": "CheckUploadResult",
+      "description": "stored: the file is there, within the size and of the type asked, private (Q-31); notStored: no file came to the link (K-21 v1 uploadNotFound: 'no file came to it before it lapsed'), so nothing is kept, and once the link has lapsed nothing ever will be.",
+      "oneOf": [
+        {
+          "title": "UploadStored",
+          "type": "object",
+          "properties": {
+            "result": { "const": "stored" },
+            "sizeBytes": {
+              "description": "The stored object's size.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10485760
+            },
+            "mediaType": {
+              "description": "The stored object's type, as its bytes show it: the type asked.",
+              "$ref": "#/$defs/uploadMediaType"
+            },
+            "storedAt": {
+              "description": "When the file came (K-21 v1 upload-id-finished.json: 'The photo reached the signed address at 14:30:41').",
+              "$ref": "#/$defs/utc"
+            }
+          },
+          "required": ["result", "sizeBytes", "mediaType", "storedAt"],
+          "additionalProperties": false
+        },
+        {
+          "title": "UploadNotStored",
+          "type": "object",
+          "properties": { "result": { "const": "notStored" } },
+          "required": ["result"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "checkUpload.errors": {
+      "title": "CheckUploadErrors",
+      "description": "A file came but is refused: larger than maxBytes, or its bytes are not the type asked (K-21 v1 finishUpload's tooLarge and wrongType). The port has removed it before answering (removed true), so nothing refused is kept (README 'What checkUpload reads'). Or the port is unavailable, and the caller checks again.",
+      "anyOf": [
+        {
+          "title": "StoredTooLarge",
+          "type": "object",
+          "properties": {
+            "error": { "const": "tooLarge" },
+            "maxBytes": { "$ref": "#/$defs/uploadMaxBytes" },
+            "sizeBytes": {
+              "description": "The size that came.",
+              "type": "integer",
+              "minimum": 10485761
+            },
+            "removed": { "const": true }
+          },
+          "required": ["error", "maxBytes", "sizeBytes", "removed"],
+          "additionalProperties": false
+        },
+        {
+          "title": "StoredWrongType",
+          "type": "object",
+          "properties": {
+            "error": { "const": "wrongType" },
+            "allowed": {
+              "description": "The type asked, the one the bytes had to show.",
+              "type": "array",
+              "items": { "$ref": "#/$defs/uploadMediaType" },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "removed": { "const": true }
+          },
+          "required": ["error", "allowed", "removed"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/unavailableError" }
+      ]
+    },
+    "checkUpload.exchange": {
+      "title": "CheckUploadExchange",
+      "description": "One checkUpload call and its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "checkUpload" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/checkUpload.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/checkUpload.response" }, { "$ref": "#/$defs/checkUpload.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "readLink.request": {
+      "title": "ReadLinkRequest",
+      "description": "A short signed read link for one object (02-contracts K-13 'A short signed read link, given only after the caller has checked who may see the file; views logged where RULES 4.5 asks'). The caller (the page entry, C-094's check) asks only after its own check of who may see it, and says whom it checked and on what ground (viewer); the port refuses no viewer, since it holds no record of who may see what, and the link carries no right beyond this one object for this short while. Each call writes its span, the view's log line (README 'Each view logged'). Repeat: safe; each call gives a fresh link and logs again. Primary or replica: neither. Time budget: none in the sources. Key: FILES_LINK_SECRET.",
+      "type": "object",
+      "properties": {
+        "objectKey": {
+          "description": "The key, unsealed from its row on the server (K-22 v1 rule 6, K-35 v1 rule 6), never from a browser.",
+          "$ref": "#/$defs/objectKey"
+        },
+        "file": {
+          "description": "The row that names the file, which the view's log line names (RULES 4.5 'each view logged'): the key itself never enters a log.",
+          "$ref": "#/$defs/rowRef"
+        },
+        "viewer": { "$ref": "#/$defs/viewer" },
+        "lifeSeconds": {
+          "description": "How long the link lasts: short, from 1 to 15 minutes, as long as the page shows the file (K-21 v1.1 readListing's photo links: 10 minutes; README default 3).",
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 900
+        }
+      },
+      "required": ["objectKey", "file", "viewer", "lifeSeconds"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "viewer": {
+          "description": "Only a photo is shown on the listing (FS row B07; S1-84): any other file is never anyone's to see by the listing.",
+          "if": {
+            "properties": {
+              "viewer": {
+                "type": "object",
+                "properties": { "as": { "const": "listing" } },
+                "required": ["as"]
+              }
+            },
+            "required": ["viewer"]
+          },
+          "then": {
+            "properties": {
+              "objectKey": { "type": "string", "pattern": "^photo/" }
+            }
+          }
+        }
+      }
+    },
+    "readLink.response": {
+      "title": "ReadLink",
+      "description": "The link: for this one object, until expiresAt, and nothing else. Every file is served as an attachment with X-Content-Type-Options: nosniff, never inline (K-35 v1 default 20: 'K-13's read link still serves every file as an attachment'), so no stored file runs as a page; an image link still shows in a page's image (K-21 v1.1 listing photos).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "link" },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "expiresAt": {
+          "description": "When the link stops working: the request's lifeSeconds from now.",
+          "$ref": "#/$defs/utc"
+        },
+        "disposition": {
+          "description": "Content-Disposition: attachment, always.",
+          "const": "attachment"
+        },
+        "noSniff": {
+          "description": "X-Content-Type-Options: nosniff, always.",
+          "const": true
+        }
+      },
+      "required": ["result", "url", "expiresAt", "disposition", "noSniff"],
+      "additionalProperties": false
+    },
+    "readLink.errors": {
+      "title": "ReadLinkErrors",
+      "description": "No link: notFound, no object under that key (never stored, refused at checkUpload, or deleted for erasure), one answer for all three; or unavailable.",
+      "anyOf": [
+        {
+          "title": "FileNotFound",
+          "type": "object",
+          "properties": { "error": { "const": "notFound" } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/unavailableError" }
+      ]
+    },
+    "readLink.exchange": {
+      "title": "ReadLinkExchange",
+      "description": "One readLink call and its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readLink" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readLink.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/readLink.response" }, { "$ref": "#/$defs/readLink.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "source": {
+      "title": "WriteSource",
+      "description": "Where a server write's bytes came from: rosie, Rosie's own code made them or took them in (a sealed trace, the export, an export file, a report); linq, a photo that came in by text, named by its K-06 event and attachment (S1-09, S1-12, B8-17; K-06 v1 'attachments as file references (K-13)'), so the attachment id becomes a file reference.",
+      "oneOf": [
+        {
+          "title": "SourceRosie",
+          "type": "object",
+          "properties": { "kind": { "const": "rosie" } },
+          "required": ["kind"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SourceLinq",
+          "type": "object",
+          "properties": {
+            "kind": { "const": "linq" },
+            "eventId": {
+              "description": "The K-06 event that carried it (K-06 v1 eventId).",
+              "$ref": "#/$defs/id"
+            },
+            "attachmentId": {
+              "description": "Its K-06 attachment (K-06 v1 attachments[].attachmentId; K-02 v1 attachment).",
+              "$ref": "#/$defs/id"
+            }
+          },
+          "required": ["kind", "eventId", "attachmentId"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "serverWrite.request": {
+      "title": "ServerWriteRequest",
+      "description": "A server-side write of one system object (02-contracts K-13 'A server-side write for system objects: sealed traces, the event-log Parquet export, exports, reports, DONE photos, and photos that arrive by Linq'). The bytes travel beside this request as the call's body, never in it; sha256 and sizeBytes say which bytes. Repeat: safe under writeId: a retry with the same writeId and the same bytes answers stored with repeated true and writes nothing twice; other bytes under the same key answer conflict (README 'Repeats'). Primary or replica: neither. Time budget: the calling job's. Key: none beyond the FILES binding (README 'The link').",
+      "type": "object",
+      "properties": {
+        "kind": { "$ref": "#/$defs/writeKind" },
+        "owner": { "$ref": "#/$defs/owner" },
+        "mediaType": { "$ref": "#/$defs/mediaType" },
+        "sizeBytes": {
+          "description": "The bytes' size.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "writeId": { "$ref": "#/$defs/writeId" },
+        "day": {
+          "description": "The key's day: the UTC day the writer first made writeId, kept for every retry; for the event-log export, the day of the rows it holds (README 'The object key').",
+          "$ref": "#/$defs/day"
+        },
+        "visibility": { "$ref": "#/$defs/visibility" },
+        "source": { "$ref": "#/$defs/source" }
+      },
+      "required": [
+        "kind",
+        "owner",
+        "mediaType",
+        "sizeBytes",
+        "sha256",
+        "writeId",
+        "day",
+        "visibility",
+        "source"
+      ],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "kind": {
+          "description": "Each write kind takes its own types, owner and source (README 'Media types' and 'Owners').",
+          "allOf": [
+            {
+              "if": { "properties": { "kind": { "const": "sealedTrace" } } },
+              "then": {
+                "properties": {
+                  "mediaType": { "const": "application/octet-stream" },
+                  "owner": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "rosie" } },
+                    "required": ["kind"]
+                  },
+                  "source": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "rosie" } },
+                    "required": ["kind"]
+                  }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "eventLogExport" } } },
+              "then": {
+                "properties": {
+                  "mediaType": { "const": "application/vnd.apache.parquet" },
+                  "owner": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "rosie" } },
+                    "required": ["kind"]
+                  },
+                  "source": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "rosie" } },
+                    "required": ["kind"]
+                  }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "export" } } },
+              "then": {
+                "properties": {
+                  "mediaType": { "const": "text/csv" },
+                  "owner": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "business" } },
+                    "required": ["kind"]
+                  },
+                  "source": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "rosie" } },
+                    "required": ["kind"]
+                  }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "report" } } },
+              "then": {
+                "properties": {
+                  "mediaType": {
+                    "enum": [
+                      "application/pdf",
+                      "image/jpeg",
+                      "image/png",
+                      "image/heic",
+                      "image/heif",
+                      "image/webp",
+                      "video/mp4",
+                      "video/quicktime"
+                    ]
+                  },
+                  "owner": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "booking" } },
+                    "required": ["kind"]
+                  },
+                  "source": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "rosie" } },
+                    "required": ["kind"]
+                  }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "kind": { "const": "photo" } } },
+              "then": {
+                "properties": {
+                  "mediaType": { "$ref": "#/$defs/imageType" },
+                  "owner": {
+                    "type": "object",
+                    "properties": { "kind": { "enum": ["person", "business", "booking"] } },
+                    "required": ["kind"]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "source": {
+          "description": "Only a photo comes in by text (K-11 v1: a photo is the one file kind Linq carries).",
+          "if": {
+            "properties": {
+              "source": {
+                "type": "object",
+                "properties": { "kind": { "const": "linq" } },
+                "required": ["kind"]
+              }
+            },
+            "required": ["source"]
+          },
+          "then": { "properties": { "kind": { "const": "photo" } } }
+        }
+      }
+    },
+    "serverWrite.response": {
+      "title": "ServerWriteStored",
+      "description": "Stored, private: the key is <kind>/<day>/<writeId> (README 'The object key'), which the writer keeps in its own row or record.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "stored" },
+        "objectKey": { "$ref": "#/$defs/writeObjectKey" },
+        "storedAt": { "$ref": "#/$defs/utc" },
+        "repeated": {
+          "description": "True when the same bytes were already stored under this key by an earlier try: nothing was written again.",
+          "type": "boolean"
+        }
+      },
+      "required": ["result", "objectKey", "storedAt", "repeated"],
+      "additionalProperties": false
+    },
+    "serverWrite.errors": {
+      "title": "ServerWriteErrors",
+      "description": "Nothing was written: conflict, other bytes already hold this key (a writeId used twice for different bytes, a writer's fault; nothing is overwritten); or unavailable, and the writer retries with the same writeId (arch 10 line 540).",
+      "anyOf": [
+        {
+          "title": "WriteConflict",
+          "type": "object",
+          "properties": { "error": { "const": "conflict" } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/unavailableError" }
+      ]
+    },
+    "serverWrite.exchange": {
+      "title": "ServerWriteExchange",
+      "description": "One serverWrite call and its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "serverWrite" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/serverWrite.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/serverWrite.response" }, { "$ref": "#/$defs/serverWrite.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "serverRead.request": {
+      "title": "ServerReadRequest",
+      "description": "Rosie's own code reads one object's bytes on the server, never for a person's eyes: C-120 photo reading takes a photo by its file reference (02-contracts K-02 'Photo reading', a later K-02 minor version: 'a K-13 file reference (the object key of a photo that came in by Linq or a signed upload)'; 02-contracts K-13 consumers: 'C-120's photo reading inputs'), and reports and evals read the event-log export (arch 10 line 544; C-037). A person who sees a file gets a read link instead (readLink). The bytes come back beside the response, never in it (README default 11). Repeat: safe; a read. Primary or replica: neither. Time budget: the calling stage's.",
+      "type": "object",
+      "properties": {
+        "objectKey": {
+          "description": "The key, from the caller's own record (a turn's photo, the export's listing by its day), never from a browser.",
+          "$ref": "#/$defs/objectKey"
+        },
+        "file": {
+          "description": "The row that names the file, for the read's log line, or null where no row names it (a photo a turn reads before any row keeps its key; an export object; a sealed trace).",
+          "anyOf": [{ "$ref": "#/$defs/rowRef" }, { "type": "null" }]
+        }
+      },
+      "required": ["objectKey", "file"],
+      "additionalProperties": false
+    },
+    "serverRead.response": {
+      "title": "ServerReadResult",
+      "description": "The object's bytes, beside this answer, with its type and size as stored.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "read" },
+        "mediaType": { "$ref": "#/$defs/mediaType" },
+        "sizeBytes": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["result", "mediaType", "sizeBytes"],
+      "additionalProperties": false
+    },
+    "serverRead.errors": {
+      "title": "ServerReadErrors",
+      "description": "No bytes: notFound, no object under that key (as readLink's), or unavailable.",
+      "anyOf": [
+        {
+          "title": "ReadNotFound",
+          "type": "object",
+          "properties": { "error": { "const": "notFound" } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/unavailableError" }
+      ]
+    },
+    "serverRead.exchange": {
+      "title": "ServerReadExchange",
+      "description": "One serverRead call and its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "serverRead" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/serverRead.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/serverRead.response" }, { "$ref": "#/$defs/serverRead.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "deleteObject.request": {
+      "title": "DeleteObjectRequest",
+      "description": "Delete one object, for erasure under RULES 4.10 ('A copy or delete is done in 45 days after a check it is the person'; 02-contracts K-13 'Delete, for erasure under RULES 4.10'). v1 deletes for no other reason: how long files are kept follows Q-31's default, and no deletion rule is invented (reason erasure only). The erasure job (C-156) calls it for each file of the person, with the key unsealed from its row while the person's key still exists, before it deletes that key (K-35 v1 rule 8). Which files the trade's rules or the law keep is the erasure job's to decide before it calls (RULES 4.10; S13-08; open gaps). Repeat: safe; an object already gone answers deleted with alreadyGone true. Primary or replica: neither. Time budget: the job's.",
+      "type": "object",
+      "properties": {
+        "objectKey": { "$ref": "#/$defs/objectKey" },
+        "file": {
+          "description": "The row that named the file, for the delete's log line.",
+          "$ref": "#/$defs/rowRef"
+        },
+        "reason": {
+          "description": "Erasure under RULES 4.10, the one reason v1 deletes (Q-31: no deletion rule is invented).",
+          "const": "erasure"
+        },
+        "erasure": {
+          "title": "Erasure",
+          "description": "Whose erasure, and when the request was checked to be theirs (RULES 4.10: the 45 days run from that check).",
+          "type": "object",
+          "properties": {
+            "personId": {
+              "description": "The person being erased (K-04 persons.id).",
+              "$ref": "#/$defs/id"
+            },
+            "checkedAt": {
+              "description": "When their request was checked to be theirs.",
+              "$ref": "#/$defs/utc"
+            }
+          },
+          "required": ["personId", "checkedAt"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["objectKey", "file", "reason", "erasure"],
+      "additionalProperties": false
+    },
+    "deleteObject.response": {
+      "title": "ObjectDeleted",
+      "description": "Deleted: no object is under that key any more, so readLink answers notFound for it.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "deleted" },
+        "alreadyGone": {
+          "description": "True when no object was there to delete (an earlier try, or a file never stored).",
+          "type": "boolean"
+        }
+      },
+      "required": ["result", "alreadyGone"],
+      "additionalProperties": false
+    },
+    "deleteObject.errors": {
+      "title": "DeleteObjectErrors",
+      "description": "Nothing is known to be deleted: unavailable, and the erasure job retries before it deletes the person's key (K-35 v1 rule 8).",
+      "anyOf": [{ "$ref": "#/$defs/unavailableError" }]
+    },
+    "deleteObject.exchange": {
+      "title": "DeleteObjectExchange",
+      "description": "One deleteObject call and its outcome.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "deleteObject" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/deleteObject.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/deleteObject.response" }, { "$ref": "#/$defs/deleteObject.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "filesSpan": {
+      "title": "FilesSpan",
+      "description": "The span each call writes: a K-08 v1 span on the portCall hop, provider r2, its call and attempt (K-08 v1 README: portCall covers 'an R2 upload link, read link, server-side write or delete (K-13, C-219)'). What it got and decided is a closed list here, so no object key, link, hash, file name or file ever enters it (K-08 v1 'never the raw number or words'; the key stays sealed in its row: K-22 v1 rule 6, K-35 v1 rule 6). A readLink span is the view's log line: who saw which row's file, on what ground, when (RULES 4.5 'each view logged'); a deleteObject span is the erasure's.",
+      "allOf": [
+        { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/span" },
+        {
+          "type": "object",
+          "properties": {
+            "hop": { "const": "portCall" },
+            "provider": { "const": "r2" },
+            "call": {
+              "description": "The port call, by this contract's name.",
+              "type": "string",
+              "enum": ["uploadLink", "checkUpload", "readLink", "serverWrite", "serverRead", "deleteObject"]
+            },
+            "got": {
+              "description": "What the call got, in labels and counts: never the key, the link, a hash or a file name.",
+              "type": "object",
+              "properties": {
+                "step": {
+                  "description": "The step whose page or turn asked, such as S1-10 (a K-08 v1 label, safeId's form).",
+                  "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/safeId"
+                },
+                "kind": { "$ref": "#/$defs/fileKind" },
+                "owner": { "$ref": "#/$defs/ownerKind" },
+                "mediaType": { "$ref": "#/$defs/mediaType" },
+                "sizeBytes": {
+                  "description": "The size asked or written.",
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "source": {
+                  "description": "A server write's source kind.",
+                  "type": "string",
+                  "enum": ["rosie", "linq"]
+                },
+                "as": { "$ref": "#/$defs/viewerGround" },
+                "viewer": {
+                  "description": "A read link's viewer (K-04 persons.id, a K-08 v1 label), or null for a listing photo.",
+                  "anyOf": [
+                    { "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/safeId" },
+                    { "type": "null" }
+                  ]
+                },
+                "fileTable": {
+                  "description": "The table of the row that names the file (readLink, serverRead, deleteObject).",
+                  "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/tableName"
+                },
+                "fileRow": {
+                  "description": "That row's id (a K-08 v1 label).",
+                  "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/safeId"
+                },
+                "erasureOf": {
+                  "description": "A delete's person being erased (K-04 persons.id, a K-08 v1 label).",
+                  "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/safeId"
+                }
+              },
+              "required": ["kind"],
+              "additionalProperties": false
+            },
+            "decided": {
+              "description": "The answer in labels and counts. Left out on an error, whose name is the span's error_code (unavailable, tooLarge, wrongType, notFound, conflict).",
+              "type": "object",
+              "properties": {
+                "result": {
+                  "description": "ready (uploadLink), stored or notStored (checkUpload, serverWrite), link (readLink), read (serverRead), deleted (deleteObject).",
+                  "type": "string",
+                  "enum": ["ready", "stored", "notStored", "link", "read", "deleted"]
+                },
+                "sizeBytes": {
+                  "description": "The stored size (checkUpload, serverRead).",
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "repeated": {
+                  "description": "A server write already stored (serverWrite).",
+                  "type": "boolean"
+                },
+                "alreadyGone": {
+                  "description": "A delete with nothing there (deleteObject).",
+                  "type": "boolean"
+                }
+              },
+              "required": ["result"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["hop", "provider", "call", "attempt", "got"]
+        }
+      ]
+    }
+  }
+}

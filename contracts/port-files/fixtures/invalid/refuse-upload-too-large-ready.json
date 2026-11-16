@@ -1,0 +1,29 @@
+{
+  "call": "uploadLink",
+  "given": {
+    "now": "2026-11-03T00:12:10Z",
+    "note": "upload-too-large.json's 12,000,000-byte photo answered ready with a link: refused, since a file over the 10 MiB gets no link."
+  },
+  "request": {
+    "kind": "photo",
+    "owner": {
+      "kind": "booking",
+      "businessId": "biz-lee-home-services",
+      "bookingId": "booking-alex-water-heater",
+      "personId": "person-alex"
+    },
+    "mediaType": "image/heic",
+    "sizeBytes": 12000000,
+    "visibility": "private",
+    "lifeSeconds": 600
+  },
+  "outcome": {
+    "result": "ready",
+    "objectKey": "photo/2026-11-03/b9g2h4e6a8t0r1p3h5o7t9o2l4",
+    "url": "https://files.example/placeholder-signed-upload-heater-2",
+    "method": "PUT",
+    "contentType": "image/heic",
+    "maxBytes": 10485760,
+    "expiresAt": "2026-11-03T00:22:10Z"
+  }
+}

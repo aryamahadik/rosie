@@ -1,0 +1,24 @@
+{
+  "call": "uploadLink",
+  "given": {
+    "now": "2026-10-19T14:30:30Z",
+    "note": "upload-id-document.json with Sam's ID document owned by Lee's Barbershop: refused, since an ID document is always the person's own (MC C10; K-22 v1 id_uploads is per person)."
+  },
+  "request": {
+    "kind": "idDocument",
+    "owner": { "kind": "business", "businessId": "biz-lees-barbershop" },
+    "mediaType": "image/jpeg",
+    "sizeBytes": 2400000,
+    "visibility": "private",
+    "lifeSeconds": 900
+  },
+  "outcome": {
+    "result": "ready",
+    "objectKey": "idDocument/2026-10-19/q7m2k9x4t8v1c6b3n5p0r2s4w6",
+    "url": "https://files.example.com/upload/placeholder-signed-sam-id-1",
+    "method": "PUT",
+    "contentType": "image/jpeg",
+    "maxBytes": 10485760,
+    "expiresAt": "2026-10-19T14:45:30Z"
+  }
+}

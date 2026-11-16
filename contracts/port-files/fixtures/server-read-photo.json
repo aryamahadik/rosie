@@ -1,0 +1,16 @@
+{
+  "call": "serverRead",
+  "given": {
+    "now": "2026-10-19T14:20:05Z",
+    "note": "S1-12's photo reading (C-120; 02-contracts K-02 'Photo reading', kind price list) reads Sam's price list photo by its file reference, the key server-write-linq-photo.json gave, before any row keeps it (file null). The bytes come back beside the answer and go to the model; no person sees them, so it is no view, and its span logs the read."
+  },
+  "request": {
+    "objectKey": "photo/2026-10-19/l4q9p2r7c6e1s8u3n0k5m2v9x3",
+    "file": null
+  },
+  "outcome": {
+    "result": "read",
+    "mediaType": "image/jpeg",
+    "sizeBytes": 1650000
+  }
+}

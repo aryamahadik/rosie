@@ -1,0 +1,16 @@
+{
+  "call": "readLink",
+  "given": {
+    "now": "2026-11-02T09:15:30Z",
+    "note": "Between delete-erasure.json's delete of Riley's license photo and the erasure job's delete of his key (K-35 rule 8: the object first, then the key), Sam's portal asks for the photo once more: notFound, the one answer for a file never stored, refused or deleted. Once Riley's key is gone, no one can unseal the key to ask at all."
+  },
+  "request": {
+    "objectKey": "licenseFile/2026-10-19/r1l3y8b4r5l9c2n6s0p7h3t5k1",
+    "file": { "table": "document_files", "id": "docfile-riley-barber-license-photo" },
+    "viewer": { "as": "business", "personId": "person-sam" },
+    "lifeSeconds": 300
+  },
+  "outcome": {
+    "error": "notFound"
+  }
+}

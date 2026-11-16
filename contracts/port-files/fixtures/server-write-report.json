@@ -1,0 +1,29 @@
+{
+  "call": "serverWrite",
+  "given": {
+    "now": "2026-10-23T12:40:00Z",
+    "note": "B10-19: Alex's sewer camera report from Thu Oct 22 ('Video and Jordan's notes') is stored before Rosie texts its secure link on Fri Oct 23 (B10-25 checks at 9am Springfield, 13:00Z). This is the video, for Alex alone (B10-25: 'each only to that person'). How Jordan gives the report to Rosie is journey 10's (README open gaps). Size and hash are placeholders."
+  },
+  "request": {
+    "kind": "report",
+    "owner": {
+      "kind": "booking",
+      "businessId": "biz-lee-home-services",
+      "bookingId": "booking-alex-drain",
+      "personId": "person-alex"
+    },
+    "mediaType": "video/mp4",
+    "sizeBytes": 48000000,
+    "sha256": "7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b",
+    "writeId": "r3p0r7v1d3o9c5a2m8e4r6a0s2",
+    "day": "2026-10-23",
+    "visibility": "private",
+    "source": { "kind": "rosie" }
+  },
+  "outcome": {
+    "result": "stored",
+    "objectKey": "report/2026-10-23/r3p0r7v1d3o9c5a2m8e4r6a0s2",
+    "storedAt": "2026-10-23T12:40:04Z",
+    "repeated": false
+  }
+}

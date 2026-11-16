@@ -1,0 +1,24 @@
+{
+  "call": "serverWrite",
+  "given": {
+    "now": "2026-10-19T14:12:40Z",
+    "note": "The full detail of trace-sam-0009 (Sam's S1-09 listing search: K-08 span-places-call.json), sealed by its writer (C-017 traces) under Sam's key and written as one object (arch 02 diagram line 105: 'sealed traces'). The port stores the sealed bytes as they are and never opens them; deleting Sam's key erases them (arch 01 line 93). The second try after error-unavailable.json, with the same writeId. Size and hash are placeholders."
+  },
+  "request": {
+    "kind": "sealedTrace",
+    "owner": { "kind": "rosie" },
+    "mediaType": "application/octet-stream",
+    "sizeBytes": 18432,
+    "sha256": "5e2c9a1f7b3d6e8a0c4f2b9d7e1a3c5f8b0d2e4a6c8e0f1a3b5c7d9e1f3a5b7c",
+    "writeId": "t5r8c3s6q1w9e4a7d2f0g6h3j8",
+    "day": "2026-10-19",
+    "visibility": "private",
+    "source": { "kind": "rosie" }
+  },
+  "outcome": {
+    "result": "stored",
+    "objectKey": "sealedTrace/2026-10-19/t5r8c3s6q1w9e4a7d2f0g6h3j8",
+    "storedAt": "2026-10-19T14:12:40Z",
+    "repeated": false
+  }
+}

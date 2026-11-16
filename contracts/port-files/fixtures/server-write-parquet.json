@@ -1,0 +1,24 @@
+{
+  "call": "serverWrite",
+  "given": {
+    "now": "2026-10-20T03:30:00Z",
+    "note": "The warehouse export (C-037) writes the event log's rows of Mon Oct 19 (UTC) as one Parquet object, K-08 v1 export rows with their sealed values still sealed (arch 10 line 544: 'Event log to R2 Parquet. Reports and evals never touch the primary'). The key's day is the rows' day, so a reader takes one day's rows by the prefix eventLogExport/2026-10-19/. When the export runs is C-037's (README open gaps). Size and hash are placeholders."
+  },
+  "request": {
+    "kind": "eventLogExport",
+    "owner": { "kind": "rosie" },
+    "mediaType": "application/vnd.apache.parquet",
+    "sizeBytes": 524288,
+    "sha256": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b3",
+    "writeId": "p2q7e4x9l1o6g3r8c5u0n2t7s4",
+    "day": "2026-10-19",
+    "visibility": "private",
+    "source": { "kind": "rosie" }
+  },
+  "outcome": {
+    "result": "stored",
+    "objectKey": "eventLogExport/2026-10-19/p2q7e4x9l1o6g3r8c5u0n2t7s4",
+    "storedAt": "2026-10-20T03:30:02Z",
+    "repeated": false
+  }
+}

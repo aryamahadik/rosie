@@ -1,0 +1,17 @@
+{
+  "call": "deleteObject",
+  "given": {
+    "now": "2026-11-02T09:15:00Z",
+    "note": "delete-erasure.json's delete for another reason, a photo replaced: refused, since v1 deletes only for erasure under RULES 4.10 and no deletion rule is invented (Q-31)."
+  },
+  "request": {
+    "objectKey": "licenseFile/2026-10-19/r1l3y8b4r5l9c2n6s0p7h3t5k1",
+    "file": { "table": "document_files", "id": "docfile-riley-barber-license-photo" },
+    "reason": "replaced",
+    "erasure": { "personId": "person-riley", "checkedAt": "2026-10-26T15:00:00Z" }
+  },
+  "outcome": {
+    "result": "deleted",
+    "alreadyGone": false
+  }
+}
