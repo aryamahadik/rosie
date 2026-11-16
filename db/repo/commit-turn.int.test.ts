@@ -1656,3 +1656,244 @@ describe("commitTurn: postgres.js's statement errors leave with the call's name 
     });
   });
 });
+
+// ---- T-1417: a phones row is named by its handle id in every row the commit answers (DL-872) ------------------------
+//
+// K-08 v1 names a phone row by its handle id (phones.handle_id, unique in K-04), never by its number
+// (contracts/event-trace/README.md lines 42 and 263), and the turn's span copies the rows commitTurn answers
+// (actions/src/commit/commit.ts spanRowsOf). A request still names a phones row by its primary key, the number, and the
+// commit locks, compares and writes the row by it; only what the call answers names the row by its handle id, read from
+// the row as locked or as written. Every number here is a whole 555-01xx literal (rule 9), and each check that could
+// show one is a boolean, asked first, so a failing run prints none.
+
+describe("a phones row is named by its handle id, never its number, in every row the commit answers (T-1417)", () => {
+  const K08_ID = (readJson(new URL("event-trace/event-trace.v1.schema.json", CONTRACTS)) as { $id: string })
+    .$id;
+  const ALEX_NUMBER = "+15555550101";
+  const NEW_NUMBER = "+15555550174";
+  const BLANK_NUMBER = "+15555550176";
+
+  /** Every row the answer names, as K-08 v1's span row reference (table and id), the way spanRowsOf copies them. */
+  function rowsNamed(outcome: CommitTurnOutcome): { table: string; id: string }[] {
+    if ("result" in outcome) {
+      const { written, waitingChat } = outcome.committed;
+      return [...written, ...(waitingChat?.superseded ?? []), ...(waitingChat?.withdrawn ?? [])].map(
+        (row) => ({ table: row.table, id: row.rowId }),
+      );
+    }
+    switch (outcome.error) {
+      case "versionChanged":
+        return outcome.changed.map((row) => ({ table: row.table, id: row.rowId }));
+      case "wrongState":
+        return [{ table: outcome.table, id: outcome.rowId }];
+      case "reservationLost":
+        return outcome.reservations.map((row) => ({ table: "reservations", id: row.id }));
+      default:
+        return [];
+    }
+  }
+
+  /**
+   * Whether the answer names at least one row, each a K-08 v1 rowRef (its id a safeId: no "+", never seven or more
+   * digits and phone punctuation), and holds none of `numbers` anywhere.
+   */
+  function namesNoNumber(outcome: CommitTurnOutcome, numbers: readonly string[]): boolean {
+    const rows = rowsNamed(outcome);
+    const text = JSON.stringify(outcome);
+    return (
+      rows.length > 0 &&
+      rows.every((row) => schemaErrors("rowRef", row, K08_ID).length === 0) &&
+      numbers.every((number) => !text.includes(number.slice(1)))
+    );
+  }
+
+  /** The phones row stored under `number`, with what this card checks. */
+  async function phoneRow(
+    number: string,
+  ): Promise<{ handle_id: string; stopped: boolean; chat_open: boolean; version: number }[]> {
+    return db.sql<{ handle_id: string; stopped: boolean; chat_open: boolean; version: number }[]>`
+      select handle_id, stopped, chat_open, version from phones where number = ${number}
+    `;
+  }
+
+  it("K-08 v1's span row reference refuses a number and takes a handle id, so the checks below mean something", () => {
+    expect(schemaErrors("rowRef", { table: "phones", id: ALEX_NUMBER }, K08_ID).length > 0).toBe(true);
+    expect(schemaErrors("rowRef", { table: "phones", id: ALEX_NUMBER.slice(1) }, K08_ID).length > 0).toBe(
+      true,
+    );
+    expect(schemaErrors("rowRef", { table: "phones", id: "handle-alex" }, K08_ID)).toEqual([]);
+  });
+
+  it(
+    "a STOP's state update of a phones row, keyed by its number, answers written with its handle id; so does the START",
+    SLOW,
+    async () => {
+      const stopExchange = await given("commit-alex-stop.json");
+      const stop = requestOf("commit-alex-stop.json");
+      const [stopWrite] = stop.writes.state;
+      // The request names the row by its primary key, the number, as K-05 v1's rowRef does.
+      expect(
+        stopWrite?.op === "update" && stopWrite.table === "phones" && stopWrite.key.number === ALEX_NUMBER,
+      ).toBe(true);
+      const stopped = await commitTurn(runtime, stop, { now: new Date(stopExchange.given.now) });
+      expect(namesNoNumber(stopped, [ALEX_NUMBER])).toBe(true);
+      expect(answerErrors(stopped)).toEqual([]);
+      expect(committed(stopped).committed).toEqual({
+        written: [{ table: "phones", rowId: "handle-alex", version: 4 }],
+        outboxRows: [{ id: "out-alex-stop-reply", commitSeq: 3 }],
+        promoted: [],
+      });
+      // The write went by the number: that row is stopped, its chat closed, at version 4.
+      expect(await phoneRow(ALEX_NUMBER)).toEqual([
+        { handle_id: "handle-alex", stopped: true, chat_open: false, version: 4 },
+      ]);
+
+      const startExchange = exchangeOf("commit-alex-start.json");
+      const started = await commitTurn(runtime, requestOf("commit-alex-start.json"), {
+        now: new Date(startExchange.given.now),
+      });
+      expect(namesNoNumber(started, [ALEX_NUMBER])).toBe(true);
+      expect(answerErrors(started)).toEqual([]);
+      expect(committed(started).committed).toEqual({
+        written: [{ table: "phones", rowId: "handle-alex", version: 5 }],
+        outboxRows: [{ id: "out-alex-start-reply", commitSeq: 4 }],
+        promoted: [],
+      });
+      expect(await phoneRow(ALEX_NUMBER)).toEqual([
+        { handle_id: "handle-alex", stopped: false, chat_open: true, version: 5 },
+      ]);
+    },
+  );
+
+  it("an insert of a phones row answers written with its handle id at version 1", SLOW, async () => {
+    const exchange = await given("commit-alex-stop.json");
+    const request = requestOf("commit-alex-stop.json");
+    request.turn = {
+      ...request.turn,
+      id: "turn-t1417-first-text",
+      eventIds: ["evt-t1417-0001"],
+      traceId: "trace-t1417-0001",
+    };
+    request.versionsRead = [];
+    // A first text's handle and phone in one commit: the handle carries no version, so the answer names the phone alone.
+    request.writes.state = [
+      {
+        op: "insert",
+        table: "handles",
+        values: { id: "handle-t1417-new", kind: "phone", address: NEW_NUMBER },
+      },
+      {
+        op: "insert",
+        table: "phones",
+        values: {
+          number: NEW_NUMBER,
+          handle_id: "handle-t1417-new",
+          chat_open: true,
+          chat_open_at: exchange.given.now,
+          chat_way: "imessage",
+        },
+      },
+    ];
+    request.writes.outboxRows = [];
+    request.writes.events = [];
+    expect(schemaErrors("commitTurn.request", request)).toEqual([]);
+    const outcome = await commitTurn(runtime, request, { now: new Date(exchange.given.now) });
+    expect(namesNoNumber(outcome, [NEW_NUMBER])).toBe(true);
+    expect(answerErrors(outcome)).toEqual([]);
+    expect(committed(outcome).committed).toEqual({
+      written: [{ table: "phones", rowId: "handle-t1417-new", version: 1 }],
+      outboxRows: [],
+      promoted: [],
+    });
+    expect(await phoneRow(NEW_NUMBER)).toEqual([
+      { handle_id: "handle-t1417-new", stopped: false, chat_open: true, version: 1 },
+    ]);
+  });
+
+  it(
+    "a stale version of a phones row, read or written, answers versionChanged naming its handle id, and writes nothing",
+    SLOW,
+    async () => {
+      const exchange = await given("commit-alex-stop.json");
+      const now = new Date(exchange.given.now);
+      const before = await snapshot();
+
+      // Read only (FOR SHARE): the turn saw Alex's phone at version 2; it is at 3.
+      const read = requestOf("commit-alex-stop.json");
+      read.versionsRead = [{ table: "phones", rowId: ALEX_NUMBER, version: 2 }];
+      read.writes.state = read.writes.state.filter((write) => write.table !== "phones");
+      // Written (FOR UPDATE): the STOP's update expects version 2.
+      const written = requestOf("commit-alex-stop.json");
+      written.versionsRead = [];
+      const [stopWrite] = written.writes.state;
+      if (stopWrite?.op !== "update") {
+        throw new Error("the fixture's first state write is the phone's update");
+      }
+      stopWrite.expectVersion = 2;
+
+      for (const [what, request] of [
+        ["read", read],
+        ["written", written],
+      ] as const) {
+        const outcome = await commitTurn(runtime, request, { now });
+        expect(namesNoNumber(outcome, [ALEX_NUMBER]), what).toBe(true);
+        expect(answerErrors(outcome), what).toEqual([]);
+        expect(outcome, what).toEqual({
+          error: "versionChanged",
+          changed: [{ table: "phones", rowId: "handle-alex", readVersion: 2, currentVersion: 3 }],
+        });
+        expect(await snapshot(), what).toEqual(before);
+        expect(await footprint(request.turn.id), what).toEqual(NO_FOOTPRINT);
+      }
+    },
+  );
+
+  it(
+    "a phones row with no handle id fails closed: the commit throws naming no number, and writes nothing",
+    SLOW,
+    async () => {
+      const exchange = await given("commit-alex-stop.json");
+      const now = new Date(exchange.given.now);
+      // K-04 takes an empty handle id (no CHECK names it); the answer must never name this row by its number instead.
+      await insertRow(db.sql, "handles", { id: "", kind: "phone", address: BLANK_NUMBER });
+      await insertRow(db.sql, "phones", { number: BLANK_NUMBER, handle_id: "" });
+      const blank = (version: number): CommitTurnRequest => {
+        const request = requestOf("commit-alex-stop.json");
+        request.turn = {
+          ...request.turn,
+          id: "turn-t1417-blank",
+          eventIds: ["evt-t1417-0002"],
+          traceId: "trace-t1417-0002",
+        };
+        request.versionsRead = [];
+        request.writes.state = [
+          {
+            op: "update",
+            table: "phones",
+            key: { number: BLANK_NUMBER },
+            expectVersion: version,
+            set: { poll_voted_at: exchange.given.now },
+          },
+        ];
+        request.writes.outboxRows = [];
+        request.writes.events = [];
+        return request;
+      };
+      const before = await snapshot();
+      // Its write (version 1, current) and its compare (version 2, stale) each throw before any answer is made.
+      for (const version of [1, 2]) {
+        const what = `expecting version ${String(version)}`;
+        const error = await thrownBy(commitTurn(runtime, blank(version), { now }));
+        expect(error instanceof Error, what).toBe(true);
+        const message = error instanceof Error ? error.message : "";
+        expect(message.includes(BLANK_NUMBER.slice(1)), what).toBe(false);
+        expect(message, what).toBe("commitTurn: a phones row has no handle_id to name it by in the answer");
+        expect(await snapshot(), what).toEqual(before);
+        expect(await footprint("turn-t1417-blank"), what).toEqual(NO_FOOTPRINT);
+      }
+      expect(await phoneRow(BLANK_NUMBER)).toEqual([
+        { handle_id: "", stopped: false, chat_open: false, version: 1 },
+      ]);
+    },
+  );
+});
