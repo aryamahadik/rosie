@@ -255,13 +255,8 @@ function rewrite(value: unknown, path: string, mark: Mark, inMessage: string | n
     return next;
   }
   if (Array.isArray(value)) {
-    let changed = false;
-    const out = value.map((item, k) => {
-      const next = rewrite(item, key(path, k), mark, inMessage);
-      if (next !== item) changed = true;
-      return next;
-    });
-    return changed ? out : value;
+    const out = value.map((item, k) => rewrite(item, key(path, k), mark, inMessage));
+    return out.some((next, k) => next !== value[k]) ? out : value;
   }
   if (typeof value === "object" && value !== null) {
     let changed = false;
@@ -292,30 +287,24 @@ function rewriteField(
 
 /** A list of [old, new] pairs with each new side rewritten; the old side is the master's line, matched as written. */
 function newSides(pairs: readonly unknown[], path: string, mark: Mark, inMessage: string | null): unknown[] {
-  let changed = false;
   const out = pairs.map((pair, k): unknown => {
     if (!Array.isArray(pair) || pair.length !== 2) return pair;
     const next = rewrite(pair[1], `${path}[${String(k)}][1]`, mark, inMessage);
-    if (next === pair[1]) return pair;
-    changed = true;
-    return [pair[0], next];
+    return next === pair[1] ? pair : [pair[0], next];
   });
-  return changed ? out : (pairs as unknown[]);
+  return out.some((next, k) => next !== pairs[k]) ? out : (pairs as unknown[]);
 }
 
 /** A list of messages, each read as a message a person reads: its lanes are not words. */
 function messages(list: readonly unknown[], path: string, mark: Mark): unknown[] {
-  let changed = false;
   const out = list.map((message, k): unknown => {
     const at = `${path}[${String(k)}]`;
     if (!Array.isArray(message)) return rewrite(message, at, mark, at);
     const words = message.slice(2);
     const next = rewrite(words, at, mark, at) as unknown[];
-    if (next === words) return message;
-    changed = true;
-    return [message[0], message[1], ...next];
+    return next === words ? message : [message[0], message[1], ...next];
   });
-  return changed ? out : (list as unknown[]);
+  return out.some((next, k) => next !== list[k]) ? out : (list as unknown[]);
 }
 
 /**

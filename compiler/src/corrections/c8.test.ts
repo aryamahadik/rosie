@@ -159,7 +159,10 @@ describe("C8's void list", () => {
         const ops = raw.flows[flow].ops;
         const dropped = new Set(voided.filter((one) => one.flow === flow).map((one) => one.op));
         expect(done.flows[flow].ops, `${id} ${flow}`).toStrictEqual(ops.filter((_, n) => !dropped.has(n)));
-        for (const n of dropped) expect(isVoidOff(ops[n] as TradeOp)).toBe(true);
+        for (const n of dropped) {
+          const op = ops[n];
+          expect(op !== undefined && isVoidOff(op), `${id} ${flow} op ${String(n)}`).toBe(true);
+        }
         expect(done.flows[flow].ops.some(isVoidOff), `${id} ${flow}`).toBe(false);
       }
       expect({ ...done, flows: null }).toStrictEqual({ ...raw, flows: null });
