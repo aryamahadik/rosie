@@ -2,9 +2,59 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 696, [`e34bc58`](https://github.com/aryamahadik/rosie/commit/e34bc58), 2026-11-16 06:30:34 UTC.
+- **Through:** commit 698, [`f17a5e3`](https://github.com/aryamahadik/rosie/commit/f17a5e3), 2026-11-16 07:00:57 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 698. docs: COMMIT\_HISTORY.md through commit 696 (e34bc58, \#707) (\#709)
+
+- **Commit:** [`f17a5e3`](https://github.com/aryamahadik/rosie/commit/f17a5e3), by Arya Mahadik, 2026-11-16 07:00:57 UTC
+- **Pull request:** [#709](https://github.com/aryamahadik/rosie/pull/709) from `task/commit-history-143`, merged 2026-11-16 07:00:58 UTC. It squashed 1 branch commit:
+  - `1aed179` docs: COMMIT\_HISTORY.md through commit 696 (e34bc58, \#707)
+- **Files changed:** 1 (+53 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +53 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 236 (DL-879); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 697. T-590: the stop home (S13-32) as code: a yes only from the person's own word; one number stops every business; a stop never cancels a visit (\#708)
+
+- **Commit:** [`3508bc8`](https://github.com/aryamahadik/rosie/commit/3508bc8), by Arya Mahadik, 2026-11-16 07:00:53 UTC
+- **Pull request:** [#708](https://github.com/aryamahadik/rosie/pull/708) from `task/T-590`, merged 2026-11-16 07:00:53 UTC. It squashed 3 branch commits:
+  - `535e24b` T-590: stop home (S13-32) as code: whose word gives a yes, one number…
+  - `e3b597a` T-590: texting in counts only on a turn that carries the person's tex…
+  - `963dd1a` T-590: numberStop reads the stopped phone row and the STOP row withou…
+- **Files changed:** 8 (+1679 −0), by folder:
+  - `actions/src/homes/stop/` errors.ts +12 −0, home.ts +61 −0, index.ts +47 −0, reads.ts +117 −0, stop.test.ts +782 −0, stop.ts +414 −0, test-support.ts +173 −0, words.ts +73 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-590: stop home (S13-32) as code: whose word gives a yes, one number stops every business until START, the opt-out line once, a stop word never cancels a visit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-590: texting in counts only on a turn that carries the person's texts (TurnRef.texted), never a clock turn; tests for it
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-590: numberStop reads the stopped phone row and the STOP row without aliased conditions (lint: no-unnecessary-condition)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 696. docs: COMMIT\_HISTORY.md through commit 694 (32a2eee, \#704) (\#707)
 
