@@ -7,10 +7,26 @@ import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import type { Manifest } from "../../bundle";
 import { readContractJson, schemaErrors } from "../../trace/test-support";
 import { contractProblems, K09_V1 } from "../test-support";
-import type { Keyword, KeywordText } from "../types";
-import { actionFor, fixedLinePlan, replyToKeywords, setReplyDeps } from "./replies";
-import { ROSIE_NUMBER, fakeCore, phone, pinnedManifest, turnTrace, typed, withLine } from "./test-support";
-import type { TurnCaller, UnplannedRow } from "./types";
+import type { GuardText, Keyword, KeywordText } from "../types";
+import {
+  actionFor,
+  fixedLinePlan,
+  replyToKeywords,
+  setReplyDeps,
+  stopOrStartFor,
+  type KeywordReply,
+} from "./replies";
+import {
+  ROSIE_NUMBER,
+  fakeCore,
+  phone,
+  pinnedManifest,
+  turnTrace,
+  typed,
+  withLine,
+  type FakeCore,
+} from "./test-support";
+import type { CoreCommitted, RecordStopOrStartRequest, TurnCaller, UnplannedRow } from "./types";
 import { HELP_REPLY, Q01_DRAFTED, START_REPLY, STOP_REPLY, fixedLinesOf, wordsFor } from "./words";
 
 const K05_V1 = "data-access/data-access.v1.schema.json";
@@ -248,31 +264,404 @@ describe("the plans and spans the replies write are the contracts'", () => {
       { bookingId: "booking-alex-sam-book", businessId: "biz-lees-barbershop", ownerHandleId: "handle-sam" },
     ]);
     restore = setReplyDeps({ core: fake.core, rows: fake.rows, rosieNumber: ROSIE_NUMBER });
-    const { trace, spans } = turnTrace("turn-alex-spans");
+    const first = turnTrace("turn-alex-spans");
+    const second = turnTrace("turn-alex-spans-2");
+    const alexTurn = (turnId: string, keywords: KeywordText[], trace: typeof first.trace) =>
+      replyToKeywords({
+        turnId,
+        handleId: "handle-alex",
+        phoneNumber: "+15555550101",
+        personId: "person-alex",
+        traceId: `trace-${turnId}`,
+        keywords,
+        bundle: { manifest },
+        trace,
+      });
 
-    const result = await replyToKeywords({
-      turnId: "turn-alex-spans",
-      handleId: "handle-alex",
-      phoneNumber: "+15555550101",
-      personId: "person-alex",
-      traceId: "trace-alex-spans",
-      keywords: [
+    // CANCEL, HELP, START: the phone's one record is its newest word's, the START (T-1416), so HELP is answered too.
+    const result = await alexTurn(
+      "turn-alex-spans",
+      [
         keywordText("evt-alex-0701", "Cancel", { kind: "stop", word: "CANCEL", flagsVisit: true }),
         keywordText("evt-alex-0702", "HELP", { kind: "help", word: "HELP", flagsVisit: false }),
         keywordText("evt-alex-0703", "START", { kind: "start", word: "START", flagsVisit: false }),
       ],
-      bundle: { manifest },
-      trace,
-    });
+      first.trace,
+    );
+    // Then STOP and HELP: the stop reply and the business's notice are written, and HELP is refused while stopped.
+    const later = await alexTurn(
+      "turn-alex-spans-2",
+      [
+        keywordText("evt-alex-0704", "STOP", { kind: "stop", word: "STOP", flagsVisit: false }),
+        keywordText("evt-alex-0705", "HELP", { kind: "help", word: "HELP", flagsVisit: false }),
+      ],
+      second.trace,
+    );
 
-    expect(result.replies.map((reply) => reply.outcome)).toEqual(["replied", "refused", "replied"]);
-    expect(spans).toHaveLength(3);
+    expect(result.replies.map((reply) => reply.outcome)).toEqual(["replied", "replied", "replied"]);
+    expect(later.replies.map((reply) => reply.outcome)).toEqual(["replied", "refused"]);
+    const spans = [...first.spans, ...second.spans];
+    expect(spans).toHaveLength(5);
     for (const span of spans) {
       expect(span.hop).toBe("fillAndChecks");
       expect(schemaErrors("span", span)).toEqual([]);
     }
     // Every plan written is K-05 v1's, the replies' and the notice's alike.
-    expect(fake.plans).toHaveLength(3);
+    expect(fake.plans.map((plan) => plan.finalParts.fixedLines)).toEqual([
+      ["startReply"],
+      ["helpReply"],
+      ["stopReply"],
+      ["stopToBusiness"],
+    ]);
     for (const plan of fake.plans) expect(contractProblems(K05_V1, "writePlan.request", plan)).toEqual([]);
+  });
+});
+
+describe("one recordStopOrStart per phone per keyword turn, from the phone's newest word (T-1416; T-317's note N1)", () => {
+  const ALEX = "+15555550101";
+  const LEES = "biz-lees-barbershop";
+  const turn = { handleId: "handle-alex", phoneNumber: ALEX };
+  const STOP: Keyword = { kind: "stop", word: "STOP", flagsVisit: false };
+  const START: Keyword = { kind: "start", word: "START", flagsVisit: false };
+  const HELP: Keyword = { kind: "help", word: "HELP", flagsVisit: false };
+  const CANCEL: Keyword = { kind: "stop", word: "CANCEL", flagsVisit: true };
+  const CANCELAR: Keyword = { kind: "stop", word: "CANCELAR", flagsVisit: true };
+
+  /**
+   * The shared core over Alex's and Sam's phones, keyed by the turn as K-09 v1 keys a STOP or a START (the core's keyOf):
+   * a commit that gives one id twice is refused whole, as the commit refuses it, with nothing written.
+   */
+  function keyedCore(): FakeCore {
+    const fake = fakeCore("2026-10-22T16:40:02Z", [
+      phone(ALEX, "handle-alex", "person-alex"),
+      phone("+15555550100", "handle-sam", "person-sam"),
+    ]);
+    fake.keyedByTurn = true;
+    restore();
+    restore = setReplyDeps({ core: fake.core, rows: fake.rows, rosieNumber: ROSIE_NUMBER });
+    return fake;
+  }
+
+  /** One keyword turn of Alex's, with its spans. */
+  async function alexTurn(turnId: string, keywords: KeywordText[]) {
+    const { trace, spans } = turnTrace(turnId);
+    const result = await replyToKeywords({
+      turnId,
+      handleId: "handle-alex",
+      phoneNumber: ALEX,
+      personId: "person-alex",
+      traceId: `trace-${turnId}`,
+      keywords,
+      bundle: { manifest },
+      trace,
+    });
+    return { result, spans };
+  }
+
+  /** Each commit's recordStopOrStart requests, commit by commit. */
+  const recordsOf = (fake: FakeCore): RecordStopOrStartRequest[][] =>
+    fake.commits.map((commit) =>
+      commit.actions.flatMap((action) => (action.call === "recordStopOrStart" ? [action.request] : [])),
+    );
+
+  /** How each keyword text was answered: its word, its outcome, its line, the flag and the code. */
+  const answered = (replies: readonly KeywordReply<GuardText>[]) =>
+    replies.map((reply) => [reply.keyword.word, reply.outcome, reply.line, reply.stopped, reply.errorCode]);
+
+  it.each([
+    ["STOP then STOP", [STOP, STOP], "evt-alex-0811", "stop!", "stop", false],
+    ["START then STOP", [START, STOP], "evt-alex-0811", "stop!", "stop", false],
+    ["STOP then START", [STOP, START], "evt-alex-0811", "start!", "start", false],
+    ["CANCEL then STOP", [CANCEL, STOP], "evt-alex-0811", "stop!", "stop", true],
+    ["STOP then CANCELAR", [STOP, CANCELAR], "evt-alex-0811", "cancelar!", "stop", true],
+    ["CANCEL then START", [CANCEL, START], "evt-alex-0811", "start!", "start", true],
+    ["STOP, HELP, then START", [STOP, HELP, START], "evt-alex-0812", "start!", "start", false],
+    ["START, STOP, HELP", [START, STOP, HELP], "evt-alex-0811", "stop!", "stop", false],
+  ] as const)(
+    "%s: one K-09 v1 recordStopOrStart, the newest word's kind, event and words, the visit flagged by any CANCEL",
+    (_case, keywords, inboundEventId, words, kind, alsoCancelVisit) => {
+      // Each text's words are its keyword's, as typed: "stop!", "start!", ... at evt-alex-0810, 0811 and 0812.
+      const texts = keywords.map((keyword, index) =>
+        keywordText(`evt-alex-08${String(10 + index)}`, `${keyword.word.toLowerCase()}!`, keyword),
+      );
+
+      const action = stopOrStartFor(texts, turn, CALLER);
+
+      expect(action).toEqual({
+        call: "recordStopOrStart",
+        request: {
+          caller: CALLER,
+          kind,
+          phoneNumber: ALEX,
+          inboundEventId,
+          words,
+          alsoCancelVisit,
+          workPhoneBusinessIds: null,
+          sentByActor: null,
+        },
+      });
+      expect(contractProblems(K09_V1, "coreAction", action)).toEqual([]);
+      expect(contractProblems(K09_V1, "recordStopOrStart.request", action?.request)).toEqual([]);
+    },
+  );
+
+  it("no stop word or START, or no number: no record (each HELP stays its own sendFixedLine)", () => {
+    const stop = keywordText("evt-alex-0818", "STOP", STOP);
+    const help = keywordText("evt-alex-0819", "HELP", HELP);
+
+    expect(stopOrStartFor([], turn, CALLER)).toBeNull();
+    expect(stopOrStartFor([help, help], turn, CALLER)).toBeNull();
+    expect(
+      stopOrStartFor([stop, help], { handleId: "handle-alex-email", phoneNumber: null }, CALLER),
+    ).toBeNull();
+    expect(actionFor(help, turn, CALLER)?.call).toBe("sendFixedLine");
+  });
+
+  it("N1, the shape this card ends: one action per text gives two rows one id, so a core keyed by the turn refuses the whole commit on every run", async () => {
+    const fake = keyedCore();
+    const caller: TurnCaller = { ...CALLER, turnId: "turn-alex-stop-stop", requestId: "turn-alex-stop-stop" };
+    const actions = [
+      actionFor(keywordText("evt-alex-0801", "STOP", STOP), turn, caller),
+      actionFor(keywordText("evt-alex-0802", "stop", STOP), turn, caller),
+    ].filter((action) => action !== null);
+    expect(actions).toHaveLength(2);
+
+    for (let run = 1; run <= 3; run += 1) {
+      await expect(fake.core.commitCore({ caller, actions })).rejects.toThrow(/idTwice/u);
+    }
+
+    // Nothing landed: no consent row, no reply row, the phone not stopped.
+    expect(fake.consents).toEqual([]);
+    expect(fake.outbox.size).toBe(0);
+    expect(fake.phones.get(ALEX)).toMatchObject({ stopped: false, chatOpen: true, version: 3 });
+  });
+
+  it("two STOP texts in one turn give one action and both replies recorded: one consent row, one reply row, the phone moved once", async () => {
+    const fake = keyedCore();
+
+    const { result, spans } = await alexTurn("turn-alex-stop-stop", [
+      keywordText("evt-alex-0801", "STOP", STOP),
+      keywordText("evt-alex-0802", "stop", STOP),
+    ]);
+
+    // One commit with one record: the newest word's event and words.
+    expect(recordsOf(fake)).toEqual([
+      [
+        {
+          caller: {
+            ...CALLER,
+            turnId: "turn-alex-stop-stop",
+            requestId: "turn-alex-stop-stop",
+            traceId: "trace-turn-alex-stop-stop",
+          },
+          kind: "stop",
+          phoneNumber: ALEX,
+          inboundEventId: "evt-alex-0802",
+          words: "stop",
+          alsoCancelVisit: false,
+          workPhoneBusinessIds: null,
+          sentByActor: null,
+        },
+      ],
+    ]);
+    expect(fake.commits[0]?.actions).toHaveLength(1);
+    // It landed: one consent row and one reply row, each its own id, and the phone's version moved once (3 to 4).
+    expect(fake.consents.map((consent) => [consent.id, consent.revoked, consent.exactWords])).toEqual([
+      ["consent-turn-alex-stop-stop", true, "stop"],
+    ]);
+    expect([...fake.outbox.keys()]).toEqual(["out-turn-alex-stop-stop-stopReply"]);
+    expect(fake.phones.get(ALEX)).toMatchObject({ stopped: true, chatOpen: false, version: 4 });
+    // Both texts are answered from that one action, recorded, and the turn need not run again.
+    expect(answered(result.replies)).toEqual([
+      ["STOP", "replied", "stopReply", true, null],
+      ["STOP", "replied", "stopReply", true, null],
+    ]);
+    expect(result.rerun).toBe(false);
+    // The one reply's words are written once, and listed on the newest text's reply alone.
+    expect(fake.plans.map((plan) => plan.outboxRowId)).toEqual(["out-turn-alex-stop-stop-stopReply"]);
+    expect(result.replies.map((reply) => [reply.rowsWritten, reply.words])).toEqual([
+      [[], null],
+      [["out-turn-alex-stop-stop-stopReply"], "q01Default"],
+    ]);
+    // One fillAndChecks span per text, each K-08 v1's.
+    expect(spans.map((span) => [span.event_id, span.decided])).toMatchObject([
+      ["evt-alex-0801", { result: "replied", line: "stopReply", stopped: true, rowsWritten: 0 }],
+      ["evt-alex-0802", { result: "replied", line: "stopReply", stopped: true, rowsWritten: 1 }],
+    ]);
+    for (const span of spans) expect(schemaErrors("span", span)).toEqual([]);
+  });
+
+  it("START then STOP gives one stop: from a phone on or one stopped before, the START never lifts it and writes no row", async () => {
+    const fake = keyedCore();
+    const startThenStop = (turnId: string, at: number) =>
+      alexTurn(turnId, [
+        keywordText(`evt-alex-08${String(at)}`, "START", START),
+        keywordText(`evt-alex-08${String(at + 1)}`, "Stop", STOP),
+      ]);
+
+    const fromOn = await startThenStop("turn-alex-start-stop-1", 20);
+    expect(fake.phones.get(ALEX)).toMatchObject({ stopped: true, chatOpen: false });
+    const fromStopped = await startThenStop("turn-alex-start-stop-2", 22);
+
+    // Each turn carries one record, the STOP: the newest word, its event and its words.
+    expect(recordsOf(fake)).toMatchObject([
+      [{ kind: "stop", inboundEventId: "evt-alex-0821", words: "Stop", alsoCancelVisit: false }],
+      [{ kind: "stop", inboundEventId: "evt-alex-0823", words: "Stop", alsoCancelVisit: false }],
+    ]);
+    expect(fake.commits.map((commit) => commit.actions.length)).toEqual([1, 1]);
+    // No START row was ever written, and the phone stays stopped.
+    expect(fake.consents.map((consent) => [consent.revoked, consent.exactWords])).toEqual([
+      [true, "Stop"],
+      [true, "Stop"],
+    ]);
+    expect(fake.phones.get(ALEX)).toMatchObject({ stopped: true, chatOpen: false });
+    for (const { result } of [fromOn, fromStopped]) {
+      expect(answered(result.replies)).toEqual([
+        ["START", "replied", "stopReply", true, null],
+        ["STOP", "replied", "stopReply", true, null],
+      ]);
+    }
+  });
+
+  it("STOP then START gives one start: no stop row or stop reply is written, from a phone on or one stopped before", async () => {
+    const fake = keyedCore();
+    const stopThenStart = (turnId: string, at: number) =>
+      alexTurn(turnId, [
+        keywordText(`evt-alex-08${String(at)}`, "STOP", STOP),
+        keywordText(`evt-alex-08${String(at + 1)}`, "Start", START),
+      ]);
+
+    const fromOn = await stopThenStart("turn-alex-stop-start-1", 30);
+    // Only the START's row and reply: no stopReply row, which limit 8 would send past the flag.
+    expect(fake.consents.map((consent) => [consent.revoked, consent.exactWords])).toEqual([[false, "Start"]]);
+    expect([...fake.outbox.values()].map((row) => row.fixedLineId)).toEqual(["startReply"]);
+    await alexTurn("turn-alex-stop-0832", [keywordText("evt-alex-0832", "STOP", STOP)]);
+    expect(fake.phones.get(ALEX)).toMatchObject({ stopped: true });
+    const fromStopped = await stopThenStart("turn-alex-stop-start-2", 33);
+
+    expect(recordsOf(fake)).toMatchObject([
+      [{ kind: "start", inboundEventId: "evt-alex-0831", words: "Start", alsoCancelVisit: false }],
+      [{ kind: "stop", inboundEventId: "evt-alex-0832" }],
+      [{ kind: "start", inboundEventId: "evt-alex-0834", words: "Start", alsoCancelVisit: false }],
+    ]);
+    expect(fake.commits.map((commit) => commit.actions.length)).toEqual([1, 1, 1]);
+    expect(fake.consents.map((consent) => consent.revoked)).toEqual([false, true, false]);
+    expect(fake.phones.get(ALEX)).toMatchObject({ stopped: false, chatOpen: true });
+    for (const { result } of [fromOn, fromStopped]) {
+      expect(answered(result.replies)).toEqual([
+        ["STOP", "replied", "startReply", false, null],
+        ["START", "replied", "startReply", false, null],
+      ]);
+    }
+  });
+
+  it("CANCEL then STOP keeps alsoCancelVisit: one stop with the STOP's words flags the visit, and the business is told once", async () => {
+    const fake = keyedCore();
+    fake.openBookings.set(ALEX, [
+      { bookingId: "booking-alex-sam-book", businessId: LEES, ownerHandleId: "handle-sam" },
+    ]);
+
+    const { result } = await alexTurn("turn-alex-cancel-stop", [
+      keywordText("evt-alex-0841", "Cancel", CANCEL),
+      keywordText("evt-alex-0842", "STOP", STOP),
+    ]);
+
+    expect(recordsOf(fake)).toMatchObject([
+      [{ kind: "stop", inboundEventId: "evt-alex-0842", words: "STOP", alsoCancelVisit: true }],
+    ]);
+    const [stop] = (fake.answers[0] as CoreCommitted).core;
+    expect(stop?.response).toMatchObject({
+      stopped: true,
+      flaggedBookingIds: ["booking-alex-sam-book"],
+      businessesTold: [
+        { businessId: LEES, outboxRowId: "out-turn-alex-cancel-stop-biz-lees-barbershop-texts-off" },
+      ],
+    });
+    expect(result.replies.map((reply) => [reply.keyword.word, reply.outcome, reply.told])).toEqual([
+      ["CANCEL", "replied", [LEES]],
+      ["STOP", "replied", [LEES]],
+    ]);
+    // The reply's and the notice's words are written once each, on the newest text's reply.
+    expect(result.replies.map((reply) => reply.rowsWritten)).toEqual([
+      [],
+      ["out-turn-alex-cancel-stop-stopReply", "out-turn-alex-cancel-stop-biz-lees-barbershop-texts-off"],
+    ]);
+    expect(fake.plans.map((plan) => plan.finalParts.fixedLines)).toEqual([["stopReply"], ["stopToBusiness"]]);
+  });
+
+  it("HELP beside STOP keeps both actions: each HELP its own sendFixedLine, the one record in the place of the phone's first word", async () => {
+    const beside = keyedCore();
+
+    const { result } = await alexTurn("turn-alex-stop-help", [
+      keywordText("evt-alex-0851", "STOP", STOP),
+      keywordText("evt-alex-0852", "HELP", HELP),
+    ]);
+
+    expect(beside.commits.map((commit) => commit.actions.map((action) => action.call))).toEqual([
+      ["recordStopOrStart", "sendFixedLine"],
+    ]);
+    // HELP is answered as before: refused from a stopped number (phoneStopped), its one reply T-268's.
+    expect(answered(result.replies)).toEqual([
+      ["STOP", "replied", "stopReply", true, null],
+      ["HELP", "refused", null, null, "phoneStopped"],
+    ]);
+
+    const mixed = keyedCore();
+
+    const { result: mixedResult } = await alexTurn("turn-alex-help-mixed", [
+      keywordText("evt-alex-0853", "HELP", HELP),
+      keywordText("evt-alex-0854", "START", START),
+      keywordText("evt-alex-0855", "help", HELP),
+      keywordText("evt-alex-0856", "Stop", STOP),
+    ]);
+
+    expect(mixed.commits.map((commit) => commit.actions.map((action) => action.call))).toEqual([
+      ["sendFixedLine", "recordStopOrStart", "sendFixedLine"],
+    ]);
+    expect(recordsOf(mixed)).toMatchObject([
+      [{ kind: "stop", inboundEventId: "evt-alex-0856", words: "Stop" }],
+    ]);
+    // The HELP before the phone's first word meets the phone on; the HELP after it meets the phone as its newest word,
+    // the STOP, leaves it, though the word just before that HELP was START.
+    expect(answered(mixedResult.replies)).toEqual([
+      ["HELP", "replied", "helpReply", null, null],
+      ["START", "replied", "stopReply", true, null],
+      ["HELP", "refused", null, null, "phoneStopped"],
+      ["STOP", "replied", "stopReply", true, null],
+    ]);
+  });
+
+  it("every word of the phone is answered from the one action when it fails too: not recorded, and the rerun lands the same one record", async () => {
+    const fake = keyedCore();
+    const texts = [
+      keywordText("evt-alex-0861", "STOP", STOP),
+      keywordText("evt-alex-0862", "Start", START),
+      keywordText("evt-alex-0863", "stop", STOP),
+    ];
+    fake.down = true;
+
+    const first = await alexTurn("turn-alex-rerun", texts);
+
+    expect(first.result.replies.map((reply) => [reply.outcome, reply.errorCode])).toEqual([
+      ["notRecorded", "noAnswer"],
+      ["notRecorded", "noAnswer"],
+      ["notRecorded", "noAnswer"],
+    ]);
+    expect(first.result.rerun).toBe(true);
+
+    fake.down = false;
+    const second = await alexTurn("turn-alex-rerun", texts);
+
+    // Each run carries the same one record, so the turn's key gives its rows once.
+    const [down, up] = recordsOf(fake);
+    expect(down).toEqual(up);
+    expect(up).toMatchObject([{ kind: "stop", inboundEventId: "evt-alex-0863", words: "stop" }]);
+    expect(answered(second.result.replies)).toEqual([
+      ["STOP", "replied", "stopReply", true, null],
+      ["START", "replied", "stopReply", true, null],
+      ["STOP", "replied", "stopReply", true, null],
+    ]);
+    expect(second.result.rerun).toBe(false);
+    expect(fake.consents).toHaveLength(1);
   });
 });

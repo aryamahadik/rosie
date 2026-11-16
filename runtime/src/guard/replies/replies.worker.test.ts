@@ -856,8 +856,8 @@ describe("the owner is told (S2-08; S13-32 and RULES 7.5 through K-09 v1.1 busin
   });
 });
 
-describe("several keyword texts in one turn: one commit, in arrival order", () => {
-  it("STOP, then HELP, then START: HELP is refused while stopped, START turns texts back on", async () => {
+describe("several keyword texts in one turn: one commit, in arrival order, one record per phone (T-1416)", () => {
+  it("STOP, then HELP, then START: one record, the START (the newest word), in the STOP's place; HELP is answered, START keeps texts on", async () => {
     const fake = fakeCore(stopTellsBusinesses.given.now, [alex()]);
     wire(fake);
 
@@ -871,14 +871,97 @@ describe("several keyword texts in one turn: one commit, in arrival order", () =
     expect(fake.commits[0]?.actions.map((action) => action.call)).toEqual([
       "recordStopOrStart",
       "sendFixedLine",
-      "recordStopOrStart",
     ]);
-    expect(result.replies.map((reply) => [reply.keyword.kind, reply.outcome, reply.errorCode])).toEqual([
-      ["stop", "replied", null],
-      ["help", "refused", "phoneStopped"],
-      ["start", "replied", null],
+    expect(fake.commits[0]?.actions[0]?.request).toMatchObject({
+      kind: "start",
+      inboundEventId: "evt-alex-0403",
+      words: "START",
+      alsoCancelVisit: false,
+    });
+    // The phone is never stopped in this turn: the STOP is answered from the START's record, and HELP gets its reply.
+    expect(
+      result.replies.map((reply) => [reply.keyword.kind, reply.outcome, reply.line, reply.errorCode]),
+    ).toEqual([
+      ["stop", "replied", "startReply", null],
+      ["help", "replied", "helpReply", null],
+      ["start", "replied", "startReply", null],
     ]);
     expect(fake.phones.get("+15555550101")).toMatchObject({ stopped: false, chatOpen: true });
+    expect(fake.consents.map((consent) => consent.revoked)).toEqual([false]);
+  });
+
+  it("START, then HELP, then STOP: one record, the STOP, in the START's place; HELP is refused while stopped, and only the stop reply goes", async () => {
+    const fake = fakeCore(stopTellsBusinesses.given.now, [alex()]);
+    wire(fake);
+
+    const { result } = await turn(alex(), "turn-alex-three-stop", [
+      typed("evt-alex-0404", "START"),
+      typed("evt-alex-0405", "HELP"),
+      typed("evt-alex-0406", "STOP"),
+    ]);
+
+    expect(fake.commits).toHaveLength(1);
+    expect(fake.commits[0]?.actions.map((action) => action.call)).toEqual([
+      "recordStopOrStart",
+      "sendFixedLine",
+    ]);
+    expect(fake.commits[0]?.actions[0]?.request).toMatchObject({
+      kind: "stop",
+      inboundEventId: "evt-alex-0406",
+      words: "STOP",
+    });
+    expect(
+      result.replies.map((reply) => [reply.keyword.kind, reply.outcome, reply.line, reply.errorCode]),
+    ).toEqual([
+      ["start", "replied", "stopReply", null],
+      ["help", "refused", null, "phoneStopped"],
+      ["stop", "replied", "stopReply", null],
+    ]);
+    expect(fake.phones.get("+15555550101")).toMatchObject({ stopped: true, chatOpen: false });
+    expect(fake.consents.map((consent) => consent.revoked)).toEqual([true]);
+
+    // Through the real dispatcher: Alex gets exactly one text, the stop reply, past the opt-out.
+    const { linq } = await dispatch(fake, seedRowsOf(fake));
+    expect(sentTo(linq.requests, "+15555550101")).toEqual([[Q01_DRAFTED.stopReply, true]]);
+    expect(linq.requests).toHaveLength(1);
+  });
+
+  it("STOP, then Stop!, keyed by the turn as K-09 keys it: the turn lands with one record, and exactly one stop reply goes (T-267's note a)", async () => {
+    const fake = fakeCore(stopRecorded.given.now, [ben()]);
+    fake.keyedByTurn = true;
+    wire(fake);
+
+    const { result } = await turn(ben(), "turn-ben-stop-stop", [
+      typed("evt-ben-0007", "STOP"),
+      typed("evt-ben-0008", "Stop!"),
+    ]);
+
+    expect(fake.commits).toHaveLength(1);
+    expect(fake.commits[0]?.actions).toMatchObject([
+      {
+        call: "recordStopOrStart",
+        request: { kind: "stop", inboundEventId: "evt-ben-0008", words: "Stop!" },
+      },
+    ]);
+    expect(result.replies.map((reply) => [reply.outcome, reply.line, reply.stopped])).toEqual([
+      ["replied", "stopReply", true],
+      ["replied", "stopReply", true],
+    ]);
+    expect(result.rerun).toBe(false);
+    expect(fake.consents.map((consent) => [consent.id, consent.revoked])).toEqual([
+      ["consent-turn-ben-stop-stop", true],
+    ]);
+
+    const { report, linq } = await dispatch(fake, seedRowsOf(fake));
+    expect(report.rows).toEqual([
+      {
+        outboxRowId: "out-turn-ben-stop-stop-stopReply",
+        recipientHandleId: "handle-ben",
+        outcome: "sent",
+        partsSent: 1,
+      },
+    ]);
+    expect(sentTo(linq.requests, "+15555550131")).toEqual([[Q01_DRAFTED.stopReply, true]]);
   });
 });
 
