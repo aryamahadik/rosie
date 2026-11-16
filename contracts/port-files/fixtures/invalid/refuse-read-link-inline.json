@@ -1,0 +1,20 @@
+{
+  "call": "readLink",
+  "given": {
+    "now": "2026-10-20T15:02:00Z",
+    "note": "read-link-logged.json's link served inline: refused, since every file is served as an attachment with nosniff, so no stored file runs as a page (K-35 v1 default 20)."
+  },
+  "request": {
+    "objectKey": "licenseFile/2026-10-19/r1l3y8b4r5l9c2n6s0p7h3t5k1",
+    "file": { "table": "document_files", "id": "docfile-riley-barber-license-photo" },
+    "viewer": { "as": "business", "personId": "person-sam" },
+    "lifeSeconds": 300
+  },
+  "outcome": {
+    "result": "link",
+    "url": "https://files.example/read/placeholder-signed-riley-license-1",
+    "expiresAt": "2026-10-20T15:07:00Z",
+    "disposition": "inline",
+    "noSniff": true
+  }
+}

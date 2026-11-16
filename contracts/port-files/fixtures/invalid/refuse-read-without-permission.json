@@ -1,0 +1,19 @@
+{
+  "call": "readLink",
+  "given": {
+    "now": "2026-10-20T15:02:00Z",
+    "note": "read-link-logged.json with no viewer: a link asked before anyone checked who will see Riley's license photo, and so with no view to log. Refused."
+  },
+  "request": {
+    "objectKey": "licenseFile/2026-10-19/r1l3y8b4r5l9c2n6s0p7h3t5k1",
+    "file": { "table": "document_files", "id": "docfile-riley-barber-license-photo" },
+    "lifeSeconds": 300
+  },
+  "outcome": {
+    "result": "link",
+    "url": "https://files.example/read/placeholder-signed-riley-license-1",
+    "expiresAt": "2026-10-20T15:07:00Z",
+    "disposition": "attachment",
+    "noSniff": true
+  }
+}

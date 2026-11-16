@@ -1,0 +1,20 @@
+{
+  "call": "readLink",
+  "given": {
+    "now": "2026-10-20T15:02:00Z",
+    "note": "Sam, Lee's Barbershop's owner, opens Riley's barber license photo from the portal's Team page (K-35 seed-license-as-given.json: document_files row docfile-riley-barber-license-photo, its key sealed under Riley's key; K-35's readers: the owner in the portal, each view logged). The page entry has checked that Sam may see it (ground business), unsealed the key on the server and asks for a 5-minute link. The call's span, span-read-link-logged.json, is the view's log line: Sam, on the ground business, the row's file, at 15:02. The address is a placeholder."
+  },
+  "request": {
+    "objectKey": "licenseFile/2026-10-19/r1l3y8b4r5l9c2n6s0p7h3t5k1",
+    "file": { "table": "document_files", "id": "docfile-riley-barber-license-photo" },
+    "viewer": { "as": "business", "personId": "person-sam" },
+    "lifeSeconds": 300
+  },
+  "outcome": {
+    "result": "link",
+    "url": "https://files.example/read/placeholder-signed-riley-license-1",
+    "expiresAt": "2026-10-20T15:07:00Z",
+    "disposition": "attachment",
+    "noSniff": true
+  }
+}

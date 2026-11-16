@@ -1,0 +1,24 @@
+{
+  "call": "serverWrite",
+  "given": {
+    "now": "2026-10-19T14:20:09Z",
+    "note": "server-write-linq-photo.json's first try stored the photo but its answer never came back, so the Linq side tries again with the same writeId and bytes (arch 10 line 540): the same hash is already under the key, so nothing is written again and the first storedAt comes back with repeated true."
+  },
+  "request": {
+    "kind": "photo",
+    "owner": { "kind": "business", "businessId": "biz-lees-barbershop" },
+    "mediaType": "image/jpeg",
+    "sizeBytes": 1650000,
+    "sha256": "0f9e8d7c6b5a493827160f9e8d7c6b5a493827160f9e8d7c6b5a493827160f9e",
+    "writeId": "l4q9p2r7c6e1s8u3n0k5m2v9x3",
+    "day": "2026-10-19",
+    "visibility": "private",
+    "source": { "kind": "linq", "eventId": "evt-sam-0004", "attachmentId": "att-sam-price-list" }
+  },
+  "outcome": {
+    "result": "stored",
+    "objectKey": "photo/2026-10-19/l4q9p2r7c6e1s8u3n0k5m2v9x3",
+    "storedAt": "2026-10-19T14:20:03Z",
+    "repeated": true
+  }
+}

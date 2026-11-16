@@ -1,0 +1,24 @@
+{
+  "call": "uploadLink",
+  "given": {
+    "now": "2026-11-03T00:12:10Z",
+    "note": "On the water heater's photos page (K-21 v1.2 secureUpload; A4-07), Alex picks a second photo of 12,000,000 bytes, over the 10 MiB: no link and no key, tooLarge, which the page entry answers as K-21's tooLarge. The booking's file, from Alex (K-30 seed-quote-owner-ok.json: booking-alex-water-heater)."
+  },
+  "request": {
+    "kind": "photo",
+    "owner": {
+      "kind": "booking",
+      "businessId": "biz-lee-home-services",
+      "bookingId": "booking-alex-water-heater",
+      "personId": "person-alex"
+    },
+    "mediaType": "image/heic",
+    "sizeBytes": 12000000,
+    "visibility": "private",
+    "lifeSeconds": 600
+  },
+  "outcome": {
+    "error": "tooLarge",
+    "maxBytes": 10485760
+  }
+}

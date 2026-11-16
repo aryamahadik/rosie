@@ -1,0 +1,20 @@
+{
+  "call": "readLink",
+  "given": {
+    "now": "2026-10-30T16:00:00Z",
+    "note": "K-21 v1.1 readListing (its listing-barbershop.json): Lee's Barbershop's public listing shows its shop-front photo (K-23 business_photos photo-lees-barbershop-front) to anyone. The object stays private; the page gets a 10-minute link, the same address and end as that fixture's. No person views it by name (ground listing). K-23's seed holds a placeholder key written before K-13 froze; this is the key in K-13's form (README open gaps)."
+  },
+  "request": {
+    "objectKey": "photo/2026-10-19/f9r2n7t4s1h6p3o8m5c0k2x7v4",
+    "file": { "table": "business_photos", "id": "photo-lees-barbershop-front" },
+    "viewer": { "as": "listing", "personId": null },
+    "lifeSeconds": 600
+  },
+  "outcome": {
+    "result": "link",
+    "url": "https://files.example/placeholder-signed-read-front",
+    "expiresAt": "2026-10-30T16:10:00Z",
+    "disposition": "attachment",
+    "noSniff": true
+  }
+}

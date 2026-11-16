@@ -1,0 +1,25 @@
+{
+  "trace_id": "trace-job-erasure-riley-0001",
+  "span_id": "span-job-erasure-riley-0001-03",
+  "seq": 3,
+  "hop": "portCall",
+  "at": "2026-11-02T09:15:00.050Z",
+  "ms": 21,
+  "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "turn_id": null,
+  "job_id": "job-erasure-riley",
+  "handle_ref": null,
+  "business_id": "biz-lees-barbershop",
+  "provider": "r2",
+  "call": "deleteObject",
+  "attempt": 1,
+  "got": {
+    "kind": "licenseFile",
+    "fileTable": "document_files",
+    "fileRow": "docfile-riley-barber-license-photo",
+    "erasureOf": "person-riley"
+  },
+  "decided": { "result": "deleted", "alreadyGone": false },
+  "outcome": "ok",
+  "error_code": null
+}

@@ -1,0 +1,15 @@
+{
+  "call": "checkUpload",
+  "given": {
+    "now": "2026-10-19T14:56:00Z",
+    "note": "The price-list link of upload-price-list-photo.json lapsed at 14:55 with no file sent to it: notStored. The page entry answers K-21's uploadNotFound, nothing is kept, and a new try asks for a new link."
+  },
+  "request": {
+    "objectKey": "priceList/2026-10-19/h3n8c5v2x7m4k9q1t6b0p3r8s5",
+    "mediaType": "image/jpeg",
+    "maxBytes": 10485760
+  },
+  "outcome": {
+    "result": "notStored"
+  }
+}
