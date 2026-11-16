@@ -12,10 +12,11 @@ import { CommitNotBuiltError } from "../errors";
 /**
  * Why a core action is not built in a turn's commit:
  *   - noService: no shared-core service runs it yet (M3b's other core calls, each its own task), or its name is no K-09
- *     v1 call at all;
+ *     v1 call at all; or, for sendFixedLine, a line no service sends in a turn yet, or an actor's send to record
+ *     (core.ts default 8);
  *   - portNotWired: its service is built, but a port it reads is not wired yet (the service's own NotBuiltError:
  *     K-34's reads, the sealer, the plug-in's stop words, hand-offs and pages, an address pause's sealer), or no
- *     flags port is bound for recordStopOrStart and setRecordFlag (core.ts default 5; DL-864).
+ *     flags port is bound for recordStopOrStart, setRecordFlag and sendFixedLine (core.ts defaults 5 and 8; DL-864).
  * A run that arms clock rows no question owns is no longer one (T-1156 retired T-1140's clockRows gap): its clock rows
  * ride in its writes (UnitWrites.clocks), and the turn's commit writes each (DL-341: no clock is ever dropped).
  */
