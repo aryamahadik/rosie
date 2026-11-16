@@ -2,9 +2,58 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 687, [`8658b20`](https://github.com/aryamahadik/rosie/commit/8658b20), 2026-11-16 00:52:21 UTC.
+- **Through:** commit 689, [`a9de0d1`](https://github.com/aryamahadik/rosie/commit/a9de0d1), 2026-11-16 03:43:34 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 689. docs: COMMIT\_HISTORY.md through commit 687 (8658b20, \#697) (\#699)
+
+- **Commit:** [`a9de0d1`](https://github.com/aryamahadik/rosie/commit/a9de0d1), by Arya Mahadik, 2026-11-16 03:43:34 UTC
+- **Pull request:** [#699](https://github.com/aryamahadik/rosie/pull/699) from `task/commit-history-139`, merged 2026-11-16 03:43:34 UTC. It squashed 1 branch commit:
+  - `5e3a143` docs: COMMIT\_HISTORY.md through commit 687 (8658b20, \#697)
+- **Files changed:** 1 (+47 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +47 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 232 (DL-863); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 688. T-022: freeze K-13 v1, the Files port (R2): six calls, the private object key, the K-08 span, 32 fixtures, the spike's read-only findings and the freeze record (\#700)
+
+- **Commit:** [`dc38981`](https://github.com/aryamahadik/rosie/commit/dc38981), by Arya Mahadik, 2026-11-16 03:43:29 UTC
+- **Pull request:** [#700](https://github.com/aryamahadik/rosie/pull/700) from `task/T-022`, merged 2026-11-16 03:43:29 UTC. It squashed 2 branch commits:
+  - `71c8292` T-022: freeze K-13 v1, the files port (R2): uploadLink, checkUpload, …
+  - `3e78ac4` T-022: the README's open gaps quote RULES 4.10 and B10-17 and K-15 v1…
+- **Files changed:** 36 (+2289 −0), by folder:
+  - `contracts/port-files/` README.md +200 −0, frozen.json +1 −0, port-files.v1.schema.json +1125 −0
+  - `contracts/port-files/fixtures/` check-upload-not-stored.json +15 −0, check-upload-stored.json +18 −0, check-upload-wrong-type.json +17 −0, delete-already-gone.json +17 −0, delete-erasure.json +17 −0, error-unavailable.json +21 −0, index.json +260 −0, read-link-listing-photo.json +20 −0, read-link-logged.json +20 −0, read-link-not-found.json +16 −0, server-read-photo.json +16 −0, server-write-done-photo.json +29 −0, server-write-linq-photo.json +24 −0, server-write-parquet.json +24 −0, server-write-repeat.json +24 −0, server-write-report.json +29 −0, server-write-sealed-trace.json +24 −0, span-delete-erasure.json +25 −0, span-read-link-logged.json +26 −0, span-upload-link.json +20 −0, upload-id-document.json +24 −0, upload-price-list-photo.json +24 −0, upload-too-large.json +24 −0
+  - `contracts/port-files/fixtures/invalid/` refuse-caller-names-key.json +25 −0, refuse-delete-without-erasure.json +17 −0, refuse-id-document-for-business.json +24 −0, refuse-key-in-span.json +27 −0, refuse-listing-read-of-id-document.json +20 −0, refuse-public-object.json +24 −0, refuse-read-link-inline.json +20 −0, refuse-read-without-permission.json +19 −0, refuse-svg-upload.json +24 −0, refuse-upload-too-large-ready.json +29 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-022: freeze K-13 v1, the files port (R2): uploadLink, checkUpload, readLink, serverWrite, serverRead and deleteObject, the object key, the K-08 span, 22 accepted and 10 refused fixtures, the spike's read-only findings, the freeze record and frozen.json
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-022: the README's open gaps quote RULES 4.10 and B10-17 and K-15 v1's 'What may be kept'; 'Frozen before it' adds the K-07 and K-08 lines
+
+The builder's three wording edits, left uncommitted when its run ended before its self-check finished (nothing failed); each citation checked against its source by the lead, and prettier --check passed on the file.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 687. docs: COMMIT\_HISTORY.md through commit 685 (8c7b071, \#696) (\#697)
 
