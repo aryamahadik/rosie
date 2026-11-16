@@ -7,11 +7,12 @@
 //     reads with the texts' arrival, the sealer, the pinned bundle's checked lines (with the core's line rule on top:
 //     lines.ts), the plug-in's stop words and who is told. Each text of a turn carries its record, No included (K-09
 //     README default 5; runtime/src/turn/turn.ts), and its answer's hold binds what follows it.
+//   - The clock rows a run arms that no question owns (a threat's pause call-offs, S11-62; T-319's escalations), which the
+//     service hands back beside its writes, are handed over in them (UnitWrites.clocks; T-1156), so the turn's one commit
+//     writes each with its event-log entry and none is ever dropped (DL-341).
 //   - Every other core action answers notBuilt (CoreNotBuiltError), as does a name K-09 v1 does not hold: M3b's other core
-//     calls are each their own task. So does a safety call whose port is not wired yet (the service's NotBuiltError), and
-//     a run that arms clock rows no question owns (a threat's pause call-offs, T-319's escalations): UnitWrites has no
-//     list for them until T-1156, and none is ever dropped (DL-341). gateAndCommit then answers notBuilt, and nothing of
-//     the turn is written.
+//     calls are each their own task. So does a safety call whose port is not wired yet (the service's NotBuiltError).
+//     gateAndCommit then answers notBuilt, and nothing of the turn is written.
 //   - A refused core action stops only itself (K-09 v1 coreResult): its error comes back in its result and it writes
 //     nothing. What K-09 has no answer for (the safety service's SafetyRefusedError, a fault) fails the turn, unchanged.
 //
@@ -41,7 +42,7 @@ import type {
 import { recordSafetyOutcomeCore, releaseSafetyHoldCore } from "../../domain/safety";
 import { NotBuiltError, isCallName, type CallName, type Caller } from "../../tool-api";
 import { CommitRefusedError } from "../errors";
-import type { CommitPorts, CommitTurnContext, CoreAction, CoreRun } from "../types";
+import type { ClockNew, CommitPorts, CommitTurnContext, CoreAction, CoreRun } from "../types";
 import { CoreNotBuiltError } from "./errors";
 import { coreSafetyLines } from "./lines";
 
@@ -77,8 +78,18 @@ function checkCaller(caller: Caller, turn: CommitTurnContext): void {
 }
 
 /**
- * One safety call's run as the commit takes it: a port not wired answers notBuilt (default 4), and so does a run that arms
- * clock rows the turn's commit has no list for (DL-341), so none is dropped; otherwise its result and writes.
+ * A core action's run with the clock rows its service armed beside its writes handed over in them (UnitWrites.clocks,
+ * after any the writes already carry), so the turn's one commit writes each (T-1156; DL-341: none is ever dropped). A run
+ * that arms none is handed on as it is.
+ */
+function withClocks(run: CoreRun, clocks: readonly ClockNew[]): CoreRun {
+  if (clocks.length === 0) return run;
+  return { ...run, writes: { ...run.writes, clocks: [...(run.writes.clocks ?? []), ...clocks] } };
+}
+
+/**
+ * One safety call's run as the commit takes it: a port not wired answers notBuilt (default 4); otherwise its result and
+ * writes, with the clock rows it arms that no question owns handed over in them (withClocks).
  */
 async function committable(core: CallName, run: () => Promise<SafetyCoreRun>): Promise<CoreRun> {
   let ran: SafetyCoreRun;
@@ -88,8 +99,7 @@ async function committable(core: CallName, run: () => Promise<SafetyCoreRun>): P
     if (error instanceof NotBuiltError) throw new CoreNotBuiltError(core, "portNotWired", error);
     throw error;
   }
-  if (ran.clocks.length > 0) throw new CoreNotBuiltError(core, "clockRows");
-  return ran.run;
+  return withClocks(ran.run, ran.clocks);
 }
 
 /** The name of a core action K-09 v1 does not hold, or holds with no service yet: never the caller's own text. */

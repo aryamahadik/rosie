@@ -112,10 +112,10 @@ export interface Ask {
 
 /**
  * What one unit writes in the turn's commit: a part the gate passed (the effects of the choice decide picked: arch 02 line
- * 121; K-09 v1 README "In a turn or alone"), or one core action of the turn. Every list is present, empty when it has none.
- * The commit adds the rows it owns (an asked question's clock row) and the event-log entry of every row it writes; the
- * state writes' own entries come with them, since only the domain knows their kind (`stateEvents`; K-08 v1.1 open gap:
- * setup writes have no kind yet, CQ-56).
+ * 121; K-09 v1 README "In a turn or alone"), or one core action of the turn. Every list is present, empty when it has none,
+ * but `clocks`, which may be left out (none). The commit adds the rows it owns (an asked question's clock row) and the
+ * event-log entry of every row it writes, a unit's own clock rows among them; the state writes' own entries come with
+ * them, since only the domain knows their kind (`stateEvents`; K-08 v1.1 open gap: setup writes have no kind yet, CQ-56).
  */
 export interface UnitWrites {
   readonly why: Why;
@@ -124,6 +124,14 @@ export interface UnitWrites {
   readonly state: readonly StateWrite[];
   readonly stateEvents: readonly EventEntry[];
   readonly asks: readonly Ask[];
+  /**
+   * The unit's own clock rows, beside the clock rows the commit makes for its asked questions (T-1156; DL-341): clock rows
+   * no question of the unit owns, in K-05 v1's clockNew shape as its service makes them, such as a threat's pause
+   * call-offs (S11-62: armed at the commit, with their due time) and T-319's escalations. The commit writes each as given,
+   * once, with its event-log entry (build.ts), so none is ever dropped. Optional, unlike the other lists, so every unit
+   * built without it (the walk's, T-317's unitWritesOf) stays as it is: left out, the unit has none.
+   */
+  readonly clocks?: readonly ClockNew[];
   /** The open questions it closes: answered, defaulted or withdrawn. */
   readonly closes: readonly OpenQuestionClose[];
   /** The clock rows it cancels: a closed question's own clock. */

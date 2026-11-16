@@ -5,9 +5,11 @@
 //   - a crisis outcome opens its hold, and a routine part after it is held;
 //   - an unknown or unbuilt core action answers notBuilt and writes nothing;
 //   - the same action twice gives the same writes.
-// And the lead's notes on the card: with bundle v0 pinned each danger outcome gets its line (DL-325, DL-341), a run that
-// arms clock rows answers notBuilt (DL-341), so does a port not wired, each core action is the turn's own call, and a
-// refused core action stops only itself.
+// And the lead's notes on the card: with bundle v0 pinned each danger outcome gets its line (DL-325, DL-341), a port not
+// wired answers notBuilt, each core action is the turn's own call, and a refused core action stops only itself.
+// T-1156's proofs (DL-341: no clock is ever dropped): a threat's record hands its pause call-off clock rows over in its
+// writes, and the turn's one commit writes them with their event-log entries; a repeated turn writes none twice; a run
+// with no clocks writes none.
 
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
@@ -45,11 +47,20 @@ import {
   type Committed,
   type CoreAction,
   type CoreRun,
+  type EventEntry,
   type GateAndCommitAnswer,
   type GateAndCommitRequest,
   type OpenHolds,
+  type StateWrite,
 } from "../index";
-import { doublePorts, k05Fake, type K05Fake, type PortCalls } from "../test-support";
+import {
+  contractChecks,
+  doublePorts,
+  eventLogRowsOf,
+  k05Fake,
+  type K05Fake,
+  type PortCalls,
+} from "../test-support";
 import {
   CoreNotBuiltError,
   STRICTEST_LINE,
@@ -540,40 +551,219 @@ describe("an unknown or unbuilt core action answers notBuilt and writes nothing"
 
 // ---------------------------------------------------------------------------------------------------------------
 
-describe("a run that arms clock rows answers notBuilt until T-1156: no clock is ever dropped (DL-341)", () => {
+describe("a run's clock rows ride in its writes, and the turn's one commit writes each with its entry, once (T-1156; DL-341)", () => {
   /** Alex's Nov 14 visit with Riley at the barbershop, as T-317's flag-paused.json covers it (S11-62). */
   const NOV14 = {
     bookingId: "booking-alex-riley-nov14",
     startsAt: "2026-11-14T15:00:00Z",
     zone: "America/New_York",
   };
+  /** S11-62's call-off time for that visit: 7pm the day before it, in its zone (Nov 13, 7pm in New York). */
+  const CALL_OFF_DUE = "2026-11-14T00:00:00Z";
 
-  it("a threat with a later visit: its pauses arm call-off clocks, so the record answers notBuilt and writes nothing", async () => {
+  /** Alex's threat recorded in a turn of its own, about his Nov 14 visit, which the pauses' visits port covers. */
+  function threatWithVisit(world: SafetyWorld = safetyWorldOf()): {
+    request: GateAndCommitRequest;
+    deps: CoreDeps<unknown>;
+  } {
     const request = alexTurn([safetyRead("safety-threat.json")], { bookingId: NOV14.bookingId });
-    const { deps } = coreDoublesOn(safetyWorldOf(), { visits: { visitsOf: () => Promise.resolve([NOV14]) } });
+    const { deps } = coreDoublesOn(world, { visits: { visitsOf: () => Promise.resolve([NOV14]) } });
+    return { request, deps };
+  }
+
+  /** The ids of the pauses a turn's state writes insert, in order. */
+  function pauseIdsOf(state: readonly StateWrite[]): unknown[] {
+    return state.flatMap((write) =>
+      write.op === "insert" && write.table === "pauses" ? [write.values.id] : [],
+    );
+  }
+
+  /** A pause's call-off clock row for the Nov 14 visit (T-317's record-flag.ts; S11-62), armed and due at its time. */
+  function callOffOf(pauseId: unknown): unknown {
+    return expect.objectContaining({
+      kind: "step",
+      openQuestionId: null,
+      reservationId: null,
+      handleId: null,
+      businessId: BARBERSHOP,
+      bookingId: NOV14.bookingId,
+      fires: { step: "S11-62", branch: "callOff", pause_id: pauseId, no_fee: true },
+      due: { dueAt: CALL_OFF_DUE, dueZone: NOV14.zone },
+    });
+  }
+
+  /** A call-off clock row's event-log entry, as the commit writes it (build.ts default 6): Rosie's, with the record's why. */
+  function callOffEntryOf(clockId: string): EventEntry {
+    return {
+      id: `log-${clockId}-created`,
+      kind: "clock_row.created",
+      zone: null,
+      businessId: BARBERSHOP,
+      actorKind: "rosie",
+      actorPersonId: null,
+      actorRole: null,
+      tableName: "clock_rows",
+      rowId: clockId,
+      oldValues: null,
+      newValues: { kind: "step", state: "armed", due_at: CALL_OFF_DUE, due_zone: NOV14.zone },
+      sealed: null,
+      why: { step: "A3-22" },
+      approvedBy: null,
+      proofs: null,
+    };
+  }
+
+  /** gateAndCommit through runCore as built and limits 1 to 6 as passing doubles, on a K-05 fake each call shares. */
+  function commitOn(
+    k05: K05Fake,
+    request: GateAndCommitRequest,
+    deps: CoreDeps<unknown>,
+    call = callContext(BARBERSHOP),
+  ): Promise<GateAndCommitAnswer> {
+    const { ports } = doublePorts({ k05 });
+    return gateAndCommit(copy(request), call, {
+      limits: scriptedLimits(),
+      ports: { ...ports, runCore: createRunCore(deps) },
+    });
+  }
+
+  it("a threat with a later visit: runCore hands its pauses' call-off clock rows over in its writes, as the service armed them", async () => {
+    const { request, deps } = threatWithVisit();
     const turn = turnContextOf(request);
     const action = recordOf(request, "evt-alex-0204");
-    // The service plans the record with both call-off clocks (S11-62), which UnitWrites has no list for yet.
+    // The service plans the record with one call-off clock row per pause (S11-62), beside its writes.
     const planned = await recordSafetyOutcomeCore(action, turn, copy(NOTHING_OPEN), {
       ...deps.safety,
       lines: coreSafetyLines(deps.safety.lines),
     });
     expect(planned.clocks).toHaveLength(2);
     expect(planned.run.writes.state.map((write) => write.table)).toContain("pauses");
-    // So runCore answers notBuilt for it rather than write the pauses without their clocks.
-    await expect(createRunCore(deps)(action, turn, copy(NOTHING_OPEN))).rejects.toMatchObject({
-      name: "CoreNotBuiltError",
-      core: "recordSafetyOutcome",
-      gap: "clockRows",
-      call: "gateAndCommit",
+    expect(planned.run.writes).not.toHaveProperty("clocks");
+    // runCore hands them over in the run's writes as given (its writes carried none), and changes nothing more of the run.
+    const run = await createRunCore(deps)(action, turn, copy(NOTHING_OPEN));
+    expect(run).toEqual({
+      result: planned.run.result,
+      writes: { ...planned.run.writes, clocks: planned.clocks },
     });
-    // And the turn writes nothing at all.
-    const { ports, k05, ran } = commitWith(deps);
-    await expect(
-      gateAndCommit(request, callContext(BARBERSHOP), { limits: scriptedLimits(), ports }),
-    ).rejects.toBeInstanceOf(CoreNotBuiltError);
-    expect(ran).toEqual(["recordSafetyOutcome"]);
-    expect(k05.requests).toEqual([]);
+    responseOf(run);
+    const pauseIds = pauseIdsOf(run.writes.state);
+    expect(pauseIds).toHaveLength(2);
+    expect(run.writes.clocks).toHaveLength(2);
+    expect(run.writes.clocks).toEqual(expect.arrayContaining(pauseIds.map(callOffOf)));
+    // Run again before anything is committed (a repeated turn runs runCore first), it hands over the same clock rows.
+    expect(await createRunCore(deps)(action, turn, copy(NOTHING_OPEN))).toEqual(run);
+  });
+
+  it("the turn's one commit writes the pauses with both call-off clock rows and one entry each, under the turn id; K-05 v1.1 and K-08 v1.1 take them", async () => {
+    const { request, deps } = threatWithVisit();
+    const k05 = k05Fake();
+    const call = callContext(BARBERSHOP);
+    const answer = await commitOn(k05, request, deps, call);
+    if ("error" in answer || answer.result !== "committed") throw new Error("the turn commits");
+    expect(answer).toMatchObject({
+      repeated: false,
+      core: [{ call: "recordSafetyOutcome", response: { hold: { releaseRule: "never" } }, error: null }],
+    });
+    expect(k05.requests).toHaveLength(1);
+    const [sent] = k05.requests;
+    if (sent === undefined) throw new Error("one commit was sent");
+    expect(sent.turn.id).toBe("turn-alex-core");
+    expect(contractChecks().k05("commitTurn.request", sent)).toEqual([]);
+    // The clock rows' entries as they land in K-04's event_log, held to K-08 v1.1. (The record's own entry carries its
+    // sealed words as K-05's base64, which the database writes as bytea: eventLogRowsOf does not convert it.)
+    const rows = eventLogRowsOf(sent, "2026-10-26T21:40:03Z").filter(
+      (row) => row.table_name === "clock_rows",
+    );
+    expect(rows).toHaveLength(2);
+    for (const row of rows) expect(contractChecks().k08("eventLogRow", row), String(row.id)).toEqual([]);
+    expect(contractChecks().k08("eventLogBatch", { rows })).toEqual([]);
+    // Both pauses, each with its call-off clock row: the turn's only clock rows, since it asks nothing.
+    const pauseIds = pauseIdsOf(sent.writes.state);
+    expect(pauseIds).toHaveLength(2);
+    const clocks = sent.writes.clockRows.make;
+    expect(clocks).toHaveLength(2);
+    expect(clocks).toEqual(expect.arrayContaining(pauseIds.map(callOffOf)));
+    const clockIds = clocks.map((clock) => String(clock.id));
+    expect(new Set(clockIds).size).toBe(2);
+    // Each clock row has its one entry, after its pause's own (pause.set: the state writes' entries come first).
+    for (const clockId of clockIds) {
+      expect(sent.writes.events.filter((entry) => entry.rowId === clockId)).toEqual([
+        callOffEntryOf(clockId),
+      ]);
+    }
+    const kinds = sent.writes.events.map((entry) => entry.kind);
+    expect(kinds.lastIndexOf("pause.set")).toBeLessThan(kinds.indexOf("clock_row.created"));
+    // K-05 wrote them in that one commit, under the turn's id; the answer's `written` lists none of the core action's
+    // rows (commit.ts default 9), and the call's span keeps every row written, the clock rows among them.
+    expect(k05.commits).toHaveLength(1);
+    expect(k05.commits[0]?.turnId).toBe("turn-alex-core");
+    expect(
+      k05.commits[0]?.written.filter((row) => row.table === "clock_rows").map((row) => row.rowId),
+    ).toEqual(clockIds);
+    expect(answer.written.written).toEqual([]);
+    expect(call.span.rows).toEqual(
+      expect.arrayContaining(clockIds.map((id) => ({ table: "clock_rows", id }))),
+    );
+  });
+
+  it("a repeated turn writes none twice: run again, it sends the same clock rows, and K-05 commits them once", async () => {
+    const { request, deps } = threatWithVisit();
+    const k05 = k05Fake();
+    const first = await commitOn(k05, request, deps);
+    const again = await commitOn(k05, request, deps);
+    expect(first).toMatchObject({ result: "committed", repeated: false });
+    expect(again).toMatchObject({ result: "committed", repeated: true, written: { written: [] } });
+    // The rerun builds the same request (the same clock rows under the same ids); K-05 answers it as the first commit.
+    expect(k05.requests).toHaveLength(2);
+    expect(k05.requests[1]).toEqual(k05.requests[0]);
+    expect(k05.requests[0]?.writes.clockRows.make).toHaveLength(2);
+    expect(k05.commits).toHaveLength(1);
+    const written = (k05.commits[0]?.written ?? [])
+      .filter((row) => row.table === "clock_rows")
+      .map((row) => row.rowId);
+    expect(written).toHaveLength(2);
+    expect(new Set(written).size).toBe(2);
+  });
+
+  it("once the first commit is read back, the record repeats: runCore hands over no clock row and nothing is written again", async () => {
+    const world = safetyWorldOf();
+    const { request, deps } = threatWithVisit(world);
+    const k05 = k05Fake();
+    await commitOn(k05, request, deps);
+    const [first] = k05.requests;
+    if (first === undefined) throw new Error("one commit was sent");
+    applySafetyWrites(world, first.writes.state, first.writes.outboxRows);
+    const run = await createRunCore(deps)(
+      recordOf(request, "evt-alex-0204"),
+      turnContextOf(request),
+      copy(NOTHING_OPEN),
+    );
+    expect(responseOf(run).repeated).toBe(true);
+    expect(run.writes).not.toHaveProperty("clocks");
+    expect(run.writes.state).toEqual([]);
+    const again = await commitOn(k05, request, deps);
+    expect(again).toMatchObject({ result: "committed", repeated: true });
+    expect(k05.requests[1]?.writes.clockRows.make).toEqual([]);
+    expect(k05.commits).toHaveLength(1);
+  });
+
+  it("a run with no clocks writes none: the threat with no later visit, and turn 1's No", async () => {
+    const threat = alexTurn([safetyRead("safety-threat.json")]);
+    const { request: s1_01Request } = s1_01();
+    for (const request of [threat, s1_01Request]) {
+      const [action] = request.core;
+      if (action === undefined) throw new Error("the turn carries its record");
+      const { deps } = coreDoublesOn(safetyWorldOf());
+      const run = await createRunCore(deps)(action, turnContextOf(request), copy(NOTHING_OPEN));
+      expect(run.writes, request.turn?.id).not.toHaveProperty("clocks");
+      const { k05 } = await committed(request, deps);
+      const [sent] = k05.requests;
+      expect(sent?.writes.clockRows, request.turn?.id).toEqual({ make: [], cancel: [] });
+      expect(
+        sent?.writes.events.filter((entry) => entry.tableName === "clock_rows"),
+        request.turn?.id,
+      ).toEqual([]);
+    }
   });
 
   it("the same threat with no later visit arms no clock: it records its never hold, the pauses and the owner's line", async () => {

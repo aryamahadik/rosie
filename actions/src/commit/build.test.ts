@@ -29,7 +29,7 @@ import {
   stringsIn,
   traceFor,
 } from "../tool-api/test-support";
-import { buildCommitRequest, k05TurnRow, questionClock, rowsNamedBy } from "./build";
+import { buildCommitRequest, k05TurnRow, questionClock, rowsNamedBy, type CommitUnit } from "./build";
 import { gateAndCommit } from "./commit";
 import { CommitRefusedError } from "./errors";
 import {
@@ -43,6 +43,7 @@ import {
   whyOfChoice,
 } from "./test-support";
 import type {
+  ClockNew,
   CommitDeps,
   CommitPorts,
   CommitTurnAnswer,
@@ -363,6 +364,200 @@ describe("rowsNamedBy names the rows one unit's writes write, by table and id, a
     };
     expect(rowsNamedBy(writes)).toEqual([]);
     expect(rowsNamedBy(noWrites({ step: "A3-22", choice: null }))).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// A unit's own clock rows (T-1156; DL-341)
+
+describe("buildCommitRequest writes a unit's own clock rows as given, once, each with its entry (T-1156; DL-341)", () => {
+  /**
+   * A pause's call-off clock row as T-317's setRecordFlag arms it for Alex's threat (record-flag.ts; S11-62; K-34
+   * seed-threat-pause.json's pauses): K-05 v1 clockNew, a step clock the minute sweep owns, armed at the commit and due
+   * 7pm the day before Alex's Nov 14 visit in its zone; or, `timed` false, the same row with no due time (written waiting).
+   */
+  function callOff(pauseId: string, timed = true): ClockNew {
+    const clock: ClockNew = {
+      id: `clock-call-off-${pauseId}`,
+      kind: "step",
+      openQuestionId: null,
+      reservationId: null,
+      handleId: null,
+      businessId: "biz-lees-barbershop",
+      bookingId: "booking-alex-riley-nov14",
+      fires: { step: "S11-62", branch: "callOff", pause_id: pauseId, no_fee: true },
+    };
+    return timed ? { ...clock, due: { dueAt: "2026-11-14T00:00:00Z", dueZone: "America/New_York" } } : clock;
+  }
+
+  /** S1-02's walk (samKindsWrites: S1-04's question asked, S1-02's closed with its clock cancelled) with clock rows of its own. */
+  function withClocks(clocks: readonly ClockNew[]): UnitWrites {
+    return { ...samKindsWrites(), clocks };
+  }
+
+  function built(units: readonly CommitUnit[]): CommitTurnRequest {
+    return buildCommitRequest({
+      turn: requestTurn(),
+      zone: "America/New_York",
+      businessId: "biz-lees-barbershop",
+      actor: { personId: "person-sam", roleAt: () => null },
+      units,
+    });
+  }
+
+  /** What building throws, or null. */
+  function thrownBy(units: readonly CommitUnit[]): unknown {
+    try {
+      built(units);
+      return null;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  it("each as given in K-05 v1's clockNew shape, after the asked question's clock row, with its clock_row.created entry; K-05 v1.1 and K-08 v1.1 take them", () => {
+    const clocks = [callOff("pause-alex-threat-person"), callOff("pause-alex-threat-phone")];
+    const writes = withClocks(clocks);
+    const request = built([{ writes, answer: null }]);
+    const [ask] = writes.asks;
+    if (ask === undefined) throw new Error("S1-02's walk asks S1-04");
+    expect(request.writes.clockRows).toEqual({
+      make: [questionClock(ask.question, ask.safeDefault), ...clocks],
+      cancel: [{ id: "clock-oq-s1-02", expectVersion: 2 }],
+    });
+    // One entry per clock row it writes, in the rows' order, after the question clock's.
+    const clockEntries = request.writes.events.filter((entry) => entry.tableName === "clock_rows");
+    expect(clockEntries.map((entry) => [entry.id, entry.kind, entry.rowId])).toEqual([
+      ["log-clock-oq-s1-02-cancelled", "clock_row.cancelled", "clock-oq-s1-02"],
+      ["log-clock-oq-s1-04-sam-created", "clock_row.created", "clock-oq-s1-04-sam"],
+      [
+        "log-clock-call-off-pause-alex-threat-person-created",
+        "clock_row.created",
+        "clock-call-off-pause-alex-threat-person",
+      ],
+      [
+        "log-clock-call-off-pause-alex-threat-phone-created",
+        "clock_row.created",
+        "clock-call-off-pause-alex-threat-phone",
+      ],
+    ]);
+    // Rosie's, with the unit's why and no approval, under the clock's business, armed with its due time and zone.
+    expect(clockEntries[2]).toEqual({
+      id: "log-clock-call-off-pause-alex-threat-person-created",
+      kind: "clock_row.created",
+      zone: "America/New_York",
+      businessId: "biz-lees-barbershop",
+      actorKind: "rosie",
+      actorPersonId: null,
+      actorRole: null,
+      tableName: "clock_rows",
+      rowId: "clock-call-off-pause-alex-threat-person",
+      oldValues: null,
+      newValues: {
+        kind: "step",
+        state: "armed",
+        due_at: "2026-11-14T00:00:00Z",
+        due_zone: "America/New_York",
+      },
+      sealed: null,
+      why: { step: "S1-02", choice: "All on the list" },
+      approvedBy: null,
+      proofs: null,
+    });
+    expect(contractChecks().k05("commitTurn.request", request)).toEqual([]);
+    const rows = eventLogRowsOf(request, "2026-10-19T18:05:05Z");
+    for (const row of rows) expect(contractChecks().k08("eventLogRow", row), String(row.id)).toEqual([]);
+    expect(contractChecks().k08("eventLogBatch", { rows })).toEqual([]);
+  });
+
+  it("a clock row with no due time is written as given and logged waiting", () => {
+    const waiting = callOff("pause-alex-threat-person", false);
+    const request = built([
+      { writes: { ...noWrites({ step: "A3-48", choice: null }), clocks: [waiting] }, answer: null },
+    ]);
+    expect(request.writes.clockRows).toEqual({ make: [waiting], cancel: [] });
+    expect(request.writes.clockRows.make[0]).not.toHaveProperty("due");
+    expect(request.writes.events).toEqual([
+      expect.objectContaining({
+        id: "log-clock-call-off-pause-alex-threat-person-created",
+        kind: "clock_row.created",
+        rowId: "clock-call-off-pause-alex-threat-person",
+        oldValues: null,
+        newValues: { kind: "step", state: "waiting" },
+        why: { step: "A3-48" },
+      }),
+    ]);
+    expect(contractChecks().k05("commitTurn.request", request)).toEqual([]);
+  });
+
+  it("a unit with `clocks` left out or empty writes no clock row of its own: the same request either way", () => {
+    const leftOut = built([{ writes: samKindsWrites(), answer: null }]);
+    expect(built([{ writes: withClocks([]), answer: null }])).toEqual(leftOut);
+    expect(leftOut.writes.clockRows.make.map((clock) => clock.id)).toEqual(["clock-oq-s1-04-sam"]);
+  });
+
+  it("no clock row is given twice: twice in one unit, once in each of two, or on an asked question's clock id, refuses the turn (idTwice)", () => {
+    const person = callOff("pause-alex-threat-person");
+    const onQuestion = { ...callOff("pause-alex-threat-phone"), id: "clock-oq-s1-04-sam" };
+    const core = (clocks: readonly ClockNew[]): CommitUnit => ({
+      writes: { ...noWrites({ step: "A3-22", choice: null }), clocks },
+      answer: null,
+    });
+    const cases: [string, CommitUnit[], string][] = [
+      ["twice in one unit", [core([person, person])], String(person.id)],
+      [
+        "once in each of two units",
+        [core([person]), { writes: withClocks([person]), answer: null }],
+        String(person.id),
+      ],
+      [
+        "on the asked question's clock id",
+        [{ writes: withClocks([onQuestion]), answer: null }],
+        "clock-oq-s1-04-sam",
+      ],
+    ];
+    for (const [what, units, id] of cases) {
+      const refused = thrownBy(units);
+      expect(refused, what).toBeInstanceOf(CommitRefusedError);
+      expect(refused, what).toMatchObject({ fault: "idTwice", ids: [id] });
+    }
+  });
+
+  it("a clock row the commit cannot read in K-05 v1's form throws before anything is built, naming no value; K-05 v1.1 refuses it too", () => {
+    const base = callOff("pause-alex-threat-person");
+    const cases: [string, ClockNew][] = [
+      ["no id", { ...base, id: "" }],
+      ["an id that is no text", { ...base, id: 7 }],
+      ["a kind K-04 does not hold", { ...base, kind: "callOff" }],
+      ["a business that is no id", { ...base, businessId: 42 }],
+      ["a due time with no zone", { ...base, due: { dueAt: "2026-11-14T00:00:00Z" } }],
+    ];
+    for (const [what, clock] of cases) {
+      const refused = thrownBy([{ writes: withClocks([clock]), answer: null }]);
+      expect(refused, what).toBeInstanceOf(TypeError);
+      expect((refused as Error).message, what).toBe(
+        "gateAndCommit: a unit's clock row is not in K-05 v1's clockNew form; nothing was written",
+      );
+      // K-05 v1.1's schema refuses the same row: code and contract agree.
+      const asSent = built([{ writes: samKindsWrites(), answer: null }]);
+      asSent.writes.clockRows.make.push(copy(clock));
+      expect(contractChecks().k05("commitTurn.request", asSent), what).not.toEqual([]);
+    }
+  });
+
+  it("rowsNamedBy names a unit's own clock rows after its questions' (default 8), each a row K-05's fake lists for the unit", async () => {
+    const writes = withClocks([callOff("pause-alex-threat-person"), callOff("pause-alex-threat-phone")]);
+    expect(rowsNamedBy(writes).filter((row) => row.table === "clock_rows")).toEqual([
+      { table: "clock_rows", rowId: "clock-oq-s1-04-sam" },
+      { table: "clock_rows", rowId: "clock-call-off-pause-alex-threat-person" },
+      { table: "clock_rows", rowId: "clock-call-off-pause-alex-threat-phone" },
+      { table: "clock_rows", rowId: "clock-oq-s1-02" },
+    ]);
+    const k05 = k05Fake();
+    await k05.commitTurn(built([{ writes, answer: null }]), callContext());
+    const listed = (k05.commits[0]?.written ?? []).map((row) => ({ table: row.table, rowId: row.rowId }));
+    expect(listed).toHaveLength(rowsNamedBy(writes).length);
+    expect(listed).toEqual(expect.arrayContaining(rowsNamedBy(writes)));
   });
 });
 
