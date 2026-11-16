@@ -424,16 +424,12 @@ describe("one compiled overlay per trade", () => {
     expect(step?.fallbackText).toMatch(/^Beard color needs a skin test/);
   });
 
-  it("insurance lists no facts (C5's fill is T-139's), and its settings are typed for each flow", () => {
+  it("insurance lists C5's facts, cpa.json's list in its order, and starts each flow at window and an empty cutoff (MC C5)", () => {
     const insurance = built.bundle.trades.insurance as Obj;
-    expect(insurance.facts).toBeNull();
-    for (const flow of ["A", "B"] as const) {
-      const settings = tradeFlow("insurance", flow).settings as { arrive: unknown; cutoff: unknown };
-      expect(
-        ["window", "setstart"].includes(settings.arrive as string) || typeof settings.arrive === "object",
-      ).toBe(true);
-      expect(settings.cutoff === null || typeof settings.cutoff === "string").toBe(true);
-    }
+    expect(insurance.facts).toStrictEqual(["forms", "firststeps", "documents", "video"]);
+    expect(insurance.facts).toStrictEqual(loadTrade("cpa").facts);
+    for (const flow of ["A", "B"] as const)
+      expect(tradeFlow("insurance", flow).settings).toStrictEqual({ arrive: "window", cutoff: null });
   });
 });
 
