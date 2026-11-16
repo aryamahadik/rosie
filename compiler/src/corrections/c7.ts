@@ -1,7 +1,8 @@
 // C7 (Master Corrections section 3; D96; RULES 10.1; S13-11; `switches.verify`): trade text that says Rosie or Rosie's
 // team checks, looks up or has read a license, permit, certificate, insurance or carrier status is the business's own
 // word; so is a trade's free-text rule that waits on a paper that "checks out", or says one is "checked like a license",
-// without saying who checks (the lead's ruling on MC C7, DL-884).
+// without saying who checks (the lead's ruling on MC C7, DL-884), or that says a paper is checked in another passive
+// wording with no checker named (its ruling on round 2's open question 1, DL-894).
 //
 // The trade files were never read one by one by a reviewer (MC section 6), and some still say Rosie checks a paper on an
 // official lookup: acupuncturist.json's pf.license.check, camp.json's pf.staff.license, movers.json's
@@ -11,14 +12,15 @@
 // (S13-11), and a step that waits on such a check waits on the business's own yes alone (DD). That wait is CQ-347's, not
 // this file's: C7 changes no gate, only words.
 //
-// How this build counts (c7.test.ts pins the list): CLAIM_PATTERNS, read in every text, flags 31 trade files, whose
+// How this build counts (c7.test.ts pins the list): CLAIM_PATTERNS, read in every text, flags 61 trade files, whose
 // texts name Rosie or Rosie's team as the one who checks; PASSIVE_PATTERNS, read in the 11 free-text pf blocks alone,
-// flags 28 more, whose rules wait on a paper that checks out, or check one like a license, and name no one who checks
-// (the pf.license blocks of 19 building trades; appraiser, energy-audit, home-engineer, inspector, surveyor, locksmith,
-// towing, property-manager and gym): 59 in all. A passive wait is read in the pf blocks alone: an op's words that wait on
-// a permit that checks out belong to a step that waits (movers.json's junk hauling, three of whose lines are messages a
-// person reads; driving-school.json's learner's permit, which the instructor checks in person), and those waits are
-// CQ-347's.
+// flags 41 more, whose rules wait on, or show, a paper checked by no one named: 102 in all (run 1 counted 31, round 2 59;
+// MC's Nov 4 count was 45). Round 3 (DL-894) added: a negation never reaches across a clause break (CLAUSE_BREAK), so
+// "Where a lookup has no data feed, a person on Rosie's team checks within 1 business day" is a claim; PAPER also reads
+// the place a paper is checked where a lookup has no feed; and PASSIVE_PATTERNS reads the other passive wordings. A
+// passive wording is read in the pf blocks alone: an op's words that wait on a permit that checks out belong to a step
+// that waits (movers.json's junk hauling, three of whose lines are messages a person reads; driving-school.json's
+// learner's permit, which the instructor checks in person), and those waits are CQ-347's.
 //
 // What this file changes: the trade's own text, wherever the compiled overlay holds it (K-01 tradeOverlay): the 11
 // free-text pf blocks (each stored whole, MC R3; K-01 pluginText says such text is the business's own word), every op's
@@ -36,8 +38,9 @@
 //
 // What this file gives:
 //   CLAIM_PATTERNS, PASSIVE_PATTERNS, PF_CLAIM_PATTERNS, patternsAt()
-//                                 the phrases that say Rosie checks a paper; those that wait on a paper no one named
-//                                 checks; the phrases read in a pf block; and the phrases read at a text's place.
+//                                 the phrases that say Rosie checks a paper; those that wait on, or show, a paper no one
+//                                 named checks; the phrases read in a pf block; and the phrases read at a text's place.
+//   PAPER                         what makes a text name a paper.
 //   findClaims(), ownWord()       the claims in one text, and the text with each run of them replaced.
 //   markClaims()                  the trade with each claim replaced, and every text changed, tagged MC:C7.
 //   renderMarks()                 the changes as diff lines, each starting with its tag.
@@ -67,13 +70,18 @@ const NO_PAPER = String.raw`(?:no|nothing|none|each job|the job|the total|the da
 /** One phrase that says Rosie checks a paper, and how many words before it a negation takes it back (NEGATION). */
 export interface ClaimPattern {
   pattern: RegExp;
-  /** Words looked at before the phrase for a negation: a number, or the whole sentence before it (Infinity). */
+  /**
+   * Words looked at before the phrase for a negation, in the phrase's own clause (CLAUSE_BREAK): a number (0: none),
+   * or the whole clause before it (Infinity).
+   */
   reach: number;
 }
 
 /**
  * The phrases that say Rosie or Rosie's team checks, looks up or has read a paper, each with an example from the trade
- * files. A phrase counts in a text that names a paper (PAPER), unless a negation comes within its reach before it.
+ * files. A phrase counts in a text that names a paper (PAPER), unless a negation comes within its reach before it, in
+ * its own clause: "Where a lookup has no data feed, a person on Rosie's team checks within 1 business day" (movers.json)
+ * is a claim (DL-894).
  */
 export const CLAIM_PATTERNS: readonly ClaimPattern[] = [
   // Rosie, or Rosie's team, checks, re-checks, looks up, has read, reads, verifies or confirms: "Rosie checks it on the
@@ -93,8 +101,8 @@ export const CLAIM_PATTERNS: readonly ClaimPattern[] = [
     ),
     reach: 3,
   },
-  // Checked by Rosie: "Licenses: Checked by Rosie on the state's lookup". Any negation before it in the sentence takes
-  // it back ("Rosie never says a certificate was checked by Rosie", doula.json).
+  // Checked by Rosie: "Licenses: Checked by Rosie on the state's lookup". Any negation before it in its clause takes it
+  // back ("Rosie never says a certificate was checked by Rosie", doula.json).
   {
     pattern: new RegExp(
       String.raw`\b(?:checked|re-?checked|verified|looked\s+up|confirmed|read)\s+by\s+${WHO}`,
@@ -110,7 +118,7 @@ export const CLAIM_PATTERNS: readonly ClaimPattern[] = [
     reach: 3,
   },
   // A paper on an official lookup, with no check verb of Rosie's around it: "each number on the state board's official
-  // lookup" (acupuncturist.json). Any negation before it in the sentence takes it back ("never checks a paper on an
+  // lookup" (acupuncturist.json). Any negation before it in its clause takes it back ("never checks a paper on an
   // official lookup").
   { pattern: /\b(?:on|against)\s+(?:the|an?)\s+[\w' ]{0,40}?official\s+lookup\b/i, reach: Infinity },
   // Rosie saw a paper on a lookup: "unless Rosie saw them on the certifier's own lookup" (restoration.json).
@@ -124,9 +132,11 @@ export const CLAIM_PATTERNS: readonly ClaimPattern[] = [
 
 /**
  * The phrases that wait on a paper that checks out, or say one is checked like a license, and name no one who checks
- * (the lead's ruling on MC C7, DL-884): while switch "verify" is off no one makes that check (C4), so such a rule is the
- * business's own word. They are read in a trade's free-text pf blocks alone (patternsAt), each with its trade file's
- * example. A phrase counts in a text that names a paper (PAPER), unless a negation comes within its reach before it.
+ * (the lead's ruling on MC C7, DL-884); and the other passive wordings of a paper checked with no checker named (its
+ * ruling on round 2's open question 1, DL-894). While switch "verify" is off no one makes that check (C4), so such a rule
+ * reads as a check Rosie made, and is the business's own word. They are read in a trade's free-text pf blocks alone
+ * (patternsAt), each with its trade file's example. A phrase counts in a text that names a paper (PAPER), unless a
+ * negation comes within its reach before it, in its own clause.
  */
 export const PASSIVE_PATTERNS: readonly ClaimPattern[] = [
   // A paper, or its numbers, that checks out or doesn't: "No concrete work goes live until the company's registration or
@@ -143,6 +153,44 @@ export const PASSIVE_PATTERNS: readonly ClaimPattern[] = [
   // asked and checked like a license" (gym.json), "the studio's number and each designer's are checked like any license"
   // (contractor.json).
   { pattern: /\bchecked\s+like\s+(?:a|an|any)\s+licen[cs]e\b/i, reach: 3 },
+  // The other passive wordings (the lead's ruling, DL-894): a paper checked, with no one named who checks.
+  // A paper, or its number, that is checked: "the city's or county's license is checked, by the customer's address"
+  // (hvac.json), "each one's number is checked" (contractor.json; interior), "its business registration is checked"
+  // (tree.json's wood yard).
+  {
+    pattern:
+      /\b(?:licen[cs]es?|registrations?|permits?|certificates?|credentials?|numbers?)\s+(?:is|are)\s+(?:re-?)?checked\b/i,
+    reach: 3,
+  },
+  // The license that is the one checked: "the license for the job's address is the one checked" (electrician.json).
+  { pattern: /\bis\s+the\s+one\s+checked\b/i, reach: 3 },
+  // Checked before a person is named on a job: "Trade subcontractors hold their own, checked before they're named on a
+  // job" (contractor.json; gutters, pool-builder, roofer, siding), "both are checked before they are named on a job"
+  // (irrigation.json).
+  { pattern: /\bchecked\s+before\s+(?:they're|they\s+are)\s+named\b/i, reach: 3 },
+  // A paper shown only once checked: "a certificate shows only once checked" (dog-trainer.json), "a national
+  // certificate is shown only once checked" (speech-therapist.json), "shown only as 'checked' once it is"
+  // (gunsmith.json).
+  { pattern: /\b(?:shows?|shown)\s+only\s+(?:once\s+checked|as\s+'checked'\s+once)\b/i, reach: 3 },
+  // A person checked for the papers a form asks: "a threader is checked for what the form asks instead (an ID, a
+  // course, insurance)" (lash-brow.json).
+  { pattern: /\bchecked\s+for\s+what\s+the\s+form\s+asks\b/i, reach: 3 },
+  // A rule that starts "Checked", its paper named by its block: "Checked on each renewal date from the state form"
+  // (cpa.json; funeral, lawyer, mortgage, realtor), "Checked each year, and on the date from the state's form"
+  // (advisor.json), "checked at sign-up and re-checked" (vehicle-inspection.json). "Checked by Rosie" is a phrase of
+  // CLAIM_PATTERNS.
+  { pattern: /^(?:re-?)?checked\b(?!\s+by\b)/i, reach: 3 },
+  // Credentials shown as checked: "Credentials show exactly as checked" (tax.json).
+  { pattern: /\b(?:shows?|shown)\s+(?:exactly\s+)?as\s+checked\b/i, reach: 3 },
+  // The business's word unless checked: "shown as 'as stated' unless it's checked" (coach.json), "shown as the
+  // business's word unless checked" (trainer.json).
+  { pattern: /\bunless\s+(?:it's\s+|it\s+is\s+)?checked\b/i, reach: 3 },
+  // Checked where required: "a coach's certificate and CPR card: a switch from the state's form (checked where
+  // required, otherwise the gym's word)" (gym.json).
+  { pattern: /\bchecked\s+where\s+required\b/i, reach: 3 },
+  // A wait on a paper confirmed by no one named: "customers see no permit claim until it's confirmed" (limo.json). No
+  // word before "until" takes the wait back (reach 0): the "no" there is the claim's, not the check's.
+  { pattern: /\buntil\s+(?:it's|it\s+is)\s+(?:confirmed|checked)\b/i, reach: 0 },
 ];
 
 /** The phrases read in a free-text pf block: CLAIM_PATTERNS, then PASSIVE_PATTERNS. */
@@ -157,12 +205,25 @@ export function patternsAt(where: string): readonly ClaimPattern[] {
   return where.startsWith("pluginText.") ? PF_CLAIM_PATTERNS : CLAIM_PATTERNS;
 }
 
-/** A text names a paper: a license, permit, certificate, registration, insurance, bond, credential, carrier or authority, or an official lookup. */
+/**
+ * A text names a paper: a license, permit, certificate, registration, insurance, bond, credential, carrier or authority,
+ * or an official lookup; or the place a person checks one where a lookup has no data feed or is down (DL-894): a data
+ * feed, the state's own or an official site, the state's records, or the city ("Where a state has no data feed, a person
+ * on Rosie's team checks the state's own site and keeps a screenshot", carpet.json and 21 more; "a person on Rosie's
+ * team checks with the city another way", dog-walker.json, after MC C7's "Rosie's team checks it with the city").
+ */
 export const PAPER =
-  /licen[cs]|permit|certif|insur|registration|credential|\bbond|carrier|\bauthority|lookup|\bpapers?\b/i;
+  /licen[cs]|permit|certif|insur|registration|credential|\bbond|carrier|\bauthority|lookup|\bpapers?\b|\bdata\s+feed\b|\b(?:own|official)\s+site\b|\bstate's\s+records\b|\bwith\s+the\s+city\b/i;
 
 /** A word that negates the phrase after it: "not checked by Rosie", "never as checked by Rosie". */
 const NEGATION = /\b(?:never|not|no|nor|cannot|nothing|none)\b|n't\b/i;
+
+/**
+ * A clause break: a comma, a semicolon or a sentence end (".", "!" or "?") before white space or the end. A negation
+ * never reaches across one (DL-894): in "Where a lookup has no data feed, a person on Rosie's team checks within 1
+ * business day" (movers.json), the "no" belongs to the first clause, and the second says Rosie's team checks.
+ */
+const CLAUSE_BREAK = /[,;.!?](?=\s|$)/;
 
 /** One sentence and the separator after it, as a text splits (the separator is "" at the end). */
 interface Sentence {
@@ -178,13 +239,14 @@ function sentences(text: string): Sentence[] {
   return out;
 }
 
-/** Whether a negation comes within `reach` words (punctuation alone is no word) before `at` in the sentence. */
+/**
+ * Whether a negation comes within `reach` words (punctuation alone is no word) before `at`, in the clause `at` lies in:
+ * the words looked at stop at the last clause break before it (CLAUSE_BREAK).
+ */
 function negated(sentence: string, at: number, reach: number): boolean {
-  const words = sentence
-    .slice(0, at)
-    .split(/\s+/)
-    .filter((word) => /[a-z]/i.test(word));
-  return words.slice(Number.isFinite(reach) ? -reach : 0).some((word) => NEGATION.test(word));
+  const clauses = sentence.slice(0, at).split(CLAUSE_BREAK);
+  const words = (clauses[clauses.length - 1] ?? "").split(/\s+/).filter((word) => /[a-z]/i.test(word));
+  return words.slice(Math.max(0, words.length - reach)).some((word) => NEGATION.test(word));
 }
 
 /** Whether a sentence says Rosie or Rosie's team checks a paper: one of the patterns matches where no negation takes it back. */
