@@ -118,7 +118,10 @@ export function tradeSwitches(trade: LoadedTrade, flow: FlowLetter): Record<stri
   return { ...loadPathScripts().core.switchesOf(overlayView(trade, flow), flow) };
 }
 
-/** The facts the trade lists, header-only ones included, or null when it lists none (insurance.json: C5 fills it, T-139). */
+/**
+ * The facts the trade lists, header-only ones included, or null when it lists none (insurance.json, until the emitter
+ * gives it C5's list: corrections/c5.ts correctTrade()).
+ */
 export function tradeFacts(trade: LoadedTrade): string[] | null {
   return trade.facts === null ? null : [...trade.facts];
 }

@@ -13,8 +13,9 @@
 //
 // What it hands on, for the overlay applier (T-135) and the key map (T-143): the ops of each flow in the file's
 // order, the rename pairs, the sample cast, names and story, and the trade's own record slot rows. It applies none of
-// them. It fills nothing in either: a trade with no pf.facts has `facts: null` (insurance.json; C5's fill belongs to
-// T-139), and a trade with no pf.settings has `settings: null` (12 trades; C5's start values belong to the compiler).
+// them. It fills nothing in either: a trade with no pf.facts has `facts: null` (insurance.json; C5 fills it in the
+// emitter: corrections/c5.ts correctTrade()), and a trade with no pf.settings has `settings: null` (12 trades; C5's
+// start values belong to the compiler).
 //
 // The loader never counts or shapes anything to reach a number: what the file has is loaded, and a shape it does not
 // expect is an error that names the path (TradeLoadError), never a silent skip. Names follow K-01 v1 (tradeOverlay,
@@ -222,7 +223,7 @@ export interface LoadedTrade {
   name: string;
   style: string;
   pattern: Pattern;
-  /** pf.facts, or null when the file has none (insurance.json; C5's fill is T-139's). */
+  /** pf.facts, or null when the file has none (insurance.json; C5 fills it: corrections/c5.ts correctTrade()). */
   facts: Name[] | null;
   /** pf.switches, or null when the file has none (99 trades). */
   switches: TradeSwitches | null;
