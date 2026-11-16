@@ -54,7 +54,7 @@ import { sealingWrapKeys } from "./secrets";
 import { stagingSendCalls } from "./send";
 import { stagingSignIn } from "./sign-in";
 import { stagingDirectories } from "./state-reads";
-import { stagingTestPhone } from "./test-phone";
+import { rosieNumberOf, stagingTestPhone } from "./test-phone";
 import { stagingGateReads } from "./tool-api-gate";
 import { stagingRowCalls } from "./tool-api-rows";
 
@@ -232,4 +232,17 @@ export function stagingOptions(env: StagingEnv, seams: StagingSeams = {}): Stagi
     emailRows,
     signIn,
   };
+}
+
+/**
+ * Rosie's number for the guard's HELP reply (T-1412; RootOptions.rosieNumber), staging's hand-off, kept apart from the
+ * inputs above, which stay all null where no binding is bound (NO_STAGING_INPUTS): ROSIE_NUMBER is a var, no part's
+ * binding. On staging a reader, called at each use and never as the root is built, that answers ROSIE_NUMBER when it is
+ * E.164 by the test-phone page's own check (./test-phone.ts rosieNumberOf: K-04's and K-11's phone pattern) and blank
+ * otherwise, so HELP's row gets no words then; anywhere else none (null), with nothing read but ENVIRONMENT. STOP and
+ * START need no number. The number is never logged.
+ */
+export function stagingRosieNumber(env: StagingEnv): (() => string) | null {
+  if (environmentOf(env) !== "staging") return null;
+  return () => rosieNumberOf(env.ROSIE_NUMBER) ?? "";
 }
