@@ -1,0 +1,71 @@
+{
+  "call": "readBusinessKinds",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["business-setup/seed-company-two-kinds.json", "kinds-of-work/seed-kinds-sample.json"],
+    "after": [],
+    "now": "2026-10-26T14:00:00Z",
+    "note": "Lee Home Services' kinds of work, read under its own scope as the catalog reads them before a way is written (T-320's CatalogReads.kindsOf; README item 72): K-23's seed-company-two-kinds gives it two, Lee Electric (electrician) and Lee Plumbing (plumber, with cancelright on in flow B), both of company-lee-home-services at version 1, and K-24's seed-kinds-sample gives each kind its two kind_flows rows, whose combos are the only paths a way of that kind may take in that flow (K-25 rule 9). Each row is named by README item 77's rule: company_kinds by company and kind, kind_flows by kind and flow. The two kinds are answered in (company_id, kind_id) order, electrician before plumber. No seed writes Lee Home Services a business_setup row (K-23's seed-business-demo-shop gives the barbershop's alone), so setup is null, which the catalog reads as not known, never as money allowed (default 161). The barbershop's kind of work in the same seed is another business's and is never read."
+  },
+  "request": {
+    "businessId": "biz-lee-home-services"
+  },
+  "outcome": {
+    "result": "businessKinds",
+    "businessId": "biz-lee-home-services",
+    "readAt": "2026-10-26T14:00:00Z",
+    "setup": null,
+    "kinds": [
+      {
+        "rowId": "company-lee-home-services/electrician",
+        "companyId": "company-lee-home-services",
+        "kindId": "electrician",
+        "businessId": "biz-lee-home-services",
+        "tradeName": "Lee Electric",
+        "facts": ["photos", "firststeps", "dropoff", "extrawork", "stages", "documents", "video"],
+        "switchesA": [],
+        "switchesB": [],
+        "version": 1,
+        "flows": [
+          {
+            "rowId": "electrician/A",
+            "flow": "A",
+            "combos": ["list|card|counter", "list|none|counter", "list|full|none", "photos|card|counter", "visit|card|counter"],
+            "version": 1
+          },
+          {
+            "rowId": "electrician/B",
+            "flow": "B",
+            "combos": ["list|card|bill", "list|none|bill", "list|card|card", "visit|card|bill", "visit|none|bill", "photos|deposit|bill", "list|full|none"],
+            "version": 1
+          }
+        ]
+      },
+      {
+        "rowId": "company-lee-home-services/plumber",
+        "companyId": "company-lee-home-services",
+        "kindId": "plumber",
+        "businessId": "biz-lee-home-services",
+        "tradeName": "Lee Plumbing",
+        "facts": ["firststeps", "documents", "forms", "sentnow", "planbill", "dropoff", "extrawork", "photos", "video"],
+        "switchesA": [],
+        "switchesB": ["cancelright"],
+        "version": 1,
+        "flows": [
+          {
+            "rowId": "plumber/A",
+            "flow": "A",
+            "combos": ["list|card|counter", "list|none|counter", "list|deposit|counter", "list|full|none", "photos|card|counter", "visit|card|counter"],
+            "version": 1
+          },
+          {
+            "rowId": "plumber/B",
+            "flow": "B",
+            "combos": ["list|card|bill", "list|none|bill", "list|card|card", "visit|card|bill", "photos|deposit|bill", "list|full|none"],
+            "version": 1
+          }
+        ]
+      }
+    ]
+  }
+}

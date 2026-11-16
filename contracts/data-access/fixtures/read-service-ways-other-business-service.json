@@ -1,0 +1,21 @@
+{
+  "call": "readServiceWays",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["services-prices/seed-service-money-paths.json"],
+    "after": [],
+    "now": "2026-10-26T14:00:00Z",
+    "note": "Lee Electric's wiring repair named under the barbershop's scope: the service and its one way (way-lee-electric-wiring-repair-home) are Lee Home Services', which the scope does not show, so the answer is an empty list, the same as for a service with no ways or one built earlier in the same call and not yet written; never notFound, and never another business's way (README item 74, default 153). The caller knows its services from readBusinessServices and its own writes."
+  },
+  "request": {
+    "businessId": "biz-lees-barbershop",
+    "serviceId": "svc-lee-electric-wiring-repair"
+  },
+  "outcome": {
+    "result": "serviceWays",
+    "businessId": "biz-lees-barbershop",
+    "serviceId": "svc-lee-electric-wiring-repair",
+    "readAt": "2026-10-26T14:00:00Z",
+    "ways": []
+  }
+}
