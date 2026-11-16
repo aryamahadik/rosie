@@ -2,9 +2,45 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 713, [`f03528b`](https://github.com/aryamahadik/rosie/commit/f03528b), 2026-11-16 13:55:58 UTC.
+- **Through:** commit 715, [`e1c4800`](https://github.com/aryamahadik/rosie/commit/e1c4800), 2026-11-16 22:06:31 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 715. docs: COMMIT\_HISTORY.md through commit 713 (f03528b, \#723) (\#725)
+
+- **Commit:** [`e1c4800`](https://github.com/aryamahadik/rosie/commit/e1c4800), by Arya Mahadik, 2026-11-16 22:06:31 UTC
+- **Pull request:** [#725](https://github.com/aryamahadik/rosie/pull/725) from `task/commit-history-150`, merged 2026-11-16 22:06:32 UTC. It squashed 1 branch commit:
+  - `b4ef497` docs: COMMIT\_HISTORY.md through commit 713 (f03528b, \#723)
+- **Files changed:** 1 (+54 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +54 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 243 (DL-902); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 714. T-1430: ci.yml's checks job gets the merge check's 45 minutes: main's CI outgrew its 20 (\#726)
+
+- **Commit:** [`2284199`](https://github.com/aryamahadik/rosie/commit/2284199), by Arya Mahadik, 2026-11-16 22:06:27 UTC
+- **Pull request:** [#726](https://github.com/aryamahadik/rosie/pull/726) from `task/T-1430`, merged 2026-11-16 22:06:27 UTC. It squashed 1 branch commit:
+  - `4339ae9` T-1430: ci.yml's checks job gets the merge check's 45 minutes: main's…
+- **Files changed:** 1 (+4 −1), by folder:
+  - `.github/workflows/` ci.yml +4 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Main's checks job ran 19m13s in run 43873100250; after train 243 its timeout cancelled runs 43880559558 and 43880572601 at 20m16s and 20m12s, cutting off the CI script tests step. timeout-minutes 20 becomes 45, merge-check.yml's own for the job that runs the same steps, with a comment saying why. No step, trigger, service, env or concurrency change (DL-905).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 713. docs: COMMIT\_HISTORY.md through commit 711 (7097400, \#719) (\#723)
 
