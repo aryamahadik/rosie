@@ -2,9 +2,57 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 683, [`dd2e62e`](https://github.com/aryamahadik/rosie/commit/dd2e62e), 2026-11-15 21:16:09 UTC.
+- **Through:** commit 685, [`8c7b071`](https://github.com/aryamahadik/rosie/commit/8c7b071), 2026-11-15 22:42:59 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 685. docs: COMMIT\_HISTORY.md through commit 683 (dd2e62e, \#694) (\#696)
+
+- **Commit:** [`8c7b071`](https://github.com/aryamahadik/rosie/commit/8c7b071), by Arya Mahadik, 2026-11-15 22:42:59 UTC
+- **Pull request:** [#696](https://github.com/aryamahadik/rosie/pull/696) from `task/commit-history-137`, merged 2026-11-15 22:42:59 UTC. It squashed 1 branch commit:
+  - `ea2fd4d` docs: COMMIT\_HISTORY.md through commit 683 (dd2e62e, \#694)
+- **Files changed:** 1 (+35 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +35 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 230 (DL-853); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 684. T-1410: the turn face's and staging's Tool API scopes pass the K-09 call and transient on to withBusiness (\#689)
+
+- **Commit:** [`0d25a4b`](https://github.com/aryamahadik/rosie/commit/0d25a4b), by Arya Mahadik, 2026-11-15 22:42:55 UTC
+- **Pull request:** [#689](https://github.com/aryamahadik/rosie/pull/689) from `task/T-1410`, merged 2026-11-15 22:42:55 UTC. It squashed 3 branch commits:
+  - `9bc62c5` T-1410: pgCallScope and staging's two Tool API scopes hand the base's…
+  - `aac74bc` T-1410: merge main (dd2e62e) into task/T-1410 for round 2
+  - `8185f21` T-1410: db/repo/scope.int.test.ts's T-1331 face-call pins assert the …
+- **Files changed:** 7 (+799 −29), by folder:
+  - `actions/src/tool-api/turn-face/pg/` calls.int.test.ts +445 −1, calls.ts +33 −5
+  - `db/repo/` scope.int.test.ts +24 −13
+  - `runtime/src/wiring/staging/` tool-api-gate.ts +13 −5, tool-api-gate.worker.test.ts +131 −0, tool-api-rows.ts +10 −5, tool-api-rows.worker.test.ts +143 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1410: pgCallScope and staging's two Tool API scopes hand the base's ScopeCall on to withBusiness, so a lost start answers K-09 transient and a refused one is scrubbed under the K-09 call's name
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1410: db/repo/scope.int.test.ts's T-1331 face-call pins assert the card's behaviour (DL-845): gateAndCommit, composeInput and finalizeMessage answer K-09 transient on a lost or never-opened start and throw every other failed start scrubbed under their own K-09 name; pgCallScope with no call named is unchanged
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 683. docs: COMMIT\_HISTORY.md through commit 681 (c2f36d6, \#692) (\#694)
 
