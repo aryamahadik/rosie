@@ -59,8 +59,17 @@ function isRight(each: Sample, part: KindMatch): boolean {
   return part.outcome === "which" && each.fits.every((id) => ids.includes(id));
 }
 
-/** The words of the samples in these groups, with the step's kinds. */
+/** The words of the samples `keep` picks, in T-631's order. */
 const wordsOf = (keep: (each: Sample) => boolean): string[] => SAMPLES.filter(keep).map((each) => each.words);
+
+/** The S1-02 trade words method A does not list as their kind (T-631's table): each is asserted on its own below. */
+const NOT_LISTED_BY_A: readonly string[] = [
+  "golf lessons",
+  "ski lessons",
+  "snowboard lessons",
+  "course coaching",
+  "Training studio",
+];
 
 describe("the catalog handed in: the 243 kinds the kinds seed writes (T-212)", () => {
   it("is 243 trade-file kinds, each with an id, a name, a style and a pattern, and the matcher offers all of them", () => {
@@ -93,18 +102,13 @@ describe("S1-02: each owner's word to its kind", () => {
     expect(parts.map((part) => part.kinds[0]?.name)).toEqual(["Barber", "Plumber", "Electrician"]);
   });
 
-  it.each(
-    wordsOf(
-      (each) =>
-        each.group === "S1-02 trades" &&
-        !["golf lessons", "ski lessons", "snowboard lessons", "course coaching", "Training studio"].includes(
-          each.words,
-        ),
-    ),
-  )("S1-02 as a trade words it: %s is listed as its kind", (text) => {
-    const part = onePart(text);
-    expect(brief(part)).toEqual({ words: text, outcome: "listed", kinds: [...sample(text).fits] });
-  });
+  it.each(wordsOf((each) => each.group === "S1-02 trades" && !NOT_LISTED_BY_A.includes(each.words)))(
+    "S1-02 as a trade words it: %s is listed as its kind",
+    (text) => {
+      const part = onePart(text);
+      expect(brief(part)).toEqual({ words: text, outcome: "listed", kinds: [...sample(text).fits] });
+    },
+  );
 
   it("golf, ski and snowboard lessons offer their kind first, with Music lessons second: one 'which?' from the shared word 'lessons' (T-631's limit 2)", () => {
     expect(["golf lessons", "ski lessons", "snowboard lessons"].map((text) => brief(onePart(text)))).toEqual([
