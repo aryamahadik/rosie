@@ -266,25 +266,34 @@ function rewrite(value: unknown, path: string, mark: Mark, inMessage: string | n
   if (typeof value === "object" && value !== null) {
     let changed = false;
     const out: Record<string, unknown> = {};
-    for (const [field, item] of Object.entries(value)) {
-      const at = key(path, field);
-      let next: unknown = item;
-      if (NOT_WORDS.has(field)) next = item;
-      else if (PAIR_LISTS.has(field) && Array.isArray(item)) next = newSides(item, at, mark, inMessage);
-      else if (MESSAGE_LISTS.has(field) && Array.isArray(item)) next = messages(item, at, mark);
-      else next = rewrite(item, at, mark, inMessage);
+    for (const [name, item] of Object.entries(value)) {
+      const next = rewriteField(name, item, key(path, name), mark, inMessage);
       if (next !== item) changed = true;
-      out[field] = next;
+      out[name] = next;
     }
     return changed ? out : value;
   }
   return value;
 }
 
+/** One field of an object rewritten: as it is where it holds no words; a pair list's new sides; a message list's words. */
+function rewriteField(
+  name: string,
+  item: unknown,
+  at: string,
+  mark: Mark,
+  inMessage: string | null,
+): unknown {
+  if (NOT_WORDS.has(name)) return item;
+  if (PAIR_LISTS.has(name) && Array.isArray(item)) return newSides(item, at, mark, inMessage);
+  if (MESSAGE_LISTS.has(name) && Array.isArray(item)) return messages(item, at, mark);
+  return rewrite(item, at, mark, inMessage);
+}
+
 /** A list of [old, new] pairs with each new side rewritten; the old side is the master's line, matched as written. */
 function newSides(pairs: readonly unknown[], path: string, mark: Mark, inMessage: string | null): unknown[] {
   let changed = false;
-  const out = pairs.map((pair, k) => {
+  const out = pairs.map((pair, k): unknown => {
     if (!Array.isArray(pair) || pair.length !== 2) return pair;
     const next = rewrite(pair[1], `${path}[${String(k)}][1]`, mark, inMessage);
     if (next === pair[1]) return pair;
@@ -297,7 +306,7 @@ function newSides(pairs: readonly unknown[], path: string, mark: Mark, inMessage
 /** A list of messages, each read as a message a person reads: its lanes are not words. */
 function messages(list: readonly unknown[], path: string, mark: Mark): unknown[] {
   let changed = false;
-  const out = list.map((message, k) => {
+  const out = list.map((message, k): unknown => {
     const at = `${path}[${String(k)}]`;
     if (!Array.isArray(message)) return rewrite(message, at, mark, at);
     const words = message.slice(2);
