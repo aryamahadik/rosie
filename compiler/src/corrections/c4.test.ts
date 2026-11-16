@@ -3,8 +3,9 @@
 //   - on every path of the trades swept below (every money, booking and fixture path of barber; every money path of the
 //     others), S1-33, S2-12, S2-13, S2-14, S11-99, S12-19, S13-41 and S13-43 and the verify branches of S1-32, S2-11 and
 //     S11-42 are unlit; on barber's money paths also with switch "verify" turned on, where before C4 they are lit;
-//   - S2-11 is lit wherever its trade keeps it, with its branch "Matches" alone, and gives license_checked; a trade's own
-//     off of it stays (occupational-therapist: C8 is T-140's);
+//   - S2-11 is lit wherever its trade keeps it, with its branch "Matches" alone, and gives license_checked; C4 keeps a
+//     trade's own off of it (occupational-therapist's D96 off), which C8 voids (T-140: c8.ts voidOffs drops it before
+//     the applier), so S2-11 is lit there too, with "Matches" alone;
 //   - over all 243 trade files, none turns switch "verify" on or adds a branch, step or words gated on it, so the master's
 //     branches and steps are all there are; the corrected master the bundle holds has each of them off;
 //   - each is switched off with C4's reason (a trade's own off kept), found by its place even where a trade renamed its
@@ -29,6 +30,7 @@ import {
   c4,
   onlyWithVerify,
 } from "./c4";
+import { voidOffs } from "./c8";
 import { CorrectionError, applyCorrections, renderDiff, type CorrectedTrade } from "./framework";
 
 vi.setConfig({ testTimeout: 300_000 });
@@ -303,9 +305,26 @@ describe("C4 on every path: nothing only switch verify lights is lit", () => {
     expect(kept).toBeGreaterThan(0);
     for (const flow of FLOWS) {
       expect(find(corrected("barber", flow).done.flow.steps, KEPT_STEP)?.off).toBeUndefined();
+      // C4 keeps a trade's own off: occupational-therapist's D96 off of S2-11 ...
       expect(find(corrected("occupational-therapist", flow).done.flow.steps, KEPT_STEP)?.off).toMatch(
         /^D96: /,
       );
+      // ... which C8 voids (T-140): with its void offs dropped before the applier, S2-11 is built and lit on every money
+      // path, with "Matches" alone, and still gives license_checked.
+      const voided = voidOffs(loadTrade("occupational-therapist")).trade;
+      const done = applyCorrections(applyTrade(master[flow], voided), [c4]);
+      const built = find(done.flow.steps, KEPT_STEP);
+      expect(built?.off, flow).toBeUndefined();
+      expect(built?.gives).toContain(LICENSE_CHECKED);
+      const paths = tradePaths(done, voided, { booking: false, fixtures: false });
+      expect(paths.length).toBeGreaterThan(0);
+      for (const path of paths) {
+        const lit = walkPath(done, path).steps.find((entry) => entry.id === KEPT_STEP);
+        expect(lit, `occupational-therapist ${flow} ${nameOf(path)}: S2-11 lit`).toBeDefined();
+        expect(lit?.branches.filter((branch) => branch.lit).map((branch) => branch.label)).toStrictEqual([
+          "Matches",
+        ]);
+      }
     }
   });
 });

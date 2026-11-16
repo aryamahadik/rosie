@@ -16,8 +16,9 @@
 //
 // What it leaves: S2-11 itself, which is not gated and is built. It keeps each license as added and gives
 // `license_checked`, which S2-15 needs, and its words already say license checks are off (D96). Its branch "Matches"
-// stays. The owner's ID at sign-up (S1-10, S1-32's ID half) is C10's; the trade files' D96 offs are C8's (T-140); the
-// out-of-scope markers for these branches and steps are T-147's.
+// stays. The owner's ID at sign-up (S1-10, S1-32's ID half) is C10's; the trade files' D96 offs are C8's (c8.ts: its void
+// ones are dropped before the applier, every other one stays); the out-of-scope markers for these branches and steps are
+// T-147's.
 import type { Gate } from "../graph/types.ts";
 import type { Correction, EditContext } from "./framework";
 

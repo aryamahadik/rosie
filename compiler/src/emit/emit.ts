@@ -37,6 +37,8 @@ import { createHash } from "node:crypto";
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { correctTrade } from "../corrections/c5";
+import { markClaims } from "../corrections/c7";
+import { voidOffs } from "../corrections/c8";
 import type { FlowLetter, MasterGraphs } from "../graph/types.ts";
 import { loadMaster } from "../load/flow";
 import { listTradeIds, loadTrade, type LoadedTrade, type TradeId } from "../load/trade";
@@ -188,7 +190,9 @@ export function emitBundle(input: EmitInputs): EmitResult {
   if (byId.size !== input.trades.length) throw new Error("a trade is given twice");
   const sorted = [...byId]
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-    .map(([, trade]) => correctWordsOps(input.master, correctTrade(trade).trade));
+    .map(([, trade]) =>
+      correctWordsOps(input.master, voidOffs(markClaims(correctTrade(trade).trade).trade).trade),
+    );
   const stops = {} as Record<FlowLetter, StopMarks>;
   for (const flow of FLOWS)
     stops[flow] = placeStops(
