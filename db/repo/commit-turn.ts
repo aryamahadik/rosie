@@ -25,15 +25,20 @@
 //   4. The answer: every row inserted or updated with its version after the commit (turn, outbox and event-log rows
 //      left out, and rows of a table with no version, which a row reference cannot name), the outbox rows in commit
 //      order, the next in line its releases promoted, and the waiting rows it ended. Each row it names (written, and
-//      versionChanged's changed rows) is named by its primary key, save a phones row, named by its handle id (below).
+//      versionChanged's changed rows) is named by its primary key, save a phones row when the request asks for its
+//      handle id (below).
 //
-// A phones row in the answer (T-1417; DL-872): K-08 v1 names a phone row by its handle id (phones.handle_id, unique and
-// not null in K-04), never by its number (contracts/event-trace/README.md lines 42 and 263), and the turn's span copies
-// the rows this call answers (actions/src/commit/commit.ts spanRowsOf). So every row reference the call answers names a
-// phones row by the handle id of the row itself, as the commit locked it (versionChanged) or as its write returned it
-// (written), never by a second read, and a phones row with no handle id throws (fail closed): the number is never
-// answered in its place. Inside the commit nothing changes: a request still names a phones row by its primary key, the
-// number (a state write's key, versionsRead), and the lock, the compare and the write use it.
+// A phones row in the answer (T-1417; K-05 v1.17 item 71 and defaults 145 to 151; DL-872, DL-876, DL-877): K-08 v1
+// names a phone row by its handle id (phones.handle_id, unique and not null in K-04), never by its number
+// (contracts/event-trace/README.md lines 42 and 263), and the turn's span copies the rows this call answers
+// (actions/src/commit/commit.ts spanRowsOf). A request that carries answerPhoneRowsBy "handleId" is answered with
+// every row reference naming a phones row by the handle id of the row itself, as the commit locked it (versionChanged)
+// or as its write returned it (written), never by a second read, and a phones row with no handle id, or an empty one,
+// throws (fail closed): the number is never answered in its place. A request without the field is answered as v1.16
+// answers it, byte for byte (a phones row by its number), by v1.16's own statements. Either way nothing changes inside
+// the commit: a request still names a phones row by its primary key, the number (a state write's key, versionsRead),
+// and the lock, the compare and the write use it; an answered handle id passed back where a request names a phones row
+// names no row, so the call throws and writes nothing (default 1).
 //
 // Scope (K-05 README "Scope": per write; T-191's roles): the call runs on the runtime side, as rosie_job, in one read
 // committed transaction that starts with no business scope. Before each write the scope is set to that write's own
@@ -77,15 +82,24 @@
 //  11. A state write's value for a bytea column (a sealed value, such as safety_outcomes.sealed_words or a pause's
 //      address) is K-04's text form, "\x" and hex digit pairs, and is written as the bytes it spells (bytea.ts; T-1185):
 //      postgres.js would store a string's own characters. A value in any other form throws, and nothing is written.
+//  12. answerPhoneRowsBy left out answers as v1.16 and "handleId" as K-05 v1.17 item 71; any other value (null, a
+//      boolean, another spelling) throws before the database is reached, naming the field alone, so a request that
+//      means to ask is never answered with a number in silence (fail closed).
+//  13. A table the answer names by a column other than its primary key (phones, by handle_id, when the request asks)
+//      that has no such column throws; its rows are never answered by their primary key instead.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.1";
+import type * as K05v117 from "../../contracts/generated/data-access/data-access.v1.17";
 import { byteaFromText } from "./bytea";
 import { appendEvent, type EventEntry as LogEntry } from "./event-log";
 import { releaseIn } from "./reservations";
 import { assertBusinessId, SCOPE_SETTING, type Sql } from "./scope";
 import { inRuntimeTransaction, transientOrThrow, utc } from "./targets";
 
-/** K-05 v1.1 commitTurn.request: the turn row, the versions read and every write. */
-export type CommitTurnRequest = K05.CommitTurnRequest;
+/**
+ * K-05 v1.1 commitTurn.request (the turn row, the versions read and every write), with K-05 v1.17's optional
+ * answerPhoneRowsBy (item 71), which changes only what the call answers. Without it the request is v1.16's.
+ */
+export type CommitTurnRequest = K05.CommitTurnRequest & Pick<K05v117.CommitTurnRequest, "answerPhoneRowsBy">;
 /** K-05 v1.1 commitTurn.response: committed; a repeated turn id answers the first commit with repeated true. */
 export type CommitTurnResponse = K05.CommitTurnResponse;
 /** K-05 v1.1 commitTurn.errors: refused, nothing written. */
@@ -240,6 +254,10 @@ function checkRequest(request: CommitTurnRequest): void {
   if (!isRecord(raw)) {
     fail("the request is not an object");
   }
+  if (raw.answerPhoneRowsBy !== undefined && raw.answerPhoneRowsBy !== "handleId") {
+    // Default 12: an ask in any other spelling is refused, never read as no ask (fail closed).
+    fail('answerPhoneRowsBy is neither left out nor "handleId"');
+  }
   checkTurn(objectField(raw, "turn", "request"));
   for (const ref of listOf(raw, "versionsRead", "request")) {
     if (!isRecord(ref)) {
@@ -354,6 +372,12 @@ interface Context {
   readonly turn: K05.Turn;
   readonly scope: Scope;
   readonly tables: Map<string, TableInfo>;
+  /**
+   * The tables whose rows the answer names by a column other than their primary key, by that column:
+   * PHONES_BY_HANDLE_ID when the request asks (answerPhoneRowsBy "handleId": K-05 v1.17 item 71; T-1417), else
+   * none (v1.16's answer).
+   */
+  readonly answerNames: ReadonlyMap<string, string>;
 }
 
 /**
@@ -440,14 +464,30 @@ function businessOf(info: TableInfo, row: Row): string | null {
 }
 
 /**
- * The tables whose rows the answer names by a column other than the primary key (T-1417): a phones row by its handle id,
- * never by its number (K-08 v1 README line 42 and default 3). Every other table's rows are named by their primary key.
+ * The answer of a request that asks for phones rows by handle id (answerPhoneRowsBy "handleId": K-05 v1.17 item 71;
+ * T-1417): a phones row is named by its handle id, never by its number (K-08 v1 README line 42 and default 3).
+ * Every other table's rows are named by their primary key, as v1.16 names them.
  */
-const ANSWER_NAMES: ReadonlyMap<string, string> = new Map([["phones", "handle_id"]]);
+const PHONES_BY_HANDLE_ID: ReadonlyMap<string, string> = new Map([["phones", "handle_id"]]);
 
-/** The column the answer names a table's rows by: its ANSWER_NAMES column, else its one primary key column `key`. */
-function answerColumn(info: TableInfo, key: string): string {
-  const column = ANSWER_NAMES.get(info.name) ?? key;
+/** The answer of a request that does not ask: every row named by its primary key, v1.16's answer, byte for byte. */
+const BY_PRIMARY_KEY: ReadonlyMap<string, string> = new Map();
+
+/** The names the request's answer gives rows (checkRequest has held the field to left out or "handleId"). */
+function answerNamesOf(request: CommitTurnRequest): ReadonlyMap<string, string> {
+  return request.answerPhoneRowsBy === "handleId" ? PHONES_BY_HANDLE_ID : BY_PRIMARY_KEY;
+}
+
+/**
+ * The column the answer names `info`'s rows by when it is not the primary key (a phones row's handle_id, when the
+ * request asks: T-1417), or null: the row is named by its key, and its write returns what v1.16's returns. A table
+ * without that column throws (default 13): its rows are never answered by their key instead.
+ */
+function answerColumn(ctx: Context, info: TableInfo): string | null {
+  const column = ctx.answerNames.get(info.name);
+  if (column === undefined) {
+    return null;
+  }
   if (!info.columns.has(column)) {
     throw new Error(`commitTurn: ${info.name} has no ${column} column to name its rows by in the answer`);
   }
@@ -455,13 +495,13 @@ function answerColumn(info: TableInfo, key: string): string {
 }
 
 /**
- * The id the answer names a row by (T-1417): for a phones row, its handle id, read from `row`, the row as the commit
- * locked it or as its write returned it (never a second read); for any other row, its primary key's value `keyValue`, as
- * before. A phones row with no handle id throws, naming the table and the column alone: the number is never answered in
- * its place (fail closed).
+ * The id the answer names a row by: its primary key's value `keyValue`, as v1.16 names it, unless the request asks for
+ * another name (T-1417): then a phones row's handle id, read from `row`, the row as the commit locked it or as its write
+ * returned it (never a second read). A row with no such id, or an empty one, throws, naming the table and the column
+ * alone: the number is never answered in its place (fail closed; K-05 v1.17 default 146).
  */
-function answeredRowId(table: string, keyValue: string, row: Row): string {
-  const column = ANSWER_NAMES.get(table);
+function answeredRowId(ctx: Context, table: string, keyValue: string, row: Row): string {
+  const column = ctx.answerNames.get(table);
   if (column === undefined) {
     return keyValue;
   }
@@ -721,7 +761,7 @@ async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise
   }
 
   // Limit 4: every row read or written at the version the turn saw, each changed row listed once, named as the answer
-  // names it (a phones row by the handle id of the row as locked: T-1417).
+  // names it (a phones row, when the request asks, by the handle id of the row as locked: T-1417).
   const changed: ChangedRow[] = [];
   const listed = new Set<string>();
   for (const expectation of expected) {
@@ -731,7 +771,7 @@ async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise
       listed.add(key);
       changed.push({
         table: expectation.table,
-        rowId: answeredRowId(expectation.table, expectation.rowId, now.row),
+        rowId: answeredRowId(ctx, expectation.table, expectation.rowId, now.row),
         readVersion: expectation.version,
         currentVersion: now.version,
       });
@@ -800,17 +840,23 @@ async function writeState(
         continue;
       }
       const key = oneKey(info);
-      // The column the answer names the row by comes back with it (a phones row's handle id: T-1417).
-      const [row] = await tx<(Row & { key: unknown; version: number })[]>`
-        insert into ${tx(write.table)} ${tx(values)}
-        returning ${tx(key)} as key, ${tx(answerColumn(info, key))}, version
-      `;
+      // The column the answer names the row by, when it is not the key, comes back with it (a phones row's handle id,
+      // when the request asks: T-1417); otherwise the insert returns what v1.16's returns.
+      const named = answerColumn(ctx, info);
+      const [row] =
+        named === null
+          ? await tx<(Row & { key: unknown; version: number })[]>`
+              insert into ${tx(write.table)} ${tx(values)} returning ${tx(key)} as key, version
+            `
+          : await tx<(Row & { key: unknown; version: number })[]>`
+              insert into ${tx(write.table)} ${tx(values)} returning ${tx(key)} as key, ${tx(named)}, version
+            `;
       if (row === undefined) {
         throw new Error(`commitTurn: ${what} returned no row`);
       }
       out.written.push({
         table: write.table,
-        rowId: answeredRowId(write.table, String(row.key), row),
+        rowId: answeredRowId(ctx, write.table, String(row.key), row),
         version: row.version,
       });
       continue;
@@ -820,17 +866,26 @@ async function writeState(
     const locked = lockedRow(compared, write.table, rowId);
     const set = columnValues(ctx, info, write.set, `a state update of ${write.table}`);
     await ctx.scope.to(locked.business);
-    const [row] = await tx<(Row & { version: number })[]>`
-      update ${tx(write.table)} set ${tx(set)}, version = ${write.expectVersion + 1}
-      where ${tx(key)} = ${rowId} and version = ${write.expectVersion}
-      returning ${tx(answerColumn(info, key))}, version
-    `;
+    // As the insert: the update returns the answer's column too only when the answer names the row by it (T-1417).
+    const named = answerColumn(ctx, info);
+    const [row] =
+      named === null
+        ? await tx<(Row & { version: number })[]>`
+            update ${tx(write.table)} set ${tx(set)}, version = ${write.expectVersion + 1}
+            where ${tx(key)} = ${rowId} and version = ${write.expectVersion}
+            returning version
+          `
+        : await tx<(Row & { version: number })[]>`
+            update ${tx(write.table)} set ${tx(set)}, version = ${write.expectVersion + 1}
+            where ${tx(key)} = ${rowId} and version = ${write.expectVersion}
+            returning ${tx(named)}, version
+          `;
     if (row === undefined) {
       throw new Error(`commitTurn: a state update of ${write.table} matched no row at its version`);
     }
     out.written.push({
       table: write.table,
-      rowId: answeredRowId(write.table, rowId, row),
+      rowId: answeredRowId(ctx, write.table, rowId, row),
       version: row.version,
     });
   }
@@ -1438,7 +1493,15 @@ async function commitIn(
     return repeatOf(tx, turn.id);
   }
 
-  const ctx: Context = { tx, now, at: utc(now), turn, scope: new Scope(tx), tables: new Map() };
+  const ctx: Context = {
+    tx,
+    now,
+    at: utc(now),
+    turn,
+    scope: new Scope(tx),
+    tables: new Map(),
+    answerNames: answerNamesOf(request),
+  };
   const compared = await lockAndCompare(ctx, request);
   const out: Written = { written: [], outboxRows: [], promoted: [], superseded: [], withdrawn: [] };
   await writeState(ctx, request, compared, out);
@@ -1562,9 +1625,11 @@ function scrubbed(error: unknown): unknown {
  * Commits a turn (K-05 v1.1 item 1): one transaction on the primary, on the runtime side with the business scope set per
  * write. Pass the client's primary handle, run as rosie_job. Answers committed (repeated true for a turn id already
  * committed, which writes nothing), or a refusal that wrote nothing: versionChanged (limit 4), reservationLost (limit
- * 5), turnParked, wrongState (an effect let go not in outage), constraint (a database rule) or transient. Throws for a
- * request it cannot carry out (see the top of this file), a database error as CommitTurnDatabaseError; nothing is
- * written then either.
+ * 5), turnParked, wrongState (an effect let go not in outage), constraint (a database rule) or transient. A request
+ * that carries answerPhoneRowsBy "handleId" (K-05 v1.17 item 71) is answered with every phones row it names (written,
+ * versionChanged's changed) named by its handle id; without the field the answer is v1.16's. Throws for a request it
+ * cannot carry out (see the top of this file), a database error as CommitTurnDatabaseError; nothing is written then
+ * either.
  */
 export async function commitTurn(
   sql: Sql,
