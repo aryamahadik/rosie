@@ -2,9 +2,79 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 689, [`a9de0d1`](https://github.com/aryamahadik/rosie/commit/a9de0d1), 2026-11-16 03:43:34 UTC.
+- **Through:** commit 692, [`a4e6fd1`](https://github.com/aryamahadik/rosie/commit/a4e6fd1), 2026-11-16 05:10:26 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 692. docs: COMMIT\_HISTORY.md through commit 689 (a9de0d1, \#699) (\#701)
+
+- **Commit:** [`a4e6fd1`](https://github.com/aryamahadik/rosie/commit/a4e6fd1), by Arya Mahadik, 2026-11-16 05:10:26 UTC
+- **Pull request:** [#701](https://github.com/aryamahadik/rosie/pull/701) from `task/commit-history-140`, merged 2026-11-16 05:10:26 UTC. It squashed 1 branch commit:
+  - `3d0f234` docs: COMMIT\_HISTORY.md through commit 689 (a9de0d1, \#699)
+- **Files changed:** 1 (+50 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +50 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 233 (DL-869); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 691. T-1416: one recordStopOrStart per phone per keyword turn, from the phone's newest word (T-317's N1) (\#702)
+
+- **Commit:** [`da58470`](https://github.com/aryamahadik/rosie/commit/da58470), by Arya Mahadik, 2026-11-16 05:10:22 UTC
+- **Pull request:** [#702](https://github.com/aryamahadik/rosie/pull/702) from `task/T-1416`, merged 2026-11-16 05:10:22 UTC. It squashed 1 branch commit:
+  - `74946b5` T-1416: one recordStopOrStart per phone per keyword turn, from the ph…
+- **Files changed:** 5 (+632 −50), by folder:
+  - `runtime/src/guard/replies/` index.ts +1 −0, replies.test.ts +407 −18, replies.ts +80 −17, replies.worker.test.ts +90 −7, test-support.ts +54 −8
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+replyToKeywords sends the turn's stop words and STARTs as one K-09 recordStopOrStart (stopOrStartFor), in the place of the first, built from the newest in arrival order; alsoCancelVisit is set when any of them was CANCEL or CANCELAR; every one of those texts is answered from that one action's result (its rows listed on the newest's reply alone). Each HELP stays its own sendFixedLine. So two words in one batch never share a consent row id, a reply row id or a phone version.
+
+Tests: replies.test.ts (the Proves-it cases, a core double keyed by the turn showing the old shape refused on every run); the spans test and the Workers STOP, HELP, START test updated to the new rule, with START, HELP, STOP and STOP, Stop! through the real dispatcher. test-support: an opt-in keyedByTurn double; CANCEL flags visits beside a START too, as the core does.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 690. T-1163: runCore dispatches setRecordFlag and recordStopOrStart to T-317's core functions through a flags port the wiring binds (\#703)
+
+- **Commit:** [`70e04e6`](https://github.com/aryamahadik/rosie/commit/70e04e6), by Arya Mahadik, 2026-11-16 05:10:18 UTC
+- **Pull request:** [#703](https://github.com/aryamahadik/rosie/pull/703) from `task/T-1163`, merged 2026-11-16 05:10:18 UTC. It squashed 3 branch commits:
+  - `5d48cf9` T-1163: runCore dispatches recordStopOrStart and setRecordFlag to T-3…
+  - `12bdb92` T-1163: T-1140's notBuilt test keeps every call it covered: the 11 ca…
+  - `68f0a2d` T-1163: the turns that carry start-recorded.json's START and flag-pau…
+- **Files changed:** 6 (+1063 −49), by folder:
+  - `actions/src/commit/core/` core-flags.test.ts +848 −0, core.test.ts +8 −4, core.ts +138 −26, errors.ts +30 −7, index.ts +6 −5, test-support.ts +33 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1163: runCore dispatches recordStopOrStart and setRecordFlag to T-317's core functions through CoreDeps.flags, the port the wiring binds by name (reader, messagesReader, ids, events); none bound or one left out answers notBuilt portNotWired, never the service's default reader; recordFlagCore's call-off clocks ride in the run's writes through withClocks; each is the turn's own call, its caller naming no business or the call's (otherBusiness refused); 19 tests on stop-recorded.json, start-recorded.json and flag-paused.json
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1163: T-1140's notBuilt test keeps every call it covered: the 11 calls with no service answer noService, recordStopOrStart and setRecordFlag with no flags port bound answer portNotWired, its title unchanged
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1163: the turns that carry start-recorded.json's START and flag-paused.json's pause are each held to K-09 v1.5's gateAndCommit request
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 689. docs: COMMIT\_HISTORY.md through commit 687 (8658b20, \#697) (\#699)
 
