@@ -143,12 +143,19 @@ describe("5 trades x 3 paths x both flows: the compiler's pre-correction words e
     expect(readings).toBeGreaterThan(30);
   }, 600_000);
 
-  it("aba's switches are on every path: A10-01 shows its pf:sensitive words (the step.js --prof trap is avoided)", () => {
+  it("aba's own switches ride each of its paths, and A10-01 shows its pf:sensitive words (the step.js --prof trap)", () => {
     const trade = loadTrade("aba");
     expect(trade.switches).not.toBeNull();
+    for (const flow of FLOWS) {
+      for (const path of picks("aba", flow)) {
+        expect(path.switches, `aba flow ${flow} ${pathName(path)}`).toEqual({
+          sensitive: true,
+          welfare: true,
+        });
+      }
+    }
     const [money] = picks("aba", "A");
     if (money === undefined) throw new Error("aba has no money path in flow A");
-    expect(money.switches).toEqual({ sensitive: true, welfare: true });
     const parity = comparePath(reference, applied("aba", "A"), money);
     expect(lines(parity.differences)).toEqual([]);
     const receipt = parity.reference?.steps.find((step) => step.id === "A10-01");
