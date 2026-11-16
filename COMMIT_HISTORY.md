@@ -2,9 +2,56 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 705, [`647ca13`](https://github.com/aryamahadik/rosie/commit/647ca13), 2026-11-16 10:34:08 UTC.
+- **Through:** commit 707, [`b07069f`](https://github.com/aryamahadik/rosie/commit/b07069f), 2026-11-16 11:09:39 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 707. docs: COMMIT\_HISTORY.md through commit 705 (647ca13, \#715) (\#718)
+
+- **Commit:** [`b07069f`](https://github.com/aryamahadik/rosie/commit/b07069f), by Arya Mahadik, 2026-11-16 11:09:39 UTC
+- **Pull request:** [#718](https://github.com/aryamahadik/rosie/pull/718) from `task/commit-history-147`, merged 2026-11-16 11:09:40 UTC. It squashed 1 branch commit:
+  - `c57ea52` docs: COMMIT\_HISTORY.md through commit 705 (647ca13, \#715)
+- **Files changed:** 1 (+56 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +56 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 240 (DL-891); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 706. T-631: the kind matcher spike (Q-42): plain text on K-24's name, style and pattern, no stored index, for S1-02 (\#717)
+
+- **Commit:** [`139dfd5`](https://github.com/aryamahadik/rosie/commit/139dfd5), by Arya Mahadik, 2026-11-16 11:09:34 UTC
+- **Pull request:** [#717](https://github.com/aryamahadik/rosie/pull/717) from `task/T-631`, merged 2026-11-16 11:09:35 UTC. It squashed 2 branch commits:
+  - `3074cab` T-631: the kind matcher spike (Q-42): plain text on K-24's names, sty…
+  - `0769be0` T-631: FINDINGS.md, method A (plain text on K-24's name, style and pa…
+- **Files changed:** 7 (+1311 −0), by folder:
+  - `actions/spikes/q42-kind-matcher/` FINDINGS.md +324 −0, catalog.mjs +71 −0, compare.mjs +219 −0, matchers.mjs +151 −0, q42-kind-matcher.test.mjs +218 −0, samples.mjs +206 −0, words.mjs +122 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-631: the kind matcher spike (Q-42): plain text on K-24's names, style and pattern (A, A0) against the trades' services and questions text (B) on 47 sample words from S1-02, A4-03, B4-04 and the master's cast, with the model read (C), vector index (D) and full-text index (E) described as not run; A named for S1-02's matchKinds with no stored index; FINDINGS.md's text returned to the lead (the harness refused the write)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-631: FINDINGS.md, method A (plain text on K-24's name, style and pattern; no stored index) for S1-02; the customer-side match is open question 1
+
+Written by the lead exactly from the builder's findings_text (the harness refused the builder's write: subagents return findings as text); prettier --check passed and the spike's test passes 13/13 with it.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 705. docs: COMMIT\_HISTORY.md through commit 703 (9a32ac9, \#712) (\#715)
 
