@@ -861,7 +861,7 @@ describe("this file's database: the walking skeleton's rows, the made-up key's r
 
 // ---- built ---------------------------------------------------------------------------------------------------------
 
-describe("built on staging: the five pieces, and nothing read but the environment and the two bindings' presence", () => {
+describe("built on staging: the six pieces, and nothing read but the environment and the two bindings' presence", () => {
   it("with both bindings: reads ENVIRONMENT, then each binding's presence, and no connection string or secret; holds scope, readOpenHolds, the seven safety reads, the sealer and the words, and no reader of its own", () => {
     const testEnv = envOf();
     const written: Json[] = [];
@@ -884,6 +884,7 @@ describe("built on staging: the five pieces, and nothing read but the environmen
     expect(testEnv.names).toEqual(["ENVIRONMENT", "HYPERDRIVE_JOB", "HYPERDRIVE_APP"]);
     expect([testEnv.job?.reads.n, testEnv.app?.reads.n]).toEqual([0, 0]);
     expect(Object.keys(reads ?? {}).sort()).toEqual([
+      "keywordDoor",
       "readOpenHolds",
       "safetyReads",
       "scope",
@@ -901,6 +902,7 @@ describe("built on staging: the five pieces, and nothing read but the environmen
     ]);
     // No adapter: the words are left out, the safety service's own default (notBuilt for a line that asks).
     expect(Object.keys(stagingGateReads({ ...part, bundleSafety: null }) ?? {}).sort()).toEqual([
+      "keywordDoor",
       "readOpenHolds",
       "safetyReads",
       "scope",
@@ -946,8 +948,15 @@ describe("built on staging: the five pieces, and nothing read but the environmen
     if (gate === null) throw new Error("the gate is bound with both bindings");
     expect(gate.words?.fixedLine("safetyAsk")).toEqual({ id: "safetyAsk", text: "t1398 stand-in words" });
     expect(gate.words?.fixedLine("safetyCrisis")).toBeNull();
-    // Nothing else of its input but the five pieces.
-    expect(Object.keys(gate).sort()).toEqual(["readOpenHolds", "safetyReads", "scope", "sealer", "words"]);
+    // Nothing else of its input but the six pieces.
+    expect(Object.keys(gate).sort()).toEqual([
+      "keywordDoor",
+      "readOpenHolds",
+      "safetyReads",
+      "scope",
+      "sealer",
+      "words",
+    ]);
   });
 
   it("unbound: with neither binding, or either alone, the input is null, with nothing read but ENVIRONMENT and the presences", () => {
