@@ -19,6 +19,11 @@
 //     (./pinned-runs.ts, T-557) and its last text's service and chat id for its gate (./turn-chats.ts, T-559), and the
 //     turn's ports (`TurnDeps`, its frontier the frontier port, joined by T-557, its gate and commit the gate port, joined
 //     by T-559), the Durable Object reading each at use;
+//   - the guard's fixed replies (T-267; bound by T-1412, DL-856), put in place by `install()` beside the actor's ports: a
+//     STOP, START or HELP commits through the turn loop's keyword commit (../turn/keywords.ts turnReplyCore), the running
+//     turn's own gateAndCommit through the lease, so a bare keyword turn's call, which names no business, reaches the
+//     gate port's keyword door (./real.ts realGate, T-1415); each fixed line's words go into its row through the turn's
+//     plan calls, and HELP's words name Rosie's number, read at each use (RootOptions.rosieNumber);
 //   - the outbox dispatcher (T-257), which the turn wakes once its rows are composed (T-252): one claim-and-send run for
 //     the turn's recipient, each claimed row on the turn's trace; and which an outage line's writer wakes once the core
 //     names its row (T-1341, SafetyDeps.wake): one run for the line's recipient, each claimed row on its own trace; and
@@ -127,6 +132,7 @@ import { durableObjectActor, type HandleActorRpc } from "../gateway/actor-door";
 import { readBundleId, type WebhookEnvironment } from "../gateway/answer";
 import { unconfiguredPages, type PageHandlers } from "../gateway/pages";
 import type { ActorHandoff, ActorStub, GatewayDeps, ReceiptSink } from "../gateway/types";
+import { setReplyDeps, type ReplyDeps, type ReplyRows, type UnplannedRowsAnswer } from "../guard/replies";
 import { setGuardDeps } from "../guard/targets";
 import { setDbOutageDeps, type DbOutageDeps } from "../outage/db";
 import {
@@ -141,8 +147,9 @@ import {
 import { setSafetyDeps } from "../safety";
 import type { HandleDirectory, SafetyDeps } from "../safety/types";
 import { isLabel, logSink, openTrace, type BundleId, type LogContext, type TraceContext } from "../trace";
+import { turnReplyCore } from "../turn/keywords";
 import { setTurnDeps, turnHooks } from "../turn/turn";
-import type { TurnDeps, TurnDirectory, TurnDispatcher } from "../turn/types";
+import type { TurnDeps, TurnDirectory, TurnDispatcher, TurnRows } from "../turn/types";
 import { bindPorts, WiringError, type Binding, type ImplementationSets } from "./bind";
 import { closedPorts } from "./closed";
 import { answeringRecipients, emailDoor } from "./email-door";
@@ -178,7 +185,7 @@ import { RowTraces } from "./row-traces";
 import { signInPages, type SignInInputs } from "./sign-in";
 import { skeletonLinqRoute, type ReleaseFlags } from "./skeleton";
 // The file itself, never ./staging's index, which holds T-1254's handle (cloudflare:sockets): this graph loads under Node.
-import { stagingOptions } from "./staging/options";
+import { stagingOptions, stagingRosieNumber } from "./staging/options";
 import { testPhonePages, type TestPhoneInputs } from "./test-phone";
 import { TurnChats } from "./turn-chats";
 
@@ -414,6 +421,15 @@ export interface RootOptions {
    * and the copy keeps the stricter reading, as before.
    */
   readonly copies?: CopyDeps | null;
+  /**
+   * Rosie's one number (D102; K-09 README default 21 and open gap 9; Q-51) as the guard's HELP reply gives it (T-1412;
+   * ../guard/replies ReplyDeps.rosieNumber): a reader, called each time a HELP's words are written, never as the root is
+   * built. On staging, staging's hand-off (./staging/options.ts stagingRosieNumber): ROSIE_NUMBER when it is E.164 by the
+   * test-phone page's own check, else blank. Left out or null (production, until its number is handed in), blank: HELP's
+   * row then gets no words and nothing is sent for it, while a STOP's and a START's words, which name no number, are
+   * written all the same. A reader that throws or answers no string reads as blank.
+   */
+  readonly rosieNumber?: (() => string) | null;
 }
 
 export interface Root {
@@ -461,8 +477,15 @@ export interface Root {
   /** What the actor's copies reach (`setCopyDeps`), as `install()` sets them: RootOptions.copies, or null for none. */
   readonly copies: CopyDeps | null;
   /**
-   * Puts the actor's ports, the PostgreSQL-down path's, the copies' where the root holds them, and the retry queue's in
-   * place for this isolate; returns the function that puts the earlier ones back.
+   * What the guard's fixed replies reach (`setReplyDeps`; T-267's replies, bound by T-1412), as `install()` sets them:
+   * their core the turn loop's keyword commit (../turn/keywords.ts turnReplyCore, which hands each commit to the running
+   * turn's own gateAndCommit through the lease), their rows the turn's own plan calls (`turn.rows`, through
+   * replyRowsOf), and Rosie's number read at each use (RootOptions.rosieNumber; blank with none).
+   */
+  readonly replies: ReplyDeps;
+  /**
+   * Puts the actor's ports, the guard's fixed replies', the PostgreSQL-down path's, the copies' where the root holds them,
+   * and the retry queue's in place for this isolate; returns the function that puts the earlier ones back.
    */
   install(): () => void;
 }
@@ -714,6 +737,20 @@ export function composeRoot(options: RootOptions): Root {
     now: utc,
   };
 
+  // The guard's fixed replies (T-267; T-1412, DL-856): a STOP, START or HELP commits through the turn loop's keyword
+  // commit, which routes each commitCore made under a running turn's id to that turn's own gateAndCommit through the lease
+  // (../turn/keywords.ts turnReplyCore), so a bare keyword turn's call, naming no business, reaches the gate port's door
+  // (./real.ts realGate, T-1415); each fixed line's words go into its row through the turn's own plan calls; HELP's words
+  // name Rosie's number, read at each use (RootOptions.rosieNumber), never as the root is built.
+  const rosieNumber = options.rosieNumber ?? null;
+  const replies: ReplyDeps = {
+    core: turnReplyCore,
+    rows: replyRowsOf(turn.rows),
+    get rosieNumber(): string {
+      return numberOf(rosieNumber);
+    },
+  };
+
   const safety: SafetyDeps = {
     read: ports.safetyRead,
     bundle: ports.stateReads.safety.bundle,
@@ -832,6 +869,7 @@ export function composeRoot(options: RootOptions): Root {
     queue,
     outage,
     copies,
+    replies,
     install() {
       const restores = [
         setBatchHooks({ clock: { now } }),
@@ -842,6 +880,8 @@ export function composeRoot(options: RootOptions): Root {
         ...(copies === null ? [] : [setCopyDeps(copies)]),
         setBundleDeps(pin),
         setGuardDeps({ targets: ports.targets }),
+        // The guard's fixed replies, through the turn's own keyword commit and plan calls (T-1412).
+        setReplyDeps(replies),
         setTurnDeps(turn),
         setLeaseHooks(turnChats.around(pinnedRuns.around(turnHooks))),
         // The retry queue's ports (T-256): its send jobs reach the dispatcher's door (T-258; DL-315).
@@ -857,6 +897,31 @@ export function composeRoot(options: RootOptions): Root {
 /** True when the port took its real implementation (./real.ts) in the root's environment. */
 function bindsReal(bindings: readonly Binding[], port: PortName): boolean {
   return bindings.some((binding) => binding.port === port && binding.implementation === "real");
+}
+
+/**
+ * The guard's replies' two K-05 v1 plan calls (../guard/replies ReplyRows) over the turn's own (T-1412; round 1's note
+ * 1): the same two calls, each request handed on and each answer handed back as it comes, nothing read or changed here.
+ * They differ in type alone: the turn's answers are read-only and may name any K-05 error (../turn/types.ts RowsAnswer),
+ * where ReplyRows names K-05's transient alone; replies.ts reads each answer as unknown and checks its shape itself
+ * (unplannedOf, fill), so an answer that is not K-05's is badAnswer and any error is read as its own code.
+ */
+function replyRowsOf(rows: Pick<TurnRows, "unplannedRows" | "writePlan">): ReplyRows {
+  return {
+    unplannedRows: async (request) => (await rows.unplannedRows(request)) as unknown as UnplannedRowsAnswer,
+    writePlan: (request) => rows.writePlan(request),
+  };
+}
+
+/** Rosie's number as the reader answers it now: blank with no reader, or for a reader that throws or answers no string. */
+function numberOf(reader: (() => string) | null): string {
+  if (reader === null) return "";
+  try {
+    const number: unknown = reader();
+    return typeof number === "string" ? number : "";
+  } catch {
+    return "";
+  }
 }
 
 /**
@@ -926,6 +991,8 @@ export interface WorkerSecrets {
  * compose reaches a model, nothing commits, no row is composed, finalized or sent, nothing is armed, the test-phone
  * page's calls and the sign-in calls stay unconfigured, the copies' sources stay unwired, and with no release flags
  * handed in (until T-1393 binds T-185's flag read, DL-356) the skeleton flag reads off and `linqWebhook` answers 404.
+ * Rosie's number for HELP's reply is staging's own hand-off (./staging/options.ts stagingRosieNumber, T-1412): a reader of
+ * ROSIE_NUMBER called at each use, never read here; production hands none yet, so HELP's row there gets no words.
  * The gateway's door to the handle's actor is the HANDLE_ACTOR binding where the environment has one (T-553;
  * env.staging has it since T-566). One root per env object, so its memories (rows' traces, armed parts) and its
  * database handle's counts last as long as the isolate does.
@@ -944,6 +1011,8 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     // Every other input (T-1257): in production none, with no binding read; on staging each later part of T-1154's own,
     // over T-1254's handle, null until that part binds it (its own file, ./staging/<part>.ts, says what its null does).
     ...stagingOptions(env),
+    // Rosie's number for HELP's reply (T-1412): on staging a reader of ROSIE_NUMBER, called at each use; none elsewhere.
+    rosieNumber: stagingRosieNumber(env),
   });
   workerRoots.set(env, root);
   return root;
