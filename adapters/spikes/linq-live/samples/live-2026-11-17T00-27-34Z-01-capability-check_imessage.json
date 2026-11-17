@@ -1,0 +1,35 @@
+{
+  "card": "T-1121",
+  "run": "2026-11-17T00-27-34Z-ddc156a1",
+  "mode": "live",
+  "step": "capability",
+  "call": "check_imessage",
+  "at": "2026-11-17T00:27:34.185Z",
+  "elapsedMs": 625,
+  "request": {
+    "method": "POST",
+    "path": "/api/partner/v3/capability/check_imessage",
+    "body": {
+      "address": "***90"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "x-trace-id": "e37493a952b94e849c67507d77d62740"
+    },
+    "body": {
+      "address": "***90",
+      "available": true
+    }
+  },
+  "port": {
+    "call": "capabilityCheck",
+    "check": "imessage",
+    "result": "checked",
+    "available": true,
+    "reason": null,
+    "service": null
+  }
+}

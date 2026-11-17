@@ -5,8 +5,9 @@
 // Sources: contracts/port-linq/README.md "Spike findings" rows 1 (the API base, a bearer token; a first send by number),
 // 10 (the send body: message.parts, message.idempotency_key, top-level override_optout), 13 (the capability checks) and
 // 14 (the error body and codes), its "Outcomes of a send" table, its open gap 1 (no documented contacts/add), and the
-// recorded vendor samples in contracts/port-linq/vendor-samples/. Two paths are not in the repository and are marked
-// TODO for phase 2 (FINDINGS.md says so too): CONTACT_ADD_PATH and CHAT_CREATE_PATH, with their bodies.
+// recorded vendor samples in contracts/port-linq/vendor-samples/. Round 2 (Nov 17; DL-918 to DL-920; FINDINGS.md):
+// CHAT_CREATE_PATH and chatCreateBody are confirmed by Linq's create-chat page and the live runs (samples/), while
+// CONTACT_ADD_PATH and contactAddBody stay a placeholder, since Linq's v3 API has no contacts/add (K-11 open gap 1).
 
 /** Linq's API host: the live run's only origin (README spike row 1). */
 export const LINQ_ORIGIN = "https://api.linqapp.com";
@@ -21,21 +22,26 @@ export const CHECK_IMESSAGE_PATH = "/capability/check_imessage";
 export const CHECK_RCS_PATH = "/capability/check_rcs";
 
 /**
- * contacts/add. TODO(T-1121 phase 2): the path and its body are NOT in the repository. K-11's open gap 1: the Nov 7
- * spike found no documented call that adds a contact to the line (the Nov 5 kit used Linq's command-line tool, `linq
- * contacts add`; Linq's v2 API has a CRM-style POST /api/partner/v2/contacts with another auth header; neither is
- * confirmed). Read Linq's documents or ask Linq's support before phase 2 runs the contact step, and set the path and
- * contactAddBody to what they give. Until then a live run does the contact step only when named (--step contact).
+ * contacts/add. TODO(K-11 open gap 1, for the architect; T-415): Linq's v3 API has no such call. Its API reference
+ * (docs.linqapp.com/api/, read by the lead Nov 17, DL-919) has no contacts resource and no contacts/add; the closest
+ * are POST /v3/chats/{chatId}/participants, POST /v3/chats and the contact card. A send by number needed no add first:
+ * the live send was accepted (201, samples/live-2026-11-17T00-27-34Z-03-send-send.json). So this path and
+ * contactAddBody are a placeholder that only the dry run's stand-in answers, and no live run took the contact step.
+ * The Nov 5 kit's `linq contacts add` (Linq's command-line tool) and v2's CRM-style POST /api/partner/v2/contacts, with
+ * another auth header, stay unconfirmed; the architect rules what T-415's contacts/add becomes.
  */
 export const CONTACT_ADD_PATH = "/contacts";
 
 /**
- * A first send by number, which opens a chat with the destination. TODO(T-1121 phase 2): the repository records only
- * that Linq has one ("a first send by number: POST /messages or POST /chats", README spike row 1); its body is not
- * recorded. chatCreateBody follows the send body of row 10 (message.parts, message.idempotency_key, top-level
- * override_optout) with the sending line as `from` and the destination in `to`; read Linq's send documents (row 1's
- * page S) before phase 2 and correct both if they differ. Rosie's product never opens a chat (arch 07 line 369); only
- * this probe does, to reach the one test phone.
+ * A send by number, Linq's create-chat call. Confirmed in round 2 (Nov 17, DL-918 to DL-920): Linq's create-chat page
+ * (docs.linqapp.com/api/resources/chats/methods/create/) gives POST /v3/chats with from, to (a list), message.parts (a
+ * text part), message.idempotency_key and override_optout, the body chatCreateBody builds, and says a first message in
+ * a new chat may not be a link (400, code 1005); the probe's words hold none. The live send was accepted (201,
+ * samples/live-2026-11-17T00-27-34Z-03-send-send.json). Its answer is the chat, with the message under it
+ * (chat.message, beside chat.service, chat.handles and chat.health_status), not at the top as a send into a chat
+ * answers (vendor sample send-message-response.json); and the chat was the one the line already had with that phone
+ * (the same chat id in both live runs). Rosie's product never opens a chat (arch 07 line 369); only this probe does,
+ * to reach the one test phone.
  */
 export const CHAT_CREATE_PATH = "/chats";
 
@@ -44,14 +50,14 @@ export function capabilityBody(address) {
   return { address };
 }
 
-/** The body of contacts/add. TODO(T-1121 phase 2): not in the repository (see CONTACT_ADD_PATH). */
+/** The body of contacts/add: a placeholder, since Linq's v3 API has no contacts/add (see CONTACT_ADD_PATH). */
 export function contactAddBody(phone) {
   return { phone_number: phone };
 }
 
 /**
- * The body of a first send by number: one text part, its idempotency key (Linq dedupes by it: README row 10), and
- * override_optout for that one request. TODO(T-1121 phase 2): see CHAT_CREATE_PATH.
+ * The body of a send by number: one text part, its idempotency key (Linq dedupes by it: README row 10), and
+ * override_optout for that one request. Confirmed by Linq's create-chat page and the live runs (see CHAT_CREATE_PATH).
  */
 export function chatCreateBody({ from, to, text, idempotencyKey, overrideOptout }) {
   return {
@@ -98,8 +104,9 @@ export function readCapability(which, status, body) {
 }
 
 /**
- * contacts/add's answer in K-11's contactAdd terms, read from the status alone (its body's shape is pending the live
- * run): added, or failed, retryable for a server error or no answer (K-11: `failed` with `retryable`).
+ * contacts/add's answer in K-11's contactAdd terms, read from the status alone (no live answer exists: Linq's v3 API
+ * has no contacts/add, see CONTACT_ADD_PATH): added, or failed, retryable for a server error or no answer (K-11:
+ * `failed` with `retryable`).
  */
 export function readContactAdd(status, body) {
   if (isSuccess(status)) return { call: "contactAdd", result: "added", alreadyContact: null };

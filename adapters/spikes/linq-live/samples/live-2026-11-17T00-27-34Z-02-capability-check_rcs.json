@@ -1,0 +1,35 @@
+{
+  "card": "T-1121",
+  "run": "2026-11-17T00-27-34Z-ddc156a1",
+  "mode": "live",
+  "step": "capability",
+  "call": "check_rcs",
+  "at": "2026-11-17T00:27:34.813Z",
+  "elapsedMs": 679,
+  "request": {
+    "method": "POST",
+    "path": "/api/partner/v3/capability/check_rcs",
+    "body": {
+      "address": "***90"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "x-trace-id": "97f4418a40260e262419f15484dbb329"
+    },
+    "body": {
+      "address": "***90",
+      "available": true
+    }
+  },
+  "port": {
+    "call": "capabilityCheck",
+    "check": "rcs",
+    "result": "checked",
+    "available": true,
+    "reason": null,
+    "service": null
+  }
+}
