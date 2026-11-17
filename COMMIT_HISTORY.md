@@ -2,9 +2,52 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 731, [`4b1196b`](https://github.com/aryamahadik/rosie/commit/4b1196b), 2026-11-17 08:00:40 UTC.
+- **Through:** commit 733, [`1097f01`](https://github.com/aryamahadik/rosie/commit/1097f01), 2026-11-17 08:33:05 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 733. docs: COMMIT\_HISTORY.md through commit 731 (4b1196b, \#742) (\#744)
+
+- **Commit:** [`1097f01`](https://github.com/aryamahadik/rosie/commit/1097f01), by Arya Mahadik, 2026-11-17 08:33:05 UTC
+- **Pull request:** [#744](https://github.com/aryamahadik/rosie/pull/744) from `task/commit-history-159`, merged 2026-11-17 08:33:05 UTC. It squashed 1 branch commit:
+  - `8f9603a` docs: COMMIT\_HISTORY.md through commit 731 (4b1196b, \#742)
+- **Files changed:** 1 (+45 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +45 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 732. T-594: the change home (S13-56) as code: offers, deadline and silence for every can't-make-it and leaving path (\#743)
+
+- **Commit:** [`b2376a3`](https://github.com/aryamahadik/rosie/commit/b2376a3), by Arya Mahadik, 2026-11-17 08:33:00 UTC
+- **Pull request:** [#743](https://github.com/aryamahadik/rosie/pull/743) from `task/T-594`, merged 2026-11-17 08:33:01 UTC. It squashed 2 branch commits:
+  - `b19be99` T-594: the change home (S13-56) as code: offers, deadline and silence…
+  - `239c097` T-594: plain null checks where lint asked for an optional chain (stan…
+- **Files changed:** 7 (+1819 −0), by folder:
+  - `actions/src/homes/change/` change.test.ts +752 −0, change.ts +656 −0, errors.ts +12 −0, home.ts +116 −0, index.ts +44 −0, reads.ts +51 −0, test-support.ts +188 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-594: the change home (S13-56) as code: offers, deadline and silence for every can't-make-it and leaving path, registered in the home registry
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-594: plain null checks where lint asked for an optional chain (standInWhy, readChangeBooking)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 731. docs: COMMIT\_HISTORY.md through commit 729 (d7aa916, \#740) (\#742)
 
