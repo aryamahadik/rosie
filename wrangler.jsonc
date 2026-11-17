@@ -62,11 +62,17 @@
       // DB_SCHEMA stays empty on staging; each branch preview sets it to preview_<slug> at upload.
       // LINK_HOST with BASE_PATH is rosfield.com/test, the route below, so staging's links are
       // https://rosfield.com/test/<short code> and come back to this Worker (DL-023, DL-036).
+      // STAGING_LINQ_LINE is D-018's switch (T-572; DL-940; T-1449 reads it): "real" puts staging on Rosie's real Linq
+      // line for the roster phones (STAGING_LINQ_ALLOWLIST), while a test phone keeps the test-phone line; absent, or any
+      // other value, keeps today's test-phone line alone. It holds no number, key or secret: Linq's key and the roster
+      // are put by name (npm run secrets:staging), and Rosie's number is the deploy's --var (deploy-staging.sh).
+      // Rollback: remove this line or set it to "double", then npm run deploy:staging.
       "vars": {
         "ENVIRONMENT": "staging",
         "BASE_PATH": "/test",
         "DB_SCHEMA": "",
         "LINK_HOST": "rosfield.com",
+        "STAGING_LINQ_LINE": "real",
       },
       "secrets": {
         "required": [],
