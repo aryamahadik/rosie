@@ -311,7 +311,7 @@ export function opWords(ops: readonly TradeOp[]): Words {
     });
   };
   for (const op of ops) {
-    if (op.op === "words") stepWords(op as unknown as Record<string, unknown>, visit, true);
+    if (op.op === "words") stepWords(op, visit, true);
     else if (op.op === "more") for (const line of op.more) visit(line);
     else if (op.op === "after" || op.op === "before") steps(op.steps);
     else if (op.op === "branch") {
@@ -364,7 +364,10 @@ export function tradePairs(trade: LoadedTrade, text: string): TradePair[] {
       });
     });
     const swaps = (value: unknown, path: JsonPart[], at: string | null): void => {
-      if (Array.isArray(value)) value.forEach((item, k) => swaps(item, [...path, k], at));
+      if (Array.isArray(value))
+        value.forEach((item, k) => {
+          swaps(item, [...path, k], at);
+        });
       else if (typeof value === "object" && value !== null)
         for (const [key, item] of Object.entries(value)) {
           if (key !== "swap" || !Array.isArray(item)) {
@@ -602,7 +605,10 @@ function verifyKey(key: string): boolean {
 export function readLines(steps: readonly AppliedStep[], out: ReadLine[] = []): ReadLine[] {
   const deep = (value: unknown, step: string, field: string): void => {
     if (typeof value === "string") out.push({ step, field, text: value });
-    else if (Array.isArray(value)) value.forEach((item, k) => deep(item, step, `${field}[${String(k)}]`));
+    else if (Array.isArray(value))
+      value.forEach((item, k) => {
+        deep(item, step, `${field}[${String(k)}]`);
+      });
     else if (typeof value === "object" && value !== null)
       for (const [key, item] of Object.entries(value)) deep(item, step, `${field}.${key}`);
   };
