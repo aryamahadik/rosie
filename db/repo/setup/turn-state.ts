@@ -17,9 +17,11 @@
 // item 77's name, the key's values joined by "/" in key order, which the SQL builds from the row's own columns and
 // compares with the rowId whole, never split (row-names.ts). Every read of a business-scoped setup table also names the
 // business (with businessId null, rows with no business), as turn-state.ts does, so the answer holds no other business's
-// row even for a role row-level security does not bind, and a two-column name's compare uses the business's index
-// (T-1427's database engineer's N3) rather than a scan. A table scoped none is read the same on both sides (K-24's kinds
-// and kind_flows, the shared catalog; K-22's accounts, proof_codes and sessions; K-27's calendar_links and busy_blocks).
+// row even for a role row-level security does not bind, and a two-column name's compare is narrowed by the business,
+// through its index where the table has one (T-1427's database engineer's N3: company_kinds_business_idx,
+// picked_kind_texts_business_idx, flow_defaults' own key). A table scoped none is read the same on both sides (K-24's
+// kinds and kind_flows, the shared catalog, whose name is compared over the catalog; K-22's accounts, proof_codes and
+// sessions; K-27's calendar_links and busy_blocks).
 //
 // A value is written as K-04's seed fixtures write values, as turn-state.ts writes them: JSON booleans and numbers (a
 // bigint or a numeric as a JSON number, refused past the largest safe integer), arrays as JSON arrays, a timestamptz in

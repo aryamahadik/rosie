@@ -104,7 +104,8 @@
 //   - a version read names the row by its name, which the SQL compares whole with the row's own name, never splitting the
 //     rowId (CQ-09), with business_id one of the businesses the commit writes (default 14; T-1427's security reviewer's N2,
 //     DL-913), so another business's name finds no row and the commit throws (default 1, fail closed), and the compare
-//     uses the business's index (T-1427's database engineer's N3);
+//     is narrowed by the business, through its index where the table has one (T-1427's database engineer's N3:
+//     company_kinds_business_idx, picked_kind_texts_business_idx, flow_defaults' own key);
 //   - versionChanged names a changed row by its name.
 // A table of one key column is named, locked, compared and answered as before, by the same statements.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.1";

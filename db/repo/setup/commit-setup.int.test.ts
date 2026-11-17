@@ -41,6 +41,8 @@ const SEEDS: readonly [string, string][] = [
   ["business-setup", "seed-company-two-kinds.json"],
   ["kinds-of-work", "seed-kinds-sample.json"],
   ["services-prices", "seed-services-price-list.json"],
+  ["services-prices", "seed-service-money-paths.json"],
+  ["services-prices", "seed-item-services.json"],
 ];
 
 interface SeedRow {
@@ -69,6 +71,14 @@ function seedRowWhere(part: string, file: string, table: string, match: Values):
     throw new Error(`${file} has no one ${table} row that matches`);
   }
   return row.values;
+}
+
+/** A seed value that must be text (an id). */
+function textOf(value: Json | undefined): string {
+  if (typeof value !== "string") {
+    throw new Error("expected a seed id as text");
+  }
+  return value;
 }
 
 /** A seed's rows after those of every seed its `after` names (each path from the naming file's folder), each once. */
@@ -607,6 +617,72 @@ describe("commitTurn with the setup tables as write targets (T-667)", () => {
       ).rejects.toThrow(/a row of company_kinds the request names does not exist/);
       expect(await turnWritten("turn-t667-bad-key")).toBe(false);
       expect(await versionNow("company_kinds", "company-lees-barbershop/barber")).toBe(1);
+    },
+  );
+
+  it(
+    "carries the catalog's writes (T-320's set): a way changed and a price closed at their versions, a space's link added",
+    SLOW,
+    async () => {
+      const way = seedRowWhere("services-prices", "seed-service-money-paths.json", "service_money", {
+        id: "way-lees-haircut-shop",
+      });
+      const price = seedRowWhere("services-prices", "seed-item-services.json", "price_rules", {
+        id: "price-boarding-cat-condo",
+      });
+      const link = seedRowWhere("services-prices", "seed-item-services.json", "item_services", {
+        place_or_thing_id: "place-pet-boarding-cat-condo",
+      });
+      const place = textOf(link.place_or_thing_id);
+      const service = seedRowWhere("services-prices", "seed-item-services.json", "services", {
+        id: textOf(link.service_id),
+      });
+      // The seed's own link, taken out by the owner so the commit adds it as S1-81 does.
+      await db.sql`
+        delete from item_services where place_or_thing_id = ${place} and service_id = ${textOf(service.id)}
+      `;
+      const outcome = await commit(
+        turnOf(
+          "turn-t667-catalog",
+          [
+            {
+              op: "update",
+              table: "service_money",
+              key: { id: way.id },
+              expectVersion: way.version,
+              set: { fee_cents: 2500 },
+            },
+            {
+              op: "update",
+              table: "price_rules",
+              key: { id: price.id },
+              expectVersion: price.version,
+              set: { effective_to: "2026-11-16T15:00:00Z" },
+            },
+            { op: "insert", table: "item_services", values: link },
+          ] as unknown as StateWrite[],
+          [{ table: "services", rowId: textOf(service.id), version: service.version as number }],
+        ),
+      );
+      expect(answerErrors(outcome)).toEqual([]);
+      // item_services carries no version, so the answer names no row of it (K-05 item 1).
+      expect(outcome).toMatchObject({
+        result: "committed",
+        committed: {
+          written: [
+            { table: "service_money", rowId: way.id, version: (way.version as number) + 1 },
+            { table: "price_rules", rowId: price.id, version: (price.version as number) + 1 },
+          ],
+        },
+      });
+      const [linked] = await db.sql<{ business_id: string }[]>`
+        select business_id from item_services where place_or_thing_id = ${place} and service_id = ${textOf(service.id)}
+      `;
+      expect(linked?.business_id).toBe(link.business_id);
+      const [closed] = await db.sql<{ open: boolean }[]>`
+        select effective_to is null as open from price_rules where id = ${textOf(price.id)}
+      `;
+      expect(closed?.open).toBe(false);
     },
   );
 

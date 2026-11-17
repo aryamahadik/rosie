@@ -137,7 +137,15 @@ function chainRows(file: URL, seen: Set<string>): SeedRow[] {
 
 /** The rowId K-05 names a home's row by: its one key's value, or item 77's "/" name, from the seed's values. */
 function rowIdOf(home: SetupFactHome, values: Values): string {
-  return home.key.map((column) => String(values[column])).join("/");
+  return home.key
+    .map((column) => {
+      const value = values[column];
+      if (typeof value !== "string" && typeof value !== "number") {
+        throw new Error(`a seed key column ${column} holds no text or number`);
+      }
+      return String(value);
+    })
+    .join("/");
 }
 
 /** A seed interval's whole minutes ("30 minutes", "24 hours", "2 days"), as the read answers an interval. */
