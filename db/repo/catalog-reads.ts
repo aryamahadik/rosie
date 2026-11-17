@@ -252,7 +252,7 @@ async function enterSide(db: Db, call: CatalogRead, businessId: string): Promise
     select current_setting('transaction_isolation') as isolation,
            current_setting('transaction_read_only') as read_only
   `;
-  if (moment === undefined || moment.read_only !== "on" || !ONE_MOMENT.has(moment.isolation)) {
+  if (moment?.read_only !== "on" || !ONE_MOMENT.has(moment.isolation)) {
     throw new Error(
       `${call} runs in one read-only transaction at repeatable read, so every row and version it answers is one moment's`,
     );

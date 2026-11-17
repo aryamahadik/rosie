@@ -1456,27 +1456,16 @@ describe("values: never rounded, never an answer the contract refuses; a value i
     async () => {
       const read = (): Promise<unknown> =>
         readServicePriceRules(app, { businessId: BARBERSHOP, serviceId: HAIRCUT, at: NOV_4 });
-      const faults: [SeedRow, string, string][] = [
-        [
-          haircutPrice("price-lees-haircut-sunday-late", "7", { from_time: "24:00" }),
-          "price_rules.from_time",
-          "24:00",
-        ],
-        [
-          haircutPrice("price-lees-haircut-saturday-late", "6", { from_time: "17:00:00.5" }),
-          "price_rules.from_time",
-          "17:00:00.5",
-        ],
-        [
-          haircutPrice("price-lees-haircut-friday-early", "5", { until_time: "23:59:59.5" }),
-          "price_rules.until_time",
-          "23:59:59.5",
-        ],
+      /** Each fault: the new rule's id and weekday, its one faulty time column, and the time it holds. */
+      const faults: [string, string, string, string][] = [
+        ["price-lees-haircut-sunday-late", "7", "from_time", "24:00"],
+        ["price-lees-haircut-saturday-late", "6", "from_time", "17:00:00.5"],
+        ["price-lees-haircut-friday-early", "5", "until_time", "23:59:59.5"],
       ];
-      for (const [row, column, value] of faults) {
+      for (const [id, weekdays, column, value] of faults) {
         await world();
-        await loadSeeds([], [row]);
-        await expectCannotCarry(read(), "readServicePriceRules", column, [value, String(row.values.id)]);
+        await loadSeeds([], [haircutPrice(id, weekdays, { [column]: value })]);
+        await expectCannotCarry(read(), "readServicePriceRules", `price_rules.${column}`, [value, id]);
       }
       await world();
       await loadSeeds(
