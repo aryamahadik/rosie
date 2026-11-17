@@ -1,0 +1,54 @@
+{
+  "call": "readBusinessKinds",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": [
+      "business-setup/seed-business-demo-shop.json",
+      "business-setup/seed-company-two-kinds.json",
+      "kinds-of-work/seed-kinds-sample.json"
+    ],
+    "after": [],
+    "now": "2026-10-26T14:00:00Z",
+    "note": "Lee's Barbershop's kinds of work (T-320's CatalogReads.kindsOf; README item 72): K-23's seed-company-two-kinds gives it one, barber, of company-lees-barbershop, with no trade name of its own and no switch on in either flow, at version 1, and K-24's seed-kinds-sample gives barber its two kind_flows rows. K-23's seed-business-demo-shop gives the business its business_setup row at version 4, whose no_money is false (CQ-349 (2): read 1 answers it, so a way's money path is checked against the business's M02 as well as its kind's nomoney fact); none of that row's other columns is answered (the listing's phone and email, the website, About us, the Stripe account, the terms and control). Lee Home Services' two kinds in the same seed are another business's and are never read."
+  },
+  "request": {
+    "businessId": null
+  },
+  "outcome": {
+    "result": "businessKinds",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-26T14:00:00Z",
+    "setup": {
+      "businessId": "biz-lees-barbershop",
+      "noMoney": false,
+      "version": 4
+    },
+    "kinds": [
+      {
+        "rowId": "company-lees-barbershop/barber",
+        "companyId": "company-lees-barbershop",
+        "kindId": "barber",
+        "businessId": "biz-lees-barbershop",
+        "tradeName": null,
+        "facts": ["children", "documents", "extrawork", "groups", "photos"],
+        "switchesA": [],
+        "switchesB": [],
+        "version": 1,
+        "flows": [
+          {
+            "rowId": "barber/A",
+            "flow": "A",
+            "combos": ["list|card|counter", "list|none|counter", "list|deposit|counter"],
+            "version": 1
+          },
+          {
+            "rowId": "barber/B",
+            "flow": "B",
+            "combos": ["list|card|bill", "list|full|none", "photos|deposit|bill"],
+            "version": 1
+          }
+        ]
+      }
+    ]
+  }
+}

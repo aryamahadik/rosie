@@ -1,0 +1,32 @@
+{
+  "call": "readBusinessServices",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["services-prices/seed-service-money-paths.json"],
+    "after": [],
+    "now": "2026-10-26T14:00:00Z",
+    "note": "Lee Home Services' services under its own scope (README item 73): K-25's seed-service-money-paths gives it one, Lee Electric's wiring repair (90 minutes), while its chain also loads the barbershop's ten lines (seed-services-price-list), which are another business's and are never answered, not even counted."
+  },
+  "request": {
+    "businessId": "biz-lee-home-services"
+  },
+  "outcome": {
+    "result": "businessServices",
+    "businessId": "biz-lee-home-services",
+    "readAt": "2026-10-26T14:00:00Z",
+    "services": [
+      {
+        "id": "svc-lee-electric-wiring-repair",
+        "businessId": "biz-lee-home-services",
+        "kindId": "electrician",
+        "name": "Wiring repair (flickering lights, a dead circuit)",
+        "priceKind": "one_price",
+        "unit": null,
+        "lengthMinutes": 90,
+        "position": 1,
+        "active": true,
+        "version": 1
+      }
+    ]
+  }
+}

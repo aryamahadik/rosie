@@ -1,0 +1,89 @@
+{
+  "result": "termsSources",
+  "businessId": "biz-lees-barbershop",
+  "at": "2026-10-22T22:30:00Z",
+  "readAt": "2026-10-22T22:30:00Z",
+  "flowDefaults": [
+    {
+      "rowId": "biz-lees-barbershop/A",
+      "businessId": "biz-lees-barbershop",
+      "flow": "A",
+      "cutoffBeforeMinutes": 1440,
+      "cutoffDayBeforeAt": null,
+      "version": 1
+    },
+    {
+      "rowId": "biz-lees-barbershop/B",
+      "businessId": "biz-lees-barbershop",
+      "flow": "B",
+      "cutoffBeforeMinutes": 1440,
+      "cutoffDayBeforeAt": null,
+      "version": 1
+    }
+  ],
+  "rules": [
+    {
+      "id": "rule-lees-barbershop-note-kids-cut",
+      "businessId": "biz-lees-barbershop",
+      "ruleKind": "note",
+      "valueType": "note",
+      "flow": null,
+      "kindId": "barber",
+      "valueOn": null,
+      "valueCents": null,
+      "valueCurrency": null,
+      "valueSpanMinutes": null,
+      "valueCount": null,
+      "valueDates": null,
+      "effectiveFrom": "2026-10-19T18:12:00Z",
+      "effectiveTo": null,
+      "version": 1,
+      "words": "A parent or guardian books for anyone under 18, and a parent stays for a kids cut."
+    },
+    {
+      "id": "rule-lees-barbershop-ok-new-customer",
+      "businessId": "biz-lees-barbershop",
+      "ruleKind": "ok_new_customer",
+      "valueType": "on",
+      "flow": null,
+      "kindId": null,
+      "valueOn": true,
+      "valueCents": null,
+      "valueCurrency": null,
+      "valueSpanMinutes": null,
+      "valueCount": null,
+      "valueDates": null,
+      "effectiveFrom": "2026-10-19T18:12:00Z",
+      "effectiveTo": null,
+      "version": 1
+    },
+    {
+      "id": "rule-lees-barbershop-ok-same-day",
+      "businessId": "biz-lees-barbershop",
+      "ruleKind": "ok_same_day",
+      "valueType": "on",
+      "flow": null,
+      "kindId": null,
+      "valueOn": true,
+      "valueCents": null,
+      "valueCurrency": null,
+      "valueSpanMinutes": null,
+      "valueCount": null,
+      "valueDates": null,
+      "effectiveFrom": "2026-10-19T18:12:00Z",
+      "effectiveTo": null,
+      "version": 1
+    }
+  ],
+  "priceOkLimits": [
+    {
+      "id": "pok-lees-barbershop-quotes",
+      "businessId": "biz-lees-barbershop",
+      "flow": "A",
+      "kindId": null,
+      "effectiveFrom": "2026-10-19T18:12:00Z",
+      "effectiveTo": null,
+      "version": 1
+    }
+  ]
+}

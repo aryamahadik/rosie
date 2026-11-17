@@ -2799,6 +2799,198 @@
       "expect": "refuse",
       "shows": "commit-alex-stop-handle-id answered with Alex's phone row named by his number, +15555550101, though its request asks for handle ids: an answered phones rowId is a K-08 handleRef and never has phoneNumber's shape (put right, handle-alex, it is commit-alex-stop-handle-id's outcome)",
       "source": "K-08 v1 handleRef, safeId and default 3; 02-contracts K-08 ('never the raw number or words'); arch 10 line 516; BP rule 7; K-05 v1 phoneNumber; ops/cards/T-1418.md; K-05 v1.17 item 71 and default 149"
+    },
+    {
+      "file": "read-business-kinds-lee-home-services.json",
+      "version": "v1.18",
+      "def": "readBusinessKinds.exchange",
+      "expect": "accept",
+      "shows": "Lee Home Services' two kinds of work, Lee Electric and Lee Plumbing (cancelright on in flow B), each named company-lee-home-services/<kind> by item 77's rule, with its facts, switches per flow, version and its kind's two kind_flows rows (each named <kind>/<flow>, with the combos a way may take); setup null, since no seed writes Lee Home Services a business_setup row",
+      "source": "ops/cards/T-320.md (run 1's NEED, read 1); ops/cards/T-1427.md; DL-888, DL-903; K-23 v1 company_kinds, seed-company-two-kinds; K-24 v1 kind_flows.combos, seed-kinds-sample; K-25 v1 rule 9; actions/src/domain/catalog/types.ts BusinessKind; K-05 v1.18 items 72 and 77, defaults 155, 161 and 163"
+    },
+    {
+      "file": "read-business-kinds-barbershop.json",
+      "version": "v1.18",
+      "def": "readBusinessKinds.exchange",
+      "expect": "accept",
+      "shows": "Lee's Barbershop's one kind of work, barber, with no trade name and no switch on, its two kind_flows rows, and the business's business_setup.no_money (false, version 4) and nothing else of that row",
+      "source": "QUESTIONS.md CQ-349 (2); FS row M02; K-23 v1 business_setup, seed-business-demo-shop, seed-company-two-kinds; K-24 v1 seed-kinds-sample; K-25 v1 rule 9; K-05 v1.18 item 72 and default 161"
+    },
+    {
+      "file": "read-business-kinds-yoga-studio-none.json",
+      "version": "v1.18",
+      "def": "readBusinessKinds.exchange",
+      "expect": "accept",
+      "shows": "The yoga studio, found in its scope with no kind of work placed on it and no setup row: empty kinds and setup null, never notFound; the other businesses' rows in the same seeds are never read",
+      "source": "K-04 v1 seed-business-head; arch 10 line 546; K-04 v1 rule 4; K-05 v1.4 default 56; K-05 v1.18 item 72 and default 153"
+    },
+    {
+      "file": "read-business-kinds-no-business-row.json",
+      "version": "v1.18",
+      "def": "readBusinessKinds.exchange",
+      "expect": "accept",
+      "shows": "Lee Home Services read before its business row is written: notFound (table businesses), never an empty list",
+      "source": "K-05 v1.4 item 42 and default 56 (a business found first); K-23 v1 seed-company-two-kinds (the business head it writes, not loaded); K-05 v1.18 item 72 and default 153"
+    },
+    {
+      "file": "read-business-services-barbershop.json",
+      "version": "v1.18",
+      "def": "readBusinessServices.exchange",
+      "expect": "accept",
+      "shows": "Lee's Barbershop's ten services from Sam's price board in (position, id) order, each with its kind, name, price kind, unit, length in whole minutes (the groom's package's 2 hours 30 minutes as 150), place, offered flag and version, never its extras",
+      "source": "ops/cards/T-320.md (read 2); S1-12; K-25 v1 services, seed-services-price-list; actions/src/domain/catalog/types.ts ServiceRow; K-05 v1.18 item 73, defaults 156, 162 and 164"
+    },
+    {
+      "file": "read-business-services-lee-home-services.json",
+      "version": "v1.18",
+      "def": "readBusinessServices.exchange",
+      "expect": "accept",
+      "shows": "Lee Home Services' one service, the wiring repair (90 minutes), under its own scope, while the barbershop's ten lines its seed chain also loads are never answered",
+      "source": "arch 10 line 546; K-04 v1 rule 4; K-25 v1 rule 5, seed-service-money-paths; K-05 v1.18 item 73"
+    },
+    {
+      "file": "read-service-ways-haircut.json",
+      "version": "v1.18",
+      "def": "readServiceWays.exchange",
+      "expect": "accept",
+      "shows": "The haircut's two ways in id order: at the customer's home in flow B paid in full with the $20 fee, and at the shop in flow A with a card saved for the $20 fee, each with every column T-320's WayRow reads and its version",
+      "source": "ops/cards/T-320.md (read 3); S1-13; K-25 v1 service_money, seed-service-money-paths; actions/src/domain/catalog/types.ts WayRow; K-05 v1.18 item 74"
+    },
+    {
+      "file": "read-service-ways-skin-fade.json",
+      "version": "v1.18",
+      "def": "readServiceWays.exchange",
+      "expect": "accept",
+      "shows": "The skin fade's one way with its own 2-hour free-cancel time, answered as 120 whole minutes, the rule a terms snapshot copies over the flow default",
+      "source": "K-25 v1 service_money.cutoff_before, seed-service-money-paths; K-30 v1 seed-terms-snapshot (cutoff_before 2 hours); K-05 v1.18 item 74 and default 156"
+    },
+    {
+      "file": "read-service-ways-other-business-service.json",
+      "version": "v1.18",
+      "def": "readServiceWays.exchange",
+      "expect": "accept",
+      "shows": "Lee Electric's wiring repair named under the barbershop's scope: an empty list, as for a service with no ways or one not yet written, never notFound and never another business's way",
+      "source": "arch 10 line 546; K-04 v1 rule 4; actions/src/domain/catalog/service.ts (a service added, then its way, in one call); K-05 v1.18 item 74 and default 153"
+    },
+    {
+      "file": "read-price-rules-haircut-before-raise.json",
+      "version": "v1.18",
+      "def": "readServicePriceRules.exchange",
+      "expect": "accept",
+      "shows": "The haircut's rules in effect at or after Oct 27, the day after S11-54's raise was set: the $35 closed at Nov 2 (version 2), the $40 from Nov 2 and the $75 at home with its place condition, in id order; no tie",
+      "source": "ops/cards/T-320.md (read 4); S11-54; arch 09 line 488; K-25 v1 price_rules, seed-price-rule-dates; actions/src/domain/catalog/types.ts PriceRuleRow, PriceConditions; K-05 v1.18 item 75 and default 157"
+    },
+    {
+      "file": "read-price-rules-haircut-after-raise.json",
+      "version": "v1.18",
+      "def": "readServicePriceRules.exchange",
+      "expect": "accept",
+      "shows": "The same rules read on Nov 3: the $35, ended before at, is not answered; the $40 and the home price are",
+      "source": "S11-54; RULES 3.7; K-25 v1 seed-price-rule-dates; K-05 v1.18 item 75 and default 157"
+    },
+    {
+      "file": "read-price-rules-event-hours-andre.json",
+      "version": "v1.18",
+      "def": "readServicePriceRules.exchange",
+      "expect": "accept",
+      "shows": "Event hours' $120 and its $140 with Andre, a worker condition named by his worker resource's id alone",
+      "source": "FS row T06; S2-15; K-25 v1 price_rules.worker_resource_id, seed-price-rule-dates; K-05 v1.18 item 75"
+    },
+    {
+      "file": "read-price-rules-haircut-tie.json",
+      "version": "v1.18",
+      "def": "readServicePriceRules.exchange",
+      "expect": "accept",
+      "shows": "A possible tie between the haircut's $75 at home and a $45 evening price from 17:00, unanswered, answered as a tie row with the three rules in effect, the clock time as HH:MM; the database side writes the evening rule and the tie its note lists",
+      "source": "arch 05 line 253; S13-25 rule 19; K-25 v1 price_rule_ties (README: no seed shows a tie); actions/src/domain/catalog/types.ts PriceTieRow; K-05 v1.18 item 75, defaults 157 and 166"
+    },
+    {
+      "file": "read-terms-sources-dee-skin-fade.json",
+      "version": "v1.18",
+      "def": "readTermsSources.exchange",
+      "expect": "accept",
+      "shows": "The sources of Dee's skin fade snapshot at its written_at: both flows' defaults (24 hours, named <business>/<flow>), the three K-26 rules and the one price OK limit in force, exactly the four the seed's snapshot names, the note without its words",
+      "source": "ops/cards/T-320.md (read 5); QUESTIONS.md CQ-349 (1); K-23 v1 flow_defaults; K-26 v1 rules, price_ok_limits; K-30 v1 seed-terms-snapshot, rule 10 and default 11; actions/src/domain/catalog/types.ts TermsSources; actions/src/gate/limit-2/facts.ts OwnerRules; K-05 v1.18 items 76 and 77, defaults 158 to 160"
+    },
+    {
+      "file": "read-terms-sources-after-no-show-count.json",
+      "version": "v1.18",
+      "def": "readTermsSources.exchange",
+      "expect": "accept",
+      "shows": "The same business a week later: the no-show count (a count of 2) in force from Oct 28 is answered with its value beside the other rules, and the barber kind's flow B price OK limit beside the flow A one; Lee Home Services' limit is never read",
+      "source": "S11-57; K-26 v1 rules (value_count), seed-price-ok-limit; K-30 v1 seed-terms-snapshot; actions/src/rules/evaluator/types.ts RuleRow; K-05 v1.18 item 76, defaults 159 and 160"
+    },
+    {
+      "file": "invalid/refuse-business-kinds-no-business.json",
+      "version": "v1.18",
+      "def": "readBusinessKinds.exchange",
+      "expect": "refuse",
+      "shows": "A kinds read with businessId null: a catalog read is a business's and never runs unscoped on the runtime side (put right, biz-lees-barbershop, it is read-business-kinds-barbershop)",
+      "source": "arch 10 line 546; K-04 v1 rule 4; db/repo/scope.ts (a Tool API call never runs with no scope); K-05 v1.18 item 72 and default 154"
+    },
+    {
+      "file": "invalid/refuse-business-kinds-row-by-kind-id.json",
+      "version": "v1.18",
+      "def": "readBusinessKinds.response",
+      "expect": "refuse",
+      "shows": "Lee Plumbing's company_kinds row named plumber, its kind's id alone, which names no row of a two-column key (put right, company-lee-home-services/plumber, it is read-business-kinds-lee-home-services's outcome)",
+      "source": "QUESTIONS.md CQ-349 (1); K-23 v1 company_kinds primary key (company_id, kind_id); db/repo/commit-turn.ts oneKey; K-05 v1.18 item 77 and default 163"
+    },
+    {
+      "file": "invalid/refuse-business-kinds-setup-listing-phone.json",
+      "version": "v1.18",
+      "def": "readBusinessKinds.response",
+      "expect": "refuse",
+      "shows": "The barbershop's setup answered with its listing phone, +15555550177, beside no_money: read 1 answers no_money alone of that row, never a number (put right, the phone left out, it is read-business-kinds-barbershop's outcome)",
+      "source": "ops/cards/T-1427.md ('no person's address or number'); K-23 v1 business_setup.listing_phone; BP rule 7; K-05 v1.18 item 72 and default 161"
+    },
+    {
+      "file": "invalid/refuse-business-services-with-extras.json",
+      "version": "v1.18",
+      "def": "readBusinessServices.response",
+      "expect": "refuse",
+      "shows": "The wiring repair answered with its extras, the profession file's words about it: no code reads a sub-key, so the read never answers them (put right, the extras left out, it is read-business-services-lee-home-services's outcome)",
+      "source": "K-25 v1 services.extras (FS lines 747, 748); actions/src/domain/catalog/types.ts ServiceRow ('Its extras are not read'); K-05 v1.18 item 73 and default 162"
+    },
+    {
+      "file": "invalid/refuse-service-ways-no-service.json",
+      "version": "v1.18",
+      "def": "readServiceWays.exchange",
+      "expect": "refuse",
+      "shows": "A ways read naming no service: the read is one service's ways (put right, svc-lees-haircut, it is read-service-ways-haircut)",
+      "source": "ops/cards/T-320.md (read 3: a service's ways); actions/src/domain/catalog/reads.ts waysOf; K-05 v1.18 item 74"
+    },
+    {
+      "file": "invalid/refuse-service-ways-cutoff-as-interval.json",
+      "version": "v1.18",
+      "def": "readServiceWays.response",
+      "expect": "refuse",
+      "shows": "The skin fade's free-cancel time answered as the interval text '2 hours': a span is whole minutes (put right, 120, it is read-service-ways-skin-fade's outcome)",
+      "source": "actions/src/domain/catalog/types.ts ('A span ... is whole minutes'); K-25 v1 service_money.cutoff_before; K-05 v1.18 item 74 and default 156"
+    },
+    {
+      "file": "invalid/refuse-price-rules-at-with-offset.json",
+      "version": "v1.18",
+      "def": "readServicePriceRules.exchange",
+      "expect": "refuse",
+      "shows": "A rules read whose at carries a zone offset, -04:00: every instant is UTC ending in Z (put right, 2026-10-27T14:00:00Z, it is read-price-rules-haircut-before-raise)",
+      "source": "CQ-09 (every time in UTC); common formats.v1 utc; actions/src/domain/catalog/reads.ts priceRulesOf ('a UTC instant'); K-05 v1.18 item 75"
+    },
+    {
+      "file": "invalid/refuse-terms-sources-caller-flow.json",
+      "version": "v1.18",
+      "def": "readTermsSources.exchange",
+      "expect": "refuse",
+      "shows": "A sources read naming a flow: the read answers both flows' defaults and the caller takes its own, so one read serves a snapshot and limit 2 alike (put right, the flow left out, it is read-terms-sources-dee-skin-fade)",
+      "source": "actions/src/domain/catalog/reads.ts termsSourcesOf; actions/src/gate/limit-2/facts.ts OwnerRules.rulesOf (no flow); K-05 v1.18 item 76 and default 158"
+    },
+    {
+      "file": "invalid/refuse-terms-sources-rule-with-words.json",
+      "version": "v1.18",
+      "def": "readTermsSources.response",
+      "expect": "refuse",
+      "shows": "The kids-cut note answered with Sam's words: a rule is answered by its kind, scope, value and dates, never the owner's words, which the AI reads and code never enforces (put right, the words left out, it is read-terms-sources-dee-skin-fade's outcome)",
+      "source": "arch 09 line 482; K-26 v1 rules.words; actions/src/rules/evaluator/types.ts RuleRow ('The owner's words are left out'); K-30 v1 default 11; K-05 v1.18 item 76 and default 160"
     }
   ]
 }

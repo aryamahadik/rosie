@@ -2,9 +2,57 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 715, [`e1c4800`](https://github.com/aryamahadik/rosie/commit/e1c4800), 2026-11-16 22:06:31 UTC.
+- **Through:** commit 717, [`46fbad5`](https://github.com/aryamahadik/rosie/commit/46fbad5), 2026-11-16 22:54:21 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 717. docs: COMMIT\_HISTORY.md through commit 715 (e1c4800, \#725) (\#727)
+
+- **Commit:** [`46fbad5`](https://github.com/aryamahadik/rosie/commit/46fbad5), by Arya Mahadik, 2026-11-16 22:54:21 UTC
+- **Pull request:** [#727](https://github.com/aryamahadik/rosie/pull/727) from `task/commit-history-151`, merged 2026-11-16 22:54:22 UTC. It squashed 1 branch commit:
+  - `7af998e` docs: COMMIT\_HISTORY.md through commit 715 (e1c4800, \#725)
+- **Files changed:** 1 (+37 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +37 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 244 (DL-910); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 716. T-1412: the root binds the guard's fixed replies, so STOP, START and HELP are recorded and answered on staging (\#728)
+
+- **Commit:** [`519f307`](https://github.com/aryamahadik/rosie/commit/519f307), by Arya Mahadik, 2026-11-16 22:54:18 UTC
+- **Pull request:** [#728](https://github.com/aryamahadik/rosie/pull/728) from `task/T-1412`, merged 2026-11-16 22:54:18 UTC. It squashed 2 branch commits:
+  - `7125820` T-1412: work in progress at the user's pause, unchecked (DL-904)
+  - `12cc5c4` T-1412: the root's Workers test: STOP, START and HELP through install…
+- **Files changed:** 6 (+1305 −17), by folder:
+  - `runtime/src/wiring/` keyword-replies.worker.test.ts +897 −0, ports.ts +6 −4, root.ts +73 −4, test-support.ts +314 −8
+  - `runtime/src/wiring/staging/` index.ts +1 −0, options.ts +14 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1412: work in progress at the user's pause, unchecked (DL-904)
+
+The build run wf_fcabf6e8-590 was stopped at about 14:15Z Nov 16 at the user's request, about 18 minutes in, before its first self-check. Its edits to root.ts, ports.ts, staging/index.ts, staging/options.ts and test-support.ts are saved exactly as they stood. The resumed builder re-reads them against the card and runs every check; nothing here is verified.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1412: the root's Workers test: STOP, START and HELP through install()'s replies and the fake root's keyword door, the binding and its restore, Rosie's number read at each use (every self-check passes)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 715. docs: COMMIT\_HISTORY.md through commit 713 (f03528b, \#723) (\#725)
 

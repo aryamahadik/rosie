@@ -1,0 +1,103 @@
+{
+  "call": "readTermsSources",
+  "given": {
+    "k04Seeds": [],
+    "partSeeds": ["bookings-changes/seed-terms-snapshot.json"],
+    "after": [],
+    "now": "2026-10-22T22:30:00Z",
+    "note": "The sources of Dee's skin fade snapshot, read at its written_at (K-30's seed-terms-snapshot; README item 76): the barbershop's two flow defaults, 24 hours before the visit in each flow (K-23 seed-business-demo-shop), named by README item 77's rule; the K-26 rows in force at that instant, of every scope: the kids-cut note (barber), same-day and new customers ask Sam first, and the price OK for flow A quotes. These are exactly the four rows the seed's snapshot names (booking_terms_rules), since each covers flow A and the barber kind; the no-show count Sam turns on from Oct 28 is in the seed but not yet in force. The snapshot's cancel rule is the skin fade way's own 2 hours (read-service-ways-skin-fade), not the flow default. The note rule is answered with its kind and scope, never its words. Limit 2's owner rules read the same rules list (OwnerRules.rulesOf)."
+  },
+  "request": {
+    "businessId": "biz-lees-barbershop",
+    "at": "2026-10-22T22:30:00Z",
+    "flow": "A"
+  },
+  "outcome": {
+    "result": "termsSources",
+    "businessId": "biz-lees-barbershop",
+    "at": "2026-10-22T22:30:00Z",
+    "readAt": "2026-10-22T22:30:00Z",
+    "flowDefaults": [
+      {
+        "rowId": "biz-lees-barbershop/A",
+        "businessId": "biz-lees-barbershop",
+        "flow": "A",
+        "cutoffBeforeMinutes": 1440,
+        "cutoffDayBeforeAt": null,
+        "version": 1
+      },
+      {
+        "rowId": "biz-lees-barbershop/B",
+        "businessId": "biz-lees-barbershop",
+        "flow": "B",
+        "cutoffBeforeMinutes": 1440,
+        "cutoffDayBeforeAt": null,
+        "version": 1
+      }
+    ],
+    "rules": [
+      {
+        "id": "rule-lees-barbershop-note-kids-cut",
+        "businessId": "biz-lees-barbershop",
+        "ruleKind": "note",
+        "valueType": "note",
+        "flow": null,
+        "kindId": "barber",
+        "valueOn": null,
+        "valueCents": null,
+        "valueCurrency": null,
+        "valueSpanMinutes": null,
+        "valueCount": null,
+        "valueDates": null,
+        "effectiveFrom": "2026-10-19T18:12:00Z",
+        "effectiveTo": null,
+        "version": 1
+      },
+      {
+        "id": "rule-lees-barbershop-ok-new-customer",
+        "businessId": "biz-lees-barbershop",
+        "ruleKind": "ok_new_customer",
+        "valueType": "on",
+        "flow": null,
+        "kindId": null,
+        "valueOn": true,
+        "valueCents": null,
+        "valueCurrency": null,
+        "valueSpanMinutes": null,
+        "valueCount": null,
+        "valueDates": null,
+        "effectiveFrom": "2026-10-19T18:12:00Z",
+        "effectiveTo": null,
+        "version": 1
+      },
+      {
+        "id": "rule-lees-barbershop-ok-same-day",
+        "businessId": "biz-lees-barbershop",
+        "ruleKind": "ok_same_day",
+        "valueType": "on",
+        "flow": null,
+        "kindId": null,
+        "valueOn": true,
+        "valueCents": null,
+        "valueCurrency": null,
+        "valueSpanMinutes": null,
+        "valueCount": null,
+        "valueDates": null,
+        "effectiveFrom": "2026-10-19T18:12:00Z",
+        "effectiveTo": null,
+        "version": 1
+      }
+    ],
+    "priceOkLimits": [
+      {
+        "id": "pok-lees-barbershop-quotes",
+        "businessId": "biz-lees-barbershop",
+        "flow": "A",
+        "kindId": null,
+        "effectiveFrom": "2026-10-19T18:12:00Z",
+        "effectiveTo": null,
+        "version": 1
+      }
+    ]
+  }
+}
