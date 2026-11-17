@@ -155,6 +155,21 @@ describe("(a) a deposit is never over the price known then (K-25 rule 9; S1-13; 
     });
     expect(catalog.written()).toEqual({ versionsRead: [], state: [] });
     expect((await catalog.changePrice({ ...lower, priceCents: 4000 })).openedRuleId).not.toBeNull();
+    // An added price of the shop's own place prices that way too: $39.99 is under its $40 deposit.
+    const atShop = {
+      serviceId: "svc-lees-grooms-package",
+      conditions: { ...NO_CONDITIONS, serviceMoneyId: "way-lees-grooms-package-shop" },
+      priceCents: 3999,
+      fromCents: null,
+      setByPersonId: SAM,
+    };
+    const added = catalogAt(seeded()).catalog;
+    await expect(added.addPrice(atShop)).rejects.toMatchObject({
+      reason: "depositOverPrice",
+      fields: ["priceCents"],
+    });
+    expect(added.written()).toEqual({ versionsRead: [], state: [] });
+    expect((await added.addPrice({ ...atShop, priceCents: 4000 })).openedRuleId).not.toBeNull();
   });
 
   it("its place's rule, else the service's own: a way priced by its own place is held to that price alone", () => {
