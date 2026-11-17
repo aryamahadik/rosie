@@ -254,6 +254,11 @@ describe("recorded: T-1121's live run to the roster iPhone (Nov 17)", () => {
     expect(parseJson(maskNumbers(seen.body))).toEqual(recorded.body);
     expect(seen.headers).toEqual(SENT_HEADERS);
     expect(seen.redirect).toBe("manual");
+
+    // The Linq double's own answer for a number it has not been told about is this one, imessage with service imessage
+    // (T-411): on the recorded answer the adapter and the double give the same port-level result (K-11 README
+    // 'Producers and consumers').
+    expect(outcome).toEqual(createLinqDouble({ now: () => NOW }).capabilityCheck(request));
   });
 
   it("check_rcs's recorded answer, asked when check_imessage says not available and names no service, reads as RCS", async () => {
