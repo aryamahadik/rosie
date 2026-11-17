@@ -4,8 +4,9 @@
 // (T-633, T-634 and the journey 1 lane, once T-1429 binds its reads and T-667 lets the commit write the setup tables).
 //
 // One service serves one Tool API call, inside the call's business scope (T-290: CallContext.businessId), and reads its
-// now from the clock it is given (BP 9.4). It reads only through the five reads the caller hands in by name (reads.ts);
-// with none bound, every call answers notBuilt before it reads or builds anything (fails closed; DL-888). Every write is
+// now from the clock it is given (BP 9.4). It reads only through the reads the caller hands in by name (reads.ts: the
+// five list reads and, since T-1433, three reads of a row by id); with none bound, every call answers notBuilt before it
+// reads or builds anything (fails closed; DL-888). Every write is
 // a K-05 v1 stateWrite, an insert or an update naming the version read, held by rows.ts checkCatalogWrite; nothing is
 // deleted (CQ-128 (2): removing a space's link to a service answers notBuilt until K-05 has a delete write). Calls run
 // one at a time, and each sees what the earlier calls of the same service built (a service added, then its price, in
@@ -33,8 +34,8 @@
 //      service's rows of that kind in call order, so a repeated turn builds the same ids (payments' default 1). A
 //      snapshot's rule rows are `btr-<booking>-rule-<rule>` and `btr-<booking>-limit-<limit>`.
 //   2. With the kind's `nomoney` fact, a way takes nothing before and its after is counter (A), own (B) or none (a free
-//      service): K-25 rule 9 names counter and own; none moves no money either. K-23 business_setup.no_money is not one
-//      of the five reads, so the kind's fact is what is checked.
+//      service): K-25 rule 9 names counter and own; none moves no money either. Since T-1433 the business's own K-23
+//      business_setup.no_money (read 1's setup, a business with no setup row read as no money) is held the same way.
 //   3. The business's one currency (K-25 rule 7) is the caller's (no column holds it): every new amount is in it, and a
 //      way's or a rule's amounts in another are refused (currencyMismatch), never relabelled.
 //   4. A change, a close or a new price is never dated before now (`backdated`): effective dates are history.
@@ -142,7 +143,7 @@ export interface CatalogDeps {
   readonly now: string;
   /** The turn's (or the call's) key, the last part of every row id made by rule (default 1). */
   readonly turnKey: string;
-  /** The five reads, handed in by name (T-1429 binds them). None bound: every call answers notBuilt. */
+  /** The reads, handed in by name (T-1429 binds them; T-1433 widens them). None bound: every call answers notBuilt. */
   readonly reads?: CatalogReads;
 }
 

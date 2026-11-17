@@ -65,7 +65,7 @@ export function checkLocation(
   businessId: string,
 ): void {
   if (locationId === null) return;
-  if (location === null || location.id !== locationId || location.businessId !== businessId)
+  if (location?.id !== locationId || location.businessId !== businessId)
     refuse("locationNotOnBusiness", ["locationId"]);
   const fits =
     place === "customer"
@@ -146,12 +146,7 @@ export function checkWorker(
   businessId: string,
 ): void {
   if (workerResourceId === null) return;
-  if (
-    resource === null ||
-    resource.id !== workerResourceId ||
-    resource.businessId !== businessId ||
-    resource.kind !== "worker"
-  )
+  if (resource?.id !== workerResourceId || resource.businessId !== businessId || resource.kind !== "worker")
     refuse("workerNotOnBusiness", ["conditions.workerResourceId"]);
 }
 
@@ -166,6 +161,6 @@ export function checkCompany(companyId: string, kinds: readonly BusinessKind[]):
 
 /** (e) The space or thing a link names is the business's, as read under its scope (null: none of its). */
 export function checkSpace(placeOrThingId: string, row: PlaceOrThingRow | null, businessId: string): void {
-  if (row === null || row.id !== placeOrThingId || row.businessId !== businessId)
+  if (row?.id !== placeOrThingId || row.businessId !== businessId)
     refuse("spaceNotOnBusiness", ["placeOrThing.id"]);
 }

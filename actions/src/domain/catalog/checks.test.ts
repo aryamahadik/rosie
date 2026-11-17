@@ -16,6 +16,7 @@ import {
   type AddWayInput,
   type CatalogDeps,
   type CatalogReads,
+  type CatalogRefusal,
   type LocationRow,
   type PriceRuleRow,
   type WayRow,
@@ -87,6 +88,13 @@ function seedRow(store: Store, table: string, id: string): Record<string, unknow
   const row = store.row(table, id);
   if (row === undefined) throw new Error(`no seeded ${table} ${id}`);
   return row;
+}
+
+/** The reason (a) refuses a way's deposit under `rules` at the way's save, or null when it passes. */
+function depositRefusal(way: WayRow, rules: readonly PriceRuleRow[]): CatalogRefusal | null {
+  return refusalOf(() => {
+    checkDeposit(way, rules, ["depositCents"]);
+  });
 }
 
 describe("(a) a deposit is never over the price known then (K-25 rule 9; S1-13; README ruling 4 (a))", () => {
@@ -161,9 +169,9 @@ describe("(a) a deposit is never over the price known then (K-25 rule 9; S1-13; 
     const rules = ["price-lees-haircut-35", "price-lees-haircut-home"].map((id) =>
       ruleOf(seedRow(store, "price_rules", id)),
     );
-    expect(refusalOf(() => checkDeposit(home, rules, ["depositCents"]))).toBeNull();
+    expect(depositRefusal(home, rules)).toBeNull();
     const shop: WayRow = { ...home, id: "way-lees-haircut-shop" };
-    expect(refusalOf(() => checkDeposit(shop, rules, ["depositCents"]))).toBe("depositOverPrice");
+    expect(depositRefusal(shop, rules)).toBe("depositOverPrice");
   });
 
   it("a visit path: a deposit up to the starting price (A4-13), none with no starting price known", () => {
@@ -176,15 +184,13 @@ describe("(a) a deposit is never over the price known then (K-25 rule 9; S1-13; 
       feeCents: null,
     };
     const rule: PriceRuleRow = ruleOf(seedRow(store, "price_rules", "price-lee-electric-wiring-repair"));
-    expect(refusalOf(() => checkDeposit(way, [{ ...rule, fromCents: 8900 }], ["depositCents"]))).toBeNull();
-    expect(refusalOf(() => checkDeposit(way, [{ ...rule, fromCents: 8899 }], ["depositCents"]))).toBe(
-      "depositOverPrice",
-    );
-    expect(refusalOf(() => checkDeposit(way, [rule], ["depositCents"]))).toBe("depositOverPrice");
-    expect(refusalOf(() => checkDeposit(way, [], ["depositCents"]))).toBe("depositOverPrice");
+    expect(depositRefusal(way, [{ ...rule, fromCents: 8900 }])).toBeNull();
+    expect(depositRefusal(way, [{ ...rule, fromCents: 8899 }])).toBe("depositOverPrice");
+    expect(depositRefusal(way, [rule])).toBe("depositOverPrice");
+    expect(depositRefusal(way, [])).toBe("depositOverPrice");
     // A percent is under the price by its form, and a stopped way takes no new booking.
-    expect(refusalOf(() => checkDeposit({ ...way, depositCents: null }, [], ["depositCents"]))).toBeNull();
-    expect(refusalOf(() => checkDeposit({ ...way, active: false }, [], ["depositCents"]))).toBeNull();
+    expect(depositRefusal({ ...way, depositCents: null }, [])).toBeNull();
+    expect(depositRefusal({ ...way, active: false }, [])).toBeNull();
   });
 });
 
@@ -282,7 +288,9 @@ describe("(c) a way's location and place, and a rule's worker, are the business'
       version: 1,
     };
     const fits = (place: "business" | "meeting_spot" | "customer", location: LocationRow) =>
-      refusalOf(() => checkLocation(place, location.id, location, BARBERSHOP));
+      refusalOf(() => {
+        checkLocation(place, location.id, location, BARBERSHOP);
+      });
     expect(fits("business", shop)).toBeNull();
     expect(fits("business", { ...shop, kind: "office" })).toBeNull();
     expect(fits("meeting_spot", shop)).toBe("locationNotOfPlace");
@@ -291,9 +299,7 @@ describe("(c) a way's location and place, and a rule's worker, are the business'
     expect(fits("customer", shop)).toBe("locationNotOfPlace");
     expect(fits("customer", { ...shop, travelMiles: 25 })).toBeNull();
     // A row another business holds, answered by a leaky read, is never the business's.
-    expect(
-      refusalOf(() => checkLocation("business", shop.id, { ...shop, businessId: YOGA }, BARBERSHOP)),
-    ).toBe("locationNotOnBusiness");
+    expect(fits("business", { ...shop, businessId: YOGA })).toBe("locationNotOnBusiness");
   });
 
   it("a price by the yoga studio's Maya is refused at the barbershop; Avery's passes (a rule's worker)", async () => {
@@ -314,14 +320,11 @@ describe("(c) a way's location and place, and a rule's worker, are the business'
     const avery = { ...byPerson, conditions: { ...NO_CONDITIONS, workerResourceId: "res-avery" } };
     expect(await outcomeOf(catalog.addPrice(avery))).toBe("built");
     // A worker is a worker resource: the yoga studio's room is none, even under its own business.
+    const room = { id: "res-studio-room", businessId: YOGA, kind: "room", active: true, version: 1 };
     expect(
-      refusalOf(() =>
-        checkWorker(
-          "res-studio-room",
-          { id: "res-studio-room", businessId: YOGA, kind: "room", active: true, version: 1 },
-          YOGA,
-        ),
-      ),
+      refusalOf(() => {
+        checkWorker(room.id, room, YOGA);
+      }),
     ).toBe("workerNotOnBusiness");
   });
 });
