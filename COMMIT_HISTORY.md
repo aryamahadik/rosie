@@ -2,9 +2,53 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 729, [`d7aa916`](https://github.com/aryamahadik/rosie/commit/d7aa916), 2026-11-17 06:59:46 UTC.
+- **Through:** commit 731, [`4b1196b`](https://github.com/aryamahadik/rosie/commit/4b1196b), 2026-11-17 08:00:40 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 731. docs: COMMIT\_HISTORY.md through commit 729 (d7aa916, \#740) (\#742)
+
+- **Commit:** [`4b1196b`](https://github.com/aryamahadik/rosie/commit/4b1196b), by Arya Mahadik, 2026-11-17 08:00:40 UTC
+- **Pull request:** [#742](https://github.com/aryamahadik/rosie/pull/742) from `task/commit-history-158`, merged 2026-11-17 08:00:41 UTC. It squashed 1 branch commit:
+  - `690acc6` docs: COMMIT\_HISTORY.md through commit 729 (d7aa916, \#740)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 730. T-415: Linq contacts/add stub (CQ-354) and the capability check, on recorded samples (\#741)
+
+- **Commit:** [`35842dc`](https://github.com/aryamahadik/rosie/commit/35842dc), by Arya Mahadik, 2026-11-17 08:00:36 UTC
+- **Pull request:** [#741](https://github.com/aryamahadik/rosie/pull/741) from `task/T-415`, merged 2026-11-17 08:00:37 UTC. It squashed 2 branch commits:
+  - `9ccf9d0` T-415: Linq capability check (check\_imessage, then check\_rcs, mapped …
+  - `15d9d09` T-415: the recorded check\_imessage replay equals the Linq double's ow…
+- **Files changed:** 9 (+1538 −0), by folder:
+  - `adapters/src/linq/capability/` capability.test.ts +737 −0, capability.ts +192 −0, index.ts +21 −0, types.ts +32 −0, wire.ts +125 −0
+  - `adapters/src/linq/contacts/` contacts.test.ts +290 −0, contacts.ts +101 −0, index.ts +12 −0, types.ts +28 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-415: Linq capability check (check_imessage, then check_rcs, mapped to K-11 capabilityCheck from T-1121's recorded answers) and contacts/add as a no-network stub answering K-11 failed (CQ-354), refused when ENVIRONMENT is test
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-415: the recorded check_imessage replay equals the Linq double's own answer (imessage, service imessage)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 729. docs: COMMIT\_HISTORY.md through commit 727 (156740a, \#738) (\#740)
 
