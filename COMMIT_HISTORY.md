@@ -2,9 +2,56 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 717, [`46fbad5`](https://github.com/aryamahadik/rosie/commit/46fbad5), 2026-11-16 22:54:21 UTC.
+- **Through:** commit 719, [`5e26074`](https://github.com/aryamahadik/rosie/commit/5e26074), 2026-11-17 00:17:29 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 719. docs: COMMIT\_HISTORY.md through commit 717 (46fbad5, \#727) (\#730)
+
+- **Commit:** [`5e26074`](https://github.com/aryamahadik/rosie/commit/5e26074), by Arya Mahadik, 2026-11-17 00:17:29 UTC
+- **Pull request:** [#730](https://github.com/aryamahadik/rosie/pull/730) from `task/commit-history-152`, merged 2026-11-17 00:17:29 UTC. It squashed 1 branch commit:
+  - `951bc33` docs: COMMIT\_HISTORY.md through commit 717 (46fbad5, \#727)
+- **Files changed:** 1 (+49 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +49 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 245 (DL-915); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 718. T-1427: K-05 v1.18, the catalog's five reads under the business scope with row versions (CQ-349 ruled) (\#729)
+
+- **Commit:** [`dd0758e`](https://github.com/aryamahadik/rosie/commit/dd0758e), by Arya Mahadik, 2026-11-17 00:17:25 UTC
+- **Pull request:** [#729](https://github.com/aryamahadik/rosie/pull/729) from `task/T-1427`, merged 2026-11-17 00:17:25 UTC. It squashed 2 branch commits:
+  - `f63d0ff` T-1427: K-05 v1.18, the catalog's five reads under the call's busines…
+  - `b255c19` T-1427: README v1.18, what T-1429 binds as the port stands and what t…
+- **Files changed:** 28 (+3207 −9), by folder:
+  - `contracts/data-access/` README.md +119 −8, data-access.v1.18.schema.json +1376 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` index.json +192 −0, read-business-kinds-barbershop.json +54 −0, read-business-kinds-lee-home-services.json +71 −0, read-business-kinds-no-business-row.json +18 −0, read-business-kinds-yoga-studio-none.json +24 −0, read-business-services-barbershop.json +140 −0, read-business-services-lee-home-services.json +32 −0, read-price-rules-event-hours-andre.json +63 −0, read-price-rules-haircut-after-raise.json +63 −0, read-price-rules-haircut-before-raise.json +82 −0, read-price-rules-haircut-tie.json +95 −0, read-service-ways-haircut.json +58 −0, read-service-ways-other-business-service.json +21 −0, read-service-ways-skin-fade.json +40 −0, read-terms-sources-after-no-show-count.json +128 −0, read-terms-sources-dee-skin-fade.json +102 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-business-kinds-no-business.json +54 −0, refuse-business-kinds-row-by-kind-id.json +58 −0, refuse-business-kinds-setup-listing-phone.json +38 −0, refuse-business-services-with-extras.json +20 −0, refuse-price-rules-at-with-offset.json +82 −0, refuse-service-ways-cutoff-as-interval.json +26 −0, refuse-service-ways-no-service.json +57 −0, refuse-terms-sources-caller-flow.json +103 −0, refuse-terms-sources-rule-with-words.json +89 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1427: K-05 v1.18, the catalog's five reads under the call's business with row versions; CQ-349 (1) to (4) ruled
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1427: README v1.18, what T-1429 binds as the port stands and what the catalog-checks card widens
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 717. docs: COMMIT\_HISTORY.md through commit 715 (e1c4800, \#725) (\#727)
 
