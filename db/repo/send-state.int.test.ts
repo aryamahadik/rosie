@@ -38,7 +38,7 @@ import {
   type TextsConsentV1Dot8,
   VERSIONED_HOMES,
 } from "./send-state";
-import { SETUP_FACT_HOMES, UNSCOPED_ROWS } from "./setup/fact-homes";
+import { rowBound, SETUP_FACT_HOMES, UNSCOPED_ROWS } from "./setup/fact-homes";
 import { rowNameSql } from "./setup/row-names";
 import { readTurnState } from "./setup/turn-state";
 import { createTestDatabase, type TestDatabase } from "./test-db";
@@ -1587,7 +1587,7 @@ describe("sendState: the setup rows an outbox row's versions_read names (T-1436)
 
   /**
    * readTurnState's answer (setup/turn-state.ts) for one setup row's version, read as `handleId` under `businessId`: the
-   * row's version, or null for notFound. The rules there are the ones sendState's must equal (send-state.ts default 2).
+   * row's version, or null for notFound. Both calls bind a row by one function, setup/fact-homes.ts rowBound (round 2).
    */
   async function turnStateVersion(
     handleId: string,
@@ -1919,7 +1919,7 @@ describe("sendState: the setup rows an outbox row's versions_read names (T-1436)
         if (turn === null) {
           continue;
         }
-        // readTurnState answers the turn's handle under the outbox row's business exactly so (default 2).
+        // readTurnState answers the turn's handle under the outbox row's business exactly so (one rowBound for both).
         for (const { each, ref } of now) {
           const read = await turnStateVersion(turn.handleId, businessId, ref);
           expect(read, `${where}: ${each.why}`).toBe(each.answers ? ref.version : null);
@@ -2058,4 +2058,29 @@ describe("sendState: the setup rows an outbox row's versions_read names (T-1436)
       }
     },
   );
+
+  // Round 2 (DL-938, DL-941): sendState, readTurnState and fireClock bind a setup row by one function, rowBound, each
+  // with its own business and people; a table that is no setup home has no bound, so it is refused, never read unbound.
+  it("refuses in rowBound, the one bound every reader calls, a table that is no setup home, with nothing sent", () => {
+    const nobody = runtime`(select ph.person_id from person_handles ph where false)`;
+    sent.length = 0;
+    for (const table of [
+      "persons",
+      "outbox_rows",
+      "sign_in_attempts",
+      "staging_testers",
+      "item_services",
+      "sealing_keys",
+      "no_such_table",
+      "__proto__",
+      "toString",
+    ]) {
+      for (const businessId of [BARBERSHOP, null]) {
+        expect(() => rowBound(runtime, table, businessId, nobody), table).toThrow(
+          `rowBound: ${table} is not a setup home`,
+        );
+      }
+    }
+    expect(sent).toEqual([]);
+  });
 });

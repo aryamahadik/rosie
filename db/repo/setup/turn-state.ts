@@ -31,7 +31,9 @@
 // business that is none or the request's; calendar_links as the Tool API's select policy admits them, through a live
 // share to the request's business or as a link of one of the handle's people; busy_blocks as that policy admits them, a
 // photo block of the request's business or a calendar block whose link has a live share to it. With businessId null no
-// business or share stands: a person's own rows only, and no busy block. Any other row answers notFound.
+// business or share stands: a person's own rows only, and no busy block. Any other row answers notFound. The rules' SQL
+// is fact-homes.ts rowBound's, given the request's business and its handle's people: the one function sendState (and,
+// from T-1437, fireClock) calls with its own, never a copy (T-1436 round 2; DL-938, DL-941).
 //
 // A value is written as K-04's seed fixtures write values, as turn-state.ts writes them: JSON booleans and numbers (a
 // bigint or a numeric as a JSON number, refused past the largest safe integer), arrays as JSON arrays, a timestamptz in
@@ -83,7 +85,7 @@ import {
   type ReadTurnStateResponse,
   type UnknownFactError,
 } from "../turn-state";
-import { type SetupColumnType, type SetupFactHome, setupHomeOf, unscopedRowsOf } from "./fact-homes";
+import { rowBound, type SetupColumnType, setupHomeOf } from "./fact-homes";
 import { rowNameSql } from "./row-names";
 
 type Db = Sql | Tx;
@@ -250,69 +252,10 @@ function valueOf(type: SetupColumnType, raw: unknown, what: string): unknown {
 }
 
 /**
- * What a setup fact's row must meet beside its name, as SQL that follows the name's compare (see the top of this file): a
- * business-scoped table's row the request's business (with businessId null, none); a row of a table scoped none its
- * table's rule (fact-homes.ts UNSCOPED_ROWS), which throws for a table with none. The K-27 rules are the Tool API's select
- * policies (0024 calendar_links_tool_api_select, busy_blocks_tool_api_select) with the request's business for
- * rosie.business_id and the handle's people for rosie.person_id, each on its own table only.
- */
-function rowBound(db: Db, table: string, found: SetupFactHome, request: ReadTurnStateRequest) {
-  const { businessId, handleId } = request;
-  if (found.scopedBy !== null) {
-    return businessId === null
-      ? db`and ${db(found.scopedBy)} is null`
-      : db`and ${db(found.scopedBy)} = ${businessId}`;
-  }
-  const rule = unscopedRowsOf(table);
-  // The request handle's people, as K-05 item 26 reads them; a handle with none finds no row of a person's.
-  const people = db`(select ph.person_id from person_handles ph where ph.handle_id = ${handleId})`;
-  switch (rule) {
-    case "catalog":
-      return db``;
-    case "person":
-      return db`and person_id in ${people}`;
-    case "personCode":
-      return businessId === null
-        ? db`and person_id in ${people} and business_id is null`
-        : db`and person_id in ${people} and (business_id is null or business_id = ${businessId})`;
-    case "calendarLink":
-      if (table !== "calendar_links") {
-        throw new Error("readTurnState: a link's rule reads calendar_links alone");
-      }
-      return businessId === null
-        ? db`and person_id in ${people}`
-        : db`and (
-            exists (
-              select 1 from calendar_link_shares s
-              where s.calendar_link_id = calendar_links.id and s.business_id = ${businessId} and s.ended_at is null
-            )
-            or person_id in ${people}
-          )`;
-    case "busyBlock":
-      if (table !== "busy_blocks") {
-        throw new Error("readTurnState: a busy block's rule reads busy_blocks alone");
-      }
-      return businessId === null
-        ? db`and false`
-        : db`and (
-            (source = 'photo' and business_id = ${businessId})
-            or (
-              source = 'calendar'
-              and exists (
-                select 1 from calendar_link_shares s
-                where s.calendar_link_id = busy_blocks.calendar_link_id and s.business_id = ${businessId}
-                  and s.ended_at is null
-              )
-            )
-          )`;
-  }
-}
-
-/**
  * One setup fact from its home row, or null when the row does not exist or the request does not reach it: a row of a
  * business-scoped table must carry the request's business (with none, no business), and a row of a table scoped none must
- * meet its table's rule (rowBound). Every name in the query comes from SETUP_FACT_HOMES, which the caller has checked the
- * fact against.
+ * meet its table's rule, with the request handle's people (fact-homes.ts rowBound, the one function sendState also
+ * calls). Every name in the query comes from SETUP_FACT_HOMES, which the caller has checked the fact against.
  */
 async function readSetupFact(
   db: Db,
@@ -327,7 +270,9 @@ async function readSetupFact(
   const column = db(fact.column);
   const table = db(fact.table);
   const name = rowNameSql(db, found.key);
-  const bound = rowBound(db, fact.table, found, request);
+  // The request handle's people, as K-05 item 26 reads them; a handle with none finds no row of a person's.
+  const people = db`(select ph.person_id from person_handles ph where ph.handle_id = ${request.handleId})`;
+  const bound = rowBound(db, fact.table, request.businessId, people);
   const ref: FactRef = { key: fact.key, table: fact.table, rowId: fact.rowId, column: fact.column };
   const what = `${fact.table}.${fact.column}`;
   switch (type) {

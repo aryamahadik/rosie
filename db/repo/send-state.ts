@@ -68,14 +68,15 @@
 // Any other name throws, since leaving it out would read as changed every time and make limit 8 compose the row again
 // for ever. A domain part's versioned table joins a list in the task that migrates it.
 //
-// A setup row's bound (T-1436; T-667 round 2, DL-925 item 8; DL-927, DL-935). On the runtime side rosie_job sees every
-// business's setup rows, so each read's own SQL names which rows may answer, as readTurnState's does for its request
-// (setup/turn-state.ts), with the outbox row's business and the people of its turn's handle:
+// A setup row's bound (T-1436; T-667 round 2, DL-925 item 8; DL-927, DL-935, DL-938). On the runtime side rosie_job sees
+// every business's setup rows, so each read's own SQL names which rows may answer. That SQL is setup/fact-homes.ts
+// rowBound's, the one function readTurnState (setup/turn-state.ts) also calls for its request, never a copy here; this
+// call gives it the outbox row's business and the people of its turn's handle (default 1), both from the stored row:
 //   - a business-scoped table's row (its list's rowLevelSecurity column, business_id) only of the outbox row's business,
 //     or with no business when the outbox row has none, named beside the key, so the compare is narrowed through the
 //     key's or the business's index (T-1427's database engineer's N3) and a name of another business's row finds none
 //     (its security reviewer's N2, DL-913), failing closed;
-//   - a table scoped none by its rule (setup/fact-homes.ts UNSCOPED_ROWS, through unscopedRowsOf; never a second list):
+//   - a table scoped none by its rule (setup/fact-homes.ts UNSCOPED_ROWS, through rowBound; never a second list):
 //     K-24's kinds and kind_flows, the shared catalog, any row; K-22's accounts and sessions only a row of one of the
 //     turn's handle's people, and proof_codes only such a row with no business or the outbox row's (item 8b); K-27's
 //     calendar_links only with a live share (calendar_link_shares, ended_at null) to the outbox row's business, or of
@@ -97,9 +98,9 @@
 //      recipient's: a turn's message to another handle (a customer's turn that tells the owner) then answers the rows
 //      that turn read, and never reads as changed for ever. A row with no turn (K-04 v1.1's job row) has no people, so
 //      no person's row answers for it.
-//   2. Each table's rule is UNSCOPED_ROWS's, and each rule's SQL is setup/turn-state.ts rowBound's, written here for the
-//      outbox row's business and turn: rowBound is not exported, and this card may change no other file. The integration
-//      test holds the two together row for row against readTurnState (send-state.int.test.ts, T-1436).
+//   2. Withdrawn in round 2 (DL-938): no rule's SQL is written here. Each is setup/fact-homes.ts rowBound's, the function
+//      readTurnState calls, given the outbox row's business and its turn's handle's people. The integration test still
+//      holds the two calls to one answer row for row (send-state.int.test.ts, T-1436).
 //   3. currentVersionsOf without a bound (limit 4's reload: actions/src/gate/limit-4/facts.ts) still reads the core homes
 //      alone and throws on a setup home, as before: that reload has no outbox row to bound a setup row by.
 import type postgres from "postgres";
@@ -121,7 +122,7 @@ import {
   utcOrNull,
 } from "./targets";
 import type { Sql, Tx } from "./scope";
-import { type SetupFactHome, setupHomeOf, unscopedRowsOf } from "./setup/fact-homes";
+import { rowBound, setupHomeOf } from "./setup/fact-homes";
 import { rowNameSql } from "./setup/row-names";
 
 type Db = Sql | Tx;
@@ -303,7 +304,8 @@ function rowRefsOf(value: unknown, outboxRowId: string): RowRef[] {
 /**
  * Where an outbox row's setup rows are read (T-1436; see the top of this file): the row's business, which a
  * business-scoped row must carry (null: rows with no business), and the turn that wrote it, whose handle's people a
- * person's row must be of (null: a job's row, which has none).
+ * person's row must be of (null: a job's row, which has none). Both come from a stored row's own columns, never from a
+ * request's words (T-1436 round 2, item 3: the security reviewer's note b).
  */
 export interface SetupBound {
   readonly businessId: string | null;
@@ -311,77 +313,21 @@ export interface SetupBound {
 }
 
 /**
- * What a setup row an outbox row's versions_read names must meet beside its name, as SQL that follows the name's compare
- * (see the top of this file): a business-scoped table's row the bound's business (with none, no business); a row of a
- * table scoped none its table's rule (setup/fact-homes.ts UNSCOPED_ROWS), which throws for a table with none. Each rule
- * is setup/turn-state.ts rowBound's (default 2), with the outbox row's business for the request's and its turn's
- * handle's people for the request handle's (default 1). A rule with no SQL here is a type error, never a row read
- * unbound.
+ * The people a person's setup row must be of for an outbox row (default 1): those of its turn's handle (person_handles of
+ * turns.handle_id), as K-05 item 26 reads a handle's people, as a subquery for setup/fact-homes.ts rowBound. A row with
+ * no turn (a job's), or a handle with none, has no one, so it finds no row of a person's.
  */
-function setupRowBound(
-  db: Db,
-  table: string,
-  home: SetupFactHome,
-  bound: SetupBound,
-): postgres.PendingQuery<postgres.Row[]> {
-  const { businessId, turnId } = bound;
-  if (home.scopedBy !== null) {
-    return businessId === null
-      ? db`and ${db(home.scopedBy)} is null`
-      : db`and ${db(home.scopedBy)} = ${businessId}`;
-  }
-  const rule = unscopedRowsOf(table);
-  // The people of the outbox row's turn's handle, as K-05 item 26 reads a handle's people; a row with no turn, or a
-  // handle with none, finds no row of a person's.
-  const people = db`(
+function turnHandlePeople(db: Db, turnId: string | null): postgres.PendingQuery<postgres.Row[]> {
+  return db`(
     select ph.person_id from turns t join person_handles ph on ph.handle_id = t.handle_id where t.id = ${turnId}
   )`;
-  switch (rule) {
-    case "catalog":
-      return db``;
-    case "person":
-      return db`and person_id in ${people}`;
-    case "personCode":
-      return businessId === null
-        ? db`and person_id in ${people} and business_id is null`
-        : db`and person_id in ${people} and (business_id is null or business_id = ${businessId})`;
-    case "calendarLink":
-      if (table !== "calendar_links") {
-        throw new Error("sendState: a link's rule reads calendar_links alone");
-      }
-      return businessId === null
-        ? db`and person_id in ${people}`
-        : db`and (
-            exists (
-              select 1 from calendar_link_shares s
-              where s.calendar_link_id = calendar_links.id and s.business_id = ${businessId} and s.ended_at is null
-            )
-            or person_id in ${people}
-          )`;
-    case "busyBlock":
-      if (table !== "busy_blocks") {
-        throw new Error("sendState: a busy block's rule reads busy_blocks alone");
-      }
-      return businessId === null
-        ? db`and false`
-        : db`and (
-            (source = 'photo' and business_id = ${businessId})
-            or (
-              source = 'calendar'
-              and exists (
-                select 1 from calendar_link_shares s
-                where s.calendar_link_id = busy_blocks.calendar_link_id and s.business_id = ${businessId}
-                  and s.ended_at is null
-              )
-            )
-          )`;
-  }
 }
 
 /**
  * One referenced row's version now, or null when the row no longer exists or, for a setup row, lies outside the bound: a
  * core home's row by its key column, as it stands; a setup home's row by its name within the bound, which only an outbox
- * row's read gives. Any other table name throws.
+ * row's read gives, by setup/fact-homes.ts rowBound, the one function readTurnState also calls (T-1436 round 2). Any
+ * other table name throws.
  */
 async function versionNow(db: Db, ref: RowRef, bound: SetupBound | undefined): Promise<number | null> {
   const key = Object.hasOwn(VERSIONED_HOMES, ref.table) ? VERSIONED_HOMES[ref.table] : undefined;
@@ -399,9 +345,10 @@ async function versionNow(db: Db, ref: RowRef, bound: SetupBound | undefined): P
   if (bound === undefined) {
     throw new Error(`versions_read names ${ref.table}, a setup home read only within an outbox row's bound`);
   }
+  const within = rowBound(db, ref.table, bound.businessId, turnHandlePeople(db, bound.turnId));
   const [row] = await db<{ version: number }[]>`
     select version from ${db(ref.table)}
-    where ${rowNameSql(db, home.key)} = ${ref.rowId} ${setupRowBound(db, ref.table, home, bound)}
+    where ${rowNameSql(db, home.key)} = ${ref.rowId} ${within}
   `;
   return row === undefined ? null : row.version;
 }
@@ -410,7 +357,8 @@ async function versionNow(db: Db, ref: RowRef, bound: SetupBound | undefined): P
  * Each referenced row at its version now, in the order given; a row that no longer exists is left out. The homes
  * VERSIONED_HOMES lists are read as they stand; with a bound (an outbox row's: T-1436), the setup homes too, each row by
  * its name and only within the bound, a row outside it left out as one gone; any other table name throws, and so does a
- * setup home without a bound.
+ * setup home without a bound. A bound comes only from a stored row's own columns (an outbox row's business and turn),
+ * never from a request's words (T-1436 round 2, item 3).
  */
 export async function currentVersionsOf(
   db: Db,
