@@ -88,7 +88,7 @@ describe("local-merge-check: the step list is merge-check.yml's, read from the f
     }
   });
 
-  it("the merge-check job: install, contracts, format, lint, typecheck, npm test, CI script tests, three guards, migrate, test:scripts, integration, scenario, e2e", () => {
+  it("the merge-check job: install, contracts, format, lint, typecheck, npm test, CI script tests, the Linq probe test, three guards, migrate, test:scripts, integration, scenario, e2e", () => {
     const [job] = readWorkflow(WORKFLOW).jobs;
     const oneLine = job.steps.filter((step) => step.run !== null && !step.run.trim().includes("\n"));
     assert.deepEqual(
@@ -102,6 +102,7 @@ describe("local-merge-check: the step list is merge-check.yml's, read from the f
         "npm run typecheck",
         "npm test",
         'node --test "infra/ci/*.test.mjs"',
+        "npm run test:linq-probe",
         "npm run guard:tests",
         "npm run guard:migrations",
         "npm run guard:contracts",
