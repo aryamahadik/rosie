@@ -284,7 +284,7 @@ describe("wrangler.jsonc env.staging's STAGING_LINQ_LINE (T-572)", () => {
       /STAGING_LINQ_LINE is real/,
     );
     assert.throws(
-      broken((c) => delete c.env.staging.vars[LINQ_LINE]),
+      broken((c) => delete c.env.staging.vars.STAGING_LINQ_LINE),
       /STAGING_LINQ_LINE is real/,
     );
     assert.throws(
