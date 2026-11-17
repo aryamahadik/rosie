@@ -2,7 +2,9 @@
 // team checks, looks up or has read a license, permit, certificate, insurance or carrier status is the business's own
 // word; so is a trade's free-text rule that waits on a paper that "checks out", or says one is "checked like a license",
 // without saying who checks (the lead's ruling on MC C7, DL-884), or that says a paper is checked in another passive
-// wording with no checker named (its ruling on round 2's open question 1, DL-894).
+// wording with no checker named (its ruling on round 2's open question 1, DL-894); and so is a text under a pf key that
+// names a check, which carries the check verb, a lookup's or official records' result with no check verb, and Rosie's
+// check in the first person (its rulings on round 4's FAIL, DL-916).
 //
 // The trade files were never read one by one by a reviewer (MC section 6), and some still say Rosie checks a paper on an
 // official lookup: acupuncturist.json's pf.license.check, camp.json's pf.staff.license, movers.json's
@@ -14,17 +16,25 @@
 //
 // How this build counts (c7.test.ts pins the list): CLAIM_PATTERNS, read in every text, flags 62 trade files, whose
 // texts name Rosie or Rosie's team as the one who checks; PASSIVE_PATTERNS, read in every text but a message a person
-// reads, flags 61 more, whose texts wait on, or show, a paper checked by no one named: 123 in all, 300 texts (run 1
-// counted 31, round 2 59, round 3 102; MC's Nov 4 count was 45). Round 3 (DL-894) added: a negation never reaches
-// across a clause break (CLAUSE_BREAK), so "Where a lookup has no data feed, a person on Rosie's team checks within 1
-// business day" is a claim; PAPER also reads the place a paper is checked where a lookup has no feed; and
-// PASSIVE_PATTERNS reads the other passive wordings. Round 4 (DL-901) added: any separator is a clause break ("None
-// needed · registration checked on the state's lookup, Oct 19", dance.json); a passive wording counts in an op's words
-// as in a pf block ("None needed · registration 0628841, checked", snow.json); a text names a paper by its place too
-// (namedAt). A message a person reads is read with CLAIM_PATTERNS alone: the six of movers.json's junk hauling wait on a
-// permit that checks out, a step that waits on a check, CQ-347's (the lead's ruling, DL-904), and notary.json's S1-23
-// card ("Sam Lee · NP045210 · checked") waits on the lead (a NEED). c7.test.ts's exhaustive scan lists every hit that
-// stays unmarked, with its one reason.
+// reads, flags 61 more, whose texts wait on, or show, a paper checked by no one named; round 5's KEY_PATTERNS,
+// RESULT_PATTERNS and FIRST_PERSON_PATTERNS flag 15 more: 138 in all, 398 texts (run 1 counted 31, round 2 59, round 3
+// 102, round 4 123; MC's Nov 4 count was 45). Round 3 (DL-894) added: a negation never reaches across a clause break
+// (CLAUSE_BREAK), so "Where a lookup has no data feed, a person on Rosie's team checks within 1 business day" is a claim;
+// PAPER also reads the place a paper is checked where a lookup has no feed; and PASSIVE_PATTERNS reads the other passive
+// wordings. Round 4 (DL-901) added: any separator is a clause break ("None needed · registration checked on the state's
+// lookup, Oct 19", dance.json); a passive wording counts in an op's words as in a pf block ("None needed · registration
+// 0628841, checked", snow.json); a text names a paper by its place too (namedAt). Round 5 (DL-916) added the three
+// shapes the security reviewer's raw scans found: under a pf key that names a check (checkAt), the place a paper is
+// checked and who checks ("the state's lookup; a person on Rosie's team within 1 business day when it's down",
+// biohazard.json's and fence.json's pf.license.checked); a lookup's or records' result with no check verb ("expiry
+// dates from the lookup"; "The lookup shows Leo's massage license as expired"); and Rosie in the first person ("so I'll
+// check the business registration"). They are read in a trade's own words, but in an op at one of C4's verify-only
+// steps (VERIFY_ONLY_STEPS), switched off while verify is off, whose lookup results c7.test.ts lists with that reason
+// (DL-916 item 25, as lead note 12 leaves S1-33's lines). A message a person reads is read with CLAIM_PATTERNS alone: the
+// six of movers.json's junk hauling wait on a permit that checks out, a step that waits on a check, CQ-347's (the lead's
+// ruling, DL-904); six more claim a check made (notary.json's S1-23 card, DL-913; dog-walker.json's two S11-50 records
+// results and the first-person S1-38 lines of tires, vehicle-wrap and window-tint, DL-916), and T-1435 fixes their
+// words. c7.test.ts's exhaustive scan lists every hit that stays unmarked, with its one reason.
 //
 // What this file changes: the trade's own text, wherever the compiled overlay holds it (K-01 tradeOverlay): the 11
 // free-text pf blocks (each stored whole, MC R3; K-01 pluginText says such text is the business's own word), every op's
@@ -44,13 +54,19 @@
 //   CLAIM_PATTERNS, PASSIVE_PATTERNS, WORD_PATTERNS, patternsAt()
 //                                 the phrases that say Rosie checks a paper; those that wait on, or show, a paper no one
 //                                 named checks; the phrases read in a trade's own words; and those read at a text's place.
+//   RESULT_PATTERNS, FIRST_PERSON_PATTERNS, KEY_PATTERNS, checkAt()
+//                                 round 5's: a lookup's or records' result; Rosie in the first person; and, under a pf key
+//                                 that names a check (checkAt), the place a paper is checked and who checks.
+//   VERIFY_ONLY_STEPS, VERIFY_ONLY_PATTERNS, onVerifyOnlyStep()
+//                                 C4's verify-only steps, and the phrases read in an op at one: all but round 5's.
 //   PAPER, namedAt()              what makes a text name a paper: its words, or its place.
 //   findClaims(), ownWord()       the claims in one text, and the text with each run of them replaced.
 //   markClaims()                  the trade with each claim replaced, and every text changed, tagged MC:C7.
 //   renderMarks()                 the changes as diff lines, each starting with its tag.
 //   c7                            the correction in the frame's list: it changes no step (the texts are the trade's).
 import type { FlowLetter } from "../graph/types.ts";
-import { PF_TEXT_KEYS, type LoadedTrade, type PluginText, type TradeId } from "../load/trade";
+import { PF_TEXT_KEYS, type LoadedTrade, type PluginText, type TradeId, type TradeOp } from "../load/trade";
+import { VERIFY_BRANCHES, VERIFY_STEPS } from "./c4";
 import type { Correction, CorrectionTag } from "./framework";
 
 /** The marker every text C7 changes carries: the frame's tag for C7. */
@@ -243,8 +259,135 @@ export const PASSIVE_PATTERNS: readonly ClaimPattern[] = [
   { pattern: /\bonly\s+as\s+checked\b/i, reach: 3 },
 ];
 
-/** The phrases read in a trade's own words: CLAIM_PATTERNS, then PASSIVE_PATTERNS. */
-export const WORD_PATTERNS: readonly ClaimPattern[] = [...CLAIM_PATTERNS, ...PASSIVE_PATTERNS];
+/**
+ * A lookup, or an official body's records, where a paper is looked up (DL-916 item 23): "the state's lookup", "the
+ * federal pilot lookup", "the city's records", "the city's permit records". A person's or a business's own record ("a
+ * returning patient's record", "the agent's own records") is no lookup. Words between a preposition and the lookup never
+ * hold another lookup (NOT_LOOKUP), so "from the lookup's 'The lookup is down'" names the lookup's branch, no result.
+ */
+const LOOKUP = String.raw`(?:lookups?|(?:state|city|county|town|board|federal|official)(?:'s)?\s+(?:[\w-]+\s+)?records?)`;
+const NOT_LOOKUP = String.raw`(?!lookup)[\w'-]+\s+`;
+
+/**
+ * A lookup's or official records' result, with no check verb (the lead's ruling on round 4's FAIL 2, DL-916 item 23): a
+ * paper "shows as expired on the state's lookup", "the lookup shows" or "the city's records show" it, a date comes "from
+ * the lookup". Each reads as a check made, which no one makes while switch "verify" is off (C4), so it is the business's
+ * own word in a trade's own words. A message a person reads is not read with them (patternsAt): the two of dog-walker's
+ * S11-50 are c7.test.ts's MESSAGES_NEED, whose words T-1435 fixes. An op at one of C4's verify-only steps is not read
+ * with them either (VERIFY_ONLY_STEPS, DL-916 item 25). A phrase counts in a text that names a paper (PAPER, or its
+ * place: namedAt), unless a negation comes within its reach before it, in its own clause.
+ */
+export const RESULT_PATTERNS: readonly ClaimPattern[] = [
+  // The lookup or the records as the one that shows, has, lists, finds or answers, or doesn't find: "The lookup shows
+  // Leo's massage license as expired" (pilates.json, a rename's new side), "The state's lookup has no massage license
+  // with the number Eli sent" (yoga.json, one too), "Sasha's card is checked again when the lookup answers"
+  // (caterer.json, one too), "The city's records show Quinn's park permit as suspended today" (dog-walker.json at S11-50,
+  // a message), "The state's business lookup doesn't find registration 2019-0451 for the company" (band.json, a rename's
+  // new side). A result the lookup gives is a check made, whatever it finds; "We couldn't find ... on the state's
+  // lookup" is Rosie's own voice at S1-33, lead note 12's, where the lookup is not the one that finds.
+  {
+    pattern: new RegExp(
+      String.raw`\b${LOOKUP}\s+(?:(?:now|still|also|then)\s+)?(?:shows?|showed|says?|said|lists?|listed|has|had|holds?|finds?|found|answers?|answered|returns?|returned|catches\s+up|caught\s+up|matches?|matched|confirms?|confirmed|gives?|gave|(?:doesn't|does\s+not|didn't|did\s+not|can't|cannot|couldn't|could\s+not)\s+(?:find|show|list|match))\b`,
+      "i",
+    ),
+    reach: 3,
+  },
+  // A paper shown as it stands on a lookup or records: "Leo's massage license shows as expired on the state's lookup"
+  // (pilates.json at S2-13, a message).
+  {
+    pattern: new RegExp(
+      String.raw`\b(?:shows?|showed|shown|listed|appears?)\s+(?:as\s+)?(?:${NOT_LOOKUP}){0,4}?(?:on|in)\s+(?:the|an?)\s+(?:${NOT_LOOKUP}){0,3}?${LOOKUP}\b`,
+      "i",
+    ),
+    reach: 3,
+  },
+  // A date or a status read from a lookup: "expiry dates from the lookup" (biohazard.json's pf.license.renewals), "the
+  // expiry date from the lookup" (fence.json's).
+  {
+    pattern: new RegExp(String.raw`\bfrom\s+(?:the|an?)\s+(?:${NOT_LOOKUP}){0,3}?${LOOKUP}\b(?!'s)`, "i"),
+    reach: 3,
+  },
+];
+
+/**
+ * Rosie in the first person, saying it checks a paper (the lead's ruling on round 4's FAIL 3, DL-916 item 24): "Mobile
+ * tire service needs no state license where you work, so I'll check the business registration." (tires.json at S1-38).
+ * WHO reads "I" where Rosie speaks: a trade's own words outside a message a person reads (an op's words, a rename's new
+ * side: "Wrap work needs no state license where you work, so I'll check the business registration.", vehicle-wrap.json
+ * and window-tint.json). In a message a person reads it is not read: the three of tires, vehicle-wrap and window-tint at
+ * S1-38 are c7.test.ts's MESSAGES_NEED, whose words T-1435 fixes. A check of no paper is no claim (NO_PAPER).
+ */
+export const FIRST_PERSON_PATTERNS: readonly ClaimPattern[] = [
+  {
+    pattern: new RegExp(
+      String.raw`\bI(?:'ll|'ve|'d|\s+will|\s+have|\s+had|\s+would)?\s+(?:(?:also|then|first|again|only|still|now|just|already)\s+)?(?:re-?check(?:ed)?|check(?:ed)?|look(?:ed)?\s+(?:(?!no\b|nothing\b)[\w'-]+\s+){0,4}?up|verif(?:y|ied)|confirm(?:ed)?)\b(?!\s+${NO_PAPER})`,
+    ),
+    reach: 3,
+  },
+];
+
+/**
+ * What a pf block's text says under a key that names a check (checkAt; the lead's ruling on round 4's FAIL 1, DL-916
+ * item 22), where the key carries the check verb: the place a paper is checked ("the state's lookup", "the state's
+ * license lookup", "the state's or city's business lookup") and who checks ("a person on Rosie's team within 1 business
+ * day when it's down"): "checked: the state's lookup; a person on Rosie's team ..." (biohazard.json and fence.json's
+ * pf.license.checked) says Rosie's team checks a paper on the state's lookup, MC C7's own acupuncturist example. Any
+ * negation before it in its clause takes it back ("the school's own check, with no lookup", driving-school.json). A
+ * sentence there that names only the paper and the owner who keeps it ("The owner keeps the papers", architect.json;
+ * "the owner is responsible for the licenses they add", occupational-therapist.json) says no one checks it.
+ */
+export const KEY_PATTERNS: readonly ClaimPattern[] = [
+  {
+    pattern: new RegExp(String.raw`\b(?:${LOOKUP}(?!'s)|data\s+feed|(?:own|official)\s+site)\b`, "i"),
+    reach: Infinity,
+  },
+  { pattern: /\b(?:a\s+person\s+on\s+Rosie's\s+team|Rosie's\s+team)\b/, reach: Infinity },
+];
+
+/**
+ * The phrases read in a trade's own words: CLAIM_PATTERNS, PASSIVE_PATTERNS, then round 5's RESULT_PATTERNS and
+ * FIRST_PERSON_PATTERNS (DL-916).
+ */
+export const WORD_PATTERNS: readonly ClaimPattern[] = [
+  ...CLAIM_PATTERNS,
+  ...PASSIVE_PATTERNS,
+  ...RESULT_PATTERNS,
+  ...FIRST_PERSON_PATTERNS,
+];
+
+/**
+ * The phrases read in an op at one of C4's verify-only steps (VERIFY_ONLY_STEPS): WORD_PATTERNS without round 5's. Such a
+ * step is switched off while verify is off, so its lookup results stay as written and c7.test.ts lists them with the
+ * reason "C4's verify-only branch, switched off while verify is off" (DL-916 item 25, the same position as lead note 12
+ * on S1-33's lines); a claim the rounds before marked there stays marked.
+ */
+export const VERIFY_ONLY_PATTERNS: readonly ClaimPattern[] = [...CLAIM_PATTERNS, ...PASSIVE_PATTERNS];
+
+/** The phrases read under a key that names a check (checkAt): WORD_PATTERNS, then KEY_PATTERNS. */
+const KEY_WORD_PATTERNS: readonly ClaimPattern[] = [...WORD_PATTERNS, ...KEY_PATTERNS];
+
+/**
+ * The steps only switch "verify" lights, which C4 switches off (c4.ts): the steps its branches hold (S1-33, S2-12,
+ * S2-13, S2-14, S11-99) and its steps (S12-19, S13-41, S13-43).
+ */
+export const VERIFY_ONLY_STEPS: ReadonlySet<string> = new Set([
+  ...VERIFY_BRANCHES.map(([, holds]) => holds),
+  ...VERIFY_STEPS,
+]);
+
+/** A pf key that names a check, the key itself the check: "check", "checked", "checks", "how it's checked". */
+const CHECK_KEY = /^(?:how\s+(?:it's|it\s+is|they're|they\s+are)\s+)?(?:re-?)?check(?:s|ed)?$/i;
+
+/**
+ * Whether a text's place is a pf block's key that names a check (DL-916 item 22): pluginText.pf.license.checked
+ * (biohazard.json, fence.json), pf.license.check (acupuncturist.json and 169 more), pf.license.how it's checked. A key
+ * that names another kind of check (a background check, a customer's check-in, a recall check) is not one.
+ */
+export function checkAt(where: string): boolean {
+  if (!where.startsWith("pluginText.")) return false;
+  const keys = where.replace(/\[\d+\]/g, "").split(".");
+  return CHECK_KEY.test(keys[keys.length - 1] ?? "");
+}
 
 /** A place inside a message a person reads: a say or addSay list (`A ops[11].say[2][0]`). */
 const IN_MESSAGE = /\.(?:say|addSay)\[/;
@@ -252,14 +395,19 @@ const IN_MESSAGE = /\.(?:say|addSay)\[/;
 /**
  * The phrases read in a text at its place (a ClaimMark's `where`): WORD_PATTERNS in a pf block, an op's words, a
  * rename's new side, a slot row or a money text (DL-901: a paper checked with no checker named is the business's own
- * word in an op as in a pf block); CLAIM_PATTERNS alone in a message a person reads, since OWN_WORD is no word for a
- * person and marking one would stop the build (C7ClaimError). Six such messages wait on a permit that "checks out"
- * (movers.json's junk hauling): steps that wait on a check, CQ-347's (the lead's ruling, DL-904; c7.test.ts's
- * MESSAGES_WAITING). One shows a paper checked by no one named (notary.json's S1-23 card): a NEED for the lead
- * (c7.test.ts's MESSAGES_NEED).
+ * word in an op as in a pf block), with KEY_PATTERNS too under a pf key that names a check (checkAt, DL-916 item 22);
+ * VERIFY_ONLY_PATTERNS in an op at one of C4's verify-only steps (`verifyOnly`, onVerifyOnlyStep(), DL-916 item 25);
+ * CLAIM_PATTERNS alone in a message a person reads, since OWN_WORD is no word for a person and marking one would stop
+ * the build (C7ClaimError). Six such messages wait on a permit that "checks out" (movers.json's junk hauling): steps that
+ * wait on a check, CQ-347's (the lead's ruling, DL-904; c7.test.ts's MESSAGES_WAITING). Six more are c7.test.ts's
+ * MESSAGES_NEED, whose words T-1435 fixes: notary.json's S1-23 card shows a paper checked by no one named (DL-913),
+ * dog-walker.json's two S11-50 messages a records' result (DL-916 item 23), and the S1-38 lines of tires, vehicle-wrap
+ * and window-tint Rosie's check in the first person (item 24).
  */
-export function patternsAt(where: string): readonly ClaimPattern[] {
-  return IN_MESSAGE.test(where) ? CLAIM_PATTERNS : WORD_PATTERNS;
+export function patternsAt(where: string, verifyOnly = false): readonly ClaimPattern[] {
+  if (IN_MESSAGE.test(where)) return CLAIM_PATTERNS;
+  if (verifyOnly) return VERIFY_ONLY_PATTERNS;
+  return checkAt(where) ? KEY_WORD_PATTERNS : WORD_PATTERNS;
 }
 
 /**
@@ -454,11 +602,19 @@ function key(path: string, part: string | number): string {
 /**
  * The value with each claim in its words replaced (a copy where anything changed, the value itself where nothing did),
  * each text read with the patterns of its place (patternsAt). `inMessage` is the message the value lies in, when it lies
- * in one; `named`, whether the first side its value replaces names a paper.
+ * in one; `named`, whether the first side its value replaces names a paper; `verifyOnly`, whether the value lies in an
+ * op at one of C4's verify-only steps (onVerifyOnlyStep).
  */
-function rewrite(value: unknown, path: string, mark: Mark, inMessage: string | null, named = false): unknown {
+function rewrite(
+  value: unknown,
+  path: string,
+  mark: Mark,
+  inMessage: string | null,
+  named = false,
+  verifyOnly = false,
+): unknown {
   if (typeof value === "string") {
-    const next = ownWord(value, patternsAt(path), named || namedAt(path));
+    const next = ownWord(value, patternsAt(path, verifyOnly), named || namedAt(path));
     if (next === value) return value;
     if (inMessage !== null)
       throw new C7ClaimError(
@@ -468,14 +624,14 @@ function rewrite(value: unknown, path: string, mark: Mark, inMessage: string | n
     return next;
   }
   if (Array.isArray(value)) {
-    const out = value.map((item, k) => rewrite(item, key(path, k), mark, inMessage, named));
+    const out = value.map((item, k) => rewrite(item, key(path, k), mark, inMessage, named, verifyOnly));
     return out.some((next, k) => next !== value[k]) ? out : value;
   }
   if (typeof value === "object" && value !== null) {
     let changed = false;
     const out: Record<string, unknown> = {};
     for (const [name, item] of Object.entries(value)) {
-      const next = rewriteField(name, item, key(path, name), mark, inMessage, named);
+      const next = rewriteField(name, item, key(path, name), mark, inMessage, named, verifyOnly);
       if (next !== item) changed = true;
       out[name] = next;
     }
@@ -492,22 +648,29 @@ function rewriteField(
   mark: Mark,
   inMessage: string | null,
   named: boolean,
+  verifyOnly: boolean,
 ): unknown {
   if (NOT_WORDS.has(name)) return item;
-  if (PAIR_LISTS.has(name) && Array.isArray(item)) return newSides(item, at, mark, inMessage);
+  if (PAIR_LISTS.has(name) && Array.isArray(item)) return newSides(item, at, mark, inMessage, verifyOnly);
   if (MESSAGE_LISTS.has(name) && Array.isArray(item)) return messages(item, at, mark);
-  return rewrite(item, at, mark, inMessage, named);
+  return rewrite(item, at, mark, inMessage, named, verifyOnly);
 }
 
 /**
  * A list of [old, new] pairs with each new side rewritten, naming the paper its old side names (namedAt); the old side
  * is the master's line, matched as written.
  */
-function newSides(pairs: readonly unknown[], path: string, mark: Mark, inMessage: string | null): unknown[] {
+function newSides(
+  pairs: readonly unknown[],
+  path: string,
+  mark: Mark,
+  inMessage: string | null,
+  verifyOnly = false,
+): unknown[] {
   const out = pairs.map((pair, k): unknown => {
     if (!Array.isArray(pair) || pair.length !== 2) return pair;
     const named = typeof pair[0] === "string" && PAPER.test(pair[0]);
-    const next = rewrite(pair[1], `${path}[${String(k)}][1]`, mark, inMessage, named);
+    const next = rewrite(pair[1], `${path}[${String(k)}][1]`, mark, inMessage, named, verifyOnly);
     return next === pair[1] ? pair : [pair[0], next];
   });
   return out.some((next, k) => next !== pairs[k]) ? out : (pairs as unknown[]);
@@ -525,11 +688,25 @@ function messages(list: readonly unknown[], path: string, mark: Mark): unknown[]
   return out.some((next, k) => next !== list[k]) ? out : (list as unknown[]);
 }
 
+/** Whether an op lies at one of C4's verify-only steps (VERIFY_ONLY_STEPS), where round 5's phrases are not read. */
+export function onVerifyOnlyStep(op: { at?: unknown }): boolean {
+  return typeof op.at === "string" && VERIFY_ONLY_STEPS.has(op.at);
+}
+
+/** A flow's ops, each rewritten with the patterns of its step (onVerifyOnlyStep, DL-916 item 25). */
+function rewriteOps(ops: TradeOp[], path: string, mark: Mark): TradeOp[] {
+  const out = ops.map(
+    (op, k) => rewrite(op, key(path, k), mark, null, false, onVerifyOnlyStep(op)) as TradeOp,
+  );
+  return out.some((next, k) => next !== ops[k]) ? out : ops;
+}
+
 /**
  * The trade with every claim that Rosie or Rosie's team checks a paper (and, outside a message a person reads, every
- * wait on, or show of, a paper that no one named checks) replaced with OWN_WORD, in each text the compiled overlay holds
- * (see the top of this file), and each text changed, tagged MC:C7. The trade given is not changed; one with no claim is
- * given back as it is. Throws C7ClaimError for a claim in a message a person reads.
+ * wait on, or show of, a paper that no one named checks, and, but in an op at one of C4's verify-only steps, every
+ * lookup's result, first-person check and check key's place or checker) replaced with OWN_WORD, in each text the
+ * compiled overlay holds (see the top of this file), and each text changed, tagged MC:C7. The trade given is not
+ * changed; one with no claim is given back as it is. Throws C7ClaimError for a claim in a message a person reads.
  */
 export function markClaims(trade: LoadedTrade): MarkedTrade {
   const marked: ClaimMark[] = [];
@@ -550,7 +727,7 @@ export function markClaims(trade: LoadedTrade): MarkedTrade {
 
   for (const flow of FLOWS) {
     const part = trade.flows[flow];
-    const ops = rewrite(part.ops, `${flow} ops`, mark, null) as typeof part.ops;
+    const ops = rewriteOps(part.ops, `${flow} ops`, mark);
     const rename = newSides(part.rename, `${flow} rename`, mark, null) as typeof part.rename;
     const slotRows = rewrite(part.slotRows, `${flow} slotRows`, mark, null) as typeof part.slotRows;
     const money = rewrite(part.money, `${flow} money`, mark, null) as typeof part.money;

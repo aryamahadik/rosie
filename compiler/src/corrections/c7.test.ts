@@ -3,11 +3,14 @@
 // that waits on a paper that "checks out", or says one is "checked like a license", and names no one who checks (the
 // lead's ruling on MC C7's count, DL-884), and a pf rule with another passive wording of a paper checked by no one named
 // (its ruling on round 2's open question 1, DL-894), and the same passive wordings in an op's words, a rename's new side,
-// a slot row or a money text (its ruling on round 3's FAIL, DL-901). Proofs of the card that belong to C7:
+// a slot row or a money text (its ruling on round 3's FAIL, DL-901), and a pf key that names a check, a lookup's or
+// records' result with no check verb, and Rosie in the first person (its rulings on round 4's FAIL, DL-916). Proofs of
+// the card that belong to C7:
 //   - over all 243 trades, C7 flags the texts in the snapshot below, MC C7's five examples among them (acupuncturist,
-//     camp, movers, tree, dog-walker), in 123 trade files (300 texts): 62 whose texts name Rosie or Rosie's team as the
-//     one who checks (c7.ts CLAIM_PATTERNS), and 61 more whose texts only wait on, or show, a paper checked by no one
-//     named (c7.ts PASSIVE_PATTERNS). The counts by round: run 1 counted 31 trade files (CLAIM_PATTERNS alone); round 2,
+//     camp, movers, tree, dog-walker), in 138 trade files (398 texts): 62 whose texts name Rosie or Rosie's team as the
+//     one who checks (c7.ts CLAIM_PATTERNS), 61 more whose texts only wait on, or show, a paper checked by no one named
+//     (c7.ts PASSIVE_PATTERNS), and 15 more whose texts hold only round 5's shapes (c7.ts KEY_PATTERNS, RESULT_PATTERNS,
+//     FIRST_PERSON_PATTERNS). The counts by round: run 1 counted 31 trade files (CLAIM_PATTERNS alone); round 2,
 //     59 (the 28 passive files of DL-884: the pf.license blocks of 19 building trades; appraiser, energy-audit,
 //     home-engineer, inspector, surveyor, locksmith, towing, property-manager and gym); round 3, 102 (DL-894):
 //       a negation no longer reaches across a clause break, so "Where a lookup has no data feed, a person on Rosie's
@@ -26,21 +29,37 @@
 //       "it" stands for: yoga becomes the 62nd file that names Rosie), by a paper's renewal or a notary's commission:
 //       20 passive files more (chimney, college-admissions, cpr-training, estate-sale, home-stager, image-consultant,
 //       lawn, matchmaker, organizer, personal-shopper, photographer, pilates, private-investigator, psychic,
-//       shoe-repair, tailor, tours, translator, travel-agent, upholstery), 61 in all.
+//       shoe-repair, tailor, tours, translator, travel-agent, upholstery), 61 in all;
+//     round 5, 138 (DL-916, the security reviewer's three shapes): a pf key that names a check carries the check verb
+//       (checkAt, KEY_PATTERNS: "the state's lookup; a person on Rosie's team within 1 business day when it's down",
+//       biohazard.json:31 and fence.json:31, and the same place first in the pf.license.check of the 15 repair trades
+//       and tutor's); a lookup's or records' result with no check verb is a claim (RESULT_PATTERNS: "expiry dates from
+//       the lookup", their renewals at :34; "The lookup shows Leo's massage license as expired", "The state's business
+//       lookup doesn't find registration 2019-0451 for the company" and the like on 91 renames' new sides); Rosie in
+//       the first person checks ("so I'll check the business registration", FIRST_PERSON_PATTERNS, vehicle-wrap's and
+//       window-tint's renames' new sides). 98 texts more are marked, and 17 marked texts change (the 15 repair trades'
+//       pf.license.check is marked whole, and two of interior's renames' new sides); 15 files more (biohazard, caterer,
+//       event-staffing, fence, food-truck, golf-instructor, gymnastics, martial-arts, pet-sitter, septic,
+//       ski-instructor, sports-coach, surf-school, swim, valet). None of round 5's shapes is read in an op at one of
+//       C4's verify-only steps (item 25: listed, not marked) nor in a message a person reads (items 23 and 24:
+//       MESSAGES_NEED).
 //     MC C7 says the Nov 4 check listed 45 such trade files; that list is not available, so this build pins its own
-//     count, 123, each phrase with its trade file's example in c7.ts (never padded or trimmed to 45);
-//   - the exhaustive scan (DL-901 item 16): every hit of CLAIM_PATTERNS and PASSIVE_PATTERNS (their guards left out),
-//     and every check verb with a negation within 3 words before it across a separator, that stays in a compiled text
-//     is in ALLOWED with its one reason (a true negation, no paper, or lead note 12), in FIRST_SIDES, in
-//     MESSAGES_WAITING (CQ-347's, DL-904) or in MESSAGES_NEED (notary.json's card, a NEED for the lead);
+//     count, 138, each phrase with its trade file's example in c7.ts (never padded or trimmed to 45);
+//   - the exhaustive scan (DL-901 item 16, DL-916 item 26): every hit of CLAIM_PATTERNS and PASSIVE_PATTERNS (their
+//     guards left out), of round 5's shapes (ROUND5_SHAPES), and every check verb with a negation within 3 words before
+//     it across a separator, that stays in a compiled text is in ALLOWED with its one reason (a true negation, no paper,
+//     lead note 12, or C4's verify-only branch), in FIRST_SIDES, in MESSAGES_WAITING (CQ-347's, DL-904) or in
+//     MESSAGES_NEED (six messages whose words T-1435 fixes: notary.json's card, DL-913; dog-walker's two S11-50 records
+//     results and the three S1-38 first-person lines of tires, vehicle-wrap and window-tint, DL-916);
 //   - after it, no text a trade's compiled overlay holds says Rosie or Rosie's team checks a paper, no pf block waits on
 //     or shows a paper no one named checks, and each text it flagged carries the C7 marker, the rest of each text as
 //     written; the business's own word ("Rosie never looks a license up") is left as it is. Checked apart from
 //     findClaims too: no compiled text keeps a negating clause, a comma, then Rosie or Rosie's team checks (38 trade
 //     files had one), and a person on Rosie's team still checks in three texts only, fraud and cap flags that name no
 //     paper;
-//   - in the bundle, the compiled overlays of the five example trades, two passive ones (concrete, gym) and two of
-//     DL-894's (carpet, hvac) say no such thing, and each flagged pf block carries the marker;
+//   - in the bundle, the compiled overlays of the five example trades, two passive ones (concrete, gym), two of
+//     DL-894's (carpet, hvac) and round 5's biohazard and fence say no such thing, and each flagged pf block carries the
+//     marker;
 //   - a rename's or swap's first side (the master's own line) and a branch label are never changed: hair-restoration,
 //     iv-hydration and plastic-surgeon keep the master's S1-38 lines ("Where a lookup has no data feed, a person on
 //     Rosie's team checks ...") on their renames' first sides; a claim in a message a person reads stops the build;
@@ -51,7 +70,9 @@
 // within 1 business day": 25 trade files rename the master's line, laundry, shoe-repair and upholstery keeping "our team
 // checks it", and 9 carry it in the say messages of words ops at S1-33, round 2's count) sit on C4's verify-only branch,
 // switched off while verify is off, so no person reads them; C4 and T-147's markers cover them, and C7 leaves them as
-// written (DL-894).
+// written (DL-894). Rename pairs whose first side matches no master line (vehicle-wrap.json:413-414,
+// window-tint.json:440-441, the security reviewer's round 4 new task) are a later card's; C7 reads their new sides as it
+// reads every new side (DL-916 item 26).
 import { describe, expect, it, vi } from "vitest";
 import type { FlowLetter } from "../graph/types.ts";
 import { buildBundle } from "../emit";
@@ -62,13 +83,21 @@ import {
   C7ClaimError,
   C7_MARKER,
   CLAIM_PATTERNS,
+  FIRST_PERSON_PATTERNS,
+  KEY_PATTERNS,
   OWN_WORD,
+  PAPER,
   PASSIVE_PATTERNS,
+  RESULT_PATTERNS,
+  VERIFY_ONLY_PATTERNS,
+  VERIFY_ONLY_STEPS,
   WORD_PATTERNS,
   c7,
+  checkAt,
   findClaims,
   markClaims,
   namedAt,
+  onVerifyOnlyStep,
   ownWord,
   patternsAt,
   renderMarks,
@@ -177,6 +206,47 @@ const PASSIVE_ONLY: readonly string[] = [
 ];
 
 /**
+ * Texts round 5 marks (DL-916): biohazard's and fence's pf.license.checked ("the state's lookup; a person on Rosie's team
+ * within 1 business day when it's down") and renewals ("expiry dates from the lookup"), a check key's place and checker
+ * and a lookup's result (items 22 and 23); tutor's pf.license.check ("the registration on the state's business lookup");
+ * a lookup's result on a rename's new side (photographer, caterer); and Rosie in the first person on vehicle-wrap's and
+ * window-tint's rename new sides (item 24).
+ */
+const ROUND5_EXAMPLES: readonly (readonly [trade: string, where: string])[] = [
+  ["biohazard", "pluginText.pf.license.checked"],
+  ["biohazard", "pluginText.pf.license.renewals"],
+  ["fence", "pluginText.pf.license.checked"],
+  ["fence", "pluginText.pf.license.renewals"],
+  ["tutor", "pluginText.pf.license.check"],
+  ["photographer", "A rename[103][1]"],
+  ["caterer", "A rename[30][1]"],
+  ["vehicle-wrap", "A rename[7][1]"],
+  ["window-tint", "A rename[18][1]"],
+];
+
+/**
+ * The 15 trade files C7 flags for round 5's shapes alone (DL-916): biohazard and fence, a check key's place and checker
+ * and their renewals' lookup result; the 13 more, a lookup's result on a rename's new side.
+ */
+const ROUND5_ONLY: readonly string[] = [
+  "biohazard",
+  "caterer",
+  "event-staffing",
+  "fence",
+  "food-truck",
+  "golf-instructor",
+  "gymnastics",
+  "martial-arts",
+  "pet-sitter",
+  "septic",
+  "ski-instructor",
+  "sports-coach",
+  "surf-school",
+  "swim",
+  "valet",
+];
+
+/**
  * The security reviewer's 25 trade files (round 2's FAIL): a negating clause, a comma, then a person on Rosie's team or
  * Rosie checks. 22 hold it in their own words; the last 3 only on a rename's first side, the master's own S1-38 line.
  */
@@ -275,6 +345,20 @@ function texts(value: unknown, path: string, out: { path: string; text: string }
       else texts(item, `${path}.${key}`, out);
     }
   return out;
+}
+
+/**
+ * Whether a text's place (`A ops[3].does`, `A.ops[3].does`, `dog-walker.flows.A.ops[3].does`) lies in an op at one of
+ * C4's verify-only steps (onVerifyOnlyStep), where round 5's phrases are not read (DL-916 item 25).
+ */
+function verifyOnlyAt(
+  flows: Readonly<Record<FlowLetter, { ops: readonly unknown[] }>>,
+  where: string,
+): boolean {
+  const at = /(?:^|\.)([AB])[ .]ops\[(\d+)\]/.exec(where);
+  if (at === null) return false;
+  const op: unknown = flows[at[1] === "B" ? "B" : "A"].ops[Number(at[2])];
+  return typeof op === "object" && op !== null && onVerifyOnlyStep(op);
 }
 
 /** The texts of a loaded trade the compiled overlay holds: its pf blocks, and per flow its ops, renames, slot rows and money. */
@@ -460,10 +544,11 @@ describe("what C7 counts as a claim", () => {
 });
 
 describe("C7 over all 243 trades", () => {
-  it("flags the texts below, MC C7's five examples among them, in 123 trade files: 62 that name Rosie or Rosie's team, 61 more with a passive wording (run 1: 31; round 2: 59; round 3: 102; MC C7: the Nov 4 check listed 45)", () => {
+  it("flags the texts below, MC C7's five examples among them, in 138 trade files: 62 that name Rosie or Rosie's team, 61 more with a passive wording, 15 more with round 5's shapes alone (run 1: 31; round 2: 59; round 3: 102; round 4: 123; MC C7: the Nov 4 check listed 45)", () => {
     expect(ALL).toHaveLength(243);
     const flagged: Record<string, string[]> = {};
     const namesRosie: string[] = [];
+    const passive: string[] = [];
     for (const id of ALL) {
       const { done } = marked(id);
       const where = done.marked.map((one) => one.where);
@@ -471,17 +556,23 @@ describe("C7 over all 243 trades", () => {
       // A text C7 marked names a paper, in its words or by its place (namedAt): read it as one that does.
       if (done.marked.some((one) => findClaims(one.before, CLAIM_PATTERNS, true).length > 0))
         namesRosie.push(id);
+      else if (done.marked.some((one) => findClaims(one.before, PASSIVE_PATTERNS, true).length > 0))
+        passive.push(id);
     }
-    for (const [id, where] of [...EXAMPLES, ...PASSIVE_EXAMPLES, ...ROUND3_EXAMPLES])
+    for (const [id, where] of [...EXAMPLES, ...PASSIVE_EXAMPLES, ...ROUND3_EXAMPLES, ...ROUND5_EXAMPLES])
       expect(flagged[id], id).toContain(where);
     // 62 trade files name Rosie or Rosie's team as the one who checks (run 1's 31, DL-894's 30, and yoga, whose rename
     // says Rosie checks the license its first side names, DL-901); 61 more only wait on, or show, a paper no one named
-    // checks (round 3's 41, and DL-901's 20); 123 in all, pinned as this build counts them (never padded or trimmed to
-    // MC C7's 45, whose list is not available). 300 texts are marked (round 3: 193).
+    // checks (round 3's 41, and DL-901's 20); 15 more hold only round 5's shapes (DL-916): a check key's place and
+    // checker, a lookup's result, Rosie in the first person. 138 in all, pinned as this build counts them (never padded
+    // or trimmed to MC C7's 45, whose list is not available). 398 texts are marked (round 3: 193; round 4: 300).
     expect(namesRosie).toHaveLength(62);
-    expect(Object.keys(flagged).filter((id) => !namesRosie.includes(id))).toStrictEqual(PASSIVE_ONLY);
-    expect(Object.keys(flagged)).toHaveLength(123);
-    expect(Object.values(flagged).flat()).toHaveLength(300);
+    expect(passive).toStrictEqual(PASSIVE_ONLY);
+    expect(
+      Object.keys(flagged).filter((id) => !namesRosie.includes(id) && !passive.includes(id)),
+    ).toStrictEqual(ROUND5_ONLY);
+    expect(Object.keys(flagged)).toHaveLength(138);
+    expect(Object.values(flagged).flat()).toHaveLength(398);
     expect(flagged).toMatchInlineSnapshot(`
       {
         "acupuncturist": [
@@ -506,7 +597,13 @@ describe("C7 over all 243 trades", () => {
           "pluginText.pf.license.check",
         ],
         "band": [
+          "A rename[119][1]",
           "B rename[7][1]",
+          "B rename[324][1]",
+        ],
+        "biohazard": [
+          "pluginText.pf.license.checked",
+          "pluginText.pf.license.renewals",
         ],
         "boat-repair": [
           "pluginText.pf.license.check",
@@ -518,13 +615,22 @@ describe("C7 over all 243 trades", () => {
           "A ops[0].more[1]",
           "B ops[0].more[1]",
         ],
+        "caterer": [
+          "A rename[30][1]",
+          "B rename[68][1]",
+        ],
         "chef": [
           "A ops[5].does",
           "A ops[5].more[1]",
+          "A rename[0][1]",
+          "A rename[30][1]",
           "B ops[5].does",
           "B ops[5].more[1]",
+          "B rename[5][1]",
+          "B rename[74][1]",
         ],
         "chimney": [
+          "B rename[12][1]",
           "B rename[31][1]",
         ],
         "cleaner": [
@@ -533,10 +639,13 @@ describe("C7 over all 243 trades", () => {
         ],
         "closets": [
           "pluginText.pf.license.blocks[0]",
+          "B rename[163][1]",
           "B rename[165][1]",
         ],
         "clown": [
+          "A rename[117][1]",
           "B rename[5][1]",
+          "B rename[324][1]",
         ],
         "coach": [
           "pluginText.pf.license.ask",
@@ -548,7 +657,9 @@ describe("C7 over all 243 trades", () => {
           "B ops[58].more[1]",
         ],
         "comedian": [
+          "A rename[117][1]",
           "B rename[5][1]",
+          "B rename[324][1]",
         ],
         "commercial-cleaning": [
           "A ops[0].more[1]",
@@ -572,11 +683,19 @@ describe("C7 over all 243 trades", () => {
         "dance": [
           "A ops[61].form[3][1]",
           "A ops[70].does",
+          "A rename[291][1]",
           "A rename[292][1]",
+          "A rename[372][1]",
+          "A rename[375][1]",
           "A rename[380][1]",
+          "A rename[565][1]",
+          "A rename[566][1]",
           "B ops[52].form[3][1]",
           "B ops[56].does",
+          "B rename[348][1]",
           "B rename[349][1]",
+          "B rename[429][1]",
+          "B rename[432][1]",
           "B rename[437][1]",
         ],
         "daycare": [
@@ -600,8 +719,10 @@ describe("C7 over all 243 trades", () => {
           "B ops[11].more[1]",
         ],
         "dj": [
+          "A rename[115][1]",
           "B ops[84].form[3][1]",
           "B rename[3][1]",
+          "B rename[320][1]",
         ],
         "dog-trainer": [
           "pluginText.pf.staff.licenses",
@@ -645,6 +766,7 @@ describe("C7 over all 243 trades", () => {
         "duct-cleaning": [
           "A ops[0].more[1]",
           "B ops[0].more[1]",
+          "B rename[70][1]",
           "B rename[90][1]",
         ],
         "electrician": [
@@ -656,12 +778,24 @@ describe("C7 over all 243 trades", () => {
         "estate-sale": [
           "A rename[60][1]",
         ],
+        "event-staffing": [
+          "A rename[30][1]",
+          "B rename[68][1]",
+        ],
         "excavation": [
           "pluginText.pf.license.blocks[0]",
         ],
         "farrier": [
           "A ops[45].does",
           "B ops[20].does",
+        ],
+        "fence": [
+          "pluginText.pf.license.checked",
+          "pluginText.pf.license.renewals",
+        ],
+        "food-truck": [
+          "A rename[30][1]",
+          "B rename[68][1]",
         ],
         "foundation": [
           "pluginText.pf.license.blocks[0]",
@@ -671,6 +805,10 @@ describe("C7 over all 243 trades", () => {
         ],
         "glass-doors": [
           "pluginText.pf.license.blocks[0]",
+        ],
+        "golf-instructor": [
+          "A rename[146][1]",
+          "B rename[182][1]",
         ],
         "groomer": [
           "pluginText.pf.license.check",
@@ -686,7 +824,13 @@ describe("C7 over all 243 trades", () => {
           "pluginText.pf.license.coachCertificate",
           "pluginText.pf.staff.certificate",
           "A ops[24].why",
+          "A rename[163][1]",
           "B ops[16].why",
+          "B rename[194][1]",
+        ],
+        "gymnastics": [
+          "A rename[41][1]",
+          "B rename[69][1]",
         ],
         "hearing": [
           "A ops[66].more[0]",
@@ -699,6 +843,7 @@ describe("C7 over all 243 trades", () => {
           "pluginText.pf.license.blocks_live",
         ],
         "home-stager": [
+          "B rename[164][1]",
           "B rename[166][1]",
         ],
         "hvac": [
@@ -724,6 +869,9 @@ describe("C7 over all 243 trades", () => {
         "interior": [
           "pluginText.pf.staff.licenses",
           "A rename[121][1]",
+          "B rename[405][1]",
+          "B rename[406][1]",
+          "B rename[408][1]",
           "B rename[411][1]",
           "B rename[434][1]",
         ],
@@ -746,6 +894,10 @@ describe("C7 over all 243 trades", () => {
         ],
         "locksmith": [
           "pluginText.pf.license.blocks going live",
+        ],
+        "martial-arts": [
+          "A rename[181][1]",
+          "B rename[197][1]",
         ],
         "masonry": [
           "pluginText.pf.license.blocks[0]",
@@ -783,6 +935,7 @@ describe("C7 over all 243 trades", () => {
           "B ops[3].more[0]",
         ],
         "organizer": [
+          "B rename[164][1]",
           "B rename[166][1]",
         ],
         "orthopedist": [
@@ -793,7 +946,9 @@ describe("C7 over all 243 trades", () => {
           "A rename[27][1]",
         ],
         "party-characters": [
+          "A rename[117][1]",
           "B rename[5][1]",
+          "B rename[324][1]",
         ],
         "paving": [
           "pluginText.pf.license.blocks[0]",
@@ -801,6 +956,10 @@ describe("C7 over all 243 trades", () => {
         "personal-shopper": [
           "A ops[63].more[1]",
           "B ops[58].more[1]",
+        ],
+        "pet-sitter": [
+          "A rename[66][1]",
+          "B rename[106][1]",
         ],
         "pet-taxi": [
           "A ops[50].does",
@@ -819,15 +978,29 @@ describe("C7 over all 243 trades", () => {
           "B ops[53].does",
         ],
         "photographer": [
+          "A rename[27][1]",
+          "A rename[72][1]",
+          "A rename[100][1]",
+          "A rename[101][1]",
+          "A rename[103][1]",
+          "A rename[104][1]",
           "A rename[120][1]",
           "A rename[121][1]",
+          "B rename[66][1]",
+          "B rename[170][1]",
+          "B rename[216][1]",
+          "B rename[217][1]",
+          "B rename[226][1]",
+          "B rename[227][1]",
           "B rename[252][1]",
           "B rename[253][1]",
         ],
         "pilates": [
           "A ops[17].why",
           "A ops[68].does",
+          "A rename[133][1]",
           "B ops[13].why",
+          "B rename[136][1]",
           "B rename[139][1]",
         ],
         "pool": [
@@ -842,6 +1015,7 @@ describe("C7 over all 243 trades", () => {
         "pressure": [
           "A ops[0].more[3]",
           "B ops[0].more[3]",
+          "B rename[5][1]",
         ],
         "primary-care": [
           "A ops[40].more[0]",
@@ -888,8 +1062,14 @@ describe("C7 over all 243 trades", () => {
         "restoration": [
           "pluginText.pf.license.certifications",
           "A ops[26].does",
+          "A rename[122][1]",
+          "A rename[123][1]",
+          "A rename[126][1]",
           "A rename[131][1]",
           "B ops[26].does",
+          "B rename[410][1]",
+          "B rename[411][1]",
+          "B rename[414][1]",
           "B rename[419][1]",
         ],
         "roofer": [
@@ -902,6 +1082,10 @@ describe("C7 over all 243 trades", () => {
         "security": [
           "pluginText.pf.license.blocks[0]",
           "A ops[6].does",
+        ],
+        "septic": [
+          "A rename[21][1]",
+          "B rename[20][1]",
         ],
         "sharpening": [
           "pluginText.pf.license.check",
@@ -918,6 +1102,10 @@ describe("C7 over all 243 trades", () => {
           "B ops[3].does",
           "B ops[139].more[0]",
         ],
+        "ski-instructor": [
+          "A rename[146][1]",
+          "B rename[182][1]",
+        ],
         "small-engine": [
           "pluginText.pf.license.check",
         ],
@@ -930,10 +1118,21 @@ describe("C7 over all 243 trades", () => {
         "speech-therapist": [
           "pluginText.pf.license.national",
         ],
+        "sports-coach": [
+          "A rename[147][1]",
+          "B rename[182][1]",
+        ],
+        "surf-school": [
+          "A rename[35][1]",
+        ],
         "surveyor": [
           "pluginText.pf.license.blocks_live",
         ],
+        "swim": [
+          "A rename[104][1]",
+        ],
         "tailor": [
+          "A rename[43][1]",
           "A rename[46][1]",
         ],
         "tax": [
@@ -965,7 +1164,9 @@ describe("C7 over all 243 trades", () => {
         ],
         "tours": [
           "A ops[15].why",
+          "A rename[45][1]",
           "B ops[13].why",
+          "B rename[79][1]",
         ],
         "towing": [
           "pluginText.pf.license.blocks going live",
@@ -973,7 +1174,9 @@ describe("C7 over all 243 trades", () => {
         "trainer": [
           "pluginText.pf.license.certificates",
           "A ops[5].why",
+          "A rename[144][1]",
           "B ops[5].why",
+          "B rename[181][1]",
         ],
         "translator": [
           "A ops[4].why",
@@ -988,6 +1191,7 @@ describe("C7 over all 243 trades", () => {
           "pluginText.pf.license.wood_yard",
         ],
         "tutor": [
+          "pluginText.pf.license.check",
           "A ops[10].does",
           "A ops[179].does",
           "A ops[179].more[1]",
@@ -998,12 +1202,17 @@ describe("C7 over all 243 trades", () => {
         "upholstery": [
           "B rename[82][1]",
         ],
+        "valet": [
+          "A rename[30][1]",
+          "B rename[68][1]",
+        ],
         "vehicle-inspection": [
           "pluginText.pf.license.check",
           "pluginText.pf.staff.licenses",
         ],
         "vehicle-wrap": [
           "pluginText.pf.license.check",
+          "A rename[7][1]",
         ],
         "watch-jewelry": [
           "pluginText.pf.license.check",
@@ -1014,9 +1223,11 @@ describe("C7 over all 243 trades", () => {
           "B ops[0].more[1]",
           "B ops[2].does",
           "B rename[56][1]",
+          "B rename[66][1]",
         ],
         "window-tint": [
           "pluginText.pf.license.check",
+          "A rename[18][1]",
         ],
         "windows": [
           "A ops[3].more[1]",
@@ -1024,28 +1235,40 @@ describe("C7 over all 243 trades", () => {
         ],
         "yoga": [
           "A ops[18].why",
+          "A rename[339][1]",
           "A rename[340][1]",
+          "A rename[420][1]",
+          "A rename[423][1]",
           "A rename[428][1]",
+          "A rename[614][1]",
+          "A rename[615][1]",
           "B ops[13].why",
+          "B rename[355][1]",
           "B rename[356][1]",
+          "B rename[436][1]",
+          "B rename[439][1]",
           "B rename[444][1]",
         ],
       }
     `);
   });
 
-  it("leaves no text the compiled overlay holds saying Rosie checks a paper, no pf block waiting on a paper no one named checks, and marks each text it changed", () => {
+  it("leaves no text the compiled overlay holds saying Rosie checks a paper, no pf block waiting on a paper no one named checks, no lookup result or first-person check but on a verify-only step (DL-916), and marks each text it changed", () => {
     for (const id of ALL) {
       const { trade, done } = marked(id);
       for (const leaf of tradeTexts(done.trade)) {
         expect(findClaims(leaf.text), `${id} ${leaf.path}`).toStrictEqual([]);
         expect(
-          findClaims(leaf.text, patternsAt(leaf.path), namedAt(leaf.path)),
+          findClaims(
+            leaf.text,
+            patternsAt(leaf.path, verifyOnlyAt(done.trade.flows, leaf.path)),
+            namedAt(leaf.path),
+          ),
           `${id} ${leaf.path}`,
         ).toStrictEqual([]);
       }
       for (const one of done.marked) {
-        const patterns = patternsAt(one.where);
+        const patterns = patternsAt(one.where, verifyOnlyAt(trade.flows, one.where));
         expect(one.tag).toBe("MC:C7");
         // A marked text names a paper, in its words or by its place (namedAt, a rename's first side).
         expect(findClaims(one.before, patterns, true).length, `${id} ${one.where}`).toBeGreaterThan(0);
@@ -1185,18 +1408,25 @@ describe("C7 over all 243 trades", () => {
 });
 
 describe("C7 in the bundle", () => {
-  it("leaves no claim in the compiled overlays of MC C7's five example trades, two passive ones and two of DL-894's, and marks each flagged pf block", async () => {
-    const ids = [...EXAMPLES, ...PASSIVE_EXAMPLES, ...ROUND3_EXAMPLES].map(([id]) => id);
+  it("leaves no claim in the compiled overlays of MC C7's five example trades, two passive ones, two of DL-894's and round 5's biohazard and fence, and marks each flagged pf block", async () => {
+    const ids = [
+      ...[...EXAMPLES, ...PASSIVE_EXAMPLES, ...ROUND3_EXAMPLES].map(([id]) => id),
+      "biohazard",
+      "fence",
+    ];
     const built = await buildBundle({ trades: ids, master });
     for (const id of ids) {
       const overlay = built.bundle.trades[id] as {
         pluginText: Record<string, string>;
-        flows: Record<FlowLetter, Record<string, unknown>>;
+        flows: Record<FlowLetter, { ops: unknown[] }>;
       };
       for (const leaf of texts(overlay, id)) {
-        // Every text is read with WORD_PATTERNS but a message a person reads (patternsAt, DL-901); a pf block is stored
-        // whole as one text (K-01 pluginText).
-        expect(findClaims(leaf.text, patternsAt(leaf.path)), leaf.path).toStrictEqual([]);
+        // Every text is read with WORD_PATTERNS but a message a person reads and an op at a verify-only step (patternsAt,
+        // DL-901, DL-916); a pf block is stored whole as one text (K-01 pluginText).
+        expect(
+          findClaims(leaf.text, patternsAt(leaf.path, verifyOnlyAt(overlay.flows, leaf.path))),
+          leaf.path,
+        ).toStrictEqual([]);
       }
       for (const one of marked(id).done.marked) {
         const block = /^pluginText\.(pf\.[a-z_]+)/.exec(one.where)?.[1];
@@ -1352,6 +1582,405 @@ describe("the security reviewer's round 3 FAIL and the lead's ruling on op text 
   });
 });
 
+/** The value at a path of keys and indexes, or undefined. */
+function valueAt(value: unknown, path: readonly (string | number)[]): unknown {
+  let at = value;
+  for (const part of path) {
+    if (typeof at !== "object" || at === null) return undefined;
+    at = (at as Record<string | number, unknown>)[part];
+  }
+  return at;
+}
+
+describe("the security reviewer's round 4 FAIL and the lead's rulings on its three shapes (DL-916 items 22 to 25)", () => {
+  it("reads a pf key that names a check as carrying the check verb: biohazard.json:31 and fence.json:31 and their renewals at :34 are marked (item 22)", () => {
+    for (const where of [
+      "pluginText.pf.license.checked",
+      "pluginText.pf.license.check",
+      "pluginText.pf.license.how it's checked",
+      "pluginText.pf.first_steps.steps[0].check",
+    ])
+      expect(checkAt(where), where).toBe(true);
+    // A key that names a background check, a customer's check-in or a recall check names no check of a paper.
+    for (const where of [
+      "pluginText.pf.license.background check",
+      "pluginText.pf.license.background_checks",
+      "pluginText.pf.visit.checkIn",
+      "pluginText.pf.visit.check-in at the venue",
+      "pluginText.pf.visit.recall_check",
+      "pluginText.pf.license.renewals",
+      "A ops[3].more[0]",
+    ])
+      expect(checkAt(where), where).toBe(false);
+    expect(patternsAt("pluginText.pf.license.checked")).toStrictEqual([...WORD_PATTERNS, ...KEY_PATTERNS]);
+    expect(patternsAt("pluginText.pf.license.renewals")).toBe(WORD_PATTERNS);
+    // The reviewer's lines, by their place, raw and marked; the same claim's place first in the pf.license.check of the
+    // 15 repair trades (round 3 marked only its second half) and in tutor's.
+    const checked = "the state's lookup; a person on Rosie's team within 1 business day when it's down";
+    const cases: readonly (readonly [trade: string, where: string, before: string, after: string])[] = [
+      ["biohazard", "pluginText.pf.license.checked", checked, OWN_WORD],
+      [
+        "biohazard",
+        "pluginText.pf.license.renewals",
+        "expiry dates from the lookup; reminded before they lapse",
+        `${OWN_WORD} reminded before they lapse`,
+      ],
+      ["fence", "pluginText.pf.license.checked", checked, OWN_WORD],
+      [
+        "fence",
+        "pluginText.pf.license.renewals",
+        "the expiry date from the lookup; reminded before it lapses",
+        `${OWN_WORD} reminded before it lapses`,
+      ],
+      [
+        "auto-body",
+        "pluginText.pf.license.check",
+        "the state's license lookup; where there's none, a person on Rosie's team checks within 1 business day",
+        OWN_WORD,
+      ],
+      [
+        "watch-jewelry",
+        "pluginText.pf.license.check",
+        "the state's or city's business lookup; where there's none, a person on Rosie's team checks within 1 business day",
+        OWN_WORD,
+      ],
+      [
+        "tutor",
+        "pluginText.pf.license.check",
+        "the registration on the state's business lookup, within 1 business day where it can't be read; a background check is shown only as the business stated it (who ran it, what it covered, when), never as 'background checked'",
+        `${OWN_WORD} a background check is shown only as the business stated it (who ran it, what it covered, when), never as 'background checked'`,
+      ],
+    ];
+    for (const [trade, where, before, after] of cases)
+      expect(
+        marked(trade).done.marked.find((one) => one.where === where),
+        `${trade} ${where}`,
+      ).toStrictEqual({ tag: "MC:C7", trade, where, before, after });
+    for (const trade of ["biohazard", "fence"]) {
+      const block = JSON.parse(marked(trade).done.trade.pluginText["pf.license"]) as Record<string, string>;
+      expect(block.checked, trade).toBe(OWN_WORD);
+      expect(block.renewals, trade).toContain(C7_MARKER);
+    }
+    // Under a check key, a negation takes the place back, and a paper the owner keeps names no check.
+    for (const text of [
+      "Sam or the desk checks the photo and the dates before lesson 1 (the school's own check, with no lookup);",
+      "none: Rosie never checks a license or insurance for this work (not on any lookup, not by the team)",
+      "none: Rosie never looks up, checks or confirms a license, insurance or registration (D96); anything shown is as given by the business, not checked by Rosie",
+      "The owner keeps the papers.",
+      "the owner is responsible for the licenses they add",
+      "Rosie keeps the numbers and dates the owner gives, and the owner keeps the papers.",
+    ])
+      expect(findClaims(text, patternsAt("pluginText.pf.license.check"), true), text).toStrictEqual([]);
+  });
+
+  it("reads a lookup's or records' result with no check verb as a claim in a trade's own words, and pins dog-walker's two S11-50 messages in MESSAGES_NEED (item 23)", () => {
+    for (const text of [
+      "The lookup shows Leo's massage license as expired.",
+      "The state's lookup has no massage license with the number Eli sent.",
+      "Sasha's card is checked again when the lookup answers.",
+      "The city's records show Quinn's park permit as suspended today.",
+      "Leo's massage license shows as expired on the state's lookup.",
+      "expiry dates from the lookup; reminded before they lapse",
+      "The federal lookup shows your pilot certificate as suspended, so your new drone bookings are paused.",
+      "A renewal receipt counts while the lookup catches up.",
+      "The state's business lookup doesn't find registration 2019-0451 for the company.",
+    ]) {
+      expect(findClaims(text, RESULT_PATTERNS), text).toHaveLength(1);
+      expect(findClaims(text, WORD_PATTERNS), text).toHaveLength(1);
+      // CLAIM_PATTERNS alone, as a message a person reads is read, do not read it (CLAIM_PATTERNS[4] needs "official").
+      expect(findClaims(text), text).toStrictEqual([]);
+    }
+    // A person's or a business's own record is no lookup; a lookup's branch named in a why, or a lookup that is down, is
+    // no result.
+    for (const text of [
+      "A returning patient's record shows past visits and notes for the clinician.",
+      "The language shows on the customer's record, so Sam can send someone who speaks it.",
+      "For Medicare plans: each agent's plan appointments and this year's plan training, from the agent's own records.",
+      "Juniper's rabies record has run out, and no new one was brought.",
+      "D96: only from the lookup's 'The lookup is down'",
+      "The city's permit records are down, so Quinn S.'s park permit isn't checked yet.",
+      // Rosie's own voice at S1-33, lead note 12's: the lookup is not the one that finds.
+      "We couldn't find registration 2019-0451 for Lee Live Music on the state's business lookup.",
+    ])
+      expect(findClaims(text, WORD_PATTERNS), text).toStrictEqual([]);
+    // dog-walker.json:2041 and :2055: the words op at S11-50, to Sam and to Quinn, as written, each pinned with its
+    // reason; the op's own words say "Rosie checks no permit".
+    const dog = marked("dog-walker");
+    const op = dog.trade.flows.A.ops[22];
+    expect(op?.at).toBe("S11-50");
+    expect(onVerifyOnlyStep(op ?? {})).toBe(false);
+    for (const [k, line] of [
+      [0, "The city's records show Quinn's park permit as suspended today."],
+      [
+        1,
+        "The city's records show your park permit as suspended, so you're off the hike schedule for now. Tell Sam if that's wrong.",
+      ],
+    ] as const) {
+      expect(valueAt(op, ["say", k, 2])).toBe(line);
+      expect(valueAt(dog.done.trade.flows.A.ops[22], ["say", k, 2])).toBe(line);
+      expect(findClaims(line, patternsAt(`A ops[22].say[${String(k)}][2]`))).toStrictEqual([]);
+      expect(findClaims(line, WORD_PATTERNS)).toHaveLength(1);
+      expect(MESSAGES_NEED.map(([place]) => place)).toContain(`dog-walker A.ops[22].say[${String(k)}][2]`);
+    }
+    // The same result in a trade's own words is marked: a rename's new side.
+    const results: readonly (readonly [trade: string, where: string, before: string, after: string])[] = [
+      [
+        "yoga",
+        "A rename[614][1]",
+        "Say Quinn also does massage. The state's lookup shows Quinn's massage license as suspended today.",
+        `Say Quinn also does massage. ${OWN_WORD}`,
+      ],
+      [
+        "photographer",
+        "A rename[103][1]",
+        "The federal lookup shows Quinn's pilot certificate as suspended today.",
+        OWN_WORD,
+      ],
+      ["caterer", "A rename[30][1]", "Sasha's card is checked again when the lookup answers.", OWN_WORD],
+      [
+        "band",
+        "A rename[119][1]",
+        "The state's business lookup doesn't find registration 2019-0451 for the company.",
+        OWN_WORD,
+      ],
+      [
+        "chimney",
+        "B rename[12][1]",
+        "The lookup shows Wes's gas license as expired. Wes still sweeps, and takes stove work again once it shows renewed.",
+        `${OWN_WORD} Wes still sweeps, and takes stove work again once it shows renewed.`,
+      ],
+    ];
+    for (const [trade, where, before, after] of results)
+      expect(
+        marked(trade).done.marked.find((one) => one.where === where),
+        `${trade} ${where}`,
+      ).toStrictEqual({ tag: "MC:C7", trade, where, before, after });
+  });
+
+  it("reads Rosie in the first person as the one who checks: the three S1-38 messages are pinned, the same words on rename new sides are marked (item 24)", () => {
+    for (const text of [
+      "Mobile tire service needs no state license where you work, so I'll check the business registration.",
+      "I check licenses right away.",
+      "I'll check it on the state's lookup.",
+    ]) {
+      expect(findClaims(text, FIRST_PERSON_PATTERNS), text).toHaveLength(1);
+      expect(findClaims(text), text).toStrictEqual([]);
+    }
+    for (const text of [
+      "I don't check it.",
+      "Which prices should I check with you first?",
+      "Send a photo of your class schedule, and I'll read it back.",
+    ])
+      expect(findClaims(text, WORD_PATTERNS), text).toStrictEqual([]);
+    // tires.json:1266, vehicle-wrap.json:2936 and window-tint.json:2093: flow A, the words op at S1-38, Rosie to the
+    // owner, as written, each pinned with its reason.
+    const messages: readonly (readonly [trade: string, k: number, line: string])[] = [
+      [
+        "tires",
+        10,
+        "Thanks. Mobile tire service needs no state license where you work, so I'll check the business registration. Now send its prices: a photo or a list.",
+      ],
+      [
+        "vehicle-wrap",
+        29,
+        "Thanks. Mobile wrap service needs no state license where you work, so I'll check the business registration. Now send its prices: a photo or a list.",
+      ],
+      [
+        "window-tint",
+        26,
+        "Thanks. Mobile tint service needs no state license where you work, so I'll check the business registration. Now send its prices: a photo or a list.",
+      ],
+    ];
+    for (const [trade, k, line] of messages) {
+      const { trade: raw, done } = marked(trade);
+      expect(raw.flows.A.ops[k]?.at, trade).toBe("S1-38");
+      expect(valueAt(raw.flows.A.ops[k], ["say", 4, 0]), trade).toBe("san");
+      expect(valueAt(raw.flows.A.ops[k], ["say", 4, 2]), trade).toBe(line);
+      expect(valueAt(done.trade.flows.A.ops[k], ["say", 4, 2]), trade).toBe(line);
+      expect(findClaims(line, WORD_PATTERNS), trade).toHaveLength(1);
+      expect(MESSAGES_NEED.map(([place]) => place)).toContain(`${trade} A.ops[${String(k)}].say[4][2]`);
+    }
+    // vehicle-wrap.json:414 and window-tint.json:441: the same words on rename new sides are marked.
+    for (const [trade, where, work] of [
+      ["vehicle-wrap", "A rename[7][1]", "Wrap work"],
+      ["window-tint", "A rename[18][1]", "Window tint"],
+    ] as const)
+      expect(
+        marked(trade).done.marked.find((one) => one.where === where),
+        `${trade} ${where}`,
+      ).toStrictEqual({
+        tag: "MC:C7",
+        trade,
+        where,
+        before: `Thanks. ${work} needs no state license where you work, so I'll check the business registration. What's the shop's registration number?`,
+        after: `Thanks. ${OWN_WORD} What's the shop's registration number?`,
+      });
+  });
+
+  it("leaves the lookup results on C4's verify-only steps as written, each listed with that reason (item 25)", () => {
+    expect([...VERIFY_ONLY_STEPS].sort()).toStrictEqual([
+      "S1-33",
+      "S11-99",
+      "S12-19",
+      "S13-41",
+      "S13-43",
+      "S2-12",
+      "S2-13",
+      "S2-14",
+    ]);
+    expect(onVerifyOnlyStep({ at: "S2-12" })).toBe(true);
+    expect(onVerifyOnlyStep({ at: "S2-11" })).toBe(false);
+    expect(patternsAt("A ops[66].does", true)).toBe(VERIFY_ONLY_PATTERNS);
+    expect(patternsAt("A ops[66].say[0][2]", true)).toBe(CLAIM_PATTERNS);
+    expect(VERIFY_ONLY_PATTERNS).toStrictEqual([...CLAIM_PATTERNS, ...PASSIVE_PATTERNS]);
+    const noMatch = "The state's lookup has no massage license with the number Leo sent.";
+    const expired = "The lookup shows Leo's massage license as expired.";
+    const places: (readonly [
+      trade: string,
+      flow: FlowLetter,
+      k: number,
+      step: string,
+      path: readonly (string | number)[],
+      sentence: string,
+    ])[] = [
+      // pilates.json:4668, 4673 (S2-12); 4688, 4693, 4707 (S2-13).
+      ["pilates", "A", 66, "S2-12", ["does"], noMatch],
+      ["pilates", "A", 66, "S2-12", ["say", 0, 2], noMatch],
+      ["pilates", "A", 67, "S2-13", ["does"], expired],
+      [
+        "pilates",
+        "A",
+        67,
+        "S2-13",
+        ["say", 0, 2],
+        "Leo's massage license shows as expired on the state's lookup.",
+      ],
+      [
+        "pilates",
+        "A",
+        67,
+        "S2-13",
+        ["say", 1, 2],
+        "Your massage license shows as expired on the state's lookup.",
+      ],
+      // security.json:6923, 6928 (S2-12); 6943, 6948, 6962 (S2-13).
+      [
+        "security",
+        "A",
+        4,
+        "S2-12",
+        ["does"],
+        "The state's lookup has no license with the number Rafael sent.",
+      ],
+      [
+        "security",
+        "A",
+        4,
+        "S2-12",
+        ["say", 0, 2],
+        "The state's lookup has no license with the number Rafael sent.",
+      ],
+      ["security", "A", 5, "S2-13", ["does"], "The lookup shows the license as expired."],
+      [
+        "security",
+        "A",
+        5,
+        "S2-13",
+        ["say", 0, 2],
+        "Rafael's license shows as expired on the state's lookup.",
+      ],
+      [
+        "security",
+        "A",
+        5,
+        "S2-13",
+        ["say", 1, 2],
+        "Your license shows as expired on the state's lookup, so Lee Alarm & Camera can't book you until it shows renewed.",
+      ],
+      // S12-19's "receipt counts while the lookup catches up": detailing.json:2220, 3591; tutor.json:5384, 11942;
+      // tires.json:3201, 5447; rentals.json:2779, 4822.
+      ["detailing", "A", 11, "S12-19", ["more", 0], "A renewal receipt counts while the lookup catches up."],
+      ["detailing", "B", 11, "S12-19", ["more", 0], "A renewal receipt counts while the lookup catches up."],
+      ["tutor", "A", 179, "S12-19", ["more", 0], "A receipt counts while the lookup catches up."],
+      ["tutor", "B", 260, "S12-19", ["more", 0], "A receipt counts while the lookup catches up."],
+      ["tires", "A", 115, "S12-19", ["more", 0], "A renewal receipt counts while the lookup catches up."],
+      ["tires", "B", 105, "S12-19", ["more", 0], "A renewal receipt counts while the lookup catches up."],
+      ["rentals", "A", 66, "S12-19", ["more", 0], "A paper's receipt counts while the lookup catches up."],
+      ["rentals", "B", 77, "S12-19", ["more", 0], "A paper's receipt counts while the lookup catches up."],
+    ];
+    // repair-shop.json:2411, 2416, 2432, 2437, 2451 (flow A) and 3375, 3380, 3396, 3401, 3415 (flow B).
+    for (const [flow, noLicense, expiredOp] of [
+      ["A", 46, 47],
+      ["B", 34, 35],
+    ] as const)
+      places.push(
+        [
+          "repair-shop",
+          flow,
+          noLicense,
+          "S2-12",
+          ["does"],
+          "The state's lookup has no license with the number Ethan sent.",
+        ],
+        [
+          "repair-shop",
+          flow,
+          noLicense,
+          "S2-12",
+          ["say", 0, 2],
+          "The state's lookup has no low-voltage license with the number Ethan sent.",
+        ],
+        ["repair-shop", flow, expiredOp, "S2-13", ["does"], "The lookup shows Ethan's license as expired."],
+        [
+          "repair-shop",
+          flow,
+          expiredOp,
+          "S2-13",
+          ["say", 0, 2],
+          "Ethan's low-voltage license shows as expired on the state's lookup.",
+        ],
+        [
+          "repair-shop",
+          flow,
+          expiredOp,
+          "S2-13",
+          ["say", 1, 2],
+          "Your low-voltage license shows as expired on the state's lookup.",
+        ],
+      );
+    expect(places).toHaveLength(28);
+    for (const [trade, flow, k, step, path, sentence] of places) {
+      const where = `${trade} ${flow} ops[${String(k)}].${path.join(".")}`;
+      const { trade: raw, done } = marked(trade);
+      const op = raw.flows[flow].ops[k];
+      expect(op?.at, where).toBe(step);
+      expect(onVerifyOnlyStep(op ?? {}), where).toBe(true);
+      const before = valueAt(op, path);
+      expect(before, where).toContain(sentence);
+      expect(valueAt(done.trade.flows[flow].ops[k], path), where).toBe(before);
+      expect(findClaims(sentence, WORD_PATTERNS), where).toHaveLength(1);
+      expect(ALLOWED[VERIFY_ONLY], where).toContain(sentence);
+    }
+    // The same result at S1-33, lead note 12's own step, stays as written in the words ops of 8 trades and is listed
+    // with the same reason; the rounds before marked another sentence of some of those texts.
+    for (const [trade, k, sentence] of [
+      ["daycare", 5, "The state's business lookup doesn't find registration EX-1042 under Lee Kids Events."],
+      [
+        "tutor",
+        10,
+        "The state's business lookup doesn't find registration 2019-0451 under Lee Home Tutoring.",
+      ],
+      ["primary-care", 62, "The state's lookup doesn't find license MD045210 under Sam's name."],
+    ] as const) {
+      const { trade: raw, done } = marked(trade);
+      expect(raw.flows.A.ops[k]?.at, trade).toBe("S1-33");
+      expect(valueAt(raw.flows.A.ops[k], ["does"]), trade).toContain(sentence);
+      expect(valueAt(done.trade.flows.A.ops[k], ["does"]), trade).toContain(sentence);
+      expect(ALLOWED[VERIFY_ONLY], trade).toContain(sentence);
+    }
+  });
+});
+
 /**
  * The six texts of messages a person reads that wait on a permit that "checks out" (movers.json's junk hauling), each
  * by its place (the scan's places: a message's index in its list, then its element's), with its one reason: a step that
@@ -1370,29 +1999,62 @@ const MESSAGES_WAITING: readonly (readonly [place: string, reason: string])[] = 
 ];
 
 /**
- * A text of a message a person reads that shows a paper as checked by no one named, and waits on nothing: a NEED for
- * the lead (DL-901 item 15, DL-904 item 19). notary.json's S1-23 card tells the owner the notary's commission is
- * "checked" ("Sam Lee · NP045210 · checked"); marking it would stop the build (C7ClaimError), which is never loosened,
- * so it stays as written until the lead rules. The same op's own words ("Sam's commission was checked already") are
- * marked.
+ * The texts of messages a person reads that claim a check made and wait on nothing, each by its place with its one
+ * reason; marking one would stop the build (C7ClaimError), which is never loosened, so each stays as written and T-1435
+ * fixes its words (the lead's rulings, DL-913 and DL-916).
+ *   - notary.json's S1-23 card tells the owner the notary's commission is "checked" ("Sam Lee · NP045210 · checked"), a
+ *     paper checked by no one named (DL-901 item 15; accepted as built, DL-913). The same op's own words ("Sam's
+ *     commission was checked already") are marked.
+ *   - dog-walker.json:2041 and :2055, the words op at S11-50 (a step that runs while verify is off): "The city's records
+ *     show Quinn's park permit as suspended today", to Sam and to Quinn, a records' result with no check verb (DL-916
+ *     item 23). The same op's own words say "Rosie checks no permit".
+ *   - tires.json:1266, vehicle-wrap.json:2936 and window-tint.json:2093, the words op at S1-38, Rosie to the owner: "...
+ *     needs no state license where you work, so I'll check the business registration", Rosie's check in the first
+ *     person (DL-916 item 24). The same words on vehicle-wrap's and window-tint's rename new sides are marked.
  */
 const MESSAGES_NEED: readonly (readonly [place: string, reason: string])[] = [
   [
     "notary A.ops[3].say[0][3].card.lines[0]",
     "NEED: a message a person reads shows a paper checked by no one named (DL-901 item 15)",
   ],
+  [
+    "dog-walker A.ops[22].say[0][2]",
+    "NEED: a message a person reads shows the records' result of a check no one makes while verify is off (DL-916 item 23); T-1435 fixes its words",
+  ],
+  [
+    "dog-walker A.ops[22].say[1][2]",
+    "NEED: a message a person reads shows the records' result of a check no one makes while verify is off (DL-916 item 23); T-1435 fixes its words",
+  ],
+  [
+    "tires A.ops[10].say[4][2]",
+    "NEED: Rosie says in the first person that it checks a paper (DL-916 item 24); T-1435 fixes its words",
+  ],
+  [
+    "vehicle-wrap A.ops[29].say[4][2]",
+    "NEED: Rosie says in the first person that it checks a paper (DL-916 item 24); T-1435 fixes its words",
+  ],
+  [
+    "window-tint A.ops[26].say[4][2]",
+    "NEED: Rosie says in the first person that it checks a paper (DL-916 item 24); T-1435 fixes its words",
+  ],
 ];
 
+/** The reason a round 5 hit in an op at one of C4's verify-only steps stays as written (DL-916 item 25). */
+const VERIFY_ONLY = "C4's verify-only branch, switched off while verify is off";
+
 /**
- * The exhaustive scan's allow list (DL-901 item 16): every sentence of a compiled trade text (pf blocks, ops, renames'
- * and swaps' new sides, slot rows, money; messages too) that still holds a hit, with its one reason. A hit is a phrase
- * of SHAPES (CLAIM_PATTERNS and PASSIVE_PATTERNS without their guards), or a check verb with a negation within 3 words
- * before it across a separator (CHECK_VERB; one with the negation in its own clause is a true negation of it, and is not
- * listed). The reasons: a true negation ("checks none", "never checked"); no paper, with what is checked instead (a
- * fraud or booking-cap flag, a background check, a record on file, an identity, a vehicle, and the rest of default 4 and
- * the lead's rulings on round 3's open questions, DL-901 item 17); and lead note 12's S1-33 line in Rosie's own voice,
- * on C4's verify-only branch. A rename's or a swap's first side (the master's own line, default 4) is listed apart, in
- * FIRST_SIDES; the six messages that wait, in MESSAGES_WAITING.
+ * The exhaustive scan's allow list (DL-901 item 16; DL-916 item 26): every sentence of a compiled trade text (pf blocks,
+ * ops, renames' and swaps' new sides, slot rows, money; messages too) that still holds a hit, with its one reason. A hit
+ * is a phrase of SHAPES (CLAIM_PATTERNS and PASSIVE_PATTERNS without their guards) or of ROUND5_SHAPES (a lookup's or
+ * records' result; Rosie in the first person; a check key's place or checker), or a check verb with a negation within 3
+ * words before it across a separator (CHECK_VERB; one with the negation in its own clause is a true negation of it, and
+ * is not listed). The reasons: a true negation ("checks none", "never checked"); no paper, with what is checked instead
+ * (a fraud or booking-cap flag, a background check, a record on file, an identity, a vehicle, a price, and the rest of
+ * default 4 and the lead's rulings on round 3's open questions, DL-901 item 17); lead note 12's S1-33 line in Rosie's
+ * own voice, on C4's verify-only branch; and, for a round 5 hit in an op at one of C4's verify-only steps, VERIFY_ONLY
+ * (DL-916 item 25). A rename's or a swap's first side (the master's own line, default 4) is listed apart, in
+ * FIRST_SIDES; the six messages that wait, in MESSAGES_WAITING; the six messages that claim a check, in MESSAGES_NEED.
+ * A scanned sentence shows OWN_WORD as "§".
  */
 const ALLOWED: Readonly<Record<string, readonly string[]>> = {
   "true negation": [
@@ -1513,6 +2175,7 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
     "Rosie never says a certification was checked by Rosie",
     "Rosie never says a license was checked by Rosie",
     "Safe default: no person license is checked here.",
+    "Sam or the desk checks the photo and the dates before lesson 1 (the school's own check, with no lookup);",
     "Sam sends a photo of the license, and it is shown as given, not checked by Rosie.",
     "Shown as given by the business, not checked by Rosie.",
     "Sitting, tutoring and play room work license nobody where Sam works, so no license is checked.",
@@ -1581,6 +2244,9 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
     "none is checked by Rosie, D96)",
     "none: Rosie does not look up, check or confirm any license, registration, certificate or insurance (D96);",
     "none: Rosie looks no license up and checks none (D96);",
+    "none: Rosie never checks a license or insurance for this work (not on any lookup, not by the team)",
+    "none: Rosie never checks a license, certificate or insurance for this work (not on any lookup, not by the team)",
+    "none: Rosie never checks a license, insurance or background check for this work (not on any lookup, not by the team)",
     "none: Rosie never looks up, checks or confirms a credential, license, insurance or registration (D96);",
     "none: Rosie never looks up, checks or confirms a license, certificate, roster listing or insurance (D96);",
     "none: Rosie never looks up, checks or confirms a license, insurance or permit (D96);",
@@ -1602,6 +2268,8 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
     "the owner's word, never looked up by Rosie",
     "the photo's number and name, as given, not checked by Rosie",
     "the practice keeps its own record (optional, never looked up by Rosie)",
+    // restaurant.json's pf.license.check after its claim is marked ("§"): where no lookup exists, none is read.
+    "§ where no lookup exists, identity plus what the business says",
   ],
   // dj.json S12-19 (the lead's ruling on round 3's open question 1, DL-901 item 17): a background check is no paper in
   // MC C7's list.
@@ -1718,6 +2386,9 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
     "Where a license is needed only above a job-size amount, Rosie checks each job's total, an add-on too, against it.",
     "Where the form licenses work only above a job size, Rosie checks each job against it: at booking, when a task is added by text, and at the visit.",
     "Where the state's form licenses handyman work only up to a job size, Rosie adds up the tasks and checks the total.",
+    // Rosie in the first person, at S1-21, asks which prices to check with the owner (DL-916 item 24's shape).
+    "Which prices should I check with you before they go out?",
+    "Which prices should I check with you first?",
     "the owner confirms every fee",
   ],
   "no paper: words read back": [
@@ -1832,6 +2503,39 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
   "lead note 12: S1-33's line, on C4's verify-only branch": [
     "We couldn't find business registration EX-1042 for Sam Lee on the official lookup.",
   ],
+  // DL-916 item 25 (the security reviewer's round 4 note a): the lookup results on C4's verify-only steps, in the words
+  // ops at S2-12 and S2-13 (pilates.json:4668, 4673, 4688, 4693, 4707; repair-shop.json:2411, 2416, 2432, 2437, 2451,
+  // 3375, 3380, 3396, 3401, 3415; security.json:6923, 6928, 6943, 6948, 6962) and at S12-19 ("receipt counts while the
+  // lookup catches up": detailing.json:2220, 3591; tutor.json:5384, 11942; tires.json:3201, 5447; rentals.json:2779,
+  // 4822), the same position as lead note 12: listed, not marked. So is the same result in the words ops at S1-33, lead
+  // note 12's own step ("The state's lookup doesn't find ...": daycare, driving-school, orthopedist, pharmacist,
+  // primary-care, sitter, tax, tutor).
+  [VERIFY_ONLY]: [
+    "A paper's receipt counts while the lookup catches up.",
+    "A receipt counts while the lookup catches up.",
+    "A renewal receipt counts while the lookup catches up.",
+    "Ethan's low-voltage license shows as expired on the state's lookup.",
+    "Leo's massage license shows as expired on the state's lookup.",
+    "Rafael's license shows as expired on the state's lookup.",
+    "The lookup shows Ethan's license as expired.",
+    "The lookup shows Leo's massage license as expired.",
+    "The lookup shows the license as expired.",
+    "The state's business lookup doesn't find registration 2019-0451 under Lee Home Tutoring.",
+    "The state's business lookup doesn't find registration 2019-0451 under the company's name.",
+    "The state's business lookup doesn't find registration EX-1042 under Lee Kids Events.",
+    "The state's lookup doesn't find license EX-1042 under Sam's name.",
+    "The state's lookup doesn't find license EX-RPH-1042 under Sam's name.",
+    "The state's lookup doesn't find license MD045210 under Sam's name.",
+    "The state's lookup doesn't find registration 2019-0451 under Lee Family Sitters LLC.",
+    "The state's lookup doesn't find school license DS045210 under Lee Driving School.",
+    "The state's lookup has no license with the number Ethan sent.",
+    "The state's lookup has no license with the number Rafael sent.",
+    "The state's lookup has no low-voltage license with the number Ethan sent.",
+    "The state's lookup has no massage license with the number Leo sent.",
+    "Your license shows as expired on the state's lookup, so Lee Alarm & Camera can't book you until it shows renewed.",
+    "Your low-voltage license shows as expired on the state's lookup.",
+    "Your massage license shows as expired on the state's lookup.",
+  ],
 };
 
 /** The hits on a rename's or a swap's first side: the master's own line it matches, never changed (default 4). */
@@ -1844,8 +2548,10 @@ const FIRST_SIDES: readonly string[] = [
   "At 5pm the day before, Rosie checks the public forecast for each outdoor job.",
   "Avery's license is checked again when the lookup answers.",
   "Avery's license shows as expired on the official lookup.",
+  "Avery's license shows as expired on the state's lookup.",
   "Casey's license is checked again when the lookup answers.",
   "Casey's license shows as expired on the official lookup.",
+  "Casey's license shows as expired on the state's lookup.",
   "Checked by Rosie on the state's lookup, Oct 19",
   "Checked by Rosie's team",
   "Checked on the official lookup",
@@ -1860,6 +2566,11 @@ const FIRST_SIDES: readonly string[] = [
   "Every license, permit or certificate the work needs is checked on the official lookup the plug-in names.",
   "Everyone's licenses are confirmed on the official lookup.",
   "Felix's license is checked again when the lookup answers.",
+  "Felix's license shows as expired on the state's lookup.",
+  "I check licenses right away.",
+  "I'll check it on the state's license lookup.",
+  "I'll check it on the state's lookup.",
+  "I'll check it on the state's lookup: minutes where the state shares its records, or within the day.",
   "It goes live on its own once its licenses check out.",
   "It goes live once Jordan's own license checks out",
   "It goes live once its licenses check out.",
@@ -1870,8 +2581,10 @@ const FIRST_SIDES: readonly string[] = [
   "Leo's license checked out on the second state's lookup.",
   "Licenses are checked again every 30 days, before each end date, and the day the license holder leaves or the owner changes.",
   "Licenses: Checked by Rosie on the state's lookup, Oct 19",
+  "Lou's card is checked again when the lookup answers.",
   "Luis's license checked out on the second state's lookup.",
   "Marcus's license checked out on the second state's lookup.",
+  "Means 'Doesn't match': the lookup has no license with that number and name.",
   "Milo's license is checked again",
   "New bookings for it pause until the license checks out again.",
   "Nobody is offered to customers until their license is confirmed and Sam says yes.",
@@ -1880,6 +2593,7 @@ const FIRST_SIDES: readonly string[] = [
   "Once your electrician's license checks out and you say yes",
   "Quinn can be booked once the license checks out on the state's lookup, and Sam says yes.",
   "Ravi's license is checked again when the lookup answers.",
+  "Ravi's license shows as expired on the state's lookup.",
   "Reese can be booked once the license checks out on the state's lookup, and Sam says yes.",
   "Rosie checks each license again on the state's lookup: every 30 days by default, and before each end date.",
   "Rosie checks that Riley has the time, then shows the price first.",
@@ -1897,14 +2611,28 @@ const FIRST_SIDES: readonly string[] = [
   "That day, the license is checked again on the lookup the plug-in names.",
   "The license is checked again that day.",
   "The licenses check out;",
+  "The lookup shows the license as expired.",
   "The owner sends a photo of the class schedule, and Rosie reads it back.",
   "The shop's own license is checked first.",
+  "The state's lookup doesn't find license MP045210 under Sam's name.",
+  "The state's lookup has no license with the number Avery sent.",
+  "The state's lookup has no license with the number Casey sent.",
+  "The state's lookup has no license with the number Felix sent.",
+  "The state's lookup has no license with the number Ravi sent.",
+  "The state's lookup shows Quinn's license as suspended today.",
+  "The state's lookup shows Reese's license as suspended today.",
+  "The state's lookup shows your license as suspended, so your new bookings are paused.",
   "The studio's own license is checked first.",
   "Where a lookup has no data feed, a person on Rosie's team checks the official site and keeps a screenshot.",
   "Where a lookup has no data feed, a person on Rosie's team checks within 1 business day.",
   "You follow your state's rules for your trade, and Rosie checks licenses itself.",
+  "Your license expires in 30 days, and the state's lookup doesn't show it renewed yet.",
   "Your license shows as expired on the official lookup, so Lee Home Services can't book you until it shows renewed.",
   "Your license shows as expired on the official lookup, so Lee's Barbershop can't book you until it shows renewed.",
+  "Your license shows as expired on the state's lookup, so Lee Dance Lessons can't book you until it shows renewed.",
+  "Your license shows as expired on the state's lookup, so Lee Home Services can't book you until it shows renewed.",
+  "Your license shows as expired on the state's lookup, so Lee Private Yoga can't book you until it shows renewed.",
+  "Your license shows as expired on the state's lookup, so Lee's Barbershop can't book you until it shows renewed.",
   "Your license, checked while you go on",
   "checked from photos",
   "license checked out on the second state's lookup.",
@@ -1978,34 +2706,79 @@ const SHAPES: readonly { pattern: RegExp; passive: boolean }[] = [
   })),
 ];
 
+/**
+ * Round 5's shapes (DL-916 items 22 to 24), as c7.ts reads them but for FIRST_PERSON_PATTERNS' guard against a check of
+ * no paper: a lookup's or official records' result (RESULT_PATTERNS), read in every text; Rosie in the first person,
+ * read where Rosie speaks (every text but a message another lane sends); and, under a pf key that names a check
+ * (checkAt), the place a paper is checked and who checks (KEY_PATTERNS).
+ */
+const ROUND5_SHAPES: readonly { pattern: RegExp; reads: "every text" | "Rosie's words" | "a check key" }[] = [
+  ...RESULT_PATTERNS.map(({ pattern }) => ({
+    pattern: new RegExp(pattern.source, `${pattern.flags}g`),
+    reads: "every text" as const,
+  })),
+  {
+    pattern:
+      /\bI(?:'ll|'ve|'d|\s+will|\s+have|\s+had|\s+would)?\s+(?:(?:also|then|first|again|only|still|now|just|already)\s+)?(?:re-?check(?:ed)?|check(?:ed)?|look(?:ed)?\s+(?:[\w'-]+\s+){0,4}?up|verif(?:y|ied)|confirm(?:ed)?)\b/g,
+    reads: "Rosie's words",
+  },
+  ...KEY_PATTERNS.map(({ pattern }) => ({
+    pattern: new RegExp(pattern.source, `${pattern.flags}g`),
+    reads: "a check key" as const,
+  })),
+];
+
 /** A check verb in any words: a hit where a negation within 3 words before it lies across a clause break. */
 const CHECK_VERB =
   /\b(?:re-?)?(?:check(?:s|ed)?|verif(?:y|ies|ied)|confirm(?:s|ed)?)\b|\blook(?:s|ed)?\s+(?:[\w'-]+\s+){0,4}?up\b/gi;
 
-/** One text of a trade, at its place: on a rename's or a swap's first side, or in a message a person reads. */
+/**
+ * One text of a trade, at its place: on a rename's or a swap's first side, or in a message a person reads (and the lane
+ * that sends it), or in an op at one of C4's verify-only steps.
+ */
 interface Leaf {
   where: string;
   text: string;
   first: boolean;
   message: boolean;
+  from: string | null;
+  verifyOnly: boolean;
 }
 
-function leavesOf(value: unknown, where: string, out: Leaf[], first = false, message = false): Leaf[] {
-  if (typeof value === "string") out.push({ where, text: value, first, message });
+/** Where a text lies: on a first side, in a message and who sends it, in an op at one of C4's verify-only steps. */
+interface LeafPlace {
+  first: boolean;
+  message: boolean;
+  from: string | null;
+  verifyOnly: boolean;
+}
+
+const NOWHERE: LeafPlace = { first: false, message: false, from: null, verifyOnly: false };
+
+function leavesOf(value: unknown, where: string, out: Leaf[], place: LeafPlace = NOWHERE): Leaf[] {
+  if (typeof value === "string") out.push({ where, text: value, ...place });
   else if (Array.isArray(value))
-    value.forEach((item, k) => leavesOf(item, `${where}[${String(k)}]`, out, first, message));
-  else if (typeof value === "object" && value !== null)
+    value.forEach((item, k) => leavesOf(item, `${where}[${String(k)}]`, out, place));
+  else if (typeof value === "object" && value !== null) {
+    const op = value as { op?: unknown; at?: unknown };
+    const here = typeof op.op === "string" && onVerifyOnlyStep(op) ? { ...place, verifyOnly: true } : place;
     for (const [name, item] of Object.entries(value)) {
       const at = `${where}.${name}`;
       if ((name === "swap" || name === "rename") && Array.isArray(item))
         item.forEach((pair, k) => {
           if (Array.isArray(pair) && pair.length === 2) {
-            leavesOf(pair[0], `${at}[${String(k)}][0]`, out, true, message);
-            leavesOf(pair[1], `${at}[${String(k)}][1]`, out, first, message);
-          } else leavesOf(pair, `${at}[${String(k)}]`, out, first, message);
+            leavesOf(pair[0], `${at}[${String(k)}][0]`, out, { ...here, first: true });
+            leavesOf(pair[1], `${at}[${String(k)}][1]`, out, here);
+          } else leavesOf(pair, `${at}[${String(k)}]`, out, here);
         });
-      else leavesOf(item, at, out, first, message || name === "say" || name === "addSay");
+      else if ((name === "say" || name === "addSay") && Array.isArray(item))
+        item.forEach((message, k) => {
+          const from = Array.isArray(message) && typeof message[0] === "string" ? message[0] : null;
+          leavesOf(message, `${at}[${String(k)}]`, out, { ...here, message: true, from });
+        });
+      else leavesOf(item, at, out, here);
     }
+  }
   return out;
 }
 
@@ -2021,11 +2794,16 @@ function allLeaves(trade: LoadedTrade): Leaf[] {
   return out;
 }
 
-/** One hit of the scan: its sentence, and whether it lies on a first side or is a passive wait in a message. */
+/**
+ * One hit of the scan: its sentence; whether it lies on a first side; whether it is a passive wait in a message, or a
+ * round 5 claim in a message a person reads, which C7 does not read there (`waits`); whether it is a round 5 hit in an op
+ * at one of C4's verify-only steps (`verifyOnly`).
+ */
 interface ScanHit {
   sentence: string;
   first: boolean;
   waits: boolean;
+  verifyOnly: boolean;
 }
 
 /** The hits in one text, OWN_WORD left out (its "never checked by Rosie" is C7's own). */
@@ -2040,14 +2818,35 @@ function scanHits(leaf: Leaf): ScanHit[] {
           sentence: sentence.text,
           first: leaf.first,
           waits: leaf.message && passive && !negatedInClause(sentence.text, match.index),
+          verifyOnly: false,
         });
+  // Round 5's shapes (DL-916): a hit in a message a person reads that names a paper and is not negated waits on the
+  // lead's list (MESSAGES_NEED), as C7 does not read it there; one in an op at a verify-only step is listed with that
+  // reason (item 25).
+  for (const sentence of sentences)
+    for (const { pattern, reads } of ROUND5_SHAPES) {
+      if (reads === "a check key" && (leaf.message || !checkAt(leaf.where))) continue;
+      if (reads === "Rosie's words" && leaf.message && leaf.from !== "san") continue;
+      for (const match of sentence.text.matchAll(pattern))
+        out.push({
+          sentence: sentence.text,
+          first: leaf.first,
+          waits:
+            leaf.message &&
+            !leaf.first &&
+            !leaf.verifyOnly &&
+            PAPER.test(leaf.text) &&
+            !negatedInClause(sentence.text, match.index),
+          verifyOnly: leaf.verifyOnly && !leaf.first,
+        });
+    }
   if (leaf.first) return out;
   for (const match of text.matchAll(CHECK_VERB)) {
     if (!negationBefore(text.slice(0, match.index))) continue;
     let sentence = { text, start: 0 };
     for (const one of sentences) if (one.start <= match.index) sentence = one;
     if (negatedInClause(sentence.text, match.index - sentence.start)) continue;
-    out.push({ sentence: sentence.text, first: false, waits: false });
+    out.push({ sentence: sentence.text, first: false, waits: false, verifyOnly: false });
   }
   return out;
 }
@@ -2058,10 +2857,11 @@ function kind(reason: string): string {
 }
 
 describe("C7's exhaustive scan (DL-901 item 16)", () => {
-  it("leaves unmarked only the allow list's hits, each with its one reason, the first sides, the six messages that wait and the one NEED", () => {
+  it("leaves unmarked only the allow list's hits, each with its one reason, the first sides, the six messages that wait and the six that claim a check (round 5's shapes too, DL-916 item 26)", () => {
     const found = new Map<string, { hits: number; files: Set<string> }>();
     const firstSides = new Map<string, { hits: number; files: Set<string> }>();
     const waits: string[] = [];
+    const verifyOnly = new Set<string>();
     for (const id of ALL)
       for (const leaf of allLeaves(marked(id).done.trade))
         for (const hit of scanHits(leaf)) {
@@ -2069,6 +2869,7 @@ describe("C7's exhaustive scan (DL-901 item 16)", () => {
             waits.push(`${id} ${leaf.where}`);
             continue;
           }
+          if (hit.verifyOnly) verifyOnly.add(hit.sentence);
           const bucket = hit.first ? firstSides : found;
           const entry = bucket.get(hit.sentence) ?? { hits: 0, files: new Set<string>() };
           entry.hits++;
@@ -2085,6 +2886,9 @@ describe("C7's exhaustive scan (DL-901 item 16)", () => {
     expect(reasonOf.size, "each sentence is listed once, with one reason").toBe(listed.length);
     expect([...found.keys()].sort()).toStrictEqual(listed.map(([sentence]) => sentence).sort());
     expect([...firstSides.keys()].sort()).toStrictEqual([...FIRST_SIDES].sort());
+    // Each round 5 hit in an op at one of C4's verify-only steps is listed with that reason, and only those are (DL-916
+    // item 25).
+    expect([...verifyOnly].sort()).toStrictEqual([...(ALLOWED[VERIFY_ONLY] ?? [])].sort());
     for (const sentence of ALLOWED["true negation"] ?? [])
       expect(NEGATION_WORD.test(sentence), sentence).toBe(true);
     // How many sentences, hits and trade files each reason holds.
@@ -2105,10 +2909,15 @@ describe("C7's exhaustive scan (DL-901 item 16)", () => {
     );
     expect(counts).toMatchInlineSnapshot(`
       {
+        "C4's verify-only branch, switched off while verify is off": {
+          "files": 14,
+          "hits": 43,
+          "sentences": 24,
+        },
         "a rename's first side": {
-          "files": 56,
-          "hits": 465,
-          "sentences": 73,
+          "files": 71,
+          "hits": 828,
+          "sentences": 97,
         },
         "lead note 12": {
           "files": 1,
@@ -2117,13 +2926,13 @@ describe("C7's exhaustive scan (DL-901 item 16)", () => {
         },
         "no paper": {
           "files": 120,
-          "hits": 464,
-          "sentences": 180,
+          "hits": 474,
+          "sentences": 182,
         },
         "true negation": {
-          "files": 228,
-          "hits": 1478,
-          "sentences": 206,
+          "files": 229,
+          "hits": 1485,
+          "sentences": 211,
         },
       }
     `);
