@@ -2,9 +2,52 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 745, [`3452a12`](https://github.com/aryamahadik/rosie/commit/3452a12), 2026-11-17 12:52:38 UTC.
+- **Through:** commit 747, [`cd7deae`](https://github.com/aryamahadik/rosie/commit/cd7deae), 2026-11-17 22:23:38 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 747. docs: COMMIT\_HISTORY.md through commit 745 (3452a12, \#756) (\#758)
+
+- **Commit:** [`cd7deae`](https://github.com/aryamahadik/rosie/commit/cd7deae), by Arya Mahadik, 2026-11-17 22:23:38 UTC
+- **Pull request:** [#758](https://github.com/aryamahadik/rosie/pull/758) from `task/commit-history-164`, merged 2026-11-17 22:23:39 UTC. It squashed 1 branch commit:
+  - `c9d73dd` docs: COMMIT\_HISTORY.md through commit 745 (3452a12, \#756)
+- **Files changed:** 1 (+78 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +78 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 746. T-417: the Linq live-check script for staging (one roster send, one signed inbound; stubbed, never live) (\#757)
+
+- **Commit:** [`f763ebf`](https://github.com/aryamahadik/rosie/commit/f763ebf), by Arya Mahadik, 2026-11-17 22:23:34 UTC
+- **Pull request:** [#757](https://github.com/aryamahadik/rosie/pull/757) from `task/T-417`, merged 2026-11-17 22:23:34 UTC. It squashed 2 branch commits:
+  - `9d9c085` T-417: the Linq live check for staging (run.mjs): one roster send thr…
+  - `698f8ec` T-417: offRosterNumber's comment names the fiction block without a di…
+- **Files changed:** 7 (+1867 −0), by folder:
+  - `adapters/src/linq/live-check/` logs.d.mts +56 −0, logs.mjs +266 −0, output-scan.d.mts +4 −0, output-scan.mjs +5 −0, run.d.mts +68 −0, run.mjs +643 −0, run.test.ts +825 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-417: the Linq live check for staging (run.mjs): one roster send through T-414's sender behind T-416's guard, the K-06 signature check with T-413's verifier, an off-roster send refused before Linq, and the reply's signed K-06 event with one trace id read from staging's logs (wrangler tail through cf.sh); tested against recorded Linq samples and a stubbed environment
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-417: offRosterNumber's comment names the fiction block without a digit run the phone scan reads as a number
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 745. docs: COMMIT\_HISTORY.md through commit 741 (8f40a70, \#752) (\#756)
 
