@@ -2,9 +2,176 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 725, [`f414c35`](https://github.com/aryamahadik/rosie/commit/f414c35), 2026-11-17 03:24:24 UTC.
+- **Through:** commit 731, [`4b1196b`](https://github.com/aryamahadik/rosie/commit/4b1196b), 2026-11-17 08:00:40 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 731. docs: COMMIT\_HISTORY.md through commit 729 (d7aa916, \#740) (\#742)
+
+- **Commit:** [`4b1196b`](https://github.com/aryamahadik/rosie/commit/4b1196b), by Arya Mahadik, 2026-11-17 08:00:40 UTC
+- **Pull request:** [#742](https://github.com/aryamahadik/rosie/pull/742) from `task/commit-history-158`, merged 2026-11-17 08:00:41 UTC. It squashed 1 branch commit:
+  - `690acc6` docs: COMMIT\_HISTORY.md through commit 729 (d7aa916, \#740)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 730. T-415: Linq contacts/add stub (CQ-354) and the capability check, on recorded samples (\#741)
+
+- **Commit:** [`35842dc`](https://github.com/aryamahadik/rosie/commit/35842dc), by Arya Mahadik, 2026-11-17 08:00:36 UTC
+- **Pull request:** [#741](https://github.com/aryamahadik/rosie/pull/741) from `task/T-415`, merged 2026-11-17 08:00:37 UTC. It squashed 2 branch commits:
+  - `9ccf9d0` T-415: Linq capability check (check\_imessage, then check\_rcs, mapped …
+  - `15d9d09` T-415: the recorded check\_imessage replay equals the Linq double's ow…
+- **Files changed:** 9 (+1538 −0), by folder:
+  - `adapters/src/linq/capability/` capability.test.ts +737 −0, capability.ts +192 −0, index.ts +21 −0, types.ts +32 −0, wire.ts +125 −0
+  - `adapters/src/linq/contacts/` contacts.test.ts +290 −0, contacts.ts +101 −0, index.ts +12 −0, types.ts +28 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-415: Linq capability check (check_imessage, then check_rcs, mapped to K-11 capabilityCheck from T-1121's recorded answers) and contacts/add as a no-network stub answering K-11 failed (CQ-354), refused when ENVIRONMENT is test
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-415: the recorded check_imessage replay equals the Linq double's own answer (imessage, service imessage)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 729. docs: COMMIT\_HISTORY.md through commit 727 (156740a, \#738) (\#740)
+
+- **Commit:** [`d7aa916`](https://github.com/aryamahadik/rosie/commit/d7aa916), by Arya Mahadik, 2026-11-17 06:59:46 UTC
+- **Pull request:** [#740](https://github.com/aryamahadik/rosie/pull/740) from `task/commit-history-157`, merged 2026-11-17 06:59:46 UTC. It squashed 1 branch commit:
+  - `01ba7aa` docs: COMMIT\_HISTORY.md through commit 727 (156740a, \#738)
+- **Files changed:** 1 (+81 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +81 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 728. T-1428: db/repo builds the catalog's K-05 v1.18 reads (the sign-up chain) (\#739)
+
+- **Commit:** [`88a8348`](https://github.com/aryamahadik/rosie/commit/88a8348), by Arya Mahadik, 2026-11-17 06:59:42 UTC
+- **Pull request:** [#739](https://github.com/aryamahadik/rosie/pull/739) from `task/T-1428`, merged 2026-11-17 06:59:43 UTC. It squashed 2 branch commits:
+  - `0e4aceb` T-1428: db/repo builds K-05 v1.18's five catalog reads (readBusinessK…
+  - `f22faab` T-1428: lint fixes: an optional chain in the side check, and the test…
+- **Files changed:** 2 (+2812 −0), by folder:
+  - `db/repo/` catalog-reads.int.test.ts +1743 −0, catalog-reads.ts +1069 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1428: db/repo builds K-05 v1.18's five catalog reads (readBusinessKinds, readBusinessServices, readServiceWays, readServicePriceRules, readTermsSources) as rosie_app under the request's business, in one repeatable-read read-only transaction, with item 77's names built in SQL, and their integration test
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1428: lint fixes: an optional chain in the side check, and the test's faulty price rules named by typed ids
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 727. docs: COMMIT\_HISTORY.md through commit 725 (f414c35, \#736) (\#738)
+
+- **Commit:** [`156740a`](https://github.com/aryamahadik/rosie/commit/156740a), by Arya Mahadik, 2026-11-17 04:58:31 UTC
+- **Pull request:** [#738](https://github.com/aryamahadik/rosie/pull/738) from `task/commit-history-156`, merged 2026-11-17 04:58:31 UTC. It squashed 1 branch commit:
+  - `b2e7b13` docs: COMMIT\_HISTORY.md through commit 725 (f414c35, \#736)
+- **Files changed:** 1 (+49 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +49 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated after train 249 (DL-924) with scratch/build/lead/commit-history.mjs; prettier's check passes with the train worktree's ignore file (DL-796).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 726. T-140: the Master Corrections layer's C7 (Rosie checks no paper) and C8 (void D96 offs), after five rounds (\#737)
+
+- **Commit:** [`d7d543c`](https://github.com/aryamahadik/rosie/commit/d7d543c), by Arya Mahadik, 2026-11-17 04:58:27 UTC
+- **Pull request:** [#737](https://github.com/aryamahadik/rosie/pull/737) from `task/T-140`, merged 2026-11-17 04:58:27 UTC. It squashed 10 branch commits:
+  - `34ff820` T-140: Master Corrections C7 (a trade's claim that Rosie checks a pap…
+  - `1a6891a` T-140: c7.ts rewrites each field through one helper and types its lis…
+  - `f0084e4` T-140: lint: c7.ts tells a changed list by comparing it with the give…
+  - `0399324` T-140: C7 marks the 28 passive-check files too (DL-884): PASSIVE\_PATT…
+  - `2d79022` T-140: C7 round 3 (DL-894): a negation never reaches across a clause …
+  - `b0ee0e5` Merge branch 'main' into task/T-140
+  - `55be019` T-140 round 4: work in progress at the user's pause, unchecked (DL-904)
+  - `71acadc` T-140: round 4: any separator ends a negation's reach; passive checks…
+  - `d34e0f4` Merge branch 'main' into task/T-140
+  - `0ca883b` T-140: round 5: the reviewer's three claim shapes: a pf key that name…
+- **Files changed:** 10 (+4262 −9), by folder:
+  - `compiler/src/corrections/` c4.test.ts +21 −2, c4.ts +3 −2, c7.test.ts +3035 −0, c7.ts +759 −0, c8.test.ts +307 −0, c8.ts +119 −0, framework.test.ts +3 −1, framework.ts +3 −1
+  - `compiler/src/emit/` emit.ts +10 −2, trade.ts +2 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-140: Master Corrections C7 (a trade's claim that Rosie checks a paper is the business's own word, marked MC:C7) and C8 (the void D96 offs dropped before the applier; the other D96 offs kept), at emitBundle's trade line beside C5
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-140: c7.ts rewrites each field through one helper and types its list callbacks' answers as unknown (no behavior change)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-140: lint: c7.ts tells a changed list by comparing it with the given one (no flag set inside a callback); c8.test.ts narrows an op with no type assertion
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-140: C7 marks the 28 passive-check files too (DL-884): PASSIVE_PATTERNS, read in the free-text pf blocks alone, mark a rule that waits on a paper that checks out, or checks one like a license, with no one named, as the business's own word (MC:C7); c7.test.ts pins 59 files (31 that name Rosie or Rosie's team, 28 passive; MC's Nov 4 count was 45); emitBundle's doc comment names C5, C7 and C8
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-140: C7 round 3 (DL-894): a negation never reaches across a clause break, so movers.json's S1-38 line and the same shape in 37 more trade files are marked; PAPER also reads where a paper is checked when a lookup has no feed; PASSIVE_PATTERNS reads the other passive wordings; c7.test.ts pins 102 files (61 name Rosie or Rosie's team, 41 passive; run 1: 31, round 2: 59, MC's Nov 4: 45) and checks the reviewer's shape apart from findClaims
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-140 round 4: work in progress at the user's pause, unchecked (DL-904)
+
+The build run wf_46fdc9e0-4de was stopped at about 14:15Z Nov 16 at the user's request, about 18 minutes in, after it merged main (b0ee0e5) and before its first self-check of round 4. Its edits to c7.ts and c7.test.ts are saved exactly as they stood. The resumed builder re-reads them against the round 4 lead note and runs every check; nothing here is verified. Round 3's checked work is 2d79022.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-140: round 4: any separator ends a negation's reach; passive checks read in op words and renames' new sides; a text names a paper by its place; the exhaustive scan's allow list, MESSAGES_WAITING, MESSAGES_NEED and the snapshot re-pinned (123 files, 300 texts)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-140: round 5: the reviewer's three claim shapes: a pf key that names a check carries the verb (KEY_PATTERNS, biohazard and fence pf.license.checked, the 15 repair trades' check, tutor's); a lookup's or records' result with no check verb (RESULT_PATTERNS); Rosie in the first person (FIRST_PERSON_PATTERNS); none read in messages (5 new MESSAGES_NEED) or in ops at C4's verify-only steps (allow-listed, DL-916 item 25); scan and snapshot re-pinned (138 files, 398 texts)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 725. docs: COMMIT\_HISTORY.md through commit 723 (7ca9f87, \#734) (\#736)
 
