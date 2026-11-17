@@ -159,6 +159,7 @@ import type { PortName, Ports } from "./ports";
 import { PinnedRuns } from "./pinned-runs";
 import {
   checkedPin,
+  MissingSecretError,
   realPorts,
   type ArmingCalls,
   type BundleReadCalls,
@@ -185,6 +186,7 @@ import { RowTraces } from "./row-traces";
 import { signInPages, type SignInInputs } from "./sign-in";
 import { skeletonLinqRoute, type ReleaseFlags } from "./skeleton";
 // The file itself, never ./staging's index, which holds T-1254's handle (cloudflare:sockets): this graph loads under Node.
+import { stagingLinqVerifyInputs } from "./staging/linq-line";
 import { stagingOptions, stagingRosieNumber } from "./staging/options";
 import { testPhonePages, type TestPhoneInputs } from "./test-phone";
 import { TurnChats } from "./turn-chats";
@@ -835,7 +837,16 @@ export function composeRoot(options: RootOptions): Root {
     ...(testPhone !== null && onStaging
       ? testPhonePages({
           inputs: testPhone,
-          webhookSecret: () => options.linq?.webhookSecret(),
+          // The page signs with its own secret where the verify holds one beside Linq's (T-1449: staging's real Linq
+          // line, ./staging/linq-line.ts), missing as MissingSecretError by that secret's own name; else with the
+          // verify's one secret, as before.
+          webhookSecret: async () => {
+            const page = options.linq?.pageSecret;
+            if (page === undefined) return options.linq?.webhookSecret();
+            const secret = await page.secret();
+            if (secret === undefined || secret === "") throw new MissingSecretError(page.name);
+            return secret;
+          },
           linqWebhook,
           now,
         })
@@ -1004,7 +1015,9 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     environment: environmentOf(env),
     actors: handleActorsOf(env),
     vars: env,
-    linq: { webhookSecret: () => env.LINQ_WEBHOOK_SECRET },
+    // LINQ_WEBHOOK_SECRET by name at each call; on staging's real Linq line, the test-phone page's own secret beside it,
+    // which speaks only for a test phone (T-1449: ./staging/linq-line.ts); anywhere else nothing more is read.
+    linq: stagingLinqVerifyInputs(env),
     // The RETRY_QUEUE binding where the environment has one (T-279; env.staging has it since T-566; with none, each wait
     // reports noQueue): a row the dispatcher leaves waiting goes on it, and its consumer runs it through the door.
     retryQueue: retryQueueOf(env),
