@@ -13,10 +13,20 @@
 // K-05 v1.18 item 77 (DL-911, DL-913): a two-column key's row is named by its key's values joined by "/" in key order,
 // built by the SQL and compared whole; a state update names it by its key, column to value; a version read by its name,
 // under the businesses the commit writes, so another business's name finds no row.
+//
+// Round 2 (DL-925 item 8d): a commit never moves a row of a business to another business or to none. Its test adds K-27's
+// seed photo block (seed-busy-block.json's own row, which names no link, so none of its chain), which, like K-22's codes,
+// row-level security does not hold to its business on the runtime side (rosie_job's policy is true), so the commit
+// refuses the move itself.
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { commitTurn, type CommitTurnOutcome, type CommitTurnRequest } from "../commit-turn";
+import {
+  BUSINESS_UNHELD_TABLES,
+  commitTurn,
+  type CommitTurnOutcome,
+  type CommitTurnRequest,
+} from "../commit-turn";
 import type { Sql } from "../scope";
 import { createTestDatabase, type TestDatabase } from "../test-db";
 
@@ -1059,6 +1069,121 @@ describe("commitTurn with the setup tables as write targets (T-667)", () => {
         ],
       });
       expect(await turnWritten("turn-t667-person-bound-stale")).toBe(false);
+    },
+  );
+
+  it(
+    "refuses an update that moves a code or a photo block to another business or to none, before any write (round 2)",
+    SLOW,
+    async () => {
+      // K-27's seed photo block: Sam's schedule photo at the movers, on Sam's yes. It names no link, so it is added alone.
+      const photo = seedRowWhere("availability", "seed-busy-block.json", "busy_blocks", { source: "photo" });
+      await db.sql`insert into busy_blocks ${db.sql(photo as unknown as Record<string, never>)}`;
+      const ownerEmail = seedRowWhere("people-access", "seed-proof-code.json", "proof_codes", {
+        id: "code-sam-owner-email",
+      });
+      const signIn = seedRowWhere("people-access", "seed-proof-code.json", "proof_codes", {
+        id: "code-sam-sign-in-oct20",
+      });
+      const setBusiness = (table: string, row: Values, business: string | null): StateWrite =>
+        ({
+          op: "update",
+          table,
+          key: { id: row.id },
+          expectVersion: row.version,
+          set: { business_id: business },
+        }) as unknown as StateWrite;
+      const rowNow = async (
+        table: string,
+        id: Json | undefined,
+      ): Promise<{ business_id: string | null; version: number } | undefined> => {
+        const [row] = await db.sql<{ business_id: string | null; version: number }[]>`
+          select business_id, version from ${db.sql(table)} where id = ${textOf(id)}
+        `;
+        return row;
+      };
+      expect(ownerEmail.business_id).toBe(BARBERSHOP);
+      expect(photo.business_id).toBe(MOVERS);
+      for (const [turnId, move] of [
+        ["turn-t667-move-code", setBusiness("proof_codes", ownerEmail, MOVERS)],
+        ["turn-t667-move-code-to-none", setBusiness("proof_codes", ownerEmail, null)],
+        ["turn-t667-move-photo", setBusiness("busy_blocks", photo, BARBERSHOP)],
+        ["turn-t667-move-photo-to-none", setBusiness("busy_blocks", photo, null)],
+      ] as const) {
+        // The barbershop's own write comes first in the list, and is not written either: the refusal comes first.
+        await expect(commit(turnOf(turnId, [SHOP_NO_MONEY, move]))).rejects.toThrow(
+          /may not move a row of a business to another business/,
+        );
+        expect(await turnWritten(turnId), turnId).toBe(false);
+      }
+      expect(await versionNow("business_setup", BARBERSHOP)).toBe(4);
+      expect(await rowNow("proof_codes", ownerEmail.id)).toEqual({
+        business_id: BARBERSHOP,
+        version: ownerEmail.version,
+      });
+      expect(await rowNow("busy_blocks", photo.id)).toEqual({ business_id: MOVERS, version: photo.version });
+      // A stale move is answered versionChanged first, as any stale write, and writes nothing.
+      const stale = await commit(
+        turnOf("turn-t667-move-stale", [
+          { ...setBusiness("proof_codes", ownerEmail, MOVERS), expectVersion: 1 } as unknown as StateWrite,
+        ]),
+      );
+      expect(stale).toEqual({
+        error: "versionChanged",
+        changed: [
+          {
+            table: "proof_codes",
+            rowId: ownerEmail.id,
+            readVersion: 1,
+            currentVersion: ownerEmail.version,
+          },
+        ],
+      });
+      // The row's own business named again moves nothing, and a code with no business may be given one (S1-09's way):
+      // both commit, each at its version.
+      const kept = await commit(
+        turnOf("turn-t667-business-kept", [
+          setBusiness("busy_blocks", photo, MOVERS),
+          setBusiness("proof_codes", signIn, BARBERSHOP),
+        ]),
+      );
+      expect(answerErrors(kept)).toEqual([]);
+      expect(kept).toMatchObject({
+        result: "committed",
+        committed: {
+          written: [
+            { table: "busy_blocks", rowId: photo.id, version: (photo.version as number) + 1 },
+            { table: "proof_codes", rowId: signIn.id, version: (signIn.version as number) + 1 },
+          ],
+        },
+      });
+      expect(await rowNow("proof_codes", signIn.id)).toEqual({
+        business_id: BARBERSHOP,
+        version: (signIn.version as number) + 1,
+      });
+    },
+  );
+
+  it(
+    "holds BUSINESS_UNHELD_TABLES to the catalog: each table with a business whose rosie_job policy admits any row",
+    SLOW,
+    async () => {
+      const open = await db.sql<{ name: string }[]>`
+      select distinct c.relname::text as name
+      from pg_policy p
+      join pg_class c on c.oid = p.polrelid
+      join pg_namespace n on n.oid = c.relnamespace
+      where n.nspname = ${db.schema}
+        and p.polpermissive
+        and p.polcmd in ('*', 'w')
+        and p.polroles @> array[to_regrole('rosie_job')::oid]
+        and pg_get_expr(coalesce(p.polwithcheck, p.polqual), p.polrelid) = 'true'
+        and exists (
+          select 1 from pg_attribute a where a.attrelid = c.oid and a.attname = 'business_id' and not a.attisdropped
+        )
+      order by 1
+    `;
+      expect(open.map((row) => row.name)).toEqual([...BUSINESS_UNHELD_TABLES].sort());
     },
   );
 });

@@ -25,6 +25,9 @@
 //     document_signatures), since a fact is compared by its row's version.
 // A two-column key names its row by K-05 v1.18 item 77's name (row-names.ts): company_kinds, flow_defaults, kind_flows,
 // picked_kind_texts and new_work_draft_blocks.
+//
+// A table scoped none is never read by its row's name alone under any business (T-667 round 2; DL-925 item 8, which
+// withdraws run 2's default 8): each has its rule, UNSCOPED_ROWS, which setup/turn-state.ts writes into the read's SQL.
 
 /** A column type a setup fact may hold, as the frozen table lists spell it. */
 export type SetupColumnType =
@@ -58,7 +61,10 @@ export interface SetupFactHome {
   readonly part: SetupPart;
   /** The primary key's columns in key order: one, or two named by item 77 (row-names.ts TWO_COLUMN_KEYS). */
   readonly key: readonly string[];
-  /** The column row-level security scopes the table by (the list's rowLevelSecurity.column), or null for scope none. */
+  /**
+   * The column row-level security scopes the table by (the list's rowLevelSecurity.column), or null for scope none, whose
+   * rows answer by the table's rule in UNSCOPED_ROWS.
+   */
   readonly scopedBy: string | null;
   /** Each column a fact may name, with its type. */
   readonly columns: Readonly<Record<string, SetupColumnType>>;
@@ -647,6 +653,47 @@ export const SETUP_FACT_HOMES: Readonly<Record<string, SetupFactHome>> = Object.
     service_id: "text",
   }),
 });
+
+/**
+ * Which rows of a table scoped none answer a setup fact (T-667 round 2; DL-925 item 8). The read runs on the job handle
+ * (rosie_job), whose policies on K-22's codes and sessions and K-27's links and busy blocks are `using (true)`, and K-22's
+ * accounts have no row-level security (0020, 0024; DL-247's note for this card), so the read's own SQL holds each rule:
+ *   - catalog (K-24 kinds, kind_flows): the shared catalog, the same rows under any business and under none;
+ *   - person (K-22 accounts, sessions): a row whose person is one of the request handle's people (person_handles, as
+ *     K-05 item 26 reads them), K-22 rule 5's binding to the call's person and its accounts note ("a row predicate on
+ *     the call's person first": contracts/db-schema/people-access/README.md lines 97 and 329; K-05 default 25);
+ *   - personCode (K-22 proof_codes): the same, and only a code whose business is none or the request's; a code with no
+ *     person (a listing's control code) never answers;
+ *   - calendarLink (K-27 calendar_links): the Tool API's select policy (contracts/db-schema/availability/README.md line
+ *     108): a link with a live share (calendar_link_shares, ended_at null) to the request's business, or a link whose
+ *     person is one of the handle's people;
+ *   - busyBlock (K-27 busy_blocks): the Tool API's select policy (the same README, line 110): a photo block of the
+ *     request's business, or a calendar block whose link has a live share to the request's business.
+ * With businessId null (a sign-up) no business or share stands: a person's own rows only, so no busy block answers. Any
+ * other row answers notFound, as K-05 item 26 answers a row the scope hides. A table scoped none with no rule here throws
+ * before it is read.
+ */
+export type UnscopedRows = "catalog" | "person" | "personCode" | "calendarLink" | "busyBlock";
+
+/** The rule of each table scoped none that SETUP_FACT_HOMES lists (the integration test holds the two lists together). */
+export const UNSCOPED_ROWS: Readonly<Record<string, UnscopedRows>> = Object.freeze({
+  accounts: "person",
+  proof_codes: "personCode",
+  sessions: "person",
+  kinds: "catalog",
+  kind_flows: "catalog",
+  calendar_links: "calendarLink",
+  busy_blocks: "busyBlock",
+});
+
+/** The rule a fact of `table`, a table scoped none, is read by; a throw when it has none (never read by name alone). */
+export function unscopedRowsOf(table: string): UnscopedRows {
+  const rule = Object.hasOwn(UNSCOPED_ROWS, table) ? UNSCOPED_ROWS[table] : undefined;
+  if (rule === undefined) {
+    throw new Error(`readTurnState: ${table} is scoped none and has no rule for which of its rows answer`);
+  }
+  return rule;
+}
 
 /**
  * Never a setup fact, whatever SETUP_FACT_HOMES may come to list: a secret's hash (K-05 v1.2 secretColumn, and K-22

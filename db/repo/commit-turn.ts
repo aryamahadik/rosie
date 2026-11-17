@@ -14,7 +14,9 @@
 //      each, in (table, row id) order: a row it writes FOR UPDATE, a row it only read FOR SHARE. A reservation to confirm
 //      that is not held, or is held past its held_until, refuses the commit with reservationLost (limit 5, checked before
 //      its version: arch 06 line 307); then any version that moved refuses it with versionChanged, every changed row
-//      listed (limit 4: arch 06 line 305); then an effect let go that is not in outage refuses it with wrongState.
+//      listed (limit 4: arch 06 line 305); then an effect let go that is not in outage refuses it with wrongState; then a
+//      state update that would move a row of a business to another business, or to none, where row-level security does
+//      not hold the row there, throws (default 16).
 //   3. The writes, in K-05's order: state writes (an update raises the version by one); open questions opened (waiting)
 //      or closed; clock rows made (waiting, or armed with their due time) or cancelled; outbox rows with no plan (K-04's
 //      first state; commit_seq from the identity column, so commit order is the database's); reservations confirmed
@@ -98,6 +100,13 @@
 //      business column, are written on the runtime side, where their runtime policies give rosie_job every row: K-22
 //      rule 5 has the commit end someone else's sessions there (left, handed_over), and K-27 rule 5 has it write a
 //      link's connect start and an unlink there.
+//  16. (T-667 round 2; DL-925 item 8d) A state update never moves a row of a business to another business or to none;
+//      one that gives a row with no business its business stays allowed (S1-09). Where row-level security holds the row
+//      to its business (a rosie_job policy that compares business_id with the scope, which the commit sets to the row's
+//      own business before its update), the update is refused there, 42501 with nothing written, as before
+//      (commit-turn.int.test.ts's booking moved to another business). Where it does not (BUSINESS_UNHELD_TABLES, whose
+//      rosie_job policy is true: K-22 proof_codes and K-27 busy_blocks; and a table with a business_id column and no
+//      row-level security), the commit throws on the row as locked, after the compares and before any write.
 //
 // The setup tables (T-667; K-05 v1.18 item 77; DL-867, DL-911, DL-913): the state writes take every setup part's table
 // (K-22 to K-27, K-33, K-35) as any other domain table, an update naming the version it read. A table whose primary key is
@@ -175,6 +184,14 @@ export const NOT_STATE_TABLES: ReadonlySet<string> = new Set([
  * calendar_links, which the commit starts connecting and unlinks): written on the runtime side (default 15; T-667).
  */
 const PERSON_BOUND_TABLES: ReadonlySet<string> = new Set(["sessions", "calendar_links"]);
+
+/**
+ * The tables with a business whose rosie_job policy is `using (true) with check (true)` (0020 proof_codes_runtime, 0024
+ * busy_blocks_runtime): under the row's own scope, row-level security does not hold such a row to its business when the
+ * commit updates it, so the commit refuses a move itself (default 16; T-667 round 2). The setup tests hold this list to
+ * the catalog's policies.
+ */
+export const BUSINESS_UNHELD_TABLES: ReadonlySet<string> = new Set(["busy_blocks", "proof_codes"]);
 
 /** A database rule that refuses a write answers `constraint` (K-05 README item 1). */
 const CONSTRAINT_SQLSTATES = new Set(["23P01", "23514", "23505", "23503"]);
@@ -397,6 +414,12 @@ interface TableInfo {
   readonly versioned: boolean;
   /** The column row-level security scopes the table by (K-04 rule 4), or null for a table with none. */
   readonly scopeColumn: string | null;
+  /**
+   * The column holding a row's business where row-level security does not hold the row there on update (default 16): a
+   * table of BUSINESS_UNHELD_TABLES, or a table with business_id and no row-level security; null where it holds the row,
+   * or the table has no business.
+   */
+  readonly unheldBusiness: string | null;
 }
 
 interface Context {
@@ -484,6 +507,8 @@ async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
     key: row.key,
     versioned: columns.has("version"),
     scopeColumn,
+    unheldBusiness:
+      columns.has("business_id") && (!row.rls || BUSINESS_UNHELD_TABLES.has(table)) ? "business_id" : null,
   };
   ctx.tables.set(table, info);
   return info;
@@ -925,8 +950,10 @@ async function writeBusinesses(
   }
   named.push(...before.values());
   // A state update that gives a row with no business its business (S1-09: a sign-up's rows to the new business) writes
-  // that business too. A row of a business is never moved to another (row-level security refuses it under the row's own
-  // scope), so its update's set names no business here.
+  // that business too. A row of a business is never moved to another business or to none (default 16): row-level
+  // security refuses that update under the row's own scope where it holds the row there (42501), and where it does not
+  // (rosie_job's policy of true on busy_blocks and proof_codes, or a table with no row-level security) lockAndCompare
+  // refuses it on the row as locked, before any write. So a set's business counts here only for a row with none.
   for (const write of writes.state) {
     if (write.op !== "update") {
       continue;
@@ -1101,6 +1128,25 @@ async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise
         rowId: letGo.effectId,
         state: row.state as K05.EffectState,
       });
+    }
+  }
+
+  // A state update never moves a row of a business to another business or to none (default 16; T-667 round 2): where
+  // row-level security does not hold the row there, the row as locked is compared with the set, before any write. A row
+  // with no business may be given one (S1-09).
+  for (const write of writes.state) {
+    if (write.op !== "update") {
+      continue;
+    }
+    const info = await tableInfo(ctx, write.table);
+    const column = info.unheldBusiness;
+    // A column whose value is undefined is not written (columnValues), so it moves nothing.
+    if (column === null || write.set[column] === undefined) {
+      continue;
+    }
+    const held = locked(write.table, (await stateUpdateTarget(ctx, write)).rowId).row[column];
+    if (held !== null && held !== undefined && write.set[column] !== held) {
+      fail(`a state update of ${write.table} may not move a row of a business to another business`);
     }
   }
 

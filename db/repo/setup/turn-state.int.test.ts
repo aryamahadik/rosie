@@ -7,12 +7,17 @@
 // no business. The tables' owner (the migrations' role) loads the seeds, so only the reads under test meet row-level
 // security. The rows come only from fixture set v1's demo shops (rule 9): each setup part's seeds and the K-04 seeds
 // their after chains name (Lee's Barbershop, Lee Home Services, the pet boarding shop, the yoga studio and the master's
-// sample cast). The one row made here is a seed row under a new id: Lee Home Services' plumbing kind as S1-04 writes it
-// before its business.
+// sample cast), K-27's busy block and calendar link seeds, and K-22's code, session and staging tester seeds (another
+// person's code, session and account). The rows made here are seed rows under new ids: Lee Home Services' plumbing kind
+// as S1-04 writes it before its business; Riley's share with the barbershop as a share with Lee Home Services that has
+// ended; and Sam's owner-email code as the barbershop's listing control code, which has no person (S1-75).
+//
+// Round 2 (DL-925 item 8c): the tables scoped none answer by their rules (fact-homes.ts UNSCOPED_ROWS), each case read
+// under one business, another, and none, against handle-sam, whose one person is person-sam.
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { type Sql, type Tx, withBusiness } from "../scope";
+import { setBusinessScope, setPersonScope, type Sql, type Tx, withBusiness } from "../scope";
 import { createTestDatabase, type TestDatabase } from "../test-db";
 import type { FactRef, ReadTurnStateRequest, ReadTurnStateResponse } from "../turn-state";
 import {
@@ -21,6 +26,7 @@ import {
   type SetupColumnType,
   SETUP_FACT_HOMES,
   type SetupFactHome,
+  UNSCOPED_ROWS,
 } from "./fact-homes";
 import { rowNameSql, TWO_COLUMN_KEYS } from "./row-names";
 import { readTurnState, readTurnStateIn, type SetupTurnStateOutcome } from "./turn-state";
@@ -36,7 +42,11 @@ const SLOW = { timeout: 120_000 };
 const BARBERSHOP = "biz-lees-barbershop";
 const HOME_SERVICES = "biz-lee-home-services";
 const YOGA = "biz-yoga-studio";
+/** The movers (K-04's seed-business-head), whose one busy block is Sam's photo block (K-27's seed-busy-block). */
+const MOVERS = "biz-movers";
 const SAM = "handle-sam";
+/** The barbershop's listing control code made here from Sam's owner-email code: a code with no person. */
+const CONTROL_CODE = "code-barbershop-listing-control";
 
 interface SeedRow {
   table: string;
@@ -100,6 +110,17 @@ const PART_ROWS: readonly { part: string; seed: string; table: string }[] = [
   { part: "availability", seed: "seed-hours.json", table: "weekly_hours" },
   { part: "platform-billing", seed: "seed-bill-card.json", table: "bill_cards" },
   { part: "documents-licenses", seed: "seed-license-as-given.json", table: "documents" },
+];
+
+/**
+ * The seeds of the tables scoped none that round 2's proof reads (DL-925 item 8c), with their chains: K-27's links, their
+ * shares and busy blocks; K-22's codes and sessions (Sam's, and Jordan's paused code); the staging testers' account, code
+ * and session (another person's).
+ */
+const UNSCOPED_SEEDS: readonly { part: string; seed: string }[] = [
+  { part: "availability", seed: "seed-busy-block.json" },
+  { part: "people-access", seed: "seed-session.json" },
+  { part: "people-access", seed: "seed-staging-tester.json" },
 ];
 
 /** The registries a migration seeds (K-26 rule 5): a seed chain names their rows, which are already there. */
@@ -261,7 +282,9 @@ beforeAll(async () => {
   `;
   typedColumns = new Map(typed.map((column) => [column.key, column.type]));
   await loadSeeds(
-    [...new Set(PART_ROWS.map((row) => seedUrl(row.part, row.seed).href))].map((href) => new URL(href)),
+    [...new Set([...PART_ROWS, ...UNSCOPED_SEEDS].map((row) => seedUrl(row.part, row.seed).href))].map(
+      (href) => new URL(href),
+    ),
   );
   // Lee Home Services' plumbing kind and its company as S1-04 writes them before the business exists (a seed row under
   // a new id): seen by no business scope, read on the runtime side.
@@ -277,9 +300,29 @@ beforeAll(async () => {
     business_id: null,
     version: 1,
   };
+  // Riley's share with the barbershop under a new id, as a share with Lee Home Services that Riley has since ended: the
+  // only share of Riley's link with that business.
+  const endedShare: Values = {
+    ...seedRowWhere("availability", "seed-calendar-link.json", "calendar_link_shares", {
+      id: "share-riley-barbershop",
+    }),
+    id: "share-riley-home-services-ended",
+    business_id: HOME_SERVICES,
+    ended_at: "2026-11-05T15:00:00Z",
+    version: 2,
+  };
+  // Sam's owner-email code under a new id, as the barbershop's listing control code, which has no person (S1-75).
+  const controlCode: Values = {
+    ...seedRowWhere("people-access", "seed-proof-code.json", "proof_codes", { id: "code-sam-owner-email" }),
+    id: CONTROL_CODE,
+    purpose: "listing_control",
+    person_id: null,
+  };
   await db.sql.begin(async (tx) => {
     await tx`insert into companies ${tx(company as unknown as Record<string, never>)}`;
     await tx`insert into company_kinds ${tx(kind as unknown as Record<string, never>)}`;
+    await tx`insert into calendar_link_shares ${tx(endedShare as unknown as Record<string, never>)}`;
+    await tx`insert into proof_codes ${tx(controlCode as unknown as Record<string, never>)}`;
   });
 }, 180_000);
 
@@ -312,6 +355,82 @@ const requestOf = (
 function businessOfRow(home: SetupFactHome, values: Values): string {
   const own = home.scopedBy === null ? null : values[home.scopedBy];
   return typeof own === "string" ? own : BARBERSHOP;
+}
+
+// ---- round 2: a table scoped none, read by its rule (DL-925 item 8) ---------------------------------------------------
+
+/** One row of a table scoped none, read as handle-sam under `businessId`: answered with its seed values, or notFound. */
+interface Reach {
+  readonly businessId: string | null;
+  readonly table: string;
+  readonly rowId: string;
+  /** The row's seed values when the read answers it; null when it answers notFound. */
+  readonly seed: Values | null;
+  readonly why: string;
+}
+
+const yes = (businessId: string | null, table: string, rowId: string, seed: Values, why: string): Reach => ({
+  businessId,
+  table,
+  rowId,
+  seed,
+  why,
+});
+
+const no = (businessId: string | null, table: string, rowId: string, why: string): Reach => ({
+  businessId,
+  table,
+  rowId,
+  seed: null,
+  why,
+});
+
+/** Reads every fact of the case's row: each answered with the row's id, version and seed value, or notFound. */
+async function expectReach({ businessId, table, rowId, seed, why }: Reach): Promise<void> {
+  const home = SETUP_FACT_HOMES[table];
+  if (home === undefined) {
+    throw new Error(`no setup home ${table}`);
+  }
+  const outcome = await readTurnState(runtime, requestOf(businessId, factsOfRow(table, rowId)));
+  expect(outcomeErrors(outcome), why).toEqual([]);
+  if (seed === null) {
+    expect(outcome, why).toEqual({ error: "notFound", table, rowId });
+    return;
+  }
+  const state = asTurnState(outcome);
+  expect(
+    state.facts.map((fact) => fact.column),
+    why,
+  ).toEqual(Object.keys(home.columns));
+  for (const fact of state.facts) {
+    const what = `${why}: ${fact.column}`;
+    expect([fact.table, fact.rowId, fact.key, fact.version], what).toEqual([
+      table,
+      rowId,
+      `${table}.${fact.column}`,
+      seed.version,
+    ]);
+    const type = home.columns[fact.column];
+    if (type !== undefined && Object.hasOwn(seed, fact.column)) {
+      expect(fact.value, what).toEqual(answered(type, seed[fact.column] ?? null));
+    }
+  }
+}
+
+/**
+ * Whether the Tool API sees the row: rosie_app under `businessId`'s scope (or none), acting for person-sam (rosie.person_id,
+ * K-22 rule 4), as K-22's and K-27's select policies admit it.
+ */
+async function toolApiSees(businessId: string | null, table: string, rowId: string): Promise<boolean> {
+  return db.sql.begin(async (tx) => {
+    await tx.unsafe("set local role rosie_app");
+    if (businessId !== null) {
+      await setBusinessScope(tx, businessId);
+    }
+    await setPersonScope(tx, "person-sam");
+    const rows = await tx<{ id: string }[]>`select id from ${tx(table)} where id = ${rowId}`;
+    return rows.length === 1;
+  });
 }
 
 // ---- the frozen lists ----------------------------------------------------------------------------------------------
@@ -451,6 +570,7 @@ describe("readTurnState with setup facts (T-667)", () => {
     async () => {
       for (const { part, seed, table } of PART_ROWS) {
         const home = SETUP_FACT_HOMES[table];
+        // A table scoped none answers by its own rule, which the round 2 tests below hold under each business.
         if (home === undefined || home.scopedBy === null) {
           continue;
         }
@@ -475,6 +595,135 @@ describe("readTurnState with setup facts (T-667)", () => {
           expect(await count(own), `${role} ${table} own`).toBe(1);
           expect(await count(other), `${role} ${table} other`).toBe(0);
         }
+      }
+    },
+  );
+
+  it(
+    "answers a link or a busy block only as K-27's Tool API policies admit it, under a business and with none (round 2)",
+    SLOW,
+    async () => {
+      const busy = (id: string): Values =>
+        seedRowWhere("availability", "seed-busy-block.json", "busy_blocks", { id });
+      const link = (id: string): Values =>
+        seedRowWhere("availability", "seed-calendar-link.json", "calendar_links", { id });
+      const photo = "busy-sam-movers-photo-sat-nov-14";
+      const rileysBlock = "busy-riley-sat-nov-7";
+      const samsBlock = "busy-sam-thu-nov-12";
+      const rileysLink = "callink-riley-google";
+      const samsLink = "callink-sam-microsoft";
+      const cases: Reach[] = [
+        yes(MOVERS, "busy_blocks", photo, busy(photo), "the business's own photo block"),
+        no(BARBERSHOP, "busy_blocks", photo, "another business's photo block"),
+        yes(
+          BARBERSHOP,
+          "busy_blocks",
+          rileysBlock,
+          busy(rileysBlock),
+          "a block of a link shared live with it",
+        ),
+        no(HOME_SERVICES, "busy_blocks", rileysBlock, "a block of a link whose share with it has ended"),
+        no(YOGA, "busy_blocks", rileysBlock, "a block of a link it has no share of"),
+        no(MOVERS, "busy_blocks", samsBlock, "the handle's person's own block, its link not shared with it"),
+        yes(
+          HOME_SERVICES,
+          "busy_blocks",
+          samsBlock,
+          busy(samsBlock),
+          "the handle's person's block, shared live",
+        ),
+        yes(BARBERSHOP, "calendar_links", rileysLink, link(rileysLink), "a link shared live with it"),
+        no(HOME_SERVICES, "calendar_links", rileysLink, "a link whose share with it has ended"),
+        no(YOGA, "calendar_links", rileysLink, "a link it has no share of"),
+        no(YOGA, "calendar_links", "callink-avery-google", "another person's link it has no share of"),
+        yes(
+          MOVERS,
+          "calendar_links",
+          samsLink,
+          link(samsLink),
+          "the handle's person's own link, shared elsewhere",
+        ),
+        yes(null, "calendar_links", samsLink, link(samsLink), "the handle's own link, with no business"),
+        no(null, "calendar_links", rileysLink, "another person's link, with no business, though shared"),
+        no(null, "busy_blocks", samsBlock, "the handle's person's own block, with no business"),
+        no(null, "busy_blocks", photo, "a photo block, with no business"),
+      ];
+      for (const reach of cases) {
+        await expectReach(reach);
+        // The Tool API's select policy, acting for the handle's one person, admits exactly the same rows.
+        expect(await toolApiSees(reach.businessId, reach.table, reach.rowId), reach.why).toBe(
+          reach.seed !== null,
+        );
+      }
+      // A link's tokens are never a fact, whoever reads it.
+      expect(
+        await readTurnState(
+          runtime,
+          requestOf(BARBERSHOP, [
+            { key: "tokens", table: "calendar_links", rowId: rileysLink, column: "tokens" },
+          ]),
+        ),
+      ).toEqual({ error: "unknownFact", key: "tokens", table: "calendar_links", column: "tokens" });
+    },
+  );
+
+  it(
+    "answers a code, a session or an account only of the handle's people, a code only with no business or the request's (round 2)",
+    SLOW,
+    async () => {
+      // handle-sam's one person, as item 26 reads the handle's people.
+      const sam = asTurnState(await readTurnState(runtime, requestOf(null, [])));
+      expect(sam.persons.map((person) => person.personId)).toEqual(["person-sam"]);
+      const code = (id: string): Values =>
+        seedRowWhere("people-access", "seed-proof-code.json", "proof_codes", { id });
+      const session = (id: string): Values =>
+        seedRowWhere("people-access", "seed-session.json", "sessions", { id });
+      const account = seedRowWhere("people-access", "seed-owner-id-upload.json", "accounts", {
+        person_id: "person-sam",
+      });
+      const ownerEmail = "code-sam-owner-email";
+      const signIn = "code-sam-sign-in-oct26";
+      const live = "session-sam-oct26";
+      const ended = "session-sam-oct20";
+      const cases: Reach[] = [
+        yes(BARBERSHOP, "proof_codes", ownerEmail, code(ownerEmail), "the person's code of the business"),
+        no(HOME_SERVICES, "proof_codes", ownerEmail, "the person's code of another business"),
+        yes(HOME_SERVICES, "proof_codes", signIn, code(signIn), "the person's code with no business"),
+        no(BARBERSHOP, "proof_codes", "code-jordan-sign-in-paused", "another person's code"),
+        no(BARBERSHOP, "proof_codes", "code-tester-one-sign-in", "another person's code, with no business"),
+        no(BARBERSHOP, "proof_codes", CONTROL_CODE, "the business's own control code, which has no person"),
+        no(HOME_SERVICES, "proof_codes", CONTROL_CODE, "another business's control code"),
+        yes(BARBERSHOP, "sessions", live, session(live), "the person's live session"),
+        yes(YOGA, "sessions", ended, session(ended), "the person's ended session, under any business"),
+        no(BARBERSHOP, "sessions", "session-tester-one", "another person's session"),
+        yes(BARBERSHOP, "accounts", "person-sam", account, "the person's account"),
+        yes(YOGA, "accounts", "person-sam", account, "the person's account, under any business"),
+        no(BARBERSHOP, "accounts", "person-tester-one", "another person's account"),
+        yes(null, "proof_codes", signIn, code(signIn), "the person's code with no business, with none"),
+        no(null, "proof_codes", ownerEmail, "the person's code of a business, with no business"),
+        no(null, "proof_codes", CONTROL_CODE, "a control code, with no business"),
+        yes(null, "sessions", live, session(live), "the person's session, with no business"),
+        no(null, "sessions", "session-tester-one", "another person's session, with no business"),
+        yes(null, "accounts", "person-sam", account, "the person's account, with no business"),
+        no(null, "accounts", "person-tester-one", "another person's account, with no business"),
+      ];
+      for (const reach of cases) {
+        await expectReach(reach);
+        // Never a row the Tool API's select policy would not show the handle's person (K-22 rule 5; it has no grant on
+        // accounts).
+        if (reach.seed !== null && reach.table !== "accounts") {
+          expect(await toolApiSees(reach.businessId, reach.table, reach.rowId), reach.why).toBe(true);
+        }
+      }
+      // The hash columns stay unknown facts, of the person's own rows too.
+      for (const [table, rowId, column] of [
+        ["proof_codes", ownerEmail, "code_hash"],
+        ["sessions", live, "token_sha256"],
+        ["sessions", live, "device_sha256"],
+      ] as const) {
+        expect(
+          await readTurnState(runtime, requestOf(BARBERSHOP, [{ key: "hash", table, rowId, column }])),
+        ).toEqual({ error: "unknownFact", key: "hash", table, column });
       }
     },
   );
