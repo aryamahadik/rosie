@@ -1,24 +1,35 @@
 #!/usr/bin/env bash
-# Staging's Worker secrets, set by name from the build Mac (T-568; T-1276, ADR-016 card G; T-1261; C-022; build prompt
-# rule 7: keys are named, never shown; DL-017, DL-024):
+# Staging's Worker secrets, set by name from the build Mac (T-568; T-1276, ADR-016 card G; T-1261; T-572; C-022; build
+# prompt rule 7: keys are named, never shown; DL-017, DL-024):
 #   npm run secrets:staging        (bash infra/scripts/put-staging-secrets.sh [--env staging])
-# For each name in SECRETS below but staging's own (is_made below), the value is read by name from this checkout's
-# git-ignored .dev.vars and handed to `wrangler secret put <NAME> --env staging` through cf.sh, on standard input.
+# For each name in SECRETS below but staging's own (is_made below) and Linq's (is_linqs below), the value is read by name
+# from this checkout's git-ignored .dev.vars and handed to `wrangler secret put <NAME> --env staging` through cf.sh, on
+# standard input.
 # Standard output is one line per name, in the list's order, and nothing else:
 #   <NAME> set       wrangler took the value: staging's Worker reads it by that name from now on
 #   <NAME> missing   .dev.vars holds no value for the name (no line, or an empty one): nothing was put for it, never an
 #                    empty secret
 #   <NAME> made in place, never put
 #                    one of staging's own: nothing was read or put for it, whatever .dev.vars holds
+#   <NAME> Linq's own, never put: npm run linq:staging:create puts it
+#                    LINQ_WEBHOOK_SECRET (below): nothing was read or put for it, whatever .dev.vars holds
 # The names are the ones staging's Worker reads, each beside the code that reads it, or for sign-in by code beside the
-# card that builds that code (ADR-016). The model key is the one scoped to Rosie's workspace (DL-027), so no workspace
-# id is a secret: no code reads one.
-# SEALING_WRAP_KEY, LINQ_WEBHOOK_SECRET and PROOF_CODE_HASH_KEY are staging's own: nobody is given them, so they need no
-# line in .dev.vars. make-staging-secrets.sh (npm run secrets:staging:make, T-1236, T-1276) makes them in place, on
-# staging alone, and keeps them nowhere else. This script never puts one, even when .dev.vars has a value for it, and
-# never takes that value: a put replaces the secret staging holds, and replacing the sealing key would orphan everything
-# sealed under it, the proof-code hash key every live sign-in code (DL-495; CQ-218; DL-549). Rotation is a task of its
-# own, never this script's.
+# card that builds that code (ADR-016), or for staging's real Linq line beside the name DL-940 fixed (T-572, T-1449).
+# The model key is the one scoped to Rosie's workspace (DL-027), so no workspace id is a secret: no code reads one.
+# SEALING_WRAP_KEY, PROOF_CODE_HASH_KEY and TEST_PHONE_WEBHOOK_SECRET are staging's own: nobody is given them, so they
+# need no line in .dev.vars. make-staging-secrets.sh (npm run secrets:staging:make, T-1236, T-1276, T-572) makes them in
+# place, on staging alone, and keeps them nowhere else. This script never puts one, even when .dev.vars has a value for
+# it, and never takes that value: a put replaces the secret staging holds, and replacing the sealing key would orphan
+# everything sealed under it, the proof-code hash key every live sign-in code (DL-495; CQ-218; DL-549). Rotation is a
+# task of its own, never this script's.
+# LINQ_WEBHOOK_SECRET is Linq's own since T-572 (DL-940; K-11 default 1): the signing secret Linq gives once, when
+# linq-staging-check.sh --create makes staging's webhook subscription, which puts it straight from Linq's answer. So this
+# script never puts it, nor takes a value .dev.vars has for it: a put from here would replace Linq's secret, and every
+# webhook Linq sends staging would then be refused.
+# Rosie's own number, ROSIE_NUMBER, is not on the list: deploy-staging.sh gives it to the Worker at each deploy, as the
+# var --var ROSIE_NUMBER:<number> (T-1304; DL-581), and Cloudflare keeps a var and a secret of one name apart (a put
+# of a name the deployed version holds as a var is refused), so it is never a secret. The Worker reads it by the same
+# name either way.
 #
 # A value:
 #   - comes from .dev.vars alone. A variable of the same name in the caller's shell is dropped before the file is read,
@@ -38,9 +49,9 @@
 # Refused before any value is put (exit 1):
 #   - a .dev.vars that cannot be read;
 #   - a value that holds a space, a quote or a #: no key, base64 or whsec_ value does, nor the inbox list, whose
-#     addresses are joined by commas, so its line is not a plain NAME=value (a comment after the value, a quote left
-#     open: lib.sh's load_dev_var keeps those in the value). Every name it puts is checked before the first put, so
-#     staging is untouched.
+#     addresses are joined by commas, nor the roster, whose numbers are too, so its line is not a plain NAME=value (a
+#     comment after the value, a quote left open: lib.sh's load_dev_var keeps those in the value). Every name it puts
+#     is checked before the first put, so staging is untouched.
 # A put that fails stops the run (exit 1): the names before it stay set, and the ones after it are not put. cf.sh's own
 # refusals arrive the same way.
 # Each put makes a new version of the staging Worker and deploys it at once (wrangler secret put), so run this when a
@@ -78,9 +89,13 @@ SECRETS=(
   # The environment key that wraps every person's sealing key (NQ-DB-1): runtime/src/wiring/real.ts SEALING_WRAP_KEY and
   # db/repo/sealing.ts DEFAULT_WRAPPING_KEY_NAME (T-182). 32 random bytes as base64.
   SEALING_WRAP_KEY
-  # The Linq webhook signing secret: runtime/src/wiring/real.ts LINQ_WEBHOOK_SECRET. "whsec_" and base64. Until J-08 it
-  # is the one the test-phone page's Linq double signs with (T-412): staging's own, never Linq's.
+  # The Linq webhook signing secret: runtime/src/wiring/real.ts LINQ_WEBHOOK_SECRET. "whsec_" and base64. Since T-572
+  # Linq's own (above): linq-staging-check.sh --create puts it, never this script.
   LINQ_WEBHOOK_SECRET
+  # The test-phone page's own signing secret once staging is on the real Linq line (T-1449 reads it; DL-940; K-11's
+  # doubleWebhook row: the test environment's, never Linq's). "whsec_" and base64, staging's own: make-staging-secrets.sh
+  # makes it in place.
+  TEST_PHONE_WEBHOOK_SECRET
   # The key every sign-in code's hash and every typed contact's hash is made under (ADR-016 section 4; the name K-22's
   # rows keep in hash_key_name): the hashing port staging's root hands the sign-in calls reads it (T-1289). 32 random
   # bytes as base64, staging's own: make-staging-secrets.sh makes it in place (T-1276).
@@ -93,6 +108,13 @@ SECRETS=(
   # allow-list (T-419) read it; seed:staging reads the same name from .dev.vars (T-1287). Its line holds the addresses
   # joined by commas, with no space. Like every value here it is never printed: only its name is.
   STAGING_TEST_INBOXES
+  # Linq's key (J-08; DL-034): T-414's sender reads it by name at each send (adapters/src/linq/send LINQ_API_TOKEN),
+  # behind T-416's roster guard, once staging is on the real Linq line (T-1449, DL-940).
+  LINQ_API_TOKEN
+  # The roster (Q-53; DL-841; T-416): the roster phones' numbers in E.164, joined by commas with no space, the only
+  # numbers a real send from staging reaches. T-416's guard reads it by name at each call (adapters/src/linq/roster
+  # STAGING_LINQ_ALLOWLIST), and fails closed on any other form.
+  STAGING_LINQ_ALLOWLIST
 )
 # A variable of one of those names in the caller's shell (another tool's key on this Mac) is dropped here, before cf.sh
 # or wrangler starts: it is never the value put, and never travels on to them. A name this script never reads, one of
@@ -104,7 +126,16 @@ unset -v "${SECRETS[@]}"
 # put-staging-secrets.test.mjs fails until it does.
 is_made() {
   case "$1" in
-    SEALING_WRAP_KEY | LINQ_WEBHOOK_SECRET | PROOF_CODE_HASH_KEY) return 0 ;;
+    SEALING_WRAP_KEY | PROOF_CODE_HASH_KEY | TEST_PHONE_WEBHOOK_SECRET) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# is_linqs <NAME>: whether the name is Linq's own, the signing secret linq-staging-check.sh --create puts straight from
+# Linq's answer (T-572; above): never put from here, and its value in .dev.vars never taken.
+is_linqs() {
+  case "$1" in
+    LINQ_WEBHOOK_SECRET) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -176,10 +207,11 @@ value_of() {
   unset "$name"
 }
 
-# Every value it puts is checked before the first put. Staging's own are passed over: their values are never taken.
+# Every value it puts is checked before the first put. Staging's own and Linq's are passed over: their values are never
+# taken.
 bad=""
 for name in "${SECRETS[@]}"; do
-  if is_made "$name"; then
+  if is_made "$name" || is_linqs "$name"; then
     continue
   fi
   value_of "$name"
@@ -200,6 +232,10 @@ missing=0
 for name in "${SECRETS[@]}"; do
   if is_made "$name"; then
     printf '%s made in place, never put\n' "$name"
+    continue
+  fi
+  if is_linqs "$name"; then
+    printf "%s Linq's own, never put: npm run linq:staging:create puts it\n" "$name"
     continue
   fi
   value_of "$name"
