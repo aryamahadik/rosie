@@ -121,6 +121,11 @@ jobs:
       - name: CI script tests (the guards and the PreToolUse hook)
         run: node --test "infra/ci/*.test.mjs"
 
+      # T-1440 (DL-927): the Linq live probe's own test (T-1121), as ci.yml runs it: no key or unmasked number in a
+      # recorded sample, and no network call (its stand-in on 127.0.0.1).
+      - name: Linq probe test (no key or unmasked number in its recorded samples; never live)
+        run: npm run test:linq-probe
+
       - name: Test guard (no fewer tests, no new skip, todo or only)
         run: npm run guard:tests
 

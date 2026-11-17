@@ -43,6 +43,7 @@
     "test:scripts": "node --test \"infra/scripts/*.test.mjs\"",
     "pretest:ci-scripts": "npm run build:validators",
     "test:ci-scripts": "node --test \"infra/ci/*.test.mjs\"",
+    "test:linq-probe": "node --test adapters/spikes/linq-live/probe.test.mjs",
     "pretest:count": "npm run build:validators",
     "test:count": "node infra/scripts/test-count.mjs",
     "guard:tests": "node infra/ci/test-guard.mjs",
