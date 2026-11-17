@@ -577,107 +577,147 @@ describe("commitTurn with the setup tables as write targets (T-667)", () => {
     },
   );
 
-  it("compares a sign-up's version read with no business only under no business", SLOW, async () => {
-    const company = seedRowWhere("business-setup", "seed-company-two-kinds.json", "companies", {
-      id: "company-lee-home-services",
-    });
-    const plumber = seedRowWhere("business-setup", "seed-company-two-kinds.json", "company_kinds", {
-      kind_id: "plumber",
-    });
-    // S1-04 before S1-09: a company and its kind with no business, on the runtime side.
-    const placed = await commit(
-      turnOf("turn-t667-sign-up-1", [
-        {
-          op: "insert",
-          table: "companies",
-          values: { ...company, id: "company-sam-sign-up", business_id: null, version: undefined },
-        },
-        {
-          op: "insert",
-          table: "company_kinds",
-          values: { ...plumber, company_id: "company-sam-sign-up", business_id: null, version: undefined },
-        },
-      ] as unknown as StateWrite[]),
-    );
-    expect(placed).toMatchObject({
-      result: "committed",
-      committed: {
-        written: [
-          { table: "companies", rowId: "company-sam-sign-up", version: 1 },
-          { table: "company_kinds", rowId: "company-sam-sign-up/plumber", version: 1 },
-        ],
-      },
-    });
-    const earlyKind: RowRef = { table: "company_kinds", rowId: "company-sam-sign-up/plumber", version: 1 };
-    // The next sign-up turn, with no business either, rests a second kind on the first.
-    const second = await commit(
-      turnOf(
-        "turn-t667-sign-up-2",
-        [
+  it(
+    "compares a sign-up's version reads under no business, S1-09's under none and the business it gives",
+    SLOW,
+    async () => {
+      const company = seedRowWhere("business-setup", "seed-company-two-kinds.json", "companies", {
+        id: "company-lee-home-services",
+      });
+      const plumber = seedRowWhere("business-setup", "seed-company-two-kinds.json", "company_kinds", {
+        kind_id: "plumber",
+      });
+      // S1-04 before S1-09: a company and its kind with no business, on the runtime side.
+      const placed = await commit(
+        turnOf("turn-t667-sign-up-1", [
+          {
+            op: "insert",
+            table: "companies",
+            values: { ...company, id: "company-sam-sign-up", business_id: null, version: undefined },
+          },
           {
             op: "insert",
             table: "company_kinds",
-            values: {
-              ...ELECTRICIAN,
-              company_id: "company-sam-sign-up",
-              business_id: null,
-              version: undefined,
+            values: { ...plumber, company_id: "company-sam-sign-up", business_id: null, version: undefined },
+          },
+        ] as unknown as StateWrite[]),
+      );
+      expect(placed).toMatchObject({
+        result: "committed",
+        committed: {
+          written: [
+            { table: "companies", rowId: "company-sam-sign-up", version: 1 },
+            { table: "company_kinds", rowId: "company-sam-sign-up/plumber", version: 1 },
+          ],
+        },
+      });
+      const earlyKind: RowRef = { table: "company_kinds", rowId: "company-sam-sign-up/plumber", version: 1 };
+      // The next sign-up turn, with no business either, rests a second kind on the first.
+      const second = await commit(
+        turnOf(
+          "turn-t667-sign-up-2",
+          [
+            {
+              op: "insert",
+              table: "company_kinds",
+              values: {
+                ...ELECTRICIAN,
+                company_id: "company-sam-sign-up",
+                business_id: null,
+                version: undefined,
+              },
             },
-          },
-        ] as unknown as StateWrite[],
-        [earlyKind],
-      ),
-    );
-    expect(second).toMatchObject({
-      result: "committed",
-      committed: {
-        written: [{ table: "company_kinds", rowId: "company-sam-sign-up/electrician", version: 1 }],
-      },
-    });
-    // A business's write never finds a kind with no business by its name.
-    await expect(commit(turnOf("turn-t667-sign-up-other", [SHOP_NO_MONEY], [earlyKind]))).rejects.toThrow(
-      /a row of company_kinds the request names does not exist/,
-    );
-    expect(await versionNow("business_setup", BARBERSHOP)).toBe(4);
-    // The commit that places it names the kind by its key, found as it stands (no business), its business set in the
-    // same commit as its company's; its version read is the same row, compared once.
-    const placedKind = await commit(
-      turnOf(
-        "turn-t667-sign-up-placed",
-        [
-          {
-            op: "update",
-            table: "companies",
-            key: { id: "company-sam-sign-up" },
-            expectVersion: 1,
-            set: { business_id: MOVERS },
-          },
-          {
-            op: "update",
-            table: "company_kinds",
-            key: { company_id: "company-sam-sign-up", kind_id: "plumber" },
-            expectVersion: 1,
-            set: { business_id: MOVERS },
-          },
-        ] as unknown as StateWrite[],
-        [earlyKind],
-      ),
-    );
-    expect(answerErrors(placedKind)).toEqual([]);
-    expect(placedKind).toMatchObject({
-      result: "committed",
-      committed: {
-        written: [
-          { table: "companies", rowId: "company-sam-sign-up", version: 2 },
-          { table: "company_kinds", rowId: "company-sam-sign-up/plumber", version: 2 },
-        ],
-      },
-    });
-    const [kind] = await db.sql<{ business_id: string | null }[]>`
+          ] as unknown as StateWrite[],
+          [earlyKind],
+        ),
+      );
+      expect(second).toMatchObject({
+        result: "committed",
+        committed: {
+          written: [{ table: "company_kinds", rowId: "company-sam-sign-up/electrician", version: 1 }],
+        },
+      });
+      // A business's write never finds a kind with no business by its name.
+      await expect(commit(turnOf("turn-t667-sign-up-other", [SHOP_NO_MONEY], [earlyKind]))).rejects.toThrow(
+        /a row of company_kinds the request names does not exist/,
+      );
+      expect(await versionNow("business_setup", BARBERSHOP)).toBe(4);
+      // S1-09: the commit that gives the company its business names the plumbing kind by its key, found as it stands (no
+      // business), its business set in the same commit as its company's; its version read is the same row, compared once.
+      // It writes rows with no business and the movers', so its version read of the electrician kind, which it does not
+      // write, is found with no business too.
+      const electrician: RowRef = {
+        table: "company_kinds",
+        rowId: "company-sam-sign-up/electrician",
+        version: 1,
+      };
+      const placedKind = await commit(
+        turnOf(
+          "turn-t667-sign-up-placed",
+          [
+            {
+              op: "update",
+              table: "companies",
+              key: { id: "company-sam-sign-up" },
+              expectVersion: 1,
+              set: { business_id: MOVERS },
+            },
+            {
+              op: "update",
+              table: "company_kinds",
+              key: { company_id: "company-sam-sign-up", kind_id: "plumber" },
+              expectVersion: 1,
+              set: { business_id: MOVERS },
+            },
+          ] as unknown as StateWrite[],
+          [earlyKind, electrician],
+        ),
+      );
+      expect(answerErrors(placedKind)).toEqual([]);
+      expect(placedKind).toMatchObject({
+        result: "committed",
+        committed: {
+          written: [
+            { table: "companies", rowId: "company-sam-sign-up", version: 2 },
+            { table: "company_kinds", rowId: "company-sam-sign-up/plumber", version: 2 },
+          ],
+        },
+      });
+      const [kind] = await db.sql<{ business_id: string | null }[]>`
       select business_id from company_kinds where company_id = 'company-sam-sign-up' and kind_id = 'plumber'
     `;
-    expect(kind?.business_id).toBe(MOVERS);
-  });
+      expect(kind?.business_id).toBe(MOVERS);
+      // The electrician kind's own move to the movers: a commit of that shape never finds another business's kind.
+      const placeElectrician = {
+        op: "update",
+        table: "company_kinds",
+        key: { company_id: "company-sam-sign-up", kind_id: "electrician" },
+        expectVersion: 1,
+        set: { business_id: MOVERS },
+      } as unknown as StateWrite;
+      await expect(
+        commit(
+          turnOf(
+            "turn-t667-sign-up-placed-other",
+            [placeElectrician],
+            [{ table: "company_kinds", rowId: "company-lees-barbershop/barber", version: 1 }],
+          ),
+        ),
+      ).rejects.toThrow(/a row of company_kinds the request names does not exist/);
+      expect(await versionNow("company_kinds", "company-sam-sign-up/electrician")).toBe(1);
+      // Under the business it moves the row to, it finds the plumbing kind placed before it.
+      const placedElectrician = await commit(
+        turnOf("turn-t667-sign-up-placed-2", [placeElectrician], [{ ...earlyKind, version: 2 }]),
+      );
+      expect(answerErrors(placedElectrician)).toEqual([]);
+      expect(placedElectrician).toMatchObject({
+        result: "committed",
+        committed: {
+          written: [{ table: "company_kinds", rowId: "company-sam-sign-up/electrician", version: 2 }],
+        },
+      });
+    },
+  );
 
   it(
     "refuses a two-column update that does not name its whole key, or changes it, before anything is written",

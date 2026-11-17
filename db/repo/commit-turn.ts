@@ -88,9 +88,12 @@
 //  13. A table the answer names by a column other than its primary key (phones, by handle_id, when the request asks)
 //      that has no such column throws; its rows are never answered by their primary key instead.
 //  14. (T-667) A two-column key's version read is compared under the businesses the commit writes: those its request
-//      names (a state insert's business, an open question's, a clock row's, an outbox row's, an effect's, an event's) and
-//      those of the rows it updates, as they stand before its locks. With none, only a row with no business is found (a
-//      sign-up turn before there is a business). A table scoped none (kind_flows) has no business to compare.
+//      names (a state insert's business, an open question's, a clock row's, an outbox row's, an effect's, an event's),
+//      those of the rows it updates, as they stand before its locks, and the business a state update gives a row that
+//      has none, a write with no business naming none. So the name finds a row of one of those businesses, or a row with
+//      no business when one of those writes has none or the commit writes no business's row at all (a sign-up's turns,
+//      and S1-09's, which moves rows with no business to the new one), and never another business's row. A table scoped
+//      none (kind_flows) has no business to compare.
 //  15. (T-667) K-22's sessions and K-27's calendar_links, which row-level security binds by person and which have no
 //      business column, are written on the runtime side, where their runtime policies give rosie_job every row: K-22
 //      rule 5 has the commit end someone else's sessions there (left, handed_over), and K-27 rule 5 has it write a
@@ -104,10 +107,11 @@
 //   - a state update names the row by its key, column to value (K-05 v1 stateWrite), and is found by those columns; the
 //     name it is locked, compared and answered by is the one the database builds for that row, read before the locks;
 //   - a version read names the row by its name, which the SQL compares whole with the row's own name, never splitting the
-//     rowId (CQ-09), with business_id one of the businesses the commit writes (default 14; T-1427's security reviewer's N2,
-//     DL-913), so another business's name finds no row and the commit throws (default 1, fail closed), and the compare
-//     is narrowed by the business, through its index where the table has one (T-1427's database engineer's N3:
-//     company_kinds_business_idx, picked_kind_texts_business_idx, flow_defaults' own key);
+//     rowId (CQ-09), with business_id one of the businesses the commit writes, or null where one of its writes has no
+//     business (default 14; T-1427's security reviewer's N2, DL-913), so another business's name finds no row and the
+//     commit throws (default 1, fail closed), and the compare is narrowed by the business, through its index where the
+//     table has one (T-1427's database engineer's N3: company_kinds_business_idx, picked_kind_texts_business_idx,
+//     flow_defaults' own key);
 //   - versionChanged names a changed row by its name.
 // A table of one key column is named, locked, compared and answered as before, by the same statements.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.1";
@@ -663,16 +667,24 @@ function keyWhere(ctx: Context, key: readonly string[], keyValues: Row) {
   return tx`${tx(first)} = ${keyValues[first] as string | number} and ${tx(second)} = ${keyValues[second] as string | number}`;
 }
 
+/** The businesses the commit writes (default 14; T-667), read once, before the locks, when a compare needs them. */
+interface WriteBusinesses {
+  /** Each business a write names or a row it updates holds. */
+  readonly ids: ReadonlySet<string>;
+  /** Whether a write has no business (the runtime side's rows), or the commit writes no business's row at all. */
+  readonly none: boolean;
+}
+
 /**
  * How a two-column row is found (T-667): a state update's by its key's columns; a version read's by item 77's name, the
- * SQL's own name for the row compared whole with the rowId, of one of the businesses the commit writes (default 14; none:
- * a row with no business), or of no business at all for a table scoped none.
+ * SQL's own name for the row compared whole with the rowId, of one of the businesses the commit writes, or with no
+ * business when one of its writes has none (default 14), or of no business at all for a table scoped none.
  */
 function namedRowWhere(
   ctx: Context,
   info: TableInfo,
   target: LockTarget,
-  businesses: ReadonlySet<string> | null,
+  businesses: WriteBusinesses | null,
 ) {
   const { tx } = ctx;
   if (target.keyValues !== null) {
@@ -687,15 +699,19 @@ function namedRowWhere(
       "commitTurn: a two-column version read was compared before the commit's businesses were read",
     );
   }
-  return businesses.size === 0
-    ? tx`${name} = ${target.rowId} and ${tx(info.scopeColumn)} is null`
-    : tx`${name} = ${target.rowId} and ${tx(info.scopeColumn)} in ${tx([...businesses])}`;
+  if (businesses.ids.size === 0) {
+    return tx`${name} = ${target.rowId} and ${tx(info.scopeColumn)} is null`;
+  }
+  const ids = [...businesses.ids];
+  return businesses.none
+    ? tx`${name} = ${target.rowId} and (${tx(info.scopeColumn)} in ${tx(ids)} or ${tx(info.scopeColumn)} is null)`
+    : tx`${name} = ${target.rowId} and ${tx(info.scopeColumn)} in ${tx(ids)}`;
 }
 
 async function lockRow(
   ctx: Context,
   target: LockTarget,
-  businesses: ReadonlySet<string> | null,
+  businesses: WriteBusinesses | null,
 ): Promise<Locked> {
   const { table, rowId, mode } = target;
   const info = await tableInfo(ctx, table);
@@ -848,41 +864,40 @@ async function stateUpdateTarget(
 
 /**
  * The businesses the commit writes (default 14; T-667): each one its request names (a state insert's business, an open
- * question's, a clock row's, an outbox row's, an effect's, an event's) and each one of a row it updates, read now, before
- * the locks, on the runtime side. Read only when a two-column version read of a business-scoped table needs it.
+ * question's, a clock row's, an outbox row's, an effect's, an event's), each one of a row it updates, read now, before
+ * the locks, on the runtime side, and the business a state update gives a row that has none (S1-09), a write with no
+ * business naming none. Read only when a two-column version read of a business-scoped table needs it.
  */
 async function writeBusinesses(
   ctx: Context,
   request: CommitTurnRequest,
   targets: readonly LockTarget[],
-): Promise<ReadonlySet<string>> {
-  const businesses = new Set<string>();
-  const add = (value: unknown): void => {
-    if (typeof value === "string" && value !== "") {
-      businesses.add(value);
-    }
-  };
+): Promise<WriteBusinesses> {
+  // Each write's business as it names it or its row holds it: an id, or null for none.
+  const named: unknown[] = [];
   const { writes } = request;
   for (const write of writes.state) {
     if (write.op === "insert") {
       const info = await tableInfo(ctx, write.table);
       if (info.scopeColumn !== null) {
-        add(write.values[info.scopeColumn]);
+        named.push(write.values[info.scopeColumn] ?? null);
       }
     }
   }
-  const named: readonly unknown[] = [
+  const records: readonly unknown[] = [
     ...writes.openQuestions.open,
     ...writes.clockRows.make,
     ...writes.outboxRows,
     ...(writes.effects?.write ?? []),
     ...writes.events,
   ];
-  for (const write of named) {
-    if (isRecord(write)) {
-      add(write.businessId);
+  for (const record of records) {
+    if (isRecord(record) && Object.hasOwn(record, "businessId")) {
+      named.push(record.businessId);
     }
   }
+  // The business of each row the commit updates, as it stands before the locks, by targetKey.
+  const before = new Map<string, unknown>();
   const { tx } = ctx;
   for (const target of targets) {
     if (target.mode !== "update") {
@@ -893,7 +908,7 @@ async function writeBusinesses(
       continue;
     }
     if (target.business !== undefined) {
-      add(target.business);
+      before.set(targetKey(target.table, target.rowId), target.business);
       continue;
     }
     const column = singleColumn(oneKey(info));
@@ -903,9 +918,38 @@ async function writeBusinesses(
     const [row] = await tx<{ business: unknown }[]>`
       select ${tx(info.scopeColumn)} as business from ${tx(target.table)} where ${tx(column)} = ${target.rowId}
     `;
-    add(row?.business);
+    // A row that does not exist names no business here; its lock throws (default 1).
+    if (row !== undefined) {
+      before.set(targetKey(target.table, target.rowId), row.business);
+    }
   }
-  return businesses;
+  named.push(...before.values());
+  // A state update that gives a row with no business its business (S1-09: a sign-up's rows to the new business) writes
+  // that business too. A row of a business is never moved to another (row-level security refuses it under the row's own
+  // scope), so its update's set names no business here.
+  for (const write of writes.state) {
+    if (write.op !== "update") {
+      continue;
+    }
+    const info = await tableInfo(ctx, write.table);
+    if (info.scopeColumn === null || !Object.hasOwn(write.set, info.scopeColumn)) {
+      continue;
+    }
+    const target = await stateUpdateTarget(ctx, write);
+    if (before.get(targetKey(write.table, target.rowId)) === null) {
+      named.push(write.set[info.scopeColumn] ?? null);
+    }
+  }
+  const ids = new Set<string>();
+  let none = false;
+  for (const value of named) {
+    if (value === null) {
+      none = true;
+    } else if (typeof value === "string" && value !== "") {
+      ids.add(value);
+    }
+  }
+  return { ids, none: none || ids.size === 0 };
 }
 
 async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise<Compared> {
@@ -978,8 +1022,8 @@ async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise
   }
 
   // A two-column version read of a business-scoped table is compared under the businesses the commit writes, read
-  // before any row is locked (default 14; T-667). A commit with none reads nothing more.
-  let businesses: ReadonlySet<string> | null = null;
+  // before any row is locked (default 14; T-667). A commit with no such read reads nothing more.
+  let businesses: WriteBusinesses | null = null;
   for (const target of modes.values()) {
     if (target.keyValues === null && twoColumnKeyOf(target.table) !== null) {
       const info = await tableInfo(ctx, target.table);
