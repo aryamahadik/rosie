@@ -4,7 +4,8 @@
 // what it reads facts.ts.
 //
 // `limit2` is given no walk and no rules read yet: a part that may carry an owner rule is refused (notBuilt, fails
-// closed) until the walk (C-100, C-132, C-133) and a data-access read of K-26's rules are wired here; any other part, such
+// closed) until the walk (C-100, C-132, C-133) and the read of K-26's rules are wired in (./pg's pgOwnerRules binds K-05
+// v1.18's readTermsSources, T-1429, for the wiring to hand to createLimit2); any other part, such
 // as Sam's S1-02 answer, proposes nothing an owner rule governs and passes with nothing read, and the sign-up door before
 // it is not checked (owner-rules.ts default 4). createLimit2 takes other ports, as the tests do.
 

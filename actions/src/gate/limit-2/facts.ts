@@ -6,10 +6,11 @@
 //     booking step (T-1139 builds the walk for S1-01 and S1-02 only), so the shipped limit answers it with
 //     WALK_NOT_BUILT: a part that may carry an owner rule is not known, and the limit refuses it (notBuilt: fails
 //     closed); any other part proposes nothing an owner rule governs (owner-rules.ts default 1);
-//   - the business's owner rules: K-26 v1's rules rows, read through a data-access call on the call's own transaction
-//     (the Tool API's scoped repo, where row-level security leaves the call's business only: arch 10 line 546). db/repo
-//     has no read of K-26's rules yet, so the shipped limit has none, and a part with a proposal is refused (notBuilt)
-//     until one is wired here (createLimit2's `rules`).
+//   - the business's owner rules: K-26 v1's rules rows, read through a data-access call under the call's business scope
+//     (row-level security leaves the call's business only: arch 10 line 546): K-05 v1.18's readTermsSources, bound on
+//     PostgreSQL by ./pg (T-1429: pgOwnerRules, in a read-only transaction of its own on the Tool API's client). The
+//     shipped limit is handed none yet, so a part with a proposal is refused (notBuilt) until the wiring hands it in
+//     (createLimit2's `rules`).
 // Neither port writes. Every read gives ids, labels, amounts and instants; the owner's words (rules.words) are not read.
 
 import { holdClassOf } from "../../commit/hold";
