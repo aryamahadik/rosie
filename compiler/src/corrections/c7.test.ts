@@ -2233,7 +2233,7 @@ describe("the security reviewer's note a on round 5: S12-19's passive lines, lis
     expect(places).toHaveLength(23);
     for (const [trade, flow, k, sentence, listed] of places) {
       const where = `${trade} ${flow} ops[${String(k)}].does`;
-      const { trade: raw, done } = marked(trade);
+      const raw = marked(trade).trade;
       const op = raw.flows[flow].ops[k];
       expect(op?.op, where).toBe("words");
       expect(op?.at, where).toBe("S12-19");
