@@ -1,0 +1,51 @@
+{
+  "card": "T-1121",
+  "run": "2026-11-17T00-37-18Z-7ccff4e6",
+  "mode": "live",
+  "step": "stopped",
+  "call": "send",
+  "at": "2026-11-17T00:37:18.851Z",
+  "elapsedMs": 189,
+  "request": {
+    "method": "POST",
+    "path": "/api/partner/v3/chats",
+    "body": {
+      "from": "***17",
+      "to": ["***90"],
+      "message": {
+        "parts": [
+          {
+            "type": "text",
+            "value": "Rosie staging test (T-1121): a test text sent after STOP. No reply needed."
+          }
+        ],
+        "idempotency_key": "t1121-stopped-2026-11-17T00-37-18Z-7ccff4e6"
+      },
+      "override_optout": false
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json",
+      "x-trace-id": "621d9284aabe43da818f73cff355b714"
+    },
+    "body": {
+      "error": {
+        "code": 2024,
+        "doc_url": "https://docs.linqapp.com/channel/imessage/error/codes/2xxx/2024/",
+        "message": "Recipient asked you to stop messaging them",
+        "status": 403
+      },
+      "success": false,
+      "trace_id": "621d9284aabe43da818f73cff355b714"
+    }
+  },
+  "port": {
+    "call": "sendPart",
+    "result": "failed",
+    "kind": "optedOut",
+    "httpStatus": 403,
+    "code": "2024"
+  }
+}

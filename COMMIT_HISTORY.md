@@ -2,9 +2,172 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 717, [`46fbad5`](https://github.com/aryamahadik/rosie/commit/46fbad5), 2026-11-16 22:54:21 UTC.
+- **Through:** commit 723, [`7ca9f87`](https://github.com/aryamahadik/rosie/commit/7ca9f87), 2026-11-17 01:25:37 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 723. docs: COMMIT\_HISTORY.md through commit 721 (262c2ec, \#732) (\#734)
+
+- **Commit:** [`7ca9f87`](https://github.com/aryamahadik/rosie/commit/7ca9f87), by Arya Mahadik, 2026-11-17 01:25:37 UTC
+- **Pull request:** [#734](https://github.com/aryamahadik/rosie/pull/734) from `task/commit-history-154`, merged 2026-11-17 01:25:37 UTC. It squashed 1 branch commit:
+  - `7a05389` docs: COMMIT\_HISTORY.md through commit 721 (262c2ec, \#732)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 247 (DL-921); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 722. T-630: journey 1 and 2 Tool API call folders and registry entries, each refusing not built (\#733)
+
+- **Commit:** [`18459fa`](https://github.com/aryamahadik/rosie/commit/18459fa), by Arya Mahadik, 2026-11-17 01:25:33 UTC
+- **Pull request:** [#733](https://github.com/aryamahadik/rosie/pull/733) from `task/T-630`, merged 2026-11-17 01:25:33 UTC. It squashed 1 branch commit:
+  - `db6d65d` T-630: journey 1 and 2 Tool API call folders and registry entries, ea…
+- **Files changed:** 39 (+1942 −0), by folder:
+  - `actions/src/page-api/journey-1-2/` index.ts +72 −0, journey-1-2.test.ts +107 −0
+  - `actions/src/tool-api/journey-1/after-live/` index.ts +15 −0
+  - `actions/src/tool-api/journey-1/agreements/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/calendar/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/companies/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/control/` index.ts +12 −0
+  - `actions/src/tool-api/journey-1/fee-consent/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/go-live-page/` index.ts +19 −0
+  - `actions/src/tool-api/journey-1/go-live/` index.ts +24 −0
+  - `actions/src/tool-api/journey-1/` index.ts +292 −0, journey-1.test.ts +687 −0
+  - `actions/src/tool-api/journey-1/kinds/` index.ts +25 −0
+  - `actions/src/tool-api/journey-1/licenses/` index.ts +23 −0
+  - `actions/src/tool-api/journey-1/listing/` index.ts +20 −0
+  - `actions/src/tool-api/journey-1/mobile-id/` index.ts +20 −0
+  - `actions/src/tool-api/journey-1/money-card/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/places/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/plan/` index.ts +11 −0
+  - `actions/src/tool-api/journey-1/plug-ins/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/profile/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/rules/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/services/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/spaces/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/start/` index.ts +13 −0
+  - `actions/src/tool-api/journey-1/stripe-connect/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/summary/` index.ts +11 −0
+  - `actions/src/tool-api/journey-1/team-size/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/timetable/` index.ts +18 −0
+  - `actions/src/tool-api/journey-2/add-team/` index.ts +18 −0
+  - `actions/src/tool-api/journey-2/` index.ts +31 −0, journey-2.test.ts +157 −0
+  - `actions/src/tool-api/journey-2/join-links/` index.ts +12 −0
+  - `actions/src/tool-api/journey-2/join/` index.ts +20 −0
+  - `actions/src/tool-api/journey-2/licenses/` index.ts +23 −0
+  - `actions/src/tool-api/journey-2/on-call/` index.ts +23 −0
+  - `actions/src/tool-api/journey-2/skills/` index.ts +18 −0
+  - `actions/src/tool-api/journey-2/staff-page/` index.ts +18 −0
+  - `actions/src/tool-api/journey-2/take-bookings/` index.ts +19 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Each call task of journeys 1 and 2 (T-633 to T-664) gets its own folder under actions/src/tool-api/journey-1 and journey-2, whose index.ts gives its entries: K-09 v1's matchKinds, lookupListing, readSetup and each of saveSetupStep's 32 steps, registered once each by the folder that builds it. setupHandlers and withSetupCalls make the base's four setup handlers from those entries (saveSetupStep dispatched by its request's step), refuse a call outside the four, an unknown step and anything registered twice, and leave every other handler as given, so the walking skeleton's turn face is untouched. Every handler answers notBuilt and writes nothing until its task. actions/src/page-api/journey-1-2/index.ts lists the K-21 v1 page calls T-665 and T-666 serve, with the setup call behind each, each refusing as the page entry's unconfigured stubs do.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 721. docs: COMMIT\_HISTORY.md through commit 719 (5e26074, \#730) (\#732)
+
+- **Commit:** [`262c2ec`](https://github.com/aryamahadik/rosie/commit/262c2ec), by Arya Mahadik, 2026-11-17 00:53:43 UTC
+- **Pull request:** [#732](https://github.com/aryamahadik/rosie/pull/732) from `task/commit-history-153`, merged 2026-11-17 00:53:44 UTC. It squashed 1 branch commit:
+  - `c2e7fb8` docs: COMMIT\_HISTORY.md through commit 719 (5e26074, \#730)
+- **Files changed:** 1 (+48 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +48 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 246 (DL-918); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 720. T-632: the kind matcher: an owner's words to the closest of the 243 kinds, one which-question for two, not-booked said plainly (\#731)
+
+- **Commit:** [`f84a0e6`](https://github.com/aryamahadik/rosie/commit/f84a0e6), by Arya Mahadik, 2026-11-17 00:53:39 UTC
+- **Pull request:** [#731](https://github.com/aryamahadik/rosie/pull/731) from `task/T-632`, merged 2026-11-17 00:53:40 UTC. It squashed 2 branch commits:
+  - `7f99021` T-632: kind matcher: an owner's words to the closest of the 243 kinds…
+  - `1a6d62f` T-632: name the S1-02 trade words method A does not list; fix a test …
+- **Files changed:** 6 (+1233 −0), by folder:
+  - `actions/src/domain/kind-matcher/` index.ts +26 −0, kind-matcher.test.ts +363 −0, matcher.ts +242 −0, not-booked.ts +63 −0, test-support.ts +405 −0, words.ts +134 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-632: kind matcher: an owner's words to the closest of the 243 kinds (T-631's method A), listed, one which?, new_work, or not_booked by RULES 1.4
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-632: name the S1-02 trade words method A does not list; fix a test helper's comment
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 719. docs: COMMIT\_HISTORY.md through commit 717 (46fbad5, \#727) (\#730)
+
+- **Commit:** [`5e26074`](https://github.com/aryamahadik/rosie/commit/5e26074), by Arya Mahadik, 2026-11-17 00:17:29 UTC
+- **Pull request:** [#730](https://github.com/aryamahadik/rosie/pull/730) from `task/commit-history-152`, merged 2026-11-17 00:17:29 UTC. It squashed 1 branch commit:
+  - `951bc33` docs: COMMIT\_HISTORY.md through commit 717 (46fbad5, \#727)
+- **Files changed:** 1 (+49 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +49 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 245 (DL-915); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 718. T-1427: K-05 v1.18, the catalog's five reads under the business scope with row versions (CQ-349 ruled) (\#729)
+
+- **Commit:** [`dd0758e`](https://github.com/aryamahadik/rosie/commit/dd0758e), by Arya Mahadik, 2026-11-17 00:17:25 UTC
+- **Pull request:** [#729](https://github.com/aryamahadik/rosie/pull/729) from `task/T-1427`, merged 2026-11-17 00:17:25 UTC. It squashed 2 branch commits:
+  - `f63d0ff` T-1427: K-05 v1.18, the catalog's five reads under the call's busines…
+  - `b255c19` T-1427: README v1.18, what T-1429 binds as the port stands and what t…
+- **Files changed:** 28 (+3207 −9), by folder:
+  - `contracts/data-access/` README.md +119 −8, data-access.v1.18.schema.json +1376 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` index.json +192 −0, read-business-kinds-barbershop.json +54 −0, read-business-kinds-lee-home-services.json +71 −0, read-business-kinds-no-business-row.json +18 −0, read-business-kinds-yoga-studio-none.json +24 −0, read-business-services-barbershop.json +140 −0, read-business-services-lee-home-services.json +32 −0, read-price-rules-event-hours-andre.json +63 −0, read-price-rules-haircut-after-raise.json +63 −0, read-price-rules-haircut-before-raise.json +82 −0, read-price-rules-haircut-tie.json +95 −0, read-service-ways-haircut.json +58 −0, read-service-ways-other-business-service.json +21 −0, read-service-ways-skin-fade.json +40 −0, read-terms-sources-after-no-show-count.json +128 −0, read-terms-sources-dee-skin-fade.json +102 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-business-kinds-no-business.json +54 −0, refuse-business-kinds-row-by-kind-id.json +58 −0, refuse-business-kinds-setup-listing-phone.json +38 −0, refuse-business-services-with-extras.json +20 −0, refuse-price-rules-at-with-offset.json +82 −0, refuse-service-ways-cutoff-as-interval.json +26 −0, refuse-service-ways-no-service.json +57 −0, refuse-terms-sources-caller-flow.json +103 −0, refuse-terms-sources-rule-with-words.json +89 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1427: K-05 v1.18, the catalog's five reads under the call's business with row versions; CQ-349 (1) to (4) ruled
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1427: README v1.18, what T-1429 binds as the port stands and what the catalog-checks card widens
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 717. docs: COMMIT\_HISTORY.md through commit 715 (e1c4800, \#725) (\#727)
 
