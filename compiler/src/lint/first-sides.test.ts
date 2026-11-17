@@ -6,11 +6,12 @@
 //       in it (vehicle-wrap.json:413-414, window-tint.json:440-441, and the "Everyone's licenses are confirmed on the
 //       state's lookup." and "official lookup" first sides of 17 trade files, which no master file holds); a made-up pair
 //       that matches nothing is listed, and a pair that matches master text is not;
-//   (2) what a person reads, by compiling the trade (the bundle's trade, its applied flow and Master Corrections, verify
-//       off), where a listed pair was meant to rename, and whether it claims a check made while verify is off: the pairs
-//       meant for one of the master's own claim lines, and the card's known members. None does, so the corrections layer
-//       changes nothing for them (the master's own S2-11 and S1-32 lines say they hold only with checks on, or that
-//       checks are off now);
+//   (2) where each listed pair was meant to rename on the master's own flow (masterPlaces), marked pair by pair in the
+//       list by place, none of them a line that claims a check made while verify is off; and what a person reads, by
+//       compiling the trade (the bundle's trade, its applied flow and Master Corrections, verify off), where a listed
+//       pair was meant to rename, and whether it claims a check made while verify is off: the pairs meant for one of the
+//       master's own claim lines, and the card's known members. None does, so the corrections layer changes nothing for
+//       them (the master's own S2-11 and S1-32 lines say they hold only with checks on, or that checks are off now);
 //   (3) each listed pair's reason as found.
 // Fixture set v1 holds no swap pair in any trade (only master-B.json's own variants swap), so the swaps are proved on a
 // made-up op.
@@ -26,6 +27,7 @@ import {
   holdsClaim,
   jsonLines,
   masterClaimLines,
+  masterPlaces,
   meantFor,
   pairsAtClaimLines,
   placeOf,
@@ -84,6 +86,13 @@ describe("the lint's reading of a trade file and of the words a rename runs on",
     expect(standsIn("barbershop", words)).toBe(false);
     expect(standsIn("license. a", words)).toBe(false);
     expect(standsIn("Shops", words)).toBe(true);
+    // A swap's first side that ends with a space or a mark needs no word edge there (swapRes); a rename's does.
+    const row = wordsOf(["Skin fade, Sat 10am"]);
+    expect(standsIn("Skin fade, ", row)).toBe(false);
+    expect(standsIn("Skin fade, ", row, true)).toBe(true);
+    expect(standsIn("Skin fade", row, true)).toBe(true);
+    expect(standsIn("Skin fad", row, true)).toBe(false);
+    expect(standsIn("", row, true)).toBe(false);
   });
 
   it("finds where a first side was meant to rename by the words in a row it shares with a line", () => {
@@ -245,16 +254,25 @@ describe("the first-side lint (T-1439)", () => {
     ).toBe(17);
   });
 
-  it("pins today's list by place, with its counts: it reports, and nothing it finds stops the build", async () => {
+  it("pins today's list by place, with its counts and where each pair was meant to rename: it reports, and nothing it finds stops the build", async () => {
     const { pairs, unlisted, findings } = report();
     const byReason: Record<string, number> = {};
     for (const one of findings) byReason[one.reason] = (byReason[one.reason] ?? 0) + 1;
+    // Each listed pair's place on the master's own flow, while verify is off (masterPlaces): a master line it shares
+    // the most words in a row with, or none.
+    const places = masterPlaces(master, findings);
+    const meant = {
+      "no line": places.filter((one) => one.line === null).length,
+      "a line with no claim": places.filter((one) => one.line !== null && !one.claim).length,
+      "a line with a claim": places.filter((one) => one.claim).length,
+    };
     expect({
       pairs,
       unlisted,
       listed: findings.length,
       files: new Set(findings.map((one) => one.trade)).size,
       byReason,
+      meant,
     }).toMatchInlineSnapshot(`
       {
         "byReason": {
@@ -267,6 +285,11 @@ describe("the first-side lint (T-1439)", () => {
         },
         "files": 234,
         "listed": 28568,
+        "meant": {
+          "a line with a claim": 0,
+          "a line with no claim": 3770,
+          "no line": 24798,
+        },
         "pairs": {
           "rename": 112389,
           "swap": 0,
@@ -278,8 +301,48 @@ describe("the first-side lint (T-1439)", () => {
       }
     `);
     // Each line: a trade file, a flow and a kind, then each listed pair's first side line and its reason's letter (s a
-    // slot, o the other flow, d a dead new side, p another trade's first side, n another trade's new side, x none found).
-    await expect(placesText(findings)).toMatchFileSnapshot("./first-sides.places.txt");
+    // slot, o the other flow, d a dead new side, p another trade's first side, n another trade's new side, x none found),
+    // then where it was meant to rename on the master's flow: nothing for no line, + a line that claims no check made
+    // while verify is off, ! one that does.
+    await expect(placesText(findings, places)).toMatchFileSnapshot("./first-sides.places.txt");
+    // No listed pair was meant for a master line that claims a check made while verify is off.
+    expect(findings.filter((_, k) => places[k]?.claim === true).map((one) => one.line)).toStrictEqual([]);
+    // The renames not listed whose first side matches the trade's own ops' words alone (renames run before the ops, so
+    // they rename nothing either; c7.test.ts keeps them out of FIRST_SIDES), by place.
+    const ownOps = report().ownOps.map(
+      (one) => `${one.trade}.json:${String(one.lines[0])} ${one.flow} rename[${String(one.path[2])}]`,
+    );
+    expect(ownOps).toHaveLength(unlisted["own ops"]);
+    expect(ownOps).toMatchInlineSnapshot(`
+      [
+        "band.json:2423 B rename[3]",
+        "carpet.json:1836 B rename[239]",
+        "carpet.json:1840 B rename[240]",
+        "carpet.json:1844 B rename[241]",
+        "orthopedist.json:787 B rename[10]",
+        "restoration.json:1544 A rename[305]",
+        "security.json:6502 B rename[753]",
+        "security.json:6506 B rename[754]",
+        "senior-living.json:608 A rename[98]",
+        "senior-living.json:1114 B rename[104]",
+        "senior-living.json:1122 B rename[106]",
+        "senior-living.json:1130 B rename[108]",
+      ]
+    `);
+    // A pair placed on a master line that holds a check claim at all (S1-32's and S2-11's, which hold only with checks on
+    // or say checks are off now) is meant for that claim line, so pairsAtClaimLines reads it again on its trade's
+    // compiled flow (the next test).
+    const claims = { A: masterClaimLines(master, "A"), B: masterClaimLines(master, "B") };
+    const placedOnClaims = findings.filter((_, k) => {
+      const line = places[k]?.line;
+      return line !== undefined && line !== null && holdsClaim(line.text);
+    });
+    expect(placedOnClaims.length).toBeGreaterThan(0);
+    for (const one of placedOnClaims)
+      expect(
+        claims[one.flow].some((line) => meantFor(one.first, line.text)),
+        one.line,
+      ).toBe(true);
   });
 
   it("reads what a person reads, by compiling, where a listed pair was meant for one of the master's own claim lines", () => {

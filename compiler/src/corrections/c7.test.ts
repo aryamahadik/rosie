@@ -2881,10 +2881,11 @@ const FIRST_SIDES: readonly string[] = [
 /**
  * The hits on the first side of a pair T-1439's lint lists (lint/first-sides.ts firstSideFindings): its first side
  * matches no text the master or the trade's own ops lay at its flow, so the pair renames nothing and no person reads
- * either side; default 4 (the master's own line) does not hold for it, so it is not in FIRST_SIDES. The lint gives each
- * such pair's reason, and reads, by compiling, that a person reads no check claim where it was meant to rename
- * (lint/first-sides.test.ts). A sentence on a first side that matches master text in one trade and on one that matches
- * none in another is in both lists (11 of them).
+ * either side; default 4 (the master's own line) does not hold for it, so it is not in FIRST_SIDES. The same for a
+ * rename whose first side matches the trade's own ops' words alone (the lint's ownOps): renames run before the ops, so
+ * it renames nothing either. The lint gives each listed pair its reason and its place, and reads, by compiling, that a
+ * person reads no check claim where it was meant to rename (lint/first-sides.test.ts). A sentence on a first side that
+ * matches master text in one trade and on one that matches none in another is in both lists (11 of them).
  */
 const NO_MASTER_LINE: readonly string[] = [
   "A license holder confirms it on their own secure page when they join, or Rosie's team checks.",
@@ -2978,21 +2979,28 @@ const NO_MASTER_LINE: readonly string[] = [
   "licenses only as checked,",
 ];
 
-/** The rename pairs T-1439's lint lists, as `<trade> <flow> <index>`, made once. */
+/**
+ * The rename pairs whose first side matches no master text, as `<trade> <flow> <index>`, made once: those T-1439's lint
+ * lists, and those whose first side matches the trade's own ops' words alone (its report's ownOps), which come after
+ * the renames.
+ */
 let listedMemo: ReadonlySet<string> | null = null;
 
-/** Whether a text lies on the first side of a rename pair T-1439's lint lists (`A.rename[7][0]` of its trade). */
+/** Whether a text lies on the first side of a rename pair whose first side matches no master text (`A.rename[7][0]`). */
 function listedFirstSide(id: string, where: string): boolean {
   const found = /^([AB])\.rename\[(\d+)\]\[0\]$/.exec(where);
   if (found === null) return false;
-  listedMemo ??= new Set(
-    firstSideFindings(
+  if (listedMemo === null) {
+    const lint = firstSideFindings(
       master,
       ALL.map((one) => ({ trade: loadTrade(one), text: tradeText(one) })),
-    )
-      .findings.filter((one) => one.kind === "rename")
-      .map((one) => `${one.trade} ${one.flow} ${String(one.path[2])}`),
-  );
+    );
+    listedMemo = new Set(
+      [...lint.findings.filter((one) => one.kind === "rename"), ...lint.ownOps].map(
+        (one) => `${one.trade} ${one.flow} ${String(one.path[2])}`,
+      ),
+    );
+  }
   return listedMemo.has(`${id} ${found[1] ?? ""} ${found[2] ?? ""}`);
 }
 

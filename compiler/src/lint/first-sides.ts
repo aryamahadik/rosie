@@ -25,7 +25,10 @@
 // words in a row shared), masterClaimLines() the master's own lines that hold a check claim (READ_PATTERNS: C7's, and a
 // paper "confirmed on" a lookup), pairsAtClaimLines() the listed pairs meant for one of those, each with what a person
 // reads there, and claimsWhileOff() whether a line claims a check made while verify is off (a sentence that says it holds
-// only with checks on, or that checks are off now, does not).
+// only with checks on, or that checks are off now, does not). Every listed pair gets its place on the master's own flow
+// (masterPlaces, placer: compiling all 468 trade flows takes too long for a unit test), marked in the list by place; a
+// pair placed on a master claim line is one pairsAtClaimLines reads on its compiled flow. Where a person reads a trade's
+// own words instead (an op's words, a rename's new side), C7's exhaustive scan (c7.test.ts) already reads every one.
 //
 // It reads fixture set v1 as the loader does (load/trade.ts, load/flow.ts) and the master's own functions for the slots
 // (overlay-core.js, loaded once by overlay/core.ts); it changes nothing.
@@ -213,15 +216,19 @@ const WORD = /[A-Za-z0-9]/;
 
 /**
  * Whether `first` stands in the words as renameAll matches a first side: whole words, as written, with no letter or
- * digit right before or after it ("(^|[^A-Za-z0-9])" + first side + "(?![A-Za-z0-9])", lines 1723-1724).
+ * digit right before or after it ("(^|[^A-Za-z0-9])" + first side + "(?![A-Za-z0-9])", lines 1723-1724). With `swap`,
+ * as a variant's swap matches one (swapRes, lines 882-887): a first side that starts or ends with no letter or digit
+ * needs no word edge there, and an empty one matches nothing.
  */
-export function standsIn(first: string, words: Words): boolean {
-  if (first === "") return words.length > 0;
+export function standsIn(first: string, words: Words, swap = false): boolean {
+  if (first === "") return !swap && words.length > 0;
+  const edgeBefore = !swap || WORD.test(first[0] ?? "");
+  const edgeAfter = !swap || WORD.test(first[first.length - 1] ?? "");
   for (const chunk of words)
     for (let at = chunk.indexOf(first); at >= 0; at = chunk.indexOf(first, at + 1)) {
       const before = chunk[at - 1] ?? SEP;
       const after = chunk[at + first.length] ?? SEP;
-      if (!WORD.test(before) && !WORD.test(after)) return true;
+      if ((!edgeBefore || !WORD.test(before)) && (!edgeAfter || !WORD.test(after))) return true;
     }
   return false;
 }
@@ -439,6 +446,11 @@ export interface FirstSideReport {
    * pairs renamed first ("shadowed"), or words of the trade's own ops only, which come after the renames ("own ops").
    */
   unlisted: { shadowed: number; "own ops": number };
+  /**
+   * The rename pairs counted under unlisted["own ops"]: a first side that matches words of the trade's own ops alone,
+   * which no master line holds, so default 4 (the master's own line) does not hold for it either.
+   */
+  ownOps: TradePair[];
   findings: FirstSideFinding[];
 }
 
@@ -491,6 +503,7 @@ export function firstSideFindings(master: MasterGraphs, trades: readonly LintedT
   const examples = { A: exampleWords(master, "A"), B: exampleWords(master, "B") };
   const counts = { rename: 0, swap: 0 };
   const unlisted = { shadowed: 0, "own ops": 0 };
+  const ownOps: TradePair[] = [];
   const findings: FirstSideFinding[] = [];
 
   trades.forEach(({ trade }, n) => {
@@ -514,26 +527,29 @@ export function firstSideFindings(master: MasterGraphs, trades: readonly LintedT
       counts[pair.kind] += 1;
       const at = read[pair.flow];
       const other = read[pair.flow === "A" ? "B" : "A"];
-      const inMaster = standsIn(pair.first, at.master);
+      // A swap's first side matches as swapRes matches it; a rename's, as renameAll does.
+      const swap = pair.kind === "swap";
+      const stands = (words: Words): boolean => standsIn(pair.first, words, swap);
+      const inMaster = stands(at.master);
       // A rename is matched when it renamed something (renameAll); a swap, when its first side stands in the master's
       // words as the trade's pairs leave them, where the swap runs.
-      const matched =
-        pair.kind === "rename"
-          ? at.renamed[pair.path[2] as number] === true
-          : inMaster || standsIn(pair.first, at.after);
+      const matched = swap ? inMaster || stands(at.after) : at.renamed[pair.path[2] as number] === true;
       if (matched || inMaster) {
         if (!matched) unlisted.shadowed += 1;
         continue;
       }
-      if (standsIn(pair.first, at.ops)) {
-        if (pair.kind === "rename") unlisted["own ops"] += 1;
+      if (stands(at.ops)) {
+        if (!swap) {
+          unlisted["own ops"] += 1;
+          ownOps.push(pair);
+        }
         continue;
       }
-      const reason: Reason = standsIn(pair.first, examples[pair.flow])
+      const reason: Reason = stands(examples[pair.flow])
         ? "slot"
-        : standsIn(pair.first, other.master)
+        : stands(other.master)
           ? "other flow"
-          : standsIn(pair.first, at.seconds)
+          : stands(at.seconds)
             ? "dead new side"
             : [...(firstsBy.get(pair.first) ?? [])].some((id) => id !== pair.trade)
               ? "other trade's pair"
@@ -548,7 +564,7 @@ export function firstSideFindings(master: MasterGraphs, trades: readonly LintedT
       });
     }
   });
-  return { rule: FIRST_SIDE_RULE, pairs: counts, unlisted, findings };
+  return { rule: FIRST_SIDE_RULE, pairs: counts, unlisted, ownOps, findings };
 }
 
 /** One reason letter per reason, for the list by place (placesText). */
@@ -562,22 +578,33 @@ const LETTER: Readonly<Record<Reason, string>> = {
 };
 
 /**
- * The listed pairs by place, one line per trade file, flow and kind: `vehicle-wrap.json A rename: 413p 417p ...`, each
- * entry its first side's line and its reason's letter (s slot, o other flow, d dead new side, p other trade's pair, n
- * other trade's new side, x no source found), in the order listed.
+ * A place's mark in the list by place: none where the first side was meant for no line, + for a line that claims no
+ * check made while verify is off, ! for one that does.
  */
-export function placesText(findings: readonly FirstSideFinding[]): string {
+function placeMark(place: PairPlace | undefined): string {
+  if (place === undefined || place.line === null) return "";
+  return place.claim ? "!" : "+";
+}
+
+/**
+ * The listed pairs by place, one line per trade file, flow and kind: `vehicle-wrap.json A rename: 413p 417p+ ...`, each
+ * entry its first side's line and its reason's letter (s slot, o other flow, d dead new side, p other trade's pair, n
+ * other trade's new side, x no source found), in the order listed; with `places` (one per finding, masterPlaces), the
+ * entry then says where it was meant to rename (placeMark): nothing for no line, + for a line that claims no check
+ * made while verify is off, ! for one that does.
+ */
+export function placesText(findings: readonly FirstSideFinding[], places?: readonly PairPlace[]): string {
   const lines: string[] = [];
   let head = "";
   let entries: string[] = [];
-  for (const one of findings) {
+  for (const [k, one] of findings.entries()) {
     const next = `${one.file} ${one.flow} ${one.kind}`;
     if (next !== head) {
       if (entries.length > 0) lines.push(`${head}: ${entries.join(" ")}`);
       head = next;
       entries = [];
     }
-    entries.push(`${String(one.lines[0])}${LETTER[one.reason]}`);
+    entries.push(`${String(one.lines[0])}${LETTER[one.reason]}${placeMark(places?.[k])}`);
   }
   if (entries.length > 0) lines.push(`${head}: ${entries.join(" ")}`);
   return `${lines.join("\n")}\n`;
@@ -722,8 +749,11 @@ export function meantFor(first: string, line: string): boolean {
 
 /** The longest run of words in a row two texts share (case and punctuation aside). */
 export function sharedRun(first: string, line: string): number {
-  const own = plainWords(first);
-  const other = ` ${plainWords(line).join(" ")} `;
+  return runIn(plainWords(first), ` ${plainWords(line).join(" ")} `);
+}
+
+/** The longest run of a first side's words (plainWords) in a row that a line's words, spaced (" w1 w2 ... "), hold. */
+function runIn(own: readonly string[], other: string): number {
   let best = 0;
   for (let k = 0; k < own.length; k += 1)
     for (let n = best + 1; k + n <= own.length; n += 1) {
@@ -733,7 +763,51 @@ export function sharedRun(first: string, line: string): number {
   return best;
 }
 
-/** Where a listed pair was meant to rename, found by compiling, and what a person reads there. */
+/** Each run of three words in a row of a text's words, as one string. */
+function triples(words: readonly string[]): string[] {
+  const out: string[] = [];
+  for (let k = 0; k + 3 <= words.length; k += 1) out.push(words.slice(k, k + 3).join(" "));
+  return out;
+}
+
+const NO_PLACE: PairPlace = { line: null, run: 0, claim: false };
+
+/**
+ * placeOf over many first sides on the same lines: the lines are read once, and each first side is held only against the
+ * lines that share three words in a row with it (a first side is meant for a line only when they share 3 or more).
+ */
+export function placer(lines: readonly ReadLine[]): (first: string) => PairPlace {
+  const spaced: string[] = [];
+  const byTriple = new Map<string, number[]>();
+  lines.forEach((line, k) => {
+    const words = plainWords(line.text);
+    spaced.push(` ${words.join(" ")} `);
+    for (const triple of triples(words)) {
+      const list = byTriple.get(triple);
+      if (list === undefined) byTriple.set(triple, [k]);
+      else if (list[list.length - 1] !== k) list.push(k);
+    }
+  });
+  return (first) => {
+    const need = needed(first);
+    if (!Number.isFinite(need)) return NO_PLACE;
+    const own = plainWords(first);
+    const near = new Set<number>();
+    for (const triple of triples(own)) for (const k of byTriple.get(triple) ?? []) near.add(k);
+    let best: ReadLine | null = null;
+    let run = need - 1;
+    for (const k of [...near].sort((a, b) => a - b)) {
+      const shared = runIn(own, spaced[k] ?? "");
+      if (shared > run) {
+        best = lines[k] ?? null;
+        run = shared;
+      }
+    }
+    return best === null ? NO_PLACE : { line: best, run, claim: claimsWhileOff(best.text) };
+  };
+}
+
+/** Where a listed pair was meant to rename on a flow (a trade's compiled one, or the master's own), and what a person reads there. */
 export interface PairPlace {
   /** The line a person reads that the first side was meant for (meantFor) and shares the most words in a row with, or null. */
   line: ReadLine | null;
@@ -749,18 +823,31 @@ export interface PairPlace {
  * was meant for none.
  */
 export function placeOf(first: string, lines: readonly ReadLine[]): PairPlace {
-  let best: ReadLine | null = null;
-  let run = needed(first) - 1;
-  for (const line of lines) {
-    const shared = sharedRun(first, line.text);
-    if (shared > run) {
-      best = line;
-      run = shared;
-    }
-  }
-  return best === null
-    ? { line: null, run: 0, claim: false }
-    : { line: best, run, claim: claimsWhileOff(best.text) };
+  return placer(lines)(first);
+}
+
+/** The master's lines a person may read on a flow while verify is off (its corrected flow, readLines), made once. */
+const masterLinesCache = new WeakMap<MasterGraphs, Partial<Record<FlowLetter, ReadLine[]>>>();
+
+function masterLines(master: MasterGraphs, flow: FlowLetter): ReadLine[] {
+  const cache = masterLinesCache.get(master) ?? {};
+  masterLinesCache.set(master, cache);
+  const known = cache[flow];
+  if (known !== undefined) return known;
+  const lines = readLines(correctedFlow(master, flow).flow.steps);
+  cache[flow] = lines;
+  return lines;
+}
+
+/**
+ * Where each listed pair was meant to rename on the master's own flow (placeOf over the lines a person may read on its
+ * corrected flow while verify is off), in the findings' order: the master line its first side shares the most words in
+ * a row with, and whether that line claims a check made while verify is off. A pair meant for one of the master's claim
+ * lines is read again on its trade's compiled flow by pairsAtClaimLines.
+ */
+export function masterPlaces(master: MasterGraphs, findings: readonly FirstSideFinding[]): PairPlace[] {
+  const place = { A: placer(masterLines(master, "A")), B: placer(masterLines(master, "B")) };
+  return findings.map((one) => place[one.flow](one.first));
 }
 
 /** A listed pair meant for one of the master's claim lines, and what a person reads there on the trade's compiled flow. */
