@@ -1,0 +1,57 @@
+{
+  "call": "readServiceWays",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["services-prices/seed-service-money-paths.json"],
+    "after": [],
+    "now": "2026-10-26T14:00:00Z",
+    "note": "The haircut's two ways, as S1-13's money card left them (K-25's seed-service-money-paths; README item 74), in id order: at the customer's home in flow B, from the second shop's travel area, paid in full with the card's $20 fee, and at the shop in flow A, a card saved for the $20 fee and paid at the counter. Neither has a free-cancel time or a tip line of its own, so the business's apply (K-23 flow_defaults; K-26's tip_line rule)."
+  },
+  "request": {
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "serviceWays",
+    "businessId": "biz-lees-barbershop",
+    "serviceId": "svc-lees-haircut",
+    "readAt": "2026-10-26T14:00:00Z",
+    "ways": [
+      {
+        "id": "way-lees-haircut-home",
+        "serviceId": "svc-lees-haircut",
+        "businessId": "biz-lees-barbershop",
+        "flow": "B",
+        "place": "customer",
+        "locationId": "loc-lees-barbershop-second-shop",
+        "path": "list|full|none",
+        "depositCents": null,
+        "depositPercent": null,
+        "feeCents": 2000,
+        "currency": "USD",
+        "cutoffBeforeMinutes": null,
+        "cutoffDayBeforeAt": null,
+        "tipLine": null,
+        "active": true,
+        "version": 1
+      },
+      {
+        "id": "way-lees-haircut-shop",
+        "serviceId": "svc-lees-haircut",
+        "businessId": "biz-lees-barbershop",
+        "flow": "A",
+        "place": "business",
+        "locationId": "loc-lees-barbershop-shop",
+        "path": "list|card|counter",
+        "depositCents": null,
+        "depositPercent": null,
+        "feeCents": 2000,
+        "currency": "USD",
+        "cutoffBeforeMinutes": null,
+        "cutoffDayBeforeAt": null,
+        "tipLine": null,
+        "active": true,
+        "version": 1
+      }
+    ]
+  }
+}

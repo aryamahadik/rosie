@@ -1,0 +1,95 @@
+{
+  "call": "readServicePriceRules",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["services-prices/seed-price-rule-dates.json"],
+    "after": [],
+    "now": "2026-11-04T14:00:00Z",
+    "note": "A possible tie on the haircut (arch 05 line 253; README item 75): Sam saves an evening price, $45 after 5pm, beside the $75 at the customer's home, a place rule and a time rule with as many conditions that can both apply (a haircut at home after 5pm), so the read-back asks which wins and, until he answers, the lower price applies (S13-25 rule 19). No frozen seed holds a tie (K-25 README: 'No seed shows a tie'), so the database side writes these two rows itself before the read, in this order: price_rules price-lees-haircut-evening (business biz-lees-barbershop, service svc-lees-haircut, no place or worker, every day, from 17:00 with no end time, 4500 cents in USD, set by person-sam, effective from 2026-11-03T15:00:00Z and open, version 1); price_rule_ties tie-lees-haircut-home-evening (business biz-lees-barbershop, service svc-lees-haircut, first rule price-lees-haircut-home, second rule price-lees-haircut-evening, asked at 2026-11-03T15:00:00Z, not answered, version 1). The $35 ended before at and is not answered; the tie is, with its rules, as every tie of the service is. The evening price, its time and the tie's id are examples."
+  },
+  "request": {
+    "businessId": "biz-lees-barbershop",
+    "serviceId": "svc-lees-haircut",
+    "at": "2026-11-04T14:00:00Z"
+  },
+  "outcome": {
+    "result": "servicePriceRules",
+    "businessId": "biz-lees-barbershop",
+    "serviceId": "svc-lees-haircut",
+    "at": "2026-11-04T14:00:00Z",
+    "readAt": "2026-11-04T14:00:00Z",
+    "rules": [
+      {
+        "id": "price-lees-haircut-40",
+        "businessId": "biz-lees-barbershop",
+        "serviceId": "svc-lees-haircut",
+        "conditions": {
+          "serviceMoneyId": null,
+          "workerResourceId": null,
+          "weekdays": null,
+          "fromTime": null,
+          "untilTime": null
+        },
+        "priceCents": 4000,
+        "fromCents": null,
+        "currency": "USD",
+        "setByPersonId": "person-sam",
+        "effectiveFrom": "2026-11-02T05:00:00Z",
+        "effectiveTo": null,
+        "version": 1
+      },
+      {
+        "id": "price-lees-haircut-evening",
+        "businessId": "biz-lees-barbershop",
+        "serviceId": "svc-lees-haircut",
+        "conditions": {
+          "serviceMoneyId": null,
+          "workerResourceId": null,
+          "weekdays": null,
+          "fromTime": "17:00",
+          "untilTime": null
+        },
+        "priceCents": 4500,
+        "fromCents": null,
+        "currency": "USD",
+        "setByPersonId": "person-sam",
+        "effectiveFrom": "2026-11-03T15:00:00Z",
+        "effectiveTo": null,
+        "version": 1
+      },
+      {
+        "id": "price-lees-haircut-home",
+        "businessId": "biz-lees-barbershop",
+        "serviceId": "svc-lees-haircut",
+        "conditions": {
+          "serviceMoneyId": "way-lees-haircut-home",
+          "workerResourceId": null,
+          "weekdays": null,
+          "fromTime": null,
+          "untilTime": null
+        },
+        "priceCents": 7500,
+        "fromCents": null,
+        "currency": "USD",
+        "setByPersonId": "person-sam",
+        "effectiveFrom": "2026-10-19T18:11:00Z",
+        "effectiveTo": null,
+        "version": 1
+      }
+    ],
+    "ties": [
+      {
+        "id": "tie-lees-haircut-home-evening",
+        "businessId": "biz-lees-barbershop",
+        "serviceId": "svc-lees-haircut",
+        "firstRuleId": "price-lees-haircut-home",
+        "secondRuleId": "price-lees-haircut-evening",
+        "askedAt": "2026-11-03T15:00:00Z",
+        "winnerRuleId": null,
+        "answeredAt": null,
+        "answeredByPersonId": null,
+        "version": 1
+      }
+    ]
+  }
+}

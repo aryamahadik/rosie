@@ -1,0 +1,82 @@
+{
+  "call": "readServicePriceRules",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["services-prices/seed-price-rule-dates.json"],
+    "after": [],
+    "now": "2026-10-27T14:00:00Z",
+    "note": "The haircut's prices the day after Sam set S11-54's raise (K-25's seed-price-rule-dates: the $35 closed at the start of Mon Nov 2 at version 2, the $40 open from that instant, and the $75 at the customer's home), read from now (README item 75): every rule whose effective_to is null or after at, so the $35 still in effect until Nov 2, the $40 set for later and the home price, in id order, each with its conditions (the home price's place is way-lees-haircut-home) and version. No tie has been asked about the haircut, so ties is empty."
+  },
+  "request": {
+    "businessId": "biz-lees-barbershop",
+    "serviceId": "svc-lees-haircut",
+    "at": "2026-10-27T10:00:00-04:00"
+  },
+  "outcome": {
+    "result": "servicePriceRules",
+    "businessId": "biz-lees-barbershop",
+    "serviceId": "svc-lees-haircut",
+    "at": "2026-10-27T14:00:00Z",
+    "readAt": "2026-10-27T14:00:00Z",
+    "rules": [
+      {
+        "id": "price-lees-haircut-35",
+        "businessId": "biz-lees-barbershop",
+        "serviceId": "svc-lees-haircut",
+        "conditions": {
+          "serviceMoneyId": null,
+          "workerResourceId": null,
+          "weekdays": null,
+          "fromTime": null,
+          "untilTime": null
+        },
+        "priceCents": 3500,
+        "fromCents": null,
+        "currency": "USD",
+        "setByPersonId": "person-sam",
+        "effectiveFrom": "2026-10-19T18:11:00Z",
+        "effectiveTo": "2026-11-02T05:00:00Z",
+        "version": 2
+      },
+      {
+        "id": "price-lees-haircut-40",
+        "businessId": "biz-lees-barbershop",
+        "serviceId": "svc-lees-haircut",
+        "conditions": {
+          "serviceMoneyId": null,
+          "workerResourceId": null,
+          "weekdays": null,
+          "fromTime": null,
+          "untilTime": null
+        },
+        "priceCents": 4000,
+        "fromCents": null,
+        "currency": "USD",
+        "setByPersonId": "person-sam",
+        "effectiveFrom": "2026-11-02T05:00:00Z",
+        "effectiveTo": null,
+        "version": 1
+      },
+      {
+        "id": "price-lees-haircut-home",
+        "businessId": "biz-lees-barbershop",
+        "serviceId": "svc-lees-haircut",
+        "conditions": {
+          "serviceMoneyId": "way-lees-haircut-home",
+          "workerResourceId": null,
+          "weekdays": null,
+          "fromTime": null,
+          "untilTime": null
+        },
+        "priceCents": 7500,
+        "fromCents": null,
+        "currency": "USD",
+        "setByPersonId": "person-sam",
+        "effectiveFrom": "2026-10-19T18:11:00Z",
+        "effectiveTo": null,
+        "version": 1
+      }
+    ],
+    "ties": []
+  }
+}

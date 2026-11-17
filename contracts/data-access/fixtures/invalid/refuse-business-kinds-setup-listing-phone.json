@@ -1,0 +1,38 @@
+{
+  "result": "businessKinds",
+  "businessId": "biz-lees-barbershop",
+  "readAt": "2026-10-26T14:00:00Z",
+  "setup": {
+    "businessId": "biz-lees-barbershop",
+    "noMoney": false,
+    "version": 4,
+    "listingPhone": "+15555550177"
+  },
+  "kinds": [
+    {
+      "rowId": "company-lees-barbershop/barber",
+      "companyId": "company-lees-barbershop",
+      "kindId": "barber",
+      "businessId": "biz-lees-barbershop",
+      "tradeName": null,
+      "facts": ["children", "documents", "extrawork", "groups", "photos"],
+      "switchesA": [],
+      "switchesB": [],
+      "version": 1,
+      "flows": [
+        {
+          "rowId": "barber/A",
+          "flow": "A",
+          "combos": ["list|card|counter", "list|none|counter", "list|deposit|counter"],
+          "version": 1
+        },
+        {
+          "rowId": "barber/B",
+          "flow": "B",
+          "combos": ["list|card|bill", "list|full|none", "photos|deposit|bill"],
+          "version": 1
+        }
+      ]
+    }
+  ]
+}

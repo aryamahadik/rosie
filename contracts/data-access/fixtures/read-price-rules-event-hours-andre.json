@@ -1,0 +1,63 @@
+{
+  "call": "readServicePriceRules",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["services-prices/seed-price-rule-dates.json"],
+    "after": [],
+    "now": "2026-10-27T14:00:00Z",
+    "note": "Event hours' two prices (K-25's seed-price-rule-dates; README item 75): $120 an hour whoever goes, and $140 with Andre, a worker condition naming his worker resource (res-andre, which the seed writes with his staff role), by its id alone, never his name. The rule's worker belongs to the business by K-25 rule 9, a check of the card CQ-349 (4) names, not this read's."
+  },
+  "request": {
+    "businessId": "biz-lees-barbershop",
+    "serviceId": "svc-lees-event-hours",
+    "at": "2026-10-27T14:00:00Z"
+  },
+  "outcome": {
+    "result": "servicePriceRules",
+    "businessId": "biz-lees-barbershop",
+    "serviceId": "svc-lees-event-hours",
+    "at": "2026-10-27T14:00:00Z",
+    "readAt": "2026-10-27T14:00:00Z",
+    "rules": [
+      {
+        "id": "price-lees-event-hours",
+        "businessId": "biz-lees-barbershop",
+        "serviceId": "svc-lees-event-hours",
+        "conditions": {
+          "serviceMoneyId": null,
+          "workerResourceId": null,
+          "weekdays": null,
+          "fromTime": null,
+          "untilTime": null
+        },
+        "priceCents": 12000,
+        "fromCents": null,
+        "currency": "USD",
+        "setByPersonId": "person-sam",
+        "effectiveFrom": "2026-10-19T18:11:00Z",
+        "effectiveTo": null,
+        "version": 1
+      },
+      {
+        "id": "price-lees-event-hours-andre",
+        "businessId": "biz-lees-barbershop",
+        "serviceId": "svc-lees-event-hours",
+        "conditions": {
+          "serviceMoneyId": null,
+          "workerResourceId": "res-andre",
+          "weekdays": null,
+          "fromTime": null,
+          "untilTime": null
+        },
+        "priceCents": 14000,
+        "fromCents": null,
+        "currency": "USD",
+        "setByPersonId": "person-sam",
+        "effectiveFrom": "2026-10-19T19:00:00Z",
+        "effectiveTo": null,
+        "version": 1
+      }
+    ],
+    "ties": []
+  }
+}
