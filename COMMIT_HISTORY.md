@@ -2,9 +2,78 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 735, [`dc02106`](https://github.com/aryamahadik/rosie/commit/dc02106), 2026-11-17 10:28:52 UTC.
+- **Through:** commit 737, [`6a6e33b`](https://github.com/aryamahadik/rosie/commit/6a6e33b), 2026-11-17 11:05:41 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 737. docs: COMMIT\_HISTORY.md through commit 735 (dc02106, \#746) (\#748)
+
+- **Commit:** [`6a6e33b`](https://github.com/aryamahadik/rosie/commit/6a6e33b), by Arya Mahadik, 2026-11-17 11:05:41 UTC
+- **Pull request:** [#748](https://github.com/aryamahadik/rosie/pull/748) from `task/commit-history-161`, merged 2026-11-17 11:05:42 UTC. It squashed 1 branch commit:
+  - `84c57eb` docs: COMMIT\_HISTORY.md through commit 735 (dc02106, \#746)
+- **Files changed:** 1 (+45 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +45 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 736. T-667: setup-part fact reads with row and version, and the setup tables as commit write targets (\#747)
+
+- **Commit:** [`1d78ff2`](https://github.com/aryamahadik/rosie/commit/1d78ff2), by Arya Mahadik, 2026-11-17 11:05:38 UTC
+- **Pull request:** [#747](https://github.com/aryamahadik/rosie/pull/747) from `task/T-667`, merged 2026-11-17 11:05:38 UTC. It squashed 9 branch commits:
+  - `8fb5c1b` T-667: setup-part facts in readTurnState (db/repo/setup) and the setu…
+  - `63a2af1` Merge branch 'main' into task/T-667
+  - `056718c` T-667: work in progress at the usage-limit pause, unchecked (DL-917)
+  - `94510ae` Merge branch 'main' into task/T-667
+  - `dfecbce` T-667: the run 1 snapshot checked: a type error and two files' format…
+  - `6afb75d` T-667: a two-column version read is compared under the commit's busin…
+  - `96ae928` Merge branch 'main' into task/T-667
+  - `b39f0a5` T-667: round 2 (DL-925 item 8): setup facts of tables scoped none rea…
+  - `2a86438` T-667: round 3 (DL-930 item 11): remove the unused UNSCOPED\_ROWS impo…
+- **Files changed:** 8 (+4072 −45), by folder:
+  - `db/repo/` commit-turn.ts +416 −45
+  - `db/repo/setup/` commit-setup.int.test.ts +1189 −0, fact-homes.ts +744 −0, row-names.test.ts +78 −0, row-names.ts +60 −0, turn-state.int.test.ts +964 −0, turn-state.test.ts +111 −0, turn-state.ts +510 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-667: setup-part facts in readTurnState (db/repo/setup) and the setup tables as commitTurn write targets, two-column keys by K-05 v1.18 item 77's name
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-667: work in progress at the usage-limit pause, unchecked (DL-917)
+
+The build run wf_5cda4c48-c94 was stopped at about 00:13Z Nov 17, about 82 minutes in, because this account's week reached 98% (the user's 97%/99% rule). Its edits to db/repo/commit-turn.ts, db/repo/setup/turn-state.ts and its tests (commit-setup.int.test.ts, turn-state.int.test.ts, the new turn-state.test.ts) are saved exactly as they stood, on 63a2af1 (main merged). The resumed builder re-reads them against the card and runs every check; nothing here is verified.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-667: the run 1 snapshot checked: a type error and two files' formatting fixed; proofs for item 77's other names (a pick's text, a draft's block), T-320's whole catalog set with a terms snapshot, and the person-bound tables at their versions
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-667: a two-column version read is compared under the commit's businesses with a write with no business counting as none, and the business an update gives a row that had none (S1-09), never another business's; tests of S1-09's commit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-667: round 2 (DL-925 item 8): setup facts of tables scoped none read only by their rules (K-27 links and busy blocks through a live share or the handle's own person; K-22 codes, sessions and accounts of the handle's people, a code only with no business or the request's); commitTurn refuses a move of a business's row where row-level security does not hold it (busy_blocks, proof_codes), before any write; proofs under a business, another and none
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-667: round 3 (DL-930 item 11): remove the unused UNSCOPED_ROWS import from db/repo/setup/turn-state.int.test.ts, lint's only problem on b39f0a5
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 735. docs: COMMIT\_HISTORY.md through commit 733 (1097f01, \#744) (\#746)
 
