@@ -60,6 +60,21 @@ export type AnswerHandOffAnswer = AnswerHandOffResponse | AnswerHandOffError;
 /** What a hand-off's escalation clock row fires, as K-36's seeds write it. */
 export const ESCALATION_JOB = "hand-off-escalation";
 
+/**
+ * All the owner hears of crisis words (master A3-25: "Rosie's team, and Sam with 'Urgent: a customer may need help'. Never
+ * the words."; K-36 v1 hand_offs.summary, audience owner).
+ */
+export const CRISIS_OWNER_LINE = "Urgent: a customer may need help";
+
+/**
+ * A hand-off's summary as written, only what the owner may hear (K-36 v1 hand_offs.summary; its README rule 4): for crisis
+ * words A3-25's line alone, whatever the caller gave, so no outcome, kind, read id or person's words reaches the owner's
+ * row or its business-scoped entry (telling.ts default 25); any other kind as given.
+ */
+export function ownerSummaryOf(kind: HandOffKind, summary: string): string {
+  return kind === "crisis_words" ? CRISIS_OWNER_LINE : summary;
+}
+
 /** An emergency's or a threat's owner has 5 minutes to reply or tap (arch 06 line 329). */
 export const OWNER_MINUTES = 5;
 
@@ -98,7 +113,7 @@ export interface NewHandOff {
   readonly turnId: string | null;
   readonly bookingId: string | null;
   readonly aboutPersonId: string | null;
-  /** What is handed off, only what the owner may hear (K-36 v1 hand_offs.summary). */
+  /** What is handed off, only what the owner may hear (K-36 v1 hand_offs.summary); crisis words write A3-25's line. */
   readonly summary: string;
   readonly now: string;
   /** For crisis words, whether the team's page opened at once repeats every 5 minutes until acknowledged. */
@@ -217,7 +232,7 @@ export async function openHandOff(handOff: NewHandOff, ports: PagingPorts): Prom
     told_person_id: owner,
     told_as: "owner",
     alert_outbox_row_id: alert?.id ?? null,
-    summary: handOff.summary,
+    summary: ownerSummaryOf(handOff.kind, handOff.summary),
     handed_at: handOff.now,
     escalate_at: escalateAt,
     escalation_clock_row_id: clock?.id ?? null,

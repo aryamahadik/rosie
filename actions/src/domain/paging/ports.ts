@@ -105,6 +105,16 @@ export interface StoredReviewItem {
   readonly version: number;
 }
 
+/**
+ * A row a review reads by its table and primary key: its version, and the business it belongs to (arch 10 line 546), read
+ * together, so the business a decision checks is the one its compare-and-set on that version holds (K-04 v1 rule 2).
+ */
+export interface StoredRow {
+  readonly version: number;
+  /** Its business_id (a businesses row's own id), or null for a row of no business (a draft whose pick has none, K-24). */
+  readonly businessId: string | null;
+}
+
 /** A K-04 v1 clock_rows row's state, as an answer or an acknowledgement cancels it. */
 export interface StoredClock {
   readonly id: string;
@@ -169,11 +179,11 @@ export interface PagingReader {
   /** K-37 review_items by id, or null. */
   reviewItem(reviewItemId: string): Promise<StoredReviewItem | null>;
   /**
-   * The version of a row by its table and primary key, or null when there is none: a review item's subject (K-37 rule
-   * 5: "a review_items row's subject exists", kept by code) and the row a decision writes back to (K-23 business_setup
-   * by its business; K-24 new_work_drafts by id).
+   * A row by its table and primary key, as its version and its business, or null when there is none: a review item's
+   * subject (K-37 rule 5: "a review_items row's subject exists", kept by code) and the row a decision writes back to (K-23
+   * business_setup by its business; K-24 new_work_drafts by id), whose business the decision checks before any write.
    */
-  rowVersion(table: string, rowId: string): Promise<number | null>;
+  row(table: string, rowId: string): Promise<StoredRow | null>;
   /**
    * K-04 outbox_rows: whether a row with this id is written, never its words (K-05 v1.4 readOutboxRowWritten, under the
    * row's business: the page's and the alert's rows are written under the business they are about, K-05 open gap 78).
@@ -195,7 +205,7 @@ export function noPagingReads(call: CallName): PagingReader {
     businessZone: refuse,
     clock: refuse,
     reviewItem: refuse,
-    rowVersion: refuse,
+    row: refuse,
     outboxRowWritten: refuse,
   };
 }

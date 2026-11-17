@@ -11,6 +11,8 @@
 //   - a review item opened and decided as K-37 says.
 // And around them: the telling port's rows for a crisis record and a threat's repeat (K-09 v1.10 defaults 174 to 176),
 // each refusal K-09 lists, the defaults that fail closed, and no number, address or person's words in anything written.
+// Round 2 (DL-930): a crisis-words hand-off's summary is A3-25's line alone (telling.ts default 25), and a decision
+// writes back only to a row of the call's business (review.ts default 29).
 
 import { describe, expect, it } from "vitest";
 
@@ -28,6 +30,7 @@ import {
 } from "./hand-off";
 import {
   acknowledgePageAlone,
+  decideReviewItemAlone,
   handOffAlone,
   openReviewItemCore,
   pageTeamAlone,
@@ -175,6 +178,29 @@ async function pageTeamPlan(options: { environment?: string; roster?: TestRoster
 /** Rows' recipients and classes, as the commit writes them. */
 const rowsOf = (writes: PagingWrites) =>
   writes.messages.map((row) => ({ id: row.id, to: row.recipientHandleId, sendClass: row.sendClass }));
+
+/** A hand-off's summary as its commit writes it: in hand_offs, and in its business-scoped hand_off.created entry. */
+function summariesOf(writes: Pick<PagingWrites, "state" | "stateEvents">) {
+  const insert = writes.state.find((write) => write.op === "insert" && write.table === "hand_offs");
+  const entry = writes.stateEvents.find((each) => each.kind === "hand_off.created");
+  const entryValues: Record<string, unknown> = entry?.newValues ?? {};
+  return {
+    row: insert?.op === "insert" ? insert.values.summary : "no hand_offs row",
+    entry: entryValues.summary,
+    entryBusinessId: entry?.businessId,
+  };
+}
+
+/** What the owner hears of crisis words, and all they hear (master A3-25; DL-930). */
+const URGENT_LINE = "Urgent: a customer may need help";
+
+/** What a crisis-words summary never holds: the topic, the outcome's name, or the read's id (DL-930 item 6). */
+function holdsNoCrisisDetail(summary: unknown, outcomeId: string): void {
+  const lower = String(summary).toLowerCase();
+  for (const word of ["crisis", "suicide", "self-harm", "harm", "crisis words", outcomeId.toLowerCase()]) {
+    expect(lower).not.toContain(word);
+  }
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -983,6 +1009,86 @@ describe("review items are opened and decided as K-37 says", () => {
     valid("openReviewItem", "errors", plan.answer);
   });
 
+  it("refuses deciding new work whose draft is another business's (otherBusiness), with nothing written", async () => {
+    const world = pagingWorld();
+    const open = openExchange("review-item.json");
+    const ids = reviewIds(open.request, "review-lee-tile-repair");
+    applyPagingWrites(
+      world,
+      (await planOpenReviewItem({ request: open.request, now: open.given.now }, portsOf(world, { ids })))
+        .writes,
+    );
+    const decide = decideExchange("new-work-approved.json");
+    const committed: AloneCommitRequest[] = [];
+    const commitAlone: AloneCommit<null> = {
+      commit(request) {
+        committed.push(request);
+        return Promise.resolve({ committed: true, repeated: false });
+      },
+    };
+    const deps = {
+      reader: () => readerOn(world),
+      ids: fixturePagingIds(ids),
+      now: () => decide.given.now,
+      commitAlone,
+    };
+    const draft = "new_work_drafts/draft-lee-tile-repair";
+    // The item and the caller are Lee Home Services'. The draft is Lee's Barbershop's, then of no business; and a
+    // console caller with no business is held to the item's.
+    const cases = [
+      { draftBusiness: BARBERSHOP, callerBusiness: HOME_SERVICES },
+      { draftBusiness: null, callerBusiness: HOME_SERVICES },
+      { draftBusiness: BARBERSHOP, callerBusiness: null },
+    ];
+    for (const { draftBusiness, callerBusiness } of cases) {
+      world.rows.set(draft, { version: 2, businessId: draftBusiness });
+      const request = { ...decide.request, caller: { ...decide.request.caller, businessId: callerBusiness } };
+      const refused = await decideReviewItemAlone(request, null, callerBusiness, deps).then(
+        () => "answered",
+        (error: unknown) => error,
+      );
+      expect(refused).toBeInstanceOf(PagingRefusedError);
+      expect(refused).toMatchObject({
+        fault: "otherBusiness",
+        rowIds: ["review-lee-tile-repair", "draft-lee-tile-repair"],
+      });
+    }
+    // Nothing written: no commit was made, the item is still open at version 1 and the draft still at version 2.
+    expect(committed).toEqual([]);
+    expect(world.reviewItems.get("review-lee-tile-repair")).toMatchObject({ state: "open", version: 1 });
+    expect(world.rows.get(draft)?.version).toBe(2);
+
+    // The draft Lee Home Services' again: the same decision commits once and writes it back.
+    world.rows.set(draft, { version: 2, businessId: HOME_SERVICES });
+    expect(await decideReviewItemAlone(decide.request, null, HOME_SERVICES, deps)).toEqual(decide.outcome);
+    expect(committed).toHaveLength(1);
+  });
+
+  it("refuses a control decision that writes back to a setup of another business than the caller's (default 29)", async () => {
+    const world = pagingWorld();
+    const open = openExchange("control-team-review.json");
+    // An item opened about Lee Home Services' setup with no business of its own, decided under Lee's Barbershop.
+    const request = { ...open.request, caller: { ...open.request.caller, businessId: null } };
+    const ports = portsOf(world, { ids: reviewIds(request, "review-lee-home-control") });
+    applyPagingWrites(world, (await planOpenReviewItem({ request, now: open.given.now }, ports)).writes);
+    const decide = decideExchange("control-team-decided.json");
+    const refused = await planDecideReviewItem(
+      {
+        request: { ...decide.request, caller: { ...decide.request.caller, businessId: BARBERSHOP } },
+        now: decide.given.now,
+      },
+      ports,
+    ).then(
+      () => "answered",
+      (error: unknown) => error,
+    );
+    expect(refused).toMatchObject({
+      fault: "otherBusiness",
+      rowIds: ["review-lee-home-control", HOME_SERVICES],
+    });
+    expect(world.rows.get(`business_setup/${HOME_SERVICES}`)?.version).toBe(1);
+  });
+
   it("dues: 1 business day skips the weekend and keeps the local time across a clock change; same-day kinds end at midnight", () => {
     // Friday Oct 30, 10:00 New York (EDT) is due Monday Nov 2, 10:00 New York (EST): one more hour in UTC.
     expect(dueAtOf("control", "2026-10-30T14:00:00Z", NEW_YORK)).toBe("2026-11-02T15:00:00Z");
@@ -1083,6 +1189,66 @@ describe("the telling port (T-318's SafetyTelling) writes and names its rows as 
     );
     expect(again.writes.state).toEqual([]);
     expect(again.writes.messages).toEqual([]);
+  });
+
+  it("crisis words: the hand-off's summary is A3-25's line alone, in hand_offs and in its hand_off.created entry", async () => {
+    const telling = createPagingTelling(portsOf(pagingWorld(), { ids: CRISIS_IDS }));
+    const plan = await telling.tell(crisisTell());
+    const written = summariesOf(plan.writes);
+    expect(written).toEqual({ row: URGENT_LINE, entry: URGENT_LINE, entryBusinessId: BARBERSHOP });
+    holdsNoCrisisDetail(written.row, "safety-outcome-alex-0203");
+    holdsNoCrisisDetail(written.entry, "safety-outcome-alex-0203");
+    // The kind and the read stay in the team's page summary, which no business reads (K-36 rule 2; README rule 4).
+    const page = plan.writes.state.find((write) => write.op === "insert" && write.table === "team_pages");
+    expect(page?.op === "insert" ? page.values.summary : "no page").toBe(
+      "Hand-off handoff-alex-crisis at biz-lees-barbershop: crisis words, read from safety-outcome-alex-0203; " +
+        "Rosie's team and the owner are told at once.",
+    );
+  });
+
+  it("a handOff call for crisis words writes A3-25's line too, whatever summary its caller gave", async () => {
+    const request: HandOffRequest = {
+      caller: {
+        kind: "turn",
+        turnId: "turn-alex-0303",
+        requestId: "turn-alex-0303",
+        businessId: BARBERSHOP,
+        personId: ALEX,
+        traceId: "trace-alex-0303",
+      },
+      kind: "crisis_words",
+      about: "other",
+      safetyOutcomeId: "safety-outcome-alex-0303",
+      bookingId: null,
+      aboutPersonId: ALEX,
+      summary: "A safety read (safety-outcome-alex-0303) found crisis words: self-harm.",
+    };
+    valid("handOff", "request", request);
+    const plan = await planHandOff(
+      { request, businessId: BARBERSHOP, now: "2026-10-26T15:00:00Z" },
+      portsOf(pagingWorld()),
+    );
+    const written = summariesOf(plan.writes);
+    expect(written).toEqual({ row: URGENT_LINE, entry: URGENT_LINE, entryBusinessId: BARBERSHOP });
+    holdsNoCrisisDetail(written.row, "safety-outcome-alex-0303");
+    holdsNoCrisisDetail(written.entry, "safety-outcome-alex-0303");
+  });
+
+  it("an emergency's and a threat's hand-offs keep their owner lines, unchanged", async () => {
+    const cases = [
+      ["An emergency", "an emergency"],
+      ["A threat to staff or others", "a threat to staff or others"],
+    ] as const;
+    for (const [outcome, words] of cases) {
+      const telling = createPagingTelling(portsOf(pagingWorld()));
+      const plan = await telling.tell({
+        ...crisisTell(),
+        outcomeId: "safety-outcome-alex-0204",
+        outcomes: [outcome],
+      });
+      const line = `A safety read (safety-outcome-alex-0204) found ${words}.`;
+      expect(summariesOf(plan.writes)).toEqual({ row: line, entry: line, entryBusinessId: BARBERSHOP });
+    }
   });
 
   it("answers notBuilt for a record with no turn (K-09 v1.10 default 178: its clock turn is not built)", async () => {

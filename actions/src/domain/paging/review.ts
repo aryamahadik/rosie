@@ -20,6 +20,10 @@
 //      new work its new_work_drafts row. The write-back has no K-08 kind (K-09 README open gap 1), so no entry is written
 //      for it.
 //  22. A decided item asked again with the same outcome answers repeated; with another, or a wait, alreadyDone.
+//  29. The row a done decision writes back to belongs to the call's business, checked before any write (arch 10 line
+//      546; the security reviewer's note c on round 1): the caller's business, else the item's. A row of another business,
+//      or of none while the call has one, is refused (otherBusiness: nothing is written); with neither, nothing is
+//      checked (Rosie's team on an item about no business). The business is read with the version the write compares.
 
 import type { RowRef, StateWrite } from "../../commit";
 import type { ErrorsOf, RequestOf, ResponseOf } from "../../tool-api";
@@ -104,7 +108,7 @@ export async function planOpenReviewItem(
   const stored = await ports.reader.reviewItem(reviewItemId);
   if (stored !== null) return nothing({ reviewItemId, dueAt: stored.dueAt, repeated: true });
   // The row under review exists (K-37 rule 5, kept by code).
-  if (subject !== null && (await ports.reader.rowVersion(subject.table, subject.rowId)) === null) {
+  if (subject !== null && (await ports.reader.row(subject.table, subject.rowId)) === null) {
     return nothing({ error: "notFound", table: subject.table, rowId: subject.rowId });
   }
 
@@ -184,6 +188,7 @@ function writeBackOf(item: StoredReviewItem, decision: Done, now: string): Write
     case "new_work": {
       if (back?.table !== "new_work_drafts" || subject === null) return "refused";
       if (item.subjectTable !== "new_work_drafts") return "refused";
+      // The draft's business is read with its version and checked against the call's before any write (default 29).
       return { table: "new_work_drafts", key: { id: subject }, rowId: subject, set: { state: back.state } };
     }
     default:
@@ -257,10 +262,16 @@ export async function planDecideReviewItem(
   const written: RowRef[] = [itemWritten];
   let backWrite: StateWrite | null = null;
   if (back !== null && back.set !== null) {
-    const version = await ports.reader.rowVersion(back.table, back.rowId);
-    if (version === null) return nothing({ error: "notFound", table: back.table, rowId: back.rowId }, step);
-    backWrite = { op: "update", table: back.table, key: back.key, expectVersion: version, set: back.set };
-    written.push({ table: back.table, rowId: back.rowId, version: version + 1 });
+    const row = await ports.reader.row(back.table, back.rowId);
+    if (row === null) return nothing({ error: "notFound", table: back.table, rowId: back.rowId }, step);
+    // The row written back to is the call's business's, before any write (default 29): a new-work draft of another
+    // business, or a business's setup other than the caller's, is refused with nothing written.
+    const scope = caller.businessId ?? item.businessId;
+    if (scope !== null && row.businessId !== scope) {
+      throw new PagingRefusedError("otherBusiness", [item.id, back.rowId]);
+    }
+    backWrite = { op: "update", table: back.table, key: back.key, expectVersion: row.version, set: back.set };
+    written.push({ table: back.table, rowId: back.rowId, version: row.version + 1 });
   }
   return {
     key,

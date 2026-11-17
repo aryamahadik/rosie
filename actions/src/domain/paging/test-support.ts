@@ -20,6 +20,7 @@ import type {
   StoredHandOff,
   StoredPage,
   StoredReviewItem,
+  StoredRow,
   TeamMember,
   TestRoster,
 } from "./ports";
@@ -50,8 +51,11 @@ export interface PagingWorld {
   readonly owners: Map<string, string>;
   readonly zones: Map<string, string>;
   readonly clocks: Map<string, StoredClock & { readonly dueAt: string | null }>;
-  /** Other rows by `<table>/<id>`, with their versions: a review's subject and the row a decision writes back to. */
-  readonly rows: Map<string, number>;
+  /**
+   * Other rows by `<table>/<id>`, with their versions and businesses: a review's subject and the row a decision writes
+   * back to.
+   */
+  readonly rows: Map<string, StoredRow>;
   /** Every outbox row written, by id, with its recipient handle and send class. */
   readonly outbox: Map<string, { readonly recipientHandleId: string; readonly sendClass: string }>;
 }
@@ -59,7 +63,8 @@ export interface PagingWorld {
 /**
  * The world the tests start from: Rosie's team of two (each with an open iMessage chat, added before October), Sam the
  * barbershop's owner and Pat whom he named (each with an open chat), the two demo shops in New York's zone, and the rows
- * the review fixtures point at (K-24's tile-repair draft at version 2, K-23's business_setup of Lee Home Services at 1).
+ * the review fixtures point at (K-24's tile-repair draft at version 2, K-23's business_setup at 1, both Lee Home
+ * Services').
  */
 export function pagingWorld(): PagingWorld {
   const chat = (handleId: string): ChatState => ({ handleId, open: true, way: "imessage" });
@@ -103,8 +108,8 @@ export function pagingWorld(): PagingWorld {
     ]),
     clocks: new Map(),
     rows: new Map([
-      ["new_work_drafts/draft-lee-tile-repair", 2],
-      ["business_setup/biz-lee-home-services", 1],
+      ["new_work_drafts/draft-lee-tile-repair", { version: 2, businessId: HOME_SERVICES }],
+      ["business_setup/biz-lee-home-services", { version: 1, businessId: HOME_SERVICES }],
     ]),
     outbox: new Map(),
   };
@@ -134,7 +139,7 @@ export function readerOn(world: PagingWorld): PagingReader & { readonly asked: s
       );
     },
     reviewItem: (reviewItemId) => read("reviewItem", world.reviewItems.get(reviewItemId) ?? null),
-    rowVersion: (table, rowId) => read("rowVersion", world.rows.get(`${table}/${rowId}`) ?? null),
+    row: (table, rowId) => read("row", world.rows.get(`${table}/${rowId}`) ?? null),
     outboxRowWritten: (rowId) => read("outboxRowWritten", world.outbox.has(rowId)),
   };
 }
@@ -278,9 +283,9 @@ export function applyPagingWrites(world: PagingWorld, writes: PagingWrites): voi
         });
       } else {
         const name = `${write.table}/${id}`;
-        const version = world.rows.get(name);
-        if (version !== write.expectVersion) throw new StaleRowError(write.table, id);
-        world.rows.set(name, version + 1);
+        const row = world.rows.get(name);
+        if (row?.version !== write.expectVersion) throw new StaleRowError(write.table, id);
+        world.rows.set(name, { ...row, version: row.version + 1 });
       }
     }
   }

@@ -25,14 +25,19 @@
 //  24. A record with no turn (a page's or an agent's free text) tells by a clock row due at once on each reader's handle
 //      (K-09 v1.10 default 178; v1.4 default 112), whose clock turn is not built: it answers notBuilt, as NOT_TOLD_YET
 //      did, and nothing is written (fail closed).
-//  25. The hand-off's summary is the safety read's id and its outcome's name, in plain words with no private value
-//      (K-36 hand_offs.summary); the owner's own alert words are the bundle's, written into the alert's row after the
-//      commit like every row's.
+//  25. (Round 2, DL-930: the security reviewer's FAIL 1.) A safety read's hand-off summary holds only what the owner may
+//      hear (K-36 v1 hand_offs.summary, audience owner; its README rule 4; master A3-25: "Never the words"). Crisis
+//      words: exactly A3-25's "Urgent: a customer may need help", with no outcome name, kind or read id and none of the
+//      person's words (hand-off.ts ownerSummaryOf writes it whatever the caller gave). An emergency and a threat keep
+//      their owner lines, the read and its kind, which their owner lines tell the owner themselves (K-36's
+//      seed-page-acknowledged.json; A3-48). Any other safety outcome whose owner line the master does not give: A3-25's
+//      line. The kind and the read stay in the team's page summary (team_pages.summary), for Rosie's team; the owner's
+//      own alert words are the bundle's, written into the alert's row after the commit like every row's.
 
 import { NotBuiltError } from "../../tool-api";
 import type { SafetyOutcome, SafetyTelling, SafetyTold, TellPlan, TellRequest } from "../safety";
 import { PagingRefusedError } from "./errors";
-import { handOffKeyOf, handOffPageKey, openHandOff } from "./hand-off";
+import { CRISIS_OWNER_LINE, handOffKeyOf, handOffPageKey, openHandOff } from "./hand-off";
 import { rowsOfPage, type PagingPorts } from "./page";
 import type { HandOffKind } from "./ports";
 import { tellWritesOf } from "./writes";
@@ -59,12 +64,15 @@ export function tellingKindOf(outcomes: readonly SafetyOutcome[]): Exclude<HandO
   return null;
 }
 
-/** The outcome's name in a hand-off's summary (default 25). */
-const OUTCOME_WORDS: Readonly<Record<Exclude<HandOffKind, "other">, string>> = {
-  crisis_words: "crisis words",
-  emergency: "an emergency",
-  threat: "a threat to staff or others",
-};
+/**
+ * A safety read's hand-off summary, only what the owner may hear (default 25): an emergency's and a threat's owner lines;
+ * A3-25's line for crisis words and for any outcome whose owner line the master does not give.
+ */
+export function safetySummaryOf(kind: Exclude<HandOffKind, "other">, outcomeId: string): string {
+  if (kind === "emergency") return `A safety read (${outcomeId}) found an emergency.`;
+  if (kind === "threat") return `A safety read (${outcomeId}) found a threat to staff or others.`;
+  return CRISIS_OWNER_LINE;
+}
 
 /** The telling port over the paging service's reads (T-318's SafetyTelling shape). Reads only. */
 export function createPagingTelling(ports: PagingPorts): PagingTelling {
@@ -115,7 +123,7 @@ export function createPagingTelling(ports: PagingPorts): PagingTelling {
           turnId: request.turnId,
           bookingId: request.bookingId,
           aboutPersonId: request.personId,
-          summary: `A safety read (${request.outcomeId}) found ${OUTCOME_WORDS[kind]}.`,
+          summary: safetySummaryOf(kind, request.outcomeId),
           now: request.now,
           pageRepeats:
             request.outcomes.includes("An emergency") ||
