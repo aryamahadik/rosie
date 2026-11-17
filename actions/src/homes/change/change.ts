@@ -465,7 +465,8 @@ export function standInWhy(booking: ChangeBooking, standIn: StandIn): StandInWhy
   if (!standIn.staffRulesHold) return "staffRules";
   const booked = booking.price;
   const theirs = standIn.price;
-  if (booked === null || theirs === null || booked.currency !== theirs.currency) return "priceNotKnown";
+  if (booked === null || theirs === null) return "priceNotKnown";
+  if (booked.currency !== theirs.currency) return "priceNotKnown";
   return theirs.cents > booked.cents ? "higherPrice" : "allowed";
 }
 

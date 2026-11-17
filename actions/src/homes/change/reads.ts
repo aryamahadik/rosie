@@ -37,7 +37,8 @@ export async function readChangeBooking(
   if (!isId(asked)) throw new ChangeHomeError("the request names no booking");
   const businessId = reads.access.businessId;
   const head = await reads.bookingHead(asked);
-  if (head === null || head.id !== asked || head.businessId !== businessId) return null;
+  if (head === null) return null;
+  if (head.id !== asked || head.businessId !== businessId) return null;
   const decides = await reads.access.whoDecides({ kind: "visit", bookingId: asked });
   return {
     bookingId: asked,
