@@ -2,9 +2,57 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 723, [`7ca9f87`](https://github.com/aryamahadik/rosie/commit/7ca9f87), 2026-11-17 01:25:37 UTC.
+- **Through:** commit 725, [`f414c35`](https://github.com/aryamahadik/rosie/commit/f414c35), 2026-11-17 03:24:24 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 725. docs: COMMIT\_HISTORY.md through commit 723 (7ca9f87, \#734) (\#736)
+
+- **Commit:** [`f414c35`](https://github.com/aryamahadik/rosie/commit/f414c35), by Arya Mahadik, 2026-11-17 03:24:24 UTC
+- **Pull request:** [#736](https://github.com/aryamahadik/rosie/pull/736) from `task/commit-history-155`, merged 2026-11-17 03:24:25 UTC. It squashed 1 branch commit:
+  - `3345d84` docs: COMMIT\_HISTORY.md through commit 723 (7ca9f87, \#734)
+- **Files changed:** 1 (+72 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +72 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated after train 248 (DL-922) with scratch/build/lead/commit-history.mjs; prettier's check passes with the train worktree's ignore file (DL-796).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 724. T-1121 round 2: the Linq live spike's masked samples and findings from the two live runs (DL-923) (\#735)
+
+- **Commit:** [`4c6494c`](https://github.com/aryamahadik/rosie/commit/4c6494c), by Arya Mahadik, 2026-11-17 03:24:21 UTC
+- **Pull request:** [#735](https://github.com/aryamahadik/rosie/pull/735) from `task/T-1121-r2`, merged 2026-11-17 03:24:21 UTC. It squashed 2 branch commits:
+  - `6e3a2ff` T-1121: round 2: the two live runs' masked samples in samples/, and w…
+  - `e2eb002` T-1121 round 2: FINDINGS.md answers from the live runs, written by th…
+- **Files changed:** 9 (+502 −34), by folder:
+  - `adapters/spikes/linq-live/` FINDINGS.md +48 −16, wire.mjs +25 −18
+  - `adapters/spikes/linq-live/samples/` live-2026-11-17T00-27-34Z-01-capability-check\_imessage.json +35 −0, live-2026-11-17T00-27-34Z-02-capability-check\_rcs.json +35 −0, live-2026-11-17T00-27-34Z-03-send-send.json +105 −0, live-2026-11-17T00-27-34Z-run.json +57 −0, live-2026-11-17T00-37-18Z-01-stopped-send.json +51 −0, live-2026-11-17T00-37-18Z-02-stopped-override-send.json +105 −0, live-2026-11-17T00-37-18Z-run.json +41 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1121: round 2: the two live runs' masked samples in samples/, and wire.mjs's comments record the confirmed send and the missing contacts/add (no code path change)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1121 round 2: FINDINGS.md answers from the live runs, written by the lead from the builder's text (DL-923)
+
+The harness refused the builder's write of FINDINGS.md ("Subagents should return findings as text"), so the lead wrote the builder's returned findings_text, unchanged, over phase 1's pending file. prettier's check passes; probe.test.mjs 13/13 (its scan reads FINDINGS.md and samples/: no key, no unmasked number, no number outside the fiction range).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 723. docs: COMMIT\_HISTORY.md through commit 721 (262c2ec, \#732) (\#734)
 
