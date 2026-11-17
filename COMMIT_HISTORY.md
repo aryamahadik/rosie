@@ -2,9 +2,114 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 737, [`6a6e33b`](https://github.com/aryamahadik/rosie/commit/6a6e33b), 2026-11-17 11:05:41 UTC.
+- **Through:** commit 741, [`8f40a70`](https://github.com/aryamahadik/rosie/commit/8f40a70), 2026-11-17 11:44:31 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 741. docs: COMMIT\_HISTORY.md through commit 737 (6a6e33b, \#748) (\#752)
+
+- **Commit:** [`8f40a70`](https://github.com/aryamahadik/rosie/commit/8f40a70), by Arya Mahadik, 2026-11-17 11:44:31 UTC
+- **Pull request:** [#752](https://github.com/aryamahadik/rosie/pull/752) from `task/commit-history-162`, merged 2026-11-17 11:44:31 UTC. It squashed 1 branch commit:
+  - `e703ffd` docs: COMMIT\_HISTORY.md through commit 737 (6a6e33b, \#748)
+- **Files changed:** 1 (+70 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +70 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 740. T-1429: bind the catalog's read port and limit 2's owner rules to K-05 v1.18's reads on PostgreSQL (\#751)
+
+- **Commit:** [`9c7e30a`](https://github.com/aryamahadik/rosie/commit/9c7e30a), by Arya Mahadik, 2026-11-17 11:44:26 UTC
+- **Pull request:** [#751](https://github.com/aryamahadik/rosie/pull/751) from `task/T-1429`, merged 2026-11-17 11:44:27 UTC. It squashed 1 branch commit:
+  - `c590184` T-1429: bind the catalog's read port and limit 2's owner rules to K-0…
+- **Files changed:** 10 (+1716 −5), by folder:
+  - `actions/src/domain/catalog/pg/` index.ts +11 −0, reads.int.test.ts +390 −0, reads.test.ts +385 −0, reads.ts +378 −0, test-support.ts +303 −0
+  - `actions/src/gate/limit-2/` facts.ts +5 −4, index.ts +2 −1
+  - `actions/src/gate/limit-2/pg/` index.ts +10 −0, owner-rules.test.ts +120 −0, owner-rules.ts +112 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+actions/src/domain/catalog/pg: T-320's CatalogReads over db/repo/catalog-reads.ts's five standalone reads on the rosie_app client, under the call's own business; field by field; notFound and transient thrown as CatalogReadError carrying K-05's answer; another business, asked or answered, fails closed; db/repo's throws pass unchanged. actions/src/gate/limit-2/pg: OwnerRules.rulesOf over readTermsSources' rules as RuleRow. Unit tests with fakes over the v1.18 exchanges; an integration test against the fixture set v1 seeds.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 739. T-319: the safety and hand-offs service: paging Rosie's team, acknowledgements, hand-offs, review items (\#750)
+
+- **Commit:** [`b0dc352`](https://github.com/aryamahadik/rosie/commit/b0dc352), by Arya Mahadik, 2026-11-17 11:44:22 UTC
+- **Pull request:** [#750](https://github.com/aryamahadik/rosie/pull/750) from `task/T-319`, merged 2026-11-17 11:44:22 UTC. It squashed 3 branch commits:
+  - `5950e97` T-319: paging and hand-offs service (pageTeam, acknowledgePage, handO…
+  - `f4b911b` Merge branch 'main' into worktree-wf\_66cb49e2-bf7-1
+  - `9579a86` T-319: round 2 (DL-930): a crisis-words hand-off's summary is A3-25's…
+- **Files changed:** 14 (+4747 −0), by folder:
+  - `actions/src/domain/paging/` errors.ts +48 −0, hand-off.ts +483 −0, handlers.ts +387 −0, ids.ts +59 −0, index.ts +140 −0, page.ts +671 −0, paging.test.ts +1430 −0, ports.ts +229 −0, recipients.ts +156 −0, review.ts +313 −0, telling.ts +143 −0, test-support.ts +341 −0, time.ts +138 −0, writes.ts +209 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-319: paging and hand-offs service (pageTeam, acknowledgePage, handOff, answerHandOff, review items, telling port) with its proofs
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-319: round 2 (DL-930): a crisis-words hand-off's summary is A3-25's line alone; a review decision writes back only to a row of the call's business
+
+Item 6: telling.ts default 25 and hand-off.ts ownerSummaryOf write exactly 'Urgent: a customer may need help' to hand_offs.summary and the hand_off.created entry for crisis words (the telling port and a handOff call alike); the emergency and threat summaries are unchanged. Item 7: review.ts reads the row written back to with its business (PagingReader.row) and refuses one of another business than the caller's, else the item's (otherBusiness, nothing written), for new_work and control alike (default 29). Tests: 5 new cases, 40/40.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 738. T-1435: while verify is off, the corrections layer drops the check claims from T-140's six MESSAGES\_NEED messages (MC:C7) (\#749)
+
+- **Commit:** [`0051847`](https://github.com/aryamahadik/rosie/commit/0051847), by Arya Mahadik, 2026-11-17 11:44:18 UTC
+- **Pull request:** [#749](https://github.com/aryamahadik/rosie/pull/749) from `task/T-1435`, merged 2026-11-17 11:44:18 UTC. It squashed 4 branch commits:
+  - `a43d84b` T-1435: a scratch file for a read-only scan, removed by the next commit
+  - `3326c7d` Revert "T-1435: a scratch file for a read-only scan, removed by the n…
+  - `d0c4cf8` T-1435: C7's step in the frame drops the check claim from the six mes…
+  - `07fce6b` T-1435: drop an unused binding in the S12-19 pin test (lint)
+- **Files changed:** 2 (+500 −74), by folder:
+  - `compiler/src/corrections/` c7.test.ts +392 −58, c7.ts +108 −16
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1435: a scratch file for a read-only scan, removed by the next commit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* Revert "T-1435: a scratch file for a read-only scan, removed by the next commit"
+
+This reverts commit a43d84bd21d6000484e53cd0b36a71cf11aaca16.
+
+* T-1435: C7's step in the frame drops the check claim from the six messages MESSAGES_NEED held; S12-19's passive lines listed under VERIFY_ONLY
+
+notary's S1-23 card line reads Sam Lee · NP045210 (CQ-353's default); dog-walker's two S11-50 messages drop the city's records claim; tires', vehicle-wrap's and window-tint's S1-38 lines read so I'll show the business registration as you give it. Each change is tagged MC:C7 by the frame and carried into the words op by correctWordsOps; C7ClaimError is unchanged. MESSAGES_NEED is empty, each entry pinned by raw text in CORRECTED_MESSAGES. The scan reads S12-19's passive wordings (DL-926) and lists each under VERIFY_ONLY, pinned by place.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1435: drop an unused binding in the S12-19 pin test (lint)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 737. docs: COMMIT\_HISTORY.md through commit 735 (dc02106, \#746) (\#748)
 

@@ -89,6 +89,13 @@ jobs:
       - name: CI script tests (the guards and the PreToolUse hook)
         run: node --test "infra/ci/*.test.mjs"
 
+      # T-1440 (DL-927): the Linq live probe's own test (T-1121) is in no Vitest project and outside the CI script
+      # tests' glob, so this step runs it. It fails on a key shape, an authorization header or an unmasked phone
+      # number in any recorded sample (adapters/spikes/linq-live/samples/). No network call: each run is a dry run
+      # against its stand-in on 127.0.0.1. infra/ci/ci-linq-probe.test.mjs pins this step here and in merge-check.yml.
+      - name: Linq probe test (no key or unmasked number in its recorded samples; never live)
+        run: npm run test:linq-probe
+
       - name: Test guard (no fewer tests, no new skip, todo or only)
         run: npm run guard:tests
 

@@ -116,6 +116,7 @@ test("no job or step is removed", () => {
     "Type check",
     "Tests (unit, workers, contract)",
     "CI script tests (the guards and the PreToolUse hook)",
+    "Linq probe test (no key or unmasked number in its recorded samples; never live)",
     "Test guard (no fewer tests, no new skip, todo or only)",
     "Migration guard (migrations only expand)",
     "Frozen-contract guard (no edit to a schema or fixture of a frozen version)",
