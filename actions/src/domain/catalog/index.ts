@@ -13,6 +13,7 @@ export {
   checkLocation,
   checkSpace,
   checkWorker,
+  priceFieldsOf,
   rulesPricing,
 } from "./checks";
 export { CatalogRefusedError, isCatalogRefusal, notBuiltFor, type CatalogRefusal } from "./errors";

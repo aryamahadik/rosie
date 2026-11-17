@@ -2,11 +2,13 @@
 // notes N1): each rule across rows that the database does not hold alone, made by the service before any write, from
 // what its reads answer (reads.ts). Each refusal names its rule (errors.ts), and a refused call writes nothing.
 //   (a) depositOverPrice      a deposit is never over the price known then: the way's price rules in effect at or after
-//                             the save, its place's rules, else the service's own (README ruling 4 (a)); on a list path
-//                             each rule's price, on a visit path each rule's starting price (A4-13: "never more than the
-//                             starting price"). A percent is under the price by its form (1 to 99), and a photos path's
-//                             deposit is checked against its quote at booking (K-30), so neither is checked here. The same
-//                             check at a price's save: a rule never prices a way under its deposit (read 3).
+//                             the save, its place's rules, else the service's own (README ruling 4 (a)), at each instant
+//                             and for each booking (rulesPricing); on a list path each rule's price, on a visit path each
+//                             rule's starting price (A4-13: "never more than the starting price"). A percent is under the
+//                             price by its form (1 to 99), and a photos path's deposit is checked against its quote at
+//                             booking (K-30), so neither is checked here. The same check at a price's save (an add, a
+//                             change, a withdrawal or a close): no rule the save leaves pricing a way, and not pricing it
+//                             before, is under its deposit (read 3).
 //   (b) noPriceInEffect       a list-priced way has a price rule of its place or of the service in effect at its save.
 //   (c) locationNotOnBusiness a way's location is one of the business's (a location of another business, or none, reads
 //                             as null under the call's scope);
@@ -24,7 +26,7 @@
 // than the way's is refused (currencyMismatch), never compared.
 
 import { refuse } from "./errors";
-import { inEffectAt, isEmpty, rangeOf } from "./prices";
+import { inEffectAt, isEmpty, rangeOf, sameConditions } from "./prices";
 import { takesNoMoney } from "./rows";
 import type {
   BusinessKind,
@@ -77,13 +79,46 @@ export function checkLocation(
 }
 
 /**
- * The rules that price a way, of `rules` (those in effect at or after the time read): its place's, else the service's
- * own (README ruling 4 (a)); a price withdrawn before it started holds no instant and prices nothing.
+ * Whether rules of the way's place with a service rule's other conditions (its worker, days and clock times) cover the
+ * service rule's dates from `fromMs` on: there, for every booking it would price at the way, a rule of the place with one
+ * condition more is in effect and wins (K-25 "How a price is found": the most conditions set win).
  */
-export function rulesPricing(wayId: string, rules: readonly PriceRuleRow[]): PriceRuleRow[] {
+function placeCovers(
+  rule: PriceRuleRow,
+  placed: readonly PriceRuleRow[],
+  wayId: string,
+  fromMs: number,
+): boolean {
+  const atPlace = { ...rule.conditions, serviceMoneyId: wayId };
+  const ranges = placed
+    .filter((each) => sameConditions(each.conditions, atPlace))
+    .map(rangeOf)
+    .sort((a, b) => a.from - b.from);
+  const own = rangeOf(rule);
+  let from = Math.max(own.from, fromMs);
+  for (const range of ranges) {
+    if (own.to !== null && from >= own.to) return true;
+    if (range.from > from) return false;
+    if (range.to === null) return true;
+    from = Math.max(from, range.to);
+  }
+  return own.to !== null && from >= own.to;
+}
+
+/**
+ * The rules that price a way at some instant from `fromMs` (its save) on, of `rules` (those in effect at or after it):
+ * every rule of its place, and every rule of the service's own but one its place's rules cover there (README ruling
+ * 4 (a): "its place's rule, else the service's own", at each instant and for each booking: a place's price set for a
+ * later date, or on some days only, leaves the service's own pricing the way meanwhile). A price withdrawn before it
+ * started holds no instant and prices nothing.
+ */
+export function rulesPricing(wayId: string, rules: readonly PriceRuleRow[], fromMs: number): PriceRuleRow[] {
   const live = rules.filter((rule) => !isEmpty(rangeOf(rule)));
   const placed = live.filter((rule) => rule.conditions.serviceMoneyId === wayId);
-  return placed.length > 0 ? placed : live.filter((rule) => rule.conditions.serviceMoneyId === null);
+  const own = live.filter(
+    (rule) => rule.conditions.serviceMoneyId === null && !placeCovers(rule, placed, wayId, fromMs),
+  );
+  return [...placed, ...own];
 }
 
 /** (b) An active list-priced way has a price rule of its place or of the service in effect at `atMs`, its save. */
@@ -101,42 +136,71 @@ export function checkListPriced(
   if (!priced) refuse("noPriceInEffect", ["path"]);
 }
 
-/**
- * (a) An active way's deposit in cents is never over the price known then by any rule that prices it (`rules`, in effect
- * at or after its save): on a list path each rule's price, on a visit path each rule's starting price, and a visit path
- * with no starting price known takes no deposit (fails closed). `fields` name what the refusal blames: the deposit at the
- * way's save, the price at the price's.
- */
-export function checkDeposit(
-  way: Pick<WayRow, "id" | "path" | "active" | "depositCents" | "currency">,
-  rules: readonly PriceRuleRow[],
+/** The way's deposit in cents when (a) holds it: an active way's on a list or visit path; else null (nothing to hold). */
+function heldDeposit(way: Pick<WayRow, "path" | "active" | "depositCents">): number | null {
+  const priced = pricedBy(way.path);
+  return way.active && (priced === "list" || priced === "visit") ? way.depositCents : null;
+}
+
+/** (a) A deposit is never over a rule's known price: a list path's price, a visit path's starting price (A4-13). */
+function checkUnder(
+  way: Pick<WayRow, "path" | "currency">,
+  deposit: number,
+  pricing: readonly PriceRuleRow[],
   fields: readonly string[],
 ): void {
-  const deposit = way.depositCents;
-  const priced = pricedBy(way.path);
-  if (deposit === null || !way.active || (priced !== "list" && priced !== "visit")) return;
-  const pricing = rulesPricing(way.id, rules);
-  if (priced === "visit" && pricing.length === 0) refuse("depositOverPrice", fields);
   for (const rule of pricing) {
     if (rule.currency !== way.currency) refuse("currencyMismatch", ["currency"]);
-    const known = priced === "list" ? rule.priceCents : rule.fromCents;
+    const known = pricedBy(way.path) === "list" ? rule.priceCents : rule.fromCents;
     if (known === null || deposit > known) refuse("depositOverPrice", fields);
   }
 }
 
 /**
- * (a) at a price's save: every active way the new rule prices among `rulesAfter` (the service's rules as the save leaves
- * them, the new one among them) keeps its deposit under the new rule's known price (README ruling 4 (a), read 3).
+ * (a) An active way's deposit in cents is never over the price known then by any rule that prices it from `fromMs` (its
+ * save) on (`rules`, in effect at or after it; rulesPricing): on a list path each rule's price, on a visit path each
+ * rule's starting price, and a visit path with no starting price known takes no deposit (fails closed). `fields` name
+ * what the refusal blames: the deposit at the way's save.
+ */
+export function checkDeposit(
+  way: Pick<WayRow, "id" | "path" | "active" | "depositCents" | "currency">,
+  rules: readonly PriceRuleRow[],
+  fromMs: number,
+  fields: readonly string[],
+): void {
+  const deposit = heldDeposit(way);
+  if (deposit === null) return;
+  const pricing = rulesPricing(way.id, rules, fromMs);
+  if (pricedBy(way.path) === "visit" && pricing.length === 0) refuse("depositOverPrice", fields);
+  checkUnder(way, deposit, pricing, fields);
+}
+
+/**
+ * (a) at a price's save (README ruling 4 (a), read 3): every active way of the service keeps its deposit under each rule
+ * that prices it from `fromMs` (the save) on among `rulesAfter` (the service's rules as the save leaves them) and did
+ * not among `rulesBefore` (as read): the rule an add or a change opens, the price a withdrawal opens again, or a
+ * service's own price a closed or withdrawn price of the way's place no longer covers. A rule that priced the way before
+ * was held at its own save. `fieldsOf` names what the refusal blames for a way.
  */
 export function checkDepositsUnder(
-  rule: PriceRuleRow,
   ways: readonly WayRow[],
+  rulesBefore: readonly PriceRuleRow[],
   rulesAfter: readonly PriceRuleRow[],
+  fromMs: number,
+  fieldsOf: (way: WayRow) => readonly string[],
 ): void {
   for (const way of ways) {
-    if (!rulesPricing(way.id, rulesAfter).some((each) => each.id === rule.id)) continue;
-    checkDeposit(way, [rule], pricedBy(way.path) === "visit" ? ["fromCents"] : ["priceCents"]);
+    const deposit = heldDeposit(way);
+    if (deposit === null) continue;
+    const before = new Set(rulesPricing(way.id, rulesBefore, fromMs).map((rule) => rule.id));
+    const newly = rulesPricing(way.id, rulesAfter, fromMs).filter((rule) => !before.has(rule.id));
+    checkUnder(way, deposit, newly, fieldsOf(way));
   }
+}
+
+/** What a price's own save blames for a way: the starting price on a visit path, else the price. */
+export function priceFieldsOf(way: Pick<WayRow, "path">): readonly string[] {
+  return pricedBy(way.path) === "visit" ? ["fromCents"] : ["priceCents"];
 }
 
 /** (c) A price rule's worker is a worker resource of the business, as read under its scope (null: none of its). */

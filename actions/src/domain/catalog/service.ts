@@ -56,8 +56,10 @@
 //      (registry.ts), besides their form and nomoney as both or neither.
 //
 // The cross-row checks (T-1433; checks.ts): before any write, each rule across rows the database does not hold alone is
-// checked through the reads, and its refusal names its rule: a way's deposit under the price known then and a list way's
-// price in effect (reads 3 and 4), its location the business's and of its place's kind (read 6), a rule's worker the
+// checked through the reads, and its refusal names its rule: a way's deposit under the price known then, at the way's
+// save and at a price's (an add, a change, a withdrawal or a close: no price the save leaves pricing a way, and not
+// pricing it before, under its deposit), and a list way's price in effect at its save (reads 3 and 4), its location the
+// business's and of its place's kind (read 6), a rule's worker the
 // business's (read 7), a linked space the business's (read 8), a placed kind's company the business's (read 1), and a
 // way's path against the business's no money through Rosie (read 1's setup, null read as no money). A way rests on its
 // kind's company_kinds row and its flow's kind_flows row, named by K-05 v1.18 item 77's names, and on the business's
@@ -76,6 +78,7 @@ import {
   checkLocation,
   checkSpace,
   checkWorker,
+  priceFieldsOf,
 } from "./checks";
 import { notBuiltFor, refuse } from "./errors";
 import { inEffectAt, isEmpty, isPossibleTie, overlaps, rangeOf, ruleValues, sameConditions } from "./prices";
@@ -703,16 +706,19 @@ export function createCatalog(deps: CatalogDeps): Catalog {
   }
 
   /**
-   * (a) at a price's save (README ruling 4 (a), read 3): every way of the service the new rule prices among the rules
-   * as the save leaves them keeps its deposit under the rule's known price.
+   * (a) at a price's save (README ruling 4 (a), read 3): every way of the service keeps its deposit under each rule the
+   * save leaves pricing it from now on and that did not before (checks.ts checkDepositsUnder): the rule an add or a
+   * change opens, the price a withdrawal opens again, or the service's own price a closed or withdrawn price of the
+   * way's place no longer covers.
    */
   async function checkDepositsAtSave(
     reads: CatalogReads,
     service: ServiceRow,
-    rule: PriceRuleRow,
+    rulesBefore: readonly PriceRuleRow[],
     rulesAfter: readonly PriceRuleRow[],
+    fieldsOf: (way: WayRow) => readonly string[],
   ): Promise<void> {
-    checkDepositsUnder(rule, await waysNow(reads, service.id), rulesAfter);
+    checkDepositsUnder(await waysNow(reads, service.id), rulesBefore, rulesAfter, nowMs, fieldsOf);
   }
 
   // ---- the calls ----
@@ -951,7 +957,7 @@ export function createCatalog(deps: CatalogDeps): Catalog {
           );
         const rules = (await rulesNow(reads, service.id, now)).rules;
         checkListPriced({ id, path: draft.path, active: draft.active }, rules, nowMs);
-        checkDeposit({ id, ...draft }, rules, ["depositCents"]);
+        checkDeposit({ id, ...draft }, rules, nowMs, ["depositCents"]);
         const state = [
           insert("service_money", {
             id,
@@ -1019,7 +1025,7 @@ export function createCatalog(deps: CatalogDeps): Catalog {
         checkBusinessMoney(next.path, setup);
         const rules = (await rulesNow(reads, service.id, now)).rules;
         checkListPriced(next, rules, nowMs);
-        checkDeposit(next, rules, ["depositCents"]);
+        checkDeposit(next, rules, nowMs, ["depositCents"]);
         const state = [update("service_money", way.id, version, set)];
         wayEdits.set(way.id, { ...next, version });
         touched.add(`service_money:${way.id}`);
@@ -1086,7 +1092,7 @@ export function createCatalog(deps: CatalogDeps): Catalog {
         )
           refuse("overlap", ["effectiveFrom", "effectiveTo"]);
         // (a) The new price never under a deposit of a way it prices (read 3).
-        await checkDepositsAtSave(reads, service, rule, [...read.rules, rule]);
+        await checkDepositsAtSave(reads, service, read.rules, [...read.rules, rule], priceFieldsOf);
         const ties = tiesFor(rule, read);
         return recordPrice({
           closed: null,
@@ -1133,7 +1139,7 @@ export function createCatalog(deps: CatalogDeps): Catalog {
           ties: read.ties,
         };
         // (a) The new price never under a deposit of a way it prices (read 3).
-        await checkDepositsAtSave(reads, service, opened, [...others.rules, opened]);
+        await checkDepositsAtSave(reads, service, read.rules, [...others.rules, opened], priceFieldsOf);
         const ties = tiesFor(opened, others);
         return recordPrice({
           closed: current,
@@ -1173,8 +1179,14 @@ export function createCatalog(deps: CatalogDeps): Catalog {
         const state: StateWrite[] = [
           update("price_rules", target.id, version, { effective_to: target.effectiveFrom }),
         ];
+        // The service's rules as the withdrawal leaves them: the withdrawn price closed at its own start.
+        const others: PriceRulesRead = {
+          rules: read.rules.map((rule) =>
+            rule.id === target.id ? { ...rule, effectiveTo: target.effectiveFrom } : rule,
+          ),
+          ties: read.ties,
+        };
         let opened: PriceRuleRow | null = null;
-        let ties: PriceTieRow[] = [];
         if (replaced !== undefined) {
           if (replaced.currency !== currency) refuse("currencyMismatch", ["currency"]);
           const id = newId("price", input.id, "price_rules");
@@ -1193,18 +1205,20 @@ export function createCatalog(deps: CatalogDeps): Catalog {
             effectiveTo: target.effectiveTo,
             version: 1,
           };
-          const others: PriceRulesRead = {
-            rules: read.rules.map((rule) =>
-              rule.id === target.id ? { ...rule, effectiveTo: target.effectiveFrom } : rule,
-            ),
-            ties: read.ties,
-          };
-          // The reopened rule is a new row: its worker the business's (read 7), never under a way's deposit (read 3).
+          // The reopened rule is a new row: its worker the business's (read 7).
           await checkRuleWorker(reads, opened.conditions);
-          await checkDepositsAtSave(reads, service, opened, [...others.rules, opened]);
-          ties = tiesFor(opened, others);
-          state.push(insert("price_rules", ruleValues(opened)), ...ties.map(tieInsert));
         }
+        // (a) No way's deposit over a price the withdrawal leaves pricing it and did not before (read 3): the price opened
+        // again, or the service's own where the withdrawn price of the way's place covered it.
+        await checkDepositsAtSave(
+          reads,
+          service,
+          read.rules,
+          opened === null ? others.rules : [...others.rules, opened],
+          () => ["ruleId"],
+        );
+        const ties = opened === null ? [] : tiesFor(opened, others);
+        if (opened !== null) state.push(insert("price_rules", ruleValues(opened)), ...ties.map(tieInsert));
         return recordPrice({
           closed: target,
           closeAt: target.effectiveFrom,
@@ -1234,6 +1248,14 @@ export function createCatalog(deps: CatalogDeps): Catalog {
         if (msOf(at) < range.from) refuse("closedBeforeStart", ["at"]);
         if (range.to !== null && msOf(at) >= range.to) refuse("badInput", ["at"]);
         const version = closable(target, input.expectVersion);
+        // (a) No way's deposit over the service's own price where the closed price of the way's place covered it (read 3).
+        await checkDepositsAtSave(
+          reads,
+          service,
+          read.rules,
+          read.rules.map((rule) => (rule.id === target.id ? { ...rule, effectiveTo: at } : rule)),
+          () => ["ruleId"],
+        );
         return recordPrice({
           closed: target,
           closeAt: at,

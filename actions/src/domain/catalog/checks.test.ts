@@ -90,10 +90,10 @@ function seedRow(store: Store, table: string, id: string): Record<string, unknow
   return row;
 }
 
-/** The reason (a) refuses a way's deposit under `rules` at the way's save, or null when it passes. */
+/** The reason (a) refuses a way's deposit under `rules` at the way's save (Sam's raise day), or null when it passes. */
 function depositRefusal(way: WayRow, rules: readonly PriceRuleRow[]): CatalogRefusal | null {
   return refusalOf(() => {
-    checkDeposit(way, rules, ["depositCents"]);
+    checkDeposit(way, rules, Date.parse(RAISE_DAY), ["depositCents"]);
   });
 }
 
@@ -172,6 +172,115 @@ describe("(a) a deposit is never over the price known then (K-25 rule 9; S1-13; 
     expect(depositRefusal(home, rules)).toBeNull();
     const shop: WayRow = { ...home, id: "way-lees-haircut-shop" };
     expect(depositRefusal(shop, rules)).toBe("depositOverPrice");
+  });
+
+  it("its place's rule, else the service's own, at each instant and booking: a place's price from Nov 2 only, or on weekends only, leaves the $35 pricing the way meanwhile", () => {
+    const store = seeded();
+    const home: WayRow = {
+      ...wayOf(seedRow(store, "service_money", "way-lees-haircut-home")),
+      path: "list|deposit|bill",
+      depositCents: 5000,
+      currency: "USD",
+    };
+    const [own35, own40, place] = [
+      "price-lees-haircut-35",
+      "price-lees-haircut-40",
+      "price-lees-haircut-home",
+    ].map((id) => ruleOf(seedRow(store, "price_rules", id)));
+    if (own35 === undefined || own40 === undefined || place === undefined) throw new Error("no seeded rule");
+    // As seeded, the at-home $75 covers the $35 and the $40 from Sam's raise day on: $50 is under it.
+    expect(depositRefusal(home, [own35, own40, place])).toBeNull();
+    // One seed value changed: the at-home price starts on Nov 2, so until then the at-home haircut is the $35.
+    const fromNov2 = { ...place, effectiveFrom: "2026-11-02T05:00:00Z" };
+    expect(depositRefusal(home, [own35, own40, fromNov2])).toBe("depositOverPrice");
+    expect(depositRefusal({ ...home, depositCents: 3500 }, [own35, own40, fromNov2])).toBeNull();
+    // Or it holds on weekends only, so a weekday at home is the $35, then the $40.
+    const weekends = { ...place, conditions: { ...place.conditions, weekdays: "67" } };
+    expect(depositRefusal(home, [own35, own40, weekends])).toBe("depositOverPrice");
+    expect(depositRefusal({ ...home, depositCents: 3500 }, [own35, own40, weekends])).toBeNull();
+  });
+
+  /**
+   * The kids cut at the second shop (its $25 the service's own), saved with a deposit, its own place then priced at $45
+   * from `placeFrom`, as three committed turns.
+   */
+  async function kidsCutPlacePriced(store: Store, depositCents: number, placeFrom: string): Promise<void> {
+    const way = await catalogAt(store).catalog.addWay({
+      ...kidsCutAtSecondShop,
+      id: "way-lees-kids-cut-second-shop",
+      path: "list|deposit|counter",
+      depositCents,
+    });
+    store.apply(way.writes.state);
+    const price = await catalogAt(store).catalog.addPrice({
+      id: "price-lees-kids-cut-second-shop",
+      serviceId: "svc-lees-kids-cut",
+      conditions: { ...NO_CONDITIONS, serviceMoneyId: "way-lees-kids-cut-second-shop" },
+      priceCents: 4500,
+      fromCents: null,
+      setByPersonId: SAM,
+      effectiveFrom: placeFrom,
+    });
+    store.apply(price.writes.state);
+  }
+
+  it("at a price's close: closing the $45 a $40 deposit rests on lets the $25 price the way again, refused, nothing written; a $25 deposit passes", async () => {
+    const store = seeded();
+    await kidsCutPlacePriced(store, 2500, RAISE_DAY);
+    const raised = await catalogAt(store).catalog.updateWay({
+      wayId: "way-lees-kids-cut-second-shop",
+      serviceId: "svc-lees-kids-cut",
+      depositCents: 4000,
+    });
+    store.apply(raised.writes.state);
+    const close = {
+      ruleId: "price-lees-kids-cut-second-shop",
+      serviceId: "svc-lees-kids-cut",
+      at: "2026-11-02T05:00:00Z",
+    };
+    const { catalog } = catalogAt(store);
+    await expect(catalog.closePrice(close)).rejects.toMatchObject({
+      reason: "depositOverPrice",
+      fields: ["ruleId"],
+    });
+    expect(catalog.written()).toEqual({ versionsRead: [], state: [] });
+    const lowered = await catalogAt(store).catalog.updateWay({
+      wayId: "way-lees-kids-cut-second-shop",
+      serviceId: "svc-lees-kids-cut",
+      depositCents: 2500,
+    });
+    store.apply(lowered.writes.state);
+    expect(await outcomeOf(catalogAt(store).catalog.closePrice(close))).toBe("built");
+  });
+
+  it("at a price's withdrawal: withdrawing the $45 set from Nov 2 leaves the kids cut's $20 from Nov 2 under a $25 deposit, refused; a $20 deposit passes", async () => {
+    const withdrawn = async (depositCents: number) => {
+      const store = seeded();
+      await kidsCutPlacePriced(store, depositCents, "2026-11-02T05:00:00Z");
+      // The service's own $25 becomes $20 from Nov 2, where the second shop's $45 covers it.
+      const cut = await catalogAt(store).catalog.changePrice({
+        serviceId: "svc-lees-kids-cut",
+        conditions: NO_CONDITIONS,
+        priceCents: 2000,
+        fromCents: null,
+        setByPersonId: SAM,
+        effectiveFrom: "2026-11-02T05:00:00Z",
+      });
+      store.apply(cut.writes.state);
+      const { catalog } = catalogAt(store);
+      const outcome = await outcomeOf(
+        catalog.withdrawPrice({
+          ruleId: "price-lees-kids-cut-second-shop",
+          serviceId: "svc-lees-kids-cut",
+          setByPersonId: SAM,
+        }),
+      );
+      return { outcome, written: catalog.written() };
+    };
+    const over = await withdrawn(2500);
+    expect(over.outcome).toBe("depositOverPrice");
+    expect(over.written).toEqual({ versionsRead: [], state: [] });
+    expect((await withdrawn(2000)).outcome).toBe("built");
   });
 
   it("a visit path: a deposit up to the starting price (A4-13), none with no starting price known", () => {
