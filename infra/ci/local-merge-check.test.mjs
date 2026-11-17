@@ -287,6 +287,7 @@ const SCRIPTS = [
   "lint",
   "typecheck",
   "test",
+  "test:linq-probe",
   "guard:tests",
   "guard:migrations",
   "guard:contracts",
