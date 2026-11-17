@@ -92,7 +92,9 @@
 //      those of the rows it updates, as they stand before its locks. With none, only a row with no business is found (a
 //      sign-up turn before there is a business). A table scoped none (kind_flows) has no business to compare.
 //  15. (T-667) K-22's sessions and K-27's calendar_links, which row-level security binds by person and which have no
-//      business column, are written on the runtime side, where their runtime policies give rosie_job every row.
+//      business column, are written on the runtime side, where their runtime policies give rosie_job every row: K-22
+//      rule 5 has the commit end someone else's sessions there (left, handed_over), and K-27 rule 5 has it write a
+//      link's connect start and an unlink there.
 //
 // The setup tables (T-667; K-05 v1.18 item 77; DL-867, DL-911, DL-913): the state writes take every setup part's table
 // (K-22 to K-27, K-33, K-35) as any other domain table, an update naming the version it read. A table whose primary key is
@@ -165,8 +167,8 @@ export const NOT_STATE_TABLES: ReadonlySet<string> = new Set([
 
 /**
  * The setup parts' tables that row-level security binds by person, with no business column, and whose runtime policy
- * gives rosie_job every row (K-22 v1 rule 5's sessions; K-27 v1 rule 5's calendar_links): written on the runtime side
- * (default 15; T-667).
+ * gives rosie_job every row (K-22 v1 rule 5's sessions, which the commit ends for someone else; K-27 v1 rule 5's
+ * calendar_links, which the commit starts connecting and unlinks): written on the runtime side (default 15; T-667).
  */
 const PERSON_BOUND_TABLES: ReadonlySet<string> = new Set(["sessions", "calendar_links"]);
 

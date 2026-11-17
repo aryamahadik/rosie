@@ -5,8 +5,10 @@
 // Every commit runs as K-05 states it (README "Scope": per write): through a client whose connections run as rosie_job
 // with no business scope at the start of each transaction, so the grants and row-level security are the ones the commit
 // meets. The tables' owner (the migrations' role) loads the seeds and reads what a commit wrote. The rows come only from
-// fixture set v1's demo shops (rule 9): K-23's, K-24's and K-25's seeds and the K-04 seeds their chains name (Lee's
-// Barbershop, Lee Home Services and the master's sample cast). A row a commit writes here is a seed row under a new id.
+// fixture set v1's demo shops (rule 9): K-22's, K-23's, K-24's, K-25's and K-30's seeds and the K-04 seeds their chains
+// name (Lee's Barbershop, Lee Home Services, the pet boarding shop and the master's sample cast), K-27's calendar link
+// seed (read for one row's values, never loaded) and K-05 v1.18's read-price-rules-haircut-tie.json, whose note names
+// the two rows its database side writes. A row a commit writes here is one of those rows, or a seed row under a new id.
 //
 // K-05 v1.18 item 77 (DL-911, DL-913): a two-column key's row is named by its key's values joined by "/" in key order,
 // built by the SQL and compared whole; a state update names it by its key, column to value; a version read by its name,
@@ -37,12 +39,16 @@ const BUNDLE = { hash: "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f
 /** The seeds every test starts from, with their chains. */
 const SEEDS: readonly [string, string][] = [
   ["core", "seed-bundle-registry.json"],
+  ["people-access", "seed-session.json"],
   ["business-setup", "seed-business-demo-shop.json"],
   ["business-setup", "seed-company-two-kinds.json"],
   ["kinds-of-work", "seed-kinds-sample.json"],
+  ["kinds-of-work", "seed-new-work-draft.json"],
   ["services-prices", "seed-services-price-list.json"],
   ["services-prices", "seed-service-money-paths.json"],
   ["services-prices", "seed-item-services.json"],
+  ["services-prices", "seed-price-rule-dates.json"],
+  ["bookings-changes", "seed-terms-snapshot.json"],
 ];
 
 interface SeedRow {
@@ -60,17 +66,23 @@ const fromHex = (hex: string): Uint8Array =>
   Uint8Array.from((hex.match(/../g) ?? []).map((pair) => parseInt(pair, 16)));
 const seedUrl = (part: string, file: string): URL => new URL(`${part}/fixtures/${file}`, DB_SCHEMA_DIR);
 
+/** Every own row of `table` in a seed whose values hold each of `match`'s, in the seed's order. */
+function seedRows(part: string, file: string, table: string, match: Values = {}): Values[] {
+  return (readJson(seedUrl(part, file)) as SeedFile).rows
+    .filter(
+      (row) =>
+        row.table === table && Object.entries(match).every(([column, value]) => row.values[column] === value),
+    )
+    .map((row) => row.values);
+}
+
 /** The one own row of `table` in a seed whose values hold each of `match`'s. */
 function seedRowWhere(part: string, file: string, table: string, match: Values): Values {
-  const rows = (readJson(seedUrl(part, file)) as SeedFile).rows.filter(
-    (row) =>
-      row.table === table && Object.entries(match).every(([column, value]) => row.values[column] === value),
-  );
-  const [row, ...more] = rows;
+  const [row, ...more] = seedRows(part, file, table, match);
   if (row === undefined || more.length > 0) {
     throw new Error(`${file} has no one ${table} row that matches`);
   }
-  return row.values;
+  return row;
 }
 
 /** A seed value that must be text (an id). */
@@ -128,6 +140,9 @@ let runtime: Sql;
 /** jsonb and bytea columns of the schema, keyed table.column, for the seed loader. */
 let typedColumns: Map<string, string>;
 
+/** The registries a migration seeds (K-26 rule 5): a seed chain names their rows, which are already there. */
+const MIGRATION_SEEDED = new Set(["trade_facts", "plugin_switches", "rule_kinds"]);
+
 /** Empties every table the seeds and commits write (this file's schema only); the migration's registries stay. */
 async function reset(): Promise<void> {
   await db.sql`truncate businesses, persons, handles, bundles, release_flags, kinds cascade`;
@@ -150,7 +165,11 @@ async function loadSeeds(): Promise<void> {
               : value;
         values[column] = out as never;
       }
-      await tx`insert into ${tx(row.table)} ${tx(values)}`;
+      if (MIGRATION_SEEDED.has(row.table)) {
+        await tx`insert into ${tx(row.table)} ${tx(values)} on conflict do nothing`;
+      } else {
+        await tx`insert into ${tx(row.table)} ${tx(values)}`;
+      }
     }
   });
 }
@@ -243,6 +262,98 @@ const BARBER_A = seedRowWhere("kinds-of-work", "seed-kinds-sample.json", "kind_f
 const ELECTRICIAN = seedRowWhere("business-setup", "seed-company-two-kinds.json", "company_kinds", {
   kind_id: "electrician",
 });
+const FLOW_A_DEFAULTS = seedRowWhere("business-setup", "seed-business-demo-shop.json", "flow_defaults", {
+  flow: "A",
+});
+
+/** K-05 v1.18's read-price-rules-haircut-tie.json, as far as this file reads it: its answer's rules and ties. */
+interface TieFixture {
+  outcome: {
+    rules: {
+      id: string;
+      businessId: string;
+      serviceId: string;
+      conditions: {
+        serviceMoneyId: string | null;
+        workerResourceId: string | null;
+        weekdays: string | null;
+        fromTime: string | null;
+        untilTime: string | null;
+      };
+      priceCents: number;
+      fromCents: number | null;
+      currency: string;
+      setByPersonId: string;
+      effectiveFrom: string;
+      effectiveTo: string | null;
+    }[];
+    ties: {
+      id: string;
+      businessId: string;
+      serviceId: string;
+      firstRuleId: string;
+      secondRuleId: string;
+      askedAt: string;
+      winnerRuleId: string | null;
+      answeredAt: string | null;
+      answeredByPersonId: string | null;
+    }[];
+  };
+}
+
+/**
+ * The two rows K-05 v1.18's tie fixture says its database side writes (its note: no frozen seed holds a tie), as the
+ * columns of K-25's price_rules and price_rule_ties, taken from the fixture's answer: the haircut's evening price and its
+ * tie with the price at the customer's home, as T-320's catalog adds them when Sam saves the evening price.
+ */
+function tieFixtureRows(): { evening: Values; tie: Values } {
+  const fixture = readJson(
+    new URL("data-access/fixtures/read-price-rules-haircut-tie.json", CONTRACTS),
+  ) as TieFixture;
+  const [tie, ...moreTies] = fixture.outcome.ties;
+  const evening = fixture.outcome.rules.find((rule) => rule.id === tie?.secondRuleId);
+  if (tie === undefined || moreTies.length > 0 || evening === undefined) {
+    throw new Error("read-price-rules-haircut-tie.json has no one tie with its second rule");
+  }
+  return {
+    evening: {
+      id: evening.id,
+      business_id: evening.businessId,
+      service_id: evening.serviceId,
+      service_money_id: evening.conditions.serviceMoneyId,
+      worker_resource_id: evening.conditions.workerResourceId,
+      weekdays: evening.conditions.weekdays,
+      from_time: evening.conditions.fromTime,
+      until_time: evening.conditions.untilTime,
+      price_cents: evening.priceCents,
+      from_cents: evening.fromCents,
+      currency: evening.currency,
+      set_by_person_id: evening.setByPersonId,
+      effective_from: evening.effectiveFrom,
+      effective_to: evening.effectiveTo,
+    },
+    tie: {
+      id: tie.id,
+      business_id: tie.businessId,
+      service_id: tie.serviceId,
+      first_rule_id: tie.firstRuleId,
+      second_rule_id: tie.secondRuleId,
+      asked_at: tie.askedAt,
+      winner_rule_id: tie.winnerRuleId,
+      answered_at: tie.answeredAt,
+      answered_by_person_id: tie.answeredByPersonId,
+    },
+  };
+}
+
+/** The barbershop's own write, at its seed version: a commit whose one business is the barbershop. */
+const SHOP_NO_MONEY = {
+  op: "update",
+  table: "business_setup",
+  key: { business_id: BARBERSHOP },
+  expectVersion: 4,
+  set: { no_money: true },
+} as unknown as StateWrite;
 
 describe("commitTurn with the setup tables as write targets (T-667)", () => {
   it(
@@ -270,6 +381,12 @@ describe("commitTurn with the setup tables as write targets (T-667)", () => {
             key: { business_id: BARBERSHOP, flow: "A" },
             expectVersion: 1,
             set: { cutoff_before: "48 hours" },
+          },
+          {
+            // A business's own defaults written (S1-21), the barbershop's flow A row under the movers' business.
+            op: "insert",
+            table: "flow_defaults",
+            values: { ...FLOW_A_DEFAULTS, business_id: MOVERS, version: undefined },
           },
           {
             op: "update",
@@ -307,6 +424,7 @@ describe("commitTurn with the setup tables as write targets (T-667)", () => {
             { table: "services", rowId: "svc-lees-haircut-t667", version: 1 },
             { table: "business_setup", rowId: BARBERSHOP, version: 5 },
             { table: "flow_defaults", rowId: `${BARBERSHOP}/A`, version: 2 },
+            { table: "flow_defaults", rowId: `${MOVERS}/A`, version: 1 },
             { table: "company_kinds", rowId: "company-lees-barbershop/barber", version: 2 },
             { table: "company_kinds", rowId: "company-lees-barbershop/electrician", version: 1 },
           ],
@@ -427,13 +545,7 @@ describe("commitTurn with the setup tables as write targets (T-667)", () => {
         },
       });
       // Under another business: the barbershop's write names Lee Home Services' kind, which its compare does not find.
-      const shopWrite = {
-        op: "update",
-        table: "business_setup",
-        key: { business_id: BARBERSHOP },
-        expectVersion: 4,
-        set: { no_money: true },
-      } as unknown as StateWrite;
+      const shopWrite = SHOP_NO_MONEY;
       await expect(commit(turnOf("turn-t667-other-business", [shopWrite], [plumbing]))).rejects.toThrow(
         /a row of company_kinds the request names does not exist/,
       );
@@ -523,23 +635,9 @@ describe("commitTurn with the setup tables as write targets (T-667)", () => {
       },
     });
     // A business's write never finds a kind with no business by its name.
-    await expect(
-      commit(
-        turnOf(
-          "turn-t667-sign-up-other",
-          [
-            {
-              op: "update",
-              table: "business_setup",
-              key: { business_id: BARBERSHOP },
-              expectVersion: 4,
-              set: { no_money: true },
-            },
-          ] as unknown as StateWrite[],
-          [earlyKind],
-        ),
-      ),
-    ).rejects.toThrow(/a row of company_kinds the request names does not exist/);
+    await expect(commit(turnOf("turn-t667-sign-up-other", [SHOP_NO_MONEY], [earlyKind]))).rejects.toThrow(
+      /a row of company_kinds the request names does not exist/,
+    );
     expect(await versionNow("business_setup", BARBERSHOP)).toBe(4);
     // The commit that places it names the kind by its key, found as it stands (no business), its business set in the
     // same commit as its company's; its version read is the same row, compared once.
@@ -621,7 +719,98 @@ describe("commitTurn with the setup tables as write targets (T-667)", () => {
   );
 
   it(
-    "carries the catalog's writes (T-320's set): a way changed and a price closed at their versions, a space's link added",
+    "names a draft's block, a key whose second column is a number, by item 77's name: added, changed, read and refused",
+    SLOW,
+    async () => {
+      const no = seedRowWhere("kinds-of-work", "seed-new-work-draft.json", "new_work_draft_blocks", {
+        block: 3,
+      });
+      const draft = textOf(no.draft_id);
+      const asNo = {
+        outcome: no.outcome,
+        answer: no.answer,
+        facts_on: no.facts_on,
+        switches_on: no.switches_on,
+      };
+      const blockNow = async (block: number): Promise<{ outcome: string; version: number } | undefined> => {
+        const [row] = await db.sql<{ outcome: string; version: number }[]>`
+          select outcome, version from new_work_draft_blocks where draft_id = ${draft} and block = ${block}
+        `;
+        return row;
+      };
+      // S1-03's checklist: block 5, at its safe default with no row, gets a clear no (block 3's row under block 5),
+      // and block 4's answer becomes a no, at its version; both rest on block 6 as read.
+      const outcome = await commit(
+        turnOf(
+          "turn-t667-draft-blocks",
+          [
+            {
+              op: "insert",
+              table: "new_work_draft_blocks",
+              values: { ...no, block: 5, version: undefined },
+            },
+            {
+              op: "update",
+              table: "new_work_draft_blocks",
+              key: { draft_id: draft, block: 4 },
+              expectVersion: 1,
+              set: asNo,
+            },
+          ] as unknown as StateWrite[],
+          [{ table: "new_work_draft_blocks", rowId: `${draft}/6`, version: 1 }],
+        ),
+      );
+      expect(answerErrors(outcome)).toEqual([]);
+      expect(outcome).toMatchObject({
+        result: "committed",
+        committed: {
+          written: [
+            { table: "new_work_draft_blocks", rowId: `${draft}/5`, version: 1 },
+            { table: "new_work_draft_blocks", rowId: `${draft}/4`, version: 2 },
+          ],
+        },
+      });
+      // A version read of block 4 by its name, at the version before: versionChanged names it so, and nothing is written.
+      const stale = await commit(
+        turnOf(
+          "turn-t667-draft-stale",
+          [
+            {
+              op: "update",
+              table: "new_work_draft_blocks",
+              key: { draft_id: draft, block: 8 },
+              expectVersion: 1,
+              set: asNo,
+            },
+          ] as unknown as StateWrite[],
+          [{ table: "new_work_draft_blocks", rowId: `${draft}/4`, version: 1 }],
+        ),
+      );
+      expect(answerErrors(stale)).toEqual([]);
+      expect(stale).toEqual({
+        error: "versionChanged",
+        changed: [{ table: "new_work_draft_blocks", rowId: `${draft}/4`, readVersion: 1, currentVersion: 2 }],
+      });
+      expect(await turnWritten("turn-t667-draft-stale")).toBe(false);
+      // The barbershop's write never finds the pet boarding shop's block by its name.
+      await expect(
+        commit(
+          turnOf(
+            "turn-t667-draft-other-business",
+            [SHOP_NO_MONEY],
+            [{ table: "new_work_draft_blocks", rowId: `${draft}/6`, version: 1 }],
+          ),
+        ),
+      ).rejects.toThrow(/a row of new_work_draft_blocks the request names does not exist/);
+      expect(await blockNow(4)).toEqual({ outcome: "no", version: 2 });
+      expect(await blockNow(5)).toEqual({ outcome: "no", version: 1 });
+      expect(await blockNow(8)).toEqual({ outcome: "answered", version: 1 });
+      expect(await versionNow("business_setup", BARBERSHOP)).toBe(4);
+    },
+  );
+
+  it(
+    "carries the catalog's writes (T-320's set) at their versions: services, ways, prices and ties added and changed, a space's link and a terms snapshot added",
     SLOW,
     async () => {
       const way = seedRowWhere("services-prices", "seed-service-money-paths.json", "service_money", {
@@ -637,14 +826,56 @@ describe("commitTurn with the setup tables as write targets (T-667)", () => {
       const service = seedRowWhere("services-prices", "seed-item-services.json", "services", {
         id: textOf(link.service_id),
       });
-      // The seed's own link, taken out by the owner so the commit adds it as S1-81 does.
+      const consult = seedRowWhere("services-prices", "seed-services-price-list.json", "services", {
+        id: "svc-lees-style-consult",
+      });
+      const home = seedRowWhere("services-prices", "seed-price-rule-dates.json", "price_rules", {
+        id: "price-lees-haircut-home",
+      });
+      const { evening, tie } = tieFixtureRows();
+      const terms = seedRowWhere("bookings-changes", "seed-terms-snapshot.json", "booking_terms", {
+        booking_id: "booking-dee-skin-fade",
+      });
+      const booking = textOf(terms.booking_id);
+      const termsRules = seedRows("bookings-changes", "seed-terms-snapshot.json", "booking_terms_rules", {
+        booking_id: booking,
+      });
+      expect(termsRules).toHaveLength(4);
+      // The seed's own link and terms snapshot, taken out by the owner so the commit adds them, as S1-81 adds a space's
+      // link and a booking's commit its terms snapshot (K-30; T-320's takeTermsSnapshot).
       await db.sql`
         delete from item_services where place_or_thing_id = ${place} and service_id = ${textOf(service.id)}
       `;
+      await db.sql`delete from booking_terms_rules where booking_id = ${booking}`;
+      await db.sql`delete from booking_terms where booking_id = ${booking}`;
       const outcome = await commit(
         turnOf(
           "turn-t667-catalog",
           [
+            {
+              op: "insert",
+              table: "services",
+              values: { ...HAIRCUT, id: "svc-lees-haircut-t667", position: 11, version: undefined },
+            },
+            {
+              op: "insert",
+              table: "service_money",
+              values: {
+                ...way,
+                id: "way-lees-haircut-t667-shop",
+                service_id: "svc-lees-haircut-t667",
+                version: undefined,
+              },
+            },
+            { op: "insert", table: "price_rules", values: evening },
+            { op: "insert", table: "price_rule_ties", values: tie },
+            {
+              op: "update",
+              table: "services",
+              key: { id: consult.id },
+              expectVersion: consult.version,
+              set: { active: false },
+            },
             {
               op: "update",
               table: "service_money",
@@ -660,20 +891,57 @@ describe("commitTurn with the setup tables as write targets (T-667)", () => {
               set: { effective_to: "2026-11-16T15:00:00Z" },
             },
             { op: "insert", table: "item_services", values: link },
+            { op: "insert", table: "booking_terms", values: terms },
+            ...termsRules.map((values) => ({ op: "insert", table: "booking_terms_rules", values })),
           ] as unknown as StateWrite[],
-          [{ table: "services", rowId: textOf(service.id), version: service.version as number }],
+          [
+            { table: "services", rowId: textOf(service.id), version: service.version as number },
+            { table: "price_rules", rowId: textOf(home.id), version: home.version as number },
+          ],
         ),
       );
       expect(answerErrors(outcome)).toEqual([]);
-      // item_services carries no version, so the answer names no row of it (K-05 item 1).
+      // item_services, booking_terms and booking_terms_rules carry no version, so the answer names no row of them (K-05
+      // item 1).
       expect(outcome).toMatchObject({
         result: "committed",
         committed: {
           written: [
+            { table: "services", rowId: "svc-lees-haircut-t667", version: 1 },
+            { table: "service_money", rowId: "way-lees-haircut-t667-shop", version: 1 },
+            { table: "price_rules", rowId: evening.id, version: 1 },
+            { table: "price_rule_ties", rowId: tie.id, version: 1 },
+            { table: "services", rowId: consult.id, version: (consult.version as number) + 1 },
             { table: "service_money", rowId: way.id, version: (way.version as number) + 1 },
             { table: "price_rules", rowId: price.id, version: (price.version as number) + 1 },
           ],
         },
+      });
+      // The owner answers the tie (S13-25 rule 19): an update at the version the insert gave it, resting on the evening
+      // price as the first commit wrote it.
+      const answered = await commit(
+        turnOf(
+          "turn-t667-tie-answered",
+          [
+            {
+              op: "update",
+              table: "price_rule_ties",
+              key: { id: tie.id },
+              expectVersion: 1,
+              set: {
+                winner_rule_id: home.id,
+                answered_at: "2026-11-16T15:00:00Z",
+                answered_by_person_id: evening.set_by_person_id,
+              },
+            },
+          ] as unknown as StateWrite[],
+          [{ table: "price_rules", rowId: textOf(evening.id), version: 1 }],
+        ),
+      );
+      expect(answerErrors(answered)).toEqual([]);
+      expect(answered).toMatchObject({
+        result: "committed",
+        committed: { written: [{ table: "price_rule_ties", rowId: tie.id, version: 2 }] },
       });
       const [linked] = await db.sql<{ business_id: string }[]>`
         select business_id from item_services where place_or_thing_id = ${place} and service_id = ${textOf(service.id)}
@@ -683,34 +951,74 @@ describe("commitTurn with the setup tables as write targets (T-667)", () => {
         select effective_to is null as open from price_rules where id = ${textOf(price.id)}
       `;
       expect(closed?.open).toBe(false);
+      const [winner] = await db.sql<{ winner: string | null; version: number }[]>`
+        select winner_rule_id as winner, version from price_rule_ties where id = ${textOf(tie.id)}
+      `;
+      expect(winner).toEqual({ winner: home.id, version: 2 });
+      const [snapshot] = await db.sql<{ consent: string | null; rules: number }[]>`
+        select t.terms_consent_id as consent,
+               (select count(*)::integer from booking_terms_rules r where r.booking_id = t.booking_id) as rules
+        from booking_terms t where t.booking_id = ${booking}
+      `;
+      expect(snapshot).toEqual({ consent: terms.terms_consent_id, rules: termsRules.length });
+      expect(await versionNow("services", textOf(consult.id))).toBe((consult.version as number) + 1);
     },
   );
 
   it(
-    "writes K-27's calendar link, which row-level security binds by person, on the runtime side",
+    "writes K-27's calendar link and ends a K-22 session, the tables bound by person, on the runtime side at their versions",
     SLOW,
     async () => {
+      // K-27's connecting link (Avery's, the seed's one) under a new id for Sam, whose own link this file does not load,
+      // as the connect's start writes it through the commit (K-27 rule 5); Sam's live session ended at its version, as
+      // the commit ends someone else's sessions on the runtime side (K-22 rule 5: handed_over, S11-100).
+      const connecting = seedRowWhere("availability", "seed-calendar-link.json", "calendar_links", {
+        state: "connecting",
+      });
+      const session = seedRowWhere("people-access", "seed-session.json", "sessions", { ended_at: null });
+      const sessionId = textOf(session.id);
+      const endSession = {
+        op: "update",
+        table: "sessions",
+        key: { id: sessionId },
+        expectVersion: session.version,
+        set: { ended_at: "2026-11-16T15:00:00Z", ended_why: "handed_over" },
+      } as unknown as StateWrite;
       const outcome = await commit(
-        turnOf("turn-t667-calendar-connect", [
+        turnOf("turn-t667-person-bound", [
           {
             op: "insert",
             table: "calendar_links",
-            values: {
-              id: "callink-sam-google-connecting",
-              person_id: "person-sam",
-              provider: "google",
-              state: "connecting",
-            },
+            values: { ...connecting, id: "callink-sam-google", person_id: "person-sam", version: undefined },
           },
+          endSession,
         ] as unknown as StateWrite[]),
       );
       expect(answerErrors(outcome)).toEqual([]);
       expect(outcome).toMatchObject({
         result: "committed",
         committed: {
-          written: [{ table: "calendar_links", rowId: "callink-sam-google-connecting", version: 1 }],
+          written: [
+            { table: "calendar_links", rowId: "callink-sam-google", version: 1 },
+            { table: "sessions", rowId: sessionId, version: (session.version as number) + 1 },
+          ],
         },
       });
+      // The same end again, at the version it read before: refused with the row that changed, nothing written.
+      const stale = await commit(turnOf("turn-t667-person-bound-stale", [endSession]));
+      expect(answerErrors(stale)).toEqual([]);
+      expect(stale).toEqual({
+        error: "versionChanged",
+        changed: [
+          {
+            table: "sessions",
+            rowId: sessionId,
+            readVersion: session.version,
+            currentVersion: (session.version as number) + 1,
+          },
+        ],
+      });
+      expect(await turnWritten("turn-t667-person-bound-stale")).toBe(false);
     },
   );
 });

@@ -6,8 +6,9 @@
 // rosie_job, on the server's primary, under the request's business scope, or on the runtime side when the request names
 // no business. The tables' owner (the migrations' role) loads the seeds, so only the reads under test meet row-level
 // security. The rows come only from fixture set v1's demo shops (rule 9): each setup part's seeds and the K-04 seeds
-// their after chains name (Lee's Barbershop, Lee Home Services, the yoga studio and the master's sample cast). The one
-// row made here is a seed row under a new id: Lee Home Services' plumbing kind as S1-04 writes it before its business.
+// their after chains name (Lee's Barbershop, Lee Home Services, the pet boarding shop, the yoga studio and the master's
+// sample cast). The one row made here is a seed row under a new id: Lee Home Services' plumbing kind as S1-04 writes it
+// before its business.
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -91,6 +92,9 @@ const PART_ROWS: readonly { part: string; seed: string; table: string }[] = [
   { part: "kinds-of-work", seed: "seed-kinds-sample.json", table: "kinds" },
   { part: "kinds-of-work", seed: "seed-kinds-sample.json", table: "kind_flows" },
   { part: "kinds-of-work", seed: "seed-business-kinds.json", table: "picked_kinds" },
+  // Item 77's other two names: a pick's text block (pick id/pf key) and a draft's block (draft id/block, an integer).
+  { part: "kinds-of-work", seed: "seed-business-kinds.json", table: "picked_kind_texts" },
+  { part: "kinds-of-work", seed: "seed-new-work-draft.json", table: "new_work_draft_blocks" },
   { part: "services-prices", seed: "seed-services-price-list.json", table: "services" },
   { part: "rules", seed: "seed-rules-tap-list.json", table: "rules" },
   { part: "availability", seed: "seed-hours.json", table: "weekly_hours" },
@@ -261,11 +265,21 @@ beforeAll(async () => {
   );
   // Lee Home Services' plumbing kind and its company as S1-04 writes them before the business exists (a seed row under
   // a new id): seen by no business scope, read on the runtime side.
-  const company = seedRow("business-setup", "seed-company-two-kinds.json", "companies", 0);
-  const kind = seedRow("business-setup", "seed-company-two-kinds.json", "company_kinds", 0);
+  const company: Values = {
+    ...seedRow("business-setup", "seed-company-two-kinds.json", "companies", 0),
+    id: "company-sam-before-business",
+    business_id: null,
+    version: 1,
+  };
+  const kind: Values = {
+    ...seedRow("business-setup", "seed-company-two-kinds.json", "company_kinds", 0),
+    company_id: "company-sam-before-business",
+    business_id: null,
+    version: 1,
+  };
   await db.sql.begin(async (tx) => {
-    await tx`insert into companies ${tx({ ...company, id: "company-sam-before-business", business_id: null, version: 1 } as Record<string, never>)}`;
-    await tx`insert into company_kinds ${tx({ ...kind, company_id: "company-sam-before-business", business_id: null, version: 1 } as Record<string, never>)}`;
+    await tx`insert into companies ${tx(company as unknown as Record<string, never>)}`;
+    await tx`insert into company_kinds ${tx(kind as unknown as Record<string, never>)}`;
   });
 }, 180_000);
 

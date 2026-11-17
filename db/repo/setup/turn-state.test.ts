@@ -44,7 +44,12 @@ describe("setup/turn-state.ts readTurnState before the database", () => {
       const outcome = await readTurnState(
         sql,
         request([
-          { key: "kind", table: "company_kinds", rowId: "company-lees-barbershop/barber", column: "pf_facts" },
+          {
+            key: "kind",
+            table: "company_kinds",
+            rowId: "company-lees-barbershop/barber",
+            column: "pf_facts",
+          },
           { key: "zone", table: "businesses", rowId: "biz-lees-barbershop", column: "time_zone" },
           { key: "refused", table, rowId: "x", column },
           { key: "also", table: "no_such_table", rowId: "x", column: "id" },
