@@ -10,6 +10,9 @@
 //   - K-05's notFound and transient come through as CatalogReadError carrying K-05's answer; a stored value db/repo
 //     cannot carry comes through the binding and the service with db/repo's own words.
 //   - Limit 2's OwnerRules over readTermsSources answers the business's K-26 rows in force, as T-300 reads them.
+//   - T-1433's widened port: read 1's setup and item 77's names as the database builds them; the reads of a row by id
+//     through readTurnState as rosie_job for Sam's handle (a location, a worker, a space of the business; another
+//     business's, or none, null); the service's cross-row checks through them; no turn handle, or rosie_app, fails closed.
 // Rule 9: every row is a frozen seed of fixture set v1's demo shops; nothing logs.
 
 import { once } from "node:events";
@@ -24,14 +27,16 @@ import { openCommitDatabase, TOOL_API_ROLE, type CommitDatabase } from "../../..
 import { pgOwnerRules } from "../../../gate/limit-2/pg";
 import type { RuleRow } from "../../../rules/evaluator";
 import { ruleRowOf } from "../../../rules/evaluator/test-support";
-import { CatalogRefusedError, createCatalog, type CatalogReads } from "../index";
+import { CatalogRefusedError, NO_CONDITIONS, createCatalog, type CatalogReads } from "../index";
 import type { SnapshotInput } from "../terms";
 import { SKIN_FADE_WRITTEN, Store, ZONE, readsOf } from "../test-support";
-import { CatalogReadError, pgCatalogReads } from "./index";
+import { CatalogReadError, pgCatalogReads, type CatalogTurn } from "./index";
 import {
   BARBERSHOP,
   HOME_SERVICES,
   MOVERS,
+  ROW_BY_ID_SEEDS,
+  SAM_HANDLE,
   YOGA,
   catalogExchange,
   loadWorld,
@@ -115,9 +120,14 @@ describe("under each business's scope the bound reads answer the seeds as T-320'
 
         const rows = rowsIn(answers);
         for (const row of rows) expect(row.businessId, businessId).toBe(businessId);
-        // No item 77 name and no setup: the port has no field for them yet (DL-911 item 1).
-        expect(valuesNamed(answers, "rowId")).toEqual([]);
-        expect(valuesNamed(answers, "setup")).toEqual([]);
+        // The widened port (T-1433 (h)): item 77's names, as the database builds them, for every kind, kind_flows row and
+        // flow default answered (each held to the double's reading above), and read 1's setup, null with no setup row.
+        for (const rowId of valuesNamed(answers, "rowId")) expect(rowId).toMatch(/^.+\/.+$/);
+        const [setup] = valuesNamed(answers, "setup");
+        if (businessId === BARBERSHOP) {
+          expect(setup).toEqual({ businessId, noMoney: false, version: 4 });
+          expect(valuesNamed(answers, "rowId")).toContain("company-lees-barbershop/barber");
+        } else expect(setup).toBeNull();
         if (businessId === YOGA) expect(rows).toEqual([]);
         if (businessId === BARBERSHOP) expect(rows.length).toBeGreaterThan(0);
       },
@@ -354,6 +364,159 @@ describe("K-05's transient answer and db/repo's own throw come through unchanged
         update company_kinds set trade_name = null, version = version + 1 where business_id = ${BARBERSHOP}
       `;
       }
+    },
+  );
+});
+
+describe("the reads of a row by id: readTurnState's facts as rosie_job for the turn's handle, under the call's business (T-1433)", () => {
+  const rows = worldRows(ROW_BY_ID_SEEDS);
+  /** Sam's turn: the runtime side's client (rosie_job) and his handle. */
+  const turn = (): CatalogTurn => ({ runtime: cdb.runtime, handleId: SAM_HANDLE });
+  const bound = (businessId: string): CatalogReads => pgCatalogReads(cdb.toolApi, businessId, turn());
+  const reference = (): CatalogReads => readsOf(new Store(rows));
+  /** Now, for the service's saves: Sam's raise day, a week after the money card (K-25). */
+  const NOW = "2026-10-26T14:00:00Z";
+  const catalogOf = (businessId: string, reads: CatalogReads) =>
+    createCatalog({
+      call: "saveSetupStep",
+      businessId,
+      currency: "USD",
+      now: NOW,
+      turnKey: "turn-sam-0400",
+      reads,
+    });
+
+  beforeAll(async () => {
+    await loadWorld(cdb.db.sql, cdb.db.schema, rows);
+  }, 120_000);
+
+  it(
+    "a location, a worker and a space of the business answer as the double reads them; another business's, or none, null",
+    SLOW,
+    async () => {
+      const asks: [string, (reads: CatalogReads) => Promise<unknown>][] = [
+        [BARBERSHOP, (reads) => reads.locationOf(BARBERSHOP, "loc-lees-barbershop-second-shop")],
+        [BARBERSHOP, (reads) => reads.locationOf(BARBERSHOP, "loc-lees-barbershop-shop")],
+        [BARBERSHOP, (reads) => reads.locationOf(BARBERSHOP, "loc-lee-home-services-office")],
+        [HOME_SERVICES, (reads) => reads.locationOf(HOME_SERVICES, "loc-lee-home-services-office")],
+        [BARBERSHOP, (reads) => reads.resourceOf(BARBERSHOP, "res-andre")],
+        [BARBERSHOP, (reads) => reads.resourceOf(BARBERSHOP, "res-maya")],
+        [YOGA, (reads) => reads.resourceOf(YOGA, "res-studio-room")],
+        ["biz-pet-boarding", (reads) => reads.placeOrThingOf("biz-pet-boarding", "place-pet-boarding-suite")],
+        [BARBERSHOP, (reads) => reads.placeOrThingOf(BARBERSHOP, "place-pet-boarding-suite")],
+      ];
+      for (const [businessId, ask] of asks) {
+        expect(await ask(bound(businessId))).toEqual(await ask(reference()));
+      }
+      expect(await bound(BARBERSHOP).locationOf(BARBERSHOP, "loc-lees-barbershop-second-shop")).toEqual({
+        id: "loc-lees-barbershop-second-shop",
+        businessId: BARBERSHOP,
+        kind: "shop",
+        travelMiles: 25,
+        version: 1,
+      });
+      expect(await bound(BARBERSHOP).resourceOf(BARBERSHOP, "res-maya")).toBeNull();
+      expect(await bound(BARBERSHOP).placeOrThingOf(BARBERSHOP, "place-pet-boarding-suite")).toBeNull();
+    },
+  );
+
+  it(
+    "the service's checks through the binding: another business's location, worker or space is refused, its own passes",
+    SLOW,
+    async () => {
+      const way = {
+        serviceId: "svc-lees-kids-cut",
+        place: "business" as const,
+        locationId: "loc-lees-barbershop-second-shop",
+        path: "list|card|counter",
+        depositCents: null,
+        depositPercent: null,
+        feeCents: 2000,
+        cutoffBeforeMinutes: null,
+        cutoffDayBeforeAt: null,
+        tipLine: null,
+      };
+      const catalog = catalogOf(BARBERSHOP, bound(BARBERSHOP));
+      await expect(
+        catalog.addWay({ ...way, locationId: "loc-lee-home-services-office" }),
+      ).rejects.toMatchObject({ reason: "locationNotOnBusiness" });
+      const byPerson = {
+        serviceId: "svc-lees-event-hours",
+        conditions: { ...NO_CONDITIONS, workerResourceId: "res-maya" },
+        priceCents: 13_000,
+        fromCents: null,
+        setByPersonId: "person-sam",
+      };
+      await expect(catalog.addPrice(byPerson)).rejects.toMatchObject({ reason: "workerNotOnBusiness" });
+      await expect(
+        catalog.linkSpace({
+          placeOrThing: { id: "place-pet-boarding-suite", businessId: BARBERSHOP },
+          serviceId: "svc-lees-haircut",
+        }),
+      ).rejects.toMatchObject({ reason: "spaceNotOnBusiness" });
+      expect(catalog.written()).toEqual({ versionsRead: [], state: [] });
+
+      const added = await catalog.addWay(way);
+      // The way rests on its kind's rows by the names the database built (item 77) and the setup, at their versions.
+      expect(added.writes.versionsRead).toEqual([
+        { table: "services", rowId: "svc-lees-kids-cut", version: 1 },
+        { table: "company_kinds", rowId: "company-lees-barbershop/barber", version: 1 },
+        { table: "kind_flows", rowId: "barber/A", version: 1 },
+        { table: "business_setup", rowId: BARBERSHOP, version: 4 },
+      ]);
+      const avery = await catalog.addPrice({
+        ...byPerson,
+        conditions: { ...NO_CONDITIONS, workerResourceId: "res-avery" },
+      });
+      expect(avery.openedRuleId).not.toBeNull();
+      const inn = catalogOf("biz-pet-boarding", bound("biz-pet-boarding"));
+      const linked = await inn.linkSpace({
+        placeOrThing: { id: "place-pet-boarding-standard-run", businessId: "biz-pet-boarding" },
+        serviceId: "svc-boarding-suite-stay",
+      });
+      expect(linked.writes.state).toHaveLength(1);
+    },
+  );
+
+  it(
+    "a call with no turn handle reads no row by id: the way at its location fails closed (noTurn), nothing written",
+    SLOW,
+    async () => {
+      const catalog = catalogOf(BARBERSHOP, pgCatalogReads(cdb.toolApi, BARBERSHOP));
+      const error = await thrownBy(
+        catalog.addWay({
+          serviceId: "svc-lees-kids-cut",
+          place: "business",
+          locationId: "loc-lees-barbershop-second-shop",
+          path: "list|card|counter",
+          depositCents: null,
+          depositPercent: null,
+          feeCents: 2000,
+          cutoffBeforeMinutes: null,
+          cutoffDayBeforeAt: null,
+          tipLine: null,
+        }),
+      );
+      expect(error).toBeInstanceOf(CatalogReadError);
+      expect(error).toMatchObject({ read: "readTurnState", code: "noTurn" });
+      expect(catalog.written()).toEqual({ versionsRead: [], state: [] });
+    },
+  );
+
+  it(
+    "as the Tool API's own role (rosie_app) readTurnState is refused by privilege, never answered: it is the runtime side's read",
+    SLOW,
+    async () => {
+      const error = await thrownBy(
+        pgCatalogReads(cdb.toolApi, BARBERSHOP, { runtime: cdb.toolApi, handleId: SAM_HANDLE }).locationOf(
+          BARBERSHOP,
+          "loc-lees-barbershop-shop",
+        ),
+      );
+      // db/repo's scrubbed refusal passes through as thrown: its call and SQLSTATE alone (42501), never a value.
+      expect(error).toBeInstanceOf(Error);
+      expect(error).not.toBeInstanceOf(CatalogReadError);
+      expect(error).toMatchObject({ call: "readTurnState", code: "42501" });
     },
   );
 });

@@ -355,7 +355,7 @@ describe("kinds of work (K-23 company_kinds, K-24 kind_flows)", () => {
 });
 
 describe("services, ways and prices in one call (S1-12, S1-13)", () => {
-  it("adds a service, its way and its price, each seeing the one before, with ids made by rule", async () => {
+  it("adds a service, its price and its way, each seeing the one before, with ids made by rule", async () => {
     const store = new Store(seedRows(SEEDS));
     const { catalog } = catalogAt(store);
     const service = await catalog.addService({
@@ -364,6 +364,15 @@ describe("services, ways and prices in one call (S1-12, S1-13)", () => {
       priceKind: "one_price",
       unit: null,
       lengthMinutes: 60,
+    });
+    // The price before the way (S1-12 before S1-13): a list-priced way needs a price in effect at its save (K-25 rule 9;
+    // T-1433 (b)), which the way sees once this call has added it.
+    const price = await catalog.addPrice({
+      serviceId: service.id,
+      conditions: NO_CONDITIONS,
+      priceCents: 15_000,
+      fromCents: null,
+      setByPersonId: SAM,
     });
     const way = await catalog.addWay({
       serviceId: service.id,
@@ -376,13 +385,6 @@ describe("services, ways and prices in one call (S1-12, S1-13)", () => {
       cutoffBeforeMinutes: null,
       cutoffDayBeforeAt: null,
       tipLine: null,
-    });
-    const price = await catalog.addPrice({
-      serviceId: service.id,
-      conditions: NO_CONDITIONS,
-      priceCents: 15_000,
-      fromCents: null,
-      setByPersonId: SAM,
     });
     expect([service.id, way.id, price.openedRuleId]).toEqual([
       "svc-turn-sam-0300-1",
@@ -408,13 +410,19 @@ describe("services, ways and prices in one call (S1-12, S1-13)", () => {
     expect(way.writes.state[0]).toMatchObject({
       values: { flow: "B", place: "customer", path: "list|full|none", fee_cents: 8900, currency: "USD" },
     });
-    // Nothing was read at a version: every row it rests on was built in this call.
+    // The service and its price were built in this call, so neither is read at a version; the way rests on its kind's
+    // company_kinds row, the kind's flow B kind_flows row (by K-05 v1.18 item 77's names) and the business's setup row,
+    // each at the version read (limit 4; T-1433).
     const written = catalog.written();
-    expect(written.versionsRead).toEqual([]);
+    expect(written.versionsRead).toEqual([
+      { table: "company_kinds", rowId: "company-lees-barbershop/barber", version: 1 },
+      { table: "kind_flows", rowId: "barber/B", version: 1 },
+      { table: "business_setup", rowId: BARBERSHOP, version: 4 },
+    ]);
     expect(written.state.map((write) => [write.op, write.table])).toEqual([
       ["insert", "services"],
-      ["insert", "service_money"],
       ["insert", "price_rules"],
+      ["insert", "service_money"],
     ]);
     // The commit carries them in the part's writes, after what the part already writes.
     const unit = withCatalog(noWrites({ step: "S1-13", choice: "1 Yes" }), written);
@@ -474,9 +482,13 @@ describe("services, ways and prices in one call (S1-12, S1-13)", () => {
       ["update", "service_money"],
       ["insert", "services"],
     ]);
+    // The way's change also rests on its kind's rows by item 77's names and the business's setup (T-1433).
     expect(request.versionsRead).toEqual([
       { table: "services", rowId: "svc-lees-kids-cut", version: 1 },
       { table: "services", rowId: "svc-lees-haircut", version: 1 },
+      { table: "company_kinds", rowId: "company-lees-barbershop/barber", version: 1 },
+      { table: "kind_flows", rowId: "barber/A", version: 1 },
+      { table: "business_setup", rowId: BARBERSHOP, version: 4 },
     ]);
   });
 
@@ -575,7 +587,12 @@ describe("services, ways and prices in one call (S1-12, S1-13)", () => {
       feeCents: 2500,
     });
     expect(changed.writes).toEqual({
-      versionsRead: [{ table: "services", rowId: "svc-lees-haircut", version: 1 }],
+      versionsRead: [
+        { table: "services", rowId: "svc-lees-haircut", version: 1 },
+        { table: "company_kinds", rowId: "company-lees-barbershop/barber", version: 1 },
+        { table: "kind_flows", rowId: "barber/A", version: 1 },
+        { table: "business_setup", rowId: BARBERSHOP, version: 4 },
+      ],
       state: [
         {
           op: "update",

@@ -17,10 +17,14 @@ import { CatalogRefusedError, type CatalogRefusal } from "./errors";
 import type { CatalogReads } from "./reads";
 import type {
   BusinessKind,
+  BusinessSetup,
   Flow,
   FlowDefault,
+  LocationRow,
+  PlaceOrThingRow,
   PriceRuleRow,
   PriceTieRow,
+  ResourceRow,
   ScopedRow,
   ServiceRow,
   WayRow,
@@ -73,7 +77,10 @@ export function refusedFixture(file: string): { readonly rows: SeedRow[]; readon
   return { rows: [...(seed.rows ?? [])], refused: seed.refused };
 }
 
-/** The seeds every test starts from: the barbershop's and Lee Home Services' kinds, services, ways and prices, the rules. */
+/**
+ * The seeds every test starts from: the barbershop's and Lee Home Services' kinds, services, ways and prices, the rules,
+ * and K-04's worker resources (Riley and Avery at the barbershop, which a price by person names; T-1433).
+ */
 export const SEEDS = [
   "kinds-of-work/fixtures/seed-kinds-sample.json",
   "business-setup/fixtures/seed-company-two-kinds.json",
@@ -82,6 +89,7 @@ export const SEEDS = [
   "rules/fixtures/seed-note-only-rule.json",
   "rules/fixtures/seed-price-ok-limit.json",
   "bookings-changes/fixtures/seed-booking-line-price-copied.json",
+  "core/fixtures/seed-resources.json",
 ] as const;
 
 // ---- the store ------------------------------------------------------------------------------------------------------
@@ -245,13 +253,23 @@ const inForceAt = (row: Readonly<Row>, at: number): boolean => {
   return from <= at && (to === null || at < Date.parse(to));
 };
 
+/** K-05 v1.18 item 77's name of a row whose key is two columns: the key's values joined by "/" (the database builds it). */
+const nameOf = (first: string, second: string): string => `${first}/${second}`;
+
 export function kindOf(store: Store, row: Readonly<Row>): BusinessKind {
   const kindId = text(row, "kind_id");
+  const flowRow = (flow: Flow): Row | undefined =>
+    store.rows("kind_flows").find((each) => each.kind_id === kindId && each.flow === flow);
   const paths = (flow: Flow): string[] => {
-    const found = store.rows("kind_flows").find((each) => each.kind_id === kindId && each.flow === flow);
+    const found = flowRow(flow);
     return found === undefined ? [] : strings(found, "combos");
   };
+  const flows = (["A", "B"] as const).flatMap((flow) => {
+    const found = flowRow(flow);
+    return found === undefined ? [] : [{ rowId: nameOf(kindId, flow), flow, version: versionOf(found) }];
+  });
   return {
+    rowId: nameOf(text(row, "company_id"), kindId),
     companyId: text(row, "company_id"),
     kindId,
     businessId: text(row, "business_id"),
@@ -261,6 +279,41 @@ export function kindOf(store: Store, row: Readonly<Row>): BusinessKind {
     switchesB: strings(row, "pf_switches_b"),
     version: versionOf(row),
     paths: { A: paths("A"), B: paths("B") },
+    flows,
+  };
+}
+
+/** A business_setup row as read 1 answers it: its no money alone, with its key and version. */
+function setupOf(row: Readonly<Row>): BusinessSetup {
+  return { businessId: text(row, "business_id"), noMoney: row.no_money === true, version: versionOf(row) };
+}
+
+function locationOf(row: Readonly<Row>): LocationRow {
+  return {
+    id: text(row, "id"),
+    businessId: text(row, "business_id"),
+    kind: text(row, "kind") as LocationRow["kind"],
+    travelMiles: numberOrNull(row, "travel_miles"),
+    version: versionOf(row),
+  };
+}
+
+function resourceOf(row: Readonly<Row>): ResourceRow {
+  return {
+    id: text(row, "id"),
+    businessId: text(row, "business_id"),
+    kind: text(row, "kind"),
+    active: row.active !== false,
+    version: versionOf(row),
+  };
+}
+
+function placeOrThingOf(row: Readonly<Row>): PlaceOrThingRow {
+  return {
+    id: text(row, "id"),
+    businessId: text(row, "business_id"),
+    kind: text(row, "kind"),
+    version: versionOf(row),
   };
 }
 
@@ -352,6 +405,7 @@ function scopedOf(row: Readonly<Row>): ScopedRow {
 
 function flowDefaultOf(row: Readonly<Row>): FlowDefault {
   return {
+    rowId: nameOf(text(row, "business_id"), text(row, "flow")),
     businessId: text(row, "business_id"),
     flow: flowOrNull(row, "flow") ?? "A",
     cutoffBeforeMinutes: minutesOrNull(row, "cutoff_before"),
@@ -364,9 +418,11 @@ function flowDefaultOf(row: Readonly<Row>): FlowDefault {
 export type ReadLog = string[];
 
 /**
- * The five reads over the store, as T-1429's binding will answer them under the call's business scope: only the
- * business's rows (row-level security), each with its version; a service's rules in effect at or after the instant
- * asked; the rules and limits in force then. `scoped: false` answers every business's rows, as a leaky binding would.
+ * The catalog's reads over the store, as T-1429's binding answers them under the call's business scope: only the
+ * business's rows (row-level security), each with its version (and item 77's name for a key of two columns); the
+ * business's setup, or null with none; a service's rules in effect at or after the instant asked; the rules and limits in
+ * force then; a location, resource or space by its id, or null when the business has none by that id (T-1433). `scoped:
+ * false` answers every business's rows, as a leaky binding would.
  */
 export function readsOf(
   store: Store,
@@ -375,15 +431,23 @@ export function readsOf(
 ): CatalogReads {
   const scoped = options.scoped ?? true;
   const mine = (businessId: string) => (row: Readonly<Row>) => !scoped || row.business_id === businessId;
+  /** A row of `table` by its id under the business, or null. */
+  const byId = (table: string, businessId: string, id: string): Row | null =>
+    store
+      .rows(table)
+      .filter(mine(businessId))
+      .find((row) => row.id === id) ?? null;
   return {
     kindsOf(businessId) {
       log.push("kindsOf");
-      return Promise.resolve(
-        store
+      const [setup] = store.rows("business_setup").filter(mine(businessId));
+      return Promise.resolve({
+        setup: setup === undefined ? null : setupOf(setup),
+        kinds: store
           .rows("company_kinds")
           .filter(mine(businessId))
           .map((row) => kindOf(store, row)),
-      );
+      });
     },
     servicesOf(businessId) {
       log.push("servicesOf");
@@ -435,6 +499,21 @@ export function readsOf(
           .filter((row) => inForceAt(row, atMs))
           .map(scopedOf),
       });
+    },
+    locationOf(businessId, locationId) {
+      log.push("locationOf");
+      const row = byId("locations", businessId, locationId);
+      return Promise.resolve(row === null ? null : locationOf(row));
+    },
+    resourceOf(businessId, resourceId) {
+      log.push("resourceOf");
+      const row = byId("resources", businessId, resourceId);
+      return Promise.resolve(row === null ? null : resourceOf(row));
+    },
+    placeOrThingOf(businessId, placeOrThingId) {
+      log.push("placeOrThingOf");
+      const row = byId("places_or_things", businessId, placeOrThingId);
+      return Promise.resolve(row === null ? null : placeOrThingOf(row));
     },
   };
 }
