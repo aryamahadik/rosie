@@ -15,6 +15,14 @@
 // T-1185: a firing's state write gives a bytea column in K-04's text form ("\x" and hex), written as the bytes it
 // spells; a sealed value opens with its person's key (sealing.ts, under a wrapping key made here from random bytes for
 // the run and never written to a file), and any other form is thrown with nothing written.
+//
+// T-1437 (DL-927, DL-935): a firing takes the targets a turn's commit takes, through commit-turn.ts's own helpers. Its
+// tests add setup parts' seeds of fixture set v1's demo shops (K-22, K-23 and K-27: Lee's Barbershop, Lee Home Services,
+// the movers and the master's sample cast), each with its chain, as the tables' owner, over what a fixture's `given`
+// loaded; a row a firing writes there is one of those rows, or a seed row under a new id. A two-column row is named by
+// K-05 v1.18 item 77's "/" name, compared under the businesses the firing writes; a row of a table scoped none (sessions,
+// accounts, proof codes, calendar links, busy blocks) only under T-667 round 2's rules (items 8a and 8b), with the clock
+// row's business and its handle's people; and no update moves a row of a business to another business (item 8d).
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
@@ -25,6 +33,7 @@ import {
   type ArmClockRequest,
   cancelClock,
   type CancelClockRequest,
+  DataAccessDatabaseError,
   dueClocks,
   type DueClocksRequest,
   dueForHandle,
@@ -1253,6 +1262,583 @@ describe("fireClock: fire a row exactly once (K-05 item 7)", () => {
       const [bytes = new Uint8Array(0)] = stored;
       expect(sameBytes(bytes, sealed), "the stored address is the sealed address's bytes").toBe(true);
       expect(await unsealText(db.sql, KEYS, "person-alex", bytes)).toBe(address);
+    },
+  );
+});
+
+// ---- T-1437: a firing's targets are a turn's commit's (commit-turn.ts RowWriter) ------------------------------------------
+
+type StateWrite = FireClockRequest["writes"]["state"][number];
+type RowRef = FireClockRequest["versionsRead"][number];
+type Fired = Extract<FireClockOutcome, { result: "fired" }>;
+
+const DB_SCHEMA_DIR = new URL("db-schema/", CONTRACTS);
+const SETUP_SLOW = { timeout: 120_000 };
+const BARBERSHOP = "biz-lees-barbershop";
+const MOVERS = "biz-movers";
+/** The moment of this block's own firings: after its seeds' links were read and Sam's dropped (Nov 2026). */
+const SETUP_FIRED_AT = "2026-11-11T21:30:00Z";
+
+const partSeedUrl = (part: string, file: string): URL => new URL(`${part}/fixtures/${file}`, DB_SCHEMA_DIR);
+
+/** A seed's rows after those of every seed its `after` names (each path from the naming file's folder), each file once. */
+function chainRowsOf(file: URL, seen: Set<string>): SeedFile["rows"] {
+  if (seen.has(file.href)) {
+    return [];
+  }
+  seen.add(file.href);
+  const seed = readJson(file) as SeedFile;
+  return [...seed.after.flatMap((before) => chainRowsOf(new URL(before, file), seen)), ...seed.rows];
+}
+
+/**
+ * Loads setup parts' seeds of fixture set v1, each with its chain, as the tables' owner, over what `file`'s given
+ * loaded: the K-04 seed files its chain loaded (with their own chains) are not loaded twice.
+ */
+async function givenParts(file: string, parts: readonly (readonly [string, string])[]): Promise<void> {
+  const seen = new Set<string>();
+  for (const seed of chainOf(file).seeds) {
+    chainRowsOf(new URL(seed, CORE_DIR), seen);
+  }
+  const rows = parts.flatMap(([part, seed]) => chainRowsOf(partSeedUrl(part, seed), seen));
+  await db.sql.begin(async (tx) => {
+    for (const row of rows) {
+      await insertRow(tx, row.table, row.values);
+    }
+  });
+}
+
+/** The one own row of `table` in a setup part's seed whose values hold each of `match`'s. */
+function partSeedRow(
+  part: string,
+  file: string,
+  table: string,
+  match: Record<string, Json>,
+): Record<string, Json> {
+  const [row, ...more] = (readJson(partSeedUrl(part, file)) as SeedFile).rows.filter(
+    (each) =>
+      each.table === table && Object.entries(match).every(([column, value]) => each.values[column] === value),
+  );
+  if (row === undefined || more.length > 0) {
+    throw new Error(`${file} has no one ${table} row that matches`);
+  }
+  return row.values;
+}
+
+/** The setup tables this block's firings read or write, counted beside snapshot()'s. */
+const SETUP_VERSIONED = [
+  "companies",
+  "company_kinds",
+  "flow_defaults",
+  "accounts",
+  "proof_codes",
+  "sessions",
+  "calendar_links",
+  "calendar_link_shares",
+  "busy_blocks",
+];
+
+/** snapshot(), and each setup table's rows and the sum of their versions: equal before and after = nothing written. */
+async function everything(): Promise<Record<string, string>> {
+  const out = await snapshot();
+  for (const table of SETUP_VERSIONED) {
+    const [row] = await db.sql<{ n: number; v: number }[]>`
+      select count(*)::int as n, coalesce(sum(version), 0)::int as v from ${db.sql(table)}
+    `;
+    out[table] = `${String(row?.n)} rows, versions ${String(row?.v)}`;
+  }
+  return out;
+}
+
+/** An armed step clock row of `handleId` at `businessId` (or none), due before SETUP_FIRED_AT, written by the owner. */
+async function armedFor(id: string, handleId: string, businessId: string | null): Promise<void> {
+  await insertRow(db.sql, "clock_rows", {
+    id,
+    kind: "step",
+    handle_id: handleId,
+    business_id: businessId,
+    due_at: "2026-11-11T21:00:00Z",
+    due_zone: "America/New_York",
+    state: "armed",
+    armed_at: "2026-11-10T21:00:00Z",
+    fires: { step: "S11-100", safeDefault: "nothing changes" },
+  });
+}
+
+/** A turnless firing of an armed row armedFor wrote (version 1) that reads `versionsRead` and writes `state` alone. */
+function firingOf(clockRowId: string, versionsRead: RowRef[], state: StateWrite[] = []): FireClockRequest {
+  return {
+    clockRowId,
+    expectVersion: 1,
+    firedAt: SETUP_FIRED_AT,
+    by: "alarm",
+    jobId: `job-fire-${clockRowId}`,
+    turn: null,
+    versionsRead,
+    writes: {
+      state,
+      openQuestions: { open: [], close: [] },
+      clockRows: { make: [], cancel: [] },
+      outboxRows: [],
+      reservations: { confirm: [], release: [] },
+      events: [],
+    },
+  };
+}
+
+/** A state update of `ref`'s row by its id, at `expectVersion` (by default the version `ref` names). */
+function updateOf(ref: RowRef, set: Record<string, Json>, expectVersion = ref.version): StateWrite {
+  return {
+    op: "update",
+    table: ref.table,
+    key: { id: ref.rowId },
+    expectVersion,
+    set,
+  } as unknown as StateWrite;
+}
+
+/** A row a firing may not reach: it finds no row and throws (commit-turn.ts default 1, fail closed). */
+const notFoundIn = (table: string): RegExp =>
+  new RegExp(`^fireClock: a row of ${table} the request names does not exist`);
+
+/**
+ * A firing refused before anything is written: it throws a TypeError whose message matches `pattern`, every table stands
+ * as it was, and its clock row is still armed.
+ */
+async function expectRefused(request: FireClockRequest, pattern: RegExp, what: string): Promise<void> {
+  const before = await everything();
+  const error = await thrownBy(fireClock(runtime, structuredClone(request)));
+  expect(error, what).toBeInstanceOf(TypeError);
+  expect((error as Error).message, what).toMatch(pattern);
+  expect(await everything(), what).toEqual(before);
+  expect(await clockRow(request.clockRowId), what).toMatchObject({ state: "armed", fired_at: null });
+}
+
+describe("fireClock takes the setup tables a turn's commit takes (T-1437; K-05 v1.18 item 77; T-667 round 2)", () => {
+  const SHOP_SEEDS = [
+    ["business-setup", "seed-business-demo-shop.json"],
+    ["business-setup", "seed-company-two-kinds.json"],
+  ] as const;
+  const ELECTRICIAN = partSeedRow("business-setup", "seed-company-two-kinds.json", "company_kinds", {
+    kind_id: "electrician",
+  });
+  const BARBER: RowRef = { table: "company_kinds", rowId: "company-lees-barbershop/barber", version: 1 };
+  /** The barbershop's barber kind and flow B defaults, read by item 77's names at `version`. */
+  const shopReads = (version = 1): RowRef[] => [
+    { ...BARBER, version },
+    { table: "flow_defaults", rowId: `${BARBERSHOP}/B`, version },
+  ];
+  /**
+   * The barbershop's flow A defaults kept at 48 hours (S1-21) and its barber kind's trade name, each updated by its key
+   * (the key's columns in any order), and an electrician kind added (S1-04): two-column rows of K-23.
+   */
+  const shopWrites = (): StateWrite[] =>
+    [
+      {
+        op: "update",
+        table: "flow_defaults",
+        key: { flow: "A", business_id: BARBERSHOP },
+        expectVersion: 1,
+        set: { cutoff_before: "48 hours" },
+      },
+      {
+        op: "update",
+        table: "company_kinds",
+        key: { kind_id: "barber", company_id: "company-lees-barbershop" },
+        expectVersion: 1,
+        set: { trade_name: "Lee's Barbershop" },
+      },
+      {
+        op: "insert",
+        table: "company_kinds",
+        values: {
+          ...ELECTRICIAN,
+          company_id: "company-lees-barbershop",
+          business_id: BARBERSHOP,
+          version: undefined,
+        },
+      },
+    ] as unknown as StateWrite[];
+  /** The setup rows shopWrites writes, as the answer names them: by item 77's names. */
+  const SHOP_WRITTEN = [
+    { table: "flow_defaults", rowId: `${BARBERSHOP}/A`, version: 2 },
+    { table: "company_kinds", rowId: "company-lees-barbershop/barber", version: 2 },
+    { table: "company_kinds", rowId: "company-lees-barbershop/electrician", version: 1 },
+  ];
+
+  it(
+    "compares two-column rows by their '/' names and updates them by their keys, answered by those names; another business's name, a kind's id alone or a stale version writes nothing",
+    SETUP_SLOW,
+    async () => {
+      const exchange = await given("fire-once.json");
+      await givenParts("fire-once.json", SHOP_SEEDS);
+      const firing = (reads: RowRef[]): FireClockRequest => {
+        const request = fireRequest();
+        request.versionsRead.push(...reads);
+        request.writes.state = shopWrites();
+        return request;
+      };
+      // Alex's A7-03 firing writes the barbershop's rows: another business's kind by its name (a row that is there), or
+      // a kind's id alone, finds no row, and the firing throws with nothing written (N2, N3).
+      const plumbing: RowRef = {
+        table: "company_kinds",
+        rowId: "company-lee-home-services/plumber",
+        version: 1,
+      };
+      expect(
+        await db.sql`select version from company_kinds where company_id || '/' || kind_id = ${plumbing.rowId}`,
+      ).toEqual([{ version: 1 }]);
+      await expectRefused(
+        firing([plumbing]),
+        notFoundIn("company_kinds"),
+        "Lee Home Services' kind by its name",
+      );
+      await expectRefused(
+        firing([{ ...BARBER, rowId: "barber" }]),
+        notFoundIn("company_kinds"),
+        "the barber kind by its kind's id alone",
+      );
+      // Versions read that moved: versionChanged names each changed row by its name (limit 4), nothing written.
+      const before = await everything();
+      const stale = await fireClock(runtime, firing(shopReads(2)));
+      expect(stale).toEqual({
+        error: "versionChanged",
+        changed: [
+          {
+            table: "company_kinds",
+            rowId: "company-lees-barbershop/barber",
+            readVersion: 2,
+            currentVersion: 1,
+          },
+          { table: "flow_defaults", rowId: `${BARBERSHOP}/B`, readVersion: 2, currentVersion: 1 },
+        ],
+      });
+      expect(answerErrors("fireClock", stale)).toEqual([]);
+      expect(await everything()).toEqual(before);
+      expect(await clockRow(CLOCK_ROW)).toMatchObject({ state: "armed", version: 2 });
+
+      const outcome = fired(await fireClock(runtime, firing(shopReads())));
+      expect(answerErrors("fireClock", outcome)).toEqual([]);
+      const first = exchange.outcome as unknown as Fired;
+      expect(outcome).toEqual({
+        ...first,
+        committed: { ...first.committed, written: [...SHOP_WRITTEN, ...first.committed.written] },
+      });
+      const [cutoff] = await db.sql<{ minutes: number; version: number }[]>`
+        select (extract(epoch from cutoff_before) / 60)::integer as minutes, version from flow_defaults
+        where business_id = ${BARBERSHOP} and flow = 'A'
+      `;
+      expect(cutoff).toEqual({ minutes: 2880, version: 2 });
+      const kinds = await db.sql<{ kind_id: string; trade_name: string | null; version: number }[]>`
+        select kind_id, trade_name, version from company_kinds where company_id = 'company-lees-barbershop'
+        order by kind_id
+      `;
+      expect(kinds).toEqual([
+        { kind_id: "barber", trade_name: "Lee's Barbershop", version: 2 },
+        { kind_id: "electrician", trade_name: ELECTRICIAN.trade_name, version: 1 },
+      ]);
+      expect(await clockRow(CLOCK_ROW)).toMatchObject({ state: "fired", version: 3 });
+    },
+  );
+
+  it(
+    "answers the same two-column reads and writes as a turn's commit answers them (one shared reading)",
+    SETUP_SLOW,
+    async () => {
+      await given("fire-once.json");
+      await givenParts("fire-once.json", SHOP_SEEDS);
+      const request = fireRequest();
+      request.versionsRead.push(...shopReads());
+      request.writes.state = shopWrites();
+      const firing = fired(await fireClock(runtime, request));
+      // The same reads and writes in a turn of Sam's, from the same rows.
+      await given("fire-once.json");
+      await givenParts("fire-once.json", SHOP_SEEDS);
+      const commit = await commitTurn(
+        runtime,
+        {
+          turn: {
+            id: "turn-t1437-shop",
+            handleId: "handle-sam",
+            eventIds: ["evt-t1437-shop"],
+            bundleId: { hash: "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", build: 1 },
+            traceId: "trace-t1437-shop",
+            joinedTraceIds: [],
+            tries: 1,
+          },
+          versionsRead: shopReads(),
+          writes: {
+            state: shopWrites(),
+            openQuestions: { open: [], close: [] },
+            clockRows: { make: [], cancel: [] },
+            outboxRows: [],
+            reservations: { confirm: [], release: [] },
+            events: [],
+          },
+        },
+        { now: new Date(SETUP_FIRED_AT) },
+      );
+      expect("result" in commit ? commit.committed.written : commit).toEqual(SHOP_WRITTEN);
+      expect(firing.committed.written.slice(0, SHOP_WRITTEN.length)).toEqual(SHOP_WRITTEN);
+    },
+  );
+
+  it(
+    "compares a two-column read under the firing's own clock row's business too, when it writes nothing else (default 11)",
+    SETUP_SLOW,
+    async () => {
+      await given("fire-once.json");
+      await givenParts("fire-once.json", SHOP_SEEDS);
+      await armedFor("clock-t1437-sam-shop", "handle-sam", BARBERSHOP);
+      const plumbing: RowRef = {
+        table: "company_kinds",
+        rowId: "company-lee-home-services/plumber",
+        version: 1,
+      };
+      await expectRefused(
+        firingOf("clock-t1437-sam-shop", [plumbing]),
+        notFoundIn("company_kinds"),
+        "Lee Home Services' kind, from the barbershop's clock",
+      );
+      const outcome = await fireClock(runtime, firingOf("clock-t1437-sam-shop", shopReads()));
+      expect(answerErrors("fireClock", outcome)).toEqual([]);
+      expect(outcome).toEqual({
+        result: "fired",
+        clockRowId: "clock-t1437-sam-shop",
+        version: 2,
+        firedAt: SETUP_FIRED_AT,
+        turnId: null,
+        repeated: false,
+        committed: { written: [], outboxRows: [], promoted: [] },
+      });
+    },
+  );
+
+  // K-22's and K-27's rows bound to a person (seed-session's chain: Sam's codes, sessions and account; seed-busy-block's:
+  // the links of Sam, Riley and Avery, their shares, two calendar blocks and the movers' photo block).
+  const PERSON_SEEDS = [
+    ["people-access", "seed-session.json"],
+    ["availability", "seed-busy-block.json"],
+  ] as const;
+  const SESSION: RowRef = { table: "sessions", rowId: "session-sam-oct26", version: 2 };
+  const ACCOUNT: RowRef = { table: "accounts", rowId: "person-sam", version: 3 };
+  const SIGN_IN_CODE: RowRef = { table: "proof_codes", rowId: "code-sam-sign-in-oct26", version: 3 };
+  const OWNER_EMAIL_CODE: RowRef = { table: "proof_codes", rowId: "code-sam-owner-email", version: 2 };
+  const SAM_LINK: RowRef = { table: "calendar_links", rowId: "callink-sam-microsoft", version: 9 };
+  const RILEY_LINK: RowRef = { table: "calendar_links", rowId: "callink-riley-google", version: 7 };
+  const SAM_BLOCK: RowRef = { table: "busy_blocks", rowId: "busy-sam-thu-nov-12", version: 1 };
+  const RILEY_BLOCK: RowRef = { table: "busy_blocks", rowId: "busy-riley-sat-nov-7", version: 1 };
+  const MOVERS_PHOTO: RowRef = {
+    table: "busy_blocks",
+    rowId: "busy-sam-movers-photo-sat-nov-14",
+    version: 1,
+  };
+  const CONNECTING = partSeedRow("availability", "seed-calendar-link.json", "calendar_links", {
+    state: "connecting",
+  });
+  /** K-27's connecting link (Avery's, the seed's one) under a new id for `personId`, as a connect's start writes it. */
+  const newLink = (id: string, personId: string): StateWrite =>
+    ({
+      op: "insert",
+      table: "calendar_links",
+      values: { ...CONNECTING, id, person_id: personId, version: undefined },
+    }) as unknown as StateWrite;
+  const END_SESSION = { ended_at: SETUP_FIRED_AT, ended_why: "handed_over" };
+
+  it(
+    "reaches a row scoped none only under round 2's rules: the clock's handle's people's own, and a link or block through a live share to its business (items 8a, 8b)",
+    SETUP_SLOW,
+    async () => {
+      await given("fire-once.json");
+      await givenParts("fire-once.json", PERSON_SEEDS);
+      await armedFor("clock-t1437-alex", "handle-alex", BARBERSHOP);
+      await armedFor("clock-t1437-sam", "handle-sam", BARBERSHOP);
+      await armedFor("clock-t1437-sam-later", "handle-sam", BARBERSHOP);
+      await armedFor("clock-t1437-sam-none", "handle-sam", null);
+
+      // Alex's clock at the barbershop reaches none of Sam's own rows, read or written: each finds no row.
+      for (const [what, request, table] of [
+        ["Sam's session read", firingOf("clock-t1437-alex", [SESSION]), "sessions"],
+        ["Sam's account read", firingOf("clock-t1437-alex", [ACCOUNT]), "accounts"],
+        ["Sam's sign-in code read", firingOf("clock-t1437-alex", [SIGN_IN_CODE]), "proof_codes"],
+        [
+          "Sam's session ended",
+          firingOf("clock-t1437-alex", [], [updateOf(SESSION, END_SESSION)]),
+          "sessions",
+        ],
+      ] as const) {
+        await expectRefused(request, notFoundIn(table), what);
+      }
+      // A link written for another person (Maya, who shares none with the barbershop) is refused before any write, so
+      // Alex's own link written ahead of it is not written either.
+      await expectRefused(
+        firingOf(
+          "clock-t1437-alex",
+          [],
+          [newLink("callink-alex-google", "person-alex"), newLink("callink-maya-google", "person-maya")],
+        ),
+        /^fireClock: a state insert into calendar_links writes a row outside its rule for a firing \(default 10\)$/,
+        "a link for Maya",
+      );
+      // Alex's own link is written, on the runtime side, and the links and blocks the barbershop reads through a live
+      // share are compared.
+      const alex = fired(
+        await fireClock(
+          runtime,
+          firingOf(
+            "clock-t1437-alex",
+            [SAM_LINK, RILEY_LINK, RILEY_BLOCK],
+            [newLink("callink-alex-google", "person-alex")],
+          ),
+        ),
+      );
+      expect(answerErrors("fireClock", alex)).toEqual([]);
+      expect(alex.committed.written).toEqual([
+        { table: "calendar_links", rowId: "callink-alex-google", version: 1 },
+      ]);
+
+      // Sam's clock at the barbershop: never the movers' photo block; his own session, account and codes, his link,
+      // and the calendar blocks of the links the barbershop reads through a live share.
+      await expectRefused(
+        firingOf("clock-t1437-sam", [MOVERS_PHOTO]),
+        notFoundIn("busy_blocks"),
+        "the movers' photo",
+      );
+      const sam = fired(
+        await fireClock(
+          runtime,
+          firingOf(
+            "clock-t1437-sam",
+            [ACCOUNT, OWNER_EMAIL_CODE, SIGN_IN_CODE, SAM_BLOCK, RILEY_BLOCK],
+            [updateOf(SESSION, END_SESSION), updateOf(SAM_LINK, { drop_reminded_at: SETUP_FIRED_AT })],
+          ),
+        ),
+      );
+      expect(answerErrors("fireClock", sam)).toEqual([]);
+      expect(sam.committed.written).toEqual([
+        { table: "sessions", rowId: SESSION.rowId, version: 3 },
+        { table: "calendar_links", rowId: SAM_LINK.rowId, version: 10 },
+      ]);
+
+      // A share that has ended: the barbershop reaches neither Riley's link nor its block.
+      await db.sql`
+        update calendar_link_shares set ended_at = ${SETUP_FIRED_AT}, version = version + 1
+        where id = 'share-riley-barbershop'
+      `;
+      for (const ref of [RILEY_LINK, RILEY_BLOCK]) {
+        await expectRefused(
+          firingOf("clock-t1437-sam-later", [ref]),
+          notFoundIn(ref.table),
+          `${ref.rowId}, share ended`,
+        );
+      }
+
+      // With no business (a sign-up's clock): no busy block, not even Sam's own, and no code of a business; his own link,
+      // code of no business, session and account are compared.
+      for (const ref of [SAM_BLOCK, OWNER_EMAIL_CODE]) {
+        await expectRefused(
+          firingOf("clock-t1437-sam-none", [ref]),
+          notFoundIn(ref.table),
+          `${ref.rowId}, no business`,
+        );
+      }
+      const none = await fireClock(
+        runtime,
+        firingOf("clock-t1437-sam-none", [
+          { ...SAM_LINK, version: 10 },
+          SIGN_IN_CODE,
+          ACCOUNT,
+          { ...SESSION, version: 3 },
+        ]),
+      );
+      expect(answerErrors("fireClock", none)).toEqual([]);
+      expect(none).toMatchObject({ result: "fired", turnId: null, committed: { written: [] } });
+    },
+  );
+
+  it(
+    "refuses an update that gives a row's business another value, with nothing written: in code where row-level security does not hold it, by row-level security where it does (item 8d)",
+    SETUP_SLOW,
+    async () => {
+      await given("fire-once.json");
+      await givenParts("fire-once.json", PERSON_SEEDS);
+      await armedFor("clock-t1437-sam", "handle-sam", BARBERSHOP);
+      await armedFor("clock-t1437-sam-movers", "handle-sam", MOVERS);
+      // K-22's codes and K-27's photo blocks: rosie_job's policy is true, so the firing refuses the move itself.
+      const moved =
+        /^fireClock: a state update of (proof_codes|busy_blocks) may not move a row of a business to another business$/;
+      for (const [what, request] of [
+        [
+          "Sam's owner-email code to the movers",
+          firingOf("clock-t1437-sam", [], [updateOf(OWNER_EMAIL_CODE, { business_id: MOVERS })]),
+        ],
+        [
+          "Sam's owner-email code to none",
+          firingOf("clock-t1437-sam", [], [updateOf(OWNER_EMAIL_CODE, { business_id: null })]),
+        ],
+        [
+          "the movers' photo block to the barbershop",
+          firingOf("clock-t1437-sam-movers", [], [updateOf(MOVERS_PHOTO, { business_id: BARBERSHOP })]),
+        ],
+        [
+          "the movers' photo block to none",
+          firingOf("clock-t1437-sam-movers", [], [updateOf(MOVERS_PHOTO, { business_id: null })]),
+        ],
+      ] as const) {
+        await expectRefused(request, moved, what);
+      }
+      // A stale move is answered versionChanged first, as any stale write, and writes nothing.
+      const before = await everything();
+      const stale = await fireClock(
+        runtime,
+        firingOf("clock-t1437-sam", [], [updateOf(OWNER_EMAIL_CODE, { business_id: MOVERS }, 1)]),
+      );
+      expect(stale).toEqual({
+        error: "versionChanged",
+        changed: [{ table: "proof_codes", rowId: OWNER_EMAIL_CODE.rowId, readVersion: 1, currentVersion: 2 }],
+      });
+      expect(await everything()).toEqual(before);
+      // Where row-level security holds the business (Alex's booking), it refuses the write under the row's own scope:
+      // 42501, scrubbed to its SQLSTATE, nothing written.
+      const booking = fireRequest();
+      booking.writes.state = [
+        updateOf(
+          { table: "bookings", rowId: "booking-alex-haircut", version: 7 },
+          { business_id: "biz-yoga-studio" },
+        ),
+      ];
+      const refusal = await thrownBy(fireClock(runtime, booking));
+      expect(refusal).toBeInstanceOf(DataAccessDatabaseError);
+      expect(refusal).toMatchObject({ code: "42501", constraint: null });
+      expect((refusal as Error).message).toMatch(
+        /^fireClock: the database refused the call \(SQLSTATE 42501/,
+      );
+      expect(await everything()).toEqual(before);
+      expect(await clockRow(CLOCK_ROW)).toMatchObject({ state: "armed", version: 2 });
+      // The row's own business named again moves nothing, and a code with no business may be given the clock's
+      // business (S1-09's way): both fire.
+      const kept = fired(
+        await fireClock(
+          runtime,
+          firingOf("clock-t1437-sam-movers", [], [updateOf(MOVERS_PHOTO, { business_id: MOVERS })]),
+        ),
+      );
+      expect(kept.committed.written).toEqual([
+        { table: "busy_blocks", rowId: MOVERS_PHOTO.rowId, version: 2 },
+      ]);
+      const placed = fired(
+        await fireClock(
+          runtime,
+          firingOf("clock-t1437-sam", [], [updateOf(SIGN_IN_CODE, { business_id: BARBERSHOP })]),
+        ),
+      );
+      expect(placed.committed.written).toEqual([
+        { table: "proof_codes", rowId: SIGN_IN_CODE.rowId, version: 4 },
+      ]);
+      const [code] = await db.sql<{ business_id: string | null }[]>`
+        select business_id from proof_codes where id = ${SIGN_IN_CODE.rowId}
+      `;
+      expect(code?.business_id).toBe(BARBERSHOP);
     },
   );
 });

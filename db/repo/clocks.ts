@@ -33,10 +33,23 @@
 // rows. fireClock's writes go per write, as commitTurn's do: before each write the scope is set to that write's own
 // business (set_config(..., true)), so row-level security holds each write to its business.
 //
-// The firing's commit below follows db/repo/commit-turn.ts step for step (its helpers are not exported, and this card
-// may not change that file), with two differences a firing needs: the turn may be null (a row no handle owns, or a
-// firing that writes no outbox row), so the rows a commit keys on the turn (open questions, outbox rows) need one, and
-// what it writes carries the job id instead (effects: job_id; entries: job_id beside the turn id).
+// The firing's commit below follows db/repo/commit-turn.ts step for step, with two differences a firing needs: the turn
+// may be null (a row no handle owns, or a firing that writes no outbox row), so the rows a commit keys on the turn (open
+// questions, outbox rows) need one, and what it writes carries the job id instead (effects: job_id; entries: job_id
+// beside the turn id).
+//
+// Its state writes and version reads take the targets a turn's commit takes (T-1437; DL-927, DL-935), read by
+// commit-turn.ts's own exported helpers (RowWriter: tableInfo, oneKey, stateUpdateTarget, lockRow, comparedBusinesses,
+// refuseBusinessMoves), so the two writers never drift: every table commitTurn accepts, T-667's setup tables among them; a
+// two-column key (K-05 v1.18 item 77: company_kinds, flow_defaults, kind_flows, picked_kind_texts,
+// new_work_draft_blocks) named by its key's values joined by "/", which the SQL builds and compares whole, never split,
+// an update finding its row by the key's columns and a version read its row by the name, beside the business filter
+// (commit-turn.ts default 14; T-1427's N2 and N3), whose businesses include the firing's own clock row's (default 11);
+// K-22's sessions and K-27's calendar_links written on the runtime side (commit-turn.ts default 15); and no update that
+// moves a row of a business to another business or to none (commit-turn.ts default 16; T-667 round 2's item 8d): refused
+// by row-level security where it holds the row's business (42501), and in code, after the compares and before any write,
+// where it does not. A row of a table scoped none is reached only under round 2's rules (items 8a and 8b; default 10).
+// A one-column core table's firing is unchanged.
 //
 // Refusals write nothing: the transaction rolls back. A database rule that refuses a firing's write (23P01, 23514,
 // 23505, 23503) answers constraint with the SQLSTATE and the constraint's name only; a serialization failure, a deadlock
@@ -72,12 +85,52 @@
 //   9. A firing's state write gives a bytea column (a sealed value) in K-04's text form, "\x" and hex digit pairs, and
 //      it is written as the bytes it spells, as commitTurn's are (commit-turn.ts default 11; bytea.ts; T-1185):
 //      postgres.js would store a string's own characters. A value in any other form throws, and nothing is written.
+//  10. (T-1437) A firing reaches a row of a table scoped none (setup/fact-homes.ts UNSCOPED_ROWS) only as T-667 round 2's
+//      items 8a and 8b let readTurnState read one, with the clock row's business for the request's business and the
+//      clock row's handle's people (person_handles) for the request handle's people: K-22's accounts and sessions only a
+//      row of one of those people; proof_codes the same, and only of no business or the clock row's (with no business,
+//      no business only); K-27's calendar_links a link with a live share (calendar_link_shares, ended_at null) to the
+//      clock row's business, or a link of one of those people; busy_blocks a photo block of the clock row's business, or
+//      a calendar block whose link has a live share to it (with no business, none); K-24's kinds and kind_flows, the
+//      shared catalog, any row. A row no handle owns has no people. A version read or an update of a row outside its rule
+//      finds no row and throws (commit-turn.ts default 1, fail closed, as another business's two-column name does); an
+//      insert, or an update's row as it will stand (the row as locked with the columns its set writes), outside its rule
+//      throws after the compares and the move check and before any write. Nothing is written either way. So a firing
+//      never compares or writes another business's or another person's row of these tables, though commitTurn, which
+//      runs for a person's own turn, writes them on the runtime side (commit-turn.ts default 15).
+//  11. (T-1437) The businesses a two-column version read is compared under (commit-turn.ts default 14) include the clock
+//      row's own business, a row the firing writes (fired), or none when it has none, as a commit counts each row it
+//      updates.
+import type postgres from "postgres";
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.1";
 import { byteaFromText } from "./bytea";
-import { NOT_STATE_TABLES } from "./commit-turn";
+import {
+  addTarget,
+  businessOf,
+  comparedBusinesses,
+  type Expectation,
+  keyValuesOf,
+  keyWhere,
+  type Locked,
+  type LockTarget,
+  lockRow,
+  type Mode,
+  NOT_STATE_TABLES,
+  oneKey,
+  refuseBusinessMoves,
+  type RowWriter,
+  singleColumn,
+  stateUpdateTarget,
+  tableInfo,
+  type TableInfo,
+  targetKey,
+  type UpdateTarget,
+} from "./commit-turn";
 import { appendEvent, type EventContext, type EventEntry as LogEntry } from "./event-log";
 import { releaseIn } from "./reservations";
 import { assertBusinessId, SCOPE_SETTING, type Sql } from "./scope";
+import { UNSCOPED_ROWS } from "./setup/fact-homes";
+import { rowNameSql } from "./setup/row-names";
 import { assertRequestShape, inRuntimeTransaction, isSessionFailure, transientOrThrow, utc } from "./targets";
 
 type Json = Parameters<Sql["json"]>[0];
@@ -939,27 +992,22 @@ class Scope {
   }
 }
 
-interface TableInfo {
-  readonly name: string;
-  readonly columns: ReadonlySet<string>;
-  readonly jsonColumns: ReadonlySet<string>;
-  /** The columns of type bytea, whose values come in K-04's text form and are written as their bytes (default 9). */
-  readonly byteaColumns: ReadonlySet<string>;
-  readonly key: readonly string[];
-  readonly versioned: boolean;
-  /** The column row-level security scopes the table by (K-04 rule 4), or null for a table with none. */
-  readonly scopeColumn: string | null;
-}
-
-/** One firing: its moment (firedAt), its turn or none, the job id its writes carry, its scope and the tables it read. */
-interface Firing {
-  readonly tx: Sql;
+/**
+ * One firing: its moment (firedAt), its turn or none, the job id its writes carry and its scope; as a writer of state
+ * rows (commit-turn.ts RowWriter: T-1437), the tables and two-column updates it read; and the clock row's business and
+ * handle, which the rows of a table scoped none are held to (default 10).
+ */
+interface Firing extends RowWriter {
+  readonly call: "fireClock";
   readonly now: Date;
   readonly at: string;
   readonly turn: K05.Turn | null;
   readonly jobId: string;
   readonly scope: Scope;
-  readonly tables: Map<string, TableInfo>;
+  /** The clock row's business (default 10), or null when it has none. */
+  readonly business: string | null;
+  /** The clock row's handle, whose people a person's row must be of (default 10), or null when no handle owns it. */
+  readonly handleId: string | null;
 }
 
 const FIRE = "fireClock";
@@ -982,89 +1030,6 @@ function eventContextOf(f: Firing): EventContext {
         traceId: f.turn.traceId,
         bundle: { hash: f.turn.bundleId.hash, build: f.turn.bundleId.build },
       };
-}
-
-/**
- * A table's columns, its JSON and bytea columns, its primary key and its row-level security, from the catalog: an
- * ordinary table of this connection's search path (never one of PostgreSQL's own), or a throw. Read once per call.
- */
-async function tableInfo(f: Firing, table: string): Promise<TableInfo> {
-  const known = f.tables.get(table);
-  if (known !== undefined) {
-    return known;
-  }
-  assertName(FIRE, table, "a table name");
-  const [row] = await f.tx<
-    { rls: boolean; columns: string[]; json_columns: string[]; bytea_columns: string[]; key: string[] }[]
-  >`
-    select c.relrowsecurity as rls,
-           array(select a.attname::text from pg_attribute a
-                 where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
-                 order by a.attnum) as columns,
-           array(select a.attname::text from pg_attribute a
-                 where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
-                   and a.atttypid in ('json'::regtype, 'jsonb'::regtype)
-                 order by a.attnum) as json_columns,
-           array(select a.attname::text from pg_attribute a
-                 where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped
-                   and a.atttypid = 'bytea'::regtype
-                 order by a.attnum) as bytea_columns,
-           array(select a.attname::text
-                 from pg_index i
-                 cross join lateral unnest(i.indkey::int2[]) with ordinality as k(attnum, ord)
-                 join pg_attribute a on a.attrelid = i.indrelid and a.attnum = k.attnum
-                 where i.indrelid = c.oid and i.indisprimary
-                 order by k.ord) as key
-    from pg_class c
-    join pg_namespace n on n.oid = c.relnamespace
-    where c.oid = to_regclass(${table}) and c.relkind in ('r', 'p') and n.nspname = any (current_schemas(false))
-  `;
-  if (row === undefined) {
-    fail(FIRE, `no table ${table} in this database's schema`);
-  }
-  const columns = new Set(row.columns);
-  let scopeColumn: string | null = null;
-  if (row.rls) {
-    scopeColumn = table === "businesses" ? "id" : "business_id";
-    if (!columns.has(scopeColumn)) {
-      fail(FIRE, `${table} has row-level security but no business column this call can scope by`);
-    }
-  }
-  const info: TableInfo = {
-    name: table,
-    columns,
-    jsonColumns: new Set(row.json_columns),
-    byteaColumns: new Set(row.bytea_columns),
-    key: row.key,
-    versioned: columns.has("version"),
-    scopeColumn,
-  };
-  f.tables.set(table, info);
-  return info;
-}
-
-/** The one key column of a versioned table: a row reference names a row by one key as text (K-02 fact rowId). */
-function oneKey(info: TableInfo): string {
-  const [key, ...more] = info.key;
-  if (!info.versioned) {
-    fail(FIRE, `${info.name} carries no version, so no firing compares or names its rows`);
-  }
-  if (key === undefined || more.length > 0) {
-    fail(FIRE, `${info.name}'s primary key is not one column, so a row reference cannot name its rows`);
-  }
-  return key;
-}
-
-function businessOf(info: TableInfo, row: Row): string | null {
-  if (info.scopeColumn === null) {
-    return null;
-  }
-  const value = row[info.scopeColumn];
-  if (value === null || value === undefined) {
-    return null;
-  }
-  assertId(FIRE, value, `${info.name}.${info.scopeColumn}`);
-  return value;
 }
 
 /**
@@ -1108,17 +1073,112 @@ function columnValues(f: Firing, info: TableInfo, values: Row, what: string): Re
   return out;
 }
 
-// ---- the firing's locks and compares (commitTurn's step 2) ---------------------------------------------------------------
+// ---- a firing's rows of a table scoped none (default 10; T-1437; T-667 round 2's items 8a and 8b) ------------------------
 
-type Mode = "share" | "update";
-
-interface Locked {
-  readonly table: string;
-  readonly rowId: string;
-  readonly version: number;
-  readonly business: string | null;
-  readonly row: Row;
+/** A value a write gives a column a rule reads (an id or a word): its text, or null for anything else, which meets none. */
+function textOrNull(value: unknown): string | null {
+  return typeof value === "string" ? value : null;
 }
+
+/**
+ * The rule a firing's row of `table` must meet (default 10), as SQL over `column(name)`: the row's own column (a lock),
+ * or the value a write leaves in it (an insert, or an update's row as it will stand). Null for a table with no such rule:
+ * a business-scoped table (row-level security per write, and a two-column compare's businesses), K-24's shared catalog
+ * (kinds, kind_flows), and every table setup/fact-homes.ts UNSCOPED_ROWS does not list. The K-27 rules are the Tool
+ * API's select policies (0024 calendar_links_tool_api_select, busy_blocks_tool_api_select) with the clock row's business
+ * for rosie.business_id and its handle's people for rosie.person_id, as setup/turn-state.ts rowBound reads them.
+ */
+function scopedNoneRule(
+  f: Firing,
+  table: string,
+  column: (name: string) => postgres.Fragment,
+): postgres.Fragment | null {
+  const rule = Object.hasOwn(UNSCOPED_ROWS, table) ? UNSCOPED_ROWS[table] : undefined;
+  if (rule === undefined || rule === "catalog") {
+    return null;
+  }
+  const { tx, business, handleId } = f;
+  // The clock row's handle's people, as K-05 item 26 reads a handle's; a row no handle owns has none.
+  const ofPeople =
+    handleId === null
+      ? tx`false`
+      : tx`${column("person_id")} in (select ph.person_id from person_handles ph where ph.handle_id = ${handleId})`;
+  switch (rule) {
+    case "person":
+      return ofPeople;
+    case "personCode":
+      return business === null
+        ? tx`(${ofPeople}) and ${column("business_id")} is null`
+        : tx`(${ofPeople}) and (${column("business_id")} is null or ${column("business_id")} = ${business})`;
+    case "calendarLink":
+      return business === null
+        ? ofPeople
+        : tx`exists (
+            select 1 from calendar_link_shares s
+            where s.calendar_link_id = ${column("id")} and s.business_id = ${business} and s.ended_at is null
+          ) or (${ofPeople})`;
+    case "busyBlock":
+      return business === null
+        ? tx`false`
+        : tx`(${column("source")} = 'photo' and ${column("business_id")} = ${business}) or (
+            ${column("source")} = 'calendar'
+            and exists (
+              select 1 from calendar_link_shares s
+              where s.calendar_link_id = ${column("calendar_link_id")} and s.business_id = ${business}
+                and s.ended_at is null
+            )
+          )`;
+  }
+}
+
+/** A table's rule over the row a lock finds (default 10), or null for a table with none. */
+function lockRule(f: Firing, table: string): postgres.Fragment | null {
+  return scopedNoneRule(f, table, (name) => f.tx`${f.tx(`${table}.${name}`)}`);
+}
+
+/**
+ * Whether `values`, a row as a state write leaves it, meets its table's rule (default 10): read on the runtime side,
+ * where every live share is seen, before any write. True for a table with no such rule, which reads nothing.
+ */
+async function meetsRule(f: Firing, table: string, values: Row): Promise<boolean> {
+  const rule = scopedNoneRule(f, table, (name) => f.tx`${textOrNull(values[name])}::text`);
+  if (rule === null) {
+    return true;
+  }
+  await f.scope.to(null);
+  const [row] = await f.tx<{ meets: boolean }[]>`select coalesce((${rule}), false) as meets`;
+  return row?.meets === true;
+}
+
+/**
+ * No state write leaves a row of a table scoped none outside its rule (default 10): an insert's values, and an update's
+ * row as it will stand (the row as locked with each column its set writes), each held to it before any write.
+ */
+async function refuseRowsOutsideRules(
+  f: Firing,
+  state: readonly K05.StateWrite[],
+  locked: (table: string, rowId: string) => Locked,
+): Promise<void> {
+  for (const write of state) {
+    if (write.op === "insert") {
+      if (!(await meetsRule(f, write.table, write.values))) {
+        fail(
+          FIRE,
+          `a state insert into ${write.table} writes a row outside its rule for a firing (default 10)`,
+        );
+      }
+      continue;
+    }
+    const { row } = locked(write.table, (await stateUpdateTarget(f, write)).rowId);
+    // A column whose value is undefined is not written (columnValues), so the row keeps its own.
+    const set = Object.fromEntries(Object.entries(write.set).filter(([, value]) => value !== undefined));
+    if (!(await meetsRule(f, write.table, { ...row, ...set }))) {
+      fail(FIRE, `a state update of ${write.table} leaves a row outside its rule for a firing (default 10)`);
+    }
+  }
+}
+
+// ---- the firing's locks and compares (commitTurn's step 2) ---------------------------------------------------------------
 
 interface Compared {
   /** Every row compared or written, by targetKey. */
@@ -1127,7 +1187,6 @@ interface Compared {
   readonly savedTimeClocks: ReadonlyMap<string, Row>;
 }
 
-const targetKey = (table: string, rowId: string): string => `${table}\u0000${rowId}`;
 const savedTimeClockId = (reservationId: string): string => `${reservationId}/saved-time`;
 
 function compareText(a: string, b: string): number {
@@ -1137,22 +1196,6 @@ function compareText(a: string, b: string): number {
 function nonEmpty<T>(items: readonly T[]): [T, ...T[]] | null {
   const [first, ...rest] = items;
   return first === undefined ? null : [first, ...rest];
-}
-
-async function lockRow(f: Firing, table: string, rowId: string, mode: Mode): Promise<Locked> {
-  const info = await tableInfo(f, table);
-  const key = oneKey(info);
-  const { tx } = f;
-  const [row] =
-    mode === "update"
-      ? await tx<Row[]>`select * from ${tx(table)} where ${tx(key)} = ${rowId} for update`
-      : await tx<Row[]>`select * from ${tx(table)} where ${tx(key)} = ${rowId} for share`;
-  if (row === undefined) {
-    fail(FIRE, `a row of ${table} the request names does not exist`);
-  }
-  const version = row.version;
-  assertVersion(FIRE, version, `${table}.version`);
-  return { table, rowId, version, business: businessOf(info, row), row };
 }
 
 /** The saved-time clock rows of the reservations the firing confirms or releases, locked first (FOR UPDATE). */
@@ -1191,27 +1234,6 @@ async function lockReleaseSlots(f: Firing, reservationIds: readonly string[]): P
   }
 }
 
-/** A state update's row id: its one key column's value, the key naming exactly the primary key (no wider update). */
-async function stateUpdateTarget(
-  f: Firing,
-  write: Extract<K05.StateWrite, { op: "update" }>,
-): Promise<string> {
-  const info = await tableInfo(f, write.table);
-  const key = oneKey(info);
-  const named = Object.keys(write.key);
-  if (named.length !== 1 || named[0] !== key) {
-    fail(FIRE, `a state update of ${write.table} must name the row by its primary key alone`);
-  }
-  const value = write.key[key];
-  if ((typeof value !== "string" && typeof value !== "number") || value === "") {
-    fail(FIRE, `a state update of ${write.table} names its key with no value`);
-  }
-  if (Object.hasOwn(write.set, key)) {
-    fail(FIRE, `a state update of ${write.table} may not change the row's key`);
-  }
-  return String(value);
-}
-
 async function lockAndCompare(f: Firing, request: FireClockRequest): Promise<Compared> {
   const { writes } = request;
   const confirms = writes.reservations.confirm;
@@ -1227,22 +1249,26 @@ async function lockAndCompare(f: Firing, request: FireClockRequest): Promise<Com
     releases.map((release) => release.id),
   );
 
-  const modes = new Map<string, { table: string; rowId: string; mode: Mode }>();
-  const expected: { table: string; rowId: string; version: number }[] = [];
-  const want = (table: string, rowId: string, mode: Mode, version: number): void => {
-    const key = targetKey(table, rowId);
-    const known = modes.get(key);
-    if (known === undefined || (known.mode === "share" && mode === "update")) {
-      modes.set(key, { table, rowId, mode });
-    }
-    expected.push({ table, rowId, version });
+  // Every row compared or written, with the strongest lock it needs, and every version the request read or expects, as
+  // commitTurn's (commit-turn.ts addTarget). A two-column row a state update names keeps the key it is found by (T-667).
+  const modes = new Map<string, LockTarget>();
+  const expected: Expectation[] = [];
+  const want = (
+    table: string,
+    rowId: string,
+    mode: Mode,
+    version: number,
+    update: UpdateTarget | null = null,
+  ): void => {
+    addTarget(modes, expected, table, rowId, mode, version, update);
   };
   for (const ref of request.versionsRead) {
     want(ref.table, ref.rowId, "share", ref.version);
   }
   for (const write of writes.state) {
     if (write.op === "update") {
-      want(write.table, await stateUpdateTarget(f, write), "update", write.expectVersion);
+      const update = await stateUpdateTarget(f, write);
+      want(write.table, update.rowId, "update", write.expectVersion, update);
     }
   }
   for (const close of writes.openQuestions.close) {
@@ -1266,7 +1292,13 @@ async function lockAndCompare(f: Firing, request: FireClockRequest): Promise<Com
     want("effects", letGo.effectId, "update", letGo.expectVersion);
   }
 
-  // Locked in one fixed order after the clock row, so a firing and a commit never wait on each other in a circle.
+  // A two-column version read of a business-scoped table is compared under the businesses the firing writes, its own
+  // clock row's among them, read before any row is locked (commit-turn.ts default 14; default 11). A firing with no such
+  // read reads nothing more.
+  const businesses = await comparedBusinesses(f, writes, [...modes.values()], [f.business]);
+
+  // Locked in one fixed order after the clock row, so a firing and a commit never wait on each other in a circle; a row
+  // of a table scoped none only when it meets its rule (default 10), else it is not found and the firing throws.
   const rows = new Map<string, Locked>();
   const order = [...modes.values()].sort(
     (a, b) => compareText(a.table, b.table) || compareText(a.rowId, b.rowId),
@@ -1274,7 +1306,7 @@ async function lockAndCompare(f: Firing, request: FireClockRequest): Promise<Com
   for (const target of order) {
     rows.set(
       targetKey(target.table, target.rowId),
-      await lockRow(f, target.table, target.rowId, target.mode),
+      await lockRow(f, target, businesses, lockRule(f, target.table)),
     );
   }
   const locked = (table: string, rowId: string): Locked => {
@@ -1338,6 +1370,12 @@ async function lockAndCompare(f: Firing, request: FireClockRequest): Promise<Com
     }
   }
 
+  // A state update never moves a row of a business to another business or to none (commit-turn.ts default 16; T-667
+  // round 2's item 8d), and no state write leaves a row of a table scoped none outside its rule (default 10): each
+  // refused here, after the compares and before any write.
+  await refuseBusinessMoves(f, writes.state, locked);
+  await refuseRowsOutsideRules(f, writes.state, locked);
+
   return { rows, savedTimeClocks };
 }
 
@@ -1371,31 +1409,48 @@ async function writeState(
     if (write.op === "insert") {
       const what = `a state insert into ${write.table}`;
       const values = columnValues(f, info, write.values, what);
-      await f.scope.to(info.scopeColumn === null ? null : businessOf(info, write.values));
+      await f.scope.to(info.scopeColumn === null ? null : businessOf(f, info, write.values));
       if (!info.versioned) {
         await tx`insert into ${tx(write.table)} ${tx(values)}`;
         continue;
       }
-      const key = oneKey(info);
-      const [row] = await tx<{ key: unknown; version: number }[]>`
-        insert into ${tx(write.table)} ${tx(values)} returning ${tx(key)} as key, version
-      `;
+      const key = oneKey(f, info);
+      const column = singleColumn(key);
+      // A two-column row comes back with item 77's name, which the database builds from the row's own columns (T-667).
+      const [row] =
+        column === null
+          ? await tx<{ key: unknown; version: number }[]>`
+              insert into ${tx(write.table)} ${tx(values)} returning ${rowNameSql(tx, key)} as key, version
+            `
+          : await tx<{ key: unknown; version: number }[]>`
+              insert into ${tx(write.table)} ${tx(values)} returning ${tx(column)} as key, version
+            `;
       if (row === undefined) {
         throw new Error(`fireClock: ${what} returned no row`);
       }
       out.written.push({ table: write.table, rowId: String(row.key), version: row.version });
       continue;
     }
-    const rowId = await stateUpdateTarget(f, write);
-    const key = oneKey(info);
+    const target = await stateUpdateTarget(f, write);
+    const { rowId } = target;
+    const key = oneKey(f, info);
+    const column = singleColumn(key);
     const locked = lockedRow(compared, write.table, rowId);
     const set = columnValues(f, info, write.set, `a state update of ${write.table}`);
     await f.scope.to(locked.business);
-    const [row] = await tx<{ version: number }[]>`
-      update ${tx(write.table)} set ${tx(set)}, version = ${write.expectVersion + 1}
-      where ${tx(key)} = ${rowId} and version = ${write.expectVersion}
-      returning version
-    `;
+    // A two-column row is found by its key's columns, as the write names it, and answered by its name (T-667).
+    const [row] =
+      column === null
+        ? await tx<{ version: number }[]>`
+            update ${tx(write.table)} set ${tx(set)}, version = ${write.expectVersion + 1}
+            where ${keyWhere(f, key, keyValuesOf(f, target))} and version = ${write.expectVersion}
+            returning version
+          `
+        : await tx<{ version: number }[]>`
+            update ${tx(write.table)} set ${tx(set)}, version = ${write.expectVersion + 1}
+            where ${tx(column)} = ${rowId} and version = ${write.expectVersion}
+            returning version
+          `;
     if (row === undefined) {
       throw new Error(`fireClock: a state update of ${write.table} matched no row at its version`);
     }
@@ -2006,12 +2061,16 @@ async function fireIn(tx: Sql, request: FireClockRequest, firedAt: Date): Promis
 
   const f: Firing = {
     tx,
+    call: FIRE,
     now: firedAt,
     at: utc(firedAt),
     turn,
     jobId: request.jobId,
     scope: new Scope(tx),
     tables: new Map(),
+    namedUpdates: new Map(),
+    business: row.business_id,
+    handleId: row.handle_id,
   };
   // The turn row, written once, as committed (NQ-RT-3); an id already taken is the primary key's refusal (constraint).
   if (turn !== null) {
