@@ -2036,7 +2036,7 @@ describe("sendState: the setup rows an outbox row's versions_read names (T-1436)
       for (const businessId of [BARBERSHOP, null]) {
         expect(
           await versionsNow(await outboxRowNaming(businessId, SAM, missing)),
-          `${businessId ?? "no business"}`,
+          businessId ?? "no business",
         ).toEqual([]);
       }
 
