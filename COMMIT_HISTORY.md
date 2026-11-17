@@ -2,9 +2,86 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 741, [`8f40a70`](https://github.com/aryamahadik/rosie/commit/8f40a70), 2026-11-17 11:44:31 UTC.
+- **Through:** commit 745, [`3452a12`](https://github.com/aryamahadik/rosie/commit/3452a12), 2026-11-17 12:52:38 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 745. docs: COMMIT\_HISTORY.md through commit 741 (8f40a70, \#752) (\#756)
+
+- **Commit:** [`3452a12`](https://github.com/aryamahadik/rosie/commit/3452a12), by Arya Mahadik, 2026-11-17 12:52:38 UTC
+- **Pull request:** [#756](https://github.com/aryamahadik/rosie/pull/756) from `task/commit-history-163`, merged 2026-11-17 12:52:38 UTC. It squashed 1 branch commit:
+  - `f418038` docs: COMMIT\_HISTORY.md through commit 741 (8f40a70, \#752)
+- **Files changed:** 1 (+106 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +106 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 744. T-1434: K-05 v1.18's contract test: its fixture part and its database side (data-access.v1.18.test.ts, data-access.v1.18.db-side.test.ts); v1.18 added to WRITTEN\_FOR with its nine mends, C-096 and C-082 added to SIDE\_CHECKS (\#754)
+
+- **Commit:** [`a6249a6`](https://github.com/aryamahadik/rosie/commit/a6249a6), by Arya Mahadik, 2026-11-17 12:52:33 UTC
+- **Pull request:** [#754](https://github.com/aryamahadik/rosie/pull/754) from `task/T-1434`, merged 2026-11-17 12:52:34 UTC. It squashed 1 branch commit:
+  - `dfede45` T-1434: K-05 v1.18's contract test: its fixture part and its database…
+- **Files changed:** 3 (+1756 −2), by folder:
+  - `tests/contract/` data-access.v1.18.db-side.test.ts +853 −0, data-access.v1.18.test.ts +812 −0, data-access.v1.test.ts +91 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 743. T-1440: CI runs the Linq live probe's own test (its key and number scan of the recorded samples) (\#753)
+
+- **Commit:** [`c1853ee`](https://github.com/aryamahadik/rosie/commit/c1853ee), by Arya Mahadik, 2026-11-17 12:52:28 UTC
+- **Pull request:** [#753](https://github.com/aryamahadik/rosie/pull/753) from `task/T-1440`, merged 2026-11-17 12:52:29 UTC. It squashed 2 branch commits:
+  - `5f4f187` T-1440: CI runs the Linq probe's own test (npm run test:linq-probe) a…
+  - `485d08e` T-1440: the local merge-check's run fixtures give test:linq-probe a r…
+- **Files changed:** 6 (+220 −1), by folder:
+  - `.github/workflows/` ci.yml +7 −0, merge-check.yml +5 −0
+  - `infra/ci/` ci-linq-probe.test.mjs +203 −0, ci-triggers.test.mjs +1 −0, local-merge-check.test.mjs +3 −1
+  - `/` package.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1440: CI runs the Linq probe's own test (npm run test:linq-probe) as its own step in ci.yml's checks job and merge-check.yml's merge-check job, pinned by infra/ci/ci-linq-probe.test.mjs
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1440: the local merge-check's run fixtures give test:linq-probe a recorder, in merge-check.yml's order
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 742. T-416: the staging roster allow-list in front of the real Linq line: on staging, T-414's send, T-415's contact add and capability check reach Linq only for a number on STAGING\_LINQ\_ALLOWLIST that is not ROSIE\_NUMBER; missing, empty or ill-formed roster or line fails closed; refusals logged with at most the last 2 digits; off staging nothing changes (\#755)
+
+- **Commit:** [`ec5a089`](https://github.com/aryamahadik/rosie/commit/ec5a089), by Arya Mahadik, 2026-11-17 12:52:23 UTC
+- **Pull request:** [#755](https://github.com/aryamahadik/rosie/pull/755) from `task/T-416`, merged 2026-11-17 12:52:24 UTC. It squashed 1 branch commit:
+  - `7acbd18` T-416: the staging roster allow-list in front of the real Linq line: …
+- **Files changed:** 3 (+1136 −0), by folder:
+  - `adapters/src/linq/roster/` index.ts +14 −0, roster.test.ts +854 −0, roster.ts +268 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 741. docs: COMMIT\_HISTORY.md through commit 737 (6a6e33b, \#748) (\#752)
 
