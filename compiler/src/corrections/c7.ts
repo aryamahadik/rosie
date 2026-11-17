@@ -32,9 +32,10 @@
 // steps (VERIFY_ONLY_STEPS), switched off while verify is off, whose lookup results c7.test.ts lists with that reason
 // (DL-916 item 25, as lead note 12 leaves S1-33's lines). A message a person reads is read with CLAIM_PATTERNS alone: the
 // six of movers.json's junk hauling wait on a permit that checks out, a step that waits on a check, CQ-347's (the lead's
-// ruling, DL-904); six more claim a check made (notary.json's S1-23 card, DL-913; dog-walker.json's two S11-50 records
-// results and the first-person S1-38 lines of tires, vehicle-wrap and window-tint, DL-916), and T-1435 fixes their
-// words. c7.test.ts's exhaustive scan lists every hit that stays unmarked, with its one reason.
+// ruling, DL-904); six more claimed a check made (notary.json's S1-23 card, DL-913; dog-walker.json's two S11-50 records
+// results and the first-person S1-38 lines of tires, vehicle-wrap and window-tint, DL-916), and C7's step in the frame
+// gives each of them its words with the claim dropped (MESSAGE_LINES; T-1435). c7.test.ts's exhaustive scan lists every
+// hit that stays unmarked, with its one reason.
 //
 // What this file changes: the trade's own text, wherever the compiled overlay holds it (K-01 tradeOverlay): the 11
 // free-text pf blocks (each stored whole, MC R3; K-01 pluginText says such text is the business's own word), every op's
@@ -50,6 +51,14 @@
 // claim stops the build (C7ClaimError): OWN_WORD and its marker are not words for a person, and no trade of fixture set
 // v1 has one.
 //
+// What it changes in the frame (c7.apply, T-1435; the lead's rulings DL-913 and DL-916): the six messages a person reads
+// that claim a check made in words CLAIM_PATTERNS do not read (a commission "checked" by no one named, the city's records'
+// result, Rosie's "I'll check"), each by its trade, its step and its exact line (MESSAGE_LINES), get the words that hold
+// while switch "verify" is off (MC C4 keeps it off in this build): the same message with the claim dropped. The frame
+// tags each change MC:C7, and the emitter carries it into the trade's words op (emit/words-corrections.ts
+// correctWordsOps), as it carries C1's and C9's; the trade file and the bundles are never edited. C7ClaimError is not
+// loosened: a claim CLAIM_PATTERNS read in a message still stops the build, these six included.
+//
 // What this file gives:
 //   CLAIM_PATTERNS, PASSIVE_PATTERNS, WORD_PATTERNS, patternsAt()
 //                                 the phrases that say Rosie checks a paper; those that wait on, or show, a paper no one
@@ -63,11 +72,13 @@
 //   findClaims(), ownWord()       the claims in one text, and the text with each run of them replaced.
 //   markClaims()                  the trade with each claim replaced, and every text changed, tagged MC:C7.
 //   renderMarks()                 the changes as diff lines, each starting with its tag.
-//   c7                            the correction in the frame's list: it changes no step (the texts are the trade's).
+//   MESSAGE_LINES                 the six messages' lines and the words that hold instead (T-1435).
+//   c7                            the correction in the frame's list: it changes only MESSAGE_LINES' messages (the other
+//                                 texts are the trade's, markClaims).
 import type { FlowLetter } from "../graph/types.ts";
 import { PF_TEXT_KEYS, type LoadedTrade, type PluginText, type TradeId, type TradeOp } from "../load/trade";
 import { VERIFY_BRANCHES, VERIFY_STEPS } from "./c4";
-import type { Correction, CorrectionTag } from "./framework";
+import type { Correction, CorrectionTag, LineRule } from "./framework";
 
 /** The marker every text C7 changes carries: the frame's tag for C7. */
 export const C7_MARKER: CorrectionTag = "MC:C7";
@@ -273,9 +284,10 @@ const NOT_LOOKUP = String.raw`(?!lookup)[\w'-]+\s+`;
  * paper "shows as expired on the state's lookup", "the lookup shows" or "the city's records show" it, a date comes "from
  * the lookup". Each reads as a check made, which no one makes while switch "verify" is off (C4), so it is the business's
  * own word in a trade's own words. A message a person reads is not read with them (patternsAt): the two of dog-walker's
- * S11-50 are c7.test.ts's MESSAGES_NEED, whose words T-1435 fixes. An op at one of C4's verify-only steps is not read
- * with them either (VERIFY_ONLY_STEPS, DL-916 item 25). A phrase counts in a text that names a paper (PAPER, or its
- * place: namedAt), unless a negation comes within its reach before it, in its own clause.
+ * S11-50 get their words with the claim dropped from C7's step in the frame (MESSAGE_LINES, T-1435). An op at one of
+ * C4's verify-only steps is not read with them either (VERIFY_ONLY_STEPS, DL-916 item 25). A phrase counts in a text
+ * that names a paper (PAPER, or its place: namedAt), unless a negation comes within its reach before it, in its own
+ * clause.
  */
 export const RESULT_PATTERNS: readonly ClaimPattern[] = [
   // The lookup or the records as the one that shows, has, lists, finds or answers, or doesn't find: "The lookup shows
@@ -315,7 +327,8 @@ export const RESULT_PATTERNS: readonly ClaimPattern[] = [
  * WHO reads "I" where Rosie speaks: a trade's own words outside a message a person reads (an op's words, a rename's new
  * side: "Wrap work needs no state license where you work, so I'll check the business registration.", vehicle-wrap.json
  * and window-tint.json). In a message a person reads it is not read: the three of tires, vehicle-wrap and window-tint at
- * S1-38 are c7.test.ts's MESSAGES_NEED, whose words T-1435 fixes. A check of no paper is no claim (NO_PAPER).
+ * S1-38 get their words with the claim dropped from C7's step in the frame (MESSAGE_LINES, T-1435). A check of no paper
+ * is no claim (NO_PAPER).
  */
 export const FIRST_PERSON_PATTERNS: readonly ClaimPattern[] = [
   {
@@ -399,10 +412,10 @@ const IN_MESSAGE = /\.(?:say|addSay)\[/;
  * VERIFY_ONLY_PATTERNS in an op at one of C4's verify-only steps (`verifyOnly`, onVerifyOnlyStep(), DL-916 item 25);
  * CLAIM_PATTERNS alone in a message a person reads, since OWN_WORD is no word for a person and marking one would stop
  * the build (C7ClaimError). Six such messages wait on a permit that "checks out" (movers.json's junk hauling): steps that
- * wait on a check, CQ-347's (the lead's ruling, DL-904; c7.test.ts's MESSAGES_WAITING). Six more are c7.test.ts's
- * MESSAGES_NEED, whose words T-1435 fixes: notary.json's S1-23 card shows a paper checked by no one named (DL-913),
- * dog-walker.json's two S11-50 messages a records' result (DL-916 item 23), and the S1-38 lines of tires, vehicle-wrap
- * and window-tint Rosie's check in the first person (item 24).
+ * wait on a check, CQ-347's (the lead's ruling, DL-904; c7.test.ts's MESSAGES_WAITING). Six more claimed a check made,
+ * and C7's step in the frame gives them their words with the claim dropped (MESSAGE_LINES, T-1435): notary.json's S1-23
+ * card showed a paper checked by no one named (DL-913), dog-walker.json's two S11-50 messages a records' result (DL-916
+ * item 23), and the S1-38 lines of tires, vehicle-wrap and window-tint Rosie's check in the first person (item 24).
  */
 export function patternsAt(where: string, verifyOnly = false): readonly ClaimPattern[] {
   if (IN_MESSAGE.test(where)) return CLAIM_PATTERNS;
@@ -746,14 +759,93 @@ export function renderMarks(marked: readonly ClaimMark[]): string[] {
   ]);
 }
 
-/** C7: a trade's claims that Rosie checks a paper are the business's own word. They are the trade's texts, so the correction changes no step. */
+/**
+ * One message a person reads whose words claim a check made while switch "verify" is off, and the words that hold
+ * instead (T-1435): its trade, its step, its exact line as the trade's words op writes it there, and the line with the
+ * claim dropped.
+ */
+export interface MessageLine {
+  trade: TradeId;
+  step: string;
+  line: string;
+  held: string;
+}
+
+/**
+ * The six messages a person reads that claim a check made in words CLAIM_PATTERNS do not read, so markClaims leaves
+ * them, and what C7's step in the frame gives each instead (T-1435; the lead's rulings DL-913 and DL-916). Each is in
+ * flow A's words op at its step; flow B holds none of them. The new words are defaults Jay may reword (CQ-353).
+ */
+export const MESSAGE_LINES: readonly MessageLine[] = [
+  // notary.json:1124, S1-23, the owner's card: a commission "checked" by no one named (DL-901 item 15; DL-913). CQ-353's
+  // default: the claim dropped.
+  { trade: "notary", step: "S1-23", line: "Sam Lee · NP045210 · checked", held: "Sam Lee · NP045210" },
+  // dog-walker.json:2041 and :2055, S11-50, to Sam and to Quinn: the city's records' result, a check no one makes while
+  // verify is off (DL-916 item 23). The op's own words say whose word it is ("Rosie checks no permit; the owner says when
+  // one lapses. Here, Sam says Quinn's is suspended"), as the master's S11-50 does ("Their own word, never a check";
+  // "Got it: ..." to the owner, "Sam says your license for this work has lapsed, so ..." to the person,
+  // master-A.json:35085-35118).
+  {
+    trade: "dog-walker",
+    step: "S11-50",
+    line: "The city's records show Quinn's park permit as suspended today.",
+    held: "Got it: Quinn's park permit is suspended today.",
+  },
+  {
+    trade: "dog-walker",
+    step: "S11-50",
+    line: "The city's records show your park permit as suspended, so you're off the hike schedule for now. Tell Sam if that's wrong.",
+    held: "Sam says your park permit is suspended, so you're off the hike schedule for now. Tell Sam if that's wrong.",
+  },
+  // tires.json:1266, vehicle-wrap.json:2936 and window-tint.json:2093, S1-38, Rosie to the owner: Rosie's check in the
+  // first person (DL-916 item 24), in master-A.json:1110's own words: "I show it as you give it and don't check it".
+  {
+    trade: "tires",
+    step: "S1-38",
+    line: "Thanks. Mobile tire service needs no state license where you work, so I'll check the business registration. Now send its prices: a photo or a list.",
+    held: "Thanks. Mobile tire service needs no state license where you work, so I'll show the business registration as you give it. Now send its prices: a photo or a list.",
+  },
+  {
+    trade: "vehicle-wrap",
+    step: "S1-38",
+    line: "Thanks. Mobile wrap service needs no state license where you work, so I'll check the business registration. Now send its prices: a photo or a list.",
+    held: "Thanks. Mobile wrap service needs no state license where you work, so I'll show the business registration as you give it. Now send its prices: a photo or a list.",
+  },
+  {
+    trade: "window-tint",
+    step: "S1-38",
+    line: "Thanks. Mobile tint service needs no state license where you work, so I'll check the business registration. Now send its prices: a photo or a list.",
+    held: "Thanks. Mobile tint service needs no state license where you work, so I'll show the business registration as you give it. Now send its prices: a photo or a list.",
+  },
+];
+
+/** MESSAGE_LINES by trade, then by step: the line rules C7's step in the frame gives that step's messages. */
+const LINES_BY_TRADE: ReadonlyMap<string, ReadonlyMap<string, readonly LineRule[]>> = (() => {
+  const out = new Map<string, Map<string, LineRule[]>>();
+  for (const { trade, step, line, held } of MESSAGE_LINES) {
+    const steps = out.get(trade) ?? new Map<string, LineRule[]>();
+    steps.set(step, [...(steps.get(step) ?? []), [line, held]]);
+    out.set(trade, steps);
+  }
+  return out;
+})();
+
+/**
+ * C7: a trade's claims that Rosie checks a paper are the business's own word. Its texts are the trade's (markClaims), so
+ * in the frame it changes only the six messages of MESSAGE_LINES: in the applied flow of their trade, each exact line in
+ * its step's messages becomes its held words, each change tagged MC:C7 by the frame (a flow that holds no such line, the
+ * master's own included, is left as it is).
+ */
 export const c7: Correction = {
   id: "C7",
   title:
     "Trade text that says Rosie or Rosie's team checks a license, permit, certificate, insurance or carrier status is the business's own word",
   source:
     "Master Corrections C7; D96; RULES 10.1; S13-11; switches.verify in master-A.json and master-B.json",
-  apply() {
-    // No step changes: C7's texts are the trade's (markClaims).
+  apply(ctx) {
+    for (const [step, rules] of LINES_BY_TRADE.get(ctx.trade) ?? []) {
+      ctx.need(step);
+      ctx.rewriteLines(step, rules, ["say"]);
+    }
   },
 };
