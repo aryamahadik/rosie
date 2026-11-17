@@ -2,9 +2,53 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 733, [`1097f01`](https://github.com/aryamahadik/rosie/commit/1097f01), 2026-11-17 08:33:05 UTC.
+- **Through:** commit 735, [`dc02106`](https://github.com/aryamahadik/rosie/commit/dc02106), 2026-11-17 10:28:52 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 735. docs: COMMIT\_HISTORY.md through commit 733 (1097f01, \#744) (\#746)
+
+- **Commit:** [`dc02106`](https://github.com/aryamahadik/rosie/commit/dc02106), by Arya Mahadik, 2026-11-17 10:28:52 UTC
+- **Pull request:** [#746](https://github.com/aryamahadik/rosie/pull/746) from `task/commit-history-160`, merged 2026-11-17 10:28:53 UTC. It squashed 1 branch commit:
+  - `233fcbb` docs: COMMIT\_HISTORY.md through commit 733 (1097f01, \#744)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 734. T-414: Linq send, the real adapter on recorded samples: every tested format, the key screened from every reason, override\_optout, errors (\#745)
+
+- **Commit:** [`c8bab54`](https://github.com/aryamahadik/rosie/commit/c8bab54), by Arya Mahadik, 2026-11-17 10:28:47 UTC
+- **Pull request:** [#745](https://github.com/aryamahadik/rosie/pull/745) from `task/T-414`, merged 2026-11-17 10:28:48 UTC. It squashed 3 branch commits:
+  - `00f04b7` T-414: the real Linq send adapter on recorded samples: every Nov 5 pa…
+  - `d5f138c` Merge branch 'main' into task/T-414
+  - `0f37005` T-414: no part of the adapter's own key in a reason: Linq's error.mes…
+- **Files changed:** 6 (+2351 −0), by folder:
+  - `adapters/src/linq/send/` index.ts +27 −0, send.test.ts +1441 −0, send.ts +210 −0, types.ts +100 −0, validate.ts +173 −0, wire.ts +400 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-414: the real Linq send adapter on recorded samples: every Nov 5 part kind under its K-07 key, override_optout only on a marked send, Linq's errors read into K-11's
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-414: no part of the adapter's own key in a reason: Linq's error.message and the file step's reason screened for the key raw, URL-encoded, in any case or in part, a letters-only second fake key in the echo tests (round 2, DL-928)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 733. docs: COMMIT\_HISTORY.md through commit 731 (4b1196b, \#742) (\#744)
 
