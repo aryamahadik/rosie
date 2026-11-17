@@ -96,6 +96,7 @@ export {
   type OpenChatOnTextCall,
   type OutboxCalls,
   type OutboxInputs,
+  type PageWebhookSecret,
   type ParkTurnCall,
   type ReadActiveBundleCall,
   type ReadBundleValueCall,
@@ -142,6 +143,18 @@ export {
 } from "./sign-in";
 export { SKELETON_FLAG, skeletonLinqRoute, type ReleaseFlags, type SkeletonRouteDeps } from "./skeleton";
 // Staging's inputs (T-1257), by file: ./staging's index also holds T-1254's handle, which loads only in the Workers runtime.
+export {
+  guardedLinqSender,
+  isTestPhone,
+  linqLineSend,
+  REAL_LINQ_LINE,
+  realLinqLineOn,
+  STAGING_LINQ_LINE,
+  stagingLinqVerifyInputs,
+  TEST_PHONE_WEBHOOK_SECRET,
+  type LinqLineEnv,
+  type LinqLineSeams,
+} from "./staging/linq-line";
 export {
   NO_STAGING_INPUTS,
   STAGING_BUILDERS,

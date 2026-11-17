@@ -2,8 +2,9 @@
 // Worker's database handle and its guard in every call (./db.ts, T-1254), which the later parts' calls run on;
 // stagingOptions(env), the RootOptions inputs staging gives (./options.ts, T-1257), which the Worker's root spreads into
 // its options; each later part's own file with its final signature (./flags.ts to ./copies.ts), what each is handed
-// (./part.ts) and the SEALING_WRAP_KEY-only resolver (./secrets.ts); the email rows' port (./email.ts, T-1288); and the
-// sign-in calls' inputs with the hashing port over PROOF_CODE_HASH_KEY (./sign-in.ts, T-1289).
+// (./part.ts) and the SEALING_WRAP_KEY-only resolver (./secrets.ts); the email rows' port (./email.ts, T-1288); the
+// sign-in calls' inputs with the hashing port over PROOF_CODE_HASH_KEY (./sign-in.ts, T-1289); and the real Linq line's
+// switch beside the test-phone line, for the send and the Linq verify (./linq-line.ts, T-1449).
 //
 // This index holds ./db.ts's values, so it loads only in the Workers runtime (cloudflare:sockets): ../root.ts and
 // ../index.ts import ./options.ts and the files they need by name, never this index, since their graph loads under Node
@@ -51,6 +52,18 @@ export {
 export { stagingFlags, type FlagsPart } from "./flags";
 export { NO_RECEIPT_INPUTS, stagingReceiptCalls, type ReceiptInputs, type ReceiptPart } from "./k05-receipt";
 export { NO_TURN_CALL_INPUTS, stagingTurnCalls, type TurnCallInputs, type TurnCallsPart } from "./k05-turn";
+export {
+  guardedLinqSender,
+  isTestPhone,
+  linqLineSend,
+  REAL_LINQ_LINE,
+  realLinqLineOn,
+  STAGING_LINQ_LINE,
+  stagingLinqVerifyInputs,
+  TEST_PHONE_WEBHOOK_SECRET,
+  type LinqLineEnv,
+  type LinqLineSeams,
+} from "./linq-line";
 export { NO_MODEL_READER_INPUTS, stagingModels, type ModelReaderInputs, type ModelsPart } from "./models";
 export {
   NO_STAGING_INPUTS,
