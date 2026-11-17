@@ -28,6 +28,8 @@ import { c2 } from "./c2";
 import { c3 } from "./c3";
 import { c4 } from "./c4";
 import { c5 } from "./c5";
+import { c7 } from "./c7";
+import { c8 } from "./c8";
 import { c9 } from "./c9";
 
 /** A correction's id: C1 to C10 of Master Corrections section 3. */
@@ -143,7 +145,7 @@ export interface CorrectedTrade extends AppliedTrade {
  * The corrections this build applies, in the order they run (the order of their ids). T-139 to T-141 add C3 to C10
  * here: each is one file beside c1.ts, and each change it makes is tagged by the frame.
  */
-export const CORRECTIONS: readonly Correction[] = [c1, c2, c3, c4, c5, c9, c10];
+export const CORRECTIONS: readonly Correction[] = [c1, c2, c3, c4, c5, c7, c8, c9, c10];
 
 /** The tag of a correction id. */
 export function tagOf(id: CorrectionId): CorrectionTag {

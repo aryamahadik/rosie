@@ -19,7 +19,8 @@
 //                               slotting with the trade's own sample table), where they sit between the master's steps,
 //                               so `next`, the branches' rejoinAt and the cards read the master steps around them.
 // A words op's `tells` and `why` are left out: K-01's words op does not hold them (fields overlay-core ignores are left
-// out). C8's void offs are kept until T-140's correction drops them. Each message's opt-out line (its `stop` marker), in a
+// out). C8's void offs are not among the ops: emit.ts drops them from the trade first (corrections/c8.ts voidOffs), and
+// every other off is kept as written. Each message's opt-out line (its `stop` marker), in a
 // words op and in the steps an op adds, is the one stop-marks.ts placeStops() gives it from the trade's own walks
 // (T-1116; Q-30), not the marker the trade file wrote.
 //
