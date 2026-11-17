@@ -46,11 +46,14 @@
 //     MC C7 says the Nov 4 check listed 45 such trade files; that list is not available, so this build pins its own
 //     count, 138, each phrase with its trade file's example in c7.ts (never padded or trimmed to 45);
 //   - the exhaustive scan (DL-901 item 16, DL-916 item 26): every hit of CLAIM_PATTERNS and PASSIVE_PATTERNS (their
-//     guards left out), of round 5's shapes (ROUND5_SHAPES), and every check verb with a negation within 3 words before
-//     it across a separator, that stays in a compiled text is in ALLOWED with its one reason (a true negation, no paper,
-//     lead note 12, or C4's verify-only branch), in FIRST_SIDES, in MESSAGES_WAITING (CQ-347's, DL-904) or in
-//     MESSAGES_NEED (six messages whose words T-1435 fixes: notary.json's card, DL-913; dog-walker's two S11-50 records
-//     results and the three S1-38 first-person lines of tires, vehicle-wrap and window-tint, DL-916);
+//     guards left out), of round 5's shapes (ROUND5_SHAPES), of S12-19's passive wordings (S12_19_SHAPES, DL-926), and
+//     every check verb with a negation within 3 words before it across a separator, that stays in a compiled text (the
+//     trade as C7 leaves it: its marks, then its step in the frame) is in ALLOWED with its one reason (a true negation,
+//     no paper, lead note 12, or C4's verify-only branch), in FIRST_SIDES, in MESSAGES_WAITING (CQ-347's, DL-904) or in
+//     MESSAGES_NEED, which is empty: the six messages it held (notary.json's card, DL-913; dog-walker's two S11-50
+//     records results and the three S1-38 first-person lines of tires, vehicle-wrap and window-tint, DL-916) get their
+//     words with the claim dropped from C7's step in the frame (c7.ts MESSAGE_LINES, T-1435), each pinned by its raw
+//     text in CORRECTED_MESSAGES;
 //   - after it, no text a trade's compiled overlay holds says Rosie or Rosie's team checks a paper, no pf block waits on
 //     or shows a paper no one named checks, and each text it flagged carries the C7 marker, the rest of each text as
 //     written; the business's own word ("Rosie never looks a license up") is left as it is. Checked apart from
@@ -63,7 +66,11 @@
 //   - a rename's or swap's first side (the master's own line) and a branch label are never changed: hair-restoration,
 //     iv-hydration and plastic-surgeon keep the master's S1-38 lines ("Where a lookup has no data feed, a person on
 //     Rosie's team checks ...") on their renames' first sides; a claim in a message a person reads stops the build;
-//   - every change is tagged MC:C7, and C7 changes no step in the frame.
+//   - every change is tagged MC:C7, and C7 changes no step in the frame but the six messages' words (T-1435), which the
+//     emitter carries into the trades' words ops (correctWordsOps);
+//   - S12-19's passive lines that no pattern reads ("People already checked stay bookable.", "Those already checked stay
+//     on.", detailing's "until they're checked", and the like), on C4's verify-only step, are listed under VERIFY_ONLY,
+//     each pinned by its place (the security reviewer's note a on round 5, DL-926).
 // Not here: a step that waits on a paper that checks out (movers' junk hauling, whose six messages a person reads stay
 // as written; driving-school's learner's permit, which the instructor checks in person) is CQ-347's. S1-33's lines in
 // Rosie's own voice ("We couldn't find barbershop license BS20981 ... on the state's lookup ... until our team checks it
@@ -76,6 +83,8 @@
 import { describe, expect, it, vi } from "vitest";
 import type { FlowLetter } from "../graph/types.ts";
 import { buildBundle } from "../emit";
+import { MASTER_TRADE, masterShape } from "../emit/flow";
+import { correctWordsOps, type CorrectedOps } from "../emit/words-corrections";
 import { loadMaster } from "../load/flow";
 import { listTradeIds, loadTrade, type LoadedTrade, type TradeOp } from "../load/trade";
 import { applyTrade } from "../overlay/apply";
@@ -85,6 +94,7 @@ import {
   CLAIM_PATTERNS,
   FIRST_PERSON_PATTERNS,
   KEY_PATTERNS,
+  MESSAGE_LINES,
   OWN_WORD,
   PAPER,
   PASSIVE_PATTERNS,
@@ -104,7 +114,7 @@ import {
   type MarkedTrade,
 } from "./c7";
 import { isD96Off, voidOffs } from "./c8";
-import { applyCorrections } from "./framework";
+import { applyCorrections, pathText, renderDiff } from "./framework";
 
 vi.setConfig({ testTimeout: 600_000 });
 
@@ -325,6 +335,20 @@ function marked(id: string): { trade: LoadedTrade; done: MarkedTrade } {
     const trade = loadTrade(id);
     hit = { trade, done: markClaims(trade) };
     memo.set(id, hit);
+  }
+  return hit;
+}
+
+const heldMemo = new Map<string, CorrectedOps>();
+/**
+ * The trade as C7 leaves it in the bundle: its marks (markClaims), then C7's step in the frame carried into its words
+ * ops (correctWordsOps with C7 alone, as emitBundle carries every correction's), and each words op C7 so corrected.
+ */
+function held(id: string): CorrectedOps {
+  let hit = heldMemo.get(id);
+  if (hit === undefined) {
+    hit = correctWordsOps(master, marked(id).done.trade, [c7]);
+    heldMemo.set(id, hit);
   }
   return hit;
 }
@@ -1441,7 +1465,7 @@ describe("C7 in the bundle", () => {
 });
 
 describe("C7's tags", () => {
-  it("tags every change MC:C7 in its diff lines, and changes no step in the frame", () => {
+  it("tags every change MC:C7 in its diff lines, and changes no step in the frame of a trade MESSAGE_LINES does not name", () => {
     const { done } = marked("tree");
     const lines = renderMarks(done.marked);
     expect(lines.length).toBe(2 * done.marked.length);
@@ -1450,6 +1474,7 @@ describe("C7's tags", () => {
       `MC:C7 + tree pluginText.pf.license.trust: ${OWN_WORD} otherwise it's the business's own words`,
     );
     const applied = applyTrade(master.A, loadTrade("tree"));
+    expect(MESSAGE_LINES.map((one) => one.trade)).not.toContain("tree");
     expect(applyCorrections(applied, [c7]).changes).toStrictEqual([]);
     expect(c7.id).toBe("C7");
     expect(c7.source).toContain("Master Corrections C7");
@@ -1673,7 +1698,7 @@ describe("the security reviewer's round 4 FAIL and the lead's rulings on its thr
       expect(findClaims(text, patternsAt("pluginText.pf.license.check"), true), text).toStrictEqual([]);
   });
 
-  it("reads a lookup's or records' result with no check verb as a claim in a trade's own words, and pins dog-walker's two S11-50 messages in MESSAGES_NEED (item 23)", () => {
+  it("reads a lookup's or records' result with no check verb as a claim in a trade's own words, and leaves dog-walker's two S11-50 messages to C7's step in the frame (item 23; T-1435)", () => {
     for (const text of [
       "The lookup shows Leo's massage license as expired.",
       "The state's lookup has no massage license with the number Eli sent.",
@@ -1703,8 +1728,9 @@ describe("the security reviewer's round 4 FAIL and the lead's rulings on its thr
       "We couldn't find registration 2019-0451 for Lee Live Music on the state's business lookup.",
     ])
       expect(findClaims(text, WORD_PATTERNS), text).toStrictEqual([]);
-    // dog-walker.json:2041 and :2055: the words op at S11-50, to Sam and to Quinn, as written, each pinned with its
-    // reason; the op's own words say "Rosie checks no permit".
+    // dog-walker.json:2041 and :2055: the words op at S11-50, to Sam and to Quinn, as C7's marks leave them (a message is
+    // read with CLAIM_PATTERNS alone); C7's step in the frame then drops the records' claim (CORRECTED_MESSAGES, T-1435).
+    // The op's own words say "Rosie checks no permit".
     const dog = marked("dog-walker");
     const op = dog.trade.flows.A.ops[22];
     expect(op?.at).toBe("S11-50");
@@ -1720,7 +1746,9 @@ describe("the security reviewer's round 4 FAIL and the lead's rulings on its thr
       expect(valueAt(dog.done.trade.flows.A.ops[22], ["say", k, 2])).toBe(line);
       expect(findClaims(line, patternsAt(`A ops[22].say[${String(k)}][2]`))).toStrictEqual([]);
       expect(findClaims(line, WORD_PATTERNS)).toHaveLength(1);
-      expect(MESSAGES_NEED.map(([place]) => place)).toContain(`dog-walker A.ops[22].say[${String(k)}][2]`);
+      expect(
+        CORRECTED_MESSAGES.find(([place]) => place === `dog-walker A.ops[22].say[${String(k)}][2]`)?.[2],
+      ).toBe(line);
     }
     // The same result in a trade's own words is marked: a rename's new side.
     const results: readonly (readonly [trade: string, where: string, before: string, after: string])[] = [
@@ -1757,7 +1785,7 @@ describe("the security reviewer's round 4 FAIL and the lead's rulings on its thr
       ).toStrictEqual({ tag: "MC:C7", trade, where, before, after });
   });
 
-  it("reads Rosie in the first person as the one who checks: the three S1-38 messages are pinned, the same words on rename new sides are marked (item 24)", () => {
+  it("reads Rosie in the first person as the one who checks: the three S1-38 messages are left to C7's step in the frame, the same words on rename new sides are marked (item 24; T-1435)", () => {
     for (const text of [
       "Mobile tire service needs no state license where you work, so I'll check the business registration.",
       "I check licenses right away.",
@@ -1773,7 +1801,7 @@ describe("the security reviewer's round 4 FAIL and the lead's rulings on its thr
     ])
       expect(findClaims(text, WORD_PATTERNS), text).toStrictEqual([]);
     // tires.json:1266, vehicle-wrap.json:2936 and window-tint.json:2093: flow A, the words op at S1-38, Rosie to the
-    // owner, as written, each pinned with its reason.
+    // owner, as C7's marks leave them; C7's step in the frame then drops the claim (CORRECTED_MESSAGES, T-1435).
     const messages: readonly (readonly [trade: string, k: number, line: string])[] = [
       [
         "tires",
@@ -1798,7 +1826,10 @@ describe("the security reviewer's round 4 FAIL and the lead's rulings on its thr
       expect(valueAt(raw.flows.A.ops[k], ["say", 4, 2]), trade).toBe(line);
       expect(valueAt(done.trade.flows.A.ops[k], ["say", 4, 2]), trade).toBe(line);
       expect(findClaims(line, WORD_PATTERNS), trade).toHaveLength(1);
-      expect(MESSAGES_NEED.map(([place]) => place)).toContain(`${trade} A.ops[${String(k)}].say[4][2]`);
+      expect(
+        CORRECTED_MESSAGES.find(([place]) => place === `${trade} A.ops[${String(k)}].say[4][2]`)?.[2],
+        trade,
+      ).toBe(line);
     }
     // vehicle-wrap.json:414 and window-tint.json:441: the same words on rename new sides are marked.
     for (const [trade, where, work] of [
@@ -1981,6 +2012,246 @@ describe("the security reviewer's round 4 FAIL and the lead's rulings on its thr
   });
 });
 
+/** A scan place (`notary A.ops[3].say[0][3].card.lines[0]`) as its trade, its flow, its op and the path in the op. */
+function placeOf(place: string): {
+  trade: string;
+  flow: FlowLetter;
+  k: number;
+  path: (string | number)[];
+} {
+  const at = /^([\w-]+) ([AB])\.ops\[(\d+)\]\.(.+)$/.exec(place);
+  if (at === null) throw new Error(`${place} is not a place in an op`);
+  const path = [...(at[4] ?? "").matchAll(/([^.[\]]+)|\[(\d+)\]/g)].map((part) =>
+    part[2] === undefined ? (part[1] ?? "") : Number(part[2]),
+  );
+  return { trade: at[1] ?? "", flow: at[2] === "B" ? "B" : "A", k: Number(at[3]), path };
+}
+
+/** A copy of the trade with the text at a path of one op of a flow replaced. */
+function withText(
+  trade: LoadedTrade,
+  flow: FlowLetter,
+  k: number,
+  path: readonly (string | number)[],
+  text: string,
+): LoadedTrade {
+  const copy = structuredClone(trade);
+  const last = path.at(-1);
+  const holder = valueAt(copy.flows[flow].ops[k], path.slice(0, -1));
+  if (last === undefined || typeof holder !== "object" || holder === null) throw new Error("no such text");
+  Reflect.set(holder, last, text);
+  return copy;
+}
+
+describe("the six messages MESSAGES_NEED held: C7's step in the frame drops the claim (T-1435; DL-913, DL-916)", () => {
+  it("gives each its corrected line, pinned by raw text, tagged MC:C7, in the corrected build and in the bundle's words op, and MESSAGES_NEED ends empty", () => {
+    expect(MESSAGES_NEED).toStrictEqual([]);
+    expect(CORRECTED_MESSAGES).toHaveLength(6);
+    // c7.ts's table holds these six, line for line.
+    expect(
+      MESSAGE_LINES.map(({ trade, step, line, held: words }) => [trade, step, line, words]),
+    ).toStrictEqual(
+      CORRECTED_MESSAGES.map(([place, step, raw, corrected]) => [placeOf(place).trade, step, raw, corrected]),
+    );
+    for (const [place, step, raw, corrected] of CORRECTED_MESSAGES) {
+      const { trade: id, flow, k, path } = placeOf(place);
+      const at = pathText(path);
+      const { trade, done } = marked(id);
+      const op = trade.flows[flow].ops[k];
+      // As the trade file writes it, in a words op at its step, and as C7's marks leave it (a message a person reads is
+      // read with CLAIM_PATTERNS alone, which find no claim in it).
+      expect(op?.op, place).toBe("words");
+      expect(op?.at, place).toBe(step);
+      expect(valueAt(op, path), place).toBe(raw);
+      expect(valueAt(done.trade.flows[flow].ops[k], path), place).toBe(raw);
+      expect(findClaims(raw, CLAIM_PATTERNS, true), place).toStrictEqual([]);
+      // The corrected build (the frame over the trade's applied flow): the line changed, the change and its diff lines
+      // tagged MC:C7.
+      const built = applyCorrections(applyTrade(master[flow], trade), [c7]);
+      expect(
+        built.changes
+          .filter((change) => change.step === step && change.path === at)
+          .map(({ tag, correction, op: kind, before, after }) => ({ tag, correction, kind, before, after })),
+        place,
+      ).toStrictEqual([{ tag: "MC:C7", correction: "C7", kind: "set", before: raw, after: corrected }]);
+      const diff = renderDiff(built.changes);
+      expect(diff, place).toContain(`MC:C7 - ${id} ${flow} ${step} ${at}: ${raw}`);
+      expect(diff, place).toContain(`MC:C7 + ${id} ${flow} ${step} ${at}: ${corrected}`);
+      // The bundle (emitBundle's correctWordsOps, every correction, over C7's marks): the words op holds the corrected
+      // line, and says so, tagged MC:C7; the trades given are not changed.
+      const bundle = correctWordsOps(master, done.trade);
+      expect(valueAt(bundle.trade.flows[flow].ops[k], path), place).toBe(corrected);
+      const entry = bundle.corrected.find((one) => one.flow === flow && one.op === k);
+      expect(entry?.at, place).toBe(step);
+      expect(
+        entry?.changes
+          .filter((change) => change.path === at)
+          .map(({ tag, correction, before, after }) => ({ tag, correction, before, after })),
+        place,
+      ).toStrictEqual([{ tag: "MC:C7", correction: "C7", before: raw, after: corrected }]);
+      expect(valueAt(done.trade.flows[flow].ops[k], path), place).toBe(raw);
+      expect(valueAt(trade.flows[flow].ops[k], path), place).toBe(raw);
+      // The corrected line claims no check: no pattern of C7 reads one in it, wherever it sat.
+      expect(findClaims(corrected, WORD_PATTERNS, true), place).toStrictEqual([]);
+    }
+  });
+
+  it("changes nothing else: not flow B, which holds none of the six lines, not the master's own flows, and no other trade's words op", () => {
+    for (const flow of FLOWS)
+      expect(
+        applyCorrections({ trade: MASTER_TRADE, flow: masterShape(master[flow]), slotProblems: [] }, [c7])
+          .changes,
+        `master ${flow}`,
+      ).toStrictEqual([]);
+    for (const id of new Set(MESSAGE_LINES.map((one) => one.trade))) {
+      const raw = loadTrade(id);
+      const flowB = JSON.stringify(raw.flows.B);
+      for (const one of MESSAGE_LINES) if (one.trade === id) expect(flowB, id).not.toContain(one.line);
+      expect(applyCorrections(applyTrade(master.B, raw), [c7]).changes, `${id} B`).toStrictEqual([]);
+    }
+    // Over all 243 trades, C7's step in the frame changes the six messages' words alone, each change tagged MC:C7.
+    const places = ALL.flatMap((id) =>
+      held(id).corrected.flatMap((entry) =>
+        entry.changes.map((change) => {
+          expect(change.tag, id).toBe("MC:C7");
+          return `${id} ${entry.flow}.ops[${String(entry.op)}].${change.path}`;
+        }),
+      ),
+    );
+    expect(places.sort()).toStrictEqual(CORRECTED_MESSAGES.map(([place]) => place).sort());
+  });
+
+  it("still stops the build on a claim in a message a person reads, at the six messages' places too: C7ClaimError is not loosened", () => {
+    for (const [place] of CORRECTED_MESSAGES) {
+      const { trade: id, flow, k, path } = placeOf(place);
+      const raw = loadTrade(id);
+      expect(() => markClaims(raw), place).not.toThrow();
+      expect(
+        () => markClaims(withText(raw, flow, k, path, "Checked by Rosie on the state's lookup")),
+        place,
+      ).toThrow(C7ClaimError);
+      expect(() =>
+        markClaims(withText(raw, flow, k, path, "Rosie checks your license on the state's lookup.")),
+      ).toThrow(C7ClaimError);
+    }
+  });
+});
+
+describe("the security reviewer's note a on round 5: S12-19's passive lines, listed under VERIFY_ONLY (DL-926)", () => {
+  it("pins each by its place, as written, read by no pattern of c7.ts, on C4's verify-only step, and listed with that reason", () => {
+    // The does of each trade's words op at S12-19: the sentence as the trade file writes it, and as the scan lists it
+    // (after a sentence C7 marked, its OWN_WORD shows as "§"). The reviewer's lines: detailing.json:2218, tutor.json:5382,
+    // dance.json:8635, pet-taxi.json:2842, pet-waste.json:2606, dog-walker.json:2065; S12_19_SHAPES finds the same
+    // wordings in daycare's, dj's, dog-walker's, rentals' and tires' S12-19 too.
+    const people = "People already checked stay bookable.";
+    const those = "Those already checked stay on.";
+    const places: readonly (readonly [
+      trade: string,
+      flow: FlowLetter,
+      k: number,
+      sentence: string,
+      listed: string,
+    ])[] = [
+      ["dance", "A", 70, people, people],
+      ["dance", "B", 56, people, people],
+      [
+        "daycare",
+        "B",
+        81,
+        "Ones already checked stay as they are.",
+        "Ones already checked stay as they are.",
+      ],
+      [
+        "detailing",
+        "A",
+        11,
+        "While it's down, nobody new is offered until they're checked.",
+        "§ While it's down, nobody new is offered until they're checked.",
+      ],
+      ["detailing", "A", 11, people, people],
+      [
+        "detailing",
+        "B",
+        11,
+        "While it's down, nobody new is offered until they're checked.",
+        "§ While it's down, nobody new is offered until they're checked.",
+      ],
+      ["detailing", "B", 11, people, people],
+      [
+        "dj",
+        "A",
+        1,
+        "While it's down, nobody new is offered for them, and people already checked stay bookable.",
+        "While it's down, nobody new is offered for them, and people already checked stay bookable.",
+      ],
+      [
+        "dj",
+        "B",
+        1,
+        "While it's down, nobody new is offered for them, and people already checked stay bookable.",
+        "While it's down, nobody new is offered for them, and people already checked stay bookable.",
+      ],
+      [
+        "dog-walker",
+        "A",
+        23,
+        "While they're down, nobody new leads a hike until checked.",
+        "§ While they're down, nobody new leads a hike until checked.",
+      ],
+      ["dog-walker", "A", 23, those, those],
+      [
+        "dog-walker",
+        "B",
+        25,
+        "While they're down, nobody new leads a hike until checked.",
+        "§ While they're down, nobody new leads a hike until checked.",
+      ],
+      ["dog-walker", "B", 25, those, those],
+      ["pet-taxi", "A", 50, those, `§ ${those}`],
+      ["pet-taxi", "B", 20, those, `§ ${those}`],
+      ["pet-waste", "A", 39, those, `§ ${those}`],
+      ["pet-waste", "B", 19, those, `§ ${those}`],
+      [
+        "rentals",
+        "A",
+        20,
+        "What's already checked stays bookable.",
+        "What's already checked stays bookable.",
+      ],
+      [
+        "rentals",
+        "B",
+        20,
+        "What's already checked stays bookable.",
+        "What's already checked stays bookable.",
+      ],
+      ["tires", "A", 35, "Work already checked stays bookable.", "§ Work already checked stays bookable."],
+      ["tires", "B", 75, "Work already checked stays bookable.", "§ Work already checked stays bookable."],
+      ["tutor", "A", 179, people, people],
+      ["tutor", "B", 260, people, people],
+    ];
+    expect(places).toHaveLength(23);
+    for (const [trade, flow, k, sentence, listed] of places) {
+      const where = `${trade} ${flow} ops[${String(k)}].does`;
+      const raw = marked(trade).trade;
+      const op = raw.flows[flow].ops[k];
+      expect(op?.op, where).toBe("words");
+      expect(op?.at, where).toBe("S12-19");
+      expect(onVerifyOnlyStep(op ?? {}), where).toBe(true);
+      expect(valueAt(op, ["does"]), where).toContain(sentence);
+      // Not marked: no pattern of c7.ts reads it, in a trade's own words or at a verify-only step.
+      expect(findClaims(sentence, WORD_PATTERNS, true), where).toStrictEqual([]);
+      expect(findClaims(sentence, VERIFY_ONLY_PATTERNS, true), where).toStrictEqual([]);
+      // In the compiled text, a sentence of its own as the scan reads it (OWN_WORD as "§"), listed with that reason.
+      const compiled = valueAt(held(trade).trade.flows[flow].ops[k], ["does"]);
+      if (typeof compiled !== "string") throw new Error(`${where}: the compiled op has no does`);
+      const scanned = sentencesOf(compiled.split(OWN_WORD).join("§")).map((one) => one.text);
+      expect(scanned, where).toContain(listed);
+      expect(ALLOWED[VERIFY_ONLY], where).toContain(listed);
+    }
+  });
+});
+
 /**
  * The six texts of messages a person reads that wait on a permit that "checks out" (movers.json's junk hauling), each
  * by its place (the scan's places: a message's index in its list, then its element's), with its one reason: a step that
@@ -1999,43 +2270,63 @@ const MESSAGES_WAITING: readonly (readonly [place: string, reason: string])[] = 
 ];
 
 /**
- * The texts of messages a person reads that claim a check made and wait on nothing, each by its place with its one
- * reason; marking one would stop the build (C7ClaimError), which is never loosened, so each stays as written and T-1435
- * fixes its words (the lead's rulings, DL-913 and DL-916).
- *   - notary.json's S1-23 card tells the owner the notary's commission is "checked" ("Sam Lee · NP045210 · checked"), a
- *     paper checked by no one named (DL-901 item 15; accepted as built, DL-913). The same op's own words ("Sam's
- *     commission was checked already") are marked.
- *   - dog-walker.json:2041 and :2055, the words op at S11-50 (a step that runs while verify is off): "The city's records
- *     show Quinn's park permit as suspended today", to Sam and to Quinn, a records' result with no check verb (DL-916
- *     item 23). The same op's own words say "Rosie checks no permit".
- *   - tires.json:1266, vehicle-wrap.json:2936 and window-tint.json:2093, the words op at S1-38, Rosie to the owner: "...
- *     needs no state license where you work, so I'll check the business registration", Rosie's check in the first
- *     person (DL-916 item 24). The same words on vehicle-wrap's and window-tint's rename new sides are marked.
+ * The texts of messages a person reads that claim a check made, wait on nothing and keep their words, each by its place
+ * with its one reason; marking one would stop the build (C7ClaimError), which is never loosened. Empty since T-1435: the
+ * six it held (the lead's rulings, DL-913 and DL-916) get their words with the claim dropped from C7's step in the frame
+ * (c7.ts MESSAGE_LINES), each pinned by its raw text in CORRECTED_MESSAGES.
  */
-const MESSAGES_NEED: readonly (readonly [place: string, reason: string])[] = [
-  [
-    "notary A.ops[3].say[0][3].card.lines[0]",
-    "NEED: a message a person reads shows a paper checked by no one named (DL-901 item 15)",
-  ],
+const MESSAGES_NEED: readonly (readonly [place: string, reason: string])[] = [];
+
+/**
+ * The six messages MESSAGES_NEED held (T-140 rounds 4 and 5), each by its place in the trade file (the scan's places),
+ * its step, its line as the trade file writes it, and the line the bundle holds instead (T-1435): C7's step in the frame
+ * drops the claim, tagged MC:C7, and the emitter carries it into the trade's words op (correctWordsOps).
+ *   - notary.json:1124, the words op at S1-23, the owner's card: the commission "checked" by no one named (DL-901 item
+ *     15; DL-913); CQ-353's default until Jay rewords: the claim dropped. The same op's own words ("Sam's commission was
+ *     checked already") are marked.
+ *   - dog-walker.json:2041 and :2055, the words op at S11-50 (a step that runs while verify is off), to Sam and to Quinn:
+ *     the city's records' result, a check no one makes while verify is off (DL-916 item 23); the owner's own word
+ *     instead, as the op's own words ("Here, Sam says Quinn's is suspended") and the master's S11-50 say it.
+ *   - tires.json:1266, vehicle-wrap.json:2936 and window-tint.json:2093, the words op at S1-38, Rosie to the owner:
+ *     Rosie's check in the first person (DL-916 item 24); master-A.json:1110's own words instead ("I show it as you give
+ *     it and don't check it"). The same words on vehicle-wrap's and window-tint's rename new sides are marked.
+ */
+const CORRECTED_MESSAGES: readonly (readonly [
+  place: string,
+  step: string,
+  raw: string,
+  corrected: string,
+])[] = [
+  ["notary A.ops[3].say[0][3].card.lines[0]", "S1-23", "Sam Lee · NP045210 · checked", "Sam Lee · NP045210"],
   [
     "dog-walker A.ops[22].say[0][2]",
-    "NEED: a message a person reads shows the records' result of a check no one makes while verify is off (DL-916 item 23); T-1435 fixes its words",
+    "S11-50",
+    "The city's records show Quinn's park permit as suspended today.",
+    "Got it: Quinn's park permit is suspended today.",
   ],
   [
     "dog-walker A.ops[22].say[1][2]",
-    "NEED: a message a person reads shows the records' result of a check no one makes while verify is off (DL-916 item 23); T-1435 fixes its words",
+    "S11-50",
+    "The city's records show your park permit as suspended, so you're off the hike schedule for now. Tell Sam if that's wrong.",
+    "Sam says your park permit is suspended, so you're off the hike schedule for now. Tell Sam if that's wrong.",
   ],
   [
     "tires A.ops[10].say[4][2]",
-    "NEED: Rosie says in the first person that it checks a paper (DL-916 item 24); T-1435 fixes its words",
+    "S1-38",
+    "Thanks. Mobile tire service needs no state license where you work, so I'll check the business registration. Now send its prices: a photo or a list.",
+    "Thanks. Mobile tire service needs no state license where you work, so I'll show the business registration as you give it. Now send its prices: a photo or a list.",
   ],
   [
     "vehicle-wrap A.ops[29].say[4][2]",
-    "NEED: Rosie says in the first person that it checks a paper (DL-916 item 24); T-1435 fixes its words",
+    "S1-38",
+    "Thanks. Mobile wrap service needs no state license where you work, so I'll check the business registration. Now send its prices: a photo or a list.",
+    "Thanks. Mobile wrap service needs no state license where you work, so I'll show the business registration as you give it. Now send its prices: a photo or a list.",
   ],
   [
     "window-tint A.ops[26].say[4][2]",
-    "NEED: Rosie says in the first person that it checks a paper (DL-916 item 24); T-1435 fixes its words",
+    "S1-38",
+    "Thanks. Mobile tint service needs no state license where you work, so I'll check the business registration. Now send its prices: a photo or a list.",
+    "Thanks. Mobile tint service needs no state license where you work, so I'll show the business registration as you give it. Now send its prices: a photo or a list.",
   ],
 ];
 
@@ -2045,16 +2336,17 @@ const VERIFY_ONLY = "C4's verify-only branch, switched off while verify is off";
 /**
  * The exhaustive scan's allow list (DL-901 item 16; DL-916 item 26): every sentence of a compiled trade text (pf blocks,
  * ops, renames' and swaps' new sides, slot rows, money; messages too) that still holds a hit, with its one reason. A hit
- * is a phrase of SHAPES (CLAIM_PATTERNS and PASSIVE_PATTERNS without their guards) or of ROUND5_SHAPES (a lookup's or
- * records' result; Rosie in the first person; a check key's place or checker), or a check verb with a negation within 3
- * words before it across a separator (CHECK_VERB; one with the negation in its own clause is a true negation of it, and
- * is not listed). The reasons: a true negation ("checks none", "never checked"); no paper, with what is checked instead
- * (a fraud or booking-cap flag, a background check, a record on file, an identity, a vehicle, a price, and the rest of
- * default 4 and the lead's rulings on round 3's open questions, DL-901 item 17); lead note 12's S1-33 line in Rosie's
- * own voice, on C4's verify-only branch; and, for a round 5 hit in an op at one of C4's verify-only steps, VERIFY_ONLY
- * (DL-916 item 25). A rename's or a swap's first side (the master's own line, default 4) is listed apart, in
- * FIRST_SIDES; the six messages that wait, in MESSAGES_WAITING; the six messages that claim a check, in MESSAGES_NEED.
- * A scanned sentence shows OWN_WORD as "§".
+ * is a phrase of SHAPES (CLAIM_PATTERNS and PASSIVE_PATTERNS without their guards), of ROUND5_SHAPES (a lookup's or
+ * records' result; Rosie in the first person; a check key's place or checker) or of S12_19_SHAPES (a passive "already
+ * checked" or "until (they're) checked", DL-926), or a check verb with a negation within 3 words before it across a
+ * separator (CHECK_VERB; one with the negation in its own clause is a true negation of it, and is not listed). The
+ * reasons: a true negation ("checks none", "never checked"); no paper, with what is checked instead (a fraud or
+ * booking-cap flag, a background check, a record on file, an identity, a vehicle, a price, and the rest of default 4 and
+ * the lead's rulings on round 3's open questions, DL-901 item 17); lead note 12's S1-33 line in Rosie's own voice, on
+ * C4's verify-only branch; and, for a hit of ROUND5_SHAPES or S12_19_SHAPES in an op at one of C4's verify-only steps,
+ * VERIFY_ONLY (DL-916 item 25; DL-926). A rename's or a swap's first side (the master's own line, default 4) is listed
+ * apart, in FIRST_SIDES; the six messages that wait, in MESSAGES_WAITING; a message that claims a check and keeps its
+ * words, in MESSAGES_NEED (none since T-1435). A scanned sentence shows OWN_WORD as "§".
  */
 const ALLOWED: Readonly<Record<string, readonly string[]>> = {
   "true negation": [
@@ -2303,6 +2595,8 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
     "Checked at booking and again on site.",
     "Checked on every first visit.",
     "checked on site, and the line comes off if it isn't needed",
+    // snow.json's rename new side (A rename[183][1], S12_19_SHAPES' "already checked", DL-926): a truck.
+    "like a truck already checked",
     "the hull ID and the engine's serial number are checked for open safety recalls at check-in;",
   ],
   "no paper: a fraud or booking-cap flag": [
@@ -2535,6 +2829,20 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
     "Your license shows as expired on the state's lookup, so Lee Alarm & Camera can't book you until it shows renewed.",
     "Your low-voltage license shows as expired on the state's lookup.",
     "Your massage license shows as expired on the state's lookup.",
+    // DL-926 (the security reviewer's note a on round 5): S12-19's passive lines that no pattern of c7.ts reads, in the
+    // words ops' does at S12-19, C4's verify-only step: "People already checked stay bookable." (dance.json:8635,
+    // detailing.json:2218, tutor.json:5382), "Those already checked stay on." (dog-walker.json:2065, pet-taxi.json:2842,
+    // pet-waste.json:2606) and detailing's "until they're checked", with the same wordings S12_19_SHAPES finds in
+    // daycare's, dj's, dog-walker's, rentals' and tires' S12-19 (S12_19_PLACES pins each by its place).
+    "§ Those already checked stay on.",
+    "§ While it's down, nobody new is offered until they're checked.",
+    "§ While they're down, nobody new leads a hike until checked.",
+    "§ Work already checked stays bookable.",
+    "Ones already checked stay as they are.",
+    "People already checked stay bookable.",
+    "Those already checked stay on.",
+    "What's already checked stays bookable.",
+    "While it's down, nobody new is offered for them, and people already checked stay bookable.",
   ],
 };
 
@@ -2728,6 +3036,18 @@ const ROUND5_SHAPES: readonly { pattern: RegExp; reads: "every text" | "Rosie's 
   })),
 ];
 
+/**
+ * S12-19's passive wordings (the security reviewer's note a on round 5; DL-926), which no pattern of c7.ts reads: a
+ * person, a kind of work or a paper "already checked", and a wait "until checked" or "until they're checked", each with
+ * no checker and no paper named ("People already checked stay bookable.", "Those already checked stay on.", "nobody new
+ * is offered until they're checked"). Read in every text: a hit in an op at one of C4's verify-only steps (S12-19's) is
+ * listed under VERIFY_ONLY, any other with its reason.
+ */
+const S12_19_SHAPES: readonly RegExp[] = [
+  /\balready\s+checked\b/gi,
+  /\buntil\s+(?:they're\s+|they\s+are\s+)?checked\b/gi,
+];
+
 /** A check verb in any words: a hit where a negation within 3 words before it lies across a clause break. */
 const CHECK_VERB =
   /\b(?:re-?)?(?:check(?:s|ed)?|verif(?:y|ies|ied)|confirm(?:s|ed)?)\b|\blook(?:s|ed)?\s+(?:[\w'-]+\s+){0,4}?up\b/gi;
@@ -2796,8 +3116,8 @@ function allLeaves(trade: LoadedTrade): Leaf[] {
 
 /**
  * One hit of the scan: its sentence; whether it lies on a first side; whether it is a passive wait in a message, or a
- * round 5 claim in a message a person reads, which C7 does not read there (`waits`); whether it is a round 5 hit in an op
- * at one of C4's verify-only steps (`verifyOnly`).
+ * round 5 claim or an S12-19 passive wording in a message a person reads, which C7 does not read there (`waits`);
+ * whether it is a hit of round 5's shapes or of S12_19_SHAPES in an op at one of C4's verify-only steps (`verifyOnly`).
  */
 interface ScanHit {
   sentence: string;
@@ -2840,6 +3160,18 @@ function scanHits(leaf: Leaf): ScanHit[] {
           verifyOnly: leaf.verifyOnly && !leaf.first,
         });
     }
+  // S12-19's passive wordings (DL-926): one in an op at a verify-only step is listed with that reason; one in a message a
+  // person reads that is not negated waits on the lead's lists, as a passive wait of SHAPES does.
+  for (const sentence of sentences)
+    for (const pattern of S12_19_SHAPES)
+      for (const match of sentence.text.matchAll(pattern))
+        out.push({
+          sentence: sentence.text,
+          first: leaf.first,
+          waits:
+            leaf.message && !leaf.first && !leaf.verifyOnly && !negatedInClause(sentence.text, match.index),
+          verifyOnly: leaf.verifyOnly && !leaf.first,
+        });
   if (leaf.first) return out;
   for (const match of text.matchAll(CHECK_VERB)) {
     if (!negationBefore(text.slice(0, match.index))) continue;
@@ -2857,13 +3189,14 @@ function kind(reason: string): string {
 }
 
 describe("C7's exhaustive scan (DL-901 item 16)", () => {
-  it("leaves unmarked only the allow list's hits, each with its one reason, the first sides, the six messages that wait and the six that claim a check (round 5's shapes too, DL-916 item 26)", () => {
+  it("leaves unmarked only the allow list's hits, each with its one reason, the first sides and the six messages that wait, and no message that claims a check (round 5's shapes too, DL-916 item 26; S12-19's, DL-926; T-1435)", () => {
     const found = new Map<string, { hits: number; files: Set<string> }>();
     const firstSides = new Map<string, { hits: number; files: Set<string> }>();
     const waits: string[] = [];
     const verifyOnly = new Set<string>();
+    // The trades as C7 leaves them in the bundle: its marks, then its step in the frame (the six messages' words).
     for (const id of ALL)
-      for (const leaf of allLeaves(marked(id).done.trade))
+      for (const leaf of allLeaves(held(id).trade))
         for (const hit of scanHits(leaf)) {
           if (hit.waits) {
             waits.push(`${id} ${leaf.where}`);
@@ -2876,6 +3209,7 @@ describe("C7's exhaustive scan (DL-901 item 16)", () => {
           entry.files.add(id);
           bucket.set(hit.sentence, entry);
         }
+    expect(MESSAGES_NEED).toStrictEqual([]);
     expect(waits.sort()).toStrictEqual(
       [...MESSAGES_WAITING, ...MESSAGES_NEED].map(([place]) => place).sort(),
     );
@@ -2886,8 +3220,8 @@ describe("C7's exhaustive scan (DL-901 item 16)", () => {
     expect(reasonOf.size, "each sentence is listed once, with one reason").toBe(listed.length);
     expect([...found.keys()].sort()).toStrictEqual(listed.map(([sentence]) => sentence).sort());
     expect([...firstSides.keys()].sort()).toStrictEqual([...FIRST_SIDES].sort());
-    // Each round 5 hit in an op at one of C4's verify-only steps is listed with that reason, and only those are (DL-916
-    // item 25).
+    // Each hit of round 5's shapes or S12-19's in an op at one of C4's verify-only steps is listed with that reason, and
+    // only those are (DL-916 item 25; DL-926).
     expect([...verifyOnly].sort()).toStrictEqual([...(ALLOWED[VERIFY_ONLY] ?? [])].sort());
     for (const sentence of ALLOWED["true negation"] ?? [])
       expect(NEGATION_WORD.test(sentence), sentence).toBe(true);
@@ -2910,9 +3244,9 @@ describe("C7's exhaustive scan (DL-901 item 16)", () => {
     expect(counts).toMatchInlineSnapshot(`
       {
         "C4's verify-only branch, switched off while verify is off": {
-          "files": 14,
-          "hits": 43,
-          "sentences": 24,
+          "files": 19,
+          "hits": 66,
+          "sentences": 33,
         },
         "a rename's first side": {
           "files": 71,
@@ -2926,8 +3260,8 @@ describe("C7's exhaustive scan (DL-901 item 16)", () => {
         },
         "no paper": {
           "files": 120,
-          "hits": 474,
-          "sentences": 182,
+          "hits": 475,
+          "sentences": 183,
         },
         "true negation": {
           "files": 229,
