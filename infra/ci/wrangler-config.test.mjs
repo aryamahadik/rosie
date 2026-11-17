@@ -233,6 +233,79 @@ describe("wrangler.jsonc LINK_HOST (T-1235)", () => {
   });
 });
 
+// D-018's switch (T-572; DL-940): env.staging's var STAGING_LINQ_LINE, "real", puts staging on Rosie's real Linq line
+// for the roster phones (T-1449 reads it; absent or any other value keeps the test-phone line alone). Wrangler does not
+// pass vars down, so it is in env.staging alone: never at the top level or in env.production. It is a var, never a
+// secret, and staging's vars hold nothing else new: no number, key or secret (those are put by name, and Rosie's number
+// is the deploy's --var). Its comment says what it switches and how it rolls back.
+const LINQ_LINE = "STAGING_LINQ_LINE";
+const STAGING_VARS = ["BASE_PATH", "DB_SCHEMA", "ENVIRONMENT", "LINK_HOST", LINQ_LINE];
+
+function checkLinqLine(cfg) {
+  assert.equal(cfg.env.staging.vars[LINQ_LINE], "real", "env.staging's STAGING_LINQ_LINE is real");
+  assert.deepEqual(
+    Object.keys(cfg.env.staging.vars).sort(),
+    STAGING_VARS,
+    "env.staging's vars are its four and the switch",
+  );
+  for (const [where, section] of [
+    ["the top level", cfg],
+    ["env.production", cfg.env.production],
+  ]) {
+    assert.ok(!Object.hasOwn(section.vars ?? {}, LINQ_LINE), `${where} names no STAGING_LINQ_LINE`);
+  }
+  for (const section of [cfg, cfg.env.staging, cfg.env.production]) {
+    assert.deepEqual(section.secrets, { required: [] }, "a section requires a secret");
+  }
+}
+
+describe("wrangler.jsonc env.staging's STAGING_LINQ_LINE (T-572)", () => {
+  it('is "real" in env.staging\'s vars alone, beside its four vars, and no section requires a secret', () => {
+    checkLinqLine(config);
+  });
+
+  it("is commented in place: D-018's switch, and its rollback", () => {
+    assert.match(raw, /^\s*\/\/ STAGING_LINQ_LINE is D-018's switch \(T-572; DL-940; T-1449 reads it\)/m);
+    assert.match(
+      raw,
+      /^\s*\/\/ Rollback: remove this line or set it to "double", then npm run deploy:staging\.$/m,
+    );
+    assert.equal(raw.split(`"${LINQ_LINE}"`).length - 1, 1, "wrangler.jsonc names the switch once as a key");
+  });
+
+  it("rejects an in-memory copy that turns the switch off, names it elsewhere, or adds a var or a secret beside it", () => {
+    const broken = (change) => {
+      const copy = structuredClone(config);
+      change(copy);
+      return () => checkLinqLine(copy);
+    };
+    assert.throws(
+      broken((c) => (c.env.staging.vars[LINQ_LINE] = "double")),
+      /STAGING_LINQ_LINE is real/,
+    );
+    assert.throws(
+      broken((c) => delete c.env.staging.vars.STAGING_LINQ_LINE),
+      /STAGING_LINQ_LINE is real/,
+    );
+    assert.throws(
+      broken((c) => (c.env.production.vars[LINQ_LINE] = "real")),
+      /env\.production names no STAGING_LINQ_LINE/,
+    );
+    assert.throws(
+      broken((c) => (c.vars[LINQ_LINE] = "real")),
+      /the top level names no STAGING_LINQ_LINE/,
+    );
+    assert.throws(
+      broken((c) => (c.env.staging.vars.STAGING_LINQ_ALLOWLIST = "+15555550150")),
+      /its four and the switch/,
+    );
+    assert.throws(
+      broken((c) => (c.env.staging.secrets = { required: ["LINQ_API_TOKEN"] })),
+      /requires a secret/,
+    );
+  });
+});
+
 describe("wrangler.jsonc clock-sweep cron trigger (T-278)", () => {
   it("declares exactly one cron, every minute, at the top level", () => {
     assert.deepEqual(config.triggers, { crons: ["* * * * *"] });
