@@ -12,6 +12,7 @@ import type { ValidateFunction } from "ajv";
 import Ajv2020 from "ajv/dist/2020.js";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
+import { findPrivateValue, redactFreeText } from "../../shared/redact";
 import { loadRecordedSample } from "../../shared/samples";
 import { createLinqDouble } from "../double/double";
 import { sendPartProblems as doubleProblems } from "../double/validate";
@@ -30,6 +31,15 @@ const K11_ID = "https://rosie.invalid/contracts/port-linq/port-linq.v1.schema.js
 
 // Made up here, not a key of any service, and not in a key's shape (rule 7).
 const FAKE_KEY = "fake-linq-key-t414-0001";
+// A second made-up key, of letters alone: no run of digits, no vendor prefix, no email or phone shape, so no
+// shared/redact.ts pattern catches it (FAKE_KEY's "414-0001" reads as a phone number there), and only the adapter's own
+// screen of the key it sends keeps it out of an outcome.
+const LETTERS_KEY = "fakeKeyRoundTwoLettersOnlyZqXwVb";
+/** Both fake keys, each with a label for the test's name, so no test name prints a key. */
+const BOTH_KEYS: [string, string][] = [
+  ["the first fake key", FAKE_KEY],
+  ["the letters-only fake key", LETTERS_KEY],
+];
 const NOW = "2026-10-23T14:05:03Z";
 /** The attachment id the recorded calendar send names (vendor-samples/send-message-request-calendar-file.json). */
 const CALENDAR_ATTACHMENT = "linq-att-demo-0002";
@@ -358,6 +368,33 @@ function privateValues(request: SendPartRequest): string[] {
 function bodyOf(seen: Seen | undefined): Record<string, unknown> {
   const text = seen?.body ?? "";
   return text === "" ? {} : (JSON.parse(text) as Record<string, unknown>);
+}
+
+/** Every byte of `value` as a %XX escape: a URL encoding of it whatever its characters, so it differs from the raw value. */
+function percentEncoded(value: string): string {
+  return [...new TextEncoder().encode(value)]
+    .map((byte) => `%${byte.toString(16).toUpperCase().padStart(2, "0")}`)
+    .join("");
+}
+
+/**
+ * Words that echo the key, as an error.message or a file step's reason might: raw, URL-encoded (every byte, in either
+ * case of hex, and twice over), inside a longer token, in capitals, cut short, and masked down to its first or last 4.
+ */
+function keyEchoes(key: string): [string, string][] {
+  const encoded = percentEncoded(key);
+  return [
+    ["raw", `Bad token ${key}`],
+    ["URL-encoded", `Bad token ${encoded}`],
+    ["URL-encoded in lower-case hex", `Bad token ${encoded.toLowerCase()}`],
+    ["URL-encoded twice", `Bad token ${encoded.replace(/%/g, "%25")}`],
+    ["inside a longer token", `Bad request: token=${key}&retry=no`],
+    ["glued to other letters", `Bad token x${key}x`],
+    ["in capitals", `Bad token ${key.toUpperCase()}`],
+    ["cut short", `Bad token ${key.slice(0, 8)}...`],
+    ["masked down to its first 4", `Bad token ${key.slice(0, 4)}****`],
+    ["masked down to its last 4", `Bad token ****${key.slice(-4)}`],
+  ];
 }
 
 describe("the K-11 v1 send fixtures", () => {
@@ -920,6 +957,66 @@ describe("the key: read only from the Worker environment by name, sent only as t
   });
 });
 
+describe("the key in Linq's error.message: no part of it is ever kept in a reason, whatever its shape", () => {
+  const text = sendFixture("send-text.json").request;
+  /** Linq's error answers, each with the words it carries, and the adapter's fixed words for it. */
+  const answers: [string, (message: string) => Response, string][] = [
+    ["401 with no code", (message) => linqError(401, null, { message }), REASONS.refused],
+    ["403 code 2024", (message) => linqError(403, 2024, { message }), REASONS.optedOut],
+    ["429 code 1007", (message) => linqError(429, 1007, { message, retryAfter: 65 }), REASONS.rateLimited],
+    ["500 code 4001", (message) => linqError(500, 4001, { message }), REASONS.failed4001],
+    ["504 code 4006", (message) => linqError(504, 4006, { message }), REASONS.timedOut4006],
+    ["503 with no code", (message) => linqError(503, null, { message }), REASONS.serverError],
+  ];
+
+  it("has a letters-only fake key that no shared/redact.ts pattern catches, so only the adapter's screen can", () => {
+    expect(LETTERS_KEY).toMatch(/^[A-Za-z]+$/);
+    for (const words of [
+      LETTERS_KEY,
+      `Bad token ${LETTERS_KEY}`,
+      `Bad token ${percentEncoded(LETTERS_KEY)}`,
+    ]) {
+      expect(findPrivateValue(words)).toBeUndefined();
+      expect(redactFreeText(words)).toBe(words);
+    }
+  });
+
+  it.each(BOTH_KEYS)(
+    "gives the adapter's fixed words, never Linq's, when error.message echoes %s raw, URL-encoded or in part",
+    async (_label, key) => {
+      for (const [shape, message] of keyEchoes(key)) {
+        for (const [answerLabel, answer, reason] of answers) {
+          const label = `${shape}, ${answerLabel}`;
+          const stub = stubFetch(() => answer(message));
+          const outcome = await sender({ env: { LINQ_API_TOKEN: key }, fetch: stub.fetch }).sendPart(text);
+          // The key echoed is the one the request went with.
+          expect(
+            stub.seen.map((seen) => seen.headers.authorization),
+            label,
+          ).toEqual([`Bearer ${key}`]);
+          expect(outcome, label).toMatchObject({ result: "failed", reason, providerMessageId: null });
+          expectSendError(outcome);
+          const written = JSON.stringify(outcome);
+          for (const form of [key, key.toLowerCase(), key.toUpperCase(), percentEncoded(key)])
+            expect(written.includes(form), label).toBe(false);
+        }
+      }
+    },
+  );
+
+  it.each(BOTH_KEYS)(
+    "keeps Linq's words that hold no part of %s, even when they name LINQ_API_TOKEN",
+    async (_label, key) => {
+      for (const message of [`${LINQ_API_TOKEN} is not valid`, "Made up for a test."]) {
+        const stub = stubFetch(() => linqError(401, null, { message }));
+        const outcome = await sender({ env: { LINQ_API_TOKEN: key }, fetch: stub.fetch }).sendPart(text);
+        expect(outcome, message).toMatchObject({ kind: "refused", httpStatus: 401, reason: message });
+        expectSendError(outcome);
+      }
+    },
+  );
+});
+
 describe("sendPart: Linq's answers read into K-11's outcomes", () => {
   const text = sendFixture("send-text.json").request;
   const link = sendFixture("send-link-card.json").request;
@@ -1213,6 +1310,72 @@ describe("a part that carries a file", () => {
       expect(stub.seen).toEqual([]);
     }
   });
+
+  it.each(BOTH_KEYS)(
+    "screens the file step's reason as Linq's message, with %s: no key, whole number or words of the part reach the outcome",
+    async (_label, key) => {
+      const reasons = [
+        ...keyEchoes(key).map(([, words]) => words),
+        `Upload for ${calendar.to} refused`,
+        "Upload for (555) 555-0101 refused",
+        `Upload refused: ${calendar.text ?? ""}`,
+      ];
+      const failures = [
+        (reason: string) => failed("refused", 400, "1004", reason),
+        (reason: string) => failed("rateLimited", 429, "1007", reason, 65),
+        (reason: string) => failed("transient", 503, null, reason),
+      ];
+      for (const [index, reason] of reasons.entries()) {
+        for (const failure of failures) {
+          const label = `reason ${String(index)}`;
+          const stub = stubFetch(acceptAny(calendar));
+          const attachFile: AttachFile = () => Promise.resolve(failure(reason));
+          const outcome = await sender({
+            env: { LINQ_API_TOKEN: key },
+            fetch: stub.fetch,
+            attachFile,
+          }).sendPart(calendar);
+          expect(outcome, label).toEqual({ ...failure(reason), reason: REASONS.fileStep });
+          expectSendError(outcome);
+          expect(stub.seen, label).toEqual([]);
+          const written = JSON.stringify(outcome);
+          for (const value of [key, percentEncoded(key), calendar.to, calendar.text ?? ""])
+            expect(written.includes(value), label).toBe(false);
+        }
+      }
+    },
+  );
+
+  it.each(BOTH_KEYS)(
+    "keeps a file step's reason that holds nothing private, and reads its code as Linq's, digits alone (%s)",
+    async (_label, key) => {
+      const steps: [AttachFile, SendPartFailed][] = [
+        [
+          () => Promise.resolve(failed("refused", 400, "1004", "The file was refused.")),
+          failed("refused", 400, "1004", "The file was refused."),
+        ],
+        [
+          () => Promise.resolve({ ...failed("refused", 400, null, "The file was refused."), code: key }),
+          failed("refused", 400, null, "The file was refused."),
+        ],
+        [
+          () => Promise.resolve({ ...failed("refused", 400, null, "The file was refused."), reason: "" }),
+          failed("refused", 400, null, REASONS.fileStep),
+        ],
+      ];
+      for (const [attachFile, expected] of steps) {
+        const stub = stubFetch(acceptAny(calendar));
+        const outcome = await sender({
+          env: { LINQ_API_TOKEN: key },
+          fetch: stub.fetch,
+          attachFile,
+        }).sendPart(calendar);
+        expect(outcome).toEqual(expected);
+        expectSendError(outcome);
+        expect(stub.seen).toEqual([]);
+      }
+    },
+  );
 
   it("answers transient when the file step throws or answers what cannot be read, and sends no message", async () => {
     const steps: AttachFile[] = [

@@ -24,6 +24,10 @@
 //   5. a part with a file when no step to put files up is given: no status, no code. The dispatcher then sends the
 //      part again plain, the words without their file (arch 07 line 367).
 // Then the one request, with a time limit; no answer in time, or a network error, is `transient`.
+//
+// A failure's reason never holds the key or any part of it, a number, an address or the part's own words: Linq's
+// error.message and the reason of the caller's file step are both screened (wire.ts `screenedReason`), and screened
+// words give way to the adapter's fixed ones. The file step's code is read as Linq's is, digits alone.
 
 import type {
   AttachFile,
@@ -36,13 +40,16 @@ import type {
 import { sendPartProblems } from "./validate";
 import {
   LINQ_API_BASE,
+  REASONS,
   USER_AGENT,
+  codeOf,
   failed,
   isStepSegment,
   linqCall,
   noAnswer,
   pathIds,
   readAnswer,
+  screenedReason,
 } from "./wire";
 
 /** The name Linq's key is read by (K-11 README default 1). */
@@ -104,9 +111,10 @@ function fileOf(request: SendPartRequest): LinqFile | null {
 
 /**
  * The file step's answer: attached with an id the message can name, its failure (K-11's fields alone, so the outcome
- * holds nothing else), or one the adapter cannot read.
+ * holds nothing else), or one the adapter cannot read. The failure's reason is screened as Linq's message is, and its
+ * code read as Linq's is, so the caller's words never bring the key, a number or the part's words into the outcome.
  */
-function readAttached(outcome: unknown): LinqAttachOutcome {
+function readAttached(outcome: unknown, request: SendPartRequest, key: string): LinqAttachOutcome {
   if (typeof outcome === "object" && outcome !== null) {
     const { result, attachmentId } = outcome as { result?: unknown; attachmentId?: unknown };
     if (result === "attached" && typeof attachmentId === "string" && ATTACHMENT_ID.test(attachmentId))
@@ -116,8 +124,8 @@ function readAttached(outcome: unknown): LinqAttachOutcome {
       return failed(
         failure.kind,
         failure.httpStatus,
-        failure.code,
-        failure.reason,
+        codeOf(failure.code),
+        screenedReason(failure.reason, REASONS.fileStep, request, key),
         failure.retryAfterSeconds,
       );
     }
@@ -134,13 +142,13 @@ export function createLinqSender(options: LinqSenderOptions): LinqSender {
     throw new RangeError("timeoutMs is not a whole number of milliseconds above 0");
 
   /** Puts the part's file up through the caller's step; its failure is the part's. */
-  async function attach(file: LinqFile): Promise<LinqAttachOutcome> {
+  async function attach(file: LinqFile, request: SendPartRequest, key: string): Promise<LinqAttachOutcome> {
     if (options.attachFile === undefined)
       return refusedHere("No step to put a file up at Linq is set up: nothing was sent.");
     try {
-      return readAttached(await options.attachFile(file));
+      return readAttached(await options.attachFile(file), request, key);
     } catch {
-      return failed("transient", null, null, "The file could not be put up at Linq: nothing was sent.");
+      return failed("transient", null, null, REASONS.fileStep);
     }
   }
 
@@ -166,7 +174,7 @@ export function createLinqSender(options: LinqSenderOptions): LinqSender {
       let attachmentId: string | null = null;
       const file = fileOf(request);
       if (file !== null) {
-        const attached = await attach(file);
+        const attached = await attach(file, request, key);
         if (attached.result !== "attached") return attached;
         attachmentId = attached.attachmentId;
       }
@@ -196,7 +204,7 @@ export function createLinqSender(options: LinqSenderOptions): LinqSender {
         // The body did not come: a 2xx is then unreadable, and an error is read by its status alone.
         text = "";
       }
-      return readAnswer(call, request, answer.status, answer.headers.get("retry-after"), text, now());
+      return readAnswer(call, request, key, answer.status, answer.headers.get("retry-after"), text, now());
     },
   };
 }

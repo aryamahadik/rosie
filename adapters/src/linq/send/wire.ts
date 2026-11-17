@@ -37,7 +37,9 @@
 //   5xx                                   transient
 //   anything else (1xx, 3xx), no answer   transient with no status
 // A code K-11 keeps for one kind (2024 for optedOut at 403) is never written on another. The reason is Linq's own
-// message when it holds no key, number, address or words of the request, else the adapter's fixed words.
+// message when it holds no key, number, address or words of the request, and no part of the key the adapter sends,
+// whatever its shape (raw, URL-encoded, inside a longer token, in another case, cut short); else the adapter's fixed
+// words, so no part of a screened message reaches the outcome (`screenedReason`).
 
 import { findPrivateValue } from "../../shared/redact";
 import type { LinqService, SendFailureKind, SendPartFailed, SendPartOutcome, SendPartRequest } from "./types";
@@ -144,6 +146,7 @@ export const REASONS = {
   serverError: "A server error at Linq.",
   noAnswer: "No answer came: a timeout or a network error.",
   unreadable: "Linq's answer could not be read.",
+  fileStep: "The file could not be put up at Linq: nothing was sent.",
 } as const;
 
 /** The no-answer failure: a timeout or a network error (K-11: httpStatus null). */
@@ -186,7 +189,7 @@ function serviceOf(value: unknown): LinqService | null {
 }
 
 /** Linq's error code as K-11 writes it (digits as text): a whole number or a string of digits; else null. */
-function codeOf(value: unknown): string | null {
+export function codeOf(value: unknown): string | null {
   if (typeof value === "number") return Number.isSafeInteger(value) && value >= 0 ? String(value) : null;
   if (typeof value === "string") return /^[0-9]{1,9}$/.test(value) ? value : null;
   return null;
@@ -214,20 +217,78 @@ export function retryAfterSeconds(header: string | null, bodyValue: unknown): nu
   return found.length === 0 ? null : Math.max(...found);
 }
 
-/** The request's own words, link and number, which no reason may hold (K-11 `reason`). */
-function privateValues(request: SendPartRequest): string[] {
-  return [request.text, request.link, request.to, request.calendarFile?.ics, ...request.options].filter(
+/**
+ * The request's own words, link and number, and the key the adapter sends it with (send.ts reads LINQ_API_TOKEN), which
+ * no reason may hold (K-11 `reason`: "Never a key, a phone number or the message's words").
+ */
+function privateValues(request: SendPartRequest, key: string): string[] {
+  return [request.text, request.link, request.to, request.calendarFile?.ics, ...request.options, key].filter(
     (value): value is string => typeof value === "string" && value !== "",
   );
 }
 
-/** Linq's message as the reason when it is one short line holding nothing private, else the fixed words. */
-function linqWords(message: unknown, fallback: string, request: SendPartRequest): string {
-  if (typeof message !== "string") return fallback;
-  const words = message.trim();
+/** The fewest of the key's characters in a row that count as a part of it: a masked key shows its last 4, say. */
+const KEY_PART_LENGTH = 4;
+
+/**
+ * Whether `text` holds any part of the key: the whole key in any case, or any KEY_PART_LENGTH of its characters in a
+ * row (the key cut short, or masked down to its first or last few). Shorter runs are left, since any text holds a few
+ * of the key's characters together by chance.
+ */
+function holdsKeyPart(text: string, key: string): boolean {
+  if (text.toLowerCase().includes(key.toLowerCase())) return true;
+  for (let start = 0; start + KEY_PART_LENGTH <= key.length; start += 1)
+    if (text.includes(key.slice(start, start + KEY_PART_LENGTH))) return true;
+  return false;
+}
+
+const UTF8 = new TextDecoder();
+
+/** `text` with each run of %XX escapes read as the UTF-8 bytes it encodes; a byte that is not UTF-8 reads as U+FFFD. */
+function percentDecoded(text: string): string {
+  return text.replace(/(?:%[0-9A-Fa-f]{2})+/g, (run) =>
+    UTF8.decode(Uint8Array.from(run.slice(1).split("%"), (hex) => Number.parseInt(hex, 16))),
+  );
+}
+
+/**
+ * The ways a private value may sit in `text`: as given, and URL-decoded, again until nothing changes (at most 3 times),
+ * so a value written URL-encoded, even twice, reads as itself.
+ */
+function readings(text: string): string[] {
+  const found = [text];
+  let current = text;
+  for (let round = 0; round < 3; round += 1) {
+    const decoded = percentDecoded(current);
+    if (decoded === current) break;
+    found.push(decoded);
+    current = decoded;
+  }
+  return found;
+}
+
+/**
+ * Words given for a failure (Linq's error.message, or the reason of the caller's file step) as the outcome's reason,
+ * when they are one short line in which no reading (as given, or URL-decoded) holds a number, an address or a key's
+ * shape (shared/redact.ts), the request's own words, link or number, or any part of the key the adapter sends (raw,
+ * URL-encoded, inside a longer token, in another case, cut short); else `fallback`, the adapter's fixed words, so no part
+ * of screened words reaches the outcome. Words may still name LINQ_API_TOKEN, the key's name.
+ */
+export function screenedReason(
+  given: unknown,
+  fallback: string,
+  request: SendPartRequest,
+  key: string,
+): string {
+  if (typeof given !== "string") return fallback;
+  const words = given.trim();
   if (words === "" || words.length > 300 || /\p{Cc}/u.test(words)) return fallback;
-  if (findPrivateValue(words) !== undefined) return fallback;
-  return privateValues(request).some((value) => words.includes(value)) ? fallback : words;
+  const values = privateValues(request, key);
+  const holdsPrivate = (text: string): boolean =>
+    findPrivateValue(text) !== undefined ||
+    values.some((value) => text.includes(value)) ||
+    holdsKeyPart(text, key);
+  return readings(words).some(holdsPrivate) ? fallback : words;
 }
 
 /** A poll's option ids in the order of the request's options, each found by its words; null when any is not found once. */
@@ -292,10 +353,11 @@ function readFailure(
   retryAfter: string | null,
   body: unknown,
   request: SendPartRequest,
+  key: string,
 ): SendPartFailed {
   const error = field(body, "error");
   const given = codeOf(field(error, "code"));
-  const words = (fallback: string): string => linqWords(field(error, "message"), fallback, request);
+  const words = (fallback: string): string => screenedReason(field(error, "message"), fallback, request, key);
   if (status === 403 && given === "2024") return failed("optedOut", 403, "2024", words(REASONS.optedOut));
   if (given === "4001" || given === "4006")
     return failed(
@@ -319,10 +381,14 @@ function readFailure(
   return unreadable();
 }
 
-/** Linq's answer to one call, read into K-11's outcome (see the top of this file). */
+/**
+ * Linq's answer to one call, read into K-11's outcome (see the top of this file). `key` is the key the call was sent
+ * with, which no reason may hold any part of.
+ */
 export function readAnswer(
   call: LinqCall,
   request: SendPartRequest,
+  key: string,
   status: number,
   retryAfter: string | null,
   text: string,
@@ -330,5 +396,5 @@ export function readAnswer(
 ): SendPartOutcome {
   const body = parseJson(text);
   if (status >= 200 && status <= 299) return readAccepted(call, request, body, answeredAt);
-  return readFailure(status, retryAfter, body, request);
+  return readFailure(status, retryAfter, body, request, key);
 }
