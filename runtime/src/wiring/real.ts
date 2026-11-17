@@ -7,7 +7,10 @@
 //                Linq double's made-up test secret in a test and LINQ_WEBHOOK_SECRET by name in the Worker (K-11 README
 //                default 1; set on staging by name, T-568; until J-08 it must be the secret the test-phone page's Linq
 //                double signs with, which K-11 says is the test environment's, never Linq's). Where no secret is set the
-//                call fails, so the gateway answers 503, verifies nothing and hands nothing on.
+//                call fails, so the gateway answers 503, verifies nothing and hands nothing on. On staging's real Linq
+//                line (T-1449, ./staging/linq-line.ts) the root hands a second secret beside it, the test-phone page's
+//                own (LinqVerifyInputs.pageSecret), which is tried only for a signature the first does not match and
+//                speaks only for a test phone; anything else is the first's rejection, badSignature.
 //   sealing      T-553: K-05 v1.2 handleSealingKey (T-220, db/repo/handle-keys.ts; item 29) with its database bound,
 //                handed in by the root (RootOptions.handleKey): the K-05 double in a test; nothing in the Worker until
 //                T-567 binds its database, so every seal there fails closed and the gateway answers 503. New ids on every
@@ -385,6 +388,29 @@ export class MissingSecretError extends Error {
  */
 export interface LinqVerifyInputs extends ParseLookups {
   readonly webhookSecret: () => string | undefined | Promise<string | undefined>;
+  /**
+   * A second secret beside it, with its one rule (T-1449; DL-940): the test environment's own (K-11 README, doubleWebhook:
+   * "Signed with the test environment's secret, never Linq's"), where the root holds one, which is staging on its real
+   * Linq line (./staging/linq-line.ts): there `webhookSecret` is Linq's own and the test-phone page signs with this one
+   * (./root.ts, the page join). Left out: the one secret, as before.
+   */
+  readonly pageSecret?: PageWebhookSecret;
+}
+
+/**
+ * The test-phone page's own webhook secret and its one rule (T-1449): the verify tries it only for a webhook whose
+ * signature `webhookSecret`'s does not match (badSignature; a bad or stale timestamp is the same under either), and
+ * takes what it signs only as a K-06 event whose sender `speaksFor` admits; anything else stays that rejection,
+ * badSignature (401). Where it is needed and missing, or "", the call fails as for the first (MissingSecretError, by
+ * `name` alone).
+ */
+export interface PageWebhookSecret {
+  /** The secret's name, for MissingSecretError: never a value. */
+  readonly name: string;
+  /** The secret, read at each call that needs it ("whsec_" and base64; undefined or "" where none is set). */
+  readonly secret: () => string | undefined | Promise<string | undefined>;
+  /** Whether it may speak for a K-06 event's sender (the event's handle). */
+  readonly speaksFor: (sender: HandleRef) => boolean;
 }
 
 /**
@@ -557,23 +583,37 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
 /**
  * K-11 v1 verifyWebhook through the Linq adapter (T-413): the signature over id.timestamp.raw under the secret, within
  * 300 s of the gateway's receipt time, then the body parsed into one K-06 v1 event with the part key beside it, or ignored,
- * or rejected (badTimestamp, staleTimestamp, badSignature), which the gateway answers 401.
+ * or rejected (badTimestamp, staleTimestamp, badSignature), which the gateway answers 401. Where the root hands the
+ * test-phone page's own secret beside it (LinqVerifyInputs.pageSecret, T-1449), a webhook that secret signs is taken
+ * only as an event from a sender it speaks for; anything else it signs is the first secret's badSignature.
  */
 function linqVerify(inputs: RealInputs): LinqPort {
   const linq = inputs.linq;
-  const verifier = createLinqWebhookVerifier({
-    ...(linq?.chatHandle === undefined ? {} : { chatHandle: linq.chatHandle }),
-    ...(linq?.optionWords === undefined ? {} : { optionWords: linq.optionWords }),
-    now: inputs.now,
-    secret: async () => {
-      const secret = linq === undefined ? undefined : await linq.webhookSecret();
-      if (secret === undefined || secret === "") throw new MissingSecretError(LINQ_WEBHOOK_SECRET);
-      return secret;
-    },
-  });
+  /** The adapter's verify under one secret, read at each call: missing or "", the call fails, naming the secret alone. */
+  const verifierUnder = (
+    name: string,
+    read: () => string | undefined | Promise<string | undefined>,
+  ): ReturnType<typeof createLinqWebhookVerifier> =>
+    createLinqWebhookVerifier({
+      ...(linq?.chatHandle === undefined ? {} : { chatHandle: linq.chatHandle }),
+      ...(linq?.optionWords === undefined ? {} : { optionWords: linq.optionWords }),
+      now: inputs.now,
+      secret: async () => {
+        const secret = await read();
+        if (secret === undefined || secret === "") throw new MissingSecretError(name);
+        return secret;
+      },
+    });
+  const verifier = verifierUnder(LINQ_WEBHOOK_SECRET, () => linq?.webhookSecret());
+  const page = linq?.pageSecret;
+  const paged = page === undefined ? null : { page, verifier: verifierUnder(page.name, () => page.secret()) };
   return {
     async verifyWebhook(request) {
-      return gatewayResultOf(await verifier.verifyWebhook(request));
+      const answer = gatewayResultOf(await verifier.verifyWebhook(request));
+      // The first secret speaks for any sender. Only a signature it does not match is tried under the page's own.
+      if (paged === null || answer.result !== "rejected" || answer.reason !== "badSignature") return answer;
+      const second = gatewayResultOf(await paged.verifier.verifyWebhook(request));
+      return second.result === "event" && paged.page.speaksFor(second.event.handle) ? second : answer;
     },
   };
 }
