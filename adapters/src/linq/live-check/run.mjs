@@ -128,7 +128,7 @@ function describeError(error, secrets, numbers) {
   return maskWith(`${name}: ${message}`, secrets, numbers);
 }
 
-/** The first fiction number (+1 555 555 01NN) that is neither on the roster nor Rosie's line; null when there is none. */
+/** The first fiction number (area code 555, then 555-0100 to 555-0199) on neither the roster nor Rosie's line, or null. */
 export function offRosterNumber(roster, line) {
   for (let n = 0; n < 100; n += 1) {
     const number = `${FICTION_LINE}${String(n).padStart(2, "0")}`;
