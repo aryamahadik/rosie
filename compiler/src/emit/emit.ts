@@ -37,6 +37,8 @@ import { createHash } from "node:crypto";
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { correctTrade } from "../corrections/c5";
+import { markClaims } from "../corrections/c7";
+import { voidOffs } from "../corrections/c8";
 import type { FlowLetter, MasterGraphs } from "../graph/types.ts";
 import { loadMaster } from "../load/flow";
 import { listTradeIds, loadTrade, type LoadedTrade, type TradeId } from "../load/trade";
@@ -181,14 +183,20 @@ function kvKey(id: BundleId, part: string): string {
  * Packs the inputs into a bundle: corrects each trade's words ops that would put back words a Master Correction replaced
  * (correctWordsOps), compiles both flows and each trade, writes the manifest, checks the whole bundle against K-01 v1
  * (BundleValidationError when it is refused) and serializes each stored value.
- * Before its words ops are corrected, each trade takes C5's fill (c5.ts correctTrade(): insurance's facts).
+ * Before its words ops are corrected, each trade takes the Master Corrections that act on the trade itself, in id order:
+ * C5's fill (c5.ts correctTrade(): insurance's facts), C7's marks (c7.ts markClaims(): a text that says Rosie checks a
+ * paper, or a pf rule that waits on a paper no one named checks, becomes the business's own word, tagged MC:C7) and C8's
+ * void offs (c8.ts voidOffs(): the whole-step D96 offs MC C8 voids are dropped before the applier; every other D96 off
+ * stays).
  */
 export function emitBundle(input: EmitInputs): EmitResult {
   const byId = new Map(input.trades.map((trade) => [trade.id, trade]));
   if (byId.size !== input.trades.length) throw new Error("a trade is given twice");
   const sorted = [...byId]
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-    .map(([, trade]) => correctWordsOps(input.master, correctTrade(trade).trade));
+    .map(([, trade]) =>
+      correctWordsOps(input.master, voidOffs(markClaims(correctTrade(trade).trade).trade).trade),
+    );
   const stops = {} as Record<FlowLetter, StopMarks>;
   for (const flow of FLOWS)
     stops[flow] = placeStops(
