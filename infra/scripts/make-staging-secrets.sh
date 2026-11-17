@@ -29,9 +29,12 @@
 #   - is made here and nowhere else: 32 random bytes from node's crypto.randomBytes (node's own cryptographic generator;
 #     no package), as base64, with the name's prefix in front. It is checked to be exactly that form before it is put,
 #     so an empty or cut-short value is never put.
-#   - is made only for a name on MADE. A vendor's key is never made here, nor the testers' inbox list:
-#     ANTHROPIC_API_KEY, RESEND_API_KEY, STAGING_TEST_INBOXES, or any other name that is not on the list, is refused as
-#     an argument before anything is listed, made or put.
+#   - is made only for a name on MADE. A vendor's key is never made here, nor the testers' inbox list or the roster:
+#     ANTHROPIC_API_KEY, RESEND_API_KEY, STAGING_TEST_INBOXES, LINQ_API_TOKEN, STAGING_LINQ_ALLOWLIST, or any other name
+#     that is not on the list, is refused as an argument before anything is listed, made or put. So is
+#     LINQ_WEBHOOK_SECRET since T-572 (DL-940): once staging is on the real Linq line it is Linq's own signing secret
+#     (K-11 default 1), which Linq gives once and linq-staging-check.sh --create alone puts, so no run here can ever
+#     replace it. The value this script made for it before stays on staging until that put.
 #   - is never printed, logged, exported, put on a command line or written to a file: it is held in one shell variable
 #     and goes down one pipe to cf.sh. No here-document or here-string is used (bash 3.2 writes those to a temporary
 #     file), and tracing is switched off first, whatever the caller's shell asked for. So are allexport and keyword, and
@@ -87,10 +90,12 @@ MADE=(
   # The environment key that wraps every person's sealing key (NQ-DB-1): 32 random bytes as base64 (db/repo/sealing.ts
   # WrappingKeys.resolve; runtime/src/wiring/real.ts SEALING_WRAP_KEY).
   SEALING_WRAP_KEY
-  # The Linq webhook signing secret: "whsec_" and base64 (runtime/src/wiring/real.ts LinqVerifyInputs; the key bytes
-  # after the prefix are what adapters/src/shared/hmac.ts signs and checks under). Until J-08 it is the one the
-  # test-phone page's Linq double signs with (T-412): staging's own, never Linq's.
-  LINQ_WEBHOOK_SECRET
+  # The test-phone page's own webhook signing secret (T-572 and T-1449, DL-940; K-11's doubleWebhook row: the test
+  # environment's, never Linq's): with staging on the real Linq line (wrangler.jsonc STAGING_LINQ_LINE "real"), the
+  # test-phone page's Linq double signs with it, and the gateway takes it only for a test phone's text. "whsec_" and
+  # base64, the form LINQ_WEBHOOK_SECRET was made in here (the key bytes after the prefix are what
+  # adapters/src/shared/hmac.ts signs and checks under).
+  TEST_PHONE_WEBHOOK_SECRET
   # The key every sign-in code's hash and every typed contact's hash is made under: HMAC-SHA-256, with a fixed, distinct
   # prefix for each (ADR-016 section 4; one key for both, CQ-240). 32 random bytes as base64, as SEALING_WRAP_KEY. Its
   # name is the one K-22's rows keep in hash_key_name (contracts/db-schema/people-access); staging's root hands a hashing
@@ -98,8 +103,9 @@ MADE=(
   PROOF_CODE_HASH_KEY
 )
 # A variable of one of those names in the caller's shell (another tool's key on this Mac) is dropped before any command
-# is started: it never counts as a value, and never travels on to cf.sh, node or wrangler.
-unset -v "${MADE[@]}"
+# is started: it never counts as a value, and never travels on to cf.sh, node or wrangler. So is one of
+# LINQ_WEBHOOK_SECRET, Linq's own signing secret since T-572, which this script never makes: it never travels on either.
+unset -v "${MADE[@]}" LINQ_WEBHOOK_SECRET
 USAGE="usage: make-staging-secrets.sh [--env staging] [NAME ...]   (names: ${MADE[*]})"
 DEV_VARS="$ROOT/.dev.vars"
 # The 64 signs of base64, one by one: a range such as A-Z takes in other letters in some locales.
@@ -245,7 +251,7 @@ make_value() {
   local prefix
   case "$1" in
     SEALING_WRAP_KEY | PROOF_CODE_HASH_KEY) prefix="" ;;
-    LINQ_WEBHOOK_SECRET) prefix="whsec_" ;;
+    TEST_PHONE_WEBHOOK_SECRET) prefix="whsec_" ;;
     *) die "refused: $1 is on MADE with no form in make_value: nothing was made or put for it" ;;
   esac
   value="$(node -e "$RANDOM_BYTES")" || value=""

@@ -7,7 +7,9 @@
 // no run gets this shell's values of the names (script-harness.mjs). Every value is made up, and built at run time, so
 // no key-shaped text sits in this file: none is a key of anything, and no address in it is anyone's (rule 9).
 // Since T-1261 (DL-549) the script never puts staging's own names, whatever .dev.vars holds for them, and it switches
-// keyword off as well as tracing and allexport; the cases below hold it to both.
+// keyword off as well as tracing and allexport; the cases below hold it to both. Since T-572 (DL-940) it puts Linq's key
+// and the roster for staging's real Linq line, staging's own names hold the test-phone page's signing secret, and
+// LINQ_WEBHOOK_SECRET is Linq's own: never put from here (linq-staging-check.sh --create puts it).
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { copyFileSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
@@ -25,26 +27,36 @@ import {
   write,
 } from "./script-harness.mjs";
 
-// The names the script puts, in its order. The last three joined with ADR-016's sign-in by code (T-1276).
+// The names the script puts, in its order. PROOF_CODE_HASH_KEY, RESEND_API_KEY and STAGING_TEST_INBOXES joined with
+// ADR-016's sign-in by code (T-1276); TEST_PHONE_WEBHOOK_SECRET, LINQ_API_TOKEN and STAGING_LINQ_ALLOWLIST with staging's
+// real Linq line (T-572, DL-940).
 const NAMES = [
   "ANTHROPIC_API_KEY",
   "SEALING_WRAP_KEY",
   "LINQ_WEBHOOK_SECRET",
+  "TEST_PHONE_WEBHOOK_SECRET",
   "PROOF_CODE_HASH_KEY",
   "RESEND_API_KEY",
   "STAGING_TEST_INBOXES",
+  "LINQ_API_TOKEN",
+  "STAGING_LINQ_ALLOWLIST",
 ];
-// Staging's own names: make-staging-secrets.sh makes them in place, and staging holds the first two since T-1236's
+// Staging's own names: make-staging-secrets.sh makes them in place, and staging holds SEALING_WRAP_KEY since T-1236's
 // live run (DL-518), never to be replaced (DL-495). So the build Mac's .dev.vars has no line for them, and the script
 // never puts one, even when .dev.vars has a value for it (DL-549; T-1261).
-const OWN = ["SEALING_WRAP_KEY", "LINQ_WEBHOOK_SECRET", "PROOF_CODE_HASH_KEY"];
-// The names the script puts from .dev.vars, in its order: every name but staging's own.
-const PUT = NAMES.filter((name) => !OWN.includes(name));
-// The values of the checkout's .dev.vars: a model key, 32 bytes as base64 and a whsec_ secret, in the forms the code
+const OWN = ["SEALING_WRAP_KEY", "TEST_PHONE_WEBHOOK_SECRET", "PROOF_CODE_HASH_KEY"];
+// Linq's own (T-572): the signing secret linq-staging-check.sh --create puts straight from Linq's answer. Never put from
+// here, and its value in .dev.vars never taken.
+const LINQS = ["LINQ_WEBHOOK_SECRET"];
+// Every name the script never puts.
+const NEVER = [...OWN, ...LINQS];
+// The names the script puts from .dev.vars, in its order: every name but staging's own and Linq's.
+const PUT = NAMES.filter((name) => !NEVER.includes(name));
+// The values of the checkout's .dev.vars: a model key, 32 bytes as base64 and two whsec_ secrets, in the forms the code
 // reads them in (db/repo/sealing.ts WrappingKeys.resolve; runtime/src/wiring/real.ts LinqVerifyInputs). The 32 bytes
 // are picked so their base64 holds every sign base64 has: forty "+", then "//8=". Then the proof-code hash key (32
-// other bytes as base64), a send-only key, and the inbox list: two addresses joined by a comma, on domains kept for
-// examples.
+// other bytes as base64), a send-only key, the inbox list (two addresses joined by a comma, on domains kept for
+// examples), Linq's key, and the roster: two fiction-range numbers joined by a comma.
 const VALUES = {
   ANTHROPIC_API_KEY: `t568-made-up-model-key-${"0f3c9a71".repeat(3)}`,
   SEALING_WRAP_KEY: Buffer.concat([
@@ -52,18 +64,24 @@ const VALUES = {
     Buffer.from([0xff, 0xff]),
   ]).toString("base64"),
   LINQ_WEBHOOK_SECRET: `whsec_${Buffer.from("t568 made-up webhook signing bytes 0001").toString("base64")}`,
+  TEST_PHONE_WEBHOOK_SECRET: `whsec_${Buffer.from("t572 made-up test-phone signing bytes 01").toString("base64")}`,
   PROOF_CODE_HASH_KEY: Buffer.from("t1276 made-up proof code key 001").toString("base64"),
   RESEND_API_KEY: `t1276-made-up-send-only-key-${"3e9b07d2".repeat(2)}`,
   STAGING_TEST_INBOXES: "t1276-tester-one@example.com,t1276-tester-two+staging@example.net",
+  LINQ_API_TOKEN: `t572-made-up-linq-key-${"c4e1a9b2".repeat(3)}`,
+  STAGING_LINQ_ALLOWLIST: "+15555550150,+15555550151",
 };
 // Other made-up values under the same names, as the caller's shell might hold them: never the ones put.
 const SHELL_VALUES = {
   ANTHROPIC_API_KEY: `t568-made-up-key-of-another-tool-${"7d1e44b2".repeat(3)}`,
   SEALING_WRAP_KEY: Buffer.alloc(32, 0x33).toString("base64"),
   LINQ_WEBHOOK_SECRET: `whsec_${Buffer.from("t568 another made-up signing secret 0002").toString("base64")}`,
+  TEST_PHONE_WEBHOOK_SECRET: `whsec_${Buffer.from("t572 another made-up page secret 0002").toString("base64")}`,
   PROOF_CODE_HASH_KEY: Buffer.alloc(32, 0x44).toString("base64"),
   RESEND_API_KEY: `t1276-made-up-key-of-another-tool-${"a51c6e08".repeat(2)}`,
   STAGING_TEST_INBOXES: "t1276-caller-inbox@example.org",
+  LINQ_API_TOKEN: `t572-made-up-linq-key-of-another-tool-${"9f0b3d6e".repeat(2)}`,
+  STAGING_LINQ_ALLOWLIST: "+15555550160",
 };
 // Lines of other names in the same .dev.vars: the script reads none of them.
 const OTHER_VALUES = ["t568-made-up-email-key-55aa90c3", "t568-made-up-other-value-91c2e07d"];
@@ -72,23 +90,31 @@ const EVERY_VALUE = [...Object.values(VALUES), ...Object.values(SHELL_VALUES), .
 const CALLER_TEXTS = ["t568 made-up caller text", "t1261 made-up caller text"];
 
 /**
- * A .dev.vars in the build Mac's forms: plain, double-quoted, and exported with single quotes, among other lines.
- * Each form holds a name the script puts, so the byte-for-byte case proves each on a value put: ANTHROPIC_API_KEY
- * plain, STAGING_TEST_INBOXES double-quoted, RESEND_API_KEY exported. LINQ_WEBHOOK_SECRET's exported line is one of
- * staging's own, never read (DL-549).
+ * A .dev.vars in the build Mac's forms: plain, double-quoted, and exported with single or double quotes, among other
+ * lines. Each form holds a name the script puts, so the byte-for-byte case proves each on a value put: ANTHROPIC_API_KEY
+ * and STAGING_LINQ_ALLOWLIST plain, STAGING_TEST_INBOXES double-quoted, RESEND_API_KEY and LINQ_API_TOKEN exported.
+ * LINQ_WEBHOOK_SECRET's exported line is Linq's own and TEST_PHONE_WEBHOOK_SECRET's plain one staging's own, neither
+ * ever read (DL-549; T-572).
  */
 const devVars = (values = VALUES) =>
   [
-    "# made-up values for T-568's and T-1276's tests",
+    "# made-up values for T-568's, T-1276's and T-572's tests",
     `RESEND_WEBHOOK_SECRET=${OTHER_VALUES[0]}`,
     ...("ANTHROPIC_API_KEY" in values ? [`ANTHROPIC_API_KEY=${values.ANTHROPIC_API_KEY}`] : []),
     ...("SEALING_WRAP_KEY" in values ? [`SEALING_WRAP_KEY="${values.SEALING_WRAP_KEY}"`] : []),
     ...("LINQ_WEBHOOK_SECRET" in values
       ? [`  export LINQ_WEBHOOK_SECRET='${values.LINQ_WEBHOOK_SECRET}'`]
       : []),
+    ...("TEST_PHONE_WEBHOOK_SECRET" in values
+      ? [`TEST_PHONE_WEBHOOK_SECRET=${values.TEST_PHONE_WEBHOOK_SECRET}`]
+      : []),
     ...("PROOF_CODE_HASH_KEY" in values ? [`PROOF_CODE_HASH_KEY=${values.PROOF_CODE_HASH_KEY}`] : []),
     ...("RESEND_API_KEY" in values ? [`  export RESEND_API_KEY='${values.RESEND_API_KEY}'`] : []),
     ...("STAGING_TEST_INBOXES" in values ? [`STAGING_TEST_INBOXES="${values.STAGING_TEST_INBOXES}"`] : []),
+    ...("LINQ_API_TOKEN" in values ? [`export LINQ_API_TOKEN="${values.LINQ_API_TOKEN}"`] : []),
+    ...("STAGING_LINQ_ALLOWLIST" in values
+      ? [`STAGING_LINQ_ALLOWLIST=${values.STAGING_LINQ_ALLOWLIST}`]
+      : []),
     `OTHER_NAME="${OTHER_VALUES[1]}"`,
     "",
   ].join("\n");
@@ -223,8 +249,16 @@ function filesHolding(dir, values, except) {
 
 /** Standard output's line for one of staging's own: never put (DL-549). */
 const MADE_HERE = (name) => `${name} made in place, never put\n`;
-/** Standard output of a run that put every name it puts: each with set, and staging's own made in place, never put. */
-const ALL_SET = NAMES.map((name) => (OWN.includes(name) ? MADE_HERE(name) : `${name} set\n`)).join("");
+/** Standard output's line for Linq's own: never put (T-572). */
+const LINQS_LINE = (name) => `${name} Linq's own, never put: npm run linq:staging:create puts it\n`;
+/** Standard output's line for a name, with `put` the line of a name it puts (set or missing). */
+const lineOf = (name, put = `${name} set\n`) =>
+  OWN.includes(name) ? MADE_HERE(name) : LINQS.includes(name) ? LINQS_LINE(name) : put;
+/**
+ * Standard output of a run that put every name it puts: each with set, staging's own made in place, never put, and
+ * Linq's own Linq's own, never put.
+ */
+const ALL_SET = NAMES.map((name) => lineOf(name)).join("");
 /** Standard error's one line when `missing` of the names had no value. */
 const missingNote = (missing) =>
   `put-staging-secrets.sh: no value in .dev.vars for ${String(missing)} of the ${String(NAMES.length)} names, each printed as missing: nothing was put for a missing name. Add each as NAME=value, then run it again.\n`;
@@ -313,12 +347,12 @@ describe("put-staging-secrets.sh (npm run secrets:staging) puts each named value
       assert.equal(result.status, 3, `${what}: ${result.output}`);
       assert.equal(
         result.stdout,
-        "ANTHROPIC_API_KEY set\nSEALING_WRAP_KEY made in place, never put\nLINQ_WEBHOOK_SECRET made in place, never put\nPROOF_CODE_HASH_KEY made in place, never put\nRESEND_API_KEY missing\nSTAGING_TEST_INBOXES set\n",
+        "ANTHROPIC_API_KEY set\nSEALING_WRAP_KEY made in place, never put\nLINQ_WEBHOOK_SECRET Linq's own, never put: npm run linq:staging:create puts it\nTEST_PHONE_WEBHOOK_SECRET made in place, never put\nPROOF_CODE_HASH_KEY made in place, never put\nRESEND_API_KEY missing\nSTAGING_TEST_INBOXES set\nLINQ_API_TOKEN set\nSTAGING_LINQ_ALLOWLIST set\n",
         what,
       );
       assert.equal(
         result.stderr,
-        "put-staging-secrets.sh: no value in .dev.vars for 1 of the 6 names, each printed as missing: nothing was put for a missing name. Add each as NAME=value, then run it again.\n",
+        "put-staging-secrets.sh: no value in .dev.vars for 1 of the 9 names, each printed as missing: nothing was put for a missing name. Add each as NAME=value, then run it again.\n",
         what,
       );
       const calls = rig.calls();
@@ -337,29 +371,27 @@ describe("put-staging-secrets.sh (npm run secrets:staging) puts each named value
     }
   });
 
-  it("with no .dev.vars every name it puts is missing, staging's own are made in place, never put, and wrangler never starts, whatever the caller's shell holds", (t) => {
+  it("with no .dev.vars every name it puts is missing, staging's own are made in place, never put, Linq's own is never put, and wrangler never starts, whatever the caller's shell holds", (t) => {
     const rig = checkout(t);
     const result = rig.run([], SHELL_VALUES);
     assert.equal(result.status, 3, result.output);
-    assert.equal(
-      result.stdout,
-      NAMES.map((name) => (OWN.includes(name) ? MADE_HERE(name) : `${name} missing\n`)).join(""),
-    );
+    assert.equal(result.stdout, NAMES.map((name) => lineOf(name, `${name} missing\n`)).join(""));
     // The closing note counts only the names it puts: it never asks for a line for one of staging's own (DL-549).
     assert.equal(result.stderr, missingNote(PUT.length));
     assert.deepEqual(rig.calls(), []);
     assertNoValueShown(result, "no .dev.vars");
   });
 
-  it("the build Mac's .dev.vars for ADR-016's live run: the model key, Resend's key and the inbox list are set, and staging's own three are made in place, never put, so the keys staging holds are left as they are (exit 0)", (t) => {
-    const given = NAMES.filter((name) => !OWN.includes(name));
+  it("the build Mac's .dev.vars for the live runs: the model key, Resend's key, the inbox list, Linq's key and the roster are set, staging's own three are made in place, never put, and Linq's own is never put, so the secrets staging holds are left as they are (exit 0)", (t) => {
+    const given = NAMES.filter((name) => !NEVER.includes(name));
     const rig = checkout(t, { devVars: devVars(valuesOf(given)) });
-    // Another tool's values of every name in the caller's shell change nothing: staging's own are still never put.
+    // Another tool's values of every name in the caller's shell change nothing: staging's own and Linq's are still never
+    // put.
     const result = rig.run([], SHELL_VALUES);
     assert.equal(result.status, 0, result.output);
     assert.equal(
       result.stdout,
-      "ANTHROPIC_API_KEY set\nSEALING_WRAP_KEY made in place, never put\nLINQ_WEBHOOK_SECRET made in place, never put\nPROOF_CODE_HASH_KEY made in place, never put\nRESEND_API_KEY set\nSTAGING_TEST_INBOXES set\n",
+      "ANTHROPIC_API_KEY set\nSEALING_WRAP_KEY made in place, never put\nLINQ_WEBHOOK_SECRET Linq's own, never put: npm run linq:staging:create puts it\nTEST_PHONE_WEBHOOK_SECRET made in place, never put\nPROOF_CODE_HASH_KEY made in place, never put\nRESEND_API_KEY set\nSTAGING_TEST_INBOXES set\nLINQ_API_TOKEN set\nSTAGING_LINQ_ALLOWLIST set\n",
     );
     assert.equal(result.stderr, "");
     const calls = rig.calls();
@@ -372,12 +404,13 @@ describe("put-staging-secrets.sh (npm run secrets:staging) puts each named value
       given.map((name) => VALUES[name]),
     );
     for (const [index, name] of given.entries()) assertOnlyOnStdin(calls[index], name);
-    // No put names one of staging's own, so SEALING_WRAP_KEY and LINQ_WEBHOOK_SECRET, which staging holds, stay as
-    // they are, and PROOF_CODE_HASH_KEY is left to secrets:staging:make.
+    // No put names one of staging's own or Linq's, so SEALING_WRAP_KEY and PROOF_CODE_HASH_KEY, which staging holds, stay
+    // as they are, TEST_PHONE_WEBHOOK_SECRET is left to secrets:staging:make, and LINQ_WEBHOOK_SECRET to
+    // linq:staging:create.
     assert.deepEqual(
-      calls.filter((call) => OWN.some((name) => call.args.includes(name))),
+      calls.filter((call) => NEVER.some((name) => call.args.includes(name))),
       [],
-      "a put of staging's own name",
+      "a put of staging's own name or Linq's",
     );
     // The output holds names and set or missing, never a value or an address.
     assertNoValueShown(result, "the live run's .dev.vars");
@@ -385,23 +418,25 @@ describe("put-staging-secrets.sh (npm run secrets:staging) puts each named value
   });
 });
 
-describe("put-staging-secrets.sh never puts a name make-staging-secrets.sh makes in place (DL-549; T-1261)", () => {
-  // Lines for staging's own that are not a plain NAME=value: a comment after the value, a space in it, a quote left
-  // open. For a name it puts the script refuses such a line (the refusal cases below); for these it never takes the
-  // value, so they refuse nothing.
+describe("put-staging-secrets.sh never puts a name make-staging-secrets.sh makes in place (DL-549; T-1261), nor Linq's own (T-572)", () => {
+  // Lines for staging's own and Linq's that are not a plain NAME=value: a comment after the value, a space in it, a
+  // quote left open. For a name it puts the script refuses such a line (the refusal cases below); for these it never
+  // takes the value, so they refuse nothing.
   const FAULTY_OWN_LINES = [
     `SEALING_WRAP_KEY="${VALUES.SEALING_WRAP_KEY}" # staging's key`,
     `LINQ_WEBHOOK_SECRET=${VALUES.LINQ_WEBHOOK_SECRET.slice(0, 12)} ${VALUES.LINQ_WEBHOOK_SECRET.slice(12)}`,
+    `TEST_PHONE_WEBHOOK_SECRET="${VALUES.TEST_PHONE_WEBHOOK_SECRET} # the page's`,
     `PROOF_CODE_HASH_KEY='${VALUES.PROOF_CODE_HASH_KEY}`,
   ];
-  // Every text of staging's own a run could hand on: the .dev.vars values, the caller's, and the parts of the split one.
+  // Every text of staging's own and Linq's a run could hand on: the .dev.vars values, the caller's, and the parts of the
+  // split one.
   const OWN_TEXTS = [
-    ...OWN.map((name) => VALUES[name]),
-    ...OWN.map((name) => SHELL_VALUES[name]),
+    ...NEVER.map((name) => VALUES[name]),
+    ...NEVER.map((name) => SHELL_VALUES[name]),
     VALUES.LINQ_WEBHOOK_SECRET.slice(12),
   ];
 
-  it("a value in .dev.vars for each of staging's own is never put, taken or shown, whatever form its line takes and whatever the caller's shell holds (exit 0)", (t) => {
+  it("a value in .dev.vars for each of staging's own and Linq's is never put, taken or shown, whatever form its line takes and whatever the caller's shell holds (exit 0)", (t) => {
     for (const [what, text] of [
       ["the build Mac's forms: quoted, exported, plain", devVars()],
       ["lines that are not a plain NAME=value", `${FAULTY_OWN_LINES.join("\n")}\n${devVars(valuesOf(PUT))}`],
@@ -418,9 +453,9 @@ describe("put-staging-secrets.sh never puts a name make-staging-secrets.sh makes
         what,
       );
       assert.deepEqual(
-        calls.filter((call) => OWN.some((name) => call.args.includes(name))),
+        calls.filter((call) => NEVER.some((name) => call.args.includes(name))),
         [],
-        `${what}: a put of staging's own name`,
+        `${what}: a put of staging's own name or Linq's`,
       );
       assert.deepEqual(
         calls.map((call) => call.stdin),
@@ -432,7 +467,7 @@ describe("put-staging-secrets.sh never puts a name make-staging-secrets.sh makes
         assert.equal(
           OWN_TEXTS.some((own) => call.stdin.includes(own)),
           false,
-          `${what}: a value of staging's own on standard input`,
+          `${what}: a value of staging's own or Linq's on standard input`,
         );
         assert.deepEqual(
           call.envHoldingValue,
@@ -444,25 +479,22 @@ describe("put-staging-secrets.sh never puts a name make-staging-secrets.sh makes
       assert.equal(
         OWN_TEXTS.some((own) => result.output.includes(own)),
         false,
-        `${what}: a part of a value of staging's own is shown`,
+        `${what}: a part of a value of staging's own or Linq's is shown`,
       );
-      // No file holds a value of staging's own but the .dev.vars it is in: not even the stand-in's record.
+      // No file holds a value of staging's own or Linq's but the .dev.vars it is in: not even the stand-in's record.
       assert.deepEqual(filesHolding(rig.dir, OWN_TEXTS, [rig.devVarsFile]), [], what);
     }
   });
 
-  it("a .dev.vars with values for staging's own alone: every name it puts is missing, the note asks for those alone, and wrangler never starts (exit 3)", (t) => {
-    const rig = checkout(t, { devVars: devVars(valuesOf(OWN)) });
+  it("a .dev.vars with values for staging's own and Linq's alone: every name it puts is missing, the note asks for those alone, and wrangler never starts (exit 3)", (t) => {
+    const rig = checkout(t, { devVars: devVars(valuesOf(NEVER)) });
     const result = rig.run();
     assert.equal(result.status, 3, result.output);
-    assert.equal(
-      result.stdout,
-      NAMES.map((name) => (OWN.includes(name) ? MADE_HERE(name) : `${name} missing\n`)).join(""),
-    );
-    // "Add each as NAME=value" is said of the names printed as missing, never of staging's own.
+    assert.equal(result.stdout, NAMES.map((name) => lineOf(name, `${name} missing\n`)).join(""));
+    // "Add each as NAME=value" is said of the names printed as missing, never of staging's own or Linq's.
     assert.equal(result.stderr, missingNote(PUT.length));
     assert.deepEqual(rig.calls(), []);
-    assertNoValueShown(result, "staging's own alone");
+    assertNoValueShown(result, "staging's own and Linq's alone");
   });
 
   it("the names it never puts are make-staging-secrets.sh's MADE list, each on its own list (SECRETS)", (t) => {
@@ -491,6 +523,17 @@ describe("put-staging-secrets.sh never puts a name make-staging-secrets.sh makes
       made.filter((name) => !NAMES.includes(name)),
       [],
       "a name make-staging-secrets.sh makes that is not on put-staging-secrets.sh's list",
+    );
+    // Linq's own (T-572): printed as never put, and on neither script's made list, so no make run can replace it.
+    const linqs = Array.from(
+      result.stdout.matchAll(/^(\S+) Linq's own, never put: npm run linq:staging:create puts it$/gm),
+      ([, name]) => name,
+    );
+    assert.deepEqual(linqs, LINQS);
+    assert.deepEqual(
+      made.filter((name) => LINQS.includes(name)),
+      [],
+      "a name Linq gives that make-staging-secrets.sh would make",
     );
   });
 });
@@ -607,9 +650,12 @@ describe("put-staging-secrets.sh refuses", () => {
     const [first, second] = VALUES.STAGING_TEST_INBOXES.split(",");
     const key = VALUES.SEALING_WRAP_KEY;
     const secret = VALUES.LINQ_WEBHOOK_SECRET;
+    const linq = VALUES.LINQ_API_TOKEN;
+    const [phone, otherPhone] = VALUES.STAGING_LINQ_ALLOWLIST.split(",");
     const own = [
       `SEALING_WRAP_KEY="${key}" # staging's key`,
       `LINQ_WEBHOOK_SECRET=${secret.slice(0, 12)} ${secret.slice(12)}`,
+      `TEST_PHONE_WEBHOOK_SECRET=${VALUES.TEST_PHONE_WEBHOOK_SECRET} # the page's`,
       `PROOF_CODE_HASH_KEY='${VALUES.PROOF_CODE_HASH_KEY}`,
     ];
     // [the lines of some of the names, the names refused]
@@ -638,12 +684,22 @@ describe("put-staging-secrets.sh refuses", () => {
         [`RESEND_API_KEY=${resend} # send-only`, `STAGING_TEST_INBOXES='${first},${second}`],
         "RESEND_API_KEY, STAGING_TEST_INBOXES",
       ],
+      // Linq's key with a comment after it (T-572).
+      [[`ANTHROPIC_API_KEY=${model}`, `LINQ_API_TOKEN="${linq}" # Linq's key`], "LINQ_API_TOKEN"],
+      // The roster with a space after its comma: its numbers are joined by a comma alone, as T-416's guard reads it.
+      [
+        [`ANTHROPIC_API_KEY=${model}`, `STAGING_LINQ_ALLOWLIST=${phone}, ${otherPhone}`],
+        "STAGING_LINQ_ALLOWLIST",
+      ],
     ];
     for (const [lines, names] of cases) {
       const shown = lines
         .join(" | ")
         .replace(model, "<model>")
         .replace(resend, "<resend>")
+        .replace(linq, "<linq>")
+        .replace(phone, "<number>")
+        .replace(otherPhone, "<number>")
         .replace(first, "<address>")
         .replace(second, "<address>");
       const what = `${names}: ${shown}`;
@@ -662,6 +718,7 @@ describe("put-staging-secrets.sh refuses", () => {
       assert.equal(result.output.includes(resend.slice(12)), false, `${what}: a part of the value`);
       assert.equal(result.output.includes(secret.slice(12)), false, `${what}: a part of staging's own value`);
       assert.equal(result.output.includes("@"), false, `${what}: a part of an address`);
+      assert.equal(/555/.test(result.output), false, `${what}: a part of a number`);
     }
   });
 });
@@ -669,12 +726,12 @@ describe("put-staging-secrets.sh refuses", () => {
 describe("put-staging-secrets.sh when a put fails", () => {
   it("stops there: the names before it stay set, the ones after it are not put, and the value is taken out of wrangler's words", (t) => {
     const rig = checkout(t, { devVars: devVars() });
-    // A name it puts, after the model key and staging's own (SEALING_WRAP_KEY here before T-1261, never put now).
+    // A name it puts, after the model key, staging's own and Linq's (SEALING_WRAP_KEY here before T-1261, never put now).
     const result = rig.run([], { FAKE_FAIL_AT: "RESEND_API_KEY" });
     assert.equal(result.status, 1, result.output);
     assert.equal(
       result.stdout,
-      "ANTHROPIC_API_KEY set\nSEALING_WRAP_KEY made in place, never put\nLINQ_WEBHOOK_SECRET made in place, never put\nPROOF_CODE_HASH_KEY made in place, never put\n",
+      "ANTHROPIC_API_KEY set\nSEALING_WRAP_KEY made in place, never put\nLINQ_WEBHOOK_SECRET Linq's own, never put: npm run linq:staging:create puts it\nTEST_PHONE_WEBHOOK_SECRET made in place, never put\nPROOF_CODE_HASH_KEY made in place, never put\n",
     );
     // Both streams of wrangler, each with the value it repeated taken out, then the script's own line.
     assert.match(result.stderr, /^fake wrangler: was given \[value not shown\]$/m);
@@ -969,27 +1026,36 @@ describe("put-staging-secrets.sh's names are the ones the runtime reads", () => 
   };
 
   /**
-   * The script's names, from a run: with no .dev.vars it names each, in its order, as missing, or as made in place,
-   * never put for staging's own (DL-549).
+   * The script's names, from a run: with no .dev.vars it names each, in its order, as missing, as made in place, never
+   * put for staging's own (DL-549), or as Linq's own, never put (T-572).
    */
   function namesOfTheScript(t) {
     const result = checkout(t).run();
     assert.equal(result.status, 3, result.output);
     return Array.from(
-      result.stdout.matchAll(/^(\S+) (?:missing|made in place, never put)$/gm),
+      result.stdout.matchAll(
+        /^(\S+) (?:missing|made in place, never put|Linq's own, never put: npm run linq:staging:create puts it)$/gm,
+      ),
       ([, name]) => name,
     );
   }
 
-  it("the model key the AI gateway reads, the wrapping key the seal call reads, the Linq webhook secret, and ADR-016's three for sign-in by code", (t) => {
+  it("the model key the AI gateway reads, the wrapping key the seal call reads, the Linq webhook secret, ADR-016's three for sign-in by code, and the real Linq line's three (T-572)", (t) => {
     const read = [
       // T-361: the AI gateway's key, which the safety read reads by the same constant.
       nameIn("ai/src/gateway/gateway.ts", "KEY_VARIABLE"),
       // T-182 and T-553: the environment key that wraps each person's sealing key.
       nameIn("db/repo/sealing.ts", "DEFAULT_WRAPPING_KEY_NAME"),
       nameIn("runtime/src/wiring/real.ts", "SEALING_WRAP_KEY"),
-      // T-552 and T-412: the secret the Linq verify reads, which the test-phone page's Linq double signs with.
+      // T-552 and T-412: the secret the Linq verify reads; Linq's own since T-572 (K-11 default 1).
       nameIn("runtime/src/wiring/real.ts", "LINQ_WEBHOOK_SECRET"),
+      // T-414: Linq's key, which the real sender reads by name at each send.
+      nameIn("adapters/src/linq/send/send.ts", "LINQ_API_TOKEN"),
+      // T-416: the roster, which the guard in front of the real sender reads by name at each call.
+      nameIn("adapters/src/linq/roster/roster.ts", "STAGING_LINQ_ALLOWLIST"),
+      // DL-940: the test-phone page's own signing secret once the real line is on. T-1449 builds the code that reads it,
+      // beside T-572, so its name is the one DL-940 fixed until that code is on main.
+      "TEST_PHONE_WEBHOOK_SECRET",
     ];
     // ADR-016 (T-1276): the code that reads these is its later cards' (T-1289, T-419, T-1288), so each name is read from
     // the source that names it. First the key a sign-in code's and a typed contact's hash are made under (section 4):
@@ -1015,6 +1081,17 @@ describe("put-staging-secrets.sh's names are the ones the runtime reads", () => 
     const names = namesOfTheScript(t);
     assert.deepEqual(names, NAMES);
     assert.deepEqual([...names].sort(), [...new Set([...read, ...signIn])].sort());
+  });
+
+  it("Rosie's own number is never a secret: deploy-staging.sh gives it as a var at each deploy (T-1304), and a secret of the same name would clash with that var", (t) => {
+    const names = namesOfTheScript(t);
+    const roster = nameIn("adapters/src/linq/roster/roster.ts", "ROSIE_NUMBER");
+    assert.equal(names.includes(roster), false, "put-staging-secrets.sh lists ROSIE_NUMBER");
+    assert.match(
+      source("infra/scripts/deploy-staging.sh"),
+      new RegExp(`rosie_number_var=\\(--var "${roster}:\\$rosie_number"\\)`),
+      "deploy-staging.sh no longer gives ROSIE_NUMBER as a var",
+    );
   });
 
   it("every secret the Worker's root declares (WorkerSecrets) is in the script's list", (t) => {
