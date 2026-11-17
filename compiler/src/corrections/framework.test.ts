@@ -189,6 +189,8 @@ describe("the list of corrections", () => {
       "C3",
       "C4",
       "C5",
+      "C7",
+      "C8",
       "C9",
       "C10",
     ]);
@@ -220,6 +222,6 @@ describe("the list of corrections", () => {
     expect(order).toContain("C1");
     expect(order).toContain("C2");
     expect(order.lastIndexOf("C1")).toBeLessThan(order.indexOf("C2"));
-    expect(done.corrections).toStrictEqual(["C1", "C2", "C3", "C4", "C5", "C9", "C10"]);
+    expect(done.corrections).toStrictEqual(["C1", "C2", "C3", "C4", "C5", "C7", "C8", "C9", "C10"]);
   });
 });
