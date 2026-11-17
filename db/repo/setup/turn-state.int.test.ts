@@ -26,7 +26,6 @@ import {
   type SetupColumnType,
   SETUP_FACT_HOMES,
   type SetupFactHome,
-  UNSCOPED_ROWS,
 } from "./fact-homes";
 import { rowNameSql, TWO_COLUMN_KEYS } from "./row-names";
 import { readTurnState, readTurnStateIn, type SetupTurnStateOutcome } from "./turn-state";
