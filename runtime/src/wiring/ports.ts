@@ -73,10 +73,12 @@
 //
 // Not ports: the HandleActor namespace (the gateway's door to each handle's actor and the clock arming's way to it, a
 // binding the root is handed), the clock, and the wiring between the parts the root builds (the lease runs the turn loop;
-// the turn wakes the dispatcher; the receipt door marks the part delivered and arms its clock). Not bound here: the
-// guard's fixed replies (`setReplyDeps`), the clock firing (`setClockDeps`), the actor's copies (`setCopyDeps`) and the
-// Stripe and calendar doors, none of which a D-017 hop runs. The PostgreSQL-down path's deps (`setDbOutageDeps`) are
-// bound from the ports by the root's `install()` (T-1326).
+// the turn wakes the dispatcher; the receipt door marks the part delivered and arms its clock). Nor are the guard's fixed
+// replies (`setReplyDeps`), which the root's `install()` binds from the turn's own deps (T-1412): their core the turn's
+// keyword commit through the gate port, their rows the turn's plan calls through the data-access port. Not bound here:
+// the clock firing (`setClockDeps`), the actor's copies (`setCopyDeps`) and the Stripe and calendar doors, none of which a
+// D-017 hop runs. The PostgreSQL-down path's deps (`setDbOutageDeps`) are bound from the ports by the root's `install()`
+// (T-1326).
 
 import type { CommitTurnOutcome, CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 

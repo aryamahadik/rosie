@@ -1,0 +1,26 @@
+{
+  "result": "serviceWays",
+  "businessId": "biz-lees-barbershop",
+  "serviceId": "svc-lees-skin-fade",
+  "readAt": "2026-10-26T14:00:00Z",
+  "ways": [
+    {
+      "id": "way-lees-skin-fade-shop",
+      "serviceId": "svc-lees-skin-fade",
+      "businessId": "biz-lees-barbershop",
+      "flow": "A",
+      "place": "business",
+      "locationId": "loc-lees-barbershop-shop",
+      "path": "list|card|counter",
+      "depositCents": null,
+      "depositPercent": null,
+      "feeCents": 2000,
+      "currency": "USD",
+      "cutoffBeforeMinutes": "2 hours",
+      "cutoffDayBeforeAt": null,
+      "tipLine": null,
+      "active": true,
+      "version": 1
+    }
+  ]
+}

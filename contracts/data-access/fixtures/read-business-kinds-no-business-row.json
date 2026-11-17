@@ -1,0 +1,18 @@
+{
+  "call": "readBusinessKinds",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["kinds-of-work/seed-kinds-sample.json"],
+    "after": [],
+    "now": "2026-10-19T18:06:00Z",
+    "note": "Lee Home Services before its business row: K-04's seeds hold the barbershop, the yoga studio and the movers, and K-23's seed-company-two-kinds, which writes Lee Home Services' business head, is not loaded. The read finds no such business in its scope and answers notFound (table businesses), never an empty list, so a catalog read never answers 'none' under a business that is not there (README item 72; v1.4 default 56's rule)."
+  },
+  "request": {
+    "businessId": "biz-lee-home-services"
+  },
+  "outcome": {
+    "error": "notFound",
+    "table": "businesses",
+    "rowId": "biz-lee-home-services"
+  }
+}

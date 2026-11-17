@@ -1,0 +1,40 @@
+{
+  "call": "readServiceWays",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["services-prices/seed-service-money-paths.json"],
+    "after": [],
+    "now": "2026-10-26T14:00:00Z",
+    "note": "The skin fade's one way, at the shop in flow A, with its own 2-hour free-cancel time (K-25's seed-service-money-paths: '2 hours'), answered in whole minutes, 120 (README item 74, default 156). A terms snapshot copies this way's own rule, not the business's 24-hour default for flow A (K-30's seed-terms-snapshot: cutoff_before 2 hours)."
+  },
+  "request": {
+    "businessId": "biz-lees-barbershop",
+    "serviceId": "svc-lees-skin-fade"
+  },
+  "outcome": {
+    "result": "serviceWays",
+    "businessId": "biz-lees-barbershop",
+    "serviceId": "svc-lees-skin-fade",
+    "readAt": "2026-10-26T14:00:00Z",
+    "ways": [
+      {
+        "id": "way-lees-skin-fade-shop",
+        "serviceId": "svc-lees-skin-fade",
+        "businessId": "biz-lees-barbershop",
+        "flow": "A",
+        "place": "business",
+        "locationId": "loc-lees-barbershop-shop",
+        "path": "list|card|counter",
+        "depositCents": null,
+        "depositPercent": null,
+        "feeCents": 2000,
+        "currency": "USD",
+        "cutoffBeforeMinutes": 120,
+        "cutoffDayBeforeAt": null,
+        "tipLine": null,
+        "active": true,
+        "version": 1
+      }
+    ]
+  }
+}

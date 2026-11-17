@@ -2,9 +2,146 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 711, [`7097400`](https://github.com/aryamahadik/rosie/commit/7097400), 2026-11-16 13:09:27 UTC.
+- **Through:** commit 717, [`46fbad5`](https://github.com/aryamahadik/rosie/commit/46fbad5), 2026-11-16 22:54:21 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 717. docs: COMMIT\_HISTORY.md through commit 715 (e1c4800, \#725) (\#727)
+
+- **Commit:** [`46fbad5`](https://github.com/aryamahadik/rosie/commit/46fbad5), by Arya Mahadik, 2026-11-16 22:54:21 UTC
+- **Pull request:** [#727](https://github.com/aryamahadik/rosie/pull/727) from `task/commit-history-151`, merged 2026-11-16 22:54:22 UTC. It squashed 1 branch commit:
+  - `7af998e` docs: COMMIT\_HISTORY.md through commit 715 (e1c4800, \#725)
+- **Files changed:** 1 (+37 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +37 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 244 (DL-910); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 716. T-1412: the root binds the guard's fixed replies, so STOP, START and HELP are recorded and answered on staging (\#728)
+
+- **Commit:** [`519f307`](https://github.com/aryamahadik/rosie/commit/519f307), by Arya Mahadik, 2026-11-16 22:54:18 UTC
+- **Pull request:** [#728](https://github.com/aryamahadik/rosie/pull/728) from `task/T-1412`, merged 2026-11-16 22:54:18 UTC. It squashed 2 branch commits:
+  - `7125820` T-1412: work in progress at the user's pause, unchecked (DL-904)
+  - `12cc5c4` T-1412: the root's Workers test: STOP, START and HELP through install…
+- **Files changed:** 6 (+1305 −17), by folder:
+  - `runtime/src/wiring/` keyword-replies.worker.test.ts +897 −0, ports.ts +6 −4, root.ts +73 −4, test-support.ts +314 −8
+  - `runtime/src/wiring/staging/` index.ts +1 −0, options.ts +14 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1412: work in progress at the user's pause, unchecked (DL-904)
+
+The build run wf_fcabf6e8-590 was stopped at about 14:15Z Nov 16 at the user's request, about 18 minutes in, before its first self-check. Its edits to root.ts, ports.ts, staging/index.ts, staging/options.ts and test-support.ts are saved exactly as they stood. The resumed builder re-reads them against the card and runs every check; nothing here is verified.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1412: the root's Workers test: STOP, START and HELP through install()'s replies and the fake root's keyword door, the binding and its restore, Rosie's number read at each use (every self-check passes)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 715. docs: COMMIT\_HISTORY.md through commit 713 (f03528b, \#723) (\#725)
+
+- **Commit:** [`e1c4800`](https://github.com/aryamahadik/rosie/commit/e1c4800), by Arya Mahadik, 2026-11-16 22:06:31 UTC
+- **Pull request:** [#725](https://github.com/aryamahadik/rosie/pull/725) from `task/commit-history-150`, merged 2026-11-16 22:06:32 UTC. It squashed 1 branch commit:
+  - `b4ef497` docs: COMMIT\_HISTORY.md through commit 713 (f03528b, \#723)
+- **Files changed:** 1 (+54 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +54 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 243 (DL-902); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 714. T-1430: ci.yml's checks job gets the merge check's 45 minutes: main's CI outgrew its 20 (\#726)
+
+- **Commit:** [`2284199`](https://github.com/aryamahadik/rosie/commit/2284199), by Arya Mahadik, 2026-11-16 22:06:27 UTC
+- **Pull request:** [#726](https://github.com/aryamahadik/rosie/pull/726) from `task/T-1430`, merged 2026-11-16 22:06:27 UTC. It squashed 1 branch commit:
+  - `4339ae9` T-1430: ci.yml's checks job gets the merge check's 45 minutes: main's…
+- **Files changed:** 1 (+4 −1), by folder:
+  - `.github/workflows/` ci.yml +4 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Main's checks job ran 19m13s in run 43873100250; after train 243 its timeout cancelled runs 43880559558 and 43880572601 at 20m16s and 20m12s, cutting off the CI script tests step. timeout-minutes 20 becomes 45, merge-check.yml's own for the job that runs the same steps, with a comment saying why. No step, trigger, service, env or concurrency change (DL-905).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 713. docs: COMMIT\_HISTORY.md through commit 711 (7097400, \#719) (\#723)
+
+- **Commit:** [`f03528b`](https://github.com/aryamahadik/rosie/commit/f03528b), by Arya Mahadik, 2026-11-16 13:55:58 UTC
+- **Pull request:** [#723](https://github.com/aryamahadik/rosie/pull/723) from `task/commit-history-149`, merged 2026-11-16 13:55:58 UTC. It squashed 1 branch commit:
+  - `b1fc535` docs: COMMIT\_HISTORY.md through commit 711 (7097400, \#719)
+- **Files changed:** 1 (+114 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +114 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 242 (DL-899); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 712. T-1415: staging's gate sends a no-business keyword turn to the runtime-side door, within the gate's connection slots (\#724)
+
+- **Commit:** [`40f4a7e`](https://github.com/aryamahadik/rosie/commit/40f4a7e), by Arya Mahadik, 2026-11-16 13:55:54 UTC
+- **Pull request:** [#724](https://github.com/aryamahadik/rosie/pull/724) from `task/T-1415`, merged 2026-11-16 13:55:54 UTC. It squashed 3 branch commits:
+  - `493f2d9` T-1415: staging's gate sends a no-business keyword turn to T-1413's k…
+  - `951797d` T-1415: real.ts header: in production the gate stays closed (not the …
+  - `1e6fcee` T-1415: T-1398's exact key lists of the gate's input each add keyword…
+- **Files changed:** 5 (+1088 −36), by folder:
+  - `runtime/src/wiring/` picks.ts +3 −1, real.ts +109 −3
+  - `runtime/src/wiring/staging/` keyword-door.worker.test.ts +869 −0, tool-api-gate.ts +95 −29, tool-api-gate.worker.test.ts +12 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1415: staging's gate sends a no-business keyword turn to T-1413's keyword door on the runtime side, in the gate's slots
+
+realGate routes a gateAndCommit whose caller names no business, K-09-valid and isKeywordTurn, to createKeywordDoor with keywordCommitDeps (the gate's validator, bundles, turn-row commitTurn and sealer; TURN_RECORDS_GATE); every other call goes to the Tool API base unchanged. GateReads gains keywordDoor (KeywordDoorReads). Staging binds it in tool-api-gate.ts: pgDoorRuntime over a runtime-side client per call (HYPERDRIVE_JOB, rosie_worker_job) inside the gate's one set of ClientSlots, readOpenHoldsIn, pgNoBusinessSafetyReads and pgDoorFlags. Unbound or in production nothing changes (noBusinessScope; the gate closed). New Workers test keyword-door.worker.test.ts.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1415: real.ts header: in production the gate stays closed (not the base's noBusinessScope)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1415: T-1398's exact key lists of the gate's input each add keywordDoor (the six pieces; DL-845, DL-896)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 711. docs: COMMIT\_HISTORY.md through commit 707 (b07069f, \#718) (\#719)
 
