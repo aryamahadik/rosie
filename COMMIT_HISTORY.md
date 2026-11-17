@@ -2,9 +2,80 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 721, [`262c2ec`](https://github.com/aryamahadik/rosie/commit/262c2ec), 2026-11-17 00:53:43 UTC.
+- **Through:** commit 723, [`7ca9f87`](https://github.com/aryamahadik/rosie/commit/7ca9f87), 2026-11-17 01:25:37 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 723. docs: COMMIT\_HISTORY.md through commit 721 (262c2ec, \#732) (\#734)
+
+- **Commit:** [`7ca9f87`](https://github.com/aryamahadik/rosie/commit/7ca9f87), by Arya Mahadik, 2026-11-17 01:25:37 UTC
+- **Pull request:** [#734](https://github.com/aryamahadik/rosie/pull/734) from `task/commit-history-154`, merged 2026-11-17 01:25:37 UTC. It squashed 1 branch commit:
+  - `7a05389` docs: COMMIT\_HISTORY.md through commit 721 (262c2ec, \#732)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 247 (DL-921); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 722. T-630: journey 1 and 2 Tool API call folders and registry entries, each refusing not built (\#733)
+
+- **Commit:** [`18459fa`](https://github.com/aryamahadik/rosie/commit/18459fa), by Arya Mahadik, 2026-11-17 01:25:33 UTC
+- **Pull request:** [#733](https://github.com/aryamahadik/rosie/pull/733) from `task/T-630`, merged 2026-11-17 01:25:33 UTC. It squashed 1 branch commit:
+  - `db6d65d` T-630: journey 1 and 2 Tool API call folders and registry entries, ea…
+- **Files changed:** 39 (+1942 −0), by folder:
+  - `actions/src/page-api/journey-1-2/` index.ts +72 −0, journey-1-2.test.ts +107 −0
+  - `actions/src/tool-api/journey-1/after-live/` index.ts +15 −0
+  - `actions/src/tool-api/journey-1/agreements/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/calendar/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/companies/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/control/` index.ts +12 −0
+  - `actions/src/tool-api/journey-1/fee-consent/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/go-live-page/` index.ts +19 −0
+  - `actions/src/tool-api/journey-1/go-live/` index.ts +24 −0
+  - `actions/src/tool-api/journey-1/` index.ts +292 −0, journey-1.test.ts +687 −0
+  - `actions/src/tool-api/journey-1/kinds/` index.ts +25 −0
+  - `actions/src/tool-api/journey-1/licenses/` index.ts +23 −0
+  - `actions/src/tool-api/journey-1/listing/` index.ts +20 −0
+  - `actions/src/tool-api/journey-1/mobile-id/` index.ts +20 −0
+  - `actions/src/tool-api/journey-1/money-card/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/places/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/plan/` index.ts +11 −0
+  - `actions/src/tool-api/journey-1/plug-ins/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/profile/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/rules/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/services/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/spaces/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/start/` index.ts +13 −0
+  - `actions/src/tool-api/journey-1/stripe-connect/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/summary/` index.ts +11 −0
+  - `actions/src/tool-api/journey-1/team-size/` index.ts +18 −0
+  - `actions/src/tool-api/journey-1/timetable/` index.ts +18 −0
+  - `actions/src/tool-api/journey-2/add-team/` index.ts +18 −0
+  - `actions/src/tool-api/journey-2/` index.ts +31 −0, journey-2.test.ts +157 −0
+  - `actions/src/tool-api/journey-2/join-links/` index.ts +12 −0
+  - `actions/src/tool-api/journey-2/join/` index.ts +20 −0
+  - `actions/src/tool-api/journey-2/licenses/` index.ts +23 −0
+  - `actions/src/tool-api/journey-2/on-call/` index.ts +23 −0
+  - `actions/src/tool-api/journey-2/skills/` index.ts +18 −0
+  - `actions/src/tool-api/journey-2/staff-page/` index.ts +18 −0
+  - `actions/src/tool-api/journey-2/take-bookings/` index.ts +19 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Each call task of journeys 1 and 2 (T-633 to T-664) gets its own folder under actions/src/tool-api/journey-1 and journey-2, whose index.ts gives its entries: K-09 v1's matchKinds, lookupListing, readSetup and each of saveSetupStep's 32 steps, registered once each by the folder that builds it. setupHandlers and withSetupCalls make the base's four setup handlers from those entries (saveSetupStep dispatched by its request's step), refuse a call outside the four, an unknown step and anything registered twice, and leave every other handler as given, so the walking skeleton's turn face is untouched. Every handler answers notBuilt and writes nothing until its task. actions/src/page-api/journey-1-2/index.ts lists the K-21 v1 page calls T-665 and T-666 serve, with the setup call behind each, each refusing as the page entry's unconfigured stubs do.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 721. docs: COMMIT\_HISTORY.md through commit 719 (5e26074, \#730) (\#732)
 
