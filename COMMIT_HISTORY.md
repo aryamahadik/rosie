@@ -2,9 +2,54 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 719, [`5e26074`](https://github.com/aryamahadik/rosie/commit/5e26074), 2026-11-17 00:17:29 UTC.
+- **Through:** commit 721, [`262c2ec`](https://github.com/aryamahadik/rosie/commit/262c2ec), 2026-11-17 00:53:43 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 721. docs: COMMIT\_HISTORY.md through commit 719 (5e26074, \#730) (\#732)
+
+- **Commit:** [`262c2ec`](https://github.com/aryamahadik/rosie/commit/262c2ec), by Arya Mahadik, 2026-11-17 00:53:43 UTC
+- **Pull request:** [#732](https://github.com/aryamahadik/rosie/pull/732) from `task/commit-history-153`, merged 2026-11-17 00:53:44 UTC. It squashed 1 branch commit:
+  - `c2e7fb8` docs: COMMIT\_HISTORY.md through commit 719 (5e26074, \#730)
+- **Files changed:** 1 (+48 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +48 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated with scratch/build/lead/commit-history.mjs after train 246 (DL-918); the user's standing request (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 720. T-632: the kind matcher: an owner's words to the closest of the 243 kinds, one which-question for two, not-booked said plainly (\#731)
+
+- **Commit:** [`f84a0e6`](https://github.com/aryamahadik/rosie/commit/f84a0e6), by Arya Mahadik, 2026-11-17 00:53:39 UTC
+- **Pull request:** [#731](https://github.com/aryamahadik/rosie/pull/731) from `task/T-632`, merged 2026-11-17 00:53:40 UTC. It squashed 2 branch commits:
+  - `7f99021` T-632: kind matcher: an owner's words to the closest of the 243 kinds…
+  - `1a6d62f` T-632: name the S1-02 trade words method A does not list; fix a test …
+- **Files changed:** 6 (+1233 −0), by folder:
+  - `actions/src/domain/kind-matcher/` index.ts +26 −0, kind-matcher.test.ts +363 −0, matcher.ts +242 −0, not-booked.ts +63 −0, test-support.ts +405 −0, words.ts +134 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-632: kind matcher: an owner's words to the closest of the 243 kinds (T-631's method A), listed, one which?, new_work, or not_booked by RULES 1.4
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-632: name the S1-02 trade words method A does not list; fix a test helper's comment
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 719. docs: COMMIT\_HISTORY.md through commit 717 (46fbad5, \#727) (\#730)
 
