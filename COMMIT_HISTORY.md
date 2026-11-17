@@ -2,9 +2,52 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 727, [`156740a`](https://github.com/aryamahadik/rosie/commit/156740a), 2026-11-17 04:58:31 UTC.
+- **Through:** commit 729, [`d7aa916`](https://github.com/aryamahadik/rosie/commit/d7aa916), 2026-11-17 06:59:46 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 729. docs: COMMIT\_HISTORY.md through commit 727 (156740a, \#738) (\#740)
+
+- **Commit:** [`d7aa916`](https://github.com/aryamahadik/rosie/commit/d7aa916), by Arya Mahadik, 2026-11-17 06:59:46 UTC
+- **Pull request:** [#740](https://github.com/aryamahadik/rosie/pull/740) from `task/commit-history-157`, merged 2026-11-17 06:59:46 UTC. It squashed 1 branch commit:
+  - `01ba7aa` docs: COMMIT\_HISTORY.md through commit 727 (156740a, \#738)
+- **Files changed:** 1 (+81 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +81 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 728. T-1428: db/repo builds the catalog's K-05 v1.18 reads (the sign-up chain) (\#739)
+
+- **Commit:** [`88a8348`](https://github.com/aryamahadik/rosie/commit/88a8348), by Arya Mahadik, 2026-11-17 06:59:42 UTC
+- **Pull request:** [#739](https://github.com/aryamahadik/rosie/pull/739) from `task/T-1428`, merged 2026-11-17 06:59:43 UTC. It squashed 2 branch commits:
+  - `0e4aceb` T-1428: db/repo builds K-05 v1.18's five catalog reads (readBusinessK…
+  - `f22faab` T-1428: lint fixes: an optional chain in the side check, and the test…
+- **Files changed:** 2 (+2812 −0), by folder:
+  - `db/repo/` catalog-reads.int.test.ts +1743 −0, catalog-reads.ts +1069 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1428: db/repo builds K-05 v1.18's five catalog reads (readBusinessKinds, readBusinessServices, readServiceWays, readServicePriceRules, readTermsSources) as rosie_app under the request's business, in one repeatable-read read-only transaction, with item 77's names built in SQL, and their integration test
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1428: lint fixes: an optional chain in the side check, and the test's faulty price rules named by typed ids
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 727. docs: COMMIT\_HISTORY.md through commit 725 (f414c35, \#736) (\#738)
 
