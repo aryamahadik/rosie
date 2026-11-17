@@ -1,0 +1,57 @@
+{
+  "card": "T-1121",
+  "run": "2026-11-17T00-27-34Z-ddc156a1",
+  "mode": "live",
+  "startedAt": "2026-11-17T00:27:34.183Z",
+  "steps": ["capability", "send"],
+  "destination": "***90",
+  "sendingLine": {
+    "variable": "ROSIE_NUMBER",
+    "number": "***17"
+  },
+  "allowListNumbers": 1,
+  "calls": [
+    {
+      "file": "01-capability-check_imessage.json",
+      "step": "capability",
+      "call": "check_imessage",
+      "status": 200,
+      "elapsedMs": 625,
+      "port": {
+        "call": "capabilityCheck",
+        "check": "imessage",
+        "result": "checked",
+        "available": true,
+        "reason": null,
+        "service": null
+      }
+    },
+    {
+      "file": "02-capability-check_rcs.json",
+      "step": "capability",
+      "call": "check_rcs",
+      "status": 200,
+      "elapsedMs": 679,
+      "port": {
+        "call": "capabilityCheck",
+        "check": "rcs",
+        "result": "checked",
+        "available": true,
+        "reason": null,
+        "service": null
+      }
+    },
+    {
+      "file": "03-send-send.json",
+      "step": "send",
+      "call": "send",
+      "status": 201,
+      "elapsedMs": 105,
+      "port": {
+        "call": "sendPart",
+        "result": "accepted",
+        "service": null
+      }
+    }
+  ]
+}
