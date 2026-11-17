@@ -1,0 +1,41 @@
+{
+  "card": "T-1121",
+  "run": "2026-11-17T00-37-18Z-7ccff4e6",
+  "mode": "live",
+  "startedAt": "2026-11-17T00:37:18.849Z",
+  "steps": ["stopped", "stopped-override"],
+  "destination": "***90",
+  "sendingLine": {
+    "variable": "ROSIE_NUMBER",
+    "number": "***17"
+  },
+  "allowListNumbers": 1,
+  "calls": [
+    {
+      "file": "01-stopped-send.json",
+      "step": "stopped",
+      "call": "send",
+      "status": 403,
+      "elapsedMs": 189,
+      "port": {
+        "call": "sendPart",
+        "result": "failed",
+        "kind": "optedOut",
+        "httpStatus": 403,
+        "code": "2024"
+      }
+    },
+    {
+      "file": "02-stopped-override-send.json",
+      "step": "stopped-override",
+      "call": "send",
+      "status": 201,
+      "elapsedMs": 90,
+      "port": {
+        "call": "sendPart",
+        "result": "accepted",
+        "service": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "card": "T-1121",
+  "run": "2026-11-17T00-27-34Z-ddc156a1",
+  "mode": "live",
+  "step": "send",
+  "call": "send",
+  "at": "2026-11-17T00:27:35.493Z",
+  "elapsedMs": 105,
+  "request": {
+    "method": "POST",
+    "path": "/api/partner/v3/chats",
+    "body": {
+      "from": "***17",
+      "to": ["***90"],
+      "message": {
+        "parts": [
+          {
+            "type": "text",
+            "value": "Rosie staging test (T-1121): a test text from Rosie's line. No reply needed."
+          }
+        ],
+        "idempotency_key": "t1121-send-2026-11-17T00-27-34Z-ddc156a1"
+      },
+      "override_optout": false
+    }
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "content-type": "application/json",
+      "x-trace-id": "54dae2652defd6ddc4c8f03726f72564"
+    },
+    "body": {
+      "chat": {
+        "display_name": "[name]",
+        "handles": [
+          {
+            "handle": "***17",
+            "id": "3c36c892-b06f-488b-ad96-5709f94949d1",
+            "is_me": true,
+            "joined_at": "2026-10-22T02:40:10.777966Z",
+            "left_at": null,
+            "service": "iMessage",
+            "status": "active"
+          },
+          {
+            "handle": "***90",
+            "id": "1f09b322-4411-4275-96c0-e7b38baccf80",
+            "is_me": false,
+            "joined_at": "2026-10-22T02:40:10.777966Z",
+            "left_at": null,
+            "service": "iMessage",
+            "status": "active"
+          }
+        ],
+        "health_status": {
+          "doc_url": "https://docs.linqapp.com/channel/imessage/guides/chats/chat-health#healthy",
+          "status": "HEALTHY",
+          "updated_at": "2026-11-16T01:43:40.356394Z"
+        },
+        "id": "a52f09fa-b359-4dc0-93f0-a4a83b6cda16",
+        "is_group": false,
+        "message": {
+          "created_at": "2026-11-17T00:27:35.578614Z",
+          "delivered_at": null,
+          "delivery_status": "pending",
+          "effect": null,
+          "from_handle": {
+            "handle": "***17",
+            "id": "3c36c892-b06f-488b-ad96-5709f94949d1",
+            "is_me": true,
+            "joined_at": "2026-10-22T02:40:10.777966Z",
+            "left_at": null,
+            "service": "iMessage",
+            "status": "active"
+          },
+          "id": "604f0270-4b5d-4ddb-a7c0-c3d4d232e440",
+          "is_read": false,
+          "parts": [
+            {
+              "inline_stickers": null,
+              "mention": null,
+              "mention_range": null,
+              "mentions": null,
+              "reactions": null,
+              "text_decorations": null,
+              "type": "text",
+              "value": "Rosie staging test (T-1121): a test text from Rosie's line. No reply needed."
+            }
+          ],
+          "preferred_service": null,
+          "reply_to": null,
+          "sent_at": null,
+          "service": null
+        },
+        "service": "iMessage"
+      }
+    }
+  },
+  "port": {
+    "call": "sendPart",
+    "result": "accepted",
+    "service": null
+  }
+}
