@@ -5028,7 +5028,7 @@ const ORDINARY_CLAIMS: readonly {
   { name: "v1.2's claimOutboxV12", run: claimV12 },
   {
     name: "claimOutboxV114 without sendClass (v1.13's claim, the dispatcher's on staging)",
-    run: (request) => claimV114(request as ClaimOutboxV114Request),
+    run: (request) => claimV114(request),
   },
 ];
 
