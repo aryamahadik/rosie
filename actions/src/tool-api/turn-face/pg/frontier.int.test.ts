@@ -1854,7 +1854,7 @@ describe("the frontier reads a demo shop's setup facts beside its core facts (T-
         expect(setting, scope).toBeGreaterThan(0);
         const after = refused.statements.slice(setting + 1).map((text) => text.trim());
         expect(
-          after.filter((text) => !/current_setting/.test(text)),
+          after.filter((text) => !text.includes("current_setting")),
           scope,
         ).toEqual(["rollback"]);
       }
