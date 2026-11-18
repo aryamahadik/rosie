@@ -2,9 +2,96 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 769, [`e1edd4c`](https://github.com/aryamahadik/rosie/commit/e1edd4c), 2026-11-18 09:09:09 UTC.
+- **Through:** commit 772, [`6715e5c`](https://github.com/aryamahadik/rosie/commit/6715e5c), 2026-11-18 10:23:21 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 772. docs: COMMIT\_HISTORY.md through commit 769 (e1edd4c, \#780) (\#783)
+
+- **Commit:** [`6715e5c`](https://github.com/aryamahadik/rosie/commit/6715e5c), by Arya Mahadik, 2026-11-18 10:23:21 UTC
+- **Pull request:** [#783](https://github.com/aryamahadik/rosie/pull/783) from `task/commit-history-173`, merged 2026-11-18 10:23:21 UTC. It squashed 1 branch commit:
+  - `09c82a4` docs: COMMIT\_HISTORY.md through commit 769 (e1edd4c, \#780)
+- **Files changed:** 1 (+48 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +48 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated after train 266 (DL-959) with scratch/build/lead/commit-history.mjs: every commit on main, newest first, with its pull request, squashed branch commits, changed files and full message (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 771. T-1457: the gate reads an open question as rosie\_app through one narrow definer function (0037; DL-950) (\#782)
+
+- **Commit:** [`1bc48a5`](https://github.com/aryamahadik/rosie/commit/1bc48a5), by Arya Mahadik, 2026-11-18 10:23:17 UTC
+- **Pull request:** [#782](https://github.com/aryamahadik/rosie/pull/782) from `task/T-1457`, merged 2026-11-18 10:23:18 UTC. It squashed 2 branch commits:
+  - `1b06f43` T-1457: the open questions' read as rosie\_app: migration 0037's secur…
+  - `c955233` T-1457: money.int.test.ts's pinned migration list gains 0037 (a pin-o…
+- **Files changed:** 5 (+667 −4), by folder:
+  - `db/migrations/` 0037\_core\_question\_went\_out.sql +73 −0
+  - `db/repo/` money.int.test.ts +4 −2, rls.int.test.ts +17 −2, targets-app.int.test.ts +547 −0, targets.ts +26 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1457: the open questions' read as rosie_app: migration 0037's security-definer open_questions_went_out (a question's sent_at and poll_id, only for a question of the caller's business scope; reads open_questions, outbox_rows and outbox_parts; EXECUTE to rosie_app and rosie_job, never PUBLIC); liveOpenQuestionsOfHandle reads through it for a role that may not select outbox_parts, rosie_job's join unchanged; targets-app.int.test.ts proves it; rls.int.test.ts's definer list names it
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1457: money.int.test.ts's pinned migration list gains 0037 (a pin-only edit, as T-1278, T-1333 and T-1402 made)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 770. T-1455: K-05 v1.19, the kind catalog and the owner's picked kinds (DL-949, DL-954, DL-958) (\#781)
+
+- **Commit:** [`6b70a79`](https://github.com/aryamahadik/rosie/commit/6b70a79), by Arya Mahadik, 2026-11-18 10:23:14 UTC
+- **Pull request:** [#781](https://github.com/aryamahadik/rosie/pull/781) from `task/T-1455`, merged 2026-11-18 10:23:14 UTC. It squashed 5 branch commits:
+  - `5852f7a` T-1455: K-05 v1.19, frozen: readKindCatalog (item 78: the kind matche…
+  - `cb04dd8` T-1455: README section v1.19, the tests on this branch: tests/contrac…
+  - `c6482a9` Merge branch 'main' into task/T-1455
+  - `e016fae` T-1455: tests/contract/data-access.v1.18.test.ts line 70 alone (DL-95…
+  - `68f185a` T-1455: item 79's scope with a business (round 3, DL-958): readPicked…
+- **Files changed:** 21 (+2687 −7), by folder:
+  - `contracts/data-access/` README.md +119 −5, data-access.v1.19.schema.json +996 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` index.json +128 −0, read-kind-catalog-not-seeded.json +15 −0, read-kind-catalog-sample.json +81 −0, read-picked-kinds-barbershop.json +112 −0, read-picked-kinds-no-business-row.json +18 −0, read-picked-kinds-other-person.json +22 −0, read-picked-kinds-pack-hikes-draft.json +105 −0, read-picked-kinds-sign-up-under-business.json +132 −0, read-picked-kinds-sign-up.json +132 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-kind-catalog-drafted-kind.json +78 −0, refuse-kind-catalog-names-business.json +83 −0, refuse-kind-catalog-with-facts.json +71 −0, refuse-picked-kinds-business-left-out.json +131 −0, refuse-picked-kinds-draft-block-answer.json +92 −0, refuse-picked-kinds-no-person.json +132 −0, refuse-picked-kinds-owner-mobile.json +119 −0, refuse-picked-kinds-text-by-key-alone.json +118 −0
+  - `tests/contract/` data-access.v1.18.test.ts +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1455: K-05 v1.19, frozen: readKindCatalog (item 78: the kind matcher's catalog, every K-24 kinds row of source trade_file, id, name, style, pattern, source and version in id order, never a drafted kind or its facts, read by rosie_app under any scope: no row-level security on kinds and rosie_app's SELECT, 0021) and readPickedKinds (item 79: the owner's kinds so far, K-24 picked_kinds with each pick's text block keys, draft and draft blocks, never a block's text or answer, and K-23 companies, of the call's business and of the call's person with no business, on the runtime side as rosie_job with that rule in every statement); README section v1.19 with the step-by-step reads of T-633 and T-634 (S1-02, S1-74, S1-03, S1-11, S1-04, S1-08), defaults 167 to 182, open gaps 89 to 93, freeze record; 8 accepted and 8 refused fixtures
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1455: README section v1.19, the tests on this branch: tests/contract/data-access.v1.18.test.ts line 70 (earlierAccepted) takes every version but v1.18 where it means the versions before it, so it fails at its load on v1.19's two new calls (missing the schema ...v1.18...#/$defs/readKindCatalog.exchange); QA's one-line fix, outside this card's May touch, merges with v1.19; data-access.v1.test.ts alone 784/784
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1455: tests/contract/data-access.v1.18.test.ts line 70 alone (DL-954): earlierAccepted selects the accepted fixtures of the versions before v1.18 by the version's number (v1, v1.1 to v1.17), never every version but v1.18, so v1.19's fixtures are no longer read against v1.18's schema; it selects 255 fixtures on main (dd9eb08) and 255 on this commit, the same files
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1455: item 79's scope with a business (round 3, DL-958): readPickedKinds runs as rosie_job in one read-only repeatable-read transaction; persons first; with a business, setBusinessScope and requireBusinessScope() before businesses and the business's rows, then the scope cleared and confirmed empty (assertRuntimeSide) before the person's rows with no business; with businessId null as before; each text, draft and block statement joins its pick under the rule, so a business pick's child with no business is answered nowhere (default 180); the db/repo card throws on an empty kinds.style or companies.name; default 172 and gap 90 record the security reviewer's ruling (bind by person); the line-70 and security-review lines mended, gap 93 closed; README and the v1.19 readPickedKinds.request description only, no field, fixture or test changed
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 769. docs: COMMIT\_HISTORY.md through commit 767 (b3918c1, \#778) (\#780)
 
