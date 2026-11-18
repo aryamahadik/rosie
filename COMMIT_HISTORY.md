@@ -2,9 +2,72 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 747, [`cd7deae`](https://github.com/aryamahadik/rosie/commit/cd7deae), 2026-11-17 22:23:38 UTC.
+- **Through:** commit 750, [`180b57d`](https://github.com/aryamahadik/rosie/commit/180b57d), 2026-11-17 23:13:18 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 750. docs: COMMIT\_HISTORY.md through commit 747 (cd7deae, \#758) (\#761)
+
+- **Commit:** [`180b57d`](https://github.com/aryamahadik/rosie/commit/180b57d), by Arya Mahadik, 2026-11-17 23:13:18 UTC
+- **Pull request:** [#761](https://github.com/aryamahadik/rosie/pull/761) from `task/commit-history-165`, merged 2026-11-17 23:13:18 UTC. It squashed 1 branch commit:
+  - `2b58723` docs: COMMIT\_HISTORY.md through commit 747 (cd7deae, \#758)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 749. T-572: D-018 staging on the real Linq line (STAGING\_LINQ\_LINE, the secrets by name, linq-staging-check.sh's check and --create) (\#760)
+
+- **Commit:** [`0d097e8`](https://github.com/aryamahadik/rosie/commit/0d097e8), by Arya Mahadik, 2026-11-17 23:13:14 UTC
+- **Pull request:** [#760](https://github.com/aryamahadik/rosie/pull/760) from `task/T-572`, merged 2026-11-17 23:13:14 UTC. It squashed 2 branch commits:
+  - `e22b874` T-572: D-018's switch STAGING\_LINQ\_LINE real in env.staging; Linq's k…
+  - `bda148c` T-572: the switch's broken-copy test deletes the var by its literal n…
+- **Files changed:** 11 (+1890 −151), by folder:
+  - `infra/ci/` README.md +6 −2, linq-staging-check.test.mjs +1063 −0, make-staging-secrets.test.mjs +98 −60, put-staging-secrets.test.mjs +136 −59, wrangler-config.test.mjs +73 −0, wrangler-env.test.mjs +14 −0
+  - `infra/scripts/` linq-staging-check.sh +420 −0, make-staging-secrets.sh +16 −10, put-staging-secrets.sh +56 −20
+  - `/` package.json +2 −0, wrangler.jsonc +6 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-572: D-018's switch STAGING_LINQ_LINE real in env.staging; Linq's key and the roster put by name, TEST_PHONE_WEBHOOK_SECRET made in place, LINQ_WEBHOOK_SECRET Linq's own (off both made lists); linq-staging-check.sh (read-only check and --create, the signing secret piped to wrangler alone) with npm scripts; tests on stubs with no network
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-572: the switch's broken-copy test deletes the var by its literal name (no-dynamic-delete)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 748. T-1449: staging's real Linq line beside the test-phone line: STAGING\_LINQ\_LINE exactly real on staging routes a part to a test phone to the test-phone line and every other part through guardLinqSender(createLinqSender({ env }), { env }); the Linq verify takes LINQ\_WEBHOOK\_SECRET from any sender and TEST\_PHONE\_WEBHOOK\_SECRET only from a test phone, which the page now signs with; off, every path as before; adapters exports ./linq/send and ./linq/roster (\#759)
+
+- **Commit:** [`485c726`](https://github.com/aryamahadik/rosie/commit/485c726), by Arya Mahadik, 2026-11-17 23:13:09 UTC
+- **Pull request:** [#759](https://github.com/aryamahadik/rosie/pull/759) from `task/T-1449`, merged 2026-11-17 23:13:10 UTC. It squashed 1 branch commit:
+  - `fb2a02f` T-1449: staging's real Linq line beside the test-phone line: STAGING\_…
+- **Files changed:** 10 (+1569 −23), by folder:
+  - `adapters/` package.json +3 −1
+  - `runtime/src/wiring/` index.ts +13 −0, linq.test.ts +239 −1, real.ts +53 −13, root.ts +15 −2
+  - `runtime/src/wiring/staging/` index.ts +15 −2, linq-line.test.ts +408 −0, linq-line.ts +165 −0, linq-line.worker.test.ts +650 −0, send.ts +8 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 747. docs: COMMIT\_HISTORY.md through commit 745 (3452a12, \#756) (\#758)
 
