@@ -37,7 +37,10 @@
 //                check has passed in the isolate the adapter's read throws NoStateReadError, which is answered here as the
 //                service's own notBuilt (NotBuiltError), so a record whose line asks the danger question answers notBuilt
 //                with nothing written, and one that asks nothing never reads it. No adapter: left out, the service's own
-//                default, notBuilt for such a record too.
+//                default, notBuilt for such a record too. With the adapter they carry its check (T-1453; ../real.ts
+//                GateWords.checkPin), which ../real.ts realGate awaits for the run's pinned bundle before its face runs, so
+//                a rerun in a fresh isolate (its pin keeps the stored id and runs no check) has that bundle's words: kept
+//                already, nothing is read; refused, the words answer as before; unreadable, the gate fails as for a read.
 //   flagsReader and messagesReader are left out: the safety service's own, on the call's transaction (../real.ts GateReads).
 //   keywordDoor  the keyword door's runtime-side pieces (T-1415; ../real.ts KeywordDoorReads; T-1413's door, the CQ-335
 //                ruling's NEW-3, DL-864, DL-877), as @rosie/actions' pgKeywordDoor binds them, for a keyword turn whose
@@ -101,7 +104,7 @@ import {
   pgNoBusinessSafetyReads,
 } from "@rosie/actions/src/tool-api/turn-face/pg/calls";
 import { pgReadOnlySealer } from "@rosie/actions/src/tool-api/turn-face/pg/sealer";
-import type { SafetyWords, WordsSealer } from "@rosie/actions/src/domain/safety";
+import type { WordsSealer } from "@rosie/actions/src/domain/safety";
 import {
   readBusinessOwner,
   readBusinessZoneIn,
@@ -116,7 +119,14 @@ import type { WrappingKeys } from "@rosie/db/repo/sealing";
 import { readOpenHoldsIn } from "@rosie/db/repo/turn-face-reads";
 
 import { environmentOf } from "../picks";
-import { NoStateReadError, type BundleSafetyLines, type GateReads, type KeywordDoorReads } from "../real";
+import {
+  NoStateReadError,
+  type BundleSafetyLines,
+  type GateReads,
+  type GateWords,
+  type KeywordDoorReads,
+} from "../real";
+import { BundleRefusedError } from "./bundle-safety";
 import type { StagingDb, StagingPart } from "./part";
 
 /** What T-1398's builder is handed (DL-757): the env, the root's handle, the resolver and the one BundleSafety adapter. */
@@ -269,8 +279,13 @@ function keywordDoorOn(db: StagingDb, slots: ClientSlots): KeywordDoorReads<Sql>
  * SafetyDeps.words over the one BundleSafety adapter, read at each call: the line's id and words from the bundle the
  * adapter's own check passed and answers for, a copy, or null for a line it holds no words for. Before any check passed
  * the adapter's read throws NoStateReadError: no bundle's words are known, which the record takes as its port not built.
+ *
+ * With them, the adapter's check (../real.ts GateWords.checkPin, T-1453), which the gate awaits for the run's pinned bundle
+ * before its face runs: a bundle kept already passes at once, with nothing read, and any other is read and checked, then
+ * kept. A bundle the check refuses (BundleRefusedError) is kept nowhere and resolves, so the words answer as before; a
+ * check that cannot read the bundle rejects as the adapter rejects (BundleUnreadableError), and the gate fails with it.
  */
-function wordsOf(lines: BundleSafetyLines): SafetyWords {
+function wordsOf(lines: BundleSafetyLines): GateWords {
   return {
     fixedLine(id) {
       let line: ReturnType<BundleSafetyLines["fixedLine"]>;
@@ -281,6 +296,14 @@ function wordsOf(lines: BundleSafetyLines): SafetyWords {
         throw error;
       }
       return line === null ? null : { id: line.id, text: line.text };
+    },
+    async checkPin(request) {
+      try {
+        await lines.checkPin(request);
+      } catch (error) {
+        if (error instanceof BundleRefusedError) return;
+        throw error;
+      }
     },
   };
 }
