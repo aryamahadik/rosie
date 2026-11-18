@@ -2,9 +2,45 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 765, [`dd9eb08`](https://github.com/aryamahadik/rosie/commit/dd9eb08), 2026-11-18 06:29:27 UTC.
+- **Through:** commit 767, [`b3918c1`](https://github.com/aryamahadik/rosie/commit/b3918c1), 2026-11-18 07:16:14 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 767. docs: COMMIT\_HISTORY.md through commit 765 (dd9eb08, \#775) (\#778)
+
+- **Commit:** [`b3918c1`](https://github.com/aryamahadik/rosie/commit/b3918c1), by Arya Mahadik, 2026-11-18 07:16:14 UTC
+- **Pull request:** [#778](https://github.com/aryamahadik/rosie/pull/778) from `task/commit-history-171`, merged 2026-11-18 07:16:15 UTC. It squashed 1 branch commit:
+  - `f3c277d` docs: COMMIT\_HISTORY.md through commit 765 (dd9eb08, \#775)
+- **Files changed:** 1 (+77 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +77 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated after train 264 with scratch/build/lead/commit-history.mjs (the user's standing request, DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 766. T-1456: staging's real-line Linq verify places receipts: chatHandle bound to db/repo's readChatHandle on the root's handle (workerRoot makes its one handle and hands it to stagingOptions and the verify input; HYPERDRIVE\_JOB's presence read once), so a known chat's signed receipt is its K-06 event (200) and an unknown chat or a transient read stays 503 receiptHandleUnknown; the gateway's failure line names a LinqWebhookError's code (one of its four labels) beside its name, any other error its name alone; unit tests for the lookup, the gateway path (written then duplicate, unknown and transient 503, main's input 503, other receipts placed, texts and the page's events unchanged) and logFailure; a Workers case for workerRoot's runtime-side lookup (\#777)
+
+- **Commit:** [`1e6d075`](https://github.com/aryamahadik/rosie/commit/1e6d075), by Arya Mahadik, 2026-11-18 07:16:10 UTC
+- **Pull request:** [#777](https://github.com/aryamahadik/rosie/pull/777) from `task/T-1456`, merged 2026-11-18 07:16:10 UTC. It squashed 1 branch commit:
+  - `33349f4` T-1456: staging's real-line Linq verify places receipts: chatHandle b…
+- **Files changed:** 6 (+1120 −15), by folder:
+  - `runtime/src/gateway/` answer.test.ts +150 −0, answer.ts +39 −3
+  - `runtime/src/wiring/` root.ts +11 −4
+  - `runtime/src/wiring/staging/` linq-line.test.ts +702 −1, linq-line.ts +62 −5, linq-line.worker.test.ts +156 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 765. docs: COMMIT\_HISTORY.md through commit 762 (273d59b, \#773) (\#775)
 
