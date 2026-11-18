@@ -2,9 +2,60 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 756, [`17d358e`](https://github.com/aryamahadik/rosie/commit/17d358e), 2026-11-18 02:47:48 UTC.
+- **Through:** commit 759, [`ad90046`](https://github.com/aryamahadik/rosie/commit/ad90046), 2026-11-18 03:51:45 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 759. docs: COMMIT\_HISTORY.md through commit 756 (17d358e, \#767) (\#770)
+
+- **Commit:** [`ad90046`](https://github.com/aryamahadik/rosie/commit/ad90046), by Arya Mahadik, 2026-11-18 03:51:45 UTC
+- **Pull request:** [#770](https://github.com/aryamahadik/rosie/pull/770) from `task/commit-history-168`, merged 2026-11-18 03:51:46 UTC. It squashed 1 branch commit:
+  - `86c6f5a` docs: COMMIT\_HISTORY.md through commit 756 (17d358e, \#767)
+- **Files changed:** 1 (+67 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +67 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 758. T-1453: realGate awaits the adapter's checkPin for the run's pinned bundle before the face runs (GateWords.checkPin on staging's words; a refused bundle resolves, an unreadable one fails the gate as a read); Workers tests: a rerun in a fresh isolate (notBuilt on main), a warm isolate, a failed check, a refused bundle, no adapter and no reads unchanged (\#769)
+
+- **Commit:** [`2e67887`](https://github.com/aryamahadik/rosie/commit/2e67887), by Arya Mahadik, 2026-11-18 03:51:41 UTC
+- **Pull request:** [#769](https://github.com/aryamahadik/rosie/pull/769) from `task/T-1453`, merged 2026-11-18 03:51:41 UTC. It squashed 1 branch commit:
+  - `85aaf30` T-1453: realGate awaits the adapter's checkPin for the run's pinned b…
+- **Files changed:** 3 (+545 −12), by folder:
+  - `runtime/src/wiring/` real.ts +39 −4
+  - `runtime/src/wiring/staging/` tool-api-gate.ts +27 −4, tool-api-gate.worker.test.ts +479 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 757. T-1452: staging-only reset of a listed test handle's actor: the reset list (tp-01 and the real line's allow-list, read at each call), its hook set only by staging's root, run at the start of each alarm and hand-off for a target not yet applied, deferred while a lease is live, a read is out, a text waits, PostgreSQL is known down or a stop-rank write waits; one transaction deleting what ADR-017 section 5's forget deletes plus each open outcome hold, keeping the marker, the stopped copies, the stop-rank writes, the bundle's and timers' copies, the newest lease turn emptied, sqlite\_sequence and the platform's tables; the safety read built again with no name, the alarm re-armed, one log line of labels and counts (\#768)
+
+- **Commit:** [`e4c7b02`](https://github.com/aryamahadik/rosie/commit/e4c7b02), by Arya Mahadik, 2026-11-18 03:51:37 UTC
+- **Pull request:** [#768](https://github.com/aryamahadik/rosie/pull/768) from `task/T-1452`, merged 2026-11-18 03:51:38 UTC. It squashed 1 branch commit:
+  - `3e28032` T-1452: staging-only reset of a listed test handle's actor: the reset…
+- **Files changed:** 7 (+1988 −4), by folder:
+  - `runtime/src/actor/` handle-actor.ts +46 −3, staging-reset.ts +408 −0, staging-reset.worker.test.ts +843 −0
+  - `runtime/src/wiring/` root.ts +14 −0
+  - `runtime/src/wiring/staging/` actor-reset.ts +103 −0, actor-reset.worker.test.ts +564 −0, options.ts +10 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 756. docs: COMMIT\_HISTORY.md through commit 753 (67f851b, \#764) (\#767)
 
