@@ -1554,15 +1554,33 @@ export interface GateReads<Repo = unknown, DoorRepo = unknown> {
    * The safety service's SafetyDeps.words (T-1242; T-1176): K-01 v1's fixed lines word for word from the pinned bundle,
    * for the danger question a record's line carries (safetyAsk's). A later part of T-1154 fills it; left out, as in the
    * test environment, the service has none, so a record whose line asks it answers notBuilt and one that asks nothing
-   * never reads it.
+   * never reads it. Words a bundle-backed adapter gives carry its check (GateWords.checkPin, T-1453).
    */
-  readonly words?: SafetyWords;
+  readonly words?: GateWords;
   /**
    * The keyword door's runtime-side pieces (T-1415; KeywordDoorReads), for a keyword turn whose caller names no business.
    * Left out (a test's doubles, and any binding that has no door), every call goes to the Tool API base, which refuses
    * such a call (noBusinessScope) before anything is read.
    */
   readonly keywordDoor?: KeywordDoorReads<DoorRepo>;
+}
+
+/**
+ * The gate's SafetyDeps.words (GateReads.words) and, where a bundle-backed BundleSafety adapter gives them (staging's,
+ * ./staging/tool-api-gate.ts), that adapter's check (T-1453). Such words answer only from a bundle the adapter's own
+ * check passed in the isolate, and a turn's rerun keeps the bundle id its turn stored without running the check
+ * (../bundle/pin.ts), so realGate awaits `checkPin` for the run's pinned bundle before its face runs. Words with no check
+ * (the test environment's, or none at all) are read as they always were.
+ */
+export interface GateWords extends SafetyWords {
+  /**
+   * Resolves once the words answer for the asked bundle as far as its check allows: a bundle kept already at once, with
+   * nothing read; any other read and checked, then kept. A bundle the check refuses is kept nowhere and resolves too, so
+   * the words answer as they did before (none while no check has passed: notBuilt for a record whose line asks the
+   * danger question). Rejects when the check cannot read the bundle (a lost read, PostgreSQL's copy missing, a value that
+   * is not the bundle's own), with nothing kept.
+   */
+  readonly checkPin?: (request: PinCheckRequest) => Promise<void>;
 }
 
 /**
@@ -1632,6 +1650,15 @@ const NO_GATE_SCOPE: BusinessScope<unknown> = {
  * turn-row port and sealer, and TURN_RECORDS_GATE, so the door records no span of its own either; it holds no words for
  * compose input (a keyword turn's rows get their words from the guard's replies). Every other call goes to the base
  * exactly as above, and so does every call while no door is bound.
+ *
+ * Before the face runs (T-1453; the architect's card D, DL-944): where the reads' words carry their adapter's check
+ * (GateWords.checkPin: staging's), the check is awaited for the bundle the call's run pinned, through the bound bundle
+ * port, since a rerun's pin keeps its stored id without the check and the words then know no bundle in a fresh isolate. A
+ * bundle kept already passes at once, with nothing read, so a warm isolate pays nothing; one the check refuses is kept
+ * nowhere, and the words answer as before. A check that cannot read the bundle rejects here, before the scope opens: the
+ * gate fails as for any read, nothing read or written in its scope, and the lease runs the turn again. The keyword door
+ * reads no words and checks nothing; a call whose trace is no pinned run's, and every call where the words carry no check
+ * (production's closed gate, the test environment's reads), runs exactly as before.
  */
 export function realGate(inputs: GateInputs): GatePort {
   let validator: ToolApiValidator | null = null;
@@ -1639,7 +1666,9 @@ export function realGate(inputs: GateInputs): GatePort {
     async gateAndCommit(request, at, trace) {
       validator ??= createToolApiValidator();
       const reads = inputs.reads;
-      const bundles = new FrontierBundleReads(inputs.pinnedOf(trace), inputs.bundles());
+      const pinned = inputs.pinnedOf(trace);
+      const bound = inputs.bundles();
+      const bundles = new FrontierBundleReads(pinned, bound);
       const door = reads?.keywordDoor;
       if (reads !== null && door !== undefined && goesToDoor(request, validator)) {
         const answered = await keywordDoorOf(inputs, door, reads.sealer, bundles, validator).gateAndCommit(
@@ -1650,6 +1679,12 @@ export function realGate(inputs: GateInputs): GatePort {
         );
         // The door's answer is K-09 gateAndCommit's, or one of the base's own refusals, as the face's is.
         return answered as unknown as GateAndCommitAnswer;
+      }
+      // The run's pinned bundle, checked before the face runs (T-1453): the words then answer for it, even on a rerun in a
+      // fresh isolate; a check that cannot read the bundle rejects here, so the gate fails as for any read.
+      const words = reads?.words;
+      if (pinned !== null && words?.checkPin !== undefined) {
+        await words.checkPin({ bundleId: pinned.bundleId, bundles: bound });
       }
       const binding: TurnCommitBinding<unknown> = {
         bundles,
@@ -1665,7 +1700,7 @@ export function realGate(inputs: GateInputs): GatePort {
         safetyExtra: {
           ...(reads?.flagsReader === undefined ? {} : { flagsReader: reads.flagsReader }),
           ...(reads?.messagesReader === undefined ? {} : { messagesReader: reads.messagesReader }),
-          ...(reads?.words === undefined ? {} : { words: reads.words }),
+          ...(words === undefined ? {} : { words }),
         },
       };
       const face = createTurnFace<FrontierRepo>({
