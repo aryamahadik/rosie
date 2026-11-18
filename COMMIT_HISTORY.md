@@ -2,9 +2,44 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 774, [`c46b073`](https://github.com/aryamahadik/rosie/commit/c46b073), 2026-11-18 10:57:59 UTC.
+- **Through:** commit 776, [`7a00bad`](https://github.com/aryamahadik/rosie/commit/7a00bad), 2026-11-18 12:05:11 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 776. docs: COMMIT\_HISTORY.md through commit 774 (c46b073, \#785) (\#787)
+
+- **Commit:** [`7a00bad`](https://github.com/aryamahadik/rosie/commit/7a00bad), by Arya Mahadik, 2026-11-18 12:05:11 UTC
+- **Pull request:** [#787](https://github.com/aryamahadik/rosie/pull/787) from `task/commit-history-175`, merged 2026-11-18 12:05:12 UTC. It squashed 1 branch commit:
+  - `d6fc871` docs: COMMIT\_HISTORY.md through commit 774 (c46b073, \#785)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated after train 268 (DL-963) with scratch/build/lead/commit-history.mjs: every commit on main, newest first, with its pull request, squashed branch commits, changed files and full message (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 775. T-1459: limit 1 passes a sign-up's own answers (default 14, DL-961): until the business's control is proven, an S1 option about no booking that answers an open question stored for the sender, live on this turn's handle at the call's business and gone out to it, from a sender linked to that handle, is the sender's own record (proven by the one rule); settings alone (no stake of any kind, no team, owner-only or live step: LIVE\_STEPS S1-29, S1-35); its facts from one readTurnState on the call's transaction (SignUpFacts, signUpFactsOver); any fact missing or unreadable answers as today; unit tests on commit-s1-02.json (5 passing cases, 37 as-today cases, the door and own records unchanged) and one integration case (rosie\_job passes; control proven and no business\_setup row as today; rosie\_app refused 42501) (\#786)
+
+- **Commit:** [`6a5e426`](https://github.com/aryamahadik/rosie/commit/6a5e426), by Arya Mahadik, 2026-11-18 12:05:07 UTC
+- **Pull request:** [#786](https://github.com/aryamahadik/rosie/pull/786) from `task/T-1459`, merged 2026-11-18 12:05:07 UTC. It squashed 1 branch commit:
+  - `18cc3b9` T-1459: limit 1 passes a sign-up's own answers (default 14, DL-961): …
+- **Files changed:** 6 (+1147 −10), by folder:
+  - `actions/src/gate/limit-1/` allowed.ts +113 −6, facts.ts +88 −2, index.ts +20 −1, sign-up.test.ts +513 −0, test-support.ts +145 −1
+  - `actions/src/gate/limit-1/pg/` sign-up.int.test.ts +268 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 774. docs: COMMIT\_HISTORY.md through commit 772 (6715e5c, \#783) (\#785)
 
