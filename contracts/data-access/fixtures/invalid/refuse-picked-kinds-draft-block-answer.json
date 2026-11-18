@@ -1,0 +1,92 @@
+{
+  "result": "pickedKinds",
+  "businessId": "biz-pet-boarding",
+  "personId": "person-sam",
+  "readAt": "2026-10-26T14:10:00Z",
+  "picks": [
+    {
+      "id": "pick-sam-pack-hikes",
+      "ownerPersonId": "person-sam",
+      "position": 1,
+      "words": "pack hikes",
+      "outcome": "new_work",
+      "kindId": "new-pack-hikes",
+      "companyId": null,
+      "businessId": "biz-pet-boarding",
+      "pickedAt": "2026-10-26T14:00:00Z",
+      "version": 1,
+      "texts": [],
+      "draft": {
+        "id": "draft-pack-hikes",
+        "businessId": "biz-pet-boarding",
+        "state": "in_review",
+        "draftedAt": "2026-10-26T14:01:00Z",
+        "version": 2,
+        "blocks": [
+          {
+            "rowId": "draft-pack-hikes/3",
+            "block": 3,
+            "businessId": "biz-pet-boarding",
+            "outcome": "no",
+            "factsOn": [],
+            "switchesOn": [],
+            "answeredAt": "2026-10-26T14:02:00Z",
+            "version": 1
+          },
+          {
+            "rowId": "draft-pack-hikes/4",
+            "block": 4,
+            "businessId": "biz-pet-boarding",
+            "outcome": "answered",
+            "answer": "A vaccine record on file, and a free group check before the first hike",
+            "factsOn": ["forms", "firststeps"],
+            "switchesOn": [],
+            "answeredAt": "2026-10-26T14:03:00Z",
+            "version": 1
+          },
+          {
+            "rowId": "draft-pack-hikes/6",
+            "block": 6,
+            "businessId": "biz-pet-boarding",
+            "outcome": "answered",
+            "factsOn": ["plans"],
+            "switchesOn": [],
+            "answeredAt": "2026-10-26T14:04:00Z",
+            "version": 1
+          },
+          {
+            "rowId": "draft-pack-hikes/8",
+            "block": 8,
+            "businessId": "biz-pet-boarding",
+            "outcome": "answered",
+            "factsOn": ["animals"],
+            "switchesOn": [],
+            "answeredAt": "2026-10-26T14:05:00Z",
+            "version": 1
+          },
+          {
+            "rowId": "draft-pack-hikes/12",
+            "block": 12,
+            "businessId": "biz-pet-boarding",
+            "outcome": "answered",
+            "factsOn": ["groups"],
+            "switchesOn": [],
+            "answeredAt": "2026-10-26T14:06:00Z",
+            "version": 1
+          },
+          {
+            "rowId": "draft-pack-hikes/14",
+            "block": 14,
+            "businessId": "biz-pet-boarding",
+            "outcome": "answered",
+            "factsOn": ["dropoff"],
+            "switchesOn": [],
+            "answeredAt": "2026-10-26T14:07:00Z",
+            "version": 1
+          }
+        ]
+      }
+    }
+  ],
+  "companies": []
+}

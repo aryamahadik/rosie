@@ -1,0 +1,71 @@
+{
+  "result": "kindCatalog",
+  "readAt": "2026-10-26T14:10:00Z",
+  "kinds": [
+    {
+      "id": "barber",
+      "name": "Barber",
+      "style": "Chair",
+      "pattern": "chair",
+      "source": "trade_file",
+      "version": 1,
+      "facts": ["children", "documents", "extrawork", "groups", "photos"]
+    },
+    {
+      "id": "boarding",
+      "name": "Pet boarding and doggy daycare",
+      "style": "Drop-off",
+      "pattern": "dropoff",
+      "source": "trade_file",
+      "version": 1
+    },
+    {
+      "id": "dog-walker",
+      "name": "Dog walking",
+      "style": "Set service",
+      "pattern": "service",
+      "source": "trade_file",
+      "version": 1
+    },
+    {
+      "id": "electrician",
+      "name": "Electrician",
+      "style": "Home visit",
+      "pattern": "fix",
+      "source": "trade_file",
+      "version": 1
+    },
+    {
+      "id": "insurance",
+      "name": "Insurance agent",
+      "style": "Consult",
+      "pattern": "consult",
+      "source": "trade_file",
+      "version": 1
+    },
+    {
+      "id": "movers",
+      "name": "Movers",
+      "style": "Project",
+      "pattern": "project",
+      "source": "trade_file",
+      "version": 1
+    },
+    {
+      "id": "plumber",
+      "name": "Plumber",
+      "style": "Home visit",
+      "pattern": "fix",
+      "source": "trade_file",
+      "version": 1
+    },
+    {
+      "id": "yoga",
+      "name": "Yoga studio",
+      "style": "Class",
+      "pattern": "class",
+      "source": "trade_file",
+      "version": 1
+    }
+  ]
+}

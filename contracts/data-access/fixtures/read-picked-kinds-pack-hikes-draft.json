@@ -1,0 +1,105 @@
+{
+  "call": "readPickedKinds",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["kinds-of-work/seed-new-work-draft.json"],
+    "after": [],
+    "now": "2026-10-26T14:10:00Z",
+    "note": "The pet boarding business's kinds of work after Sam's NEW 'pack hikes' (S11-58), which no listed kind matched, so S1-03 drafted it (README item 79). K-24's seed-new-work-draft holds the pick, outcome new_work, of the drafted kind new-pack-hikes, with no company yet and the pet boarding business, its draft in review at version 2, and the six checklist blocks Sam answered (block 3 a clear no, blocks 4, 6, 8, 12 and 14 answered, each with the facts it set); its chain loads K-23's seed-place-or-thing. The pick is answered with its draft and the draft's blocks in block order, each block with its outcome, facts and switches and never the owner's words (default 176); no text block is loaded for a drafted kind here; the business holds no company in these seeds."
+  },
+  "request": {
+    "businessId": "biz-pet-boarding",
+    "personId": "person-sam"
+  },
+  "outcome": {
+    "result": "pickedKinds",
+    "businessId": "biz-pet-boarding",
+    "personId": "person-sam",
+    "readAt": "2026-10-26T14:10:00Z",
+    "picks": [
+      {
+        "id": "pick-sam-pack-hikes",
+        "ownerPersonId": "person-sam",
+        "position": 1,
+        "words": "pack hikes",
+        "outcome": "new_work",
+        "kindId": "new-pack-hikes",
+        "companyId": null,
+        "businessId": "biz-pet-boarding",
+        "pickedAt": "2026-10-26T14:00:00Z",
+        "version": 1,
+        "texts": [],
+        "draft": {
+          "id": "draft-pack-hikes",
+          "businessId": "biz-pet-boarding",
+          "state": "in_review",
+          "draftedAt": "2026-10-26T14:01:00Z",
+          "version": 2,
+          "blocks": [
+            {
+              "rowId": "draft-pack-hikes/3",
+              "block": 3,
+              "businessId": "biz-pet-boarding",
+              "outcome": "no",
+              "factsOn": [],
+              "switchesOn": [],
+              "answeredAt": "2026-10-26T14:02:00Z",
+              "version": 1
+            },
+            {
+              "rowId": "draft-pack-hikes/4",
+              "block": 4,
+              "businessId": "biz-pet-boarding",
+              "outcome": "answered",
+              "factsOn": ["forms", "firststeps"],
+              "switchesOn": [],
+              "answeredAt": "2026-10-26T14:03:00Z",
+              "version": 1
+            },
+            {
+              "rowId": "draft-pack-hikes/6",
+              "block": 6,
+              "businessId": "biz-pet-boarding",
+              "outcome": "answered",
+              "factsOn": ["plans"],
+              "switchesOn": [],
+              "answeredAt": "2026-10-26T14:04:00Z",
+              "version": 1
+            },
+            {
+              "rowId": "draft-pack-hikes/8",
+              "block": 8,
+              "businessId": "biz-pet-boarding",
+              "outcome": "answered",
+              "factsOn": ["animals"],
+              "switchesOn": [],
+              "answeredAt": "2026-10-26T14:05:00Z",
+              "version": 1
+            },
+            {
+              "rowId": "draft-pack-hikes/12",
+              "block": 12,
+              "businessId": "biz-pet-boarding",
+              "outcome": "answered",
+              "factsOn": ["groups"],
+              "switchesOn": [],
+              "answeredAt": "2026-10-26T14:06:00Z",
+              "version": 1
+            },
+            {
+              "rowId": "draft-pack-hikes/14",
+              "block": 14,
+              "businessId": "biz-pet-boarding",
+              "outcome": "answered",
+              "factsOn": ["dropoff"],
+              "switchesOn": [],
+              "answeredAt": "2026-10-26T14:07:00Z",
+              "version": 1
+            }
+          ]
+        }
+      }
+    ],
+    "companies": []
+  }
+}

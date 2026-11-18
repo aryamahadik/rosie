@@ -1,0 +1,132 @@
+{
+  "call": "readPickedKinds",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["kinds-of-work/seed-kinds-sample.json"],
+    "after": [],
+    "now": "2026-10-19T18:08:00Z",
+    "note": "Sam's kinds of work at his S1-04 turn, before S1-04 places them and before S1-09 gives a business: a sign-up's rows, which no business scope sees, read on the runtime side for the call's own person (README item 79). No frozen seed holds a sign-up's picks with no business, so the database side writes these rows itself before the read, as v1.11's fixtures list theirs: K-24's seed-business-kinds' three picks (pick-sam-barbershop, pick-sam-plumbing and pick-sam-electrical: Sam's 'Barbershop, plumbing, electrical' at 18:05:00Z, positions 1 to 3, listed as barber, plumber and electrician) with company_id and business_id null and version 1, and pick-sam-barbershop's eleven text blocks as that seed holds them, each with business_id null and version 1. That is S1-02's commit, which walks through the automatic S1-11 for the first kind named (K-09 commit-s1-02.json), before S1-04 places the picks (K-24 README 'Order of sign-up'). The picks come in the order named; the barbershop's text blocks by their keys and versions, never their text; plumbing and electrical have none yet (S1-11: 'when Sam gets to them'); no pick is new work, so no draft; and Sam has no company yet."
+  },
+  "request": {
+    "businessId": null,
+    "personId": "person-sam"
+  },
+  "outcome": {
+    "result": "pickedKinds",
+    "businessId": null,
+    "personId": "person-sam",
+    "readAt": "2026-10-19T18:08:00Z",
+    "picks": [
+      {
+        "id": "pick-sam-barbershop",
+        "ownerPersonId": "person-sam",
+        "position": 1,
+        "words": "Barbershop",
+        "outcome": "listed",
+        "kindId": "barber",
+        "companyId": null,
+        "businessId": null,
+        "pickedAt": "2026-10-19T18:05:00Z",
+        "version": 1,
+        "texts": [
+          {
+            "rowId": "pick-sam-barbershop/pf.edges",
+            "pfKey": "pf.edges",
+            "businessId": null,
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.first_steps",
+            "pfKey": "pf.first_steps",
+            "businessId": null,
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.license",
+            "pfKey": "pf.license",
+            "businessId": null,
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.messages",
+            "pfKey": "pf.messages",
+            "businessId": null,
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.money",
+            "pfKey": "pf.money",
+            "businessId": null,
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.questions",
+            "pfKey": "pf.questions",
+            "businessId": null,
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.rules",
+            "pfKey": "pf.rules",
+            "businessId": null,
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.safety",
+            "pfKey": "pf.safety",
+            "businessId": null,
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.services",
+            "pfKey": "pf.services",
+            "businessId": null,
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.staff",
+            "pfKey": "pf.staff",
+            "businessId": null,
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.visit",
+            "pfKey": "pf.visit",
+            "businessId": null,
+            "version": 1
+          }
+        ],
+        "draft": null
+      },
+      {
+        "id": "pick-sam-plumbing",
+        "ownerPersonId": "person-sam",
+        "position": 2,
+        "words": "plumbing",
+        "outcome": "listed",
+        "kindId": "plumber",
+        "companyId": null,
+        "businessId": null,
+        "pickedAt": "2026-10-19T18:05:00Z",
+        "version": 1,
+        "texts": [],
+        "draft": null
+      },
+      {
+        "id": "pick-sam-electrical",
+        "ownerPersonId": "person-sam",
+        "position": 3,
+        "words": "electrical",
+        "outcome": "listed",
+        "kindId": "electrician",
+        "companyId": null,
+        "businessId": null,
+        "pickedAt": "2026-10-19T18:05:00Z",
+        "version": 1,
+        "texts": [],
+        "draft": null
+      }
+    ],
+    "companies": []
+  }
+}
