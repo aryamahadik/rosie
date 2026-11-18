@@ -49,7 +49,8 @@
 //     guards left out), of round 5's shapes (ROUND5_SHAPES), of S12-19's passive wordings (S12_19_SHAPES, DL-926), and
 //     every check verb with a negation within 3 words before it across a separator, that stays in a compiled text (the
 //     trade as C7 leaves it: its marks, then its step in the frame) is in ALLOWED with its one reason (a true negation,
-//     no paper, lead note 12, or C4's verify-only branch), in FIRST_SIDES, in MESSAGES_WAITING (CQ-347's, DL-904) or in
+//     no paper, lead note 12, or C4's verify-only branch), in FIRST_SIDES (a first side that matches master text,
+//     default 4) or NO_MASTER_LINE (one that matches none, T-1439), in MESSAGES_WAITING (CQ-347's, DL-904) or in
 //     MESSAGES_NEED, which is empty: the six messages it held (notary.json's card, DL-913; dog-walker's two S11-50
 //     records results and the three S1-38 first-person lines of tires, vehicle-wrap and window-tint, DL-916) get their
 //     words with the claim dropped from C7's step in the frame (c7.ts MESSAGE_LINES, T-1435), each pinned by its raw
@@ -77,9 +78,13 @@
 // within 1 business day": 25 trade files rename the master's line, laundry, shoe-repair and upholstery keeping "our team
 // checks it", and 9 carry it in the say messages of words ops at S1-33, round 2's count) sit on C4's verify-only branch,
 // switched off while verify is off, so no person reads them; C4 and T-147's markers cover them, and C7 leaves them as
-// written (DL-894). Rename pairs whose first side matches no master line (vehicle-wrap.json:413-414,
-// window-tint.json:440-441, the security reviewer's round 4 new task) are a later card's; C7 reads their new sides as it
-// reads every new side (DL-916 item 26).
+// written (DL-894). Rename pairs whose first side matches no master text (28,568 in fixture set v1: vehicle-wrap.json:
+// 413-414 and window-tint.json:440-441, the security reviewer's round 4 new task, and the "Everyone's licenses are
+// confirmed on the ... lookup." first sides of 17 trade files, its round 5 note b, among them) are listed by T-1439's lint
+// (lint/first-sides.ts, which also reads, by compiling, what a person reads where they were meant to rename); C7 reads
+// their new sides as it reads every new side (DL-916 item 26), and the exhaustive scan lists the hits on their first sides
+// in NO_MASTER_LINE, apart from FIRST_SIDES: default 4 (the master's own line) holds only for a first side that matches
+// master text.
 import { describe, expect, it, vi } from "vitest";
 import type { FlowLetter } from "../graph/types.ts";
 import { buildBundle } from "../emit";
@@ -87,6 +92,7 @@ import { MASTER_TRADE, masterShape } from "../emit/flow";
 import { correctWordsOps, type CorrectedOps } from "../emit/words-corrections";
 import { loadMaster } from "../load/flow";
 import { listTradeIds, loadTrade, type LoadedTrade, type TradeOp } from "../load/trade";
+import { firstSideFindings, tradeText } from "../lint/first-sides";
 import { applyTrade } from "../overlay/apply";
 import {
   C7ClaimError,
@@ -2846,8 +2852,42 @@ const ALLOWED: Readonly<Record<string, readonly string[]>> = {
   ],
 };
 
-/** The hits on a rename's or a swap's first side: the master's own line it matches, never changed (default 4). */
+/**
+ * The hits on a rename's or a swap's first side that matches master text: the master's own line it matches, never
+ * changed (default 4). A first side that matches none is NO_MASTER_LINE's (T-1439).
+ */
 const FIRST_SIDES: readonly string[] = [
+  "Avery's license is checked again when the lookup answers.",
+  "Avery's license shows as expired on the official lookup.",
+  "Casey's license is checked again when the lookup answers.",
+  "Casey's license shows as expired on the official lookup.",
+  "Dev's license is checked again when the lookup answers.",
+  "Every license, permit or certificate the work needs is checked on the official lookup the plug-in names.",
+  "Felix's license is checked again when the lookup answers.",
+  "Licenses are checked again every 30 days, before each end date, and the day the license holder leaves or the owner changes.",
+  "Lou's card is checked again when the lookup answers.",
+  "Milo's license is checked again",
+  "New bookings for it pause until the license checks out again.",
+  "On that day, Rosie checks it's ready.",
+  "Ravi's license is checked again when the lookup answers.",
+  "That day, the license is checked again on the lookup the plug-in names.",
+  "The lookup shows the license as expired.",
+  "The owner sends a photo of the class schedule, and Rosie reads it back.",
+  "Your license shows as expired on the official lookup, so Lee Home Services can't book you until it shows renewed.",
+  "Your license shows as expired on the official lookup, so Lee's Barbershop can't book you until it shows renewed.",
+  "checked from photos",
+];
+
+/**
+ * The hits on the first side of a pair T-1439's lint lists (lint/first-sides.ts firstSideFindings): its first side
+ * matches no text the master or the trade's own ops lay at its flow, so the pair renames nothing and no person reads
+ * either side; default 4 (the master's own line) does not hold for it, so it is not in FIRST_SIDES. The same for a
+ * rename whose first side matches the trade's own ops' words alone (the lint's ownOps): renames run before the ops, so
+ * it renames nothing either. The lint gives each listed pair its reason and its place, and reads, by compiling, that a
+ * person reads no check claim where it was meant to rename (lint/first-sides.test.ts). A sentence on a first side that
+ * matches master text in one trade and on one that matches none in another is in both lists (11 of them).
+ */
+const NO_MASTER_LINE: readonly string[] = [
   "A license holder confirms it on their own secure page when they join, or Rosie's team checks.",
   "A license shows as 'checked by Rosie' only after Rosie read it on the state's lookup, with the date.",
   "AI assistants can book it once your electrician's own license checks out.",
@@ -2866,12 +2906,10 @@ const FIRST_SIDES: readonly string[] = [
   "Customers can book it once a barber's own license checks out.",
   "Customers see the shop once a barber's license checks out and Sam says yes.",
   "Customers see the studio once a teacher's license checks out and Sam says yes.",
-  "Dev's license is checked again when the lookup answers.",
   "Each is checked on the lookup the plug-in names.",
   "Each license is checked the moment it's added on the secure page, after the person's YES.",
   "Each person is offered once their own license checks out and the owner says yes.",
   "Eli's license checked out on the second state's lookup.",
-  "Every license, permit or certificate the work needs is checked on the official lookup the plug-in names.",
   "Everyone's licenses are confirmed on the official lookup.",
   "Felix's license is checked again when the lookup answers.",
   "Felix's license shows as expired on the state's lookup.",
@@ -2887,16 +2925,13 @@ const FIRST_SIDES: readonly string[] = [
   "Its license checked out.",
   "Jordan's license checked out on the second state's lookup.",
   "Leo's license checked out on the second state's lookup.",
-  "Licenses are checked again every 30 days, before each end date, and the day the license holder leaves or the owner changes.",
   "Licenses: Checked by Rosie on the state's lookup, Oct 19",
   "Lou's card is checked again when the lookup answers.",
   "Luis's license checked out on the second state's lookup.",
   "Marcus's license checked out on the second state's lookup.",
   "Means 'Doesn't match': the lookup has no license with that number and name.",
   "Milo's license is checked again",
-  "New bookings for it pause until the license checks out again.",
   "Nobody is offered to customers until their license is confirmed and Sam says yes.",
-  "On that day, Rosie checks it's ready.",
   "Once Jordan's license checks out and you say yes",
   "Once your electrician's license checks out and you say yes",
   "Quinn can be booked once the license checks out on the state's lookup, and Sam says yes.",
@@ -2916,11 +2951,9 @@ const FIRST_SIDES: readonly string[] = [
   "Sam sends a photo of the license, and Rosie checks it again right away.",
   "Sam sends a photo of the license, and it is shown as given, not checked by Rosie.",
   "Sam's own license was checked at sign-up.",
-  "That day, the license is checked again on the lookup the plug-in names.",
   "The license is checked again that day.",
   "The licenses check out;",
   "The lookup shows the license as expired.",
-  "The owner sends a photo of the class schedule, and Rosie reads it back.",
   "The shop's own license is checked first.",
   "The state's lookup doesn't find license MP045210 under Sam's name.",
   "The state's lookup has no license with the number Avery sent.",
@@ -2942,10 +2975,34 @@ const FIRST_SIDES: readonly string[] = [
   "Your license shows as expired on the state's lookup, so Lee Private Yoga can't book you until it shows renewed.",
   "Your license shows as expired on the state's lookup, so Lee's Barbershop can't book you until it shows renewed.",
   "Your license, checked while you go on",
-  "checked from photos",
   "license checked out on the second state's lookup.",
   "licenses only as checked,",
 ];
+
+/**
+ * The rename pairs whose first side matches no master text, as `<trade> <flow> <index>`, made once: those T-1439's lint
+ * lists, and those whose first side matches the trade's own ops' words alone (its report's ownOps), which come after
+ * the renames.
+ */
+let listedMemo: ReadonlySet<string> | null = null;
+
+/** Whether a text lies on the first side of a rename pair whose first side matches no master text (`A.rename[7][0]`). */
+function listedFirstSide(id: string, where: string): boolean {
+  const found = /^([AB])\.rename\[(\d+)\]\[0\]$/.exec(where);
+  if (found === null) return false;
+  if (listedMemo === null) {
+    const lint = firstSideFindings(
+      master,
+      ALL.map((one) => ({ trade: loadTrade(one), text: tradeText(one) })),
+    );
+    listedMemo = new Set(
+      [...lint.findings.filter((one) => one.kind === "rename"), ...lint.ownOps].map(
+        (one) => `${one.trade} ${one.flow} ${String(one.path[2])}`,
+      ),
+    );
+  }
+  return listedMemo.has(`${id} ${found[1] ?? ""} ${found[2] ?? ""}`);
+}
 
 /** A negation word, as c7.ts reads one. */
 const NEGATION_WORD = /\b(?:never|not|no|nor|cannot|nothing|none|nobody)\b|n't\b/i;
@@ -3192,6 +3249,7 @@ describe("C7's exhaustive scan (DL-901 item 16)", () => {
   it("leaves unmarked only the allow list's hits, each with its one reason, the first sides and the six messages that wait, and no message that claims a check (round 5's shapes too, DL-916 item 26; S12-19's, DL-926; T-1435)", () => {
     const found = new Map<string, { hits: number; files: Set<string> }>();
     const firstSides = new Map<string, { hits: number; files: Set<string> }>();
+    const noMasterLine = new Map<string, { hits: number; files: Set<string> }>();
     const waits: string[] = [];
     const verifyOnly = new Set<string>();
     // The trades as C7 leaves them in the bundle: its marks, then its step in the frame (the six messages' words).
@@ -3203,7 +3261,8 @@ describe("C7's exhaustive scan (DL-901 item 16)", () => {
             continue;
           }
           if (hit.verifyOnly) verifyOnly.add(hit.sentence);
-          const bucket = hit.first ? firstSides : found;
+          // A first side is the master's own line (default 4) only where it matches master text (T-1439).
+          const bucket = hit.first ? (listedFirstSide(id, leaf.where) ? noMasterLine : firstSides) : found;
           const entry = bucket.get(hit.sentence) ?? { hits: 0, files: new Set<string>() };
           entry.hits++;
           entry.files.add(id);
@@ -3220,6 +3279,7 @@ describe("C7's exhaustive scan (DL-901 item 16)", () => {
     expect(reasonOf.size, "each sentence is listed once, with one reason").toBe(listed.length);
     expect([...found.keys()].sort()).toStrictEqual(listed.map(([sentence]) => sentence).sort());
     expect([...firstSides.keys()].sort()).toStrictEqual([...FIRST_SIDES].sort());
+    expect([...noMasterLine.keys()].sort()).toStrictEqual([...NO_MASTER_LINE].sort());
     // Each hit of round 5's shapes or S12-19's in an op at one of C4's verify-only steps is listed with that reason, and
     // only those are (DL-916 item 25; DL-926).
     expect([...verifyOnly].sort()).toStrictEqual([...(ALLOWED[VERIFY_ONLY] ?? [])].sort());
@@ -3235,6 +3295,8 @@ describe("C7's exhaustive scan (DL-901 item 16)", () => {
     };
     for (const [sentence, entry] of found) add(kind(reasonOf.get(sentence) ?? ""), entry);
     for (const entry of firstSides.values()) add("a rename's first side", entry);
+    for (const entry of noMasterLine.values())
+      add("a first side that matches no master text (T-1439)", entry);
     const counts = Object.fromEntries(
       Object.entries(tally).map(([reason, one]) => [
         reason,
@@ -3248,10 +3310,15 @@ describe("C7's exhaustive scan (DL-901 item 16)", () => {
           "hits": 66,
           "sentences": 33,
         },
+        "a first side that matches no master text (T-1439)": {
+          "files": 38,
+          "hits": 618,
+          "sentences": 89,
+        },
         "a rename's first side": {
-          "files": 71,
-          "hits": 828,
-          "sentences": 97,
+          "files": 50,
+          "hits": 210,
+          "sentences": 19,
         },
         "lead note 12": {
           "files": 1,
