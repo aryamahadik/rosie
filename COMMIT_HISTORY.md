@@ -2,9 +2,75 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 753, [`67f851b`](https://github.com/aryamahadik/rosie/commit/67f851b), 2026-11-18 02:05:32 UTC.
+- **Through:** commit 756, [`17d358e`](https://github.com/aryamahadik/rosie/commit/17d358e), 2026-11-18 02:47:48 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 756. docs: COMMIT\_HISTORY.md through commit 753 (67f851b, \#764) (\#767)
+
+- **Commit:** [`17d358e`](https://github.com/aryamahadik/rosie/commit/17d358e), by Arya Mahadik, 2026-11-18 02:47:48 UTC
+- **Pull request:** [#767](https://github.com/aryamahadik/rosie/pull/767) from `task/commit-history-167`, merged 2026-11-18 02:47:48 UTC. It squashed 1 branch commit:
+  - `04d727f` docs: COMMIT\_HISTORY.md through commit 753 (67f851b, \#764)
+- **Files changed:** 1 (+89 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +89 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 755. T-1442: a K-36 state write naming a clock or outbox row of its own commit is written after those rows (commitIn's write order, default 17), with the hand-off, repeating page and refusal cases in commit-turn.int.test.ts (\#766)
+
+- **Commit:** [`2b06275`](https://github.com/aryamahadik/rosie/commit/2b06275), by Arya Mahadik, 2026-11-18 02:47:44 UTC
+- **Pull request:** [#766](https://github.com/aryamahadik/rosie/pull/766) from `task/T-1442`, merged 2026-11-18 02:47:44 UTC. It squashed 1 branch commit:
+  - `be26799` T-1442: a K-36 state write naming a clock or outbox row of its own co…
+- **Files changed:** 2 (+707 −4), by folder:
+  - `db/repo/` commit-turn.int.test.ts +619 −0, commit-turn.ts +88 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 754. T-1436: send-state reads the setup rows versions\_read names, through one shared rowBound (round 2) (\#765)
+
+- **Commit:** [`ee4eefb`](https://github.com/aryamahadik/rosie/commit/ee4eefb), by Arya Mahadik, 2026-11-18 02:47:39 UTC
+- **Pull request:** [#765](https://github.com/aryamahadik/rosie/pull/765) from `task/T-1436`, merged 2026-11-18 02:47:39 UTC. It squashed 4 branch commits:
+  - `ff85f9d` T-1436: sendState reads the setup rows an outbox row's versions\_read …
+  - `f4a935d` T-1436: the every-home test names its business plainly (lint: no-unne…
+  - `1853e8e` Merge branch 'main' into task/T-1436
+  - `3615f7d` T-1436: one shared rowBound: moved into setup/fact-homes.ts and expor…
+- **Files changed:** 4 (+909 −84), by folder:
+  - `db/repo/` send-state.int.test.ts +700 −0, send-state.ts +117 −19
+  - `db/repo/setup/` fact-homes.ts +83 −1, turn-state.ts +9 −64
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1436: sendState reads the setup rows an outbox row's versions_read names, within the row's business and its turn's people, instead of throwing
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1436: the every-home test names its business plainly (lint: no-unnecessary-template-expression)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1436: one shared rowBound: moved into setup/fact-homes.ts and exported with the business and the people subquery as parameters; readTurnState and sendState both call it, send-state.ts's copy deleted (DL-938, DL-941)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 753. docs: COMMIT\_HISTORY.md through commit 750 (180b57d, \#761) (\#764)
 
