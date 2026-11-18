@@ -15,12 +15,13 @@
 //      longer possible: say what changed (saidWhatChanged, questionClosed). A call with no turn (a secure page, an own
 //      AI, a job) has no handle to read it on: what a page or a bound token showed is K-21's and T-328's, neither built,
 //      so limit 4 answers notBuilt and the gate refuses the whole call (fail closed).
-//   3. The reload: every row the question showed (limit 5's rows aside, below), read again now. None moved: pass. The
-//      commit then compares and sets every one of them at the version shown (`compareAndSet`, K-05 v1 versionsRead; the
-//      walk hands them to the commit: the commit's writesOf), so a commit made between this read and the commit is refused
-//      with the rows that changed (K-05 v1 versionChanged), and the commit gates once more (T-305 GATE_RUNS: "reloads once
-//      and gates again"), where this limit reloads again. A conflict on a row the read-back never showed leaves every
-//      shown row as it was: nothing shown changed, so the part commits on that second run.
+//   3. The reload: every row the question showed (limit 5's rows aside, below), read again now, a setup row within the
+//      question row's own bound (default 7). None moved: pass. The commit then compares and sets every one of them at the
+//      version shown (`compareAndSet`, K-05 v1 versionsRead; the walk hands them to the commit: the commit's writesOf), so
+//      a commit made between this read and the commit is refused with the rows that changed (K-05 v1 versionChanged), and
+//      the commit gates once more (T-305 GATE_RUNS: "reloads once and gates again"), where this limit reloads again. A
+//      conflict on a row the read-back never showed leaves every shown row as it was: nothing shown changed, so the part
+//      commits on that second run.
 //   4. Something shown moved (another version, or the row is gone):
 //        - a question already asked again (ask count 2 or more: its fresh yes went out) has had its conflict: this second
 //          conflict on one question goes to a person (toPerson), with a review item; never a third try;
@@ -57,10 +58,17 @@
 //      empty), so compare-and-set on every row it was shown holds with none to compare: nothing shown changed, so it
 //      commits (arch 06 line 305), with no row to compare and set and nothing read. Every other door, and a sign-up door
 //      that names a booking (not the door K-02 v1.1 shapes), stays notChecked as before (step 1).
+//   7. T-1448 (DL-938; T-1436's open question 3 and its security reviewer's note b): the reload reads every row shown
+//      within the bound of the stored question row (setupBoundOf): its business (open_questions.business_id) and the turn
+//      that wrote it (open_questions.turn_id), whose handle's people a person's setup row must be of, as sendState binds
+//      the outbox row its turn wrote (db/repo/send-state.ts default 1: the handle whose turn read the rows). Both come from
+//      the row as K-05 reads it, never from the request: not the caller's business, nor the turn now answering. A setup
+//      row outside the bound reads as gone (a row shown is gone: no longer possible, step 4), and a moved one as changed;
+//      a core row is read as before, so a question that names no setup row gives what it gave before.
 
 import type { Choice, Context, GatePart, GateTurn, LimitOutcomes } from "../framework";
-import type { AskedQuestion, QuestionReader, RowRef } from "../limit-3/facts";
-import type { BookingStage, TodayReader } from "./facts";
+import type { AskedQuestion, RowRef } from "../limit-3/facts";
+import type { BookingStage, SetupBound, StoredQuestion, StoredQuestionReader, TodayReader } from "./facts";
 
 /** Limit 4's outcomes when it fails (K-09 v1 limit4Outcome). */
 export type Limit4Outcome = LimitOutcomes[4];
@@ -162,7 +170,7 @@ export type VersionsDecision =
 
 /** What the rule reads, made only when it needs them. */
 export interface VersionsPorts {
-  readonly questions: () => QuestionReader;
+  readonly questions: () => StoredQuestionReader;
   readonly today: () => TodayReader;
 }
 
@@ -188,6 +196,14 @@ export function compareAndSetOf(question: AskedQuestion): RowRef[] {
     rows.push({ table: row.table, rowId: row.rowId, version: row.version });
   }
   return rows;
+}
+
+/**
+ * Where the reload reads the setup rows `question` showed (default 7): the stored row's business and the turn that wrote
+ * it, never the request's.
+ */
+export function setupBoundOf(question: StoredQuestion): SetupBound {
+  return { businessId: question.businessId, turnId: question.turnId };
 }
 
 /** The rows shown that moved: another version now, or gone (left out of today's read). */
@@ -223,7 +239,7 @@ async function liveOn(
   ports: VersionsPorts,
   handleId: string,
   questionId: string,
-): Promise<AskedQuestion | null> {
+): Promise<StoredQuestion | null> {
   const found = await ports.questions().liveQuestion(handleId, questionId);
   return found !== null && found.handleId === handleId ? found : null;
 }
@@ -295,9 +311,9 @@ export async function decideVersions(
     };
   }
 
-  // 3. The reload: every row it showed, read again now.
+  // 3. The reload: every row it showed, read again now, within the stored row's own bound (default 7).
   const shown = compareAndSetOf(question);
-  const today = shown.length === 0 ? [] : await ports.today().currentVersions(shown);
+  const today = shown.length === 0 ? [] : await ports.today().currentVersions(shown, setupBoundOf(question));
   const changed = changedRows(shown, today);
   if (changed.length === 0) return { result: "pass", compareAndSet: shown };
 

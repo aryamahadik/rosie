@@ -4,7 +4,8 @@
 // versions.ts; what it reads is facts.ts.
 //
 // `limit4` reads through the call's database transaction (the Tool API's scoped repo): the open questions as limit 3
-// reads them, and today's versions and booking heads. createLimit4 takes other ports, as the tests do.
+// reads them, each with the turn that wrote its row (T-1448), and today's versions, within the stored question row's
+// bound, and booking heads. createLimit4 takes other ports, as the tests do.
 //
 // What the commit reads from it (T-305's commit and the walk that builds a passed part's writes):
 //   - decide(part, turn).compareAndSet on a pass: the rows the commit compares and sets for the part, at the versions
@@ -13,13 +14,21 @@
 //     writer writes.
 
 import type { GatePart, GateTurn, Limit, LimitVerdict } from "../framework";
-import { questionReaderOf, type QuestionReader } from "../limit-3/facts";
-import { databaseOf, todayReaderOf, type TodayReader } from "./facts";
+import {
+  databaseOf,
+  storedQuestionReaderOf,
+  todayReaderOf,
+  type StoredQuestionReader,
+  type TodayReader,
+} from "./facts";
 import { decideVersions, type VersionsDecision, type VersionsPorts } from "./versions";
 
 export interface Limit4Deps {
-  /** The open questions' read on the call's repo. Default: limit 3's reader on the call's transaction. */
-  readonly questions?: (repo: unknown) => QuestionReader;
+  /**
+   * The open questions' read on the call's repo. Default: limit 3's read on the call's transaction, each row with its
+   * turn (facts.ts storedQuestionReaderOf).
+   */
+  readonly questions?: (repo: unknown) => StoredQuestionReader;
   /** Today's versions and booking heads on the call's repo. Default: the data-access calls on its transaction. */
   readonly today?: (repo: unknown) => TodayReader;
 }
@@ -54,7 +63,7 @@ function once<T>(make: () => T): () => T {
 }
 
 export function createLimit4(deps: Limit4Deps = {}): VersionsLimit {
-  const questionsOf = deps.questions ?? ((repo: unknown) => questionReaderOf(databaseOf(repo)));
+  const questionsOf = deps.questions ?? ((repo: unknown) => storedQuestionReaderOf(databaseOf(repo)));
   const todayOf = deps.today ?? ((repo: unknown) => todayReaderOf(databaseOf(repo)));
   const decide = (part: GatePart, turn: GateTurn): Promise<VersionsDecision> => {
     const ports: VersionsPorts = {
@@ -84,6 +93,7 @@ export {
   decideVersions,
   freshYesOutcome,
   saidWhatChangedOutcome,
+  setupBoundOf,
   toPersonOutcome,
   type ChangedRow,
   type FreshYes,
@@ -95,4 +105,14 @@ export {
   type VersionsDecision,
   type VersionsPorts,
 } from "./versions";
-export { databaseOf, todayReaderOf, type BookingNow, type BookingStage, type TodayReader } from "./facts";
+export {
+  databaseOf,
+  storedQuestionReaderOf,
+  todayReaderOf,
+  type BookingNow,
+  type BookingStage,
+  type SetupBound,
+  type StoredQuestion,
+  type StoredQuestionReader,
+  type TodayReader,
+} from "./facts";
