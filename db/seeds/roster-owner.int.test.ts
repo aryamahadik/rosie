@@ -4,13 +4,15 @@
 //
 // The card's proofs: a roster number with no handle yet gets its person, handle, link, business head, company and kind
 // of work; a roster number whose handle was made at first sight (by the gateway's own key call, handleSealingKey) keeps
-// that handle and person and gets the business, company and kind; after either, K-05's readTurnParty answers atBusiness
-// with the set's business and handleTargets a first text, both read as the runtime reads them (a client of this file's
-// own whose connections run as rosie_job with no business scope). Each refusal writes nothing for any number: two people
-// on the handle, a role (live or ended), a company, an open question, a booking, a phone row (the one openChatOnText
-// writes at receipt among them) and an ill-formed list. A second run writes nothing. The skeleton and staging-core sets,
-// run before or after it, write what they write on a fresh schema and keep it after. The runner finds the set by its
-// name and prints counts alone.
+// that handle and person and gets the business, company and kind, and so does one whose chat its first text's receipt
+// opened (the real openChatOnText's phone row, which the set adopts as it is: round 2's ruling, DL-948); after any of
+// them, K-05's readTurnParty answers atBusiness with the set's business and handleTargets a first text, both read as the
+// runtime reads them (a client of this file's own whose connections run as rosie_job with no business scope). Each
+// refusal writes nothing for any number: two people on the handle, a role (live or ended), a company, an open question,
+// a booking, every phone row but the one openChatOnText's insert leaves (stopped, and each of stop_at, start_at,
+// optout_line_delivered_at, linq_contact_added_at and poll_voted_at set; round 2 replaced run 1's refusal of that row)
+// and an ill-formed list. A second run writes nothing. The skeleton and staging-core sets, run before or after it, write
+// what they write on a fresh schema and keep it after. The runner finds the set by its name and prints counts alone.
 //
 // What the rows must be is read here from the skeleton seed's rows (T-1148, which its own test checks against K-04's
 // seed-business-head.json and K-23's seed-company-two-kinds.json) and the frozen K-05 fixtures (targets-first-text.json,
@@ -23,9 +25,16 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { openChatOnText } from "../repo/chat-open";
+import { openChatOnText, type OpenChatOnTextInserted } from "../repo/chat-open";
 import { resolvePrimaryUrl } from "../repo/client";
 import { handleSealingKey } from "../repo/handle-keys";
+import {
+  recordLinqContactAdded,
+  recordOptoutLineDelivered,
+  recordPollVoted,
+  startPhone,
+  stopPhone,
+} from "../repo/phones";
 import type { Sql } from "../repo/scope";
 import { handleTargets, type HandleTargetsResponse } from "../repo/targets";
 import { createTestDatabase, type TestDatabase } from "../repo/test-db";
@@ -213,6 +222,29 @@ async function firstSight(
   return { handleId: result.outcome.handleId, personId: result.outcome.personId };
 }
 
+/** When a roster phone's first text reached the gateway, in these tests. */
+const FIRST_TEXT_AT = "2026-11-18T00:02:00Z";
+/** handleTargets' phone (K-05 v1.2 phoneFlags) for the row openChatOnText inserts: not stopped, chat open, version 1. */
+const OPENED_FLAGS = { stopped: false, chatOpen: true, version: 1 };
+
+/**
+ * The gateway's receipt of a number's first text (K-05 v1.7 openChatOnText, called at receipt, before the turn): the
+ * phone row it inserts, its chat open since then by iMessage, not stopped, every other column at K-04's defaults.
+ */
+async function openChat(runtime: Sql, handleId: string, tag: string): Promise<OpenChatOnTextInserted> {
+  const opened = await openChatOnText(runtime, {
+    eventId: `evt-t1450-${tag}`,
+    handleId,
+    service: "imessage",
+    receivedAt: FIRST_TEXT_AT,
+    traceId: `trace-t1450-${tag}`,
+  });
+  if (!("result" in opened) || opened.result !== "inserted") {
+    throw new Error("the first text's receipt inserted no phone row");
+  }
+  return opened;
+}
+
 /** The set's rows for the roster phone at `place`, with the handle and person it found or wrote. */
 function rowsFor(
   place: number,
@@ -305,13 +337,13 @@ function expectNoNumber(text: string, what: string): void {
 
 /**
  * The seed refuses `env`'s list, naming each of `reasons` and no number, and leaves every watched row as it was: nothing
- * is written for any number on the list.
+ * is written for any number on the list. Gives back what it threw.
  */
 async function expectRefused(
   sql: Sql,
   env: Record<string, string>,
   reasons: readonly string[],
-): Promise<void> {
+): Promise<Error> {
   const before = await snapshot(sql);
   const error = await refusal(seedRosterOwner(sql, { env }));
   expect(error).toBeInstanceOf(RosterOwnerSeedError);
@@ -321,6 +353,7 @@ async function expectRefused(
   }
   expectNoNumber(error.message, "the refusal");
   expect(await snapshot(sql)).toEqual(before);
+  return error;
 }
 
 /** Empties every table of this file's schema (truncating the heads cascades to the rest). */
@@ -495,6 +528,92 @@ describe("a roster number with no handle yet, and one whose handle was made at f
       );
 
       const before = await snapshot(db.sql);
+      const second = await seedRosterOwner(db.sql, { env: listOf(PHONE_A) });
+      expect(second.tables).toEqual(countsOf(1, {}));
+      expect(await snapshot(db.sql)).toEqual(before);
+    },
+  );
+
+  it(
+    "made at first sight, its chat opened by its first text's receipt (the real openChatOnText's phone row: stopped false; stop_at, start_at, optout_line_delivered_at, linq_contact_added_at and poll_voted_at null): that handle and person are used and the phone row is left as it was; noBusiness before, atBusiness and a first text after (no role, open question or booking: the doors); the next JOIN's receipt writes nothing and both reads answer the same; a second run writes nothing",
+    SLOW,
+    async () => {
+      const sight = await firstSight(runtime, PHONE_A, "chat-opened");
+      const opened = await openChat(runtime, sight.handleId, "chat-opened");
+      // Staging's state since the roster phone first texted: its handle, its key and its open chat, and its turns run
+      // with no business (open gap 119).
+      expect(await partyOf(runtime, PHONE_A)).toEqual({
+        ...PARTY_FIRST_SIGHT.outcome,
+        handleId: sight.handleId,
+        personId: sight.personId,
+      });
+      const phonesBefore = [...(await db.sql`select * from phones order by number`)];
+      expect(phonesBefore).toEqual([
+        {
+          number: PHONE_A,
+          handle_id: sight.handleId,
+          chat_open: true,
+          chat_open_at: new Date(FIRST_TEXT_AT),
+          chat_way: "imessage",
+          stopped: false,
+          stop_at: null,
+          start_at: null,
+          linq_contact_added_at: null,
+          poll_voted_at: null,
+          optout_line_delivered_at: null,
+          version: 1,
+        },
+      ]);
+      const keysBefore = [...(await db.sql`select * from sealing_keys order by person_id`)];
+
+      const ids = rosterOwnerIds(1);
+      const first = await seedRosterOwner(db.sql, { env: listOf(PHONE_A) });
+      expect(first.ranAs).toBe(RUNTIME_ROLE);
+      expect(first.tables).toEqual(countsOf(1, { businesses: 1, companies: 1, company_kinds: 1 }));
+      expect(first.owners).toEqual([
+        {
+          place: 1,
+          handleId: sight.handleId,
+          personId: sight.personId,
+          businessId: ids.businessId,
+          companyId: ids.companyId,
+        },
+      ]);
+      expect(await rowsOf(db.sql, sight.handleId, sight.personId, 1)).toEqual(
+        rowsFor(1, PHONE_A, sight.handleId, sight.personId),
+      );
+      expect([...(await db.sql`select * from phones order by number`)]).toEqual(phonesBefore);
+      expect([...(await db.sql`select * from sealing_keys order by person_id`)]).toEqual(keysBefore);
+      const firstTextWithChat = {
+        ...firstTextAnswer(sight.handleId, sight.personId),
+        phone: OPENED_FLAGS,
+      };
+      expect(await partyOf(runtime, PHONE_A)).toEqual(
+        atBusiness(sight.handleId, sight.personId, ids.businessId),
+      );
+      expect(await guardRead(runtime, sight.handleId)).toEqual(firstTextWithChat);
+
+      // The roster phone's next JOIN: its receipt finds the chat open and writes nothing, and its turn reads the same.
+      const before = await snapshot(db.sql);
+      const join = await openChatOnText(runtime, {
+        eventId: "evt-t1450-next-join",
+        handleId: sight.handleId,
+        service: "imessage",
+        receivedAt: "2026-11-18T00:30:00Z",
+        traceId: "trace-t1450-next-join",
+      });
+      expect(join).toEqual({
+        result: "alreadyOpen",
+        handleId: sight.handleId,
+        phone: opened.phone,
+        event: null,
+      });
+      expect(await snapshot(db.sql)).toEqual(before);
+      expect(await partyOf(runtime, PHONE_A)).toEqual(
+        atBusiness(sight.handleId, sight.personId, ids.businessId),
+      );
+      expect(await guardRead(runtime, sight.handleId)).toEqual(firstTextWithChat);
+
       const second = await seedRosterOwner(db.sql, { env: listOf(PHONE_A) });
       expect(second.tables).toEqual(countsOf(1, {}));
       expect(await snapshot(db.sql)).toEqual(before);
@@ -758,22 +877,97 @@ describe("never on top of a state where a roster phone's JOIN would not be a fir
     await expectRefused(db.sql, listOf(PHONE_A, PHONE_B), ["entry 2's handle has 1 booking"]);
   });
 
-  it(
-    "a phone row: the one K-05 v1.7 openChatOnText writes at receipt of the number's first text, before its turn (as on staging since the roster phone first texted)",
-    SLOW,
-    async () => {
-      const sight = await firstSight(runtime, PHONE_B, "phone-row");
-      const opened = await openChatOnText(runtime, {
-        eventId: "evt-t1450-first-text",
-        handleId: sight.handleId,
-        service: "imessage",
-        receivedAt: "2026-11-18T00:02:00Z",
-        traceId: "trace-t1450-0000",
-      });
-      expect(opened).toMatchObject({ result: "inserted", handleId: sight.handleId });
-      await expectRefused(db.sql, listOf(PHONE_A, PHONE_B), ["entry 2's handle has a phone row"]);
+  // Every phone row but the one openChatOnText's insert leaves (round 2's ruling, DL-948; it replaces run 1's refusal of
+  // that row, which the set now adopts): each made from that row, by db/repo/phones.ts's own writer where one sets the
+  // column alone, else by an update of that column alone, the version raised as K-04's trigger asks.
+  const STOP_AT = new Date("2026-11-18T00:05:00Z");
+  const START_AT = new Date("2026-11-18T00:06:00Z");
+  /** The row's change went through: the writer's compare-and-set at the version it read. */
+  const applied = (result: { ok: boolean }): void => {
+    expect(result.ok).toBe(true);
+  };
+  const phoneRowCases: { what: string; tag: string; change: () => Promise<void>; says: string[] }[] = [
+    {
+      what: "stopped (the real stopPhone): a recorded STOP is never adopted",
+      tag: "stopped",
+      change: async () => {
+        applied(await stopPhone(db.sql, PHONE_B, 1, STOP_AT));
+      },
+      says: [
+        "entry 2's phone is stopped, and a recorded STOP is never adopted",
+        "entry 2's phone row has stop_at set",
+      ],
     },
-  );
+    {
+      what: "stop_at set, not stopped",
+      tag: "stop-at",
+      change: async () => {
+        await db.sql`update phones set stop_at = ${STOP_AT}, version = version + 1 where number = ${PHONE_B}`;
+      },
+      says: ["entry 2's phone row has stop_at set, so it is not the row openChatOnText's insert leaves"],
+    },
+    {
+      what: "start_at set",
+      tag: "start-at",
+      change: async () => {
+        await db.sql`update phones set start_at = ${START_AT}, version = version + 1 where number = ${PHONE_B}`;
+      },
+      says: ["entry 2's phone row has start_at set, so it is not the row openChatOnText's insert leaves"],
+    },
+    {
+      what: "optout_line_delivered_at set (the real recordOptoutLineDelivered: the STOP, HELP and rates line went)",
+      tag: "optout-line",
+      change: async () => {
+        applied(await recordOptoutLineDelivered(db.sql, PHONE_B, 1, START_AT));
+      },
+      says: [
+        "entry 2's phone row has optout_line_delivered_at set, so it is not the row openChatOnText's insert leaves",
+      ],
+    },
+    {
+      what: "linq_contact_added_at set (the real recordLinqContactAdded)",
+      tag: "linq-contact",
+      change: async () => {
+        applied(await recordLinqContactAdded(db.sql, PHONE_B, 1, START_AT));
+      },
+      says: [
+        "entry 2's phone row has linq_contact_added_at set, so it is not the row openChatOnText's insert leaves",
+      ],
+    },
+    {
+      what: "poll_voted_at set (the real recordPollVoted)",
+      tag: "poll-voted",
+      change: async () => {
+        applied(await recordPollVoted(db.sql, PHONE_B, 1, START_AT));
+      },
+      says: [
+        "entry 2's phone row has poll_voted_at set, so it is not the row openChatOnText's insert leaves",
+      ],
+    },
+    {
+      what: "a STOP, then a START (the real stopPhone and startPhone): not stopped, stop_at and start_at set",
+      tag: "started-again",
+      change: async () => {
+        applied(await stopPhone(db.sql, PHONE_B, 1, STOP_AT));
+        applied(await startPhone(db.sql, PHONE_B, 2, START_AT));
+      },
+      says: [
+        "entry 2's phone row has stop_at and start_at set, so it is not the row openChatOnText's insert leaves",
+      ],
+    },
+  ];
+
+  for (const { what, tag, change, says } of phoneRowCases) {
+    it(`a phone row other than the one openChatOnText's insert leaves: ${what}`, SLOW, async () => {
+      const sight = await firstSight(runtime, PHONE_B, tag);
+      await openChat(runtime, sight.handleId, tag);
+      await change();
+      const error = await expectRefused(db.sql, listOf(PHONE_A, PHONE_B), says);
+      if (tag !== "stopped") {
+        expect(error.message).not.toContain("is stopped");
+      }
+    });
+  }
 
   it("two entries whose handles are one person's", SLOW, async () => {
     const sight = await firstSight(runtime, PHONE_A, "one-person");

@@ -41,22 +41,36 @@
 // every entry first and refusing, writing nothing for any number, with every problem named by its entry's place:
 //   - the number's handle has more than one person;
 //   - its person holds a role, live or ended, or owns a company other than the one this set gives its place;
-//   - its handle has a live open question, a booking (its person booked or is served) or a phone row (K-05 v1.2
-//     handleTargets, the guard's read);
+//   - its handle has a live open question or a booking (its person booked or is served: K-05 v1.2 handleTargets, the
+//     guard's read);
+//   - its handle has a phone row other than the one K-05 v1.7 openChatOnText's insert leaves (below);
 //   - two entries' handles are one person's;
 //   - an id this set gives a place is held otherwise: its handle at another number, its new person on another handle,
 //     its company by another person, or its business by another company (the list's order changed since the set first
 //     ran: each number keeps its place).
+// The phone row (the lead's ruling, DL-948, from run 1's handoff 1). The gateway calls openChatOnText at receipt
+// of every text from a phone handle, before the handle's actor (runtime/src/gateway/linq-webhook.ts; K-05 v1.7 item
+// 46), so a roster phone that has ever texted staging has a phone row, though no turn of its committed (T-1148's
+// "no phone row until turn 1 commits" predates T-1213). The set accepts exactly the row that insert leaves: stopped
+// false, and stop_at, start_at, optout_line_delivered_at, linq_contact_added_at and poll_voted_at all null
+// (PHONE_TIMES). Any other is refused, a stopped one above all: a recorded STOP is never adopted. Those six columns
+// are the only ones read, as booleans (never a time and never the number): a STOP, a START, the delivery of the STOP,
+// HELP and rates line, a Linq contact and a poll vote each set one of them (db/repo/phones.ts), and the rest (the
+// number and its handle, chat_open, chat_open_at, chat_way and version) are not read. The set never writes or updates
+// a phone row. The guard reads the phone's flags as no target (runtime/src/guard/targets.ts noTarget: no open question
+// and no booking), so with that row JOIN is still a first text.
 // A handle with no person (an erasure that removed the link: K-05 v1.11 default 4) takes person-roster-owner-<n> and the
 // link, as the skeleton seed writes Sam's. Each row is written only when its primary key is free (ON CONFLICT DO NOTHING;
 // nothing is updated or deleted), and a clash on any other key is an error that rolls the whole transaction back. After
 // the writes it reads every entry again and refuses, rolling everything back, unless the number's handle is a phone
 // handle whose one person has no role and owns this place's company alone, whose business holds no live owner role, and
-// the guard finds a first text (no live open question, no booking, no phone row): so readTurnParty answers atBusiness
-// with biz-roster-owner-<n>, and handleTargets the doors. Idempotent: a second run writes nothing and leaves every row as
-// it was, version included. Once a turn from a roster phone has committed (S1-02's question waits for its answer, and its
-// phone row stands), the set refuses, as the skeleton seed does for tp-01. Nothing is printed, and no error names a
-// number or a value of a row: the runner (T-201) prints the counts this returns.
+// the guard finds a first text (no live open question, no booking, and no phone row but the one openChatOnText's insert
+// leaves): so readTurnParty answers atBusiness with biz-roster-owner-<n>, and handleTargets the doors. Idempotent: a
+// second run writes nothing and leaves every row as it was, version included. Once a turn from a roster phone has
+// committed, S1-02's question waits for its answer, and the set refuses, as the skeleton seed does for tp-01; what
+// follows a reply (its STOP, HELP and rates line delivered, a Linq contact, a poll vote, a STOP or a START) is on its
+// phone row and refused too. Nothing is printed, and no error names a number or a value of a row: the runner (T-201)
+// prints the counts this returns.
 //
 // It runs only when named, `npm run seed:staging -- --set roster-owner`, never in D-017's run (seed-staging.sh's
 // D017_SETS). It reads and writes the database alone: the roster phone's actor is cleared by T-1452's staging-only reset
@@ -151,8 +165,23 @@ const E164 = /^\+[1-9][0-9]{6,14}$/;
 const LIST_FORM = "+, then 7 to 15 digits, joined by commas with no space";
 const WHEN =
   "run it on a roster phone that has no handle yet or one made at first sight, before a turn from it has committed " +
-  "(after that S1-02's question waits for its answer, and only a fresh schema makes its JOIN a first text again), " +
-  "with each number at the place it held when the set first ran";
+  "(after that S1-02's question waits for its answer, and only a fresh schema makes its JOIN a first text again) and " +
+  "while its phone row, if any, is as its first text's receipt wrote it (never stopped or started again), with each " +
+  "number at the place it held when the set first ran";
+/**
+ * The phone row's times that openChatOnText's insert leaves null (K-05 v1.7 item 46: "every other column at K-04's
+ * defaults"), and that a STOP, a START, the STOP, HELP and rates line's delivery, a Linq contact or a poll vote sets
+ * (db/repo/phones.ts). With stopped, the only columns of the row the set reads (the ruling, DL-948).
+ */
+const PHONE_TIMES = [
+  "stop_at",
+  "start_at",
+  "optout_line_delivered_at",
+  "linq_contact_added_at",
+  "poll_voted_at",
+] as const;
+
+type PhoneTime = (typeof PHONE_TIMES)[number];
 
 /** T-1148's rows for tp-01, the values every roster phone's rows take (see the top of this file). */
 function skeletonRow<T>(rows: readonly T[], table: string): T {
@@ -175,13 +204,18 @@ const refused = (why: string): RosterOwnerSeedError =>
 const listRefused = (why: string): RosterOwnerSeedError =>
   refused(`${ALLOWLIST_VARIABLE} ${why} (no part of its value is shown)`);
 
+/** "a", "a and b" or "a, b and c". */
+function andList(words: readonly string[]): string {
+  if (words.length < 2) {
+    return words[0] ?? "";
+  }
+  return `${words.slice(0, -1).join(", ")} and ${words[words.length - 1] ?? ""}`;
+}
+
 /** "entry 2" or "entries 1 and 3": places on the list, never their values. */
 function entryNames(places: readonly number[]): string {
   const named = places.map(String);
-  if (named.length === 1) {
-    return `entry ${named[0] ?? ""}`;
-  }
-  return `entries ${named.slice(0, -1).join(", ")} and ${named[named.length - 1] ?? ""}`;
+  return `${named.length === 1 ? "entry" : "entries"} ${andList(named)}`;
 }
 
 /**
@@ -271,8 +305,40 @@ function ownsOnlyItsCompany(
 }
 
 /**
+ * The handle's phone row as problems (see the top of this file): none when it has no row, or the one openChatOnText's
+ * insert leaves (stopped false, every one of PHONE_TIMES null); else a stopped phone, named first, and each time that is
+ * set. Reads those six columns alone, as booleans: never a time, never the number.
+ */
+async function phoneProblems(tx: Tx, handleId: string, entry: string): Promise<string[]> {
+  const [phone] = await tx<({ stopped: boolean } & Record<PhoneTime, boolean>)[]>`
+    select stopped,
+           stop_at is not null as stop_at,
+           start_at is not null as start_at,
+           optout_line_delivered_at is not null as optout_line_delivered_at,
+           linq_contact_added_at is not null as linq_contact_added_at,
+           poll_voted_at is not null as poll_voted_at
+    from phones where handle_id = ${handleId}
+  `;
+  if (phone === undefined) {
+    return [];
+  }
+  const problems: string[] = [];
+  if (phone.stopped) {
+    problems.push(`${entry}'s phone is stopped, and a recorded STOP is never adopted`);
+  }
+  const set = PHONE_TIMES.filter((column) => phone[column]);
+  if (set.length > 0) {
+    problems.push(
+      `${entry}'s phone row has ${andList(set)} set, so it is not the row openChatOnText's insert leaves at receipt`,
+    );
+  }
+  return problems;
+}
+
+/**
  * What the guard would find on a handle (K-05 v1.2 handleTargets, read inside the seed's transaction, on the runtime
- * side), as problems: a live open question, a booking its people booked or are served by, and a phone row.
+ * side), as problems: a live open question and a booking its people booked or are served by; then its phone row, unless
+ * it is the one openChatOnText's insert leaves (phoneProblems).
  */
 async function guardProblems(tx: Tx, handleId: string, entry: string): Promise<string[]> {
   const targets = await handleTargetsIn(tx, { handleId });
@@ -288,9 +354,7 @@ async function guardProblems(tx: Tx, handleId: string, entry: string): Promise<s
   if (targets.bookings.length > 0) {
     problems.push(`${entry}'s handle has ${counted(targets.bookings.length, "booking", "bookings")}`);
   }
-  if (targets.phone !== null) {
-    problems.push(`${entry}'s handle has a phone row`);
-  }
+  problems.push(...(await phoneProblems(tx, handleId, entry)));
   return problems;
 }
 
@@ -412,8 +476,9 @@ function rowsOf(plans: readonly Plan[]): RosterOwnerSeedRows {
  * Reads every entry again after the writes, inside the seed's transaction, and refuses, rolling everything back, unless
  * each is a test owner as tp-01 is: the number's handle is the planned phone handle, whose one person holds no role and
  * owns this place's company alone; the business is there and holds no live owner role (readTurnParty's step 5); and the
- * guard finds a first text (handleTargets: no live open question, no booking, no phone row). So readTurnParty answers
- * atBusiness with this place's business (K-05 v1.11 default 100), and the guard offers the doors.
+ * guard finds a first text (handleTargets: no live open question, no booking, and no phone row but the one
+ * openChatOnText's insert leaves). So readTurnParty answers atBusiness with this place's business (K-05 v1.11 default
+ * 100), and the guard offers the doors.
  */
 async function requireTestOwners(tx: Tx, plans: readonly Plan[]): Promise<void> {
   const problems: string[] = [];
