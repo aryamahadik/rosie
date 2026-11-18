@@ -2,9 +2,56 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 767, [`b3918c1`](https://github.com/aryamahadik/rosie/commit/b3918c1), 2026-11-18 07:16:14 UTC.
+- **Through:** commit 769, [`e1edd4c`](https://github.com/aryamahadik/rosie/commit/e1edd4c), 2026-11-18 09:09:09 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 769. docs: COMMIT\_HISTORY.md through commit 767 (b3918c1, \#778) (\#780)
+
+- **Commit:** [`e1edd4c`](https://github.com/aryamahadik/rosie/commit/e1edd4c), by Arya Mahadik, 2026-11-18 09:09:09 UTC
+- **Pull request:** [#780](https://github.com/aryamahadik/rosie/pull/780) from `task/commit-history-172`, merged 2026-11-18 09:09:10 UTC. It squashed 1 branch commit:
+  - `b262357` docs: COMMIT\_HISTORY.md through commit 767 (b3918c1, \#778)
+- **Files changed:** 1 (+37 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +37 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated after train 265 (DL-956) with scratch/build/lead/commit-history.mjs: every commit on main, newest first, with its pull request, squashed branch commits, changed files and full message (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 768. T-1454: a STOP read as danger is still recorded (card E, DL-944, DL-952) (\#779)
+
+- **Commit:** [`5a12dde`](https://github.com/aryamahadik/rosie/commit/5a12dde), by Arya Mahadik, 2026-11-18 09:09:05 UTC
+- **Pull request:** [#779](https://github.com/aryamahadik/rosie/pull/779) from `task/T-1454`, merged 2026-11-18 09:09:05 UTC. It squashed 3 branch commits:
+  - `4e2eca0` T-1454: in a turn holding a stop word, the core-only commit under the…
+  - `6cfd41c` Merge branch 'main' into task/T-1454
+  - `5eb5516` T-1454: outage.worker.test.ts's DL-508 STOP batch expects its core-on…
+- **Files changed:** 3 (+523 −27), by folder:
+  - `runtime/src/outage/ai/` outage.worker.test.ts +25 −13
+  - `runtime/src/turn/` turn.ts +46 −14, turn.worker.test.ts +452 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1454: in a turn holding a stop word, the core-only commit under the no-business caller leaves out each danger text's recordSafetyOutcome (leavesDangerOut), so recordStopOrStart and the No records commit in the same return order and the danger text stays unread. Workers tests: a STOP beside a HELP read as an emergency, a bare STOP read as danger (4 fixtures), an email STOP, DL-521 and DL-508 beside a decided danger text, each failing on main with the keyword door's notBuilt, and HELP or START read as danger, all-No STOPs and decided commits unchanged
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1454: outage.worker.test.ts's DL-508 STOP batch expects its core-only requests without the danger text's record (STOP_BATCH_CORE_ONLY_ORDER: S1-02's record, the STOP's, recordStopOrStart; DL-944, DL-952); the decided request keeps STOP_BATCH_ORDER, the danger record first; one test name reworded where it put the danger record in the core-only commit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 767. docs: COMMIT\_HISTORY.md through commit 765 (dd9eb08, \#775) (\#778)
 
