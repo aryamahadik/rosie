@@ -82,9 +82,9 @@ function businessBound(rows: readonly HeldRow[]): TodayReader {
       return Promise.resolve(
         asked.flatMap((ref) => {
           const row = rows.find((each) => each.table === ref.table && each.rowId === ref.rowId);
-          return row === undefined || row.businessId !== bound.businessId
-            ? []
-            : [{ table: row.table, rowId: row.rowId, version: row.version }];
+          return row?.businessId === bound.businessId
+            ? [{ table: row.table, rowId: row.rowId, version: row.version }]
+            : [];
         }),
       );
     },
