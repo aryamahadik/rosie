@@ -180,7 +180,7 @@ describe("the Tool API base carries the paging service's handlers (T-1443; domai
       reader: () => readerOn(threatWorld()),
       environment: "production",
       now: () => exchange.given.now,
-      commitAlone: NO_ALONE_COMMIT as AloneCommit<unknown>,
+      commitAlone: NO_ALONE_COMMIT,
     };
     expect(await baseOver({ paging }).call("pageTeam", request, traceFor(request).trace)).toEqual({
       error: "notBuilt",
