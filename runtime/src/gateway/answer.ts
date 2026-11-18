@@ -1,7 +1,11 @@
 // The gateway's answer rules (T-241; C-044; arch 02 step 1 "Receive", line 109), shared by every webhook door: Linq's
 // (linq-webhook.ts) and the Stripe and calendar doors (providers/, T-275). Every answer is JSON carrying the trace id in
 // its body and in x-trace-id, never cached. A failure is logged as one JSON line with its stage and the error's name only
-// (its message could carry words from a body). The bundle id is read at receipt, with bundle v0's as the stand-in.
+// (its message could carry words from a body); for the Linq adapter's LinqWebhookError, its code beside the name (one of
+// its four labels, never a field value: T-1456), so each 503 the Linq verify answers for it says why. The bundle id is
+// read at receipt, with bundle v0's as the stand-in.
+
+import type { LinqWebhookError } from "@rosie/adapters/linq/webhook";
 
 import { isLabel, logSink, openTrace, type BundleId, type OpenedBy, type TraceContext } from "../trace";
 
@@ -36,11 +40,43 @@ export function respond(answer: Answer, traceId: string): Response {
   });
 }
 
-/** One JSON log line for a failed stage: the error's name only, since its message could carry words from the body. */
+/**
+ * LinqWebhookError's four codes (T-413, adapters/src/linq/webhook/parse.ts), each a label. The type holds this list to
+ * the adapter's own: a code added there and not here, or kept here and dropped there, fails the typecheck.
+ */
+const LINQ_WEBHOOK_CODES: Readonly<Record<LinqWebhookError["code"], true>> = {
+  badEvent: true,
+  unsupportedWebhookVersion: true,
+  unknownService: true,
+  receiptHandleUnknown: true,
+};
+
+/**
+ * The code of a LinqWebhookError (an Error by that name) when it is one of the four labels; null for any other error, and
+ * for a code that is none of them, so nothing but a label is ever logged for it.
+ */
+function linqWebhookCodeOf(error: unknown): string | null {
+  if (!(error instanceof Error) || error.name !== "LinqWebhookError") return null;
+  const code: unknown = (error as { code?: unknown }).code;
+  return typeof code === "string" && Object.hasOwn(LINQ_WEBHOOK_CODES, code) ? code : null;
+}
+
+/**
+ * One JSON log line for a failed stage: the error's name only, since its message could carry words from the body; for a
+ * LinqWebhookError, its code beside it (linqWebhookCodeOf: one of its four labels), and for every other error nothing more.
+ */
 export function logFailure(traceId: string, stage: string, error: unknown): void {
   const name = error instanceof Error ? error.name : "unknown";
+  const code = linqWebhookCodeOf(error);
   console.log(
-    JSON.stringify({ level: "error", msg: "gateway_failed", trace_id: traceId, stage, error: name }),
+    JSON.stringify({
+      level: "error",
+      msg: "gateway_failed",
+      trace_id: traceId,
+      stage,
+      error: name,
+      ...(code === null ? {} : { code }),
+    }),
   );
 }
 
