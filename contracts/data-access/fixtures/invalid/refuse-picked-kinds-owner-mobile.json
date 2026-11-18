@@ -1,0 +1,119 @@
+{
+  "result": "pickedKinds",
+  "businessId": null,
+  "personId": "person-sam",
+  "readAt": "2026-10-19T18:08:00Z",
+  "picks": [
+    {
+      "id": "pick-sam-barbershop",
+      "ownerPersonId": "person-sam",
+      "ownerMobile": "+15555550100",
+      "position": 1,
+      "words": "Barbershop",
+      "outcome": "listed",
+      "kindId": "barber",
+      "companyId": null,
+      "businessId": null,
+      "pickedAt": "2026-10-19T18:05:00Z",
+      "version": 1,
+      "texts": [
+        {
+          "rowId": "pick-sam-barbershop/pf.edges",
+          "pfKey": "pf.edges",
+          "businessId": null,
+          "version": 1
+        },
+        {
+          "rowId": "pick-sam-barbershop/pf.first_steps",
+          "pfKey": "pf.first_steps",
+          "businessId": null,
+          "version": 1
+        },
+        {
+          "rowId": "pick-sam-barbershop/pf.license",
+          "pfKey": "pf.license",
+          "businessId": null,
+          "version": 1
+        },
+        {
+          "rowId": "pick-sam-barbershop/pf.messages",
+          "pfKey": "pf.messages",
+          "businessId": null,
+          "version": 1
+        },
+        {
+          "rowId": "pick-sam-barbershop/pf.money",
+          "pfKey": "pf.money",
+          "businessId": null,
+          "version": 1
+        },
+        {
+          "rowId": "pick-sam-barbershop/pf.questions",
+          "pfKey": "pf.questions",
+          "businessId": null,
+          "version": 1
+        },
+        {
+          "rowId": "pick-sam-barbershop/pf.rules",
+          "pfKey": "pf.rules",
+          "businessId": null,
+          "version": 1
+        },
+        {
+          "rowId": "pick-sam-barbershop/pf.safety",
+          "pfKey": "pf.safety",
+          "businessId": null,
+          "version": 1
+        },
+        {
+          "rowId": "pick-sam-barbershop/pf.services",
+          "pfKey": "pf.services",
+          "businessId": null,
+          "version": 1
+        },
+        {
+          "rowId": "pick-sam-barbershop/pf.staff",
+          "pfKey": "pf.staff",
+          "businessId": null,
+          "version": 1
+        },
+        {
+          "rowId": "pick-sam-barbershop/pf.visit",
+          "pfKey": "pf.visit",
+          "businessId": null,
+          "version": 1
+        }
+      ],
+      "draft": null
+    },
+    {
+      "id": "pick-sam-plumbing",
+      "ownerPersonId": "person-sam",
+      "position": 2,
+      "words": "plumbing",
+      "outcome": "listed",
+      "kindId": "plumber",
+      "companyId": null,
+      "businessId": null,
+      "pickedAt": "2026-10-19T18:05:00Z",
+      "version": 1,
+      "texts": [],
+      "draft": null
+    },
+    {
+      "id": "pick-sam-electrical",
+      "ownerPersonId": "person-sam",
+      "position": 3,
+      "words": "electrical",
+      "outcome": "listed",
+      "kindId": "electrician",
+      "companyId": null,
+      "businessId": null,
+      "pickedAt": "2026-10-19T18:05:00Z",
+      "version": 1,
+      "texts": [],
+      "draft": null
+    }
+  ],
+  "companies": []
+}

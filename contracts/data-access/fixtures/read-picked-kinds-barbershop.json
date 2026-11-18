@@ -1,0 +1,112 @@
+{
+  "call": "readPickedKinds",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["kinds-of-work/seed-business-kinds.json"],
+    "after": [],
+    "now": "2026-10-21T14:00:00Z",
+    "note": "Lee's Barbershop's kinds of work once sign-up has placed them, read under its own business, as S1-38's next kind or S11-58's NEW reads them before a new pick (README item 79). K-24's seed-business-kinds holds Sam's three picks placed at S1-04 (the barbershop in Lee's Barbershop LLC at version 2; plumbing and electrical in Lee Home Services LLC) with the barbershop's eleven text blocks, and its chain loads K-24's seed-kinds-sample and K-23's seed-company-two-kinds with the two companies. Under the barbershop, its one pick is answered with its text blocks' keys and versions, never their text, and its one company with its name and version. Plumbing, electrical and Lee Home Services LLC are another business's and are never answered, nor counted; Sam has no row with no business here."
+  },
+  "request": {
+    "businessId": "biz-lees-barbershop",
+    "personId": "person-sam"
+  },
+  "outcome": {
+    "result": "pickedKinds",
+    "businessId": "biz-lees-barbershop",
+    "personId": "person-sam",
+    "readAt": "2026-10-21T14:00:00Z",
+    "picks": [
+      {
+        "id": "pick-sam-barbershop",
+        "ownerPersonId": "person-sam",
+        "position": 1,
+        "words": "Barbershop",
+        "outcome": "listed",
+        "kindId": "barber",
+        "companyId": "company-lees-barbershop",
+        "businessId": "biz-lees-barbershop",
+        "pickedAt": "2026-10-19T18:05:00Z",
+        "version": 2,
+        "texts": [
+          {
+            "rowId": "pick-sam-barbershop/pf.edges",
+            "pfKey": "pf.edges",
+            "businessId": "biz-lees-barbershop",
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.first_steps",
+            "pfKey": "pf.first_steps",
+            "businessId": "biz-lees-barbershop",
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.license",
+            "pfKey": "pf.license",
+            "businessId": "biz-lees-barbershop",
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.messages",
+            "pfKey": "pf.messages",
+            "businessId": "biz-lees-barbershop",
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.money",
+            "pfKey": "pf.money",
+            "businessId": "biz-lees-barbershop",
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.questions",
+            "pfKey": "pf.questions",
+            "businessId": "biz-lees-barbershop",
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.rules",
+            "pfKey": "pf.rules",
+            "businessId": "biz-lees-barbershop",
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.safety",
+            "pfKey": "pf.safety",
+            "businessId": "biz-lees-barbershop",
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.services",
+            "pfKey": "pf.services",
+            "businessId": "biz-lees-barbershop",
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.staff",
+            "pfKey": "pf.staff",
+            "businessId": "biz-lees-barbershop",
+            "version": 1
+          },
+          {
+            "rowId": "pick-sam-barbershop/pf.visit",
+            "pfKey": "pf.visit",
+            "businessId": "biz-lees-barbershop",
+            "version": 1
+          }
+        ],
+        "draft": null
+      }
+    ],
+    "companies": [
+      {
+        "id": "company-lees-barbershop",
+        "ownerPersonId": "person-sam",
+        "name": "Lee's Barbershop LLC",
+        "businessId": "biz-lees-barbershop",
+        "version": 2
+      }
+    ]
+  }
+}
