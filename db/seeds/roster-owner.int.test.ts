@@ -14,6 +14,14 @@
 // and an ill-formed list. A second run writes nothing. The skeleton and staging-core sets, run before or after it, write
 // what they write on a fresh schema and keep it after. The runner finds the set by its name and prints counts alone.
 //
+// T-1462's proofs (DL-964, the architect's N1 on T-1459): each roster business also gets its K-23 v1 business_setup row,
+// its business_id alone (control_proven_at and control_proven_via null, no contact value, no_money false, version 1),
+// after its businesses row in the set's one transaction, so limit 1's default 14 reads its control as not proven, on the
+// runtime side and as the Tool API under that business's scope. A re-run over a set seeded before T-1462 (no such row)
+// adds the row and keeps every other row; a row already there, a proven one included, is kept as it is and counted as
+// kept; a refusal, before the writes or after them, writes none. Every count and snapshot of T-1450's cases holds the
+// table too, so each of them proves the row as well.
+//
 // What the rows must be is read here from the skeleton seed's rows (T-1148, which its own test checks against K-04's
 // seed-business-head.json and K-23's seed-company-two-kinds.json) and the frozen K-05 fixtures (targets-first-text.json,
 // read-turn-party-first-text.json, read-turn-party-test-owner-1.json). Every number here is a whole literal in the
@@ -35,7 +43,7 @@ import {
   startPhone,
   stopPhone,
 } from "../repo/phones";
-import type { Sql } from "../repo/scope";
+import { type Sql, withBusiness } from "../repo/scope";
 import { handleTargets, type HandleTargetsResponse } from "../repo/targets";
 import { createTestDatabase, type TestDatabase } from "../repo/test-db";
 import { readTurnParty } from "../repo/turn-party";
@@ -64,6 +72,7 @@ const PHONE_B = "+15555550151";
 const PHONE_C = "+15555550152";
 const SEED_TABLES = [
   "businesses",
+  "business_setup",
   "persons",
   "handles",
   "person_handles",
@@ -74,6 +83,7 @@ const SEED_TABLES = [
 // writes.
 const WATCHED = [
   "businesses",
+  "business_setup",
   "persons",
   "person_roles",
   "handles",
@@ -245,6 +255,30 @@ async function openChat(runtime: Sql, handleId: string, tag: string): Promise<Op
   return opened;
 }
 
+/**
+ * K-23 v1 business_setup's row, every column, as the set writes it for a business (T-1462): its business_id alone, and
+ * every other column null or its default (no_money false, version 1). So control is not proven (control_proven_at and
+ * control_proven_via null), and it holds no contact value (listing phone or email, website), no About us or profile,
+ * no Stripe account and no terms.
+ */
+function setupRowOf(businessId: string): Record<string, unknown> {
+  return {
+    business_id: businessId,
+    listing_phone: null,
+    listing_email: null,
+    website: null,
+    about: null,
+    profile_confirmed_at: null,
+    stripe_account_id: null,
+    no_money: false,
+    terms_accepted_at: null,
+    terms_accepted_by_person_id: null,
+    control_proven_at: null,
+    control_proven_via: null,
+    version: 1,
+  };
+}
+
 /** The set's rows for the roster phone at `place`, with the handle and person it found or wrote. */
 function rowsFor(
   place: number,
@@ -258,6 +292,7 @@ function rowsFor(
   const [kind] = SKELETON_ROWS.company_kinds;
   return {
     businesses: [{ ...business, id: ids.businessId }],
+    business_setup: [setupRowOf(ids.businessId)],
     persons: [{ id: personId, name: null, language: null }],
     handles: [{ id: handleId, kind: "phone", address: number }],
     person_handles: [{ person_id: personId, handle_id: handleId }],
@@ -266,7 +301,10 @@ function rowsFor(
   };
 }
 
-/** The rows of the set's six tables that hold one of the roster phone's keys, in the skeleton test's columns. */
+/**
+ * The rows of the set's seven tables that hold one of the roster phone's keys, in the skeleton test's columns, and
+ * business_setup's with every column.
+ */
 async function rowsOf(
   sql: Sql,
   handleId: string,
@@ -282,6 +320,7 @@ async function rowsOf(
         from businesses where id = ${ids.businessId}
       `),
     ],
+    business_setup: [...(await sql`select * from business_setup where business_id = ${ids.businessId}`)],
     persons: [...(await sql`select id, name, language from persons where id = ${personId}`)],
     handles: [...(await sql`select id, kind, address from handles where id = ${handleId}`)],
     person_handles: [
@@ -445,6 +484,7 @@ describe("a roster number with no handle yet, and one whose handle was made at f
         ranAs: RUNTIME_ROLE,
         tables: countsOf(1, {
           businesses: 1,
+          business_setup: 1,
           persons: 1,
           handles: 1,
           person_handles: 1,
@@ -501,7 +541,9 @@ describe("a roster number with no handle yet, and one whose handle was made at f
       const ids = rosterOwnerIds(1);
       const first = await seedRosterOwner(db.sql, { env: listOf(PHONE_A) });
       expect(first.ranAs).toBe(RUNTIME_ROLE);
-      expect(first.tables).toEqual(countsOf(1, { businesses: 1, companies: 1, company_kinds: 1 }));
+      expect(first.tables).toEqual(
+        countsOf(1, { businesses: 1, business_setup: 1, companies: 1, company_kinds: 1 }),
+      );
       expect(first.owners).toEqual([
         {
           place: 1,
@@ -569,7 +611,9 @@ describe("a roster number with no handle yet, and one whose handle was made at f
       const ids = rosterOwnerIds(1);
       const first = await seedRosterOwner(db.sql, { env: listOf(PHONE_A) });
       expect(first.ranAs).toBe(RUNTIME_ROLE);
-      expect(first.tables).toEqual(countsOf(1, { businesses: 1, companies: 1, company_kinds: 1 }));
+      expect(first.tables).toEqual(
+        countsOf(1, { businesses: 1, business_setup: 1, companies: 1, company_kinds: 1 }),
+      );
       expect(first.owners).toEqual([
         {
           place: 1,
@@ -628,7 +672,14 @@ describe("a roster number with no handle yet, and one whose handle was made at f
       const ids = rosterOwnerIds(1);
       const first = await seedRosterOwner(db.sql, { env: listOf(PHONE_A) });
       expect(first.tables).toEqual(
-        countsOf(1, { businesses: 1, persons: 1, person_handles: 1, companies: 1, company_kinds: 1 }),
+        countsOf(1, {
+          businesses: 1,
+          business_setup: 1,
+          persons: 1,
+          person_handles: 1,
+          companies: 1,
+          company_kinds: 1,
+        }),
       );
       expect(first.owners).toMatchObject([{ handleId: "handle-t1450-no-person", personId: ids.personId }]);
       expect(await rowsOf(db.sql, "handle-t1450-no-person", ids.personId, 1)).toEqual(
@@ -654,6 +705,7 @@ describe("a roster number with no handle yet, and one whose handle was made at f
       expect(first.tables).toEqual(
         countsOf(3, {
           businesses: 3,
+          business_setup: 3,
           persons: 2,
           handles: 1,
           person_handles: 2,
@@ -694,7 +746,7 @@ describe("a roster number with no handle yet, and one whose handle was made at f
       expect(lines(run.stdout)).toEqual([
         `seed: set roster-owner into schema ${db.schema} on the local database`,
         ...SEED_TABLES.map((table) => `seed: ${table}: 2 rows (2 inserted, 0 kept)`),
-        `seed: done: set roster-owner into schema ${db.schema}: 12 rows in 6 tables (12 inserted, 0 kept)`,
+        `seed: done: set roster-owner into schema ${db.schema}: 14 rows in 7 tables (14 inserted, 0 kept)`,
       ]);
       expectNoNumber(`${run.stdout}${run.stderr}`.replaceAll(db.schema, ""), "the runner's output");
 
@@ -1041,6 +1093,7 @@ describe("with D-017's sets: core, staging-core and skeleton run before or after
       expect(roster.tables).toEqual(
         countsOf(2, {
           businesses: 2,
+          business_setup: 2,
           persons: 2,
           handles: 2,
           person_handles: 2,
@@ -1084,6 +1137,7 @@ describe("with D-017's sets: core, staging-core and skeleton run before or after
       expect(roster.tables).toEqual(
         countsOf(2, {
           businesses: 2,
+          business_setup: 2,
           persons: 2,
           handles: 2,
           person_handles: 2,
@@ -1099,6 +1153,205 @@ describe("with D-017's sets: core, staging-core and skeleton run before or after
         countsOf(2, {}),
       );
       expect(await snapshot(db.sql)).toEqual(before);
+    },
+  );
+});
+
+// ---- business_setup (T-1462) -----------------------------------------------------------------------------------------
+
+describe("each roster business's business_setup row, its control not proven (T-1462; DL-964, the architect's N1 on T-1459): written after its businesses row in the set's one transaction, then kept as it is", () => {
+  let db: TestDatabase;
+  let runtime: Sql;
+
+  beforeAll(async () => {
+    db = await createTestDatabase({ name: "seeds_roster_owner_setup" });
+    runtime = runtimeClient(db);
+  }, 120_000);
+
+  afterAll(async () => {
+    await runtime.end({ timeout: 5 });
+    await db.drop();
+  });
+
+  beforeEach(async () => {
+    await emptied(db.sql);
+  });
+
+  // S1-75's two proofs of a business's control (K-23 v1 control_proven_via), and a role's end, in these tests.
+  const CODE_CAME_BACK_AT = new Date("2026-11-18T01:00:00Z");
+  const TEAM_CHECKED_AT = new Date("2026-11-18T01:30:00Z");
+  const ROLE_ENDED_AT = new Date("2026-11-18T02:00:00Z");
+
+  /** Every business_setup row, every column, in business order. */
+  async function setupRows(): Promise<unknown[]> {
+    return [...(await db.sql`select * from business_setup order by business_id`)];
+  }
+
+  /** What a run of the set from before T-1462 left: its rows, and no business_setup row (it wrote none). */
+  async function asBeforeT1462(): Promise<void> {
+    await db.sql`delete from business_setup`;
+    expect(await setupRows()).toEqual([]);
+  }
+
+  /** The control state limit 1's default 14 reads (DL-961 (d)) of a business whose control is not proven. */
+  const notProven = (businessId: string): Record<string, unknown> => ({
+    business_id: businessId,
+    control_proven_at: null,
+    control_proven_via: null,
+  });
+
+  /** readTurnParty's and the guard's answers for each roster phone, as the runtime reads them. */
+  async function readsOf(owners: readonly { number: string; handleId: string }[]): Promise<unknown[]> {
+    const answers: unknown[] = [];
+    for (const { number, handleId } of owners) {
+      answers.push({ party: await partyOf(runtime, number), guard: await guardRead(runtime, handleId) });
+    }
+    return answers;
+  }
+
+  it(
+    "a first run writes one row per roster entry, whatever its handle (none yet; made at first sight, its chat opened; one with no person): its business_id alone, after its businesses row (the foreign key is checked at once), so control_proven_at and control_proven_via are null and it holds no contact value; the runtime side (rosie_job, no scope) reads each, and the Tool API (rosie_app) under a roster business's scope its own alone",
+    SLOW,
+    async () => {
+      const sight = await firstSight(runtime, PHONE_B, "setup-first-run");
+      await openChat(runtime, sight.handleId, "setup-first-run");
+      await db.sql`insert into handles (id, kind, address) values ('handle-t1462-no-person', 'phone', ${PHONE_C})`;
+      const first = await seedRosterOwner(db.sql, { env: listOf(PHONE_A, PHONE_B, PHONE_C) });
+      const businessIds = [1, 2, 3].map((place) => rosterOwnerIds(place).businessId);
+      expect(first.owners.map((owner) => owner.businessId)).toEqual(businessIds);
+      expect(first.tables.business_setup).toEqual({ rows: 3, inserted: 3, kept: 0 });
+      expect(await setupRows()).toEqual(businessIds.map((businessId) => setupRowOf(businessId)));
+
+      expect([
+        ...(await runtime`
+          select business_id, control_proven_at, control_proven_via from business_setup order by business_id
+        `),
+      ]).toEqual(businessIds.map((businessId) => notProven(businessId)));
+      for (const businessId of businessIds) {
+        const seen = await withBusiness(db.sql, businessId, async (tx) => {
+          await tx`set local role rosie_app`;
+          return [
+            ...(await tx`select business_id, control_proven_at, control_proven_via from business_setup`),
+          ];
+        });
+        expect(seen, businessId).toEqual([notProven(businessId)]);
+      }
+    },
+  );
+
+  it(
+    "a re-run over a set seeded before T-1462 (its rows, no business_setup row) adds each business's row, control not proven, and keeps every other row as it was, version included; a refused run before it adds none; readTurnParty and the guard answer as before; a third run writes nothing",
+    SLOW,
+    async () => {
+      const sight = await firstSight(runtime, PHONE_B, "setup-before");
+      const env = listOf(PHONE_A, PHONE_B);
+      await seedRosterOwner(db.sql, { env });
+      await asBeforeT1462();
+      const owners = [
+        { number: PHONE_A, handleId: rosterOwnerIds(1).handleId, personId: rosterOwnerIds(1).personId },
+        { number: PHONE_B, handleId: sight.handleId, personId: sight.personId },
+      ];
+      const readsBefore = await readsOf(owners);
+      expect(readsBefore).toEqual(
+        owners.map(({ handleId, personId }, index) => ({
+          party: atBusiness(handleId, personId, rosterOwnerIds(index + 1).businessId),
+          guard: firstTextAnswer(handleId, personId),
+        })),
+      );
+      const before = await snapshot(db.sql);
+
+      // A refusal adds no row: the list's order changed since the set ran, so each place's company is the other's.
+      await expectRefused(db.sql, listOf(PHONE_B, PHONE_A), [
+        "entry 1's person owns a company already",
+        "entry 2's person owns a company already",
+      ]);
+
+      const again = await seedRosterOwner(db.sql, { env });
+      expect(again.tables).toEqual(countsOf(2, { business_setup: 2 }));
+      expect(await snapshot(db.sql)).toEqual({
+        ...before,
+        business_setup: [1, 2].map((place) => setupRowOf(rosterOwnerIds(place).businessId)),
+      });
+      expect(await readsOf(owners)).toEqual(readsBefore);
+
+      const after = await snapshot(db.sql);
+      expect((await seedRosterOwner(db.sql, { env })).tables).toEqual(countsOf(2, {}));
+      expect(await snapshot(db.sql)).toEqual(after);
+    },
+  );
+
+  it(
+    "a row already there is kept as it is and counted as kept, never updated, reset or deleted, a proven one included (S1-75: the listing's code came back right, or Rosie's team checked); a business that lacks its row gets it; a second run writes nothing",
+    SLOW,
+    async () => {
+      const env = listOf(PHONE_A, PHONE_B, PHONE_C);
+      await seedRosterOwner(db.sql, { env });
+      const byCode = rosterOwnerIds(1).businessId;
+      const byTeam = rosterOwnerIds(2).businessId;
+      const missing = rosterOwnerIds(3).businessId;
+      await db.sql`
+        update business_setup
+        set control_proven_at = ${CODE_CAME_BACK_AT}, control_proven_via = 'listing_code', version = version + 1
+        where business_id = ${byCode}
+      `;
+      await db.sql`
+        update business_setup
+        set control_proven_at = ${TEAM_CHECKED_AT}, control_proven_via = 'team_check', version = version + 1
+        where business_id = ${byTeam}
+      `;
+      await db.sql`delete from business_setup where business_id = ${missing}`;
+      const proven = [
+        {
+          ...setupRowOf(byCode),
+          control_proven_at: CODE_CAME_BACK_AT,
+          control_proven_via: "listing_code",
+          version: 2,
+        },
+        {
+          ...setupRowOf(byTeam),
+          control_proven_at: TEAM_CHECKED_AT,
+          control_proven_via: "team_check",
+          version: 2,
+        },
+      ];
+      expect(await setupRows()).toEqual(proven);
+      const before = await snapshot(db.sql);
+
+      const run = await seedRosterOwner(db.sql, { env });
+      expect(run.tables).toEqual(countsOf(3, { business_setup: 1 }));
+      expect(run.tables.business_setup).toEqual({ rows: 3, inserted: 1, kept: 2 });
+      expect(await snapshot(db.sql)).toEqual({ ...before, business_setup: [...proven, setupRowOf(missing)] });
+
+      const after = await snapshot(db.sql);
+      expect((await seedRosterOwner(db.sql, { env })).tables).toEqual(countsOf(3, {}));
+      expect(await snapshot(db.sql)).toEqual(after);
+    },
+  );
+
+  it(
+    "in the set's one transaction: a refusal after the writes (the recheck: another person holds a live owner role at the roster business, so readTurnParty would not answer atBusiness) rolls the row back with every other write, so nothing is written; once that role has ended, the same run writes it",
+    SLOW,
+    async () => {
+      const env = listOf(PHONE_A);
+      await seedRosterOwner(db.sql, { env });
+      await asBeforeT1462();
+      const { businessId } = rosterOwnerIds(1);
+      await db.sql`insert into persons (id) values ('person-t1462-other-owner')`;
+      await db.sql`
+        insert into person_roles (id, person_id, business_id, role)
+        values ('role-t1462-other-owner', 'person-t1462-other-owner', ${businessId}, 'owner')
+      `;
+      await expectRefused(db.sql, env, [
+        "a roster phone's JOIN would not be a first text under its own business: entry 1's business has a live owner role",
+      ]);
+
+      await db.sql`
+        update person_roles set ended_at = ${ROLE_ENDED_AT}, version = version + 1 where id = 'role-t1462-other-owner'
+      `;
+      const before = await snapshot(db.sql);
+      const run = await seedRosterOwner(db.sql, { env });
+      expect(run.tables).toEqual(countsOf(1, { business_setup: 1 }));
+      expect(await snapshot(db.sql)).toEqual({ ...before, business_setup: [setupRowOf(businessId)] });
     },
   );
 });
