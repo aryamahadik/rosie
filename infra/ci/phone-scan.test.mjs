@@ -38,7 +38,7 @@ const PUBLIC_NUMBERS = new Set(Object.values(PUBLIC_LINES).map((line) => listedN
 
 /** The only files a public line may be listed at (DL-616): the master's trade text and what is built from it. */
 const PUBLIC_LINE_FILES =
-  /^(?:fixtures\/master\/engine\/work\/prof\/[a-z0-9-]+\.json|fixtures\/v1\/forms\/[a-z0-9-]+\.json|fixtures\/v1\/KNOWN-STALE\.md|compiler\/src\/slots\/slots\.test\.ts)$/;
+  /^(?:fixtures\/master\/engine\/work\/prof\/[a-z0-9-]+\.json|fixtures\/v1\/forms\/[a-z0-9-]+\.json|fixtures\/v1\/KNOWN-STALE\.md|compiler\/src\/slots\/slots\.test\.ts|bundles\/v[0-9]+\/bundle\/trade\/[a-z0-9-]+\.json|bundles\/v[0-9]+\/bundle\.kv\.json)$/;
 
 /** Nevada's area codes: 702, its overlay 725, and 775. A 555 line there is never of the kind "555 exchange". */
 const NEVADA_AREA_CODES = new Set(["702", "725", "775"]);
