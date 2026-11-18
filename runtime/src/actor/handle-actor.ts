@@ -60,6 +60,10 @@
 // before the bundle is pinned and writes its spans once the pin has answered (batch.ts beginSpans). For an event id it
 // already holds, the actor tells the gateway which trace the event first arrived under (`firstTraceOf`).
 //
+// On staging alone, at the start of each alarm and each hand-off, a listed test handle's actor is reset once (T-1452;
+// ./staging-reset.ts; DL-944 card A): its stored state cleared as that file says, then the safety read built again with no
+// state or name in memory, and the alarm set from the stored schedule.
+//
 // Not here: what runs inside a turn (T-251, T-252), edits and vote changes after a commit (T-245). This file opens no
 // sealed box: the safety read does, and the PostgreSQL-down path, to read a STOP or a START, each with the handle's key.
 // Never logged: a word, a phone number, a key, a sealed body.
@@ -89,6 +93,7 @@ import {
   isReadableEvent,
   type HoldEntry,
   type SafetyEntry,
+  type SafetyHost,
 } from "../safety";
 import {
   beginSeq,
@@ -138,6 +143,7 @@ import {
   type ParkTraceRequest,
   type TurnEntry,
 } from "./lease";
+import { runStagingReset } from "./staging-reset";
 
 /** A delivery receipt as the actor passes it on: the scrubbed K-06 event (no words) with `partKey` beside it. */
 export interface ReceiptHandoff {
@@ -227,7 +233,9 @@ function checkHandoff(handoff: SealedHandoff): "inbox" | "receipt" {
 }
 
 export class HandleActor extends DurableObject {
-  private readonly safety: SafetyOnArrival;
+  private safety: SafetyOnArrival;
+  /** What the safety read runs over: kept, so the staging reset builds it again, empty and with no name (T-1452). */
+  private readonly safetyHost: SafetyHost;
   private readonly batch: BatchWindow;
   private readonly lease: TurnLease;
   private readonly pins: BundlePins;
@@ -250,7 +258,7 @@ export class HandleActor extends DurableObject {
       turnsOpened: () => this.turnsOpened(),
     });
     this.returns = new ReturnQueue({ storage: ctx.storage, now: () => actorClock().now() });
-    this.safety = new SafetyOnArrival({
+    this.safetyHost = {
       returns: this.returns,
       // The copy of the stopped flag (T-269), or a text no commit has taken that may hold a stop word, the actor's own STOP
       // and START aside (T-270): the down path's one reading, the lease's `stopAmong` too, true while that path is unwired,
@@ -270,7 +278,8 @@ export class HandleActor extends DurableObject {
         );
       },
       storedTexts: (eventIds) => readInboxEvents(ctx.storage.sql, eventIds),
-    });
+    };
+    this.safety = new SafetyOnArrival(this.safetyHost);
     this.batch = new BatchWindow({
       storage: ctx.storage,
       held: (eventIds) => this.unreadAmong(eventIds),
@@ -364,6 +373,9 @@ export class HandleActor extends DurableObject {
    * sets the alarm again from the whole schedule.
    */
   override async alarm(): Promise<void> {
+    // The staging-only reset of a listed test handle's actor, first (T-1452).
+    const reset = this.resetIfListed(null);
+    if (reset !== null) await reset;
     this.resumeSafetyGuarded();
     // The PostgreSQL-down path's due work (T-270: a safety timer due, a text waiting 20 s, the next ask), lent: it never
     // holds the lease and batch handlers back.
@@ -371,6 +383,33 @@ export class HandleActor extends DurableObject {
     await this.lease.onAlarm();
     await this.batch.onAlarm();
     await this.clocks.onAlarm();
+  }
+
+  /**
+   * The staging-only reset of a listed test handle's actor (T-1452; ./staging-reset.ts), at the start of each alarm and
+   * hand-off. Null when it did nothing (not staging, no hook, not a target, every entry applied, a reason to wait, or a
+   * failure, each but the first four written as a log line). Once it has deleted what it deletes: the safety read starts
+   * again over the same host, with no read, timer or name in memory (the next hand-off writes the name again), the safety
+   * entry of the stored schedule is set again from what is left, and the alarm from the whole schedule. Never rejects.
+   */
+  private resetIfListed(handedName: unknown): Promise<void> | null {
+    const outcome = runStagingReset({
+      storage: this.ctx.storage,
+      env: this.env,
+      handedName: typeof handedName === "string" ? handedName : null,
+      safety: this.safety,
+      pending: () => [...this.batch.pendingEventIds(), ...this.lease.pendingEventIds()],
+    });
+    if (outcome !== "applied") return null;
+    this.safety = new SafetyOnArrival(this.safetyHost);
+    return Promise.resolve()
+      .then(() => {
+        this.syncSafetySchedule();
+        return this.batch.arm();
+      })
+      .catch(() => {
+        // Not set: the alarm's own steps, and the next hand-off, set it again from the schedule.
+      });
   }
 
   /**
@@ -392,6 +431,10 @@ export class HandleActor extends DurableObject {
    * event id was known and nothing changed. A throw means nothing was kept: the gateway answers 503.
    */
   async accept(handoff: SealedHandoff): Promise<StoreAnswer> {
+    // The staging-only reset of a listed test handle's actor, first (T-1452), so a text this hand-off stores is never
+    // among what it deletes.
+    const reset = this.resetIfListed(handoff.actorName);
+    if (reset !== null) await reset;
     const route = checkHandoff(handoff);
     let answer: StoreAnswer;
     if (route === "inbox") {

@@ -119,6 +119,7 @@ import { setBatchHooks } from "../actor/batch";
 import { setCopyDeps } from "../actor/copies/copies";
 import type { CopyDeps } from "../actor/copies/types";
 import { setLeaseHooks } from "../actor/lease";
+import { setStagingReset, type StagingResetHook } from "../actor/staging-reset";
 import { setBundleDeps } from "../bundle/pin";
 import type { BundleDeps, BundleRegistry } from "../bundle/types";
 import { actorOf } from "../clocks/actors";
@@ -432,6 +433,13 @@ export interface RootOptions {
    * written all the same. A reader that throws or answers no string reads as blank.
    */
   readonly rosieNumber?: (() => string) | null;
+  /**
+   * The staging-only reset of a listed test handle's actor (T-1452; DL-944 card A; ../actor/staging-reset.ts): the reset
+   * list's hook, handed in by ./staging/actor-reset.ts through stagingOptions. install() sets it for the isolate only where
+   * the root is staging's (its environment staging, and environmentOf its vars staging); a production or test root never
+   * sets it, whatever it is handed. Null or left out, none is set, and every actor's alarm and hand-off read nothing for it.
+   */
+  readonly actorReset?: StagingResetHook | null;
 }
 
 export interface Root {
@@ -882,6 +890,11 @@ export function composeRoot(options: RootOptions): Root {
     copies,
     replies,
     install() {
+      // The staging-only reset's hook (T-1452): only where the root is staging's, never production's or a test's.
+      const actorReset =
+        options.environment === "staging" && environmentOf(options.vars) === "staging"
+          ? (options.actorReset ?? null)
+          : null;
       const restores = [
         setBatchHooks({ clock: { now } }),
         setSafetyDeps(safety),
@@ -897,6 +910,7 @@ export function composeRoot(options: RootOptions): Root {
         setLeaseHooks(turnChats.around(pinnedRuns.around(turnHooks))),
         // The retry queue's ports (T-256): its send jobs reach the dispatcher's door (T-258; DL-315).
         setQueueDeps(queue),
+        ...(actorReset === null ? [] : [setStagingReset(actorReset)]),
       ];
       return () => {
         for (const restore of restores.reverse()) restore();
