@@ -1704,6 +1704,18 @@ describe("fireClock takes the setup tables a turn's commit takes (T-1437; K-05 v
         notFoundIn("busy_blocks"),
         "the movers' photo",
       );
+      // An update of his own row that would leave it outside the rule is refused before any write, on the row as it will
+      // stand (DL-941 item 3): his session given to Maya, and his sign-in code of no business given to the movers.
+      for (const [what, write] of [
+        ["Sam's session given to Maya", updateOf(SESSION, { person_id: "person-maya" })],
+        ["Sam's sign-in code given to the movers", updateOf(SIGN_IN_CODE, { business_id: MOVERS })],
+      ] as const) {
+        await expectRefused(
+          firingOf("clock-t1437-sam", [], [write]),
+          /^fireClock: a state update of (sessions|proof_codes) leaves a row outside its rule for a firing \(default 10\)$/,
+          what,
+        );
+      }
       const sam = fired(
         await fireClock(
           runtime,

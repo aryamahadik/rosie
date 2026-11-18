@@ -142,8 +142,9 @@
 // commits a turn's, and reads each table (tableInfo), names its key (oneKey, stateUpdateTarget), finds and locks each row
 // (lockRow), reads the businesses a two-column version read is compared under (comparedBusinesses) and refuses a move
 // (refuseBusinessMoves) by these exported helpers, through RowWriter, so the two writers take the same targets and never
-// drift. A helper's error starts with its writer's name. The firing adds its own rule for a row of a table scoped none
-// (clocks.ts), passed to lockRow as `bound`; commitTurn passes none, so what it accepts is unchanged.
+// drift. A helper's error starts with its writer's name. A firing's row of a table scoped none must also meet
+// setup/fact-homes.ts rowBound, the one rule every reader of a setup row by its name calls, passed to lockRow as `bound`
+// (clocks.ts); commitTurn passes none, so what it accepts is unchanged.
 import type postgres from "postgres";
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.1";
 import type * as K05v117 from "../../contracts/generated/data-access/data-access.v1.17";
@@ -791,9 +792,10 @@ function namedRowWhere(
 
 /**
  * Finds and locks one row a writer compares or writes (FOR UPDATE to write it, FOR SHARE to compare it), by its one key
- * column, or a two-column row as namedRowWhere finds it; with `bound`, only a row that also meets it (clocks.ts's rule
- * for a firing's rows of a table scoped none: T-1437), never one for commitTurn. A row it does not find throws (default
- * 1, fail closed).
+ * column, or a two-column row as namedRowWhere finds it; with `bound`, only a row that also meets it: SQL that follows
+ * the row's compare and starts with "and" (or is empty), as setup/fact-homes.ts rowBound writes it (a firing's rows of a
+ * table scoped none: clocks.ts, T-1437), never one for commitTurn. A row it does not find throws (default 1, fail
+ * closed).
  */
 export async function lockRow(
   w: RowWriter,
@@ -807,7 +809,7 @@ export async function lockRow(
   const column = singleColumn(key);
   const { tx } = w;
   const named = column === null ? namedRowWhere(w, info, target, businesses) : tx`${tx(column)} = ${rowId}`;
-  const where = bound === null ? named : tx`${named} and (${bound})`;
+  const where = bound === null ? named : tx`${named} ${bound}`;
   const [row] =
     mode === "update"
       ? await tx<Row[]>`select * from ${tx(table)} where ${where} for update`
