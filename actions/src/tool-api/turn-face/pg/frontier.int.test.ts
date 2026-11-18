@@ -40,6 +40,23 @@
 // one written to no socket among them), nothing is thrown uncaught (Vitest fails the run on one, and such a statement
 // never settles), and what the call leaves holds none of the connection: K-09's transient when a read follows the close,
 // else the end thrown scrubbed, readTurnState's 08006 alone. Through the scope alone, the same for any await of `work`.
+//
+// T-1438 (T-667 run 1's new task (c); DL-927): the frontier reads setup facts, its repo reading through
+// db/repo/setup/turn-state's readTurnStateIn. On local PostgreSQL, in a schema of this file's own (the turn face's seeds,
+// test-support.ts openTurnFaceDatabase), with a demo shop mid-setup: Lee's Barbershop as T-1148's seed leaves it for
+// S1-02 (its company and its one kind of work), with K-23's setup row and flow defaults for it (seed-business-demo-shop
+// .json) and its K-33 bill card, and no service, rule or hours yet. Beside it, other businesses' setup rows: the yoga
+// studio's bill card (seed-bill-card.json) and Lee Home Services with its company and two kinds of work
+// (seed-company-two-kinds.json); and K-24's shared catalog (seed-kinds-sample.json). Each seed's own rows are loaded as
+// the tables' owner, its `after` chain left out: T-1148's seed stands in for it, and holds the barbershop's company and
+// kind of work value for value. Every value is a seed's: this file writes no phone number, name or address. The proofs:
+// through the scope, the barbershop's setup facts answer beside the core facts, in the request's order, each with its
+// row (a two-column key by K-05 v1.18 item 77's name) and its version, in the frontier's one read-only transaction;
+// a request of core facts alone answers value for value what T-219's read (db/repo/turn-state.ts, the frontier's read
+// before this card) answers in the same transaction; another business's setup rows answer notFound under each scope,
+// and a request naming another business than the scope's is refused before any setup table is read; and through
+// buildFrontier, decide's context carries each setup fact with its row and version beside a core fact's, each a K-05
+// rowRef, the row reference the commit's versions_read takes.
 
 import { once } from "node:events";
 import { type AddressInfo, createConnection, createServer, type Socket } from "node:net";
@@ -48,10 +65,11 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { createClient, resolvePrimaryUrl } from "../../../../../db/repo/client";
 import { DataAccessDatabaseError } from "../../../../../db/repo/clocks";
-import { SCOPE_SETTING, type Sql } from "../../../../../db/repo/scope";
+import { BusinessScopeError, SCOPE_SETTING, type Sql, withBusiness } from "../../../../../db/repo/scope";
 import type { TransientError } from "../../../../../db/repo/targets";
+import { FACT_HOMES, readTurnStateIn as readCoreTurnStateIn } from "../../../../../db/repo/turn-state";
 import type { Span } from "../../../../../runtime/src/trace";
-import { RUNTIME_ROLE, type CommitDatabase } from "../../../commit/pg/test-support";
+import { insertRow, RUNTIME_ROLE, writesIn, type CommitDatabase } from "../../../commit/pg/test-support";
 import { frameFacts } from "../../../frontier/assemble/frame";
 import { frontierHandlers } from "../../../frontier/assemble/handler";
 import { frontierSources } from "../../../frontier/assemble/registry";
@@ -66,11 +84,15 @@ import {
   type LogCapture,
 } from "../../../frontier/assemble/test-support";
 import type {
+  Context,
   FrontierBundles,
   FrontierRepo,
+  ReadTurnStateAnswer,
   ReadTurnStateRequest,
   SourceSlot,
+  TurnState,
 } from "../../../frontier/assemble/types";
+import type { FactSource, FrontierFactsOptions } from "../../../frontier/facts/facts";
 import { factHomes } from "../../../frontier/facts/homes";
 import { turnStateFactsPort } from "../../../frontier/facts/read";
 import { traceFor } from "../../test-support";
@@ -78,7 +100,7 @@ import { createToolApi } from "../../tool-api";
 import { s101Exchange } from "../test-support";
 import type { BuildFrontierCallAnswer } from "../turn-face";
 import { pgFrontierRepo, pgFrontierScope, pgTurnFace } from "./frontier";
-import { BARBERSHOP, openTurnFaceDatabase, SAM, SAM_HANDLE } from "./test-support";
+import { BARBERSHOP, openTurnFaceDatabase, SAM, SAM_HANDLE, YOGA } from "./test-support";
 
 /** The frontier's one K-05 call: the name every scrubbed error of its transaction carries. */
 const CALL = "readTurnState";
@@ -1484,6 +1506,520 @@ describe("a close while the frontier's transaction waits between its statements 
       });
       expectNothingAfterClose(thrown, `${how}: work threw`);
       expect(thrownOf(thrown.settled)).toBe(own);
+    },
+  );
+});
+
+// ---- T-1438: the frontier reads setup facts ------------------------------------------------------------------------
+
+const SETUP_SLOW = { timeout: 60_000 };
+
+/** Lee Home Services (K-23 seed-company-two-kinds.json): another business of Sam's, with setup rows of its own. */
+const HOME_SERVICES = "biz-lee-home-services";
+/** The barbershop's company, whose row T-1148's seed holds (K-23's, value for value). */
+const SHOP_COMPANY = "company-lees-barbershop";
+/** K-05 v1.18 item 77's names: a two-column key's values joined by "/" in key order (company/kind, business/flow). */
+const SHOP_KIND = `${SHOP_COMPANY}/barber`;
+const SHOP_FLOW_A = `${BARBERSHOP}/A`;
+const SHOP_CARD = "billcard-lees-barbershop-1";
+const YOGA_CARD = "billcard-yoga-studio-1";
+const OTHER_COMPANY = "company-lee-home-services";
+const OTHER_KIND = `${OTHER_COMPANY}/plumber`;
+/** The barbershop's haircut (K-25 seed-services-price-list.json): a service this schema has not set up yet. */
+const SHOP_HAIRCUT = "svc-lees-haircut";
+
+/** The setup parts' seeds this block loads or reads, by their paths under contracts/db-schema/. */
+const SHOP_SETUP = "business-setup/fixtures/seed-business-demo-shop.json";
+const TWO_KINDS = "business-setup/fixtures/seed-company-two-kinds.json";
+const KINDS_SAMPLE = "kinds-of-work/fixtures/seed-kinds-sample.json";
+const BILL_CARDS = "platform-billing/fixtures/seed-bill-card.json";
+
+type Values = Readonly<Record<string, unknown>>;
+
+/** A seed of a setup part (contracts/db-schema/<part>/fixtures): its own rows, in order. */
+interface SetupSeed {
+  readonly after: readonly string[];
+  readonly rows: readonly { readonly table: string; readonly values: Values }[];
+}
+
+const setupSeed = (file: string): SetupSeed => contractFixture(`db-schema/${file}`) as SetupSeed;
+
+/** The one row of `table` in a setup seed whose values hold each of `match`'s. */
+function setupRow(file: string, table: string, match: Values): Values {
+  const [row, ...more] = setupSeed(file).rows.filter(
+    (each) =>
+      each.table === table && Object.entries(match).every(([column, value]) => each.values[column] === value),
+  );
+  if (row === undefined || more.length > 0) throw new Error(`${file} has no one ${table} row that matches`);
+  return row.values;
+}
+
+/** K-05 v1.2 factRef: a fact named by its key and its one home (a table, a row's name, a column). */
+type FactRef = ReadTurnStateRequest["facts"][number];
+
+/**
+ * A fact of one home's row, keyed `<table>.<column>`. The generated factTable type is wider than the schema (it cannot say
+ * "a table name, never sealing_keys"), so the name is cast, as frame.ts casts its own; K-05's own schema check holds it.
+ */
+function factOf(table: string, rowId: string, column: string): FactRef {
+  return { key: `${table}.${column}`, table: table as unknown as FactRef["table"], rowId, column };
+}
+
+/** A fact as the read answers it: its ref, the value (the seed row's own unless given) and the row's version. */
+function answered(ref: FactRef, seed: Values, value: unknown = seed[ref.column]): Values {
+  return { ...ref, value, version: seed.version };
+}
+
+/** A read's notFound for the row a fact names. */
+function missing(ref: FactRef): Values {
+  return { error: "notFound", table: ref.table, rowId: ref.rowId };
+}
+
+/** What a call answered (it must have answered). */
+function answerOf(settled: Settled): unknown {
+  expect(settled).toHaveProperty("answer");
+  return (settled as { answer: unknown }).answer;
+}
+
+/** A read's turn state (it must be one). */
+function turnStateOf(answer: unknown): TurnState {
+  expect(answer).toHaveProperty("result", "turnState");
+  return answer as TurnState;
+}
+
+/** The statements that open and end a call's transaction: its begin, then its commit or its rollback. */
+function transactionOf(statements: readonly string[]): string[] {
+  return statements.map((text) => text.trim()).filter((text) => /^(begin|commit|rollback)\b/i.test(text));
+}
+
+/** Where the first statement that reads `table` by its quoted name is among `statements` (their text alone), or -1. */
+function readAt(statements: readonly string[], table: string): number {
+  return statements.findIndex((text) => text.includes(`from "${table}"`));
+}
+
+/** Each of `tables` was read inside the call's one transaction: after the frontier set its scope, before the commit. */
+function expectReadInside(statements: readonly string[], tables: readonly string[]): void {
+  const setting = statements.findIndex((text) => FRONTIER_SCOPE.test(text.trim()));
+  const commit = statements.map((text) => text.trim()).lastIndexOf("commit");
+  expect(setting).toBeGreaterThan(0);
+  for (const table of tables) {
+    expect(readAt(statements, table), table).toBeGreaterThan(setting);
+    expect(readAt(statements, table), table).toBeLessThan(commit);
+  }
+}
+
+describe("the frontier reads a demo shop's setup facts beside its core facts (T-1438; local PostgreSQL)", () => {
+  let cdb: CommitDatabase;
+
+  beforeAll(async () => {
+    ({ cdb } = await openTurnFaceDatabase(2, [], "frontier_setup"));
+    const { sql } = cdb.db;
+    const columns = await sql<{ key: string; type: string }[]>`
+      select table_name || '.' || column_name as key, data_type as type from information_schema.columns
+      where table_schema = ${cdb.db.schema} and data_type in ('jsonb', 'bytea')
+    `;
+    const typed = new Map(columns.map((column) => [column.key, column.type]));
+    const ofHomeServices = (values: Values): boolean =>
+      values.id === HOME_SERVICES || values.business_id === HOME_SERVICES;
+    const rows = [
+      // K-24's shared catalog, scoped none.
+      ...setupSeed(KINDS_SAMPLE).rows,
+      // The barbershop's setup row and its flow defaults.
+      ...setupSeed(SHOP_SETUP).rows.filter(
+        (row) => row.table === "business_setup" || row.table === "flow_defaults",
+      ),
+      // Lee Home Services' business head, company and kinds of work (its owner role is no setup row; the barbershop's
+      // company and kind of work are T-1148's already).
+      ...setupSeed(TWO_KINDS).rows.filter(
+        (row) => row.table !== "person_roles" && ofHomeServices(row.values),
+      ),
+      // The barbershop's bill card, and the yoga studio's.
+      ...setupSeed(BILL_CARDS).rows,
+    ];
+    await sql.begin(async (tx) => {
+      for (const row of rows) await insertRow(tx, typed, row.table, row.values);
+    });
+  }, 120_000);
+
+  afterAll(async () => {
+    await cdb.close();
+  });
+
+  /** One call through the frontier's scope under `businessId`, on a client of its own that writes down each statement. */
+  async function scoped(
+    businessId: string,
+    work: (repo: FrontierRepo) => Promise<unknown>,
+  ): Promise<{ settled: Settled; statements: string[] }> {
+    const statements: string[] = [];
+    const runtime = cdb.client(RUNTIME_ROLE, "rosie-t1438-frontier-setup", 1, (text) => {
+      statements.push(text);
+    });
+    try {
+      return { settled: await settle(pgFrontierScope(runtime).withBusiness(businessId, work)), statements };
+    } finally {
+      await runtime.end({ timeout: 5 });
+    }
+  }
+
+  /** The frontier's read of Sam's handle under `businessId`, naming `businessId` and `facts`: what it answered. */
+  async function readUnder(businessId: string, facts: FactRef[]): Promise<unknown> {
+    const { settled } = await scoped(businessId, (repo) =>
+      repo.readTurnState({ handleId: SAM_HANDLE, businessId, bookingIds: [], facts }),
+    );
+    return answerOf(settled);
+  }
+
+  it(
+    "a demo shop mid-setup: its setup facts answer beside the core facts, in the request's order, each with its row and version, in the frontier's one read-only transaction",
+    SETUP_SLOW,
+    async () => {
+      const noMoney = factOf("business_setup", BARBERSHOP, "no_money");
+      const cutoff = factOf("flow_defaults", SHOP_FLOW_A, "cutoff_before");
+      const company = factOf("companies", SHOP_COMPANY, "name");
+      const kindFacts = factOf("company_kinds", SHOP_KIND, "pf_facts");
+      const pattern = factOf("kinds", "barber", "pattern");
+      const savedAt = factOf("bill_cards", SHOP_CARD, "saved_at");
+      const frame = frontierRead(BARBERSHOP);
+      const request: ReadTurnStateRequest = {
+        ...frame,
+        facts: [noMoney, ...frame.facts, cutoff, company, kindFacts, pattern, savedAt],
+      };
+
+      const { settled, statements } = await scoped(BARBERSHOP, async (repo) => [
+        await repo.readTurnState(request),
+        await repo.readTurnState(frame),
+      ]);
+      const [mixed, coreOnly] = answerOf(settled) as [ReadTurnStateAnswer, ReadTurnStateAnswer];
+      expect(k05Problems("readTurnState.response", mixed)).toEqual([]);
+      const state = turnStateOf(mixed);
+      const core = turnStateOf(coreOnly);
+      expect(state.facts).toEqual([
+        answered(noMoney, setupRow(SHOP_SETUP, "business_setup", { business_id: BARBERSHOP })),
+        ...core.facts,
+        // K-23's "24 hours", as its whole minutes (setup/turn-state.ts default 5).
+        answered(
+          cutoff,
+          setupRow(SHOP_SETUP, "flow_defaults", { business_id: BARBERSHOP, flow: "A" }),
+          "1440 minutes",
+        ),
+        answered(company, setupRow(TWO_KINDS, "companies", { id: SHOP_COMPANY })),
+        answered(
+          kindFacts,
+          setupRow(TWO_KINDS, "company_kinds", { company_id: SHOP_COMPANY, kind_id: "barber" }),
+        ),
+        answered(pattern, setupRow(KINDS_SAMPLE, "kinds", { id: "barber" })),
+        answered(savedAt, setupRow(BILL_CARDS, "bill_cards", { id: SHOP_CARD })),
+      ]);
+      // The core facts' answer is the one the core-only read gave in the same moment: nothing of it changed.
+      const coreKeys = new Set(frame.facts.map((fact) => fact.key));
+      expect({ ...state, facts: state.facts.filter((fact) => coreKeys.has(fact.key)) }).toEqual(core);
+
+      // One read-only transaction, committed, nothing written; each setup table read inside it, under the scope.
+      expect(transactionOf(statements)).toEqual([expect.stringMatching(/^begin\b.*\bread only$/i), "commit"]);
+      expect(writesIn(statements)).toEqual([]);
+      expectReadInside(statements, [
+        "business_setup",
+        "flow_defaults",
+        "companies",
+        "company_kinds",
+        "kinds",
+        "bill_cards",
+      ]);
+
+      // Mid-setup: its haircut is a setup fact's home (K-25 services), but not set up yet, so its row is missing.
+      const haircut = factOf("services", SHOP_HAIRCUT, "name");
+      expect(await readUnder(BARBERSHOP, [haircut])).toEqual(missing(haircut));
+    },
+  );
+
+  it(
+    "a core-only turn answers as before: value for value what T-219's read answers in the same transaction; a setup fact, which T-219's read refuses, is answered",
+    SETUP_SLOW,
+    async () => {
+      const everyColumn = (table: string, rowId: string): FactRef[] =>
+        Object.keys(FACT_HOMES[table]?.columns ?? {}).map((column) => factOf(table, rowId, column));
+      const frame = frontierRead(BARBERSHOP);
+      const requests: ReadTurnStateRequest[] = [
+        frame,
+        { ...frame, facts: [...everyColumn("businesses", BARBERSHOP), ...everyColumn("persons", SAM)] },
+        { ...frame, facts: [] },
+        { ...frame, facts: frameFacts(YOGA, []) },
+        { ...frame, handleId: "handle-not-there" },
+        { ...frame, facts: [factOf("businesses", BARBERSHOP, "not_a_column")] },
+      ];
+      const noMoney = factOf("business_setup", BARBERSHOP, "no_money");
+      const setupRequest: ReadTurnStateRequest = { ...frame, facts: [noMoney] };
+
+      // Both reads on one read-only transaction under the barbershop's scope, so each answer is the same moment's.
+      const { outcomes, setup } = await withBusiness(
+        cdb.runtime,
+        BARBERSHOP,
+        async (tx) => {
+          const read: { frontier: ReadTurnStateAnswer; before: unknown }[] = [];
+          for (const request of requests) {
+            read.push({
+              frontier: await pgFrontierRepo(tx).readTurnState(request),
+              before: await readCoreTurnStateIn(tx, request),
+            });
+          }
+          return {
+            outcomes: read,
+            setup: {
+              frontier: await pgFrontierRepo(tx).readTurnState(setupRequest),
+              before: await readCoreTurnStateIn(tx, setupRequest),
+            },
+          };
+        },
+        { readOnly: true },
+      );
+
+      expect(
+        outcomes.map(({ frontier }) => ("error" in frontier ? frontier.error : frontier.result)),
+      ).toEqual(["turnState", "turnState", "turnState", "notFound", "notFound", "unknownFact"]);
+      for (const [index, { frontier, before }] of outcomes.entries()) {
+        expect(frontier, `request ${String(index)}`).toEqual(before);
+      }
+      // Before this card the frontier read through T-219's read alone, which refuses a setup fact; now it is answered.
+      expect(setup.before).toEqual({
+        error: "unknownFact",
+        key: noMoney.key,
+        table: "business_setup",
+        column: "no_money",
+      });
+      expect(turnStateOf(setup.frontier).facts).toEqual([
+        answered(noMoney, setupRow(SHOP_SETUP, "business_setup", { business_id: BARBERSHOP })),
+      ]);
+    },
+  );
+
+  it(
+    "another business's setup rows are never answered: notFound under each scope, the business's own answered; a request naming another business is refused before any read",
+    SETUP_SLOW,
+    async () => {
+      // Under the barbershop: the yoga studio's bill card, and Lee Home Services' company and plumbing kind (Sam owns both
+      // businesses: the business decides, never the person).
+      for (const ref of [
+        factOf("bill_cards", YOGA_CARD, "saved_at"),
+        factOf("companies", OTHER_COMPANY, "name"),
+        factOf("company_kinds", OTHER_KIND, "trade_name"),
+      ]) {
+        const answer = await readUnder(BARBERSHOP, [ref]);
+        expect(answer, ref.key).toEqual(missing(ref));
+        expect(k05Problems("readTurnState.errors", answer), ref.key).toEqual([]);
+      }
+      // Beside the barbershop's own facts: the first missing in the request's order, and nothing else answered.
+      const otherKind = factOf("company_kinds", OTHER_KIND, "trade_name");
+      expect(
+        await readUnder(BARBERSHOP, [
+          factOf("business_setup", BARBERSHOP, "no_money"),
+          ...frameFacts(BARBERSHOP, [SAM]),
+          otherKind,
+          factOf("bill_cards", SHOP_CARD, "saved_at"),
+        ]),
+      ).toEqual(missing(otherKind));
+
+      // Under the yoga studio: each of the barbershop's setup rows is missing.
+      for (const ref of [
+        factOf("business_setup", BARBERSHOP, "no_money"),
+        factOf("flow_defaults", SHOP_FLOW_A, "cutoff_before"),
+        factOf("companies", SHOP_COMPANY, "name"),
+        factOf("company_kinds", SHOP_KIND, "trade_name"),
+        factOf("bill_cards", SHOP_CARD, "saved_at"),
+      ]) {
+        expect(await readUnder(YOGA, [ref]), ref.key).toEqual(missing(ref));
+      }
+      // Its own bill card answers, and the shared catalog (scoped none) under any business.
+      const yogaCard = factOf("bill_cards", YOGA_CARD, "saved_at");
+      const barber = factOf("kinds", "barber", "pattern");
+      expect(turnStateOf(await readUnder(YOGA, [yogaCard, barber])).facts).toEqual([
+        answered(yogaCard, setupRow(BILL_CARDS, "bill_cards", { id: YOGA_CARD })),
+        answered(barber, setupRow(KINDS_SAMPLE, "kinds", { id: "barber" })),
+      ]);
+
+      // A request naming another business than the scope's is refused (T-219's scope check, which T-667's read runs
+      // first) before anything is read: after the scope's setting, only the scope's own read and the rollback.
+      const shopFacts = [
+        factOf("business_setup", BARBERSHOP, "no_money"),
+        factOf("company_kinds", SHOP_KIND, "trade_name"),
+      ];
+      for (const [scope, named] of [
+        [YOGA, BARBERSHOP],
+        [BARBERSHOP, YOGA],
+      ] as const) {
+        const refused = await scoped(scope, (repo) =>
+          repo.readTurnState({ handleId: SAM_HANDLE, businessId: named, bookingIds: [], facts: shopFacts }),
+        );
+        expect(thrownOf(refused.settled), scope).toBeInstanceOf(BusinessScopeError);
+        const setting = refused.statements.findIndex((text) => FRONTIER_SCOPE.test(text.trim()));
+        expect(setting, scope).toBeGreaterThan(0);
+        const after = refused.statements.slice(setting + 1).map((text) => text.trim());
+        expect(
+          after.filter((text) => !/current_setting/.test(text)),
+          scope,
+        ).toEqual(["rollback"]);
+      }
+    },
+  );
+
+  /** buildFrontier on turn 1 through the Tool API base on the frontier's scope, the hub slot and these facts' options. */
+  async function buildWith(
+    facts: FrontierFactsOptions,
+  ): Promise<{ settled: Settled; spans: Span[]; statements: string[] }> {
+    const statements: string[] = [];
+    const runtime = cdb.client(RUNTIME_ROLE, "rosie-t1438-frontier-facts", 1, (text) => {
+      statements.push(text);
+    });
+    const bundles = fakeBundles(sampleBundle("bundle-v0-skeleton.json"));
+    const log = captureLog();
+    const { request } = s101Exchange();
+    const { trace, spans } = traceFor(request);
+    try {
+      const handlers = frontierHandlers<FrontierRepo>({
+        bundles,
+        checker,
+        log: log.sink,
+        sources: [...frontierSources(bundles), hubSlot()],
+        facts,
+      });
+      const api = createToolApi({ validator, scope: pgFrontierScope(runtime), handlers });
+      const settled = await settle(api.call("buildFrontier", structuredClone(request), trace));
+      return { settled, spans, statements };
+    } finally {
+      await runtime.end({ timeout: 5 });
+    }
+  }
+
+  it(
+    "buildFrontier gives decide each setup fact with its row and version beside a core fact's, each the K-05 rowRef the commit's versions_read takes; another business's row is never given",
+    SETUP_SLOW,
+    async () => {
+      const setup = setupRow(SHOP_SETUP, "business_setup", { business_id: BARBERSHOP });
+      const flowA = setupRow(SHOP_SETUP, "flow_defaults", { business_id: BARBERSHOP, flow: "A" });
+      const kind = setupRow(TWO_KINDS, "company_kinds", { company_id: SHOP_COMPANY, kind_id: "barber" });
+      // `thread`, which S1-02 needs (bundle v0), at its core home as T-1368's facts run has it; and three setup keys S1-02
+      // reads (a fact source's places, each its key's home): the call's business's setup row, and two rows by their names.
+      const homesFor = (kindRow: string) =>
+        factHomes([
+          { name: "thread", home: "record", table: "businesses", column: "name", row: { of: "business" } },
+          {
+            name: "setup.no_money",
+            home: "money",
+            table: "business_setup",
+            column: "no_money",
+            row: { of: "business" },
+          },
+          {
+            name: "setup.cutoff",
+            home: "clock",
+            table: "flow_defaults",
+            column: "cutoff_before",
+            row: { of: "row", rowId: SHOP_FLOW_A },
+          },
+          {
+            name: "setup.trade_name",
+            home: "record",
+            table: "company_kinds",
+            column: "trade_name",
+            row: { of: "row", rowId: kindRow },
+          },
+        ]);
+      const readsFor = (kindRow: string): FactSource => ({
+        name: "t1438Setup",
+        reads: (view) => [
+          {
+            name: "setup.no_money",
+            step: "S1-02",
+            table: "business_setup",
+            rowId: view.target.businessId,
+            column: "no_money",
+          },
+          {
+            name: "setup.cutoff",
+            step: "S1-02",
+            table: "flow_defaults",
+            rowId: SHOP_FLOW_A,
+            column: "cutoff_before",
+          },
+          {
+            name: "setup.trade_name",
+            step: "S1-02",
+            table: "company_kinds",
+            rowId: kindRow,
+            column: "trade_name",
+          },
+        ],
+      });
+
+      const built = await buildWith({ homes: homesFor(SHOP_KIND), sources: [readsFor(SHOP_KIND)] });
+      const answer = answerOf(built.settled) as { context: Context; flagged: unknown[] };
+      expect(validator.check("buildFrontier", "response", answer)).toEqual([]);
+      expect(checker.check("context", answer.context)).toEqual([]);
+      expect(answer.flagged).toEqual([]);
+      expect(answer.context.facts).toEqual([
+        {
+          name: "thread",
+          value: "Lee's Barbershop",
+          home: "record",
+          table: "businesses",
+          rowId: BARBERSHOP,
+          version: 3,
+          forSteps: ["S1-02"],
+        },
+        {
+          name: "setup.no_money",
+          value: setup.no_money,
+          home: "money",
+          table: "business_setup",
+          rowId: BARBERSHOP,
+          version: setup.version,
+          forSteps: ["S1-02"],
+        },
+        {
+          name: "setup.cutoff",
+          value: "1440 minutes",
+          home: "clock",
+          table: "flow_defaults",
+          rowId: SHOP_FLOW_A,
+          version: flowA.version,
+          forSteps: ["S1-02"],
+        },
+        {
+          name: "setup.trade_name",
+          value: kind.trade_name,
+          home: "record",
+          table: "company_kinds",
+          rowId: SHOP_KIND,
+          version: kind.version,
+          forSteps: ["S1-02"],
+        },
+      ]);
+      // Each fact's row and version is the row reference K-05 stores in versions_read and a commit compares and sets
+      // (limit 4): a setup row's as a core row's.
+      for (const fact of answer.context.facts) {
+        const row = { table: fact.table, rowId: fact.rowId, version: fact.version };
+        expect(k05Problems("rowRef", row), fact.name).toEqual([]);
+      }
+      expect(built.spans).toHaveLength(1);
+      expect(built.spans[0]).toMatchObject({
+        hop: "frontier",
+        outcome: "ok",
+        error_code: null,
+        business_id: BARBERSHOP,
+      });
+      // The frame's read and the facts' read, both in the call's one read-only transaction, committed; nothing written.
+      expect(transactionOf(built.statements)).toEqual([
+        expect.stringMatching(/^begin\b.*\bread only$/i),
+        "commit",
+      ]);
+      expect(writesIn(built.statements)).toEqual([]);
+      expectReadInside(built.statements, ["business_setup", "flow_defaults", "company_kinds"]);
+
+      // A home naming Lee Home Services' kind under the barbershop's call: buildFrontier's own notFound, never its value.
+      const other = await buildWith({ homes: homesFor(OTHER_KIND), sources: [readsFor(OTHER_KIND)] });
+      const refused = answerOf(other.settled);
+      expect(refused).toEqual({ error: "notFound", table: "company_kinds", rowId: OTHER_KIND });
+      expect(validator.check("buildFrontier", "errors", refused)).toEqual([]);
+      expect(other.spans[0]).toMatchObject({ hop: "frontier", outcome: "refused", error_code: "notFound" });
     },
   );
 });
