@@ -1,11 +1,12 @@
 // What the paging and hand-offs service reads (T-319; C-104), each a port another task binds, so the service is tested
 // with doubles and fails closed while one is not bound:
 //
-//   - PagingReader: K-36 v1's pages, recipients and hand-offs, K-37 v1's review items, the K-04 rows they lean on (a
-//     clock row's state, a chat's state, the business's owner and zone) and the version of the row a review decision
-//     writes back to. K-36 rule 2 and K-37 rule 2 keep team_pages, team_page_recipients and review_items from the Tool
-//     API role (insert only on team_pages; no grant on the other two), so those reads are the runtime side's, which the
-//     binding chooses: this service never opens a transaction. The default reader refuses every read (notBuilt);
+//   - PagingReader: K-36 v1's pages, recipients and hand-offs, K-37 v1's review items, the K-34 v1 safety read a handOff
+//     names (its business and outcomes, never its words: K-36 rule 5, T-1447), the K-04 rows they lean on (a clock row's
+//     state, a chat's state, the business's owner, zone and name) and the version of the row a review decision writes
+//     back to. K-36 rule 2 and K-37 rule 2 keep team_pages, team_page_recipients and review_items from the Tool API role
+//     (insert only on team_pages; no grant on the other two), so those reads are the runtime side's, which the binding
+//     chooses: this service never opens a transaction. The default reader refuses every read (notBuilt);
 //   - TestRoster: on staging, which handles are roster test phones (build prompt 9.4; QUESTIONS.md M3-M3b.5; the user's
 //     rule, DL-839). The default knows none, so on staging every page and alert waits in the test console and no row is
 //     written to anyone (recipients.ts).
@@ -14,6 +15,7 @@
 // so nothing here may send, store or tell outside the one commit (../../commit/types.ts CommitPorts).
 
 import { NotBuiltError, type CallName } from "../../tool-api";
+import type { StoredOutcome } from "../safety";
 
 /** K-36 v1 team_pages.reason. */
 export type PageReason =
@@ -27,6 +29,9 @@ export type PageReason =
 
 /** K-36 v1 hand_offs.kind (arch 06 line 329's "Who is told"). */
 export type HandOffKind = "crisis_words" | "emergency" | "threat" | "other";
+
+/** The three hand-off kinds a safety read raises, each naming its read (K-36 v1 hand_offs_safety_kind_has_outcome). */
+export type SafetyHandOffKind = Exclude<HandOffKind, "other">;
 
 /** K-37 v1 review_items.kind. */
 export type ReviewKind =
@@ -115,6 +120,13 @@ export interface StoredRow {
   readonly businessId: string | null;
 }
 
+/**
+ * A K-34 v1 safety_outcomes row as a handOff reads it (K-05 v1.4 readSafetyOutcome, item 38, in T-318's StoredOutcome
+ * names): its id, its business and what holds after code's rules, which the hand-off's kind must match (K-36 rule 5).
+ * Never its sealed words.
+ */
+export type StoredSafetyRead = Pick<StoredOutcome, "id" | "businessId" | "outcomes">;
+
 /** A K-04 v1 clock_rows row's state, as an answer or an acknowledgement cancels it. */
 export interface StoredClock {
   readonly id: string;
@@ -170,10 +182,17 @@ export interface PagingReader {
   reachOf(personId: string): Promise<PersonReach | null>;
   /** K-36 hand_offs by id, under the business's scope, or null. */
   handOff(handOffId: string): Promise<StoredHandOff | null>;
+  /**
+   * K-34 safety_outcomes by id, under the business's scope (K-05 v1.4 readSafetyOutcome, item 38: never sealed_words), or
+   * null: the read a handOff names, whose outcome its kind matches (K-36 rule 5).
+   */
+  safetyRead(outcomeId: string): Promise<StoredSafetyRead | null>;
   /** K-04 person_roles: the business's live owner, or null. */
   ownerOf(businessId: string): Promise<string | null>;
   /** K-04 businesses.time_zone: the IANA zone the business's days and clock rows are read in (CQ-05), or null. */
   businessZone(businessId: string): Promise<string | null>;
+  /** K-04 businesses.display_name: the name texts show (B02; RULES 4.6), which A3-48's owner line names; or null. */
+  businessName(businessId: string): Promise<string | null>;
   /** K-04 clock_rows by id: its state and version, or null. */
   clock(clockRowId: string): Promise<StoredClock | null>;
   /** K-37 review_items by id, or null. */
@@ -201,8 +220,10 @@ export function noPagingReads(call: CallName): PagingReader {
     chat: refuse,
     reachOf: refuse,
     handOff: refuse,
+    safetyRead: refuse,
     ownerOf: refuse,
     businessZone: refuse,
+    businessName: refuse,
     clock: refuse,
     reviewItem: refuse,
     row: refuse,

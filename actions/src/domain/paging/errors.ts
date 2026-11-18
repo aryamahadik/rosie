@@ -25,6 +25,12 @@ export type PagingFault =
   | "notThePagesClock"
   /** A repeat page of a page paged once (K-36 v1 team_pages.repeat_minutes null: it waits in the team console). */
   | "pageNotRepeating"
+  /**
+   * A hand-off's kind is not its safety read's (K-36 v1 README rule 5: "a hand-off's kind matches its safety read's
+   * outcome (Crisis words, An emergency, A threat to staff or others)"; hand_offs_safety_kind_has_outcome: a hand-off of
+   * kind other names no read, and each safety kind names its read).
+   */
+  | "kindNotItsRead"
   /** A hand-off or its alert needs the business's owner (K-36 v1 hand_offs.told_person_id is not null). */
   | "noOwner"
   /** A clock row's due zone, a harm report's day or a review's business days need the business's zone (CQ-05). */
