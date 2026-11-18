@@ -10,13 +10,21 @@
 //     is refused (notBuilt), never passed;
 //   - each step's card in the turn's bundle (K-01 v1 step: its section, who it is from and to, a split's branches), which
 //     says the step's side (DL-188 ruling 1): StepCards. The gate is not given the turn's bundle yet, so the shipped limit
-//     reads none (NO_STEP_CARDS): every step's side cannot be read, and every choice is the business's (fails closed).
+//     reads none (NO_STEP_CARDS): every step's side cannot be read, and every choice is the business's (fails closed);
+//   - what default 14 (T-1459; DL-961) reads about the turn's handle at the call's business, each from its stored row:
+//     the open question a sign-up's answer answers, the sender's link to the handle and the business's control (K-04
+//     open_questions and person_handles, K-23 business_setup.control_proven_at), in one K-05 v1.2 readTurnState on the
+//     call's transaction: SignUpFacts.
 //
 // Every read takes and gives ids and closed labels: never a person's words, name, number or email (the action layer never
-// reads free text: arch 02 line 139), so nothing limit 1 answers can carry one into a log, a span or an error.
+// reads free text: arch 02 line 139), so nothing limit 1 answers can carry one into a log, a span or an error. The one
+// exception is Rosie's own words of a question as stored (its options and read-back, in limit 3's AskedQuestion), which
+// default 14 never reads.
 
 import type { BookingStage } from "../../../../db/repo/bookings-head";
 import type { Sql, Tx } from "../../../../db/repo/scope";
+import { readTurnStateIn } from "../../../../db/repo/setup/turn-state";
+import type { ReadTurnStateResponse } from "../../../../db/repo/turn-state";
 import {
   NOTHING_ON_FILE,
   NO_ADMIN_POWERS,
@@ -28,6 +36,7 @@ import {
   type ServedFactsReader,
 } from "../../domain/identity-access";
 import type { GateRequest } from "../framework";
+import { askedQuestionOf, type AskedQuestion } from "../limit-3/facts";
 
 /** Who makes the call (K-09 v1 caller.kind): a turn, a page, an outside AI, the console, a job, a clock, the actor. */
 export type CallerKind = GateRequest["caller"]["kind"];
@@ -246,6 +255,83 @@ export function stepCardsOf(graphs: readonly unknown[]): StepCards {
         if (card !== null) return Promise.resolve(card);
       }
       return Promise.resolve(null);
+    },
+  };
+}
+
+// ---- a sign-up's own answer (T-1459; DL-961; default 14 in allowed.ts) ------------------------------------------------
+
+/** K-23 business_setup's control of the call's business (S1-75): when it was proven, or null while it is not. */
+export interface BusinessControl {
+  /** business_setup.control_proven_at in UTC; null: "not yet, so the business stays offline" (K-23 v1). */
+  readonly provenAt: string | null;
+}
+
+/**
+ * What default 14 reads about one turn's handle at the call's business, each fact from its home row, never from the
+ * request's words. A fact that is missing, or whose value cannot be read, answers null or false; a read that fails throws;
+ * the limit answers the part as before default 14 either way.
+ */
+export interface SignUpFacts {
+  /**
+   * (b) The open question as stored (limit 3's AskedQuestion: K-05 v1.2 openQuestionRead), when it is live (waiting or
+   * open) on this handle at the call's business; else null.
+   */
+  question(openQuestionId: string): Promise<AskedQuestion | null>;
+  /** (c) Whether K-04 links the person to this handle (person_handles). */
+  linked(personId: string): Promise<boolean>;
+  /** (d) The call's business's control (K-23 business_setup), or null when it has no business_setup row. */
+  control(): Promise<BusinessControl | null>;
+}
+
+/** The fact default 14 reads of the call's business: a setup fact home (db/repo/setup/fact-homes.ts, K-23 v1). */
+const CONTROL_PROVEN = {
+  key: "controlProvenAt",
+  table: "business_setup",
+  column: "control_proven_at",
+} as const;
+
+/**
+ * Default 14's facts over the call's transaction, read once when first asked: K-05 v1.2 item 26's readTurnState of the
+ * handle at the call's business with its business_setup row's control_proven_at (db/repo/setup/turn-state.ts
+ * readTurnStateIn, on the transaction as it is, under the call's business scope, which the read checks before its first
+ * statement). Of its answer only three things are kept: the live open questions sent to the handle at the business, as
+ * limit 3 maps them (askedQuestionOf); the people K-04 links to the handle; and the control. A notFound (no such handle,
+ * business or business_setup row) answers every fact as missing. The read's other fields (the handle's address among
+ * them) are never kept or returned. Its own errors (a refused statement, a lost connection, a scope that is not the
+ * call's) are thrown as it throws them, and the limit answers the part as before default 14; a refused statement has
+ * aborted the call's transaction by then, which postgres.js fails with that error, so the call fails as a whole. As
+ * rosie_app the read is refused at its first table (handles: 0012 grants it, person_handles, persons, phones and
+ * outbox_parts to rosie_job alone).
+ */
+export function signUpFactsOver(db: Sql | Tx, businessId: string, handleId: string): SignUpFacts {
+  let read: Promise<ReadTurnStateResponse | null> | null = null;
+  const state = (): Promise<ReadTurnStateResponse | null> =>
+    (read ??= readTurnStateIn(db, {
+      handleId,
+      businessId,
+      bookingIds: [],
+      facts: [{ ...CONTROL_PROVEN, rowId: businessId }],
+    }).then((answer) => ("error" in answer ? null : answer)));
+  return {
+    async question(openQuestionId) {
+      const found = (await state())?.openQuestions.find((question) => question.id === openQuestionId);
+      return found === undefined ? null : askedQuestionOf(handleId, found);
+    },
+    async linked(personId) {
+      return (await state())?.persons.some((person) => person.personId === personId) === true;
+    },
+    async control() {
+      const fact = (await state())?.facts.find(
+        (each) =>
+          each.table === CONTROL_PROVEN.table &&
+          each.column === CONTROL_PROVEN.column &&
+          each.rowId === businessId,
+      );
+      if (fact === undefined) return null;
+      // A timestamptz fact is written in UTC, or null (db/repo/setup/turn-state.ts); any other value cannot be read.
+      const { value } = fact;
+      return value === null || typeof value === "string" ? { provenAt: value } : null;
     },
   };
 }

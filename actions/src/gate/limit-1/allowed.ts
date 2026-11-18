@@ -120,10 +120,41 @@
 //      commit-s1-01.json: limit 1 passes Sam's first text). Entering it starts a business's sign-up, whose walk (arch 03
 //      line 191) writes only rows new in the turn, the handle's own thread (S1-01) and S1-02's question to the sender, so
 //      it changes no existing record and decides nothing for an existing business. What follows it stays the business's:
-//      S1-02's answer is a choice at an S1 step, so the business's settings (defaults 3a and 9). Only the door as K-02
-//      v1.1 shapes it passes: at S1-01, on no booking, with no stake and no field. A sign-up door that names a booking, a
-//      stake or a field, or another business than the call's, is not that door, so nobody decides it (fails closed), as
-//      with a door the gate does not know, which still answers unknown.
+//      S1-02's answer is a choice at an S1 step, so the business's settings (defaults 3a and 9), unless it is the signer's
+//      own answer while the business's control is not proven (default 14). Only the door as K-02 v1.1 shapes it passes:
+//      at S1-01, on no booking, with no stake and no field. A sign-up door that names a booking, a stake or a field, or
+//      another business than the call's, is not that door, so nobody decides it (fails closed), as with a door the gate
+//      does not know, which still answers unknown.
+//
+// T-1459 (DL-961: the architect's ruling on the second turn, card A, which the lead adopted): until a business's control
+// is proven (S1-75), its sign-up's answers are the signer's own record, not the business's settings. Where it differs
+// from the defaults above, this wins:
+//  14. A part is the sender's own record (3a's own: the one rule then proves the sender by the turn's handle, as on
+//      OWN_RECORD_STEPS) when every one of these holds, each fact read from its stored row on the call's transaction
+//      (SignUpFacts, facts.ts), never from the request's words:
+//      a. the caller is a turn, with a handle, acting for a person on the record (K-09 caller.personId);
+//      b. the part chooses an option of an open question at an S1 step, about no booking, and that question's stored row
+//         (K-04 open_questions, as limit 3 reads it: K-05 v1.2 openQuestionRead) is live on this turn's handle, is the
+//         call's business's, is at that same step about no booking, was asked of the sender, and went out to that handle
+//         (its sentAt: a part of an outbox row that asks it, to its own handle, sent or delivered);
+//      c. the sender is linked to that handle (K-04 person_handles);
+//      d. the business's control is not proven: its K-23 business_setup row's control_proven_at is null;
+//      e. what it changes is the business's settings alone (3a): its choice names no stake at all (no fee, refund or
+//         unknown money stake, and no booking, calendar entry, cancel, move or high option of its question), it is no
+//         team matter and no owner-only step, and its step is not one whose answer takes the business live (LIVE_STEPS).
+//      A fact that is missing (no such question live on the handle, no link, no business_setup row) or cannot be read
+//      (its read throws, or answers a value of another type) answers as today: the business's settings, never a pass. On
+//      the call's database a refused statement aborts the transaction, and postgres.js then fails it with that
+//      statement's error even though limit 1 caught it (its begin keeps a statement's first error: postgres 3.4.9
+//      src/index.js 255-273, 291-292), so the call fails as a whole: closed either way. Nothing here writes or names a
+//      role: a claim never adds authority (S13-23 rule 5), and the owner role is S1-75's own card. Unchanged: the
+//      sign-up door (13), every step outside S1, every business whose control is proven, money, team, live and
+//      owner-only matters, a choice on a booking, and OWN_RECORD_STEPS.
+//      This round's own defaults, where the ruling names no source: in (b), "asked of the sender" (limit 3's rule 4: from
+//      the person the question was sent to), "at that same step" and "went out", so another person on the same handle,
+//      or a question that has not gone out, answers as today; in (e), "no live change" read as no stake at all and
+//      LIVE_STEPS, the master's two S1 steps whose answer takes a business live: S1-29 "Shows the preview, the terms and
+//      Go live" (its reply "1 Go live") and S1-35 "Goes live, tells its listing, offers the next" (it gives live).
 
 import { holdClassOf } from "../../commit/hold";
 import {
@@ -145,6 +176,7 @@ import type {
   ProofCodes,
   ProofStanding,
   Side,
+  SignUpFacts,
   Standing,
   StepCard,
   StepCards,
@@ -301,6 +333,18 @@ function businessBase(step: string): "team" | "settings" {
   return step.startsWith("S2-") ? "team" : "settings";
 }
 
+/**
+ * The S1 steps whose answer takes a business live, so never a sign-up's own record (default 14e): S1-29 "Shows the
+ * preview, the terms and Go live" (its reply "1 Go live") and S1-35 "Goes live, tells its listing, offers the next" (it
+ * gives live), as MASTER-FLOW-A section 1 writes them.
+ */
+export const LIVE_STEPS: readonly string[] = ["S1-29", "S1-35"];
+
+/** A step of section 1, setting up a business (S1-01 on; never an S11, S12 or S13 step). */
+function signUpStep(step: string): boolean {
+  return step.startsWith("S1-");
+}
+
 // ---- a step's side (DL-188 ruling 1; default 9) ----------------------------------------------------------------------
 
 /** Which side a step is on: the business's, or the customer's. */
@@ -403,6 +447,11 @@ export interface ChangeReads {
   readonly identity: () => IdentityAccess;
   /** The turn's bundle's step cards (K-01 v1), which say each step's side (default 9). */
   readonly steps: () => StepCards;
+  /**
+   * The stored facts default 14 reads about the turn's handle at the call's business (SignUpFacts). Absent, no answer is
+   * a sign-up's own record: each answers as before.
+   */
+  readonly signUps?: (handleId: string) => SignUpFacts;
 }
 
 /**
@@ -433,10 +482,67 @@ async function onBookingAt(
   return holdsRole && !plays ? forTheBusiness(choice, bookingId) : decided({ kind: "visit", bookingId });
 }
 
+/** The business's settings alone (default 14e): one matter, settings, put to no role and with no second role. */
+function settingsAlone(change: DecidedChange): boolean {
+  const [only, ...more] = change.matters;
+  return only?.kind === "settings" && more.length === 0 && !change.inRole && !change.twoRoles;
+}
+
+/**
+ * Default 14: whether a choice about no booking at an S1 step is the sender's own answer to an open question Rosie sent
+ * them on this turn's handle, while the business's control is not proven. What needs no read comes first (e, a), then each
+ * fact from its stored row (b, c, d), each read only when the one before it holds. A fact that is missing, does not hold
+ * or cannot be read gives false, so the part answers as today.
+ */
+async function ownSignUpAnswer(
+  choice: Choice,
+  change: DecidedChange,
+  turn: GateTurn,
+  reads: ChangeReads,
+): Promise<boolean> {
+  // (e) The business's settings alone, about no booking, with no stake, at an S1 step whose answer takes nothing live.
+  const questionId = choice.kind === "option" ? choice.question : null;
+  if (questionId === null || !signUpStep(choice.step) || LIVE_STEPS.includes(choice.step)) return false;
+  if (choice.target.bookingId !== null || choice.stakesFrom.length > 0 || !settingsAlone(change))
+    return false;
+  // (a) A turn, with a handle, acting for a person on the record.
+  const { caller } = turn.request;
+  const handleId = turn.request.turn?.handleId ?? null;
+  const sender = caller.personId;
+  if (caller.kind !== "turn" || handleId === null || sender === null || reads.signUps === undefined) {
+    return false;
+  }
+  try {
+    const facts = reads.signUps(handleId);
+    // (b) The question's stored row, never the request's: live on this handle, the call's business's, at this step about
+    // no booking, asked of the sender, and gone out to this handle.
+    const asked = await facts.question(questionId);
+    if (asked === null) return false;
+    const theirs =
+      asked.openQuestionId === questionId &&
+      asked.handleId === handleId &&
+      asked.businessId === turn.businessId &&
+      asked.step === choice.step &&
+      asked.bookingId === null &&
+      asked.personId === sender &&
+      asked.sentAt !== null;
+    if (!theirs) return false;
+    // (c) The sender is linked to the handle (person_handles).
+    if (!(await facts.linked(sender))) return false;
+    // (d) The business's control is not proven: its business_setup row is there, with control_proven_at null.
+    const control = await facts.control();
+    return control !== null && control.provenAt === null;
+  } catch {
+    // A fact that cannot be read answers as today, never as a pass (default 14).
+    return false;
+  }
+}
+
 /**
  * An open question's option or a meaning-search entry (defaults 1, 3, 9 to 11): about no booking, row 1 for the
  * new-booking door's entries; then, by the step's card, the business's matter at a business step, the sender's own record
- * at an own-record step, row 1 at a customer step of booking a new visit, and the business's matter anywhere else (3a);
+ * at an own-record step, row 1 at a customer step of booking a new visit, and the business's matter anywhere else (3a),
+ * unless it is a sign-up's own answer while the business's control is not proven, the sender's own record (default 14);
  * on a booking, as onBookingAt says for the step's side.
  */
 async function atStep(choice: Choice, turn: GateTurn, reads: ChangeReads): Promise<Change> {
@@ -451,7 +557,8 @@ async function atStep(choice: Choice, turn: GateTurn, reads: ChangeReads): Promi
     if (OWN_RECORD_STEPS.includes(choice.step)) return decided({ kind: "own" });
     if (newVisitStep(choice.step, card)) return ANYONE;
   }
-  return businessChange(choice, businessBase(choice.step));
+  const business = businessChange(choice, businessBase(choice.step));
+  return (await ownSignUpAnswer(choice, business, turn, reads)) ? decided({ kind: "own" }) : business;
 }
 
 /** What one gated part changes (defaults 1 to 3). */
