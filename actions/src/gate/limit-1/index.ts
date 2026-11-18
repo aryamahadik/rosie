@@ -9,7 +9,9 @@
 // proof codes yet (T-322), so a part whose sender must be proven by a code is refused (notBuilt) until they land. It is
 // not given the turn's bundle yet (K-01 v1), so it reads no step's card: every step's side cannot be read, and every
 // choice is the business's (DL-188 ruling 1; fails closed) until the gate hands it the bundle's steps (`steps`).
-// createLimit1 takes other ports, as the tests do.
+// Default 14's facts (T-1459; DL-961: a sign-up's own answer while the business's control is not proven) come from one
+// K-05 v1.2 readTurnState of the turn's handle on the same transaction (`signUps`); a fact it cannot read leaves the part
+// as it was before default 14, never passed. createLimit1 takes other ports, as the tests do.
 
 import { identityReaderOf, type IdentityAccess } from "../../domain/identity-access";
 import type { GatePart, GateTurn, Limit, LimitVerdict } from "../framework";
@@ -21,10 +23,12 @@ import {
   contactsOnFileOver,
   databaseOf,
   identityOver,
+  signUpFactsOver,
   type BookingStages,
   type ContactsOnFile,
   type IdentityDefaults,
   type ProofCodes,
+  type SignUpFacts,
   type StepCards,
 } from "./facts";
 
@@ -45,6 +49,12 @@ export interface Limit1Deps {
   readonly stages?: (repo: unknown, businessId: string) => BookingStages;
   /** S13-45's one rule. Default: K-04's links for a customer; nothing yet for a business role, a page or an AI. */
   readonly contacts?: (identity: IdentityAccess) => ContactsOnFile;
+  /**
+   * Default 14's stored facts about the turn's handle at the call's business: the open question a sign-up's answer
+   * answers, the sender's link to the handle, the business's control. Default: K-05 v1.2 readTurnState on the call's
+   * transaction (signUpFactsOver: db/repo/setup/turn-state.ts readTurnStateIn, with business_setup.control_proven_at).
+   */
+  readonly signUps?: (repo: unknown, businessId: string, handleId: string) => SignUpFacts;
   /** T-322's proof codes. Default: none, so a part that needs a code is refused (notBuilt). */
   readonly proofCodes?: ProofCodes;
 }
@@ -92,6 +102,10 @@ export function createLimit1(deps: Limit1Deps = {}): AllowedLimit {
       bookingStagesOver(identityReaderOf(databaseOf(repo)), businessId));
   const contactsOf = deps.contacts ?? ((identity: IdentityAccess) => contactsOnFileOver(() => identity));
   const stepsOf = deps.steps ?? (() => NO_STEP_CARDS);
+  const signUpsOf =
+    deps.signUps ??
+    ((repo: unknown, businessId: string, handleId: string) =>
+      signUpFactsOver(databaseOf(repo), businessId, handleId));
   const decide = async (part: GatePart, turn: GateTurn): Promise<AllowedDecision> => {
     const identity = once(() => identityOf(turn.repo, turn.businessId));
     const ports: AllowedPorts = {
@@ -99,6 +113,7 @@ export function createLimit1(deps: Limit1Deps = {}): AllowedLimit {
       steps: once(() => stepsOf(turn.context.bundleId, turn.context.flow)),
       stages: once(() => stagesOf(turn.repo, turn.businessId)),
       contacts: once(() => contactsOf(identity())),
+      signUps: (handleId) => signUpsOf(turn.repo, turn.businessId, handleId),
       proofCodes: deps.proofCodes ?? null,
     };
     try {
@@ -124,6 +139,7 @@ export const limit1: AllowedLimit = createLimit1();
 
 export {
   BUSINESS_ROLES,
+  LIVE_STEPS,
   NEW_BOOKING_DOORS,
   NEW_VISIT_STEPS,
   OWNER_ONLY_STEPS,
@@ -155,8 +171,10 @@ export {
   databaseOf,
   identityOver,
   sideOf,
+  signUpFactsOver,
   stepCardsOf,
   type BookingStages,
+  type BusinessControl,
   type CallerKind,
   type CodeAsk,
   type ContactsOnFile,
@@ -167,6 +185,7 @@ export {
   type ProofCodes,
   type ProofStanding,
   type Side,
+  type SignUpFacts,
   type Standing,
   type StepBranch,
   type StepCard,
