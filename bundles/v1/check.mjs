@@ -31,9 +31,11 @@
 //      (insurance's facts, cpa.json's list; the trades with no pf.settings at arrive window and an empty cutoff in both
 //      flows); plumbing (plumber), electrical (electrician) and barber read back with all 11 pf keys from the bundle
 //      folder and the KV bulk file (and PostgreSQL with --db).
-//   8. T-160's lint (compiler/src/lint/report.ts) of the master's flows and of every trade's flows the bundle holds
-//      finds no failure on the six steps, nor do the emitter's own marks; the manifest's lint summary counts exactly the
-//      failures the steps' marks and the lint give the six steps.
+//   8. T-160's lint (compiler/src/lint/report.ts) of the master's flows and of every trade's flows the bundle holds,
+//      with the emitter's own marks, finds exactly the two marks the whole build gives the six steps, its own and not
+//      the cut's (DL-965), and no other: notary's S1-02 record-lint L7 (notary's flow A words op at S1-02 drops "Safe
+//      default:") and S1-04 unknown-slot (its owner sample reply names {{biz.name}}, outside K-01 v1's slot list); the
+//      manifest's lint summary counts exactly the failures the steps' marks and the lint give the six steps.
 //   9. The manifest: bundle v0 …/2's prompts, models, routing and fixed lines (staging's base path /test), the prompts as
 //      their modules give them today and prompts.json and models.json as the build read them; no journey, as v0 lists
 //      none.
@@ -449,27 +451,45 @@ async function checkTrades(read, tradeDir, kv) {
 
 // ---- 8. T-160's lint on the six steps -----------------------------------------------------------------------------
 
+/**
+ * The two marks the whole build gives the six steps, its own and not the cut's, which bundle v1 keeps as K-01 v1 says
+ * (DL-965; T-1460 round 2): T-160's lint fails notary's S1-02 under record-lint, the master's rule L7 (notary's flow A
+ * words op at S1-02 drops "Safe default:"), and the emitter marks S1-04 unknown-slot (its owner sample reply names
+ * {{biz.name}}, outside K-01 v1's slot list). Each is a card: the notary overlay's S1-02 words op (J-18), and a K-01
+ * slot-list minor version. Any other mark on the six steps fails, and so does either of these two gone.
+ */
+const BUILD_MARKS = ["notary's S1-02 record-lint L7", "S1-04 unknown-slot"];
+
 async function checkLint(bundle, tradeIds) {
   const lint = await load("compiler/src/lint/report.ts");
   const run = lint.lintFixtureSet(tradeIds);
-  const found = lint.lintReport(run.results).failures.filter((failure) => failure.flow === FLOW && STEPS.includes(failure.step));
+  const onSteps = (entry) => entry.flow === FLOW && STEPS.includes(entry.step);
+  const found = lint.lintReport(run.results).failures.filter(onSteps);
   const master = found.filter((failure) => failure.trade === null);
   const trades = found.filter((failure) => failure.trade !== null);
+  // The hits the failures are made of (each an error the record's allow list does not exempt, as lintReport counts
+  // them), by their rule's own id: L1 to L8 for record-lint.
+  const hits = lint.lintFindings(run).hits.filter((hit) => onSteps(hit) && !hit.allowed && hit.level === "error");
   const steps = bundle.flows[FLOW].steps;
   const marks = STEPS.flatMap((id) => steps[id].lint.map((rule) => ({ id, rule })));
   const named = (list) => list.map((failure) => `${failure.trade ?? "the master"}'s ${failure.step} ${failure.rule}: ${failure.message}`).join(" | ");
+  // Every mark on the six steps: each of T-160's failing hits by its trade, step, K-01 rule and own rule, and each
+  // rule a step's own lint names (the emitter's marks, with T-160's master failures the cut adds).
+  const given = [
+    ...new Set(hits.map((hit) => `${hit.trade ?? "the master"}'s ${hit.step} ${hit.rule} ${hit.check}`)),
+    ...marks.map((mark) => `${mark.id} ${mark.rule}`),
+  ];
+  const others = given.filter((mark) => !BUILD_MARKS.includes(mark));
+  const missing = BUILD_MARKS.filter((mark) => !given.includes(mark));
   report(
-    master.length === 0,
-    `T-160's lint (compiler/src/lint/report.ts, ${String(run.rules.length)} rules, Master Corrections ${run.corrections.join(", ")}) of the master's flows: ${String(master.length)} failures on the six steps${master.length === 0 ? "" : `: ${named(master)}`}`,
+    others.length === 0 && missing.length === 0,
+    `T-160's lint finds exactly these two marks, the whole build's own (notary S1-02 record-lint L7; S1-04 unknown-slot), and no other (DL-965): on the six steps, T-160's lint (compiler/src/lint/report.ts, ${String(run.rules.length)} rules, Master Corrections ${run.corrections.join(", ")}) gives ${String(master.length)} failures in the master's flows and ${String(trades.length)} in the ${String((run.results.length - 2) / 2)} trades' flows the bundle holds, and the steps' own marks (the emitter's, K-01 v1's step checks, with T-160's master failures) are ${marks.length === 0 ? "none" : marks.map((mark) => `${mark.id} ${mark.rule}`).join(", ")}; the marks found: ${given.length === 0 ? "none" : given.join(", ")}${others.length === 0 ? "" : `; other marks: ${others.join(", ")}`}${missing.length === 0 ? "" : `; not found: ${missing.join(", ")}`}`,
   );
-  report(
-    trades.length === 0,
-    `T-160's lint of the ${String((run.results.length - 2) / 2)} trades' flows the bundle holds: ${String(trades.length)} failures on the six steps${trades.length === 0 ? "" : `: ${named(trades)}`}`,
+  if (found.length > 0) note(`T-160's failures on the six steps: ${named(found)}`);
+  const slotted = (steps["S1-04"]?.say ?? []).map(
+    (said) => `${said.from} → ${said.to}: ${(said.plainText.match(/\{\{[^{}]+\}\}/g) ?? []).join(" ") || "no slot"}`,
   );
-  report(
-    marks.length === 0,
-    `the six steps' own lint marks (the emitter's, K-01 v1's step checks, with T-160's master failures): ${marks.length === 0 ? "none" : marks.map((mark) => `${mark.id} ${mark.rule}`).join(", ")}`,
-  );
+  note(`S1-04's messages and the slots each names: ${slotted.join("; ")}`);
   const summary = bundle.manifest.lint;
   const expected = [
     ...marks.map((mark) => [mark.rule, FLOW, mark.id, null]),

@@ -355,4 +355,72 @@ export const EXCEPTIONS = [
       "the master's own trade text, quoted as a line the slot fill must leave alone",
     ),
   ),
+
+  // Bundle v1 (T-1460, DL-965): each trade overlay it holds that is compiled from a master trade file above naming a
+  // public line, and its KV bulk file, which holds every overlay's bytes.
+  ...[
+    [
+      PUBLIC_LINES.poisonHelp,
+      [
+        "allergist",
+        "cardiologist",
+        "credit-counselor",
+        "dentist",
+        "dermatologist",
+        "doula",
+        "endocrinologist",
+        "ent",
+        "gastroenterologist",
+        "hair-restoration",
+        "iv-hydration",
+        "lactation",
+        "lawn",
+        "midwife",
+        "neurologist",
+        "ophthalmologist",
+        "optometrist",
+        "oral-surgeon",
+        "orthodontist",
+        "orthopedist",
+        "painter",
+        "pediatrician",
+        "pest",
+        "pharmacist",
+        "plastic-surgeon",
+        "pool",
+        "pressure",
+        "primary-care",
+        "psychic",
+        "senior-living",
+        "urgent-care",
+        "urologist",
+      ],
+    ],
+    [
+      PUBLIC_LINES.domesticViolence,
+      ["immigration-services", "lawyer", "mediator", "movers", "private-investigator"],
+    ],
+    [PUBLIC_LINES.elderFraud, ["advisor", "insurance"]],
+    [PUBLIC_LINES.housingCounseling, ["mortgage"]],
+  ].flatMap(([line, names]) =>
+    names.map((trade) =>
+      publicLine(
+        `bundles/v1/bundle/trade/${trade}.json`,
+        line,
+        "a trade overlay of bundle v1, compiled from the master's own trade text",
+      ),
+    ),
+  ),
+  ...[
+    PUBLIC_LINES.poisonHelp,
+    PUBLIC_LINES.domesticViolence,
+    PUBLIC_LINES.elderFraud,
+    PUBLIC_LINES.housingCounseling,
+  ].map((line) =>
+    publicLine(
+      "bundles/v1/bundle.kv.json",
+      line,
+      "bundle v1's KV bulk file, which holds its trade overlays compiled from the master's own trade text",
+    ),
+  ),
 ];
