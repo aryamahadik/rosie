@@ -817,6 +817,17 @@ const STOP_BATCH_ORDER = [
   ["recordStopOrStart", "stop"],
 ];
 
+/**
+ * That batch's core-only order under the replies' caller, which names no business: the others' records in arrival order,
+ * then the STOP's, with no danger record. A core-only commit of a turn holding a stop word leaves out each danger text's
+ * record, and that text stays unread (DL-944, card E; DL-952); a decided commit keeps STOP_BATCH_ORDER.
+ */
+const STOP_BATCH_CORE_ONLY_ORDER = [
+  ["recordSafetyOutcome", S1_02_TEXT.eventId],
+  ["recordSafetyOutcome", STOP_TEXT.eventId],
+  ["recordStopOrStart", "stop"],
+];
+
 /** A request's core actions in order: each safety record by its text's event id, a STOP's or START's record by kind. */
 const coreOrder = (request: GateAndCommitRequest): string[][] =>
   request.core.map((action) => {
@@ -845,7 +856,7 @@ async function refusedStopBatch(
 }
 
 describe("the return order, danger first, then stops, then the rest: a STOP commits at once whatever the models answer, core-only while they are down, and waits only for the core (DL-508, DL-521); only a turn with no STOP waits for the models' return", () => {
-  it("a queued danger text is handled before a queued STOP in the one commit, which a STOP never holds for the models' return: core-only, on the first run (DL-508)", async () => {
+  it("a queued STOP beside a queued danger text commits in the one commit, which leaves out the danger text's record (it stays unread: DL-944) and which a STOP never holds for the models' return: core-only, on the first run (DL-508)", async () => {
     // Arrival order is the reverse of the return order: the routine answer, then the STOP, then the danger text.
     const danger = { ...(safetyEmergencyNow as unknown as SafetyResult), eventId: DANGER_TEXT.eventId };
     const s = await samTurn([S1_02_TEXT, STOP_TEXT, DANGER_TEXT], {
@@ -867,19 +878,15 @@ describe("the return order, danger first, then stops, then the rest: a STOP comm
     expect(s.o.waits).toEqual([]);
     expect(s.face.gateCalls).toHaveLength(1);
     const request = s.face.gateCalls[0]?.request;
-    // The danger text's safety record first, then the others' in arrival order, then the STOP's record; core-only, since
-    // the decided parts (the routine and danger texts' choices) could not be made on this run.
+    // The others' safety records in arrival order, then the STOP's record, with no danger record: the replies' core-only
+    // commit of a turn holding a stop word leaves it out, and the danger text stays unread (DL-944); core-only, since the
+    // decided parts (the routine and danger texts' choices) could not be made on this run.
     expect(
       request?.core.map((action) => {
         const asked = action.request as { safety?: { eventId: string }; phoneNumber?: string };
         return [action.call, asked.safety?.eventId ?? "stop"];
       }),
-    ).toEqual([
-      ["recordSafetyOutcome", DANGER_TEXT.eventId],
-      ["recordSafetyOutcome", S1_02_TEXT.eventId],
-      ["recordSafetyOutcome", STOP_TEXT.eventId],
-      ["recordStopOrStart", "stop"],
-    ]);
+    ).toEqual(STOP_BATCH_CORE_ONLY_ORDER);
     expect(request?.input.kind).toBe("coreOnly");
     // The STOP went to the stop path, never to decide: only the routine and danger texts did, in arrival order.
     expect(s.face.frontierCalls.at(-1)?.texts.map((text) => text.eventId)).toEqual([
@@ -917,8 +924,12 @@ describe("the return order, danger first, then stops, then the rest: a STOP comm
       true,
     ]);
     expect(requests.at(-1)?.input).toEqual(commitS102.request.input);
-    // The same core order in every request, the refused core-only ones and the decided one alike.
-    for (const request of requests) expect(coreOrder(request)).toEqual(STOP_BATCH_ORDER);
+    // The same core order in every request: the refused core-only ones without the danger text's record (DL-944), the
+    // decided one, under the turn's own caller, with it first.
+    expect(requests.map((request) => coreOrder(request))).toEqual([
+      ...Array<string[][]>(2 * KEYWORD_RUNS).fill(STOP_BATCH_CORE_ONLY_ORDER),
+      STOP_BATCH_ORDER,
+    ]);
     // The STOP never reached decide, on either try: only the routine and danger texts did.
     expect(s.face.frontierCalls.map((request) => request.texts.map((text) => text.eventId))).toEqual([
       [S1_02_TEXT.eventId, DANGER_TEXT.eventId],
@@ -944,7 +955,8 @@ describe("the return order, danger first, then stops, then the rest: a STOP comm
     expect(report).toMatchObject({ end: "committed", tries: 2 });
     expect(s.decidedAt).toEqual([0, RETRY_MS]);
     expect(s.o.waits).toEqual([{ at: 0, ms: RETRY_MS }]);
-    // Every request core-only, in the same core order: the first try's refused, the next try's committed.
+    // Every request core-only, in the same core order, without the danger text's record (DL-944): the first try's refused,
+    // the next try's committed.
     const requests = s.face.gateCalls.map((call) => call.request);
     expect(requests.map((request) => request.input.kind)).toEqual(
       Array<string>(2 * KEYWORD_RUNS + 1).fill("coreOnly"),
@@ -953,7 +965,7 @@ describe("the return order, danger first, then stops, then the rest: a STOP comm
       ...Array<boolean>(2 * KEYWORD_RUNS).fill(false),
       true,
     ]);
-    for (const request of requests) expect(coreOrder(request)).toEqual(STOP_BATCH_ORDER);
+    for (const request of requests) expect(coreOrder(request)).toEqual(STOP_BATCH_CORE_ONLY_ORDER);
     expect(core.phones.get("+15555550100")?.stopped).toBe(true);
     if (report.outcome.result !== "committed") throw new Error("not committed");
     expect(report.outcome.answer.parts).toEqual([]);
