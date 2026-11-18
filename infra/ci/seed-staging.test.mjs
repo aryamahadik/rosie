@@ -2065,13 +2065,13 @@ describe("seed-staging.sh runs roster-owner only when named, and hands it the ro
       assert.deepEqual(startedOf(result), [ROSTER_SET], what);
       assert.deepEqual(runsOf(result), [`${ROSTER_SET} into ${ON_STAGING}`], what);
       assert.match(result.stdout, IS_SET, what);
-      // Six tables, a row in each for each roster phone: the first source's run writes them, the second keeps them.
+      // Seven tables, a row in each for each roster phone: the first source's run writes them, the second keeps them.
       assert.deepEqual(
         doneOf(result),
         [
           index === 0
-            ? { set: ROSTER_SET, rows: 6 * NUMBERS.length, inserted: 6 * NUMBERS.length, kept: 0 }
-            : { set: ROSTER_SET, rows: 6 * NUMBERS.length, inserted: 0, kept: 6 * NUMBERS.length },
+            ? { set: ROSTER_SET, rows: 7 * NUMBERS.length, inserted: 7 * NUMBERS.length, kept: 0 }
+            : { set: ROSTER_SET, rows: 7 * NUMBERS.length, inserted: 0, kept: 7 * NUMBERS.length },
         ],
         `${what}: ${result.output}`,
       );
