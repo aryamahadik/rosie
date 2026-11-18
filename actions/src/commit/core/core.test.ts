@@ -452,18 +452,21 @@ describe("an unknown or unbuilt core action answers notBuilt and writes nothing"
     expect(calls).toHaveLength(15);
     // T-1163 built recordStopOrStart and setRecordFlag, and T-1414 sendFixedLine on the same flags port: with no flags
     // port bound, as here, each still answers notBuilt by its name before anything is read, its gap portNotWired
-    // (core-flags.test.ts and core-fixed-lines.test.ts hold them with the port bound).
+    // (core-flags.test.ts and core-fixed-lines.test.ts hold them with the port bound). T-1443 built the paging service's
+    // five on the paging port: with none bound, as here, the same (core-paging.test.ts holds them with the port bound).
     const flagsCalls = ["recordStopOrStart", "setRecordFlag", "sendFixedLine"];
-    const built = ["recordSafetyOutcome", "releaseSafetyHold", ...flagsCalls];
+    const pagingCalls = ["handOff", "answerHandOff", "pageTeam", "acknowledgePage", "openReviewItem"];
+    const portCalls = [...flagsCalls, ...pagingCalls];
+    const built = ["recordSafetyOutcome", "releaseSafetyHold", ...portCalls];
     const unbuilt = calls.filter((call) => !built.includes(call));
-    expect(unbuilt).toHaveLength(10);
-    for (const call of [...unbuilt, ...flagsCalls]) {
+    expect(unbuilt).toHaveLength(5);
+    for (const call of [...unbuilt, ...portCalls]) {
       const action = { call, request: { caller: copy(request.caller) } } as unknown as CoreAction;
       const refused = await runCore(action, turn, copy(NOTHING_OPEN)).catch((thrown: unknown) => thrown);
       expect(refused, call).toBeInstanceOf(CoreNotBuiltError);
       expect(refused, call).toMatchObject({
         core: call,
-        gap: flagsCalls.includes(call) ? "portNotWired" : "noService",
+        gap: portCalls.includes(call) ? "portNotWired" : "noService",
         seam: "runCore",
         call: "gateAndCommit",
       });

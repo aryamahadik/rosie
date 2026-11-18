@@ -19,7 +19,13 @@
 //       lines      the pinned bundle's checked lines (pinnedSafetyLines below), under the core's line rule (lines.ts);
 //       stopWords  PLUGIN_LISTS_NO_STOP_WORDS for the barbershop (K-09 v1.1 j3-safety-arrival-own-line.json), given by
 //                  the wiring, never a default;
-//       telling    NOT_TOLD_YET until T-319, so an outcome that must tell someone answers notBuilt;
+//       telling    the wiring's TellingPort (T-1443): the paging telling port (commit/core pagingTellingPort, built on
+//                  each call's repo from the paging reads, the roster and ENVIRONMENT, each failing closed), or
+//                  NOT_TOLD_YET, the default every binding names until the runtime binds the port (T-1444), so an
+//                  outcome that must tell someone answers notBuilt;
+//     and, beside the safety ports, runCore's paging port (CoreDeps.paging; T-1443) as the wiring binds it
+//     (TurnCommitBinding.paging): left out, as until T-1444, handOff, answerHandOff, pageTeam, acknowledgePage and
+//     openReviewItem answer notBuilt portNotWired;
 //   - openHolds: K-05 v1.3 readOpenHolds on the call's transaction (rosie_app, the call's business), naming the turn's
 //     texts the safety read reads (never a tapback: default 4) whose recordSafetyOutcome is not among the request's core
 //     actions and every unread id the runtime's CommitContext carries, each hold cut to K-09 safetyHold's three fields,
@@ -44,7 +50,9 @@
 //     readers set to the same two (never a reader on any other side: C1);
 //   - openHolds with no business: K-05 v1.3 readOpenHolds with businessId null, on the door's transaction.
 // The business-scoped binding (turnCommitDeps) binds no flags port: in a business-scoped turn recordStopOrStart and
-// setRecordFlag stay notBuilt portNotWired (DL-877 C5; their scoped binding is a card of its own after K-05 v1.18).
+// setRecordFlag stay notBuilt portNotWired (DL-877 C5; their scoped binding is a card of its own after K-05 v1.18). The
+// door binds no paging port (KeywordCommitBinding has none): a keyword turn carries no paging call (isKeywordTurn), and
+// with no business no hand-off or page can be written (K-36 hand_offs.business_id is not null).
 //
 // Defaults used (for ops/QUESTIONS.md):
 //   1. A hold the actor keeps that PostgreSQL has not recorded (CommitContext hold with no hold id), or one still waiting
@@ -81,15 +89,16 @@ import type {
 } from "../../commit";
 import { createRunCore, type CoreDeps, type CoreFlagsDeps, type CoreSafetyDeps } from "../../commit/core";
 import { createWritesOf, type WalkDeps } from "../../commit/walk";
+import type { PagingDeps } from "../../domain/paging";
 import type {
   OwnerContact,
   SafetyLineChoice,
   SafetyLines,
   SafetyReader,
-  SafetyTelling,
   StopWords,
   StoredHold,
   StoredOutcome,
+  TellingPort,
   WordsSealer,
 } from "../../domain/safety";
 import { flowsListed } from "../../frontier/assemble/bundle";
@@ -226,8 +235,18 @@ export interface TurnCommitBinding<Repo> {
    * for the barbershop, whose plug-in lists none (DL-344).
    */
   readonly stopWords: StopWords;
-  /** Hand-offs and pages (T-319), named by the wiring: NOT_TOLD_YET until T-319 lands, so such an outcome is notBuilt. */
-  readonly telling: SafetyTelling;
+  /**
+   * Hand-offs and pages (T-319), named by the wiring (T-1443): the paging telling port (commit/core pagingTellingPort,
+   * built on each call's repo), or NOT_TOLD_YET, the default until the runtime binds the port (T-1444), so an outcome that
+   * must tell someone answers notBuilt.
+   */
+  readonly telling: TellingPort<Repo>;
+  /**
+   * runCore's paging port (CoreDeps.paging; T-1443): the paging service's reads, ids, ENVIRONMENT and staging's roster for
+   * the paging core actions a turn carries (commit/core pagingDepsOf gives them, each failing closed). Left out, as until
+   * the runtime binds it (T-1444), handOff, answerHandOff, pageTeam, acknowledgePage and openReviewItem answer notBuilt.
+   */
+  readonly paging?: PagingDeps<Repo>;
   /**
    * The safety service's other ports, as T-1140's CoreSafetyDeps names them (T-317's and T-307's readers, ids, visits).
    * Default: the service's own, on the call's transaction.
@@ -243,9 +262,9 @@ export interface TurnCommitBinding<Repo> {
 
 /**
  * What the keyword door's commit binds (keywordCommitDeps; T-1413): the turn face's binding, with K-05 v1.4's record
- * reads in their no-business forms in place of the business-scoped seven.
+ * reads in their no-business forms in place of the business-scoped seven, and no paging port (the top of this file).
  */
-export type KeywordCommitBinding<Repo> = Omit<TurnCommitBinding<Repo>, "safetyReads"> & {
+export type KeywordCommitBinding<Repo> = Omit<TurnCommitBinding<Repo>, "safetyReads" | "paging"> & {
   readonly safetyReads: NoBusinessSafetyReads<Repo>;
 };
 
@@ -570,9 +589,11 @@ function commitDepsWith<Repo>(
 /**
  * The commit's deps for one gateAndCommit call, given the runtime's commit-time context: the limits, writesOf, runCore,
  * openHolds and commitTurn as the top of this file binds them. No flags port is bound, so in this business-scoped commit
- * recordStopOrStart and setRecordFlag answer notBuilt portNotWired (DL-877 C5).
+ * recordStopOrStart and setRecordFlag answer notBuilt portNotWired (DL-877 C5); the paging port is the binding's own
+ * (TurnCommitBinding.paging), none until the runtime binds it (T-1444).
  */
 export function turnCommitDeps<Repo>(binding: TurnCommitBinding<Repo>): (at: CommitAt) => CommitDeps<Repo> {
+  const { paging } = binding;
   return commitDepsWith(binding, (lines, turn) => ({
     safety: {
       ...binding.safetyExtra,
@@ -582,6 +603,7 @@ export function turnCommitDeps<Repo>(binding: TurnCommitBinding<Repo>): (at: Com
       stopWords: binding.stopWords,
       telling: binding.telling,
     },
+    ...(paging === undefined ? {} : { paging }),
   }));
 }
 

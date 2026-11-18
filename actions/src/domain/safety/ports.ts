@@ -18,7 +18,11 @@
 //     rather than let a plug-in's stop words go unread; a plug-in known to list none is wired as such, by name
 //     (PLUGIN_LISTS_NO_STOP_WORDS), never by default;
 //   - SafetyTelling: who is told through a hand-off or a page (K-36 v1; arch 06 line 329), T-319's paging and hand-offs.
-//     With none, an outcome that must tell someone answers notBuilt;
+//     With none, an outcome that must tell someone answers notBuilt. A binding names it as a TellingPort (T-1443): one
+//     SafetyTelling for every call (NOT_TOLD_YET, the default until the runtime binds the paging port: T-1444), or a
+//     RepoTelling built on each call's own repo (the paging telling port, commit/core/telling.ts pagingTellingPort),
+//     which the commit core puts on each turn's repo (tellingOn) before the service reads it, and which answers
+//     notBuilt, as NOT_TOLD_YET does, wherever it is told without a call's repo;
 //   - SafetyWords: K-01 v1's fixed lines word for word, from the pinned bundle (as the handle actor's BundleSafety reads
 //     them): the record reads safetyAsk's, the danger question its line carries after a label of unknown tense (T-1176;
 //     CQ-172). With none, a record whose line asks it answers notBuilt; one whose line asks nothing never reads it.
@@ -264,7 +268,35 @@ export interface SafetyTelling {
   tell(request: TellRequest): Promise<TellPlan>;
 }
 
-/** No hand-offs or pages yet (T-319): an outcome that must tell someone answers notBuilt, so the call fails closed. */
+/**
+ * No hand-offs or pages bound: an outcome that must tell someone answers notBuilt, so the call fails closed. T-319 built the
+ * paging service and T-1443 its port (commit/core/telling.ts pagingTellingPort); this stays the default every binding
+ * names until the runtime binds that port (T-1444).
+ */
 export const NOT_TOLD_YET: SafetyTelling = {
   tell: () => Promise.reject(new NotBuiltError("handOff")),
 };
+
+/**
+ * A telling port built for each call on that call's own repo (T-1443: the paging telling port), so the reads behind it are
+ * the binding's for that call (K-36 rule 2 keeps team_pages and team_page_recipients from the Tool API's role, so the
+ * runtime picks where they are read: T-1444). It is a SafetyTelling itself, so every place that takes NOT_TOLD_YET takes
+ * it as it is; told before it is put on a call's repo (tellingOn), it answers notBuilt as NOT_TOLD_YET does, so it never
+ * tells over reads that are not the call's.
+ */
+export interface RepoTelling<Repo> extends SafetyTelling {
+  /** The port on one call's repo: the SafetyTelling that call's record tells through. */
+  on(repo: Repo): SafetyTelling;
+}
+
+/** Who is told, as a binding names it (T-1443): one SafetyTelling for every call (NOT_TOLD_YET, a double), or a RepoTelling. */
+export type TellingPort<Repo> = SafetyTelling | RepoTelling<Repo>;
+
+function isRepoTelling<Repo>(port: TellingPort<Repo>): port is RepoTelling<Repo> {
+  return typeof (port as Partial<RepoTelling<Repo>>).on === "function";
+}
+
+/** A telling port on one call's repo: a RepoTelling put on that repo, any other SafetyTelling as it is. */
+export function tellingOn<Repo>(port: TellingPort<Repo>, repo: Repo): SafetyTelling {
+  return isRepoTelling(port) ? port.on(repo) : port;
+}
