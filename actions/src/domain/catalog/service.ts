@@ -4,8 +4,9 @@
 // (T-633, T-634 and the journey 1 lane, once T-1429 binds its reads and T-667 lets the commit write the setup tables).
 //
 // One service serves one Tool API call, inside the call's business scope (T-290: CallContext.businessId), and reads its
-// now from the clock it is given (BP 9.4). It reads only through the five reads the caller hands in by name (reads.ts);
-// with none bound, every call answers notBuilt before it reads or builds anything (fails closed; DL-888). Every write is
+// now from the clock it is given (BP 9.4). It reads only through the reads the caller hands in by name (reads.ts: the
+// five list reads and, since T-1433, three reads of a row by id); with none bound, every call answers notBuilt before it
+// reads or builds anything (fails closed; DL-888). Every write is
 // a K-05 v1 stateWrite, an insert or an update naming the version read, held by rows.ts checkCatalogWrite; nothing is
 // deleted (CQ-128 (2): removing a space's link to a service answers notBuilt until K-05 has a delete write). Calls run
 // one at a time, and each sees what the earlier calls of the same service built (a service added, then its price, in
@@ -33,8 +34,8 @@
 //      service's rows of that kind in call order, so a repeated turn builds the same ids (payments' default 1). A
 //      snapshot's rule rows are `btr-<booking>-rule-<rule>` and `btr-<booking>-limit-<limit>`.
 //   2. With the kind's `nomoney` fact, a way takes nothing before and its after is counter (A), own (B) or none (a free
-//      service): K-25 rule 9 names counter and own; none moves no money either. K-23 business_setup.no_money is not one
-//      of the five reads, so the kind's fact is what is checked.
+//      service): K-25 rule 9 names counter and own; none moves no money either. Since T-1433 the business's own K-23
+//      business_setup.no_money (read 1's setup, a business with no setup row read as no money) is held the same way.
 //   3. The business's one currency (K-25 rule 7) is the caller's (no column holds it): every new amount is in it, and a
 //      way's or a rule's amounts in another are refused (currencyMismatch), never relabelled.
 //   4. A change, a close or a new price is never dated before now (`backdated`): effective dates are history.
@@ -48,18 +49,37 @@
 //      (rowTwice), so every update names the version the commit will compare. A row this call changed is seen by the
 //      later calls as changed but at the version read, since the commit compares every version before it writes.
 //  10. notBuilt names the call the service serves: NotBuiltError for a K-09 v1 call, LaneNotBuiltError for a lane's.
-//  11. A space-service link takes the space as the caller read it (its id and business): none of the five reads answers
-//      K-23 places_or_things, and K-25 leaves to code that it is the service's business's.
+//  11. Withdrawn by T-1433 (T-320 N1): a space-service link reads the space by its id under the call's business (read
+//      8) instead of trusting the business the caller gives; a given business that is not the call's is still refused.
 //  12. A kind placed in a call offers no money path in that call: K-24's paths are read for the business's kinds only.
-//  13. Fact and switch names are checked for form, and nomoney as both or neither; K-26's closed registry of names is
-//      not one of the five reads.
+//  13. Withdrawn by T-1433 (K-05 v1.18 CQ-349 (3)): fact and switch names are held to K-26 v1's registry in code
+//      (registry.ts), besides their form and nomoney as both or neither.
 //
-// Known limit (for T-667): company_kinds' primary key is two columns (company_id, kind_id). placeKind and updateKind
-// name its row by both, as K-05 v1's stateWrite key allows ("the row's primary key, column to value"), but
-// db/repo/commit-turn.ts carries a versioned table's rows by a one-column key only (oneKey), so the commit refuses
-// those writes until T-667 accepts them; and K-05's RowRef has one rowId, so no write names the kind's version read.
+// The cross-row checks (T-1433; checks.ts): before any write, each rule across rows the database does not hold alone is
+// checked through the reads, and its refusal names its rule: a way's deposit under the price known then, at the way's
+// save and at a price's (an add, a change, a withdrawal or a close: no price the save leaves pricing a way, and not
+// pricing it before, under its deposit), and a list way's price in effect at its save (reads 3 and 4), its location the
+// business's and of its place's kind (read 6), a rule's worker the
+// business's (read 7), a linked space the business's (read 8), a placed kind's company the business's (read 1), and a
+// way's path against the business's no money through Rosie (read 1's setup, null read as no money). A way rests on its
+// kind's company_kinds row and its flow's kind_flows row, named by K-05 v1.18 item 77's names, and on the business's
+// setup row, each at the version read (limit 4; CQ-349 (1), (2)); a terms snapshot that copies the flow's default rests
+// on that flow_defaults row the same way. company_kinds' rows are named `<company id>/<kind id>` (item 77; the database
+// engineer's N4): the read's name for a kind read, the same name built for a kind this call places. T-667 lets the
+// commit carry company_kinds' writes and item 77's names.
 
 import type { RowRef, StateWrite, UnitWrites } from "../../commit";
+import {
+  checkBusinessMoney,
+  checkCompany,
+  checkDeposit,
+  checkDepositsUnder,
+  checkListPriced,
+  checkLocation,
+  checkSpace,
+  checkWorker,
+  priceFieldsOf,
+} from "./checks";
 import { notBuiltFor, refuse } from "./errors";
 import { inEffectAt, isEmpty, isPossibleTie, overlaps, rangeOf, ruleValues, sameConditions } from "./prices";
 import type { CatalogReads } from "./reads";
@@ -76,11 +96,12 @@ import {
   requireBoolean,
   requireCents,
   requireClock,
+  requireFacts,
   requireId,
   requireKindId,
   requireLanguage,
   requireMinutes,
-  requireNames,
+  requireSwitches,
   requireUtc,
   requireVersion,
   requireWords,
@@ -96,7 +117,9 @@ import {
   PRICE_KINDS,
   type Built,
   type BusinessKind,
+  type BusinessSetup,
   type CatalogWrites,
+  type Flow,
   type Place,
   type PriceChange,
   type PriceConditions,
@@ -123,7 +146,7 @@ export interface CatalogDeps {
   readonly now: string;
   /** The turn's (or the call's) key, the last part of every row id made by rule (default 1). */
   readonly turnKey: string;
-  /** The five reads, handed in by name (T-1429 binds them). None bound: every call answers notBuilt. */
+  /** The reads, handed in by name (T-1429 binds them; T-1433 widens them). None bound: every call answers notBuilt. */
   readonly reads?: CatalogReads;
 }
 
@@ -212,9 +235,9 @@ export interface UpdateWayInput {
 }
 
 /**
- * A space or thing and a service it takes (K-25 item_services; S1-81). The space is as the caller read it (K-23
- * places_or_things, its id and business): none of the five reads answers it, and K-25 leaves to code that it is the
- * same business's as the service, so a space of another business is refused.
+ * A space or thing and a service it takes (K-25 item_services; S1-81). The space is named by its id and the business
+ * the caller read it under; the service reads it by its id under the call's business (read 8) instead of trusting that
+ * business (T-320 N1), so a space of another business, given or read, is refused (K-25 rule 9).
  */
 export interface SpaceLinkInput {
   readonly placeOrThing: { readonly id: string; readonly businessId: string };
@@ -451,14 +474,31 @@ export function createCatalog(deps: CatalogDeps): Catalog {
 
   // ---- the reads, as this call has left them ----
 
-  const kindKey = (companyId: string, kindId: string): string => `${companyId}|${kindId}`;
+  /**
+   * A company_kinds row's name, K-05 v1.18 item 77's `<company id>/<kind id>` (the database engineer's N4): the key of
+   * this call's own records, and the id of a kind placed in this call (no row to read its name from yet). A kind read
+   * from the database is named by the name the read answers (BusinessKind.rowId), never one built here.
+   */
+  const kindKey = (companyId: string, kindId: string): string => `${companyId}/${kindId}`;
+
+  /** Read 1 as this call has left it: the business's setup and kinds, then the kinds placed in this call. */
+  async function kindsRead(
+    reads: CatalogReads,
+  ): Promise<{ readonly setup: BusinessSetup | null; readonly kinds: BusinessKind[] }> {
+    const read = await reads.kindsOf(businessId);
+    const kinds = own(read.kinds, "kinds");
+    if (read.setup !== null && read.setup.businessId !== businessId) refuse("otherBusiness", ["setup"]);
+    return {
+      setup: read.setup,
+      kinds: [
+        ...kinds.map((kind) => kindEdits.get(kindKey(kind.companyId, kind.kindId)) ?? kind),
+        ...placedKinds,
+      ],
+    };
+  }
 
   async function kindsNow(reads: CatalogReads): Promise<BusinessKind[]> {
-    const read = own(await reads.kindsOf(businessId), "kinds");
-    return [
-      ...read.map((kind) => kindEdits.get(kindKey(kind.companyId, kind.kindId)) ?? kind),
-      ...placedKinds,
-    ];
+    return (await kindsRead(reads)).kinds;
   }
 
   async function servicesNow(reads: CatalogReads): Promise<ServiceRow[]> {
@@ -566,6 +606,7 @@ export function createCatalog(deps: CatalogDeps): Catalog {
       if (priced === "photos") refuse("badInput", ["conditions.serviceMoneyId"]);
       if (fromCents !== null && priced !== "visit") refuse("badInput", ["fromCents"]);
     }
+    await checkRuleWorker(reads, conditions);
     return {
       conditions,
       priceCents: requireCents(input.priceCents, "priceCents", 0),
@@ -640,6 +681,46 @@ export function createCatalog(deps: CatalogDeps): Catalog {
     return versionRead(expectVersion, rule.version, "price_rules");
   }
 
+  /**
+   * The rows a way's money rests on, at the versions read (limit 4; K-05 v1.18 items 72 and 77, CQ-349 (1) and (2)): its
+   * kind's company_kinds row (its facts and switches) and the kind_flows row of its flow (the paths offered), by the
+   * names read 1 answers, and the business's setup row (no money through Rosie). A kind placed in this call has no row
+   * to compare yet.
+   */
+  function wayRefs(kind: BusinessKind, flow: Flow, setup: BusinessSetup | null): RowRef[] {
+    const refs: RowRef[] = [];
+    if (!placedKinds.includes(kind)) {
+      refs.push(ref("company_kinds", kind.rowId, kind.version));
+      const flowRow = kind.flows.find((row) => row.flow === flow);
+      if (flowRow !== undefined) refs.push(ref("kind_flows", flowRow.rowId, flowRow.version));
+    }
+    if (setup !== null) refs.push(ref("business_setup", setup.businessId, setup.version));
+    return refs;
+  }
+
+  /** (c) A price rule's worker, read by its id under the call's business (read 7), is a worker of the business. */
+  async function checkRuleWorker(reads: CatalogReads, conditions: PriceConditions): Promise<void> {
+    const workerId = conditions.workerResourceId;
+    if (workerId === null) return;
+    checkWorker(workerId, await reads.resourceOf(businessId, workerId), businessId);
+  }
+
+  /**
+   * (a) at a price's save (README ruling 4 (a), read 3): every way of the service keeps its deposit under each rule the
+   * save leaves pricing it from now on and that did not before (checks.ts checkDepositsUnder): the rule an add or a
+   * change opens, the price a withdrawal opens again, or the service's own price a closed or withdrawn price of the
+   * way's place no longer covers.
+   */
+  async function checkDepositsAtSave(
+    reads: CatalogReads,
+    service: ServiceRow,
+    rulesBefore: readonly PriceRuleRow[],
+    rulesAfter: readonly PriceRuleRow[],
+    fieldsOf: (way: WayRow) => readonly string[],
+  ): Promise<void> {
+    checkDepositsUnder(await waysNow(reads, service.id), rulesBefore, rulesAfter, nowMs, fieldsOf);
+  }
+
   // ---- the calls ----
 
   return {
@@ -656,13 +737,17 @@ export function createCatalog(deps: CatalogDeps): Catalog {
         const companyId = requireId(input.companyId, "companyId");
         const kindId = requireKindId(input.kindId, "kindId");
         const tradeName = wordsOrNull(input.tradeName, "tradeName");
-        const facts = requireNames(input.facts, "facts");
-        const switchesA = requireNames(input.switchesA, "switchesA");
-        const switchesB = requireNames(input.switchesB, "switchesB");
+        // Names only from K-26 v1's registry (CQ-349 (3)): one it does not hold is refused, never written.
+        const facts = requireFacts(input.facts, "facts");
+        const switchesA = requireSwitches(input.switchesA, "switchesA");
+        const switchesB = requireSwitches(input.switchesB, "switchesB");
         // K-23 company_kinds_nomoney_fact_and_switch: a profession sets both or neither (SPEC-master 5d).
         if (facts.includes("nomoney") !== (switchesA.includes("nomoney") || switchesB.includes("nomoney")))
           refuse("badInput", ["facts", "switchesA", "switchesB"]);
-        if ((await kindsNow(reads)).some((kind) => kind.kindId === kindId)) refuse("kindTwice", ["kindId"]);
+        const kinds = await kindsNow(reads);
+        if (kinds.some((kind) => kind.kindId === kindId)) refuse("kindTwice", ["kindId"]);
+        // (d) Under the business's one company, as its kinds name it (read 1; T-320 N1).
+        checkCompany(companyId, kinds);
         const key = kindKey(companyId, kindId);
         once("company_kinds", key);
         const state = [
@@ -678,6 +763,7 @@ export function createCatalog(deps: CatalogDeps): Catalog {
         ];
         // Its money paths are K-24's, read once it is the business's: none offered in this call.
         placedKinds.push({
+          rowId: key,
           companyId,
           kindId,
           businessId,
@@ -687,6 +773,7 @@ export function createCatalog(deps: CatalogDeps): Catalog {
           switchesB,
           version: 1,
           paths: { A: [], B: [] },
+          flows: [],
         });
         touched.add(`company_kinds:${key}`);
         return record(key, { versionsRead: [], state });
@@ -708,11 +795,12 @@ export function createCatalog(deps: CatalogDeps): Catalog {
           ...kind,
           tradeName:
             input.tradeName === undefined ? kind.tradeName : wordsOrNull(input.tradeName, "tradeName"),
-          facts: input.facts === undefined ? kind.facts : requireNames(input.facts, "facts"),
+          // Names given only from K-26 v1's registry (CQ-349 (3)); those left out stay as read.
+          facts: input.facts === undefined ? kind.facts : requireFacts(input.facts, "facts"),
           switchesA:
-            input.switchesA === undefined ? kind.switchesA : requireNames(input.switchesA, "switchesA"),
+            input.switchesA === undefined ? kind.switchesA : requireSwitches(input.switchesA, "switchesA"),
           switchesB:
-            input.switchesB === undefined ? kind.switchesB : requireNames(input.switchesB, "switchesB"),
+            input.switchesB === undefined ? kind.switchesB : requireSwitches(input.switchesB, "switchesB"),
         };
         if (
           next.facts.includes("nomoney") !==
@@ -733,7 +821,8 @@ export function createCatalog(deps: CatalogDeps): Catalog {
         // Later calls see the change at the version read: the commit compares every version before it writes.
         kindEdits.set(key, { ...next, version });
         touched.add(`company_kinds:${key}`);
-        return record(key, { versionsRead: [], state });
+        // Named by item 77's name as read 1 answers it: the update's key and expectVersion are what the commit compares.
+        return record(kind.rowId, { versionsRead: [], state });
       }),
 
     addService: (input) =>
@@ -829,7 +918,8 @@ export function createCatalog(deps: CatalogDeps): Catalog {
       serial(async (reads) => {
         const id = newId("way", input.id, "service_money");
         const service = await serviceOf(reads, input.serviceId);
-        const kind = (await kindsNow(reads)).find((each) => each.kindId === service.kindId);
+        const { setup, kinds } = await kindsRead(reads);
+        const kind = kinds.find((each) => each.kindId === service.kindId);
         if (kind === undefined) return refuse("kindNotOnBusiness", ["serviceId"]);
         const place = oneOf(input.place, PLACES, "place");
         const path: unknown = input.path;
@@ -855,6 +945,19 @@ export function createCatalog(deps: CatalogDeps): Catalog {
         if (ways.some((way) => way.id === id)) refuse("rowTwice", ["service_money"]);
         if (ways.some((way) => way.place === draft.place && way.locationId === draft.locationId))
           refuse("wayTwice", ["place", "locationId"]);
+        // The cross-row checks (checks.ts), each through a read, before anything is written: the business's no money
+        // (read 1's setup), the location (read 6), and the list way's price and the deposit under it (read 4, at now).
+        checkBusinessMoney(draft.path, setup);
+        if (draft.locationId !== null)
+          checkLocation(
+            draft.place,
+            draft.locationId,
+            await reads.locationOf(businessId, draft.locationId),
+            businessId,
+          );
+        const rules = (await rulesNow(reads, service.id, now)).rules;
+        checkListPriced({ id, path: draft.path, active: draft.active }, rules, nowMs);
+        checkDeposit({ id, ...draft }, rules, nowMs, ["depositCents"]);
         const state = [
           insert("service_money", {
             id,
@@ -866,7 +969,10 @@ export function createCatalog(deps: CatalogDeps): Catalog {
         claimId("way", input.id);
         addedWays.push({ ...draft, id, serviceId: service.id, businessId, version: 1 });
         touched.add(`service_money:${id}`);
-        return record(id, { versionsRead: serviceRefs(service), state });
+        return record(id, {
+          versionsRead: [...serviceRefs(service), ...wayRefs(kind, draft.flow, setup)],
+          state,
+        });
       }),
 
     updateWay: (input) =>
@@ -878,7 +984,8 @@ export function createCatalog(deps: CatalogDeps): Catalog {
         if (builtHere(way.id, addedWays)) refuse("rowTwice", ["service_money"]);
         once("service_money", way.id);
         const version = versionRead(input.expectVersion, way.version, "service_money");
-        const kind = (await kindsNow(reads)).find((each) => each.kindId === service.kindId);
+        const { setup, kinds } = await kindsRead(reads);
+        const kind = kinds.find((each) => each.kindId === service.kindId);
         if (kind === undefined) return refuse("kindNotOnBusiness", ["serviceId"]);
         // A field left out stays as read; one given as null clears it.
         const pick = (key: keyof UpdateWayInput, current: unknown): unknown => {
@@ -912,10 +1019,20 @@ export function createCatalog(deps: CatalogDeps): Catalog {
         checkWayMoney(next, kind, currency);
         const set = changed(wayValues(way), wayValues(next));
         if (Object.keys(set).length === 0) refuse("badInput", ["set"]);
+        // The cross-row checks (checks.ts) on the way as it will stand: the business's no money (read 1's setup), the list
+        // way's price and the deposit under it (read 4, at now). Its place and location never change here: they were
+        // held at its save (default).
+        checkBusinessMoney(next.path, setup);
+        const rules = (await rulesNow(reads, service.id, now)).rules;
+        checkListPriced(next, rules, nowMs);
+        checkDeposit(next, rules, nowMs, ["depositCents"]);
         const state = [update("service_money", way.id, version, set)];
         wayEdits.set(way.id, { ...next, version });
         touched.add(`service_money:${way.id}`);
-        return record(way.id, { versionsRead: serviceRefs(service), state });
+        return record(way.id, {
+          versionsRead: [...serviceRefs(service), ...wayRefs(kind, next.flow, setup)],
+          state,
+        });
       }),
 
     linkSpace: (input) =>
@@ -928,6 +1045,8 @@ export function createCatalog(deps: CatalogDeps): Catalog {
         const service = await serviceOf(reads, input.serviceId);
         const key = `${placeOrThingId}|${service.id}`;
         if (links.has(key)) refuse("rowTwice", ["item_services"]);
+        // (e) The space as read by its id under the call's business (read 8), never as the caller says (T-320 N1).
+        checkSpace(placeOrThingId, await reads.placeOrThingOf(businessId, placeOrThingId), businessId);
         const state = [
           insert("item_services", {
             place_or_thing_id: placeOrThingId,
@@ -972,6 +1091,8 @@ export function createCatalog(deps: CatalogDeps): Catalog {
           )
         )
           refuse("overlap", ["effectiveFrom", "effectiveTo"]);
+        // (a) The new price never under a deposit of a way it prices (read 3).
+        await checkDepositsAtSave(reads, service, read.rules, [...read.rules, rule], priceFieldsOf);
         const ties = tiesFor(rule, read);
         return recordPrice({
           closed: null,
@@ -1017,6 +1138,8 @@ export function createCatalog(deps: CatalogDeps): Catalog {
           rules: read.rules.map((rule) => (rule.id === current.id ? { ...rule, effectiveTo: at } : rule)),
           ties: read.ties,
         };
+        // (a) The new price never under a deposit of a way it prices (read 3).
+        await checkDepositsAtSave(reads, service, read.rules, [...others.rules, opened], priceFieldsOf);
         const ties = tiesFor(opened, others);
         return recordPrice({
           closed: current,
@@ -1056,8 +1179,14 @@ export function createCatalog(deps: CatalogDeps): Catalog {
         const state: StateWrite[] = [
           update("price_rules", target.id, version, { effective_to: target.effectiveFrom }),
         ];
+        // The service's rules as the withdrawal leaves them: the withdrawn price closed at its own start.
+        const others: PriceRulesRead = {
+          rules: read.rules.map((rule) =>
+            rule.id === target.id ? { ...rule, effectiveTo: target.effectiveFrom } : rule,
+          ),
+          ties: read.ties,
+        };
         let opened: PriceRuleRow | null = null;
-        let ties: PriceTieRow[] = [];
         if (replaced !== undefined) {
           if (replaced.currency !== currency) refuse("currencyMismatch", ["currency"]);
           const id = newId("price", input.id, "price_rules");
@@ -1076,15 +1205,20 @@ export function createCatalog(deps: CatalogDeps): Catalog {
             effectiveTo: target.effectiveTo,
             version: 1,
           };
-          const others: PriceRulesRead = {
-            rules: read.rules.map((rule) =>
-              rule.id === target.id ? { ...rule, effectiveTo: target.effectiveFrom } : rule,
-            ),
-            ties: read.ties,
-          };
-          ties = tiesFor(opened, others);
-          state.push(insert("price_rules", ruleValues(opened)), ...ties.map(tieInsert));
+          // The reopened rule is a new row: its worker the business's (read 7).
+          await checkRuleWorker(reads, opened.conditions);
         }
+        // (a) No way's deposit over a price the withdrawal leaves pricing it and did not before (read 3): the price opened
+        // again, or the service's own where the withdrawn price of the way's place covered it.
+        await checkDepositsAtSave(
+          reads,
+          service,
+          read.rules,
+          opened === null ? others.rules : [...others.rules, opened],
+          () => ["ruleId"],
+        );
+        const ties = opened === null ? [] : tiesFor(opened, others);
+        if (opened !== null) state.push(insert("price_rules", ruleValues(opened)), ...ties.map(tieInsert));
         return recordPrice({
           closed: target,
           closeAt: target.effectiveFrom,
@@ -1114,6 +1248,14 @@ export function createCatalog(deps: CatalogDeps): Catalog {
         if (msOf(at) < range.from) refuse("closedBeforeStart", ["at"]);
         if (range.to !== null && msOf(at) >= range.to) refuse("badInput", ["at"]);
         const version = closable(target, input.expectVersion);
+        // (a) No way's deposit over the service's own price where the closed price of the way's place covered it (read 3).
+        await checkDepositsAtSave(
+          reads,
+          service,
+          read.rules,
+          read.rules.map((rule) => (rule.id === target.id ? { ...rule, effectiveTo: at } : rule)),
+          () => ["ruleId"],
+        );
         return recordPrice({
           closed: target,
           closeAt: at,

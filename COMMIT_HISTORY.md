@@ -2,9 +2,226 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 747, [`cd7deae`](https://github.com/aryamahadik/rosie/commit/cd7deae), 2026-11-17 22:23:38 UTC.
+- **Through:** commit 756, [`17d358e`](https://github.com/aryamahadik/rosie/commit/17d358e), 2026-11-18 02:47:48 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 756. docs: COMMIT\_HISTORY.md through commit 753 (67f851b, \#764) (\#767)
+
+- **Commit:** [`17d358e`](https://github.com/aryamahadik/rosie/commit/17d358e), by Arya Mahadik, 2026-11-18 02:47:48 UTC
+- **Pull request:** [#767](https://github.com/aryamahadik/rosie/pull/767) from `task/commit-history-167`, merged 2026-11-18 02:47:48 UTC. It squashed 1 branch commit:
+  - `04d727f` docs: COMMIT\_HISTORY.md through commit 753 (67f851b, \#764)
+- **Files changed:** 1 (+89 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +89 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 755. T-1442: a K-36 state write naming a clock or outbox row of its own commit is written after those rows (commitIn's write order, default 17), with the hand-off, repeating page and refusal cases in commit-turn.int.test.ts (\#766)
+
+- **Commit:** [`2b06275`](https://github.com/aryamahadik/rosie/commit/2b06275), by Arya Mahadik, 2026-11-18 02:47:44 UTC
+- **Pull request:** [#766](https://github.com/aryamahadik/rosie/pull/766) from `task/T-1442`, merged 2026-11-18 02:47:44 UTC. It squashed 1 branch commit:
+  - `be26799` T-1442: a K-36 state write naming a clock or outbox row of its own co…
+- **Files changed:** 2 (+707 −4), by folder:
+  - `db/repo/` commit-turn.int.test.ts +619 −0, commit-turn.ts +88 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 754. T-1436: send-state reads the setup rows versions\_read names, through one shared rowBound (round 2) (\#765)
+
+- **Commit:** [`ee4eefb`](https://github.com/aryamahadik/rosie/commit/ee4eefb), by Arya Mahadik, 2026-11-18 02:47:39 UTC
+- **Pull request:** [#765](https://github.com/aryamahadik/rosie/pull/765) from `task/T-1436`, merged 2026-11-18 02:47:39 UTC. It squashed 4 branch commits:
+  - `ff85f9d` T-1436: sendState reads the setup rows an outbox row's versions\_read …
+  - `f4a935d` T-1436: the every-home test names its business plainly (lint: no-unne…
+  - `1853e8e` Merge branch 'main' into task/T-1436
+  - `3615f7d` T-1436: one shared rowBound: moved into setup/fact-homes.ts and expor…
+- **Files changed:** 4 (+909 −84), by folder:
+  - `db/repo/` send-state.int.test.ts +700 −0, send-state.ts +117 −19
+  - `db/repo/setup/` fact-homes.ts +83 −1, turn-state.ts +9 −64
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1436: sendState reads the setup rows an outbox row's versions_read names, within the row's business and its turn's people, instead of throwing
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1436: the every-home test names its business plainly (lint: no-unnecessary-template-expression)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1436: one shared rowBound: moved into setup/fact-homes.ts and exported with the business and the people subquery as parameters; readTurnState and sendState both call it, send-state.ts's copy deleted (DL-938, DL-941)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 753. docs: COMMIT\_HISTORY.md through commit 750 (180b57d, \#761) (\#764)
+
+- **Commit:** [`67f851b`](https://github.com/aryamahadik/rosie/commit/67f851b), by Arya Mahadik, 2026-11-18 02:05:32 UTC
+- **Pull request:** [#764](https://github.com/aryamahadik/rosie/pull/764) from `task/commit-history-166`, merged 2026-11-18 02:05:33 UTC. It squashed 1 branch commit:
+  - `9c2c8c6` docs: COMMIT\_HISTORY.md through commit 750 (180b57d, \#761)
+- **Files changed:** 1 (+64 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +64 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 752. T-1439: the first-side lint (rename pairs whose first side matches no master text) and C7's FIRST\_SIDES held to master text (\#763)
+
+- **Commit:** [`d0d3858`](https://github.com/aryamahadik/rosie/commit/d0d3858), by Arya Mahadik, 2026-11-18 02:05:28 UTC
+- **Pull request:** [#763](https://github.com/aryamahadik/rosie/pull/763) from `task/T-1439`, merged 2026-11-18 02:05:28 UTC. It squashed 4 branch commits:
+  - `f65b294` T-1439: list rename and swap pairs whose first side matches no master…
+  - `7811e29` T-1439: braces for two forEach callbacks and no needless cast in the …
+  - `b323b68` Merge branch 'main' into task/T-1439
+  - `6977b7d` T-1439: every listed pair gets its place on the master's flow (indexe…
+- **Files changed:** 4 (+2033 −17), by folder:
+  - `compiler/src/corrections/` c7.test.ts +84 −17
+  - `compiler/src/lint/` first-sides.places.txt +464 −0, first-sides.test.ts +592 −0, first-sides.ts +893 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1439: list rename and swap pairs whose first side matches no master text, read by compiling what a person reads where they were meant to rename, and keep only master-text first sides in C7's FIRST_SIDES
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1439: braces for two forEach callbacks and no needless cast in the first-side lint (eslint)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1439: every listed pair gets its place on the master's flow (indexed placer), marked pair by pair in first-sides.places.txt (none on a line that claims a check while verify is off); swaps match as swapRes does; own-ops renames pinned and kept out of C7's FIRST_SIDES
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 751. T-1433: the catalog's cross-row checks (a) to (i) before any write, the widened read port bound in catalog/pg (\#762)
+
+- **Commit:** [`d0a9bc5`](https://github.com/aryamahadik/rosie/commit/d0a9bc5), by Arya Mahadik, 2026-11-18 02:05:24 UTC
+- **Pull request:** [#762](https://github.com/aryamahadik/rosie/pull/762) from `task/T-1433`, merged 2026-11-18 02:05:24 UTC. It squashed 4 branch commits:
+  - `c3612d7` T-1433: the catalog's cross-row checks through K-05 v1.18's reads (de…
+  - `edbcf2f` T-1433: lint fixes (optional chains in checks.ts, braced void checks …
+  - `968dbf2` T-1433: (a) at each instant and booking (a place's price from a later…
+  - `5c2a116` T-1433: (a)'s price-save test also adds a place price under the Groom…
+- **Files changed:** 19 (+2247 −157), by folder:
+  - `actions/src/domain/catalog/` catalog.test.ts +29 −12, checks.test.ts +681 −0, checks.ts +230 −0, errors.ts +25 −2, index.ts +31 −4, prices.test.ts +2 −2, reads.ts +44 −15, registry.test.ts +43 −0, registry.ts +59 −0, rows.ts +39 −6, service.ts +186 −44, terms.ts +7 −2, test-support.ts +87 −8, types.ts +83 −0
+  - `actions/src/domain/catalog/pg/` index.ts +5 −2, reads.int.test.ts +168 −5, reads.test.ts +166 −4, reads.ts +254 −40, test-support.ts +108 −11
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1433: the catalog's cross-row checks through K-05 v1.18's reads (deposit under the price, a list way's price, location and worker, a kind's company, a link's space, no update of business or key, item 77 names, setup's no money, the K-26 registry), with the widened port bound in catalog/pg
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1433: lint fixes (optional chains in checks.ts, braced void checks in its test) and the service header's reads and default 2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1433: (a) at each instant and booking (a place's price from a later date, or on some days, leaves the service's own pricing the way), and at every price save (an add, a change, a withdrawal or a close) for each rule newly pricing a way, with their unit tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1433: (a)'s price-save test also adds a place price under the Groom's package's deposit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 750. docs: COMMIT\_HISTORY.md through commit 747 (cd7deae, \#758) (\#761)
+
+- **Commit:** [`180b57d`](https://github.com/aryamahadik/rosie/commit/180b57d), by Arya Mahadik, 2026-11-17 23:13:18 UTC
+- **Pull request:** [#761](https://github.com/aryamahadik/rosie/pull/761) from `task/commit-history-165`, merged 2026-11-17 23:13:18 UTC. It squashed 1 branch commit:
+  - `2b58723` docs: COMMIT\_HISTORY.md through commit 747 (cd7deae, \#758)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 749. T-572: D-018 staging on the real Linq line (STAGING\_LINQ\_LINE, the secrets by name, linq-staging-check.sh's check and --create) (\#760)
+
+- **Commit:** [`0d097e8`](https://github.com/aryamahadik/rosie/commit/0d097e8), by Arya Mahadik, 2026-11-17 23:13:14 UTC
+- **Pull request:** [#760](https://github.com/aryamahadik/rosie/pull/760) from `task/T-572`, merged 2026-11-17 23:13:14 UTC. It squashed 2 branch commits:
+  - `e22b874` T-572: D-018's switch STAGING\_LINQ\_LINE real in env.staging; Linq's k…
+  - `bda148c` T-572: the switch's broken-copy test deletes the var by its literal n…
+- **Files changed:** 11 (+1890 −151), by folder:
+  - `infra/ci/` README.md +6 −2, linq-staging-check.test.mjs +1063 −0, make-staging-secrets.test.mjs +98 −60, put-staging-secrets.test.mjs +136 −59, wrangler-config.test.mjs +73 −0, wrangler-env.test.mjs +14 −0
+  - `infra/scripts/` linq-staging-check.sh +420 −0, make-staging-secrets.sh +16 −10, put-staging-secrets.sh +56 −20
+  - `/` package.json +2 −0, wrangler.jsonc +6 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-572: D-018's switch STAGING_LINQ_LINE real in env.staging; Linq's key and the roster put by name, TEST_PHONE_WEBHOOK_SECRET made in place, LINQ_WEBHOOK_SECRET Linq's own (off both made lists); linq-staging-check.sh (read-only check and --create, the signing secret piped to wrangler alone) with npm scripts; tests on stubs with no network
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-572: the switch's broken-copy test deletes the var by its literal name (no-dynamic-delete)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 748. T-1449: staging's real Linq line beside the test-phone line: STAGING\_LINQ\_LINE exactly real on staging routes a part to a test phone to the test-phone line and every other part through guardLinqSender(createLinqSender({ env }), { env }); the Linq verify takes LINQ\_WEBHOOK\_SECRET from any sender and TEST\_PHONE\_WEBHOOK\_SECRET only from a test phone, which the page now signs with; off, every path as before; adapters exports ./linq/send and ./linq/roster (\#759)
+
+- **Commit:** [`485c726`](https://github.com/aryamahadik/rosie/commit/485c726), by Arya Mahadik, 2026-11-17 23:13:09 UTC
+- **Pull request:** [#759](https://github.com/aryamahadik/rosie/pull/759) from `task/T-1449`, merged 2026-11-17 23:13:10 UTC. It squashed 1 branch commit:
+  - `fb2a02f` T-1449: staging's real Linq line beside the test-phone line: STAGING\_…
+- **Files changed:** 10 (+1569 −23), by folder:
+  - `adapters/` package.json +3 −1
+  - `runtime/src/wiring/` index.ts +13 −0, linq.test.ts +239 −1, real.ts +53 −13, root.ts +15 −2
+  - `runtime/src/wiring/staging/` index.ts +15 −2, linq-line.test.ts +408 −0, linq-line.ts +165 −0, linq-line.worker.test.ts +650 −0, send.ts +8 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 747. docs: COMMIT\_HISTORY.md through commit 745 (3452a12, \#756) (\#758)
 

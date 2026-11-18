@@ -559,10 +559,10 @@ describe("a possible tie is caught at the second save (arch 05 line 253; S13-25 
 });
 
 describe("reads", () => {
-  it("each price call reads through the port: the service's row, then its rules", async () => {
+  it("each price call reads through the port: the service's row, then its rules, then its ways' deposits (T-1433 (a))", async () => {
     const store = beforeRaise();
     const { catalog, log } = catalogAt(store, RAISE_DAY);
     await catalog.changePrice(raise);
-    expect(log).toEqual(["servicesOf", "priceRulesOf"]);
+    expect(log).toEqual(["servicesOf", "priceRulesOf", "waysOf"]);
   });
 });

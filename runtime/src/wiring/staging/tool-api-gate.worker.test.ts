@@ -24,6 +24,12 @@
 //   - SafetyDeps.words: from the adapter's checked bundle v0, word for word, null for a line it holds no words for; before
 //     any check it is no port (notBuilt). A record whose line asks the danger question commits with bundle v0 checked and
 //     answers notBuilt with nothing written before any check.
+//   - A rerun's pinned bundle, checked before the gate's face runs (T-1453): a turn's rerun keeps the id its turn stored
+//     and runs no check (the real pin over a HandleActor's storage), so in a fresh isolate the gate awaits the adapter's
+//     check for that id, then the record whose line asks the danger question commits with v0's words (on main it answered
+//     notBuilt); a warm isolate's kept bundle is asked once and read again nowhere; a check whose read fails keeps nothing
+//     and fails the gate before its scope opens; a refused bundle is kept nowhere and still answers notBuilt; with no
+//     adapter, and with no reads at all, the gate does what it did.
 //   - The read-only sealer: seals under an existing key; a person with no key is refused (noSealingKey) and no key is made;
 //     with SEALING_WRAP_KEY left out the seal fails with its code alone. Through the gate, either writes nothing.
 //   - Connections: two gates side by side, each holding its Tool API client while its seal and commit (and two scopes' owner
@@ -54,15 +60,27 @@ import { readActiveBundle } from "@rosie/db/repo/bundles";
 import { DataAccessDatabaseError } from "@rosie/db/repo/clocks";
 import type { Sql } from "@rosie/db/repo/scope";
 import { SealingError, unsealText } from "@rosie/db/repo/sealing";
-import { env as poolEnv } from "cloudflare:workers";
+import { runInDurableObject } from "cloudflare:test";
+import { env as poolEnv, exports } from "cloudflare:workers";
 import { afterEach, beforeEach, describe, expect, inject, it, vi } from "vitest";
 
+import type { HandleActor } from "../../actor";
 import { turnIdOf } from "../../actor/lease";
-import { openTrace, type Span, type TraceContext } from "../../trace";
+import {
+  BundlePins,
+  setBundleDeps,
+  type BundleDeps,
+  type BundleKv,
+  type PinnedBundle,
+  type PinRequest,
+  type TurnPin,
+} from "../../bundle";
+import { openTrace, type BundleId, type Span, type TraceContext } from "../../trace";
 import { composeRoot, NoDatabaseError, NotJoinedError, workerRoot, type Root } from "../index";
-import type { BundleSafetyLines, GateReads } from "../real";
+import { realGate, type BundleSafetyLines, type GateReads } from "../real";
 import { BUNDLE_V0, bundleV0FixedLine, SAM_CHAT } from "../test-support";
-import { answeringBundleOf } from "./bundle-safety";
+import { answeringBundleOf, BundleUnreadableError } from "./bundle-safety";
+import { bundleOf, V0_FLOW_A, withoutWords, type SeedBundle } from "./bundle-safety.seed";
 import { CONNECTIONS_PER_CLIENT, DB_SIDES, dbHandle } from "./db";
 import { NO_RECEIPT_INPUTS } from "./k05-receipt";
 import { NO_TURN_CALL_INPUTS } from "./k05-turn";
@@ -1082,6 +1100,463 @@ describe("SafetyDeps.words from T-1397's adapter, read at each call, only from a
     });
     // The record was a repeat: only the turn row is new, no record, hold, line row or entry.
     await expectCountsAfter(before, { turns: 1 }, "same");
+  });
+});
+
+// ---- a rerun's pinned bundle, checked before the gate's face runs (T-1453) ----------------------------------------
+//
+// The turn's pin checks the bundle it reads as active (../real.ts checkedPin), but a rerun keeps the id its turn stored and
+// runs no check (../../bundle/pin.ts), so in a fresh isolate (an alarm's rerun after a deploy) the adapter has passed no
+// check and the gate's words know no bundle. Here each run's pin is the real pin over a HandleActor's own storage, reading
+// through a root's `pin` as root.install() sets it, and the gate is the root's own (../real.ts realGate over the root's gate
+// reads, its turn-row port's commitTurn and its bound bundle port), the run's pinned bundle found for the call's trace as
+// the root's lease hooks keep it (../pinned-runs.ts). Each gate is the ask record's repeat (its line asks the danger
+// question, so the words are read) in a turn of its own: that text and one with no record.
+
+type Namespace = DurableObjectNamespace<HandleActor>;
+
+/** Whole fiction-range numbers (555-01xx), one per HandleActor whose storage holds a turn's pins here. */
+const PIN_ACTOR_PHONES: readonly string[] = [
+  "+15555550171",
+  "+15555550172",
+  "+15555550173",
+  "+15555550174",
+  "+15555550175",
+  "+15555550176",
+];
+let pinActors = 0;
+
+/** A HandleActor of its own for each turn, so no turn's pins meet another's stored rows. */
+function pinActor(): DurableObjectStub<HandleActor> {
+  const ns = (exports as unknown as { HandleActor: Namespace }).HandleActor;
+  const phone = PIN_ACTOR_PHONES[pinActors];
+  pinActors += 1;
+  if (phone === undefined) throw new Error("more turns than fiction-range numbers in PIN_ACTOR_PHONES");
+  return ns.get(ns.idFromName(`phone:${phone}`));
+}
+
+/** What the lease hands the pin for a run of `call`'s turn: its first run (try 1), or a rerun after a lapse (try 2). */
+function pinRequestOf(call: GateCall, tries: number): PinRequest {
+  return {
+    turnId: call.turnId,
+    traceId: call.trace.traceId,
+    joinedTraceIds: [],
+    texts: 2,
+    tries,
+    restart: false,
+    leaseMs: 60_000,
+    arrivedUnder: { ...V0 },
+  };
+}
+
+/**
+ * One run's pin by the real pin over the actor's own storage, reading through `deps` (a root's `pin`, as root.install()
+ * sets it, and the KV `deps` names); each lease span it records is kept in `spans`. The actor has no BUNDLES binding.
+ */
+async function pinRun(
+  actor: DurableObjectStub<HandleActor>,
+  deps: BundleDeps,
+  request: PinRequest,
+  spans: Json[],
+): Promise<TurnPin> {
+  const restore = setBundleDeps(deps);
+  try {
+    const pin = await runInDurableObject(actor, (_actor, state) =>
+      new BundlePins({
+        storage: state.storage,
+        now: () => 3000,
+        kv: () => null,
+        spanSink: () => (span: Span) => {
+          spans.push(span as unknown as Json);
+        },
+      }).pin(request, new AbortController().signal),
+    );
+    if (pin === null) throw new Error("the run pinned no bundle");
+    return pin;
+  } finally {
+    restore();
+  }
+}
+
+/** Each run's lease span, as [tries, bundle id, bundleKept]. */
+const leaseRuns = (spans: readonly Json[]): unknown[][] =>
+  spans
+    .filter((span) => span.hop === "lease")
+    .map((span) => [(span.decided as Json).tries, span.bundle_id, (span.decided as Json).bundleKept]);
+
+/**
+ * `call`'s turn pinned twice on one actor's storage: its first run through `first` (the isolate whose check let the
+ * bundle through), then its rerun through `rerun` (a fresh isolate's root after a deploy, or the same one), which keeps
+ * the stored id. The rerun's pin.
+ */
+async function pinnedRerun(first: BundleDeps, rerun: BundleDeps, call: GateCall): Promise<TurnPin> {
+  const actor = pinActor();
+  const spans: Json[] = [];
+  await pinRun(actor, first, pinRequestOf(call, 1), spans);
+  const pin = await pinRun(actor, rerun, pinRequestOf(call, 2), spans);
+  // One bundle for the turn: the rerun kept the id its first run stored, and its pin ran no check.
+  expect(leaseRuns(spans)).toEqual([
+    [1, V0, false],
+    [2, V0, true],
+  ]);
+  expect(pin.bundleId).toEqual(V0);
+  return pin;
+}
+
+/**
+ * The gate as the root builds it (../real.ts realGate; ../root.ts composeRoot's gate inputs): the root's gate reads, its
+ * turn-row port's commitTurn and its bound bundle port (or `bundles`), with `pinned` as the bundle the call's run pinned.
+ */
+function pinnedGate(
+  gate: { readonly root: Root; readonly reads: GateReads | null },
+  call: GateCall,
+  pinned: PinnedBundle,
+  bundles?: BundleDeps,
+): Promise<unknown> {
+  return realGate({
+    reads: gate.reads,
+    commitTurn: (request) => gate.root.ports.turnRow.commitTurn(request),
+    bundles: () => bundles ?? gate.root.ports.bundles,
+    pinnedOf: (trace) => (trace === call.trace ? pinned : null),
+  }).gateAndCommit(call.request as never, NOTHING_OPEN, call.trace);
+}
+
+/**
+ * The ask record's repeat (ASK_RECORD: a record whose line asks the danger question) as the one core action of a turn of
+ * its own, a rerun's (try 2): that text and `other`, a text with no record, under `bundleId` (bundle v0 unless named).
+ */
+async function askTurnGate(other: string, bundleId: BundleId = V0): Promise<GateCall> {
+  const eventIds = [ASK_RECORD.eventId, other];
+  const turnId = await turnIdOf(eventIds);
+  const trace = openTrace({
+    openedBy: "textWebhook",
+    bundleId: { ...bundleId },
+    sink: (span) => SPANS.push(span),
+  });
+  trace.setTurn(turnId);
+  const caller = {
+    kind: "turn",
+    turnId,
+    requestId: turnId,
+    businessId: BARBERSHOP,
+    personId: SAM.personId,
+    traceId: trace.traceId,
+  };
+  const read = structuredClone(safetyBusinessOwnLine);
+  const [label] = read.read.labels;
+  if (label === undefined) throw new Error("safety-business-own-line.json holds a label");
+  const safety = {
+    ...read,
+    eventId: ASK_RECORD.eventId,
+    read: { labels: [{ ...label, tense: ASK_RECORD.tense }] },
+  };
+  const request = {
+    caller,
+    turn: {
+      id: turnId,
+      handleId: SAM.handleId,
+      eventIds,
+      bundleId: { ...bundleId },
+      traceId: trace.traceId,
+      joinedTraceIds: [],
+      tries: 2,
+    },
+    input: { kind: "coreOnly" },
+    core: [
+      {
+        call: "recordSafetyOutcome",
+        request: { caller, safety, handleId: SAM.handleId, bookingId: null, sentByActor: null },
+      },
+    ],
+    now: "2026-10-19T18:31:05Z",
+  };
+  return { request, turnId, trace };
+}
+
+/**
+ * The ask record's repeat committed under `call`'s turn, as far as the gate's answer says it: its first line named
+ * (safetyEmergency's row), nothing written.
+ */
+async function askCommitted(call: GateCall): Promise<Json> {
+  return {
+    result: "committed",
+    turnId: call.turnId,
+    repeated: false,
+    parts: [],
+    core: [
+      {
+        call: "recordSafetyOutcome",
+        error: null,
+        response: {
+          outcomeId: await KEYED_SAFETY_IDS.rowId("outcome", ASK_RECORD.eventId),
+          outcomes: [ASK_RECORD.outcome],
+          hold: null,
+          safetyLine: {
+            fixedLineId: "safetyEmergency",
+            outboxRowId: await KEYED_SAFETY_IDS.rowId("line", ASK_RECORD.eventId),
+          },
+          told: [],
+          nothingBooks: false,
+          repeated: true,
+        },
+      },
+    ],
+    written: { written: [], outboxRows: [], promoted: [] },
+  };
+}
+
+/** The adapters' check lines among `written` (./bundle-safety.ts: one JSON line each on console.log), in order. */
+const checkLinesOf = (written: readonly string[]): Json[] =>
+  written
+    .flatMap((line) => (line.startsWith("{") ? [parsed(line)] : []))
+    .filter((line) => line.msg === "bundleSafetyCheck");
+
+/** A bundle port over `port`'s registry whose every K-05 call is named in `made` (and nothing else changed). */
+function countedPort(port: BundleDeps, made: string[]): BundleDeps {
+  return {
+    ...(port.kv === undefined ? {} : { kv: port.kv }),
+    registry: {
+      readActiveBundle: (request) => {
+        made.push("readActiveBundle");
+        return port.registry.readActiveBundle(request);
+      },
+      readBundleValue: (request) => {
+        made.push(`readBundleValue ${request.key.split("/").slice(3).join("/")}`);
+        return port.registry.readBundleValue(request);
+      },
+    },
+  };
+}
+
+/** The actor's BUNDLES KV, as a double holding `bundle`'s values as a publish writes them. */
+function kvHolding(bundle: Pick<SeedBundle, "values">): BundleKv {
+  const held = new Map(bundle.values.map((value) => [value.key, value.text]));
+  return { get: (key) => Promise.resolve(held.get(key) ?? null) };
+}
+
+describe("a rerun's pinned bundle is checked before the gate's face runs (T-1453)", () => {
+  it("a rerun in a fresh isolate: its pin kept bundle v0 and ran no check, so the gate awaits this isolate's check for that id before its scope opens; the ask record's repeat then commits with v0's words (on main it answered notBuilt)", async () => {
+    const before = await rowCounts();
+    // The turn's first run: pinned in another isolate, whose check let bundle v0 through.
+    const first = rootOver(envOf());
+    // Its rerun: an alarm in a fresh isolate after a deploy, a root of its own and the one adapter it made.
+    const fresh = rootOver(envOf());
+    const call = await askTurnGate("evt-t1453-rerun");
+
+    const rerun = await pinnedRerun(first.root.pin, fresh.root.pin, call);
+
+    // The rerun's pin ran no check: this isolate's adapter has passed none, and its words know no bundle.
+    expect(answeringBundleOf(first.adapter)).toEqual(V0);
+    expect(answeringBundleOf(fresh.adapter)).toBeNull();
+    const words = fresh.gate.words;
+    if (words === undefined) throw new Error("the gate's part is handed the adapter");
+    expect(() => words.fixedLine("safetyAsk")).toThrow(NotBuiltError);
+    const checksBefore = checkLinesOf(lines).length;
+    const calledBefore = fresh.written.length;
+
+    const answer = await pinnedGate({ root: fresh.root, reads: fresh.gate }, call, rerun.bundle);
+
+    expect(answer).toMatchObject(await askCommitted(call));
+    // The check, for the stored id, read bundle v0 once (PostgreSQL's copy: no BUNDLES here) before the scope opened.
+    expect(checkLinesOf(lines).slice(checksBefore)).toEqual([
+      expect.objectContaining({
+        level: "info",
+        bundle_id: V0,
+        outcome: "passed",
+        parts: ["manifest", "flow/A"],
+        from: ["postgres", "postgres"],
+        answers_for: V0,
+      }),
+    ]);
+    expect(callsOf(fresh.written.slice(calledBefore)).slice(0, 3)).toEqual([
+      onJob("readBundleValue"),
+      onJob("readBundleValue"),
+      onApp(GATE_CALLS.scope),
+    ]);
+    // The words now answer for the stored bundle, word for word.
+    expect(answeringBundleOf(fresh.adapter)).toEqual(V0);
+    for (const id of ["safetyAsk", "safetyEmergency", "safetyCrisis"]) {
+      expect(words.fixedLine(id), id).toEqual({ id, text: bundleV0FixedLine(id) });
+    }
+    // A repeat: only the turn row is new.
+    await expectCountsAfter(before, { turns: 1 }, "same");
+  });
+
+  it("a warm isolate: the turn's first run pinned v0 through this isolate's own check, so the gate's check for the stored id passes at once: asked once, no bundle value read and no check line", async () => {
+    const before = await rowCounts();
+    const testEnv = envOf();
+    const rooted = rootOver(testEnv);
+    const call = await askTurnGate("evt-t1453-warm");
+    const rerun = await pinnedRerun(rooted.root.pin, rooted.root.pin, call);
+    expect(answeringBundleOf(rooted.adapter)).toEqual(V0);
+    // The gate's part over the root's one adapter, each check it asks named.
+    const asked: unknown[] = [];
+    const adapter = rooted.adapter;
+    const counting: BundleSafetyLines = {
+      fixedLine: (id) => adapter.fixedLine(id),
+      outcomeLine: (outcome) => adapter.outcomeLine(outcome),
+      dangerWords: () => adapter.dangerWords(),
+      checkPin: (request) => {
+        asked.push(request.bundleId);
+        return adapter.checkPin(request);
+      },
+    };
+    const reads = stagingGateReads({
+      env: testEnv.env,
+      db: rooted.db,
+      keys: sealingWrapKeys(testEnv.env),
+      bundleSafety: counting,
+    });
+    const made: string[] = [];
+    const checksBefore = checkLinesOf(lines).length;
+    const calledBefore = rooted.written.length;
+
+    const answer = await pinnedGate(
+      { root: rooted.root, reads },
+      call,
+      rerun.bundle,
+      countedPort(rooted.root.ports.bundles, made),
+    );
+
+    expect(answer).toMatchObject(await askCommitted(call));
+    expect(asked).toEqual([V0]);
+    // Kept already: nothing read for the check, no line written, and the scope's call is the gate's first.
+    expect(made).toEqual([]);
+    expect(checkLinesOf(lines).slice(checksBefore)).toEqual([]);
+    expect(callsOf(rooted.written.slice(calledBefore))[0]).toEqual(onApp(GATE_CALLS.scope));
+    await expectCountsAfter(before, { turns: 1 }, "same");
+  });
+
+  it("a failed check: the bound bundle port loses its read (K-05's transient), so the check keeps nothing and the gate fails as for any read, before its scope opens and with nothing written; the next gate, with the read back, commits", async () => {
+    const before = await rowCounts();
+    const first = rootOver(envOf());
+    const fresh = rootOver(envOf());
+    const call = await askTurnGate("evt-t1453-lost");
+    const rerun = await pinnedRerun(first.root.pin, fresh.root.pin, call);
+    const lost: BundleDeps = {
+      registry: {
+        readActiveBundle: (request) => fresh.root.ports.bundles.registry.readActiveBundle(request),
+        readBundleValue: () => Promise.resolve({ error: "transient", sqlstate: "08006" }),
+      },
+    };
+    const checksBefore = checkLinesOf(lines).length;
+    const calledBefore = fresh.written.length;
+
+    const thrown = await rejectionOf(
+      pinnedGate({ root: fresh.root, reads: fresh.gate }, call, rerun.bundle, lost),
+    );
+
+    expect(thrown).toBeInstanceOf(BundleUnreadableError);
+    expect(thrown).toMatchObject({ code: "transient", call: "readBundleValue", sqlstate: "08006" });
+    expect(answeringBundleOf(fresh.adapter)).toBeNull();
+    expect(checkLinesOf(lines).slice(checksBefore)).toEqual([
+      expect.objectContaining({
+        level: "error",
+        bundle_id: V0,
+        outcome: "unreadable",
+        error_code: "transient",
+        answers_for: null,
+      }),
+    ]);
+    // No call was made: the gate's scope never opened.
+    expect(fresh.written.slice(calledBefore)).toEqual([]);
+    expect(await rowCounts()).toEqual(before);
+
+    // The lease runs the turn again: with the read back, the check passes and the same gate commits.
+    expect(await pinnedGate({ root: fresh.root, reads: fresh.gate }, call, rerun.bundle)).toMatchObject(
+      await askCommitted(call),
+    );
+    await expectCountsAfter(before, { turns: 1 }, "same");
+  });
+
+  it("a refused bundle: the run's stored bundle is one the check refuses (its safetyAsk line has no words), so it is kept nowhere and the ask record's repeat still answers notBuilt, with nothing written", async () => {
+    const before = await rowCounts();
+    const rooted = rootOver(envOf());
+    const refused = await bundleOf(13, { A: V0_FLOW_A }, withoutWords("safetyAsk"));
+    const kv = kvHolding(refused);
+    const port = rooted.root.ports.bundles;
+    // The turn's id stored under that bundle (K-05's active id answered as it, its values in the actor's BUNDLES KV).
+    const activeRefused: BundleDeps = {
+      kv,
+      registry: {
+        readActiveBundle: () =>
+          Promise.resolve({
+            result: "active",
+            bundleId: { ...refused.bundleId },
+            manifestKey: `bundle/${refused.bundleId.hash}/${String(refused.bundleId.build)}/manifest`,
+            activatedAt: "2026-11-14T12:00:00Z",
+          }),
+        readBundleValue: (request) => port.registry.readBundleValue(request),
+      },
+    };
+    const call = await askTurnGate("evt-t1453-refused", refused.bundleId);
+    const pin = await pinRun(pinActor(), activeRefused, pinRequestOf(call, 1), []);
+    expect(pin.bundleId).toEqual(refused.bundleId);
+    const checksBefore = checkLinesOf(lines).length;
+
+    const answer = await pinnedGate({ root: rooted.root, reads: rooted.gate }, call, pin.bundle, {
+      registry: port.registry,
+      kv,
+    });
+
+    expect(answer).toEqual({ error: "notBuilt", call: "gateAndCommit" });
+    expect(checkLinesOf(lines).slice(checksBefore)).toEqual([
+      expect.objectContaining({
+        level: "error",
+        bundle_id: refused.bundleId,
+        outcome: "refused",
+        checks: ["safetyAskWords"],
+        answers_for: null,
+      }),
+    ]);
+    expect(answeringBundleOf(rooted.adapter)).toBeNull();
+    expect(await rowCounts()).toEqual(before);
+  });
+
+  it("unchanged with no adapter and with no reads: staging's gate part holds the check on its words only with an adapter; with none the rerun's gate reads no bundle and answers notBuilt as before; with no reads (production, unbound) it fails closed inside the base, the bundle port never asked", async () => {
+    const before = await rowCounts();
+    // With the adapter the words carry its check; with none there are no words, and nothing to check.
+    const built = rootOver(envOf());
+    expect(typeof built.gate.words?.checkPin).toBe("function");
+    const testEnv = envOf();
+    const written: Json[] = [];
+    const db = handleOver(testEnv.env, written);
+    const inputs = stagingOptions(testEnv.env, {
+      db,
+      builders: { ...OFF_THE_GATE_PATH, bundleSafety: () => null },
+    });
+    const reads = inputs.gateReads;
+    if (reads === null) throw new Error("the gate's part is bound on this file's pair");
+    expect(reads.words).toBeUndefined();
+    const root = composeRoot({ environment: "staging", actors: null, vars: testEnv.env, ...inputs });
+    const call = await askTurnGate("evt-t1453-unchanged");
+    const rerun = await pinnedRerun(built.root.pin, root.pin, call);
+    const made: string[] = [];
+    const calledBefore = written.length;
+
+    const answer = await pinnedGate(
+      { root, reads },
+      call,
+      rerun.bundle,
+      countedPort(root.ports.bundles, made),
+    );
+
+    expect(answer).toEqual({ error: "notBuilt", call: "gateAndCommit" });
+    expect(made).toEqual([]);
+    expect(callsOf(written.slice(calledBefore))[0]).toEqual(onApp(GATE_CALLS.scope));
+
+    // No reads at all: the gate fails closed inside the base before anything is read, the bundle port never asked.
+    const thrown = await rejectionOf(
+      realGate({
+        reads: null,
+        commitTurn: () => Promise.reject(new NoDatabaseError("commitTurn")),
+        bundles: () => countedPort(root.ports.bundles, made),
+        pinnedOf: (trace) => (trace === call.trace ? rerun.bundle : null),
+      }).gateAndCommit(call.request as never, NOTHING_OPEN, call.trace),
+    );
+    expect(thrown).toEqual(new NoDatabaseError("gateAndCommit"));
+    expect(made).toEqual([]);
+    expect(await rowCounts()).toEqual(before);
   });
 });
 
