@@ -11,15 +11,28 @@
 //      (set_config(rosie.business_id, ..., true)), so the scope ends with the transaction and never stays on a pooled
 //      connection.
 //   3. The frontier names the call's business (the call context's businessId: the request's caller.businessId) in each
-//      readTurnState request, and the repo reads through T-219's readTurnStateIn on that same transaction, which refuses
-//      to read anything (BusinessScopeError) unless requireBusinessScope answers that very business: a request naming any
-//      other business, or a transaction with no scope, is never read.
+//      readTurnState request, and the repo reads through T-667's readTurnStateIn (db/repo/setup/turn-state.ts) on that
+//      same transaction. It reads K-04 core's part first, through T-219's readTurnStateIn (db/repo/turn-state.ts), which
+//      refuses to read anything (BusinessScopeError) unless requireBusinessScope answers that very business: a request
+//      naming any other business, or a transaction with no scope, is never read, a setup fact no more than a core one.
 //   4. Before the transaction ends, withBusiness checks with requireBusinessScope that the scope is still that business,
 //      so nothing read under another scope is ever answered.
 // Under the scope, rosie_job's row-level security (0012's runtime policies) shows that business's rows only, and
-// readTurnState also names the business in each read of a business-scoped table, so no other business's open question,
-// outbox row, role, booking, pause, consent or fact row is read. Rows K-04 scopes none (the handle, its people, its phone)
-// are read as on any side.
+// readTurnState also names the business in each read of a business-scoped table, a setup part's too, so no other
+// business's open question, outbox row, role, booking, pause, consent or fact row is read. Rows K-04 scopes none (the
+// handle, its people, its phone) are read as on any side; a setup table scoped none answers only by its rule (below).
+//
+// The setup facts (T-1438; T-667 run 1's new task (c); DL-927; K-05 v1.2 item 26, whose setup-part reads extend
+// readTurnState): a fact whose home is a setup part's (K-22 to K-27, K-33 and K-35: db/repo/setup/fact-homes.ts
+// SETUP_FACT_HOMES) is answered beside the core facts, in the request's order, each with its row (a key of two columns
+// by K-05 v1.18 item 77's name) and that row's version, read in the frontier's one transaction. So a setup fact's row and
+// version reach decide's context (frontier/facts/facts.ts: each fact with the row and version it came from), and from it
+// the commit's versions_read (K-05 rowRef; limit 4), as a core fact's do. Under T-667's rules, each read of a
+// business-scoped setup table names the call's business, so another business's row answers notFound; a table scoped
+// none answers only by its rule (fact-homes.ts UNSCOPED_ROWS, through rowBound: the shared catalog under any business,
+// a person's own rows only for the request handle's people, a calendar link or busy block only through a live share to
+// the business); and a fact whose home is neither a core nor a setup one answers unknownFact before anything is read. A
+// request that names core facts alone is read by T-219's read and answered as before, value for value.
 //
 // Why rosie_job (K-05 v1.2 item 26, default 25): readTurnState also reads tables only the runtime side holds (handles,
 // person_handles, persons, phones, outbox_parts), and 0012 grants rosie_app none of them. With no scope rosie_job reads
@@ -34,7 +47,7 @@
 // the transaction's start (step 2: its first statement, its reserved connection, its begin, the watch below and both
 // settings) goes through db/repo/clocks.ts's transientOrScrubbed (T-1368; T-1315's security note b), and each read
 // through transientOrThrow, under the frontier's K-05 call's name, readTurnState, as K-05's own readTurnState does
-// (db/repo/turn-state.ts). So a connection that never opened (08001: a closed port, a name that never resolves,
+// (db/repo/turn-state.ts, and setup/turn-state.ts's). So a connection that never opened (08001: a closed port, a name that never resolves,
 // postgres.js's CONNECT_TIMEOUT) or was lost (08006, 57P01 to 57P03) answers transient, and every other failure of the
 // start is thrown scrubbed, never transient: the call's name and the code alone (db/repo/clocks.ts scrubbed, a
 // PostgresError as DataAccessDatabaseError with its SQLSTATE). That covers a session refused at its start (PostgreSQL's
@@ -98,7 +111,7 @@ import {
   transientOrThrow,
   type TransientError,
 } from "../../../../../db/repo/targets";
-import { readTurnStateIn } from "../../../../../db/repo/turn-state";
+import { readTurnStateIn } from "../../../../../db/repo/setup/turn-state";
 import type { FrontierRepo, ReadTurnStateAnswer } from "../../../frontier";
 import type { BusinessScope } from "../../scope";
 import { createTurnFace, type TurnFace, type TurnFaceOptions } from "../turn-face";
@@ -218,8 +231,9 @@ export function pgFrontierRepo(db: Sql | Tx, seen: ConnectionSeen = { gone: null
     async readTurnState(request) {
       if (seen.gone !== null) return { error: "transient", sqlstate: seen.gone };
       try {
-        // T-219 types K-05 v1.2's answer by hand (db/repo/turn-state.ts); the frontier takes the type generated from the
-        // same frozen schema (ADR-005), whose JSON values are typed as objects. The tests hold each answer to that schema.
+        // T-219 types K-05 v1.2's answer by hand (db/repo/turn-state.ts), and T-667's read with the setup facts answers
+        // that same type (db/repo/setup/turn-state.ts); the frontier takes the type generated from the same frozen schema
+        // (ADR-005), whose JSON values are typed as objects. The tests hold each answer to that schema.
         return (await readTurnStateIn(db, request)) as ReadTurnStateAnswer;
       } catch (error) {
         seen.gone ??= goneWith(error);
