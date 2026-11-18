@@ -581,8 +581,34 @@ const toBooking = (row: BookingRow): BookingHead => ({
  * Every live open question sent to a handle that the transaction sees, in id order, each with when it went out and the
  * poll it went out as (see the top of this file): on the runtime side every business's; under a business scope,
  * row-level security leaves that business's questions and outbox rows only.
+ *
+ * Which read (T-1457; T-1448's open question 1 and its security reviewer's note a): the went-out join reads outbox_parts,
+ * a table that spans businesses, which 0012 grants the runtime side's role (rosie_job) alone (the migrations' role owns
+ * it). So a first statement, which reads no table, asks whether the transaction's role may select from outbox_parts:
+ *   - it may (rosie_job, the tables' owner): the join as it was, unchanged;
+ *   - it may not (the Tool API's rosie_app, the gate's real side): the questions row-level security shows it, its
+ *     scope's business's (none with no scope), each with the two values of open_questions_went_out (0037), a
+ *     security-definer function that answers them only for a question of the caller's own business scope and reads
+ *     only outbox_rows and outbox_parts besides the question's own row. rosie_app holds no grant on outbox_parts.
+ * Under one business's scope the two reads answer the same: 0037 counts only that business's outbox rows, as
+ * outbox_rows' row-level security leaves rosie_job's join (targets-app.int.test.ts compares them).
  */
 export async function liveOpenQuestionsOfHandle(db: Db, handleId: string): Promise<OpenQuestionRead[]> {
+  const [side] = await db<{ reads_parts: boolean }[]>`
+    select has_table_privilege('outbox_parts', 'SELECT') as reads_parts
+  `;
+  if (side?.reads_parts !== true) {
+    const shown = await db<QuestionRow[]>`
+      select q.id, q.business_id, q.booking_id, q.person_id, q.turn_id, q.step, q.status, q.options, q.readback,
+             q.versions_read, q.clock, q.ask_count, q.bundle_hash, q.bundle_build, q.version,
+             went.sent_at, went.poll_id
+      from open_questions q
+      left join lateral open_questions_went_out(q.id) went on true
+      where q.handle_id = ${handleId} and q.status in ('waiting', 'open')
+      order by q.id collate "C"
+    `;
+    return shown.map(toQuestion);
+  }
   const rows = await db<QuestionRow[]>`
     select q.id, q.business_id, q.booking_id, q.person_id, q.turn_id, q.step, q.status, q.options, q.readback,
            q.versions_read, q.clock, q.ask_count, q.bundle_hash, q.bundle_build, q.version,
