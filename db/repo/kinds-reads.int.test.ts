@@ -1307,8 +1307,9 @@ describe("readKindCatalog (item 78): the matcher's catalog as rosie_app, the sam
       await db.sql`update kinds set style = 'Set service', version = version + 1 where id = ${DRAFTED_KIND}`;
       for (const state of ["drafting", "in_review", "approved", "kept_offline"]) {
         await db.sql`update new_work_drafts set state = ${state}, version = version + 1 where id = ${DRAFT}`;
-        for (const read of [readKindCatalog(app, {}, AT), catalogIn(app, PET_BOARDING)]) {
-          const answer = catalogOf(await read);
+        // Each read starts only once the one before it has ended: one at a time, none left unawaited.
+        for (const read of [() => readKindCatalog(app, {}, AT), () => catalogIn(app, PET_BOARDING)]) {
+          const answer = catalogOf(await read());
           expect(
             answer.kinds.map((kind) => kind.id),
             state,
@@ -1363,8 +1364,9 @@ describe("readKindCatalog (item 78): the matcher's catalog as rosie_app, the sam
     async () => {
       await businessesWorld();
       await db.sql`update kinds set style = '', version = version + 1 where id = 'barber'`;
-      for (const read of [readKindCatalog(app, {}, AT), catalogIn(app, BARBERSHOP)]) {
-        const error = await thrownBy(read);
+      // Each read starts only once the one before it has ended, so no refusal is left unawaited.
+      for (const read of [() => readKindCatalog(app, {}, AT), () => catalogIn(app, BARBERSHOP)]) {
+        const error = await thrownBy(read());
         expect(error.message).toBe(
           "readKindCatalog: kinds.style holds an empty style, which the answer cannot carry",
         );
