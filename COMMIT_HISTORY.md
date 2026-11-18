@@ -2,9 +2,72 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 759, [`ad90046`](https://github.com/aryamahadik/rosie/commit/ad90046), 2026-11-18 03:51:45 UTC.
+- **Through:** commit 762, [`273d59b`](https://github.com/aryamahadik/rosie/commit/273d59b), 2026-11-18 05:38:25 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 762. docs: COMMIT\_HISTORY.md through commit 759 (ad90046, \#770) (\#773)
+
+- **Commit:** [`273d59b`](https://github.com/aryamahadik/rosie/commit/273d59b), by Arya Mahadik, 2026-11-18 05:38:25 UTC
+- **Pull request:** [#773](https://github.com/aryamahadik/rosie/pull/773) from `task/commit-history-169`, merged 2026-11-18 05:38:25 UTC. It squashed 1 branch commit:
+  - `b434377` docs: COMMIT\_HISTORY.md through commit 759 (ad90046, \#770)
+- **Files changed:** 1 (+52 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +52 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated after train 262 with scratch/build/lead/commit-history.mjs (the user's standing request, DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 761. T-1447: handOff checks K-36 rule 5 (its kind is its safety read's, refused as kindNotItsRead before any write; a read not shown answers notFound, another business's is otherBusiness); the emergency and threat hand-off summaries are their owner lines word for word (K-36 seed-page-acknowledged.json; A3-48 with the business's display name), with no read id, which stays in team\_pages.summary (\#772)
+
+- **Commit:** [`c6ff87f`](https://github.com/aryamahadik/rosie/commit/c6ff87f), by Arya Mahadik, 2026-11-18 05:38:21 UTC
+- **Pull request:** [#772](https://github.com/aryamahadik/rosie/pull/772) from `task/T-1447`, merged 2026-11-18 05:38:21 UTC. It squashed 1 branch commit:
+  - `99f37bc` T-1447: handOff checks K-36 rule 5 (its kind is its safety read's, re…
+- **Files changed:** 7 (+458 −69), by folder:
+  - `actions/src/domain/paging/` errors.ts +6 −0, hand-off.ts +101 −10, index.ts +7 −7, paging.test.ts +259 −10, ports.ts +26 −5, telling.ts +13 −30, test-support.ts +46 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 760. T-1437: a clock's firing compares, locks and writes two-column and person-bound setup rows as a turn's commit does: one shared rule (fact-homes.ts rowBound; the copy deleted), inserts and an update's row as it will stand checked before any write, business moves refused before any write; commitTurn unchanged; clocks.int.test.ts: 5 new cases (\#771)
+
+- **Commit:** [`0e4f6c3`](https://github.com/aryamahadik/rosie/commit/0e4f6c3), by Arya Mahadik, 2026-11-18 05:38:16 UTC
+- **Pull request:** [#771](https://github.com/aryamahadik/rosie/pull/771) from `task/T-1437`, merged 2026-11-18 05:38:17 UTC. It squashed 4 branch commits:
+  - `2064533` T-1437: fireClock compares and writes two-column and person-bound set…
+  - `7e8b71c` Merge branch 'main' into task/T-1437
+  - `5199f3d` Merge branch 'main' into task/T-1437
+  - `6a5bc41` T-1437: fireClock holds a row of a table scoped none to setup/fact-ho…
+- **Files changed:** 3 (+1048 −313), by folder:
+  - `db/repo/` clocks.int.test.ts +598 −0, clocks.ts +218 −174, commit-turn.ts +232 −139
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1437: fireClock compares and writes two-column and person-bound setup rows as a turn's commit does, through commit-turn.ts's shared key and table helpers (RowWriter); a row of a table scoped none only under T-667 round 2's rules (8a, 8b), and no business move (8d)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1437: fireClock holds a row of a table scoped none to setup/fact-homes.ts rowBound (the copy scopedNoneRule deleted): locked with it as lockRow's bound, and an insert or an update's row as it will stand checked before any write over the would-be row (jsonb_populate_record aliased as the table); round 2, DL-941
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 759. docs: COMMIT\_HISTORY.md through commit 756 (17d358e, \#767) (\#770)
 
