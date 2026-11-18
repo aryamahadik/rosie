@@ -189,6 +189,7 @@ import { skeletonLinqRoute, type ReleaseFlags } from "./skeleton";
 // The file itself, never ./staging's index, which holds T-1254's handle (cloudflare:sockets): this graph loads under Node.
 import { stagingLinqVerifyInputs } from "./staging/linq-line";
 import { stagingOptions, stagingRosieNumber } from "./staging/options";
+import { stagingDb } from "./staging/part";
 import { testPhonePages, type TestPhoneInputs } from "./test-phone";
 import { TurnChats } from "./turn-chats";
 
@@ -1025,19 +1026,25 @@ export interface WorkerSecrets {
 export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
   const known = workerRoots.get(env);
   if (known !== undefined) return known;
+  // The root's one database handle (./staging/part.ts stagingDb, T-1257: nothing is read or opened as it is made), made
+  // here so the real line's chat lookup runs on the handle staging's parts run on (T-1456): stagingOptions takes it as its
+  // `db` seam, so the receipt's read and the chat open share it. Production's inputs and verify read nothing of it.
+  const db = stagingDb(env);
   const root = composeRoot({
     environment: environmentOf(env),
     actors: handleActorsOf(env),
     vars: env,
     // LINQ_WEBHOOK_SECRET by name at each call; on staging's real Linq line, the test-phone page's own secret beside it,
-    // which speaks only for a test phone (T-1449: ./staging/linq-line.ts); anywhere else nothing more is read.
-    linq: stagingLinqVerifyInputs(env),
+    // which speaks only for a test phone (T-1449), and, where HYPERDRIVE_JOB is bound, the chat lookup on the root's handle
+    // (T-1456: db/repo's readChatHandle), both ./staging/linq-line.ts's; anywhere else nothing more is read.
+    linq: stagingLinqVerifyInputs(env, db),
     // The RETRY_QUEUE binding where the environment has one (T-279; env.staging has it since T-566; with none, each wait
     // reports noQueue): a row the dispatcher leaves waiting goes on it, and its consumer runs it through the door.
     retryQueue: retryQueueOf(env),
     // Every other input (T-1257): in production none, with no binding read; on staging each later part of T-1154's own,
-    // over T-1254's handle, null until that part binds it (its own file, ./staging/<part>.ts, says what its null does).
-    ...stagingOptions(env),
+    // over T-1254's handle (the root's, above), null until that part binds it (its own file, ./staging/<part>.ts, says
+    // what its null does).
+    ...stagingOptions(env, { db }),
     // Rosie's number for HELP's reply (T-1412): on staging a reader of ROSIE_NUMBER, called at each use; none elsewhere.
     rosieNumber: stagingRosieNumber(env),
   });
