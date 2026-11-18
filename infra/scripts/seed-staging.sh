@@ -12,6 +12,10 @@
 #       below).
 #   npm run seed:staging -- --set <name> [--set <name>]...
 #       the sets named, in the order given: a later set (T-216's, T-218's) runs by its name, db/seeds/<name>.ts.
+#   npm run seed:staging -- --set roster-owner
+#       roster-owner (T-1450: each roster phone on STAGING_LINQ_ALLOWLIST made a test owner, as skeleton makes test owner
+#       1, under a test business of its own, so its JOIN is a first text: see below), which runs only when named, never
+#       in D-017's sets.
 # Each set is one run of T-201's seed runner (node db/seeds/run.mjs --set <name>), which writes it idempotently, in one
 # transaction as rosie_job, and prints its row counts: a second run writes nothing. A set that fails stops the script:
 # nothing of that set is written, the sets before it stay seeded (each committed on its own) and the ones after it do
@@ -46,6 +50,14 @@
 # as. Like the URL, it leaves this shell's environment before anything is started and is kept in a variable of the
 # script's own that is never exported (T-1343): staging-core's run of the seed runner, the one set that reads it, gets it
 # by name, on that command's line alone, and no other command gets it.
+#
+# The roster phones' numbers (T-1450; DL-943, DL-944): STAGING_LINQ_ALLOWLIST, the list staging's real Linq line sends to
+# (T-416's guard; E.164 numbers joined by commas with no space), from the environment, else from .dev.vars by name, never
+# printed. Like the URL, it leaves this shell's environment before anything is started and is kept in a variable of the
+# script's own that is never exported. It is read only when roster-owner is among the sets, and roster-owner's run of
+# the seed runner, the one set that reads it, gets it by name, on that command's line alone; no other command gets it,
+# and a run without that set drops it unread. The set refuses a list that is unset, blank or ill-formed, writing nothing
+# and naming an entry by its place alone, which stops the run there as any set's failure does.
 #
 # The testers' inboxes (T-1287; ADR-016 section 5 and card S; DL-011, DL-801): STAGING_TEST_INBOXES, from the
 # environment, else from .dev.vars by name, never printed: the addresses of the people who run staging's human tests,
@@ -110,6 +122,7 @@ unset -v token hash ends status with_tester sets named name file list line value
 unset -v D017_SETS CHECK_TESTER_SET SET_NAME USAGE BASE64URL_SIGNS LAST_SIGNS HEX_SIGNS ISO_TIME SHA256_OF_INPUT
 unset -v SESSION_END BASH_REMATCH TEST_PHONES_SET test_phones
 unset -v TEST_INBOXES_SET test_inboxes with_inboxes
+unset -v ROSTER_PHONES_SET roster_phones with_roster
 # The check tester's token, when the caller's environment holds it, goes into a variable of the script's own, which is
 # never exported, and the name is dropped from the environment at once, with its hash's, before any command is started
 # (sourcing lib.sh runs dirname): no command started from here finds either in its environment, whatever the sets.
@@ -127,6 +140,9 @@ unset -v STAGING_TEST_PHONES
 # The testers' inboxes go the same way (T-1287): test_inboxes is handed on by name to staging-testers' run alone.
 test_inboxes="${STAGING_TEST_INBOXES:-}"
 unset -v STAGING_TEST_INBOXES
+# The roster phones' numbers go the same way (T-1450): roster_phones is handed on by name to roster-owner's run alone.
+roster_phones="${STAGING_LINQ_ALLOWLIST:-}"
+unset -v STAGING_LINQ_ALLOWLIST
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 # D-017's sets, in their order (STATE note 67; T-202's handoff; the human testers', T-1281, after skeleton: T-1287,
@@ -138,6 +154,9 @@ CHECK_TESTER_SET="check-tester"
 TEST_PHONES_SET="staging-core"
 # The set that reads the testers' inboxes, STAGING_TEST_INBOXES (T-1281's db/seeds/staging-testers.ts).
 TEST_INBOXES_SET="staging-testers"
+# The set that reads the roster phones' numbers, STAGING_LINQ_ALLOWLIST (T-1450's db/seeds/roster-owner.ts), run only
+# when named.
+ROSTER_PHONES_SET="roster-owner"
 # A set's name, as the runner takes it (db/seeds/run.mjs SET_NAME): test files and lib/ are never sets.
 SET_NAME='^[a-z][a-z0-9]*(-[a-z0-9]+)*$'
 USAGE="usage: seed-staging.sh [--set <name>]... (with no --set: D-017's sets, ${D017_SETS[*]})"
@@ -343,12 +362,16 @@ fi
 # unread.
 with_tester=0
 with_inboxes=0
+with_roster=0
 for name in "${sets[@]}"; do
   if [[ "$name" == "$CHECK_TESTER_SET" ]]; then
     with_tester=1
   fi
   if [[ "$name" == "$TEST_INBOXES_SET" ]]; then
     with_inboxes=1
+  fi
+  if [[ "$name" == "$ROSTER_PHONES_SET" ]]; then
+    with_roster=1
   fi
 done
 hash=""
@@ -403,6 +426,17 @@ if [[ "$with_inboxes" == 1 ]]; then
 else
   test_inboxes=""
 fi
+# The roster phones' numbers, only when roster-owner is among the sets: from .dev.vars by name when the environment gave
+# none (see the top of this file), as the testers' inboxes above. Otherwise the list is dropped unread.
+if [[ "$with_roster" == 1 ]]; then
+  if [[ -z "$roster_phones" ]]; then
+    load_dev_var STAGING_LINQ_ALLOWLIST
+    roster_phones="${STAGING_LINQ_ALLOWLIST:-}"
+    unset -v STAGING_LINQ_ALLOWLIST
+  fi
+else
+  roster_phones=""
+fi
 cd "$ROOT"
 
 log "seed-staging: sets ${sets[*]}, one run each in this order, into schema public on the staging database" \
@@ -423,6 +457,15 @@ if [[ "$with_inboxes" == 1 ]]; then
   else
     log "seed-staging: STAGING_TEST_INBOXES is not set: $TEST_INBOXES_SET seeds no tester, so no one signs in to" \
       "staging by a code until the testers' inboxes are on that list (in .dev.vars, by name)"
+  fi
+fi
+if [[ "$with_roster" == 1 ]]; then
+  if [[ "$roster_phones" =~ [^[:space:]] ]]; then
+    log "seed-staging: STAGING_LINQ_ALLOWLIST is set: $ROSTER_PHONES_SET gets it by name and makes each roster phone" \
+      "it names a test owner of a test business of its own (no number is shown, and no other command gets the list)"
+  else
+    log "seed-staging: STAGING_LINQ_ALLOWLIST is not set: $ROSTER_PHONES_SET refuses, writing nothing, until the" \
+      "roster phones' numbers are on that list (in .dev.vars, by name)"
   fi
 fi
 if [[ "$with_tester" == 1 ]]; then
@@ -447,6 +490,10 @@ for name in "${sets[@]}"; do
     # The testers' inboxes, by name, to this run of the seed runner alone (empty: no inbox, so no tester).
     DATABASE_URL="$db_url" STAGING_DATABASE_URL="$db_url" STAGING_TEST_INBOXES="$test_inboxes" DB_SCHEMA="public" \
       node --disable-warning=ExperimentalWarning "$ROOT/db/seeds/run.mjs" --set "$name" || status=$?
+  elif [[ "$name" == "$ROSTER_PHONES_SET" ]]; then
+    # The roster phones' numbers, by name, to this run of the seed runner alone (empty: the set refuses).
+    DATABASE_URL="$db_url" STAGING_DATABASE_URL="$db_url" STAGING_LINQ_ALLOWLIST="$roster_phones" DB_SCHEMA="public" \
+      node --disable-warning=ExperimentalWarning "$ROOT/db/seeds/run.mjs" --set "$name" || status=$?
   else
     DATABASE_URL="$db_url" STAGING_DATABASE_URL="$db_url" DB_SCHEMA="public" \
       node --disable-warning=ExperimentalWarning "$ROOT/db/seeds/run.mjs" --set "$name" || status=$?
@@ -456,6 +503,7 @@ for name in "${sets[@]}"; do
     db_url=""
     test_phones=""
     test_inboxes=""
+    roster_phones=""
     log "seed-staging: FAILED at set $name (the seed runner's exit $status, for the reason above): nothing of set" \
       "$name was written; the sets before it stay seeded, and the ones after it did not run. Once the cause is fixed" \
       "(a missing migration: npm run deploy:staging migrates the staging database, step 1), run the same command" \
@@ -470,4 +518,5 @@ hash=""
 db_url=""
 test_phones=""
 test_inboxes=""
+roster_phones=""
 log "seed-staging: done: sets ${sets[*]} seeded into schema public on the staging database"
