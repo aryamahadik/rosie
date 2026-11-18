@@ -9,7 +9,9 @@
 //     K-30 default 11), in id order, so a repeated turn builds the same rows;
 //   - its writes are inserts only (rows.ts checkCatalogWrite refuses any update of booking_terms or booking_terms_rules),
 //     and the snapshot handed back is frozen, writes included: a later change to a way, a default or a rule opens or
-//     changes those rows, never a snapshot already taken.
+//     changes those rows, never a snapshot already taken;
+//   - it rests on the way, the service, the flow default it copied (by K-05 v1.18 item 77's name, T-1433) and the rows it
+//     named, each at the version read.
 
 import type { RowRef, StateWrite } from "../../commit";
 import { refuse } from "./errors";
@@ -151,9 +153,12 @@ export function snapshotOf(args: {
       }),
     ),
   ];
-  // The snapshot rests on the rows it named at their versions: one closed before the commit is refused (limit 4).
+  // The snapshot rests on the rows it named and copied at their versions: one changed before the commit is refused (limit
+  // 4). A flow default it copied is named by K-05 v1.18 item 77's name as read 5 answers it (CQ-349 (1); T-1433).
+  const copied = cutoff.from === "flowDefault" ? sources.flowDefault : null;
   const versionsRead: RowRef[] = [
     ...args.versionsRead,
+    ...(copied === null ? [] : [{ table: "flow_defaults", rowId: copied.rowId, version: copied.version }]),
     ...rules.map((rule) => ({ table: "rules", rowId: rule.id, version: rule.version })),
     ...limits.map((limit) => ({ table: "price_ok_limits", rowId: limit.id, version: limit.version })),
   ];
