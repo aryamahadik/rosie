@@ -1,8 +1,8 @@
 // The paging service's test doubles (T-319): an in-memory world of the rows the service reads and writes (K-36's pages,
-// recipients and hand-offs, K-37's review items, K-04's clock rows, chats, owners and zones, and the outbox rows written),
-// a reader over it, the writes applied to it as K-05's commit would, a roster of staging test phones, and the ids a K-09
-// fixture names. Never a database: what the database itself refuses is the integration tests' (K-36 and K-37's
-// contract tests, T-113 and T-114).
+// recipients and hand-offs, K-37's review items, K-34's safety reads a handOff names (T-1447), K-04's clock rows, chats,
+// owners, zones and business names, and the outbox rows written), a reader over it, the writes applied to it as K-05's
+// commit would, a roster of staging test phones, and the ids a K-09 fixture names. Never a database: what the database
+// itself refuses is the integration tests' (K-36 and K-37's contract tests, T-113 and T-114).
 //
 // The cast is fixture set v1's and the master's sample cast only (rule 9): Sam (the barbershop's owner), Alex, Pat (the
 // person Sam named, K-36's seed), and Rosie's team as placeholder people with no name (person-rosie-team-1 and -2, as
@@ -10,17 +10,20 @@
 // j3-safety-arrival-crisis-rows.json names their handles), each by handle id: no number or address is needed or held.
 
 import { contractJson } from "../messages-consent/test-support";
+import type { SafetyOutcome } from "../safety";
 import type { PagingIds, PagingRow } from "./ids";
 import { KEYED_PAGING_IDS } from "./ids";
 import type {
   ChatState,
   PagingReader,
   PersonReach,
+  SafetyHandOffKind,
   StoredClock,
   StoredHandOff,
   StoredPage,
   StoredReviewItem,
   StoredRow,
+  StoredSafetyRead,
   TeamMember,
   TestRoster,
 } from "./ports";
@@ -34,6 +37,15 @@ export const TEAM_2 = "person-rosie-team-2";
 export const SAM = "person-sam";
 export const PAT = "person-pat";
 export const ALEX = "person-alex";
+/** Lee's Barbershop's name as texts show it (K-04 seed-business-head.json's display_name). */
+export const BARBERSHOP_NAME = "Lee's Barbershop";
+
+/** The K-02 outcome each safety hand-off kind is read from (K-36 rule 5). */
+export const OUTCOME_OF_KIND: Readonly<Record<SafetyHandOffKind, SafetyOutcome>> = {
+  crisis_words: "Crisis words",
+  emergency: "An emergency",
+  threat: "A threat to staff or others",
+};
 
 /** One of the frozen contracts' fixtures, a fresh copy, as parsed: each test names the shape it reads it as. */
 export function fixture(file: string): unknown {
@@ -45,11 +57,15 @@ export interface PagingWorld {
   readonly pages: Map<string, StoredPage>;
   readonly handOffs: Map<string, StoredHandOff>;
   readonly reviewItems: Map<string, StoredReviewItem>;
+  /** K-34's safety reads by id, as a handOff reads them: business and outcomes, never words. */
+  readonly safetyReads: Map<string, StoredSafetyRead>;
   members: TeamMember[];
   readonly chats: Map<string, ChatState>;
   readonly reach: Map<string, PersonReach>;
   readonly owners: Map<string, string>;
   readonly zones: Map<string, string>;
+  /** K-04 businesses.display_name by business. */
+  readonly names: Map<string, string>;
   readonly clocks: Map<string, StoredClock & { readonly dueAt: string | null }>;
   /**
    * Other rows by `<table>/<id>`, with their versions and businesses: a review's subject and the row a decision writes
@@ -62,16 +78,26 @@ export interface PagingWorld {
 
 /**
  * The world the tests start from: Rosie's team of two (each with an open iMessage chat, added before October), Sam the
- * barbershop's owner and Pat whom he named (each with an open chat), the two demo shops in New York's zone, and the rows
- * the review fixtures point at (K-24's tile-repair draft at version 2, K-23's business_setup at 1, both Lee Home
- * Services').
+ * barbershop's owner and Pat whom he named (each with an open chat), the two demo shops in New York's zone (the
+ * barbershop's name as texts show it), the rows the review fixtures point at (K-24's tile-repair draft at version 2,
+ * K-23's business_setup at 1, both Lee Home Services'), and Alex's safety reads at the barbershop that the hand-off tests
+ * name: crisis words (0203, j3-safety-arrival-crisis-rows.json's; 0303) and a threat (0204, page-team.json's hand-off's).
  */
 export function pagingWorld(): PagingWorld {
   const chat = (handleId: string): ChatState => ({ handleId, open: true, way: "imessage" });
+  const read = (id: string, outcome: SafetyOutcome): [string, StoredSafetyRead] => [
+    id,
+    { id, businessId: BARBERSHOP, outcomes: [outcome] },
+  ];
   return {
     pages: new Map(),
     handOffs: new Map(),
     reviewItems: new Map(),
+    safetyReads: new Map([
+      read("safety-outcome-alex-0203", "Crisis words"),
+      read("safety-outcome-alex-0204", "A threat to staff or others"),
+      read("safety-outcome-alex-0303", "Crisis words"),
+    ]),
     members: [
       {
         id: "recipient-team-1",
@@ -106,6 +132,7 @@ export function pagingWorld(): PagingWorld {
       [BARBERSHOP, NEW_YORK],
       [HOME_SERVICES, NEW_YORK],
     ]),
+    names: new Map([[BARBERSHOP, BARBERSHOP_NAME]]),
     clocks: new Map(),
     rows: new Map([
       ["new_work_drafts/draft-lee-tile-repair", { version: 2, businessId: HOME_SERVICES }],
@@ -113,6 +140,16 @@ export function pagingWorld(): PagingWorld {
     ]),
     outbox: new Map(),
   };
+}
+
+/** Puts one of Alex's K-34 safety reads in the world, with these outcomes, at the barbershop unless another is named. */
+export function seedRead(
+  world: PagingWorld,
+  id: string,
+  outcomes: readonly SafetyOutcome[],
+  businessId: string | null = BARBERSHOP,
+): void {
+  world.safetyReads.set(id, { id, businessId, outcomes });
 }
 
 /** The reader over a world: every read as the binding gives it, with nothing scoped away (the scopes are the binding's). */
@@ -129,8 +166,10 @@ export function readerOn(world: PagingWorld): PagingReader & { readonly asked: s
     chat: (handleId) => read("chat", world.chats.get(handleId) ?? null),
     reachOf: (personId) => read("reachOf", world.reach.get(personId) ?? null),
     handOff: (handOffId) => read("handOff", world.handOffs.get(handOffId) ?? null),
+    safetyRead: (outcomeId) => read("safetyRead", world.safetyReads.get(outcomeId) ?? null),
     ownerOf: (businessId) => read("ownerOf", world.owners.get(businessId) ?? null),
     businessZone: (businessId) => read("businessZone", world.zones.get(businessId) ?? null),
+    businessName: (businessId) => read("businessName", world.names.get(businessId) ?? null),
     clock: (clockRowId) => {
       const clock = world.clocks.get(clockRowId);
       return read(
