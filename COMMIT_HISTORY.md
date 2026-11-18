@@ -2,9 +2,85 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 762, [`273d59b`](https://github.com/aryamahadik/rosie/commit/273d59b), 2026-11-18 05:38:25 UTC.
+- **Through:** commit 765, [`dd9eb08`](https://github.com/aryamahadik/rosie/commit/dd9eb08), 2026-11-18 06:29:27 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 765. docs: COMMIT\_HISTORY.md through commit 762 (273d59b, \#773) (\#775)
+
+- **Commit:** [`dd9eb08`](https://github.com/aryamahadik/rosie/commit/dd9eb08), by Arya Mahadik, 2026-11-18 06:29:27 UTC
+- **Pull request:** [#775](https://github.com/aryamahadik/rosie/pull/775) from `task/commit-history-170`, merged 2026-11-18 06:29:27 UTC. It squashed 1 branch commit:
+  - `9cdd6d4` docs: COMMIT\_HISTORY.md through commit 762 (273d59b, \#773)
+- **Files changed:** 1 (+64 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +64 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated after train 263 with scratch/build/lead/commit-history.mjs (the user's standing request, DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 764. T-1448: limit 4's reload re-reads a setup row an open question's versions\_read names, inside the stored question row's bound (its business; the people of its turn's handle; never the request's), through rowBound; a moved row shows changed, a row outside the bound reads as gone; core rows unchanged; limit-4 tests: 3 unit and 5 integration cases (\#774)
+
+- **Commit:** [`1d2c009`](https://github.com/aryamahadik/rosie/commit/1d2c009), by Arya Mahadik, 2026-11-18 06:29:23 UTC
+- **Pull request:** [#774](https://github.com/aryamahadik/rosie/pull/774) from `task/T-1448`, merged 2026-11-18 06:29:23 UTC. It squashed 2 branch commits:
+  - `da1163f` T-1448: limit 4's reload re-reads an open question's setup rows withi…
+  - `7161543` T-1448: bound.test.ts's business-bound double reads the row through a…
+- **Files changed:** 6 (+718 −38), by folder:
+  - `actions/src/gate/limit-4/` bound.test.ts +174 −0, facts.ts +64 −13, index.ts +27 −7, test-support.ts +35 −6, versions.ts +28 −12
+  - `actions/src/gate/limit-4/pg/` reload.int.test.ts +390 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1448: limit 4's reload re-reads an open question's setup rows within its stored row's bound (its business and the turn that wrote it), with unit and pg proofs
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1448: bound.test.ts's business-bound double reads the row through an optional chain (lint: prefer-optional-chain)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 763. T-1450: the roster phone as a test owner on staging: db/seeds/roster-owner.ts gives each STAGING\_LINQ\_ALLOWLIST number tp-01's test-owner rows under a test business of its own (its first-sight handle's one person adopted; exactly openChatOnText's untouched phone row accepted, a stopped one never), run only when named by seed-staging.sh with the list on that run's line alone; every refusal writes nothing; roster-owner tests 28/28 (\#776)
+
+- **Commit:** [`085dd0b`](https://github.com/aryamahadik/rosie/commit/085dd0b), by Arya Mahadik, 2026-11-18 06:29:19 UTC
+- **Pull request:** [#776](https://github.com/aryamahadik/rosie/pull/776) from `task/T-1450`, merged 2026-11-18 06:29:20 UTC. It squashed 3 branch commits:
+  - `2d2480b` T-1450: roster-owner seed set (each STAGING\_LINQ\_ALLOWLIST phone gets…
+  - `53d0752` Merge branch 'main' into task/T-1450
+  - `4b9ff45` T-1450: round 2 (DL-948): the roster-owner set adopts exactly the pho…
+- **Files changed:** 4 (+2101 −13), by folder:
+  - `db/seeds/` roster-owner.int.test.ts +1104 −0, roster-owner.ts +621 −0
+  - `infra/ci/` seed-staging.test.mjs +327 −13
+  - `infra/scripts/` seed-staging.sh +49 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1450: roster-owner seed set (each STAGING_LINQ_ALLOWLIST phone gets tp-01's test-owner rows under a test business of its own), run by seed-staging.sh only when named, the list handed to that run alone
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1450: round 2 (DL-948): the roster-owner set adopts exactly the phone row openChatOnText's insert leaves (stopped false; stop_at, start_at, optout_line_delivered_at, linq_contact_added_at and poll_voted_at null) and refuses every other, a stopped one above all, writing nothing for any number; int tests: a first-sight handle with the real openChatOnText's row adopted (atBusiness and a first text after, the next JOIN's receipt writes nothing), one refusal per non-null column, stopped, and a STOP then START, replacing run 1's phone-row refusal
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 762. docs: COMMIT\_HISTORY.md through commit 759 (ad90046, \#770) (\#773)
 
