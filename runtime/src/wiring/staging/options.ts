@@ -30,6 +30,10 @@
 //                                     DL-768)
 //   ./sign-in.ts        T-1289 (D)    signIn, the sign-in calls' inputs (ADR-016 card D); handed the email part's port,
 //                                     the one way a code goes out (no port, no sign-in: DL-768)
+// Beside the parts, the staging-only reset of a listed test handle's actor (./actor-reset.ts, T-1452; DL-944 card A):
+// actorReset, the reset list's hook, which install() sets where the root is staging's. It is handed in where the seal is
+// bound (the receipt part's handleKey): with no seal no text can reach an actor, so there is nothing to reset, and a
+// staging with no Hyperdrive binding keeps every input null (DL-768). Making it reads nothing.
 // The three seams critic_collisions B6 names are made here: the model readers' manifest access (P2b's bundle reads handed to
 // ./models.ts), the BundleSafety hook at the pin (RootOptions.bundleSafety, checked at each pin: ../real.ts checkedPin) and
 // the copy deps in install() (RootOptions.copies). The first text into a fresh isolate's lines (DL-757's option (c)) is
@@ -42,6 +46,7 @@ import type { FetchLike } from "@rosie/ai/src/gateway/types";
 import { bundleKvOf } from "../../bundle/kv";
 import { environmentOf } from "../picks";
 import type { RootOptions } from "../root";
+import { stagingActorReset } from "./actor-reset";
 import { stagingBundleSafety } from "./bundle-safety";
 import { stagingCopies } from "./copies";
 import { stagingEmail } from "./email";
@@ -85,7 +90,8 @@ export type StagingInputName =
   | "testPhone"
   | "copies"
   | "emailRows"
-  | "signIn";
+  | "signIn"
+  | "actorReset";
 
 /** Each of those inputs, null where it is not bound. */
 export type StagingInputs = Required<Pick<RootOptions, StagingInputName>>;
@@ -118,6 +124,7 @@ export const NO_STAGING_INPUTS: StagingInputs = Object.freeze({
   copies: null,
   emailRows: null,
   signIn: null,
+  actorReset: null,
 });
 
 /** Each part's builder, as its own file exports it. */
@@ -231,6 +238,8 @@ export function stagingOptions(env: StagingEnv, seams: StagingSeams = {}): Stagi
     copies,
     emailRows,
     signIn,
+    // The reset list's hook (T-1452), where the seal is bound: with none, no text can reach an actor to be reset.
+    actorReset: receipt.handleKey === null ? null : stagingActorReset(env),
   };
 }
 
