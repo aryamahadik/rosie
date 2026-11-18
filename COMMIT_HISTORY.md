@@ -2,9 +2,54 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 772, [`6715e5c`](https://github.com/aryamahadik/rosie/commit/6715e5c), 2026-11-18 10:23:21 UTC.
+- **Through:** commit 774, [`c46b073`](https://github.com/aryamahadik/rosie/commit/c46b073), 2026-11-18 10:57:59 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 774. docs: COMMIT\_HISTORY.md through commit 772 (6715e5c, \#783) (\#785)
+
+- **Commit:** [`c46b073`](https://github.com/aryamahadik/rosie/commit/c46b073), by Arya Mahadik, 2026-11-18 10:57:59 UTC
+- **Pull request:** [#785](https://github.com/aryamahadik/rosie/pull/785) from `task/commit-history-174`, merged 2026-11-18 10:58:00 UTC. It squashed 1 branch commit:
+  - `81810fc` docs: COMMIT\_HISTORY.md through commit 772 (6715e5c, \#783)
+- **Files changed:** 1 (+88 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +88 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated after train 267 (DL-962) with scratch/build/lead/commit-history.mjs: every commit on main, newest first, with its pull request, squashed branch commits, changed files and full message (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 773. T-1438: the frontier reads setup facts through db/repo/setup/turn-state's readTurnStateIn (DL-927) (\#784)
+
+- **Commit:** [`9ed8a62`](https://github.com/aryamahadik/rosie/commit/9ed8a62), by Arya Mahadik, 2026-11-18 10:57:55 UTC
+- **Pull request:** [#784](https://github.com/aryamahadik/rosie/pull/784) from `task/T-1438`, merged 2026-11-18 10:57:55 UTC. It squashed 2 branch commits:
+  - `b175452` T-1438: the frontier reads setup facts: pgFrontierRepo reads through …
+  - `964c73c` T-1438: frontier.int.test.ts: the refusal's statement filter uses Str…
+- **Files changed:** 2 (+563 −13), by folder:
+  - `actions/src/tool-api/turn-face/pg/` frontier.int.test.ts +539 −3, frontier.ts +24 −10
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1438: the frontier reads setup facts: pgFrontierRepo reads through db/repo/setup/turn-state's readTurnStateIn (T-667), so a turn's frontier answers each setup fact with its row and version beside the core facts in its one read-only transaction; a core-only request answers as T-219's read does; frontier.int.test.ts: 4 cases on a demo shop mid-setup (setup facts with rows and versions, core-only unchanged, another business's rows never answered, buildFrontier's context facts as K-05 rowRefs)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1438: frontier.int.test.ts: the refusal's statement filter uses String#includes (lint: @typescript-eslint/prefer-includes)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 772. docs: COMMIT\_HISTORY.md through commit 769 (e1edd4c, \#780) (\#783)
 
