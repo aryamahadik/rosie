@@ -22,8 +22,28 @@ export type CatalogRefusal =
   | "pathUnknown"
   /** A path the kind's plug-in does not offer in that flow (K-24 kind_flows.combos; S1-13; K-25 rule 9). */
   | "pathNotOffered"
-  /** A path that takes money while the kind takes no money through Rosie (fact nomoney; K-25 rule 9). */
+  /**
+   * A path that takes money while the kind takes no money through Rosie (fact nomoney; fields path), or while the
+   * business does (K-23 business_setup.no_money, M02; a business with no setup row read as no money through Rosie,
+   * K-05 v1.18 default 161; fields path and noMoney): K-25 rule 9, "only nothing before and after counter (A) or own (B)".
+   */
   | "noMoneyPath"
+  /** A deposit over the price known then: a list price, or a visit path's starting price (K-25 rule 9; S1-13; A4-13). */
+  | "depositOverPrice"
+  /** A list-priced way with no price rule of its place or of the service in effect at its save (K-25 rule 9). */
+  | "noPriceInEffect"
+  /** A way's location that is not one of the business's, as the business's scope reads it (K-25 rule 9; S1-43). */
+  | "locationNotOnBusiness"
+  /** A location not of the way's place's kind: a shop or office, a meeting spot, one with a travel area (K-25 rule 9). */
+  | "locationNotOfPlace"
+  /** A price rule's worker that is not one of the business's worker resources (K-25 rule 9; T-320 N1). */
+  | "workerNotOnBusiness"
+  /** A kind of work placed under a company that is not the business's one company (K-23 companies; T-320 N1). */
+  | "companyNotOnBusiness"
+  /** A space linked to a service that is not one of the business's spaces or things (K-25 rule 9; T-320 N1). */
+  | "spaceNotOnBusiness"
+  /** A fact or switch name that is not in K-26 v1's registry (trade_facts, plugin_switches; K-05 CQ-349 (3)). */
+  | "nameNotInRegistry"
   /**
    * A deposit on a path that takes none, both deposit_cents and deposit_percent on any path (CQ-128 (1): K-25 v1's CHECK
    * lets a non-deposit path hold both), or a deposit path without exactly one of them (FS row V06).
@@ -61,7 +81,10 @@ export type CatalogRefusal =
   | "snapshotTaken"
   /** A write that would change a terms snapshot or its rules (K-30 rule 6: insert only, never updated). */
   | "snapshotImmutable"
-  /** A write to a table the catalog does not write, or a delete (K-05 v1 has no delete write; CQ-128 (2)). */
+  /**
+   * A write to a table the catalog does not write, or a delete (K-05 v1 has no delete write; CQ-128 (2)); or an update
+   * whose set names the row's business, its id or a column of its key (T-320 N2: a row never moves business or key).
+   */
   | "notCatalogWrite";
 
 /** A catalog row refused: nothing is written. Names the reason and the fields at fault, never a value. */
