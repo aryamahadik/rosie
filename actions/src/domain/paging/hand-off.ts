@@ -16,6 +16,9 @@
 //     page.ts's pageTeam with reason hand_off), which opens the team's page and sets escalated_at.
 //   - An answer (a reply or a console tap from the person told) records it and cancels the escalation's clock row while
 //     it still waits; one that already fired stays as it is (the team was paged; K-36 open gap: the owner's late answer).
+//   - A handOff's kind is its safety read's (K-36 rule 5; T-1447, DL-934), checked before anything is written or
+//     answered (default 31), so its summary follows the read's real outcome: each safety kind writes its owner line
+//     word for word, never the read's id, which stays in the team's page summary (README rule 4; defaults 32 to 34).
 //
 // Defaults used (for ops/QUESTIONS.md):
 //  13. Who is told is the business's live owner, told_as owner: whoever the owner named to stand for them is K-22's
@@ -31,9 +34,27 @@
 //      row is due in the business's zone, UTC with none.
 //  17. The person told is the only one whose answer counts (K-36 hand_offs.told_person_id; notTold otherwise), whatever
 //      the way; the answer's actor is that person, with the owner's role when told as owner.
+//  31. (T-1447, DL-934: K-36 rule 5.) A handOff's kind is its safety read's: a read's kind is its most urgent outcome
+//      that tells (telling.ts default 23: crisis words, else an emergency, else a threat), and kind other names no read
+//      (hand_offs_safety_kind_has_outcome). Refused before anything is written or answered, a repeat included
+//      (kindNotItsRead, naming the read's id): a read named under another kind than its own (a crisis read as an
+//      emergency, a threat or other), a read whose outcomes tell nothing named under a safety kind, a safety kind that
+//      names no read, and kind other naming one. A read the business's scope does not show answers notFound
+//      (safety_outcomes), nothing written; a read of another business, or of none, is refused (otherBusiness).
+//  32. Each safety kind's owner line, word for word: crisis words A3-25's; an emergency K-36's seed-page-acknowledged.json
+//      summary (the master gives no owner line of its own: A3-24 says only "No booking" and that Sam is told at once);
+//      a threat A3-48's (K-36's seed-page-open.json), with the business's name as texts show it (K-04
+//      businesses.display_name, B02; RULES 4.6: with the sensitive switch on, texts show only it), the one value code
+//      fills. None holds the read's id, its kind's name or the person's words.
+//  33. A threat whose business's name is not read (no businesses row) writes A3-25's line, as telling.ts default 25 does
+//      for an outcome whose owner line the master does not give: the owner is still told, and nothing on the safety path
+//      is refused for it.
+//  34. A handOff call's own summary is written only for a hand-off of kind other; each safety kind writes its owner line
+//      whatever the caller gave (crisis words since T-319 round 2; an emergency and a threat since T-1447).
 
 import type { OutboxRowNew } from "../../commit";
 import { NotBuiltError, type ErrorsOf, type RequestOf, type ResponseOf } from "../../tool-api";
+import type { SafetyOutcome } from "../safety";
 import { PagingRefusedError } from "./errors";
 import {
   handOffPageSummary,
@@ -43,7 +64,7 @@ import {
   type PagingPlan,
   type PagingPorts,
 } from "./page";
-import type { HandOffKind, StoredHandOff } from "./ports";
+import type { HandOffKind, PagingReader, SafetyHandOffKind, StoredHandOff } from "./ports";
 import { resolvePerson } from "./recipients";
 import { laterOf, plusMinutes } from "./time";
 import { joinPaging, noPagingWrites, pagingEntry, type JobClock, type PagingWrites } from "./writes";
@@ -60,19 +81,57 @@ export type AnswerHandOffAnswer = AnswerHandOffResponse | AnswerHandOffError;
 /** What a hand-off's escalation clock row fires, as K-36's seeds write it. */
 export const ESCALATION_JOB = "hand-off-escalation";
 
+/** The hand-off a safety read's outcomes call for (telling.ts default 23), or null when none tells. */
+export function tellingKindOf(outcomes: readonly SafetyOutcome[]): SafetyHandOffKind | null {
+  if (outcomes.includes("Crisis words")) return "crisis_words";
+  if (outcomes.includes("An emergency")) return "emergency";
+  if (outcomes.includes("A threat to staff or others")) return "threat";
+  return null;
+}
+
 /**
  * All the owner hears of crisis words (master A3-25: "Rosie's team, and Sam with 'Urgent: a customer may need help'. Never
  * the words."; K-36 v1 hand_offs.summary, audience owner).
  */
 export const CRISIS_OWNER_LINE = "Urgent: a customer may need help";
 
+/** All the owner hears of an emergency, word for word (K-36 v1 seed-page-acknowledged.json's summary; default 32). */
+export const EMERGENCY_OWNER_LINE =
+  "Urgent: a customer may need help. This sounded like an emergency: they were told to get to safety and call 911. Nothing was booked.";
+
 /**
- * A hand-off's summary as written, only what the owner may hear (K-36 v1 hand_offs.summary; its README rule 4): for crisis
- * words A3-25's line alone, whatever the caller gave, so no outcome, kind, read id or person's words reaches the owner's
- * row or its business-scoped entry (telling.ts default 25); any other kind as given.
+ * All the owner hears of a threat, word for word (master A3-48's line to Sam; K-36 v1 seed-page-open.json's summary),
+ * with the business's name as texts show it, the one value code fills (default 32).
  */
-export function ownerSummaryOf(kind: HandOffKind, summary: string): string {
-  return kind === "crisis_words" ? CRISIS_OWNER_LINE : summary;
+export function threatOwnerLine(businessName: string): string {
+  return (
+    `Urgent: a message to ${businessName} threatened harm to someone on your team. Nothing was booked. ` +
+    "Visits with this person are paused until you decide. Details on the secure page."
+  );
+}
+
+/**
+ * A safety kind's owner line (default 32): A3-25's for crisis words, the emergency's, and A3-48's for a threat, or A3-25's
+ * for a threat whose business's name is not read (default 33). Never the read's id or the person's words.
+ */
+export function ownerLineOf(kind: SafetyHandOffKind, businessName: string | null): string {
+  switch (kind) {
+    case "crisis_words":
+      return CRISIS_OWNER_LINE;
+    case "emergency":
+      return EMERGENCY_OWNER_LINE;
+    case "threat":
+      return businessName === null ? CRISIS_OWNER_LINE : threatOwnerLine(businessName);
+  }
+}
+
+/**
+ * A hand-off's summary as written, only what the owner may hear (K-36 v1 hand_offs.summary; its README rule 4): a safety
+ * kind's owner line, whatever the caller gave, so no outcome name, read id or person's words reaches the owner's row or
+ * its business-scoped entry (telling.ts default 25; default 34); a hand-off of kind other's as given.
+ */
+export function ownerSummaryOf(kind: HandOffKind, summary: string, businessName: string | null): string {
+  return kind === "other" ? summary : ownerLineOf(kind, businessName);
 }
 
 /** An emergency's or a threat's owner has 5 minutes to reply or tap (arch 06 line 329). */
@@ -113,7 +172,10 @@ export interface NewHandOff {
   readonly turnId: string | null;
   readonly bookingId: string | null;
   readonly aboutPersonId: string | null;
-  /** What is handed off, only what the owner may hear (K-36 v1 hand_offs.summary); crisis words write A3-25's line. */
+  /**
+   * What its caller says is handed off: written as given for a hand-off of kind other; each safety kind writes its owner
+   * line instead, whatever is given (ownerSummaryOf; K-36 v1 hand_offs.summary; default 34).
+   */
   readonly summary: string;
   readonly now: string;
   /** For crisis words, whether the team's page opened at once repeats every 5 minutes until acknowledged. */
@@ -223,6 +285,8 @@ export async function openHandOff(handOff: NewHandOff, ports: PagingPorts): Prom
     : null;
   const escalatedAt = page === null ? null : handOff.now;
 
+  // The business's name, which a threat's owner line names (default 32).
+  const businessName = handOff.kind === "threat" ? await reader.businessName(handOff.businessId) : null;
   const created = {
     kind: handOff.kind,
     safety_outcome_id: handOff.safetyOutcomeId,
@@ -232,7 +296,7 @@ export async function openHandOff(handOff: NewHandOff, ports: PagingPorts): Prom
     told_person_id: owner,
     told_as: "owner",
     alert_outbox_row_id: alert?.id ?? null,
-    summary: ownerSummaryOf(handOff.kind, handOff.summary),
+    summary: ownerSummaryOf(handOff.kind, handOff.summary, businessName),
     handed_at: handOff.now,
     escalate_at: escalateAt,
     escalation_clock_row_id: clock?.id ?? null,
@@ -319,6 +383,30 @@ async function repeatAnswer(handOff: StoredHandOff, ports: PagingPorts): Promise
   };
 }
 
+/**
+ * A handOff's kind, checked against its safety read (K-36 rule 5; hand_offs_safety_kind_has_outcome; default 31): other
+ * for a hand-off that names no read, else its read's own kind (default 23), which must be the kind it names. A read the
+ * business's scope does not show answers notFound; any other mismatch throws before anything is written. Reads only.
+ */
+async function kindOfItsRead(
+  request: HandOffRequest,
+  businessId: string,
+  reader: PagingReader,
+): Promise<HandOffKind | HandOffError> {
+  const outcomeId = request.safetyOutcomeId;
+  if (outcomeId === null) {
+    if (request.kind !== "other") throw new PagingRefusedError("kindNotItsRead");
+    return "other";
+  }
+  if (request.kind === "other") throw new PagingRefusedError("kindNotItsRead", [outcomeId]);
+  const read = await reader.safetyRead(outcomeId);
+  if (read === null) return { error: "notFound", table: "safety_outcomes", rowId: outcomeId };
+  if (read.businessId !== businessId) throw new PagingRefusedError("otherBusiness", [outcomeId]);
+  if (tellingKindOf(read.outcomes) !== request.kind)
+    throw new PagingRefusedError("kindNotItsRead", [outcomeId]);
+  return request.kind;
+}
+
 /** Plans one handOff call: the hand-off, its alert and its escalation. Reads only. */
 export async function planHandOff(call: HandOffCall, ports: PagingPorts): Promise<PagingPlan<HandOffAnswer>> {
   const { request, businessId, now } = call;
@@ -328,8 +416,11 @@ export async function planHandOff(call: HandOffCall, ports: PagingPorts): Promis
     throw new PagingRefusedError("otherBusiness");
   }
   const key = handOffKeyOf(request.safetyOutcomeId, request.caller.requestId);
-  const handOffId = await ports.ids.rowId("handOff", key);
   const step = handOffStep(request.kind);
+  // K-36 rule 5 before anything is written or answered, a repeat included: the kind is the read's (default 31).
+  const kind = await kindOfItsRead(request, businessId, ports.reader);
+  if (typeof kind !== "string") return { key, answer: kind, writes: noPagingWrites(step) };
+  const handOffId = await ports.ids.rowId("handOff", key);
   const stored = await ports.reader.handOff(handOffId);
   if (stored !== null)
     return { key, answer: await repeatAnswer(stored, ports), writes: noPagingWrites(step) };
@@ -338,7 +429,7 @@ export async function planHandOff(call: HandOffCall, ports: PagingPorts): Promis
     {
       handOffId,
       businessId,
-      kind: request.kind,
+      kind,
       safetyOutcomeId: request.safetyOutcomeId,
       turnId: request.caller.turnId,
       bookingId: request.bookingId,

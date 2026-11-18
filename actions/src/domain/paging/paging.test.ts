@@ -13,6 +13,9 @@
 // each refusal K-09 lists, the defaults that fail closed, and no number, address or person's words in anything written.
 // Round 2 (DL-930): a crisis-words hand-off's summary is A3-25's line alone (telling.ts default 25), and a decision
 // writes back only to a row of the call's business (review.ts default 29).
+// T-1447 (DL-934): a handOff whose kind is not its safety read's is refused before anything is written (K-36 rule 5;
+// hand-off.ts default 31), and an emergency's and a threat's hand-off summaries are their owner lines word for word, as
+// K-36's seed-page-acknowledged.json and seed-page-open.json (A3-48) write them, with no read id (defaults 32 to 34).
 
 import { describe, expect, it } from "vitest";
 
@@ -62,6 +65,7 @@ import {
   BARBERSHOP,
   HOME_SERVICES,
   NEW_YORK,
+  OUTCOME_OF_KIND,
   PAT,
   SAM,
   TEAM_1,
@@ -73,9 +77,10 @@ import {
   pagingWorld,
   readerOn,
   rosterOf,
+  seedRead,
   type PagingWorld,
 } from "./test-support";
-import type { PagingWrites } from "./writes";
+import { pagingWritesNothing, type PagingWrites } from "./writes";
 
 const validator = createToolApiValidator();
 
@@ -201,6 +206,24 @@ function holdsNoCrisisDetail(summary: unknown, outcomeId: string): void {
     expect(lower).not.toContain(word);
   }
 }
+
+/** A K-36 v1 seed, as these tests read its rows. */
+interface NotificationsSeed {
+  readonly rows: readonly { readonly table: string; readonly values: Readonly<Record<string, unknown>> }[];
+}
+
+/** The owner line a K-36 v1 seed writes to hand_offs.summary, word for word (T-1447). */
+function ownerLineOfSeed(file: string): string {
+  const seed = fixture(`db-schema/notifications/fixtures/${file}`) as NotificationsSeed;
+  const summary = seed.rows.find((row) => row.table === "hand_offs")?.values.summary;
+  if (typeof summary !== "string") throw new Error(`${file} holds no hand-off summary`);
+  return summary;
+}
+
+/** What the owner hears of an emergency (K-36 seed-page-acknowledged.json, line 37). */
+const EMERGENCY_LINE = ownerLineOfSeed("seed-page-acknowledged.json");
+/** What Lee's Barbershop's owner hears of a threat: master A3-48's line (K-36 seed-page-open.json, line 61). */
+const THREAT_LINE = ownerLineOfSeed("seed-page-open.json");
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -627,6 +650,8 @@ describe("a hand-off unanswered by the owner for 2 days opens a team review item
   async function handedOff(world: PagingWorld, kind: HandOffRequest["kind"]) {
     const ports = portsOf(world);
     const request = handOffRequest(kind);
+    // The read it names, of the kind it names (K-36 rule 5; T-1447).
+    if (kind !== "other") seedRead(world, "safety-outcome-alex-0301", [OUTCOME_OF_KIND[kind]]);
     valid("handOff", "request", request);
     const plan = await planHandOff({ request, businessId: BARBERSHOP, now: handedAt }, ports);
     valid("handOff", "response", plan.answer);
@@ -1234,26 +1259,250 @@ describe("the telling port (T-318's SafetyTelling) writes and names its rows as 
     holdsNoCrisisDetail(written.entry, "safety-outcome-alex-0303");
   });
 
-  it("an emergency's and a threat's hand-offs keep their owner lines, unchanged", async () => {
+  it("an emergency's and a threat's hand-off summaries are their owner lines word for word, with no read id (T-1447)", async () => {
     const cases = [
-      ["An emergency", "an emergency"],
-      ["A threat to staff or others", "a threat to staff or others"],
+      ["An emergency", "emergency", "safety-outcome-alex-0202", EMERGENCY_LINE],
+      ["A threat to staff or others", "threat", "safety-outcome-alex-0204", THREAT_LINE],
     ] as const;
-    for (const [outcome, words] of cases) {
-      const telling = createPagingTelling(portsOf(pagingWorld()));
-      const plan = await telling.tell({
+    for (const [outcome, kind, outcomeId, line] of cases) {
+      // The telling port's record of the read.
+      const told = await createPagingTelling(portsOf(pagingWorld())).tell({
         ...crisisTell(),
-        outcomeId: "safety-outcome-alex-0204",
+        outcomeId,
         outcomes: [outcome],
       });
-      const line = `A safety read (safety-outcome-alex-0204) found ${words}.`;
-      expect(summariesOf(plan.writes)).toEqual({ row: line, entry: line, entryBusinessId: BARBERSHOP });
+      // A handOff call naming the read, whatever summary its caller gave (here one naming the read and its kind).
+      const world = pagingWorld();
+      seedRead(world, outcomeId, [outcome]);
+      const request: HandOffRequest = {
+        caller: {
+          kind: "turn",
+          turnId: "turn-alex-0304",
+          requestId: "turn-alex-0304",
+          businessId: BARBERSHOP,
+          personId: ALEX,
+          traceId: "trace-alex-0304",
+        },
+        kind,
+        about: "other",
+        safetyOutcomeId: outcomeId,
+        bookingId: null,
+        aboutPersonId: ALEX,
+        summary: `A safety read (${outcomeId}) found ${outcome.toLowerCase()}.`,
+      };
+      valid("handOff", "request", request);
+      const plan = await planHandOff(
+        { request, businessId: BARBERSHOP, now: "2026-10-26T15:00:00Z" },
+        portsOf(world),
+      );
+      for (const written of [summariesOf(told.writes), summariesOf(plan.writes)]) {
+        expect(written).toEqual({ row: line, entry: line, entryBusinessId: BARBERSHOP });
+        expect(String(written.row)).not.toContain(outcomeId);
+        expect(String(written.entry)).not.toContain(outcomeId);
+      }
+      // The read stays in the team's page summary (K-36 README rule 4): the page its escalation opens after 5 minutes.
+      if ("error" in plan.answer) throw new Error(plan.answer.error);
+      applyPagingWrites(world, plan.writes);
+      const escalation = escalationRequest({
+        handOff: must(world.handOffs.get(must(plan.answer.handOffId))),
+        clockRowId: must(plan.answer.escalationClockRowId),
+        traceId: "trace-clock-0304",
+        namedPersonId: PAT,
+      });
+      expect(escalation?.summary).toContain(`read from ${outcomeId}`);
     }
+  });
+
+  it("a threat at a business whose name is not read writes A3-25's line instead (hand-off.ts default 33)", async () => {
+    const world = pagingWorld();
+    world.names.clear();
+    const told = await createPagingTelling(portsOf(world)).tell({
+      ...crisisTell(),
+      outcomeId: "safety-outcome-alex-0204",
+      outcomes: ["A threat to staff or others"],
+    });
+    expect(summariesOf(told.writes)).toEqual({
+      row: URGENT_LINE,
+      entry: URGENT_LINE,
+      entryBusinessId: BARBERSHOP,
+    });
   });
 
   it("answers notBuilt for a record with no turn (K-09 v1.10 default 178: its clock turn is not built)", async () => {
     const telling = createPagingTelling(portsOf(pagingWorld()));
     await expect(telling.tell({ ...crisisTell(), turnId: null })).rejects.toThrow(NotBuiltError);
+  });
+});
+
+describe("K-36 rule 5: a handOff whose kind is not its safety read's is refused before anything is written (T-1447)", () => {
+  const now = "2026-10-26T15:00:00Z";
+  /** Alex's crisis-words read at the barbershop (j3-safety-arrival-crisis-rows.json's; crisisTell's outcome). */
+  const CRISIS_READ = "safety-outcome-alex-0203";
+
+  /** A handOff of Alex's, in a turn at the barbershop, naming a read under a kind. */
+  const handOffOf = (kind: HandOffRequest["kind"], safetyOutcomeId: string | null): HandOffRequest => ({
+    caller: {
+      kind: "turn",
+      turnId: "turn-alex-0305",
+      requestId: "turn-alex-0305",
+      businessId: BARBERSHOP,
+      personId: ALEX,
+      traceId: "trace-alex-0305",
+    },
+    kind,
+    about: "other",
+    safetyOutcomeId,
+    bookingId: null,
+    aboutPersonId: ALEX,
+    summary: "Alex's text was read.",
+  });
+
+  /** The fault and rows a planned handOff is refused with, or null when it plans. */
+  async function refusalOf(
+    request: HandOffRequest,
+    world: PagingWorld,
+  ): Promise<{ readonly fault: string; readonly rowIds: readonly string[] } | null> {
+    try {
+      await planHandOff({ request, businessId: BARBERSHOP, now }, portsOf(world));
+      return null;
+    } catch (error) {
+      if (!(error instanceof PagingRefusedError)) throw error;
+      return { fault: error.fault, rowIds: error.rowIds };
+    }
+  }
+
+  /** How many of the rows a hand-off writes the world holds. */
+  const writtenIn = (world: PagingWorld) => ({
+    handOffs: world.handOffs.size,
+    pages: world.pages.size,
+    outbox: world.outbox.size,
+    clocks: world.clocks.size,
+  });
+  const NOTHING = { handOffs: 0, pages: 0, outbox: 0, clocks: 0 };
+
+  /** A commit with no turn that records each request it is asked to commit. */
+  function recordingCommit(): {
+    readonly committed: AloneCommitRequest[];
+    readonly commitAlone: AloneCommit<null>;
+  } {
+    const committed: AloneCommitRequest[] = [];
+    return {
+      committed,
+      commitAlone: {
+        commit(request) {
+          committed.push(request);
+          return Promise.resolve({ committed: true, repeated: false });
+        },
+      },
+    };
+  }
+
+  it("refuses a handOff naming a crisis read under another kind, with nothing written, planned or made alone", async () => {
+    const world = pagingWorld();
+    const { committed, commitAlone } = recordingCommit();
+    for (const kind of ["emergency", "threat", "other"] as const) {
+      const request = handOffOf(kind, CRISIS_READ);
+      valid("handOff", "request", request);
+      expect(await refusalOf(request, world)).toEqual({ fault: "kindNotItsRead", rowIds: [CRISIS_READ] });
+      // Made alone (a job's call): refused before its commit is asked.
+      const job = { ...request.caller, kind: "job" as const, turnId: null, requestId: `req-job-${kind}` };
+      await expect(
+        handOffAlone({ ...request, caller: job }, null, BARBERSHOP, {
+          reader: () => readerOn(world),
+          commitAlone,
+          now: () => now,
+        }),
+      ).rejects.toThrow(PagingRefusedError);
+    }
+    expect(committed).toEqual([]);
+    expect(writtenIn(world)).toEqual(NOTHING);
+  });
+
+  it("checks the kind before a repeat: once the read's record has told, another kind is still refused", async () => {
+    const world = pagingWorld();
+    const told = await createPagingTelling(portsOf(world)).tell(crisisTell());
+    applyPagingWrites(world, { ...told.writes, clockCancels: [] });
+    const written = writtenIn(world);
+    for (const kind of ["emergency", "threat", "other"] as const) {
+      expect(await refusalOf(handOffOf(kind, CRISIS_READ), world)).toEqual({
+        fault: "kindNotItsRead",
+        rowIds: [CRISIS_READ],
+      });
+    }
+    // Under its own kind, the call is the record's hand-off again (hand-off.ts default 14), writing nothing.
+    const again = await planHandOff(
+      { request: handOffOf("crisis_words", CRISIS_READ), businessId: BARBERSHOP, now },
+      portsOf(world),
+    );
+    valid("handOff", "response", again.answer);
+    expect(again.answer).toMatchObject({ handOffId: told.told[0]?.id, repeated: true });
+    expect(pagingWritesNothing(again.writes)).toBe(true);
+    expect(writtenIn(world)).toEqual(written);
+  });
+
+  it("follows the read's real outcome: a read of an emergency and crisis words hands off as crisis words alone", async () => {
+    const world = pagingWorld();
+    const both = "safety-outcome-alex-0306";
+    seedRead(world, both, ["An emergency", "Crisis words"]);
+    expect(await refusalOf(handOffOf("emergency", both), world)).toEqual({
+      fault: "kindNotItsRead",
+      rowIds: [both],
+    });
+    expect(writtenIn(world)).toEqual(NOTHING);
+    const request = {
+      ...handOffOf("crisis_words", both),
+      summary: `An emergency and crisis words, read ${both}.`,
+    };
+    valid("handOff", "request", request);
+    const plan = await planHandOff({ request, businessId: BARBERSHOP, now }, portsOf(world));
+    valid("handOff", "response", plan.answer);
+    expect(plan.answer).toMatchObject({ escalateAt: now, escalationClockRowId: null, repeated: false });
+    const written = summariesOf(plan.writes);
+    expect(written).toEqual({ row: URGENT_LINE, entry: URGENT_LINE, entryBusinessId: BARBERSHOP });
+    holdsNoCrisisDetail(written.row, both);
+    holdsNoCrisisDetail(written.entry, both);
+  });
+
+  it("refuses a safety kind naming no read, a read that tells nothing and a read of another business or none", async () => {
+    const world = pagingWorld();
+    seedRead(world, "safety-outcome-alex-0307", ["Unsafe at home"]);
+    seedRead(world, "safety-outcome-home-services-0308", ["Crisis words"], HOME_SERVICES);
+    seedRead(world, "safety-outcome-alex-0309", ["Crisis words"], null);
+    expect(await refusalOf(handOffOf("emergency", null), world)).toEqual({
+      fault: "kindNotItsRead",
+      rowIds: [],
+    });
+    expect(await refusalOf(handOffOf("threat", "safety-outcome-alex-0307"), world)).toEqual({
+      fault: "kindNotItsRead",
+      rowIds: ["safety-outcome-alex-0307"],
+    });
+    for (const other of ["safety-outcome-home-services-0308", "safety-outcome-alex-0309"]) {
+      expect(await refusalOf(handOffOf("crisis_words", other), world)).toEqual({
+        fault: "otherBusiness",
+        rowIds: [other],
+      });
+    }
+    expect(writtenIn(world)).toEqual(NOTHING);
+  });
+
+  it("answers notFound for a read that is not there (K-09 lists it), writing nothing, planned or made alone", async () => {
+    const world = pagingWorld();
+    const { committed, commitAlone } = recordingCommit();
+    const request = handOffOf("crisis_words", "safety-outcome-alex-0399");
+    const notFound = { error: "notFound", table: "safety_outcomes", rowId: "safety-outcome-alex-0399" };
+    const plan = await planHandOff({ request, businessId: BARBERSHOP, now }, portsOf(world));
+    expect(plan.answer).toEqual(notFound);
+    valid("handOff", "errors", plan.answer);
+    expect(pagingWritesNothing(plan.writes)).toBe(true);
+    const job = { ...request.caller, kind: "job" as const, turnId: null, requestId: "req-job-0399" };
+    const alone = await handOffAlone({ ...request, caller: job }, null, BARBERSHOP, {
+      reader: () => readerOn(world),
+      commitAlone,
+      now: () => now,
+    });
+    expect(alone).toEqual(notFound);
+    expect(committed).toEqual([]);
+    expect(writtenIn(world)).toEqual(NOTHING);
   });
 });
 
