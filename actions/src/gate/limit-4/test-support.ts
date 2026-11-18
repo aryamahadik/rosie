@@ -57,7 +57,7 @@ import {
   rowFor,
   typed,
 } from "../limit-3/test-support";
-import type { BookingStage, TodayReader } from "./facts";
+import type { BookingStage, SetupBound, StoredQuestion, StoredQuestionReader, TodayReader } from "./facts";
 import { compareAndSetOf, createLimit4, type VersionsLimit } from "./index";
 
 export type StepCard = Context["cards"][number];
@@ -67,8 +67,11 @@ export type StepCard = Context["cards"][number];
 
 /** What limit 4 reads in a test: the open questions live on their handles, and today's facts. */
 export interface World {
-  /** The live open questions; a test may change the list, and the limit reads it as it stands. */
-  readonly questions: AskedQuestion[];
+  /**
+   * The live open questions; a test may change the list, and the limit reads it as it stands. A question that names no
+   * turn was written by ASKING_TURN (T-1448).
+   */
+  readonly questions: (AskedQuestion | StoredQuestion)[];
   readonly today: TodayReader;
 }
 
@@ -76,14 +79,17 @@ export interface World {
 export interface TodayReads {
   readonly versions: RowRef[][];
   readonly bookings: string[];
+  /** The bound of each versions read, in order, when the test keeps them (T-1448). */
+  readonly bounds?: SetupBound[];
 }
 
 /** Today's facts over a reader, every read written down. */
 export function counted(today: TodayReader, reads: TodayReads): TodayReader {
   return {
-    currentVersions(rows) {
+    currentVersions(rows, bound) {
       reads.versions.push(rows.map((row) => ({ ...row })));
-      return today.currentVersions(rows);
+      reads.bounds?.push({ ...bound });
+      return today.currentVersions(rows, bound);
     },
     booking(bookingId) {
       reads.bookings.push(bookingId);
@@ -92,9 +98,32 @@ export function counted(today: TodayReader, reads: TodayReads): TodayReader {
   };
 }
 
+/**
+ * The turn a question double's row names when its test names none (K-04 open_questions.turn_id is never null): no row
+ * holds it, so its handle has no people, and today's doubles read no bound (T-1448).
+ */
+export const ASKING_TURN = "turn-asking";
+
+/**
+ * The open questions' read over rows, as limit 4 reads them: limit 3's double (a row answers only for the handle it was
+ * sent to), each row with the turn it names, else ASKING_TURN.
+ */
+export function storedQuestionsOf(rows: readonly (AskedQuestion | StoredQuestion)[]): StoredQuestionReader {
+  const asked = questionsOf(rows);
+  return {
+    async liveQuestion(handleId, openQuestionId) {
+      const found = await asked.liveQuestion(handleId, openQuestionId);
+      if (found === null) return null;
+      const row = rows.find((each) => each.openQuestionId === openQuestionId && each.handleId === handleId);
+      const turnId = row !== undefined && "turnId" in row ? row.turnId : ASKING_TURN;
+      return { ...found, turnId };
+    },
+  };
+}
+
 /** Limit 4 itself, over doubles of its ports. */
 export function limitIn(world: World): VersionsLimit {
-  return createLimit4({ questions: () => questionsOf(world.questions), today: () => world.today });
+  return createLimit4({ questions: () => storedQuestionsOf(world.questions), today: () => world.today });
 }
 
 /** Limits 1 to 3, 5 and 6 as the gate framework's scripted doubles, with `limit` in slot 4 (each call written down). */
