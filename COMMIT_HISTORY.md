@@ -2,9 +2,97 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 750, [`180b57d`](https://github.com/aryamahadik/rosie/commit/180b57d), 2026-11-17 23:13:18 UTC.
+- **Through:** commit 753, [`67f851b`](https://github.com/aryamahadik/rosie/commit/67f851b), 2026-11-18 02:05:32 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 753. docs: COMMIT\_HISTORY.md through commit 750 (180b57d, \#761) (\#764)
+
+- **Commit:** [`67f851b`](https://github.com/aryamahadik/rosie/commit/67f851b), by Arya Mahadik, 2026-11-18 02:05:32 UTC
+- **Pull request:** [#764](https://github.com/aryamahadik/rosie/pull/764) from `task/commit-history-166`, merged 2026-11-18 02:05:33 UTC. It squashed 1 branch commit:
+  - `9c2c8c6` docs: COMMIT\_HISTORY.md through commit 750 (180b57d, \#761)
+- **Files changed:** 1 (+64 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +64 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 752. T-1439: the first-side lint (rename pairs whose first side matches no master text) and C7's FIRST\_SIDES held to master text (\#763)
+
+- **Commit:** [`d0d3858`](https://github.com/aryamahadik/rosie/commit/d0d3858), by Arya Mahadik, 2026-11-18 02:05:28 UTC
+- **Pull request:** [#763](https://github.com/aryamahadik/rosie/pull/763) from `task/T-1439`, merged 2026-11-18 02:05:28 UTC. It squashed 4 branch commits:
+  - `f65b294` T-1439: list rename and swap pairs whose first side matches no master…
+  - `7811e29` T-1439: braces for two forEach callbacks and no needless cast in the …
+  - `b323b68` Merge branch 'main' into task/T-1439
+  - `6977b7d` T-1439: every listed pair gets its place on the master's flow (indexe…
+- **Files changed:** 4 (+2033 −17), by folder:
+  - `compiler/src/corrections/` c7.test.ts +84 −17
+  - `compiler/src/lint/` first-sides.places.txt +464 −0, first-sides.test.ts +592 −0, first-sides.ts +893 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1439: list rename and swap pairs whose first side matches no master text, read by compiling what a person reads where they were meant to rename, and keep only master-text first sides in C7's FIRST_SIDES
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1439: braces for two forEach callbacks and no needless cast in the first-side lint (eslint)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1439: every listed pair gets its place on the master's flow (indexed placer), marked pair by pair in first-sides.places.txt (none on a line that claims a check while verify is off); swaps match as swapRes does; own-ops renames pinned and kept out of C7's FIRST_SIDES
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 751. T-1433: the catalog's cross-row checks (a) to (i) before any write, the widened read port bound in catalog/pg (\#762)
+
+- **Commit:** [`d0a9bc5`](https://github.com/aryamahadik/rosie/commit/d0a9bc5), by Arya Mahadik, 2026-11-18 02:05:24 UTC
+- **Pull request:** [#762](https://github.com/aryamahadik/rosie/pull/762) from `task/T-1433`, merged 2026-11-18 02:05:24 UTC. It squashed 4 branch commits:
+  - `c3612d7` T-1433: the catalog's cross-row checks through K-05 v1.18's reads (de…
+  - `edbcf2f` T-1433: lint fixes (optional chains in checks.ts, braced void checks …
+  - `968dbf2` T-1433: (a) at each instant and booking (a place's price from a later…
+  - `5c2a116` T-1433: (a)'s price-save test also adds a place price under the Groom…
+- **Files changed:** 19 (+2247 −157), by folder:
+  - `actions/src/domain/catalog/` catalog.test.ts +29 −12, checks.test.ts +681 −0, checks.ts +230 −0, errors.ts +25 −2, index.ts +31 −4, prices.test.ts +2 −2, reads.ts +44 −15, registry.test.ts +43 −0, registry.ts +59 −0, rows.ts +39 −6, service.ts +186 −44, terms.ts +7 −2, test-support.ts +87 −8, types.ts +83 −0
+  - `actions/src/domain/catalog/pg/` index.ts +5 −2, reads.int.test.ts +168 −5, reads.test.ts +166 −4, reads.ts +254 −40, test-support.ts +108 −11
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1433: the catalog's cross-row checks through K-05 v1.18's reads (deposit under the price, a list way's price, location and worker, a kind's company, a link's space, no update of business or key, item 77 names, setup's no money, the K-26 registry), with the widened port bound in catalog/pg
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1433: lint fixes (optional chains in checks.ts, braced void checks in its test) and the service header's reads and default 2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1433: (a) at each instant and booking (a place's price from a later date, or on some days, leaves the service's own pricing the way), and at every price save (an add, a change, a withdrawal or a close) for each rule newly pricing a way, with their unit tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1433: (a)'s price-save test also adds a place price under the Groom's package's deposit
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 750. docs: COMMIT\_HISTORY.md through commit 747 (cd7deae, \#758) (\#761)
 
