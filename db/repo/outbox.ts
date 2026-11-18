@@ -51,13 +51,15 @@
 //                  skipped, SKIP LOCKED's meaning per recipient. Under the lock its open rows are read in commit_seq order
 //                  FOR UPDATE and walked: a row held for text hours (held_until after now) is passed and reported in
 //                  passedHeld (arch 02 line 125, DD); a waiting_chat row is passed and not reported (K-07: it waits for the
-//                  chat, not the dispatcher); a row claimed earlier and not finished (sending), or one with no final parts
-//                  (planned, stale), stops the walk; a checked row, or a held row whose held_until has passed, is claimed:
-//                  its state moves to sending under compare-and-set and its version rises by one, and each part gets its
-//                  row under '<row>/<part>/<try>' (a new part try 1, attempts 1, its K-03 send kind; a part the provider
-//                  never accepted keeps its stored key with attempts raised; an accepted part is listed as sent). At most
-//                  `limit` rows in all. Finished rows (sent, delivered, dropped_stopped, withdrawn, failed, superseded) are
-//                  not open, so they are skipped. Under v1 a claim never lapses (K-05 v1 open gap 1).
+//                  chat, not the dispatcher), as is a parked turn's "nothing changed" row (planned with no plan, its
+//                  turn parked), which nothing composes (T-1464, DL-967; default 26); a row claimed earlier and not
+//                  finished (sending), or any other row with no final parts (planned, stale), stops the walk;
+//                  a checked row, or a held row whose held_until has passed, is claimed: its state moves to sending
+//                  under compare-and-set and its version rises by one, and each part gets its row under
+//                  '<row>/<part>/<try>' (a new part try 1, attempts 1, its K-03 send kind; a part the provider never
+//                  accepted keeps its stored key with attempts raised; an accepted part is listed as sent). At most
+//                  `limit` rows in all. Finished rows (sent, delivered, dropped_stopped, withdrawn, failed, superseded)
+//                  are not open, so they are skipped. Under v1 a claim never lapses (K-05 v1 open gap 1).
 //   claimOutboxV12 claimOutbox, and (v1.1 item 13) each claim writes the row's outbox_claims row under the row's lock:
 //                  claimer, claimed_at = now, lapses_at = now + 60 s (K-07 default 2), claim_no 1 for a row with none or
 //                  raised by one, first_try_at and next_try_not_before kept, the claim's version raised; it is returned as
@@ -256,6 +258,20 @@
 //  25. claimOutboxV12 and claimOutboxV113 keep refusing sendClass (their request is v1.2's: exactly its four fields),
 //      so a store bound to either that is handed the field refuses the claim, before any statement, rather than claim
 //      every class (T-1356's fail-closed store; DL-698 note c; RULES 7.2).
+//  26. A parked turn's "nothing changed" row is passed by the ordinary walk, never a stop (T-1464; DL-967; K-05 README
+//      default 183): parkTurn writes it planned with no plan, and nothing composes it (runtime/src/turn/park.ts: the
+//      runtime never words that line; its words are a later card), so stopping there for commit order held every later
+//      row to that person for good (staging, Nov 18: a checked reply never claimed). The rule is PARKED_UNPLANNED: state
+//      planned, plan null and the row's turn parked, the turn read by the row's turn_id in the statement that reads the
+//      row, never locked (turns are written once, committed or parked: NQ-RT-3). Such a row is still read and locked
+//      FOR UPDATE with the recipient's other open rows, as a waiting_chat row is, so a writePlan that composes it waits
+//      for the walk, and a walk that waits for that writePlan reads the row as it then stands; it is passed, not listed
+//      in passedHeld, and never claimed, sent or counted toward `limit`. Every other planned row (a committed turn's
+//      row not yet composed, a row with no turn) and every stale row still stops the walk; a parked turn's row that
+//      holds a plan is walked as today. The sweep (claimableRecipients, claimableRecipientsV12) looks past it as it
+//      looks past a passed row, while it still counts as open in the earliest-open order (default 4), as a passed held
+//      or waiting row does. The safety claim (claimOutboxV114 with sendClass) is unchanged: it reads only safety rows,
+//      and parkTurn's row is a quick reply.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1";
 import type * as K05v11 from "../../contracts/generated/data-access/data-access.v1.1";
 import type * as K05v12 from "../../contracts/generated/data-access/data-access.v1.2";
@@ -1251,6 +1267,22 @@ interface PartRow {
 
 const PART_COLUMNS = "part_no, try_no, idempotency_key, attempts, kind, state, linq_message_id, delivered_at";
 
+/**
+ * Whether the statement's outbox row `r` is a parked turn's "nothing changed" row (T-1464, DL-967; default 26):
+ * planned with no plan, its turn parked (K-04 turns.state), the turn read by the row's turn_id in the same statement and
+ * never locked. parkTurn writes that row so and nothing composes it (runtime/src/turn/park.ts), so the ordinary walk
+ * passes it and the sweep looks past it. A row with no turn (a job row) is no parked turn's.
+ */
+const PARKED_UNPLANNED =
+  "(r.state = 'planned' and r.plan is null" +
+  " and exists (select 1 from turns t where t.id = r.turn_id and t.state = 'parked'))";
+
+/** An open row as the ordinary walk reads it (items 3 and 13): with whether it is a parked turn's unplanned row. */
+interface WalkRow extends OpenRow {
+  /** PARKED_UNPLANNED, read in the walk's own statement: passed and not reported, as a waiting_chat row is. */
+  parked_unplanned: boolean;
+}
+
 /** A held row whose held_until is still ahead (default 4: none counts as due). */
 function heldAhead(row: { state: RowState; held_until: Date | null }, now: Date): boolean {
   return row.state === "held" && row.held_until !== null && row.held_until.getTime() > now.getTime();
@@ -1258,18 +1290,20 @@ function heldAhead(row: { state: RowState; held_until: Date | null }, now: Date)
 
 /**
  * The sweep's recipients (no recipient named): those whose first open row that is not passed (a held row not yet due, a
- * waiting row) is claimable, so a recipient whose walk would stop at once is not locked; earliest open commit_seq first
- * (default 4). A read without locks: each walk reads its rows again under its recipient's lock.
+ * waiting row, a parked turn's unplanned row: default 26) is claimable, so a recipient whose walk would stop at once is
+ * not locked; earliest open commit_seq first (default 4). A read without locks: each walk reads its rows again under its
+ * recipient's lock.
  */
 async function claimableRecipients(tx: Sql, now: Date): Promise<string[]> {
   const rows = await tx<{ recipient_handle_id: string }[]>`
     select f.recipient_handle_id
     from (
-      select distinct on (recipient_handle_id) recipient_handle_id, state
-      from outbox_rows
-      where state in ('planned', 'checked', 'sending', 'stale')
-         or (state = 'held' and (held_until is null or held_until <= ${now}))
-      order by recipient_handle_id, commit_seq
+      select distinct on (r.recipient_handle_id) r.recipient_handle_id, r.state
+      from outbox_rows r
+      where (r.state in ('planned', 'checked', 'sending', 'stale')
+             or (r.state = 'held' and (r.held_until is null or r.held_until <= ${now})))
+        and not ${tx.unsafe(PARKED_UNPLANNED)}
+      order by r.recipient_handle_id, r.commit_seq
     ) as f
     join (
       select recipient_handle_id, min(commit_seq) as first_open
@@ -1284,8 +1318,9 @@ async function claimableRecipients(tx: Sql, now: Date): Promise<string[]> {
 }
 
 /**
- * The v1.2 sweep's recipients: as claimableRecipients, and a recipient whose first open row that is not passed is a
- * sending row whose claim lapsed or that has no claim row (K-05 v1.1 item 13; default 20).
+ * The v1.2 sweep's recipients: as claimableRecipients (a parked turn's unplanned row passed too: default 26), and a
+ * recipient whose first open row that is not passed is a sending row whose claim lapsed or that has no claim row (K-05
+ * v1.1 item 13; default 20).
  */
 async function claimableRecipientsV12(tx: Sql, now: Date): Promise<string[]> {
   const rows = await tx<{ recipient_handle_id: string }[]>`
@@ -1295,8 +1330,9 @@ async function claimableRecipientsV12(tx: Sql, now: Date): Promise<string[]> {
              (c.outbox_row_id is null or c.lapses_at <= ${now}) as lapsed
       from outbox_rows r
       left join outbox_claims c on c.outbox_row_id = r.id
-      where r.state in ('planned', 'checked', 'sending', 'stale')
-         or (r.state = 'held' and (r.held_until is null or r.held_until <= ${now}))
+      where (r.state in ('planned', 'checked', 'sending', 'stale')
+             or (r.state = 'held' and (r.held_until is null or r.held_until <= ${now})))
+        and not ${tx.unsafe(PARKED_UNPLANNED)}
       order by r.recipient_handle_id, r.commit_seq
     ) as f
     join (
@@ -1541,19 +1577,22 @@ async function walkRecipient(
   taken: Taken[],
   passedHeld: PassedHeld[],
 ): Promise<void> {
-  const rows = await tx<OpenRow[]>`
-    select id, commit_seq, state, held_until, version, recipient_person_id, business_id, booking_id,
-           open_question_id, channel, send_class, versions_read, final_parts, trace_id, email_purpose, not_after
-    from outbox_rows
-    where recipient_handle_id = ${recipientHandleId} and state in ${tx(OPEN_STATES)}
-    order by commit_seq
-    for update
+  const rows = await tx<WalkRow[]>`
+    select r.id, r.commit_seq, r.state, r.held_until, r.version, r.recipient_person_id, r.business_id, r.booking_id,
+           r.open_question_id, r.channel, r.send_class, r.versions_read, r.final_parts, r.trace_id, r.email_purpose,
+           r.not_after, ${tx.unsafe(PARKED_UNPLANNED)} as parked_unplanned
+    from outbox_rows r
+    where r.recipient_handle_id = ${recipientHandleId} and r.state in ${tx(OPEN_STATES)}
+    order by r.commit_seq
+    for update of r
   `;
   for (const row of rows) {
     if (taken.length >= request.limit) {
       return;
     }
-    if (row.state === "waiting_chat") {
+    // A waiting_chat row waits for the chat, not the dispatcher (K-07). A parked turn's "nothing changed" row has no
+    // plan, and nothing composes it (park.ts): never claimed, sent or counted, it holds no later row back (default 26).
+    if (row.state === "waiting_chat" || row.parked_unplanned) {
       continue;
     }
     if (heldAhead(row, request.now)) {
@@ -1576,7 +1615,7 @@ async function walkRecipient(
     } else if (row.state === "checked" || row.state === "held") {
       current = v12 ? await lockClaim(tx, row.id) : undefined;
     } else {
-      // planned or stale: no final parts yet. Commit order: stop.
+      // Any other planned row, or a stale one: no final parts yet. Commit order: stop.
       return;
     }
     const claiming = v12 ? { claimer: request.claimer, now: request.now, current } : null;

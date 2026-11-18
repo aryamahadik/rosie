@@ -33,6 +33,11 @@
 // safety, the safety claim of a danger line's own wake, which waits for the recipient's lock, reads only the
 // recipient's open safety rows, takes what it can claim and passes what it cannot; without the field, v1.13's claim.
 // Every test above runs unchanged.
+//
+// T-1464 (DL-967) adds, after those and before the last test, the tests of the walk past a parked turn's "nothing
+// changed" row (outbox.ts default 26): the ordinary claim and the sweep pass a row that is planned with no plan and whose
+// turn is parked, which nothing composes, where every other planned or stale row still stops them. Every test above
+// runs unchanged.
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
@@ -77,6 +82,7 @@ import {
   type WritePlanOutcome,
   type WritePlanRequest,
 } from "./outbox";
+import { parkTurn, type ParkTurnRequest } from "./park";
 import { reserve, type ReserveRequest } from "./reservations";
 import type { Sql, Tx } from "./scope";
 import { createTestDatabase, type TestDatabase } from "./test-db";
@@ -4869,6 +4875,302 @@ describe("claimOutboxV114 with sendClass safety (K-05 v1.14 item 67; T-1354)", (
       });
     }
   });
+});
+
+// ==== T-1464: the walk passes a parked turn's "nothing changed" row, which nothing composes (DL-967) ===================
+//
+// parkTurn writes a parked turn's one "nothing changed" row with no plan, and nothing composes it
+// (runtime/src/turn/park.ts), so a walk that stopped at every planned row stopped at it for good: on staging, Nov 18, a
+// person's checked reply waited behind their earlier parked rows and was never claimed (DL-967). The ordinary claim (v1,
+// v1.2, and v1.14 without sendClass, which is v1.13's claim, the one the dispatcher makes on staging) and the sweep now
+// pass such a row, planned with no plan and its turn parked, as they pass a waiting_chat row: never claimed, sent,
+// listed or counted toward `limit` (outbox.ts default 26). Every other planned or stale row still stops the walk, a
+// parked turn's row that holds a plan is walked as today, and the safety claim is unchanged. Each world is Maya's
+// (park-turn.json's handle, person and business), in commit order: her parks through the real parkTurn (park-turn.json's
+// request, each turn's row and entry named by the runtime's rule), her other rows written as the tables' owner, under one
+// committed turn of hers or, for a row with no turn, a job id.
+
+/** Maya's two parked turns and when each was parked, then her committed turn and its reply. */
+const PARKED_TURNS = ["turn-maya-0004", "turn-maya-0005"] as const;
+const PARKED_AT = ["2026-11-07T15:20:00Z", "2026-11-07T15:40:00Z"] as const;
+const MAYA_HANDLE = "handle-maya";
+const MAYA_TURN = "turn-maya-0006";
+const MAYA_REPLY = "out-maya-reply";
+const MAYA_NOW = "2026-11-07T16:05:00Z";
+
+/** A parked turn's one row, named by the runtime's rule (runtime/src/turn/park.ts parkedRowId). */
+const parkedRowOf = (turnId: string): string => `out-${turnId}-parked`;
+const PARKED_ROWS: readonly string[] = PARKED_TURNS.map(parkedRowOf);
+
+/** park-turn.json's request for one of Maya's turns, its row and its entry named by the runtime's rule (park.ts). */
+function parkRequestFor(turnId: string, parkedAt: string): ParkTurnRequest {
+  const request = structuredClone(exchangeOf("park-turn.json").request) as unknown as ParkTurnRequest;
+  const [row] = request.outboxRows;
+  const [entry] = request.events;
+  if (row === undefined || entry === undefined) {
+    throw new Error("park-turn.json parks a turn with one row and one entry");
+  }
+  return {
+    ...request,
+    turn: { ...request.turn, id: turnId, eventIds: [`evt-${turnId}`], traceId: `trace-${turnId}` },
+    parkedAt,
+    outboxRows: [{ ...row, id: parkedRowOf(turnId) }],
+    events: [{ ...entry, id: `log-${turnId}-parked`, rowId: turnId }],
+  };
+}
+
+/** One step of Maya's world, in commit order: a park (of PARKED_TURNS' turn at that index), or one row of hers. */
+type MayaStep =
+  | { readonly park: 0 | 1 }
+  | {
+      readonly row: string;
+      readonly state: "planned" | "checked" | "stale";
+      /** A job row: no turn, a job id in its place (K-04 v1.1). */
+      readonly noTurn?: true;
+      /** Else a quick reply, as the parked row is. */
+      readonly sendClass?: "safety";
+    };
+
+/** A row's version as the calls leave it: written planned, checked by writePlan, stale after its claim and markRow. */
+const STEP_VERSION = { planned: 1, checked: 2, stale: 4 } as const;
+
+/**
+ * Maya's world: park-turn.json's K-04 seeds and her committed turn, then each step in commit order. A park runs the
+ * real parkTurn (its row planned with no plan, its turn parked); a row is written as the tables' owner, under her
+ * committed turn or with no turn: planned as a commit writes it, checked as writePlan leaves it, or stale as markRow
+ * stale leaves it (no plan, no final parts).
+ */
+async function mayaWorld(steps: readonly MayaStep[]): Promise<void> {
+  await reset();
+  await loadSeeds(exchangeOf("park-turn.json").given.k04Seeds);
+  await insertRow(db.sql, "turns", {
+    id: MAYA_TURN,
+    handle_id: MAYA_HANDLE,
+    event_ids: [`evt-${MAYA_TURN}`],
+    state: "committed",
+    bundle_hash: BUNDLE_HASH,
+    bundle_build: 1,
+    trace_id: `trace-${MAYA_TURN}`,
+    committed_at: "2026-11-07T16:00:00Z",
+  });
+  for (const step of steps) {
+    if ("park" in step) {
+      const turnId = PARKED_TURNS[step.park];
+      expect(await parkTurn(runtime, parkRequestFor(turnId, PARKED_AT[step.park]))).toMatchObject({
+        result: "parked",
+        turnId,
+        outboxRows: [{ id: parkedRowOf(turnId) }],
+        repeated: false,
+      });
+      continue;
+    }
+    const { row: id, state } = step;
+    const turnId = step.noTurn === true ? null : MAYA_TURN;
+    const composed = state === "checked";
+    await insertRow(db.sql, "outbox_rows", {
+      id,
+      turn_id: turnId,
+      job_id: turnId === null ? `job-${id}` : null,
+      recipient_handle_id: MAYA_HANDLE,
+      recipient_person_id: "person-maya",
+      business_id: "biz-yoga-studio",
+      channel: "imessage",
+      send_class: step.sendClass ?? "quick_reply",
+      versions_read: [],
+      plan: composed ? { row: id, channel: "imessage", copyOf: null, plan: PLAN_BODY } : null,
+      final_parts: composed
+        ? {
+            row: id,
+            channel: "imessage",
+            sends: [WORDS],
+            fixedLines: [],
+            slotValues: [],
+            threadReplyTo: null,
+          }
+        : null,
+      state,
+      version: STEP_VERSION[state],
+      bundle_hash: BUNDLE_HASH,
+      bundle_build: 1,
+      trace_id: `trace-${turnId ?? id}`,
+    });
+  }
+}
+
+/** Each row as parkTurn wrote it: planned at version 1 with no plan or final parts, no part and no claim. */
+async function parkedRowsAsWritten(ids: readonly string[]): Promise<void> {
+  for (const id of ids) {
+    const [row] = await db.sql<{ state: string; version: number; unplanned: boolean }[]>`
+      select state, version, plan is null and final_parts is null as unplanned from outbox_rows where id = ${id}
+    `;
+    expect(row, id).toEqual({ state: "planned", version: 1, unplanned: true });
+    expect(await partsNow(id), id).toEqual([]);
+    expect(await claimNow(id), id).toBeUndefined();
+  }
+}
+
+/** What each ordinary claim answers that these tests read. */
+interface ClaimSeen {
+  readonly claimed: readonly {
+    readonly outboxRowId: string;
+    readonly version: number;
+    readonly commitSeq: number;
+  }[];
+  readonly passedHeld: readonly unknown[];
+}
+
+/** The ordinary claim at each version, each answer checked against its version by its helper. */
+const ORDINARY_CLAIMS: readonly {
+  readonly name: string;
+  readonly run: (request: ClaimOutboxRequest) => Promise<ClaimSeen>;
+}[] = [
+  { name: "v1's claimOutbox", run: claim },
+  { name: "v1.2's claimOutboxV12", run: claimV12 },
+  {
+    name: "claimOutboxV114 without sendClass (v1.13's claim, the dispatcher's on staging)",
+    run: (request) => claimV114(request as ClaimOutboxV114Request),
+  },
+];
+
+/** Maya's own claim (the dispatcher's wake after her turn) and the sweep, at `limit`. */
+const mayaClaims = (limit: number): ClaimOutboxRequest[] => [
+  { claimer: "dispatcher-1", recipientHandleId: MAYA_HANDLE, now: MAYA_NOW, limit },
+  { claimer: "dispatcher-1", now: MAYA_NOW, limit },
+];
+
+const NOTHING_CLAIMED = { result: "claimed", claimed: [], passedHeld: [] };
+
+describe('the walk passes a parked turn\'s "nothing changed" row, which nothing composes (T-1464; DL-967)', () => {
+  for (const { name, run } of ORDINARY_CLAIMS) {
+    it(
+      `${name}: after two parked turns' rows, Maya's claim and the sweep take her committed turn's checked row at ` +
+        "limit 1, and the parked rows are passed, unlisted and untouched",
+      SLOW,
+      async () => {
+        for (const request of mayaClaims(1)) {
+          const who = request.recipientHandleId ?? "the sweep";
+          await mayaWorld([{ park: 0 }, { park: 1 }, { row: MAYA_REPLY, state: "checked" }]);
+          const answer = await run(request);
+          expect(
+            answer.claimed.map((row) => [row.outboxRowId, row.version, row.commitSeq]),
+            who,
+          ).toEqual([[MAYA_REPLY, 3, 3]]);
+          expect(answer.passedHeld, who).toEqual([]);
+          expect(await rowNow(MAYA_REPLY), who).toEqual({ state: "sending", version: 3, held_until: null });
+          await parkedRowsAsWritten(PARKED_ROWS);
+        }
+      },
+    );
+  }
+
+  it(
+    "every other planned or stale row still stops the walk and the sweep, at every version: a committed turn's " +
+      "planned row after the parked rows or before them, a stale row and a planned row with no turn; nothing is written",
+    SLOW,
+    async () => {
+      const worlds: readonly (readonly MayaStep[])[] = [
+        [
+          { park: 0 },
+          { park: 1 },
+          { row: "out-maya-composing", state: "planned" },
+          { row: MAYA_REPLY, state: "checked" },
+        ],
+        [{ row: "out-maya-composing", state: "planned" }, { park: 0 }, { row: MAYA_REPLY, state: "checked" }],
+        [{ park: 0 }, { row: "out-maya-stale", state: "stale" }, { row: MAYA_REPLY, state: "checked" }],
+        [
+          { park: 0 },
+          { row: "out-maya-job", state: "planned", noTurn: true },
+          { row: MAYA_REPLY, state: "checked" },
+        ],
+      ];
+      for (const steps of worlds) {
+        await mayaWorld(steps);
+        const before = await everythingNow();
+        for (const { name, run } of ORDINARY_CLAIMS) {
+          for (const request of mayaClaims(10)) {
+            const who = `${name}, ${request.recipientHandleId ?? "the sweep"}, ${JSON.stringify(steps)}`;
+            expect(await run(request), who).toEqual(NOTHING_CLAIMED);
+          }
+        }
+        expect(await everythingNow()).toEqual(before);
+      }
+    },
+  );
+
+  it(
+    "a parked turn's row that holds a plan is walked as today: left planned, it stops the walk; composed by " +
+      "writePlan, it is claimed first, in commit order",
+    SLOW,
+    async () => {
+      const [first] = PARKED_ROWS;
+      if (first === undefined) {
+        throw new Error("Maya has a parked row");
+      }
+      await mayaWorld([{ park: 0 }, { row: MAYA_REPLY, state: "checked" }]);
+      const rowPlan: Json = { row: first, channel: "imessage", copyOf: null, plan: PLAN_BODY };
+      await db.sql`update outbox_rows set plan = ${db.sql.json(rowPlan)}, version = version + 1 where id = ${first}`;
+      expect(await rowNow(first)).toEqual({ state: "planned", version: 2, held_until: null });
+      const before = await everythingNow();
+      for (const { name, run } of ORDINARY_CLAIMS) {
+        for (const request of mayaClaims(10)) {
+          expect(await run(request), `${name}, ${request.recipientHandleId ?? "the sweep"}`).toEqual(
+            NOTHING_CLAIMED,
+          );
+        }
+      }
+      expect(await everythingNow()).toEqual(before);
+
+      for (const { name, run } of ORDINARY_CLAIMS) {
+        for (const request of mayaClaims(10)) {
+          const who = `${name}, ${request.recipientHandleId ?? "the sweep"}`;
+          await mayaWorld([{ park: 0 }, { row: MAYA_REPLY, state: "checked" }]);
+          expect(await plan(planRequest(first, 1, [WORDS])), who).toEqual({
+            result: "written",
+            outboxRowId: first,
+            version: 2,
+          });
+          const answer = await run(request);
+          expect(
+            answer.claimed.map((row) => [row.outboxRowId, row.version, row.commitSeq]),
+            who,
+          ).toEqual([
+            [first, 3, 1],
+            [MAYA_REPLY, 3, 2],
+          ]);
+          expect(answer.passedHeld, who).toEqual([]);
+        }
+      }
+    },
+  );
+
+  it(
+    "the safety claim is unchanged: it reads only Maya's safety rows, so neither a parked row (a quick reply) nor a " +
+      "planned row holds her danger line back, and no row of another class is touched",
+    SLOW,
+    async () => {
+      await mayaWorld([
+        { park: 0 },
+        { park: 1 },
+        { row: "out-maya-composing", state: "planned" },
+        { row: MAYA_REPLY, state: "checked" },
+        { row: "out-maya-danger", state: "checked", sendClass: "safety" },
+      ]);
+      const others = await otherClassesNow();
+      const answer = await claimV114({
+        claimer: "dispatcher-safety",
+        recipientHandleId: MAYA_HANDLE,
+        now: MAYA_NOW,
+        limit: 10,
+        sendClass: "safety",
+      });
+      expect(
+        answer.claimed.map((row) => [row.outboxRowId, row.version, row.commitSeq, row.sendClass]),
+      ).toEqual([["out-maya-danger", 3, 5, "safety"]]);
+      expect(answer.passedHeld).toEqual([]);
+      expect(await otherClassesNow()).toEqual(others);
+      await parkedRowsAsWritten(PARKED_ROWS);
+    },
+  );
 });
 
 // ---- the claim's recipient lock, in this file's own database (T-1251) -------------------------------------------------
