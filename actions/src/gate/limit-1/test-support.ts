@@ -8,7 +8,9 @@
 // phone numbers in the 555-01xx range (rule 9). The turn's bundle (K-01 v1) is a double too: the steps the scenarios
 // reach, each with who it is from and to as the master writes it (MASTER_STEPS below), and K-01's own sample bundle.
 // T-1183 adds the doors: K-01 v1's five at their entry steps, K-02 v1.1's sign-up door as K-09 v1.5's commit-s1-01.json
-// offers it, and one door value no contract holds.
+// offers it, and one door value no contract holds. T-1459 adds default 14's stored facts as a double (SignUpWorld): the
+// open questions as K-04 stores them, person_handles and K-23's business_setup control, with Sam before S1-75 as the
+// signer (ADR-013 section 4: "Sam holds no role yet") on K-09 v1.5's turn 2, commit-s1-02.json.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -24,6 +26,7 @@ import {
   readerOf,
   seedRecord,
   withRows,
+  type PersonHandle,
   type TestRecord,
 } from "../../domain/identity-access/test-support";
 import type {
@@ -47,6 +50,7 @@ import {
   type Script,
 } from "../framework/test-support";
 import { CONTRACTS_DIR } from "../../tool-api/validator";
+import type { AskedQuestion } from "../limit-3/facts";
 import {
   bookingStagesOver,
   sideOf,
@@ -499,6 +503,11 @@ export interface World {
   readonly proofCodes?: ProofCodes | null;
   /** The turn's bundle's step cards (K-01 v1); default the seeded master steps (MASTER_STEP_CARDS). */
   readonly steps?: StepCards;
+  /**
+   * Default 14's stored facts (T-1459). Default: none given, so the shipped default reads the test repo, which is no
+   * database: no fact can be read, and every part answers as before default 14.
+   */
+  readonly signUps?: SignUpWorld;
 }
 
 /** Limit 1 itself, over doubles of its ports. */
@@ -511,6 +520,7 @@ export function limitIn(world: World = {}): AllowedLimit {
     contacts: contactsOf(record, world.roles ?? ROLE_CONTACTS, world.ownAsked ?? []),
     steps: stepsOf(world.steps),
     ...(proofCodes === null ? {} : { proofCodes }),
+    ...(world.signUps === undefined ? {} : { signUps: signUpsOf(world.signUps, record) }),
   });
 }
 
@@ -1110,5 +1120,139 @@ export function unknownDoor(): Choice {
 export function enteringDoor(door: Choice): GateRequest {
   const request = exchangeRequest(SIGN_UP_FIXTURE);
   decidedIn(request).context.choices = [{ ...copy(door), choiceId: "c-01" }];
+  return request;
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1459 (DL-961): a sign-up's own answer while the business's control is not proven (default 14)
+
+/** K-09 v1.5's turn 2 (ADR-013 section 1): Sam's answer to S1-02's question, "Barbershop, plumbing, electrical". */
+export const SECOND_TURN_FIXTURE = "commit-s1-02.json";
+
+/** The open question commit-s1-02.json's options answer, as its frontier names it: S1-02's to Sam. */
+export const S1_02_QUESTION = "oq-s1-02";
+
+/** S1-02's question went out at 2:02pm on Mon Oct 19 (commit-s1-02.json's recent message from Rosie). */
+export const S1_02_SENT_AT = "2026-10-19T14:02:00Z";
+
+/** Someone who helps run the shop, writing from Sam's own phone (S1-09's "Helps run it; not an owner"). */
+export const SAM_HELPER: Someone = { ...SAM, personId: "person-sam-helper", name: "Casey" };
+
+/**
+ * The record of a sign-up before S1-75: K-04's and K-22's seeds as limitRecord gives them, but Sam holds no role at the
+ * barbershop yet (ADR-013 section 4: "Sam holds no role yet"), so the barbershop has no owner; and Sam's helper writes
+ * from Sam's phone too.
+ */
+export function signUpRecord(): TestRecord {
+  const record = withRows(limitRecord(), {
+    personHandles: [{ personId: SAM_HELPER.personId ?? "", handleId: SAM.handleId }],
+  });
+  return {
+    ...record,
+    roles: record.roles.filter((row) => !(row.personId === "person-sam" && row.businessId === BARBERSHOP)),
+  };
+}
+
+/**
+ * S1-02's open question as commit-s1-01.json's commit stores it (ADR-013 section 4: to Sam on his handle at the
+ * barbershop, about no booking, no options, no read-back, no versions read), under the id commit-s1-02.json's frontier
+ * answers, asked once and gone out at S1_02_SENT_AT; `over` changes what a case names.
+ */
+export function s1_02Asked(over: Partial<AskedQuestion> = {}): AskedQuestion {
+  return {
+    openQuestionId: S1_02_QUESTION,
+    handleId: SAM.handleId,
+    personId: "person-sam",
+    businessId: BARBERSHOP,
+    bookingId: null,
+    step: "S1-02",
+    options: [],
+    readback: null,
+    versionsRead: [],
+    sentAt: S1_02_SENT_AT,
+    pollId: null,
+    askCount: 1,
+    ...over,
+  };
+}
+
+/** One open question as K-04 stores it: limit 3's view of the row, and whether it is live (waiting or open). */
+export interface StoredQuestion {
+  readonly asked: AskedQuestion;
+  /** False for one answered, defaulted or withdrawn (K-04 open_questions.status). */
+  readonly live: boolean;
+}
+
+/** Each of default 14's facts, by the read that answers it. */
+export type SignUpRead = "question" | "linked" | "control";
+
+/** Default 14's stored facts as a test gives them. */
+export interface SignUpWorld {
+  /** The open questions as stored; default S1-02's to Sam (s1_02Asked), live. */
+  readonly questions?: readonly StoredQuestion[];
+  /** K-04 person_handles; default the record's. */
+  readonly links?: readonly PersonHandle[];
+  /**
+   * K-23 business_setup's control_proven_at, by business; a business with no entry has no business_setup row. Default:
+   * the barbershop's row, control not proven.
+   */
+  readonly control?: Readonly<Record<string, string | null>>;
+  /** The read that fails, as a refused statement does. */
+  readonly unreadable?: SignUpRead;
+  /** Where each read is written down, in order. */
+  readonly reads?: SignUpRead[];
+}
+
+/** Nothing stored: no question, no link, no business_setup row. */
+export const NOTHING_STORED: SignUpWorld = { questions: [], links: [], control: {} };
+
+/**
+ * Default 14's facts over a SignUpWorld, as the shipped read answers them: of the questions, a live one on the turn's
+ * handle at the call's business only; a link of the person to that handle; the call's business's control, or null with
+ * no business_setup row. Each read is written down; the unreadable one fails.
+ */
+export function signUpsOf(
+  world: SignUpWorld = {},
+  record: TestRecord = signUpRecord(),
+): NonNullable<Limit1Deps["signUps"]> {
+  const questions = world.questions ?? [{ asked: s1_02Asked(), live: true }];
+  const links = world.links ?? record.personHandles;
+  const control = world.control ?? { [BARBERSHOP]: null };
+  const reads = world.reads ?? [];
+  const read = <T>(fact: SignUpRead, answer: () => T): Promise<T> => {
+    reads.push(fact);
+    return world.unreadable === fact
+      ? Promise.reject(new Error(`the ${fact} read was refused`))
+      : Promise.resolve(answer());
+  };
+  return (_repo, businessId, handleId) => ({
+    question: (openQuestionId) =>
+      read(
+        "question",
+        () =>
+          questions.find(
+            ({ asked, live }) =>
+              live &&
+              asked.openQuestionId === openQuestionId &&
+              asked.handleId === handleId &&
+              asked.businessId === businessId,
+          )?.asked ?? null,
+      ),
+    linked: (personId) =>
+      read("linked", () => links.some((link) => link.personId === personId && link.handleId === handleId)),
+    control: () =>
+      read("control", () => {
+        const provenAt = control[businessId];
+        return provenAt === undefined ? null : { provenAt };
+      }),
+  });
+}
+
+/** commit-s1-02.json's request as `who` sends it: their person, on their handle, with every other field as stated. */
+export function secondTurnFrom(who: Someone): GateRequest {
+  const request = exchangeRequest(SECOND_TURN_FIXTURE);
+  request.caller.personId = who.personId;
+  if (request.turn === null) throw new Error(`${SECOND_TURN_FIXTURE}'s request has no turn`);
+  request.turn.handleId = who.handleId;
   return request;
 }
