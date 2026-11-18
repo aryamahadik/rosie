@@ -1,0 +1,15 @@
+{
+  "call": "readKindCatalog",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-19T18:05:03Z",
+    "note": "Sam's S1-02 answer reaches matchKinds on a database migrated with no catalog seed yet (the seed job writes one kinds row per trade file from the compiled bundle: K-24 README rule 7). The read answers the catalog as it stands, an empty list, never an error: T-632's matcher refuses a list with no trade_file kind (KindCatalogError, its default 4; QUESTIONS.md CQ-348 (4): K-09 matchKinds' indexUnavailable), so S1-02 asks again later and nothing is picked (README item 78, default 170)."
+  },
+  "request": {},
+  "outcome": {
+    "result": "kindCatalog",
+    "readAt": "2026-10-19T18:05:03Z",
+    "kinds": []
+  }
+}

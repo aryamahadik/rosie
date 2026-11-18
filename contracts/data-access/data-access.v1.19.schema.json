@@ -1,0 +1,996 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/data-access/data-access.v1.19.schema.json",
+  "title": "DataAccessV1dot19",
+  "description": "K-05 v1.19, a minor version of the data-access calls (T-1455: the reads journey 1's first calls need that v1.18 lacks, from T-632's handoff, on the sign-up chain; DL-867, DL-949). It only adds to v1.18 (data-access.v1.18.schema.json, frozen and unchanged, referred to here, which refers on to every earlier version down to v1): every v1.18 definition is here under its own name, by reference, and none is restated, so every v1 to v1.18 exchange is a v1.19 exchange. Added: two reads on the primary, uncached, each in one read-only transaction, each row answered with its id (or, for a row whose primary key is two columns, the name README item 77 gives it) and its version (limit 4): readKindCatalog (README item 78: the kind matcher's catalog, every K-24 kinds row whose source is trade_file, shared reference data with no business column, read by the Tool API's client, rosie_app, under any business scope or none; never a drafted kind) and readPickedKinds (README item 79: the owner's kinds of work as sign-up holds them, K-24 picked_kinds with each pick's picked_kind_texts by key and version, its new_work_drafts row and that draft's new_work_draft_blocks, and K-23 companies: the call's business's rows and the call's person's rows with no business, read on the runtime side as rosie_job with that rule in every statement). Every column answered is named; never a person's address or number, a plug-in block's text or a draft block's answer. No call, write, state, column, grant, index or migration is added beyond these reads. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    { "$ref": "#/$defs/commitTurn.exchange" },
+    { "$ref": "#/$defs/writePlan.exchange" },
+    { "$ref": "#/$defs/unplannedRows.exchange" },
+    { "$ref": "#/$defs/claimOutbox.exchange" },
+    { "$ref": "#/$defs/markPart.exchange" },
+    { "$ref": "#/$defs/markRow.exchange" },
+    { "$ref": "#/$defs/armClock.exchange" },
+    { "$ref": "#/$defs/cancelClock.exchange" },
+    { "$ref": "#/$defs/dueClocks.exchange" },
+    { "$ref": "#/$defs/fireClock.exchange" },
+    { "$ref": "#/$defs/reserve.exchange" },
+    { "$ref": "#/$defs/release.exchange" },
+    { "$ref": "#/$defs/extend.exchange" },
+    { "$ref": "#/$defs/readActiveBundle.exchange" },
+    { "$ref": "#/$defs/readBundleValue.exchange" },
+    { "$ref": "#/$defs/publishBundleCopy.exchange" },
+    { "$ref": "#/$defs/setActiveBundle.exchange" },
+    { "$ref": "#/$defs/parkTurn.exchange" },
+    { "$ref": "#/$defs/renewClaim.exchange" },
+    { "$ref": "#/$defs/dispatcherGivesUp.exchange" },
+    { "$ref": "#/$defs/claimEffects.exchange" },
+    { "$ref": "#/$defs/recordEffectResult.exchange" },
+    { "$ref": "#/$defs/serviceBack.exchange" },
+    { "$ref": "#/$defs/recordProviderEvent.exchange" },
+    { "$ref": "#/$defs/reconciliationRefund.exchange" },
+    { "$ref": "#/$defs/writeAllSet.exchange" },
+    { "$ref": "#/$defs/readTurnState.exchange" },
+    { "$ref": "#/$defs/handleTargets.exchange" },
+    { "$ref": "#/$defs/sendState.exchange" },
+    { "$ref": "#/$defs/handleSealingKey.exchange" },
+    { "$ref": "#/$defs/readOpenHolds.exchange" },
+    { "$ref": "#/$defs/readOutboxRow.exchange" },
+    { "$ref": "#/$defs/readFixedLineFacts.exchange" },
+    { "$ref": "#/$defs/readSafetyOutcomeOfEvent.exchange" },
+    { "$ref": "#/$defs/readSafetyOutcome.exchange" },
+    { "$ref": "#/$defs/readSafetyHold.exchange" },
+    { "$ref": "#/$defs/readSafetyHoldOfOutcome.exchange" },
+    { "$ref": "#/$defs/readOutboxRowWritten.exchange" },
+    { "$ref": "#/$defs/readBusinessOwner.exchange" },
+    { "$ref": "#/$defs/readBusinessZone.exchange" },
+    { "$ref": "#/$defs/rowReader.exchange" },
+    { "$ref": "#/$defs/openChatOnText.exchange" },
+    { "$ref": "#/$defs/readQuestionFacts.exchange" },
+    { "$ref": "#/$defs/readHandle.exchange" },
+    { "$ref": "#/$defs/readChatHandle.exchange" },
+    { "$ref": "#/$defs/readTurnParty.exchange" },
+    { "$ref": "#/$defs/readTesterStanding.exchange" },
+    { "$ref": "#/$defs/readRosterPhone.exchange" },
+    { "$ref": "#/$defs/readPhoneState.exchange" },
+    { "$ref": "#/$defs/readLiveTimers.exchange" },
+    { "$ref": "#/$defs/readStoppedFlag.exchange" },
+    { "$ref": "#/$defs/startSignIn.exchange" },
+    { "$ref": "#/$defs/sendSignInCode.exchange" },
+    { "$ref": "#/$defs/proveSignIn.exchange" },
+    { "$ref": "#/$defs/endSession.exchange" },
+    { "$ref": "#/$defs/personStanding.exchange" },
+    { "$ref": "#/$defs/signInEntries.exchange" },
+    { "$ref": "#/$defs/readBusinessKinds.exchange" },
+    { "$ref": "#/$defs/readBusinessServices.exchange" },
+    { "$ref": "#/$defs/readServiceWays.exchange" },
+    { "$ref": "#/$defs/readServicePriceRules.exchange" },
+    { "$ref": "#/$defs/readTermsSources.exchange" },
+    { "$ref": "#/$defs/readKindCatalog.exchange" },
+    { "$ref": "#/$defs/readPickedKinds.exchange" }
+  ],
+  "$defs": {
+    "id": { "$ref": "data-access.v1.18.schema.json#/$defs/id" },
+    "nullableId": { "$ref": "data-access.v1.18.schema.json#/$defs/nullableId" },
+    "utc": { "$ref": "data-access.v1.18.schema.json#/$defs/utc" },
+    "nullableUtc": { "$ref": "data-access.v1.18.schema.json#/$defs/nullableUtc" },
+    "zone": { "$ref": "data-access.v1.18.schema.json#/$defs/zone" },
+    "bundleId": { "$ref": "data-access.v1.18.schema.json#/$defs/bundleId" },
+    "phoneNumber": { "$ref": "data-access.v1.18.schema.json#/$defs/phoneNumber" },
+    "tableName": { "$ref": "data-access.v1.18.schema.json#/$defs/tableName" },
+    "version": { "$ref": "data-access.v1.18.schema.json#/$defs/version" },
+    "sqlstate": { "$ref": "data-access.v1.18.schema.json#/$defs/sqlstate" },
+    "rowRef": { "$ref": "data-access.v1.18.schema.json#/$defs/rowRef" },
+    "changedRow": { "$ref": "data-access.v1.18.schema.json#/$defs/changedRow" },
+    "during": { "$ref": "data-access.v1.18.schema.json#/$defs/during" },
+    "given": { "$ref": "data-access.v1.18.schema.json#/$defs/given" },
+    "transientError": { "$ref": "data-access.v1.18.schema.json#/$defs/transientError" },
+    "notFoundError": { "$ref": "data-access.v1.18.schema.json#/$defs/notFoundError" },
+    "versionChangedError": { "$ref": "data-access.v1.18.schema.json#/$defs/versionChangedError" },
+    "constraintError": { "$ref": "data-access.v1.18.schema.json#/$defs/constraintError" },
+    "turn": { "$ref": "data-access.v1.18.schema.json#/$defs/turn" },
+    "stateWrite": { "$ref": "data-access.v1.18.schema.json#/$defs/stateWrite" },
+    "stateTable": { "$ref": "data-access.v1.18.schema.json#/$defs/stateTable" },
+    "openQuestionNew": { "$ref": "data-access.v1.18.schema.json#/$defs/openQuestionNew" },
+    "openQuestionClose": { "$ref": "data-access.v1.18.schema.json#/$defs/openQuestionClose" },
+    "clockKind": { "$ref": "data-access.v1.18.schema.json#/$defs/clockKind" },
+    "clockNew": { "$ref": "data-access.v1.18.schema.json#/$defs/clockNew" },
+    "clockCancel": { "$ref": "data-access.v1.18.schema.json#/$defs/clockCancel" },
+    "channel": { "$ref": "data-access.v1.18.schema.json#/$defs/channel" },
+    "sendClass": { "$ref": "data-access.v1.18.schema.json#/$defs/sendClass" },
+    "outboxRowNew": { "$ref": "data-access.v1.18.schema.json#/$defs/outboxRowNew" },
+    "reservationConfirm": { "$ref": "data-access.v1.18.schema.json#/$defs/reservationConfirm" },
+    "reservationLetGo": { "$ref": "data-access.v1.18.schema.json#/$defs/reservationLetGo" },
+    "sealedValues": { "$ref": "data-access.v1.18.schema.json#/$defs/sealedValues" },
+    "eventEntry": { "$ref": "data-access.v1.18.schema.json#/$defs/eventEntry" },
+    "writes": { "$ref": "data-access.v1.18.schema.json#/$defs/writes" },
+    "outboxRowWritten": { "$ref": "data-access.v1.18.schema.json#/$defs/outboxRowWritten" },
+    "promotion": { "$ref": "data-access.v1.18.schema.json#/$defs/promotion" },
+    "skippedInLine": { "$ref": "data-access.v1.18.schema.json#/$defs/skippedInLine" },
+    "commitResult": { "$ref": "data-access.v1.18.schema.json#/$defs/commitResult" },
+    "reservationLostError": { "$ref": "data-access.v1.18.schema.json#/$defs/reservationLostError" },
+    "phoneRowByHandleId": { "$ref": "data-access.v1.18.schema.json#/$defs/phoneRowByHandleId" },
+    "commitTurn.request": { "$ref": "data-access.v1.18.schema.json#/$defs/commitTurn.request" },
+    "commitTurn.response": { "$ref": "data-access.v1.18.schema.json#/$defs/commitTurn.response" },
+    "commitTurn.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/commitTurn.errors" },
+    "commitTurn.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/commitTurn.exchange" },
+    "commitTurn.handleIdExchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/commitTurn.handleIdExchange"
+    },
+    "writePlan.request": { "$ref": "data-access.v1.18.schema.json#/$defs/writePlan.request" },
+    "writePlan.response": { "$ref": "data-access.v1.18.schema.json#/$defs/writePlan.response" },
+    "writePlan.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/writePlan.errors" },
+    "writePlan.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/writePlan.exchange" },
+    "unplannedRows.request": { "$ref": "data-access.v1.18.schema.json#/$defs/unplannedRows.request" },
+    "unplannedRows.response": { "$ref": "data-access.v1.18.schema.json#/$defs/unplannedRows.response" },
+    "unplannedRows.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/unplannedRows.errors" },
+    "unplannedRows.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/unplannedRows.exchange" },
+    "claimOutbox.request": { "$ref": "data-access.v1.18.schema.json#/$defs/claimOutbox.request" },
+    "claimedPart": { "$ref": "data-access.v1.18.schema.json#/$defs/claimedPart" },
+    "claimedRow": { "$ref": "data-access.v1.18.schema.json#/$defs/claimedRow" },
+    "claimOutbox.response": { "$ref": "data-access.v1.18.schema.json#/$defs/claimOutbox.response" },
+    "claimOutbox.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/claimOutbox.errors" },
+    "claimOutbox.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/claimOutbox.exchange" },
+    "markPart.request": { "$ref": "data-access.v1.18.schema.json#/$defs/markPart.request" },
+    "repeatedDelivery": { "$ref": "data-access.v1.18.schema.json#/$defs/repeatedDelivery" },
+    "markPart.response": { "$ref": "data-access.v1.18.schema.json#/$defs/markPart.response" },
+    "markPart.v1dot9Response": { "$ref": "data-access.v1.18.schema.json#/$defs/markPart.v1dot9Response" },
+    "markPart.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/markPart.errors" },
+    "markPart.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/markPart.exchange" },
+    "markRow.request": { "$ref": "data-access.v1.18.schema.json#/$defs/markRow.request" },
+    "markRow.response": { "$ref": "data-access.v1.18.schema.json#/$defs/markRow.response" },
+    "markRow.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/markRow.errors" },
+    "markRow.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/markRow.exchange" },
+    "armClock.request": { "$ref": "data-access.v1.18.schema.json#/$defs/armClock.request" },
+    "armedClock": { "$ref": "data-access.v1.18.schema.json#/$defs/armedClock" },
+    "armClock.response": { "$ref": "data-access.v1.18.schema.json#/$defs/armClock.response" },
+    "armClock.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/armClock.errors" },
+    "armClock.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/armClock.exchange" },
+    "cancelClock.request": { "$ref": "data-access.v1.18.schema.json#/$defs/cancelClock.request" },
+    "cancelClock.response": { "$ref": "data-access.v1.18.schema.json#/$defs/cancelClock.response" },
+    "cancelClock.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/cancelClock.errors" },
+    "cancelClock.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/cancelClock.exchange" },
+    "dueClocks.request": { "$ref": "data-access.v1.18.schema.json#/$defs/dueClocks.request" },
+    "dueClock": { "$ref": "data-access.v1.18.schema.json#/$defs/dueClock" },
+    "dueClocks.response": { "$ref": "data-access.v1.18.schema.json#/$defs/dueClocks.response" },
+    "dueClocks.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/dueClocks.errors" },
+    "dueClocks.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/dueClocks.exchange" },
+    "fireClock.request": { "$ref": "data-access.v1.18.schema.json#/$defs/fireClock.request" },
+    "fireClock.response": { "$ref": "data-access.v1.18.schema.json#/$defs/fireClock.response" },
+    "fireClock.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/fireClock.errors" },
+    "fireClock.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/fireClock.exchange" },
+    "door": { "$ref": "data-access.v1.18.schema.json#/$defs/door" },
+    "savedFor": { "$ref": "data-access.v1.18.schema.json#/$defs/savedFor" },
+    "reserve.request": { "$ref": "data-access.v1.18.schema.json#/$defs/reserve.request" },
+    "reserve.response": { "$ref": "data-access.v1.18.schema.json#/$defs/reserve.response" },
+    "reserve.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/reserve.errors" },
+    "reserve.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/reserve.exchange" },
+    "release.request": { "$ref": "data-access.v1.18.schema.json#/$defs/release.request" },
+    "release.response": { "$ref": "data-access.v1.18.schema.json#/$defs/release.response" },
+    "release.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/release.errors" },
+    "release.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/release.exchange" },
+    "extend.request": { "$ref": "data-access.v1.18.schema.json#/$defs/extend.request" },
+    "extend.response": { "$ref": "data-access.v1.18.schema.json#/$defs/extend.response" },
+    "extend.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/extend.errors" },
+    "extend.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/extend.exchange" },
+    "readActiveBundle.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readActiveBundle.request" },
+    "readActiveBundle.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readActiveBundle.response" },
+    "readActiveBundle.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readActiveBundle.errors" },
+    "readActiveBundle.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readActiveBundle.exchange" },
+    "storedText": { "$ref": "data-access.v1.18.schema.json#/$defs/storedText" },
+    "readBundleValue.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readBundleValue.request" },
+    "readBundleValue.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readBundleValue.response" },
+    "readBundleValue.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readBundleValue.errors" },
+    "readBundleValue.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readBundleValue.exchange" },
+    "publishBundleCopy.request": { "$ref": "data-access.v1.18.schema.json#/$defs/publishBundleCopy.request" },
+    "publishBundleCopy.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/publishBundleCopy.response"
+    },
+    "publishBundleCopy.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/publishBundleCopy.errors" },
+    "publishBundleCopy.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/publishBundleCopy.exchange"
+    },
+    "setActiveBundle.request": { "$ref": "data-access.v1.18.schema.json#/$defs/setActiveBundle.request" },
+    "setActiveBundle.response": { "$ref": "data-access.v1.18.schema.json#/$defs/setActiveBundle.response" },
+    "setActiveBundle.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/setActiveBundle.errors" },
+    "setActiveBundle.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/setActiveBundle.exchange" },
+    "parkTurn.request": { "$ref": "data-access.v1.18.schema.json#/$defs/parkTurn.request" },
+    "parkTurn.response": { "$ref": "data-access.v1.18.schema.json#/$defs/parkTurn.response" },
+    "parkTurn.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/parkTurn.errors" },
+    "parkTurn.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/parkTurn.exchange" },
+    "wrongStateError": { "$ref": "data-access.v1.18.schema.json#/$defs/wrongStateError" },
+    "claimLostError": { "$ref": "data-access.v1.18.schema.json#/$defs/claimLostError" },
+    "effectNew": { "$ref": "data-access.v1.18.schema.json#/$defs/effectNew" },
+    "effectLetGo": { "$ref": "data-access.v1.18.schema.json#/$defs/effectLetGo" },
+    "effectWrites": { "$ref": "data-access.v1.18.schema.json#/$defs/effectWrites" },
+    "waitingChatWrites": { "$ref": "data-access.v1.18.schema.json#/$defs/waitingChatWrites" },
+    "followUpRow": { "$ref": "data-access.v1.18.schema.json#/$defs/followUpRow" },
+    "renewClaim.request": { "$ref": "data-access.v1.18.schema.json#/$defs/renewClaim.request" },
+    "renewClaim.response": { "$ref": "data-access.v1.18.schema.json#/$defs/renewClaim.response" },
+    "renewClaim.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/renewClaim.errors" },
+    "renewClaim.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/renewClaim.exchange" },
+    "dispatcherGivesUp.request": { "$ref": "data-access.v1.18.schema.json#/$defs/dispatcherGivesUp.request" },
+    "dispatcherGivesUp.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/dispatcherGivesUp.response"
+    },
+    "dispatcherGivesUp.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/dispatcherGivesUp.errors" },
+    "dispatcherGivesUp.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/dispatcherGivesUp.exchange"
+    },
+    "claimEvent": { "$ref": "data-access.v1.18.schema.json#/$defs/claimEvent" },
+    "claimedEffect": { "$ref": "data-access.v1.18.schema.json#/$defs/claimedEffect" },
+    "claimEffects.request": { "$ref": "data-access.v1.18.schema.json#/$defs/claimEffects.request" },
+    "claimEffects.response": { "$ref": "data-access.v1.18.schema.json#/$defs/claimEffects.response" },
+    "claimEffects.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/claimEffects.errors" },
+    "claimEffects.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/claimEffects.exchange" },
+    "serviceBack.request": { "$ref": "data-access.v1.18.schema.json#/$defs/serviceBack.request" },
+    "serviceBack.response": { "$ref": "data-access.v1.18.schema.json#/$defs/serviceBack.response" },
+    "serviceBack.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/serviceBack.errors" },
+    "serviceBack.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/serviceBack.exchange" },
+    "recordEffectResult.request": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/recordEffectResult.request"
+    },
+    "recordEffectResult.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/recordEffectResult.response"
+    },
+    "recordEffectResult.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/recordEffectResult.errors" },
+    "recordEffectResult.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/recordEffectResult.exchange"
+    },
+    "recordProviderEvent.request": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/recordProviderEvent.request"
+    },
+    "recordProviderEvent.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/recordProviderEvent.response"
+    },
+    "recordProviderEvent.errors": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/recordProviderEvent.errors"
+    },
+    "recordProviderEvent.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/recordProviderEvent.exchange"
+    },
+    "reconciliationRefund.request": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/reconciliationRefund.request"
+    },
+    "reconciliationRefund.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/reconciliationRefund.response"
+    },
+    "reconciliationRefund.errors": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/reconciliationRefund.errors"
+    },
+    "reconciliationRefund.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/reconciliationRefund.exchange"
+    },
+    "writeAllSet.request": { "$ref": "data-access.v1.18.schema.json#/$defs/writeAllSet.request" },
+    "writeAllSet.response": { "$ref": "data-access.v1.18.schema.json#/$defs/writeAllSet.response" },
+    "writeAllSet.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/writeAllSet.errors" },
+    "writeAllSet.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/writeAllSet.exchange" },
+    "columnName": { "$ref": "data-access.v1.18.schema.json#/$defs/columnName" },
+    "factTable": { "$ref": "data-access.v1.18.schema.json#/$defs/factTable" },
+    "secretColumn": { "$ref": "data-access.v1.18.schema.json#/$defs/secretColumn" },
+    "role": { "$ref": "data-access.v1.18.schema.json#/$defs/role" },
+    "phoneFlags": { "$ref": "data-access.v1.18.schema.json#/$defs/phoneFlags" },
+    "phoneRead": { "$ref": "data-access.v1.18.schema.json#/$defs/phoneRead" },
+    "openQuestionRead": { "$ref": "data-access.v1.18.schema.json#/$defs/openQuestionRead" },
+    "bookingHead": { "$ref": "data-access.v1.18.schema.json#/$defs/bookingHead" },
+    "factRef": { "$ref": "data-access.v1.18.schema.json#/$defs/factRef" },
+    "factValue": { "$ref": "data-access.v1.18.schema.json#/$defs/factValue" },
+    "pauseRead": { "$ref": "data-access.v1.18.schema.json#/$defs/pauseRead" },
+    "consentRead": { "$ref": "data-access.v1.18.schema.json#/$defs/consentRead" },
+    "unknownFactError": { "$ref": "data-access.v1.18.schema.json#/$defs/unknownFactError" },
+    "readTurnState.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readTurnState.request" },
+    "readTurnState.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readTurnState.response" },
+    "readTurnState.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readTurnState.errors" },
+    "readTurnState.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readTurnState.exchange" },
+    "handleTargets.request": { "$ref": "data-access.v1.18.schema.json#/$defs/handleTargets.request" },
+    "handleTargets.response": { "$ref": "data-access.v1.18.schema.json#/$defs/handleTargets.response" },
+    "handleTargets.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/handleTargets.errors" },
+    "handleTargets.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/handleTargets.exchange" },
+    "textsConsentRead": { "$ref": "data-access.v1.18.schema.json#/$defs/textsConsentRead" },
+    "textsConsentV1dot8": { "$ref": "data-access.v1.18.schema.json#/$defs/textsConsentV1dot8" },
+    "sendState.request": { "$ref": "data-access.v1.18.schema.json#/$defs/sendState.request" },
+    "sendState.response": { "$ref": "data-access.v1.18.schema.json#/$defs/sendState.response" },
+    "sendState.v1dot8Response": { "$ref": "data-access.v1.18.schema.json#/$defs/sendState.v1dot8Response" },
+    "sendState.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/sendState.errors" },
+    "sendState.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/sendState.exchange" },
+    "handleSealingKey.request": { "$ref": "data-access.v1.18.schema.json#/$defs/handleSealingKey.request" },
+    "handleSealingKey.response": { "$ref": "data-access.v1.18.schema.json#/$defs/handleSealingKey.response" },
+    "handleSealingKey.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/handleSealingKey.errors" },
+    "handleSealingKey.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/handleSealingKey.exchange" },
+    "releaseRule": { "$ref": "data-access.v1.18.schema.json#/$defs/releaseRule" },
+    "openHold": { "$ref": "data-access.v1.18.schema.json#/$defs/openHold" },
+    "readOpenHolds.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readOpenHolds.request" },
+    "readOpenHolds.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readOpenHolds.response" },
+    "readOpenHolds.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readOpenHolds.errors" },
+    "readOpenHolds.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readOpenHolds.exchange" },
+    "rowLine": { "$ref": "data-access.v1.18.schema.json#/$defs/rowLine" },
+    "answeredText": { "$ref": "data-access.v1.18.schema.json#/$defs/answeredText" },
+    "rowRecipient": { "$ref": "data-access.v1.18.schema.json#/$defs/rowRecipient" },
+    "businessHeadRead": { "$ref": "data-access.v1.18.schema.json#/$defs/businessHeadRead" },
+    "rowQuestion": { "$ref": "data-access.v1.18.schema.json#/$defs/rowQuestion" },
+    "questionAsSent": { "$ref": "data-access.v1.18.schema.json#/$defs/questionAsSent" },
+    "fixedLineRowError": { "$ref": "data-access.v1.18.schema.json#/$defs/fixedLineRowError" },
+    "businessSensitive": { "$ref": "data-access.v1.18.schema.json#/$defs/businessSensitive" },
+    "readOutboxRow.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readOutboxRow.request" },
+    "readOutboxRow.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readOutboxRow.response" },
+    "readOutboxRow.v1dot6Response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readOutboxRow.v1dot6Response"
+    },
+    "readOutboxRow.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readOutboxRow.errors" },
+    "readOutboxRow.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readOutboxRow.exchange" },
+    "readFixedLineFacts.request": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readFixedLineFacts.request"
+    },
+    "readFixedLineFacts.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readFixedLineFacts.response"
+    },
+    "readFixedLineFacts.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readFixedLineFacts.errors" },
+    "readFixedLineFacts.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readFixedLineFacts.exchange"
+    },
+    "nullableTurnId": { "$ref": "data-access.v1.18.schema.json#/$defs/nullableTurnId" },
+    "storedOutcome": { "$ref": "data-access.v1.18.schema.json#/$defs/storedOutcome" },
+    "storedHold": { "$ref": "data-access.v1.18.schema.json#/$defs/storedHold" },
+    "ownerContact": { "$ref": "data-access.v1.18.schema.json#/$defs/ownerContact" },
+    "moreThanOneOwnerError": { "$ref": "data-access.v1.18.schema.json#/$defs/moreThanOneOwnerError" },
+    "readSafetyOutcomeOfEvent.request": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyOutcomeOfEvent.request"
+    },
+    "readSafetyOutcomeOfEvent.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyOutcomeOfEvent.response"
+    },
+    "readSafetyOutcomeOfEvent.errors": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyOutcomeOfEvent.errors"
+    },
+    "readSafetyOutcomeOfEvent.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyOutcomeOfEvent.exchange"
+    },
+    "readSafetyOutcome.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyOutcome.request" },
+    "readSafetyOutcome.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyOutcome.response"
+    },
+    "readSafetyOutcome.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyOutcome.errors" },
+    "readSafetyOutcome.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyOutcome.exchange"
+    },
+    "readSafetyHold.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyHold.request" },
+    "readSafetyHold.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyHold.response" },
+    "readSafetyHold.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyHold.errors" },
+    "readSafetyHold.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyHold.exchange" },
+    "readSafetyHoldOfOutcome.request": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyHoldOfOutcome.request"
+    },
+    "readSafetyHoldOfOutcome.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyHoldOfOutcome.response"
+    },
+    "readSafetyHoldOfOutcome.errors": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyHoldOfOutcome.errors"
+    },
+    "readSafetyHoldOfOutcome.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readSafetyHoldOfOutcome.exchange"
+    },
+    "readOutboxRowWritten.request": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readOutboxRowWritten.request"
+    },
+    "readOutboxRowWritten.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readOutboxRowWritten.response"
+    },
+    "readOutboxRowWritten.v1dot16Response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readOutboxRowWritten.v1dot16Response"
+    },
+    "readOutboxRowWritten.errors": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readOutboxRowWritten.errors"
+    },
+    "readOutboxRowWritten.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readOutboxRowWritten.exchange"
+    },
+    "readBusinessOwner.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessOwner.request" },
+    "readBusinessOwner.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessOwner.response"
+    },
+    "readBusinessOwner.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessOwner.errors" },
+    "readBusinessOwner.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessOwner.exchange"
+    },
+    "readBusinessZone.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessZone.request" },
+    "readBusinessZone.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessZone.response" },
+    "readBusinessZone.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessZone.errors" },
+    "readBusinessZone.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessZone.exchange" },
+    "rowReader.request": { "$ref": "data-access.v1.18.schema.json#/$defs/rowReader.request" },
+    "rowReader.response": { "$ref": "data-access.v1.18.schema.json#/$defs/rowReader.response" },
+    "noReaderError": { "$ref": "data-access.v1.18.schema.json#/$defs/noReaderError" },
+    "rowReader.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/rowReader.errors" },
+    "rowReader.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/rowReader.exchange" },
+    "textService": { "$ref": "data-access.v1.18.schema.json#/$defs/textService" },
+    "chatPhoneOpen": { "$ref": "data-access.v1.18.schema.json#/$defs/chatPhoneOpen" },
+    "chatPhoneStopped": { "$ref": "data-access.v1.18.schema.json#/$defs/chatPhoneStopped" },
+    "chatOpenValues": { "$ref": "data-access.v1.18.schema.json#/$defs/chatOpenValues" },
+    "chatClosedValues": { "$ref": "data-access.v1.18.schema.json#/$defs/chatClosedValues" },
+    "chatOpenedEvent": { "$ref": "data-access.v1.18.schema.json#/$defs/chatOpenedEvent" },
+    "notAPhoneError": { "$ref": "data-access.v1.18.schema.json#/$defs/notAPhoneError" },
+    "openChatOnText.request": { "$ref": "data-access.v1.18.schema.json#/$defs/openChatOnText.request" },
+    "openChatOnText.inserted": { "$ref": "data-access.v1.18.schema.json#/$defs/openChatOnText.inserted" },
+    "openChatOnText.opened": { "$ref": "data-access.v1.18.schema.json#/$defs/openChatOnText.opened" },
+    "openChatOnText.alreadyOpen": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/openChatOnText.alreadyOpen"
+    },
+    "openChatOnText.stopped": { "$ref": "data-access.v1.18.schema.json#/$defs/openChatOnText.stopped" },
+    "openChatOnText.repeated": { "$ref": "data-access.v1.18.schema.json#/$defs/openChatOnText.repeated" },
+    "openChatOnText.response": { "$ref": "data-access.v1.18.schema.json#/$defs/openChatOnText.response" },
+    "openChatOnText.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/openChatOnText.errors" },
+    "openChatOnText.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/openChatOnText.exchange" },
+    "questionVisit": { "$ref": "data-access.v1.18.schema.json#/$defs/questionVisit" },
+    "neverDeliveredRow": { "$ref": "data-access.v1.18.schema.json#/$defs/neverDeliveredRow" },
+    "readQuestionFacts.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readQuestionFacts.request" },
+    "readQuestionFacts.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readQuestionFacts.response"
+    },
+    "readQuestionFacts.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readQuestionFacts.errors" },
+    "readQuestionFacts.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readQuestionFacts.exchange"
+    },
+    "readHandle.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readHandle.request" },
+    "readHandle.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readHandle.response" },
+    "readHandle.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readHandle.errors" },
+    "readHandle.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readHandle.exchange" },
+    "chatPhoneHandle": { "$ref": "data-access.v1.18.schema.json#/$defs/chatPhoneHandle" },
+    "readChatHandle.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readChatHandle.request" },
+    "readChatHandle.found": { "$ref": "data-access.v1.18.schema.json#/$defs/readChatHandle.found" },
+    "readChatHandle.unknown": { "$ref": "data-access.v1.18.schema.json#/$defs/readChatHandle.unknown" },
+    "readChatHandle.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readChatHandle.response" },
+    "readChatHandle.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readChatHandle.errors" },
+    "readChatHandle.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readChatHandle.exchange" },
+    "readTurnParty.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readTurnParty.request" },
+    "readTurnParty.atBusiness": { "$ref": "data-access.v1.18.schema.json#/$defs/readTurnParty.atBusiness" },
+    "readTurnParty.noBusiness": { "$ref": "data-access.v1.18.schema.json#/$defs/readTurnParty.noBusiness" },
+    "readTurnParty.unknown": { "$ref": "data-access.v1.18.schema.json#/$defs/readTurnParty.unknown" },
+    "readTurnParty.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readTurnParty.response" },
+    "businessUndecidedError": { "$ref": "data-access.v1.18.schema.json#/$defs/businessUndecidedError" },
+    "readTurnParty.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readTurnParty.errors" },
+    "readTurnParty.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readTurnParty.exchange" },
+    "tokenSha256": { "$ref": "data-access.v1.18.schema.json#/$defs/tokenSha256" },
+    "readTesterStanding.request": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readTesterStanding.request"
+    },
+    "readTesterStanding.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readTesterStanding.response"
+    },
+    "readTesterStanding.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readTesterStanding.errors" },
+    "readTesterStanding.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readTesterStanding.exchange"
+    },
+    "emailOnFile": { "$ref": "data-access.v1.18.schema.json#/$defs/emailOnFile" },
+    "rosterPhone": { "$ref": "data-access.v1.18.schema.json#/$defs/rosterPhone" },
+    "readRosterPhone.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readRosterPhone.request" },
+    "readRosterPhone.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readRosterPhone.response" },
+    "readRosterPhone.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readRosterPhone.errors" },
+    "readRosterPhone.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readRosterPhone.exchange" },
+    "phoneStateOpen": { "$ref": "data-access.v1.18.schema.json#/$defs/phoneStateOpen" },
+    "phoneStateStopped": { "$ref": "data-access.v1.18.schema.json#/$defs/phoneStateStopped" },
+    "chatLinkRead": { "$ref": "data-access.v1.18.schema.json#/$defs/chatLinkRead" },
+    "readPhoneState.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readPhoneState.request" },
+    "readPhoneState.noRow": { "$ref": "data-access.v1.18.schema.json#/$defs/readPhoneState.noRow" },
+    "readPhoneState.row": { "$ref": "data-access.v1.18.schema.json#/$defs/readPhoneState.row" },
+    "readPhoneState.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readPhoneState.response" },
+    "readPhoneState.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readPhoneState.errors" },
+    "readPhoneState.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readPhoneState.exchange" },
+    "sealedBytes": { "$ref": "data-access.v1.18.schema.json#/$defs/sealedBytes" },
+    "liveTimer": { "$ref": "data-access.v1.18.schema.json#/$defs/liveTimer" },
+    "readLiveTimers.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readLiveTimers.request" },
+    "readLiveTimers.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readLiveTimers.response" },
+    "readLiveTimers.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readLiveTimers.errors" },
+    "readLiveTimers.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readLiveTimers.exchange" },
+    "readStoppedFlag.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readStoppedFlag.request" },
+    "readStoppedFlag.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readStoppedFlag.response" },
+    "phoneNotFoundError": { "$ref": "data-access.v1.18.schema.json#/$defs/phoneNotFoundError" },
+    "readStoppedFlag.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readStoppedFlag.errors" },
+    "readStoppedFlag.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readStoppedFlag.exchange" },
+    "noTurnError": { "$ref": "data-access.v1.18.schema.json#/$defs/noTurnError" },
+    "sha256Hex": { "$ref": "data-access.v1.18.schema.json#/$defs/sha256Hex" },
+    "hashKeyName": { "$ref": "data-access.v1.18.schema.json#/$defs/hashKeyName" },
+    "signInContact": { "$ref": "data-access.v1.18.schema.json#/$defs/signInContact" },
+    "startSignIn.request": { "$ref": "data-access.v1.18.schema.json#/$defs/startSignIn.request" },
+    "startSignIn.started": { "$ref": "data-access.v1.18.schema.json#/$defs/startSignIn.started" },
+    "startSignIn.paused": { "$ref": "data-access.v1.18.schema.json#/$defs/startSignIn.paused" },
+    "startSignIn.response": { "$ref": "data-access.v1.18.schema.json#/$defs/startSignIn.response" },
+    "startSignIn.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/startSignIn.errors" },
+    "startSignIn.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/startSignIn.exchange" },
+    "codeRowPlan": { "$ref": "data-access.v1.18.schema.json#/$defs/codeRowPlan" },
+    "codeFinalParts": { "$ref": "data-access.v1.18.schema.json#/$defs/codeFinalParts" },
+    "sendSignInCode.request": { "$ref": "data-access.v1.18.schema.json#/$defs/sendSignInCode.request" },
+    "sendSignInCode.sent": { "$ref": "data-access.v1.18.schema.json#/$defs/sendSignInCode.sent" },
+    "sendSignInCode.repeated": { "$ref": "data-access.v1.18.schema.json#/$defs/sendSignInCode.repeated" },
+    "sendSignInCode.notSent": { "$ref": "data-access.v1.18.schema.json#/$defs/sendSignInCode.notSent" },
+    "sendSignInCode.response": { "$ref": "data-access.v1.18.schema.json#/$defs/sendSignInCode.response" },
+    "sendSignInCode.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/sendSignInCode.errors" },
+    "sendSignInCode.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/sendSignInCode.exchange" },
+    "proveSignIn.request": { "$ref": "data-access.v1.18.schema.json#/$defs/proveSignIn.request" },
+    "proveSignIn.signedIn": { "$ref": "data-access.v1.18.schema.json#/$defs/proveSignIn.signedIn" },
+    "proveSignIn.secondProofNeeded": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/proveSignIn.secondProofNeeded"
+    },
+    "proveSignIn.alreadySignedIn": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/proveSignIn.alreadySignedIn"
+    },
+    "proveSignIn.wrong": { "$ref": "data-access.v1.18.schema.json#/$defs/proveSignIn.wrong" },
+    "proveSignIn.paused": { "$ref": "data-access.v1.18.schema.json#/$defs/proveSignIn.paused" },
+    "proveSignIn.expired": { "$ref": "data-access.v1.18.schema.json#/$defs/proveSignIn.expired" },
+    "proveSignIn.response": { "$ref": "data-access.v1.18.schema.json#/$defs/proveSignIn.response" },
+    "attemptNotFoundError": { "$ref": "data-access.v1.18.schema.json#/$defs/attemptNotFoundError" },
+    "proveSignIn.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/proveSignIn.errors" },
+    "proveSignIn.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/proveSignIn.exchange" },
+    "endSession.request": { "$ref": "data-access.v1.18.schema.json#/$defs/endSession.request" },
+    "endSession.ended": { "$ref": "data-access.v1.18.schema.json#/$defs/endSession.ended" },
+    "endSession.repeated": { "$ref": "data-access.v1.18.schema.json#/$defs/endSession.repeated" },
+    "endSession.response": { "$ref": "data-access.v1.18.schema.json#/$defs/endSession.response" },
+    "endSession.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/endSession.errors" },
+    "endSession.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/endSession.exchange" },
+    "personStanding.request": { "$ref": "data-access.v1.18.schema.json#/$defs/personStanding.request" },
+    "signedInRole": { "$ref": "data-access.v1.18.schema.json#/$defs/signedInRole" },
+    "personStanding.response": { "$ref": "data-access.v1.18.schema.json#/$defs/personStanding.response" },
+    "personStanding.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/personStanding.errors" },
+    "personStanding.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/personStanding.exchange" },
+    "signInEntryAsk": { "$ref": "data-access.v1.18.schema.json#/$defs/signInEntryAsk" },
+    "signInEntries.request": { "$ref": "data-access.v1.18.schema.json#/$defs/signInEntries.request" },
+    "signInEntries.response": { "$ref": "data-access.v1.18.schema.json#/$defs/signInEntries.response" },
+    "signInEntries.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/signInEntries.errors" },
+    "signInEntries.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/signInEntries.exchange" },
+    "currency": { "$ref": "data-access.v1.18.schema.json#/$defs/currency" },
+    "catalogFlow": { "$ref": "data-access.v1.18.schema.json#/$defs/catalogFlow" },
+    "spanMinutes": { "$ref": "data-access.v1.18.schema.json#/$defs/spanMinutes" },
+    "nullableSpanMinutes": { "$ref": "data-access.v1.18.schema.json#/$defs/nullableSpanMinutes" },
+    "clockTime": { "$ref": "data-access.v1.18.schema.json#/$defs/clockTime" },
+    "nullableClockTime": { "$ref": "data-access.v1.18.schema.json#/$defs/nullableClockTime" },
+    "nullableCents": { "$ref": "data-access.v1.18.schema.json#/$defs/nullableCents" },
+    "kindId": { "$ref": "data-access.v1.18.schema.json#/$defs/kindId" },
+    "pluginName": { "$ref": "data-access.v1.18.schema.json#/$defs/pluginName" },
+    "moneyPath": { "$ref": "data-access.v1.18.schema.json#/$defs/moneyPath" },
+    "companyKindRowId": { "$ref": "data-access.v1.18.schema.json#/$defs/companyKindRowId" },
+    "kindFlowRowId": { "$ref": "data-access.v1.18.schema.json#/$defs/kindFlowRowId" },
+    "flowDefaultRowId": { "$ref": "data-access.v1.18.schema.json#/$defs/flowDefaultRowId" },
+    "businessSetupRead": { "$ref": "data-access.v1.18.schema.json#/$defs/businessSetupRead" },
+    "kindFlowRead": { "$ref": "data-access.v1.18.schema.json#/$defs/kindFlowRead" },
+    "businessKindRead": { "$ref": "data-access.v1.18.schema.json#/$defs/businessKindRead" },
+    "serviceRead": { "$ref": "data-access.v1.18.schema.json#/$defs/serviceRead" },
+    "wayRead": { "$ref": "data-access.v1.18.schema.json#/$defs/wayRead" },
+    "priceConditionsRead": { "$ref": "data-access.v1.18.schema.json#/$defs/priceConditionsRead" },
+    "priceRuleRead": { "$ref": "data-access.v1.18.schema.json#/$defs/priceRuleRead" },
+    "priceTieRead": { "$ref": "data-access.v1.18.schema.json#/$defs/priceTieRead" },
+    "flowDefaultRead": { "$ref": "data-access.v1.18.schema.json#/$defs/flowDefaultRead" },
+    "dayRange": { "$ref": "data-access.v1.18.schema.json#/$defs/dayRange" },
+    "ownerRuleRead": { "$ref": "data-access.v1.18.schema.json#/$defs/ownerRuleRead" },
+    "priceOkLimitRead": { "$ref": "data-access.v1.18.schema.json#/$defs/priceOkLimitRead" },
+    "catalogBusinessNotFoundError": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/catalogBusinessNotFoundError"
+    },
+    "readBusinessKinds.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessKinds.request" },
+    "readBusinessKinds.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessKinds.response"
+    },
+    "readBusinessKinds.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessKinds.errors" },
+    "readBusinessKinds.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessKinds.exchange"
+    },
+    "readBusinessServices.request": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessServices.request"
+    },
+    "readBusinessServices.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessServices.response"
+    },
+    "readBusinessServices.errors": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessServices.errors"
+    },
+    "readBusinessServices.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readBusinessServices.exchange"
+    },
+    "readServiceWays.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readServiceWays.request" },
+    "readServiceWays.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readServiceWays.response" },
+    "readServiceWays.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readServiceWays.errors" },
+    "readServiceWays.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readServiceWays.exchange" },
+    "readServicePriceRules.request": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readServicePriceRules.request"
+    },
+    "readServicePriceRules.response": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readServicePriceRules.response"
+    },
+    "readServicePriceRules.errors": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readServicePriceRules.errors"
+    },
+    "readServicePriceRules.exchange": {
+      "$ref": "data-access.v1.18.schema.json#/$defs/readServicePriceRules.exchange"
+    },
+    "readTermsSources.request": { "$ref": "data-access.v1.18.schema.json#/$defs/readTermsSources.request" },
+    "readTermsSources.response": { "$ref": "data-access.v1.18.schema.json#/$defs/readTermsSources.response" },
+    "readTermsSources.errors": { "$ref": "data-access.v1.18.schema.json#/$defs/readTermsSources.errors" },
+    "readTermsSources.exchange": { "$ref": "data-access.v1.18.schema.json#/$defs/readTermsSources.exchange" },
+    "kindPattern": {
+      "title": "KindPattern",
+      "description": "A kind of work's booking pattern, one of the 11 of FS section 3 (K-24 v1 kinds_pattern_known; SPEC-prof 2 item 5): what the customer picks and how the time is held, as the matcher reads it beside the name and style (README item 78). New in v1.19.",
+      "enum": [
+        "fix",
+        "urgent",
+        "project",
+        "service",
+        "dropoff",
+        "chair",
+        "clinic",
+        "class",
+        "event",
+        "consult",
+        "table"
+      ]
+    },
+    "kindCatalogRow": {
+      "title": "KindCatalogRow",
+      "description": "One kind of the matcher's catalog, a K-24 v1 kinds row whose source is trade_file, as readKindCatalog answers it (README item 78), shaped to T-632's CatalogKind (actions/src/domain/kind-matcher/matcher.ts): its id, name, style, pattern and source, with the row's version beside them (limit 4). Never its facts, the trade's default facts S1-04 reads by id through readTurnState (refuse-kind-catalog-with-facts), and never a drafted kind (refuse-kind-catalog-drafted-kind). New in v1.19.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "kinds.id, the trade file's id, such as barber or plumber (K-01 v1 tradeId): the row's one-column primary key, so its id in a K-05 row reference (table kinds).",
+          "$ref": "#/$defs/kindId"
+        },
+        "name": {
+          "description": "kinds.name, the trade file's name, such as Barber: the words the matcher weighs most, and the name K-09 matchKinds offers (KindFound.name).",
+          "type": "string",
+          "minLength": 1
+        },
+        "style": {
+          "description": "kinds.style, the booking type in words, such as Chair or Home visit: never null for a trade-file kind (kinds_trade_file_has_style).",
+          "type": "string",
+          "minLength": 1
+        },
+        "pattern": {
+          "description": "kinds.pattern, such as chair or fix.",
+          "$ref": "#/$defs/kindPattern"
+        },
+        "source": {
+          "description": "kinds.source: trade_file, the one source the catalog answers (K-24 README line 96: the matcher offers only trade_file kinds; a drafted kind stays with its owner).",
+          "const": "trade_file"
+        },
+        "version": { "$ref": "#/$defs/version" }
+      },
+      "required": ["id", "name", "style", "pattern", "source", "version"],
+      "additionalProperties": false
+    },
+    "readKindCatalog.request": {
+      "title": "ReadKindCatalogRequest",
+      "description": "The kind matcher's catalog (T-632's CatalogKind list; S1-02; README item 78): every K-24 kinds row whose source is trade_file. The request names nothing: the catalog is shared reference data with no business column (K-24 README rule 2: scope none), so it answers the same rows under any business and under none, and a business named would read as a filter the read never applies (refuse-kind-catalog-names-business). Scope and role: the Tool API's client, rosie_app, in the call's own transaction under whatever business scope it holds, which does not narrow the catalog (no row-level security on kinds, and rosie_app holds SELECT on it: 0021); rosie_job holds the same SELECT, so a runtime-side caller reads it the same way. Reads: the primary, uncached, one read-only transaction. Repeat: safe, a read. Time budget: none in the sources (K-09 matchKinds proposes at most 200 ms: its README default 3). New in v1.19.",
+      "type": "object",
+      "additionalProperties": false
+    },
+    "readKindCatalog.response": {
+      "title": "ReadKindCatalogResponse",
+      "description": "kinds, every trade-file kinds row in id order, compared byte by byte (the matcher's own order: matcher.ts offered()), never a drafted kind; empty only when the catalog seed has not run (K-24 README rule 7), which the matcher refuses (T-632 default 4: KindCatalogError), so S1-02 asks again later and nothing is picked (README item 78, default 170). New in v1.19.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "kindCatalog" },
+        "readAt": {
+          "description": "The database's now() at the read.",
+          "$ref": "#/$defs/utc"
+        },
+        "kinds": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/kindCatalogRow" }
+        }
+      },
+      "required": ["result", "readAt", "kinds"],
+      "additionalProperties": false
+    },
+    "readKindCatalog.errors": {
+      "title": "ReadKindCatalogErrors",
+      "description": "transient alone: the catalog names no business and no row, so nothing can be not found. The binding fails closed on it: a thrown error, never an empty list (README item 78). New in v1.19.",
+      "oneOf": [{ "$ref": "#/$defs/transientError" }]
+    },
+    "readKindCatalog.exchange": {
+      "title": "ReadKindCatalogExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readKindCatalog" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readKindCatalog.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/readKindCatalog.response" },
+            { "$ref": "#/$defs/readKindCatalog.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "pickOutcome": {
+      "title": "PickOutcome",
+      "description": "What a pick became (K-24 v1 picked_kinds_outcome_known; S1-02's three branches): listed, a kind on Rosie's list; new_work, not on the list yet, drafted for Rosie's team to review (S1-03); not_booked, not a service Rosie books, set up nowhere and kept so Rosie's team sees the owner's words (S1-74). New in v1.19.",
+      "enum": ["listed", "new_work", "not_booked"]
+    },
+    "pfKey": {
+      "title": "PluginTextKey",
+      "description": "One of the 11 free-text plug-in keys S1-11 gives (K-24 v1 picked_kind_texts_key_known; MC R3; Q-39), never a typed key (pf.facts, pf.switches and pf.settings are K-23's and K-24's typed columns). New in v1.19.",
+      "enum": [
+        "pf.license",
+        "pf.services",
+        "pf.questions",
+        "pf.safety",
+        "pf.first_steps",
+        "pf.visit",
+        "pf.money",
+        "pf.messages",
+        "pf.staff",
+        "pf.rules",
+        "pf.edges"
+      ]
+    },
+    "pickTextRowId": {
+      "title": "PickTextRowId",
+      "description": "The name every K-05 row reference gives a K-24 v1 picked_kind_texts row, whose primary key is two columns (picked_kind_id, pf_key): <pick id>/<pf key>, such as pick-sam-barbershop/pf.rules (README item 77; db/repo/setup/row-names.ts). A pf key holds no slash (picked_kind_texts_key_known), so no two rows share a name; the database builds the name from the row's own columns and compares it whole, never split (CQ-09). The pf key alone names no row (refuse-picked-kinds-text-by-key-alone). New in v1.19.",
+      "type": "string",
+      "pattern": "^.+/pf[.](license|services|questions|safety|first_steps|visit|money|messages|staff|rules|edges)$"
+    },
+    "draftBlockRowId": {
+      "title": "DraftBlockRowId",
+      "description": "The name every K-05 row reference gives a K-24 v1 new_work_draft_blocks row, whose primary key is two columns (draft_id, block): <draft id>/<block>, the block's number as text, such as draft-pack-hikes/4 (README item 77; db/repo/setup/row-names.ts). A block is 1 to 15 (new_work_draft_blocks_block_range), so no two rows share a name. Built and compared as pickTextRowId says. New in v1.19.",
+      "type": "string",
+      "pattern": "^.+/([1-9]|1[0-5])$"
+    },
+    "pickTextRead": {
+      "title": "PickTextRead",
+      "description": "One of a pick's plug-in text blocks, a K-24 v1 picked_kind_texts row, as readPickedKinds answers it (README item 79): which pf key is loaded, with the row's name, business and version, never the block's text, which a step that needs it reads by this name through readTurnState (S1-08's pf.rules; README default 175). New in v1.19.",
+      "type": "object",
+      "properties": {
+        "rowId": { "$ref": "#/$defs/pickTextRowId" },
+        "pfKey": {
+          "description": "picked_kind_texts.pf_key.",
+          "$ref": "#/$defs/pfKey"
+        },
+        "businessId": {
+          "description": "picked_kind_texts.business_id: its pick's business, or null while the pick has none (picked_kind_texts_pick_business_fk).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "version": { "$ref": "#/$defs/version" }
+      },
+      "required": ["rowId", "pfKey", "businessId", "version"],
+      "additionalProperties": false
+    },
+    "draftBlockRead": {
+      "title": "DraftBlockRead",
+      "description": "One answered block of a new-work draft's checklist, a K-24 v1 new_work_draft_blocks row, as readPickedKinds answers it (README item 79): the block, the owner's answer or clear no, and the facts and switches it set, with the row's name, business and version. Never the answer's words, the owner's own (refuse-picked-kinds-draft-block-answer; README default 176). A block with no row is still at its safe default (K-24 README 'Picks, text blocks and drafts'). New in v1.19.",
+      "type": "object",
+      "properties": {
+        "rowId": { "$ref": "#/$defs/draftBlockRowId" },
+        "block": {
+          "description": "new_work_draft_blocks.block, the block's number on S1-03's checklist.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 15
+        },
+        "businessId": {
+          "description": "new_work_draft_blocks.business_id: its draft's business, or null while the draft has none.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "outcome": {
+          "description": "new_work_draft_blocks.outcome: answered, or no, the owner's clear no, which sets nothing.",
+          "enum": ["answered", "no"]
+        },
+        "factsOn": {
+          "description": "new_work_draft_blocks.facts_on, as stored: empty for a no.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/pluginName" }
+        },
+        "switchesOn": {
+          "description": "new_work_draft_blocks.switches_on, as stored, in both flows: empty for a no.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/pluginName" }
+        },
+        "answeredAt": { "$ref": "#/$defs/utc" },
+        "version": { "$ref": "#/$defs/version" }
+      },
+      "required": [
+        "rowId",
+        "block",
+        "businessId",
+        "outcome",
+        "factsOn",
+        "switchesOn",
+        "answeredAt",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "newWorkDraftRead": {
+      "title": "NewWorkDraftRead",
+      "description": "A new_work pick's draft, its K-24 v1 new_work_drafts row, as readPickedKinds answers it (README item 79): its id, business, state, when it was started and version, with every block answered so far, in block order. Offline until approved (S1-03); the team's decision writes its state (K-09 decideReviewItem). New in v1.19.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "new_work_drafts.id, which K-37's review item names as its subject (subject_table new_work_drafts).",
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "new_work_drafts.business_id: its pick's business, or null while the pick has none.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "state": {
+          "description": "new_work_drafts.state: drafting, in_review (the team's review item is open), approved or kept_offline.",
+          "enum": ["drafting", "in_review", "approved", "kept_offline"]
+        },
+        "draftedAt": { "$ref": "#/$defs/utc" },
+        "version": { "$ref": "#/$defs/version" },
+        "blocks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/draftBlockRead" },
+          "maxItems": 15
+        }
+      },
+      "required": ["id", "businessId", "state", "draftedAt", "version", "blocks"],
+      "additionalProperties": false
+    },
+    "pickedKindRead": {
+      "title": "PickedKindRead",
+      "description": "One kind of work an owner named, a K-24 v1 picked_kinds row, as readPickedKinds answers it (README item 79): every column, with the pf keys of its plug-in text blocks loaded so far (S1-11) and, for a new_work pick, its draft (S1-03). New in v1.19.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "picked_kinds.id: the row's one-column primary key, its id in a K-05 row reference (table picked_kinds), and the pick K-09 SetupS1_03, SetupS1_11 and SetupS1_04 name.",
+          "$ref": "#/$defs/id"
+        },
+        "ownerPersonId": {
+          "description": "picked_kinds.owner_person_id: who named it (K-04 persons.id), never their name or contact.",
+          "$ref": "#/$defs/id"
+        },
+        "position": {
+          "description": "picked_kinds.position: its place in the order the owner named the kinds, from 1 (S1-02: the first named is set up first).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "words": {
+          "description": "picked_kinds.words: the owner's own words for this kind, as S1-02 took them, such as Barbershop or plumbing (audience owner), which S1-04's answer is matched to and S1-08's plan names the kind by (README default 177).",
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": { "$ref": "#/$defs/pickOutcome" },
+        "kindId": {
+          "description": "picked_kinds.kind_id: a trade-file kind when listed, the drafted kind (new-...) when new_work, null when not_booked (picked_kinds_kind_unless_not_booked).",
+          "anyOf": [{ "$ref": "#/$defs/kindId" }, { "type": "null" }]
+        },
+        "companyId": {
+          "description": "picked_kinds.company_id (K-23 companies.id), set at S1-04; null until then, and for work not booked.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "businessId": {
+          "description": "picked_kinds.business_id: the business it is for, or null while there is none (a sign-up before S1-04 or S1-09 sets it).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "pickedAt": { "$ref": "#/$defs/utc" },
+        "version": { "$ref": "#/$defs/version" },
+        "texts": {
+          "description": "Its picked_kind_texts rows, in pf key order compared byte by byte: none until S1-11 loads the kind ('the barbershop's now, and plumbing's and electrical's when Sam gets to them').",
+          "type": "array",
+          "items": { "$ref": "#/$defs/pickTextRead" },
+          "maxItems": 11
+        },
+        "draft": {
+          "description": "Its new_work_drafts row with its blocks, or null: only a new_work pick has one (new_work_drafts_one_per_pick; that the pick is new_work is code's, K-24).",
+          "anyOf": [{ "$ref": "#/$defs/newWorkDraftRead" }, { "type": "null" }]
+        }
+      },
+      "required": [
+        "id",
+        "ownerPersonId",
+        "position",
+        "words",
+        "outcome",
+        "kindId",
+        "companyId",
+        "businessId",
+        "pickedAt",
+        "version",
+        "texts",
+        "draft"
+      ],
+      "additionalProperties": false
+    },
+    "companyRead": {
+      "title": "CompanyRead",
+      "description": "One of the owner's companies, a K-23 v1 companies row, as readPickedKinds answers it (README item 79): its id, owner, name, business and version, so S1-04 places a pick in a company already made rather than a second of the same name, and S1-08 names the companies in the plan. Its kinds are its picks' (companyId) and K-23 company_kinds, which v1.18's readBusinessKinds lists once the business exists. New in v1.19.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "companies.id: the row's one-column primary key, its id in a K-05 row reference (table companies).",
+          "$ref": "#/$defs/id"
+        },
+        "ownerPersonId": {
+          "description": "companies.owner_person_id (K-04 persons.id), never their name or contact.",
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "description": "companies.name, such as Lee Home Services LLC (FS row B10).",
+          "type": "string",
+          "minLength": 1
+        },
+        "businessId": {
+          "description": "companies.business_id: its business, or null until S1-09 gives it one (K-23 README 'Companies and kinds').",
+          "$ref": "#/$defs/nullableId"
+        },
+        "version": { "$ref": "#/$defs/version" }
+      },
+      "required": ["id", "ownerPersonId", "name", "businessId", "version"],
+      "additionalProperties": false
+    },
+    "pickedKindsNotFoundError": {
+      "title": "PickedKindsNotFoundError",
+      "description": "notFound with table persons (the request's person does not exist) or businesses (the request's business does not exist), so readPickedKinds never answers empty lists for a person or a business that is not there (README item 79, default 174). Nothing was read beyond them. New in v1.19.",
+      "allOf": [
+        { "$ref": "#/$defs/notFoundError" },
+        {
+          "type": "object",
+          "properties": {
+            "table": { "enum": ["persons", "businesses"] }
+          }
+        }
+      ]
+    },
+    "readPickedKinds.request": {
+      "title": "ReadPickedKindsRequest",
+      "description": "The owner's kinds of work as sign-up holds them (S1-02, S1-03, S1-74, S1-11, S1-04 and S1-08; README item 79): every K-24 picked_kinds row with its text blocks' keys, its draft and the draft's blocks, and every K-23 companies row, of the call's business, and of the call's person with no business. Both are stated: the business, or null for a sign-up before its business (refuse-picked-kinds-business-left-out), and the person, never null (refuse-picked-kinds-no-person). Scope and role: rosie_job, in one read-only transaction at repeatable read, so one snapshot: persons first; with a business, the transaction's scope set to it and confirmed by requireBusinessScope() before businesses and the business's rows are read, since a Tool API call never runs with no scope (db/repo scope.ts, T-1094; QUESTIONS.md CQ-70), then the scope cleared and confirmed empty before the person's rows with no business, which no business scope sees (K-23 README rule 5; K-24 README 'Picks, text blocks and drafts'); with businessId null, those alone, on the runtime side. Every statement carries the rule itself (business_id = the request's business, or business_id is null and owner_person_id = the request's person), and each text, draft and block is joined to its pick under it (README item 79, defaults 171 and 180). Reads: the primary, uncached. Repeat: safe, a read. Time budget: none in the sources. New in v1.19.",
+      "type": "object",
+      "properties": {
+        "businessId": {
+          "description": "The business the call runs under (K-09 caller.businessId), whose rows are read, or null for a sign-up before its business.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "personId": {
+          "description": "The call's own person (K-09 caller.personId: the turn party's person, or a page's signed-in person), whose rows with no business are read; never a person named in words.",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["businessId", "personId"],
+      "additionalProperties": false
+    },
+    "readPickedKinds.response": {
+      "title": "ReadPickedKindsResponse",
+      "description": "picks, every picked_kinds row of the request's business and every one of the request's person with no business, in (picked_at, position, id) order, the order the owner named them, each with its text blocks' keys, and its draft with its blocks or null; companies, every companies row of the business and every one of the person with no business, in id order; ids compared byte by byte. Never another business's row and never another person's row with no business; empty lists when there are none (README item 79). New in v1.19.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "pickedKinds" },
+        "businessId": { "$ref": "#/$defs/nullableId" },
+        "personId": { "$ref": "#/$defs/id" },
+        "readAt": {
+          "description": "The database's now() at the read.",
+          "$ref": "#/$defs/utc"
+        },
+        "picks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/pickedKindRead" }
+        },
+        "companies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/companyRead" }
+        }
+      },
+      "required": ["result", "businessId", "personId", "readAt", "picks", "companies"],
+      "additionalProperties": false
+    },
+    "readPickedKinds.errors": {
+      "title": "ReadPickedKindsErrors",
+      "description": "notFound (table persons or businesses): the request's person or business does not exist; transient. The binding fails closed on either: a thrown error, never empty lists (README item 79). New in v1.19.",
+      "oneOf": [{ "$ref": "#/$defs/pickedKindsNotFoundError" }, { "$ref": "#/$defs/transientError" }]
+    },
+    "readPickedKinds.exchange": {
+      "title": "ReadPickedKindsExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readPickedKinds" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readPickedKinds.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/readPickedKinds.response" },
+            { "$ref": "#/$defs/readPickedKinds.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    }
+  }
+}

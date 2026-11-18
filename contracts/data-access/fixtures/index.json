@@ -2991,6 +2991,134 @@
       "expect": "refuse",
       "shows": "The kids-cut note answered with Sam's words: a rule is answered by its kind, scope, value and dates, never the owner's words, which the AI reads and code never enforces (put right, the words left out, it is read-terms-sources-dee-skin-fade's outcome)",
       "source": "arch 09 line 482; K-26 v1 rules.words; actions/src/rules/evaluator/types.ts RuleRow ('The owner's words are left out'); K-30 v1 default 11; K-05 v1.18 item 76 and default 160"
+    },
+    {
+      "file": "read-kind-catalog-sample.json",
+      "version": "v1.19",
+      "def": "readKindCatalog.exchange",
+      "expect": "accept",
+      "shows": "The kind matcher's catalog: the eight trade-file kinds of K-24's seed-kinds-sample in id order, each with its id, name, style, pattern, source and version and never its facts; the drafted kind new-pack-hikes in the same table is never answered; the request names no business, and the same rows answer under any scope",
+      "source": "ops/cards/T-1455.md (Gives 1); ops/cards/T-632.md (the matcher's handoff); actions/src/domain/kind-matcher/matcher.ts CatalogKind; K-24 v1 kinds, README lines 41 and 96, rule 2, seed-kinds-sample, seed-new-work-draft; db/migrations/0021_kinds_of_work.sql (rosie_app's SELECT on kinds; no row-level security on kinds); S1-02; K-05 v1.19 item 78, defaults 167 to 169"
+    },
+    {
+      "file": "read-kind-catalog-not-seeded.json",
+      "version": "v1.19",
+      "def": "readKindCatalog.exchange",
+      "expect": "accept",
+      "shows": "A database with no catalog seed yet: an empty list, answered as it stands, which T-632's matcher refuses (KindCatalogError), so S1-02 asks again later and nothing is picked",
+      "source": "K-24 v1 README rule 7 (the catalog seed, per bundle); actions/src/domain/kind-matcher/matcher.ts KindCatalogError; ops/cards/T-632.md (default 4); QUESTIONS.md CQ-348 (4); K-05 v1.19 item 78 and default 170"
+    },
+    {
+      "file": "read-picked-kinds-sign-up.json",
+      "version": "v1.19",
+      "def": "readPickedKinds.exchange",
+      "expect": "accept",
+      "shows": "Sam's sign-up before S1-04 and S1-09: his three picks with no company and no business, in the order named, the barbershop's eleven text blocks by key and version (never their text), none yet for plumbing and electrical, no draft and no company; read on the runtime side for his own person, the rows written by the database side as the note lists them",
+      "source": "ops/cards/T-1455.md (Gives 2); S1-02 ('The first kind named is set up first'); S1-11 ('when Sam gets to them'); K-24 v1 picked_kinds, picked_kind_texts, README 'Picks, text blocks and drafts', seed-business-kinds; K-23 v1 README rule 5; K-09 v1 commit-s1-02.json, SetupS1_11, SetupS1_04; K-05 v1.18 item 77; K-05 v1.19 item 79, defaults 171 to 175, 177 and 179"
+    },
+    {
+      "file": "read-picked-kinds-sign-up-under-business.json",
+      "version": "v1.19",
+      "def": "readPickedKinds.exchange",
+      "expect": "accept",
+      "shows": "The same sign-up read by a call under Lee's Barbershop: the business's own rows (none in these seeds) and Sam's rows with no business, in one moment, so S1-02's unplaced picks still answer once a business is known",
+      "source": "K-05 v1.11 read-turn-party-test-owner-1 (a turn under the business a company names); K-24 v1 README 'Order of sign-up'; K-05 v1.19 item 79 and default 173"
+    },
+    {
+      "file": "read-picked-kinds-other-person.json",
+      "version": "v1.19",
+      "def": "readPickedKinds.exchange",
+      "expect": "accept",
+      "shows": "The same sign-up read for Alex, who named none of it: empty lists, never another person's rows with no business, and never notFound",
+      "source": "K-23 v1 README rule 5; K-24 v1 README 'Picks, text blocks and drafts' (seen by no business scope); db/migrations/0021_kinds_of_work.sql picked_kinds_runtime (rosie_job sees every row with no scope, so the statement binds the person); K-05 v1.19 item 79 and default 172"
+    },
+    {
+      "file": "read-picked-kinds-barbershop.json",
+      "version": "v1.19",
+      "def": "readPickedKinds.exchange",
+      "expect": "accept",
+      "shows": "Lee's Barbershop after sign-up placed its kinds: its one pick at version 2 in Lee's Barbershop LLC with its eleven text blocks by key and version, and its one company; Lee Home Services' picks and company are never answered",
+      "source": "S1-04; S1-38; S11-58; K-24 v1 seed-business-kinds; K-23 v1 companies, seed-company-two-kinds; arch 10 line 546; K-05 v1.19 item 79 and default 178"
+    },
+    {
+      "file": "read-picked-kinds-pack-hikes-draft.json",
+      "version": "v1.19",
+      "def": "readPickedKinds.exchange",
+      "expect": "accept",
+      "shows": "The pet boarding business's new-work pick, pack hikes, with its draft in review at version 2 and its six answered blocks in block order, each named <draft>/<block> with its outcome, facts and switches and never the owner's words",
+      "source": "S1-03 (the 15 blocks; 'Each answer sets a switch or a fact'); S11-58; K-24 v1 new_work_drafts, new_work_draft_blocks, seed-new-work-draft; K-09 v1 SetupS1_03 (pickedKindId); K-05 v1.18 item 77; K-05 v1.19 item 79 and default 176"
+    },
+    {
+      "file": "read-picked-kinds-no-business-row.json",
+      "version": "v1.19",
+      "def": "readPickedKinds.exchange",
+      "expect": "accept",
+      "shows": "A read naming Lee Home Services before its business row is written: notFound (table businesses), never empty lists",
+      "source": "K-05 v1.4 default 56; K-05 v1.18 read-business-kinds-no-business-row; K-05 v1.19 item 79 and default 174"
+    },
+    {
+      "file": "invalid/refuse-kind-catalog-names-business.json",
+      "version": "v1.19",
+      "def": "readKindCatalog.exchange",
+      "expect": "refuse",
+      "shows": "read-kind-catalog-sample's exchange with the pet boarding business named in the request: the catalog is shared reference data with no business column, so a business would read as a filter the read never applies (put right, the request naming nothing, it is read-kind-catalog-sample)",
+      "source": "K-24 v1 README rule 2 (scope none); ops/cards/T-1455.md ('Rule its scope'); K-05 v1.19 item 78 and default 167"
+    },
+    {
+      "file": "invalid/refuse-kind-catalog-drafted-kind.json",
+      "version": "v1.19",
+      "def": "readKindCatalog.response",
+      "expect": "refuse",
+      "shows": "The catalog answered with the drafted kind new-pack-hikes (source new_work, no style) in its id place among the trade-file kinds: a drafted kind is never answered (put right, its row taken out, it is read-kind-catalog-sample's outcome)",
+      "source": "K-24 v1 README line 96 (the matcher offers only trade_file kinds; a drafted kind stays with its owner), seed-new-work-draft; ops/cards/T-1455.md ('A drafted kind ... is never answered'); K-05 v1.19 item 78"
+    },
+    {
+      "file": "invalid/refuse-kind-catalog-with-facts.json",
+      "version": "v1.19",
+      "def": "readKindCatalog.response",
+      "expect": "refuse",
+      "shows": "The barber's catalog row answered with its facts: the read names its columns, id, name, style, pattern, source and version, and never selects every column (put right, the facts left out, it is read-kind-catalog-sample's outcome)",
+      "source": "ops/cards/T-1455.md ('never select *'); actions/src/domain/kind-matcher/matcher.ts CatalogKind; K-24 v1 kinds.facts; K-05 v1.19 item 78 and default 168"
+    },
+    {
+      "file": "invalid/refuse-picked-kinds-no-person.json",
+      "version": "v1.19",
+      "def": "readPickedKinds.exchange",
+      "expect": "refuse",
+      "shows": "read-picked-kinds-sign-up's exchange with personId null: a sign-up's rows with no business are read for the call's own person alone, so a read with no person has nothing to bind them to (put right, person-sam, it is read-picked-kinds-sign-up)",
+      "source": "K-23 v1 README rule 5; K-24 v1 README 'Picks, text blocks and drafts'; DL-925 item 8 (a person-bound row read for the call's person); K-05 v1.19 item 79 and default 172"
+    },
+    {
+      "file": "invalid/refuse-picked-kinds-business-left-out.json",
+      "version": "v1.19",
+      "def": "readPickedKinds.exchange",
+      "expect": "refuse",
+      "shows": "read-picked-kinds-sign-up's exchange with businessId left out: the request always states its side, a business or null for a sign-up before its business, never left to a default (put right, null, it is read-picked-kinds-sign-up)",
+      "source": "K-05 v1.2 readTurnState.request (businessId stated, null for the runtime side); K-05 v1.19 item 79 and default 173"
+    },
+    {
+      "file": "invalid/refuse-picked-kinds-draft-block-answer.json",
+      "version": "v1.19",
+      "def": "readPickedKinds.response",
+      "expect": "refuse",
+      "shows": "The pack hikes draft's block 4 answered with Sam's own words: a block is answered by its outcome and the facts and switches it set, never the owner's words (put right, the answer left out, it is read-picked-kinds-pack-hikes-draft's outcome)",
+      "source": "K-24 v1 new_work_draft_blocks.answer; S1-03; K-05 v1.18 default 160 (no person's words in an answer no consumer reads); K-05 v1.19 item 79 and default 176"
+    },
+    {
+      "file": "invalid/refuse-picked-kinds-text-by-key-alone.json",
+      "version": "v1.19",
+      "def": "readPickedKinds.response",
+      "expect": "refuse",
+      "shows": "The barbershop's pf.rules text block named pf.rules, its key alone, which names no row of a two-column key (put right, pick-sam-barbershop/pf.rules, it is read-picked-kinds-sign-up's outcome)",
+      "source": "K-05 v1.18 item 77 and default 163; db/repo/setup/row-names.ts (picked_kind_texts as pick id/pf key); K-24 v1 picked_kind_texts primary key; K-05 v1.19 item 79"
+    },
+    {
+      "file": "invalid/refuse-picked-kinds-owner-mobile.json",
+      "version": "v1.19",
+      "def": "readPickedKinds.response",
+      "expect": "refuse",
+      "shows": "Sam's first pick answered with his mobile, +15555550100, beside his person's id: the read joins no handle and answers no person's number (put right, the mobile left out, it is read-picked-kinds-sign-up's outcome)",
+      "source": "ops/cards/T-1455.md ('no person's address or number'); K-04 v1 handles.address; BP rule 7; K-05 v1.19 item 79"
     }
   ]
 }

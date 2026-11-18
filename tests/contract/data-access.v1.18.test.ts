@@ -67,7 +67,7 @@ const ofVersion = entries.filter((entry) => entry.version === VERSION);
 const accepted = ofVersion.filter((entry) => entry.expect === "accept");
 const refused = ofVersion.filter((entry) => entry.expect === "refuse");
 /** Every accepted fixture of a version before v1.18. */
-const earlierAccepted = entries.filter((entry) => entry.version !== VERSION && entry.expect === "accept");
+const earlierAccepted = entries.filter((entry) => +entry.version.slice(3) < 18 && entry.expect === "accept");
 const entryOf = (file: string): FixtureEntry =>
   must(
     entries.find((candidate) => candidate.file === file),

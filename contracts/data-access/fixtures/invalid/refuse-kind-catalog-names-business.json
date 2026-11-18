@@ -1,0 +1,83 @@
+{
+  "call": "readKindCatalog",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["kinds-of-work/seed-kinds-sample.json", "kinds-of-work/seed-new-work-draft.json"],
+    "after": [],
+    "now": "2026-10-26T14:10:00Z",
+    "note": "The kind matcher's catalog, read as T-633's matchKinds hands it to T-632's matcher (README item 78), ten minutes after Sam's NEW 'pack hikes' for the pet boarding business was drafted (K-24's seed-new-work-draft). K-24's seed-kinds-sample gives the catalog eight of fixture set v1's 243 trade-file kinds (barber, plumber, electrician, yoga, movers, boarding, dog-walker and insurance), each at version 1; they are answered in id order, compared byte by byte, with their id, name, style, pattern and source, and never their facts. The drafted kind new-pack-hikes, source new_work, is in the same table and is never answered: v1 keeps a drafted kind to its owner, and the matcher offers only trade_file kinds (K-24 README line 96). The request names no business: the catalog is shared, and the same eight rows answer under any business's scope and under none."
+  },
+  "request": {
+    "businessId": "biz-pet-boarding"
+  },
+  "outcome": {
+    "result": "kindCatalog",
+    "readAt": "2026-10-26T14:10:00Z",
+    "kinds": [
+      {
+        "id": "barber",
+        "name": "Barber",
+        "style": "Chair",
+        "pattern": "chair",
+        "source": "trade_file",
+        "version": 1
+      },
+      {
+        "id": "boarding",
+        "name": "Pet boarding and doggy daycare",
+        "style": "Drop-off",
+        "pattern": "dropoff",
+        "source": "trade_file",
+        "version": 1
+      },
+      {
+        "id": "dog-walker",
+        "name": "Dog walking",
+        "style": "Set service",
+        "pattern": "service",
+        "source": "trade_file",
+        "version": 1
+      },
+      {
+        "id": "electrician",
+        "name": "Electrician",
+        "style": "Home visit",
+        "pattern": "fix",
+        "source": "trade_file",
+        "version": 1
+      },
+      {
+        "id": "insurance",
+        "name": "Insurance agent",
+        "style": "Consult",
+        "pattern": "consult",
+        "source": "trade_file",
+        "version": 1
+      },
+      {
+        "id": "movers",
+        "name": "Movers",
+        "style": "Project",
+        "pattern": "project",
+        "source": "trade_file",
+        "version": 1
+      },
+      {
+        "id": "plumber",
+        "name": "Plumber",
+        "style": "Home visit",
+        "pattern": "fix",
+        "source": "trade_file",
+        "version": 1
+      },
+      {
+        "id": "yoga",
+        "name": "Yoga studio",
+        "style": "Class",
+        "pattern": "class",
+        "source": "trade_file",
+        "version": 1
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "call": "readPickedKinds",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "partSeeds": ["kinds-of-work/seed-kinds-sample.json"],
+    "after": [],
+    "now": "2026-10-19T18:08:00Z",
+    "note": "The same rows as read-picked-kinds-sign-up's, written by the database side as that fixture's note lists them (Sam's three picks with no company and no business, and the barbershop pick's eleven text blocks with no business), read for Alex, who named none of them. A row with no business is answered to its own person alone, so the read finds nothing: empty lists, never Sam's sign-up and never notFound, since Alex exists (README item 79, default 172)."
+  },
+  "request": {
+    "businessId": null,
+    "personId": "person-alex"
+  },
+  "outcome": {
+    "result": "pickedKinds",
+    "businessId": null,
+    "personId": "person-alex",
+    "readAt": "2026-10-19T18:08:00Z",
+    "picks": [],
+    "companies": []
+  }
+}
