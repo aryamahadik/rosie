@@ -35,13 +35,33 @@
 // (MissingSecretError, naming the name alone). With the real line off, the page and the verify use LINQ_WEBHOOK_SECRET
 // alone, exactly as before.
 //
-// Nothing here logs, and nothing is put in a span or an error but a name: never a number, an entry, a key or a secret.
+// The chat lookup (chatHandleLookup, T-1456; K-05 v1.10 item 51, the audit's CHAT; CQ-61): on the real line Linq posts
+// its receipts (message.sent, message.delivered, message.failed, poll.failed) and Rosie's own reactions with the chat id,
+// not the person's number, and the adapter asks ParseLookups.chatHandle for it (adapters/src/linq/webhook/parse.ts
+// receiptHandle). Where the real line is on, the root hands its one database handle (../root.ts workerRoot, the handle
+// staging's parts run on, the chat open among them: ./k05-receipt.ts) and HYPERDRIVE_JOB is bound (its presence alone,
+// once, as the chat open checks it), the verify's chatHandle is db/repo/threads.ts readChatHandle on that handle's
+// runtime side: one client from HYPERDRIVE_JOB as rosie_worker_job, one read-only transaction, nothing written. A chat a
+// thread of kind chat holds, whose handle is a phone, answers its number (E.164), so its receipt becomes its K-06 event
+// and reaches its door as any event does. An unknown chat answers null (an answer, not an error: K-05 default 95), a
+// transient read answers null, and a call that cannot be made throws, scrubbed; for each the adapter throws
+// receiptHandleUnknown and the gateway answers 503, so Linq retries (a receipt can arrive before its chat is written).
+// The lookup is handed the chat id alone, so its timing line (./part.ts dbCallLine) names no trace. Elsewhere (the line
+// off, production, no handle handed, or no HYPERDRIVE_JOB) no lookup is bound, as before. The test-phone page's secret
+// and its rule are unchanged: ../real.ts hands the page's verify the same lookup, and the page's own events (texts) never
+// ask it.
+//
+// Nothing here logs, and nothing is put in a span or an error but a name: never a number, an entry, a key, a secret or a
+// chat id.
 
 import { guardLinqSender, type LinqRosterEnv } from "@rosie/adapters/linq/roster";
 import { createLinqSender, type LinqSender, type LinqSendEnv } from "@rosie/adapters/linq/send";
+import { scrubbed } from "@rosie/db/repo/clocks";
+import { readChatHandle, type ReadChatHandleOutcome } from "@rosie/db/repo/threads";
 
 import { environmentOf } from "../picks";
 import type { LinqSendCall, LinqVerifyInputs, PageWebhookSecret } from "../real";
+import type { StagingDb } from "./part";
 
 /** The switch's name (DL-940): T-572 sets it on staging. */
 export const STAGING_LINQ_LINE = "STAGING_LINQ_LINE";
@@ -60,6 +80,8 @@ export interface LinqLineEnv extends LinqSendEnv, LinqRosterEnv {
   /** K-11's webhook secret, as ../root.ts WorkerSecrets types it: Linq's own where the real line is on. */
   readonly LINQ_WEBHOOK_SECRET?: string;
   readonly TEST_PHONE_WEBHOOK_SECRET?: unknown;
+  /** The runtime side's binding (./db.ts DbEnv): its presence alone is read here, for the chat lookup (T-1456). */
+  readonly HYPERDRIVE_JOB?: unknown;
 }
 
 /** Whether staging's real Linq line is on: ENVIRONMENT staging (read first) and STAGING_LINQ_LINE exactly "real". */
@@ -144,13 +166,43 @@ export function linqLineSend(
   };
 }
 
+/** K-05 v1.10 readChatHandle's name on the root's handle (T-1456): on its timing line, and on every error that leaves it. */
+export const READ_CHAT_HANDLE_CALL = "readChatHandle";
+
+/** The number readChatHandle answers for a chat a thread of kind chat holds, whose handle is a phone; null for any other answer. */
+function numberOf(answer: ReadChatHandleOutcome): string | null {
+  return "handle" in answer && answer.handle !== null ? answer.handle.address : null;
+}
+
+/**
+ * The real line's chat lookup (the header's; T-1456): ParseLookups.chatHandle as db/repo/threads.ts readChatHandle
+ * answers it, on `db`'s runtime side (the root's handle: one client from HYPERDRIVE_JOB for each call, read-only, nothing
+ * written). The chat's number (E.164) when a thread of kind chat holds the chat id and its handle is a phone; null for an
+ * unknown chat (K-05 default 94) and for a transient read. A call that cannot be made (the handle's refusal, a connect that
+ * fails, a database error) throws, scrubbed as ./k05-receipt.ts scrubs its calls' (db/repo/clocks.ts scrubbed: the call's
+ * name and a SQLSTATE or the client's code). The chat id goes to the read alone: never into an answer, an error or a log.
+ */
+export function chatHandleLookup(db: StagingDb): (chatId: string) => Promise<string | null> {
+  return async (chatId) => {
+    let answer: ReadChatHandleOutcome;
+    try {
+      answer = await db.runtime(READ_CHAT_HANDLE_CALL, (sql) => readChatHandle(sql, { linqChatId: chatId }));
+    } catch (error) {
+      throw scrubbed(READ_CHAT_HANDLE_CALL, error);
+    }
+    return numberOf(answer);
+  };
+}
+
 /**
  * The Worker's Linq verify input (../root.ts workerRoot): LINQ_WEBHOOK_SECRET by name at each call, as before; and, only
  * on staging's real Linq line, the test-phone page's own secret beside it, TEST_PHONE_WEBHOOK_SECRET by name at each call
- * that needs it, which speaks only for a test phone. Anywhere else nothing more is read: production reads ENVIRONMENT
- * alone here.
+ * that needs it, which speaks only for a test phone; and there, where the root hands its handle (`db`) and HYPERDRIVE_JOB
+ * is bound, the chat lookup (chatHandleLookup, T-1456). Anywhere else nothing more is read: production reads ENVIRONMENT
+ * alone here. Making it reads ENVIRONMENT, the switch and, on the real line with a handle handed, the presence of
+ * HYPERDRIVE_JOB; no secret, no connection string, and no database call.
  */
-export function stagingLinqVerifyInputs(env: LinqLineEnv): LinqVerifyInputs {
+export function stagingLinqVerifyInputs(env: LinqLineEnv, db?: StagingDb): LinqVerifyInputs {
   const webhookSecret = (): string | undefined => env.LINQ_WEBHOOK_SECRET;
   if (!realLinqLineOn(env)) return { webhookSecret };
   const pageSecret: PageWebhookSecret = {
@@ -161,5 +213,10 @@ export function stagingLinqVerifyInputs(env: LinqLineEnv): LinqVerifyInputs {
     },
     speaksFor: (sender) => sender.kind === "phone" && isTestPhone(env, sender.address),
   };
-  return { webhookSecret, pageSecret };
+  if (db === undefined) return { webhookSecret, pageSecret };
+  // The binding's presence, once, as the root is built (./k05-receipt.ts reads it so for the chat open); its connection
+  // string is the handle's to read, at each call.
+  const binding: unknown = env.HYPERDRIVE_JOB;
+  if (binding === undefined || binding === null) return { webhookSecret, pageSecret };
+  return { webhookSecret, pageSecret, chatHandle: chatHandleLookup(db) };
 }

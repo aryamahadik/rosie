@@ -21,8 +21,16 @@
 //     page's own secret and hands it to tp-04's actor; with tp-04's number on the list it is answered 401 and reaches no
 //     actor; with the page's secret missing the page answers 503 and nothing is posted;
 //   - no key, secret or number in any log line, span or answer.
+//   - T-1456: the Worker's own root (workerRoot) on the real line, with T-1254's handle as the Worker makes it: a signed
+//     Linq receipt's verify asks the root's handle for its chat on the runtime side (HYPERDRIVE_JOB's connection string
+//     read once, HYPERDRIVE_APP's never; both stand-ins fail that read, so no database or host is reached) and, with no
+//     answer, the receipt is not placed: the gateway answers 503 and its failure line names receiptHandleUnknown; a
+//     message.received asks nothing; no line holds the chat id.
 // Test values only (rule 9): K-11's and K-21's fixtures and vendor samples, whole fiction-range numbers (555-01xx), a
 // made-up key and made-up secrets.
+import { createLinqWebhookDouble } from "@rosie/adapters/linq/double-webhooks";
+import deliveredJson from "@rosie/contracts/inbound-event/fixtures/delivered.json";
+import textJson from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
 import testPhoneSendJson from "@rosie/contracts/page-api/fixtures/test-phone-send.json";
 import sendText from "@rosie/contracts/port-linq/fixtures/send-text.json";
 import sendMessageResponse from "@rosie/contracts/port-linq/vendor-samples/send-message-response.json";
@@ -42,7 +50,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { claimHost } from "../../../test/outbound";
 import type { HandleActor } from "../../actor";
 import type { LinqSendRequest } from "../../dispatch/types";
-import { actorNameOf, pagePathOf } from "../../gateway";
+import { actorNameOf, handleLinqWebhook, pagePathOf } from "../../gateway";
 import { createWorker } from "../../index";
 import {
   composeRoot,
@@ -50,11 +58,19 @@ import {
   LINQ_WEBHOOK_SECRET,
   SKELETON_FLAG,
   testPhoneLineOf,
+  workerRoot,
   type HandleActors,
   type LinqSendCall,
   type Root,
 } from "../index";
-import { fakeFlags, skeletonFakes, testWebhookSecret, withSamPhoneRow } from "../test-support";
+import {
+  fakeFlags,
+  skeletonFakes,
+  testWebhookSecret,
+  withSamPhoneRow,
+  type LinqInboundEvent,
+  type SignedWebhook,
+} from "../test-support";
 import {
   REAL_LINQ_LINE,
   STAGING_LINQ_LINE,
@@ -645,6 +661,144 @@ describe("the test-phone page's send with the real line on: signed by the page's
       } finally {
         run.restore();
       }
+    },
+  );
+});
+
+// ---- T-1456: the Worker's root asks its own handle for a receipt's chat --------------------------------------------------
+
+/** The roster phone's chat on the real line, as Linq names it (made up). */
+const ROSTER_CHAT = "linq-chat-t1456-roster";
+const TRACE = "4f1c2b7a-9d3e-4c5f-8a6b-1e2d3c4b5a69";
+
+interface RootEnv {
+  readonly env: StagingEnv;
+  readonly linqSecret: string;
+  /** Reads of each Hyperdrive binding's connection string: T-1254's handle reads its side's at each call. */
+  readonly reads: { job: number; app: number };
+}
+
+/**
+ * Staging's env on the real line for workerRoot: Linq's made-up secret, the roster phone on the list, Rosie's line, and
+ * HYPERDRIVE_JOB and HYPERDRIVE_APP stand-ins whose connection strings count each read and then fail it, so a call reaches
+ * no database and no host, and its side is known by the binding it read.
+ */
+function rootEnv(): RootEnv {
+  const linqSecret = testWebhookSecret();
+  const reads = { job: 0, app: 0 };
+  const values: Json = {
+    ENVIRONMENT: "staging",
+    BASE_PATH: "/test",
+    DB_SCHEMA: "",
+    GIT_SHA: "test-sha",
+    [STAGING_LINQ_LINE]: REAL_LINQ_LINE,
+    STAGING_LINQ_ALLOWLIST: ROSTER_PHONE,
+    ROSIE_NUMBER: ROSIE,
+    [LINQ_WEBHOOK_SECRET]: linqSecret,
+    HYPERDRIVE_JOB: {
+      get connectionString(): string {
+        reads.job += 1;
+        throw new Error("t1456: no database stands behind this HYPERDRIVE_JOB");
+      },
+    },
+    HYPERDRIVE_APP: {
+      get connectionString(): string {
+        reads.app += 1;
+        throw new Error("t1456: no database stands behind this HYPERDRIVE_APP");
+      },
+    },
+  };
+  return { env: values as unknown as StagingEnv, linqSecret, reads };
+}
+
+/** A K-06 fixture's event from the roster phone on its chat, received now (to the whole second, as the double signs it). */
+function rosterEvent(fixture: object, eventId: string): LinqInboundEvent {
+  const at = new Date(Math.floor(Date.now() / 1000) * 1000).toISOString().replace(/[.][0-9]{3}Z$/u, "Z");
+  const event = structuredClone(fixture) as LinqInboundEvent;
+  return {
+    ...event,
+    eventId,
+    handle: { kind: "phone", address: ROSTER_PHONE },
+    chatId: ROSTER_CHAT,
+    receivedAt: at,
+    sentAt: event.sentAt === null ? null : at,
+    status: event.status === null ? null : { ...event.status, at },
+    traceId: `trace-${eventId}`,
+  };
+}
+
+/** The webhook as Linq posts it to {BASE_PATH}/webhooks/linq. */
+function linqPost(webhook: SignedWebhook): Request {
+  return new Request("https://rosie.test/test/webhooks/linq", {
+    method: "POST",
+    headers: {
+      "webhook-id": webhook.webhookId,
+      "webhook-timestamp": webhook.timestamp,
+      "webhook-signature": webhook.signature,
+    },
+    body: webhook.raw,
+  });
+}
+
+describe("the Worker's root on the real line (workerRoot, T-1456): a Linq receipt's chat is asked of the root's own handle", () => {
+  it(
+    "a signed message.delivered: the verify asks the root's handle on the runtime side (HYPERDRIVE_JOB read once, HYPERDRIVE_APP never), and with no answer the receipt is not placed: the gateway answers 503, its line naming receiptHandleUnknown; a message.received asks nothing; no line holds the chat id",
+    { timeout: TEST_MS },
+    async () => {
+      const { env, linqSecret, reads } = rootEnv();
+      const root = workerRoot(env);
+      // Nothing is read of either binding's connection string as the root is built.
+      expect(reads).toEqual({ job: 0, app: 0 });
+      const linq = createLinqWebhookDouble({ secret: linqSecret });
+      const receipt = await linq.sign({
+        event: rosterEvent(deliveredJson, "evt-t1456-delivered-0001"),
+        partKey: "out-t1456-roster-join/1/1",
+      });
+
+      const verified = await root.ports.linqVerify
+        .verifyWebhook({ ...receipt, receivedAt: new Date().toISOString(), traceId: TRACE })
+        .then(
+          () => null,
+          (error: unknown) => error,
+        );
+
+      expect(verified).toMatchObject({ name: "LinqWebhookError", code: "receiptHandleUnknown" });
+      expect(reads).toEqual({ job: 1, app: 0 });
+
+      const response = await handleLinqWebhook(linqPost(receipt), root.gateway, {
+        environment: "staging",
+        version: "test-sha",
+      });
+
+      expect(response.status).toBe(503);
+      const traceId = response.headers.get("x-trace-id");
+      expect(linesOf("gateway_failed").filter((failed) => failed.trace_id === traceId)).toEqual([
+        {
+          level: "error",
+          msg: "gateway_failed",
+          trace_id: traceId,
+          stage: "verify",
+          error: "LinqWebhookError",
+          code: "receiptHandleUnknown",
+        },
+      ]);
+      expect(reads.app).toBe(0);
+
+      const jobReadsBefore = reads.job;
+      const text = await linq.sign({ event: rosterEvent(textJson, "evt-t1456-text-0001"), partKey: null });
+      const textAnswer = await root.ports.linqVerify.verifyWebhook({
+        ...text,
+        receivedAt: new Date().toISOString(),
+        traceId: TRACE,
+      });
+
+      expect(textAnswer).toMatchObject({
+        result: "event",
+        event: { kind: "text", handle: { kind: "phone", address: ROSTER_PHONE }, chatId: ROSTER_CHAT },
+      });
+      expect(reads).toEqual({ job: jobReadsBefore, app: 0 });
+      expectNothingLeaked([linqSecret]);
+      for (const line of logged) expect(line.includes(ROSTER_CHAT), "a line holds the chat id").toBe(false);
     },
   );
 });
