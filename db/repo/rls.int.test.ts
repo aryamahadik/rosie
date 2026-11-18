@@ -21,11 +21,20 @@ const RUNTIME = "rosie_job";
 type Role = typeof TOOL_API | typeof RUNTIME;
 const ROLES: readonly Role[] = [TOOL_API, RUNTIME];
 const PRIVILEGES = ["SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "REFERENCES", "TRIGGER"];
-/** The security-definer functions, in name order: 0012's two (T-1085, narrowed by T-1094) and T-1094's handle read. */
-const FUNCTIONS = ["handles_id_of_mobile", "reservations_booked_overlap", "reservations_saved_times"];
+/**
+ * The security-definer functions, in name order: 0012's two (T-1085, narrowed by T-1094), T-1094's handle read and
+ * T-1457's went-out read of one open question (0037; targets-app.int.test.ts checks its bound).
+ */
+const FUNCTIONS = [
+  "handles_id_of_mobile",
+  "open_questions_went_out",
+  "reservations_booked_overlap",
+  "reservations_saved_times",
+];
 /** Who may run each function besides its owner (T-1094: the handle read is the Tool API's alone). */
 const RUNS: Record<string, readonly Role[]> = {
   handles_id_of_mobile: [TOOL_API],
+  open_questions_went_out: [TOOL_API, RUNTIME],
   reservations_booked_overlap: [TOOL_API, RUNTIME],
   reservations_saved_times: [TOOL_API, RUNTIME],
 };
@@ -2161,6 +2170,12 @@ describe("the security-definer functions: the two that read across businesses (K
         ...shared,
         args: "mobile_wanted text",
         result: "text",
+      },
+      {
+        name: "open_questions_went_out",
+        ...shared,
+        args: "question_wanted text",
+        result: "TABLE(sent_at timestamp with time zone, poll_id text)",
       },
       {
         name: "reservations_booked_overlap",
