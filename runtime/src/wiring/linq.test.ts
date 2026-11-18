@@ -5,7 +5,9 @@
 // double-signed-webhook.json (K-11 v1) is the one the card names. The doors after the gateway are doubles, since the
 // handle's actor is hop 2 (T-553): a HandleActors namespace whose actors store an event once and record every time one is
 // reached, the K-05 double behind the root's real sealing port (T-553: the key K-05 v1.2 handleSealingKey hands over), and
-// the fake outbox store behind the receipt door. Test values only (rule 9).
+// the fake outbox store behind the receipt door. T-1449 (DL-940): the Worker's root on staging's real Linq line, whose
+// verify takes Linq's secret from any sender and the test-phone page's own only from a test phone, and which reads none of
+// it with the line off or in production. Test values only (rule 9).
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -20,10 +22,17 @@ import { spansOfLogLines } from "../trace/hop-check";
 import {
   composeRoot,
   LINQ_WEBHOOK_SECRET,
+  MissingSecretError,
+  NotJoinedError,
+  REAL_LINQ_LINE,
   SKELETON_FLAG,
+  STAGING_LINQ_LINE,
+  stagingLinqVerifyInputs,
+  TEST_PHONE_WEBHOOK_SECRET,
   workerRoot,
   type HandleActors,
   type LinqVerifyInputs,
+  type Root,
 } from "./index";
 import {
   fakeFlags,
@@ -431,6 +440,235 @@ describe("the Worker's root", () => {
     expect(workerFiles.length).toBeGreaterThan(5);
     for (const file of workerFiles) {
       expect(readFileSync(path.join(folder, file), "utf8"), file).not.toMatch(/linq\/double/);
+    }
+  });
+});
+
+describe("the Worker's root on staging's real Linq line (T-1449; DL-940): Linq's secret from any sender, the test-phone page's own only from a test phone", () => {
+  /** The roster phone: on STAGING_LINQ_ALLOWLIST (here a fiction number, as every number in a test is). */
+  const ROSTER_PHONE = "+15555550150";
+  /** double-signed-webhook.json's sender, Maya's test phone: in the fiction range, off the list. */
+  const TEST_PHONE = EVENT.handle.address;
+  /** Rosie's own line for these tests (the Linq double's made-up line): never a test phone. */
+  const ROSIE = "+15555550199";
+  const TRACE_ID = "4f1c2b7a-9d3e-4c5f-8a6b-1e2d3c4b5a69";
+  /** Every name this card adds; none is read while the line is off. */
+  const NEW_NAMES = ["STAGING_LINQ_ALLOWLIST", "ROSIE_NUMBER", "LINQ_API_TOKEN", TEST_PHONE_WEBHOOK_SECRET];
+
+  interface LineEnv {
+    readonly env: Cloudflare.Env;
+    readonly values: Record<string, unknown>;
+    readonly names: string[];
+    readonly linqSecret: string;
+    readonly pageSecret: string;
+  }
+
+  /** A Worker env for staging with the real line on (or as `changes` say), both secrets made up for it, its reads counted. */
+  function lineEnv(changes: Record<string, unknown> = {}): LineEnv {
+    const linqSecret = testWebhookSecret();
+    const pageSecret = testWebhookSecret();
+    const values: Record<string, unknown> = {
+      ENVIRONMENT: "staging",
+      BASE_PATH: "/test",
+      DB_SCHEMA: "",
+      [STAGING_LINQ_LINE]: REAL_LINQ_LINE,
+      STAGING_LINQ_ALLOWLIST: ROSTER_PHONE,
+      ROSIE_NUMBER: ROSIE,
+      [LINQ_WEBHOOK_SECRET]: linqSecret,
+      [TEST_PHONE_WEBHOOK_SECRET]: pageSecret,
+      ...changes,
+    };
+    for (const [name, value] of Object.entries(changes))
+      if (value === undefined) Reflect.deleteProperty(values, name);
+    const names: string[] = [];
+    const env = new Proxy(values, {
+      get(target, name, receiver): unknown {
+        if (typeof name === "string") names.push(name);
+        return Reflect.get(target, name, receiver);
+      },
+      has(target, name): boolean {
+        if (typeof name === "string") names.push(name);
+        return Reflect.has(target, name);
+      },
+    });
+    return { env: env as unknown as Cloudflare.Env, values, names, linqSecret, pageSecret };
+  }
+
+  /** double-signed-webhook.json's event from `sender`, signed under `secret` as received now (or stale), and verified. */
+  async function verifyAs(
+    root: Root,
+    secret: string,
+    sender: string,
+    options: { stale?: boolean } = {},
+  ): Promise<unknown> {
+    const now = new Date();
+    const receivedAt = now.toISOString().replace(/[.][0-9]+Z$/, "Z");
+    const webhook = await createLinqWebhookDouble({ secret }).sign(
+      { event: { ...EVENT, handle: { kind: "phone", address: sender }, receivedAt }, partKey: null },
+      options,
+    );
+    return root.ports.linqVerify.verifyWebhook({
+      ...webhook,
+      receivedAt: now.toISOString(),
+      traceId: TRACE_ID,
+    });
+  }
+
+  const accepted = (sender: string): unknown =>
+    expect.objectContaining({
+      result: "event",
+      httpStatus: 200,
+      partKey: null,
+      event: expect.objectContaining({
+        eventId: EVENT.eventId,
+        handle: { kind: "phone", address: sender },
+      }) as unknown,
+    });
+  const rejected = (reason: string): unknown => ({ result: "rejected", httpStatus: 401, reason });
+
+  it("Linq's secret (LINQ_WEBHOOK_SECRET) is accepted from any sender: the roster phone, a test phone, Rosie's own line", async () => {
+    const line = lineEnv();
+    const root = workerRoot(line.env);
+
+    expect(await verifyAs(root, line.linqSecret, ROSTER_PHONE)).toEqual(accepted(ROSTER_PHONE));
+    expect(await verifyAs(root, line.linqSecret, TEST_PHONE)).toEqual(accepted(TEST_PHONE));
+    expect(await verifyAs(root, line.linqSecret, ROSIE)).toEqual(accepted(ROSIE));
+  });
+
+  it("the page's own secret (TEST_PHONE_WEBHOOK_SECRET) is accepted from a test phone, and rejected (401, badSignature) from the roster phone and from Rosie's own line", async () => {
+    const line = lineEnv();
+    const root = workerRoot(line.env);
+
+    expect(await verifyAs(root, line.pageSecret, TEST_PHONE)).toEqual(accepted(TEST_PHONE));
+    expect(await verifyAs(root, line.pageSecret, "+15555550101")).toEqual(accepted("+15555550101"));
+    expect(await verifyAs(root, line.pageSecret, ROSTER_PHONE)).toEqual(rejected("badSignature"));
+    expect(await verifyAs(root, line.pageSecret, ROSIE)).toEqual(rejected("badSignature"));
+  });
+
+  it("a webhook signed under neither secret is rejected (401, badSignature), from a test phone or the roster phone", async () => {
+    const line = lineEnv();
+    const root = workerRoot(line.env);
+    const neither = testWebhookSecret();
+
+    expect(await verifyAs(root, neither, TEST_PHONE)).toEqual(rejected("badSignature"));
+    expect(await verifyAs(root, neither, ROSTER_PHONE)).toEqual(rejected("badSignature"));
+  });
+
+  it("the same timestamp rules for both: outside the 300 s window, either secret's webhook is rejected staleTimestamp", async () => {
+    const line = lineEnv();
+    const root = workerRoot(line.env);
+
+    expect(await verifyAs(root, line.linqSecret, ROSTER_PHONE, { stale: true })).toEqual(
+      rejected("staleTimestamp"),
+    );
+    expect(await verifyAs(root, line.pageSecret, TEST_PHONE, { stale: true })).toEqual(
+      rejected("staleTimestamp"),
+    );
+  });
+
+  it("the page's secret speaks for no one once the list holds the number, or while the list cannot be read", async () => {
+    const listed = lineEnv({ STAGING_LINQ_ALLOWLIST: `${ROSTER_PHONE},${TEST_PHONE}` });
+    const illFormed = lineEnv({ STAGING_LINQ_ALLOWLIST: `${ROSTER_PHONE}, ${TEST_PHONE}` });
+
+    expect(await verifyAs(workerRoot(listed.env), listed.pageSecret, TEST_PHONE)).toEqual(
+      rejected("badSignature"),
+    );
+    expect(await verifyAs(workerRoot(illFormed.env), illFormed.pageSecret, TEST_PHONE)).toEqual(
+      rejected("badSignature"),
+    );
+  });
+
+  it("a missing secret fails closed as before (MissingSecretError, by its name alone): the page's where it is needed, Linq's for every webhook", async () => {
+    const noPage = lineEnv({ [TEST_PHONE_WEBHOOK_SECRET]: undefined });
+    const noPageRoot = workerRoot(noPage.env);
+    // Linq's own still verify; a signature Linq's does not match needs the page's, which is not set.
+    expect(await verifyAs(noPageRoot, noPage.linqSecret, ROSTER_PHONE)).toEqual(accepted(ROSTER_PHONE));
+    const pageMissing = await verifyAs(noPageRoot, testWebhookSecret(), TEST_PHONE).then(
+      () => null,
+      (error: unknown) => error,
+    );
+    expect(pageMissing).toEqual(new MissingSecretError(TEST_PHONE_WEBHOOK_SECRET));
+    expect((pageMissing as Error).message).toBe(`${TEST_PHONE_WEBHOOK_SECRET} is not set here`);
+
+    const noLinq = lineEnv({ [LINQ_WEBHOOK_SECRET]: undefined });
+    await expect(verifyAs(workerRoot(noLinq.env), noLinq.pageSecret, TEST_PHONE)).rejects.toThrow(
+      new MissingSecretError(LINQ_WEBHOOK_SECRET),
+    );
+    const blank = lineEnv({ [TEST_PHONE_WEBHOOK_SECRET]: "" });
+    await expect(verifyAs(workerRoot(blank.env), testWebhookSecret(), TEST_PHONE)).rejects.toThrow(
+      new MissingSecretError(TEST_PHONE_WEBHOOK_SECRET),
+    );
+  });
+
+  it.each([
+    ["absent", undefined],
+    ['"double"', "double"],
+    ['""', ""],
+  ])(
+    "STAGING_LINQ_LINE %s: Linq's secret alone, as before; the page's secret is rejected even from a test phone, and no name this card adds is read",
+    async (_name, value) => {
+      const line = lineEnv({ [STAGING_LINQ_LINE]: value });
+      const root = workerRoot(line.env);
+
+      expect(await verifyAs(root, line.linqSecret, TEST_PHONE)).toEqual(accepted(TEST_PHONE));
+      expect(await verifyAs(root, line.linqSecret, ROSTER_PHONE)).toEqual(accepted(ROSTER_PHONE));
+      expect(await verifyAs(root, line.pageSecret, TEST_PHONE)).toEqual(rejected("badSignature"));
+      expect(line.names).toContain(STAGING_LINQ_LINE);
+      for (const name of NEW_NAMES) expect(line.names, name).not.toContain(name);
+    },
+  );
+
+  it("production reads none of it: the switch real and both secrets set, nothing but ENVIRONMENT is read for the line, and the verify stays closed", async () => {
+    const line = lineEnv({ ENVIRONMENT: "production", BASE_PATH: "" });
+    const root = workerRoot(line.env);
+
+    await expect(verifyAs(root, line.linqSecret, ROSTER_PHONE)).rejects.toThrow(
+      new NotJoinedError("linqVerify"),
+    );
+    expect(line.names).not.toContain(STAGING_LINQ_LINE);
+    for (const name of NEW_NAMES) expect(line.names, name).not.toContain(name);
+  });
+
+  it("through the gateway's Linq route: the page's secret from a test phone is handed to its actor (200), from the roster phone it is answered 401 with nothing written, and no secret or number is logged", async () => {
+    const line = lineEnv();
+    const inputs = stagingLinqVerifyInputs(line.env);
+    const run = await rig({ linq: inputs });
+    const page = createLinqWebhookDouble({ secret: line.pageSecret });
+
+    const fromRoster = await run.route(
+      post(
+        await page.sign({
+          event: { ...EVENT, handle: { kind: "phone", address: ROSTER_PHONE } },
+          partKey: null,
+        }),
+      ),
+    );
+    expect(fromRoster.status).toBe(401);
+    expect(run.spans()).toHaveLength(1);
+    expect(run.spans()[0]).toMatchObject({
+      outcome: "refused",
+      error_code: "badSignature",
+      decided: { signatureValid: false, answered: 401 },
+    });
+    expectNothingWritten(run);
+
+    const fromTestPhone = await run.route(post(await page.sign({ event: EVENT, partKey: null })));
+    expect(fromTestPhone.status).toBe(200);
+    expect(run.actors.opened).toEqual([MAYA_ACTOR]);
+    expect(run.actors.accepted.map((handoff) => handoff.event.eventId)).toEqual([EVENT.eventId]);
+
+    const text = JSON.stringify(run.lines());
+    for (const value of [
+      line.linqSecret,
+      line.pageSecret,
+      line.pageSecret.slice("whsec_".length),
+      ROSTER_PHONE,
+      ROSTER_PHONE.slice(2),
+      TEST_PHONE,
+      TEST_PHONE.slice(2),
+      ROSIE,
+    ]) {
+      expect(text).not.toContain(value);
     }
   });
 });

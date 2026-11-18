@@ -27,7 +27,13 @@
 // picked_kind_texts and new_work_draft_blocks.
 //
 // A table scoped none is never read by its row's name alone under any business (T-667 round 2; DL-925 item 8, which
-// withdraws run 2's default 8): each has its rule, UNSCOPED_ROWS, which setup/turn-state.ts writes into the read's SQL.
+// withdraws run 2's default 8): each has its rule, UNSCOPED_ROWS, whose SQL rowBound (below) writes into the read. It is
+// the one function every reader of a setup row by its name calls, with its own business and people (T-1436 round 2;
+// DL-938, DL-941): setup/turn-state.ts's readTurnState, send-state.ts's sendState and, from T-1437, clocks.ts's fireClock.
+import type postgres from "postgres";
+import type { Sql, Tx } from "../scope";
+
+type Db = Sql | Tx;
 
 /** A column type a setup fact may hold, as the frozen table lists spell it. */
 export type SetupColumnType =
@@ -693,6 +699,82 @@ export function unscopedRowsOf(table: string): UnscopedRows {
     throw new Error(`readTurnState: ${table} is scoped none and has no rule for which of its rows answer`);
   }
   return rule;
+}
+
+/**
+ * What a row of the setup home `table` must meet beside its name, as SQL that follows the name's compare in a read from
+ * `table` (K-05 v1.2 item 26; T-667 round 2's items 8a and 8b). It is the one function every reader of a setup row by
+ * its name calls, so no reader holds a second copy that could drift (T-1436 round 2; DL-938, DL-941):
+ *   - a business-scoped table's row (its scopedBy column) must be of `businessId`, or have no business when it is null;
+ *   - a row of a table scoped none must meet its table's rule (UNSCOPED_ROWS, through unscopedRowsOf), with `businessId`
+ *     for rosie.business_id and `people` for rosie.person_id. The K-27 rules are the Tool API's select policies (0024
+ *     calendar_links_tool_api_select, busy_blocks_tool_api_select), each on its own table only. With businessId null no
+ *     business or share stands: a person's own rows only, and no busy block.
+ * Each caller passes its own business and people, from its checked request or its own stored row, never from a row's
+ * name: readTurnState the request's business and the request handle's people; sendState the outbox row's business and
+ * the people of its turn's handle (send-state.ts default 1); fireClock (T-1437) the clock row's business and the people
+ * of its handle. `people` is a subquery in parentheses that selects person ids, built by the caller's own tagged
+ * template; one that finds no one finds no row of a person's. The SQL starts with "and" (the catalog's is empty), names
+ * `table`'s own columns, and names calendar_links.id and busy_blocks.calendar_link_id by their table's name. A table
+ * that is no setup home throws, as does a table scoped none with no rule; a rule with no SQL here is a type error, never
+ * a row read unbound.
+ */
+export function rowBound(
+  db: Db,
+  table: string,
+  businessId: string | null,
+  people: postgres.PendingQuery<postgres.Row[]>,
+): postgres.PendingQuery<postgres.Row[]> {
+  const home = Object.hasOwn(SETUP_FACT_HOMES, table) ? SETUP_FACT_HOMES[table] : undefined;
+  if (home === undefined) {
+    throw new Error(`rowBound: ${table} is not a setup home`);
+  }
+  if (home.scopedBy !== null) {
+    return businessId === null
+      ? db`and ${db(home.scopedBy)} is null`
+      : db`and ${db(home.scopedBy)} = ${businessId}`;
+  }
+  const rule = unscopedRowsOf(table);
+  switch (rule) {
+    case "catalog":
+      return db``;
+    case "person":
+      return db`and person_id in ${people}`;
+    case "personCode":
+      return businessId === null
+        ? db`and person_id in ${people} and business_id is null`
+        : db`and person_id in ${people} and (business_id is null or business_id = ${businessId})`;
+    case "calendarLink":
+      if (table !== "calendar_links") {
+        throw new Error("rowBound: a link's rule reads calendar_links alone");
+      }
+      return businessId === null
+        ? db`and person_id in ${people}`
+        : db`and (
+            exists (
+              select 1 from calendar_link_shares s
+              where s.calendar_link_id = calendar_links.id and s.business_id = ${businessId} and s.ended_at is null
+            )
+            or person_id in ${people}
+          )`;
+    case "busyBlock":
+      if (table !== "busy_blocks") {
+        throw new Error("rowBound: a busy block's rule reads busy_blocks alone");
+      }
+      return businessId === null
+        ? db`and false`
+        : db`and (
+            (source = 'photo' and business_id = ${businessId})
+            or (
+              source = 'calendar'
+              and exists (
+                select 1 from calendar_link_shares s
+                where s.calendar_link_id = busy_blocks.calendar_link_id and s.business_id = ${businessId}
+                  and s.ended_at is null
+              )
+            )
+          )`;
+  }
 }
 
 /**

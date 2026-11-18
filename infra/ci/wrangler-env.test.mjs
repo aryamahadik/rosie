@@ -113,6 +113,9 @@ function productionProblems(config) {
   if (prod.routes !== undefined || prod.route !== undefined) problems.push("env.production has a route");
   if (prod.vars?.ENVIRONMENT !== "production")
     problems.push("env.production.vars.ENVIRONMENT is not production");
+  // D-018's switch is staging's alone (T-572): production never names it.
+  if (Object.hasOwn(prod.vars ?? {}, "STAGING_LINQ_LINE"))
+    problems.push("env.production names STAGING_LINQ_LINE");
   // The link host (T-1235): the bare host production's links start with (Q-51's default; DL-014).
   if (prod.vars?.LINK_HOST !== LINK_HOST) problems.push(`env.production.vars.LINK_HOST is not ${LINK_HOST}`);
   if (JSON.stringify(prod.secrets) !== JSON.stringify({ required: [] }))
@@ -582,6 +585,12 @@ describe("env.production checks catch a broken copy", () => {
       [],
     );
   });
+  it("fail when production names staging's real-line switch (T-572)", () => {
+    assert.deepEqual(
+      broken((c) => (c.env.production.vars.STAGING_LINQ_LINE = "real")),
+      ["env.production names STAGING_LINQ_LINE"],
+    );
+  });
   it("fail when production's LINK_HOST is missing, another host, or not a bare host", () => {
     const problem = [`env.production.vars.LINK_HOST is not ${LINK_HOST}`];
     assert.deepEqual(
@@ -626,6 +635,11 @@ describe("Rosie's own number in no tracked config (T-1304)", () => {
         `${where} requires ROSIE_NUMBER`,
       );
     }
+  });
+
+  it("is no part of D-018's switch either: env.staging's STAGING_LINQ_LINE holds a word, never a number (T-572)", () => {
+    assert.equal(config.env.staging.vars.STAGING_LINQ_LINE, "real");
+    assert.deepEqual(phoneNumbersIn(JSON.stringify(config.env.staging.vars)), []);
   });
 
   it("finds no phone number outside the fiction range in wrangler.jsonc, package.json or any infra/scripts file", () => {

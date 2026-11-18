@@ -32,8 +32,10 @@
 //                  it as a stop (../root.ts actorReadingPort). The same directory names a recipient's actor for that
 //                  reading.
 //   linqSendCall   `(request) => lineLinqSend(testPhoneLineOf(env.TEST_PHONE_LINE)).sendPart(request)` (../test-phone):
-//                  staging's test-phone line, the one T-1238 capped, until J-08 brings the real adapter. The binding is
-//                  read at each send.
+//                  staging's test-phone line, the one T-1238 capped. The binding is read at each send. Behind
+//                  ./linq-line.ts's switch (T-1449; DL-940: STAGING_LINQ_LINE exactly "real", read at each send), a part
+//                  to a test phone still goes there, and every other part goes through T-414's sender behind T-416's
+//                  guard (J-08's real line); with the switch off every part goes to the line, as before.
 //
 // All or nothing (DL-468; critic_collisions B7; T-564's security note b; T-1244's handoff note a): the four are bound
 // together or not at all. Bound alone, outboxCalls would mark a part delivered while its arming failed, and every
@@ -85,6 +87,7 @@ import {
   type SendStateCall,
 } from "../real";
 import { lineLinqSend, testPhoneLineOf } from "../test-phone";
+import { linqLineSend } from "./linq-line";
 import type { StagingDb, StagingPart } from "./part";
 
 /** What T-1401's builder is handed: the env (TEST_PHONE_LINE, HYPERDRIVE_JOB) and the root's handle. */
@@ -202,12 +205,13 @@ export const stagingSendCalls: (part: SendPart) => SendInputs = ({ env, db }) =>
   return {
     outboxCalls: outboxCallsOn(db),
     sendStateCall: (request) => onJob(db, SEND_CALLS.sendState, (sql) => sendState(sql, request)),
-    linqSendCall: (request) => {
+    // By recipient behind the real line's switch (./linq-line.ts, T-1449): off, every part to the test-phone line.
+    linqSendCall: linqLineSend(env, (request) => {
       // The line's binding, read at each send; one that is gone fails closed as with no line bound.
       const line = env.TEST_PHONE_LINE;
       if (line === undefined) return Promise.reject(new NoLinqLineError());
       return lineLinqSend(testPhoneLineOf(line)).sendPart(request);
-    },
+    }),
     armingCalls: armingCallsOn(db),
   };
 };

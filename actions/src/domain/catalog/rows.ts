@@ -1,8 +1,10 @@
 // The catalog's field checks and its writes (C-096, T-320): every row it builds is held here to the forms K-23 v1, K-25 v1
 // and K-30 v1 give it, with the rules across rows that K-25 rule 9 leaves to code, so a malformed row never reaches the
-// commit. Every write passes checkCatalogWrite, the one gate between the service and the commit:
+// commit (the checks across rows that need a read are checks.ts's, T-1433). Every write passes checkCatalogWrite, the one
+// gate between the service and the commit:
 //   - only the catalog's own tables, and only an insert or an update naming the version read (K-05 v1 stateWrite; K-05
 //     has no delete write, CQ-128 (2));
+//   - an update never sets the row's business, its id or a column of its key (T-320 N2, T-1433 (f));
 //   - a terms snapshot and its rules are inserted and never updated (K-30 rule 6), so one taken never changes;
 //   - a price rule's values are never edited in place: an update only closes it (K-25 rule 6), so a booking that copied a
 //     rule's price keeps it (RULES 3.7);
@@ -10,6 +12,7 @@
 
 import type { StateWrite } from "../../commit";
 import { refuse } from "./errors";
+import { isPluginSwitch, isTradeFact } from "./registry";
 import type { BusinessKind, Flow, Place, PriceConditions, WayRow } from "./types";
 
 const UTC = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?Z$/u;
@@ -192,6 +195,27 @@ export function requireNames(value: unknown, field: string): readonly string[] {
   return names;
 }
 
+/**
+ * Refuses a list of fact names out of form, or naming a fact K-26 v1's registry does not hold (trade_facts; K-05 v1.18
+ * CQ-349 (3)): names come only from compiled sources, so one outside the registry is refused, never written.
+ */
+export function requireFacts(value: unknown, field: string): readonly string[] {
+  const names = requireNames(value, field);
+  names.forEach((name, index) => {
+    if (!isTradeFact(name)) refuse("nameNotInRegistry", [`${field}.${String(index)}`]);
+  });
+  return names;
+}
+
+/** Refuses a list of switch names out of form, or naming a switch K-26 v1's registry does not hold (plugin_switches). */
+export function requireSwitches(value: unknown, field: string): readonly string[] {
+  const names = requireNames(value, field);
+  names.forEach((name, index) => {
+    if (!isPluginSwitch(name)) refuse("nameNotInRegistry", [`${field}.${String(index)}`]);
+  });
+  return names;
+}
+
 export function requireLanguage(value: unknown, field: string): string {
   if (typeof value !== "string" || !LANGUAGE.test(value)) refuse("badInput", [field]);
   return value;
@@ -232,6 +256,15 @@ export function flowOf(place: Place): Flow {
 export type WayDraft = Omit<WayRow, "id" | "serviceId" | "businessId" | "version">;
 
 /**
+ * Whether a money path takes no money through Rosie (K-25 rule 9): nothing before, and after counter (A), own (B) or
+ * none, a free service (T-320 default 2).
+ */
+export function takesNoMoney(path: string): boolean {
+  const [, before, after] = path.split("|");
+  return before === "none" && ["none", "counter", "own"].includes(after ?? "");
+}
+
+/**
  * Refuses a way whose money breaks K-25 v1's rules, its CHECKs and those it leaves to code (rule 9), and CQ-128 (1):
  *   - its place and location (video alone has none), and its path one of the master's 28 for its flow;
  *   - a path its kind's plug-in offers in that flow (K-24 kind_flows.combos), and with the kind's `nomoney` fact one that
@@ -247,11 +280,7 @@ export function checkWayMoney(way: WayDraft, kind: BusinessKind, currency: strin
   if (!PATHS[way.flow].includes(way.path)) refuse("pathUnknown", ["path"]);
   if (!kind.paths[way.flow].includes(way.path)) refuse("pathNotOffered", ["path"]);
   const [, before, after] = way.path.split("|");
-  if (
-    kind.facts.includes("nomoney") &&
-    (before !== "none" || !["none", "counter", "own"].includes(after ?? ""))
-  )
-    refuse("noMoneyPath", ["path"]);
+  if (kind.facts.includes("nomoney") && !takesNoMoney(way.path)) refuse("noMoneyPath", ["path"]);
 
   const deposits = [way.depositCents, way.depositPercent].filter((amount) => amount !== null).length;
   if (before === "deposit" ? deposits !== 1 : deposits !== 0)
@@ -360,6 +389,10 @@ export function checkCatalogWrite(write: StateWrite): StateWrite {
   requireVersion(write.expectVersion, `${write.table}.expectVersion`);
   const columns = Object.keys(write.set);
   if (columns.includes("version")) refuse("notCatalogWrite", [`${write.table}.version`]);
+  // A row never moves to another business or another key (T-320 N2): its business, its id and every column of the key
+  // that names it are never set, whatever the caller built.
+  for (const column of ["business_id", "id", ...Object.keys(write.key)])
+    if (columns.includes(column)) refuse("notCatalogWrite", [`${write.table}.${column}`]);
   if (write.table === "price_rules" && columns.some((column) => column !== "effective_to"))
     refuse("notCatalogWrite", ["price_rules.set"]);
   return write;

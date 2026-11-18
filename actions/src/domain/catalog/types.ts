@@ -25,10 +25,25 @@ export type Place = (typeof PLACES)[number];
 // ---- the rows the five reads answer --------------------------------------------------------------------------------
 
 /**
+ * A kind's K-24 v1 kind_flows row in one flow, by its K-05 v1.18 item 77 name (`<kind id>/<flow>`) and version (README
+ * item 72, default 155): the row a way that rests on one of its paths names at the version read (limit 4).
+ */
+export interface KindFlowRow {
+  readonly rowId: string;
+  readonly flow: Flow;
+  readonly version: number;
+}
+
+/**
  * One of the business's kinds of work (read 1): its K-23 v1 company_kinds row, with the money paths K-24 v1 kind_flows'
  * combos say the trade really uses in each flow (empty for a drafted kind not yet reviewed, which then offers none).
  */
 export interface BusinessKind {
+  /**
+   * K-05 v1.18 item 77's name of its company_kinds row, `<company id>/<kind id>`, as the database builds it (never split):
+   * what a write that rests on the kind names in its version reads (README item 72; CQ-349 (1)).
+   */
+  readonly rowId: string;
   readonly companyId: string;
   /** The profession file's id (K-24 kinds.id), such as barber. */
   readonly kindId: string;
@@ -44,6 +59,69 @@ export interface BusinessKind {
   readonly version: number;
   /** K-24 kind_flows.combos per flow: the only money paths a way of this kind may take (S1-13; K-25 rule 9). */
   readonly paths: { readonly A: readonly string[]; readonly B: readonly string[] };
+  /** The kind_flows rows those paths come from, flow A then B, by name and version; none for a drafted kind. */
+  readonly flows: readonly KindFlowRow[];
+}
+
+/**
+ * The business's K-23 v1 business_setup row as read 1 answers it (README item 72; CQ-349 (2)): its no money through
+ * Rosie (M02) alone, with the row's key and version, so a way's money path is checked against it (K-25 rule 9) and a
+ * commit compares that version (limit 4).
+ */
+export interface BusinessSetup {
+  readonly businessId: string;
+  readonly noMoney: boolean;
+  readonly version: number;
+}
+
+/** Read 1: the business's kinds of work and its setup's no money, one moment's (README item 72). */
+export interface KindsRead {
+  /**
+   * The business's setup, or null when it has no setup row yet: not known, read as the closed side, no money through
+   * Rosie, never as money allowed (K-05 v1.18 default 161).
+   */
+  readonly setup: BusinessSetup | null;
+  readonly kinds: readonly BusinessKind[];
+}
+
+/** K-23 v1 locations.kind: where a way's place is (K-23 locations_kind_known). */
+export type LocationKind = "shop" | "office" | "meeting_spot";
+
+/**
+ * A K-23 v1 locations row of the business, as K-05 v1.2 readTurnState's facts read it by id under the call's business
+ * (T-667's setup homes; K-05 v1.18 ruling 4 (c)): its kind and travel area, with its version. Never its address or map
+ * point.
+ */
+export interface LocationRow {
+  readonly id: string;
+  readonly businessId: string;
+  readonly kind: LocationKind;
+  /** The travel area's miles from this shop or office, or null when it has none (only a shop or office has one). */
+  readonly travelMiles: number | null;
+  readonly version: number;
+}
+
+/**
+ * A K-04 v1 resources row of the business, as readTurnState's facts read it by id under the call's business (K-05 v1.18
+ * ruling 4 (d)): its kind (worker, room, vehicle, class_session) and whether it is active. Never its name.
+ */
+export interface ResourceRow {
+  readonly id: string;
+  readonly businessId: string;
+  readonly kind: string;
+  readonly active: boolean;
+  readonly version: number;
+}
+
+/**
+ * A K-23 v1 places_or_things row of the business, as readTurnState's facts read it by id under the call's business
+ * (T-320 N1; default 11 withdrawn): its kind (space or thing). Never its name.
+ */
+export interface PlaceOrThingRow {
+  readonly id: string;
+  readonly businessId: string;
+  readonly kind: string;
+  readonly version: number;
 }
 
 /** A K-25 v1 services row (read 2). Its extras are not read: no code reads a sub-key (K-25 README). */
@@ -147,6 +225,11 @@ export interface PriceRulesRead {
 
 /** K-23 v1 flow_defaults: the business's default free-cancel time in one flow (H06). */
 export interface FlowDefault {
+  /**
+   * K-05 v1.18 item 77's name of the row, `<business id>/<flow>`, as the database builds it: what a snapshot that copies
+   * the default names in its version reads (README item 77, CQ-349 (1)).
+   */
+  readonly rowId: string;
   readonly businessId: string;
   readonly flow: Flow;
   readonly cutoffBeforeMinutes: number | null;

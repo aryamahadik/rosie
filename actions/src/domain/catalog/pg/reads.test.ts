@@ -20,6 +20,8 @@ import { CatalogReadError, catalogReadsOf } from "./index";
 import {
   BARBERSHOP,
   HOME_SERVICES,
+  ROW_BY_ID_SEEDS,
+  SAM_HANDLE,
   TIE_FIXTURE,
   YOGA,
   acceptedCatalogFiles,
@@ -28,6 +30,7 @@ import {
   fixtureK05Reads,
   ordered,
   rowsOf,
+  seededTurnState,
   thrownBy,
   throwingK05Reads,
   valuesNamed,
@@ -107,16 +110,22 @@ describe("each port read maps its K-05 v1.18 answer field by field (README items
       // Every request went to K-05 as the exchange's, the call's business named (a terms read once per flow asked).
       expect(asked.length).toBeGreaterThan(0);
       for (const ask of asked) expect(ask).toEqual({ call: exchange.call, request: exchange.request });
-      // Nothing the port has no field for is answered: no item 77 name, no flows list, no setup (DL-911 item 1).
-      for (const name of ["rowId", "flows", "setup", "readAt", "result"]) {
+      // Nothing the port has no field for is answered: no call name, no read time.
+      for (const name of ["readAt", "result"]) {
         expect(valuesNamed(bound, name), name).toEqual([]);
       }
+      // The widened port (T-1433 (h)) carries item 77's names, the kind_flows rows' versions and read 1's setup, each
+      // from its own field of K-05's answer, never built here.
+      expect(valuesNamed(bound, "rowId").sort()).toEqual(valuesNamed(exchange.outcome, "rowId").sort());
+      expect(valuesNamed(bound, "setup")).toEqual(valuesNamed(exchange.outcome, "setup"));
     });
   }
 
   it("read-business-kinds-barbershop: paths.A and paths.B are the combos of the kind's kind_flows row in each flow (item 72)", async () => {
     const exchange = catalogExchange("read-business-kinds-barbershop.json");
-    const [kind] = await catalogReadsOf(fixtureK05Reads([exchange]), BARBERSHOP).kindsOf(BARBERSHOP);
+    const {
+      kinds: [kind],
+    } = await catalogReadsOf(fixtureK05Reads([exchange]), BARBERSHOP).kindsOf(BARBERSHOP);
     const outcome = exchange.outcome as { kinds: { flows: { flow: string; combos: string[] }[] }[] };
     const flows = outcome.kinds[0]?.flows ?? [];
     expect(kind?.paths).toEqual({
@@ -129,7 +138,7 @@ describe("each port read maps its K-05 v1.18 answer field by field (README items
     const exchange = catalogExchange("read-business-kinds-barbershop.json");
     const drafted = structuredClone(exchange.outcome) as { kinds: { flows: unknown[] }[] };
     for (const kind of drafted.kinds) kind.flows = [];
-    const kinds = await catalogReadsOf(answeringK05Reads(drafted), BARBERSHOP).kindsOf(BARBERSHOP);
+    const { kinds } = await catalogReadsOf(answeringK05Reads(drafted), BARBERSHOP).kindsOf(BARBERSHOP);
     expect(kinds.map((kind) => kind.paths)).toEqual([{ A: [], B: [] }]);
   });
 });
@@ -381,5 +390,158 @@ describe("the service built with the binding (createCatalog's reads, as journey 
     const outcome = exchange.outcome as { rules: { id: string }[] };
     expect(read.rules.map((rule) => rule.id)).toEqual(outcome.rules.map((rule) => rule.id));
     expect(read.ties).toEqual([]);
+  });
+});
+
+describe("a row by its id: K-05 v1.2 readTurnState's facts under the call's business, for the turn's handle (T-1433)", () => {
+  /** The world the reads of a row by id meet: the exchanges' seeds, K-04's resources and the inn's spaces. */
+  const rows = worldRows(ROW_BY_ID_SEEDS);
+  const boundFor = (businessId: string, asked: K05Ask[] = []): CatalogReads =>
+    catalogReadsOf(fixtureK05Reads([], asked, seededTurnState(rows, asked)), businessId, SAM_HANDLE);
+  /** Each read of a row by id, of a row the business holds, as T-320's double reads the same rows. */
+  const own: [string, string, (reads: CatalogReads) => Promise<unknown>][] = [
+    [BARBERSHOP, "locations", (reads) => reads.locationOf(BARBERSHOP, "loc-lees-barbershop-second-shop")],
+    [BARBERSHOP, "locations", (reads) => reads.locationOf(BARBERSHOP, "loc-lees-barbershop-shop")],
+    [HOME_SERVICES, "locations", (reads) => reads.locationOf(HOME_SERVICES, "loc-lee-home-services-office")],
+    [BARBERSHOP, "resources", (reads) => reads.resourceOf(BARBERSHOP, "res-andre")],
+    [YOGA, "resources", (reads) => reads.resourceOf(YOGA, "res-studio-room")],
+    [
+      "biz-pet-boarding",
+      "places_or_things",
+      (reads) => reads.placeOrThingOf("biz-pet-boarding", "place-pet-boarding-suite"),
+    ],
+  ];
+
+  it("each answers the business's row as the double reads it, asking only its own columns, never an address or a name", async () => {
+    for (const [businessId, table, read] of own) {
+      const asked: K05Ask[] = [];
+      const bound = await read(boundFor(businessId, asked));
+      expect(bound, table).not.toBeNull();
+      expect(bound).toEqual(await read(readsOf(new Store(rows))));
+      expect(asked.map((ask) => ask.call)).toEqual(["readTurnState"]);
+      const [ask] = asked;
+      const request = ask?.request as { handleId: string; businessId: string; facts: { column: string }[] };
+      expect([request.handleId, request.businessId]).toEqual([SAM_HANDLE, businessId]);
+      for (const fact of request.facts) {
+        expect(["business_id", "kind", "travel_miles", "active"], fact.column).toContain(fact.column);
+      }
+    }
+    expect(await boundFor(BARBERSHOP).locationOf(BARBERSHOP, "loc-lees-barbershop-second-shop")).toEqual({
+      id: "loc-lees-barbershop-second-shop",
+      businessId: BARBERSHOP,
+      kind: "shop",
+      travelMiles: 25,
+      version: 1,
+    });
+  });
+
+  it("another business's row, or none, answers null (readTurnState's notFound of that very row)", async () => {
+    const reads = boundFor(BARBERSHOP);
+    expect(await reads.locationOf(BARBERSHOP, "loc-lee-home-services-office")).toBeNull();
+    expect(await reads.resourceOf(BARBERSHOP, "res-maya")).toBeNull();
+    expect(await reads.placeOrThingOf(BARBERSHOP, "place-pet-boarding-suite")).toBeNull();
+    expect(await reads.locationOf(BARBERSHOP, "loc-lees-barbershop-third-shop")).toBeNull();
+  });
+
+  it("a call with no turn handle reads no row by id: noTurn, nothing asked (K-05 open gap 84)", async () => {
+    const asked: K05Ask[] = [];
+    const reads = catalogReadsOf(fixtureK05Reads([], asked, seededTurnState(rows, asked)), BARBERSHOP);
+    for (const read of [
+      () => reads.locationOf(BARBERSHOP, "loc-lees-barbershop-shop"),
+      () => reads.resourceOf(BARBERSHOP, "res-andre"),
+      () => reads.placeOrThingOf(BARBERSHOP, "place-pet-boarding-suite"),
+    ]) {
+      expect(await thrownBy(read())).toMatchObject({ read: "readTurnState", code: "noTurn", answer: null });
+    }
+    expect(asked).toEqual([]);
+    for (const none of ["", 7]) {
+      expect(() => catalogReadsOf(fixtureK05Reads([]), BARBERSHOP, none as unknown as string)).toThrow(
+        TypeError,
+      );
+    }
+  });
+
+  it("asked for another business than the call's: refused before anything is read", async () => {
+    const asked: K05Ask[] = [];
+    const error = await thrownBy(boundFor(BARBERSHOP, asked).locationOf(YOGA, "loc-lees-barbershop-shop"));
+    expect(error).toMatchObject({ read: "readTurnState", code: "otherBusiness" });
+    expect(asked).toEqual([]);
+  });
+
+  it("notFound of the handle or the business, and transient, are thrown with K-05's answer; unknownFact throws", async () => {
+    const unknownHandle = await thrownBy(
+      catalogReadsOf(fixtureK05Reads([], [], seededTurnState(rows)), BARBERSHOP, "handle-nobody").locationOf(
+        BARBERSHOP,
+        "loc-lees-barbershop-shop",
+      ),
+    );
+    expect(unknownHandle).toMatchObject({
+      read: "readTurnState",
+      code: "notFound",
+      answer: { error: "notFound", table: "handles", rowId: "handle-nobody" },
+    });
+    const transient = { error: "transient", sqlstate: "40001" };
+    const failed = await thrownBy(
+      catalogReadsOf(answeringK05Reads(transient), BARBERSHOP, SAM_HANDLE).resourceOf(
+        BARBERSHOP,
+        "res-andre",
+      ),
+    );
+    expect(failed).toMatchObject({ read: "readTurnState", code: "transient", answer: transient });
+    const unknown = { error: "unknownFact", key: "kind", table: "locations", column: "kind" };
+    const refused = await thrownBy(
+      catalogReadsOf(answeringK05Reads(unknown), BARBERSHOP, SAM_HANDLE).locationOf(
+        BARBERSHOP,
+        "loc-lees-barbershop-shop",
+      ),
+    );
+    expect(refused).toBeInstanceOf(Error);
+    expect(refused).not.toBeInstanceOf(CatalogReadError);
+  });
+
+  it("an answer for another business, a row of another business, or a value the column cannot hold fails closed", async () => {
+    const answer = async (businessId: string): Promise<Record<string, unknown>> =>
+      (await seededTurnState(rows)({
+        handleId: SAM_HANDLE,
+        businessId,
+        bookingIds: [],
+        facts: ["business_id", "kind", "travel_miles"].map((column) => ({
+          key: column,
+          table: "locations",
+          rowId: "loc-lees-barbershop-shop",
+          column,
+        })),
+      })) as unknown as Record<string, unknown>;
+    const ours = await answer(BARBERSHOP);
+    const read = (outcome: object) =>
+      thrownBy(
+        catalogReadsOf(answeringK05Reads(outcome), BARBERSHOP, SAM_HANDLE).locationOf(
+          BARBERSHOP,
+          "loc-lees-barbershop-shop",
+        ),
+      );
+    expect(await read({ ...ours, businessId: YOGA })).toMatchObject({ code: "otherBusiness" });
+    const facts = ours.facts as { column: string; value: unknown }[];
+    const theirs = facts.map((fact) => (fact.column === "business_id" ? { ...fact, value: YOGA } : fact));
+    expect(await read({ ...ours, facts: theirs })).toMatchObject({ code: "otherBusiness" });
+    const garage = facts.map((fact) => (fact.column === "kind" ? { ...fact, value: "garage" } : fact));
+    const odd = await read({ ...ours, facts: garage });
+    expect(odd).not.toBeInstanceOf(CatalogReadError);
+    expect((odd as Error).message).toBe(
+      "readTurnState answered locations.kind with a value the column cannot hold",
+    );
+    // The answer's handle address and every other part are never used: a location of the shop is all it gives.
+    expect(
+      await catalogReadsOf(answeringK05Reads(ours), BARBERSHOP, SAM_HANDLE).locationOf(
+        BARBERSHOP,
+        "loc-lees-barbershop-shop",
+      ),
+    ).toEqual({
+      id: "loc-lees-barbershop-shop",
+      businessId: BARBERSHOP,
+      kind: "shop",
+      travelMiles: null,
+      version: 1,
+    });
   });
 });

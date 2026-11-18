@@ -2140,3 +2140,622 @@ describe("a phones row is named by its handle id when the request asks, never it
     },
   );
 });
+
+// ---- T-1442: a state row naming a clock or outbox row of its own commit (K-36 v1; commit-turn.ts default 17) --------
+//
+// K-36 v1's three foreign keys from a state row to a clock row or an outbox row are not deferrable (0017:
+// hand_offs_alert_outbox_fk, hand_offs_clock_fk, team_pages_clock_fk), so each is checked at the state row's own write.
+// A hand-off names its alert to the owner (written in the same commit: K-36 README rule 5) and its escalation clock row;
+// a repeating page names its next page's clock row; T-319's paging makes each in the commit that writes the row naming
+// it. The commit writes those clock and outbox rows first (T-1442; DL-930, DL-936).
+//
+// Two danger records, each one turn's commit, written as T-319's paging writes them (actions/src/domain/paging):
+//   - Alex's emergency at Lee's Barbershop (commit-alex-safety.json's turn and safety record, K-02 v1's
+//     safety-emergency-now read), handed to Sam with an alert, escalating through a clock row 5 minutes on;
+//   - Alex's crisis words (K-34 v1's seed-outcome-crisis.json: the turn and the read of evt-alex-0203), handed to Sam at
+//     once with an alert, and paged to Rosie's team at once, every 5 minutes from its next page's clock row.
+// The owner lines are the master's and K-36's (A3-25 for crisis words; seed-page-acknowledged.json's for an emergency);
+// the team's summary is an example, as the seeds' are. No seed names a member of Rosie's team (Q-18's members are real
+// people), so the one member paged is a stand-in persons row with no name, on a stand-in handle in the fixtures'
+// made-up range, as T-581's notifications test makes it.
+
+const SAFETY_SEEDS = new URL("db-schema/safety-incidents/fixtures/", CONTRACTS);
+const NOTIFICATION_SEEDS = new URL("db-schema/notifications/fixtures/", CONTRACTS);
+const BARBERSHOP = "biz-lees-barbershop";
+const NEW_YORK = "America/New_York";
+
+type ClockNew = CommitTurnRequest["writes"]["clockRows"]["make"][number];
+type OutboxRowNew = CommitTurnRequest["writes"]["outboxRows"][number];
+
+/** The values of a part's seed row (K-34, K-36): the seed's first row of `table`. */
+function seedRowOf(dir: URL, file: string, table: string): Record<string, Json> {
+  const row = (readJson(new URL(file, dir)) as SeedFile).rows.find((candidate) => candidate.table === table);
+  if (row === undefined) {
+    throw new Error(`${file} has no ${table} row`);
+  }
+  return row.values;
+}
+
+/** A seed's value that is text. */
+function textOf(value: Json | undefined): string {
+  if (typeof value !== "string") {
+    throw new Error("a seed value that should be text is not");
+  }
+  return value;
+}
+
+/** The instant `minutes` after `at`, as the contracts write a time (whole seconds, ending in Z). */
+const minutesAfter = (at: string, minutes: number): string =>
+  new Date(Date.parse(at) + minutes * 60_000).toISOString().replace(".000Z", "Z");
+
+/** A clock row the minute sweep owns (kind job, no handle), armed at the commit, due at `dueAt` in New York (T-319). */
+function jobClock(id: string, dueAt: string, fires: Record<string, Json>): ClockNew {
+  return {
+    id,
+    kind: "job",
+    openQuestionId: null,
+    reservationId: null,
+    handleId: null,
+    businessId: BARBERSHOP,
+    bookingId: null,
+    fires,
+    due: { dueAt, dueZone: NEW_YORK },
+  };
+}
+
+/** One safety row of a danger record, to one person, under Lee's Barbershop, naming no booking (T-319's default 9). */
+function safetyRow(id: string, handleId: string, personId: string): OutboxRowNew {
+  return {
+    id,
+    recipientHandleId: handleId,
+    recipientPersonId: personId,
+    businessId: BARBERSHOP,
+    bookingId: null,
+    channel: "imessage",
+    sendClass: "safety",
+    openQuestionId: null,
+    copyOfRowId: null,
+    versionsRead: [],
+  };
+}
+
+/** The values of the request's state insert into `table`, to change for a refused case. */
+function insertInto(request: CommitTurnRequest, table: string): Record<string, unknown> {
+  const write = request.writes.state.find((each) => each.table === table && each.op === "insert");
+  if (write?.op !== "insert") {
+    throw new Error(`the request inserts no ${table} row`);
+  }
+  return write.values;
+}
+
+/** commit-alex-safety.json's moment, the hand-off's, and its escalation 5 minutes on (K-36's five-minute CHECK). */
+const EMERGENCY_AT = "2026-11-07T15:59:58Z";
+const EMERGENCY_ESCALATES = minutesAfter(EMERGENCY_AT, 5);
+const EMERGENCY_HAND_OFF = "handoff-alex-0050";
+const EMERGENCY_ALERT = "out-sam-handoff-alex-0050";
+const EMERGENCY_CLOCK = "clock-handoff-alex-0050";
+/** K-36 v1's owner line for an emergency (seed-page-acknowledged.json; A3-48). */
+const EMERGENCY_LINE = textOf(
+  seedRowOf(NOTIFICATION_SEEDS, "seed-page-acknowledged.json", "hand_offs").summary,
+);
+
+/**
+ * commit-alex-safety.json's turn with its safety record (safetyCommit), handed to Sam as an emergency (T-319
+ * openHandOff): the hand-off names its alert to Sam and its escalation clock row due 5 minutes on, both of this commit.
+ */
+function emergencyHandOff(sealedWords: string): CommitTurnRequest {
+  const request = safetyCommit(sealedWords);
+  request.writes.state.push({
+    op: "insert",
+    table: "hand_offs",
+    values: {
+      id: EMERGENCY_HAND_OFF,
+      business_id: BARBERSHOP,
+      kind: "emergency",
+      safety_outcome_id: OUTCOME_ID,
+      turn_id: request.turn.id,
+      booking_id: null,
+      about_person_id: "person-alex",
+      told_person_id: "person-sam",
+      told_as: "owner",
+      alert_outbox_row_id: EMERGENCY_ALERT,
+      summary: EMERGENCY_LINE,
+      handed_at: EMERGENCY_AT,
+      escalate_at: EMERGENCY_ESCALATES,
+      escalation_clock_row_id: EMERGENCY_CLOCK,
+    },
+  });
+  request.writes.clockRows.make.push(
+    jobClock(EMERGENCY_CLOCK, EMERGENCY_ESCALATES, {
+      job: "hand-off-escalation",
+      handOff: EMERGENCY_HAND_OFF,
+    }),
+  );
+  request.writes.outboxRows.push(safetyRow(EMERGENCY_ALERT, "handle-sam", "person-sam"));
+  return request;
+}
+
+/** K-34 v1's crisis-words read of Alex's text evt-alex-0203 (seed-outcome-crisis.json), and the turn that read it. */
+const CRISIS_OUTCOME = seedRowOf(SAFETY_SEEDS, "seed-outcome-crisis.json", "safety_outcomes");
+const CRISIS_TURN = seedRowOf(SAFETY_SEEDS, "seed-outcome-crisis.json", "turns");
+const CRISIS_AT = textOf(CRISIS_TURN.committed_at);
+const CRISIS_HAND_OFF = "handoff-alex-0203";
+const CRISIS_LINE = "out-alex-crisis-0203";
+const CRISIS_ALERT = "out-sam-handoff-alex-0203";
+const CRISIS_PAGE = "page-alex-0203";
+const CRISIS_PAGE_ROW = "out-team-page-alex-0203-1";
+const CRISIS_PAGE_CLOCK = "clock-page-alex-0203-2";
+const CRISIS_NEXT_CLOCK = "clock-page-alex-0203-3";
+/** The master's owner line for crisis words, word for word, never the words (A3-25; K-36 hand_offs.summary). */
+const CRISIS_OWNER_LINE = "Urgent: a customer may need help";
+/** The page's summary for Rosie's team: ids, the kind and plain words (K-36 team_pages.summary), an example. */
+const CRISIS_PAGE_SUMMARY =
+  "Hand-off handoff-alex-0203 (biz-lees-barbershop): crisis words, read from safety-alex-0203; paged at once.";
+/** Rosie's team's one member here: a stand-in with no name and no role (T-581's notifications test). */
+const TEAM_MEMBER = "person-team-stand-in";
+const TEAM_HANDLE = "handle-team-stand-in";
+
+/** The stand-in member's rows, written as the tables' owner, as a seed would be. */
+async function teamStandIn(): Promise<void> {
+  await insertRow(db.sql, "persons", { id: TEAM_MEMBER });
+  await insertRow(db.sql, "handles", { id: TEAM_HANDLE, kind: "phone", address: "+15555550190" });
+  await insertRow(db.sql, "person_handles", { person_id: TEAM_MEMBER, handle_id: TEAM_HANDLE });
+}
+
+/**
+ * The turn that read Alex's crisis words (K-34's seed: turn-alex-0203), committing its read, its hand-off to Sam at once
+ * with an alert (escalate_at = handed_at and no clock row: hand_offs_crisis_words_at_once), and the page to Rosie's team
+ * at once, repeating every 5 minutes from its next page's clock row (T-319 openHandOff and openPage). The page comes
+ * after the hand-off it points at (team_pages_hand_off_fk). Its rows: the crisis line to Alex first (the safety message
+ * first), the alert to Sam, the page to the team's member.
+ */
+function crisisHandOff(): CommitTurnRequest {
+  const request = requestOf("commit-alex-safety.json");
+  request.turn = {
+    ...request.turn,
+    id: textOf(CRISIS_TURN.id),
+    eventIds: [textOf(CRISIS_OUTCOME.event_id)],
+    traceId: textOf(CRISIS_TURN.trace_id),
+  };
+  request.writes.state = [
+    { op: "insert", table: "safety_outcomes", values: CRISIS_OUTCOME },
+    {
+      op: "insert",
+      table: "hand_offs",
+      values: {
+        id: CRISIS_HAND_OFF,
+        business_id: BARBERSHOP,
+        kind: "crisis_words",
+        safety_outcome_id: textOf(CRISIS_OUTCOME.id),
+        turn_id: request.turn.id,
+        booking_id: CRISIS_OUTCOME.booking_id ?? null,
+        about_person_id: "person-alex",
+        told_person_id: "person-sam",
+        told_as: "owner",
+        alert_outbox_row_id: CRISIS_ALERT,
+        summary: CRISIS_OWNER_LINE,
+        handed_at: CRISIS_AT,
+        escalate_at: CRISIS_AT,
+        escalation_clock_row_id: null,
+        escalated_at: CRISIS_AT,
+      },
+    },
+    {
+      op: "insert",
+      table: "team_pages",
+      values: {
+        id: CRISIS_PAGE,
+        reason: "hand_off",
+        business_id: BARBERSHOP,
+        hand_off_id: CRISIS_HAND_OFF,
+        turn_id: request.turn.id,
+        named_person_id: null,
+        summary: CRISIS_PAGE_SUMMARY,
+        opened_at: CRISIS_AT,
+        last_paged_at: CRISIS_AT,
+        times_paged: 1,
+        repeat_minutes: 5,
+        next_page_clock_row_id: CRISIS_PAGE_CLOCK,
+        state: "open",
+      },
+    },
+  ];
+  request.writes.clockRows.make = [
+    jobClock(CRISIS_PAGE_CLOCK, minutesAfter(CRISIS_AT, 5), { job: "team-page", page: CRISIS_PAGE }),
+  ];
+  request.writes.outboxRows = [
+    safetyRow(CRISIS_LINE, "handle-alex", "person-alex"),
+    safetyRow(CRISIS_ALERT, "handle-sam", "person-sam"),
+    safetyRow(CRISIS_PAGE_ROW, TEAM_HANDLE, TEAM_MEMBER),
+  ];
+  return request;
+}
+
+/**
+ * The write each repeat makes (K-36: each page arms a new clock row and next_page_clock_row_id moves to it), as a state
+ * update in a later commit: the page paged a second time, its next page's clock row `nextClock`, made by this commit when
+ * `made`. A repeat itself rides its clock row's firing (clocks.ts fireClock, not this card's), so the turn here is a
+ * stand-in that carries the same writes.
+ */
+function pagedAgain(nextClock: string | null, made: boolean): CommitTurnRequest {
+  const request = requestOf("commit-alex-safety.json");
+  request.turn = {
+    ...request.turn,
+    id: "turn-t1442-paged-again",
+    eventIds: ["evt-t1442-paged-again"],
+    traceId: "trace-t1442-paged-again",
+  };
+  request.writes.state = [
+    {
+      op: "update",
+      table: "team_pages",
+      key: { id: CRISIS_PAGE },
+      expectVersion: 1,
+      set: { times_paged: 2, last_paged_at: minutesAfter(CRISIS_AT, 5), next_page_clock_row_id: nextClock },
+    },
+  ];
+  request.writes.clockRows.make = made
+    ? [jobClock(CRISIS_NEXT_CLOCK, minutesAfter(CRISIS_AT, 10), { job: "team-page", page: CRISIS_PAGE })]
+    : [];
+  request.writes.outboxRows = [];
+  return request;
+}
+
+/** How many rows K-34's safety_outcomes and K-36's hand_offs and team_pages hold. */
+async function dangerRows(): Promise<{ safety_outcomes: number; hand_offs: number; team_pages: number }> {
+  const [row] = await db.sql<{ safety_outcomes: number; hand_offs: number; team_pages: number }[]>`
+    select (select count(*)::int from safety_outcomes) as safety_outcomes,
+           (select count(*)::int from hand_offs) as hand_offs,
+           (select count(*)::int from team_pages) as team_pages
+  `;
+  if (row === undefined) {
+    throw new Error("dangerRows: no row");
+  }
+  return row;
+}
+
+/**
+ * Commits `request` through a rosie_job client that records each statement it sends, and gives the answer with each
+ * insert and update in the order sent: its table and the business scope in force ('' for the runtime side).
+ */
+async function writesInOrder(
+  request: CommitTurnRequest,
+  now: Date,
+): Promise<{ outcome: CommitTurnOutcome; writes: [string, string][] }> {
+  const statements: { text: string; parameters: unknown[] }[] = [];
+  const watched = postgres(resolvePrimaryUrl(), {
+    max: 1,
+    onnotice: () => undefined,
+    debug: (_connection: number, text: string, parameters: unknown[]) => {
+      statements.push({ text, parameters });
+    },
+    connection: {
+      application_name: "rosie-t1442-order",
+      search_path: `${db.schema}, public`,
+      role: RUNTIME_ROLE,
+    },
+  });
+  let outcome: CommitTurnOutcome;
+  try {
+    outcome = await commitTurn(watched, request, { now });
+  } finally {
+    await watched.end({ timeout: 5 });
+  }
+  let scope = "";
+  const writes: [string, string][] = [];
+  for (const { text, parameters } of statements) {
+    if (text.includes("select set_config($1, '', true)")) {
+      scope = "";
+    } else if (text.includes("select set_config($1, $2, true)")) {
+      scope = String(parameters[1]);
+    }
+    const write = /^\s*(?:insert into|update)\s+"?([a-z_]+)"?/.exec(text);
+    if (write?.[1] !== undefined) {
+      writes.push([write[1], scope]);
+    }
+  }
+  return { outcome, writes };
+}
+
+describe("a state row naming a clock or outbox row of its own commit is written after it (K-36 v1; T-1442)", () => {
+  it("K-36's three foreign keys to clock and outbox rows are checked at the write, never deferred (0017)", async () => {
+    const keys = await db.sql<{ name: string; deferrable: boolean; deferred: boolean }[]>`
+      select conname as name, condeferrable as deferrable, condeferred as deferred from pg_constraint
+      where connamespace = ${db.schema}::regnamespace
+        and conname in ('hand_offs_alert_outbox_fk', 'hand_offs_clock_fk', 'team_pages_clock_fk')
+      order by conname
+    `;
+    expect(keys).toEqual([
+      { name: "hand_offs_alert_outbox_fk", deferrable: false, deferred: false },
+      { name: "hand_offs_clock_fk", deferrable: false, deferred: false },
+      { name: "team_pages_clock_fk", deferrable: false, deferred: false },
+    ]);
+  });
+
+  it(
+    "a turn writing a hand-off with its alert and its escalation clock commits: the clock and outbox rows go first",
+    SLOW,
+    async () => {
+      const exchange = await given("commit-alex-safety.json");
+      const now = new Date(exchange.given.now);
+      const request = emergencyHandOff(byteaText(await seal(db.sql, KEYS, "person-alex", EMERGENCY_WORDS)));
+      expect(schemaErrors("commitTurn.request", request)).toEqual([]);
+      const { outcome, writes } = await writesInOrder(request, now);
+      expect(outcome).toEqual({
+        result: "committed",
+        turnId: "turn-alex-safety-1",
+        committedAt: EMERGENCY_AT,
+        repeated: false,
+        committed: {
+          // safety_outcomes carries no version, so no row of it is answered; the hand-off is answered where it is written.
+          written: [
+            { table: "clock_rows", rowId: EMERGENCY_CLOCK, version: 1 },
+            { table: "hand_offs", rowId: EMERGENCY_HAND_OFF, version: 1 },
+          ],
+          outboxRows: [
+            { id: "out-alex-safety-emergency", commitSeq: 1 },
+            { id: EMERGENCY_ALERT, commitSeq: 2 },
+          ],
+          promoted: [],
+        },
+      });
+      expect(answerErrors(outcome)).toEqual([]);
+      // The clock row and the alert before the hand-off naming them, each under its business (the scope per write).
+      expect(writes).toEqual([
+        ["turns", ""],
+        ["safety_outcomes", BARBERSHOP],
+        ["clock_rows", BARBERSHOP],
+        ["outbox_rows", BARBERSHOP],
+        ["outbox_rows", BARBERSHOP],
+        ["hand_offs", BARBERSHOP],
+      ]);
+      const [handOff] = await db.sql<
+        { alert_outbox_row_id: string; escalation_clock_row_id: string; escalate_at: Date; version: number }[]
+      >`
+        select alert_outbox_row_id, escalation_clock_row_id, escalate_at, version from hand_offs
+        where id = ${EMERGENCY_HAND_OFF}
+      `;
+      expect(handOff).toEqual({
+        alert_outbox_row_id: EMERGENCY_ALERT,
+        escalation_clock_row_id: EMERGENCY_CLOCK,
+        escalate_at: new Date(EMERGENCY_ESCALATES),
+        version: 1,
+      });
+      const [clock] = await db.sql<{ state: string; due_at: Date; created_by_turn_id: string }[]>`
+        select state, due_at, created_by_turn_id from clock_rows where id = ${EMERGENCY_CLOCK}
+      `;
+      expect(clock).toEqual({
+        state: "armed",
+        due_at: new Date(EMERGENCY_ESCALATES),
+        created_by_turn_id: "turn-alex-safety-1",
+      });
+      const [alert] = await db.sql<{ recipient_handle_id: string; send_class: string; state: string }[]>`
+        select recipient_handle_id, send_class, state from outbox_rows where id = ${EMERGENCY_ALERT}
+      `;
+      expect(alert).toEqual({ recipient_handle_id: "handle-sam", send_class: "safety", state: "planned" });
+    },
+  );
+
+  it(
+    "a turn writing a crisis-words hand-off and its repeating page commits: the page's clock row and the rows first, the page after its hand-off",
+    SLOW,
+    async () => {
+      await given("commit-opens-question.json");
+      await teamStandIn();
+      const request = crisisHandOff();
+      expect(schemaErrors("commitTurn.request", request)).toEqual([]);
+      const { outcome, writes } = await writesInOrder(request, new Date(CRISIS_AT));
+      expect(outcome).toEqual({
+        result: "committed",
+        turnId: "turn-alex-0203",
+        committedAt: CRISIS_AT,
+        repeated: false,
+        committed: {
+          written: [
+            { table: "clock_rows", rowId: CRISIS_PAGE_CLOCK, version: 1 },
+            { table: "hand_offs", rowId: CRISIS_HAND_OFF, version: 1 },
+            { table: "team_pages", rowId: CRISIS_PAGE, version: 1 },
+          ],
+          outboxRows: [
+            { id: CRISIS_LINE, commitSeq: 1 },
+            { id: CRISIS_ALERT, commitSeq: 2 },
+            { id: CRISIS_PAGE_ROW, commitSeq: 3 },
+          ],
+          promoted: [],
+        },
+      });
+      expect(answerErrors(outcome)).toEqual([]);
+      // team_pages is Rosie's team's (scope none), so the page goes on the runtime side.
+      expect(writes).toEqual([
+        ["turns", ""],
+        ["safety_outcomes", BARBERSHOP],
+        ["clock_rows", BARBERSHOP],
+        ["outbox_rows", BARBERSHOP],
+        ["outbox_rows", BARBERSHOP],
+        ["outbox_rows", BARBERSHOP],
+        ["hand_offs", BARBERSHOP],
+        ["team_pages", ""],
+      ]);
+      const [page] = await db.sql<
+        { hand_off_id: string; next_page_clock_row_id: string; state: string; times_paged: number }[]
+      >`
+        select hand_off_id, next_page_clock_row_id, state, times_paged from team_pages where id = ${CRISIS_PAGE}
+      `;
+      expect(page).toEqual({
+        hand_off_id: CRISIS_HAND_OFF,
+        next_page_clock_row_id: CRISIS_PAGE_CLOCK,
+        state: "open",
+        times_paged: 1,
+      });
+      const [handOff] = await db.sql<
+        { alert_outbox_row_id: string; escalation_clock_row_id: string | null; summary: string }[]
+      >`
+        select alert_outbox_row_id, escalation_clock_row_id, summary from hand_offs where id = ${CRISIS_HAND_OFF}
+      `;
+      expect(handOff).toEqual({
+        alert_outbox_row_id: CRISIS_ALERT,
+        escalation_clock_row_id: null,
+        summary: CRISIS_OWNER_LINE,
+      });
+      expect(await dangerRows()).toEqual({ safety_outcomes: 1, hand_offs: 1, team_pages: 1 });
+    },
+  );
+
+  it(
+    "a state update moving a page to a next clock row its own commit makes waits for it too; left out, K-36 refuses it",
+    SLOW,
+    async () => {
+      await given("commit-opens-question.json");
+      await teamStandIn();
+      committed(await commitTurn(runtime, crisisHandOff(), { now: new Date(CRISIS_AT) }));
+      const now = new Date(minutesAfter(CRISIS_AT, 5));
+      const pageNow = async (): Promise<{
+        next_page_clock_row_id: string;
+        times_paged: number;
+        version: number;
+      }> => {
+        const [page] = await db.sql<
+          { next_page_clock_row_id: string; times_paged: number; version: number }[]
+        >`
+          select next_page_clock_row_id, times_paged, version from team_pages where id = ${CRISIS_PAGE}
+        `;
+        if (page === undefined) {
+          throw new Error("the page was not written");
+        }
+        return page;
+      };
+      const before = await snapshot();
+      for (const [what, request, refusal] of [
+        [
+          "the next clock row left out, the page naming none",
+          pagedAgain(null, false),
+          "team_pages_open_repeat_has_clock",
+        ],
+        [
+          "the next clock row left out, the page still naming it",
+          pagedAgain(CRISIS_NEXT_CLOCK, false),
+          "team_pages_clock_fk",
+        ],
+      ] as const) {
+        const outcome = await commitTurn(runtime, request, { now });
+        expect(outcome, what).toEqual({
+          error: "constraint",
+          sqlstate: refusal === "team_pages_clock_fk" ? "23503" : "23514",
+          constraint: refusal,
+        });
+        expect(answerErrors(outcome), what).toEqual([]);
+        expect(await snapshot(), what).toEqual(before);
+        expect(await footprint(request.turn.id), what).toEqual(NO_FOOTPRINT);
+        expect(await pageNow(), what).toEqual({
+          next_page_clock_row_id: CRISIS_PAGE_CLOCK,
+          times_paged: 1,
+          version: 1,
+        });
+      }
+      const outcome = committed(await commitTurn(runtime, pagedAgain(CRISIS_NEXT_CLOCK, true), { now }));
+      expect(outcome.committed.written).toEqual([
+        { table: "clock_rows", rowId: CRISIS_NEXT_CLOCK, version: 1 },
+        { table: "team_pages", rowId: CRISIS_PAGE, version: 2 },
+      ]);
+      expect(answerErrors(outcome)).toEqual([]);
+      expect(await pageNow()).toEqual({
+        next_page_clock_row_id: CRISIS_NEXT_CLOCK,
+        times_paged: 2,
+        version: 2,
+      });
+    },
+  );
+
+  it(
+    "the same hand-off with its named clock row or alert left out is refused as K-36 says, and nothing is written",
+    SLOW,
+    async () => {
+      const exchange = await given("commit-alex-safety.json");
+      const now = new Date(exchange.given.now);
+      const sealedWords = byteaText(await seal(db.sql, KEYS, "person-alex", EMERGENCY_WORDS));
+      const cases: [string, (request: CommitTurnRequest) => void, string, string][] = [
+        [
+          "the clock row left out, the hand-off naming none",
+          (request) => {
+            request.writes.clockRows.make = [];
+            insertInto(request, "hand_offs").escalation_clock_row_id = null;
+          },
+          "23514",
+          "hand_offs_clock_unless_at_once",
+        ],
+        [
+          "the clock row left out, the hand-off still naming it",
+          (request) => {
+            request.writes.clockRows.make = [];
+          },
+          "23503",
+          "hand_offs_clock_fk",
+        ],
+        [
+          "the alert left out, the hand-off still naming it",
+          (request) => {
+            request.writes.outboxRows = request.writes.outboxRows.filter((row) => row.id !== EMERGENCY_ALERT);
+          },
+          "23503",
+          "hand_offs_alert_outbox_fk",
+        ],
+      ];
+      const before = await snapshot();
+      for (const [what, leaveOut, sqlstate, constraint] of cases) {
+        const request = emergencyHandOff(sealedWords);
+        leaveOut(request);
+        const outcome = await commitTurn(runtime, request, { now });
+        expect(outcome, what).toEqual({ error: "constraint", sqlstate, constraint });
+        expect(answerErrors(outcome), what).toEqual([]);
+        expect(await snapshot(), what).toEqual(before);
+        expect(await footprint(request.turn.id), what).toEqual(NO_FOOTPRINT);
+        expect(await dangerRows(), what).toEqual({ safety_outcomes: 0, hand_offs: 0, team_pages: 0 });
+      }
+      // Refused for what was left out alone: the whole hand-off commits.
+      committed(await commitTurn(runtime, emergencyHandOff(sealedWords), { now }));
+      expect(await dangerRows()).toEqual({ safety_outcomes: 1, hand_offs: 1, team_pages: 0 });
+    },
+  );
+
+  it(
+    "the same page with its next clock row left out is refused as K-36 says, and nothing is written",
+    SLOW,
+    async () => {
+      await given("commit-opens-question.json");
+      await teamStandIn();
+      const now = new Date(CRISIS_AT);
+      const cases: [string, (request: CommitTurnRequest) => void, string, string][] = [
+        [
+          "the next clock row left out, the page naming none",
+          (request) => {
+            request.writes.clockRows.make = [];
+            insertInto(request, "team_pages").next_page_clock_row_id = null;
+          },
+          "23514",
+          "team_pages_open_repeat_has_clock",
+        ],
+        [
+          "the next clock row left out, the page still naming it",
+          (request) => {
+            request.writes.clockRows.make = [];
+          },
+          "23503",
+          "team_pages_clock_fk",
+        ],
+      ];
+      const before = await snapshot();
+      for (const [what, leaveOut, sqlstate, constraint] of cases) {
+        const request = crisisHandOff();
+        leaveOut(request);
+        const outcome = await commitTurn(runtime, request, { now });
+        expect(outcome, what).toEqual({ error: "constraint", sqlstate, constraint });
+        expect(answerErrors(outcome), what).toEqual([]);
+        expect(await snapshot(), what).toEqual(before);
+        expect(await footprint(request.turn.id), what).toEqual(NO_FOOTPRINT);
+        expect(await dangerRows(), what).toEqual({ safety_outcomes: 0, hand_offs: 0, team_pages: 0 });
+      }
+      committed(await commitTurn(runtime, crisisHandOff(), { now }));
+      expect(await dangerRows()).toEqual({ safety_outcomes: 1, hand_offs: 1, team_pages: 1 });
+    },
+  );
+});

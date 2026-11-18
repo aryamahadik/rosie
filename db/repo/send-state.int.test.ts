@@ -29,6 +29,7 @@ import { setPhoneStopped } from "./phones";
 import { reserve, type ReserveRequest } from "./reservations";
 import { type Sql, type Tx, withBusiness } from "./scope";
 import {
+  currentVersionsOf,
   sendState,
   sendStateIn,
   type SendStateRequest,
@@ -37,6 +38,9 @@ import {
   type TextsConsentV1Dot8,
   VERSIONED_HOMES,
 } from "./send-state";
+import { rowBound, SETUP_FACT_HOMES, UNSCOPED_ROWS } from "./setup/fact-homes";
+import { rowNameSql } from "./setup/row-names";
+import { readTurnState } from "./setup/turn-state";
 import { createTestDatabase, type TestDatabase } from "./test-db";
 
 type Db = Sql | Tx;
@@ -1382,5 +1386,701 @@ describe("sendState: a statement's own refusal and postgres.js's statement error
       code: expected.client,
       message: `${call}: the database call failed (code ${expected.client})`,
     });
+  });
+});
+
+// ---- T-1436: the setup rows an outbox row's versions_read names, each read within the row's bound --------------------
+//
+// sendState re-reads every setup row an outbox row's versions_read names, as it re-reads a core row (T-1436; DL-927,
+// DL-935): a one-column key by its column, a two-column key by K-05 v1.18 item 77's name, built and compared whole by
+// the SQL beside the outbox row's business; a row of a table scoped none only under T-667 round 2's rules (DL-925 items
+// 8a and 8b), with the outbox row's business and its turn's handle's people (send-state.ts default 1). A row outside its
+// bound is left out, as a row gone.
+//
+// The rows come only from fixture set v1's demo shops (rule 9), loaded once for this block: K-04's turn seed (the
+// bundle, the demo businesses, the cast and their handles) and, with their after chains, the setup seeds T-667's tests
+// read: K-22's codes and sessions (Sam's, and Jordan's paused code) and the staging testers' (another person's account,
+// code and session), K-27's links, shares and busy blocks, K-25's price list (K-23's demo shop and K-24's sample kinds
+// behind it), K-24's picked kinds and the pet boarding shop's new-work draft. Made here from seed rows under new ids, as
+// T-667's setup tests make them: Lee Home Services' plumbing kind placed before its business (no business), Riley's
+// barbershop share as an ended share with Lee Home Services, and Sam's owner-email code as the barbershop's listing
+// control code (no person); and committed turns of handle-sam, handle-riley and the first staging tester's email handle,
+// whose outbox rows name the rows. Every number is a seed's own 555-01xx number: this block writes none.
+
+describe("sendState: the setup rows an outbox row's versions_read names (T-1436)", () => {
+  const DB_SCHEMA_DIR = new URL("db-schema/", CONTRACTS);
+  const seedOf = (path: string): URL => new URL(path, DB_SCHEMA_DIR);
+  const SEEDS: readonly URL[] = [
+    seedOf("core/fixtures/seed-turn.json"),
+    seedOf("people-access/fixtures/seed-session.json"),
+    seedOf("people-access/fixtures/seed-staging-tester.json"),
+    seedOf("availability/fixtures/seed-busy-block.json"),
+    seedOf("services-prices/fixtures/seed-services-price-list.json"),
+    seedOf("kinds-of-work/fixtures/seed-business-kinds.json"),
+    seedOf("kinds-of-work/fixtures/seed-new-work-draft.json"),
+  ];
+  const HOME_SERVICES = "biz-lee-home-services";
+  const YOGA = "biz-yoga-studio";
+  const MOVERS = "biz-movers";
+  const PET_BOARDING = "biz-pet-boarding";
+  /** Lee Home Services' plumbing kind as S1-04 places it before its business: a seed row under a new id, no business. */
+  const EARLY_KIND = "company-sam-before-business/plumber";
+  /** The barbershop's listing control code, made from Sam's owner-email code: a code with no person (S1-75). */
+  const CONTROL_CODE = "code-barbershop-listing-control";
+  const SWEEP = { timeout: 300_000 };
+
+  /** Whom an outbox row goes to. */
+  interface Recipient {
+    readonly handleId: string;
+    readonly personId: string;
+    readonly channel: "imessage" | "email";
+  }
+  /** A committed turn of a handle, whose outbox rows go to that handle unless a case says otherwise. */
+  interface Turn extends Recipient {
+    readonly id: string;
+  }
+  /** A versions_read entry (K-04 outbox_rows.versions_read). */
+  interface Named {
+    readonly table: string;
+    readonly rowId: string;
+    readonly version: number;
+  }
+
+  const SAM: Turn = {
+    id: "turn-t1436-sam",
+    handleId: "handle-sam",
+    personId: "person-sam",
+    channel: "imessage",
+  };
+  const RILEY: Turn = {
+    id: "turn-t1436-riley",
+    handleId: "handle-riley",
+    personId: "person-riley",
+    channel: "imessage",
+  };
+  const TESTER: Turn = {
+    id: "turn-t1436-tester",
+    handleId: "handle-tester-one-email",
+    personId: "person-tester-one",
+    channel: "email",
+  };
+  const TO_ALEX: Recipient = { handleId: "handle-alex", personId: "person-alex", channel: "imessage" };
+
+  /** One seed's own row of `table` whose values hold each of `match`'s. */
+  function seedRowOf(seed: URL, table: string, match: Record<string, Json>): Record<string, Json> {
+    const rows = (readJson(seed) as SeedFile).rows.filter(
+      (row) =>
+        row.table === table && Object.entries(match).every(([column, value]) => row.values[column] === value),
+    );
+    const [row, ...more] = rows;
+    if (row === undefined || more.length > 0) {
+      throw new Error(`${seed.pathname} has no one ${table} row that matches`);
+    }
+    return row.values;
+  }
+
+  beforeAll(async () => {
+    await reset();
+    // The shared catalog hangs from no business, person or handle, so reset() leaves it: emptied with what hangs from it.
+    await db.sql`truncate kinds cascade`;
+    const seen = new Set<string>();
+    const rows = SEEDS.flatMap((seed) => seedRows(seed, seen));
+    await db.sql.begin(async (tx) => {
+      for (const row of rows) {
+        await insertRow(tx, row.table, row.values);
+      }
+      const twoKinds = seedOf("business-setup/fixtures/seed-company-two-kinds.json");
+      await insertRow(tx, "companies", {
+        ...seedRowOf(twoKinds, "companies", { id: "company-lee-home-services" }),
+        id: "company-sam-before-business",
+        business_id: null,
+        version: 1,
+      });
+      await insertRow(tx, "company_kinds", {
+        ...seedRowOf(twoKinds, "company_kinds", {
+          company_id: "company-lee-home-services",
+          kind_id: "plumber",
+        }),
+        company_id: "company-sam-before-business",
+        business_id: null,
+        version: 1,
+      });
+      await insertRow(tx, "calendar_link_shares", {
+        ...seedRowOf(seedOf("availability/fixtures/seed-calendar-link.json"), "calendar_link_shares", {
+          id: "share-riley-barbershop",
+        }),
+        id: "share-riley-home-services-ended",
+        business_id: HOME_SERVICES,
+        ended_at: "2026-11-05T15:00:00Z",
+        version: 2,
+      });
+      await insertRow(tx, "proof_codes", {
+        ...seedRowOf(seedOf("people-access/fixtures/seed-proof-code.json"), "proof_codes", {
+          id: "code-sam-owner-email",
+        }),
+        id: CONTROL_CODE,
+        purpose: "listing_control",
+        person_id: null,
+      });
+    });
+    for (const turn of [SAM, RILEY, TESTER]) {
+      await addTurn(turn.id, turn.handleId, "2026-11-07T16:00:00Z");
+    }
+  }, 180_000);
+
+  let rowsMade = 0;
+  /**
+   * An outbox row of `turn` at `businessId`, naming `refs` in its versions_read, to the turn's own handle unless `to` says
+   * otherwise; with no turn, a job's row (K-04 v1.1: a job id in place of the turn), to Sam unless `to` says otherwise.
+   */
+  async function outboxRowNaming(
+    businessId: string | null,
+    turn: Turn | null,
+    refs: readonly Named[],
+    to: Recipient = turn ?? SAM,
+  ): Promise<string> {
+    rowsMade += 1;
+    const id = `out-t1436-${String(rowsMade)}`;
+    await insertRow(db.sql, "outbox_rows", {
+      id,
+      turn_id: turn === null ? null : turn.id,
+      job_id: turn === null ? `job-t1436-${String(rowsMade)}` : null,
+      recipient_handle_id: to.handleId,
+      recipient_person_id: to.personId,
+      business_id: businessId,
+      channel: to.channel,
+      send_class: "routine",
+      versions_read: refs.map((ref) => ({ table: ref.table, rowId: ref.rowId, version: ref.version })),
+      state: "sending",
+      bundle_hash: HASH,
+      bundle_build: 1,
+      trace_id: `trace-${id}`,
+    });
+    return id;
+  }
+
+  /** The rows sendState answers now for an outbox row, its whole answer checked against v1.8 (stateOf). */
+  async function versionsNow(outboxRowId: string): Promise<Named[]> {
+    return stateOf(await sendState(runtime, { outboxRowId })).currentVersions;
+  }
+
+  /** A setup row's version as the tables' owner reads it by its name alone (no bound), or null when there is no such row. */
+  async function versionOfRow(table: string, rowId: string): Promise<number | null> {
+    const home = SETUP_FACT_HOMES[table];
+    if (home === undefined) {
+      throw new Error(`no setup home ${table}`);
+    }
+    const [row] = await db.sql<{ version: number }[]>`
+      select version from ${db.sql(table)} where ${rowNameSql(db.sql, home.key)} = ${rowId}
+    `;
+    return row === undefined ? null : row.version;
+  }
+
+  /** The row's version now, which must exist: a row that finds none then finds none by its bound, never by its absence. */
+  async function existingVersionOf(table: string, rowId: string): Promise<number> {
+    const version = await versionOfRow(table, rowId);
+    if (version === null) {
+      throw new Error(`the test names a ${table} row that is not there: ${rowId}`);
+    }
+    return version;
+  }
+
+  /**
+   * readTurnState's answer (setup/turn-state.ts) for one setup row's version, read as `handleId` under `businessId`: the
+   * row's version, or null for notFound. Both calls bind a row by one function, setup/fact-homes.ts rowBound (round 2).
+   */
+  async function turnStateVersion(
+    handleId: string,
+    businessId: string | null,
+    row: Named,
+  ): Promise<number | null> {
+    const outcome = await readTurnState(runtime, {
+      handleId,
+      businessId,
+      bookingIds: [],
+      facts: [{ key: "version", table: row.table, rowId: row.rowId, column: "version" }],
+    });
+    if (!("result" in outcome)) {
+      expect(outcome, `${row.table} ${row.rowId}`).toEqual({
+        error: "notFound",
+        table: row.table,
+        rowId: row.rowId,
+      });
+      return null;
+    }
+    const [fact, ...more] = outcome.facts;
+    expect(more).toEqual([]);
+    return fact === undefined ? null : fact.version;
+  }
+
+  const keyOf = (ref: { table: string; rowId: string }): string => `${ref.table}\u0000${ref.rowId}`;
+
+  it(
+    "answers a one-column and a two-column setup row at their versions now, in versions_read's order beside a core row, and each moved version shows",
+    SLOW,
+    async () => {
+      const named: Named[] = [
+        // One column: the business's own setup row, by its business id.
+        { table: "business_setup", rowId: BARBERSHOP, version: 4 },
+        // Item 77's names: business id/flow, then (below) company id/kind id and pick id/pf key.
+        { table: "flow_defaults", rowId: `${BARBERSHOP}/A`, version: 1 },
+        { table: "persons", rowId: "person-sam", version: 1 },
+        { table: "services", rowId: "svc-lees-haircut", version: 1 },
+        { table: "company_kinds", rowId: "company-lees-barbershop/barber", version: 1 },
+        { table: "picked_kind_texts", rowId: "pick-sam-barbershop/pf.license", version: 1 },
+        // The shared catalog, one column and two (kind id/flow).
+        { table: "kinds", rowId: "barber", version: 1 },
+        { table: "kind_flows", rowId: "barber/A", version: 1 },
+        // A person's row: Sam's live session, read for his own turn.
+        { table: "sessions", rowId: "session-sam-oct26", version: 2 },
+      ];
+      const id = await outboxRowNaming(BARBERSHOP, SAM, named);
+      sent.length = 0;
+      expect(await versionsNow(id)).toEqual(named);
+
+      // The SQL builds a two-column row's name from the row's own columns and compares it whole with the rowId, beside the
+      // outbox row's business; a one-column key is compared by its column beside it too; the catalog names no business;
+      // a person's row is bound to the people of the outbox row's turn's handle.
+      const readOf = (table: string): string => {
+        const query = sent.find((text) => text.includes(`from "${table}"`));
+        if (query === undefined) {
+          throw new Error(`sendState sent no read of ${table}`);
+        }
+        return query;
+      };
+      expect(readOf("company_kinds")).toMatch(
+        /where \("company_id"::text \|\| '\/' \|\| "kind_id"::text\) = \$1\s+and "business_id" = \$2/,
+      );
+      expect(readOf("flow_defaults")).toMatch(
+        /where \("business_id"::text \|\| '\/' \|\| "flow"::text\) = \$1\s+and "business_id" = \$2/,
+      );
+      expect(readOf("services")).toMatch(/where "id" = \$1\s+and "business_id" = \$2/);
+      expect(readOf("kind_flows")).toMatch(/where \("kind_id"::text \|\| '\/' \|\| "flow"::text\) = \$1\s*$/);
+      expect(readOf("sessions")).toMatch(
+        /where "id" = \$1\s+and person_id in \(\s*select ph\.person_id from turns t join person_handles ph on ph\.handle_id = t\.handle_id where t\.id = \$2\s*\)/,
+      );
+
+      // Each row moves on, as a commit moves it: the read answers each at its new version.
+      await db.sql.begin(async (tx) => {
+        await tx`update business_setup set version = version + 1 where business_id = ${BARBERSHOP}`;
+        await tx`update flow_defaults set version = version + 1 where business_id = ${BARBERSHOP} and flow = 'A'`;
+        await tx`update persons set version = version + 1 where id = 'person-sam'`;
+        await tx`update services set version = version + 1 where id = 'svc-lees-haircut'`;
+        await tx`
+          update company_kinds set version = version + 1
+          where company_id = 'company-lees-barbershop' and kind_id = 'barber'
+        `;
+        await tx`
+          update picked_kind_texts set version = version + 1
+          where picked_kind_id = 'pick-sam-barbershop' and pf_key = 'pf.license'
+        `;
+        await tx`update kinds set version = version + 1 where id = 'barber'`;
+        await tx`update kind_flows set version = version + 1 where kind_id = 'barber' and flow = 'A'`;
+        await tx`update sessions set version = version + 1 where id = 'session-sam-oct26'`;
+      });
+      expect(await versionsNow(id)).toEqual(named.map((ref) => ({ ...ref, version: ref.version + 1 })));
+    },
+  );
+
+  it(
+    "finds none of another business's rows by their names, compared whole, and a row with no business only for an outbox row with none; the catalog answers any",
+    SLOW,
+    async () => {
+      const CATALOG = "the catalog";
+      const rows: readonly { table: string; rowId: string; of: string | null }[] = [
+        { table: "business_setup", rowId: BARBERSHOP, of: BARBERSHOP },
+        { table: "flow_defaults", rowId: `${BARBERSHOP}/B`, of: BARBERSHOP },
+        { table: "services", rowId: "svc-lees-skin-fade", of: BARBERSHOP },
+        { table: "picked_kind_texts", rowId: "pick-sam-barbershop/pf.money", of: BARBERSHOP },
+        { table: "company_kinds", rowId: "company-lee-home-services/plumber", of: HOME_SERVICES },
+        // Item 77's name with an integer key column: draft id/block.
+        { table: "new_work_draft_blocks", rowId: "draft-pack-hikes/3", of: PET_BOARDING },
+        { table: "company_kinds", rowId: EARLY_KIND, of: null },
+        { table: "kinds", rowId: "plumber", of: CATALOG },
+        { table: "kind_flows", rowId: "plumber/B", of: CATALOG },
+      ];
+      const refs: Named[] = rows.map((row) => ({ table: row.table, rowId: row.rowId, version: 1 }));
+      for (const businessId of [BARBERSHOP, HOME_SERVICES, PET_BOARDING, YOGA, null]) {
+        const expected: Named[] = [];
+        for (const row of rows) {
+          const version = await existingVersionOf(row.table, row.rowId);
+          if (row.of === businessId || row.of === CATALOG) {
+            expected.push({ table: row.table, rowId: row.rowId, version });
+          }
+        }
+        const id = await outboxRowNaming(businessId, SAM, refs);
+        expect(await versionsNow(id), `an outbox row of ${businessId ?? "no business"}`).toEqual(expected);
+      }
+
+      // A name is compared whole: the kind alone, the company alone, a trailing slash or another case finds none, under
+      // the row's own business too; the whole name finds it.
+      const plumbing = await existingVersionOf("company_kinds", "company-lee-home-services/plumber");
+      const names = [
+        "company-lee-home-services/plumber",
+        "plumber",
+        "company-lee-home-services",
+        "company-lee-home-services/plumber/",
+        "company-lee-home-services/Plumber",
+        "/company-lee-home-services/plumber",
+      ];
+      const id = await outboxRowNaming(
+        HOME_SERVICES,
+        SAM,
+        names.map((rowId) => ({ table: "company_kinds", rowId, version: 1 })),
+      );
+      expect(await versionsNow(id)).toEqual([
+        { table: "company_kinds", rowId: "company-lee-home-services/plumber", version: plumbing },
+      ]);
+    },
+  );
+
+  it(
+    "finds none of a person's rows outside T-667 round 2's rules, and answers those inside them, as readTurnState does for the turn's handle",
+    SLOW,
+    async () => {
+      interface Case {
+        readonly table: string;
+        readonly rowId: string;
+        readonly answers: boolean;
+        readonly why: string;
+      }
+      const yes = (table: string, rowId: string, why: string): Case => ({ table, rowId, answers: true, why });
+      const no = (table: string, rowId: string, why: string): Case => ({ table, rowId, answers: false, why });
+      const groups: readonly {
+        businessId: string | null;
+        turn: Turn | null;
+        to?: Recipient;
+        cases: readonly Case[];
+      }[] = [
+        {
+          businessId: BARBERSHOP,
+          turn: SAM,
+          cases: [
+            yes("accounts", "person-sam", "the turn's person's account"),
+            no("accounts", "person-tester-one", "another person's account"),
+            yes("sessions", "session-sam-oct26", "the turn's person's live session"),
+            yes("sessions", "session-sam-oct20", "the turn's person's ended session"),
+            no("sessions", "session-tester-one", "another person's session"),
+            yes("proof_codes", "code-sam-owner-email", "the person's code of the outbox row's business"),
+            yes("proof_codes", "code-sam-sign-in-oct26", "the person's code with no business"),
+            no("proof_codes", "code-jordan-sign-in-paused", "another person's code"),
+            no("proof_codes", "code-tester-one-sign-in", "another person's code with no business"),
+            no("proof_codes", CONTROL_CODE, "the business's own control code, which has no person"),
+            yes(
+              "calendar_links",
+              "callink-riley-google",
+              "another person's link shared live with the business",
+            ),
+            yes("calendar_links", "callink-sam-microsoft", "the person's own link, shared live too"),
+            yes("busy_blocks", "busy-riley-sat-nov-7", "a block of a link shared live with the business"),
+            yes(
+              "busy_blocks",
+              "busy-sam-thu-nov-12",
+              "the person's block, its link shared live with the business",
+            ),
+            no("busy_blocks", "busy-sam-movers-photo-sat-nov-14", "another business's photo block"),
+          ],
+        },
+        {
+          businessId: HOME_SERVICES,
+          turn: SAM,
+          cases: [
+            no("proof_codes", "code-sam-owner-email", "the person's code of another business"),
+            no("calendar_links", "callink-riley-google", "a link whose share with the business has ended"),
+            no(
+              "busy_blocks",
+              "busy-riley-sat-nov-7",
+              "a block of a link whose share with the business has ended",
+            ),
+            yes("busy_blocks", "busy-sam-thu-nov-12", "a block of a link shared live with the business"),
+          ],
+        },
+        {
+          businessId: MOVERS,
+          turn: SAM,
+          cases: [
+            yes("busy_blocks", "busy-sam-movers-photo-sat-nov-14", "the business's own photo block"),
+            no(
+              "busy_blocks",
+              "busy-sam-thu-nov-12",
+              "the person's own block, its link not shared with the business",
+            ),
+            yes(
+              "calendar_links",
+              "callink-sam-microsoft",
+              "the person's own link, not shared with the business",
+            ),
+            no(
+              "calendar_links",
+              "callink-riley-google",
+              "another person's link the business has no share of",
+            ),
+          ],
+        },
+        {
+          businessId: YOGA,
+          turn: RILEY,
+          cases: [
+            yes(
+              "calendar_links",
+              "callink-riley-google",
+              "the turn's person's own link, which the business has no share of",
+            ),
+            no(
+              "calendar_links",
+              "callink-sam-microsoft",
+              "another person's link the business has no share of",
+            ),
+            no("calendar_links", "callink-avery-google", "another person's link, shared only elsewhere"),
+            no("accounts", "person-sam", "another person's account"),
+            no("sessions", "session-sam-oct26", "another person's session"),
+          ],
+        },
+        {
+          businessId: null,
+          turn: SAM,
+          cases: [
+            yes("accounts", "person-sam", "the person's account, with no business"),
+            yes("sessions", "session-sam-oct26", "the person's session, with no business"),
+            yes("proof_codes", "code-sam-sign-in-oct26", "the person's code with no business, with none"),
+            no("proof_codes", "code-sam-owner-email", "the person's code of a business, with no business"),
+            no("proof_codes", CONTROL_CODE, "a control code, with no business"),
+            yes("calendar_links", "callink-sam-microsoft", "the person's own link, with no business"),
+            no(
+              "calendar_links",
+              "callink-riley-google",
+              "another person's link, though shared, with no business",
+            ),
+            no("busy_blocks", "busy-sam-thu-nov-12", "the person's own block, with no business"),
+            no("busy_blocks", "busy-sam-movers-photo-sat-nov-14", "a photo block, with no business"),
+          ],
+        },
+        {
+          businessId: null,
+          turn: TESTER,
+          cases: [
+            yes("accounts", "person-tester-one", "the tester's own account"),
+            yes("sessions", "session-tester-one", "the tester's own session"),
+            yes("proof_codes", "code-tester-one-sign-in", "the tester's own code"),
+            no("accounts", "person-sam", "another person's account"),
+            no("proof_codes", "code-sam-sign-in-oct26", "another person's code"),
+          ],
+        },
+        // Default 1: the people of the turn's handle, never the recipient's.
+        {
+          businessId: BARBERSHOP,
+          turn: RILEY,
+          to: SAM,
+          cases: [
+            no("sessions", "session-sam-oct26", "the recipient's session, in another person's turn"),
+            no("accounts", "person-sam", "the recipient's account, in another person's turn"),
+            yes("calendar_links", "callink-riley-google", "the turn's person's own link"),
+          ],
+        },
+        {
+          businessId: BARBERSHOP,
+          turn: SAM,
+          to: TO_ALEX,
+          cases: [
+            yes("sessions", "session-sam-oct26", "the turn's person's session, sent to another handle"),
+            yes("accounts", "person-sam", "the turn's person's account, sent to another handle"),
+          ],
+        },
+        // A job's row has no turn, so no person's row answers for it; a business's own rows still do.
+        {
+          businessId: MOVERS,
+          turn: null,
+          cases: [
+            no("accounts", "person-sam", "a person's account, for a row with no turn"),
+            no("sessions", "session-sam-oct26", "a person's session, for a row with no turn"),
+            no("proof_codes", "code-sam-sign-in-oct26", "a person's code, for a row with no turn"),
+            no("calendar_links", "callink-sam-microsoft", "a person's link the business has no share of"),
+            yes("busy_blocks", "busy-sam-movers-photo-sat-nov-14", "the business's own photo block"),
+          ],
+        },
+      ];
+      for (const { businessId, turn, to, cases } of groups) {
+        // Each case's row is there, so one that finds none finds none by its rule, never by its absence.
+        const now: { each: Case; ref: Named }[] = [];
+        for (const each of cases) {
+          const version = await existingVersionOf(each.table, each.rowId);
+          now.push({ each, ref: { table: each.table, rowId: each.rowId, version } });
+        }
+        const id = await outboxRowNaming(
+          businessId,
+          turn,
+          now.map(({ ref }) => ref),
+          to ?? turn ?? SAM,
+        );
+        const where = `${turn?.id ?? "a job's row"} at ${businessId ?? "no business"}`;
+        expect(await versionsNow(id), where).toEqual(
+          now.filter(({ each }) => each.answers).map(({ ref }) => ref),
+        );
+        if (turn === null) {
+          continue;
+        }
+        // readTurnState answers the turn's handle under the outbox row's business exactly so (one rowBound for both).
+        for (const { each, ref } of now) {
+          const read = await turnStateVersion(turn.handleId, businessId, ref);
+          expect(read, `${where}: ${each.why}`).toBe(each.answers ? ref.version : null);
+        }
+      }
+    },
+  );
+
+  it(
+    "holds each rule to readTurnState's: every row answers sendState as readTurnState answers the turn's handle under the outbox row's business",
+    SWEEP,
+    async () => {
+      const rows: Named[] = [
+        ...["person-sam", "person-tester-one"].map((rowId) => ({ table: "accounts", rowId, version: 1 })),
+        ...["session-sam-oct26", "session-sam-oct20", "session-tester-one"].map((rowId) => ({
+          table: "sessions",
+          rowId,
+          version: 1,
+        })),
+        ...[
+          "code-sam-owner-email",
+          "code-sam-sign-in-oct26",
+          "code-jordan-sign-in-paused",
+          "code-tester-one-sign-in",
+          CONTROL_CODE,
+        ].map((rowId) => ({ table: "proof_codes", rowId, version: 1 })),
+        ...["callink-sam-microsoft", "callink-riley-google", "callink-avery-google"].map((rowId) => ({
+          table: "calendar_links",
+          rowId,
+          version: 1,
+        })),
+        ...["busy-sam-movers-photo-sat-nov-14", "busy-riley-sat-nov-7", "busy-sam-thu-nov-12"].map(
+          (rowId) => ({
+            table: "busy_blocks",
+            rowId,
+            version: 1,
+          }),
+        ),
+        { table: "kinds", rowId: "barber", version: 1 },
+        { table: "kind_flows", rowId: "barber/A", version: 1 },
+        { table: "services", rowId: "svc-lees-haircut", version: 1 },
+        { table: "flow_defaults", rowId: `${BARBERSHOP}/A`, version: 1 },
+        { table: "company_kinds", rowId: "company-lee-home-services/plumber", version: 1 },
+        { table: "company_kinds", rowId: EARLY_KIND, version: 1 },
+        { table: "calendar_link_shares", rowId: "share-riley-barbershop", version: 1 },
+      ];
+      for (const row of rows) {
+        await existingVersionOf(row.table, row.rowId);
+      }
+      // Each table's verdicts across the sweep: true where a row answered, false where one found none.
+      const verdicts = new Map<string, Set<boolean>>();
+      for (const businessId of [BARBERSHOP, HOME_SERVICES, YOGA, MOVERS, null]) {
+        for (const turn of [SAM, RILEY, TESTER]) {
+          const answered = new Map(
+            (await versionsNow(await outboxRowNaming(businessId, turn, rows))).map((ref) => [
+              keyOf(ref),
+              ref.version,
+            ]),
+          );
+          for (const row of rows) {
+            const read = await turnStateVersion(turn.handleId, businessId, row);
+            expect(
+              answered.get(keyOf(row)) ?? null,
+              `${row.table} ${row.rowId}, ${turn.id} at ${businessId ?? "none"}`,
+            ).toBe(read);
+            verdicts.set(row.table, (verdicts.get(row.table) ?? new Set<boolean>()).add(read !== null));
+          }
+        }
+      }
+      // Every table a person's rule binds both answered and found none somewhere, so no rule was held to an empty case.
+      const bound = Object.entries(UNSCOPED_ROWS).filter(([, rule]) => rule !== "catalog");
+      expect(bound.map(([table]) => table).sort()).toEqual(
+        ["accounts", "busy_blocks", "calendar_links", "proof_codes", "sessions"].sort(),
+      );
+      for (const [table] of bound) {
+        expect([...(verdicts.get(table) ?? [])].sort(), table).toEqual([false, true]);
+      }
+    },
+  );
+
+  it(
+    "reads every setup home by its name within the bound, each a table with a version and the key its name is built from; without a bound a setup home still throws",
+    SLOW,
+    async () => {
+      const homes = Object.entries(SETUP_FACT_HOMES);
+      const catalog = await db.sql<{ name: string; key: string[]; version: string | null }[]>`
+        select c.relname::text as name,
+               array(select a.attname::text
+                     from pg_index i
+                     cross join lateral unnest(i.indkey::int2[]) with ordinality as k(attnum, ord)
+                     join pg_attribute a on a.attrelid = i.indrelid and a.attnum = k.attnum
+                     where i.indrelid = c.oid and i.indisprimary
+                     order by k.ord) as key,
+               (select format_type(a.atttypid, a.atttypmod) from pg_attribute a
+                where a.attrelid = c.oid and a.attname = 'version' and not a.attisdropped) as version
+        from pg_class c
+        join pg_namespace n on n.oid = c.relnamespace
+        where n.nspname = ${db.schema} and c.relkind in ('r', 'p')
+          and c.relname::text = any(${homes.map(([table]) => table)}::text[])
+      `;
+      expect(
+        Object.fromEntries(catalog.map((row) => [row.name, { key: row.key, version: row.version }])),
+      ).toEqual(
+        Object.fromEntries(homes.map(([table, home]) => [table, { key: [...home.key], version: "integer" }])),
+      );
+
+      // One outbox row names a row of every setup home that is not there: each home is read by its name within the
+      // bound, under a business and with none, and none answers (a table scoped none with no rule would have thrown).
+      const missing: Named[] = homes.map(([table, home]) => ({
+        table,
+        rowId: home.key.map(() => "t1436-none").join("/"),
+        version: 1,
+      }));
+      for (const businessId of [BARBERSHOP, null]) {
+        expect(
+          await versionsNow(await outboxRowNaming(businessId, SAM, missing)),
+          businessId ?? "no business",
+        ).toEqual([]);
+      }
+
+      // Without a bound (limit 4's reload), the core homes alone are read, as before T-1436, and a setup home throws.
+      expect(
+        await currentVersionsOf(runtime, [{ table: "persons", rowId: "person-alex", version: 1 }]),
+      ).toEqual([{ table: "persons", rowId: "person-alex", version: 1 }]);
+      await expect(
+        currentVersionsOf(runtime, [{ table: "services", rowId: "svc-lees-haircut", version: 1 }]),
+      ).rejects.toThrow("versions_read names services, a setup home read only within an outbox row's bound");
+
+      // A table that is no home still throws: setup tables never a fact (the Tool API never reads them, or they carry no
+      // version) and the sealing keys.
+      for (const table of ["sign_in_attempts", "staging_testers", "item_services", "sealing_keys"]) {
+        const id = await outboxRowNaming(BARBERSHOP, SAM, [{ table, rowId: "t1436-none", version: 1 }]);
+        await expect(sendState(runtime, { outboxRowId: id }), table).rejects.toThrow(
+          `versions_read names ${table}, which is not a versioned home sendState reads`,
+        );
+      }
+    },
+  );
+
+  // Round 2 (DL-938, DL-941): sendState, readTurnState and fireClock bind a setup row by one function, rowBound, each
+  // with its own business and people; a table that is no setup home has no bound, so it is refused, never read unbound.
+  it("refuses in rowBound, the one bound every reader calls, a table that is no setup home, with nothing sent", () => {
+    const nobody = runtime`(select ph.person_id from person_handles ph where false)`;
+    sent.length = 0;
+    for (const table of [
+      "persons",
+      "outbox_rows",
+      "sign_in_attempts",
+      "staging_testers",
+      "item_services",
+      "sealing_keys",
+      "no_such_table",
+      "__proto__",
+      "toString",
+    ]) {
+      for (const businessId of [BARBERSHOP, null]) {
+        expect(() => rowBound(runtime, table, businessId, nobody), table).toThrow(
+          `rowBound: ${table} is not a setup home`,
+        );
+      }
+    }
+    expect(sent).toEqual([]);
   });
 });

@@ -29,29 +29,36 @@ import {
 
 const SCRIPT = "make-staging-secrets.sh";
 // The names the script makes, in its order, and what stands before the base64 in each one's form. PROOF_CODE_HASH_KEY
-// joined with ADR-016's sign-in by code (T-1276): 32 random bytes as base64, as SEALING_WRAP_KEY.
-const NAMES = ["SEALING_WRAP_KEY", "LINQ_WEBHOOK_SECRET", "PROOF_CODE_HASH_KEY"];
-const PREFIX = { SEALING_WRAP_KEY: "", LINQ_WEBHOOK_SECRET: "whsec_", PROOF_CODE_HASH_KEY: "" };
+// joined with ADR-016's sign-in by code (T-1276): 32 random bytes as base64, as SEALING_WRAP_KEY. TEST_PHONE_WEBHOOK_SECRET
+// took LINQ_WEBHOOK_SECRET's place with staging's real Linq line (T-572, DL-940): the test-phone page's own signing
+// secret, "whsec_" and base64, the form LINQ_WEBHOOK_SECRET was made in.
+const NAMES = ["SEALING_WRAP_KEY", "TEST_PHONE_WEBHOOK_SECRET", "PROOF_CODE_HASH_KEY"];
+const PREFIX = { SEALING_WRAP_KEY: "", TEST_PHONE_WEBHOOK_SECRET: "whsec_", PROOF_CODE_HASH_KEY: "" };
+// Linq's own since T-572 (K-11 default 1): linq-staging-check.sh --create puts it from Linq's answer, and this script
+// never makes it, so no run here can replace it.
+const LINQS = "LINQ_WEBHOOK_SECRET";
 // The vendor's key staging reads too: put by secrets:staging from .dev.vars, never made.
 const MODEL_KEY = "ANTHROPIC_API_KEY";
-// The names staging holds since T-1236's live run (DL-518): the model key and the two made then, which are never
-// replaced (DL-495).
-const HELD_NOW = [MODEL_KEY, "SEALING_WRAP_KEY", "LINQ_WEBHOOK_SECRET"];
-// The names secrets:staging puts from .dev.vars for sign-in by code (ADR-016 section 5): Resend's send-only key and the
-// testers' inbox list. Neither is ever made here.
-const GIVEN_NAMES = ["RESEND_API_KEY", "STAGING_TEST_INBOXES"];
+// The names staging holds today: the model key and SEALING_WRAP_KEY and LINQ_WEBHOOK_SECRET since T-1236's live run
+// (DL-518), PROOF_CODE_HASH_KEY since ADR-016's; none is ever replaced from here (DL-495).
+const HELD_NOW = [MODEL_KEY, "SEALING_WRAP_KEY", LINQS, "PROOF_CODE_HASH_KEY"];
+// The names secrets:staging puts from .dev.vars: for sign-in by code (ADR-016 section 5), Resend's send-only key and the
+// testers' inbox list; for staging's real Linq line (T-572), Linq's key and the roster. None is ever made here.
+const GIVEN_NAMES = ["RESEND_API_KEY", "STAGING_TEST_INBOXES", "LINQ_API_TOKEN", "STAGING_LINQ_ALLOWLIST"];
 
 // Made-up values a checkout's .dev.vars may hold under the names, in the forms the code reads them in.
 const DEV_VALUES = {
   SEALING_WRAP_KEY: Buffer.alloc(32, 0x5a).toString("base64"),
-  LINQ_WEBHOOK_SECRET: `whsec_${Buffer.from("t1236 made-up webhook signing bytes 0001").toString("base64")}`,
+  TEST_PHONE_WEBHOOK_SECRET: `whsec_${Buffer.from("t572 made-up test-phone signing bytes 01").toString("base64")}`,
   PROOF_CODE_HASH_KEY: Buffer.alloc(32, 0x6c).toString("base64"),
+  [LINQS]: `whsec_${Buffer.from("t1236 made-up webhook signing bytes 0001").toString("base64")}`,
 };
 // Other made-up values under the same names, as the caller's shell might hold them: never put, never counted.
 const SHELL_VALUES = {
   SEALING_WRAP_KEY: Buffer.alloc(32, 0x33).toString("base64"),
-  LINQ_WEBHOOK_SECRET: `whsec_${Buffer.from("t1236 another made-up signing secret 0002").toString("base64")}`,
+  TEST_PHONE_WEBHOOK_SECRET: `whsec_${Buffer.from("t572 another made-up page secret 0002").toString("base64")}`,
   PROOF_CODE_HASH_KEY: Buffer.alloc(32, 0x44).toString("base64"),
+  [LINQS]: `whsec_${Buffer.from("t1236 another made-up signing secret 0002").toString("base64")}`,
 };
 // Lines of other names in the same .dev.vars: the script reads none of them. The inbox list's addresses are made up, on
 // domains kept for examples (rule 9).
@@ -86,10 +93,11 @@ const devVars = (values = {}) =>
     `${MODEL_KEY}=${MODEL_VALUE}`,
     `STAGING_TEST_INBOXES=${INBOX_VALUE}`,
     ...("SEALING_WRAP_KEY" in values ? [`SEALING_WRAP_KEY="${values.SEALING_WRAP_KEY}"`] : []),
-    ...("LINQ_WEBHOOK_SECRET" in values
-      ? [`  export LINQ_WEBHOOK_SECRET='${values.LINQ_WEBHOOK_SECRET}'`]
+    ...("TEST_PHONE_WEBHOOK_SECRET" in values
+      ? [`  export TEST_PHONE_WEBHOOK_SECRET='${values.TEST_PHONE_WEBHOOK_SECRET}'`]
       : []),
     ...("PROOF_CODE_HASH_KEY" in values ? [`PROOF_CODE_HASH_KEY=${values.PROOF_CODE_HASH_KEY}`] : []),
+    ...(LINQS in values ? [`${LINQS}=${values[LINQS]}`] : []),
     "",
   ].join("\n");
 
@@ -219,7 +227,9 @@ function checkout(t, { devVars: text, mode, files = {}, staging = [MODEL_KEY], r
   if (random !== undefined) write(randomFile, random);
   /** Runs the script; `bash` holds options for bash itself (-x). This shell's values of the names never reach it. */
   const run = (args = [], extra = {}, { bash = [] } = {}) => {
-    const unset = Object.fromEntries([...NAMES, MODEL_KEY, ...GIVEN_NAMES].map((name) => [name, undefined]));
+    const unset = Object.fromEntries(
+      [...NAMES, LINQS, MODEL_KEY, ...GIVEN_NAMES].map((name) => [name, undefined]),
+    );
     const result = spawnSync("bash", [...bash, script, ...args], {
       cwd: root,
       encoding: "utf8",
@@ -300,7 +310,7 @@ function assertForm(name, value) {
   if (name === "SEALING_WRAP_KEY") {
     assert.equal(atob(value.trim()).length, wrappingKeyBytes(), `${name}: the length sealing.ts takes`);
   }
-  if (name === "LINQ_WEBHOOK_SECRET") {
+  if (name === "TEST_PHONE_WEBHOOK_SECRET") {
     assert.ok(linqKeyBase64().test(text), `${name}: not the base64 hmac.ts takes after whsec_`);
   }
 }
@@ -328,7 +338,7 @@ function assertNothingHandedOn(rig, what, names = []) {
     assert.deepEqual(entry.envHoldingValue, [], `${which}: a variable of its environment holds a value`);
     assert.equal(entry.argsHoldingValue, 0, `${which}: an argument holds a value`);
     assert.deepEqual(
-      [...NAMES, ...names].filter((name) => entry.envNames.includes(name)),
+      [...NAMES, LINQS, ...names].filter((name) => entry.envNames.includes(name)),
       [],
       `${which}: its environment has a variable of a secret's name or of the script's own`,
     );
@@ -455,12 +465,12 @@ describe("make-staging-secrets.sh (npm run secrets:staging:make) makes a missing
     assertNothingHandedOn(two, "two of the names");
     const rig = checkout(t, { devVars: devVars() });
     const result = rig.run([
-      "LINQ_WEBHOOK_SECRET",
+      "TEST_PHONE_WEBHOOK_SECRET",
       "PROOF_CODE_HASH_KEY",
       "--env",
       "staging",
       "SEALING_WRAP_KEY",
-      "LINQ_WEBHOOK_SECRET",
+      "TEST_PHONE_WEBHOOK_SECRET",
     ]);
     assertAllMade(rig, result, "every name, one of them twice");
     assert.equal(rig.generated(), NAMES.length);
@@ -510,9 +520,9 @@ describe("make-staging-secrets.sh leaves a name alone", () => {
   it("a name secret list already shows is left as it is: nothing is made or put for it", (t) => {
     for (const set of [
       ["SEALING_WRAP_KEY"],
-      ["LINQ_WEBHOOK_SECRET"],
+      ["TEST_PHONE_WEBHOOK_SECRET"],
       ["PROOF_CODE_HASH_KEY"],
-      ["SEALING_WRAP_KEY", "LINQ_WEBHOOK_SECRET"],
+      ["SEALING_WRAP_KEY", "TEST_PHONE_WEBHOOK_SECRET"],
       NAMES,
     ]) {
       const what = `staging holds ${set.join(" and ")}`;
@@ -536,21 +546,23 @@ describe("make-staging-secrets.sh leaves a name alone", () => {
     }
   });
 
-  it("staging as T-1236's live run left it (DL-518): SEALING_WRAP_KEY and LINQ_WEBHOOK_SECRET are left as they are, and PROOF_CODE_HASH_KEY alone is made and put", (t) => {
-    const newOneMade = made(["PROOF_CODE_HASH_KEY"]);
-    const heldTwo = `${ALREADY("SEALING_WRAP_KEY")}${ALREADY("LINQ_WEBHOOK_SECRET")}`;
+  it("staging as the live runs left it (DL-518, ADR-016): SEALING_WRAP_KEY and PROOF_CODE_HASH_KEY are left as they are, TEST_PHONE_WEBHOOK_SECRET alone is made and put, and LINQ_WEBHOOK_SECRET is never touched (T-572)", (t) => {
+    const held = ALREADY("SEALING_WRAP_KEY");
+    const newOneMade = made(["TEST_PHONE_WEBHOOK_SECRET"]);
+    const heldLast = ALREADY("PROOF_CODE_HASH_KEY");
     // [title, the values .dev.vars has, the caller's own variables]
     for (const [what, values, caller] of [
-      // The build Mac's .dev.vars as ADR-016's live run finds it: the vendors' keys and the inbox list, and no line for
-      // a name made here.
+      // The build Mac's .dev.vars as T-572's live run finds it: the vendors' keys, the inbox list and the roster, and no
+      // line for a name made here.
       ["the build Mac's .dev.vars", {}, {}],
-      // An old local copy of the two held names in .dev.vars, and another tool's values of every name in the caller's
-      // shell: neither ever replaces what staging holds, and neither is put.
+      // An old local copy of the held names in .dev.vars, LINQ_WEBHOOK_SECRET's among them, and another tool's values of
+      // every name in the caller's shell: none ever replaces what staging holds, and none is put.
       [
         "values of the held names in .dev.vars and of every name in the caller's shell",
         {
           SEALING_WRAP_KEY: DEV_VALUES.SEALING_WRAP_KEY,
-          LINQ_WEBHOOK_SECRET: DEV_VALUES.LINQ_WEBHOOK_SECRET,
+          PROOF_CODE_HASH_KEY: DEV_VALUES.PROOF_CODE_HASH_KEY,
+          [LINQS]: DEV_VALUES[LINQS],
         },
         SHELL_VALUES,
       ],
@@ -558,17 +570,18 @@ describe("make-staging-secrets.sh leaves a name alone", () => {
       const rig = checkout(t, { devVars: devVars(values), staging: HELD_NOW });
       const result = rig.run([], caller);
       assert.equal(result.status, 0, `${what}: ${result.output}`);
-      assert.equal(result.stdout, `${heldTwo}${newOneMade}`, what);
+      assert.equal(result.stdout, `${held}${newOneMade}${heldLast}`, what);
       assert.equal(result.stderr, "", what);
-      // One list and one put, of the new name alone: no put of a held name, so neither is replaced.
+      // One list and one put, of the new name alone: no put of a held name, and none of Linq's own, so none is replaced.
       assert.deepEqual(
         rig.calls().map((call) => call.args),
-        [listArgs(rig), putArgs(rig, "PROOF_CODE_HASH_KEY")],
+        [listArgs(rig), putArgs(rig, "TEST_PHONE_WEBHOOK_SECRET")],
         what,
       );
+      assert.equal(result.output.includes(LINQS), false, `${what}: Linq's own is named`);
       assert.equal(rig.generated(), 1, `${what}: values made`);
       const [value] = rig.puts().map((call) => call.stdin);
-      assertForm("PROOF_CODE_HASH_KEY", value);
+      assertForm("TEST_PHONE_WEBHOOK_SECRET", value);
       assert.equal(
         GIVEN_VALUES.includes(value),
         false,
@@ -576,7 +589,7 @@ describe("make-staging-secrets.sh leaves a name alone", () => {
       );
       assertNoValueShown(result, [value], what);
       assertNothingHandedOn(rig, what);
-      assert.deepEqual(rig.held(), [...HELD_NOW, "PROOF_CODE_HASH_KEY"], what);
+      assert.deepEqual(rig.held(), [...HELD_NOW, "TEST_PHONE_WEBHOOK_SECRET"], what);
       // A second run, as DL-495's check of secret list before any re-run expects: all three already set, nothing made.
       const again = rig.run([], caller);
       assert.equal(again.status, 0, `${what}, again: ${again.output}`);
@@ -584,22 +597,22 @@ describe("make-staging-secrets.sh leaves a name alone", () => {
       assert.equal(again.stderr, "", `${what}, again`);
       assert.deepEqual(
         rig.calls().map((call) => call.args),
-        [listArgs(rig), putArgs(rig, "PROOF_CODE_HASH_KEY"), listArgs(rig)],
+        [listArgs(rig), putArgs(rig, "TEST_PHONE_WEBHOOK_SECRET"), listArgs(rig)],
         `${what}, again`,
       );
       assert.equal(rig.generated(), 1, `${what}, again: a value was made`);
       assertNoValueShown(again, [value], `${what}, again`);
       assertNothingHandedOn(rig, `${what}, both runs`);
     }
-    // A value for the new name in .dev.vars is not used, and the name is not made while its line is there; the two held
+    // A value for the new name in .dev.vars is not used, and the name is not made while its line is there; the held
     // names are still left alone.
     const rig = checkout(t, {
-      devVars: devVars({ PROOF_CODE_HASH_KEY: DEV_VALUES.PROOF_CODE_HASH_KEY }),
+      devVars: devVars({ TEST_PHONE_WEBHOOK_SECRET: DEV_VALUES.TEST_PHONE_WEBHOOK_SECRET }),
       staging: HELD_NOW,
     });
     const result = rig.run();
     assert.equal(result.status, 3, result.output);
-    assert.equal(result.stdout, `${heldTwo}${LEFT("PROOF_CODE_HASH_KEY")}`);
+    assert.equal(result.stdout, `${held}${LEFT("TEST_PHONE_WEBHOOK_SECRET")}${heldLast}`);
     assert.equal(result.stderr, leftNote(1, NAMES.length));
     assert.deepEqual(
       rig.calls().map((call) => call.args),
@@ -609,6 +622,21 @@ describe("make-staging-secrets.sh leaves a name alone", () => {
     assertNoValueShown(result, [], "a value of the new name in .dev.vars");
     assertNothingHandedOn(rig, "a value of the new name in .dev.vars");
     assert.deepEqual(rig.held(), HELD_NOW);
+  });
+
+  it("a staging without LINQ_WEBHOOK_SECRET is never given one from here: Linq's own is not on the list, made or put (T-572)", (t) => {
+    const rig = checkout(t, { devVars: devVars({ [LINQS]: DEV_VALUES[LINQS] }), staging: [MODEL_KEY] });
+    const result = rig.run();
+    const values = assertAllMade(rig, result, "a staging that holds no LINQ_WEBHOOK_SECRET");
+    assert.equal(result.stderr, "");
+    assert.equal(result.output.includes(LINQS), false, "Linq's own is named");
+    assert.deepEqual(
+      rig.puts().filter((call) => call.args.includes(LINQS)),
+      [],
+      "a put of Linq's own",
+    );
+    assert.deepEqual(rig.held(), [MODEL_KEY, ...NAMES]);
+    assertNoValueShown(result, values, "a staging that holds no LINQ_WEBHOOK_SECRET");
   });
 
   it("a second run finds what the first one set: every name is already set, and no value is made again", (t) => {
@@ -632,13 +660,13 @@ describe("make-staging-secrets.sh leaves a name alone", () => {
     // [the names .dev.vars has a value for, the names given as arguments]
     for (const [inFile, args] of [
       [["SEALING_WRAP_KEY"], []],
-      [["LINQ_WEBHOOK_SECRET"], []],
+      [["TEST_PHONE_WEBHOOK_SECRET"], []],
       [["PROOF_CODE_HASH_KEY"], []],
       [NAMES, []],
-      [NAMES, ["LINQ_WEBHOOK_SECRET"]],
+      [NAMES, ["TEST_PHONE_WEBHOOK_SECRET"]],
       [
         ["SEALING_WRAP_KEY", "PROOF_CODE_HASH_KEY"],
-        ["PROOF_CODE_HASH_KEY", "LINQ_WEBHOOK_SECRET"],
+        ["PROOF_CODE_HASH_KEY", "TEST_PHONE_WEBHOOK_SECRET"],
       ],
     ]) {
       const what = `.dev.vars has ${inFile.join(" and ")}; arguments ${JSON.stringify(args)}`;
@@ -713,7 +741,7 @@ describe("make-staging-secrets.sh leaves a name alone", () => {
     assert.equal(result.status, 3, result.output);
     assert.equal(
       result.stdout,
-      `${ALREADY("SEALING_WRAP_KEY")}${LEFT("LINQ_WEBHOOK_SECRET")}${LEFT("PROOF_CODE_HASH_KEY")}`,
+      `${ALREADY("SEALING_WRAP_KEY")}${LEFT("TEST_PHONE_WEBHOOK_SECRET")}${LEFT("PROOF_CODE_HASH_KEY")}`,
     );
     assert.equal(result.stderr, leftNote(2, NAMES.length));
     assert.deepEqual(
@@ -807,7 +835,7 @@ describe("make-staging-secrets.sh refuses", () => {
     }
   });
 
-  it("a name that is not on its list, before anything is read, listed or made: a vendor's key is never made", (t) => {
+  it("a name that is not on its list, before anything is read, listed or made: a vendor's key, Linq's own or the roster is never made", (t) => {
     const readable = checkout(t, { devVars: devVars() });
     const unreadable = checkout(t, { devVars: devVars(), mode: 0o000 });
     const modelKey = /^export const KEY_VARIABLE = "([A-Z][A-Z0-9_]*)";$/m.exec(
@@ -815,7 +843,7 @@ describe("make-staging-secrets.sh refuses", () => {
     );
     assert.ok(modelKey, 'ai/src/gateway/gateway.ts no longer holds: export const KEY_VARIABLE = "<NAME>";');
     assert.equal(modelKey[1], MODEL_KEY);
-    const pasted = SHELL_VALUES.LINQ_WEBHOOK_SECRET;
+    const pasted = SHELL_VALUES.TEST_PHONE_WEBHOOK_SECRET;
     // [arguments, the argument that is off the list]
     const cases = [
       [[MODEL_KEY], MODEL_KEY],
@@ -824,7 +852,12 @@ describe("make-staging-secrets.sh refuses", () => {
       [["PROOF_CODE_HASH_KEY", "RESEND_API_KEY"], "RESEND_API_KEY"],
       [["STRIPE_WEBHOOK_SECRET"], "STRIPE_WEBHOOK_SECRET"],
       [["SEALING_WRAP_KEY", MODEL_KEY], MODEL_KEY],
-      [[MODEL_KEY, "LINQ_WEBHOOK_SECRET"], MODEL_KEY],
+      [[MODEL_KEY, "TEST_PHONE_WEBHOOK_SECRET"], MODEL_KEY],
+      // Linq's own since T-572: never made here, so a make run can never replace the secret Linq gave.
+      [[LINQS], LINQS],
+      [["SEALING_WRAP_KEY", LINQS], LINQS],
+      [["LINQ_API_TOKEN"], "LINQ_API_TOKEN"],
+      [["STAGING_LINQ_ALLOWLIST"], "STAGING_LINQ_ALLOWLIST"],
       [["--env", "staging", "SEALING_WRAP_KEY", "OTHER_NAME"], "OTHER_NAME"],
       [["sealing_wrap_key"], "sealing_wrap_key"],
       [["proof_code_hash_key"], "proof_code_hash_key"],
@@ -851,7 +884,7 @@ describe("make-staging-secrets.sh refuses", () => {
         assert.equal(result.status, 1, `${what}: ${result.output}`);
         assert.equal(
           result.stderr,
-          "make-staging-secrets.sh: refused: an argument is not a name this script makes (it makes SEALING_WRAP_KEY LINQ_WEBHOOK_SECRET PROOF_CODE_HASH_KEY; arguments are never echoed): a vendor's key, or any other name, is never made here; nothing was read, listed or made\n",
+          "make-staging-secrets.sh: refused: an argument is not a name this script makes (it makes SEALING_WRAP_KEY TEST_PHONE_WEBHOOK_SECRET PROOF_CODE_HASH_KEY; arguments are never echoed): a vendor's key, or any other name, is never made here; nothing was read, listed or made\n",
           what,
         );
         assert.equal(result.stdout, "", what);
@@ -863,7 +896,7 @@ describe("make-staging-secrets.sh refuses", () => {
 
   it("an option it does not take (exit 2), never echoed, before anything is read", (t) => {
     const rig = checkout(t, { devVars: devVars(), mode: 0o000 });
-    const pasted = SHELL_VALUES.LINQ_WEBHOOK_SECRET;
+    const pasted = SHELL_VALUES.TEST_PHONE_WEBHOOK_SECRET;
     for (const args of [
       ["--bogus"],
       ["-e", "production"],
@@ -881,7 +914,7 @@ describe("make-staging-secrets.sh refuses", () => {
       assert.equal(
         result.stderr,
         "make-staging-secrets.sh: an option it does not take (arguments are never echoed)\n" +
-          "usage: make-staging-secrets.sh [--env staging] [NAME ...]   (names: SEALING_WRAP_KEY LINQ_WEBHOOK_SECRET PROOF_CODE_HASH_KEY)\n",
+          "usage: make-staging-secrets.sh [--env staging] [NAME ...]   (names: SEALING_WRAP_KEY TEST_PHONE_WEBHOOK_SECRET PROOF_CODE_HASH_KEY)\n",
         what,
       );
       assert.equal(result.stdout, "", what);
@@ -969,8 +1002,8 @@ describe("make-staging-secrets.sh refuses", () => {
       { name: MODEL_KEY, type: "secret_text" },
       { name: "SEALING_WRAP_KEY", type: "secret_text" },
       { name: "sealing_wrap_key" },
-      { name: "LINQ_WEBHOOK_SECRET_OLD" },
-      { name: " LINQ_WEBHOOK_SECRET" },
+      { name: "TEST_PHONE_WEBHOOK_SECRET_OLD" },
+      { name: " TEST_PHONE_WEBHOOK_SECRET" },
       { name: "a name with spaces" },
       { name: "PROOF_CODE_HASH_KEY_2" },
       { name: "proof_code_hash_key" },
@@ -985,13 +1018,13 @@ describe("make-staging-secrets.sh refuses", () => {
     assert.equal(result.status, 0, result.output);
     assert.equal(
       result.stdout,
-      `${ALREADY("SEALING_WRAP_KEY")}${made(["LINQ_WEBHOOK_SECRET", "PROOF_CODE_HASH_KEY"])}`,
+      `${ALREADY("SEALING_WRAP_KEY")}${made(["TEST_PHONE_WEBHOOK_SECRET", "PROOF_CODE_HASH_KEY"])}`,
     );
     // The list's own words on standard error reach the terminal as they are: a list holds no value.
     assert.equal(result.stderr, "fake wrangler: a warning\n");
     assert.deepEqual(
       rig.calls().map((call) => call.args),
-      [listArgs(rig), putArgs(rig, "LINQ_WEBHOOK_SECRET"), putArgs(rig, "PROOF_CODE_HASH_KEY")],
+      [listArgs(rig), putArgs(rig, "TEST_PHONE_WEBHOOK_SECRET"), putArgs(rig, "PROOF_CODE_HASH_KEY")],
     );
     assert.equal(rig.generated(), 2);
   });
@@ -1060,7 +1093,7 @@ describe("make-staging-secrets.sh when a put fails", () => {
   it("stops there: the names before it stay set, the ones after it are not tried, and the value is taken out of wrangler's words", (t) => {
     // The value is known here, and holds every sign base64 has (+, / and =), so the test can look for it.
     const rig = checkout(t, { devVars: devVars(), random: KNOWN_BYTES });
-    const result = rig.run([], { FAKE_FAIL_AT: "LINQ_WEBHOOK_SECRET" });
+    const result = rig.run([], { FAKE_FAIL_AT: "TEST_PHONE_WEBHOOK_SECRET" });
     assert.equal(result.status, 1, result.output);
     assert.equal(result.stdout, made(["SEALING_WRAP_KEY"]));
     // Both streams of wrangler, with the value taken out with and without its prefix, then the script's own line.
@@ -1069,10 +1102,10 @@ describe("make-staging-secrets.sh when a put fails", () => {
       result.stderr,
       /^fake wrangler: was given \[value not shown\], key bytes \[value not shown\]$/m,
     );
-    assert.match(result.stderr, /^fake wrangler: secret put LINQ_WEBHOOK_SECRET failed$/m);
+    assert.match(result.stderr, /^fake wrangler: secret put TEST_PHONE_WEBHOOK_SECRET failed$/m);
     assert.match(
       result.stderr,
-      /^make-staging-secrets\.sh: wrangler secret put LINQ_WEBHOOK_SECRET --env staging failed \(exit 1, for the reason above\): LINQ_WEBHOOK_SECRET was not put, and no name after it was tried; the names printed as made and set stay set\. The value made for it is dropped\. Once the cause is fixed, run it again\.$/m,
+      /^make-staging-secrets\.sh: wrangler secret put TEST_PHONE_WEBHOOK_SECRET --env staging failed \(exit 1, for the reason above\): TEST_PHONE_WEBHOOK_SECRET was not put, and no name after it was tried; the names printed as made and set stay set\. The value made for it is dropped\. Once the cause is fixed, run it again\.$/m,
     );
     assert.deepEqual(
       rig.puts().map((call) => call.stdin),
@@ -1087,7 +1120,7 @@ describe("make-staging-secrets.sh when a put fails", () => {
     const rig = checkout(t, { devVars: devVars(), random: KNOWN_BYTES });
     const result = rig.run([], { FAKE_FAIL_AT: "PROOF_CODE_HASH_KEY" });
     assert.equal(result.status, 1, result.output);
-    assert.equal(result.stdout, made(["SEALING_WRAP_KEY", "LINQ_WEBHOOK_SECRET"]));
+    assert.equal(result.stdout, made(["SEALING_WRAP_KEY", "TEST_PHONE_WEBHOOK_SECRET"]));
     assert.match(result.stderr, /^fake wrangler: was given \[value not shown\]$/m);
     assert.match(
       result.stderr,
@@ -1103,7 +1136,7 @@ describe("make-staging-secrets.sh when a put fails", () => {
       [KNOWN_BYTES, `whsec_${KNOWN_BYTES}`, KNOWN_BYTES],
     );
     assertNoValueShown(result, [KNOWN_BYTES], "a failed last put");
-    assert.deepEqual(rig.held(), [MODEL_KEY, "SEALING_WRAP_KEY", "LINQ_WEBHOOK_SECRET"]);
+    assert.deepEqual(rig.held(), [MODEL_KEY, "SEALING_WRAP_KEY", "TEST_PHONE_WEBHOOK_SECRET"]);
     assertNothingHandedOn(rig, "a failed last put");
   });
 
@@ -1265,7 +1298,7 @@ describe("make-staging-secrets.sh hands no variable of its own on to what it sta
     // whatever the script next kept in it.
     const caller = Object.fromEntries(names.map((name) => [name, `t1236 made-up caller text, ${name}`]));
     // .dev.vars has a value for no name, with lines for each that load_dev_var matches and reads.
-    const text = `${devVars()}SEALING_WRAP_KEY=\nLINQ_WEBHOOK_SECRET=''\nPROOF_CODE_HASH_KEY=""\n`;
+    const text = `${devVars()}SEALING_WRAP_KEY=\nTEST_PHONE_WEBHOOK_SECRET=''\nPROOF_CODE_HASH_KEY=""\n`;
     const rig = checkout(t, { devVars: text });
     assertRunHandsNothingOn(rig, rig.run([], caller), names, "the caller's variables");
   });
@@ -1367,7 +1400,7 @@ describe("make-staging-secrets.sh's names are staging's own, and the ones the ru
     return [...names][0];
   };
 
-  it("the wrapping key the seal call reads, the Linq webhook secret and the proof-code hash key K-22's rows name, each on secrets:staging's list too; the vendors' keys and the inbox list are not made", (t) => {
+  it("the wrapping key the seal call reads, the test-phone page's signing secret and the proof-code hash key K-22's rows name, each on secrets:staging's list too; the vendors' keys, Linq's own, the inbox list and the roster are not made", (t) => {
     // The script's names, from a run on a staging that holds nothing: each is made, in its order.
     const rig = checkout(t, { staging: [] });
     const result = rig.run();
@@ -1381,13 +1414,18 @@ describe("make-staging-secrets.sh's names are staging's own, and the ones the ru
           // T-182 and T-553: the environment key that wraps each person's sealing key.
           nameIn("db/repo/sealing.ts", "DEFAULT_WRAPPING_KEY_NAME"),
           nameIn("runtime/src/wiring/real.ts", "SEALING_WRAP_KEY"),
-          // T-552 and T-412: the secret the Linq verify reads, which the test-phone page's Linq double signs with.
-          nameIn("runtime/src/wiring/real.ts", "LINQ_WEBHOOK_SECRET"),
+          // DL-940: the test-phone page's own signing secret once staging is on the real Linq line (K-11's doubleWebhook
+          // row). T-1449 builds the code that reads it, beside T-572, so its name is the one DL-940 fixed.
+          "TEST_PHONE_WEBHOOK_SECRET",
           // ADR-016 section 4 (T-1276): the key a sign-in code's and a typed contact's hash are made under.
           proofCodeHashKeyName(),
         ]),
       ].sort(),
     );
+    // T-552 and T-412: the secret the Linq verify reads is Linq's own since T-572 (K-11 default 1), never made here.
+    const linqs = nameIn("runtime/src/wiring/real.ts", "LINQ_WEBHOOK_SECRET");
+    assert.equal(linqs, LINQS);
+    assert.equal(names.includes(linqs), false, "Linq's own signing secret is made here");
     // Each is on put-staging-secrets.sh's list too, which prints it as made in place, never put, and never takes its
     // value from .dev.vars (T-1261; DL-549): so a value there is not used, as this script says (T-1310).
     const block = /^SECRETS=\(\n([\s\S]*?)\n\)$/m.exec(

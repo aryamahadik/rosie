@@ -15,10 +15,12 @@ import { isDeepStrictEqual } from "node:util";
 
 import type { CatalogRead } from "../../../../../db/repo/catalog-reads";
 import type { Sql } from "../../../../../db/repo/scope";
+import type { SetupTurnStateOutcome } from "../../../../../db/repo/setup/turn-state";
+import type { FactValue, ReadTurnStateRequest } from "../../../../../db/repo/turn-state";
 import { insertRow } from "../../../commit/pg/test-support";
 import { contractFile } from "../../../tool-api/test-support";
 import { seedRows, type SeedRow } from "../test-support";
-import type { CatalogK05Reads } from "./reads";
+import type { CatalogK05Reads, CatalogReadName } from "./reads";
 
 /** The K-05 version whose catalog reads the binding binds. */
 export const VERSION = "v1.18";
@@ -132,17 +134,32 @@ export function rowsOf(file: string): SeedRow[] {
 
 /**
  * Every accepted v1.18 exchange's world at once, each seed file once (K-25's withdrawn price beside them, as T-1428's
- * world has it), then every noted row: the barbershop, Lee Home Services, the yoga studio and the movers.
+ * world has it), then every noted row: the barbershop, Lee Home Services, the yoga studio and the movers. `more` adds
+ * other seed files (paths under contracts/db-schema/) to the same set, each file once.
  */
-export function worldRows(): SeedRow[] {
+export function worldRows(more: readonly string[] = []): SeedRow[] {
   const files = [
     ...new Set([
       ...acceptedCatalogFiles().flatMap((file) => seedFilesOf(catalogExchange(file).given)),
       "services-prices/fixtures/seed-price-withdrawn-before-start.json",
+      ...more,
     ]),
   ];
   return [...seedRows(files), ...Object.values(NOTED_ROWS).flat()];
 }
+
+/**
+ * The seeds the reads of a row by id meet beside the world (T-1433): K-04's resources (the barbershop's Riley and Avery,
+ * the yoga studio's Maya and its room, the movers' trucks) and the pet boarding inn's spaces and their links (K-23
+ * seed-place-or-thing through K-25 seed-item-services).
+ */
+export const ROW_BY_ID_SEEDS = [
+  "core/fixtures/seed-resources.json",
+  "services-prices/fixtures/seed-item-services.json",
+] as const;
+
+/** The handle the reads of a row by id are made for: Sam's, the owner of the shops (K-04 seed-person-roles). */
+export const SAM_HANDLE = "handle-sam";
 
 // ---- comparing answers --------------------------------------------------------------------------------------------------
 
@@ -153,9 +170,13 @@ const isRecord = (value: unknown): value is Row =>
 
 const textOf = (value: unknown): string => (typeof value === "string" ? value : "");
 
-/** A row's sort key: its id, or a kind's company and kind. */
+/** A row's sort key: its id, else its item 77 name (a kind, a kind_flows row, a flow default), else a kind's key. */
 const keyOf = (row: Row): string =>
-  typeof row.id === "string" ? row.id : `${textOf(row.companyId)}/${textOf(row.kindId)}`;
+  typeof row.id === "string"
+    ? row.id
+    : typeof row.rowId === "string"
+      ? row.rowId
+      : `${textOf(row.companyId)}/${textOf(row.kindId)}`;
 
 /** Every list of rows in an answer in one order (the port names none), so two readings compare row by row. */
 export function ordered(value: unknown): unknown {
@@ -192,17 +213,84 @@ export async function thrownBy(promise: Promise<unknown>): Promise<unknown> {
 
 /** One read the fake was asked, as asked. */
 export interface K05Ask {
-  readonly call: CatalogRead;
+  readonly call: CatalogReadName;
   readonly request: unknown;
 }
 
+/** The tables the binding reads a row of by id, each scoped by its business_id (T-667's setup homes; K-04 resources). */
+const ROW_BY_ID_TABLES: ReadonlySet<string> = new Set(["locations", "resources", "places_or_things"]);
+
+/**
+ * K-05 v1.2 readTurnState over seed rows, as db/repo/setup/turn-state.ts answers a request whose facts name rows by id
+ * (T-667): notFound for the handle or the business when the rows hold none, else each fact from its row of the request's
+ * business by id, in the request's order, with the row's version, or notFound for the first fact whose row the business
+ * does not hold (another business's, or none). Values as K-04's seed fixtures write them. Of the rest of the answer only
+ * the handle is filled, from its seed row; no person, role, question, booking, pause or consent. Only the tables the
+ * binding asks are homes here; any other answers unknownFact. Every ask is written down in `asked`.
+ */
+export function seededTurnState(
+  rows: readonly SeedRow[],
+  asked: K05Ask[] = [],
+): (request: ReadTurnStateRequest) => Promise<SetupTurnStateOutcome> {
+  const find = (table: string, match: (values: Readonly<Record<string, unknown>>) => boolean) =>
+    rows.find((row) => row.table === table && match(row.values))?.values;
+  return (request) => {
+    asked.push({ call: "readTurnState", request: structuredClone(request) });
+    const handle = find("handles", (values) => values.id === request.handleId);
+    if (handle === undefined) {
+      return Promise.resolve({ error: "notFound", table: "handles", rowId: request.handleId });
+    }
+    const businessId = request.businessId;
+    if (businessId !== null && find("businesses", (values) => values.id === businessId) === undefined) {
+      return Promise.resolve({ error: "notFound", table: "businesses", rowId: businessId });
+    }
+    const facts: FactValue[] = [];
+    for (const fact of request.facts) {
+      if (!ROW_BY_ID_TABLES.has(fact.table)) {
+        return Promise.resolve({
+          error: "unknownFact",
+          key: fact.key,
+          table: fact.table,
+          column: fact.column,
+        });
+      }
+      const row = find(fact.table, (values) => values.id === fact.rowId && values.business_id === businessId);
+      if (row === undefined)
+        return Promise.resolve({ error: "notFound", table: fact.table, rowId: fact.rowId });
+      const version = typeof row.version === "number" ? row.version : 1;
+      facts.push({ ...fact, value: row[fact.column] ?? null, version });
+    }
+    return Promise.resolve({
+      result: "turnState",
+      handleId: request.handleId,
+      handle: { kind: handle.kind === "email" ? "email" : "phone", address: String(handle.address) },
+      businessId,
+      readAt: "2026-10-26T14:00:00Z",
+      persons: [],
+      roles: [],
+      phone: null,
+      openQuestions: [],
+      bookings: [],
+      pauses: [],
+      consents: [],
+      facts,
+    });
+  };
+}
+
+/** A readTurnState no test expected to be asked: it fails the test. */
+const noTurnStateExpected = (): Promise<never> =>
+  Promise.reject(new Error("no readTurnState was expected of this fake"));
+
 /**
  * The five reads answering from `exchanges`: a request equal to an exchange's of the same call gets a fresh copy of its
- * outcome; any other request fails the test. Every ask is written down in `asked`.
+ * outcome; any other request fails the test. readTurnState answers through `turnState` (default: none expected). Every
+ * ask is written down in `asked`.
  */
 export function fixtureK05Reads(
   exchanges: readonly CatalogExchange[],
   asked: K05Ask[] = [],
+  turnState: CatalogK05Reads["readTurnState"] = noTurnStateExpected,
 ): CatalogK05Reads {
   const answer = (call: CatalogRead, request: unknown): Promise<unknown> => {
     asked.push({ call, request: structuredClone(request) });
@@ -213,6 +301,7 @@ export function fixtureK05Reads(
     return Promise.resolve(structuredClone(found.outcome));
   };
   return {
+    readTurnState: turnState,
     readBusinessKinds: async (request) =>
       (await answer("readBusinessKinds", request)) as Awaited<
         ReturnType<CatalogK05Reads["readBusinessKinds"]>
@@ -232,9 +321,12 @@ export function fixtureK05Reads(
   };
 }
 
-/** The five reads each answering `outcome` to any request (an error answer, or another business's rows), asks noted. */
+/**
+ * The reads each answering `outcome` to any request (an error answer, or another business's rows), the five and
+ * readTurnState alike, asks noted.
+ */
 export function answeringK05Reads(outcome: object, asked: K05Ask[] = []): CatalogK05Reads {
-  const answer = (call: CatalogRead, request: unknown): Promise<never> => {
+  const answer = (call: CatalogReadName, request: unknown): Promise<never> => {
     asked.push({ call, request: structuredClone(request) });
     return Promise.resolve(structuredClone(outcome) as never);
   };
@@ -244,12 +336,16 @@ export function answeringK05Reads(outcome: object, asked: K05Ask[] = []): Catalo
     readServiceWays: (request) => answer("readServiceWays", request),
     readServicePriceRules: (request) => answer("readServicePriceRules", request),
     readTermsSources: (request) => answer("readTermsSources", request),
+    readTurnState: (request) => answer("readTurnState", request),
   };
 }
 
-/** The five reads each throwing `error` itself, as db/repo throws (a request it refuses, a value it cannot carry). */
+/**
+ * The reads each throwing `error` itself, as db/repo throws (a request it refuses, a value it cannot carry), the five and
+ * readTurnState alike.
+ */
 export function throwingK05Reads(error: Error, asked: K05Ask[] = []): CatalogK05Reads {
-  const thrown = (call: CatalogRead, request: unknown): Promise<never> => {
+  const thrown = (call: CatalogReadName, request: unknown): Promise<never> => {
     asked.push({ call, request: structuredClone(request) });
     return Promise.reject(error);
   };
@@ -259,6 +355,7 @@ export function throwingK05Reads(error: Error, asked: K05Ask[] = []): CatalogK05
     readServiceWays: (request) => thrown("readServiceWays", request),
     readServicePriceRules: (request) => thrown("readServicePriceRules", request),
     readTermsSources: (request) => thrown("readTermsSources", request),
+    readTurnState: (request) => thrown("readTurnState", request),
   };
 }
 

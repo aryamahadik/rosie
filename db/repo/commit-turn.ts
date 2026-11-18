@@ -23,7 +23,8 @@
 //      (booked, with the booking, and the saved-time clock row cancelled) or released (as release does, promotion
 //      included: db/repo/reservations.ts releaseIn); then K-05 v1.1's effects (written pending under the turn's id, and
 //      outage rows let go) and waiting rows (superseded or withdrawn, each with its own event-log entry); then the
-//      request's event-log entries, each under the turn id, its trace id and its bundle.
+//      request's event-log entries, each under the turn id, its trace id and its bundle. A K-36 state write that names a
+//      clock row or an outbox row this commit makes waits for it, right after the outbox rows (default 17; T-1442).
 //   4. The answer: every row inserted or updated with its version after the commit (turn, outbox and event-log rows
 //      left out, and rows of a table with no version, which a row reference cannot name), the outbox rows in commit
 //      order, the next in line its releases promoted, and the waiting rows it ended. Each row it names (written, and
@@ -62,8 +63,9 @@
 //   1. A row the request names (a version read or a write's row) that does not exist throws: K-05's errors have no
 //      answer for it (versionChanged needs the version now), and rows that carry a version are never deleted.
 //   2. `written` keeps the order of the writes: state, open questions opened then closed, clock rows made then cancelled,
-//      reservations confirmed (each with its saved-time clock row) then released (each with its class seats, its
-//      saved-time clock row, the promoted row and the promoted row's clock row), effects written then let go.
+//      the state writes that waited for them (default 17), reservations confirmed (each with its saved-time clock row)
+//      then released (each with its class seats, its saved-time clock row, the promoted row and the promoted row's clock
+//      row), effects written then let go.
 //   3. A confirm or a release cancels the reservation's saved-time clock row only while it is waiting or armed; a
 //      cancelled or fired one stays as it is and is not listed.
 //   4. The promoted next in line gets its saved-time clock row here (K-05 item 9: "with its own saved-time clock row"),
@@ -107,6 +109,18 @@
 //      (commit-turn.int.test.ts's booking moved to another business). Where it does not (BUSINESS_UNHELD_TABLES, whose
 //      rosie_job policy is true: K-22 proof_codes and K-27 busy_blocks; and a table with a business_id column and no
 //      row-level security), the commit throws on the row as locked, after the compares and before any write.
+//  17. (T-1442; DL-930, DL-936) K-36 v1's three foreign keys from a state row to a clock row or an outbox row are not
+//      deferrable (0017: hand_offs_alert_outbox_fk, hand_offs_clock_fk, team_pages_clock_fk), so each is checked at the
+//      state row's own write, and K-36 rule 5 has a hand-off's alert written in the same commit. So a hand_offs or
+//      team_pages write (an insert's values or an update's set) whose alert_outbox_row_id, escalation_clock_row_id or
+//      next_page_clock_row_id names a row this commit makes (clockRows.make, outboxRows) waits: it is written right after
+//      the outbox rows, before the reservations and the effects, and so is every hand_offs and team_pages write after it,
+//      in the request's order (a page after the hand-off it points at: team_pages_hand_off_fk). Every other write keeps
+//      K-05 item 1's order, where the clock and outbox rows find what they name (a booking, a person, an open question).
+//      A request with no such write is written statement for statement as before, and one with such a write failed
+//      before (23503, or 23505 for a made row's id already taken), so nothing that committed before changes. K-05 item 1
+//      orders the turn row, then the locks and compares, then the writes, in one transaction; the outbox rows keep their
+//      commit order, and the effects still follow every state write (item 18).
 //
 // The setup tables (T-667; K-05 v1.18 item 77; DL-867, DL-911, DL-913): the state writes take every setup part's table
 // (K-22 to K-27, K-33, K-35) as any other domain table, an update naming the version it read. A table whose primary key is
@@ -1888,6 +1902,73 @@ async function writeEvents(ctx: Context, request: CommitTurnRequest): Promise<vo
   }
 }
 
+/** A table's state columns that name a row by a foreign key checked at the write, each with the list making such rows. */
+type NamingColumns = readonly (readonly [column: string, list: "clockRows" | "outboxRows"])[];
+
+/**
+ * K-36 v1's columns that name a clock row or an outbox row by a foreign key checked at the write itself (0017:
+ * hand_offs_alert_outbox_fk, hand_offs_clock_fk and team_pages_clock_fk, none deferrable), by table (default 17).
+ */
+const NAMES_A_MADE_ROW: ReadonlyMap<string, NamingColumns> = new Map<string, NamingColumns>([
+  [
+    "hand_offs",
+    [
+      ["alert_outbox_row_id", "outboxRows"],
+      ["escalation_clock_row_id", "clockRows"],
+    ],
+  ],
+  ["team_pages", [["next_page_clock_row_id", "clockRows"]]],
+]);
+
+/** The ids a list of the request gives its rows, each one that is text (the writes check every id). */
+function idsOf(rows: readonly unknown[]): ReadonlySet<string> {
+  const ids = new Set<string>();
+  for (const row of rows) {
+    if (isRecord(row) && typeof row.id === "string") {
+      ids.add(row.id);
+    }
+  }
+  return ids;
+}
+
+/**
+ * The request's state writes in the two places the commit writes them (default 17): `first`, K-05 item 1's place before
+ * the open questions, and `afterRows`, right after the outbox rows: from the first hand_offs or team_pages write that
+ * names a clock row or an outbox row this commit makes, every hand_offs and team_pages write, in the request's order.
+ * Each write stays the request's own object (namedUpdates knows an update by it).
+ */
+function stateWritesInPlace(request: CommitTurnRequest): {
+  readonly first: K05.StateWrite[];
+  readonly afterRows: K05.StateWrite[];
+} {
+  const made = {
+    clockRows: idsOf(request.writes.clockRows.make),
+    outboxRows: idsOf(request.writes.outboxRows),
+  };
+  const first: K05.StateWrite[] = [];
+  const afterRows: K05.StateWrite[] = [];
+  for (const write of request.writes.state) {
+    const columns = NAMES_A_MADE_ROW.get(write.table);
+    const values: Row = write.op === "insert" ? write.values : write.set;
+    const namesMadeRow =
+      columns?.some(([column, list]) => {
+        const id = values[column];
+        return typeof id === "string" && made[list].has(id);
+      }) ?? false;
+    if (columns !== undefined && (namesMadeRow || afterRows.length > 0)) {
+      afterRows.push(write);
+    } else {
+      first.push(write);
+    }
+  }
+  return { first, afterRows };
+}
+
+/** The request with `state` for its state writes and every other list as it is: what writeState writes. */
+function withState(request: CommitTurnRequest, state: K05.StateWrite[]): CommitTurnRequest {
+  return { ...request, writes: { ...request.writes, state } };
+}
+
 // ---- 1. the turn, and a repeat ------------------------------------------------------------------------------------------
 
 async function commitMoment(tx: Sql, options: CommitOptions): Promise<Date> {
@@ -1966,10 +2047,13 @@ async function commitIn(
   };
   const compared = await lockAndCompare(ctx, request);
   const out: Written = { written: [], outboxRows: [], promoted: [], superseded: [], withdrawn: [] };
-  await writeState(ctx, request, compared, out);
+  // A K-36 state write that names a clock row or an outbox row of this commit waits for it (default 17).
+  const state = stateWritesInPlace(request);
+  await writeState(ctx, withState(request, state.first), compared, out);
   await writeOpenQuestions(ctx, request, compared, out);
   await writeClockRows(ctx, request, compared, out);
   await writeOutboxRows(ctx, request, out);
+  await writeState(ctx, withState(request, state.afterRows), compared, out);
   await writeReservations(ctx, request, compared, out);
   await writeEffects(ctx, request, compared, out);
   await writeWaitingChat(ctx, request, out);
