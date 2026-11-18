@@ -137,6 +137,15 @@
 //     flow_defaults' own key);
 //   - versionChanged names a changed row by its name.
 // A table of one key column is named, locked, compared and answered as before, by the same statements.
+//
+// One reading for both writers (T-1437; DL-927, DL-935): clocks.ts's fireClock commits a firing's writes as this file
+// commits a turn's, and reads each table (tableInfo), names its key (oneKey, stateUpdateTarget), finds and locks each row
+// (lockRow), reads the businesses a two-column version read is compared under (comparedBusinesses) and refuses a move
+// (refuseBusinessMoves) by these exported helpers, through RowWriter, so the two writers take the same targets and never
+// drift. A helper's error starts with its writer's name. A firing's row of a table scoped none must also meet
+// setup/fact-homes.ts rowBound, the one rule every reader of a setup row by its name calls, passed to lockRow as `bound`
+// (clocks.ts); commitTurn passes none, so what it accepts is unchanged.
+import type postgres from "postgres";
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.1";
 import type * as K05v117 from "../../contracts/generated/data-access/data-access.v1.17";
 import { byteaFromText } from "./bytea";
@@ -226,35 +235,42 @@ class Refused extends Error {
 
 // ---- request checks: what the database cannot be trusted to refuse, or what reaches SQL as a name -------------------
 
-function fail(what: string): never {
-  throw new TypeError(`commitTurn: ${what}`);
+/**
+ * The two writers of a turn's state rows: commitTurn here, and clocks.ts's fireClock, whose firing reads, names, finds,
+ * locks and compares its rows by this file's helpers below (T-1437).
+ */
+export type WriterCall = "commitTurn" | "fireClock";
+
+/** A request the writer `call` cannot carry out, named by that call (commitTurn unless a shared helper names another). */
+function fail(what: string, call: WriterCall = "commitTurn"): never {
+  throw new TypeError(`${call}: ${what}`);
 }
 
 function isRecord(value: unknown): value is Row {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function assertName(value: unknown, what: string): asserts value is string {
+function assertName(value: unknown, what: string, call?: WriterCall): asserts value is string {
   if (typeof value !== "string" || !NAME.test(value)) {
-    fail(`${what} is not a plain lower-case SQL name`);
+    fail(`${what} is not a plain lower-case SQL name`, call);
   }
 }
 
-function assertId(value: unknown, what: string): asserts value is string {
+function assertId(value: unknown, what: string, call?: WriterCall): asserts value is string {
   if (typeof value !== "string" || value === "" || value.includes("\u0000")) {
-    fail(`${what} is not a non-empty id`);
+    fail(`${what} is not a non-empty id`, call);
   }
 }
 
-function assertNullableId(value: unknown, what: string): asserts value is string | null {
+function assertNullableId(value: unknown, what: string, call?: WriterCall): asserts value is string | null {
   if (value !== null) {
-    assertId(value, what);
+    assertId(value, what, call);
   }
 }
 
-function assertVersion(value: unknown, what: string): asserts value is number {
+function assertVersion(value: unknown, what: string, call?: WriterCall): asserts value is number {
   if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 1) {
-    fail(`${what} is not a version (a positive integer)`);
+    fail(`${what} is not a version (a positive integer)`, call);
   }
 }
 
@@ -418,7 +434,31 @@ class Scope {
 
 // ---- tables, read from the catalog once per call ------------------------------------------------------------------------
 
-interface TableInfo {
+/**
+ * A writer of a turn's state rows (T-1437; DL-927): commitTurn's Context, or clocks.ts's firing, whose firing commits its
+ * writes as this file does. Each reads a table, names a row, and finds, locks and compares it by the same helpers here
+ * (tableInfo, oneKey, stateUpdateTarget, lockRow, comparedBusinesses and refuseBusinessMoves), so the two writers accept
+ * the same targets and never drift. Each helper's error starts with the writer's `call`.
+ */
+export interface RowWriter {
+  readonly tx: Sql;
+  readonly call: WriterCall;
+  /** Each table read from the catalog, once per call. */
+  readonly tables: Map<string, TableInfo>;
+  /** Each state update of a two-column key, found once by its key's columns (T-667), by the write it is. */
+  readonly namedUpdates: Map<object, UpdateTarget>;
+}
+
+/**
+ * What each writer's errors call its writes, and where its rule for a row it names that does not exist is written (this
+ * file's default 1, which the firing follows).
+ */
+const WRITER_WORDS: Readonly<Record<WriterCall, { readonly writes: string; readonly missing: string }>> = {
+  commitTurn: { writes: "commit", missing: "default 1" },
+  fireClock: { writes: "firing", missing: "commit-turn.ts default 1" },
+};
+
+export interface TableInfo {
   readonly name: string;
   readonly columns: ReadonlySet<string>;
   readonly jsonColumns: ReadonlySet<string>;
@@ -436,22 +476,19 @@ interface TableInfo {
   readonly unheldBusiness: string | null;
 }
 
-interface Context {
-  readonly tx: Sql;
+interface Context extends RowWriter {
+  readonly call: "commitTurn";
   readonly now: Date;
   /** `now` in the contract's form. */
   readonly at: string;
   readonly turn: K05.Turn;
   readonly scope: Scope;
-  readonly tables: Map<string, TableInfo>;
   /**
    * The tables whose rows the answer names by a column other than their primary key, by that column:
    * PHONES_BY_HANDLE_ID when the request asks (answerPhoneRowsBy "handleId": K-05 v1.17 item 71; T-1417), else
    * none (v1.16's answer).
    */
   readonly answerNames: ReadonlyMap<string, string>;
-  /** Each state update of a two-column key, found once by its key's columns (T-667), by the write it is. */
-  readonly namedUpdates: Map<object, UpdateTarget>;
 }
 
 /**
@@ -459,7 +496,7 @@ interface Context {
  * a two-column key finds), the key's columns to values when it has two (null for one), and for two its business as read
  * before the locks (undefined for one: read only when a compare needs it).
  */
-interface UpdateTarget {
+export interface UpdateTarget {
   readonly rowId: string;
   readonly keyValues: Row | null;
   readonly business: string | null | undefined;
@@ -467,15 +504,16 @@ interface UpdateTarget {
 
 /**
  * A table's columns, its JSON and bytea columns, its primary key and its row-level security, from the catalog: an
- * ordinary table of this connection's search path (never one of PostgreSQL's own), or a throw. Read once per call.
+ * ordinary table of this connection's search path (never one of PostgreSQL's own), or a throw. Read once per call, for
+ * either writer (T-1437).
  */
-async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
-  const known = ctx.tables.get(table);
+export async function tableInfo(w: RowWriter, table: string): Promise<TableInfo> {
+  const known = w.tables.get(table);
   if (known !== undefined) {
     return known;
   }
-  assertName(table, "a table name");
-  const [row] = await ctx.tx<
+  assertName(table, "a table name", w.call);
+  const [row] = await w.tx<
     { rls: boolean; columns: string[]; json_columns: string[]; bytea_columns: string[]; key: string[] }[]
   >`
     select c.relrowsecurity as rls,
@@ -501,7 +539,7 @@ async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
     where c.oid = to_regclass(${table}) and c.relkind in ('r', 'p') and n.nspname = any (current_schemas(false))
   `;
   if (row === undefined) {
-    fail(`no table ${table} in this database's schema`);
+    fail(`no table ${table} in this database's schema`, w.call);
   }
   const columns = new Set(row.columns);
   let scopeColumn: string | null = null;
@@ -510,7 +548,7 @@ async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
     if (columns.has(column)) {
       scopeColumn = column;
     } else if (!PERSON_BOUND_TABLES.has(table)) {
-      fail(`${table} has row-level security but no business column this call can scope by`);
+      fail(`${table} has row-level security but no business column this call can scope by`, w.call);
     }
   }
   const info: TableInfo = {
@@ -524,7 +562,7 @@ async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
     unheldBusiness:
       columns.has("business_id") && (!row.rls || BUSINESS_UNHELD_TABLES.has(table)) ? "business_id" : null,
   };
-  ctx.tables.set(table, info);
+  w.tables.set(table, info);
   return info;
 }
 
@@ -533,33 +571,37 @@ async function tableInfo(ctx: Context, table: string): Promise<TableInfo> {
  * column, or the two of a table K-05 v1.18 item 77 names (setup/row-names.ts TWO_COLUMN_KEYS; T-667), whose rows are
  * named by the two values joined by "/". Any other key of more than one column names no row.
  */
-function oneKey(info: TableInfo): readonly string[] {
+export function oneKey(w: RowWriter, info: TableInfo): readonly string[] {
   const [key, ...more] = info.key;
   if (!info.versioned) {
-    fail(`${info.name} carries no version, so no commit compares or names its rows`);
+    fail(
+      `${info.name} carries no version, so no ${WRITER_WORDS[w.call].writes} compares or names its rows`,
+      w.call,
+    );
   }
   if (key === undefined || (more.length > 0 && !isNamedKey(info.name, info.key))) {
-    fail(`${info.name}'s primary key is not one column, so a row reference cannot name its rows`);
+    fail(`${info.name}'s primary key is not one column, so a row reference cannot name its rows`, w.call);
   }
   return info.key;
 }
 
 /** The one column of a key of one column, or null for a key of two (item 77's name). */
-function singleColumn(key: readonly string[]): string | null {
+export function singleColumn(key: readonly string[]): string | null {
   const [column, ...more] = key;
   return column !== undefined && more.length === 0 ? column : null;
 }
 
 /** A two-column key's columns, matched to the values its write names (setup/row-names.ts: one or two columns only). */
-function twoColumns(key: readonly string[]): readonly [string, string] {
+function twoColumns(w: RowWriter, key: readonly string[]): readonly [string, string] {
   const [first, second, ...more] = key;
   if (first === undefined || second === undefined || more.length > 0) {
-    throw new Error("commitTurn: a row named by item 77's name has a key of two columns");
+    throw new Error(`${w.call}: a row named by item 77's name has a key of two columns`);
   }
   return [first, second];
 }
 
-function businessOf(info: TableInfo, row: Row): string | null {
+/** The business of `row`, a row of `info`'s table or the values a write gives one: its scope column's id, or null. */
+export function businessOf(w: RowWriter, info: TableInfo, row: Row): string | null {
   if (info.scopeColumn === null) {
     return null;
   }
@@ -567,7 +609,7 @@ function businessOf(info: TableInfo, row: Row): string | null {
   if (value === null || value === undefined) {
     return null;
   }
-  assertId(value, `${info.name}.${info.scopeColumn}`);
+  assertId(value, `${info.name}.${info.scopeColumn}`, w.call);
   return value;
 }
 
@@ -663,9 +705,9 @@ function columnValues(ctx: Context, info: TableInfo, values: Row, what: string):
 
 // ---- 2. the locks and the compares ---------------------------------------------------------------------------------------
 
-type Mode = "share" | "update";
+export type Mode = "share" | "update";
 
-interface Locked {
+export interface Locked {
   readonly table: string;
   readonly rowId: string;
   readonly version: number;
@@ -673,7 +715,8 @@ interface Locked {
   readonly row: Row;
 }
 
-const targetKey = (table: string, rowId: string): string => `${table}\u0000${rowId}`;
+/** A row's key among the rows a writer compares or writes: its table and its rowId (a two-column row's name). */
+export const targetKey = (table: string, rowId: string): string => `${table}\u0000${rowId}`;
 const savedTimeClockId = (reservationId: string): string => `${reservationId}/saved-time`;
 
 function compareText(a: string, b: string): number {
@@ -681,7 +724,7 @@ function compareText(a: string, b: string): number {
 }
 
 /** A row the commit locks: by its rowId, or (a two-column row a state update names: T-667) by its key's columns. */
-interface LockTarget {
+export interface LockTarget {
   readonly table: string;
   readonly rowId: string;
   readonly mode: Mode;
@@ -692,22 +735,22 @@ interface LockTarget {
 }
 
 /** The key's columns to values of a two-column row a state update names (stateUpdateTarget set them). */
-function keyValuesOf(target: UpdateTarget): Row {
+export function keyValuesOf(w: RowWriter, target: UpdateTarget): Row {
   if (target.keyValues === null) {
-    throw new Error("commitTurn: a two-column row to update has no key's values");
+    throw new Error(`${w.call}: a two-column row to update has no key's values`);
   }
   return target.keyValues;
 }
 
 /** A two-column key's columns, each with the value a state update names it by (stateUpdateTarget checked each). */
-function keyWhere(ctx: Context, key: readonly string[], keyValues: Row) {
-  const { tx } = ctx;
-  const [first, second] = twoColumns(key);
+export function keyWhere(w: RowWriter, key: readonly string[], keyValues: Row) {
+  const { tx } = w;
+  const [first, second] = twoColumns(w, key);
   return tx`${tx(first)} = ${keyValues[first] as string | number} and ${tx(second)} = ${keyValues[second] as string | number}`;
 }
 
 /** The businesses the commit writes (default 14; T-667), read once, before the locks, when a compare needs them. */
-interface WriteBusinesses {
+export interface WriteBusinesses {
   /** Each business a write names or a row it updates holds. */
   readonly ids: ReadonlySet<string>;
   /** Whether a write has no business (the runtime side's rows), or the commit writes no business's row at all. */
@@ -720,14 +763,14 @@ interface WriteBusinesses {
  * business when one of its writes has none (default 14), or of no business at all for a table scoped none.
  */
 function namedRowWhere(
-  ctx: Context,
+  w: RowWriter,
   info: TableInfo,
   target: LockTarget,
   businesses: WriteBusinesses | null,
 ) {
-  const { tx } = ctx;
+  const { tx } = w;
   if (target.keyValues !== null) {
-    return keyWhere(ctx, info.key, target.keyValues);
+    return keyWhere(w, info.key, target.keyValues);
   }
   const name = rowNameSql(tx, info.key);
   if (info.scopeColumn === null) {
@@ -735,7 +778,7 @@ function namedRowWhere(
   }
   if (businesses === null) {
     throw new Error(
-      "commitTurn: a two-column version read was compared before the commit's businesses were read",
+      `${w.call}: a two-column version read was compared before the ${WRITER_WORDS[w.call].writes}'s businesses were read`,
     );
   }
   if (businesses.ids.size === 0) {
@@ -747,35 +790,36 @@ function namedRowWhere(
     : tx`${name} = ${target.rowId} and ${tx(info.scopeColumn)} in ${tx(ids)}`;
 }
 
-async function lockRow(
-  ctx: Context,
+/**
+ * Finds and locks one row a writer compares or writes (FOR UPDATE to write it, FOR SHARE to compare it), by its one key
+ * column, or a two-column row as namedRowWhere finds it; with `bound`, only a row that also meets it: SQL that follows
+ * the row's compare and starts with "and" (or is empty), as setup/fact-homes.ts rowBound writes it (a firing's rows of a
+ * table scoped none: clocks.ts, T-1437), never one for commitTurn. A row it does not find throws (default 1, fail
+ * closed).
+ */
+export async function lockRow(
+  w: RowWriter,
   target: LockTarget,
   businesses: WriteBusinesses | null,
+  bound: postgres.Fragment | null = null,
 ): Promise<Locked> {
   const { table, rowId, mode } = target;
-  const info = await tableInfo(ctx, table);
-  const key = oneKey(info);
+  const info = await tableInfo(w, table);
+  const key = oneKey(w, info);
   const column = singleColumn(key);
-  const { tx } = ctx;
-  let row: Row | undefined;
-  if (column !== null) {
-    [row] =
-      mode === "update"
-        ? await tx<Row[]>`select * from ${tx(table)} where ${tx(column)} = ${rowId} for update`
-        : await tx<Row[]>`select * from ${tx(table)} where ${tx(column)} = ${rowId} for share`;
-  } else {
-    const where = namedRowWhere(ctx, info, target, businesses);
-    [row] =
-      mode === "update"
-        ? await tx<Row[]>`select * from ${tx(table)} where ${where} for update`
-        : await tx<Row[]>`select * from ${tx(table)} where ${where} for share`;
-  }
+  const { tx } = w;
+  const named = column === null ? namedRowWhere(w, info, target, businesses) : tx`${tx(column)} = ${rowId}`;
+  const where = bound === null ? named : tx`${named} ${bound}`;
+  const [row] =
+    mode === "update"
+      ? await tx<Row[]>`select * from ${tx(table)} where ${where} for update`
+      : await tx<Row[]>`select * from ${tx(table)} where ${where} for share`;
   if (row === undefined) {
-    fail(`a row of ${table} the request names does not exist (default 1)`);
+    fail(`a row of ${table} the request names does not exist (${WRITER_WORDS[w.call].missing})`, w.call);
   }
   const version = row.version;
-  assertVersion(version, `${table}.version`);
-  return { table, rowId, version, business: businessOf(info, row), row };
+  assertVersion(version, `${table}.version`, w.call);
+  return { table, rowId, version, business: businessOf(w, info, row), row };
 }
 
 /** The saved-time clock rows of the reservations the commit confirms or releases, locked first (FOR UPDATE). */
@@ -830,10 +874,38 @@ interface Compared {
   readonly savedTimeClocks: ReadonlyMap<string, Row>;
 }
 
-interface Expectation {
+export interface Expectation {
   readonly table: string;
   readonly rowId: string;
   readonly version: number;
+}
+
+/**
+ * Adds a row a writer compares or writes to `modes`, once, with the strongest lock it needs, and the version it read or
+ * expects to `expected`. A two-column row a state update names keeps the key it is found by, and its business as read
+ * (T-667).
+ */
+export function addTarget(
+  modes: Map<string, LockTarget>,
+  expected: Expectation[],
+  table: string,
+  rowId: string,
+  mode: Mode,
+  version: number,
+  update: UpdateTarget | null = null,
+): void {
+  const key = targetKey(table, rowId);
+  const known = modes.get(key);
+  if (known === undefined || (known.mode === "share" && mode === "update")) {
+    modes.set(key, {
+      table,
+      rowId,
+      mode,
+      keyValues: update === null ? (known?.keyValues ?? null) : update.keyValues,
+      business: update === null ? known?.business : update.business,
+    });
+  }
+  expected.push({ table, rowId, version });
 }
 
 /**
@@ -841,47 +913,47 @@ interface Expectation {
  * column names the row by its value; a key of two (K-05 v1.18 item 77; T-667) by the name the database builds for the
  * row those values find, with that row's business, read once per write before any lock (default 1 when there is none).
  */
-async function stateUpdateTarget(
-  ctx: Context,
+export async function stateUpdateTarget(
+  w: RowWriter,
   write: Extract<K05.StateWrite, { op: "update" }>,
 ): Promise<UpdateTarget> {
-  const known = ctx.namedUpdates.get(write);
+  const known = w.namedUpdates.get(write);
   if (known !== undefined) {
     return known;
   }
-  const info = await tableInfo(ctx, write.table);
-  const key = oneKey(info);
+  const info = await tableInfo(w, write.table);
+  const key = oneKey(w, info);
   const named = Object.keys(write.key);
   const column = singleColumn(key);
   if (column !== null) {
     if (named.length !== 1 || named[0] !== column) {
-      fail(`a state update of ${write.table} must name the row by its primary key alone`);
+      fail(`a state update of ${write.table} must name the row by its primary key alone`, w.call);
     }
     const value = write.key[column];
     if ((typeof value !== "string" && typeof value !== "number") || value === "") {
-      fail(`a state update of ${write.table} names its key with no value`);
+      fail(`a state update of ${write.table} names its key with no value`, w.call);
     }
     if (Object.hasOwn(write.set, column)) {
-      fail(`a state update of ${write.table} may not change the row's key`);
+      fail(`a state update of ${write.table} may not change the row's key`, w.call);
     }
     return { rowId: String(value), keyValues: null, business: undefined };
   }
   if (named.length !== key.length || !key.every((keyColumn) => named.includes(keyColumn))) {
-    fail(`a state update of ${write.table} must name the row by its primary key alone`);
+    fail(`a state update of ${write.table} must name the row by its primary key alone`, w.call);
   }
   const keyValues: Row = {};
   for (const keyColumn of key) {
     const value = write.key[keyColumn];
     if ((typeof value !== "string" && typeof value !== "number") || value === "") {
-      fail(`a state update of ${write.table} names its key with no value`);
+      fail(`a state update of ${write.table} names its key with no value`, w.call);
     }
     if (Object.hasOwn(write.set, keyColumn)) {
-      fail(`a state update of ${write.table} may not change the row's key`);
+      fail(`a state update of ${write.table} may not change the row's key`, w.call);
     }
     keyValues[keyColumn] = value;
   }
-  const { tx } = ctx;
-  const where = keyWhere(ctx, key, keyValues);
+  const { tx } = w;
+  const where = keyWhere(w, key, keyValues);
   const [row] =
     info.scopeColumn === null
       ? await tx<{ name: string; business: string | null }[]>`
@@ -892,12 +964,15 @@ async function stateUpdateTarget(
           from ${tx(write.table)} where ${where}
         `;
   if (row === undefined) {
-    fail(`a row of ${write.table} the request names does not exist (default 1)`);
+    fail(
+      `a row of ${write.table} the request names does not exist (${WRITER_WORDS[w.call].missing})`,
+      w.call,
+    );
   }
-  assertId(row.name, `${write.table}'s row name`);
-  assertNullableId(row.business, `${write.table}.${info.scopeColumn ?? "business"}`);
+  assertId(row.name, `${write.table}'s row name`, w.call);
+  assertNullableId(row.business, `${write.table}.${info.scopeColumn ?? "business"}`, w.call);
   const target: UpdateTarget = { rowId: row.name, keyValues, business: row.business };
-  ctx.namedUpdates.set(write, target);
+  w.namedUpdates.set(write, target);
   return target;
 }
 
@@ -905,19 +980,21 @@ async function stateUpdateTarget(
  * The businesses the commit writes (default 14; T-667): each one its request names (a state insert's business, an open
  * question's, a clock row's, an outbox row's, an effect's, an event's), each one of a row it updates, read now, before
  * the locks, on the runtime side, and the business a state update gives a row that has none (S1-09), a write with no
- * business naming none. Read only when a two-column version read of a business-scoped table needs it.
+ * business naming none. Read only when a two-column version read of a business-scoped table needs it. `also` holds the
+ * businesses of what the writer writes beside its request's lists (a firing's own clock row: clocks.ts, T-1437); none
+ * for a commit.
  */
 async function writeBusinesses(
-  ctx: Context,
-  request: CommitTurnRequest,
+  w: RowWriter,
+  writes: K05.Writes,
   targets: readonly LockTarget[],
+  also: readonly (string | null)[],
 ): Promise<WriteBusinesses> {
   // Each write's business as it names it or its row holds it: an id, or null for none.
-  const named: unknown[] = [];
-  const { writes } = request;
+  const named: unknown[] = [...also];
   for (const write of writes.state) {
     if (write.op === "insert") {
-      const info = await tableInfo(ctx, write.table);
+      const info = await tableInfo(w, write.table);
       if (info.scopeColumn !== null) {
         named.push(write.values[info.scopeColumn] ?? null);
       }
@@ -937,12 +1014,12 @@ async function writeBusinesses(
   }
   // The business of each row the commit updates, as it stands before the locks, by targetKey.
   const before = new Map<string, unknown>();
-  const { tx } = ctx;
+  const { tx } = w;
   for (const target of targets) {
     if (target.mode !== "update") {
       continue;
     }
-    const info = await tableInfo(ctx, target.table);
+    const info = await tableInfo(w, target.table);
     if (info.scopeColumn === null) {
       continue;
     }
@@ -950,9 +1027,9 @@ async function writeBusinesses(
       before.set(targetKey(target.table, target.rowId), target.business);
       continue;
     }
-    const column = singleColumn(oneKey(info));
+    const column = singleColumn(oneKey(w, info));
     if (column === null) {
-      throw new Error("commitTurn: a two-column row to update was not read before its business was asked");
+      throw new Error(`${w.call}: a two-column row to update was not read before its business was asked`);
     }
     const [row] = await tx<{ business: unknown }[]>`
       select ${tx(info.scopeColumn)} as business from ${tx(target.table)} where ${tx(column)} = ${target.rowId}
@@ -972,11 +1049,11 @@ async function writeBusinesses(
     if (write.op !== "update") {
       continue;
     }
-    const info = await tableInfo(ctx, write.table);
+    const info = await tableInfo(w, write.table);
     if (info.scopeColumn === null || !Object.hasOwn(write.set, info.scopeColumn)) {
       continue;
     }
-    const target = await stateUpdateTarget(ctx, write);
+    const target = await stateUpdateTarget(w, write);
     if (before.get(targetKey(write.table, target.rowId)) === null) {
       named.push(write.set[info.scopeColumn] ?? null);
     }
@@ -991,6 +1068,55 @@ async function writeBusinesses(
     }
   }
   return { ids, none: none || ids.size === 0 };
+}
+
+/**
+ * The businesses a two-column version read of a business-scoped table is compared under (default 14; T-667), read before
+ * any row is locked: null when no target is such a read, so a writer with none reads nothing more. `also`: as
+ * writeBusinesses.
+ */
+export async function comparedBusinesses(
+  w: RowWriter,
+  writes: K05.Writes,
+  targets: readonly LockTarget[],
+  also: readonly (string | null)[] = [],
+): Promise<WriteBusinesses | null> {
+  for (const target of targets) {
+    if (target.keyValues === null && twoColumnKeyOf(target.table) !== null) {
+      const info = await tableInfo(w, target.table);
+      if (info.scopeColumn !== null) {
+        return writeBusinesses(w, writes, targets, also);
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * A state update never moves a row of a business to another business or to none (default 16; T-667 round 2): where
+ * row-level security does not hold the row there, the row as locked (`locked`) is compared with the set, after the
+ * compares and before any write, and a move throws. A row with no business may be given one (S1-09).
+ */
+export async function refuseBusinessMoves(
+  w: RowWriter,
+  state: readonly K05.StateWrite[],
+  locked: (table: string, rowId: string) => Locked,
+): Promise<void> {
+  for (const write of state) {
+    if (write.op !== "update") {
+      continue;
+    }
+    const info = await tableInfo(w, write.table);
+    const column = info.unheldBusiness;
+    // A column whose value is undefined is not written (columnValues), so it moves nothing.
+    if (column === null || write.set[column] === undefined) {
+      continue;
+    }
+    const held = locked(write.table, (await stateUpdateTarget(w, write)).rowId).row[column];
+    if (held !== null && held !== undefined && write.set[column] !== held) {
+      fail(`a state update of ${write.table} may not move a row of a business to another business`, w.call);
+    }
+  }
 }
 
 async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise<Compared> {
@@ -1019,18 +1145,7 @@ async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise
     version: number,
     update: UpdateTarget | null = null,
   ): void => {
-    const key = targetKey(table, rowId);
-    const known = modes.get(key);
-    if (known === undefined || (known.mode === "share" && mode === "update")) {
-      modes.set(key, {
-        table,
-        rowId,
-        mode,
-        keyValues: update === null ? (known?.keyValues ?? null) : update.keyValues,
-        business: update === null ? known?.business : update.business,
-      });
-    }
-    expected.push({ table, rowId, version });
+    addTarget(modes, expected, table, rowId, mode, version, update);
   };
   for (const ref of request.versionsRead) {
     want(ref.table, ref.rowId, "share", ref.version);
@@ -1064,16 +1179,7 @@ async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise
 
   // A two-column version read of a business-scoped table is compared under the businesses the commit writes, read
   // before any row is locked (default 14; T-667). A commit with no such read reads nothing more.
-  let businesses: WriteBusinesses | null = null;
-  for (const target of modes.values()) {
-    if (target.keyValues === null && twoColumnKeyOf(target.table) !== null) {
-      const info = await tableInfo(ctx, target.table);
-      if (info.scopeColumn !== null) {
-        businesses = await writeBusinesses(ctx, request, [...modes.values()]);
-        break;
-      }
-    }
-  }
+  const businesses = await comparedBusinesses(ctx, writes, [...modes.values()]);
 
   // Locked in one fixed order, so two commits never wait on each other in a circle.
   const rows = new Map<string, Locked>();
@@ -1148,21 +1254,7 @@ async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise
   // A state update never moves a row of a business to another business or to none (default 16; T-667 round 2): where
   // row-level security does not hold the row there, the row as locked is compared with the set, before any write. A row
   // with no business may be given one (S1-09).
-  for (const write of writes.state) {
-    if (write.op !== "update") {
-      continue;
-    }
-    const info = await tableInfo(ctx, write.table);
-    const column = info.unheldBusiness;
-    // A column whose value is undefined is not written (columnValues), so it moves nothing.
-    if (column === null || write.set[column] === undefined) {
-      continue;
-    }
-    const held = locked(write.table, (await stateUpdateTarget(ctx, write)).rowId).row[column];
-    if (held !== null && held !== undefined && write.set[column] !== held) {
-      fail(`a state update of ${write.table} may not move a row of a business to another business`);
-    }
-  }
+  await refuseBusinessMoves(ctx, writes.state, locked);
 
   return { rows, savedTimeClocks };
 }
@@ -1202,13 +1294,13 @@ async function writeState(
     if (write.op === "insert") {
       const what = `a state insert into ${write.table}`;
       const values = columnValues(ctx, info, write.values, what);
-      const business = info.scopeColumn === null ? null : businessOf(info, write.values);
+      const business = info.scopeColumn === null ? null : businessOf(ctx, info, write.values);
       await ctx.scope.to(business);
       if (!info.versioned) {
         await tx`insert into ${tx(write.table)} ${tx(values)}`;
         continue;
       }
-      const key = oneKey(info);
+      const key = oneKey(ctx, info);
       const column = singleColumn(key);
       // The column the answer names the row by, when it is not the key, comes back with it (a phones row's handle id,
       // when the request asks: T-1417); otherwise the insert returns what v1.16's returns. A two-column row comes back
@@ -1238,7 +1330,7 @@ async function writeState(
     }
     const target = await stateUpdateTarget(ctx, write);
     const { rowId } = target;
-    const key = oneKey(info);
+    const key = oneKey(ctx, info);
     const column = singleColumn(key);
     const locked = lockedRow(compared, write.table, rowId);
     const set = columnValues(ctx, info, write.set, `a state update of ${write.table}`);
@@ -1250,7 +1342,7 @@ async function writeState(
       column === null
         ? await tx<(Row & { version: number })[]>`
             update ${tx(write.table)} set ${tx(set)}, version = ${write.expectVersion + 1}
-            where ${keyWhere(ctx, key, keyValuesOf(target))} and version = ${write.expectVersion}
+            where ${keyWhere(ctx, key, keyValuesOf(ctx, target))} and version = ${write.expectVersion}
             returning version
           `
         : named === null
@@ -1946,6 +2038,7 @@ async function commitIn(
 
   const ctx: Context = {
     tx,
+    call: "commitTurn",
     now,
     at: utc(now),
     turn,
