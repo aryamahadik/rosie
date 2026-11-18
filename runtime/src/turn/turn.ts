@@ -15,7 +15,9 @@
 //      records no core action (K-05 v1 parkTurn). So the keyword texts commit core-only on the run whose targets read,
 //      frontier, decide or re-read fails while a result is missing or one of them is a stop word, and on the run whose
 //      decided request the gate refuses on its tries when one of them is a stop word (`commitKeywords`). START and HELP
-//      alone, with every result present, keep the lease's retry, which may find the decided part ready.
+//      alone, with every result present, keep the lease's retry, which may find the decided part ready. A core-only
+//      commit of a turn holding a stop word leaves out the records of the texts read as danger, which stay unread, so
+//      the STOP is recorded at once (DL-944, card E; `leavesDangerOut`).
 //   4. Frontier (K-09 buildFrontier): the other texts, with the guard's targets, give K-02's context. Its span is the
 //      turn's, unless the turn face records the hop itself (`recordsFrontierSpan`, CQ-159: the Tool API base's span).
 //   5. Decide (K-02, the AI layer's two reads). When the reads disagree on a part, or a part is unmapped, the one Sonnet
@@ -57,8 +59,9 @@
 // go through, and then for the core, not the models: on a later try it commits core-only while they are still down, or
 // with the decided input once they are back (a run's first keyword commit carries it: `commitKeywords`). Either way its
 // one commit carries the core actions in the return order (`coreOf`): every text's safety record, the danger texts'
-// first, then the stop and start records, then the rest; the decided parts follow them (C-087). After the commit no
-// outage line goes: a model call that fails then takes step 7's path for its row (./compose.ts).
+// first (the core-only commit leaves those out: `leavesDangerOut`), then the stop and start records, then the rest; the
+// decided parts follow them (C-087). After the commit no outage line goes: a model call that fails then takes step 7's
+// path for its row (./compose.ts).
 //
 // Not here: the planner after meaning search (C-117: `planner` is null); the safety read (T-246); wiring the real Tool
 // API, AI, K-05 and dispatcher calls into the ports (D-017, T-552 onward).
@@ -595,13 +598,15 @@ async function safetyOf(turn: LeasedTurn, opened: readonly OpenedText[]): Promis
 
 /**
  * Each text's recordSafetyOutcome under `caller` (K-09 README default 5), the danger texts' first, then the others, each
- * in arrival order (the return order: "danger words are read first", S12-12; T-271); a text with none is left out.
+ * in arrival order (the return order: "danger words are read first", S12-12; T-271); a text with none is left out. With
+ * `dangerLeftOut` (`leavesDangerOut`), so is each text read as danger.
  */
-function safetyRecords(run: Run, caller: TurnCaller): RecordSafetyOutcomeAction[] {
+function safetyRecords(run: Run, caller: TurnCaller, dangerLeftOut: boolean): RecordSafetyOutcomeAction[] {
   const records: RecordSafetyOutcomeAction[] = [];
   for (const text of run.opened) {
     const result = run.safety.get(text.eventId);
     if (!text.readable || result === undefined) continue;
+    if (dangerLeftOut && isDanger(result)) continue;
     records.push({
       call: "recordSafetyOutcome",
       request: {
@@ -624,12 +629,35 @@ function isDanger(result: SafetyResult): boolean {
 
 /**
  * The turn's core actions in the return order (arch 11 line 564; T-271): every text's safety record, the danger texts'
- * first; then the keyword texts' actions, the stop and start records first ("stops next", S12-12), each in its order. The
- * records always come first (K-09 README default 5), and the commit writes the decided parts after the core (C-087).
+ * first (none with `dangerLeftOut`); then the keyword texts' actions, the stop and start records first ("stops next",
+ * S12-12), each in its order. The records always come first (K-09 README default 5), and the commit writes the decided
+ * parts after the core (C-087).
  */
-function coreOf(run: Run, caller: TurnCaller, actions: readonly CoreAction[]): CoreAction[] {
+function coreOf(
+  run: Run,
+  caller: TurnCaller,
+  actions: readonly CoreAction[],
+  dangerLeftOut: boolean,
+): CoreAction[] {
   const keyword = inReturnOrder(actions, (action) => (action.call === "recordStopOrStart" ? "stop" : "rest"));
-  return [...safetyRecords(run, caller), ...keyword];
+  return [...safetyRecords(run, caller, dangerLeftOut), ...keyword];
+}
+
+/**
+ * True when a core-only commit leaves out the records of the texts read as danger (DL-944, the architect's card E;
+ * T-1454): the turn holds a stop word, and the commit's caller names no business, so it is the keyword texts' own commit,
+ * which covers every business (`keywordCaller`, the replies' caller), for keyword texts alone or beside decided texts.
+ * The keyword door answers a danger record with no business notBuilt (actions turn-face/commit.ts noBusinessSafetyLines:
+ * with no business no line row is built and no owner told; DL-864 note 2) and rolls the whole commit back, so the STOP
+ * beside it would never be recorded (RULES 7.2: a STOP always works). The STOP's record and every record read as No
+ * commit as before, in the same return order. Each danger text left out stays unread: nothing is written for it here,
+ * its kept result and its hold stay as they are (no hold is lifted without a verdict: CQ-65), and the commit is handed
+ * its hold (CommitContext) as before. Its record and line come with journey 3's arrival record (K-09 v1.1 default 36).
+ * A turn with no stop word (HELP or START read as danger keeps DL-864 note 2's notBuilt) and a decided commit, under the
+ * turn's own caller, keep every record.
+ */
+function leavesDangerOut(run: Run, caller: TurnCaller): boolean {
+  return run.stopAsked && caller.businessId === null;
 }
 
 // ---- 3. keyword texts ---------------------------------------------------------------------------------------------
@@ -687,8 +715,9 @@ const keywordCaller = (run: Run): TurnCaller => ({ ...run.caller, businessId: nu
 
 /**
  * The replies' commitCore for this turn: each text's recordSafetyOutcome first, then the keyword texts' core actions, in
- * one gateAndCommit through the lease, with the decided input when the turn has one. The replies are answered K-09's core
- * results for their own actions only.
+ * one gateAndCommit through the lease, with the decided input when the turn has one; a core-only one of a turn holding a
+ * stop word without the danger texts' records (`leavesDangerOut`). The replies are answered K-09's core results for their
+ * own actions only.
  *
  * A turn holding a stop word never waits on the decided part (DL-521, after DL-508; arch 06 line 329): when the gate
  * refuses the decided request on its tries (its one resend, and for `valueFailsWords` the one re-read), the keyword
@@ -979,13 +1008,16 @@ type Sent =
       readonly request: GateAndCommitRequest;
     };
 
-/** A core-only commit: each text's safety record under `caller`, then the keyword texts' core actions (`coreOf`). */
+/**
+ * A core-only commit: each text's safety record under `caller`, then the keyword texts' core actions (`coreOf`); in a
+ * turn holding a stop word under a caller that names no business, without the danger texts' records (`leavesDangerOut`).
+ */
 function commitCoreOnly(run: Run, caller: TurnCaller, actions: readonly CoreAction[]): Promise<Sent> {
   return sendWithResend(run, {
     caller,
     turn: run.ref,
     input: { kind: "coreOnly" },
-    core: coreOf(run, caller, actions),
+    core: coreOf(run, caller, actions, leavesDangerOut(run, caller)),
     now: run.set.now(),
   });
 }
@@ -1001,7 +1033,7 @@ async function commitDecided(run: Run, input: DecidedInput, actions: readonly Co
       caller: { ...run.caller },
       turn: run.ref,
       input: current,
-      core: coreOf(run, run.caller, actions),
+      core: coreOf(run, run.caller, actions, false),
       now: run.set.now(),
     });
     if (sent.kind === "committed" || sent.error !== "valueFailsWords") return sent;
