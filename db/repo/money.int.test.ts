@@ -760,7 +760,7 @@ describe("the migration against the frozen table list (K-32 v1): part 1's five t
     expect(found.map((row) => row.name).sort()).toEqual([...OWN_TABLES, ...PART_2_TABLES].sort());
   });
 
-  it("is recorded in schema_migrations as money_payments_ledger, followed only by part 2's money_fees_packs (T-723), T-1278's three (K-04 v1.1's two and K-22 v1.2's), T-1333's core_migrator_set_role and T-1402's staging_testers (K-22 v1.3's), after effects_provider_events (K-07), core_rls_narrow (T-1094), customers (K-28) and both K-30 parts", async () => {
+  it("is recorded in schema_migrations as money_payments_ledger, followed only by part 2's money_fees_packs (T-723), T-1278's three (K-04 v1.1's two and K-22 v1.2's), T-1333's core_migrator_set_role, T-1402's staging_testers (K-22 v1.3's) and T-1457's core_question_went_out, after effects_provider_events (K-07), core_rls_narrow (T-1094), customers (K-28) and both K-30 parts", async () => {
     const rows = await db.sql<{ name: string }[]>`select name from schema_migrations order by version`;
     const names = rows.map((row) => row.name);
     // DL-225 (T-723, DL-306): the files after this part's gain part 2's money_fees_packs (0031), and stay exact.
@@ -769,7 +769,8 @@ describe("the migration against the frozen table list (K-32 v1): part 1's five t
     // T-1333 (DL-634; its card: a migration-runner test that pins the migration count changes only to add the file):
     // they gain 0035, and stay exact.
     // T-1402 (DL-759; its card's grant: a pin-only edit of DL-455's kind): they gain 0036, and stay exact.
-    expect(names.slice(-7)).toEqual([
+    // T-1457 (its card's May touch: the migrations' own guard lists, a pin-only edit): they gain 0037, and stay exact.
+    expect(names.slice(-8)).toEqual([
       "money_payments_ledger",
       "money_fees_packs",
       "core_outbox_no_turn",
@@ -777,6 +778,7 @@ describe("the migration against the frozen table list (K-32 v1): part 1's five t
       "sign_in_attempts",
       "core_migrator_set_role",
       "staging_testers",
+      "core_question_went_out",
     ]);
     for (const before of [
       "effects_provider_events",
