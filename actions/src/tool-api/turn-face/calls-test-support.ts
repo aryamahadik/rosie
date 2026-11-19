@@ -23,11 +23,12 @@ import type { GateAndCommitRequest } from "../../commit";
 import type { CommitTurnContext } from "../../commit";
 import { S1_01_IDS, sameSealer, type SameSealer } from "../../commit/core/test-support";
 import { k05Fake, type K05Fake } from "../../commit/test-support";
+import type { PagingDeps } from "../../domain/paging";
 import {
   NOT_TOLD_YET,
   PLUGIN_LISTS_NO_STOP_WORDS,
-  type SafetyTelling,
   type StoredOutcome,
+  type TellingPort,
 } from "../../domain/safety";
 import { flagsReaderOn, messagesReaderOn } from "../../domain/flags/test-support";
 import { BARBERSHOP, safetyWorldOf, type SafetyWorld } from "../../domain/safety/test-support";
@@ -248,7 +249,10 @@ export interface CallDoubles {
 
 export interface CallDoublesOptions {
   readonly world?: SafetyWorld;
-  readonly telling?: SafetyTelling;
+  /** Who is told (T-1443): a TellingPort, the paging telling port among them. Default NOT_TOLD_YET. */
+  readonly telling?: TellingPort<unknown>;
+  /** The paging ports, for runCore's paging core actions and the base's paging handlers. Default: none bound. */
+  readonly paging?: PagingDeps<unknown>;
   readonly scope?: TurnFaceCalls<unknown>["scope"];
 }
 
@@ -265,7 +269,8 @@ export function noDatabaseScope(businesses: string[] = []): TurnFaceCalls<unknow
 /**
  * The face's calls over the doubles: commit-s1-01.json's ids (its outcome id and turn key sam), K-05 v1.1's fake commit at
  * the fixture's now, T-318's world for the safety reads with T-317's and T-307's readers on it, the same-bytes sealer,
- * the barbershop's plug-in (no stop words) and nobody told yet (T-319).
+ * the barbershop's plug-in (no stop words), and who is told and the paging ports as given (T-1443): by default nobody is
+ * told (NOT_TOLD_YET) and no paging port is bound.
  */
 export function callDoubles(options: CallDoublesOptions = {}): CallDoubles {
   const world = options.world ?? safetyWorldOf();
@@ -288,10 +293,12 @@ export function callDoubles(options: CallDoublesOptions = {}): CallDoubles {
       ids: S1_01_IDS,
     },
     turnKey: () => SAM_KEY,
+    ...(options.paging === undefined ? {} : { paging: options.paging }),
   };
   const calls: TurnFaceCalls<unknown> = {
     scope: options.scope ?? noDatabaseScope(),
     commit: turnCommitDeps(binding),
+    ...(options.paging === undefined ? {} : { paging: options.paging }),
   };
   return { calls, k05, world, sealer, bundles, openHoldsReads, safetyReads };
 }

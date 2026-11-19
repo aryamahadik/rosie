@@ -16,6 +16,15 @@
 // rosie_job scope: T-315's security note b), and each K-05 call that needs the runtime side runs in a transaction of its
 // own (STATE note 59). Without `calls`, each of them answers notBuilt and nothing is read (fail closed).
 //
+// The same base carries the paging service's six calls made alone (T-1443; domain/paging pagingHandlers: pageTeam,
+// acknowledgePage, handOff, answerHandOff, openReviewItem and decideReviewItem, each under the call's business scope),
+// with the paging ports the wiring binds (`calls.paging`: the runtime's PagingReader, T-1444). Left out, each answers
+// notBuilt, as every call with no handler does. A call made alone commits through K-05's commit with no turn (the paging
+// ports' commitAlone), which K-05 has no call for yet (CQ-44, CQ-28): with none bound, each answers notBuilt after its
+// reads and writes nothing. A turn's own call is refused there (the paging service's turnRidesInCommit), since it rides
+// in its turn's commit (runCore's paging core actions, commit/core/core.ts). A binding reaches the six through this base
+// as callHandlers builds it.
+//
 // Spans: K-08's hop check fails a hop recorded twice, and the actor's turn records its own spans around its ports
 // (runtime/src/turn). The frontier's span is the base's, on the trace it is handed, since it names where each bundle part
 // came from; the turn records none for it (CQ-159, T-557: TurnFace.recordsFrontierSpan). For the three calls after it,
@@ -35,6 +44,7 @@ import {
 import type { CommitDeps } from "../../commit";
 import { gateAndCommitHandler } from "../../commit";
 import { createComposeInputHandler, type ComposeInputDeps } from "../../compose-input";
+import { pagingHandlers, type PagingDeps } from "../../domain/paging";
 import { finalizeMessage, type FinalizeDeps } from "../../finalize";
 import type { AnswerOf } from "../calls";
 import type { BaseRefusal } from "../errors";
@@ -103,6 +113,12 @@ export interface TurnFaceCalls<Repo> {
    * given an inbound text.
    */
   readonly held?: HeldTurns;
+  /**
+   * The paging service's ports for its six calls made alone on this base (T-1443; pagingHandlers): its reads (the
+   * runtime's PagingReader: T-1444), ids, ENVIRONMENT, staging's roster, its commit with no turn and its clock. Omitted:
+   * each of the six answers notBuilt and nothing is read.
+   */
+  readonly paging?: PagingDeps<Repo>;
 }
 
 export interface TurnFaceOptions<Repo extends FrontierRepo, CallRepo = unknown> {
@@ -138,8 +154,9 @@ export const TURN_RECORDS_GATE: CallOptions = { callerRecordsHop: "gate" };
 export const TURN_RECORDS_FILL_AND_CHECKS: CallOptions = { callerRecordsHop: "fillAndChecks" };
 
 /**
- * The base's handlers for the three calls after the frontier, gateAndCommit's deps those of one call's context. Exported
- * so a test can run the same handlers on a base called as any other caller calls it, without the face's options.
+ * The base's handlers for the three calls after the frontier, gateAndCommit's deps those of one call's context, and the
+ * paging service's six calls made alone when the calls carry its ports (T-1443). Exported so a test, or a binding that
+ * makes a paging call alone (T-1444), can run the same handlers on a base called as any other caller calls it.
  */
 export function callHandlers<Repo>(calls: TurnFaceCalls<Repo>, at: CommitAt | null): Handlers<Repo> {
   const handlers = notBuiltHandlers() as Handlers<Repo>;
@@ -148,6 +165,7 @@ export function callHandlers<Repo>(calls: TurnFaceCalls<Repo>, at: CommitAt | nu
     ...(at === null ? {} : { gateAndCommit: gateAndCommitHandler<Repo>(calls.commit(at)) }),
     ...(calls.compose === undefined ? {} : { composeInput: createComposeInputHandler<Repo>(calls.compose) }),
     ...(calls.finalize === undefined ? {} : { finalizeMessage: finalizeMessage<Repo>(calls.finalize) }),
+    ...(calls.paging === undefined ? {} : pagingHandlers<Repo>(calls.paging)),
   };
 }
 
