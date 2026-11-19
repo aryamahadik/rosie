@@ -1,7 +1,8 @@
 // Tests for infra/scripts/seed-staging.sh, `npm run seed:staging` (T-571; build prompt 9.4 'Seeded state'; QUESTIONS
 // NQ-DB-2; STATE note 67; the check tester's token: T-1303, K-05 v1.12 default 105, CQ-214 (a), DL-561; the human
 // testers' set and their inboxes: T-1287, ADR-016 card S, DL-801; the roster phones' set and their numbers: T-1450,
-// DL-943), run by `node --test "infra/ci/*.test.mjs"`. The script runs in throwaway checkouts (release-harness.mjs's
+// DL-943; the roster businesses' setup rows from the same numbers: T-1466, DL-978), run by
+// `node --test "infra/ci/*.test.mjs"`. The script runs in throwaway checkouts (release-harness.mjs's
 // releaseRoot, with this repository's db/ linked in, so T-201's runner and the seed sets run as they are) against
 // throwaway local databases migrated as the staging database is, each one standing in for staging's: the database
 // STAGING_DATABASE_URL names, from the environment or from the checkout's own made-up .dev.vars. No run gets this shell's
@@ -127,6 +128,7 @@ const OWN_NAMES = [
   "ISO_TIME",
   "LAST_SIGNS",
   "ROSTER_PHONES_SET",
+  "ROSTER_SETUP_SET",
   "SESSION_END",
   "SET_NAME",
   "SHA256_OF_INPUT",
@@ -151,6 +153,7 @@ const OWN_NAMES = [
   "value",
   "with_inboxes",
   "with_roster",
+  "with_roster_setup",
   "with_tester",
 ];
 
@@ -2169,6 +2172,314 @@ describe("seed-staging.sh runs roster-owner only when named, and hands it the ro
       () => assertNothingShown({ output: `seed: ${NUMBERS[1]}\n` }, db.url, NUMBERS, "control"),
       /control: seven digits in a row/,
     );
+  });
+});
+
+// T-1466 (DL-978): seed:staging runs T-1466's set, roster-owner-setup, only when it is named, never in D-017's run, and
+// hands it the roster phones' numbers, STAGING_LINQ_ALLOWLIST, as it hands them to roster-owner (T-1450): read by name
+// from the environment, else from the checkout's .dev.vars, on that run's command line alone. With no --set, or with
+// other sets named, neither set runs and the list reaches no command: T-1450's first case above shows it (no line names
+// roster-owner, which roster-owner-setup's name holds, and no command holds a number). A recorder (script-harness.mjs's
+// spies) stands in front of every command the script and lib.sh start by name; PATH holds nothing else, so none starts
+// unseen. Each keeps its environment and its arguments, and both are checked: no other command gets a number in either,
+// and the output shows none. The numbers are made up, whole literals in the fiction range (rule 9); the database is a
+// throwaway local one, where roster-owner writes the roster phones' rows and their business_setup rows are then taken
+// out, as a run of that set from before T-1462 left them.
+describe("seed-staging.sh runs roster-owner-setup only when named, and hands it the roster phones' numbers alone (T-1466)", () => {
+  const cleanups = [];
+  const t = { after: (fn) => cleanups.push(fn) };
+  const token = madeUpToken();
+  // Every command seed-staging.sh and lib.sh start by name, but node (below).
+  const COMMANDS = ["basename", "bash", "date", "dirname"];
+  const CALLER_TEXT = "t1466 made-up caller text";
+  const ROSTER_SET = "roster-owner";
+  const SETUP_SET = "roster-owner-setup";
+  // The roster phones: made up, in the fiction range, none a test phone's fixed fake handle.
+  const NUMBERS = ["+15555550150", "+15555550151"];
+  const ROSTER_VALUE = NUMBERS.join(",");
+  const LIST_HOLDER = [`runner ${SETUP_SET}: env ${ROSTER_NAME}`];
+  const LIST_NAMED = [`runner ${SETUP_SET}: ${ROSTER_NAME}`];
+  let db;
+  let fromEnv;
+  let fromFile;
+  let noList;
+
+  /** What a recorded command is: a run of the seed runner by its set, the hasher, the session's end, or its name. */
+  const kindOf = (child) => {
+    if (child.name !== "node") return child.name;
+    if (child.args.some((arg) => arg.endsWith("/db/seeds/run.mjs")))
+      return `runner ${child.args[child.args.indexOf("--set") + 1] ?? ""}`;
+    if (child.args.some((arg) => arg.includes("createHash"))) return "hasher";
+    if (child.args.includes("--input-type=module")) return "session end";
+    return "node";
+  };
+
+  /** A seed root (with a made-up .dev.vars when devVars is given) whose every command is spied. */
+  const spiedRoot = (devVars) => {
+    const rig = seedRoot(t, devVars === undefined ? {} : { devVars });
+    const spy = spies(rig.dir, COMMANDS, { node: [process.execPath] });
+    return {
+      /** Runs seed-staging.sh with `args` under the real bash, `bash` holding its options, with the variables given. */
+      seed({ args = [], extra = {}, bash = [] } = {}) {
+        spy.clear();
+        const result = spawnSync(
+          realProgram("bash"),
+          [...bash, path.join(rig.root, "infra", "scripts", "seed-staging.sh"), ...args],
+          {
+            cwd: rig.root,
+            encoding: "utf8",
+            env: cleanEnv(path.join(rig.dir, "home"), {
+              PATH: spy.bin,
+              DB_SCHEMA: undefined,
+              STAGING_TEST_PHONES: undefined,
+              [INBOXES_NAME]: undefined,
+              [ROSTER_NAME]: undefined,
+              [TOKEN_NAME]: undefined,
+              [HASH_NAME]: undefined,
+              ...extra,
+            }),
+          },
+        );
+        return { ...result, output: `${result.stdout}${result.stderr}`, children: spy.children() };
+      },
+    };
+  };
+
+  before(async () => {
+    db = await createThrowawayDatabase("staging_roster_setup");
+    fromEnv = spiedRoot();
+    // The build Mac's form: each read by name from the checkout's .dev.vars, as lib.sh's load_dev_var reads it (the
+    // list's line exported and quoted).
+    fromFile = spiedRoot(
+      `STAGING_DATABASE_URL=${db.url}\n  export ${ROSTER_NAME}="${ROSTER_VALUE}"\n  export ${TOKEN_NAME}='${token}'\n`,
+    );
+    // A .dev.vars whose list line holds nothing.
+    noList = spiedRoot(`STAGING_DATABASE_URL=${db.url}\n${ROSTER_NAME}=\n`);
+  });
+
+  after(async () => {
+    for (const cleanup of cleanups.reverse()) cleanup();
+    await db?.drop();
+  });
+
+  // [title, the root, its variables]: the URL, the list and the token from the caller's environment, or from the
+  // checkout's .dev.vars.
+  const sources = () => [
+    [
+      "from the environment",
+      fromEnv,
+      { STAGING_DATABASE_URL: db.url, [ROSTER_NAME]: ROSTER_VALUE, [TOKEN_NAME]: token },
+    ],
+    ["from .dev.vars", fromFile, {}],
+  ];
+
+  /** The roster businesses' business_setup rows, in business order: "<business> <proven or not> version <n>". */
+  async function setupRows(sql) {
+    const rows = await sql`
+      select business_id, control_proven_at is not null or control_proven_via is not null as proven, version
+      from business_setup where business_id like 'biz-roster-owner-%' order by business_id
+    `;
+    return rows.map(
+      (row) => `${row.business_id} ${row.proven ? "proven" : "not proven"} version ${String(row.version)}`,
+    );
+  }
+
+  /** A snapshot (above) without business_setup's line: every other table of the database. */
+  const otherTables = (state) =>
+    Object.fromEntries(Object.entries(state).filter(([table]) => table !== "business_setup"));
+
+  // The lines the script prints when roster-owner-setup runs, with the list or with none: the list's name, no value.
+  const NOT_SET =
+    /^\[[^\]]+\] seed-staging: STAGING_LINQ_ALLOWLIST is not set: roster-owner-setup refuses, writing nothing, until the roster phones' numbers are on that list \(in \.dev\.vars, by name\)$/m;
+  const IS_SET =
+    /^\[[^\]]+\] seed-staging: STAGING_LINQ_ALLOWLIST is set: roster-owner-setup gets it by name and gives the roster business of each place on it its missing business_setup row alone \(no number is shown, and no other command gets the list\)$/m;
+  // roster-owner's own line (T-1450's describe above).
+  const ROSTER_IS_SET =
+    /^\[[^\]]+\] seed-staging: STAGING_LINQ_ALLOWLIST is set: roster-owner gets it by name and makes each roster phone it names a test owner of a test business of its own \(no number is shown, and no other command gets the list\)$/m;
+
+  it("with no roster business yet, --set roster-owner-setup stops the run there (exit 1), writing nothing: its run alone gets the list, by name, the set after it does not run, and no number is shown", async () => {
+    const before = await snapshot(db.sql);
+    const result = fromEnv.seed({
+      args: ["--set", SETUP_SET, "--set", "core"],
+      extra: { STAGING_DATABASE_URL: db.url, [ROSTER_NAME]: ROSTER_VALUE },
+    });
+    assert.equal(result.status, 1, result.output);
+    assert.deepEqual(startedOf(result), [SETUP_SET]);
+    assert.deepEqual(doneOf(result), []);
+    assert.match(result.stdout, IS_SET);
+    assert.doesNotMatch(result.stdout, ROSTER_IS_SET);
+    assert.match(
+      result.stderr,
+      /^seed: failed: the roster owner setup seed refused, writing nothing: entry 1's business does not exist yet; entry 2's business does not exist yet; /m,
+    );
+    assert.match(
+      result.stderr,
+      /seed-staging: FAILED at set roster-owner-setup \(the seed runner's exit 1, for the reason above\): nothing of set roster-owner-setup was written; the sets before it stay seeded, and the ones after it did not run/,
+    );
+    assert.deepEqual(whereHeld(result.children, NUMBERS, kindOf), LIST_HOLDER);
+    assert.deepEqual(namedIn(result.children, [ROSTER_NAME], kindOf), LIST_NAMED);
+    assert.deepEqual(await snapshot(db.sql), before);
+    assertNothingShown(result, db.url, NUMBERS, "no roster business yet");
+  });
+
+  it("with the list missing, empty or blank, roster-owner-setup refuses (exit 1) with roster-owner's own words for the list, writing nothing, and the output names only the missing name", async () => {
+    const before = await snapshot(db.sql);
+    for (const [title, root, extra] of [
+      ["unset, with no .dev.vars", fromEnv, { STAGING_DATABASE_URL: db.url }],
+      ["empty", fromEnv, { STAGING_DATABASE_URL: db.url, [ROSTER_NAME]: "" }],
+      ["blank", fromEnv, { STAGING_DATABASE_URL: db.url, [ROSTER_NAME]: "   " }],
+      ["unset, .dev.vars' line empty", noList, {}],
+    ]) {
+      const result = root.seed({ args: ["--set", SETUP_SET], extra });
+      assert.equal(result.status, 1, `${title}: ${result.output}`);
+      assert.deepEqual(startedOf(result), [SETUP_SET], title);
+      assert.deepEqual(doneOf(result), [], title);
+      assert.match(result.stdout, NOT_SET, title);
+      assert.match(
+        result.stderr,
+        /^seed: failed: the roster owner seed refused, writing nothing: STAGING_LINQ_ALLOWLIST is not set, or is empty: /m,
+        title,
+      );
+      assert.match(
+        result.stderr,
+        /seed-staging: FAILED at set roster-owner-setup \(the seed runner's exit 1, for the reason above\)/,
+        title,
+      );
+      assert.deepEqual(namedIn(result.children, [ROSTER_NAME], kindOf), LIST_NAMED, title);
+      assertNothingShown(result, db.url, NUMBERS, title);
+    }
+    assert.deepEqual(await snapshot(db.sql), before);
+  });
+
+  it("after roster-owner wrote the roster phones' rows, with their business_setup rows taken out (a run from before T-1462), --set roster-owner-setup from the caller's environment or from .dev.vars: its run alone gets the list, by name; it writes each roster business's row, control not proven, and no other row; the second source's run writes nothing; no number is shown", async () => {
+    const seeded = fromEnv.seed({
+      args: ["--set", ROSTER_SET],
+      extra: { STAGING_DATABASE_URL: db.url, [ROSTER_NAME]: ROSTER_VALUE },
+    });
+    assert.equal(seeded.status, 0, seeded.output);
+    assert.match(seeded.stdout, ROSTER_IS_SET);
+    assert.doesNotMatch(seeded.stdout, IS_SET);
+    await db.sql`delete from business_setup where business_id like 'biz-roster-owner-%'`;
+    assert.deepEqual(await setupRows(db.sql), []);
+    const before = await snapshot(db.sql);
+    for (const [index, [what, root, extra]] of sources().entries()) {
+      const result = root.seed({ args: ["--set", SETUP_SET], extra });
+      assert.equal(result.status, 0, `${what}: ${result.output}`);
+      assert.deepEqual(startedOf(result), [SETUP_SET], what);
+      assert.deepEqual(runsOf(result), [`${SETUP_SET} into ${ON_STAGING}`], what);
+      assert.match(result.stdout, IS_SET, what);
+      // One table, a row for each roster phone's business: the first source's run writes them, the second keeps them.
+      assert.deepEqual(
+        doneOf(result),
+        [
+          index === 0
+            ? { set: SETUP_SET, rows: NUMBERS.length, inserted: NUMBERS.length, kept: 0 }
+            : { set: SETUP_SET, rows: NUMBERS.length, inserted: 0, kept: NUMBERS.length },
+        ],
+        `${what}: ${result.output}`,
+      );
+      assert.deepEqual(
+        whereHeld(result.children, NUMBERS, kindOf),
+        LIST_HOLDER,
+        `${what}: where the list is`,
+      );
+      assert.deepEqual(
+        namedIn(result.children, [ROSTER_NAME], kindOf),
+        LIST_NAMED,
+        `${what}: the list's name`,
+      );
+      const run = result.children.find((child) => kindOf(child) === `runner ${SETUP_SET}`);
+      assert.ok(run.env.split("\n").includes(`${ROSTER_NAME}=${ROSTER_VALUE}`), `${what}: the list's value`);
+      // The database's URL is where T-1310 put it: the run of the seed runner.
+      assert.deepEqual(
+        whereHeld(result.children, [db.url, new URL(db.url).pathname.slice(1)], kindOf),
+        [`runner ${SETUP_SET}: env DATABASE_URL STAGING_DATABASE_URL`],
+        `${what}: where the URL is`,
+      );
+      assert.deepEqual(
+        await setupRows(db.sql),
+        ["biz-roster-owner-1 not proven version 1", "biz-roster-owner-2 not proven version 1"],
+        what,
+      );
+      assert.deepEqual(otherTables(await snapshot(db.sql)), otherTables(before), `${what}: another table`);
+      assert.equal(result.stderr, "", what);
+      assertNothingShown(result, db.url, NUMBERS, what);
+      assertNoTokenShown(result, [token], what);
+    }
+  });
+
+  it("both sets named in one run: roster-owner's run and roster-owner-setup's each get the list, by name, and no other command; each set's line is printed, and neither writes a row more", async () => {
+    const before = await snapshot(db.sql);
+    const result = fromEnv.seed({
+      args: ["--set", ROSTER_SET, "--set", SETUP_SET],
+      extra: { STAGING_DATABASE_URL: db.url, [ROSTER_NAME]: ROSTER_VALUE },
+    });
+    assert.equal(result.status, 0, result.output);
+    assert.deepEqual(startedOf(result), [ROSTER_SET, SETUP_SET]);
+    assert.match(result.stdout, ROSTER_IS_SET);
+    assert.match(result.stdout, IS_SET);
+    assert.deepEqual(doneOf(result), [
+      { set: ROSTER_SET, rows: 7 * NUMBERS.length, inserted: 0, kept: 7 * NUMBERS.length },
+      { set: SETUP_SET, rows: NUMBERS.length, inserted: 0, kept: NUMBERS.length },
+    ]);
+    // whereHeld and namedIn sort their lines.
+    assert.deepEqual(
+      whereHeld(result.children, NUMBERS, kindOf),
+      [`runner ${ROSTER_SET}: env ${ROSTER_NAME}`, `runner ${SETUP_SET}: env ${ROSTER_NAME}`].sort(),
+    );
+    assert.deepEqual(
+      namedIn(result.children, [ROSTER_NAME], kindOf),
+      [`runner ${ROSTER_SET}: ${ROSTER_NAME}`, `runner ${SETUP_SET}: ${ROSTER_NAME}`].sort(),
+    );
+    assert.deepEqual(await snapshot(db.sql), before);
+    assert.equal(result.stderr, "");
+    assertNothingShown(result, db.url, NUMBERS, "both sets");
+  });
+
+  it("allexport, keyword and tracing from the caller, and the caller's variables of the script's own names, from either source: roster-owner-setup's run alone gets the list", async () => {
+    const caller = {
+      roster_phones: CALLER_TEXT,
+      ROSTER_SETUP_SET: CALLER_TEXT,
+      with_roster_setup: CALLER_TEXT,
+    };
+    const SETS = ["skeleton", SETUP_SET, "check-tester"];
+    for (const [source, root, extra] of sources()) {
+      // [mode, its variables, bash's options, what standard error holds: a trace begins and ends at set +x]
+      for (const [mode, variables, bash, stderr] of [
+        ["SHELLOPTS=allexport", { SHELLOPTS: "allexport" }, [], ""],
+        ["bash -a -k", {}, ["-a", "-k"], ""],
+        ["the caller's variables under allexport", { ...caller, SHELLOPTS: "allexport" }, [], ""],
+        ["bash -x", {}, ["-x"], "+ set +x\n"],
+      ]) {
+        const what = `${mode}, ${source}`;
+        const result = root.seed({
+          args: SETS.flatMap((set) => ["--set", set]),
+          extra: { ...extra, ...variables },
+          bash,
+        });
+        assert.equal(result.status, 0, `${what}: ${result.output}`);
+        assert.deepEqual(startedOf(result), SETS, what);
+        assert.deepEqual(
+          whereHeld(result.children, NUMBERS, kindOf),
+          LIST_HOLDER,
+          `${what}: where the list is`,
+        );
+        assert.deepEqual(
+          namedIn(result.children, [ROSTER_NAME], kindOf),
+          LIST_NAMED,
+          `${what}: the list's name`,
+        );
+        assert.deepEqual(whereHeld(result.children, [CALLER_TEXT], kindOf), [], `${what}: a caller's text`);
+        assert.deepEqual(
+          await setupRows(db.sql),
+          ["biz-roster-owner-1 not proven version 1", "biz-roster-owner-2 not proven version 1"],
+          what,
+        );
+        assert.equal(result.stderr, stderr, `${what}: standard error`);
+        assertNothingShown(result, db.url, NUMBERS, what);
+        assertNoTokenShown(result, [token], what);
+      }
+    }
   });
 });
 
