@@ -13,8 +13,9 @@
 //     reads none (NO_STEP_CARDS): every step's side cannot be read, and every choice is the business's (fails closed);
 //   - what default 14 (T-1459; DL-961) reads about the turn's handle at the call's business, each from its stored row:
 //     the open question a sign-up's answer answers, the sender's link to the handle and the business's control (K-04
-//     open_questions and person_handles, K-23 business_setup.control_proven_at), in one K-05 v1.2 readTurnState on the
-//     call's transaction: SignUpFacts.
+//     open_questions and person_handles, K-23 business_setup.control_proven_at), on the call's transaction as the Tool
+//     API's role may read them (T-1463; DL-964): limit 3's question read, and db/repo/sign-up-reads.ts's read of the link
+//     and the control: SignUpFacts.
 //
 // Every read takes and gives ids and closed labels: never a person's words, name, number or email (the action layer never
 // reads free text: arch 02 line 139), so nothing limit 1 answers can carry one into a log, a span or an error. The one
@@ -23,8 +24,8 @@
 
 import type { BookingStage } from "../../../../db/repo/bookings-head";
 import type { Sql, Tx } from "../../../../db/repo/scope";
-import { readTurnStateIn } from "../../../../db/repo/setup/turn-state";
-import type { ReadTurnStateResponse } from "../../../../db/repo/turn-state";
+import { readSignUpFactsIn, type SignUpFactsRead } from "../../../../db/repo/sign-up-reads";
+import { liveOpenQuestionsOfHandle, type OpenQuestionRead } from "../../../../db/repo/targets";
 import {
   NOTHING_ON_FILE,
   NO_ADMIN_POWERS,
@@ -278,60 +279,59 @@ export interface SignUpFacts {
    * open) on this handle at the call's business; else null.
    */
   question(openQuestionId: string): Promise<AskedQuestion | null>;
-  /** (c) Whether K-04 links the person to this handle (person_handles). */
+  /**
+   * (c) Whether K-04 links the person to this handle (person_handles). As rosie_app, through 0038, only for a handle with
+   * a live open question of the call's business: (b)'s question is one, so where default 14 asks, the answer is the same.
+   */
   linked(personId: string): Promise<boolean>;
   /** (d) The call's business's control (K-23 business_setup), or null when it has no business_setup row. */
   control(): Promise<BusinessControl | null>;
 }
 
-/** The fact default 14 reads of the call's business: a setup fact home (db/repo/setup/fact-homes.ts, K-23 v1). */
-const CONTROL_PROVEN = {
-  key: "controlProvenAt",
-  table: "business_setup",
-  column: "control_proven_at",
-} as const;
-
 /**
- * Default 14's facts over the call's transaction, read once when first asked: K-05 v1.2 item 26's readTurnState of the
- * handle at the call's business with its business_setup row's control_proven_at (db/repo/setup/turn-state.ts
- * readTurnStateIn, on the transaction as it is, under the call's business scope, which the read checks before its first
- * statement). Of its answer only three things are kept: the live open questions sent to the handle at the business, as
- * limit 3 maps them (askedQuestionOf); the people K-04 links to the handle; and the control. A notFound (no such handle,
- * business or business_setup row) answers every fact as missing. The read's other fields (the handle's address among
- * them) are never kept or returned. Its own errors (a refused statement, a lost connection, a scope that is not the
- * call's) are thrown as it throws them, and the limit answers the part as before default 14; a refused statement has
- * aborted the call's transaction by then, which postgres.js fails with that error, so the call fails as a whole. As
- * rosie_app the read is refused at its first table (handles: 0012 grants it, person_handles, persons, phones and
- * outbox_parts to rosie_job alone).
+ * Default 14's facts over the call's transaction, each from its stored row, as the Tool API's role (rosie_app, the gate's
+ * real side) may read them, with no statement on handles, persons, phones or person_handles (T-1463; the architect's N2
+ * on T-1459; DL-964):
+ *   (b) the question: limit 3's read, K-05 v1.2's openQuestionRead (db/repo/targets.ts liveOpenQuestionsOfHandle, which
+ *       reads when a question went out through 0037's open_questions_went_out as rosie_app: T-1457), made once when first
+ *       asked; of it only a live question sent to the handle at the call's business is answered, as limit 3 maps it
+ *       (askedQuestionOf). The business filter holds where row-level security does not bind (rosie_job with no scope, the
+ *       tables' owner), as readTurnState's did (db/repo/turn-state.ts lines 843 to 847);
+ *   (c) the link and (d) the control: db/repo/sign-up-reads.ts readSignUpFactsIn, under the call's business scope (which
+ *       it checks before its first read), in one statement: the business's business_setup row read under that scope, and
+ *       the link read directly on the runtime side, or through 0038's person_handles_linked as rosie_app (true only for a
+ *       handle with a live open question of the scoped business, which (b) has found before limit 1 asks). Each person's
+ *       read is made once, when first asked; control() answers from the first read made (in limit 1 the sender's, made
+ *       for (c), so (c) and (d) are one moment's), or from a read that asks no link.
+ * A missing row answers null or false: no such question live on the handle at the business, no link, no business_setup
+ * row. Every read's own errors (a refused statement, a lost connection, a scope that is not the call's, a value it cannot
+ * read) are thrown as it throws them, and the limit answers the part as before default 14; a refused statement has
+ * aborted the call's transaction by then, which postgres.js fails with that error, so the call fails as a whole. The
+ * handle's address, its other people and the question's words are never read here.
  */
 export function signUpFactsOver(db: Sql | Tx, businessId: string, handleId: string): SignUpFacts {
-  let read: Promise<ReadTurnStateResponse | null> | null = null;
-  const state = (): Promise<ReadTurnStateResponse | null> =>
-    (read ??= readTurnStateIn(db, {
-      handleId,
-      businessId,
-      bookingIds: [],
-      facts: [{ ...CONTROL_PROVEN, rowId: businessId }],
-    }).then((answer) => ("error" in answer ? null : answer)));
+  let live: Promise<OpenQuestionRead[]> | null = null;
+  const reads = new Map<string | null, Promise<SignUpFactsRead>>();
+  const readFor = (personId: string | null): Promise<SignUpFactsRead> => {
+    const read = reads.get(personId) ?? readSignUpFactsIn(db, { businessId, handleId, personId });
+    reads.set(personId, read);
+    return read;
+  };
   return {
     async question(openQuestionId) {
-      const found = (await state())?.openQuestions.find((question) => question.id === openQuestionId);
+      live ??= liveOpenQuestionsOfHandle(db, handleId);
+      const found = (await live).find(
+        (question) => question.id === openQuestionId && question.businessId === businessId,
+      );
       return found === undefined ? null : askedQuestionOf(handleId, found);
     },
     async linked(personId) {
-      return (await state())?.persons.some((person) => person.personId === personId) === true;
+      return (await readFor(personId)).linked;
     },
     async control() {
-      const fact = (await state())?.facts.find(
-        (each) =>
-          each.table === CONTROL_PROVEN.table &&
-          each.column === CONTROL_PROVEN.column &&
-          each.rowId === businessId,
-      );
-      if (fact === undefined) return null;
-      // A timestamptz fact is written in UTC, or null (db/repo/setup/turn-state.ts); any other value cannot be read.
-      const { value } = fact;
-      return value === null || typeof value === "string" ? { provenAt: value } : null;
+      const [first] = reads.values();
+      const { setup } = await (first ?? readFor(null));
+      return setup === null ? null : { provenAt: setup.controlProvenAt };
     },
   };
 }
