@@ -6,8 +6,15 @@
 //   - recordSafetyOutcome and releaseSafetyHold go through the safety service (T-318, domain/safety:
 //     recordSafetyOutcomeCore and releaseSafetyHoldCore), with every port it reads handed through (DL-330, DL-341): K-34's
 //     reads with the texts' arrival, the sealer, the pinned bundle's checked lines (with the core's line rule on top:
-//     lines.ts), the plug-in's stop words and who is told. Each text of a turn carries its record, No included (K-09
-//     README default 5; runtime/src/turn/turn.ts), and its answer's hold binds what follows it.
+//     lines.ts), the plug-in's stop words and who is told, the telling port on the turn's own repo (default 10: the paging
+//     telling port, telling.ts pagingTellingPort, or NOT_TOLD_YET). Each text of a turn carries its record, No included
+//     (K-09 README default 5; runtime/src/turn/turn.ts), and its answer's hold binds what follows it.
+//   - handOff, answerHandOff, pageTeam, acknowledgePage and openReviewItem go through the paging service (T-319,
+//     domain/paging: handOffCore, answerHandOffCore, pageTeamCore, acknowledgePageCore and openReviewItemCore; T-1443),
+//     with the paging port the wiring binds by name (CoreDeps.paging: its PagingReader, the runtime's, T-1444; its ids;
+//     ENVIRONMENT; staging's roster): a hand-off's alert and escalation, a page's rows and next page, an answer's or an
+//     acknowledgement's cancel and a review item commit in the turn's one commit, their clock rows and cancels in the
+//     unit's writes (default 9). decideReviewItem is the console's alone (K-09 v1), never a core action.
 //   - recordStopOrStart and setRecordFlag go through the flags service (T-317, domain/flags: stopOrStartCore
 //     and recordFlagCore), with the flags port the wiring hands in by name (CoreDeps.flags; DL-864): a STOP or
 //     START text and a record flag commit in the turn's one commit, the STOP's reply row among its outbox rows
@@ -19,14 +26,15 @@
 //   - The clock rows a run arms that no question owns (a threat's pause call-offs, S11-62; a pause's,
 //     flag-paused.json; T-319's escalations), which a service hands back beside its writes, are handed over in
 //     them (UnitWrites.clocks; T-1156's withClocks), so the turn's one commit writes each with its event-log
-//     entry and none is ever dropped (DL-341).
+//     entry and none is ever dropped (DL-341). The paging service hands its own clock rows and cancels in its
+//     writes already (domain/paging writes.ts pagingUnitWritesOf), so they go on as it gives them.
 //   - Every other core action answers notBuilt (CoreNotBuiltError), as does a name K-09 v1 does not hold: M3b's
 //     other core calls are each their own task. So does a call whose port is not wired yet (the service's
-//     NotBuiltError, or no flags port bound). gateAndCommit then answers notBuilt, and nothing of the turn is
-//     written.
+//     NotBuiltError, or no flags or paging port bound). gateAndCommit then answers notBuilt, and nothing of the turn
+//     is written.
 //   - A refused core action stops only itself (K-09 v1 coreResult): its error comes back in its result and it
 //     writes nothing. What K-09 has no answer for (the safety service's SafetyRefusedError, the flags service's
-//     FlagRefusedError, a fault) fails the turn, unchanged.
+//     FlagRefusedError, the paging service's PagingRefusedError, a fault) fails the turn, unchanged.
 //
 // runCore only reads, through the ports it is given, and hands back what the commit is to write: nothing is sent,
 // charged, stored or told outside the one K-05 request, since a repeated turn runs it again before K-05 answers
@@ -65,16 +73,37 @@
 //      no flags port bound, or one of its four ports left out, it answers notBuilt (portNotWired) before anything is
 //      read. A line the fixed-lines service does not send in a turn (HELP's reply alone, as quick_reply), or a request
 //      carrying an actor's send, answers notBuilt (noService; fixed-lines.ts default 1). Its run arms no clock row.
+//   9. (T-1443) The five paging core actions are each the turn's own call (default 3), checked here before the paging
+//      service's own check of the turn and the business (handlers.ts checkTurn), and read through the paging port the
+//      wiring binds alone (CoreDeps.paging), never the service's default reader: with no paging port bound, or one bound
+//      with no reader, each answers notBuilt (portNotWired) before anything is read, as the flags calls do (default 5).
+//      What is open on the handle is not handed to them (the paging service's core functions take none): none writes a
+//      routine row to the held handle, only an alert to the owner, rows to Rosie's team, a review item for the team, or
+//      an answer or acknowledgement recorded, and a hand-off or a page about danger must never wait behind its own hold
+//      (arch 06 line 329). A paging service's NotBuiltError (a read the port answers notBuilt; handOff about ownerOrStaff,
+//      its default 15) answers notBuilt (portNotWired), as default 4's.
+//  10. (T-1443) Who is told is the wiring's TellingPort (CoreSafetyDeps.telling): one SafetyTelling for every turn
+//      (NOT_TOLD_YET, the default every binding names until the runtime binds the paging port: T-1444), or a RepoTelling
+//      built on each turn's own repo (telling.ts pagingTellingPort), put on the repo the commit hands runCore before the
+//      safety service runs (domain/safety tellingOn), so its reads are that turn's call's.
 
 import type {
   SafetyDeps,
   SafetyLines,
   SafetyReader,
-  SafetyTelling,
   StopWords,
+  TellingPort,
   WordsSealer,
 } from "../../domain/safety";
-import { recordSafetyOutcomeCore, releaseSafetyHoldCore } from "../../domain/safety";
+import { recordSafetyOutcomeCore, releaseSafetyHoldCore, tellingOn } from "../../domain/safety";
+import {
+  acknowledgePageCore,
+  answerHandOffCore,
+  handOffCore,
+  openReviewItemCore,
+  pageTeamCore,
+  type PagingDeps,
+} from "../../domain/paging";
 import {
   recordFlagCore,
   stopOrStartCore,
@@ -106,8 +135,12 @@ export type CoreSafetyDeps<Repo> = SafetyDeps<Repo> & {
   readonly lines: SafetyLines;
   /** The plug-in's stop words (A3-26): PLUGIN_LISTS_NO_STOP_WORDS for a plug-in known to list none, the barbershop's. */
   readonly stopWords: StopWords;
-  /** Hand-offs and pages (T-319); NOT_TOLD_YET until they land, so an outcome that must tell someone answers notBuilt. */
-  readonly telling: SafetyTelling;
+  /**
+   * Hand-offs and pages (T-319), put on each turn's repo (default 10): the paging telling port (telling.ts
+   * pagingTellingPort), or NOT_TOLD_YET, the default every binding names until the runtime binds the port (T-1444), so an
+   * outcome that must tell someone answers notBuilt.
+   */
+  readonly telling: TellingPort<Repo>;
 };
 
 /**
@@ -134,6 +167,13 @@ export interface CoreDeps<Repo> {
    * setRecordFlag and sendFixedLine answer notBuilt (portNotWired) and nothing is read or written (defaults 5 and 8).
    */
   readonly flags?: CoreFlagsDeps<Repo>;
+  /**
+   * The paging service's ports (T-319's PagingDeps; T-1443): its reads (the runtime's PagingReader: T-1444), its ids,
+   * ENVIRONMENT and staging's roster, each failing closed as the service's own defaults do (telling.ts pagingDepsOf).
+   * None bound, or bound with no reader, and handOff, answerHandOff, pageTeam, acknowledgePage and openReviewItem answer
+   * notBuilt (portNotWired) before anything is read (default 9).
+   */
+  readonly paging?: PagingDeps<Repo>;
 }
 
 /** The four ports the flags calls read with, each handed in by name (default 5). */
@@ -169,6 +209,24 @@ function flagsPortOf<Repo>(core: CallName, port: CoreFlagsDeps<Repo> | undefined
 }
 
 /**
+ * The paging port the wiring bound, as T-319's core functions take it (default 9): none bound, or one bound with no reader,
+ * answers notBuilt (portNotWired), so the service never falls back to its default reader.
+ */
+function pagingPortOf<Repo>(core: CallName, port: PagingDeps<Repo> | undefined): PagingDeps<Repo> {
+  // As the wiring handed it in: a reader left out, or null (which its type says it cannot be), is not bound either.
+  const reader: unknown = port?.reader;
+  if (port === undefined || reader === undefined || reader === null) {
+    throw new CoreNotBuiltError(core, "portNotWired");
+  }
+  return port;
+}
+
+/** A paging core action's run as the commit takes it (default 9): its result and writes, its clock rows already in them. */
+async function pagingRun(run: () => Promise<CoreRun>): Promise<ServiceRun> {
+  return { run: await run(), clocks: [] };
+}
+
+/**
  * A core action's run with the clock rows its service armed beside its writes handed over in them (UnitWrites.clocks,
  * after any the writes already carry), so the turn's one commit writes each (T-1156; DL-341: none is ever dropped). A run
  * that arms none is handed on as it is.
@@ -179,8 +237,9 @@ function withClocks(run: CoreRun, clocks: readonly ClockNew[]): CoreRun {
 }
 
 /**
- * A service's run of one core action (the safety service's SafetyCoreRun, the flags service's RecordFlagCoreRun):
- * its result and writes, and the clock rows it arms that no question owns, beside them.
+ * A service's run of one core action (the safety service's SafetyCoreRun, the flags service's RecordFlagCoreRun, the
+ * paging service's CoreRun with none beside it): its result and writes, and the clock rows it arms that no question owns,
+ * beside them.
  */
 interface ServiceRun {
   readonly run: CoreRun;
@@ -188,8 +247,8 @@ interface ServiceRun {
 }
 
 /**
- * One safety or flags call's run as the commit takes it: a port not wired answers notBuilt (default 4); otherwise
- * its result and writes, with the clock rows it arms that no question owns handed over in them (withClocks).
+ * One safety, flags or paging call's run as the commit takes it: a port not wired answers notBuilt (defaults 4 and 9);
+ * otherwise its result and writes, with the clock rows it arms that no question owns handed over in them (withClocks).
  */
 async function committable(core: CallName, run: () => Promise<ServiceRun>): Promise<CoreRun> {
   let ran: ServiceRun;
@@ -232,15 +291,54 @@ function notBuilt(action: { readonly call: unknown }): never {
  * what the commit is to write. Throws CoreNotBuiltError (notBuilt) for a core action it cannot run yet.
  */
 export function createRunCore<Repo>(deps: CoreDeps<Repo>): CommitPorts<Repo>["runCore"] {
-  const safety: SafetyDeps<Repo> = { ...deps.safety, lines: coreSafetyLines(deps.safety.lines) };
+  const lines = coreSafetyLines(deps.safety.lines);
+  /** The safety service's ports for one turn: who is told, on the turn's own repo (default 10). */
+  const safetyOn = (repo: Repo): SafetyDeps<Repo> => ({
+    ...deps.safety,
+    lines,
+    telling: tellingOn(deps.safety.telling, repo),
+  });
   return async (action: CoreAction, turn, open) => {
     switch (action.call) {
-      case "recordSafetyOutcome":
+      case "recordSafetyOutcome": {
         checkCaller(action.request.caller, turn);
+        const safety = safetyOn(turn.repo);
         return await committable(action.call, () => recordSafetyOutcomeCore(action, turn, open, safety));
-      case "releaseSafetyHold":
+      }
+      case "releaseSafetyHold": {
         checkCaller(action.request.caller, turn);
+        const safety = safetyOn(turn.repo);
         return await committable(action.call, () => releaseSafetyHoldCore(action, turn, open, safety));
+      }
+      case "handOff": {
+        checkCaller(action.request.caller, turn);
+        const paging = pagingPortOf(action.call, deps.paging);
+        return await committable(action.call, () => pagingRun(() => handOffCore(action, turn, paging)));
+      }
+      case "answerHandOff": {
+        checkCaller(action.request.caller, turn);
+        const paging = pagingPortOf(action.call, deps.paging);
+        return await committable(action.call, () => pagingRun(() => answerHandOffCore(action, turn, paging)));
+      }
+      case "pageTeam": {
+        checkCaller(action.request.caller, turn);
+        const paging = pagingPortOf(action.call, deps.paging);
+        return await committable(action.call, () => pagingRun(() => pageTeamCore(action, turn, paging)));
+      }
+      case "acknowledgePage": {
+        checkCaller(action.request.caller, turn);
+        const paging = pagingPortOf(action.call, deps.paging);
+        return await committable(action.call, () =>
+          pagingRun(() => acknowledgePageCore(action, turn, paging)),
+        );
+      }
+      case "openReviewItem": {
+        checkCaller(action.request.caller, turn);
+        const paging = pagingPortOf(action.call, deps.paging);
+        return await committable(action.call, () =>
+          pagingRun(() => openReviewItemCore(action, turn, paging)),
+        );
+      }
       case "recordStopOrStart": {
         checkCaller(action.request.caller, turn);
         checkBusiness(action.call, action.request.caller, turn);

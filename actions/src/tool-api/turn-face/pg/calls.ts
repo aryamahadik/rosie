@@ -62,7 +62,8 @@ import type { CoreFlagsDeps } from "../../../commit/core";
 import { pgCommitTurn } from "../../../commit/pg";
 import { KEYED_IDS, NO_EVENT_SOURCES, flagsReaderOf } from "../../../domain/flags";
 import { messagesReaderOf } from "../../../domain/messages-consent";
-import type { SafetyTelling, StopWords } from "../../../domain/safety";
+import type { PagingDeps } from "../../../domain/paging";
+import type { StopWords, TellingPort } from "../../../domain/safety";
 import type { FrontierBundles } from "../../../frontier";
 import type { BusinessScope, ScopeCall } from "../../scope";
 import type { SpanRefusedReport } from "../../tool-api";
@@ -149,8 +150,17 @@ export interface PgTurnCallsOptions {
   readonly wrappingKeys: WrappingKeys;
   /** The plug-in's stop words, named (PLUGIN_LISTS_NO_STOP_WORDS for the barbershop: DL-344). */
   readonly stopWords: StopWords;
-  /** Who is told (NOT_TOLD_YET until T-319: DL-344). */
-  readonly telling: SafetyTelling;
+  /**
+   * Who is told (DL-344; T-1443): the paging telling port (commit/core pagingTellingPort, built on each call's transaction),
+   * or NOT_TOLD_YET, the default until the runtime binds the port (T-1444).
+   */
+  readonly telling: TellingPort<Tx>;
+  /**
+   * The paging service's ports (T-1443; commit/core pagingDepsOf): runCore's, for the paging core actions a turn carries,
+   * and the Tool API base's paging handlers', for the six paging calls made alone. Left out, as until T-1444, each answers
+   * notBuilt.
+   */
+  readonly paging?: PagingDeps<Tx>;
   /** The commit's moment, read once per commit: a test's fake clock. Default: the database's now() (T-306). */
   readonly now?: () => Date;
   /** The walk's turn key (K-09 v1.5 default 131). Default: the turn's own id. */
@@ -177,11 +187,14 @@ export function pgRowData(runtime: Sql): RowData {
   };
 }
 
-/** What the commit binding on PostgreSQL is built from: the options both the turn face's calls and the door take. */
-type PgCommitBindingOptions = Pick<
+/**
+ * What the commit binding on PostgreSQL is built from: the options both the turn face's calls and the door take, who is
+ * told named on the call's own repo (`Repo`: the call's transaction, or the door's).
+ */
+type PgCommitBindingOptions<Repo> = Pick<
   PgTurnCallsOptions,
-  "bundles" | "wrappingKeys" | "stopWords" | "telling" | "now" | "turnKey"
->;
+  "bundles" | "wrappingKeys" | "stopWords" | "now" | "turnKey"
+> & { readonly telling: TellingPort<Repo> };
 
 /**
  * The commit's binding on PostgreSQL (T-1141), for a call whose repo is `Repo`: the Tool API's call transaction (Tx) for
@@ -191,7 +204,7 @@ type PgCommitBindingOptions = Pick<
  */
 function pgCommitBinding<Repo extends Sql | Tx>(
   runtime: Sql,
-  options: PgCommitBindingOptions,
+  options: PgCommitBindingOptions<Repo>,
 ): TurnCommitBinding<Repo> {
   return {
     bundles: options.bundles,
@@ -210,9 +223,11 @@ function pgCommitBinding<Repo extends Sql | Tx>(
  * `toolApi` one whose connections run as rosie_app, both on the primary, uncached (arch 10 lines 504, 538).
  */
 export function pgTurnCalls(runtime: Sql, toolApi: Sql, options: PgTurnCallsOptions): TurnFaceCalls<Tx> {
+  const { paging } = options;
   const binding: TurnCommitBinding<Tx> = {
     ...pgCommitBinding<Tx>(runtime, options),
     ...(options.safetyExtra === undefined ? {} : { safetyExtra: options.safetyExtra }),
+    ...(paging === undefined ? {} : { paging }),
   };
   const held = new HeldTurns();
   const rows: RowBinding = {
@@ -228,6 +243,7 @@ export function pgTurnCalls(runtime: Sql, toolApi: Sql, options: PgTurnCallsOpti
     compose: composeInputDeps<Tx>(rows),
     finalize: finalizeDeps<Tx>(rows),
     held,
+    ...(paging === undefined ? {} : { paging }),
   };
 }
 
@@ -286,8 +302,12 @@ export interface PgKeywordDoorOptions {
   readonly wrappingKeys: WrappingKeys;
   /** The plug-in's stop words, named (no business has a plug-in: PLUGIN_LISTS_NO_STOP_WORDS answers none). */
   readonly stopWords: StopWords;
-  /** Who is told (NOT_TOLD_YET until T-319). */
-  readonly telling: SafetyTelling;
+  /**
+   * Who is told (T-1443): NOT_TOLD_YET, the default until the runtime binds the paging telling port (T-1444), or that
+   * port, built on the door's transaction. The door's lines answer notBuilt for every danger outcome (commit.ts default
+   * 5), so no record of the door's tells anyone either way.
+   */
+  readonly telling: TellingPort<Sql>;
   /** The commit's moment, read once per commit: a test's fake clock. Default: the database's now() (T-306). */
   readonly now?: () => Date;
   /** K-09's checks. Default: the validator over the frozen schemas read from contracts/. */

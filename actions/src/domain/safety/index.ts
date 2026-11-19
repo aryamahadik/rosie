@@ -2,7 +2,8 @@
 // (a threat pauses the person and their phone, unsafe at home makes the booking private), and the hold's release only by
 // its rule: at once after the message, once the booking is private, or after a clear "we're safe" with a fresh read-back;
 // a threat's never. The commit's runCore (T-1140) calls recordSafetyOutcomeCore and releaseSafetyHoldCore; paging and
-// hand-offs are T-319's (the SafetyTelling port).
+// hand-offs are T-319's (the SafetyTelling port), which a binding names as a TellingPort (T-1443: NOT_TOLD_YET, or the
+// paging telling port, a RepoTelling put on each call's repo by tellingOn).
 
 export { SafetyRefusedError, type SafetyFault } from "./errors";
 export {
@@ -25,9 +26,11 @@ export {
   PLUGIN_LISTS_NO_STOP_WORDS,
   STOP_WORDS_NOT_WIRED,
   noSafetyReads,
+  tellingOn,
   type FixedLineWords,
   type HotlineKind,
   type OwnerContact,
+  type RepoTelling,
   type SafetyLineChoice,
   type SafetyLines,
   type SafetyReader,
@@ -39,6 +42,7 @@ export {
   type StoredOutcome,
   type TellPlan,
   type TellRequest,
+  type TellingPort,
   type WordsSealer,
 } from "./ports";
 export {
