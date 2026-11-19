@@ -4,11 +4,14 @@
 // (K-01 v1) one path, in order:
 //
 //   - a plain step is walked (its own writes apply: its gives) and the walk goes on to its next;
+//   - a plain step whose message carries buttons asks someone, its question being those buttons (T-1461; DL-965's lead
+//     note: S1-04 in bundle v1), so the walk stops there and never walks past it; one with no buttons is walked on;
 //   - a split stops the walk: one with a message branch asks someone, one with a clock branch waits on a clock; one whose
 //     branches are all lookups is settled by code from a field it reads, which the walk does not read yet (notBuilt);
 //   - a chosen branch is taken (its effects apply: what the choice causes, read by the compiler from the branch's own
-//     steps), then its own steps are passed in order, each only to see whether it stops the walk, then it goes on: an
-//     ending branch ends the path with its end text, a merging one rejoins at its rejoinAt or its split's next;
+//     steps), then its own steps are walked in order, as plain steps are (T-1461: their own writes are the branch's
+//     effects), each stopping the walk where a step on a list would, then it goes on: an ending branch ends the path
+//     with its end text, a merging one rejoins at its rejoinAt or its split's next;
 //   - where a list ends (next null), its section's main path ends the journey, and a branch's list goes where its branch
 //     goes.
 //
@@ -22,7 +25,8 @@
 //      the path ends after the branch's steps anyway. So S1-02's "Not a service we book" ends with its end text on bundle
 //      v0, which does not hold S1-74 (ADR-013 section 6; DL-322 ruling 3), while "One isn't on the list yet" and "All on
 //      the list", which merge at S1-11, are refused at S1-03 and S1-11. Any other step the bundle does not hold is
-//      refused.
+//      refused. Writing the answer still refuses such a step (writes.ts: an answer writes each step of its branch through
+//      that step's writer), so this default tells where the path goes, never what it writes.
 //   2. A step with its own gate (K-01 v1 step.when) is not walked yet: its gate reads the path, the plug-in and the
 //      record (notBuilt). A chosen branch's own gate was the frontier's to read when it offered the branch.
 
@@ -41,14 +45,17 @@ export type WalkStart =
 
 /** What the walk applies, in order. */
 export type Move =
-  /** A plain step walked: its own writes apply. */
+  /** A plain step walked, on a list or on a chosen branch: its own writes apply. */
   | { readonly kind: "step"; readonly step: GraphStep }
-  /** A branch taken: its effects apply. */
+  /** A branch taken: its effects apply (its own steps follow it, each a move of its own). */
   | { readonly kind: "branch"; readonly split: GraphStep; readonly branch: GraphBranch };
 
 /** Where the walk stops. */
 export type Stop =
-  /** A split that asks someone (a message branch): its question goes out, and the walk waits for the answer. */
+  /**
+   * A step that asks someone: a split with a message branch, or a plain step whose message carries buttons (T-1461). Its
+   * question goes out, and the walk waits for the answer.
+   */
   | { readonly kind: "asks"; readonly step: GraphStep }
   /** A split a clock settles (a clock branch, no message branch). */
   | { readonly kind: "waits"; readonly step: GraphStep }
@@ -100,16 +107,27 @@ export function walkFrom(graph: FlowGraph, start: WalkStart): Walked {
     throw new WalkNotBuiltError("lookup", [split.id]);
   };
 
+  /**
+   * One step entered: where it stops the walk (a split, or a plain step whose message carries buttons: its question is
+   * those buttons), or null when it is walked, applied as a move.
+   */
+  const visit = (entered: GraphStep): Stop | null => {
+    enter(entered.id);
+    if (entered.gated) throw new WalkNotBuiltError("stepGate", [entered.id]);
+    if (entered.split) return atSplit(entered);
+    if (entered.buttons > 0) return { kind: "asks", step: entered };
+    moves.push({ kind: "step", step: entered });
+    return null;
+  };
+
   /** From step `id` along its own list (each step's next), each plain step applied, to where the walk stops. */
   const from = (id: string): Stop => {
-    let step = held(id);
+    let walking = held(id);
     for (;;) {
-      enter(step.id);
-      if (step.gated) throw new WalkNotBuiltError("stepGate", [step.id]);
-      if (step.split) return atSplit(step);
-      moves.push({ kind: "step", step });
-      if (step.next === null) return climb(step);
-      step = held(step.next);
+      const stop = visit(walking);
+      if (stop !== null) return stop;
+      if (walking.next === null) return climb(walking);
+      walking = held(walking.next);
     }
   };
 
@@ -123,20 +141,19 @@ export function walkFrom(graph: FlowGraph, start: WalkStart): Walked {
   };
 
   /**
-   * A branch taken: its effects, then its own steps in order, each passed only to see whether it stops the walk (what a
-   * plain one writes is in the branch's effects, which the compiler reads from it), then where the branch goes.
+   * A branch taken: its effects, then its own steps in order, each walked as a step on a list is (what a plain one writes
+   * is what the branch's effects name, which the compiler reads from it: T-1461), then where the branch goes.
    */
   const take = (split: GraphStep, branch: GraphBranch): Stop => {
     moves.push({ kind: "branch", split, branch });
     for (const id of branch.steps) {
-      const step = graph.step(id);
-      if (step === null) {
+      const own = graph.step(id);
+      if (own === null) {
         if (accountedFor(branch, id)) continue;
         throw new WalkRefusedError("stepNotInBundle", [id]);
       }
-      enter(step.id);
-      if (step.gated) throw new WalkNotBuiltError("stepGate", [step.id]);
-      if (step.split) return atSplit(step);
+      const stop = visit(own);
+      if (stop !== null) return stop;
     }
     return after(split, branch);
   };
