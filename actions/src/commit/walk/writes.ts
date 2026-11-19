@@ -6,25 +6,55 @@
 // given.stated.writes (K-09 v1.5 default 136; ADR-013 section 4): S1-01's thread, S1-02's question and
 // outbox-s1-02-sam-1.
 //
-// It only reads (the pinned graph, through its own port, and the call's request) and has no outside effect, since a
-// repeated turn runs it again before K-05 answers repeated (STATE note 1; types.ts CommitPorts). Nothing here logs; what
-// it throws names faults, step ids and keys (errors.ts), never words or the chat id.
+// An answer (T-1461; the architect's ruling on the second turn, DL-961, and the lead's note, DL-965): a part that chooses
+// an open question's option closes that question at the version its row is read at, never the request's (the question
+// read, WalkDeps.questions, on the call's transaction), names that row in versionsRead, and walks from the chosen branch.
+// Each walked step that writes something is written by its own read-only step writer, found by its step id
+// (WalkDeps.writers: T-633's and T-634's, bound in the turn face by card F), and a step that writes something with no
+// writer bound is refused (notBuilt), so the call fails closed with nothing written. For turn 2's "All on the list"
+// (commit-s1-02.json) that is, up to row ids: S1-02's writer's three picked kinds, S1-11's writer's eleven pf keys,
+// S1-04's question with its outbox row, and oq-s1-02 closed at its version. While no question read is bound, every
+// answer is notBuilt, as before.
+//
+// It only reads (the pinned graph through its own port; the answered question and what each step writer reads, on the
+// call's transaction; the call's request) and has no outside effect, since a repeated turn runs it again before K-05
+// answers repeated (STATE note 1; types.ts CommitPorts). Nothing here logs; what it throws names faults, step ids and
+// keys (errors.ts), never words or the chat id.
 //
 // What it writes, step by step (each journey's lane extends the writers; anything else is notBuilt, nothing written):
-//   - a plain step's gives: `thread` (S1-01) only, the handle's chat with Rosie's number (K-04 threads: kind chat, no
-//     booking, the Linq chat id of the turn's last text, no reply address), with its `thread.created` entry, whose values
-//     name the kind alone, never the chat id (K-09 v1.5 defaults 134 and 135);
+//   - a plain step's gives with no writer bound: `thread` (S1-01) only, the handle's chat with Rosie's number (K-04
+//     threads: kind chat, no booking, the Linq chat id of the turn's last text, no reply address), with its
+//     `thread.created` entry, whose values name the kind alone, never the chat id (K-09 v1.5 defaults 134 and 135);
 //   - the split it stops at, when Rosie asks it of the turn's own writer by text (S1-02): one open question (no options,
 //     no read-back, step 9's default clock: K-09 v1.5 default 134) with the card's safe default for its clock row, and
-//     one quick reply on the turn's service (defaults 132 and 133).
+//     one quick reply on the turn's service (defaults 132 and 133);
+//   - the plain step it stops at whose message carries buttons (S1-04, DL-965's lead note), asked of the turn's own
+//     writer by text: its question and its quick reply, as a split's are (default 10);
+//   - the question an answer closes, answered at its row's version, with that row in versionsRead (default 11);
+//   - every other row of a walked step, by that step's writer (default 9): the answered split's gives (S1-02's kinds),
+//     each step of the chosen branch (S1-03's and S1-74's messages) and each plain step after it (S1-11's pf keys), in
+//     the walk's order. A branch's effects are what its own steps write (compiler/src/branches/effects.ts: a message per
+//     step that tells someone, a record write per gives key); any other effect (a clock, a charge, a refund, a calendar
+//     write, a flag) is notBuilt.
 // While anything is open (a safety hold, or a text not yet read), the walk stops at its first routine row (STATE note 1;
-// DL-128 note a): the rows before it are written, that row and every row after it are not. A protective step's rows pass
-// every hold; a safety-flow step's (A3-24, A3-25 and their twins) pass only an after-safe hold (hold.ts's lists).
+// DL-128 note a): the rows before it are written, that row and every row after it are not, and nothing is read for them.
+// A protective step's rows pass every hold; a safety-flow step's (A3-24, A3-25 and their twins) pass only an after-safe
+// hold (hold.ts's lists). An answer's first row is its question's close, so a held answer closes nothing.
+//
+// The walk reads the pinned bundle's flow graphs alone (WalkBundles.flow), never a trade overlay (K-01 v1's trade parts):
+// before a kind is known no overlay applies, and S1-02's answer is where the kinds are picked, so it walks the master's
+// steps alone, a trade's words ops at S1-02 and its offs of "One isn't on the list yet" included (DL-965's lead note 5).
+// A later card that walks a step after a kind is known adds an overlay read.
+//
+// Not here: the answered question's clock row (`clock-<question id>`, build.ts default 2) is not cancelled, since its
+// cancel names the clock row's version (K-05 v1 clockCancel.expectVersion), which no read the walk is given returns
+// (T-1461's open question 1).
 //
 // Defaults used (for ops/QUESTIONS.md), beside walk.ts's:
 //   3. The row ids are K-09 v1.5 default 131's: `<kind>-<step>-<turn key>-<n>`, the writing step in lower case, n from 1
 //      per kind and step in the walk's order, the turn key the turn's own id unless the binding names another (a proof
-//      on a fixture names the fixture's stand-in, `sam`). The thread's entry is `log-<row id>-created`, T-305's rule.
+//      on a fixture names the fixture's stand-in, `sam`). The thread's entry is `log-<row id>-created`, T-305's rule. A
+//      step writer names its rows the same way (WriterContext.rowId), by a kind of its own.
 //   4. The writer of the turn is the lane of the step the part entered when that step is written to Rosie (S1-01:
 //      "owner -> san"), and a question the walk stops at goes to the turn's own handle and person (the request's caller)
 //      only when Rosie asks it of that lane by text (S1-02: "san -> owner", via msg): a reply in the same turn, so a quick
@@ -35,7 +65,26 @@
 //   6. The unit's why is the step the part's choice names, with the branch it chose or else the choice's label, as the
 //      frontier offered it from the bundle (never the person's words).
 //   7. The question's and the outbox row's business and booking are the choice's target's (the call's business, checked;
-//      no booking for the sign-up door). The versions read are none: the door's walk reads no row (K-09 v1.5 default 134).
+//      no booking for the sign-up door). The versions read are none for a walk from a step: the door's walk reads no row
+//      (K-09 v1.5 default 134); an answer reads its question's row (default 11).
+//   8. (T-1461) The writer of an answer's turn is the lane Rosie asked the answered split of (S1-02: "san -> owner", so
+//      the owner), as default 4 takes an entered step's lane when it is written to Rosie.
+//   9. (T-1461) A step writes something when it gives a key or tells someone. The answered split's message went out when
+//      it was asked, so only its gives are written when it is answered; the step the walk stops at is asked, and its
+//      gives are written when it is answered (as S1-02's kinds are at turn 2, never at turn 1). A step that writes
+//      nothing needs no writer, and none is called for it; a bound writer writes its step's rows in place of the walk's
+//      own (S1-01's thread). Every writer is found before anything is read, so a missing one refuses the part with
+//      nothing read. A writer gives only its step's own keys (K-01 v1 step.gives), else the part is refused.
+//  10. (T-1461) A plain step's buttons question (S1-04) is opened as S1-02's is at turn 1 (the open question of default 7
+//      and default 134): no options (the buttons' option ids are K-03's, and the next turn's options are a later card:
+//      DL-965's lead note 3), no read-back, no versions read, and, with no card, no safe default and step 9's default
+//      clock (clock null), as T-305's double of commit-s1-02.json writes oq-s1-04-sam (commit/test-support.ts
+//      samKindsWrites). A card it has is read as a split's is (its Clock, its safe default); a split asked with buttons
+//      stays notBuilt (buttons).
+//  11. (T-1461) An answered question is the live question the option names (K-02 v1 choice.question), sent to the turn's
+//      handle, at the chosen step, of the call's business, read on the call's transaction; any other is refused. It is
+//      closed answered with no option id (K-05 v1 openQuestionClose.answeredOptionId null): S1-02 is asked with no
+//      options (K-09 v1.5 default 134), so none went out; one that went out with options is notBuilt (buttons).
 
 import type { Choice, SetupKey } from "../../gate/framework";
 import { PROTECTIVE_STEPS, SAFETY_FLOW_STEPS, holdClassOf, isHeld, type HoldClass } from "../hold";
@@ -46,9 +95,11 @@ import type {
   EventEntry,
   GateAndCommitRequest,
   OpenHolds,
+  OpenQuestionClose,
   OpenQuestionNew,
   OutboxRowNew,
   PassedPart,
+  RowRef,
   StateWrite,
   TurnRow,
   UnitWrites,
@@ -74,11 +125,90 @@ export interface WalkBundles {
   flow(bundleId: BundleIdOf, flow: FlowLetter): Promise<unknown>;
 }
 
-export interface WalkDeps {
+/**
+ * An open question as the walk reads it to close it: the fields of K-05 v1.2 openQuestionRead it reads, so the rows
+ * db/repo/targets.ts reads (OpenQuestionRead, its version read from the row at targets.ts:564) bind as they are.
+ */
+export interface LiveQuestion {
+  readonly id: string;
+  readonly step: string;
+  /** The business it is about (open_questions.business_id), or null before there is one. */
+  readonly businessId: string | null;
+  /** The options as they went out (K-04 open_questions.options); empty for a question asked with none (S1-02). */
+  readonly options: readonly unknown[];
+  /** The row's version, which the close compares and sets (K-05 v1 openQuestionClose.expectVersion; limit 4). */
+  readonly version: number;
+}
+
+/** Where an answer reads the open question it closes: the call's transaction (default 11). */
+export interface WalkQuestions<Repo = unknown> {
+  /**
+   * The open question `openQuestionId` when it is live (waiting or open) and was sent to the handle `handleId`, as its
+   * row stands on the call's transaction `repo`; else null. Card F binds K-05 v1.2's read of a handle's live questions
+   * (db/repo/targets.ts liveOpenQuestionsOfHandle, as limit 3 reads them), whose rows carry their versions.
+   */
+  liveQuestion(repo: Repo, handleId: string, openQuestionId: string): Promise<LiveQuestion | null>;
+}
+
+/** What one step's writer hands the walk: its rows in its own order, each list present (empty when it has none). */
+export interface StepRows {
+  /** State writes (K-05 v1 stateWrite), with their event-log entries, since only the domain knows their kind (types.ts). */
+  readonly state: readonly StateWrite[];
+  readonly stateEvents: readonly EventEntry[];
+  /** The keys these rows give (K-09 v1.5 partResult.gives): each one of its step's own (K-01 v1 step.gives). */
+  readonly gives: readonly SetupKey[];
+  /** The questions it opens, each with its safe default (the commit adds each one's clock row: build.ts). */
+  readonly asks: readonly Ask[];
+  /** One outbox row per message, with no plan: words go in after the commit (arch 01 line 41). */
+  readonly messages: readonly OutboxRowNew[];
+}
+
+/** The walk's writer context, as a step's writer reads it. */
+export interface WriterContext<Repo = unknown> {
+  /** The turn as the commit hands it to writesOf: the request, the turn row, the call's repo and its business. */
+  readonly turn: CommitTurnContext<Repo>;
+  /** The unit's why (default 6), which every entry of its rows carries. */
+  readonly why: Why;
+  /** The zone the turn's texts were read in (build.ts default 4), for the entries of the state rows it writes. */
+  readonly zone: string | null;
+  /** The lane of the turn's writer (defaults 4 and 8), or null when the walk names none. */
+  readonly writerLane: string | null;
+  /** Default 131's next row id of `kind` that this step writes, in the walk's order: `<kind>-<step>-<turn key>-<n>`. */
+  rowId(kind: string): string;
+  /** The service and Linq chat id of the turn's last text (default 135): refused (noServiceOrChatId) without them. */
+  text(): TextSource;
+}
+
+/** One call of a step's writer: on the call's transaction, with the part, its choice and the walk's writer context. */
+export interface StepWriterCall<Repo = unknown> {
+  /** The call's repo, inside its transaction and business scope (CommitTurnContext.repo): read through, never written. */
+  readonly repo: Repo;
+  /** The step written, as the walk reads it from the turn's pinned graph. */
+  readonly step: GraphStep;
+  readonly part: PassedPart;
+  /** The offered choice the part chose or entered (an answer's: its option, with the branch it chose). */
+  readonly choice: Choice;
+  readonly writer: WriterContext<Repo>;
+}
+
+/**
+ * One step's own writer (DL-961 ruling 2): what that step writes when the walk walks it. It only reads, and never
+ * writes: the commit writes what writesOf returns. What it throws fails the call closed, as the walk's own refusals do.
+ */
+export type StepWriter<Repo = unknown> = (call: StepWriterCall<Repo>) => Promise<StepRows>;
+
+/** The read-only step writers, by step id: the writer bound to `stepId`, or null when none is. */
+export type StepWriters<Repo = unknown> = (stepId: string) => StepWriter<Repo> | null;
+
+export interface WalkDeps<Repo = unknown> {
   /** The pinned bundle's graphs: the walk's own dependency (DL-322 ruling 4), bound by T-1141. */
   readonly bundles: WalkBundles;
   /** Default 131's turn key, from the turn row. Default: the turn's own id. */
   readonly turnKey?: (turn: TurnRow) => string;
+  /** Where an answer reads the question it closes (default 11). Left out, every answer is notBuilt (answer). */
+  readonly questions?: WalkQuestions<Repo>;
+  /** The read-only step writers by step id (default 9). Left out, no writer is bound. */
+  readonly writers?: StepWriters<Repo>;
 }
 
 /** The service and Linq chat id of the turn's last text (K-09 v1.5 gateAndCommit.turn; default 135). */
@@ -95,6 +225,9 @@ const LINQ_SERVICES: readonly OutboxRowNew["channel"][] = ["imessage", "rcs", "s
 
 /** The keys the walk writes (S1-01 gives thread). */
 const THREAD: SetupKey = "thread";
+
+/** The effects of a branch that its own steps' writers write: a message per step that tells, a record write per key. */
+const WRITTEN_EFFECTS: readonly string[] = ["message", "recordWrite"];
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -153,31 +286,60 @@ function startOf(choice: Choice): WalkStart {
   }
 }
 
-/** One step whose rows the walk writes: a plain step walked, or the split it stops at. */
-interface Writing {
-  readonly step: GraphStep;
-  readonly as: "step" | "asks" | "waits";
+/**
+ * Where an answer reads the question it closes (default 11): an option's, once a question read is bound. A hub's case,
+ * or an option while none is bound, is not built: the close needs the version the question's row is read at.
+ */
+function questionsOf<Repo>(deps: WalkDeps<Repo>, choice: Choice, start: WalkStart): WalkQuestions<Repo> {
+  if (choice.kind !== "option" || deps.questions === undefined) {
+    throw new WalkNotBuiltError("answer", [start.step]);
+  }
+  return deps.questions;
 }
 
-/** The steps whose rows the walk writes, in order (a walk from a step: its plain steps, then the split it stops at). */
-function writingOf(walked: Walked): Writing[] {
+/**
+ * One step whose rows the walk writes: the split an answer answers, a step walked (on a list, or on the chosen branch),
+ * or the step the walk stops at.
+ */
+interface Writing {
+  readonly step: GraphStep;
+  readonly as: "answer" | "step" | "asks" | "waits";
+}
+
+/**
+ * The steps whose rows the walk writes, in order: an answer's split, the steps walked, then the step it stops at. An
+ * answer writes each step of its chosen branch through that step's writer, so a branch step the bundle does not hold
+ * (walk.ts default 1) is refused here, and an effect no step writes is not built (effect).
+ */
+function writingOf(graph: FlowGraph, walked: Walked): Writing[] {
   const writing = walked.moves.map((move): Writing => {
-    if (move.kind === "branch") throw new WalkNotBuiltError("answer", [move.split.id]);
-    return { step: move.step, as: "step" };
+    if (move.kind === "step") return { step: move.step, as: "step" };
+    const { split, branch } = move;
+    for (const id of branch.steps) {
+      if (graph.step(id) === null) throw new WalkRefusedError("stepNotInBundle", [id]);
+    }
+    const other = branch.effects.find((effect) => !WRITTEN_EFFECTS.includes(effect.kind));
+    if (other !== undefined) throw new WalkNotBuiltError("effect", [split.id, other.kind]);
+    return { step: split, as: "answer" };
   });
   const { stop } = walked;
   if (stop.kind === "asks" || stop.kind === "waits") writing.push({ step: stop.step, as: stop.kind });
   return writing;
 }
 
-/** The writer's lane (default 4): who the entered step is from, when it is written to Rosie (S1-01: owner). */
+/**
+ * The writer's lane (defaults 4 and 8): who the entered step is from, when it is written to Rosie (S1-01: owner); for an
+ * answer, whom Rosie asked the answered split of (S1-02: owner).
+ */
 function writerLaneOf(graph: FlowGraph, start: WalkStart): string | null {
   const entered = graph.step(start.step);
-  return entered !== null && entered.to === "san" ? entered.who : null;
+  if (entered === null) return null;
+  if (start.kind === "branch") return entered.who === "san" ? entered.to : null;
+  return entered.to === "san" ? entered.who : null;
 }
 
 /** Default 131's row ids for one walk: `<kind>-<step>-<turn key>-<n>`. */
-function rowIds(turnKey: string): (kind: "thread" | "oq" | "outbox", stepId: string) => string {
+function rowIds(turnKey: string): (kind: string, stepId: string) => string {
   const counts = new Map<string, number>();
   return (kind, stepId) => {
     const step = stepId.toLowerCase();
@@ -194,30 +356,69 @@ function whyEntry(why: Why): Record<string, unknown> {
 }
 
 /** What the rows of one walk are written from. */
-interface Writer {
-  readonly context: CommitTurnContext;
+interface WalkRun<Repo> {
+  readonly context: CommitTurnContext<Repo>;
+  readonly part: PassedPart;
   readonly choice: Choice;
   readonly why: Why;
   /** The zone the turn's texts were read in (build.ts default 4). */
   readonly zone: string | null;
   readonly nextId: ReturnType<typeof rowIds>;
-  /** The lane of the turn's writer (default 4), or null when the entered step names none. */
+  /** The lane of the turn's writer (defaults 4 and 8), or null when the walk names none. */
   readonly writerLane: string | null;
+  /** Where an answer reads its question (default 11); null for a walk from a step. */
+  readonly questions: WalkQuestions<Repo> | null;
+  readonly writers: StepWriters<Repo> | null;
+}
+
+/** Who writes one step's rows: the writer bound to its id, or the walk itself (S1-01's thread, a question, or none). */
+type WrittenBy<Repo> = StepWriter<Repo> | "walk";
+
+/**
+ * Who writes one step's rows (default 9). A step that gives a key or tells someone (the answered split: gives a key) is
+ * written by the writer bound to its id; with none bound, the walk writes S1-01's thread alone, and any other is
+ * notBuilt (tells, gives). A step that writes nothing, and the step the walk stops at, are the walk's own.
+ */
+function writtenBy<Repo>(writers: StepWriters<Repo> | null, each: Writing): WrittenBy<Repo> {
+  if (each.as === "asks" || each.as === "waits") return "walk";
+  const { step } = each;
+  // The answered split's message went out when it was asked: only its gives are written now.
+  const tells = each.as === "answer" ? [] : step.tells;
+  if (step.gives.length === 0 && tells.length === 0) return "walk";
+  const writer = writers?.(step.id) ?? null;
+  if (writer !== null) return writer;
+  if (tells.length > 0) throw new WalkNotBuiltError("tells", [step.id]);
+  const other = step.gives.find((key) => key !== THREAD);
+  if (other !== undefined) throw new WalkNotBuiltError("gives", [step.id, other]);
+  return "walk";
 }
 
 /** The part's writes, built row by row as the walk goes: every list present, empty when it has none. */
 interface Built {
+  readonly versionsRead: RowRef[];
   readonly state: StateWrite[];
   readonly stateEvents: EventEntry[];
   readonly asks: Ask[];
+  readonly closes: OpenQuestionClose[];
   readonly messages: OutboxRowNew[];
   readonly gives: SetupKey[];
 }
 
-/** The rows of the steps a walk writes, in order; the turn's service and chat id are read once, when a row needs them. */
-function writeRows(writer: Writer, writing: readonly Writing[]): Built {
-  const built: Built = { state: [], stateEvents: [], asks: [], messages: [], gives: [] };
-  const { context, choice } = writer;
+/**
+ * The rows of the steps a walk writes, in order. Every step's writer is found first, so a step with none refuses the part
+ * before anything is read; the turn's service and chat id are read once, when a row needs them.
+ */
+async function writeRows<Repo>(run: WalkRun<Repo>, writing: readonly Writing[]): Promise<Built> {
+  const built: Built = {
+    versionsRead: [],
+    state: [],
+    stateEvents: [],
+    asks: [],
+    closes: [],
+    messages: [],
+    gives: [],
+  };
+  const { context, choice } = run;
   let source: TextSource | undefined;
   const text = (): TextSource => (source ??= textSourceOf(context.request));
 
@@ -225,7 +426,7 @@ function writeRows(writer: Writer, writing: readonly Writing[]): Built {
   const thread = (step: GraphStep): void => {
     const { service, chatId } = text();
     if (!LINQ_SERVICES.includes(service)) throw new WalkNotBuiltError("threadByEmail", [step.id]);
-    const id = writer.nextId("thread", step.id);
+    const id = run.nextId("thread", step.id);
     built.state.push({
       op: "insert",
       table: "threads",
@@ -241,7 +442,7 @@ function writeRows(writer: Writer, writing: readonly Writing[]): Built {
     built.stateEvents.push({
       id: `log-${id}-created`,
       kind: "thread.created",
-      zone: writer.zone,
+      zone: run.zone,
       businessId: null,
       actorKind: "rosie",
       actorPersonId: null,
@@ -251,41 +452,30 @@ function writeRows(writer: Writer, writing: readonly Writing[]): Built {
       oldValues: null,
       newValues: { kind: "chat" },
       sealed: null,
-      why: whyEntry(writer.why),
+      why: whyEntry(run.why),
       approvedBy: null,
       proofs: null,
     });
     if (!built.gives.includes(THREAD)) built.gives.push(THREAD);
   };
 
-  /** A plain step's rows: its gives (the thread alone); a message no question carries is not built. */
-  const plain = (step: GraphStep): void => {
-    if (step.tells.length > 0) throw new WalkNotBuiltError("tells", [step.id]);
-    for (const key of step.gives) {
-      if (key !== THREAD) throw new WalkNotBuiltError("gives", [step.id, key]);
-      thread(step);
-    }
-  };
-
-  /** The split the walk stops at, asking the turn's writer (default 4): its question and the quick reply asking it. */
+  /**
+   * The step the walk stops at, asking the turn's writer (default 4): a split's question with its card's safe default,
+   * or a plain step's buttons' question (default 10), and the quick reply asking it.
+   */
   const asked = (step: GraphStep): void => {
-    if (
-      step.who !== "san" ||
-      step.via !== "msg" ||
-      writer.writerLane === null ||
-      step.to !== writer.writerLane
-    ) {
+    if (step.who !== "san" || step.via !== "msg" || run.writerLane === null || step.to !== run.writerLane) {
       throw new WalkNotBuiltError("recipient", [step.id]);
     }
-    if (step.buttons > 0) throw new WalkNotBuiltError("buttons", [step.id]);
     const { card } = step;
-    if (card === null) throw new WalkRefusedError("stepNotWellFormed", [step.id]);
-    if (card.clock?.from !== "step9Default") throw new WalkNotBuiltError("clock", [step.id]);
+    if (step.split && step.buttons > 0) throw new WalkNotBuiltError("buttons", [step.id]);
+    if (step.split && card === null) throw new WalkRefusedError("stepNotWellFormed", [step.id]);
+    if (card !== null && card.clock?.from !== "step9Default") throw new WalkNotBuiltError("clock", [step.id]);
     const { service } = text();
     const { target } = choice;
     const { personId } = context.request.caller;
     const question: OpenQuestionNew = {
-      id: writer.nextId("oq", step.id),
+      id: run.nextId("oq", step.id),
       handleId: context.turn.handleId,
       personId,
       businessId: target.businessId,
@@ -296,9 +486,9 @@ function writeRows(writer: Writer, writing: readonly Writing[]): Built {
       versionsRead: [],
       clock: null,
     };
-    built.asks.push({ question, safeDefault: card.safeDefault });
+    built.asks.push({ question, safeDefault: card?.safeDefault ?? null });
     built.messages.push({
-      id: writer.nextId("outbox", step.id),
+      id: run.nextId("outbox", step.id),
       recipientHandleId: context.turn.handleId,
       recipientPersonId: personId,
       businessId: target.businessId,
@@ -311,19 +501,70 @@ function writeRows(writer: Writer, writing: readonly Writing[]): Built {
     });
   };
 
-  for (const each of writing) {
-    if (each.as === "waits") throw new WalkNotBuiltError("waits", [each.step.id]);
-    if (each.as === "asks") asked(each.step);
-    else plain(each.step);
+  /**
+   * The question an answer closes (default 11): the live question the option names, as the question read finds its row
+   * on the call's transaction, closed answered at that row's version, and the row named in versionsRead.
+   */
+  const answered = async (step: GraphStep): Promise<void> => {
+    const { questions } = run;
+    const id = choice.question;
+    if (questions === null || id === null) throw new WalkRefusedError("questionNotLive", [step.id]);
+    const row = await questions.liveQuestion(context.repo, context.turn.handleId, id);
+    if (row?.id !== id || row.step !== step.id) throw new WalkRefusedError("questionNotLive", [step.id]);
+    if (row.businessId !== context.businessId) throw new WalkRefusedError("businessNotInScope");
+    if (row.options.length > 0) throw new WalkNotBuiltError("buttons", [step.id]);
+    built.versionsRead.push({ table: "open_questions", rowId: row.id, version: row.version });
+    built.closes.push({ id: row.id, expectVersion: row.version, status: "answered", answeredOptionId: null });
+  };
+
+  /** A step's rows by its own writer (default 9), added in the walk's order; a key its step does not give is refused. */
+  const written = async (step: GraphStep, writer: StepWriter<Repo>): Promise<void> => {
+    const rows = await writer({
+      repo: context.repo,
+      step,
+      part: run.part,
+      choice,
+      writer: {
+        turn: context,
+        why: run.why,
+        zone: run.zone,
+        writerLane: run.writerLane,
+        rowId: (kind) => run.nextId(kind, step.id),
+        text,
+      },
+    });
+    const other = rows.gives.find((key) => !step.gives.includes(key));
+    if (other !== undefined) throw new WalkRefusedError("givesNotStep", [step.id, other]);
+    built.state.push(...rows.state);
+    built.stateEvents.push(...rows.stateEvents);
+    built.asks.push(...rows.asks);
+    built.messages.push(...rows.messages);
+    for (const key of rows.gives) if (!built.gives.includes(key)) built.gives.push(key);
+  };
+
+  const planned = writing.map((each) => ({ each, by: writtenBy(run.writers, each) }));
+  for (const { each, by } of planned) {
+    const { step } = each;
+    if (each.as === "waits") throw new WalkNotBuiltError("waits", [step.id]);
+    if (each.as === "asks") {
+      asked(step);
+      continue;
+    }
+    if (each.as === "answer") await answered(step);
+    if (by === "walk") {
+      for (const key of step.gives) if (key === THREAD) thread(step);
+    } else {
+      await written(step, by);
+    }
   }
   return built;
 }
 
 /** writesOf for one passed part (createWritesOf). */
-async function walkWrites(
-  deps: WalkDeps,
+async function walkWrites<Repo>(
+  deps: WalkDeps<Repo>,
   part: PassedPart,
-  context: CommitTurnContext,
+  context: CommitTurnContext<Repo>,
   open: OpenHolds,
 ): Promise<UnitWrites> {
   const { request } = context;
@@ -339,10 +580,11 @@ async function walkWrites(
   const pin = { hash: context.turn.bundleId.hash, build: context.turn.bundleId.build };
   const graph = flowGraphOf(await deps.bundles.flow(pin, flow), flow);
   const walked = walkFrom(graph, start);
-  if (start.kind === "branch") throw new WalkNotBuiltError("answer", [start.step]);
+  // An answer closes its question at the version the question's row is read at: with no read bound, it is not built.
+  const questions = start.kind === "branch" ? questionsOf(deps, choice, start) : null;
 
   // What is open stops the walk at its first routine row (STATE note 1).
-  const writing = writingOf(walked);
+  const writing = writingOf(graph, walked);
   const heldAt = firstHeld(
     writing.map((each) => each.step.id),
     holdClassOf(part.part, choice),
@@ -352,22 +594,25 @@ async function walkWrites(
   const turnKey = (deps.turnKey ?? ((turn: TurnRow) => turn.id))(context.turn);
   if (turnKey === "") throw new WalkRefusedError("noTurnKey");
   const why: Why = { step: choice.step, choice: choice.branch ?? choice.label };
-  const writer: Writer = {
+  const run: WalkRun<Repo> = {
     context,
+    part,
     choice,
     why,
     zone: decided.context.texts[0].sentAt.zone,
     nextId: rowIds(turnKey),
     writerLane: writerLaneOf(graph, start),
+    questions,
+    writers: deps.writers ?? null,
   };
-  const built = writeRows(writer, heldAt === null ? writing : writing.slice(0, heldAt));
+  const built = await writeRows(run, heldAt === null ? writing : writing.slice(0, heldAt));
   return {
     why,
-    versionsRead: [],
+    versionsRead: built.versionsRead,
     state: built.state,
     stateEvents: built.stateEvents,
     asks: built.asks,
-    closes: [],
+    closes: built.closes,
     clockCancels: [],
     messages: built.messages,
     reservations: { confirm: [], release: [] },
@@ -381,6 +626,6 @@ async function walkWrites(
  * scope, with no outside effect. Throws WalkRefusedError (refused, never guessed) or WalkNotBuiltError (notBuilt), so the
  * call fails closed with nothing written.
  */
-export function createWritesOf<Repo = unknown>(deps: WalkDeps): CommitPorts<Repo>["writesOf"] {
+export function createWritesOf<Repo = unknown>(deps: WalkDeps<Repo>): CommitPorts<Repo>["writesOf"] {
   return (part, turn, open) => walkWrites(deps, part, turn, open);
 }
