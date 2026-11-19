@@ -2,9 +2,55 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 780, [`48981cf`](https://github.com/aryamahadik/rosie/commit/48981cf), 2026-11-18 16:29:12 UTC.
+- **Through:** commit 782, [`3a5883d`](https://github.com/aryamahadik/rosie/commit/3a5883d), 2026-11-19 07:16:08 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 782. docs: COMMIT\_HISTORY.md through commit 780 (48981cf, \#791) (\#794)
+
+- **Commit:** [`3a5883d`](https://github.com/aryamahadik/rosie/commit/3a5883d), by Arya Mahadik, 2026-11-19 07:16:08 UTC
+- **Pull request:** [#794](https://github.com/aryamahadik/rosie/pull/794) from `task/commit-history-177`, merged 2026-11-19 07:16:09 UTC. It squashed 1 branch commit:
+  - `83bb568` docs: COMMIT\_HISTORY.md through commit 780 (48981cf, \#791)
+- **Files changed:** 1 (+110 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +110 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated after train 270 (DL-972) with scratch/build/lead/commit-history.mjs: every commit on main, newest first, with its pull request, squashed branch commits, changed files and full message (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 781. T-1464: the outbox claim passes a parked turn's unplanned row instead of stopping at it (DL-967) (\#793)
+
+- **Commit:** [`02cf630`](https://github.com/aryamahadik/rosie/commit/02cf630), by Arya Mahadik, 2026-11-19 07:16:03 UTC
+- **Pull request:** [#793](https://github.com/aryamahadik/rosie/pull/793) from `task/T-1464`, merged 2026-11-19 07:16:04 UTC. It squashed 2 branch commits:
+  - `0e411ea` T-1464: the ordinary claim's walk and sweep pass a parked turn's unpl…
+  - `f779f7d` T-1464: the new integration cases call claimOutboxV114 without a need…
+- **Files changed:** 3 (+372 −27), by folder:
+  - `contracts/data-access/` README.md +4 −0
+  - `db/repo/` outbox.int.test.ts +302 −0, outbox.ts +66 −27
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1464: the ordinary claim's walk and sweep pass a parked turn's unplanned row (planned, no plan, its turn parked), which nothing composes, instead of stopping at it (DL-967); every other planned or stale row still stops the walk; the safety claim unchanged; outbox.ts default 26, README default 183; integration cases for v1, v1.2 and v1.14 without sendClass, named and swept
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1464: the new integration cases call claimOutboxV114 without a needless type assertion (lint)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 780. docs: COMMIT\_HISTORY.md through commit 776 (7a00bad, \#787) (\#791)
 
