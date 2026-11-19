@@ -4,7 +4,8 @@
 //   - a booking's stage (K-04 v1 bookings.stage, through the same K-04 reads: BookingStages), since the booker goes on
 //     making a booking that is still being made (S13-45 row 1: "book a new visit: anyone, at any door");
 //   - S13-45's one rule, whether a request is a person's own: ContactsOnFile ("a request counts when it comes from the
-//     contact on file, in its own one-to-one thread");
+//     contact on file, in its own one-to-one thread"); a customer's link to the turn's handle is read on the call's
+//     transaction as the Tool API's role may read it, as default 14 reads it (T-1467; DL-982): contactsOnFileIn;
 //   - the code an unproven sender gets (K-09 v1 sendProofCode purpose unprovenSender; K-22 v1 proof_codes purpose
 //     link_record): ProofCodes, T-322's. It is not built yet, so the shipped limit has none, and a part that needs a code
 //     is refused (notBuilt), never passed;
@@ -100,6 +101,9 @@ export interface ContactsOnFile {
  *     owner role");
  *   - a call that is no turn: a page's signed-in session (K-21) and an outside AI's bound token (T-328) are not read yet,
  *     so neither is proven here.
+ * T-308's sender() reads the handle's people on person_handles (db/repo/phones.ts listPersonIdsOfHandle), which 0012
+ * gives rosie_job alone, so as the Tool API's role this read is refused (42501). It stays the one rule over a given
+ * identity service (the tests' doubles); the shipped limit reads the link with contactsOnFileIn (T-1467).
  */
 export function contactsOnFileOver(identity: () => IdentityAccess): ContactsOnFile {
   return {
@@ -108,6 +112,39 @@ export function contactsOnFileOver(identity: () => IdentityAccess): ContactsOnFi
       if (sideOf(ask.as) === "business") return false;
       const sender = await identity().sender(ask.handleId);
       return sender.people.some((person) => person.personId === ask.personId);
+    },
+  };
+}
+
+/**
+ * The one rule on the call's transaction `db`, as the Tool API's role may read it: the shipped limit's (T-1467; DL-982,
+ * the architect's ruling on T-1463's handoff 1). It answers what contactsOnFileOver answers, read where rosie_app may:
+ *   - first the same two refusals, which read nothing: a call that is no turn or a turn with no handle, and a business
+ *     standing (whose own mobile or email on file has no reader yet: T-321);
+ *   - then, as a customer (self), whether K-04 links the person to the turn's handle: db/repo/sign-up-reads.ts
+ *     readSignUpFactsIn's link of the call's business (OwnAsk.businessId), under that business's scope, which it checks
+ *     before its first read; on person_handles directly as rosie_job, or through 0038's person_handles_linked as
+ *     rosie_app, with no statement on handles, persons, phones, person_handles or turns.
+ * As rosie_app, 0038 answers true only for a handle with a live open question of the call's business. Limit 1 asks a
+ * sign-up's answer here only once default 14 has passed (allowed.ts), whose (b) found such a question on this handle,
+ * asked of the sender, so there the answer is the link as K-04 holds it, as rosie_job reads it. Anywhere else rosie_app's
+ * answer is false: the sender counts as unproven, and a turn answers notBuilt until T-322's codes land, so the call is
+ * still refused as a whole (the one rule as rosie_app on a handle with no live question waits for a later read: DL-982).
+ * Every error of the read (a refused statement, a lost connection, a scope that is not the call's: BusinessScopeError) is
+ * thrown as it throws it, so the call fails as a whole, never answered. The handle's address and its other people are
+ * never read here, and T-308's sender() is not called (it has other callers, and stays as it is).
+ */
+export function contactsOnFileIn(db: Sql | Tx): ContactsOnFile {
+  return {
+    async isOwn(ask) {
+      if (ask.caller !== "turn" || ask.handleId === null) return false;
+      if (sideOf(ask.as) === "business") return false;
+      const read = await readSignUpFactsIn(db, {
+        businessId: ask.businessId,
+        handleId: ask.handleId,
+        personId: ask.personId,
+      });
+      return read.linked;
     },
   };
 }

@@ -4,14 +4,16 @@
 // registry (../limits.ts). The rule is allowed.ts; what it reads is facts.ts.
 //
 // `limit1` reads through the call's database transaction (the Tool API's scoped repo): T-308's identity and access
-// service with its defaults, the booking's stage, and S13-45's one rule over K-04's links. A call that holds no database
+// service with its defaults, the booking's stage, and S13-45's one rule over K-04's links, the sender's link to the
+// turn's handle read as the Tool API's role may read it (contactsOnFileIn: T-1467; DL-982). A call that holds no database
 // transaction cannot be read, so a part that needs a read is refused (notBuilt); a protect-only part needs none. It has no
 // proof codes yet (T-322), so a part whose sender must be proven by a code is refused (notBuilt) until they land. It is
 // not given the turn's bundle yet (K-01 v1), so it reads no step's card: every step's side cannot be read, and every
 // choice is the business's (DL-188 ruling 1; fails closed) until the gate hands it the bundle's steps (`steps`).
-// Default 14's facts (T-1459; DL-961: a sign-up's own answer while the business's control is not proven) come from one
-// K-05 v1.2 readTurnState of the turn's handle on the same transaction (`signUps`); a fact it cannot read leaves the part
-// as it was before default 14, never passed. createLimit1 takes other ports, as the tests do.
+// Default 14's facts (T-1459; DL-961: a sign-up's own answer while the business's control is not proven) come from the
+// same transaction (`signUps`): limit 3's question read and db/repo/sign-up-reads.ts's link and control (T-1463); a fact
+// it cannot read leaves the part as it was before default 14, never passed. createLimit1 takes other ports, as the
+// tests do.
 
 import { identityReaderOf, type IdentityAccess } from "../../domain/identity-access";
 import type { GatePart, GateTurn, Limit, LimitVerdict } from "../framework";
@@ -20,6 +22,7 @@ import {
   NO_STEP_CARDS,
   NoCallDatabaseError,
   bookingStagesOver,
+  contactsOnFileIn,
   contactsOnFileOver,
   databaseOf,
   identityOver,
@@ -47,12 +50,17 @@ export interface Limit1Deps {
   readonly identityDefaults?: IdentityDefaults;
   /** A booking's stage at the call's business. Default: K-04's booking head on the call's transaction. */
   readonly stages?: (repo: unknown, businessId: string) => BookingStages;
-  /** S13-45's one rule. Default: K-04's links for a customer; nothing yet for a business role, a page or an AI. */
+  /**
+   * S13-45's one rule, over the call's identity service. Default: K-04's link of a customer to the turn's handle, read
+   * where the identity service reads K-04: with the shipped service, on the call's transaction as the Tool API's role
+   * may read it (contactsOnFileIn: T-1467); with a given one (the tests' doubles), through its sender(), as before
+   * (contactsOnFileOver). Either way, nothing yet for a business role, a page or an AI.
+   */
   readonly contacts?: (identity: IdentityAccess) => ContactsOnFile;
   /**
    * Default 14's stored facts about the turn's handle at the call's business: the open question a sign-up's answer
-   * answers, the sender's link to the handle, the business's control. Default: K-05 v1.2 readTurnState on the call's
-   * transaction (signUpFactsOver: db/repo/setup/turn-state.ts readTurnStateIn, with business_setup.control_proven_at).
+   * answers, the sender's link to the handle, the business's control. Default: signUpFactsOver on the call's
+   * transaction (limit 3's question read; db/repo/sign-up-reads.ts readSignUpFactsIn's link and control: T-1463).
    */
   readonly signUps?: (repo: unknown, businessId: string, handleId: string) => SignUpFacts;
   /** T-322's proof codes. Default: none, so a part that needs a code is refused (notBuilt). */
@@ -100,7 +108,14 @@ export function createLimit1(deps: Limit1Deps = {}): AllowedLimit {
     deps.stages ??
     ((repo: unknown, businessId: string) =>
       bookingStagesOver(identityReaderOf(databaseOf(repo)), businessId));
-  const contactsOf = deps.contacts ?? ((identity: IdentityAccess) => contactsOnFileOver(() => identity));
+  // The one rule reads K-04's link where the identity service reads K-04 (Limit1Deps.contacts).
+  const givenContacts = deps.contacts;
+  const contactsOf: (repo: unknown, identity: () => IdentityAccess) => ContactsOnFile =
+    givenContacts !== undefined
+      ? (_repo, identity) => givenContacts(identity())
+      : deps.identity === undefined
+        ? (repo) => contactsOnFileIn(databaseOf(repo))
+        : (_repo, identity) => contactsOnFileOver(identity);
   const stepsOf = deps.steps ?? (() => NO_STEP_CARDS);
   const signUpsOf =
     deps.signUps ??
@@ -112,7 +127,7 @@ export function createLimit1(deps: Limit1Deps = {}): AllowedLimit {
       identity,
       steps: once(() => stepsOf(turn.context.bundleId, turn.context.flow)),
       stages: once(() => stagesOf(turn.repo, turn.businessId)),
-      contacts: once(() => contactsOf(identity())),
+      contacts: once(() => contactsOf(turn.repo, identity)),
       signUps: (handleId) => signUpsOf(turn.repo, turn.businessId, handleId),
       proofCodes: deps.proofCodes ?? null,
     };
@@ -167,6 +182,7 @@ export {
   NO_STEP_CARDS,
   NoCallDatabaseError,
   bookingStagesOver,
+  contactsOnFileIn,
   contactsOnFileOver,
   databaseOf,
   identityOver,
