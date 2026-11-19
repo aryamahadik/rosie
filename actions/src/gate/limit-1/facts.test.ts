@@ -94,7 +94,7 @@ function refusal(): Error {
 
 /**
  * A database double for readSignUpFactsIn: each statement or fragment is made lazily, as postgres.js makes one, and sent
- * only once awaited; the three statements are answered from `world`, and any other statement sent is refused.
+ * only once awaited; the three statements are answered from `world`, and any other statement sent fails.
  */
 function dbOf(world: DbWorld): DbDouble {
   const made: Statement[] = [];
@@ -293,7 +293,11 @@ describe("T-1467: createLimit1's default one rule", () => {
 
   it("a limit given an identity service (the tests' doubles) still proves a sender through that service's sender(), with nothing read on the call's transaction", async () => {
     const record = limitRecord();
-    const limit = createLimit1({ identity: identityFrom(record), stages: stagesFrom(record), steps: stepsOf() });
+    const limit = createLimit1({
+      identity: identityFrom(record),
+      stages: stagesFrom(record),
+      steps: stepsOf(),
+    });
     const own = dbOf(asApp(false));
     expect(await decide(limit, contactChangeFrom(ALEX), own)).toEqual({ result: "pass", why: "decider" });
     expect(own.made).toEqual([]);

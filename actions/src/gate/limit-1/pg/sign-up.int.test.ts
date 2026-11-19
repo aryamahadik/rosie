@@ -302,7 +302,7 @@ function decideUnder(client: Sql, request: GateRequest = secondTurn()): Promise<
   return withBusiness(client, BUSINESS, (tx) => limit1.decide(partOf(request), turnOf(request, tx)));
 }
 
-/** S13-45's one rule asked for the person on their own handle, in a turn, as a customer (what limit 1 asks after (14)). */
+/** The one rule's question for the person on their own handle, in a turn, as a customer: what limit 1 asks here. */
 const PERSON_OWN: OwnAsk = {
   businessId: BUSINESS,
   personId: PERSON,
@@ -314,7 +314,7 @@ const PERSON_OWN: OwnAsk = {
 /** Unproven, with no T-322 codes to send: the part is refused (notBuilt), so the gate refuses the whole call. */
 const UNPROVEN_NOT_BUILT: AllowedDecision = { result: "notBuilt", port: "proofCodes" };
 
-/** The helper on the person's handle and the person's second handle (no question on it), made for one case. */
+/** Adds the helper on the person's handle and the person's second handle (no question on it); a case removes both. */
 async function addHelperAndSecondHandle(): Promise<void> {
   const { sql } = cdb.db;
   await insertRow(sql, typed, "persons", { id: HELPER, name: null, language: null });
@@ -572,7 +572,9 @@ describe("T-1459: limit 1 reads a sign-up's own answer from the stored rows, on 
           const shipped = contactsOnFileIn(tx);
           const old = contactsOnFileOver(() => identityOver(identityReaderOf(tx), BUSINESS));
           const answers: { shipped: boolean; old: boolean }[] = [];
-          for (const ask of asks) answers.push({ shipped: await shipped.isOwn(ask), old: await old.isOwn(ask) });
+          for (const ask of asks) {
+            answers.push({ shipped: await shipped.isOwn(ask), old: await old.isOwn(ask) });
+          }
           return answers;
         });
         expect(asJob).toEqual([
