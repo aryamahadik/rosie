@@ -15,11 +15,16 @@
 // business's business_setup row under the call's scope, and the link through 0038's person_handles_linked as rosie_app
 // (directly on person_handles as rosie_job). So as rosie_app default 14 reads its three facts and passes the role-less
 // signer's answer as their own record (limit 1's rule, changeOf, on the call's transaction), and answers as today for
-// every case that fails it. The part as a whole then reaches S13-45's one rule, whose read of the handle's people (T-308's
-// sender: db/repo/phones.ts listPersonIdsOfHandle, on person_handles) rosie_app may still not make: that statement is
-// refused (42501), the transaction is aborted, postgres.js fails it with that refusal (its transaction keeps a
-// statement's first error, caught or not), and the part goes with the whole call, never passed. That read is outside
-// this card (its "facts (c) and (d) alone"): the last case below pins where the call now stops.
+// every case that fails it.
+//
+// T-1467 (DL-982, the architect's ruling on T-1463's handoff 1): the part as a whole then reaches S13-45's one rule,
+// which on eb873da read the handle's people through T-308's sender (db/repo/phones.ts listPersonIdsOfHandle, on
+// person_handles), refused as rosie_app (42501), so the whole call failed closed. The shipped one rule now reads the
+// sender's link to the turn's handle as default 14 does (facts.ts contactsOnFileIn: readSignUpFactsIn's link, through
+// 0038 as rosie_app, on person_handles directly as rosie_job), so as rosie_app limit 1 passes the role-less signer's
+// answer with no statement on a table that spans businesses; on rosie_job it answers as the old check; and every
+// as-today answer holds, with a linked handle that has no live question of the business unproven as rosie_app (0038's
+// bound: notBuilt, still refused as a whole). The old read stays pinned as refused (42501) for rosie_app.
 //
 // Rows (rule 9): K-04's seed bundle, and the roster-owner seed's shape for its first place (db/seeds/roster-owner.ts): the
 // test business biz-roster-owner-1 (K-04 seed-business-head.json's barbershop, value for value, but its id), its one
@@ -33,9 +38,10 @@
 import { readFileSync } from "node:fs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { withBusiness, type Sql, type Tx } from "../../../../../db/repo/scope";
+import { BusinessScopeError, withBusiness, type Sql, type Tx } from "../../../../../db/repo/scope";
 import { readTurnStateIn } from "../../../../../db/repo/setup/turn-state";
 import {
+  RUNTIME_ROLE,
   TOOL_API_ROLE,
   insertRow,
   openCommitDatabase,
@@ -48,11 +54,14 @@ import {
   NO_STEP_CARDS,
   askedDeciderOutcome,
   changeOf,
+  contactsOnFileIn,
+  contactsOnFileOver,
   identityOver,
   limit1,
   signUpFactsOver,
   type AllowedDecision,
   type Change,
+  type OwnAsk,
 } from "../index";
 import { SECOND_TURN_FIXTURE, decidedIn, exchangeRequest, partOf, turnOf } from "../test-support";
 
@@ -253,13 +262,74 @@ function factsUnder(client: Sql): Promise<Record<string, unknown>> {
   });
 }
 
-/** `read` in one transaction as rosie_app with no business scope: never set, or set and then ended (''). */
-async function unscoped<T>(ended: boolean, read: (tx: Tx) => Promise<T>): Promise<T> {
-  const answer = await cdb.toolApi.begin(async (tx) => {
+/**
+ * `read` in one transaction as rosie_app (or as `client`'s role) with no business scope: never set, or set and then
+ * ended ('').
+ */
+async function unscoped<T>(
+  ended: boolean,
+  read: (tx: Tx) => Promise<T>,
+  client: Sql = cdb.toolApi,
+): Promise<T> {
+  const answer = await client.begin(async (tx) => {
     if (ended) await tx`select set_config('rosie.business_id', '', true)`;
     return { value: await read(tx) };
   });
   return answer.value;
+}
+
+/** A statement that reads a table that spans businesses, which rosie_app holds no grant on (0012's lines 98 to 103). */
+const SPANS_BUSINESSES = /\b(from|join)\s+(handles|persons|phones|person_handles|turns)\b/u;
+
+/**
+ * `work` on one more client as the Tool API's role (one connection), each statement it sends written to `sent` as its
+ * text (SQL with its placeholders, never its values); the client is ended after.
+ */
+async function watchedApp<T>(work: (client: Sql, sent: readonly string[]) => Promise<T>): Promise<T> {
+  const sent: string[] = [];
+  const client = cdb.client(TOOL_API_ROLE, "rosie-limit-1-sign-up-watched", 1, (text) => {
+    sent.push(text.trim());
+  });
+  try {
+    return await work(client, sent);
+  } finally {
+    await client.end({ timeout: 5 });
+  }
+}
+
+/** The shipped limit 1's decision on `request`'s part as `client`'s role under the test business's scope. */
+function decideUnder(client: Sql, request: GateRequest = secondTurn()): Promise<AllowedDecision> {
+  return withBusiness(client, BUSINESS, (tx) => limit1.decide(partOf(request), turnOf(request, tx)));
+}
+
+/** S13-45's one rule asked for the person on their own handle, in a turn, as a customer (what limit 1 asks after (14)). */
+const PERSON_OWN: OwnAsk = {
+  businessId: BUSINESS,
+  personId: PERSON,
+  as: "self",
+  caller: "turn",
+  handleId: HANDLE,
+};
+
+/** Unproven, with no T-322 codes to send: the part is refused (notBuilt), so the gate refuses the whole call. */
+const UNPROVEN_NOT_BUILT: AllowedDecision = { result: "notBuilt", port: "proofCodes" };
+
+/** The helper on the person's handle and the person's second handle (no question on it), made for one case. */
+async function addHelperAndSecondHandle(): Promise<void> {
+  const { sql } = cdb.db;
+  await insertRow(sql, typed, "persons", { id: HELPER, name: null, language: null });
+  await insertRow(sql, typed, "person_handles", { person_id: HELPER, handle_id: HANDLE });
+  await insertRow(sql, typed, "handles", { id: SECOND_HANDLE, kind: "phone", address: SECOND_NUMBER });
+  await insertRow(sql, typed, "person_handles", { person_id: PERSON, handle_id: SECOND_HANDLE });
+}
+
+/** Removes what addHelperAndSecondHandle made. */
+async function removeHelperAndSecondHandle(): Promise<void> {
+  const { sql } = cdb.db;
+  await sql`delete from person_handles where person_id = ${HELPER} and handle_id = ${HANDLE}`;
+  await sql`delete from persons where id = ${HELPER}`;
+  await sql`delete from person_handles where person_id = ${PERSON} and handle_id = ${SECOND_HANDLE}`;
+  await sql`delete from handles where id = ${SECOND_HANDLE}`;
 }
 
 describe("T-1459: limit 1 reads a sign-up's own answer from the stored rows, on the call's transaction (default 14)", () => {
@@ -457,34 +527,169 @@ describe("T-1459: limit 1 reads a sign-up's own answer from the stored rows, on 
   );
 
   it(
-    "as rosie_app, the part as a whole: default 14's reads name no table that spans businesses, and the part then reaches S13-45's one rule, whose read of the handle's people is still refused (42501 on person_handles), so the call still fails as a whole, closed, until that read is the Tool API's too",
+    "as rosie_app, the part as a whole (T-1467): default 14's facts and then S13-45's one rule are read as the Tool API's role may read them, so limit 1 passes the role-less signer's S1-02 answer, with no statement on handles, persons, phones, person_handles or turns; the one rule's read on eb873da (T-308's sender: listPersonIdsOfHandle) is still refused there (42501 on person_handles)",
     SLOW,
     async () => {
-      const sent: string[] = [];
-      const watched = cdb.client(TOOL_API_ROLE, "rosie-limit-1-sign-up-watched", 1, (text) => {
-        sent.push(text.trim());
+      const sent = await watchedApp(async (client, statements) => {
+        expect(await under(client)).toEqual({ result: "pass", why: "decider" });
+        return [...statements];
+      });
+      // Default 14's three facts: the question through 0037, then the link through 0038 with the control in one read;
+      // then the one rule's link, through 0038 again in readSignUpFactsIn's one read (contactsOnFileIn).
+      expect(sent.some((text) => text.includes("open_questions_went_out("))).toBe(true);
+      expect(sent.filter((text) => text.includes("person_handles_linked(")).length).toBe(2);
+      expect(sent.filter((text) => text.includes("left join business_setup s")).length).toBe(2);
+      // Never the handle's people (db/repo/phones.ts listPersonIdsOfHandle), nor any table that spans businesses.
+      expect(sent.some((text) => /\bperson_id from person_handles\b/u.test(text))).toBe(false);
+      for (const text of sent) {
+        expect(text).not.toMatch(SPANS_BUSINESSES);
+      }
+      // The one rule as eb873da read it, through T-308's sender, is still refused as rosie_app, at person_handles.
+      await expect(
+        withBusiness(cdb.toolApi, BUSINESS, (tx) =>
+          contactsOnFileOver(() => identityOver(identityReaderOf(tx), BUSINESS)).isOwn(PERSON_OWN),
+        ),
+      ).rejects.toMatchObject({ code: "42501", message: "permission denied for table person_handles" });
+    },
+  );
+
+  it(
+    "the one rule's link (T-1467): as rosie_job under the scope it answers as the old check (T-308's sender, listPersonIdsOfHandle) for a linked person, an unlinked one, the helper and the second handle; as rosie_app it answers the same on the handle with a live question of the business, and no link on the second handle, which has none (0038's bound)",
+    SLOW,
+    async () => {
+      await addHelperAndSecondHandle();
+      try {
+        // The linked person on their own handle; an unlinked one (the helper on the second handle, and an id no row
+        // has); the helper on the person's handle; the person on their second handle.
+        const asks: readonly OwnAsk[] = [
+          PERSON_OWN,
+          { ...PERSON_OWN, personId: HELPER, handleId: SECOND_HANDLE },
+          { ...PERSON_OWN, personId: "person-roster-owner-2" },
+          { ...PERSON_OWN, personId: HELPER },
+          { ...PERSON_OWN, handleId: SECOND_HANDLE },
+        ];
+        const asJob = await withBusiness(cdb.runtime, BUSINESS, async (tx) => {
+          const shipped = contactsOnFileIn(tx);
+          const old = contactsOnFileOver(() => identityOver(identityReaderOf(tx), BUSINESS));
+          const answers: { shipped: boolean; old: boolean }[] = [];
+          for (const ask of asks) answers.push({ shipped: await shipped.isOwn(ask), old: await old.isOwn(ask) });
+          return answers;
+        });
+        expect(asJob).toEqual([
+          { shipped: true, old: true },
+          { shipped: false, old: false },
+          { shipped: false, old: false },
+          { shipped: true, old: true },
+          { shipped: true, old: true },
+        ]);
+        const asApp = await withBusiness(cdb.toolApi, BUSINESS, async (tx) => {
+          const shipped = contactsOnFileIn(tx);
+          const answers: boolean[] = [];
+          for (const ask of asks) answers.push(await shipped.isOwn(ask));
+          return answers;
+        });
+        expect(asApp).toEqual([true, false, false, true, false]);
+      } finally {
+        await removeHelperAndSecondHandle();
+      }
+    },
+  );
+
+  it(
+    "as rosie_app, the part as a whole (T-1467): control proven, no business_setup row and the helper answer as rosie_job does (nobody there can decide yet); the second handle, linked but with no live question, is unproven (notBuilt, still refused as a whole) where rosie_job answers nobody; with no scope the one rule is refused (BusinessScopeError); and no statement names a table that spans businesses",
+    SLOW,
+    async () => {
+      const { sql } = cdb.db;
+      const sent = await watchedApp(async (app, statements) => {
+        // Control proven (with still no role).
+        await sql`
+          update business_setup
+          set control_proven_at = '2026-10-19T18:20:00Z', control_proven_via = 'listing_code', version = version + 1
+          where business_id = ${BUSINESS}
+        `;
+        try {
+          expect(await decideUnder(app)).toEqual(NOBODY_ALLOWED);
+          expect(await decideUnder(cdb.runtime)).toEqual(NOBODY_ALLOWED);
+        } finally {
+          await sql`
+            update business_setup set control_proven_at = null, control_proven_via = null, version = version + 1
+            where business_id = ${BUSINESS}
+          `;
+        }
+
+        // No business_setup row.
+        await sql`delete from business_setup where business_id = ${BUSINESS}`;
+        try {
+          expect(await decideUnder(app)).toEqual(NOBODY_ALLOWED);
+          expect(await decideUnder(cdb.runtime)).toEqual(NOBODY_ALLOWED);
+        } finally {
+          await insertRow(sql, typed, "business_setup", { business_id: BUSINESS });
+        }
+
+        await addHelperAndSecondHandle();
+        try {
+          // The helper on the person's handle: linked to it, but S1-02's question was asked of the person.
+          expect(await decideUnder(app, secondTurn(HELPER, HANDLE))).toEqual(NOBODY_ALLOWED);
+          expect(await decideUnder(cdb.runtime, secondTurn(HELPER, HANDLE))).toEqual(NOBODY_ALLOWED);
+          // The person on their second handle, linked to them alone, with no live question of the business on it.
+          expect(await decideUnder(app, secondTurn(PERSON, SECOND_HANDLE))).toEqual(UNPROVEN_NOT_BUILT);
+          expect(await decideUnder(cdb.runtime, secondTurn(PERSON, SECOND_HANDLE))).toEqual(NOBODY_ALLOWED);
+        } finally {
+          await removeHelperAndSecondHandle();
+        }
+
+        // No scope, never set or ended: the one rule's read is refused before it reads (BusinessScopeError), so the
+        // call fails as a whole.
+        for (const ended of [false, true]) {
+          const request = secondTurn();
+          await expect(
+            unscoped(ended, (tx) => limit1.decide(partOf(request), turnOf(request, tx)), app),
+            String(ended),
+          ).rejects.toBeInstanceOf(BusinessScopeError);
+        }
+
+        // And with every row as it was, the part passes as rosie_app.
+        expect(await decideUnder(app)).toEqual({ result: "pass", why: "decider" });
+        return [...statements];
+      });
+      expect(sent.some((text) => text.includes("person_handles_linked("))).toBe(true);
+      for (const text of sent) {
+        expect(text).not.toMatch(SPANS_BUSINESSES);
+      }
+    },
+  );
+
+  it(
+    "the one rule's two refusals (T-1467) send no statement on the real database: a call that is no turn, a turn with no handle and a business standing answer false, as rosie_app and as rosie_job",
+    SLOW,
+    async () => {
+      const asks: readonly OwnAsk[] = [
+        { ...PERSON_OWN, caller: "page" },
+        { ...PERSON_OWN, caller: "agent" },
+        { ...PERSON_OWN, caller: "job" },
+        { ...PERSON_OWN, handleId: null },
+        { ...PERSON_OWN, as: "owner" },
+        { ...PERSON_OWN, as: "admin" },
+        { ...PERSON_OWN, as: "staff" },
+      ];
+      /** Each ask's answer on `tx`, and the statements sent while they were asked. */
+      const refusals = async (tx: Tx, sent: readonly string[]) => {
+        const before = sent.length;
+        const answers: boolean[] = [];
+        for (const ask of asks) answers.push(await contactsOnFileIn(tx).isOwn(ask));
+        return { answers, sent: sent.slice(before) };
+      };
+      const none = { answers: asks.map(() => false), sent: [] };
+      const asApp = await watchedApp((app, sent) => withBusiness(app, BUSINESS, (tx) => refusals(tx, sent)));
+      expect(asApp).toEqual(none);
+      const jobSent: string[] = [];
+      const job = cdb.client(RUNTIME_ROLE, "rosie-limit-1-sign-up-watched-job", 1, (text) => {
+        jobSent.push(text.trim());
       });
       try {
-        await expect(under(watched)).rejects.toMatchObject({
-          code: "42501",
-          message: "permission denied for table person_handles",
-        });
+        expect(await withBusiness(job, BUSINESS, (tx) => refusals(tx, jobSent))).toEqual(none);
       } finally {
-        await watched.end({ timeout: 5 });
-      }
-      // The refused statement: T-308's sender, db/repo/phones.ts listPersonIdsOfHandle, which the one rule reads.
-      const refused = sent.findIndex((text) => /\bfrom\s+person_handles\b/u.test(text));
-      expect(refused).toBeGreaterThan(0);
-      expect(sent[refused]).toMatch(
-        /^select person_id from person_handles where handle_id = \$1 order by person_id$/u,
-      );
-      // Before it, default 14 read its three facts: the question through 0037, the link through 0038 and the control.
-      const before = sent.slice(0, refused);
-      expect(before.some((text) => text.includes("open_questions_went_out("))).toBe(true);
-      expect(before.some((text) => text.includes("person_handles_linked("))).toBe(true);
-      expect(before.some((text) => text.includes("left join business_setup s"))).toBe(true);
-      for (const text of before) {
-        expect(text).not.toMatch(/\b(from|join)\s+(handles|persons|phones|person_handles|turns)\b/u);
+        await job.end({ timeout: 5 });
       }
     },
   );
