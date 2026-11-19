@@ -2,9 +2,45 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 786, [`a920f74`](https://github.com/aryamahadik/rosie/commit/a920f74), 2026-11-19 08:59:54 UTC.
+- **Through:** commit 788, [`eb873da`](https://github.com/aryamahadik/rosie/commit/eb873da), 2026-11-19 10:43:31 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 788. docs: COMMIT\_HISTORY.md through commit 786 (a920f74, \#797) (\#799)
+
+- **Commit:** [`eb873da`](https://github.com/aryamahadik/rosie/commit/eb873da), by Arya Mahadik, 2026-11-19 10:43:31 UTC
+- **Pull request:** [#799](https://github.com/aryamahadik/rosie/pull/799) from `task/commit-history-179`, merged 2026-11-19 10:43:31 UTC. It squashed 1 branch commit:
+  - `2155ae4` docs: COMMIT\_HISTORY.md through commit 786 (a920f74, \#797)
+- **Files changed:** 1 (+87 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +87 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated after train 272 (DL-980) with scratch/build/lead/commit-history.mjs: every commit on main, newest first, with its pull request, squashed branch commits, changed files and full message (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 787. T-1466: roster-owner-setup, a seed set that adds only the missing business\_setup row (business\_id alone, control not proven, ON CONFLICT DO NOTHING) to each roster business roster-owner wrote for a place on STAGING\_LINQ\_ALLOWLIST, even once its handle has a live open question; refused, writing nothing, while a place's business does not exist yet; seed-staging.sh hands it the list by name as it does roster-owner; roster-owner.ts unchanged (DL-978) (\#798)
+
+- **Commit:** [`ac4a5b9`](https://github.com/aryamahadik/rosie/commit/ac4a5b9), by Arya Mahadik, 2026-11-19 10:43:26 UTC
+- **Pull request:** [#798](https://github.com/aryamahadik/rosie/pull/798) from `task/T-1466`, merged 2026-11-19 10:43:27 UTC. It squashed 1 branch commit:
+  - `38230dd` T-1466: roster-owner-setup, a seed set that adds only the missing bus…
+- **Files changed:** 4 (+1098 −9), by folder:
+  - `db/seeds/` roster-owner-setup.int.test.ts +613 −0, roster-owner-setup.ts +141 −0
+  - `infra/ci/` seed-staging.test.mjs +312 −1
+  - `infra/scripts/` seed-staging.sh +32 −8
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 786. docs: COMMIT\_HISTORY.md through commit 782 (3a5883d, \#794) (\#797)
 
