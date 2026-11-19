@@ -9,6 +9,13 @@
 // S1-02's question. For the entry at place <n> of the list (from 1), table by table, in the order the foreign keys need:
 //   businesses      biz-roster-owner-<n>: T-1148's business head for tp-01 (K-04 v1 seed-business-head.json's
 //                   biz-lees-barbershop, fixture set v1's barbershop), value for value, version included, but its id
+//   business_setup  biz-roster-owner-<n>'s setup row (K-23 v1; T-1462): its business_id alone, every other column null
+//                   or its default (no_money false, version 1), so its control is not proven (control_proven_at and
+//                   control_proven_via null, as before S1-75) and it holds no listing phone or email, website, About
+//                   us, profile, Stripe account or terms. Limit 1's default 14 reads the sign-up's control state from
+//                   this row, and a missing row fails closed (DL-961; DL-964, the architect's N1 on T-1459): in the
+//                   master S1-09 inserts it (migration 0019), later in the sign-up than S1-02. No value comes from a
+//                   fixture shop, so none names a phone, an email, a website, a Stripe account or a person
 //   persons         the handle's one person, as it is, when the number's handle holds one (made at first sight, as the
 //                   roster phone's is on staging); else person-roster-owner-<n>, with no name and no language, as first
 //                   sight writes a person ("null until known"; K-02 v1.1 default 11)
@@ -19,13 +26,13 @@
 //   company_kinds   company-roster-owner-<n>'s barber: T-1148's one kind of work, fixture set v1's barber shop with its
 //                   facts and no switch on in either flow, so K-05 v1.6 reads the business's sensitive switch as off
 // The ids are the set's own for each place, never made from the number. No other column of these rows must be unique
-// (K-04 core; K-23 companies_business_key holds the business's id, the set's own), so every value is the barbershop's as
-// T-1148 writes it. Never seeded: a role, an open question, a booking, a phone row or a sealing key (T-1148's list and its
-// reasons: a role, an open question or a booking makes JOIN a turn with a target, a phone row is written at receipt
-// (K-05 v1.7 openChatOnText) and a sealing key at first sight (handleSealingKey), each by the gateway). The guard reads no
-// company and no kind of work (K-05 v1.2 handleTargets), so JOIN stays a first text; readTurnParty reads the person's one
-// company with no role anywhere (K-05 v1.11 item 52, default 100), so the turn runs under biz-roster-owner-<n>, in
-// America/New_York.
+// (K-04 core; K-23's companies_business_key and business_setup's key hold the business's id, the set's own), so every
+// value is the barbershop's as T-1148 writes it. Never seeded: a role, an open question, a booking, a phone row or a
+// sealing key (T-1148's list and its reasons: a role, an open question or a booking makes JOIN a turn with a target, a
+// phone row is written at receipt (K-05 v1.7 openChatOnText) and a sealing key at first sight (handleSealingKey), each
+// by the gateway). The guard reads no company, no kind of work and no setup row (K-05 v1.2 handleTargets), so JOIN stays
+// a first text; readTurnParty reads the person's one company with no role anywhere (K-05 v1.11 item 52, default 100)
+// and no setup row, so the turn runs under biz-roster-owner-<n>, in America/New_York.
 //
 //   const result = await seedRosterOwner(sql);   // result.tables.companies: { rows: 1, inserted: 1, kept: 0 }
 //
@@ -66,11 +73,13 @@
 // handle whose one person has no role and owns this place's company alone, whose business holds no live owner role, and
 // the guard finds a first text (no live open question, no booking, and no phone row but the one openChatOnText's insert
 // leaves): so readTurnParty answers atBusiness with biz-roster-owner-<n>, and handleTargets the doors. Idempotent: a
-// second run writes nothing and leaves every row as it was, version included. Once a turn from a roster phone has
-// committed, S1-02's question waits for its answer, and the set refuses, as the skeleton seed does for tp-01; what
-// follows a reply (its STOP, HELP and rates line delivered, a Linq contact, a poll vote, a STOP or a START) is on its
-// phone row and refused too. Nothing is printed, and no error names a number or a value of a row: the runner (T-201)
-// prints the counts this returns.
+// second run writes nothing and leaves every row as it was, version included. So a business whose business_setup row is
+// there keeps it as it is, counted as kept, whether or not its control is proven (a proof, S1-75's code or the team's
+// check, is never reset), and a business that lacks it (a set this file seeded before T-1462) gets it, with every other
+// row kept. Once a turn from a roster phone has committed, S1-02's question waits for its answer, and the set refuses, as
+// the skeleton seed does for tp-01; what follows a reply (its STOP, HELP and rates line delivered, a Linq contact, a poll
+// vote, a STOP or a START) is on its phone row and refused too. Nothing is printed, and no error names a number or a
+// value of a row: the runner (T-201) prints the counts this returns.
 //
 // It runs only when named, `npm run seed:staging -- --set roster-owner`, never in D-017's run (seed-staging.sh's
 // D017_SETS). It reads and writes the database alone: the roster phone's actor is cleared by T-1452's staging-only reset
@@ -119,9 +128,18 @@ export interface RosterOwnerPersonRow {
   readonly language: null;
 }
 
+/**
+ * A business's K-23 v1 setup row as this set writes it: its business_id alone, so every other column takes its default
+ * (no_money false, version 1) or null, control_proven_at and control_proven_via among them (see the top of this file).
+ */
+export interface RosterOwnerBusinessSetupRow {
+  readonly business_id: string;
+}
+
 /** The set's rows, table by table, in the order their foreign keys need: one row of each table for each roster phone. */
 export interface RosterOwnerSeedRows {
   readonly businesses: readonly SkeletonBusinessRow[];
+  readonly business_setup: readonly RosterOwnerBusinessSetupRow[];
   readonly persons: readonly RosterOwnerPersonRow[];
   readonly handles: readonly SkeletonHandleRow[];
   readonly person_handles: readonly SkeletonPersonHandleRow[];
@@ -444,6 +462,7 @@ async function planOwners(tx: Tx, numbers: readonly string[]): Promise<Plan[]> {
 function rowsOf(plans: readonly Plan[]): RosterOwnerSeedRows {
   return {
     businesses: plans.map(({ ids }): SkeletonBusinessRow => ({ ...BUSINESS, id: ids.businessId })),
+    business_setup: plans.map(({ ids }): RosterOwnerBusinessSetupRow => ({ business_id: ids.businessId })),
     persons: plans.map(({ personId }): RosterOwnerPersonRow => ({
       id: personId,
       name: null,
@@ -549,6 +568,11 @@ export async function seedRosterOwner(
       )}
       on conflict (id) do nothing
     `;
+    // Its business_id alone, after its businesses row: every other column null or its default, so control is not
+    // proven. A row already there is kept as it is, a proven one included.
+    const businessSetup = await tx`
+      insert into business_setup ${tx(rows.business_setup, "business_id")} on conflict (business_id) do nothing
+    `;
     const persons = await tx`
       insert into persons ${tx(rows.persons, "id", "name", "language")} on conflict (id) do nothing
     `;
@@ -583,6 +607,7 @@ export async function seedRosterOwner(
       plans,
       inserted: {
         businesses: businesses.count,
+        business_setup: businessSetup.count,
         persons: persons.count,
         handles: handles.count,
         person_handles: personHandles.count,
@@ -601,6 +626,7 @@ export async function seedRosterOwner(
     ranAs: written.ranAs,
     tables: {
       businesses: count("businesses"),
+      business_setup: count("business_setup"),
       persons: count("persons"),
       handles: count("handles"),
       person_handles: count("person_handles"),
