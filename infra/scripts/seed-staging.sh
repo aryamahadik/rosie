@@ -16,6 +16,10 @@
 #       roster-owner (T-1450: each roster phone on STAGING_LINQ_ALLOWLIST made a test owner, as skeleton makes test owner
 #       1, under a test business of its own, so its JOIN is a first text: see below), which runs only when named, never
 #       in D-017's sets.
+#   npm run seed:staging -- --set roster-owner-setup
+#       roster-owner-setup (T-1466, DL-978: the business_setup row alone of each roster business roster-owner wrote for a
+#       place on STAGING_LINQ_ALLOWLIST before T-1462, even once its phone's handle has a live open question, when
+#       roster-owner refuses: see below), which runs only when named, never in D-017's sets.
 # Each set is one run of T-201's seed runner (node db/seeds/run.mjs --set <name>), which writes it idempotently, in one
 # transaction as rosie_job, and prints its row counts: a second run writes nothing. A set that fails stops the script:
 # nothing of that set is written, the sets before it stay seeded (each committed on its own) and the ones after it do
@@ -54,10 +58,11 @@
 # The roster phones' numbers (T-1450; DL-943, DL-944): STAGING_LINQ_ALLOWLIST, the list staging's real Linq line sends to
 # (T-416's guard; E.164 numbers joined by commas with no space), from the environment, else from .dev.vars by name, never
 # printed. Like the URL, it leaves this shell's environment before anything is started and is kept in a variable of the
-# script's own that is never exported. It is read only when roster-owner is among the sets, and roster-owner's run of
-# the seed runner, the one set that reads it, gets it by name, on that command's line alone; no other command gets it,
-# and a run without that set drops it unread. The set refuses a list that is unset, blank or ill-formed, writing nothing
-# and naming an entry by its place alone, which stops the run there as any set's failure does.
+# script's own that is never exported. It is read only when roster-owner or roster-owner-setup (T-1466) is among the
+# sets, and each one's run of the seed runner, the two sets that read it, gets it by name, on that command's line alone;
+# no other command gets it, and a run without either set drops it unread. Each set refuses a list that is unset, blank
+# or ill-formed, writing nothing and naming an entry by its place alone, which stops the run there as any set's failure
+# does.
 #
 # The testers' inboxes (T-1287; ADR-016 section 5 and card S; DL-011, DL-801): STAGING_TEST_INBOXES, from the
 # environment, else from .dev.vars by name, never printed: the addresses of the people who run staging's human tests,
@@ -123,6 +128,7 @@ unset -v D017_SETS CHECK_TESTER_SET SET_NAME USAGE BASE64URL_SIGNS LAST_SIGNS HE
 unset -v SESSION_END BASH_REMATCH TEST_PHONES_SET test_phones
 unset -v TEST_INBOXES_SET test_inboxes with_inboxes
 unset -v ROSTER_PHONES_SET roster_phones with_roster
+unset -v ROSTER_SETUP_SET with_roster_setup
 # The check tester's token, when the caller's environment holds it, goes into a variable of the script's own, which is
 # never exported, and the name is dropped from the environment at once, with its hash's, before any command is started
 # (sourcing lib.sh runs dirname): no command started from here finds either in its environment, whatever the sets.
@@ -157,6 +163,9 @@ TEST_INBOXES_SET="staging-testers"
 # The set that reads the roster phones' numbers, STAGING_LINQ_ALLOWLIST (T-1450's db/seeds/roster-owner.ts), run only
 # when named.
 ROSTER_PHONES_SET="roster-owner"
+# The set that reads the same list to add each roster business's missing business_setup row alone (T-1466's
+# db/seeds/roster-owner-setup.ts), run only when named.
+ROSTER_SETUP_SET="roster-owner-setup"
 # A set's name, as the runner takes it (db/seeds/run.mjs SET_NAME): test files and lib/ are never sets.
 SET_NAME='^[a-z][a-z0-9]*(-[a-z0-9]+)*$'
 USAGE="usage: seed-staging.sh [--set <name>]... (with no --set: D-017's sets, ${D017_SETS[*]})"
@@ -363,6 +372,7 @@ fi
 with_tester=0
 with_inboxes=0
 with_roster=0
+with_roster_setup=0
 for name in "${sets[@]}"; do
   if [[ "$name" == "$CHECK_TESTER_SET" ]]; then
     with_tester=1
@@ -372,6 +382,9 @@ for name in "${sets[@]}"; do
   fi
   if [[ "$name" == "$ROSTER_PHONES_SET" ]]; then
     with_roster=1
+  fi
+  if [[ "$name" == "$ROSTER_SETUP_SET" ]]; then
+    with_roster_setup=1
   fi
 done
 hash=""
@@ -426,9 +439,10 @@ if [[ "$with_inboxes" == 1 ]]; then
 else
   test_inboxes=""
 fi
-# The roster phones' numbers, only when roster-owner is among the sets: from .dev.vars by name when the environment gave
-# none (see the top of this file), as the testers' inboxes above. Otherwise the list is dropped unread.
-if [[ "$with_roster" == 1 ]]; then
+# The roster phones' numbers, only when roster-owner or roster-owner-setup is among the sets: from .dev.vars by name
+# when the environment gave none (see the top of this file), as the testers' inboxes above. Otherwise the list is
+# dropped unread.
+if [[ "$with_roster" == 1 || "$with_roster_setup" == 1 ]]; then
   if [[ -z "$roster_phones" ]]; then
     load_dev_var STAGING_LINQ_ALLOWLIST
     roster_phones="${STAGING_LINQ_ALLOWLIST:-}"
@@ -468,6 +482,16 @@ if [[ "$with_roster" == 1 ]]; then
       "roster phones' numbers are on that list (in .dev.vars, by name)"
   fi
 fi
+if [[ "$with_roster_setup" == 1 ]]; then
+  if [[ "$roster_phones" =~ [^[:space:]] ]]; then
+    log "seed-staging: STAGING_LINQ_ALLOWLIST is set: $ROSTER_SETUP_SET gets it by name and gives the roster business" \
+      "of each place on it its missing business_setup row alone (no number is shown, and no other command gets the" \
+      "list)"
+  else
+    log "seed-staging: STAGING_LINQ_ALLOWLIST is not set: $ROSTER_SETUP_SET refuses, writing nothing, until the" \
+      "roster phones' numbers are on that list (in .dev.vars, by name)"
+  fi
+fi
 if [[ "$with_tester" == 1 ]]; then
   log "seed-staging: $CHECK_TESTER_SET gets the sha256 of the check tester's token (STAGING_CHECK_TESTER_TOKEN)" \
     "by name, as STAGING_CHECK_TESTER_TOKEN_SHA256: neither is shown, and no other command gets either"
@@ -490,7 +514,7 @@ for name in "${sets[@]}"; do
     # The testers' inboxes, by name, to this run of the seed runner alone (empty: no inbox, so no tester).
     DATABASE_URL="$db_url" STAGING_DATABASE_URL="$db_url" STAGING_TEST_INBOXES="$test_inboxes" DB_SCHEMA="public" \
       node --disable-warning=ExperimentalWarning "$ROOT/db/seeds/run.mjs" --set "$name" || status=$?
-  elif [[ "$name" == "$ROSTER_PHONES_SET" ]]; then
+  elif [[ "$name" == "$ROSTER_PHONES_SET" || "$name" == "$ROSTER_SETUP_SET" ]]; then
     # The roster phones' numbers, by name, to this run of the seed runner alone (empty: the set refuses).
     DATABASE_URL="$db_url" STAGING_DATABASE_URL="$db_url" STAGING_LINQ_ALLOWLIST="$roster_phones" DB_SCHEMA="public" \
       node --disable-warning=ExperimentalWarning "$ROOT/db/seeds/run.mjs" --set "$name" || status=$?
