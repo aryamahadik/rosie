@@ -2,9 +2,95 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 782, [`3a5883d`](https://github.com/aryamahadik/rosie/commit/3a5883d), 2026-11-19 07:16:08 UTC.
+- **Through:** commit 786, [`a920f74`](https://github.com/aryamahadik/rosie/commit/a920f74), 2026-11-19 08:59:54 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 786. docs: COMMIT\_HISTORY.md through commit 782 (3a5883d, \#794) (\#797)
+
+- **Commit:** [`a920f74`](https://github.com/aryamahadik/rosie/commit/a920f74), by Arya Mahadik, 2026-11-19 08:59:54 UTC
+- **Pull request:** [#797](https://github.com/aryamahadik/rosie/pull/797) from `task/commit-history-178`, merged 2026-11-19 08:59:55 UTC. It squashed 1 branch commit:
+  - `42e3fc8` docs: COMMIT\_HISTORY.md through commit 782 (3a5883d, \#794)
+- **Files changed:** 1 (+47 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +47 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Regenerated after train 271 (DL-977) with scratch/build/lead/commit-history.mjs: every commit on main, newest first, with its pull request, squashed branch commits, changed files and full message (DL-436).
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 785. T-1463: default 14's facts readable as rosie\_app: migration 0038's person\_handles\_linked (security definer, stable, BEGIN ATOMIC, search\_path pg\_catalog, pg\_temp; EXECUTE rosie\_app and rosie\_job, revoked from PUBLIC; true only for a person linked to a handle with a live open question of the scoped business), db/repo/sign-up-reads.ts readSignUpFactsIn (business\_setup's control and version under the call's scope, and the link through 0038 as rosie\_app or person\_handles directly as rosie\_job, chosen by privilege, in one statement), limit 1's signUpFactsOver reading (b) through limit 3's question read and (c), (d) through it; rls and money pins (\#796)
+
+- **Commit:** [`bb78026`](https://github.com/aryamahadik/rosie/commit/bb78026), by Arya Mahadik, 2026-11-19 08:59:50 UTC
+- **Pull request:** [#796](https://github.com/aryamahadik/rosie/pull/796) from `task/T-1463`, merged 2026-11-19 08:59:51 UTC. It squashed 2 branch commits:
+  - `ccdce36` T-1463: default 14's facts readable as rosie\_app: migration 0038's pe…
+  - `62cab5c` Merge branch 'main' into task/T-1463
+- **Files changed:** 7 (+997 −67), by folder:
+  - `actions/src/gate/limit-1/` facts.ts +43 −43
+  - `actions/src/gate/limit-1/pg/` sign-up.int.test.ts +243 −20
+  - `db/migrations/` 0038\_core\_person\_handles\_linked.sql +75 −0
+  - `db/repo/` money.int.test.ts +5 −2, rls.int.test.ts +11 −2, sign-up-reads.int.test.ts +489 −0, sign-up-reads.ts +131 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 784. T-1461: the walk answers an option: closes the question at its row's version, walks the branch, writes each walked step by its read-only step writer and stops at a step whose message carries buttons (DL-961, DL-965) (\#795)
+
+- **Commit:** [`2f6c365`](https://github.com/aryamahadik/rosie/commit/2f6c365), by Arya Mahadik, 2026-11-19 08:59:45 UTC
+- **Pull request:** [#795](https://github.com/aryamahadik/rosie/pull/795) from `task/T-1461`, merged 2026-11-19 08:59:46 UTC. It squashed 1 branch commit:
+  - `8169bdb` T-1461: the walk answers an option: closes the question at its row's …
+- **Files changed:** 6 (+1363 −104), by folder:
+  - `actions/src/commit/walk/` answer.test.ts +677 −0, errors.ts +24 −14, index.ts +10 −1, test-support.ts +303 −2, walk.ts +37 −20, writes.ts +312 −67
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 783. T-1443: the paging service bound into the action layer, with a fail-closed telling port (DL-930) (\#792)
+
+- **Commit:** [`c0af7b0`](https://github.com/aryamahadik/rosie/commit/c0af7b0), by Arya Mahadik, 2026-11-19 08:59:41 UTC
+- **Pull request:** [#792](https://github.com/aryamahadik/rosie/pull/792) from `task/T-1443`, merged 2026-11-19 08:59:41 UTC. It squashed 2 branch commits:
+  - `dd5aac0` T-1443: bind the paging service into the action layer: core dispatch,…
+  - `17dd6b9` T-1443: drop an unneeded type assertion in the turn face's paging tes…
+- **Files changed:** 13 (+1872 −53), by folder:
+  - `actions/src/commit/core/` core-paging.test.ts +855 −0, core.test.ts +8 −5, core.ts +115 −17, index.ts +14 −5, telling.ts +96 −0
+  - `actions/src/domain/safety/` index.ts +5 −1, ports.ts +34 −2
+  - `actions/src/tool-api/turn-face/` calls-test-support.ts +10 −3, commit.ts +30 −8, paging.test.ts +340 −0, turn-face.ts +20 −2
+  - `actions/src/tool-api/turn-face/pg/` calls.ts +30 −10, telling.int.test.ts +315 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1443: bind the paging service into the action layer: core dispatch, the base's paging handlers, the telling port factory
+
+runCore dispatches handOff, answerHandOff, pageTeam, acknowledgePage and openReviewItem to T-319's core functions through the paging port the wiring binds (CoreDeps.paging; none bound answers notBuilt portNotWired). The turn face's Tool API base carries pagingHandlers when its calls carry the paging ports. commit/core/telling.ts pagingTellingPort builds T-319's telling port from the reads, the roster (by handle id) and ENVIRONMENT, failing closed (staging unless exactly production; no roster, no test phone); it is a RepoTelling (domain/safety ports.ts), a SafetyTelling put on each turn's repo by tellingOn, so every place that names NOT_TOLD_YET takes it. NOT_TOLD_YET stays the default until T-1444.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1443: drop an unneeded type assertion in the turn face's paging test (lint)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 782. docs: COMMIT\_HISTORY.md through commit 780 (48981cf, \#791) (\#794)
 
