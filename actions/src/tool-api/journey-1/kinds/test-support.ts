@@ -1,6 +1,7 @@
 // Doubles and inputs for the kinds folder's tests (T-633). Never imported by the Worker. None of them is the code under
 // test: the K-05 reads (items 78 and 79, as db/repo answers them), the stop home's reads (T-317's and T-307's doubles over
-// the frozen seeds, homes/stop/test-support), T-319's PagingReader (the paging world's), and the walk's doubles of T-1461
+// the frozen seeds, homes/stop/test-support), T-319's PagingReader (the paging world's, for the review item's plan alone),
+// and the walk's doubles of T-1461
 // (commit/walk/test-support: bundle v1, the question read, the stand-in writers). Every value comes from the contracts'
 // fixtures and fixture set v1: K-09's commit-s1-02.json and match-kinds.json, K-24's seed-kinds-sample.json,
 // seed-business-kinds.json and seed-new-work-draft.json ("pack hikes"), the master's S1-02 ("Gift cards are never set up
@@ -17,6 +18,7 @@ import type { Phone } from "../../../../../db/repo/phones";
 import { decidedOf, turnTwoOnV1, type WalkTestRepo } from "../../../commit/walk/test-support";
 import type { CatalogKind } from "../../../domain/kind-matcher";
 import { k24Kinds, seededKinds } from "../../../domain/kind-matcher/test-support";
+import type { PagingDeps } from "../../../domain/paging";
 import { pagingWorld, readerOn, type PagingWorld } from "../../../domain/paging/test-support";
 import { readsOn, seedWorld, withPhones, type World } from "../../../homes/stop/test-support";
 import { fixture } from "../../test-support";
@@ -179,7 +181,10 @@ export function stoppedWorld(stopAt: string): World {
   return { record: withPhones(world.record, [stopped]) };
 }
 
-/** What the writers' doubles hold: the stop home's world and the paging world, each written down as it is read. */
+/**
+ * What the doubles hold: the stop home's world, which the writers read, and the paging world, which the review item's
+ * plan alone reads (no writer is handed it).
+ */
 export interface WriterWorlds {
   readonly stop: World;
   readonly paging: PagingWorld;
@@ -190,18 +195,26 @@ export function writerWorlds(stop: World = seedWorld()): WriterWorlds {
 }
 
 /**
- * The writers' deps over the doubles: the K-05 reads given, the stop home's reads on the runtime side (scope none, as the
- * binding gives them), and T-319's ports with the paging world's reader.
+ * The writers' deps over the doubles: the K-05 reads given and the stop home's reads on the runtime side (scope none, as
+ * the binding gives them). No paging port: the writers take none.
  */
-export function writerDeps(
-  k05: KindsK05Reads,
-  worlds: WriterWorlds = writerWorlds(),
-): KindsWriterDeps<WalkTestRepo> {
-  return {
-    reads: kindsReadsOf(k05),
-    stop: readsOn(worlds.stop, null),
-    paging: { reader: () => readerOn(worlds.paging) },
-  };
+export function writerDeps(k05: KindsK05Reads, worlds: WriterWorlds = writerWorlds()): KindsWriterDeps {
+  return { reads: kindsReadsOf(k05), stop: readsOn(worlds.stop, null) };
+}
+
+/** A paging reader over the world, with every read written down (T-319's double). */
+export type PagingReaderDouble = ReturnType<typeof readerOn>;
+
+/**
+ * T-319's ports for the review item's plan: the paging world's reader, one for the whole plan, so a test reads what the
+ * plan asked it.
+ */
+export function planPaging(world: PagingWorld): {
+  readonly paging: PagingDeps<WalkTestRepo>;
+  readonly reader: PagingReaderDouble;
+} {
+  const reader = readerOn(world);
+  return { paging: { reader: () => reader }, reader };
 }
 
 /** match-kinds.json, as its exchange is written. */

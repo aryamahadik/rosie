@@ -14,10 +14,15 @@
 //
 // The binding (pgKindsReads) takes two clients, each its own pool: `toolApi`, whose connections run as rosie_app, and
 // `runtime`, whose connections run as rosie_job. Each read takes a connection of its client's own beside the one the
-// call's transaction holds, so the Tool API's client needs at least 2 connections when a catalog read runs inside a call
-// (DL-931): staging's client holds 1 (runtime/src/wiring/staging/db.ts CONNECTIONS_PER_CLIENT, used at its `max`), so
-// card F opens the catalog read's client of its own there, as that file's header says a call that needs another
-// connection does.
+// call's transaction holds, so a Tool API client that also holds the call's transaction needs at least 2 connections
+// when a catalog read runs inside a call (DL-931). Where the pool size is set:
+//   - locally, db/repo/client.ts createClient's `max` (line 142: options.max, else 10), which pgKindsReads fits;
+//   - on staging, runtime/src/wiring/staging/db.ts CONNECTIONS_PER_CLIENT (line 93), which is 1 and stays 1: each client
+//     there serves one call. So card F never hands pgKindsReads the gate's own client: it binds KindsK05Reads over the
+//     root's handle (one short-lived client per read, each on its own side: `toolApi(call, fn)` for item 78,
+//     `runtime(call, fn)` for item 79) and wraps it with kindsReadsOf.
+// The folder's calls await each read before the next, never side by side, so a call holds its own transaction's
+// connection and at most one read's beside it.
 //
 // Fails closed (K-05 README "Who reads them": "A notFound or transient answer ... throws and fails closed, never an empty
 // list"): K-05's transient or notFound answer is thrown as KindsReadError carrying that answer, so matchKinds answers K-09's
@@ -61,6 +66,12 @@ export interface KindsReads {
  * The reads on PostgreSQL: item 78 on `toolApi` (connections that run as rosie_app) and item 79 on `runtime` (connections
  * that run as rosie_job), each db/repo's standalone read in a read-only transaction at repeatable read of its own, on the
  * primary, uncached.
+ *
+ * `toolApi` must never be the client whose transaction the call holds when that client's `max` is 1: the catalog read
+ * takes a connection of its own beside the call's, so on a client of one connection it would wait for the connection
+ * the call itself holds, and the call would never end. Hand in a client with at least 2 connections (locally,
+ * db/repo/client.ts createClient's `max`), or bind KindsK05Reads over a client of the read's own (staging, where
+ * runtime/src/wiring/staging/db.ts CONNECTIONS_PER_CLIENT stays 1) and wrap it with kindsReadsOf.
  */
 export function pgKindsK05Reads(toolApi: Sql, runtime: Sql): KindsK05Reads {
   return {

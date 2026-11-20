@@ -48,8 +48,9 @@ export class KindsReadError extends Error {
  *   - branchNotWords: the branch decide picked does not fit what the kind matcher reads in the words ("All on the list"
  *     with a part no listed kind fits, "One isn't on the list yet" with no part new or with a part Rosie never books);
  *   - notAnswered: S1-03's writer found no S1-02 answer of this part in the walk's run, or one that drafted nothing;
- *   - reviewRefused: openReviewItem answered one of its errors (its subject not found, say);
- *   - reviewWrites: openReviewItem's writes held a row a step writer cannot hand the walk (a clock row or a message).
+ *   - reviewRefused: the review item's plan (writers.ts newWorkReviewPlan) got one of openReviewItem's errors (its
+ *     subject not found, say);
+ *   - reviewWrites: openReviewItem's writes held a row the plan does not hand on (a clock row or a message).
  */
 export type KindsFault =
   | "wrongStep"
@@ -82,14 +83,15 @@ export class KindsRefusedError extends Error {
 /**
  * What the kinds writers do not write yet, each answered notBuilt with nothing written:
  *   - which: a part two kinds fit, which needs the owner's "which?" first (arch 05 line 237), a question not built here;
- *   - pagingNotWired: S1-03's review item with no paging port bound, or one bound with no reader (T-319's PagingReader is
- *     the runtime's, T-1444), so the service never falls back to its default reader;
+ *   - pagingNotWired: the review item's plan (writers.ts newWorkReviewPlan, the later checklist card's) with no paging
+ *     port handed in, or one with no reader (T-319's PagingReader is the runtime's, T-1444), so the service never falls
+ *     back to its default reader; S1-03's walk-time writer opens no review item and never answers it;
  *   - stopNotWired: a message to the owner with no stop home reads bound (DL-878's handoff 1: the owner is read with
  *     readStop and mayText rules the text before it is written).
  */
 export type KindsSeam = "which" | "pagingNotWired" | "stopNotWired";
 
-/** Something the kinds writers would have to write is not built yet: the base answers notBuilt and rolls back. */
+/** Something the kinds of work would have to write is not built yet: the base answers notBuilt and rolls back. */
 export class KindsNotBuiltError extends NotBuiltError {
   override name = "KindsNotBuiltError";
   readonly seam: KindsSeam;
