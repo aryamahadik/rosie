@@ -2,9 +2,59 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 805, [`187aa91`](https://github.com/aryamahadik/rosie/commit/187aa91), 2026-11-20 13:36:41 UTC.
+- **Through:** commit 807, [`fa4ef40`](https://github.com/aryamahadik/rosie/commit/fa4ef40), 2026-11-20 14:59:58 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 807. docs: COMMIT\_HISTORY.md through commit 805 (187aa91, \#817) (\#818)
+
+- **Commit:** [`fa4ef40`](https://github.com/aryamahadik/rosie/commit/fa4ef40), by Arya Mahadik, 2026-11-20 14:59:58 UTC
+- **Pull request:** [#818](https://github.com/aryamahadik/rosie/pull/818) from `task/commit-history-188`, merged 2026-11-20 14:59:59 UTC. It squashed 1 branch commit:
+  - `9e439d8` docs: COMMIT\_HISTORY.md through commit 805 (187aa91, \#817)
+- **Files changed:** 1 (+35 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +35 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 806. T-1471: freeze K-09 v1.11: S1-04's buttons question as option choices with their fields, the turn that answers it, and S1-08's term lines (DL-999, DL-1005) (\#816)
+
+- **Commit:** [`984d5f7`](https://github.com/aryamahadik/rosie/commit/984d5f7), by Arya Mahadik, 2026-11-20 14:59:54 UTC
+- **Pull request:** [#816](https://github.com/aryamahadik/rosie/pull/816) from `task/T-1471`, merged 2026-11-20 14:59:55 UTC. It squashed 3 branch commits:
+  - `3aa64c3` T-1471: K-09 v1.11 frozen: S1-04's buttons question, its option choic…
+  - `584e9a2` T-1471: the two accepted S1-04 commit fixtures name givesStepKeys in …
+  - `cba3a54` T-1471: round 2 (DL-1005): default 181 closes at the version the row …
+- **Files changed:** 15 (+991 −4), by folder:
+  - `contracts/tool-api/` README.md +104 −2, frozen.json +1 −1, tool-api.rules.mjs +321 −0, tool-api.v1.11.schema.json +544 −0
+  - `contracts/tool-api/fixtures/` build-frontier-s1-04.json +1 −0, commit-s1-04-some-share.json +1 −0, commit-s1-04.json +1 −0, index.json +11 −1
+  - `contracts/tool-api/fixtures/invalid/` refuse-s1-04-commit-all-share-second-company.json +1 −0, refuse-s1-04-commit-new-company-with-business.json +1 −0, refuse-s1-04-commit-plan-row-asks.json +1 −0, refuse-s1-04-commit-question-left-open.json +1 −0, refuse-s1-04-option-field-not-in-table.json +1 −0, refuse-s1-04-option-label-reworded.json +1 −0, refuse-s1-04-option-stakes-high.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1471: K-09 v1.11 frozen: S1-04's buttons question, its option choices and fields, the turn that answers it, and S1-08's term lines (defaults 179 to 187, open gaps 148 to 160, two named rules, 3 accepted and 7 refused fixtures)
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1471: the two accepted S1-04 commit fixtures name givesStepKeys in the index, as the contract test holds every accepted journey 1 step fixture to; buttonsAnswerCommit stays their refused twins' rule
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1471: round 2 (DL-1005): default 181 closes at the version the row is read at and reads the turn's pinned graph; defaults 188 to 190; limit 6 notChecked for a choose with no field; written names two-column rows by K-05 item 77; open gap 150 corrected, 159 closed, 161 to 166 added
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 805. docs: COMMIT\_HISTORY.md through commit 803 (5eb144e, \#814) (\#817)
 
