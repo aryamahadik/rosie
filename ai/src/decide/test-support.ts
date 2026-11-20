@@ -48,12 +48,15 @@ export const MINI_A = bundleFile("bundle-mini-a.json");
 export const MINI_B = bundleFile("bundle-mini-b.json");
 export const BUNDLES: readonly Bundle[] = [V0, MINI_A, MINI_B];
 
-/** A bundle as the compiler will pack it: its own flows, with this task's decide prompt in its manifest. */
-export function withDecidePrompt(bundle: Bundle): CacheBundle {
+/**
+ * A bundle as the compiler will pack it: its own flows, with a decide prompt in its manifest. That is decide-1
+ * (DECIDE_PROMPT), the version bundles v0 and v1 ship, unless the test packs another (decide-2: T-1500).
+ */
+export function withDecidePrompt(bundle: Bundle, prompt: typeof DECIDE_PROMPT = DECIDE_PROMPT): CacheBundle {
   return {
     manifest: {
       bundleId: bundle.manifest.bundleId,
-      prompts: { ...bundle.manifest.prompts, decide: DECIDE_PROMPT },
+      prompts: { ...bundle.manifest.prompts, decide: prompt },
       partial: true,
     },
     flows: bundle.flows,
