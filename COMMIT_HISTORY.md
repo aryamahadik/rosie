@@ -2,9 +2,52 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 792, [`eebeaa5`](https://github.com/aryamahadik/rosie/commit/eebeaa5), 2026-11-20 07:26:12 UTC.
+- **Through:** commit 794, [`9ae503d`](https://github.com/aryamahadik/rosie/commit/9ae503d), 2026-11-20 08:08:03 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 794. docs: COMMIT\_HISTORY.md through commit 792 (eebeaa5, \#803) (\#805)
+
+- **Commit:** [`9ae503d`](https://github.com/aryamahadik/rosie/commit/9ae503d), by Arya Mahadik, 2026-11-20 08:08:03 UTC
+- **Pull request:** [#805](https://github.com/aryamahadik/rosie/pull/805) from `task/commit-history-182`, merged 2026-11-20 08:08:03 UTC. It squashed 1 branch commit:
+  - `853c881` docs: COMMIT\_HISTORY.md through commit 792 (eebeaa5, \#803)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 793. T-634 part 1: S1-11's read-only step writer: the first kind named gets its 11 plug-in text blocks from the pinned bundle's trade overlay, with Master Corrections C5's fills checked (DL-961 card E, DL-994) (\#804)
+
+- **Commit:** [`7f25c5f`](https://github.com/aryamahadik/rosie/commit/7f25c5f), by Arya Mahadik, 2026-11-20 08:07:59 UTC
+- **Pull request:** [#804](https://github.com/aryamahadik/rosie/pull/804) from `task/T-634`, merged 2026-11-20 08:07:59 UTC. It squashed 2 branch commits:
+  - `f4e09e5` T-634: S1-11's read-only step writer (part 1): each listed pick's 11 …
+  - `5f7a037` T-634: S1-11 in S1-02's walk loads the first kind named only (round 2…
+- **Files changed:** 6 (+1360 −2), by folder:
+  - `actions/src/tool-api/journey-1/plug-ins/` errors.ts +42 −0, index.ts +30 −2, plug-in.ts +185 −0, plug-ins.test.ts +754 −0, test-support.ts +118 −0, writer.ts +231 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-634: S1-11's read-only step writer (part 1): each listed pick's 11 plug-in text blocks from the pinned bundle's trade overlay, with MC C5's fills, and the kinds wrapper that hands it S1-02's picks from the same walk (DL-961 card E, DL-988)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-634: S1-11 in S1-02's walk loads the first kind named only (round 2, DL-994): the lowest-position kept pick of the walk's own S1-02 answer, one awaited overlay read and 11 picked_kind_texts inserts when it is listed, nothing when it is new work or no pick is kept; pickOf reads position; no other pick's overlay is read
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 792. docs: COMMIT\_HISTORY.md through commit 790 (d2ac19b, \#801) (\#803)
 
