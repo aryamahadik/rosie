@@ -20,10 +20,27 @@
 //                             times in UTC with the zone); CQ-07 and arch 06 line 341 (the text's language, never from a
 //                             name)
 //   examples                  written for this prompt from the master's kinds of turn; none is a K-02 fixture's text
+//   typed_answers (decide-2)  DL-1016 and DL-1018 (the ruling on S1-02's answer, section A, with the checker's
+//                             corrections: ops/reviews/s102-answer-ruling); arch 03 line 185 and K-02 README "Verbs and
+//                             what code checks" (code re-parses every value from its words); agree.ts (two reads agree
+//                             on the choice and on each field's value); context/builder.ts (ids are set before each
+//                             read's shuffle)
 //
 // The text is a constant built from this file's words alone, with no time, id or value of a call, so its bytes are the
 // same on every call (T-364's cached prefix: the decide prompt, then the flow's 50 rules, then the turn's cards). It ships
 // in the bundle as K-01's manifest.prompts.decide, as DECIDE_PROMPT gives it; a read uses its own bundle's copy.
+//
+// Two versions live here, and which one a turn reads is its pinned bundle's choice, never this file's:
+//   decide-1 (T-368)   DECIDE_PROMPT, with DECIDE_PROMPT_VERSION, DECIDE_PROMPT_TEXT, decidePromptText() and
+//                      DECIDE_EXAMPLES. Bundles v0 and v1 ship it (bundles/v1/build.mjs reads DECIDE_PROMPT), so its
+//                      bytes never change.
+//   decide-2 (T-1500)  DECIDE_2_PROMPT, with DECIDE_2_PROMPT_VERSION, DECIDE_2_PROMPT_TEXT, decide2PromptText() and
+//                      DECIDE_2_EXAMPLES. It is decide-1's text with four rules and one example added, and nothing
+//                      else changed but the examples' count word: the typed_answers section (typed words that give
+//                      what the one open question asked for are a choose; a list is one part; with options that list
+//                      the same fields and differ only by something code looks up, the lowest id), one line in
+//                      quotes_and_fields (a text field's value is the typed words exactly), and example 6. A later
+//                      bundle cut ships it (T-1501).
 
 import { sha256Hex } from "../cache";
 import { dataElement, escapeAttribute, parentElement } from "../context/tags";
@@ -77,12 +94,16 @@ const BARE_REPLIES = section("bare_replies", [
   "- Silence, the recent messages and what someone says another person wants are never an answer.",
 ]);
 
-const QUOTES_AND_FIELDS = section("quotes_and_fields", [
+/** What each field of an answer holds: the quote and the fields, then how a value is written, then the language. */
+const QUOTE_AND_FIELD_LINES: readonly string[] = [
   "- quote: the part's words, copied exactly from one text of the turn, as the person typed them. Never quote the recent messages: they are for tone only.",
   "- fields: only fields the chosen choice lists. Each gives its value and words, the exact words of the text it comes from. Leave out a field the turn gives no words for; never take a value from a fact, a recent message or a guess.",
   '- A value is in its field\'s type: text, the words as the person means them; integer, a whole number; boolean, true or false; money, whole cents with the currency code, so $12 is {"cents":1200,"currency":"USD"}; time, the instant in UTC with the zone, read from the text\'s send time in that zone. Code reads every value again from its words, so the words must hold it.',
-  "- language: the two-letter code of the language the turn's texts are written in, such as en or es. Never take it from a name or a stored language.",
-]);
+];
+const LANGUAGE_LINE =
+  "- language: the two-letter code of the language the turn's texts are written in, such as en or es. Never take it from a name or a stored language.";
+
+const QUOTES_AND_FIELDS = section("quotes_and_fields", [...QUOTE_AND_FIELD_LINES, LANGUAGE_LINE]);
 
 /** One worked example as the prompt shows it: what the turn holds, each step's answer, and why. */
 export interface DecideExample {
@@ -192,10 +213,14 @@ export function exampleText(example: DecideExample, n: number): string {
   ].join("\n");
 }
 
-const EXAMPLES = section("examples", [
-  "Five worked examples, each shortened: what the turn holds, each step's answer, and why.",
-  ...DECIDE_EXAMPLES.map((example, index) => exampleText(example, index + 1)),
-]);
+/** The examples section: its first line says how many there are, in a word. */
+const examplesSection = (count: string, examples: readonly DecideExample[]): string =>
+  section("examples", [
+    `${count} worked examples, each shortened: what the turn holds, each step's answer, and why.`,
+    ...examples.map((example, index) => exampleText(example, index + 1)),
+  ]);
+
+const EXAMPLES = examplesSection("Five", DECIDE_EXAMPLES);
 
 const CLOSING = "The turn is in the user message. Answer the step its step tag names.";
 
@@ -222,6 +247,104 @@ export const DECIDE_PROMPT: Readonly<{ version: string; sha256: string; text: st
   version: DECIDE_PROMPT_VERSION,
   sha256: sha256Hex(DECIDE_PROMPT_TEXT),
   text: DECIDE_PROMPT_TEXT,
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// decide-2 (T-1500; DL-1016, DL-1018): decide-1's text with four rules and one example added.
+//
+// Why: on staging an owner answered S1-02 ("What kinds of work do you do? Just type them.") with a typed list, and both
+// reads answered ask. The model is shown three options that differ only by whether each kind is on Rosie's list, which
+// it never sees, and decide-1 tells it to ask when a part is unclear. The ruling: decide carries the typed words under
+// the question's lowest-id option, and code's matcher settles the branch. So the rules say what the model can tell (the
+// words answer the question; every option lists the same fields) and leave to code what it cannot (which option is
+// true). None tells the model to guess a fact: the lowest id is a fixed place to carry the words, the same for both
+// reads, since ids are set before each read's shuffle.
+
+/** decide-2's own version (K-01 `prompt.version`). */
+export const DECIDE_2_PROMPT_VERSION = "decide-2";
+
+/**
+ * Rules a to c (T-1500's card): typed words that give what the one open question asked for are a choose; a list is one
+ * part; and, only when every option of that question lists the same fields, the lowest id carries the words.
+ */
+const TYPED_ANSWERS = section("typed_answers", [
+  "- Typed words that give what the one open question asked for are an answer to it: choose, never ask. What a question asks for is in its step card and in the fields its options list. A bare reply or reaction that gives nothing the question asked for is still ask.",
+  "- A list in one text that answers one question, such as kinds of work separated by commas, is one part, and the whole list is its quote: never one part per item.",
+  "- You never see Rosie's lists or records. When every option of the one open question lists the same fields, and the options differ only by something Rosie's code looks up, such as whether a word is on one of Rosie's lists, a list you cannot see is no reason to ask: choose that question's option with the lowest id (c-01 before c-02), wherever it is listed, and put the typed words in its field. That is not a guess: code checks the answer and settles which option is true. This rule applies only when every option of that question lists the same fields: never pick by lowest id among options with different fields, or when more than one question is open.",
+]);
+
+/** Rule d: it follows the line on a value's type, which it narrows for text. */
+const TEXT_VALUE_LINE =
+  "- A text field's value is the person's typed words exactly as typed, the same characters in order, the same as its words: never reworded, corrected, sorted or shortened. Two reads then give the same value.";
+
+const QUOTES_AND_FIELDS_2 = section("quotes_and_fields", [
+  ...QUOTE_AND_FIELD_LINES,
+  TEXT_VALUE_LINE,
+  LANGUAGE_LINE,
+]);
+
+/**
+ * Example 6, decide-2's one new example: S1-02's question as a read is shown it (three options, each listing the one
+ * text field, in a shuffled order) and a typed comma list. The step's id and labels are the master's, as examples 1 to
+ * 5 take A6-02's and S11-12's; the typed words are written for this prompt and are no K-02 fixture's text.
+ */
+export const DECIDE_EXAMPLE_6: DecideExample = {
+  title: "A typed list answers the one open question",
+  turn: [
+    "Open question: oq-3 (step S1-02).",
+    "Choices: c-2 (option, question oq-3) One isn't on the list yet, fields kinds:text; c-3 (option, question oq-3) Not a service we book, fields kinds:text; c-1 (option, question oq-3) All on the list, fields kinds:text.",
+    "Text: lawn mowing, hedge trimming, gutter cleaning",
+  ],
+  step1: {
+    language: "en",
+    parts: [{ quote: "lawn mowing, hedge trimming, gutter cleaning", verb: "choose" }],
+  },
+  step2: [
+    {
+      part: 1,
+      answer: {
+        question: "oq-3",
+        choice: "c-1",
+        fields: [
+          {
+            name: "kinds",
+            value: "lawn mowing, hedge trimming, gutter cleaning",
+            words: "lawn mowing, hedge trimming, gutter cleaning",
+          },
+        ],
+      },
+    },
+  ],
+  why: "One open question, and the typed list gives the kinds of work it asked for: one part, a choose. Its three options list the same field and differ only by Rosie's list, which you never see, so the choice is the lowest id, c-1, though it is listed last, with the whole list in kinds exactly as typed. Code settles which option is true.",
+};
+
+/** decide-2's worked examples: decide-1's five, then example 6. */
+export const DECIDE_2_EXAMPLES: readonly DecideExample[] = [...DECIDE_EXAMPLES, DECIDE_EXAMPLE_6];
+
+/** decide-2's system prompt, built from the constants above alone: the same text every time it is built. */
+export function decide2PromptText(): string {
+  return [
+    ROLE_SENTENCE,
+    YOUR_JOB,
+    INPUT,
+    STEPS,
+    VERB_LINES,
+    BARE_REPLIES,
+    TYPED_ANSWERS,
+    QUOTES_AND_FIELDS_2,
+    examplesSection("Six", DECIDE_2_EXAMPLES),
+    CLOSING,
+  ].join("\n\n");
+}
+
+/** decide-2's text, built once. */
+export const DECIDE_2_PROMPT_TEXT = decide2PromptText();
+
+/** decide-2 as a bundle ships it (K-01 `prompt`): its version, the sha256 of its UTF-8 bytes, and its text. */
+export const DECIDE_2_PROMPT: Readonly<{ version: string; sha256: string; text: string }> = Object.freeze({
+  version: DECIDE_2_PROMPT_VERSION,
+  sha256: sha256Hex(DECIDE_2_PROMPT_TEXT),
+  text: DECIDE_2_PROMPT_TEXT,
 });
 
 /** Step 1's tail of the per-turn part: the step tag alone (it holds no words, so it is no instruction inside data). */
