@@ -223,6 +223,30 @@
       "expect": "refuse",
       "shows": "The tour's delivered words part to Alex (seed-outbox-row.json, out-a7-03-alex/1/1) updated to drop its delivery time, its version raised 3 to 4, is refused (CHECK outbox_parts_delivered_has_time, 23514); keeping its time, the same update passes",
       "source": "QUESTIONS.md CQ-211 (the CHECK joins K-04's next minor version); ADR-016 section 1; arch 02 line 127"
+    },
+    {
+      "file": "invalid/refuse-outbox-row-negative-line.json",
+      "version": "v1.2",
+      "table": "outbox_rows",
+      "expect": "refuse",
+      "shows": "Sam's turn that answers S1-04 writes two rows to his mobile. Its rows load S1-08's message, which asks no question and holds its own step and line (out-s1-08-sam: step S1-08, line_no 0), and S1-09's open question. The runtime side then writing S1-09's question row (out-s1-09-sam, step S1-09) with line_no -1 is refused (CHECK outbox_rows_line_no_not_negative, 23514); with line_no 0 the same insert passes",
+      "source": "K-05 README open gap 29 (outbox_rows.line_no: integer, null, with a CHECK line_no is null or line_no >= 0); QUESTIONS.md CQ-151 (a), CQ-360; DL-999 (e); MASTER-FLOW-A S1-04, S1-08, S1-09"
+    },
+    {
+      "file": "invalid/refuse-outbox-row-step-without-line.json",
+      "version": "v1.2",
+      "table": "outbox_rows",
+      "expect": "refuse",
+      "shows": "The same turn's rows (S1-08's message row holding step S1-08 and line_no 0, and S1-09's open question), then S1-09's question row written with its step and no line is refused (CHECK outbox_rows_step_with_line, 23514): a row holds both or neither; with line_no 0 the same insert passes",
+      "source": "DL-999 (e) and T-1472's card (step and line_no are both set or both null); K-05 v1.3 rowLine (step and index both required); K-05 README open gap 29"
+    },
+    {
+      "file": "invalid/refuse-outbox-row-step-not-a-step-id.json",
+      "version": "v1.2",
+      "table": "outbox_rows",
+      "expect": "refuse",
+      "shows": "The same turn's rows (S1-08's message row holding step S1-08 and line_no 0, and S1-09's open question), then S1-09's question row written with the step S1-9, which is no K-01 step id (two or three digits follow the dash), and line_no 0 is refused (CHECK outbox_rows_step_form, 23514, the form open_questions.step has); with step S1-09 the same insert passes",
+      "source": "K-01 v1 stepId; K-04 v1 open_questions_step_form; K-05 README open gap 29 (outbox_rows.step: a K-01 stepId)"
     }
   ]
 }
