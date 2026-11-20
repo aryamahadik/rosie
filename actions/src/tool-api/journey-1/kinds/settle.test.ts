@@ -264,7 +264,7 @@ describe("S1-02's settler in the walk: the words, not the option named, decide t
   it("c-02 named, every part listed gives commit-s1-02.json's rows: today's c-01 writes, to the row", async () => {
     const today = await answer(settledWalk({ noSettler: true }), "c-01");
     const walk = settledWalk();
-    const { writes, exchange } = await answer(walk, "c-02");
+    const { writes, exchange } = await answer(walk, "c-02", WORDS);
     expect(walk.settled).toEqual([ALL_ON_THE_LIST]);
     expect(writes).toEqual(today.writes);
     expect(writes.why).toEqual({ step: "S1-02", choice: ALL_ON_THE_LIST });
