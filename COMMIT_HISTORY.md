@@ -2,9 +2,74 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 798, [`fed38f5`](https://github.com/aryamahadik/rosie/commit/fed38f5), 2026-11-20 09:13:12 UTC.
+- **Through:** commit 801, [`c17d5a3`](https://github.com/aryamahadik/rosie/commit/c17d5a3), 2026-11-20 11:27:21 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 801. docs: COMMIT\_HISTORY.md through commit 798 (fed38f5, \#809) (\#811)
+
+- **Commit:** [`c17d5a3`](https://github.com/aryamahadik/rosie/commit/c17d5a3), by Arya Mahadik, 2026-11-20 11:27:21 UTC
+- **Pull request:** [#811](https://github.com/aryamahadik/rosie/pull/811) from `task/commit-history-185`, merged 2026-11-20 11:27:21 UTC. It squashed 1 branch commit:
+  - `0a074be` docs: COMMIT\_HISTORY.md through commit 798 (fed38f5, \#809)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 800. T-1468 (card F1): the turn face can bind the walk's question read and the sign-up step writers; an owner's whole second turn proven on local PostgreSQL (DL-994, DL-997) (\#810)
+
+- **Commit:** [`eb0132f`](https://github.com/aryamahadik/rosie/commit/eb0132f), by Arya Mahadik, 2026-11-20 11:27:17 UTC
+- **Pull request:** [#810](https://github.com/aryamahadik/rosie/pull/810) from `task/T-1468`, merged 2026-11-20 11:27:18 UTC. It squashed 3 branch commits:
+  - `67422a5` T-1468: the turn face's binding takes the walk's question read and st…
+  - `eed28c4` T-1468: unit proof of the sign-up binding through the turn face (Prov…
+  - `4f1ffb1` T-1468: the owner's whole second turn on local PostgreSQL (Proves 1):…
+- **Files changed:** 7 (+1446 −10), by folder:
+  - `actions/src/tool-api/turn-face/` calls-test-support.ts +11 −0, commit.ts +94 −9, index.ts +3 −0, sign-up.test.ts +586 −0
+  - `actions/src/tool-api/turn-face/pg/` calls.ts +36 −1, index.ts +1 −0, sign-up.int.test.ts +715 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1468: the turn face's binding takes the walk's question read and step writers; signUpStepWriters and pgWalkQuestions; pgTurnCalls' signUp option
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1468: unit proof of the sign-up binding through the turn face (Proves 2): the four writers, the three branches, kinds on file, noPicks, a failed read, the fields left out
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1468: the owner's whole second turn on local PostgreSQL (Proves 1): the roster owner's JOIN, the two notBuilt branches, 'All on the list' committed as rosie_job with the gate as rosie_app, S1-04's row composed and finalized
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 799. T-1498: npm run lint runs eslint with an 8 GB heap (node --max-old-space-size=8192); the rule set, the files linted and --max-warnings=0 unchanged (DL-1002 to DL-1004) (\#812)
+
+- **Commit:** [`4f6ea50`](https://github.com/aryamahadik/rosie/commit/4f6ea50), by Arya Mahadik, 2026-11-20 11:27:13 UTC
+- **Pull request:** [#812](https://github.com/aryamahadik/rosie/pull/812) from `task/T-1498`, merged 2026-11-20 11:27:14 UTC. It squashed 1 branch commit:
+  - `e681698` T-1498: npm run lint runs eslint with an 8 GB heap (node --max-old-sp…
+- **Files changed:** 1 (+1 −1), by folder:
+  - `/` package.json +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 798. docs: COMMIT\_HISTORY.md through commit 796 (e7eea15, \#807) (\#809)
 
