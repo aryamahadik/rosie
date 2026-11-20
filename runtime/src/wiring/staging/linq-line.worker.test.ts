@@ -26,10 +26,22 @@
 //     read once, HYPERDRIVE_APP's never; both stand-ins fail that read, so no database or host is reached) and, with no
 //     answer, the receipt is not placed: the gateway answers 503 and its failure line names receiptHandleUnknown; a
 //     message.received asks nothing; no line holds the chat id.
+//   - T-1465 (DL-978: four Linq events answered 503 handoffFailed right after the delivered receipt): each Linq event
+//     kind about the roster phone's chat, placed by the real line's lookup (db/repo's readChatHandle over a stand-in for
+//     PostgreSQL), through the root's own Linq route, the HandleActor and the root's own receipt door: a
+//     message.delivered is answered 200 as before, its part marked delivered; Rosie's own reaction is answered 200,
+//     written once to the roster phone's actor, which starts no turn for it; a message.sent on iMessage (no delivery
+//     receipt) is answered 200 by the root's receipt door, written with nothing marked and no failure line (DL-997); a
+//     message.sent on SMS and a poll.failed are still refused by the root's receipt door before its store is asked
+//     anything (../root.ts deliveredStatusOf), answered 503 handoffFailed, the failure line naming the kind and the
+//     refusal's label (smsSentReceiptNoDoor, failedReceiptNoDoor); none reaches the actor.
 // Test values only (rule 9): K-11's and K-21's fixtures and vendor samples, whole fiction-range numbers (555-01xx), a
 // made-up key and made-up secrets.
 import { createLinqWebhookDouble } from "@rosie/adapters/linq/double-webhooks";
 import deliveredJson from "@rosie/contracts/inbound-event/fixtures/delivered.json";
+import pollFailedJson from "@rosie/contracts/inbound-event/fixtures/poll-failed.json";
+import reactionFromRosieJson from "@rosie/contracts/inbound-event/fixtures/reaction-from-rosie.json";
+import sentJson from "@rosie/contracts/inbound-event/fixtures/sent.json";
 import textJson from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
 import testPhoneSendJson from "@rosie/contracts/page-api/fixtures/test-phone-send.json";
 import sendText from "@rosie/contracts/port-linq/fixtures/send-text.json";
@@ -43,6 +55,7 @@ import {
 } from "@rosie/actions/src/page-calls/staging/test-phone/index";
 import { REASONS as GUARD_REASONS } from "@rosie/adapters/linq/roster";
 import { LINQ_API_BASE, LINQ_API_TOKEN } from "@rosie/adapters/linq/send";
+import type { Sql } from "@rosie/db/repo/scope";
 import { createExecutionContext, reset, runInDurableObject } from "cloudflare:test";
 import { env as poolEnv, exports } from "cloudflare:workers";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -799,6 +812,286 @@ describe("the Worker's root on the real line (workerRoot, T-1456): a Linq receip
       expect(reads).toEqual({ job: jobReadsBefore, app: 0 });
       expectNothingLeaked([linqSecret]);
       for (const line of logged) expect(line.includes(ROSTER_CHAT), "a line holds the chat id").toBe(false);
+    },
+  );
+});
+
+// ---- T-1465: each Linq event kind about a placed chat, through the root's own doors --------------------------------------
+
+/** The roster phone's handle in K-04 (made up), and its actor's name. */
+const ROSTER_HANDLE_ID = "hdl-t1465-roster";
+const ROSTER_ACTOR = actorNameOf({ kind: "phone", address: ROSTER_PHONE });
+/** The key the roster phone's part was sent under (K-07 '<row>/<part>/<try>'), which its sent and delivered receipts echo. */
+const ROSTER_PART_KEY = "out-t1465-roster-join/1/1";
+
+type Row = Record<string, unknown>;
+
+/**
+ * The root's handle over a stand-in for PostgreSQL that answers db/repo's readChatHandle (its two reads: K-04 threads by
+ * linq_chat_id, handles by id) for the roster phone's chat alone, so the real line's own lookup places the chat and
+ * nothing leaves the isolate. Each call's name is kept.
+ */
+function chatDb(): { db: StagingDb; calls: string[] } {
+  const calls: string[] = [];
+  const query = (strings: TemplateStringsArray, ...values: unknown[]): Promise<Row[]> => {
+    const text = strings.join("$?").replace(/\s+/gu, " ").trim();
+    if (/\bfrom threads where linq_chat_id = \$\?$/u.test(text)) {
+      return Promise.resolve(
+        values[0] === ROSTER_CHAT ? [{ kind: "chat", handle_id: ROSTER_HANDLE_ID }] : [],
+      );
+    }
+    if (/\bfrom handles where id = \$\?$/u.test(text)) {
+      return Promise.resolve(
+        values[0] === ROSTER_HANDLE_ID ? [{ kind: "phone", address: ROSTER_PHONE }] : [],
+      );
+    }
+    return Promise.resolve([]);
+  };
+  const reserved = Object.assign(
+    (strings: TemplateStringsArray, ...values: unknown[]) => query(strings, ...values),
+    { unsafe: (): Promise<Row[]> => Promise.resolve([]), release: (): void => undefined },
+  );
+  const sql = Object.assign(
+    (strings: TemplateStringsArray, ...values: unknown[]) => query(strings, ...values),
+    { reserve: () => Promise.resolve(reserved) },
+  ) as unknown as Sql;
+  const db: StagingDb = {
+    ...NO_DB,
+    runtime: (call, fn) => {
+      calls.push(call);
+      return fn(sql);
+    },
+  };
+  return { db, calls };
+}
+
+interface KindsRun {
+  readonly root: Root;
+  readonly fakes: ReturnType<typeof skeletonFakes>;
+  readonly linqSecret: string;
+  /** The names of the calls the root's handle was asked for, in order. */
+  readonly dbCalls: string[];
+  /** A K-06 event as Linq signs it on the real line, posted to the root's own Linq route. */
+  post(event: LinqInboundEvent, partKey: string | null): Promise<{ status: number; traceId: string | null }>;
+  restore(): void;
+}
+
+/**
+ * The root ../test-phone.worker.test.ts's rig composes (the test environment's fakes, the HandleActor namespace, the
+ * skeleton flag on, staging's vars), with the Worker's own verify input on the real line: Linq's made-up secret,
+ * HYPERDRIVE_JOB bound (its presence alone is read) and the chat lookup on chatDb's handle, as workerRoot hands the
+ * root's own. Its receipt door is the root's own, over the fakes' outbox store.
+ */
+function kindsRig(): KindsRun {
+  const fakes = skeletonFakes();
+  const { values, linqSecret } = pageLineValues({
+    HYPERDRIVE_JOB: {
+      get connectionString(): string {
+        throw new Error("t1465: the verify input read HYPERDRIVE_JOB's connection string");
+      },
+    },
+  });
+  const chats = chatDb();
+  const root = composeRoot({
+    environment: "test",
+    sets: { fake: fakes.ports },
+    actors: handleActors(),
+    vars: { ENVIRONMENT: "staging", GIT_SHA: "test-sha" },
+    clock: fakes.clock,
+    linq: stagingLinqVerifyInputs(values as unknown as StagingEnv, chats.db),
+    handleKey: fakes.handleKeys.call,
+    chatOpenCall: fakes.dispatch.openChat,
+    safetyReaders: fakes.models.readers,
+    bundleReads: fakes.bundleReads.calls,
+    handleTargets: fakes.handleTargets.call,
+    frontierScope: fakes.frontier.scope,
+    deciders: fakes.decide.deciders,
+    turnRows: fakes.turnRows.calls,
+    gateReads: fakes.gate.reads,
+    composeReads: fakes.compose.reads,
+    composers: fakes.composer.composers,
+    finalizeData: fakes.finalize.data,
+    outboxCalls: fakes.dispatch.outbox,
+    sendStateCall: fakes.dispatch.sendState,
+    flags: fakeFlags([SKELETON_FLAG]),
+  });
+  const restore = root.install();
+  const linq = createLinqWebhookDouble({ secret: linqSecret });
+  return {
+    root,
+    fakes,
+    linqSecret,
+    dbCalls: chats.calls,
+    restore,
+    async post(event, partKey) {
+      const response = await root.linqWebhook(linqPost(await linq.sign({ event, partKey })));
+      return { status: response.status, traceId: response.headers.get("x-trace-id") };
+    },
+  };
+}
+
+/** The roster phone's actor: what its inbox holds and the batches it opened. */
+async function rosterActorHolds(): Promise<{ inbox: string[]; batches: number }> {
+  return runInDurableObject(actorOf(ROSTER_ACTOR), (actor: HandleActor) => ({
+    inbox: actor.readInbox().map((entry) => entry.event.eventId),
+    batches: actor.readBatches().length,
+  }));
+}
+
+/**
+ * The receipts the root's receipt door still refuses, as Linq posts them about the roster phone's part, each with the
+ * label its refusal carries (DL-997 item 3): they must be acted on, and no door acts on them yet.
+ */
+const DOOR_REFUSES: readonly (readonly [string, () => LinqInboundEvent, string | null, string])[] = [
+  [
+    "a message.sent on SMS (sent.json's own service)",
+    () => rosterEvent(sentJson, "evt-t1465-sent-sms-0001"),
+    ROSTER_PART_KEY,
+    "smsSentReceiptNoDoor",
+  ],
+  [
+    "a poll.failed (poll-failed.json)",
+    () => rosterEvent(pollFailedJson, "evt-t1465-poll-failed-0001"),
+    null,
+    "failedReceiptNoDoor",
+  ],
+];
+
+describe("T-1465 (DL-978): each Linq event kind about the roster phone's chat, placed by the real line's lookup, through the root's own Linq route, the HandleActor and the root's receipt door", () => {
+  it(
+    "a message.delivered: 200 as before, its part marked delivered by the receipt door, the actor's inbox untouched, no failure line",
+    { timeout: TEST_MS },
+    async () => {
+      const run = kindsRig();
+      try {
+        const answer = await run.post(
+          rosterEvent(deliveredJson, "evt-t1465-delivered-0001"),
+          ROSTER_PART_KEY,
+        );
+
+        expect(answer.status).toBe(200);
+        expect(run.dbCalls).toEqual(["readChatHandle"]);
+        expect(run.fakes.dispatch.partMarks.map((mark) => mark.request)).toEqual([
+          expect.objectContaining({
+            outcome: "delivered",
+            providerMessageId: deliveredJson.status.messageId,
+            idempotencyKey: ROSTER_PART_KEY,
+          }),
+        ]);
+        expect(gatewayReceive(answer.traceId)).toMatchObject({
+          outcome: "ok",
+          got: { kind: "delivered", service: "imessage" },
+          decided: { signatureValid: true, knownEventId: false, answered: 200 },
+        });
+        expect(linesOf("gateway_failed")).toEqual([]);
+        expect(await rosterActorHolds()).toEqual({ inbox: [], batches: 0 });
+        expectNothingLeaked([run.linqSecret]);
+      } finally {
+        run.restore();
+      }
+    },
+  );
+
+  it(
+    "Rosie's own reaction (reaction.added, is_from_me): 200, written once to the roster phone's actor, which starts no turn for it; the same event again is 200 and dropped; no failure line",
+    { timeout: TEST_MS },
+    async () => {
+      const run = kindsRig();
+      try {
+        const reaction = rosterEvent(reactionFromRosieJson, "evt-t1465-reaction-0001");
+
+        const first = await run.post(reaction, null);
+        const again = await run.post(reaction, null);
+
+        expect([first.status, again.status]).toEqual([200, 200]);
+        expect(run.dbCalls).toEqual(["readChatHandle", "readChatHandle"]);
+        expect(gatewayReceive(first.traceId)).toMatchObject({
+          outcome: "ok",
+          got: { kind: "reaction", service: "imessage" },
+          decided: { signatureValid: true, knownEventId: false, sealedToActor: true, answered: 200 },
+        });
+        expect(gatewayReceive(again.traceId)).toMatchObject({
+          outcome: "dropped",
+          decided: { signatureValid: true, knownEventId: true, answered: 200 },
+        });
+        expect(await rosterActorHolds()).toEqual({ inbox: ["evt-t1465-reaction-0001"], batches: 0 });
+        expect(run.fakes.dispatch.partMarks).toEqual([]);
+        expect(linesOf("gateway_failed")).toEqual([]);
+        expectNothingLeaked([run.linqSecret]);
+      } finally {
+        run.restore();
+      }
+    },
+  );
+
+  it(
+    "a message.sent on iMessage (no delivery receipt): the chat is placed, then the root's receipt door answers it written with nothing marked, so 200 and no failure line; Linq's repeat is answered 200 the same way; the actor is never reached",
+    { timeout: TEST_MS },
+    async () => {
+      const run = kindsRig();
+      try {
+        const sent = { ...rosterEvent(sentJson, "evt-t1465-sent-0001"), service: "imessage" as const };
+
+        const first = await run.post(sent, ROSTER_PART_KEY);
+        const again = await run.post(sent, ROSTER_PART_KEY);
+
+        expect([first.status, again.status]).toEqual([200, 200]);
+        expect(run.dbCalls).toEqual(["readChatHandle", "readChatHandle"]);
+        for (const answer of [first, again]) {
+          expect(gatewayReceive(answer.traceId)).toMatchObject({
+            outcome: "ok",
+            error_code: null,
+            got: { kind: "sent", service: "imessage" },
+            decided: { signatureValid: true, knownEventId: false, answered: 200 },
+          });
+        }
+        expect(run.fakes.dispatch.partMarks).toEqual([]);
+        expect(linesOf("gateway_failed")).toEqual([]);
+        expect(await rosterActorHolds()).toEqual({ inbox: [], batches: 0 });
+        expectNothingLeaked([run.linqSecret]);
+        for (const line of logged) expect(line.includes(ROSTER_CHAT), "a line holds the chat id").toBe(false);
+      } finally {
+        run.restore();
+      }
+    },
+  );
+
+  it.each(DOOR_REFUSES)(
+    "%s: the chat is placed, then the root's receipt door still refuses it before its store is asked anything (../root.ts deliveredStatusOf): 503 handoffFailed, the failure line naming its kind and the refusal's label; the actor is never reached",
+    { timeout: TEST_MS },
+    async (_name, eventOf, partKey, refusal) => {
+      const run = kindsRig();
+      try {
+        const event = eventOf();
+
+        const answer = await run.post(event, partKey);
+
+        expect(answer.status).toBe(503);
+        expect(run.dbCalls).toEqual(["readChatHandle"]);
+        expect(gatewayReceive(answer.traceId)).toMatchObject({
+          outcome: "failed",
+          error_code: "handoffFailed",
+          got: { kind: event.kind },
+          decided: { signatureValid: true, answered: 503 },
+        });
+        expect(linesOf("gateway_failed")).toEqual([
+          {
+            level: "error",
+            msg: "gateway_failed",
+            trace_id: answer.traceId,
+            stage: "handoff",
+            error: "WiringError",
+            kind: event.kind,
+            refusal,
+          },
+        ]);
+        expect(run.fakes.dispatch.partMarks).toEqual([]);
+        expect(await rosterActorHolds()).toEqual({ inbox: [], batches: 0 });
+        expectNothingLeaked([run.linqSecret]);
+        for (const line of logged) expect(line.includes(ROSTER_CHAT), "a line holds the chat id").toBe(false);
+      } finally {
+        run.restore();
+      }
     },
   );
 });

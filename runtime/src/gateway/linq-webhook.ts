@@ -9,7 +9,8 @@
 // scrubbed, then (texts, photos, reactions, votes, edits) sealed and written to the handle's actor, or (receipts) handed
 // scrubbed to the dispatcher's door (hand-off.ts). The trace id opens at receipt, one K-08 `receive` span ends every answer,
 // and the answer carries x-trace-id. Never logged: a body, a phone number, the webhook secret. The answer rules it shares
-// with the Stripe and calendar doors are answer.ts's.
+// with the Stripe and calendar doors are answer.ts's. A hand-off its door refuses or fails (503) writes one failure line
+// naming the event's kind and the refusal's label, each from a closed list (T-1465; answer.ts HANDOFF_REFUSALS).
 //
 // A number's chat opens at receipt (T-1213; K-05 v1.7 item 46; chat-open.ts): a text or photo a phone handle sends through
 // Linq goes to K-05 openChatOnText after the key call and before the actor's door, once per webhook. Its answer decides:
@@ -170,7 +171,10 @@ export async function handleLinqWebhook(
           }
         }
       } catch (error) {
-        logFailure(context.traceId, stage, error);
+        // A door's refusal of the hand-off names the event's kind and the refusal's label (T-1465; answer.ts), so the
+        // line says which kind failed and why; a failure before the hand-off is logged as it was.
+        if (stage === "handoff") logFailure(context.traceId, stage, error, { kind: event.kind });
+        else logFailure(context.traceId, stage, error);
         if (stage === "prepare") code = error instanceof HandoffError ? error.code : "sealFailed";
         else if (stage === "chat") code = "chatOpenFailed";
       }
