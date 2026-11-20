@@ -28,7 +28,9 @@ import {
   NOTHING_OPEN,
   bundleV1Id,
   commitS1_02,
+  contextOf,
   decidedOf,
+  passedPartOf,
   questionsOver,
   s1_02QuestionRow,
   turnTwoOnV1,
@@ -409,16 +411,24 @@ describe("turn 2 through the turn face with the question read and the sign-up wr
   });
 
   it("with the stop port left out, 'One isn't on the list yet' and 'Not a service we book' each answer notBuilt, and nothing is committed", async () => {
-    for (const [choiceId, words] of [
-      ["c-02", `Barbershop, ${PACK_HIKES}`],
-      ["c-03", GIFT_CARDS],
+    for (const [choiceId, words, stepId] of [
+      ["c-02", `Barbershop, ${PACK_HIKES}`, "S1-03"],
+      ["c-03", GIFT_CARDS, "S1-74"],
     ] as const) {
       const made = doubles();
-      const { answer, thrown } = await through(made, secondTurn(choiceId, words));
+      const request = secondTurn(choiceId, words);
+      const { answer, thrown } = await through(made, request);
       expect(thrown, choiceId).toBeUndefined();
       expect(answer, choiceId).toEqual(NOT_BUILT);
       expect(made.commit.requests, choiceId).toEqual([]);
       expect(made.commit.commits, choiceId).toEqual([]);
+      // What the walk itself answers under the binding: the branch's own step cannot tell the owner (stopNotWired),
+      // and returns no row.
+      const { ports } = made.calls.commit(NOTHING_OPEN_AT);
+      await expect(
+        ports.writesOf(passedPartOf(request), contextOf(request), NOTHING_OPEN),
+        choiceId,
+      ).rejects.toMatchObject({ name: "KindsNotBuiltError", seam: "stopNotWired", ids: [stepId] });
     }
   });
 
