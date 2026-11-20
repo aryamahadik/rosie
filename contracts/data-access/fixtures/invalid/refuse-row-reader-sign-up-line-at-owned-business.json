@@ -1,0 +1,26 @@
+{
+  "call": "rowReader",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-business-head.json"],
+    "after": [],
+    "now": "2026-11-30T15:00:03Z",
+    "note": "row-reader-s1-02-sam-after-hand-over.json's exchange with Sam read as the owner by the sign-up line: after S11-100's hand-over Hugo P. holds the barbershop's live owner role and Sam holds no role there, so the request states businessOwner live, and a person with no role is never read by the sign-up line at a business that has a live owner (README item 80; T-1184's security note a: limit 7 would release the owner's fields of Hugo's business to Sam). Refused by rowReader.exchange's rule 7. Put right, noReader with why businessHasOwner, it is row-reader-s1-02-sam-after-hand-over.json."
+  },
+  "request": {
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "line": { "step": "S1-02", "index": 0, "from": "openQuestion" },
+    "recipient": { "personId": "person-sam", "roles": [] },
+    "flow": "A",
+    "section": 1,
+    "lineTo": "owner",
+    "businessOwner": "live"
+  },
+  "outcome": {
+    "result": "reader",
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "reader": "owner",
+    "from": "signUpLine",
+    "roleId": null
+  }
+}

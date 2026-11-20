@@ -1,0 +1,25 @@
+{
+  "call": "rowReader",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-business-head.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:05Z",
+    "note": "row-reader-s1-02-no-role-no-owner.json's exchange with businessOwner left out: a v1.20 mapping states whether the row's business has a live owner role wherever the outcome reads it, a recipient who is a person, holds no role and is on a section 1 step, so a consumer that did not read the owner never reads the row by the sign-up line (README item 80, default 188). Refused by rowReader.ownerExchange's own rule; v1.20's rowReader.exchange alone accepts it, as v1.5's row-reader-s1-02-no-role.json, the mapping of a consumer not yet on v1.20. Put right, businessOwner none, it is row-reader-s1-02-no-role-no-owner.json."
+  },
+  "request": {
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "line": { "step": "S1-02", "index": 0, "from": "openQuestion" },
+    "recipient": { "personId": "person-sam", "roles": [] },
+    "flow": "A",
+    "section": 1,
+    "lineTo": "owner"
+  },
+  "outcome": {
+    "result": "reader",
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "reader": "owner",
+    "from": "signUpLine",
+    "roleId": null
+  }
+}
