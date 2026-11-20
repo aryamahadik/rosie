@@ -2,9 +2,58 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 788, [`eb873da`](https://github.com/aryamahadik/rosie/commit/eb873da), 2026-11-19 10:43:31 UTC.
+- **Through:** commit 790, [`d2ac19b`](https://github.com/aryamahadik/rosie/commit/d2ac19b), 2026-11-19 23:20:41 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 790. docs: COMMIT\_HISTORY.md through commit 788 (eb873da, \#799) (\#801)
+
+- **Commit:** [`d2ac19b`](https://github.com/aryamahadik/rosie/commit/d2ac19b), by Arya Mahadik, 2026-11-19 23:20:41 UTC
+- **Pull request:** [#801](https://github.com/aryamahadik/rosie/pull/801) from `task/commit-history-180`, merged 2026-11-19 23:20:41 UTC. It squashed 1 branch commit:
+  - `c77607b` docs: COMMIT\_HISTORY.md through commit 788 (eb873da, \#799)
+- **Files changed:** 1 (+37 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +37 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 789. T-1467: S13-45's one rule readable as rosie\_app: limit 1's contactsOnFileIn asks readSignUpFactsIn().linked (0038 as rosie\_app, person\_handles as rosie\_job); no migration (DL-982) (\#800)
+
+- **Commit:** [`d7b3041`](https://github.com/aryamahadik/rosie/commit/d7b3041), by Arya Mahadik, 2026-11-19 23:20:37 UTC
+- **Pull request:** [#800](https://github.com/aryamahadik/rosie/pull/800) from `task/T-1467`, merged 2026-11-19 23:20:37 UTC. It squashed 3 branch commits:
+  - `aa8d803` T-1467: limit 1's one rule reads the sender's link to the turn's hand…
+  - `9ff6022` T-1467: sign-up.int.test.ts: the last case replaced (as rosie\_app lim…
+  - `eb1ae8c` T-1467: Prettier's layout and two comment fixes in facts.test.ts and …
+- **Files changed:** 4 (+611 −40), by folder:
+  - `actions/src/gate/limit-1/` facts.test.ts +311 −0, facts.ts +38 −1, index.ts +25 −9
+  - `actions/src/gate/limit-1/pg/` sign-up.int.test.ts +237 −30
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1467: limit 1's one rule reads the sender's link to the turn's handle on the call's transaction as rosie_app may (contactsOnFileIn: the two refusals that read nothing, then readSignUpFactsIn().linked, 0038 as rosie_app); createLimit1's default, with a given identity's sender() kept for the test doubles; unit test beside facts.ts (DL-982)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1467: sign-up.int.test.ts: the last case replaced (as rosie_app limit 1 passes the role-less signer's S1-02 answer with no statement on a table that spans businesses; the eb873da read stays pinned 42501); rosie_job's link as the old check; the as-today answers of the part as a whole; the two refusals send nothing
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1467: Prettier's layout and two comment fixes in facts.test.ts and sign-up.int.test.ts
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 788. docs: COMMIT\_HISTORY.md through commit 786 (a920f74, \#797) (\#799)
 
