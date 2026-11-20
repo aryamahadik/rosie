@@ -1452,7 +1452,10 @@ function placedCompaniesProblems(option, fields, state, caller) {
  * openQuestions.closed); and `given.stated.writes` states the walk's rows: the next step's row, which asks nothing
  * (S1-08's), then the question of the step the walk stops at (S1-09's, with no options) and its row, the question among
  * those the answer opened. For S1-04 the state rows are held to placedCompaniesProblems. The schema takes any stated writes, so
- * this rule alone refuses a question left open, a plan row that asks, and company rows the option does not mean.
+ * this rule alone refuses a question left open, a plan row that asks, and company rows the option does not mean. It
+ * holds the case where Rosie may text the owner, the only one v1.11 freezes: an exchange in which the stop home rules
+ * "noTexts", so S1-08's row is not written (README default 189), needs its own rule under a new name. It does not read
+ * the answer's `written` or the limits' results.
  */
 export function buttonsAnswerCommit(exchange) {
   const stated = exchange.given?.stated;
