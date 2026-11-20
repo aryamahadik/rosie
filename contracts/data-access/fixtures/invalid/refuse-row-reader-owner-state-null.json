@@ -1,0 +1,26 @@
+{
+  "call": "rowReader",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-business-head.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:05Z",
+    "note": "row-reader-s1-02-no-role-no-owner.json's exchange with businessOwner null, as a consumer whose owner read failed or was not made might state it: the state is none or live and nothing else, so a read that did not answer is never read as no owner, and the row is refused before a reader is looked for (README item 80, default 188). Refused by rowReader.request (businessOwnerState). Put right, businessOwner none, the answer the read gives for T-1148's seed, it is row-reader-s1-02-no-role-no-owner.json."
+  },
+  "request": {
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "line": { "step": "S1-02", "index": 0, "from": "openQuestion" },
+    "recipient": { "personId": "person-sam", "roles": [] },
+    "flow": "A",
+    "section": 1,
+    "lineTo": "owner",
+    "businessOwner": null
+  },
+  "outcome": {
+    "result": "reader",
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "reader": "owner",
+    "from": "signUpLine",
+    "roleId": null
+  }
+}

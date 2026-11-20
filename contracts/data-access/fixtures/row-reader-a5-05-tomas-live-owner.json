@@ -1,0 +1,24 @@
+{
+  "call": "rowReader",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-07T15:06:00Z",
+    "note": "v1.5's row-reader-a5-05-tomas-no-role.json with the owner state stated: Tomás holds no role at the barbershop, whose live owner role is Sam's (K-04's seed-person-roles.json; business-owner-barbershop.json), so the request states businessOwner live. A5-05 is in section 5 of flow A in K-01's bundle-mini-a.json, outside the sign-up section, so the row is refused as v1.5 refuses it, noReader (noRole): the reason names the first thing wrong, no person or a step outside section 1 before the business's owner (README default 187), and businessHasOwner is answered only where the sign-up reading would otherwise apply. Outside section 1 the field may also be left out. outbox-a5-05-tomas-1 is an example row id in K-09 v1.5 default 131's form; no chain here writes it. Not a database call."
+  },
+  "request": {
+    "outboxRowId": "outbox-a5-05-tomas-1",
+    "bundleId": { "hash": "5bc63b09b605d99a676e32fd75a88ca0c72b921f3b5ccb50688db7a0e4f98f82", "build": 1 },
+    "line": { "step": "A5-05", "index": 0, "from": "openQuestion" },
+    "recipient": { "personId": "person-tomas", "roles": [] },
+    "flow": "A",
+    "section": 5,
+    "lineTo": "cust",
+    "businessOwner": "live"
+  },
+  "outcome": {
+    "error": "noReader",
+    "outboxRowId": "outbox-a5-05-tomas-1",
+    "why": "noRole"
+  }
+}

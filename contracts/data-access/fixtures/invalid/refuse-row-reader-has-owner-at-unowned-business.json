@@ -1,0 +1,24 @@
+{
+  "call": "rowReader",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-business-head.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:05Z",
+    "note": "row-reader-s1-02-no-role-no-owner.json's exchange refused as businessHasOwner: T-1148's seed gives the barbershop no owner role, the request states businessOwner none, and the refusal is answered only for a business that has a live owner, so turn 1's row keeps its reader and the walking skeleton's turn 1 is not stopped by the new rule (README item 80). Refused by rowReader.exchange's rule 3. Put right, the owner by the sign-up line, it is row-reader-s1-02-no-role-no-owner.json."
+  },
+  "request": {
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "line": { "step": "S1-02", "index": 0, "from": "openQuestion" },
+    "recipient": { "personId": "person-sam", "roles": [] },
+    "flow": "A",
+    "section": 1,
+    "lineTo": "owner",
+    "businessOwner": "none"
+  },
+  "outcome": {
+    "error": "noReader",
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "why": "businessHasOwner"
+  }
+}

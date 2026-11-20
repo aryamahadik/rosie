@@ -1,0 +1,26 @@
+{
+  "call": "rowReader",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-business-head.json"],
+    "after": [],
+    "now": "2026-10-19T18:05:05Z",
+    "note": "Turn 1's row as v1.5's row-reader-s1-02-no-role.json maps it, in its v1.20 form: the request also states whether the row's business has a live owner role. T-1148's seed (db/seeds/skeleton.ts) writes the barbershop's head, Sam and his handle, and no role, so v1.4's readBusinessOwner for biz-lees-barbershop answers owner null, as business-owner-none.json shows, and the request states businessOwner none (README item 80). Sam, a person who holds no role, on S1-02 in section 1 of flow A, whose one line from Rosie goes to the owner, at a business with no live owner: he reads it by the sign-up line, as the owner, as v1.5 reads him and as K-09's compose-input-s1-02.json and compose-input-s1-02-v1.6.json do. Not a database call: rowReader is the consumers' mapping, and the owner read is v1.4's own call, made by the consumer before it."
+  },
+  "request": {
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "line": { "step": "S1-02", "index": 0, "from": "openQuestion" },
+    "recipient": { "personId": "person-sam", "roles": [] },
+    "flow": "A",
+    "section": 1,
+    "lineTo": "owner",
+    "businessOwner": "none"
+  },
+  "outcome": {
+    "result": "reader",
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "reader": "owner",
+    "from": "signUpLine",
+    "roleId": null
+  }
+}
