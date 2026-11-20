@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 790, [`d2ac19b`](https://github.com/aryamahadik/rosie/commit/d2ac19b), 2026-11-19 23:20:41 UTC.
+- **Through:** commit 792, [`eebeaa5`](https://github.com/aryamahadik/rosie/commit/eebeaa5), 2026-11-20 07:26:12 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 792. docs: COMMIT\_HISTORY.md through commit 790 (d2ac19b, \#801) (\#803)
+
+- **Commit:** [`eebeaa5`](https://github.com/aryamahadik/rosie/commit/eebeaa5), by Arya Mahadik, 2026-11-20 07:26:12 UTC
+- **Pull request:** [#803](https://github.com/aryamahadik/rosie/pull/803) from `task/commit-history-181`, merged 2026-11-20 07:26:13 UTC. It squashed 1 branch commit:
+  - `f53c19a` docs: COMMIT\_HISTORY.md through commit 790 (d2ac19b, \#801)
+- **Files changed:** 1 (+50 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +50 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 791. T-1469: kinds-catalog seed set writes K-24's catalog alone (243 kinds, 486 kind\_flows) from the checked trade files as kinds.ts does, with no demo shop's pick and no setup seed; refuses a catalog row that differs from its trade file, naming the kind; kinds.ts refactored to share catalogPlanOf and insertCatalog, output unchanged (DL-961 card G, DL-988) (\#802)
+
+- **Commit:** [`95b3d40`](https://github.com/aryamahadik/rosie/commit/95b3d40), by Arya Mahadik, 2026-11-20 07:26:08 UTC
+- **Pull request:** [#802](https://github.com/aryamahadik/rosie/pull/802) from `task/T-1469`, merged 2026-11-20 07:26:08 UTC. It squashed 1 branch commit:
+  - `bc05c29` T-1469: kinds-catalog seed set writes K-24's catalog alone (243 kinds…
+- **Files changed:** 4 (+1093 −30), by folder:
+  - `db/seeds/` kinds-catalog.int.test.ts +631 −0, kinds-catalog.test.ts +154 −0, kinds-catalog.ts +218 −0, kinds.ts +90 −30
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 790. docs: COMMIT\_HISTORY.md through commit 788 (eb873da, \#799) (\#801)
 
