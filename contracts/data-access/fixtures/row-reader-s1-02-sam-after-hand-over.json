@@ -1,0 +1,24 @@
+{
+  "call": "rowReader",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-business-head.json"],
+    "after": [],
+    "now": "2026-11-30T15:00:03Z",
+    "note": "A sign-up row to Sam read after S11-100's hand-over, 'Sam sells Lee's Barbershop to Hugo P.', with the handover time Mon Nov 30 at 9:00am (14:00Z): 'Sam's access ends at the handover time'. The rows are v1.11's read-turn-party-handed-over.json's (test owner 1's rows from T-1148's skeleton seed, then persons person-hugo and person_roles role-hugo-barber, owner at biz-lees-barbershop, ended_at null), with the handle Hugo writes from, which S11-100's writer links when he confirms by a code to his own phone (handles handle-hugo, phone, +15555550199; person_handles person-hugo, handle-hugo), so v1.4's readBusinessOwner for biz-lees-barbershop answers Hugo, and the request states businessOwner live. Sam holds no role there. The row is a section 1 row of the barbershop to Sam that is mapped after the handover time: a row composed again after its plan went stale, or one a question's clock wrote, with no party read of Sam's between the hand-over and this read (v1.11's anotherOwner stops his next turn, never a row already written or one no turn writes). The example keeps turn 1's row, outbox-s1-02-sam-1, so it differs from row-reader-s1-02-no-role-no-owner.json in the owner state alone. A person with no role, on a section 1 step, at a business that has a live owner: the sign-up reading does not apply, so the row is refused, noReader (businessHasOwner), and Sam is never read as the owner of a business Hugo owns (README item 80; T-1184's security note a). Hugo P. and the handover time are S11-100's own sample; person-hugo, role-hugo-barber, handle-hugo and the number are examples. Not a database call."
+  },
+  "request": {
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "line": { "step": "S1-02", "index": 0, "from": "openQuestion" },
+    "recipient": { "personId": "person-sam", "roles": [] },
+    "flow": "A",
+    "section": 1,
+    "lineTo": "owner",
+    "businessOwner": "live"
+  },
+  "outcome": {
+    "error": "noReader",
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "why": "businessHasOwner"
+  }
+}

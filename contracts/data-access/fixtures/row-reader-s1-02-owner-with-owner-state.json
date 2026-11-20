@@ -1,0 +1,29 @@
+{
+  "call": "rowReader",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json", "seed-phone-chat-open.json"],
+    "after": ["read-outbox-row-s1-02.json"],
+    "now": "2026-10-19T18:05:05Z",
+    "note": "v1.5's row-reader-s1-02-owner.json with the owner state stated: with K-04's seed-person-roles.json Sam holds the barbershop's live owner role (role-sam-barber), so v1.4's readBusinessOwner answers him (business-owner-barbershop.json) and the request states businessOwner live. A recipient who holds a role is read by it, as v1.3 maps a reader, whatever the owner state says: rule 7 reads only a recipient with no role, so the owner of the business is never refused by its own owner role (README item 80). Here the field may also be left out, since the outcome does not read it; a consumer that has made the read may state it. Not a database call."
+  },
+  "request": {
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "line": { "step": "S1-02", "index": 0, "from": "openQuestion" },
+    "recipient": {
+      "personId": "person-sam",
+      "roles": [{ "roleId": "role-sam-barber", "role": "owner", "version": 1 }]
+    },
+    "flow": "A",
+    "section": 1,
+    "lineTo": "owner",
+    "businessOwner": "live"
+  },
+  "outcome": {
+    "result": "reader",
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "reader": "owner",
+    "from": "roles",
+    "roleId": "role-sam-barber"
+  }
+}

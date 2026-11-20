@@ -3119,6 +3119,70 @@
       "expect": "refuse",
       "shows": "Sam's first pick answered with his mobile, +15555550100, beside his person's id: the read joins no handle and answers no person's number (put right, the mobile left out, it is read-picked-kinds-sign-up's outcome)",
       "source": "ops/cards/T-1455.md ('no person's address or number'); K-04 v1 handles.address; BP rule 7; K-05 v1.19 item 79"
+    },
+    {
+      "file": "row-reader-s1-02-no-role-no-owner.json",
+      "version": "v1.20",
+      "def": "rowReader.ownerExchange",
+      "expect": "accept",
+      "shows": "Turn 1's row in its v1.20 form: the barbershop has no live owner role (T-1148's seed; readBusinessOwner answers owner null), the request states businessOwner none, and Sam, a person with no role on a section 1 step whose line goes to the owner, reads it as the owner by the sign-up line, as v1.5 reads him",
+      "source": "ops/cards/T-1187.md; ops/cards/T-1184.md security note a; K-05 v1.5 row-reader-s1-02-no-role.json and item 44; K-05 v1.4 business-owner-none.json and item 42; db/seeds/skeleton.ts (T-1148); ADR-013 default 130; K-05 v1.20 item 80"
+    },
+    {
+      "file": "row-reader-s1-02-sam-after-hand-over.json",
+      "version": "v1.20",
+      "def": "rowReader.ownerExchange",
+      "expect": "accept",
+      "shows": "A section 1 row of the barbershop to Sam, mapped after S11-100's hand-over gave Hugo P. its live owner role: Sam holds no role and the business has a live owner, so the sign-up reading does not apply and the row is refused, noReader (businessHasOwner), never read as the owner of a business someone else owns",
+      "source": "ops/cards/T-1187.md ('refused (noReader, a named reason) when the business already has a live owner'); ops/cards/T-1184.md security note a; S11-100 ('Sam's access ends at the handover time'); S2-02 ('One account owner'); K-05 v1.11 read-turn-party-handed-over.json; K-05 v1.4 item 42 (readBusinessOwner); K-05 v1.20 item 80 and default 187"
+    },
+    {
+      "file": "row-reader-s1-02-owner-with-owner-state.json",
+      "version": "v1.20",
+      "def": "rowReader.ownerExchange",
+      "expect": "accept",
+      "shows": "Sam's S1-02 row with his owner role at the barbershop and the owner state stated live (the owner is Sam himself): a recipient who holds a role is read by it whatever the owner state says, so an owner is never refused by their own owner role",
+      "source": "K-05 v1.5 row-reader-s1-02-owner.json and item 44 (a role is read by it, never by the line); K-05 v1.4 business-owner-barbershop.json; K-04 v1 seed-person-roles.json; K-05 v1.20 item 80"
+    },
+    {
+      "file": "row-reader-a5-05-tomas-live-owner.json",
+      "version": "v1.20",
+      "def": "rowReader.ownerExchange",
+      "expect": "accept",
+      "shows": "Tomás's A5-05 row at the barbershop, which has a live owner (Sam), with the owner state stated: outside section 1 the row is refused as v1.5 refuses it, noReader (noRole), the reason naming the step before the business's owner",
+      "source": "K-05 v1.5 row-reader-a5-05-tomas-no-role.json and item 44; DL-364 ('every other row with no role is still refused'); K-05 v1.4 business-owner-barbershop.json; K-05 v1.20 item 80 and default 187"
+    },
+    {
+      "file": "invalid/refuse-row-reader-sign-up-line-at-owned-business.json",
+      "version": "v1.20",
+      "def": "rowReader.ownerExchange",
+      "expect": "refuse",
+      "shows": "Sam read as the owner by the sign-up line at the barbershop after Hugo P. took its live owner role: a person with no role is never read by the sign-up line at a business that has a live owner (put right, noReader businessHasOwner, it is row-reader-s1-02-sam-after-hand-over)",
+      "source": "ops/cards/T-1184.md security note a (limit 7 would release owner-visible slot fields to a person with no role at someone else's business); ops/cards/T-1187.md; S11-100; K-05 v1.20 item 80 (rowReader.exchange rule 7)"
+    },
+    {
+      "file": "invalid/refuse-row-reader-owner-state-left-out.json",
+      "version": "v1.20",
+      "def": "rowReader.ownerExchange",
+      "expect": "refuse",
+      "shows": "Turn 1's row read by the sign-up line with the owner state left out: a v1.20 mapping states it wherever a person with no role is on a section 1 step, so a consumer that did not read the owner never reads the row by the line (put right, businessOwner none, it is row-reader-s1-02-no-role-no-owner)",
+      "source": "ops/cards/T-1187.md ('rowReader.request gains the business's live-owner state'); ops/reviews/s1-04-design/check-merge.json card 28 ('A failed owner read refuses the row; it is never read as no owner'); K-05 v1.20 item 80 and default 188 (rowReader.ownerExchange)"
+    },
+    {
+      "file": "invalid/refuse-row-reader-owner-state-null.json",
+      "version": "v1.20",
+      "def": "rowReader.ownerExchange",
+      "expect": "refuse",
+      "shows": "Turn 1's row read by the sign-up line with the owner state null: the state is none or live, and a read that failed or was not made is never stated as no owner (put right, businessOwner none, it is row-reader-s1-02-no-role-no-owner)",
+      "source": "K-05 v1.4 readBusinessOwner.errors ('The call fails closed on each: the wiring maps them to a thrown error, never to null'); ops/reviews/s1-04-design/check-merge.json card 28; K-05 v1.20 item 80 and default 188 (businessOwnerState)"
+    },
+    {
+      "file": "invalid/refuse-row-reader-has-owner-at-unowned-business.json",
+      "version": "v1.20",
+      "def": "rowReader.ownerExchange",
+      "expect": "refuse",
+      "shows": "Turn 1's row refused as businessHasOwner while the barbershop has no live owner role: the refusal is answered only for a business that has one, so the walking skeleton's turn 1 keeps its reader (put right, the owner by the sign-up line, it is row-reader-s1-02-no-role-no-owner)",
+      "source": "K-05 v1.5 item 44 and row-reader-s1-02-no-role.json; ADR-013 default 130; db/seeds/skeleton.ts (T-1148: no owner role); K-05 v1.20 item 80 (rowReader.exchange rule 3)"
     }
   ]
 }
