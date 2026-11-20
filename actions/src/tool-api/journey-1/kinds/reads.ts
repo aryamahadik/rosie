@@ -126,3 +126,25 @@ export async function matcherOf(reads: Pick<KindsReads, "catalog">): Promise<Mat
     throw error;
   }
 }
+
+/** The catalog's matcher for one walk, keyed by the turn context the commit hands writesOf (walkMatcher). */
+export type WalkMatcher = (turn: object) => Promise<MatcherOf>;
+
+/**
+ * One catalog read per walk, shared by S1-02's settler and S1-02's writer (K-09 README default 191: "the catalog is read
+ * once for the call and both use it", so the two can never read different catalogs; DL-1018 card 4). It is keyed by the
+ * turn context the commit hands writesOf, which the walk hands the settler as `turn` and every writer of the same run as
+ * `writer.turn`: the first ask reads the catalog (matcherOf), every later ask of that walk gets the same answer, a failed
+ * read included, so a failure is never read again as a catalog. The commit builds a new context for each gate run, so a
+ * repeat or a re-gate reads afresh; a WeakMap, so a walk's read goes with its context.
+ */
+export function walkMatcher(reads: Pick<KindsReads, "catalog">): WalkMatcher {
+  const read = new WeakMap<object, Promise<MatcherOf>>();
+  return (turn) => {
+    const known = read.get(turn);
+    if (known !== undefined) return known;
+    const reading = matcherOf(reads);
+    read.set(turn, reading);
+    return reading;
+  };
+}

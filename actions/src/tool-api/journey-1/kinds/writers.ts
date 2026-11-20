@@ -66,7 +66,7 @@ import { openReviewItemCore, type PagingDeps } from "../../../domain/paging";
 import { mayText, readStop, type StopHomeReads } from "../../../homes/stop";
 import { answerOf, type KindsAnswer, type KindsPick } from "./answer";
 import { KindsNotBuiltError, KindsRefusedError } from "./errors";
-import type { KindsReads } from "./reads";
+import type { KindsReads, WalkMatcher } from "./reads";
 
 /** The steps this folder writes, in the order the walk meets them. */
 export const KINDS_STEPS = ["S1-02", "S1-03", "S1-74"] as const;
@@ -252,9 +252,14 @@ export async function newWorkReviewPlan<Repo>(
 /**
  * The read-only step writers of S1-02, S1-03 and S1-74 over `deps` (the top of this file), by step id. S1-02's answer is
  * kept for the walk's run (its turn context and the part's index) so S1-03's writer drafts the new_work picks it wrote,
- * by their row ids; it is let go with the run.
+ * by their row ids; it is let go with the run. S1-02's writer reads the catalog through `catalog` when one is handed in:
+ * the walk's one read, shared with S1-02's settler (settle.ts kindsSteps; K-09 README default 191); else a read of its own
+ * for each call, as before.
  */
-export function kindsWriters<Repo = unknown>(deps: KindsWriterDeps): KindsWriters<Repo> {
+export function kindsWriters<Repo = unknown>(
+  deps: KindsWriterDeps,
+  catalog?: WalkMatcher,
+): KindsWriters<Repo> {
   const answers = new WeakMap<object, Map<number, KindsAnswer>>();
   const remember = (call: StepWriterCall<Repo>, answer: KindsAnswer): void => {
     const key: object = call.writer.turn;
@@ -267,7 +272,10 @@ export function kindsWriters<Repo = unknown>(deps: KindsWriterDeps): KindsWriter
 
   const s1_02: StepWriter<Repo> = async (call) => {
     stepIs(call, "S1-02");
-    const answer = await answerOf(deps.reads, call);
+    const answer =
+      catalog === undefined
+        ? await answerOf(deps.reads, call)
+        : await answerOf(deps.reads, call, () => catalog(call.writer.turn));
     remember(call, answer);
     const rows: StepRows = {
       state: answer.state,

@@ -13,6 +13,7 @@ export {
   pinnedSafetyLines,
   safetyReaderOf,
   signUpStepWriters,
+  signUpSteps,
   turnCommitDeps,
   turnLimits,
   type CommitAt,
@@ -22,6 +23,7 @@ export {
   type OpenHoldsAnswer,
   type OpenHoldsRequest,
   type SafetyReads,
+  type SignUpSteps,
   type SignUpWriterDeps,
   type TurnCommitBinding,
 } from "./commit";

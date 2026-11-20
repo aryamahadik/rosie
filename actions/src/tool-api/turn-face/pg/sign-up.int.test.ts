@@ -31,6 +31,13 @@
 // delivered, and armClock moves the question to open at version 2. Turn 2, under bundle v1's id: with the stop port left
 // out, "One isn't on the list yet" and "Not a service we book" each answer notBuilt and write nothing; then "All on the
 // list" with the words "Barbershop, plumbing, electrical" commits, and S1-04's row is composed and finalized.
+//
+// T-1502 (K-09 README default 191; DL-1018 card 4): a second world, built the same way in a schema of its own, whose
+// binding also hands the walk S1-02's settler (pgTurnCalls' settleSignUp: signUpSteps, one catalog read per walk shared
+// with S1-02's writer). The same turn 1 opens S1-02's question there; then a decision naming c-02 ("One isn't on the list
+// yet") for "Barbershop, plumbing, electrical" still commits "All on the list"'s rows, since the words, not the option
+// named, settle the branch; the part's choiceId stays c-02, and item 78 is read once for the call. The first world binds
+// no settler, so everything above is the walk as before.
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -217,9 +224,30 @@ let face: TurnFace;
 const clock = { now: NOW_1, finalize: FINALIZED_1 };
 const trades = tradesOverV1();
 
-beforeAll(async () => {
-  cdb = await openCommitDatabase("turn_face_sign_up", JOB_POOL);
-  const { sql } = cdb.db;
+/** One world: its schema, its two clients with their statements written down, the trade port, and the face. */
+interface World {
+  readonly cdb: CommitDatabase;
+  readonly app: Sql;
+  readonly job: Sql;
+  readonly sent: { readonly app: string[]; readonly job: string[] };
+  readonly trades: ReturnType<typeof tradesOverV1>;
+  readonly face: TurnFace;
+}
+
+/** How a world is built: its schema and clients' names, where its statements and trade reads go, and its settler. */
+interface WorldGiven {
+  readonly schema: string;
+  readonly name: string;
+  readonly sent: World["sent"];
+  readonly trades: World["trades"];
+  /** Bind S1-02's settler with the sign-up writers (T-1502; pgTurnCalls' settleSignUp). */
+  readonly settleSignUp: boolean;
+}
+
+/** A world as the top of this file describes it, in a fresh schema of its own. */
+async function openWorld(given: WorldGiven): Promise<World> {
+  const database = await openCommitDatabase(given.schema, JOB_POOL);
+  const { sql } = database.db;
   // The registry rows: bundle v0 as published, which turn 1 pins, and bundle v1, which turn 2 pins.
   await sql`
     insert into bundles (hash, build, manifest_key, built_at, published_at, active)
@@ -247,7 +275,7 @@ beforeAll(async () => {
     { place: 1, handleId: HANDLE, personId: PERSON, businessId: BUSINESS, companyId: IDS.companyId },
   ]);
   // The person's key, made as the gateway makes it at the first sight of the number (K-05 v1.2 item 29).
-  const sighted = await handleSealingKey(cdb.runtime, KEYS, {
+  const sighted = await handleSealingKey(database.runtime, KEYS, {
     handle: { kind: "phone", address: NUMBER },
     newHandleId: "handle-t1468-unused",
     newPersonId: "person-t1468-unused",
@@ -257,19 +285,19 @@ beforeAll(async () => {
     throw new Error("first sight did not give the roster owner's key");
   }
 
-  app = cdb.client(TOOL_API_ROLE, "rosie-turn-face-sign-up-app", APP_POOL, (text) => {
-    sent.app.push(text.trim());
+  const toolApi = database.client(TOOL_API_ROLE, `${given.name}-app`, APP_POOL, (text) => {
+    given.sent.app.push(text.trim());
   });
-  job = cdb.client(RUNTIME_ROLE, "rosie-turn-face-sign-up-job", JOB_POOL, (text) => {
-    sent.job.push(text.trim());
+  const runtime = database.client(RUNTIME_ROLE, `${given.name}-job`, JOB_POOL, (text) => {
+    given.sent.job.push(text.trim());
   });
   const bundles = fakeBundles(publishedBundleV0(), publishedBundleV1());
-  face = pgTurnFace(job, {
+  const turnFace = pgTurnFace(runtime, {
     bundles,
     validator,
     checker,
     log: captureLog().sink,
-    calls: pgTurnCalls(job, app, {
+    calls: pgTurnCalls(runtime, toolApi, {
       bundles,
       wrappingKeys: KEYS,
       stopWords: PLUGIN_LISTS_NO_STOP_WORDS,
@@ -278,9 +306,36 @@ beforeAll(async () => {
       finalizeNow: () => clock.finalize,
       finalizeLog: () => undefined,
       // T-1468's binding: items 78 and 79 on PostgreSQL, no stop port, and the trade port over bundle v1's overlays.
-      signUp: { kinds: { reads: pgKindsReads(app, job) }, plugIns: { bundles: trades.bundles } },
+      signUp: {
+        kinds: { reads: pgKindsReads(toolApi, runtime) },
+        plugIns: { bundles: given.trades.bundles },
+      },
+      // T-1502: S1-02's settler beside the writers, in the second world alone.
+      ...(given.settleSignUp ? { settleSignUp: true } : {}),
     }),
   });
+  return {
+    cdb: database,
+    app: toolApi,
+    job: runtime,
+    sent: given.sent,
+    trades: given.trades,
+    face: turnFace,
+  };
+}
+
+/** The world the first describe block runs in: no settler bound, the walk as before. */
+let main: World;
+
+beforeAll(async () => {
+  main = await openWorld({
+    schema: "turn_face_sign_up",
+    name: "rosie-turn-face-sign-up",
+    sent,
+    trades,
+    settleSignUp: false,
+  });
+  ({ cdb, app, job, face } = main);
 }, 240_000);
 
 afterAll(async () => {
@@ -290,19 +345,20 @@ afterAll(async () => {
 
 // ---- what the turns left ------------------------------------------------------------------------------------------------
 
-/** One open question's status and version, as the owner reads its row. */
+/** One open question's status and version, as the owner reads its row (in the first world, unless one is named). */
 async function questionRow(
   id: string,
+  db: CommitDatabase = cdb,
 ): Promise<{ status: string; version: number; step: string } | undefined> {
-  const [row] = await cdb.db.sql<{ status: string; version: number; step: string }[]>`
+  const [row] = await db.db.sql<{ status: string; version: number; step: string }[]>`
     select status, version, step from open_questions where id = ${id}
   `;
   return row;
 }
 
-/** The row counts of K-24's kinds tables and K-37's review items, as the owner reads them. */
-async function kindsRows(): Promise<Record<string, number>> {
-  const [row] = await cdb.db.sql<Record<string, number>[]>`
+/** The row counts of K-24's kinds tables and K-37's review items, as the owner reads them (the first world's unless named). */
+async function kindsRows(db: CommitDatabase = cdb): Promise<Record<string, number>> {
+  const [row] = await db.db.sql<Record<string, number>[]>`
     select (select count(*)::int from kinds) as kinds,
            (select count(*)::int from picked_kinds) as picked_kinds,
            (select count(*)::int from picked_kind_texts) as picked_kind_texts,
@@ -336,6 +392,66 @@ interface Finalized extends Json {
   };
 }
 
+/**
+ * Turn 1 in a world (the JOIN through the real turn face under bundle v0's id): S1-02's question opened; its row composed,
+ * finalized and delivered; armClock moves the question to open at version 2. Answers the version it is open at.
+ */
+async function joinAndDeliver(world: World): Promise<number> {
+  const { face: turnFace, cdb: database, job: runtime } = world;
+  clock.now = NOW_1;
+  clock.finalize = FINALIZED_1;
+  const request = turnOne();
+  const first = await turnFace.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
+  expect(first, JSON.stringify(first)).toMatchObject({
+    result: "committed",
+    turnId: TURN_1,
+    repeated: false,
+    parts: commitS101().outcome.parts,
+    openQuestions: { opened: [QUESTION_1], closed: [] },
+  });
+  expect(await questionRow(QUESTION_1, database)).toEqual({ status: "waiting", version: 1, step: "S1-02" });
+
+  // Its row composed and finalized through the face, on bundle v0.
+  const names = TURN_1_NAMES;
+  const compose = renamed(composeS102().request, names);
+  const composed = await turnFace.composeInput(structuredClone(compose), traceFor(compose).trace);
+  expect(composed, JSON.stringify(composed)).toMatchObject({
+    result: "compose",
+    input: { row: ROW_1, turn: TURN_1, masterText: { step: "S1-02" } },
+  });
+  const finalize = renamed((fixture("finalize-pass.json") as { request: Json }).request, names);
+  const finalized = (await turnFace.finalizeMessage(
+    structuredClone(finalize),
+    traceFor(finalize).trace,
+  )) as unknown as Finalized;
+  expect(finalized.outcome, JSON.stringify(finalized)).toBe("send");
+  expect(await rowOf(database, "outbox_rows", ROW_1, ["state"])).toEqual({ version: 2, state: "checked" });
+
+  // The send and its delivery receipt, played: one delivered part, as limit-1's sign-up test writes one, then K-05's
+  // own armClock at the receipt, on the runtime side.
+  const { sql } = database.db;
+  await sql`
+    insert into outbox_parts (outbox_row_id, part_no, try_no, idempotency_key, attempts, kind, linq_message_id,
+                              state, sent_at, delivered_at)
+    values (${ROW_1}, 1, 1, ${`${ROW_1}/1/1`}, 1, 'words', 'linq-msg-roster-owner-1-0001', 'delivered',
+            ${SENT_1}, ${DELIVERED_1})
+  `;
+  await sql`update outbox_rows set state = 'delivered', version = version + 1 where id = ${ROW_1}`;
+  const armed = await armClock(runtime, {
+    openQuestionId: QUESTION_1,
+    deliveredAt: DELIVERED_1,
+    dueAt: "2026-10-20T18:05:09Z",
+    dueZone: "America/New_York",
+  });
+  expect(armed).toMatchObject({ result: "armed", repeated: false });
+
+  const question = await questionRow(QUESTION_1, database);
+  expect(question?.status).toBe("open");
+  expect(question?.version).not.toBe(1);
+  expect(question?.version).toBe(2);
+  return question?.version ?? 0;
+}
+
 describe("an owner's whole second turn on local PostgreSQL: the gate as rosie_app, the commit as rosie_job (T-1468)", () => {
   /** S1-02's question's version once its first delivery receipt armed its clock: what turn 2 closes it at. */
   let openAt = 0;
@@ -352,58 +468,7 @@ describe("an owner's whole second turn on local PostgreSQL: the gate as rosie_ap
     "turn 1: JOIN through the real turn face under bundle v0's id opens S1-02's question; its row is composed, finalized and delivered, and armClock moves the question to open at version 2",
     SLOW,
     async () => {
-      clock.now = NOW_1;
-      clock.finalize = FINALIZED_1;
-      const request = turnOne();
-      const first = await face.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
-      expect(first, JSON.stringify(first)).toMatchObject({
-        result: "committed",
-        turnId: TURN_1,
-        repeated: false,
-        parts: commitS101().outcome.parts,
-        openQuestions: { opened: [QUESTION_1], closed: [] },
-      });
-      expect(await questionRow(QUESTION_1)).toEqual({ status: "waiting", version: 1, step: "S1-02" });
-
-      // Its row composed and finalized through the face, on bundle v0.
-      const names = TURN_1_NAMES;
-      const compose = renamed(composeS102().request, names);
-      const composed = await face.composeInput(structuredClone(compose), traceFor(compose).trace);
-      expect(composed, JSON.stringify(composed)).toMatchObject({
-        result: "compose",
-        input: { row: ROW_1, turn: TURN_1, masterText: { step: "S1-02" } },
-      });
-      const finalize = renamed((fixture("finalize-pass.json") as { request: Json }).request, names);
-      const finalized = (await face.finalizeMessage(
-        structuredClone(finalize),
-        traceFor(finalize).trace,
-      )) as unknown as Finalized;
-      expect(finalized.outcome, JSON.stringify(finalized)).toBe("send");
-      expect(await rowOf(cdb, "outbox_rows", ROW_1, ["state"])).toEqual({ version: 2, state: "checked" });
-
-      // The send and its delivery receipt, played: one delivered part, as limit-1's sign-up test writes one, then K-05's
-      // own armClock at the receipt, on the runtime side.
-      const { sql } = cdb.db;
-      await sql`
-        insert into outbox_parts (outbox_row_id, part_no, try_no, idempotency_key, attempts, kind, linq_message_id,
-                                  state, sent_at, delivered_at)
-        values (${ROW_1}, 1, 1, ${`${ROW_1}/1/1`}, 1, 'words', 'linq-msg-roster-owner-1-0001', 'delivered',
-                ${SENT_1}, ${DELIVERED_1})
-      `;
-      await sql`update outbox_rows set state = 'delivered', version = version + 1 where id = ${ROW_1}`;
-      const armed = await armClock(job, {
-        openQuestionId: QUESTION_1,
-        deliveredAt: DELIVERED_1,
-        dueAt: "2026-10-20T18:05:09Z",
-        dueZone: "America/New_York",
-      });
-      expect(armed).toMatchObject({ result: "armed", repeated: false });
-
-      const question = await questionRow(QUESTION_1);
-      expect(question?.status).toBe("open");
-      expect(question?.version).not.toBe(1);
-      expect(question?.version).toBe(2);
-      openAt = question?.version ?? 0;
+      openAt = await joinAndDeliver(main);
     },
   );
 
@@ -710,6 +775,124 @@ describe("an owner's whole second turn on local PostgreSQL: the gate as rosie_ap
       // spans businesses anywhere in this file.
       expect(sent.job.some((text) => /\boutbox_rows\b/u.test(text))).toBe(true);
       for (const text of sent.app) expect(text).not.toMatch(SPANS_BUSINESSES);
+    },
+  );
+});
+
+// ---- T-1502: the second world, with S1-02's settler bound ------------------------------------------------------------
+
+/** A statement that reads K-24's kinds table: item 78's read. */
+const READS_KINDS = /\bfrom kinds\b/u;
+
+describe("with S1-02's settler bound, a decision naming c-02 for the owner's words still writes 'All on the list''s rows (T-1502)", () => {
+  const settledSent = { app: [] as string[], job: [] as string[] };
+  const settledTrades = tradesOverV1();
+  let settled: World;
+  let openAt = 0;
+
+  beforeAll(async () => {
+    settled = await openWorld({
+      schema: "turn_face_sign_up_settled",
+      name: "rosie-turn-face-sign-up-settled",
+      sent: settledSent,
+      trades: settledTrades,
+      settleSignUp: true,
+    });
+  }, 240_000);
+
+  afterAll(async () => {
+    await Promise.all([settled.app.end({ timeout: 5 }), settled.job.end({ timeout: 5 })]);
+    await settled.cdb.close();
+  });
+
+  it("turn 1 opens S1-02's question in this world as in the first", SLOW, async () => {
+    openAt = await joinAndDeliver(settled);
+    expect(openAt).toBe(2);
+  });
+
+  it(
+    "c-02 ('One isn't on the list yet') named for 'Barbershop, plumbing, electrical' commits 'All on the list''s rows: three listed picks, the first pick's 11 blocks, S1-02's question closed, S1-04's asked; the part's choiceId stays c-02; item 78 read once",
+    SLOW,
+    async () => {
+      clock.now = NOW_2;
+      const exchange = commitS1_02();
+      // One read of item 78 on its own, as the settler and S1-02's writer share it: the statements it sends.
+      const perRead = settledSent.app.length;
+      await matcherOf(pgKindsReads(settled.app, settled.job));
+      const oneRead = settledSent.app.slice(perRead).filter((text) => READS_KINDS.test(text)).length;
+      expect(oneRead).toBeGreaterThan(0);
+
+      const appBefore = settledSent.app.length;
+      const request = turnTwo(TURN_2, "c-02", WORDS);
+      const answer = await settled.face.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
+      expect(answer, JSON.stringify(answer)).toMatchObject({
+        result: "committed",
+        turnId: TURN_2,
+        repeated: false,
+      });
+      expect(validator.check("gateAndCommit", "response", answer)).toEqual([]);
+      const committed = answer as unknown as {
+        parts: Json[];
+        written: { written: Json[]; outboxRows: Json[] };
+        openQuestions: { opened: string[]; closed: string[] };
+      };
+      // The part as commit-s1-02.json answers it, but for its choice: the option decide named, c-02 (default 191).
+      expect(committed.parts).toEqual(exchange.outcome.parts.map((part) => ({ ...part, choiceId: "c-02" })));
+      expect(committed.parts[0]?.gives).toEqual(exchange.given.stated.gives);
+
+      // "All on the list"'s rows, as the first world's c-01 commit wrote them.
+      expect(committed.written.written).toEqual([
+        { table: "picked_kinds", rowId: pickId(1), version: 1 },
+        { table: "picked_kinds", rowId: pickId(2), version: 1 },
+        { table: "picked_kinds", rowId: pickId(3), version: 1 },
+        ...PF_TEXT_KEYS.map((key) => ({
+          table: "picked_kind_texts",
+          rowId: `${pickId(1)}/${key}`,
+          version: 1,
+        })),
+        { table: "open_questions", rowId: QUESTION_2, version: 1 },
+        { table: "open_questions", rowId: QUESTION_1, version: openAt + 1 },
+        { table: "clock_rows", rowId: `clock-${QUESTION_2}`, version: 1 },
+      ]);
+      expect(committed.written.outboxRows.map((row) => row.id)).toEqual([ROW_2]);
+      expect(committed.openQuestions).toEqual({ opened: [QUESTION_2], closed: [QUESTION_1] });
+      expect(await questionRow(QUESTION_1, settled.cdb)).toEqual({
+        status: "answered",
+        version: openAt + 1,
+        step: "S1-02",
+      });
+      const picks = await settled.cdb.db.sql<Json[]>`
+        select id, position, words, outcome, kind_id, company_id, business_id from picked_kinds order by position
+      `;
+      expect(picks).toEqual(
+        [
+          ["Barbershop", "barber"],
+          ["plumbing", "plumber"],
+          ["electrical", "electrician"],
+        ].map(([words, kindId], index) => ({
+          id: pickId(index + 1),
+          position: index + 1,
+          words,
+          outcome: "listed",
+          kind_id: kindId,
+          company_id: null,
+          business_id: null,
+        })),
+      );
+      expect(settledTrades.reads).toEqual([{ bundleId: V1, tradeId: "barber" }]);
+      expect(await kindsRows(settled.cdb)).toEqual({
+        kinds: 243,
+        picked_kinds: 3,
+        picked_kind_texts: 11,
+        new_work_drafts: 0,
+        review_items: 0,
+      });
+
+      // The settler and S1-02's writer read one catalog: item 78's statements once, on the Tool API's client, and no
+      // statement on a table that spans businesses.
+      const statements = settledSent.app.slice(appBefore);
+      expect(statements.filter((text) => READS_KINDS.test(text))).toHaveLength(oneRead);
+      for (const text of statements) expect(text).not.toMatch(SPANS_BUSINESSES);
     },
   );
 });

@@ -18,6 +18,11 @@
 //     1 business day, in case it was misread"); no catalog is read.
 // A part two kinds fit needs the owner's "which?" first (arch 05 line 237), which is not built: notBuilt, nothing written.
 //
+// With S1-02's settler bound (T-1502; settle.ts; K-09 README default 191), the branch is the settled one, never the option
+// decide named: the walk hands this writer the settled branch as the branch chosen, and the writer reads the catalog the
+// settler read for the same walk (the catalog read handed in), so the two readings are one. This table does not change,
+// and its fit check (branchNotWords) stays as a second lock, which then fires only when the two readings differ.
+//
 // Defaults used (for ops/QUESTIONS.md):
 //   1. The branch decides how the parts are kept and must fit them, as the table above: "All on the list" and "One isn't
 //      on the list yet" are refused (branchNotWords) when the matcher reads a part otherwise (a part no kind fits under the
@@ -171,12 +176,12 @@ interface Kept {
 
 /** Every part's match under "All on the list" or "One isn't on the list yet", held to the branch (default 1). */
 async function matchedUnder(
-  reads: KindsReads,
+  catalog: () => Promise<MatcherOf>,
   branch: string,
   text: string,
   stepId: string,
 ): Promise<Kept[]> {
-  const match = await matcherOf(reads);
+  const match = await catalog();
   const parts: KindMatch[] = match.matcher.match(text);
   if (parts.length === 0) throw new KindsRefusedError("noWords", [stepId]);
   if (parts.some((part) => part.outcome === "which")) {
@@ -211,11 +216,17 @@ function notBooked(text: string, stepId: string): Kept[] {
 }
 
 /**
- * S1-02's answer for one call of its writer: the owner's words read under the branch decide picked, numbered after item
- * 79's picks, each kept pick's rows, and the keys it gives. Reads item 78 (unless "Not a service we book") and item 79,
- * each in its own read-only transaction; writes nothing. Throws KindsRefusedError, KindsNotBuiltError or KindsReadError.
+ * S1-02's answer for one call of its writer: the owner's words read under the branch decide picked (or, with a settler
+ * bound, the settled branch the walk hands it), numbered after item 79's picks, each kept pick's rows, and the keys it
+ * gives. Reads item 78 through `catalog` (unless "Not a service we book"; by default a read of its own, or the walk's one
+ * read shared with S1-02's settler: reads.ts walkMatcher) and item 79, each in its own read-only transaction; writes
+ * nothing. Throws KindsRefusedError, KindsNotBuiltError or KindsReadError.
  */
-export async function answerOf<Repo>(reads: KindsReads, call: StepWriterCall<Repo>): Promise<KindsAnswer> {
+export async function answerOf<Repo>(
+  reads: KindsReads,
+  call: StepWriterCall<Repo>,
+  catalog: () => Promise<MatcherOf> = () => matcherOf(reads),
+): Promise<KindsAnswer> {
   const stepId = call.step.id;
   const { branch } = call.choice;
   if (branch !== ALL_ON_THE_LIST && branch !== ONE_NOT_LISTED && branch !== NOT_A_SERVICE) {
@@ -229,7 +240,7 @@ export async function answerOf<Repo>(reads: KindsReads, call: StepWriterCall<Rep
   if (text === null) throw new KindsRefusedError("noWords", [stepId]);
 
   const kept =
-    branch === NOT_A_SERVICE ? notBooked(text, stepId) : await matchedUnder(reads, branch, text, stepId);
+    branch === NOT_A_SERVICE ? notBooked(text, stepId) : await matchedUnder(catalog, branch, text, stepId);
   // The business is the call's own (CommitTurnContext.businessId), never a request value (DL-935).
   const onFile = await reads.pickedKinds({ businessId: turn.businessId, personId });
   const picked = new Set(onFile.picks.flatMap((pick) => (pick.kindId === null ? [] : [pick.kindId])));

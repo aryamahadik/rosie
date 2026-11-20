@@ -9,6 +9,10 @@
 // plan for a new-work draft (writers.ts newWorkReviewPlan), which the later checklist card calls and no writer here does.
 // Nothing here binds them: the folder's registry entries below still answer notBuilt and write nothing, as journey 1's
 // registry (../index.ts) and its tests hold them, until the card that binds the setup calls.
+//
+// T-1502 (K-09 README default 191; DL-1018 card 4) adds S1-02's settler (settle.ts): the walk asks it for S1-02's branch
+// from the owner's words, never from the option decide named, and kindsSteps builds it with the writers over one catalog
+// read per walk (reads.ts walkMatcher). The turn face's signUpSteps binds it; T-1503 binds that on staging.
 
 import { NotBuiltError } from "../../errors";
 import type { SetupFolder } from "../index";
@@ -42,10 +46,20 @@ export {
   matcherOf,
   pgKindsK05Reads,
   pgKindsReads,
+  walkMatcher,
   type KindsK05Reads,
   type KindsReads,
   type MatcherOf,
+  type WalkMatcher,
 } from "./reads";
+export {
+  SETTLED_STEP,
+  kindsSteps,
+  settleS1_02,
+  settledKinds,
+  type KindsSettlers,
+  type KindsSteps,
+} from "./settle";
 export {
   DRAFTING,
   IN_REVIEW,

@@ -47,6 +47,10 @@ export class KindsReadError extends Error {
  *   - noPerson: the turn names no person to own the picks or receive the message (K-09 caller.personId null);
  *   - branchNotWords: the branch decide picked does not fit what the kind matcher reads in the words ("All on the list"
  *     with a part no listed kind fits, "One isn't on the list yet" with no part new or with a part Rosie never books);
+ *     with S1-02's settler bound, the writer's second lock, which fires only when the settler's reading and the writer's
+ *     differ, a fault (K-09 README default 191);
+ *   - notBookedBesideKept: S1-02's settler read a part Rosie never books beside a part it keeps (listed or new work), a
+ *     mix S1-02's card holds no branch for, whichever option decide named (K-09 README default 191, open gap 169);
  *   - notAnswered: S1-03's writer found no S1-02 answer of this part in the walk's run, or one that drafted nothing;
  *   - reviewRefused: the review item's plan (writers.ts newWorkReviewPlan) got one of openReviewItem's errors (its
  *     subject not found, say);
@@ -58,6 +62,7 @@ export type KindsFault =
   | "noWords"
   | "noPerson"
   | "branchNotWords"
+  | "notBookedBesideKept"
   | "notAnswered"
   | "reviewRefused"
   | "reviewWrites";
