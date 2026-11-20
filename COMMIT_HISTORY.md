@@ -2,9 +2,58 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 811, [`5084255`](https://github.com/aryamahadik/rosie/commit/5084255), 2026-11-20 18:23:05 UTC.
+- **Through:** commit 813, [`5504256`](https://github.com/aryamahadik/rosie/commit/5504256), 2026-11-20 18:51:37 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 813. docs: COMMIT\_HISTORY.md through commit 811 (5084255, \#822) (\#824)
+
+- **Commit:** [`5504256`](https://github.com/aryamahadik/rosie/commit/5504256), by Arya Mahadik, 2026-11-20 18:51:37 UTC
+- **Pull request:** [#824](https://github.com/aryamahadik/rosie/pull/824) from `task/commit-history-191`, merged 2026-11-20 18:51:37 UTC. It squashed 1 branch commit:
+  - `11008f7` docs: COMMIT\_HISTORY.md through commit 811 (5084255, \#822)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 812. T-1499: K-09 README default 191 and K-02 README default 16 (no new version): decide carries the owner's kinds under the lowest-id option, and a settler settles S1-02's branch (DL-1018, DL-1021, DL-1023; CQ-157 (2), CQ-348 (3)) (\#823)
+
+- **Commit:** [`f1f918a`](https://github.com/aryamahadik/rosie/commit/f1f918a), by Arya Mahadik, 2026-11-20 18:51:33 UTC
+- **Pull request:** [#823](https://github.com/aryamahadik/rosie/pull/823) from `task/T-1499`, merged 2026-11-20 18:51:33 UTC. It squashed 3 branch commits:
+  - `f8edfc5` T-1499: K-09 README default 191 and K-02 README default 16, with no n…
+  - `afa4c7c` T-1499: round 2 (DL-1021), README text only: default 191 asks a settl…
+  - `7f12db2` T-1499: round 3 (DL-1023): K-02 README says decide-2's rule d keeps a…
+- **Files changed:** 2 (+81 −2), by folder:
+  - `contracts/model/` README.md +27 −1
+  - `contracts/tool-api/` README.md +54 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1499: K-09 README default 191 and K-02 README default 16, with no new version: decide carries the owner's kinds under the question's lowest-id option, and a bound settler settles S1-02's branch (DL-1016, DL-1018 card 1; CQ-157 (2), CQ-348 (3))
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1499: round 2 (DL-1021), README text only: default 191 asks a settler only at a split step for a part no hold keeps back (S1-04's never), a mix is refused (notBookedBesideKept) whichever option was named, an empty catalog fails closed, open gap 167 names givesStepKeys, new open gap 172; K-02 default 16 holds only with exactly one question open, condition (c) reads the options alone, one span (the part's whole quote), decide-2's rule d for every text field
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1499: round 3 (DL-1023): K-02 README says decide-2's rule d keeps a value character for character and names no span, the span is default 16's own, and decide-2 does not yet state it (new fourth open gap, T-1507 decide-3); change log matched
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 811. docs: COMMIT\_HISTORY.md through commit 809 (5e87ab0, \#820) (\#822)
 
