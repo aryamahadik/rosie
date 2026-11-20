@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 809, [`5e87ab0`](https://github.com/aryamahadik/rosie/commit/5e87ab0), 2026-11-20 15:34:21 UTC.
+- **Through:** commit 811, [`5084255`](https://github.com/aryamahadik/rosie/commit/5084255), 2026-11-20 18:23:05 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 811. docs: COMMIT\_HISTORY.md through commit 809 (5e87ab0, \#820) (\#822)
+
+- **Commit:** [`5084255`](https://github.com/aryamahadik/rosie/commit/5084255), by Arya Mahadik, 2026-11-20 18:23:05 UTC
+- **Pull request:** [#822](https://github.com/aryamahadik/rosie/pull/822) from `task/commit-history-190`, merged 2026-11-20 18:23:05 UTC. It squashed 1 branch commit:
+  - `88b8fba` docs: COMMIT\_HISTORY.md through commit 809 (5e87ab0, \#820)
+- **Files changed:** 1 (+35 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +35 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 810. T-1500: decide-2 beside decide-1: typed words that answer the one open question are a choose (rules a to d, example 6); decide-1 pinned byte for byte (\#821)
+
+- **Commit:** [`d3a93d1`](https://github.com/aryamahadik/rosie/commit/d3a93d1), by Arya Mahadik, 2026-11-20 18:23:00 UTC
+- **Pull request:** [#821](https://github.com/aryamahadik/rosie/pull/821) from `task/T-1500`, merged 2026-11-20 18:23:01 UTC. It squashed 1 branch commit:
+  - `c1024e4` T-1500: decide-2 beside decide-1: typed words that answer the one ope…
+- **Files changed:** 4 (+494 −42), by folder:
+  - `ai/src/decide/` index.ts +9 −0, prompt.test.ts +349 −32, prompt.ts +130 −7, test-support.ts +6 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 809. docs: COMMIT\_HISTORY.md through commit 807 (fa4ef40, \#818) (\#820)
 
