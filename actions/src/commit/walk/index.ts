@@ -2,9 +2,18 @@
 // pinned flow graph and each step's writes, as the commit's writesOf port (../types.ts CommitPorts). T-1141 binds it:
 // `createWritesOf({ bundles })`, with the pinned bundle's flow graphs. T-1461 adds the answer to an open question's
 // option: card F binds `questions` (the answered question's row, read on the call's transaction) and `writers` (the
-// read-only step writers by step id). See writes.ts and walk.ts.
+// read-only step writers by step id). T-1502 adds `settlers` (K-09 README default 191: a split's settler answers the
+// branch from the owner's words, never the option decide named; T-1503 binds S1-02's). See writes.ts, settle.ts and
+// walk.ts.
 
 export { WalkNotBuiltError, WalkRefusedError, type WalkFault, type WalkSeam } from "./errors";
+export {
+  isSplitStep,
+  settledBranch,
+  type StepSettler,
+  type StepSettlerCall,
+  type StepSettlers,
+} from "./settle";
 export {
   flowGraphOf,
   flowOfStep,

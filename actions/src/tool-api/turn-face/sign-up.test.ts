@@ -69,6 +69,7 @@ import {
   NOTHING_OPEN_AT,
   keywordCommitDeps,
   signUpStepWriters,
+  signUpSteps,
   turnCommitDeps,
   type KeywordCommitBinding,
   type SignUpWriterDeps,
@@ -129,6 +130,8 @@ interface Given {
   readonly writers?: (deps: SignUpWriterDeps) => StepWriters;
   /** The two new binding fields left out, as before T-1468. */
   readonly leftOut?: boolean;
+  /** Bind signUpSteps' writers and settlers (T-1502) in place of signUpStepWriters'. */
+  readonly settled?: boolean;
 }
 
 /** The turn face's commit binding over the doubles (the top of this file), and what each double saw. */
@@ -161,7 +164,9 @@ function doubles(given: Given = {}) {
       ? {}
       : {
           questions: questions.questions,
-          writers: given.writers === undefined ? signUpStepWriters(signUp) : given.writers(signUp),
+          ...(given.settled === true
+            ? signUpSteps(signUp)
+            : { writers: given.writers === undefined ? signUpStepWriters(signUp) : given.writers(signUp) }),
         }),
   };
   const calls: TurnFaceCalls<unknown> = { scope: noDatabaseScope(), commit: turnCommitDeps(binding) };
@@ -582,5 +587,117 @@ describe("a binding that leaves the question read and the writers out behaves as
       WalkNotBuiltError,
     );
     expect(made.questions.reads).toHaveLength(before);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1502: the binding carries S1-02's settler (signUpSteps), so the owner's words settle S1-02's branch
+
+describe("signUpSteps on the turn face's binding: the words, not the option named, settle S1-02's branch (T-1502)", () => {
+  it("answers S1-02's settler alone, the writers step for step as signUpStepWriters does, and building them reads nothing", () => {
+    const made = doubles();
+    const steps = signUpSteps<unknown>({
+      kinds: { reads: kindsReadsOf(made.k05.k05) },
+      plugIns: { bundles: made.trades.bundles },
+    });
+    expect(typeof steps.settlers("S1-02")).toBe("function");
+    for (const stepId of ["S1-01", "S1-03", "S1-04", "S1-11", "S1-74", "s1-02", "", "constructor"]) {
+      expect(steps.settlers(stepId), stepId).toBeNull();
+    }
+    for (const stepId of ["S1-02", "S1-03", "S1-74", "S1-11"]) {
+      expect(typeof steps.writers(stepId), stepId).toBe("function");
+    }
+    for (const stepId of ["S1-01", "S1-04", "S1-08", "toString", "__proto__"]) {
+      expect(steps.writers(stepId), stepId).toBeNull();
+    }
+    expect(made.k05.asked).toEqual([]);
+    expect(made.trades.reads).toEqual([]);
+  });
+
+  it("c-02 named for 'Barbershop, plumbing, electrical' commits 'All on the list''s rows; the part's choiceId stays c-02; the catalog is read once", async () => {
+    const made = doubles({ settled: true });
+    const { answer, thrown } = await through(made, secondTurn("c-02"));
+    expect(thrown).toBeUndefined();
+    const result = committed(answer);
+    expect(result.parts).toEqual([
+      expect.objectContaining({ part: 0, choiceId: "c-02", result: "committed", gives: STATED_GIVES }),
+    ]);
+    expect(result.openQuestions).toEqual({ opened: ["oq-s1-04-sam-1"], closed: ["oq-s1-02"] });
+    expect(
+      inserted(made, "picked_kinds").map((row) => [row.id, row.position, row.outcome, row.kind_id]),
+    ).toEqual([
+      ["pick-s1-02-sam-1", 1, "listed", "barber"],
+      ["pick-s1-02-sam-2", 2, "listed", "plumber"],
+      ["pick-s1-02-sam-3", 3, "listed", "electrician"],
+    ]);
+    expect(inserted(made, "picked_kind_texts")).toEqual(blocksOf("pick-s1-02-sam-1", "barber"));
+    // The settler and S1-02's writer read one catalog: item 78 once, then item 79 once.
+    expect(made.k05.asked).toEqual([
+      { read: "readKindCatalog" },
+      { read: "readPickedKinds", request: { businessId: BARBERSHOP, personId: "person-sam" } },
+    ]);
+    // Without the settler the same answer is refused (branchNotWords), as before.
+    const today = doubles();
+    const before = await through(today, secondTurn("c-02"));
+    expect(before.answer).toBeNull();
+    expect(before.thrown).toMatchObject({ name: "KindsRefusedError", fault: "branchNotWords" });
+    expect(today.commit.requests).toEqual([]);
+  });
+
+  it("c-01 named for 'Barbershop, pack hikes', with a stop double, settles 'One isn't on the list yet': S1-03 drafts the new work", async () => {
+    const made = doubles({ settled: true, stop: readsOn(seedWorld(), null) });
+    const { answer, thrown } = await through(made, secondTurn("c-01", `Barbershop, ${PACK_HIKES}`));
+    expect(thrown).toBeUndefined();
+    const result = committed(answer);
+    expect(result.parts).toEqual([
+      expect.objectContaining({ choiceId: "c-01", result: "committed", gives: STATED_GIVES }),
+    ]);
+    expect(walkTables(made)).toEqual([
+      "picked_kinds",
+      "kinds",
+      "picked_kinds",
+      "new_work_drafts",
+      ...PF_TEXT_KEYS.map(() => "picked_kind_texts"),
+    ]);
+    expect(sentBy(made).writes.outboxRows.map((row) => [row.id, row.openQuestionId])).toEqual([
+      ["outbox-s1-03-sam-1", null],
+      ["outbox-s1-04-sam-1", "oq-s1-04-sam-1"],
+    ]);
+  });
+
+  it("not booked beside kept work is refused (notBookedBesideKept) whichever option was named: nothing committed", async () => {
+    for (const choiceId of ["c-01", "c-02", "c-03"]) {
+      const made = doubles({ settled: true, stop: readsOn(seedWorld(), null) });
+      const { answer, thrown } = await through(made, secondTurn(choiceId, `Barbershop, ${GIFT_CARDS}`));
+      expect(answer, choiceId).toBeNull();
+      expect(thrown, choiceId).toMatchObject({
+        name: "KindsRefusedError",
+        fault: "notBookedBesideKept",
+        ids: ["S1-02"],
+      });
+      expect(made.commit.requests, choiceId).toEqual([]);
+      expect(made.questions.reads, choiceId).toEqual([]);
+    }
+  });
+
+  it("the keyword door's commit hands the walk no settler, whatever its binding object carries", async () => {
+    const made = doubles({ settled: true });
+    expect(Object.hasOwn(made.binding, "settlers")).toBe(true);
+    const turn = turnTwoOnV1("c-02");
+    const { world } = made;
+    const door = keywordCommitDeps(made.binding as unknown as KeywordCommitBinding<unknown>, {
+      reader: () => flagsReaderOn(world.flags, null),
+      messagesReader: () => messagesReaderOn(world.flags, null),
+      ids: KEYED_IDS,
+      events: NO_EVENT_SOURCES,
+    })(NOTHING_OPEN_AT);
+    await expect(door.ports.writesOf(turn.part, turn.context, NOTHING_OPEN)).rejects.toBeInstanceOf(
+      WalkNotBuiltError,
+    );
+    expect(made.k05.asked).toEqual([]);
+  });
+
+  it("a binding built as before carries no settlers field", () => {
+    expect(Object.hasOwn(doubles().binding, "settlers")).toBe(false);
   });
 });

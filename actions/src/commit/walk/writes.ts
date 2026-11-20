@@ -16,6 +16,12 @@
 // S1-04's question with its outbox row, and oq-s1-02 closed at its version. While no question read is bound, every
 // answer is notBuilt, as before.
 //
+// A settled answer (T-1502; K-09 README default 191 as T-1499's round 2 corrects it; DL-1018 card 4, DL-1021): where the
+// binding hands in a settler for the answered split (WalkDeps.settlers, settle.ts), the walk asks it once for the branch
+// before it walks, and never reads the option decide named to find it: from there the walk is the walk of a chosen
+// branch, with the settled branch in the chosen one's place (its writers handed it as the branch chosen, the unit's why
+// naming it). A held answer asks no settler and writes nothing. With no settler bound the walk is exactly as above.
+//
 // It only reads (the pinned graph through its own port; the answered question and what each step writer reads, on the
 // call's transaction; the call's request) and has no outside effect, since a repeated turn runs it again before K-05
 // answers repeated (STATE note 1; types.ts CommitPorts). Nothing here logs; what it throws names faults, step ids and
@@ -63,7 +69,8 @@
 //      threads has no business), and is Rosie's, with the unit's why, in the zone the turn's texts were read in (build.ts
 //      default 4).
 //   6. The unit's why is the step the part's choice names, with the branch it chose or else the choice's label, as the
-//      frontier offered it from the bundle (never the person's words).
+//      frontier offered it from the bundle (never the person's words). A settled answer's why names the step and the
+//      settled branch (default 191); a settled answer held back names the step alone, since no branch was settled.
 //   7. The question's and the outbox row's business and booking are the choice's target's (the call's business, checked;
 //      no booking for the sign-up door). The versions read are none for a walk from a step: the door's walk reads no row
 //      (K-09 v1.5 default 134); an answer reads its question's row (default 11).
@@ -86,7 +93,7 @@
 //      closed answered with no option id (K-05 v1 openQuestionClose.answeredOptionId null): S1-02 is asked with no
 //      options (K-09 v1.5 default 134), so none went out; one that went out with options is notBuilt (buttons).
 
-import type { Choice, SetupKey } from "../../gate/framework";
+import type { Choice, Decided, SetupKey } from "../../gate/framework";
 import { PROTECTIVE_STEPS, SAFETY_FLOW_STEPS, holdClassOf, isHeld, type HoldClass } from "../hold";
 import type {
   Ask,
@@ -107,6 +114,7 @@ import type {
 } from "../types";
 import { WalkNotBuiltError, WalkRefusedError } from "./errors";
 import { flowGraphOf, flowOfStep, type FlowGraph, type FlowLetter, type GraphStep } from "./graph";
+import { isSplitStep, settledBranch, type StepSettler, type StepSettlers } from "./settle";
 import { walkFrom, type WalkStart, type Walked } from "./walk";
 
 /** A bundle id as the turn row pins it (K-05 v1 turn.bundleId; K-01 v1 bundleId). */
@@ -209,6 +217,12 @@ export interface WalkDeps<Repo = unknown> {
   readonly questions?: WalkQuestions<Repo>;
   /** The read-only step writers by step id (default 9). Left out, no writer is bound. */
   readonly writers?: StepWriters<Repo>;
+  /**
+   * The read-only settlers by step id (K-09 README default 191; T-1502; settle.ts), handed in as `questions` and
+   * `writers` are. The walk asks one only at a split step, for a passed part that chooses an option of that step's open
+   * question and that no hold keeps back. Left out, no settler is bound and the walk is exactly as before.
+   */
+  readonly settlers?: StepSettlers<Repo>;
 }
 
 /** The service and Linq chat id of the turn's last text (K-09 v1.5 gateAndCommit.turn; default 135). */
@@ -290,11 +304,20 @@ function startOf(choice: Choice): WalkStart {
  * Where an answer reads the question it closes (default 11): an option's, once a question read is bound. A hub's case,
  * or an option while none is bound, is not built: the close needs the version the question's row is read at.
  */
-function questionsOf<Repo>(deps: WalkDeps<Repo>, choice: Choice, start: WalkStart): WalkQuestions<Repo> {
+function questionsOf<Repo>(deps: WalkDeps<Repo>, choice: Choice, stepId: string): WalkQuestions<Repo> {
   if (choice.kind !== "option" || deps.questions === undefined) {
-    throw new WalkNotBuiltError("answer", [start.step]);
+    throw new WalkNotBuiltError("answer", [stepId]);
   }
   return deps.questions;
+}
+
+/**
+ * The settler bound to the step an open question's option names (default 191), found by step id alone: null for any
+ * other choice, or when none is bound. Whether it is asked waits for the pinned graph (a split step) and the holds.
+ */
+function settlerFor<Repo>(deps: WalkDeps<Repo>, choice: Choice): StepSettler<Repo> | null {
+  if (deps.settlers === undefined || choice.kind !== "option") return null;
+  return deps.settlers(choice.step);
 }
 
 /**
@@ -560,30 +583,45 @@ async function writeRows<Repo>(run: WalkRun<Repo>, writing: readonly Writing[]):
   return built;
 }
 
-/** writesOf for one passed part (createWritesOf). */
-async function walkWrites<Repo>(
-  deps: WalkDeps<Repo>,
-  part: PassedPart,
-  context: CommitTurnContext<Repo>,
-  open: OpenHolds,
-): Promise<UnitWrites> {
-  const { request } = context;
-  if (request.input.kind !== "decided") throw new WalkRefusedError("notDecided");
-  const { decided } = request.input;
-  const { choice } = part;
-  if (choice === null) throw new WalkNotBuiltError("verb", [part.part.verb]);
-  if (choice.target.businessId !== context.businessId) throw new WalkRefusedError("businessNotInScope");
-  const start = startOf(choice);
+/** The decided texts a turn read. */
+type DecidedTexts = Decided["context"]["texts"];
 
-  // The walk, on the turn's pinned graph, read afresh on every run: a step or branch it lacks is refused here.
-  const flow = flowOfStep(choice.step, decided.context.flow);
-  const pin = { hash: context.turn.bundleId.hash, build: context.turn.bundleId.build };
-  const graph = flowGraphOf(await deps.bundles.flow(pin, flow), flow);
-  const walked = walkFrom(graph, start);
-  // An answer closes its question at the version the question's row is read at: with no read bound, it is not built.
-  const questions = start.kind === "branch" ? questionsOf(deps, choice, start) : null;
+/** A unit that writes nothing, with its why: a settled answer whose first row is held back (default 191). */
+function nothingWritten(why: Why): UnitWrites {
+  return {
+    why,
+    versionsRead: [],
+    state: [],
+    stateEvents: [],
+    asks: [],
+    closes: [],
+    clockCancels: [],
+    messages: [],
+    reservations: { confirm: [], release: [] },
+    effects: { write: [], letGo: [] },
+    gives: [],
+  };
+}
 
-  // What is open stops the walk at its first routine row (STATE note 1).
+/** One walk, once its start is known: what the part's rows are written from. */
+interface Walking<Repo> {
+  readonly part: PassedPart;
+  readonly context: CommitTurnContext<Repo>;
+  readonly open: OpenHolds;
+  /** The decided texts the turn read (the zone of their first). */
+  readonly texts: DecidedTexts;
+  /** The choice the writers are handed: the part's own, or, settled, the part's with the settled branch as its branch. */
+  readonly choice: Choice;
+  readonly graph: FlowGraph;
+  readonly start: WalkStart;
+  readonly walked: Walked;
+  readonly questions: WalkQuestions<Repo> | null;
+  readonly why: Why;
+}
+
+/** The part's writes from its walk: what is open stops the walk at its first routine row (STATE note 1). */
+async function unitOf<Repo>(deps: WalkDeps<Repo>, walking: Walking<Repo>): Promise<UnitWrites> {
+  const { part, context, open, choice, graph, start, walked, questions, why } = walking;
   const writing = writingOf(graph, walked);
   const heldAt = firstHeld(
     writing.map((each) => each.step.id),
@@ -593,13 +631,12 @@ async function walkWrites<Repo>(
 
   const turnKey = (deps.turnKey ?? ((turn: TurnRow) => turn.id))(context.turn);
   if (turnKey === "") throw new WalkRefusedError("noTurnKey");
-  const why: Why = { step: choice.step, choice: choice.branch ?? choice.label };
   const run: WalkRun<Repo> = {
     context,
     part,
     choice,
     why,
-    zone: decided.context.texts[0].sentAt.zone,
+    zone: walking.texts[0].sentAt.zone,
     nextId: rowIds(turnKey),
     writerLane: writerLaneOf(graph, start),
     questions,
@@ -619,6 +656,93 @@ async function walkWrites<Repo>(
     effects: { write: [], letGo: [] },
     gives: built.gives,
   };
+}
+
+/** What a settled answer is walked from (default 191): the part, its turn, the pinned graph and the split's settler. */
+interface Settling<Repo> {
+  readonly part: PassedPart;
+  readonly context: CommitTurnContext<Repo>;
+  readonly open: OpenHolds;
+  readonly texts: DecidedTexts;
+  /** The choice decide named: of it, only what every option of its question shares is read here. */
+  readonly choice: Choice;
+  readonly graph: FlowGraph;
+  /** The answered split, as the pinned graph holds it, with its branches. */
+  readonly split: GraphStep;
+  readonly settler: StepSettler<Repo>;
+}
+
+/**
+ * A settled answer (default 191): the question read is bound (else notBuilt, nothing asked); a held answer asks no
+ * settler and writes nothing; else the settler is asked once, its label checked against the split's branches in the
+ * pinned graph, and the walk of that branch is written, each writer handed it as the branch chosen.
+ */
+async function settledWrites<Repo>(deps: WalkDeps<Repo>, settling: Settling<Repo>): Promise<UnitWrites> {
+  const { part, context, open, choice, graph, split } = settling;
+  // An answer closes its question at the version the question's row is read at: with no read bound, it is not built.
+  const questions = questionsOf(deps, choice, split.id);
+  // The answer's first row is its question's close (the part's own class): held back, nothing is read for the part.
+  if (firstHeld([split.id], holdClassOf(part.part, choice), open) === 0) {
+    return nothingWritten({ step: split.id, choice: null });
+  }
+  const branch = await settledBranch(settling.settler, {
+    repo: context.repo,
+    businessId: context.businessId,
+    step: split,
+    part,
+    choice,
+    turn: context,
+  });
+  const start: WalkStart = { kind: "branch", step: split.id, branch };
+  return unitOf(deps, {
+    part,
+    context,
+    open,
+    texts: settling.texts,
+    choice: { ...choice, branch },
+    graph,
+    start,
+    walked: walkFrom(graph, start),
+    questions,
+    why: { step: split.id, choice: branch },
+  });
+}
+
+/** writesOf for one passed part (createWritesOf). */
+async function walkWrites<Repo>(
+  deps: WalkDeps<Repo>,
+  part: PassedPart,
+  context: CommitTurnContext<Repo>,
+  open: OpenHolds,
+): Promise<UnitWrites> {
+  const { request } = context;
+  if (request.input.kind !== "decided") throw new WalkRefusedError("notDecided");
+  const { decided } = request.input;
+  const { choice } = part;
+  if (choice === null) throw new WalkNotBuiltError("verb", [part.part.verb]);
+  if (choice.target.businessId !== context.businessId) throw new WalkRefusedError("businessNotInScope");
+  // With no settler bound to the step an option names, the start is the choice's own, found before any read.
+  const settler = settlerFor(deps, choice);
+  const named = settler === null ? startOf(choice) : null;
+
+  // The walk, on the turn's pinned graph, read afresh on every run: a step or branch it lacks is refused here.
+  const flow = flowOfStep(choice.step, decided.context.flow);
+  const pin = { hash: context.turn.bundleId.hash, build: context.turn.bundleId.build };
+  const graph = flowGraphOf(await deps.bundles.flow(pin, flow), flow);
+  const texts = decided.context.texts;
+  if (settler !== null) {
+    // Default 191 asks a settler only at a split step; one bound at a step with no branches is never asked.
+    const split = graph.step(choice.step);
+    if (isSplitStep(split)) {
+      return settledWrites(deps, { part, context, open, texts, choice, graph, split, settler });
+    }
+  }
+  const start = named ?? startOf(choice);
+  const walked = walkFrom(graph, start);
+  // An answer closes its question at the version the question's row is read at: with no read bound, it is not built.
+  const questions = start.kind === "branch" ? questionsOf(deps, choice, start.step) : null;
+  const why: Why = { step: choice.step, choice: choice.branch ?? choice.label };
+  return unitOf(deps, { part, context, open, texts, choice, graph, start, walked, questions, why });
 }
 
 /**

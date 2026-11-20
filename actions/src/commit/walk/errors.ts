@@ -24,7 +24,9 @@ import { NotBuiltError } from "../../tool-api/errors";
  *   - noTurnKey: the turn key the row ids are built from is empty (default 131);
  *   - questionNotLive: the open question an option answers is not live on the turn's handle as the question read finds
  *     it (closed, never sent there, or not the chosen step's), or the option names none (T-1461);
- *   - givesNotStep: a step's writer gave a key its step does not give (K-01 v1 step.gives; T-1461).
+ *   - givesNotStep: a step's writer gave a key its step does not give (K-01 v1 step.gives; T-1461);
+ *   - settledNotInBundle: a split's bound settler answered no label of that step's branches in the turn's pinned graph,
+ *     word for word (K-09 README default 191; T-1502), so the walk has no branch to take.
  */
 export type WalkFault =
   | "flowNotInBundle"
@@ -39,7 +41,8 @@ export type WalkFault =
   | "noServiceOrChatId"
   | "noTurnKey"
   | "questionNotLive"
-  | "givesNotStep";
+  | "givesNotStep"
+  | "settledNotInBundle";
 
 /** The walk refused the part: the whole turn is refused and nothing is written. */
 export class WalkRefusedError extends Error {

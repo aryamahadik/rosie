@@ -73,6 +73,7 @@ import type { ToolApiValidator } from "../../validator";
 import {
   keywordCommitDeps,
   signUpStepWriters,
+  signUpSteps,
   turnCommitDeps,
   type NoBusinessSafetyReads,
   type SafetyReads,
@@ -176,6 +177,13 @@ export interface PgTurnCallsOptions {
    * an open question is notBuilt, as before.
    */
   readonly signUp?: SignUpWriterDeps;
+  /**
+   * Whether the walk is also handed S1-02's settler (T-1502; K-09 README default 191; ../commit signUpSteps): true, with
+   * `signUp` given, binds the sign-up steps' writers and settlers together over one catalog read per walk, so the owner's
+   * words settle S1-02's branch whichever option decide named. Left out or false, no settler is bound and the walk is as
+   * before; without `signUp` it binds nothing.
+   */
+  readonly settleSignUp?: boolean;
   /** The wrapping key the sealer opens a person's data key with, read by name from the environment (T-182). */
   readonly wrappingKeys: WrappingKeys;
   /** The plug-in's stop words, named (PLUGIN_LISTS_NO_STOP_WORDS for the barbershop: DL-344). */
@@ -254,15 +262,20 @@ function pgCommitBinding<Repo extends Sql | Tx>(
  */
 export function pgTurnCalls(runtime: Sql, toolApi: Sql, options: PgTurnCallsOptions): TurnFaceCalls<Tx> {
   const { paging, signUp } = options;
-  // The walk's question read and the sign-up steps' writers are this binding's own (T-1468), never pgCommitBinding's,
-  // which the keyword door shares.
+  // The walk's question read, the sign-up steps' writers and, where asked, their settlers are this binding's own (T-1468,
+  // T-1502), never pgCommitBinding's, which the keyword door shares.
   const binding: TurnCommitBinding<Tx> = {
     ...pgCommitBinding<Tx>(runtime, options),
     ...(options.safetyExtra === undefined ? {} : { safetyExtra: options.safetyExtra }),
     ...(paging === undefined ? {} : { paging }),
     ...(signUp === undefined
       ? {}
-      : { questions: pgWalkQuestions<Tx>(), writers: signUpStepWriters<Tx>(signUp) }),
+      : {
+          questions: pgWalkQuestions<Tx>(),
+          ...(options.settleSignUp === true
+            ? signUpSteps<Tx>(signUp)
+            : { writers: signUpStepWriters<Tx>(signUp) }),
+        }),
   };
   const held = new HeldTurns();
   const rows: RowBinding = {
