@@ -1,0 +1,93 @@
+{
+  "after": [
+    "seed-person-roles.json",
+    "seed-bundle-registry.json"
+  ],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-s1-04-sam",
+        "handle_id": "handle-sam",
+        "event_ids": [
+          "evt-sam-0002"
+        ],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-sam-0002",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-19T14:08:04Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "outbox_rows",
+      "values": {
+        "id": "out-s1-08-sam",
+        "turn_id": "turn-s1-04-sam",
+        "recipient_handle_id": "handle-sam",
+        "recipient_person_id": "person-sam",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": null,
+        "channel": "imessage",
+        "send_class": "quick_reply",
+        "versions_read": [],
+        "open_question_id": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-sam-0002",
+        "step": "S1-08",
+        "line_no": 0
+      }
+    },
+    {
+      "table": "open_questions",
+      "values": {
+        "id": "oq-s1-09-sam",
+        "turn_id": "turn-s1-04-sam",
+        "handle_id": "handle-sam",
+        "person_id": "person-sam",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": null,
+        "step": "S1-09",
+        "options": [],
+        "readback": null,
+        "versions_read": [],
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1
+      }
+    }
+  ],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "insert",
+    "table": "outbox_rows",
+    "values": {
+      "id": "out-s1-09-sam",
+      "turn_id": "turn-s1-04-sam",
+      "recipient_handle_id": "handle-sam",
+      "recipient_person_id": "person-sam",
+      "business_id": "biz-lees-barbershop",
+      "booking_id": null,
+      "channel": "imessage",
+      "send_class": "quick_reply",
+      "versions_read": [],
+      "open_question_id": "oq-s1-09-sam",
+      "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+      "bundle_build": 1,
+      "trace_id": "trace-sam-0002",
+      "step": "S1-09",
+      "line_no": -1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": [
+        "outbox_rows_line_no_not_negative"
+      ]
+    }
+  }
+}
