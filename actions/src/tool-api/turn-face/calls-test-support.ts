@@ -486,6 +486,17 @@ export function publishedBundleV0(): BundleDocument {
   return { manifest: read("manifest.json"), flows: { A: read("flow/A.json") } };
 }
 
+const BUNDLE_V1_DIR = new URL("../../../../bundles/v1/bundle/", import.meta.url);
+
+/**
+ * Bundle v1 as bundles/v1 holds it (T-1460): its manifest and flow A, the master's steps S1-01, S1-02, S1-03, S1-74,
+ * S1-11 and S1-04 (T-1468's tests; its trade overlays are read through journey-1/plug-ins' trade port).
+ */
+export function publishedBundleV1(): BundleDocument {
+  const read = (file: string): Json => JSON.parse(readFileSync(new URL(file, BUNDLE_V1_DIR), "utf8")) as Json;
+  return { manifest: read("manifest.json"), flows: { A: read("flow/A.json") } };
+}
+
 /** The row read with its bundle the published bundle v0's id, so the row is read in it (the rest as K-05's fixture). */
 export function rowUnderPublishedV0(row: OutboxRowRead = outboxRowS102()): OutboxRowRead {
   const bundleId = publishedBundleV0().manifest.bundleId as { hash: string; build: number };
