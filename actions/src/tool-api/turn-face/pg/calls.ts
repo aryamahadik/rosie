@@ -55,11 +55,13 @@ import type { WrappingKeys } from "../../../../../db/repo/sealing";
 import {
   enterKeywordDoorSide,
   inRuntimeTransaction,
+  liveOpenQuestionsOfHandle,
   type TransientError,
 } from "../../../../../db/repo/targets";
 import { readFixedLineFacts, readOpenHoldsIn, readOutboxRow } from "../../../../../db/repo/turn-face-reads";
 import type { CoreFlagsDeps } from "../../../commit/core";
 import { pgCommitTurn } from "../../../commit/pg";
+import type { WalkQuestions } from "../../../commit/walk";
 import { KEYED_IDS, NO_EVENT_SOURCES, flagsReaderOf } from "../../../domain/flags";
 import { messagesReaderOf } from "../../../domain/messages-consent";
 import type { PagingDeps } from "../../../domain/paging";
@@ -70,9 +72,11 @@ import type { SpanRefusedReport } from "../../tool-api";
 import type { ToolApiValidator } from "../../validator";
 import {
   keywordCommitDeps,
+  signUpStepWriters,
   turnCommitDeps,
   type NoBusinessSafetyReads,
   type SafetyReads,
+  type SignUpWriterDeps,
   type TurnCommitBinding,
 } from "../commit";
 import { createKeywordDoor, type DoorRuntime, type KeywordDoor } from "../door";
@@ -143,9 +147,35 @@ export function pgSafetyReads<Repo extends Sql | Tx = Tx>(runtime: Sql): SafetyR
   };
 }
 
+/**
+ * The walk's question read on PostgreSQL (T-1468; commit/walk WalkQuestions, default 11): K-05 v1.2's read of a handle's
+ * live questions (db/repo/targets.ts liveOpenQuestionsOfHandle, as limit 3 reads them) on the call's own transaction
+ * `tx`, and of those rows the one with that id, as it is, with the version its row is read at; else null. On the Tool
+ * API's side (rosie_app, the call's business scope) it reads the scope's business's questions through 0037's
+ * open_questions_went_out and names no table that spans businesses; on the runtime side (rosie_job) it reads them
+ * directly. It reads through `tx` alone and never writes.
+ */
+export function pgWalkQuestions<Repo extends Sql | Tx>(): WalkQuestions<Repo> {
+  return {
+    async liveQuestion(tx, handleId, openQuestionId) {
+      const live = await liveOpenQuestionsOfHandle(tx, handleId);
+      return live.find((question) => question.id === openQuestionId) ?? null;
+    },
+  };
+}
+
 export interface PgTurnCallsOptions {
   /** The bundles, read under their ids (KV, or PostgreSQL's copy on a miss): the frontier's port. */
   readonly bundles: FrontierBundles;
+  /**
+   * The sign-up steps' ports (T-1468; ../commit signUpStepWriters), both handed in by the caller: the kinds reads (item
+   * 78 on a rosie_app client that is never one whose only connection holds the call's transaction, item 79 on the runtime
+   * side: journey-1/kinds reads.ts) with the stop home's reads where the runtime side binds them, and the pinned bundle's
+   * trade overlays. Given, the commit binds the walk's question read on the call's transaction (pgWalkQuestions) and the
+   * sign-up steps' writers, so an answer to S1-02's question is written. Left out, neither is bound, and every answer to
+   * an open question is notBuilt, as before.
+   */
+  readonly signUp?: SignUpWriterDeps;
   /** The wrapping key the sealer opens a person's data key with, read by name from the environment (T-182). */
   readonly wrappingKeys: WrappingKeys;
   /** The plug-in's stop words, named (PLUGIN_LISTS_NO_STOP_WORDS for the barbershop: DL-344). */
@@ -223,11 +253,16 @@ function pgCommitBinding<Repo extends Sql | Tx>(
  * `toolApi` one whose connections run as rosie_app, both on the primary, uncached (arch 10 lines 504, 538).
  */
 export function pgTurnCalls(runtime: Sql, toolApi: Sql, options: PgTurnCallsOptions): TurnFaceCalls<Tx> {
-  const { paging } = options;
+  const { paging, signUp } = options;
+  // The walk's question read and the sign-up steps' writers are this binding's own (T-1468), never pgCommitBinding's,
+  // which the keyword door shares.
   const binding: TurnCommitBinding<Tx> = {
     ...pgCommitBinding<Tx>(runtime, options),
     ...(options.safetyExtra === undefined ? {} : { safetyExtra: options.safetyExtra }),
     ...(paging === undefined ? {} : { paging }),
+    ...(signUp === undefined
+      ? {}
+      : { questions: pgWalkQuestions<Tx>(), writers: signUpStepWriters<Tx>(signUp) }),
   };
   const held = new HeldTurns();
   const rows: RowBinding = {
