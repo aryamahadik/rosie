@@ -104,7 +104,7 @@ const STATED_GIVES = [
 async function callMatchKinds(k05: FakeK05, request: unknown = matchKindsExchange().request) {
   const scope = recordingScope();
   const handlers = {
-    ...notBuiltHandlers<RecordingRepo>(),
+    ...notBuiltHandlers(),
     matchKinds: createMatchKinds<RecordingRepo>({ reads: kindsReadsOf(k05.k05) }),
   };
   const api = createToolApi<RecordingRepo>({ validator, scope, handlers });
@@ -174,7 +174,10 @@ interface Wrote {
 }
 
 /** This folder's writers as they are, each call's rows or rejection written down and handed on unchanged. */
-function noted(real: KindsWriters<WalkTestRepo>, wrote: Wrote[]): Record<KindsStep, StepWriter<WalkTestRepo>> {
+function noted(
+  real: KindsWriters<WalkTestRepo>,
+  wrote: Wrote[],
+): Record<KindsStep, StepWriter<WalkTestRepo>> {
   const note =
     (stepId: KindsStep): StepWriter<WalkTestRepo> =>
     (call) =>

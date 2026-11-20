@@ -148,7 +148,13 @@ async function committed(context: CommitTurnContext<WalkTestRepo>, writes: UnitW
     },
     units: [{ writes, answer: null }],
   });
-  return pgCommitTurn<WalkTestRepo>(cdb.runtime, { now: () => new Date(context.request.now) })(request);
+  const commitTurn = pgCommitTurn<WalkTestRepo>(cdb.runtime, { now: () => new Date(context.request.now) });
+  // The call's context as the commit hands it to its port: the port commits on the runtime client, in its own transaction.
+  return commitTurn(request, {
+    repo: context.repo,
+    businessId: context.businessId,
+    span: { limits: [], rows: [] },
+  });
 }
 
 /**
