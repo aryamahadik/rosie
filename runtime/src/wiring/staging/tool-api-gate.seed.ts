@@ -23,6 +23,12 @@
 //                 unknown tense, as actions' safety-ask.test.ts reads it), with the outbox row of its checked line written
 //                 under the id the safety service keys it by (KEYED_SAFETY_IDS), so recording that text again is a repeat
 //                 whose line carries the danger question (record.ts default 18), with nothing to write.
+//   the catalog   (T-1470) K-24 v1 seed-kinds-sample.json's eight trade-file kinds rows, value for value, for K-05 v1.19
+//                 item 78 (the gate's catalog read). No kind_flows row: item 78 reads none.
+//   one question  (T-1470) S1-02's question, live, of a handle of this seed's own (its person holds no key and no pick),
+//                 at the barbershop, as staging holds one once it has gone out: its turn row, its outbox row with one
+//                 part sent and delivered, and the question open at version 2, raised once as K-05 armClock raises it at
+//                 the first delivery receipt. The walk's question read (pgWalkQuestions) reads it on the gate's scope.
 //
 // Everything is written in one transaction as the runtime side's role, rosie_job, with no business scope, as the core and
 // skeleton seeds write. Test values only (rule 9): the master's sample cast, the fixtures' ids, whole fiction-range
@@ -33,6 +39,7 @@
 import { KEYED_SAFETY_IDS } from "../../../../actions/src/domain/safety/ids";
 import seedBusinessHead from "../../../../contracts/db-schema/core/fixtures/seed-business-head.json";
 import seedPersonRoles from "../../../../contracts/db-schema/core/fixtures/seed-person-roles.json";
+import seedKindsSample from "../../../../contracts/db-schema/kinds-of-work/fixtures/seed-kinds-sample.json";
 import seedOwnerIdUpload from "../../../../contracts/db-schema/people-access/fixtures/seed-owner-id-upload.json";
 import { handleSealingKeyIn } from "../../../../db/repo/handle-keys";
 import { SCOPE_SETTING, type Sql, type Tx } from "../../../../db/repo/scope";
@@ -254,6 +261,97 @@ async function writeLineRow(tx: Tx, record: SeededRecord, bundleId: BundleId): P
   `;
 }
 
+// ---- the kinds catalog and the open question (T-1470) -----------------------------------------------------------------
+
+/** K-24 v1 seed-kinds-sample.json's kinds rows: eight trade-file kinds, written value for value. */
+const KIND_ROWS = rowsOf(seedKindsSample).filter((row) => row.table === "kinds");
+
+/** A kind as K-05 v1.19 item 78 answers its row, but for its version. */
+export interface SeededKind {
+  readonly id: string;
+  readonly name: string;
+  readonly style: string;
+  readonly pattern: string;
+  readonly source: string;
+}
+
+/** The catalog this database holds, as item 78 answers it: every seeded kind, in id order, byte by byte. */
+export const CATALOG: readonly SeededKind[] = KIND_ROWS.map(({ values }): SeededKind => ({
+  id: String(values.id),
+  name: String(values.name),
+  style: String(values.style),
+  pattern: String(values.pattern),
+  source: String(values.source),
+})).sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+
+/**
+ * The owner whose S1-02 question is live here: a handle of this seed's own at a whole fiction-range number, its person
+ * (no name, no key, no pick), the turn that asked, the question, and the outbox row it went out as (one part, sent and
+ * delivered). `version` is the question row's: 2, K-04's first version raised once.
+ */
+export const ASKED = {
+  handleId: "handle-t1470-asked",
+  personId: "person-t1470-asked",
+  number: "+15555550177",
+  turnId: "turn-t1470-asked",
+  eventId: "evt-t1470-asked",
+  traceId: "trace-t1470-asked",
+  questionId: "oq-s1-02-t1470-asked-1",
+  outboxRowId: "outbox-s1-02-t1470-asked-1",
+  messageId: "linq-msg-t1470-asked-0001",
+  committedAt: "2026-10-19T18:05:05Z",
+  sentAt: "2026-10-19T18:05:07Z",
+  deliveredAt: "2026-10-19T18:05:08Z",
+  version: 2,
+} as const;
+
+/**
+ * The asked owner's rows: the handle, its person and their link; the committed turn; S1-02's question at the barbershop
+ * (no options, no read-back, nothing read, no clock named); its outbox row, delivered, with its one part; then the
+ * question made open with its version raised once, as K-05 armClock leaves it at the first delivery receipt.
+ */
+async function writeAskedQuestion(tx: Tx, bundleId: BundleId): Promise<void> {
+  await tx`insert into persons (id) values (${ASKED.personId})`;
+  await tx`insert into handles (id, kind, address) values (${ASKED.handleId}, 'phone', ${ASKED.number})`;
+  await tx`insert into person_handles (person_id, handle_id) values (${ASKED.personId}, ${ASKED.handleId})`;
+  await tx`
+    insert into turns (
+      id, handle_id, event_ids, state, bundle_hash, bundle_build, trace_id, joined_trace_ids, tries, committed_at
+    ) values (
+      ${ASKED.turnId}, ${ASKED.handleId}, ${[ASKED.eventId]}, 'committed', ${bundleId.hash}, ${bundleId.build},
+      ${ASKED.traceId}, ${[]}, 1, ${ASKED.committedAt}
+    )
+  `;
+  await tx`
+    insert into open_questions (
+      id, turn_id, handle_id, person_id, business_id, booking_id, step, options, readback, versions_read, bundle_hash,
+      bundle_build, clock, ask_count, status
+    ) values (
+      ${ASKED.questionId}, ${ASKED.turnId}, ${ASKED.handleId}, ${ASKED.personId}, ${BARBERSHOP}, null, 'S1-02',
+      ${tx.json([])}, null, ${tx.json([])}, ${bundleId.hash}, ${bundleId.build}, null, 1, 'waiting'
+    )
+  `;
+  await tx`
+    insert into outbox_rows (
+      id, turn_id, recipient_handle_id, recipient_person_id, business_id, booking_id, channel, send_class, versions_read,
+      open_question_id, state, bundle_hash, bundle_build, trace_id
+    ) values (
+      ${ASKED.outboxRowId}, ${ASKED.turnId}, ${ASKED.handleId}, ${ASKED.personId}, ${BARBERSHOP}, null, 'imessage',
+      'quick_reply', ${tx.json([])}, ${ASKED.questionId}, 'delivered', ${bundleId.hash}, ${bundleId.build},
+      ${ASKED.traceId}
+    )
+  `;
+  await tx`
+    insert into outbox_parts (
+      outbox_row_id, part_no, try_no, idempotency_key, attempts, kind, linq_message_id, state, sent_at, delivered_at
+    ) values (
+      ${ASKED.outboxRowId}, 1, 1, ${`${ASKED.outboxRowId}/1/1`}, 1, 'words', ${ASKED.messageId}, 'delivered',
+      ${ASKED.sentAt}, ${ASKED.deliveredAt}
+    )
+  `;
+  await tx`update open_questions set status = 'open', version = version + 1 where id = ${ASKED.questionId}`;
+}
+
 // ---- the seed ---------------------------------------------------------------------------------------------------------
 
 /** One first sight (K-05 v1.2 item 29) under the made-up key; refused unless it made what it was asked to. */
@@ -320,5 +418,9 @@ export async function seed(sql: Sql): Promise<void> {
     await writeRecord(tx, OTHER_BUSINESS_RECORD, bundleId);
     await writeRecord(tx, ASK_RECORD, bundleId);
     await writeLineRow(tx, ASK_RECORD, bundleId);
+
+    // T-1470: the catalog item 78 reads, and one live S1-02 question the walk's question read reads.
+    for (const row of KIND_ROWS) await insertRow(tx, row);
+    await writeAskedQuestion(tx, bundleId);
   });
 }

@@ -45,10 +45,20 @@
 //     transient and never under withBusiness.
 //   - No line written while this file runs holds a text's words, a number, an address, the wrapping key, a sealed value,
 //     a chat id or a fixed line's words, and no rejection is left unhandled.
+//   - T-1470 (card F2), the walk's question read and the kinds reads the gate binds for an answer to S1-02's question.
+//     This rig holds bundle v0 and no bundle v1, so no second turn is walked here (that is T-1468's local proof, and
+//     ../gate-binding.test.ts proves the gate port's binding); what is proven is each read on its own client, role and
+//     scope, on the seed's catalog rows and its one live S1-02 question: the gate holds `questions` and `kinds.reads`
+//     and no stop port; the question read as rosie_worker_app inside the gate's scope answers the live question with its
+//     row's version, and null under another business's scope, for another handle and for an id that is not live; inside
+//     one held scope the catalog is read on a second Tool API client and item 79 on a runtime-side one, one after the
+//     other, 2 connections at most; with every slot's scope held, each reads the catalog and ends (its client takes no
+//     slot), 6 connections at most; a failed item 79 read is KindsReadError as thrown, and no line holds its row id.
 // Test values only (rule 9): the master's sample cast, the fixtures' ids and words, whole fiction-range 555-01xx numbers,
 // made-up ids, and the seed's made-up wrapping key.
 import { KEYED_SAFETY_IDS } from "@rosie/actions/src/domain/safety/ids";
 import { NotBuiltError } from "@rosie/actions/src/tool-api/errors";
+import { KindsReadError } from "@rosie/actions/src/tool-api/journey-1/kinds/errors";
 import { TurnFaceReadError, TurnFaceRefusedError } from "@rosie/actions/src/tool-api/turn-face/errors";
 import businessOwnerPhoneFirst from "@rosie/contracts/data-access/fixtures/business-owner-phone-first.json";
 import businessZoneBarbershop from "@rosie/contracts/data-access/fixtures/business-zone-barbershop.json";
@@ -93,7 +103,9 @@ import { NO_DIRECTORY_INPUTS } from "./state-reads";
 import { GATE_CALLS, GATE_CLIENTS_AT_ONCE, stagingGateReads, type GatePart } from "./tool-api-gate";
 import {
   ASK_RECORD,
+  ASKED,
   BARBERSHOP,
+  CATALOG,
   NO_KEY,
   NO_WRAP_KEY,
   OTHER_BUSINESS_RECORD,
@@ -903,12 +915,19 @@ describe("built on staging: the six pieces, and nothing read but the environment
     expect([testEnv.job?.reads.n, testEnv.app?.reads.n]).toEqual([0, 0]);
     expect(Object.keys(reads ?? {}).sort()).toEqual([
       "keywordDoor",
+      "kinds",
+      "questions",
       "readOpenHolds",
       "safetyReads",
       "scope",
       "sealer",
       "words",
     ]);
+    // T-1470: the walk's question read, and the kinds reads alone (items 78 and 79): no stop port at rung 1.
+    expect(Object.keys(reads?.questions ?? {})).toEqual(["liveQuestion"]);
+    expect(Object.keys(reads?.kinds ?? {})).toEqual(["reads"]);
+    expect(reads?.kinds?.stop).toBeUndefined();
+    expect(Object.keys(reads?.kinds?.reads ?? {}).sort()).toEqual(["catalog", "pickedKinds"]);
     expect(Object.keys(reads?.safetyReads ?? {}).sort()).toEqual([
       "businessOwner",
       "businessZone",
@@ -921,6 +940,8 @@ describe("built on staging: the six pieces, and nothing read but the environment
     // No adapter: the words are left out, the safety service's own default (notBuilt for a line that asks).
     expect(Object.keys(stagingGateReads({ ...part, bundleSafety: null }) ?? {}).sort()).toEqual([
       "keywordDoor",
+      "kinds",
+      "questions",
       "readOpenHolds",
       "safetyReads",
       "scope",
@@ -966,9 +987,11 @@ describe("built on staging: the six pieces, and nothing read but the environment
     if (gate === null) throw new Error("the gate is bound with both bindings");
     expect(gate.words?.fixedLine("safetyAsk")).toEqual({ id: "safetyAsk", text: "t1398 stand-in words" });
     expect(gate.words?.fixedLine("safetyCrisis")).toBeNull();
-    // Nothing else of its input but the six pieces.
+    // Nothing else of its input but the six pieces and T-1470's two.
     expect(Object.keys(gate).sort()).toEqual([
       "keywordDoor",
+      "kinds",
+      "questions",
       "readOpenHolds",
       "safetyReads",
       "scope",
@@ -2041,6 +2064,233 @@ describe("the scope's start: the gate's transaction is opened for the K-09 call 
   });
 });
 
+// ---- the walk's question read and the kinds reads (T-1470) ----------------------------------------------------------
+//
+// What the gate binds for an answer to S1-02's question, each read by itself on this file's database (bundle v0 and the
+// seed's rows: no second turn is walked here). The question read runs on the scope's own transaction; each kinds read
+// opens a client of its own, asked from inside a held scope as a step writer asks it.
+
+/** A person this database does not hold: a made-up row id, which no line may hold once item 79 has refused it. */
+const NOBODY = "person-t1470-nobody";
+
+/** The gate's two T-1470 pieces, as stagingOptions gave them. */
+function signUpReadsOf(gate: GateReads) {
+  const { questions, kinds } = gate;
+  if (questions === undefined || kinds === undefined) {
+    throw new Error("staging's gate binds the question read and the kinds reads");
+  }
+  return { questions, kinds: kinds.reads };
+}
+
+/** Who a scope's transaction runs as, and under which business. */
+async function whoOn(repo: unknown): Promise<Json | undefined> {
+  const tx = repo as Sql;
+  const [who] = await tx<Json[]>`
+    select session_user::text as session_login, current_user::text as current_login,
+           current_setting('rosie.business_id', true) as scope
+  `;
+  return who;
+}
+
+describe("the walk's question read and the kinds reads, as the gate binds them for an answer to S1-02's question (T-1470)", () => {
+  it("the question read, as rosie_worker_app inside the gate's own scope: the live question by its id, with its row's version (2, not 1) and when it went out; null under another business's scope, for another handle and for an id that is not live", async () => {
+    const before = await rowCounts();
+    const { gate, written, db } = rootOver(envOf());
+    const { questions } = signUpReadsOf(gate);
+    const login = DB_SIDES.toolApi.login;
+    const ask = (businessId: string, handleId: string, openQuestionId: string) =>
+      gate.scope.withBusiness(businessId, async (repo) => ({
+        who: await whoOn(repo),
+        question: await questions.liveQuestion(repo, handleId, openQuestionId),
+      }));
+
+    const live = await ask(BARBERSHOP, ASKED.handleId, ASKED.questionId);
+    expect(live.who).toEqual({ session_login: login, current_login: login, scope: BARBERSHOP });
+    expect(live.question).toEqual({
+      id: ASKED.questionId,
+      businessId: BARBERSHOP,
+      bookingId: null,
+      personId: ASKED.personId,
+      turnId: ASKED.turnId,
+      step: "S1-02",
+      status: "open",
+      options: [],
+      readback: null,
+      versionsRead: [],
+      clock: null,
+      sentAt: ASKED.sentAt,
+      pollId: null,
+      askCount: 1,
+      bundleId: V0,
+      version: ASKED.version,
+    });
+    expect(live.question?.version).not.toBe(1);
+
+    // Another business's scope: row-level security shows it none of the barbershop's questions.
+    const other = await ask(YOGA_STUDIO, ASKED.handleId, ASKED.questionId);
+    expect(other.who).toEqual({ session_login: login, current_login: login, scope: YOGA_STUDIO });
+    expect(other.question).toBeNull();
+    // Another handle, asked for that question's id; and an id no live question of the handle has.
+    expect((await ask(BARBERSHOP, SAM.handleId, ASKED.questionId)).question).toBeNull();
+    expect((await ask(BARBERSHOP, ASKED.handleId, "oq-s1-02-t1470-not-live")).question).toBeNull();
+
+    // One client each, the scope's own, on the Tool API's side: the read ran on the call's transaction and wrote nothing.
+    expect(callsOf(written)).toEqual(Array.from({ length: 4 }, () => onApp(GATE_CALLS.scope)));
+    expect(db.counts()).toMatchObject({ opened: 4, ended: 4, connectionsOpen: 0, connectionsPeak: 1 });
+    expect(await rowCounts()).toEqual(before);
+  });
+
+  it("one gate alone: inside its held scope the catalog is read on a second Tool API client (rosie_worker_app), then item 79 on a runtime-side client (rosie_worker_job), each named on its timing line; 2 connections at most, opened equal to ended", async () => {
+    const before = await rowCounts();
+    const { gate, written, db } = rootOver(envOf());
+    const { kinds } = signUpReadsOf(gate);
+    const login = DB_SIDES.toolApi.login;
+
+    const read = await gate.scope.withBusiness(BARBERSHOP, async (repo) => {
+      const first = await whoOn(repo);
+      const catalog = await kinds.catalog();
+      const picked = await kinds.pickedKinds({ businessId: BARBERSHOP, personId: ASKED.personId });
+      // The scope's own transaction answers again after both reads: its client was held throughout.
+      return { first, catalog, picked, last: await whoOn(repo) };
+    });
+
+    expect(read.first).toEqual({ session_login: login, current_login: login, scope: BARBERSHOP });
+    expect(read.last).toEqual(read.first);
+    // Item 78: the seed's trade-file kinds as the matcher takes them, in id order.
+    expect(read.catalog).toEqual(CATALOG);
+    expect(read.catalog).toHaveLength(8);
+    // Item 79: no pick yet, of the barbershop or of the asked owner with no business; the barbershop's companies as this
+    // database holds them (T-1148's one), read back on the runtime side.
+    const companies = await own.runtime("companies", (sql) =>
+      sql<Json[]>`
+        select id, business_id as "businessId", name, owner_person_id as "ownerPersonId", version from companies
+        where business_id = ${BARBERSHOP} order by id collate "C"
+      `.then((rows) => rows.map((row) => ({ ...row }))),
+    );
+    expect(companies).toHaveLength(1);
+    expect(read.picked).toEqual({
+      result: "pickedKinds",
+      businessId: BARBERSHOP,
+      personId: ASKED.personId,
+      readAt: expect.stringMatching(UTC_INSTANT) as string,
+      picks: [],
+      companies,
+    });
+
+    // The scope's client first; then the catalog's own, on the Tool API's side; then item 79's, on the runtime side.
+    expect(callsOf(written)).toEqual([
+      onApp(GATE_CALLS.scope),
+      onApp(GATE_CALLS.kindCatalog),
+      onJob(GATE_CALLS.pickedKinds),
+    ]);
+    expect([GATE_CALLS.kindCatalog, GATE_CALLS.pickedKinds]).toEqual(["readKindCatalog", "readPickedKinds"]);
+    expect(written.map((line) => line.trace_id)).toEqual([null, null, null]);
+    // Each read's connect and guard are timed apart on its line, as every call's: when it started and whole milliseconds.
+    for (const line of written.slice(1)) {
+      for (const step of [line.connect, line.guard] as { at: unknown; ms: unknown }[]) {
+        expect(step.at).toEqual(expect.stringMatching(UTC_INSTANT));
+        expect(Number.isInteger(step.ms) && (step.ms as number) >= 0).toBe(true);
+      }
+    }
+    // One after another beside the held scope: never more than the scope's connection and one read's.
+    expect(db.counts()).toMatchObject({
+      opened: 3,
+      ended: 3,
+      connectionsOpen: 0,
+      connectionsPeak: 2 * CONNECTIONS_PER_CLIENT,
+    });
+    expect(await rowCounts()).toEqual(before);
+  });
+
+  it(
+    "no slot: with every slot's scope held at once, each then reads the catalog on a client of its own and every call ends; a further scope waits for a slot meanwhile; 6 connections at most, opened equal to ended",
+    { timeout: TEST_MS },
+    async () => {
+      const { gate, written, db } = rootOver(envOf());
+      const { kinds } = signUpReadsOf(gate);
+      const order: string[] = [];
+      let entered = 0;
+      let open: () => void = () => undefined;
+      const allHeld = new Promise<void>((resolve) => {
+        open = resolve;
+      });
+
+      // As many scopes as there are slots, each holding its client until all of them hold one, then reading the catalog.
+      const held = Array.from({ length: GATE_CLIENTS_AT_ONCE }, () =>
+        gate.scope.withBusiness(BARBERSHOP, async () => {
+          entered += 1;
+          if (entered === GATE_CLIENTS_AT_ONCE) open();
+          await allHeld;
+          const catalog = await kinds.catalog();
+          order.push("catalog");
+          return catalog;
+        }),
+      );
+      // One more scope: no slot is free, so it waits until one of the others has ended.
+      const waiting = gate.scope.withBusiness(BARBERSHOP, () => {
+        order.push("waited");
+        return Promise.resolve(entered);
+      });
+
+      const catalogs = await Promise.all(held);
+      for (const catalog of catalogs) expect(catalog).toEqual(CATALOG);
+      expect(await waiting).toBe(GATE_CLIENTS_AT_ONCE);
+      // A catalog read answered before the waiting scope got a slot: the reads took none.
+      expect(order[0]).toBe("catalog");
+      expect(order.filter((each) => each === "catalog")).toHaveLength(GATE_CLIENTS_AT_ONCE);
+
+      const sides = callsOf(written);
+      expect(sides.filter(([name]) => name === GATE_CALLS.scope)).toEqual(
+        Array.from({ length: GATE_CLIENTS_AT_ONCE + 1 }, () => onApp(GATE_CALLS.scope)),
+      );
+      expect(sides.filter(([name]) => name === GATE_CALLS.kindCatalog)).toEqual(
+        Array.from({ length: GATE_CLIENTS_AT_ONCE }, () => onApp(GATE_CALLS.kindCatalog)),
+      );
+      const counts = db.counts();
+      expect(counts).toMatchObject({
+        opened: 2 * GATE_CLIENTS_AT_ONCE + 1,
+        ended: 2 * GATE_CLIENTS_AT_ONCE + 1,
+        connectionsOpen: 0,
+      });
+      // Every slot's scope was held when the first catalog client opened, so at least one more than the slots.
+      expect(counts.connectionsPeak).toBeGreaterThan(GATE_CLIENTS_AT_ONCE);
+      expect(counts.connectionsPeak).toBeLessThanOrEqual(WORKER_CONNECTIONS);
+    },
+  );
+
+  it("a failed item 79 read (a person this database does not hold) rejects with KindsReadError as thrown, its message the read and the fault alone; the scope's client is ended, nothing is written and no line holds that row id", async () => {
+    const before = await rowCounts();
+    const { gate, written, db } = rootOver(envOf());
+    const { kinds } = signUpReadsOf(gate);
+    let inside: unknown;
+
+    const thrown = await rejectionOf(
+      gate.scope.withBusiness(BARBERSHOP, async () => {
+        try {
+          return await kinds.pickedKinds({ businessId: BARBERSHOP, personId: NOBODY });
+        } catch (error) {
+          inside = error;
+          throw error;
+        }
+      }),
+    );
+
+    expect(thrown).toBeInstanceOf(KindsReadError);
+    // The scope hands on what the read threw, the same error: nothing wraps it.
+    expect(thrown).toBe(inside);
+    expect(thrown).toMatchObject({ name: "KindsReadError", read: "readPickedKinds", fault: "notFound" });
+    expect((thrown as Error).message).toBe(new KindsReadError("readPickedKinds", "notFound", null).message);
+    expect((thrown as Error).message).not.toContain(NOBODY);
+    // K-05's own answer rides on the error for matchKinds (never logged): the table and the row it did not find.
+    expect((thrown as KindsReadError).answer).toEqual({ error: "notFound", table: "persons", rowId: NOBODY });
+
+    expect(callsOf(written)).toEqual([onApp(GATE_CALLS.scope), onJob(GATE_CALLS.pickedKinds)]);
+    expect(db.counts()).toMatchObject({ opened: 2, ended: 2, connectionsOpen: 0 });
+    for (const line of lines) expect(line, "a line holds the row id").not.toContain(NOBODY);
+    expect(await rowCounts()).toEqual(before);
+  });
+});
+
 // ---- production ---------------------------------------------------------------------------------------------------
 
 describe("in production's environment the part builds nothing and reads no binding", () => {
@@ -2095,5 +2345,15 @@ describe("the span and log capture", () => {
       setTimeout(resolve, 0);
     });
     expect(rejections.map((reason) => String(reason))).toEqual([]);
+  });
+
+  it("no line written while this file ran, and no span, holds the row id the failed item 79 read named, or the asked owner's number (T-1470)", () => {
+    // The capture holds the two kinds reads' timing lines, so it saw those calls.
+    const calls = everyLine.flatMap((line) => (line.startsWith("{") ? [String(parsed(line).call)] : []));
+    expect(calls).toEqual(expect.arrayContaining([GATE_CALLS.kindCatalog, GATE_CALLS.pickedKinds]));
+    const secrets = [NOBODY, ASKED.number, ASKED.number.slice(1), ASKED.number.slice(2)];
+    for (const text of [...everyLine, ...SPANS.map((span) => JSON.stringify(span))]) {
+      for (const secret of secrets) expect(text, "a line holds a row id or a number").not.toContain(secret);
+    }
   });
 });
