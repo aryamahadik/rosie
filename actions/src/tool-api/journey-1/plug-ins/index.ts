@@ -1,11 +1,13 @@
 // Journey 1's plug-in per kind (T-630; K-09 v1 README "Journeys 1 and 2: the setup calls"): saveSetupStep's S1-11 variant,
-// each kind's plug-in loaded into the business (the 11 pf keys, with C5's fills).
+// a kind's plug-in loaded into the business (the 11 pf keys, with C5's fills).
 //
-// T-634 part 1 (DL-961 card E; DL-988) builds S1-11's read-only step writer for the walk (./writer.ts, ./plug-in.ts):
-// createPlugInWriters gives `plugIns`, which card F binds to S1-11 in the turn face (turn-face/commit.ts:566,
-// createWritesOf's writers), and `kinds`, which card F wraps around S1-02's writer (T-633's) so S1-11 knows the picks the
-// same walk gives. The registry entry below stays as T-630 made it: saveSetupStep's S1-11 variant alone (a page's, the
-// console's or a job's call) answers notBuilt and writes nothing until its own card.
+// T-634 part 1 (DL-961 card E; DL-988; DL-994) builds S1-11's read-only step writer for the walk (./writer.ts,
+// ./plug-in.ts): in S1-02's walk it loads the first kind named's plug-in alone (each other kind's is loaded when the
+// owner gets to it). createPlugInWriters gives `plugIns`, which card F binds to S1-11 in the turn face
+// (turn-face/commit.ts:566, createWritesOf's writers), and `kinds`, which card F wraps around S1-02's writer (T-633's) so
+// S1-11 knows the picks the same walk gives: both from one createPlugInWriters instance per binding. The registry entry
+// below stays as T-630 made it: saveSetupStep's S1-11 variant alone (a page's, the console's or a job's call) answers
+// notBuilt and writes nothing until its own card.
 
 import { NotBuiltError } from "../../errors";
 import type { SetupFolder } from "../index";

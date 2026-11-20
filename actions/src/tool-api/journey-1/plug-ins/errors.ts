@@ -9,10 +9,11 @@
  *   - notS1_11: the writer was called for a step other than S1-11 (a binding by the wrong step id);
  *   - noPicks: S1-11 was walked with no picks kept from S1-02's writer in the same walk (its writer was not bound
  *     through `kinds`), so there is nothing to tell which kinds to load;
- *   - pickNotWellFormed: a picked_kinds insert S1-02's writer gave is not K-24 v1's shape (its id, outcome, kind and
- *     business), or a listed pick names no trade-file kind;
+ *   - pickNotWellFormed: a picked_kinds insert S1-02's writer gave is not K-24 v1's shape (its id, its position, a
+ *     whole number from 1, its outcome, kind and business), or a listed pick names no trade-file kind;
  *   - pickOtherBusiness: a pick is of another business than the call's (a pick has the call's business, or none yet);
- *   - kindNotInBundle: the turn's pinned bundle holds no trade overlay for a listed pick's kind;
+ *   - kindNotInBundle: the turn's pinned bundle holds no trade overlay for the first kind named, the one kind S1-11
+ *     loads (a later kind's overlay is never read here);
  *   - overlayNotWellFormed: the overlay read is not K-01 v1's tradeOverlay of that kind (its contract, its trade, the
  *     11 plug-in text blocks each JSON text, its facts and each flow's settings).
  */

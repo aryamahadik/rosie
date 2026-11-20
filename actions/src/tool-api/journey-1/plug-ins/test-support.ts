@@ -68,6 +68,8 @@ export interface StandInPick {
   readonly words: string;
   readonly outcome: "listed" | "new_work" | "not_booked";
   readonly kindId: string | null;
+  /** Its place in the order the owner named the kinds (picked_kinds.position). Left out: its place in `picks`, from 1. */
+  readonly position?: number;
 }
 
 /** K-24's seed-business-kinds.json's picked kinds: Sam's "Barbershop, plumbing, electrical" as three listed picks. */
@@ -86,8 +88,9 @@ export function samSeedPicks(): StandInPick[] {
 
 /**
  * A stand-in for S1-02's writer (T-633's, which runs the matcher over the catalog): one K-24 picked_kinds insert per
- * pick in `picks`, in order, named by the walk's row ids (default 131, kind "pick"), owned by the call's person, of the
- * business `businessId` (null: not placed yet, K-24 README), giving kinds. It reads nothing.
+ * pick in `picks`, in order, named by the walk's row ids (default 131, kind "pick"), owned by the call's person, at its
+ * own position or its place in `picks`, of the business `businessId` (null: not placed yet, K-24 README), giving kinds.
+ * It reads nothing.
  */
 export function picksWriter(
   picks: readonly StandInPick[] = samSeedPicks(),
@@ -101,7 +104,7 @@ export function picksWriter(
       values: {
         id: call.writer.rowId("pick"),
         owner_person_id: request.caller.personId,
-        position: index + 1,
+        position: pick.position ?? index + 1,
         words: pick.words,
         outcome: pick.outcome,
         kind_id: pick.kindId,

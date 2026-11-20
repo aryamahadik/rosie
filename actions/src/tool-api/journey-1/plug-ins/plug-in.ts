@@ -1,8 +1,9 @@
-// A kind's plug-in as S1-11 loads it (T-634 part 1; DL-961 card E; DL-988): one trade's compiled overlay in the turn's
-// pinned bundle (K-01 v1 tradeOverlay, stored whole under bundle/<hash>/<build>/trade/<trade id>), which K-05 v1.19's
-// table names as S1-11's source ("The 11 blocks of a listed kind, whole": T-1455's README, section "What journey 1's
-// first calls read"). The overlay is narrowed field by field, and refused whole (overlayNotWellFormed) when a field
-// S1-11 loads is not K-01 v1's shape, never read in part:
+// A kind's plug-in as S1-11 loads it (T-634 part 1; DL-961 card E; DL-988; DL-994): one trade's compiled overlay in the
+// turn's pinned bundle (K-01 v1 tradeOverlay, stored whole under bundle/<hash>/<build>/trade/<trade id>), which K-05
+// v1.19's table names as S1-11's source ("The 11 blocks of a listed kind, whole": T-1455's README, section "What journey
+// 1's first calls read"). In S1-02's walk S1-11 loads one kind so, the first kind named (./writer.ts). The overlay is
+// narrowed field by field, and refused whole (overlayNotWellFormed) when a field S1-11 loads is not K-01 v1's shape,
+// never read in part:
 //
 //   - the 11 free-text plug-in blocks (K-01 v1 pluginText; K-24 v1 picked_kind_texts_key_known; T-143's key map sends
 //     each to pluginText/<key>; Q-39's default: stored whole, sub-keys guidance only), each kept byte for byte as the
@@ -25,7 +26,14 @@
 // defaults are K-24's kinds and kind_flows (the catalog seed copies them from these overlays, README rule 7), and the
 // business's own are K-23's company_kinds (S1-04) and flow_defaults (S1-21). So they are loaded here, checked, and handed
 // on with the blocks, from the same overlay, one source in a call (T-1455's README, "T-634 ... reads C5's facts and
-// settings ... from the same overlay"). Nothing here reads the database, logs, or puts a block's words in an error.
+// settings ... from the same overlay"), and written to no row (DL-994 item 3): no column holds the "confirm at S1-21"
+// mark, which is confirmAt below alone. Nothing here reads the database, logs, or puts a block's words in an error.
+//
+// Two defaults (DL-994 item 6). C5_INSURANCE_FACTS is this folder's own copy of C5's list, the same four names in the
+// same order as the compiler's (compiler/src/corrections/c5.ts INSURANCE_FACTS), which actions/ does not import. And
+// loadPlugIn reads only an overlay whose contract is "bundle.v1", the same check as the runtime's bundle reader
+// (runtime/src/bundle/values.ts:106, :130 and :136): a K-01 version that changes that constant changes all four places
+// together.
 
 import type { FlowLetter } from "../../../commit/walk";
 import type { SetupKey } from "../../../gate/framework";

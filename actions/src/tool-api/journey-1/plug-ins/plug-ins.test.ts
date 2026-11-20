@@ -1,14 +1,15 @@
-// T-634 part 1 (DL-961 card E; DL-988): S1-11's read-only step writer, each listed pick's plug-in loaded from the turn's
-// pinned bundle (the 11 pf keys stored whole, with MC C5's fills). Proved on bundle v1 (bundles/v1, T-1460: every trade's
-// compiled overlay) with T-1461's walk doubles (commit/walk/test-support.ts: the bundle v1 port, the question read, the
-// stand-in writers) and this folder's two (./test-support.ts: the trade port over bundle v1, and a stand-in for T-633's
-// S1-02 writer), never of the writer or the walk:
+// T-634 part 1 (DL-961 card E; DL-988; DL-994): S1-11's read-only step writer, the first kind named's plug-in loaded
+// from the turn's pinned bundle (the 11 pf keys stored whole, with MC C5's fills). Proved on bundle v1 (bundles/v1,
+// T-1460: every trade's compiled overlay) with T-1461's walk doubles (commit/walk/test-support.ts: the bundle v1 port,
+// the question read, the stand-in writers) and this folder's two (./test-support.ts: the trade port over bundle v1, and
+// a stand-in for T-633's S1-02 writer), never of the writer or the walk:
 //   - the plan's first two lines: insurance gets facts video, forms, firststeps, documents; each of the 12 trades with no
 //     pf.settings gets arrival "window" and an empty free-cancel time, marked to confirm at S1-21;
-//   - every picked kind gets its 11 pf keys from the pinned overlay, byte for byte (all 243 trades);
+//   - the first kind named gets its 11 pf keys from the pinned overlay, byte for byte (each of the 243 trades as the
+//     first pick), with one overlay read, and no other pick gets any;
 //   - S1-02's answer walks S1-11 with this writer and stops at S1-04's question, with T-633's writer stubbed;
-//   - what it refuses (a kind the bundle lacks, no picks, a pick of another business or not K-24's shape, an overlay not
-//     K-01's), each with nothing written, and the same part twice gives the same writes.
+//   - what it refuses (a first kind the bundle lacks, no picks, a pick of another business or not K-24's shape, an
+//     overlay not K-01's), each with nothing written, and the same part twice gives the same writes.
 
 import { describe, expect, it } from "vitest";
 
@@ -81,8 +82,26 @@ function draftedPick(): StandInPick {
 /** Work Rosie never books (MASTER-FLOW-A S1-02: "Gift cards are never set up either"), kept with no kind (S1-74). */
 const NOT_BOOKED: StandInPick = { words: "gift cards", outcome: "not_booked", kindId: null };
 
-/** A trade-file pick of `kindId`. */
-const listed = (kindId: string): StandInPick => ({ words: kindId, outcome: "listed", kindId });
+/** A trade-file pick of `kindId`, at `position` when given (else its place in the answer). */
+const listed = (kindId: string, position?: number): StandInPick =>
+  position === undefined
+    ? { words: kindId, outcome: "listed", kindId }
+    : { words: kindId, outcome: "listed", kindId, position };
+
+/** Sam's three picks through the stand-in, each picked_kinds insert's `position` as `change` leaves it. */
+function repositioned(change: (values: Record<string, unknown>) => void): StepWriter<WalkTestRepo> {
+  const inner = picksWriter();
+  return async (call) => {
+    const rows = await inner(call);
+    const state = rows.state.map((write): StateWrite => {
+      if (write.op !== "insert") return write;
+      const values = { ...write.values };
+      change(values);
+      return { ...write, values };
+    });
+    return { ...rows, state };
+  };
+}
 
 /** Sam's three picks' kinds (K-24 seed-business-kinds.json): barber, plumber, electrician. */
 function samKinds(): string[] {
@@ -240,75 +259,100 @@ describe("MC C5's fills, as S1-11 loads each kind's plug-in from bundle v1", () 
 });
 
 // ---------------------------------------------------------------------------------------------------------------
-// Every picked kind gets its 11 pf keys from the pinned overlay
+// The first kind named gets its 11 pf keys from the pinned overlay
 
-describe("every picked kind gets its 11 pf keys from the pinned overlay, stored whole", () => {
-  it("Sam's three picks (barber, plumber, electrician) give 33 picked_kind_texts rows, each block its kind's overlay's own", async () => {
-    const { writes } = await answer("c-01");
+describe("the first kind named gets its 11 pf keys from the pinned overlay, stored whole", () => {
+  it("Sam's three picks (barber, plumber, electrician) give 11 picked_kind_texts rows, all the barbershop pick's, with one trade read", async () => {
+    const { writes, tradeReads, context } = await answer("c-01");
     const picks = rowsOf(writes, "picked_kinds").map(valuesOf);
     expect(picks.map((pick) => pick.kind_id)).toEqual(["barber", "plumber", "electrician"]);
-    expect(rowsOf(writes, "picked_kind_texts")).toEqual(
-      picks.flatMap((pick) => expectedTexts(String(pick.id), String(pick.kind_id))),
-    );
-    // In the walk's order: S1-02's picks first, so each pick is inserted before the blocks that name it.
+    expect(picks.map((pick) => pick.position)).toEqual([1, 2, 3]);
+    // The barbershop's now; plumbing's and electrical's when Sam gets to them (MASTER-FLOW-A.md:73).
+    expect(rowsOf(writes, "picked_kind_texts")).toEqual(expectedTexts(String(picks[0]?.id), "barber"));
+    expect(rowsOf(writes, "picked_kind_texts")).toHaveLength(11);
+    // Exactly one overlay read, under the turn's pinned bundle id.
+    expect(tradeReads).toEqual([{ bundleId: bundleV1Id(), tradeId: "barber" }]);
+    expect(tradeReads[0]?.bundleId).toEqual(context.turn.bundleId);
+    expect(writes.gives).toEqual(["kinds", ...PF_TEXT_KEYS]);
+    // In the walk's order: S1-02's picks first, so the pick is inserted before the blocks that name it.
     expect(writes.state.map((write) => write.table)).toEqual([
       ...Array<string>(3).fill("picked_kinds"),
-      ...Array<string>(33).fill("picked_kind_texts"),
+      ...Array<string>(11).fill("picked_kind_texts"),
     ]);
   });
 
-  it("each of bundle v1's 243 trades, picked, gets its 11 blocks from its own overlay, byte for byte, each JSON text", async () => {
+  it("each of bundle v1's 243 trades, loaded, gives its 11 blocks from its own overlay, byte for byte, each JSON text", () => {
     const trades = tradesV1();
     expect(trades).toHaveLength(243);
-    const { writes, tradeReads } = await answer(
-      "c-01",
-      plugInWalk({ s1_02: picksWriter(trades.map(listed)) }),
-    );
-    const texts = rowsOf(writes, "picked_kind_texts").map(valuesOf);
-    expect(texts).toHaveLength(243 * 11);
-    trades.forEach((trade, index) => {
-      const own = texts.slice(index * 11, index * 11 + 11);
-      const blocks = overlayV1(trade).pluginText as Record<string, string>;
-      expect(own.map((text) => text.pf_key)).toEqual([...PF_TEXT_KEYS]);
-      for (const text of own) {
-        expect(text.picked_kind_id, trade).toBe(`pick-s1-02-sam-${String(index + 1)}`);
-        expect(text.block, trade).toBe(blocks[String(text.pf_key)]);
-        expect(() => JSON.parse(String(text.block)) as unknown).not.toThrow();
+    for (const trade of trades) {
+      const overlay = overlayV1(trade);
+      const text = overlay.pluginText as Record<string, string>;
+      const { blocks, kindId } = loadPlugIn(overlay, trade);
+      expect(kindId).toBe(trade);
+      expect(blocks.map((each) => each.key)).toEqual([...PF_TEXT_KEYS]);
+      for (const { key, block } of blocks) {
+        expect(block, trade).toBe(text[key]);
+        expect(() => JSON.parse(block) as unknown).not.toThrow();
       }
-    });
-    expect(tradeReads.map((read) => read.tradeId)).toEqual(trades);
+    }
   });
 
-  it("reads each overlay under the turn's pinned bundle id, once per kind however many picks name it", async () => {
+  it("each of bundle v1's 243 trades, named first, gets its own 11 blocks through the writer with one trade read, and the kind named after it none", async () => {
+    const trades = tradesV1();
+    expect(trades).toHaveLength(243);
+    const next = (index: number): string => String(trades[(index + 1) % trades.length]);
+    for (const [index, trade] of trades.entries()) {
+      const s1_02 = picksWriter([listed(trade), listed(next(index))]);
+      const { writes, tradeReads } = await answer("c-01", plugInWalk({ s1_02 }));
+      expect(rowsOf(writes, "picked_kind_texts"), trade).toEqual(expectedTexts("pick-s1-02-sam-1", trade));
+      expect(
+        tradeReads.map((read) => read.tradeId),
+        trade,
+      ).toEqual([trade]);
+    }
+  }, 60_000);
+
+  it("a later pick of the same kind gets no blocks: the first kind named alone is loaded, with one read", async () => {
     const twice = picksWriter([listed("barber"), listed("plumber"), listed("barber")]);
-    const { writes, tradeReads, context } = await answer("c-01", plugInWalk({ s1_02: twice }));
-    expect(tradeReads).toEqual([
-      { bundleId: bundleV1Id(), tradeId: "barber" },
-      { bundleId: bundleV1Id(), tradeId: "plumber" },
-    ]);
-    expect(tradeReads[0]?.bundleId).toEqual(context.turn.bundleId);
-    // Each pick holds its own set of blocks (K-24: blocks are per pick).
-    expect(rowsOf(writes, "picked_kind_texts")).toEqual([
-      ...expectedTexts("pick-s1-02-sam-1", "barber"),
-      ...expectedTexts("pick-s1-02-sam-2", "plumber"),
-      ...expectedTexts("pick-s1-02-sam-3", "barber"),
-    ]);
+    const { writes, tradeReads } = await answer("c-01", plugInWalk({ s1_02: twice }));
+    expect(tradeReads).toEqual([{ bundleId: bundleV1Id(), tradeId: "barber" }]);
+    expect(rowsOf(writes, "picked_kind_texts")).toEqual(expectedTexts("pick-s1-02-sam-1", "barber"));
   });
 
-  it("a pick placed in the call's business gives blocks of that business, as K-24's composite key holds them", async () => {
+  it("picks at positions 4 and 5 load position 4's kind alone, with one trade read", async () => {
+    const later = picksWriter([listed("plumber", 4), listed("electrician", 5)]);
+    const { writes, tradeReads } = await answer("c-01", plugInWalk({ s1_02: later }));
+    expect(rowsOf(writes, "picked_kinds").map((row) => valuesOf(row).position)).toEqual([4, 5]);
+    expect(rowsOf(writes, "picked_kind_texts")).toEqual(expectedTexts("pick-s1-02-sam-1", "plumber"));
+    expect(tradeReads).toEqual([{ bundleId: bundleV1Id(), tradeId: "plumber" }]);
+    expect(writes.gives).toEqual(["kinds", ...PF_TEXT_KEYS]);
+  });
+
+  it("the lowest position is the first kind named, whatever order S1-02's rows come in; of two at one position, the row given first", async () => {
+    const reversed = picksWriter([listed("electrician", 5), listed("plumber", 4)]);
+    const first = await answer("c-01", plugInWalk({ s1_02: reversed }));
+    expect(rowsOf(first.writes, "picked_kind_texts")).toEqual(expectedTexts("pick-s1-02-sam-2", "plumber"));
+    expect(first.tradeReads.map((read) => read.tradeId)).toEqual(["plumber"]);
+    const tied = picksWriter([listed("electrician", 2), listed("plumber", 2)]);
+    const second = await answer("c-01", plugInWalk({ s1_02: tied }));
+    expect(rowsOf(second.writes, "picked_kind_texts")).toEqual(
+      expectedTexts("pick-s1-02-sam-1", "electrician"),
+    );
+    expect(second.tradeReads.map((read) => read.tradeId)).toEqual(["electrician"]);
+  });
+
+  it("a first pick placed in the call's business gives blocks of that business, as K-24's composite key holds them", async () => {
     const placed = picksWriter(samSeedPicks(), BARBERSHOP);
     const { writes } = await answer("c-01", plugInWalk({ s1_02: placed }));
     const texts = rowsOf(writes, "picked_kind_texts").map(valuesOf);
-    expect(texts).toHaveLength(33);
+    expect(texts).toHaveLength(11);
     expect(new Set(texts.map((text) => text.business_id))).toEqual(new Set([BARBERSHOP]));
     expect(rowsOf(writes, "picked_kind_texts")).toEqual(
-      samKinds().flatMap((kind, index) =>
-        expectedTexts(`pick-s1-02-sam-${String(index + 1)}`, kind, BARBERSHOP),
-      ),
+      expectedTexts("pick-s1-02-sam-1", String(samKinds()[0]), BARBERSHOP),
     );
   });
 
-  it("only listed picks are loaded: a pick drafted as new work and one not booked get no blocks", async () => {
+  it("a listed first kind is loaded, and a pick drafted as new work and one not booked after it get no blocks", async () => {
     const mixed = picksWriter([listed("barber"), draftedPick(), NOT_BOOKED]);
     const { writes, tradeReads } = await answer("c-01", plugInWalk({ s1_02: mixed }));
     expect(rowsOf(writes, "picked_kind_texts")).toEqual(expectedTexts("pick-s1-02-sam-1", "barber"));
@@ -316,9 +360,29 @@ describe("every picked kind gets its 11 pf keys from the pinned overlay, stored 
     expect(writes.gives).toEqual(["kinds", ...PF_TEXT_KEYS]);
   });
 
-  it("with no listed pick, S1-11 writes nothing and gives no pf key", async () => {
-    const none = picksWriter([draftedPick(), NOT_BOOKED]);
-    const { writes, calls, tradeReads } = await answer("c-01", plugInWalk({ s1_02: none }));
+  it("a first kind that is new work loads nothing, even with a listed kind named after it: no read, state [] and gives []", async () => {
+    const draftedFirst = picksWriter([draftedPick(), listed("barber")]);
+    const { writes, calls, tradeReads } = await answer("c-01", plugInWalk({ s1_02: draftedFirst }));
+    expect(calls.map((call) => call.stepId)).toEqual(["S1-02", "S1-11"]);
+    expect(rowsOf(writes, "picked_kind_texts")).toEqual([]);
+    expect(tradeReads).toEqual([]);
+    expect(writes.gives).toEqual(["kinds"]);
+    expect(writes.asks.map((ask) => ask.question.step)).toEqual(["S1-04"]);
+  });
+
+  it("a pick not booked is never the first kind named: the lowest-position kept pick after it is loaded", async () => {
+    const notBookedFirst = picksWriter([NOT_BOOKED, listed("plumber"), listed("barber")]);
+    const { writes, tradeReads } = await answer("c-01", plugInWalk({ s1_02: notBookedFirst }));
+    expect(rowsOf(writes, "picked_kind_texts")).toEqual(expectedTexts("pick-s1-02-sam-2", "plumber"));
+    expect(tradeReads.map((read) => read.tradeId)).toEqual(["plumber"]);
+  });
+
+  it.each([
+    ["only a pick not booked", [NOT_BOOKED]],
+    ["a pick drafted as new work, then one not booked", [draftedPick(), NOT_BOOKED]],
+    ["no pick at all", []],
+  ] as const)("with %s, S1-11 writes nothing and gives no pf key", async (_, picks) => {
+    const { writes, calls, tradeReads } = await answer("c-01", plugInWalk({ s1_02: picksWriter(picks) }));
     expect(calls.map((call) => call.stepId)).toEqual(["S1-02", "S1-11"]);
     expect(rowsOf(writes, "picked_kind_texts")).toEqual([]);
     expect(tradeReads).toEqual([]);
@@ -358,7 +422,7 @@ describe("S1-02's answer walks S1-11 with this writer and stops at S1-04's quest
     for (const named of ["S1-08", "s1-08"]) expect(JSON.stringify(writes)).not.toContain(named);
   });
 
-  it("'One isn't on the list yet' walks S1-03, then S1-11 loads the listed picks alone, then S1-04's question", async () => {
+  it("'One isn't on the list yet' walks S1-03, then S1-11 loads the first kind named, a listed one, then S1-04's question", async () => {
     const mixed = picksWriter([listed("barber"), draftedPick()]);
     const { writes, calls } = await answer("c-02", plugInWalk({ s1_02: mixed }));
     expect(calls.map((call) => call.stepId)).toEqual(["S1-02", "S1-03", "S1-11"]);
@@ -394,7 +458,7 @@ describe("S1-02's answer walks S1-11 with this writer and stops at S1-04's quest
       units: [{ writes, answer: { openQuestionId: "oq-s1-02", optionId: null, eventId: "evt-sam-0001" } }],
     });
     expect(checks.k05("commitTurn.request", request)).toEqual([]);
-    expect(request.writes.state.filter((write) => write.table === "picked_kind_texts")).toHaveLength(33);
+    expect(request.writes.state.filter((write) => write.table === "picked_kind_texts")).toHaveLength(11);
     expect(request.writes.openQuestions.open.map((question) => question.id)).toEqual(["oq-s1-04-sam-1"]);
   });
 
@@ -407,7 +471,8 @@ describe("S1-02's answer walks S1-11 with this writer and stops at S1-04's quest
     expect(second).toEqual(first);
     expect(copy({ part, request: context.request, turn: context.turn })).toEqual(given);
     expect(walk.calls.map((call) => call.stepId)).toEqual(["S1-02", "S1-11", "S1-02", "S1-11"]);
-    expect(walk.tradeReads).toHaveLength(6);
+    // One overlay read a walk: the first kind named's, read again by the repeat (nothing is kept between walks' reads).
+    expect(walk.tradeReads.map((read) => read.tradeId)).toEqual(["barber", "barber"]);
     // The picks are the stand-in's own rows, as it gives them unwrapped.
     const unwrapped = await answer(
       "c-01",
@@ -426,18 +491,30 @@ function writesNothing(): StepWriter<WalkTestRepo> {
 // What S1-11's writer refuses, with nothing written
 
 describe("what S1-11's writer refuses: the call fails closed with nothing written", () => {
-  it("a pick whose kind the pinned bundle holds no overlay for (match-kinds.json's illustrative ids) is refused", async () => {
+  it("a first kind the pinned bundle holds no overlay for (match-kinds.json's illustrative ids) is refused, after its one read", async () => {
     // commit/walk/test-support.ts's stand-in gives match-kinds.json's kind ids (barbershop, plumbing, electrical: "The
     // kind ids illustrate K-24's id form"), which bundle v1 holds no overlay for.
     const { error, tradeReads } = await refusal("c-01", plugInWalk({ s1_02: s1_02Writer }));
     expectRefused(error, "kindNotInBundle", ["S1-11", "barbershop"]);
-    expect(tradeReads.map((read) => read.tradeId)).toEqual(["barbershop", "plumbing", "electrical"]);
+    expect(tradeReads.map((read) => read.tradeId)).toEqual(["barbershop"]);
   });
 
-  it("one kind the pinned bundle answers none for refuses the whole part, whatever the other kinds hold", async () => {
-    const { error, tradeReads } = await refusal("c-01", plugInWalk({ overlays: { plumber: null } }));
-    expectRefused(error, "kindNotInBundle", ["S1-11", "plumber"]);
-    expect(tradeReads.map((read) => read.tradeId)).toEqual(samKinds());
+  it("the first kind named, when the pinned bundle answers none for it, refuses the whole part, whatever the other kinds hold", async () => {
+    const { error, tradeReads } = await refusal("c-01", plugInWalk({ overlays: { barber: null } }));
+    expectRefused(error, "kindNotInBundle", ["S1-11", "barber"]);
+    expect(tradeReads.map((read) => read.tradeId)).toEqual(["barber"]);
+  });
+
+  it("a later kind with no overlay, or one not K-01's, no longer refuses the part: it is never read", async () => {
+    const overlays = { plumber: null, electrician: { contract: "bundle.v2" } };
+    const { writes, tradeReads } = await answer("c-01", plugInWalk({ overlays }));
+    expect(rowsOf(writes, "picked_kind_texts")).toEqual(expectedTexts("pick-s1-02-sam-1", "barber"));
+    expect(tradeReads.map((read) => read.tradeId)).toEqual(["barber"]);
+    // A later pick whose kind bundle v1 never held (match-kinds.json's illustrative id) is not read either.
+    const unknownLater = picksWriter([listed("barber"), listed("plumbing")]);
+    const second = await answer("c-01", plugInWalk({ s1_02: unknownLater }));
+    expect(second.tradeReads.map((read) => read.tradeId)).toEqual(["barber"]);
+    expect(rowsOf(second.writes, "picked_kind_texts")).toHaveLength(11);
   });
 
   it("S1-11 walked with no picks kept from S1-02's writer (bound without `kinds`) is refused (noPicks)", async () => {
@@ -450,7 +527,7 @@ describe("what S1-11's writer refuses: the call fails closed with nothing writte
     const walk = plugInWalk();
     const { part, context } = turnTwoOnV1("c-01");
     await walk.writesOf(part, context, NOTHING_OPEN);
-    expect(walk.tradeReads).toHaveLength(3);
+    expect(walk.tradeReads).toHaveLength(1);
     // The same S1-11 writer in another turn's walk, whose S1-02 never ran through `kinds`, finds no picks.
     const other = turnTwoOnV1("c-01");
     const lone = createWritesOf<WalkTestRepo>({
@@ -464,7 +541,7 @@ describe("what S1-11's writer refuses: the call fails closed with nothing writte
       (thrown: unknown) => thrown,
     );
     expectRefused(error, "noPicks");
-    expect(walk.tradeReads).toHaveLength(3);
+    expect(walk.tradeReads).toHaveLength(1);
   });
 
   it("a pick of another business than the call's is refused (pickOtherBusiness)", async () => {
@@ -491,6 +568,27 @@ describe("what S1-11's writer refuses: the call fails closed with nothing writte
     expectRefused(error, "pickNotWellFormed");
     expect(tradeReads).toEqual([]);
   });
+
+  it.each([
+    ["no position", undefined],
+    ["position 0", 0],
+    ["a position that is no whole number", 1.5],
+    ["a position given as text", "1"],
+    ["a position that is no number", Number.NaN],
+  ] as const)(
+    "a pick with %s is not K-24's shape, even a later one: refused (pickNotWellFormed)",
+    async (_, position) => {
+      // Sam's third pick alone is changed: the first kind named is well formed, and the part is still refused.
+      const s1_02 = repositioned((values) => {
+        if (values.position !== 3) return;
+        if (position === undefined) Reflect.deleteProperty(values, "position");
+        else values.position = position;
+      });
+      const { error, tradeReads } = await refusal("c-01", plugInWalk({ s1_02 }));
+      expectRefused(error, "pickNotWellFormed");
+      expect(tradeReads).toEqual([]);
+    },
+  );
 
   it("a malformed pick refuses S1-11 alone: S1-02's rows still pass through `kinds` when S1-11 is not walked", async () => {
     const bad = picksWriter([{ words: "gift cards", outcome: "not_booked", kindId: "florist" }]);
