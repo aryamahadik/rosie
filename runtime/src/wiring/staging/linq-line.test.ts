@@ -19,13 +19,14 @@
 // and never the chat id or a number; Rosie's own reaction, a sent receipt and a failed poll on the known chat are placed
 // too; a message.received and the test-phone page's own events verify as before and never ask the lookup.
 //
-// T-1465 (DL-978: four Linq events answered 503 handoffFailed right after the delivered receipt): which kinds fail after
-// the chat is placed. Through the root's own Linq route and receipt door, a message.sent (on iMessage, RCS, SMS or no
-// service reported), a message.failed and a poll.failed on the known chat are each placed by one lookup and then refused
-// by the root's receipt door before its store is asked anything (../root.ts deliveredStatusOf, a WiringError): 503, the
-// receive span failed handoffFailed and already naming the kind, the failure line naming WiringError alone, nothing
-// marked. The handle's actor is never reached by a receipt; ./linq-line.worker.test.ts runs the same kinds, and Rosie's own
-// reaction, over the HandleActor.
+// T-1465 (DL-978: four Linq events answered 503 handoffFailed right after the delivered receipt; DL-997): each receipt
+// kind after the chat is placed, through the root's own Linq route and receipt door. A message.sent that is no delivery
+// receipt (on iMessage, RCS or no service reported) is placed by one lookup and answered 200, written with nothing marked
+// and no failure line, and so is Linq's repeat of it. A message.sent on SMS, a message.failed and a poll.failed are placed
+// and then still refused by the door before its store is asked anything (../root.ts deliveredStatusOf, a WiringError
+// carrying a label): 503, the receive span failed handoffFailed and naming the kind, the failure line naming the kind and
+// the refusal's label (smsSentReceiptNoDoor, failedReceiptNoDoor), nothing marked. The handle's actor is never reached by
+// a receipt; ./linq-line.worker.test.ts runs the same kinds, and Rosie's own reaction, over the HandleActor.
 import { createLinqWebhookDouble } from "@rosie/adapters/linq/double-webhooks";
 import deliveredJson from "@rosie/contracts/inbound-event/fixtures/delivered.json";
 import pollFailedJson from "@rosie/contracts/inbound-event/fixtures/poll-failed.json";
@@ -962,21 +963,28 @@ function sentOn(service: "imessage" | "rcs" | "sms" | null, clock: TestClock): L
 }
 
 /**
- * The receipts Linq posts about a part beside its message.delivered (T-1465; DL-978's four 503s), each with its answer
- * as the root's receipt door gives it today: ../root.ts deliveredStatusOf has a door for a delivered receipt alone, so
- * every sent and every failed receipt is refused there (503, and Linq sends it again). A failed receipt, and a sent one on
- * SMS (the SMS delivery receipt: ../../clocks/due.ts isDeliveryReceipt; arch 02 step 9), are a part's news the dispatcher
- * or the clock arming must act on; a sent receipt on any other service is acted on by no one by design, and its 503 is
- * what staging answered after Rosie's first delivered reply.
+ * The sent receipts no one acts on by design (T-1465; DL-997 item 2): a message.sent that is no delivery receipt, on any
+ * service but SMS, none reported included (../../clocks/due.ts isDeliveryReceipt; arch 02 step 9). The root's receipt
+ * door answers each written with nothing marked, so the gateway answers 200 and Linq does not send it again. These are
+ * what staging answered 503 after Rosie's first delivered reply (DL-978).
  */
-const REFUSED_RECEIPTS: readonly (readonly [string, number, (clock: TestClock) => LinqInboundEvent])[] = [
-  ["a message.sent on iMessage", 503, (clock) => sentOn("imessage", clock)],
-  ["a message.sent on RCS", 503, (clock) => sentOn("rcs", clock)],
-  ["a message.sent that reports no service", 503, (clock) => sentOn(null, clock)],
-  ["a message.sent on SMS", 503, (clock) => sentOn("sms", clock)],
+const SENT_TAKEN: readonly (readonly [string, (clock: TestClock) => LinqInboundEvent])[] = [
+  ["a message.sent on iMessage", (clock) => sentOn("imessage", clock)],
+  ["a message.sent on RCS", (clock) => sentOn("rcs", clock)],
+  ["a message.sent that reports no service", (clock) => sentOn(null, clock)],
+];
+
+/**
+ * The receipts the root's receipt door still refuses (T-1465; DL-997 item 3), each with the label its refusal carries: a
+ * failed receipt (the dispatcher's retry or next way, arch 02 step 8) and a sent one on SMS (SMS's delivery receipt,
+ * which arms the clock, arch 02 step 9) are a part's news that must be acted on, and no door acts on them yet. Each stays
+ * 503, so Linq's retry keeps it.
+ */
+const STILL_REFUSED: readonly (readonly [string, string, (clock: TestClock) => LinqInboundEvent])[] = [
+  ["a message.sent on SMS", "smsSentReceiptNoDoor", (clock) => sentOn("sms", clock)],
   [
     "a message.failed",
-    503,
+    "failedReceiptNoDoor",
     (clock) => {
       const event = onChat(pollFailedJson, KNOWN_CHAT, clock, "evt-t1465-failed-0001");
       return {
@@ -989,7 +997,11 @@ const REFUSED_RECEIPTS: readonly (readonly [string, number, (clock: TestClock) =
       };
     },
   ],
-  ["a poll.failed", 503, (clock) => onChat(pollFailedJson, KNOWN_CHAT, clock, "evt-t1465-poll-failed-0001")],
+  [
+    "a poll.failed",
+    "failedReceiptNoDoor",
+    (clock) => onChat(pollFailedJson, KNOWN_CHAT, clock, "evt-t1465-poll-failed-0001"),
+  ],
 ];
 
 describe("Linq's signed receipts through the gateway's Linq entry, with the root's verify on the real line (T-1456)", () => {
@@ -1117,9 +1129,49 @@ describe("Linq's signed receipts through the gateway's Linq entry, with the root
     },
   );
 
-  it.each(REFUSED_RECEIPTS)(
-    "T-1465, %s on the known chat, through the root's own route: placed by one lookup, then answered %i by the root's receipt door",
-    async (_name, answered, eventOf) => {
+  it.each(SENT_TAKEN)(
+    "T-1465, %s on the known chat, through the root's own route: placed by one lookup, then answered 200 by the root's receipt door, written with nothing marked; Linq's repeat is answered 200 the same way",
+    async (_name, eventOf) => {
+      const rig = gatewayRig();
+      const event = eventOf(rig.clock);
+      const webhook = await createLinqWebhookDouble({ secret: rig.linqSecret }).sign({
+        event,
+        partKey: PART_KEY,
+      });
+
+      const response = await rig.root.linqWebhook(post(webhook));
+      const again = await rig.root.linqWebhook(post(webhook));
+
+      expect([response.status, again.status]).toEqual([200, 200]);
+      const traceId = response.headers.get("x-trace-id");
+      expect(await response.json()).toEqual({ ok: true, trace_id: traceId });
+      // The chat was placed each time: the verify's one read answered the roster phone, and the event reached the door.
+      expect(rig.lookup.calls).toEqual([
+        { side: "runtime", call: READ_CHAT_HANDLE_CALL },
+        { side: "runtime", call: READ_CHAT_HANDLE_CALL },
+      ]);
+      // The receive span names the kind (and the service, where Linq reports one): a receipt, so not sealed to an actor.
+      const got = event.service === null ? { kind: "sent" } : { kind: "sent", service: event.service };
+      const taken = {
+        outcome: "ok",
+        error_code: null,
+        got,
+        decided: { signatureValid: true, knownEventId: false, answered: 200 },
+      };
+      expect(receiveSpans(rig.logged())).toEqual([
+        expect.objectContaining({ ...taken, trace_id: traceId }),
+        expect.objectContaining({ ...taken, trace_id: again.headers.get("x-trace-id") }),
+      ]);
+      // Acted on by no one: the door's store is asked nothing, so no part is marked, and nothing failed.
+      expect(rig.fakes.dispatch.partMarks).toEqual([]);
+      expect(jsonLines(rig.logged(), "gateway_failed")).toEqual([]);
+      expectNoChatIdOrNumber([...rig.logged(), ...rig.lookup.written]);
+    },
+  );
+
+  it.each(STILL_REFUSED)(
+    "T-1465, %s on the known chat, through the root's own route: placed by one lookup, then still refused by the root's receipt door (503), the failure line naming its kind and the refusal %s",
+    async (_name, refusal, eventOf) => {
       const rig = gatewayRig();
       const event = eventOf(rig.clock);
       const webhook = await createLinqWebhookDouble({ secret: rig.linqSecret }).sign({
@@ -1129,12 +1181,12 @@ describe("Linq's signed receipts through the gateway's Linq entry, with the root
 
       const response = await rig.root.linqWebhook(post(webhook));
 
-      expect(response.status).toBe(answered);
+      expect(response.status).toBe(503);
       const traceId = response.headers.get("x-trace-id");
       expect(await response.json()).toEqual({ ok: false, error: "unavailable", trace_id: traceId });
       // The chat was placed: the verify's one read answered the roster phone, and the event reached the hand-off.
       expect(rig.lookup.calls).toEqual([{ side: "runtime", call: READ_CHAT_HANDLE_CALL }]);
-      // The receive span already names the kind (and the service, where Linq reports one) beside handoffFailed.
+      // The receive span names the kind (and the service, where Linq reports one) beside handoffFailed.
       expect(receiveSpans(rig.logged())).toEqual([
         expect.objectContaining({
           trace_id: traceId,
@@ -1144,10 +1196,19 @@ describe("Linq's signed receipts through the gateway's Linq entry, with the root
           decided: { signatureValid: true, answered: 503 },
         }),
       ]);
-      // The refusal is the root's receipt door's own (../root.ts deliveredStatusOf: "only a delivered receipt has a door
-      // yet"), thrown before its store is asked anything: the handle's actor is never reached, and nothing is marked.
+      // The refusal is the root's receipt door's own (../root.ts deliveredStatusOf), thrown before its store is asked
+      // anything: the handle's actor is never reached, and nothing is marked. The failure line names the event's kind and
+      // the refusal's label, each from its closed list, and no chat id, number or field value.
       expect(jsonLines(rig.logged(), "gateway_failed")).toEqual([
-        { level: "error", msg: "gateway_failed", trace_id: traceId, stage: "handoff", error: "WiringError" },
+        {
+          level: "error",
+          msg: "gateway_failed",
+          trace_id: traceId,
+          stage: "handoff",
+          error: "WiringError",
+          kind: event.kind,
+          refusal,
+        },
       ]);
       expect(rig.fakes.dispatch.partMarks).toEqual([]);
       expectNoChatIdOrNumber([...rig.logged(), ...rig.lookup.written]);

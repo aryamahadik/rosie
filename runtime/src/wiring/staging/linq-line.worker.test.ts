@@ -30,10 +30,11 @@
 //     kind about the roster phone's chat, placed by the real line's lookup (db/repo's readChatHandle over a stand-in for
 //     PostgreSQL), through the root's own Linq route, the HandleActor and the root's own receipt door: a
 //     message.delivered is answered 200 as before, its part marked delivered; Rosie's own reaction is answered 200,
-//     written once to the roster phone's actor, which starts no turn for it; a message.sent (iMessage, SMS) and a
-//     poll.failed are refused by the root's receipt door before its store is asked anything (../root.ts
-//     deliveredStatusOf), answered 503 handoffFailed, the failure line naming WiringError alone, and never reach the
-//     actor.
+//     written once to the roster phone's actor, which starts no turn for it; a message.sent on iMessage (no delivery
+//     receipt) is answered 200 by the root's receipt door, written with nothing marked and no failure line (DL-997); a
+//     message.sent on SMS and a poll.failed are still refused by the root's receipt door before its store is asked
+//     anything (../root.ts deliveredStatusOf), answered 503 handoffFailed, the failure line naming the kind and the
+//     refusal's label (smsSentReceiptNoDoor, failedReceiptNoDoor); none reaches the actor.
 // Test values only (rule 9): K-11's and K-21's fixtures and vendor samples, whole fiction-range numbers (555-01xx), a
 // made-up key and made-up secrets.
 import { createLinqWebhookDouble } from "@rosie/adapters/linq/double-webhooks";
@@ -937,19 +938,23 @@ async function rosterActorHolds(): Promise<{ inbox: string[]; batches: number }>
   }));
 }
 
-/** The receipts the root's receipt door refuses today, as Linq posts them about the roster phone's part (DL-978). */
-const DOOR_REFUSES: readonly (readonly [string, () => LinqInboundEvent, string | null])[] = [
-  [
-    "a message.sent on iMessage",
-    () => ({ ...rosterEvent(sentJson, "evt-t1465-sent-0001"), service: "imessage" }),
-    ROSTER_PART_KEY,
-  ],
+/**
+ * The receipts the root's receipt door still refuses, as Linq posts them about the roster phone's part, each with the
+ * label its refusal carries (DL-997 item 3): they must be acted on, and no door acts on them yet.
+ */
+const DOOR_REFUSES: readonly (readonly [string, () => LinqInboundEvent, string | null, string])[] = [
   [
     "a message.sent on SMS (sent.json's own service)",
     () => rosterEvent(sentJson, "evt-t1465-sent-sms-0001"),
     ROSTER_PART_KEY,
+    "smsSentReceiptNoDoor",
   ],
-  ["a poll.failed (poll-failed.json)", () => rosterEvent(pollFailedJson, "evt-t1465-poll-failed-0001"), null],
+  [
+    "a poll.failed (poll-failed.json)",
+    () => rosterEvent(pollFailedJson, "evt-t1465-poll-failed-0001"),
+    null,
+    "failedReceiptNoDoor",
+  ],
 ];
 
 describe("T-1465 (DL-978): each Linq event kind about the roster phone's chat, placed by the real line's lookup, through the root's own Linq route, the HandleActor and the root's receipt door", () => {
@@ -1019,10 +1024,42 @@ describe("T-1465 (DL-978): each Linq event kind about the roster phone's chat, p
     },
   );
 
-  it.each(DOOR_REFUSES)(
-    "%s: the chat is placed, then the root's receipt door refuses it before its store is asked anything (../root.ts deliveredStatusOf): 503 handoffFailed, the failure line naming WiringError alone; the actor is never reached",
+  it(
+    "a message.sent on iMessage (no delivery receipt): the chat is placed, then the root's receipt door answers it written with nothing marked, so 200 and no failure line; Linq's repeat is answered 200 the same way; the actor is never reached",
     { timeout: TEST_MS },
-    async (_name, eventOf, partKey) => {
+    async () => {
+      const run = kindsRig();
+      try {
+        const sent = { ...rosterEvent(sentJson, "evt-t1465-sent-0001"), service: "imessage" as const };
+
+        const first = await run.post(sent, ROSTER_PART_KEY);
+        const again = await run.post(sent, ROSTER_PART_KEY);
+
+        expect([first.status, again.status]).toEqual([200, 200]);
+        expect(run.dbCalls).toEqual(["readChatHandle", "readChatHandle"]);
+        for (const answer of [first, again]) {
+          expect(gatewayReceive(answer.traceId)).toMatchObject({
+            outcome: "ok",
+            error_code: null,
+            got: { kind: "sent", service: "imessage" },
+            decided: { signatureValid: true, knownEventId: false, answered: 200 },
+          });
+        }
+        expect(run.fakes.dispatch.partMarks).toEqual([]);
+        expect(linesOf("gateway_failed")).toEqual([]);
+        expect(await rosterActorHolds()).toEqual({ inbox: [], batches: 0 });
+        expectNothingLeaked([run.linqSecret]);
+        for (const line of logged) expect(line.includes(ROSTER_CHAT), "a line holds the chat id").toBe(false);
+      } finally {
+        run.restore();
+      }
+    },
+  );
+
+  it.each(DOOR_REFUSES)(
+    "%s: the chat is placed, then the root's receipt door still refuses it before its store is asked anything (../root.ts deliveredStatusOf): 503 handoffFailed, the failure line naming its kind and the refusal's label; the actor is never reached",
+    { timeout: TEST_MS },
+    async (_name, eventOf, partKey, refusal) => {
       const run = kindsRig();
       try {
         const event = eventOf();
@@ -1044,6 +1081,8 @@ describe("T-1465 (DL-978): each Linq event kind about the roster phone's chat, p
             trace_id: answer.traceId,
             stage: "handoff",
             error: "WiringError",
+            kind: event.kind,
+            refusal,
           },
         ]);
         expect(run.fakes.dispatch.partMarks).toEqual([]);
