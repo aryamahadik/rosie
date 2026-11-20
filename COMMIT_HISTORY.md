@@ -2,9 +2,57 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 794, [`9ae503d`](https://github.com/aryamahadik/rosie/commit/9ae503d), 2026-11-20 08:08:03 UTC.
+- **Through:** commit 796, [`e7eea15`](https://github.com/aryamahadik/rosie/commit/e7eea15), 2026-11-20 08:42:05 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 796. docs: COMMIT\_HISTORY.md through commit 794 (9ae503d, \#805) (\#807)
+
+- **Commit:** [`e7eea15`](https://github.com/aryamahadik/rosie/commit/e7eea15), by Arya Mahadik, 2026-11-20 08:42:05 UTC
+- **Pull request:** [#807](https://github.com/aryamahadik/rosie/pull/807) from `task/commit-history-183`, merged 2026-11-20 08:42:06 UTC. It squashed 1 branch commit:
+  - `06669f5` docs: COMMIT\_HISTORY.md through commit 794 (9ae503d, \#805)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 795. T-633: S1-02's, S1-03's and S1-74's read-only step writers: the owner's kinds of work kept as picked\_kinds rows, new work drafted (drafting), work Rosie never books kept as a not\_booked pick; the matchKinds handler (DL-961 card D, DL-994) (\#806)
+
+- **Commit:** [`0cbe392`](https://github.com/aryamahadik/rosie/commit/0cbe392), by Arya Mahadik, 2026-11-20 08:42:02 UTC
+- **Pull request:** [#806](https://github.com/aryamahadik/rosie/pull/806) from `task/T-633`, merged 2026-11-20 08:42:02 UTC. It squashed 3 branch commits:
+  - `9d193ac` T-633: unchecked snapshot of the builder's work when the usage limit …
+  - `2c987a2` T-633: round 2 (DL-994): S1-03's walk-time writer drafts new work in …
+  - `0c55611` T-633: the tests type-check and are formatted: the commit port is han…
+- **Files changed:** 9 (+2561 −2), by folder:
+  - `actions/src/tool-api/journey-1/kinds/` answer.ts +281 −0, errors.ts +110 −0, index.ts +57 −2, kinds.int.test.ts +369 −0, kinds.test.ts +1016 −0, match-kinds.ts +54 −0, reads.ts +128 −0, test-support.ts +228 −0, writers.ts +318 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-633: unchecked snapshot of the builder's work when the usage limit stopped run 1 (wf_fbc41ad0-65e, about 05:43Z Nov 20): journey-1/kinds step writers, matcher call, reads and tests; no check has been run on this commit (DL-992)
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-633: round 2 (DL-994): S1-03's walk-time writer drafts new work in state drafting and opens no review item; the review item's plan is its own exported function (newWorkReviewPlan); unit cases for a failed read, the not_booked pick and a word two kinds fit; the integration test reads the picks back through readPickedKinds
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-633: the tests type-check and are formatted: the commit port is handed its call context, notBuiltHandlers takes no type argument
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 794. docs: COMMIT\_HISTORY.md through commit 792 (eebeaa5, \#803) (\#805)
 
