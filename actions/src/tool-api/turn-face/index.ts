@@ -12,6 +12,7 @@ export {
   openHoldsPort,
   pinnedSafetyLines,
   safetyReaderOf,
+  signUpStepWriters,
   turnCommitDeps,
   turnLimits,
   type CommitAt,
@@ -21,6 +22,7 @@ export {
   type OpenHoldsAnswer,
   type OpenHoldsRequest,
   type SafetyReads,
+  type SignUpWriterDeps,
   type TurnCommitBinding,
 } from "./commit";
 export {
@@ -45,6 +47,7 @@ export {
   pgSafetyReads,
   pgTurnCalls,
   pgTurnFace,
+  pgWalkQuestions,
   type PgKeywordDoorOptions,
   type PgTurnCallsOptions,
 } from "./pg";
