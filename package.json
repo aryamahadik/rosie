@@ -23,7 +23,7 @@
   "scripts": {
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "eslint . --max-warnings=0",
+    "lint": "node --max-old-space-size=8192 node_modules/eslint/bin/eslint.js . --max-warnings=0",
     "typecheck": "tsc --noEmit -p . && tsc --noEmit -p db/tsconfig.erasable.json",
     "pretest": "npm run build:validators",
     "test": "vitest run --project unit --project workers --project contract",
