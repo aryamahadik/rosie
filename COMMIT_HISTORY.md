@@ -2,9 +2,43 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 803, [`5eb144e`](https://github.com/aryamahadik/rosie/commit/5eb144e), 2026-11-20 13:01:55 UTC.
+- **Through:** commit 805, [`187aa91`](https://github.com/aryamahadik/rosie/commit/187aa91), 2026-11-20 13:36:41 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 805. docs: COMMIT\_HISTORY.md through commit 803 (5eb144e, \#814) (\#817)
+
+- **Commit:** [`187aa91`](https://github.com/aryamahadik/rosie/commit/187aa91), by Arya Mahadik, 2026-11-20 13:36:41 UTC
+- **Pull request:** [#817](https://github.com/aryamahadik/rosie/pull/817) from `task/commit-history-187`, merged 2026-11-20 13:36:41 UTC. It squashed 1 branch commit:
+  - `81923e5` docs: COMMIT\_HISTORY.md through commit 803 (5eb144e, \#814)
+- **Files changed:** 1 (+45 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +45 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 804. T-1472: K-04 core v1.2, frozen: outbox\_rows.step and line\_no (both or neither) with three CHECKs; three refused twins whose rows load the row with both; README section v1.2, defaults 19 to 29, v1.2 gaps 1 to 6 (DL-999, K-05 open gap 29) (\#813)
+
+- **Commit:** [`82b203f`](https://github.com/aryamahadik/rosie/commit/82b203f), by Arya Mahadik, 2026-11-20 13:36:37 UTC
+- **Pull request:** [#813](https://github.com/aryamahadik/rosie/pull/813) from `task/T-1472`, merged 2026-11-20 13:36:37 UTC. It squashed 1 branch commit:
+  - `7a36917` T-1472: K-04 core v1.2, frozen: outbox\_rows.step and line\_no (both or…
+- **Files changed:** 7 (+4228 −5), by folder:
+  - `contracts/db-schema/core/` README.md +83 −4, core.v1.2.tables.json +3841 −0, frozen.json +1 −1
+  - `contracts/db-schema/core/fixtures/` index.json +24 −0
+  - `contracts/db-schema/core/fixtures/invalid/` refuse-outbox-row-negative-line.json +93 −0, refuse-outbox-row-step-not-a-step-id.json +93 −0, refuse-outbox-row-step-without-line.json +93 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 803. docs: COMMIT\_HISTORY.md through commit 801 (c17d5a3, \#811) (\#814)
 
