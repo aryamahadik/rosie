@@ -2,9 +2,54 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 796, [`e7eea15`](https://github.com/aryamahadik/rosie/commit/e7eea15), 2026-11-20 08:42:05 UTC.
+- **Through:** commit 798, [`fed38f5`](https://github.com/aryamahadik/rosie/commit/fed38f5), 2026-11-20 09:13:12 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 798. docs: COMMIT\_HISTORY.md through commit 796 (e7eea15, \#807) (\#809)
+
+- **Commit:** [`fed38f5`](https://github.com/aryamahadik/rosie/commit/fed38f5), by Arya Mahadik, 2026-11-20 09:13:12 UTC
+- **Pull request:** [#809](https://github.com/aryamahadik/rosie/pull/809) from `task/commit-history-184`, merged 2026-11-20 09:13:13 UTC. It squashed 1 branch commit:
+  - `fb41f62` docs: COMMIT\_HISTORY.md through commit 796 (e7eea15, \#807)
+- **Files changed:** 1 (+49 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +49 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 797. T-1465: a sent receipt that is no delivery receipt is answered 200 with nothing marked, not 503; failed receipts and SMS's sent receipt stay 503; the hand-off failure line names the event's kind and a refusal label (DL-978, DL-997) (\#808)
+
+- **Commit:** [`a5ed40a`](https://github.com/aryamahadik/rosie/commit/a5ed40a), by Arya Mahadik, 2026-11-20 09:13:08 UTC
+- **Pull request:** [#808](https://github.com/aryamahadik/rosie/pull/808) from `task/T-1465`, merged 2026-11-20 09:13:08 UTC. It squashed 2 branch commits:
+  - `fb975fb` T-1465: tests find which Linq event kinds fail after the chat is plac…
+  - `fea7fee` T-1465: the root's receipt door answers a sent receipt that is no del…
+- **Files changed:** 8 (+767 −13), by folder:
+  - `runtime/src/gateway/` answer.test.ts +174 −1, answer.ts +61 −3, linq-webhook.ts +6 −2, linq-webhook.worker.test.ts +46 −0
+  - `runtime/src/wiring/` hop13.worker.test.ts +4 −0, root.ts +41 −7
+  - `runtime/src/wiring/staging/` linq-line.test.ts +142 −0, linq-line.worker.test.ts +293 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1465: tests find which Linq event kinds fail after the chat is placed: through the root's own route on the real line, every sent and failed receipt is refused by the root's receipt door (root.ts deliveredStatusOf, WiringError) before its store is asked, 503 handoffFailed; the delivered receipt and Rosie's own reaction are answered 200; no source change (the fix is outside the card's paths: NEED)
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1465: the root's receipt door answers a sent receipt that is no delivery receipt (any service but SMS, none reported included) written with nothing marked, so the gateway answers 200; failed, poll.failed and sent on SMS stay 503, each refusal a WiringError carrying a label from the gateway's closed list (HANDOFF_REFUSALS); the hand-off's failure line gains the event's kind and the refusal's label, never a field value; hop13's pinned line holds the two new fields (DL-978, DL-997)
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 796. docs: COMMIT\_HISTORY.md through commit 794 (9ae503d, \#805) (\#807)
 
