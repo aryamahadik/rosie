@@ -43,6 +43,10 @@
 // row that went missing is written again as the first run wrote it. A clash on any other key (a second pick for one
 // company kind) is an error, and the transaction rolls back. Nothing is printed: the caller prints the counts this
 // returns.
+//
+// The catalog part, kinds and kind_flows from the checked trade files (catalogPlanOf, insertCatalog), is shared with the
+// kinds catalog set (kinds-catalog.ts, T-1469), which writes those two tables alone, with no demo shop's pick, so a
+// database with no demo shop (staging) gets the same catalog.
 import { createHash } from "node:crypto";
 import { lstatSync, readdirSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
@@ -174,6 +178,19 @@ export interface KindsSeedRows {
 }
 
 export type KindsSeedTable = keyof KindsSeedRows;
+
+/** K-24's catalog: the two tables of kinds of work every business picks from (scope none). */
+export type KindsCatalogTable = "kinds" | "kind_flows";
+
+/** The catalog's rows alone: what kinds-catalog.ts writes (T-1469), and the first two tables this seed writes. */
+export type KindsCatalogRows = Pick<KindsSeedRows, KindsCatalogTable>;
+
+/** K-24's catalog, planned from the trade files alone (catalogPlanOf). */
+export interface KindsCatalogPlan {
+  readonly rows: KindsCatalogRows;
+  /** One entry per kind, in code-point order of id. */
+  readonly kinds: readonly SeededKind[];
+}
 
 /** A setting a flow took MC C5's start value for, because its trade file gives none. */
 export type StartedSetting = "arrive" | "cutoff";
@@ -532,23 +549,27 @@ function flowRowOf(read: ReadTrade, flow: Flow): { row: KindFlowSeedRow; started
   };
 }
 
-/**
- * Plans every row of the kinds seed from the two verified sets (pure: no database). Kinds are taken in code-point order
- * of id; the demo shops in the setup seed's order, so each pick names the company kind that seed plans.
- */
-export function kindsPlanOf(shops: VerifiedFixtureSet, trades: VerifiedTradeSet): KindsSeedPlan {
+/** Every trade file of the set, read through T-133's loader (readTrades); a set with none is refused. */
+function tradesOf(trades: VerifiedTradeSet): ReadTrade[] {
   const read = readTrades(trades);
   if (read.length === 0) {
     throw new Error(`the trade files' set at ${trades.dir} has no trade file under ${TRADES_DIR}`);
   }
-  const byId = new Map(read.map((entry) => [entry.trade.id, entry]));
-  const textKeys = textBlockKeys();
+  return read;
+}
 
+/**
+ * K-24's catalog from the trade files read (pure): one kinds row per trade file and its two kind_flows rows, in the order
+ * read (code-point order of id), with insurance's facts from cpa.json and MC C5's start values (see the top of this file).
+ */
+function catalogOf(read: readonly ReadTrade[]): {
+  rows: { kinds: KindSeedRow[]; kind_flows: KindFlowSeedRow[] };
+  kinds: SeededKind[];
+} {
+  const byId = new Map(read.map((entry) => [entry.trade.id, entry]));
   const rows = {
     kinds: [] as KindSeedRow[],
     kind_flows: [] as KindFlowSeedRow[],
-    picked_kinds: [] as PickedKindSeedRow[],
-    picked_kind_texts: [] as PickedKindTextSeedRow[],
   };
   const kinds: SeededKind[] = [];
   for (const entry of read) {
@@ -585,6 +606,32 @@ export function kindsPlanOf(shops: VerifiedFixtureSet, trades: VerifiedTradeSet)
     }
     kinds.push({ kindId: trade.id, source: file.path, sha256: file.sha256, valuesFrom, startValues });
   }
+  return { rows, kinds };
+}
+
+/**
+ * Plans K-24's catalog alone from the verified trade files' set (pure: no database): the kinds and kind_flows rows and
+ * one entry per kind, exactly as kindsPlanOf plans them, with no demo shop read (the kinds catalog set, T-1469).
+ */
+export function catalogPlanOf(trades: VerifiedTradeSet): KindsCatalogPlan {
+  return catalogOf(tradesOf(trades));
+}
+
+/**
+ * Plans every row of the kinds seed from the two verified sets (pure: no database). Kinds are taken in code-point order
+ * of id; the demo shops in the setup seed's order, so each pick names the company kind that seed plans.
+ */
+export function kindsPlanOf(shops: VerifiedFixtureSet, trades: VerifiedTradeSet): KindsSeedPlan {
+  const read = tradesOf(trades);
+  const byId = new Map(read.map((entry) => [entry.trade.id, entry]));
+  const textKeys = textBlockKeys();
+  const catalog = catalogOf(read);
+
+  const rows = {
+    ...catalog.rows,
+    picked_kinds: [] as PickedKindSeedRow[],
+    picked_kind_texts: [] as PickedKindTextSeedRow[],
+  };
 
   const setup = setupPlanOf(shops);
   const nameOf = new Map(setup.rows.companies.map((company) => [company.id, company.name]));
@@ -638,7 +685,7 @@ export function kindsPlanOf(shops: VerifiedFixtureSet, trades: VerifiedTradeSet)
   if (picks.length === 0) {
     throw new Error(`the fixture set at ${shops.dir} has no demo shop with a kind of work`);
   }
-  return { rows, kinds, picks, pickedAt: setup.seededAt };
+  return { rows, kinds: catalog.kinds, picks, pickedAt: setup.seededAt };
 }
 
 /** Seeds the kinds of work and the demo shops' kinds from the trade files and fixture set v1 (see the top of this file). */
@@ -665,6 +712,36 @@ async function requireSetupRows(tx: Tx, picks: readonly PickedKindSeedRow[]): Pr
   }
 }
 
+/**
+ * Writes K-24's catalog rows in `tx`, each only when its key is free (ON CONFLICT DO NOTHING; nothing is updated or
+ * deleted): the kinds, then the kind_flows that name them. Gives how many rows of each table it inserted. Shared with
+ * the kinds catalog set (T-1469), so both write the catalog with the same two statements.
+ */
+export async function insertCatalog(
+  tx: Tx,
+  rows: KindsCatalogRows,
+): Promise<Record<KindsCatalogTable, number>> {
+  const kinds = await tx`
+    insert into kinds ${tx(rows.kinds, "id", "name", "style", "pattern", "facts", "source")}
+    on conflict (id) do nothing
+  `;
+  const kindFlows = await tx`
+    insert into kind_flows ${tx(
+      rows.kind_flows,
+      "kind_id",
+      "flow",
+      "main_combo",
+      "combos",
+      "switches_on",
+      "arrive",
+      "arrive_window_hours",
+      "cutoff",
+    )}
+    on conflict (kind_id, flow) do nothing
+  `;
+  return { kinds: kinds.count, kind_flows: kindFlows.count };
+}
+
 /** seedKinds, from sets already opened (tests open temporary copies of the sets inside their own jails). */
 export async function seedKindsFrom(
   sql: Sql,
@@ -683,24 +760,7 @@ export async function seedKindsFrom(
     const [who] = await tx<{ role: string }[]>`select current_user as role`;
     await requireSetupRows(tx, rows.picked_kinds);
 
-    const kinds = await tx`
-      insert into kinds ${tx(rows.kinds, "id", "name", "style", "pattern", "facts", "source")}
-      on conflict (id) do nothing
-    `;
-    const kindFlows = await tx`
-      insert into kind_flows ${tx(
-        rows.kind_flows,
-        "kind_id",
-        "flow",
-        "main_combo",
-        "combos",
-        "switches_on",
-        "arrive",
-        "arrive_window_hours",
-        "cutoff",
-      )}
-      on conflict (kind_id, flow) do nothing
-    `;
+    const catalog = await insertCatalog(tx, rows);
     const pickedKinds = await tx`
       insert into picked_kinds ${tx(
         rows.picked_kinds,
@@ -723,8 +783,8 @@ export async function seedKindsFrom(
     return {
       ranAs: who?.role ?? "",
       inserted: {
-        kinds: kinds.count,
-        kind_flows: kindFlows.count,
+        kinds: catalog.kinds,
+        kind_flows: catalog.kind_flows,
         picked_kinds: pickedKinds.count,
         picked_kind_texts: pickedKindTexts.count,
       },
