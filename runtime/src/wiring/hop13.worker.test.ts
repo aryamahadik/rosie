@@ -662,6 +662,10 @@ describe("T-1244: a receipt whose clock arming fails is answered 503, so Linq se
             trace_id: first.traceId,
             stage: "handoff",
             error: "ArmingNotDone",
+            // T-1465: the hand-off's line names the event's kind and the door's refusal label; an arming not done is no
+            // refusal of the door's own and carries none, so its name still says why.
+            kind: "delivered",
+            refusal: "unlabeled",
           },
         ]);
 

@@ -124,13 +124,14 @@ import { setBundleDeps } from "../bundle/pin";
 import type { BundleDeps, BundleRegistry } from "../bundle/types";
 import { actorOf } from "../clocks/actors";
 import { ArmingMemory, clockArming } from "../clocks/arming";
+import { isDeliveryReceipt } from "../clocks/due";
 import type { ClockActorRpc, ClockActors, ClockDirectory } from "../clocks/types";
 import { handleDeliveryReceipt, runDispatch, type DispatchDeps } from "../dispatch/dispatcher";
 import { dispatchSendDoor, queueRetries, retryBodyOf } from "../dispatch/retry";
 import type { ClaimedRow } from "../dispatch/types";
 import type { EmailRowsDeps } from "../email";
 import { durableObjectActor, type HandleActorRpc } from "../gateway/actor-door";
-import { readBundleId, type WebhookEnvironment } from "../gateway/answer";
+import { readBundleId, type HandoffRefusal, type WebhookEnvironment } from "../gateway/answer";
 import { unconfiguredPages, type PageHandlers } from "../gateway/pages";
 import type { ActorHandoff, ActorStub, GatewayDeps, ReceiptSink } from "../gateway/types";
 import { setReplyDeps, type ReplyDeps, type ReplyRows, type UnplannedRowsAnswer } from "../guard/replies";
@@ -799,6 +800,11 @@ export function composeRoot(options: RootOptions): Root {
 
   const receipts: ReceiptSink = {
     async accept(handoff) {
+      // A sent receipt that is no delivery receipt (any service but SMS, none reported included: isDeliveryReceipt) is
+      // acted on by no one by design (arch 02 step 9): answered written with nothing marked and its store asked nothing,
+      // so the gateway answers 200 and Linq does not send it again (T-1465; DL-997).
+      if (handoff.event.kind === "sent" && !isDeliveryReceipt("sent", handoff.event.service))
+        return "written";
       const status = deliveredStatusOf(handoff);
       const trace = rowTraces.forPart(handoff.partKey) ?? receiptTraceOf(handoff, log, now);
       // A store call that throws, and an arming not done (ArmingNotDone: it ended failed, T-1244), reject here, and the
@@ -825,8 +831,7 @@ export function composeRoot(options: RootOptions): Root {
         { providerMessageId: status.messageId, partKey: handoff.partKey, at: status.at },
       );
       // Not marked: answered 503, so Linq sends the receipt again (K-05: the receipt is not lost).
-      if (result.result === "storeError")
-        throw new WiringError("the outbox store gave no answer to the receipt");
+      if (result.result === "storeError") throw new ReceiptRefusal("outboxStoreNoAnswer");
       return result.result === "repeated" ? "duplicate" : "written";
     },
   };
@@ -1151,15 +1156,44 @@ async function postgresAnswers(registry: Pick<BundleRegistry, "readActiveBundle"
   return isRecord(answer) && (answer.result === "active" || answer.error === "noActiveBundle");
 }
 
+/** What each refusal of the receipt door says, by its label: fixed words, never built from a value of the receipt. */
+const RECEIPT_REFUSAL_WORDS: Readonly<Record<HandoffRefusal, string>> = {
+  failedReceiptNoDoor: "a failed receipt has no door yet",
+  smsSentReceiptNoDoor: "a sent receipt on SMS has no door yet",
+  receiptKindNoDoor: "the receipt door has no door for this kind",
+  deliveredReceiptNoStatus: "a delivered receipt with no status",
+  outboxStoreNoAnswer: "the outbox store gave no answer to the receipt",
+};
+
 /**
- * A delivery receipt's K-06 status: Linq's message id and when it was delivered. A sent or failed receipt has no door yet
- * (T-258's retry keys and Linq's error kinds): it is refused, so the gateway answers 503 and Linq sends it again.
+ * The receipt door's refusal (T-1465): a WiringError whose `code` is one of the gateway's closed list of labels
+ * (../gateway/answer.ts HANDOFF_REFUSALS), which the gateway's failure line names beside the event's kind. The gateway
+ * answers 503 for it, so Linq sends the receipt again.
+ */
+class ReceiptRefusal extends WiringError {
+  readonly code: HandoffRefusal;
+  constructor(code: HandoffRefusal) {
+    super(RECEIPT_REFUSAL_WORDS[code]);
+    this.code = code;
+  }
+}
+
+/**
+ * A delivery receipt's K-06 status: Linq's message id and when it was delivered. The door takes a delivered receipt (its
+ * part marked, its clock armed) and, before this is asked, a sent receipt that is no delivery receipt (answered written
+ * with nothing marked: receipts.accept). A failed receipt (the dispatcher's retry or next way, arch 02 step 8; T-258's
+ * retry keys and Linq's error kinds) and a sent receipt on SMS (SMS's delivery receipt, which arms the clock, arch 02
+ * step 9) must be acted on and have no door yet: each is refused with its own label, so the gateway answers 503 and Linq
+ * sends it again.
  */
 function deliveredStatusOf(handoff: ActorHandoff): { messageId: string; at: string } {
-  if (handoff.event.kind !== "delivered") throw new WiringError("only a delivered receipt has a door yet");
+  const kind = handoff.event.kind;
+  if (kind === "failed") throw new ReceiptRefusal("failedReceiptNoDoor");
+  if (kind === "sent") throw new ReceiptRefusal("smsSentReceiptNoDoor");
+  if (kind !== "delivered") throw new ReceiptRefusal("receiptKindNoDoor");
   const status = handoff.event.status;
   if (!isRecord(status) || typeof status.messageId !== "string" || typeof status.at !== "string") {
-    throw new WiringError("a delivered receipt with no status");
+    throw new ReceiptRefusal("deliveredReceiptNoStatus");
   }
   return { messageId: status.messageId, at: status.at };
 }

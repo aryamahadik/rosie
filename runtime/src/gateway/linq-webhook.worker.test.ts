@@ -2,6 +2,7 @@
 // K-11's fixtures state (it knows no signature algorithm: that is the adapter's); the actor is a stub that models the
 // seen-event-id check. Fixtures: contracts/port-linq/fixtures and contracts/inbound-event/fixtures.
 // T-1180: a body over its own cap is answered 413 before it is read whole, with nothing verified or handed on.
+// T-1465: a hand-off that fails writes one failure line naming the event's kind and the door's refusal label.
 import { env } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -297,6 +298,51 @@ describe("POST /webhooks/linq", () => {
     const spans = receiveSpans(logLines());
     expect(spans).toHaveLength(1);
     expect(spans[0]).toMatchObject({ outcome: "failed", error_code: "handoffFailed" });
+    // T-1465: the hand-off's one failure line names the event's kind, and "unlabeled" for an error that carries no label.
+    expect(logLines().filter((line) => line.msg === "gateway_failed")).toEqual([
+      {
+        level: "error",
+        msg: "gateway_failed",
+        trace_id: response.headers.get("x-trace-id"),
+        stage: "handoff",
+        error: "Error",
+        kind: "text",
+        refusal: "unlabeled",
+      },
+    ]);
+  });
+
+  it("T-1465, a receipt its door refuses with a label (verify-delivered-after-4006): 503, and the failure line names the kind and that label, never the refusal's words", async () => {
+    const logLines = captureLogLines();
+    const refusal = Object.assign(new Error("the outbox store gave no answer to the receipt"), {
+      code: "outboxStoreNoAnswer",
+    });
+    refusal.name = "WiringError";
+    const receipts: ReceiptSink = { accept: () => Promise.reject(refusal) };
+    const actor = actorStub();
+
+    const response = await handleLinqWebhook(
+      webhookOf(deliveredAfter4006),
+      depsOf(portDouble(ALL), actor, receipts),
+      WHERE,
+    );
+
+    expect(response.status).toBe(503);
+    expect(actor.calls).toHaveLength(0);
+    expect(receiveSpans(logLines())).toMatchObject([
+      { outcome: "failed", error_code: "handoffFailed", got: { kind: "delivered" } },
+    ]);
+    expect(logLines().filter((line) => line.msg === "gateway_failed")).toEqual([
+      {
+        level: "error",
+        msg: "gateway_failed",
+        trace_id: response.headers.get("x-trace-id"),
+        stage: "handoff",
+        error: "WiringError",
+        kind: "delivered",
+        refusal: "outboxStoreNoAnswer",
+      },
+    ]);
   });
 
   it("a verifier that cannot answer: 503, nothing handed on", async () => {
