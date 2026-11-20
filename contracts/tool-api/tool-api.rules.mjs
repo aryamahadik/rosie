@@ -1205,7 +1205,328 @@ export function journeySevenGivesNone(exchange) {
   return problems;
 }
 
+/**
+ * v1.11 (T-1471; README "v1.11", default 180): the option table of a plain step that asks with buttons and has no
+ * split, by step. Each option in the order sent: its label, word for word the step's button in the bundle the question
+ * was asked under (for S1-04, MASTER-FLOW-A line 97 and bundle v1's S1-04); its definition, with where the words come
+ * from ("meansLine": the master's Means line; "declared": this contract's own words, a default until Jay answers
+ * CQ-122 (2)); and the fields an answer carries (K-01 answerField). `tells` is the next step, which only tells, and
+ * `asks` the step the walk stops at (default 181). The frontier builder (C-075), the walk (C-087) and S1-04's writer
+ * read this table through the README; QA's contract test reads it here.
+ */
+export const BUTTONS_OPTIONS = Object.freeze({
+  "S1-04": Object.freeze({
+    tells: "S1-08",
+    asks: "S1-09",
+    options: Object.freeze([
+      Object.freeze({
+        label: "Some share one",
+        definition:
+          "some of the kinds of work share one company, with one tax number, and each other kind is its own.",
+        definitionFrom: "declared",
+        fields: Object.freeze([
+          Object.freeze({ name: "shared_kinds", type: "text" }),
+          Object.freeze({ name: "company_name", type: "text" }),
+        ]),
+      }),
+      Object.freeze({
+        label: "All share one",
+        definition: "every kind of work shares one company, with one tax number.",
+        definitionFrom: "declared",
+        fields: Object.freeze([Object.freeze({ name: "company_name", type: "text" })]),
+      }),
+      Object.freeze({
+        label: "Each is its own",
+        definition: "no two kinds of work share a tax number.",
+        definitionFrom: "meansLine",
+        fields: Object.freeze([]),
+      }),
+    ]),
+  }),
+});
+
+/**
+ * v1.11 (README default 186): the lines of S1-08's plan card that are Rosie's own fixed terms, each with its place on
+ * the card (K-01 `card.lines[index]`, from 0) and its words (MASTER-FLOW-A line 109; master-A.json S1-08). Only these
+ * four are term facts of S1-08's row, and only word for word at their place; the card's other lines are the sample
+ * story's (Master Corrections C6) or carry a slot, and give none.
+ */
+export const S1_08_TERM_LINES = Object.freeze([
+  Object.freeze({ index: 0, words: "Your business and your ID: about 3 minutes" }),
+  Object.freeze({ index: 1, words: "Any license or document you want shown (optional)" }),
+  Object.freeze({ index: 5, words: "Then your people" }),
+  Object.freeze({ index: 6, words: "Nothing you tell me is asked twice" }),
+]);
+
+/**
+ * buttonsOptionChoices (v1.11; README defaults 179 and 180): on a buildFrontier exchange answered with a context, each
+ * open question at a step of BUTTONS_OPTIONS is offered exactly the table's option choices, in the buttons' order:
+ * `label` and `branch` the button's words, `definition` and `fields` the table's, `step` the question's step, and
+ * stakes low with no reason, which is what the choice's own walk gives on bundles v1 and v2 (default 179; limit 1's
+ * sign-up rule passes only a choice with no stake). The context carries no step card for such a step. The schema cannot
+ * see the table, so this rule alone refuses a reworded label, another definition, a field the table does not give and
+ * v1.2 default 86's stakes (high, unknown).
+ */
+export function buttonsOptionChoices(exchange) {
+  const context = exchange.outcome?.context;
+  if (context === undefined || context === null) return ["the outcome holds no context"];
+  const asked = (context.openQuestions ?? []).filter(
+    (question) => BUTTONS_OPTIONS[question.step] !== undefined,
+  );
+  if (asked.length === 0) return ["the context holds no open question at a step of BUTTONS_OPTIONS"];
+  const problems = [];
+  for (const question of asked) {
+    const { options } = BUTTONS_OPTIONS[question.step];
+    const offered = (context.choices ?? []).filter(
+      (choice) => choice.kind === "option" && choice.question === question.openQuestionId,
+    );
+    if (offered.length !== options.length) {
+      problems.push(
+        `${question.openQuestionId} (${question.step}) is offered ${offered.length} option choices, not its ${options.length} buttons`,
+      );
+      continue;
+    }
+    options.forEach((option, at) => {
+      const choice = offered[at];
+      const where = `${question.step} option ${at + 1} (${choice.choiceId})`;
+      if (choice.step !== question.step) problems.push(`${where} names the step ${choice.step}`);
+      if (choice.label !== option.label || choice.branch !== option.label) {
+        problems.push(
+          `${where} has the label '${choice.label}' and the branch '${choice.branch}', not the button '${option.label}'`,
+        );
+      }
+      if (choice.definition !== option.definition) {
+        problems.push(`${where} is not defined as the table defines '${option.label}'`);
+      }
+      if (!isDeepStrictEqual(choice.fields, option.fields)) {
+        problems.push(
+          `${where} carries the fields [${choice.fields.map((field) => field.name).join(", ")}], not the table's [${option.fields.map((field) => field.name).join(", ")}]`,
+        );
+      }
+      if (choice.stakes !== "low" || choice.stakesFrom.length > 0) {
+        problems.push(
+          `${where} has stakes ${choice.stakes} (${choice.stakesFrom.join(", ")}), not low with no reason, as its own walk gives`,
+        );
+      }
+    });
+    if ((context.cards ?? []).some((card) => card.step === question.step)) {
+      problems.push(`${question.step} is a plain step, so the context carries no step card for it`);
+    }
+  }
+  return problems;
+}
+
+/** The tables S1-04's writer writes, in the order the foreign keys need (README default 182). */
+const S1_04_AFTER_PICKS = Object.freeze(["picked_kind_texts", "new_work_drafts", "new_work_draft_blocks"]);
+const S1_04_WRITE_ORDER = Object.freeze(["companies", "company_kinds", "picked_kinds", ...S1_04_AFTER_PICKS]);
+
+/**
+ * What S1-04's stated state rows must hold for the option chosen (README defaults 182 and 183): rows in foreign-key
+ * order; each kept pick placed by an update that sets its company; exactly one group in the company the turn runs
+ * under (a company the commit does not insert), whose picks and rows take the caller's business; every other group in
+ * a new company owned by the caller's person, with no business; a company kind only for a company a pick is placed in,
+ * with no trade name; the groups the label means; and a company's name written only where the owner gave one.
+ */
+function placedCompaniesProblems(option, fields, state, caller) {
+  const problems = [];
+  const order = state.map((write) => S1_04_WRITE_ORDER.indexOf(write.table));
+  if (order.includes(-1)) problems.push(`S1-04 writes only ${S1_04_WRITE_ORDER.join(", ")}`);
+  if (order.some((at, i) => i > 0 && at < order[i - 1])) {
+    problems.push(
+      "S1-04's rows are out of foreign-key order: companies, company_kinds, picked_kinds, then the rows of a pick that gained a business",
+    );
+  }
+  const made = state.filter((write) => write.table === "companies" && write.op === "insert");
+  const renamed = state.filter((write) => write.table === "companies" && write.op === "update");
+  const picks = state.filter((write) => write.table === "picked_kinds");
+  const madeIds = made.map((write) => write.values.id);
+  for (const write of made) {
+    if ((write.values.business_id ?? null) !== null) {
+      problems.push(
+        `the new company ${write.values.id} names the business ${write.values.business_id}; a company has none before its own S1-09`,
+      );
+    }
+    if (write.values.owner_person_id !== caller.personId) {
+      problems.push(
+        `the new company ${write.values.id} is owned by ${write.values.owner_person_id}, not the caller's person ${caller.personId}`,
+      );
+    }
+  }
+  if (
+    picks.length === 0 ||
+    picks.some((pick) => pick.op !== "update" || typeof pick.set.company_id !== "string")
+  ) {
+    return [...problems, "S1-04 places each kept pick by an update that sets its company_id"];
+  }
+  const groups = new Map();
+  for (const pick of picks) {
+    groups.set(pick.set.company_id, [...(groups.get(pick.set.company_id) ?? []), pick]);
+  }
+  const businessOf = (company) => (madeIds.includes(company) ? null : caller.businessId);
+  const onFile = [...groups.keys()].filter((company) => !madeIds.includes(company));
+  if (onFile.length !== 1) {
+    problems.push(`exactly one group takes the company the turn runs under, not ${onFile.length}`);
+  }
+  for (const [company, placed] of groups) {
+    for (const pick of placed) {
+      if ((pick.set.business_id ?? null) !== businessOf(company)) {
+        problems.push(
+          `the pick ${pick.key.id}, placed in ${company}, takes the business ${pick.set.business_id ?? null}, not ${businessOf(company)}`,
+        );
+      }
+    }
+  }
+  for (const id of madeIds) {
+    if (!groups.has(id)) problems.push(`the new company ${id} holds no pick`);
+  }
+  for (const write of state.filter((entry) => entry.table === "company_kinds")) {
+    const company = write.op === "insert" ? write.values.company_id : undefined;
+    if (!groups.has(company)) {
+      problems.push("a company kind is inserted, for a company a pick is placed in");
+    } else if (
+      (write.values.business_id ?? null) !== businessOf(company) ||
+      (write.values.trade_name ?? null) !== null
+    ) {
+      problems.push(
+        `the company kind ${write.values.kind_id} of ${company} takes its company's business (${businessOf(company)}) and no trade name`,
+      );
+    }
+  }
+  for (const write of state.filter((entry) => S1_04_AFTER_PICKS.includes(entry.table))) {
+    if (write.op !== "update" || write.set.business_id !== caller.businessId) {
+      problems.push(`a ${write.table} row of a placed pick takes the caller's business, by an update`);
+    }
+  }
+  const shared = [...groups.values()].filter((placed) => placed.length > 1).length;
+  if (option.label === "All share one" && (groups.size !== 1 || made.length > 0)) {
+    problems.push(
+      "'All share one' places every kept pick in the company the turn runs under and writes no other company",
+    );
+  }
+  if (option.label === "Each is its own" && shared > 0) {
+    problems.push("'Each is its own' places each kept pick in a company of its own");
+  }
+  if (option.label === "Some share one") {
+    if (shared !== 1) {
+      problems.push(
+        `'Some share one' has one group of two or more picks and each other pick alone, not ${shared}`,
+      );
+    }
+    if (!fields.some((field) => field.name === "shared_kinds")) {
+      problems.push("'Some share one' carries shared_kinds, the kinds that share, in the owner's own words");
+    }
+  }
+  const name = fields.find((field) => field.name === "company_name")?.value ?? null;
+  const namedCompany =
+    name === null || option.label === "Each is its own"
+      ? undefined
+      : [...groups].find(([, placed]) => option.label === "All share one" || placed.length > 1)?.[0];
+  if (namedCompany !== undefined && madeIds.includes(namedCompany)) {
+    if (made.find((write) => write.values.id === namedCompany).values.name !== name) {
+      problems.push(`the new company ${namedCompany} takes the name the owner gave, '${name}'`);
+    }
+  }
+  if (namedCompany !== undefined && !madeIds.includes(namedCompany)) {
+    const [only, ...more] = renamed;
+    if (
+      only === undefined ||
+      more.length > 0 ||
+      only.key.id !== namedCompany ||
+      !isDeepStrictEqual(only.set, { name })
+    ) {
+      problems.push(
+        `the company the turn runs under, ${namedCompany}, alone is updated, with the name the owner gave`,
+      );
+    }
+  } else if (renamed.length > 0) {
+    problems.push("a company on file keeps its stored name unless the owner names it");
+  }
+  return problems;
+}
+
+/**
+ * buttonsAnswerCommit (v1.11; README defaults 181 to 185): on a gateAndCommit exchange whose stated step is a step of
+ * BUTTONS_OPTIONS, exactly one part answers that step's question with one of its buttons (an option choice of the
+ * request's context whose branch is a label of the table), committed and giving the step's keys (STEP_GIVES); its
+ * fields are the table's for that option; the commit closes the question it answers (the answer's
+ * openQuestions.closed); and `given.stated.writes` states the walk's rows: the next step's row, which asks nothing
+ * (S1-08's), then the question of the step the walk stops at (S1-09's, with no options) and its row, the question among
+ * those the answer opened. For S1-04 the state rows are held to placedCompaniesProblems. The schema takes any stated writes, so
+ * this rule alone refuses a question left open, a plan row that asks, and company rows the option does not mean. It
+ * holds the case where Rosie may text the owner, the only one v1.11 freezes: an exchange in which the stop home rules
+ * "noTexts", so S1-08's row is not written (README default 189), needs its own rule under a new name. It does not read
+ * the answer's `written` or the limits' results.
+ */
+export function buttonsAnswerCommit(exchange) {
+  const stated = exchange.given?.stated;
+  const table = stated === null || stated === undefined ? undefined : BUTTONS_OPTIONS[stated.step];
+  if (table === undefined) return ["given.stated names no step of BUTTONS_OPTIONS"];
+  const { step } = stated;
+  const gives = STEP_GIVES[step];
+  const problems = [];
+  if (!isDeepStrictEqual(stated.gives, gives)) {
+    problems.push(`${step} gives [${gives.join(", ")}], but given.stated says [${stated.gives.join(", ")}]`);
+  }
+  const decided = exchange.request?.input?.decided;
+  const outcome = exchange.outcome ?? {};
+  const choices = decided?.context?.choices ?? [];
+  const answers = (outcome.parts ?? []).flatMap((result) => {
+    const choice = choices.find((entry) => entry.choiceId === result.choiceId);
+    return choice !== undefined && choice.kind === "option" && choice.step === step
+      ? [{ result, choice }]
+      : [];
+  });
+  if (answers.length !== 1)
+    return [...problems, `the turn answers ${step} in ${answers.length} parts, not one`];
+  const [{ result, choice }] = answers;
+  const option = table.options.find((entry) => entry.label === choice.branch);
+  if (option === undefined) return [...problems, `'${choice.branch}' is no button of ${step}`];
+  if (result.result !== "committed" || !isDeepStrictEqual(result.gives, gives)) {
+    problems.push(`the part that answers ${step} is committed and gives [${gives.join(", ")}]`);
+  }
+  if (!(outcome.openQuestions?.closed ?? []).includes(choice.question)) {
+    problems.push(
+      `the commit that answers ${choice.question} closes it, but the answer's closed list lacks it`,
+    );
+  }
+  const fields = decided.decide?.parts?.[result.part]?.part?.fields ?? [];
+  const allowed = option.fields.map((field) => field.name);
+  for (const field of fields) {
+    if (!allowed.includes(field.name)) {
+      problems.push(`'${option.label}' carries [${allowed.join(", ")}], not the field ${field.name}`);
+    }
+  }
+  const writes = stated.writes;
+  if (writes === undefined) return [...problems, "given.stated states no writes"];
+  const [tells, asks, ...moreRows] = writes.outboxRows;
+  const [question, ...moreQuestions] = writes.openQuestions;
+  if (tells === undefined || asks === undefined || moreRows.length > 0) {
+    problems.push(
+      `the walk writes two outbox rows, ${table.tells}'s and then ${table.asks}'s, not ${writes.outboxRows.length}`,
+    );
+  } else if (question === undefined || moreQuestions.length > 0 || question.step !== table.asks) {
+    problems.push(`the walk opens one question, ${table.asks}'s`);
+  } else {
+    if (tells.openQuestionId !== null) {
+      problems.push(`${table.tells}'s row asks no question, but names ${tells.openQuestionId}`);
+    }
+    if (asks.openQuestionId !== question.id) {
+      problems.push(`${table.asks}'s row asks ${question.id}, not ${asks.openQuestionId}`);
+    }
+    if (question.options.length > 0) problems.push(`${table.asks}'s question is opened with no options`);
+    if (!(outcome.openQuestions?.opened ?? []).includes(question.id)) {
+      problems.push(`the answer's opened list lacks ${question.id}`);
+    }
+  }
+  if (step === "S1-04") {
+    problems.push(...placedCompaniesProblems(option, fields, writes.state, exchange.request.caller));
+  }
+  return problems;
+}
+
 export const rules = Object.freeze({
+  buttonsOptionChoices,
+  buttonsAnswerCommit,
   statedOutcome,
   givesStepKeys,
   rereadBeforeQuestion,
