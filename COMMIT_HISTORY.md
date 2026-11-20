@@ -2,9 +2,43 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 807, [`fa4ef40`](https://github.com/aryamahadik/rosie/commit/fa4ef40), 2026-11-20 14:59:58 UTC.
+- **Through:** commit 809, [`5e87ab0`](https://github.com/aryamahadik/rosie/commit/5e87ab0), 2026-11-20 15:34:21 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 809. docs: COMMIT\_HISTORY.md through commit 807 (fa4ef40, \#818) (\#820)
+
+- **Commit:** [`5e87ab0`](https://github.com/aryamahadik/rosie/commit/5e87ab0), by Arya Mahadik, 2026-11-20 15:34:21 UTC
+- **Pull request:** [#820](https://github.com/aryamahadik/rosie/pull/820) from `task/commit-history-189`, merged 2026-11-20 15:34:21 UTC. It squashed 1 branch commit:
+  - `00eecd6` docs: COMMIT\_HISTORY.md through commit 807 (fa4ef40, \#818)
+- **Files changed:** 1 (+51 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +51 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 808. T-1187: K-05 v1.20 frozen: the reader mapping's request states the row's business's live-owner state, and the sign-up reading is refused (noReader, businessHasOwner) at a business with a live owner; 4 accepted and 4 refused fixtures; defaults 184 to 191, open gaps 94 to 96, gap 46 closed (\#819)
+
+- **Commit:** [`af146b0`](https://github.com/aryamahadik/rosie/commit/af146b0), by Arya Mahadik, 2026-11-20 15:34:16 UTC
+- **Pull request:** [#819](https://github.com/aryamahadik/rosie/pull/819) from `task/T-1187`, merged 2026-11-20 15:34:17 UTC. It squashed 1 branch commit:
+  - `b1f0f93` T-1187: K-05 v1.20 frozen: the reader mapping's request states the ro…
+- **Files changed:** 12 (+1330 −5), by folder:
+  - `contracts/data-access/` README.md +84 −4, data-access.v1.20.schema.json +976 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` index.json +64 −0, row-reader-a5-05-tomas-live-owner.json +24 −0, row-reader-s1-02-no-role-no-owner.json +26 −0, row-reader-s1-02-owner-with-owner-state.json +29 −0, row-reader-s1-02-sam-after-hand-over.json +24 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-row-reader-has-owner-at-unowned-business.json +24 −0, refuse-row-reader-owner-state-left-out.json +25 −0, refuse-row-reader-owner-state-null.json +26 −0, refuse-row-reader-sign-up-line-at-owned-business.json +26 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 807. docs: COMMIT\_HISTORY.md through commit 805 (187aa91, \#817) (\#818)
 
