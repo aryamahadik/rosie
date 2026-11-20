@@ -2,9 +2,53 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 801, [`c17d5a3`](https://github.com/aryamahadik/rosie/commit/c17d5a3), 2026-11-20 11:27:21 UTC.
+- **Through:** commit 803, [`5eb144e`](https://github.com/aryamahadik/rosie/commit/5eb144e), 2026-11-20 13:01:55 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 803. docs: COMMIT\_HISTORY.md through commit 801 (c17d5a3, \#811) (\#814)
+
+- **Commit:** [`5eb144e`](https://github.com/aryamahadik/rosie/commit/5eb144e), by Arya Mahadik, 2026-11-20 13:01:55 UTC
+- **Pull request:** [#814](https://github.com/aryamahadik/rosie/pull/814) from `task/commit-history-186`, merged 2026-11-20 13:01:56 UTC. It squashed 1 branch commit:
+  - `7829ce8` docs: COMMIT\_HISTORY.md through commit 801 (c17d5a3, \#811)
+- **Files changed:** 1 (+66 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +66 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 802. T-1470 (card F2): the gate port and staging's gate bind the walk's question read and the sign-up step writers; the kinds reads on their own clients, at most 2 connections per gate call (DL-994, DL-997) (\#815)
+
+- **Commit:** [`c1e9baf`](https://github.com/aryamahadik/rosie/commit/c1e9baf), by Arya Mahadik, 2026-11-20 13:01:51 UTC
+- **Pull request:** [#815](https://github.com/aryamahadik/rosie/pull/815) from `task/T-1470`, merged 2026-11-20 13:01:52 UTC. It squashed 2 branch commits:
+  - `4bb61fc` T-1470: the gate port binds the walk's question read and the sign-up …
+  - `8d5cb06` T-1470: staging's gate binds the walk's question read on the call's t…
+- **Files changed:** 5 (+920 −40), by folder:
+  - `runtime/src/wiring/` gate-binding.test.ts +368 −0, real.ts +124 −26
+  - `runtime/src/wiring/staging/` tool-api-gate.seed.ts +102 −0, tool-api-gate.ts +65 −13, tool-api-gate.worker.test.ts +261 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1470: the gate port binds the walk's question read and the sign-up step writers where the reads bind them; the trade overlay comes from the run's pinned bundle, one read after another; a Node unit test of the binding
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+* T-1470: staging's gate binds the walk's question read on the call's transaction and the kinds reads (the catalog on a Tool API client of its own, no slot; item 79 on the runtime side), no stop port; the seed's catalog rows and one live S1-02 question; the worker cases
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 801. docs: COMMIT\_HISTORY.md through commit 798 (fed38f5, \#809) (\#811)
 
