@@ -2,9 +2,45 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 847, [`6651fc9c`](https://github.com/aryamahadik/rosie/commit/6651fc9c), 2026-11-21 18:24:59 UTC.
+- **Through:** commit 849, [`7abf41b7`](https://github.com/aryamahadik/rosie/commit/7abf41b7), 2026-11-21 19:31:33 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 849. docs: COMMIT\_HISTORY.md through commit 847 (6651fc9c, \#859) (\#861)
+
+- **Commit:** [`7abf41b7`](https://github.com/aryamahadik/rosie/commit/7abf41b7), by Arya Mahadik, 2026-11-21 19:31:33 UTC
+- **Pull request:** [#861](https://github.com/aryamahadik/rosie/pull/861) from `task/commit-history-205`, merged 2026-11-21 19:31:33 UTC. It squashed 1 branch commit:
+  - `03e1713` docs: COMMIT\_HISTORY.md through commit 847 (6651fc9c, \#859)
+- **Files changed:** 1 (+71 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +71 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 848. T-1505: the commit sends an asked turn's one open question again, once, and raises its ask count (K-09 v1.12 defaults 192 to 198; K-05 v1.21 item 81), squashed onto main as one commit (round 3, DL-1079; rounds 1-2 5268c26d and f327b1cf, DL-1069). turn-face/commit.ts and commit.test.ts resolved keeping both sides: main's readChatHandle and walkChatsOf (T-1519) and T-1505's askAgain (commitDepsWith hands the walk's question read and turn key only where questions is bound; the keyword door gets none). pg/sign-up.int.test.ts's third world pins bundle v2 as T-1511 moved the file (tradesOverV2, V2, publishedBundleV2) (\#860)
+
+- **Commit:** [`c21792fb`](https://github.com/aryamahadik/rosie/commit/c21792fb), by Arya Mahadik, 2026-11-21 19:31:30 UTC
+- **Pull request:** [#860](https://github.com/aryamahadik/rosie/pull/860) from `task/T-1505s`, merged 2026-11-21 19:31:30 UTC. It squashed 1 branch commit:
+  - `e2fa72b` T-1505: the commit sends an asked turn's one open question again, onc…
+- **Files changed:** 13 (+1708 −52), by folder:
+  - `actions/src/commit/` ask-again.test.ts +817 −0, ask-again.ts +232 −0, build.ts +89 −15, commit.ts +19 −2, errors.ts +7 −1, index.ts +11 −0, test-support.ts +49 −6, types.ts +86 −2
+  - `actions/src/commit/pg/` commit-turn.ts +5 −1
+  - `actions/src/commit/walk/` writes.ts +17 −24
+  - `actions/src/tool-api/turn-face/` commit.test.ts +54 −0, commit.ts +18 −1
+  - `actions/src/tool-api/turn-face/pg/` sign-up.int.test.ts +304 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 847. docs: COMMIT\_HISTORY.md through commit 843 (65c03ce4, \#855) (\#859)
 
