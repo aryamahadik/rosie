@@ -17,14 +17,23 @@
 //      commit-s1-02.json's all-listed words ("Barbershop, plumbing, electrical") runs S1-02's settler, then S1-02's
 //      writer and S1-11's writer, through the commit's own writesOf, and gives "All on the list"'s rows, the catalog read
 //      once for the call; the same part with the settler taken out is refused (branchNotWords), as before; with the kinds
-//      reads left out the binding carries neither `writers` nor `settlers`.
+//      reads left out the binding carries neither `writers` nor `settlers`;
+//   d. the stop home's reads (T-1516; DL-1033 ruling 8; CQ-360): with GateReads.stop bound beside the kinds reads, the
+//      binding hands them into the sign-up writers' deps, so an answer the settler settles as "One isn't on the list yet"
+//      ("Barbershop, pack hikes" on the 243 seeded kinds) writes S1-02's picks, S1-03's draft and S1-03's message row, and
+//      one it settles as "Not a service we book" ("Gift cards") writes S1-02's not_booked pick and S1-74's message row,
+//      each read through homes/stop's readStop for the turn's own person and handle, on the runtime side's reads, one
+//      read open at a time; with the stop reads left out both answers stay notBuilt (stopNotWired), as before; the stop
+//      reads bound with no kinds reads bind no writer and are never read.
 //
 // Under test, as they are: ./real.ts's binding and its bundles; @rosie/actions' turnCommitDeps, T-1461's walk on bundle
-// v1's flow A with T-1502's settler port, T-633's writers and T-1502's S1-02 settler with T-632's matcher, and T-634's
-// writer. Doubles, for ports only: the pinned bundle (bundle
+// v1's flow A with T-1502's settler port, T-633's writers and T-1502's S1-02 settler with T-632's matcher, T-634's
+// writer, and T-590's readStop and mayText inside T-633's writers. Doubles, for ports only: the pinned bundle (bundle
 // v1's own flow A and trade overlays, read from bundles/v1), the bundle port (../bundle/test-support), the question read
-// and K-05 items 78 and 79 (@rosie/actions' own doubles, as T-1468's unit test binds them), and ./test-support's
-// fakeGateReads as it is. Test values only (rule 9): the contracts' fixtures, bundle v1 and the master's sample cast.
+// and K-05 items 78 and 79 (@rosie/actions' own doubles, as T-1468's unit test binds them), the stop home's reads
+// (@rosie/actions' own double over the frozen seeds, on the runtime side, as T-633's unit test binds them), and
+// ./test-support's fakeGateReads as it is. Test values only (rule 9): the contracts' fixtures, bundle v1 and the
+// master's sample cast.
 import { BARBERSHOP } from "@rosie/actions/src/domain/safety/test-support";
 import {
   NOTHING_OPEN,
@@ -32,14 +41,22 @@ import {
   decidedOf,
   flowAV1,
   questionsOver,
+  requestTurnFields,
   s1_02QuestionRow,
   tradeOverlayV1,
   turnTwoOnV1,
 } from "@rosie/actions/src/commit/walk/test-support";
 import type { WalkQuestions } from "@rosie/actions/src/commit/walk";
-import { KindsRefusedError } from "@rosie/actions/src/tool-api/journey-1/kinds/errors";
+import type { StopHomeReads } from "@rosie/actions/src/homes/stop/reads";
+import { readsOn, seedWorld } from "@rosie/actions/src/homes/stop/test-support";
+import { KindsNotBuiltError, KindsRefusedError } from "@rosie/actions/src/tool-api/journey-1/kinds/errors";
 import { kindsReadsOf } from "@rosie/actions/src/tool-api/journey-1/kinds/reads";
-import { fakeK05 } from "@rosie/actions/src/tool-api/journey-1/kinds/test-support";
+import {
+  GIFT_CARDS,
+  PACK_HIKES,
+  fakeK05,
+  turnWithWords,
+} from "@rosie/actions/src/tool-api/journey-1/kinds/test-support";
 import { PF_TEXT_KEYS } from "@rosie/actions/src/tool-api/journey-1/plug-ins/plug-in";
 import { NOTHING_OPEN_AT, turnCommitDeps } from "@rosie/actions/src/tool-api/turn-face/commit";
 import { describe, expect, it } from "vitest";
@@ -538,5 +555,266 @@ describe("the gate's commit binding hands in S1-02's settler beside the sign-up 
       expect(binding.settlers).toBeUndefined();
     }
     expect(pinned.asked).toEqual([]);
+  });
+});
+
+// ---- the stop home's reads (T-1516) -----------------------------------------------------------------------------------
+
+/** One read the stop home's reads were asked for: the member, and the ids it was handed. */
+interface StopAsked {
+  readonly read: keyof StopHomeReads;
+  readonly ids: readonly string[];
+}
+
+interface RecordedStop {
+  readonly stop: StopHomeReads;
+  /** Every read, in order, as it started. */
+  readonly asked: StopAsked[];
+  /** The most reads open at once: a read is open from its call until its answer has settled. */
+  peak(): number;
+}
+
+/**
+ * The stop home's reads as @rosie/actions' own double answers them on the runtime side (homes/stop test-support readsOn,
+ * scope null: T-307's and T-317's doubles over the frozen seeds, where Sam's mobile texts), each read written down as it
+ * starts and counted while it is open. The double is a port's: readStop and mayText, which read it, are the code's own.
+ */
+function recordedStop(): RecordedStop {
+  const reads = readsOn(seedWorld(), null);
+  const asked: StopAsked[] = [];
+  let open = 0;
+  let peak = 0;
+  const counted = async <T>(read: keyof StopHomeReads, ids: readonly string[], answer: () => Promise<T>) => {
+    asked.push({ read, ids: [...ids] });
+    open += 1;
+    peak = Math.max(peak, open);
+    try {
+      return await answer();
+    } finally {
+      open -= 1;
+    }
+  };
+  return {
+    asked,
+    peak: () => peak,
+    stop: {
+      handle: (handleId) => counted("handle", [handleId], () => reads.handle(handleId)),
+      handleIdsOfPerson: (personId) =>
+        counted("handleIdsOfPerson", [personId], () => reads.handleIdsOfPerson(personId)),
+      phoneOfHandle: (handleId) => counted("phoneOfHandle", [handleId], () => reads.phoneOfHandle(handleId)),
+      consentsOfPersons: (personIds) =>
+        counted("consentsOfPersons", personIds, () => reads.consentsOfPersons(personIds)),
+      personIdsOfHandle: (handleId) =>
+        counted("personIdsOfHandle", [handleId], () => reads.personIdsOfHandle(handleId)),
+    },
+  };
+}
+
+/** readStop's reads for the turn's own person and handle (Sam's, on his mobile), in its order. */
+const SAM_STOP_READS: readonly StopAsked[] = [
+  { read: "handle", ids: ["handle-sam"] },
+  { read: "handleIdsOfPerson", ids: ["person-sam"] },
+  { read: "phoneOfHandle", ids: ["handle-sam"] },
+  { read: "personIdsOfHandle", ids: ["handle-sam"] },
+  { read: "consentsOfPersons", ids: ["person-sam"] },
+];
+
+describe("the gate's commit binding hands the stop home's reads into the sign-up writers' deps, only where the reads bind them, so an answer settled as 'One isn't on the list yet' or 'Not a service we book' is written with its message (T-1516)", () => {
+  /** fakeGateReads as it is (./test-support.ts): it binds neither the kinds reads nor the stop reads. */
+  const baseReads = (): GateReads => fakeGateReads(fakeTurnRows()).reads;
+
+  /**
+   * The binding realGate builds for one call with the question read and the kinds reads bound (S1-02's question open at
+   * version 5, the 243 seeded kinds, no pick yet, the run's pinned bundle v1), and the stop reads where `stopBound`.
+   */
+  function boundWith(stopBound: boolean) {
+    const k05 = fakeK05();
+    const questions = questionsOver([{ ...s1_02QuestionRow(), version: 5 }]);
+    const stop = recordedStop();
+    const reads: GateReads = {
+      ...baseReads(),
+      questions: questions.questions,
+      kinds: { reads: kindsReadsOf(k05.k05) },
+      ...(stopBound ? { stop: { reads: stop.stop } } : {}),
+    };
+    const pinned = pinnedV1();
+    return { k05, questions, stop, pinned, ...bindingOver(reads, pinned.bundle) };
+  }
+
+  type Bound = ReturnType<typeof boundWith>["binding"];
+
+  /** The binding's own settler and writers, each call written down in `order` as it reaches them, handed on unchanged. */
+  function watchedOf(binding: Bound, order: string[]): Bound {
+    const { settlers, writers } = binding;
+    if (settlers === undefined || writers === undefined) {
+      throw new Error("the binding carries the sign-up writers and S1-02's settler");
+    }
+    return {
+      ...binding,
+      settlers: (stepId) => {
+        const settler = settlers(stepId);
+        if (settler === null) return null;
+        return (call) => {
+          order.push(`settler ${call.step.id}`);
+          return settler(call);
+        };
+      },
+      writers: (stepId) => {
+        const writer = writers(stepId);
+        if (writer === null) return null;
+        return (call) => {
+          order.push(`writer ${call.step.id}`);
+          return writer(call);
+        };
+      },
+    };
+  }
+
+  /** A part naming c-01 (decide-2's one option) for `words`, through the commit's own writesOf over the binding. */
+  async function answered(binding: Bound, words: string, order: string[] = []) {
+    const turn = turnWithWords("c-01", words);
+    expect(decidedOf(turn.context.request).context.texts.map((text) => text.words)).toEqual([words]);
+    const { ports } = turnCommitDeps(watchedOf(binding, order))(NOTHING_OPEN_AT);
+    return { turn, writes: await ports.writesOf(turn.part, turn.context, NOTHING_OPEN) };
+  }
+
+  /** What a part naming c-01 for `words` threw through the commit's own writesOf over the binding. */
+  async function refusedWith(binding: Bound, words: string, order: string[]) {
+    const turn = turnWithWords("c-01", words);
+    const { ports } = turnCommitDeps(watchedOf(binding, order))(NOTHING_OPEN_AT);
+    return thrownBy(ports.writesOf(turn.part, turn.context, NOTHING_OPEN));
+  }
+
+  /** S1-03's or S1-74's message row (T-633 default 12): one quick reply to the turn's handle and person, no question. */
+  const messageOf = (turn: ReturnType<typeof turnWithWords>, stepId: string) => ({
+    id: `outbox-${stepId.toLowerCase()}-${turn.context.turn.id}-1`,
+    recipientHandleId: "handle-sam",
+    recipientPersonId: "person-sam",
+    businessId: BARBERSHOP,
+    bookingId: null,
+    channel: requestTurnFields(turn.context.request).service,
+    sendClass: "quick_reply",
+    openQuestionId: null,
+    copyOfRowId: null,
+    versionsRead: [],
+  });
+
+  it("bound: 'Barbershop, pack hikes' is settled 'One isn't on the list yet' and writes S1-02's picks, S1-03's draft and S1-03's message row (not stopNotWired), the owner read through readStop for the turn's own person and handle, one read open at a time", async () => {
+    const { k05, questions, stop, pinned, binding, bound } = boundWith(true);
+    // Building the binding read nothing.
+    expect(stop.asked).toEqual([]);
+    expect(k05.asked).toEqual([]);
+
+    const order: string[] = [];
+    const { turn, writes } = await answered(binding, `Barbershop, ${PACK_HIKES}`, order);
+
+    // The settler first; then S1-02's writer, S1-03's (which reads the stop home) and S1-11's, for the one part.
+    expect(order).toEqual(["settler S1-02", "writer S1-02", "writer S1-03", "writer S1-11"]);
+    expect(writes.why).toEqual({ step: "S1-02", choice: "One isn't on the list yet" });
+    // The catalog once for the call, item 79 once, the stop home's five reads once each for Sam's own person and handle
+    // (readStop's order), one open at a time, and the barber overlay once from the pinned bundle.
+    expect(k05.asked).toEqual([
+      { read: "readKindCatalog" },
+      { read: "readPickedKinds", request: { businessId: BARBERSHOP, personId: "person-sam" } },
+    ]);
+    expect(stop.asked).toEqual(SAM_STOP_READS);
+    expect(stop.peak()).toBe(1);
+    expect(pinned.asked).toEqual(["barber"]);
+    expect(bound.kvReads).toEqual([]);
+    expect(bound.calls).toEqual([]);
+    expect(questions.reads).toEqual([
+      { repo: turn.context.repo, handleId: "handle-sam", openQuestionId: "oq-s1-02" },
+    ]);
+
+    // S1-02's rows (the barbershop listed; pack hikes drafted as a new_work kind, its row before its pick), S1-03's draft
+    // in state drafting with no business, then S1-11's 11 text blocks of the first pick.
+    const inserts = writes.state.flatMap((write) => (write.op === "insert" ? [write] : []));
+    expect(inserts).toHaveLength(writes.state.length);
+    expect(inserts.map((write) => write.table)).toEqual([
+      "picked_kinds",
+      "kinds",
+      "picked_kinds",
+      "new_work_drafts",
+      ...PF_TEXT_KEYS.map(() => "picked_kind_texts"),
+    ]);
+    const picks = inserts.filter((write) => write.table === "picked_kinds").map((write) => write.values);
+    expect(picks.map((pick) => [pick.position, pick.words, pick.outcome])).toEqual([
+      [1, "Barbershop", "listed"],
+      [2, PACK_HIKES, "new_work"],
+    ]);
+    const drafted = inserts.find((write) => write.table === "kinds")?.values;
+    expect(drafted).toMatchObject({ name: PACK_HIKES, source: "new_work" });
+    expect(picks[1]?.kind_id).toBe(drafted?.id);
+    expect(inserts.find((write) => write.table === "new_work_drafts")?.values).toMatchObject({
+      picked_kind_id: picks[1]?.id,
+      business_id: null,
+      state: "drafting",
+    });
+    // S1-03's message row first, then S1-04's question's own row, as the walk goes on to S1-04.
+    expect(writes.messages[0]).toEqual(messageOf(turn, "S1-03"));
+    expect(writes.messages.slice(1).map((row) => row.openQuestionId)).toEqual(
+      writes.asks.map((ask) => ask.question.id),
+    );
+    expect(writes.asks.map((ask) => ask.question.step)).toEqual(["S1-04"]);
+  });
+
+  it("bound: 'Gift cards' is settled 'Not a service we book' and writes S1-02's not_booked pick and S1-74's message row (not stopNotWired), and nothing after", async () => {
+    const { k05, stop, pinned, binding } = boundWith(true);
+
+    const order: string[] = [];
+    const { turn, writes } = await answered(binding, GIFT_CARDS, order);
+
+    expect(order).toEqual(["settler S1-02", "writer S1-02", "writer S1-74"]);
+    expect(writes.why).toEqual({ step: "S1-02", choice: "Not a service we book" });
+    expect(k05.asked).toEqual([
+      { read: "readKindCatalog" },
+      { read: "readPickedKinds", request: { businessId: BARBERSHOP, personId: "person-sam" } },
+    ]);
+    expect(stop.asked).toEqual(SAM_STOP_READS);
+    expect(stop.peak()).toBe(1);
+    // No kind to set up: no trade overlay is read.
+    expect(pinned.asked).toEqual([]);
+
+    expect(writes.state.map((write) => [write.op, write.table])).toEqual([["insert", "picked_kinds"]]);
+    const [pick] = writes.state.flatMap((write) => (write.op === "insert" ? [write.values] : []));
+    expect(pick).toMatchObject({
+      words: GIFT_CARDS,
+      outcome: "not_booked",
+      kind_id: null,
+      business_id: null,
+    });
+    expect(writes.gives).toEqual([]);
+    expect(writes.messages).toEqual([messageOf(turn, "S1-74")]);
+    expect(writes.asks).toEqual([]);
+  });
+
+  it("left out: the same two answers stay notBuilt (stopNotWired, at S1-03 and at S1-74), as before, and no stop read is made", async () => {
+    for (const [words, stepId, writers] of [
+      [`Barbershop, ${PACK_HIKES}`, "S1-03", ["writer S1-02", "writer S1-03"]],
+      [GIFT_CARDS, "S1-74", ["writer S1-02", "writer S1-74"]],
+    ] as const) {
+      const { stop, binding } = boundWith(false);
+      const order: string[] = [];
+
+      const thrown = await refusedWith(binding, words, order);
+
+      expect(thrown, stepId).toBeInstanceOf(KindsNotBuiltError);
+      expect(thrown, stepId).toMatchObject({
+        name: "KindsNotBuiltError",
+        call: "gateAndCommit",
+        seam: "stopNotWired",
+        ids: [stepId],
+      });
+      expect(order, stepId).toEqual(["settler S1-02", ...writers]);
+      expect(stop.asked, stepId).toEqual([]);
+    }
+  });
+
+  it("the stop reads bound with no kinds reads bind no writer and no settler, and are never read", () => {
+    const stop = recordedStop();
+    const { binding } = bindingOver({ ...baseReads(), stop: { reads: stop.stop } }, pinnedV1().bundle);
+    expect(Object.hasOwn(binding, "writers")).toBe(false);
+    expect(Object.hasOwn(binding, "settlers")).toBe(false);
+    expect(stop.asked).toEqual([]);
   });
 });

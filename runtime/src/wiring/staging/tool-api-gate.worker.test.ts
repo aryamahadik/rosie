@@ -54,9 +54,19 @@
 //     one held scope the catalog is read on a second Tool API client and item 79 on a runtime-side one, one after the
 //     other, 2 connections at most; with every slot's scope held, each reads the catalog and ends (its client takes no
 //     slot), 6 connections at most; a failed item 79 read is KindsReadError as thrown, and no line holds its row id.
+//   - T-1516 (DL-1033 ruling 8; CQ-360), the stop home's reads the gate binds beside the kinds reads, shared by S1-03's,
+//     S1-74's and S1-08's writers: the gate holds `stop.reads`, StopHomeReads' five members exactly; inside one held
+//     scope, homes/stop's readStop (the writers' own read) for the asked owner reads the handle, the person's handles,
+//     the phone row and the people behind the handle and their consent rows, each on a runtime-side client of its own
+//     (rosie_worker_job), one after another, 2 connections at most, and answers that handle's own reading as this
+//     database holds it; through the pool's own HYPERDRIVE_JOB the first read fails with its call's name and SQLSTATE
+//     alone and the scope's client is ended; nothing is written, and no line holds the asked owner's number. The walk
+//     of an answer settled as "One isn't on the list yet" or "Not a service we book" over these reads is
+//     ../gate-binding.test.ts's (this rig holds no bundle v1).
 // Test values only (rule 9): the master's sample cast, the fixtures' ids and words, whole fiction-range 555-01xx numbers,
 // made-up ids, and the seed's made-up wrapping key.
 import { KEYED_SAFETY_IDS } from "@rosie/actions/src/domain/safety/ids";
+import { readStop, type StopHomeReads } from "@rosie/actions/src/homes/stop/reads";
 import { NotBuiltError } from "@rosie/actions/src/tool-api/errors";
 import { KindsReadError } from "@rosie/actions/src/tool-api/journey-1/kinds/errors";
 import { TurnFaceReadError, TurnFaceRefusedError } from "@rosie/actions/src/tool-api/turn-face/errors";
@@ -921,13 +931,23 @@ describe("built on staging: the six pieces, and nothing read but the environment
       "safetyReads",
       "scope",
       "sealer",
+      "stop",
       "words",
     ]);
-    // T-1470: the walk's question read, and the kinds reads alone (items 78 and 79): no stop port at rung 1.
+    // T-1470: the walk's question read, and the kinds reads alone (items 78 and 79).
     expect(Object.keys(reads?.questions ?? {})).toEqual(["liveQuestion"]);
     expect(Object.keys(reads?.kinds ?? {})).toEqual(["reads"]);
     expect(reads?.kinds?.stop).toBeUndefined();
     expect(Object.keys(reads?.kinds?.reads ?? {}).sort()).toEqual(["catalog", "pickedKinds"]);
+    // T-1516: the stop home's reads beside them (DL-1033 ruling 8), StopHomeReads' five members exactly.
+    expect(Object.keys(reads?.stop ?? {})).toEqual(["reads"]);
+    expect(Object.keys(reads?.stop?.reads ?? {}).sort()).toEqual([
+      "consentsOfPersons",
+      "handle",
+      "handleIdsOfPerson",
+      "personIdsOfHandle",
+      "phoneOfHandle",
+    ]);
     expect(Object.keys(reads?.safetyReads ?? {}).sort()).toEqual([
       "businessOwner",
       "businessZone",
@@ -946,6 +966,7 @@ describe("built on staging: the six pieces, and nothing read but the environment
       "safetyReads",
       "scope",
       "sealer",
+      "stop",
     ]);
     // No call was made to build it.
     expect(written).toEqual([]);
@@ -987,7 +1008,7 @@ describe("built on staging: the six pieces, and nothing read but the environment
     if (gate === null) throw new Error("the gate is bound with both bindings");
     expect(gate.words?.fixedLine("safetyAsk")).toEqual({ id: "safetyAsk", text: "t1398 stand-in words" });
     expect(gate.words?.fixedLine("safetyCrisis")).toBeNull();
-    // Nothing else of its input but the six pieces and T-1470's two.
+    // Nothing else of its input but the six pieces, T-1470's two and T-1516's stop reads.
     expect(Object.keys(gate).sort()).toEqual([
       "keywordDoor",
       "kinds",
@@ -996,6 +1017,7 @@ describe("built on staging: the six pieces, and nothing read but the environment
       "safetyReads",
       "scope",
       "sealer",
+      "stop",
       "words",
     ]);
   });
@@ -2287,6 +2309,135 @@ describe("the walk's question read and the kinds reads, as the gate binds them f
     expect(callsOf(written)).toEqual([onApp(GATE_CALLS.scope), onJob(GATE_CALLS.pickedKinds)]);
     expect(db.counts()).toMatchObject({ opened: 2, ended: 2, connectionsOpen: 0 });
     for (const line of lines) expect(line, "a line holds the row id").not.toContain(NOBODY);
+    expect(await rowCounts()).toEqual(before);
+  });
+});
+
+// ---- the stop home's reads (T-1516) -------------------------------------------------------------------------------
+//
+// The reads S1-03's, S1-74's and S1-08's writers read the owner's contact with, as the gate binds them beside the kinds
+// reads, each read by the writers' own readStop from inside a held scope, as a step writer asks it, on this file's
+// database (bundle v0 and the seed's rows: no second turn is walked here).
+
+/** The gate's stop reads, as stagingOptions gave them. */
+function stopReadsOf(gate: GateReads): StopHomeReads {
+  const { stop } = gate;
+  if (stop === undefined) throw new Error("staging's gate binds the stop home's reads");
+  return stop.reads;
+}
+
+describe("the stop home's reads, as the gate binds them for S1-03's, S1-74's and S1-08's writers (T-1516)", () => {
+  it("one gate alone: inside its held scope readStop for the asked owner reads the handle, the person's handles, the phone row, the people behind the handle and their consent rows, each on a runtime-side client of its own (rosie_worker_job) named on its timing line, one after another; 2 connections at most, opened equal to ended, nothing written", async () => {
+    const before = await rowCounts();
+    const { gate, written, db } = rootOver(envOf());
+    const stop = stopReadsOf(gate);
+    const login = DB_SIDES.toolApi.login;
+
+    const read = await gate.scope.withBusiness(BARBERSHOP, async (repo) => {
+      const first = await whoOn(repo);
+      const reading = await readStop(stop, {
+        personId: ASKED.personId,
+        businessId: BARBERSHOP,
+        handleId: ASKED.handleId,
+      });
+      // The scope's own transaction answers again after every read: its client was held throughout.
+      return { first, reading, last: await whoOn(repo) };
+    });
+
+    expect(read.first).toEqual({ session_login: login, current_login: login, scope: BARBERSHOP });
+    expect(read.last).toEqual(read.first);
+    // The asked owner's own reading as this database holds it: a phone handle that is the person's own, no phones row
+    // yet (the seed writes none), and no consent row of anyone behind the handle, for any business.
+    expect(read.reading).toEqual({
+      personId: ASKED.personId,
+      businessId: BARBERSHOP,
+      handleId: ASKED.handleId,
+      kind: "phone",
+      own: true,
+      phone: null,
+      texts: [],
+    });
+
+    // The scope's client first; then each stop read's own, on the runtime side, in readStop's order.
+    expect(callsOf(written)).toEqual([
+      onApp(GATE_CALLS.scope),
+      onJob(GATE_CALLS.stopHandle),
+      onJob(GATE_CALLS.stopHandleIdsOfPerson),
+      onJob(GATE_CALLS.stopPhoneOfHandle),
+      onJob(GATE_CALLS.stopPersonIdsOfHandle),
+      onJob(GATE_CALLS.stopConsentsOfPersons),
+    ]);
+    expect([
+      GATE_CALLS.stopHandle,
+      GATE_CALLS.stopHandleIdsOfPerson,
+      GATE_CALLS.stopPhoneOfHandle,
+      GATE_CALLS.stopPersonIdsOfHandle,
+      GATE_CALLS.stopConsentsOfPersons,
+    ]).toEqual([
+      "getHandle",
+      "listHandleIdsOfPerson",
+      "getPhoneByHandle",
+      "listPersonIdsOfHandle",
+      "listConsentsOfPersons",
+    ]);
+    expect(written.map((line) => line.trace_id)).toEqual(Array.from({ length: 6 }, () => null));
+    // One after another beside the held scope: never more than the scope's connection and one read's.
+    expect(db.counts()).toMatchObject({
+      opened: 6,
+      ended: 6,
+      connectionsOpen: 0,
+      connectionsPeak: 2 * CONNECTIONS_PER_CLIENT,
+    });
+    expect(await rowCounts()).toEqual(before);
+    // The handle's address was read (readStop keeps its kind alone); no line holds it.
+    for (const line of lines) {
+      for (const form of [ASKED.number, ASKED.number.slice(1), ASKED.number.slice(2)]) {
+        expect(line, "a line holds the asked owner's number").not.toContain(form);
+      }
+    }
+  });
+
+  it("the pool's own HYPERDRIVE_JOB (its database, rosie_rig_none, never made): inside a held scope the first stop read fails with its call's name and SQLSTATE only, nothing of the binding's string in what is thrown; the scope's client is ended and nothing is written", async () => {
+    const before = await rowCounts();
+    const { gate, written, db } = rootOver(envOf({ job: POOL_JOB }));
+    const stop = stopReadsOf(gate);
+    let inside: unknown;
+
+    const thrown = await rejectionOf(
+      gate.scope.withBusiness(BARBERSHOP, async () => {
+        try {
+          return await readStop(stop, {
+            personId: ASKED.personId,
+            businessId: BARBERSHOP,
+            handleId: ASKED.handleId,
+          });
+        } catch (error) {
+          inside = error;
+          throw error;
+        }
+      }),
+    );
+
+    // The scope hands on what the read threw, the same error: the handle's own refusal, as the scrub leaves it.
+    expect(thrown).toBe(inside);
+    expect(thrown).toBeInstanceOf(DataAccessDatabaseError);
+    expect(thrown).toMatchObject({
+      call: GATE_CALLS.stopHandle,
+      code: "3D000",
+      table: null,
+      constraint: null,
+    });
+    expect((thrown as Error).message).toBe(
+      `${GATE_CALLS.stopHandle}: the database refused the call (SQLSTATE 3D000)`,
+    );
+    expect(Object.keys(thrown as Error).sort()).toEqual(["call", "code", "constraint", "name", "table"]);
+    for (const name of [POOL_APP, POOL_JOB, APP, JOB]) expectNothingOf(poolBinding(name), textsOf(thrown));
+    for (const text of textsOf(thrown)) {
+      for (const id of [ASKED.personId, ASKED.handleId, ASKED.number]) expect(text).not.toContain(id);
+    }
+    // The scope's client was timed and ended; the stop read's client never passed its guard and was ended too.
+    expect(callsOf(written)).toEqual([onApp(GATE_CALLS.scope)]);
+    expect(db.counts()).toMatchObject({ opened: 2, ended: 2, connectionsOpen: 0 });
     expect(await rowCounts()).toEqual(before);
   });
 });
