@@ -69,12 +69,30 @@
 //                  item 79  K-05 v1.19 readPickedKinds on a runtime-side client (part.db.runtime: HYPERDRIVE_JOB,
 //                           rosie_worker_job, which inherits rosie_job): the one role that reads persons and sees a pick
 //                           with no business; db/repo refuses it as rosie_app before any table is read.
-//                No `stop` is bound at rung 1 (K-05 open gap 29; CQ-360), so S1-03's and S1-74's messages answer notBuilt
-//                (stopNotWired) and "One isn't on the list yet" and "Not a service we book" write nothing: their
-//                messages ask no question and cannot be composed yet, and a row left with no plan would hold back every
-//                later reply to that phone. "All on the list" needs no stop read. A failed read is thrown as
-//                KindsReadError and fails the call closed; its `answer` holds a SQLSTATE or a person's or a business's
-//                row id, and nothing here catches, wraps or logs it.
+//                "All on the list" needs no stop read. A failed read is thrown as KindsReadError and fails the call closed;
+//                its `answer` holds a SQLSTATE or a person's or a business's row id, and nothing here catches, wraps or
+//                logs it.
+//   stop         the stop home's reads (T-1516; ../real.ts GateReads.stop and GateStopReads), beside `kinds`: CQ-360's
+//                scope is the stop reads shared by S1-03's, S1-74's and S1-08's writers (DL-1033 ruling 8, which replaces
+//                card F's "no stop at rung 1"), so an owner's answer that settles "One isn't on the list yet" or "Not a
+//                service we book" (T-1503's settler) writes its message instead of failing closed with stopNotWired and
+//                ending silent. @rosie/actions' StopHomeReads exactly, each member the runtime's own reader's over db/repo
+//                (no SQL here), each on a runtime-side client of its own that the root's handle opens, guards and ends
+//                for that one read (part.db.runtime: HYPERDRIVE_JOB, rosie_worker_job, which inherits rosie_job: the role
+//                that reads handles, person_handles, phones and K-29's rows of every business; DL-982: rosie_app reads
+//                none of them), straight from the handle and never through the slots, as item 78's client:
+//                  handle             T-307's MessagesReader.handle: db/repo phones.ts getHandle
+//                  handleIdsOfPerson  T-307's MessagesReader.handleIdsOfPerson: phones.ts listHandleIdsOfPerson
+//                  phoneOfHandle      T-307's MessagesReader.phoneOfHandle: phones.ts getPhoneByHandle
+//                  consentsOfPersons  T-307's MessagesReader.consentsOfPersons: consent.ts listConsentsOfPersons
+//                  personIdsOfHandle  T-317's FlagsReader.personIdsOfHandle: phones.ts listPersonIdsOfHandle
+//                The writers read them only through homes/stop's readStop, for the turn's own person and handle, each read
+//                awaited before the next, so the call holds its own client and one of these at a time. Each read's
+//                failure leaves scrubbed (db/repo/clocks.ts scrubbed: the call's name and a SQLSTATE or the client's
+//                code; the handle's and db/repo's own errors as they are), since these db/repo calls catch nothing and
+//                postgres.js puts a statement's values on its error; the call then fails closed with nothing written.
+//                What they read (a number, an address, a consent row) goes to readStop alone, never to a line or an
+//                error.
 //
 // The gate's one commitTurn (K-05 v1.1 item 1) is never this input's: it goes through the root's turn-row port, T-1395's
 // binding on the job side (./k05-turn.ts turnRows; critic_collisions N5), with ../real.ts's turn id check in front.
@@ -82,16 +100,18 @@
 // Connections (ADR-014 Consequences, "Connections inside one call"; critic_collisions N2; critic_size N6; DL-760, DL-761):
 // a gate call holds its Tool API client's one connection while each of its other calls (the bundle reads, the owner's
 // read, a seal, the commit on the runtime side; and, for an answer to S1-02's question, the catalog on a second Tool API
-// client, item 79 and S1-11's one trade overlay on the runtime side: T-1470) opens and ends a client of its own, one
-// after another, so it holds 2 connections at most; a keyword door's call holds its runtime-side transaction's one
-// connection the same way while its bundle reads, seal and commit open theirs (T-1415), 2 at most too. At most 3 such
-// calls, the gate's and the door's together, hold their call's client at once, so the gates hold 6 at most, the Worker's
-// limit (infra/spikes/hyperdrive-host/worker.mjs line 77); a 4th waits for a slot before its client is opened, and
-// nothing that holds a slot ever waits for one (the catalog's client takes no slot), so no call waits for a connection
-// another call holds while that call waits for one.
+// client, item 79 and S1-11's one trade overlay on the runtime side: T-1470; and the stop home's reads, each on the
+// runtime side: T-1516) opens and ends a client of its own, one after another, so it holds 2 connections at most; a
+// keyword door's call holds its runtime-side transaction's one connection the same way while its bundle reads, seal and
+// commit open theirs (T-1415), 2 at most too. At most 3 such calls, the gate's and the door's together, hold their call's
+// client at once, so the gates hold 6 at most, the Worker's limit (infra/spikes/hyperdrive-host/worker.mjs line 77); a
+// 4th waits for a slot before its client is opened, and nothing that holds a slot ever waits for one (the catalog's
+// client and the stop reads' take no slot), so no call waits for a connection another call holds while that call waits
+// for one.
 //
 //   bound    staging, with both HYPERDRIVE_APP (the scope, the question read on it, and the catalog's own client) and
-//            HYPERDRIVE_JOB (the owner's read, the sealer, the keyword door, item 79 and the commit) present. Only their presence is read as the root is built (DL-768): no connection
+//            HYPERDRIVE_JOB (the owner's read, the sealer, the keyword door, item 79, the stop reads and the commit)
+//            present. Only their presence is read as the root is built (DL-768): no connection
 //            string, secret, KV or other binding. Each connection string is the handle's to read, and SEALING_WRAP_KEY
 //            the resolver's, at each call.
 //   unbound  any environment but staging, checked before anything else is read, or a binding missing: null, as the
@@ -114,9 +134,12 @@
 // line. No word of a text or a fixed line, no number, address, key, wrapping key's value, token or hash is in a log line
 // or an error.
 //
-// pgCallScope, the door's pieces, pgWalkQuestions, kindsReadsOf and pgReadOnlySealer are imported by their own files, as
-// ./tool-api-rows.ts imports pgCallScope (critic_size N5): no change to @rosie/actions.
+// pgCallScope, the door's pieces, pgWalkQuestions, kindsReadsOf, pgReadOnlySealer, messagesReaderOf and flagsReaderOf are
+// imported by their own files, as ./tool-api-rows.ts imports pgCallScope (critic_size N5): no change to @rosie/actions.
 
+import { flagsReaderOf } from "@rosie/actions/src/domain/flags/reads";
+import { messagesReaderOf } from "@rosie/actions/src/domain/messages-consent/reads";
+import type { StopHomeReads } from "@rosie/actions/src/homes/stop/reads";
 import { NotBuiltError } from "@rosie/actions/src/tool-api/errors";
 import { kindsReadsOf, type KindsReads } from "@rosie/actions/src/tool-api/journey-1/kinds/reads";
 import type { BusinessScope, ScopeCall } from "@rosie/actions/src/tool-api/scope";
@@ -131,6 +154,7 @@ import {
 } from "@rosie/actions/src/tool-api/turn-face/pg/calls";
 import { pgReadOnlySealer } from "@rosie/actions/src/tool-api/turn-face/pg/sealer";
 import type { WordsSealer } from "@rosie/actions/src/domain/safety";
+import { scrubbed } from "@rosie/db/repo/clocks";
 import { readKindCatalog, readPickedKinds } from "@rosie/db/repo/kinds-reads";
 import {
   readBusinessOwner,
@@ -174,8 +198,9 @@ export const GATE_CLIENTS_AT_ONCE = 3;
 /**
  * Each call's name on the handle: on its timing line, and on every error of the handle's that leaves it. The scope's and
  * the keyword door's are K-09's name for the call their transaction is opened for (the scope's on the Tool API's side,
- * the door's on the runtime side), the owner's K-05's, the sealer's its own (sealer.ts), and the two kinds reads' K-05's
- * (T-1470: item 78 on the Tool API's side, item 79 on the runtime side).
+ * the door's on the runtime side), the owner's K-05's, the sealer's its own (sealer.ts), the two kinds reads' K-05's
+ * (T-1470: item 78 on the Tool API's side, item 79 on the runtime side), and the five stop reads' db/repo's own (T-1516,
+ * each on the runtime side: the data-access call each StopHomeReads member makes).
  */
 export const GATE_CALLS = Object.freeze({
   scope: "gateAndCommit",
@@ -184,6 +209,11 @@ export const GATE_CALLS = Object.freeze({
   seal: "seal",
   kindCatalog: "readKindCatalog",
   pickedKinds: "readPickedKinds",
+  stopHandle: "getHandle",
+  stopHandleIdsOfPerson: "listHandleIdsOfPerson",
+  stopPhoneOfHandle: "getPhoneByHandle",
+  stopConsentsOfPersons: "listConsentsOfPersons",
+  stopPersonIdsOfHandle: "listPersonIdsOfHandle",
 } as const);
 
 /** A binding is present when the env holds a value for it; its connection string is never read here. */
@@ -289,6 +319,39 @@ function kindsReadsOn(db: StagingDb): KindsReads {
 }
 
 /**
+ * The stop home's reads (T-1516; DL-1033 ruling 8; CQ-360; @rosie/actions' StopHomeReads): each member the runtime's own
+ * reader's over db/repo, T-307's MessagesReader (messagesReaderOf) or T-317's FlagsReader (flagsReaderOf), each one
+ * data-access call on a runtime-side client the handle opens, guards and ends for that one read (HYPERDRIVE_JOB,
+ * rosie_worker_job, which inherits rosie_job), straight from the handle, never through gateScope or the slots: the gate
+ * call that asks it already holds its own client and a slot. readStop awaits one read before the next, so the call holds
+ * its own client and one of these at a time. Whatever a read throws leaves scrubbed under its call's name (db/repo's
+ * scrubbed: a SQLSTATE or the client's code alone; the handle's own errors and db/repo's as they are), so no statement's
+ * values ride out; nothing here logs.
+ */
+function stopReadsOn(db: StagingDb): StopHomeReads {
+  const onRuntime = async <T>(call: string, read: (sql: Sql) => Promise<T>): Promise<T> => {
+    try {
+      return await db.runtime(call, read);
+    } catch (error) {
+      throw scrubbed(call, error);
+    }
+  };
+  return {
+    handle: (handleId) => onRuntime(GATE_CALLS.stopHandle, (sql) => messagesReaderOf(sql).handle(handleId)),
+    handleIdsOfPerson: (personId) =>
+      onRuntime(GATE_CALLS.stopHandleIdsOfPerson, (sql) => messagesReaderOf(sql).handleIdsOfPerson(personId)),
+    phoneOfHandle: (handleId) =>
+      onRuntime(GATE_CALLS.stopPhoneOfHandle, (sql) => messagesReaderOf(sql).phoneOfHandle(handleId)),
+    consentsOfPersons: (personIds) =>
+      onRuntime(GATE_CALLS.stopConsentsOfPersons, (sql) =>
+        messagesReaderOf(sql).consentsOfPersons(personIds),
+      ),
+    personIdsOfHandle: (handleId) =>
+      onRuntime(GATE_CALLS.stopPersonIdsOfHandle, (sql) => flagsReaderOf(sql).personIdsOfHandle(handleId)),
+  };
+}
+
+/**
  * The keyword door's one transaction for each call (T-1415): @rosie/actions' pgDoorRuntime over a runtime-side client
  * opened for that call (HYPERDRIVE_JOB, rosie_worker_job), which the handle guards first and ends once the transaction
  * has ended, taken only while one of the gate's slots is free. pgDoorRuntime checks the door's side and makes the
@@ -366,9 +429,10 @@ const asGateReads = (reads: GateReads<Tx, Sql>): GateReads => reads as GateReads
  * scope's on HYPERDRIVE_APP and the owner's, the sealer's and the keyword door's on HYPERDRIVE_JOB, the scope and the door
  * sharing one set of slots, and SafetyDeps.words from the one BundleSafety adapter; and, for an answer to S1-02's
  * question (T-1470), the walk's question read on the call's transaction and the kinds reads, the catalog on a Tool API
- * client of its own (no slot) and item 79 on a runtime-side one, with no stop port. Null anywhere but staging (nothing
- * read but ENVIRONMENT) and while either binding is missing, so every gate fails closed, a keyword turn naming no
- * business with the base's noBusinessScope.
+ * client of its own (no slot) and item 79 on a runtime-side one, and beside them the stop home's reads, each on a
+ * runtime-side client of its own (T-1516; DL-1033 ruling 8). Null anywhere but staging (nothing read but ENVIRONMENT)
+ * and while either binding is missing, so every gate fails closed, a keyword turn naming no business with the base's
+ * noBusinessScope.
  */
 export const stagingGateReads: (part: GatePart) => GateReads | null = ({ env, db, keys, bundleSafety }) => {
   if (environmentOf(env) !== "staging") return null;
@@ -385,8 +449,9 @@ export const stagingGateReads: (part: GatePart) => GateReads | null = ({ env, db
     sealer: sealerOn(db, keys),
     keywordDoor: keywordDoorOn(db, slots),
     questions: pgWalkQuestions<Tx>(),
-    // No `stop` at rung 1: S1-03's and S1-74's messages answer notBuilt, so those two branches write nothing.
     kinds: { reads: kindsReadsOn(db) },
+    // The stop reads S1-03's, S1-74's and S1-08's writers share (DL-1033 ruling 8, CQ-360's scope): on the runtime side.
+    stop: { reads: stopReadsOn(db) },
     ...(bundleSafety === null ? {} : { words: wordsOf(bundleSafety) }),
   });
 };
