@@ -24,6 +24,9 @@
 //     rule 2): one send, one part delivered.
 //
 // Each test runs the JOIN on a fresh rig, and the Durable Objects' storage is reset after each (as hop 11's tests run it).
+// Test owner 1 holds no role, so the JOIN's S1-02 row is read by its sign-up line as the owner and its first text opens
+// with signUpOpener, S1-02's own words (K-01 README default 19; T-1511); the turn pins bundle v2, which carries the line
+// (T-1477), as hops 10 and 11 do (T-1512): on bundle v0 finalize would refuse the text and nothing would be sent.
 // Test values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and the fixtures' own words.
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import deliveredFixture from "@rosie/contracts/inbound-event/fixtures/delivered.json";
@@ -41,12 +44,14 @@ import { leaks, spansOfLogLines, spansOfTrace } from "../trace/hop-check";
 import { flush } from "../turn/test-support";
 import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "./index";
 import {
-  bundleV0FixedLine,
+  BUNDLE_V2,
+  bundleV2FixedLine,
   fakeFlags,
   SAM_CHAT,
   skeletonFakes,
   TEST_OWNER_1,
   TEST_OWNER_1_BUSINESS_NAME,
+  testClock,
   type LinqInboundEvent,
   type SignedWebhook,
   type SkeletonFakes,
@@ -198,8 +203,9 @@ interface Rig {
   restore(): void;
 }
 
+/** The root for "test" with the HandleActor namespace and its actor ports; bundle v2 active, the JOIN's pin (T-1512). */
 function rig(log: MockInstance): Rig {
-  const fakes = skeletonFakes();
+  const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
   const root = testRoot(fakes, handleActors());
   const restore = root.install();
   const spans = (): Span[] => spansOfLogLines(log.mock.calls.map((call: unknown[]) => call[0]));
@@ -283,17 +289,21 @@ function expectNothingLeaked(run: Rig, text: string): void {
   );
 }
 
-/** The final parts' one text finalize wrote into the row: the opener first, the STOP, HELP and rates line and the link last. */
+/**
+ * The final parts' one text finalize wrote into the row: signUpOpener first (S1-02's own words, naming no business), the
+ * STOP, HELP and rates line and the link last, each as bundle v2 writes it.
+ */
 function finalTextOf(run: Rig, row: string): string {
   const written = run.fakes.finalize.plans.get(row);
   if (written === undefined) throw new Error("finalize wrote no final parts into the JOIN turn's row");
   expect(written.finalParts.sends).toHaveLength(1);
+  expect(written.finalParts.fixedLines).toEqual(["signUpOpener", "optOutLine", "privacyLink"]);
   const text = written.finalParts.sends[0].text ?? "";
-  const opener = bundleV0FixedLine("opener").replace("<business>", TEST_OWNER_1_BUSINESS_NAME);
-  expect(text.startsWith(`${opener} `)).toBe(true);
+  expect(text.startsWith(`${bundleV2FixedLine("signUpOpener")} `)).toBe(true);
+  expect(text).not.toContain(TEST_OWNER_1_BUSINESS_NAME);
   expect(text.split("\n").slice(-2)).toEqual([
-    bundleV0FixedLine("optOutLine"),
-    bundleV0FixedLine("privacyLink"),
+    bundleV2FixedLine("optOutLine"),
+    bundleV2FixedLine("privacyLink"),
   ]);
   return text;
 }

@@ -5,9 +5,15 @@
 
 import { describe, expect, it } from "vitest";
 
-import { lengthAndReadingFaults, runMessageChecks, type FixedLine } from "../checks";
+import { fixedLinesFaults, lengthAndReadingFaults, runMessageChecks, type FixedLine } from "../checks";
 import { fixedLineWords } from "../checks/reading";
-import type { FinalizeRequest, FinalizeResponse, FinalParts } from "../rewrite";
+import {
+  passedOnParts,
+  passedOnWords,
+  type FinalizeRequest,
+  type FinalizeResponse,
+  type FinalParts,
+} from "../rewrite";
 import {
   a717Source,
   bareContext,
@@ -17,12 +23,15 @@ import {
   type CallRun,
 } from "../rewrite/test-support";
 import {
+  FIRST_TEXT_LINES,
   FixedLineRefusedError,
+  SIGN_UP_OPENER_LINE,
   claimedBusiness,
   firstTextLines,
   fixedLineInserter,
   insertFixedLines,
   notBuiltFixedLinePorts,
+  openerOf,
   type FixedLineFacts,
 } from "./index";
 import {
@@ -37,12 +46,17 @@ import {
   RILEY,
   SAFETY_ASK,
   SECOND_TEXT,
+  SIGN_UP_FIRST_TEXT,
+  SIGN_UP_OPENER,
+  bundleV2Manifest,
   factsPort,
   firstTextRow,
   listsWithFirstText,
+  listsWithSignUpOpener,
   msgtextSource,
   partsOf,
   repoWithInserter,
+  signUpRow,
   wordsSend,
 } from "./test-support";
 
@@ -476,5 +490,286 @@ describe("the parts are kept as they are around the lines (STATE note 34)", () =
     // Through the port, the same: the parts the finalize call checks keep every slot value it filled.
     const through = await fixedLineInserter(factsPort(FIRST_TEXT))(parts, firstTextRow(), bareContext());
     expect(through).toEqual(added);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1511: K-01 README default 19 (T-1510; DL-1033 fault 1). An owner's sign-up texts open with S1-02's own words,
+// signUpOpener, never with a business the owner has not named.
+
+const PASS = exchange("finalize-pass.json");
+
+/** finalize-pass.json's final words: S1-02's own words before the composed plan (the fixture marks them "opener"). */
+const PASS_TEXT = PASS.outcome.finalParts?.sends[0].text ?? "";
+
+/** S1-02's fallback text, the master's S1-02 words (T-313's S1-02 row): it begins with the sign-up opener's words. */
+const S1_02_FALLBACK = signUpRow().fallbackText ?? "";
+
+/** How many times `piece` stands in `text`. */
+const timesIn = (text: string | null | undefined, piece: string): number =>
+  (text ?? "").split(piece).length - 1;
+
+/** The sign-up row's composed plan as its one rewrite, put to miss Values: a slot this row holds no value for. */
+function missingRewrite(): FinalizeRequest {
+  const base = PASS.request;
+  return {
+    ...base,
+    attempt: "rewrite",
+    plan: {
+      ...base.plan,
+      plan: {
+        ...base.plan.plan,
+        lines: [{ role: "first", text: "{{pro.name}} will set up your business." }],
+      },
+    },
+  };
+}
+
+/** The sign-up row on a bundle without the line (bundles v0, v1, v1.1): K-01 v1's lines with the first text's. */
+const withoutTheLine = (change: Parameters<typeof signUpRow>[0] = {}) =>
+  signUpRow(change, { lists: listsWithFirstText() });
+
+describe("the sign-up opener: S1-02's own words in opener's place on an owner's sign-up texts (K-01 README default 19)", () => {
+  it("bundle v2 carries the line as default 19 states it, once, naming no business; S1-02's master text begins with it", () => {
+    const lines = bundleV2Manifest().lists.fixedLines.lines.filter((line) => line.id === SIGN_UP_OPENER_LINE);
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatchObject({
+      id: "signUpOpener",
+      text: SIGN_UP_OPENER,
+      lang: "en",
+      status: "asWritten",
+    });
+    expect(S1_02_FALLBACK.startsWith(SIGN_UP_OPENER)).toBe(true);
+    expect(PASS_TEXT.startsWith(`${SIGN_UP_OPENER} `)).toBe(true);
+    // No <business> in it: the Fixed lines check takes it as written with no business at all.
+    expect(fixedLineWords(SIGN_UP_OPENER_LINE, signUpRow().checks)).toEqual({ words: SIGN_UP_OPENER });
+    expect(FIRST_TEXT_LINES).toContain(SIGN_UP_OPENER_LINE);
+  });
+
+  it("the signUp fact picks the opener, one per row: signUpOpener when true, today's opener when false", () => {
+    expect(openerOf(SIGN_UP_FIRST_TEXT)).toBe("signUpOpener");
+    expect(openerOf(FIRST_TEXT)).toBe("opener");
+    // Whether the row carries an opener at all is the first-text rule's alone, the same for both.
+    expect(firstTextLines("imessage", SIGN_UP_FIRST_TEXT)).toEqual(firstTextLines("imessage", FIRST_TEXT));
+    expect(
+      insertFixedLines(partsOf([wordsSend(COMPOSED)]), signUpRow(), { ...SECOND_TEXT, signUp: true }),
+    ).toEqual(insertFixedLines(partsOf([wordsSend(COMPOSED)]), signUpRow(), SECOND_TEXT));
+  });
+
+  it("through the finalize call: the owner's first sign-up text is finalize-pass.json's words with the opt-out line and the privacy link, fixedLines signUpOpener first, every check passed, no business named", async () => {
+    const { repo, ports } = repoWithInserter(signUpRow(), factsPort(SIGN_UP_FIRST_TEXT));
+    const sent = responseOf(await runFinalize(PASS.request, ports));
+
+    expect(sent.outcome).toBe("send");
+    expect(sent.checks[0].checks.every((check) => check.passed)).toBe(true);
+    expect(wordsOf(sent.finalParts)).toBe(`${PASS_TEXT}\n${OPT_OUT}\n${PRIVACY}`);
+    expect(sent.finalParts?.fixedLines).toEqual(["signUpOpener", "optOutLine", "privacyLink"]);
+    expect(timesIn(wordsOf(sent.finalParts), SIGN_UP_OPENER)).toBe(1);
+    expect(stringsIn(sent).join(" ")).not.toContain("booking assistant for");
+    expect(repo.calls.writes.map((write) => write.finalParts)).toEqual([sent.finalParts]);
+  });
+
+  it("with the opt-out line delivered before, the ids go in the order signUpOpener, privacyLink (the privacy link alone on the last line)", async () => {
+    const delivered: FixedLineFacts = {
+      ...SIGN_UP_FIRST_TEXT,
+      optOutLineDeliveredAt: "2026-10-12T16:20:00Z",
+    };
+    const { ports } = repoWithInserter(signUpRow(), factsPort(delivered));
+    const sent = responseOf(await runFinalize(PASS.request, ports));
+
+    expect(sent.outcome).toBe("send");
+    expect(sent.finalParts?.fixedLines).toEqual(["signUpOpener", "privacyLink"]);
+    expect(wordsOf(sent.finalParts)).toBe(`${PASS_TEXT}\n${PRIVACY}`);
+  });
+
+  it("names no business whatever the row holds: a business's name, or none at all; the same row with signUp false needs one (noBusiness)", () => {
+    // A row whose business head holds a name, as staging's stand-in head does: the sign-up opener never shows it.
+    const named = firstTextRow({ reader: "owner" }, { lists: listsWithSignUpOpener() });
+    const added = insertFixedLines(partsOf([wordsSend(COMPOSED)]), named, SIGN_UP_FIRST_TEXT);
+    expect(wordsOf(added)).toBe(`${SIGN_UP_OPENER} ${COMPOSED}\n${OPT_OUT}\n${PRIVACY}`);
+    expect(wordsOf(added)).not.toContain("Lee's Barbershop");
+    expect(runMessageChecks(added, named.checks).checks.every((check) => check.passed)).toBe(true);
+
+    // S1-02's row before there is a business: signUpOpener goes; today's opener cannot fill <business> and is refused.
+    const parts = partsOf([wordsSend(COMPOSED)], []);
+    expect(insertFixedLines(parts, signUpRow(), SIGN_UP_FIRST_TEXT).fixedLines).toEqual([
+      "signUpOpener",
+      "optOutLine",
+      "privacyLink",
+    ]);
+    expect(() => insertFixedLines(parts, signUpRow(), FIRST_TEXT)).toThrow(/noBusiness: opener/);
+  });
+
+  it("every other row keeps today's opener with the business's name, exactly as before (a reader by a role, staff or a customer, a step that needs business)", () => {
+    const row = firstTextRow({}, { lists: listsWithSignUpOpener() });
+    const added = insertFixedLines(partsOf([wordsSend(COMPOSED)]), row, FIRST_TEXT);
+    expect(wordsOf(added)).toBe(`${OPENER} ${COMPOSED}\n${OPT_OUT}\n${PRIVACY}`);
+    expect(added.fixedLines).toEqual(["opener", "optOutLine", "privacyLink"]);
+    // The bundle carrying the sign-up line changes nothing for such a row: the same parts as on K-01 v1's lists.
+    expect(added).toEqual(insertFixedLines(partsOf([wordsSend(COMPOSED)]), firstTextRow(), FIRST_TEXT));
+  });
+
+  it("one opener per row: parts that carry either id get neither again, and the port may never ask for signUpOpener", () => {
+    const row = firstTextRow({}, { lists: listsWithSignUpOpener() });
+    const cases: [string, FixedLineFacts][] = [
+      ["opener", SIGN_UP_FIRST_TEXT],
+      ["signUpOpener", FIRST_TEXT],
+      ["signUpOpener", SIGN_UP_FIRST_TEXT],
+      ["opener", FIRST_TEXT],
+    ];
+    for (const [carried, facts] of cases) {
+      const added = insertFixedLines(partsOf([wordsSend(COMPOSED)], [RILEY, DAY], [carried]), row, facts);
+      expect(added.fixedLines, carried).toEqual([carried, "optOutLine", "privacyLink"]);
+      expect(wordsOf(added), carried).toBe(`${COMPOSED}\n${OPT_OUT}\n${PRIVACY}`);
+    }
+    expect(() =>
+      insertFixedLines(partsOf([wordsSend(COMPOSED)]), row, { ...SECOND_TEXT, lines: ["signUpOpener"] }),
+    ).toThrow(/firstTextLineListed: signUpOpener/);
+  });
+});
+
+describe("no doubles: words that already begin with the opener's exact words get its id and no second copy (default 19)", () => {
+  it("S1-02's fallback text, which begins with the sign-up opener's words: the id is recorded, the words stay once, and the Fixed lines check finds them", () => {
+    const row = signUpRow();
+    const parts = partsOf([wordsSend(S1_02_FALLBACK)], []);
+    const added = insertFixedLines(parts, row, SIGN_UP_FIRST_TEXT);
+
+    expect(wordsOf(added)).toBe(`${S1_02_FALLBACK}\n${OPT_OUT}\n${PRIVACY}`);
+    expect(timesIn(wordsOf(added), SIGN_UP_OPENER)).toBe(1);
+    expect(added.fixedLines).toEqual(["signUpOpener", "optOutLine", "privacyLink"]);
+    expect(fixedLinesFaults(added, row.checks)).toEqual([]);
+    // On a later text the opener's words are the text's own: nothing is recorded or added.
+    expect(insertFixedLines(parts, row, { ...SECOND_TEXT, signUp: true })).toBe(parts);
+  });
+
+  it("through the finalize call's fallback attempt (index.ts fallbackAttempt): the rewrite misses Values, S1-02's fallback is sent with the sign-up opener's words once", async () => {
+    const { repo, ports } = repoWithInserter(signUpRow(), factsPort(SIGN_UP_FIRST_TEXT));
+    const response = responseOf(await runFinalize(missingRewrite(), ports));
+
+    expect(response.checks.map((result) => [result.attempt, result.outcome])).toEqual([
+      ["rewrite", "fallback"],
+      ["fallback", "send"],
+    ]);
+    expect(response.outcome).toBe("send");
+    expect(wordsOf(response.finalParts)).toBe(`${S1_02_FALLBACK}\n${OPT_OUT}\n${PRIVACY}`);
+    expect(timesIn(wordsOf(response.finalParts), SIGN_UP_OPENER)).toBe(1);
+    expect(response.finalParts?.fixedLines).toEqual(["signUpOpener", "optOutLine", "privacyLink"]);
+    expect(response.checks[1]?.checks.find((check) => check.check === "fixedLines")?.passed).toBe(true);
+    expect(repo.calls.writes.map((write) => write.finalParts)).toEqual([response.finalParts]);
+  });
+
+  it("the same rule for opener with its name filled: words that begin with it get the id and no second copy", () => {
+    const row = firstTextRow();
+    const parts = partsOf([wordsSend(`${OPENER} ${COMPOSED}`)]);
+    const added = insertFixedLines(parts, row, FIRST_TEXT);
+    expect(wordsOf(added)).toBe(`${OPENER} ${COMPOSED}\n${OPT_OUT}\n${PRIVACY}`);
+    expect(timesIn(wordsOf(added), OPENER)).toBe(1);
+    expect(added.fixedLines).toEqual(["opener", "optOutLine", "privacyLink"]);
+    expect(runMessageChecks(added, row.checks).checks.every((check) => check.passed)).toBe(true);
+  });
+
+  it("only the exact words from the first character count: words that merely resemble the line, or hold it later, get the line before them", () => {
+    const row = signUpRow();
+    for (const text of [
+      `Hi, I'm Rosie, an automated assistant. ${COMPOSED}`,
+      `hi! i'm rosie, an automated assistant. ${COMPOSED}`,
+      ` ${S1_02_FALLBACK}`,
+    ]) {
+      const added = insertFixedLines(partsOf([wordsSend(text)], []), row, SIGN_UP_FIRST_TEXT);
+      expect(wordsOf(added), text).toBe(`${SIGN_UP_OPENER} ${text}\n${OPT_OUT}\n${PRIVACY}`);
+      expect(added.fixedLines, text).toEqual(["signUpOpener", "optOutLine", "privacyLink"]);
+    }
+  });
+
+  it("pinned as default 19 accepts it: an owner who already holds a role gets opener before S1-02's fallback, so both openers' words show (K-05's test world only)", () => {
+    // A reader by the owner's role is never read by the sign-up line, so signUp is false (rows.ts signUpOf).
+    const row = firstTextRow({ reader: "owner" });
+    const added = insertFixedLines(partsOf([wordsSend(S1_02_FALLBACK)], []), row, FIRST_TEXT);
+    expect(wordsOf(added)).toBe(`${OPENER} ${S1_02_FALLBACK}\n${OPT_OUT}\n${PRIVACY}`);
+    expect(added.fixedLines).toEqual(["opener", "optOutLine", "privacyLink"]);
+    expect(timesIn(wordsOf(added), SIGN_UP_OPENER)).toBe(1);
+    expect(timesIn(wordsOf(added), OPENER)).toBe(1);
+  });
+});
+
+describe("fail closed: a pinned bundle without signUpOpener refuses an owner's sign-up text, never falling back to opener (default 19)", () => {
+  it("the inserter refuses it (lineNotInBundle: signUpOpener), even when the words already begin with the line's words, and with a business to name", () => {
+    const parts = partsOf([wordsSend(COMPOSED)], []);
+    expect(() => insertFixedLines(parts, withoutTheLine(), SIGN_UP_FIRST_TEXT)).toThrow(
+      /lineNotInBundle: signUpOpener/,
+    );
+    expect(() =>
+      insertFixedLines(partsOf([wordsSend(S1_02_FALLBACK)], []), withoutTheLine(), SIGN_UP_FIRST_TEXT),
+    ).toThrow(/lineNotInBundle: signUpOpener/);
+    // A row whose business has a name still never gets opener in its place.
+    let refused: unknown = null;
+    try {
+      insertFixedLines(partsOf([wordsSend(COMPOSED)]), firstTextRow({ reader: "owner" }), SIGN_UP_FIRST_TEXT);
+    } catch (error) {
+      refused = error;
+    }
+    expect(refused).toBeInstanceOf(FixedLineRefusedError);
+    expect(refused).toMatchObject({ fault: "lineNotInBundle", line: "signUpOpener" });
+    // The line's words alone are no line: a bundle must carry it by its id.
+    expect(fixedLinesFaults({ ...parts, fixedLines: ["signUpOpener"] }, withoutTheLine().checks)).toEqual([
+      "The fixed line signUpOpener is not one of the bundle's fixed lines.",
+    ]);
+  });
+
+  it("through the finalize call the text is refused whole and nothing is written", async () => {
+    const { repo, ports } = repoWithInserter(withoutTheLine(), factsPort(SIGN_UP_FIRST_TEXT));
+    await expect(runFinalize(PASS.request, ports)).rejects.toMatchObject({
+      name: "FixedLineRefusedError",
+      fault: "lineNotInBundle",
+      line: "signUpOpener",
+    });
+    expect(repo.calls.writes).toEqual([]);
+  });
+
+  it("the passed-on line of a sign-up row is refused too (finalize's passed-on path, index.ts passOn): nothing written, no clock cancelled, no review item", async () => {
+    const row = withoutTheLine({ fallbackText: null });
+    const words = passedOnWords(row.checks);
+    if (words === null) throw new Error("K-01 v1's lines hold the passed-on line");
+    expect(() =>
+      insertFixedLines(passedOnParts(row, PASS.request.plan, words), row, SIGN_UP_FIRST_TEXT),
+    ).toThrow(/lineNotInBundle: signUpOpener/);
+    const { repo, ports } = repoWithInserter(row, factsPort(SIGN_UP_FIRST_TEXT));
+    await expect(runFinalize(missingRewrite(), ports)).rejects.toThrow(/lineNotInBundle: signUpOpener/);
+    expect(repo.calls.writes).toEqual([]);
+    expect(repo.calls.cancels).toEqual([]);
+    expect(repo.calls.reviews).toEqual([]);
+  });
+
+  it("with the line, the sign-up row's passed-on line carries it: the passed-on words after signUpOpener's, the opt-out line and the privacy link", async () => {
+    const { repo, ports } = repoWithInserter(
+      signUpRow({ fallbackText: null }),
+      factsPort(SIGN_UP_FIRST_TEXT),
+    );
+    const response = responseOf(await runFinalize(missingRewrite(), ports));
+
+    expect(response.outcome).toBe("passedOn");
+    expect(wordsOf(response.finalParts)).toBe(
+      `${SIGN_UP_OPENER} I’ve passed this on. Rosie’s team will reply within 1 business day.\n${OPT_OUT}\n${PRIVACY}`,
+    );
+    expect(response.finalParts?.fixedLines).toEqual([
+      "passedOn",
+      "signUpOpener",
+      "optOutLine",
+      "privacyLink",
+    ]);
+    expect(repo.calls.writes).toHaveLength(1);
+  });
+
+  it("the Fixed lines check holds either id to its own words: signUpOpener's words are not opener's, nor the other way", () => {
+    const row = firstTextRow({}, { lists: listsWithSignUpOpener() });
+    const said = (text: string, id: string): FinalParts => partsOf([wordsSend(text)], [RILEY, DAY], [id]);
+    expect(fixedLinesFaults(said(`${SIGN_UP_OPENER} ${COMPOSED}`, "signUpOpener"), row.checks)).toEqual([]);
+    expect(fixedLinesFaults(said(`${OPENER} ${COMPOSED}`, "opener"), row.checks)).toEqual([]);
+    expect(fixedLinesFaults(said(`${OPENER} ${COMPOSED}`, "signUpOpener"), row.checks)).toEqual([
+      `The fixed line signUpOpener is not in the text word for word: "${SIGN_UP_OPENER}"`,
+    ]);
+    expect(fixedLinesFaults(said(`${SIGN_UP_OPENER} ${COMPOSED}`, "opener"), row.checks)).toEqual([
+      `The fixed line opener is not in the text word for word: "${OPENER}"`,
+    ]);
   });
 });

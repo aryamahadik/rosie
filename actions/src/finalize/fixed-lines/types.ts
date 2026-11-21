@@ -21,6 +21,18 @@ import type { FinalizeRow } from "../rewrite";
 /** K-01 v1's opener: "This is Rosie, the automated booking assistant for <business>." (arch 07 line 361; S13-01). */
 export const OPENER_LINE = "opener";
 
+/**
+ * The sign-up opener, S1-02's own first words: "Hi! I'm Rosie, an automated assistant." (K-01 README default 19, T-1510;
+ * MASTER-FLOW-A.md:28; arch 07 line 361: "S1-02's opener before there is a business"; DL-1033). It goes in place of
+ * `opener` on Rosie's first text to an owner read by the sign-up line on a step that does not need `business`
+ * (FixedLineFacts.signUp); bundle v2 carries it (T-1477), and a bundle without it refuses such a text (lineNotInBundle),
+ * never falling back to `opener`.
+ */
+export const SIGN_UP_OPENER_LINE = "signUpOpener";
+
+/** The two openers. A row carries one of them, never both (default 19). */
+export const OPENER_LINES: readonly string[] = [OPENER_LINE, SIGN_UP_OPENER_LINE];
+
 /** K-01 v1's STOP, HELP and rates line, S13-02's (RULES 4.3; msgtext.js line 14; Q-30). */
 export const OPT_OUT_LINE = "optOutLine";
 
@@ -31,8 +43,16 @@ export const OPT_OUT_LINE = "optOutLine";
  */
 export const PRIVACY_LINK_LINE = "privacyLink";
 
-/** The lines Rosie's first texts carry, each by the rule below (firstTextLines), never asked for by the port. */
-export const FIRST_TEXT_LINES: readonly string[] = [OPENER_LINE, OPT_OUT_LINE, PRIVACY_LINK_LINE];
+/**
+ * The lines Rosie's first texts carry, each by the rule below (firstTextLines; the opener's id by openerOf), never asked
+ * for by the port.
+ */
+export const FIRST_TEXT_LINES: readonly string[] = [
+  OPENER_LINE,
+  SIGN_UP_OPENER_LINE,
+  OPT_OUT_LINE,
+  PRIVACY_LINK_LINE,
+];
 
 /**
  * The one line besides a safety row that limit 8 lets past the stopped flag (T-267's security note b): a composed
@@ -67,6 +87,15 @@ export interface FixedLineFacts {
    * 4.3; S13-01; Q-30).
    */
   readonly textedAboutBusiness: boolean;
+  /**
+   * Whether the row's first-text opener is the sign-up opener (K-01 README default 19, T-1510; DL-1033): true only when
+   * the row's reader is read by the sign-up line as the owner (K-05 v1.5 rowReader: `from` signUpLine, `reader` owner)
+   * AND the row's step, as the row's own bundle holds it, does not need `business` (a step with no `needs` does not).
+   * The turn face reads both from the row reading it already makes for FinalizeRow.reader, in the same call (rows.ts
+   * finalizeDeps); no other read. Every other row (a reader by a role, staff or a customer read by the line, a step that
+   * needs `business`: S1-77, S1-10) is false and keeps `opener` with the business's name.
+   */
+  readonly signUp: boolean;
   /**
    * When the STOP, HELP and rates line was first delivered to this number (K-04 core phones.optout_line_delivered_at,
    * as T-220's sendState reads it into K-05 v1.2 phoneRead.optoutLineDeliveredAt), or null while none of its texts that

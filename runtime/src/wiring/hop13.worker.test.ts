@@ -11,7 +11,7 @@
 //     sets no Clock line and the question is about no visit, so 8pm the day after delivery in Lee's Barbershop's zone
 //     (arch 02 line 127; K-09 README v1.5 default 134). Its question opens; there is no never-delivered row to cancel (the
 //     commit's own, STATE note 37), and Sam's actor is told. The delivered and clockArmed spans go on the JOIN's trace,
-//     under its trace id and bundle v0, after the part's providerAccepted span; the receipt's webhook has its own trace,
+//     under its trace id and bundle v2, after the part's providerAccepted span; the receipt's webhook has its own trace,
 //     its receive alone.
 //   - A second delivered event for the same part (Linq's retry of the webhook, and another event for the part) arms
 //     nothing more: K-05 answers it repeated, saying it repeats the row's first delivery at that delivery's stored time
@@ -27,6 +27,9 @@
 // repeated), and a receipt for a row that asks no question is answered 200 with nothing read or armed.
 //
 // Each test runs the JOIN on a fresh rig, and the Durable Objects' storage is reset after each (as hop 12's tests run it).
+// Test owner 1 holds no role, so the JOIN's S1-02 row is read by its sign-up line as the owner and its first text opens
+// with signUpOpener (K-01 README default 19; T-1511); the turn pins bundle v2, which carries the line (T-1477), as hops 10
+// to 12 do (T-1512): on bundle v0 finalize would refuse the text and nothing would be sent or delivered.
 // Test values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and the fixtures' own words.
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import textFixture from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
@@ -44,11 +47,12 @@ import { flush } from "../turn/test-support";
 import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "./index";
 import type { ArmingCalls, OutboxCalls } from "./real";
 import {
-  BUNDLE_V0,
+  BUNDLE_V2,
   fakeFlags,
   SAM_CHAT,
   skeletonFakes,
   TEST_OWNER_1,
+  testClock,
   type LinqInboundEvent,
   type SignedWebhook,
   type SkeletonFakes,
@@ -209,9 +213,12 @@ interface Rig {
   restore(): void;
 }
 
-/** A rig whose root is fed the doubles' own calls, or what `feedsOf` gives in their place. */
+/**
+ * A rig whose root is fed the doubles' own calls, or what `feedsOf` gives in their place; bundle v2 active, the JOIN's pin
+ * (T-1512).
+ */
 function rig(log: MockInstance, feedsOf: (fakes: SkeletonFakes) => Partial<Feeds> = () => ({})): Rig {
-  const fakes = skeletonFakes();
+  const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
   const feeds: Feeds = {
     armingCalls: fakes.arming.calls,
     outboxCalls: fakes.dispatch.outbox,
@@ -447,7 +454,7 @@ describe("hop 13 joined: the double's delivery receipt reaches the gateway, the 
         // Sam's actor was named for its alarm (T-254).
         expect(arming.actorReads).toEqual([TEST_OWNER_1.handleId]);
 
-        // Under the JOIN's trace id and bundle v0: one delivered span, then one clockArmed span, after the part's
+        // Under the JOIN's trace id and bundle v2: one delivered span, then one clockArmed span, after the part's
         // providerAccepted span; labels and counts only.
         const trace = run.traceOf(traceId);
         const accept = onlySpan(trace, "providerAccepted");
@@ -455,7 +462,7 @@ describe("hop 13 joined: the double's delivery receipt reaches the gateway, the 
         const armed = onlySpan(trace, "clockArmed");
         expect(delivered).toMatchObject({
           trace_id: traceId,
-          bundle_id: BUNDLE_V0,
+          bundle_id: BUNDLE_V2,
           outcome: "ok",
           provider: "linq",
           error_code: null,
@@ -464,7 +471,7 @@ describe("hop 13 joined: the double's delivery receipt reaches the gateway, the 
         });
         expect(armed).toMatchObject({
           trace_id: traceId,
-          bundle_id: BUNDLE_V0,
+          bundle_id: BUNDLE_V2,
           outcome: "ok",
           error_code: null,
           got: { firstDelivery: true, partNo: 1, tryNo: 1 },

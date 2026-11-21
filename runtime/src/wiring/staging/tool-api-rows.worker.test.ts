@@ -8,10 +8,13 @@
 // connection string.
 //
 // One database holds one world: the walking skeleton's (T-1148's rows for Sam, who holds no role and no phone row), with
-// K-05's commit-s1-01-sam.json committed through db/repo's commitTurn under bundle v0 as the rig publishes it, and the
-// seed's own commits of the same request beside it. So each K-05 fixture named below is answered in its shape, and where
-// this world differs from the fixture's given the difference is stated at the comparison (`rowReadHere`, the facts): the
-// bundle id, Sam's stored language, his role at the barbershop and his phone row.
+// K-05's commit-s1-01-sam.json committed through db/repo's commitTurn, and the seed's own commits of the same request
+// beside it, each turn pinned to bundle v2 (T-1477), whose registry row the seed writes beside the rig's bundle v0: Sam's
+// S1-02 rows are read by the sign-up line as the owner, so finalize opens their first text with signUpOpener, S1-02's own
+// words, which bundle v2 carries and bundle v0 does not (K-01 README default 19; T-1511, T-1512; DL-1033). So each K-05
+// fixture named below is answered in its shape, and where this world differs from the fixture's given the difference is
+// stated at the comparison (`rowReadHere`, the facts): the bundle id, Sam's stored language, his role at the barbershop
+// and his phone row.
 //
 //   - Each input by direct call: readOutboxRow as read-outbox-row-s1-02-no-kinds.json (businessSensitive null), then, once
 //     K-23's seed-company-two-kinds.json is whole, as read-outbox-row-s1-02-not-sensitive.json (false), and notFound as
@@ -74,12 +77,14 @@ import { composeRoot, workerRoot, type HandleActors, type Root } from "../root";
 import { SKELETON_FLAG } from "../skeleton";
 import {
   BUNDLE_V0,
-  bundleV0FixedLine,
+  BUNDLE_V2,
+  bundleV2FixedLine,
   fakeFlags,
   SAM_CHAT,
   skeletonFakes,
   TEST_OWNER_1,
   TEST_OWNER_1_BUSINESS_NAME,
+  testClock,
   watchGate,
   type LinqInboundEvent,
   type SignedWebhook,
@@ -102,6 +107,7 @@ import {
   BARBERSHOP_KINDS,
   BUSINESSES,
   HOME_SERVICES,
+  SEEDED_BUNDLE,
   TURNS,
   writeBarbershopKinds,
   YOGA_STUDIO,
@@ -445,21 +451,24 @@ const PLAN_S1_02 = planS102 as unknown as {
 /** K-03 check-pass.json's checks: the seven message checks, in K-03's order, each passed. */
 const ALL_PASSED = checkPass.checks;
 
-/** Bundle v0's opener, its <business> filled with the name limit 7 lets Sam see (the switch is off: biz.name). */
-const OPENER = bundleV0FixedLine("opener").replace("<business>", TEST_OWNER_1_BUSINESS_NAME);
-/** Q-30's lines as bundle v0 writes them: the STOP, HELP and rates line, then the privacy link. */
-const OPT_OUT_LINE = bundleV0FixedLine("optOutLine");
-const PRIVACY_LINK = bundleV0FixedLine("privacyLink");
-/** The fixed lines of Rosie's first text to a handle about one business, in the order finalize adds them. */
-const FIRST_TEXT_LINES = ["opener", "optOutLine", "privacyLink"];
+/**
+ * Bundle v2's sign-up opener, S1-02's own first words (K-01 README default 19): Sam holds no role, so his S1-02 rows are
+ * read by the sign-up line as the owner, and their first text opens with it, naming no business.
+ */
+const OPENER = bundleV2FixedLine("signUpOpener");
+/** Q-30's lines as bundle v2 writes them: the STOP, HELP and rates line, then the privacy link. */
+const OPT_OUT_LINE = bundleV2FixedLine("optOutLine");
+const PRIVACY_LINK = bundleV2FixedLine("privacyLink");
+/** The fixed lines of Rosie's first sign-up text to the owner, in the order finalize adds them (default 19). */
+const FIRST_TEXT_LINES = ["signUpOpener", "optOutLine", "privacyLink"];
 
 /** The words plan-s1-02.json plans, a line each. */
 const PLANNED_WORDS = [...PLAN_S1_02.lines.map((line) => line.text), PLAN_S1_02.question.text].join("\n");
 
 /**
- * The final parts of Rosie's first text to Sam about Lee's Barbershop on `row`: S13-01's opener before the plan's words,
- * then Q-30's lines, the privacy link alone on the last line (T-1148's Sam holds no phone row, so the STOP, HELP and rates
- * line was never delivered and rides too).
+ * The final parts of Rosie's first text to Sam on `row`: signUpOpener before the plan's words, then Q-30's lines, the
+ * privacy link alone on the last line (T-1148's Sam holds no phone row, so the STOP, HELP and rates line was never
+ * delivered and rides too).
  */
 function firstTextParts(row: string): Json {
   return {
@@ -506,15 +515,15 @@ const UTC_INSTANT = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][
 
 /**
  * A K-05 row-read fixture's outcome as this database answers it. The same row, question, clock row, texts, business head
- * and line; what differs is this world's, never the read's: the turn is pinned to bundle v0 as the rig publishes it (the
- * fixture's registry row is K-04's stand-in), and Sam is T-1148's (no language stored, no role at the barbershop, no
+ * and line; what differs is this world's, never the read's: the turn is pinned to bundle v2 as the seed registers it
+ * (the fixture's registry row is K-04's stand-in), and Sam is T-1148's (no language stored, no role at the barbershop, no
  * phone row), where the fixture's given loads K-04's seed-person-roles.json and seed-phone-chat-open.json.
  */
 function rowReadHere(outcome: { readonly row: object; readonly recipient: object }): Json {
   return {
     ...outcome,
     readAt: expect.stringMatching(UTC_INSTANT) as string,
-    row: { ...outcome.row, bundleId: BUNDLE_V0 },
+    row: { ...outcome.row, bundleId: BUNDLE_V2 },
     recipient: { ...outcome.recipient, storedLanguage: null, roles: [], phone: null },
   };
 }
@@ -591,12 +600,12 @@ function stagingRoot(
   });
 }
 
-/** A call's own trace under bundle v0, set to its turn, with the spans it wrote. */
+/** A call's own trace under bundle v2, the seeded turns' bundle, set to its turn, with the spans it wrote. */
 function traceFor(turnId: string): { trace: TraceContext; spans: Span[] } {
   const spans: Span[] = [];
   const trace = openTrace({
     openedBy: "textWebhook",
-    bundleId: BUNDLE_V0,
+    bundleId: BUNDLE_V2,
     sink: (span) => spans.push(span),
   });
   trace.setTurn(turnId);
@@ -640,7 +649,7 @@ const composedFor = (turn: SeededTurn, inbound: unknown): Json => ({
 // ---- this file's database --------------------------------------------------------------------------------------------
 
 describe("this file's database: the walking skeleton's rows, K-05's commit-s1-01-sam and the seed's own turns", () => {
-  it("the rig made this file's database with bundle v0 active, and its seed wrote the business heads and committed each turn, the JOIN's under the id the lease hashes", async () => {
+  it("the rig made this file's database with bundle v0 active, and its seed wrote the business heads, bundle v2's registry row (not active) and committed each turn under bundle v2, the JOIN's under the id the lease hashes", async () => {
     expect(DATABASE).toMatch(/^rosie_rig_[0-9a-f]{8}_tool_api_rows$/u);
     // The JOIN's turn id is the lease's hash of its event id, its row K-09 v1.5 default 131's, as recording 4 names both.
     expect(TURNS.join.turnId).toBe(await turnIdOf([TURNS.join.eventId]));
@@ -648,11 +657,16 @@ describe("this file's database: the walking skeleton's rows, K-05's commit-s1-01
     expect(TURNS.join.row).toBe(joinComposeInput.row);
     expect(TURNS.s101.row).toBe(readOutboxRowNoKinds.request.outboxRowId);
     expect(BARBERSHOP).toBe(TEST_OWNER_1.businessId);
+    // The seed pins its turns to bundle v2 as bundles/v2 publishes it: the bundle the test's bundle double holds too.
+    expect(SEEDED_BUNDLE).toEqual(BUNDLE_V2);
 
     const active = await own.runtime("readActiveBundle", (sql) => readActiveBundle(sql));
     expect(active).toMatchObject({ result: "active", bundleId: BUNDLE_V0 });
     const stored = await own.runtime("seeded", async (sql) => ({
       businesses: (await sql<{ id: string }[]>`select id from businesses order by id`).map((row) => row.id),
+      bundles: await sql<{ hash: string; build: number; active: boolean }[]>`
+        select hash, build, active from bundles order by active desc, hash
+      `,
       turns: await sql<{ id: string; state: string; hash: string; build: number }[]>`
         select id, state, bundle_hash as hash, bundle_build as build from turns order by id
       `,
@@ -662,9 +676,13 @@ describe("this file's database: the walking skeleton's rows, K-05's commit-s1-01
     }));
     expect(stored.businesses).toEqual(BUSINESSES);
     expect(stored.businesses).toEqual(expect.arrayContaining([BARBERSHOP, YOGA_STUDIO, HOME_SERVICES]));
+    expect(stored.bundles).toEqual([
+      { ...BUNDLE_V0, active: true },
+      { ...BUNDLE_V2, active: false },
+    ]);
     expect(stored.turns).toEqual(
       Object.values(TURNS)
-        .map((turn) => ({ id: turn.turnId, state: "committed", ...BUNDLE_V0 }))
+        .map((turn) => ({ id: turn.turnId, state: "committed", ...BUNDLE_V2 }))
         .sort((a, b) => (a.id < b.id ? -1 : 1)),
     );
     expect(stored.rows).toEqual(expect.arrayContaining(Object.values(TURNS).map((turn) => turn.row)));
@@ -1115,14 +1133,15 @@ function expectNoSecrets(texts: readonly string[]): void {
 
 describe("through a root composed for staging: the three inputs on PostgreSQL, every other input on its double", () => {
   it(
-    "the JOIN's turn, as hops 9 and 10 run it: the gate on its double first, then unplannedRows, compose input (compose-input-s1-02-v1.6.json's input for the JOIN's row) and finalize (finalize-pass.json's plan) on PostgreSQL; the plan and the final parts read back from the row, S13-01's opener first; each scope on the Tool API's side and each row call on the runtime side, opened equal to ended",
+    "the JOIN's turn under bundle v2, as hops 9 and 10 run it: the gate on its double first, then unplannedRows, compose input (compose-input-s1-02-v1.6.json's input for the JOIN's row) and finalize (finalize-pass.json's plan) on PostgreSQL; the plan and the final parts read back from the row, signUpOpener first and no business named; each scope on the Tool API's side and each row call on the runtime side, opened equal to ended",
     { timeout: TEST_MS },
     async () => {
       await withBarbershopKinds();
       const fetch = vi.fn();
       vi.stubGlobal("fetch", fetch);
       const made = onPair();
-      const fakes = skeletonFakes();
+      // Bundle v2 active on the double, so the JOIN's run pins the bundle the seed committed its row under (T-1512).
+      const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
       const root = stagingRoot(fakes, made.inputs, handleActors());
       const turn = TURNS.join;
       expect(await storedRow(turn.row)).toMatchObject({ state: "planned", version: 1, plan: null });
@@ -1168,7 +1187,7 @@ describe("through a root composed for staging: the three inputs on PostgreSQL, e
         expect(onlySpan(trace, "compose")).toMatchObject({
           outcome: "ok",
           turn_id: turn.turnId,
-          bundle_id: BUNDLE_V0,
+          bundle_id: BUNDLE_V2,
           business_id: BARBERSHOP,
           got: { row: turn.row, channel: "imessage", situation: "routine", facts: 4, inbound: true },
         });
@@ -1198,7 +1217,8 @@ describe("through a root composed for staging: the three inputs on PostgreSQL, e
         });
 
         // Read back from the row in PostgreSQL: the plan and the final parts, written together, the row checked at its
-        // next version; S13-01's opener first, the privacy link alone on the last line.
+        // next version; signUpOpener first (S1-02's own words), the privacy link alone on the last line, and the
+        // business's name nowhere: Sam has named no business yet (default 19).
         const stored = await storedRow(turn.row);
         expect(stored).toEqual({
           turn_id: turn.turnId,
@@ -1207,11 +1227,13 @@ describe("through a root composed for staging: the three inputs on PostgreSQL, e
           plan: planOn(turn.row),
           final_parts: firstTextParts(turn.row),
         });
-        const words = String(
+        const text = String(
           (stored?.final_parts as { sends: { text: string }[] } | undefined)?.sends[0]?.text,
-        ).split("\n");
+        );
+        const words = text.split("\n");
         expect(words[0]?.startsWith(`${OPENER} `)).toBe(true);
         expect(words.slice(-2)).toEqual([OPT_OUT_LINE, PRIVACY_LINK]);
+        expect(text).not.toContain(TEST_OWNER_1_BUSINESS_NAME);
 
         // Each side's login: the turn's rows listed and each row call on the runtime side, each scope on the Tool
         // API's, every client ended; a call held its Tool API client while its runtime-side call ran (2 at once).

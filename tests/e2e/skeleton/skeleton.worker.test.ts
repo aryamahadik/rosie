@@ -36,6 +36,11 @@
 //     span, its receive, dropped at receipt (row 12);
 //   - twenty consecutive runs, each through a fresh composition root, give the same result (build prompt 5.2): RUNS
 //     named cases, each the whole test, each giving expectedResult's result.
+// The run pins bundle v2 as bundles/v2 publishes it (T-1477; ./root-run.ts holds it active): test owner 1 holds no role, so
+// the JOIN's S1-02 row is read by its sign-up line as the owner, and its first text opens with signUpOpener, S1-02's own
+// words, naming no business (K-01 README default 19; T-1511, T-1512; DL-1033). Bundle v0 has no such line, so finalize
+// would refuse that text there (fail closed). Bundle v2 holds S1-01 and S1-02 byte for byte as bundle v0 does, so the
+// frontier's choices, the gate's commit and the composer's input are the same; decide reads recording 2's reads on it.
 // Nothing here prints a message's words or a number.
 
 import { reset, runDurableObjectAlarm } from "cloudflare:test";
@@ -57,8 +62,8 @@ import { dueOf } from "../../../runtime/src/clocks/due";
 import { actorNameOf, openWords } from "../../../runtime/src/gateway";
 import { SEALING_WRAP_KEY } from "../../../runtime/src/wiring";
 import {
-  BUNDLE_V0,
-  bundleV0FixedLine,
+  BUNDLE_V2,
+  bundleV2FixedLine,
   JOIN_TEXT,
   SAM_CHAT,
   TEST_OWNER_1,
@@ -410,9 +415,9 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     // span says the same (trace-skeleton.json: threeSecondsQuiet).
     expect(["quiet", "max"]).toContain(batches[0]?.reason);
     expect(batch.decided?.closedBy).toBe(batches[0]?.reason === "max" ? "maxWait" : "threeSecondsQuiet");
-    // One bundle id on every span: bundle v0's, as bundles/v0 publishes it, read at receipt and pinned for the turn.
+    // One bundle id on every span: bundle v2's, as bundles/v2 publishes it, read at receipt and pinned for the turn.
     expect(new Set(facts.collected.spans.map((span) => JSON.stringify(span.bundle_id)))).toEqual(
-      new Set([JSON.stringify(BUNDLE_V0)]),
+      new Set([JSON.stringify(BUNDLE_V2)]),
     );
     // The database's row: K-05's commit wrote the turn's one K-04 turns row, under the lease's turn id and the JOIN's trace.
     expect([...facts.run.fakes.turnRows.turns.values()]).toMatchObject([
@@ -421,7 +426,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
         handleId: TEST_OWNER_1.handleId,
         eventIds: [JOIN.eventId],
         state: "committed",
-        bundleId: BUNDLE_V0,
+        bundleId: BUNDLE_V2,
         traceId: facts.sent.traceId,
         joinedTraceIds: [],
         tries: 1,
@@ -429,7 +434,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     ]);
   },
 
-  // Row 5, "Guard: keywords, then targets" (K-01 keywords, K-04 targets; T-556): JOIN is none of bundle v0's keywords, and
+  // Row 5, "Guard: keywords, then targets" (K-01 keywords, K-04 targets; T-556): JOIN is none of bundle v2's keywords, and
   // the seeded test owner has no target, so the doors.
   5: (facts) => {
     const guard = onlySpan(facts, "guard");
@@ -457,18 +462,18 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     return Promise.resolve();
   },
 
-  // Row 6, "Frontier from the Tool API" (K-09 buildFrontier, K-02 context, K-01 bundle v0; T-557): @rosie/actions' turn
+  // Row 6, "Frontier from the Tool API" (K-09 buildFrontier, K-02 context, K-01 bundle v2; T-557): @rosie/actions' turn
   // face, over the bundle the turn pinned and test owner 1's stored state (K-05 v1.2 readTurnState under Lee's
   // Barbershop's scope: no role, open question, booking or phone row), gives the JOIN turn build-frontier-s1-01.json's
   // choices: one choice, c-01, the sign-up door to S1-01. KV is empty, so its bundle part comes from PostgreSQL's copy,
-  // and its span, under bundle v0's id, says so.
+  // and its span, under bundle v2's id, says so.
   6: async (facts) => {
-    const flowKey = `bundle/${BUNDLE_V0.hash}/${String(BUNDLE_V0.build)}/flow/A`;
+    const flowKey = `bundle/${BUNDLE_V2.hash}/${String(BUNDLE_V2.build)}/flow/A`;
     expect(onlySpan(facts, "frontier")).toMatchObject({
       outcome: "ok",
       turn_id: facts.turnId,
       error_code: null,
-      bundle_id: BUNDLE_V0,
+      bundle_id: BUNDLE_V2,
       business_id: TEST_OWNER_1.businessId,
       got: {
         toolCall: "buildFrontier",
@@ -489,7 +494,8 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
   },
 
   // Row 7, "Decide, two reads" (K-02; T-558): @rosie/ai's decider, over the recorded-model double's recording 2 (the JOIN
-  // run's own context, as ai/recordings keys it: DL-347), gives the JOIN turn two decide reads, first and check, both
+  // run's own context, as ai/recordings keys it: DL-347; its reads on bundle v2's id), gives the JOIN turn two decide
+  // reads, first and check, both
   // Haiku, which agree, and no re-read: both enter c-01, the sign-up door, with the quote JOIN and no field, as
   // decide-s1-01-enter.json's reads do with its own text. The turn records the hop's one decideReads span (the AI layer
   // records only each model call's portCall span beside it), labels and counts only.
@@ -499,7 +505,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       outcome: "ok",
       turn_id: facts.turnId,
       error_code: null,
-      bundle_id: BUNDLE_V0,
+      bundle_id: BUNDLE_V2,
       business_id: TEST_OWNER_1.businessId,
       got: { choices: 1 },
       decided: {
@@ -550,16 +556,17 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     );
     expect(input.decided.decide).toMatchObject({
       turnId: facts.turnId,
-      bundleId: BUNDLE_V0,
+      bundleId: BUNDLE_V2,
       agreed: true,
       reread: false,
       parts: [{ outcome: "go", part: { verb: "enter", quote: JOIN_TEXT, choice: "c-01", fields: [] } }],
     });
     expect(input.decided.context.choices).toMatchObject([{ choiceId: "c-01", kind: "door", door: "signUp" }]);
-    // Every decide call was answered from recording 2 as ai/recordings keys it: the run's request is the recording's.
+    // Every decide call was answered from recording 2's reads on bundle v2 (runtime/src/wiring/test-support.ts
+    // onBundleV2): the run's request is recording 2's as ai/recordings keys it, but for the pinned bundle id.
     expect(facts.run.fakes.decide.misses).toEqual([]);
     expect(new Set(facts.run.fakes.decide.calls.flatMap((call) => call.recordings))).toEqual(
-      new Set(["decide-s1-01-join-first", "decide-s1-01-join-check"]),
+      new Set(["decide-s1-01-join-first-on-bundle-v2", "decide-s1-01-join-check-on-bundle-v2"]),
     );
     return Promise.resolve();
   },
@@ -636,7 +643,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
         id: facts.turnId,
         handleId: TEST_OWNER_1.handleId,
         eventIds: [JOIN.eventId],
-        bundleId: BUNDLE_V0,
+        bundleId: BUNDLE_V2,
         traceId: facts.sent.traceId,
         joinedTraceIds: [],
         tries: 1,
@@ -673,7 +680,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       channel: JOIN.service,
       sendClass: "quick_reply",
     });
-    // The event-log entries: each under the one turn id, the one trace id and bundle v0.
+    // The event-log entries: each under the one turn id, the one trace id and bundle v2.
     expect(turnRows.eventLog.length).toBeGreaterThan(0);
     expect(
       new Set(
@@ -681,7 +688,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
           JSON.stringify([row.turn_id, row.trace_id, row.bundle_hash, row.bundle_build]),
         ),
       ),
-    ).toEqual(new Set([JSON.stringify([facts.turnId, facts.sent.traceId, BUNDLE_V0.hash, BUNDLE_V0.build])]));
+    ).toEqual(new Set([JSON.stringify([facts.turnId, facts.sent.traceId, BUNDLE_V2.hash, BUNDLE_V2.build])]));
     // Every row under the one turn id.
     expect(
       new Set([...turnRows.rows.values()].flatMap((table) => [...table.values()].map((row) => row.turnId))),
@@ -722,7 +729,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
   // Barbershop's scope, gives the composer exactly T-1175's recording 4 (S1-02's row, routine, S1-02's four card terms
   // as its facts, the JOIN as its inbound text, no frontier); @rosie/ai's composer, over the recorded-model double,
   // answers it from recording 4 with one Haiku call. One compose span for the one row, its plan plan-s1-02.json's shape,
-  // its model call under bundles/v0's pinned id and the JOIN's hashed turn id, on its own portCall span too. No span
+  // its model call under bundles/v2's pinned id and the JOIN's hashed turn id, on its own portCall span too. No span
   // holds a word the composer was given or wrote, the JOIN's words, its number or its chat id, even inside a longer
   // value (T-1200, from T-560's security review note a).
   9: async (facts) => {
@@ -738,7 +745,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       outcome: "ok",
       error_code: null,
       turn_id: facts.turnId,
-      bundle_id: BUNDLE_V0,
+      bundle_id: BUNDLE_V2,
       business_id: TEST_OWNER_1.businessId,
       got: {
         row,
@@ -767,7 +774,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(facts.run.fakes.composer.calls).toEqual([
       { model: HAIKU_MODEL, recording: "composer-join-s1-02" },
     ]);
-    // Its one model call, Haiku for compose, on the compose span and on its own portCall span, under bundles/v0's pinned
+    // Its one model call, Haiku for compose, on the compose span and on its own portCall span, under bundles/v2's pinned
     // id and the turn id T-248's hash of evt-sam-0000 (DL-357).
     expect(facts.turnId).toBe(await turnIdOf(["evt-sam-0000"]));
     expect(compose.model_calls?.map((call) => [call.model, call.purpose, call.outcome])).toEqual([
@@ -777,7 +784,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       (span) => isModelCallSpan(span) && (span.model_calls ?? []).some((call) => call.purpose === "compose"),
     );
     expect(composeCalls.map((span) => [span.bundle_id, span.turn_id, span.attempt, span.outcome])).toEqual([
-      [BUNDLE_V0, facts.turnId, 1, "ok"],
+      [BUNDLE_V2, facts.turnId, 1, "ok"],
     ]);
     // Compose input read the row once, under Lee's Barbershop's scope.
     expect(facts.run.fakes.compose.scopes).toEqual([TEST_OWNER_1.businessId]);
@@ -817,20 +824,22 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
   // Row 10, "Code fills slots and fixed lines; claim check and message checks" (K-09 finalizeMessage, K-03 final parts;
   // T-561; ADR-013 section 6; Q-30's default): @rosie/actions' turn face's finalizeMessage, reading the JOIN turn's row and
   // its fixed-line facts once each under Lee's Barbershop's scope, fills the row's plan (plan-s1-02.json) and adds Rosie's
-  // first-text lines word for word as bundle v0 writes them: S13-01's opener first, then Q-30's STOP, HELP and rates line,
-  // and the privacy link alone on the last line. Every message check passes at the first attempt as finalize runs them, so
-  // no rewrite, and the plan and the final parts are written into the row together, once, after the commit (T-196's
-  // writePlan). One fillAndChecks span, the turn's (the Tool API base records none: DL-376).
+  // first-text lines word for word as bundle v2 writes them: signUpOpener first (S1-02's own words: test owner 1 holds no
+  // role, so the row is read by the sign-up line as the owner, and he has named no business; K-01 README default 19),
+  // then Q-30's STOP, HELP and rates line, and the privacy link alone on the last line. Every message check passes at the
+  // first attempt as finalize runs them, so no rewrite, and the plan and the final parts are written into the row
+  // together, once, after the commit (T-196's writePlan). One fillAndChecks span, the turn's (the Tool API base records
+  // none: DL-376).
   10: (facts) => {
     const row = `outbox-s1-02-${facts.turnId}-1`;
     const plan = planS102 as unknown as {
       readonly lines: readonly { readonly text: string }[];
       readonly question: { readonly text: string };
     };
-    const opener = bundleV0FixedLine("opener").replace("<business>", TEST_OWNER_1_BUSINESS_NAME);
-    const optOutLine = bundleV0FixedLine("optOutLine");
-    const privacyLink = bundleV0FixedLine("privacyLink");
-    const fixedLines = ["opener", "optOutLine", "privacyLink"];
+    const opener = bundleV2FixedLine("signUpOpener");
+    const optOutLine = bundleV2FixedLine("optOutLine");
+    const privacyLink = bundleV2FixedLine("privacyLink");
+    const fixedLines = ["signUpOpener", "optOutLine", "privacyLink"];
     // One fillAndChecks span for the row, the turn's, after the compose: sent at the first attempt with no message check
     // failed, the first text's fixed lines by id, the row written.
     const checks = onlySpan(facts, "fillAndChecks");
@@ -838,7 +847,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       outcome: "ok",
       error_code: null,
       turn_id: facts.turnId,
-      bundle_id: BUNDLE_V0,
+      bundle_id: BUNDLE_V2,
       business_id: TEST_OWNER_1.businessId,
       got: { row, attempt: "composed", calls: 1 },
       decided: {
@@ -880,6 +889,9 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     const lines = text.split("\n");
     expect(lines[0]?.startsWith(`${opener} `)).toBe(true);
     expect(lines.slice(-2)).toEqual([optOutLine, privacyLink]);
+    // No business named: neither the business opener's words nor the stand-in business's name (default 19).
+    expect(text).not.toContain(bundleV2FixedLine("opener").replace(" <business>.", ""));
+    expect(text).not.toContain(TEST_OWNER_1_BUSINESS_NAME);
     expect(facts.run.fakes.turnRows.commits).toHaveLength(1);
     // Finalize read the row and its fixed-line facts once each, under Lee's Barbershop's scope.
     expect(finalize.scopes).toEqual([TEST_OWNER_1.businessId]);
@@ -897,7 +909,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
   // Row 11, "Outbox dispatcher, limit 8" (K-05, K-07; T-562; ADR-013 section 6: commit-s1-01.json's row, quick_reply,
   // K-09 v1.5 default 133; DL-312, DL-317, DL-433; T-1213, DL-444): the dispatcher the turn woke claims the JOIN turn's one
   // row once, in commit order, through K-05 v1.2's claim (claim 1, from checked, by the linq port), with the final parts
-  // finalize wrote into it: S13-01's opener, the plan's words, Q-30's STOP, HELP and rates line, and the privacy link alone
+  // finalize wrote into it: signUpOpener, the plan's words, Q-30's STOP, HELP and rates line, and the privacy link alone
   // on the last line. The JOIN opened Sam's chat at receipt (row 1: K-05 v1.7 openChatOnText), so limit 8 reads Sam's
   // send state with his phone row, not stopped, its chat open by iMessage, and lets the reply in the same turn go (Q-15);
   // the claim is renewed just before the part goes, with Sam's phone row read beside it (not stopped, chat open), and the
@@ -913,9 +925,9 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     const { dispatch, finalize, linq } = facts.run.fakes;
     const written = finalize.plans.get(row);
     if (written === undefined) throw new Error("finalize wrote no final parts into the JOIN turn's row");
-    const opener = bundleV0FixedLine("opener").replace("<business>", TEST_OWNER_1_BUSINESS_NAME);
-    const optOutLine = bundleV0FixedLine("optOutLine");
-    const privacyLink = bundleV0FixedLine("privacyLink");
+    const opener = bundleV2FixedLine("signUpOpener");
+    const optOutLine = bundleV2FixedLine("optOutLine");
+    const privacyLink = bundleV2FixedLine("privacyLink");
 
     // One claim, for the JOIN turn's recipient: the row claimed once, from checked, by the linq port, as quick_reply.
     expect(dispatch.claims.map((call) => call.request.recipientHandleId)).toEqual([TEST_OWNER_1.handleId]);
@@ -992,7 +1004,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       outcome: "ok",
       error_code: null,
       turn_id: facts.turnId,
-      bundle_id: BUNDLE_V0,
+      bundle_id: BUNDLE_V2,
       provider: "linq",
       call: "sendPart",
       attempt: 1,
@@ -1023,7 +1035,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
   // Row 12, "Send to the Linq double" (K-11; T-563; DL-315, DL-433; CQ-152): the row's one words part went through the
   // root's Linq send port to @rosie/adapters' Linq double (T-411), the one the local target collects its parts from, which
   // recorded exactly one send: under the part's key, to Sam's chat by iMessage, carrying S1-02's question in the final
-  // parts finalize wrote (S13-01's opener first, Q-30's STOP, HELP and rates line, the privacy link alone on the last
+  // parts finalize wrote (signUpOpener first, Q-30's STOP, HELP and rates line, the privacy link alone on the last
   // line), accepted with the message id the part was marked sent with. One providerAccepted span, the part's, at the
   // double's acceptance, inside the row's dispatch span and after its start (DL-349); no retry was needed, so nothing went
   // on the retry queue. Then the hard invariant (no duplicate send): the same webhook sent again is dropped at receipt, and
@@ -1038,7 +1050,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     const written = finalize.plans.get(row);
     if (written === undefined) throw new Error("finalize wrote no final parts into the JOIN turn's row");
     const text = written.finalParts.sends[0].text ?? "";
-    const opener = bundleV0FixedLine("opener").replace("<business>", TEST_OWNER_1_BUSINESS_NAME);
+    const opener = bundleV2FixedLine("signUpOpener");
     const question = (planS102 as unknown as { readonly question: { readonly text: string } }).question.text;
 
     // The Linq double the target collects from recorded exactly one send: the part, under its key, to Sam's chat, with
@@ -1066,7 +1078,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     const lines = text.split("\n");
     expect(lines[0]?.startsWith(`${opener} `)).toBe(true);
     expect(text).toContain(question);
-    expect(lines.slice(-2)).toEqual([bundleV0FixedLine("optOutLine"), bundleV0FixedLine("privacyLink")]);
+    expect(lines.slice(-2)).toEqual([bundleV2FixedLine("optOutLine"), bundleV2FixedLine("privacyLink")]);
     // Accepted by the double, and the part marked sent with the message id it gave.
     const accepted = linq.accepted.get(key);
     if (accepted?.providerMessageId == null) throw new Error("the Linq double accepted no part");
@@ -1082,7 +1094,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       outcome: "ok",
       error_code: null,
       turn_id: facts.turnId,
-      bundle_id: BUNDLE_V0,
+      bundle_id: BUNDLE_V2,
       provider: "linq",
       rows: [{ table: "outbox_parts", id: key }],
     });
@@ -1191,7 +1203,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
   // the commit made, through K-05 armClock named by its question: at step 9's due time with no Clock line and no visit,
   // 8pm the day after delivery in Lee's Barbershop's zone. Its question opened, no never-delivered row was cancelled (the
   // commit's own, none for turn 1: note 37), and Sam's actor was named for its alarm. One delivered span and one
-  // clockArmed span, on the JOIN's trace (one trace id from the webhook to the receipt) and bundle v0, after the part's
+  // clockArmed span, on the JOIN's trace (one trace id from the webhook to the receipt) and bundle v2, after the part's
   // providerAccepted span, labels and counts only. Then a second delivered event for the same part arms nothing more:
   // K-05 answers it repeated. Linq's repeats and the arming failing closed with no database are proven in
   // runtime/src/wiring/hop13.worker.test.ts.
@@ -1282,14 +1294,14 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(arming.cancels).toEqual([]);
     expect(arming.actorReads).toEqual([TEST_OWNER_1.handleId]);
 
-    // One delivered and one clockArmed span, on the JOIN's trace and bundle v0, after the part's providerAccepted span.
+    // One delivered and one clockArmed span, on the JOIN's trace and bundle v2, after the part's providerAccepted span.
     const accept = onlySpan(facts, "providerAccepted");
     const delivered = onlySpan(facts, "delivered");
     const armed = onlySpan(facts, "clockArmed");
     expect(delivered).toMatchObject({
       trace_id: facts.sent.traceId,
       turn_id: facts.turnId,
-      bundle_id: BUNDLE_V0,
+      bundle_id: BUNDLE_V2,
       outcome: "ok",
       provider: "linq",
       error_code: null,
@@ -1299,7 +1311,7 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(armed).toMatchObject({
       trace_id: facts.sent.traceId,
       turn_id: facts.turnId,
-      bundle_id: BUNDLE_V0,
+      bundle_id: BUNDLE_V2,
       outcome: "ok",
       error_code: null,
       got: { firstDelivery: true, partNo: 1, tryNo: 1 },
@@ -1534,9 +1546,9 @@ function fullPathOf(facts: Facts, report: RunReport): Omit<FullPathResult, "repe
   expect(report.hops?.hops).toEqual(section11);
   expect(report.problems).toEqual([]);
 
-  // One bundle id on every span, the model calls' own too: bundle v0's, as bundles/v0 publishes it.
+  // One bundle id on every span, the model calls' own too: bundle v2's, as bundles/v2 publishes it.
   const bundleIds = [...new Set(facts.collected.spans.map((span) => bundleLabel(span.bundle_id)))];
-  expect(bundleIds).toEqual([bundleLabel(BUNDLE_V0)]);
+  expect(bundleIds).toEqual([bundleLabel(BUNDLE_V2)]);
 
   // One trace id: in the whole log, no span of the JOIN's event or of its turn is on any trace but the JOIN's. The only
   // other trace is the delivery receipt's own webhook's: its one receive span (the receipt's delivered and clockArmed
@@ -1572,7 +1584,7 @@ function fullPathOf(facts: Facts, report: RunReport): Omit<FullPathResult, "repe
   });
 
   // Its words carry S1-02's first sign-up question (D-017's human test: "Rosie answers once, with the first sign-up
-  // question"), once: the question plan-s1-02.json asks, which is S1-02's own as bundle v0 words it, the master text
+  // question"), once: the question plan-s1-02.json asks, which is S1-02's own as bundle v2 words it, the master text
   // compose input read for the JOIN turn's one row (row 9 holds that input to recording 4).
   const [input, ...moreInputs] = composer.inputs;
   expect(moreInputs).toEqual([]);
@@ -1761,7 +1773,7 @@ async function skeletonRun(prefix: SkeletonPrefix | null): Promise<RunResult> {
 
 /**
  * What every run gives (T-466: twenty consecutive runs give the same result), from the fixtures and the run's own ids:
- * the hops of section 11 as K-08's trace-skeleton.json draws them, bundle v0's id, the JOIN turn's one S1-02 row (its id
+ * the hops of section 11 as K-08's trace-skeleton.json draws them, bundle v2's id, the JOIN turn's one S1-02 row (its id
  * T-248's hash of the JOIN's event id, as row 8 builds it), one words part under that row's first key to Sam's chat by
  * the JOIN's service, asking S1-02's question once, the receipt's own webhook a trace of one receive span, and the same
  * webhook sent again one receive span as trace-duplicate-webhook.json draws it, naming the JOIN's trace, with still one
@@ -1779,7 +1791,7 @@ async function expectedResult(prefix: SkeletonPrefix | null): Promise<RunResult>
         ? null
         : {
             hops: SKELETON.spans.map((span) => span.hop),
-            bundleIds: [bundleLabel(BUNDLE_V0)],
+            bundleIds: [bundleLabel(BUNDLE_V2)],
             otherTraces: [[{ seq: 1, hop: "receive", outcome: "ok" }]],
             outboxRows: [row],
             sends: [

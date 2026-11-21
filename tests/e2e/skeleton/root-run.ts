@@ -11,12 +11,16 @@
 //   join 2, sealing     K-05 v1.2 handleSealingKey as a double answering as the handle-key-*.json fixtures;
 //   join 3, safetyRead  @rosie/ai's safety read over the recorded-model double (each skeleton text reads No);
 //   join 4, turnRow     K-05's commitTurn and parkTurn as a double keeping each turn id's one K-04 turns row;
-//   join 5, bundles     K-05's bundle reads holding bundle v0 as bundles/v0 publishes it, and targets: K-05 v1.2
-//                       handleTargets over test owner 1's seeded rows (T-1148), as targets-first-text.json;
+//   join 5, bundles     K-05's bundle reads holding bundle v0 as bundles/v0 publishes it and bundle v2 as bundles/v2
+//                       publishes it (T-1477), bundle v2 active, so the JOIN's turn pins it: test owner 1 holds no role,
+//                       so finalize opens his sign-up text with signUpOpener, which bundle v2 carries and bundle v0 does
+//                       not (K-01 README default 19; T-1511, T-1512); and targets: K-05 v1.2 handleTargets over test owner
+//                       1's seeded rows (T-1148), as targets-first-text.json;
 //   join 6, frontier    @rosie/actions' turn face over the frontier's scope: K-05 v1.2 readTurnState as a double over
 //                       test owner 1's seeded rows (T-1148), reading the bundle the turn pinned;
 //   join 7, decide      @rosie/ai's decider (T-369's createDecider with T-370's re-read), one per bundle, over the
-//                       recorded-model double: a fake Messages API answered from ai/recordings (recording 2, DL-347);
+//                       recorded-model double: a fake Messages API answered from ai/recordings (recording 2, DL-347,
+//                       its reads on bundle v2's id: test-support's onBundleV2);
 //   join 8, gate        @rosie/actions' turn face's gateAndCommit (T-1141), its reads over test owner 1's seeded rows
 //                       and what the K-05 commitTurn double wrote, its one commit through the root's turn-row port;
 //   join 9, compose     @rosie/actions' turn face's composeInput (T-1141), over a K-05 v1.6 readOutboxRow double over
@@ -56,8 +60,10 @@ import type { HandleActor } from "../../../runtime/src/actor";
 import { actorNameOf } from "../../../runtime/src/gateway";
 import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "../../../runtime/src/wiring";
 import {
+  BUNDLE_V2,
   fakeFlags,
   skeletonFakes,
+  testClock,
   watchGate,
   type SkeletonFakes,
   type WatchedGateCall,
@@ -167,9 +173,12 @@ export interface RootRun {
   close(): void;
 }
 
-/** The composition root for "test", with every joined port fed its double, and T-465's local target posting to it. */
+/**
+ * The composition root for "test", with every joined port fed its double (bundle v2 active, the JOIN's pin: T-1512), and
+ * T-465's local target posting to it.
+ */
 export function startRootRun(): RootRun {
-  const fakes = skeletonFakes();
+  const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
   const secret = makeTestWebhookSecret();
   // The log capture first: it is in place before the root binds its span sinks to console.log. The target reads each
   // trace from it, and the run hands it over whole (`spans`).

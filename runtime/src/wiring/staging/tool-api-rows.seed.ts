@@ -18,9 +18,14 @@
 //               this file's job binding, the barbershop's own company and its barber kind (`writeBarbershopKinds`: the two
 //               rows T-1148's seed writes for it, checked equal here), after which the read answers false
 //               (read-outbox-row-s1-02-not-sensitive.json) and the whole fixture is loaded.
-//   the turns   K-05's commit-s1-01-sam.json through db/repo's commitTurn, its turn pinned to bundle v0 as the rig
-//               publishes it (the one bundle this database holds; nothing else changed), and six more commits of the same
-//               request under ids of their own (`TURNS`): the JOIN's turn, under the id the lease hashes from its event id
+//   bundle v2   its registry row (K-04 bundles: id, manifest key, built at; not active), as bundles/v2 publishes it
+//               (T-1477), beside bundle v0, which the rig publishes and holds active. Sam holds no role, so each S1-02
+//               row here is read by its sign-up line as the owner, and finalize opens its first text with signUpOpener,
+//               which bundle v2 carries and bundle v0 does not (K-01 README default 19; T-1511): an owner's sign-up turn
+//               pins bundle v2 (DL-1033 ruling 2; T-1512). Its parts are read through the test's bundle double, never here.
+//   the turns   K-05's commit-s1-01-sam.json through db/repo's commitTurn, its turn pinned to bundle v2 (nothing else
+//               changed), and six more commits of the same request under ids of their own (`TURNS`), each pinned the
+//               same way: the JOIN's turn, under the id the lease hashes from its event id
 //               (ai/recordings' recording 4 names that id and its row), which the turn-row port takes where it refuses
 //               turn-s1-01-sam; two turns whose rows are composed and finalized side by side; a turn with two rows for
 //               writePlan and unplannedRows called directly, and one for the same calls through the root's own rows; and
@@ -35,6 +40,7 @@
 // T-1148's rows are read at `seed`, in Node, since db/seeds reads the fixture set from disk as it loads.
 import joinComposeInput from "../../../../ai/recordings/composer-inputs/join-s1-02.json";
 import joinRunContext from "../../../../ai/recordings/contexts/join-s1-01.json";
+import bundleV2Manifest from "../../../../bundles/v2/bundle/manifest.json";
 import commitS101Sam from "../../../../contracts/data-access/fixtures/commit-s1-01-sam.json";
 import seedCompanyTwoKinds from "../../../../contracts/db-schema/business-setup/fixtures/seed-company-two-kinds.json";
 import seedBusinessHead from "../../../../contracts/db-schema/core/fixtures/seed-business-head.json";
@@ -200,6 +206,15 @@ interface BundleId {
   readonly build: number;
 }
 
+/** Bundle v2's id, as bundles/v2 publishes it (T-1477): the bundle every turn of this seed is pinned to (T-1512). */
+export const SEEDED_BUNDLE: BundleId = {
+  hash: bundleV2Manifest.bundleId.hash,
+  build: bundleV2Manifest.bundleId.build,
+};
+
+/** When bundle v2 was built, as its manifest says: its registry row's built_at. */
+const SEEDED_BUNDLE_BUILT_AT = bundleV2Manifest.builtAt;
+
 /**
  * commit-s1-01-sam.json's request for `turn`: every id of the fixture's swapped for the turn's wherever the request
  * names it as a whole string, the turn pinned to `bundleId`, and for a turn of two rows a second outbox row beside the
@@ -270,14 +285,19 @@ export async function seed(sql: Sql): Promise<void> {
     for (const row of OTHER_BUSINESS_ROWS) await insertRow(tx, row);
   });
 
-  // Bundle v0 as the rig published it: the one bundle here, active, which every turn of this seed is pinned to.
+  // Bundle v0 as the rig published it: the one bundle here so far, and the active one, which stays active.
   const bundles = await sql<{ hash: string; build: number }[]>`select hash, build from bundles where active`;
-  const [bundleId] = bundles;
-  if (bundleId === undefined || bundles.length !== 1) {
+  if (bundles.length !== 1) {
     throw new Error("the tool-api-rows seed: this database holds no one active bundle");
   }
+  // Bundle v2's registry row, not active, which every turn of this seed is pinned to (T-1512).
+  await sql`
+    insert into bundles (hash, build, manifest_key, built_at)
+    values (${SEEDED_BUNDLE.hash}, ${SEEDED_BUNDLE.build},
+            ${`bundle/${SEEDED_BUNDLE.hash}/${String(SEEDED_BUNDLE.build)}/manifest`}, ${SEEDED_BUNDLE_BUILT_AT})
+  `;
   for (const [name, turn] of Object.entries(TURNS)) {
-    const committed = await commitTurn(sql, requestOf(turn, bundleId), { now: new Date(turn.at) });
+    const committed = await commitTurn(sql, requestOf(turn, SEEDED_BUNDLE), { now: new Date(turn.at) });
     if (!("result" in committed) || committed.repeated) {
       throw new Error(`the tool-api-rows seed: the commit of its turn ${name} was not taken`);
     }
