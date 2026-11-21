@@ -2804,12 +2804,26 @@ const NEVER_WENT: ReadonlySet<string> = new Set(["withdrawn", "failed", "dropped
 const OPT_OUT_LINE_ID = "optOutLine";
 
 /**
+ * A readFixedLineFacts request's business as K-05 takes it: a business, or none (null) on the runtime side. The Tool
+ * API's port always names one (@rosie/actions' RowData), but the double answers K-05's call, so it answers both, as
+ * db/repo's read does.
+ */
+function requestedBusiness(request: { readonly businessId: string | null }): string | null {
+  return request.businessId;
+}
+
+/**
  * Whether final parts hold one of `lines` among their fixedLines (db/repo/outbox.ts carriesLine): false when they hold no
  * list.
  */
-function carriesLine(finalParts: { readonly fixedLines?: unknown } | undefined, lines: readonly string[]): boolean {
+function carriesLine(
+  finalParts: { readonly fixedLines?: unknown } | undefined,
+  lines: readonly string[],
+): boolean {
   const fixedLines: unknown = finalParts?.fixedLines;
-  return Array.isArray(fixedLines) && fixedLines.some((line) => typeof line === "string" && lines.includes(line));
+  return (
+    Array.isArray(fixedLines) && fixedLines.some((line) => typeof line === "string" && lines.includes(line))
+  );
 }
 
 /**
@@ -2904,15 +2918,15 @@ export function fakeFinalizeData(
     },
     readFixedLineFacts(request) {
       factReads.push({ outboxRowId: request.outboxRowId, businessId: request.businessId });
+      const businessId = requestedBusiness(request);
       const row = outboxRow(request.outboxRowId);
-      if (row?.values.businessId !== request.businessId) {
+      if (row === undefined || businessOf(row) !== businessId) {
         return Promise.resolve({ error: "notFound", table: "outbox_rows", rowId: request.outboxRowId });
       }
       const handleId = row.values.recipientHandleId;
       if (typeof handleId !== "string" || handleId !== TEST_OWNER_1.handleId) {
         return Promise.reject(new Error("the skeleton's readFixedLineFacts double holds no other recipient"));
       }
-      const { businessId } = request;
       let openerRowId: string | null;
       if (businessId === null) {
         // openers_sent holds no mark with no business: the earliest earlier row to the handle with none that carries an
@@ -3962,8 +3976,7 @@ export function fakeDispatchData(
         tryKind === "words" &&
         sendKind === "words" &&
         carriesLine(finalParts, [OPT_OUT_LINE_ID]) &&
-        phone !== undefined &&
-        phone.optoutLineDeliveredAt === null
+        phone?.optoutLineDeliveredAt === null
       ) {
         phones.set(recipientOf(row), {
           ...phone,
