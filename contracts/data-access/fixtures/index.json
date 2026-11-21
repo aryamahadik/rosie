@@ -3183,6 +3183,46 @@
       "expect": "refuse",
       "shows": "Turn 1's row refused as businessHasOwner while the barbershop has no live owner role: the refusal is answered only for a business that has one, so the walking skeleton's turn 1 keeps its reader (put right, the owner by the sign-up line, it is row-reader-s1-02-no-role-no-owner)",
       "source": "K-05 v1.5 item 44 and row-reader-s1-02-no-role.json; ADR-013 default 130; db/seeds/skeleton.ts (T-1148: no owner role); K-05 v1.20 item 80 (rowReader.exchange rule 3)"
+    },
+    {
+      "file": "commit-s1-02-sam-asks-again.json",
+      "version": "v1.21",
+      "def": "commitTurn.askAgainExchange",
+      "expect": "accept",
+      "shows": "K-09 v1.12's asked part as K-05 commits it: Sam's 'A bit of everything' sends S1-02's one open question again in outbox-s1-02-sam-asked-1 (quick_reply, the question named, no plan) and, in the same transaction, raises oq-s1-02-sam-1's ask count from 1 to 2 at the version read, 1, with its open_question.asked_again entry; the answer names the question at version 2 and the row at commitSeq 2, and nothing else of the question moves",
+      "source": "ops/cards/T-1508.md (Gives 1 to 4); K-09 v1.12 defaults 192 to 197, open gap 173 and commit-s1-02-asked.json; arch 09 line 490 (an ask count: 'Rosie asks once; once more only after a language or access problem'); K-04 v1 open_questions.ask_count (0009); K-08 v1 open_question.asked_again; DL-1018 section C, DL-1030; K-05 v1.21 item 81 and defaults 192, 195 and 196"
+    },
+    {
+      "file": "commit-s1-02-sam-asks-again-stale.json",
+      "version": "v1.21",
+      "def": "commitTurn.askAgainExchange",
+      "expect": "accept",
+      "shows": "A second raise of S1-02's question from a turn that read it at version 1, after commit-s1-02-sam-asks-again moved it to 2: limit 4 refuses the commit, versionChanged naming oq-s1-02-sam-1 (read 1, now 2), and nothing is written, so no raise slips past K-09 v1.12's cap",
+      "source": "arch 06 line 305 (limit 4: compare-and-set, say what changed); K-05 v1 item 1 (any version mismatch refuses the commit with versionChanged); K-09 v1.12 default 194 (the cap, compared and set at the version the commit read); ops/cards/T-1508.md (refused twin: a stale version); K-05 v1.21 item 81 and default 192"
+    },
+    {
+      "file": "commit-a7-03-alex-asks-again-defaulted.json",
+      "version": "v1.21",
+      "def": "commitTurn.askAgainExchange",
+      "expect": "accept",
+      "shows": "A raise of A7-03's question after fire-once defaulted it, at its version now, 3: the question is not waiting or open, so the commit is refused wrongState naming oq-a7-03-alex and its status, defaulted, and nothing is written",
+      "source": "arch 09 line 490 (waiting, open, answered, defaulted, withdrawn); K-05 v1 item 7 and fire-once.json (the safe default closes the question); ops/cards/T-1508.md (refused wrongState unless the question is live); K-05 v1.1 wrongStateError; K-05 v1.21 item 81 and default 193 (openQuestionWrongStateError)"
+    },
+    {
+      "file": "invalid/refuse-commit-s1-02-asks-again-twice.json",
+      "version": "v1.21",
+      "def": "commitTurn.askAgainExchange",
+      "expect": "refuse",
+      "shows": "commit-s1-02-sam-asks-again with S1-02's question raised twice in one commit: a commit asks at most one question again, once (askAgain holds one raise), so the second is refused (its one fault request.writes.openQuestions.askAgain.1; put right, it is commit-s1-02-sam-asks-again)",
+      "source": "ops/cards/T-1508.md ('At most one raise per question per commit'; DL-1030: 'a commit may raise one live open question's ask count by one'); K-09 v1.12 default 192 ('At most one row a turn'); K-05 v1.21 item 81 and default 194"
+    },
+    {
+      "file": "invalid/refuse-commit-s1-02-asks-again-and-closes.json",
+      "version": "v1.21",
+      "def": "commitTurn.askAgainExchange",
+      "expect": "refuse",
+      "shows": "commit-s1-02-sam-asks-again with the question it asks again also closed, answered, in the same commit: a commit that asks a question again closes none, so a question is never raised and closed together (its one fault request.writes.openQuestions.close.0; put right, it is commit-s1-02-sam-asks-again)",
+      "source": "ops/cards/T-1508.md ('a question raised and closed in the same commit is refused (say which refusal)'); K-09 v1.12 default 192 ('openQuestions opens and closes nothing') and refuse-s1-02-asked-question-closed.json; K-05 v1.21 item 81 and default 194"
     }
   ]
 }
