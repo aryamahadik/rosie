@@ -8,6 +8,10 @@
 // commit-s1-02.json's walk is unchanged. Proved on T-1491's test graph (bundle v1's flow A with S1-08 and S1-09) and on
 // bundle v1 itself, with T-1461's doubles (the bundle port, the question read, the stand-in writers) and a stand-in
 // settler, never a double of the walk. S1-04's own settler is T-1492's (journey-1/companies).
+//
+// T-1479: S1-08's row (T-1482's planWriter's stand-in) names S1-08 and line 0, S1-09's question's row S1-09 and line 0
+// (K-05 v1.22 item 82; writes.ts defaults 15 and 16), held to K-05 v1.22; and S1-09 as bundle v2 compiles it, a split
+// whose message carries two buttons, is asked with its card's safe default and no options (writes.ts default 10).
 
 import { describe, expect, it } from "vitest";
 
@@ -39,8 +43,11 @@ import {
   bundleV1Bundles,
   decidedOf,
   flowAV1,
+  flowAV2,
+  flowAWithCompiledPlan,
   flowAWithPlan,
   hold,
+  k05v122,
   planWriters,
   questionsOver,
   requestTurnFields,
@@ -225,7 +232,7 @@ describe("a bound buttons settler that answers S1-04's rows: S1-04 is walked, th
     expect(writes.why).toEqual({ step: "S1-02", choice: ALL });
   });
 
-  it("S1-08's row and S1-09's question field for field: the turn's handle and person, the call's business, step 9's default clock and S1-09's safe default", async () => {
+  it("S1-08's row and S1-09's question field for field: the turn's handle and person, the call's business, step 9's default clock and S1-09's safe default, each row naming its step and line 0", async () => {
     const { writes, context } = await answer(buttonsWalk(), "c-01");
     const service = requestTurnFields(context.request).service;
     const row = {
@@ -239,8 +246,8 @@ describe("a bound buttons settler that answers S1-04's rows: S1-04 is walked, th
       versionsRead: [],
     };
     expect(writes.messages).toEqual([
-      { id: "outbox-s1-08-sam-1", ...row, openQuestionId: null },
-      { id: "outbox-s1-09-sam-1", ...row, openQuestionId: "oq-s1-09-sam-1" },
+      { id: "outbox-s1-08-sam-1", ...row, openQuestionId: null, step: "S1-08", lineNo: 0 },
+      { id: "outbox-s1-09-sam-1", ...row, openQuestionId: "oq-s1-09-sam-1", step: "S1-09", lineNo: 0 },
     ]);
     expect(writes.asks).toEqual([
       {
@@ -332,12 +339,12 @@ describe("a bound buttons settler that answers S1-04's rows: S1-04 is walked, th
     expect(walk.asks).toHaveLength(2);
   });
 
-  it("writes each row in K-05's own shapes, and goes into the commit's one K-05 request with S1-09's clock row", async () => {
+  it("writes each row in K-05's own shapes (its outbox rows K-05 v1.22's), and goes into the commit's one K-05 v1.22 request with S1-09's clock row", async () => {
     const { writes, context, exchange } = await answer(buttonsWalk(), "c-01");
     const checks = contractChecks();
     for (const write of writes.state) expect(checks.k05("stateWrite", write)).toEqual([]);
     for (const ask of writes.asks) expect(checks.k05("openQuestionNew", ask.question)).toEqual([]);
-    for (const row of writes.messages) expect(checks.k05("outboxRowNew", row)).toEqual([]);
+    for (const row of writes.messages) expect(k05v122("outboxRowNew", row)).toEqual([]);
     for (const close of writes.closes) expect(checks.k05("openQuestionClose", close)).toEqual([]);
     const { people } = decidedOf(context.request).context.writer;
     const personId = context.request.caller.personId;
@@ -352,7 +359,7 @@ describe("a bound buttons settler that answers S1-04's rows: S1-04 is walked, th
       },
       units: [{ writes, answer: { openQuestionId: "oq-s1-02", optionId: null, eventId: "evt-sam-0001" } }],
     });
-    expect(checks.k05("commitTurn.request", request)).toEqual([]);
+    expect(k05v122("commitTurn.request", request)).toEqual([]);
     const logged = eventLogRowsOf(request, exchange.request.now);
     for (const row of logged) expect(checks.k08("eventLogRow", row), String(row.id)).toEqual([]);
     expect(request.writes.openQuestions.open.map((question) => question.id)).toEqual(["oq-s1-09-sam-1"]);
@@ -362,6 +369,54 @@ describe("a bound buttons settler that answers S1-04's rows: S1-04 is walked, th
       "outbox-s1-08-sam-1",
       "outbox-s1-09-sam-1",
     ]);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1479: S1-09 as bundle v2 compiles it, a split whose message carries buttons, is asked as any split is
+
+describe("S1-09 as bundle v2 compiles it (two buttons) is asked with its card's safe default and no options (T-1479)", () => {
+  /** S1-09's compiled card, as bundle v2 holds it. */
+  const compiledCard = () => stepIn(flowAV2(), "S1-09").card as { safeDefault: string; clock: unknown };
+
+  it("on T-1491's test graph with the compiled S1-08 and S1-09: S1-08's row, then S1-09's question and its row, exactly as with no buttons", async () => {
+    const graph = flowAWithCompiledPlan();
+    const s1_09 = flowGraphOf(graph, "A").step("S1-09");
+    expect(s1_09).toMatchObject({ split: true, buttons: 2, card: { clock: { from: "step9Default" } } });
+    const plain = await answer(buttonsWalk(), "c-01");
+    const { writes } = await answer(buttonsWalk({ graph }), "c-01");
+    // The buttons' option ids are K-03's: none is stored, so the rows are those of S1-09 with no buttons.
+    expect(writes).toEqual(plain.writes);
+    expect(writes.asks.map((ask) => [ask.question.step, ask.question.options, ask.question.clock])).toEqual([
+      ["S1-09", [], null],
+    ]);
+    expect(writes.asks.map((ask) => ask.safeDefault)).toEqual([compiledCard().safeDefault]);
+    expect(compiledCard().safeDefault).toBe(S1_09_SAFE_DEFAULT);
+    expect(writes.messages.map((row) => [row.id, row.openQuestionId, row.step, row.lineNo])).toEqual([
+      ["outbox-s1-08-sam-1", null, "S1-08", 0],
+      ["outbox-s1-09-sam-1", "oq-s1-09-sam-1", "S1-09", 0],
+    ]);
+    for (const row of writes.messages) expect(k05v122("outboxRowNew", row)).toEqual([]);
+  });
+
+  it("on bundle v2's own flow A: 'All on the list' walks to S1-09 and asks it, never notBuilt (buttons)", async () => {
+    const walk = buttonsWalk({ graph: flowAV2() });
+    const { writes } = await answer(walk, "c-01");
+    expect(walk.log).toEqual(["question", "write S1-02", "write S1-11", "settle S1-04", "write S1-08"]);
+    expect(askedSteps(writes)).toEqual(["S1-09"]);
+    expect(writes.asks.map((ask) => ask.safeDefault)).toEqual([compiledCard().safeDefault]);
+    expect(writes.messages.map((row) => [row.id, row.step, row.lineNo])).toEqual([
+      ["outbox-s1-08-sam-1", "S1-08", 0],
+      ["outbox-s1-09-sam-1", "S1-09", 0],
+    ]);
+  });
+
+  it("the compiled S1-09 with a Clock line of its own is still notBuilt (clock): only its buttons changed", async () => {
+    const graph = flowAWithCompiledPlan();
+    (stepIn(graph, "S1-09").card as Record<string, unknown>).clock = { from: "clockLine", text: "24 h" };
+    const error = await refusal(buttonsWalk({ graph }), "c-01");
+    expect(error).toBeInstanceOf(WalkNotBuiltError);
+    expect(error).toMatchObject({ seam: "clock", ids: ["S1-09"] });
   });
 });
 

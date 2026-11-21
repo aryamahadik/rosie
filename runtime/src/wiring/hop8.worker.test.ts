@@ -536,9 +536,14 @@ describe("hop 8 joined: the gate and one commit through @rosie/actions' turn fac
           createdByTurnId: turnId,
         });
         expect(rowsIn(run.fakes, "clock_rows")[0]?.values.due ?? null).toBeNull();
-        // The one outbox row: to Sam, on the JOIN event's service, quick_reply, the question's id, no plan.
+        // The one outbox row: to Sam, on the JOIN event's service, quick_reply, the question's id, no plan, naming
+        // the step it asks and line 0 (T-1479; commit/walk/writes.ts; K-05 v1.22 item 82).
         expect(rowsIn(run.fakes, "outbox_rows").map((row) => [row.id, row.values, row.version])).toEqual([
-          [`outbox-s1-02-${turnId}-1`, { ...asRun(stated.outboxRows[0], turnId), commitSeq: 1 }, 1],
+          [
+            `outbox-s1-02-${turnId}-1`,
+            { ...asRun(stated.outboxRows[0], turnId), step: "S1-02", lineNo: 0, commitSeq: 1 },
+            1,
+          ],
         ]);
         expect(rowsIn(run.fakes, "outbox_rows")[0]?.values).toMatchObject({
           channel: "imessage",

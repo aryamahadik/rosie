@@ -701,7 +701,10 @@ describe("the gate's commit binding hands the stop home's reads into the sign-up
     return thrownBy(ports.writesOf(turn.part, turn.context, NOTHING_OPEN));
   }
 
-  /** S1-03's or S1-74's message row (T-633 default 12): one quick reply to the turn's handle and person, no question. */
+  /**
+   * S1-03's or S1-74's message row (T-633 default 12): one quick reply to the turn's handle and person, no question,
+   * naming its writer's step and line 0, its one row (T-1479; commit/walk/writes.ts default 16; K-05 v1.22 item 82).
+   */
   const messageOf = (turn: ReturnType<typeof turnWithWords>, stepId: string) => ({
     id: `outbox-${stepId.toLowerCase()}-${turn.context.turn.id}-1`,
     recipientHandleId: "handle-sam",
@@ -713,6 +716,8 @@ describe("the gate's commit binding hands the stop home's reads into the sign-up
     openQuestionId: null,
     copyOfRowId: null,
     versionsRead: [],
+    step: stepId,
+    lineNo: 0,
   });
 
   it("bound: 'Barbershop, pack hikes' is settled 'One isn't on the list yet' and writes S1-02's picks, S1-03's draft and S1-03's message row (not stopNotWired), the owner read through readStop for the turn's own person and handle, one read open at a time", async () => {

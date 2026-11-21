@@ -463,8 +463,17 @@ describe("'One isn't on the list yet' walks to S1-03, which drafts the new work 
         openQuestionId: null,
         copyOfRowId: null,
         versionsRead: [],
+        // S1-03's writer's one row: its step and line 0 (T-1479; commit/walk/writes.ts default 16).
+        step: "S1-03",
+        lineNo: 0,
       },
-      expect.objectContaining({ id: "outbox-s1-04-sam-1", openQuestionId: "oq-s1-04-sam-1" }) as unknown,
+      // S1-04's question's own row names S1-04 and line 0 (T-1479; commit/walk/writes.ts default 15).
+      expect.objectContaining({
+        id: "outbox-s1-04-sam-1",
+        openQuestionId: "oq-s1-04-sam-1",
+        step: "S1-04",
+        lineNo: 0,
+      }) as unknown,
     ]);
   });
 
