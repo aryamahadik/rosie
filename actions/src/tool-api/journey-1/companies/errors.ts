@@ -1,7 +1,7 @@
-// What journey 1's companies folder throws (T-1492). Each message names a read, a step, a fault or a code: never the
-// owner's words, an id, a number, a K-05 answer or the turn's chat id (K-08 v1 README line 75; DL-935: never log a read's
-// answer raw). A throw inside a step writer or a buttons settler fails the call closed with nothing written (the walk:
-// actions/src/commit/walk/writes.ts and buttons.ts; the Tool API base rolls the call's transaction back).
+// What journey 1's companies folder throws (T-1492; T-1481). Each message names a read, a step, a fault or a code: never
+// the owner's words, an id, a number, a K-05 answer or the turn's chat id (K-08 v1 README line 75; DL-935: never log a
+// read's answer raw). A throw inside a step writer or a buttons settler fails the call closed with nothing written (the
+// walk: actions/src/commit/walk/writes.ts and buttons.ts; the Tool API base rolls the call's transaction back).
 
 import type { NotFoundError, TransientError } from "../../../../../db/repo/targets";
 import type { UnknownFactError } from "../../../../../db/repo/turn-state";
@@ -61,6 +61,17 @@ export class CompaniesReadError extends Error {
  *     without the wrapper, or S1-04 reached by a walk that did not walk S1-02);
  *   - placementDisagrees: the settler's recount and the wrapper's placement disagree (another count, another pick, or the
  *     rows built no longer hold the placed insert and its company kind as the wrapper left them).
+ * And why S1-04's writer refused (T-1481; K-09 README defaults 182 to 184 and 190), beside wrongStep, noPerson, noKeptPick,
+ * noTurnCompany and twoPicksOneKind above, which it shares (its wrongStep: called for another step than S1-04):
+ *   - unknownBranch: the choice's branch is none of S1-04's three buttons, word for word;
+ *   - noSharedKinds: "Some share one" with no `shared_kinds` words, or words with no word left to match (default 184);
+ *   - secondSharedGroup: the words name a second sharing group: `shared_kinds`, or `company_name`, given twice;
+ *   - sharedWordNoPick: a `shared_kinds` word names no kept pick (default 190);
+ *   - sharedWordTwoPicks: a `shared_kinds` word names two kept picks or more (default 190);
+ *   - sharedGroupTooSmall: the picks `shared_kinds` names are fewer than two (default 184);
+ *   - alreadyPlaced: a kept pick is placed already, in a company or under a business (default 190; open gap 166);
+ *   - secondCompany: the answer would write a second company while the binding's flag says the party rule is not live
+ *     (default 184; open gap 149).
  */
 export type CompaniesFault =
   | "wrongStep"
@@ -72,9 +83,17 @@ export type CompaniesFault =
   | "twoPicksOneKind"
   | "placedElsewhere"
   | "notPlaced"
-  | "placementDisagrees";
+  | "placementDisagrees"
+  | "unknownBranch"
+  | "noSharedKinds"
+  | "secondSharedGroup"
+  | "sharedWordNoPick"
+  | "sharedWordTwoPicks"
+  | "sharedGroupTooSmall"
+  | "alreadyPlaced"
+  | "secondCompany";
 
-/** The one-kind wrapper or settler refused: the whole call is refused and nothing is written. */
+/** The one-kind wrapper or settler, or S1-04's writer, refused: the whole call is refused and nothing is written. */
 export class CompaniesRefusedError extends Error {
   override name = "CompaniesRefusedError";
   readonly fault: CompaniesFault;
