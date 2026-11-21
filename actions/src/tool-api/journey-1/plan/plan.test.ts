@@ -435,6 +435,9 @@ describe("on the walk, with a stand-in settler at S1-04: S1-08's row sits after 
       openQuestionId: null,
       copyOfRowId: null,
       versionsRead: [],
+      // S1-08's writer's one row: its step and line 0 (T-1479; commit/walk/writes.ts default 16).
+      step: "S1-08",
+      lineNo: 0,
     });
   });
 
