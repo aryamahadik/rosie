@@ -112,6 +112,10 @@
 //                steps' deps beside the kinds reads (SignUpWriterDeps' kinds.stop, the one field S1-03's, S1-74's and
 //                later S1-08's writers read the owner's contact with), so an answer settled as "One isn't on the list
 //                yet" or "Not a service we book" writes its message; left out, those two answer notBuilt, as before.
+//                T-1519 (DL-1048, DL-1051): where the reads bind K-05 v1.10 item 51's readChatHandle (GateReads
+//                .readChatHandle: on staging on a runtime-side client of its own), it goes into the commit binding as it
+//                is (TurnCommitBinding.readChatHandle), so S1-01 reuses the chat thread the turn's own handle already
+//                holds for the turn's chat id instead of inserting a second one; left out, S1-01 inserts, as before.
 //   composeInput T-560: K-09 composeInput through @rosie/actions' turn face (T-1141, createTurnFace with its calls: the
 //                Tool API base with K-09 v1.6's checks and the call's own business scope; T-309's compose input with
 //                T-1174's term facts over T-1141's row binding). Its reads are handed in by the root
@@ -1641,6 +1645,16 @@ export interface GateReads<Repo = unknown, DoorRepo = unknown> {
    * messages answer notBuilt (stopNotWired), as before; bound with no `kinds`, nothing reads them.
    */
   readonly stop?: GateStopReads;
+  /**
+   * K-05 v1.10 item 51's readChatHandle (T-1519; DL-1048, DL-1051; @rosie/actions' TurnCommitBinding.readChatHandle):
+   * the phone handle whose chat thread holds a Linq chat id, read on the runtime side (rosie_job: threads and handles are
+   * scoped none and rosie_app holds no grant on either, 0012), never on the call's transaction. Bound, gateBindingOf hands
+   * it into the commit binding as it is, and S1-01's walk asks it once for the turn's chat id, reusing the handle's own
+   * chat thread when the answer names the turn's handle (the walk's writes.ts default 12); an error answer fails the call
+   * closed. Left out (a test's doubles, any binding with no runtime side), S1-01 inserts the thread, as before. The
+   * number it also answers is dropped by the turn face (walkChatsOf), and neither it nor the chat id is logged.
+   */
+  readonly readChatHandle?: NonNullable<TurnCommitBinding<Repo>["readChatHandle"]>;
 }
 
 /**
@@ -1757,6 +1771,11 @@ const NO_GATE_SCOPE: BusinessScope<unknown> = {
  * gate as thrown and fails the call closed: a failed item 78 or item 79 read is @rosie/actions' KindsReadError, whose
  * `answer` holds a SQLSTATE or a person's or a business's row id, so nothing here catches, wraps, logs or reports it (a
  * caller that reports it names its name, read and fault alone; the base's span takes an error's name only).
+ *
+ * The walk's chat read (T-1519; DL-1048, DL-1051): where the reads bind K-05 v1.10 item 51's readChatHandle
+ * (GateReads.readChatHandle), S1-01 reuses the chat thread the turn's own handle holds for the turn's chat id, so a
+ * returning number's JOIN gets S1-02's question instead of the one-chat-per-handle constraint; an error answer fails the
+ * call closed (the turn face's TurnFaceReadError, naming the read and its code alone). Left out, S1-01 inserts, as before.
  */
 export function realGate(inputs: GateInputs): GatePort {
   let validator: ToolApiValidator | null = null;
@@ -1819,10 +1838,13 @@ export function realGate(inputs: GateInputs): GatePort {
  *     the pinned bundle's (FrontierBundleReads.trade). The writers are signUpStepWriters' step for step, and the settlers
  *     S1-02's alone (DL-1018 card 5); the step-id maps are signUpSteps' own;
  *   - the stop home's reads (GateReads.stop; T-1516, DL-1033 ruling 8), handed into those same writers' deps as
- *     SignUpWriterDeps' kinds.stop, the one field S1-03's, S1-74's and later S1-08's writers share (signUpKindsOf).
- * With either left out the binding carries no such field (the kinds reads left out: neither `writers` nor `settlers`;
- * the stop reads left out: the kinds reads as they are handed, so S1-03 and S1-74 answer notBuilt), and the commit
- * behaves as before. It reads nothing and logs nothing. Exported for its unit test alone
+ *     SignUpWriterDeps' kinds.stop, the one field S1-03's, S1-74's and later S1-08's writers share (signUpKindsOf);
+ *   - `readChatHandle`: the reads' own K-05 v1.10 item 51 read (GateReads.readChatHandle; T-1519, DL-1048), handed on as
+ *     it is, which S1-01's walk asks for the turn's chat id through the turn face's walkChatsOf.
+ * With any left out the binding carries no such field (the kinds reads left out: neither `writers` nor `settlers`;
+ * the stop reads left out: the kinds reads as they are handed, so S1-03 and S1-74 answer notBuilt; the chat read left
+ * out: S1-01 inserts its thread), and the commit behaves as before. It reads nothing and logs nothing. Exported for its
+ * unit test alone
  * (./gate-binding.test.ts): no rig walks a second turn, so the binding's own fields are proven under Node.
  */
 export function gateBindingOf(
@@ -1853,6 +1875,7 @@ export function gateBindingOf(
     ...(reads?.kinds === undefined
       ? {}
       : signUpSteps<unknown>({ kinds: signUpKindsOf(reads.kinds, reads.stop), plugIns: { bundles } })),
+    ...(reads?.readChatHandle === undefined ? {} : { readChatHandle: reads.readChatHandle }),
   };
 }
 

@@ -19,6 +19,10 @@
 // is never read by the safety read, so K-34 never holds a row for it. The commit names to readOpenHolds only the turn's
 // texts the safety read reads (K-05 item 34: "the turn's texts"), so a tapback beside a recorded text no longer holds every
 // routine part, while a real text with no record still does.
+//
+// T-1519 (DL-1048): with the walk's chat read bound (TurnCommitBinding.readChatHandle, K-05 v1.10 item 51), a turn 1 whose
+// chat Sam's own chat thread already holds commits S1-02's question with no thread written; one whose chat no thread
+// holds commits exactly as commit-s1-01.json states it; an error answer fails the call closed.
 
 import { describe, expect, it } from "vitest";
 
@@ -48,6 +52,7 @@ import {
   openHoldsPort,
   pinnedSafetyLines,
   safetyReaderOf,
+  walkChatsOf,
   type CommitAt,
   type SafetyReads,
 } from "./commit";
@@ -221,6 +226,78 @@ describe("gateAndCommit through the turn face: commit-s1-01.json, turn 1 (K-09 v
       error: "notBuilt",
       call: "gateAndCommit",
     });
+  });
+});
+
+describe("the walk's chat read: S1-01 reuses the handle's own chat thread (T-1519; DL-1048)", () => {
+  /** The chat read as K-05 v1.10 readChatHandle answers it: the handle `handleId` holds the chat id, its number beside it. */
+  function chatRead(handleId: string | null, asked: string[] = []) {
+    return (request: { linqChatId: string }) => {
+      asked.push(request.linqChatId);
+      return Promise.resolve(
+        handleId === null
+          ? { handleId: null, handle: null }
+          : { handleId, handle: { kind: "phone" as const, address: "+15555550100" } },
+      );
+    };
+  }
+
+  it("Sam's own chat thread holds the turn's chat: turn 1 commits S1-02's question, its clock row and outbox row with no thread written, and the part gives thread", async () => {
+    const exchange = commitS101();
+    const asked: string[] = [];
+    const doubles = callDoubles({ readChatHandle: chatRead("handle-sam", asked) });
+    const { answer } = await commitThrough(doubles.calls, commitRequestAfter(undefined));
+    const result = committed(answer);
+    // The fixture's answer but the thread's row: the same parts (S1-01 gives thread), S1-02's question opened.
+    expect(result).toEqual({
+      ...exchange.outcome,
+      written: {
+        ...exchange.outcome.written,
+        written: exchange.outcome.written.written.filter((row) => row.table !== "threads"),
+      },
+    });
+    expect(result.parts).toEqual(exchange.outcome.parts);
+    // K-05's one commit writes the text's safety record and no thread, with no thread.created entry.
+    const [sent] = doubles.k05.requests;
+    expect(sent?.writes.state.map((write) => write.table)).toEqual(["safety_outcomes"]);
+    expect(sent?.writes.events.map((entry) => entry.kind)).not.toContain("thread.created");
+    expect(sent?.writes.outboxRows.map((row) => row.id)).toEqual(["outbox-s1-02-sam-1"]);
+    // The read was asked once, for the turn's chat id alone.
+    expect(asked).toEqual(["linq-chat-demo-sam"]);
+  });
+
+  it("no chat thread holds the turn's chat: turn 1 commits exactly as commit-s1-01.json states it, the thread inserted", async () => {
+    const asked: string[] = [];
+    const doubles = callDoubles({ readChatHandle: chatRead(null, asked) });
+    const { answer } = await commitThrough(doubles.calls, commitRequestAfter(undefined));
+    expect(committed(answer)).toEqual(commitS101().outcome);
+    expect(asked).toEqual(["linq-chat-demo-sam"]);
+  });
+
+  it("walkChatsOf hands the walk the handle id alone, and throws an error answer, never read as none", async () => {
+    const chats = walkChatsOf(chatRead("handle-sam"));
+    expect(await chats.chatHandle("linq-chat-demo-sam")).toBe("handle-sam");
+    expect(await walkChatsOf(chatRead(null)).chatHandle("linq-chat-demo-sam")).toBeNull();
+    const failing = walkChatsOf(() => Promise.resolve({ error: "transient" }));
+    const error = await failing.chatHandle("linq-chat-demo-sam").then(
+      () => null,
+      (thrown: unknown) => thrown,
+    );
+    expect(error).toBeInstanceOf(TurnFaceReadError);
+    expect(error).toMatchObject({ read: "readChatHandle", code: "transient" });
+    // The error names the read and its code, never the chat id or the number.
+    expect(String(error)).not.toContain("linq-chat-demo-sam");
+  });
+
+  it("a chat read that answers an error fails the call closed: the face throws it as the base does, and nothing is committed", async () => {
+    const doubles = callDoubles({ readChatHandle: () => Promise.resolve({ error: "transient" }) });
+    const request = commitRequestAfter(undefined);
+    const { trace } = traceFor(request);
+    await expect(
+      faceOver(doubles.calls).gateAndCommit(structuredClone(request), NOTHING_OPEN_AT, trace),
+    ).rejects.toMatchObject({ name: "TurnFaceReadError", read: "readChatHandle", code: "transient" });
+    expect(doubles.k05.requests).toEqual([]);
+    expect(doubles.k05.commits).toEqual([]);
   });
 });
 
