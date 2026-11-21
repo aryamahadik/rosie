@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 841, [`e01cdcb5`](https://github.com/aryamahadik/rosie/commit/e01cdcb5), 2026-11-21 14:09:22 UTC.
+- **Through:** commit 843, [`65c03ce4`](https://github.com/aryamahadik/rosie/commit/65c03ce4), 2026-11-21 16:47:05 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 843. docs: COMMIT\_HISTORY.md through commit 841 (e01cdcb5, \#853) (\#855)
+
+- **Commit:** [`65c03ce4`](https://github.com/aryamahadik/rosie/commit/65c03ce4), by Arya Mahadik, 2026-11-21 16:47:05 UTC
+- **Pull request:** [#855](https://github.com/aryamahadik/rosie/pull/855) from `task/commit-history-203`, merged 2026-11-21 16:47:05 UTC. It squashed 1 branch commit:
+  - `c954a36` docs: COMMIT\_HISTORY.md through commit 841 (e01cdcb5, \#853)
+- **Files changed:** 1 (+94 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +94 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 842. T-1483: S1-08's card gives only Rosie's four fixed lines as term facts (K-09 v1.11 default 186); isTermLine exported for finalize's terms (\#854)
+
+- **Commit:** [`b61d735b`](https://github.com/aryamahadik/rosie/commit/b61d735b), by Arya Mahadik, 2026-11-21 16:47:01 UTC
+- **Pull request:** [#854](https://github.com/aryamahadik/rosie/pull/854) from `task/T-1483`, merged 2026-11-21 16:47:02 UTC. It squashed 1 branch commit:
+  - `34b3cfd` T-1483: S1-08's card gives only Rosie's four fixed lines as term fact…
+- **Files changed:** 2 (+298 −41), by folder:
+  - `actions/src/compose-input/` term-facts.test.ts +215 −4, term-facts.ts +83 −37
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 841. docs: COMMIT\_HISTORY.md through commit 838 (b17f005b, \#849) (\#853)
 
