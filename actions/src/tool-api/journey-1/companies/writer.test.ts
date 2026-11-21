@@ -3,7 +3,10 @@
 // (writes.ts `written`) on K-09's own S1-04 answers: commit-s1-04.json (the roster owner's "All share one") and
 // commit-s1-04-some-share.json (Sam's "Some share one"), with another button or other fields where a case needs them.
 // Only the K-05 reads are doubles (items 79 and 72 and readTurnState's catalog facts by id, as db/repo answers them:
-// test-support.ts), never the writer or the helpers it reuses from T-1492.
+// test-support.ts), never the writer or the helpers it reuses from T-1492. Round 2 (DL-1094) also holds the writer's
+// rows to K-09's own buttonsAnswerCommit (tool-api.rules.mjs) where a case states a whole answer, so a rule refusal shows
+// up here: the company under way updated whenever the owner names it, company_name's value as the name, and a gained
+// business's rows table by table.
 
 import { describe, expect, it } from "vitest";
 
@@ -35,6 +38,7 @@ import {
   pickOnFile,
   s1_04CallOf,
   s1_04Exchange,
+  s1_04RuleProblems,
   samCompanies,
   seedCompanyKinds,
   type AnswerField,
@@ -219,6 +223,8 @@ describe("'All share one': every kept pick in the company the turn runs under", 
     const exchange = s1_04Exchange(COMMIT_S1_04);
     const { rows, asked } = await written(rosterWorld(), exchange, "roster");
     expect(rows.state).toEqual(exchange.given.stated.writes.state);
+    // K-09's buttonsAnswerCommit holds the writer's own rows, as it holds the fixture's.
+    expect(await s1_04RuleProblems(exchange, rows.state)).toEqual([]);
     expect(rows).toEqual({
       state: rows.state,
       stateEvents: [],
@@ -276,19 +282,58 @@ describe("'All share one': every kept pick in the company the turn runs under", 
     );
   });
 
-  it("a company name the owner gives renames the company under way at its version; its stored name keeps it", async () => {
-    const { rows } = await written(samWorld(), samAnswer(ALL, [named("Lee Services")]));
-    const [rename, ...rest] = rows.state;
-    expect(rename).toEqual({
+  it("a company name the owner gives updates the company under way at its version, always, even to its stored name", async () => {
+    const [company] = samCompanies();
+    if (company === undefined) throw new Error("Sam owns the company of Lee's Barbershop");
+    const unnamed = (await written(samWorld(), samAnswer(ALL))).rows.state;
+    for (const name of ["Lee Services", company.name]) {
+      const answer = samAnswer(ALL, [named(name)]);
+      const { rows } = await written(samWorld(), answer);
+      const [rename, ...rest] = rows.state;
+      expect(rename).toEqual({
+        op: "update",
+        table: "companies",
+        key: { id: SAM_COMPANY },
+        expectVersion: company.version,
+        set: { name },
+      });
+      expect(rest).toEqual(unnamed);
+      expect(await s1_04RuleProblems(answer, rows.state)).toEqual([]);
+      // Left out, as round 1 left it out for an equal name, K-09 refuses the rows (default 183).
+      expect(await s1_04RuleProblems(answer, rest)).toEqual([
+        `the company the turn runs under, ${SAM_COMPANY}, alone is updated, with the name the owner gave`,
+      ]);
+    }
+    expect(company.name).toBe("Lee's Barbershop LLC");
+  });
+
+  it("the company's name is company_name's value, not its source words, where the two differ", async () => {
+    const fields = [{ name: COMPANY_NAME, value: "Lee Home Services", words: "lee home services llc" }];
+    const all = samAnswer(ALL, fields);
+    const { rows } = await written(samWorld(), all);
+    expect(rows.state[0]).toEqual({
       op: "update",
       table: "companies",
       key: { id: SAM_COMPANY },
       expectVersion: 2,
-      set: { name: "Lee Services" },
+      set: { name: "Lee Home Services" },
     });
-    expect(rest).toEqual((await written(samWorld(), samAnswer(ALL))).rows.state);
-    const same = await written(samWorld(), samAnswer(ALL, [named("Lee's Barbershop LLC")]));
-    expect(same.rows.state.filter((write) => write.table === "companies")).toEqual([]);
+    expect(await s1_04RuleProblems(all, rows.state)).toEqual([]);
+    // Under "Some share one" (the flag on) the new company of the shared group takes the value too.
+    const some = samAnswer(SOME, [shared("Plumbing and electrical"), ...fields]);
+    const made = await written(samWorld(), some, "sam", true);
+    expect(made.rows.state).toEqual(s1_04Exchange(COMMIT_S1_04_SOME_SHARE).given.stated.writes.state);
+    expect(made.rows.state[0]).toEqual(newCompany("company-s1-04-sam-1", "Lee Home Services"));
+    expect(await s1_04RuleProblems(some, made.rows.state)).toEqual([]);
+    expect(JSON.stringify([rows.state, made.rows.state])).not.toContain("llc");
+  });
+
+  it("a company_name whose value is blank or no text counts as not given: the company keeps its stored name", async () => {
+    const unnamed = (await written(samWorld(), samAnswer(ALL))).rows.state;
+    for (const value of [" ", 7]) {
+      const field = { name: COMPANY_NAME, value, words: "Lee Home Services" } as unknown as AnswerField;
+      expect((await written(samWorld(), samAnswer(ALL, [field]))).rows.state).toEqual(unnamed);
+    }
   });
 
   it("'Some share one' naming every kept pick is one company, saved with the flag off", async () => {
@@ -305,6 +350,7 @@ describe("with the party flag on: Sam's own answer, and 'Each is its own'", () =
     const exchange = s1_04Exchange(COMMIT_S1_04_SOME_SHARE);
     const { rows, asked } = await written(samWorld(), exchange, "sam", true);
     expect(rows.state).toEqual(exchange.given.stated.writes.state);
+    expect(await s1_04RuleProblems(exchange, rows.state)).toEqual([]);
     expect(rows.gives).toEqual([COMPANIES]);
     expect(rows.stateEvents).toEqual([]);
     // The kinds' names by id (default 190's matching), then item 72, then the catalog for each company kind inserted.
@@ -334,6 +380,7 @@ describe("with the party flag on: Sam's own answer, and 'Each is its own'", () =
 
   it("'Each is its own' gives three companies: the turn's for the first kind named, two new ones with no business", async () => {
     const { rows, asked } = await written(samWorld(), samAnswer(EACH), "sam", true);
+    expect(await s1_04RuleProblems(samAnswer(EACH), rows.state)).toEqual([]);
     expect(rows.state).toEqual([
       newCompany("company-s1-04-sam-1", "plumbing"),
       newCompany("company-s1-04-sam-2", "electrical"),
@@ -490,6 +537,63 @@ describe("which picks are placed, and which rows take the business", () => {
         expectVersion: 1,
         set: { business_id: SAM_BUSINESS },
       },
+    ]);
+  });
+
+  it("two drafted picks gaining a business: every text row, then both drafts, then the first's answered block", async () => {
+    const walks = pickOnFile({
+      id: "pick-sam-walks",
+      position: 4,
+      words: "dog walks",
+      outcome: "new_work",
+      kindId: "new-fedcba9876543210",
+      draft: {
+        id: "draft-sam-walks",
+        businessId: null,
+        state: "drafting",
+        draftedAt: "2026-10-19T14:03:00Z",
+        version: 1,
+        blocks: [],
+      },
+    });
+    const world = draftedWorld();
+    const answer = samAnswer(ALL);
+    const { rows } = await written({ picks: [...(world.picks ?? []), walks] }, answer);
+    const draftOf = (id: string, version: number): StateWrite => ({
+      op: "update",
+      table: "new_work_drafts",
+      key: { id },
+      expectVersion: version,
+      set: { business_id: SAM_BUSINESS },
+    });
+    expect(rows.state.slice(-25)).toEqual([
+      ...textsGiven("pick-sam-barbershop", SAM_BUSINESS),
+      ...textsGiven("pick-sam-plumbing", SAM_BUSINESS),
+      draftOf("draft-sam-hikes", 4),
+      draftOf("draft-sam-walks", 1),
+      {
+        op: "update",
+        table: "new_work_draft_blocks",
+        key: { draft_id: "draft-sam-hikes", block: 3 },
+        expectVersion: 1,
+        set: { business_id: SAM_BUSINESS },
+      },
+    ]);
+    // Table by table, in K-09's S1_04_WRITE_ORDER: each table's rows together, never one pick's after another's.
+    const tables = rows.state.map((write) => write.table);
+    expect([...new Set(tables)]).toEqual([
+      "company_kinds",
+      "picked_kinds",
+      "picked_kind_texts",
+      "new_work_drafts",
+      "new_work_draft_blocks",
+    ]);
+    expect(tables.filter((table, at) => at > 0 && table !== tables[at - 1])).toHaveLength(4);
+    expect(await s1_04RuleProblems(answer, rows.state)).toEqual([]);
+    // One pick's rows after another's (draft, block, draft), as round 1 strung them, K-09 refuses as out of order.
+    const strung = [...rows.state.slice(0, -2), ...rows.state.slice(-1), ...rows.state.slice(-2, -1)];
+    expect(await s1_04RuleProblems(answer, strung)).toEqual([
+      "S1-04's rows are out of foreign-key order: companies, company_kinds, picked_kinds, then the rows of a pick that gained a business",
     ]);
   });
 

@@ -20,13 +20,14 @@
 //     caller's person's own company whose business is the call's business: turnCompanyOf); every other group is a new
 //     company (`company-s1-04-<turn key>-<n>`, n from 1 in the groups' order: the walk's rowId), owned by the caller's
 //     person, with no business until its own S1-09 (MASTER-FLOW-A line 93).
-//   - Rows, in the order the foreign keys need: (1) companies: the company under way renamed at the version read when
-//     the owner named it (default 183), then each new company inserted; (2) company_kinds: one per kept pick whose
-//     company and kind are not on file together, business copied from its company, trade name null, a listed kind's
-//     facts and switches from the catalog by id and a drafted kind's from its draft (companyKindInsert, draftedDefaults);
-//     (3) picked_kinds: each kept pick updated at the version read with its company and, where its company has one, its
-//     business (pickPlacement); (4) the text, draft and block rows of each pick that gained a business, each at the
-//     version read (gainedBusinessRows). It gives `companies`.
+//   - Rows, in the order the foreign keys need (K-09 tool-api.rules.mjs S1_04_WRITE_ORDER): (1) companies: the company
+//     under way updated to the name at the version read whenever the owner named its group (default 183), then each new
+//     company inserted; (2) company_kinds: one per kept pick whose company and kind are not on file together, business
+//     copied from its company, trade name null, a listed kind's facts and switches from the catalog by id and a drafted
+//     kind's from its draft (companyKindInsert, draftedDefaults); (3) picked_kinds: each kept pick updated at the version
+//     read with its company and, where its company has one, its business (pickPlacement); (4) the rows of the picks that
+//     gained a business, each at the version read (gainedBusinessRows): every picked_kind_texts row, then every
+//     new_work_drafts row, then every new_work_draft_blocks row. It gives `companies`.
 //   - Refused, with nothing returned (CompaniesRefusedError, default 184): a `shared_kinds` word that names no kept pick
 //     or two (sharedWordNoPick, sharedWordTwoPicks); fewer than two picks in the shared group (sharedGroupTooSmall); a
 //     second shared group (secondSharedGroup); "Some share one" with no words to match (noSharedKinds); two picks of one
@@ -41,7 +42,7 @@
 // Whose rows it may write (default 182, the security reviewer's): only the caller's person's own picks (item 79's picks
 // whose owner is that person), their text, draft and block rows, the company that person owns under the call's business,
 // and new companies owned by that person with no business; never another person's row and never a new company under a
-// business. The owner's words reach only a company's name (company_name, or the pick's own S1-02 words), never a log or
+// business. The owner's words reach only a company's name (company_name's value, or the pick's own S1-02 words), never a log or
 // an error: what it throws names faults and steps (errors.ts).
 //
 // Defaults used (for ops/QUESTIONS.md), beside one-kind.ts's O1 to O7 and reads.ts's R1 to R3:
@@ -52,21 +53,26 @@
 //   W2. The first kind named is the kept pick of the lowest position (S1-02 sets the first kind named up first), item
 //       79's order (picked_at, position, id) on a tie; its group takes the company the turn runs under (open gap 151).
 //   W3. The groups' order: by each group's first kind named; the new companies' ids follow it. Within each kind of row
-//       (company kinds, pick updates, a gained business's rows) the picks go in the kept picks' order (W2's), and a
-//       pick's text, draft and block rows in the order item 79 answers them (texts by pf key, blocks by number), as
-//       gainedBusinessRows takes them; the commit compares and sets each by its own key and version, so no other order
-//       is needed (commit-s1-04.json lists the same rows with its texts in the pf keys' own order).
-//   W4. A company's name (default 183): company_name's source words (K-02 field.words, the exact words of the turn's
-//       text, as default 190 reads shared_kinds), trimmed, never the model's value. It names the shared group's company:
-//       the one group's under "All share one", the shared group's under "Some share one". The company under way is
-//       renamed only when that name differs from its stored name (an equal name keeps the row as it is, its version
-//       unraised); with no name it keeps its stored name. A new company with no name takes its group's first kind's
-//       S1-02 words as stored (picked_kinds.words), until its S1-09 reads the listing (open gap 152).
+//       (company kinds, pick updates) the picks go in the kept picks' order (W2's). A gained business's rows go table by
+//       table, as default 182 (4) lists them and buttonsAnswerCommit's S1_04_WRITE_ORDER holds them: every pick's text
+//       rows, then every draft, then every draft block; within one table the picks go in the kept picks' order, and a
+//       pick's rows in the order item 79 answers them (texts by pf key, blocks by number), as gainedBusinessRows takes
+//       them. The commit compares and sets each by its own key and version, so no finer order is needed
+//       (commit-s1-04.json lists the same rows with its texts in the pf keys' own order).
+//   W4. A company's name (defaults 182 and 183): company_name's value as given (K-02 fieldValue: the name limit 6
+//       re-parsed from its words, and the name buttonsAnswerCommit checks), never its source words; default 190 reads
+//       source words for shared_kinds alone. It names the shared group's company: the one group's under "All share
+//       one", the shared group's under "Some share one". When that group takes the company under way, that company is
+//       updated to the name at the version read, always, even when the name equals its stored one (default 183: "that
+//       company's name is updated to it"); with no name it keeps its stored name and is not written. A new company with
+//       no name takes its group's first kind's S1-02 words as stored (picked_kinds.words), until its S1-09 reads the
+//       listing (open gap 152).
 //   W5. A field is read only under a button that carries it (default 180's table): shared_kinds under "Some share one",
 //       company_name under "Some share one" and "All share one"; a field under "Each is its own" is not read (limit 6
-//       holds a part's fields to its choice). A field whose words are blank counts as not given.
-//   W6. "A second shared group" (default 184) is shared_kinds, or company_name, given twice in the part, each with words:
-//       one field's words are one group, never split inside (default 190 reads them as words, not parts).
+//       holds a part's fields to its choice). A shared_kinds whose words are blank, or a company_name whose value is
+//       blank or no text, counts as not given.
+//   W6. "A second shared group" (default 184) is shared_kinds, or company_name, given twice in the part, each given as
+//       W5 reads it: one field's words are one group, never split inside (default 190 reads them as words, not parts).
 //   W7. A kind's name for default 190's matching: a listed kind's kinds.name, read by id through readTurnState (reads.ts
 //       kindNames; item 79 answers no kind's name), and a drafted kind's the pick's own words (K-24 kinds.name: "a drafted
 //       kind's name in the owner's words"). "Some share one" whose words name every kept pick is one group, so one
@@ -122,6 +128,9 @@ type Button = typeof SOME_SHARE_ONE | typeof ALL_SHARE_ONE | typeof EACH_IS_ITS_
 
 const BUTTONS: readonly Button[] = [SOME_SHARE_ONE, ALL_SHARE_ONE, EACH_IS_ITS_OWN];
 
+/** The tables of a pick that gained a business, in the order the rows go (default 182 (4); K-09 S1_04_WRITE_ORDER). */
+const AFTER_PICKS: readonly string[] = ["picked_kind_texts", "new_work_drafts", "new_work_draft_blocks"];
+
 /** A kept pick: one of the caller's person's own, listed or new work, with its kind (W1). */
 interface KeptPick {
   readonly pick: PickedKindRead;
@@ -144,32 +153,31 @@ interface Landing {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** The source words of each field named `name` the part carries, trimmed, blank ones left out (W4, W5). */
-function fieldWords(call: Pick<StepWriterCall, "part">, name: string): string[] {
+/** The text `key` (`words` or `value`) of each field named `name` the part carries, blank or non-text ones left out (W5). */
+function fieldTexts(call: Pick<StepWriterCall, "part">, name: string, key: "words" | "value"): string[] {
   const part: unknown = call.part.part;
   if (!isRecord(part) || !Array.isArray(part.fields)) return [];
   const found: string[] = [];
   for (const field of part.fields as unknown[]) {
-    if (
-      isRecord(field) &&
-      field.name === name &&
-      typeof field.words === "string" &&
-      field.words.trim() !== ""
-    ) {
-      found.push(field.words.trim());
-    }
+    if (!isRecord(field) || field.name !== name) continue;
+    const text = field[key];
+    if (typeof text === "string" && text.trim() !== "") found.push(text);
   }
   return found;
 }
 
-/** The answer's fields as its button carries them: the shared kinds' words and the company's name, each once or none. */
+/**
+ * The answer's fields as its button carries them, each once or none: the shared kinds' source words, trimmed (default
+ * 190), and the company's name, company_name's value as given (W4).
+ */
 function fieldsOf(
   call: Pick<StepWriterCall, "part">,
   button: Button,
 ): { shared: string | null; name: string | null } {
   if (button === EACH_IS_ITS_OWN) return { shared: null, name: null };
-  const names = fieldWords(call, COMPANY_NAME);
-  const shared = button === SOME_SHARE_ONE ? fieldWords(call, SHARED_KINDS) : [];
+  const names = fieldTexts(call, COMPANY_NAME, "value");
+  const shared =
+    button === SOME_SHARE_ONE ? fieldTexts(call, SHARED_KINDS, "words").map((each) => each.trim()) : [];
   if (names.length > 1 || shared.length > 1) throw new CompaniesRefusedError("secondSharedGroup", [S1_04]);
   if (button === SOME_SHARE_ONE && shared.length === 0) {
     throw new CompaniesRefusedError("noSharedKinds", [S1_04]);
@@ -281,7 +289,7 @@ export function companiesWriter<Repo = unknown>(deps: CompaniesWriterDeps<Repo>)
     }
     if (groups.length > 1 && !partyRuleLive) throw new CompaniesRefusedError("secondCompany", [S1_04]);
 
-    // (1) companies: the company under way, renamed when named; each other group a new company with no business.
+    // (1) companies: the company under way, updated to the name when named; each other group a new company, no business.
     const companies: StateWrite[] = [];
     const landing = new Map<KeptPick, Landing>();
     groups.forEach((group, index) => {
@@ -289,7 +297,7 @@ export function companiesWriter<Repo = unknown>(deps: CompaniesWriterDeps<Repo>)
       let lands: Landing;
       if (index === 0) {
         lands = { companyId: underWay.id, businessId: turn.businessId };
-        if (name !== null && name !== underWay.name) {
+        if (name !== null) {
           companies.push({
             op: "update",
             table: "companies",
@@ -335,12 +343,16 @@ export function companiesWriter<Repo = unknown>(deps: CompaniesWriterDeps<Repo>)
       companyKinds.push(companyKindInsert(lands.companyId, lands.businessId, each.kindId, defaults));
     }
 
-    // (3) the picks placed at the version read; (4) then the rows of each pick that gained a business.
+    // (3) the picks placed at the version read; (4) then the rows of each pick that gained a business, table by table:
+    // every text row, then every draft, then every draft block (W3).
     const picks = placed.map(({ each, lands }) =>
       pickPlacement(each.pick, lands.companyId, lands.businessId),
     );
-    const gained = placed.flatMap(({ each, lands }) =>
+    const rowsGained = placed.flatMap(({ each, lands }) =>
       lands.businessId === null ? [] : gainedBusinessRows(each.pick, lands.businessId),
+    );
+    const gained = [...rowsGained].sort(
+      (first, second) => AFTER_PICKS.indexOf(first.table) - AFTER_PICKS.indexOf(second.table),
     );
 
     return {

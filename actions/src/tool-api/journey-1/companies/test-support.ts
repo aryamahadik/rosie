@@ -8,6 +8,9 @@
 // answered S1-04's call as the walk hands it to S1-04's writer, from K-09 commit-s1-04.json (the roster world) and
 // commit-s1-04-some-share.json (Sam's own answer), with another button or other fields where a case needs them.
 
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+
 import type {
   BusinessKindRead,
   ReadBusinessKindsOutcome,
@@ -37,6 +40,7 @@ import {
   type WalkTestRepo,
 } from "../../../commit/walk/test-support";
 import { contractFile, fixture } from "../../test-support";
+import { CONTRACTS_DIR } from "../../validator";
 import { READ_AT } from "../kinds/test-support";
 import type { CompaniesK05Reads, KindDefaults } from "./reads";
 
@@ -274,10 +278,14 @@ export function fakeCompaniesK05(given: CompaniesGiven = {}): FakeCompanies {
 export const COMMIT_S1_04 = "commit-s1-04.json";
 export const COMMIT_S1_04_SOME_SHARE = "commit-s1-04-some-share.json";
 
-/** An S1-04 commit fixture as S1-04's writer's tests read it: its request and the state rows it states. */
+/**
+ * An S1-04 commit fixture as S1-04's writer's tests read it: its request, the state rows it states and its outcome's
+ * parts (the choice each part committed, which buttonsAnswerCommit reads the button from).
+ */
 export interface CommitS1_04 {
   readonly request: GateAndCommitRequest;
   readonly given: { readonly stated: { readonly writes: { readonly state: StateWrite[] } } };
+  readonly outcome: { readonly parts: { choiceId: string }[] };
 }
 
 /** One field an S1-04 answer carries (K-02 v1 field), its value and its source words. */
@@ -289,15 +297,44 @@ export interface AnswerField {
 
 /**
  * An S1-04 commit fixture, freshly parsed, its one part choosing `choiceId` (c-01 "Some share one", c-02 "All share one",
- * c-03 "Each is its own", as its context offers them) with `fields`, each when given, else the fixture's own.
+ * c-03 "Each is its own", as its context offers them) with `fields`, each when given, else the fixture's own. A choice
+ * given is the outcome's committed part's too, so K-09's rules read the button the part chose.
  */
 export function s1_04Exchange(file: string, choiceId?: string, fields?: readonly AnswerField[]): CommitS1_04 {
   const exchange = fixture(file) as CommitS1_04;
   const [entry] = decidedOf(exchange.request).decide.parts;
   if (entry.part.verb !== "choose") throw new Error(`${file}'s part chooses`);
-  if (choiceId !== undefined) entry.part.choice = choiceId;
+  const [committed] = exchange.outcome.parts;
+  if (committed === undefined) throw new Error(`${file}'s outcome commits its part`);
+  if (choiceId !== undefined) {
+    entry.part.choice = choiceId;
+    committed.choiceId = choiceId;
+  }
   if (fields !== undefined) entry.part.fields = fields.map((field) => ({ ...field }));
   return exchange;
+}
+
+/** K-09's buttonsAnswerCommit (tool-api.rules.mjs v1.11), the rule `npm run contracts:check` holds the fixtures to. */
+type ButtonsAnswerCommit = (exchange: unknown) => string[];
+
+/**
+ * What K-09's buttonsAnswerCommit finds wrong with `exchange` when it states `state` as S1-04's rows (README defaults
+ * 181 to 185 and 190: the rows' foreign-key order, the groups, the companies and their names): none when it holds them.
+ * Each problem is the rule's own line, so a rule refusal shows up in the writer's own tests.
+ */
+export async function s1_04RuleProblems(
+  exchange: CommitS1_04,
+  state: readonly StateWrite[],
+): Promise<string[]> {
+  const file = path.join(CONTRACTS_DIR, "tool-api", "tool-api.rules.mjs");
+  const rules = (await import(pathToFileURL(file).href)) as {
+    buttonsAnswerCommit: ButtonsAnswerCommit;
+  };
+  const { stated } = exchange.given;
+  return rules.buttonsAnswerCommit({
+    ...exchange,
+    given: { ...exchange.given, stated: { ...stated, writes: { ...stated.writes, state: [...state] } } },
+  });
 }
 
 /** A step of T-1491's test graph (bundle v1's flow A with S1-08 and S1-09), as the walk reads it. */
