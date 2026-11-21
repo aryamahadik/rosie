@@ -153,8 +153,12 @@ describe("commit-s1-01.json's part: the walk after entering the sign-up door", (
     for (const write of writes.state) expect(checks.k05("stateWrite", write)).toEqual([]);
     for (const ask of writes.asks) expect(checks.k05("openQuestionNew", ask.question)).toEqual([]);
     for (const row of writes.messages) expect(k05v122("outboxRowNew", row)).toEqual([]);
-    // v1.1's row is closed: the step and line are v1.22's alone (README item 82).
-    for (const row of writes.messages) expect(checks.k05("outboxRowNew", row)).not.toEqual([]);
+    // Both or neither (K-05 v1.22 default 206): the row's step with its line taken away is refused.
+    for (const row of writes.messages) {
+      const half: Record<string, unknown> = { ...row };
+      Reflect.deleteProperty(half, "lineNo");
+      expect(k05v122("outboxRowNew", half)).not.toEqual([]);
+    }
   });
 
   it("its state: S1-01's thread insert (handle-sam, chat, no booking, the request turn's chatId, no reply address)", async () => {
