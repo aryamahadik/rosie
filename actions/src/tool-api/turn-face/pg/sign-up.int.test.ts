@@ -47,6 +47,15 @@
 // yet") for "Barbershop, plumbing, electrical" still commits "All on the list"'s rows, since the words, not the option
 // named, settle the branch; the part's choiceId stays c-02, and item 78 is read once for the call. The first world binds
 // no settler, so everything above is the walk as before.
+//
+// T-1505 (K-09 v1.12 defaults 192 to 198; K-05 v1.21 item 81; DL-1014, DL-1030): a third world, built as the first, in a
+// schema of its own. The same turn 1 opens S1-02's question, asked once; then the owner types "A bit of everything",
+// which names no kind of work, and both reads ask about that one question (K-09 v1.12's commit-s1-02-asked.json as this
+// owner sends it, on bundle v2, which both turns pin: T-1511). The commit sends the question again: one quick reply on
+// the turn's service, named in `written.outboxRows`, and K-05 v1.21's raise, so the question's ask_count goes 1 to 2 and
+// its version 2 to 3, with its status, options, read-back, clock line and clock row as they were; a replay writes
+// nothing. Compose input composes the row from S1-02's own line and finalize finalizes it, its plan written. A second
+// asked text then writes no row and leaves ask_count at 2: the turn commits its text's safety outcome alone.
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -944,6 +953,301 @@ describe("with S1-02's settler bound, a decision naming c-02 for the owner's wor
       const statements = settledSent.app.slice(appBefore);
       expect(statements.filter((text) => READS_KINDS.test(text))).toHaveLength(oneRead);
       for (const text of statements) expect(text).not.toMatch(SPANS_BUSINESSES);
+    },
+  );
+});
+
+// ---- T-1505: the third world, an asked text sends S1-02's question again, once -----------------------------------------
+
+/** The owner's words that name no kind of work (K-09 v1.12's commit-s1-02-asked.json's). */
+const ASKED_WORDS = "A bit of everything";
+/** The asked turns, each under its own id, so each row id is its own (K-09 v1.5 default 131). */
+const TURN_ASKED = `${TURN_2}-asked`;
+const TURN_ASKED_AGAIN = `${TURN_2}-asked-again`;
+/** The re-sent row: S1-02's step, the turn's own id as its key, n 1 (K-09 v1.12 default 192). */
+const ROW_ASKED = `outbox-s1-02-${TURN_ASKED}-1`;
+const NOW_3 = "2026-10-19T18:09:06Z";
+
+/**
+ * An asked turn: turn 2's request as this owner sends it under `turnId`, its text "A bit of everything", and decide's
+ * agreed part and both reads K-09 v1.12's commit-s1-02-asked.json's: ask, about S1-02's one open question.
+ */
+function askedTurn(turnId: string): GateAndCommitRequest {
+  const request = turnTwo(turnId, "c-01", ASKED_WORDS);
+  const asked = fixture("commit-s1-02-asked.json") as { request: GateAndCommitRequest };
+  const [entry] = decidedOf(asked.request).decide.parts;
+  if (entry.part.verb !== "ask") throw new Error("commit-s1-02-asked.json's part asks");
+  const ask = { ...entry.part, quote: ASKED_WORDS, questions: [QUESTION_1] };
+  const decided = decidedOf(request);
+  decided.decide.parts = [{ part: structuredClone(ask), outcome: entry.outcome }];
+  for (const read of decided.decide.reads) read.output.parts = [structuredClone(ask)];
+  return request;
+}
+
+/** S1-02's question's stored columns and its clock row, as the owner reads them. */
+async function questionState(db: CommitDatabase): Promise<{ question: Json; clock: Json }> {
+  const [question] = await db.db.sql<Json[]>`
+    select status, version, ask_count, options, readback, versions_read, clock, step, person_id, business_id,
+           booking_id, turn_id, bundle_hash, bundle_build, answered_option_id, closed_at
+    from open_questions where id = ${QUESTION_1}
+  `;
+  const [clockRow] = await db.db.sql<Json[]>`
+    select id, kind, state, due_at, version from clock_rows where open_question_id = ${QUESTION_1}
+  `;
+  if (question === undefined || clockRow === undefined) throw new Error("S1-02's question and its clock row");
+  return { question, clock: clockRow };
+}
+
+describe("an asked text sends S1-02's one open question again, once, its ask count raised; a second asked text sends nothing (T-1505; K-09 v1.12)", () => {
+  const askedSent = { app: [] as string[], job: [] as string[] };
+  let asked: World;
+  /** The question's state before the first asked text: what the raise must leave as it was, but its count and version. */
+  let before: { question: Json; clock: Json };
+
+  beforeAll(async () => {
+    asked = await openWorld({
+      schema: "turn_face_sign_up_asked",
+      name: "rosie-turn-face-sign-up-asked",
+      sent: askedSent,
+      trades: tradesOverV2(),
+      settleSignUp: false,
+    });
+  }, 240_000);
+
+  afterAll(async () => {
+    await Promise.all([asked.app.end({ timeout: 5 }), asked.job.end({ timeout: 5 })]);
+    await asked.cdb.close();
+  });
+
+  it("turn 1 opens S1-02's question in this world as in the first, asked once", SLOW, async () => {
+    expect(await joinAndDeliver(asked)).toBe(2);
+    before = await questionState(asked.cdb);
+    expect(before.question).toMatchObject({
+      status: "open",
+      version: 2,
+      ask_count: 1,
+      options: [],
+      readback: null,
+    });
+    expect(before.clock).toMatchObject({ kind: "question", state: "armed" });
+  });
+
+  it(
+    "'A bit of everything', which decide asks back on: the part asked, one quick reply that sends S1-02's question again, named in written.outboxRows, and the raise: ask_count 1 to 2, version 2 to 3, nothing else of the question or its clock row moved; a replay writes nothing",
+    SLOW,
+    async () => {
+      clock.now = NOW_2;
+      const appBefore = askedSent.app.length;
+      const request = askedTurn(TURN_ASKED);
+      const answer = await asked.face.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
+      expect(answer, JSON.stringify(answer)).toMatchObject({
+        result: "committed",
+        turnId: TURN_ASKED,
+        repeated: false,
+      });
+      expect(validator.check("gateAndCommit", "response", answer)).toEqual([]);
+      const committed = answer as unknown as {
+        parts: Json[];
+        written: { written: Json[]; outboxRows: Json[]; promoted: Json[] };
+        openQuestions: { opened: string[]; closed: string[] };
+        effects: Json[];
+      };
+      // The part as K-09 v1.12's commit-s1-02-asked.json answers it: asked, no limit run, no key.
+      const fixed = fixture("commit-s1-02-asked.json") as { outcome: { parts: Json[] } };
+      expect(committed.parts).toEqual(fixed.outcome.parts);
+      // K-05's answer: the question at its version after the raise, and the one row; nothing opened or closed.
+      expect(committed.written.written).toEqual([{ table: "open_questions", rowId: QUESTION_1, version: 3 }]);
+      expect(committed.written.outboxRows.map((row) => row.id)).toEqual([ROW_ASKED]);
+      expect(committed.openQuestions).toEqual({ opened: [], closed: [] });
+      expect(committed.effects).toEqual([]);
+
+      // The question: ask_count 2 and version 3; status, options, read-back, versions read, clock line, bundle and turn as
+      // they were, still open and answerable; its clock row untouched (default 196).
+      const after = await questionState(asked.cdb);
+      expect(after.question).toEqual({ ...before.question, version: 3, ask_count: 2 });
+      expect(after.clock).toEqual(before.clock);
+      // The row, as the walk writes the first ask's, with no plan yet.
+      const { sql } = asked.cdb.db;
+      const rows = await sql<Json[]>`
+        select id, state, channel, send_class, open_question_id, recipient_handle_id, recipient_person_id, business_id,
+               booking_id, copy_of_row_id, versions_read, plan, bundle_hash, bundle_build
+        from outbox_rows where turn_id = ${TURN_ASKED}
+      `;
+      expect(rows).toEqual([
+        {
+          id: ROW_ASKED,
+          state: "planned",
+          channel: "imessage",
+          send_class: "quick_reply",
+          open_question_id: QUESTION_1,
+          recipient_handle_id: HANDLE,
+          recipient_person_id: PERSON,
+          business_id: BUSINESS,
+          booking_id: null,
+          copy_of_row_id: null,
+          versions_read: [],
+          plan: null,
+          bundle_hash: V2.hash,
+          bundle_build: V2.build,
+        },
+      ]);
+      // The raise's entry and the row's, Rosie's, why the step alone (K-05 v1.21 default 196).
+      const entries = await sql<Json[]>`
+        select id, kind, table_name, row_id, old_values, new_values, actor_kind, why, business_id from event_log
+        where turn_id = ${TURN_ASKED} and table_name in ('open_questions', 'outbox_rows') order by id collate "C"
+      `;
+      expect(entries).toEqual([
+        {
+          id: `log-${QUESTION_1}-asked_again`,
+          kind: "open_question.asked_again",
+          table_name: "open_questions",
+          row_id: QUESTION_1,
+          old_values: { ask_count: 1 },
+          new_values: { ask_count: 2 },
+          actor_kind: "rosie",
+          why: { step: "S1-02" },
+          business_id: BUSINESS,
+        },
+        {
+          id: `log-${ROW_ASKED}-created`,
+          kind: "outbox_row.created",
+          table_name: "outbox_rows",
+          row_id: ROW_ASKED,
+          old_values: null,
+          new_values: { state: "planned", channel: "imessage", send_class: "quick_reply" },
+          actor_kind: "rosie",
+          why: { step: "S1-02" },
+          business_id: BUSINESS,
+        },
+      ]);
+      // One turn, one row, no question opened and no clock row made by it.
+      expect(await footprint(asked.cdb, TURN_ASKED)).toMatchObject({
+        turns: 1,
+        outbox: 1,
+        questions: 0,
+        clocks: 0,
+        effects: 0,
+      });
+      // As rosie_app nothing read a table that spans businesses; the question was read through 0037.
+      const statements = askedSent.app.slice(appBefore);
+      for (const text of statements) expect(text).not.toMatch(SPANS_BUSINESSES);
+      expect(statements.some((text) => text.includes("open_questions_went_out("))).toBe(true);
+
+      // A replay of the same turn answers the first commit and writes nothing: no second row, no second raise.
+      const written = await snapshot(asked.cdb);
+      const again = await asked.face.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
+      expect(again).toMatchObject({ result: "committed", turnId: TURN_ASKED, repeated: true });
+      expect((again as unknown as typeof committed).written).toEqual({
+        written: [],
+        outboxRows: committed.written.outboxRows,
+        promoted: [],
+      });
+      expect(await snapshot(asked.cdb)).toEqual(written);
+      expect((await questionState(asked.cdb)).question).toMatchObject({ version: 3, ask_count: 2 });
+    },
+  );
+
+  it(
+    "then composeInput and finalizeMessage take the re-sent row as they took the first: S1-02's own line on bundle v2, no option, the owner's text as its inbound; its plan and final parts written",
+    SLOW,
+    async () => {
+      clock.finalize = FINALIZED_2;
+      const caller = callerOf(TURN_ASKED, TRACE_2);
+      const compose = { caller, outboxRowId: ROW_ASKED };
+      const composed = (await asked.face.composeInput(
+        structuredClone(compose),
+        traceFor(compose).trace,
+      )) as unknown as { result: string; input: Json };
+      expect(composed, JSON.stringify(composed)).toMatchObject({ result: "compose" });
+      expect(validator.check("composeInput", "response", composed)).toEqual([]);
+      // S1-02's own line as bundle v2 holds it: the question's own words again, with no preface (default 197).
+      const step = (publishedBundleV2().flows.A as { steps: Record<string, { say: { text: string }[] }> })
+        .steps["S1-02"];
+      const line = step?.say[0]?.text ?? "";
+      expect(line).not.toBe("");
+      expect(composed.input).toMatchObject({
+        row: ROW_ASKED,
+        turn: TURN_ASKED,
+        masterText: { step: "S1-02", text: line },
+        situation: "routine",
+        channel: "imessage",
+        options: [],
+        inbound: { text: ASKED_WORDS },
+      });
+
+      // finalize-pass.json's plan for S1-02's first row, as this row's: the same words, finalized the same way.
+      const finalize = renamed(
+        (fixture("finalize-pass.json") as { request: Json }).request,
+        new Map<string, string>([
+          ...OWNER_NAMES,
+          ["turn-s1-01-sam", TURN_ASKED],
+          ["trace-sam-0000", TRACE_2],
+          ["outbox-s1-02-sam-1", ROW_ASKED],
+        ]),
+      );
+      const finalized = (await asked.face.finalizeMessage(
+        structuredClone(finalize),
+        traceFor(finalize).trace,
+      )) as unknown as Finalized;
+      expect(finalized.outcome, JSON.stringify(finalized)).toBe("send");
+      expect(validator.check("finalizeMessage", "response", finalized)).toEqual([]);
+      expect(finalized.finalParts.row).toBe(ROW_ASKED);
+      expect(finalized.finalParts.sends).toHaveLength(1);
+      const text = finalized.finalParts.sends[0]?.text ?? "";
+      expect(text).toContain("What kinds of work do you do? Just type them.");
+      expect(finalized.finalParts.sends[0]).toMatchObject({ kind: "words", options: [] });
+      // Its plan and final parts written by K-05's writePlan on the runtime side: the phone is never held back by it.
+      expect(await rowOf(asked.cdb, "outbox_rows", ROW_ASKED, ["turn_id", "state", "final_parts"])).toEqual({
+        version: 2,
+        turn_id: TURN_ASKED,
+        state: "checked",
+        final_parts: finalized.finalParts,
+      });
+      const [planned] = await asked.cdb.db.sql<{ planned: boolean }[]>`
+        select plan is not null as planned from outbox_rows where id = ${ROW_ASKED}
+      `;
+      expect(planned?.planned).toBe(true);
+    },
+  );
+
+  it(
+    "a second asked text on the same question writes no row and no raise: ask_count stays 2, the question's version 3; the turn commits its text's safety outcome alone",
+    SLOW,
+    async () => {
+      clock.now = NOW_3;
+      const questionBefore = await questionState(asked.cdb);
+      const [outboxBefore] = await asked.cdb.db.sql<
+        { n: number }[]
+      >`select count(*)::int as n from outbox_rows`;
+      const request = askedTurn(TURN_ASKED_AGAIN);
+      const answer = await asked.face.gateAndCommit(request, NOTHING_OPEN_AT, traceFor(request).trace);
+      expect(answer, JSON.stringify(answer)).toMatchObject({
+        result: "committed",
+        turnId: TURN_ASKED_AGAIN,
+        repeated: false,
+        written: { written: [], outboxRows: [], promoted: [] },
+        openQuestions: { opened: [], closed: [] },
+      });
+      expect(validator.check("gateAndCommit", "response", answer)).toEqual([]);
+      const fixed = fixture("commit-s1-02-asked.json") as { outcome: { parts: Json[] } };
+      expect((answer as unknown as { parts: Json[] }).parts).toEqual(fixed.outcome.parts);
+      expect(await questionState(asked.cdb)).toEqual(questionBefore);
+      expect(questionBefore.question).toMatchObject({ status: "open", version: 3, ask_count: 2 });
+      const [outboxAfter] = await asked.cdb.db.sql<
+        { n: number }[]
+      >`select count(*)::int as n from outbox_rows`;
+      expect(outboxAfter?.n).toBe(outboxBefore?.n);
+      expect(await footprint(asked.cdb, TURN_ASKED_AGAIN)).toMatchObject({
+        turns: 1,
+        outbox: 0,
+        questions: 0,
+        clocks: 0,
+        effects: 0,
+      });
+      const [raised] = await asked.cdb.db.sql<{ n: number }[]>`
+        select count(*)::int as n from event_log where kind = 'open_question.asked_again'
+      `;
+      expect(raised?.n).toBe(1);
     },
   );
 });
