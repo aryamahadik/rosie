@@ -1,0 +1,144 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": [
+      "seed-bundle-registry.json",
+      "seed-person-roles.json"
+    ],
+    "after": [
+      "commit-s1-01-sam.json"
+    ],
+    "now": "2026-10-19T18:07:04Z",
+    "note": "commit-s1-02-sam-asks-again with the question it asks again also closed in the same commit, answered with no option (README item 81, default 194): a commit that asks a question again closes none (writes.openQuestions.close empty when askAgain is given), so a question is never raised and closed together, and the schema refuses it; db/repo throws on such a request before any statement reaches the database (its default 1), writing nothing, never versionChanged or wrongState, which name the record's state, not a request that contradicts itself. K-09 v1.12's commit that sends a question again opens and closes nothing (its default 192; its refuse-s1-02-asked-question-closed.json). Its one fault is request.writes.openQuestions.close.0; put right, the close taken out, it is commit-s1-02-sam-asks-again."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-s1-02-sam-asked",
+      "handleId": "handle-sam",
+      "eventIds": [
+        "evt-sam-0002"
+      ],
+      "bundleId": {
+        "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "build": 1
+      },
+      "traceId": "trace-sam-0002",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [],
+    "writes": {
+      "state": [],
+      "openQuestions": {
+        "open": [],
+        "close": [
+          {
+            "id": "oq-s1-02-sam-1",
+            "expectVersion": 1,
+            "status": "answered",
+            "answeredOptionId": null
+          }
+        ],
+        "askAgain": [
+          {
+            "id": "oq-s1-02-sam-1",
+            "expectVersion": 1
+          }
+        ]
+      },
+      "clockRows": {
+        "make": [],
+        "cancel": []
+      },
+      "outboxRows": [
+        {
+          "id": "outbox-s1-02-sam-asked-1",
+          "recipientHandleId": "handle-sam",
+          "recipientPersonId": "person-sam",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": null,
+          "channel": "imessage",
+          "sendClass": "quick_reply",
+          "openQuestionId": "oq-s1-02-sam-1",
+          "copyOfRowId": null,
+          "versionsRead": []
+        }
+      ],
+      "reservations": {
+        "confirm": [],
+        "release": []
+      },
+      "events": [
+        {
+          "id": "log-oq-s1-02-sam-1-asked_again",
+          "kind": "open_question.asked_again",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "rosie",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "open_questions",
+          "rowId": "oq-s1-02-sam-1",
+          "oldValues": {
+            "ask_count": 1
+          },
+          "newValues": {
+            "ask_count": 2
+          },
+          "sealed": null,
+          "why": {
+            "step": "S1-02"
+          },
+          "approvedBy": null,
+          "proofs": null
+        },
+        {
+          "id": "log-outbox-s1-02-sam-asked-1-created",
+          "kind": "outbox_row.created",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "rosie",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "outbox_rows",
+          "rowId": "outbox-s1-02-sam-asked-1",
+          "oldValues": null,
+          "newValues": {
+            "state": "planned",
+            "channel": "imessage",
+            "send_class": "quick_reply"
+          },
+          "sealed": null,
+          "why": {
+            "step": "S1-02"
+          },
+          "approvedBy": null,
+          "proofs": null
+        }
+      ]
+    },
+    "answerPhoneRowsBy": "handleId"
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-s1-02-sam-asked",
+    "committedAt": "2026-10-19T18:07:04Z",
+    "repeated": false,
+    "committed": {
+      "written": [
+        {
+          "table": "open_questions",
+          "rowId": "oq-s1-02-sam-1",
+          "version": 2
+        }
+      ],
+      "outboxRows": [
+        {
+          "id": "outbox-s1-02-sam-asked-1",
+          "commitSeq": 2
+        }
+      ],
+      "promoted": []
+    }
+  }
+}

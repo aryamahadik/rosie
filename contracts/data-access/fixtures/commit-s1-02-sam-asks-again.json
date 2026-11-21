@@ -1,0 +1,93 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["commit-s1-01-sam.json"],
+    "now": "2026-10-19T18:07:04Z",
+    "note": "K-09 v1.12's commit-s1-02-asked.json as K-05 commits it (README item 81): Sam's second text, 'A bit of everything', names no kind of work, both reads ask about S1-02's one open question, and the commit sends that question again in one row and raises its ask count, in one transaction. The question is commit-s1-01-sam's oq-s1-02-sam-1, stored with no options and no read-back, asked once, still waiting at version 1 (no K-05 exchange of this chain runs its first delivery receipt's armClock, which K-09's chain counts as version 2: the raise is the same at either version). The request raises it at version 1 (writes.openQuestions.askAgain), writes outbox-s1-02-sam-asked-1 (K-09 v1.12 default 192: to handle-sam and person-sam under biz-lees-barbershop, no booking, on imessage, quick_reply, the question named, no copy, no versions read, no plan) and the two entries, open_question.asked_again (ask_count 1 to 2: README default 196) and outbox_row.created; it opens and closes no question and makes no clock row. The answer names the question at version 2 and the row at commitSeq 2, after outbox-s1-02-sam-1's 1. In the table the question's ask_count is 2 and its version 2, and its status (waiting), options, read-back, versions read, Clock line, bundle, turn and clock row (clock-oq-s1-02-sam-1, waiting) are as commit-s1-01-sam wrote them (README default 195). The request asks for phones rows by handle id, as every turn's commit does (T-1419), and names none. Sam's text's safety outcome is a K-09 core action, not a K-05 write (commit-s1-01-sam's note)."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-s1-02-sam-asked",
+      "handleId": "handle-sam",
+      "eventIds": ["evt-sam-0002"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-sam-0002",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [],
+    "writes": {
+      "state": [],
+      "openQuestions": {
+        "open": [],
+        "close": [],
+        "askAgain": [{ "id": "oq-s1-02-sam-1", "expectVersion": 1 }]
+      },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [
+        {
+          "id": "outbox-s1-02-sam-asked-1",
+          "recipientHandleId": "handle-sam",
+          "recipientPersonId": "person-sam",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": null,
+          "channel": "imessage",
+          "sendClass": "quick_reply",
+          "openQuestionId": "oq-s1-02-sam-1",
+          "copyOfRowId": null,
+          "versionsRead": []
+        }
+      ],
+      "reservations": { "confirm": [], "release": [] },
+      "events": [
+        {
+          "id": "log-oq-s1-02-sam-1-asked_again",
+          "kind": "open_question.asked_again",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "rosie",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "open_questions",
+          "rowId": "oq-s1-02-sam-1",
+          "oldValues": { "ask_count": 1 },
+          "newValues": { "ask_count": 2 },
+          "sealed": null,
+          "why": { "step": "S1-02" },
+          "approvedBy": null,
+          "proofs": null
+        },
+        {
+          "id": "log-outbox-s1-02-sam-asked-1-created",
+          "kind": "outbox_row.created",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "rosie",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "outbox_rows",
+          "rowId": "outbox-s1-02-sam-asked-1",
+          "oldValues": null,
+          "newValues": { "state": "planned", "channel": "imessage", "send_class": "quick_reply" },
+          "sealed": null,
+          "why": { "step": "S1-02" },
+          "approvedBy": null,
+          "proofs": null
+        }
+      ]
+    },
+    "answerPhoneRowsBy": "handleId"
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-s1-02-sam-asked",
+    "committedAt": "2026-10-19T18:07:04Z",
+    "repeated": false,
+    "committed": {
+      "written": [{ "table": "open_questions", "rowId": "oq-s1-02-sam-1", "version": 2 }],
+      "outboxRows": [{ "id": "outbox-s1-02-sam-asked-1", "commitSeq": 2 }],
+      "promoted": []
+    }
+  }
+}
