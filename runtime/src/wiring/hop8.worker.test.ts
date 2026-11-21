@@ -24,8 +24,11 @@
 //   - Concurrency: two actors (two roots over one K-05) forced to commit the same turn id in parallel give one commit.
 //
 // The Durable Objects' storage is not cleared between this file's tests, so each test's texts go to a handle no other test
-// uses, or to a fresh rig whose K-05 has seen nothing. Test values only (rule 9): the master's sample cast, the fictional
-// 555-01xx numbers and the fixtures' own words.
+// uses, or to a fresh rig whose K-05 has seen nothing. Test owner 1 holds no role, so the JOIN's S1-02 row is read by its
+// sign-up line as the owner and its first text opens with signUpOpener (K-01 README default 19; T-1511); each rig holds
+// bundle v2 active, which carries the line (T-1477), and the JOIN's turn pins it, as hops 10 to 12 do (T-1512): on bundle
+// v0 finalize would refuse the text and the reply would never end. Test values only (rule 9): the master's sample cast,
+// the fictional 555-01xx numbers and the fixtures' own words.
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import traceSkeleton from "@rosie/contracts/event-trace/fixtures/trace-skeleton.json";
 import textFixture from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
@@ -42,11 +45,12 @@ import { flush } from "../turn/test-support";
 import type { GateCommitted } from "../turn/types";
 import { composeRoot, SKELETON_FLAG, withTextSource, type HandleActors, type Root } from "./index";
 import {
-  BUNDLE_V0,
+  BUNDLE_V2,
   fakeFlags,
   SAM_CHAT,
   skeletonFakes,
   TEST_OWNER_1,
+  testClock,
   watchGate,
   type EventLogRow,
   type LinqInboundEvent,
@@ -262,9 +266,12 @@ interface Rig {
   restore(): void;
 }
 
-/** The root for "test" with the HandleActor namespace, its actor ports installed and the turn's gate calls watched. */
+/**
+ * The root for "test" with the HandleActor namespace, its actor ports installed and the turn's gate calls watched; bundle
+ * v2 active, the JOIN's pin (T-1512).
+ */
 function rig(log: MockInstance): Rig {
-  const fakes = skeletonFakes();
+  const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
   const root = testRoot(fakes, handleActors());
   const restoreRoot = root.install();
   const watched = watchGate(root);
@@ -429,7 +436,7 @@ describe("hop 8 joined: the gate and one commit through @rosie/actions' turn fac
           outcome: "ok",
           error_code: null,
           turn_id: turnId,
-          bundle_id: BUNDLE_V0,
+          bundle_id: BUNDLE_V2,
           business_id: TEST_OWNER_1.businessId,
           decided: { part: 0, result: "committed", choice: "c-01" },
         });
@@ -458,7 +465,7 @@ describe("hop 8 joined: the gate and one commit through @rosie/actions' turn fac
           id: turnId,
           handleId: TEST_OWNER_1.handleId,
           eventIds: [JOIN_CONTEXT.texts[0]?.eventId],
-          bundleId: BUNDLE_V0,
+          bundleId: BUNDLE_V2,
           traceId,
           joinedTraceIds: [],
           tries: 1,
@@ -486,7 +493,7 @@ describe("hop 8 joined: the gate and one commit through @rosie/actions' turn fac
             handleId: TEST_OWNER_1.handleId,
             state: "committed",
             traceId,
-            bundleId: BUNDLE_V0,
+            bundleId: BUNDLE_V2,
             tries: 1,
           },
         ]);
@@ -564,7 +571,7 @@ describe("hop 8 joined: the gate and one commit through @rosie/actions' turn fac
         expect(new Set(logRows.map((row) => row.trace_id))).toEqual(new Set([traceId]));
         expect(
           new Set(logRows.map((row) => `${String(row.bundle_hash)}/${String(row.bundle_build)}`)),
-        ).toEqual(new Set([`${BUNDLE_V0.hash}/${String(BUNDLE_V0.build)}`]));
+        ).toEqual(new Set([`${BUNDLE_V2.hash}/${String(BUNDLE_V2.build)}`]));
 
         // The gate's reads ran under Lee's Barbershop's scope only, every one naming it.
         expect(run.fakes.gate.scopes).toEqual([TEST_OWNER_1.businessId]);
@@ -712,14 +719,15 @@ describe("hop 8 joined: the gate and one commit through @rosie/actions' turn fac
       }
 
       // A K-05 that has seen nothing, and two roots over it, as two actors' isolates over one database. Each is handed the
-      // turn's request with the JOIN event's service and chat id on its turn, as each actor's root puts them there.
-      const fakes = skeletonFakes();
+      // turn's request with the JOIN event's service and chat id on its turn, as each actor's root puts them there; bundle
+      // v2 active, as in the run that made the request.
+      const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
       const roots = [testRoot(fakes, null), testRoot(fakes, null)];
       const sent = withTextSource(request, { service: "imessage", chatId: SAM_CHAT });
       const traceOf = () =>
         openTrace({
           openedBy: "textWebhook",
-          bundleId: BUNDLE_V0,
+          bundleId: BUNDLE_V2,
           incomingTraceId: request.caller.traceId,
           sink: () => undefined,
           now: () => Date.now(),
@@ -775,11 +783,11 @@ describe("hop 8 joined: the gate and one commit through @rosie/actions' turn fac
       expect(request.turn).not.toHaveProperty("service");
       expect(request.turn).not.toHaveProperty("chatId");
 
-      const fakes = skeletonFakes();
+      const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
       const root = testRoot(fakes, null);
       const trace = openTrace({
         openedBy: "textWebhook",
-        bundleId: BUNDLE_V0,
+        bundleId: BUNDLE_V2,
         incomingTraceId: request.caller.traceId,
         sink: () => undefined,
         now: () => Date.now(),

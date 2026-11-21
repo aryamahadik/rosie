@@ -1123,6 +1123,15 @@ const BUNDLE_V2_PARTS: ReadonlyMap<string, string> = (() => {
  */
 export const BUNDLE_V2: BundleId = bundleIdOfParts(BUNDLE_V2_PARTS);
 
+/**
+ * Bundle v2's manifest and flow A in bundle.kv.json's form (each part's K-01 key and its exact text, as the double holds
+ * them above): what a test puts into the BUNDLES namespace to stand for bundle v2's publish to KV (T-1512, as bundles/v0's
+ * bundle.kv.json stands for bundle v0's). Its trade overlays are not among them, as above.
+ */
+export const BUNDLE_V2_KV: readonly { readonly key: string; readonly value: string }[] = [
+  ...BUNDLE_V2_PARTS,
+].map(([key, value]) => ({ key, value }));
+
 /** Every part the double's copy holds, by K-01 key: bundle v0's and bundle v2's, each as its bundle publishes it. */
 const BUNDLE_PARTS: ReadonlyMap<string, string> = new Map([...BUNDLE_V0_PARTS, ...BUNDLE_V2_PARTS]);
 
