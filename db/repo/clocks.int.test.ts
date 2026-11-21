@@ -1205,6 +1205,60 @@ describe("fireClock: fire a row exactly once (K-05 item 7)", () => {
   );
 
   it(
+    "a firing whose writes carry askAgain, with any value, throws before any statement, naming the field alone, and its clock row, the question and the event log stay as they were (K-05 v1.21 default 199; T-1509)",
+    SLOW,
+    async () => {
+      await given("fire-once.json");
+      const before = await snapshot();
+      const clockBefore = await clockRow(CLOCK_ROW);
+      const questionBefore = await question(QUESTION);
+      const entriesBefore = await db.sql<{ id: string }[]>`select id from event_log order by id`;
+      // A rosie_job client that records every statement it sends: none means the firing threw before the database.
+      const statements: string[] = [];
+      const watched = postgres(resolvePrimaryUrl(), {
+        max: 1,
+        onnotice: () => undefined,
+        debug: (_connection: number, text: string) => {
+          statements.push(text);
+        },
+        connection: {
+          application_name: "rosie-t1509-clocks-watched",
+          search_path: `${db.schema}, public`,
+          role: RUNTIME_ROLE,
+        },
+      });
+      const values: [string, unknown][] = [
+        ["a raise of the firing's own question", [{ id: QUESTION, expectVersion: 2 }]],
+        ["an empty list", []],
+        ["null", null],
+        ["undefined", undefined],
+        ["a raise not in a list", { id: QUESTION, expectVersion: 2 }],
+      ];
+      try {
+        for (const [what, value] of values) {
+          const request = fireRequest();
+          (request.writes.openQuestions as unknown as Record<string, unknown>).askAgain = value;
+          const error = await thrownBy(fireClock(watched, request));
+          expect(error, what).toBeInstanceOf(TypeError);
+          expect((error as Error).message, what).toBe(
+            "fireClock: writes.openQuestions.askAgain is not a firing's: only a turn's commit asks a question again",
+          );
+        }
+      } finally {
+        await watched.end({ timeout: 5 });
+      }
+      expect(statements).toEqual([]);
+      expect(await snapshot()).toEqual(before);
+      expect(await clockRow(CLOCK_ROW)).toEqual(clockBefore);
+      expect(clockBefore).toMatchObject({ state: "armed", version: 2, fired_at: null });
+      expect(await question(QUESTION)).toEqual(questionBefore);
+      expect(await db.sql<{ id: string }[]>`select id from event_log order by id`).toEqual(entriesBefore);
+      // The same firing without the field fires as fire-once.json says.
+      expect(await fireClock(runtime, fireRequest())).toEqual(exchangeOf("fire-once.json").outcome);
+    },
+  );
+
+  it(
     "a firing's state write gives a bytea column the bytes of its hex form, and refuses any other form (T-1185)",
     SLOW,
     async () => {
