@@ -2,9 +2,43 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 819, [`1a1ce44`](https://github.com/aryamahadik/rosie/commit/1a1ce44), 2026-11-21 01:26:48 UTC.
+- **Through:** commit 821, [`c0176bf`](https://github.com/aryamahadik/rosie/commit/c0176bf), 2026-11-21 02:12:11 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 821. docs: COMMIT\_HISTORY.md through commit 819 (1a1ce44, \#830) (\#832)
+
+- **Commit:** [`c0176bf`](https://github.com/aryamahadik/rosie/commit/c0176bf), by Arya Mahadik, 2026-11-21 02:12:11 UTC
+- **Pull request:** [#832](https://github.com/aryamahadik/rosie/pull/832) from `task/commit-history-194`, merged 2026-11-21 02:12:11 UTC. It squashed 1 branch commit:
+  - `89eddaa` docs: COMMIT\_HISTORY.md through commit 819 (1a1ce44, \#830)
+- **Files changed:** 1 (+60 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +60 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 820. T-1504: K-09 v1.12, an asked part sends the turn's one open question again once (defaults 192 to 198, open gaps 173 to 177, rule askedResendsQuestion, 1 accepted and 4 refused fixtures; frozen) (\#831)
+
+- **Commit:** [`4075dd0`](https://github.com/aryamahadik/rosie/commit/4075dd0), by Arya Mahadik, 2026-11-21 02:12:07 UTC
+- **Pull request:** [#831](https://github.com/aryamahadik/rosie/pull/831) from `task/T-1504`, merged 2026-11-21 02:12:08 UTC. It squashed 1 branch commit:
+  - `c27cf14` T-1504: K-09 v1.12, an asked part sends the turn's one open question …
+- **Files changed:** 10 (+1773 −4), by folder:
+  - `contracts/tool-api/` README.md +54 −2, frozen.json +1 −1, tool-api.rules.mjs +197 −0, tool-api.v1.12.schema.json +1510 −0
+  - `contracts/tool-api/fixtures/` commit-s1-02-asked.json +1 −0, index.json +6 −1
+  - `contracts/tool-api/fixtures/invalid/` refuse-s1-02-asked-question-closed.json +1 −0, refuse-s1-02-asked-twice.json +1 −0, refuse-s1-02-asked-two-rows.json +1 −0, refuse-s2-22-asked-read-back.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 819. docs: COMMIT\_HISTORY.md through commit 816 (ed15454, \#826) (\#830)
 
