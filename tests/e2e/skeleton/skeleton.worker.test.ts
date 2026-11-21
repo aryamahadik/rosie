@@ -252,6 +252,11 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     // Before the actor's inbox entry: the call had ended when the hand-off reached the actor.
     expect(opened.endedAt).toBeLessThanOrEqual(inboxEntryAt(facts));
     // K-04's phone row, inserted once, as the dispatcher's doubles read it: its number the handle's own address.
+    // After the whole run: the JOIN's first text carries the STOP, HELP and rates line, and its delivery receipt reached
+    // the gateway before the trace was collected (root-run.ts), so K-05 markPart set the line's delivered time to that
+    // receipt's and raised the phone's version once, as db/repo's markPartIn does (K-05 v1.21 default 203; T-1514).
+    const [deliveredMark] = dispatch.partMarks.filter((call) => call.request.outcome === "delivered");
+    if (deliveredMark?.request.outcome !== "delivered") throw new Error("no delivered mark");
     expect(dispatch.phones.get(TEST_OWNER_1.handleId)).toEqual({
       number: JOIN.handle.address,
       stopped: false,
@@ -260,8 +265,8 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
       chatWay: JOIN.service,
       linqContactAddedAt: null,
       pollVotedAt: null,
-      optoutLineDeliveredAt: null,
-      version: 1,
+      optoutLineDeliveredAt: deliveredMark.request.at,
+      version: 2,
     });
     // One phone.chat_opened entry, with no turn: the event id as its job id, the JOIN's trace, no bundle.
     expect(dispatch.chatEntries).toMatchObject([
