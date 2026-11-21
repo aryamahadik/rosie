@@ -2,9 +2,79 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 843, [`65c03ce4`](https://github.com/aryamahadik/rosie/commit/65c03ce4), 2026-11-21 16:47:05 UTC.
+- **Through:** commit 847, [`6651fc9c`](https://github.com/aryamahadik/rosie/commit/6651fc9c), 2026-11-21 18:24:59 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 847. docs: COMMIT\_HISTORY.md through commit 843 (65c03ce4, \#855) (\#859)
+
+- **Commit:** [`6651fc9c`](https://github.com/aryamahadik/rosie/commit/6651fc9c), by Arya Mahadik, 2026-11-21 18:24:59 UTC
+- **Pull request:** [#859](https://github.com/aryamahadik/rosie/pull/859) from `task/commit-history-204`, merged 2026-11-21 18:24:59 UTC. It squashed 1 branch commit:
+  - `9da219b` docs: COMMIT\_HISTORY.md through commit 843 (65c03ce4, \#855)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 846. T-1482: S1-08's read-only step writer (planWriter): readStop and mayText rule its one quick reply (K-09 default 189), notBuilt with no stop reads, refused for another step, no person or no service; exported from plan/index.ts for H1a (\#857)
+
+- **Commit:** [`a48dabcd`](https://github.com/aryamahadik/rosie/commit/a48dabcd), by Arya Mahadik, 2026-11-21 18:24:55 UTC
+- **Pull request:** [#857](https://github.com/aryamahadik/rosie/pull/857) from `task/T-1482`, merged 2026-11-21 18:24:55 UTC. It squashed 1 branch commit:
+  - `7038662` T-1482: S1-08's read-only step writer (planWriter): readStop and mayT…
+- **Files changed:** 4 (+700 −0), by folder:
+  - `actions/src/tool-api/journey-1/plan/` errors.ts +57 −0, index.ts +8 −0, plan.test.ts +515 −0, writer.ts +120 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 845. T-1506: K-09 v1.12's contract test: askedResendsQuestion on all five fixtures with each reason word for word, the three twins mended to commit-s1-02-asked.json and the asked-twice and read-back twins accepted silent, commit-s1-01.json's stored S1-02 row, defaults 192 and 194 modeled and agreeing with the rule, 13 damaged copies the schema takes refused one fault each, every earlier accepted fixture under v1.12, the unmapped end still silent (\#856)
+
+- **Commit:** [`8763ddc0`](https://github.com/aryamahadik/rosie/commit/8763ddc0), by Arya Mahadik, 2026-11-21 18:24:51 UTC
+- **Pull request:** [#856](https://github.com/aryamahadik/rosie/pull/856) from `task/T-1506`, merged 2026-11-21 18:24:51 UTC. It squashed 1 branch commit:
+  - `993c697` T-1506: K-09 v1.12's contract test: askedResendsQuestion on all five …
+- **Files changed:** 1 (+1073 −0), by folder:
+  - `tests/contract/` tool-api.v1.12.test.ts +1073 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 844. T-1513 + T-1514: a sign-up text sends the opener, STOP line and privacy link once: db/repo's opener mark and opt-out delivery time, and the runtime doubles and tests that follow them (DL-1033, DL-1050, DL-1062, DL-1078) (\#858)
+
+- **Commit:** [`78835f59`](https://github.com/aryamahadik/rosie/commit/78835f59), by Arya Mahadik, 2026-11-21 18:24:46 UTC
+- **Pull request:** [#858](https://github.com/aryamahadik/rosie/pull/858) from `task/T-1514s`, merged 2026-11-21 18:24:46 UTC. It squashed 1 branch commit:
+  - `5a7f13f` T-1513 + T-1514: a sign-up text sends the opener, STOP line and priva…
+- **Files changed:** 11 (+2221 −93), by folder:
+  - `actions/src/tool-api/turn-face/pg/` sign-up.int.test.ts +28 −11
+  - `db/repo/` outbox-first-lines.int.test.ts +887 −0, outbox.ts +101 −9, turn-face-reads.int.test.ts +130 −0, turn-face-reads.ts +75 −20
+  - `runtime/src/wiring/` hop10.worker.test.ts +356 −0, hop11.worker.test.ts +14 −10, hop13.worker.test.ts +364 −7, test-support.ts +197 −30
+  - `runtime/src/wiring/staging/` tool-api-rows.worker.test.ts +62 −4
+  - `tests/e2e/skeleton/` skeleton.worker.test.ts +7 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Squash of task/T-1514 (f48840a9: T-1513's bcc40957 under T-1514's rounds 1-2, with main merged) onto origin/main, one commit (DL-1065). QA PASS on f48840a9 (whole suite incl. test:e2e skeleton 30/30), the database engineer PASS; T-1513's architect and security reviewer PASS on bcc40957.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 843. docs: COMMIT\_HISTORY.md through commit 841 (e01cdcb5, \#853) (\#855)
 
