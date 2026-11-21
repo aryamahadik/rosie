@@ -1412,7 +1412,7 @@ What the new tasks must hold to:
 
     Nothing else in the answer changes. A row with no turn is still `notFound` before anything of it is read (item 65), so its columns are never selected; a safety row is still `fixedLineRow`; `slotSource.question` is still null for a row that asks no question, so finalize's question is null for it, with no ask-by (item 35's table, row `FinalizeRow.question`), and default 54 still holds for a row that asks one. The read selects no words, address or number (item 35's reason 1): the two columns are a step id and an index (audience `never`: K-04 core v1.2 default 29).
 
-**The schema holds the form:** `outboxRowNew` is closed, `dependentRequired` ties `step` to `lineNo` and back, and `rowLine.from` is `openQuestion` or `row`. That `row` is answered whenever the row stores a step, and `openQuestion` only when it stores none, is the producer's to keep (T-1476), as each of item 35's fields is: a schema cannot compare an answer with the database. As in v1.17 and v1.21, the generated types leave `dependentRequired` out, so a consumer proves its requests on the fixtures.
+**The schema holds the form:** `outboxRowNew` is closed, `dependentRequired` ties `step` to `lineNo` and back, and `rowLine.from` is `openQuestion` or `row`. That `row` is answered whenever the row stores a step, and `openQuestion` only when it stores none, is the producer's to keep (T-1476), as each of item 35's fields is: a schema cannot compare an answer with the database. As in v1.17 and v1.21, the generated types do not hold every rule of the schema (they leave `outboxRowNew`'s `if` and `then` out, as v1's), so a consumer proves its requests against the schema and the fixtures.
 
 ### What each consumer reads
 
