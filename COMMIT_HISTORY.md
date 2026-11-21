@@ -2,9 +2,97 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 832, [`7e57119f`](https://github.com/aryamahadik/rosie/commit/7e57119f), 2026-11-21 09:34:25 UTC.
+- **Through:** commit 835, [`1057240b`](https://github.com/aryamahadik/rosie/commit/1057240b), 2026-11-21 10:43:42 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 835. docs: COMMIT\_HISTORY.md through commit 832 (7e57119f, \#843) (\#847)
+
+- **Commit:** [`1057240b`](https://github.com/aryamahadik/rosie/commit/1057240b), by Arya Mahadik, 2026-11-21 10:43:42 UTC
+- **Pull request:** [#847](https://github.com/aryamahadik/rosie/pull/847) from `task/commit-history-200`, merged 2026-11-21 10:43:42 UTC. It squashed 1 branch commit:
+  - `3a21ff2` docs: COMMIT\_HISTORY.md through commit 832 (7e57119f, \#843)
+- **Files changed:** 1 (+64 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +64 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 834. T-1517: staging reset of one roster phone: questions closed, a fresh stand-in head, the actor reset entry (DL-1033, DL-1048) (\#845)
+
+- **Commit:** [`9a3b97e3`](https://github.com/aryamahadik/rosie/commit/9a3b97e3), by Arya Mahadik, 2026-11-21 10:43:38 UTC
+- **Pull request:** [#845](https://github.com/aryamahadik/rosie/pull/845) from `task/T-1517`, merged 2026-11-21 10:43:38 UTC. It squashed 4 branch commits:
+  - `17dbf51` T-1517: roster-reset seed set: withdraw a roster phone's live questio…
+  - `0126319` T-1517: ACTOR\_RESET\_LIST entry t1517-nov21 (allowList) under DL-1043,…
+  - `3b44c37` T-1517: the roster reset's fresh head writes no company\_kinds row (DL…
+  - `d37b196` T-1517: seed-staging case for roster-reset counts five rows in five t…
+- **Files changed:** 6 (+1806 −16), by folder:
+  - `db/seeds/` roster-reset.int.test.ts +854 −0, roster-reset.ts +632 −0
+  - `infra/ci/` seed-staging.test.mjs +267 −1
+  - `infra/scripts/` seed-staging.sh +32 −10
+  - `runtime/src/wiring/staging/` actor-reset.ts +3 −0, actor-reset.worker.test.ts +18 −5
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1517: roster-reset seed set: withdraw a roster phone's live questions, cancel their clocks and move its handle to a fresh stand-in business head, nothing deleted but the moved link; seed-staging.sh hands it the list; integration and script cases
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1517: ACTOR_RESET_LIST entry t1517-nov21 (allowList) under DL-1043, so the roster phone's actor drops texts sealed under the old person's key once; the worker test's pin of matches per allow-list number updated exactly for the second entry (10 list reads over 5 calls)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1517: the roster reset's fresh head writes no company_kinds row (DL-1048): no barber kind copied from the skeleton, so S1-02 names the new owner's kinds; company, person, business and business_setup rows stay; the int test checks no company_kinds row names the fresh business or company and readTurnParty still answers atBusiness
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1517: seed-staging case for roster-reset counts five rows in five tables (DL-1052): the fresh head no longer writes a company_kinds row; title, comment and the first run's count updated exactly, nothing loosened
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 833. T-1492: one-kind path, companies: S1-04's buttons settler and the S1-02 wrapper that places the one pick (DL-1033) (\#844)
+
+- **Commit:** [`9236784e`](https://github.com/aryamahadik/rosie/commit/9236784e), by Arya Mahadik, 2026-11-21 10:43:33 UTC
+- **Pull request:** [#844](https://github.com/aryamahadik/rosie/pull/844) from `task/T-1492`, merged 2026-11-21 10:43:33 UTC. It squashed 3 branch commits:
+  - `03c827e` T-1491: K-09 README default 199 and open gap 178 (no new version, fro…
+  - `f042e9c` T-1491: the walk asks a bound buttons settler (WalkDeps.buttonsSettle…
+  - `7653b88` T-1492: one-kind path: S1-02 wrapper places the one kept pick on its …
+- **Files changed:** 7 (+2402 −2), by folder:
+  - `actions/src/tool-api/journey-1/companies/` companies.int.test.ts +392 −0, errors.ts +93 −0, index.ts +40 −2, one-kind.test.ts +869 −0, one-kind.ts +525 −0, reads.ts +236 −0, test-support.ts +247 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1491: K-09 README default 199 and open gap 178 (no new version, from T-1515's card under DL-1041 item 4): S1-04's one-kind settler, WalkDeps.buttonsSettlers, asked once where the walk would stop at a plain step with buttons, after the rows before it; ask or rows; S1-04's count by kind; S1-08 needs the stop reads; the stand-in name before S1-09 (DL-1032, DL-1033 ruling 7)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1491: the walk asks a bound buttons settler (WalkDeps.buttonsSettlers, K-09 README default 199) once where it would stop at a plain step with buttons that no hold keeps back, after the rows before it; ask: the step asked as today; rows: written as walked (givesNotStep) and the walk goes on from its next (walk.ts Stretch.walkOn), holds re-checked, one loop check and MAX_WALK; refusal, throw or settledNotRows: nothing written; none bound: today's walk byte for byte; T-1502's settlers untouched
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1492: one-kind path: S1-02 wrapper places the one kept pick on its own insert (company kind first), S1-04 buttons settler recounts and gives companies, places a pick on file by update, asks for two or more; reads ports and helpers for T-1481; unit and PostgreSQL proofs
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 832. docs: COMMIT\_HISTORY.md through commit 829 (995f918f, \#842) (\#843)
 
