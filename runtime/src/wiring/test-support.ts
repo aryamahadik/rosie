@@ -2836,7 +2836,8 @@ function carriesLine(
  *                       db/repo/turn-face-reads.ts readFixedLineFactsIn, statement for statement): with a business, the
  *                       opener mark of the row's handle and business (`openersSent`): none, one naming this row, or one
  *                       whose row is in any state but K-07's four ends of a row that did not go (withdrawn, failed,
- *                       dropped_stopped, superseded) answers the mark's row (null for none); a mark whose row did not go
+ *                       dropped_stopped, superseded) and was committed before this one answers the mark's row (null for
+ *                       none); a mark whose row did not go, or was committed after this one in any state (default 215),
  *                       is read past, to the earliest earlier row (a lower commit order) to the same handle and business
  *                       whose final parts carry an opener, either id, and that is in none of those four states; with no
  *                       business there is no mark, and that same earlier-row read answers. Rosie has texted the handle
@@ -2934,11 +2935,21 @@ export function fakeFinalizeData(
         openerRowId = earliestOpenerRow(handleId, null, row);
       } else {
         const mark = openersSent.find((sent) => sent.handleId === handleId && sent.businessId === businessId);
-        if (mark === undefined || mark.outboxRowId === row.id || !NEVER_WENT.has(stateOf(mark.outboxRowId))) {
+        // The marked row's commit order beside this row's (default 215): a row the double does not hold reads as one
+        // committed before, as db/repo reads a row its scope hid.
+        const markedSeq = mark === undefined ? undefined : outboxRow(mark.outboxRowId)?.values.commitSeq;
+        const markedLater = markedSeq !== undefined && Number(markedSeq) > Number(row.values.commitSeq);
+        if (
+          mark === undefined ||
+          mark.outboxRowId === row.id ||
+          (!NEVER_WENT.has(stateOf(mark.outboxRowId)) && !markedLater)
+        ) {
           openerRowId = mark?.outboxRowId ?? null;
         } else {
           // A mark whose row never went is read past, to the earliest earlier row that carries an opener and went (or
-          // may yet): never a state filter without this fallback, since the mark is written once (default 202).
+          // may yet): never a state filter without this fallback, since the mark is written once (default 202). So is a
+          // mark naming a row committed after this one, whatever its state: rows go out in commit order, so the earliest
+          // row sent carries the opener and the privacy-notice link (default 215).
           openerRowId = earliestOpenerRow(handleId, businessId, row);
         }
       }
