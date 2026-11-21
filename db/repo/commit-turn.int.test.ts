@@ -3002,7 +3002,7 @@ describe("commitTurn writes a row's own step and line, both or neither (K-05 v1.
           withRow(1, (row) => {
             row.lineNo = lineNo;
           }),
-          "commitTurn: writes.outboxRows[].lineNo is not a line index (an integer from 0 to 2147483647)",
+          "commitTurn: writes.outboxRows[].lineNo is not a line index (an integer from 0 to 2^31 - 1)",
         ]),
       ];
       const before = await snapshot();

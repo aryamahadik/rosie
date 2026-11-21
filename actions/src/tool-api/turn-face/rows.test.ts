@@ -669,7 +669,14 @@ describe("a row that carries its own line: K-05 v1.22's read (T-1475; README ite
       },
     });
     const { facts } = (answer as unknown as { input: { facts: { value: string }[] } }).input;
-    expect(facts.map((fact) => fact.value)).toEqual(PLAN_TERMS);
+    // T-1483 (K-09 v1.11 default 186): on S1-08 only Rosie's four fixed lines are term facts (term-facts.ts
+    // S1_08_TERMS), in the card's order; the agreement and first-kind lines are the sample story's and are withheld.
+    expect(facts.map((fact) => fact.value)).toEqual([
+      "Your business and your ID: about 3 minutes",
+      "Any license or document you want shown (optional)",
+      "Then your people",
+      "Nothing you tell me is asked twice",
+    ]);
     expect(doubles.reads).toEqual(["readOutboxRow out-s1-08-sam@biz-lees-barbershop"]);
   });
 

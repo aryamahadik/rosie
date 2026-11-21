@@ -145,7 +145,7 @@
 //      before (23503, or 23505 for a made row's id already taken), so nothing that committed before changes. K-05 item 1
 //      orders the turn row, then the locks and compares, then the writes, in one transaction; the outbox rows keep their
 //      commit order, and the effects still follow every state write (item 18).
-//  18. (T-1476) A row's lineNo above 2147483647, the largest value K-04's integer line_no holds, throws in checkRequest
+//  18. (T-1476) A row's lineNo above 2^31 - 1, the largest value K-04's integer line_no holds, throws in checkRequest
 //      with the other malformed lines (K-05 v1.22 default 207 sets no upper bound; the database engineer's note 1 on
 //      T-1474): the insert would fail with 22003, which is no constraint's answer, so the call would throw anyway, and
 //      this way it throws before any statement, as item 82 has every malformed line do. A step or lineNo given as
@@ -448,7 +448,7 @@ function checkRowLine(row: Row): void {
   }
   const line = row.lineNo;
   if (typeof line !== "number" || !Number.isSafeInteger(line) || line < 0 || line > MAX_LINE_NO) {
-    fail("writes.outboxRows[].lineNo is not a line index (an integer from 0 to 2147483647)");
+    fail("writes.outboxRows[].lineNo is not a line index (an integer from 0 to 2^31 - 1)");
   }
 }
 
