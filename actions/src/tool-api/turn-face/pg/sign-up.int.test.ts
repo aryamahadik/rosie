@@ -36,7 +36,10 @@
 // owner, on S1-02 and S1-04, neither of which needs business, so each first text opens with signUpOpener, S1-02's own
 // words, and never names the stand-in business. Bundles v0 and v1 hold no such line and would refuse those texts
 // (lineNotInBundle), so both turns pin bundle v2 (T-1477), which holds S1-01 to S1-04's six steps as bundle v1 does,
-// byte for byte, and bundle v1's trade overlays, byte for byte.
+// byte for byte, and bundle v1's trade overlays, byte for byte. In the first world turn 1's text is that first text:
+// its writePlan writes the opener mark (T-1513; K-05 v1.21 defaults 200 to 204), so turn 2's text, the second to the
+// same handle and business, carries neither the opener nor the privacy link, only the opt-out line no receipt has
+// marked delivered (T-1514).
 //
 // T-1502 (K-09 README default 191; DL-1018 card 4): a second world, built the same way in a schema of its own, whose
 // binding also hands the walk S1-02's settler (pgTurnCalls' settleSignUp: signUpSteps, one catalog read per walk shared
@@ -114,6 +117,15 @@ const V2 = bundleV2Id();
 
 /** S1-02's own first words, bundle v2's signUpOpener (K-01 README default 19). */
 const SIGN_UP_OPENER = "Hi! I'm Rosie, an automated assistant.";
+
+/** Bundle v2's STOP, HELP and rates line in English (K-01 v1 lists.fixedLines), word for word as its manifest holds it. */
+const OPT_OUT_LINE = ((): string => {
+  const lists = publishedBundleV2().manifest.lists as
+    { fixedLines?: { lines?: { id: string; lang: string; text: string | null }[] } } | undefined;
+  const text = lists?.fixedLines?.lines?.find((line) => line.id === "optOutLine" && line.lang === "en")?.text;
+  if (typeof text !== "string") throw new Error("bundle v2 holds no English optOutLine");
+  return text;
+})();
 
 /** The turns, and the rows the walk names from each turn's own id (K-09 v1.5 default 131). */
 const TURN_1 = "turn-s1-01-roster-owner-1";
@@ -723,7 +735,7 @@ describe("an owner's whole second turn on local PostgreSQL: the gate as rosie_ap
   );
 
   it(
-    "then composeInput and finalizeMessage for the committed S1-04 row on bundle v2 succeed: S1-04's line, the reader by the sign-up line, no option, signUpOpener, and its final parts written",
+    "then composeInput and finalizeMessage for the committed S1-04 row on bundle v2 succeed: S1-04's line, the reader by the sign-up line, no option, no opener and no privacy link a second time (turn 1's mark), the opt-out line still owed, and its final parts written",
     SLOW,
     async () => {
       clock.finalize = FINALIZED_2;
@@ -786,16 +798,21 @@ describe("an owner's whole second turn on local PostgreSQL: the gate as rosie_ap
       expect(finalized.finalParts.row).toBe(ROW_2);
       expect(finalized.finalParts.sends).toHaveLength(1);
       expect(finalized.finalParts.sends[0]).toMatchObject({ kind: "words", options: [] });
-      // One text: the plan's line and its one question, each whole, inside the fixed lines code adds. This world holds
-      // no phone row and no opener mark (the roster-owner seed writes none, and the send was played by a written part,
-      // never by the outbox runner), so K-05's fixed-line facts read as before a first text, and the opener, the
-      // opt-out line and the privacy link ride again. The owner is read by S1-04's sign-up line, and S1-04 needs no
-      // business (it gives companies), so the opener is signUpOpener and the stand-in business is named nowhere (T-1511).
+      // One text: the plan's line and its one question, each whole, then the one fixed line still owed. Turn 1's
+      // writePlan wrote the opener mark for this handle and business, naming turn 1's row, which went (K-05 v1.21
+      // defaults 200 to 204; T-1513), so K-05's fixed-line facts read "texted before": this second text carries no
+      // opener (signUpOpener rode on turn 1's text alone) and no privacy link. This world holds no phone row (the
+      // roster-owner seed writes none, and turn 1's send was played by a written part, never by markPart, so no delivery
+      // receipt set the line's time): the STOP, HELP and rates line was never delivered, and rides again, alone. The
+      // stand-in business is named nowhere (T-1511).
+      const [mark] = await cdb.db.sql<{ outbox_row_id: string }[]>`
+        select outbox_row_id from openers_sent where handle_id = ${HANDLE} and business_id = ${BUSINESS}
+      `;
+      expect(mark?.outbox_row_id).toBe(ROW_1);
       const text = finalized.finalParts.sends[0]?.text ?? "";
-      const lines = text.split("\n");
-      expect(lines[0]).toBe(`${SIGN_UP_OPENER} ${rest}`);
-      expect(lines[1]).toBe(asks);
-      expect(finalized.finalParts.fixedLines).toEqual(["signUpOpener", "optOutLine", "privacyLink"]);
+      expect(text.split("\n")).toEqual([rest, asks, OPT_OUT_LINE]);
+      expect(finalized.finalParts.fixedLines).toEqual(["optOutLine"]);
+      expect(text).not.toContain(SIGN_UP_OPENER);
       expect(text).not.toContain(await standInName(cdb));
       expect(text).not.toContain("booking assistant for");
       // The final parts are written with the plan, by K-05's writePlan on the runtime side.
