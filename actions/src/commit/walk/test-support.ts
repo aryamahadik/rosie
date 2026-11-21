@@ -8,6 +8,9 @@
 // rows (db/repo/targets.ts's type, so the rows card F binds fit the walk's port as they are), and stand-ins for the step
 // writers (T-633's and T-634's), each call written down. Their values come from K-09's commit-s1-01.json,
 // commit-s1-02.json, commit-s1-02-unmapped-end.json and match-kinds.json.
+//
+// T-1519 adds the chat read's double (K-05 v1.10 item 51 readChatHandle as the walk's WalkChats port takes it: the handle
+// whose chat thread holds a chat id), each read written down; it never stands in for the walk.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -44,6 +47,7 @@ import type {
   StepWriterCall,
   StepWriters,
   WalkBundles,
+  WalkChats,
   WalkQuestions,
 } from "./index";
 
@@ -434,6 +438,33 @@ export function questionsOver(
         reads.push({ repo, handleId, openQuestionId });
         const found = handleId === sentTo ? rows.find((row) => row.id === openQuestionId) : undefined;
         return Promise.resolve(found === undefined ? null : copy(found));
+      },
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// The chat read (T-1519: K-05 v1.10 item 51 readChatHandle, the phone handle whose chat thread holds a Linq chat id)
+
+export interface FakeChats {
+  readonly chats: WalkChats;
+  /** Every chat id the read was asked for, in order. */
+  readonly reads: string[];
+}
+
+/**
+ * The chat read over one stored chat thread: `holder`, the handle whose chat thread holds the chat id `chatId`, answered
+ * for that chat id alone, and null for any other (no thread holds it), or for every chat id when `holder` is null. Each
+ * read is written down. Its values are commit-s1-01.json's (handle-sam, linq-chat-demo-sam) or the master's sample cast.
+ */
+export function chatsOver(holder: string | null, chatId = "linq-chat-demo-sam"): FakeChats {
+  const reads: string[] = [];
+  return {
+    reads,
+    chats: {
+      chatHandle(linqChatId) {
+        reads.push(linqChatId);
+        return Promise.resolve(linqChatId === chatId ? holder : null);
       },
     },
   };

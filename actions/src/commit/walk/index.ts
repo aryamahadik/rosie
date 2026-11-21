@@ -3,8 +3,9 @@
 // `createWritesOf({ bundles })`, with the pinned bundle's flow graphs. T-1461 adds the answer to an open question's
 // option: card F binds `questions` (the answered question's row, read on the call's transaction) and `writers` (the
 // read-only step writers by step id). T-1502 adds `settlers` (K-09 README default 191: a split's settler answers the
-// branch from the owner's words, never the option decide named; T-1503 binds S1-02's). See writes.ts, settle.ts and
-// walk.ts.
+// branch from the owner's words, never the option decide named; T-1503 binds S1-02's). T-1519 adds `chats` (K-05 v1.10
+// item 51's readChatHandle: S1-01 reuses the handle's own chat thread for the turn's chat instead of inserting a second
+// one). See writes.ts, settle.ts and walk.ts.
 
 export { WalkNotBuiltError, WalkRefusedError, type WalkFault, type WalkSeam } from "./errors";
 export {
@@ -40,6 +41,7 @@ export {
   type StepWriters,
   type TextSource,
   type WalkBundles,
+  type WalkChats,
   type WalkDeps,
   type WalkQuestions,
   type WriterContext,
