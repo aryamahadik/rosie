@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 823, [`5a30e70`](https://github.com/aryamahadik/rosie/commit/5a30e70), 2026-11-21 03:03:31 UTC.
+- **Through:** commit 825, [`444c43f`](https://github.com/aryamahadik/rosie/commit/444c43f), 2026-11-21 03:33:15 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 825. docs: COMMIT\_HISTORY.md through commit 823 (5a30e70, \#834) (\#836)
+
+- **Commit:** [`444c43f`](https://github.com/aryamahadik/rosie/commit/444c43f), by Arya Mahadik, 2026-11-21 03:33:15 UTC
+- **Pull request:** [#836](https://github.com/aryamahadik/rosie/pull/836) from `task/commit-history-196`, merged 2026-11-21 03:33:16 UTC. It squashed 1 branch commit:
+  - `277b146` docs: COMMIT\_HISTORY.md through commit 823 (5a30e70, \#834)
+- **Files changed:** 1 (+45 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +45 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 824. T-1510: K-01 README default 19 (no new version): fixed line signUpOpener, S1-02's own words, in place of opener when the row's reader is read by the sign-up line as owner and its step does not need business; no doubles; fail closed with lineNotInBundle; RULES 4.2's sign-up exception; the stand-in name before S1-09; open gap for S1-10's wording (DL-1033) (\#835)
+
+- **Commit:** [`fa7ea85`](https://github.com/aryamahadik/rosie/commit/fa7ea85), by Arya Mahadik, 2026-11-21 03:33:10 UTC
+- **Pull request:** [#835](https://github.com/aryamahadik/rosie/pull/835) from `task/T-1510`, merged 2026-11-21 03:33:10 UTC. It squashed 1 branch commit:
+  - `72ffb63` T-1510: K-01 README default 19 (no new version): fixed line signUpOpe…
+- **Files changed:** 1 (+36 −1), by folder:
+  - `contracts/bundle/` README.md +36 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 823. docs: COMMIT\_HISTORY.md through commit 821 (c0176bf, \#832) (\#834)
 
