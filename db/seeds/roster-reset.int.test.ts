@@ -6,8 +6,9 @@
 // roster-owner set (T-1450) after its first sight and its first text's receipt (the gateway's own handleSealingKey and
 // openChatOnText), whose turn 1 asked S1-02 and whose turn 2 answered it with one kind ("Plumbing": one listed pick with
 // no company, and one of its text blocks) and opened S1-04's question with its armed clock. The reset withdraws that
-// question and cancels its clock, gives the phone a fresh stand-in business head, and moves the handle's link to it;
-// afterwards the roster-owner set's checks hold for the fresh head's ids (one person, no role, its company alone, no live
+// question and cancels its clock, gives the phone a fresh stand-in business head with no kind of work (no company_kinds
+// row, DL-1048: S1-02 names the owner's kinds), and moves the handle's link to it; afterwards the roster-owner set's checks
+// hold for the fresh head's ids (one person, no role, its company alone, no live
 // owner, a first text), so K-05's readTurnParty answers atBusiness with the fresh business, handleTargets a first text
 // and readPickedKinds no pick on file, each read as the runtime reads it (a client of this file's own whose connections
 // run as rosie_job with no business scope): the next turn's frontier starts at S1-01. Every old row is still there, the
@@ -58,14 +59,8 @@ const PHONE_A = "+15555550160";
 const PHONE_B = "+15555550161";
 const PHONE_C = "+15555550162";
 const OFF_LIST = "+15555550169";
-const SEED_TABLES = [
-  "businesses",
-  "business_setup",
-  "persons",
-  "companies",
-  "company_kinds",
-  "person_handles",
-] as const;
+// The tables the set writes: never company_kinds (DL-1048).
+const SEED_TABLES = ["businesses", "business_setup", "persons", "companies", "person_handles"] as const;
 // Every table the reset reads or writes, and every table whose rows decide a phone's targets, party and picks.
 const WATCHED = [
   "businesses",
@@ -335,12 +330,14 @@ async function emptied(sql: Sql): Promise<void> {
   await sql`truncate businesses, persons, handles, bundles, kinds cascade`;
 }
 
-/** The fresh head's rows, every column the set writes, as roster-owner writes them for its own ids. */
+/**
+ * The fresh head's rows, every column the set writes, as roster-owner writes them for its own ids, but no kind of work:
+ * no company_kinds row names the fresh business or the fresh company (DL-1048).
+ */
 function freshRows(place: number, generation: number, handleId: string): Record<string, unknown[]> {
   const ids = rosterResetIds(place, generation);
   const [business] = SKELETON_ROWS.businesses;
   const [company] = SKELETON_ROWS.companies;
-  const [kind] = SKELETON_ROWS.company_kinds;
   return {
     businesses: [{ ...business, id: ids.businessId }],
     business_setup: [{ business_id: ids.businessId, control_proven_at: null, no_money: false, version: 1 }],
@@ -348,7 +345,7 @@ function freshRows(place: number, generation: number, handleId: string): Record<
     companies: [
       { ...company, id: ids.companyId, owner_person_id: ids.personId, business_id: ids.businessId },
     ],
-    company_kinds: [{ ...kind, company_id: ids.companyId, business_id: ids.businessId }],
+    company_kinds: [],
     person_handles: [{ person_id: ids.personId, handle_id: handleId }],
   };
 }
@@ -379,7 +376,7 @@ async function rowsOf(sql: Sql, place: number, generation: number, handleId: str
     company_kinds: [
       ...(await sql`
         select company_id, kind_id, business_id, trade_name, pf_facts, pf_switches_a, pf_switches_b, version
-        from company_kinds where business_id = ${ids.businessId}
+        from company_kinds where business_id = ${ids.businessId} or company_id = ${ids.companyId}
       `),
     ],
     person_handles: [
@@ -458,7 +455,7 @@ describe("a roster phone with an open S1-04 question and a pick", () => {
   });
 
   it(
-    "is reset: S1-04's question withdrawn and its clock cancelled, a fresh head written and the handle's link moved to it, as rosie_job; roster-owner's checks hold for the fresh head (readTurnParty atBusiness, handleTargets a first text, no pick on file), so the next turn starts at S1-01; every old row is still there, closed; the phone off the list is untouched; a second run changes nothing and says so",
+    "is reset: S1-04's question withdrawn and its clock cancelled, a fresh head written with no kind of work (no company_kinds row) and the handle's link moved to it, as rosie_job; roster-owner's checks hold for the fresh head (readTurnParty atBusiness, handleTargets a first text, no pick on file), so the next turn starts at S1-01; every old row is still there, closed; the phone off the list is untouched; a second run changes nothing and says so",
     SLOW,
     async () => {
       const { handleId, personId, ids, offList } = await world();
@@ -500,10 +497,12 @@ describe("a roster phone with an open S1-04 question and a pick", () => {
         question: { status: "withdrawn", closed: true, answered: null, version: 2 },
         clock: { state: "cancelled", cancelled: true, fired: false, version: 2 },
       });
-      // The fresh head, as roster-owner writes its rows for its own ids.
+      // The fresh head, as roster-owner writes its rows for its own ids, with no company_kinds row for the fresh business
+      // or company.
       expect(await rowsOf(db.sql, 1, 2, handleId)).toEqual(freshRows(1, 2, handleId));
-      // Every other row as it was: the old head, the old person with its pick, text block and key, the turns, S1-02's
-      // answered question, the phone row and the handle; the one link removed is the old person's to the handle.
+      // Every other row as it was: the old head with its barber kind of work, the old person with its pick, text block
+      // and key, the turns, S1-02's answered question, the phone row and the handle; the one link removed is the old
+      // person's to the handle. company_kinds is left out of `changed`, so its rows are exactly as they were: none added.
       const after = await snapshot(db.sql);
       const changed = {
         open_questions: [ids.askedS104],
@@ -512,7 +511,6 @@ describe("a roster phone with an open S1-04 question and a pick", () => {
         business_setup: [fresh.businessId],
         persons: [fresh.personId],
         companies: [fresh.companyId],
-        company_kinds: [fresh.companyId],
         person_handles: [personId, fresh.personId],
       };
       expect(without(after, changed)).toEqual(without(before, changed));
@@ -541,8 +539,8 @@ describe("a roster phone with an open S1-04 question and a pick", () => {
       });
 
       // roster-owner's checks, for the fresh head's ids, as the runtime reads them: the turn runs under the fresh
-      // business with the fresh person, in the barbershop's zone; the guard finds a first text (the doors); no pick and
-      // only the fresh company are on file for the next S1-02.
+      // business with the fresh person, in the barbershop's zone (atBusiness, with no kind of work on file); the guard
+      // finds a first text (the doors); no pick and only the fresh company are on file for the next S1-02.
       expect(await partyOf(runtime, PHONE_A)).toEqual({
         handleId,
         businessId: fresh.businessId,
@@ -635,7 +633,6 @@ describe("a roster phone with an open S1-04 question and a pick", () => {
         business_setup: [fresh.businessId],
         persons: [fresh.personId],
         companies: [fresh.companyId],
-        company_kinds: [fresh.companyId],
         person_handles: [a.personId, fresh.personId],
       };
       expect(without(await snapshot(db.sql), changed)).toEqual(without(before, changed));
@@ -656,7 +653,7 @@ describe("a roster phone with an open S1-04 question and a pick", () => {
       expect(lines(run.stdout)).toEqual([
         `seed: set roster-reset into schema ${db.schema} on the local database`,
         ...SEED_TABLES.map((table) => `seed: ${table}: 1 row (1 inserted, 0 kept)`),
-        `seed: done: set roster-reset into schema ${db.schema}: 6 rows in 6 tables (6 inserted, 0 kept)`,
+        `seed: done: set roster-reset into schema ${db.schema}: 5 rows in 5 tables (5 inserted, 0 kept)`,
       ]);
       expectNoNumber(`${run.stdout}${run.stderr}`.replaceAll(db.schema, ""), "the runner's output");
 
@@ -666,7 +663,7 @@ describe("a roster phone with an open S1-04 question and a pick", () => {
       expect(lines(again.stdout)).toEqual([
         `seed: set roster-reset into schema ${db.schema} on the local database`,
         ...SEED_TABLES.map((table) => `seed: ${table}: 0 rows (0 inserted, 0 kept)`),
-        `seed: done: set roster-reset into schema ${db.schema}: 0 rows in 6 tables (0 inserted, 0 kept)`,
+        `seed: done: set roster-reset into schema ${db.schema}: 0 rows in 5 tables (0 inserted, 0 kept)`,
       ]);
       expect(await snapshot(db.sql)).toEqual(settled);
 

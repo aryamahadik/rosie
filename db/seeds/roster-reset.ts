@@ -18,7 +18,9 @@
 //   persons         person-roster-owner-<n>-g<k>, with no name and no language, as first sight writes a person
 //   companies       company-roster-owner-<n>-g<k>: roster-owner's company, value for value, owned by that person and naming
 //                   that business
-//   company_kinds   that company's barber: roster-owner's one kind of work (roster-owner.ts:26), as it writes it
+//   company_kinds   none (DL-1048): a new owner has no kind of work until S1-02 names one. roster-owner's barber
+//                   (roster-owner.ts:26) is not copied, since the one-kind path's S1-04 settler would leave it beside the
+//                   named kind, and later steps (services per kind) would then ask about barbering
 //   person_handles  the handle's one link moves to the new person: the old person's link is removed and the new one added,
 //                   as K-04 allows ("Rows are added or removed, never updated": migration 0004; 0012 grants rosie_job
 //                   DELETE on person_handles for exactly this, and on no other table)
@@ -66,8 +68,9 @@
 //      is the new person, with no role, owning the new company alone, naming the new business, which holds no live owner
 //      role; the guard finds a first text (K-05 v1.2 handleTargets: no live open question and no booking); no live clock
 //      of the handle is left; the phone is not stopped. So readTurnParty answers atBusiness with the new business (K-05
-//      v1.11 default 100), readPickedKinds finds no pick for the new business and person, and JOIN is a first text that
-//      the frontier answers with S1-02's question (K-02 v1.1 default 9; K-09 README default 130).
+//      v1.11 default 100, which reads no kind of work), readPickedKinds finds no pick for the new business and person, the
+//      new company holds no kind of work, and JOIN is a first text that the frontier answers with S1-02's question (K-02
+//      v1.1 default 9; K-09 README default 130).
 // Idempotent: a place with nothing live is never touched, so a second run, with nothing live, writes nothing and says so
 // (every table 0 rows, and each place answered nothingLive). Nothing is printed, and no error names a number or a value of
 // a row: the runner (T-201) prints the counts this returns, the new head's rows alone (as staging-testers' ended listings
@@ -91,7 +94,6 @@ import {
 } from "./roster-owner";
 import {
   type SkeletonBusinessRow,
-  type SkeletonCompanyKindRow,
   type SkeletonCompanyRow,
   type SkeletonPersonHandleRow,
   SKELETON_ROWS,
@@ -123,7 +125,6 @@ export interface RosterResetSeedRows {
   readonly business_setup: readonly RosterOwnerBusinessSetupRow[];
   readonly persons: readonly RosterOwnerPersonRow[];
   readonly companies: readonly SkeletonCompanyRow[];
-  readonly company_kinds: readonly SkeletonCompanyKindRow[];
   readonly person_handles: readonly SkeletonPersonHandleRow[];
 }
 
@@ -209,7 +210,6 @@ function skeletonRow<T>(rows: readonly T[], table: string): T {
 
 const BUSINESS = skeletonRow(SKELETON_ROWS.businesses, "businesses");
 const COMPANY = skeletonRow(SKELETON_ROWS.companies, "companies");
-const KIND = skeletonRow(SKELETON_ROWS.company_kinds, "company_kinds");
 
 /** A place with something live, as read and checked before any write. */
 interface Plan {
@@ -445,11 +445,6 @@ function rowsOf(plans: readonly Plan[]): RosterResetSeedRows {
       owner_person_id: to.personId,
       business_id: to.businessId,
     })),
-    company_kinds: plans.map(({ to }): SkeletonCompanyKindRow => ({
-      ...KIND,
-      company_id: to.companyId,
-      business_id: to.businessId,
-    })),
     person_handles: plans.map(({ to, handleId }): SkeletonPersonHandleRow => ({
       person_id: to.personId,
       handle_id: handleId,
@@ -580,19 +575,7 @@ export async function seedRosterReset(
       await tx`
         insert into companies ${tx(rows.companies, "id", "owner_person_id", "name", "business_id", "version")}
       `;
-      await tx`
-        insert into company_kinds ${tx(
-          rows.company_kinds,
-          "company_id",
-          "kind_id",
-          "business_id",
-          "trade_name",
-          "pf_facts",
-          "pf_switches_a",
-          "pf_switches_b",
-          "version",
-        )}
-      `;
+      // No company_kinds row (DL-1048): the new company holds no kind of work until S1-02 names one.
       // The move: the old person's one link to the handle removed, the new person's added (K-04: added or removed).
       for (const { handleId, from } of plans) {
         const removed = await tx`
@@ -638,7 +621,6 @@ export async function seedRosterReset(
       business_setup: count(),
       persons: count(),
       companies: count(),
-      company_kinds: count(),
       person_handles: count(),
     },
     closed: written.closed,
