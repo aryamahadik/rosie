@@ -19,6 +19,7 @@
 import { commitTurn, type CommitOptions } from "../../../../db/repo/commit-turn";
 import type { Sql } from "../../../../db/repo/scope";
 import { LIMITS } from "../../gate/limits";
+import { asksAgain } from "../build";
 import { notBuiltPorts } from "../commit";
 import type { CommitDeps, CommitPorts } from "../types";
 
@@ -34,6 +35,9 @@ export interface PgCommitOptions {
 /**
  * K-05 v1.1 commitTurn as the commit's port (types.ts CommitPorts.commitTurn), on `runtime`: the primary handle of a
  * client whose connections run as rosie_job, uncached (arch 10 lines 504, 538). Each call is one transaction of its own.
+ * A request that asks an open question again (build.ts asksAgain; T-1505) goes on db/repo's K-05 v1.21 overload, whose
+ * answer may also be v1.21's wrongState for that question (K-05 v1.21 default 199); every other request on v1.20's, as
+ * before.
  */
 export function pgCommitTurn<Repo = unknown>(
   runtime: Sql,
@@ -42,7 +46,7 @@ export function pgCommitTurn<Repo = unknown>(
   const { now } = options;
   return (request) => {
     const given: CommitOptions = now === undefined ? {} : { now: now() };
-    return commitTurn(runtime, request, given);
+    return asksAgain(request) ? commitTurn(runtime, request, given) : commitTurn(runtime, request, given);
   };
 }
 

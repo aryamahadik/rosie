@@ -18,6 +18,10 @@
 //     the walk asks for the turn's Linq chat id, handed only the handle id it answers (walkChatsOf, never the number), so
 //     S1-01 reuses the handle's own chat thread for that chat instead of inserting a second one (commit/walk writes.ts
 //     default 12). Left out, S1-01's thread is inserted as before;
+//   - askAgain (T-1505; K-09 v1.12 defaults 192 to 198): where the binding hands in the walk's question read
+//     (TurnCommitBinding.questions), the commit is handed the same read with the walk's turn key (CommitDeps.askAgain),
+//     so a turn whose parts decide ended in one question, with exactly one open question, sends that question again once
+//     with K-05 v1.21's raise of its ask count (commit/ask-again.ts). Left out, an asked turn writes nothing, as before;
 //   - runCore: T-1140's createRunCore({ safety: { reader, sealer, lines, stopWords, telling } }), built for each call:
 //       reader     K-05 v1.4's safety reads (T-1161): outcomeOfEvent, outcome, hold, holdOfOutcome, outboxRowWritten and
 //                  businessZone on the call's own transaction (rosie_app) with the call's own business; ownerOf through
@@ -90,6 +94,7 @@
 
 import type { CommitContext } from "../../../../runtime/src/actor";
 import type {
+  AskAgainDeps,
   CommitDeps,
   CommitPorts,
   CommitTurnContext,
@@ -721,7 +726,8 @@ type WalkAnswerDeps<Repo> = Pick<WalkDeps<Repo>, "questions" | "writers" | "sett
  * turn's pinned lines (built for each action: DL-864 note 4), and openHolds under the business `businessOf` names.
  * writesOf is handed the walk's question read, step writers, settlers and chat read only as `answers` names them, each
  * only when present (T-1468, T-1502, T-1519): the turn face's binding's own, and none for the keyword door, whatever its
- * binding object carries.
+ * binding object carries. The commit is handed that same question read, with the binding's turn key, as
+ * CommitDeps.askAgain (T-1505), only when `answers` names it, so the keyword door never sends a question again.
  */
 function commitDepsWith<Repo>(
   binding: Omit<
@@ -743,6 +749,14 @@ function commitDepsWith<Repo>(
     ...(answers.chats === undefined ? {} : { chats: answers.chats }),
   });
   const limitsOf = binding.limits ?? turnLimits;
+  // The asked turn's question read (T-1505; K-09 v1.12): the walk's own, with the walk's turn key, only where bound.
+  const askAgain: AskAgainDeps<Repo> | undefined =
+    answers.questions === undefined
+      ? undefined
+      : {
+          questions: answers.questions,
+          ...(binding.turnKey === undefined ? {} : { turnKey: binding.turnKey }),
+        };
   return (at) => {
     const runCore: CommitPorts<Repo>["runCore"] = async (action, turn, open) => {
       const lines = await pinnedSafetyLines(bundles, turn.turn.bundleId);
@@ -757,6 +771,7 @@ function commitDepsWith<Repo>(
         runCore,
         openHolds: openHoldsPort(at, binding.readOpenHolds, businessOf),
       },
+      ...(askAgain === undefined ? {} : { askAgain }),
     };
   };
 }
@@ -768,6 +783,8 @@ function commitDepsWith<Repo>(
  * (TurnCommitBinding.paging), none until the runtime binds it (T-1444). The walk's question read, step writers,
  * settlers and chat read are the binding's own too (TurnCommitBinding.questions, .writers, .settlers and
  * .readChatHandle through walkChatsOf; T-1468, T-1502, T-1519): with any left out the walk runs without it, as before.
+ * Where the question read is bound, the commit reads an asked turn's one open question through it too
+ * (CommitDeps.askAgain; T-1505).
  */
 export function turnCommitDeps<Repo>(binding: TurnCommitBinding<Repo>): (at: CommitAt) => CommitDeps<Repo> {
   const { paging, questions, writers, settlers, readChatHandle } = binding;
