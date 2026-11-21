@@ -22,6 +22,16 @@
 // branch, with the settled branch in the chosen one's place (its writers handed it as the branch chosen, the unit's why
 // naming it). A held answer asks no settler and writes nothing. With no settler bound the walk is exactly as above.
 //
+// A settled buttons step (T-1491; K-09 README default 199, from T-1515; DL-1033 ruling 7): where the walk would stop at a
+// plain step with no branches whose message has buttons (S1-04), a buttons settler is bound for that step
+// (WalkDeps.buttonsSettlers, buttons.ts; not T-1502's `settlers`, which stay split-only), and no hold keeps that step
+// back, the walk builds the rows before that step, then asks the settler once, handing it the call, the step, the turn
+// and the rows built so far. "ask": the step is asked exactly as default 10 asks it today. Rows: the step is written as
+// walked (a key it does not give is refused, givesNotStep) and the walk goes on from its next (walk.ts Stretch.walkOn),
+// holds re-checked for each later step, the loop check and MAX_WALK covering both stretches; each later stretch finds its
+// writers when it is reached. A refusal, a failed read or any other answer: nothing written (fail closed). With no
+// buttons settler bound for the step, the walk is today's, byte for byte.
+//
 // It only reads (the pinned graph through its own port; the answered question and what each step writer reads, on the
 // call's transaction; the call's request) and has no outside effect, since a repeated turn runs it again before K-05
 // answers repeated (STATE note 1; types.ts CommitPorts). Nothing here logs; what it throws names faults, step ids and
@@ -92,6 +102,12 @@
 //      handle, at the chosen step, of the call's business, read on the call's transaction; any other is refused. It is
 //      closed answered with no option id (K-05 v1 openQuestionClose.answeredOptionId null): S1-02 is asked with no
 //      options (K-09 v1.5 default 134), so none went out; one that went out with options is notBuilt (buttons).
+//  12. (T-1491) A walk in stretches (K-09 README default 199) finds each stretch's writers when that stretch is reached:
+//      the first stretch's before anything is read, as default 9 says, and a later stretch's after the buttons settler
+//      answered rows. A step with no writer still refuses the part with nothing written: writesOf hands back no row until
+//      its whole walk is built, so the rows built before the refusal are dropped with it.
+//  13. (T-1491) A buttons settler is handed copies of the lists built so far, so what it does with them never changes
+//      the part's rows; the rows themselves are the writers' objects, read-only by contract (a settler writes nothing).
 
 import type { Choice, Decided, SetupKey } from "../../gate/framework";
 import { PROTECTIVE_STEPS, SAFETY_FLOW_STEPS, holdClassOf, isHeld, type HoldClass } from "../hold";
@@ -112,10 +128,11 @@ import type {
   UnitWrites,
   Why,
 } from "../types";
+import { buttonsAnswer, type ButtonsSettler, type ButtonsSettlers, type RowsBuilt } from "./buttons";
 import { WalkNotBuiltError, WalkRefusedError } from "./errors";
 import { flowGraphOf, flowOfStep, type FlowGraph, type FlowLetter, type GraphStep } from "./graph";
 import { isSplitStep, settledBranch, type StepSettler, type StepSettlers } from "./settle";
-import { walkFrom, type WalkStart, type Walked } from "./walk";
+import { walkStretchFrom, type Stretch, type WalkStart, type Walked } from "./walk";
 
 /** A bundle id as the turn row pins it (K-05 v1 turn.bundleId; K-01 v1 bundleId). */
 export interface BundleIdOf {
@@ -223,6 +240,13 @@ export interface WalkDeps<Repo = unknown> {
    * question and that no hold keeps back. Left out, no settler is bound and the walk is exactly as before.
    */
   readonly settlers?: StepSettlers<Repo>;
+  /**
+   * The read-only buttons settlers by step id (K-09 README default 199; T-1491; buttons.ts), handed in as `settlers`
+   * is. The walk asks one only where it would stop at a plain step with no branches whose message has buttons (S1-04),
+   * bound for that step, that no hold keeps back: once, after the rows before that step are built. Left out, or binding
+   * none for that step, the walk is exactly as before.
+   */
+  readonly buttonsSettlers?: ButtonsSettlers<Repo>;
 }
 
 /** The service and Linq chat id of the turn's last text (K-09 v1.5 gateAndCommit.turn; default 135). */
@@ -427,11 +451,23 @@ interface Built {
   readonly gives: SetupKey[];
 }
 
-/**
- * The rows of the steps a walk writes, in order. Every step's writer is found first, so a step with none refuses the part
- * before anything is read; the turn's service and chat id are read once, when a row needs them.
- */
-async function writeRows<Repo>(run: WalkRun<Repo>, writing: readonly Writing[]): Promise<Built> {
+/** The rows of one part, built stretch by stretch (default 199): every list, the row ids and the text source shared. */
+interface RowBuilder {
+  readonly built: Built;
+  /**
+   * Adds the rows of the steps a stretch writes, in order. Every step's writer is found first, so a step with none
+   * refuses the part before anything of the stretch is read; the turn's service and chat id are read once, when a row
+   * first needs them.
+   */
+  write(writing: readonly Writing[]): Promise<void>;
+  /** Adds a walked step's rows as its buttons settler answered them (default 199): a key its step does not give is refused. */
+  settled(step: GraphStep, rows: StepRows): void;
+  /** The rows built so far, each list a copy: what a buttons settler is handed (default 199). */
+  soFar(): RowsBuilt;
+}
+
+/** The row builder of one walk (rowBuilderOf's lists start empty). */
+function rowBuilderOf<Repo>(run: WalkRun<Repo>): RowBuilder {
   const built: Built = {
     versionsRead: [],
     state: [],
@@ -540,7 +576,21 @@ async function writeRows<Repo>(run: WalkRun<Repo>, writing: readonly Writing[]):
     built.closes.push({ id: row.id, expectVersion: row.version, status: "answered", answeredOptionId: null });
   };
 
-  /** A step's rows by its own writer (default 9), added in the walk's order; a key its step does not give is refused. */
+  /**
+   * A step's rows, by its own writer (default 9) or its buttons settler (default 199), added in the walk's order; a key
+   * its step does not give is refused.
+   */
+  const add = (step: GraphStep, rows: StepRows): void => {
+    const other = rows.gives.find((key) => !step.gives.includes(key));
+    if (other !== undefined) throw new WalkRefusedError("givesNotStep", [step.id, other]);
+    built.state.push(...rows.state);
+    built.stateEvents.push(...rows.stateEvents);
+    built.asks.push(...rows.asks);
+    built.messages.push(...rows.messages);
+    for (const key of rows.gives) if (!built.gives.includes(key)) built.gives.push(key);
+  };
+
+  /** A step's rows by its own writer (default 9). */
   const written = async (step: GraphStep, writer: StepWriter<Repo>): Promise<void> => {
     const rows = await writer({
       repo: context.repo,
@@ -556,31 +606,67 @@ async function writeRows<Repo>(run: WalkRun<Repo>, writing: readonly Writing[]):
         text,
       },
     });
-    const other = rows.gives.find((key) => !step.gives.includes(key));
-    if (other !== undefined) throw new WalkRefusedError("givesNotStep", [step.id, other]);
-    built.state.push(...rows.state);
-    built.stateEvents.push(...rows.stateEvents);
-    built.asks.push(...rows.asks);
-    built.messages.push(...rows.messages);
-    for (const key of rows.gives) if (!built.gives.includes(key)) built.gives.push(key);
+    add(step, rows);
   };
 
-  const planned = writing.map((each) => ({ each, by: writtenBy(run.writers, each) }));
-  for (const { each, by } of planned) {
-    const { step } = each;
-    if (each.as === "waits") throw new WalkNotBuiltError("waits", [step.id]);
-    if (each.as === "asks") {
-      asked(step);
-      continue;
+  const write = async (writing: readonly Writing[]): Promise<void> => {
+    const planned = writing.map((each) => ({ each, by: writtenBy(run.writers, each) }));
+    for (const { each, by } of planned) {
+      const { step } = each;
+      if (each.as === "waits") throw new WalkNotBuiltError("waits", [step.id]);
+      if (each.as === "asks") {
+        asked(step);
+        continue;
+      }
+      if (each.as === "answer") await answered(step);
+      if (by === "walk") {
+        for (const key of step.gives) if (key === THREAD) thread(step);
+      } else {
+        await written(step, by);
+      }
     }
-    if (each.as === "answer") await answered(step);
-    if (by === "walk") {
-      for (const key of step.gives) if (key === THREAD) thread(step);
-    } else {
-      await written(step, by);
-    }
-  }
-  return built;
+  };
+
+  const soFar = (): RowsBuilt => ({
+    versionsRead: [...built.versionsRead],
+    state: [...built.state],
+    stateEvents: [...built.stateEvents],
+    asks: [...built.asks],
+    closes: [...built.closes],
+    messages: [...built.messages],
+    gives: [...built.gives],
+  });
+
+  return { built, write, settled: add, soFar };
+}
+
+/** A stretch's stop that a bound buttons settler may settle (default 199): its step, the settler and the walk on. */
+interface ButtonsSettling<Repo> {
+  readonly step: GraphStep;
+  readonly settler: ButtonsSettler<Repo>;
+  readonly walkOn: () => Stretch;
+}
+
+/**
+ * The buttons settler bound to the step a stretch stops at (default 199), when that step is a plain step with no
+ * branches whose message has buttons: null for any other stop, or when none is bound. Holds are the caller's to check.
+ */
+function buttonsSettlingOf<Repo>(deps: WalkDeps<Repo>, stretch: Stretch): ButtonsSettling<Repo> | null {
+  const { stop, walkOn } = stretch;
+  if (deps.buttonsSettlers === undefined || walkOn === null || stop.kind !== "asks") return null;
+  const { step } = stop;
+  if (step.split || step.branches.length > 0 || step.buttons === 0) return null;
+  const settler = deps.buttonsSettlers(step.id);
+  return settler === null ? null : { step, settler, walkOn };
+}
+
+/**
+ * Where what is open stops a stretch after a walked step (default 199: holds re-checked): the index of its first step
+ * whose rows the open holds or an unread text keep back, each step of its own class (none is the part's own), or null.
+ */
+function firstHeldOn(stepIds: readonly string[], open: OpenHolds): number | null {
+  const index = stepIds.findIndex((id) => isHeld(stepHoldClass(id), open.holds, open.unreadEventIds));
+  return index === -1 ? null : index;
 }
 
 /** The decided texts a turn read. */
@@ -614,16 +700,23 @@ interface Walking<Repo> {
   readonly choice: Choice;
   readonly graph: FlowGraph;
   readonly start: WalkStart;
-  readonly walked: Walked;
+  /** The walk's first stretch (walk.ts walkStretchFrom). */
+  readonly walked: Stretch;
   readonly questions: WalkQuestions<Repo> | null;
   readonly why: Why;
 }
 
-/** The part's writes from its walk: what is open stops the walk at its first routine row (STATE note 1). */
+/**
+ * The part's writes from its walk: what is open stops the walk at its first routine row (STATE note 1). Where a stretch
+ * stops at a plain step with buttons whose buttons settler is bound and no hold keeps that step back (default 199), the
+ * rows before the step are built and the settler is asked once: "ask" asks the step as today; rows write it as walked
+ * and the walk goes on, its next stretch's holds re-checked. Any other stretch is written as before.
+ */
 async function unitOf<Repo>(deps: WalkDeps<Repo>, walking: Walking<Repo>): Promise<UnitWrites> {
   const { part, context, open, choice, graph, start, walked, questions, why } = walking;
-  const writing = writingOf(graph, walked);
-  const heldAt = firstHeld(
+  let stretch: Stretch = walked;
+  let writing: readonly Writing[] = writingOf(graph, stretch);
+  let heldAt = firstHeld(
     writing.map((each) => each.step.id),
     holdClassOf(part.part, choice),
     open,
@@ -642,7 +735,38 @@ async function unitOf<Repo>(deps: WalkDeps<Repo>, walking: Walking<Repo>): Promi
     questions,
     writers: deps.writers ?? null,
   };
-  const built = await writeRows(run, heldAt === null ? writing : writing.slice(0, heldAt));
+  const rows = rowBuilderOf(run);
+  for (;;) {
+    const settling = heldAt === null ? buttonsSettlingOf(deps, stretch) : null;
+    if (settling === null) {
+      await rows.write(heldAt === null ? writing : writing.slice(0, heldAt));
+      break;
+    }
+    // The rows before the step (its asked entry is the stretch's last), then its settler, once.
+    const { step, settler, walkOn } = settling;
+    await rows.write(writing.slice(0, -1));
+    const settled = await buttonsAnswer(settler, {
+      repo: context.repo,
+      businessId: context.businessId,
+      step,
+      part,
+      choice,
+      turn: context,
+      rows: rows.soFar(),
+    });
+    if (settled === "ask") {
+      await rows.write(writing.slice(-1));
+      break;
+    }
+    rows.settled(step, settled);
+    stretch = walkOn();
+    writing = writingOf(graph, stretch);
+    heldAt = firstHeldOn(
+      writing.map((each) => each.step.id),
+      open,
+    );
+  }
+  const { built } = rows;
   return {
     why,
     versionsRead: built.versionsRead,
@@ -702,7 +826,7 @@ async function settledWrites<Repo>(deps: WalkDeps<Repo>, settling: Settling<Repo
     choice: { ...choice, branch },
     graph,
     start,
-    walked: walkFrom(graph, start),
+    walked: walkStretchFrom(graph, start),
     questions,
     why: { step: split.id, choice: branch },
   });
@@ -738,7 +862,7 @@ async function walkWrites<Repo>(
     }
   }
   const start = named ?? startOf(choice);
-  const walked = walkFrom(graph, start);
+  const walked = walkStretchFrom(graph, start);
   // An answer closes its question at the version the question's row is read at: with no read bound, it is not built.
   const questions = start.kind === "branch" ? questionsOf(deps, choice, start.step) : null;
   const why: Why = { step: choice.step, choice: choice.branch ?? choice.label };
