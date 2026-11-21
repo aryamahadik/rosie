@@ -33,8 +33,12 @@ export class CommitNotBuiltError extends NotBuiltError {
  *   - effectWithoutKey, effectKeyTwice, effectNotWellFormed: an effect row with no idempotency key, a key two effects
  *     share, or an effect without its id or kind (K-07 v1 effectRow; arch 10 line 542: one key over all tries);
  *   - idTwice: one id given to two rows of one list, or to two event-log entries;
+ *   - askAgainNotAlone: a second open question asked again in one commit, or one asked again beside a close (K-05
+ *     v1.21 item 81.5: one raise a commit, never beside a close; T-1505);
+ *   - noTurnKey: the turn key a re-sent question's row id is named by is empty (K-09 v1.5 default 131; T-1505);
  *   - partNotGated: the gate passed a part decide does not hold, or one whose verb no limit gates;
- *   - wrongState: K-05 answered an error K-09 v1 has no answer for (an effect let go that is not in outage);
+ *   - wrongState: K-05 answered an error K-09 v1 has no answer for (an effect let go that is not in outage, or, from
+ *     K-05 v1.21, an open question asked again that is not live);
  *   - stillChanged: the rows the turn read changed again after the one reload (arch 06 line 305: reload once).
  */
 export type CommitFault =
@@ -47,6 +51,8 @@ export type CommitFault =
   | "effectKeyTwice"
   | "effectNotWellFormed"
   | "idTwice"
+  | "askAgainNotAlone"
+  | "noTurnKey"
   | "partNotGated"
   | "wrongState"
   | "stillChanged";

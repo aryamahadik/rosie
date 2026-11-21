@@ -15,9 +15,15 @@
 //   5. one question first: a passed part on the booking of a part decide ended in one question waits (CQ-73's default);
 //   6. the writes: each core action's (runCore), then each passed part's (writesOf), in decide's order; a part the gate
 //      stopped, held or asked writes no row of its own. A unit's writes carry its own clock rows (UnitWrites.clocks: a
-//      threat's pause call-offs, T-319's escalations; T-1156), which the commit writes with the rest;
+//      threat's pause call-offs, T-319's escalations; T-1156), which the commit writes with the rest. Then, from K-09
+//      v1.12 (T-1505; ask-again.ts), a turn whose parts decide ended in one question, with no part passed and exactly one
+//      open question in its context, sends that question again once: one unit with no part answer, the quick reply
+//      default 192 states and K-05 v1.21's raise of the question's ask count, read and checked as default 192 says, and
+//      only where the binding hands in the question read (CommitDeps.askAgain); in every other case nothing (default 198);
 //   7. one K-05 commitTurn request under the turn id (build.ts), sent once, asking K-05 v1.17 to name every phones row it
-//      answers by its handle id (answerPhoneRowsBy: build.ts default 9; T-1419). A repeated turn id returns the first
+//      answers by its handle id (answerPhoneRowsBy: build.ts default 9; T-1419); K-05 v1.21's, with its one raise, when
+//      the turn asks a question again (build.ts default 10), whose wrongState for that question, not live, refuses the
+//      turn as wrongState does (fail closed; K-05 v1.21 default 193). A repeated turn id returns the first
 //      commit and writes nothing (K-05 v1 item 1). A version or reservation conflict reloads once and gates again (arch 06
 //      line 305; K-09 v1 gateAndCommit.request), its request built again from the turn's own reads, never from the rows
 //      the answer named (an answered phones row id is a name, never a key: K-05 v1.17 item 71.4); a second one fails
@@ -94,6 +100,7 @@ import {
   type TurnActor,
   type TurnCommitRequest,
 } from "./build";
+import { askAgainUnit } from "./ask-again";
 import { CommitNotBuiltError, CommitRefusedError } from "./errors";
 import { askedBookings, bookingKey, bundleMismatchOf, checkTurn, choiceOf, heldParts } from "./hold";
 import type {
@@ -368,6 +375,16 @@ async function gateAndCommitOnce<Repo>(
     units.push({ writes, answer: answerOf(decided, passed, writes) });
     parts.push(partResultOf(gated, writes.gives));
   }
+
+  // An asked turn's one row: its one open question sent again, with its ask count raised (K-09 v1.12; ask-again.ts).
+  const again = await askAgainUnit(deps.askAgain, {
+    context,
+    gated: verdict.parts,
+    held,
+    core,
+    open: copy(open),
+  });
+  if (again !== null) units.push(again);
 
   const commitRequest = buildCommitRequest({
     turn,
