@@ -44,6 +44,9 @@ export interface ActorResetEntry {
 export const ACTOR_RESET_LIST: readonly ActorResetEntry[] = Object.freeze([
   // DL-944 card A: tp-01, held since Nov 15 (db5b0ecd), and the roster phone, held since 00:09Z Nov 18 (b924fb36).
   Object.freeze({ id: "t1452-nov18", targets: Object.freeze([{ roster: "tp-01" }, "allowList"] as const) }),
+  // DL-1043 (T-1517): the roster phone, moved by the roster-reset seed to a new person whose new sealing key cannot open a
+  // text the actor still holds sealed under the old one, so an unread hold on it would hold JOIN's reply.
+  Object.freeze({ id: "t1517-nov21", targets: Object.freeze(["allowList"] as const) }),
 ]);
 
 /** The Worker's env as the hook reads it: ENVIRONMENT, and STAGING_LINQ_ALLOWLIST by name at each call. */
