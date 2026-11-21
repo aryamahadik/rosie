@@ -2,9 +2,86 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 813, [`5504256`](https://github.com/aryamahadik/rosie/commit/5504256), 2026-11-20 18:51:37 UTC.
+- **Through:** commit 816, [`ed15454`](https://github.com/aryamahadik/rosie/commit/ed15454), 2026-11-20 22:01:54 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 816. docs: COMMIT\_HISTORY.md through commit 813 (5504256, \#824) (\#826)
+
+- **Commit:** [`ed15454`](https://github.com/aryamahadik/rosie/commit/ed15454), by Arya Mahadik, 2026-11-20 22:01:54 UTC
+- **Pull request:** [#826](https://github.com/aryamahadik/rosie/pull/826) from `task/commit-history-192`, merged 2026-11-20 22:01:55 UTC. It squashed 1 branch commit:
+  - `b9e9df5` docs: COMMIT\_HISTORY.md through commit 813 (5504256, \#824)
+- **Files changed:** 1 (+50 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +50 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 815. T-1501: bundle v1.1: bundle v1 byte for byte with decide-2 as its decide prompt (c2de3e90…/2; DL-1018 card 3, DL-1027) (\#827)
+
+- **Commit:** [`3038d7f`](https://github.com/aryamahadik/rosie/commit/3038d7f), by Arya Mahadik, 2026-11-20 22:01:49 UTC
+- **Pull request:** [#827](https://github.com/aryamahadik/rosie/pull/827) from `task/T-1501`, merged 2026-11-20 22:01:50 UTC. It squashed 2 branch commits:
+  - `f63b2d8` T-1501: bundle v1.1, bundle v1 byte for byte with decide-2 as its dec…
+  - `3ccfa67` T-1501: the phone scan test's PUBLIC\_LINE\_FILES admits a bundle folde…
+- **Files changed:** 253 (+1183 −2), by folder:
+  - `bundles/v1.1/` build.mjs +301 −0, bundle.kv.json +1 −0, check.mjs +351 −0, check.test.mjs +177 −0, models.json +17 −0, prompts.json +18 −0
+  - `bundles/v1.1/bundle/flow/` A.json +1 −0
+  - `bundles/v1.1/bundle/` manifest.json +1 −0
+  - `bundles/v1.1/bundle/trade/` aba.json +1 −0, acupuncturist.json +1 −0, addiction.json +1 −0, advisor.json +1 −0, airport-shuttle.json +1 −0, allergist.json +1 −0, appliance.json +1 −0, appraiser.json +1 −0, aquarium.json +1 −0, architect.json +1 −0, art-appraiser.json +1 −0, art-classes.json +1 −0, auto-body.json +1 −0, auto-glass.json +1 −0, auto-repair.json +1 −0, axe-throwing.json +1 −0, baker.json +1 −0, band.json +1 −0, barber.json +1 −0, bike-repair.json +1 −0, biohazard.json +1 −0, boarding.json +1 −0, boat-repair.json +1 −0, camp.json +1 −0, cardiologist.json +1 −0, carpet.json +1 −0, caterer.json +1 −0, chef.json +1 −0, chimney.json +1 −0, chiropractor.json +1 −0, cleaner.json +1 −0, climbing-gym.json +1 −0, closets.json +1 −0, clown.json +1 −0, coach.json +1 −0, coding-classes.json +1 −0, college-admissions.json +1 −0, comedian.json +1 −0, commercial-cleaning.json +1 −0, concierge.json +1 −0, concrete.json +1 −0, contractor.json +1 −0, cooking-classes.json +1 −0, cpa.json +1 −0, cpr-training.json +1 −0, credit-counselor.json +1 −0, dance.json +1 −0, daycare.json +1 −0, deck.json +1 −0, demolition.json +1 −0, dentist.json +1 −0, dermatologist.json +1 −0, detailing.json +1 −0, dietitian.json +1 −0, dj.json +1 −0, dog-trainer.json +1 −0, dog-walker.json +1 −0, doula.json +1 −0, driving-school.json +1 −0, drywall.json +1 −0, duct-cleaning.json +1 −0, electrician.json +1 −0, endocrinologist.json +1 −0, energy-audit.json +1 −0, enrichment.json +1 −0, ent.json +1 −0, escape-room.json +1 −0, estate-sale.json +1 −0, esthetician.json +1 −0, event-staffing.json +1 −0, excavation.json +1 −0, face-painter.json +1 −0, farrier.json +1 −0, fence.json +1 −0, fertility.json +1 −0, fishing-charter.json +1 −0, flight-school.json +1 −0, flooring.json +1 −0, florist.json +1 −0, food-truck.json +1 −0, foundation.json +1 −0, funeral.json +1 −0, garage-door.json +1 −0, gastroenterologist.json +1 −0, glass-doors.json +1 −0, golf-instructor.json +1 −0, groomer.json +1 −0, gunsmith.json +1 −0, gutters.json +1 −0, gym.json +1 −0, gymnastics.json +1 −0, hair-restoration.json +1 −0, hair.json +1 −0, handyman.json +1 −0, hearing.json +1 −0, holiday-lights.json +1 −0, home-care.json +1 −0, home-engineer.json +1 −0, home-stager.json +1 −0, horse-riding.json +1 −0, hunting-guide.json +1 −0, hvac.json +1 −0, hypnotherapist.json +1 −0, image-consultant.json +1 −0, imaging.json +1 −0, immigration-services.json +1 −0, inspector.json +1 −0, instrument-repair.json +1 −0, insulation.json +1 −0, insurance.json +1 −0, interior.json +1 −0, irrigation.json +1 −0, iv-hydration.json +1 −0, junk.json +1 −0, lab.json +1 −0, lactation.json +1 −0, language-school.json +1 −0, lash-brow.json +1 −0, laundry.json +1 −0, lawn.json +1 −0, lawyer.json +1 −0, limo.json +1 −0, locksmith.json +1 −0, magician.json +1 −0, makeup.json +1 −0, martial-arts.json +1 −0, masonry.json +1 −0, massage.json +1 −0, matchmaker.json +1 −0, mediator.json +1 −0, medical-transport.json +1 −0, medspa.json +1 −0, midwife.json +1 −0, mini-golf.json +1 −0, mortgage.json +1 −0, motorcycle.json +1 −0, movers.json +1 −0, music.json +1 −0, nails.json +1 −0, naturopath.json +1 −0, neurologist.json +1 −0, notary.json +1 −0, obgyn.json +1 −0, occupational-therapist.json +1 −0, officiant.json +1 −0, ophthalmologist.json +1 −0, optometrist.json +1 −0, oral-surgeon.json +1 −0, organizer.json +1 −0, orthodontist.json +1 −0, orthopedist.json +1 −0, pain-management.json +1 −0, painter.json +1 −0, party-characters.json +1 −0, paving.json +1 −0, pediatrician.json +1 −0, personal-shopper.json +1 −0, pest.json +1 −0, pet-cremation.json +1 −0, pet-rehab.json +1 −0, pet-sitter.json +1 −0, pet-taxi.json +1 −0, pet-waste.json +1 −0, pharmacist.json +1 −0, photographer.json +1 −0, physical-therapist.json +1 −0, piano-tuner.json +1 −0, pilates.json +1 −0, planner.json +1 −0, plastic-surgeon.json +1 −0, plumber.json +1 −0, pmu.json +1 −0, podiatrist.json +1 −0, pool-builder.json +1 −0, pool.json +1 −0, pressure.json +1 −0, primary-care.json +1 −0, private-investigator.json +1 −0, property-manager.json +1 −0, psychiatrist.json +1 −0, psychic.json +1 −0, radon.json +1 −0, realtor.json +1 −0, recording-studio.json +1 −0, reiki.json +1 −0, rentals.json +1 −0, repair-shop.json +1 −0, restaurant.json +1 −0, restoration.json +1 −0, roofer.json +1 −0, rv-repair.json +1 −0, security.json +1 −0, senior-living.json +1 −0, senior-move.json +1 −0, septic.json +1 −0, sharpening.json +1 −0, shoe-repair.json +1 −0, shooting.json +1 −0, siding.json +1 −0, sitter.json +1 −0, ski-instructor.json +1 −0, sleep-clinic.json +1 −0, small-engine.json +1 −0, snow.json +1 −0, spa.json +1 −0, speech-therapist.json +1 −0, sports-coach.json +1 −0, sports-medicine.json +1 −0, spray-tan.json +1 −0, surf-school.json +1 −0, surveyor.json +1 −0, swim.json +1 −0, tailor.json +1 −0, tattoo.json +1 −0, tax.json +1 −0, teeth-whitening.json +1 −0, tennis-coach.json +1 −0, therapist.json +1 −0, tires.json +1 −0, tours.json +1 −0, towing.json +1 −0, trainer.json +1 −0, trampoline-park.json +1 −0, translator.json +1 −0, travel-agent.json +1 −0, tree.json +1 −0, tutor.json +1 −0, tv-repair.json +1 −0, upholstery.json +1 −0, urgent-care.json +1 −0, urologist.json +1 −0, valet.json +1 −0, vehicle-inspection.json +1 −0, vehicle-wrap.json +1 −0, vet.json +1 −0, watch-jewelry.json +1 −0, weight-loss.json +1 −0, well-pump.json +1 −0, wellness-studio.json +1 −0, wildlife.json +1 −0, window-tint.json +1 −0, windows.json +1 −0, yoga.json +1 −0
+  - `infra/ci/` phone-scan-exceptions.mjs +68 −0, phone-scan.test.mjs +5 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1501: bundle v1.1, bundle v1 byte for byte with decide-2 as its decide prompt (c2de3e90.../2), its build.mjs, check.mjs and node test; the phone scan's exceptions for its copies of v1's public lines
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1501: the phone scan test's PUBLIC_LINE_FILES admits a bundle folder with one minor number (bundles/v1.1), in both bundle alternatives (DL-1027)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 814. T-1502: S1-02's settler: the commit's walk asks a bound settler for S1-02's branch, so the owner's words decide it (DL-1018 card 4, K-09 default 191) (\#825)
+
+- **Commit:** [`81bcc39`](https://github.com/aryamahadik/rosie/commit/81bcc39), by Arya Mahadik, 2026-11-20 22:01:45 UTC
+- **Pull request:** [#825](https://github.com/aryamahadik/rosie/pull/825) from `task/T-1502`, merged 2026-11-20 22:01:46 UTC. It squashed 2 branch commits:
+  - `1f40b41` T-1502: S1-02's settler: WalkDeps.settlers asked once at a split befo…
+  - `325daaf` T-1502: the settler's c-02 case names commit-s1-02.json's words expli…
+- **Files changed:** 17 (+1721 −131), by folder:
+  - `actions/src/commit/walk/` errors.ts +5 −2, index.ts +10 −1, settle.test.ts +366 −0, settle.ts +77 −0, writes.ts +152 −28
+  - `actions/src/tool-api/journey-1/kinds/` answer.ts +18 −7, errors.ts +5 −0, index.ts +14 −0, reads.ts +22 −0, settle.test.ts +487 −0, settle.ts +99 −0, writers.ts +12 −4
+  - `actions/src/tool-api/turn-face/` commit.ts +67 −17, index.ts +2 −0, sign-up.test.ts +118 −1
+  - `actions/src/tool-api/turn-face/pg/` calls.ts +16 −3, sign-up.int.test.ts +251 −68
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1502: S1-02's settler: WalkDeps.settlers asked once at a split before the walk, never reading the named option; S1-02's settler by default 191's table (notBookedBesideKept); one catalog read per walk shared with S1-02's writer (kindsSteps, walkMatcher); signUpSteps and TurnCommitBinding.settlers for T-1503; pgTurnCalls settleSignUp
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1502: the settler's c-02 case names commit-s1-02.json's words explicitly (lint: no unused constant)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 813. docs: COMMIT\_HISTORY.md through commit 811 (5084255, \#822) (\#824)
 
