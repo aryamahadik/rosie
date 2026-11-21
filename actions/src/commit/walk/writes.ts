@@ -44,6 +44,15 @@
 // for any other answer (no thread holds the chat id, or another handle's does) the thread is inserted exactly as before.
 // With no chat read bound, the thread is inserted exactly as before.
 //
+// Every row's step and line (T-1479; K-05 v1.22 items 82 and 83, defaults 206 to 210; the S1-04 design ruling's card 10
+// and decision (e), DL-999): K-05's row read takes a row's line from the row itself first, so S1-08's row, which asks no
+// question, reaches compose input and finalize. Every outbox row the walk writes names its step and line, both or
+// neither (default 206): the row asking the question of the step the walk stops at names that step and line 0 (default
+// 15); a step writer's rows (or a buttons settler's) name the writer's own step, and the line the writer names, else the
+// row's place among that writer's rows from 0, and a row that names another step is refused (rowNotStep; default 16); an
+// email copy names neither (K-05 v1.22 default 210). The row K-09 v1.12's asked turn sends again (../ask-again.ts) is
+// the commit's, not the walk's, so it names neither and reads its line from its question, as before.
+//
 // It only reads (the pinned graph through its own port; the answered question and what each step writer reads, on the
 // call's transaction; the call's request) and has no outside effect, since a repeated turn runs it again before K-05
 // answers repeated (STATE note 1; types.ts CommitPorts). Nothing here logs; what it throws names faults, step ids and
@@ -54,9 +63,10 @@
 //     threads: kind chat, no booking, the Linq chat id of the turn's last text, no reply address), with its
 //     `thread.created` entry, whose values name the kind alone, never the chat id (K-09 v1.5 defaults 134 and 135); or,
 //     where the chat read finds the handle's own chat thread holding the turn's chat id, no row and no entry (default 12);
-//   - the split it stops at, when Rosie asks it of the turn's own writer by text (S1-02): one open question (no options,
-//     no read-back, step 9's default clock: K-09 v1.5 default 134) with the card's safe default for its clock row, and
-//     one quick reply on the turn's service (defaults 132 and 133);
+//   - the split it stops at, when Rosie asks it of the turn's own writer by text (S1-02; S1-09, whose message carries
+//     buttons, from T-1479): one open question (no options, no read-back, step 9's default clock: K-09 v1.5 default 134)
+//     with the card's safe default for its clock row, and one quick reply on the turn's service (defaults 132 and 133),
+//     naming that step and line 0 (default 15);
 //   - the plain step it stops at whose message carries buttons (S1-04, DL-965's lead note), asked of the turn's own
 //     writer by text: its question and its quick reply, as a split's are (default 10);
 //   - the question an answer closes, answered at its row's version, with that row in versionsRead (default 11);
@@ -109,8 +119,11 @@
 //      and default 134): no options (the buttons' option ids are K-03's, and the next turn's options are a later card:
 //      DL-965's lead note 3), no read-back, no versions read, and, with no card, no safe default and step 9's default
 //      clock (clock null), as T-305's double of commit-s1-02.json writes oq-s1-04-sam (commit/test-support.ts
-//      samKindsWrites). A card it has is read as a split's is (its Clock, its safe default); a split asked with buttons
-//      stays notBuilt (buttons).
+//      samKindsWrites). A card it has is read as a split's is (its Clock, its safe default). (T-1479; the S1-04 design
+//      ruling's card 10, DL-999) A split whose message carries buttons (S1-09) is asked as any split is, with its card's
+//      safe default and no options, never notBuilt (buttons): the buttons' option ids are K-03's, so none is stored, and
+//      the question is open-ended, as S1-02's and S1-04's are. A question stored with options still answers notBuilt
+//      (buttons) at its close (default 11).
 //  11. (T-1461) An answered question is the live question the option names (K-02 v1 choice.question), sent to the turn's
 //      handle, at the chosen step, of the call's business, read on the call's transaction; any other is refused. It is
 //      closed answered with no option id (K-05 v1 openQuestionClose.answeredOptionId null): S1-02 is asked with no
@@ -132,6 +145,20 @@
 //      its whole walk is built, so the rows built before the refusal are dropped with it.
 //  14. (T-1491) A buttons settler is handed copies of the lists built so far, so what it does with them never changes
 //      the part's rows; the rows themselves are the writers' objects, read-only by contract (a settler writes nothing).
+//      (T-1479) An outbox row a writer hands back is copied once, with its step and line (default 16), so the part's row
+//      is the walk's object and the writer's stays as it was handed.
+//  15. (T-1479; K-05 v1.22 items 82 and 83, defaults 207 and 208) The row asking the question of the step the walk stops
+//      at (a split's, or a plain step's buttons question) names that step and line 0: the question is the step's first
+//      line from Rosie to its reader (S1-02's, S1-04's and S1-09's are each their step's first `say` line to the owner),
+//      and the row asks that very question, so its step is the question's step (default 208).
+//  16. (T-1479; the card's Gives 2) A step writer's rows, and a buttons settler's (written as walked, as a writer's are),
+//      name the writer's own step. A row's line is the one the writer names (K-05 v1.22 `lineNo`), else the row's place
+//      among that writer's rows that carry a line, from 0 (S1-03's, S1-74's and S1-08's one row each: line 0). An email
+//      copy (copyOfRowId set) names neither: it reuses its text row's plan and is never composed (K-05 v1.22 default
+//      210), so it is skipped in the count and anything it names is dropped. A row that names another step than its
+//      writer's is refused (rowNotStep), copy or not, with nothing written: never written as another step's line. A line
+//      the writer names is not checked against the step's lines (K-05 v1.22 default 209): the writer is code for its own
+//      step, and compose input throws on a line the bundle does not hold, so a wrong one fails closed.
 
 import type { Choice, Decided, SetupKey } from "../../gate/framework";
 import { PROTECTIVE_STEPS, SAFETY_FLOW_STEPS, holdClassOf, isHeld, type HoldClass } from "../hold";
@@ -433,6 +460,24 @@ function rowIds(turnKey: string): (kind: string, stepId: string) => string {
   };
 }
 
+/**
+ * A step writer's outbox rows (or its buttons settler's) as the walk writes them (default 16; K-05 v1.22 item 82): each
+ * a copy naming `step`, its writer's own, with the line the writer names, else its place among the writer's rows that
+ * carry a line, from 0; an email copy names neither (K-05 v1.22 default 210). A row naming another step is refused
+ * (rowNotStep), naming the writer's step and the one named.
+ */
+function linedRows(step: GraphStep, messages: readonly OutboxRowNew[]): OutboxRowNew[] {
+  let place = 0;
+  return messages.map((row): OutboxRowNew => {
+    const { step: named, lineNo, ...fields } = row;
+    if (named !== undefined && named !== step.id) throw new WalkRefusedError("rowNotStep", [step.id, named]);
+    if (fields.copyOfRowId !== null) return fields;
+    const line = lineNo ?? place;
+    place += 1;
+    return { ...fields, step: step.id, lineNo: line };
+  });
+}
+
 /** The unit's why (default 6), in build.ts's spelling for an entry's `why`. */
 function whyEntry(why: Why): Record<string, unknown> {
   return why.choice === null ? { step: why.step } : { step: why.step, choice: why.choice };
@@ -566,14 +611,14 @@ function rowBuilderOf<Repo>(run: WalkRun<Repo>): RowBuilder {
 
   /**
    * The step the walk stops at, asking the turn's writer (default 4): a split's question with its card's safe default,
-   * or a plain step's buttons' question (default 10), and the quick reply asking it.
+   * buttons or none (default 10), or a plain step's buttons' question, and the quick reply asking it, naming that step
+   * and line 0 (default 15).
    */
   const asked = (step: GraphStep): void => {
     if (step.who !== "san" || step.via !== "msg" || run.writerLane === null || step.to !== run.writerLane) {
       throw new WalkNotBuiltError("recipient", [step.id]);
     }
     const { card } = step;
-    if (step.split && step.buttons > 0) throw new WalkNotBuiltError("buttons", [step.id]);
     if (step.split && card === null) throw new WalkRefusedError("stepNotWellFormed", [step.id]);
     if (card !== null && card.clock?.from !== "step9Default") throw new WalkNotBuiltError("clock", [step.id]);
     const { service } = text();
@@ -603,6 +648,8 @@ function rowBuilderOf<Repo>(run: WalkRun<Repo>): RowBuilder {
       openQuestionId: question.id,
       copyOfRowId: null,
       versionsRead: [],
+      step: step.id,
+      lineNo: 0,
     });
   };
 
@@ -623,16 +670,18 @@ function rowBuilderOf<Repo>(run: WalkRun<Repo>): RowBuilder {
   };
 
   /**
-   * A step's rows, by its own writer (default 9) or its buttons settler (default 199), added in the walk's order; a key
-   * its step does not give is refused.
+   * A step's rows, by its own writer (default 9) or its buttons settler (default 199), added in the walk's order, each
+   * outbox row naming the step and its line (default 16); a key its step does not give, or a row naming another step,
+   * is refused.
    */
   const add = (step: GraphStep, rows: StepRows): void => {
     const other = rows.gives.find((key) => !step.gives.includes(key));
     if (other !== undefined) throw new WalkRefusedError("givesNotStep", [step.id, other]);
+    const messages = linedRows(step, rows.messages);
     built.state.push(...rows.state);
     built.stateEvents.push(...rows.stateEvents);
     built.asks.push(...rows.asks);
-    built.messages.push(...rows.messages);
+    built.messages.push(...messages);
     for (const key of rows.gives) if (!built.gives.includes(key)) built.gives.push(key);
   };
 

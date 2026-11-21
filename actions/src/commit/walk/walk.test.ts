@@ -5,13 +5,17 @@
 // them; an open safety hold stops the walk at its first routine row; the same part twice gives the same writes; a step
 // or branch the bundle lacks is refused, never guessed. The walk reads K-01 v1's bundle-v0-skeleton.json through its
 // bundles port (the one double), and every row is held to K-05 v1.1's and K-08 v1.1's schemas.
+//
+// T-1479: the outbox row is the fixture's plus its step and line (S1-02, line 0: K-05 v1.22 item 82), held to K-05
+// v1.22's outboxRowNew and the built request to its commitTurn.request; a split whose message carries buttons is asked
+// as any split is (writes.ts default 10), no longer notBuilt (buttons).
 
 import { describe, expect, it } from "vitest";
 
 import { copy } from "../../gate/framework/test-support";
 import { buildCommitRequest, questionClock } from "../build";
 import { contractChecks, eventLogRowsOf } from "../test-support";
-import type { CommitTurnContext, OpenHolds, PassedPart, UnitWrites } from "../types";
+import type { CommitTurnContext, OpenHolds, OutboxRowNew, PassedPart, UnitWrites } from "../types";
 import {
   MAX_WALK,
   WalkNotBuiltError,
@@ -31,6 +35,7 @@ import {
   branchIn,
   flowA,
   hold,
+  k05v122,
   requestTurnFields,
   skeletonBundles,
   stepIn,
@@ -38,6 +43,9 @@ import {
   turnTwo,
   type WalkTestRepo,
 } from "./test-support";
+
+/** S1-02's question's row names S1-02 and its first line (writes.ts default 15; K-05 v1.22 item 82). */
+const S1_02_LINE = { step: "S1-02", lineNo: 0 } as const;
 
 type Graph = ReturnType<typeof flowA>;
 
@@ -110,13 +118,14 @@ function expectNothingWritten(writes: UnitWrites): void {
 // commit-s1-01.json: turn 1, the sign-up door to S1-01
 
 describe("commit-s1-01.json's part: the walk after entering the sign-up door", () => {
-  it("gives exactly the rows its given.stated.writes states, field for field, with default 131's ids for sam", async () => {
+  it("gives exactly the rows its given.stated.writes states, field for field, with default 131's ids for sam, its outbox row naming S1-02 and line 0", async () => {
     const { exchange } = turnOne();
     const stated = exchange.given.stated.writes;
     const writes = await turnOneWrites();
+    const outboxRows = stated.outboxRows.map((row) => ({ ...row, ...S1_02_LINE }));
     expect(writes.state).toEqual(stated.state);
     expect(writes.asks.map((ask) => ask.question)).toEqual(stated.openQuestions);
-    expect(writes.messages).toEqual(stated.outboxRows);
+    expect(writes.messages).toEqual(outboxRows);
     // Nothing else: no close, no cancel, no reservation, no effect, no row read.
     expect(writes).toEqual({
       why: writes.why,
@@ -126,7 +135,7 @@ describe("commit-s1-01.json's part: the walk after entering the sign-up door", (
       asks: writes.asks,
       closes: [],
       clockCancels: [],
-      messages: stated.outboxRows,
+      messages: outboxRows,
       reservations: { confirm: [], release: [] },
       effects: { write: [], letGo: [] },
       gives: writes.gives,
@@ -138,12 +147,18 @@ describe("commit-s1-01.json's part: the walk after entering the sign-up door", (
     ]).toEqual(["thread-s1-01-sam-1", "oq-s1-02-sam-1", "outbox-s1-02-sam-1"]);
   });
 
-  it("writes each row in K-05 v1's own write shape", async () => {
+  it("writes each row in K-05's own write shape: its outbox row K-05 v1.22's, with its step and line", async () => {
     const writes = await turnOneWrites();
     const checks = contractChecks();
     for (const write of writes.state) expect(checks.k05("stateWrite", write)).toEqual([]);
     for (const ask of writes.asks) expect(checks.k05("openQuestionNew", ask.question)).toEqual([]);
-    for (const row of writes.messages) expect(checks.k05("outboxRowNew", row)).toEqual([]);
+    for (const row of writes.messages) expect(k05v122("outboxRowNew", row)).toEqual([]);
+    // Both or neither (K-05 v1.22 default 206): the row's step with its line taken away is refused.
+    for (const row of writes.messages) {
+      const half: Record<string, unknown> = { ...row };
+      Reflect.deleteProperty(half, "lineNo");
+      expect(k05v122("outboxRowNew", half)).not.toEqual([]);
+    }
   });
 
   it("its state: S1-01's thread insert (handle-sam, chat, no booking, the request turn's chatId, no reply address)", async () => {
@@ -201,7 +216,7 @@ describe("commit-s1-01.json's part: the walk after entering the sign-up door", (
     expect(exchange.outcome.written.written.map((row) => row.rowId)).toContain("clock-oq-s1-02-sam-1");
   });
 
-  it("its message: outbox-s1-02-sam-1 to Sam at Lee's Barbershop, on the request turn's service, quick_reply, no plan", async () => {
+  it("its message: outbox-s1-02-sam-1 to Sam at Lee's Barbershop, on the request turn's service, quick_reply, no plan, naming S1-02 and line 0", async () => {
     const { exchange } = turnOne();
     const writes = await turnOneWrites();
     expect(writes.messages).toEqual([
@@ -216,9 +231,11 @@ describe("commit-s1-01.json's part: the walk after entering the sign-up door", (
         openQuestionId: "oq-s1-02-sam-1",
         copyOfRowId: null,
         versionsRead: [],
+        step: "S1-02",
+        lineNo: 0,
       },
     ]);
-    // K-05 v1 outboxRowNew's fields and nothing else: no plan, no final parts (arch 01 line 41).
+    // K-05 v1.22 outboxRowNew's fields and nothing else: no plan, no final parts (arch 01 line 41).
     expect(Object.keys(writes.messages[0] ?? {}).sort()).toEqual(
       [
         "id",
@@ -231,8 +248,12 @@ describe("commit-s1-01.json's part: the walk after entering the sign-up door", (
         "openQuestionId",
         "copyOfRowId",
         "versionsRead",
+        "step",
+        "lineNo",
       ].sort(),
     );
+    // The row's step is the step of the question it asks (K-05 v1.22 default 208).
+    expect(writes.messages[0]?.step).toBe(writes.asks[0]?.question.step);
   });
 
   it("gives exactly thread, as the fixture states it and its outcome's part answers", async () => {
@@ -284,7 +305,7 @@ describe("commit-s1-01.json's part: the walk after entering the sign-up door", (
     for (const later of ["S1-11", "S1-04", "s1-11", "s1-04"]) expect(steps).not.toContain(later);
   });
 
-  it("goes into the commit's one K-05 request as it is: K-05 v1.1 and K-08 v1.1 take it, and it writes the fixture's rows", async () => {
+  it("goes into the commit's one K-05 request as it is: K-05 v1.22 and K-08 v1.1 take it, and it writes the fixture's rows", async () => {
     const { exchange, context } = turnOne();
     const writes = await turnOneWrites();
     const request = buildCommitRequest({
@@ -295,7 +316,11 @@ describe("commit-s1-01.json's part: the walk after entering the sign-up door", (
       units: [{ writes, answer: null }],
     });
     const checks = contractChecks();
-    expect(checks.k05("commitTurn.request", request)).toEqual([]);
+    expect(k05v122("commitTurn.request", request)).toEqual([]);
+    const sentRows: readonly OutboxRowNew[] = request.writes.outboxRows;
+    expect(sentRows.map((row) => [row.id, row.step, row.lineNo])).toEqual([
+      ["outbox-s1-02-sam-1", "S1-02", 0],
+    ]);
     const rows = eventLogRowsOf(request, "2026-10-19T18:05:05Z");
     for (const row of rows) expect(checks.k08("eventLogRow", row), String(row.id)).toEqual([]);
     expect(checks.k08("eventLogBatch", { rows })).toEqual([]);
@@ -674,7 +699,6 @@ describe("the walk's rules on the graph (arch 03 line 191)", () => {
     ["a question to another lane", "recipient", ["S1-02"], setOn("S1-02", "to", "cust")],
     ["a question on a page", "recipient", ["S1-02"], setOn("S1-02", "via", "page")],
     ["a question from someone but Rosie", "recipient", ["S1-02"], setOn("S1-02", "who", "owner")],
-    ["a question with buttons", "buttons", ["S1-02"], setOn("S1-02", "say", BUTTONS)],
     [
       "a card with a Clock line of its own",
       "clock",
@@ -684,6 +708,21 @@ describe("the walk's rules on the graph (arch 03 line 191)", () => {
     ["a card with no Clock", "clock", ["S1-02"], cardClock(undefined)],
   ] as const)("%s is not built, nothing written", async (_, seam, ids, change) => {
     expectNotBuilt(await turnOneOn(change), seam, ids);
+  });
+
+  it("a split whose message carries buttons is asked as any split is (T-1479): its card's safe default, no options, its row naming the step and line 0", async () => {
+    const graph = flowA();
+    setOn("S1-02", "say", BUTTONS)(graph);
+    const plain = await turnOneWrites();
+    const writes = await turnOneWrites(NOTHING_OPEN, graph);
+    // Exactly the rows S1-02 with no buttons gives: the buttons' option ids are K-03's, so none is stored.
+    expect(writes).toEqual(plain);
+    expect(writes.asks.map((ask) => [ask.question.step, ask.question.options, ask.safeDefault])).toEqual([
+      ["S1-02", [], (stepIn(flowA(), "S1-02").card as { safeDefault: string }).safeDefault],
+    ]);
+    expect(writes.messages.map((row) => [row.openQuestionId, row.step, row.lineNo])).toEqual([
+      ["oq-s1-02-sam-1", "S1-02", 0],
+    ]);
   });
 
   it("an entered step not written to Rosie names no writer: its question is not built", async () => {

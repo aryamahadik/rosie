@@ -14,6 +14,7 @@
 
 import type * as K05 from "../../../contracts/generated/data-access/data-access.v1.1";
 import type * as K05V1dot21 from "../../../contracts/generated/data-access/data-access.v1.21";
+import type * as K05V1dot22 from "../../../contracts/generated/data-access/data-access.v1.22";
 import type { Choice, GatedVerbPart, GateRequest, LimitRegistry, SetupKey } from "../gate/framework";
 import type { CallContext, ErrorsOf, RequestOf, ResponseOf } from "../tool-api";
 import type { TurnCommitRequest } from "./build";
@@ -46,7 +47,12 @@ export type OpenQuestionNew = K05.OpenQuestionNew;
 export type OpenQuestionClose = K05.OpenQuestionClose;
 export type ClockNew = K05.ClockNew;
 export type ClockCancel = K05.ClockCancel;
-export type OutboxRowNew = K05.OutboxRowNew;
+/**
+ * K-05 v1.22 `outboxRowNew` (T-1474; README item 82): v1's ten fields and, from v1.22, the step whose line the row carries
+ * to its reader and that line's index (`step` and `lineNo`, both or neither), which the walk writes on every row it writes
+ * (walk/writes.ts defaults 15 and 16; T-1479). Every v1 row, with neither, is a v1.22 row (README default 206).
+ */
+export type OutboxRowNew = K05V1dot22.OutboxRowNew;
 export type ReservationConfirm = K05.ReservationConfirm;
 export type ReservationLetGo = K05.ReservationLetGo;
 /** K-05 v1.1 `effectNew` (K-07 v1 effectRow's fields); its kind's rules are schema rules the commit checks in code. */

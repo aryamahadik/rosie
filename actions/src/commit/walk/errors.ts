@@ -28,7 +28,10 @@ import { NotBuiltError } from "../../tool-api/errors";
  *   - settledNotInBundle: a split's bound settler answered no label of that step's branches in the turn's pinned graph,
  *     word for word (K-09 README default 191; T-1502), so the walk has no branch to take;
  *   - settledNotRows: a plain step's bound buttons settler answered neither "ask" nor rows in a step writer's shape
- *     (K-09 README default 199; T-1491), so the walk can neither ask the step nor write it as walked.
+ *     (K-09 README default 199; T-1491), so the walk can neither ask the step nor write it as walked;
+ *   - rowNotStep: a step's writer (or its buttons settler) gave an outbox row that names another step than its own
+ *     (K-05 v1.22 item 82: a writer's rows carry the writer's own step; T-1479), so the row would carry another step's
+ *     line to its reader.
  */
 export type WalkFault =
   | "flowNotInBundle"
@@ -45,7 +48,8 @@ export type WalkFault =
   | "questionNotLive"
   | "givesNotStep"
   | "settledNotInBundle"
-  | "settledNotRows";
+  | "settledNotRows"
+  | "rowNotStep";
 
 /** The walk refused the part: the whole turn is refused and nothing is written. */
 export class WalkRefusedError extends Error {
@@ -79,8 +83,9 @@ export class WalkRefusedError extends Error {
  *   - waits: a split a clock settles (K-01 branch tag clock);
  *   - otherFlow: a branch that continues in the other flow;
  *   - recipient: an asked step whose question is not Rosie's reply by text to the turn's own writer;
- *   - buttons: an asked split whose message has buttons, or an answer to a question that went out with options: their
- *     option ids are K-03's, which the walk does not map to a branch yet;
+ *   - buttons: an answer to a question that went out with options: their option ids are K-03's, which the walk does not
+ *     map to a branch yet (an asked split whose message has buttons is asked with no options from T-1479: writes.ts
+ *     default 10);
  *   - clock: an asked step whose card's Clock is not step 9's default (a Clock line of its own, or none), since the walk
  *     writes only step 9's default (K-05 v1 openQuestionNew.clock null);
  *   - threadByEmail: S1-01's thread for a turn whose last text came by email (K-04 threads: an email thread needs a
