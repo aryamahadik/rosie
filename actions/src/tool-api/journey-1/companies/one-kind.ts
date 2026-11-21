@@ -217,8 +217,8 @@ function onlyPick(count: KindCount, stepId: string): KeptPick {
   return only;
 }
 
-/** The turn's person: who owns the picks (K-09 caller.personId, the turn party's). */
-function personOf<Repo>(turn: CommitTurnContext<Repo>, stepId: string): string {
+/** The turn's person: who owns the picks (K-09 caller.personId, the turn party's). Exported for T-1481's S1-04 writer. */
+export function personOf<Repo>(turn: CommitTurnContext<Repo>, stepId: string): string {
   const { personId } = turn.request.caller;
   if (personId === null) throw new CompaniesRefusedError("noPerson", [stepId]);
   return personId;
@@ -274,19 +274,31 @@ function placedState(
 }
 
 /**
- * A pick on file placed in the company (default 182 (3) and (4); default O4): the pick's update at the version read,
- * then each of its text, draft and block rows with no business yet given the business, each at the version read.
+ * A pick on file placed in a company (default 182 (3)): its update at the version item 79 read, setting its company and,
+ * where the company has one, its business (`businessId` null: the company has none yet, so the pick's business stays as
+ * it is, null). Exported for T-1481's S1-04 writer.
  */
-function placedOnFile(pick: PickedKindRead, companyId: string, businessId: string): StateWrite[] {
-  const state: StateWrite[] = [
-    {
-      op: "update",
-      table: "picked_kinds",
-      key: { id: pick.id },
-      expectVersion: pick.version,
-      set: { company_id: companyId, business_id: businessId },
-    },
-  ];
+export function pickPlacement(
+  pick: PickedKindRead,
+  companyId: string,
+  businessId: string | null,
+): StateWrite {
+  return {
+    op: "update",
+    table: "picked_kinds",
+    key: { id: pick.id },
+    expectVersion: pick.version,
+    set: businessId === null ? { company_id: companyId } : { company_id: companyId, business_id: businessId },
+  };
+}
+
+/**
+ * The rows of a pick that gained a business (default 182 (4); default O4): each of its text, draft and block rows with no
+ * business yet given the business, each at the version item 79 read; a row that already carries one is left. Exported
+ * for T-1481's S1-04 writer.
+ */
+export function gainedBusinessRows(pick: PickedKindRead, businessId: string): StateWrite[] {
+  const state: StateWrite[] = [];
   for (const text of pick.texts) {
     if (text.businessId !== null) continue;
     state.push({
@@ -320,6 +332,14 @@ function placedOnFile(pick: PickedKindRead, companyId: string, businessId: strin
     }
   }
   return state;
+}
+
+/**
+ * A pick on file placed in the company (default 182 (3) and (4); default O4): the pick's update at the version read,
+ * then each of its text, draft and block rows with no business yet given the business, each at the version read.
+ */
+function placedOnFile(pick: PickedKindRead, companyId: string, businessId: string): StateWrite[] {
+  return [pickPlacement(pick, companyId, businessId), ...gainedBusinessRows(pick, businessId)];
 }
 
 /** S1-04's rows for one kept kind: the state given (none, or the placing rows), giving companies. */

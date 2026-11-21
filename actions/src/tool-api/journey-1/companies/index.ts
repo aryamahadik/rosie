@@ -10,6 +10,14 @@
 // oneKind.buttonsSettlers, both from one createOneKind instance per binding, with the reads (reads.ts) handed in. The
 // helpers T-1481's S1-04 writer reuses are exported here too: turnCompanyOf, companyKindOnFile, companyKindInsert and
 // draftedDefaults.
+//
+// T-1481 (T-634 part 2a; K-09 README defaults 182 to 184 and 190; card 12 of the S1-04 design ruling) builds S1-04's
+// read-only step writer for an answered S1-04 (default 181's walk): companiesWriter (writer.ts), a StepWriter that places
+// the caller's person's kept picks in the groups "Some share one", "All share one" or "Each is its own" gives, reading
+// through the same CompaniesReads port (reads.ts, with kindNames added for default 190's matching) and reusing the
+// helpers above (and one-kind.ts's personOf, pickPlacement and gainedBusinessRows). The binding card (T-1484, H1b) binds
+// it at S1-04 by step id, with `partyRuleLive` left off until the party rule is live (default 184). This entry and the
+// registry stay as they are.
 
 import { NotBuiltError } from "../../errors";
 import type { SetupFolder } from "../index";
@@ -27,6 +35,9 @@ export {
   S1_04,
   companyKindInsert,
   createOneKind,
+  gainedBusinessRows,
+  personOf,
+  pickPlacement,
   type OneKind,
   type OneKindDeps,
 } from "./one-kind";
@@ -41,7 +52,17 @@ export {
   type CompaniesReads,
   type KindDefaults,
   type KindDefaultsRequest,
+  type KindNamesRequest,
 } from "./reads";
+export {
+  ALL_SHARE_ONE,
+  COMPANY_NAME,
+  EACH_IS_ITS_OWN,
+  SHARED_KINDS,
+  SOME_SHARE_ONE,
+  companiesWriter,
+  type CompaniesWriterDeps,
+} from "./writer";
 
 /** This folder's entries, as journey 1's lane registers them (../index.ts JOURNEY_1_LANE). */
 export const FOLDER: SetupFolder<unknown> = {
