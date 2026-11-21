@@ -46,6 +46,13 @@ import type {
  */
 const DATA_ACCESS_V1_17_FILE = "data-access/data-access.v1.17.schema.json";
 const DATA_ACCESS_V1_17 = `https://rosie.invalid/contracts/${DATA_ACCESS_V1_17_FILE}`;
+/**
+ * K-05 v1.21 (T-1508), the version a turn's commit speaks when it asks an open question again (build.ts default 10;
+ * T-1505): v1.20's definitions by reference, and `writes`, `commitTurn.request`, `commitTurn.errors` and the exchanges
+ * restated to take `openQuestions.askAgain` (README item 81).
+ */
+const DATA_ACCESS_V1_21_FILE = "data-access/data-access.v1.21.schema.json";
+const DATA_ACCESS_V1_21 = `https://rosie.invalid/contracts/${DATA_ACCESS_V1_21_FILE}`;
 const EVENT_TRACE_V1 = "https://rosie.invalid/contracts/event-trace/event-trace.v1.schema.json";
 const EVENT_TRACE_V1_1 = "https://rosie.invalid/contracts/event-trace/event-trace.v1.1.schema.json";
 
@@ -55,6 +62,11 @@ export interface ContractChecks {
    * definition by reference, commitTurn.request with answerPhoneRowsBy, and commitTurn.handleIdExchange.
    */
   k05(definition: string, value: unknown): string[];
+  /**
+   * Problems K-05 v1.21 `$defs/<call>.<part>` finds (T-1505): commitTurn.request with `openQuestions.askAgain`, its
+   * errors with the open question's wrongState, and commitTurn.askAgainExchange.
+   */
+  k05v121(definition: string, value: unknown): string[];
   /** Problems K-08 v1.1 `$defs/<definition>` finds (eventLogRow, eventLogBatch). */
   k08(definition: string, value: unknown): string[];
   /** Problems K-08 v1 `$defs/<definition>` finds (safeId, handleRef, rowRef: a row id that is never a number). */
@@ -78,14 +90,14 @@ function referencedFiles(file: string, schema: unknown): string[] {
 }
 
 /**
- * One strict Ajv instance holding the frozen schemas the Tool API holds, and K-05 v1.17 with every file its $refs reach
- * (K-05 v1 to v1.16 among them), each file once.
+ * One strict Ajv instance holding the frozen schemas the Tool API holds, and K-05 v1.17 and v1.21 with every file their
+ * $refs reach (K-05 v1 to v1.20 among them), each file once.
  */
 export function contractChecks(): ContractChecks {
   if (checks !== undefined) return checks;
   const ajv = new Ajv2020({ strict: true, strictRequired: false, allErrors: true });
   const held = new Set<string>();
-  const queue: string[] = [...SCHEMA_FILES, DATA_ACCESS_V1_17_FILE];
+  const queue: string[] = [...SCHEMA_FILES, DATA_ACCESS_V1_17_FILE, DATA_ACCESS_V1_21_FILE];
   for (let file = queue.shift(); file !== undefined; file = queue.shift()) {
     if (held.has(file)) continue;
     const schema = JSON.parse(readFileSync(path.join(CONTRACTS_DIR, ...file.split("/")), "utf8")) as object;
@@ -100,6 +112,7 @@ export function contractChecks(): ContractChecks {
   };
   checks = {
     k05: (definition, value) => problems(DATA_ACCESS_V1_17, definition, value),
+    k05v121: (definition, value) => problems(DATA_ACCESS_V1_21, definition, value),
     k08: (definition, value) => problems(EVENT_TRACE_V1_1, definition, value),
     k08v1: (definition, value) => problems(EVENT_TRACE_V1, definition, value),
   };
@@ -172,12 +185,36 @@ export interface K05Fake {
 }
 
 /**
+ * Whether a request carries K-05 v1.21's `writes.openQuestions.askAgain` (README item 81; T-1505), read loosely, since the
+ * fake also takes K-05 v1.17's requests, which have no such list.
+ */
+function asksAgainIn(request: K05V1dot17.CommitTurnRequest): boolean {
+  const questions: unknown = request.writes.openQuestions;
+  return isRecord(questions) && Object.hasOwn(questions, "askAgain");
+}
+
+/** The one raise of a request K-05 v1.21's schema took (asksAgainIn), or null for a request with no `askAgain`. */
+function raiseIn(request: K05V1dot17.CommitTurnRequest): { id: string; expectVersion: number } | null {
+  const questions: unknown = request.writes.openQuestions;
+  if (!isRecord(questions) || !Object.hasOwn(questions, "askAgain")) return null;
+  const list: unknown = questions.askAgain;
+  const raise: unknown = Array.isArray(list) ? list[0] : undefined;
+  if (!isRecord(raise) || typeof raise.id !== "string" || typeof raise.expectVersion !== "number") {
+    throw new Error("K-05 v1.21 refuses the request: askAgain holds no raise");
+  }
+  return { id: raise.id, expectVersion: raise.expectVersion };
+}
+
+/**
  * A K-05 v1.17 commitTurn that commits into memory as K-05 v1 item 1 and v1.1 item 18 say: a request K-05 v1.17's schema
  * refuses throws (the commit sent what K-05 does not take); a turn id committed before writes nothing and returns the
  * first commit with `repeated` true and no rows, whatever the repeat's body; otherwise every row written with its version
  * after the commit (an insert 1, an update its read version plus one; a reservation booked also cancels its saved-time
  * clock row) and the outbox rows in commit order. The versions read are not compared (limit 4 runs on PostgreSQL: T-306).
- * It knows no phones row's handle id, so a turn that writes a phones row scripts K-05's answer (`answers`).
+ * It knows no phones row's handle id, so a turn that writes a phones row scripts K-05's answer (`answers`). A request
+ * that asks an open question again (`openQuestions.askAgain`: K-05 v1.21 item 81; T-1505) is held to K-05 v1.21's schema
+ * instead, and its raise written at its read version plus one, after the questions opened and closed (v1.21 default
+ * 198); whether the question is live and at that version is the database's to check (T-1509).
  */
 export function k05Fake(options: K05FakeOptions = {}): K05Fake {
   const now = options.now ?? "2026-10-19T14:05:06Z";
@@ -205,6 +242,8 @@ export function k05Fake(options: K05FakeOptions = {}): K05Fake {
     }
     for (const question of writes.openQuestions.open) row("open_questions", question.id, 1);
     for (const close of writes.openQuestions.close) row("open_questions", close.id, close.expectVersion + 1);
+    const raise = raiseIn(request);
+    if (raise !== null) row("open_questions", raise.id, raise.expectVersion + 1);
     for (const clock of writes.clockRows.make) row("clock_rows", String(clock.id), 1);
     for (const cancel of writes.clockRows.cancel) row("clock_rows", cancel.id, cancel.expectVersion + 1);
     for (const confirm of writes.reservations.confirm) {
@@ -230,9 +269,13 @@ export function k05Fake(options: K05FakeOptions = {}): K05Fake {
     commits,
     commitTurn(request) {
       requests.push(copy(request));
-      const problems = contractChecks().k05("commitTurn.request", request);
+      const raises = asksAgainIn(request);
+      const problems = raises
+        ? contractChecks().k05v121("commitTurn.request", request)
+        : contractChecks().k05("commitTurn.request", request);
       if (problems.length > 0) {
-        return Promise.reject(new Error(`K-05 v1.17 refuses the request: ${problems.join("; ")}`));
+        const version = raises ? "v1.21" : "v1.17";
+        return Promise.reject(new Error(`K-05 ${version} refuses the request: ${problems.join("; ")}`));
       }
       const first = firsts.get(request.turn.id);
       if (first !== undefined) {

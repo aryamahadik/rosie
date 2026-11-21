@@ -141,6 +141,8 @@ import type {
   CommitTurnContext,
   EventEntry,
   GateAndCommitRequest,
+  LiveQuestion,
+  LiveQuestions,
   OpenHolds,
   OpenQuestionClose,
   OpenQuestionNew,
@@ -175,29 +177,17 @@ export interface WalkBundles {
 }
 
 /**
- * An open question as the walk reads it to close it: the fields of K-05 v1.2 openQuestionRead it reads, so the rows
- * db/repo/targets.ts reads (OpenQuestionRead, its version read from the row at targets.ts:564) bind as they are.
+ * An open question as the walk reads it to close it: K-05 v1.2 openQuestionRead's fields the commit reads (../types.ts,
+ * where T-1505 moved it and widened it for the commit's own read of the turn's one open question; K-09 v1.12).
  */
-export interface LiveQuestion {
-  readonly id: string;
-  readonly step: string;
-  /** The business it is about (open_questions.business_id), or null before there is one. */
-  readonly businessId: string | null;
-  /** The options as they went out (K-04 open_questions.options); empty for a question asked with none (S1-02). */
-  readonly options: readonly unknown[];
-  /** The row's version, which the close compares and sets (K-05 v1 openQuestionClose.expectVersion; limit 4). */
-  readonly version: number;
-}
+export type { LiveQuestion };
 
-/** Where an answer reads the open question it closes: the call's transaction (default 11). */
-export interface WalkQuestions<Repo = unknown> {
-  /**
-   * The open question `openQuestionId` when it is live (waiting or open) and was sent to the handle `handleId`, as its
-   * row stands on the call's transaction `repo`; else null. Card F binds K-05 v1.2's read of a handle's live questions
-   * (db/repo/targets.ts liveOpenQuestionsOfHandle, as limit 3 reads them), whose rows carry their versions.
-   */
-  liveQuestion(repo: Repo, handleId: string, openQuestionId: string): Promise<LiveQuestion | null>;
-}
+/**
+ * Where an answer reads the open question it closes: the call's transaction (default 11). The same read the commit asks
+ * to send the turn's one open question again (../types.ts LiveQuestions; AskAgainDeps.questions), so a binding hands one
+ * object to both.
+ */
+export type WalkQuestions<Repo = unknown> = LiveQuestions<Repo>;
 
 /**
  * Where S1-01's thread write finds the handle's chat thread (T-1519; default 12): K-05 v1.10 item 51's readChatHandle,
@@ -298,8 +288,11 @@ export interface TextSource {
   readonly chatId: string;
 }
 
-/** K-06 v1 service: the channel of a reply's outbox row (K-05 v1 outboxRowNew.channel; default 132). */
-const SERVICES: readonly OutboxRowNew["channel"][] = ["imessage", "rcs", "sms", "email"];
+/**
+ * K-06 v1 service: the channel of a reply's outbox row (K-05 v1 outboxRowNew.channel; default 132). The commit's re-sent
+ * question reads its channel from the same list (../ask-again.ts; K-09 v1.12 default 192 (g)).
+ */
+export const SERVICES: readonly OutboxRowNew["channel"][] = ["imessage", "rcs", "sms", "email"];
 
 /** The services that come through Linq, whose chat is K-04 threads kind chat with its Linq chat id. */
 const LINQ_SERVICES: readonly OutboxRowNew["channel"][] = ["imessage", "rcs", "sms"];

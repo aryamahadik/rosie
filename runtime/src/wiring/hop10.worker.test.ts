@@ -32,18 +32,25 @@
 //     planned, the fallback sent). @rosie/ai's composer refuses a typed price itself before finalize could see one
 //     (ai/src/composer/check.ts literalValue, for a plan and for a plan to fix), so a composer double that types it stands
 //     in for the AI layer here: finalize's Values check is the backstop shown.
+//   - T-1514 (DL-1033 fault 2; K-05 v1.21 defaults 200 to 204): finalize's K-05 doubles by direct call, as T-1513's
+//     db/repo writes and reads K-04's opener mark. writePlan writes the mark once, for the first row planned to carry an
+//     opener, either id, with a business; the facts read it, past a mark whose row ended withdrawn, failed,
+//     dropped_stopped or superseded, to the earliest earlier row that carries an opener and did not end so, with a
+//     business and with none; and the STOP, HELP and rates line's time is the phone row's as the dispatch double holds it.
 //
 // Each test runs the JOIN on a fresh rig, and the Durable Objects' storage is reset after each (as hop 8's tests run it).
 // Test values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and the fixtures' own words.
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import type { Composer } from "@rosie/ai/src/composer/types";
 import { HAIKU_MODEL } from "@rosie/ai/src/gateway/index";
+import commitS101Sam from "@rosie/contracts/data-access/fixtures/commit-s1-01-sam.json";
 import traceSkeleton from "@rosie/contracts/event-trace/fixtures/trace-skeleton.json";
 import textFixture from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
 import checkPass from "@rosie/contracts/message-plan/fixtures/check-pass.json";
 import checkRawPrice from "@rosie/contracts/message-plan/fixtures/check-raw-price.json";
 import planS102 from "@rosie/contracts/message-plan/fixtures/plan-s1-02.json";
 import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
+import type { CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import { reset, runDurableObjectAlarm } from "cloudflare:test";
 import { env, exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
@@ -62,6 +69,7 @@ import {
   bundleV2FixedLine,
   fakeFlags,
   SAM_CHAT,
+  samPhoneRow,
   skeletonFakes,
   TEST_OWNER_1,
   TEST_OWNER_1_BUSINESS_NAME,
@@ -690,4 +698,352 @@ describe("hop 10 joined: finalize through @rosie/actions' turn face fills slots 
       }
     },
   );
+});
+
+// ---- T-1514: finalize's K-05 doubles keep K-04's opener mark as db/repo does (K-05 v1.21 defaults 200 to 204) ----------
+
+/** K-07's four ends of a row that did not go, or never will (K-05 v1.21 default 202). */
+const NEVER_WENT = ["withdrawn", "failed", "dropped_stopped", "superseded"] as const;
+/** K-07's other row states: a row in any of them went, or may yet (open gap 100), so it counts. */
+const MAY_YET_GO = [
+  "planned",
+  "checked",
+  "sending",
+  "sent",
+  "delivered",
+  "held",
+  "stale",
+  "waiting_chat",
+] as const;
+/** A first text's fixed lines opening with the business opener (S13-01), the other opener id. */
+const BUSINESS_FIRST_TEXT_LINES = ["opener", "optOutLine", "privacyLink"];
+
+/**
+ * K-05 commit-s1-01-sam.json's request committed on the K-05 double under ids of this test's own: one S1-02 row to test
+ * owner 1, at `businessId` or, with null, at no business. Each commit is the next in commit order. Answers the row's id.
+ */
+async function commitOwnRow(fakes: SkeletonFakes, name: string, businessId: string | null): Promise<string> {
+  const request = structuredClone(commitS101Sam.request) as unknown as CommitTurnRequest;
+  const [first] = request.writes.outboxRows;
+  if (first === undefined) throw new Error("commit-s1-01-sam.json writes an outbox row");
+  expect(first.recipientHandleId).toBe(TEST_OWNER_1.handleId);
+  const row = `outbox-t1514-${name}`;
+  const committed = await fakes.turnRows.calls.commitTurn({
+    ...request,
+    turn: { ...request.turn, id: `turn-t1514-${name}`, eventIds: [`evt-t1514-${name}`] },
+    writes: { ...request.writes, outboxRows: [{ ...first, id: row, businessId }] },
+  });
+  if (!("result" in committed) || committed.repeated) throw new Error("the commit was not taken");
+  return row;
+}
+
+/**
+ * K-05 writePlan on the finalize double for `row`: finalize-pass.json's plan and final parts of one words send that carry
+ * `fixedLines`, at `expectVersion` (a row's first by default) on `channel` (the row's by default).
+ */
+function planOwnRow(
+  fakes: SkeletonFakes,
+  row: string,
+  fixedLines: readonly string[],
+  expectVersion = 1,
+  channel = "imessage",
+): Promise<unknown> {
+  return fakes.finalize.data.writePlan({
+    outboxRowId: row,
+    expectVersion,
+    plan: { ...FINALIZE_PASS.request.plan, row, channel },
+    finalParts: {
+      row,
+      channel,
+      sends: [sendOf(PLAN_S1_02.question.text)],
+      fixedLines,
+      slotValues: [],
+      threadReplyTo: null,
+    },
+  } as never);
+}
+
+/** K-05 v1.3 readFixedLineFacts' answer (item 36), whole: the Tool API's port type names only the two facts it reads. */
+interface FactsAnswer {
+  readonly result: "fixedLineFacts";
+  readonly outboxRowId: string;
+  readonly businessId: string | null;
+  readonly recipientHandleId: string;
+  readonly readAt: string;
+  readonly textedAboutBusiness: boolean;
+  readonly openerRowId: string | null;
+  readonly optOutLineDeliveredAt: string | null;
+}
+
+/**
+ * K-05 readFixedLineFacts on the finalize double for `row` under `businessId` (null: K-05's runtime-side read, with no
+ * business, which the Tool API's port type never names): its answer, or its error.
+ */
+function readFacts(fakes: SkeletonFakes, row: string, businessId: string | null): Promise<unknown> {
+  return fakes.finalize.data.readFixedLineFacts({ outboxRowId: row, businessId } as never);
+}
+
+/**
+ * The three facts of `row` under `businessId` as [textedAboutBusiness, openerRowId, optOutLineDeliveredAt], the rest of
+ * the answer checked here.
+ */
+async function factsOf(
+  fakes: SkeletonFakes,
+  row: string,
+  businessId: string | null,
+): Promise<[boolean, string | null, string | null]> {
+  const facts = (await readFacts(fakes, row, businessId)) as FactsAnswer;
+  expect(Object.keys(facts).sort()).toEqual([
+    "businessId",
+    "openerRowId",
+    "optOutLineDeliveredAt",
+    "outboxRowId",
+    "readAt",
+    "recipientHandleId",
+    "result",
+    "textedAboutBusiness",
+  ]);
+  expect(facts).toMatchObject({
+    result: "fixedLineFacts",
+    outboxRowId: row,
+    businessId,
+    recipientHandleId: TEST_OWNER_1.handleId,
+  });
+  return [facts.textedAboutBusiness, facts.openerRowId, facts.optOutLineDeliveredAt];
+}
+
+/**
+ * The rows a test ends in a K-07 state of its own, by row id, read by the finalize double over the dispatch double's
+ * (which no call of its own moves to failed or superseded): every other row and each phone row as the dispatch double
+ * holds them.
+ */
+function endedRows(fakes: SkeletonFakes): Map<string, string> {
+  const ended = new Map<string, string>();
+  fakes.finalize.dispatched = {
+    row: (id) => {
+      const state = ended.get(id);
+      return state === undefined ? fakes.dispatch.row(id) : { state };
+    },
+    phones: fakes.dispatch.phones,
+  };
+  return ended;
+}
+
+describe("T-1514: finalize's K-05 doubles write the opener mark at writePlan and read it with db/repo's fallback (K-05 v1.21 defaults 200 to 204)", () => {
+  it("writePlan writes the mark once, for the first row planned to carry an opener, either id, at its turn's commit time: a row with no opener, a versionChanged and a refused write write none; a later row and a repeat never move it; the facts answer the mark's row, which for that row itself means the first text", async () => {
+    const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
+    const { finalize, turnRows } = fakes;
+    const business = TEST_OWNER_1.businessId;
+    const a = await commitOwnRow(fakes, "a", business);
+    const b = await commitOwnRow(fakes, "b", business);
+    const c = await commitOwnRow(fakes, "c", business);
+    const d = await commitOwnRow(fakes, "d", business);
+    expect(await factsOf(fakes, a, business)).toEqual([false, null, null]);
+
+    // No mark: a row whose final parts carry no opener, a write whose version moved, and a write K-05 refuses.
+    expect(await planOwnRow(fakes, a, ["optOutLine"])).toEqual({
+      result: "written",
+      outboxRowId: a,
+      version: 2,
+    });
+    expect(await planOwnRow(fakes, d, FIRST_TEXT_LINES, 7)).toMatchObject({ error: "versionChanged" });
+    await expect(planOwnRow(fakes, d, FIRST_TEXT_LINES, 1, "sms")).rejects.toThrow("another channel");
+    expect(finalize.openersSent).toEqual([]);
+    expect(await factsOf(fakes, b, business)).toEqual([false, null, null]);
+
+    // The first row planned to carry an opener (signUpOpener) writes the mark, at its own turn's commit time.
+    expect(await planOwnRow(fakes, b, FIRST_TEXT_LINES)).toEqual({
+      result: "written",
+      outboxRowId: b,
+      version: 2,
+    });
+    const sentAt = turnRows.turns.get("turn-t1514-b")?.at;
+    expect(sentAt).toEqual(expect.any(String));
+    const mark = { handleId: TEST_OWNER_1.handleId, businessId: business, sentAt, outboxRowId: b };
+    expect(finalize.openersSent).toEqual([mark]);
+    // The mark names this row: it is the first text, and carries the opener whenever it is finalized (default 50).
+    expect(await factsOf(fakes, b, business)).toEqual([false, b, null]);
+    // Any other row to the handle at the business reads "texted before", naming the mark's row, as db/repo answers
+    // while that row stands in a state that went or may yet go (whatever the two rows' commit order).
+    expect(await factsOf(fakes, c, business)).toEqual([true, b, null]);
+    expect(await factsOf(fakes, a, business)).toEqual([true, b, null]);
+
+    // A later row carrying the other opener id never moves the mark, and a repeat (alreadyPlanned) writes nothing.
+    expect(await planOwnRow(fakes, c, BUSINESS_FIRST_TEXT_LINES)).toEqual({
+      result: "written",
+      outboxRowId: c,
+      version: 2,
+    });
+    expect(await planOwnRow(fakes, b, FIRST_TEXT_LINES)).toEqual({
+      error: "alreadyPlanned",
+      outboxRowId: b,
+      version: 2,
+    });
+    expect(finalize.openersSent).toEqual([mark]);
+    expect(await factsOf(fakes, d, business)).toEqual([true, b, null]);
+    // Under another business the row is not there, as before.
+    expect(await readFacts(fakes, d, "biz-other")).toEqual({
+      error: "notFound",
+      table: "outbox_rows",
+      rowId: d,
+    });
+  });
+
+  it.each(NEVER_WENT)(
+    "with a business, a mark naming a row that ended %s is read past, to the earliest earlier row (a lower commit order) that carries an opener, either id, and did not end that way; the mark itself is never moved",
+    async (state) => {
+      const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
+      const ended = endedRows(fakes);
+      const business = TEST_OWNER_1.businessId;
+      const a = await commitOwnRow(fakes, "a", business);
+      const b = await commitOwnRow(fakes, "b", business);
+      const c = await commitOwnRow(fakes, "c", business);
+      const d = await commitOwnRow(fakes, "d", business);
+      await planOwnRow(fakes, a, FIRST_TEXT_LINES);
+      const marks = structuredClone(fakes.finalize.openersSent);
+      expect(marks.map((mark) => mark.outboxRowId)).toEqual([a]);
+      expect(await factsOf(fakes, b, business)).toEqual([true, a, null]);
+
+      // The marked row never went: the next row reads "not texted", with no earlier row to fall back to, so it
+      // carries the opener; the marked row's own read still names itself.
+      ended.set(a, state);
+      expect(await factsOf(fakes, b, business)).toEqual([false, null, null]);
+      expect(await factsOf(fakes, a, business)).toEqual([false, a, null]);
+      // A row committed after b that carries an opener is no fallback for b: only a lower commit order counts.
+      await planOwnRow(fakes, c, BUSINESS_FIRST_TEXT_LINES);
+      expect(await factsOf(fakes, b, business)).toEqual([false, null, null]);
+      expect(await factsOf(fakes, d, business)).toEqual([true, c, null]);
+      // b carries the opener too (signUpOpener): the fallback names the earliest of the two.
+      await planOwnRow(fakes, b, FIRST_TEXT_LINES);
+      expect(await factsOf(fakes, d, business)).toEqual([true, b, null]);
+      expect(await factsOf(fakes, c, business)).toEqual([true, b, null]);
+      // The state filter holds in the fallback too: each earlier row that ended this way is read past in its turn.
+      ended.set(b, state);
+      expect(await factsOf(fakes, d, business)).toEqual([true, c, null]);
+      ended.set(c, state);
+      expect(await factsOf(fakes, d, business)).toEqual([false, null, null]);
+      // Written once: the mark still names the first row.
+      expect(fakes.finalize.openersSent).toEqual(marks);
+    },
+  );
+
+  it("with a business, a mark naming a row in any other K-07 state counts: Rosie has texted the handle about the business", async () => {
+    const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
+    const ended = endedRows(fakes);
+    const business = TEST_OWNER_1.businessId;
+    const a = await commitOwnRow(fakes, "a", business);
+    const b = await commitOwnRow(fakes, "b", business);
+    await planOwnRow(fakes, a, FIRST_TEXT_LINES);
+    for (const state of MAY_YET_GO) {
+      ended.set(a, state);
+      expect([state, ...(await factsOf(fakes, b, business))]).toEqual([state, true, a, null]);
+    }
+  });
+
+  it("the row states are the dispatch double's own: a marked row the dispatcher withdrew (limit 8), and then one it dropped for STOP, are each read past", async () => {
+    const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
+    const { dispatch } = fakes;
+    const business = TEST_OWNER_1.businessId;
+    const a = await commitOwnRow(fakes, "a", business);
+    const b = await commitOwnRow(fakes, "b", business);
+    const c = await commitOwnRow(fakes, "c", business);
+    const endAs = async (row: string, outcome: "withdrawn" | "droppedStopped", at: string): Promise<void> => {
+      const claimed = await dispatch.outbox.claimOutboxV12({
+        claimer: "t1514-dispatcher",
+        recipientHandleId: TEST_OWNER_1.handleId,
+        now: at,
+        limit: 1,
+      });
+      if (!("result" in claimed)) throw new Error("the claim was not answered");
+      expect(claimed.claimed.map((each) => each.outboxRowId)).toEqual([row]);
+      const version = claimed.claimed[0]?.version ?? 0;
+      expect(
+        await dispatch.outbox.markRowV12({ outboxRowId: row, expectVersion: version, outcome, at } as never),
+      ).toMatchObject({ result: "marked", outcome });
+    };
+
+    await planOwnRow(fakes, a, FIRST_TEXT_LINES);
+    expect(await factsOf(fakes, b, business)).toEqual([true, a, null]);
+    await endAs(a, "withdrawn", "2026-10-19T14:02:00Z");
+    expect(dispatch.row(a)).toMatchObject({ state: "withdrawn" });
+    expect(await factsOf(fakes, b, business)).toEqual([false, null, null]);
+
+    await planOwnRow(fakes, b, FIRST_TEXT_LINES);
+    expect(await factsOf(fakes, c, business)).toEqual([true, b, null]);
+    await endAs(b, "droppedStopped", "2026-10-19T14:03:00Z");
+    expect(dispatch.row(b)).toMatchObject({ state: "dropped_stopped" });
+    expect(await factsOf(fakes, c, business)).toEqual([false, null, null]);
+    expect(fakes.finalize.openersSent.map((mark) => mark.outboxRowId)).toEqual([a]);
+  });
+
+  it("with no business there is no mark: the facts name the earliest earlier row to the handle with none that carries an opener, either id, and ended in none of the four states; rows with a business and rows with none never read each other", async () => {
+    const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
+    const ended = endedRows(fakes);
+    const business = TEST_OWNER_1.businessId;
+    const n1 = await commitOwnRow(fakes, "n1", null);
+    const x = await commitOwnRow(fakes, "x", business);
+    const n2 = await commitOwnRow(fakes, "n2", null);
+    const n3 = await commitOwnRow(fakes, "n3", null);
+
+    // A row with no business writes no mark, whichever opener it carries.
+    await planOwnRow(fakes, n1, FIRST_TEXT_LINES);
+    expect(fakes.finalize.openersSent).toEqual([]);
+    // Only an earlier row counts: the row itself reads "not texted", the next one names it.
+    expect(await factsOf(fakes, n1, null)).toEqual([false, null, null]);
+    expect(await factsOf(fakes, n2, null)).toEqual([true, n1, null]);
+    // A row at a business does not read the rows with none, and the other way round.
+    expect(await factsOf(fakes, x, business)).toEqual([false, null, null]);
+    await planOwnRow(fakes, x, BUSINESS_FIRST_TEXT_LINES);
+    expect(fakes.finalize.openersSent.map((mark) => mark.outboxRowId)).toEqual([x]);
+    ended.set(n1, "withdrawn");
+    expect(await factsOf(fakes, n2, null)).toEqual([false, null, null]);
+    ended.delete(n1);
+
+    // The state filter, each of the four ends: the earlier row is read past, and counts again in any other state.
+    for (const state of NEVER_WENT) {
+      ended.set(n1, state);
+      expect([state, ...(await factsOf(fakes, n2, null))]).toEqual([state, false, null, null]);
+    }
+    for (const state of MAY_YET_GO) {
+      ended.set(n1, state);
+      expect([state, ...(await factsOf(fakes, n2, null))]).toEqual([state, true, n1, null]);
+    }
+    // n1 ended without going, so n2 carries the opener (the other id); n3 names n2, the earliest earlier row that went.
+    ended.set(n1, "superseded");
+    await planOwnRow(fakes, n2, BUSINESS_FIRST_TEXT_LINES);
+    expect(await factsOf(fakes, n3, null)).toEqual([true, n2, null]);
+    ended.delete(n1);
+    expect(await factsOf(fakes, n3, null)).toEqual([true, n1, null]);
+    // Under a business a row with none is not there, and with none a row at a business is not there.
+    expect(await readFacts(fakes, n3, business)).toEqual({
+      error: "notFound",
+      table: "outbox_rows",
+      rowId: n3,
+    });
+    expect(await readFacts(fakes, x, null)).toEqual({ error: "notFound", table: "outbox_rows", rowId: x });
+  });
+
+  it("the STOP, HELP and rates line's time is the handle's phone row's, as the dispatch double holds it: null with no phone row, null while the line was never delivered, then the time a delivery set; with no dispatcher joined, null, each row as finalize left it", async () => {
+    const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
+    const { dispatch, finalize } = fakes;
+    const business = TEST_OWNER_1.businessId;
+    const a = await commitOwnRow(fakes, "a", business);
+    const b = await commitOwnRow(fakes, "b", business);
+    expect(dispatch.phones.size).toBe(0);
+    expect(await factsOf(fakes, a, business)).toEqual([false, null, null]);
+
+    const phone = { ...samPhoneRow(), optoutLineDeliveredAt: null };
+    dispatch.phones.set(TEST_OWNER_1.handleId, phone);
+    expect(await factsOf(fakes, a, business)).toEqual([false, null, null]);
+    const deliveredAt = "2026-10-19T14:02:11Z";
+    dispatch.phones.set(TEST_OWNER_1.handleId, { ...phone, optoutLineDeliveredAt: deliveredAt, version: 3 });
+    expect(await factsOf(fakes, a, business)).toEqual([false, null, deliveredAt]);
+
+    // No dispatcher joined (as ./finalize.test.ts builds the double alone): no phone row is read, and a planned row
+    // stands checked, so its mark counts.
+    await planOwnRow(fakes, a, FIRST_TEXT_LINES);
+    finalize.dispatched = null;
+    expect(await factsOf(fakes, a, business)).toEqual([false, a, null]);
+    expect(await factsOf(fakes, b, business)).toEqual([true, a, null]);
+  });
 });

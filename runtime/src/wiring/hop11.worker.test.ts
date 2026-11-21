@@ -14,9 +14,11 @@
 //     row once, in commit order (claim 1, from checked, by the linq port), with the final parts finalize wrote; limit 8
 //     reads Sam's send state and lets the reply go at once, a reply in the same turn going at any hour (Q-15; RULES 4.3);
 //     the claim is renewed with Sam's phone row read beside it, and the one words part goes to the Linq port, carrying
-//     the sign-up opener, the STOP, HELP and rates line and the privacy link, to Sam's chat, then is marked sent. One
-//     dispatch span, which starts before the part's providerAccepted span (DL-349). No span holds a word, the number or
-//     the chat id.
+//     the sign-up opener and the privacy link, to Sam's chat, then is marked sent. It carries no STOP, HELP and rates
+//     line: send-state-owner.json's phone row holds the time that line was delivered to the number, and the fixed-line
+//     facts read it as db/repo does (K-05 v1.21 default 203; T-1514), so the line is not owed again. One dispatch
+//     span, which starts before the part's providerAccepted span (DL-349). No span holds a word, the number or the
+//     chat id.
 //   - A row for a phone marked stopped before the claim (K-07 outbox-dropped-stopped): the row is claimed, limit 8 drops
 //     it as stopped (markRow droppedStopped), and nothing is renewed or sent; no texts yes lifts the stop (T-1099).
 //   - Two dispatchers claiming in parallel (two roots, each its own claimer, over the one K-05 double, as two isolates over
@@ -313,19 +315,21 @@ describe("hop 11 joined: the outbox dispatcher claims the committed row through 
 
         // The claim renewed just before the part went, the phone row read beside it; the part sent to Sam's chat with the
         // final parts finalize wrote: signUpOpener first (S1-02's own words: Sam has named no business), then the plan's
-        // words, the STOP, HELP and rates line and the privacy link alone on the last line, as bundle v2 writes them;
-        // then marked sent, the row sent.
+        // words and the privacy link alone on the last line, as bundle v2 writes them; then marked sent, the row sent.
+        // The STOP, HELP and rates line is not among them: the phone row these tests give Sam (send-state-owner.json's)
+        // holds the time that line was delivered to his number, which the fixed-line facts read as db/repo reads it
+        // (K-05 v1.21 default 203; T-1514), so the line is not owed again.
         expect(dispatch.renewals.map((call) => call.answer)).toMatchObject([
           { result: "renewed", outboxRowId: row, recipient: { stopped: false, chatOpen: true } },
         ]);
+        expect(samPhoneRow().optoutLineDeliveredAt).toEqual(expect.any(String));
+        expect(dispatch.phones.get(TEST_OWNER_1.handleId)).toEqual(samPhoneRow());
         const text = written.finalParts.sends[0].text ?? "";
-        expect(written.finalParts.fixedLines).toEqual(["signUpOpener", "optOutLine", "privacyLink"]);
+        expect(written.finalParts.fixedLines).toEqual(["signUpOpener", "privacyLink"]);
         expect(text.startsWith(`${bundleV2FixedLine("signUpOpener")} `)).toBe(true);
         expect(text).not.toContain(TEST_OWNER_1_BUSINESS_NAME);
-        expect(text.split("\n").slice(-2)).toEqual([
-          bundleV2FixedLine("optOutLine"),
-          bundleV2FixedLine("privacyLink"),
-        ]);
+        expect(text.split("\n").slice(-1)).toEqual([bundleV2FixedLine("privacyLink")]);
+        expect(text).not.toContain(bundleV2FixedLine("optOutLine"));
         expect(linq.requests).toMatchObject([
           {
             idempotencyKey: `${row}/1/1`,

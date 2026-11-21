@@ -26,13 +26,24 @@
 // answered 200 with no second clock row, in the isolate that armed it (its memory) or another (K-05 armClock answers it
 // repeated), and a receipt for a row that asks no question is answered 200 with nothing read or armed.
 //
+// T-1514 (DL-1033 fault 2; K-05 v1.21 defaults 200 to 204): Rosie's first-text lines go once, on the doubles as T-1513's
+// db/repo writes and reads them. A second text to the same handle and business carries neither the opener nor the
+// privacy link (the JOIN's writePlan wrote K-04's opener mark), and, once a delivery receipt for a words part carrying
+// the STOP, HELP and rates line set the phone row's time (its version raised once), no such line either; a repeated
+// receipt, a later line-carrying delivery, a poll part or its plain words retry, a row without the line and a handle
+// with no phone row each write nothing.
+//
 // Each test runs the JOIN on a fresh rig, and the Durable Objects' storage is reset after each (as hop 12's tests run it).
 // Test owner 1 holds no role, so the JOIN's S1-02 row is read by its sign-up line as the owner and its first text opens
 // with signUpOpener (K-01 README default 19; T-1511); the turn pins bundle v2, which carries the line (T-1477), as hops 10
 // to 12 do (T-1512): on bundle v0 finalize would refuse the text and nothing would be sent or delivered.
 // Test values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and the fixtures' own words.
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
+import commitS101Sam from "@rosie/contracts/data-access/fixtures/commit-s1-01-sam.json";
 import textFixture from "@rosie/contracts/inbound-event/fixtures/text-imessage.json";
+import planS102 from "@rosie/contracts/message-plan/fixtures/plan-s1-02.json";
+import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
+import type { CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import { reset, runDurableObjectAlarm } from "cloudflare:test";
 import { env, exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
@@ -48,8 +59,10 @@ import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "./inde
 import type { ArmingCalls, OutboxCalls } from "./real";
 import {
   BUNDLE_V2,
+  bundleV2FixedLine,
   fakeFlags,
   SAM_CHAT,
+  samPhoneRow,
   skeletonFakes,
   TEST_OWNER_1,
   testClock,
@@ -297,17 +310,43 @@ function failureLines(log: MockInstance): Json[] {
     .map((line) => JSON.parse(line) as Json);
 }
 
+/** A turn run to its reply: its turn id, trace id, the row its commit wrote, the row's question and its clock row. */
+interface RanTurn {
+  readonly turnId: string;
+  readonly traceId: string;
+  readonly row: string;
+  readonly question: string;
+  readonly clock: string;
+}
+
 /** The JOIN's turn, run on `run` to its reply: its turn id, trace id, the row its commit wrote and the row's question. */
-async function runJoin(
-  run: Rig,
-): Promise<{ turnId: string; traceId: string; row: string; question: string; clock: string }> {
-  const join = joinAsRecorded();
-  run.fakes.known(join.eventId);
-  const traceId = await run.post(join);
+function runJoin(run: Rig): Promise<RanTurn> {
+  return runText(run, joinAsRecorded());
+}
+
+/**
+ * A later text from test owner 1 on Sam's chat, in the JOIN's form under an event id of its own, its turn recorded to go
+ * the JOIN run's way (./test-support.ts recordTurn: S1-01's commit and S1-02's row under the turn's own id, the row's plan
+ * plan-s1-02.json's), run on `run` to its reply.
+ */
+function runLaterText(run: Rig, eventId: string): Promise<RanTurn> {
+  const text = {
+    ...joinAsRecorded(),
+    eventId,
+    messageId: `linq-msg-demo-in-${eventId}`,
+  } as unknown as LinqInboundEvent;
+  run.fakes.decide.recordTurn([eventId]);
+  return runText(run, text);
+}
+
+/** One text's turn, run on `run` to its reply. */
+async function runText(run: Rig, text: LinqInboundEvent): Promise<RanTurn> {
+  run.fakes.known(text.eventId);
+  const traceId = await run.post(text);
   await settle(OWNER_ACTOR);
   await run.fakes.clock.advance(QUIET_MS);
   await runDurableObjectAlarm(stubOf(OWNER_ACTOR));
-  const turnId = await turnIdOf([join.eventId]);
+  const turnId = await turnIdOf([text.eventId]);
   try {
     await untilReplied(OWNER_ACTOR, turnId);
   } catch (error) {
@@ -833,4 +872,322 @@ describe("T-1244: a receipt whose clock arming fails is answered 503, so Linq se
       }
     },
   );
+});
+
+// ---- T-1514: Rosie's first-text lines go once (K-05 v1.21 defaults 200 to 204; DL-1033 fault 2) -------------------------
+
+/** K-03's plan-s1-02.json: the plan the composer double answers for each S1-02 row (recording 4's, and a recorded turn's). */
+const PLAN_S1_02 = planS102 as unknown as {
+  readonly lines: readonly { readonly text: string }[];
+  readonly question: { readonly text: string };
+};
+/** The words plan-s1-02.json plans, a line each. */
+const PLANNED_WORDS = [...PLAN_S1_02.lines.map((line) => line.text), PLAN_S1_02.question.text].join("\n");
+/** Bundle v2's first-text lines, word for word: S1-02's own opener, the STOP, HELP and rates line, the privacy link. */
+const OPENER = bundleV2FixedLine("signUpOpener");
+const OPT_OUT_LINE = bundleV2FixedLine("optOutLine");
+const PRIVACY_LINK = bundleV2FixedLine("privacyLink");
+/** Rosie's first text to test owner 1: the opener before the plan's words, then Q-30's lines, the link alone last. */
+const FIRST_TEXT = [`${OPENER} ${PLANNED_WORDS}`, OPT_OUT_LINE, PRIVACY_LINK].join("\n");
+/** A later text that still owes the STOP, HELP and rates line: the plan's words, then that line alone. */
+const LATER_TEXT_WITH_LINE = [PLANNED_WORDS, OPT_OUT_LINE].join("\n");
+
+/** A row's final parts of one words send of `text`, carrying `fixedLines`, as finalize writes them into the row. */
+function onePartOf(row: string, text: string, fixedLines: readonly string[]): Json {
+  return {
+    row,
+    channel: "imessage",
+    sends: [{ kind: "words", text, calendarFile: "none", options: [], link: null }],
+    fixedLines,
+    slotValues: [],
+    threadReplyTo: null,
+  };
+}
+
+/** One markPartV12 request, as the outbox port hands it to K-05. */
+type MarkRequest = Parameters<OutboxCalls["markPartV12"]>[0];
+
+/** A second of one test minute, in UTC, as K-05 writes a time. */
+const secondOf = (second: number): string => `2026-10-19T14:02:${String(second).padStart(2, "0")}Z`;
+
+/**
+ * K-05 commit-s1-01-sam.json's request committed on the K-05 double under ids of this test's own: one S1-02 row to test
+ * owner 1 at Lee's Barbershop. Answers the row's id.
+ */
+async function commitOwnRow(fakes: SkeletonFakes, name: string): Promise<string> {
+  const request = structuredClone(commitS101Sam.request) as unknown as CommitTurnRequest;
+  const [first] = request.writes.outboxRows;
+  if (first === undefined) throw new Error("commit-s1-01-sam.json writes an outbox row");
+  const row = `outbox-t1514-${name}`;
+  const committed = await fakes.turnRows.calls.commitTurn({
+    ...request,
+    turn: { ...request.turn, id: `turn-t1514-${name}`, eventIds: [`evt-t1514-${name}`] },
+    writes: { ...request.writes, outboxRows: [{ ...first, id: row }] },
+  });
+  if (!("result" in committed) || committed.repeated) throw new Error("the commit was not taken");
+  return row;
+}
+
+/** K-05 writePlan on the finalize double for `row` at its first version: finalize-pass.json's plan, and `finalParts`. */
+function planOwnRow(fakes: SkeletonFakes, row: string, finalParts: Json): Promise<unknown> {
+  return fakes.finalize.data.writePlan({
+    outboxRowId: row,
+    expectVersion: 1,
+    plan: { ...finalizePass.request.plan, row },
+    finalParts,
+  } as never);
+}
+
+describe("T-1514: Rosie's first-text lines go once, the doubles writing and reading the opener mark and the opt-out line's delivery time as db/repo does (K-05 v1.21 defaults 200 to 204)", () => {
+  it(
+    "a second text to the same handle and business, before any delivery receipt, carries neither the opener nor the privacy link (the JOIN's writePlan wrote the mark) and the STOP, HELP and rates line again, never yet delivered; the line's first delivery, the second row's, sets the phone's time and raises its version once, and the first row's later delivery writes nothing",
+    { timeout: TEST_MS },
+    async () => {
+      const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+      const run = rig(log);
+      try {
+        const { finalize, dispatch, linq, turnRows, clock } = run.fakes;
+        const handle = TEST_OWNER_1.handleId;
+        const business = TEST_OWNER_1.businessId;
+
+        // Rosie's first text: all three lines, and K-04's opener mark, written with the plan, naming the JOIN's row at
+        // its turn's commit time.
+        const first = await runJoin(run);
+        expect(finalize.plans.get(first.row)?.finalParts).toEqual(
+          onePartOf(first.row, FIRST_TEXT, ["signUpOpener", "optOutLine", "privacyLink"]),
+        );
+        const committedAt = turnRows.turns.get(first.turnId)?.at;
+        expect(committedAt).toEqual(expect.any(String));
+        const mark = { handleId: handle, businessId: business, sentAt: committedAt, outboxRowId: first.row };
+        expect(finalize.openersSent).toEqual([mark]);
+        // The phone row the JOIN's text opened at receipt: the line never delivered.
+        const opened = dispatch.phones.get(handle);
+        expect(opened).toMatchObject({ stopped: false, optoutLineDeliveredAt: null, version: 1 });
+
+        // A second text, its turn going the JOIN's way: another S1-02 row to the same handle at the same business.
+        const second = await runLaterText(run, "evt-sam-0001");
+        expect(second.row).not.toBe(first.row);
+        expect(finalize.factReads).toEqual([
+          { outboxRowId: first.row, businessId: business },
+          { outboxRowId: second.row, businessId: business },
+        ]);
+        expect(finalize.plans.get(second.row)?.finalParts).toEqual(
+          onePartOf(second.row, LATER_TEXT_WITH_LINE, ["optOutLine"]),
+        );
+        // Linq was sent exactly those words, and the mark is written once: the later row did not move it.
+        expect(linq.requests.map((request) => request.text)).toEqual([FIRST_TEXT, LATER_TEXT_WITH_LINE]);
+        expect(linq.requests[1]?.text).not.toContain(OPENER);
+        expect(linq.requests[1]?.text).not.toContain(PRIVACY_LINK);
+        expect(finalize.openersSent).toEqual([mark]);
+        // Nothing delivered yet: the phone row as the text's chat open left it.
+        expect(dispatch.phones.get(handle)).toEqual(opened);
+
+        // The second row's part is delivered first: a words part of a row carrying the line, so the phone's time is that
+        // receipt's and its version rises by exactly one.
+        const secondKey = `${second.row}/1/1`;
+        const secondReceipt = deliveredReceiptOf(run.fakes, secondKey, "evt-linq-delivered-sam-0002");
+        const secondAt = String(secondReceipt.status?.at);
+        await run.post(secondReceipt, secondKey);
+        const marked = { ...opened, optoutLineDeliveredAt: secondAt, version: 2 };
+        expect(dispatch.phones.get(handle)).toEqual(marked);
+
+        // Later, the first row's part is delivered too: it carries the line as well, and writes nothing (the time is
+        // set only where it is null), though the part and its row are marked delivered.
+        await clock.advance(2000);
+        const firstKey = `${first.row}/1/1`;
+        const firstReceipt = deliveredReceiptOf(run.fakes, firstKey, "evt-linq-delivered-sam-0001");
+        expect(String(firstReceipt.status?.at)).not.toBe(secondAt);
+        await run.post(firstReceipt, firstKey);
+        expect(dispatch.row(first.row)).toMatchObject({ state: "delivered" });
+        expect(dispatch.row(second.row)).toMatchObject({ state: "delivered" });
+        expect(dispatch.phones.get(handle)).toEqual(marked);
+      } finally {
+        run.restore();
+      }
+    },
+  );
+
+  it(
+    "a second text to the same phone after the first text's line was delivered carries no STOP, HELP and rates line, no opener and no privacy link: the receipt set the phone's time and raised its version once, a repeated receipt and another event for the part wrote nothing more, and the second row, which carries no line, changes no phone when it is delivered",
+    { timeout: TEST_MS },
+    async () => {
+      const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+      const run = rig(log);
+      try {
+        const { finalize, dispatch, linq } = run.fakes;
+        const handle = TEST_OWNER_1.handleId;
+        const first = await runJoin(run);
+        const opened = dispatch.phones.get(handle);
+        expect(opened).toMatchObject({ stopped: false, optoutLineDeliveredAt: null, version: 1 });
+
+        // The first text's delivery receipt: its words part carries the line.
+        const key = `${first.row}/1/1`;
+        const receipt = deliveredReceiptOf(run.fakes, key, "evt-linq-delivered-sam-0001");
+        const deliveredAt = String(receipt.status?.at);
+        await run.post(receipt, key);
+        const marked = { ...opened, optoutLineDeliveredAt: deliveredAt, version: 2 };
+        expect(dispatch.phones.get(handle)).toEqual(marked);
+        // Linq's retry of the webhook, and another event for the part: each a repeat, which writes nothing.
+        await run.post(receipt, key);
+        await run.post(deliveredReceiptOf(run.fakes, key, "evt-linq-delivered-sam-0002"), key);
+        expect(
+          dispatch.partMarks
+            .filter((call) => call.request.outcome === "delivered")
+            .map((call) => "result" in call.answer && call.answer.repeated),
+        ).toEqual([false, true, true]);
+        expect(dispatch.phones.get(handle)).toEqual(marked);
+
+        // The second text: nothing is owed any more, so its words are the plan's own and no fixed line is recorded.
+        const second = await runLaterText(run, "evt-sam-0001");
+        expect(finalize.plans.get(second.row)?.finalParts).toEqual(onePartOf(second.row, PLANNED_WORDS, []));
+        expect(linq.requests.map((request) => request.text)).toEqual([FIRST_TEXT, PLANNED_WORDS]);
+        for (const line of [OPENER, OPT_OUT_LINE, PRIVACY_LINK]) {
+          expect(linq.requests[1]?.text).not.toContain(line);
+        }
+        expect(finalize.openersSent.map((sent) => sent.outboxRowId)).toEqual([first.row]);
+
+        // Its own delivery: a row without the line changes no phone.
+        const secondKey = `${second.row}/1/1`;
+        await run.post(deliveredReceiptOf(run.fakes, secondKey, "evt-linq-delivered-sam-0003"), secondKey);
+        expect(dispatch.row(second.row)).toMatchObject({ state: "delivered" });
+        expect(dispatch.phones.get(handle)).toEqual(marked);
+      } finally {
+        run.restore();
+      }
+    },
+  );
+
+  it("the markPartV12 double by direct call, as db/repo's markPartIn (default 203; db/repo default 29): a delivered poll part and its plain words retry, which carry the poll's words and not the line, write nothing; the words send's delivery sets the phone's time at that receipt and raises its version by one; its repeat writes nothing", async () => {
+    const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
+    const { dispatch } = fakes;
+    const handle = TEST_OWNER_1.handleId;
+    const row = await commitOwnRow(fakes, "poll");
+    const poll = {
+      kind: "poll",
+      text: PLAN_S1_02.question.text,
+      calendarFile: "none",
+      options: [
+        { id: "c-01", label: "All on the list" },
+        { id: "c-02", label: "One isn't on the list yet" },
+      ],
+      link: null,
+    };
+    const words = onePartOf(row, LATER_TEXT_WITH_LINE, ["optOutLine"]);
+    expect(await planOwnRow(fakes, row, { ...words, sends: [...(words.sends as Json[]), poll] })).toEqual({
+      result: "written",
+      outboxRowId: row,
+      version: 2,
+    });
+    // Sam's phone row with the line not yet delivered.
+    const phone = { ...samPhoneRow(), optoutLineDeliveredAt: null };
+    dispatch.phones.set(handle, phone);
+    const mark = (request: MarkRequest): ReturnType<OutboxCalls["markPartV12"]> =>
+      dispatch.outbox.markPartV12(request);
+    const sent = (key: string, messageId: string, at: string): MarkRequest => ({
+      outcome: "sent",
+      idempotencyKey: key,
+      providerMessageId: messageId,
+      providerOptionIds: null,
+      at,
+    });
+    const claim = (now: string): ReturnType<OutboxCalls["claimOutboxV12"]> =>
+      dispatch.outbox.claimOutboxV12({
+        claimer: "t1514-dispatcher",
+        recipientHandleId: handle,
+        now,
+        limit: 8,
+      });
+
+    // Claimed and both sends accepted; then the poll fails and goes again plain, as words (default 8): try 2 of part 2,
+    // sent under the row's next claim.
+    expect(await claim(secondOf(0))).toMatchObject({ result: "claimed", claimed: [{ outboxRowId: row }] });
+    await mark(sent(`${row}/1/1`, "linq-msg-t1514-words", secondOf(1)));
+    await mark(sent(`${row}/2/1`, "linq-msg-t1514-poll", secondOf(2)));
+    expect(
+      await mark({
+        outcome: "failed",
+        idempotencyKey: `${row}/2/1`,
+        errorCode: "4006",
+        retry: true,
+        at: secondOf(3),
+      }),
+    ).toMatchObject({ result: "marked", repeated: false, nextKey: `${row}/2/2` });
+    expect(await claim(secondOf(4))).toMatchObject({ result: "claimed", claimed: [{ outboxRowId: row }] });
+    await mark(sent(`${row}/2/2`, "linq-msg-t1514-poll-plain", secondOf(5)));
+
+    // The poll's plain words retry is delivered: a try of kind words, but of the poll send, so nothing is written.
+    expect(
+      await mark({ outcome: "delivered", providerMessageId: "linq-msg-t1514-poll-plain", at: secondOf(6) }),
+    ).toMatchObject({ result: "marked", repeated: false, partNo: 2, tryNo: 2 });
+    expect(dispatch.phones.get(handle)).toEqual(phone);
+    // The poll's own try is delivered after all: a poll part writes nothing.
+    expect(
+      await mark({ outcome: "delivered", providerMessageId: "linq-msg-t1514-poll", at: secondOf(7) }),
+    ).toMatchObject({ result: "marked", repeated: false, partNo: 2, tryNo: 1 });
+    expect(dispatch.phones.get(handle)).toEqual(phone);
+
+    // The words send, which carries the line, is delivered: the phone's time is this receipt's, its version one more.
+    expect(
+      await mark({ outcome: "delivered", providerMessageId: "linq-msg-t1514-words", at: secondOf(8) }),
+    ).toMatchObject({ result: "marked", repeated: false, partNo: 1, tryNo: 1, row: { state: "delivered" } });
+    const marked = { ...phone, optoutLineDeliveredAt: secondOf(8), version: phone.version + 1 };
+    expect(dispatch.phones.get(handle)).toEqual(marked);
+    // The same receipt again: a repeat, which writes nothing.
+    expect(
+      await mark({ outcome: "delivered", providerMessageId: "linq-msg-t1514-words", at: secondOf(9) }),
+    ).toMatchObject({ result: "marked", repeated: true });
+    expect(dispatch.phones.get(handle)).toEqual(marked);
+  });
+
+  it("the markPartV12 double by direct call: a handle with no phone row gets none, and a stopped phone's line time is set with nothing of its STOP touched", async () => {
+    const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
+    const { dispatch } = fakes;
+    const handle = TEST_OWNER_1.handleId;
+    const deliver = async (name: string, second: number): Promise<string> => {
+      const row = await commitOwnRow(fakes, name);
+      await planOwnRow(fakes, row, onePartOf(row, LATER_TEXT_WITH_LINE, ["optOutLine"]));
+      const claimed = await dispatch.outbox.claimOutboxV12({
+        claimer: "t1514-dispatcher",
+        recipientHandleId: handle,
+        now: secondOf(second),
+        limit: 8,
+      });
+      expect(claimed).toMatchObject({ result: "claimed", claimed: [{ outboxRowId: row }] });
+      await dispatch.outbox.markPartV12({
+        outcome: "sent",
+        idempotencyKey: `${row}/1/1`,
+        providerMessageId: `linq-msg-t1514-${name}`,
+        providerOptionIds: null,
+        at: secondOf(second + 1),
+      });
+      expect(
+        await dispatch.outbox.markPartV12({
+          outcome: "delivered",
+          providerMessageId: `linq-msg-t1514-${name}`,
+          at: secondOf(second + 2),
+        }),
+      ).toMatchObject({ result: "marked", repeated: false, row: { state: "delivered" } });
+      return secondOf(second + 2);
+    };
+
+    // No phone row for the handle (as an email handle has none): the part is marked delivered and no row is made.
+    expect(dispatch.phones.size).toBe(0);
+    await deliver("no-phone", 0);
+    expect(dispatch.phones.size).toBe(0);
+
+    // A stopped phone that never got the line: its time is set and its version raised; stopped and its time stay.
+    const stopped = {
+      ...samPhoneRow(),
+      stopped: true,
+      stopAt: "2026-10-19T13:00:00Z",
+      optoutLineDeliveredAt: null,
+    };
+    dispatch.phones.set(handle, stopped);
+    const deliveredAt = await deliver("stopped", 10);
+    expect(dispatch.phones.get(handle)).toEqual({
+      ...stopped,
+      optoutLineDeliveredAt: deliveredAt,
+      version: stopped.version + 1,
+    });
+  });
 });
