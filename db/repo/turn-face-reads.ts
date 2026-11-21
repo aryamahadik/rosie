@@ -25,7 +25,14 @@
 //   readFixedLineFacts  the fixed-line facts of a row's own handle and business (item 36): whether Rosie texted the handle
 //                       about the business before (K-04's opener mark naming another row; with no business, an earlier row
 //                       to the handle with no business whose final parts carry the opener: default 50), the row the opener
-//                       went on, and when the opt-out line was first delivered to the handle's phone.
+//                       went on, and when the opt-out line was first delivered to the handle's phone. From K-05 v1.21
+//                       (defaults 202 and 204; T-1513) no earlier row that ended withdrawn, failed, dropped_stopped or
+//                       superseded counts, in either branch: with a business, a mark naming such a row (another row) is
+//                       read past, to the earliest row to the handle and business with a lower commit_seq whose final
+//                       parts carry an opener and whose state is none of those four, else none; with no business, the
+//                       earlier row is that same query's. Either opener id, `opener` or `signUpOpener`, counts in both.
+//                       A mark naming this row, or another row in any other state, answers as before. writePlan writes
+//                       the mark (db/repo/outbox.ts; default 200).
 //
 // Roles and scope (items 34 to 36; K-04 v1 rule 4; STATE notes 5 and 22; DL-326). The role is the connection's: the
 // caller passes the client of the role the read names.
@@ -84,6 +91,10 @@
 //      the rows it held, every one with a turn. So the check comes before the send class's, and the answer holds
 //      nothing of the row, not even its class. A job row is never composed or finalized: no caller names one (the
 //      code row is written checked and never goes stale), and with no turn there are no texts to answer.
+//   5. readFixedLineFacts reads the state of the row the opener mark names in the mark's own statement, joined under
+//      the business it names (K-05 v1.21 default 202), so the read stays one read-only transaction at repeatable read;
+//      a mark whose row that read does not find (the scope hid it: a mark naming another business's row, which writePlan
+//      never writes) reads as a row in any other state, true and naming it, as before v1.21.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.3";
 import type * as K05v1dot6 from "../../contracts/generated/data-access/data-access.v1.6";
 import { transientOrScrubbed } from "./clocks";
@@ -155,6 +166,14 @@ export class BrokenRecordError extends Error {
 
 /** K-01 v1's opener line (arch 07 line 361; S13-01), as finalize's fixed-line inserter names it (C-089). */
 const OPENER_LINE = "opener";
+/** K-01's sign-up opener (K-01 default 19, T-1510), which counts as the opener does (K-05 v1.21 default 204). */
+const SIGN_UP_OPENER_LINE = "signUpOpener";
+/**
+ * K-07's ends of a row that did not go, or never will (K-05 v1.21 default 202): such a row never counts as a text that
+ * went, and a mark naming one is read past. A row still held, waiting for its chat, checked or sending counts (open gap
+ * 100).
+ */
+const NEVER_WENT: ReadonlySet<string> = new Set(["withdrawn", "failed", "dropped_stopped", "superseded"]);
 /** K-03 v1's send kind that carries the words (finalParts sends). */
 const WORDS_SEND = "words";
 
@@ -811,6 +830,36 @@ export async function readOutboxRow(
 // ---- readFixedLineFacts (item 36) ----------------------------------------------------------------------------------
 
 /**
+ * The earliest row to the handle at the business (with none: no business) committed before the row `outboxRowId`
+ * (a lower commit_seq) whose final parts' fixedLines hold an opener id, `opener` or `signUpOpener`, and whose state is
+ * none of K-07's ends of a row that did not go (K-05 v1.21 defaults 202 and 204); null when there is none. The
+ * no-business read and the fallback past a mark whose row never went, one query (default 202: "the shape of the
+ * no-business branch"). Every read of outbox_rows names the business.
+ */
+async function earliestOpenerRow(
+  db: Db,
+  handleId: string,
+  businessId: string | null,
+  outboxRowId: string,
+): Promise<string | null> {
+  const [earlier] = await db<{ id: string }[]>`
+    select r.id
+    from outbox_rows r
+    where r.recipient_handle_id = ${handleId}
+      and r.business_id is not distinct from ${businessId}
+      and r.commit_seq < (
+        select o.commit_seq from outbox_rows o
+        where o.id = ${outboxRowId} and o.business_id is not distinct from ${businessId}
+      )
+      and r.final_parts -> 'fixedLines' ?| ${[OPENER_LINE, SIGN_UP_OPENER_LINE]}::text[]
+      and r.state <> all(${[...NEVER_WENT]}::text[])
+    order by r.commit_seq
+    limit 1
+  `;
+  return earlier?.id ?? null;
+}
+
+/**
  * The fixed-line facts of a row's own handle and business, inside the transaction `db`, which must already run on the
  * request's side as rosie_job: under the request's business scope (confirmed here by requireBusinessScope()), or with
  * businessId null on the runtime side, with no scope. Prefer readFixedLineFacts(); this is for a caller that already
@@ -835,29 +884,35 @@ export async function readFixedLineFactsIn(
   const handleId = row.recipient_handle_id;
   const readAt = await readMoment(db, options);
   let openerRowId: string | null;
-  let textedAboutBusiness: boolean;
   if (businessId === null) {
-    // openers_sent holds no mark with no business: an earlier row to the handle with none that carries the opener.
-    const [earlier] = await db<{ id: string }[]>`
-      select r.id
-      from outbox_rows r
-      where r.recipient_handle_id = ${handleId}
-        and r.business_id is null
-        and r.commit_seq < (select o.commit_seq from outbox_rows o where o.id = ${outboxRowId} and o.business_id is null)
-        and r.final_parts -> 'fixedLines' @> jsonb_build_array(${OPENER_LINE}::text)
-      order by r.commit_seq
-      limit 1
-    `;
-    openerRowId = earlier?.id ?? null;
-    textedAboutBusiness = earlier !== undefined;
+    // openers_sent holds no mark with no business: the earliest earlier row to the handle with none that carries an
+    // opener and did not end without going (K-05 v1.21 defaults 202 and 204).
+    openerRowId = await earliestOpenerRow(db, handleId, null, outboxRowId);
   } else {
-    const [mark] = await db<{ outbox_row_id: string }[]>`
-      select outbox_row_id from openers_sent where handle_id = ${handleId} and business_id = ${businessId}
+    // The mark, and the state of the row it names, read under the scope and naming the business (K-05 v1.21 default
+    // 202). The mark's row is the business's own (writePlan names the row whose business it writes), and a mark always
+    // names a row (openers_sent_outbox_fk); a row the scope hid would read as one in any other state, as before v1.21.
+    const [mark] = await db<{ outbox_row_id: string; marked_state: string | null }[]>`
+      select s.outbox_row_id, m.state as marked_state
+      from openers_sent s
+      left join outbox_rows m on m.id = s.outbox_row_id and m.business_id = ${businessId}
+      where s.handle_id = ${handleId} and s.business_id = ${businessId}
     `;
-    openerRowId = mark?.outbox_row_id ?? null;
-    // The mark naming this row means this row is the first text: it carries the opener whenever it is finalized.
-    textedAboutBusiness = mark !== undefined && mark.outbox_row_id !== outboxRowId;
+    if (
+      mark === undefined ||
+      mark.outbox_row_id === outboxRowId ||
+      !NEVER_WENT.has(mark.marked_state ?? "")
+    ) {
+      openerRowId = mark?.outbox_row_id ?? null;
+    } else {
+      // A mark whose row never went is read past, to the earliest earlier row that carries an opener and went (or may
+      // yet): never a state filter without this fallback, since the mark is written once (default 202).
+      openerRowId = await earliestOpenerRow(db, handleId, businessId, outboxRowId);
+    }
   }
+  // Texted before: an opener went on another row. The mark naming this row means this row is the first text, which
+  // carries the opener whenever it is finalized (default 50).
+  const textedAboutBusiness = openerRowId !== null && openerRowId !== outboxRowId;
   const [phone] = await db<{ optout_line_delivered_at: Date | null }[]>`
     select optout_line_delivered_at from phones where handle_id = ${handleId}
   `;
