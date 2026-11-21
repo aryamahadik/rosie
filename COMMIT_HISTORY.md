@@ -2,13 +2,173 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 825, [`444c43f`](https://github.com/aryamahadik/rosie/commit/444c43f), 2026-11-21 03:33:15 UTC.
+- **Through:** commit 832, [`7e57119f`](https://github.com/aryamahadik/rosie/commit/7e57119f), 2026-11-21 09:34:25 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
 
+## 832. docs: COMMIT\_HISTORY.md through commit 829 (995f918f, \#842) (\#843)
+
+- **Commit:** [`7e57119f`](https://github.com/aryamahadik/rosie/commit/7e57119f), by Arya Mahadik, 2026-11-21 09:34:25 UTC
+- **Pull request:** [#843](https://github.com/aryamahadik/rosie/pull/843) from `task/commit-history-199`, merged 2026-11-21 09:34:25 UTC. It squashed 1 branch commit:
+  - `98e3375` docs: COMMIT\_HISTORY.md through commit 829 (995f918f, \#842)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 831. T-1491: one-kind path, the walk asks a bound buttons settler at a plain step with buttons; K-09 README default 199 (DL-1033, DL-1041) (\#840)
+
+- **Commit:** [`e4c2fbb4`](https://github.com/aryamahadik/rosie/commit/e4c2fbb4), by Arya Mahadik, 2026-11-21 09:34:21 UTC
+- **Pull request:** [#840](https://github.com/aryamahadik/rosie/pull/840) from `task/T-1491`, merged 2026-11-21 09:34:21 UTC. It squashed 2 branch commits:
+  - `03c827e` T-1491: K-09 README default 199 and open gap 178 (no new version, fro…
+  - `f042e9c` T-1491: the walk asks a bound buttons settler (WalkDeps.buttonsSettle…
+- **Files changed:** 8 (+1161 −45), by folder:
+  - `actions/src/commit/walk/` buttons.test.ts +698 −0, buttons.ts +111 −0, errors.ts +5 −2, index.ts +21 −3, test-support.ts +89 −0, walk.ts +50 −3, writes.ts +160 −36
+  - `contracts/tool-api/` README.md +27 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1491: K-09 README default 199 and open gap 178 (no new version, from T-1515's card under DL-1041 item 4): S1-04's one-kind settler, WalkDeps.buttonsSettlers, asked once where the walk would stop at a plain step with buttons, after the rows before it; ask or rows; S1-04's count by kind; S1-08 needs the stop reads; the stand-in name before S1-09 (DL-1032, DL-1033 ruling 7)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1491: the walk asks a bound buttons settler (WalkDeps.buttonsSettlers, K-09 README default 199) once where it would stop at a plain step with buttons that no hold keeps back, after the rows before it; ask: the step asked as today; rows: written as walked (givesNotStep) and the walk goes on from its next (walk.ts Stretch.walkOn), holds re-checked, one loop check and MAX_WALK; refusal, throw or settledNotRows: nothing written; none bound: today's walk byte for byte; T-1502's settlers untouched
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 830. T-1516: staging's gate binds the stop home's reads on the runtime side, and gateBindingOf hands them to the sign-up writers, so S1-03's and S1-74's messages are written (DL-1033 ruling 8; CQ-360) (\#837)
+
+- **Commit:** [`bd697d0f`](https://github.com/aryamahadik/rosie/commit/bd697d0f), by Arya Mahadik, 2026-11-21 09:34:17 UTC
+- **Pull request:** [#837](https://github.com/aryamahadik/rosie/pull/837) from `task/T-1516`, merged 2026-11-21 09:34:17 UTC. It squashed 1 branch commit:
+  - `e074ebe` T-1516: staging's gate binds the stop home's reads on the runtime sid…
+- **Files changed:** 4 (+574 −42), by folder:
+  - `runtime/src/wiring/` gate-binding.test.ts +285 −7, real.ts +49 −11
+  - `runtime/src/wiring/staging/` tool-api-gate.ts +87 −22, tool-api-gate.worker.test.ts +153 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+StopHomeReads from the runtime's MessagesReader and FlagsReader members over db/repo, each on a runtime-side client of its own, no slot, scrubbed errors; GateReads.stop; unit cases for 'One isn't on the list yet' and 'Not a service we book' bound and unbound; worker cases for the reads' clients and a failed read.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 829. docs: COMMIT\_HISTORY.md through commit 827 (02d9e164, \#839) (\#842)
+
+- **Commit:** [`995f918f`](https://github.com/aryamahadik/rosie/commit/995f918f), by Arya Mahadik, 2026-11-21 09:02:23 UTC
+- **Pull request:** [#842](https://github.com/aryamahadik/rosie/pull/842) from `task/commit-history-198`, merged 2026-11-21 09:02:23 UTC. It squashed 1 branch commit:
+  - `2d65072` docs: COMMIT\_HISTORY.md through commit 827 (02d9e164, \#839)
+- **Files changed:** 1 (+878 −826), by folder:
+  - `/` COMMIT\_HISTORY.md +878 −826
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 828. T-1508: K-05 v1.21: raise one live open question's ask count; the opener mark and opt-out delivery defaults (DL-1030, DL-1033, DL-1045) (\#841)
+
+- **Commit:** [`16ef4d60`](https://github.com/aryamahadik/rosie/commit/16ef4d60), by Arya Mahadik, 2026-11-21 09:02:19 UTC
+- **Pull request:** [#841](https://github.com/aryamahadik/rosie/pull/841) from `task/T-1508`, merged 2026-11-21 09:02:19 UTC. It squashed 2 branch commits:
+  - `a128ebc` T-1508: K-05 v1.21: commitTurn asks one live open question again, its…
+  - `ad5efd9` T-1508: round 2, K-05 v1.21 README only (DL-1045): default 202's stat…
+- **Files changed:** 9 (+2453 −13), by folder:
+  - `contracts/data-access/` README.md +128 −12, data-access.v1.21.schema.json +1731 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` commit-a7-03-alex-asks-again-defaulted.json +88 −0, commit-s1-02-sam-asks-again-stale.json +86 −0, commit-s1-02-sam-asks-again.json +93 −0, index.json +40 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-commit-s1-02-asks-again-and-closes.json +144 −0, refuse-commit-s1-02-asks-again-twice.json +141 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1508: K-05 v1.21: commitTurn asks one live open question again, its ask count and version raised by one (askAgain; versionChanged, wrongState; one raise a commit, none beside a close), the asked_again entry, and README defaults 192 to 205 with the opener mark, its read fallback and the opt-out delivery time (DL-1030, DL-1033)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1508: round 2, K-05 v1.21 README only (DL-1045): default 202's state filter in both branches of readFixedLineFacts (defaults 202 and 204, item 36, default 50, T-1513's line and its no-business proof); default 199 names db/repo's checkFire in clocks.ts as where a firing's askAgain is refused (T-1509 builds it) and the overload that keeps v1.20's answer type for a commit with no askAgain; open gap 100, a held or sending row counted before it goes
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 827. docs: COMMIT\_HISTORY.md through commit 825 (444c43f, \#836) (\#839)
+
+- **Commit:** [`02d9e164`](https://github.com/aryamahadik/rosie/commit/02d9e164), by Arya Mahadik, 2026-11-21 07:55:12 UTC
+- **Pull request:** [#839](https://github.com/aryamahadik/rosie/pull/839) from `task/commit-history-197`, merged 2026-11-21 07:55:12 UTC. It squashed 1 branch commit:
+  - `3053d50` docs: COMMIT\_HISTORY.md through commit 825 (444c43f, \#836)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 826. T-1477: bundle v2: v1's six steps plus S1-08 and S1-09, decide-2 prompts and the sign-up opener line (S1-04 design card 8, DL-1033) (\#838)
+
+- **Commit:** [`f5ce9bf9`](https://github.com/aryamahadik/rosie/commit/f5ce9bf9), by Arya Mahadik, 2026-11-21 07:55:08 UTC
+- **Pull request:** [#838](https://github.com/aryamahadik/rosie/pull/838) from `task/T-1477`, merged 2026-11-21 07:55:08 UTC. It squashed 3 branch commits:
+  - `34f1d86` T-1477: bundle v2: v1's six steps byte for byte plus S1-08 and S1-09,…
+  - `64d1fed` T-1477: bundle v2's KV bulk file from the local publish (043a3c33…/1,…
+  - `07faf56` T-1477: check.mjs names S1-09's question card as decide's, not sent
+- **Files changed:** 252 (+1621 −0), by folder:
+  - `bundles/v2/` build.mjs +420 −0, bundle.kv.json +1 −0, check.mjs +649 −0, check.test.mjs +203 −0, models.json +17 −0, prompts.json +18 −0
+  - `bundles/v2/bundle/flow/` A.json +1 −0
+  - `bundles/v2/bundle/` manifest.json +1 −0
+  - `bundles/v2/bundle/trade/` aba.json +1 −0, acupuncturist.json +1 −0, addiction.json +1 −0, advisor.json +1 −0, airport-shuttle.json +1 −0, allergist.json +1 −0, appliance.json +1 −0, appraiser.json +1 −0, aquarium.json +1 −0, architect.json +1 −0, art-appraiser.json +1 −0, art-classes.json +1 −0, auto-body.json +1 −0, auto-glass.json +1 −0, auto-repair.json +1 −0, axe-throwing.json +1 −0, baker.json +1 −0, band.json +1 −0, barber.json +1 −0, bike-repair.json +1 −0, biohazard.json +1 −0, boarding.json +1 −0, boat-repair.json +1 −0, camp.json +1 −0, cardiologist.json +1 −0, carpet.json +1 −0, caterer.json +1 −0, chef.json +1 −0, chimney.json +1 −0, chiropractor.json +1 −0, cleaner.json +1 −0, climbing-gym.json +1 −0, closets.json +1 −0, clown.json +1 −0, coach.json +1 −0, coding-classes.json +1 −0, college-admissions.json +1 −0, comedian.json +1 −0, commercial-cleaning.json +1 −0, concierge.json +1 −0, concrete.json +1 −0, contractor.json +1 −0, cooking-classes.json +1 −0, cpa.json +1 −0, cpr-training.json +1 −0, credit-counselor.json +1 −0, dance.json +1 −0, daycare.json +1 −0, deck.json +1 −0, demolition.json +1 −0, dentist.json +1 −0, dermatologist.json +1 −0, detailing.json +1 −0, dietitian.json +1 −0, dj.json +1 −0, dog-trainer.json +1 −0, dog-walker.json +1 −0, doula.json +1 −0, driving-school.json +1 −0, drywall.json +1 −0, duct-cleaning.json +1 −0, electrician.json +1 −0, endocrinologist.json +1 −0, energy-audit.json +1 −0, enrichment.json +1 −0, ent.json +1 −0, escape-room.json +1 −0, estate-sale.json +1 −0, esthetician.json +1 −0, event-staffing.json +1 −0, excavation.json +1 −0, face-painter.json +1 −0, farrier.json +1 −0, fence.json +1 −0, fertility.json +1 −0, fishing-charter.json +1 −0, flight-school.json +1 −0, flooring.json +1 −0, florist.json +1 −0, food-truck.json +1 −0, foundation.json +1 −0, funeral.json +1 −0, garage-door.json +1 −0, gastroenterologist.json +1 −0, glass-doors.json +1 −0, golf-instructor.json +1 −0, groomer.json +1 −0, gunsmith.json +1 −0, gutters.json +1 −0, gym.json +1 −0, gymnastics.json +1 −0, hair-restoration.json +1 −0, hair.json +1 −0, handyman.json +1 −0, hearing.json +1 −0, holiday-lights.json +1 −0, home-care.json +1 −0, home-engineer.json +1 −0, home-stager.json +1 −0, horse-riding.json +1 −0, hunting-guide.json +1 −0, hvac.json +1 −0, hypnotherapist.json +1 −0, image-consultant.json +1 −0, imaging.json +1 −0, immigration-services.json +1 −0, inspector.json +1 −0, instrument-repair.json +1 −0, insulation.json +1 −0, insurance.json +1 −0, interior.json +1 −0, irrigation.json +1 −0, iv-hydration.json +1 −0, junk.json +1 −0, lab.json +1 −0, lactation.json +1 −0, language-school.json +1 −0, lash-brow.json +1 −0, laundry.json +1 −0, lawn.json +1 −0, lawyer.json +1 −0, limo.json +1 −0, locksmith.json +1 −0, magician.json +1 −0, makeup.json +1 −0, martial-arts.json +1 −0, masonry.json +1 −0, massage.json +1 −0, matchmaker.json +1 −0, mediator.json +1 −0, medical-transport.json +1 −0, medspa.json +1 −0, midwife.json +1 −0, mini-golf.json +1 −0, mortgage.json +1 −0, motorcycle.json +1 −0, movers.json +1 −0, music.json +1 −0, nails.json +1 −0, naturopath.json +1 −0, neurologist.json +1 −0, notary.json +1 −0, obgyn.json +1 −0, occupational-therapist.json +1 −0, officiant.json +1 −0, ophthalmologist.json +1 −0, optometrist.json +1 −0, oral-surgeon.json +1 −0, organizer.json +1 −0, orthodontist.json +1 −0, orthopedist.json +1 −0, pain-management.json +1 −0, painter.json +1 −0, party-characters.json +1 −0, paving.json +1 −0, pediatrician.json +1 −0, personal-shopper.json +1 −0, pest.json +1 −0, pet-cremation.json +1 −0, pet-rehab.json +1 −0, pet-sitter.json +1 −0, pet-taxi.json +1 −0, pet-waste.json +1 −0, pharmacist.json +1 −0, photographer.json +1 −0, physical-therapist.json +1 −0, piano-tuner.json +1 −0, pilates.json +1 −0, planner.json +1 −0, plastic-surgeon.json +1 −0, plumber.json +1 −0, pmu.json +1 −0, podiatrist.json +1 −0, pool-builder.json +1 −0, pool.json +1 −0, pressure.json +1 −0, primary-care.json +1 −0, private-investigator.json +1 −0, property-manager.json +1 −0, psychiatrist.json +1 −0, psychic.json +1 −0, radon.json +1 −0, realtor.json +1 −0, recording-studio.json +1 −0, reiki.json +1 −0, rentals.json +1 −0, repair-shop.json +1 −0, restaurant.json +1 −0, restoration.json +1 −0, roofer.json +1 −0, rv-repair.json +1 −0, security.json +1 −0, senior-living.json +1 −0, senior-move.json +1 −0, septic.json +1 −0, sharpening.json +1 −0, shoe-repair.json +1 −0, shooting.json +1 −0, siding.json +1 −0, sitter.json +1 −0, ski-instructor.json +1 −0, sleep-clinic.json +1 −0, small-engine.json +1 −0, snow.json +1 −0, spa.json +1 −0, speech-therapist.json +1 −0, sports-coach.json +1 −0, sports-medicine.json +1 −0, spray-tan.json +1 −0, surf-school.json +1 −0, surveyor.json +1 −0, swim.json +1 −0, tailor.json +1 −0, tattoo.json +1 −0, tax.json +1 −0, teeth-whitening.json +1 −0, tennis-coach.json +1 −0, therapist.json +1 −0, tires.json +1 −0, tours.json +1 −0, towing.json +1 −0, trainer.json +1 −0, trampoline-park.json +1 −0, translator.json +1 −0, travel-agent.json +1 −0, tree.json +1 −0, tutor.json +1 −0, tv-repair.json +1 −0, upholstery.json +1 −0, urgent-care.json +1 −0, urologist.json +1 −0, valet.json +1 −0, vehicle-inspection.json +1 −0, vehicle-wrap.json +1 −0, vet.json +1 −0, watch-jewelry.json +1 −0, weight-loss.json +1 −0, well-pump.json +1 −0, wellness-studio.json +1 −0, wildlife.json +1 −0, window-tint.json +1 −0, windows.json +1 −0, yoga.json +1 −0
+  - `infra/ci/` phone-scan-exceptions.mjs +68 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1477: bundle v2: v1's six steps byte for byte plus S1-08 and S1-09, v1.1's prompts (decide-2), fixed lines plus signUpOpener; check.mjs, its test, phone-scan entries
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1477: bundle v2's KV bulk file from the local publish (043a3c33…/1, 245 entries)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1477: check.mjs names S1-09's question card as decide's, not sent
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
 ## 825. docs: COMMIT\_HISTORY.md through commit 823 (5a30e70, \#834) (\#836)
 
-- **Commit:** [`444c43f`](https://github.com/aryamahadik/rosie/commit/444c43f), by Arya Mahadik, 2026-11-21 03:33:15 UTC
+- **Commit:** [`444c43f0`](https://github.com/aryamahadik/rosie/commit/444c43f0), by Arya Mahadik, 2026-11-21 03:33:15 UTC
 - **Pull request:** [#836](https://github.com/aryamahadik/rosie/pull/836) from `task/commit-history-196`, merged 2026-11-21 03:33:16 UTC. It squashed 1 branch commit:
   - `277b146` docs: COMMIT\_HISTORY.md through commit 823 (5a30e70, \#834)
 - **Files changed:** 1 (+45 −1), by folder:
@@ -24,7 +184,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 824. T-1510: K-01 README default 19 (no new version): fixed line signUpOpener, S1-02's own words, in place of opener when the row's reader is read by the sign-up line as owner and its step does not need business; no doubles; fail closed with lineNotInBundle; RULES 4.2's sign-up exception; the stand-in name before S1-09; open gap for S1-10's wording (DL-1033) (\#835)
 
-- **Commit:** [`fa7ea85`](https://github.com/aryamahadik/rosie/commit/fa7ea85), by Arya Mahadik, 2026-11-21 03:33:10 UTC
+- **Commit:** [`fa7ea858`](https://github.com/aryamahadik/rosie/commit/fa7ea858), by Arya Mahadik, 2026-11-21 03:33:10 UTC
 - **Pull request:** [#835](https://github.com/aryamahadik/rosie/pull/835) from `task/T-1510`, merged 2026-11-21 03:33:10 UTC. It squashed 1 branch commit:
   - `72ffb63` T-1510: K-01 README default 19 (no new version): fixed line signUpOpe…
 - **Files changed:** 1 (+36 −1), by folder:
@@ -40,7 +200,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 823. docs: COMMIT\_HISTORY.md through commit 821 (c0176bf, \#832) (\#834)
 
-- **Commit:** [`5a30e70`](https://github.com/aryamahadik/rosie/commit/5a30e70), by Arya Mahadik, 2026-11-21 03:03:31 UTC
+- **Commit:** [`5a30e704`](https://github.com/aryamahadik/rosie/commit/5a30e704), by Arya Mahadik, 2026-11-21 03:03:31 UTC
 - **Pull request:** [#834](https://github.com/aryamahadik/rosie/pull/834) from `task/commit-history-195`, merged 2026-11-21 03:03:31 UTC. It squashed 1 branch commit:
   - `9cd178a` docs: COMMIT\_HISTORY.md through commit 821 (c0176bf, \#832)
 - **Files changed:** 1 (+35 −1), by folder:
@@ -56,7 +216,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 822. T-1473: migration 0039: outbox\_rows.step and line\_no (S1-04 design card 4) (\#833)
 
-- **Commit:** [`f57e919`](https://github.com/aryamahadik/rosie/commit/f57e919), by Arya Mahadik, 2026-11-21 03:03:28 UTC
+- **Commit:** [`f57e919b`](https://github.com/aryamahadik/rosie/commit/f57e919b), by Arya Mahadik, 2026-11-21 03:03:28 UTC
 - **Pull request:** [#833](https://github.com/aryamahadik/rosie/pull/833) from `task/T-1473`, merged 2026-11-21 03:03:28 UTC. It squashed 2 branch commits:
   - `3a49a17` T-1473: migration 0039, outbox\_rows.step and line\_no with K-04 v1.2's…
   - `61b698f` T-1473: money.int's migration-name pin gains core\_outbox\_step\_line (0…
@@ -84,7 +244,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 821. docs: COMMIT\_HISTORY.md through commit 819 (1a1ce44, \#830) (\#832)
 
-- **Commit:** [`c0176bf`](https://github.com/aryamahadik/rosie/commit/c0176bf), by Arya Mahadik, 2026-11-21 02:12:11 UTC
+- **Commit:** [`c0176bfa`](https://github.com/aryamahadik/rosie/commit/c0176bfa), by Arya Mahadik, 2026-11-21 02:12:11 UTC
 - **Pull request:** [#832](https://github.com/aryamahadik/rosie/pull/832) from `task/commit-history-194`, merged 2026-11-21 02:12:11 UTC. It squashed 1 branch commit:
   - `89eddaa` docs: COMMIT\_HISTORY.md through commit 819 (1a1ce44, \#830)
 - **Files changed:** 1 (+60 −1), by folder:
@@ -100,7 +260,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 820. T-1504: K-09 v1.12, an asked part sends the turn's one open question again once (defaults 192 to 198, open gaps 173 to 177, rule askedResendsQuestion, 1 accepted and 4 refused fixtures; frozen) (\#831)
 
-- **Commit:** [`4075dd0`](https://github.com/aryamahadik/rosie/commit/4075dd0), by Arya Mahadik, 2026-11-21 02:12:07 UTC
+- **Commit:** [`4075dd0c`](https://github.com/aryamahadik/rosie/commit/4075dd0c), by Arya Mahadik, 2026-11-21 02:12:07 UTC
 - **Pull request:** [#831](https://github.com/aryamahadik/rosie/pull/831) from `task/T-1504`, merged 2026-11-21 02:12:08 UTC. It squashed 1 branch commit:
   - `c27cf14` T-1504: K-09 v1.12, an asked part sends the turn's one open question …
 - **Files changed:** 10 (+1773 −4), by folder:
@@ -118,7 +278,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 819. docs: COMMIT\_HISTORY.md through commit 816 (ed15454, \#826) (\#830)
 
-- **Commit:** [`1a1ce44`](https://github.com/aryamahadik/rosie/commit/1a1ce44), by Arya Mahadik, 2026-11-21 01:26:48 UTC
+- **Commit:** [`1a1ce44e`](https://github.com/aryamahadik/rosie/commit/1a1ce44e), by Arya Mahadik, 2026-11-21 01:26:48 UTC
 - **Pull request:** [#830](https://github.com/aryamahadik/rosie/pull/830) from `task/commit-history-193`, merged 2026-11-21 01:26:49 UTC. It squashed 1 branch commit:
   - `ebdb425` docs: COMMIT\_HISTORY.md through commit 816 (ed15454, \#826)
 - **Files changed:** 1 (+78 −1), by folder:
@@ -134,7 +294,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 818. T-1496: K-09 v1.11's contract test: each new fixture against its definition and rule, every earlier accepted fixture under v1.11, the seven mends to their twins, the rules on damaged copies, bundle v1's S1-04 labels word for word, S1\_08\_TERM\_LINES against the master's record, written by item 77's names, and the security review's copies reported (\#828)
 
-- **Commit:** [`ff7bed8`](https://github.com/aryamahadik/rosie/commit/ff7bed8), by Arya Mahadik, 2026-11-21 01:26:44 UTC
+- **Commit:** [`ff7bed80`](https://github.com/aryamahadik/rosie/commit/ff7bed80), by Arya Mahadik, 2026-11-21 01:26:44 UTC
 - **Pull request:** [#828](https://github.com/aryamahadik/rosie/pull/828) from `task/T-1496`, merged 2026-11-21 01:26:44 UTC. It squashed 1 branch commit:
   - `beff2cf` T-1496: K-09 v1.11's contract test: each new fixture against its defi…
 - **Files changed:** 1 (+1302 −0), by folder:
@@ -150,7 +310,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 817. T-1503: bind S1-02's settler on the gate port and staging's gate (DL-1018 card 5) (\#829)
 
-- **Commit:** [`eb9aa4c`](https://github.com/aryamahadik/rosie/commit/eb9aa4c), by Arya Mahadik, 2026-11-21 01:26:39 UTC
+- **Commit:** [`eb9aa4c5`](https://github.com/aryamahadik/rosie/commit/eb9aa4c5), by Arya Mahadik, 2026-11-21 01:26:39 UTC
 - **Pull request:** [#829](https://github.com/aryamahadik/rosie/pull/829) from `task/T-1503`, merged 2026-11-21 01:26:39 UTC. It squashed 2 branch commits:
   - `39b2074` T-1503: the gate port binds signUpSteps (S1-02's settler beside the s…
   - `297aa25` T-1503: gate-binding.test.ts as Prettier formats it
@@ -177,7 +337,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 816. docs: COMMIT\_HISTORY.md through commit 813 (5504256, \#824) (\#826)
 
-- **Commit:** [`ed15454`](https://github.com/aryamahadik/rosie/commit/ed15454), by Arya Mahadik, 2026-11-20 22:01:54 UTC
+- **Commit:** [`ed154543`](https://github.com/aryamahadik/rosie/commit/ed154543), by Arya Mahadik, 2026-11-20 22:01:54 UTC
 - **Pull request:** [#826](https://github.com/aryamahadik/rosie/pull/826) from `task/commit-history-192`, merged 2026-11-20 22:01:55 UTC. It squashed 1 branch commit:
   - `b9e9df5` docs: COMMIT\_HISTORY.md through commit 813 (5504256, \#824)
 - **Files changed:** 1 (+50 −1), by folder:
@@ -193,7 +353,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 815. T-1501: bundle v1.1: bundle v1 byte for byte with decide-2 as its decide prompt (c2de3e90…/2; DL-1018 card 3, DL-1027) (\#827)
 
-- **Commit:** [`3038d7f`](https://github.com/aryamahadik/rosie/commit/3038d7f), by Arya Mahadik, 2026-11-20 22:01:49 UTC
+- **Commit:** [`3038d7f6`](https://github.com/aryamahadik/rosie/commit/3038d7f6), by Arya Mahadik, 2026-11-20 22:01:49 UTC
 - **Pull request:** [#827](https://github.com/aryamahadik/rosie/pull/827) from `task/T-1501`, merged 2026-11-20 22:01:50 UTC. It squashed 2 branch commits:
   - `f63b2d8` T-1501: bundle v1.1, bundle v1 byte for byte with decide-2 as its dec…
   - `3ccfa67` T-1501: the phone scan test's PUBLIC\_LINE\_FILES admits a bundle folde…
@@ -224,7 +384,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 814. T-1502: S1-02's settler: the commit's walk asks a bound settler for S1-02's branch, so the owner's words decide it (DL-1018 card 4, K-09 default 191) (\#825)
 
-- **Commit:** [`81bcc39`](https://github.com/aryamahadik/rosie/commit/81bcc39), by Arya Mahadik, 2026-11-20 22:01:45 UTC
+- **Commit:** [`81bcc398`](https://github.com/aryamahadik/rosie/commit/81bcc398), by Arya Mahadik, 2026-11-20 22:01:45 UTC
 - **Pull request:** [#825](https://github.com/aryamahadik/rosie/pull/825) from `task/T-1502`, merged 2026-11-20 22:01:46 UTC. It squashed 2 branch commits:
   - `1f40b41` T-1502: S1-02's settler: WalkDeps.settlers asked once at a split befo…
   - `325daaf` T-1502: the settler's c-02 case names commit-s1-02.json's words expli…
@@ -254,7 +414,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 813. docs: COMMIT\_HISTORY.md through commit 811 (5084255, \#822) (\#824)
 
-- **Commit:** [`5504256`](https://github.com/aryamahadik/rosie/commit/5504256), by Arya Mahadik, 2026-11-20 18:51:37 UTC
+- **Commit:** [`55042560`](https://github.com/aryamahadik/rosie/commit/55042560), by Arya Mahadik, 2026-11-20 18:51:37 UTC
 - **Pull request:** [#824](https://github.com/aryamahadik/rosie/pull/824) from `task/commit-history-191`, merged 2026-11-20 18:51:37 UTC. It squashed 1 branch commit:
   - `11008f7` docs: COMMIT\_HISTORY.md through commit 811 (5084255, \#822)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -270,7 +430,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 812. T-1499: K-09 README default 191 and K-02 README default 16 (no new version): decide carries the owner's kinds under the lowest-id option, and a settler settles S1-02's branch (DL-1018, DL-1021, DL-1023; CQ-157 (2), CQ-348 (3)) (\#823)
 
-- **Commit:** [`f1f918a`](https://github.com/aryamahadik/rosie/commit/f1f918a), by Arya Mahadik, 2026-11-20 18:51:33 UTC
+- **Commit:** [`f1f918ac`](https://github.com/aryamahadik/rosie/commit/f1f918ac), by Arya Mahadik, 2026-11-20 18:51:33 UTC
 - **Pull request:** [#823](https://github.com/aryamahadik/rosie/pull/823) from `task/T-1499`, merged 2026-11-20 18:51:33 UTC. It squashed 3 branch commits:
   - `f8edfc5` T-1499: K-09 README default 191 and K-02 README default 16, with no n…
   - `afa4c7c` T-1499: round 2 (DL-1021), README text only: default 191 asks a settl…
@@ -303,7 +463,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 811. docs: COMMIT\_HISTORY.md through commit 809 (5e87ab0, \#820) (\#822)
 
-- **Commit:** [`5084255`](https://github.com/aryamahadik/rosie/commit/5084255), by Arya Mahadik, 2026-11-20 18:23:05 UTC
+- **Commit:** [`5084255a`](https://github.com/aryamahadik/rosie/commit/5084255a), by Arya Mahadik, 2026-11-20 18:23:05 UTC
 - **Pull request:** [#822](https://github.com/aryamahadik/rosie/pull/822) from `task/commit-history-190`, merged 2026-11-20 18:23:05 UTC. It squashed 1 branch commit:
   - `88b8fba` docs: COMMIT\_HISTORY.md through commit 809 (5e87ab0, \#820)
 - **Files changed:** 1 (+35 −1), by folder:
@@ -319,7 +479,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 810. T-1500: decide-2 beside decide-1: typed words that answer the one open question are a choose (rules a to d, example 6); decide-1 pinned byte for byte (\#821)
 
-- **Commit:** [`d3a93d1`](https://github.com/aryamahadik/rosie/commit/d3a93d1), by Arya Mahadik, 2026-11-20 18:23:00 UTC
+- **Commit:** [`d3a93d1d`](https://github.com/aryamahadik/rosie/commit/d3a93d1d), by Arya Mahadik, 2026-11-20 18:23:00 UTC
 - **Pull request:** [#821](https://github.com/aryamahadik/rosie/pull/821) from `task/T-1500`, merged 2026-11-20 18:23:01 UTC. It squashed 1 branch commit:
   - `c1024e4` T-1500: decide-2 beside decide-1: typed words that answer the one ope…
 - **Files changed:** 4 (+494 −42), by folder:
@@ -335,7 +495,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 809. docs: COMMIT\_HISTORY.md through commit 807 (fa4ef40, \#818) (\#820)
 
-- **Commit:** [`5e87ab0`](https://github.com/aryamahadik/rosie/commit/5e87ab0), by Arya Mahadik, 2026-11-20 15:34:21 UTC
+- **Commit:** [`5e87ab0e`](https://github.com/aryamahadik/rosie/commit/5e87ab0e), by Arya Mahadik, 2026-11-20 15:34:21 UTC
 - **Pull request:** [#820](https://github.com/aryamahadik/rosie/pull/820) from `task/commit-history-189`, merged 2026-11-20 15:34:21 UTC. It squashed 1 branch commit:
   - `00eecd6` docs: COMMIT\_HISTORY.md through commit 807 (fa4ef40, \#818)
 - **Files changed:** 1 (+51 −1), by folder:
@@ -351,7 +511,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 808. T-1187: K-05 v1.20 frozen: the reader mapping's request states the row's business's live-owner state, and the sign-up reading is refused (noReader, businessHasOwner) at a business with a live owner; 4 accepted and 4 refused fixtures; defaults 184 to 191, open gaps 94 to 96, gap 46 closed (\#819)
 
-- **Commit:** [`af146b0`](https://github.com/aryamahadik/rosie/commit/af146b0), by Arya Mahadik, 2026-11-20 15:34:16 UTC
+- **Commit:** [`af146b03`](https://github.com/aryamahadik/rosie/commit/af146b03), by Arya Mahadik, 2026-11-20 15:34:16 UTC
 - **Pull request:** [#819](https://github.com/aryamahadik/rosie/pull/819) from `task/T-1187`, merged 2026-11-20 15:34:17 UTC. It squashed 1 branch commit:
   - `b1f0f93` T-1187: K-05 v1.20 frozen: the reader mapping's request states the ro…
 - **Files changed:** 12 (+1330 −5), by folder:
@@ -369,7 +529,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 807. docs: COMMIT\_HISTORY.md through commit 805 (187aa91, \#817) (\#818)
 
-- **Commit:** [`fa4ef40`](https://github.com/aryamahadik/rosie/commit/fa4ef40), by Arya Mahadik, 2026-11-20 14:59:58 UTC
+- **Commit:** [`fa4ef40c`](https://github.com/aryamahadik/rosie/commit/fa4ef40c), by Arya Mahadik, 2026-11-20 14:59:58 UTC
 - **Pull request:** [#818](https://github.com/aryamahadik/rosie/pull/818) from `task/commit-history-188`, merged 2026-11-20 14:59:59 UTC. It squashed 1 branch commit:
   - `9e439d8` docs: COMMIT\_HISTORY.md through commit 805 (187aa91, \#817)
 - **Files changed:** 1 (+35 −1), by folder:
@@ -385,7 +545,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 806. T-1471: freeze K-09 v1.11: S1-04's buttons question as option choices with their fields, the turn that answers it, and S1-08's term lines (DL-999, DL-1005) (\#816)
 
-- **Commit:** [`984d5f7`](https://github.com/aryamahadik/rosie/commit/984d5f7), by Arya Mahadik, 2026-11-20 14:59:54 UTC
+- **Commit:** [`984d5f71`](https://github.com/aryamahadik/rosie/commit/984d5f71), by Arya Mahadik, 2026-11-20 14:59:54 UTC
 - **Pull request:** [#816](https://github.com/aryamahadik/rosie/pull/816) from `task/T-1471`, merged 2026-11-20 14:59:55 UTC. It squashed 3 branch commits:
   - `3aa64c3` T-1471: K-09 v1.11 frozen: S1-04's buttons question, its option choic…
   - `584e9a2` T-1471: the two accepted S1-04 commit fixtures name givesStepKeys in …
@@ -419,7 +579,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 805. docs: COMMIT\_HISTORY.md through commit 803 (5eb144e, \#814) (\#817)
 
-- **Commit:** [`187aa91`](https://github.com/aryamahadik/rosie/commit/187aa91), by Arya Mahadik, 2026-11-20 13:36:41 UTC
+- **Commit:** [`187aa91a`](https://github.com/aryamahadik/rosie/commit/187aa91a), by Arya Mahadik, 2026-11-20 13:36:41 UTC
 - **Pull request:** [#817](https://github.com/aryamahadik/rosie/pull/817) from `task/commit-history-187`, merged 2026-11-20 13:36:41 UTC. It squashed 1 branch commit:
   - `81923e5` docs: COMMIT\_HISTORY.md through commit 803 (5eb144e, \#814)
 - **Files changed:** 1 (+45 −1), by folder:
@@ -435,7 +595,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 804. T-1472: K-04 core v1.2, frozen: outbox\_rows.step and line\_no (both or neither) with three CHECKs; three refused twins whose rows load the row with both; README section v1.2, defaults 19 to 29, v1.2 gaps 1 to 6 (DL-999, K-05 open gap 29) (\#813)
 
-- **Commit:** [`82b203f`](https://github.com/aryamahadik/rosie/commit/82b203f), by Arya Mahadik, 2026-11-20 13:36:37 UTC
+- **Commit:** [`82b203fd`](https://github.com/aryamahadik/rosie/commit/82b203fd), by Arya Mahadik, 2026-11-20 13:36:37 UTC
 - **Pull request:** [#813](https://github.com/aryamahadik/rosie/pull/813) from `task/T-1472`, merged 2026-11-20 13:36:37 UTC. It squashed 1 branch commit:
   - `7a36917` T-1472: K-04 core v1.2, frozen: outbox\_rows.step and line\_no (both or…
 - **Files changed:** 7 (+4228 −5), by folder:
@@ -453,7 +613,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 803. docs: COMMIT\_HISTORY.md through commit 801 (c17d5a3, \#811) (\#814)
 
-- **Commit:** [`5eb144e`](https://github.com/aryamahadik/rosie/commit/5eb144e), by Arya Mahadik, 2026-11-20 13:01:55 UTC
+- **Commit:** [`5eb144e2`](https://github.com/aryamahadik/rosie/commit/5eb144e2), by Arya Mahadik, 2026-11-20 13:01:55 UTC
 - **Pull request:** [#814](https://github.com/aryamahadik/rosie/pull/814) from `task/commit-history-186`, merged 2026-11-20 13:01:56 UTC. It squashed 1 branch commit:
   - `7829ce8` docs: COMMIT\_HISTORY.md through commit 801 (c17d5a3, \#811)
 - **Files changed:** 1 (+66 −1), by folder:
@@ -469,7 +629,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 802. T-1470 (card F2): the gate port and staging's gate bind the walk's question read and the sign-up step writers; the kinds reads on their own clients, at most 2 connections per gate call (DL-994, DL-997) (\#815)
 
-- **Commit:** [`c1e9baf`](https://github.com/aryamahadik/rosie/commit/c1e9baf), by Arya Mahadik, 2026-11-20 13:01:51 UTC
+- **Commit:** [`c1e9baf1`](https://github.com/aryamahadik/rosie/commit/c1e9baf1), by Arya Mahadik, 2026-11-20 13:01:51 UTC
 - **Pull request:** [#815](https://github.com/aryamahadik/rosie/pull/815) from `task/T-1470`, merged 2026-11-20 13:01:52 UTC. It squashed 2 branch commits:
   - `4bb61fc` T-1470: the gate port binds the walk's question read and the sign-up …
   - `8d5cb06` T-1470: staging's gate binds the walk's question read on the call's t…
@@ -497,7 +657,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 801. docs: COMMIT\_HISTORY.md through commit 798 (fed38f5, \#809) (\#811)
 
-- **Commit:** [`c17d5a3`](https://github.com/aryamahadik/rosie/commit/c17d5a3), by Arya Mahadik, 2026-11-20 11:27:21 UTC
+- **Commit:** [`c17d5a3f`](https://github.com/aryamahadik/rosie/commit/c17d5a3f), by Arya Mahadik, 2026-11-20 11:27:21 UTC
 - **Pull request:** [#811](https://github.com/aryamahadik/rosie/pull/811) from `task/commit-history-185`, merged 2026-11-20 11:27:21 UTC. It squashed 1 branch commit:
   - `0a074be` docs: COMMIT\_HISTORY.md through commit 798 (fed38f5, \#809)
 - **Files changed:** 1 (+46 −1), by folder:
@@ -513,7 +673,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 800. T-1468 (card F1): the turn face can bind the walk's question read and the sign-up step writers; an owner's whole second turn proven on local PostgreSQL (DL-994, DL-997) (\#810)
 
-- **Commit:** [`eb0132f`](https://github.com/aryamahadik/rosie/commit/eb0132f), by Arya Mahadik, 2026-11-20 11:27:17 UTC
+- **Commit:** [`eb0132fc`](https://github.com/aryamahadik/rosie/commit/eb0132fc), by Arya Mahadik, 2026-11-20 11:27:17 UTC
 - **Pull request:** [#810](https://github.com/aryamahadik/rosie/pull/810) from `task/T-1468`, merged 2026-11-20 11:27:18 UTC. It squashed 3 branch commits:
   - `67422a5` T-1468: the turn face's binding takes the walk's question read and st…
   - `eed28c4` T-1468: unit proof of the sign-up binding through the turn face (Prov…
@@ -546,7 +706,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 799. T-1498: npm run lint runs eslint with an 8 GB heap (node --max-old-space-size=8192); the rule set, the files linted and --max-warnings=0 unchanged (DL-1002 to DL-1004) (\#812)
 
-- **Commit:** [`4f6ea50`](https://github.com/aryamahadik/rosie/commit/4f6ea50), by Arya Mahadik, 2026-11-20 11:27:13 UTC
+- **Commit:** [`4f6ea507`](https://github.com/aryamahadik/rosie/commit/4f6ea507), by Arya Mahadik, 2026-11-20 11:27:13 UTC
 - **Pull request:** [#812](https://github.com/aryamahadik/rosie/pull/812) from `task/T-1498`, merged 2026-11-20 11:27:14 UTC. It squashed 1 branch commit:
   - `e681698` T-1498: npm run lint runs eslint with an 8 GB heap (node --max-old-sp…
 - **Files changed:** 1 (+1 −1), by folder:
@@ -562,7 +722,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 798. docs: COMMIT\_HISTORY.md through commit 796 (e7eea15, \#807) (\#809)
 
-- **Commit:** [`fed38f5`](https://github.com/aryamahadik/rosie/commit/fed38f5), by Arya Mahadik, 2026-11-20 09:13:12 UTC
+- **Commit:** [`fed38f55`](https://github.com/aryamahadik/rosie/commit/fed38f55), by Arya Mahadik, 2026-11-20 09:13:12 UTC
 - **Pull request:** [#809](https://github.com/aryamahadik/rosie/pull/809) from `task/commit-history-184`, merged 2026-11-20 09:13:13 UTC. It squashed 1 branch commit:
   - `fb41f62` docs: COMMIT\_HISTORY.md through commit 796 (e7eea15, \#807)
 - **Files changed:** 1 (+49 −1), by folder:
@@ -578,7 +738,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 797. T-1465: a sent receipt that is no delivery receipt is answered 200 with nothing marked, not 503; failed receipts and SMS's sent receipt stay 503; the hand-off failure line names the event's kind and a refusal label (DL-978, DL-997) (\#808)
 
-- **Commit:** [`a5ed40a`](https://github.com/aryamahadik/rosie/commit/a5ed40a), by Arya Mahadik, 2026-11-20 09:13:08 UTC
+- **Commit:** [`a5ed40a4`](https://github.com/aryamahadik/rosie/commit/a5ed40a4), by Arya Mahadik, 2026-11-20 09:13:08 UTC
 - **Pull request:** [#808](https://github.com/aryamahadik/rosie/pull/808) from `task/T-1465`, merged 2026-11-20 09:13:08 UTC. It squashed 2 branch commits:
   - `fb975fb` T-1465: tests find which Linq event kinds fail after the chat is plac…
   - `fea7fee` T-1465: the root's receipt door answers a sent receipt that is no del…
@@ -607,7 +767,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 796. docs: COMMIT\_HISTORY.md through commit 794 (9ae503d, \#805) (\#807)
 
-- **Commit:** [`e7eea15`](https://github.com/aryamahadik/rosie/commit/e7eea15), by Arya Mahadik, 2026-11-20 08:42:05 UTC
+- **Commit:** [`e7eea15a`](https://github.com/aryamahadik/rosie/commit/e7eea15a), by Arya Mahadik, 2026-11-20 08:42:05 UTC
 - **Pull request:** [#807](https://github.com/aryamahadik/rosie/pull/807) from `task/commit-history-183`, merged 2026-11-20 08:42:06 UTC. It squashed 1 branch commit:
   - `06669f5` docs: COMMIT\_HISTORY.md through commit 794 (9ae503d, \#805)
 - **Files changed:** 1 (+44 −1), by folder:
@@ -623,7 +783,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 795. T-633: S1-02's, S1-03's and S1-74's read-only step writers: the owner's kinds of work kept as picked\_kinds rows, new work drafted (drafting), work Rosie never books kept as a not\_booked pick; the matchKinds handler (DL-961 card D, DL-994) (\#806)
 
-- **Commit:** [`0cbe392`](https://github.com/aryamahadik/rosie/commit/0cbe392), by Arya Mahadik, 2026-11-20 08:42:02 UTC
+- **Commit:** [`0cbe3925`](https://github.com/aryamahadik/rosie/commit/0cbe3925), by Arya Mahadik, 2026-11-20 08:42:02 UTC
 - **Pull request:** [#806](https://github.com/aryamahadik/rosie/pull/806) from `task/T-633`, merged 2026-11-20 08:42:02 UTC. It squashed 3 branch commits:
   - `9d193ac` T-633: unchecked snapshot of the builder's work when the usage limit …
   - `2c987a2` T-633: round 2 (DL-994): S1-03's walk-time writer drafts new work in …
@@ -655,7 +815,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 794. docs: COMMIT\_HISTORY.md through commit 792 (eebeaa5, \#803) (\#805)
 
-- **Commit:** [`9ae503d`](https://github.com/aryamahadik/rosie/commit/9ae503d), by Arya Mahadik, 2026-11-20 08:08:03 UTC
+- **Commit:** [`9ae503df`](https://github.com/aryamahadik/rosie/commit/9ae503df), by Arya Mahadik, 2026-11-20 08:08:03 UTC
 - **Pull request:** [#805](https://github.com/aryamahadik/rosie/pull/805) from `task/commit-history-182`, merged 2026-11-20 08:08:03 UTC. It squashed 1 branch commit:
   - `853c881` docs: COMMIT\_HISTORY.md through commit 792 (eebeaa5, \#803)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -671,7 +831,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 793. T-634 part 1: S1-11's read-only step writer: the first kind named gets its 11 plug-in text blocks from the pinned bundle's trade overlay, with Master Corrections C5's fills checked (DL-961 card E, DL-994) (\#804)
 
-- **Commit:** [`7f25c5f`](https://github.com/aryamahadik/rosie/commit/7f25c5f), by Arya Mahadik, 2026-11-20 08:07:59 UTC
+- **Commit:** [`7f25c5f8`](https://github.com/aryamahadik/rosie/commit/7f25c5f8), by Arya Mahadik, 2026-11-20 08:07:59 UTC
 - **Pull request:** [#804](https://github.com/aryamahadik/rosie/pull/804) from `task/T-634`, merged 2026-11-20 08:07:59 UTC. It squashed 2 branch commits:
   - `f4e09e5` T-634: S1-11's read-only step writer (part 1): each listed pick's 11 …
   - `5f7a037` T-634: S1-11 in S1-02's walk loads the first kind named only (round 2…
@@ -698,7 +858,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 792. docs: COMMIT\_HISTORY.md through commit 790 (d2ac19b, \#801) (\#803)
 
-- **Commit:** [`eebeaa5`](https://github.com/aryamahadik/rosie/commit/eebeaa5), by Arya Mahadik, 2026-11-20 07:26:12 UTC
+- **Commit:** [`eebeaa58`](https://github.com/aryamahadik/rosie/commit/eebeaa58), by Arya Mahadik, 2026-11-20 07:26:12 UTC
 - **Pull request:** [#803](https://github.com/aryamahadik/rosie/pull/803) from `task/commit-history-181`, merged 2026-11-20 07:26:13 UTC. It squashed 1 branch commit:
   - `f53c19a` docs: COMMIT\_HISTORY.md through commit 790 (d2ac19b, \#801)
 - **Files changed:** 1 (+50 −1), by folder:
@@ -714,7 +874,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 791. T-1469: kinds-catalog seed set writes K-24's catalog alone (243 kinds, 486 kind\_flows) from the checked trade files as kinds.ts does, with no demo shop's pick and no setup seed; refuses a catalog row that differs from its trade file, naming the kind; kinds.ts refactored to share catalogPlanOf and insertCatalog, output unchanged (DL-961 card G, DL-988) (\#802)
 
-- **Commit:** [`95b3d40`](https://github.com/aryamahadik/rosie/commit/95b3d40), by Arya Mahadik, 2026-11-20 07:26:08 UTC
+- **Commit:** [`95b3d405`](https://github.com/aryamahadik/rosie/commit/95b3d405), by Arya Mahadik, 2026-11-20 07:26:08 UTC
 - **Pull request:** [#802](https://github.com/aryamahadik/rosie/pull/802) from `task/T-1469`, merged 2026-11-20 07:26:08 UTC. It squashed 1 branch commit:
   - `bc05c29` T-1469: kinds-catalog seed set writes K-24's catalog alone (243 kinds…
 - **Files changed:** 4 (+1093 −30), by folder:
@@ -730,7 +890,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 790. docs: COMMIT\_HISTORY.md through commit 788 (eb873da, \#799) (\#801)
 
-- **Commit:** [`d2ac19b`](https://github.com/aryamahadik/rosie/commit/d2ac19b), by Arya Mahadik, 2026-11-19 23:20:41 UTC
+- **Commit:** [`d2ac19b0`](https://github.com/aryamahadik/rosie/commit/d2ac19b0), by Arya Mahadik, 2026-11-19 23:20:41 UTC
 - **Pull request:** [#801](https://github.com/aryamahadik/rosie/pull/801) from `task/commit-history-180`, merged 2026-11-19 23:20:41 UTC. It squashed 1 branch commit:
   - `c77607b` docs: COMMIT\_HISTORY.md through commit 788 (eb873da, \#799)
 - **Files changed:** 1 (+37 −1), by folder:
@@ -746,7 +906,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 789. T-1467: S13-45's one rule readable as rosie\_app: limit 1's contactsOnFileIn asks readSignUpFactsIn().linked (0038 as rosie\_app, person\_handles as rosie\_job); no migration (DL-982) (\#800)
 
-- **Commit:** [`d7b3041`](https://github.com/aryamahadik/rosie/commit/d7b3041), by Arya Mahadik, 2026-11-19 23:20:37 UTC
+- **Commit:** [`d7b30414`](https://github.com/aryamahadik/rosie/commit/d7b30414), by Arya Mahadik, 2026-11-19 23:20:37 UTC
 - **Pull request:** [#800](https://github.com/aryamahadik/rosie/pull/800) from `task/T-1467`, merged 2026-11-19 23:20:37 UTC. It squashed 3 branch commits:
   - `aa8d803` T-1467: limit 1's one rule reads the sender's link to the turn's hand…
   - `9ff6022` T-1467: sign-up.int.test.ts: the last case replaced (as rosie\_app lim…
@@ -779,7 +939,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 788. docs: COMMIT\_HISTORY.md through commit 786 (a920f74, \#797) (\#799)
 
-- **Commit:** [`eb873da`](https://github.com/aryamahadik/rosie/commit/eb873da), by Arya Mahadik, 2026-11-19 10:43:31 UTC
+- **Commit:** [`eb873da9`](https://github.com/aryamahadik/rosie/commit/eb873da9), by Arya Mahadik, 2026-11-19 10:43:31 UTC
 - **Pull request:** [#799](https://github.com/aryamahadik/rosie/pull/799) from `task/commit-history-179`, merged 2026-11-19 10:43:31 UTC. It squashed 1 branch commit:
   - `2155ae4` docs: COMMIT\_HISTORY.md through commit 786 (a920f74, \#797)
 - **Files changed:** 1 (+87 −1), by folder:
@@ -797,7 +957,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 787. T-1466: roster-owner-setup, a seed set that adds only the missing business\_setup row (business\_id alone, control not proven, ON CONFLICT DO NOTHING) to each roster business roster-owner wrote for a place on STAGING\_LINQ\_ALLOWLIST, even once its handle has a live open question; refused, writing nothing, while a place's business does not exist yet; seed-staging.sh hands it the list by name as it does roster-owner; roster-owner.ts unchanged (DL-978) (\#798)
 
-- **Commit:** [`ac4a5b9`](https://github.com/aryamahadik/rosie/commit/ac4a5b9), by Arya Mahadik, 2026-11-19 10:43:26 UTC
+- **Commit:** [`ac4a5b9a`](https://github.com/aryamahadik/rosie/commit/ac4a5b9a), by Arya Mahadik, 2026-11-19 10:43:26 UTC
 - **Pull request:** [#798](https://github.com/aryamahadik/rosie/pull/798) from `task/T-1466`, merged 2026-11-19 10:43:27 UTC. It squashed 1 branch commit:
   - `38230dd` T-1466: roster-owner-setup, a seed set that adds only the missing bus…
 - **Files changed:** 4 (+1098 −9), by folder:
@@ -815,7 +975,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 786. docs: COMMIT\_HISTORY.md through commit 782 (3a5883d, \#794) (\#797)
 
-- **Commit:** [`a920f74`](https://github.com/aryamahadik/rosie/commit/a920f74), by Arya Mahadik, 2026-11-19 08:59:54 UTC
+- **Commit:** [`a920f742`](https://github.com/aryamahadik/rosie/commit/a920f742), by Arya Mahadik, 2026-11-19 08:59:54 UTC
 - **Pull request:** [#797](https://github.com/aryamahadik/rosie/pull/797) from `task/commit-history-178`, merged 2026-11-19 08:59:55 UTC. It squashed 1 branch commit:
   - `42e3fc8` docs: COMMIT\_HISTORY.md through commit 782 (3a5883d, \#794)
 - **Files changed:** 1 (+47 −1), by folder:
@@ -833,7 +993,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 785. T-1463: default 14's facts readable as rosie\_app: migration 0038's person\_handles\_linked (security definer, stable, BEGIN ATOMIC, search\_path pg\_catalog, pg\_temp; EXECUTE rosie\_app and rosie\_job, revoked from PUBLIC; true only for a person linked to a handle with a live open question of the scoped business), db/repo/sign-up-reads.ts readSignUpFactsIn (business\_setup's control and version under the call's scope, and the link through 0038 as rosie\_app or person\_handles directly as rosie\_job, chosen by privilege, in one statement), limit 1's signUpFactsOver reading (b) through limit 3's question read and (c), (d) through it; rls and money pins (\#796)
 
-- **Commit:** [`bb78026`](https://github.com/aryamahadik/rosie/commit/bb78026), by Arya Mahadik, 2026-11-19 08:59:50 UTC
+- **Commit:** [`bb780267`](https://github.com/aryamahadik/rosie/commit/bb780267), by Arya Mahadik, 2026-11-19 08:59:50 UTC
 - **Pull request:** [#796](https://github.com/aryamahadik/rosie/pull/796) from `task/T-1463`, merged 2026-11-19 08:59:51 UTC. It squashed 2 branch commits:
   - `ccdce36` T-1463: default 14's facts readable as rosie\_app: migration 0038's pe…
   - `62cab5c` Merge branch 'main' into task/T-1463
@@ -853,7 +1013,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 784. T-1461: the walk answers an option: closes the question at its row's version, walks the branch, writes each walked step by its read-only step writer and stops at a step whose message carries buttons (DL-961, DL-965) (\#795)
 
-- **Commit:** [`2f6c365`](https://github.com/aryamahadik/rosie/commit/2f6c365), by Arya Mahadik, 2026-11-19 08:59:45 UTC
+- **Commit:** [`2f6c3651`](https://github.com/aryamahadik/rosie/commit/2f6c3651), by Arya Mahadik, 2026-11-19 08:59:45 UTC
 - **Pull request:** [#795](https://github.com/aryamahadik/rosie/pull/795) from `task/T-1461`, merged 2026-11-19 08:59:46 UTC. It squashed 1 branch commit:
   - `8169bdb` T-1461: the walk answers an option: closes the question at its row's …
 - **Files changed:** 6 (+1363 −104), by folder:
@@ -869,7 +1029,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 783. T-1443: the paging service bound into the action layer, with a fail-closed telling port (DL-930) (\#792)
 
-- **Commit:** [`c0af7b0`](https://github.com/aryamahadik/rosie/commit/c0af7b0), by Arya Mahadik, 2026-11-19 08:59:41 UTC
+- **Commit:** [`c0af7b0f`](https://github.com/aryamahadik/rosie/commit/c0af7b0f), by Arya Mahadik, 2026-11-19 08:59:41 UTC
 - **Pull request:** [#792](https://github.com/aryamahadik/rosie/pull/792) from `task/T-1443`, merged 2026-11-19 08:59:41 UTC. It squashed 2 branch commits:
   - `dd5aac0` T-1443: bind the paging service into the action layer: core dispatch,…
   - `17dd6b9` T-1443: drop an unneeded type assertion in the turn face's paging tes…
@@ -901,7 +1061,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 782. docs: COMMIT\_HISTORY.md through commit 780 (48981cf, \#791) (\#794)
 
-- **Commit:** [`3a5883d`](https://github.com/aryamahadik/rosie/commit/3a5883d), by Arya Mahadik, 2026-11-19 07:16:08 UTC
+- **Commit:** [`3a5883d7`](https://github.com/aryamahadik/rosie/commit/3a5883d7), by Arya Mahadik, 2026-11-19 07:16:08 UTC
 - **Pull request:** [#794](https://github.com/aryamahadik/rosie/pull/794) from `task/commit-history-177`, merged 2026-11-19 07:16:09 UTC. It squashed 1 branch commit:
   - `83bb568` docs: COMMIT\_HISTORY.md through commit 780 (48981cf, \#791)
 - **Files changed:** 1 (+110 −1), by folder:
@@ -919,7 +1079,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 781. T-1464: the outbox claim passes a parked turn's unplanned row instead of stopping at it (DL-967) (\#793)
 
-- **Commit:** [`02cf630`](https://github.com/aryamahadik/rosie/commit/02cf630), by Arya Mahadik, 2026-11-19 07:16:03 UTC
+- **Commit:** [`02cf630a`](https://github.com/aryamahadik/rosie/commit/02cf630a), by Arya Mahadik, 2026-11-19 07:16:03 UTC
 - **Pull request:** [#793](https://github.com/aryamahadik/rosie/pull/793) from `task/T-1464`, merged 2026-11-19 07:16:04 UTC. It squashed 2 branch commits:
   - `0e411ea` T-1464: the ordinary claim's walk and sweep pass a parked turn's unpl…
   - `f779f7d` T-1464: the new integration cases call claimOutboxV114 without a need…
@@ -947,7 +1107,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 780. docs: COMMIT\_HISTORY.md through commit 776 (7a00bad, \#787) (\#791)
 
-- **Commit:** [`48981cf`](https://github.com/aryamahadik/rosie/commit/48981cf), by Arya Mahadik, 2026-11-18 16:29:12 UTC
+- **Commit:** [`48981cfb`](https://github.com/aryamahadik/rosie/commit/48981cfb), by Arya Mahadik, 2026-11-18 16:29:12 UTC
 - **Pull request:** [#791](https://github.com/aryamahadik/rosie/pull/791) from `task/commit-history-176`, merged 2026-11-18 16:29:13 UTC. It squashed 1 branch commit:
   - `66117b1` docs: COMMIT\_HISTORY.md through commit 776 (7a00bad, \#787)
 - **Files changed:** 1 (+36 −1), by folder:
@@ -965,7 +1125,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 779. T-1460: bundle v1, flow A's S1-01, S1-02, S1-11, S1-04, S1-03 and S1-74 with every trade's overlay (an AI change; DL-961) (\#790)
 
-- **Commit:** [`7209b24`](https://github.com/aryamahadik/rosie/commit/7209b24), by Arya Mahadik, 2026-11-18 16:29:08 UTC
+- **Commit:** [`7209b244`](https://github.com/aryamahadik/rosie/commit/7209b244), by Arya Mahadik, 2026-11-18 16:29:08 UTC
 - **Pull request:** [#790](https://github.com/aryamahadik/rosie/pull/790) from `task/T-1460`, merged 2026-11-18 16:29:08 UTC. It squashed 3 branch commits:
   - `c24790b` T-1460: bundle v1 (S1-01, S1-02, S1-11, S1-04, S1-03, S1-74 of flow A…
   - `d542170` T-1460: check.mjs states T-160's lint finds exactly the whole build's…
@@ -1001,7 +1161,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 778. T-1458: db/repo builds K-05 v1.19's readKindCatalog and readPickedKinds (DL-960) (\#789)
 
-- **Commit:** [`7b40922`](https://github.com/aryamahadik/rosie/commit/7b40922), by Arya Mahadik, 2026-11-18 16:29:04 UTC
+- **Commit:** [`7b409227`](https://github.com/aryamahadik/rosie/commit/7b409227), by Arya Mahadik, 2026-11-18 16:29:04 UTC
 - **Pull request:** [#789](https://github.com/aryamahadik/rosie/pull/789) from `task/T-1458`, merged 2026-11-18 16:29:04 UTC. It squashed 2 branch commits:
   - `1da3a7d` T-1458: db/repo builds K-05 v1.19's readKindCatalog (item 78) and rea…
   - `f043ca5` T-1458: the test starts each catalog read only once the one before it…
@@ -1028,7 +1188,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 777. T-1462: the roster-owner seed writes each roster business's business\_setup row with control not proven (DL-964) (\#788)
 
-- **Commit:** [`9722db0`](https://github.com/aryamahadik/rosie/commit/9722db0), by Arya Mahadik, 2026-11-18 16:29:00 UTC
+- **Commit:** [`9722db0e`](https://github.com/aryamahadik/rosie/commit/9722db0e), by Arya Mahadik, 2026-11-18 16:29:00 UTC
 - **Pull request:** [#788](https://github.com/aryamahadik/rosie/pull/788) from `task/T-1462`, merged 2026-11-18 16:29:00 UTC. It squashed 2 branch commits:
   - `0310238` T-1462: the roster-owner seed writes each roster business's business\_…
   - `5a25eb1` T-1462: the seed script test's --set roster-owner case counts seven t…
@@ -1056,7 +1216,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 776. docs: COMMIT\_HISTORY.md through commit 774 (c46b073, \#785) (\#787)
 
-- **Commit:** [`7a00bad`](https://github.com/aryamahadik/rosie/commit/7a00bad), by Arya Mahadik, 2026-11-18 12:05:11 UTC
+- **Commit:** [`7a00bade`](https://github.com/aryamahadik/rosie/commit/7a00bade), by Arya Mahadik, 2026-11-18 12:05:11 UTC
 - **Pull request:** [#787](https://github.com/aryamahadik/rosie/pull/787) from `task/commit-history-175`, merged 2026-11-18 12:05:12 UTC. It squashed 1 branch commit:
   - `d6fc871` docs: COMMIT\_HISTORY.md through commit 774 (c46b073, \#785)
 - **Files changed:** 1 (+46 −1), by folder:
@@ -1074,7 +1234,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 775. T-1459: limit 1 passes a sign-up's own answers (default 14, DL-961): until the business's control is proven, an S1 option about no booking that answers an open question stored for the sender, live on this turn's handle at the call's business and gone out to it, from a sender linked to that handle, is the sender's own record (proven by the one rule); settings alone (no stake of any kind, no team, owner-only or live step: LIVE\_STEPS S1-29, S1-35); its facts from one readTurnState on the call's transaction (SignUpFacts, signUpFactsOver); any fact missing or unreadable answers as today; unit tests on commit-s1-02.json (5 passing cases, 37 as-today cases, the door and own records unchanged) and one integration case (rosie\_job passes; control proven and no business\_setup row as today; rosie\_app refused 42501) (\#786)
 
-- **Commit:** [`6a5e426`](https://github.com/aryamahadik/rosie/commit/6a5e426), by Arya Mahadik, 2026-11-18 12:05:07 UTC
+- **Commit:** [`6a5e4265`](https://github.com/aryamahadik/rosie/commit/6a5e4265), by Arya Mahadik, 2026-11-18 12:05:07 UTC
 - **Pull request:** [#786](https://github.com/aryamahadik/rosie/pull/786) from `task/T-1459`, merged 2026-11-18 12:05:07 UTC. It squashed 1 branch commit:
   - `18cc3b9` T-1459: limit 1 passes a sign-up's own answers (default 14, DL-961): …
 - **Files changed:** 6 (+1147 −10), by folder:
@@ -1091,7 +1251,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 774. docs: COMMIT\_HISTORY.md through commit 772 (6715e5c, \#783) (\#785)
 
-- **Commit:** [`c46b073`](https://github.com/aryamahadik/rosie/commit/c46b073), by Arya Mahadik, 2026-11-18 10:57:59 UTC
+- **Commit:** [`c46b0736`](https://github.com/aryamahadik/rosie/commit/c46b0736), by Arya Mahadik, 2026-11-18 10:57:59 UTC
 - **Pull request:** [#785](https://github.com/aryamahadik/rosie/pull/785) from `task/commit-history-174`, merged 2026-11-18 10:58:00 UTC. It squashed 1 branch commit:
   - `81810fc` docs: COMMIT\_HISTORY.md through commit 772 (6715e5c, \#783)
 - **Files changed:** 1 (+88 −1), by folder:
@@ -1109,7 +1269,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 773. T-1438: the frontier reads setup facts through db/repo/setup/turn-state's readTurnStateIn (DL-927) (\#784)
 
-- **Commit:** [`9ed8a62`](https://github.com/aryamahadik/rosie/commit/9ed8a62), by Arya Mahadik, 2026-11-18 10:57:55 UTC
+- **Commit:** [`9ed8a62f`](https://github.com/aryamahadik/rosie/commit/9ed8a62f), by Arya Mahadik, 2026-11-18 10:57:55 UTC
 - **Pull request:** [#784](https://github.com/aryamahadik/rosie/pull/784) from `task/T-1438`, merged 2026-11-18 10:57:55 UTC. It squashed 2 branch commits:
   - `b175452` T-1438: the frontier reads setup facts: pgFrontierRepo reads through …
   - `964c73c` T-1438: frontier.int.test.ts: the refusal's statement filter uses Str…
@@ -1136,7 +1296,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 772. docs: COMMIT\_HISTORY.md through commit 769 (e1edd4c, \#780) (\#783)
 
-- **Commit:** [`6715e5c`](https://github.com/aryamahadik/rosie/commit/6715e5c), by Arya Mahadik, 2026-11-18 10:23:21 UTC
+- **Commit:** [`6715e5c5`](https://github.com/aryamahadik/rosie/commit/6715e5c5), by Arya Mahadik, 2026-11-18 10:23:21 UTC
 - **Pull request:** [#783](https://github.com/aryamahadik/rosie/pull/783) from `task/commit-history-173`, merged 2026-11-18 10:23:21 UTC. It squashed 1 branch commit:
   - `09c82a4` docs: COMMIT\_HISTORY.md through commit 769 (e1edd4c, \#780)
 - **Files changed:** 1 (+48 −1), by folder:
@@ -1154,7 +1314,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 771. T-1457: the gate reads an open question as rosie\_app through one narrow definer function (0037; DL-950) (\#782)
 
-- **Commit:** [`1bc48a5`](https://github.com/aryamahadik/rosie/commit/1bc48a5), by Arya Mahadik, 2026-11-18 10:23:17 UTC
+- **Commit:** [`1bc48a59`](https://github.com/aryamahadik/rosie/commit/1bc48a59), by Arya Mahadik, 2026-11-18 10:23:17 UTC
 - **Pull request:** [#782](https://github.com/aryamahadik/rosie/pull/782) from `task/T-1457`, merged 2026-11-18 10:23:18 UTC. It squashed 2 branch commits:
   - `1b06f43` T-1457: the open questions' read as rosie\_app: migration 0037's secur…
   - `c955233` T-1457: money.int.test.ts's pinned migration list gains 0037 (a pin-o…
@@ -1182,7 +1342,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 770. T-1455: K-05 v1.19, the kind catalog and the owner's picked kinds (DL-949, DL-954, DL-958) (\#781)
 
-- **Commit:** [`6b70a79`](https://github.com/aryamahadik/rosie/commit/6b70a79), by Arya Mahadik, 2026-11-18 10:23:14 UTC
+- **Commit:** [`6b70a792`](https://github.com/aryamahadik/rosie/commit/6b70a792), by Arya Mahadik, 2026-11-18 10:23:14 UTC
 - **Pull request:** [#781](https://github.com/aryamahadik/rosie/pull/781) from `task/T-1455`, merged 2026-11-18 10:23:14 UTC. It squashed 5 branch commits:
   - `5852f7a` T-1455: K-05 v1.19, frozen: readKindCatalog (item 78: the kind matche…
   - `cb04dd8` T-1455: README section v1.19, the tests on this branch: tests/contrac…
@@ -1223,7 +1383,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 769. docs: COMMIT\_HISTORY.md through commit 767 (b3918c1, \#778) (\#780)
 
-- **Commit:** [`e1edd4c`](https://github.com/aryamahadik/rosie/commit/e1edd4c), by Arya Mahadik, 2026-11-18 09:09:09 UTC
+- **Commit:** [`e1edd4c2`](https://github.com/aryamahadik/rosie/commit/e1edd4c2), by Arya Mahadik, 2026-11-18 09:09:09 UTC
 - **Pull request:** [#780](https://github.com/aryamahadik/rosie/pull/780) from `task/commit-history-172`, merged 2026-11-18 09:09:10 UTC. It squashed 1 branch commit:
   - `b262357` docs: COMMIT\_HISTORY.md through commit 767 (b3918c1, \#778)
 - **Files changed:** 1 (+37 −1), by folder:
@@ -1241,7 +1401,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 768. T-1454: a STOP read as danger is still recorded (card E, DL-944, DL-952) (\#779)
 
-- **Commit:** [`5a12dde`](https://github.com/aryamahadik/rosie/commit/5a12dde), by Arya Mahadik, 2026-11-18 09:09:05 UTC
+- **Commit:** [`5a12ddeb`](https://github.com/aryamahadik/rosie/commit/5a12ddeb), by Arya Mahadik, 2026-11-18 09:09:05 UTC
 - **Pull request:** [#779](https://github.com/aryamahadik/rosie/pull/779) from `task/T-1454`, merged 2026-11-18 09:09:05 UTC. It squashed 3 branch commits:
   - `4e2eca0` T-1454: in a turn holding a stop word, the core-only commit under the…
   - `6cfd41c` Merge branch 'main' into task/T-1454
@@ -1270,7 +1430,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 767. docs: COMMIT\_HISTORY.md through commit 765 (dd9eb08, \#775) (\#778)
 
-- **Commit:** [`b3918c1`](https://github.com/aryamahadik/rosie/commit/b3918c1), by Arya Mahadik, 2026-11-18 07:16:14 UTC
+- **Commit:** [`b3918c14`](https://github.com/aryamahadik/rosie/commit/b3918c14), by Arya Mahadik, 2026-11-18 07:16:14 UTC
 - **Pull request:** [#778](https://github.com/aryamahadik/rosie/pull/778) from `task/commit-history-171`, merged 2026-11-18 07:16:15 UTC. It squashed 1 branch commit:
   - `f3c277d` docs: COMMIT\_HISTORY.md through commit 765 (dd9eb08, \#775)
 - **Files changed:** 1 (+77 −1), by folder:
@@ -1288,7 +1448,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 766. T-1456: staging's real-line Linq verify places receipts: chatHandle bound to db/repo's readChatHandle on the root's handle (workerRoot makes its one handle and hands it to stagingOptions and the verify input; HYPERDRIVE\_JOB's presence read once), so a known chat's signed receipt is its K-06 event (200) and an unknown chat or a transient read stays 503 receiptHandleUnknown; the gateway's failure line names a LinqWebhookError's code (one of its four labels) beside its name, any other error its name alone; unit tests for the lookup, the gateway path (written then duplicate, unknown and transient 503, main's input 503, other receipts placed, texts and the page's events unchanged) and logFailure; a Workers case for workerRoot's runtime-side lookup (\#777)
 
-- **Commit:** [`1e6d075`](https://github.com/aryamahadik/rosie/commit/1e6d075), by Arya Mahadik, 2026-11-18 07:16:10 UTC
+- **Commit:** [`1e6d075e`](https://github.com/aryamahadik/rosie/commit/1e6d075e), by Arya Mahadik, 2026-11-18 07:16:10 UTC
 - **Pull request:** [#777](https://github.com/aryamahadik/rosie/pull/777) from `task/T-1456`, merged 2026-11-18 07:16:10 UTC. It squashed 1 branch commit:
   - `33349f4` T-1456: staging's real-line Linq verify places receipts: chatHandle b…
 - **Files changed:** 6 (+1120 −15), by folder:
@@ -1306,7 +1466,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 765. docs: COMMIT\_HISTORY.md through commit 762 (273d59b, \#773) (\#775)
 
-- **Commit:** [`dd9eb08`](https://github.com/aryamahadik/rosie/commit/dd9eb08), by Arya Mahadik, 2026-11-18 06:29:27 UTC
+- **Commit:** [`dd9eb089`](https://github.com/aryamahadik/rosie/commit/dd9eb089), by Arya Mahadik, 2026-11-18 06:29:27 UTC
 - **Pull request:** [#775](https://github.com/aryamahadik/rosie/pull/775) from `task/commit-history-170`, merged 2026-11-18 06:29:27 UTC. It squashed 1 branch commit:
   - `9cdd6d4` docs: COMMIT\_HISTORY.md through commit 762 (273d59b, \#773)
 - **Files changed:** 1 (+64 −1), by folder:
@@ -1324,7 +1484,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 764. T-1448: limit 4's reload re-reads a setup row an open question's versions\_read names, inside the stored question row's bound (its business; the people of its turn's handle; never the request's), through rowBound; a moved row shows changed, a row outside the bound reads as gone; core rows unchanged; limit-4 tests: 3 unit and 5 integration cases (\#774)
 
-- **Commit:** [`1d2c009`](https://github.com/aryamahadik/rosie/commit/1d2c009), by Arya Mahadik, 2026-11-18 06:29:23 UTC
+- **Commit:** [`1d2c0092`](https://github.com/aryamahadik/rosie/commit/1d2c0092), by Arya Mahadik, 2026-11-18 06:29:23 UTC
 - **Pull request:** [#774](https://github.com/aryamahadik/rosie/pull/774) from `task/T-1448`, merged 2026-11-18 06:29:23 UTC. It squashed 2 branch commits:
   - `da1163f` T-1448: limit 4's reload re-reads an open question's setup rows withi…
   - `7161543` T-1448: bound.test.ts's business-bound double reads the row through a…
@@ -1352,7 +1512,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 763. T-1450: the roster phone as a test owner on staging: db/seeds/roster-owner.ts gives each STAGING\_LINQ\_ALLOWLIST number tp-01's test-owner rows under a test business of its own (its first-sight handle's one person adopted; exactly openChatOnText's untouched phone row accepted, a stopped one never), run only when named by seed-staging.sh with the list on that run's line alone; every refusal writes nothing; roster-owner tests 28/28 (\#776)
 
-- **Commit:** [`085dd0b`](https://github.com/aryamahadik/rosie/commit/085dd0b), by Arya Mahadik, 2026-11-18 06:29:19 UTC
+- **Commit:** [`085dd0bd`](https://github.com/aryamahadik/rosie/commit/085dd0bd), by Arya Mahadik, 2026-11-18 06:29:19 UTC
 - **Pull request:** [#776](https://github.com/aryamahadik/rosie/pull/776) from `task/T-1450`, merged 2026-11-18 06:29:20 UTC. It squashed 3 branch commits:
   - `2d2480b` T-1450: roster-owner seed set (each STAGING\_LINQ\_ALLOWLIST phone gets…
   - `53d0752` Merge branch 'main' into task/T-1450
@@ -1382,7 +1542,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 762. docs: COMMIT\_HISTORY.md through commit 759 (ad90046, \#770) (\#773)
 
-- **Commit:** [`273d59b`](https://github.com/aryamahadik/rosie/commit/273d59b), by Arya Mahadik, 2026-11-18 05:38:25 UTC
+- **Commit:** [`273d59b7`](https://github.com/aryamahadik/rosie/commit/273d59b7), by Arya Mahadik, 2026-11-18 05:38:25 UTC
 - **Pull request:** [#773](https://github.com/aryamahadik/rosie/pull/773) from `task/commit-history-169`, merged 2026-11-18 05:38:25 UTC. It squashed 1 branch commit:
   - `b434377` docs: COMMIT\_HISTORY.md through commit 759 (ad90046, \#770)
 - **Files changed:** 1 (+52 −1), by folder:
@@ -1400,7 +1560,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 761. T-1447: handOff checks K-36 rule 5 (its kind is its safety read's, refused as kindNotItsRead before any write; a read not shown answers notFound, another business's is otherBusiness); the emergency and threat hand-off summaries are their owner lines word for word (K-36 seed-page-acknowledged.json; A3-48 with the business's display name), with no read id, which stays in team\_pages.summary (\#772)
 
-- **Commit:** [`c6ff87f`](https://github.com/aryamahadik/rosie/commit/c6ff87f), by Arya Mahadik, 2026-11-18 05:38:21 UTC
+- **Commit:** [`c6ff87ff`](https://github.com/aryamahadik/rosie/commit/c6ff87ff), by Arya Mahadik, 2026-11-18 05:38:21 UTC
 - **Pull request:** [#772](https://github.com/aryamahadik/rosie/pull/772) from `task/T-1447`, merged 2026-11-18 05:38:21 UTC. It squashed 1 branch commit:
   - `99f37bc` T-1447: handOff checks K-36 rule 5 (its kind is its safety read's, re…
 - **Files changed:** 7 (+458 −69), by folder:
@@ -1416,7 +1576,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 760. T-1437: a clock's firing compares, locks and writes two-column and person-bound setup rows as a turn's commit does: one shared rule (fact-homes.ts rowBound; the copy deleted), inserts and an update's row as it will stand checked before any write, business moves refused before any write; commitTurn unchanged; clocks.int.test.ts: 5 new cases (\#771)
 
-- **Commit:** [`0e4f6c3`](https://github.com/aryamahadik/rosie/commit/0e4f6c3), by Arya Mahadik, 2026-11-18 05:38:16 UTC
+- **Commit:** [`0e4f6c31`](https://github.com/aryamahadik/rosie/commit/0e4f6c31), by Arya Mahadik, 2026-11-18 05:38:16 UTC
 - **Pull request:** [#771](https://github.com/aryamahadik/rosie/pull/771) from `task/T-1437`, merged 2026-11-18 05:38:17 UTC. It squashed 4 branch commits:
   - `2064533` T-1437: fireClock compares and writes two-column and person-bound set…
   - `7e8b71c` Merge branch 'main' into task/T-1437
@@ -1445,7 +1605,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 759. docs: COMMIT\_HISTORY.md through commit 756 (17d358e, \#767) (\#770)
 
-- **Commit:** [`ad90046`](https://github.com/aryamahadik/rosie/commit/ad90046), by Arya Mahadik, 2026-11-18 03:51:45 UTC
+- **Commit:** [`ad900466`](https://github.com/aryamahadik/rosie/commit/ad900466), by Arya Mahadik, 2026-11-18 03:51:45 UTC
 - **Pull request:** [#770](https://github.com/aryamahadik/rosie/pull/770) from `task/commit-history-168`, merged 2026-11-18 03:51:46 UTC. It squashed 1 branch commit:
   - `86c6f5a` docs: COMMIT\_HISTORY.md through commit 756 (17d358e, \#767)
 - **Files changed:** 1 (+67 −1), by folder:
@@ -1461,7 +1621,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 758. T-1453: realGate awaits the adapter's checkPin for the run's pinned bundle before the face runs (GateWords.checkPin on staging's words; a refused bundle resolves, an unreadable one fails the gate as a read); Workers tests: a rerun in a fresh isolate (notBuilt on main), a warm isolate, a failed check, a refused bundle, no adapter and no reads unchanged (\#769)
 
-- **Commit:** [`2e67887`](https://github.com/aryamahadik/rosie/commit/2e67887), by Arya Mahadik, 2026-11-18 03:51:41 UTC
+- **Commit:** [`2e67887d`](https://github.com/aryamahadik/rosie/commit/2e67887d), by Arya Mahadik, 2026-11-18 03:51:41 UTC
 - **Pull request:** [#769](https://github.com/aryamahadik/rosie/pull/769) from `task/T-1453`, merged 2026-11-18 03:51:41 UTC. It squashed 1 branch commit:
   - `85aaf30` T-1453: realGate awaits the adapter's checkPin for the run's pinned b…
 - **Files changed:** 3 (+545 −12), by folder:
@@ -1478,7 +1638,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 757. T-1452: staging-only reset of a listed test handle's actor: the reset list (tp-01 and the real line's allow-list, read at each call), its hook set only by staging's root, run at the start of each alarm and hand-off for a target not yet applied, deferred while a lease is live, a read is out, a text waits, PostgreSQL is known down or a stop-rank write waits; one transaction deleting what ADR-017 section 5's forget deletes plus each open outcome hold, keeping the marker, the stopped copies, the stop-rank writes, the bundle's and timers' copies, the newest lease turn emptied, sqlite\_sequence and the platform's tables; the safety read built again with no name, the alarm re-armed, one log line of labels and counts (\#768)
 
-- **Commit:** [`e4c7b02`](https://github.com/aryamahadik/rosie/commit/e4c7b02), by Arya Mahadik, 2026-11-18 03:51:37 UTC
+- **Commit:** [`e4c7b026`](https://github.com/aryamahadik/rosie/commit/e4c7b026), by Arya Mahadik, 2026-11-18 03:51:37 UTC
 - **Pull request:** [#768](https://github.com/aryamahadik/rosie/pull/768) from `task/T-1452`, merged 2026-11-18 03:51:38 UTC. It squashed 1 branch commit:
   - `3e28032` T-1452: staging-only reset of a listed test handle's actor: the reset…
 - **Files changed:** 7 (+1988 −4), by folder:
@@ -1496,7 +1656,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 756. docs: COMMIT\_HISTORY.md through commit 753 (67f851b, \#764) (\#767)
 
-- **Commit:** [`17d358e`](https://github.com/aryamahadik/rosie/commit/17d358e), by Arya Mahadik, 2026-11-18 02:47:48 UTC
+- **Commit:** [`17d358eb`](https://github.com/aryamahadik/rosie/commit/17d358eb), by Arya Mahadik, 2026-11-18 02:47:48 UTC
 - **Pull request:** [#767](https://github.com/aryamahadik/rosie/pull/767) from `task/commit-history-167`, merged 2026-11-18 02:47:48 UTC. It squashed 1 branch commit:
   - `04d727f` docs: COMMIT\_HISTORY.md through commit 753 (67f851b, \#764)
 - **Files changed:** 1 (+89 −1), by folder:
@@ -1512,7 +1672,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 755. T-1442: a K-36 state write naming a clock or outbox row of its own commit is written after those rows (commitIn's write order, default 17), with the hand-off, repeating page and refusal cases in commit-turn.int.test.ts (\#766)
 
-- **Commit:** [`2b06275`](https://github.com/aryamahadik/rosie/commit/2b06275), by Arya Mahadik, 2026-11-18 02:47:44 UTC
+- **Commit:** [`2b06275a`](https://github.com/aryamahadik/rosie/commit/2b06275a), by Arya Mahadik, 2026-11-18 02:47:44 UTC
 - **Pull request:** [#766](https://github.com/aryamahadik/rosie/pull/766) from `task/T-1442`, merged 2026-11-18 02:47:44 UTC. It squashed 1 branch commit:
   - `be26799` T-1442: a K-36 state write naming a clock or outbox row of its own co…
 - **Files changed:** 2 (+707 −4), by folder:
@@ -1528,7 +1688,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 754. T-1436: send-state reads the setup rows versions\_read names, through one shared rowBound (round 2) (\#765)
 
-- **Commit:** [`ee4eefb`](https://github.com/aryamahadik/rosie/commit/ee4eefb), by Arya Mahadik, 2026-11-18 02:47:39 UTC
+- **Commit:** [`ee4eefbd`](https://github.com/aryamahadik/rosie/commit/ee4eefbd), by Arya Mahadik, 2026-11-18 02:47:39 UTC
 - **Pull request:** [#765](https://github.com/aryamahadik/rosie/pull/765) from `task/T-1436`, merged 2026-11-18 02:47:39 UTC. It squashed 4 branch commits:
   - `ff85f9d` T-1436: sendState reads the setup rows an outbox row's versions\_read …
   - `f4a935d` T-1436: the every-home test names its business plainly (lint: no-unne…
@@ -1562,7 +1722,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 753. docs: COMMIT\_HISTORY.md through commit 750 (180b57d, \#761) (\#764)
 
-- **Commit:** [`67f851b`](https://github.com/aryamahadik/rosie/commit/67f851b), by Arya Mahadik, 2026-11-18 02:05:32 UTC
+- **Commit:** [`67f851b8`](https://github.com/aryamahadik/rosie/commit/67f851b8), by Arya Mahadik, 2026-11-18 02:05:32 UTC
 - **Pull request:** [#764](https://github.com/aryamahadik/rosie/pull/764) from `task/commit-history-166`, merged 2026-11-18 02:05:33 UTC. It squashed 1 branch commit:
   - `9c2c8c6` docs: COMMIT\_HISTORY.md through commit 750 (180b57d, \#761)
 - **Files changed:** 1 (+64 −1), by folder:
@@ -1578,7 +1738,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 752. T-1439: the first-side lint (rename pairs whose first side matches no master text) and C7's FIRST\_SIDES held to master text (\#763)
 
-- **Commit:** [`d0d3858`](https://github.com/aryamahadik/rosie/commit/d0d3858), by Arya Mahadik, 2026-11-18 02:05:28 UTC
+- **Commit:** [`d0d38580`](https://github.com/aryamahadik/rosie/commit/d0d38580), by Arya Mahadik, 2026-11-18 02:05:28 UTC
 - **Pull request:** [#763](https://github.com/aryamahadik/rosie/pull/763) from `task/T-1439`, merged 2026-11-18 02:05:28 UTC. It squashed 4 branch commits:
   - `f65b294` T-1439: list rename and swap pairs whose first side matches no master…
   - `7811e29` T-1439: braces for two forEach callbacks and no needless cast in the …
@@ -1612,7 +1772,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 751. T-1433: the catalog's cross-row checks (a) to (i) before any write, the widened read port bound in catalog/pg (\#762)
 
-- **Commit:** [`d0a9bc5`](https://github.com/aryamahadik/rosie/commit/d0a9bc5), by Arya Mahadik, 2026-11-18 02:05:24 UTC
+- **Commit:** [`d0a9bc5d`](https://github.com/aryamahadik/rosie/commit/d0a9bc5d), by Arya Mahadik, 2026-11-18 02:05:24 UTC
 - **Pull request:** [#762](https://github.com/aryamahadik/rosie/pull/762) from `task/T-1433`, merged 2026-11-18 02:05:24 UTC. It squashed 4 branch commits:
   - `c3612d7` T-1433: the catalog's cross-row checks through K-05 v1.18's reads (de…
   - `edbcf2f` T-1433: lint fixes (optional chains in checks.ts, braced void checks …
@@ -1650,7 +1810,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 750. docs: COMMIT\_HISTORY.md through commit 747 (cd7deae, \#758) (\#761)
 
-- **Commit:** [`180b57d`](https://github.com/aryamahadik/rosie/commit/180b57d), by Arya Mahadik, 2026-11-17 23:13:18 UTC
+- **Commit:** [`180b57d1`](https://github.com/aryamahadik/rosie/commit/180b57d1), by Arya Mahadik, 2026-11-17 23:13:18 UTC
 - **Pull request:** [#761](https://github.com/aryamahadik/rosie/pull/761) from `task/commit-history-165`, merged 2026-11-17 23:13:18 UTC. It squashed 1 branch commit:
   - `2b58723` docs: COMMIT\_HISTORY.md through commit 747 (cd7deae, \#758)
 - **Files changed:** 1 (+44 −1), by folder:
@@ -1666,7 +1826,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 749. T-572: D-018 staging on the real Linq line (STAGING\_LINQ\_LINE, the secrets by name, linq-staging-check.sh's check and --create) (\#760)
 
-- **Commit:** [`0d097e8`](https://github.com/aryamahadik/rosie/commit/0d097e8), by Arya Mahadik, 2026-11-17 23:13:14 UTC
+- **Commit:** [`0d097e88`](https://github.com/aryamahadik/rosie/commit/0d097e88), by Arya Mahadik, 2026-11-17 23:13:14 UTC
 - **Pull request:** [#760](https://github.com/aryamahadik/rosie/pull/760) from `task/T-572`, merged 2026-11-17 23:13:14 UTC. It squashed 2 branch commits:
   - `e22b874` T-572: D-018's switch STAGING\_LINQ\_LINE real in env.staging; Linq's k…
   - `bda148c` T-572: the switch's broken-copy test deletes the var by its literal n…
@@ -1695,7 +1855,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 748. T-1449: staging's real Linq line beside the test-phone line: STAGING\_LINQ\_LINE exactly real on staging routes a part to a test phone to the test-phone line and every other part through guardLinqSender(createLinqSender({ env }), { env }); the Linq verify takes LINQ\_WEBHOOK\_SECRET from any sender and TEST\_PHONE\_WEBHOOK\_SECRET only from a test phone, which the page now signs with; off, every path as before; adapters exports ./linq/send and ./linq/roster (\#759)
 
-- **Commit:** [`485c726`](https://github.com/aryamahadik/rosie/commit/485c726), by Arya Mahadik, 2026-11-17 23:13:09 UTC
+- **Commit:** [`485c726e`](https://github.com/aryamahadik/rosie/commit/485c726e), by Arya Mahadik, 2026-11-17 23:13:09 UTC
 - **Pull request:** [#759](https://github.com/aryamahadik/rosie/pull/759) from `task/T-1449`, merged 2026-11-17 23:13:10 UTC. It squashed 1 branch commit:
   - `fb2a02f` T-1449: staging's real Linq line beside the test-phone line: STAGING\_…
 - **Files changed:** 10 (+1569 −23), by folder:
@@ -1713,7 +1873,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 747. docs: COMMIT\_HISTORY.md through commit 745 (3452a12, \#756) (\#758)
 
-- **Commit:** [`cd7deae`](https://github.com/aryamahadik/rosie/commit/cd7deae), by Arya Mahadik, 2026-11-17 22:23:38 UTC
+- **Commit:** [`cd7deaec`](https://github.com/aryamahadik/rosie/commit/cd7deaec), by Arya Mahadik, 2026-11-17 22:23:38 UTC
 - **Pull request:** [#758](https://github.com/aryamahadik/rosie/pull/758) from `task/commit-history-164`, merged 2026-11-17 22:23:39 UTC. It squashed 1 branch commit:
   - `c9d73dd` docs: COMMIT\_HISTORY.md through commit 745 (3452a12, \#756)
 - **Files changed:** 1 (+78 −1), by folder:
@@ -1729,7 +1889,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 746. T-417: the Linq live-check script for staging (one roster send, one signed inbound; stubbed, never live) (\#757)
 
-- **Commit:** [`f763ebf`](https://github.com/aryamahadik/rosie/commit/f763ebf), by Arya Mahadik, 2026-11-17 22:23:34 UTC
+- **Commit:** [`f763ebf5`](https://github.com/aryamahadik/rosie/commit/f763ebf5), by Arya Mahadik, 2026-11-17 22:23:34 UTC
 - **Pull request:** [#757](https://github.com/aryamahadik/rosie/pull/757) from `task/T-417`, merged 2026-11-17 22:23:34 UTC. It squashed 2 branch commits:
   - `9d9c085` T-417: the Linq live check for staging (run.mjs): one roster send thr…
   - `698f8ec` T-417: offRosterNumber's comment names the fiction block without a di…
@@ -1756,7 +1916,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 745. docs: COMMIT\_HISTORY.md through commit 741 (8f40a70, \#752) (\#756)
 
-- **Commit:** [`3452a12`](https://github.com/aryamahadik/rosie/commit/3452a12), by Arya Mahadik, 2026-11-17 12:52:38 UTC
+- **Commit:** [`3452a126`](https://github.com/aryamahadik/rosie/commit/3452a126), by Arya Mahadik, 2026-11-17 12:52:38 UTC
 - **Pull request:** [#756](https://github.com/aryamahadik/rosie/pull/756) from `task/commit-history-163`, merged 2026-11-17 12:52:38 UTC. It squashed 1 branch commit:
   - `f418038` docs: COMMIT\_HISTORY.md through commit 741 (8f40a70, \#752)
 - **Files changed:** 1 (+106 −1), by folder:
@@ -1772,7 +1932,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 744. T-1434: K-05 v1.18's contract test: its fixture part and its database side (data-access.v1.18.test.ts, data-access.v1.18.db-side.test.ts); v1.18 added to WRITTEN\_FOR with its nine mends, C-096 and C-082 added to SIDE\_CHECKS (\#754)
 
-- **Commit:** [`a6249a6`](https://github.com/aryamahadik/rosie/commit/a6249a6), by Arya Mahadik, 2026-11-17 12:52:33 UTC
+- **Commit:** [`a6249a6f`](https://github.com/aryamahadik/rosie/commit/a6249a6f), by Arya Mahadik, 2026-11-17 12:52:33 UTC
 - **Pull request:** [#754](https://github.com/aryamahadik/rosie/pull/754) from `task/T-1434`, merged 2026-11-17 12:52:34 UTC. It squashed 1 branch commit:
   - `dfede45` T-1434: K-05 v1.18's contract test: its fixture part and its database…
 - **Files changed:** 3 (+1756 −2), by folder:
@@ -1788,7 +1948,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 743. T-1440: CI runs the Linq live probe's own test (its key and number scan of the recorded samples) (\#753)
 
-- **Commit:** [`c1853ee`](https://github.com/aryamahadik/rosie/commit/c1853ee), by Arya Mahadik, 2026-11-17 12:52:28 UTC
+- **Commit:** [`c1853ee3`](https://github.com/aryamahadik/rosie/commit/c1853ee3), by Arya Mahadik, 2026-11-17 12:52:28 UTC
 - **Pull request:** [#753](https://github.com/aryamahadik/rosie/pull/753) from `task/T-1440`, merged 2026-11-17 12:52:29 UTC. It squashed 2 branch commits:
   - `5f4f187` T-1440: CI runs the Linq probe's own test (npm run test:linq-probe) a…
   - `485d08e` T-1440: the local merge-check's run fixtures give test:linq-probe a r…
@@ -1817,7 +1977,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 742. T-416: the staging roster allow-list in front of the real Linq line: on staging, T-414's send, T-415's contact add and capability check reach Linq only for a number on STAGING\_LINQ\_ALLOWLIST that is not ROSIE\_NUMBER; missing, empty or ill-formed roster or line fails closed; refusals logged with at most the last 2 digits; off staging nothing changes (\#755)
 
-- **Commit:** [`ec5a089`](https://github.com/aryamahadik/rosie/commit/ec5a089), by Arya Mahadik, 2026-11-17 12:52:23 UTC
+- **Commit:** [`ec5a0891`](https://github.com/aryamahadik/rosie/commit/ec5a0891), by Arya Mahadik, 2026-11-17 12:52:23 UTC
 - **Pull request:** [#755](https://github.com/aryamahadik/rosie/pull/755) from `task/T-416`, merged 2026-11-17 12:52:24 UTC. It squashed 1 branch commit:
   - `7acbd18` T-416: the staging roster allow-list in front of the real Linq line: …
 - **Files changed:** 3 (+1136 −0), by folder:
@@ -1833,7 +1993,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 741. docs: COMMIT\_HISTORY.md through commit 737 (6a6e33b, \#748) (\#752)
 
-- **Commit:** [`8f40a70`](https://github.com/aryamahadik/rosie/commit/8f40a70), by Arya Mahadik, 2026-11-17 11:44:31 UTC
+- **Commit:** [`8f40a704`](https://github.com/aryamahadik/rosie/commit/8f40a704), by Arya Mahadik, 2026-11-17 11:44:31 UTC
 - **Pull request:** [#752](https://github.com/aryamahadik/rosie/pull/752) from `task/commit-history-162`, merged 2026-11-17 11:44:31 UTC. It squashed 1 branch commit:
   - `e703ffd` docs: COMMIT\_HISTORY.md through commit 737 (6a6e33b, \#748)
 - **Files changed:** 1 (+70 −1), by folder:
@@ -1849,7 +2009,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 740. T-1429: bind the catalog's read port and limit 2's owner rules to K-05 v1.18's reads on PostgreSQL (\#751)
 
-- **Commit:** [`9c7e30a`](https://github.com/aryamahadik/rosie/commit/9c7e30a), by Arya Mahadik, 2026-11-17 11:44:26 UTC
+- **Commit:** [`9c7e30ae`](https://github.com/aryamahadik/rosie/commit/9c7e30ae), by Arya Mahadik, 2026-11-17 11:44:26 UTC
 - **Pull request:** [#751](https://github.com/aryamahadik/rosie/pull/751) from `task/T-1429`, merged 2026-11-17 11:44:27 UTC. It squashed 1 branch commit:
   - `c590184` T-1429: bind the catalog's read port and limit 2's owner rules to K-0…
 - **Files changed:** 10 (+1716 −5), by folder:
@@ -1869,7 +2029,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 739. T-319: the safety and hand-offs service: paging Rosie's team, acknowledgements, hand-offs, review items (\#750)
 
-- **Commit:** [`b0dc352`](https://github.com/aryamahadik/rosie/commit/b0dc352), by Arya Mahadik, 2026-11-17 11:44:22 UTC
+- **Commit:** [`b0dc352a`](https://github.com/aryamahadik/rosie/commit/b0dc352a), by Arya Mahadik, 2026-11-17 11:44:22 UTC
 - **Pull request:** [#750](https://github.com/aryamahadik/rosie/pull/750) from `task/T-319`, merged 2026-11-17 11:44:22 UTC. It squashed 3 branch commits:
   - `5950e97` T-319: paging and hand-offs service (pageTeam, acknowledgePage, handO…
   - `f4b911b` Merge branch 'main' into worktree-wf\_66cb49e2-bf7-1
@@ -1899,7 +2059,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 738. T-1435: while verify is off, the corrections layer drops the check claims from T-140's six MESSAGES\_NEED messages (MC:C7) (\#749)
 
-- **Commit:** [`0051847`](https://github.com/aryamahadik/rosie/commit/0051847), by Arya Mahadik, 2026-11-17 11:44:18 UTC
+- **Commit:** [`00518478`](https://github.com/aryamahadik/rosie/commit/00518478), by Arya Mahadik, 2026-11-17 11:44:18 UTC
 - **Pull request:** [#749](https://github.com/aryamahadik/rosie/pull/749) from `task/T-1435`, merged 2026-11-17 11:44:18 UTC. It squashed 4 branch commits:
   - `a43d84b` T-1435: a scratch file for a read-only scan, removed by the next commit
   - `3326c7d` Revert "T-1435: a scratch file for a read-only scan, removed by the n…
@@ -1938,7 +2098,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 737. docs: COMMIT\_HISTORY.md through commit 735 (dc02106, \#746) (\#748)
 
-- **Commit:** [`6a6e33b`](https://github.com/aryamahadik/rosie/commit/6a6e33b), by Arya Mahadik, 2026-11-17 11:05:41 UTC
+- **Commit:** [`6a6e33b9`](https://github.com/aryamahadik/rosie/commit/6a6e33b9), by Arya Mahadik, 2026-11-17 11:05:41 UTC
 - **Pull request:** [#748](https://github.com/aryamahadik/rosie/pull/748) from `task/commit-history-161`, merged 2026-11-17 11:05:42 UTC. It squashed 1 branch commit:
   - `84c57eb` docs: COMMIT\_HISTORY.md through commit 735 (dc02106, \#746)
 - **Files changed:** 1 (+45 −1), by folder:
@@ -1954,7 +2114,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 736. T-667: setup-part fact reads with row and version, and the setup tables as commit write targets (\#747)
 
-- **Commit:** [`1d78ff2`](https://github.com/aryamahadik/rosie/commit/1d78ff2), by Arya Mahadik, 2026-11-17 11:05:38 UTC
+- **Commit:** [`1d78ff29`](https://github.com/aryamahadik/rosie/commit/1d78ff29), by Arya Mahadik, 2026-11-17 11:05:38 UTC
 - **Pull request:** [#747](https://github.com/aryamahadik/rosie/pull/747) from `task/T-667`, merged 2026-11-17 11:05:38 UTC. It squashed 9 branch commits:
   - `8fb5c1b` T-667: setup-part facts in readTurnState (db/repo/setup) and the setu…
   - `63a2af1` Merge branch 'main' into task/T-667
@@ -2007,7 +2167,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 735. docs: COMMIT\_HISTORY.md through commit 733 (1097f01, \#744) (\#746)
 
-- **Commit:** [`dc02106`](https://github.com/aryamahadik/rosie/commit/dc02106), by Arya Mahadik, 2026-11-17 10:28:52 UTC
+- **Commit:** [`dc021069`](https://github.com/aryamahadik/rosie/commit/dc021069), by Arya Mahadik, 2026-11-17 10:28:52 UTC
 - **Pull request:** [#746](https://github.com/aryamahadik/rosie/pull/746) from `task/commit-history-160`, merged 2026-11-17 10:28:53 UTC. It squashed 1 branch commit:
   - `233fcbb` docs: COMMIT\_HISTORY.md through commit 733 (1097f01, \#744)
 - **Files changed:** 1 (+44 −1), by folder:
@@ -2023,7 +2183,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 734. T-414: Linq send, the real adapter on recorded samples: every tested format, the key screened from every reason, override\_optout, errors (\#745)
 
-- **Commit:** [`c8bab54`](https://github.com/aryamahadik/rosie/commit/c8bab54), by Arya Mahadik, 2026-11-17 10:28:47 UTC
+- **Commit:** [`c8bab540`](https://github.com/aryamahadik/rosie/commit/c8bab540), by Arya Mahadik, 2026-11-17 10:28:47 UTC
 - **Pull request:** [#745](https://github.com/aryamahadik/rosie/pull/745) from `task/T-414`, merged 2026-11-17 10:28:48 UTC. It squashed 3 branch commits:
   - `00f04b7` T-414: the real Linq send adapter on recorded samples: every Nov 5 pa…
   - `d5f138c` Merge branch 'main' into task/T-414
@@ -2051,7 +2211,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 733. docs: COMMIT\_HISTORY.md through commit 731 (4b1196b, \#742) (\#744)
 
-- **Commit:** [`1097f01`](https://github.com/aryamahadik/rosie/commit/1097f01), by Arya Mahadik, 2026-11-17 08:33:05 UTC
+- **Commit:** [`1097f01d`](https://github.com/aryamahadik/rosie/commit/1097f01d), by Arya Mahadik, 2026-11-17 08:33:05 UTC
 - **Pull request:** [#744](https://github.com/aryamahadik/rosie/pull/744) from `task/commit-history-159`, merged 2026-11-17 08:33:05 UTC. It squashed 1 branch commit:
   - `8f9603a` docs: COMMIT\_HISTORY.md through commit 731 (4b1196b, \#742)
 - **Files changed:** 1 (+45 −1), by folder:
@@ -2067,7 +2227,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 732. T-594: the change home (S13-56) as code: offers, deadline and silence for every can't-make-it and leaving path (\#743)
 
-- **Commit:** [`b2376a3`](https://github.com/aryamahadik/rosie/commit/b2376a3), by Arya Mahadik, 2026-11-17 08:33:00 UTC
+- **Commit:** [`b2376a3f`](https://github.com/aryamahadik/rosie/commit/b2376a3f), by Arya Mahadik, 2026-11-17 08:33:00 UTC
 - **Pull request:** [#743](https://github.com/aryamahadik/rosie/pull/743) from `task/T-594`, merged 2026-11-17 08:33:01 UTC. It squashed 2 branch commits:
   - `b19be99` T-594: the change home (S13-56) as code: offers, deadline and silence…
   - `239c097` T-594: plain null checks where lint asked for an optional chain (stan…
@@ -2094,7 +2254,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 731. docs: COMMIT\_HISTORY.md through commit 729 (d7aa916, \#740) (\#742)
 
-- **Commit:** [`4b1196b`](https://github.com/aryamahadik/rosie/commit/4b1196b), by Arya Mahadik, 2026-11-17 08:00:40 UTC
+- **Commit:** [`4b1196b7`](https://github.com/aryamahadik/rosie/commit/4b1196b7), by Arya Mahadik, 2026-11-17 08:00:40 UTC
 - **Pull request:** [#742](https://github.com/aryamahadik/rosie/pull/742) from `task/commit-history-158`, merged 2026-11-17 08:00:41 UTC. It squashed 1 branch commit:
   - `690acc6` docs: COMMIT\_HISTORY.md through commit 729 (d7aa916, \#740)
 - **Files changed:** 1 (+44 −1), by folder:
@@ -2110,7 +2270,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 730. T-415: Linq contacts/add stub (CQ-354) and the capability check, on recorded samples (\#741)
 
-- **Commit:** [`35842dc`](https://github.com/aryamahadik/rosie/commit/35842dc), by Arya Mahadik, 2026-11-17 08:00:36 UTC
+- **Commit:** [`35842dc1`](https://github.com/aryamahadik/rosie/commit/35842dc1), by Arya Mahadik, 2026-11-17 08:00:36 UTC
 - **Pull request:** [#741](https://github.com/aryamahadik/rosie/pull/741) from `task/T-415`, merged 2026-11-17 08:00:37 UTC. It squashed 2 branch commits:
   - `9ccf9d0` T-415: Linq capability check (check\_imessage, then check\_rcs, mapped …
   - `15d9d09` T-415: the recorded check\_imessage replay equals the Linq double's ow…
@@ -2138,7 +2298,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 729. docs: COMMIT\_HISTORY.md through commit 727 (156740a, \#738) (\#740)
 
-- **Commit:** [`d7aa916`](https://github.com/aryamahadik/rosie/commit/d7aa916), by Arya Mahadik, 2026-11-17 06:59:46 UTC
+- **Commit:** [`d7aa9168`](https://github.com/aryamahadik/rosie/commit/d7aa9168), by Arya Mahadik, 2026-11-17 06:59:46 UTC
 - **Pull request:** [#740](https://github.com/aryamahadik/rosie/pull/740) from `task/commit-history-157`, merged 2026-11-17 06:59:46 UTC. It squashed 1 branch commit:
   - `01ba7aa` docs: COMMIT\_HISTORY.md through commit 727 (156740a, \#738)
 - **Files changed:** 1 (+81 −1), by folder:
@@ -2154,7 +2314,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 728. T-1428: db/repo builds the catalog's K-05 v1.18 reads (the sign-up chain) (\#739)
 
-- **Commit:** [`88a8348`](https://github.com/aryamahadik/rosie/commit/88a8348), by Arya Mahadik, 2026-11-17 06:59:42 UTC
+- **Commit:** [`88a83485`](https://github.com/aryamahadik/rosie/commit/88a83485), by Arya Mahadik, 2026-11-17 06:59:42 UTC
 - **Pull request:** [#739](https://github.com/aryamahadik/rosie/pull/739) from `task/T-1428`, merged 2026-11-17 06:59:43 UTC. It squashed 2 branch commits:
   - `0e4aceb` T-1428: db/repo builds K-05 v1.18's five catalog reads (readBusinessK…
   - `f22faab` T-1428: lint fixes: an optional chain in the side check, and the test…
@@ -2181,7 +2341,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 727. docs: COMMIT\_HISTORY.md through commit 725 (f414c35, \#736) (\#738)
 
-- **Commit:** [`156740a`](https://github.com/aryamahadik/rosie/commit/156740a), by Arya Mahadik, 2026-11-17 04:58:31 UTC
+- **Commit:** [`156740a0`](https://github.com/aryamahadik/rosie/commit/156740a0), by Arya Mahadik, 2026-11-17 04:58:31 UTC
 - **Pull request:** [#738](https://github.com/aryamahadik/rosie/pull/738) from `task/commit-history-156`, merged 2026-11-17 04:58:31 UTC. It squashed 1 branch commit:
   - `b2e7b13` docs: COMMIT\_HISTORY.md through commit 725 (f414c35, \#736)
 - **Files changed:** 1 (+49 −1), by folder:
@@ -2199,7 +2359,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 726. T-140: the Master Corrections layer's C7 (Rosie checks no paper) and C8 (void D96 offs), after five rounds (\#737)
 
-- **Commit:** [`d7d543c`](https://github.com/aryamahadik/rosie/commit/d7d543c), by Arya Mahadik, 2026-11-17 04:58:27 UTC
+- **Commit:** [`d7d543ce`](https://github.com/aryamahadik/rosie/commit/d7d543ce), by Arya Mahadik, 2026-11-17 04:58:27 UTC
 - **Pull request:** [#737](https://github.com/aryamahadik/rosie/pull/737) from `task/T-140`, merged 2026-11-17 04:58:27 UTC. It squashed 10 branch commits:
   - `34ff820` T-140: Master Corrections C7 (a trade's claim that Rosie checks a pap…
   - `1a6891a` T-140: c7.ts rewrites each field through one helper and types its lis…
@@ -2261,7 +2421,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 725. docs: COMMIT\_HISTORY.md through commit 723 (7ca9f87, \#734) (\#736)
 
-- **Commit:** [`f414c35`](https://github.com/aryamahadik/rosie/commit/f414c35), by Arya Mahadik, 2026-11-17 03:24:24 UTC
+- **Commit:** [`f414c357`](https://github.com/aryamahadik/rosie/commit/f414c357), by Arya Mahadik, 2026-11-17 03:24:24 UTC
 - **Pull request:** [#736](https://github.com/aryamahadik/rosie/pull/736) from `task/commit-history-155`, merged 2026-11-17 03:24:25 UTC. It squashed 1 branch commit:
   - `3345d84` docs: COMMIT\_HISTORY.md through commit 723 (7ca9f87, \#734)
 - **Files changed:** 1 (+72 −1), by folder:
@@ -2279,7 +2439,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 724. T-1121 round 2: the Linq live spike's masked samples and findings from the two live runs (DL-923) (\#735)
 
-- **Commit:** [`4c6494c`](https://github.com/aryamahadik/rosie/commit/4c6494c), by Arya Mahadik, 2026-11-17 03:24:21 UTC
+- **Commit:** [`4c6494c2`](https://github.com/aryamahadik/rosie/commit/4c6494c2), by Arya Mahadik, 2026-11-17 03:24:21 UTC
 - **Pull request:** [#735](https://github.com/aryamahadik/rosie/pull/735) from `task/T-1121-r2`, merged 2026-11-17 03:24:21 UTC. It squashed 2 branch commits:
   - `6e3a2ff` T-1121: round 2: the two live runs' masked samples in samples/, and w…
   - `e2eb002` T-1121 round 2: FINDINGS.md answers from the live runs, written by th…
@@ -2309,7 +2469,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 723. docs: COMMIT\_HISTORY.md through commit 721 (262c2ec, \#732) (\#734)
 
-- **Commit:** [`7ca9f87`](https://github.com/aryamahadik/rosie/commit/7ca9f87), by Arya Mahadik, 2026-11-17 01:25:37 UTC
+- **Commit:** [`7ca9f873`](https://github.com/aryamahadik/rosie/commit/7ca9f873), by Arya Mahadik, 2026-11-17 01:25:37 UTC
 - **Pull request:** [#734](https://github.com/aryamahadik/rosie/pull/734) from `task/commit-history-154`, merged 2026-11-17 01:25:37 UTC. It squashed 1 branch commit:
   - `7a05389` docs: COMMIT\_HISTORY.md through commit 721 (262c2ec, \#732)
 - **Files changed:** 1 (+46 −1), by folder:
@@ -2327,7 +2487,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 722. T-630: journey 1 and 2 Tool API call folders and registry entries, each refusing not built (\#733)
 
-- **Commit:** [`18459fa`](https://github.com/aryamahadik/rosie/commit/18459fa), by Arya Mahadik, 2026-11-17 01:25:33 UTC
+- **Commit:** [`18459fa0`](https://github.com/aryamahadik/rosie/commit/18459fa0), by Arya Mahadik, 2026-11-17 01:25:33 UTC
 - **Pull request:** [#733](https://github.com/aryamahadik/rosie/pull/733) from `task/T-630`, merged 2026-11-17 01:25:33 UTC. It squashed 1 branch commit:
   - `db6d65d` T-630: journey 1 and 2 Tool API call folders and registry entries, ea…
 - **Files changed:** 39 (+1942 −0), by folder:
@@ -2380,7 +2540,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 721. docs: COMMIT\_HISTORY.md through commit 719 (5e26074, \#730) (\#732)
 
-- **Commit:** [`262c2ec`](https://github.com/aryamahadik/rosie/commit/262c2ec), by Arya Mahadik, 2026-11-17 00:53:43 UTC
+- **Commit:** [`262c2ec5`](https://github.com/aryamahadik/rosie/commit/262c2ec5), by Arya Mahadik, 2026-11-17 00:53:43 UTC
 - **Pull request:** [#732](https://github.com/aryamahadik/rosie/pull/732) from `task/commit-history-153`, merged 2026-11-17 00:53:44 UTC. It squashed 1 branch commit:
   - `c2e7fb8` docs: COMMIT\_HISTORY.md through commit 719 (5e26074, \#730)
 - **Files changed:** 1 (+48 −1), by folder:
@@ -2398,7 +2558,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 720. T-632: the kind matcher: an owner's words to the closest of the 243 kinds, one which-question for two, not-booked said plainly (\#731)
 
-- **Commit:** [`f84a0e6`](https://github.com/aryamahadik/rosie/commit/f84a0e6), by Arya Mahadik, 2026-11-17 00:53:39 UTC
+- **Commit:** [`f84a0e61`](https://github.com/aryamahadik/rosie/commit/f84a0e61), by Arya Mahadik, 2026-11-17 00:53:39 UTC
 - **Pull request:** [#731](https://github.com/aryamahadik/rosie/pull/731) from `task/T-632`, merged 2026-11-17 00:53:40 UTC. It squashed 2 branch commits:
   - `7f99021` T-632: kind matcher: an owner's words to the closest of the 243 kinds…
   - `1a6d62f` T-632: name the S1-02 trade words method A does not list; fix a test …
@@ -2425,7 +2585,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 719. docs: COMMIT\_HISTORY.md through commit 717 (46fbad5, \#727) (\#730)
 
-- **Commit:** [`5e26074`](https://github.com/aryamahadik/rosie/commit/5e26074), by Arya Mahadik, 2026-11-17 00:17:29 UTC
+- **Commit:** [`5e260742`](https://github.com/aryamahadik/rosie/commit/5e260742), by Arya Mahadik, 2026-11-17 00:17:29 UTC
 - **Pull request:** [#730](https://github.com/aryamahadik/rosie/pull/730) from `task/commit-history-152`, merged 2026-11-17 00:17:29 UTC. It squashed 1 branch commit:
   - `951bc33` docs: COMMIT\_HISTORY.md through commit 717 (46fbad5, \#727)
 - **Files changed:** 1 (+49 −1), by folder:
@@ -2443,7 +2603,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 718. T-1427: K-05 v1.18, the catalog's five reads under the business scope with row versions (CQ-349 ruled) (\#729)
 
-- **Commit:** [`dd0758e`](https://github.com/aryamahadik/rosie/commit/dd0758e), by Arya Mahadik, 2026-11-17 00:17:25 UTC
+- **Commit:** [`dd0758ef`](https://github.com/aryamahadik/rosie/commit/dd0758ef), by Arya Mahadik, 2026-11-17 00:17:25 UTC
 - **Pull request:** [#729](https://github.com/aryamahadik/rosie/pull/729) from `task/T-1427`, merged 2026-11-17 00:17:25 UTC. It squashed 2 branch commits:
   - `f63d0ff` T-1427: K-05 v1.18, the catalog's five reads under the call's busines…
   - `b255c19` T-1427: README v1.18, what T-1429 binds as the port stands and what t…
@@ -2472,7 +2632,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 717. docs: COMMIT\_HISTORY.md through commit 715 (e1c4800, \#725) (\#727)
 
-- **Commit:** [`46fbad5`](https://github.com/aryamahadik/rosie/commit/46fbad5), by Arya Mahadik, 2026-11-16 22:54:21 UTC
+- **Commit:** [`46fbad58`](https://github.com/aryamahadik/rosie/commit/46fbad58), by Arya Mahadik, 2026-11-16 22:54:21 UTC
 - **Pull request:** [#727](https://github.com/aryamahadik/rosie/pull/727) from `task/commit-history-151`, merged 2026-11-16 22:54:22 UTC. It squashed 1 branch commit:
   - `7af998e` docs: COMMIT\_HISTORY.md through commit 715 (e1c4800, \#725)
 - **Files changed:** 1 (+37 −1), by folder:
@@ -2490,7 +2650,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 716. T-1412: the root binds the guard's fixed replies, so STOP, START and HELP are recorded and answered on staging (\#728)
 
-- **Commit:** [`519f307`](https://github.com/aryamahadik/rosie/commit/519f307), by Arya Mahadik, 2026-11-16 22:54:18 UTC
+- **Commit:** [`519f3075`](https://github.com/aryamahadik/rosie/commit/519f3075), by Arya Mahadik, 2026-11-16 22:54:18 UTC
 - **Pull request:** [#728](https://github.com/aryamahadik/rosie/pull/728) from `task/T-1412`, merged 2026-11-16 22:54:18 UTC. It squashed 2 branch commits:
   - `7125820` T-1412: work in progress at the user's pause, unchecked (DL-904)
   - `12cc5c4` T-1412: the root's Workers test: STOP, START and HELP through install…
@@ -2520,7 +2680,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 715. docs: COMMIT\_HISTORY.md through commit 713 (f03528b, \#723) (\#725)
 
-- **Commit:** [`e1c4800`](https://github.com/aryamahadik/rosie/commit/e1c4800), by Arya Mahadik, 2026-11-16 22:06:31 UTC
+- **Commit:** [`e1c48009`](https://github.com/aryamahadik/rosie/commit/e1c48009), by Arya Mahadik, 2026-11-16 22:06:31 UTC
 - **Pull request:** [#725](https://github.com/aryamahadik/rosie/pull/725) from `task/commit-history-150`, merged 2026-11-16 22:06:32 UTC. It squashed 1 branch commit:
   - `b4ef497` docs: COMMIT\_HISTORY.md through commit 713 (f03528b, \#723)
 - **Files changed:** 1 (+54 −1), by folder:
@@ -2538,7 +2698,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 714. T-1430: ci.yml's checks job gets the merge check's 45 minutes: main's CI outgrew its 20 (\#726)
 
-- **Commit:** [`2284199`](https://github.com/aryamahadik/rosie/commit/2284199), by Arya Mahadik, 2026-11-16 22:06:27 UTC
+- **Commit:** [`22841993`](https://github.com/aryamahadik/rosie/commit/22841993), by Arya Mahadik, 2026-11-16 22:06:27 UTC
 - **Pull request:** [#726](https://github.com/aryamahadik/rosie/pull/726) from `task/T-1430`, merged 2026-11-16 22:06:27 UTC. It squashed 1 branch commit:
   - `4339ae9` T-1430: ci.yml's checks job gets the merge check's 45 minutes: main's…
 - **Files changed:** 1 (+4 −1), by folder:
@@ -2556,7 +2716,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 713. docs: COMMIT\_HISTORY.md through commit 711 (7097400, \#719) (\#723)
 
-- **Commit:** [`f03528b`](https://github.com/aryamahadik/rosie/commit/f03528b), by Arya Mahadik, 2026-11-16 13:55:58 UTC
+- **Commit:** [`f03528ba`](https://github.com/aryamahadik/rosie/commit/f03528ba), by Arya Mahadik, 2026-11-16 13:55:58 UTC
 - **Pull request:** [#723](https://github.com/aryamahadik/rosie/pull/723) from `task/commit-history-149`, merged 2026-11-16 13:55:58 UTC. It squashed 1 branch commit:
   - `b1fc535` docs: COMMIT\_HISTORY.md through commit 711 (7097400, \#719)
 - **Files changed:** 1 (+114 −1), by folder:
@@ -2574,7 +2734,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 712. T-1415: staging's gate sends a no-business keyword turn to the runtime-side door, within the gate's connection slots (\#724)
 
-- **Commit:** [`40f4a7e`](https://github.com/aryamahadik/rosie/commit/40f4a7e), by Arya Mahadik, 2026-11-16 13:55:54 UTC
+- **Commit:** [`40f4a7eb`](https://github.com/aryamahadik/rosie/commit/40f4a7eb), by Arya Mahadik, 2026-11-16 13:55:54 UTC
 - **Pull request:** [#724](https://github.com/aryamahadik/rosie/pull/724) from `task/T-1415`, merged 2026-11-16 13:55:54 UTC. It squashed 3 branch commits:
   - `493f2d9` T-1415: staging's gate sends a no-business keyword turn to T-1413's k…
   - `951797d` T-1415: real.ts header: in production the gate stays closed (not the …
@@ -2609,7 +2769,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 711. docs: COMMIT\_HISTORY.md through commit 707 (b07069f, \#718) (\#719)
 
-- **Commit:** [`7097400`](https://github.com/aryamahadik/rosie/commit/7097400), by Arya Mahadik, 2026-11-16 13:09:27 UTC
+- **Commit:** [`70974007`](https://github.com/aryamahadik/rosie/commit/70974007), by Arya Mahadik, 2026-11-16 13:09:27 UTC
 - **Pull request:** [#719](https://github.com/aryamahadik/rosie/pull/719) from `task/commit-history-148`, merged 2026-11-16 13:09:28 UTC. It squashed 1 branch commit:
   - `621104b` docs: COMMIT\_HISTORY.md through commit 707 (b07069f, \#718)
 - **Files changed:** 1 (+48 −1), by folder:
@@ -2627,7 +2787,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 710. T-320: the catalog and pricing service base: kinds, services, ways, dated price rules and frozen terms snapshots, reads bound later (notBuilt until then) (\#721)
 
-- **Commit:** [`497256b`](https://github.com/aryamahadik/rosie/commit/497256b), by Arya Mahadik, 2026-11-16 13:09:23 UTC
+- **Commit:** [`497256b5`](https://github.com/aryamahadik/rosie/commit/497256b5), by Arya Mahadik, 2026-11-16 13:09:23 UTC
 - **Pull request:** [#721](https://github.com/aryamahadik/rosie/pull/721) from `task/T-320`, merged 2026-11-16 13:09:24 UTC. It squashed 3 branch commits:
   - `631b2f5` T-320: the catalog and pricing service base (C-096): kinds, services,…
   - `3352450` T-320: a call's name is an id; a flow B snapshot test (seed-booking-f…
@@ -2659,7 +2819,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 709. T-1419: every turn commit asks K-05 v1.17 for phones rows by handle id, and fails closed on a number-shaped answer (\#722)
 
-- **Commit:** [`ea7421b`](https://github.com/aryamahadik/rosie/commit/ea7421b), by Arya Mahadik, 2026-11-16 13:09:19 UTC
+- **Commit:** [`ea7421b3`](https://github.com/aryamahadik/rosie/commit/ea7421b3), by Arya Mahadik, 2026-11-16 13:09:19 UTC
 - **Pull request:** [#722](https://github.com/aryamahadik/rosie/pull/722) from `task/T-1419`, merged 2026-11-16 13:09:20 UTC. It squashed 4 branch commits:
   - `f3c86f5` T-1419: buildCommitRequest asks K-05 v1.17 to name phones rows by han…
   - `b0cbfd0` T-1419: phone-rows.test.ts formatted (prettier)
@@ -2694,7 +2854,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 708. T-1417: pgCommitTurn names a phones row by its handle id, never its number, when the request asks (K-05 v1.17) (\#720)
 
-- **Commit:** [`0d79c14`](https://github.com/aryamahadik/rosie/commit/0d79c14), by Arya Mahadik, 2026-11-16 13:09:15 UTC
+- **Commit:** [`0d79c144`](https://github.com/aryamahadik/rosie/commit/0d79c144), by Arya Mahadik, 2026-11-16 13:09:15 UTC
 - **Pull request:** [#720](https://github.com/aryamahadik/rosie/pull/720) from `task/T-1417`, merged 2026-11-16 13:09:15 UTC. It squashed 3 branch commits:
   - `b321c77` T-1417: WIP: commitTurn answers a phones row by its handle id (writte…
   - `380872e` Merge branch 'main' into task/T-1417
@@ -2722,7 +2882,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 707. docs: COMMIT\_HISTORY.md through commit 705 (647ca13, \#715) (\#718)
 
-- **Commit:** [`b07069f`](https://github.com/aryamahadik/rosie/commit/b07069f), by Arya Mahadik, 2026-11-16 11:09:39 UTC
+- **Commit:** [`b07069f2`](https://github.com/aryamahadik/rosie/commit/b07069f2), by Arya Mahadik, 2026-11-16 11:09:39 UTC
 - **Pull request:** [#718](https://github.com/aryamahadik/rosie/pull/718) from `task/commit-history-147`, merged 2026-11-16 11:09:40 UTC. It squashed 1 branch commit:
   - `c57ea52` docs: COMMIT\_HISTORY.md through commit 705 (647ca13, \#715)
 - **Files changed:** 1 (+56 −1), by folder:
@@ -2740,7 +2900,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 706. T-631: the kind matcher spike (Q-42): plain text on K-24's name, style and pattern, no stored index, for S1-02 (\#717)
 
-- **Commit:** [`139dfd5`](https://github.com/aryamahadik/rosie/commit/139dfd5), by Arya Mahadik, 2026-11-16 11:09:34 UTC
+- **Commit:** [`139dfd5d`](https://github.com/aryamahadik/rosie/commit/139dfd5d), by Arya Mahadik, 2026-11-16 11:09:34 UTC
 - **Pull request:** [#717](https://github.com/aryamahadik/rosie/pull/717) from `task/T-631`, merged 2026-11-16 11:09:35 UTC. It squashed 2 branch commits:
   - `3074cab` T-631: the kind matcher spike (Q-42): plain text on K-24's names, sty…
   - `0769be0` T-631: FINDINGS.md, method A (plain text on K-24's name, style and pa…
@@ -2769,7 +2929,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 705. docs: COMMIT\_HISTORY.md through commit 703 (9a32ac9, \#712) (\#715)
 
-- **Commit:** [`647ca13`](https://github.com/aryamahadik/rosie/commit/647ca13), by Arya Mahadik, 2026-11-16 10:34:08 UTC
+- **Commit:** [`647ca13f`](https://github.com/aryamahadik/rosie/commit/647ca13f), by Arya Mahadik, 2026-11-16 10:34:08 UTC
 - **Pull request:** [#715](https://github.com/aryamahadik/rosie/pull/715) from `task/commit-history-146`, merged 2026-11-16 10:34:08 UTC. It squashed 1 branch commit:
   - `67bf5be` docs: COMMIT\_HISTORY.md through commit 703 (9a32ac9, \#712)
 - **Files changed:** 1 (+85 −1), by folder:
@@ -2787,7 +2947,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 704. T-1413: the guard's every-business keyword door: a core-only commit with no business on the runtime side, its SQL in db/repo (\#716)
 
-- **Commit:** [`dda7590`](https://github.com/aryamahadik/rosie/commit/dda7590), by Arya Mahadik, 2026-11-16 10:34:04 UTC
+- **Commit:** [`dda7590e`](https://github.com/aryamahadik/rosie/commit/dda7590e), by Arya Mahadik, 2026-11-16 10:34:04 UTC
 - **Pull request:** [#716](https://github.com/aryamahadik/rosie/pull/716) from `task/T-1413`, merged 2026-11-16 10:34:05 UTC. It squashed 3 branch commits:
   - `c4dd922` T-1413: the keyword door, the guard's every-business core-only turn c…
   - `e10f2b1` Merge branch 'main' into task/T-1413
@@ -2824,7 +2984,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 703. docs: COMMIT\_HISTORY.md through commit 700 (4dbb576, \#710) (\#712)
 
-- **Commit:** [`9a32ac9`](https://github.com/aryamahadik/rosie/commit/9a32ac9), by Arya Mahadik, 2026-11-16 09:56:35 UTC
+- **Commit:** [`9a32ac95`](https://github.com/aryamahadik/rosie/commit/9a32ac95), by Arya Mahadik, 2026-11-16 09:56:35 UTC
 - **Pull request:** [#712](https://github.com/aryamahadik/rosie/pull/712) from `task/commit-history-145`, merged 2026-11-16 09:56:36 UTC. It squashed 1 branch commit:
   - `ab122b5` docs: COMMIT\_HISTORY.md through commit 700 (4dbb576, \#710)
 - **Files changed:** 1 (+36 −1), by folder:
@@ -2842,7 +3002,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 702. T-161: the parity harness: compiled words against the vendored functions and step.js, path by path, every difference named (\#713)
 
-- **Commit:** [`08bef1d`](https://github.com/aryamahadik/rosie/commit/08bef1d), by Arya Mahadik, 2026-11-16 09:56:31 UTC
+- **Commit:** [`08bef1dc`](https://github.com/aryamahadik/rosie/commit/08bef1dc), by Arya Mahadik, 2026-11-16 09:56:31 UTC
 - **Pull request:** [#713](https://github.com/aryamahadik/rosie/pull/713) from `task/T-161`, merged 2026-11-16 09:56:32 UTC. It squashed 3 branch commits:
   - `dbd50a1` T-161: parity harness: the compiler's pre-correction words held again…
   - `b4c60bf` T-161: the harness test also holds private-call and the compiler's ow…
@@ -2874,7 +3034,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 701. T-1418: K-05 v1.17: commitTurn names a phones row by its handle id when the request asks (answerPhoneRowsBy), additive (\#714)
 
-- **Commit:** [`928ab31`](https://github.com/aryamahadik/rosie/commit/928ab31), by Arya Mahadik, 2026-11-16 09:56:24 UTC
+- **Commit:** [`928ab312`](https://github.com/aryamahadik/rosie/commit/928ab312), by Arya Mahadik, 2026-11-16 09:56:24 UTC
 - **Pull request:** [#714](https://github.com/aryamahadik/rosie/pull/714) from `task/T-1418`, merged 2026-11-16 09:56:25 UTC. It squashed 3 branch commits:
   - `6be48db` T-1418: K-05 v1.17, commitTurn names a phones row by its handle id wh…
   - `973a13e` T-1418: README v1.17 refinements: an empty handle id throws, the cons…
@@ -2908,7 +3068,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 700. docs: COMMIT\_HISTORY.md through commit 698 (f17a5e3, \#709) (\#710)
 
-- **Commit:** [`4dbb576`](https://github.com/aryamahadik/rosie/commit/4dbb576), by Arya Mahadik, 2026-11-16 07:42:16 UTC
+- **Commit:** [`4dbb576f`](https://github.com/aryamahadik/rosie/commit/4dbb576f), by Arya Mahadik, 2026-11-16 07:42:16 UTC
 - **Pull request:** [#710](https://github.com/aryamahadik/rosie/pull/710) from `task/commit-history-144`, merged 2026-11-16 07:42:16 UTC. It squashed 1 branch commit:
   - `54dfe7d` docs: COMMIT\_HISTORY.md through commit 698 (f17a5e3, \#709)
 - **Files changed:** 1 (+51 −1), by folder:
@@ -2926,7 +3086,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 699. T-1414: sendFixedLine's core service (domain/fixed-lines) and runCore's sendFixedLine case: HELP's reply as one quick\_reply outbox row to the turn's own handle, no business, built through T-307's outboxRows and read only through CoreDeps.flags.messagesReader; a stopped phone answers phoneStopped and writes nothing; the row keyed by the caller's turn, the line and the recipient, a second HELP of the same commit answering the first's row as repeated (DL-871); no flags port answers portNotWired, any other line or send class or an actor's send noService; made alone notBuilt (CQ-44); T-1140's flagsCalls pin gains sendFixedLine (DL-872) (\#711)
 
-- **Commit:** [`b312417`](https://github.com/aryamahadik/rosie/commit/b312417), by Arya Mahadik, 2026-11-16 07:42:12 UTC
+- **Commit:** [`b3124172`](https://github.com/aryamahadik/rosie/commit/b3124172), by Arya Mahadik, 2026-11-16 07:42:12 UTC
 - **Pull request:** [#711](https://github.com/aryamahadik/rosie/pull/711) from `task/T-1414`, merged 2026-11-16 07:42:13 UTC. It squashed 1 branch commit:
   - `5cc4143` T-1414: sendFixedLine's core service (domain/fixed-lines) and runCore…
 - **Files changed:** 9 (+1599 −11), by folder:
@@ -2943,7 +3103,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 698. docs: COMMIT\_HISTORY.md through commit 696 (e34bc58, \#707) (\#709)
 
-- **Commit:** [`f17a5e3`](https://github.com/aryamahadik/rosie/commit/f17a5e3), by Arya Mahadik, 2026-11-16 07:00:57 UTC
+- **Commit:** [`f17a5e3c`](https://github.com/aryamahadik/rosie/commit/f17a5e3c), by Arya Mahadik, 2026-11-16 07:00:57 UTC
 - **Pull request:** [#709](https://github.com/aryamahadik/rosie/pull/709) from `task/commit-history-143`, merged 2026-11-16 07:00:58 UTC. It squashed 1 branch commit:
   - `1aed179` docs: COMMIT\_HISTORY.md through commit 696 (e34bc58, \#707)
 - **Files changed:** 1 (+53 −1), by folder:
@@ -2961,7 +3121,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 697. T-590: the stop home (S13-32) as code: a yes only from the person's own word; one number stops every business; a stop never cancels a visit (\#708)
 
-- **Commit:** [`3508bc8`](https://github.com/aryamahadik/rosie/commit/3508bc8), by Arya Mahadik, 2026-11-16 07:00:53 UTC
+- **Commit:** [`3508bc80`](https://github.com/aryamahadik/rosie/commit/3508bc80), by Arya Mahadik, 2026-11-16 07:00:53 UTC
 - **Pull request:** [#708](https://github.com/aryamahadik/rosie/pull/708) from `task/T-590`, merged 2026-11-16 07:00:53 UTC. It squashed 3 branch commits:
   - `535e24b` T-590: stop home (S13-32) as code: whose word gives a yes, one number…
   - `e3b597a` T-590: texting in counts only on a turn that carries the person's tex…
@@ -2993,7 +3153,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 696. docs: COMMIT\_HISTORY.md through commit 694 (32a2eee, \#704) (\#707)
 
-- **Commit:** [`e34bc58`](https://github.com/aryamahadik/rosie/commit/e34bc58), by Arya Mahadik, 2026-11-16 06:30:34 UTC
+- **Commit:** [`e34bc580`](https://github.com/aryamahadik/rosie/commit/e34bc580), by Arya Mahadik, 2026-11-16 06:30:34 UTC
 - **Pull request:** [#707](https://github.com/aryamahadik/rosie/pull/707) from `task/commit-history-142`, merged 2026-11-16 06:30:34 UTC. It squashed 1 branch commit:
   - `ff940c1` docs: COMMIT\_HISTORY.md through commit 694 (32a2eee, \#704)
 - **Files changed:** 1 (+54 −1), by folder:
@@ -3011,7 +3171,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 695. T-362: the real model times spike, phase 1: the harness (key by name, the 40-call cap on disk), the dry run, and staging's spans as source 2 (\#706)
 
-- **Commit:** [`966f788`](https://github.com/aryamahadik/rosie/commit/966f788), by Arya Mahadik, 2026-11-16 06:30:30 UTC
+- **Commit:** [`966f7880`](https://github.com/aryamahadik/rosie/commit/966f7880), by Arya Mahadik, 2026-11-16 06:30:30 UTC
 - **Pull request:** [#706](https://github.com/aryamahadik/rosie/pull/706) from `task/T-362`, merged 2026-11-16 06:30:30 UTC. It squashed 3 branch commits:
   - `61d22f6` T-362: the real model times spike: dry run against a local stub, the …
   - `fcec2bc` T-362: FINDINGS.md, staging's spans as source 2 (Q-41 and DL-836 answ…
@@ -3045,7 +3205,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 694. docs: COMMIT\_HISTORY.md through commit 692 (a4e6fd1, \#701) (\#704)
 
-- **Commit:** [`32a2eee`](https://github.com/aryamahadik/rosie/commit/32a2eee), by Arya Mahadik, 2026-11-16 06:00:05 UTC
+- **Commit:** [`32a2eee0`](https://github.com/aryamahadik/rosie/commit/32a2eee0), by Arya Mahadik, 2026-11-16 06:00:05 UTC
 - **Pull request:** [#704](https://github.com/aryamahadik/rosie/pull/704) from `task/commit-history-141`, merged 2026-11-16 06:00:05 UTC. It squashed 1 branch commit:
   - `d71e550` docs: COMMIT\_HISTORY.md through commit 692 (a4e6fd1, \#701)
 - **Files changed:** 1 (+71 −1), by folder:
@@ -3063,7 +3223,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 693. T-139: Master Corrections C3 (the own-AI door), C4 (switch verify off) and C5 (insurance facts, 12 trades' settings), with emitBundle's correctTrade line (\#705)
 
-- **Commit:** [`79b7daf`](https://github.com/aryamahadik/rosie/commit/79b7daf), by Arya Mahadik, 2026-11-16 05:59:57 UTC
+- **Commit:** [`79b7daf7`](https://github.com/aryamahadik/rosie/commit/79b7daf7), by Arya Mahadik, 2026-11-16 05:59:57 UTC
 - **Pull request:** [#705](https://github.com/aryamahadik/rosie/pull/705) from `task/T-139`, merged 2026-11-16 05:59:58 UTC. It squashed 3 branch commits:
   - `8eefffe` T-139: C3 (the own-AI door compiled, steps as written), C4 (switch ve…
   - `b400d19` T-139: C5's fill holds an empty cutoff as null alone (lint: no redund…
@@ -3098,7 +3258,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 692. docs: COMMIT\_HISTORY.md through commit 689 (a9de0d1, \#699) (\#701)
 
-- **Commit:** [`a4e6fd1`](https://github.com/aryamahadik/rosie/commit/a4e6fd1), by Arya Mahadik, 2026-11-16 05:10:26 UTC
+- **Commit:** [`a4e6fd1e`](https://github.com/aryamahadik/rosie/commit/a4e6fd1e), by Arya Mahadik, 2026-11-16 05:10:26 UTC
 - **Pull request:** [#701](https://github.com/aryamahadik/rosie/pull/701) from `task/commit-history-140`, merged 2026-11-16 05:10:26 UTC. It squashed 1 branch commit:
   - `3d0f234` docs: COMMIT\_HISTORY.md through commit 689 (a9de0d1, \#699)
 - **Files changed:** 1 (+50 −1), by folder:
@@ -3116,7 +3276,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 691. T-1416: one recordStopOrStart per phone per keyword turn, from the phone's newest word (T-317's N1) (\#702)
 
-- **Commit:** [`da58470`](https://github.com/aryamahadik/rosie/commit/da58470), by Arya Mahadik, 2026-11-16 05:10:22 UTC
+- **Commit:** [`da584707`](https://github.com/aryamahadik/rosie/commit/da584707), by Arya Mahadik, 2026-11-16 05:10:22 UTC
 - **Pull request:** [#702](https://github.com/aryamahadik/rosie/pull/702) from `task/T-1416`, merged 2026-11-16 05:10:22 UTC. It squashed 1 branch commit:
   - `74946b5` T-1416: one recordStopOrStart per phone per keyword turn, from the ph…
 - **Files changed:** 5 (+632 −50), by folder:
@@ -3136,7 +3296,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 690. T-1163: runCore dispatches setRecordFlag and recordStopOrStart to T-317's core functions through a flags port the wiring binds (\#703)
 
-- **Commit:** [`70e04e6`](https://github.com/aryamahadik/rosie/commit/70e04e6), by Arya Mahadik, 2026-11-16 05:10:18 UTC
+- **Commit:** [`70e04e6b`](https://github.com/aryamahadik/rosie/commit/70e04e6b), by Arya Mahadik, 2026-11-16 05:10:18 UTC
 - **Pull request:** [#703](https://github.com/aryamahadik/rosie/pull/703) from `task/T-1163`, merged 2026-11-16 05:10:18 UTC. It squashed 3 branch commits:
   - `5d48cf9` T-1163: runCore dispatches recordStopOrStart and setRecordFlag to T-3…
   - `12bdb92` T-1163: T-1140's notBuilt test keeps every call it covered: the 11 ca…
@@ -3168,7 +3328,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 689. docs: COMMIT\_HISTORY.md through commit 687 (8658b20, \#697) (\#699)
 
-- **Commit:** [`a9de0d1`](https://github.com/aryamahadik/rosie/commit/a9de0d1), by Arya Mahadik, 2026-11-16 03:43:34 UTC
+- **Commit:** [`a9de0d19`](https://github.com/aryamahadik/rosie/commit/a9de0d19), by Arya Mahadik, 2026-11-16 03:43:34 UTC
 - **Pull request:** [#699](https://github.com/aryamahadik/rosie/pull/699) from `task/commit-history-139`, merged 2026-11-16 03:43:34 UTC. It squashed 1 branch commit:
   - `5e3a143` docs: COMMIT\_HISTORY.md through commit 687 (8658b20, \#697)
 - **Files changed:** 1 (+47 −1), by folder:
@@ -3186,7 +3346,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 688. T-022: freeze K-13 v1, the Files port (R2): six calls, the private object key, the K-08 span, 32 fixtures, the spike's read-only findings and the freeze record (\#700)
 
-- **Commit:** [`dc38981`](https://github.com/aryamahadik/rosie/commit/dc38981), by Arya Mahadik, 2026-11-16 03:43:29 UTC
+- **Commit:** [`dc389817`](https://github.com/aryamahadik/rosie/commit/dc389817), by Arya Mahadik, 2026-11-16 03:43:29 UTC
 - **Pull request:** [#700](https://github.com/aryamahadik/rosie/pull/700) from `task/T-022`, merged 2026-11-16 03:43:29 UTC. It squashed 2 branch commits:
   - `71c8292` T-022: freeze K-13 v1, the files port (R2): uploadLink, checkUpload, …
   - `3e78ac4` T-022: the README's open gaps quote RULES 4.10 and B10-17 and K-15 v1…
@@ -3217,7 +3377,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 687. docs: COMMIT\_HISTORY.md through commit 685 (8c7b071, \#696) (\#697)
 
-- **Commit:** [`8658b20`](https://github.com/aryamahadik/rosie/commit/8658b20), by Arya Mahadik, 2026-11-16 00:52:21 UTC
+- **Commit:** [`8658b203`](https://github.com/aryamahadik/rosie/commit/8658b203), by Arya Mahadik, 2026-11-16 00:52:21 UTC
 - **Pull request:** [#697](https://github.com/aryamahadik/rosie/pull/697) from `task/commit-history-138`, merged 2026-11-16 00:52:22 UTC. It squashed 1 branch commit:
   - `0ec21cd` docs: COMMIT\_HISTORY.md through commit 685 (8c7b071, \#696)
 - **Files changed:** 1 (+49 −1), by folder:
@@ -3235,7 +3395,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 686. T-1156: the commit writes a core action's clock rows (UnitWrites.clocks), once, with their entries under the turn id; runCore hands the safety service's clocks over (\#698)
 
-- **Commit:** [`c01a051`](https://github.com/aryamahadik/rosie/commit/c01a051), by Arya Mahadik, 2026-11-16 00:52:18 UTC
+- **Commit:** [`c01a0518`](https://github.com/aryamahadik/rosie/commit/c01a0518), by Arya Mahadik, 2026-11-16 00:52:18 UTC
 - **Pull request:** [#698](https://github.com/aryamahadik/rosie/pull/698) from `task/T-1156`, merged 2026-11-16 00:52:18 UTC. It squashed 2 branch commits:
   - `ef94abb` T-1156: the commit writes a core action's clock rows: UnitWrites.cloc…
   - `f41ad48` T-1156: core.test.ts: a clearer comment on the clock rows runCore han…
@@ -3263,7 +3423,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 685. docs: COMMIT\_HISTORY.md through commit 683 (dd2e62e, \#694) (\#696)
 
-- **Commit:** [`8c7b071`](https://github.com/aryamahadik/rosie/commit/8c7b071), by Arya Mahadik, 2026-11-15 22:42:59 UTC
+- **Commit:** [`8c7b0713`](https://github.com/aryamahadik/rosie/commit/8c7b0713), by Arya Mahadik, 2026-11-15 22:42:59 UTC
 - **Pull request:** [#696](https://github.com/aryamahadik/rosie/pull/696) from `task/commit-history-137`, merged 2026-11-15 22:42:59 UTC. It squashed 1 branch commit:
   - `ea2fd4d` docs: COMMIT\_HISTORY.md through commit 683 (dd2e62e, \#694)
 - **Files changed:** 1 (+35 −1), by folder:
@@ -3281,7 +3441,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 684. T-1410: the turn face's and staging's Tool API scopes pass the K-09 call and transient on to withBusiness (\#689)
 
-- **Commit:** [`0d25a4b`](https://github.com/aryamahadik/rosie/commit/0d25a4b), by Arya Mahadik, 2026-11-15 22:42:55 UTC
+- **Commit:** [`0d25a4bd`](https://github.com/aryamahadik/rosie/commit/0d25a4bd), by Arya Mahadik, 2026-11-15 22:42:55 UTC
 - **Pull request:** [#689](https://github.com/aryamahadik/rosie/pull/689) from `task/T-1410`, merged 2026-11-15 22:42:55 UTC. It squashed 3 branch commits:
   - `9bc62c5` T-1410: pgCallScope and staging's two Tool API scopes hand the base's…
   - `aac74bc` T-1410: merge main (dd2e62e) into task/T-1410 for round 2
@@ -3311,7 +3471,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 683. docs: COMMIT\_HISTORY.md through commit 681 (c2f36d6, \#692) (\#694)
 
-- **Commit:** [`dd2e62e`](https://github.com/aryamahadik/rosie/commit/dd2e62e), by Arya Mahadik, 2026-11-15 21:16:09 UTC
+- **Commit:** [`dd2e62e7`](https://github.com/aryamahadik/rosie/commit/dd2e62e7), by Arya Mahadik, 2026-11-15 21:16:09 UTC
 - **Pull request:** [#694](https://github.com/aryamahadik/rosie/pull/694) from `task/commit-history-136`, merged 2026-11-15 21:16:09 UTC. It squashed 1 branch commit:
   - `d3d3e97` docs: COMMIT\_HISTORY.md through commit 681 (c2f36d6, \#692)
 - **Files changed:** 1 (+48 −1), by folder:
@@ -3329,7 +3489,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 682. T-1367: a refused session's 3D000, 42501 and 55000 (raised FATAL) leave every session start scrubbed, and withBusiness keeps every statement off a connection lost after its start (a close watch, a guarded transaction, a held callback), throwing it scrubbed as 08006 (\#695)
 
-- **Commit:** [`7babada`](https://github.com/aryamahadik/rosie/commit/7babada), by Arya Mahadik, 2026-11-15 21:16:05 UTC
+- **Commit:** [`7babadad`](https://github.com/aryamahadik/rosie/commit/7babadad), by Arya Mahadik, 2026-11-15 21:16:05 UTC
 - **Pull request:** [#695](https://github.com/aryamahadik/rosie/pull/695) from `task/T-1367`, merged 2026-11-15 21:16:05 UTC. It squashed 1 branch commit:
   - `8314e24` T-1367: a refused session's 3D000, 42501 and 55000 (raised FATAL) lea…
 - **Files changed:** 4 (+880 −27), by folder:
@@ -3345,7 +3505,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 681. docs: COMMIT\_HISTORY.md through commit 679 (2c90291, \#690) (\#692)
 
-- **Commit:** [`c2f36d6`](https://github.com/aryamahadik/rosie/commit/c2f36d6), by Arya Mahadik, 2026-11-15 20:34:46 UTC
+- **Commit:** [`c2f36d67`](https://github.com/aryamahadik/rosie/commit/c2f36d67), by Arya Mahadik, 2026-11-15 20:34:46 UTC
 - **Pull request:** [#692](https://github.com/aryamahadik/rosie/pull/692) from `task/commit-history-135`, merged 2026-11-15 20:34:46 UTC. It squashed 1 branch commit:
   - `044b017` docs: COMMIT\_HISTORY.md through commit 679 (2c90291, \#690)
 - **Files changed:** 1 (+47 −1), by folder:
@@ -3363,7 +3523,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 680. T-1121 phase 1: the outbound Linq probe (allow-list refusals before any request, numbers masked, the key in one header), its dry run against a local stand-in, its test and findings (\#693)
 
-- **Commit:** [`b60b9bd`](https://github.com/aryamahadik/rosie/commit/b60b9bd), by Arya Mahadik, 2026-11-15 20:34:42 UTC
+- **Commit:** [`b60b9bd9`](https://github.com/aryamahadik/rosie/commit/b60b9bd9), by Arya Mahadik, 2026-11-15 20:34:42 UTC
 - **Pull request:** [#693](https://github.com/aryamahadik/rosie/pull/693) from `task/T-1121`, merged 2026-11-15 20:34:43 UTC. It squashed 2 branch commits:
   - `c5aa51b` T-1121: phase 1 of the outbound Linq probe: probe.sh and its Node pro…
   - `80c28c4` T-1121: FINDINGS.md, the builder's text written by the lead (the harn…
@@ -3392,7 +3552,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 679. docs: COMMIT\_HISTORY.md through commit 677 (8b0a10d, \#688) (\#690)
 
-- **Commit:** [`2c90291`](https://github.com/aryamahadik/rosie/commit/2c90291), by Arya Mahadik, 2026-11-15 19:22:42 UTC
+- **Commit:** [`2c90291d`](https://github.com/aryamahadik/rosie/commit/2c90291d), by Arya Mahadik, 2026-11-15 19:22:42 UTC
 - **Pull request:** [#690](https://github.com/aryamahadik/rosie/pull/690) from `task/commit-history-134`, merged 2026-11-15 19:22:43 UTC. It squashed 1 branch commit:
   - `63fc850` docs: COMMIT\_HISTORY.md through commit 677 (8b0a10d, \#688)
 - **Files changed:** 1 (+46 −1), by folder:
@@ -3410,7 +3570,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 678. T-1411: the Workers test pool's outbound tripwire: no test's fetch leaves the Mac; claimed hosts answered by stand-ins (\#691)
 
-- **Commit:** [`5cbfcdf`](https://github.com/aryamahadik/rosie/commit/5cbfcdf), by Arya Mahadik, 2026-11-15 19:22:38 UTC
+- **Commit:** [`5cbfcdf3`](https://github.com/aryamahadik/rosie/commit/5cbfcdf3), by Arya Mahadik, 2026-11-15 19:22:38 UTC
 - **Pull request:** [#691](https://github.com/aryamahadik/rosie/pull/691) from `task/T-1411`, merged 2026-11-15 19:22:39 UTC. It squashed 2 branch commits:
   - `3f25251` T-1411: the Workers test pool's outbound tripwire: every global fetch…
   - `ef29b36` T-1411: the helper's header states exactly what the connect() measure…
@@ -3438,7 +3598,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 677. docs: COMMIT\_HISTORY.md through commit 675 (cf47ff2, \#686) (\#688)
 
-- **Commit:** [`8b0a10d`](https://github.com/aryamahadik/rosie/commit/8b0a10d), by Arya Mahadik, 2026-11-15 18:27:31 UTC
+- **Commit:** [`8b0a10dd`](https://github.com/aryamahadik/rosie/commit/8b0a10dd), by Arya Mahadik, 2026-11-15 18:27:31 UTC
 - **Pull request:** [#688](https://github.com/aryamahadik/rosie/pull/688) from `task/commit-history-133`, merged 2026-11-15 18:27:31 UTC. It squashed 1 branch commit:
   - `c0b90bf` docs: COMMIT\_HISTORY.md through commit 675 (cf47ff2, \#686)
 - **Files changed:** 1 (+53 −1), by folder:
@@ -3456,7 +3616,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 676. T-1365: a replay whose holdOnReturn throws keeps the core's hold id, so its hold can be released (\#687)
 
-- **Commit:** [`9ce25cd`](https://github.com/aryamahadik/rosie/commit/9ce25cd), by Arya Mahadik, 2026-11-15 18:27:26 UTC
+- **Commit:** [`9ce25cd5`](https://github.com/aryamahadik/rosie/commit/9ce25cd5), by Arya Mahadik, 2026-11-15 18:27:26 UTC
 - **Pull request:** [#687](https://github.com/aryamahadik/rosie/pull/687) from `task/T-1365`, merged 2026-11-15 18:27:27 UTC. It squashed 2 branch commits:
   - `322654e` T-1365: a replay whose write of the core's hold throws keeps that hol…
   - `e9e52db` T-1365: holdOnReturn's comment no longer says a read that throws writ…
@@ -3483,7 +3643,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 675. docs: COMMIT\_HISTORY.md through commit 672 (c244c38, \#683) (\#686)
 
-- **Commit:** [`cf47ff2`](https://github.com/aryamahadik/rosie/commit/cf47ff2), by Arya Mahadik, 2026-11-15 17:46:54 UTC
+- **Commit:** [`cf47ff2e`](https://github.com/aryamahadik/rosie/commit/cf47ff2e), by Arya Mahadik, 2026-11-15 17:46:54 UTC
 - **Pull request:** [#686](https://github.com/aryamahadik/rosie/pull/686) from `task/commit-history-132`, merged 2026-11-15 17:46:55 UTC. It squashed 1 branch commit:
   - `9fc2313` docs: COMMIT\_HISTORY.md through commit 672 (c244c38, \#683)
 - **Files changed:** 1 (+117 −1), by folder:
@@ -3501,7 +3661,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 674. T-1407: npm run staging:trace -- \<trace id\> \[--since \<time\>\]: a read-only report of what one trace wrote on staging's database (turns, event-log entries, outbox rows and parts, messages), labels, states and times alone; the URL loaded by name and handed to the reader alone, as seed-staging.sh does; one READ ONLY transaction as rosie\_job with an empty scope; its test on a throwaway schema of K-04 fixture rows with planted canaries (\#685)
 
-- **Commit:** [`58d3b2d`](https://github.com/aryamahadik/rosie/commit/58d3b2d), by Arya Mahadik, 2026-11-15 17:46:51 UTC
+- **Commit:** [`58d3b2db`](https://github.com/aryamahadik/rosie/commit/58d3b2db), by Arya Mahadik, 2026-11-15 17:46:51 UTC
 - **Pull request:** [#685](https://github.com/aryamahadik/rosie/pull/685) from `task/T-1407`, merged 2026-11-15 17:46:51 UTC. It squashed 1 branch commit:
   - `d1d65a9` T-1407: npm run staging:trace -- \<trace id\> \[--since \<time\>\]: a read-…
 - **Files changed:** 4 (+1455 −0), by folder:
@@ -3519,7 +3679,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 673. T-1405: readActiveBundle and readBundleValue answer a failure through clocks.ts transientOrScrubbed (imported when a call fails), so a statement's own refusal and postgres.js's statement errors leave scrubbed: the call's name and code alone, no statement text, value or key. bundles.int.test.ts: T-1314's Gives 1 and 5 hold the two reads to transientOrScrubbed (the 23505 and TypeError pins move from raw to scrubbed); a T-1405 block gives each read T-1322's five real errors (22P02, 23514, UNDEFINED\_VALUE, bytea TypeError scrubbed; 40001 still transient) and a real lock-timeout refusal (55P03) of its own statement (\#684)
 
-- **Commit:** [`61ae149`](https://github.com/aryamahadik/rosie/commit/61ae149), by Arya Mahadik, 2026-11-15 17:46:47 UTC
+- **Commit:** [`61ae1497`](https://github.com/aryamahadik/rosie/commit/61ae1497), by Arya Mahadik, 2026-11-15 17:46:47 UTC
 - **Pull request:** [#684](https://github.com/aryamahadik/rosie/pull/684) from `task/T-1405`, merged 2026-11-15 17:46:48 UTC. It squashed 1 branch commit:
   - `1949bf1` T-1405: readActiveBundle and readBundleValue answer a failure through…
 - **Files changed:** 2 (+328 −6), by folder:
@@ -3535,7 +3695,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 672. docs: COMMIT\_HISTORY.md through commit 668 (2930ce6, \#679) (\#683)
 
-- **Commit:** [`c244c38`](https://github.com/aryamahadik/rosie/commit/c244c38), by Arya Mahadik, 2026-11-15 17:13:10 UTC
+- **Commit:** [`c244c38e`](https://github.com/aryamahadik/rosie/commit/c244c38e), by Arya Mahadik, 2026-11-15 17:13:10 UTC
 - **Pull request:** [#683](https://github.com/aryamahadik/rosie/pull/683) from `task/commit-history-131`, merged 2026-11-15 17:13:10 UTC. It squashed 1 branch commit:
   - `2494273` docs: COMMIT\_HISTORY.md through commit 668 (2930ce6, \#679)
 - **Files changed:** 1 (+36 −1), by folder:
@@ -3553,7 +3713,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 671. T-1409: K-05's database-side contract test covers v1.16 (\#682)
 
-- **Commit:** [`baa8f21`](https://github.com/aryamahadik/rosie/commit/baa8f21), by Arya Mahadik, 2026-11-15 17:13:06 UTC
+- **Commit:** [`baa8f21c`](https://github.com/aryamahadik/rosie/commit/baa8f21c), by Arya Mahadik, 2026-11-15 17:13:06 UTC
 - **Pull request:** [#682](https://github.com/aryamahadik/rosie/pull/682) from `task/T-1409`, merged 2026-11-15 17:13:06 UTC. It squashed 4 branch commits:
   - `c31ba21` T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row…
   - `d783047` T-1391: README v1.16, the db/repo read's tests also show an email cop…
@@ -3590,7 +3750,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 670. T-1392: db/repo's readOutboxRowWritten answers K-05 v1.16 under v1.4's role and scope (\#681)
 
-- **Commit:** [`b63ef76`](https://github.com/aryamahadik/rosie/commit/b63ef76), by Arya Mahadik, 2026-11-15 17:13:03 UTC
+- **Commit:** [`b63ef763`](https://github.com/aryamahadik/rosie/commit/b63ef763), by Arya Mahadik, 2026-11-15 17:13:03 UTC
 - **Pull request:** [#681](https://github.com/aryamahadik/rosie/pull/681) from `task/T-1392`, merged 2026-11-15 17:13:03 UTC. It squashed 3 branch commits:
   - `c31ba21` T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row…
   - `d783047` T-1391: README v1.16, the db/repo read's tests also show an email cop…
@@ -3622,7 +3782,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 669. T-1391: K-05 v1.16 frozen: readOutboxRowWritten also answers the stored row's recipient and send class (\#680)
 
-- **Commit:** [`2adbcae`](https://github.com/aryamahadik/rosie/commit/2adbcae), by Arya Mahadik, 2026-11-15 17:12:59 UTC
+- **Commit:** [`2adbcae4`](https://github.com/aryamahadik/rosie/commit/2adbcae4), by Arya Mahadik, 2026-11-15 17:12:59 UTC
 - **Pull request:** [#680](https://github.com/aryamahadik/rosie/pull/680) from `task/T-1391`, merged 2026-11-15 17:13:00 UTC. It squashed 2 branch commits:
   - `c31ba21` T-1391: K-05 v1.16, readOutboxRowWritten also answers the written row…
   - `d783047` T-1391: README v1.16, the db/repo read's tests also show an email cop…
@@ -3651,7 +3811,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 668. docs: COMMIT\_HISTORY.md through commit 666 (5c9ad62, \#677) (\#679)
 
-- **Commit:** [`2930ce6`](https://github.com/aryamahadik/rosie/commit/2930ce6), by Arya Mahadik, 2026-11-15 16:34:44 UTC
+- **Commit:** [`2930ce6e`](https://github.com/aryamahadik/rosie/commit/2930ce6e), by Arya Mahadik, 2026-11-15 16:34:44 UTC
 - **Pull request:** [#679](https://github.com/aryamahadik/rosie/pull/679) from `task/commit-history-130`, merged 2026-11-15 16:34:44 UTC. It squashed 1 branch commit:
   - `9f37a37` docs: COMMIT\_HISTORY.md through commit 666 (5c9ad62, \#677)
 - **Files changed:** 1 (+51 −1), by folder:
@@ -3669,7 +3829,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 667. T-1368: the frontier's start throws every non-transient failure scrubbed (3D000, 42501, 55000, a refused setting), its transaction hears a close between statements and sends nothing after it, and the Tool API base names its K-09 call to the scope and answers K-09's transient where the call's errors have it (\#678)
 
-- **Commit:** [`fb393f8`](https://github.com/aryamahadik/rosie/commit/fb393f8), by Arya Mahadik, 2026-11-15 16:34:40 UTC
+- **Commit:** [`fb393f8a`](https://github.com/aryamahadik/rosie/commit/fb393f8a), by Arya Mahadik, 2026-11-15 16:34:40 UTC
 - **Pull request:** [#678](https://github.com/aryamahadik/rosie/pull/678) from `task/T-1368`, merged 2026-11-15 16:34:40 UTC. It squashed 1 branch commit:
   - `1b2b43a` T-1368: the frontier's start throws every non-transient failure scrub…
 - **Files changed:** 5 (+1395 −62), by folder:
@@ -3686,7 +3846,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 666. docs: COMMIT\_HISTORY.md through commit 664 (af601fc, \#675) (\#677)
 
-- **Commit:** [`5c9ad62`](https://github.com/aryamahadik/rosie/commit/5c9ad62), by Arya Mahadik, 2026-11-15 15:28:15 UTC
+- **Commit:** [`5c9ad62a`](https://github.com/aryamahadik/rosie/commit/5c9ad62a), by Arya Mahadik, 2026-11-15 15:28:15 UTC
 - **Pull request:** [#677](https://github.com/aryamahadik/rosie/pull/677) from `task/commit-history-129`, merged 2026-11-15 15:28:15 UTC. It squashed 1 branch commit:
   - `77a6ec1` docs: COMMIT\_HISTORY.md through commit 664 (af601fc, \#675)
 - **Files changed:** 1 (+62 −1), by folder:
@@ -3704,7 +3864,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 665. T-1289: staging binds the sign-in calls: a code emailed to a listed test inbox signs a tester in on the test-phone page (ADR-016 card D) (\#676)
 
-- **Commit:** [`f763cd0`](https://github.com/aryamahadik/rosie/commit/f763cd0), by Arya Mahadik, 2026-11-15 15:28:11 UTC
+- **Commit:** [`f763cd06`](https://github.com/aryamahadik/rosie/commit/f763cd06), by Arya Mahadik, 2026-11-15 15:28:11 UTC
 - **Pull request:** [#676](https://github.com/aryamahadik/rosie/pull/676) from `task/T-1289`, merged 2026-11-15 15:28:12 UTC. It squashed 2 branch commits:
   - `bfd7404` T-1289: staging binds signInStart, signInCheck and signOut over K-05'…
   - `83507bf` T-1289: the sign-in test reads the code's expiry with a minute either…
@@ -3736,7 +3896,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 664. docs: COMMIT\_HISTORY.md through commit 661 (63167fa, \#672) (\#675)
 
-- **Commit:** [`af601fc`](https://github.com/aryamahadik/rosie/commit/af601fc), by Arya Mahadik, 2026-11-15 15:02:28 UTC
+- **Commit:** [`af601fc3`](https://github.com/aryamahadik/rosie/commit/af601fc3), by Arya Mahadik, 2026-11-15 15:02:28 UTC
 - **Pull request:** [#675](https://github.com/aryamahadik/rosie/pull/675) from `task/commit-history-128`, merged 2026-11-15 15:02:28 UTC. It squashed 1 branch commit:
   - `87dd993` docs: COMMIT\_HISTORY.md through commit 661 (63167fa, \#672)
 - **Files changed:** 1 (+38 −1), by folder:
@@ -3754,7 +3914,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 663. T-1293: K-08's contract test covers v1.2: the two refused twins mended into event-session-started.json and event-session-ended.json (each hash twin's one fault trips the name rule and the value rule, each alone); each session kind's values held to K-22 v1's sessions columns as README default 27 gives them, one value of the column's type each (a token under another name, a device id, a nested value refused); no 64-hex string anywhere in a session row but its turn id and bundle hash; the README's v1.2 tables held to the schema and to K-22; SIDE\_CHECKS gains the C-152 and C-193 sides from 'Writers and readers (v1.2)' (\#674)
 
-- **Commit:** [`3f113a2`](https://github.com/aryamahadik/rosie/commit/3f113a2), by Arya Mahadik, 2026-11-15 15:02:24 UTC
+- **Commit:** [`3f113a21`](https://github.com/aryamahadik/rosie/commit/3f113a21), by Arya Mahadik, 2026-11-15 15:02:24 UTC
 - **Pull request:** [#674](https://github.com/aryamahadik/rosie/pull/674) from `task/T-1293`, merged 2026-11-15 15:02:24 UTC. It squashed 1 branch commit:
   - `2d7f48c` T-1293: K-08's contract test covers v1.2: the two refused twins mende…
 - **Files changed:** 1 (+577 −35), by folder:
@@ -3770,7 +3930,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 662. T-1266: a turn with a customer's tapback still releases its routine parts: only texts the safety read reads are named as not read (\#673)
 
-- **Commit:** [`bddb151`](https://github.com/aryamahadik/rosie/commit/bddb151), by Arya Mahadik, 2026-11-15 15:02:20 UTC
+- **Commit:** [`bddb1510`](https://github.com/aryamahadik/rosie/commit/bddb1510), by Arya Mahadik, 2026-11-15 15:02:20 UTC
 - **Pull request:** [#673](https://github.com/aryamahadik/rosie/pull/673) from `task/T-1266`, merged 2026-11-15 15:02:20 UTC. It squashed 2 branch commits:
   - `5554d10` T-1266: a test that shows the hold: Sam's text with its record and hi…
   - `b7f7695` T-1266: the commit names to readOpenHolds only the turn's texts the s…
@@ -3797,7 +3957,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 661. docs: COMMIT\_HISTORY.md through commit 659 (b86335f, \#670) (\#672)
 
-- **Commit:** [`63167fa`](https://github.com/aryamahadik/rosie/commit/63167fa), by Arya Mahadik, 2026-11-15 13:32:08 UTC
+- **Commit:** [`63167fa9`](https://github.com/aryamahadik/rosie/commit/63167fa9), by Arya Mahadik, 2026-11-15 13:32:08 UTC
 - **Pull request:** [#672](https://github.com/aryamahadik/rosie/pull/672) from `task/commit-history-127`, merged 2026-11-15 13:32:08 UTC. It squashed 1 branch commit:
   - `2b5c6ef` docs: COMMIT\_HISTORY.md through commit 659 (b86335f, \#670)
 - **Files changed:** 1 (+37 −1), by folder:
@@ -3815,7 +3975,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 660. T-524: the test-phone page's thread view (C-205): each part the Linq double sent, in order and by kind, the email double's output, the stop state and the chat link through T-513's component, at /staging/test-phone/parts; the send page links to it and to the picker after a send (\#671)
 
-- **Commit:** [`47411bc`](https://github.com/aryamahadik/rosie/commit/47411bc), by Arya Mahadik, 2026-11-15 13:32:03 UTC
+- **Commit:** [`47411bc0`](https://github.com/aryamahadik/rosie/commit/47411bc0), by Arya Mahadik, 2026-11-15 13:32:03 UTC
 - **Pull request:** [#671](https://github.com/aryamahadik/rosie/pull/671) from `task/T-524`, merged 2026-11-15 13:32:04 UTC. It squashed 1 branch commit:
   - `d30ba38` T-524: the test-phone page's thread view (C-205): each part the Linq …
 - **Files changed:** 10 (+1720 −5), by folder:
@@ -3834,7 +3994,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 659. docs: COMMIT\_HISTORY.md through commit 657 (4c48ae5, \#668) (\#670)
 
-- **Commit:** [`b86335f`](https://github.com/aryamahadik/rosie/commit/b86335f), by Arya Mahadik, 2026-11-15 13:04:19 UTC
+- **Commit:** [`b86335fd`](https://github.com/aryamahadik/rosie/commit/b86335fd), by Arya Mahadik, 2026-11-15 13:04:19 UTC
 - **Pull request:** [#670](https://github.com/aryamahadik/rosie/pull/670) from `task/commit-history-126`, merged 2026-11-15 13:04:20 UTC. It squashed 1 branch commit:
   - `0256aaa` docs: COMMIT\_HISTORY.md through commit 657 (4c48ae5, \#668)
 - **Files changed:** 1 (+81 −1), by folder:
@@ -3852,7 +4012,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 658. T-1408: every model call's fetch asks for redirect "manual" (workerd refuses "error"); a 3xx fails by its status and is never followed; a Workers test carries both calls through workerd's own fetch (\#669)
 
-- **Commit:** [`b84d422`](https://github.com/aryamahadik/rosie/commit/b84d422), by Arya Mahadik, 2026-11-15 13:04:15 UTC
+- **Commit:** [`b84d422c`](https://github.com/aryamahadik/rosie/commit/b84d422c), by Arya Mahadik, 2026-11-15 13:04:15 UTC
 - **Pull request:** [#669](https://github.com/aryamahadik/rosie/pull/669) from `task/T-1408`, merged 2026-11-15 13:04:16 UTC. It squashed 1 branch commit:
   - `359976e` T-1408: every model call's fetch asks for redirect "manual" (workerd …
 - **Files changed:** 5 (+394 −2), by folder:
@@ -3870,7 +4030,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 657. docs: COMMIT\_HISTORY.md through commit 654 (7454283, \#665) (\#668)
 
-- **Commit:** [`4c48ae5`](https://github.com/aryamahadik/rosie/commit/4c48ae5), by Arya Mahadik, 2026-11-15 12:38:34 UTC
+- **Commit:** [`4c48ae51`](https://github.com/aryamahadik/rosie/commit/4c48ae51), by Arya Mahadik, 2026-11-15 12:38:34 UTC
 - **Pull request:** [#668](https://github.com/aryamahadik/rosie/pull/668) from `task/commit-history-125`, merged 2026-11-15 12:38:34 UTC. It squashed 1 branch commit:
   - `6727f51` docs: COMMIT\_HISTORY.md through commit 654 (7454283, \#665)
 - **Files changed:** 1 (+46 −1), by folder:
@@ -3888,7 +4048,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 656. T-1288: staging's email port: a sign-in code to a listed test inbox reaches Resend once, every other email the double (ADR-016 card F) (\#667)
 
-- **Commit:** [`ecf6e6a`](https://github.com/aryamahadik/rosie/commit/ecf6e6a), by Arya Mahadik, 2026-11-15 12:38:29 UTC
+- **Commit:** [`ecf6e6ae`](https://github.com/aryamahadik/rosie/commit/ecf6e6ae), by Arya Mahadik, 2026-11-15 12:38:29 UTC
 - **Pull request:** [#667](https://github.com/aryamahadik/rosie/pull/667) from `task/T-1288`, merged 2026-11-15 12:38:29 UTC. It squashed 3 branch commits:
   - `fadc268` T-1288: staging's email port: the router (a code to a listed inbox th…
   - `cf239a4` T-1288: the root wraps the address lookup only where the email port i…
@@ -3922,7 +4082,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 655. T-1287: seed:staging reads the testers' inbox list by name and runs the testers' set (ADR-016 card S) (\#666)
 
-- **Commit:** [`eee99a5`](https://github.com/aryamahadik/rosie/commit/eee99a5), by Arya Mahadik, 2026-11-15 12:38:24 UTC
+- **Commit:** [`eee99a53`](https://github.com/aryamahadik/rosie/commit/eee99a53), by Arya Mahadik, 2026-11-15 12:38:24 UTC
 - **Pull request:** [#666](https://github.com/aryamahadik/rosie/pull/666) from `task/T-1287`, merged 2026-11-15 12:38:24 UTC. It squashed 2 branch commits:
   - `05bb855` T-1287: seed:staging runs the testers' set (staging-testers) after sk…
   - `c031834` T-1287: the tests' inbox list in the one form put-staging-secrets.sh …
@@ -3950,7 +4110,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 654. docs: COMMIT\_HISTORY.md through commit 652 (d180e9c, \#663) (\#665)
 
-- **Commit:** [`7454283`](https://github.com/aryamahadik/rosie/commit/7454283), by Arya Mahadik, 2026-11-15 12:00:59 UTC
+- **Commit:** [`7454283e`](https://github.com/aryamahadik/rosie/commit/7454283e), by Arya Mahadik, 2026-11-15 12:00:59 UTC
 - **Pull request:** [#665](https://github.com/aryamahadik/rosie/pull/665) from `task/commit-history-124`, merged 2026-11-15 12:00:59 UTC. It squashed 1 branch commit:
   - `3dc4f5b` docs: COMMIT\_HISTORY.md through commit 652 (d180e9c, \#663)
 - **Files changed:** 1 (+72 −1), by folder:
@@ -3968,7 +4128,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 653. T-513: the chat link with its QR code (C9): the Tool API's link shown byte for byte with its QR, nothing when the contact add failed (\#664)
 
-- **Commit:** [`282322c`](https://github.com/aryamahadik/rosie/commit/282322c), by Arya Mahadik, 2026-11-15 12:00:55 UTC
+- **Commit:** [`282322c2`](https://github.com/aryamahadik/rosie/commit/282322c2), by Arya Mahadik, 2026-11-15 12:00:55 UTC
 - **Pull request:** [#664](https://github.com/aryamahadik/rosie/pull/664) from `task/T-513`, merged 2026-11-15 12:00:56 UTC. It squashed 2 branch commits:
   - `1bc7ca7` T-513: the chat-link component: the link with its QR code beside it (…
   - `9295f6d` T-513: the component's notes: the one check on the link is its sms: s…
@@ -3995,7 +4155,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 652. docs: COMMIT\_HISTORY.md through commit 649 (19f574a, \#660) (\#663)
 
-- **Commit:** [`d180e9c`](https://github.com/aryamahadik/rosie/commit/d180e9c), by Arya Mahadik, 2026-11-15 11:28:34 UTC
+- **Commit:** [`d180e9c9`](https://github.com/aryamahadik/rosie/commit/d180e9c9), by Arya Mahadik, 2026-11-15 11:28:34 UTC
 - **Pull request:** [#663](https://github.com/aryamahadik/rosie/pull/663) from `task/commit-history-123`, merged 2026-11-15 11:28:34 UTC. It squashed 1 branch commit:
   - `d17de71` docs: COMMIT\_HISTORY.md through commit 649 (19f574a, \#660)
 - **Files changed:** 1 (+52 −1), by folder:
@@ -4013,7 +4173,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 651. T-525: the seeded test-state picker at /staging/test-phone/phones (K-21 v1 testRoster): each test phone with its role, business and seeded customer, linking to T-523's send page with ?phone=\<roster id\>; each business signed up or not yet as the answer gives it (CQ-14); staging only, behind the tester sign-in (\#661)
 
-- **Commit:** [`f023684`](https://github.com/aryamahadik/rosie/commit/f023684), by Arya Mahadik, 2026-11-15 11:28:30 UTC
+- **Commit:** [`f023684c`](https://github.com/aryamahadik/rosie/commit/f023684c), by Arya Mahadik, 2026-11-15 11:28:30 UTC
 - **Pull request:** [#661](https://github.com/aryamahadik/rosie/pull/661) from `task/T-525`, merged 2026-11-15 11:28:31 UTC. It squashed 1 branch commit:
   - `a1739c5` T-525: the seeded test-state picker at /staging/test-phone/phones (K-…
 - **Files changed:** 8 (+1165 −3), by folder:
@@ -4031,7 +4191,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 650. T-570: check:staging's JOIN step: one traced test turn through test-phone-send, passing only on one reply to test phone 1 (D-017) (\#662)
 
-- **Commit:** [`1ae91ac`](https://github.com/aryamahadik/rosie/commit/1ae91ac), by Arya Mahadik, 2026-11-15 11:28:26 UTC
+- **Commit:** [`1ae91ac4`](https://github.com/aryamahadik/rosie/commit/1ae91ac4), by Arya Mahadik, 2026-11-15 11:28:26 UTC
 - **Pull request:** [#662](https://github.com/aryamahadik/rosie/pull/662) from `task/T-570`, merged 2026-11-15 11:28:27 UTC. It squashed 3 branch commits:
   - `65e9a6c` T-570: check:staging --join: test owner 1's JOIN through testPhoneSen…
   - `4545e65` T-570: the JOIN test's lower bound on since holds on a loaded machine…
@@ -4066,7 +4226,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 649. docs: COMMIT\_HISTORY.md through commit 646 (11951ca, \#656) (\#660)
 
-- **Commit:** [`19f574a`](https://github.com/aryamahadik/rosie/commit/19f574a), by Arya Mahadik, 2026-11-15 10:17:03 UTC
+- **Commit:** [`19f574a3`](https://github.com/aryamahadik/rosie/commit/19f574a3), by Arya Mahadik, 2026-11-15 10:17:03 UTC
 - **Pull request:** [#660](https://github.com/aryamahadik/rosie/pull/660) from `task/commit-history-122`, merged 2026-11-15 10:17:04 UTC. It squashed 1 branch commit:
   - `e2000a3` docs: COMMIT\_HISTORY.md through commit 646 (11951ca, \#656)
 - **Files changed:** 1 (+176 −1), by folder:
@@ -4084,7 +4244,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 648. T-1286: the dispatcher's email branch: a code row sent through the email port alone, the chat step skipped, emailFor's address, the code email's subject and assistant line, the stop and the end read again before the send, and no give-up of a row with no turn (\#659)
 
-- **Commit:** [`8062b2b`](https://github.com/aryamahadik/rosie/commit/8062b2b), by Arya Mahadik, 2026-11-15 10:17:00 UTC
+- **Commit:** [`8062b2ba`](https://github.com/aryamahadik/rosie/commit/8062b2ba), by Arya Mahadik, 2026-11-15 10:17:00 UTC
 - **Pull request:** [#659](https://github.com/aryamahadik/rosie/pull/659) from `task/T-1286`, merged 2026-11-15 10:17:00 UTC. It squashed 1 branch commit:
   - `e967aa9` T-1286: the dispatcher's email branch: a code row sent through the em…
 - **Files changed:** 9 (+1722 −78), by folder:
@@ -4101,7 +4261,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 647. T-1281: the human testers' seed (staging-testers): per inbox on STAGING\_TEST\_INBOXES a person, an email handle, a proven account and a K-22 v1.3 listing, no role and no team row; its integration test (\#658)
 
-- **Commit:** [`1367942`](https://github.com/aryamahadik/rosie/commit/1367942), by Arya Mahadik, 2026-11-15 10:16:56 UTC
+- **Commit:** [`1367942c`](https://github.com/aryamahadik/rosie/commit/1367942c), by Arya Mahadik, 2026-11-15 10:16:56 UTC
 - **Pull request:** [#658](https://github.com/aryamahadik/rosie/pull/658) from `task/T-1281`, merged 2026-11-15 10:16:56 UTC. It squashed 1 branch commit:
   - `16ff00b` T-1281: the human testers' seed (staging-testers): per inbox on STAGI…
 - **Files changed:** 2 (+1306 −0), by folder:
@@ -4117,7 +4277,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 646. docs: COMMIT\_HISTORY.md through commit 640 (33933e9, \#651) (\#656)
 
-- **Commit:** [`11951ca`](https://github.com/aryamahadik/rosie/commit/11951ca), by Arya Mahadik, 2026-11-15 09:25:36 UTC
+- **Commit:** [`11951caa`](https://github.com/aryamahadik/rosie/commit/11951caa), by Arya Mahadik, 2026-11-15 09:25:36 UTC
 - **Pull request:** [#656](https://github.com/aryamahadik/rosie/pull/656) from `task/commit-history-121`, merged 2026-11-15 09:25:37 UTC. It squashed 1 branch commit:
   - `5e64620` docs: COMMIT\_HISTORY.md through commit 640 (33933e9, \#651)
 - **Files changed:** 1 (+91 −1), by folder:
@@ -4133,7 +4293,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 645. T-1043: the chat-link device check's findings note, from the records (DL-794) (\#655)
 
-- **Commit:** [`125d1aa`](https://github.com/aryamahadik/rosie/commit/125d1aa), by Arya Mahadik, 2026-11-15 09:25:33 UTC
+- **Commit:** [`125d1aa8`](https://github.com/aryamahadik/rosie/commit/125d1aa8), by Arya Mahadik, 2026-11-15 09:25:33 UTC
 - **Pull request:** [#655](https://github.com/aryamahadik/rosie/pull/655) from `task/T-1043`, merged 2026-11-15 09:25:33 UTC. It squashed 2 branch commits:
   - `559f0d3` T-1043: the chat-link findings note, written from the records under D…
   - `00843b7` T-1043: the findings note's tables in prettier's layout (whitespace o…
@@ -4160,7 +4320,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 644. T-523: the test-phone page's send side: choose a test phone, send a text through K-21 testPhoneSend, show the trace id (\#654)
 
-- **Commit:** [`dbd0470`](https://github.com/aryamahadik/rosie/commit/dbd0470), by Arya Mahadik, 2026-11-15 09:25:28 UTC
+- **Commit:** [`dbd04702`](https://github.com/aryamahadik/rosie/commit/dbd04702), by Arya Mahadik, 2026-11-15 09:25:28 UTC
 - **Pull request:** [#654](https://github.com/aryamahadik/rosie/pull/654) from `task/T-523`, merged 2026-11-15 09:25:29 UTC. It squashed 1 branch commit:
   - `040ddc7` T-523: the test-phone page's send side: choose a test phone, send a t…
 - **Files changed:** 6 (+1370 −5), by folder:
@@ -4183,7 +4343,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 643. T-1306: staging binds the actor's copy sources (live timers and the stopped flag) on the job login (the audit's P6c) (\#657)
 
-- **Commit:** [`1c66504`](https://github.com/aryamahadik/rosie/commit/1c66504), by Arya Mahadik, 2026-11-15 09:25:24 UTC
+- **Commit:** [`1c66504c`](https://github.com/aryamahadik/rosie/commit/1c66504c), by Arya Mahadik, 2026-11-15 09:25:24 UTC
 - **Pull request:** [#657](https://github.com/aryamahadik/rosie/pull/657) from `task/T-1306`, merged 2026-11-15 09:25:25 UTC. It squashed 5 branch commits:
   - `f3a8948` T-1306: staging binds the actor's copy sources over readLiveTimers an…
   - `29096c4` T-1306: the copies' test shows the build reads alone (DL-768) and the…
@@ -4227,7 +4387,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 642. T-1305: staging binds the test-phone page's reads on the job login (the audit's P6b) (\#653)
 
-- **Commit:** [`3999f5d`](https://github.com/aryamahadik/rosie/commit/3999f5d), by Arya Mahadik, 2026-11-15 09:25:21 UTC
+- **Commit:** [`3999f5d2`](https://github.com/aryamahadik/rosie/commit/3999f5d2), by Arya Mahadik, 2026-11-15 09:25:21 UTC
 - **Pull request:** [#653](https://github.com/aryamahadik/rosie/pull/653) from `task/T-1305`, merged 2026-11-15 09:25:21 UTC. It squashed 3 branch commits:
   - `4dc11b3` T-1305: staging binds RootOptions.testPhone over K-05 v1.12 items 53 …
   - `da03e9e` T-1305: the send case shows the signed text names tp-01's number from…
@@ -4260,7 +4420,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 641. T-1398: staging binds the gate's reads, each on its own login, with the words from a checked bundle (the audit's P4a) (\#652)
 
-- **Commit:** [`e682a56`](https://github.com/aryamahadik/rosie/commit/e682a56), by Arya Mahadik, 2026-11-15 09:25:17 UTC
+- **Commit:** [`e682a56c`](https://github.com/aryamahadik/rosie/commit/e682a56c), by Arya Mahadik, 2026-11-15 09:25:17 UTC
 - **Pull request:** [#652](https://github.com/aryamahadik/rosie/pull/652) from `task/T-1398`, merged 2026-11-15 09:25:17 UTC. It squashed 3 branch commits:
   - `84f904e` T-1398: staging binds RootOptions.gateReads: pgCallScope on the Tool …
   - `86b8347` T-1398: the gate test and seed in Prettier's form; the seed reads K-2…
@@ -4292,7 +4452,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 640. docs: COMMIT\_HISTORY.md through commit 637 (e0f6ee7, \#648) (\#651)
 
-- **Commit:** [`33933e9`](https://github.com/aryamahadik/rosie/commit/33933e9), by Arya Mahadik, 2026-11-15 07:57:39 UTC
+- **Commit:** [`33933e9c`](https://github.com/aryamahadik/rosie/commit/33933e9c), by Arya Mahadik, 2026-11-15 07:57:39 UTC
 - **Pull request:** [#651](https://github.com/aryamahadik/rosie/pull/651) from `task/commit-history-120`, merged 2026-11-15 07:57:40 UTC. It squashed 1 branch commit:
   - `13152e3` docs: COMMIT\_HISTORY.md through commit 637 (e0f6ee7, \#648)
 - **Files changed:** 1 (+44 −1), by folder:
@@ -4308,7 +4468,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 639. T-1396: staging binds the safety read, decide and the composer from each bundle's own manifest (the audit's P3a) (\#650)
 
-- **Commit:** [`af8cac0`](https://github.com/aryamahadik/rosie/commit/af8cac0), by Arya Mahadik, 2026-11-15 07:57:35 UTC
+- **Commit:** [`af8cac04`](https://github.com/aryamahadik/rosie/commit/af8cac04), by Arya Mahadik, 2026-11-15 07:57:35 UTC
 - **Pull request:** [#650](https://github.com/aryamahadik/rosie/pull/650) from `task/T-1396-r2`, merged 2026-11-15 07:57:36 UTC. It squashed 5 branch commits:
   - `f44f1b1` T-1396: staging binds safetyReaders, deciders and composers from each…
   - `4e088df` T-1396: a bundle id that is not K-01's is refused before the kept rea…
@@ -4350,7 +4510,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 638. T-1401: staging binds the send all or nothing: outbox, send state, arming and the test-phone line (the audit's P5) (\#649)
 
-- **Commit:** [`1c4894b`](https://github.com/aryamahadik/rosie/commit/1c4894b), by Arya Mahadik, 2026-11-15 07:57:32 UTC
+- **Commit:** [`1c4894bf`](https://github.com/aryamahadik/rosie/commit/1c4894bf), by Arya Mahadik, 2026-11-15 07:57:32 UTC
 - **Pull request:** [#649](https://github.com/aryamahadik/rosie/pull/649) from `task/T-1401-r2`, merged 2026-11-15 07:57:32 UTC. It squashed 3 branch commits:
   - `821a850` T-1401: staging binds the send all or nothing (outboxCalls, sendState…
   - `cd3cea8` T-1401: the send's test also holds each bound call over a handle doub…
@@ -4382,7 +4542,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 637. docs: COMMIT\_HISTORY.md through commit 635 (b1e79f3, \#646) (\#648)
 
-- **Commit:** [`e0f6ee7`](https://github.com/aryamahadik/rosie/commit/e0f6ee7), by Arya Mahadik, 2026-11-15 04:19:44 UTC
+- **Commit:** [`e0f6ee70`](https://github.com/aryamahadik/rosie/commit/e0f6ee70), by Arya Mahadik, 2026-11-15 04:19:44 UTC
 - **Pull request:** [#648](https://github.com/aryamahadik/rosie/pull/648) from `task/commit-history-119`, merged 2026-11-15 04:19:45 UTC. It squashed 1 branch commit:
   - `2e4d929` docs: COMMIT\_HISTORY.md through commit 635 (b1e79f3, \#646)
 - **Files changed:** 1 (+49 −1), by folder:
@@ -4398,7 +4558,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 636. T-1400: staging binds the turn's directory over readTurnParty; idsOf and isStopped stay closed (the audit's SR) (\#647)
 
-- **Commit:** [`31fe41d`](https://github.com/aryamahadik/rosie/commit/31fe41d), by Arya Mahadik, 2026-11-15 04:19:41 UTC
+- **Commit:** [`31fe41d0`](https://github.com/aryamahadik/rosie/commit/31fe41d0), by Arya Mahadik, 2026-11-15 04:19:41 UTC
 - **Pull request:** [#647](https://github.com/aryamahadik/rosie/pull/647) from `task/T-1400`, merged 2026-11-15 04:19:41 UTC. It squashed 2 branch commits:
   - `e6fbb27` T-1400: staging binds the turn's directory: RootOptions.turnDirectory…
   - `446e789` T-1400: the test's number check holds no partial number (the phone sc…
@@ -4425,7 +4585,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 635. docs: COMMIT\_HISTORY.md through commit 633 (b9276f3, \#644) (\#646)
 
-- **Commit:** [`b1e79f3`](https://github.com/aryamahadik/rosie/commit/b1e79f3), by Arya Mahadik, 2026-11-15 03:56:40 UTC
+- **Commit:** [`b1e79f3b`](https://github.com/aryamahadik/rosie/commit/b1e79f3b), by Arya Mahadik, 2026-11-15 03:56:40 UTC
 - **Pull request:** [#646](https://github.com/aryamahadik/rosie/pull/646) from `task/commit-history-118`, merged 2026-11-15 03:56:41 UTC. It squashed 1 branch commit:
   - `6debd4c` docs: COMMIT\_HISTORY.md through commit 633 (b9276f3, \#644)
 - **Files changed:** 1 (+55 −1), by folder:
@@ -4441,7 +4601,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 634. T-1355: K-05's contract test covers v1.14, the safety-only claim's fixtures and its database side (\#645)
 
-- **Commit:** [`ce776bc`](https://github.com/aryamahadik/rosie/commit/ce776bc), by Arya Mahadik, 2026-11-15 03:56:36 UTC
+- **Commit:** [`ce776bc7`](https://github.com/aryamahadik/rosie/commit/ce776bc7), by Arya Mahadik, 2026-11-15 03:56:36 UTC
 - **Pull request:** [#645](https://github.com/aryamahadik/rosie/pull/645) from `task/T-1355`, merged 2026-11-15 03:56:37 UTC. It squashed 3 branch commits:
   - `9ff0547` T-1355: K-05's contract test covers v1.14, the safety-only claim: the…
   - `b720f2c` T-1355: the ten notices' note check also holds the danger line's row …
@@ -4473,7 +4633,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 633. docs: COMMIT\_HISTORY.md through commit 631 (16e83a7, \#642) (\#644)
 
-- **Commit:** [`b9276f3`](https://github.com/aryamahadik/rosie/commit/b9276f3), by Arya Mahadik, 2026-11-15 02:48:54 UTC
+- **Commit:** [`b9276f3f`](https://github.com/aryamahadik/rosie/commit/b9276f3f), by Arya Mahadik, 2026-11-15 02:48:54 UTC
 - **Pull request:** [#644](https://github.com/aryamahadik/rosie/pull/644) from `task/commit-history-117`, merged 2026-11-15 02:48:54 UTC. It squashed 1 branch commit:
   - `887c5fb` docs: COMMIT\_HISTORY.md through commit 631 (16e83a7, \#642)
 - **Files changed:** 1 (+34 −1), by folder:
@@ -4489,7 +4649,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 632. T-1397: staging binds the bundle-backed BundleSafety, with the safety read awaiting its bundle's checked lines (the audit's P3b) (\#643)
 
-- **Commit:** [`859a65d`](https://github.com/aryamahadik/rosie/commit/859a65d), by Arya Mahadik, 2026-11-15 02:48:50 UTC
+- **Commit:** [`859a65df`](https://github.com/aryamahadik/rosie/commit/859a65df), by Arya Mahadik, 2026-11-15 02:48:50 UTC
 - **Pull request:** [#643](https://github.com/aryamahadik/rosie/pull/643) from `task/T-1397-r3`, merged 2026-11-15 02:48:50 UTC. It squashed 4 branch commits:
   - `a67534f` T-1397: staging's bundle-backed BundleSafety (the check at the pin: t…
   - `02ef913` T-1397: the bundle-safety test's unnecessary cast removed (lint); one…
@@ -4527,7 +4687,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 631. docs: COMMIT\_HISTORY.md through commit 629 (f0d1c69, \#640) (\#642)
 
-- **Commit:** [`16e83a7`](https://github.com/aryamahadik/rosie/commit/16e83a7), by Arya Mahadik, 2026-11-15 02:16:15 UTC
+- **Commit:** [`16e83a76`](https://github.com/aryamahadik/rosie/commit/16e83a76), by Arya Mahadik, 2026-11-15 02:16:15 UTC
 - **Pull request:** [#642](https://github.com/aryamahadik/rosie/pull/642) from `task/commit-history-116`, merged 2026-11-15 02:16:15 UTC. It squashed 1 branch commit:
   - `fc299b8` docs: COMMIT\_HISTORY.md through commit 629 (f0d1c69, \#640)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -4543,7 +4703,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 630. T-1399: staging binds RootOptions.composeReads, finalizeData and planCalls through T-1254's handle (the Tool API's scope on HYPERDRIVE\_APP, K-05's row reads and plan calls on HYPERDRIVE\_JOB), with its Workers test and seed on T-1253's rig (\#641)
 
-- **Commit:** [`b6c55da`](https://github.com/aryamahadik/rosie/commit/b6c55da), by Arya Mahadik, 2026-11-15 02:16:10 UTC
+- **Commit:** [`b6c55daf`](https://github.com/aryamahadik/rosie/commit/b6c55daf), by Arya Mahadik, 2026-11-15 02:16:10 UTC
 - **Pull request:** [#641](https://github.com/aryamahadik/rosie/pull/641) from `task/T-1399`, merged 2026-11-15 02:16:11 UTC. It squashed 1 branch commit:
   - `ca0bfa1` T-1399: staging binds RootOptions.composeReads, finalizeData and plan…
 - **Files changed:** 3 (+2088 −10), by folder:
@@ -4559,7 +4719,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 629. docs: COMMIT\_HISTORY.md through commit 627 (61ddecc, \#638) (\#640)
 
-- **Commit:** [`f0d1c69`](https://github.com/aryamahadik/rosie/commit/f0d1c69), by Arya Mahadik, 2026-11-15 01:48:41 UTC
+- **Commit:** [`f0d1c698`](https://github.com/aryamahadik/rosie/commit/f0d1c698), by Arya Mahadik, 2026-11-15 01:48:41 UTC
 - **Pull request:** [#640](https://github.com/aryamahadik/rosie/pull/640) from `task/commit-history-115`, merged 2026-11-15 01:48:41 UTC. It squashed 1 branch commit:
   - `0442d9f` docs: COMMIT\_HISTORY.md through commit 627 (61ddecc, \#638)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -4575,7 +4735,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 628. T-1270: K-05's contract test covers v1.11 (readTurnParty): the fixture part adds v1.11 to WRITTEN\_FOR with a mend for each of its 4 refused fixtures, put right to the twin the README names; the database side runs db/repo's party read against every v1.11 fixture as rosie\_job, writing the rows five notes list before their exchanges and running the gateway's key call before the first text's, each refused answer answered put right in its twin's state and the refused party request refused before any statement (\#639)
 
-- **Commit:** [`ca67494`](https://github.com/aryamahadik/rosie/commit/ca67494), by Arya Mahadik, 2026-11-15 01:48:37 UTC
+- **Commit:** [`ca67494b`](https://github.com/aryamahadik/rosie/commit/ca67494b), by Arya Mahadik, 2026-11-15 01:48:37 UTC
 - **Pull request:** [#639](https://github.com/aryamahadik/rosie/pull/639) from `task/T-1270`, merged 2026-11-15 01:48:38 UTC. It squashed 1 branch commit:
   - `578d258` T-1270: K-05's contract test covers v1.11 (readTurnParty): the fixtur…
 - **Files changed:** 2 (+669 −64), by folder:
@@ -4591,7 +4751,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 627. docs: COMMIT\_HISTORY.md through commit 625 (c1c9731, \#636) (\#638)
 
-- **Commit:** [`61ddecc`](https://github.com/aryamahadik/rosie/commit/61ddecc), by Arya Mahadik, 2026-11-15 01:20:54 UTC
+- **Commit:** [`61ddeccf`](https://github.com/aryamahadik/rosie/commit/61ddeccf), by Arya Mahadik, 2026-11-15 01:20:54 UTC
 - **Pull request:** [#638](https://github.com/aryamahadik/rosie/pull/638) from `task/commit-history-114`, merged 2026-11-15 01:20:55 UTC. It squashed 1 branch commit:
   - `3cda9eb` docs: COMMIT\_HISTORY.md through commit 625 (c1c9731, \#636)
 - **Files changed:** 1 (+49 −1), by folder:
@@ -4607,7 +4767,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 626. T-1394: staging binds the receipt's two K-05 calls through the job handle: handleKey over handleSealingKey with the SEALING\_WRAP\_KEY-only resolver and chatOpenCall over openChatOnText, one job-side client per call, null with no HYPERDRIVE\_JOB or outside staging; its Workers test on the rig and its seed (\#637)
 
-- **Commit:** [`43fad13`](https://github.com/aryamahadik/rosie/commit/43fad13), by Arya Mahadik, 2026-11-15 01:20:49 UTC
+- **Commit:** [`43fad132`](https://github.com/aryamahadik/rosie/commit/43fad132), by Arya Mahadik, 2026-11-15 01:20:49 UTC
 - **Pull request:** [#637](https://github.com/aryamahadik/rosie/pull/637) from `task/T-1394`, merged 2026-11-15 01:20:50 UTC. It squashed 1 branch commit:
   - `fb3759b` T-1394: staging binds the receipt's two K-05 calls through the job ha…
 - **Files changed:** 3 (+1513 −8), by folder:
@@ -4623,7 +4783,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 625. docs: COMMIT\_HISTORY.md through commit 623 (11c5c20, \#633) (\#636)
 
-- **Commit:** [`c1c9731`](https://github.com/aryamahadik/rosie/commit/c1c9731), by Arya Mahadik, 2026-11-15 00:42:34 UTC
+- **Commit:** [`c1c9731f`](https://github.com/aryamahadik/rosie/commit/c1c9731f), by Arya Mahadik, 2026-11-15 00:42:34 UTC
 - **Pull request:** [#636](https://github.com/aryamahadik/rosie/pull/636) from `task/commit-history-113`, merged 2026-11-15 00:42:35 UTC. It squashed 1 branch commit:
   - `b76db2a` docs: COMMIT\_HISTORY.md through commit 623 (11c5c20, \#633)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -4639,7 +4799,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 624. T-1395: staging binds the turn's K-05 calls through the job handle (bundleReads, handleTargets, frontierScope, turnRows; the audit's P2b) (\#635)
 
-- **Commit:** [`5cd4554`](https://github.com/aryamahadik/rosie/commit/5cd4554), by Arya Mahadik, 2026-11-15 00:42:31 UTC
+- **Commit:** [`5cd4554e`](https://github.com/aryamahadik/rosie/commit/5cd4554e), by Arya Mahadik, 2026-11-15 00:42:31 UTC
 - **Pull request:** [#635](https://github.com/aryamahadik/rosie/pull/635) from `task/T-1395-r2`, merged 2026-11-15 00:42:31 UTC. It squashed 3 branch commits:
   - `c441032` T-1395: staging binds the turn's K-05 calls through the job handle (b…
   - `5eecd78` T-1395: the test binds this card's part alone (every other part stood…
@@ -4671,7 +4831,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 623. docs: COMMIT\_HISTORY.md through commit 621 (8f5e764, \#631) (\#633)
 
-- **Commit:** [`11c5c20`](https://github.com/aryamahadik/rosie/commit/11c5c20), by Arya Mahadik, 2026-11-14 23:55:20 UTC
+- **Commit:** [`11c5c204`](https://github.com/aryamahadik/rosie/commit/11c5c204), by Arya Mahadik, 2026-11-14 23:55:20 UTC
 - **Pull request:** [#633](https://github.com/aryamahadik/rosie/pull/633) from `task/commit-history-112`, merged 2026-11-14 23:55:20 UTC. It squashed 1 branch commit:
   - `188cd5c` docs: COMMIT\_HISTORY.md through commit 621 (8f5e764, \#631)
 - **Files changed:** 1 (+51 −1), by folder:
@@ -4687,7 +4847,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 622. T-1260: K-05's contract test covers v1.10 (readQuestionFacts, readHandle, readChatHandle): the fixture part adds v1.10 to WRITTEN\_FOR with a mend for each of its 4 refused fixtures, put right to the twin the README names; the database side runs db/repo's three reads against every v1.10 fixture as rosie\_job, writing read-chat-handle-sam's one noted row, S1-01's thread, before its exchange, each refused answer answered put right in its twin's state and the refused facts request refused before any statement (\#632)
 
-- **Commit:** [`dfbd4eb`](https://github.com/aryamahadik/rosie/commit/dfbd4eb), by Arya Mahadik, 2026-11-14 23:55:16 UTC
+- **Commit:** [`dfbd4eb9`](https://github.com/aryamahadik/rosie/commit/dfbd4eb9), by Arya Mahadik, 2026-11-14 23:55:16 UTC
 - **Pull request:** [#632](https://github.com/aryamahadik/rosie/pull/632) from `task/T-1260`, merged 2026-11-14 23:55:17 UTC. It squashed 1 branch commit:
   - `4736651` T-1260: K-05's contract test covers v1.10 (readQuestionFacts, readHan…
 - **Files changed:** 2 (+377 −79), by folder:
@@ -4703,7 +4863,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 621. docs: COMMIT\_HISTORY.md through commit 619 (3709e90, \#629) (\#631)
 
-- **Commit:** [`8f5e764`](https://github.com/aryamahadik/rosie/commit/8f5e764), by Arya Mahadik, 2026-11-14 23:31:54 UTC
+- **Commit:** [`8f5e7649`](https://github.com/aryamahadik/rosie/commit/8f5e7649), by Arya Mahadik, 2026-11-14 23:31:54 UTC
 - **Pull request:** [#631](https://github.com/aryamahadik/rosie/pull/631) from `task/commit-history-111`, merged 2026-11-14 23:31:54 UTC. It squashed 1 branch commit:
   - `1031775` docs: COMMIT\_HISTORY.md through commit 619 (3709e90, \#629)
 - **Files changed:** 1 (+64 −1), by folder:
@@ -4719,7 +4879,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 620. T-1393: staging binds the release flags over readFlag through the job handle (the audit's P1c) (\#630)
 
-- **Commit:** [`4acfa87`](https://github.com/aryamahadik/rosie/commit/4acfa87), by Arya Mahadik, 2026-11-14 23:31:50 UTC
+- **Commit:** [`4acfa879`](https://github.com/aryamahadik/rosie/commit/4acfa879), by Arya Mahadik, 2026-11-14 23:31:50 UTC
 - **Pull request:** [#630](https://github.com/aryamahadik/rosie/pull/630) from `task/T-1393`, merged 2026-11-14 23:31:50 UTC. It squashed 3 branch commits:
   - `c7559a8` T-1393: staging binds RootOptions.flags over T-185's readFlag through…
   - `f2a31b4` T-1393: the capture test makes its own 404 line, so it stands alone
@@ -4753,7 +4913,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 619. docs: COMMIT\_HISTORY.md through commit 616 (65d376a, \#626) (\#629)
 
-- **Commit:** [`3709e90`](https://github.com/aryamahadik/rosie/commit/3709e90), by Arya Mahadik, 2026-11-14 16:47:05 UTC
+- **Commit:** [`3709e90b`](https://github.com/aryamahadik/rosie/commit/3709e90b), by Arya Mahadik, 2026-11-14 16:47:05 UTC
 - **Pull request:** [#629](https://github.com/aryamahadik/rosie/pull/629) from `task/commit-history-110`, merged 2026-11-14 16:47:06 UTC. It squashed 1 branch commit:
   - `8b5fe4e` docs: COMMIT\_HISTORY.md through commit 616 (65d376a, \#626)
 - **Files changed:** 1 (+47 −1), by folder:
@@ -4769,7 +4929,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 618. T-1403: the rig test uses QuietSocket and the closed-socket filter is removed (\#628)
 
-- **Commit:** [`a0c9520`](https://github.com/aryamahadik/rosie/commit/a0c9520), by Arya Mahadik, 2026-11-14 16:47:01 UTC
+- **Commit:** [`a0c95206`](https://github.com/aryamahadik/rosie/commit/a0c95206), by Arya Mahadik, 2026-11-14 16:47:01 UTC
 - **Pull request:** [#628](https://github.com/aryamahadik/rosie/pull/628) from `task/T-1403`, merged 2026-11-14 16:47:01 UTC. It squashed 2 branch commits:
   - `2117742` T-1403: the rig test hands postgres.js the Worker handle's QuietSocke…
   - `b7deb71` T-1403: tests/QUARANTINE.md names the 9 tests of the deleted infra/ci…
@@ -4800,7 +4960,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 617. T-1404: down-path-ports.worker.test.ts's 'binds each to its fake' case runs its fake set on a clock that reads one instant (the safety read's fakeClock at the seed timer's due time), so the fire time it expects and the time fakeTimerFire keeps are one reading; every assertion unchanged (DL-760) (\#627)
 
-- **Commit:** [`ca9ca07`](https://github.com/aryamahadik/rosie/commit/ca9ca07), by Arya Mahadik, 2026-11-14 16:46:58 UTC
+- **Commit:** [`ca9ca076`](https://github.com/aryamahadik/rosie/commit/ca9ca076), by Arya Mahadik, 2026-11-14 16:46:58 UTC
 - **Pull request:** [#627](https://github.com/aryamahadik/rosie/pull/627) from `task/T-1404`, merged 2026-11-14 16:46:58 UTC. It squashed 1 branch commit:
   - `a71b498` T-1404: down-path-ports.worker.test.ts's 'binds each to its fake' cas…
 - **Files changed:** 1 (+15 −2), by folder:
@@ -4816,7 +4976,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 616. docs: COMMIT\_HISTORY.md through commit 614 (e996837, \#624) (\#626)
 
-- **Commit:** [`65d376a`](https://github.com/aryamahadik/rosie/commit/65d376a), by Arya Mahadik, 2026-11-14 12:56:18 UTC
+- **Commit:** [`65d376af`](https://github.com/aryamahadik/rosie/commit/65d376af), by Arya Mahadik, 2026-11-14 12:56:18 UTC
 - **Pull request:** [#626](https://github.com/aryamahadik/rosie/pull/626) from `task/commit-history-109`, merged 2026-11-14 12:56:18 UTC. It squashed 1 branch commit:
   - `1e7773b` docs: COMMIT\_HISTORY.md through commit 614 (e996837, \#624)
 - **Files changed:** 1 (+44 −1), by folder:
@@ -4832,7 +4992,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 615. T-1257: stagingOptions(env) and the later parts' seams (the D-017 audit's P1a, its wiring part) (\#625)
 
-- **Commit:** [`c310948`](https://github.com/aryamahadik/rosie/commit/c310948), by Arya Mahadik, 2026-11-14 12:56:14 UTC
+- **Commit:** [`c3109482`](https://github.com/aryamahadik/rosie/commit/c3109482), by Arya Mahadik, 2026-11-14 12:56:14 UTC
 - **Pull request:** [#625](https://github.com/aryamahadik/rosie/pull/625) from `task/T-1257`, merged 2026-11-14 12:56:15 UTC. It squashed 2 branch commits:
   - `a5ab645` T-1257: stagingOptions(env) wires T-1254's handle into the root on st…
   - `6d3da5e` T-1257: comment wording: workerRoot points at each part's own file fo…
@@ -4862,7 +5022,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 614. docs: COMMIT\_HISTORY.md through commit 612 (bd3def9, \#622) (\#624)
 
-- **Commit:** [`e996837`](https://github.com/aryamahadik/rosie/commit/e996837), by Arya Mahadik, 2026-11-14 11:44:39 UTC
+- **Commit:** [`e9968370`](https://github.com/aryamahadik/rosie/commit/e9968370), by Arya Mahadik, 2026-11-14 11:44:39 UTC
 - **Pull request:** [#624](https://github.com/aryamahadik/rosie/pull/624) from `task/commit-history-108`, merged 2026-11-14 11:44:39 UTC. It squashed 1 branch commit:
   - `85920eb` docs: COMMIT\_HISTORY.md through commit 612 (bd3def9, \#622)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -4878,7 +5038,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 613. T-1254: the Worker's database handle and its guard in every call (ADR-014 piece 6) (\#623)
 
-- **Commit:** [`caf9cca`](https://github.com/aryamahadik/rosie/commit/caf9cca), by Arya Mahadik, 2026-11-14 11:44:35 UTC
+- **Commit:** [`caf9ccab`](https://github.com/aryamahadik/rosie/commit/caf9ccab), by Arya Mahadik, 2026-11-14 11:44:35 UTC
 - **Pull request:** [#623](https://github.com/aryamahadik/rosie/pull/623) from `task/T-1254`, merged 2026-11-14 11:44:35 UTC. It squashed 2 branch commits:
   - `5dc985a` T-1254: the Worker's database handle and its guard in every call (run…
   - `13d48f7` T-1254: the handle's test also shows no role and no search path sent …
@@ -4905,7 +5065,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 612. docs: COMMIT\_HISTORY.md through commit 610 (79274be, \#620) (\#622)
 
-- **Commit:** [`bd3def9`](https://github.com/aryamahadik/rosie/commit/bd3def9), by Arya Mahadik, 2026-11-14 10:40:40 UTC
+- **Commit:** [`bd3def94`](https://github.com/aryamahadik/rosie/commit/bd3def94), by Arya Mahadik, 2026-11-14 10:40:40 UTC
 - **Pull request:** [#622](https://github.com/aryamahadik/rosie/pull/622) from `task/commit-history-107`, merged 2026-11-14 10:40:41 UTC. It squashed 1 branch commit:
   - `6e0c137` docs: COMMIT\_HISTORY.md through commit 610 (79274be, \#620)
 - **Files changed:** 1 (+93 −1), by folder:
@@ -4921,7 +5081,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 611. T-1259: db/repo's readChatHandle, the phone handle a Linq chat id names (K-05 v1.10 item 51): threads by linq\_chat\_id, then a chat thread's handle by its id, in one read-only transaction as rosie\_job; a phone answers its id and E.164 number, anything else both fields null (default 94); transient or a scrubbed error on a database failure; tested in db/repo/threads-chat-handle.int.test.ts (\#621)
 
-- **Commit:** [`e550d67`](https://github.com/aryamahadik/rosie/commit/e550d67), by Arya Mahadik, 2026-11-14 10:40:36 UTC
+- **Commit:** [`e550d67b`](https://github.com/aryamahadik/rosie/commit/e550d67b), by Arya Mahadik, 2026-11-14 10:40:36 UTC
 - **Pull request:** [#621](https://github.com/aryamahadik/rosie/pull/621) from `task/T-1259`, merged 2026-11-14 10:40:36 UTC. It squashed 1 branch commit:
   - `859b9c8` T-1259: db/repo's readChatHandle, the phone handle a Linq chat id nam…
 - **Files changed:** 2 (+1330 −0), by folder:
@@ -4937,7 +5097,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 610. docs: COMMIT\_HISTORY.md through commit 607 (5ef2d69, \#618) (\#620)
 
-- **Commit:** [`79274be`](https://github.com/aryamahadik/rosie/commit/79274be), by Arya Mahadik, 2026-11-14 09:58:47 UTC
+- **Commit:** [`79274be5`](https://github.com/aryamahadik/rosie/commit/79274be5), by Arya Mahadik, 2026-11-14 09:58:47 UTC
 - **Pull request:** [#620](https://github.com/aryamahadik/rosie/pull/620) from `task/commit-history-106`, merged 2026-11-14 09:58:48 UTC. It squashed 1 branch commit:
   - `9e02fd5` docs: COMMIT\_HISTORY.md through commit 607 (5ef2d69, \#618)
 - **Files changed:** 1 (+54 −1), by folder:
@@ -4953,7 +5113,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 609. T-1402: the staging\_testers migration (0036) and db/repo's tester standing reads (K-05 v1.15 items 68 and 69); merges with T-1295 (\#619)
 
-- **Commit:** [`459a31e`](https://github.com/aryamahadik/rosie/commit/459a31e), by Arya Mahadik, 2026-11-14 09:58:44 UTC
+- **Commit:** [`459a31e2`](https://github.com/aryamahadik/rosie/commit/459a31e2), by Arya Mahadik, 2026-11-14 09:58:44 UTC
 - **Pull request:** [#619](https://github.com/aryamahadik/rosie/pull/619) from `task/T-1402`, merged 2026-11-14 09:58:44 UTC. It squashed 5 branch commits:
   - `13d6057` T-1295: K-22 v1.3 lists staging's human testers apart from Rosie's te…
   - `f31e776` T-1295: the K-05 producers line names only side-listed components (th…
@@ -4996,7 +5156,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 608. T-1295: K-22 v1.3 and K-05 v1.15, where staging's human testers are listed (merges with T-1402) (\#609)
 
-- **Commit:** [`0a59ae7`](https://github.com/aryamahadik/rosie/commit/0a59ae7), by Arya Mahadik, 2026-11-14 09:58:41 UTC
+- **Commit:** [`0a59ae71`](https://github.com/aryamahadik/rosie/commit/0a59ae71), by Arya Mahadik, 2026-11-14 09:58:41 UTC
 - **Pull request:** [#609](https://github.com/aryamahadik/rosie/pull/609) from `task/T-1295`, merged 2026-11-14 09:58:41 UTC. It squashed 2 branch commits:
   - `13d6057` T-1295: K-22 v1.3 lists staging's human testers apart from Rosie's te…
   - `f31e776` T-1295: the K-05 producers line names only side-listed components (th…
@@ -5029,7 +5189,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 607. docs: COMMIT\_HISTORY.md through commit 605 (507759c, \#615) (\#618)
 
-- **Commit:** [`5ef2d69`](https://github.com/aryamahadik/rosie/commit/5ef2d69), by Arya Mahadik, 2026-11-14 09:37:26 UTC
+- **Commit:** [`5ef2d691`](https://github.com/aryamahadik/rosie/commit/5ef2d691), by Arya Mahadik, 2026-11-14 09:37:26 UTC
 - **Pull request:** [#618](https://github.com/aryamahadik/rosie/pull/618) from `task/commit-history-105`, merged 2026-11-14 09:37:26 UTC. It squashed 1 branch commit:
   - `9cce906` docs: COMMIT\_HISTORY.md through commit 605 (507759c, \#615)
 - **Files changed:** 1 (+36 −1), by folder:
@@ -5045,7 +5205,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 606. T-1253: the Workers test rig over PostgreSQL (ADR-014 piece 5) (\#617)
 
-- **Commit:** [`fb2fbff`](https://github.com/aryamahadik/rosie/commit/fb2fbff), by Arya Mahadik, 2026-11-14 09:37:22 UTC
+- **Commit:** [`fb2fbffd`](https://github.com/aryamahadik/rosie/commit/fb2fbffd), by Arya Mahadik, 2026-11-14 09:37:22 UTC
 - **Pull request:** [#617](https://github.com/aryamahadik/rosie/pull/617) from `task/T-1253`, merged 2026-11-14 09:37:22 UTC. It squashed 3 branch commits:
   - `712bf5c` T-1253: the Workers test rig over PostgreSQL: its globalSetup in both…
   - `d1aabe2` T-1253: npm run db:logins tested as npm runs it: refused on a host th…
@@ -5082,7 +5242,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 605. docs: COMMIT\_HISTORY.md through commit 603 (daf2aa6, \#613) (\#615)
 
-- **Commit:** [`507759c`](https://github.com/aryamahadik/rosie/commit/507759c), by Arya Mahadik, 2026-11-14 09:13:27 UTC
+- **Commit:** [`507759cf`](https://github.com/aryamahadik/rosie/commit/507759cf), by Arya Mahadik, 2026-11-14 09:13:27 UTC
 - **Pull request:** [#615](https://github.com/aryamahadik/rosie/pull/615) from `task/commit-history-104`, merged 2026-11-14 09:13:27 UTC. It squashed 1 branch commit:
   - `61c0c84` docs: COMMIT\_HISTORY.md through commit 603 (daf2aa6, \#613)
 - **Files changed:** 1 (+46 −1), by folder:
@@ -5098,7 +5258,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 604. T-1285: signInCheck and signOut's server side: every wrong-code answer the same with or without an account, the session token in the first signedIn alone (ADR-016 card B2) (\#616)
 
-- **Commit:** [`f66da6a`](https://github.com/aryamahadik/rosie/commit/f66da6a), by Arya Mahadik, 2026-11-14 09:13:23 UTC
+- **Commit:** [`f66da6aa`](https://github.com/aryamahadik/rosie/commit/f66da6aa), by Arya Mahadik, 2026-11-14 09:13:23 UTC
 - **Pull request:** [#616](https://github.com/aryamahadik/rosie/pull/616) from `task/T-1285-r2`, merged 2026-11-14 09:13:23 UTC. It squashed 1 branch commit:
   - `e406922` T-1285: signInCheck and signOut's server side: every wrong-code answe…
 - **Files changed:** 13 (+3050 −24), by folder:
@@ -5116,7 +5276,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 603. docs: COMMIT\_HISTORY.md through commit 601 (c22c937, \#611) (\#613)
 
-- **Commit:** [`daf2aa6`](https://github.com/aryamahadik/rosie/commit/daf2aa6), by Arya Mahadik, 2026-11-14 08:13:32 UTC
+- **Commit:** [`daf2aa6d`](https://github.com/aryamahadik/rosie/commit/daf2aa6d), by Arya Mahadik, 2026-11-14 08:13:32 UTC
 - **Pull request:** [#613](https://github.com/aryamahadik/rosie/pull/613) from `task/commit-history-103`, merged 2026-11-14 08:13:33 UTC. It squashed 1 branch commit:
   - `df1da4e` docs: COMMIT\_HISTORY.md through commit 601 (c22c937, \#611)
 - **Files changed:** 1 (+35 −1), by folder:
@@ -5132,7 +5292,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 602. T-1093: the deploy-time check of the Worker's two logins (ADR-014 piece 4); migrations set lock and statement timeouts (\#612)
 
-- **Commit:** [`d48abc3`](https://github.com/aryamahadik/rosie/commit/d48abc3), by Arya Mahadik, 2026-11-14 08:13:28 UTC
+- **Commit:** [`d48abc3e`](https://github.com/aryamahadik/rosie/commit/d48abc3e), by Arya Mahadik, 2026-11-14 08:13:28 UTC
 - **Pull request:** [#612](https://github.com/aryamahadik/rosie/pull/612) from `task/T-1093`, merged 2026-11-14 08:13:29 UTC. It squashed 2 branch commits:
   - `e59a2e8` T-1093: the deploy-time check of the Worker's two logins (ADR-014 pie…
   - `1e24a3b` T-1093: worker-logins-check.mjs takes the database URLs out of its en…
@@ -5161,7 +5321,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 601. docs: COMMIT\_HISTORY.md through commit 599 (1c5b398, \#608) (\#611)
 
-- **Commit:** [`c22c937`](https://github.com/aryamahadik/rosie/commit/c22c937), by Arya Mahadik, 2026-11-14 07:53:42 UTC
+- **Commit:** [`c22c9377`](https://github.com/aryamahadik/rosie/commit/c22c9377), by Arya Mahadik, 2026-11-14 07:53:42 UTC
 - **Pull request:** [#611](https://github.com/aryamahadik/rosie/pull/611) from `task/commit-history-102`, merged 2026-11-14 07:53:42 UTC. It squashed 1 branch commit:
   - `d5ec1cb` docs: COMMIT\_HISTORY.md through commit 599 (1c5b398, \#608)
 - **Files changed:** 1 (+63 −1), by folder:
@@ -5177,7 +5337,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 600. T-1282: signInStart's server side: the same answer with or without an account, the code sent only after the answer (ADR-016 card B1) (\#610)
 
-- **Commit:** [`8dd0dc0`](https://github.com/aryamahadik/rosie/commit/8dd0dc0), by Arya Mahadik, 2026-11-14 07:53:39 UTC
+- **Commit:** [`8dd0dc02`](https://github.com/aryamahadik/rosie/commit/8dd0dc02), by Arya Mahadik, 2026-11-14 07:53:39 UTC
 - **Pull request:** [#610](https://github.com/aryamahadik/rosie/pull/610) from `task/T-1282`, merged 2026-11-14 07:53:39 UTC. It squashed 1 branch commit:
   - `b68027d` T-1282: signInStart's server side: the same answer with or without an…
 - **Files changed:** 10 (+2272 −0), by folder:
@@ -5195,7 +5355,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 599. docs: COMMIT\_HISTORY.md through commit 596 (b381b5d, \#605) (\#608)
 
-- **Commit:** [`1c5b398`](https://github.com/aryamahadik/rosie/commit/1c5b398), by Arya Mahadik, 2026-11-14 07:00:31 UTC
+- **Commit:** [`1c5b3987`](https://github.com/aryamahadik/rosie/commit/1c5b3987), by Arya Mahadik, 2026-11-14 07:00:31 UTC
 - **Pull request:** [#608](https://github.com/aryamahadik/rosie/pull/608) from `task/commit-history-101`, merged 2026-11-14 07:00:31 UTC. It squashed 1 branch commit:
   - `ae70bbf` docs: COMMIT\_HISTORY.md through commit 596 (b381b5d, \#605)
 - **Files changed:** 1 (+34 −1), by folder:
@@ -5211,7 +5371,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 598. T-1255: the probe for the live check of staging's two Hyperdrive configurations (ADR-014 piece 7) (\#607)
 
-- **Commit:** [`0bf6d5b`](https://github.com/aryamahadik/rosie/commit/0bf6d5b), by Arya Mahadik, 2026-11-14 07:00:27 UTC
+- **Commit:** [`0bf6d5bd`](https://github.com/aryamahadik/rosie/commit/0bf6d5bd), by Arya Mahadik, 2026-11-14 07:00:27 UTC
 - **Pull request:** [#607](https://github.com/aryamahadik/rosie/pull/607) from `task/T-1255`, merged 2026-11-14 07:00:28 UTC. It squashed 2 branch commits:
   - `cd69af7` T-1255: the probe for the live check of staging's two Hyperdrive conf…
   - `2e99be8` T-1255: README: what the Worker reads and returns in a remote session…
@@ -5238,7 +5398,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 597. T-1244: a delivery receipt whose clock arming ends failed is answered 503, so Linq sends it again and the repeat path arms the clock (\#606)
 
-- **Commit:** [`e73df83`](https://github.com/aryamahadik/rosie/commit/e73df83), by Arya Mahadik, 2026-11-14 07:00:23 UTC
+- **Commit:** [`e73df837`](https://github.com/aryamahadik/rosie/commit/e73df837), by Arya Mahadik, 2026-11-14 07:00:23 UTC
 - **Pull request:** [#606](https://github.com/aryamahadik/rosie/pull/606) from `task/T-1244`, merged 2026-11-14 07:00:24 UTC. It squashed 1 branch commit:
   - `d5c6117` T-1244: a delivery receipt whose clock arming ends failed is answered…
 - **Files changed:** 6 (+632 −42), by folder:
@@ -5257,7 +5417,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 596. docs: COMMIT\_HISTORY.md through commit 594 (edaf3e1, \#603) (\#605)
 
-- **Commit:** [`b381b5d`](https://github.com/aryamahadik/rosie/commit/b381b5d), by Arya Mahadik, 2026-11-14 06:34:03 UTC
+- **Commit:** [`b381b5d0`](https://github.com/aryamahadik/rosie/commit/b381b5d0), by Arya Mahadik, 2026-11-14 06:34:03 UTC
 - **Pull request:** [#605](https://github.com/aryamahadik/rosie/pull/605) from `task/commit-history-100`, merged 2026-11-14 06:34:03 UTC. It squashed 1 branch commit:
   - `d24c08b` docs: COMMIT\_HISTORY.md through commit 594 (edaf3e1, \#603)
 - **Files changed:** 1 (+78 −1), by folder:
@@ -5273,7 +5433,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 595. T-567: env.staging binds HYPERDRIVE\_JOB and HYPERDRIVE\_APP (ADR-014 piece 3), each with its login's local string; wrangler-env.test.mjs pins exactly the two, no HYPERDRIVE, the spike's id nowhere, production unchanged (\#604)
 
-- **Commit:** [`28c1e3e`](https://github.com/aryamahadik/rosie/commit/28c1e3e), by Arya Mahadik, 2026-11-14 06:33:59 UTC
+- **Commit:** [`28c1e3e9`](https://github.com/aryamahadik/rosie/commit/28c1e3e9), by Arya Mahadik, 2026-11-14 06:33:59 UTC
 - **Pull request:** [#604](https://github.com/aryamahadik/rosie/pull/604) from `task/T-567`, merged 2026-11-14 06:33:59 UTC. It squashed 1 branch commit:
   - `dbb11d0` T-567: env.staging binds HYPERDRIVE\_JOB and HYPERDRIVE\_APP (ADR-014 p…
 - **Files changed:** 2 (+347 −5), by folder:
@@ -5290,7 +5450,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 594. docs: COMMIT\_HISTORY.md through commit 591 (1d9c3d8, \#599) (\#603)
 
-- **Commit:** [`edaf3e1`](https://github.com/aryamahadik/rosie/commit/edaf3e1), by Arya Mahadik, 2026-11-14 05:29:17 UTC
+- **Commit:** [`edaf3e1c`](https://github.com/aryamahadik/rosie/commit/edaf3e1c), by Arya Mahadik, 2026-11-14 05:29:17 UTC
 - **Pull request:** [#603](https://github.com/aryamahadik/rosie/pull/603) from `task/commit-history-99`, merged 2026-11-14 05:29:17 UTC. It squashed 1 branch commit:
   - `2546c58` docs: COMMIT\_HISTORY.md through commit 591 (1d9c3d8, \#599)
 - **Files changed:** 1 (+109 −1), by folder:
@@ -5306,7 +5466,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 593. T-1376: ADR-019, the previous databases read only behind previous\_databases (off by default) (\#602)
 
-- **Commit:** [`dc53d22`](https://github.com/aryamahadik/rosie/commit/dc53d22), by Arya Mahadik, 2026-11-14 05:29:12 UTC
+- **Commit:** [`dc53d226`](https://github.com/aryamahadik/rosie/commit/dc53d226), by Arya Mahadik, 2026-11-14 05:29:12 UTC
 - **Pull request:** [#602](https://github.com/aryamahadik/rosie/pull/602) from `task/T-1376`, merged 2026-11-14 05:29:13 UTC. It squashed 2 branch commits:
   - `aa2f5e8` T-1376: ADR-019, the previous databases kept and read only behind the…
   - `b53c032` T-1376: ADR-019 round 2: a flag read that throws or answers anything …
@@ -5333,7 +5493,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 592. T-1373: K-09 v1.10 frozen: recordSafetyOutcome names every outbox row the record's commit writes, each with its recipient and send class (\#601)
 
-- **Commit:** [`eec6532`](https://github.com/aryamahadik/rosie/commit/eec6532), by Arya Mahadik, 2026-11-14 05:29:08 UTC
+- **Commit:** [`eec6532b`](https://github.com/aryamahadik/rosie/commit/eec6532b), by Arya Mahadik, 2026-11-14 05:29:08 UTC
 - **Pull request:** [#601](https://github.com/aryamahadik/rosie/pull/601) from `task/T-1373`, merged 2026-11-14 05:29:09 UTC. It squashed 3 branch commits:
   - `8a7b0e1` T-1373: K-09 v1.10 frozen: recordSafetyOutcome's answer names every o…
   - `9317097` T-1373: K-09 v1.10 round 2 (DL-751), README only: default 175 kept, a…
@@ -5367,7 +5527,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 591. docs: COMMIT\_HISTORY.md through commit 587 (1374c22, \#596) (\#599)
 
-- **Commit:** [`1d9c3d8`](https://github.com/aryamahadik/rosie/commit/1d9c3d8), by Arya Mahadik, 2026-11-14 04:53:27 UTC
+- **Commit:** [`1d9c3d8f`](https://github.com/aryamahadik/rosie/commit/1d9c3d8f), by Arya Mahadik, 2026-11-14 04:53:27 UTC
 - **Pull request:** [#599](https://github.com/aryamahadik/rosie/pull/599) from `task/commit-history-98`, merged 2026-11-14 04:53:27 UTC. It squashed 1 branch commit:
   - `b602773` docs: COMMIT\_HISTORY.md through commit 587 (1374c22, \#596)
 - **Files changed:** 1 (+46 −1), by folder:
@@ -5383,7 +5543,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 590. T-1371: the Hyperdrive script sends each login's password only as a bound parameter of a temporary function running ALTER ROLE, never in a statement's text (CQ-225's ruling) (\#600)
 
-- **Commit:** [`cc74617`](https://github.com/aryamahadik/rosie/commit/cc74617), by Arya Mahadik, 2026-11-14 04:53:23 UTC
+- **Commit:** [`cc746170`](https://github.com/aryamahadik/rosie/commit/cc746170), by Arya Mahadik, 2026-11-14 04:53:23 UTC
 - **Pull request:** [#600](https://github.com/aryamahadik/rosie/pull/600) from `task/T-1371`, merged 2026-11-14 04:53:24 UTC. It squashed 2 branch commits:
   - `3287a0b` T-1371: the Hyperdrive script gives PostgreSQL each password only as …
   - `ef384f6` T-1371: round 2 (DL-742): step 4 sets password\_encryption to scram-sh…
@@ -5413,7 +5573,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 589. T-1326: the root joins the PostgreSQL-down path: setDbOutageDeps with its six ports in install(), proved through the root, each port closed on staging (\#598)
 
-- **Commit:** [`0ad7041`](https://github.com/aryamahadik/rosie/commit/0ad7041), by Arya Mahadik, 2026-11-14 04:53:20 UTC
+- **Commit:** [`0ad70411`](https://github.com/aryamahadik/rosie/commit/0ad70411), by Arya Mahadik, 2026-11-14 04:53:20 UTC
 - **Pull request:** [#598](https://github.com/aryamahadik/rosie/pull/598) from `task/T-1326`, merged 2026-11-14 04:53:20 UTC. It squashed 2 branch commits:
   - `6799145` T-1326: root.install() joins the PostgreSQL-down path: setDbOutageDep…
   - `59b45b7` T-1326: the join's test writes each fictional number out whole (555-0…
@@ -5440,7 +5600,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 588. T-588: the contact home (S13-19): every message the person's way, never SMS, reply clocks only once reached, the handling line; a STOP-withdrawn yes never counts (\#597)
 
-- **Commit:** [`a49a27f`](https://github.com/aryamahadik/rosie/commit/a49a27f), by Arya Mahadik, 2026-11-14 04:53:16 UTC
+- **Commit:** [`a49a27fd`](https://github.com/aryamahadik/rosie/commit/a49a27fd), by Arya Mahadik, 2026-11-14 04:53:16 UTC
 - **Pull request:** [#597](https://github.com/aryamahadik/rosie/pull/597) from `task/T-588`, merged 2026-11-14 04:53:17 UTC. It squashed 4 branch commits:
   - `8e43e87` T-588: temporary exploration of the compiled S13-19 (reverted by the …
   - `790073c` Revert "T-588: temporary exploration of the compiled S13-19 (reverted…
@@ -5475,7 +5635,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 587. docs: COMMIT\_HISTORY.md through commit 585 (59a2ee0, \#592) (\#596)
 
-- **Commit:** [`1374c22`](https://github.com/aryamahadik/rosie/commit/1374c22), by Arya Mahadik, 2026-11-13 23:53:39 UTC
+- **Commit:** [`1374c222`](https://github.com/aryamahadik/rosie/commit/1374c222), by Arya Mahadik, 2026-11-13 23:53:39 UTC
 - **Pull request:** [#596](https://github.com/aryamahadik/rosie/pull/596) from `task/commit-history-97`, merged 2026-11-13 23:53:40 UTC. It squashed 1 branch commit:
   - `aae9375` docs: COMMIT\_HISTORY.md through commit 585 (59a2ee0, \#592)
 - **Files changed:** 1 (+88 −1), by folder:
@@ -5491,7 +5651,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 586. T-024: K-15 v1, the Google Places port, frozen: search and details, no email, no key in the contract (\#595)
 
-- **Commit:** [`00f1f8d`](https://github.com/aryamahadik/rosie/commit/00f1f8d), by Arya Mahadik, 2026-11-13 23:53:32 UTC
+- **Commit:** [`00f1f8de`](https://github.com/aryamahadik/rosie/commit/00f1f8de), by Arya Mahadik, 2026-11-13 23:53:32 UTC
 - **Pull request:** [#595](https://github.com/aryamahadik/rosie/pull/595) from `task/T-024`, merged 2026-11-13 23:53:33 UTC. It squashed 2 branch commits:
   - `8c5f785` T-024: K-15 v1, the Google Places port, frozen: search and details (r…
   - `ece9604` T-024: README: the double's error fixtures share their requests with …
@@ -5520,7 +5680,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 585. docs: COMMIT\_HISTORY.md through commit 582 (58c3677, \#590) (\#592)
 
-- **Commit:** [`59a2ee0`](https://github.com/aryamahadik/rosie/commit/59a2ee0), by Arya Mahadik, 2026-11-13 23:21:38 UTC
+- **Commit:** [`59a2ee0f`](https://github.com/aryamahadik/rosie/commit/59a2ee0f), by Arya Mahadik, 2026-11-13 23:21:38 UTC
 - **Pull request:** [#592](https://github.com/aryamahadik/rosie/pull/592) from `task/commit-history-96`, merged 2026-11-13 23:21:39 UTC. It squashed 1 branch commit:
   - `20bc87c` docs: COMMIT\_HISTORY.md through commit 582 (58c3677, \#590)
 - **Files changed:** 1 (+53 −1), by folder:
@@ -5536,7 +5696,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 584. T-062: K-21 page and console calls v1.3 frozen with journey 5's screens: the money step, the card, the yes, read-backs, documents and the owner's ask (\#594)
 
-- **Commit:** [`1284256`](https://github.com/aryamahadik/rosie/commit/1284256), by Arya Mahadik, 2026-11-13 23:21:35 UTC
+- **Commit:** [`12842568`](https://github.com/aryamahadik/rosie/commit/12842568), by Arya Mahadik, 2026-11-13 23:21:35 UTC
 - **Pull request:** [#594](https://github.com/aryamahadik/rosie/pull/594) from `task/T-062`, merged 2026-11-13 23:21:35 UTC. It squashed 5 branch commits:
   - `8fbfff4` T-062: K-21 v1.3, journey 5's screens: the money step, card form, yes…
   - `c367bb0` T-062: v1.3 README and schema wording: why the money step runs on the…
@@ -5580,7 +5740,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 583. T-1356: the real outbox port carries sendClass to db/repo's v1.14 claim and never drops it; a binding that cannot carry it refuses the claim (\#593)
 
-- **Commit:** [`54fc39e`](https://github.com/aryamahadik/rosie/commit/54fc39e), by Arya Mahadik, 2026-11-13 23:21:31 UTC
+- **Commit:** [`54fc39e6`](https://github.com/aryamahadik/rosie/commit/54fc39e6), by Arya Mahadik, 2026-11-13 23:21:31 UTC
 - **Pull request:** [#593](https://github.com/aryamahadik/rosie/pull/593) from `task/T-1356`, merged 2026-11-13 23:21:31 UTC. It squashed 2 branch commits:
   - `651ebc4` T-1356: the real outbox port carries sendClass to db/repo's claimOutb…
   - `545f692` T-1356: OutboxInputs' doc names v1.14's claim beside K-05's four outb…
@@ -5607,7 +5767,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 582. docs: COMMIT\_HISTORY.md through commit 579 (335d87c, \#587) (\#590)
 
-- **Commit:** [`58c3677`](https://github.com/aryamahadik/rosie/commit/58c3677), by Arya Mahadik, 2026-11-13 22:35:16 UTC
+- **Commit:** [`58c3677d`](https://github.com/aryamahadik/rosie/commit/58c3677d), by Arya Mahadik, 2026-11-13 22:35:16 UTC
 - **Pull request:** [#590](https://github.com/aryamahadik/rosie/pull/590) from `task/commit-history-95`, merged 2026-11-13 22:35:16 UTC. It squashed 1 branch commit:
   - `4fcd180` docs: COMMIT\_HISTORY.md through commit 579 (335d87c, \#587)
 - **Files changed:** 1 (+49 −1), by folder:
@@ -5623,7 +5783,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 581. T-739: search query plan spike: SPIKE.md names the one query's shape (trade and place, owner rules materialized, free time per worker from hours minus reservations, busy blocks and time off, soonest then nearest, top 5 with exact prices) and the index list for the search-index migration (a GiST on (kind\_id, map\_point) over a trade-and-place table, resources by business for workers, a covering price index), with EXPLAIN (ANALYZE, BUFFERS) on the seeded demo shops and on a 300,000-business synthetic metro (3,465 ms with the migrated indexes, 126 ms with the set; 376 ms when no owner rule cuts the candidates). Scripts under spike/ only; both spike schemas dropped. (\#588)
 
-- **Commit:** [`0568029`](https://github.com/aryamahadik/rosie/commit/0568029), by Arya Mahadik, 2026-11-13 22:35:12 UTC
+- **Commit:** [`0568029d`](https://github.com/aryamahadik/rosie/commit/0568029d), by Arya Mahadik, 2026-11-13 22:35:12 UTC
 - **Pull request:** [#588](https://github.com/aryamahadik/rosie/pull/588) from `task/T-739`, merged 2026-11-13 22:35:12 UTC. It squashed 1 branch commit:
   - `50eb268` T-739: search query plan spike: SPIKE.md names the one query's shape …
 - **Files changed:** 6 (+988 −0), by folder:
@@ -5640,7 +5800,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 580. T-054: K-09 Tool API v1.9 frozen with journey 7's 17 calls and the fee door, every v1.8 definition carried by reference (the contracts/tool-api content of 4766cff, judged in round 2, as one commit on main 335d87c so a rebase onto main applies; DL-739) (\#591)
 
-- **Commit:** [`6b71b23`](https://github.com/aryamahadik/rosie/commit/6b71b23), by Arya Mahadik, 2026-11-13 22:35:08 UTC
+- **Commit:** [`6b71b236`](https://github.com/aryamahadik/rosie/commit/6b71b236), by Arya Mahadik, 2026-11-13 22:35:08 UTC
 - **Pull request:** [#591](https://github.com/aryamahadik/rosie/pull/591) from `task/T-054-r3`, merged 2026-11-13 22:35:08 UTC. It squashed 1 branch commit:
   - `f0a94d8` T-054: K-09 Tool API v1.9 frozen with journey 7's 17 calls and the fe…
 - **Files changed:** 55 (+7661 −3), by folder:
@@ -5658,7 +5818,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 579. docs: COMMIT\_HISTORY.md through commit 577 (0ef3a02, \#585) (\#587)
 
-- **Commit:** [`335d87c`](https://github.com/aryamahadik/rosie/commit/335d87c), by Arya Mahadik, 2026-11-13 22:07:49 UTC
+- **Commit:** [`335d87c2`](https://github.com/aryamahadik/rosie/commit/335d87c2), by Arya Mahadik, 2026-11-13 22:07:49 UTC
 - **Pull request:** [#587](https://github.com/aryamahadik/rosie/pull/587) from `task/commit-history-94`, merged 2026-11-13 22:07:49 UTC. It squashed 1 branch commit:
   - `c834ea4` docs: COMMIT\_HISTORY.md through commit 577 (0ef3a02, \#585)
 - **Files changed:** 1 (+39 −1), by folder:
@@ -5674,7 +5834,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 578. T-763: the payments and ledger service base: four ways, one payment now on one card, never a hold, an append-only ledger, effect rows with keys; a payer who is not the booker gets only a pay link (\#584)
 
-- **Commit:** [`f02d23a`](https://github.com/aryamahadik/rosie/commit/f02d23a), by Arya Mahadik, 2026-11-13 22:07:45 UTC
+- **Commit:** [`f02d23a2`](https://github.com/aryamahadik/rosie/commit/f02d23a2), by Arya Mahadik, 2026-11-13 22:07:45 UTC
 - **Pull request:** [#584](https://github.com/aryamahadik/rosie/pull/584) from `task/T-763`, merged 2026-11-13 22:07:46 UTC. It squashed 3 branch commits:
   - `657041b` T-763: payments and ledger service base: a booking's money step as ex…
   - `1ca39e5` T-763: round 2 (DL-727): a card is charged only for the booker, so ch…
@@ -5706,7 +5866,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 577. docs: COMMIT\_HISTORY.md through commit 575 (fb1dc53, \#583) (\#585)
 
-- **Commit:** [`0ef3a02`](https://github.com/aryamahadik/rosie/commit/0ef3a02), by Arya Mahadik, 2026-11-13 21:35:57 UTC
+- **Commit:** [`0ef3a02e`](https://github.com/aryamahadik/rosie/commit/0ef3a02e), by Arya Mahadik, 2026-11-13 21:35:57 UTC
 - **Pull request:** [#585](https://github.com/aryamahadik/rosie/pull/585) from `task/commit-history-93`, merged 2026-11-13 21:35:57 UTC. It squashed 1 branch commit:
   - `80e3e03` docs: COMMIT\_HISTORY.md through commit 575 (fb1dc53, \#583)
 - **Files changed:** 1 (+85 −1), by folder:
@@ -5722,7 +5882,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 576. T-1022: the Tool API base's lane door (DL-728) and journey 5's call folders registered through it: each K-09 v1.3 call in j5/\<call\>/index.ts answers notBuilt and writes nothing; j5/index.ts registers each call's name, K-08 hop, frozen K-09 version (v1.8, read from its root by the call's own name) and handler; the base answers a lane call by steps 1 to 7 and refuses a v1 name or a duplicate at registration. Proofs in j5/j5.test.ts and j5/j5.worker.test.ts. (\#586)
 
-- **Commit:** [`a6e41ed`](https://github.com/aryamahadik/rosie/commit/a6e41ed), by Arya Mahadik, 2026-11-13 21:35:53 UTC
+- **Commit:** [`a6e41edb`](https://github.com/aryamahadik/rosie/commit/a6e41edb), by Arya Mahadik, 2026-11-13 21:35:53 UTC
 - **Pull request:** [#586](https://github.com/aryamahadik/rosie/pull/586) from `task/T-1022`, merged 2026-11-13 21:35:53 UTC. It squashed 1 branch commit:
   - `221e830` T-1022: the Tool API base's lane door (DL-728) and journey 5's call f…
 - **Files changed:** 12 (+1320 −41), by folder:
@@ -5744,7 +5904,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 575. docs: COMMIT\_HISTORY.md through commit 572 (d601db5, \#580) (\#583)
 
-- **Commit:** [`fb1dc53`](https://github.com/aryamahadik/rosie/commit/fb1dc53), by Arya Mahadik, 2026-11-13 20:28:55 UTC
+- **Commit:** [`fb1dc533`](https://github.com/aryamahadik/rosie/commit/fb1dc533), by Arya Mahadik, 2026-11-13 20:28:55 UTC
 - **Pull request:** [#583](https://github.com/aryamahadik/rosie/pull/583) from `task/commit-history-92`, merged 2026-11-13 20:28:56 UTC. It squashed 1 branch commit:
   - `a0ff170` docs: COMMIT\_HISTORY.md through commit 572 (d601db5, \#580)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -5760,7 +5920,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 574. T-1369: the Hyperdrive script sends PostgreSQL only a SCRAM-SHA-256 verifier and checks each login before Cloudflare stores its password (CQ-225) (\#582)
 
-- **Commit:** [`b16c142`](https://github.com/aryamahadik/rosie/commit/b16c142), by Arya Mahadik, 2026-11-13 20:28:50 UTC
+- **Commit:** [`b16c1428`](https://github.com/aryamahadik/rosie/commit/b16c1428), by Arya Mahadik, 2026-11-13 20:28:50 UTC
 - **Pull request:** [#582](https://github.com/aryamahadik/rosie/pull/582) from `task/T-1369`, merged 2026-11-13 20:28:50 UTC. It squashed 4 branch commits:
   - `85bdb60` T-1369: the Hyperdrive script sends PostgreSQL each login's SCRAM-SHA…
   - `f69a8e6` T-1369: the first suite's and first test's titles say what holds now …
@@ -5799,7 +5959,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 573. T-1352: the danger line's row is woken by its writer at once on a safety run (K-05 v1.14 item 67), never gated and never awaited; a run's safety rows go first (\#581)
 
-- **Commit:** [`d5cbbf7`](https://github.com/aryamahadik/rosie/commit/d5cbbf7), by Arya Mahadik, 2026-11-13 20:28:46 UTC
+- **Commit:** [`d5cbbf74`](https://github.com/aryamahadik/rosie/commit/d5cbbf74), by Arya Mahadik, 2026-11-13 20:28:46 UTC
 - **Pull request:** [#581](https://github.com/aryamahadik/rosie/pull/581) from `task/T-1352`, merged 2026-11-13 20:28:46 UTC. It squashed 1 branch commit:
   - `8a4c5e2` T-1352: the danger line's row is woken by its writer at once on a saf…
 - **Files changed:** 13 (+2063 −36), by folder:
@@ -5828,7 +5988,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 572. docs: COMMIT\_HISTORY.md through commit 570 (a218f36, \#578) (\#580)
 
-- **Commit:** [`d601db5`](https://github.com/aryamahadik/rosie/commit/d601db5), by Arya Mahadik, 2026-11-13 20:05:27 UTC
+- **Commit:** [`d601db5d`](https://github.com/aryamahadik/rosie/commit/d601db5d), by Arya Mahadik, 2026-11-13 20:05:27 UTC
 - **Pull request:** [#580](https://github.com/aryamahadik/rosie/pull/580) from `task/commit-history-91`, merged 2026-11-13 20:05:28 UTC. It squashed 1 branch commit:
   - `aae62b4` docs: COMMIT\_HISTORY.md through commit 570 (a218f36, \#578)
 - **Files changed:** 1 (+62 −1), by folder:
@@ -5844,7 +6004,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 571. T-728: the journey-states seed set: for each money combo SCENARIOS.md lists (56, every one of each flow's 28 paths), four demo-shop bookings, one per stage journeys 4 to 6 start from: request (who\_for, reach\_by, customer), time\_saved (the line, a held reservation of the pro's time in open hours, the secure link, flow B's place, a photos quote), money\_before (nothing, a saved card, or the deposit or full price taken, with effect, payment, item and ledger line) and booked (visit, free-cancel time, terms snapshot). Never in staging's default run. Tests: the runner loads it on a seeded test schema, every state checked against the fixture files, reserve() refuses each saved time to anyone else, a second run writes nothing, the staging sets and --set staging-signed-up leave no state, and it refuses before the sets it builds on (\#579)
 
-- **Commit:** [`cc4b04b`](https://github.com/aryamahadik/rosie/commit/cc4b04b), by Arya Mahadik, 2026-11-13 20:05:22 UTC
+- **Commit:** [`cc4b04bf`](https://github.com/aryamahadik/rosie/commit/cc4b04bf), by Arya Mahadik, 2026-11-13 20:05:22 UTC
 - **Pull request:** [#579](https://github.com/aryamahadik/rosie/pull/579) from `task/T-728`, merged 2026-11-13 20:05:23 UTC. It squashed 1 branch commit:
   - `b15e215` T-728: the journey-states seed set: for each money combo SCENARIOS.md…
 - **Files changed:** 2 (+2800 −0), by folder:
@@ -5860,7 +6020,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 570. docs: COMMIT\_HISTORY.md through commit 567 (1a97661, \#575) (\#578)
 
-- **Commit:** [`a218f36`](https://github.com/aryamahadik/rosie/commit/a218f36), by Arya Mahadik, 2026-11-13 18:02:17 UTC
+- **Commit:** [`a218f360`](https://github.com/aryamahadik/rosie/commit/a218f360), by Arya Mahadik, 2026-11-13 18:02:17 UTC
 - **Pull request:** [#578](https://github.com/aryamahadik/rosie/pull/578) from `task/commit-history-90`, merged 2026-11-13 18:02:17 UTC. It squashed 1 branch commit:
   - `6387298` docs: COMMIT\_HISTORY.md through commit 567 (1a97661, \#575)
 - **Files changed:** 1 (+44 −1), by folder:
@@ -5876,7 +6036,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 569. T-1331: withBusiness's start goes through transientOrScrubbed, so no connect failure or refused session leaves raw (\#577)
 
-- **Commit:** [`bb21d62`](https://github.com/aryamahadik/rosie/commit/bb21d62), by Arya Mahadik, 2026-11-13 18:02:13 UTC
+- **Commit:** [`bb21d628`](https://github.com/aryamahadik/rosie/commit/bb21d628), by Arya Mahadik, 2026-11-13 18:02:13 UTC
 - **Pull request:** [#577](https://github.com/aryamahadik/rosie/pull/577) from `task/T-1331`, merged 2026-11-13 18:02:13 UTC. It squashed 2 branch commits:
   - `e4a8dc0` T-1331: withBusiness starts its transaction through transientOrThrow …
   - `7d41244` T-1331: withBusiness's start throws every non-transient failure scrub…
@@ -5903,7 +6063,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 568. T-1324: a keyword copy before a handle's first pin: while the copies hold no keyword list, a text the PostgreSQL-down path reads has the list of the bundle it arrived under copied first, from that bundle's manifest in the actor's own BUNDLES binding (checked against the id as the pin checks it), so a first text reads stop, start or other; a read that fails copies nothing and the text reads unknown. Proofs in outage.worker.test.ts through the real actor. (\#576)
 
-- **Commit:** [`5805e34`](https://github.com/aryamahadik/rosie/commit/5805e34), by Arya Mahadik, 2026-11-13 18:02:08 UTC
+- **Commit:** [`5805e34c`](https://github.com/aryamahadik/rosie/commit/5805e34c), by Arya Mahadik, 2026-11-13 18:02:08 UTC
 - **Pull request:** [#576](https://github.com/aryamahadik/rosie/pull/576) from `task/T-1324`, merged 2026-11-13 18:02:09 UTC. It squashed 1 branch commit:
   - `d7102e7` T-1324: a keyword copy before a handle's first pin: while the copies …
 - **Files changed:** 4 (+343 −10), by folder:
@@ -5921,7 +6081,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 567. docs: COMMIT\_HISTORY.md through commit 565 (9aeeba0, \#573) (\#575)
 
-- **Commit:** [`1a97661`](https://github.com/aryamahadik/rosie/commit/1a97661), by Arya Mahadik, 2026-11-13 17:26:36 UTC
+- **Commit:** [`1a976619`](https://github.com/aryamahadik/rosie/commit/1a976619), by Arya Mahadik, 2026-11-13 17:26:36 UTC
 - **Pull request:** [#575](https://github.com/aryamahadik/rosie/pull/575) from `task/commit-history-89`, merged 2026-11-13 17:26:36 UTC. It squashed 1 branch commit:
   - `985c0e9` docs: COMMIT\_HISTORY.md through commit 565 (9aeeba0, \#573)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -5937,7 +6097,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 566. T-1363: the root's two missing ports for the PostgreSQL-down path, closed on staging and in production, faked in tests (\#574)
 
-- **Commit:** [`d3fac27`](https://github.com/aryamahadik/rosie/commit/d3fac27), by Arya Mahadik, 2026-11-13 17:26:32 UTC
+- **Commit:** [`d3fac278`](https://github.com/aryamahadik/rosie/commit/d3fac278), by Arya Mahadik, 2026-11-13 17:26:32 UTC
 - **Pull request:** [#574](https://github.com/aryamahadik/rosie/pull/574) from `task/T-1363`, merged 2026-11-13 17:26:32 UTC. It squashed 2 branch commits:
   - `ff7a582` T-1363: the root's two ports for the PostgreSQL-down path, stopOrStar…
   - `25eac48` T-1363: ports.ts says the down path's probe is read over the bundles …
@@ -5964,7 +6124,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 565. docs: COMMIT\_HISTORY.md through commit 563 (89cc67b, \#571) (\#573)
 
-- **Commit:** [`9aeeba0`](https://github.com/aryamahadik/rosie/commit/9aeeba0), by Arya Mahadik, 2026-11-13 17:01:32 UTC
+- **Commit:** [`9aeeba02`](https://github.com/aryamahadik/rosie/commit/9aeeba02), by Arya Mahadik, 2026-11-13 17:01:32 UTC
 - **Pull request:** [#573](https://github.com/aryamahadik/rosie/pull/573) from `task/commit-history-88`, merged 2026-11-13 17:01:32 UTC. It squashed 1 branch commit:
   - `e65512d` docs: COMMIT\_HISTORY.md through commit 563 (89cc67b, \#571)
 - **Files changed:** 1 (+44 −1), by folder:
@@ -5980,7 +6140,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 564. T-1354: db/repo's K-05 v1.14 claim, claimOutboxV114: with sendClass safety it waits for the recipient's lock (pg\_advisory\_xact\_lock, item 3's key; default 129) under a 2 s lock\_timeout whose 55P03 it alone answers transient (DL-698), reads, locks and counts only the recipient's open safety rows in commit order, claims checked, due held and lapsed or unclaimed sending rows and passes the rest with nothing written (defaults 130 to 132), answering v1.13's full form with passedHeld empty; a request with sendClass and no recipient or another value is refused before any statement; without the field it runs claimOutboxV113 unchanged, and V12/V113 keep refusing sendClass. Tests: the five v1.14 fixtures with their noted rows, the four refused, the walk's claims and passes in commit order and the limit, row S's case, the wait on an open ordinary claim, the bound and the next try, 55P03 scrubbed for an ordinary claim, parallel claims, every v1 to v1.13 claim fixture through the new call (\#572)
 
-- **Commit:** [`2c11859`](https://github.com/aryamahadik/rosie/commit/2c11859), by Arya Mahadik, 2026-11-13 17:01:28 UTC
+- **Commit:** [`2c118597`](https://github.com/aryamahadik/rosie/commit/2c118597), by Arya Mahadik, 2026-11-13 17:01:28 UTC
 - **Pull request:** [#572](https://github.com/aryamahadik/rosie/pull/572) from `task/T-1354`, merged 2026-11-13 17:01:28 UTC. It squashed 1 branch commit:
   - `1afa9a2` T-1354: db/repo's K-05 v1.14 claim, claimOutboxV114: with sendClass s…
 - **Files changed:** 2 (+1568 −5), by folder:
@@ -5996,7 +6156,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 563. docs: COMMIT\_HISTORY.md through commit 561 (3158351, \#569) (\#571)
 
-- **Commit:** [`89cc67b`](https://github.com/aryamahadik/rosie/commit/89cc67b), by Arya Mahadik, 2026-11-13 16:39:08 UTC
+- **Commit:** [`89cc67bd`](https://github.com/aryamahadik/rosie/commit/89cc67bd), by Arya Mahadik, 2026-11-13 16:39:08 UTC
 - **Pull request:** [#571](https://github.com/aryamahadik/rosie/pull/571) from `task/commit-history-87`, merged 2026-11-13 16:39:09 UTC. It squashed 1 branch commit:
   - `a6aa087` docs: COMMIT\_HISTORY.md through commit 561 (3158351, \#569)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -6012,7 +6172,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 562. T-1364: a danger whose line is not done keeps a lasting mark, so its safety line is always retried (\#570)
 
-- **Commit:** [`a210e53`](https://github.com/aryamahadik/rosie/commit/a210e53), by Arya Mahadik, 2026-11-13 16:39:04 UTC
+- **Commit:** [`a210e531`](https://github.com/aryamahadik/rosie/commit/a210e531), by Arya Mahadik, 2026-11-13 16:39:04 UTC
 - **Pull request:** [#570](https://github.com/aryamahadik/rosie/pull/570) from `task/T-1364`, merged 2026-11-13 16:39:04 UTC. It squashed 2 branch commits:
   - `1ca7007` T-1364: a danger whose line is not done keeps a lasting mark, written…
   - `1073a47` T-1364: a mark that cannot be cleared keeps the noted line, so a repe…
@@ -6039,7 +6199,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 561. docs: COMMIT\_HISTORY.md through commit 559 (c290f4f, \#567) (\#569)
 
-- **Commit:** [`3158351`](https://github.com/aryamahadik/rosie/commit/3158351), by Arya Mahadik, 2026-11-13 16:17:51 UTC
+- **Commit:** [`3158351f`](https://github.com/aryamahadik/rosie/commit/3158351f), by Arya Mahadik, 2026-11-13 16:17:51 UTC
 - **Pull request:** [#569](https://github.com/aryamahadik/rosie/pull/569) from `task/commit-history-86`, merged 2026-11-13 16:17:52 UTC. It squashed 1 branch commit:
   - `d0659f4` docs: COMMIT\_HISTORY.md through commit 559 (c290f4f, \#567)
 - **Files changed:** 1 (+47 −1), by folder:
@@ -6055,7 +6215,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 560. T-1362: reservations.ts inSavepoint decides by targets.ts's foundGone, so a lost connection inside a savepoint gets no rollback to savepoint and reserve or release always settles; integration tests cut a rosie\_job socket 8 ways at 2 points inside reserveIn's three savepoints and releaseIn's, and show a live failure still rolled back to the savepoint (\#568)
 
-- **Commit:** [`bdc7ff3`](https://github.com/aryamahadik/rosie/commit/bdc7ff3), by Arya Mahadik, 2026-11-13 16:17:47 UTC
+- **Commit:** [`bdc7ff3c`](https://github.com/aryamahadik/rosie/commit/bdc7ff3c), by Arya Mahadik, 2026-11-13 16:17:47 UTC
 - **Pull request:** [#568](https://github.com/aryamahadik/rosie/pull/568) from `task/T-1362`, merged 2026-11-13 16:17:47 UTC. It squashed 1 branch commit:
   - `7004a92` T-1362: reservations.ts inSavepoint decides by targets.ts's foundGone…
 - **Files changed:** 2 (+437 −4), by folder:
@@ -6071,7 +6231,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 559. docs: COMMIT\_HISTORY.md through commit 557 (25912cb, \#565) (\#567)
 
-- **Commit:** [`c290f4f`](https://github.com/aryamahadik/rosie/commit/c290f4f), by Arya Mahadik, 2026-11-13 15:40:17 UTC
+- **Commit:** [`c290f4fa`](https://github.com/aryamahadik/rosie/commit/c290f4fa), by Arya Mahadik, 2026-11-13 15:40:17 UTC
 - **Pull request:** [#567](https://github.com/aryamahadik/rosie/pull/567) from `task/commit-history-85`, merged 2026-11-13 15:40:17 UTC. It squashed 1 branch commit:
   - `6979edb` docs: COMMIT\_HISTORY.md through commit 557 (25912cb, \#565)
 - **Files changed:** 1 (+34 −1), by folder:
@@ -6087,7 +6247,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 558. T-1359: no listed 555 number in a real area code; the 555 and wrong-length kinds tightened; FICTIONAL\_PHONE refuses toll-free codes (\#566)
 
-- **Commit:** [`e3dcc16`](https://github.com/aryamahadik/rosie/commit/e3dcc16), by Arya Mahadik, 2026-11-13 15:40:13 UTC
+- **Commit:** [`e3dcc164`](https://github.com/aryamahadik/rosie/commit/e3dcc164), by Arya Mahadik, 2026-11-13 15:40:13 UTC
 - **Pull request:** [#566](https://github.com/aryamahadik/rosie/pull/566) from `task/T-1359`, merged 2026-11-13 15:40:13 UTC. It squashed 2 branch commits:
   - `72183bd` T-1359: the five listed 555 lines in real area codes move to area cod…
   - `7758594` T-1359: the wrong-length shapes' comment says exactly which first dig…
@@ -6117,7 +6277,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 557. docs: COMMIT\_HISTORY.md through commit 555 (4d46a6c, \#563) (\#565)
 
-- **Commit:** [`25912cb`](https://github.com/aryamahadik/rosie/commit/25912cb), by Arya Mahadik, 2026-11-13 13:43:10 UTC
+- **Commit:** [`25912cb8`](https://github.com/aryamahadik/rosie/commit/25912cb8), by Arya Mahadik, 2026-11-13 13:43:10 UTC
 - **Pull request:** [#565](https://github.com/aryamahadik/rosie/pull/565) from `task/commit-history-84`, merged 2026-11-13 13:43:10 UTC. It squashed 1 branch commit:
   - `393a5a9` docs: COMMIT\_HISTORY.md through commit 555 (4d46a6c, \#563)
 - **Files changed:** 1 (+42 −1), by folder:
@@ -6133,7 +6293,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 556. T-1283: limit 8 for email rows (ADR-016 card E1): a row tried at or after its notAfter is withdrawn, unsent, before anything but the SMS refusal is read, at every try (a code row with no end, or an end or clock that is not a time, is withdrawn too); an email row's stop is its address's newest texts consent row (revoked: droppedStopped, whatever its class; none read: unreadable), never the phone's stopped flag; the chat rule holds text rows only, so an email row goes on to the checks after it; an email row is one whose channel and port are both email. ClaimedRow gains K-05 v1.13's optional emailPurpose and notAfter. email-rows.worker.test.ts: the lead note's limit 8 cases on claim-sam-sign-in-code.json's row (at notAfter, a retry after a failed try at minute 9, the revoked contact, the 3:00am code row, the text row with no chat), every existing limit 8 test unchanged (\#564)
 
-- **Commit:** [`f6351ad`](https://github.com/aryamahadik/rosie/commit/f6351ad), by Arya Mahadik, 2026-11-13 13:43:06 UTC
+- **Commit:** [`f6351ad3`](https://github.com/aryamahadik/rosie/commit/f6351ad3), by Arya Mahadik, 2026-11-13 13:43:06 UTC
 - **Pull request:** [#564](https://github.com/aryamahadik/rosie/pull/564) from `task/T-1283`, merged 2026-11-13 13:43:06 UTC. It squashed 1 branch commit:
   - `062f3eb` T-1283: limit 8 for email rows (ADR-016 card E1): a row tried at or a…
 - **Files changed:** 4 (+744 −13), by folder:
@@ -6150,7 +6310,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 555. docs: COMMIT\_HISTORY.md through commit 553 (84538c7, \#561) (\#563)
 
-- **Commit:** [`4d46a6c`](https://github.com/aryamahadik/rosie/commit/4d46a6c), by Arya Mahadik, 2026-11-13 13:24:24 UTC
+- **Commit:** [`4d46a6c1`](https://github.com/aryamahadik/rosie/commit/4d46a6c1), by Arya Mahadik, 2026-11-13 13:24:24 UTC
 - **Pull request:** [#563](https://github.com/aryamahadik/rosie/pull/563) from `task/commit-history-83`, merged 2026-11-13 13:24:25 UTC. It squashed 1 branch commit:
   - `e00bba4` docs: COMMIT\_HISTORY.md through commit 553 (84538c7, \#561)
 - **Files changed:** 1 (+62 −1), by folder:
@@ -6166,7 +6326,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 554. T-1348: a danger whose pending note was never written is read again until its hold is written, and a cut-off resume never clears a danger flag the first read set (\#562)
 
-- **Commit:** [`827922e`](https://github.com/aryamahadik/rosie/commit/827922e), by Arya Mahadik, 2026-11-13 13:24:20 UTC
+- **Commit:** [`827922e3`](https://github.com/aryamahadik/rosie/commit/827922e3), by Arya Mahadik, 2026-11-13 13:24:20 UTC
 - **Pull request:** [#562](https://github.com/aryamahadik/rosie/pull/562) from `task/T-1348`, merged 2026-11-13 13:24:21 UTC. It squashed 1 branch commit:
   - `442e9a5` T-1348: a danger whose pending note was never written is read again u…
 - **Files changed:** 2 (+451 −26), by folder:
@@ -6191,7 +6351,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 553. docs: COMMIT\_HISTORY.md through commit 550 (6b9227c, \#557) (\#561)
 
-- **Commit:** [`84538c7`](https://github.com/aryamahadik/rosie/commit/84538c7), by Arya Mahadik, 2026-11-13 13:05:03 UTC
+- **Commit:** [`84538c78`](https://github.com/aryamahadik/rosie/commit/84538c78), by Arya Mahadik, 2026-11-13 13:05:03 UTC
 - **Pull request:** [#561](https://github.com/aryamahadik/rosie/pull/561) from `task/commit-history-82`, merged 2026-11-13 13:05:03 UTC. It squashed 1 branch commit:
   - `f716c88` docs: COMMIT\_HISTORY.md through commit 550 (6b9227c, \#557)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -6207,7 +6367,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 552. T-1291: K-22's contract test covers v1.2, its fixtures and database side, selecting only its own versions (\#559)
 
-- **Commit:** [`6055b48`](https://github.com/aryamahadik/rosie/commit/6055b48), by Arya Mahadik, 2026-11-13 13:04:58 UTC
+- **Commit:** [`6055b482`](https://github.com/aryamahadik/rosie/commit/6055b482), by Arya Mahadik, 2026-11-13 13:04:58 UTC
 - **Pull request:** [#559](https://github.com/aryamahadik/rosie/pull/559) from `task/T-1291`, merged 2026-11-13 13:04:59 UTC. It squashed 2 branch commits:
   - `843506a` T-1291: K-22's contract test covers v1.2 (tests/contract/db-schema.pe…
   - `f35ff85` T-1291: K-22's v1.2 contract test reads only the part at v1.2 from th…
@@ -6234,7 +6394,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 551. T-1353: K-05 v1.14, frozen: claimOutbox takes the optional sendClass safety, with a named recipient only; the safety-only claim waits for the recipient lock instead of skipping it and walks only the recipient safety rows in commit order, claiming each it can and passing each it cannot (DL-687), never reading or counting a row of another class, passedHeld empty; README item 67, defaults 129 to 135, open gaps 74 to 76, items 3 and 13 state the one exception; 5 accepted and 4 refused fixtures; startSignIn.errors names migration 0034 keys (CQ-292) (\#560)
 
-- **Commit:** [`4644bd7`](https://github.com/aryamahadik/rosie/commit/4644bd7), by Arya Mahadik, 2026-11-13 13:04:54 UTC
+- **Commit:** [`4644bd7d`](https://github.com/aryamahadik/rosie/commit/4644bd7d), by Arya Mahadik, 2026-11-13 13:04:54 UTC
 - **Pull request:** [#560](https://github.com/aryamahadik/rosie/pull/560) from `task/T-1353`, merged 2026-11-13 13:04:55 UTC. It squashed 1 branch commit:
   - `85458f2` T-1353: K-05 v1.14, frozen: claimOutbox takes the optional sendClass …
 - **Files changed:** 13 (+1495 −11), by folder:
@@ -6252,7 +6412,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 550. docs: COMMIT\_HISTORY.md through commit 548 (f0b7af2, \#556) (\#557)
 
-- **Commit:** [`6b9227c`](https://github.com/aryamahadik/rosie/commit/6b9227c), by Arya Mahadik, 2026-11-13 12:40:25 UTC
+- **Commit:** [`6b9227cb`](https://github.com/aryamahadik/rosie/commit/6b9227cb), by Arya Mahadik, 2026-11-13 12:40:25 UTC
 - **Pull request:** [#557](https://github.com/aryamahadik/rosie/pull/557) from `task/commit-history-81`, merged 2026-11-13 12:40:26 UTC. It squashed 1 branch commit:
   - `93ac36d` docs: COMMIT\_HISTORY.md through commit 548 (f0b7af2, \#556)
 - **Files changed:** 1 (+45 −1), by folder:
@@ -6268,7 +6428,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 549. T-1350: inTransaction, inScopedTransaction and inBusinessTransaction decide rollback and release by targets.ts's foundGone (exported; bundles.ts imports it as its transaction starts), with 8-way socket cuts at fn's first statement and while idle after it, and fn's own error rolled back and released, in each file's integration tests (\#558)
 
-- **Commit:** [`dae9ff0`](https://github.com/aryamahadik/rosie/commit/dae9ff0), by Arya Mahadik, 2026-11-13 12:40:21 UTC
+- **Commit:** [`dae9ff0e`](https://github.com/aryamahadik/rosie/commit/dae9ff0e), by Arya Mahadik, 2026-11-13 12:40:21 UTC
 - **Pull request:** [#558](https://github.com/aryamahadik/rosie/pull/558) from `task/T-1350`, merged 2026-11-13 12:40:22 UTC. It squashed 1 branch commit:
   - `8df59cb` T-1350: inTransaction, inScopedTransaction and inBusinessTransaction …
 - **Files changed:** 7 (+1526 −27), by folder:
@@ -6284,7 +6444,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 548. docs: COMMIT\_HISTORY.md through commit 546 (520d4bd, \#554) (\#556)
 
-- **Commit:** [`f0b7af2`](https://github.com/aryamahadik/rosie/commit/f0b7af2), by Arya Mahadik, 2026-11-13 12:11:14 UTC
+- **Commit:** [`f0b7af20`](https://github.com/aryamahadik/rosie/commit/f0b7af20), by Arya Mahadik, 2026-11-13 12:11:14 UTC
 - **Pull request:** [#556](https://github.com/aryamahadik/rosie/pull/556) from `task/commit-history-80`, merged 2026-11-13 12:11:15 UTC. It squashed 1 branch commit:
   - `636e2ca` docs: COMMIT\_HISTORY.md through commit 546 (520d4bd, \#554)
 - **Files changed:** 1 (+60 −1), by folder:
@@ -6300,7 +6460,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 547. T-1344: the phone scan reads its last shapes (escapes, an escaped plus, URL-encoded separators) and tightens the 555 and wrong-length kinds (\#555)
 
-- **Commit:** [`be28ebc`](https://github.com/aryamahadik/rosie/commit/be28ebc), by Arya Mahadik, 2026-11-13 12:11:10 UTC
+- **Commit:** [`be28ebc6`](https://github.com/aryamahadik/rosie/commit/be28ebc6), by Arya Mahadik, 2026-11-13 12:11:10 UTC
 - **Pull request:** [#555](https://github.com/aryamahadik/rosie/pull/555) from `task/T-1344`, merged 2026-11-13 12:11:10 UTC. It squashed 2 branch commits:
   - `54693d9` T-1344: the phone scan reads a number right after a whole backslash-u…
   - `8586c75` T-1344: phone-scan.test.mjs proves the + form reads URL-encoded group…
@@ -6328,7 +6488,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 546. docs: COMMIT\_HISTORY.md through commit 543 (3e785b0, \#551) (\#554)
 
-- **Commit:** [`520d4bd`](https://github.com/aryamahadik/rosie/commit/520d4bd), by Arya Mahadik, 2026-11-13 11:48:27 UTC
+- **Commit:** [`520d4bda`](https://github.com/aryamahadik/rosie/commit/520d4bda), by Arya Mahadik, 2026-11-13 11:48:27 UTC
 - **Pull request:** [#554](https://github.com/aryamahadik/rosie/pull/554) from `task/commit-history-79`, merged 2026-11-13 11:48:28 UTC. It squashed 1 branch commit:
   - `b7f1a5a` docs: COMMIT\_HISTORY.md through commit 543 (3e785b0, \#551)
 - **Files changed:** 1 (+86 −1), by folder:
@@ -6344,7 +6504,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 545. T-1347: errorLabelOf never builds a label longer than LABEL\_MAX: where \<SQLSTATE\>:\<constraint\> would pass 64 characters (a constraint of 59 to 63), the label is \<Name\>:\<SQLSTATE\>, which isErrorLabel accepts, so the next retry message reads back and runs; every label that fits is unchanged, and each field is read once so the label is built from the values checked. labels.worker.test.ts: 58 kept and 59 to 63 left out on PostgresError, DataAccessDatabaseError and CommitTurnDatabaseError; a send door throwing each, its next message read back and try 3 run; a field answering otherwise on a second read never reaches the label (\#553)
 
-- **Commit:** [`21440c4`](https://github.com/aryamahadik/rosie/commit/21440c4), by Arya Mahadik, 2026-11-13 11:48:24 UTC
+- **Commit:** [`21440c42`](https://github.com/aryamahadik/rosie/commit/21440c42), by Arya Mahadik, 2026-11-13 11:48:24 UTC
 - **Pull request:** [#553](https://github.com/aryamahadik/rosie/pull/553) from `task/T-1347`, merged 2026-11-13 11:48:24 UTC. It squashed 1 branch commit:
   - `775a8f2` T-1347: errorLabelOf never builds a label longer than LABEL\_MAX: wher…
 - **Files changed:** 2 (+125 −11), by folder:
@@ -6360,7 +6520,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 544. T-1284: db/repo: the sign-in check side, proveSignIn, endSession and personStanding (ADR-016 card R2) (\#552)
 
-- **Commit:** [`a1d09ac`](https://github.com/aryamahadik/rosie/commit/a1d09ac), by Arya Mahadik, 2026-11-13 11:48:20 UTC
+- **Commit:** [`a1d09acc`](https://github.com/aryamahadik/rosie/commit/a1d09acc), by Arya Mahadik, 2026-11-13 11:48:20 UTC
 - **Pull request:** [#552](https://github.com/aryamahadik/rosie/pull/552) from `task/T-1284`, merged 2026-11-13 11:48:20 UTC. It squashed 2 branch commits:
   - `6e85a9a` T-1284: db/repo sign-in check side: proveSignIn, endSession, personSt…
   - `7f25063` T-1284: replay the v1.13 fixtures of proveSignIn, endSession and sign…
@@ -6387,7 +6547,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 543. docs: COMMIT\_HISTORY.md through commit 540 (663739f, \#547) (\#551)
 
-- **Commit:** [`3e785b0`](https://github.com/aryamahadik/rosie/commit/3e785b0), by Arya Mahadik, 2026-11-13 11:23:10 UTC
+- **Commit:** [`3e785b02`](https://github.com/aryamahadik/rosie/commit/3e785b02), by Arya Mahadik, 2026-11-13 11:23:10 UTC
 - **Pull request:** [#551](https://github.com/aryamahadik/rosie/pull/551) from `task/commit-history-78`, merged 2026-11-13 11:23:11 UTC. It squashed 1 branch commit:
   - `2c7daec` docs: COMMIT\_HISTORY.md through commit 540 (663739f, \#547)
 - **Files changed:** 1 (+34 −1), by folder:
@@ -6403,7 +6563,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 542. T-1341: every outage row written outside a turn's commit is woken by its writer, gated on the reading and never awaited; no sweep (\#550)
 
-- **Commit:** [`890102c`](https://github.com/aryamahadik/rosie/commit/890102c), by Arya Mahadik, 2026-11-13 11:23:06 UTC
+- **Commit:** [`890102c9`](https://github.com/aryamahadik/rosie/commit/890102c9), by Arya Mahadik, 2026-11-13 11:23:06 UTC
 - **Pull request:** [#550](https://github.com/aryamahadik/rosie/pull/550) from `task/T-1341`, merged 2026-11-13 11:23:06 UTC. It squashed 4 branch commits:
   - `090cf6b` T-1341: each outage row written outside a turn's commit is woken by i…
   - `3f0b66f` T-1341: comments only: lease.worker.test.ts names T-1341's writers' w…
@@ -6440,7 +6600,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 541. T-1280: db/repo: the sign-in send side, startSignIn and sendSignInCode (ADR-016 card R1) (\#549)
 
-- **Commit:** [`fb21d64`](https://github.com/aryamahadik/rosie/commit/fb21d64), by Arya Mahadik, 2026-11-13 11:23:01 UTC
+- **Commit:** [`fb21d646`](https://github.com/aryamahadik/rosie/commit/fb21d646), by Arya Mahadik, 2026-11-13 11:23:01 UTC
 - **Pull request:** [#549](https://github.com/aryamahadik/rosie/pull/549) from `task/T-1280`, merged 2026-11-13 11:23:02 UTC. It squashed 3 branch commits:
   - `c251e31` T-1280: db/repo/sign-in-send.ts, K-05 v1.13's startSignIn and sendSig…
   - `136161f` T-1280: sign-in-send.int.test.ts: a paused start (hourBound, contactP…
@@ -6472,7 +6632,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 540. docs: COMMIT\_HISTORY.md through commit 538 (f2eef53, \#546) (\#547)
 
-- **Commit:** [`663739f`](https://github.com/aryamahadik/rosie/commit/663739f), by Arya Mahadik, 2026-11-13 10:55:21 UTC
+- **Commit:** [`663739f4`](https://github.com/aryamahadik/rosie/commit/663739f4), by Arya Mahadik, 2026-11-13 10:55:21 UTC
 - **Pull request:** [#547](https://github.com/aryamahadik/rosie/pull/547) from `task/commit-history-77`, merged 2026-11-13 10:55:22 UTC. It squashed 1 branch commit:
   - `37327b4` docs: COMMIT\_HISTORY.md through commit 538 (f2eef53, \#546)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -6488,7 +6648,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 539. T-1349: preview-cleanup.sh's drop checks its URL with db-url.mjs and prints a failure as one scrubbed line (a URL that does not parse, a refused connection, a wrong password), exiting 1 as before; deploy-staging.sh, flags.sh, publish-bundle.sh, preview-cleanup.sh, seed-staging.sh and deploy-preview.sh unset a caller's DATABASE\_REPLICA\_URL before their first child; recorder cases under allexport, bash -a -k and bash -x with a control in each matching test file (\#548)
 
-- **Commit:** [`553abbe`](https://github.com/aryamahadik/rosie/commit/553abbe), by Arya Mahadik, 2026-11-13 10:55:17 UTC
+- **Commit:** [`553abbe3`](https://github.com/aryamahadik/rosie/commit/553abbe3), by Arya Mahadik, 2026-11-13 10:55:17 UTC
 - **Pull request:** [#548](https://github.com/aryamahadik/rosie/pull/548) from `task/T-1349`, merged 2026-11-13 10:55:18 UTC. It squashed 1 branch commit:
   - `dec574c` T-1349: preview-cleanup.sh's drop checks its URL with db-url.mjs and …
 - **Files changed:** 12 (+439 −12), by folder:
@@ -6505,7 +6665,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 538. docs: COMMIT\_HISTORY.md through commit 536 (3d25bcd, \#544) (\#546)
 
-- **Commit:** [`f2eef53`](https://github.com/aryamahadik/rosie/commit/f2eef53), by Arya Mahadik, 2026-11-13 10:19:38 UTC
+- **Commit:** [`f2eef53b`](https://github.com/aryamahadik/rosie/commit/f2eef53b), by Arya Mahadik, 2026-11-13 10:19:38 UTC
 - **Pull request:** [#546](https://github.com/aryamahadik/rosie/pull/546) from `task/commit-history-76`, merged 2026-11-13 10:19:38 UTC. It squashed 1 branch commit:
   - `a56dad2` docs: COMMIT\_HISTORY.md through commit 536 (3d25bcd, \#544)
 - **Files changed:** 1 (+49 −1), by folder:
@@ -6521,7 +6681,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 537. T-1351: pgReadOnlySealer throws every failure of its transaction through db/repo's scrubbed under its call's name, seal: a socket cut or PostgreSQL's refusal at its sealing\_keys read leaves with no statement, person id or message value, and a connect that never opens with no host, port, user, password or database (PostgreSQL's as DataAccessDatabaseError, a client's as the call and the code alone); its own noSealingKey and SealingError leave as they are. sealer.int.test.ts, on a rosie\_job client with a fiction person id and a made-up host, port, user and password planted: 4 socket cuts at the read, PostgreSQL's own 22P02 at the read, and 5 connects that never open; each raw error holds what it names, and the thrown one none of it by a deep walk (\#545)
 
-- **Commit:** [`682c04b`](https://github.com/aryamahadik/rosie/commit/682c04b), by Arya Mahadik, 2026-11-13 10:19:34 UTC
+- **Commit:** [`682c04b7`](https://github.com/aryamahadik/rosie/commit/682c04b7), by Arya Mahadik, 2026-11-13 10:19:34 UTC
 - **Pull request:** [#545](https://github.com/aryamahadik/rosie/pull/545) from `task/T-1351`, merged 2026-11-13 10:19:34 UTC. It squashed 1 branch commit:
   - `df5001b` T-1351: pgReadOnlySealer throws every failure of its transaction thro…
 - **Files changed:** 2 (+638 −8), by folder:
@@ -6537,7 +6697,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 536. docs: COMMIT\_HISTORY.md through commit 533 (e745c35, \#541) (\#544)
 
-- **Commit:** [`3d25bcd`](https://github.com/aryamahadik/rosie/commit/3d25bcd), by Arya Mahadik, 2026-11-13 09:55:31 UTC
+- **Commit:** [`3d25bcd5`](https://github.com/aryamahadik/rosie/commit/3d25bcd5), by Arya Mahadik, 2026-11-13 09:55:31 UTC
 - **Pull request:** [#544](https://github.com/aryamahadik/rosie/pull/544) from `task/commit-history-75`, merged 2026-11-13 09:55:31 UTC. It squashed 1 branch commit:
   - `cc3ee0f` docs: COMMIT\_HISTORY.md through commit 533 (e745c35, \#541)
 - **Files changed:** 1 (+61 −1), by folder:
@@ -6553,7 +6713,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 535. T-1325: ADR-018 amended (2026-11-13; DL-615, DL-645, DL-656, DL-669), its original text kept: A, the one reading of a possible STOP (DbOutage.mayHoldStop), its answers and its callers (the lease's stopAmong; mayHaveStopped for the safety host, the AI-down host and, third, the dispatcher's port), replacing line 42's stopPending sentence; B, the accepted costs CQ-281, CQ-282, CQ-283 (an outage row dropped at send, never held), CQ-287 and CQ-288; C, T-1342's ruling (every routine row held at send, due again at once, while the reading says a STOP may wait; outage rows dropped), replacing line 16's acceptance and CQ-264's window for this case; D, T-1341's ruling (an outage row written outside a commit is woken by its writer, gated on the reading; no sweep); E, open points T-1324, T-1326, the T-1341 and T-1342 builds and the frozen descriptions of held; Status and Date lines point to it. Every line read on main 8edd689 (\#543)
 
-- **Commit:** [`a52d5d8`](https://github.com/aryamahadik/rosie/commit/a52d5d8), by Arya Mahadik, 2026-11-13 09:55:26 UTC
+- **Commit:** [`a52d5d85`](https://github.com/aryamahadik/rosie/commit/a52d5d85), by Arya Mahadik, 2026-11-13 09:55:26 UTC
 - **Pull request:** [#543](https://github.com/aryamahadik/rosie/pull/543) from `task/T-1325`, merged 2026-11-13 09:55:27 UTC. It squashed 1 branch commit:
   - `de3f154` T-1325: ADR-018 amended (2026-11-13; DL-615, DL-645, DL-656, DL-669),…
 - **Files changed:** 1 (+77 −2), by folder:
@@ -6569,7 +6729,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 534. T-1279: the readers that meet a row with no turn (ADR-016 card R0; K-05 v1.13 items 64 to 66): claimOutboxV113 claims as claimOutboxV12 does, each claimed row also naming emailPurpose and notAfter as stored (null where the column is null), while claimOutboxV12 still answers v1.2's closed claimed row; readOutboxRow answers notFound for a row with no turn as soon as the row is read, before its send class, its reader or its turn (default 4: a turnless safety row too). Tests: read-outbox-row-sign-in-code's noted rows (DL-610) with the statements the read sent (the row's select alone), job rows of a business and of class safety, the same row given a turn read as any row; claim-sam-sign-in-code by the sweep and by recipient, the v1.2 claim of it, rows of each channel as stored, the refused code row with no end, a re-claim and a claim at its notAfter withdrawn, and a failed mark with no follow-ups marked as for the same row with a turn (\#542)
 
-- **Commit:** [`faea582`](https://github.com/aryamahadik/rosie/commit/faea582), by Arya Mahadik, 2026-11-13 09:55:23 UTC
+- **Commit:** [`faea5821`](https://github.com/aryamahadik/rosie/commit/faea5821), by Arya Mahadik, 2026-11-13 09:55:23 UTC
 - **Pull request:** [#542](https://github.com/aryamahadik/rosie/pull/542) from `task/T-1279`, merged 2026-11-13 09:55:23 UTC. It squashed 1 branch commit:
   - `a077c59` T-1279: the readers that meet a row with no turn (ADR-016 card R0; K-…
 - **Files changed:** 4 (+805 −9), by folder:
@@ -6585,7 +6745,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 533. docs: COMMIT\_HISTORY.md through commit 530 (806b881, \#537) (\#541)
 
-- **Commit:** [`e745c35`](https://github.com/aryamahadik/rosie/commit/e745c35), by Arya Mahadik, 2026-11-13 09:37:45 UTC
+- **Commit:** [`e745c35c`](https://github.com/aryamahadik/rosie/commit/e745c35c), by Arya Mahadik, 2026-11-13 09:37:45 UTC
 - **Pull request:** [#541](https://github.com/aryamahadik/rosie/pull/541) from `task/commit-history-74`, merged 2026-11-13 09:37:45 UTC. It squashed 1 branch commit:
   - `0a50e98` docs: COMMIT\_HISTORY.md through commit 530 (806b881, \#537)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -6601,7 +6761,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 532. T-1334: a reserve() that never connects answers 08001 on every runtime and business transaction, and no rollback is written on a dead connection (\#540)
 
-- **Commit:** [`3efc44b`](https://github.com/aryamahadik/rosie/commit/3efc44b), by Arya Mahadik, 2026-11-13 09:37:40 UTC
+- **Commit:** [`3efc44b9`](https://github.com/aryamahadik/rosie/commit/3efc44b9), by Arya Mahadik, 2026-11-13 09:37:40 UTC
 - **Pull request:** [#540](https://github.com/aryamahadik/rosie/pull/540) from `task/T-1334`, merged 2026-11-13 09:37:41 UTC. It squashed 2 branch commits:
   - `0042e21` T-1334: inRuntimeTransaction and inBusinessTransaction reserve throug…
   - `ace680e` T-1334: the cut tests send a statement on the same client at once, be…
@@ -6628,7 +6788,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 531. T-1343: deploy-staging.sh, flags.sh, publish-bundle.sh and preview-cleanup.sh hand a database URL only to the commands that use it, on their command lines, with tracing, allexport and keyword off first; deploy-staging.sh clears rosie\_number before it sets it and gives Rosie's number to the deploy alone; seed-staging.sh hands STAGING\_TEST\_PHONES to staging-core's run alone; README line 7 says what a made name's line now gets; shared recorders in script-harness.mjs check each child's arguments as well as its environment, and T-1310's recorder checks do too (\#539)
 
-- **Commit:** [`fc9cf35`](https://github.com/aryamahadik/rosie/commit/fc9cf35), by Arya Mahadik, 2026-11-13 09:37:36 UTC
+- **Commit:** [`fc9cf357`](https://github.com/aryamahadik/rosie/commit/fc9cf357), by Arya Mahadik, 2026-11-13 09:37:36 UTC
 - **Pull request:** [#539](https://github.com/aryamahadik/rosie/pull/539) from `task/T-1343`, merged 2026-11-13 09:37:36 UTC. It squashed 1 branch commit:
   - `541f028` T-1343: deploy-staging.sh, flags.sh, publish-bundle.sh and preview-cl…
 - **Files changed:** 13 (+1362 −55), by folder:
@@ -6645,7 +6805,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 530. docs: COMMIT\_HISTORY.md through commit 528 (8edd689, \#536) (\#537)
 
-- **Commit:** [`806b881`](https://github.com/aryamahadik/rosie/commit/806b881), by Arya Mahadik, 2026-11-13 09:16:37 UTC
+- **Commit:** [`806b881f`](https://github.com/aryamahadik/rosie/commit/806b881f), by Arya Mahadik, 2026-11-13 09:16:37 UTC
 - **Pull request:** [#537](https://github.com/aryamahadik/rosie/pull/537) from `task/commit-history-73`, merged 2026-11-13 09:16:37 UTC. It squashed 1 branch commit:
   - `d2a83ae` docs: COMMIT\_HISTORY.md through commit 528 (8edd689, \#536)
 - **Files changed:** 1 (+50 −1), by folder:
@@ -6661,7 +6821,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 529. T-1318: a danger the read found (its danger flag) with no outcome hold, released or not, is among unreadTexts and keeps routineHeld true whether or not its pending note was written, so a note and a hold whose writes all fail together still hold every routine part in every commit until a hold is written (T-1312's security note b); holdOnReturn checks for a hold and writes the core's in one guarded step, so a read that throws then succeeds can never reopen a released hold (note a); the line's 5 s, the outbox path's writeHold, the at-once release, sendDanger and sendOutage unchanged; proofs in hold.worker.test.ts (\#538)
 
-- **Commit:** [`2a1bd45`](https://github.com/aryamahadik/rosie/commit/2a1bd45), by Arya Mahadik, 2026-11-13 09:16:33 UTC
+- **Commit:** [`2a1bd454`](https://github.com/aryamahadik/rosie/commit/2a1bd454), by Arya Mahadik, 2026-11-13 09:16:33 UTC
 - **Pull request:** [#538](https://github.com/aryamahadik/rosie/pull/538) from `task/T-1318`, merged 2026-11-13 09:16:34 UTC. It squashed 1 branch commit:
   - `b08da85` T-1318: a danger the read found (its danger flag) with no outcome hol…
 - **Files changed:** 2 (+224 −25), by folder:
@@ -6677,7 +6837,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 528. docs: COMMIT\_HISTORY.md through commit 525 (d0b54e7, \#533) (\#536)
 
-- **Commit:** [`8edd689`](https://github.com/aryamahadik/rosie/commit/8edd689), by Arya Mahadik, 2026-11-13 08:31:43 UTC
+- **Commit:** [`8edd689d`](https://github.com/aryamahadik/rosie/commit/8edd689d), by Arya Mahadik, 2026-11-13 08:31:43 UTC
 - **Pull request:** [#536](https://github.com/aryamahadik/rosie/pull/536) from `task/commit-history-72`, merged 2026-11-13 08:31:44 UTC. It squashed 1 branch commit:
   - `559791f` docs: COMMIT\_HISTORY.md through commit 525 (d0b54e7, \#533)
 - **Files changed:** 1 (+69 −1), by folder:
@@ -6693,7 +6853,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 527. T-1340: errorLabelOf labels db/repo's scrubbed DataAccessDatabaseError and CommitTurnDatabaseError by their SQLSTATE and constraint, as it labels a PostgresError: \<Name\>:\<SQLSTATE\>\[:\<constraint\>\], read by name, code and the name's constraint field alone (postgres.js's constraint\_name, db/repo's constraint), with no db/repo import. labels.worker.test.ts: both errors with and without a constraint; a bad code or constraint falls back for all three names alike; each name reads only its own field; values planted in the message, call, table and other fields never reach the label; a send whose door throws sendState's refusal carries the label to the next message and the log (\#535)
 
-- **Commit:** [`e90dad8`](https://github.com/aryamahadik/rosie/commit/e90dad8), by Arya Mahadik, 2026-11-13 08:31:40 UTC
+- **Commit:** [`e90dad80`](https://github.com/aryamahadik/rosie/commit/e90dad80), by Arya Mahadik, 2026-11-13 08:31:40 UTC
 - **Pull request:** [#535](https://github.com/aryamahadik/rosie/pull/535) from `task/T-1340`, merged 2026-11-13 08:31:40 UTC. It squashed 1 branch commit:
   - `204362a` T-1340: errorLabelOf labels db/repo's scrubbed DataAccessDatabaseErro…
 - **Files changed:** 2 (+277 −5), by folder:
@@ -6709,7 +6869,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 526. T-1338: a vote's STOP or START keeps the option's words as recordStopOrStart's words (the consent row's exact words), as the PostgreSQL-down path keeps them: guard/replies typedWords reads a vote by its option words, as keywordOf does; a body, then an email's subject, as before; words with no letter or digit still take the list's word. Tests: replies.worker.test.ts (a vote's STOP, START and CANCELAR through the real guard; a typed body and an email's subject unchanged), vote-words.worker.test.ts (one sealed vote through the turn loop and the actor's down path keeps the same words), replies.test.ts (K-09 v1 schema, the list word for blank words); keywords.test.ts renames one title, its assertions unchanged (\#534)
 
-- **Commit:** [`371fee9`](https://github.com/aryamahadik/rosie/commit/371fee9), by Arya Mahadik, 2026-11-13 08:31:36 UTC
+- **Commit:** [`371fee9d`](https://github.com/aryamahadik/rosie/commit/371fee9d), by Arya Mahadik, 2026-11-13 08:31:36 UTC
 - **Pull request:** [#534](https://github.com/aryamahadik/rosie/pull/534) from `task/T-1338`, merged 2026-11-13 08:31:36 UTC. It squashed 1 branch commit:
   - `9a631ca` T-1338: a vote's STOP or START keeps the option's words as recordStop…
 - **Files changed:** 5 (+554 −6), by folder:
@@ -6726,7 +6886,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 525. docs: COMMIT\_HISTORY.md through commit 521 (1b5846d, \#528) (\#533)
 
-- **Commit:** [`d0b54e7`](https://github.com/aryamahadik/rosie/commit/d0b54e7), by Arya Mahadik, 2026-11-13 08:13:06 UTC
+- **Commit:** [`d0b54e7c`](https://github.com/aryamahadik/rosie/commit/d0b54e7c), by Arya Mahadik, 2026-11-13 08:13:06 UTC
 - **Pull request:** [#533](https://github.com/aryamahadik/rosie/pull/533) from `task/commit-history-71`, merged 2026-11-13 08:13:06 UTC. It squashed 1 branch commit:
   - `066e9aa` docs: COMMIT\_HISTORY.md through commit 521 (1b5846d, \#528)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -6742,7 +6902,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 524. T-1339: commitTurn's and openChatOnText's own scrubbed() turn a postgres.js statement error (UNDEFINED\_VALUE, a serialize TypeError, any error carrying query, parameters, args or types) into an error with the call's name and code alone, as clocks.ts's scrubbed does; a PostgresError with a SQLSTATE still leaves as each call's own database error, and the constraint and transient answers are unchanged (\#532)
 
-- **Commit:** [`9aa532f`](https://github.com/aryamahadik/rosie/commit/9aa532f), by Arya Mahadik, 2026-11-13 08:13:02 UTC
+- **Commit:** [`9aa532fe`](https://github.com/aryamahadik/rosie/commit/9aa532fe), by Arya Mahadik, 2026-11-13 08:13:02 UTC
 - **Pull request:** [#532](https://github.com/aryamahadik/rosie/pull/532) from `task/T-1339`, merged 2026-11-13 08:13:03 UTC. It squashed 1 branch commit:
   - `661edd3` T-1339: commitTurn's and openChatOnText's own scrubbed() turn a postg…
 - **Files changed:** 4 (+445 −16), by folder:
@@ -6758,7 +6918,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 523. T-1335: the PostgreSQL-down path's outage line asks the one reading right before each text's line, not once per pass; a true answer or a throw withholds that line and every later one of the pass (stopped, not asked again); real-actor proofs: a STOP taken while the first line is out holds the second, the boundary, two fail-closed cases, and a danger line still goes (\#531)
 
-- **Commit:** [`a066123`](https://github.com/aryamahadik/rosie/commit/a066123), by Arya Mahadik, 2026-11-13 08:12:58 UTC
+- **Commit:** [`a0661230`](https://github.com/aryamahadik/rosie/commit/a0661230), by Arya Mahadik, 2026-11-13 08:12:58 UTC
 - **Pull request:** [#531](https://github.com/aryamahadik/rosie/pull/531) from `task/T-1335`, merged 2026-11-13 08:12:58 UTC. It squashed 1 branch commit:
   - `399ae07` T-1335: the PostgreSQL-down path's outage line asks the one reading r…
 - **Files changed:** 2 (+241 −6), by folder:
@@ -6774,7 +6934,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 522. T-1337: the dispatcher asks the recipient actor's one reading right before an outage line's row goes (DL-656): only exactly false sends; true, a throw, no answer, a non-boolean, no actor or no port drops the row as stopped; the root joins the port by the row's recipient K-04 id (actorOf's route); HandleActor.mayHaveStoppedNow (\#530)
 
-- **Commit:** [`25c3748`](https://github.com/aryamahadik/rosie/commit/25c3748), by Arya Mahadik, 2026-11-13 08:12:54 UTC
+- **Commit:** [`25c37480`](https://github.com/aryamahadik/rosie/commit/25c37480), by Arya Mahadik, 2026-11-13 08:12:54 UTC
 - **Pull request:** [#530](https://github.com/aryamahadik/rosie/pull/530) from `task/T-1337`, merged 2026-11-13 08:12:54 UTC. It squashed 1 branch commit:
   - `d8aebd4` T-1337: the dispatcher asks the recipient actor's one reading right b…
 - **Files changed:** 7 (+1432 −13), by folder:
@@ -6794,7 +6954,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 521. docs: COMMIT\_HISTORY.md through commit 519 (93c981f, \#527) (\#528)
 
-- **Commit:** [`1b5846d`](https://github.com/aryamahadik/rosie/commit/1b5846d), by Arya Mahadik, 2026-11-13 07:45:54 UTC
+- **Commit:** [`1b5846d2`](https://github.com/aryamahadik/rosie/commit/1b5846d2), by Arya Mahadik, 2026-11-13 07:45:54 UTC
 - **Pull request:** [#528](https://github.com/aryamahadik/rosie/pull/528) from `task/commit-history-70`, merged 2026-11-13 07:45:55 UTC. It squashed 1 branch commit:
   - `3bb3a2f` docs: COMMIT\_HISTORY.md through commit 519 (93c981f, \#527)
 - **Files changed:** 1 (+60 −1), by folder:
@@ -6810,7 +6970,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 520. T-1336: the safety read's own outage line (sendOutage) asks the actor's one reading again right before each send, the core's and each straight through Linq, with nothing awaited between, so a STOP the actor takes while it awaits the stopped flag, the handle's ids or the core holds the line by every path; a throw or any answer but false holds it (fails closed); sendDanger unchanged (RULES 7.2, 4.12; DL-647) (\#529)
 
-- **Commit:** [`f202f3a`](https://github.com/aryamahadik/rosie/commit/f202f3a), by Arya Mahadik, 2026-11-13 07:45:51 UTC
+- **Commit:** [`f202f3af`](https://github.com/aryamahadik/rosie/commit/f202f3af), by Arya Mahadik, 2026-11-13 07:45:51 UTC
 - **Pull request:** [#529](https://github.com/aryamahadik/rosie/pull/529) from `task/T-1336`, merged 2026-11-13 07:45:51 UTC. It squashed 1 branch commit:
   - `9b705d5` T-1336: the safety read's own outage line (sendOutage) asks the actor…
 - **Files changed:** 2 (+283 −2), by folder:
@@ -6826,7 +6986,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 519. docs: COMMIT\_HISTORY.md through commit 516 (a879c2c, \#524) (\#527)
 
-- **Commit:** [`93c981f`](https://github.com/aryamahadik/rosie/commit/93c981f), by Arya Mahadik, 2026-11-13 07:16:28 UTC
+- **Commit:** [`93c981ff`](https://github.com/aryamahadik/rosie/commit/93c981ff), by Arya Mahadik, 2026-11-13 07:16:28 UTC
 - **Pull request:** [#527](https://github.com/aryamahadik/rosie/pull/527) from `task/commit-history-69`, merged 2026-11-13 07:16:28 UTC. It squashed 1 branch commit:
   - `b8dbc8a` docs: COMMIT\_HISTORY.md through commit 516 (a879c2c, \#524)
 - **Files changed:** 1 (+35 −1), by folder:
@@ -6842,7 +7002,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 518. T-1322: db/repo's nine direct callers throw a statement's own refusal and postgres.js's statement errors scrubbed, through clocks.ts transientOrScrubbed: handleTargets, sendState, handleSealingKey (its constraint answer first, unchanged), readTurnState, extend, the seven safety reads, readOpenHolds, readOutboxRow and readFixedLineFacts. Each call's test file gets real 22P02, CHECK 23514, UNDEFINED\_VALUE, bytea TypeError and 40001 cases, each scrubbed to its call's name and code alone, or answered as before (\#526)
 
-- **Commit:** [`938559a`](https://github.com/aryamahadik/rosie/commit/938559a), by Arya Mahadik, 2026-11-13 07:16:24 UTC
+- **Commit:** [`938559a4`](https://github.com/aryamahadik/rosie/commit/938559a4), by Arya Mahadik, 2026-11-13 07:16:24 UTC
 - **Pull request:** [#526](https://github.com/aryamahadik/rosie/pull/526) from `task/T-1322`, merged 2026-11-13 07:16:24 UTC. It squashed 1 branch commit:
   - `4abb577` T-1322: db/repo's nine direct callers throw a statement's own refusal…
 - **Files changed:** 14 (+1350 −16), by folder:
@@ -6858,7 +7018,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 517. T-1332: the phone scan reads a number glued to a letter: after an escaped newline or %2B, and a separated North American number before a letter (\#525)
 
-- **Commit:** [`860a363`](https://github.com/aryamahadik/rosie/commit/860a363), by Arya Mahadik, 2026-11-13 07:16:19 UTC
+- **Commit:** [`860a3630`](https://github.com/aryamahadik/rosie/commit/860a3630), by Arya Mahadik, 2026-11-13 07:16:19 UTC
 - **Pull request:** [#525](https://github.com/aryamahadik/rosie/pull/525) from `task/T-1332`, merged 2026-11-13 07:16:20 UTC. It squashed 2 branch commits:
   - `f9d0eef` T-1332: the phone scan reads a number glued to an escape's letter or …
   - `498431e` T-1332: the glued-shape suite's comment names an escape or a URL-enco…
@@ -6885,7 +7045,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 516. docs: COMMIT\_HISTORY.md through commit 514 (debb0cf, \#521) (\#524)
 
-- **Commit:** [`a879c2c`](https://github.com/aryamahadik/rosie/commit/a879c2c), by Arya Mahadik, 2026-11-13 06:55:02 UTC
+- **Commit:** [`a879c2c6`](https://github.com/aryamahadik/rosie/commit/a879c2c6), by Arya Mahadik, 2026-11-13 06:55:02 UTC
 - **Pull request:** [#524](https://github.com/aryamahadik/rosie/pull/524) from `task/commit-history-68`, merged 2026-11-13 06:55:02 UTC. It squashed 1 branch commit:
   - `0d600a0` docs: COMMIT\_HISTORY.md through commit 514 (debb0cf, \#521)
 - **Files changed:** 1 (+53 −1), by folder:
@@ -6901,7 +7061,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 515. T-1310: a made name's vars-file value is named as not used, never sent to secrets:staging; deploy-preview.sh and seed-staging.sh give a database URL only to the commands that use the database; deploy-staging.sh switches tracing off; cleanEnv drops ROSIE\_NUMBER; the token maker removes its leftover temp files; pretest:ci-scripts builds the validators (\#523)
 
-- **Commit:** [`b162c4a`](https://github.com/aryamahadik/rosie/commit/b162c4a), by Arya Mahadik, 2026-11-13 06:54:58 UTC
+- **Commit:** [`b162c4a4`](https://github.com/aryamahadik/rosie/commit/b162c4a4), by Arya Mahadik, 2026-11-13 06:54:58 UTC
 - **Pull request:** [#523](https://github.com/aryamahadik/rosie/pull/523) from `task/T-1310`, merged 2026-11-13 06:54:58 UTC. It squashed 1 branch commit:
   - `e7efdb5` T-1310: a made name's vars-file value is named as not used, never sen…
 - **Files changed:** 13 (+999 −57), by folder:
@@ -6919,7 +7079,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 514. docs: COMMIT\_HISTORY.md through commit 512 (0a0b002, \#520) (\#521)
 
-- **Commit:** [`debb0cf`](https://github.com/aryamahadik/rosie/commit/debb0cf), by Arya Mahadik, 2026-11-13 06:29:10 UTC
+- **Commit:** [`debb0cf7`](https://github.com/aryamahadik/rosie/commit/debb0cf7), by Arya Mahadik, 2026-11-13 06:29:10 UTC
 - **Pull request:** [#521](https://github.com/aryamahadik/rosie/pull/521) from `task/commit-history-67`, merged 2026-11-13 06:29:10 UTC. It squashed 1 branch commit:
   - `9161170` docs: COMMIT\_HISTORY.md through commit 512 (0a0b002, \#520)
 - **Files changed:** 1 (+37 −1), by folder:
@@ -6935,7 +7095,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 513. T-1314: db/repo's other raw paths carry no connection detail: the private error copies, the lost-connection check, a reserve that never connects, and the ping's log line (\#522)
 
-- **Commit:** [`64dc724`](https://github.com/aryamahadik/rosie/commit/64dc724), by Arya Mahadik, 2026-11-13 06:29:05 UTC
+- **Commit:** [`64dc724a`](https://github.com/aryamahadik/rosie/commit/64dc724a), by Arya Mahadik, 2026-11-13 06:29:05 UTC
 - **Pull request:** [#522](https://github.com/aryamahadik/rosie/pull/522) from `task/T-1314`, merged 2026-11-13 06:29:06 UTC. It squashed 5 branch commits:
   - `4dada2a` T-1314: db/repo's other raw paths carry no connection detail: bundles…
   - `f9a4f64` T-1314: reservations.ts's header names whose answer reserve and relea…
@@ -6971,7 +7131,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 512. docs: COMMIT\_HISTORY.md through commit 510 (33d0ec5, \#518) (\#520)
 
-- **Commit:** [`0a0b002`](https://github.com/aryamahadik/rosie/commit/0a0b002), by Arya Mahadik, 2026-11-13 06:05:10 UTC
+- **Commit:** [`0a0b002a`](https://github.com/aryamahadik/rosie/commit/0a0b002a), by Arya Mahadik, 2026-11-13 06:05:10 UTC
 - **Pull request:** [#520](https://github.com/aryamahadik/rosie/pull/520) from `task/commit-history-66`, merged 2026-11-13 06:05:10 UTC. It squashed 1 branch commit:
   - `acbea49` docs: COMMIT\_HISTORY.md through commit 510 (33d0ec5, \#518)
 - **Files changed:** 1 (+46 −1), by folder:
@@ -6987,7 +7147,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 511. T-1297: the gateway scrubs a poll's option words and seals them with the body and subject in one form 2 box (K-06 v1.2 sealedEvent); the turn, the safety read on arrival and the PostgreSQL-down keyword read take a vote's words from the box by its form, form 1 boxes and plain kept votes still read as kept; pollVote is a guard keyword kind (DL-540) (\#519)
 
-- **Commit:** [`8552c80`](https://github.com/aryamahadik/rosie/commit/8552c80), by Arya Mahadik, 2026-11-13 06:05:06 UTC
+- **Commit:** [`8552c80d`](https://github.com/aryamahadik/rosie/commit/8552c80d), by Arya Mahadik, 2026-11-13 06:05:06 UTC
 - **Pull request:** [#519](https://github.com/aryamahadik/rosie/pull/519) from `task/T-1297`, merged 2026-11-13 06:05:06 UTC. It squashed 1 branch commit:
   - `e4809bb` T-1297: the gateway scrubs a poll's option words and seals them with …
 - **Files changed:** 16 (+1203 −90), by folder:
@@ -7007,7 +7167,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 510. docs: COMMIT\_HISTORY.md through commit 508 (40ad7c9, \#516) (\#518)
 
-- **Commit:** [`33d0ec5`](https://github.com/aryamahadik/rosie/commit/33d0ec5), by Arya Mahadik, 2026-11-13 05:35:53 UTC
+- **Commit:** [`33d0ec5e`](https://github.com/aryamahadik/rosie/commit/33d0ec5e), by Arya Mahadik, 2026-11-13 05:35:53 UTC
 - **Pull request:** [#518](https://github.com/aryamahadik/rosie/pull/518) from `task/commit-history-65`, merged 2026-11-13 05:35:54 UTC. It squashed 1 branch commit:
   - `92a5421` docs: COMMIT\_HISTORY.md through commit 508 (40ad7c9, \#516)
 - **Files changed:** 1 (+39 −1), by folder:
@@ -7023,7 +7183,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 509. T-1333: migration 0035 grants the migrating role SET, without INHERIT, on rosie\_app and rosie\_job where it is no superuser (seed:staging's 42501) (\#517)
 
-- **Commit:** [`aee1532`](https://github.com/aryamahadik/rosie/commit/aee1532), by Arya Mahadik, 2026-11-13 05:35:49 UTC
+- **Commit:** [`aee15327`](https://github.com/aryamahadik/rosie/commit/aee15327), by Arya Mahadik, 2026-11-13 05:35:49 UTC
 - **Pull request:** [#517](https://github.com/aryamahadik/rosie/pull/517) from `task/T-1333`, merged 2026-11-13 05:35:49 UTC. It squashed 2 branch commits:
   - `55046d5` T-1333: migration 0035 grants the migrations' role SET, without INHER…
   - `3e6dcf9` T-1333: 0035's header quotes why the SET option sits on a row of its …
@@ -7052,7 +7212,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 508. docs: COMMIT\_HISTORY.md through commit 506 (3963ee6, \#514) (\#516)
 
-- **Commit:** [`40ad7c9`](https://github.com/aryamahadik/rosie/commit/40ad7c9), by Arya Mahadik, 2026-11-13 05:18:50 UTC
+- **Commit:** [`40ad7c99`](https://github.com/aryamahadik/rosie/commit/40ad7c99), by Arya Mahadik, 2026-11-13 05:18:50 UTC
 - **Pull request:** [#516](https://github.com/aryamahadik/rosie/pull/516) from `task/commit-history-64`, merged 2026-11-13 05:18:51 UTC. It squashed 1 branch commit:
   - `53e16e0` docs: COMMIT\_HISTORY.md through commit 506 (3963ee6, \#514)
 - **Files changed:** 1 (+68 −1), by folder:
@@ -7068,7 +7228,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 507. T-1330: the frontier's transaction end fails scrubbed: the scope read, the commit and a failed rollback carry no host, port, user or password (\#515)
 
-- **Commit:** [`f09ddf4`](https://github.com/aryamahadik/rosie/commit/f09ddf4), by Arya Mahadik, 2026-11-13 05:18:46 UTC
+- **Commit:** [`f09ddf48`](https://github.com/aryamahadik/rosie/commit/f09ddf48), by Arya Mahadik, 2026-11-13 05:18:46 UTC
 - **Pull request:** [#515](https://github.com/aryamahadik/rosie/pull/515) from `task/T-1330`, merged 2026-11-13 05:18:47 UTC. It squashed 3 branch commits:
   - `29b75e0` T-1330: frontier.int tests for the transaction end: the scope read, t…
   - `b0e3b93` T-1330: the frontier's transaction end fails scrubbed: after work ans…
@@ -7090,7 +7250,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 506. docs: COMMIT\_HISTORY.md through commit 503 (ff4e7e2, \#511) (\#514)
 
-- **Commit:** [`3963ee6`](https://github.com/aryamahadik/rosie/commit/3963ee6), by Arya Mahadik, 2026-11-13 04:46:15 UTC
+- **Commit:** [`3963ee6f`](https://github.com/aryamahadik/rosie/commit/3963ee6f), by Arya Mahadik, 2026-11-13 04:46:15 UTC
 - **Pull request:** [#514](https://github.com/aryamahadik/rosie/pull/514) from `task/commit-history-63`, merged 2026-11-13 04:46:15 UTC. It squashed 1 branch commit:
   - `62ccf2f` docs: COMMIT\_HISTORY.md through commit 503 (ff4e7e2, \#511)
 - **Files changed:** 1 (+68 −1), by folder:
@@ -7106,7 +7266,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 505. docs: infra/ci/README.md names the db/ syntax guard and its test (T-1329) (\#512)
 
-- **Commit:** [`46013a5`](https://github.com/aryamahadik/rosie/commit/46013a5), by Arya Mahadik, 2026-11-13 04:46:11 UTC
+- **Commit:** [`46013a5d`](https://github.com/aryamahadik/rosie/commit/46013a5d), by Arya Mahadik, 2026-11-13 04:46:11 UTC
 - **Pull request:** [#512](https://github.com/aryamahadik/rosie/pull/512) from `task/docs-ci-readme-erasable`, merged 2026-11-13 04:46:12 UTC. It squashed 1 branch commit:
   - `096c258` docs: infra/ci/README.md names the db/ syntax guard and its test (T-1…
 - **Files changed:** 1 (+6 −0), by folder:
@@ -7122,7 +7282,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 504. T-1323: the AI-outage line asks the actor's one STOP reading before each text's line, failing closed (\#513)
 
-- **Commit:** [`49c1ba9`](https://github.com/aryamahadik/rosie/commit/49c1ba9), by Arya Mahadik, 2026-11-13 04:46:07 UTC
+- **Commit:** [`49c1ba9e`](https://github.com/aryamahadik/rosie/commit/49c1ba9e), by Arya Mahadik, 2026-11-13 04:46:07 UTC
 - **Pull request:** [#513](https://github.com/aryamahadik/rosie/pull/513) from `task/T-1323`, merged 2026-11-13 04:46:08 UTC. It squashed 5 branch commits:
   - `5019744` T-1323: the AI-outage line asks the actor's one reading (copy or stop…
   - `a04b7de` T-1323: OutageHost.stopped's comment says a true answer holds the run…
@@ -7157,7 +7317,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 503. docs: COMMIT\_HISTORY.md through commit 500 (0858e4b, \#508) (\#511)
 
-- **Commit:** [`ff4e7e2`](https://github.com/aryamahadik/rosie/commit/ff4e7e2), by Arya Mahadik, 2026-11-13 03:43:38 UTC
+- **Commit:** [`ff4e7e2e`](https://github.com/aryamahadik/rosie/commit/ff4e7e2e), by Arya Mahadik, 2026-11-13 03:43:38 UTC
 - **Pull request:** [#511](https://github.com/aryamahadik/rosie/pull/511) from `task/commit-history-62`, merged 2026-11-13 03:43:38 UTC. It squashed 1 branch commit:
   - `ad43c90` docs: COMMIT\_HISTORY.md through commit 500 (0858e4b, \#508)
 - **Files changed:** 1 (+60 −1), by folder:
@@ -7173,7 +7333,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 502. T-1329: typecheck refuses, in db/'s non-test files, syntax Node's type stripping cannot run (db/tsconfig.erasable.json) (\#509)
 
-- **Commit:** [`7e46278`](https://github.com/aryamahadik/rosie/commit/7e46278), by Arya Mahadik, 2026-11-13 03:43:34 UTC
+- **Commit:** [`7e462780`](https://github.com/aryamahadik/rosie/commit/7e462780), by Arya Mahadik, 2026-11-13 03:43:34 UTC
 - **Pull request:** [#509](https://github.com/aryamahadik/rosie/pull/509) from `task/T-1329`, merged 2026-11-13 03:43:34 UTC. It squashed 5 branch commits:
   - `40aad65` T-1329: db/tsconfig.json checks db/ again with erasableSyntaxOnly, ru…
   - `ada97b6` Merge branch 'main' into task/T-1329
@@ -7208,7 +7368,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 501. T-1317: no tracked file holds a real phone number: the scan reads every tracked file, each deliberate out-of-range test input named, public service lines allowed only at their own files, Ofcom's current UK drama blocks read as fiction (rounds 1 to 3, published as one commit of 0efeb1d's six files; DL-632) (\#510)
 
-- **Commit:** [`cec6186`](https://github.com/aryamahadik/rosie/commit/cec6186), by Arya Mahadik, 2026-11-13 03:43:30 UTC
+- **Commit:** [`cec6186d`](https://github.com/aryamahadik/rosie/commit/cec6186d), by Arya Mahadik, 2026-11-13 03:43:30 UTC
 - **Pull request:** [#510](https://github.com/aryamahadik/rosie/pull/510) from `task/T-1317-squash`, merged 2026-11-13 03:43:31 UTC. It squashed 1 branch commit:
   - `9d1aa93` T-1317: no tracked file holds a real phone number: the scan reads eve…
 - **Files changed:** 6 (+851 −44), by folder:
@@ -7224,7 +7384,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 500. docs: docs/professions.md lists all 243 professions with each one's id and style (\#508)
 
-- **Commit:** [`0858e4b`](https://github.com/aryamahadik/rosie/commit/0858e4b), by Arya Mahadik, 2026-11-13 02:02:42 UTC
+- **Commit:** [`0858e4bf`](https://github.com/aryamahadik/rosie/commit/0858e4bf), by Arya Mahadik, 2026-11-13 02:02:42 UTC
 - **Pull request:** [#508](https://github.com/aryamahadik/rosie/pull/508) from `task/docs-professions`, merged 2026-11-13 02:02:42 UTC. It squashed 2 branch commits:
   - `78f46d9` docs: docs/professions.md lists all 243 professions from the master's…
   - `9ec188f` docs: docs/professions.md in Prettier's format (the table's columns a…
@@ -7251,7 +7411,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 499. docs: the deploy-staging skill's step 5 names the post-deploy check's host-rule POST (T-1321) (\#507)
 
-- **Commit:** [`1dfba45`](https://github.com/aryamahadik/rosie/commit/1dfba45), by Arya Mahadik, 2026-11-13 02:02:38 UTC
+- **Commit:** [`1dfba455`](https://github.com/aryamahadik/rosie/commit/1dfba455), by Arya Mahadik, 2026-11-13 02:02:38 UTC
 - **Pull request:** [#507](https://github.com/aryamahadik/rosie/pull/507) from `task/docs-deploy-skill-host-rule`, merged 2026-11-13 02:02:39 UTC. It squashed 1 branch commit:
   - `f71bda5` docs: the deploy-staging skill's step 5 names the post-deploy check's…
 - **Files changed:** 1 (+1 −1), by folder:
@@ -7267,7 +7427,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 498. docs: COMMIT\_HISTORY.md through commit 497 (3d6b3d9, \#504) (\#506)
 
-- **Commit:** [`21ab5fb`](https://github.com/aryamahadik/rosie/commit/21ab5fb), by Arya Mahadik, 2026-11-13 02:02:34 UTC
+- **Commit:** [`21ab5fb9`](https://github.com/aryamahadik/rosie/commit/21ab5fb9), by Arya Mahadik, 2026-11-13 02:02:34 UTC
 - **Pull request:** [#506](https://github.com/aryamahadik/rosie/pull/506) from `task/commit-history-61`, merged 2026-11-13 02:02:35 UTC. It squashed 1 branch commit:
   - `fce0813` docs: COMMIT\_HISTORY.md through commit 497 (3d6b3d9, \#504)
 - **Files changed:** 1 (+50 −1), by folder:
@@ -7283,7 +7443,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 497. docs: COMMIT\_HISTORY.md through commit 494 (ab1b5b4, \#502) (\#504)
 
-- **Commit:** [`3d6b3d9`](https://github.com/aryamahadik/rosie/commit/3d6b3d9), by Arya Mahadik, 2026-11-12 23:36:34 UTC
+- **Commit:** [`3d6b3d91`](https://github.com/aryamahadik/rosie/commit/3d6b3d91), by Arya Mahadik, 2026-11-12 23:36:34 UTC
 - **Pull request:** [#504](https://github.com/aryamahadik/rosie/pull/504) from `task/commit-history-60`, merged 2026-11-12 23:36:35 UTC. It squashed 1 branch commit:
   - `d24f794` docs: COMMIT\_HISTORY.md through commit 494 (ab1b5b4, \#502)
 - **Files changed:** 1 (+99 −1), by folder:
@@ -7299,7 +7459,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 496. T-1315: the frontier's transaction start fails scrubbed: pgFrontierScope hands a failure before work gets its repo to transientOrThrow under readTurnState, so a connection that never opens or is lost answers transient (work runs once on a repo that reads nothing and answers it, and buildFrontier answers K-09's transient) and a refused session is thrown scrubbed with the call's name and code alone; pgFrontierRepo's read names readTurnState too; frontier.int.test.ts proves it through the scope and buildFrontier (closed-port ECONNREFUSED, postgres.js's and Node's constructed connection errors, PostgreSQL's class 28 and 53300 at the start) (\#505)
 
-- **Commit:** [`46d320d`](https://github.com/aryamahadik/rosie/commit/46d320d), by Arya Mahadik, 2026-11-12 23:36:31 UTC
+- **Commit:** [`46d320d9`](https://github.com/aryamahadik/rosie/commit/46d320d9), by Arya Mahadik, 2026-11-12 23:36:31 UTC
 - **Pull request:** [#505](https://github.com/aryamahadik/rosie/pull/505) from `task/T-1315`, merged 2026-11-12 23:36:31 UTC. It squashed 1 branch commit:
   - `3e6b5f3` T-1315: the frontier's transaction start fails scrubbed: pgFrontierSc…
 - **Files changed:** 2 (+578 −12), by folder:
@@ -7315,7 +7475,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 495. T-1321: the post-deploy check sends one form POST to \<base\>/sign-in on the workers.dev address, from the site's own origin with a small form and its own trace id, and passes only the guard's 403 page (T-1237's host rule on the edge); any other answer or none fails the check, so the deploy rolls back; no POST to any other address (a NOTICE line); tests with a curl stand-in (\#503)
 
-- **Commit:** [`81cd711`](https://github.com/aryamahadik/rosie/commit/81cd711), by Arya Mahadik, 2026-11-12 23:36:27 UTC
+- **Commit:** [`81cd711b`](https://github.com/aryamahadik/rosie/commit/81cd711b), by Arya Mahadik, 2026-11-12 23:36:27 UTC
 - **Pull request:** [#503](https://github.com/aryamahadik/rosie/pull/503) from `task/T-1321`, merged 2026-11-12 23:36:27 UTC. It squashed 1 branch commit:
   - `5be2dc9` T-1321: the post-deploy check sends one form POST to \<base\>/sign-in o…
 - **Files changed:** 2 (+411 −20), by folder:
@@ -7332,7 +7492,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 494. docs: COMMIT\_HISTORY.md through commit 491 (1e30dc8, \#498) (\#502)
 
-- **Commit:** [`ab1b5b4`](https://github.com/aryamahadik/rosie/commit/ab1b5b4), by Arya Mahadik, 2026-11-12 22:14:16 UTC
+- **Commit:** [`ab1b5b4a`](https://github.com/aryamahadik/rosie/commit/ab1b5b4a), by Arya Mahadik, 2026-11-12 22:14:16 UTC
 - **Pull request:** [#502](https://github.com/aryamahadik/rosie/pull/502) from `task/commit-history-59`, merged 2026-11-12 22:14:16 UTC. It squashed 1 branch commit:
   - `d481ff4` docs: COMMIT\_HISTORY.md through commit 491 (1e30dc8, \#498)
 - **Files changed:** 1 (+52 −1), by folder:
@@ -7348,7 +7508,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 493. T-1290: K-04's contract test covers v1.1: each twin refused by its one constraint on the model and on PostgreSQL, and every rule edge pinned (\#500)
 
-- **Commit:** [`693f935`](https://github.com/aryamahadik/rosie/commit/693f935), by Arya Mahadik, 2026-11-12 22:14:12 UTC
+- **Commit:** [`693f9355`](https://github.com/aryamahadik/rosie/commit/693f9355), by Arya Mahadik, 2026-11-12 22:14:12 UTC
 - **Pull request:** [#500](https://github.com/aryamahadik/rosie/pull/500) from `task/T-1290`, merged 2026-11-12 22:14:12 UTC. It squashed 4 branch commits:
   - `58b67fa` T-1290: K-04's contract test covers v1.1. The model (db-schema.core.v…
   - `4fecf6b` T-1290: the database side loads each fixture's rows in order as the r…
@@ -7381,7 +7541,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 492. T-1313: the safety host counts a STOP stored but not yet committed (one reading, mayHoldStop; fail closed while the PostgreSQL-down path is unwired) (\#501)
 
-- **Commit:** [`90037cc`](https://github.com/aryamahadik/rosie/commit/90037cc), by Arya Mahadik, 2026-11-12 22:14:07 UTC
+- **Commit:** [`90037cc9`](https://github.com/aryamahadik/rosie/commit/90037cc9), by Arya Mahadik, 2026-11-12 22:14:07 UTC
 - **Pull request:** [#501](https://github.com/aryamahadik/rosie/pull/501) from `task/T-1313`, merged 2026-11-12 22:14:08 UTC. It squashed 6 branch commits:
   - `48604a1` T-1313 (work in progress, NEED a 6.6 grant): the safety host's stoppe…
   - `3238789` T-1313 (work in progress, NEED a 6.6 grant): the down path's own outa…
@@ -7430,7 +7590,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 491. docs: COMMIT\_HISTORY.md through commit 488 (7c3fc58, \#496) (\#498)
 
-- **Commit:** [`1e30dc8`](https://github.com/aryamahadik/rosie/commit/1e30dc8), by Arya Mahadik, 2026-11-12 21:52:59 UTC
+- **Commit:** [`1e30dc85`](https://github.com/aryamahadik/rosie/commit/1e30dc85), by Arya Mahadik, 2026-11-12 21:52:59 UTC
 - **Pull request:** [#498](https://github.com/aryamahadik/rosie/pull/498) from `task/commit-history-58`, merged 2026-11-12 21:52:59 UTC. It squashed 1 branch commit:
   - `87bc581` docs: COMMIT\_HISTORY.md through commit 488 (7c3fc58, \#496)
 - **Files changed:** 1 (+57 −1), by folder:
@@ -7446,7 +7606,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 490. T-1328: fill.test.ts line 282 takes a London number from Ofcom's drama range (T-1317's finding 2): only the input and its expected value change, in E.164 form; the test's name, claim and every other assertion unchanged (\#499)
 
-- **Commit:** [`db16c5f`](https://github.com/aryamahadik/rosie/commit/db16c5f), by Arya Mahadik, 2026-11-12 21:52:54 UTC
+- **Commit:** [`db16c5fb`](https://github.com/aryamahadik/rosie/commit/db16c5fb), by Arya Mahadik, 2026-11-12 21:52:54 UTC
 - **Pull request:** [#499](https://github.com/aryamahadik/rosie/pull/499) from `task/T-1328`, merged 2026-11-12 21:52:55 UTC. It squashed 1 branch commit:
   - `b227f95` T-1328: fill.test.ts line 282 takes a London number from Ofcom's dram…
 - **Files changed:** 1 (+1 −1), by folder:
@@ -7462,7 +7622,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 489. T-1327: the saved copy of the old /test page holds its iMessage number as one named placeholder, ROSFIELD\_TEST\_IMESSAGE\_NUMBER, at assets/\_assets\_chat.js line 9 (no other byte changed). SHA256SUMS re-pinned on that file's line only. Runbook steps 3 and 4 name the placeholder: the one expected difference, filled by the user outside the repository before a restore. rosfield-test-route.test.mjs proves it stands in one place, that T-1304's shapes read no number in the copy outside the wordmark's path data, and that a fiction fill changes only that value (T-1317's finding 1, DL-616) (\#497)
 
-- **Commit:** [`984ffee`](https://github.com/aryamahadik/rosie/commit/984ffee), by Arya Mahadik, 2026-11-12 21:52:51 UTC
+- **Commit:** [`984ffeec`](https://github.com/aryamahadik/rosie/commit/984ffeec), by Arya Mahadik, 2026-11-12 21:52:51 UTC
 - **Pull request:** [#497](https://github.com/aryamahadik/rosie/pull/497) from `task/T-1327`, merged 2026-11-12 21:52:51 UTC. It squashed 1 branch commit:
   - `bd9a7ae` T-1327: the saved copy of the old /test page holds its iMessage numbe…
 - **Files changed:** 4 (+135 −6), by folder:
@@ -7481,7 +7641,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 488. docs: COMMIT\_HISTORY.md through commit 486 (91c8bf2, \#495) (\#496)
 
-- **Commit:** [`7c3fc58`](https://github.com/aryamahadik/rosie/commit/7c3fc58), by Arya Mahadik, 2026-11-12 21:19:34 UTC
+- **Commit:** [`7c3fc58a`](https://github.com/aryamahadik/rosie/commit/7c3fc58a), by Arya Mahadik, 2026-11-12 21:19:34 UTC
 - **Pull request:** [#496](https://github.com/aryamahadik/rosie/pull/496) from `task/commit-history-57`, merged 2026-11-12 21:19:34 UTC. It squashed 1 branch commit:
   - `786b3e0` docs: COMMIT\_HISTORY.md through commit 486 (91c8bf2, \#495)
 - **Files changed:** 1 (+47 −1), by folder:
@@ -7497,7 +7657,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 487. T-1268: db/repo's error helpers scrub a connection that never opened; no host, port, user or password in any error or answer (\#491)
 
-- **Commit:** [`ddab8c9`](https://github.com/aryamahadik/rosie/commit/ddab8c9), by Arya Mahadik, 2026-11-12 21:19:30 UTC
+- **Commit:** [`ddab8c9b`](https://github.com/aryamahadik/rosie/commit/ddab8c9b), by Arya Mahadik, 2026-11-12 21:19:30 UTC
 - **Pull request:** [#491](https://github.com/aryamahadik/rosie/pull/491) from `task/T-1268`, merged 2026-11-12 21:19:30 UTC. It squashed 7 branch commits:
   - `6c69dbb` T-1268: db/repo's error helpers scrub a connection that never opened:…
   - `ae5a9a9` Merge branch 'main' into task/T-1268
@@ -7537,7 +7697,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 486. docs: COMMIT\_HISTORY.md through commit 484 (09341bc, \#494) (\#495)
 
-- **Commit:** [`91c8bf2`](https://github.com/aryamahadik/rosie/commit/91c8bf2), by Arya Mahadik, 2026-11-12 20:54:12 UTC
+- **Commit:** [`91c8bf2d`](https://github.com/aryamahadik/rosie/commit/91c8bf2d), by Arya Mahadik, 2026-11-12 20:54:12 UTC
 - **Pull request:** [#495](https://github.com/aryamahadik/rosie/pull/495) from `task/commit-history-56`, merged 2026-11-12 20:54:13 UTC. It squashed 1 branch commit:
   - `9cc9fec` docs: COMMIT\_HISTORY.md through commit 484 (09341bc, \#494)
 - **Files changed:** 1 (+34 −1), by folder:
@@ -7553,7 +7713,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 485. T-1303: seed:staging hands the check-tester set its token's sha256 by name; the token's maker (\#478)
 
-- **Commit:** [`236cf8e`](https://github.com/aryamahadik/rosie/commit/236cf8e), by Arya Mahadik, 2026-11-12 20:54:07 UTC
+- **Commit:** [`236cf8e2`](https://github.com/aryamahadik/rosie/commit/236cf8e2), by Arya Mahadik, 2026-11-12 20:54:07 UTC
 - **Pull request:** [#478](https://github.com/aryamahadik/rosie/pull/478) from `task/T-1303`, merged 2026-11-12 20:54:08 UTC. It squashed 3 branch commits:
   - `decbcbc` T-1303: seed:staging runs the check-tester set and hands it only the …
   - `a84222f` Merge branch 'main' into task/T-1303
@@ -7583,7 +7743,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 484. docs: COMMIT\_HISTORY.md through commit 482 (9a0c7fa, \#492) (\#494)
 
-- **Commit:** [`09341bc`](https://github.com/aryamahadik/rosie/commit/09341bc), by Arya Mahadik, 2026-11-12 20:22:12 UTC
+- **Commit:** [`09341bcf`](https://github.com/aryamahadik/rosie/commit/09341bcf), by Arya Mahadik, 2026-11-12 20:22:12 UTC
 - **Pull request:** [#494](https://github.com/aryamahadik/rosie/pull/494) from `task/commit-history-55`, merged 2026-11-12 20:22:12 UTC. It squashed 1 branch commit:
   - `6826f1e` docs: COMMIT\_HISTORY.md through commit 482 (9a0c7fa, \#492)
 - **Files changed:** 1 (+52 −1), by folder:
@@ -7599,7 +7759,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 483. T-1319: the corrections parity file is split by trades: T-1116's and T-1132's sweeps run over every 8th trade id (shardOf) in each of parity.shard-9 to 15 and 17, every test and assertion kept (487 across the eight; has 243 trades stays in parity.shard-9), names chosen by Vitest's sha1 order to spread 3, 3 and 2 over the three parity shard jobs (16 skipped); parity-placement.test.mjs pins corrections 1 to 15 and 17 (\#493)
 
-- **Commit:** [`11aeb94`](https://github.com/aryamahadik/rosie/commit/11aeb94), by Arya Mahadik, 2026-11-12 20:22:08 UTC
+- **Commit:** [`11aeb940`](https://github.com/aryamahadik/rosie/commit/11aeb940), by Arya Mahadik, 2026-11-12 20:22:08 UTC
 - **Pull request:** [#493](https://github.com/aryamahadik/rosie/pull/493) from `task/T-1319`, merged 2026-11-12 20:22:08 UTC. It squashed 1 branch commit:
   - `db7b19e` T-1319: the corrections parity file is split by trades: T-1116's and …
 - **Files changed:** 9 (+2875 −12), by folder:
@@ -7616,7 +7776,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 482. docs: COMMIT\_HISTORY.md through commit 480 (b8882e0, \#489) (\#492)
 
-- **Commit:** [`9a0c7fa`](https://github.com/aryamahadik/rosie/commit/9a0c7fa), by Arya Mahadik, 2026-11-12 20:03:00 UTC
+- **Commit:** [`9a0c7fa2`](https://github.com/aryamahadik/rosie/commit/9a0c7fa2), by Arya Mahadik, 2026-11-12 20:03:00 UTC
 - **Pull request:** [#492](https://github.com/aryamahadik/rosie/pull/492) from `task/commit-history-54`, merged 2026-11-12 20:03:00 UTC. It squashed 1 branch commit:
   - `4fdf08b` docs: COMMIT\_HISTORY.md through commit 480 (b8882e0, \#489)
 - **Files changed:** 1 (+34 −1), by folder:
@@ -7632,7 +7792,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 481. T-1277: K-05 v1.13, the sign-in version (six calls; a turnless row's claim fields and guards) (\#490)
 
-- **Commit:** [`774b5e1`](https://github.com/aryamahadik/rosie/commit/774b5e1), by Arya Mahadik, 2026-11-12 20:02:56 UTC
+- **Commit:** [`774b5e15`](https://github.com/aryamahadik/rosie/commit/774b5e15), by Arya Mahadik, 2026-11-12 20:02:56 UTC
 - **Pull request:** [#490](https://github.com/aryamahadik/rosie/pull/490) from `task/T-1277`, merged 2026-11-12 20:02:57 UTC. It squashed 3 branch commits:
   - `6845784` T-1277: K-05 v1.13, the sign-in version (ADR-016 card V3): startSignI…
   - `bd8ca4f` T-1277: read-outbox-row-sign-in-code writes its job row by its note (…
@@ -7667,7 +7827,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 480. docs: COMMIT\_HISTORY.md through commit 478 (5fbe5ce, \#487) (\#489)
 
-- **Commit:** [`b8882e0`](https://github.com/aryamahadik/rosie/commit/b8882e0), by Arya Mahadik, 2026-11-12 19:19:48 UTC
+- **Commit:** [`b8882e08`](https://github.com/aryamahadik/rosie/commit/b8882e08), by Arya Mahadik, 2026-11-12 19:19:48 UTC
 - **Pull request:** [#489](https://github.com/aryamahadik/rosie/pull/489) from `task/commit-history-53`, merged 2026-11-12 19:19:49 UTC. It squashed 1 branch commit:
   - `61883e8` docs: COMMIT\_HISTORY.md through commit 478 (5fbe5ce, \#487)
 - **Files changed:** 1 (+69 −1), by folder:
@@ -7683,7 +7843,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 479. T-1320: a package.json change confined to script lines the parity run never runs is not a parity input. merge-check.yml's parity-inputs step keeps its list and, when package.json is the only input that changed, runs infra/ci/parity-inputs.mjs as origin/main holds it: an input unless the change is confined to the scripts object and leaves test:parity, its pre and post scripts, npm ci's install scripts and every script their lines name unchanged; every other field counts (key order included); it fails closed, and a failing rule fails the step. parity-inputs.test.mjs runs the step as the file holds it with a case for each shape; the local merge-check gains a run test (a script line alone runs no shard; a changed test:parity runs them) and its fixture carries the rule; README section (DL-589, DL-600) (\#488)
 
-- **Commit:** [`4b87736`](https://github.com/aryamahadik/rosie/commit/4b87736), by Arya Mahadik, 2026-11-12 19:19:44 UTC
+- **Commit:** [`4b877362`](https://github.com/aryamahadik/rosie/commit/4b877362), by Arya Mahadik, 2026-11-12 19:19:44 UTC
 - **Pull request:** [#488](https://github.com/aryamahadik/rosie/pull/488) from `task/T-1320`, merged 2026-11-12 19:19:45 UTC. It squashed 1 branch commit:
   - `22b7e97` T-1320: a package.json change confined to script lines the parity run…
 - **Files changed:** 5 (+727 −4), by folder:
@@ -7700,7 +7860,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 478. docs: COMMIT\_HISTORY.md through commit 474 (9f4c5e2, \#483) (\#487)
 
-- **Commit:** [`5fbe5ce`](https://github.com/aryamahadik/rosie/commit/5fbe5ce), by Arya Mahadik, 2026-11-12 16:32:08 UTC
+- **Commit:** [`5fbe5cec`](https://github.com/aryamahadik/rosie/commit/5fbe5cec), by Arya Mahadik, 2026-11-12 16:32:08 UTC
 - **Pull request:** [#487](https://github.com/aryamahadik/rosie/pull/487) from `task/commit-history-52`, merged 2026-11-12 16:32:08 UTC. It squashed 1 branch commit:
   - `da67030` docs: COMMIT\_HISTORY.md through commit 474 (9f4c5e2, \#483)
 - **Files changed:** 1 (+50 −1), by folder:
@@ -7716,7 +7876,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 477. T-1312: the direct danger line never waits for its hold (ADR-018 card H): the direct path writes its hold through holdFromOutcomes' guard; a danger is complete only once its hold is written, its pending note staying until then; the hold written again from the kept labels at dangerSent, each re-read, resume or late answer, and closeResults keeping the note meanwhile; the record's replay writes the core's hold with its id when the actor holds none; holdFromKept never reopens a released hold; the outbox path's writeHold unchanged; card H's proofs in hold.worker.test.ts (\#486)
 
-- **Commit:** [`a7e2dc7`](https://github.com/aryamahadik/rosie/commit/a7e2dc7), by Arya Mahadik, 2026-11-12 16:32:03 UTC
+- **Commit:** [`a7e2dc7e`](https://github.com/aryamahadik/rosie/commit/a7e2dc7e), by Arya Mahadik, 2026-11-12 16:32:03 UTC
 - **Pull request:** [#486](https://github.com/aryamahadik/rosie/pull/486) from `task/T-1312`, merged 2026-11-12 16:32:03 UTC. It squashed 1 branch commit:
   - `9ec025d` T-1312: the direct danger line never waits for its hold (ADR-018 card…
 - **Files changed:** 2 (+1050 −49), by folder:
@@ -7732,7 +7892,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 476. T-1311: a STOP batch restarts a restarted turn once more (ADR-018 Card S; CQ-230): LeaseHost.stopAmong (a throw reads true, a host without it false), the second restart in planOf and advance written as 2 in lease\_turns.restart and never restarted again, the actor's lease host answering through the down path (true while unwired, on a throw, for a text it cannot find or with no reading); the tests that pin the one restart run with the down path wired, assertions kept (\#485)
 
-- **Commit:** [`1b002e2`](https://github.com/aryamahadik/rosie/commit/1b002e2), by Arya Mahadik, 2026-11-12 16:31:58 UTC
+- **Commit:** [`1b002e2a`](https://github.com/aryamahadik/rosie/commit/1b002e2a), by Arya Mahadik, 2026-11-12 16:31:58 UTC
 - **Pull request:** [#485](https://github.com/aryamahadik/rosie/pull/485) from `task/T-1311`, merged 2026-11-12 16:31:59 UTC. It squashed 1 branch commit:
   - `a3524eb` T-1311: a STOP batch restarts a restarted turn once more (ADR-018 Car…
 - **Files changed:** 6 (+883 −67), by folder:
@@ -7751,7 +7911,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 475. T-1237: the web shell takes a form post only on its own host (LINK\_HOST), and web/README.md describes the sign-in routes, the POST guards and a local wrangler dev session (\#484)
 
-- **Commit:** [`d62c7ac`](https://github.com/aryamahadik/rosie/commit/d62c7ac), by Arya Mahadik, 2026-11-12 16:31:54 UTC
+- **Commit:** [`d62c7ac7`](https://github.com/aryamahadik/rosie/commit/d62c7ac7), by Arya Mahadik, 2026-11-12 16:31:54 UTC
 - **Pull request:** [#484](https://github.com/aryamahadik/rosie/pull/484) from `task/T-1237`, merged 2026-11-12 16:31:55 UTC. It squashed 1 branch commit:
   - `023fc4d` T-1237: the web shell takes a form post only on its own host (LINK\_HO…
 - **Files changed:** 6 (+515 −24), by folder:
@@ -7768,7 +7928,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 474. docs: COMMIT\_HISTORY.md through commit 471 (f770b0a, \#480) (\#483)
 
-- **Commit:** [`9f4c5e2`](https://github.com/aryamahadik/rosie/commit/9f4c5e2), by Arya Mahadik, 2026-11-12 16:06:20 UTC
+- **Commit:** [`9f4c5e2b`](https://github.com/aryamahadik/rosie/commit/9f4c5e2b), by Arya Mahadik, 2026-11-12 16:06:20 UTC
 - **Pull request:** [#483](https://github.com/aryamahadik/rosie/pull/483) from `task/commit-history-51`, merged 2026-11-12 16:06:21 UTC. It squashed 1 branch commit:
   - `126201c` docs: COMMIT\_HISTORY.md through commit 471 (f770b0a, \#480)
 - **Files changed:** 1 (+147 −1), by folder:
@@ -7784,7 +7944,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 473. T-1294: the AI-down words say a STOP commits at once and waits only for the core; the outage test's gate double answers a core-only request as K-09 does; a test for the STOP batch whose core-only commit is refused while the models are down; a core-only repeat's gate span says repeated (\#482)
 
-- **Commit:** [`6c96621`](https://github.com/aryamahadik/rosie/commit/6c96621), by Arya Mahadik, 2026-11-12 16:06:16 UTC
+- **Commit:** [`6c966219`](https://github.com/aryamahadik/rosie/commit/6c966219), by Arya Mahadik, 2026-11-12 16:06:16 UTC
 - **Pull request:** [#482](https://github.com/aryamahadik/rosie/pull/482) from `task/T-1294`, merged 2026-11-12 16:06:17 UTC. It squashed 1 branch commit:
   - `4331548` T-1294: the AI-down words say a STOP commits at once and waits only f…
 - **Files changed:** 4 (+240 −23), by folder:
@@ -7801,7 +7961,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 472. T-1316: the chat-link spike's line is a fiction-range number (+1 555 555-0123) in build.mjs, its test and index.html, generated again with the build script and formatted; the comment and the page no longer call it Rosfield's line; the test scans every file of the spike for a phone number outside the fiction range (DL-542) (\#481)
 
-- **Commit:** [`aa402ff`](https://github.com/aryamahadik/rosie/commit/aa402ff), by Arya Mahadik, 2026-11-12 16:06:12 UTC
+- **Commit:** [`aa402ff9`](https://github.com/aryamahadik/rosie/commit/aa402ff9), by Arya Mahadik, 2026-11-12 16:06:12 UTC
 - **Pull request:** [#481](https://github.com/aryamahadik/rosie/pull/481) from `task/T-1316`, merged 2026-11-12 16:06:12 UTC. It squashed 1 branch commit:
   - `38f6e87` T-1316: the chat-link spike's line is a fiction-range number (+1 555 …
 - **Files changed:** 3 (+83 −25), by folder:
@@ -7817,7 +7977,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 471. docs: COMMIT\_HISTORY.md through commit 466 (2f29a26, \#476) (\#480)
 
-- **Commit:** [`f770b0a`](https://github.com/aryamahadik/rosie/commit/f770b0a), by Arya Mahadik, 2026-11-12 14:47:13 UTC
+- **Commit:** [`f770b0a7`](https://github.com/aryamahadik/rosie/commit/f770b0a7), by Arya Mahadik, 2026-11-12 14:47:13 UTC
 - **Pull request:** [#480](https://github.com/aryamahadik/rosie/pull/480) from `task/commit-history-50`, merged 2026-11-12 14:47:14 UTC. It squashed 1 branch commit:
   - `6797e18` docs: COMMIT\_HISTORY.md through commit 466 (2f29a26, \#476)
 - **Files changed:** 1 (+35 −1), by folder:
@@ -7833,7 +7993,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 470. T-1308: K-06 v1.2's contract test (tests/contract/inbound-event.v1.2.test.ts): each v1.2 refused twin refused by scrubbedV1dot2 alone for its one poll.optionWords line and mended to its tagged twin; scrubbedV1dot2 reads option words as scrubbedV1dot1 reads the body, and scrubbed counts their tags; every earlier fixture valid under v1.2; the sealed-event fixtures made in this test (CQ-261 (a)): every accepted fixture the actor takes sealed in form 2 (sealedEvent) and form 1 (sealedEventV1) with a real AES-256-GCM seal, plain words refused, the box forms, the additional data, a fail-closed reader; no file under fixtures/ is a sealed event (\#477)
 
-- **Commit:** [`ce5fd5c`](https://github.com/aryamahadik/rosie/commit/ce5fd5c), by Arya Mahadik, 2026-11-12 14:47:09 UTC
+- **Commit:** [`ce5fd5c1`](https://github.com/aryamahadik/rosie/commit/ce5fd5c1), by Arya Mahadik, 2026-11-12 14:47:09 UTC
 - **Pull request:** [#477](https://github.com/aryamahadik/rosie/pull/477) from `task/T-1308`, merged 2026-11-12 14:47:09 UTC. It squashed 1 branch commit:
   - `0c73ade` T-1308: K-06 v1.2's contract test (tests/contract/inbound-event.v1.2.…
 - **Files changed:** 1 (+1007 −0), by folder:
@@ -7849,7 +8009,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 469. T-1278: the sign-in migrations, K-04 v1.1 (0032, 0033) and K-22 v1.2 (0034); test-db.ts polls the migrate lock (\#479)
 
-- **Commit:** [`f709da9`](https://github.com/aryamahadik/rosie/commit/f709da9), by Arya Mahadik, 2026-11-12 14:47:04 UTC
+- **Commit:** [`f709da91`](https://github.com/aryamahadik/rosie/commit/f709da91), by Arya Mahadik, 2026-11-12 14:47:04 UTC
 - **Pull request:** [#479](https://github.com/aryamahadik/rosie/pull/479) from `task/T-1278`, merged 2026-11-12 14:47:04 UTC. It squashed 10 branch commits:
   - `390f5f7` T-1274: K-22 v1.2, sign\_in\_attempts (ADR-016 card V2): the table list…
   - `35b9458` T-1273: work in progress, unchecked (the builder was stopped at 04:39…
@@ -7905,7 +8065,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 468. T-1274: K-22 v1.2, sign\_in\_attempts and its three calls (ADR-016 card V2) (\#450)
 
-- **Commit:** [`aad01de`](https://github.com/aryamahadik/rosie/commit/aad01de), by Arya Mahadik, 2026-11-12 14:46:59 UTC
+- **Commit:** [`aad01ded`](https://github.com/aryamahadik/rosie/commit/aad01ded), by Arya Mahadik, 2026-11-12 14:46:59 UTC
 - **Pull request:** [#450](https://github.com/aryamahadik/rosie/pull/450) from `task/T-1274`, merged 2026-11-12 14:46:59 UTC. It squashed 2 branch commits:
   - `390f5f7` T-1274: K-22 v1.2, sign\_in\_attempts (ADR-016 card V2): the table list…
   - `01a740f` T-1274: K-22 README rule 9: neither role holds DELETE, TRUNCATE, REFE…
@@ -7934,7 +8094,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 467. T-1273: K-04 v1.1, outbox rows with no turn, the code row's purpose and not\_after (ADR-016 card V1) (\#455)
 
-- **Commit:** [`7dde0d9`](https://github.com/aryamahadik/rosie/commit/7dde0d9), by Arya Mahadik, 2026-11-12 14:46:54 UTC
+- **Commit:** [`7dde0d92`](https://github.com/aryamahadik/rosie/commit/7dde0d92), by Arya Mahadik, 2026-11-12 14:46:54 UTC
 - **Pull request:** [#455](https://github.com/aryamahadik/rosie/pull/455) from `task/T-1273`, merged 2026-11-12 14:46:54 UTC. It squashed 2 branch commits:
   - `35b9458` T-1273: work in progress, unchecked (the builder was stopped at 04:39…
   - `e4791b5` T-1273: K-04 v1.1 checked: section 1's table and its reader table wor…
@@ -7963,7 +8123,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 466. docs: COMMIT\_HISTORY.md through commit 464 (1c76e9b, \#474) (\#476)
 
-- **Commit:** [`2f29a26`](https://github.com/aryamahadik/rosie/commit/2f29a26), by Arya Mahadik, 2026-11-12 13:22:39 UTC
+- **Commit:** [`2f29a265`](https://github.com/aryamahadik/rosie/commit/2f29a265), by Arya Mahadik, 2026-11-12 13:22:39 UTC
 - **Pull request:** [#476](https://github.com/aryamahadik/rosie/pull/476) from `task/commit-history-48`, merged 2026-11-12 13:22:39 UTC. It squashed 1 branch commit:
   - `93c586a` docs: COMMIT\_HISTORY.md through commit 464 (1c76e9b, \#474)
 - **Files changed:** 1 (+81 −1), by folder:
@@ -7979,7 +8139,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 465. T-1304: staging's ROSIE\_NUMBER, read by name (the environment, else the git-ignored local vars file, as load\_dev\_var reads it) and given at deploy as --var ROSIE\_NUMBER:\<number\> only in E.164 form; a missing or malformed value deploys without it with one line that chat links stay off (K-05 default 109), never the value; the Worker's Env gains ROSIE\_NUMBER?; tests: the deploy's var, the vars file and precedence, missing and malformed values, no stand-in environment holds it, and no wrangler.jsonc section names it nor any tracked config or script holds a phone number outside the fiction range (\#475)
 
-- **Commit:** [`bbd1a98`](https://github.com/aryamahadik/rosie/commit/bbd1a98), by Arya Mahadik, 2026-11-12 13:22:33 UTC
+- **Commit:** [`bbd1a986`](https://github.com/aryamahadik/rosie/commit/bbd1a986), by Arya Mahadik, 2026-11-12 13:22:33 UTC
 - **Pull request:** [#475](https://github.com/aryamahadik/rosie/pull/475) from `task/T-1304`, merged 2026-11-12 13:22:33 UTC. It squashed 1 branch commit:
   - `0c6ec26` T-1304: staging's ROSIE\_NUMBER, read by name (the environment, else t…
 - **Files changed:** 4 (+327 −6), by folder:
@@ -7997,7 +8157,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 464. docs: COMMIT\_HISTORY.md through commit 461 (d43a295, \#471) (\#474)
 
-- **Commit:** [`1c76e9b`](https://github.com/aryamahadik/rosie/commit/1c76e9b), by Arya Mahadik, 2026-11-12 12:27:15 UTC
+- **Commit:** [`1c76e9ba`](https://github.com/aryamahadik/rosie/commit/1c76e9ba), by Arya Mahadik, 2026-11-12 12:27:15 UTC
 - **Pull request:** [#474](https://github.com/aryamahadik/rosie/pull/474) from `task/commit-history-47`, merged 2026-11-12 12:27:15 UTC. It squashed 1 branch commit:
   - `bee5f6b` docs: COMMIT\_HISTORY.md through commit 461 (d43a295, \#471)
 - **Files changed:** 1 (+47 −1), by folder:
@@ -8013,7 +8173,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 463. T-1264: the turn reads each kept safety result from its leased turn, and the lease removes it when the turn ends for good (ADR-015 card B) (\#473)
 
-- **Commit:** [`17c6b88`](https://github.com/aryamahadik/rosie/commit/17c6b88), by Arya Mahadik, 2026-11-12 12:27:08 UTC
+- **Commit:** [`17c6b88d`](https://github.com/aryamahadik/rosie/commit/17c6b88d), by Arya Mahadik, 2026-11-12 12:27:08 UTC
 - **Pull request:** [#473](https://github.com/aryamahadik/rosie/pull/473) from `task/T-1264`, merged 2026-11-12 12:27:08 UTC. It squashed 4 branch commits:
   - `2902d1b` T-1264: the turn reads each text's kept safety result from its leased…
   - `e8cc740` T-1264: the hop rig's known() says plainly that it sets nothing since…
@@ -8049,7 +8209,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 462. T-1267: ADR-018, a STOP batch restarts a restarted turn once more, and the direct danger line never waits for its hold (CQ-230, CQ-231) (\#472)
 
-- **Commit:** [`beeb376`](https://github.com/aryamahadik/rosie/commit/beeb376), by Arya Mahadik, 2026-11-12 12:27:00 UTC
+- **Commit:** [`beeb3768`](https://github.com/aryamahadik/rosie/commit/beeb3768), by Arya Mahadik, 2026-11-12 12:27:00 UTC
 - **Pull request:** [#472](https://github.com/aryamahadik/rosie/pull/472) from `task/T-1267`, merged 2026-11-12 12:27:00 UTC. It squashed 3 branch commits:
   - `505807c` T-1267: design record ADR-018 rules CQ-230 and CQ-231: a STOP batch r…
   - `98f8a39` Merge branch 'main' into task/T-1267
@@ -8077,7 +8237,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 461. docs: COMMIT\_HISTORY.md through commit 459 (9f1d8da, \#469) (\#471)
 
-- **Commit:** [`d43a295`](https://github.com/aryamahadik/rosie/commit/d43a295), by Arya Mahadik, 2026-11-12 12:04:32 UTC
+- **Commit:** [`d43a295f`](https://github.com/aryamahadik/rosie/commit/d43a295f), by Arya Mahadik, 2026-11-12 12:04:32 UTC
 - **Pull request:** [#471](https://github.com/aryamahadik/rosie/pull/471) from `task/commit-history-46`, merged 2026-11-12 12:04:32 UTC. It squashed 1 branch commit:
   - `938c5d1` docs: COMMIT\_HISTORY.md through commit 459 (9f1d8da, \#469)
 - **Files changed:** 1 (+48 −1), by folder:
@@ -8093,7 +8253,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 460. T-1261: cf.sh and put-staging-secrets.sh switch tracing, allexport and keyword off first; the put script never puts a made name (\#470)
 
-- **Commit:** [`b0b4f6a`](https://github.com/aryamahadik/rosie/commit/b0b4f6a), by Arya Mahadik, 2026-11-12 12:04:22 UTC
+- **Commit:** [`b0b4f6a3`](https://github.com/aryamahadik/rosie/commit/b0b4f6a3), by Arya Mahadik, 2026-11-12 12:04:22 UTC
 - **Pull request:** [#470](https://github.com/aryamahadik/rosie/pull/470) from `task/T-1261`, merged 2026-11-12 12:04:22 UTC. It squashed 2 branch commits:
   - `0958d53` T-1261: cf.sh and put-staging-secrets.sh switch tracing, allexport an…
   - `cb8240a` T-1261: put-staging-secrets.test.mjs's devVars() writes RESEND\_API\_KE…
@@ -8123,7 +8283,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 459. docs: COMMIT\_HISTORY.md through commit 457 (c549f4b, \#467) (\#469)
 
-- **Commit:** [`9f1d8da`](https://github.com/aryamahadik/rosie/commit/9f1d8da), by Arya Mahadik, 2026-11-12 10:59:16 UTC
+- **Commit:** [`9f1d8dad`](https://github.com/aryamahadik/rosie/commit/9f1d8dad), by Arya Mahadik, 2026-11-12 10:59:16 UTC
 - **Pull request:** [#469](https://github.com/aryamahadik/rosie/pull/469) from `task/commit-history-45`, merged 2026-11-12 10:59:16 UTC. It squashed 1 branch commit:
   - `c3af14f` docs: COMMIT\_HISTORY.md through commit 457 (c549f4b, \#467)
 - **Files changed:** 1 (+85 −1), by folder:
@@ -8139,7 +8299,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 458. T-1296: K-06 v1.2, a poll's option words scrubbed and sealed like the body (\#468)
 
-- **Commit:** [`501d5aa`](https://github.com/aryamahadik/rosie/commit/501d5aa), by Arya Mahadik, 2026-11-12 10:59:12 UTC
+- **Commit:** [`501d5aa3`](https://github.com/aryamahadik/rosie/commit/501d5aa3), by Arya Mahadik, 2026-11-12 10:59:12 UTC
 - **Pull request:** [#468](https://github.com/aryamahadik/rosie/pull/468) from `task/T-1296`, merged 2026-11-12 10:59:12 UTC. It squashed 3 branch commits:
   - `46561e8` T-1296: K-06 v1.2, a poll's option words scrubbed like the body (name…
   - `3d68a05` Merge branch 'main' into worktree-wf\_a8f14faa-f03-1
@@ -8170,7 +8330,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 457. docs: COMMIT\_HISTORY.md through commit 453 (69b3c85, \#462) (\#467)
 
-- **Commit:** [`c549f4b`](https://github.com/aryamahadik/rosie/commit/c549f4b), by Arya Mahadik, 2026-11-12 10:38:21 UTC
+- **Commit:** [`c549f4ba`](https://github.com/aryamahadik/rosie/commit/c549f4ba), by Arya Mahadik, 2026-11-12 10:38:21 UTC
 - **Pull request:** [#467](https://github.com/aryamahadik/rosie/pull/467) from `task/commit-history-44`, merged 2026-11-12 10:38:21 UTC. It squashed 1 branch commit:
   - `576fa73` docs: COMMIT\_HISTORY.md through commit 453 (69b3c85, \#462)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -8186,7 +8346,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 456. T-1302: the test-phone roster's one list (db/seeds/lib/roster.ts), from which staging-core and skeleton take their roster ids, handle ids and numbers; staging's check tester set (db/seeds/check-tester.ts): a person, its example.com email handle, a live team row, a used sign-in code and a 30-day session holding the token's sha256 handed in by STAGING\_CHECK\_TESTER\_TOKEN\_SHA256, refused before any write off staging's public schema or for an absent or malformed hash; unit and integration tests (\#464)
 
-- **Commit:** [`97be452`](https://github.com/aryamahadik/rosie/commit/97be452), by Arya Mahadik, 2026-11-12 10:38:17 UTC
+- **Commit:** [`97be4523`](https://github.com/aryamahadik/rosie/commit/97be4523), by Arya Mahadik, 2026-11-12 10:38:17 UTC
 - **Pull request:** [#464](https://github.com/aryamahadik/rosie/pull/464) from `task/T-1302`, merged 2026-11-12 10:38:17 UTC. It squashed 1 branch commit:
   - `53a1c5c` T-1302: the test-phone roster's one list (db/seeds/lib/roster.ts), fr…
 - **Files changed:** 9 (+1724 −19), by folder:
@@ -8203,7 +8363,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 455. T-1301: db/repo copy-reads: readLiveTimers and readStoppedFlag, the actor's copy sources (K-05 v1.12 items 56 and 57), each in one read-only transaction as rosie\_job with the business scope set empty: a handle's running and missed timers at every business in due order, the sealed address as stored in PostgreSQL's hex text form, never opened; the phone row's stopped flag and version by handle id, notFound for no row; transient on a lost connection, scrubbed; and their integration tests (\#465)
 
-- **Commit:** [`f10551c`](https://github.com/aryamahadik/rosie/commit/f10551c), by Arya Mahadik, 2026-11-12 10:38:13 UTC
+- **Commit:** [`f10551cd`](https://github.com/aryamahadik/rosie/commit/f10551cd), by Arya Mahadik, 2026-11-12 10:38:13 UTC
 - **Pull request:** [#465](https://github.com/aryamahadik/rosie/pull/465) from `task/T-1301`, merged 2026-11-12 10:38:13 UTC. It squashed 1 branch commit:
   - `cf0bf86` T-1301: db/repo copy-reads: readLiveTimers and readStoppedFlag, the a…
 - **Files changed:** 2 (+1937 −0), by folder:
@@ -8219,7 +8379,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 454. T-1251: the claim tests stop colliding with other integration runs on the shared local database (\#466)
 
-- **Commit:** [`4297762`](https://github.com/aryamahadik/rosie/commit/4297762), by Arya Mahadik, 2026-11-12 10:38:09 UTC
+- **Commit:** [`4297762a`](https://github.com/aryamahadik/rosie/commit/4297762a), by Arya Mahadik, 2026-11-12 10:38:09 UTC
 - **Pull request:** [#466](https://github.com/aryamahadik/rosie/pull/466) from `task/T-1251`, merged 2026-11-12 10:38:10 UTC. It squashed 3 branch commits:
   - `fb197bd` T-1251: the tests that take the claim's advisory lock make their sche…
   - `0513972` T-1251: the three files in a database of their own give afterAll 120 …
@@ -8254,7 +8414,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 453. docs: COMMIT\_HISTORY.md through commit 451 (9081aad, \#461) (\#462)
 
-- **Commit:** [`69b3c85`](https://github.com/aryamahadik/rosie/commit/69b3c85), by Arya Mahadik, 2026-11-12 10:16:50 UTC
+- **Commit:** [`69b3c85b`](https://github.com/aryamahadik/rosie/commit/69b3c85b), by Arya Mahadik, 2026-11-12 10:16:50 UTC
 - **Pull request:** [#462](https://github.com/aryamahadik/rosie/pull/462) from `task/commit-history-43`, merged 2026-11-12 10:16:50 UTC. It squashed 1 branch commit:
   - `359fb04` docs: COMMIT\_HISTORY.md through commit 451 (9081aad, \#461)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -8270,7 +8430,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 452. T-1300: readTesterStanding, readRosterPhone and readPhoneState (K-05 v1.12 items 53 to 55) in db/repo/test-phone-reads.ts, each one read-only transaction as rosie\_job with no business scope, with their integration tests (every v1.12 fixture, the cases beyond them, the statements sent, read-only, lost connection) (\#463)
 
-- **Commit:** [`60ef75e`](https://github.com/aryamahadik/rosie/commit/60ef75e), by Arya Mahadik, 2026-11-12 10:16:46 UTC
+- **Commit:** [`60ef75eb`](https://github.com/aryamahadik/rosie/commit/60ef75eb), by Arya Mahadik, 2026-11-12 10:16:46 UTC
 - **Pull request:** [#463](https://github.com/aryamahadik/rosie/pull/463) from `task/T-1300`, merged 2026-11-12 10:16:46 UTC. It squashed 1 branch commit:
   - `38649c7` T-1300: readTesterStanding, readRosterPhone and readPhoneState (K-05 …
 - **Files changed:** 2 (+2122 −0), by folder:
@@ -8286,7 +8446,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 451. docs: COMMIT\_HISTORY.md through commit 449 (1a7f415, \#458) (\#461)
 
-- **Commit:** [`9081aad`](https://github.com/aryamahadik/rosie/commit/9081aad), by Arya Mahadik, 2026-11-12 09:00:57 UTC
+- **Commit:** [`9081aadc`](https://github.com/aryamahadik/rosie/commit/9081aadc), by Arya Mahadik, 2026-11-12 09:00:57 UTC
 - **Pull request:** [#461](https://github.com/aryamahadik/rosie/pull/461) from `task/commit-history-42`, merged 2026-11-12 09:00:58 UTC. It squashed 1 branch commit:
   - `52db5ab` docs: COMMIT\_HISTORY.md through commit 449 (1a7f415, \#458)
 - **Files changed:** 1 (+34 −1), by folder:
@@ -8302,7 +8462,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 450. T-419: the real Resend send adapter: one email row from mail.rosfield.com with its reply address, thread headers and (for a confirmation) the chat link's QR, under the part's Idempotency-Key and a User-Agent; RESEND\_API\_KEY and the STAGING\_TEST\_INBOXES allow-list read by name, refused before any request when missing or off the list; live-check.mjs for T-1032 (the key read by name, never printed) (\#460)
 
-- **Commit:** [`7e82e92`](https://github.com/aryamahadik/rosie/commit/7e82e92), by Arya Mahadik, 2026-11-12 09:00:53 UTC
+- **Commit:** [`7e82e927`](https://github.com/aryamahadik/rosie/commit/7e82e927), by Arya Mahadik, 2026-11-12 09:00:53 UTC
 - **Pull request:** [#460](https://github.com/aryamahadik/rosie/pull/460) from `task/T-419`, merged 2026-11-12 09:00:53 UTC. It squashed 1 branch commit:
   - `b7ae610` T-419: the real Resend send adapter: one email row from mail.rosfield…
 - **Files changed:** 10 (+2059 −0), by folder:
@@ -8318,7 +8478,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 449. docs: COMMIT\_HISTORY.md through commit 447 (17c4bfa, \#457) (\#458)
 
-- **Commit:** [`1a7f415`](https://github.com/aryamahadik/rosie/commit/1a7f415), by Arya Mahadik, 2026-11-12 08:36:47 UTC
+- **Commit:** [`1a7f415a`](https://github.com/aryamahadik/rosie/commit/1a7f415a), by Arya Mahadik, 2026-11-12 08:36:47 UTC
 - **Pull request:** [#458](https://github.com/aryamahadik/rosie/pull/458) from `task/commit-history-41`, merged 2026-11-12 08:36:47 UTC. It squashed 1 branch commit:
   - `57920b5` docs: COMMIT\_HISTORY.md through commit 447 (17c4bfa, \#457)
 - **Files changed:** 1 (+63 −1), by folder:
@@ -8334,7 +8494,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 448. T-1276: staging's sign-in secrets by name (ADR-016 card G): PROOF\_CODE\_HASH\_KEY joins MADE (32 random bytes as base64, as SEALING\_WRAP\_KEY) and SECRETS; RESEND\_API\_KEY and STAGING\_TEST\_INBOXES join SECRETS; tests: each list holds each name, a name staging holds (SEALING\_WRAP\_KEY, LINQ\_WEBHOOK\_SECRET) is left as it is, the output holds names and set or missing, never a value (\#459)
 
-- **Commit:** [`9674a46`](https://github.com/aryamahadik/rosie/commit/9674a46), by Arya Mahadik, 2026-11-12 08:36:43 UTC
+- **Commit:** [`9674a465`](https://github.com/aryamahadik/rosie/commit/9674a465), by Arya Mahadik, 2026-11-12 08:36:43 UTC
 - **Pull request:** [#459](https://github.com/aryamahadik/rosie/pull/459) from `task/T-1276`, merged 2026-11-12 08:36:44 UTC. It squashed 1 branch commit:
   - `5c2daee` T-1276: staging's sign-in secrets by name (ADR-016 card G): PROOF\_COD…
 - **Files changed:** 4 (+403 −88), by folder:
@@ -8351,7 +8511,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 447. docs: COMMIT\_HISTORY.md through commit 444 (69d322c, \#449) (\#457)
 
-- **Commit:** [`17c4bfa`](https://github.com/aryamahadik/rosie/commit/17c4bfa), by Arya Mahadik, 2026-11-12 07:52:03 UTC
+- **Commit:** [`17c4bfa3`](https://github.com/aryamahadik/rosie/commit/17c4bfa3), by Arya Mahadik, 2026-11-12 07:52:03 UTC
 - **Pull request:** [#457](https://github.com/aryamahadik/rosie/pull/457) from `task/commit-history-40`, merged 2026-11-12 07:52:04 UTC. It squashed 1 branch commit:
   - `9c07e1b` docs: COMMIT\_HISTORY.md through commit 444 (69d322c, \#449)
 - **Files changed:** 1 (+165 −1), by folder:
@@ -8367,7 +8527,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 446. T-322: proof codes: sendProofCode and proveCode made alone (a sign-in code as one email row with its words, or a ready text from that mobile, never a first text), the code drawn from Web Crypto with the top range rejected, its keyed hash through the root's port, a 10-minute life and a 15-minute pause after 5 wrong tries in code before any try, a 32-byte session token, and their unit tests against K-09's fixtures and a K-22 double (\#456)
 
-- **Commit:** [`aa35c54`](https://github.com/aryamahadik/rosie/commit/aa35c54), by Arya Mahadik, 2026-11-12 07:52:00 UTC
+- **Commit:** [`aa35c549`](https://github.com/aryamahadik/rosie/commit/aa35c549), by Arya Mahadik, 2026-11-12 07:52:00 UTC
 - **Pull request:** [#456](https://github.com/aryamahadik/rosie/pull/456) from `task/T-322`, merged 2026-11-12 07:52:00 UTC. It squashed 1 branch commit:
   - `ba0892a` T-322: proof codes: sendProofCode and proveCode made alone (a sign-in…
 - **Files changed:** 12 (+2246 −0), by folder:
@@ -8383,7 +8543,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 445. T-1275: K-08 v1.2, the session.started and session.ended entries (ADR-016 card V4) (\#454)
 
-- **Commit:** [`fd224c1`](https://github.com/aryamahadik/rosie/commit/fd224c1), by Arya Mahadik, 2026-11-12 07:51:56 UTC
+- **Commit:** [`fd224c12`](https://github.com/aryamahadik/rosie/commit/fd224c12), by Arya Mahadik, 2026-11-12 07:51:56 UTC
 - **Pull request:** [#454](https://github.com/aryamahadik/rosie/pull/454) from `task/T-1275`, merged 2026-11-12 07:51:57 UTC. It squashed 2 branch commits:
   - `623913d` T-1275: freeze K-08 v1.2, a sign-in session's start and end (ADR-016 …
   - `f35bf50` T-1275: K-08 v1.2 wording: a token under a column name the schema doe…
@@ -8413,7 +8573,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 444. docs: COMMIT\_HISTORY.md through commit 438 (a363a26, \#446) (\#449)
 
-- **Commit:** [`69d322c`](https://github.com/aryamahadik/rosie/commit/69d322c), by Arya Mahadik, 2026-11-12 07:30:01 UTC
+- **Commit:** [`69d322c2`](https://github.com/aryamahadik/rosie/commit/69d322c2), by Arya Mahadik, 2026-11-12 07:30:01 UTC
 - **Pull request:** [#449](https://github.com/aryamahadik/rosie/pull/449) from `task/commit-history-39`, merged 2026-11-12 07:30:02 UTC. It squashed 1 branch commit:
   - `ae10a0a` docs: COMMIT\_HISTORY.md through commit 438 (a363a26, \#446)
 - **Files changed:** 1 (+35 −1), by folder:
@@ -8429,7 +8589,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 443. T-1248: K-05 v1.12, the test-phone page's reads and the actor's copy deps (\#452)
 
-- **Commit:** [`780e714`](https://github.com/aryamahadik/rosie/commit/780e714), by Arya Mahadik, 2026-11-12 07:29:57 UTC
+- **Commit:** [`780e7146`](https://github.com/aryamahadik/rosie/commit/780e7146), by Arya Mahadik, 2026-11-12 07:29:57 UTC
 - **Pull request:** [#452](https://github.com/aryamahadik/rosie/pull/452) from `task/T-1248`, merged 2026-11-12 07:29:58 UTC. It squashed 2 branch commits:
   - `8609ead` T-1248: K-05 v1.12 freezes the test-phone page's reads (readTesterSta…
   - `663c548` T-1248: README v1.12 names only side-list components in Producers and…
@@ -8458,7 +8618,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 442. T-1265: design record ADR-017, how long the handle actor keeps what it stores (\#451)
 
-- **Commit:** [`20015ec`](https://github.com/aryamahadik/rosie/commit/20015ec), by Arya Mahadik, 2026-11-12 07:29:53 UTC
+- **Commit:** [`20015ec0`](https://github.com/aryamahadik/rosie/commit/20015ec0), by Arya Mahadik, 2026-11-12 07:29:53 UTC
 - **Pull request:** [#451](https://github.com/aryamahadik/rosie/pull/451) from `task/T-1265`, merged 2026-11-12 07:29:54 UTC. It squashed 4 branch commits:
   - `1b76467` T-1265: design record ADR-017, how long the handle actor keeps what i…
   - `e4e29a9` T-1265: ADR-017's forget never waits on a text kept back for good (un…
@@ -8491,7 +8651,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 441. T-1256: branch previews are uploaded with no Hyperdrive binding (\#448)
 
-- **Commit:** [`69eb89c`](https://github.com/aryamahadik/rosie/commit/69eb89c), by Arya Mahadik, 2026-11-12 07:29:49 UTC
+- **Commit:** [`69eb89c2`](https://github.com/aryamahadik/rosie/commit/69eb89c2), by Arya Mahadik, 2026-11-12 07:29:49 UTC
 - **Pull request:** [#448](https://github.com/aryamahadik/rosie/pull/448) from `task/T-1256`, merged 2026-11-12 07:29:50 UTC. It squashed 1 branch commit:
   - `a5acfa9` T-1256: branch previews are uploaded with no Hyperdrive binding
 - **Files changed:** 3 (+411 −11), by folder:
@@ -8517,7 +8677,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 440. T-1263: a keyword text never waits for a missing safety result, and a STOP never waits for the decided part (ADR-015 card C) (\#447)
 
-- **Commit:** [`c32aeb7`](https://github.com/aryamahadik/rosie/commit/c32aeb7), by Arya Mahadik, 2026-11-12 07:29:45 UTC
+- **Commit:** [`c32aeb71`](https://github.com/aryamahadik/rosie/commit/c32aeb71), by Arya Mahadik, 2026-11-12 07:29:45 UTC
 - **Pull request:** [#447](https://github.com/aryamahadik/rosie/pull/447) from `task/T-1263`, merged 2026-11-12 07:29:46 UTC. It squashed 3 branch commits:
   - `f51e6a4` T-1263: keyword texts never wait for a missing safety result, and a S…
   - `d925ccc` Merge branch 'main' into task/T-1263
@@ -8550,7 +8710,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 439. T-1299: the scrub's speed check reads the median of 7 rounds (the scrub's work counted linear) (\#453)
 
-- **Commit:** [`9d05372`](https://github.com/aryamahadik/rosie/commit/9d05372), by Arya Mahadik, 2026-11-12 07:29:41 UTC
+- **Commit:** [`9d053726`](https://github.com/aryamahadik/rosie/commit/9d053726), by Arya Mahadik, 2026-11-12 07:29:41 UTC
 - **Pull request:** [#453](https://github.com/aryamahadik/rosie/pull/453) from `task/T-1299`, merged 2026-11-12 07:29:42 UTC. It squashed 2 branch commits:
   - `70bec2e` T-1299: the scrub's speed check reads the median of 7 rounds of its f…
   - `a4f7923` T-1299: the speed check's median-of-7 note carries this run's measure…
@@ -8577,7 +8737,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 438. docs: COMMIT\_HISTORY.md through commit 436 (4062130, \#444) (\#446)
 
-- **Commit:** [`a363a26`](https://github.com/aryamahadik/rosie/commit/a363a26), by Arya Mahadik, 2026-11-12 04:07:56 UTC
+- **Commit:** [`a363a264`](https://github.com/aryamahadik/rosie/commit/a363a264), by Arya Mahadik, 2026-11-12 04:07:56 UTC
 - **Pull request:** [#446](https://github.com/aryamahadik/rosie/pull/446) from `task/commit-history-37`, merged 2026-11-12 04:07:56 UTC. It squashed 1 branch commit:
   - `76c3fe1` docs: COMMIT\_HISTORY.md through commit 436 (4062130, \#444)
 - **Files changed:** 1 (+87 −1), by folder:
@@ -8593,7 +8753,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 437. T-1271: harden the staging Hyperdrive create script: log\_min\_error\_statement fatal or panic only, pgaudit refused, errors scrubbed before the cut, -pooler in any case, wrangler's log switch and the follow-up statement pinned (\#445)
 
-- **Commit:** [`6e7f7f9`](https://github.com/aryamahadik/rosie/commit/6e7f7f9), by Arya Mahadik, 2026-11-12 04:07:52 UTC
+- **Commit:** [`6e7f7f9a`](https://github.com/aryamahadik/rosie/commit/6e7f7f9a), by Arya Mahadik, 2026-11-12 04:07:52 UTC
 - **Pull request:** [#445](https://github.com/aryamahadik/rosie/pull/445) from `task/T-1271`, merged 2026-11-12 04:07:52 UTC. It squashed 1 branch commit:
   - `6e5ad5d` T-1271: harden the staging Hyperdrive create script: log\_min\_error\_st…
 - **Files changed:** 4 (+393 −18), by folder:
@@ -8611,7 +8771,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 436. docs: COMMIT\_HISTORY.md through commit 432 (5245bbf, \#440) (\#444)
 
-- **Commit:** [`4062130`](https://github.com/aryamahadik/rosie/commit/4062130), by Arya Mahadik, 2026-11-12 03:48:29 UTC
+- **Commit:** [`40621302`](https://github.com/aryamahadik/rosie/commit/40621302), by Arya Mahadik, 2026-11-12 03:48:29 UTC
 - **Pull request:** [#444](https://github.com/aryamahadik/rosie/pull/444) from `task/commit-history-36`, merged 2026-11-12 03:48:30 UTC. It squashed 1 branch commit:
   - `676fa21` docs: COMMIT\_HISTORY.md through commit 432 (5245bbf, \#440)
 - **Files changed:** 1 (+76 −1), by folder:
@@ -8627,7 +8787,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 435. T-1250: design record ADR-016, sign-in by code on staging, end to end (\#443)
 
-- **Commit:** [`304e469`](https://github.com/aryamahadik/rosie/commit/304e469), by Arya Mahadik, 2026-11-12 03:48:26 UTC
+- **Commit:** [`304e4694`](https://github.com/aryamahadik/rosie/commit/304e4694), by Arya Mahadik, 2026-11-12 03:48:26 UTC
 - **Pull request:** [#443](https://github.com/aryamahadik/rosie/pull/443) from `task/T-1250`, merged 2026-11-12 03:48:26 UTC. It squashed 5 branch commits:
   - `af4d300` T-1250: design record ADR-016, sign-in by code on staging end to end:…
   - `6b286d7` T-1250: ADR-016 read-through fixes: the send's one narrow call named,…
@@ -8665,7 +8825,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 434. T-1269: db/repo readTurnParty, K-05 v1.11 item 52: the handle's party for a turn in one read-only transaction as rosie\_job, default 100's order (anotherOwner, roleEnded, severalBusinesses), the closed reading of DL-511, tested against every v1.11 fixture, item 52's cases and every statement sent (\#442)
 
-- **Commit:** [`50f74dc`](https://github.com/aryamahadik/rosie/commit/50f74dc), by Arya Mahadik, 2026-11-12 03:48:22 UTC
+- **Commit:** [`50f74dce`](https://github.com/aryamahadik/rosie/commit/50f74dce), by Arya Mahadik, 2026-11-12 03:48:22 UTC
 - **Pull request:** [#442](https://github.com/aryamahadik/rosie/pull/442) from `task/T-1269`, merged 2026-11-12 03:48:23 UTC. It squashed 1 branch commit:
   - `8968c2c` T-1269: db/repo readTurnParty, K-05 v1.11 item 52: the handle's party…
 - **Files changed:** 2 (+1819 −0), by folder:
@@ -8681,7 +8841,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 433. T-1262: the arrival safety read's result kept sealed in the actor's own storage until its turn commits (ADR-015 card A): safety\_results, safety\_closed and the noted danger lines; the key carried from queueRead; applyResult's three steps before the line; the owed text in unreadTexts, routineHeld, waiting, onReturn, applyLate and sendDanger's clears; resultsOf and closeResults; DL-508's lead notes, with their tests (\#441)
 
-- **Commit:** [`886e82c`](https://github.com/aryamahadik/rosie/commit/886e82c), by Arya Mahadik, 2026-11-12 03:48:19 UTC
+- **Commit:** [`886e82cf`](https://github.com/aryamahadik/rosie/commit/886e82cf), by Arya Mahadik, 2026-11-12 03:48:19 UTC
 - **Pull request:** [#441](https://github.com/aryamahadik/rosie/pull/441) from `task/T-1262`, merged 2026-11-12 03:48:19 UTC. It squashed 1 branch commit:
   - `8801538` T-1262: the arrival safety read's result kept sealed in the actor's o…
 - **Files changed:** 2 (+1873 −67), by folder:
@@ -8697,7 +8857,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 432. docs: COMMIT\_HISTORY.md through commit 429 (54b9c1d, \#437) (\#440)
 
-- **Commit:** [`5245bbf`](https://github.com/aryamahadik/rosie/commit/5245bbf), by Arya Mahadik, 2026-11-12 03:12:10 UTC
+- **Commit:** [`5245bbfa`](https://github.com/aryamahadik/rosie/commit/5245bbfa), by Arya Mahadik, 2026-11-12 03:12:10 UTC
 - **Pull request:** [#440](https://github.com/aryamahadik/rosie/pull/440) from `task/commit-history-35`, merged 2026-11-12 03:12:10 UTC. It squashed 1 branch commit:
   - `b9670f9` docs: COMMIT\_HISTORY.md through commit 429 (54b9c1d, \#437)
 - **Files changed:** 1 (+52 −1), by folder:
@@ -8713,7 +8873,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 431. T-1258: db/repo's readQuestionFacts and readHandle (K-05 v1.10 items 49 and 50) (\#439)
 
-- **Commit:** [`326861d`](https://github.com/aryamahadik/rosie/commit/326861d), by Arya Mahadik, 2026-11-12 03:12:06 UTC
+- **Commit:** [`326861df`](https://github.com/aryamahadik/rosie/commit/326861df), by Arya Mahadik, 2026-11-12 03:12:06 UTC
 - **Pull request:** [#439](https://github.com/aryamahadik/rosie/pull/439) from `task/T-1258`, merged 2026-11-12 03:12:06 UTC. It squashed 3 branch commits:
   - `fd2bd39` T-1258: db/repo/arming-reads.ts gives K-05 v1.10's readQuestionFacts …
   - `c0d5305` Merge branch 'main' into task/T-1258
@@ -8741,7 +8901,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 430. T-1243: the handle actor wires its own isolate before its first call (\#438)
 
-- **Commit:** [`abb99bb`](https://github.com/aryamahadik/rosie/commit/abb99bb), by Arya Mahadik, 2026-11-12 03:12:02 UTC
+- **Commit:** [`abb99bb5`](https://github.com/aryamahadik/rosie/commit/abb99bb5), by Arya Mahadik, 2026-11-12 03:12:02 UTC
 - **Pull request:** [#438](https://github.com/aryamahadik/rosie/pull/438) from `task/T-1243`, merged 2026-11-12 03:12:02 UTC. It squashed 3 branch commits:
   - `0a8d628` T-1243: the HandleActor wires its own isolate before its first call (…
   - `7b99792` Merge branch 'main' into task/T-1243
@@ -8772,7 +8932,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 429. docs: COMMIT\_HISTORY.md through commit 427 (0292eaa, \#435) (\#437)
 
-- **Commit:** [`54b9c1d`](https://github.com/aryamahadik/rosie/commit/54b9c1d), by Arya Mahadik, 2026-11-12 02:47:06 UTC
+- **Commit:** [`54b9c1d0`](https://github.com/aryamahadik/rosie/commit/54b9c1d0), by Arya Mahadik, 2026-11-12 02:47:06 UTC
 - **Pull request:** [#437](https://github.com/aryamahadik/rosie/pull/437) from `task/commit-history-34`, merged 2026-11-12 02:47:06 UTC. It squashed 1 branch commit:
   - `0bd8987` docs: COMMIT\_HISTORY.md through commit 427 (0292eaa, \#435)
 - **Files changed:** 1 (+56 −1), by folder:
@@ -8788,7 +8948,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 428. T-1252: the Worker's two database logins and staging's two Hyperdrive configurations: the SQL, the create script, the parser (\#436)
 
-- **Commit:** [`d4767cc`](https://github.com/aryamahadik/rosie/commit/d4767cc), by Arya Mahadik, 2026-11-12 02:47:02 UTC
+- **Commit:** [`d4767cc7`](https://github.com/aryamahadik/rosie/commit/d4767cc7), by Arya Mahadik, 2026-11-12 02:47:02 UTC
 - **Pull request:** [#436](https://github.com/aryamahadik/rosie/pull/436) from `task/T-1252`, merged 2026-11-12 02:47:03 UTC. It squashed 3 branch commits:
   - `f62fba1` T-1252: the hyperdrive list parser moves to infra/scripts/hyperdrive-…
   - `2bc7f07` T-1252: create-staging-hyperdrive.sh and .mjs make staging's two Hype…
@@ -8823,7 +8983,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 427. docs: COMMIT\_HISTORY.md through commit 425 (14d7e61, \#430) (\#435)
 
-- **Commit:** [`0292eaa`](https://github.com/aryamahadik/rosie/commit/0292eaa), by Arya Mahadik, 2026-11-12 02:02:52 UTC
+- **Commit:** [`0292eaaf`](https://github.com/aryamahadik/rosie/commit/0292eaaf), by Arya Mahadik, 2026-11-12 02:02:52 UTC
 - **Pull request:** [#435](https://github.com/aryamahadik/rosie/pull/435) from `task/commit-history-33`, merged 2026-11-12 02:02:52 UTC. It squashed 1 branch commit:
   - `4bef3d0` docs: COMMIT\_HISTORY.md through commit 425 (14d7e61, \#430)
 - **Files changed:** 1 (+72 −1), by folder:
@@ -8839,7 +8999,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 426. T-1249: K-05 v1.11, the handle's party for a turn (readTurnParty) (\#434)
 
-- **Commit:** [`8464d05`](https://github.com/aryamahadik/rosie/commit/8464d05), by Arya Mahadik, 2026-11-12 02:02:48 UTC
+- **Commit:** [`8464d056`](https://github.com/aryamahadik/rosie/commit/8464d056), by Arya Mahadik, 2026-11-12 02:02:48 UTC
 - **Pull request:** [#434](https://github.com/aryamahadik/rosie/pull/434) from `task/T-1249`, merged 2026-11-12 02:02:48 UTC. It squashed 4 branch commits:
   - `8bc8265` T-1249: K-05 v1.11 freezes readTurnParty, the handle's party for a tu…
   - `3e36234` T-1249: README v1.11 wording: quotes put with their sources, the zone…
@@ -8878,7 +9038,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 425. docs: COMMIT\_HISTORY.md through commit 422 (44dab4d, \#429) (\#430)
 
-- **Commit:** [`14d7e61`](https://github.com/aryamahadik/rosie/commit/14d7e61), by Arya Mahadik, 2026-11-12 00:54:03 UTC
+- **Commit:** [`14d7e61c`](https://github.com/aryamahadik/rosie/commit/14d7e61c), by Arya Mahadik, 2026-11-12 00:54:03 UTC
 - **Pull request:** [#430](https://github.com/aryamahadik/rosie/pull/430) from `task/commit-history-32`, merged 2026-11-12 00:54:04 UTC. It squashed 1 branch commit:
   - `934f682` docs: COMMIT\_HISTORY.md through commit 422 (44dab4d, \#429)
 - **Files changed:** 1 (+50 −1), by folder:
@@ -8894,7 +9054,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 424. T-1241: design record ADR-015, where the arrival safety read's result is kept until its turn commits (rounds 1 to 3, squashed onto main 44dab4d so the merge check's rebase replays it; DL-417) (\#433)
 
-- **Commit:** [`5b71e3c`](https://github.com/aryamahadik/rosie/commit/5b71e3c), by Arya Mahadik, 2026-11-12 00:53:59 UTC
+- **Commit:** [`5b71e3c6`](https://github.com/aryamahadik/rosie/commit/5b71e3c6), by Arya Mahadik, 2026-11-12 00:53:59 UTC
 - **Pull request:** [#433](https://github.com/aryamahadik/rosie/pull/433) from `task/T-1241-r3`, merged 2026-11-12 00:54:00 UTC. It squashed 1 branch commit:
   - `4490a09` T-1241: design record ADR-015, where the arrival safety read's result…
 - **Files changed:** 2 (+229 −0), by folder:
@@ -8910,7 +9070,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 423. T-1238: staging's test-phone line keeps a bounded record, the oldest dropped first (P6a) (\#431)
 
-- **Commit:** [`e2ef567`](https://github.com/aryamahadik/rosie/commit/e2ef567), by Arya Mahadik, 2026-11-12 00:53:54 UTC
+- **Commit:** [`e2ef567e`](https://github.com/aryamahadik/rosie/commit/e2ef567e), by Arya Mahadik, 2026-11-12 00:53:54 UTC
 - **Pull request:** [#431](https://github.com/aryamahadik/rosie/pull/431) from `task/T-1238`, merged 2026-11-12 00:53:55 UTC. It squashed 5 branch commits:
   - `0f40b88` T-1238: staging's test-phone line keeps a bounded record: at most 200…
   - `947bc83` T-1238: line.ts header says the doubles' own memory still lasts until…
@@ -8948,7 +9108,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 422. docs: COMMIT\_HISTORY.md through commit 420 (2f113ee, \#427) (\#429)
 
-- **Commit:** [`44dab4d`](https://github.com/aryamahadik/rosie/commit/44dab4d), by Arya Mahadik, 2026-11-11 23:59:30 UTC
+- **Commit:** [`44dab4dd`](https://github.com/aryamahadik/rosie/commit/44dab4dd), by Arya Mahadik, 2026-11-11 23:59:30 UTC
 - **Pull request:** [#429](https://github.com/aryamahadik/rosie/pull/429) from `task/commit-history-31`, merged 2026-11-11 23:59:31 UTC. It squashed 1 branch commit:
   - `b01c7a4` docs: COMMIT\_HISTORY.md through commit 420 (2f113ee, \#427)
 - **Files changed:** 1 (+89 −1), by folder:
@@ -8964,7 +9124,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 421. T-1239: design record ADR-014: the Worker reaches PostgreSQL as rosie\_job and rosie\_app through two dedicated logins and two Hyperdrive configurations, with a guard in every call (\#428)
 
-- **Commit:** [`969c335`](https://github.com/aryamahadik/rosie/commit/969c335), by Arya Mahadik, 2026-11-11 23:59:27 UTC
+- **Commit:** [`969c3358`](https://github.com/aryamahadik/rosie/commit/969c3358), by Arya Mahadik, 2026-11-11 23:59:27 UTC
 - **Pull request:** [#428](https://github.com/aryamahadik/rosie/pull/428) from `task/T-1239`, merged 2026-11-11 23:59:27 UTC. It squashed 4 branch commits:
   - `3bb8d11` T-1239 (work in progress, unchecked): the design record on the Worker…
   - `1689379` Merge branch 'main' into task/T-1239
@@ -8997,7 +9157,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 420. docs: COMMIT\_HISTORY.md through commit 417 (601d9b5, \#423) (\#427)
 
-- **Commit:** [`2f113ee`](https://github.com/aryamahadik/rosie/commit/2f113ee), by Arya Mahadik, 2026-11-11 23:32:08 UTC
+- **Commit:** [`2f113ee5`](https://github.com/aryamahadik/rosie/commit/2f113ee5), by Arya Mahadik, 2026-11-11 23:32:08 UTC
 - **Pull request:** [#427](https://github.com/aryamahadik/rosie/pull/427) from `task/commit-history-30`, merged 2026-11-11 23:32:09 UTC. It squashed 1 branch commit:
   - `3a344df` docs: COMMIT\_HISTORY.md through commit 417 (601d9b5, \#423)
 - **Files changed:** 1 (+60 −1), by folder:
@@ -9013,7 +9173,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 419. T-1240: K-05 v1.10 names three reads for the first staging turn: the question's facts, a handle's kind and address, a chat's handle (\#426)
 
-- **Commit:** [`df4c9a8`](https://github.com/aryamahadik/rosie/commit/df4c9a8), by Arya Mahadik, 2026-11-11 23:32:05 UTC
+- **Commit:** [`df4c9a84`](https://github.com/aryamahadik/rosie/commit/df4c9a84), by Arya Mahadik, 2026-11-11 23:32:05 UTC
 - **Pull request:** [#426](https://github.com/aryamahadik/rosie/pull/426) from `task/T-1240`, merged 2026-11-11 23:32:05 UTC. It squashed 2 branch commits:
   - `e1474a3` T-1240: K-05 v1.10, frozen: readQuestionFacts (the clock arming's que…
   - `eb28895` T-1240: README v1.10 fixes: businesses is migration 0002, idsOf is Ha…
@@ -9042,7 +9202,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 418. T-520: sign-in by code for owners, staff and testers, with no password; the shell gains a POST Origin check and a 16 KiB body cap (\#414)
 
-- **Commit:** [`0c1a15f`](https://github.com/aryamahadik/rosie/commit/0c1a15f), by Arya Mahadik, 2026-11-11 23:32:01 UTC
+- **Commit:** [`0c1a15f4`](https://github.com/aryamahadik/rosie/commit/0c1a15f4), by Arya Mahadik, 2026-11-11 23:32:01 UTC
 - **Pull request:** [#414](https://github.com/aryamahadik/rosie/pull/414) from `task/T-520`, merged 2026-11-11 23:32:01 UTC. It squashed 6 branch commits:
   - `386a307` T-520: sign-in by code for owners, staff, Rosie's team and testers (s…
   - `289333d` Merge branch 'main' into task/T-520
@@ -9085,7 +9245,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 417. docs: COMMIT\_HISTORY.md through commit 414 (58acd53, \#422) (\#423)
 
-- **Commit:** [`601d9b5`](https://github.com/aryamahadik/rosie/commit/601d9b5), by Arya Mahadik, 2026-11-11 23:11:40 UTC
+- **Commit:** [`601d9b56`](https://github.com/aryamahadik/rosie/commit/601d9b56), by Arya Mahadik, 2026-11-11 23:11:40 UTC
 - **Pull request:** [#423](https://github.com/aryamahadik/rosie/pull/423) from `task/commit-history-29`, merged 2026-11-11 23:11:40 UTC. It squashed 1 branch commit:
   - `243d592` docs: COMMIT\_HISTORY.md through commit 414 (58acd53, \#422)
 - **Files changed:** 1 (+78 −1), by folder:
@@ -9101,7 +9261,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 416. T-466: the walking skeleton's end-to-end test: one JOIN, exactly one row and one send, every hop once in order, a repeat changes nothing, twenty runs alike (\#425)
 
-- **Commit:** [`db64a04`](https://github.com/aryamahadik/rosie/commit/db64a04), by Arya Mahadik, 2026-11-11 23:11:35 UTC
+- **Commit:** [`db64a04a`](https://github.com/aryamahadik/rosie/commit/db64a04a), by Arya Mahadik, 2026-11-11 23:11:35 UTC
 - **Pull request:** [#425](https://github.com/aryamahadik/rosie/pull/425) from `task/T-466`, merged 2026-11-11 23:11:36 UTC. It squashed 2 branch commits:
   - `4e167a2` T-466: the walking skeleton's end-to-end test completes D-017's autom…
   - `ec6349b` T-466: the skeleton test's header and README name both forms (the fir…
@@ -9128,7 +9288,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 415. T-1242: on staging the state reads and the plan calls are real ports over new RootOptions inputs (bundleSafety, the bundle's BundleSafety with the pin's check through Root.pin; handleDirectory; stoppedFlags; turnDirectory; turnSafety; planCalls), each failing closed while null (NoStateReadError, NoDatabaseError), so the deployed Worker behaves as before; GateReads gains an optional words field; root.ts's and hop2's stale T-566/T-567 text corrected and hop2's dead actor-span filter removed (\#424)
 
-- **Commit:** [`3af572c`](https://github.com/aryamahadik/rosie/commit/3af572c), by Arya Mahadik, 2026-11-11 23:11:31 UTC
+- **Commit:** [`3af572cb`](https://github.com/aryamahadik/rosie/commit/3af572cb), by Arya Mahadik, 2026-11-11 23:11:31 UTC
 - **Pull request:** [#424](https://github.com/aryamahadik/rosie/pull/424) from `task/T-1242`, merged 2026-11-11 23:11:32 UTC. It squashed 1 branch commit:
   - `90d6019` T-1242: on staging the state reads and the plan calls are real ports …
 - **Files changed:** 7 (+1187 −109), by folder:
@@ -9144,7 +9304,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 414. docs: COMMIT\_HISTORY.md through commit 410 (53198c6, \#417) (\#422)
 
-- **Commit:** [`58acd53`](https://github.com/aryamahadik/rosie/commit/58acd53), by Arya Mahadik, 2026-11-11 20:00:56 UTC
+- **Commit:** [`58acd53a`](https://github.com/aryamahadik/rosie/commit/58acd53a), by Arya Mahadik, 2026-11-11 20:00:56 UTC
 - **Pull request:** [#422](https://github.com/aryamahadik/rosie/pull/422) from `task/commit-history-28`, merged 2026-11-11 20:00:56 UTC. It squashed 1 branch commit:
   - `58b1797` docs: COMMIT\_HISTORY.md through commit 410 (53198c6, \#417)
 - **Files changed:** 1 (+75 −1), by folder:
@@ -9160,7 +9320,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 413. T-1234: the Worker serves the web shell: page requests go to the shell, its K-21 client reaches the page entry in process, and every other door answers as before (\#421)
 
-- **Commit:** [`a57250c`](https://github.com/aryamahadik/rosie/commit/a57250c), by Arya Mahadik, 2026-11-11 20:00:51 UTC
+- **Commit:** [`a57250c8`](https://github.com/aryamahadik/rosie/commit/a57250c8), by Arya Mahadik, 2026-11-11 20:00:51 UTC
 - **Pull request:** [#421](https://github.com/aryamahadik/rosie/pull/421) from `task/T-1234`, merged 2026-11-11 20:00:52 UTC. It squashed 2 branch commits:
   - `75f0158` T-1234: pin the Worker's answers byte for byte before it serves the s…
   - `ff318ec` T-1234: the Worker hands page requests to the web shell (shell.serve …
@@ -9187,7 +9347,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 412. T-1236: make-staging-secrets.sh (npm run secrets:staging:make) makes staging's own SEALING\_WRAP\_KEY and LINQ\_WEBHOOK\_SECRET in place: it lists staging's names first, never replaces a held name, leaves a name with a local value to secrets:staging, and hands each fresh value over on standard input only. Its tests run behind the real cf.sh with stand-ins (\#420)
 
-- **Commit:** [`19ab9b5`](https://github.com/aryamahadik/rosie/commit/19ab9b5), by Arya Mahadik, 2026-11-11 20:00:47 UTC
+- **Commit:** [`19ab9b54`](https://github.com/aryamahadik/rosie/commit/19ab9b54), by Arya Mahadik, 2026-11-11 20:00:47 UTC
 - **Pull request:** [#420](https://github.com/aryamahadik/rosie/pull/420) from `task/T-1236`, merged 2026-11-11 20:00:48 UTC. It squashed 1 branch commit:
   - `fd0e795` T-1236: make-staging-secrets.sh (npm run secrets:staging:make) makes …
 - **Files changed:** 5 (+1538 −1), by folder:
@@ -9205,7 +9365,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 411. T-1232: K-05's contract test covers v1.9 (markPart's repeatedDelivery): the fixture part adds v1.9 to WRITTEN\_FOR with a mend for each of its 3 refused fixtures, put right to the twin the README names; the database side runs db/repo's markPartV12 against each v1.9 fixture after A7-03's chain, each answer judged by markPart.v1dot9Response and as a markPart.exchange, a repeat writing nothing (\#419)
 
-- **Commit:** [`bdd444a`](https://github.com/aryamahadik/rosie/commit/bdd444a), by Arya Mahadik, 2026-11-11 20:00:43 UTC
+- **Commit:** [`bdd444aa`](https://github.com/aryamahadik/rosie/commit/bdd444aa), by Arya Mahadik, 2026-11-11 20:00:43 UTC
 - **Pull request:** [#419](https://github.com/aryamahadik/rosie/pull/419) from `task/T-1232`, merged 2026-11-11 20:00:43 UTC. It squashed 1 branch commit:
   - `d09ab02` T-1232: K-05's contract test covers v1.9 (markPart's repeatedDelivery…
 - **Files changed:** 2 (+403 −65), by folder:
@@ -9221,7 +9381,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 410. docs: COMMIT\_HISTORY.md through commit 407 (c4c76b7, \#415) (\#417)
 
-- **Commit:** [`53198c6`](https://github.com/aryamahadik/rosie/commit/53198c6), by Arya Mahadik, 2026-11-11 19:41:22 UTC
+- **Commit:** [`53198c60`](https://github.com/aryamahadik/rosie/commit/53198c60), by Arya Mahadik, 2026-11-11 19:41:22 UTC
 - **Pull request:** [#417](https://github.com/aryamahadik/rosie/pull/417) from `task/commit-history-27`, merged 2026-11-11 19:41:22 UTC. It squashed 1 branch commit:
   - `6fb1b0e` docs: COMMIT\_HISTORY.md through commit 407 (c4c76b7, \#415)
 - **Files changed:** 1 (+35 −1), by folder:
@@ -9237,7 +9397,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 409. T-1228: the dispatcher hands a repeated receipt of the row's first delivery to the clock arming (K-05 v1.9 repeatedDelivery.firstOfRow, at the stored deliveredAt), so a crash between markPart's commit and armClock no longer loses the arming; realOutbox.markPart carries repeatedDelivery across and lets a thrown markPartV12 surface; doc lines for K-05 v1.8's consent row (\#418)
 
-- **Commit:** [`e85915b`](https://github.com/aryamahadik/rosie/commit/e85915b), by Arya Mahadik, 2026-11-11 19:41:18 UTC
+- **Commit:** [`e85915b0`](https://github.com/aryamahadik/rosie/commit/e85915b0), by Arya Mahadik, 2026-11-11 19:41:18 UTC
 - **Pull request:** [#418](https://github.com/aryamahadik/rosie/pull/418) from `task/T-1228`, merged 2026-11-11 19:41:18 UTC. It squashed 1 branch commit:
   - `03cb6a9` T-1228: the dispatcher hands a repeated receipt of the row's first de…
 - **Files changed:** 7 (+716 −32), by folder:
@@ -9255,7 +9415,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 408. T-1108: the runtime's trace writers write the batch and joined-turn spans, one receive span per event, and seq across a trace's writers, as K-08 draws them (\#416)
 
-- **Commit:** [`5af066c`](https://github.com/aryamahadik/rosie/commit/5af066c), by Arya Mahadik, 2026-11-11 19:41:14 UTC
+- **Commit:** [`5af066cc`](https://github.com/aryamahadik/rosie/commit/5af066cc), by Arya Mahadik, 2026-11-11 19:41:14 UTC
 - **Pull request:** [#416](https://github.com/aryamahadik/rosie/pull/416) from `task/T-1108`, merged 2026-11-11 19:41:14 UTC. It squashed 3 branch commits:
   - `620f4a3` T-1108 (work in progress, unchecked): the trace writers' changes as t…
   - `26f7ab0` Merge branch 'main' into task/T-1108
@@ -9295,7 +9455,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 407. docs: COMMIT\_HISTORY.md through commit 405 (f317e1c, \#412) (\#415)
 
-- **Commit:** [`c4c76b7`](https://github.com/aryamahadik/rosie/commit/c4c76b7), by Arya Mahadik, 2026-11-11 19:03:34 UTC
+- **Commit:** [`c4c76b7c`](https://github.com/aryamahadik/rosie/commit/c4c76b7c), by Arya Mahadik, 2026-11-11 19:03:34 UTC
 - **Pull request:** [#415](https://github.com/aryamahadik/rosie/pull/415) from `task/commit-history-26`, merged 2026-11-11 19:03:35 UTC. It squashed 1 branch commit:
   - `cc39635` docs: COMMIT\_HISTORY.md through commit 405 (f317e1c, \#412)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -9311,7 +9471,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 406. T-1124 (round 2 of 2): the Hyperdrive spike's final findings from the live run on staging: the configuration T-567 binds, each question with its query and result, the commit timings beside 300 ms, and the limits of one run (\#413)
 
-- **Commit:** [`96a5789`](https://github.com/aryamahadik/rosie/commit/96a5789), by Arya Mahadik, 2026-11-11 19:03:30 UTC
+- **Commit:** [`96a57896`](https://github.com/aryamahadik/rosie/commit/96a57896), by Arya Mahadik, 2026-11-11 19:03:30 UTC
 - **Pull request:** [#413](https://github.com/aryamahadik/rosie/pull/413) from `task/T-1124-r2`, merged 2026-11-11 19:03:30 UTC. It squashed 1 branch commit:
   - `a7e387d` T-1124 (round 2 of 2): the Hyperdrive spike's final findings from the…
 - **Files changed:** 1 (+378 −60), by folder:
@@ -9329,7 +9489,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 405. docs: COMMIT\_HISTORY.md through commit 403 (16af5be, \#410) (\#412)
 
-- **Commit:** [`f317e1c`](https://github.com/aryamahadik/rosie/commit/f317e1c), by Arya Mahadik, 2026-11-11 18:32:00 UTC
+- **Commit:** [`f317e1c4`](https://github.com/aryamahadik/rosie/commit/f317e1c4), by Arya Mahadik, 2026-11-11 18:32:00 UTC
 - **Pull request:** [#412](https://github.com/aryamahadik/rosie/pull/412) from `task/commit-history-25`, merged 2026-11-11 18:32:00 UTC. It squashed 1 branch commit:
   - `8d63ff2` docs: COMMIT\_HISTORY.md through commit 403 (16af5be, \#410)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -9345,7 +9505,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 404. T-522: the staging-only guard for staging's test tools (web/src/staging/guard): stagingOnlyRoutes and stagingOnly answer the shell's 404 and never call a tool's handler unless ENVIRONMENT is exactly staging, read from the shell's config alone and failing closed; isStagingOnlyRefusal and refusedPage show K-21 v1's stagingOnly refusal as refused (403, in the frame); tests with spy handlers for every route, GET, POST and HEAD (\#411)
 
-- **Commit:** [`10e6c73`](https://github.com/aryamahadik/rosie/commit/10e6c73), by Arya Mahadik, 2026-11-11 18:31:55 UTC
+- **Commit:** [`10e6c739`](https://github.com/aryamahadik/rosie/commit/10e6c739), by Arya Mahadik, 2026-11-11 18:31:55 UTC
 - **Pull request:** [#411](https://github.com/aryamahadik/rosie/pull/411) from `task/T-522`, merged 2026-11-11 18:31:56 UTC. It squashed 1 branch commit:
   - `f59f51d` T-522: the staging-only guard for staging's test tools (web/src/stagi…
 - **Files changed:** 6 (+973 −0), by folder:
@@ -9361,7 +9521,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 403. docs: COMMIT\_HISTORY.md through commit 401 (74b9746, \#408) (\#410)
 
-- **Commit:** [`16af5be`](https://github.com/aryamahadik/rosie/commit/16af5be), by Arya Mahadik, 2026-11-11 18:07:36 UTC
+- **Commit:** [`16af5be9`](https://github.com/aryamahadik/rosie/commit/16af5be9), by Arya Mahadik, 2026-11-11 18:07:36 UTC
 - **Pull request:** [#410](https://github.com/aryamahadik/rosie/pull/410) from `task/commit-history-24`, merged 2026-11-11 18:07:37 UTC. It squashed 1 branch commit:
   - `148ac7f` docs: COMMIT\_HISTORY.md through commit 401 (74b9746, \#408)
 - **Files changed:** 1 (+34 −1), by folder:
@@ -9377,7 +9537,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 402. T-1227: markPartV12 answers every mark with K-05 v1.9's repeatedDelivery (a repeated delivery receipt says firstOfRow and the stored deliveredAt; null on every other answer), read in its one transaction from the locked part tries with no write; a delivered part with no delivered\_at fails loudly (\#409)
 
-- **Commit:** [`322c1a3`](https://github.com/aryamahadik/rosie/commit/322c1a3), by Arya Mahadik, 2026-11-11 18:07:32 UTC
+- **Commit:** [`322c1a32`](https://github.com/aryamahadik/rosie/commit/322c1a32), by Arya Mahadik, 2026-11-11 18:07:32 UTC
 - **Pull request:** [#409](https://github.com/aryamahadik/rosie/pull/409) from `task/T-1227`, merged 2026-11-11 18:07:33 UTC. It squashed 1 branch commit:
   - `eb89288` T-1227: markPartV12 answers every mark with K-05 v1.9's repeatedDeliv…
 - **Files changed:** 2 (+570 −18), by folder:
@@ -9393,7 +9553,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 401. docs: COMMIT\_HISTORY.md through commit 399 (f9c0032, \#406) (\#408)
 
-- **Commit:** [`74b9746`](https://github.com/aryamahadik/rosie/commit/74b9746), by Arya Mahadik, 2026-11-11 17:44:56 UTC
+- **Commit:** [`74b9746f`](https://github.com/aryamahadik/rosie/commit/74b9746f), by Arya Mahadik, 2026-11-11 17:44:56 UTC
 - **Pull request:** [#408](https://github.com/aryamahadik/rosie/pull/408) from `task/commit-history-23`, merged 2026-11-11 17:44:57 UTC. It squashed 1 branch commit:
   - `3dc3fc3` docs: COMMIT\_HISTORY.md through commit 399 (f9c0032, \#406)
 - **Files changed:** 1 (+90 −1), by folder:
@@ -9409,7 +9569,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 400. T-1235: LINK\_HOST (rosfield.com) as a var in each environment of wrangler.jsonc, and env.staging's own FILES binding on rosie-staging-files, which settles wrangler's r2\_buckets warning; the two config tests pin both (\#407)
 
-- **Commit:** [`19fdbb4`](https://github.com/aryamahadik/rosie/commit/19fdbb4), by Arya Mahadik, 2026-11-11 17:44:52 UTC
+- **Commit:** [`19fdbb47`](https://github.com/aryamahadik/rosie/commit/19fdbb47), by Arya Mahadik, 2026-11-11 17:44:52 UTC
 - **Pull request:** [#407](https://github.com/aryamahadik/rosie/pull/407) from `task/T-1235`, merged 2026-11-11 17:44:53 UTC. It squashed 1 branch commit:
   - `8661ad4` T-1235: LINK\_HOST (rosfield.com) as a var in each environment of wran…
 - **Files changed:** 3 (+168 −10), by folder:
@@ -9426,7 +9586,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 399. docs: COMMIT\_HISTORY.md through commit 396 (035381d, \#403) (\#406)
 
-- **Commit:** [`f9c0032`](https://github.com/aryamahadik/rosie/commit/f9c0032), by Arya Mahadik, 2026-11-11 17:26:36 UTC
+- **Commit:** [`f9c0032e`](https://github.com/aryamahadik/rosie/commit/f9c0032e), by Arya Mahadik, 2026-11-11 17:26:36 UTC
 - **Pull request:** [#406](https://github.com/aryamahadik/rosie/pull/406) from `task/commit-history-22`, merged 2026-11-11 17:26:36 UTC. It squashed 1 branch commit:
   - `9d0f284` docs: COMMIT\_HISTORY.md through commit 396 (035381d, \#403)
 - **Files changed:** 1 (+47 −1), by folder:
@@ -9442,7 +9602,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 398. T-1124 (round 1 of 2): the Hyperdrive spike's probe and run script, proved locally; the database URL never reaches a child's environment (\#405)
 
-- **Commit:** [`54219e0`](https://github.com/aryamahadik/rosie/commit/54219e0), by Arya Mahadik, 2026-11-11 17:26:32 UTC
+- **Commit:** [`54219e0c`](https://github.com/aryamahadik/rosie/commit/54219e0c), by Arya Mahadik, 2026-11-11 17:26:32 UTC
 - **Pull request:** [#405](https://github.com/aryamahadik/rosie/pull/405) from `task/T-1124`, merged 2026-11-11 17:26:32 UTC. It squashed 6 branch commits:
   - `2a0ee9e` T-1124: Hyperdrive host spike, round 1: the probe (extensions, EXCLUD…
   - `dff1726` T-1124: README names the probe step's own last line (remote: done) an…
@@ -9485,7 +9645,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 397. T-511: web app shell (Worker entry, error pages, trace id and one log line per page request, config with the link host), typed K-21 v1 client on the Tool API mock, and one empty route module per feature folder (\#404)
 
-- **Commit:** [`dcb13fe`](https://github.com/aryamahadik/rosie/commit/dcb13fe), by Arya Mahadik, 2026-11-11 17:26:27 UTC
+- **Commit:** [`dcb13fe5`](https://github.com/aryamahadik/rosie/commit/dcb13fe5), by Arya Mahadik, 2026-11-11 17:26:27 UTC
 - **Pull request:** [#404](https://github.com/aryamahadik/rosie/pull/404) from `task/T-511`, merged 2026-11-11 17:26:28 UTC. It squashed 1 branch commit:
   - `c71f335` T-511: web app shell (Worker entry, error pages, trace id and one log…
 - **Files changed:** 31 (+2781 −16), by folder:
@@ -9515,7 +9675,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 396. docs: COMMIT\_HISTORY.md through commit 394 (0770355, \#400) (\#403)
 
-- **Commit:** [`035381d`](https://github.com/aryamahadik/rosie/commit/035381d), by Arya Mahadik, 2026-11-11 17:11:04 UTC
+- **Commit:** [`035381dd`](https://github.com/aryamahadik/rosie/commit/035381dd), by Arya Mahadik, 2026-11-11 17:11:04 UTC
 - **Pull request:** [#403](https://github.com/aryamahadik/rosie/pull/403) from `task/commit-history-21`, merged 2026-11-11 17:11:05 UTC. It squashed 1 branch commit:
   - `8a0248e` docs: COMMIT\_HISTORY.md through commit 394 (0770355, \#400)
 - **Files changed:** 1 (+35 −1), by folder:
@@ -9531,7 +9691,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 395. T-568: staging secrets by name: each value piped to wrangler on standard input, never shown, staging only (\#402)
 
-- **Commit:** [`e33d147`](https://github.com/aryamahadik/rosie/commit/e33d147), by Arya Mahadik, 2026-11-11 17:10:59 UTC
+- **Commit:** [`e33d1479`](https://github.com/aryamahadik/rosie/commit/e33d1479), by Arya Mahadik, 2026-11-11 17:10:59 UTC
 - **Pull request:** [#402](https://github.com/aryamahadik/rosie/pull/402) from `task/T-568`, merged 2026-11-11 17:10:59 UTC. It squashed 3 branch commits:
   - `0dba368` T-568: put-staging-secrets.sh puts staging's Worker secrets by name f…
   - `47b9993` Merge branch 'main' into task/T-568
@@ -9561,7 +9721,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 394. docs: COMMIT\_HISTORY.md through commit 392 (5471539, \#399) (\#400)
 
-- **Commit:** [`0770355`](https://github.com/aryamahadik/rosie/commit/0770355), by Arya Mahadik, 2026-11-11 16:49:06 UTC
+- **Commit:** [`07703559`](https://github.com/aryamahadik/rosie/commit/07703559), by Arya Mahadik, 2026-11-11 16:49:06 UTC
 - **Pull request:** [#400](https://github.com/aryamahadik/rosie/pull/400) from `task/commit-history-20`, merged 2026-11-11 16:49:07 UTC. It squashed 1 branch commit:
   - `9637e73` docs: COMMIT\_HISTORY.md through commit 392 (5471539, \#399)
 - **Files changed:** 1 (+61 −1), by folder:
@@ -9577,7 +9737,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 393. T-265: the gateway's Resend webhook door: delivery events and inbound replies through the email port (K-12 v1), a reply read, scrubbed and sealed to the handle's actor with its sender check marked, a delivery event to the receipt door; closed until a root binds GatewayDeps.email (\#401)
 
-- **Commit:** [`c1ef392`](https://github.com/aryamahadik/rosie/commit/c1ef392), by Arya Mahadik, 2026-11-11 16:49:02 UTC
+- **Commit:** [`c1ef392c`](https://github.com/aryamahadik/rosie/commit/c1ef392c), by Arya Mahadik, 2026-11-11 16:49:02 UTC
 - **Pull request:** [#401](https://github.com/aryamahadik/rosie/pull/401) from `task/T-265`, merged 2026-11-11 16:49:02 UTC. It squashed 1 branch commit:
   - `8e332c2` T-265: the gateway's Resend webhook door: delivery events and inbound…
 - **Files changed:** 10 (+2206 −5), by folder:
@@ -9595,7 +9755,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 392. docs: COMMIT\_HISTORY.md through commit 389 (665b035, \#396) (\#399)
 
-- **Commit:** [`5471539`](https://github.com/aryamahadik/rosie/commit/5471539), by Arya Mahadik, 2026-11-11 16:04:46 UTC
+- **Commit:** [`5471539c`](https://github.com/aryamahadik/rosie/commit/5471539c), by Arya Mahadik, 2026-11-11 16:04:46 UTC
 - **Pull request:** [#399](https://github.com/aryamahadik/rosie/pull/399) from `task/commit-history-19`, merged 2026-11-11 16:04:46 UTC. It squashed 1 branch commit:
   - `5ed8b1c` docs: COMMIT\_HISTORY.md through commit 389 (665b035, \#396)
 - **Files changed:** 1 (+46 −1), by folder:
@@ -9611,7 +9771,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 391. T-574: staging-only listing call, server side: K-21 v1 testRoster over ports (the roster and the seeded rows), refused outside staging; test-roster.json's response from the contracts' seed rows (\#398)
 
-- **Commit:** [`bb1c85a`](https://github.com/aryamahadik/rosie/commit/bb1c85a), by Arya Mahadik, 2026-11-11 16:04:42 UTC
+- **Commit:** [`bb1c85a9`](https://github.com/aryamahadik/rosie/commit/bb1c85a9), by Arya Mahadik, 2026-11-11 16:04:42 UTC
 - **Pull request:** [#398](https://github.com/aryamahadik/rosie/pull/398) from `task/T-574`, merged 2026-11-11 16:04:42 UTC. It squashed 1 branch commit:
   - `a36a2b4` T-574: staging-only listing call, server side: K-21 v1 testRoster ove…
 - **Files changed:** 9 (+1850 −0), by folder:
@@ -9627,7 +9787,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 390. T-261: allowed formats, what this phone allows now for the composer (text alone when nothing tells the channel; never bold or read receipts) (\#397)
 
-- **Commit:** [`01667c6`](https://github.com/aryamahadik/rosie/commit/01667c6), by Arya Mahadik, 2026-11-11 16:04:38 UTC
+- **Commit:** [`01667c6f`](https://github.com/aryamahadik/rosie/commit/01667c6f), by Arya Mahadik, 2026-11-11 16:04:38 UTC
 - **Pull request:** [#397](https://github.com/aryamahadik/rosie/pull/397) from `task/T-261`, merged 2026-11-11 16:04:38 UTC. It squashed 3 branch commits:
   - `24b2311` T-261 (work in progress, unchecked): the allowed-formats module as it…
   - `c6d32f2` Merge branch 'main' into task/T-261
@@ -9655,7 +9815,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 389. docs: COMMIT\_HISTORY.md through commit 387 (d5d1fce, \#394) (\#396)
 
-- **Commit:** [`665b035`](https://github.com/aryamahadik/rosie/commit/665b035), by Arya Mahadik, 2026-11-11 15:42:09 UTC
+- **Commit:** [`665b035c`](https://github.com/aryamahadik/rosie/commit/665b035c), by Arya Mahadik, 2026-11-11 15:42:09 UTC
 - **Pull request:** [#396](https://github.com/aryamahadik/rosie/pull/396) from `task/commit-history-18`, merged 2026-11-11 15:42:10 UTC. It squashed 1 branch commit:
   - `603dacd` docs: COMMIT\_HISTORY.md through commit 387 (d5d1fce, \#394)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -9671,7 +9831,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 388. T-1226: freeze K-05 v1.9, markPart's answer to a repeated delivered mark says whether that delivery was the row's first (repeatedDelivery) (\#395)
 
-- **Commit:** [`560929f`](https://github.com/aryamahadik/rosie/commit/560929f), by Arya Mahadik, 2026-11-11 15:42:05 UTC
+- **Commit:** [`560929f8`](https://github.com/aryamahadik/rosie/commit/560929f8), by Arya Mahadik, 2026-11-11 15:42:05 UTC
 - **Pull request:** [#395](https://github.com/aryamahadik/rosie/pull/395) from `task/T-1226`, merged 2026-11-11 15:42:05 UTC. It squashed 2 branch commits:
   - `2a5ec34` T-1226: K-05 v1.9, frozen: markPart's answer to a repeated delivery r…
   - `7462b25` T-1226: K-05 v1.9 README and index wording: item 48's read is under t…
@@ -9700,7 +9860,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 387. docs: COMMIT\_HISTORY.md through commit 385 (ec654b7, \#392) (\#394)
 
-- **Commit:** [`d5d1fce`](https://github.com/aryamahadik/rosie/commit/d5d1fce), by Arya Mahadik, 2026-11-11 15:24:32 UTC
+- **Commit:** [`d5d1fce0`](https://github.com/aryamahadik/rosie/commit/d5d1fce0), by Arya Mahadik, 2026-11-11 15:24:32 UTC
 - **Pull request:** [#394](https://github.com/aryamahadik/rosie/pull/394) from `task/commit-history-17`, merged 2026-11-11 15:24:32 UTC. It squashed 1 branch commit:
   - `66ba9fd` docs: COMMIT\_HISTORY.md through commit 385 (ec654b7, \#392)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -9716,7 +9876,7 @@ Co-authored-by: Claude Fable 5.2 <noreply@anthropic.com>
 
 ## 386. T-1217: the send-state port maps K-05 v1.8's fromContact and bookingId across unchanged, left out when the answer has none; the v1.8 fixtures run through the port and limit 8 (\#393)
 
-- **Commit:** [`34af696`](https://github.com/aryamahadik/rosie/commit/34af696), by Arya Mahadik, 2026-11-11 15:24:26 UTC
+- **Commit:** [`34af696b`](https://github.com/aryamahadik/rosie/commit/34af696b), by Arya Mahadik, 2026-11-11 15:24:26 UTC
 - **Pull request:** [#393](https://github.com/aryamahadik/rosie/pull/393) from `task/T-1217`, merged 2026-11-11 15:24:27 UTC. It squashed 1 branch commit:
   - `16865c5` T-1217: the send-state port maps K-05 v1.8's fromContact and bookingI…
 - **Files changed:** 2 (+414 −23), by folder:
@@ -9732,7 +9892,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 385. docs: COMMIT\_HISTORY.md through commit 383 (ea324b2, \#390) (\#392)
 
-- **Commit:** [`ec654b7`](https://github.com/aryamahadik/rosie/commit/ec654b7), by Arya Mahadik, 2026-11-11 15:01:00 UTC
+- **Commit:** [`ec654b77`](https://github.com/aryamahadik/rosie/commit/ec654b77), by Arya Mahadik, 2026-11-11 15:01:00 UTC
 - **Pull request:** [#392](https://github.com/aryamahadik/rosie/pull/392) from `task/commit-history-16`, merged 2026-11-11 15:01:01 UTC. It squashed 1 branch commit:
   - `77ecb0d` docs: COMMIT\_HISTORY.md through commit 383 (ea324b2, \#390)
 - **Files changed:** 1 (+53 −1), by folder:
@@ -9748,7 +9908,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 384. T-1218: K-05 contract test covers v1.8 (sendState's fromContact and bookingId): WRITTEN\_FOR and the mends of the 3 refused fixtures to their README twins; the database side runs T-1216's sendState on every v1.8 fixture after v1's reserve, plan and claim and the commits, each through db/repo (\#391)
 
-- **Commit:** [`d5998d2`](https://github.com/aryamahadik/rosie/commit/d5998d2), by Arya Mahadik, 2026-11-11 15:00:55 UTC
+- **Commit:** [`d5998d29`](https://github.com/aryamahadik/rosie/commit/d5998d29), by Arya Mahadik, 2026-11-11 15:00:55 UTC
 - **Pull request:** [#391](https://github.com/aryamahadik/rosie/pull/391) from `task/T-1218`, merged 2026-11-11 15:00:56 UTC. It squashed 1 branch commit:
   - `0b1ee8d` T-1218: K-05 contract test covers v1.8 (sendState's fromContact and b…
 - **Files changed:** 2 (+354 −71), by folder:
@@ -9764,7 +9924,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 383. docs: COMMIT\_HISTORY.md through commit 380 (2e0b89b, \#387) (\#390)
 
-- **Commit:** [`ea324b2`](https://github.com/aryamahadik/rosie/commit/ea324b2), by Arya Mahadik, 2026-11-11 14:39:31 UTC
+- **Commit:** [`ea324b2f`](https://github.com/aryamahadik/rosie/commit/ea324b2f), by Arya Mahadik, 2026-11-11 14:39:31 UTC
 - **Pull request:** [#390](https://github.com/aryamahadik/rosie/pull/390) from `task/commit-history-15`, merged 2026-11-11 14:39:31 UTC. It squashed 1 branch commit:
   - `51f2c4f` docs: COMMIT\_HISTORY.md through commit 380 (2e0b89b, \#387)
 - **Files changed:** 1 (+50 −1), by folder:
@@ -9780,7 +9940,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 382. T-1219: K-09 v1.8, frozen: gateAndCommit takes K-02 v1.2's contextAndDecide, and its committed answer holds an unmapped turn's end (end asked: no limit run, no row written for any part, planner null); named rule unmappedEndAsked; 1 accepted and 3 refused fixtures (commit-s1-02-unmapped-end.json is K-02's pair-unmapped-all-refused.json answered asked); README defaults 142-145, open gaps 129-130, consumers' card lines; v1.7 stays T-054's (\#389)
 
-- **Commit:** [`a5e9df2`](https://github.com/aryamahadik/rosie/commit/a5e9df2), by Arya Mahadik, 2026-11-11 14:39:27 UTC
+- **Commit:** [`a5e9df29`](https://github.com/aryamahadik/rosie/commit/a5e9df29), by Arya Mahadik, 2026-11-11 14:39:27 UTC
 - **Pull request:** [#389](https://github.com/aryamahadik/rosie/pull/389) from `task/T-1219`, merged 2026-11-11 14:39:27 UTC. It squashed 1 branch commit:
   - `bf4dbe8` T-1219: K-09 v1.8, frozen: gateAndCommit takes K-02 v1.2's contextAnd…
 - **Files changed:** 9 (+938 −4), by folder:
@@ -9798,7 +9958,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 381. T-1222: contract test model.v1 reads K-02 v1.2's refused reads and checks an unmapped turn's end (\#388)
 
-- **Commit:** [`fcf31e9`](https://github.com/aryamahadik/rosie/commit/fcf31e9), by Arya Mahadik, 2026-11-11 14:39:23 UTC
+- **Commit:** [`fcf31e91`](https://github.com/aryamahadik/rosie/commit/fcf31e91), by Arya Mahadik, 2026-11-11 14:39:23 UTC
 - **Pull request:** [#388](https://github.com/aryamahadik/rosie/pull/388) from `task/T-1222`, merged 2026-11-11 14:39:23 UTC. It squashed 1 branch commit:
   - `4289764` T-1222: contract test model.v1 reads K-02 v1.2's refused reads and ch…
 - **Files changed:** 1 (+416 −19), by folder:
@@ -9816,7 +9976,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 380. docs: COMMIT\_HISTORY.md through commit 378 (cb7c9ca, \#385) (\#387)
 
-- **Commit:** [`2e0b89b`](https://github.com/aryamahadik/rosie/commit/2e0b89b), by Arya Mahadik, 2026-11-11 14:16:55 UTC
+- **Commit:** [`2e0b89b5`](https://github.com/aryamahadik/rosie/commit/2e0b89b5), by Arya Mahadik, 2026-11-11 14:16:55 UTC
 - **Pull request:** [#387](https://github.com/aryamahadik/rosie/pull/387) from `task/commit-history-14`, merged 2026-11-11 14:16:55 UTC. It squashed 1 branch commit:
   - `51761a3` docs: COMMIT\_HISTORY.md through commit 378 (cb7c9ca, \#385)
 - **Files changed:** 1 (+52 −1), by folder:
@@ -9832,7 +9992,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 379. T-564: join hop 13, the double's delivery receipt marks the part delivered and arms S1-02's clock; the walking skeleton is joined end to end (\#386)
 
-- **Commit:** [`1415609`](https://github.com/aryamahadik/rosie/commit/1415609), by Arya Mahadik, 2026-11-11 14:16:51 UTC
+- **Commit:** [`14156097`](https://github.com/aryamahadik/rosie/commit/14156097), by Arya Mahadik, 2026-11-11 14:16:51 UTC
 - **Pull request:** [#386](https://github.com/aryamahadik/rosie/pull/386) from `task/T-564`, merged 2026-11-11 14:16:51 UTC. It squashed 3 branch commits:
   - `04dd09f` T-564: join hop 13 in the wiring: the arming port (K-05 v1 item 5 arm…
   - `1e90dc3` T-564 (work in progress, NEED): e2e row 13: JOINED\_THROUGH clockArmed…
@@ -9865,7 +10025,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 378. docs: COMMIT\_HISTORY.md through commit 376 (4b69e2d, \#383) (\#385)
 
-- **Commit:** [`cb7c9ca`](https://github.com/aryamahadik/rosie/commit/cb7c9ca), by Arya Mahadik, 2026-11-11 13:58:39 UTC
+- **Commit:** [`cb7c9ca2`](https://github.com/aryamahadik/rosie/commit/cb7c9ca2), by Arya Mahadik, 2026-11-11 13:58:39 UTC
 - **Pull request:** [#385](https://github.com/aryamahadik/rosie/pull/385) from `task/commit-history-13`, merged 2026-11-11 13:58:40 UTC. It squashed 1 branch commit:
   - `5c72676` docs: COMMIT\_HISTORY.md through commit 376 (4b69e2d, \#383)
 - **Files changed:** 1 (+117 −1), by folder:
@@ -9881,7 +10041,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 377. T-1223: the Worker's queue entry wires the root before a retry batch, so a retry reaching a fresh isolate runs at once (\#384)
 
-- **Commit:** [`ba3e85b`](https://github.com/aryamahadik/rosie/commit/ba3e85b), by Arya Mahadik, 2026-11-11 13:58:34 UTC
+- **Commit:** [`ba3e85b1`](https://github.com/aryamahadik/rosie/commit/ba3e85b1), by Arya Mahadik, 2026-11-11 13:58:34 UTC
 - **Pull request:** [#384](https://github.com/aryamahadik/rosie/pull/384) from `task/T-1223`, merged 2026-11-11 13:58:34 UTC. It squashed 4 branch commits:
   - `ac08082` T-563: join hop 12: the dispatcher's Linq send port bound to @rosie/a…
   - `10af5cc` T-1223: the Worker's queue entry calls wireWorker(env) before it hand…
@@ -9916,7 +10076,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 376. docs: COMMIT\_HISTORY.md through commit 372 (6f86957, \#379) (\#383)
 
-- **Commit:** [`4b69e2d`](https://github.com/aryamahadik/rosie/commit/4b69e2d), by Arya Mahadik, 2026-11-11 13:36:09 UTC
+- **Commit:** [`4b69e2d4`](https://github.com/aryamahadik/rosie/commit/4b69e2d4), by Arya Mahadik, 2026-11-11 13:36:09 UTC
 - **Pull request:** [#383](https://github.com/aryamahadik/rosie/pull/383) from `task/commit-history-12`, merged 2026-11-11 13:36:10 UTC. It squashed 1 branch commit:
   - `0b32dc3` docs: COMMIT\_HISTORY.md through commit 372 (6f86957, \#379)
 - **Files changed:** 1 (+63 −1), by folder:
@@ -9932,7 +10092,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 375. T-1215: the Tool API validators' build reads only inside contracts/; a $ref or fixture entry leaving it is refused with no content printed (\#382)
 
-- **Commit:** [`d3b6b07`](https://github.com/aryamahadik/rosie/commit/d3b6b07), by Arya Mahadik, 2026-11-11 13:36:05 UTC
+- **Commit:** [`d3b6b076`](https://github.com/aryamahadik/rosie/commit/d3b6b076), by Arya Mahadik, 2026-11-11 13:36:05 UTC
 - **Pull request:** [#382](https://github.com/aryamahadik/rosie/pull/382) from `task/T-1215`, merged 2026-11-11 13:36:05 UTC. It squashed 2 branch commits:
   - `5224117` T-1215: the Tool API validators' build reads only inside contracts/: …
   - `6f323a2` T-1215: infra/ci/README.md names the validators' build among what npm…
@@ -9960,7 +10120,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 374. T-1216: K-05 v1.8 sendState in db/repo, fromContact and bookingId from the covering consent row (\#381)
 
-- **Commit:** [`b8fb4b6`](https://github.com/aryamahadik/rosie/commit/b8fb4b6), by Arya Mahadik, 2026-11-11 13:36:00 UTC
+- **Commit:** [`b8fb4b6e`](https://github.com/aryamahadik/rosie/commit/b8fb4b6e), by Arya Mahadik, 2026-11-11 13:36:00 UTC
 - **Pull request:** [#381](https://github.com/aryamahadik/rosie/pull/381) from `task/T-1216`, merged 2026-11-11 13:36:01 UTC. It squashed 5 branch commits:
   - `56eec29` T-1102: freeze K-05 v1.8: sendState's textsConsent says who gave the …
   - `0ad6fa9` T-1102: K-05 v1.8 wording: a staff member's ready text is the core ac…
@@ -9998,7 +10158,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 373. T-1102: freeze K-05 v1.8, sendState's texts consent says who gave the yes (fromContact) and for which booking (bookingId) (\#380)
 
-- **Commit:** [`2d49d0a`](https://github.com/aryamahadik/rosie/commit/2d49d0a), by Arya Mahadik, 2026-11-11 13:35:56 UTC
+- **Commit:** [`2d49d0a7`](https://github.com/aryamahadik/rosie/commit/2d49d0a7), by Arya Mahadik, 2026-11-11 13:35:56 UTC
 - **Pull request:** [#380](https://github.com/aryamahadik/rosie/pull/380) from `task/T-1102`, merged 2026-11-11 13:35:57 UTC. It squashed 3 branch commits:
   - `56eec29` T-1102: freeze K-05 v1.8: sendState's textsConsent says who gave the …
   - `0ad6fa9` T-1102: K-05 v1.8 wording: a staff member's ready text is the core ac…
@@ -10032,7 +10192,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 372. docs: COMMIT\_HISTORY.md through commit 370 (1ab5a50, \#377) (\#379)
 
-- **Commit:** [`6f86957`](https://github.com/aryamahadik/rosie/commit/6f86957), by Arya Mahadik, 2026-11-11 13:20:52 UTC
+- **Commit:** [`6f869570`](https://github.com/aryamahadik/rosie/commit/6f869570), by Arya Mahadik, 2026-11-11 13:20:52 UTC
 - **Pull request:** [#379](https://github.com/aryamahadik/rosie/pull/379) from `task/commit-history-11`, merged 2026-11-11 13:20:52 UTC. It squashed 1 branch commit:
   - `51be72f` docs: COMMIT\_HISTORY.md through commit 370 (1ab5a50, \#377)
 - **Files changed:** 1 (+34 −1), by folder:
@@ -10048,7 +10208,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 371. T-1153: deploy-preview.sh builds the Tool API's validators before the upload; step 0 refuses guarded paths in any ASCII case, links and paths outside printable ASCII (\#378)
 
-- **Commit:** [`cc34842`](https://github.com/aryamahadik/rosie/commit/cc34842), by Arya Mahadik, 2026-11-11 13:20:48 UTC
+- **Commit:** [`cc348427`](https://github.com/aryamahadik/rosie/commit/cc348427), by Arya Mahadik, 2026-11-11 13:20:48 UTC
 - **Pull request:** [#378](https://github.com/aryamahadik/rosie/pull/378) from `task/T-1153`, merged 2026-11-11 13:20:48 UTC. It squashed 6 branch commits:
   - `dacb63f` T-1153: deploy-preview.sh builds the Tool API's validators in the wor…
   - `4b68f49` Merge branch 'main' into task/T-1153
@@ -10094,7 +10254,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 370. docs: COMMIT\_HISTORY.md through commit 368 (cecb92e, \#375) (\#377)
 
-- **Commit:** [`1ab5a50`](https://github.com/aryamahadik/rosie/commit/1ab5a50), by Arya Mahadik, 2026-11-11 12:39:33 UTC
+- **Commit:** [`1ab5a504`](https://github.com/aryamahadik/rosie/commit/1ab5a504), by Arya Mahadik, 2026-11-11 12:39:33 UTC
 - **Pull request:** [#377](https://github.com/aryamahadik/rosie/pull/377) from `task/commit-history-10`, merged 2026-11-11 12:39:34 UTC. It squashed 1 branch commit:
   - `231bb14` docs: COMMIT\_HISTORY.md through commit 368 (cecb92e, \#375)
 - **Files changed:** 1 (+50 −1), by folder:
@@ -10110,7 +10270,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 369. T-563: join hop 12: the dispatcher's Linq send port bound to @rosie/adapters' Linq double (K-11 sendPart, real in test and staging, closed in production; the direct safety line split off as linqDirect), T-258's retries wired (DispatchDeps.retries on RootOptions.retryQueue, setQueueDeps with the dispatcher's send door), the K-05 double following db/repo defaults 1, 5, 8, 13, 17 and 18; e2e row 12 (JOINED\_THROUGH providerAccepted) and hop12.worker.test.ts prove one send per row-part-try key (\#376)
 
-- **Commit:** [`9a56e3a`](https://github.com/aryamahadik/rosie/commit/9a56e3a), by Arya Mahadik, 2026-11-11 12:39:29 UTC
+- **Commit:** [`9a56e3a7`](https://github.com/aryamahadik/rosie/commit/9a56e3a7), by Arya Mahadik, 2026-11-11 12:39:29 UTC
 - **Pull request:** [#376](https://github.com/aryamahadik/rosie/pull/376) from `task/T-563`, merged 2026-11-11 12:39:29 UTC. It squashed 1 branch commit:
   - `ac08082` T-563: join hop 12: the dispatcher's Linq send port bound to @rosie/a…
 - **Files changed:** 21 (+1500 −73), by folder:
@@ -10127,7 +10287,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 368. docs: COMMIT\_HISTORY.md through commit 366 (358f9a6, \#373) (\#375)
 
-- **Commit:** [`cecb92e`](https://github.com/aryamahadik/rosie/commit/cecb92e), by Arya Mahadik, 2026-11-11 12:16:51 UTC
+- **Commit:** [`cecb92e0`](https://github.com/aryamahadik/rosie/commit/cecb92e0), by Arya Mahadik, 2026-11-11 12:16:51 UTC
 - **Pull request:** [#375](https://github.com/aryamahadik/rosie/pull/375) from `task/commit-history-9`, merged 2026-11-11 12:16:52 UTC. It squashed 1 branch commit:
   - `2cf133c` docs: COMMIT\_HISTORY.md through commit 366 (358f9a6, \#373)
 - **Files changed:** 1 (+55 −1), by folder:
@@ -10143,7 +10303,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 367. T-1157: K-02 v1.2, a decide result can hold an unmapped turn's one-question end (\#374)
 
-- **Commit:** [`70d91ce`](https://github.com/aryamahadik/rosie/commit/70d91ce), by Arya Mahadik, 2026-11-11 12:16:48 UTC
+- **Commit:** [`70d91ce4`](https://github.com/aryamahadik/rosie/commit/70d91ce4), by Arya Mahadik, 2026-11-11 12:16:48 UTC
 - **Pull request:** [#374](https://github.com/aryamahadik/rosie/pull/374) from `task/T-1157`, merged 2026-11-11 12:16:48 UTC. It squashed 3 branch commits:
   - `35b7a47` T-1157: K-02 v1.2, frozen: a decide result holds an unmapped turn's e…
   - `398f3f2` Merge branch 'main' into task/T-1157
@@ -10176,7 +10336,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 366. docs: COMMIT\_HISTORY.md through commit 363 (8606bac, \#370) (\#373)
 
-- **Commit:** [`358f9a6`](https://github.com/aryamahadik/rosie/commit/358f9a6), by Arya Mahadik, 2026-11-11 11:16:41 UTC
+- **Commit:** [`358f9a67`](https://github.com/aryamahadik/rosie/commit/358f9a67), by Arya Mahadik, 2026-11-11 11:16:41 UTC
 - **Pull request:** [#373](https://github.com/aryamahadik/rosie/pull/373) from `task/commit-history-8`, merged 2026-11-11 11:16:42 UTC. It squashed 1 branch commit:
   - `43b5083` docs: COMMIT\_HISTORY.md through commit 363 (8606bac, \#370)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -10192,7 +10352,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 365. T-571: npm run seed:staging runs D-017's seed sets (core, staging-core, skeleton) or the sets named, one runner run each, on the staging database's schema public only, idempotently, printing no URL or phone number; infra/ci/seed-staging.test.mjs proves it on throwaway local databases (\#371)
 
-- **Commit:** [`83bc51a`](https://github.com/aryamahadik/rosie/commit/83bc51a), by Arya Mahadik, 2026-11-11 11:16:37 UTC
+- **Commit:** [`83bc51ae`](https://github.com/aryamahadik/rosie/commit/83bc51ae), by Arya Mahadik, 2026-11-11 11:16:37 UTC
 - **Pull request:** [#371](https://github.com/aryamahadik/rosie/pull/371) from `task/T-571`, merged 2026-11-11 11:16:38 UTC. It squashed 1 branch commit:
   - `db56b4c` T-571: npm run seed:staging runs D-017's seed sets (core, staging-cor…
 - **Files changed:** 3 (+612 −1), by folder:
@@ -10210,7 +10370,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 364. T-1213: the gateway opens a number's chat at receipt (K-05 v1.7 openChatOnText), so e2e row 11's JOIN reply is claimed and sent (\#372)
 
-- **Commit:** [`fa50818`](https://github.com/aryamahadik/rosie/commit/fa50818), by Arya Mahadik, 2026-11-11 11:16:33 UTC
+- **Commit:** [`fa508186`](https://github.com/aryamahadik/rosie/commit/fa508186), by Arya Mahadik, 2026-11-11 11:16:33 UTC
 - **Pull request:** [#372](https://github.com/aryamahadik/rosie/pull/372) from `task/T-1213`, merged 2026-11-11 11:16:33 UTC. It squashed 1 branch commit:
   - `f541beb` T-1213: the gateway opens a number's chat at receipt (K-05 v1.7 openC…
 - **Files changed:** 34 (+1964 −116), by folder:
@@ -10230,7 +10390,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 363. docs: COMMIT\_HISTORY.md through commit 361 (5c22bf5, \#368) (\#370)
 
-- **Commit:** [`8606bac`](https://github.com/aryamahadik/rosie/commit/8606bac), by Arya Mahadik, 2026-11-11 10:54:46 UTC
+- **Commit:** [`8606bac0`](https://github.com/aryamahadik/rosie/commit/8606bac0), by Arya Mahadik, 2026-11-11 10:54:46 UTC
 - **Pull request:** [#370](https://github.com/aryamahadik/rosie/pull/370) from `task/commit-history-7`, merged 2026-11-11 10:54:46 UTC. It squashed 1 branch commit:
   - `90e08e8` docs: COMMIT\_HISTORY.md through commit 361 (5c22bf5, \#368)
 - **Files changed:** 1 (+44 −1), by folder:
@@ -10246,7 +10406,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 362. T-1214: K-05 contract test covers v1.7 (openChatOnText): WRITTEN\_FOR, mends of the 3 refused fixtures and the entry rule; its database side through db/repo/chat-open.ts (\#369)
 
-- **Commit:** [`5842c6c`](https://github.com/aryamahadik/rosie/commit/5842c6c), by Arya Mahadik, 2026-11-11 10:54:42 UTC
+- **Commit:** [`5842c6c0`](https://github.com/aryamahadik/rosie/commit/5842c6c0), by Arya Mahadik, 2026-11-11 10:54:42 UTC
 - **Pull request:** [#369](https://github.com/aryamahadik/rosie/pull/369) from `task/T-1214`, merged 2026-11-11 10:54:42 UTC. It squashed 1 branch commit:
   - `2f0843d` T-1214: K-05 contract test covers v1.7 (openChatOnText): WRITTEN\_FOR,…
 - **Files changed:** 2 (+495 −51), by folder:
@@ -10262,7 +10422,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 361. docs: COMMIT\_HISTORY.md through commit 359 (bfabe45, \#366) (\#368)
 
-- **Commit:** [`5c22bf5`](https://github.com/aryamahadik/rosie/commit/5c22bf5), by Arya Mahadik, 2026-11-11 09:56:40 UTC
+- **Commit:** [`5c22bf54`](https://github.com/aryamahadik/rosie/commit/5c22bf54), by Arya Mahadik, 2026-11-11 09:56:40 UTC
 - **Pull request:** [#368](https://github.com/aryamahadik/rosie/pull/368) from `task/commit-history-6`, merged 2026-11-11 09:56:41 UTC. It squashed 1 branch commit:
   - `ed5748b` docs: COMMIT\_HISTORY.md through commit 359 (bfabe45, \#366)
 - **Files changed:** 1 (+46 −1), by folder:
@@ -10278,7 +10438,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 360. T-1212: K-05 v1.7 openChatOnText in db/repo, a number's text opens its chat, never a stopped one (\#367)
 
-- **Commit:** [`f5a3ff2`](https://github.com/aryamahadik/rosie/commit/f5a3ff2), by Arya Mahadik, 2026-11-11 09:56:36 UTC
+- **Commit:** [`f5a3ff27`](https://github.com/aryamahadik/rosie/commit/f5a3ff27), by Arya Mahadik, 2026-11-11 09:56:36 UTC
 - **Pull request:** [#367](https://github.com/aryamahadik/rosie/pull/367) from `task/T-1212`, merged 2026-11-11 09:56:37 UTC. It squashed 2 branch commits:
   - `a908e13` T-1212: K-05 v1.7 openChatOnText in db/repo/chat-open.ts: item 46's o…
   - `b16acda` T-1212: chat-open.int.test.ts's deadlock test waits three times deadl…
@@ -10305,7 +10465,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 359. docs: COMMIT\_HISTORY.md through commit 357 (109e822, \#364) (\#366)
 
-- **Commit:** [`bfabe45`](https://github.com/aryamahadik/rosie/commit/bfabe45), by Arya Mahadik, 2026-11-11 09:08:11 UTC
+- **Commit:** [`bfabe452`](https://github.com/aryamahadik/rosie/commit/bfabe452), by Arya Mahadik, 2026-11-11 09:08:11 UTC
 - **Pull request:** [#366](https://github.com/aryamahadik/rosie/pull/366) from `task/commit-history-5`, merged 2026-11-11 09:08:11 UTC. It squashed 1 branch commit:
   - `a77f87e` docs: COMMIT\_HISTORY.md through commit 357 (109e822, \#364)
 - **Files changed:** 1 (+52 −1), by folder:
@@ -10321,7 +10481,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 358. T-1200: join 8's and 9's leak checks: substrings at any depth, every console method, an Error's own fields (\#365)
 
-- **Commit:** [`45e8a9d`](https://github.com/aryamahadik/rosie/commit/45e8a9d), by Arya Mahadik, 2026-11-11 09:08:07 UTC
+- **Commit:** [`45e8a9df`](https://github.com/aryamahadik/rosie/commit/45e8a9df), by Arya Mahadik, 2026-11-11 09:08:07 UTC
 - **Pull request:** [#365](https://github.com/aryamahadik/rosie/pull/365) from `task/T-1200`, merged 2026-11-11 09:08:07 UTC. It squashed 3 branch commits:
   - `d84f4cb` T-1200: join 8's and 9's leak checks state the rule outright: no even…
   - `8266ed4` Merge branch 'main' into task/T-1200
@@ -10350,7 +10510,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 357. docs: COMMIT\_HISTORY.md through commit 354 (e1bfb1e, \#361) (\#364)
 
-- **Commit:** [`109e822`](https://github.com/aryamahadik/rosie/commit/109e822), by Arya Mahadik, 2026-11-11 08:53:56 UTC
+- **Commit:** [`109e8224`](https://github.com/aryamahadik/rosie/commit/109e8224), by Arya Mahadik, 2026-11-11 08:53:56 UTC
 - **Pull request:** [#364](https://github.com/aryamahadik/rosie/pull/364) from `task/commit-history-4`, merged 2026-11-11 08:53:56 UTC. It squashed 1 branch commit:
   - `c637e3d` docs: COMMIT\_HISTORY.md through commit 354 (e1bfb1e, \#361)
 - **Files changed:** 1 (+33 −1), by folder:
@@ -10366,7 +10526,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 356. T-1210: checkDatabaseUrl refuses a second @, a comma, or %2C in the host within a URL's authority, so a URL Node reads as local never sends postgres.js to another host first; db-url tests pin both refusals, that neither names any part of the URL, and that each URL still taken (a password with %40 or %2C included) names one host to Node and postgres.js alike (\#363)
 
-- **Commit:** [`cac4bab`](https://github.com/aryamahadik/rosie/commit/cac4bab), by Arya Mahadik, 2026-11-11 08:53:51 UTC
+- **Commit:** [`cac4babd`](https://github.com/aryamahadik/rosie/commit/cac4babd), by Arya Mahadik, 2026-11-11 08:53:51 UTC
 - **Pull request:** [#363](https://github.com/aryamahadik/rosie/pull/363) from `task/T-1210`, merged 2026-11-11 08:53:52 UTC. It squashed 1 branch commit:
   - `3b0771d` T-1210: checkDatabaseUrl refuses a second @, a comma, or %2C in the h…
 - **Files changed:** 2 (+124 −22), by folder:
@@ -10383,7 +10543,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 355. T-1211: K-05 v1.7, openChatOnText: a number's text opens its chat at receipt (the gateway, after handleSealingKey and before the actor): it inserts a missing phone row with its chat open, opens a closed chat that is not stopped, never touches a stopped row, writes no other column, appends one phone.chat\_opened entry and is repeat-safe by the event id; 6 accepted and 3 refused fixtures; README item 46, defaults 70 to 77, gaps 48 to 51; T-1102's consent fields move to v1.8 (DL-438) (\#362)
 
-- **Commit:** [`9f49d15`](https://github.com/aryamahadik/rosie/commit/9f49d15), by Arya Mahadik, 2026-11-11 08:53:47 UTC
+- **Commit:** [`9f49d153`](https://github.com/aryamahadik/rosie/commit/9f49d153), by Arya Mahadik, 2026-11-11 08:53:47 UTC
 - **Pull request:** [#362](https://github.com/aryamahadik/rosie/pull/362) from `task/T-1211`, merged 2026-11-11 08:53:47 UTC. It squashed 1 branch commit:
   - `2c5fe47` T-1211: K-05 v1.7, openChatOnText: a number's text opens its chat at …
 - **Files changed:** 13 (+1797 −12), by folder:
@@ -10401,7 +10561,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 354. docs: COMMIT\_HISTORY.md through commit 352 (4283580, \#359) (\#361)
 
-- **Commit:** [`e1bfb1e`](https://github.com/aryamahadik/rosie/commit/e1bfb1e), by Arya Mahadik, 2026-11-11 08:31:48 UTC
+- **Commit:** [`e1bfb1ee`](https://github.com/aryamahadik/rosie/commit/e1bfb1ee), by Arya Mahadik, 2026-11-11 08:31:48 UTC
 - **Pull request:** [#361](https://github.com/aryamahadik/rosie/pull/361) from `task/commit-history-3`, merged 2026-11-11 08:31:49 UTC. It squashed 1 branch commit:
   - `8131fc4` docs: COMMIT\_HISTORY.md through commit 352 (4283580, \#359)
 - **Files changed:** 1 (+45 −1), by folder:
@@ -10417,7 +10577,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 353. T-202: db/seeds/staging-core.ts, staging's seeded core rows for T-201's runner (--set staging-core): the 245 demo shops' business heads in America/New\_York, row for row as core.ts writes them, and for each test phone of K-21's roster but tp-01 (left out for the skeleton seed, DL-341) a person with the customer role at the barber, a handle and a phone row whose chat stays at the table's defaults; numbers read at run time from STAGING\_TEST\_PHONES, else the fixed fake 555-01xx handles the test-phone page sends as (NQ-DB-2); idempotent, refuses a clash or an unreadable variable naming no number; staging-core.int.test.ts proves it, the runner run, core with skeleton in either order, and a grep test (\#360)
 
-- **Commit:** [`121fdff`](https://github.com/aryamahadik/rosie/commit/121fdff), by Arya Mahadik, 2026-11-11 08:31:44 UTC
+- **Commit:** [`121fdff7`](https://github.com/aryamahadik/rosie/commit/121fdff7), by Arya Mahadik, 2026-11-11 08:31:44 UTC
 - **Pull request:** [#360](https://github.com/aryamahadik/rosie/pull/360) from `task/T-202`, merged 2026-11-11 08:31:45 UTC. It squashed 1 branch commit:
   - `ee550db` T-202: db/seeds/staging-core.ts, staging's seeded core rows for T-201…
 - **Files changed:** 2 (+1458 −0), by folder:
@@ -10433,7 +10593,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 352. docs: COMMIT\_HISTORY.md through commit 350 (7f552c9, \#357) (\#359)
 
-- **Commit:** [`4283580`](https://github.com/aryamahadik/rosie/commit/4283580), by Arya Mahadik, 2026-11-11 07:33:59 UTC
+- **Commit:** [`4283580b`](https://github.com/aryamahadik/rosie/commit/4283580b), by Arya Mahadik, 2026-11-11 07:33:59 UTC
 - **Pull request:** [#359](https://github.com/aryamahadik/rosie/pull/359) from `task/commit-history-2`, merged 2026-11-11 07:33:59 UTC. It squashed 1 branch commit:
   - `992e1b7` docs: COMMIT\_HISTORY.md through commit 350 (7f552c9, \#357)
 - **Files changed:** 1 (+17 −1), by folder:
@@ -10449,7 +10609,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 351. T-562: join hop 11, the dispatcher claims the row on PostgreSQL and checks limit 8 (\#358)
 
-- **Commit:** [`4c548fa`](https://github.com/aryamahadik/rosie/commit/4c548fa), by Arya Mahadik, 2026-11-11 07:33:55 UTC
+- **Commit:** [`4c548fa7`](https://github.com/aryamahadik/rosie/commit/4c548fa7), by Arya Mahadik, 2026-11-11 07:33:55 UTC
 - **Pull request:** [#358](https://github.com/aryamahadik/rosie/pull/358) from `task/T-562`, merged 2026-11-11 07:33:55 UTC. It squashed 2 branch commits:
   - `f154065` T-562: join hop 11, the dispatcher claims through K-05 v1.2's outbox …
   - `7fe47e5` T-562: a renewal answered with no recipient at all is unreadable too …
@@ -10477,7 +10637,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 350. docs: COMMIT\_HISTORY.md, every commit on main (1 to 349, through 3cd4827) with its pull request, squashed branch commits, files and message; the closed pull requests; regenerated after each merge (DL-436) (\#357)
 
-- **Commit:** [`7f552c9`](https://github.com/aryamahadik/rosie/commit/7f552c9), by Arya Mahadik, 2026-11-11 07:12:52 UTC
+- **Commit:** [`7f552c9e`](https://github.com/aryamahadik/rosie/commit/7f552c9e), by Arya Mahadik, 2026-11-11 07:12:52 UTC
 - **Pull request:** [#357](https://github.com/aryamahadik/rosie/pull/357) from `task/commit-history-1`, merged 2026-11-11 07:12:52 UTC. It squashed 1 branch commit:
   - `6ec6b53` docs: COMMIT\_HISTORY.md, every commit on main (1 to 349, through 3cd4…
 - **Files changed:** 2 (+8288 −0), by folder:
@@ -10493,7 +10653,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 349. T-201: db/seeds/run.mjs seeds one set (db/seeds/\<set\>.ts, found by file name) into the schema DB\_SCHEMA names, idempotently, printing row counts per table and no part of the database URL; it seeds only a database on this machine or the one STAGING\_DATABASE\_URL names (never production, so --set skeleton is refused elsewhere, DL-341), and refuses a schema that is missing or lacks a migration, so no row reaches public; run.int.test.ts proves it (\#356)
 
-- **Commit:** [`3cd4827`](https://github.com/aryamahadik/rosie/commit/3cd4827), by Arya Mahadik, 2026-11-11 06:50:42 UTC
+- **Commit:** [`3cd4827f`](https://github.com/aryamahadik/rosie/commit/3cd4827f), by Arya Mahadik, 2026-11-11 06:50:42 UTC
 - **Pull request:** [#356](https://github.com/aryamahadik/rosie/pull/356) from `task/T-201`, merged 2026-11-11 06:50:43 UTC. It squashed 1 branch commit:
   - `4be60a4` T-201: db/seeds/run.mjs seeds one set (db/seeds/\<set\>.ts, found by fi…
 - **Files changed:** 2 (+788 −0), by folder:
@@ -10509,7 +10669,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 348. T-1208: an earlier write never replaces the actor's STOP note; STOP and timers fail closed when storage fails (\#355)
 
-- **Commit:** [`fb50f19`](https://github.com/aryamahadik/rosie/commit/fb50f19), by Arya Mahadik, 2026-11-11 06:50:38 UTC
+- **Commit:** [`fb50f19b`](https://github.com/aryamahadik/rosie/commit/fb50f19b), by Arya Mahadik, 2026-11-11 06:50:38 UTC
 - **Pull request:** [#355](https://github.com/aryamahadik/rosie/pull/355) from `task/T-1208`, merged 2026-11-11 06:50:38 UTC. It squashed 3 branch commits:
   - `ed34d8e` T-1208: an earlier turn's answer never replaces the actor's own STOP …
   - `6f756cd` Merge branch 'main' into task/T-1208
@@ -10540,7 +10700,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 347. T-561: join hop 10, finalize fills slots and fixed lines, runs the checks and writes the final parts (\#354)
 
-- **Commit:** [`a55c5f9`](https://github.com/aryamahadik/rosie/commit/a55c5f9), by Arya Mahadik, 2026-11-11 06:07:16 UTC
+- **Commit:** [`a55c5f96`](https://github.com/aryamahadik/rosie/commit/a55c5f96), by Arya Mahadik, 2026-11-11 06:07:16 UTC
 - **Pull request:** [#354](https://github.com/aryamahadik/rosie/pull/354) from `task/T-561`, merged 2026-11-11 06:07:16 UTC. It squashed 2 branch commits:
   - `382bed9` T-561: join hop 10, finalize through @rosie/actions' turn face. The f…
   - `878eb74` T-561: comment wording only: root-run.ts's watch note reflowed, and f…
@@ -10568,7 +10728,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 346. T-1168: the turn face reads' column-list test pins each read's tables, refuses whole-row references and event\_log.sealed\_values and harm\_reports.sealed\_details, and checks each business's table names its business; readFixedLineFacts' commit\_seq subquery adds and o.business\_id is null (\#353)
 
-- **Commit:** [`5b6e81a`](https://github.com/aryamahadik/rosie/commit/5b6e81a), by Arya Mahadik, 2026-11-11 05:49:21 UTC
+- **Commit:** [`5b6e81af`](https://github.com/aryamahadik/rosie/commit/5b6e81af), by Arya Mahadik, 2026-11-11 05:49:21 UTC
 - **Pull request:** [#353](https://github.com/aryamahadik/rosie/pull/353) from `task/T-1168`, merged 2026-11-11 05:49:21 UTC. It squashed 1 branch commit:
   - `392bdec` T-1168: the turn face reads' column-list test pins each read's tables…
 - **Files changed:** 2 (+347 −12), by folder:
@@ -10584,7 +10744,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 345. T-1202: the compiler's publish failure line holds no part of the database URL (\#347)
 
-- **Commit:** [`7e56d02`](https://github.com/aryamahadik/rosie/commit/7e56d02), by Arya Mahadik, 2026-11-11 05:00:48 UTC
+- **Commit:** [`7e56d024`](https://github.com/aryamahadik/rosie/commit/7e56d024), by Arya Mahadik, 2026-11-11 05:00:48 UTC
 - **Pull request:** [#347](https://github.com/aryamahadik/rosie/pull/347) from `task/T-1202`, merged 2026-11-11 05:00:48 UTC. It squashed 2 branch commits:
   - `e73619f` T-1179: compiler publish builds its database client inside its try; a…
   - `8fa9df7` T-1202: compiler publish's failure line, once its client is built, na…
@@ -10611,7 +10771,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 344. T-1207: the Workers pool sends one module per message, so a large Workers test graph never crashes workerd (\#352)
 
-- **Commit:** [`b3a91fd`](https://github.com/aryamahadik/rosie/commit/b3a91fd), by Arya Mahadik, 2026-11-11 05:00:44 UTC
+- **Commit:** [`b3a91fd5`](https://github.com/aryamahadik/rosie/commit/b3a91fd5), by Arya Mahadik, 2026-11-11 05:00:44 UTC
 - **Pull request:** [#352](https://github.com/aryamahadik/rosie/pull/352) from `task/T-1207`, merged 2026-11-11 05:00:45 UTC. It squashed 2 branch commits:
   - `7fd96c0` T-1207: the workers and e2e-workers projects keep no module cache on …
   - `44f4bda` T-1207: the guard's header and infra/ci/README say it runs (not colle…
@@ -10639,7 +10799,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 343. T-1206: a park answered alreadyCommitted reloads the actor's timer copies and re-reads the stopped flag (\#351)
 
-- **Commit:** [`7ae67b3`](https://github.com/aryamahadik/rosie/commit/7ae67b3), by Arya Mahadik, 2026-11-11 04:33:31 UTC
+- **Commit:** [`7ae67b3e`](https://github.com/aryamahadik/rosie/commit/7ae67b3e), by Arya Mahadik, 2026-11-11 04:33:31 UTC
 - **Pull request:** [#351](https://github.com/aryamahadik/rosie/pull/351) from `task/T-1206`, merged 2026-11-11 04:33:31 UTC. It squashed 4 branch commits:
   - `249c2f0` T-1206: a park answered alreadyCommitted tells the handle actor of th…
   - `089299f` Merge branch 'main' into task/T-1206
@@ -10673,7 +10833,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 342. T-560: join hop 9, compose input and the composer's message plan (squashed onto main; replaces \#345) (\#346)
 
-- **Commit:** [`5d69f31`](https://github.com/aryamahadik/rosie/commit/5d69f31), by Arya Mahadik, 2026-11-11 03:15:12 UTC
+- **Commit:** [`5d69f318`](https://github.com/aryamahadik/rosie/commit/5d69f318), by Arya Mahadik, 2026-11-11 03:15:12 UTC
 - **Pull request:** [#346](https://github.com/aryamahadik/rosie/pull/346) from `task/T-560-r3`, merged 2026-11-11 03:15:12 UTC. It squashed 3 branch commits:
   - `c129446` T-560: join hop 9, compose input from the Tool API and the composer's…
   - `d7b0cc5` Merge branch 'main' into task/T-560-r3
@@ -10702,7 +10862,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 341. T-1191: ci.yml's checks job gives every step its postgis service's DATABASE\_URL, as merge-check.yml's job does (it was on the CI script tests step alone), so npm test's contract project (K-05's database-side test, T-1169) finds the database on GitHub, where CI is set and db/repo never falls back to a local one (\#350)
 
-- **Commit:** [`0af7682`](https://github.com/aryamahadik/rosie/commit/0af7682), by Arya Mahadik, 2026-11-11 03:04:53 UTC
+- **Commit:** [`0af76825`](https://github.com/aryamahadik/rosie/commit/0af76825), by Arya Mahadik, 2026-11-11 03:04:53 UTC
 - **Pull request:** [#350](https://github.com/aryamahadik/rosie/pull/350) from `task/T-1191`, merged 2026-11-11 03:04:53 UTC. It squashed 1 branch commit:
   - `a6fc484` T-1191: ci.yml's checks job gives every step its postgis service's DA…
 - **Files changed:** 2 (+543 −3), by folder:
@@ -10721,7 +10881,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 340. T-1204: the handle actor hands readCommit the lease's repeated flag, so a repeat through any commit hook reloads the safety-timer copies (\#349)
 
-- **Commit:** [`1f11487`](https://github.com/aryamahadik/rosie/commit/1f11487), by Arya Mahadik, 2026-11-11 03:04:49 UTC
+- **Commit:** [`1f114875`](https://github.com/aryamahadik/rosie/commit/1f114875), by Arya Mahadik, 2026-11-11 03:04:49 UTC
 - **Pull request:** [#349](https://github.com/aryamahadik/rosie/pull/349) from `task/T-1204`, merged 2026-11-11 03:04:49 UTC. It squashed 1 branch commit:
   - `c1d799d` T-1204: the handle actor hands readCommit the lease's repeated flag, …
 - **Files changed:** 5 (+237 −43), by folder:
@@ -10742,7 +10902,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 339. T-1201: the calendar webhook doors' default body cap is 256 KiB (CALENDAR\_BODY\_LIMIT\_BYTES, 262,144 bytes), the Stripe door's and the Linq webhook's, so a Graph batch (several notifications per POST, no stated count, resent for up to 4 hours on anything but a 2xx: K-16 spike row 10) is not refused on every try. The tests at and over the cap follow the constant (one test title now says 256 KiB). New tests: the default pinned at 262,144 and equal to Stripe's and Linq's; through the Worker's routes with no cap set, Graph's notifications at the cap are read whole, checked and stored, one byte more is 413; a Graph batch of 100 notifications in K-16's shape from two subscriptions (test-support graphBatchExchange) is read, every notice checked and stored once, 200, and its exchange, the door's request, its 100 rows and its span pass K-16, K-07, K-05 v1.1 and K-08. (\#348)
 
-- **Commit:** [`3ed41e9`](https://github.com/aryamahadik/rosie/commit/3ed41e9), by Arya Mahadik, 2026-11-11 02:17:54 UTC
+- **Commit:** [`3ed41e9a`](https://github.com/aryamahadik/rosie/commit/3ed41e9a), by Arya Mahadik, 2026-11-11 02:17:54 UTC
 - **Pull request:** [#348](https://github.com/aryamahadik/rosie/pull/348) from `task/T-1201`, merged 2026-11-11 02:17:55 UTC. It squashed 1 branch commit:
   - `61013bf` T-1201: the calendar webhook doors' default body cap is 256 KiB (CALE…
 - **Files changed:** 5 (+197 −8), by folder:
@@ -10758,7 +10918,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 338. T-1198: the actor's readCommit learns of safety timers from the core results and fails safe (T-1203 folded in) (\#344)
 
-- **Commit:** [`8819277`](https://github.com/aryamahadik/rosie/commit/8819277), by Arya Mahadik, 2026-11-11 02:04:59 UTC
+- **Commit:** [`88192777`](https://github.com/aryamahadik/rosie/commit/88192777), by Arya Mahadik, 2026-11-11 02:04:59 UTC
 - **Pull request:** [#344](https://github.com/aryamahadik/rosie/pull/344) from `task/T-1198`, merged 2026-11-11 02:04:59 UTC. It squashed 3 branch commits:
   - `4c63a6f` T-1198: the actor's readCommit learns of safety timers from the commi…
   - `4daef36` Merge branch 'main' into task/T-1198
@@ -10794,7 +10954,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 337. T-1186: the Worker answers the test-phone page's two calls on staging. T-565's testPhoneSend and testPhoneParts are bound into the gateway's page entry only where ENVIRONMENT is staging and a test phone is given (the Worker's own root gives none until T-567); the TestPhoneLine Durable Object keeps what the doubles sent across requests; index.ts exports TestPhoneLine and wrangler.jsonc binds TEST\_PHONE\_LINE and migrates v2-test-phone-line in env.staging alone; the two infra/ci tests check staging as the top level plus that line; the test-phone rig feeds the joined ports' fakes (deciders, gateReads, turnRows). This is task/T-1186 at 3c7dbca (rounds 1 to 6, QA and the security reviewer PASS) squashed onto main 0715db7 as one commit, because the merge-check's rebase replays the branch's old commits against main's squashed joins 7 and 8 (DL-410). No line differs from 3c7dbca. (\#342)
 
-- **Commit:** [`1edba91`](https://github.com/aryamahadik/rosie/commit/1edba91), by Arya Mahadik, 2026-11-11 00:29:40 UTC
+- **Commit:** [`1edba919`](https://github.com/aryamahadik/rosie/commit/1edba919), by Arya Mahadik, 2026-11-11 00:29:40 UTC
 - **Pull request:** [#342](https://github.com/aryamahadik/rosie/pull/342) from `task/T-1186-r7`, merged 2026-11-11 00:29:41 UTC. It squashed 1 branch commit:
   - `87cb63d` T-1186: the Worker answers the test-phone page's two calls on staging…
 - **Files changed:** 10 (+1086 −12), by folder:
@@ -10814,7 +10974,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 336. T-1195: the Stripe and calendar webhook doors read their body through readCappedText (T-1180's body.ts) under their own config values, ProviderDoors.stripeBodyLimitBytes and calendarBodyLimitBytes, which GatewayDeps.providers carries (defaults 256 KiB and 64 KiB). A body over its door's cap answers 413 {ok:false,error:"payload\_too\_large",trace\_id} before any signature check (a declared length over it unread, a stream cancelled at the chunk that goes over), with only the refused span (bodyTooLarge) logged; every other answer comes in the order it came before the cap, and the verify gets the same text. Tests: each door over its cap 413 and never verified, at its cap verified as sent, declared length and 1 GiB stream, 413 before the header and clock checks, the config values, the Worker's routes, and the 413 spans held to K-08 span and K-16 calendar.span (\#341)
 
-- **Commit:** [`7f606e8`](https://github.com/aryamahadik/rosie/commit/7f606e8), by Arya Mahadik, 2026-11-11 00:29:36 UTC
+- **Commit:** [`7f606e86`](https://github.com/aryamahadik/rosie/commit/7f606e86), by Arya Mahadik, 2026-11-11 00:29:36 UTC
 - **Pull request:** [#341](https://github.com/aryamahadik/rosie/pull/341) from `task/T-1195`, merged 2026-11-11 00:29:37 UTC. It squashed 1 branch commit:
   - `d4f2279` T-1195: the Stripe and calendar webhook doors read their body through…
 - **Files changed:** 8 (+589 −25), by folder:
@@ -10830,7 +10990,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 335. T-1190: the turn face reads the business's sensitive switch (K-05 v1.6) (\#340)
 
-- **Commit:** [`0715db7`](https://github.com/aryamahadik/rosie/commit/0715db7), by Arya Mahadik, 2026-11-11 00:10:43 UTC
+- **Commit:** [`0715db70`](https://github.com/aryamahadik/rosie/commit/0715db70), by Arya Mahadik, 2026-11-11 00:10:43 UTC
 - **Pull request:** [#340](https://github.com/aryamahadik/rosie/pull/340) from `task/T-1190`, merged 2026-11-11 00:10:44 UTC. It squashed 5 branch commits:
   - `edebd57` T-1196: K-05 v1.6, frozen: readOutboxRow gives the row's business's s…
   - `dec43fd` Merge remote-tracking branch 'origin/task/T-1196' into task/T-1197
@@ -10869,7 +11029,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 334. T-559: join hop 8, gate and one commit through the Tool API on local PostgreSQL (\#339)
 
-- **Commit:** [`6373696`](https://github.com/aryamahadik/rosie/commit/6373696), by Arya Mahadik, 2026-11-10 23:37:44 UTC
+- **Commit:** [`63736966`](https://github.com/aryamahadik/rosie/commit/63736966), by Arya Mahadik, 2026-11-10 23:37:44 UTC
 - **Pull request:** [#339](https://github.com/aryamahadik/rosie/pull/339) from `task/T-559`, merged 2026-11-10 23:37:45 UTC. It squashed 4 branch commits:
   - `f4ccf8d` T-559: join hop 8, the gate and one commit through @rosie/actions' tu…
   - `b2e997e` T-559: the root's and the doubles' notes name the joined gate (fiftee…
@@ -10903,7 +11063,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 333. T-1199: K-05's contract test covers v1.6 (fixture part and database side) (\#338)
 
-- **Commit:** [`796d7c9`](https://github.com/aryamahadik/rosie/commit/796d7c9), by Arya Mahadik, 2026-11-10 23:22:54 UTC
+- **Commit:** [`796d7c97`](https://github.com/aryamahadik/rosie/commit/796d7c97), by Arya Mahadik, 2026-11-10 23:22:54 UTC
 - **Pull request:** [#338](https://github.com/aryamahadik/rosie/pull/338) from `task/T-1199`, merged 2026-11-10 23:22:55 UTC. It squashed 4 branch commits:
   - `edebd57` T-1196: K-05 v1.6, frozen: readOutboxRow gives the row's business's s…
   - `dec43fd` Merge remote-tracking branch 'origin/task/T-1196' into task/T-1197
@@ -10936,7 +11096,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 332. T-1197: readOutboxRow answers K-05 v1.6's sensitive switch; the skeleton seed's barber kind of work (\#337)
 
-- **Commit:** [`d1d27a3`](https://github.com/aryamahadik/rosie/commit/d1d27a3), by Arya Mahadik, 2026-11-10 23:22:50 UTC
+- **Commit:** [`d1d27a33`](https://github.com/aryamahadik/rosie/commit/d1d27a33), by Arya Mahadik, 2026-11-10 23:22:50 UTC
 - **Pull request:** [#337](https://github.com/aryamahadik/rosie/pull/337) from `task/T-1197`, merged 2026-11-10 23:22:51 UTC. It squashed 3 branch commits:
   - `edebd57` T-1196: K-05 v1.6, frozen: readOutboxRow gives the row's business's s…
   - `dec43fd` Merge remote-tracking branch 'origin/task/T-1196' into task/T-1197
@@ -10965,7 +11125,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 331. T-1196: K-05 v1.6, frozen: readOutboxRow gives the row's business's sensitive switch, businessSensitive, read from K-23's company\_kinds under the row's business (true when any kind of work lists sensitive in pf\_switches\_a or pf\_switches\_b, false when it has kinds and none does, null when it has none or the row has no business, which the caller reads as on); optional in readOutboxRow.response so every v1 to v1.5 exchange stays valid, required in the new readOutboxRow.v1dot6Response, which the exchange's outcome names first; 3 accepted fixtures (a barbershop false, a practice with the switch in flow A only true, the barbershop with no kinds of work null) and 2 refused (the switch left out, the switch per flow); README item 45, defaults 66 to 69, item 35's table row source, open gap 30 narrowed and gap 47 (turn 1 reads null under D-017's seed), consumers T-1197 and T-1190, change log; T-1102's consent fields renumbered to v1.7 (DL-391) (\#334)
 
-- **Commit:** [`a84d48f`](https://github.com/aryamahadik/rosie/commit/a84d48f), by Arya Mahadik, 2026-11-10 23:22:46 UTC
+- **Commit:** [`a84d48f3`](https://github.com/aryamahadik/rosie/commit/a84d48f3), by Arya Mahadik, 2026-11-10 23:22:46 UTC
 - **Pull request:** [#334](https://github.com/aryamahadik/rosie/pull/334) from `task/T-1196`, merged 2026-11-10 23:22:47 UTC. It squashed 1 branch commit:
   - `edebd57` T-1196: K-05 v1.6, frozen: readOutboxRow gives the row's business's s…
 - **Files changed:** 9 (+1431 −13), by folder:
@@ -10983,7 +11143,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 330. T-087: contract test event-trace.v1 (K-08 v1 and v1.1), the fixture part. Every entry of contracts/event-trace/fixtures/index.json is checked against the schema its version names (the T-003 harness and again here), the count equal to the entries, and every accepted v1 fixture against v1.1; each refused fixture is refused for the one field the README names and accepted with only that field put right (mend-then-accept, with its accepted twin); removing any required field, at any depth and along the branch each fixture takes, from a copy of each accepted fixture makes it refused. What the schema leaves to the test, each also firing on a damaged copy the schema still takes: the skeleton's hops once each in D-017's order; no raw number or text in a span; seq, at, trace, bundle, turn and job per trace; joined traces; a commit's one turn and trace; each kind's table from the README's kinds tables; reply time; model-call costs at the README's prices; no words, phone or email in a plain value at any depth; export rows; the invariant run; v1.1's columns per added kind (with the review item rows the README asks the test to build) and sealed bytes. SIDE\_CHECKS holds the README's 5 producer and 4 consumer sides (\#336)
 
-- **Commit:** [`6bfeb96`](https://github.com/aryamahadik/rosie/commit/6bfeb96), by Arya Mahadik, 2026-11-10 22:55:14 UTC
+- **Commit:** [`6bfeb962`](https://github.com/aryamahadik/rosie/commit/6bfeb962), by Arya Mahadik, 2026-11-10 22:55:14 UTC
 - **Pull request:** [#336](https://github.com/aryamahadik/rosie/pull/336) from `task/T-087`, merged 2026-11-10 22:55:15 UTC. It squashed 1 branch commit:
   - `09e3eb5` T-087: contract test event-trace.v1 (K-08 v1 and v1.1), the fixture p…
 - **Files changed:** 1 (+2214 −0), by folder:
@@ -10999,7 +11159,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 329. T-086: contract test outbox-effects.v1 (K-07 fixtures) (\#335)
 
-- **Commit:** [`9275ba4`](https://github.com/aryamahadik/rosie/commit/9275ba4), by Arya Mahadik, 2026-11-10 22:55:10 UTC
+- **Commit:** [`9275ba46`](https://github.com/aryamahadik/rosie/commit/9275ba46), by Arya Mahadik, 2026-11-10 22:55:10 UTC
 - **Pull request:** [#335](https://github.com/aryamahadik/rosie/pull/335) from `task/T-086`, merged 2026-11-10 22:55:10 UTC. It squashed 2 branch commits:
   - `f140cf7` T-086: K-07's contract test, the fixture part (tests/contract/outbox-…
   - `87ae06d` T-086: the header states exactly which lifeChain clauses and retry ru…
@@ -11026,7 +11186,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 328. T-1194: the commit's written list leaves out core-action rows, as K-09 v1.5 default 134 and commit-s1-01.json do. committedOf filters K-05's written by the rows each core run's writes name (build.ts rowsNamedBy: a state insert by its K-04 id, an update by its key's one column, a question with its clock row, a close, a clock cancel, a reservation, an effect); the one K-05 request still writes them, and outboxRows, promoted and the base's span stay whole. T-1141's CORE\_ROW\_IN\_WRITTEN is gone: the turn face's commit and chain tests hold the whole answer to commit-s1-01.json's outcome and K-05's one commit to the safety record plus the listed rows. Tests: rowsNamedBy on every list and against the K-05 fake; crisis and threat records committed with none listed and their line in outboxRows; core.test.ts's turn-1 commit expects the record in K-05's commit, not in written (\#333)
 
-- **Commit:** [`cbcaa66`](https://github.com/aryamahadik/rosie/commit/cbcaa66), by Arya Mahadik, 2026-11-10 21:02:35 UTC
+- **Commit:** [`cbcaa66e`](https://github.com/aryamahadik/rosie/commit/cbcaa66e), by Arya Mahadik, 2026-11-10 21:02:35 UTC
 - **Pull request:** [#333](https://github.com/aryamahadik/rosie/pull/333) from `task/T-1194`, merged 2026-11-10 21:02:35 UTC. It squashed 1 branch commit:
   - `83e0fb7` T-1194: the commit's written list leaves out core-action rows, as K-0…
 - **Files changed:** 8 (+261 −35), by folder:
@@ -11044,7 +11204,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 327. T-558: join hop 7, decide (two reads, one Sonnet re-read) through @rosie/ai (\#331)
 
-- **Commit:** [`fa9347d`](https://github.com/aryamahadik/rosie/commit/fa9347d), by Arya Mahadik, 2026-11-10 20:26:28 UTC
+- **Commit:** [`fa9347d1`](https://github.com/aryamahadik/rosie/commit/fa9347d1), by Arya Mahadik, 2026-11-10 20:26:28 UTC
 - **Pull request:** [#331](https://github.com/aryamahadik/rosie/pull/331) from `task/T-558`, merged 2026-11-10 20:26:28 UTC. It squashed 4 branch commits:
   - `dd96f11` T-558: work in progress, interrupted by a network outage (about 13:20…
   - `a821575` Merge branch 'main' into task/T-558
@@ -11078,7 +11238,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 326. T-1176: the core's own danger line carries the danger question. recordSafetyOutcome's line (RecordLine, the plan's and the core run's line) adds K-01 safetyAsk, its words from the pinned bundle through a new SafetyWords port (SafetyDeps.words), in the handle actor's cases from the record's own labels: a label of unknown tense whose outcome is not No (K-34's stored labels and tenses on a repeat), placed on the same line after a space (lineWordsOf). Never after No, a known tense or a timed-out read. A threat's line to the owner and the outage line ask nothing. With no words port a line that asks answers notBuilt, and with no safetyAsk words the record is refused (noSafetyAsk). Tests in safety-ask.test.ts: the emergency and crisis lines of unknown tense carry it once, over, now, could restart, joke, No and timed-out reads carry none, and parity with checkedLineFor on K-02's 11 safety reads and their 8 unknown-tense versions (\#330)
 
-- **Commit:** [`12229f7`](https://github.com/aryamahadik/rosie/commit/12229f7), by Arya Mahadik, 2026-11-10 20:26:24 UTC
+- **Commit:** [`12229f76`](https://github.com/aryamahadik/rosie/commit/12229f76), by Arya Mahadik, 2026-11-10 20:26:24 UTC
 - **Pull request:** [#330](https://github.com/aryamahadik/rosie/pull/330) from `task/T-1176`, merged 2026-11-10 20:26:25 UTC. It squashed 1 branch commit:
   - `bdd7378` T-1176: the core's own danger line carries the danger question. recor…
 - **Files changed:** 8 (+907 −10), by folder:
@@ -11094,7 +11254,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 325. T-1180: the page entry and the Linq webhook cap a request's body (413 before it is read whole, nothing logged), and the page span carries only K-21's own error names (\#329)
 
-- **Commit:** [`167bff3`](https://github.com/aryamahadik/rosie/commit/167bff3), by Arya Mahadik, 2026-11-10 20:26:20 UTC
+- **Commit:** [`167bff36`](https://github.com/aryamahadik/rosie/commit/167bff36), by Arya Mahadik, 2026-11-10 20:26:20 UTC
 - **Pull request:** [#329](https://github.com/aryamahadik/rosie/pull/329) from `task/T-1180`, merged 2026-11-10 20:26:21 UTC. It squashed 2 branch commits:
   - `b6b6838` T-1180: the page entry and the Linq webhook read their body under a c…
   - `226ee1e` T-1180: the 413 ending joins the table of page entry spans held to K-…
@@ -11122,7 +11282,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 324. T-1193: the Tool API base takes a per-call option, CallOptions.callerRecordsHop, naming the hop its caller records itself: when it is the hop the call's span takes, the base records no span; the checks, scope, handler, answer and every error are unchanged, and any other hop, an empty option or none changes nothing (a page's pageRequest and an agent's agentApiRequest span stay). The turn face passes it for the handle actor's calls: gateAndCommit names the gate (TURN\_RECORDS\_GATE), composeInput and finalizeMessage fillAndChecks (TURN\_RECORDS\_FILL\_AND\_CHECKS), so the turn's per-part gate spans, its commit span and its one fillAndChecks span per row are the trace's only spans for those hops; buildFrontier passes none and keeps the base's span (CQ-159, T-557). Tests: tool-api.test.ts holds the three calls with and without the option on every accepted v1 exchange and seven refusal and failure paths each, an ended trace, other hops and every call without it; commit.test.ts, rows.test.ts and chain.test.ts show the face leaves no base span while the same handlers on a base without the option give the same answers and their one span, labels only; the turn's one trace keeps only the frontier span; calls.int.test.ts expects no base span (DL-376) (\#328)
 
-- **Commit:** [`db5090b`](https://github.com/aryamahadik/rosie/commit/db5090b), by Arya Mahadik, 2026-11-10 20:26:16 UTC
+- **Commit:** [`db5090b1`](https://github.com/aryamahadik/rosie/commit/db5090b1), by Arya Mahadik, 2026-11-10 20:26:16 UTC
 - **Pull request:** [#328](https://github.com/aryamahadik/rosie/pull/328) from `task/T-1193`, merged 2026-11-10 20:26:17 UTC. It squashed 1 branch commit:
   - `68fbd19` T-1193: the Tool API base takes a per-call option, CallOptions.caller…
 - **Files changed:** 8 (+487 −34), by folder:
@@ -11140,7 +11300,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 323. T-1192: the Worker serves web's pages last before its 404: runtime/src/index.ts calls servePage(request, env.BASE\_PATH) after the Linq webhook, the provider webhooks, the page entry and health, so GET {BASE\_PATH}/privacy (rosfield.com/test/privacy on staging) answers 200 with T-1171's privacy notice and web's headers as they are (its CSP, no set-cookie, no trace id, no log line); HEAD gives no body and any other method web's 405; every other path keeps the 404 JSON with its trace id. index.worker.test.ts proves it inside workerd, with the CSP's style hash taken there, /test/privacy/ and /privacy on staging still 404, env.BASE\_PATH followed, and the Linq route, the page entry and the other routes answering as before (\#327)
 
-- **Commit:** [`8c8553f`](https://github.com/aryamahadik/rosie/commit/8c8553f), by Arya Mahadik, 2026-11-10 15:29:53 UTC
+- **Commit:** [`8c8553fb`](https://github.com/aryamahadik/rosie/commit/8c8553fb), by Arya Mahadik, 2026-11-10 15:29:53 UTC
 - **Pull request:** [#327](https://github.com/aryamahadik/rosie/pull/327) from `task/T-1192`, merged 2026-11-10 15:29:54 UTC. It squashed 1 branch commit:
   - `55de3d8` T-1192: the Worker serves web's pages last before its 404: runtime/sr…
 - **Files changed:** 2 (+228 −5), by folder:
@@ -11156,7 +11316,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 322. T-1178: the One question check counts only the composed words. Each fixed line's source words (safetyAsk, the opt-out line, the privacy link, any other) and the typed options are taken out at their first place before the question marks are counted, so a composed question beside the danger question the inserter adds after a safety line passes, and two composed questions still fail with K-03's detail. checks.test.ts's one assertion that pinned the retired rule now asserts the card's, with a two-composed-questions counterpart; one-question.test.ts proves it alone, through the inserter and through the finalize call. (\#326)
 
-- **Commit:** [`e8844cb`](https://github.com/aryamahadik/rosie/commit/e8844cb), by Arya Mahadik, 2026-11-10 15:29:49 UTC
+- **Commit:** [`e8844cb9`](https://github.com/aryamahadik/rosie/commit/e8844cb9), by Arya Mahadik, 2026-11-10 15:29:49 UTC
 - **Pull request:** [#326](https://github.com/aryamahadik/rosie/pull/326) from `task/T-1178`, merged 2026-11-10 15:29:49 UTC. It squashed 1 branch commit:
   - `2b40c15` T-1178: the One question check counts only the composed words. Each f…
 - **Files changed:** 3 (+222 −6), by folder:
@@ -11172,7 +11332,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 321. T-1189: the Worker's prebuilt validators check composeInput by K-09 v1.6: build:validators takes tool-api.v1.6 as a root and compiles composeInput's request, response and errors from v1.6 (every other call from v1.5), records its exchanges' answers against v1.6 and still holds every validator to Ajv's compiled answer before any file is placed; validator.ts drops its workerd branch (composeInput by v1.6 in Node and workerd alike) and reads one list, SCHEMA\_FILES, now holding v1.6 and K-03 v1.1, which the prebuilt code is held to (its v1.6 id and calls too); validator.worker.test.ts accepts compose-input-s1-02-v1.6.json, fixedLineRow and masterLineMissing in workerd and refuses a term fact with no source, the Function/eval trap at 0 calls; validator.test.ts pins the closure with v1.6 (\#324)
 
-- **Commit:** [`f9fae52`](https://github.com/aryamahadik/rosie/commit/f9fae52), by Arya Mahadik, 2026-11-10 13:07:41 UTC
+- **Commit:** [`f9fae52e`](https://github.com/aryamahadik/rosie/commit/f9fae52e), by Arya Mahadik, 2026-11-10 13:07:41 UTC
 - **Pull request:** [#324](https://github.com/aryamahadik/rosie/pull/324) from `task/T-1189`, merged 2026-11-10 13:07:41 UTC. It squashed 1 branch commit:
   - `c5994a5` T-1189: the Worker's prebuilt validators check composeInput by K-09 v…
 - **Files changed:** 4 (+307 −90), by folder:
@@ -11189,7 +11349,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 320. T-1141: turn face, part 2: gate and commit, compose input and finalize for turn 1 on local PostgreSQL, the reader mapped as K-05 v1.5's rowReader; one turn id and trace id, replay writes nothing (\#325)
 
-- **Commit:** [`efbb504`](https://github.com/aryamahadik/rosie/commit/efbb504), by Arya Mahadik, 2026-11-10 13:07:36 UTC
+- **Commit:** [`efbb5045`](https://github.com/aryamahadik/rosie/commit/efbb5045), by Arya Mahadik, 2026-11-10 13:07:36 UTC
 - **Pull request:** [#325](https://github.com/aryamahadik/rosie/pull/325) from `task/T-1141`, merged 2026-11-10 13:07:36 UTC. It squashed 8 branch commits:
   - `49baecc` T-1141: the turn face's gate and commit, compose input and finalize b…
   - `1886305` T-1141: compose input and finalize proven on PostgreSQL; the unit cha…
@@ -11243,7 +11403,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 319. T-1171: the privacy notice page at BASE\_PATH + /privacy (rosfield.com/test/privacy on staging), the address on the last line of Rosie's first text: Q-30's default stand-in words, each from a RULES line, shown as a draft and marked in source as waiting for Jay's words before production (noindex); the page frame's footer links every page to it (RULES 4.3, Q-30); servePage answers GET and HEAD there with no cookie, script, form, outside resource or reader data, under a CSP that loads only the frame's hashed inline style; not yet routed by the Worker (runtime/src/index.ts, outside the card) (\#322)
 
-- **Commit:** [`5f154d5`](https://github.com/aryamahadik/rosie/commit/5f154d5), by Arya Mahadik, 2026-11-10 12:45:17 UTC
+- **Commit:** [`5f154d59`](https://github.com/aryamahadik/rosie/commit/5f154d59), by Arya Mahadik, 2026-11-10 12:45:17 UTC
 - **Pull request:** [#322](https://github.com/aryamahadik/rosie/pull/322) from `task/T-1171`, merged 2026-11-10 12:45:18 UTC. It squashed 1 branch commit:
   - `f0e2678` T-1171: the privacy notice page at BASE\_PATH + /privacy (rosfield.com…
 - **Files changed:** 8 (+763 −1), by folder:
@@ -11262,7 +11422,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 318. T-1169: K-05's contract test covers v1.3 to v1.5: every v1.3 and v1.4 fixture run against db/repo on PostgreSQL in its role, v1.5's row reader with its three security cases, drift caught (\#321)
 
-- **Commit:** [`22810cf`](https://github.com/aryamahadik/rosie/commit/22810cf), by Arya Mahadik, 2026-11-10 12:45:13 UTC
+- **Commit:** [`22810cfb`](https://github.com/aryamahadik/rosie/commit/22810cfb), by Arya Mahadik, 2026-11-10 12:45:13 UTC
 - **Pull request:** [#321](https://github.com/aryamahadik/rosie/pull/321) from `task/T-1169`, merged 2026-11-10 12:45:13 UTC. It squashed 2 branch commits:
   - `a46067c` T-1169: K-05's contract test covers v1.3, v1.4 and v1.5 (T-1188 folde…
   - `9dda4b4` T-1169: the README-list check asks only that some written-for version…
@@ -11289,7 +11449,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 317. T-557: join 6: the actor's frontier comes from the real Tool API over bundle v0 pinned at turn start (KV, else PostgreSQL); turn 1's one choice is the sign-up door; one frontier span per turn (\#323)
 
-- **Commit:** [`b11bea0`](https://github.com/aryamahadik/rosie/commit/b11bea0), by Arya Mahadik, 2026-11-10 12:45:09 UTC
+- **Commit:** [`b11bea03`](https://github.com/aryamahadik/rosie/commit/b11bea03), by Arya Mahadik, 2026-11-10 12:45:09 UTC
 - **Pull request:** [#323](https://github.com/aryamahadik/rosie/pull/323) from `task/T-557`, merged 2026-11-10 12:45:09 UTC. It squashed 3 branch commits:
   - `a1c84a1` T-557: join hop 6 (work in progress, NEED): the frontier port, split …
   - `a6690ab` Merge branch 'main' into task/T-557
@@ -11319,7 +11479,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 316. T-565: the test-phone page's server calls, staging only (K-21 v1): testPhoneSend builds the roster phone's K-06 text, has the Linq double sign it (K-11 doubleWebhook) and posts it to the gateway's Linq entry, answering the event id, the trace the gateway opened and its status (test-phone-send.json; the event is test-phone-page.json byte for byte); testPhoneParts lists the Linq double's parts with their times and answers through a parts recorder on staging's send path, the email double's emails to the phone's own person, its stop state and chat link (test-phone-parts.json); anywhere ENVIRONMENT is not exactly staging both answer stagingOnly before reading the request or any port; a phone off the roster answers notTestPhone with nothing signed or posted; signInNeeded and notTester by the token's sha256; hand-written K-21 request checks held to Ajv; repeat-safe event ids from the session and requestId; unit and workerd tests; adapters exports ./email/double (\#320)
 
-- **Commit:** [`c99dfe5`](https://github.com/aryamahadik/rosie/commit/c99dfe5), by Arya Mahadik, 2026-11-10 12:04:03 UTC
+- **Commit:** [`c99dfe51`](https://github.com/aryamahadik/rosie/commit/c99dfe51), by Arya Mahadik, 2026-11-10 12:04:03 UTC
 - **Pull request:** [#320](https://github.com/aryamahadik/rosie/pull/320) from `task/T-565`, merged 2026-11-10 12:04:03 UTC. It squashed 1 branch commit:
   - `0c91fe0` T-565: the test-phone page's server calls, staging only (K-21 v1): te…
 - **Files changed:** 12 (+2266 −0), by folder:
@@ -11336,7 +11496,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 315. T-1185: commitTurn and fireClock write a state write's bytea value in K-04's hex text form as the bytes it spells (db/repo/bytea.ts), never as the string's own characters, so a safety record's sealed words open with the person's key. Any other form throws and nothing is written. The other bytea writes in db/repo already pass bytes. (\#319)
 
-- **Commit:** [`8e82b1d`](https://github.com/aryamahadik/rosie/commit/8e82b1d), by Arya Mahadik, 2026-11-10 12:03:59 UTC
+- **Commit:** [`8e82b1d8`](https://github.com/aryamahadik/rosie/commit/8e82b1d8), by Arya Mahadik, 2026-11-10 12:03:59 UTC
 - **Pull request:** [#319](https://github.com/aryamahadik/rosie/pull/319) from `task/T-1185`, merged 2026-11-10 12:03:59 UTC. It squashed 1 branch commit:
   - `ad6dc99` T-1185: commitTurn and fireClock write a state write's bytea value in…
 - **Files changed:** 6 (+571 −14), by folder:
@@ -11352,7 +11512,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 314. T-1174: compose input answers K-09 v1.6: S1-02's card lines as K-03 v1.1 term facts with their source lines (a fixed table for S1-02's four, the generic K-01 path elsewhere; default 137 on every step, slot facts then terms, default 141), fixedLineRow and masterLineMissing answered where T-309 threw, the reader addressed by the first word of the name, K-03 v1.1 the default check; the Tool API types and checks composeInput by v1.6 (types off v1.6's exchange, pinned), every other call on v1.5; the Worker's prebuilt validators still hold v1.5's composeInput (\#318)
 
-- **Commit:** [`6b537ed`](https://github.com/aryamahadik/rosie/commit/6b537ed), by Arya Mahadik, 2026-11-10 12:03:55 UTC
+- **Commit:** [`6b537ed4`](https://github.com/aryamahadik/rosie/commit/6b537ed4), by Arya Mahadik, 2026-11-10 12:03:55 UTC
 - **Pull request:** [#318](https://github.com/aryamahadik/rosie/pull/318) from `task/T-1174`, merged 2026-11-10 12:03:56 UTC. It squashed 1 branch commit:
   - `366a836` T-1174: compose input answers K-09 v1.6: S1-02's card lines as K-03 v…
 - **Files changed:** 19 (+954 −164), by folder:
@@ -11370,7 +11530,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 313. T-1184: freeze K-05 v1.5: a row to someone with no role on the sign-up section is read by its step line's one audience (S1-02: the owner); every other no-role row refused; never stored as a role (\#317)
 
-- **Commit:** [`66af3c3`](https://github.com/aryamahadik/rosie/commit/66af3c3), by Arya Mahadik, 2026-11-10 11:38:37 UTC
+- **Commit:** [`66af3c38`](https://github.com/aryamahadik/rosie/commit/66af3c38), by Arya Mahadik, 2026-11-10 11:38:37 UTC
 - **Pull request:** [#317](https://github.com/aryamahadik/rosie/pull/317) from `task/T-1184`, merged 2026-11-10 11:38:37 UTC. It squashed 3 branch commits:
   - `2779ed2` T-1184: freeze K-05 v1.5, the sign-up reading (item 44): a row whose …
   - `3412828` T-1184: K-05 README open gap 46 (the business a sign-up row is read u…
@@ -11404,7 +11564,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 312. T-1183: the gate passes K-02 v1.1's sign-up door: limit 1's changeOf answers anyone for the door K-02 v1.1 default 9 shapes (S1-01, no booking, no stake or field; any other sign-up door is unknown, so nobodyDecides), and turn 1's part gets commit-s1-01.json's six answers (limit 2 notChecked, limit 4 pass with nothing to compare, limit 6 pass with no value; 3 and 5 already notChecked), proven through the shipped registry with nothing read (limits.test.ts) and in each limit's fixture loop; K-01's five doors and a door the gate does not know answer as before (DL-364) (\#316)
 
-- **Commit:** [`91a8ad4`](https://github.com/aryamahadik/rosie/commit/91a8ad4), by Arya Mahadik, 2026-11-10 11:38:32 UTC
+- **Commit:** [`91a8ad4a`](https://github.com/aryamahadik/rosie/commit/91a8ad4a), by Arya Mahadik, 2026-11-10 11:38:32 UTC
 - **Pull request:** [#316](https://github.com/aryamahadik/rosie/pull/316) from `task/T-1183`, merged 2026-11-10 11:38:33 UTC. It squashed 1 branch commit:
   - `b43e882` T-1183: the gate passes K-02 v1.1's sign-up door: limit 1's changeOf …
 - **Files changed:** 12 (+602 −16), by folder:
@@ -11425,7 +11585,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 311. T-569: deploy steps 3 and 4: publish bundle v0 and switch the active id, then the flags with the skeleton flag on staging only; one shared database URL check and scrub; never production (\#315)
 
-- **Commit:** [`286206d`](https://github.com/aryamahadik/rosie/commit/286206d), by Arya Mahadik, 2026-11-10 11:10:03 UTC
+- **Commit:** [`286206d5`](https://github.com/aryamahadik/rosie/commit/286206d5), by Arya Mahadik, 2026-11-10 11:10:03 UTC
 - **Pull request:** [#315](https://github.com/aryamahadik/rosie/pull/315) from `task/T-569`, merged 2026-11-10 11:10:03 UTC. It squashed 5 branch commits:
   - `2f4fd85` T-569: deploy steps 3 and 4: publish-bundle.sh publishes a bundle (Po…
   - `1a55349` T-569: flags.sh and publish-bundle.sh read no CI switch (DL-024: lib.…
@@ -11465,7 +11625,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 310. T-1175: the double's composer loader reads K-03 v1.1 as T-1145 made it read K-02 v1.1 (loadPlanContract takes a version, v1 by default, frozen.json-gated; each composer file checked by its own version, loaded as one double; an input or id recorded twice across the files refused); new ai/recordings/composer.v1.1.json: input-s1-02-v1.1.json gives plan-s1-02.json, and recording 4 (the JOIN run's composer call) re-keyed on K-09 v1.6's compose input with the run's own ids (T-248's turn hash of evt-sam-0000, writes.ts row id), its four term facts S1-02's card lines in bundles/v0 as published under its pinned id; a v1 input with no term facts is still refused on plan-s1-02 (literalValue x2) and the JOIN run's v1 key gets NoRecordingError; T-376's suite turns plan-s1-02 from WAITING to given (57 to 58 passed). No live call: fetch stubbed and asserted never called (\#314)
 
-- **Commit:** [`0f0f18a`](https://github.com/aryamahadik/rosie/commit/0f0f18a), by Arya Mahadik, 2026-11-10 10:54:17 UTC
+- **Commit:** [`0f0f18ab`](https://github.com/aryamahadik/rosie/commit/0f0f18ab), by Arya Mahadik, 2026-11-10 10:54:17 UTC
 - **Pull request:** [#314](https://github.com/aryamahadik/rosie/pull/314) from `task/T-1175`, merged 2026-11-10 10:54:17 UTC. It squashed 1 branch commit:
   - `db68233` T-1175: the double's composer loader reads K-03 v1.1 as T-1145 made i…
 - **Files changed:** 12 (+718 −156), by folder:
@@ -11484,7 +11644,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 309. T-418: the email double for K-12 v1 (C-213): sendEmail records each email once per idempotency key (Resend's 24 hours; another email under one key is refused 409 invalid\_idempotent\_request), refuses K-12's refused fixtures and the checks K-12 leaves to code, and answers any sendEmail failure the test chooses; verifyWebhook checks Svix signatures (id.timestamp.raw, HMAC-SHA256, 300 s) under a test key and reads Resend's delivered, bounced, suppressed, failed and received bodies; doubleWebhook fakes signed receipts of recorded emails and two-step inbound replies kept for readReply, which gives K-06 email-reply-check-passed and -failed byte for byte; doubleSentEmails lists the record for the test-phone page. 48 tests over all 21 K-12 fixtures. (\#313)
 
-- **Commit:** [`b3503c3`](https://github.com/aryamahadik/rosie/commit/b3503c3), by Arya Mahadik, 2026-11-10 10:54:12 UTC
+- **Commit:** [`b3503c3c`](https://github.com/aryamahadik/rosie/commit/b3503c3c), by Arya Mahadik, 2026-11-10 10:54:12 UTC
 - **Pull request:** [#313](https://github.com/aryamahadik/rosie/pull/313) from `task/T-418`, merged 2026-11-10 10:54:13 UTC. It squashed 1 branch commit:
   - `3c5ff67` T-418: the email double for K-12 v1 (C-213): sendEmail records each e…
 - **Files changed:** 6 (+2435 −0), by folder:
@@ -11500,7 +11660,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 308. T-1147: the frontier offers K-02 v1.1's sign-up door to S1-01 when nothing targets the sender, only when the pinned bundle holds its step; T-293's hubs and doors source wired into the default registry (an AI change) (\#312)
 
-- **Commit:** [`062a26c`](https://github.com/aryamahadik/rosie/commit/062a26c), by Arya Mahadik, 2026-11-10 10:37:51 UTC
+- **Commit:** [`062a26c2`](https://github.com/aryamahadik/rosie/commit/062a26c2), by Arya Mahadik, 2026-11-10 10:37:51 UTC
 - **Pull request:** [#312](https://github.com/aryamahadik/rosie/pull/312) from `task/T-1147`, merged 2026-11-10 10:37:51 UTC. It squashed 3 branch commits:
   - `d0c2dab` T-1147: the sign-up door to S1-01 (K-02 v1.1 default 9) from T-293's …
   - `1d652e6` Merge branch 'main' into task/T-1147
@@ -11532,7 +11692,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 307. T-1170: the handle actor's receive span takes its at from one reading of the actor's clock as the call begins (K-08: when the hop started), its ms from then to the answer, so it starts no later than any span begun inside it (the safety read's, a receipt hook's); two Workers tests prove it on a receipt and on a text; the skeleton e2e's row 3 now holds the safety read to start no earlier than the inbox entry (entry.at \<= read.at, DL-352) (\#311)
 
-- **Commit:** [`fd0483c`](https://github.com/aryamahadik/rosie/commit/fd0483c), by Arya Mahadik, 2026-11-10 10:04:04 UTC
+- **Commit:** [`fd0483c4`](https://github.com/aryamahadik/rosie/commit/fd0483c4), by Arya Mahadik, 2026-11-10 10:04:04 UTC
 - **Pull request:** [#311](https://github.com/aryamahadik/rosie/pull/311) from `task/T-1170`, merged 2026-11-10 10:04:05 UTC. It squashed 1 branch commit:
   - `7abaddb` T-1170: the handle actor's receive span takes its at from one reading…
 - **Files changed:** 4 (+144 −16), by folder:
@@ -11549,7 +11709,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 306. T-1165: compose input's K-03 checks run inside the Worker on prebuilt standalone validators: build:validators compiles K-03 v1's and v1.1's composeInput into compose-input-validators.js (its own module, same strict options, held to Ajv's compiled answer on every K-03 input fixture under both versions before it is placed); check.ts uses it in workerd and Ajv in Node, a checker per K-03 version (v1 by default); check.test.ts and check.worker.test.ts (Function/eval trap at 0 calls) (\#310)
 
-- **Commit:** [`0d7e131`](https://github.com/aryamahadik/rosie/commit/0d7e131), by Arya Mahadik, 2026-11-10 10:04:00 UTC
+- **Commit:** [`0d7e1317`](https://github.com/aryamahadik/rosie/commit/0d7e1317), by Arya Mahadik, 2026-11-10 10:04:00 UTC
 - **Pull request:** [#310](https://github.com/aryamahadik/rosie/pull/310) from `task/T-1165`, merged 2026-11-10 10:04:01 UTC. It squashed 1 branch commit:
   - `2029865` T-1165: compose input's K-03 checks run inside the Worker on prebuilt…
 - **Files changed:** 4 (+867 −61), by folder:
@@ -11566,7 +11726,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 305. T-1173: freeze K-09 v1.6: composeInput answers K-03 v1.1's composer input, so a row's input carries its step card's lines as term facts with their source lines; compose-input-s1-02-v1.6.json's input is K-03's input-s1-02-v1.1.json word for word (named rule inputIsK03Fixture compares the two files); errors fixedLineRow and masterLineMissing; rule termFactsFromCard; 3 accepted and 3 refused fixtures; defaults 137 to 141, open gaps 124 to 128; open gap 79 closed for S1-02's rows (\#309)
 
-- **Commit:** [`c3833f0`](https://github.com/aryamahadik/rosie/commit/c3833f0), by Arya Mahadik, 2026-11-10 09:50:12 UTC
+- **Commit:** [`c3833f09`](https://github.com/aryamahadik/rosie/commit/c3833f09), by Arya Mahadik, 2026-11-10 09:50:12 UTC
 - **Pull request:** [#309](https://github.com/aryamahadik/rosie/pull/309) from `task/T-1173`, merged 2026-11-10 09:50:12 UTC. It squashed 1 branch commit:
   - `2ef6908` T-1173: freeze K-09 v1.6: composeInput answers K-03 v1.1's composer i…
 - **Files changed:** 11 (+715 −6), by folder:
@@ -11584,7 +11744,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 304. T-021: freeze K-12 v1, the email port (Resend): send with its idempotency key, Svix-signed webhooks, the two-step inbound reply, the double's calls; spike findings recorded, read-only (\#308)
 
-- **Commit:** [`78b91de`](https://github.com/aryamahadik/rosie/commit/78b91de), by Arya Mahadik, 2026-11-10 09:28:26 UTC
+- **Commit:** [`78b91de4`](https://github.com/aryamahadik/rosie/commit/78b91de4), by Arya Mahadik, 2026-11-10 09:28:26 UTC
 - **Pull request:** [#308](https://github.com/aryamahadik/rosie/pull/308) from `task/T-021`, merged 2026-11-10 09:28:27 UTC. It squashed 5 branch commits:
   - `3624612` T-021: freeze K-12 v1, the email port (Resend): sendEmail, verifyWebh…
   - `474da2f` T-021: K-12 README: the error body's source named as the resend-rs SD…
@@ -11629,7 +11789,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 303. T-266: the page entry routes K-21 v1's 26 page and console calls, each a POST to {BASE\_PATH}/page-api/\<call\>, to the action layer's handler for that call (GatewayDeps.pages; not-connected stubs answering 503 until C-074 joins them), under a pageRequest trace opened per request (a valid incoming x-trace-id kept, else a new one) and one K-08 pageRequest span per answer; the six staging-only calls answer K-21's stagingOnly, unread and with no handler run, wherever ENVIRONMENT is not exactly staging; a 200 carries only the call's outcome, a body that is no JSON object gets 400, a failed handler 503, another method 405 and an unknown path still the 404 JSON with its trace id; nothing of a request reaches a log or a span. Tests: every K-21 v1 fixture, accepted and refused, posted at its route (Workers, 57) and the call lists, spans and trace held to K-21's enums and K-08's schema (Node, 13) (\#307)
 
-- **Commit:** [`8c8df29`](https://github.com/aryamahadik/rosie/commit/8c8df29), by Arya Mahadik, 2026-11-10 09:28:22 UTC
+- **Commit:** [`8c8df299`](https://github.com/aryamahadik/rosie/commit/8c8df299), by Arya Mahadik, 2026-11-10 09:28:22 UTC
 - **Pull request:** [#307](https://github.com/aryamahadik/rosie/pull/307) from `task/T-266`, merged 2026-11-10 09:28:23 UTC. It squashed 1 branch commit:
   - `b1fd5d1` T-266: the page entry routes K-21 v1's 26 page and console calls, eac…
 - **Files changed:** 10 (+1509 −8), by folder:
@@ -11647,7 +11807,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 302. T-376: the AI layer over every model-contract fixture on the recorded double: safety, two-read decide with its re-read, the composer, every refusal; one logged transport, no live call, every model-call span checked (\#306)
 
-- **Commit:** [`2ac86ff`](https://github.com/aryamahadik/rosie/commit/2ac86ff), by Arya Mahadik, 2026-11-10 09:28:18 UTC
+- **Commit:** [`2ac86ff9`](https://github.com/aryamahadik/rosie/commit/2ac86ff9), by Arya Mahadik, 2026-11-10 09:28:18 UTC
 - **Pull request:** [#306](https://github.com/aryamahadik/rosie/pull/306) from `task/T-376`, merged 2026-11-10 09:28:19 UTC. It squashed 2 branch commits:
   - `7ab7838` T-376: the AI layer over every model-contract fixture on the recorded…
   - `0713f69` T-376: the fixtures run moved into ai/src/fixtures-run (DL-355 ruling…
@@ -11674,7 +11834,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 301. T-1164: finalize's fixed-line inserter adds the danger question, K-01 safetyAsk, right after the row's safety line (safetyEmergency or safetyCrisis), once, when a text the row answers holds a label of unknown tense other than No (CQ-164 d, DL-344, arch 06 line 329, S13-24 rule 10), as the actor's direct path does (T-1143 checkedLineFor). FixedLineFacts gains answeredTexts, K-05 v1.3 readOutboxRow's answers.texts as read (each text's outcomes and tenses). asksIfInDanger reads them: a text asks when a tense is unknown and something other than No holds (default 1: readOutboxRow gives no label's own outcome, so a No label of unknown tense beside a danger outcome asks too, unknown reading as danger). dangerQuestionAfter puts it after the last safety line and drops a place the port gave it. Tests (34, safety-ask.test.ts, on K-02's own safety reads): a crisis line with an unknown tense gets it, through the finalize call and on the passed-on line too, every check passed. Over, now, could restart and joke get none, No gets none, a timed-out or unseen read gets none, no safety line gets none. Never twice: two texts, two lines, a port that lists it, inserting again. A bundle with no safetyAsk words refuses the row whole. Parity with the actor's checkedLineFor on all 11 K-02 safety reads and their unknown-tense twins. fixed-lines.test.ts unchanged. (\#305)
 
-- **Commit:** [`79ebf5c`](https://github.com/aryamahadik/rosie/commit/79ebf5c), by Arya Mahadik, 2026-11-10 09:28:14 UTC
+- **Commit:** [`79ebf5cb`](https://github.com/aryamahadik/rosie/commit/79ebf5cb), by Arya Mahadik, 2026-11-10 09:28:14 UTC
 - **Pull request:** [#305](https://github.com/aryamahadik/rosie/pull/305) from `task/T-1164`, merged 2026-11-10 09:28:15 UTC. It squashed 1 branch commit:
   - `0f0193b` T-1164: finalize's fixed-line inserter adds the danger question, K-01…
 - **Files changed:** 5 (+626 −8), by folder:
@@ -11690,7 +11850,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 300. T-566: env.staging bindings for the skeleton: HandleActor, the bundle KV, the retry queue with its dead letters and the minute cron, made idempotently on the pinned account (\#304)
 
-- **Commit:** [`4df1d8e`](https://github.com/aryamahadik/rosie/commit/4df1d8e), by Arya Mahadik, 2026-11-10 09:28:10 UTC
+- **Commit:** [`4df1d8eb`](https://github.com/aryamahadik/rosie/commit/4df1d8eb), by Arya Mahadik, 2026-11-10 09:28:10 UTC
 - **Pull request:** [#304](https://github.com/aryamahadik/rosie/pull/304) from `task/T-566`, merged 2026-11-10 09:28:11 UTC. It squashed 2 branch commits:
   - `3f93281` T-566: env.staging's own bindings: HANDLE\_ACTOR with its v1-handle-ac…
   - `c2c95a2` T-566: round 2 (DL-352 ruling 1): the five infra/ci asserts that said…
@@ -11719,7 +11879,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 299. T-1146: the bundle's privacyLink fixed line, and bundle v0 rebuilt with it (…/2, composer-4): a first text ends with the privacy notice alone on its last line (an AI change) (\#302)
 
-- **Commit:** [`46a1547`](https://github.com/aryamahadik/rosie/commit/46a1547), by Arya Mahadik, 2026-11-10 08:50:14 UTC
+- **Commit:** [`46a15472`](https://github.com/aryamahadik/rosie/commit/46a15472), by Arya Mahadik, 2026-11-10 08:50:14 UTC
 - **Pull request:** [#302](https://github.com/aryamahadik/rosie/pull/302) from `task/T-1146`, merged 2026-11-10 08:50:14 UTC. It squashed 3 branch commits:
   - `92f53ab` T-1146: the bundle's fixed lines (compiler/src/fixed-lines) and bundl…
   - `faf8555` Merge branch 'main' into task/T-1146
@@ -11750,7 +11910,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 298. T-1162: the safety service records a harm outcome with 911 when the bundle holds no hotline, never refusing the record or failing the turn (CQ-164 c) (\#301)
 
-- **Commit:** [`756110e`](https://github.com/aryamahadik/rosie/commit/756110e), by Arya Mahadik, 2026-11-10 08:50:10 UTC
+- **Commit:** [`756110ed`](https://github.com/aryamahadik/rosie/commit/756110ed), by Arya Mahadik, 2026-11-10 08:50:10 UTC
 - **Pull request:** [#301](https://github.com/aryamahadik/rosie/pull/301) from `task/T-1162`, merged 2026-11-10 08:50:10 UTC. It squashed 2 branch commits:
   - `09e27f1` T-1162: the safety service records harm to a child or older adult wit…
   - `f4004e3` T-1162: round 2 (DL-351): core.test.ts's harm test now expects the ca…
@@ -11778,7 +11938,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 297. T-1161: K-05 v1.4's seven safety reads in db/repo/safety-reads.ts (readSafetyOutcomeOfEvent, readSafetyOutcome, readSafetyHold, readSafetyHoldOfOutcome, readOutboxRowWritten as rosie\_app on the call's business, with no business on the runtime side naming business\_id is null; readBusinessOwner as rosie\_job after requireBusinessScope(), handles' id and kind only, one live owner else null, two moreThanOneOwner, phone handle first; readBusinessZone as rosie\_app), each finding the business first, naming the business in every read, refusing a scope other than the request's and rosie\_app with no business; In variants for the call's own transaction. 39 integration tests on local PostgreSQL: all 18 v1.4 fixtures, each read under every other side and as the tables' owner, the null-business path, an email handle id sorting before the phone's, two live owners, an owner with no handle, and a column-list test over every statement sent that pins each read's tables and columns and refuses sealed columns, \* and whole-row references (\#300)
 
-- **Commit:** [`ca55e8c`](https://github.com/aryamahadik/rosie/commit/ca55e8c), by Arya Mahadik, 2026-11-10 08:50:06 UTC
+- **Commit:** [`ca55e8cc`](https://github.com/aryamahadik/rosie/commit/ca55e8cc), by Arya Mahadik, 2026-11-10 08:50:06 UTC
 - **Pull request:** [#300](https://github.com/aryamahadik/rosie/pull/300) from `task/T-1161`, merged 2026-11-10 08:50:06 UTC. It squashed 1 branch commit:
   - `14df810` T-1161: K-05 v1.4's seven safety reads in db/repo/safety-reads.ts (re…
 - **Files changed:** 2 (+2316 −0), by folder:
@@ -11794,7 +11954,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 296. T-1150: the Tool API, the frontier's checks and the commit read K-09 v1.5 and K-02 v1.1 in Node and the Worker; types pinned per call; K-05's turn row has its seven fields alone (\#303)
 
-- **Commit:** [`d9cd060`](https://github.com/aryamahadik/rosie/commit/d9cd060), by Arya Mahadik, 2026-11-10 08:50:01 UTC
+- **Commit:** [`d9cd0602`](https://github.com/aryamahadik/rosie/commit/d9cd0602), by Arya Mahadik, 2026-11-10 08:50:01 UTC
 - **Pull request:** [#303](https://github.com/aryamahadik/rosie/pull/303) from `task/T-1150`, merged 2026-11-10 08:50:02 UTC. It squashed 6 branch commits:
   - `64ba1d3` T-1150: the Tool API's and the frontier's checks read K-09 v1.5 and K…
   - `ad33947` T-1150: round 2 (DL-345): the Tool API's call types are K-09 v1.5's a…
@@ -11842,7 +12002,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 295. T-1149: the skeleton's e2e prefix runs inside workerd through the real composition root, every joined hop once and in order up to the guard (\#299)
 
-- **Commit:** [`ea5bb6a`](https://github.com/aryamahadik/rosie/commit/ea5bb6a), by Arya Mahadik, 2026-11-10 08:09:17 UTC
+- **Commit:** [`ea5bb6ab`](https://github.com/aryamahadik/rosie/commit/ea5bb6ab), by Arya Mahadik, 2026-11-10 08:09:17 UTC
 - **Pull request:** [#299](https://github.com/aryamahadik/rosie/pull/299) from `task/T-1149`, merged 2026-11-10 08:09:18 UTC. It squashed 4 branch commits:
   - `58ff824` T-1149: the skeleton's e2e runs inside workerd through runtime/src/wi…
   - `4e7aef5` T-1149: the skeleton README for the run inside workerd (plan, known g…
@@ -11883,7 +12043,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 294. T-1145: the recorded double's turn 1 recordings: decide on context-s1-01 and the JOIN run, the safety reads of JOIN, the composer on the JOIN run, keyed on the runtime's own ids (\#298)
 
-- **Commit:** [`7de0634`](https://github.com/aryamahadik/rosie/commit/7de0634), by Arya Mahadik, 2026-11-10 07:07:11 UTC
+- **Commit:** [`7de0634c`](https://github.com/aryamahadik/rosie/commit/7de0634c), by Arya Mahadik, 2026-11-10 07:07:11 UTC
 - **Pull request:** [#298](https://github.com/aryamahadik/rosie/pull/298) from `task/T-1145`, merged 2026-11-10 07:07:11 UTC. It squashed 2 branch commits:
   - `209d49f` T-1145: the recorded-model double reads K-02 v1.1 and holds turn 1's …
   - `8c8226d` T-1145: round 2 (DL-347): recordings 2 and 4 keyed on the JOIN run's …
@@ -11913,7 +12073,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 293. T-315: the Tool API's turn face, the frontier hop for the skeleton's turn 1 on local PostgreSQL; fails closed (noChoices) with the sign-up door waiting for T-1147 (\#297)
 
-- **Commit:** [`f3c7fd0`](https://github.com/aryamahadik/rosie/commit/f3c7fd0), by Arya Mahadik, 2026-11-10 07:07:07 UTC
+- **Commit:** [`f3c7fd06`](https://github.com/aryamahadik/rosie/commit/f3c7fd06), by Arya Mahadik, 2026-11-10 07:07:07 UTC
 - **Pull request:** [#297](https://github.com/aryamahadik/rosie/pull/297) from `task/T-315`, merged 2026-11-10 07:07:07 UTC. It squashed 4 branch commits:
   - `5e6006c` T-315: the turn face's frontier hop (DL-319, DL-322) in actions/src/t…
   - `b810aa1` Merge branch 'main' into task/T-315
@@ -11943,7 +12103,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 292. T-1160: freeze K-05 v1.4: the safety service's seven reads over K-34 and K-04's existing tables, no sealed column, so turn 1's safety record can commit (\#296)
 
-- **Commit:** [`9360ad7`](https://github.com/aryamahadik/rosie/commit/9360ad7), by Arya Mahadik, 2026-11-10 06:41:15 UTC
+- **Commit:** [`9360ad70`](https://github.com/aryamahadik/rosie/commit/9360ad70), by Arya Mahadik, 2026-11-10 06:41:15 UTC
 - **Pull request:** [#296](https://github.com/aryamahadik/rosie/pull/296) from `task/T-1160`, merged 2026-11-10 06:41:15 UTC. It squashed 2 branch commits:
   - `312c533` T-1160: freeze K-05 v1.4, the safety service's seven reads (T-318's S…
   - `562fdbf` T-1160: README item 37 names the runtime side's own filter: with no b…
@@ -11972,7 +12132,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 291. T-375: the composer's relays, translation, sensitive work, tone tags and language (ai/src/composer/relay). Reader checks run last in planAgainstInput, on a plan that keeps to its formats and facts, each a typed refusal naming a check and a place: relayQuote (a row that gives relay.quote quotes it through {{relay.quote}} exactly once, CQ-109's default; no quote slot on a row that gives none; never typed: no 4-word run of the quote or of the master's sample quote outside the slot, code's readings excepted), sensitiveWork (on a gentle row, or one whose service limit 7 gave as nothing: no sample service or name typed, and no service-slot words after '\|' but the master line's, which the slot filler writes in place of the service), tone (no '!' or '¡' on a gentle row), language (on an en or es row no field reads as the other language by its small words, slots and Rosie's terms left out). The model reads private words only as 'a private detail': K-06's \[card number\] and \[SSN\] in \<conversation\>, \<inbound\> and a relay's quote; the input itself is unchanged. Prompt composer-4: rule 9 has the model translate a relay's quote into \<language\> beside the original, rule 8 adds the '¡', rule 11 the '\|' words, the language rule every own word in \<language\>, \<conversation\> its private words. Tests (28, recorded double plus the action layer's own slot filler; global fetch stubbed): plan-relay-private-a7-12.json reproduced with the quote in a slot; a Spanish text gets a Spanish plan, else the stored language; a relay into English keeps the original quote, and into Spanish; plan-sensitive.json shows no service and initials when filled with the switch on; 'your visit'; a gentle tag gives no '!'; private inbound words reach the model only as 'a private detail'; every prompt example and recorded plan passes the new checks. (\#295)
 
-- **Commit:** [`cba901f`](https://github.com/aryamahadik/rosie/commit/cba901f), by Arya Mahadik, 2026-11-10 06:20:37 UTC
+- **Commit:** [`cba901f2`](https://github.com/aryamahadik/rosie/commit/cba901f2), by Arya Mahadik, 2026-11-10 06:20:37 UTC
 - **Pull request:** [#295](https://github.com/aryamahadik/rosie/pull/295) from `task/T-375`, merged 2026-11-10 06:20:37 UTC. It squashed 1 branch commit:
   - `4b94333` T-375: the composer's relays, translation, sensitive work, tone tags …
 - **Files changed:** 19 (+1915 −27), by folder:
@@ -11991,7 +12151,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 290. T-1139: the commit's walk for bundle v0 (writesOf): createWritesOf({ bundles }) walks the turn's pinned flow graph from the part's choice (arch 03 line 191) and hands back K-05 v1's writes; commit-s1-01.json's sign-up door gives exactly its given.stated.writes (S1-01's thread, S1-02's question with its safe default, outbox-s1-02-sam-1 quick\_reply on the turn's service) with default 131's ids, gives thread; the request turn's service and chatId read with a runtime check, else fail closed (default 135); an open hold or unread text stops the walk at its first routine row; S1-02's branches walk only as far as bundle v0 holds them; a step or branch the bundle lacks is refused, never guessed; anything not built answers notBuilt (84 tests) (\#294)
 
-- **Commit:** [`89fc3c4`](https://github.com/aryamahadik/rosie/commit/89fc3c4), by Arya Mahadik, 2026-11-10 05:57:52 UTC
+- **Commit:** [`89fc3c4c`](https://github.com/aryamahadik/rosie/commit/89fc3c4c), by Arya Mahadik, 2026-11-10 05:57:52 UTC
 - **Pull request:** [#294](https://github.com/aryamahadik/rosie/pull/294) from `task/T-1139`, merged 2026-11-10 05:57:52 UTC. It squashed 1 branch commit:
   - `2ae62fc` T-1139: the commit's walk for bundle v0 (writesOf): createWritesOf({ …
 - **Files changed:** 7 (+2019 −0), by folder:
@@ -12007,7 +12167,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 289. T-1138: K-05 v1.3's three reads in db/repo/turn-face-reads.ts: readOpenHolds (rosie\_app under the business's scope; with no business rosie\_job, refusing rosie\_app), readOutboxRow and readFixedLineFacts (rosie\_job after requireBusinessScope()), each naming its business besides the scope and selecting no sealed column; 38 integration tests on local PostgreSQL: every v1.3 fixture, other businesses' rows, the no-business path, the statements' column lists, and the handle-scoped scan over 25,000 rows (\#293)
 
-- **Commit:** [`6eb5222`](https://github.com/aryamahadik/rosie/commit/6eb5222), by Arya Mahadik, 2026-11-10 05:57:48 UTC
+- **Commit:** [`6eb52224`](https://github.com/aryamahadik/rosie/commit/6eb52224), by Arya Mahadik, 2026-11-10 05:57:48 UTC
 - **Pull request:** [#293](https://github.com/aryamahadik/rosie/pull/293) from `task/T-1138`, merged 2026-11-10 05:57:49 UTC. It squashed 1 branch commit:
   - `2f34e5c` T-1138: K-05 v1.3's three reads in db/repo/turn-face-reads.ts: readOp…
 - **Files changed:** 2 (+2408 −0), by folder:
@@ -12023,7 +12183,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 288. T-556: join hop 5: the guard's keyword list comes from the pinned bundle and its targets from K-05 v1.2 handleTargets. Two new ports split from stateReads, bundles (K-05 v1 item 7 readActiveBundle and readBundleValue) and targets (handleTargets), each real for test and staging and closed in production; workerRoot feeds neither a database until T-567, so every pin and targets read fails closed. Test doubles: bundle v0 as bundles/v0 publishes it (bundle.kv.json) and test owner 1's seeded rows answering as targets-first-text.json. hop5.worker.test through root.linqWebhook: JOIN from the seeded test owner gives hops 1 to 5 once under one trace id and a guard span with no keyword and no target; a bare HELP from the same phone takes the code path with no model call after the guard; no targets read or no bundle reads fail closed. guard-reads.test: the ports, the doubles, the keyword list equal to K-01 keywords.json. (\#292)
 
-- **Commit:** [`765d6f9`](https://github.com/aryamahadik/rosie/commit/765d6f9), by Arya Mahadik, 2026-11-10 05:57:45 UTC
+- **Commit:** [`765d6f9e`](https://github.com/aryamahadik/rosie/commit/765d6f9e), by Arya Mahadik, 2026-11-10 05:57:45 UTC
 - **Pull request:** [#292](https://github.com/aryamahadik/rosie/pull/292) from `task/T-556`, merged 2026-11-10 05:57:45 UTC. It squashed 1 branch commit:
   - `7cbae92` T-556: join hop 5: the guard's keyword list comes from the pinned bun…
 - **Files changed:** 14 (+1181 −90), by folder:
@@ -12039,7 +12199,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 287. T-1140: the commit's runCore in actions/src/commit/core: createRunCore(deps) dispatches each K-09 v1 core action by name; recordSafetyOutcome and releaseSafetyHold run through T-318's safety service with every port it reads handed through (K-34's reads, the sealer, the pinned bundle's lines, the stop words, who is told), each checked as the turn's own call; the core's safety line follows T-1143's rule (every danger outcome gets a line, else safetyEmergency; a threat's goes only to the owner); every other or unknown core action, a port not wired, and a run that arms clock rows (until T-1156, DL-341) answer the commit's notBuilt, so nothing is written. 20 tests on commit-s1-01.json (K-09 v1.5), commit-s1-02.json, K-02's safety reads and bundle v0, with a same-bytes sealer double (\#291)
 
-- **Commit:** [`43d86f8`](https://github.com/aryamahadik/rosie/commit/43d86f8), by Arya Mahadik, 2026-11-10 05:47:15 UTC
+- **Commit:** [`43d86f83`](https://github.com/aryamahadik/rosie/commit/43d86f83), by Arya Mahadik, 2026-11-10 05:47:15 UTC
 - **Pull request:** [#291](https://github.com/aryamahadik/rosie/pull/291) from `task/T-1140`, merged 2026-11-10 05:47:16 UTC. It squashed 1 branch commit:
   - `078817d` T-1140: the commit's runCore in actions/src/commit/core: createRunCor…
 - **Files changed:** 6 (+1249 −0), by folder:
@@ -12055,7 +12215,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 286. T-370: the turn's one Sonnet re-read: Decider.reread runs decide's one read once more (purpose reread, the policy's model, its own seed) when the turn loop asks (disagreed; valueFailsWords with the gate's parts and fields) or for an unmapped turn (CQ-162 a), at most once per decide of a turn (a ledger; a result holding the re-read refused; RereadRefusedError before any call); rereadResult gives K-02's result with reread true: agreed parts untouched, a named failing part confirmed only if the re-read gives it alike, a low-stakes difference settled when the re-read gives one read's part, every other part one question; the language settled by the re-read giving one of the two; a refused read ends the turn in one question with nothing changed (the AI layer's own unmapped answer, as K-02 v1 holds no refused read); requests checked as the turn's own before the claim. 30 tests on the recorded double: decide-reads-disagree.json and K-09's limit 6 pair word for word, no live call (\#290)
 
-- **Commit:** [`60a532c`](https://github.com/aryamahadik/rosie/commit/60a532c), by Arya Mahadik, 2026-11-10 05:08:24 UTC
+- **Commit:** [`60a532c6`](https://github.com/aryamahadik/rosie/commit/60a532c6), by Arya Mahadik, 2026-11-10 05:08:24 UTC
 - **Pull request:** [#290](https://github.com/aryamahadik/rosie/pull/290) from `task/T-370`, merged 2026-11-10 05:08:24 UTC. It squashed 1 branch commit:
   - `6762867` T-370: the turn's one Sonnet re-read: Decider.reread runs decide's on…
 - **Files changed:** 8 (+1714 −70), by folder:
@@ -12071,7 +12231,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 285. T-1148: test owner 1's seed for D-017 (db/seeds/skeleton.ts, the set skeleton): K-04 seed-business-head.json's biz-lees-barbershop row value for value, person-sam (Sam Lee, no language stored yet) and handle-sam at tp-01's fictional 555-0100, linked; no role, open question, booking, phone row or sealing key, so K-05 handleTargets for tp-01's handle answers as targets-first-text.json does. One transaction as rosie\_job with no business scope, insert only and idempotent; it refuses and writes nothing when another handle holds the number or the guard would find a target (K-04 seed-person-roles.json's owner roles, a T-202 customer role, turn 1's open question, a phone row, a booking, a second person on the handle). 18 integration tests, D-017's order (core, then skeleton) included (\#289)
 
-- **Commit:** [`42589dc`](https://github.com/aryamahadik/rosie/commit/42589dc), by Arya Mahadik, 2026-11-10 04:58:25 UTC
+- **Commit:** [`42589dc9`](https://github.com/aryamahadik/rosie/commit/42589dc9), by Arya Mahadik, 2026-11-10 04:58:25 UTC
 - **Pull request:** [#289](https://github.com/aryamahadik/rosie/pull/289) from `task/T-1148`, merged 2026-11-10 04:58:25 UTC. It squashed 1 branch commit:
   - `92831aa` T-1148: test owner 1's seed for D-017 (db/seeds/skeleton.ts, the set …
 - **Files changed:** 2 (+815 −0), by folder:
@@ -12087,7 +12247,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 284. T-1143: every danger outcome gets a safety line with a partial bundle. checkedLineFor takes the outcome step's checked line, else the fixed line the sources give that outcome (988 and 911 for crisis words, 911 for every other outcome, and the danger words' line for Unsure), else 911, failing closed. A threat chosen first sends its writer nothing (S13-10, A3-48, DL-330), and a label of unknown tense still adds the danger question. Tests: rules.test.ts (the fallback per outcome, a full bundle's step winning, line order, the danger question, missing lines) and partial-bundle.test.ts (bundle v0 pinned: each outcome's line in v0's words, and the direct path on the real SafetyOnArrival over node:sqlite: the line goes once, its record names it on return, and the safetyRead span names it by K-01 id with no words, while a threat sends nothing and keeps its never hold) (\#288)
 
-- **Commit:** [`c05b1fa`](https://github.com/aryamahadik/rosie/commit/c05b1fa), by Arya Mahadik, 2026-11-10 04:58:21 UTC
+- **Commit:** [`c05b1faf`](https://github.com/aryamahadik/rosie/commit/c05b1faf), by Arya Mahadik, 2026-11-10 04:58:21 UTC
 - **Pull request:** [#288](https://github.com/aryamahadik/rosie/pull/288) from `task/T-1143`, merged 2026-11-10 04:58:21 UTC. It squashed 1 branch commit:
   - `c168e5a` T-1143: every danger outcome gets a safety line with a partial bundle…
 - **Files changed:** 3 (+788 −16), by folder:
@@ -12103,7 +12263,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 283. T-555: join hop 4: the batch window and turn lease run on the texts' real K-06 event ids, and the turns row is written by K-05's commit or park through a new turnRow port (picks: real for test and staging, closed in production), fed by RootOptions.turnRows (the K-05 double in tests, answering commit-first.json and park-turn.json), with workerRoot passing null so every commit and park fails closed until T-567. realTurnRow refuses a turn id that is not T-248's hash of its event ids before K-05 is reached. The turn's park writes through it, and gateThroughCommit stands in the Tool API's gate until T-559. Tests: hop4.worker.test through root.linqWebhook with the actor installed (two texts 2 s apart give one batch, one turn id and one row, a third text closes the batch at once, the same webhook twice in parallel gives one turn id, one lease and one row, three lapses park the turn under the same id), turn-row.test, root.test. The sealing double now gives one key to two first sights at once. (\#287)
 
-- **Commit:** [`b7c3779`](https://github.com/aryamahadik/rosie/commit/b7c3779), by Arya Mahadik, 2026-11-10 04:58:17 UTC
+- **Commit:** [`b7c3779b`](https://github.com/aryamahadik/rosie/commit/b7c3779b), by Arya Mahadik, 2026-11-10 04:58:17 UTC
 - **Pull request:** [#287](https://github.com/aryamahadik/rosie/pull/287) from `task/T-555`, merged 2026-11-10 04:58:17 UTC. It squashed 1 branch commit:
   - `14bce9f` T-555: join hop 4: the batch window and turn lease run on the texts' …
 - **Files changed:** 11 (+1049 −58), by folder:
@@ -12119,7 +12279,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 282. T-300: limit 2, owner rules: one shared rule evaluator; a price read once by its basis, a list price with no amount fails closed (round 2, DL-328) (\#286)
 
-- **Commit:** [`552aa00`](https://github.com/aryamahadik/rosie/commit/552aa00), by Arya Mahadik, 2026-11-10 04:46:48 UTC
+- **Commit:** [`552aa002`](https://github.com/aryamahadik/rosie/commit/552aa002), by Arya Mahadik, 2026-11-10 04:46:48 UTC
 - **Pull request:** [#286](https://github.com/aryamahadik/rosie/pull/286) from `task/T-300`, merged 2026-11-10 04:46:48 UTC. It squashed 2 branch commits:
   - `0d63f78` T-300: limit 2 (owner rules) through one evaluator search can import.…
   - `d4b07cc` T-300: round 2 (DL-328): the evaluator fails closed on a price it can…
@@ -12147,7 +12307,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 281. T-1144: the Tool API's schema checks run inside the Worker: Ajv's standalone validators built by build:validators, checked against Ajv's compiler on all 316 checks, no new Function at run time (\#285)
 
-- **Commit:** [`3d6a743`](https://github.com/aryamahadik/rosie/commit/3d6a743), by Arya Mahadik, 2026-11-10 04:46:44 UTC
+- **Commit:** [`3d6a743f`](https://github.com/aryamahadik/rosie/commit/3d6a743f), by Arya Mahadik, 2026-11-10 04:46:44 UTC
 - **Pull request:** [#285](https://github.com/aryamahadik/rosie/pull/285) from `task/T-1144`, merged 2026-11-10 04:46:44 UTC. It squashed 2 branch commits:
   - `589712c` T-1144: the Tool API's schema checks run inside the Worker: npm run b…
   - `556eece` T-1144: round 2 (DL-335): eslint.config.mjs's globalIgnores gains act…
@@ -12176,7 +12336,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 280. T-1137: freeze K-05 v1.3: readOpenHolds (gap 26), readOutboxRow (flow by default 53; words handed in by the runtime) and readFixedLineFacts for the skeleton's turn face; no migration (\#280)
 
-- **Commit:** [`10313b3`](https://github.com/aryamahadik/rosie/commit/10313b3), by Arya Mahadik, 2026-11-10 04:46:40 UTC
+- **Commit:** [`10313b30`](https://github.com/aryamahadik/rosie/commit/10313b30), by Arya Mahadik, 2026-11-10 04:46:40 UTC
 - **Pull request:** [#280](https://github.com/aryamahadik/rosie/pull/280) from `task/T-1137`, merged 2026-11-10 04:46:41 UTC. It squashed 4 branch commits:
   - `c2fc9f9` T-1137: freeze K-05 v1.3, three reads for the walking skeleton's acti…
   - `bb1ef3f` T-1137: K-05 v1.3 README and schema wording: the v1.3 consumer list a…
@@ -12216,7 +12376,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 279. T-369: decide, two reads: createDecider runs the first and check reads per T-363's route (Haiku twice with two shuffles on low stakes, Sonnet first with Haiku checking on high) side by side through decide's one read, and agreeReads compares them part by part (paired in the text's order) on the verb, choose's question, the choice, every field value in order, an ask's questions as a set and a hand-off's about; the text's language must agree too (CQ-07), else the turn is not agreed and its language null. K-02's decideResult before the re-read: an agreed part is the first read's and goes; a part the reads differ on holds the last read's part with oneQuestion, marked notAgreed on low stakes (the re-read settles it, T-370) and oneQuestion on high stakes (arch 06 line 287). A refused read makes the turn unmapped, a read down on both models modelsDown; neither is compared. 48 tests on the recorded double and K-02's decide fixtures, no live call (\#284)
 
-- **Commit:** [`ca77306`](https://github.com/aryamahadik/rosie/commit/ca77306), by Arya Mahadik, 2026-11-10 03:59:57 UTC
+- **Commit:** [`ca773067`](https://github.com/aryamahadik/rosie/commit/ca773067), by Arya Mahadik, 2026-11-10 03:59:57 UTC
 - **Pull request:** [#284](https://github.com/aryamahadik/rosie/pull/284) from `task/T-369`, merged 2026-11-10 03:59:57 UTC. It squashed 1 branch commit:
   - `2742685` T-369: decide, two reads: createDecider runs the first and check read…
 - **Files changed:** 7 (+1406 −17), by folder:
@@ -12232,7 +12392,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 278. T-318: the safety and hand-offs service: sealed outcomes, holds per arch 06 and K-34, release only by a safe read that arrived after the danger text, fail closed until each port is wired (\#283)
 
-- **Commit:** [`d36a558`](https://github.com/aryamahadik/rosie/commit/d36a558), by Arya Mahadik, 2026-11-10 03:59:52 UTC
+- **Commit:** [`d36a558f`](https://github.com/aryamahadik/rosie/commit/d36a558f), by Arya Mahadik, 2026-11-10 03:59:52 UTC
 - **Pull request:** [#283](https://github.com/aryamahadik/rosie/pull/283) from `task/T-318`, merged 2026-11-10 03:59:53 UTC. It squashed 2 branch commits:
   - `607b885` T-318: safety service in actions/src/domain/safety. recordSafetyOutco…
   - `487e8bc` T-318: round 2 (DL-330). An after\_safe hold is released only by a cle…
@@ -12259,7 +12419,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 277. T-1142: the walking skeleton's one turn (Sam's first text to S1-02's question): K-02 v1.1's sign-up door, K-09 v1.5's turn 1 frontier and commit fixtures with the event's service and chat id on the turn, ADR-013 (\#282)
 
-- **Commit:** [`a18c6b6`](https://github.com/aryamahadik/rosie/commit/a18c6b6), by Arya Mahadik, 2026-11-10 03:59:48 UTC
+- **Commit:** [`a18c6b60`](https://github.com/aryamahadik/rosie/commit/a18c6b60), by Arya Mahadik, 2026-11-10 03:59:48 UTC
 - **Pull request:** [#282](https://github.com/aryamahadik/rosie/pull/282) from `task/T-1142`, merged 2026-11-10 03:59:49 UTC. It squashed 4 branch commits:
   - `7dcb803` T-1142: freeze K-02 v1.1 (the sign-up door to S1-01, with context-s1-…
   - `366a8f0` T-1142: K-02 v1.1's contract tests beside v1 (DL-330 ruling 1): model…
@@ -12303,7 +12463,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 276. T-554: join hop 3: the actor's safety-read port bound to @rosie/ai's safety read through the composition root (picks: real for test and staging, production closed); realSafetyRead reads each raw text with the bound bundle port's danger words and writes its model-call spans into the text's trace; RootOptions.safetyReaders feeds it (the recorded-model double in tests; null in workerRoot, so every read fails closed with NoSafetyReaderError until the bundle's manifest and model key can be read there); tests: hop3.worker.test (JOIN reads No from one Haiku call, the safety span ends before the batch and the lease; with the double delaying past 4 s the danger-word text gets the safety line and a plain text the outage line), safety-read.test (T-004's loader, the danger-word lift, fail-closed cases, the root's bindings) (\#281)
 
-- **Commit:** [`83e9fea`](https://github.com/aryamahadik/rosie/commit/83e9fea), by Arya Mahadik, 2026-11-10 03:29:33 UTC
+- **Commit:** [`83e9fea2`](https://github.com/aryamahadik/rosie/commit/83e9fea2), by Arya Mahadik, 2026-11-10 03:29:33 UTC
 - **Pull request:** [#281](https://github.com/aryamahadik/rosie/pull/281) from `task/T-554`, merged 2026-11-10 03:29:33 UTC. It squashed 1 branch commit:
   - `9c96b1c` T-554: join hop 3: the actor's safety-read port bound to @rosie/ai's …
 - **Files changed:** 9 (+942 −37), by folder:
@@ -12319,7 +12479,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 275. T-293: frontier hubs by stage and door entries in actions/src/frontier/sources/hubs-doors: createHubsAndDoorsSource(bundles), the hubsAndDoors slot's source; the target booking's hub by its K-05 v1.2 stage (entry, booked, checked\_in, done) in its own flow, none in journeys 4-6 and 9, labelled by business, date and time; an owner's S11-12 and S11-53, the team's S11-42; full cards for hubs; the doors in K-01's order (A3-51/B3-40 for anyone, A3-43/B3-35 only after the code check, S11-12 and S11-21 for an owner, S11-42 for the business side), each its arch 03 name and its step's first sentence read through the bundles port; doors only with no target; nothing with no business named; stakes from each walk. 45 tests on bundle-mini-a, bundle-mini-b, bundle v0 and the compiled master, through T-291's assembler and buildFrontier. (\#279)
 
-- **Commit:** [`d1db9fe`](https://github.com/aryamahadik/rosie/commit/d1db9fe), by Arya Mahadik, 2026-11-10 02:47:19 UTC
+- **Commit:** [`d1db9fea`](https://github.com/aryamahadik/rosie/commit/d1db9fea), by Arya Mahadik, 2026-11-10 02:47:19 UTC
 - **Pull request:** [#279](https://github.com/aryamahadik/rosie/pull/279) from `task/T-293`, merged 2026-11-10 02:47:19 UTC. It squashed 1 branch commit:
   - `11a137b` T-293: frontier hubs by stage and door entries in actions/src/frontie…
 - **Files changed:** 6 (+1733 −0), by folder:
@@ -12335,7 +12495,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 274. T-553: join hop 2: the Linq webhook through workerRoot behind the skeleton flag; ports wired on the first request where HANDLE\_ACTOR is bound; the text sealed under K-05's handle key (non-exportable CryptoKey) before the HandleActor's inbox; 503 with no database (\#278)
 
-- **Commit:** [`4d9b468`](https://github.com/aryamahadik/rosie/commit/4d9b468), by Arya Mahadik, 2026-11-10 02:03:45 UTC
+- **Commit:** [`4d9b4681`](https://github.com/aryamahadik/rosie/commit/4d9b4681), by Arya Mahadik, 2026-11-10 02:03:45 UTC
 - **Pull request:** [#278](https://github.com/aryamahadik/rosie/pull/278) from `task/T-553`, merged 2026-11-10 02:03:46 UTC. It squashed 4 branch commits:
   - `9285dc3` T-553 (work in progress): the Worker's Linq webhook POST is routed th…
   - `28c7a96` Merge branch 'main' into task/T-553
@@ -12373,7 +12533,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 273. T-163: bundle v0 for the walking skeleton (D-007) in bundles/v0: S1-01 and S1-02 of flow A cut from the whole compiler build of fixture set v1 (every trade, Master Corrections in the run's order), marked partial, id baefa1e9c103b86fd9037a0703736bd6953024d491a6f6df096720b918cfc845/1; its manifest packs the AI layer's safety read, decide and composer prompts, Q-26's routing with claude-haiku-5-5 and claude-sonnet-5-5, and T-160's lint of the two steps (no failure); published to local PostgreSQL with its KV bulk file bundle.kv.json; build.mjs makes it and check.mjs proves the card's checks (K-01 v1, the skeleton's structure, step.js's words, the branches, the stop marker, the read-back) (\#277)
 
-- **Commit:** [`93f95aa`](https://github.com/aryamahadik/rosie/commit/93f95aa), by Arya Mahadik, 2026-11-10 01:42:07 UTC
+- **Commit:** [`93f95aad`](https://github.com/aryamahadik/rosie/commit/93f95aad), by Arya Mahadik, 2026-11-10 01:42:07 UTC
 - **Pull request:** [#277](https://github.com/aryamahadik/rosie/pull/277) from `task/T-163`, merged 2026-11-10 01:42:07 UTC. It squashed 1 branch commit:
   - `de9d732` T-163: bundle v0 for the walking skeleton (D-007) in bundles/v0: S1-0…
 - **Files changed:** 7 (+679 −0), by folder:
@@ -12391,7 +12551,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 272. T-1096: the gateway writes K-08's scrub span between receive and the hand-off, with only the counts of card numbers and SSNs swapped, for an event its actor wrote; tests that expected receive alone now expect receive, then scrub (\#276)
 
-- **Commit:** [`5e7018c`](https://github.com/aryamahadik/rosie/commit/5e7018c), by Arya Mahadik, 2026-11-10 00:56:27 UTC
+- **Commit:** [`5e7018cb`](https://github.com/aryamahadik/rosie/commit/5e7018cb), by Arya Mahadik, 2026-11-10 00:56:27 UTC
 - **Pull request:** [#276](https://github.com/aryamahadik/rosie/pull/276) from `task/T-1096`, merged 2026-11-10 00:56:27 UTC. It squashed 2 branch commits:
   - `27eeafa` T-1096: the gateway writes K-08's scrub span. prepareHandoff times an…
   - `b0e93b8` T-1096: round 2 (DL-315), the two tests outside the gateway now expec…
@@ -12422,7 +12582,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 271. T-363: model routing by stakes in ai/src/routing: createRouter(bundle) reads the K-01 v1 manifest's policy (checked as K-01 writes it; bundle id and model ids checked as the AI gateway checks them) and routes each turn by its K-02 stakes before any call: high when any choice is high (Sonnet first, Haiku checking, Q-26's default), else Haiku twice; a manifest saying Haiku first on high stakes is routed so (data, not code); each read gets its own seed, the check's always listing the choices in another order than the first's (stepped when a draw repeats it); the re-read's model is the policy's; a route names only haiku or sonnet as claude-haiku-5-5 or claude-sonnet-5-5 and is frozen. 23 tests: the 13 K-02 decide fixtures' stakes, routing and read models; one high choice anywhere; all 32 K-01 policies; refused policies and bundles; reads through decide's one read and the AI gateway on the recorded double (Sonnet then Haiku, Haiku twice in two orders, Haiku then Sonnet when switched), no live call (\#275)
 
-- **Commit:** [`1be0647`](https://github.com/aryamahadik/rosie/commit/1be0647), by Arya Mahadik, 2026-11-10 00:48:01 UTC
+- **Commit:** [`1be0647f`](https://github.com/aryamahadik/rosie/commit/1be0647f), by Arya Mahadik, 2026-11-10 00:48:01 UTC
 - **Pull request:** [#275](https://github.com/aryamahadik/rosie/pull/275) from `task/T-363`, merged 2026-11-10 00:48:02 UTC. It squashed 1 branch commit:
   - `135dfd3` T-363: model routing by stakes in ai/src/routing: createRouter(bundle…
 - **Files changed:** 6 (+1111 −0), by folder:
@@ -12438,7 +12598,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 270. T-1135: K-05 v1.1 items 13 to 16 and v1.2 items 30 to 32 in db/repo/outbox.ts, the dispatcher's send loop: claimOutboxV12 (each claim written to outbox\_claims, claim\_no 1 or raised, lapsing in 60 s, returned with claimedFrom and port: linq for imessage, rcs and sms, email for email; a sending row whose claim lapsed, or that has none, taken again once under the recipient's lock, keeping first\_try\_at and next\_try\_not\_before; a live claim stops the walk), renewClaim (the caller's claim on a sending row and a pending part, notYet before the Retry-After, lapses\_at = at + 60 s, first\_try\_at once, next\_try\_not\_before cleared, only the claim's version raised, and the recipient's phone row read FOR SHARE in the same transaction as recipient), markPartV12 (the row's state and version after the mark, a failure's message id and Retry-After kept, a receipt found by its part's key after a 4001 or 4006, failed to delivered) and markRowV12 (waitingChat: held\_until cleared, the claim deleted). T-196's v1 calls and their tests unchanged. Tests: the 21 v1.1 and v1.2 outbox fixtures and the refused ones, 20 parallel claimers over 1,000 rows with lapsed, live and missing claims, a STOP committing during a renewal, a receipt after a 4006 found by its key. (\#274)
 
-- **Commit:** [`4ad6309`](https://github.com/aryamahadik/rosie/commit/4ad6309), by Arya Mahadik, 2026-11-10 00:38:26 UTC
+- **Commit:** [`4ad63098`](https://github.com/aryamahadik/rosie/commit/4ad63098), by Arya Mahadik, 2026-11-10 00:38:26 UTC
 - **Pull request:** [#274](https://github.com/aryamahadik/rosie/pull/274) from `task/T-1135`, merged 2026-11-10 00:38:26 UTC. It squashed 1 branch commit:
   - `d924943` T-1135: K-05 v1.1 items 13 to 16 and v1.2 items 30 to 32 in db/repo/o…
 - **Files changed:** 2 (+2037 −138), by folder:
@@ -12454,7 +12614,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 269. T-258: dispatcher retries under K-07's key rules. runtime/src/dispatch/retry/: retryRuleFor picks each part's next try from K-11's kind (no answer: the same key under the next claim; a reported failure: markPart failed with retry, the new key, any Retry-After as the claim's nextTryNotBefore; 4001 or 4006: failed with no next try, the new key only after a minute with no receipt; 403 code 2024: never retried on Linq, a row the stop binds dropped as stopped); each wait a job on T-256's retry queue (retry-\<part key\>\#\<attempts\>), and dispatchSendDoor runs the recipient's rows again when it is due, writing a 4006's new key first unless its receipt came; the receipt finds a part by its echoed key (K-05 v1.2 item 31); override\_optout only on a safety line or a stop reply; no new job after 15 minutes of tries. Tests: error-4006, error-403-2024, error-rate-limit, send-override-optout and verify-delivered-after-4006 against the real queue and door, the row's tries equal to K-07 outbox-4006-new-key.json (\#273)
 
-- **Commit:** [`f9a7376`](https://github.com/aryamahadik/rosie/commit/f9a7376), by Arya Mahadik, 2026-11-10 00:21:37 UTC
+- **Commit:** [`f9a73767`](https://github.com/aryamahadik/rosie/commit/f9a73767), by Arya Mahadik, 2026-11-10 00:21:37 UTC
 - **Pull request:** [#273](https://github.com/aryamahadik/rosie/pull/273) from `task/T-258`, merged 2026-11-10 00:21:37 UTC. It squashed 1 branch commit:
   - `aa2a9ee` T-258: dispatcher retries under K-07's key rules. runtime/src/dispatc…
 - **Files changed:** 9 (+1592 −71), by folder:
@@ -12471,7 +12631,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 268. T-309: compose input and the situation tag: one committed row to K-03 v1 input with only the facts limit 7 shows that reader, never the frontier, no opt-out line from the bundle's plainText (DL-245), and the tag in arch 07's order (a death stays gentle even with money) (\#272)
 
-- **Commit:** [`86ac675`](https://github.com/aryamahadik/rosie/commit/86ac675), by Arya Mahadik, 2026-11-09 23:36:15 UTC
+- **Commit:** [`86ac6753`](https://github.com/aryamahadik/rosie/commit/86ac6753), by Arya Mahadik, 2026-11-09 23:36:15 UTC
 - **Pull request:** [#272](https://github.com/aryamahadik/rosie/pull/272) from `task/T-309`, merged 2026-11-09 23:36:16 UTC. It squashed 2 branch commits:
   - `1d29d26` T-309: K-09 v1's compose-input call in actions/src/compose-input/: on…
   - `7d93f85` T-309: the death-report tag test shows the money it names: the master…
@@ -12498,7 +12658,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 267. T-196: K-05 v1 items 2 to 4 in db/repo/outbox.ts: writePlan (plan and final parts together, planned or stale to checked, alreadyPlanned before the version), unplannedRows (a turn's rows with no plan, in commit order), claimOutbox (recipients earliest open commit\_seq first, each under a transaction advisory lock skipped when another claim holds it; held rows passed and reported, waiting rows passed, the walk stopped at sending, planned and stale rows; checked and due held rows claimed to sending with their parts' keys, attempts raised for a part never accepted), markPart and markRow (only K-07 v1's part and row moves, the row following its parts' latest tries; wrongState for any other move, so nothing goes from delivered back to sending or out of dropped\_stopped). ROW\_MOVES and PART\_MOVES are K-07's lists, checked against its schema. Tests: the 12 K-05 v1 outbox fixtures, 20 parallel claimers over 1,000 rows, held rows, refused moves, the crash and stale paths, two-part rows, a 4006 and a plain retry. (\#271)
 
-- **Commit:** [`0e29282`](https://github.com/aryamahadik/rosie/commit/0e29282), by Arya Mahadik, 2026-11-09 23:11:16 UTC
+- **Commit:** [`0e29282a`](https://github.com/aryamahadik/rosie/commit/0e29282a), by Arya Mahadik, 2026-11-09 23:11:16 UTC
 - **Pull request:** [#271](https://github.com/aryamahadik/rosie/pull/271) from `task/T-196`, merged 2026-11-09 23:11:16 UTC. It squashed 1 branch commit:
   - `33447aa` T-196: K-05 v1 items 2 to 4 in db/repo/outbox.ts: writePlan (plan and…
 - **Files changed:** 2 (+2743 −0), by folder:
@@ -12514,7 +12674,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 266. T-723: migration 0031, K-32 part 2: fees, memberships, packs, credits, plan charges, Rosfield's fees, pay links and reconciliation; a pack's credits never below zero; a pay link's code kept only as its hash, outside the Tool API's SELECT; part 1's three keys added (\#270)
 
-- **Commit:** [`8d3a725`](https://github.com/aryamahadik/rosie/commit/8d3a725), by Arya Mahadik, 2026-11-09 22:41:15 UTC
+- **Commit:** [`8d3a7257`](https://github.com/aryamahadik/rosie/commit/8d3a7257), by Arya Mahadik, 2026-11-09 22:41:15 UTC
 - **Pull request:** [#270](https://github.com/aryamahadik/rosie/pull/270) from `task/T-723`, merged 2026-11-09 22:41:16 UTC. It squashed 3 branch commits:
   - `4ebd6e7` T-723: migration 0031, K-32 part 2: memberships, pay\_links, packs, cr…
   - `4442765` T-723: 0031's header says exactly what rule 7 and rule 1 hold: set-on…
@@ -12547,7 +12707,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 265. T-552: join hop 1 in the composition root: the gateway's verify port bound to @rosie/adapters' Linq verify (T-413) under test and on staging (production stays closed), its webhook secret read at each call (the Linq double's made-up secret in tests, LINQ\_WEBHOOK\_SECRET by name in the Worker; none set fails closed with 503); root.linqWebhook, the Linq webhook route behind the skeleton flag read through T-185's release-flag read (on: the gateway; off or no flags bound: 404 with the body unread, nothing verified and no actor opened; unreadable: 503); adapters/package.json exports ./linq/webhook, ./linq/double and ./linq/double-webhooks; test-support signs with the Linq double (T-412) instead of the fake verify; tests: double-signed-webhook.json 200 within 1 s with one gateway span, a bad signature 401 writing nothing, the flag off 404 opening no actor (\#T-552) (\#269)
 
-- **Commit:** [`cd206e3`](https://github.com/aryamahadik/rosie/commit/cd206e3), by Arya Mahadik, 2026-11-09 22:41:10 UTC
+- **Commit:** [`cd206e31`](https://github.com/aryamahadik/rosie/commit/cd206e31), by Arya Mahadik, 2026-11-09 22:41:10 UTC
 - **Pull request:** [#269](https://github.com/aryamahadik/rosie/pull/269) from `task/T-552`, merged 2026-11-09 22:41:10 UTC. It squashed 1 branch commit:
   - `1dbc052` T-552: join hop 1 in the composition root: the gateway's verify port …
 - **Files changed:** 11 (+842 −113), by folder:
@@ -12564,7 +12724,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 264. T-374: the composer's one rewrite, told what failed, then use the fallback. ai/src/composer/rewrite/: rewrite({input, plan, attempt, told}) takes rewriteTold's shape (each failed K-03 check once, with its detail); attempt composed gets one call, purpose rewrite, on the composer's own cached system prompt (composer-3, unchanged) with the row's input as compose sent it, \<plan\_to\_fix\> and \<failed\_checks\> as data, and an untagged task keeping both rules (fixed lines and the opt-out line are code's, DL-245; never a money sentence of the model's own, DL-182); attempt rewrite is the second failure: useFallback with no call; an answer the AI layer refuses is useFallback (rewriteRefused); a request with any other field, a plan to fix the input does not allow or a malformed told is refused before any call. Haiku first at compose's effort, 6 s per attempt (the composer's stage). Tests: check-two-questions.json gives one rewrite whose prompt names One question; check-fallback.json gives useFallback and no third call; the 6 s timeout under fake timers; the cached prefix read; check-emoji.json answered by the double's own plan. (\#268)
 
-- **Commit:** [`0eaf71d`](https://github.com/aryamahadik/rosie/commit/0eaf71d), by Arya Mahadik, 2026-11-09 22:21:12 UTC
+- **Commit:** [`0eaf71d1`](https://github.com/aryamahadik/rosie/commit/0eaf71d1), by Arya Mahadik, 2026-11-09 22:21:12 UTC
 - **Pull request:** [#268](https://github.com/aryamahadik/rosie/pull/268) from `task/T-374`, merged 2026-11-09 22:21:12 UTC. It squashed 1 branch commit:
   - `90f08a7` T-374: the composer's one rewrite, told what failed, then use the fal…
 - **Files changed:** 12 (+1315 −4), by folder:
@@ -12581,7 +12741,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 263. T-510: the Tool API mock (C-186) in contracts/mock/: generate.mjs writes tool-api-mock.json from every accepted exchange fixture of the frozen versions, K-09 v1 to v1.4 and K-21 v1 to v1.2 (268 answers, each checked by the workspace's one validator and its named rule, refusing two fixtures that answer one request differently in one environment), formatted by the repository's Prettier settings; mock.mjs answers a fixture's request with a copy of its outcome in the environment its given names and otherwise throws ToolApiMockError naming the call, with the nearest fixture and where the request differs, never a default answer; mock.d.mts types it; contracts/package.json's check runs mock/\*.test.mjs and its mock script regenerates the file (--check tells a stale one); tests: every accepted exchange answered, loud errors, the two stated refusals, every other refused fixture, byte-identical regeneration and each held answer compared with its fixture file (\#267)
 
-- **Commit:** [`47ad786`](https://github.com/aryamahadik/rosie/commit/47ad786), by Arya Mahadik, 2026-11-09 20:42:26 UTC
+- **Commit:** [`47ad7864`](https://github.com/aryamahadik/rosie/commit/47ad7864), by Arya Mahadik, 2026-11-09 20:42:26 UTC
 - **Pull request:** [#267](https://github.com/aryamahadik/rosie/pull/267) from `task/T-510`, merged 2026-11-09 20:42:27 UTC. It squashed 1 branch commit:
   - `c16f126` T-510: the Tool API mock (C-186) in contracts/mock/: generate.mjs wri…
 - **Files changed:** 7 (+19678 −1), by folder:
@@ -12598,7 +12758,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 262. T-295: frontier facts and the 60-choice cap. actions/src/frontier/facts/: each key once from its one home (homes list, checked: one home per key, never a person's name or contact; default none listed), the K-01 needs of the options' and hubs' steps about the turn's target, a second place for one key refused before it is read and its step flagged with the home's row and version, one read through the port with primary=true, cache=false (default K-05 v1.2 readTurnState). actions/src/frontier/cap/: over 60, each booking but the target collapses to one which-booking choice labelled by business, date and time; still over 60, tooManyChoices. handler.ts fills facts, flagged and collapsedBookingIds. Tests: 75 choices across 6 bookings, fixtures/two-homes-one-key.json, strong reads, 150 ms median over 50 runs. (\#266)
 
-- **Commit:** [`06d3df1`](https://github.com/aryamahadik/rosie/commit/06d3df1), by Arya Mahadik, 2026-11-09 20:26:44 UTC
+- **Commit:** [`06d3df17`](https://github.com/aryamahadik/rosie/commit/06d3df17), by Arya Mahadik, 2026-11-09 20:26:44 UTC
 - **Pull request:** [#266](https://github.com/aryamahadik/rosie/pull/266) from `task/T-295`, merged 2026-11-09 20:26:44 UTC. It squashed 1 branch commit:
   - `f4d38c2` T-295: frontier facts and the 60-choice cap. actions/src/frontier/fac…
 - **Files changed:** 14 (+1901 −17), by folder:
@@ -12617,7 +12777,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 261. T-722: migration 0030, K-32 part 1: saved cards, payments with idempotency keys and effect ids, payment items, the append-only ledger and refunds; never a card hold, a Tool API write never makes a card payment paid, set-once money values; a two-column SELECT on effects for rule 5's checks (DL-298) (\#265)
 
-- **Commit:** [`9d49bb9`](https://github.com/aryamahadik/rosie/commit/9d49bb9), by Arya Mahadik, 2026-11-09 20:04:31 UTC
+- **Commit:** [`9d49bb9a`](https://github.com/aryamahadik/rosie/commit/9d49bb9a), by Arya Mahadik, 2026-11-09 20:04:31 UTC
 - **Pull request:** [#265](https://github.com/aryamahadik/rosie/pull/265) from `task/T-722`, merged 2026-11-09 20:04:32 UTC. It squashed 2 branch commits:
   - `0d4f72e` T-722: WIP migration 0030 (K-32 part 1): saved\_cards, payments, payme…
   - `19a5045` T-722: round 2 (DL-298): 0030 grants rosie\_app SELECT of effects.id a…
@@ -12645,7 +12805,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 260. T-270: PostgreSQL down in runtime/src/outage/db and the actor: while PostgreSQL is known down (a probe asked only when something waits on it, every 30 s while down) closed batches stay with the batch window in order and the lease holds its turn (a lapse counts no try and parks nothing); a text waiting 20 s gets the outage line once from the actor's copy straight through Linq under the safety read's own key, never to a stopped number, its record queued as T-271's outageLineRequest; a STOP or START in the batch window is taken at once from the copied keyword list (flag copied, reply through Linq, recordStopOrStart queued in the stop rank, never joining a turn), in arrival order and never ahead of one left to its turn; a running safety timer due fires once from its copy through a port; on return the write-on-return queue replays danger, then stops, then the rest before the lease resumes and the queued batches go on, and before any commit (CQ-104 f); the copies keep the pinned bundle's keyword list and stop and start replies; Workers tests with the data-access fake failing (\#264)
 
-- **Commit:** [`d0150fe`](https://github.com/aryamahadik/rosie/commit/d0150fe), by Arya Mahadik, 2026-11-09 19:42:19 UTC
+- **Commit:** [`d0150fef`](https://github.com/aryamahadik/rosie/commit/d0150fef), by Arya Mahadik, 2026-11-09 19:42:19 UTC
 - **Pull request:** [#264](https://github.com/aryamahadik/rosie/pull/264) from `task/T-270`, merged 2026-11-09 19:42:19 UTC. It squashed 1 branch commit:
   - `ac4bbe4` T-270: PostgreSQL down in runtime/src/outage/db and the actor: while …
 - **Files changed:** 10 (+2394 −34), by folder:
@@ -12663,7 +12823,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 259. T-061: Freeze K-21 page and console calls v1.2: journey 4's screens 2 to 11, each page call naming the K-09 v1.2 call that serves it, read back before every confirm, bound yeses with their K-29 consent, and no other mobile's saved times or stopped state shown on a page (\#263)
 
-- **Commit:** [`ce87eda`](https://github.com/aryamahadik/rosie/commit/ce87eda), by Arya Mahadik, 2026-11-09 19:21:37 UTC
+- **Commit:** [`ce87edae`](https://github.com/aryamahadik/rosie/commit/ce87edae), by Arya Mahadik, 2026-11-09 19:21:37 UTC
 - **Pull request:** [#263](https://github.com/aryamahadik/rosie/pull/263) from `task/T-061`, merged 2026-11-09 19:21:38 UTC. It squashed 3 branch commits:
   - `b08a96d` T-061: freeze K-21 page and console calls v1.2 (journey 4 screens): p…
   - `57c4ab2` T-061: K-21 v1.2 before review: each confirm's description says what …
@@ -12697,7 +12857,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 258. T-744: the saved-time rules in actions/src/domain/reservations/: 10 minutes or the door's longer save, 10 more minutes once, C3's 15 minutes never extended, 2 per mobile or token, next in line; a save behind the asker's own row gets that row back (K-05, T-1134) (\#262)
 
-- **Commit:** [`da98d52`](https://github.com/aryamahadik/rosie/commit/da98d52), by Arya Mahadik, 2026-11-09 18:43:45 UTC
+- **Commit:** [`da98d522`](https://github.com/aryamahadik/rosie/commit/da98d522), by Arya Mahadik, 2026-11-09 18:43:45 UTC
 - **Pull request:** [#262](https://github.com/aryamahadik/rosie/pull/262) from `task/T-744`, merged 2026-11-09 18:43:45 UTC. It squashed 4 branch commits:
   - `9a465c3` T-744: reservations service (actions/src/domain/reservations): saves …
   - `e3a5854` T-744: check the door facts without an unneeded type assertion (lint)…
@@ -12730,7 +12890,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 257. T-721: migration 0029 (K-30 part 2): booking\_changes, quotes, quote\_options, owner\_oks, booking\_addresses, secure\_links, page\_answers and waitlist\_entries word for word, booking\_lines' two keys to them (ALTER TABLE ... ADD CONSTRAINT, validated), rule 5's policies with the exists clause, rule 6's grants (UPDATE of the end only on secure\_links and waitlist\_entries, code\_sha256 outside the Tool API's SELECT); db/repo/bookings-changes-2.int.test.ts (the five seeds whole, sealed answers and address, 50 parallel waitlist joins at positions 1 to 50, refused rows and probes); rls.int.test.ts's K-30 lists and named exceptions (1) to (3); four DL-225 lines in bookings-changes.int.test.ts (\#261)
 
-- **Commit:** [`1d2598e`](https://github.com/aryamahadik/rosie/commit/1d2598e), by Arya Mahadik, 2026-11-09 18:25:24 UTC
+- **Commit:** [`1d2598ef`](https://github.com/aryamahadik/rosie/commit/1d2598ef), by Arya Mahadik, 2026-11-09 18:25:24 UTC
 - **Pull request:** [#261](https://github.com/aryamahadik/rosie/pull/261) from `task/T-721`, merged 2026-11-09 18:25:25 UTC. It squashed 1 branch commit:
   - `a85c57a` T-721: migration 0029 (K-30 part 2): booking\_changes, quotes, quote\_o…
 - **Files changed:** 4 (+3750 −45), by folder:
@@ -12747,7 +12907,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 256. T-1134: K-05 reserve and release keep one row per holder per slot: reserve with waitIfSaved, for a holder (the cap's: a mobile, or an agent token at one business) that already holds or waits on the slot, writes nothing and answers its own row as its first save got it (repeated); release lets go the released holder's own waiting rows in its line (let\_go) and promotes the first other holder, or nobody; both inside the call's one transaction under the slot's lock, with integration tests of the reviewer's C3 scenario, a mobile after its one extension, waiting behind another holder, and parallel saves (T-744 round 1 GAP 1; DL-292) (\#260)
 
-- **Commit:** [`e941cc2`](https://github.com/aryamahadik/rosie/commit/e941cc2), by Arya Mahadik, 2026-11-09 18:04:12 UTC
+- **Commit:** [`e941cc2f`](https://github.com/aryamahadik/rosie/commit/e941cc2f), by Arya Mahadik, 2026-11-09 18:04:12 UTC
 - **Pull request:** [#260](https://github.com/aryamahadik/rosie/pull/260) from `task/T-1134`, merged 2026-11-09 18:04:13 UTC. It squashed 1 branch commit:
   - `764113d` T-1134: K-05 reserve and release keep one row per holder per slot: re…
 - **Files changed:** 4 (+1016 −40), by folder:
@@ -12763,7 +12923,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 255. T-477: gold-set volume sizing in evals/src/sizing and its table in evals/SIZING.md: for every row of section 08's table, the smallest volume at which its 95% interval clears its target, two-sided by default with the one-sided figure beside it, from T-480's library alone (381 two-sided and 268 one-sided for 99% danger recall; lower bound for at least, upper for at most; harmful wrong actions none below 500 turns; hard invariants no volume), with tests that check every figure as a literal and against T-480's interval (\#259)
 
-- **Commit:** [`15b1de2`](https://github.com/aryamahadik/rosie/commit/15b1de2), by Arya Mahadik, 2026-11-09 14:26:23 UTC
+- **Commit:** [`15b1de2d`](https://github.com/aryamahadik/rosie/commit/15b1de2d), by Arya Mahadik, 2026-11-09 14:26:23 UTC
 - **Pull request:** [#259](https://github.com/aryamahadik/rosie/pull/259) from `task/T-477`, merged 2026-11-09 14:26:24 UTC. It squashed 1 branch commit:
   - `06e6b98` T-477: gold-set volume sizing in evals/src/sizing and its table in ev…
 - **Files changed:** 4 (+752 −0), by folder:
@@ -12780,7 +12940,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 254. T-480: accuracy statistics in evals/src/stats: right out of total, the point estimate, the two-sided 95% Wilson interval (CQ-10; z for a one-sided bound beside it) and the status met, notYetProven or miss against a target's direction and sized volume, as K-10 v1's measureResult holds it (score, statusOf, wilsonInterval), with unit tests on the sources' figures (83 of 90, 157 of 160, 300 of 300, 381 of 381), the status rules of BP 8 and K-10 v1, its sample reports and its named rule reportNumbers (\#258)
 
-- **Commit:** [`3716c98`](https://github.com/aryamahadik/rosie/commit/3716c98), by Arya Mahadik, 2026-11-09 13:56:34 UTC
+- **Commit:** [`3716c986`](https://github.com/aryamahadik/rosie/commit/3716c986), by Arya Mahadik, 2026-11-09 13:56:34 UTC
 - **Pull request:** [#258](https://github.com/aryamahadik/rosie/pull/258) from `task/T-480`, merged 2026-11-09 13:56:34 UTC. It squashed 1 branch commit:
   - `faf322d` T-480: accuracy statistics in evals/src/stats: right out of total, th…
 - **Files changed:** 5 (+605 −0), by folder:
@@ -12796,7 +12956,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 253. T-271: the AI-down path in runtime/src/outage/ai/ and runtime/src/turn/: the outage line once per waiting text and never to a stopped phone, 30 s retries until the models return, then one commit with danger first, then STOP, then the rest; a failure after the commit takes the step's fallback (\#257)
 
-- **Commit:** [`5645998`](https://github.com/aryamahadik/rosie/commit/5645998), by Arya Mahadik, 2026-11-09 13:50:12 UTC
+- **Commit:** [`5645998d`](https://github.com/aryamahadik/rosie/commit/5645998d), by Arya Mahadik, 2026-11-09 13:50:12 UTC
 - **Pull request:** [#257](https://github.com/aryamahadik/rosie/pull/257) from `task/T-271`, merged 2026-11-09 13:50:12 UTC. It squashed 2 branch commits:
   - `b721f5a` T-271: AI provider down: the outage line once per waiting text (never…
   - `b1dda2b` T-271: the next try begins 30 s after the last one began, so a slow f…
@@ -12824,7 +12984,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 252. T-470: gold-set item store (evals/src/gold/store): writes and reads K-10 v1 items by set version, journey and flow under evals/gold/, refuses invalid items (K-10 goldItem with Ajv strict 2020-12, naming each fault and its field; human-labelled live turns, BP rule 9; another set version; an id rewritten), all or nothing, and keeps a manifest per set with each file's sha256 and the units of every section 08 measure over the set and per journey; tests on K-10's item fixtures via T-003's harness; evals/gold/README.md (\#256)
 
-- **Commit:** [`09e8669`](https://github.com/aryamahadik/rosie/commit/09e8669), by Arya Mahadik, 2026-11-09 13:38:23 UTC
+- **Commit:** [`09e86690`](https://github.com/aryamahadik/rosie/commit/09e86690), by Arya Mahadik, 2026-11-09 13:38:23 UTC
 - **Pull request:** [#256](https://github.com/aryamahadik/rosie/pull/256) from `task/T-470`, merged 2026-11-09 13:38:23 UTC. It squashed 1 branch commit:
   - `af9927e` T-470: gold-set item store (evals/src/gold/store): writes and reads K…
 - **Files changed:** 13 (+1980 −0), by folder:
@@ -12841,7 +13001,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 251. T-160: compiler lint writes K-01's lint report (lint-report.json), every hit beside it (lint-findings.json) and the journey ship list (journeys.json); report.ts builds the report and the ship list (journeyGates, shipList) for the emitter's manifest to read (\#255)
 
-- **Commit:** [`d72ec00`](https://github.com/aryamahadik/rosie/commit/d72ec00), by Arya Mahadik, 2026-11-09 12:45:20 UTC
+- **Commit:** [`d72ec000`](https://github.com/aryamahadik/rosie/commit/d72ec000), by Arya Mahadik, 2026-11-09 12:45:20 UTC
 - **Pull request:** [#255](https://github.com/aryamahadik/rosie/pull/255) from `task/T-160`, merged 2026-11-09 12:45:20 UTC. It squashed 1 branch commit:
   - `60ea91a` T-160: compiler lint writes K-01's lint report (lint-report.json), ev…
 - **Files changed:** 3 (+1310 −0), by folder:
@@ -12858,7 +13018,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 250. T-152: Bundle publishing: KV entries per bundle id and the PostgreSQL copy, never switching the active id (\#254)
 
-- **Commit:** [`ad90cd5`](https://github.com/aryamahadik/rosie/commit/ad90cd5), by Arya Mahadik, 2026-11-09 12:22:54 UTC
+- **Commit:** [`ad90cd55`](https://github.com/aryamahadik/rosie/commit/ad90cd55), by Arya Mahadik, 2026-11-09 12:22:54 UTC
 - **Pull request:** [#254](https://github.com/aryamahadik/rosie/pull/254) from `task/T-152`, merged 2026-11-09 12:22:54 UTC. It squashed 2 branch commits:
   - `948931f` T-152: compiler publish \<bundle dir\>: the KV bulk file keyed by bundl…
   - `50ecbbf` T-152: the integration project's include gains compiler/\*\*/\*.int.test…
@@ -12887,7 +13047,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 249. T-053: Freeze K-09 Tool API v1.4: journey 6's calls (\#253)
 
-- **Commit:** [`cd27707`](https://github.com/aryamahadik/rosie/commit/cd27707), by Arya Mahadik, 2026-11-09 11:33:24 UTC
+- **Commit:** [`cd27707d`](https://github.com/aryamahadik/rosie/commit/cd27707d), by Arya Mahadik, 2026-11-09 11:33:24 UTC
 - **Pull request:** [#253](https://github.com/aryamahadik/rosie/pull/253) from `task/T-053`, merged 2026-11-09 11:33:24 UTC. It squashed 3 branch commits:
   - `dfc7451` T-053: Freeze K-09 Tool API v1.4: journey 6's calls (askOwnerFirst, s…
   - `9fb5b76` T-053: writeBooking's lapses as deadline clock rows (the page's clock…
@@ -12921,7 +13081,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 248. T-720: Migration 0028: the bookings and changes part (K-30), part 1 (\#252)
 
-- **Commit:** [`c42d1b9`](https://github.com/aryamahadik/rosie/commit/c42d1b9), by Arya Mahadik, 2026-11-09 11:26:15 UTC
+- **Commit:** [`c42d1b98`](https://github.com/aryamahadik/rosie/commit/c42d1b98), by Arya Mahadik, 2026-11-09 11:26:15 UTC
 - **Pull request:** [#252](https://github.com/aryamahadik/rosie/pull/252) from `task/T-720`, merged 2026-11-09 11:26:15 UTC. It squashed 2 branch commits:
   - `7d4bb98` T-720: Migration 0028: the bookings and changes part (K-30), part 1: …
   - `0f7ace6` T-720: probes of the table list's checks, unique and composite keys o…
@@ -12949,7 +13109,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 247. T-217: seed the demo shops' customers from fixture set v1 (db/seeds/customers.ts): for each of the 245 demo shops, one customer per way K-28 v1 allows (texts, textsonly, email), each a person of their own with a fictional 555-01xx mobile in area codes neither the owners nor the team use (K-04 handle, phone row and own link), the email way's customer an example.com email too, a live customer role written in the same commit (K-28 rule 7), 18 or older, added when fixture set v1 was made; the cast is never read (MC C6), no name or email comes from a fixture, no block, booking or consent is made; refuses before the core and setup seeds, and is idempotent; with its integration tests (\#251)
 
-- **Commit:** [`1a96f0b`](https://github.com/aryamahadik/rosie/commit/1a96f0b), by Arya Mahadik, 2026-11-09 11:14:06 UTC
+- **Commit:** [`1a96f0b6`](https://github.com/aryamahadik/rosie/commit/1a96f0b6), by Arya Mahadik, 2026-11-09 11:14:06 UTC
 - **Pull request:** [#251](https://github.com/aryamahadik/rosie/pull/251) from `task/T-217`, merged 2026-11-09 11:14:07 UTC. It squashed 1 branch commit:
   - `9882238` T-217: seed the demo shops' customers from fixture set v1 (db/seeds/c…
 - **Files changed:** 2 (+1348 −0), by folder:
@@ -12965,7 +13125,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 246. T-726: seed the demo shops' map points and zones from the geo double (db/seeds/setup-points.ts): each of the 245 setup-seed locations gets the double's exact point for its address, filling only the empty map\_point as rosie\_job (version raised once); its 244 flow B travel areas stay centred on that point, and a centre of its own is checked against the double; each point's IANA zone must be its business's (K-23 v1 holds none per location); refuses before core or setup-business, and any not-found, partial or other point; idempotent; with its integration tests (\#250)
 
-- **Commit:** [`acbc458`](https://github.com/aryamahadik/rosie/commit/acbc458), by Arya Mahadik, 2026-11-09 10:47:34 UTC
+- **Commit:** [`acbc4584`](https://github.com/aryamahadik/rosie/commit/acbc4584), by Arya Mahadik, 2026-11-09 10:47:34 UTC
 - **Pull request:** [#250](https://github.com/aryamahadik/rosie/pull/250) from `task/T-726`, merged 2026-11-09 10:47:35 UTC. It squashed 1 branch commit:
   - `f28c284` T-726: seed the demo shops' map points and zones from the geo double …
 - **Files changed:** 2 (+1258 −0), by folder:
@@ -12981,7 +13141,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 245. T-215: seed the demo shops' availability and bill cards from fixture set v1 (db/seeds/setup-availability.ts): each shop's opening hours from its demo listing (test-mixed-A and -B take the one listing hours every shop gives), one weekly class for each of the 33 shops whose facts list classes, selling its first list-priced service, with 90 days of scheduled sessions as K-04 class-session resources with 12-seat counters, and a live bill card per shop in the Stripe double's stand-in ids; no time off, busy block, calendar link or document, which no file gives; refuses before the core, setup, kinds, services and staff seeds, and is idempotent; with its integration tests (\#249)
 
-- **Commit:** [`abaff06`](https://github.com/aryamahadik/rosie/commit/abaff06), by Arya Mahadik, 2026-11-09 10:26:14 UTC
+- **Commit:** [`abaff065`](https://github.com/aryamahadik/rosie/commit/abaff065), by Arya Mahadik, 2026-11-09 10:26:14 UTC
 - **Pull request:** [#249](https://github.com/aryamahadik/rosie/pull/249) from `task/T-215`, merged 2026-11-09 10:26:15 UTC. It squashed 1 branch commit:
   - `10a931a` T-215: seed the demo shops' availability and bill cards from fixture …
 - **Files changed:** 2 (+1906 −0), by folder:
@@ -12997,7 +13157,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 244. T-211: Migration 0027: the customers part (K-28) (\#248)
 
-- **Commit:** [`712ad8e`](https://github.com/aryamahadik/rosie/commit/712ad8e), by Arya Mahadik, 2026-11-09 10:18:59 UTC
+- **Commit:** [`712ad8ef`](https://github.com/aryamahadik/rosie/commit/712ad8ef), by Arya Mahadik, 2026-11-09 10:18:59 UTC
 - **Pull request:** [#248](https://github.com/aryamahadik/rosie/pull/248) from `task/T-211`, merged 2026-11-09 10:19:00 UTC. It squashed 1 branch commit:
   - `2d04033` T-211: Migration 0027: the customers part (K-28)
 - **Files changed:** 3 (+2208 −2), by folder:
@@ -13016,7 +13176,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 243. T-1132: the emitter emits each trade words op that would put back words a Master Correction replaced with the correction applied, each change tagged MC:\<id\> (emit/words-corrections.ts correctWordsOps; emitBundle returns them as corrected), compileTrade stops the build naming the trade, flow, step and correction when one is left (assertWordsKeepCorrections), and corrections/parity.shard-9.test.ts sweeps all 243 trades in the run's order against the corrected build, stop markers included (\#247)
 
-- **Commit:** [`ba2557c`](https://github.com/aryamahadik/rosie/commit/ba2557c), by Arya Mahadik, 2026-11-09 10:11:23 UTC
+- **Commit:** [`ba2557c3`](https://github.com/aryamahadik/rosie/commit/ba2557c3), by Arya Mahadik, 2026-11-09 10:11:23 UTC
 - **Pull request:** [#247](https://github.com/aryamahadik/rosie/pull/247) from `task/T-1132`, merged 2026-11-09 10:11:24 UTC. It squashed 1 branch commit:
   - `b24e562` T-1132: the emitter emits each trade words op that would put back wor…
 - **Files changed:** 7 (+747 −13), by folder:
@@ -13033,7 +13193,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 242. T-1133: Limit 6's count and time readers agree on which number is which (carries T-1130) (\#246)
 
-- **Commit:** [`f0c4229`](https://github.com/aryamahadik/rosie/commit/f0c4229), by Arya Mahadik, 2026-11-09 10:11:19 UTC
+- **Commit:** [`f0c4229a`](https://github.com/aryamahadik/rosie/commit/f0c4229a), by Arya Mahadik, 2026-11-09 10:11:19 UTC
 - **Pull request:** [#246](https://github.com/aryamahadik/rosie/pull/246) from `task/T-1133`, merged 2026-11-09 10:11:20 UTC. It squashed 9 branch commits:
   - `cc15e5d` T-1130: the count reader starts and ends a count at round 7's number …
   - `786dc15` T-1130: tests: each form T-304's last review found fails at limit 6 a…
@@ -13096,7 +13256,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 241. T-1050: The 67 numbered judgment rules: each flow emits them by number, every reference resolves, and a lint rule (\#245)
 
-- **Commit:** [`8c1b759`](https://github.com/aryamahadik/rosie/commit/8c1b759), by Arya Mahadik, 2026-11-09 09:42:47 UTC
+- **Commit:** [`8c1b7598`](https://github.com/aryamahadik/rosie/commit/8c1b7598), by Arya Mahadik, 2026-11-09 09:42:47 UTC
 - **Pull request:** [#245](https://github.com/aryamahadik/rosie/pull/245) from `task/T-1050`, merged 2026-11-09 09:42:47 UTC. It squashed 2 branch commits:
   - `2165485` T-1050: the 67 numbered judgment rules compiled per flow from S13-23 …
   - `a41096c` T-1050: a step cite with 's reads as a step cite; the test names both…
@@ -13124,7 +13284,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 240. T-210: Migration 0026: the documents and licenses part (K-35), with no checked column (\#244)
 
-- **Commit:** [`ca51190`](https://github.com/aryamahadik/rosie/commit/ca51190), by Arya Mahadik, 2026-11-09 08:47:40 UTC
+- **Commit:** [`ca511903`](https://github.com/aryamahadik/rosie/commit/ca511903), by Arya Mahadik, 2026-11-09 08:47:40 UTC
 - **Pull request:** [#244](https://github.com/aryamahadik/rosie/pull/244) from `task/T-210`, merged 2026-11-09 08:47:41 UTC. It squashed 1 branch commit:
   - `6aefb9e` T-210: Migration 0026: the documents and licenses part (K-35), with n…
 - **Files changed:** 3 (+2970 −3), by folder:
@@ -13143,7 +13303,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 239. T-052: Freeze K-09 Tool API v1.3: journey 5's calls (\#243)
 
-- **Commit:** [`cb7642c`](https://github.com/aryamahadik/rosie/commit/cb7642c), by Arya Mahadik, 2026-11-09 08:37:32 UTC
+- **Commit:** [`cb7642c0`](https://github.com/aryamahadik/rosie/commit/cb7642c0), by Arya Mahadik, 2026-11-09 08:37:32 UTC
 - **Pull request:** [#243](https://github.com/aryamahadik/rosie/pull/243) from `task/T-052`, merged 2026-11-09 08:37:33 UTC. It squashed 4 branch commits:
   - `bb31a96` T-052: K-09 Tool API v1.3, journey 5 calls (showMoneyBefore, settleOf…
   - `f6378f7` T-052: refundAtOnce's double charge commits through K-05 v1.1 reconci…
@@ -13182,7 +13342,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 238. T-727: seed the demo shops' staff from fixture set v1 (db/seeds/setup-staff.ts): a joined, bookable team of two per flow whose shop file names staff, each with a fictional mobile and the staff role; every team member and owner takes the shop's kind of work; one on-call person in each flow B shop whose facts list sentnow; with its integration tests (joined and bookable, one on-call person, traced to fixture set v1, a no-real-phone grep test, idempotent) (\#242)
 
-- **Commit:** [`237e69e`](https://github.com/aryamahadik/rosie/commit/237e69e), by Arya Mahadik, 2026-11-09 08:04:02 UTC
+- **Commit:** [`237e69ee`](https://github.com/aryamahadik/rosie/commit/237e69ee), by Arya Mahadik, 2026-11-09 08:04:02 UTC
 - **Pull request:** [#242](https://github.com/aryamahadik/rosie/pull/242) from `task/T-727`, merged 2026-11-09 08:04:03 UTC. It squashed 1 branch commit:
   - `8fb67ad` T-727: seed the demo shops' staff from fixture set v1 (db/seeds/setup…
 - **Files changed:** 2 (+1563 −0), by folder:
@@ -13198,7 +13358,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 237. T-366: code's danger-word rules after the safety read (ai/src/safety/lift.ts): a trade's danger word lifts No to Unsure when its tense is now, could restart or unknown, never lowering a verdict, and no verdict in 4 s gives K-02's timeout marker with the danger words found, else the plain marker; the call takes the bundle's danger words; lift.test.ts covers the card's cases (\#241)
 
-- **Commit:** [`0486a7b`](https://github.com/aryamahadik/rosie/commit/0486a7b), by Arya Mahadik, 2026-11-09 08:03:58 UTC
+- **Commit:** [`0486a7b9`](https://github.com/aryamahadik/rosie/commit/0486a7b9), by Arya Mahadik, 2026-11-09 08:03:58 UTC
 - **Pull request:** [#241](https://github.com/aryamahadik/rosie/pull/241) from `task/T-366`, merged 2026-11-09 08:03:58 UTC. It squashed 1 branch commit:
   - `95d0dc8` T-366: code's danger-word rules after the safety read (ai/src/safety/…
 - **Files changed:** 6 (+864 −29), by folder:
@@ -13214,7 +13374,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 236. T-209: Migration 0025: the platform billing part (K-33) (\#240)
 
-- **Commit:** [`350e55b`](https://github.com/aryamahadik/rosie/commit/350e55b), by Arya Mahadik, 2026-11-09 07:32:26 UTC
+- **Commit:** [`350e55b3`](https://github.com/aryamahadik/rosie/commit/350e55b3), by Arya Mahadik, 2026-11-09 07:32:26 UTC
 - **Pull request:** [#240](https://github.com/aryamahadik/rosie/pull/240) from `task/T-209`, merged 2026-11-09 07:32:27 UTC. It squashed 1 branch commit:
   - `ca16721` T-209: Migration 0025: the platform billing part (K-33)
 - **Files changed:** 4 (+2423 −4), by folder:
@@ -13233,7 +13393,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 235. T-214: seed the demo shops' services, ways, list price rules, owner rules and price OK limits from fixture set v1 (db/seeds/setup-services-rules.ts), with its integration tests (\#239)
 
-- **Commit:** [`6433e7a`](https://github.com/aryamahadik/rosie/commit/6433e7a), by Arya Mahadik, 2026-11-09 07:19:17 UTC
+- **Commit:** [`6433e7a2`](https://github.com/aryamahadik/rosie/commit/6433e7a2), by Arya Mahadik, 2026-11-09 07:19:17 UTC
 - **Pull request:** [#239](https://github.com/aryamahadik/rosie/pull/239) from `task/T-214`, merged 2026-11-09 07:19:18 UTC. It squashed 1 branch commit:
   - `39316a6` T-214: seed the demo shops' services, ways, list price rules, owner r…
 - **Files changed:** 2 (+1993 −0), by folder:
@@ -13249,7 +13409,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 234. T-208: Migration 0024: the availability part (K-27) (\#238)
 
-- **Commit:** [`6335016`](https://github.com/aryamahadik/rosie/commit/6335016), by Arya Mahadik, 2026-11-09 06:32:03 UTC
+- **Commit:** [`6335016f`](https://github.com/aryamahadik/rosie/commit/6335016f), by Arya Mahadik, 2026-11-09 06:32:03 UTC
 - **Pull request:** [#238](https://github.com/aryamahadik/rosie/pull/238) from `task/T-208`, merged 2026-11-09 06:32:03 UTC. It squashed 2 branch commits:
   - `93f6e81` T-208: migration 0024\_availability.sql builds K-27 v1's seven tables …
   - `9b1377e` T-208: rls.int.test.ts: K-27's three named exceptions (DL-247, K-27 r…
@@ -13277,7 +13437,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 233. T-1116: The emitted bundle and the lint use T-141's per-person stop placement (\#237)
 
-- **Commit:** [`d8e234b`](https://github.com/aryamahadik/rosie/commit/d8e234b), by Arya Mahadik, 2026-11-09 06:00:17 UTC
+- **Commit:** [`d8e234b5`](https://github.com/aryamahadik/rosie/commit/d8e234b5), by Arya Mahadik, 2026-11-09 06:00:17 UTC
 - **Pull request:** [#237](https://github.com/aryamahadik/rosie/pull/237) from `task/T-1116`, merged 2026-11-09 06:00:18 UTC. It squashed 3 branch commits:
   - `b529848` T-1116: the emitted bundle and the lint place the opt-out line as wal…
   - `5879920` T-1116: a list of a step a trade adds is held by the last words op at…
@@ -13313,7 +13473,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 232. T-1119: ci.yml's checks job gets merge-check.yml's postgis service (same image, env, port, health check) and its CI script tests step merge-check.yml's DATABASE\_URL; infra/ci/ci-postgres-service.test.mjs pins both, parses ci.yml with the local merge-check's YAML reader, and shows the checks failing on copies without them (\#236)
 
-- **Commit:** [`d727faa`](https://github.com/aryamahadik/rosie/commit/d727faa), by Arya Mahadik, 2026-11-09 06:00:14 UTC
+- **Commit:** [`d727faaa`](https://github.com/aryamahadik/rosie/commit/d727faaa), by Arya Mahadik, 2026-11-09 06:00:14 UTC
 - **Pull request:** [#236](https://github.com/aryamahadik/rosie/pull/236) from `task/T-1119`, merged 2026-11-09 06:00:14 UTC. It squashed 1 branch commit:
   - `9429fac` T-1119: ci.yml's checks job gets merge-check.yml's postgis service (s…
 - **Files changed:** 2 (+139 −0), by folder:
@@ -13330,7 +13490,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 231. T-1131: every Vitest project gets the 30 s resource guard: the root test options set testTimeout and hookTimeout 30\_000 (DL-236, not part of any test's claim), so workers, contract, scenario and e2e no longer run at Vitest's 5 s default; vitest-timeouts.test.mjs pins the root limits and that each project, as Vitest itself resolves it, is at least 30000 (\#235)
 
-- **Commit:** [`e746870`](https://github.com/aryamahadik/rosie/commit/e746870), by Arya Mahadik, 2026-11-09 06:00:10 UTC
+- **Commit:** [`e7468703`](https://github.com/aryamahadik/rosie/commit/e7468703), by Arya Mahadik, 2026-11-09 06:00:10 UTC
 - **Pull request:** [#235](https://github.com/aryamahadik/rosie/pull/235) from `task/T-1131`, merged 2026-11-09 06:00:11 UTC. It squashed 1 branch commit:
   - `434155e` T-1131: every Vitest project gets the 30 s resource guard: the root t…
 - **Files changed:** 2 (+57 −9), by folder:
@@ -13347,7 +13507,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 230. T-304: Limit 6 (Values): re-parse from source words; dates in the visit's zone (\#234)
 
-- **Commit:** [`5cff492`](https://github.com/aryamahadik/rosie/commit/5cff492), by Arya Mahadik, 2026-11-09 05:09:02 UTC
+- **Commit:** [`5cff492e`](https://github.com/aryamahadik/rosie/commit/5cff492e), by Arya Mahadik, 2026-11-09 05:09:02 UTC
 - **Pull request:** [#234](https://github.com/aryamahadik/rosie/pull/234) from `task/T-304-r7`, merged 2026-11-09 05:09:03 UTC. It squashed 9 branch commits:
   - `e4d9755` T-304: Limit 6 (Values): re-parse every value from its source words; …
   - `f2b1eed` T-304: a bare number is an hour only right beside its day, and a rang…
@@ -13411,7 +13571,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 229. T-212: the kinds seed: K-24's catalog from the 243 trade files (243 kinds, 486 kind\_flows, MC C5's fills for insurance's facts and the 12 trades with no pf.settings) and each of the 243 demo shops' kinds with the trade file's 11 plug-in text blocks stored whole, byte for byte; both sets checked against their sha256 lists first; idempotent; db/seeds/kinds.int.test.ts proves it (\#233)
 
-- **Commit:** [`ef72c83`](https://github.com/aryamahadik/rosie/commit/ef72c83), by Arya Mahadik, 2026-11-09 05:08:59 UTC
+- **Commit:** [`ef72c834`](https://github.com/aryamahadik/rosie/commit/ef72c834), by Arya Mahadik, 2026-11-09 05:08:59 UTC
 - **Pull request:** [#233](https://github.com/aryamahadik/rosie/pull/233) from `task/T-212`, merged 2026-11-09 05:08:59 UTC. It squashed 1 branch commit:
   - `0eb1338` T-212: the kinds seed: K-24's catalog from the 243 trade files (243 k…
 - **Files changed:** 2 (+1586 −0), by folder:
@@ -13427,7 +13587,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 228. T-207: Migration 0023: rules part (K-26) with the closed registry of rule kinds and trade facts (\#232)
 
-- **Commit:** [`5caab5c`](https://github.com/aryamahadik/rosie/commit/5caab5c), by Arya Mahadik, 2026-11-09 04:59:12 UTC
+- **Commit:** [`5caab5c1`](https://github.com/aryamahadik/rosie/commit/5caab5c1), by Arya Mahadik, 2026-11-09 04:59:12 UTC
 - **Pull request:** [#232](https://github.com/aryamahadik/rosie/pull/232) from `task/T-207`, merged 2026-11-09 04:59:12 UTC. It squashed 2 branch commits:
   - `82f357d` T-207: migration 0023\_rules.sql builds K-26 v1's five tables (trade\_f…
   - `3631369` T-207: 0023's header names where each check left to code comes from (…
@@ -13455,7 +13615,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 227. T-593: Money home (S13-55) as code: money words follow what the booking took, the four ways, one fee, never a charge on silence (\#231)
 
-- **Commit:** [`2e90af7`](https://github.com/aryamahadik/rosie/commit/2e90af7), by Arya Mahadik, 2026-11-09 04:03:02 UTC
+- **Commit:** [`2e90af78`](https://github.com/aryamahadik/rosie/commit/2e90af78), by Arya Mahadik, 2026-11-09 04:03:02 UTC
 - **Pull request:** [#231](https://github.com/aryamahadik/rosie/pull/231) from `task/T-593-r8`, merged 2026-11-09 04:03:02 UTC. It squashed 11 branch commits:
   - `35a7787` T-593: Money home (S13-55) as code: money slot rows follow what the b…
   - `07418ec` T-593: Errors name labels only; each money proof builds the master co…
@@ -13527,7 +13687,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 226. T-1118: the integration project gets the unit project's 30 s resource guard (testTimeout and hookTimeout 30\_000; T-1118, DL-227: a guard on the build Mac's emulated PostgreSQL, not part of any test's claim), keeping fileParallelism false and T-1117's root maxWorkers; vitest-timeouts.test.mjs pins the integration project's 30 s limits (\#230)
 
-- **Commit:** [`96d1f9f`](https://github.com/aryamahadik/rosie/commit/96d1f9f), by Arya Mahadik, 2026-11-09 03:40:27 UTC
+- **Commit:** [`96d1f9fb`](https://github.com/aryamahadik/rosie/commit/96d1f9fb), by Arya Mahadik, 2026-11-09 03:40:27 UTC
 - **Pull request:** [#230](https://github.com/aryamahadik/rosie/pull/230) from `task/T-1118`, merged 2026-11-09 03:40:27 UTC. It squashed 1 branch commit:
   - `67f7dbc` T-1118: the integration project gets the unit project's 30 s resource…
 - **Files changed:** 2 (+18 −7), by folder:
@@ -13544,7 +13704,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 225. T-206: Migration 0022: services and prices part (K-25): services, service money per path, price rules with effective dates, item services (\#229)
 
-- **Commit:** [`ec653f9`](https://github.com/aryamahadik/rosie/commit/ec653f9), by Arya Mahadik, 2026-11-09 02:59:06 UTC
+- **Commit:** [`ec653f9d`](https://github.com/aryamahadik/rosie/commit/ec653f9d), by Arya Mahadik, 2026-11-09 02:59:06 UTC
 - **Pull request:** [#229](https://github.com/aryamahadik/rosie/pull/229) from `task/T-206`, merged 2026-11-09 02:59:07 UTC. It squashed 3 branch commits:
   - `926f939` T-206: migration 0022\_services\_prices.sql builds K-25 v1's five table…
   - `6aa105e` T-206: services-prices.int.test.ts checks only K-25's own foreign key…
@@ -13577,7 +13737,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 224. T-141: Master Corrections layer: C9 (no SMS, Rosie never writes first), C10 (ID upload), R4, and stop-first lines per Q-30 (\#228)
 
-- **Commit:** [`930e6e2`](https://github.com/aryamahadik/rosie/commit/930e6e2), by Arya Mahadik, 2026-11-09 02:52:22 UTC
+- **Commit:** [`930e6e2d`](https://github.com/aryamahadik/rosie/commit/930e6e2d), by Arya Mahadik, 2026-11-09 02:52:22 UTC
 - **Pull request:** [#228](https://github.com/aryamahadik/rosie/pull/228) from `task/T-141-r3`, merged 2026-11-09 02:52:23 UTC. It squashed 5 branch commits:
   - `baf5e29` T-141: C9 (no SMS, Rosie never writes first), C10 (ID upload), R4 rea…
   - `0c6102a` T-141: round 2 (DL-207): framework.test.ts expects CORRECTIONS ids \[C…
@@ -13619,7 +13779,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 223. T-1117: every Vitest run uses at most VITEST\_MAX\_WORKERS workers (a positive whole number, else 3), set once as the root test options' maxWorkers so every project shares it (DL-215, a resource guard on the build Mac); integration keeps fileParallelism false and every project its timeouts; vitest-timeouts.test.mjs loads the config under ten settings of the variable and pins the cap and that no project sets its own (\#227)
 
-- **Commit:** [`3d756a6`](https://github.com/aryamahadik/rosie/commit/3d756a6), by Arya Mahadik, 2026-11-09 01:42:40 UTC
+- **Commit:** [`3d756a6e`](https://github.com/aryamahadik/rosie/commit/3d756a6e), by Arya Mahadik, 2026-11-09 01:42:40 UTC
 - **Pull request:** [#227](https://github.com/aryamahadik/rosie/pull/227) from `task/T-1117`, merged 2026-11-09 01:42:41 UTC. It squashed 1 branch commit:
   - `fcc66a1` T-1117: every Vitest run uses at most VITEST\_MAX\_WORKERS workers (a p…
 - **Files changed:** 2 (+62 −3), by folder:
@@ -13636,7 +13796,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 222. T-213: Seed the demo shops' business setup: business fields, companies, locations, places, owner staff row and ID upload record (\#225)
 
-- **Commit:** [`3e3e3ea`](https://github.com/aryamahadik/rosie/commit/3e3e3ea), by Arya Mahadik, 2026-11-09 01:04:49 UTC
+- **Commit:** [`3e3e3ea5`](https://github.com/aryamahadik/rosie/commit/3e3e3ea5), by Arya Mahadik, 2026-11-09 01:04:49 UTC
 - **Pull request:** [#225](https://github.com/aryamahadik/rosie/pull/225) from `task/T-213`, merged 2026-11-09 01:04:49 UTC. It squashed 2 branch commits:
   - `b424e61` T-213: seed the demo shops' business setup from fixture set v1: busin…
   - `e1fb232` T-213: give the setup seed test's schema drops the 120 s guard its se…
@@ -13663,7 +13823,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 221. T-205: migration 0021\_kinds\_of\_work.sql builds K-24 v1's six tables (kinds, kind\_flows, picked\_kinds, picked\_kind\_texts, new\_work\_drafts, new\_work\_draft\_blocks) with the version trigger on all six, row-level security in T-191's pattern on the four business-scoped tables and the catalog read-only to the Tool API; kinds-of-work.int.test.ts proves the catalog against the table list, the three seeds, the byte-for-byte text block, RLS, grants and the five refused fixtures; rls.int.test.ts takes K-24's table list and the catalog's SELECT for rosie\_app (\#226)
 
-- **Commit:** [`ff97818`](https://github.com/aryamahadik/rosie/commit/ff97818), by Arya Mahadik, 2026-11-09 01:04:45 UTC
+- **Commit:** [`ff97818e`](https://github.com/aryamahadik/rosie/commit/ff97818e), by Arya Mahadik, 2026-11-09 01:04:45 UTC
 - **Pull request:** [#226](https://github.com/aryamahadik/rosie/pull/226) from `task/T-205`, merged 2026-11-09 01:04:46 UTC. It squashed 1 branch commit:
   - `2cf71a7` T-205: migration 0021\_kinds\_of\_work.sql builds K-24 v1's six tables (…
 - **Files changed:** 3 (+2057 −2), by folder:
@@ -13680,7 +13840,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 220. T-550: the composition root (runtime/src/wiring) binds D-017's ten ports once per environment, every port on its fake under test and still closed on the Worker's staging and production; it builds the gateway, the actor's ports and the dispatcher from them, and the Worker takes its gateway from it; tests list the bindings, refuse a port bound twice or left unbound, and run T-260's trace check through the root (\#224)
 
-- **Commit:** [`e96c751`](https://github.com/aryamahadik/rosie/commit/e96c751), by Arya Mahadik, 2026-11-09 00:47:54 UTC
+- **Commit:** [`e96c751e`](https://github.com/aryamahadik/rosie/commit/e96c751e), by Arya Mahadik, 2026-11-09 00:47:54 UTC
 - **Pull request:** [#224](https://github.com/aryamahadik/rosie/pull/224) from `task/T-550`, merged 2026-11-09 00:47:54 UTC. It squashed 1 branch commit:
   - `8e2828a` T-550: the composition root (runtime/src/wiring) binds D-017's ten po…
 - **Files changed:** 11 (+1533 −4), by folder:
@@ -13697,7 +13857,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 219. T-019: Freeze K-10 v1: Eval-set format (\#223)
 
-- **Commit:** [`d1aebf6`](https://github.com/aryamahadik/rosie/commit/d1aebf6), by Arya Mahadik, 2026-11-09 00:47:50 UTC
+- **Commit:** [`d1aebf64`](https://github.com/aryamahadik/rosie/commit/d1aebf64), by Arya Mahadik, 2026-11-09 00:47:50 UTC
 - **Pull request:** [#223](https://github.com/aryamahadik/rosie/pull/223) from `task/T-019`, merged 2026-11-09 00:47:50 UTC. It squashed 2 branch commits:
   - `f98f642` T-019: Freeze K-10 v1, the eval-set format: gold-set items and the ac…
   - `584cb3d` T-019: K-10 v1 round 2 (DL-201): the report names its run by bundle a…
@@ -13726,7 +13886,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 218. T-317 + T-1115: Record flags and STOP, START and work-phone answers as consent rows; slot 1 runs limit 1 whole behind the flags check (\#222)
 
-- **Commit:** [`3944dc8`](https://github.com/aryamahadik/rosie/commit/3944dc8), by Arya Mahadik, 2026-11-08 22:23:17 UTC
+- **Commit:** [`3944dc87`](https://github.com/aryamahadik/rosie/commit/3944dc87), by Arya Mahadik, 2026-11-08 22:23:17 UTC
 - **Pull request:** [#222](https://github.com/aryamahadik/rosie/pull/222) from `task/T-1115-with-T-317`, merged 2026-11-08 22:23:17 UTC. It squashed 4 branch commits:
   - `e523fe3` T-317: record flags and STOP, START and work-phone answers as consent…
   - `3b549ce` T-317: test the flags calls through the Tool API base and a flag set …
@@ -13766,7 +13926,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 217. T-1114: the parity project gets the unit project's 30 s testTimeout and hookTimeout (resource guard, DL-200), pinned by vitest-timeouts.test.mjs (\#221)
 
-- **Commit:** [`7be2201`](https://github.com/aryamahadik/rosie/commit/7be2201), by Arya Mahadik, 2026-11-08 22:08:40 UTC
+- **Commit:** [`7be22014`](https://github.com/aryamahadik/rosie/commit/7be22014), by Arya Mahadik, 2026-11-08 22:08:40 UTC
 - **Pull request:** [#221](https://github.com/aryamahadik/rosie/pull/221) from `task/T-1114-rebased`, merged 2026-11-08 22:08:41 UTC. It squashed 1 branch commit:
   - `4ab16d9` T-1114: the parity project gets the unit project's 30 s testTimeout a…
 - **Files changed:** 2 (+12 −1), by folder:
@@ -13783,7 +13943,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 216. T-1112: The runner clock's sleepUntil returns only once the instant has come: each time its timer fires it reads the time again and waits for the time left (timer and now are ports), an abort clears the pending timer, waits past 2^31-1 ms go in parts; tests for an early timer, an abort mid-wait and a 30-day wait (\#219)
 
-- **Commit:** [`1496488`](https://github.com/aryamahadik/rosie/commit/1496488), by Arya Mahadik, 2026-11-08 22:06:39 UTC
+- **Commit:** [`1496488c`](https://github.com/aryamahadik/rosie/commit/1496488c), by Arya Mahadik, 2026-11-08 22:06:39 UTC
 - **Pull request:** [#219](https://github.com/aryamahadik/rosie/pull/219) from `task/T-1112`, merged 2026-11-08 22:06:39 UTC. It squashed 1 branch commit:
   - `998cd00` T-1112: The runner clock's sleepUntil returns only once the instant h…
 - **Files changed:** 2 (+182 −11), by folder:
@@ -13799,7 +13959,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 215. T-1113: the integration project runs its files one at a time (fileParallelism: false), pinned by an infra/ci test (\#216)
 
-- **Commit:** [`4da33fb`](https://github.com/aryamahadik/rosie/commit/4da33fb), by Arya Mahadik, 2026-11-08 22:06:34 UTC
+- **Commit:** [`4da33fb4`](https://github.com/aryamahadik/rosie/commit/4da33fb4), by Arya Mahadik, 2026-11-08 22:06:34 UTC
 - **Pull request:** [#216](https://github.com/aryamahadik/rosie/pull/216) from `task/T-1113`, merged 2026-11-08 22:06:35 UTC. It squashed 1 branch commit:
   - `a41747e` T-1113: the integration project runs its files one at a time (filePar…
 - **Files changed:** 2 (+23 −2), by folder:
@@ -13816,7 +13976,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 214. T-1111: local merge-check on the build Mac: infra/ci/local-merge-check.mjs runs merge-check.yml's own steps (read from the YAML at origin/main) in a fresh clone rebased onto origin/main, against a throwaway database in the local rosie-pg, with its tests, README and the merge-check:local and test:ci-scripts scripts (\#214)
 
-- **Commit:** [`c80eecb`](https://github.com/aryamahadik/rosie/commit/c80eecb), by Arya Mahadik, 2026-11-08 22:06:31 UTC
+- **Commit:** [`c80eecb0`](https://github.com/aryamahadik/rosie/commit/c80eecb0), by Arya Mahadik, 2026-11-08 22:06:31 UTC
 - **Pull request:** [#214](https://github.com/aryamahadik/rosie/pull/214) from `task/T-1111`, merged 2026-11-08 22:06:31 UTC. It squashed 1 branch commit:
   - `e3da542` T-1111: local merge-check on the build Mac: infra/ci/local-merge-chec…
 - **Files changed:** 4 (+1856 −0), by folder:
@@ -13833,7 +13993,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 213. T-373: Composer call: one Haiku call per outbox row, message plan out (\#187)
 
-- **Commit:** [`e283da9`](https://github.com/aryamahadik/rosie/commit/e283da9), by Arya Mahadik, 2026-11-08 22:06:27 UTC
+- **Commit:** [`e283da97`](https://github.com/aryamahadik/rosie/commit/e283da97), by Arya Mahadik, 2026-11-08 22:06:27 UTC
 - **Pull request:** [#187](https://github.com/aryamahadik/rosie/pull/187) from `task/T-373`, merged 2026-11-08 22:06:27 UTC. It squashed 3 branch commits:
   - `950de40` T-373: composer call: one Haiku call per outbox row through the AI ga…
   - `55f8d2f` T-373: round 2 on K-03 v1.1: the composer takes term facts (input che…
@@ -13866,7 +14026,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 212. T-439: Geo double: fixed points and zones for the test addresses, not found for any other, the errors a test sets, one K-08 span per call (K-17 v1) (\#198)
 
-- **Commit:** [`59f392e`](https://github.com/aryamahadik/rosie/commit/59f392e), by Arya Mahadik, 2026-11-08 22:06:23 UTC
+- **Commit:** [`59f392ec`](https://github.com/aryamahadik/rosie/commit/59f392ec), by Arya Mahadik, 2026-11-08 22:06:23 UTC
 - **Pull request:** [#198](https://github.com/aryamahadik/rosie/pull/198) from `task/T-439`, merged 2026-11-08 22:06:23 UTC. It squashed 1 branch commit:
   - `8b92af2` T-439: Geo double: fixed points and zones for the test addresses, not…
 - **Files changed:** 6 (+1029 −0), by folder:
@@ -13882,7 +14042,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 211. T-1110: Stripe harness opens each effect run's trace under a fixed id, so the scan for card digits never meets a random UUID; guard test that the scanned text is the same on every run (\#210)
 
-- **Commit:** [`a6b2ae6`](https://github.com/aryamahadik/rosie/commit/a6b2ae6), by Arya Mahadik, 2026-11-08 22:06:19 UTC
+- **Commit:** [`a6b2ae6b`](https://github.com/aryamahadik/rosie/commit/a6b2ae6b), by Arya Mahadik, 2026-11-08 22:06:19 UTC
 - **Pull request:** [#210](https://github.com/aryamahadik/rosie/pull/210) from `task/T-1110`, merged 2026-11-08 22:06:19 UTC. It squashed 1 branch commit:
   - `7701293` T-1110: Stripe harness opens each effect run's trace under a fixed id…
 - **Files changed:** 2 (+49 −4), by folder:
@@ -13898,7 +14058,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 210. T-314: fixed-line inserter: S13-01 opener, opt-out line and privacy link on a first text (Q-30), the code text, safety lines, checked terms and the handling line, word for word outside the length counts, as finalize's insertFixedLines port (\#211)
 
-- **Commit:** [`5ab6203`](https://github.com/aryamahadik/rosie/commit/5ab6203), by Arya Mahadik, 2026-11-08 22:06:15 UTC
+- **Commit:** [`5ab62036`](https://github.com/aryamahadik/rosie/commit/5ab62036), by Arya Mahadik, 2026-11-08 22:06:15 UTC
 - **Pull request:** [#211](https://github.com/aryamahadik/rosie/pull/211) from `task/T-314`, merged 2026-11-08 22:06:15 UTC. It squashed 1 branch commit:
   - `7fda515` T-314: fixed-line inserter: S13-01 opener, opt-out line and privacy l…
 - **Files changed:** 6 (+968 −0), by folder:
@@ -13914,7 +14074,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 209. T-1105: The message checks' details never quote a piece of a glued value (\#203)
 
-- **Commit:** [`cd9973d`](https://github.com/aryamahadik/rosie/commit/cd9973d), by Arya Mahadik, 2026-11-08 22:06:11 UTC
+- **Commit:** [`cd9973d3`](https://github.com/aryamahadik/rosie/commit/cd9973d3), by Arya Mahadik, 2026-11-08 22:06:11 UTC
 - **Pull request:** [#203](https://github.com/aryamahadik/rosie/pull/203) from `task/T-1105`, merged 2026-11-08 22:06:11 UTC. It squashed 2 branch commits:
   - `481431b` T-1105: Values and Never-in-a-message details never quote a piece of …
   - `c2433e8` T-1105: Values places read in the send text before anything is taken …
@@ -13943,7 +14103,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 208. T-306: commit path on local PostgreSQL: the commit's K-05 port on T-195's commitTurn (actions/src/commit/pg), with integration tests: all or nothing on a refused last row, 100 parallel commits of one turn id, two turns on one booking version (\#208)
 
-- **Commit:** [`99b9ef9`](https://github.com/aryamahadik/rosie/commit/99b9ef9), by Arya Mahadik, 2026-11-08 22:06:06 UTC
+- **Commit:** [`99b9ef9c`](https://github.com/aryamahadik/rosie/commit/99b9ef9c), by Arya Mahadik, 2026-11-08 22:06:06 UTC
 - **Pull request:** [#208](https://github.com/aryamahadik/rosie/pull/208) from `task/T-306`, merged 2026-11-08 22:06:07 UTC. It squashed 1 branch commit:
   - `888ba5f` T-306: commit path on local PostgreSQL: the commit's K-05 port on T-1…
 - **Files changed:** 4 (+1079 −0), by folder:
@@ -13959,7 +14119,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 207. T-299: Limit 1 (Allowed): protect-only on anyone's word; adds need the decider's own yes (\#215)
 
-- **Commit:** [`d6a3a77`](https://github.com/aryamahadik/rosie/commit/d6a3a77), by Arya Mahadik, 2026-11-08 22:06:03 UTC
+- **Commit:** [`d6a3a772`](https://github.com/aryamahadik/rosie/commit/d6a3a772), by Arya Mahadik, 2026-11-08 22:06:03 UTC
 - **Pull request:** [#215](https://github.com/aryamahadik/rosie/pull/215) from `task/T-299`, merged 2026-11-08 22:06:03 UTC. It squashed 3 branch commits:
   - `eaa4838` T-299: Limit 1 (Allowed): protect-only on anyone's word; any other ch…
   - `288ab10` T-299: Round 2 (DL-183): a choice about no booking is the sender's ow…
@@ -13991,7 +14151,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 206. T-302: limit 4, Versions: replaces the fail-closed stub with compare-and-set on every row the read-back showed (K-04 open\_questions.versions\_read; limit 5's rows left to it), reloaded at the gate and sent with the commit; unchanged passes, changed but possible gives today's facts and a fresh yes, impossible says what changed, a second conflict on one question goes to a person with a review item (K-09 v1 limit4Outcome); 31 unit tests on K-05 commit-version-changed.json, K-09 commit-limit-4-changed.json, two turns on one booking version against a compare-and-set K-05 fake, and a second conflict (\#205)
 
-- **Commit:** [`14af477`](https://github.com/aryamahadik/rosie/commit/14af477), by Arya Mahadik, 2026-11-08 22:05:59 UTC
+- **Commit:** [`14af477f`](https://github.com/aryamahadik/rosie/commit/14af477f), by Arya Mahadik, 2026-11-08 22:05:59 UTC
 - **Pull request:** [#205](https://github.com/aryamahadik/rosie/pull/205) from `task/T-302`, merged 2026-11-08 22:06:00 UTC. It squashed 1 branch commit:
   - `a644118` T-302: limit 4, Versions: replaces the fail-closed stub with compare-…
 - **Files changed:** 5 (+1891 −5), by folder:
@@ -14007,7 +14167,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 205. T-303: Limit 5 (Reserved): a held reservation for the worker, room, vehicle or seat (\#199)
 
-- **Commit:** [`823e374`](https://github.com/aryamahadik/rosie/commit/823e374), by Arya Mahadik, 2026-11-08 22:05:56 UTC
+- **Commit:** [`823e3746`](https://github.com/aryamahadik/rosie/commit/823e3746), by Arya Mahadik, 2026-11-08 22:05:56 UTC
 - **Pull request:** [#199](https://github.com/aryamahadik/rosie/pull/199) from `task/T-303`, merged 2026-11-08 22:05:56 UTC. It squashed 2 branch commits:
   - `84beddf` T-303: limit 5 (Reserved): a booking part passes only while each save…
   - `aa7f335` T-303: limit 5 test: a saved time ending between the gate's now and t…
@@ -14034,7 +14194,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 204. T-591: Clock home (S13-35) as code: deadlines from the visit inside text hours, one reminder per booked time (\#206)
 
-- **Commit:** [`97e45da`](https://github.com/aryamahadik/rosie/commit/97e45da), by Arya Mahadik, 2026-11-08 22:05:52 UTC
+- **Commit:** [`97e45da7`](https://github.com/aryamahadik/rosie/commit/97e45da7), by Arya Mahadik, 2026-11-08 22:05:52 UTC
 - **Pull request:** [#206](https://github.com/aryamahadik/rosie/pull/206) from `task/T-591`, merged 2026-11-08 22:05:53 UTC. It squashed 2 branch commits:
   - `840c317` T-591: Clock home (S13-35) as code: deadlines by the visit inside tex…
   - `6d6d366` T-591: Round 2 (DL-180): text hours end before 8pm as limit 8 reads t…
@@ -14069,7 +14229,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 203. T-256: Queues for retries only, 5 tries, then the dead-letter queue (\#213)
 
-- **Commit:** [`7252211`](https://github.com/aryamahadik/rosie/commit/7252211), by Arya Mahadik, 2026-11-08 22:05:49 UTC
+- **Commit:** [`72522119`](https://github.com/aryamahadik/rosie/commit/72522119), by Arya Mahadik, 2026-11-08 22:05:49 UTC
 - **Pull request:** [#213](https://github.com/aryamahadik/rosie/pull/213) from `task/T-256`, merged 2026-11-08 22:05:49 UTC. It squashed 3 branch commits:
   - `cf37d5b` T-256: Retry queue producer and consumer: retries only, sends after a…
   - `3c00042` T-256: Job bodies carry ids only (K-37 rule 4) and are measured in by…
@@ -14102,7 +14262,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 202. T-275: Gateway: Stripe and calendar webhooks verified through their ports and stored once by event id (\#200)
 
-- **Commit:** [`165c8c1`](https://github.com/aryamahadik/rosie/commit/165c8c1), by Arya Mahadik, 2026-11-08 22:05:45 UTC
+- **Commit:** [`165c8c11`](https://github.com/aryamahadik/rosie/commit/165c8c11), by Arya Mahadik, 2026-11-08 22:05:45 UTC
 - **Pull request:** [#200](https://github.com/aryamahadik/rosie/pull/200) from `task/T-275`, merged 2026-11-08 22:05:45 UTC. It squashed 1 branch commit:
   - `3d2c103` T-275: Gateway: Stripe and calendar webhooks verified through their p…
 - **Files changed:** 14 (+3461 −86), by folder:
@@ -14122,7 +14282,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 201. T-269: Actor-local copies: stopped flag, checked safety lines, running safety timers (\#190)
 
-- **Commit:** [`68b6335`](https://github.com/aryamahadik/rosie/commit/68b6335), by Arya Mahadik, 2026-11-08 22:05:41 UTC
+- **Commit:** [`68b63357`](https://github.com/aryamahadik/rosie/commit/68b63357), by Arya Mahadik, 2026-11-08 22:05:41 UTC
 - **Pull request:** [#190](https://github.com/aryamahadik/rosie/pull/190) from `task/T-269`, merged 2026-11-08 22:05:41 UTC. It squashed 2 branch commits:
   - `fc716d3` T-269: actor-local copies: the stopped flag set from each committed a…
   - `56ac944` T-269: round 2 (DL-167): in the danger and stop ranks a refused write…
@@ -14151,7 +14311,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 200. T-260: Runtime trace check end to end: every runtime hop once, in order (\#188)
 
-- **Commit:** [`55125fe`](https://github.com/aryamahadik/rosie/commit/55125fe), by Arya Mahadik, 2026-11-08 22:05:37 UTC
+- **Commit:** [`55125fe3`](https://github.com/aryamahadik/rosie/commit/55125fe3), by Arya Mahadik, 2026-11-08 22:05:37 UTC
 - **Pull request:** [#188](https://github.com/aryamahadik/rosie/pull/188) from `task/T-260`, merged 2026-11-08 22:05:38 UTC. It squashed 4 branch commits:
   - `ea6d393` T-260: scratch Vitest config that ran runtime/test/\*\* in the Workers …
   - `7f218d9` T-260: remove the scratch Vitest config (the root workers project sho…
@@ -14190,7 +14350,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 199. T-151: KV size spike: measure.mjs prints each bundle value's bytes and each K-01 key against Cloudflare KV's limits (25 MiB value, 512 B key), checked against miniflare's KVLimits (\#204)
 
-- **Commit:** [`c03b80b`](https://github.com/aryamahadik/rosie/commit/c03b80b), by Arya Mahadik, 2026-11-08 22:05:34 UTC
+- **Commit:** [`c03b80bb`](https://github.com/aryamahadik/rosie/commit/c03b80bb), by Arya Mahadik, 2026-11-08 22:05:34 UTC
 - **Pull request:** [#204](https://github.com/aryamahadik/rosie/pull/204) from `task/T-151`, merged 2026-11-08 22:05:34 UTC. It squashed 1 branch commit:
   - `adaebb0` T-151: KV size spike: measure.mjs prints each bundle value's bytes an…
 - **Files changed:** 1 (+310 −0), by folder:
@@ -14206,7 +14366,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 198. T-159: Lint: a button whose whole text is a guard keyword, with its own test (\#197)
 
-- **Commit:** [`196e8b5`](https://github.com/aryamahadik/rosie/commit/196e8b5), by Arya Mahadik, 2026-11-08 22:05:30 UTC
+- **Commit:** [`196e8b51`](https://github.com/aryamahadik/rosie/commit/196e8b51), by Arya Mahadik, 2026-11-08 22:05:30 UTC
 - **Pull request:** [#197](https://github.com/aryamahadik/rosie/pull/197) from `task/T-159`, merged 2026-11-08 22:05:30 UTC. It squashed 2 branch commits:
   - `ab8006c` T-159: lint rule guard-keyword-button: fails a button whose whole tex…
   - `123763b` T-159: guard-keyword header: what is not read, stated by its sources …
@@ -14233,7 +14393,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 197. T-158: Lint rule loop (Q-39 default): fails each step on a cycle of relative t references, or of code's walk through a flow-switch end, where no step on it asks, waits or ends; splits read as T-291's frontier reads them from T-145's tags; 12 tests incl. refuse-loop.json's walk and K-01 schema check (\#186)
 
-- **Commit:** [`5a3871a`](https://github.com/aryamahadik/rosie/commit/5a3871a), by Arya Mahadik, 2026-11-08 22:05:27 UTC
+- **Commit:** [`5a3871a3`](https://github.com/aryamahadik/rosie/commit/5a3871a3), by Arya Mahadik, 2026-11-08 22:05:27 UTC
 - **Pull request:** [#186](https://github.com/aryamahadik/rosie/pull/186) from `task/T-158`, merged 2026-11-08 22:05:27 UTC. It squashed 1 branch commit:
   - `7695f04` T-158: Lint rule loop (Q-39 default): fails each step on a cycle of r…
 - **Files changed:** 2 (+864 −0), by folder:
@@ -14249,7 +14409,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 196. T-157: lint rule lookup-without-field: a lookup branch naming no field fails anywhere; for a trade, a lookup whose needs key, record field or path field is given on none of the paths that reach it fails, on some but not all warns; walks every trade path (listed money paths, booking values, record fixtures, with its facts and switches) as lib.js walkCombo does; its own test (\#185)
 
-- **Commit:** [`d5997bc`](https://github.com/aryamahadik/rosie/commit/d5997bc), by Arya Mahadik, 2026-11-08 22:05:23 UTC
+- **Commit:** [`d5997bca`](https://github.com/aryamahadik/rosie/commit/d5997bca), by Arya Mahadik, 2026-11-08 22:05:23 UTC
 - **Pull request:** [#185](https://github.com/aryamahadik/rosie/pull/185) from `task/T-157`, merged 2026-11-08 22:05:23 UTC. It squashed 1 branch commit:
   - `c42e542` T-157: lint rule lookup-without-field: a lookup branch naming no fiel…
 - **Files changed:** 2 (+963 −0), by folder:
@@ -14265,7 +14425,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 195. T-156: lint rule choice-without-definition: fails a choice whose card gives it no definition (K-01's own check), lists each decision that states no Means line as a warning for its stand-ins (NQ-PB-3); one file in the T-153 runner, tested alone on refuse-choice-without-definition.json, bundle-mini-a/b, aba and the master (48 listed, 173 choices) (\#194)
 
-- **Commit:** [`0a5908d`](https://github.com/aryamahadik/rosie/commit/0a5908d), by Arya Mahadik, 2026-11-08 22:05:19 UTC
+- **Commit:** [`0a5908db`](https://github.com/aryamahadik/rosie/commit/0a5908db), by Arya Mahadik, 2026-11-08 22:05:19 UTC
 - **Pull request:** [#194](https://github.com/aryamahadik/rosie/pull/194) from `task/T-156`, merged 2026-11-08 22:05:20 UTC. It squashed 1 branch commit:
   - `1dcc809` T-156: lint rule choice-without-definition: fails a choice whose card…
 - **Files changed:** 2 (+615 −0), by folder:
@@ -14281,7 +14441,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 194. T-155: lint rule no-safe-default-or-clock: fails a question whose card has neither a safe default nor a clock (K-01's own check), lists each decision that relies on step 9's default as a warning (NQ-PB-3); one file in the T-153 runner, tested alone on refuse-no-safe-default-or-clock.json, bundle-mini-a/b and the master (13 Clock lines, 197 listed) (\#191)
 
-- **Commit:** [`f1af1fd`](https://github.com/aryamahadik/rosie/commit/f1af1fd), by Arya Mahadik, 2026-11-08 22:05:16 UTC
+- **Commit:** [`f1af1fdd`](https://github.com/aryamahadik/rosie/commit/f1af1fdd), by Arya Mahadik, 2026-11-08 22:05:16 UTC
 - **Pull request:** [#191](https://github.com/aryamahadik/rosie/pull/191) from `task/T-155`, merged 2026-11-08 22:05:16 UTC. It squashed 1 branch commit:
   - `243c795` T-155: lint rule no-safe-default-or-clock: fails a question whose car…
 - **Files changed:** 2 (+463 −0), by folder:
@@ -14297,7 +14457,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 193. T-150: bundle id (content hash of the stored values plus a build number) and every input K-01 names with its sha256, through compiler build --build \<n\> (\#193)
 
-- **Commit:** [`70897de`](https://github.com/aryamahadik/rosie/commit/70897de), by Arya Mahadik, 2026-11-08 22:05:12 UTC
+- **Commit:** [`70897de7`](https://github.com/aryamahadik/rosie/commit/70897de7), by Arya Mahadik, 2026-11-08 22:05:12 UTC
 - **Pull request:** [#193](https://github.com/aryamahadik/rosie/pull/193) from `task/T-150`, merged 2026-11-08 22:05:12 UTC. It squashed 1 branch commit:
   - `1513755` T-150: bundle id (content hash of the stored values plus a build numb…
 - **Files changed:** 10 (+1335 −15), by folder:
@@ -14315,7 +14475,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 192. T-084: Contract test data-access.v1: every K-05 v1, v1.1 and v1.2 fixture against the schema of its version, each refusal tied to its reason, the schema not vacuous, fixture-level README rules, and the side list (\#217)
 
-- **Commit:** [`4f8bad9`](https://github.com/aryamahadik/rosie/commit/4f8bad9), by Arya Mahadik, 2026-11-08 22:05:07 UTC
+- **Commit:** [`4f8bad9d`](https://github.com/aryamahadik/rosie/commit/4f8bad9d), by Arya Mahadik, 2026-11-08 22:05:07 UTC
 - **Pull request:** [#217](https://github.com/aryamahadik/rosie/pull/217) from `task/T-084`, merged 2026-11-08 22:05:08 UTC. It squashed 1 branch commit:
   - `6855840` T-084: Contract test data-access.v1: every K-05 v1, v1.1 and v1.2 fix…
 - **Files changed:** 1 (+1595 −0), by folder:
@@ -14331,7 +14491,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 191. T-088: Contract test tool-api.v1: every K-09 fixture checked against its own version's schema (v1, v1.1, later minors by version), each refusal tied to its reason by mend-then-accept, required fields read from the schemas made refused, the README's rule statements modeled, DL-123's two checks, the side list (\#212)
 
-- **Commit:** [`663c7b4`](https://github.com/aryamahadik/rosie/commit/663c7b4), by Arya Mahadik, 2026-11-08 22:05:03 UTC
+- **Commit:** [`663c7b49`](https://github.com/aryamahadik/rosie/commit/663c7b49), by Arya Mahadik, 2026-11-08 22:05:03 UTC
 - **Pull request:** [#212](https://github.com/aryamahadik/rosie/pull/212) from `task/T-088`, merged 2026-11-08 22:05:04 UTC. It squashed 1 branch commit:
   - `fe02502` T-088: Contract test tool-api.v1: every K-09 fixture checked against …
 - **Files changed:** 1 (+1769 −0), by folder:
@@ -14347,7 +14507,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 190. T-083: Contract test db-schema.core.v1: K-04 Database schema: core part fixtures (\#209)
 
-- **Commit:** [`dc4e203`](https://github.com/aryamahadik/rosie/commit/dc4e203), by Arya Mahadik, 2026-11-08 22:04:59 UTC
+- **Commit:** [`dc4e2031`](https://github.com/aryamahadik/rosie/commit/dc4e2031), by Arya Mahadik, 2026-11-08 22:04:59 UTC
 - **Pull request:** [#209](https://github.com/aryamahadik/rosie/pull/209) from `task/T-083`, merged 2026-11-08 22:05:00 UTC. It squashed 2 branch commits:
   - `82ce92a` T-083: contract test db-schema.core.v1: K-04 fixtures checked against…
   - `a800e26` T-083: round 2: model README rule 2 (every update raises a versioned …
@@ -14374,7 +14534,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 189. T-219: readTurnState, the frontier's read of a turn's stored state on the primary, uncached, under the business scope (K-05 v1.2 item 26) (\#207)
 
-- **Commit:** [`6a45c11`](https://github.com/aryamahadik/rosie/commit/6a45c11), by Arya Mahadik, 2026-11-08 22:04:56 UTC
+- **Commit:** [`6a45c11a`](https://github.com/aryamahadik/rosie/commit/6a45c11a), by Arya Mahadik, 2026-11-08 22:04:56 UTC
 - **Pull request:** [#207](https://github.com/aryamahadik/rosie/pull/207) from `task/T-219`, merged 2026-11-08 22:04:56 UTC. It squashed 1 branch commit:
   - `dcf601e` T-219: readTurnState, the frontier's read of a turn's stored state on…
 - **Files changed:** 2 (+2321 −0), by folder:
@@ -14392,7 +14552,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 188. T-198: Data access: door lengths, the third-saved-time limit, next in line, release promotes, extend once (\#196)
 
-- **Commit:** [`38dac24`](https://github.com/aryamahadik/rosie/commit/38dac24), by Arya Mahadik, 2026-11-08 22:04:52 UTC
+- **Commit:** [`38dac249`](https://github.com/aryamahadik/rosie/commit/38dac249), by Arya Mahadik, 2026-11-08 22:04:52 UTC
 - **Pull request:** [#196](https://github.com/aryamahadik/rosie/pull/196) from `task/T-198`, merged 2026-11-08 22:04:53 UTC. It squashed 3 branch commits:
   - `c1016e0` T-198: reservation rules: extend() gives 10 more minutes once, never …
   - `5664d35` T-198: name the lock order exactly: commitTurn's (clock row, slot, ro…
@@ -14424,7 +14584,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 187. T-197: K-05 clock calls (armClock, cancelClock, dueClocks with dueForHandle and dueForSweep, fireClock once per row) and parkTurn with K-37's parked\_turns row, each with its integration tests (\#189)
 
-- **Commit:** [`a1efaa1`](https://github.com/aryamahadik/rosie/commit/a1efaa1), by Arya Mahadik, 2026-11-08 22:04:48 UTC
+- **Commit:** [`a1efaa1c`](https://github.com/aryamahadik/rosie/commit/a1efaa1c), by Arya Mahadik, 2026-11-08 22:04:48 UTC
 - **Pull request:** [#189](https://github.com/aryamahadik/rosie/pull/189) from `task/T-197`, merged 2026-11-08 22:04:49 UTC. It squashed 1 branch commit:
   - `ae0f093` T-197: K-05 clock calls (armClock, cancelClock, dueClocks with dueFor…
 - **Files changed:** 4 (+3782 −0), by folder:
@@ -14440,7 +14600,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 186. T-204: Migration 0020: people and access part (K-22): staff details, the owner's ID upload record, admins, sessions, proof codes, contact changes (\#192)
 
-- **Commit:** [`19404d1`](https://github.com/aryamahadik/rosie/commit/19404d1), by Arya Mahadik, 2026-11-08 22:04:45 UTC
+- **Commit:** [`19404d18`](https://github.com/aryamahadik/rosie/commit/19404d18), by Arya Mahadik, 2026-11-08 22:04:45 UTC
 - **Pull request:** [#192](https://github.com/aryamahadik/rosie/pull/192) from `task/T-204`, merged 2026-11-08 22:04:45 UTC. It squashed 4 branch commits:
   - `452728e` T-204: Migration 9999\_people\_access (K-22 v1.1): eleven tables, rules…
   - `1947700` T-204: rls.int.test.ts: K-22's four named exceptions (DL-169): polici…
@@ -14478,7 +14638,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 185. T-060: Freeze K-21 page and console calls v1.1: journey 3 screens (\#195)
 
-- **Commit:** [`347c4af`](https://github.com/aryamahadik/rosie/commit/347c4af), by Arya Mahadik, 2026-11-08 22:04:41 UTC
+- **Commit:** [`347c4af4`](https://github.com/aryamahadik/rosie/commit/347c4af4), by Arya Mahadik, 2026-11-08 22:04:41 UTC
 - **Pull request:** [#195](https://github.com/aryamahadik/rosie/pull/195) from `task/T-060`, merged 2026-11-08 22:04:41 UTC. It squashed 3 branch commits:
   - `848306a` T-060: freeze K-21 page-api v1.1, journey 3's booking page (screen 1,…
   - `e24ad04` T-060: page-api v1.1 round 2 on the lead's rulings DL-166: the page e…
@@ -14512,7 +14672,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 184. T-040: Freeze K-31 v1: Database schema: the visit (\#202)
 
-- **Commit:** [`81356e3`](https://github.com/aryamahadik/rosie/commit/81356e3), by Arya Mahadik, 2026-11-08 22:04:37 UTC
+- **Commit:** [`81356e33`](https://github.com/aryamahadik/rosie/commit/81356e33), by Arya Mahadik, 2026-11-08 22:04:37 UTC
 - **Pull request:** [#202](https://github.com/aryamahadik/rosie/pull/202) from `task/T-040`, merged 2026-11-08 22:04:37 UTC. It squashed 2 branch commits:
   - `09fa908` T-040: Freeze K-31 v1 (db-schema/visit): table list of 8 tables, 6 se…
   - `462636a` T-040: K-31 v1 round 2 (DL-174): customer\_state and stopped\_found sec…
@@ -14541,7 +14701,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 183. T-051: Freeze K-09 Tool API v1.2: journey 4 calls (\#201)
 
-- **Commit:** [`0589709`](https://github.com/aryamahadik/rosie/commit/0589709), by Arya Mahadik, 2026-11-08 22:04:33 UTC
+- **Commit:** [`05897092`](https://github.com/aryamahadik/rosie/commit/05897092), by Arya Mahadik, 2026-11-08 22:04:33 UTC
 - **Pull request:** [#201](https://github.com/aryamahadik/rosie/pull/201) from `task/T-051`, merged 2026-11-08 22:04:34 UTC. It squashed 5 branch commits:
   - `17fabbb` T-051: Freeze K-09 v1.2: journey 4's calls (matchService, setWhoFor, …
   - `8d0bdbb` T-051: K-09 v1.2 round 2 (DL-162): the owner's changed price stored b…
@@ -14585,7 +14745,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 182. T-203: Migration 0019: business setup part (K-23): business fields, companies, locations, places and things (\#184)
 
-- **Commit:** [`9f2bd25`](https://github.com/aryamahadik/rosie/commit/9f2bd25), by Arya Mahadik, 2026-11-08 14:06:21 UTC
+- **Commit:** [`9f2bd250`](https://github.com/aryamahadik/rosie/commit/9f2bd250), by Arya Mahadik, 2026-11-08 14:06:21 UTC
 - **Pull request:** [#184](https://github.com/aryamahadik/rosie/pull/184) from `task/T-203`, merged 2026-11-08 14:06:21 UTC. It squashed 2 branch commits:
   - `2198064` T-203: migration 9999\_business\_setup.sql (0019 at merge): K-23 v1's n…
   - `2c1e706` T-203: number the migration 0019 at merge (lead, DL-095)
@@ -14613,7 +14773,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 181. T-326: Stripe effect kinds: charges, saved cards, refunds, pay links, with the effect id stored on the object (\#183)
 
-- **Commit:** [`a01c6c5`](https://github.com/aryamahadik/rosie/commit/a01c6c5), by Arya Mahadik, 2026-11-08 13:56:45 UTC
+- **Commit:** [`a01c6c5d`](https://github.com/aryamahadik/rosie/commit/a01c6c5d), by Arya Mahadik, 2026-11-08 13:56:45 UTC
 - **Pull request:** [#183](https://github.com/aryamahadik/rosie/pull/183) from `task/T-326`, merged 2026-11-08 13:56:45 UTC. It squashed 2 branch commits:
   - `5e38f37` T-326: Stripe effect kinds: save a card, charges, refunds, pay links,…
   - `f0727f5` T-326: Stripe kinds answer as soon as the runner stops waiting (a cal…
@@ -14640,7 +14800,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 180. T-253: Crash in the middle of a turn: rerun, resume, park after the third (\#182)
 
-- **Commit:** [`c8dec4c`](https://github.com/aryamahadik/rosie/commit/c8dec4c), by Arya Mahadik, 2026-11-08 13:54:03 UTC
+- **Commit:** [`c8dec4c4`](https://github.com/aryamahadik/rosie/commit/c8dec4c4), by Arya Mahadik, 2026-11-08 13:54:03 UTC
 - **Pull request:** [#182](https://github.com/aryamahadik/rosie/pull/182) from `task/T-253`, merged 2026-11-08 13:54:03 UTC. It squashed 2 branch commits:
   - `1962564` T-253: Crash in the middle of a turn: a committed turn holds its leas…
   - `5d1d1cd` T-253: crash tests check the holds at the rerun's commit and fail on …
@@ -14668,7 +14828,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 179. T-255: Clock arming at the first delivery receipt and step 9's due rule: a pure due rule in the right zone (flow A the business's, flow B the visit address's, across DST), the never-delivered deadline, and the arming the receipt path calls (K-05 armClock by the question, a second receipt arms nothing twice, the never-delivered row cancelled, the actor's syncClocks) (\#181)
 
-- **Commit:** [`80df806`](https://github.com/aryamahadik/rosie/commit/80df806), by Arya Mahadik, 2026-11-08 13:45:24 UTC
+- **Commit:** [`80df8067`](https://github.com/aryamahadik/rosie/commit/80df8067), by Arya Mahadik, 2026-11-08 13:45:24 UTC
 - **Pull request:** [#181](https://github.com/aryamahadik/rosie/pull/181) from `task/T-255`, merged 2026-11-08 13:45:24 UTC. It squashed 1 branch commit:
   - `10160f7` T-255: Clock arming at the first delivery receipt and step 9's due ru…
 - **Files changed:** 10 (+2494 −5), by folder:
@@ -14684,7 +14844,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 178. T-313: Finalize call: options, slots, claim check, message checks; one rewrite, fallback, passed on (\#180)
 
-- **Commit:** [`163d9a9`](https://github.com/aryamahadik/rosie/commit/163d9a9), by Arya Mahadik, 2026-11-08 13:22:36 UTC
+- **Commit:** [`163d9a94`](https://github.com/aryamahadik/rosie/commit/163d9a94), by Arya Mahadik, 2026-11-08 13:22:36 UTC
 - **Pull request:** [#180](https://github.com/aryamahadik/rosie/pull/180) from `task/T-313`, merged 2026-11-08 13:22:37 UTC. It squashed 2 branch commits:
   - `1c6808a` T-313: finalize call: options, slots, claim check and message checks …
   - `3ebf80b` T-313: round 2 (DL-158): (a) Rosie's own fixed terms (the row's step …
@@ -14713,7 +14873,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 177. T-291: Frontier assembler and open-question choices from stored state (\#179)
 
-- **Commit:** [`5b8cc73`](https://github.com/aryamahadik/rosie/commit/5b8cc73), by Arya Mahadik, 2026-11-08 13:03:18 UTC
+- **Commit:** [`5b8cc733`](https://github.com/aryamahadik/rosie/commit/5b8cc733), by Arya Mahadik, 2026-11-08 13:03:18 UTC
 - **Pull request:** [#179](https://github.com/aryamahadik/rosie/pull/179) from `task/T-291`, merged 2026-11-08 13:03:19 UTC. It squashed 2 branch commits:
   - `5981730` T-291: Frontier assembler and open-question choices from stored state
   - `c9de2ca` T-291: Stakes walk stops only where someone is asked, a clock waits o…
@@ -14750,7 +14910,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 176. T-301: limit 3, the exact yes: replaces the fail-closed stub with the decider's own yes bound to the read-back's exact text and versions (K-04 open\_questions read through K-05 v1.2; who decides from T-308); refuses tapbacks, relayed yeses, stale read-backs, unbound own-AI and page yeses, and money parts with no read-back tied to their booking; fresh read-back once, then the step's safe default with an owner notice (K-09 v1 limit3Outcome); 74 unit tests on K-09 commit-limit-3-no-exact-yes.json, K-06 poll-vote, reaction and edit-after-commit, and K-04's seeds (\#178)
 
-- **Commit:** [`df82bdf`](https://github.com/aryamahadik/rosie/commit/df82bdf), by Arya Mahadik, 2026-11-08 12:55:20 UTC
+- **Commit:** [`df82bdf0`](https://github.com/aryamahadik/rosie/commit/df82bdf0), by Arya Mahadik, 2026-11-08 12:55:20 UTC
 - **Pull request:** [#178](https://github.com/aryamahadik/rosie/pull/178) from `task/T-301`, merged 2026-11-08 12:55:20 UTC. It squashed 1 branch commit:
   - `dcf5b77` T-301: limit 3, the exact yes: replaces the fail-closed stub with the…
 - **Files changed:** 5 (+2306 −5), by folder:
@@ -14766,7 +14926,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 175. T-1094: Migration 0018: the definer functions answer only what K-05 needs; chat\_links kept as issued; rosie\_app off effects and provider\_events (\#177)
 
-- **Commit:** [`2c9fa83`](https://github.com/aryamahadik/rosie/commit/2c9fa83), by Arya Mahadik, 2026-11-08 12:54:11 UTC
+- **Commit:** [`2c9fa838`](https://github.com/aryamahadik/rosie/commit/2c9fa838), by Arya Mahadik, 2026-11-08 12:54:11 UTC
 - **Pull request:** [#177](https://github.com/aryamahadik/rosie/pull/177) from `task/T-1094`, merged 2026-11-08 12:54:11 UTC. It squashed 3 branch commits:
   - `8fda5ec` T-1094: narrow the definer functions and chat\_links' update grant; a …
   - `8f9f2df` T-1094: round 2 (DL-149): a trigger keeps chat\_links' code and ready …
@@ -14815,7 +14975,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 174. T-154: lint rules L5 to L8 (twin drift, cut names, no safe default line, banned old-rule phrases), one file each in the T-153 runner, each tested alone against the vendored lib.js; L1 to L8 on the uncorrected master give lintSteps' hits: 0 errors, the 24 allowed (\#176)
 
-- **Commit:** [`2111495`](https://github.com/aryamahadik/rosie/commit/2111495), by Arya Mahadik, 2026-11-08 12:54:07 UTC
+- **Commit:** [`21114959`](https://github.com/aryamahadik/rosie/commit/21114959), by Arya Mahadik, 2026-11-08 12:54:07 UTC
 - **Pull request:** [#176](https://github.com/aryamahadik/rosie/pull/176) from `task/T-154`, merged 2026-11-08 12:54:08 UTC. It squashed 1 branch commit:
   - `5ff8303` T-154: lint rules L5 to L8 (twin drift, cut names, no safe default li…
 - **Files changed:** 8 (+1227 −0), by folder:
@@ -14831,7 +14991,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 173. T-307: Messages and consent service base: outbox rows, consent rows, reach way, chat-open and stopped flags (\#175)
 
-- **Commit:** [`5dae3a3`](https://github.com/aryamahadik/rosie/commit/5dae3a3), by Arya Mahadik, 2026-11-08 12:38:43 UTC
+- **Commit:** [`5dae3a38`](https://github.com/aryamahadik/rosie/commit/5dae3a38), by Arya Mahadik, 2026-11-08 12:38:43 UTC
 - **Pull request:** [#175](https://github.com/aryamahadik/rosie/pull/175) from `task/T-307`, merged 2026-11-08 12:38:43 UTC. It squashed 2 branch commits:
   - `858e8ed` T-307: Messages and consent service base: outbox rows (one message, o…
   - `36b6865` T-307: a yes's from-handle, whenever given, must be the person's own …
@@ -14858,7 +15018,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 172. T-1104: Freeze K-03 v1.1: Rosie's own fixed terms reach the composer as facts (\#174)
 
-- **Commit:** [`4ed0839`](https://github.com/aryamahadik/rosie/commit/4ed0839), by Arya Mahadik, 2026-11-08 11:55:47 UTC
+- **Commit:** [`4ed0839f`](https://github.com/aryamahadik/rosie/commit/4ed0839f), by Arya Mahadik, 2026-11-08 11:55:47 UTC
 - **Pull request:** [#174](https://github.com/aryamahadik/rosie/pull/174) from `task/T-1104`, merged 2026-11-08 11:55:48 UTC. It squashed 2 branch commits:
   - `85def0d` T-1104: Freeze K-03 v1.1: Rosie's own fixed terms reach the composer …
   - `5a61bf8` T-1104: K-03's v1 contract test reads v1's entries of the shared fixt…
@@ -14888,7 +15048,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 171. T-586: home registry: the ten homes resolve to their one module (clock to the runtime's due rule), an unknown home fails the build, the home wins over a step's claims with the difference logged by label, and a step following an unbuilt home is held (\#173)
 
-- **Commit:** [`2046c44`](https://github.com/aryamahadik/rosie/commit/2046c44), by Arya Mahadik, 2026-11-08 11:55:44 UTC
+- **Commit:** [`2046c442`](https://github.com/aryamahadik/rosie/commit/2046c442), by Arya Mahadik, 2026-11-08 11:55:44 UTC
 - **Pull request:** [#173](https://github.com/aryamahadik/rosie/pull/173) from `task/T-586`, merged 2026-11-08 11:55:44 UTC. It squashed 1 branch commit:
   - `5428808` T-586: home registry: the ten homes resolve to their one module (cloc…
 - **Files changed:** 5 (+1003 −0), by folder:
@@ -14904,7 +15064,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 170. T-252: Turn loop, second half: compose each committed outbox row in parallel (K-09 composeInput, the composer, finalizeMessage with at most one rewrite; fallback and passed-on inside finalize), an email copy takes its text row's plan through K-05 writePlan with no composer call, a fixed line's row is never composed, the dispatcher woken once per committed turn (\#171)
 
-- **Commit:** [`417ce38`](https://github.com/aryamahadik/rosie/commit/417ce38), by Arya Mahadik, 2026-11-08 11:55:41 UTC
+- **Commit:** [`417ce38a`](https://github.com/aryamahadik/rosie/commit/417ce38a), by Arya Mahadik, 2026-11-08 11:55:41 UTC
 - **Pull request:** [#171](https://github.com/aryamahadik/rosie/pull/171) from `task/T-252`, merged 2026-11-08 11:55:41 UTC. It squashed 1 branch commit:
   - `b7e8618` T-252: Turn loop, second half: compose each committed outbox row in p…
 - **Files changed:** 6 (+2314 −27), by folder:
@@ -14920,7 +15080,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 169. T-323: Effects runner core: claim effect rows, one key, 5 retries in 10 minutes, then the outage row (\#172)
 
-- **Commit:** [`7177974`](https://github.com/aryamahadik/rosie/commit/7177974), by Arya Mahadik, 2026-11-08 11:46:40 UTC
+- **Commit:** [`7177974f`](https://github.com/aryamahadik/rosie/commit/7177974f), by Arya Mahadik, 2026-11-08 11:46:40 UTC
 - **Pull request:** [#172](https://github.com/aryamahadik/rosie/pull/172) from `task/T-323`, merged 2026-11-08 11:46:41 UTC. It squashed 2 branch commits:
   - `ae820e6` T-323: Effects runner core: claim effect rows, run each kind's port o…
   - `cd389ad` T-323: Effects runner: a run after an outage (serviceBack's claim) go…
@@ -14948,7 +15108,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 168. T-581: Migration 0017: notifications part (K-36): pages to Rosie's team with acknowledgement, owner alerts and hand-offs (\#170)
 
-- **Commit:** [`a75da3f`](https://github.com/aryamahadik/rosie/commit/a75da3f), by Arya Mahadik, 2026-11-08 11:46:37 UTC
+- **Commit:** [`a75da3f8`](https://github.com/aryamahadik/rosie/commit/a75da3f8), by Arya Mahadik, 2026-11-08 11:46:37 UTC
 - **Pull request:** [#170](https://github.com/aryamahadik/rosie/pull/170) from `task/T-581`, merged 2026-11-08 11:46:38 UTC. It squashed 2 branch commits:
   - `e40b4a5` T-581: Migration for K-36 v1 notifications: hand\_offs (row-level secu…
   - `973474b` T-581: number the migration 0017 at merge (lead, DL-095)
@@ -14977,7 +15137,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 167. T-254: clock rows: each actor's one alarm at its earliest row (a clockRow entry in the shared stored schedule), a one-minute sweep on the Worker's scheduled handler that fires missed rows through their handle's actor and handle-less rows as jobs, and one fire-once path for the alarm, the sweep and staging's Fire now that runs the step's clock branch as a clock turn (K-09 gateAndCommit, input.kind clock; K-05 fireClock once, repeated on a repeat), each firing under its own trace id; Workers tests on K-05's due and fire fixtures (\#169)
 
-- **Commit:** [`79e1fd2`](https://github.com/aryamahadik/rosie/commit/79e1fd2), by Arya Mahadik, 2026-11-08 11:38:40 UTC
+- **Commit:** [`79e1fd25`](https://github.com/aryamahadik/rosie/commit/79e1fd25), by Arya Mahadik, 2026-11-08 11:38:40 UTC
 - **Pull request:** [#169](https://github.com/aryamahadik/rosie/pull/169) from `task/T-254`, merged 2026-11-08 11:38:40 UTC. It squashed 1 branch commit:
   - `e063f04` T-254: clock rows: each actor's one alarm at its earliest row (a cloc…
 - **Files changed:** 11 (+1862 −5), by folder:
@@ -14995,7 +15155,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 166. T-251: Turn loop, first half: frontier, decide, re-read, gate and commit (\#168)
 
-- **Commit:** [`5b0bfdf`](https://github.com/aryamahadik/rosie/commit/5b0bfdf), by Arya Mahadik, 2026-11-08 10:26:35 UTC
+- **Commit:** [`5b0bfdf3`](https://github.com/aryamahadik/rosie/commit/5b0bfdf3), by Arya Mahadik, 2026-11-08 10:26:35 UTC
 - **Pull request:** [#168](https://github.com/aryamahadik/rosie/pull/168) from `task/T-251`, merged 2026-11-08 10:26:36 UTC. It squashed 3 branch commits:
   - `5ef42d6` T-251: Turn loop, first half: inside the lease, the guard, K-09 build…
   - `5d9bb88` T-251: A run replaced during its valueFailsWords re-read sends the tu…
@@ -15027,7 +15187,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 165. T-1088: A safety read cut off by the actor's eviction resumes from an alarm; holds bind commits (\#162)
 
-- **Commit:** [`70294ba`](https://github.com/aryamahadik/rosie/commit/70294ba), by Arya Mahadik, 2026-11-08 09:23:24 UTC
+- **Commit:** [`70294ba1`](https://github.com/aryamahadik/rosie/commit/70294ba1), by Arya Mahadik, 2026-11-08 09:23:24 UTC
 - **Pull request:** [#162](https://github.com/aryamahadik/rosie/pull/162) from `task/T-1088`, merged 2026-11-08 09:23:25 UTC. It squashed 6 branch commits:
   - `69ba52c` T-1088: a safety read cut off by the actor's eviction resumes from a …
   - `89620e1` T-1088: test that the safety alarm firing past the deadline while a r…
@@ -15082,7 +15242,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 164. T-149: Bundle emitter: manifest, per-flow graphs, record, routing, shared lists and one compiled overlay per trade (\#167)
 
-- **Commit:** [`8001958`](https://github.com/aryamahadik/rosie/commit/8001958), by Arya Mahadik, 2026-11-08 08:56:18 UTC
+- **Commit:** [`80019589`](https://github.com/aryamahadik/rosie/commit/80019589), by Arya Mahadik, 2026-11-08 08:56:18 UTC
 - **Pull request:** [#167](https://github.com/aryamahadik/rosie/pull/167) from `task/T-149`, merged 2026-11-08 08:56:19 UTC. It squashed 4 branch commits:
   - `d6341f1` T-149: bundle emitter and compiler build: manifest, per-flow graphs (…
   - `1645e9e` T-149: build prints the lint marks per rule; tests for the K-01 mappi…
@@ -15120,7 +15280,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 163. T-195: Data access: commit a turn, all or nothing, unique on the turn id (K-05 v1.1) (\#166)
 
-- **Commit:** [`b0a6431`](https://github.com/aryamahadik/rosie/commit/b0a6431), by Arya Mahadik, 2026-11-08 08:56:15 UTC
+- **Commit:** [`b0a64311`](https://github.com/aryamahadik/rosie/commit/b0a64311), by Arya Mahadik, 2026-11-08 08:56:15 UTC
 - **Pull request:** [#166](https://github.com/aryamahadik/rosie/pull/166) from `task/T-195`, merged 2026-11-08 08:56:15 UTC. It squashed 2 branch commits:
   - `634b6cc` T-195: commitTurn at K-05 v1.1: one transaction as rosie\_job with the…
   - `c1a00d4` T-195: the per write scope proved for inserts too: a recording rosie\_…
@@ -15147,7 +15307,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 162. T-267: guard fixed replies: STOP, START and HELP recorded through K-09's core actions in the keyword turn's one commit, their words written into their rows by code (K-01's lines, Q-01's draft while pendingJay), never the composer; the stop reply carries stopReply so limit 8 sends it with override\_optout; each business told gets RULES 7.5's one line; Workers and unit tests (\#165)
 
-- **Commit:** [`1e84f4e`](https://github.com/aryamahadik/rosie/commit/1e84f4e), by Arya Mahadik, 2026-11-08 08:29:13 UTC
+- **Commit:** [`1e84f4ea`](https://github.com/aryamahadik/rosie/commit/1e84f4ea), by Arya Mahadik, 2026-11-08 08:29:13 UTC
 - **Pull request:** [#165](https://github.com/aryamahadik/rosie/pull/165) from `task/T-267`, merged 2026-11-08 08:29:14 UTC. It squashed 1 branch commit:
   - `27de44a` T-267: guard fixed replies: STOP, START and HELP recorded through K-0…
 - **Files changed:** 8 (+2534 −1), by folder:
@@ -15164,7 +15324,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 161. T-1103: Skeleton end-to-end test in its prefix form (tests/e2e/skeleton): one JOIN webhook (Sam, test owner 1, the sample cast) through T-465's local target with every double, judged by T-551's checkSkeletonRun; under SKELETON\_UPTO the hop's contract tests are read from the Vitest JSON report CONTRACT\_REPORT names, and with none the hop fails closed, naming it; an unknown name fails, named; unset it asserts only what T-465's driver proves today (200 and the receive hop once), skips nothing, and its header says T-466 completes it (\#164)
 
-- **Commit:** [`ab19177`](https://github.com/aryamahadik/rosie/commit/ab19177), by Arya Mahadik, 2026-11-08 08:29:10 UTC
+- **Commit:** [`ab19177a`](https://github.com/aryamahadik/rosie/commit/ab19177a), by Arya Mahadik, 2026-11-08 08:29:10 UTC
 - **Pull request:** [#164](https://github.com/aryamahadik/rosie/pull/164) from `task/T-1103`, merged 2026-11-08 08:29:11 UTC. It squashed 1 branch commit:
   - `3352a83` T-1103: Skeleton end-to-end test in its prefix form (tests/e2e/skelet…
 - **Files changed:** 2 (+223 −0), by folder:
@@ -15180,7 +15340,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 160. T-580: Migration 0016: safety and incidents part (K-34): outcomes sealed, holds and release, harm reports, safety timers, privacy slips (\#163)
 
-- **Commit:** [`d3ed27b`](https://github.com/aryamahadik/rosie/commit/d3ed27b), by Arya Mahadik, 2026-11-08 08:23:15 UTC
+- **Commit:** [`d3ed27ba`](https://github.com/aryamahadik/rosie/commit/d3ed27ba), by Arya Mahadik, 2026-11-08 08:23:15 UTC
 - **Pull request:** [#163](https://github.com/aryamahadik/rosie/pull/163) from `task/T-580`, merged 2026-11-08 08:23:15 UTC. It squashed 2 branch commits:
   - `e3bc48a` T-580: Migration for K-34 v1 safety and incidents: safety\_outcomes (w…
   - `961b3c6` T-580: number the migration 0016 at merge (lead, DL-095)
@@ -15209,7 +15369,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 159. T-551: hop-prefix mode in tests/e2e/\_driver/prefix: SKELETON\_UPTO names a hop of 02-contracts section 11 (a K-08 hop of T-465's SKELETON\_HOPS, or a join card's row name such as gateway); hops 1 to n once each, in order, by T-465's checkRun over the spans up to the prefix's last hop (later spans not judged); the hop's row's v1 contract tests read from the caller's Vitest JSON report, no pass assumed; unknown names refused, named; unset returns checkRun's report itself; 540 e2e tests (\#161)
 
-- **Commit:** [`8cfd319`](https://github.com/aryamahadik/rosie/commit/8cfd319), by Arya Mahadik, 2026-11-08 07:52:59 UTC
+- **Commit:** [`8cfd3195`](https://github.com/aryamahadik/rosie/commit/8cfd3195), by Arya Mahadik, 2026-11-08 07:52:59 UTC
 - **Pull request:** [#161](https://github.com/aryamahadik/rosie/pull/161) from `task/T-551`, merged 2026-11-08 07:53:00 UTC. It squashed 1 branch commit:
   - `05256e7` T-551: hop-prefix mode in tests/e2e/\_driver/prefix: SKELETON\_UPTO nam…
 - **Files changed:** 9 (+1457 −0), by folder:
@@ -15225,7 +15385,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 158. T-153: Lint runner and the master's rules L1 to L4 (lib.js lintSteps), each in its own file with its own test; parity with lintSteps on the uncorrected master (\#159)
 
-- **Commit:** [`579107b`](https://github.com/aryamahadik/rosie/commit/579107b), by Arya Mahadik, 2026-11-08 07:52:13 UTC
+- **Commit:** [`579107bb`](https://github.com/aryamahadik/rosie/commit/579107bb), by Arya Mahadik, 2026-11-08 07:52:13 UTC
 - **Pull request:** [#159](https://github.com/aryamahadik/rosie/pull/159) from `task/T-153`, merged 2026-11-08 07:52:13 UTC. It squashed 1 branch commit:
   - `6014218` T-153: Lint runner and the master's rules L1 to L4 (lib.js lintSteps)…
 - **Files changed:** 10 (+1927 −0), by folder:
@@ -15241,7 +15401,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 157. T-311: Claim check (limit 7): each slot's field visible to this recipient (\#160)
 
-- **Commit:** [`e5a1086`](https://github.com/aryamahadik/rosie/commit/e5a1086), by Arya Mahadik, 2026-11-08 07:45:38 UTC
+- **Commit:** [`e5a10863`](https://github.com/aryamahadik/rosie/commit/e5a10863), by Arya Mahadik, 2026-11-08 07:45:38 UTC
 - **Pull request:** [#160](https://github.com/aryamahadik/rosie/pull/160) from `task/T-311-r2`, merged 2026-11-08 07:45:39 UTC. It squashed 2 branch commits:
   - `14e9195` T-311: claim check (limit 7): each slot's field visible to this recip…
   - `839c4db` T-311: round 2 (DL-131): the claim check refuses a text with a broken…
@@ -15270,7 +15430,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 156. T-305: One commit per turn: state, open question and clock row, outbox and effect rows, event log (\#158)
 
-- **Commit:** [`64f2c4e`](https://github.com/aryamahadik/rosie/commit/64f2c4e), by Arya Mahadik, 2026-11-08 07:34:06 UTC
+- **Commit:** [`64f2c4e2`](https://github.com/aryamahadik/rosie/commit/64f2c4e2), by Arya Mahadik, 2026-11-08 07:34:06 UTC
 - **Pull request:** [#158](https://github.com/aryamahadik/rosie/pull/158) from `task/T-305-r2`, merged 2026-11-08 07:34:06 UTC. It squashed 3 branch commits:
   - `b05d671` T-305: one commit per turn: gateAndCommit runs the gate (T-298) and t…
   - `6a4f879` T-305: hand each core action and each passed part's writes the safety…
@@ -15302,7 +15462,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 155. T-194: Migration 0015: effect rows, provider events and outbox claims (K-07's schema addition, with K-05 v1.1) (\#157)
 
-- **Commit:** [`08a7c4d`](https://github.com/aryamahadik/rosie/commit/08a7c4d), by Arya Mahadik, 2026-11-08 07:25:05 UTC
+- **Commit:** [`08a7c4d3`](https://github.com/aryamahadik/rosie/commit/08a7c4d3), by Arya Mahadik, 2026-11-08 07:25:05 UTC
 - **Pull request:** [#157](https://github.com/aryamahadik/rosie/pull/157) from `task/T-194`, merged 2026-11-08 07:25:05 UTC. It squashed 2 branch commits:
   - `90cfe1e` T-194: migration 9999\_effects\_provider\_events: K-07 v1 effects, provi…
   - `49a702c` T-194: number the migration 0015 at merge (lead, DL-095)
@@ -15330,7 +15490,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 154. T-1099: limit 8 counts a texts yes as turning texts back on after a STOP only when it is the person's own yes from the number that stopped: the send state carries K-05 v1.2's stop time and covering texts row (with fromContact and bookingId, the fields the record needs; left out, the stop stands); a business's '1 Yes', and an answer holding textsOff and a consentId, never lift it; the refusal is a label on the dispatch span; 12 Workers tests on K-09 v1.1's frozen chain (\#156)
 
-- **Commit:** [`b019149`](https://github.com/aryamahadik/rosie/commit/b019149), by Arya Mahadik, 2026-11-08 07:18:29 UTC
+- **Commit:** [`b0191496`](https://github.com/aryamahadik/rosie/commit/b0191496), by Arya Mahadik, 2026-11-08 07:18:29 UTC
 - **Pull request:** [#156](https://github.com/aryamahadik/rosie/pull/156) from `task/T-1099`, merged 2026-11-08 07:18:29 UTC. It squashed 1 branch commit:
   - `640ddb7` T-1099: limit 8 counts a texts yes as turning texts back on after a S…
 - **Files changed:** 7 (+747 −13), by folder:
@@ -15347,7 +15507,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 153. T-220: data access v1.2 reads on the runtime side as rosie\_job: handleTargets (the guard's roles, live open questions with send time and poll, bookings, phone flags), sendState (limit 8's send state from the row alone: phone, chat, newest texts consent, audience, zone, H04 hours, staging override, versions now, booking and question closed, record flags and pauses) and handleSealingKey (get or create a handle's key under an advisory lock on the address, a new person with no name at first sight or after every key was erased, the key wrapped under the named secret in sealing.ts's form and handed back unexportable, never in the answer); 51 integration tests: every K-05 v1.2 fixture of the three calls, 50 parallel calls make one key, a STOP is seen right after it commits, an erased key leaves the sealed field unreadable (\#155)
 
-- **Commit:** [`a52ed42`](https://github.com/aryamahadik/rosie/commit/a52ed42), by Arya Mahadik, 2026-11-08 07:06:51 UTC
+- **Commit:** [`a52ed427`](https://github.com/aryamahadik/rosie/commit/a52ed427), by Arya Mahadik, 2026-11-08 07:06:51 UTC
 - **Pull request:** [#155](https://github.com/aryamahadik/rosie/pull/155) from `task/T-220`, merged 2026-11-08 07:06:52 UTC. It squashed 1 branch commit:
   - `f972379` T-220: data access v1.2 reads on the runtime side as rosie\_job: handl…
 - **Files changed:** 6 (+3553 −0), by folder:
@@ -15363,7 +15523,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 152. T-085: Contract test inbound-event.v1: K-06 fixtures (v1 and v1.1) (\#154)
 
-- **Commit:** [`883f11e`](https://github.com/aryamahadik/rosie/commit/883f11e), by Arya Mahadik, 2026-11-08 06:39:42 UTC
+- **Commit:** [`883f11e9`](https://github.com/aryamahadik/rosie/commit/883f11e9), by Arya Mahadik, 2026-11-08 06:39:42 UTC
 - **Pull request:** [#154](https://github.com/aryamahadik/rosie/pull/154) from `task/T-085`, merged 2026-11-08 06:39:43 UTC. It squashed 2 branch commits:
   - `7d3f780` T-085: contract test inbound-event.v1: K-06 v1 and v1.1 fixtures, nam…
   - `acf446e` T-085: round 2: refuse-no-event-id mended and accepted, kind pinned p…
@@ -15390,7 +15550,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 151. T-250: Guard: START, HELP and the 16 opt-out words in code, then the turn's targets (\#153)
 
-- **Commit:** [`8d59f1e`](https://github.com/aryamahadik/rosie/commit/8d59f1e), by Arya Mahadik, 2026-11-08 06:39:39 UTC
+- **Commit:** [`8d59f1e4`](https://github.com/aryamahadik/rosie/commit/8d59f1e4), by Arya Mahadik, 2026-11-08 06:39:39 UTC
 - **Pull request:** [#153](https://github.com/aryamahadik/rosie/pull/153) from `task/T-250`, merged 2026-11-08 06:39:40 UTC. It squashed 2 branch commits:
   - `969b3cb` T-250: guard: a text that is only START, HELP or one of the pinned bu…
   - `2f86114` T-250: keyOf's doc comment wrapped to the line width
@@ -15417,7 +15577,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 150. T-193: Migration 0014: platform and review part (K-37): parked turns, dead letters, gap cases, review queue (\#152)
 
-- **Commit:** [`26e085a`](https://github.com/aryamahadik/rosie/commit/26e085a), by Arya Mahadik, 2026-11-08 06:39:35 UTC
+- **Commit:** [`26e085a8`](https://github.com/aryamahadik/rosie/commit/26e085a8), by Arya Mahadik, 2026-11-08 06:39:35 UTC
 - **Pull request:** [#152](https://github.com/aryamahadik/rosie/pull/152) from `task/T-193`, merged 2026-11-08 06:39:36 UTC. It squashed 2 branch commits:
   - `9f6b242` T-193: migration 9999\_platform\_review: K-37 parked\_turns, dead\_letter…
   - `6680c3b` T-193: number the platform and review migration 0014
@@ -15445,7 +15605,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 149. T-050: Freeze K-09 Tool API v1.1: journey 3 calls (rebased; the v1 base's tests read v1's own fixtures) (\#150)
 
-- **Commit:** [`3e22cbd`](https://github.com/aryamahadik/rosie/commit/3e22cbd), by Arya Mahadik, 2026-11-08 06:17:38 UTC
+- **Commit:** [`3e22cbd6`](https://github.com/aryamahadik/rosie/commit/3e22cbd6), by Arya Mahadik, 2026-11-08 06:17:38 UTC
 - **Pull request:** [#150](https://github.com/aryamahadik/rosie/pull/150) from `task/T-050-r2`, merged 2026-11-08 06:17:38 UTC. It squashed 7 branch commits:
   - `b26102d` T-050: freeze K-09 Tool API v1.1, journey 3 calls (openRequest, confi…
   - `116e850` T-050: v1.1 binds a walk-in's booker to its caller, keeps a listed cu…
@@ -15503,7 +15663,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 148. T-041: Freeze K-32 v1: Database schema: money (\#151)
 
-- **Commit:** [`c069ec7`](https://github.com/aryamahadik/rosie/commit/c069ec7), by Arya Mahadik, 2026-11-08 06:16:00 UTC
+- **Commit:** [`c069ec77`](https://github.com/aryamahadik/rosie/commit/c069ec77), by Arya Mahadik, 2026-11-08 06:16:00 UTC
 - **Pull request:** [#151](https://github.com/aryamahadik/rosie/pull/151) from `task/T-041`, merged 2026-11-08 06:16:00 UTC. It squashed 4 branch commits:
   - `2f52d7f` T-041: freeze K-32 v1, database schema money: 13 tables, 6 seeds, 8 r…
   - `c573b63` T-041: add pay\_links (Rosie's pay page links, only the code's hash), …
@@ -15542,7 +15702,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 147. T-465: End-to-end harness: webhook in, parts, outbox rows and trace hops out (\#149)
 
-- **Commit:** [`6f8bac4`](https://github.com/aryamahadik/rosie/commit/6f8bac4), by Arya Mahadik, 2026-11-08 06:12:22 UTC
+- **Commit:** [`6f8bac4d`](https://github.com/aryamahadik/rosie/commit/6f8bac4d), by Arya Mahadik, 2026-11-08 06:12:22 UTC
 - **Pull request:** [#149](https://github.com/aryamahadik/rosie/pull/149) from `task/T-465`, merged 2026-11-08 06:12:22 UTC. It squashed 3 branch commits:
   - `4c1dc42` T-465: end-to-end driver: local and staging targets, trace by trace i…
   - `0d92cd1` T-465: console capture shared by concurrent targets; the no-key test …
@@ -15574,7 +15734,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 146. T-368: decide, one read: the decide prompt and CQ-25's two-step call through the AI gateway (step 1 the parts with their quotes and verbs and the text's language, step 2 one call per part side by side, cut from K-02), mapped into K-02 v1's decideRead and validated before it leaves the AI layer (K-02's schema and the named rules optionOffered and quoteInText); the answer is K-02's read with the model that read it and the language, or a typed refusal or modelsDown; 112 unit tests on the recorded-model double and K-02's fixtures (\#147)
 
-- **Commit:** [`5e35a00`](https://github.com/aryamahadik/rosie/commit/5e35a00), by Arya Mahadik, 2026-11-08 05:45:17 UTC
+- **Commit:** [`5e35a00a`](https://github.com/aryamahadik/rosie/commit/5e35a00a), by Arya Mahadik, 2026-11-08 05:45:17 UTC
 - **Pull request:** [#147](https://github.com/aryamahadik/rosie/pull/147) from `task/T-368`, merged 2026-11-08 05:45:17 UTC. It squashed 1 branch commit:
   - `4585e6e` T-368: decide, one read: the decide prompt and CQ-25's two-step call …
 - **Files changed:** 12 (+3297 −0), by folder:
@@ -15590,7 +15750,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 145. T-200: core seed from fixture set v1: 245 demo shops' business heads, owners with the owner role, handles, handle links and phone rows; checks fixtures/v1 against MANIFEST.sha256 first and reads nothing outside fixtures/; runs as rosie\_job; idempotent (\#146)
 
-- **Commit:** [`e44166a`](https://github.com/aryamahadik/rosie/commit/e44166a), by Arya Mahadik, 2026-11-08 05:44:12 UTC
+- **Commit:** [`e44166a3`](https://github.com/aryamahadik/rosie/commit/e44166a3), by Arya Mahadik, 2026-11-08 05:44:12 UTC
 - **Pull request:** [#146](https://github.com/aryamahadik/rosie/pull/146) from `task/T-200`, merged 2026-11-08 05:44:13 UTC. It squashed 1 branch commit:
   - `d906c60` T-200: core seed from fixture set v1: 245 demo shops' business heads,…
 - **Files changed:** 6 (+1529 −0), by folder:
@@ -15607,7 +15767,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 144. T-192: Migration 0013: conversations and consent part (K-29): consent rows never edited, chat links issued (\#145)
 
-- **Commit:** [`dad64a8`](https://github.com/aryamahadik/rosie/commit/dad64a8), by Arya Mahadik, 2026-11-08 05:36:13 UTC
+- **Commit:** [`dad64a84`](https://github.com/aryamahadik/rosie/commit/dad64a84), by Arya Mahadik, 2026-11-08 05:36:13 UTC
 - **Pull request:** [#145](https://github.com/aryamahadik/rosie/pull/145) from `task/T-192`, merged 2026-11-08 05:36:13 UTC. It squashed 2 branch commits:
   - `dbed263` T-192: migration 9999\_consent: K-29 chat\_links and consents (rows onl…
   - `e911e48` T-192: number the consent migration 0013
@@ -15635,7 +15795,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 143. T-134: element plain-text forms and the guard keyword list from msgtext.js, wrapped: plainText() is smsText() for every message of both flows (717 in A, 755 in B), elementTexts() gives each element's own form in smsText()'s order, typedOptions() the typed options, bareLinks() a card's link alone, bundleMessage() K-01's message with its plainText, flowMessages() every say/vary say/addSay; buildKeywords() and keywordsJson() give K-01's keywords (START, HELP, msgtext.js OPTOUT's 16 words read from its line 29, CANCEL and CANCELAR flagging the visit), equal to contracts/bundle/fixtures/keywords.json byte for byte; 27 unit tests (\#144)
 
-- **Commit:** [`2eb7ac9`](https://github.com/aryamahadik/rosie/commit/2eb7ac9), by Arya Mahadik, 2026-11-08 05:32:55 UTC
+- **Commit:** [`2eb7ac9e`](https://github.com/aryamahadik/rosie/commit/2eb7ac9e), by Arya Mahadik, 2026-11-08 05:32:55 UTC
 - **Pull request:** [#144](https://github.com/aryamahadik/rosie/pull/144) from `task/T-134`, merged 2026-11-08 05:32:55 UTC. It squashed 1 branch commit:
   - `db95bbb` T-134: element plain-text forms and the guard keyword list from msgte…
 - **Files changed:** 6 (+799 −0), by folder:
@@ -15651,7 +15811,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 142. T-298: policy gate framework: decide-output checks (verb, exact quote, offered option, value words) refuse before any limit runs (K-09 decideRefused); limits 1 to 6 per agreed part in order, the first failure stopping only that part and the parts on its booking; limit 6 answers valueFailsWords until decide's re-read; each limit slot a fail-closed stub registered in limits.ts (the call answers notBuilt, nothing passes); per-part results in K-09 v1's partResult shape; gate span logs limits 1 to 6, never words (\#143)
 
-- **Commit:** [`29993e5`](https://github.com/aryamahadik/rosie/commit/29993e5), by Arya Mahadik, 2026-11-08 04:59:00 UTC
+- **Commit:** [`29993e5a`](https://github.com/aryamahadik/rosie/commit/29993e5a), by Arya Mahadik, 2026-11-08 04:59:00 UTC
 - **Pull request:** [#143](https://github.com/aryamahadik/rosie/pull/143) from `task/T-298`, merged 2026-11-08 04:59:00 UTC. It squashed 1 branch commit:
   - `50ae303` T-298: policy gate framework: decide-output checks (verb, exact quote…
 - **Files changed:** 17 (+2440 −0), by folder:
@@ -15674,7 +15834,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 141. T-249: bundle pin at turn start: each run of a turn pins its bundle id (stored per turn id, so a rerun keeps it; else the active id read through K-05), reads the manifest from KV or PostgreSQL's copy on a miss, checked against the id, and hands the turn's work the id, the bundle and a trace whose every span carries it (\#142)
 
-- **Commit:** [`af21b9d`](https://github.com/aryamahadik/rosie/commit/af21b9d), by Arya Mahadik, 2026-11-08 04:50:21 UTC
+- **Commit:** [`af21b9d7`](https://github.com/aryamahadik/rosie/commit/af21b9d7), by Arya Mahadik, 2026-11-08 04:50:21 UTC
 - **Pull request:** [#142](https://github.com/aryamahadik/rosie/pull/142) from `task/T-249`, merged 2026-11-08 04:50:22 UTC. It squashed 1 branch commit:
   - `b489dac` T-249: bundle pin at turn start: each run of a turn pins its bundle i…
 - **Files changed:** 11 (+1566 −11), by folder:
@@ -15691,7 +15851,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 140. T-308: identity and access service base: who a sender is for a business (live K-04 roles of the handle's people, this business only), booker, person served and payer kept apart, and who decides a visit (the person served; a minor's parent or guardian on file; the owner after a death), fees, refunds, team and settings (the owner or an admin with the K-22 power) and owner-only matters; reads K-04 through db/repo, admins' powers and the served person's age band behind ports with safe defaults; 30 unit tests on the frozen seeds (\#141)
 
-- **Commit:** [`971ecdf`](https://github.com/aryamahadik/rosie/commit/971ecdf), by Arya Mahadik, 2026-11-08 04:48:16 UTC
+- **Commit:** [`971ecdf7`](https://github.com/aryamahadik/rosie/commit/971ecdf7), by Arya Mahadik, 2026-11-08 04:48:16 UTC
 - **Pull request:** [#141](https://github.com/aryamahadik/rosie/pull/141) from `task/T-308`, merged 2026-11-08 04:48:16 UTC. It squashed 1 branch commit:
   - `3d33eb0` T-308: identity and access service base: who a sender is for a busine…
 - **Files changed:** 5 (+1420 −0), by folder:
@@ -15707,7 +15867,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 139. T-191: Migration 0012: row-level security per business on every business-scoped core table (with T-1085) (\#140)
 
-- **Commit:** [`8edb79c`](https://github.com/aryamahadik/rosie/commit/8edb79c), by Arya Mahadik, 2026-11-08 04:40:26 UTC
+- **Commit:** [`8edb79c4`](https://github.com/aryamahadik/rosie/commit/8edb79c4), by Arya Mahadik, 2026-11-08 04:40:26 UTC
 - **Pull request:** [#140](https://github.com/aryamahadik/rosie/pull/140) from `task/T-191`, merged 2026-11-08 04:40:26 UTC. It squashed 2 branch commits:
   - `6c0e69f` T-191: row-level security per business on the 13 business-scoped core…
   - `c8acf64` T-191: number the row-level security migration 0012
@@ -15735,7 +15895,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 138. T-312: Message checks: fixed lines, values, one question, length, grade, banned forms (\#139)
 
-- **Commit:** [`859b678`](https://github.com/aryamahadik/rosie/commit/859b678), by Arya Mahadik, 2026-11-08 04:01:39 UTC
+- **Commit:** [`859b6789`](https://github.com/aryamahadik/rosie/commit/859b6789), by Arya Mahadik, 2026-11-08 04:01:39 UTC
 - **Pull request:** [#139](https://github.com/aryamahadik/rosie/pull/139) from `task/T-312`, merged 2026-11-08 04:01:39 UTC. It squashed 3 branch commits:
   - `bb81940` T-312: message checks (C-092): fixed lines, values, one question, nev…
   - `b1e0647` T-312: round 2: opt-out check reads the step's and typed options on e…
@@ -15767,7 +15927,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 137. T-248: turn lease: 60 s lease in the actor's storage under a turn id hashed from the texts' event ids; one restart before the commit, later batches wait for the next turn; a lapsed lease reruns from the sealed texts under the same id; T-247 security notes a, c, d, e (\#138)
 
-- **Commit:** [`8c919a5`](https://github.com/aryamahadik/rosie/commit/8c919a5), by Arya Mahadik, 2026-11-08 03:59:23 UTC
+- **Commit:** [`8c919a56`](https://github.com/aryamahadik/rosie/commit/8c919a56), by Arya Mahadik, 2026-11-08 03:59:23 UTC
 - **Pull request:** [#138](https://github.com/aryamahadik/rosie/pull/138) from `task/T-248`, merged 2026-11-08 03:59:23 UTC. It squashed 1 branch commit:
   - `48c5ad1` T-248: turn lease: 60 s lease in the actor's storage under a turn id …
 - **Files changed:** 10 (+1788 −70), by folder:
@@ -15784,7 +15944,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 136. T-030: Freeze K-21 v1: page and console calls, with K-22 v1.1 page links (\#137)
 
-- **Commit:** [`1c5aec7`](https://github.com/aryamahadik/rosie/commit/1c5aec7), by Arya Mahadik, 2026-11-08 03:57:35 UTC
+- **Commit:** [`1c5aec78`](https://github.com/aryamahadik/rosie/commit/1c5aec78), by Arya Mahadik, 2026-11-08 03:57:35 UTC
 - **Pull request:** [#137](https://github.com/aryamahadik/rosie/pull/137) from `task/T-030`, merged 2026-11-08 03:57:36 UTC. It squashed 2 branch commits:
   - `f5a5d39` T-030: freeze K-21 v1, the page and console calls: 26 calls with no b…
   - `a295e5d` T-030: round 2 of the K-21 v1 freeze: the signed link row as K-22 v1.…
@@ -15816,7 +15976,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 135. T-365: Safety read: 8 outcomes, tense, evidence words, Haiku then Sonnet at 2 s each (\#136)
 
-- **Commit:** [`27b7098`](https://github.com/aryamahadik/rosie/commit/27b7098), by Arya Mahadik, 2026-11-08 03:45:36 UTC
+- **Commit:** [`27b70981`](https://github.com/aryamahadik/rosie/commit/27b70981), by Arya Mahadik, 2026-11-08 03:45:36 UTC
 - **Pull request:** [#136](https://github.com/aryamahadik/rosie/pull/136) from `task/T-365`, merged 2026-11-08 03:45:37 UTC. It squashed 2 branch commits:
   - `14dc327` T-365: safety read: Haiku then Sonnet at 2 s each outside the AI gate…
   - `be2a9b8` T-365: give a no-verdict answer at the 4 s mark however fast both tri…
@@ -15843,7 +16003,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 134. T-190: Migration 0011: the event log, append-only, with sealed private values (\#135)
 
-- **Commit:** [`70995d7`](https://github.com/aryamahadik/rosie/commit/70995d7), by Arya Mahadik, 2026-11-08 03:16:52 UTC
+- **Commit:** [`70995d7a`](https://github.com/aryamahadik/rosie/commit/70995d7a), by Arya Mahadik, 2026-11-08 03:16:52 UTC
 - **Pull request:** [#135](https://github.com/aryamahadik/rosie/pull/135) from `task/T-190`, merged 2026-11-08 03:16:52 UTC. It squashed 2 branch commits:
   - `d2e8ab6` T-190: event\_log migration (append-only, edits refused with 42501, se…
   - `bfc093f` T-190: number the event log migration 0011
@@ -15871,7 +16031,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 133. T-310: slot filler: every K-03 v1 slot filled from the record and code facts (record rows by path and record values, money from whole cents with its currency), today and tomorrow bound at fill and worded at send in the reader's zone, a plan with an unknown or unfilled slot fails (\#134)
 
-- **Commit:** [`d0913ac`](https://github.com/aryamahadik/rosie/commit/d0913ac), by Arya Mahadik, 2026-11-08 03:07:13 UTC
+- **Commit:** [`d0913ac4`](https://github.com/aryamahadik/rosie/commit/d0913ac4), by Arya Mahadik, 2026-11-08 03:07:13 UTC
 - **Pull request:** [#134](https://github.com/aryamahadik/rosie/pull/134) from `task/T-310`, merged 2026-11-08 03:07:14 UTC. It squashed 1 branch commit:
   - `56253cc` T-310: slot filler: every K-03 v1 slot filled from the record and cod…
 - **Files changed:** 15 (+2530 −0), by folder:
@@ -15887,7 +16047,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 132. T-247: Batch window: 3 s after the latest text, the third text, or 6 s after the first; alarm schedule; hold before the lease seam (\#133)
 
-- **Commit:** [`c1923c8`](https://github.com/aryamahadik/rosie/commit/c1923c8), by Arya Mahadik, 2026-11-08 02:50:25 UTC
+- **Commit:** [`c1923c8a`](https://github.com/aryamahadik/rosie/commit/c1923c8a), by Arya Mahadik, 2026-11-08 02:50:25 UTC
 - **Pull request:** [#133](https://github.com/aryamahadik/rosie/pull/133) from `task/T-247`, merged 2026-11-08 02:50:26 UTC. It squashed 1 branch commit:
   - `90ffe1e` T-247: Batch window: 3 s after the latest text, the third text, or 6 …
 - **Files changed:** 4 (+799 −3), by folder:
@@ -15903,7 +16063,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 131. T-372: composer system prompt: role sentence, 12 style rules with reasons, five worked examples across readers and channels (A7-12 relay with a private part), master line as model, only facts, rule-67 tagged data, language rule; cached bytes per bundle id (\#132)
 
-- **Commit:** [`fe09afc`](https://github.com/aryamahadik/rosie/commit/fe09afc), by Arya Mahadik, 2026-11-08 02:23:09 UTC
+- **Commit:** [`fe09afc0`](https://github.com/aryamahadik/rosie/commit/fe09afc0), by Arya Mahadik, 2026-11-08 02:23:09 UTC
 - **Pull request:** [#132](https://github.com/aryamahadik/rosie/pull/132) from `task/T-372`, merged 2026-11-08 02:23:09 UTC. It squashed 1 branch commit:
   - `d64a58f` T-372: composer system prompt: role sentence, 12 style rules with rea…
 - **Files changed:** 6 (+1396 −0), by folder:
@@ -15919,7 +16079,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 130. T-090: contract test port-linq.v1: K-11 fixtures, schema not vacuous, code-side checks, side list (\#131)
 
-- **Commit:** [`ae070aa`](https://github.com/aryamahadik/rosie/commit/ae070aa), by Arya Mahadik, 2026-11-08 02:23:05 UTC
+- **Commit:** [`ae070aa9`](https://github.com/aryamahadik/rosie/commit/ae070aa9), by Arya Mahadik, 2026-11-08 02:23:05 UTC
 - **Pull request:** [#131](https://github.com/aryamahadik/rosie/pull/131) from `task/T-090`, merged 2026-11-08 02:23:05 UTC. It squashed 1 branch commit:
   - `755f528` T-090: contract test port-linq.v1: K-11 fixtures, schema not vacuous,…
 - **Files changed:** 1 (+672 −0), by folder:
@@ -15935,7 +16095,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 129. T-290: Tool API package base: call registry, schema validation, business scope, trace spans (\#129)
 
-- **Commit:** [`447c037`](https://github.com/aryamahadik/rosie/commit/447c037), by Arya Mahadik, 2026-11-08 02:23:00 UTC
+- **Commit:** [`447c037e`](https://github.com/aryamahadik/rosie/commit/447c037e), by Arya Mahadik, 2026-11-08 02:23:00 UTC
 - **Pull request:** [#129](https://github.com/aryamahadik/rosie/pull/129) from `task/T-290`, merged 2026-11-08 02:23:01 UTC. It squashed 4 branch commits:
   - `3920bfd` T-290: temporary schema exploration test (removed in the next commit)
   - `274a823` T-290: remove the temporary schema exploration test
@@ -15961,7 +16121,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 128. T-036: freeze K-27 v1: database schema, availability (\#128)
 
-- **Commit:** [`fcea54a`](https://github.com/aryamahadik/rosie/commit/fcea54a), by Arya Mahadik, 2026-11-08 02:22:55 UTC
+- **Commit:** [`fcea54a6`](https://github.com/aryamahadik/rosie/commit/fcea54a6), by Arya Mahadik, 2026-11-08 02:22:55 UTC
 - **Pull request:** [#128](https://github.com/aryamahadik/rosie/pull/128) from `task/T-036`, merged 2026-11-08 02:22:55 UTC. It squashed 3 branch commits:
   - `f6dcb59` T-036: freeze K-27 v1: availability (database part): weekly hours, ti…
   - `eab4521` T-036: K-27 README: scope and version per table, a default on every o…
@@ -15995,7 +16155,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 127. T-422: Stripe double: charges, declines, refunds, pay links, onboarding, page reads, signed webhooks, reconciliation hooks (K-14 v1) (\#130)
 
-- **Commit:** [`19d1848`](https://github.com/aryamahadik/rosie/commit/19d1848), by Arya Mahadik, 2026-11-08 02:13:44 UTC
+- **Commit:** [`19d1848a`](https://github.com/aryamahadik/rosie/commit/19d1848a), by Arya Mahadik, 2026-11-08 02:13:44 UTC
 - **Pull request:** [#130](https://github.com/aryamahadik/rosie/pull/130) from `task/T-422`, merged 2026-11-08 02:13:44 UTC. It squashed 1 branch commit:
   - `ad9ebf4` T-422: Stripe double: charges, declines, refunds, pay links, onboardi…
 - **Files changed:** 7 (+4001 −0), by folder:
@@ -16011,7 +16171,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 126. T-189: Migration 0010: outbox rows and parts with K-07's states, with the deferred outbox keys (\#127)
 
-- **Commit:** [`2ba0eb6`](https://github.com/aryamahadik/rosie/commit/2ba0eb6), by Arya Mahadik, 2026-11-08 02:13:41 UTC
+- **Commit:** [`2ba0eb6e`](https://github.com/aryamahadik/rosie/commit/2ba0eb6e), by Arya Mahadik, 2026-11-08 02:13:41 UTC
 - **Pull request:** [#127](https://github.com/aryamahadik/rosie/pull/127) from `task/T-189`, merged 2026-11-08 02:13:41 UTC. It squashed 2 branch commits:
   - `82a399b` T-189: Migration: outbox\_rows and outbox\_parts with K-07's states, pl…
   - `5fda604` T-189: renumber the migration to 0010 at merge (lead)
@@ -16041,7 +16201,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 125. T-1086: ci.yml drops pull\_request (merge-check runs every ci step); trigger and step-parity tests (\#126)
 
-- **Commit:** [`389a37e`](https://github.com/aryamahadik/rosie/commit/389a37e), by Arya Mahadik, 2026-11-08 02:04:29 UTC
+- **Commit:** [`389a37e1`](https://github.com/aryamahadik/rosie/commit/389a37e1), by Arya Mahadik, 2026-11-08 02:04:29 UTC
 - **Pull request:** [#126](https://github.com/aryamahadik/rosie/pull/126) from `task/T-1086`, merged 2026-11-08 02:04:30 UTC. It squashed 1 branch commit:
   - `8f6274f` T-1086: ci.yml drops pull\_request (merge-check runs every ci step); t…
 - **Files changed:** 2 (+37 −5), by folder:
@@ -16058,7 +16218,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 124. T-246: safety read on each raw text on arrival, before batching (ports, 4 s rule, holds, direct line while PostgreSQL is down) (\#125)
 
-- **Commit:** [`eab2bbe`](https://github.com/aryamahadik/rosie/commit/eab2bbe), by Arya Mahadik, 2026-11-08 01:52:29 UTC
+- **Commit:** [`eab2bbe9`](https://github.com/aryamahadik/rosie/commit/eab2bbe9), by Arya Mahadik, 2026-11-08 01:52:29 UTC
 - **Pull request:** [#125](https://github.com/aryamahadik/rosie/pull/125) from `task/T-246`, merged 2026-11-08 01:52:29 UTC. It squashed 1 branch commit:
   - `f672480` T-246: safety read on each raw text on arrival, before batching (port…
 - **Files changed:** 8 (+2071 −0), by folder:
@@ -16075,7 +16235,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 123. T-188: Migration 0009: turns, open questions and clock rows, with the deferred pauses\_turn\_fk (\#124)
 
-- **Commit:** [`578232a`](https://github.com/aryamahadik/rosie/commit/578232a), by Arya Mahadik, 2026-11-08 01:42:50 UTC
+- **Commit:** [`578232ac`](https://github.com/aryamahadik/rosie/commit/578232ac), by Arya Mahadik, 2026-11-08 01:42:50 UTC
 - **Pull request:** [#124](https://github.com/aryamahadik/rosie/pull/124) from `task/T-188`, merged 2026-11-08 01:42:51 UTC. It squashed 2 branch commits:
   - `9d7a2ed` T-188: Migration 9999: turns, open questions and clock rows, with pau…
   - `e8bbd13` T-188: renumber the migration to 0009 at merge (lead)
@@ -16105,7 +16265,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 122. T-367: context bundle builder: K-02 context to decide's prompt on T-364's cached layout, choices shuffled by a per-read seed recorded in the span, facts once, 30-day recent messages, tagged data (rule 67) (\#121)
 
-- **Commit:** [`fa5e190`](https://github.com/aryamahadik/rosie/commit/fa5e190), by Arya Mahadik, 2026-11-08 01:29:48 UTC
+- **Commit:** [`fa5e1905`](https://github.com/aryamahadik/rosie/commit/fa5e1905), by Arya Mahadik, 2026-11-08 01:29:48 UTC
 - **Pull request:** [#121](https://github.com/aryamahadik/rosie/pull/121) from `task/T-367`, merged 2026-11-08 01:29:48 UTC. It squashed 1 branch commit:
   - `694cd59` T-367: context bundle builder: K-02 context to decide's prompt on T-3…
 - **Files changed:** 8 (+1455 −0), by folder:
@@ -16121,7 +16281,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 121. T-412: Linq double: signed webhooks and inbound events for the test-phone page (\#123)
 
-- **Commit:** [`b90487f`](https://github.com/aryamahadik/rosie/commit/b90487f), by Arya Mahadik, 2026-11-08 01:29:30 UTC
+- **Commit:** [`b90487f6`](https://github.com/aryamahadik/rosie/commit/b90487f6), by Arya Mahadik, 2026-11-08 01:29:30 UTC
 - **Pull request:** [#123](https://github.com/aryamahadik/rosie/pull/123) from `task/T-412`, merged 2026-11-08 01:29:30 UTC. It squashed 2 branch commits:
   - `85ee5d3` T-412: Linq double: signed webhooks for texts, photos, reactions, vot…
   - `066e6bc` T-412: refuse fromRosie on non-reaction kinds and non-fictional numbe…
@@ -16148,7 +16308,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 120. T-044: freeze K-35 v1: database schema, documents and licenses (\#122)
 
-- **Commit:** [`7d0d147`](https://github.com/aryamahadik/rosie/commit/7d0d147), by Arya Mahadik, 2026-11-08 01:29:27 UTC
+- **Commit:** [`7d0d147b`](https://github.com/aryamahadik/rosie/commit/7d0d147b), by Arya Mahadik, 2026-11-08 01:29:27 UTC
 - **Pull request:** [#122](https://github.com/aryamahadik/rosie/pull/122) from `task/T-044`, merged 2026-11-08 01:29:27 UTC. It squashed 4 branch commits:
   - `c049896` T-044: freeze K-35 v1: documents and licenses (database part)
   - `ac82311` T-044: K-35 v1 adds documents.kind\_id for S1-31's offline work; READM…
@@ -16189,7 +16349,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 119. T-039: freeze K-30 v1, bookings and changes database schema (13 tables beside K-04's booking head, five seeds, eight refused rows, README freeze record) (\#120)
 
-- **Commit:** [`8219c7f`](https://github.com/aryamahadik/rosie/commit/8219c7f), by Arya Mahadik, 2026-11-08 01:21:23 UTC
+- **Commit:** [`8219c7f6`](https://github.com/aryamahadik/rosie/commit/8219c7f6), by Arya Mahadik, 2026-11-08 01:21:23 UTC
 - **Pull request:** [#120](https://github.com/aryamahadik/rosie/pull/120) from `task/T-039`, merged 2026-11-08 01:21:23 UTC. It squashed 1 branch commit:
   - `6187adb` T-039: freeze K-30 v1, bookings and changes database schema (13 table…
 - **Files changed:** 17 (+4565 −0), by folder:
@@ -16207,7 +16367,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 118. T-072: freeze K-05 v1.2: read turn state, a handle's targets, a recipient's send state, a handle's sealing key (\#119)
 
-- **Commit:** [`557a551`](https://github.com/aryamahadik/rosie/commit/557a551), by Arya Mahadik, 2026-11-08 01:21:19 UTC
+- **Commit:** [`557a5516`](https://github.com/aryamahadik/rosie/commit/557a5516), by Arya Mahadik, 2026-11-08 01:21:19 UTC
 - **Pull request:** [#119](https://github.com/aryamahadik/rosie/pull/119) from `task/T-072`, merged 2026-11-08 01:21:19 UTC. It squashed 3 branch commits:
   - `737b230` T-072: freeze K-05 v1.2: readTurnState, handleTargets, sendState, han…
   - `31c4345` T-072: round 2: no sealing\_keys column as a fact; erased keys get a f…
@@ -16241,7 +16401,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 117. T-187: Migration 0008: reservations that refuse a double booking (EXCLUDE, class-seat CHECK), with reserve() and release() (\#118)
 
-- **Commit:** [`33ed98b`](https://github.com/aryamahadik/rosie/commit/33ed98b), by Arya Mahadik, 2026-11-08 01:19:08 UTC
+- **Commit:** [`33ed98b5`](https://github.com/aryamahadik/rosie/commit/33ed98b5), by Arya Mahadik, 2026-11-08 01:19:08 UTC
 - **Pull request:** [#118](https://github.com/aryamahadik/rosie/pull/118) from `task/T-187`, merged 2026-11-08 01:19:09 UTC. It squashed 3 branch commits:
   - `8807a63` T-187: Migration: reservations and class seats that refuse a double b…
   - `52d8f67` T-187: lost-connection-safe reserve and release (transient), let\_go a…
@@ -16276,7 +16436,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 116. T-025: freeze K-16 v1: the calendar port (Google and Microsoft) (\#117)
 
-- **Commit:** [`aa99966`](https://github.com/aryamahadik/rosie/commit/aa99966), by Arya Mahadik, 2026-11-08 01:11:07 UTC
+- **Commit:** [`aa99966f`](https://github.com/aryamahadik/rosie/commit/aa99966f), by Arya Mahadik, 2026-11-08 01:11:07 UTC
 - **Pull request:** [#117](https://github.com/aryamahadik/rosie/pull/117) from `task/T-025`, merged 2026-11-08 01:11:08 UTC. It squashed 8 branch commits:
   - `af52f20` T-025: freeze K-16 v1, the calendar port (Google and Microsoft): sche…
   - `45b0c7b` T-025: K-16 v1 wording: Google's admin restriction is admin\_policy\_en…
@@ -16335,7 +16495,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 115. T-018: freeze K-09 v1: the Tool API (turn face, gate limits 1 to 6, shared core calls) (\#116)
 
-- **Commit:** [`fa61fe9`](https://github.com/aryamahadik/rosie/commit/fa61fe9), by Arya Mahadik, 2026-11-08 00:45:54 UTC
+- **Commit:** [`fa61fe9c`](https://github.com/aryamahadik/rosie/commit/fa61fe9c), by Arya Mahadik, 2026-11-08 00:45:54 UTC
 - **Pull request:** [#116](https://github.com/aryamahadik/rosie/pull/116) from `task/T-018`, merged 2026-11-08 00:45:54 UTC. It squashed 3 branch commits:
   - `c05d5dc` T-018: freeze K-09 v1, the Tool API: setup calls of journeys 1 and 2 …
   - `2c93198` T-018: round 2, close the verification's eight points in K-09 v1: the…
@@ -16367,7 +16527,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 114. T-023: freeze K-14 v1: the Stripe port (Connect and Rosfield billing) (\#115)
 
-- **Commit:** [`d2cbdb7`](https://github.com/aryamahadik/rosie/commit/d2cbdb7), by Arya Mahadik, 2026-11-08 00:20:49 UTC
+- **Commit:** [`d2cbdb7a`](https://github.com/aryamahadik/rosie/commit/d2cbdb7a), by Arya Mahadik, 2026-11-08 00:20:49 UTC
 - **Pull request:** [#115](https://github.com/aryamahadik/rosie/pull/115) from `task/T-023`, merged 2026-11-08 00:20:50 UTC. It squashed 2 branch commits:
   - `89c3af8` T-023: freeze K-14 v1, the Stripe port: v1 schema (13 calls with requ…
   - `743f08a` T-023: round 2 of the K-14 v1 freeze: pageIntent and savedCard reads …
@@ -16396,7 +16556,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 113. T-186: Migration 0007: bookable resources and the booking head row, with the deferred booking keys (\#114)
 
-- **Commit:** [`4998261`](https://github.com/aryamahadik/rosie/commit/4998261), by Arya Mahadik, 2026-11-08 00:02:35 UTC
+- **Commit:** [`49982617`](https://github.com/aryamahadik/rosie/commit/49982617), by Arya Mahadik, 2026-11-08 00:02:35 UTC
 - **Pull request:** [#114](https://github.com/aryamahadik/rosie/pull/114) from `task/T-186`, merged 2026-11-08 00:02:35 UTC. It squashed 3 branch commits:
   - `eec0294` T-186: resources and booking head migration, with threads\_booking\_fk …
   - `f29b4da` T-186: threads.int.test.ts: the two booking keys are asserted present…
@@ -16431,7 +16591,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 112. T-413: Linq webhook verify and parse: whsec\_ signature check, vendor payloads to K-06 events, is\_me never a turn (\#113)
 
-- **Commit:** [`4f2c6ab`](https://github.com/aryamahadik/rosie/commit/4f2c6ab), by Arya Mahadik, 2026-11-07 23:45:25 UTC
+- **Commit:** [`4f2c6abd`](https://github.com/aryamahadik/rosie/commit/4f2c6abd), by Arya Mahadik, 2026-11-07 23:45:25 UTC
 - **Pull request:** [#113](https://github.com/aryamahadik/rosie/pull/113) from `task/T-413`, merged 2026-11-07 23:45:26 UTC. It squashed 1 branch commit:
   - `b51a88a` T-413: Linq webhook verify and parse: whsec\_ signature check, vendor …
 - **Files changed:** 5 (+1224 −0), by folder:
@@ -16447,7 +16607,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 111. T-145: Branches: tags (message, lookup, clock), gates, ends, answer fields, effects, layer lines, page types (\#112)
 
-- **Commit:** [`b895eb5`](https://github.com/aryamahadik/rosie/commit/b895eb5), by Arya Mahadik, 2026-11-07 23:43:24 UTC
+- **Commit:** [`b895eb57`](https://github.com/aryamahadik/rosie/commit/b895eb57), by Arya Mahadik, 2026-11-07 23:43:24 UTC
 - **Pull request:** [#112](https://github.com/aryamahadik/rosie/pull/112) from `task/T-145`, merged 2026-11-07 23:43:25 UTC. It squashed 1 branch commit:
   - `3157e17` T-145: Branches: tags (message, lookup, clock), gates, ends, answer f…
 - **Files changed:** 14 (+1164 −0), by folder:
@@ -16463,7 +16623,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 110. T-146: Routing tables: hubs, doors, the 21 any-time rows with handlers, the 50 rule nodes, the homes (\#111)
 
-- **Commit:** [`af48ec4`](https://github.com/aryamahadik/rosie/commit/af48ec4), by Arya Mahadik, 2026-11-07 23:40:00 UTC
+- **Commit:** [`af48ec46`](https://github.com/aryamahadik/rosie/commit/af48ec46), by Arya Mahadik, 2026-11-07 23:40:00 UTC
 - **Pull request:** [#111](https://github.com/aryamahadik/rosie/pull/111) from `task/T-146`, merged 2026-11-07 23:40:01 UTC. It squashed 1 branch commit:
   - `9e51fd2` T-146: Routing tables: hubs, doors, the 21 any-time rows with handler…
 - **Files changed:** 13 (+1018 −0), by folder:
@@ -16479,7 +16639,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 109. T-1075: Linq webhook scheme beside the hex form: whsec\_ key, v1,\<base64\>, several entries (\#110)
 
-- **Commit:** [`b193309`](https://github.com/aryamahadik/rosie/commit/b193309), by Arya Mahadik, 2026-11-07 23:25:56 UTC
+- **Commit:** [`b193309f`](https://github.com/aryamahadik/rosie/commit/b193309f), by Arya Mahadik, 2026-11-07 23:25:56 UTC
 - **Pull request:** [#110](https://github.com/aryamahadik/rosie/pull/110) from `task/T-1075`, merged 2026-11-07 23:25:57 UTC. It squashed 1 branch commit:
   - `db5420f` T-1075: Linq webhook scheme beside the hex form: whsec\_ key, v1,\<base…
 - **Files changed:** 2 (+196 −0), by folder:
@@ -16495,7 +16655,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 108. T-031: freeze K-22 v1: people and access (database part) (\#109)
 
-- **Commit:** [`1ada88b`](https://github.com/aryamahadik/rosie/commit/1ada88b), by Arya Mahadik, 2026-11-07 23:25:53 UTC
+- **Commit:** [`1ada88b1`](https://github.com/aryamahadik/rosie/commit/1ada88b1), by Arya Mahadik, 2026-11-07 23:25:53 UTC
 - **Pull request:** [#109](https://github.com/aryamahadik/rosie/pull/109) from `task/T-031`, merged 2026-11-07 23:25:54 UTC. It squashed 5 branch commits:
   - `500879c` T-031: freeze K-22 v1, people and access database schema (ten tables,…
   - `44945bc` T-031: Tool API grants on proof\_codes, sessions and no-business conta…
@@ -16539,7 +16699,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 107. T-034: freeze K-25 v1: services and prices (database part) (\#108)
 
-- **Commit:** [`acca8f1`](https://github.com/aryamahadik/rosie/commit/acca8f1), by Arya Mahadik, 2026-11-07 23:07:04 UTC
+- **Commit:** [`acca8f12`](https://github.com/aryamahadik/rosie/commit/acca8f12), by Arya Mahadik, 2026-11-07 23:07:04 UTC
 - **Pull request:** [#108](https://github.com/aryamahadik/rosie/pull/108) from `task/T-034`, merged 2026-11-07 23:07:04 UTC. It squashed 2 branch commits:
   - `6092b22` T-034: freeze K-25 v1 services-prices: services, ways per place, pric…
   - `1ec8ef0` T-034: round 2: price\_rules\_dates\_in\_order allows a rule closed at it…
@@ -16568,7 +16728,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 106. T-364: Prompt caching: the always-on rules, the composer's system prompt and static card text in cached prefixes (\#107)
 
-- **Commit:** [`0d81005`](https://github.com/aryamahadik/rosie/commit/0d81005), by Arya Mahadik, 2026-11-07 22:57:29 UTC
+- **Commit:** [`0d810056`](https://github.com/aryamahadik/rosie/commit/0d810056), by Arya Mahadik, 2026-11-07 22:57:29 UTC
 - **Pull request:** [#107](https://github.com/aryamahadik/rosie/pull/107) from `task/T-364`, merged 2026-11-07 22:57:29 UTC. It squashed 2 branch commits:
   - `f34eb2e` T-364: prompt caching: a fixed layout per bundle (prompt and the 50 r…
   - `e0c3343` T-364: rules.ts states an effort change as Anthropic does (message bl…
@@ -16595,7 +16755,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 105. T-185: Migration 0006, the bundle registry and release flags, with read and publish calls (\#106)
 
-- **Commit:** [`2398f76`](https://github.com/aryamahadik/rosie/commit/2398f76), by Arya Mahadik, 2026-11-07 22:48:25 UTC
+- **Commit:** [`2398f762`](https://github.com/aryamahadik/rosie/commit/2398f762), by Arya Mahadik, 2026-11-07 22:48:25 UTC
 - **Pull request:** [#106](https://github.com/aryamahadik/rosie/pull/106) from `task/T-185`, merged 2026-11-07 22:48:26 UTC. It squashed 4 branch commits:
   - `554f139` T-185: Migration for the bundle registry and release flags, with read…
   - `89cc654` T-185: K-05 item 7: lost connection answers transient, publish refuse…
@@ -16633,7 +16793,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 104. T-037: freeze K-28 v1: customers (database part) (\#105)
 
-- **Commit:** [`19c7673`](https://github.com/aryamahadik/rosie/commit/19c7673), by Arya Mahadik, 2026-11-07 22:39:08 UTC
+- **Commit:** [`19c76738`](https://github.com/aryamahadik/rosie/commit/19c76738), by Arya Mahadik, 2026-11-07 22:39:08 UTC
 - **Pull request:** [#105](https://github.com/aryamahadik/rosie/pull/105) from `task/T-037`, merged 2026-11-07 22:39:08 UTC. It squashed 2 branch commits:
   - `d1d475f` T-037: freeze K-28 v1 customers: customers and customer\_blocks, seeds…
   - `5b5a0b4` T-037: round 2: a block keys to the business and the person, not a cu…
@@ -16662,7 +16822,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 103. T-259: Limit 8 at send: stopped, stale, text hours, no open chat, never by an SMS port (\#104)
 
-- **Commit:** [`c0d68b0`](https://github.com/aryamahadik/rosie/commit/c0d68b0), by Arya Mahadik, 2026-11-07 22:30:51 UTC
+- **Commit:** [`c0d68b05`](https://github.com/aryamahadik/rosie/commit/c0d68b05), by Arya Mahadik, 2026-11-07 22:30:51 UTC
 - **Pull request:** [#104](https://github.com/aryamahadik/rosie/pull/104) from `task/T-259`, merged 2026-11-07 22:30:51 UTC. It squashed 2 branch commits:
   - `6a08119` T-259: limit 8 at send: stopped, stale, text hours, no open chat, nev…
   - `3105e70` T-259: limit 8 rework: no open chat waits for every class and audienc…
@@ -16690,7 +16850,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 102. T-1073: unit project testTimeout and hookTimeout 30 s, with a config test (\#96)
 
-- **Commit:** [`7b2d48d`](https://github.com/aryamahadik/rosie/commit/7b2d48d), by Arya Mahadik, 2026-11-07 22:20:51 UTC
+- **Commit:** [`7b2d48de`](https://github.com/aryamahadik/rosie/commit/7b2d48de), by Arya Mahadik, 2026-11-07 22:20:51 UTC
 - **Pull request:** [#96](https://github.com/aryamahadik/rosie/pull/96) from `task/T-1073`, merged 2026-11-07 22:20:52 UTC. It squashed 1 branch commit:
   - `04eab82` T-1073: unit project testTimeout and hookTimeout 30 s, with a config …
 - **Files changed:** 2 (+48 −0), by folder:
@@ -16707,7 +16867,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 101. T-244: handle actor Durable Object with an ordered, persisted inbox of sealed events, receipt hooks, export from index (\#103)
 
-- **Commit:** [`e0f7261`](https://github.com/aryamahadik/rosie/commit/e0f7261), by Arya Mahadik, 2026-11-07 22:19:02 UTC
+- **Commit:** [`e0f7261d`](https://github.com/aryamahadik/rosie/commit/e0f7261d), by Arya Mahadik, 2026-11-07 22:19:02 UTC
 - **Pull request:** [#103](https://github.com/aryamahadik/rosie/pull/103) from `task/T-244`, merged 2026-11-07 22:19:03 UTC. It squashed 1 branch commit:
   - `f646b2b` T-244: handle actor Durable Object with an ordered, persisted inbox o…
 - **Files changed:** 5 (+606 −0), by folder:
@@ -16724,7 +16884,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 100. T-1078: parity shards run only in merge-check, in 3 parallel jobs behind an input check job; ci.yml has no parity step (\#102)
 
-- **Commit:** [`35b823f`](https://github.com/aryamahadik/rosie/commit/35b823f), by Arya Mahadik, 2026-11-07 22:11:12 UTC
+- **Commit:** [`35b823f6`](https://github.com/aryamahadik/rosie/commit/35b823f6), by Arya Mahadik, 2026-11-07 22:11:12 UTC
 - **Pull request:** [#102](https://github.com/aryamahadik/rosie/pull/102) from `task/T-1078`, merged 2026-11-07 22:11:12 UTC. It squashed 1 branch commit:
   - `81a3b3b` T-1078: parity shards run only in merge-check, in 3 parallel jobs beh…
 - **Files changed:** 4 (+257 −104), by folder:
@@ -16741,7 +16901,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 99. T-243: Gateway: scrub, seal and hand the event to the handle's actor, receipts to the dispatcher door (\#101)
 
-- **Commit:** [`0f15004`](https://github.com/aryamahadik/rosie/commit/0f15004), by Arya Mahadik, 2026-11-07 21:53:50 UTC
+- **Commit:** [`0f150049`](https://github.com/aryamahadik/rosie/commit/0f150049), by Arya Mahadik, 2026-11-07 21:53:50 UTC
 - **Pull request:** [#101](https://github.com/aryamahadik/rosie/pull/101) from `task/T-243`, merged 2026-11-07 21:53:51 UTC. It squashed 1 branch commit:
   - `df77bc0` T-243: Gateway: scrub, seal and hand the event to the handle's actor,…
 - **Files changed:** 10 (+1072 −26), by folder:
@@ -16757,7 +16917,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 98. T-1077: freeze K-08 v1.1, event kinds for the Tool API's writes and effect claims: v1.1 schema (19 added kinds, three rules on them only), 16 accepted and 3 refused fixtures, frozen.json, README v1.1 sections (\#100)
 
-- **Commit:** [`48188c8`](https://github.com/aryamahadik/rosie/commit/48188c8), by Arya Mahadik, 2026-11-07 21:34:05 UTC
+- **Commit:** [`48188c80`](https://github.com/aryamahadik/rosie/commit/48188c80), by Arya Mahadik, 2026-11-07 21:34:05 UTC
 - **Pull request:** [#100](https://github.com/aryamahadik/rosie/pull/100) from `task/T-1077`, merged 2026-11-07 21:34:05 UTC. It squashed 1 branch commit:
   - `2d59537` T-1077: freeze K-08 v1.1, event kinds for the Tool API's writes and e…
 - **Files changed:** 23 (+1645 −3), by folder:
@@ -16775,7 +16935,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 97. T-411: Linq double: records parts in order, faked failures, opt-out block, contact adds, capability, fake receipts and votes (\#99)
 
-- **Commit:** [`3588375`](https://github.com/aryamahadik/rosie/commit/3588375), by Arya Mahadik, 2026-11-07 21:23:36 UTC
+- **Commit:** [`35883750`](https://github.com/aryamahadik/rosie/commit/35883750), by Arya Mahadik, 2026-11-07 21:23:36 UTC
 - **Pull request:** [#99](https://github.com/aryamahadik/rosie/pull/99) from `task/T-411`, merged 2026-11-07 21:23:36 UTC. It squashed 1 branch commit:
   - `adefc31` T-411: Linq double: records parts in order, faked failures, opt-out b…
 - **Files changed:** 5 (+1158 −0), by folder:
@@ -16791,7 +16951,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 96. T-257: outbox dispatcher: claim in commit order, parts to the Linq port, receipts to clock arming (\#97)
 
-- **Commit:** [`7b9b013`](https://github.com/aryamahadik/rosie/commit/7b9b013), by Arya Mahadik, 2026-11-07 21:14:00 UTC
+- **Commit:** [`7b9b013b`](https://github.com/aryamahadik/rosie/commit/7b9b013b), by Arya Mahadik, 2026-11-07 21:14:00 UTC
 - **Pull request:** [#97](https://github.com/aryamahadik/rosie/pull/97) from `task/T-257`, merged 2026-11-07 21:14:01 UTC. It squashed 1 branch commit:
   - `7750097` T-257: outbox dispatcher: claim in commit order, parts to the Linq po…
 - **Files changed:** 5 (+1697 −0), by folder:
@@ -16807,7 +16967,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 95. T-184: Migration 0005, threads and the message log (\#98)
 
-- **Commit:** [`1ed64b4`](https://github.com/aryamahadik/rosie/commit/1ed64b4), by Arya Mahadik, 2026-11-07 21:13:47 UTC
+- **Commit:** [`1ed64b4b`](https://github.com/aryamahadik/rosie/commit/1ed64b4b), by Arya Mahadik, 2026-11-07 21:13:47 UTC
 - **Pull request:** [#98](https://github.com/aryamahadik/rosie/pull/98) from `task/T-184`, merged 2026-11-07 21:13:48 UTC. It squashed 2 branch commits:
   - `5e6bd07` T-184: Migration 9999 core\_threads\_messages: threads, openers\_sent, m…
   - `8e99bbd` T-184: renumber the migration to 0005; the phones and threads tests e…
@@ -16835,7 +16995,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 94. T-241: Gateway: Linq webhook entry verifying through the K-11 port, 401/200/503 answers, receive span (\#95)
 
-- **Commit:** [`ebf2567`](https://github.com/aryamahadik/rosie/commit/ebf2567), by Arya Mahadik, 2026-11-07 21:07:48 UTC
+- **Commit:** [`ebf25676`](https://github.com/aryamahadik/rosie/commit/ebf25676), by Arya Mahadik, 2026-11-07 21:07:48 UTC
 - **Pull request:** [#95](https://github.com/aryamahadik/rosie/pull/95) from `task/T-241`, merged 2026-11-07 21:07:48 UTC. It squashed 1 branch commit:
   - `54fea1b` T-241: Gateway: Linq webhook entry verifying through the K-11 port, 4…
 - **Files changed:** 5 (+695 −7), by folder:
@@ -16852,7 +17012,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 93. T-1076: parity step runs on any compiler/src change; placement test finds all shards from the glob (\#94)
 
-- **Commit:** [`1be5a5e`](https://github.com/aryamahadik/rosie/commit/1be5a5e), by Arya Mahadik, 2026-11-07 21:05:18 UTC
+- **Commit:** [`1be5a5ea`](https://github.com/aryamahadik/rosie/commit/1be5a5ea), by Arya Mahadik, 2026-11-07 21:05:18 UTC
 - **Pull request:** [#94](https://github.com/aryamahadik/rosie/pull/94) from `task/T-1076`, merged 2026-11-07 21:05:18 UTC. It squashed 1 branch commit:
   - `ea60cea` T-1076: parity step runs on any compiler/src change; placement test f…
 - **Files changed:** 4 (+37 −16), by folder:
@@ -16869,7 +17029,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 92. T-183: Migration 0004, handles and phones with the stopped flag, and the paused flag (\#93)
 
-- **Commit:** [`6996f2f`](https://github.com/aryamahadik/rosie/commit/6996f2f), by Arya Mahadik, 2026-11-07 20:27:56 UTC
+- **Commit:** [`6996f2f0`](https://github.com/aryamahadik/rosie/commit/6996f2f0), by Arya Mahadik, 2026-11-07 20:27:56 UTC
 - **Pull request:** [#93](https://github.com/aryamahadik/rosie/pull/93) from `task/T-183`, merged 2026-11-07 20:27:56 UTC. It squashed 2 branch commits:
   - `5fb1707` T-183: handles, person\_handles, phones with the stopped flag, and pau…
   - `de2604e` T-183: renumber the migration to 0004 (the lead, at merge: next free …
@@ -16897,7 +17057,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 91. T-138: Master Corrections layer: framework with per-correction tags, C1 and C2 (\#91)
 
-- **Commit:** [`3d2eafb`](https://github.com/aryamahadik/rosie/commit/3d2eafb), by Arya Mahadik, 2026-11-07 20:27:51 UTC
+- **Commit:** [`3d2eafbe`](https://github.com/aryamahadik/rosie/commit/3d2eafbe), by Arya Mahadik, 2026-11-07 20:27:51 UTC
 - **Pull request:** [#91](https://github.com/aryamahadik/rosie/pull/91) from `task/T-138`, merged 2026-11-07 20:27:52 UTC. It squashed 2 branch commits:
   - `5302b82` T-138: Master Corrections layer: tagged framework, C1 (one Rosie numb…
   - `9639288` T-138: move the all-243-trades sweep into 8 parity shards (DL-085, DL…
@@ -16924,7 +17084,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 90. T-042: freeze K-33 v1 platform-billing: bill cards, monthly bills and lines, seeds, refused rows, README freeze record (\#92)
 
-- **Commit:** [`e21877a`](https://github.com/aryamahadik/rosie/commit/e21877a), by Arya Mahadik, 2026-11-07 20:25:49 UTC
+- **Commit:** [`e21877aa`](https://github.com/aryamahadik/rosie/commit/e21877aa), by Arya Mahadik, 2026-11-07 20:25:49 UTC
 - **Pull request:** [#92](https://github.com/aryamahadik/rosie/pull/92) from `task/T-042`, merged 2026-11-07 20:25:49 UTC. It squashed 1 branch commit:
   - `3042787` T-042: freeze K-33 v1 platform-billing: bill cards, monthly bills and…
 - **Files changed:** 13 (+1544 −0), by folder:
@@ -16942,7 +17102,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 89. T-035: freeze K-26 v1, database schema rules part (\#90)
 
-- **Commit:** [`87d51a0`](https://github.com/aryamahadik/rosie/commit/87d51a0), by Arya Mahadik, 2026-11-07 20:25:43 UTC
+- **Commit:** [`87d51a07`](https://github.com/aryamahadik/rosie/commit/87d51a07), by Arya Mahadik, 2026-11-07 20:25:43 UTC
 - **Pull request:** [#90](https://github.com/aryamahadik/rosie/pull/90) from `task/T-035`, merged 2026-11-07 20:25:43 UTC. It squashed 1 branch commit:
   - `ef353be` T-035: freeze K-26 v1, database schema rules part
 - **Files changed:** 10 (+1450 −0), by folder:
@@ -16960,7 +17120,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 88. T-033: freeze K-24 v1, kinds of work database schema (catalog, picks, plug-in text blocks, new-work drafts) (\#89)
 
-- **Commit:** [`d924ed9`](https://github.com/aryamahadik/rosie/commit/d924ed9), by Arya Mahadik, 2026-11-07 20:21:50 UTC
+- **Commit:** [`d924ed95`](https://github.com/aryamahadik/rosie/commit/d924ed95), by Arya Mahadik, 2026-11-07 20:21:50 UTC
 - **Pull request:** [#89](https://github.com/aryamahadik/rosie/pull/89) from `task/T-033`, merged 2026-11-07 20:21:50 UTC. It squashed 1 branch commit:
   - `f954875` T-033: freeze K-24 v1, kinds of work database schema (catalog, picks,…
 - **Files changed:** 12 (+1857 −0), by folder:
@@ -16978,7 +17138,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 87. T-009: draft K-09 Tool API v1, the turn face and the shared core (\#88)
 
-- **Commit:** [`b496212`](https://github.com/aryamahadik/rosie/commit/b496212), by Arya Mahadik, 2026-11-07 18:42:08 UTC
+- **Commit:** [`b4962121`](https://github.com/aryamahadik/rosie/commit/b4962121), by Arya Mahadik, 2026-11-07 18:42:08 UTC
 - **Pull request:** [#88](https://github.com/aryamahadik/rosie/pull/88) from `task/T-009`, merged 2026-11-07 18:42:08 UTC. It squashed 1 branch commit:
   - `fce84f1` T-009: draft K-09 Tool API v1, the turn face and the shared core
 - **Files changed:** 2 (+4180 −0), by folder:
@@ -16994,7 +17154,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 86. T-071: Freeze K-05 v1.1, data-access calls for effects, provider events, claims and the dispatcher's follow-ups (\#87)
 
-- **Commit:** [`3f202dd`](https://github.com/aryamahadik/rosie/commit/3f202dd), by Arya Mahadik, 2026-11-07 18:42:03 UTC
+- **Commit:** [`3f202dde`](https://github.com/aryamahadik/rosie/commit/3f202dde), by Arya Mahadik, 2026-11-07 18:42:03 UTC
 - **Pull request:** [#87](https://github.com/aryamahadik/rosie/pull/87) from `task/T-071`, merged 2026-11-07 18:42:03 UTC. It squashed 2 branch commits:
   - `ae2c082` T-071: freeze K-05 v1.1: effect rows, provider events, the outbox cla…
   - `8ae9373` T-071: K-05 v1.1 round 2: follow-up rows with the give-up and a safet…
@@ -17023,7 +17183,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 85. T-142: sample-value slotting: names, businesses, places, phones, codes, dates, times and amounts in message lines become K-03 slots, fee terms literal (\#86)
 
-- **Commit:** [`4121fe7`](https://github.com/aryamahadik/rosie/commit/4121fe7), by Arya Mahadik, 2026-11-07 18:38:05 UTC
+- **Commit:** [`4121fe7a`](https://github.com/aryamahadik/rosie/commit/4121fe7a), by Arya Mahadik, 2026-11-07 18:38:05 UTC
 - **Pull request:** [#86](https://github.com/aryamahadik/rosie/pull/86) from `task/T-142`, merged 2026-11-07 18:38:06 UTC. It squashed 1 branch commit:
   - `baedfe5` T-142: sample-value slotting: names, businesses, places, phones, code…
 - **Files changed:** 15 (+1501 −0), by folder:
@@ -17039,7 +17199,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 84. T-020: Freeze K-11 v1, the Linq port (webhook verify with the echoed key, send, contacts, capability, double) (\#85)
 
-- **Commit:** [`6c30681`](https://github.com/aryamahadik/rosie/commit/6c30681), by Arya Mahadik, 2026-11-07 18:31:53 UTC
+- **Commit:** [`6c306810`](https://github.com/aryamahadik/rosie/commit/6c306810), by Arya Mahadik, 2026-11-07 18:31:53 UTC
 - **Pull request:** [#85](https://github.com/aryamahadik/rosie/pull/85) from `task/T-020`, merged 2026-11-07 18:31:53 UTC. It squashed 2 branch commits:
   - `b73f942` T-020: freeze K-11 v1, the Linq port, with fixtures, vendor samples a…
   - `a4942fe` T-020: K-11 v1 round 2: verifyWebhook gives the echoed part key (part…
@@ -17069,7 +17229,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 83. T-1074: scrub speed check measures process CPU time and the fastest run of each length (\#84)
 
-- **Commit:** [`ee2cebc`](https://github.com/aryamahadik/rosie/commit/ee2cebc), by Arya Mahadik, 2026-11-07 18:22:22 UTC
+- **Commit:** [`ee2cebc6`](https://github.com/aryamahadik/rosie/commit/ee2cebc6), by Arya Mahadik, 2026-11-07 18:22:22 UTC
 - **Pull request:** [#84](https://github.com/aryamahadik/rosie/pull/84) from `task/T-1074`, merged 2026-11-07 18:22:23 UTC. It squashed 1 branch commit:
   - `6a186bc` T-1074: scrub speed check measures process CPU time and the fastest r…
 - **Files changed:** 1 (+56 −44), by folder:
@@ -17085,7 +17245,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 82. T-026: Freeze K-17 v1, the geo port (geocode with precision, time zone and state) (\#83)
 
-- **Commit:** [`35617f1`](https://github.com/aryamahadik/rosie/commit/35617f1), by Arya Mahadik, 2026-11-07 18:09:58 UTC
+- **Commit:** [`35617f17`](https://github.com/aryamahadik/rosie/commit/35617f17), by Arya Mahadik, 2026-11-07 18:09:58 UTC
 - **Pull request:** [#83](https://github.com/aryamahadik/rosie/pull/83) from `task/T-026`, merged 2026-11-07 18:09:59 UTC. It squashed 2 branch commits:
   - `844a454` T-026: freeze K-17 v1, the geo port (geocode, double fixtures, K-08 s…
   - `83ffc5e` T-026: K-17 v1 match carries its US state (nullable USPS code), adapt…
@@ -17114,7 +17274,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 81. T-143: plug-in key map (K-01 keyMap, pf key resolver, sub-key count and guidance list) (\#82)
 
-- **Commit:** [`579e4c3`](https://github.com/aryamahadik/rosie/commit/579e4c3), by Arya Mahadik, 2026-11-07 17:55:52 UTC
+- **Commit:** [`579e4c37`](https://github.com/aryamahadik/rosie/commit/579e4c37), by Arya Mahadik, 2026-11-07 17:55:52 UTC
 - **Pull request:** [#82](https://github.com/aryamahadik/rosie/pull/82) from `task/T-143`, merged 2026-11-07 17:55:53 UTC. It squashed 1 branch commit:
   - `db3200d` T-143: plug-in key map (K-01 keyMap, pf key resolver, sub-key count a…
 - **Files changed:** 3 (+736 −0), by folder:
@@ -17130,7 +17290,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 80. T-144: step cards (question, Means or stand-in, Never, safe default, Clock or step 9 default) and fallback text (\#81)
 
-- **Commit:** [`cffc0cd`](https://github.com/aryamahadik/rosie/commit/cffc0cd), by Arya Mahadik, 2026-11-07 17:50:04 UTC
+- **Commit:** [`cffc0cd5`](https://github.com/aryamahadik/rosie/commit/cffc0cd5), by Arya Mahadik, 2026-11-07 17:50:04 UTC
 - **Pull request:** [#81](https://github.com/aryamahadik/rosie/pull/81) from `task/T-144`, merged 2026-11-07 17:50:05 UTC. It squashed 1 branch commit:
   - `db81c5b` T-144: step cards (question, Means or stand-in, Never, safe default, …
 - **Files changed:** 5 (+1052 −0), by folder:
@@ -17146,7 +17306,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 79. T-182: Migration 0003, per-person sealing keys with seal, unseal and erase (\#79)
 
-- **Commit:** [`c1a6992`](https://github.com/aryamahadik/rosie/commit/c1a6992), by Arya Mahadik, 2026-11-07 17:50:01 UTC
+- **Commit:** [`c1a6992d`](https://github.com/aryamahadik/rosie/commit/c1a6992d), by Arya Mahadik, 2026-11-07 17:50:01 UTC
 - **Pull request:** [#79](https://github.com/aryamahadik/rosie/pull/79) from `task/T-182`, merged 2026-11-07 17:50:01 UTC. It squashed 3 branch commits:
   - `08680bd` T-182: per-person sealing keys table, with seal, unseal and erasePers…
   - `5c7b0e6` T-182: renumber the migration to 0003 (the lead, at merge: next free …
@@ -17179,7 +17339,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 78. T-361: AI gateway: stage timeouts, one retry, then the other model, K-08 spans per call (\#80)
 
-- **Commit:** [`9e44991`](https://github.com/aryamahadik/rosie/commit/9e44991), by Arya Mahadik, 2026-11-07 17:43:39 UTC
+- **Commit:** [`9e449918`](https://github.com/aryamahadik/rosie/commit/9e449918), by Arya Mahadik, 2026-11-07 17:43:39 UTC
 - **Pull request:** [#80](https://github.com/aryamahadik/rosie/pull/80) from `task/T-361`, merged 2026-11-07 17:43:39 UTC. It squashed 1 branch commit:
   - `d7d354d` T-361: AI gateway: stage timeouts, one retry, then the other model, K…
 - **Files changed:** 6 (+1293 −0), by folder:
@@ -17195,7 +17355,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 77. T-032: Freeze K-23 v1, business setup database schema (owner-readable travel centre) (\#78)
 
-- **Commit:** [`2bb8440`](https://github.com/aryamahadik/rosie/commit/2bb8440), by Arya Mahadik, 2026-11-07 17:39:02 UTC
+- **Commit:** [`2bb84404`](https://github.com/aryamahadik/rosie/commit/2bb84404), by Arya Mahadik, 2026-11-07 17:39:02 UTC
 - **Pull request:** [#78](https://github.com/aryamahadik/rosie/pull/78) from `task/T-032`, merged 2026-11-07 17:39:02 UTC. It squashed 2 branch commits:
   - `f2a2215` T-032: freeze K-23 v1, database schema business setup (table list, fi…
   - `8b83f17` T-032: owner audience for map\_point and travel\_centre, travel\_centre\_…
@@ -17224,7 +17384,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 76. T-016: Freeze K-07 v1, outbox rows and effect rows (waiting for a chat, reconciliation refunds, claim times) (\#77)
 
-- **Commit:** [`a788494`](https://github.com/aryamahadik/rosie/commit/a788494), by Arya Mahadik, 2026-11-07 17:38:59 UTC
+- **Commit:** [`a7884940`](https://github.com/aryamahadik/rosie/commit/a7884940), by Arya Mahadik, 2026-11-07 17:38:59 UTC
 - **Pull request:** [#77](https://github.com/aryamahadik/rosie/pull/77) from `task/T-016`, merged 2026-11-07 17:38:59 UTC. It squashed 2 branch commits:
   - `5f0600b` T-016: freeze K-07 v1, outbox rows and effect rows (states and moves,…
   - `d586d5f` T-016: K-07 v1 round 2: waiting\_chat and superseded row states, recon…
@@ -17253,7 +17413,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 75. T-1071: the recorded-model double replays the composer's plan (K-03 v1) (\#76)
 
-- **Commit:** [`04ce119`](https://github.com/aryamahadik/rosie/commit/04ce119), by Arya Mahadik, 2026-11-07 17:18:31 UTC
+- **Commit:** [`04ce1195`](https://github.com/aryamahadik/rosie/commit/04ce1195), by Arya Mahadik, 2026-11-07 17:18:31 UTC
 - **Pull request:** [#76](https://github.com/aryamahadik/rosie/pull/76) from `task/T-1071`, merged 2026-11-07 17:18:31 UTC. It squashed 1 branch commit:
   - `1aefeac` T-1071: the recorded-model double replays the composer's plan (K-03 v1)
 - **Files changed:** 13 (+1057 −12), by folder:
@@ -17271,7 +17431,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 74. T-410: adapters shared base (HMAC helper, K-08 span helper, recorded-sample loader, port list; no SMS) (\#75)
 
-- **Commit:** [`a1be7ff`](https://github.com/aryamahadik/rosie/commit/a1be7ff), by Arya Mahadik, 2026-11-07 17:18:28 UTC
+- **Commit:** [`a1be7ffa`](https://github.com/aryamahadik/rosie/commit/a1be7ffa), by Arya Mahadik, 2026-11-07 17:18:28 UTC
 - **Pull request:** [#75](https://github.com/aryamahadik/rosie/pull/75) from `task/T-410`, merged 2026-11-07 17:18:28 UTC. It squashed 1 branch commit:
   - `481aad5` T-410: adapters shared base (HMAC helper, K-08 span helper, recorded-…
 - **Files changed:** 12 (+1108 −2), by folder:
@@ -17288,7 +17448,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 73. T-045: freeze K-36 v1 db-schema notifications (hand\_offs, team\_pages, team\_page\_recipients) with seeds, refused rows and README freeze record (\#74)
 
-- **Commit:** [`1ef3a8a`](https://github.com/aryamahadik/rosie/commit/1ef3a8a), by Arya Mahadik, 2026-11-07 17:18:24 UTC
+- **Commit:** [`1ef3a8a9`](https://github.com/aryamahadik/rosie/commit/1ef3a8a9), by Arya Mahadik, 2026-11-07 17:18:24 UTC
 - **Pull request:** [#74](https://github.com/aryamahadik/rosie/pull/74) from `task/T-045`, merged 2026-11-07 17:18:25 UTC. It squashed 1 branch commit:
   - `93e6f92` T-045: freeze K-36 v1 db-schema notifications (hand\_offs, team\_pages,…
 - **Files changed:** 10 (+1328 −0), by folder:
@@ -17306,7 +17466,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 72. T-137: record engine: homes, 16 slots, ways, one fee, fixtures, first-fit rows, hold refused (\#73)
 
-- **Commit:** [`ebbd485`](https://github.com/aryamahadik/rosie/commit/ebbd485), by Arya Mahadik, 2026-11-07 16:50:29 UTC
+- **Commit:** [`ebbd4850`](https://github.com/aryamahadik/rosie/commit/ebbd4850), by Arya Mahadik, 2026-11-07 16:50:29 UTC
 - **Pull request:** [#73](https://github.com/aryamahadik/rosie/pull/73) from `task/T-137`, merged 2026-11-07 16:50:30 UTC. It squashed 1 branch commit:
   - `91ccd2f` T-137: record engine: homes, 16 slots, ways, one fee, fixtures, first…
 - **Files changed:** 3 (+1011 −0), by folder:
@@ -17324,7 +17484,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 71. T-181: Migration 0002, core business head, persons and per-business roles (\#72)
 
-- **Commit:** [`9af986a`](https://github.com/aryamahadik/rosie/commit/9af986a), by Arya Mahadik, 2026-11-07 16:48:38 UTC
+- **Commit:** [`9af986a0`](https://github.com/aryamahadik/rosie/commit/9af986a0), by Arya Mahadik, 2026-11-07 16:48:38 UTC
 - **Pull request:** [#72](https://github.com/aryamahadik/rosie/pull/72) from `task/T-181`, merged 2026-11-07 16:48:39 UTC. It squashed 2 branch commits:
   - `cc15669` T-181: core business head, persons and per-business roles (migration,…
   - `93f9702` T-181: renumber the migration to 0002 at merge (db/README, the migrat…
@@ -17344,7 +17504,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 70. T-240: runtime trace context: one trace id per start, K-08 hop spans, CQ-06 batch and Q-41 reply time (\#71)
 
-- **Commit:** [`e3e970a`](https://github.com/aryamahadik/rosie/commit/e3e970a), by Arya Mahadik, 2026-11-07 16:47:29 UTC
+- **Commit:** [`e3e970a2`](https://github.com/aryamahadik/rosie/commit/e3e970a2), by Arya Mahadik, 2026-11-07 16:47:29 UTC
 - **Pull request:** [#71](https://github.com/aryamahadik/rosie/pull/71) from `task/T-240`, merged 2026-11-07 16:47:29 UTC. It squashed 1 branch commit:
   - `a65d5a1` T-240: runtime trace context: one trace id per start, K-08 hop spans,…
 - **Files changed:** 9 (+1869 −0), by folder:
@@ -17362,7 +17522,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 69. T-004: recorded-model double and K-02 fixture loader (\#70)
 
-- **Commit:** [`f56d0f3`](https://github.com/aryamahadik/rosie/commit/f56d0f3), by Arya Mahadik, 2026-11-07 16:45:14 UTC
+- **Commit:** [`f56d0f3b`](https://github.com/aryamahadik/rosie/commit/f56d0f3b), by Arya Mahadik, 2026-11-07 16:45:14 UTC
 - **Pull request:** [#70](https://github.com/aryamahadik/rosie/pull/70) from `task/T-004`, merged 2026-11-07 16:45:14 UTC. It squashed 1 branch commit:
   - `d4a5102` T-004: recorded-model double and K-02 fixture loader
 - **Files changed:** 12 (+1379 −0), by folder:
@@ -17382,7 +17542,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 68. T-1070: scrub follows K-06 v1.1 (Luhn windows in a run, separator runs, Nd digits, wider SSN); speed test checks growth, not a millisecond bound (\#69)
 
-- **Commit:** [`7b18de8`](https://github.com/aryamahadik/rosie/commit/7b18de8), by Arya Mahadik, 2026-11-07 16:40:57 UTC
+- **Commit:** [`7b18de84`](https://github.com/aryamahadik/rosie/commit/7b18de84), by Arya Mahadik, 2026-11-07 16:40:57 UTC
 - **Pull request:** [#69](https://github.com/aryamahadik/rosie/pull/69) from `task/T-1070`, merged 2026-11-07 16:40:57 UTC. It squashed 1 branch commit:
   - `593820b` T-1070: scrub follows K-06 v1.1 (Luhn windows in a run, separator run…
 - **Files changed:** 2 (+664 −94), by folder:
@@ -17400,7 +17560,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 67. T-136: path model, a trade's real paths, lit(), resolveVary(), applyStops() and a per-path walk (\#68)
 
-- **Commit:** [`3855241`](https://github.com/aryamahadik/rosie/commit/3855241), by Arya Mahadik, 2026-11-07 16:36:34 UTC
+- **Commit:** [`38552414`](https://github.com/aryamahadik/rosie/commit/38552414), by Arya Mahadik, 2026-11-07 16:36:34 UTC
 - **Pull request:** [#68](https://github.com/aryamahadik/rosie/pull/68) from `task/T-136`, merged 2026-11-07 16:36:34 UTC. It squashed 1 branch commit:
   - `65cf8a8` T-136: path model, a trade's real paths, lit(), resolveVary(), applyS…
 - **Files changed:** 5 (+1322 −0), by folder:
@@ -17418,7 +17578,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 66. T-043: freeze K-34 v1 db-schema safety-incidents (5 tables, 6 seeds, 4 refused, README freeze record) (\#67)
 
-- **Commit:** [`b78a4ef`](https://github.com/aryamahadik/rosie/commit/b78a4ef), by Arya Mahadik, 2026-11-07 16:35:04 UTC
+- **Commit:** [`b78a4efa`](https://github.com/aryamahadik/rosie/commit/b78a4efa), by Arya Mahadik, 2026-11-07 16:35:04 UTC
 - **Pull request:** [#67](https://github.com/aryamahadik/rosie/pull/67) from `task/T-043`, merged 2026-11-07 16:35:05 UTC. It squashed 1 branch commit:
   - `1f0ac6e` T-043: freeze K-34 v1 db-schema safety-incidents (5 tables, 6 seeds, …
 - **Files changed:** 14 (+2315 −0), by folder:
@@ -17438,7 +17598,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 65. T-180: database client with primary and replica handles, withBusiness scope, test-database helper (\#66)
 
-- **Commit:** [`71afeb5`](https://github.com/aryamahadik/rosie/commit/71afeb5), by Arya Mahadik, 2026-11-07 16:34:01 UTC
+- **Commit:** [`71afeb52`](https://github.com/aryamahadik/rosie/commit/71afeb52), by Arya Mahadik, 2026-11-07 16:34:01 UTC
 - **Pull request:** [#66](https://github.com/aryamahadik/rosie/pull/66) from `task/T-180`, merged 2026-11-07 16:34:01 UTC. It squashed 1 branch commit:
   - `2fb1c62` T-180: database client with primary and replica handles, withBusiness…
 - **Files changed:** 4 (+656 −0), by folder:
@@ -17456,7 +17616,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 64. T-1069: K-06 v1.1, the wider card-number and SSN rule scrubbedV1dot1 (Luhn windows in a longer run, runs of spaces or dashes, non-ASCII digits), v1.1 schema, fixtures and freeze (\#65)
 
-- **Commit:** [`0a46a6e`](https://github.com/aryamahadik/rosie/commit/0a46a6e), by Arya Mahadik, 2026-11-07 16:30:19 UTC
+- **Commit:** [`0a46a6e4`](https://github.com/aryamahadik/rosie/commit/0a46a6e4), by Arya Mahadik, 2026-11-07 16:30:19 UTC
 - **Pull request:** [#65](https://github.com/aryamahadik/rosie/pull/65) from `task/T-1069`, merged 2026-11-07 16:30:19 UTC. It squashed 1 branch commit:
   - `a0c3ca5` T-1069: K-06 v1.1, the wider card-number and SSN rule scrubbedV1dot1 …
 - **Files changed:** 14 (+475 −3), by folder:
@@ -17476,7 +17636,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 63. T-017: Freeze K-08 v1, the event log and trace format (\#64)
 
-- **Commit:** [`72d0ef4`](https://github.com/aryamahadik/rosie/commit/72d0ef4), by Arya Mahadik, 2026-11-07 16:29:22 UTC
+- **Commit:** [`72d0ef43`](https://github.com/aryamahadik/rosie/commit/72d0ef43), by Arya Mahadik, 2026-11-07 16:29:22 UTC
 - **Pull request:** [#64](https://github.com/aryamahadik/rosie/pull/64) from `task/T-017`, merged 2026-11-07 16:29:22 UTC. It squashed 2 branch commits:
   - `bf53ba2` T-017: freeze K-08 event-trace v1 (event-log rows, spans, traces, mea…
   - `8aebabf` T-017: span provider, call and attempt; portCall hop; vendor out of g…
@@ -17497,7 +17657,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 62. T-046: freeze K-37 v1, the platform and review database part, with its fixtures and README freeze record (\#63)
 
-- **Commit:** [`36522a9`](https://github.com/aryamahadik/rosie/commit/36522a9), by Arya Mahadik, 2026-11-07 16:26:25 UTC
+- **Commit:** [`36522a9c`](https://github.com/aryamahadik/rosie/commit/36522a9c), by Arya Mahadik, 2026-11-07 16:26:25 UTC
 - **Pull request:** [#63](https://github.com/aryamahadik/rosie/pull/63) from `task/T-046`, merged 2026-11-07 16:26:26 UTC. It squashed 1 branch commit:
   - `4a5b449` T-046: freeze K-37 v1, the platform and review database part, with it…
 - **Files changed:** 11 (+1470 −0), by folder:
@@ -17517,7 +17677,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 61. T-1068: CQ-25, decide reaches the model in two calls (live on both models) (\#62)
 
-- **Commit:** [`4977c39`](https://github.com/aryamahadik/rosie/commit/4977c39), by Arya Mahadik, 2026-11-07 16:20:00 UTC
+- **Commit:** [`4977c395`](https://github.com/aryamahadik/rosie/commit/4977c395), by Arya Mahadik, 2026-11-07 16:20:00 UTC
 - **Pull request:** [#62](https://github.com/aryamahadik/rosie/pull/62) from `task/T-1068`, merged 2026-11-07 16:20:01 UTC. It squashed 6 branch commits:
   - `1ddfafd` T-1068: decide wire-form probe (tools, flat tools, envelope, two-step…
   - `5eaea6e` T-1068: FINDINGS.md from the builder's text (its Write was refused; D…
@@ -17541,7 +17701,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 60. T-014: freeze K-05 v1, the data-access calls, with fixtures and README freeze record (\#61)
 
-- **Commit:** [`b0bad48`](https://github.com/aryamahadik/rosie/commit/b0bad48), by Arya Mahadik, 2026-11-07 16:18:07 UTC
+- **Commit:** [`b0bad489`](https://github.com/aryamahadik/rosie/commit/b0bad489), by Arya Mahadik, 2026-11-07 16:18:07 UTC
 - **Pull request:** [#61](https://github.com/aryamahadik/rosie/pull/61) from `task/T-014`, merged 2026-11-07 16:18:07 UTC. It squashed 1 branch commit:
   - `2615569` T-014: freeze K-05 v1, the data-access calls, with fixtures and READM…
 - **Files changed:** 49 (+4754 −0), by folder:
@@ -17561,7 +17721,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 59. T-242: card number and SSN scrub at the edge (pure scrub, K-06 tags, tests against the K-06 rule and fixtures) (\#60)
 
-- **Commit:** [`8dc0b78`](https://github.com/aryamahadik/rosie/commit/8dc0b78), by Arya Mahadik, 2026-11-07 16:14:45 UTC
+- **Commit:** [`8dc0b788`](https://github.com/aryamahadik/rosie/commit/8dc0b788), by Arya Mahadik, 2026-11-07 16:14:45 UTC
 - **Pull request:** [#60](https://github.com/aryamahadik/rosie/pull/60) from `task/T-242`, merged 2026-11-07 16:14:46 UTC. It squashed 1 branch commit:
   - `bcf51ed` T-242: card number and SSN scrub at the edge (pure scrub, K-06 tags, …
 - **Files changed:** 2 (+494 −0), by folder:
@@ -17579,7 +17739,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 58. T-038: freeze K-29 conversations-consent v1 (consents, chat links, seeds, refused rows) (\#59)
 
-- **Commit:** [`74d3638`](https://github.com/aryamahadik/rosie/commit/74d3638), by Arya Mahadik, 2026-11-07 16:05:13 UTC
+- **Commit:** [`74d36382`](https://github.com/aryamahadik/rosie/commit/74d36382), by Arya Mahadik, 2026-11-07 16:05:13 UTC
 - **Pull request:** [#59](https://github.com/aryamahadik/rosie/pull/59) from `task/T-038`, merged 2026-11-07 16:05:13 UTC. It squashed 1 branch commit:
   - `7d3b531` T-038: freeze K-29 conversations-consent v1 (consents, chat links, se…
 - **Files changed:** 10 (+870 −0), by folder:
@@ -17599,7 +17759,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 57. T-015: Freeze K-06 v1, the inbound event (schema, scrubbed rule, fixtures, freeze record) (\#58)
 
-- **Commit:** [`fd97a4e`](https://github.com/aryamahadik/rosie/commit/fd97a4e), by Arya Mahadik, 2026-11-07 16:05:09 UTC
+- **Commit:** [`fd97a4e6`](https://github.com/aryamahadik/rosie/commit/fd97a4e6), by Arya Mahadik, 2026-11-07 16:05:09 UTC
 - **Pull request:** [#58](https://github.com/aryamahadik/rosie/pull/58) from `task/T-015`, merged 2026-11-07 16:05:10 UTC. It squashed 1 branch commit:
   - `d8aa0c8` T-015: Freeze K-06 v1, the inbound event (schema, scrubbed rule, fixt…
 - **Files changed:** 24 (+1847 −0), by folder:
@@ -17619,7 +17779,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 56. T-135: overlay applier, a typed wrapper around overlay-core.js apply() with strict refusals and 243 x 2 parity tests (\#56)
 
-- **Commit:** [`e10461c`](https://github.com/aryamahadik/rosie/commit/e10461c), by Arya Mahadik, 2026-11-07 16:04:01 UTC
+- **Commit:** [`e10461c3`](https://github.com/aryamahadik/rosie/commit/e10461c3), by Arya Mahadik, 2026-11-07 16:04:01 UTC
 - **Pull request:** [#56](https://github.com/aryamahadik/rosie/pull/56) from `task/T-135`, merged 2026-11-07 16:04:01 UTC. It squashed 1 branch commit:
   - `cbcd8fd` T-135: overlay applier, a typed wrapper around overlay-core.js apply(…
 - **Files changed:** 13 (+647 −0), by folder:
@@ -17637,7 +17797,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 55. T-1067: Run the overlay parity suite in its own project, only when its inputs change (\#57)
 
-- **Commit:** [`05b0d62`](https://github.com/aryamahadik/rosie/commit/05b0d62), by Arya Mahadik, 2026-11-07 15:53:48 UTC
+- **Commit:** [`05b0d62c`](https://github.com/aryamahadik/rosie/commit/05b0d62c), by Arya Mahadik, 2026-11-07 15:53:48 UTC
 - **Pull request:** [#57](https://github.com/aryamahadik/rosie/pull/57) from `task/T-1067`, merged 2026-11-07 15:53:48 UTC. It squashed 1 branch commit:
   - `7d91b85` T-1067: Run the overlay parity suite in its own project, only when it…
 - **Files changed:** 6 (+233 −3), by folder:
@@ -17657,7 +17817,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 54. T-013: Freeze K-04 v1, the core database schema (\#55)
 
-- **Commit:** [`dc67399`](https://github.com/aryamahadik/rosie/commit/dc67399), by Arya Mahadik, 2026-11-07 14:00:28 UTC
+- **Commit:** [`dc673998`](https://github.com/aryamahadik/rosie/commit/dc673998), by Arya Mahadik, 2026-11-07 14:00:28 UTC
 - **Pull request:** [#55](https://github.com/aryamahadik/rosie/pull/55) from `task/T-013`, merged 2026-11-07 14:00:28 UTC. It squashed 3 branch commits:
   - `e0d1d32` T-013: Freeze K-04 v1, the database schema core part (24 tables, seed…
   - `4019b8b` T-013: Rework, reservations.queued\_at and reservations\_waiting\_queue\_…
@@ -17679,7 +17839,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 53. T-1066: Live check of the frozen model-facing schemas (decide read too complex) (\#54)
 
-- **Commit:** [`1819278`](https://github.com/aryamahadik/rosie/commit/1819278), by Arya Mahadik, 2026-11-07 13:20:52 UTC
+- **Commit:** [`18192786`](https://github.com/aryamahadik/rosie/commit/18192786), by Arya Mahadik, 2026-11-07 13:20:52 UTC
 - **Pull request:** [#54](https://github.com/aryamahadik/rosie/pull/54) from `task/T-1066`, merged 2026-11-07 13:20:52 UTC. It squashed 2 branch commits:
   - `afe3fd4` T-1066: probe --frozen plans the 4 frozen-schema calls; FINDINGS gain…
   - `482a7b4` T-1066: live results (4 calls, 20 of 20): the frozen decide read is r…
@@ -17699,7 +17859,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 52. T-360: Spike, structured outputs for K-02 and K-03 on both models (live results) (\#53)
 
-- **Commit:** [`02e1df9`](https://github.com/aryamahadik/rosie/commit/02e1df9), by Arya Mahadik, 2026-11-07 13:06:59 UTC
+- **Commit:** [`02e1df9d`](https://github.com/aryamahadik/rosie/commit/02e1df9d), by Arya Mahadik, 2026-11-07 13:06:59 UTC
 - **Pull request:** [#53](https://github.com/aryamahadik/rosie/pull/53) from `task/T-360`, merged 2026-11-07 13:07:00 UTC. It squashed 3 branch commits:
   - `a515d94` T-360: structured-outputs spike probe, candidate K-02/K-03 schemas an…
   - `645d5ad` T-360: FINDINGS.md from the builder's report (docs, candidates, dry r…
@@ -17721,7 +17881,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 51. T-133: trade file loader by top key (R2, R3) for the 243 trades (\#52)
 
-- **Commit:** [`5c6d072`](https://github.com/aryamahadik/rosie/commit/5c6d072), by Arya Mahadik, 2026-11-07 09:50:40 UTC
+- **Commit:** [`5c6d0726`](https://github.com/aryamahadik/rosie/commit/5c6d0726), by Arya Mahadik, 2026-11-07 09:50:40 UTC
 - **Pull request:** [#52](https://github.com/aryamahadik/rosie/pull/52) from `task/T-133`, merged 2026-11-07 09:50:40 UTC. It squashed 1 branch commit:
   - `2e0968b` T-133: trade file loader by top key (R2, R3) for the 243 trades
 - **Files changed:** 2 (+1283 −0), by folder:
@@ -17739,7 +17899,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 50. T-081: contract test model.v1, the fixture part and the side list (\#51)
 
-- **Commit:** [`0c84a4b`](https://github.com/aryamahadik/rosie/commit/0c84a4b), by Arya Mahadik, 2026-11-07 09:40:47 UTC
+- **Commit:** [`0c84a4b2`](https://github.com/aryamahadik/rosie/commit/0c84a4b2), by Arya Mahadik, 2026-11-07 09:40:47 UTC
 - **Pull request:** [#51](https://github.com/aryamahadik/rosie/pull/51) from `task/T-081`, merged 2026-11-07 09:40:48 UTC. It squashed 1 branch commit:
   - `45fc380` T-081: contract test model.v1, the fixture part and the side list
 - **Files changed:** 1 (+1261 −0), by folder:
@@ -17757,7 +17917,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 49. T-082: contract test for message-plan.v1 (fixtures, vacuity, slot vocabulary, pair and check-result checks, side list) (\#50)
 
-- **Commit:** [`069216d`](https://github.com/aryamahadik/rosie/commit/069216d), by Arya Mahadik, 2026-11-07 09:37:09 UTC
+- **Commit:** [`069216d9`](https://github.com/aryamahadik/rosie/commit/069216d9), by Arya Mahadik, 2026-11-07 09:37:09 UTC
 - **Pull request:** [#50](https://github.com/aryamahadik/rosie/pull/50) from `task/T-082`, merged 2026-11-07 09:37:10 UTC. It squashed 1 branch commit:
   - `713116d` T-082: contract test for message-plan.v1 (fixtures, vacuity, slot voc…
 - **Files changed:** 1 (+1376 −0), by folder:
@@ -17775,7 +17935,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 48. T-132: master flow loader, typed step graph and CLI entry for the compiler (\#49)
 
-- **Commit:** [`83fd8b6`](https://github.com/aryamahadik/rosie/commit/83fd8b6), by Arya Mahadik, 2026-11-07 09:37:06 UTC
+- **Commit:** [`83fd8b6d`](https://github.com/aryamahadik/rosie/commit/83fd8b6d), by Arya Mahadik, 2026-11-07 09:37:06 UTC
 - **Pull request:** [#49](https://github.com/aryamahadik/rosie/pull/49) from `task/T-132`, merged 2026-11-07 09:37:06 UTC. It squashed 1 branch commit:
   - `a597fb0` T-132: master flow loader, typed step graph and CLI entry for the com…
 - **Files changed:** 6 (+1431 −1), by folder:
@@ -17797,7 +17957,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 47. T-011: Freeze K-02 v1, the model's contract (\#48)
 
-- **Commit:** [`fefa0b8`](https://github.com/aryamahadik/rosie/commit/fefa0b8), by Arya Mahadik, 2026-11-07 09:29:38 UTC
+- **Commit:** [`fefa0b8f`](https://github.com/aryamahadik/rosie/commit/fefa0b8f), by Arya Mahadik, 2026-11-07 09:29:38 UTC
 - **Pull request:** [#48](https://github.com/aryamahadik/rosie/pull/48) from `task/T-011`, merged 2026-11-07 09:29:38 UTC. It squashed 2 branch commits:
   - `355d809` T-011: freeze K-02 v1, the model's contract, with fixtures, named rul…
   - `d4d2456` T-011: danger words name their kind (selfHarm or other) and hand-offs…
@@ -17821,7 +17981,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 46. T-131: spike, wrap the master's CommonJS overlay scripts from the ESM compiler (\#47)
 
-- **Commit:** [`397d3d7`](https://github.com/aryamahadik/rosie/commit/397d3d7), by Arya Mahadik, 2026-11-07 09:23:36 UTC
+- **Commit:** [`397d3d7b`](https://github.com/aryamahadik/rosie/commit/397d3d7b), by Arya Mahadik, 2026-11-07 09:23:36 UTC
 - **Pull request:** [#47](https://github.com/aryamahadik/rosie/pull/47) from `task/T-131`, merged 2026-11-07 09:23:36 UTC. It squashed 1 branch commit:
   - `15e49a3` T-131: spike, wrap the master's CommonJS overlay scripts from the ESM…
 - **Files changed:** 3 (+395 −0), by folder:
@@ -17839,7 +17999,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 45. T-012: freeze K-03 message-plan v1 with slot vocabulary, fixtures and freeze record (\#46)
 
-- **Commit:** [`b6f7b55`](https://github.com/aryamahadik/rosie/commit/b6f7b55), by Arya Mahadik, 2026-11-07 09:23:32 UTC
+- **Commit:** [`b6f7b556`](https://github.com/aryamahadik/rosie/commit/b6f7b556), by Arya Mahadik, 2026-11-07 09:23:32 UTC
 - **Pull request:** [#46](https://github.com/aryamahadik/rosie/pull/46) from `task/T-012`, merged 2026-11-07 09:23:33 UTC. It squashed 1 branch commit:
   - `613ecd6` T-012: freeze K-03 message-plan v1 with slot vocabulary, fixtures and…
 - **Files changed:** 25 (+2494 −0), by folder:
@@ -17859,7 +18019,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 44. T-130: vendor compiler master inputs into fixtures/master with SHA256SUMS (\#45)
 
-- **Commit:** [`8f48b18`](https://github.com/aryamahadik/rosie/commit/8f48b18), by Arya Mahadik, 2026-11-07 09:08:57 UTC
+- **Commit:** [`8f48b18f`](https://github.com/aryamahadik/rosie/commit/8f48b18f), by Arya Mahadik, 2026-11-07 09:08:57 UTC
 - **Pull request:** [#45](https://github.com/aryamahadik/rosie/pull/45) from `task/T-130`, merged 2026-11-07 09:08:58 UTC. It squashed 1 branch commit:
   - `42a56e2` T-130: vendor compiler master inputs into fixtures/master with SHA256…
 - **Files changed:** 251 (+1229721 −0), by folder:
@@ -17881,7 +18041,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 43. T-080: bundle.v1 contract test, fixture part and side list (\#44)
 
-- **Commit:** [`f14fb48`](https://github.com/aryamahadik/rosie/commit/f14fb48), by Arya Mahadik, 2026-11-07 09:08:54 UTC
+- **Commit:** [`f14fb480`](https://github.com/aryamahadik/rosie/commit/f14fb480), by Arya Mahadik, 2026-11-07 09:08:54 UTC
 - **Pull request:** [#44](https://github.com/aryamahadik/rosie/pull/44) from `task/T-080`, merged 2026-11-07 09:08:54 UTC. It squashed 1 branch commit:
   - `47f10d5` T-080: bundle.v1 contract test, fixture part and side list
 - **Files changed:** 1 (+847 −0), by folder:
@@ -17899,7 +18059,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 42. T-010: Freeze K-01 v1, the step-graph bundle format (\#43)
 
-- **Commit:** [`f8b6a2d`](https://github.com/aryamahadik/rosie/commit/f8b6a2d), by Arya Mahadik, 2026-11-07 08:52:55 UTC
+- **Commit:** [`f8b6a2d4`](https://github.com/aryamahadik/rosie/commit/f8b6a2d4), by Arya Mahadik, 2026-11-07 08:52:55 UTC
 - **Pull request:** [#43](https://github.com/aryamahadik/rosie/pull/43) from `task/T-010`, merged 2026-11-07 08:52:55 UTC. It squashed 2 branch commits:
   - `4a28ab0` T-010: freeze K-01 bundle v1: shared lists, lint marks, judgment rule…
   - `65f04ff` T-010: journey membership (journeyGate.steps), branch-end walker rule…
@@ -17920,7 +18080,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 41. T-008: Draft K-01 bundle format with the KV size note (\#42)
 
-- **Commit:** [`f1e2367`](https://github.com/aryamahadik/rosie/commit/f1e2367), by Arya Mahadik, 2026-11-07 08:05:40 UTC
+- **Commit:** [`f1e23677`](https://github.com/aryamahadik/rosie/commit/f1e23677), by Arya Mahadik, 2026-11-07 08:05:40 UTC
 - **Pull request:** [#42](https://github.com/aryamahadik/rosie/pull/42) from `task/T-008`, merged 2026-11-07 08:05:40 UTC. It squashed 2 branch commits:
   - `20d8620` T-008: draft K-01 bundle schema and README with the KV value-size spike
   - `51be1dc` T-008: name a source in every bundle schema description (QA rework: 6…
@@ -17939,7 +18099,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 40. T-007: fixture set v1 loader for scenario inputs (demo shops, scenarios, stale flags) (\#41)
 
-- **Commit:** [`943f1d6`](https://github.com/aryamahadik/rosie/commit/943f1d6), by Arya Mahadik, 2026-11-07 07:54:04 UTC
+- **Commit:** [`943f1d69`](https://github.com/aryamahadik/rosie/commit/943f1d69), by Arya Mahadik, 2026-11-07 07:54:04 UTC
 - **Pull request:** [#41](https://github.com/aryamahadik/rosie/pull/41) from `task/T-007`, merged 2026-11-07 07:54:04 UTC. It squashed 1 branch commit:
   - `abd13d8` T-007: fixture set v1 loader for scenario inputs (demo shops, scenari…
 - **Files changed:** 8 (+934 −0), by folder:
@@ -17957,7 +18117,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 39. T-1062: contracts:check accepts a database part's own frozen.json; README states the per-part freeze (\#40)
 
-- **Commit:** [`66c2702`](https://github.com/aryamahadik/rosie/commit/66c2702), by Arya Mahadik, 2026-11-07 07:54:00 UTC
+- **Commit:** [`66c27026`](https://github.com/aryamahadik/rosie/commit/66c27026), by Arya Mahadik, 2026-11-07 07:54:00 UTC
 - **Pull request:** [#40](https://github.com/aryamahadik/rosie/pull/40) from `task/T-1062`, merged 2026-11-07 07:54:00 UTC. It squashed 1 branch commit:
   - `1daf3e6` T-1062: contracts:check accepts a database part's own frozen.json; RE…
 - **Files changed:** 3 (+102 −10), by folder:
@@ -17976,7 +18136,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 38. T-1003: env.production in wrangler.jsonc with its own names and bindings, route commented (\#39)
 
-- **Commit:** [`8bdb137`](https://github.com/aryamahadik/rosie/commit/8bdb137), by Arya Mahadik, 2026-11-07 07:53:56 UTC
+- **Commit:** [`8bdb1370`](https://github.com/aryamahadik/rosie/commit/8bdb1370), by Arya Mahadik, 2026-11-07 07:53:56 UTC
 - **Pull request:** [#39](https://github.com/aryamahadik/rosie/pull/39) from `task/T-1003`, merged 2026-11-07 07:53:56 UTC. It squashed 1 branch commit:
   - `f947bbb` T-1003: env.production in wrangler.jsonc with its own names and bindi…
 - **Files changed:** 2 (+306 −0), by folder:
@@ -17995,7 +18155,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 37. T-1061: contract freeze guard reads the nearest frozen.json, so a database part's own frozen.json governs that part alone (\#38)
 
-- **Commit:** [`b3f094e`](https://github.com/aryamahadik/rosie/commit/b3f094e), by Arya Mahadik, 2026-11-07 07:44:25 UTC
+- **Commit:** [`b3f094ec`](https://github.com/aryamahadik/rosie/commit/b3f094ec), by Arya Mahadik, 2026-11-07 07:44:25 UTC
 - **Pull request:** [#38](https://github.com/aryamahadik/rosie/pull/38) from `task/T-1061`, merged 2026-11-07 07:44:25 UTC. It squashed 1 branch commit:
   - `f2c162d` T-1061: contract freeze guard reads the nearest frozen.json, so a dat…
 - **Files changed:** 2 (+179 −8), by folder:
@@ -18013,7 +18173,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 36. T-003: QA test harness: contract-fixture checker, double loader, quarantine rules (\#37)
 
-- **Commit:** [`d2ecf40`](https://github.com/aryamahadik/rosie/commit/d2ecf40), by Arya Mahadik, 2026-11-07 07:44:20 UTC
+- **Commit:** [`d2ecf403`](https://github.com/aryamahadik/rosie/commit/d2ecf403), by Arya Mahadik, 2026-11-07 07:44:20 UTC
 - **Pull request:** [#37](https://github.com/aryamahadik/rosie/pull/37) from `task/T-003`, merged 2026-11-07 07:44:21 UTC. It squashed 1 branch commit:
   - `28d199b` T-003: QA test harness: contract-fixture checker, double loader, quar…
 - **Files changed:** 16 (+1103 −1), by folder:
@@ -18037,7 +18197,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 35. T-441: private R2 bucket rosie-staging-files, create script and FILES binding (\#36)
 
-- **Commit:** [`44acefb`](https://github.com/aryamahadik/rosie/commit/44acefb), by Arya Mahadik, 2026-11-07 07:37:02 UTC
+- **Commit:** [`44acefbc`](https://github.com/aryamahadik/rosie/commit/44acefbc), by Arya Mahadik, 2026-11-07 07:37:02 UTC
 - **Pull request:** [#36](https://github.com/aryamahadik/rosie/pull/36) from `task/T-441`, merged 2026-11-07 07:37:03 UTC. It squashed 1 branch commit:
   - `eb45558` T-441: private R2 bucket rosie-staging-files, create script and FILES…
 - **Files changed:** 2 (+61 −1), by folder:
@@ -18056,7 +18216,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 34. T-002: fixture set v1 (forms, test-kit, PROFESSION-MAP) with sha256 manifest, input hashes, known-stale list and verify script (\#35)
 
-- **Commit:** [`53bce55`](https://github.com/aryamahadik/rosie/commit/53bce55), by Arya Mahadik, 2026-11-07 07:36:58 UTC
+- **Commit:** [`53bce55f`](https://github.com/aryamahadik/rosie/commit/53bce55f), by Arya Mahadik, 2026-11-07 07:36:58 UTC
 - **Pull request:** [#35](https://github.com/aryamahadik/rosie/pull/35) from `task/T-002`, merged 2026-11-07 07:36:59 UTC. It squashed 1 branch commit:
   - `7e4e48b` T-002: fixture set v1 (forms, test-kit, PROFESSION-MAP) with sha256 m…
 - **Files changed:** 499 (+275906 −0), by folder:
@@ -18078,7 +18238,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 33. T-1128: Spike: a Durable Object, an alarm, a queue message and a cron handler under the Workers test plugin (\#32)
 
-- **Commit:** [`6376373`](https://github.com/aryamahadik/rosie/commit/6376373), by Arya Mahadik, 2026-11-07 07:35:19 UTC
+- **Commit:** [`63763730`](https://github.com/aryamahadik/rosie/commit/63763730), by Arya Mahadik, 2026-11-07 07:35:19 UTC
 - **Pull request:** [#32](https://github.com/aryamahadik/rosie/pull/32) from `task/T-1128`, merged 2026-11-07 07:35:19 UTC. It squashed 3 branch commits:
   - `af1eea8` T-1128: spike tests for a Durable Object, alarm, queue consumer and c…
   - `fa120ac` T-1128: FINDINGS.md, written by the lead from the builder's report (D…
@@ -18098,7 +18258,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 32. T-006: contract conventions (ADR-005 to CQ-02's layout), shared formats, meta-schemas, gen-types and check-fixtures scripts (\#34)
 
-- **Commit:** [`05207a9`](https://github.com/aryamahadik/rosie/commit/05207a9), by Arya Mahadik, 2026-11-07 07:35:15 UTC
+- **Commit:** [`05207a93`](https://github.com/aryamahadik/rosie/commit/05207a93), by Arya Mahadik, 2026-11-07 07:35:15 UTC
 - **Pull request:** [#34](https://github.com/aryamahadik/rosie/pull/34) from `task/T-006`, merged 2026-11-07 07:35:15 UTC. It squashed 1 branch commit:
   - `0b1d832` T-006: contract conventions (ADR-005 to CQ-02's layout), shared forma…
 - **Files changed:** 31 (+2016 −44), by folder:
@@ -18125,7 +18285,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 31. T-1060: unit project also runs fixtures/\*\*/\*.test.ts (\#33)
 
-- **Commit:** [`021093b`](https://github.com/aryamahadik/rosie/commit/021093b), by Arya Mahadik, 2026-11-07 07:31:37 UTC
+- **Commit:** [`021093bf`](https://github.com/aryamahadik/rosie/commit/021093bf), by Arya Mahadik, 2026-11-07 07:31:37 UTC
 - **Pull request:** [#33](https://github.com/aryamahadik/rosie/pull/33) from `task/T-1060`, merged 2026-11-07 07:31:38 UTC. It squashed 1 branch commit:
   - `db82d3e` T-1060: unit project also runs fixtures/\*\*/\*.test.ts
 - **Files changed:** 1 (+1 −0), by folder:
@@ -18143,7 +18303,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 30. T-1059: wrangler config test allows one R2 FILES binding with a bucket\_name and no env.staging copy (\#31)
 
-- **Commit:** [`52e4208`](https://github.com/aryamahadik/rosie/commit/52e4208), by Arya Mahadik, 2026-11-07 07:29:27 UTC
+- **Commit:** [`52e4208a`](https://github.com/aryamahadik/rosie/commit/52e4208a), by Arya Mahadik, 2026-11-07 07:29:27 UTC
 - **Pull request:** [#31](https://github.com/aryamahadik/rosie/pull/31) from `task/T-1059`, merged 2026-11-07 07:29:28 UTC. It squashed 1 branch commit:
   - `ad0dc47` T-1059: wrangler config test allows one R2 FILES binding with a bucke…
 - **Files changed:** 1 (+54 −1), by folder:
@@ -18161,7 +18321,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 29. T-1129: one Cloudflare account for staging and production (findings for Q-51) (\#30)
 
-- **Commit:** [`54b9c32`](https://github.com/aryamahadik/rosie/commit/54b9c32), by Arya Mahadik, 2026-11-07 06:30:53 UTC
+- **Commit:** [`54b9c325`](https://github.com/aryamahadik/rosie/commit/54b9c325), by Arya Mahadik, 2026-11-07 06:30:53 UTC
 - **Pull request:** [#30](https://github.com/aryamahadik/rosie/pull/30) from `task/T-1129`, merged 2026-11-07 06:30:54 UTC. It squashed 1 branch commit:
   - `0d57aa3` T-1129: one Cloudflare account for staging and production (findings f…
 - **Files changed:** 1 (+72 −0), by folder:
@@ -18179,7 +18339,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 28. T-785: ADR-101, the Agent API's MCP transport and sign-in on a Worker (proposed) (\#29)
 
-- **Commit:** [`f876cbd`](https://github.com/aryamahadik/rosie/commit/f876cbd), by Arya Mahadik, 2026-11-07 06:30:49 UTC
+- **Commit:** [`f876cbdb`](https://github.com/aryamahadik/rosie/commit/f876cbdb), by Arya Mahadik, 2026-11-07 06:30:49 UTC
 - **Pull request:** [#29](https://github.com/aryamahadik/rosie/pull/29) from `task/T-785`, merged 2026-11-07 06:30:50 UTC. It squashed 1 branch commit:
   - `2b53563` T-785: ADR-101, the Agent API's MCP transport and sign-in on a Worker…
 - **Files changed:** 1 (+148 −0), by folder:
@@ -18197,7 +18357,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 27. T-1120: chat-link device-check page with QR codes and independent decoder test (\#28)
 
-- **Commit:** [`822d503`](https://github.com/aryamahadik/rosie/commit/822d503), by Arya Mahadik, 2026-11-07 06:29:12 UTC
+- **Commit:** [`822d503d`](https://github.com/aryamahadik/rosie/commit/822d503d), by Arya Mahadik, 2026-11-07 06:29:12 UTC
 - **Pull request:** [#28](https://github.com/aryamahadik/rosie/pull/28) from `task/T-1120`, merged 2026-11-07 06:29:12 UTC. It squashed 1 branch commit:
   - `2013d01` T-1120: chat-link device-check page with QR codes and independent dec…
 - **Files changed:** 4 (+424 −0), by folder:
@@ -18215,7 +18375,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 26. T-1056: README Transactions item matches the runner after T-724 (\#27)
 
-- **Commit:** [`ba0ff36`](https://github.com/aryamahadik/rosie/commit/ba0ff36), by Arya Mahadik, 2026-11-07 06:27:50 UTC
+- **Commit:** [`ba0ff36a`](https://github.com/aryamahadik/rosie/commit/ba0ff36a), by Arya Mahadik, 2026-11-07 06:27:50 UTC
 - **Pull request:** [#27](https://github.com/aryamahadik/rosie/pull/27) from `task/T-1056`, merged 2026-11-07 06:27:50 UTC. It squashed 1 branch commit:
   - `be4aa2c` T-1056: README Transactions item matches the runner after T-724
 - **Files changed:** 1 (+1 −1), by folder:
@@ -18233,7 +18393,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 25. T-1055: guard advice and CONCURRENTLY notice match the runner after T-724 (DL-061) (\#26)
 
-- **Commit:** [`27e5a7f`](https://github.com/aryamahadik/rosie/commit/27e5a7f), by Arya Mahadik, 2026-11-07 06:27:46 UTC
+- **Commit:** [`27e5a7fe`](https://github.com/aryamahadik/rosie/commit/27e5a7fe), by Arya Mahadik, 2026-11-07 06:27:46 UTC
 - **Pull request:** [#26](https://github.com/aryamahadik/rosie/pull/26) from `task/T-1055`, merged 2026-11-07 06:27:46 UTC. It squashed 1 branch commit:
   - `eeed52a` T-1055: guard advice and CONCURRENTLY notice match the runner after T…
 - **Files changed:** 2 (+63 −18), by folder:
@@ -18251,7 +18411,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 24. T-279: retry queue with 5 tries and a dead-letter queue in wrangler.jsonc (\#25)
 
-- **Commit:** [`aff1693`](https://github.com/aryamahadik/rosie/commit/aff1693), by Arya Mahadik, 2026-11-07 06:24:03 UTC
+- **Commit:** [`aff16931`](https://github.com/aryamahadik/rosie/commit/aff16931), by Arya Mahadik, 2026-11-07 06:24:03 UTC
 - **Pull request:** [#25](https://github.com/aryamahadik/rosie/pull/25) from `task/T-279-r2`, merged 2026-11-07 06:24:03 UTC. It squashed 1 branch commit:
   - `7d1089d` T-279: retry queue with 5 tries and a dead-letter queue in wrangler.j…
 - **Files changed:** 2 (+29 −2), by folder:
@@ -18270,7 +18430,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 23. T-1057: merge-check runs the migration runner's tests against its PostGIS service (\#24)
 
-- **Commit:** [`421a820`](https://github.com/aryamahadik/rosie/commit/421a820), by Arya Mahadik, 2026-11-07 06:23:58 UTC
+- **Commit:** [`421a8205`](https://github.com/aryamahadik/rosie/commit/421a8205), by Arya Mahadik, 2026-11-07 06:23:58 UTC
 - **Pull request:** [#24](https://github.com/aryamahadik/rosie/pull/24) from `task/T-1057`, merged 2026-11-07 06:23:58 UTC. It squashed 1 branch commit:
   - `2a3f99b` T-1057: merge-check runs the migration runner's tests against its Pos…
 - **Files changed:** 2 (+4 −0), by folder:
@@ -18289,7 +18449,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 22. T-1122: geo provider candidates against the geo port (findings) (\#23)
 
-- **Commit:** [`ada5510`](https://github.com/aryamahadik/rosie/commit/ada5510), by Arya Mahadik, 2026-11-07 06:19:42 UTC
+- **Commit:** [`ada5510e`](https://github.com/aryamahadik/rosie/commit/ada5510e), by Arya Mahadik, 2026-11-07 06:19:42 UTC
 - **Pull request:** [#23](https://github.com/aryamahadik/rosie/pull/23) from `task/T-1122`, merged 2026-11-07 06:19:42 UTC. It squashed 1 branch commit:
   - `0d47550` T-1122: geo provider candidates against the geo port (findings)
 - **Files changed:** 1 (+71 −0), by folder:
@@ -18307,7 +18467,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 21. T-1123: calendar app review and consent findings (Google, Microsoft) (\#22)
 
-- **Commit:** [`74b213e`](https://github.com/aryamahadik/rosie/commit/74b213e), by Arya Mahadik, 2026-11-07 06:19:38 UTC
+- **Commit:** [`74b213e1`](https://github.com/aryamahadik/rosie/commit/74b213e1), by Arya Mahadik, 2026-11-07 06:19:38 UTC
 - **Pull request:** [#22](https://github.com/aryamahadik/rosie/pull/22) from `task/T-1123`, merged 2026-11-07 06:19:38 UTC. It squashed 1 branch commit:
   - `84b0b22` T-1123: calendar app review and consent findings (Google, Microsoft)
 - **Files changed:** 1 (+94 −0), by folder:
@@ -18325,7 +18485,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 20. T-1058: ci.yml runs on pull\_request and on push to main only (\#21)
 
-- **Commit:** [`ff237b1`](https://github.com/aryamahadik/rosie/commit/ff237b1), by Arya Mahadik, 2026-11-07 06:16:54 UTC
+- **Commit:** [`ff237b1d`](https://github.com/aryamahadik/rosie/commit/ff237b1d), by Arya Mahadik, 2026-11-07 06:16:54 UTC
 - **Pull request:** [#21](https://github.com/aryamahadik/rosie/pull/21) from `task/T-1058`, merged 2026-11-07 06:16:55 UTC. It squashed 1 branch commit:
   - `ee83c2e` T-1058: ci.yml runs on pull\_request and on push to main only
 - **Files changed:** 2 (+92 −1), by folder:
@@ -18344,7 +18504,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 19. T-1126: CI minutes findings (written by the lead from the builder's report, DL-063, DL-064) (\#19)
 
-- **Commit:** [`caf3f28`](https://github.com/aryamahadik/rosie/commit/caf3f28), by Arya Mahadik, 2026-11-07 06:13:06 UTC
+- **Commit:** [`caf3f28d`](https://github.com/aryamahadik/rosie/commit/caf3f28d), by Arya Mahadik, 2026-11-07 06:13:06 UTC
 - **Pull request:** [#19](https://github.com/aryamahadik/rosie/pull/19) from `task/T-1126`, merged 2026-11-07 06:13:07 UTC. It squashed 1 branch commit:
   - `9c28920` T-1126: CI minutes findings (written by the lead from the builder's r…
 - **Files changed:** 1 (+70 −0), by folder:
@@ -18362,7 +18522,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 18. T-001: Fixture set v1: apply G1 to G3 in a fresh scratch copy and regenerate forms/ and test-kit/ (\#18)
 
-- **Commit:** [`1f79992`](https://github.com/aryamahadik/rosie/commit/1f79992), by Arya Mahadik, 2026-11-07 06:11:21 UTC
+- **Commit:** [`1f799922`](https://github.com/aryamahadik/rosie/commit/1f799922), by Arya Mahadik, 2026-11-07 06:11:21 UTC
 - **Pull request:** [#18](https://github.com/aryamahadik/rosie/pull/18) from `task/T-001`, merged 2026-11-07 06:11:22 UTC. It squashed 2 branch commits:
   - `5ca7292` T-001: G1-G3 patch and rebuild script for fixture set v1
   - `784b440` T-001: G3 patch also removes the old folder name from comments and notes
@@ -18382,7 +18542,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 17. T-278: one-minute cron trigger for the clock sweep in wrangler.jsonc (\#17)
 
-- **Commit:** [`b01d626`](https://github.com/aryamahadik/rosie/commit/b01d626), by Arya Mahadik, 2026-11-07 06:04:37 UTC
+- **Commit:** [`b01d6267`](https://github.com/aryamahadik/rosie/commit/b01d6267), by Arya Mahadik, 2026-11-07 06:04:37 UTC
 - **Pull request:** [#17](https://github.com/aryamahadik/rosie/pull/17) from `task/T-278`, merged 2026-11-07 06:04:37 UTC. It squashed 1 branch commit:
   - `915cae5` T-278: one-minute cron trigger for the clock sweep in wrangler.jsonc
 - **Files changed:** 2 (+22 −0), by folder:
@@ -18399,7 +18559,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 16. T-1125: Spike (1.5 h): local PostgreSQL with PostGIS under emulation on the Apple-silicon build Mac: speed and stability of integration tests (\#16)
 
-- **Commit:** [`b5f258d`](https://github.com/aryamahadik/rosie/commit/b5f258d), by Arya Mahadik, 2026-11-07 06:03:05 UTC
+- **Commit:** [`b5f258df`](https://github.com/aryamahadik/rosie/commit/b5f258df), by Arya Mahadik, 2026-11-07 06:03:05 UTC
 - **Pull request:** [#16](https://github.com/aryamahadik/rosie/pull/16) from `task/T-1125`, merged 2026-11-07 06:03:06 UTC. It squashed 5 branch commits:
   - `a715ffa` T-1125: PostGIS emulation spike scripts (bench, repeat)
   - `ad06a06` T-1125: findings (written by the lead from the builder's report, DL-063)
@@ -18433,7 +18593,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 15. T-331: uqr 0.1.3 (QR encoder) in the root manifest and lockfile (installed by the lead, P-01) (\#15)
 
-- **Commit:** [`92da1af`](https://github.com/aryamahadik/rosie/commit/92da1af), by Arya Mahadik, 2026-11-07 06:01:23 UTC
+- **Commit:** [`92da1af2`](https://github.com/aryamahadik/rosie/commit/92da1af2), by Arya Mahadik, 2026-11-07 06:01:23 UTC
 - **Pull request:** [#15](https://github.com/aryamahadik/rosie/pull/15) from `task/T-331`, merged 2026-11-07 06:01:23 UTC. It squashed 1 branch commit:
   - `9b71054` T-331: uqr 0.1.3 (QR encoder) in the root manifest and lockfile (inst…
 - **Files changed:** 2 (+12 −0), by folder:
@@ -18449,7 +18609,7 @@ Co-authored-by: Rosie lead <lead@rosie.local>
 
 ## 14. T-277: BUNDLES KV namespace binding in wrangler.jsonc, with config tests (\#14)
 
-- **Commit:** [`a7b9843`](https://github.com/aryamahadik/rosie/commit/a7b9843), by Arya Mahadik, 2026-11-07 05:58:27 UTC
+- **Commit:** [`a7b9843b`](https://github.com/aryamahadik/rosie/commit/a7b9843b), by Arya Mahadik, 2026-11-07 05:58:27 UTC
 - **Pull request:** [#14](https://github.com/aryamahadik/rosie/pull/14) from `task/T-277`, merged 2026-11-07 05:58:28 UTC. It squashed 1 branch commit:
   - `b587830` T-277: BUNDLES KV namespace binding in wrangler.jsonc, with config tests
 - **Files changed:** 2 (+29 −1), by folder:
@@ -18466,7 +18626,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 13. T-1052: saved copy of the old /test page with sha256 list, staging route test, way-back runbook (\#13)
 
-- **Commit:** [`0abc6b9`](https://github.com/aryamahadik/rosie/commit/0abc6b9), by Arya Mahadik, 2026-11-07 05:52:03 UTC
+- **Commit:** [`0abc6b9a`](https://github.com/aryamahadik/rosie/commit/0abc6b9a), by Arya Mahadik, 2026-11-07 05:52:03 UTC
 - **Pull request:** [#13](https://github.com/aryamahadik/rosie/pull/13) from `task/T-1052`, merged 2026-11-07 05:52:03 UTC. It squashed 1 branch commit:
   - `75954ec` T-1052: saved copy of the old /test page with sha256 list, staging ro…
 - **Files changed:** 17 (+2845 −0), by folder:
@@ -18485,7 +18645,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 12. T-724: Migration runner: apply a file of only CREATE INDEX CONCURRENTLY statements outside a transaction (\#12)
 
-- **Commit:** [`d29f5d3`](https://github.com/aryamahadik/rosie/commit/d29f5d3), by Arya Mahadik, 2026-11-07 05:49:50 UTC
+- **Commit:** [`d29f5d31`](https://github.com/aryamahadik/rosie/commit/d29f5d31), by Arya Mahadik, 2026-11-07 05:49:50 UTC
 - **Pull request:** [#12](https://github.com/aryamahadik/rosie/pull/12) from `task/T-724`, merged 2026-11-07 05:49:50 UTC. It squashed 2 branch commits:
   - `1503491` T-724: migrate.mjs applies files of only CREATE INDEX CONCURRENTLY ou…
   - `0175a4d` T-724: marker files keep any single statement; schema-scoped invalid-…
@@ -18512,7 +18672,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 11. T-005: Contract tooling plumbing: validator and type-generator dependencies, git-ignored types, frozen-file guard (\#10)
 
-- **Commit:** [`c15c4ba`](https://github.com/aryamahadik/rosie/commit/c15c4ba), by Arya Mahadik, 2026-11-07 05:49:45 UTC
+- **Commit:** [`c15c4ba7`](https://github.com/aryamahadik/rosie/commit/c15c4ba7), by Arya Mahadik, 2026-11-07 05:49:45 UTC
 - **Pull request:** [#10](https://github.com/aryamahadik/rosie/pull/10) from `task/T-005`, merged 2026-11-07 05:49:45 UTC. It squashed 2 branch commits:
   - `0983f45` T-005: frozen-contract guard, contracts:types and contracts:check scr…
   - `0f4afe0` T-005: add ajv and json-schema-to-typescript
@@ -18541,7 +18701,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 10. T-330: integration project also runs actions/\*\*/\*.int.test.ts (\#9)
 
-- **Commit:** [`38c6654`](https://github.com/aryamahadik/rosie/commit/38c6654), by Arya Mahadik, 2026-11-07 05:49:40 UTC
+- **Commit:** [`38c6654a`](https://github.com/aryamahadik/rosie/commit/38c6654a), by Arya Mahadik, 2026-11-07 05:49:40 UTC
 - **Pull request:** [#9](https://github.com/aryamahadik/rosie/pull/9) from `task/T-330`, merged 2026-11-07 05:49:41 UTC. It squashed 1 branch commit:
   - `bb7d8cd` T-330: integration project also runs actions/\*\*/\*.int.test.ts
 - **Files changed:** 1 (+1 −1), by folder:
@@ -18557,7 +18717,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 9. T-276: HANDLE\_ACTOR Durable Object binding and class migration (\#8)
 
-- **Commit:** [`e197520`](https://github.com/aryamahadik/rosie/commit/e197520), by Arya Mahadik, 2026-11-07 05:49:35 UTC
+- **Commit:** [`e1975202`](https://github.com/aryamahadik/rosie/commit/e1975202), by Arya Mahadik, 2026-11-07 05:49:35 UTC
 - **Pull request:** [#8](https://github.com/aryamahadik/rosie/pull/8) from `task/T-276`, merged 2026-11-07 05:49:36 UTC. It squashed 1 branch commit:
   - `717af9f` T-276: HANDLE\_ACTOR Durable Object binding and class migration
 - **Files changed:** 2 (+76 −1), by folder:
@@ -18574,7 +18734,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 8. T-1054: leave infra/rosfield-test-backup/ out of prettier and eslint (\#11)
 
-- **Commit:** [`e95e26e`](https://github.com/aryamahadik/rosie/commit/e95e26e), by Arya Mahadik, 2026-11-07 05:49:13 UTC
+- **Commit:** [`e95e26e1`](https://github.com/aryamahadik/rosie/commit/e95e26e1), by Arya Mahadik, 2026-11-07 05:49:13 UTC
 - **Pull request:** [#11](https://github.com/aryamahadik/rosie/pull/11) from `task/T-1054`, merged 2026-11-07 05:49:14 UTC. It squashed 1 branch commit:
   - `40816c9` T-1054: leave infra/rosfield-test-backup/ out of prettier and eslint
 - **Files changed:** 2 (+4 −0), by folder:
@@ -18590,7 +18750,7 @@ Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>
 
 ## 7. D-000: every agent writes Bash commands plainly (found by check 3) (\#7)
 
-- **Commit:** [`df2df27`](https://github.com/aryamahadik/rosie/commit/df2df27), by Arya Mahadik, 2026-11-06 22:49:29 UTC
+- **Commit:** [`df2df270`](https://github.com/aryamahadik/rosie/commit/df2df270), by Arya Mahadik, 2026-11-06 22:49:29 UTC
 - **Pull request:** [#7](https://github.com/aryamahadik/rosie/pull/7) from `task/D-000-plain-commands`, merged 2026-11-06 22:49:30 UTC. It squashed 1 branch commit:
   - `937ac6d` D-000: every agent writes Bash commands plainly (found by check 3)
 - **Files changed:** 1 (+2 −1), by folder:
@@ -18613,7 +18773,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 6. D-000: night shifts load the project settings explicitly (\#6)
 
-- **Commit:** [`129b9fb`](https://github.com/aryamahadik/rosie/commit/129b9fb), by Arya Mahadik, 2026-11-06 15:36:42 UTC
+- **Commit:** [`129b9fbe`](https://github.com/aryamahadik/rosie/commit/129b9fbe), by Arya Mahadik, 2026-11-06 15:36:42 UTC
 - **Pull request:** [#6](https://github.com/aryamahadik/rosie/pull/6) from `task/D-000-shift-settings`, merged 2026-11-06 15:36:42 UTC. It squashed 1 branch commit:
   - `f54ef9a` D-000: shifts load the project settings explicitly (--settings)
 - **Files changed:** 3 (+14 −1), by folder:
@@ -18631,7 +18791,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 5. D-000: correct the allow rules (found by check 3) (\#5)
 
-- **Commit:** [`246f433`](https://github.com/aryamahadik/rosie/commit/246f433), by Arya Mahadik, 2026-11-06 15:09:21 UTC
+- **Commit:** [`246f4335`](https://github.com/aryamahadik/rosie/commit/246f4335), by Arya Mahadik, 2026-11-06 15:09:21 UTC
 - **Pull request:** [#5](https://github.com/aryamahadik/rosie/pull/5) from `task/D-000-allow-rules`, merged 2026-11-06 15:09:22 UTC. It squashed 1 branch commit:
   - `f8737d1` D-000: correct the allow rules (cmd:\* form), lock removal, read-only …
 - **Files changed:** 2 (+53 −37), by folder:
@@ -18650,7 +18810,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 4. D-000: switch on the safety rules (\#4)
 
-- **Commit:** [`dc40c34`](https://github.com/aryamahadik/rosie/commit/dc40c34), by Arya Mahadik, 2026-11-06 07:05:45 UTC
+- **Commit:** [`dc40c34f`](https://github.com/aryamahadik/rosie/commit/dc40c34f), by Arya Mahadik, 2026-11-06 07:05:45 UTC
 - **Pull request:** [#4](https://github.com/aryamahadik/rosie/pull/4) from `task/D-000-safety-rules`, merged 2026-11-06 07:05:45 UTC. It squashed 1 branch commit:
   - `637ebed` D-000: switch on the safety rules (.claude/settings.json)
 - **Files changed:** 1 (+86 −0), by folder:
@@ -18668,7 +18828,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 3. D-000: staging on rosfield.com/test, and check 1 (\#3)
 
-- **Commit:** [`b6134d2`](https://github.com/aryamahadik/rosie/commit/b6134d2), by Arya Mahadik, 2026-11-06 07:01:06 UTC
+- **Commit:** [`b6134d2c`](https://github.com/aryamahadik/rosie/commit/b6134d2c), by Arya Mahadik, 2026-11-06 07:01:06 UTC
 - **Pull request:** [#3](https://github.com/aryamahadik/rosie/pull/3) from `task/D-000-staging-route`, merged 2026-11-06 07:01:07 UTC. It squashed 1 branch commit:
   - `e4991a0` D-000: staging on rosfield.com/test; health reports its service (chec…
 - **Files changed:** 3 (+12 −3), by folder:
@@ -18687,7 +18847,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 2. D-000: the factory (\#2)
 
-- **Commit:** [`5d1f84a`](https://github.com/aryamahadik/rosie/commit/5d1f84a), by Arya Mahadik, 2026-11-06 06:11:19 UTC
+- **Commit:** [`5d1f84a7`](https://github.com/aryamahadik/rosie/commit/5d1f84a7), by Arya Mahadik, 2026-11-06 06:11:19 UTC
 - **Pull request:** [#2](https://github.com/aryamahadik/rosie/pull/2) from `task/D-000-factory`, merged 2026-11-06 06:11:19 UTC. It squashed 2 branch commits:
   - `a5b44e7` WIP D-000 factory: build agents' output before the independent check …
   - `27b9116` D-000: the factory, verified
@@ -18753,7 +18913,7 @@ Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
 
 ## 1. Initial commit
 
-- **Commit:** [`5fefb27`](https://github.com/aryamahadik/rosie/commit/5fefb27), by Arya Mahadik, 2026-11-05 22:07:39 UTC
+- **Commit:** [`5fefb27a`](https://github.com/aryamahadik/rosie/commit/5fefb27a), by Arya Mahadik, 2026-11-05 22:07:39 UTC
 - **Pull request:** none (a commit made straight on `main` during setup)
 - **Files changed:** 1 (+2 −0), by folder:
   - `/` README.md +2 −0

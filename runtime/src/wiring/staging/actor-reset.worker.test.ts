@@ -195,6 +195,8 @@ describe("the hook (stagingActorReset)", () => {
   });
 
   it("on staging: nothing read but ENVIRONMENT as it is made; tp-01's actor named by its roster id and each allow-list number's by its place, the list read at each call; any other actor named by none", () => {
+    /** T-1517's entry (DL-1043): the allow-list alone, after the first; it names each allow-list number again. */
+    const ROSTER_RESET_ENTRY = "t1517-nov21";
     const reads: string[] = [];
     const values: Record<string, unknown> = {
       ENVIRONMENT: "staging",
@@ -205,21 +207,32 @@ describe("the hook (stagingActorReset)", () => {
     if (hook === null) throw new Error("staging gives a hook");
 
     expect(hook.matches(OWNER_ACTOR)).toEqual([{ entry: FIRST_ENTRY, target: "tp-01" }]);
-    expect(hook.matches("phone:+15555550104")).toEqual([{ entry: FIRST_ENTRY, target: "allowList:2" }]);
-    expect(hook.matches("phone:+15555550103")).toEqual([{ entry: FIRST_ENTRY, target: "allowList:1" }]);
+    expect(hook.matches("phone:+15555550104")).toEqual([
+      { entry: FIRST_ENTRY, target: "allowList:2" },
+      { entry: ROSTER_RESET_ENTRY, target: "allowList:2" },
+    ]);
+    expect(hook.matches("phone:+15555550103")).toEqual([
+      { entry: FIRST_ENTRY, target: "allowList:1" },
+      { entry: ROSTER_RESET_ENTRY, target: "allowList:1" },
+    ]);
     expect(hook.matches("phone:+15555550105")).toEqual([]);
     expect(hook.matches("email:sam@example.com")).toEqual([]);
-    expect(reads.filter((read) => read === "STAGING_LINQ_ALLOWLIST")).toHaveLength(5);
+    // Five calls, each reading the list once for each of the two allow-list targets.
+    expect(reads.filter((read) => read === "STAGING_LINQ_ALLOWLIST")).toHaveLength(10);
 
     // Read at each call: a number taken off the list is no longer named; one put on it is.
     values.STAGING_LINQ_ALLOWLIST = "+15555550105";
     expect(hook.matches("phone:+15555550104")).toEqual([]);
-    expect(hook.matches("phone:+15555550105")).toEqual([{ entry: FIRST_ENTRY, target: "allowList:1" }]);
-    // tp-01's number on the list too: both targets name its actor.
+    expect(hook.matches("phone:+15555550105")).toEqual([
+      { entry: FIRST_ENTRY, target: "allowList:1" },
+      { entry: ROSTER_RESET_ENTRY, target: "allowList:1" },
+    ]);
+    // tp-01's number on the list too: every target names its actor, in the list's order.
     values.STAGING_LINQ_ALLOWLIST = TP01_NUMBER;
     expect(hook.matches(OWNER_ACTOR)).toEqual([
       { entry: FIRST_ENTRY, target: "tp-01" },
       { entry: FIRST_ENTRY, target: "allowList:1" },
+      { entry: ROSTER_RESET_ENTRY, target: "allowList:1" },
     ]);
   });
 

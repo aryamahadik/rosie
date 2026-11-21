@@ -1,0 +1,88 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["fire-once.json"],
+    "now": "2026-10-24T14:07:04Z",
+    "note": "A raise of a question that is not live (README item 81, default 193): fire-once defaulted A7-03's question, oq-a7-03-alex, at its deadline, so it stands at version 3, status defaulted. A turn of Alex's that read it at that version asks it again, with a row that asks it and the two entries, as commit-s1-02-sam-asks-again asks S1-02's. The version is the one stored, so limit 4 passes, and the raise is refused because the question is no longer waiting or open: wrongState names the question and its status now, defaulted, and nothing is written, neither its row nor its entries nor a raised ask count. K-05 holds no rule on which questions may be asked again (README default 197): A7-03's options and booking would keep K-09 v1.12's commit from asking it (K-09 v1.12 default 193), and here only its closed status refuses it. Its turn, text and row are its own (README v1.5 default 131: turn key alex-asked)."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-a7-03-alex-asked",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0008"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0008",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [],
+    "writes": {
+      "state": [],
+      "openQuestions": {
+        "open": [],
+        "close": [],
+        "askAgain": [{ "id": "oq-a7-03-alex", "expectVersion": 3 }]
+      },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [
+        {
+          "id": "outbox-a7-03-alex-asked-1",
+          "recipientHandleId": "handle-alex",
+          "recipientPersonId": "person-alex",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": "booking-alex-haircut",
+          "channel": "imessage",
+          "sendClass": "quick_reply",
+          "openQuestionId": "oq-a7-03-alex",
+          "copyOfRowId": null,
+          "versionsRead": []
+        }
+      ],
+      "reservations": { "confirm": [], "release": [] },
+      "events": [
+        {
+          "id": "log-oq-a7-03-alex-asked_again",
+          "kind": "open_question.asked_again",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "rosie",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "open_questions",
+          "rowId": "oq-a7-03-alex",
+          "oldValues": { "ask_count": 1 },
+          "newValues": { "ask_count": 2 },
+          "sealed": null,
+          "why": { "step": "A7-03" },
+          "approvedBy": null,
+          "proofs": null
+        },
+        {
+          "id": "log-outbox-a7-03-alex-asked-1-created",
+          "kind": "outbox_row.created",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "rosie",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "outbox_rows",
+          "rowId": "outbox-a7-03-alex-asked-1",
+          "oldValues": null,
+          "newValues": { "state": "planned", "channel": "imessage", "send_class": "quick_reply" },
+          "sealed": null,
+          "why": { "step": "A7-03" },
+          "approvedBy": null,
+          "proofs": null
+        }
+      ]
+    },
+    "answerPhoneRowsBy": "handleId"
+  },
+  "outcome": {
+    "error": "wrongState",
+    "table": "open_questions",
+    "rowId": "oq-a7-03-alex",
+    "state": "defaulted"
+  }
+}
