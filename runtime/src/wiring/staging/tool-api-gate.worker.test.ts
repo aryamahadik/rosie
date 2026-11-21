@@ -63,6 +63,13 @@
 //     alone and the scope's client is ended; nothing is written, and no line holds the asked owner's number. The walk
 //     of an answer settled as "One isn't on the list yet" or "Not a service we book" over these reads is
 //     ../gate-binding.test.ts's (this rig holds no bundle v1).
+//   - T-1519 (DL-1048, DL-1051), the walk's chat read the gate binds for S1-01 (K-05 v1.10 item 51 readChatHandle): the
+//     gate holds `readChatHandle`; turn 1's gate asks it once on the runtime side (no thread holds Sam's chat yet, so
+//     the thread is inserted as before); after turn 1, inside one held scope, Sam's chat id answers Sam's own phone handle
+//     (the thread turn 1 wrote) and a chat id no thread holds answers none, each read on a runtime-side client of its own
+//     (rosie_worker_job) named readChatHandle on its timing line, 2 connections at most, nothing written; through the
+//     pool's own HYPERDRIVE_JOB the read fails with its call's name and SQLSTATE alone. A returning number's JOIN through
+//     the walk is ../gate-binding.test.ts's and the turn face's PostgreSQL proof (pg/thread.int.test.ts).
 // Test values only (rule 9): the master's sample cast, the fixtures' ids and words, whole fiction-range 555-01xx numbers,
 // made-up ids, and the seed's made-up wrapping key.
 import { KEYED_SAFETY_IDS } from "@rosie/actions/src/domain/safety/ids";
@@ -927,6 +934,7 @@ describe("built on staging: the six pieces, and nothing read but the environment
       "keywordDoor",
       "kinds",
       "questions",
+      "readChatHandle",
       "readOpenHolds",
       "safetyReads",
       "scope",
@@ -934,6 +942,8 @@ describe("built on staging: the six pieces, and nothing read but the environment
       "stop",
       "words",
     ]);
+    // T-1519: the walk's chat read (K-05 v1.10 item 51), one function.
+    expect(typeof reads?.readChatHandle).toBe("function");
     // T-1470: the walk's question read, and the kinds reads alone (items 78 and 79).
     expect(Object.keys(reads?.questions ?? {})).toEqual(["liveQuestion"]);
     expect(Object.keys(reads?.kinds ?? {})).toEqual(["reads"]);
@@ -962,6 +972,7 @@ describe("built on staging: the six pieces, and nothing read but the environment
       "keywordDoor",
       "kinds",
       "questions",
+      "readChatHandle",
       "readOpenHolds",
       "safetyReads",
       "scope",
@@ -1008,11 +1019,12 @@ describe("built on staging: the six pieces, and nothing read but the environment
     if (gate === null) throw new Error("the gate is bound with both bindings");
     expect(gate.words?.fixedLine("safetyAsk")).toEqual({ id: "safetyAsk", text: "t1398 stand-in words" });
     expect(gate.words?.fixedLine("safetyCrisis")).toBeNull();
-    // Nothing else of its input but the six pieces, T-1470's two and T-1516's stop reads.
+    // Nothing else of its input but the six pieces, T-1470's two, T-1516's stop reads and T-1519's chat read.
     expect(Object.keys(gate).sort()).toEqual([
       "keywordDoor",
       "kinds",
       "questions",
+      "readChatHandle",
       "readOpenHolds",
       "safetyReads",
       "scope",
@@ -1656,6 +1668,10 @@ describe("turn 1's gate: K-09 v1.5 commit-s1-01.json's request commits once, thr
         calls.filter(([, side]) => side === "runtime").map(([name]) => onJob(String(name))),
       );
       expect(calls.map(([name]) => name)).toContain(GATE_CALLS.seal);
+      // T-1519: S1-01's walk asked the chat read once, on the runtime side; no thread held Sam's chat, so it inserted.
+      expect(calls.filter(([name]) => name === GATE_CALLS.chatHandle)).toEqual([
+        onJob(GATE_CALLS.chatHandle),
+      ]);
       expect(gateLines.at(-1)?.trace_id).toBe(call.trace.traceId);
       // ADR-014 line 198: the commit's current_user is the login its client's guard read, rosie_worker_job.
       expect(gateLines.at(-1)?.login).toBe("rosie_worker_job");
@@ -2438,6 +2454,91 @@ describe("the stop home's reads, as the gate binds them for S1-03's, S1-74's and
     // The scope's client was timed and ended; the stop read's client never passed its guard and was ended too.
     expect(callsOf(written)).toEqual([onApp(GATE_CALLS.scope)]);
     expect(db.counts()).toMatchObject({ opened: 2, ended: 2, connectionsOpen: 0 });
+    expect(await rowCounts()).toEqual(before);
+  });
+});
+
+// ---- the walk's chat read (T-1519) --------------------------------------------------------------------------------
+//
+// K-05 v1.10 item 51 as the gate binds it for S1-01's walk, read from inside a held scope as the walk asks it, on this
+// file's database after turn 1 (whose commit wrote Sam's chat thread for his chat id).
+
+/** The gate's chat read, as stagingOptions gave it. */
+function chatReadOf(gate: GateReads): NonNullable<GateReads["readChatHandle"]> {
+  const read = gate.readChatHandle;
+  if (read === undefined) throw new Error("staging's gate binds the walk's chat read");
+  return read;
+}
+
+/** A chat id no thread of this file's database holds (made up, in K-06's form). */
+const NO_THREAD_CHAT = "linq-chat-demo-t1519-none";
+
+describe("the walk's chat read, as the gate binds it for S1-01 (T-1519)", () => {
+  it("after turn 1, inside one held scope: Sam's chat id answers Sam's own phone handle (the thread turn 1 wrote) and a chat id no thread holds answers none, each read on a runtime-side client of its own (rosie_worker_job) named readChatHandle on its timing line, one after another; 2 connections at most, opened equal to ended, nothing written", async () => {
+    expect(turnOne).not.toBeNull();
+    const before = await rowCounts();
+    const { gate, written, db } = rootOver(envOf());
+    const read = chatReadOf(gate);
+    const login = DB_SIDES.toolApi.login;
+
+    const answers = await gate.scope.withBusiness(BARBERSHOP, async (repo) => {
+      const first = await whoOn(repo);
+      const sam = await read({ linqChatId: SAM_CHAT });
+      const none = await read({ linqChatId: NO_THREAD_CHAT });
+      // The scope's own transaction answers again after both reads: its client was held throughout.
+      return { first, sam, none, last: await whoOn(repo) };
+    });
+
+    expect(answers.first).toEqual({ session_login: login, current_login: login, scope: BARBERSHOP });
+    expect(answers.last).toEqual(answers.first);
+    expect(answers.sam).toEqual({ handleId: SAM.handleId, handle: { kind: "phone", address: SAM.number } });
+    expect(answers.none).toEqual({ handleId: null, handle: null });
+
+    // The scope's client first; then each read's own, on the runtime side.
+    expect(callsOf(written)).toEqual([
+      onApp(GATE_CALLS.scope),
+      onJob(GATE_CALLS.chatHandle),
+      onJob(GATE_CALLS.chatHandle),
+    ]);
+    expect(GATE_CALLS.chatHandle).toBe("readChatHandle");
+    expect(written.map((line) => line.trace_id)).toEqual([null, null, null]);
+    expect(db.counts()).toMatchObject({
+      opened: 3,
+      ended: 3,
+      connectionsOpen: 0,
+      connectionsPeak: 2 * CONNECTIONS_PER_CLIENT,
+    });
+    expect(await rowCounts()).toEqual(before);
+    // The read answered Sam's number (the turn face drops it); no line holds it, nor either chat id.
+    for (const line of [...lines, ...written.map((timing) => JSON.stringify(timing))]) {
+      for (const secret of [...NUMBER_FORMS, SAM_CHAT, NO_THREAD_CHAT]) {
+        expect(line, "a line holds a number or a chat id").not.toContain(secret);
+      }
+    }
+  });
+
+  it("the pool's own HYPERDRIVE_JOB (its database, rosie_rig_none, never made): the read fails with its call's name and SQLSTATE only, nothing of the binding's string or the chat id in what is thrown; nothing is written", async () => {
+    const before = await rowCounts();
+    const { gate, written, db } = rootOver(envOf({ job: POOL_JOB }));
+
+    const thrown = await rejectionOf(chatReadOf(gate)({ linqChatId: SAM_CHAT }));
+
+    expect(thrown).toBeInstanceOf(DataAccessDatabaseError);
+    expect(thrown).toMatchObject({
+      call: GATE_CALLS.chatHandle,
+      code: "3D000",
+      table: null,
+      constraint: null,
+    });
+    expect((thrown as Error).message).toBe(
+      `${GATE_CALLS.chatHandle}: the database refused the call (SQLSTATE 3D000)`,
+    );
+    expect(Object.keys(thrown as Error).sort()).toEqual(["call", "code", "constraint", "name", "table"]);
+    for (const name of [POOL_APP, POOL_JOB, APP, JOB]) expectNothingOf(poolBinding(name), textsOf(thrown));
+    for (const text of textsOf(thrown)) expect(text).not.toContain(SAM_CHAT);
+    // The read's client never passed its guard: no timing line, and it was ended.
+    expect(callsOf(written)).toEqual([]);
+    expect(db.counts()).toMatchObject({ opened: 1, ended: 1, connectionsOpen: 0 });
     expect(await rowCounts()).toEqual(before);
   });
 });
