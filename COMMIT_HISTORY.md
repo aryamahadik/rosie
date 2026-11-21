@@ -2,9 +2,68 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 816, [`ed15454`](https://github.com/aryamahadik/rosie/commit/ed15454), 2026-11-20 22:01:54 UTC.
+- **Through:** commit 819, [`1a1ce44`](https://github.com/aryamahadik/rosie/commit/1a1ce44), 2026-11-21 01:26:48 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 819. docs: COMMIT\_HISTORY.md through commit 816 (ed15454, \#826) (\#830)
+
+- **Commit:** [`1a1ce44`](https://github.com/aryamahadik/rosie/commit/1a1ce44), by Arya Mahadik, 2026-11-21 01:26:48 UTC
+- **Pull request:** [#830](https://github.com/aryamahadik/rosie/pull/830) from `task/commit-history-193`, merged 2026-11-21 01:26:49 UTC. It squashed 1 branch commit:
+  - `ebdb425` docs: COMMIT\_HISTORY.md through commit 816 (ed15454, \#826)
+- **Files changed:** 1 (+78 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +78 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 818. T-1496: K-09 v1.11's contract test: each new fixture against its definition and rule, every earlier accepted fixture under v1.11, the seven mends to their twins, the rules on damaged copies, bundle v1's S1-04 labels word for word, S1\_08\_TERM\_LINES against the master's record, written by item 77's names, and the security review's copies reported (\#828)
+
+- **Commit:** [`ff7bed8`](https://github.com/aryamahadik/rosie/commit/ff7bed8), by Arya Mahadik, 2026-11-21 01:26:44 UTC
+- **Pull request:** [#828](https://github.com/aryamahadik/rosie/pull/828) from `task/T-1496`, merged 2026-11-21 01:26:44 UTC. It squashed 1 branch commit:
+  - `beff2cf` T-1496: K-09 v1.11's contract test: each new fixture against its defi…
+- **Files changed:** 1 (+1302 −0), by folder:
+  - `tests/contract/` tool-api.v1.11.test.ts +1302 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 817. T-1503: bind S1-02's settler on the gate port and staging's gate (DL-1018 card 5) (\#829)
+
+- **Commit:** [`eb9aa4c`](https://github.com/aryamahadik/rosie/commit/eb9aa4c), by Arya Mahadik, 2026-11-21 01:26:39 UTC
+- **Pull request:** [#829](https://github.com/aryamahadik/rosie/pull/829) from `task/T-1503`, merged 2026-11-21 01:26:39 UTC. It squashed 2 branch commits:
+  - `39b2074` T-1503: the gate port binds signUpSteps (S1-02's settler beside the s…
+  - `297aa25` T-1503: gate-binding.test.ts as Prettier formats it
+- **Files changed:** 2 (+202 −24), by folder:
+  - `runtime/src/wiring/` gate-binding.test.ts +176 −2, real.ts +26 −22
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1503: the gate port binds signUpSteps (S1-02's settler beside the sign-up writers) where the kinds reads are bound; unit cases for c-02 on all-listed words, the rows of c-01 without a settler, and no writers or settlers unbound (DL-1018 card 5)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1503: gate-binding.test.ts as Prettier formats it
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 816. docs: COMMIT\_HISTORY.md through commit 813 (5504256, \#824) (\#826)
 
