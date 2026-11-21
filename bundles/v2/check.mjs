@@ -312,7 +312,7 @@ export async function runChecks({ dir = BUNDLE_DIR, kvFile = KV_FILE, full = nul
     const card = steps[id]?.card;
     if (card !== undefined) {
       const cardText = JSON.stringify(card);
-      note(5, `${id}'s card (never sent as such: a card line with a slot is no term fact) names ${slotsOf(cardText).join(" ") || "no slot"}`);
+      note(5, `${id}'s question card (decide reads it; Rosie does not send it) names ${slotsOf(cardText).join(" ") || "no slot"}`);
     }
     const ends = (steps[id]?.branches ?? []).filter((branch) => typeof branch.endText === "string");
     for (const branch of ends)
