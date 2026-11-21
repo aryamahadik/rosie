@@ -2,9 +2,102 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 838, [`b17f005b`](https://github.com/aryamahadik/rosie/commit/b17f005b), 2026-11-21 12:57:57 UTC.
+- **Through:** commit 841, [`e01cdcb5`](https://github.com/aryamahadik/rosie/commit/e01cdcb5), 2026-11-21 14:09:22 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 841. docs: COMMIT\_HISTORY.md through commit 838 (b17f005b, \#849) (\#853)
+
+- **Commit:** [`e01cdcb5`](https://github.com/aryamahadik/rosie/commit/e01cdcb5), by Arya Mahadik, 2026-11-21 14:09:22 UTC
+- **Pull request:** [#853](https://github.com/aryamahadik/rosie/pull/853) from `task/commit-history-202`, merged 2026-11-21 14:09:22 UTC. It squashed 1 branch commit:
+  - `564ad8b` docs: COMMIT\_HISTORY.md through commit 838 (b17f005b, \#849)
+- **Files changed:** 1 (+56 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +56 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 840. T-1518: the kind matcher reads an owner's everyday words: 243/243 names, everyday words, K-09 default 191's comma exception (DL-1042) (\#851)
+
+- **Commit:** [`a74d3635`](https://github.com/aryamahadik/rosie/commit/a74d3635), by Arya Mahadik, 2026-11-21 14:09:18 UTC
+- **Pull request:** [#851](https://github.com/aryamahadik/rosie/pull/851) from `task/T-1518`, merged 2026-11-21 14:09:19 UTC. It squashed 4 branch commits:
+  - `ab303b1` T-1518: the kind matcher reads an owner's everyday words: a kind's ow…
+  - `10ac0fa` T-1518: settle.test.ts open gap 172 block (DL-1047 grant): 'We do hai…
+  - `ec520c2` T-1518: K-09 README default 191's split and open gap 172 restated wit…
+  - `3744005` T-1518: K-09 README default 191's exception and open gap 172 bound th…
+- **Files changed:** 10 (+2223 −36), by folder:
+  - `actions/src/domain/kind-matcher/` everyday.ts +161 −0, index.ts +15 −2, kind-matcher.test.ts +18 −7, kinds-guide.json +1362 −0, kinds-guide.test.ts +449 −0, matcher.ts +122 −16, test-support.ts +33 −0, words.ts +40 −0
+  - `actions/src/tool-api/journey-1/kinds/` settle.test.ts +21 −9
+  - `contracts/tool-api/` README.md +2 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1518: the kind matcher reads an owner's everyday words: a kind's own name lists that kind (243 of 243, a name with commas as one part), an everyday words table (everyday.ts, each entry citing its catalog id) for the words Gives 2 and 3 name, and the texting guide's 1,344 inputs as a regression (40 named inputs move, every other keeps its outcome)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1518: settle.test.ts open gap 172 block (DL-1047 grant): 'We do haircuts' now lists hair, and the walk with c-01 named settles 'One isn't on the list yet' (hair listed, 'beard trims and shaves' drafted as new work, S1-02, S1-03, S1-11, outbox-s1-03-sam-1 and outbox-s1-04-sam-1, oq-s1-02 closed)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1518: K-09 README default 191's split and open gap 172 restated with matcher.ts partsIn's one exception: pieces split at commas alone that together are exactly one catalog kind's own name, as typed or in lower case, stay one part ('Glass, window and door installer'); every other split as before (DL-1042, DL-1054)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1518: K-09 README default 191's exception and open gap 172 bound the joined run as matcher.ts partsIn does: no more pieces than the catalog's most-cut name has (nameParts, four today: matcher.ts lines 200 and 313), so 'Medical imaging center, X-ray, CT, MRI, ultrasound' (five comma pieces) is read piece by piece (DL-1061)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 839. T-1511 + T-1512: sign-up texts open with S1-02's own words (signUpOpener), never a business the owner has not named (DL-1033) (\#852)
+
+- **Commit:** [`0aa0688c`](https://github.com/aryamahadik/rosie/commit/0aa0688c), by Arya Mahadik, 2026-11-21 14:09:14 UTC
+- **Pull request:** [#852](https://github.com/aryamahadik/rosie/pull/852) from `task/T-1512`, merged 2026-11-21 14:09:15 UTC. It squashed 3 branch commits:
+  - `b61d148` T-1511: finalize opens an owner's sign-up texts with signUpOpener (K-…
+  - `c320100` T-1512: the runtime and e2e sign-up tests pin bundle v2 and expect si…
+  - `0b428b3` T-1512: the ten JOIN Workers tests pin bundle v2 (DL-1064): hops 5 to…
+- **Files changed:** 32 (+1450 −427), by folder:
+  - `actions/src/finalize/fixed-lines/` errors.ts +4 −2, fixed-lines.test.ts +297 −2, index.ts +5 −1, insert.ts +29 −4, test-support.ts +50 −2, types.ts +31 −2
+  - `actions/src/tool-api/turn-face/` calls-test-support.ts +58 −0, chain.test.ts +33 −15, rows.test.ts +127 −1, rows.ts +45 −11
+  - `actions/src/tool-api/turn-face/pg/` calls.int.test.ts +17 −10, sign-up.int.test.ts +84 −50
+  - `compiler/src/fixed-lines/` bundle-v0.test.ts +17 −5
+  - `runtime/src/wiring/` finalize.test.ts +59 −21, hop10.worker.test.ts +65 −43, hop11.worker.test.ts +21 −13, hop12.worker.test.ts +17 −7, hop13.worker.test.ts +14 −7, hop5.worker.test.ts +19 −14, hop6.worker.test.ts +28 −23, hop7.worker.test.ts +32 −16, hop8.worker.test.ts +22 −14, hop9.worker.test.ts +15 −9, kept-results.worker.test.ts +7 −3, root.worker.test.ts +11 −7, test-phone.worker.test.ts +7 −2, test-support.ts +178 −53
+  - `runtime/src/wiring/staging/` actor-reset.worker.test.ts +6 −1, tool-api-rows.seed.ts +27 −7, tool-api-rows.worker.test.ts +50 −28
+  - `tests/e2e/skeleton/` root-run.ts +14 −5, skeleton.worker.test.ts +61 −49
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1511: finalize opens an owner's sign-up texts with signUpOpener (K-01 README default 19): the signUp fact from the turn face's own row reading, one opener per row, no doubles, fail closed on a bundle without the line; pg proofs on bundle v2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1512: the runtime and e2e sign-up tests pin bundle v2 and expect signUpOpener (K-01 README default 19, DL-1033, DL-1060): test-support holds bundle v2's manifest and flow A with an opt-in active bundle, recording 2's reads on v2, carriesOpener counting either id; finalize, hop10-12, staging tool-api-rows (seed pins v2) and the skeleton e2e moved; a v0-pinned sign-up row refused; bundle-v0 compiler test loops over its three lines
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1512: the ten JOIN Workers tests pin bundle v2 (DL-1064): hops 5 to 9 and 13, kept-results, root, test-phone and staging actor-reset rig skeletonFakes on bundle v2 (withSamPhoneRow kept); their JOIN bundle checks name bundle v2; hop 7 reads recording 2 on bundle v2 (decide-s1-01-join-{first,check}-on-bundle-v2) with the JOIN context's pin swapped; hop 6's parts-in-KV test puts bundle v2's manifest and flow A (test-support BUNDLE_V2_KV)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 838. docs: COMMIT\_HISTORY.md through commit 835 (1057240b, \#847) (\#849)
 
