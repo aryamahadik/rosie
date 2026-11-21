@@ -7,7 +7,14 @@
 // else in English, as the Fixed lines check reads it (T-312's fixedLineWords, called here, so the two never differ):
 //   - on Rosie's first text to a handle about one business (DD): the opener before the first line, as finalize-pass.json
 //     places it ("This is Rosie, the automated booking assistant for <business>."; S13-01; RULES 1.11), and the
-//     privacy-notice link alone on the last line (RULES 4.3; arch 12 line 644; Q-30);
+//     privacy-notice link alone on the last line (RULES 4.3; arch 12 line 644; Q-30). On an owner's sign-up text before
+//     there is a business (FixedLineFacts.signUp: read by the sign-up line as the owner, on a step that does not need
+//     `business`) the opener is `signUpOpener`, S1-02's own words "Hi! I'm Rosie, an automated assistant.", in the same
+//     place (K-01 README default 19, T-1510; DL-1033): it names no business, so a stand-in name never reaches a sign-up
+//     text before S1-09. One opener per row, never both; a bundle without the one the row gets refuses the text
+//     (lineNotInBundle), never falling back to the other. No doubles: when the words send already begins with the exact
+//     words of the opener the row gets (S1-02's fallbackText begins with signUpOpener's), its id is recorded in
+//     `fixedLines` and no words are added;
 //   - on a number's texts until one that carried it is delivered: the STOP, HELP and rates line, S13-02's (RULES 4.3;
 //     msgtext.js line 14; Q-30: "Rosie's first reply in a chat the person opened, which is now the first text that
 //     number gets"), just above the privacy link, the whole line as the bundle writes it (msgtext.js's stopLine leaves
@@ -36,16 +43,18 @@
 
 import { claimText } from "../claim-check";
 import type { CheckContext, FixedLine } from "../checks";
-import { fixedLineWords } from "../checks/reading";
+import { fixedLineWords, wordsText } from "../checks/reading";
 import type { Channel, FinalParts, FinalizeRow, Send } from "../rewrite";
 import { FixedLineRefusedError } from "./errors";
 import {
   FIRST_TEXT_LINES,
   OPENER_LINE,
+  OPENER_LINES,
   OPT_OUT_LINE,
   PRIVACY_LINK_LINE,
   SAFETY_ASK_LINE,
   SAFETY_LINES,
+  SIGN_UP_OPENER_LINE,
   STOP_REPLY_LINE,
   type AnsweredText,
   type FirstTextLines,
@@ -66,6 +75,15 @@ export function firstTextLines(channel: Channel, facts: FixedLineFacts): FirstTe
     optOut: channel !== "email" && facts.optOutLineDeliveredAt === null,
     privacyLink: firstAboutBusiness,
   };
+}
+
+/**
+ * The opener a row's first text carries, by its K-01 id: `signUpOpener` on an owner's sign-up text before there is a
+ * business (FixedLineFacts.signUp), else `opener` (K-01 README default 19). The first-text rule (firstTextLines) decides
+ * whether the row carries an opener at all; this decides which one, and only one.
+ */
+export function openerOf(facts: FixedLineFacts): string {
+  return facts.signUp ? SIGN_UP_OPENER_LINE : OPENER_LINE;
 }
 
 /**
@@ -193,7 +211,8 @@ export function insertFixedLines(parts: FinalParts, row: FinalizeRow, facts: Fix
   const first = firstTextLines(parts.channel, facts);
   const listed = dangerQuestionAfter(listedLines(facts.lines), facts.answeredTexts);
   const carried = new Set(parts.fixedLines);
-  const before = (first.opener ? [OPENER_LINE] : []).filter((id) => !carried.has(id));
+  // One opener per row (default 19): the one openerOf picks, and none when the parts carry either already.
+  const before = first.opener && !OPENER_LINES.some((id) => carried.has(id)) ? [openerOf(facts)] : [];
   const after = [
     ...listed,
     ...(first.optOut ? [OPT_OUT_LINE] : []),
@@ -203,10 +222,16 @@ export function insertFixedLines(parts: FinalParts, row: FinalizeRow, facts: Fix
 
   const business = claimedBusiness(row);
   const words = (id: string): string => fixedLineText(id, row.checks, business);
+  // Each opener's words first: a bundle without them refuses the text here, whatever the words send says (fail closed).
+  const openers = before.map(words);
+  // No doubles (default 19): a words send that already begins with the opener's exact words keeps them as they are, and
+  // only the opener's id is recorded, which the Fixed lines check then finds in the text and the counts leave out.
+  const text = wordsText(parts);
+  const added = openers.filter((opener) => !text.startsWith(opener));
   return {
     row: parts.row,
     channel: parts.channel,
-    sends: withLines(parts.sends, before.map(words), after.map(words)),
+    sends: withLines(parts.sends, added, after.map(words)),
     fixedLines: [...parts.fixedLines, ...before, ...after],
     slotValues: parts.slotValues,
     threadReplyTo: parts.threadReplyTo,

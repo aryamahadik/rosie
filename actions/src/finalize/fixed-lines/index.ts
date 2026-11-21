@@ -3,7 +3,8 @@
 // checks run (insert.ts). Wiring: `{ ...finalizePorts, insertFixedLines: fixedLineInserter(fixedLinePorts) }`, with the
 // send-state reader as fixedLinePorts once it is built; until then notBuiltFixedLinePorts() keeps the call failing closed
 // (notBuilt, nothing written). That reader hands K-05 v1.3 readFixedLineFacts' two facts and readOutboxRow's
-// answers.texts as read (FixedLineFacts.answeredTexts), from which the inserter adds the danger question (T-1164).
+// answers.texts as read (FixedLineFacts.answeredTexts), from which the inserter adds the danger question (T-1164), and
+// the sign-up switch from the same call's row reading (FixedLineFacts.signUp; K-01 README default 19, T-1511).
 
 import { FinalizeNotBuiltError, type FinalizePorts } from "../rewrite";
 import { insertFixedLines } from "./insert";
@@ -17,14 +18,17 @@ export {
   firstTextLines,
   fixedLineText,
   insertFixedLines,
+  openerOf,
 } from "./insert";
 export {
   FIRST_TEXT_LINES,
   OPENER_LINE,
+  OPENER_LINES,
   OPT_OUT_LINE,
   PRIVACY_LINK_LINE,
   SAFETY_ASK_LINE,
   SAFETY_LINES,
+  SIGN_UP_OPENER_LINE,
   STOP_REPLY_LINE,
   type AnsweredText,
   type FirstTextLines,

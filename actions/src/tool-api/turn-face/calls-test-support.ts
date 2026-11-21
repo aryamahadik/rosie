@@ -40,6 +40,7 @@ import {
   type FakeBundles,
 } from "../../frontier/assemble/test-support";
 import type { GatePart, GateTurn, LimitVerdict } from "../../gate/framework";
+import type { TradeRead, TradesDouble } from "../journey-1/plug-ins/test-support";
 import { contractFile, fixture } from "../test-support";
 import { CONTRACTS_DIR, formatProblems } from "../validator";
 import {
@@ -501,6 +502,63 @@ export function publishedBundleV1(): BundleDocument {
 export function rowUnderPublishedV0(row: OutboxRowRead = outboxRowS102()): OutboxRowRead {
   const bundleId = publishedBundleV0().manifest.bundleId as { hash: string; build: number };
   return { ...row, row: { ...row.row, bundleId } };
+}
+
+const BUNDLE_V2_DIR = new URL("../../../../bundles/v2/bundle/", import.meta.url);
+
+/** One of bundle v2's parts (bundles/v2/bundle/, T-1477), freshly parsed. */
+function bundleV2Part(file: string): Json {
+  return JSON.parse(readFileSync(new URL(file, BUNDLE_V2_DIR), "utf8")) as Json;
+}
+
+/**
+ * Bundle v2 as bundles/v2 holds it (T-1477): its manifest and flow A, bundle v1's six steps byte for byte plus S1-08 and
+ * S1-09, and the fixed lines with signUpOpener, the 16th (K-01 README default 19, T-1510). Its trade overlays are read
+ * through tradesOverV2.
+ */
+export function publishedBundleV2(): BundleDocument {
+  return { manifest: bundleV2Part("manifest.json"), flows: { A: bundleV2Part("flow/A.json") } };
+}
+
+/** Bundle v2's id, as its manifest names it (K-01 v1 manifest.bundleId). */
+export function bundleV2Id(): { hash: string; build: number } {
+  const { hash, build } = publishedBundleV2().manifest.bundleId as { hash: string; build: number };
+  return { hash, build };
+}
+
+/** The row read with its bundle bundle v2's id, so the row is read in it (the rest as given, K-05's fixture by default). */
+export function rowUnderBundleV2(row: OutboxRowRead = outboxRowS102()): OutboxRowRead {
+  return { ...row, row: { ...row.row, bundleId: bundleV2Id() } };
+}
+
+/** One trade's overlay in bundle v2 (K-01 v1's trade part), freshly parsed. */
+export function overlayV2(trade: string): Record<string, unknown> {
+  return bundleV2Part(`trade/${trade}.json`);
+}
+
+/**
+ * The trade port over bundle v2, as journey-1/plug-ins' tradesOverV1 is over bundle v1: the overlay of the trade asked
+ * for when the bundle id is bundle v2's and it holds that trade, else null. Each read hands over a fresh copy and is
+ * written down.
+ */
+export function tradesOverV2(): TradesDouble {
+  const pin = bundleV2Id();
+  const held = new Set(
+    readdirSync(new URL("trade/", BUNDLE_V2_DIR))
+      .filter((file) => file.endsWith(".json"))
+      .map((file) => file.slice(0, -".json".length)),
+  );
+  const reads: TradeRead[] = [];
+  return {
+    reads,
+    bundles: {
+      trade(bundleId, tradeId) {
+        reads.push({ bundleId: { hash: bundleId.hash, build: bundleId.build }, tradeId });
+        if (bundleId.hash !== pin.hash || bundleId.build !== pin.build) return Promise.resolve(null);
+        return Promise.resolve(held.has(tradeId) ? overlayV2(tradeId) : null);
+      },
+    },
+  };
 }
 
 // ---------------------------------------------------------------------------------------------------------------
