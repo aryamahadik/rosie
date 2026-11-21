@@ -2,9 +2,52 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 851, [`0cd5fcca`](https://github.com/aryamahadik/rosie/commit/0cd5fcca), 2026-11-21 20:15:12 UTC.
+- **Through:** commit 853, [`26ce5441`](https://github.com/aryamahadik/rosie/commit/26ce5441), 2026-11-21 23:13:29 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 853. docs: COMMIT\_HISTORY.md through commit 851 (0cd5fcca, \#863) (\#867)
+
+- **Commit:** [`26ce5441`](https://github.com/aryamahadik/rosie/commit/26ce5441), by Arya Mahadik, 2026-11-21 23:13:29 UTC
+- **Pull request:** [#867](https://github.com/aryamahadik/rosie/pull/867) from `task/commit-history-208`, merged 2026-11-21 23:13:29 UTC. It squashed 1 branch commit:
+  - `0a510bc` docs: COMMIT\_HISTORY.md through commit 851 (0cd5fcca, \#863)
+- **Files changed:** 1 (+37 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +37 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 852. T-1481: S1-04's read-only step writer (companies, company kinds, picks placed), built to K-09 defaults 181-185, 190 (DL-1094) (\#866)
+
+- **Commit:** [`efe21352`](https://github.com/aryamahadik/rosie/commit/efe21352), by Arya Mahadik, 2026-11-21 23:13:25 UTC
+- **Pull request:** [#866](https://github.com/aryamahadik/rosie/pull/866) from `task/T-1481`, merged 2026-11-21 23:13:25 UTC. It squashed 2 branch commits:
+  - `f4e50dd` T-1481: S1-04's read-only step writer (companiesWriter): the groups o…
+  - `fd6a542` T-1481: round 2 (DL-1094): the company under way is updated to the na…
+- **Files changed:** 8 (+1885 −31), by folder:
+  - `actions/src/tool-api/journey-1/companies/` errors.ts +25 −6, index.ts +21 −0, one-kind.ts +34 −14, reads.ts +50 −0, test-support.ts +144 −11, writer.int.test.ts +424 −0, writer.test.ts +821 −0, writer.ts +366 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1481: S1-04's read-only step writer (companiesWriter): the groups of 'Some share one', 'All share one' and 'Each is its own', the company under way for the first kind named, new companies with no business behind the party flag, company kinds, picks placed at the version read and a gained business's rows; kindNames on the CompaniesReads port for default 190's matching; T-1492's helpers reused (pickPlacement, gainedBusinessRows, personOf), createOneKind unchanged
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1481: round 2 (DL-1094): the company under way is updated to the name whenever the owner names its group, even its stored name (default 183); company_name's value is the name, never its words (W4 restated); a gained business's rows go table by table, texts then drafts then blocks (S1_04_WRITE_ORDER); buttonsAnswerCommit holds the writer's rows in the unit tests
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 851. docs: COMMIT\_HISTORY.md through commit 849 (7abf41b7, \#861) (\#863)
 
@@ -19342,4 +19385,5 @@ Each was replaced by another pull request (a branch rebased or squashed under a 
 - [#614](https://github.com/aryamahadik/rosie/pull/614) T-1285: signInCheck and signOut's server side, every wrong-code answer the same with or without an account (ADR-016 card B2) (`task/T-1285`, 2 branch commits, closed 2026-11-14 08:45:15 UTC)
 - [#634](https://github.com/aryamahadik/rosie/pull/634) T-1397: staging binds the bundle-backed BundleSafety, with the safety read awaiting its bundle's checked lines (the audit's P3b) (`task/T-1397-r2`, 3 branch commits, closed 2026-11-15 02:06:24 UTC)
 - [#846](https://github.com/aryamahadik/rosie/pull/846) T-1519: S1-01 reuses a number's existing chat thread; staging's gate binds the chat read (DL-1048, DL-1051) (`task/T-1519`, 5 branch commits, closed 2026-11-21 12:13:08 UTC)
+- [#864](https://github.com/aryamahadik/rosie/pull/864) T-1474 + T-1475 + T-1476: K-05 v1.22, a row's step and line through the commit, the turn face and db/repo (S1-04 cards 5-7) (`task/T-1476`, 8 branch commits, closed 2026-11-21 22:37:07 UTC)
 - [#865](https://github.com/aryamahadik/rosie/pull/865) docs: COMMIT\_HISTORY.md through commit 851 (0cd5fcca, \#863) (`task/commit-history-207`, 1 branch commit, closed 2026-11-21 20:16:45 UTC)
