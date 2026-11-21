@@ -1,6 +1,8 @@
 // T-189: outbox rows and outbox parts against local PostgreSQL
 // (`npm run db:up`; `npm run test:integration -- db/repo/outbox-schema`). The schema comes from migrating a fresh test
 // schema. Claiming and moving rows is T-196's; this file proves the tables, their states and the rules they hold.
+// T-1473 (DL-999 card 4): the catalog pin moves to K-04 v1.2's list, which migration 0039 builds, and the v1.2 block
+// proves its two columns and three CHECKs on PostgreSQL.
 import { readFileSync, readdirSync } from "node:fs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Sql } from "./scope";
@@ -150,8 +152,9 @@ describe("the migration against the frozen table list (K-04 v1 core)", () => {
     jsonb: "jsonb",
     timestamptz: "timestamp with time zone",
   };
-  // T-1278 (DL-545): the pin moves to K-04 v1.1's list, the whole part at v1.1, which migrations 0032 and 0033 build.
-  const tables = (readCore("core.v1.1.tables.json") as { tables: ContractTable[] }).tables.filter((table) =>
+  // T-1278 (DL-545): the pin moved to K-04 v1.1's list, which migrations 0032 and 0033 build. T-1473 (DL-999 card 4):
+  // it moves to K-04 v1.2's list, the whole part at v1.2, which migration 0039 builds (outbox_rows.step and line_no).
+  const tables = (readCore("core.v1.2.tables.json") as { tables: ContractTable[] }).tables.filter((table) =>
     (OWN_TABLES as readonly string[]).includes(table.name),
   );
 
@@ -828,11 +831,191 @@ describe("what the database refuses", () => {
   });
 });
 
+describe("K-04 v1.2: an outbox row holds its own step and line, both or neither (T-1473, migration 0039)", () => {
+  const STEP_LINE_CHECKS = [
+    "outbox_rows_step_form",
+    "outbox_rows_line_no_not_negative",
+    "outbox_rows_step_with_line",
+  ];
+  const v12Row = (
+    readCore("core.v1.2.tables.json") as {
+      tables: { name: string; checks?: { name: string; expression: string }[] }[];
+    }
+  ).tables.find((table) => table.name === "outbox_rows");
+
+  /** A row as main's writers write it (no step, no line), with `extra` on top. */
+  const rowInsert = (id: string, extra: Record<string, unknown> = {}): Promise<unknown> => {
+    const row = {
+      id,
+      turn_id: "turn-alex-move-1",
+      recipient_handle_id: "handle-alex",
+      channel: "imessage",
+      versions_read: db.sql.json([]),
+      bundle_hash: HASH,
+      bundle_build: 1,
+      trace_id: "trace-step-line",
+      ...extra,
+    };
+    return db.sql`insert into outbox_rows ${db.sql(row as never)}`;
+  };
+
+  async function stepLine(id: string): Promise<{ step: string | null; line_no: number | null }[]> {
+    return db.sql<{ step: string | null; line_no: number | null }[]>`
+      select step, line_no from outbox_rows where id = ${id}`;
+  }
+
+  async function seed(): Promise<void> {
+    await emptyTables(db.sql);
+    await loadFixture(db.sql, "seed-outbox-row.json");
+  }
+
+  it("the three CHECKs are v1.2's expressions word for word, as PostgreSQL holds them, and each is validated", async () => {
+    const wanted = (v12Row?.checks ?? []).filter((check) => STEP_LINE_CHECKS.includes(check.name));
+    expect(wanted.map((check) => check.name).sort()).toEqual([...STEP_LINE_CHECKS].sort());
+    const found = await db.sql<{ name: string; definition: string; validated: boolean }[]>`
+      select conname as name, pg_get_constraintdef(oid) as definition, convalidated as validated
+      from pg_constraint
+      where conrelid = ${`${db.schema}.outbox_rows`}::regclass and conname in ${db.sql(STEP_LINE_CHECKS)}
+      order by conname
+    `;
+    expect(found.map((row) => [row.name, row.validated])).toEqual(
+      [...STEP_LINE_CHECKS].sort().map((name) => [name, true]),
+    );
+    // The table list's own text, put on a throwaway twin of the two columns, deparses to what the migration made: the
+    // same expression, never a looser or a stricter one. The twin is dropped at the transaction's end.
+    const twin = await db.sql.begin(async (tx) => {
+      await tx`create temp table outbox_step_line_twin (step text, line_no integer) on commit drop`;
+      for (const check of wanted) {
+        await tx.unsafe(
+          `alter table outbox_step_line_twin add constraint ${check.name} check (${check.expression})`,
+        );
+      }
+      const rows = await tx<{ name: string; definition: string }[]>`
+        select conname as name, pg_get_constraintdef(oid) as definition from pg_constraint
+        where conrelid = to_regclass('pg_temp.outbox_step_line_twin') order by conname
+      `;
+      return rows.map((row) => [row.name, row.definition]);
+    });
+    expect(twin).toHaveLength(3);
+    expect(found.map((row) => [row.name, row.definition])).toEqual(twin);
+  });
+
+  it("both columns are nullable with no default, and 0012's table grants cover them for both roles", async () => {
+    const columns = await db.sql<{ name: string; type: string; nullable: string; default: string | null }[]>`
+      select column_name as name, data_type as type, is_nullable as nullable, column_default as default
+      from information_schema.columns
+      where table_schema = ${db.schema} and table_name = 'outbox_rows' and column_name in ('step', 'line_no')
+      order by ordinal_position
+    `;
+    expect(columns).toEqual([
+      { name: "step", type: "text", nullable: "YES", default: null },
+      { name: "line_no", type: "integer", nullable: "YES", default: null },
+    ]);
+    const privileges = await db.sql<
+      { role_name: string; column_name: string; privilege: string; held: boolean }[]
+    >`
+      select r.role_name, c.column_name, p.privilege,
+             has_column_privilege(r.role_name::name, ${`${db.schema}.outbox_rows`}::text, c.column_name::text,
+                                  p.privilege::text) as held
+      from (values ('rosie_app'), ('rosie_job')) as r(role_name),
+           (values ('step'), ('line_no')) as c(column_name),
+           (values ('SELECT'), ('INSERT'), ('UPDATE')) as p(privilege)
+    `;
+    expect(privileges).toHaveLength(12);
+    expect(privileges.filter((row) => !row.held)).toEqual([]);
+  });
+
+  it("every row main's writers write holds both null: the seeded rows and a row that names neither", async () => {
+    await seed();
+    const seeded = await db.sql<{ id: string; step: string | null; line_no: number | null }[]>`
+      select id, step, line_no from outbox_rows order by commit_seq`;
+    expect(seeded).toEqual([
+      { id: "out-a7-03-alex", step: null, line_no: null },
+      { id: "out-a7-03-alex-email", step: null, line_no: null },
+    ]);
+    await rowInsert("out-neither");
+    expect(await stepLine("out-neither")).toEqual([{ step: null, line_no: null }]);
+    // A move as main makes one (state and version) leaves both null and meets every CHECK.
+    await db.sql`update outbox_rows set state = 'checked', version = version + 1 where id = 'out-neither'`;
+    expect(await stepLine("out-neither")).toEqual([{ step: null, line_no: null }]);
+  });
+
+  it("a row with both is accepted: S1-08's row that asks no question, line 0, and a later line of a step", async () => {
+    await seed();
+    await rowInsert("out-s1-08", { step: "S1-08", line_no: 0 });
+    expect(await stepLine("out-s1-08")).toEqual([{ step: "S1-08", line_no: 0 }]);
+    // The database holds the form only (README default 24): a line has no upper bound.
+    await rowInsert("out-a7-03-line-2", { step: "A7-03", line_no: 2 });
+    await rowInsert("out-b13-x101", { step: "B13-x101", line_no: 1 });
+    expect(await stepLine("out-b13-x101")).toEqual([{ step: "B13-x101", line_no: 1 }]);
+  });
+
+  it("a negative line is refused with 23514 by outbox_rows_line_no_not_negative; line 0 passes", async () => {
+    await seed();
+    expect(await refusal(rowInsert("out-negative", { step: "S1-09", line_no: -1 }))).toEqual({
+      code: "23514",
+      constraint: "outbox_rows_line_no_not_negative",
+    });
+    expect(await stepLine("out-negative")).toEqual([]);
+    await rowInsert("out-negative", { step: "S1-09", line_no: 0 });
+    expect(await stepLine("out-negative")).toEqual([{ step: "S1-09", line_no: 0 }]);
+  });
+
+  it("a step with no line, or a line with no step, is refused with 23514 by outbox_rows_step_with_line", async () => {
+    await seed();
+    expect(await refusal(rowInsert("out-step-only", { step: "S1-09" }))).toEqual({
+      code: "23514",
+      constraint: "outbox_rows_step_with_line",
+    });
+    expect(await refusal(rowInsert("out-line-only", { line_no: 0 }))).toEqual({
+      code: "23514",
+      constraint: "outbox_rows_step_with_line",
+    });
+    expect(await stepLine("out-step-only")).toEqual([]);
+    expect(await stepLine("out-line-only")).toEqual([]);
+    await rowInsert("out-step-only", { step: "S1-09", line_no: 0 });
+    // An update that sets one of the two alone is refused the same way; setting both passes.
+    await rowInsert("out-later");
+    expect(
+      await refusal(
+        db.sql`update outbox_rows set step = 'S1-08', version = version + 1 where id = 'out-later'`,
+      ),
+    ).toEqual({ code: "23514", constraint: "outbox_rows_step_with_line" });
+    expect(
+      await refusal(
+        db.sql`update outbox_rows set step = null, version = version + 1 where id = 'out-step-only'`,
+      ),
+    ).toEqual({ code: "23514", constraint: "outbox_rows_step_with_line" });
+    await db.sql`
+      update outbox_rows set step = 'S1-08', line_no = 0, version = version + 1 where id = 'out-later'`;
+    expect(await stepLine("out-later")).toEqual([{ step: "S1-08", line_no: 0 }]);
+  });
+
+  it("a step that is not a K-01 step id is refused with 23514 by outbox_rows_step_form", async () => {
+    await seed();
+    for (const step of ["S1-9", "s1-09", "S14-01", "S0-01", "C1-01", "S1-0001", "S1-y01", "S1_09", ""]) {
+      expect(await refusal(rowInsert(`out-form-${step}`, { step, line_no: 0 })), step).toEqual({
+        code: "23514",
+        constraint: "outbox_rows_step_form",
+      });
+    }
+    await rowInsert("out-form-ok", { step: "S1-09", line_no: 0 });
+  });
+});
+
 describe("the migration queue", () => {
   it("is recorded in schema_migrations as core_outbox, after the migrations before it", async () => {
     const rows = await db.sql<{ name: string }[]>`select name from schema_migrations order by version`;
     const names = rows.map((row) => row.name);
     expect(names).toContain("core_outbox");
     expect(names.indexOf("core_outbox")).toBeGreaterThan(names.indexOf("core_turns_questions_clocks"));
+  });
+
+  it("records 0039 as core_outbox_step_line, after v1.1's core_outbox_no_turn and core_outbox_job_idx (T-1473)", async () => {
+    const rows = await db.sql<{ name: string }[]>`select name from schema_migrations order by version`;
+    const names = rows.map((row) => row.name);
+    expect(names).toContain("core_outbox_step_line");
+    expect(names.indexOf("core_outbox_step_line")).toBeGreaterThan(names.indexOf("core_outbox_no_turn"));
+    expect(names.indexOf("core_outbox_step_line")).toBeGreaterThan(names.indexOf("core_outbox_job_idx"));
   });
 });
