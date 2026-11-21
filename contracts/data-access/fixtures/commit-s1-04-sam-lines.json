@@ -1,0 +1,161 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["commit-s1-01-sam.json"],
+    "now": "2026-10-19T18:20:04Z",
+    "note": "The two rows S1-04's walk writes after it, each with its own step and line (README item 82): Sam's turn-s1-04-sam (his text evt-sam-0004) walks on from S1-04 to S1-08, which tells and asks nothing, and stops at S1-09's question, as K-09 v1.11's commit-s1-04.json walks the roster owner's turn. out-s1-08-sam goes to handle-sam and person-sam under biz-lees-barbershop, on imessage, quick_reply, no booking, no question, no copy, no versions read, with step S1-08 and lineNo 0 (S1-08's one line from Rosie, to the owner: MASTER-FLOW-A S1-08); out-s1-09-sam, the same but asking oq-s1-09-sam, with step S1-09 and lineNo 0 (S1-09's first line from Rosie, the question; its read-back is line 1, after the answer). The question is opened waiting with no options, no read-back and no Clock line (step 9's default), with its question clock row clock-oq-s1-09-sam, waiting for the first delivery receipt, firing S1-09's safe default. The entries are the question's open_question.opened and each row's outbox_row.created. The answer names the question and its clock row at version 1 and the rows at commitSeq 2 and 3, after commit-s1-01-sam's outbox-s1-02-sam-1 at 1; a row's step and line change nothing in it. S1-04's own part of the turn (its question closed, the companies and kinds it writes) is K-09's: K-05's world holds no S1-04 question and no pick (no K-04 seed does), so this exchange shows K-05's part alone, and the turns between turn 1 and this one (S1-02's answer, S1-11, S1-04's question) are left out, so commit-s1-01-sam's S1-02 question stays as that commit wrote it. The request asks for phones rows by handle id, as every turn's commit does (T-1419), and names none. Ids follow K-04 core v1.2's twins (turn-s1-04-sam, out-s1-08-sam, oq-s1-09-sam, out-s1-09-sam); the event, trace and time are this chain's own."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-s1-04-sam",
+      "handleId": "handle-sam",
+      "eventIds": ["evt-sam-0004"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-sam-0004",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [],
+    "writes": {
+      "state": [],
+      "openQuestions": {
+        "open": [
+          {
+            "id": "oq-s1-09-sam",
+            "handleId": "handle-sam",
+            "personId": "person-sam",
+            "businessId": "biz-lees-barbershop",
+            "bookingId": null,
+            "step": "S1-09",
+            "options": [],
+            "readback": null,
+            "versionsRead": [],
+            "clock": null
+          }
+        ],
+        "close": []
+      },
+      "clockRows": {
+        "make": [
+          {
+            "id": "clock-oq-s1-09-sam",
+            "kind": "question",
+            "openQuestionId": "oq-s1-09-sam",
+            "reservationId": null,
+            "handleId": "handle-sam",
+            "businessId": "biz-lees-barbershop",
+            "bookingId": null,
+            "fires": {
+              "step": "S1-09",
+              "safeDefault": "not yet an owner. Setup goes on, saved, and nothing goes live."
+            }
+          }
+        ],
+        "cancel": []
+      },
+      "outboxRows": [
+        {
+          "id": "out-s1-08-sam",
+          "recipientHandleId": "handle-sam",
+          "recipientPersonId": "person-sam",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": null,
+          "channel": "imessage",
+          "sendClass": "quick_reply",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": [],
+          "step": "S1-08",
+          "lineNo": 0
+        },
+        {
+          "id": "out-s1-09-sam",
+          "recipientHandleId": "handle-sam",
+          "recipientPersonId": "person-sam",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": null,
+          "channel": "imessage",
+          "sendClass": "quick_reply",
+          "openQuestionId": "oq-s1-09-sam",
+          "copyOfRowId": null,
+          "versionsRead": [],
+          "step": "S1-09",
+          "lineNo": 0
+        }
+      ],
+      "reservations": { "confirm": [], "release": [] },
+      "events": [
+        {
+          "id": "log-oq-s1-09-sam-opened",
+          "kind": "open_question.opened",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "rosie",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "open_questions",
+          "rowId": "oq-s1-09-sam",
+          "oldValues": null,
+          "newValues": { "step": "S1-09", "status": "waiting" },
+          "sealed": null,
+          "why": { "step": "S1-09" },
+          "approvedBy": null,
+          "proofs": null
+        },
+        {
+          "id": "log-out-s1-08-sam-created",
+          "kind": "outbox_row.created",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "rosie",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "outbox_rows",
+          "rowId": "out-s1-08-sam",
+          "oldValues": null,
+          "newValues": { "state": "planned", "channel": "imessage", "send_class": "quick_reply" },
+          "sealed": null,
+          "why": { "step": "S1-08" },
+          "approvedBy": null,
+          "proofs": null
+        },
+        {
+          "id": "log-out-s1-09-sam-created",
+          "kind": "outbox_row.created",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "rosie",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "outbox_rows",
+          "rowId": "out-s1-09-sam",
+          "oldValues": null,
+          "newValues": { "state": "planned", "channel": "imessage", "send_class": "quick_reply" },
+          "sealed": null,
+          "why": { "step": "S1-09" },
+          "approvedBy": null,
+          "proofs": null
+        }
+      ]
+    },
+    "answerPhoneRowsBy": "handleId"
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-s1-04-sam",
+    "committedAt": "2026-10-19T18:20:04Z",
+    "repeated": false,
+    "committed": {
+      "written": [
+        { "table": "open_questions", "rowId": "oq-s1-09-sam", "version": 1 },
+        { "table": "clock_rows", "rowId": "clock-oq-s1-09-sam", "version": 1 }
+      ],
+      "outboxRows": [
+        { "id": "out-s1-08-sam", "commitSeq": 2 },
+        { "id": "out-s1-09-sam", "commitSeq": 3 }
+      ],
+      "promoted": []
+    }
+  }
+}

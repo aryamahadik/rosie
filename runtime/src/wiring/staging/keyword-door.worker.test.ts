@@ -218,7 +218,7 @@ class CommitStoodIn extends Error {
 function keptTurnRows(commits: Json[]): TurnRowCalls {
   return {
     commitTurn: (request) => {
-      commits.push(structuredClone(request) as unknown as Json);
+      commits.push(structuredClone(request));
       return Promise.reject(new CommitStoodIn());
     },
     parkTurn: () => Promise.reject(new CommitStoodIn()),

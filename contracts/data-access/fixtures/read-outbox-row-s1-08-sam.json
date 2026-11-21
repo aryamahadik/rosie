@@ -1,0 +1,59 @@
+{
+  "call": "readOutboxRow",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json", "seed-phone-chat-open.json"],
+    "after": ["commit-s1-04-sam-lines.json"],
+    "now": "2026-10-19T18:20:04Z",
+    "note": "S1-08's row, which asks no question, read under the barbershop's scope after commit-s1-04-sam-lines wrote it with its own step and line (README item 83): the read answers line from the row, step S1-08 at index 0, from row, where v1.3 to v1.21 answered null (open gap 29, closed), so compose input and finalize can take it (README item 35's table, rows step and line). It asks no question, so slotSource.question is null and finalize's question is null for it, with no ask-by (item 35's table, row FinalizeRow.question). Everything else is read as v1.6 reads it: the row as committed, planned at version 1 with no plan; its recipient, Sam, with his owner role at the barbershop and his phone's flags (K-04's seeds); the text it answers, turn-s1-04-sam's one event id, with no safety row in this chain (its outcome is a K-09 core action, not a K-05 write); the business head; businessSensitive null, since Lee's Barbershop holds no kind of work in K-05's world (S1-04's company kinds are K-09's: commit-s1-04-sam-lines' note); and no other question still open with Sam that has gone, since neither S1-02's question nor S1-09's has a row that went (README default 51)."
+  },
+  "request": {
+    "outboxRowId": "out-s1-08-sam",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "outboxRow",
+    "outboxRowId": "out-s1-08-sam",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-19T18:20:04Z",
+    "row": {
+      "turnId": "turn-s1-04-sam",
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "state": "planned",
+      "version": 1,
+      "channel": "imessage",
+      "sendClass": "quick_reply",
+      "bookingId": null,
+      "openQuestionId": null,
+      "copyOfRowId": null,
+      "hasPlan": false,
+      "finalParts": null
+    },
+    "line": { "step": "S1-08", "index": 0, "from": "row" },
+    "recipient": {
+      "handleId": "handle-sam",
+      "kind": "phone",
+      "personId": "person-sam",
+      "name": "Sam Lee",
+      "storedLanguage": "en",
+      "roles": [{ "roleId": "role-sam-barber", "role": "owner", "version": 1 }],
+      "phone": { "stopped": false, "chatOpen": true, "chatWay": "imessage", "pollVotedAt": null, "version": 2 }
+    },
+    "answers": {
+      "handleId": "handle-sam",
+      "texts": [{ "eventId": "evt-sam-0004", "outcomes": null, "tenses": null }]
+    },
+    "slotSource": {
+      "business": {
+        "id": "biz-lees-barbershop",
+        "name": "Lee's Barbershop",
+        "displayName": "Lee's Barbershop",
+        "timeZone": "America/New_York",
+        "version": 3
+      },
+      "booking": null,
+      "question": null
+    },
+    "businessSensitive": null,
+    "openQuestions": []
+  }
+}
