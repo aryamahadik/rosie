@@ -1,15 +1,20 @@
 // The turn face's compose input and finalize (T-1141; C-074 over C-090, C-093 and C-089): the two readRow ports and the
-// fixed lines' facts bound to K-05's readOutboxRow, as v1.6 answers it (v1.3's row with the business's sensitive switch:
-// T-1197, T-1190), and v1.3's readFixedLineFacts (T-1138), from K-05 v1.3 item 35's table ("T-1141 binds the ports from
-// this table; nothing else is read for them") and v1.6 item 45, the words the runtime hands in (default 47) and the
-// pinned bundle the row was committed under. Both reads run on the runtime side (rosie_job) in a read-only transaction of
+// fixed lines' facts bound to K-05's readOutboxRow, as v1.22 answers it (v1.3's row with v1.6's sensitive switch of the
+// business: T-1197, T-1190; and v1.22's line, the row's own step and line first: T-1475, item 83), and v1.3's
+// readFixedLineFacts (T-1138), from K-05 v1.3 item 35's table ("T-1141 binds the ports from this table; nothing else is
+// read for them"), v1.6 item 45 and v1.22 item 83, the words the runtime hands in (default 47) and the pinned bundle the
+// row was committed under. Both reads run on the runtime side (rosie_job) in a read-only transaction of
 // their own under the call's business (STATE note 59; T-315's security note b; readOutboxRow, never readOutboxRowIn, so
 // the read holds its own read-only transaction: DL-402 note b); finalize's two K-05 writes (writePlan, cancelClock) are
 // the runtime side's own transactions too.
 //
 // Where each field comes from (item 35's table, and the defaults below where the table leaves a rule to the caller):
-//   - the row, its step and line (line 0 of the question it asks), its turn, bundle and channel: readOutboxRow; a null line
-//     is refused, never guessed; a safety row (fixedLineRow) is the handlers' fixed-line refusal;
+//   - the row, its step and line, its turn, bundle and channel: readOutboxRow. The line is the row's own stored step and
+//     line (`from` row: K-05 v1.22 item 83; T-1475), else line 0 of the question it asks (`from` openQuestion). The two
+//     are taken alike, field by field, into ComposeRow.step and line and FinalizeRow.step, and `from` is read by no rule
+//     here (default 214). So a row that asks no question and carries its own line (S1-08's) is composed and finalized as
+//     any row is, its finalize question null, with no ask-by and no clock row. A null line (a row that holds neither and
+//     asks no question) is refused, never guessed; a safety row (fixedLineRow) is the handlers' fixed-line refusal;
 //   - the flow the step is read in: default 53 (an A or B step's own; a shared step's, the booking's, else the first of A,
 //     then B, that the row's bundle lists whose graph holds the step; none: stepMissing);
 //   - the reader (ComposeRow.role, FinalizeRow.reader): K-05 v1.5 item 44's mapping, exactly as its rowReader states it
@@ -69,7 +74,7 @@
 //      never guessed. A row whose bundle or step is missing is refused before a reader is looked for (K-05 v1.5
 //      rowReader.errors; bundleMissing, stepMissing), so compose input never reaches its masterLineMissing for it.
 
-import type * as K05 from "../../../../contracts/generated/data-access/data-access.v1.6";
+import type * as K05 from "../../../../contracts/generated/data-access/data-access.v1.22";
 import { NotBuiltError } from "../errors";
 import {
   addressedAs,
@@ -120,10 +125,12 @@ const isRecord = (value: unknown): value is Json =>
 // ---- K-05's two reads, as the binding takes them (db/repo/turn-face-reads.ts) ----------------------------------------
 
 /**
- * K-05 v1.6 readOutboxRow.v1dot6Response (items 35 and 45): the answer a v1.6 call gives, as db/repo's readOutboxRow
- * types it (T-1197): v1.3's row with the row's business's sensitive switch, businessSensitive, always stated (true, false
- * or null). A v1.3 to v1.5 answer, which has none, is not this type; one that reaches the binding all the same reads as
- * null, on (default 67: sensitiveOf).
+ * K-05 v1.22 readOutboxRow.v1dot6Response (items 35, 45 and 83): the answer a v1.6 or later call gives: v1.3's row with
+ * the row's business's sensitive switch, businessSensitive, always stated (true, false or null), and a line read from the
+ * row itself (`from` row) or from the question it asks (`from` openQuestion), or null (T-1475). v1.6's answer, as
+ * db/repo's readOutboxRow types it until T-1476 (T-1197), is a narrower form of this one (its line only `from`
+ * openQuestion), so it binds as it is (pg/calls.ts pgRowData). A v1.3 to v1.5 answer, which has no switch, is not this
+ * type; one that reaches the binding all the same reads as null, on (default 67: sensitiveOf).
  */
 export type OutboxRowRead = K05.ReadOutboxRowV1Dot6Response;
 
@@ -211,10 +218,18 @@ function linesTo(step: Json, reader: Reader): Json[] {
 
 // ---- the reader: K-05 v1.5 rowReader (README item 44; defaults 62 to 65) ---------------------------------------------
 
-/** K-05 v1.5 rowReader's request: what the reader mapping reads, from one row read and the row's bundle. */
+/**
+ * K-05 rowReader's request (v1.5 item 44), typed at v1.22: what the reader mapping reads, from one row read and the
+ * row's bundle. Its line is v1.22's rowLine, so a line `from` row is mapped as one `from` openQuestion is: the rules read
+ * section and lineTo, never `from` (default 214). The type also holds v1.20's businessOwner, which this binding neither
+ * reads nor states (item 80 is T-1497's).
+ */
 export type RowReaderRequest = K05.RowReaderRequest;
 
-/** K-05 v1.5 rowReader's outcome: the reader, by a role or by the sign-up line, or noReader with why. */
+/**
+ * K-05 rowReader's outcome, typed at v1.22: the reader, by a role or by the sign-up line, or noReader with why. Of the
+ * type's whys this binding gives v1.5's three (noRole, lineHasNoReader, roleReadsAsNoOne).
+ */
 export type RowReaderOutcome = K05.RowReaderResponse | K05.RowReaderErrors;
 
 /** K-01 v1's lanes (bundle.v1 lane). */
