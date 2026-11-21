@@ -8,8 +8,9 @@
 //     withBusiness), opened for the K-09 call the Tool API base names (T-1410: below). Every limit, the walk's reads,
 //     readOpenHolds and six of the seven safety reads run on it, each naming the call's business;
 //   - K-05's runtime-side calls on `runtime` (rosie_job), each its own transaction: commitTurn (T-306: unique on the turn
-//     id, all or nothing), readBusinessOwner (person_handles and handles are the runtime's tables), and the sealer's read
-//     of the person's key (sealing_keys is the runtime's table: sealer.ts), each scoped as its call says.
+//     id, all or nothing), readBusinessOwner (person_handles and handles are the runtime's tables), the sealer's read
+//     of the person's key (sealing_keys is the runtime's table: sealer.ts), and the walk's chat read (T-1519: K-05 v1.10
+//     item 51 readChatHandle, threads and handles being the runtime's tables), each scoped as its call says.
 // Nothing here logs; what a call throws names a read, a fault or a SQLSTATE, never a value.
 //
 // The keyword door's runtime-side binding (T-1413; DL-864; DL-877 C1, C2; ../door.ts): pgKeywordDoor runs the door's
@@ -58,6 +59,7 @@ import {
   liveOpenQuestionsOfHandle,
   type TransientError,
 } from "../../../../../db/repo/targets";
+import { readChatHandle } from "../../../../../db/repo/threads";
 import { readFixedLineFacts, readOpenHoldsIn, readOutboxRow } from "../../../../../db/repo/turn-face-reads";
 import type { CoreFlagsDeps } from "../../../commit/core";
 import { pgCommitTurn } from "../../../commit/pg";
@@ -263,9 +265,11 @@ function pgCommitBinding<Repo extends Sql | Tx>(
 export function pgTurnCalls(runtime: Sql, toolApi: Sql, options: PgTurnCallsOptions): TurnFaceCalls<Tx> {
   const { paging, signUp } = options;
   // The walk's question read, the sign-up steps' writers and, where asked, their settlers are this binding's own (T-1468,
-  // T-1502), never pgCommitBinding's, which the keyword door shares.
+  // T-1502), never pgCommitBinding's, which the keyword door shares; and so is the walk's chat read (T-1519), K-05 v1.10
+  // item 51 on the runtime side in a read-only transaction of its own, so S1-01 reuses a handle's own chat thread.
   const binding: TurnCommitBinding<Tx> = {
     ...pgCommitBinding<Tx>(runtime, options),
+    readChatHandle: (request) => readChatHandle(runtime, { linqChatId: request.linqChatId }),
     ...(options.safetyExtra === undefined ? {} : { safetyExtra: options.safetyExtra }),
     ...(paging === undefined ? {} : { paging }),
     ...(signUp === undefined

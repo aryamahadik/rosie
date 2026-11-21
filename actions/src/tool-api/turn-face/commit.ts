@@ -13,7 +13,11 @@
 //     to an open question is notBuilt. And, where the wiring binds them (T-1502; K-09 README default 191; T-1503 binds
 //     them on staging), the read-only settlers by step id (TurnCommitBinding.settlers: signUpSteps, S1-02's settler over
 //     the same kinds ports and one catalog read per walk shared with S1-02's writer), so the owner's words, not the option
-//     decide named, settle S1-02's branch. Left out, the walk is exactly as before;
+//     decide named, settle S1-02's branch. Left out, the walk is exactly as before. And, where the wiring binds it
+//     (T-1519; DL-1048), K-05 v1.10 item 51's readChatHandle on the runtime side (TurnCommitBinding.readChatHandle), which
+//     the walk asks for the turn's Linq chat id, handed only the handle id it answers (walkChatsOf, never the number), so
+//     S1-01 reuses the handle's own chat thread for that chat instead of inserting a second one (commit/walk writes.ts
+//     default 12). Left out, S1-01's thread is inserted as before;
 //   - runCore: T-1140's createRunCore({ safety: { reader, sealer, lines, stopWords, telling } }), built for each call:
 //       reader     K-05 v1.4's safety reads (T-1161): outcomeOfEvent, outcome, hold, holdOfOutcome, outboxRowWritten and
 //                  businessZone on the call's own transaction (rosie_app) with the call's own business; ownerOf through
@@ -101,6 +105,7 @@ import {
   type StepSettlers,
   type StepWriter,
   type StepWriters,
+  type WalkChats,
   type WalkDeps,
   type WalkQuestions,
 } from "../../commit/walk";
@@ -235,6 +240,19 @@ export interface ErrorAnswer {
   readonly error: string;
 }
 
+/** K-05 v1.10 readChatHandle.request (item 51): Linq's chat id alone. */
+export interface ChatHandleRequest {
+  readonly linqChatId: string;
+}
+
+/**
+ * K-05 v1.10 readChatHandle.response, as far as the commit reads it: the id of the phone handle whose chat thread holds
+ * the chat id, or null when none does. The number it also answers is never read here nor handed to the walk.
+ */
+export interface ChatHandleAnswer {
+  readonly handleId: string | null;
+}
+
 /** What the commit binding reads and calls: K-05's calls and the pinned bundle. */
 export interface TurnCommitBinding<Repo> {
   /** The pinned bundle's manifest and flow graphs (the frontier's port: KV, or PostgreSQL's copy on a miss). */
@@ -295,17 +313,26 @@ export interface TurnCommitBinding<Repo> {
    * does not fit the words (branchNotWords).
    */
   readonly settlers?: StepSettlers<Repo>;
+  /**
+   * K-05 v1.10 item 51's readChatHandle (T-1519; DL-1048): the phone handle whose chat thread holds a Linq chat id, read on
+   * the runtime side (rosie_job, no business scope, a read-only transaction of its own: threads and handles are scoped
+   * none, and rosie_app holds no grant on either), never on the call's transaction. The walk asks it once for the turn's
+   * chat id when S1-01 writes the handle's thread, and reuses the handle's own chat thread when the answer names the
+   * turn's handle (commit/walk writes.ts default 12); an error answer fails the call closed. Left out, S1-01's thread is
+   * inserted as before.
+   */
+  readonly readChatHandle?: (request: ChatHandleRequest) => Promise<ChatHandleAnswer | ErrorAnswer>;
 }
 
 /**
  * What the keyword door's commit binds (keywordCommitDeps; T-1413): the turn face's binding, with K-05 v1.4's record
  * reads in their no-business forms in place of the business-scoped seven, no paging port (the top of this file), and no
- * question read, step writers or settlers (T-1468, T-1502): a keyword turn carries no part, so the door's commit never
- * walks an answer.
+ * question read, step writers, settlers or chat read (T-1468, T-1502, T-1519): a keyword turn carries no part, so the
+ * door's commit never walks.
  */
 export type KeywordCommitBinding<Repo> = Omit<
   TurnCommitBinding<Repo>,
-  "safetyReads" | "paging" | "questions" | "writers" | "settlers"
+  "safetyReads" | "paging" | "questions" | "writers" | "settlers" | "readChatHandle"
 > & {
   readonly safetyReads: NoBusinessSafetyReads<Repo>;
 };
@@ -666,20 +693,41 @@ export function turnLimits<Repo>(
   return flagsFirst([createLimit1({ steps }), limit2, limit3, limit4, limit5, limit6]);
 }
 
+// ---- the walk's chat read (T-1519) ------------------------------------------------------------------------------------
+
+/**
+ * The walk's chat read over K-05 v1.10 item 51's readChatHandle (T-1519; commit/walk WalkChats, writes.ts default 12):
+ * the answer's handle id alone, or null when no chat thread of a phone handle holds the chat id. An error answer
+ * (transient) is thrown, never read as none (K-05 v1.4 default 61), so the call fails closed. The number the read also
+ * answers is dropped here; nothing is logged.
+ */
+export function walkChatsOf(read: NonNullable<TurnCommitBinding<unknown>["readChatHandle"]>): WalkChats {
+  return {
+    async chatHandle(linqChatId) {
+      const answer = await read({ linqChatId });
+      if ("error" in answer) throw new TurnFaceReadError("readChatHandle", answer.error);
+      return answer.handleId;
+    },
+  };
+}
+
 // ---- the commit's deps for one call -----------------------------------------------------------------------------------
 
-/** The walk's question read, step writers and settlers as a binding names them: each present only when bound. */
-type WalkAnswerDeps<Repo> = Pick<WalkDeps<Repo>, "questions" | "writers" | "settlers">;
+/** The walk's question read, step writers, settlers and chat read as a binding names them: each present only when bound. */
+type WalkAnswerDeps<Repo> = Pick<WalkDeps<Repo>, "questions" | "writers" | "settlers" | "chats">;
 
 /**
  * The commit's deps over one binding: the limits, writesOf and commitTurn as bound, runCore with the core's deps for the
  * turn's pinned lines (built for each action: DL-864 note 4), and openHolds under the business `businessOf` names.
- * writesOf is handed the walk's question read, step writers and settlers only as `answers` names them, each only when
- * present (T-1468, T-1502): the turn face's binding's own, and none for the keyword door, whatever its binding object
- * carries.
+ * writesOf is handed the walk's question read, step writers, settlers and chat read only as `answers` names them, each
+ * only when present (T-1468, T-1502, T-1519): the turn face's binding's own, and none for the keyword door, whatever its
+ * binding object carries.
  */
 function commitDepsWith<Repo>(
-  binding: Omit<TurnCommitBinding<Repo>, "safetyReads" | "questions" | "writers" | "settlers">,
+  binding: Omit<
+    TurnCommitBinding<Repo>,
+    "safetyReads" | "questions" | "writers" | "settlers" | "readChatHandle"
+  >,
   answers: WalkAnswerDeps<Repo>,
   coreDeps: (lines: SafetyLines, turn: CommitTurnContext<Repo>) => CoreDeps<Repo>,
   businessOf?: (turn: CommitTurnContext<Repo>) => string | null,
@@ -692,6 +740,7 @@ function commitDepsWith<Repo>(
     ...(answers.questions === undefined ? {} : { questions: answers.questions }),
     ...(answers.writers === undefined ? {} : { writers: answers.writers }),
     ...(answers.settlers === undefined ? {} : { settlers: answers.settlers }),
+    ...(answers.chats === undefined ? {} : { chats: answers.chats }),
   });
   const limitsOf = binding.limits ?? turnLimits;
   return (at) => {
@@ -716,16 +765,17 @@ function commitDepsWith<Repo>(
  * The commit's deps for one gateAndCommit call, given the runtime's commit-time context: the limits, writesOf, runCore,
  * openHolds and commitTurn as the top of this file binds them. No flags port is bound, so in this business-scoped commit
  * recordStopOrStart and setRecordFlag answer notBuilt portNotWired (DL-877 C5); the paging port is the binding's own
- * (TurnCommitBinding.paging), none until the runtime binds it (T-1444). The walk's question read, step writers and
- * settlers are the binding's own too (TurnCommitBinding.questions, .writers and .settlers; T-1468, T-1502): with any left
- * out the walk runs without it, as before.
+ * (TurnCommitBinding.paging), none until the runtime binds it (T-1444). The walk's question read, step writers,
+ * settlers and chat read are the binding's own too (TurnCommitBinding.questions, .writers, .settlers and
+ * .readChatHandle through walkChatsOf; T-1468, T-1502, T-1519): with any left out the walk runs without it, as before.
  */
 export function turnCommitDeps<Repo>(binding: TurnCommitBinding<Repo>): (at: CommitAt) => CommitDeps<Repo> {
-  const { paging, questions, writers, settlers } = binding;
+  const { paging, questions, writers, settlers, readChatHandle } = binding;
   const answers: WalkAnswerDeps<Repo> = {
     ...(questions === undefined ? {} : { questions }),
     ...(writers === undefined ? {} : { writers }),
     ...(settlers === undefined ? {} : { settlers }),
+    ...(readChatHandle === undefined ? {} : { chats: walkChatsOf(readChatHandle) }),
   };
   return commitDepsWith(binding, answers, (lines, turn) => ({
     safety: {
@@ -746,7 +796,7 @@ export function turnCommitDeps<Repo>(binding: TurnCommitBinding<Repo>): (at: Com
  * forms, the door's lines (default 5), the flags port `flags` the door binds over its own transaction (DL-872 item 4:
  * reader, messagesReader, ids, events, by name; runCore answers notBuilt portNotWired with any one missing), the safety
  * service's T-317 and T-307 readers set to the same two (DL-877 C1), and openHolds with no business. The walk gets no
- * question read, no step writer and no settler here (T-1468, T-1502).
+ * question read, no step writer, no settler and no chat read here (T-1468, T-1502, T-1519).
  */
 export function keywordCommitDeps<Repo>(
   binding: KeywordCommitBinding<Repo>,

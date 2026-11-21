@@ -24,26 +24,35 @@
 //      one it settles as "Not a service we book" ("Gift cards") writes S1-02's not_booked pick and S1-74's message row,
 //      each read through homes/stop's readStop for the turn's own person and handle, on the runtime side's reads, one
 //      read open at a time; with the stop reads left out both answers stay notBuilt (stopNotWired), as before; the stop
-//      reads bound with no kinds reads bind no writer and are never read.
+//      reads bound with no kinds reads bind no writer and are never read;
+//   e. the walk's chat read (T-1519; DL-1048, DL-1051): with GateReads.readChatHandle bound (K-05 v1.10 item 51) the
+//      binding carries it as it is, so turn 1 (commit-s1-01.json's JOIN on bundle v0) whose chat Sam's own chat thread
+//      already holds writes no thread row and no thread.created entry, still gives thread and asks S1-02's question, the
+//      read asked once for the turn's chat id; a chat no thread holds, and one another handle's thread holds, insert the
+//      thread as with no read bound; an error answer fails the walk closed (TurnFaceReadError); with the read left out
+//      (fakeGateReads as it is, no reads at all) the binding carries no such field and S1-01 inserts, as before.
 //
 // Under test, as they are: ./real.ts's binding and its bundles; @rosie/actions' turnCommitDeps, T-1461's walk on bundle
 // v1's flow A with T-1502's settler port, T-633's writers and T-1502's S1-02 settler with T-632's matcher, T-634's
-// writer, and T-590's readStop and mayText inside T-633's writers. Doubles, for ports only: the pinned bundle (bundle
-// v1's own flow A and trade overlays, read from bundles/v1), the bundle port (../bundle/test-support), the question read
-// and K-05 items 78 and 79 (@rosie/actions' own doubles, as T-1468's unit test binds them), the stop home's reads
-// (@rosie/actions' own double over the frozen seeds, on the runtime side, as T-633's unit test binds them), and
-// ./test-support's fakeGateReads as it is. Test values only (rule 9): the contracts' fixtures, bundle v1 and the
-// master's sample cast.
+// writer, and T-590's readStop and mayText inside T-633's writers; and T-1519's walkChatsOf and S1-01's thread write.
+// Doubles, for ports only: the pinned bundle (bundle v1's own flow A and trade overlays, read from bundles/v1; for turn
+// 1, K-01's bundle-v0-skeleton.json's flow A), the bundle port (../bundle/test-support), the question read and K-05
+// items 78 and 79 (@rosie/actions' own doubles, as T-1468's unit test binds them), the stop home's reads (@rosie/actions'
+// own double over the frozen seeds, on the runtime side, as T-633's unit test binds them), K-05 item 51 (an answer as
+// readChatHandle gives it), and ./test-support's fakeGateReads as it is. Test values only (rule 9): the contracts'
+// fixtures, bundle v1, the master's sample cast and a whole fiction-range 555-01xx number.
 import { BARBERSHOP } from "@rosie/actions/src/domain/safety/test-support";
 import {
   NOTHING_OPEN,
   bundleV1Id,
   decidedOf,
+  flowA,
   flowAV1,
   questionsOver,
   requestTurnFields,
   s1_02QuestionRow,
   tradeOverlayV1,
+  turnOne,
   turnTwoOnV1,
 } from "@rosie/actions/src/commit/walk/test-support";
 import type { WalkQuestions } from "@rosie/actions/src/commit/walk";
@@ -58,7 +67,14 @@ import {
   turnWithWords,
 } from "@rosie/actions/src/tool-api/journey-1/kinds/test-support";
 import { PF_TEXT_KEYS } from "@rosie/actions/src/tool-api/journey-1/plug-ins/plug-in";
-import { NOTHING_OPEN_AT, turnCommitDeps } from "@rosie/actions/src/tool-api/turn-face/commit";
+import {
+  NOTHING_OPEN_AT,
+  turnCommitDeps,
+  type ChatHandleAnswer,
+  type ChatHandleRequest,
+  type ErrorAnswer,
+} from "@rosie/actions/src/tool-api/turn-face/commit";
+import { TurnFaceReadError } from "@rosie/actions/src/tool-api/turn-face/errors";
 import { describe, expect, it } from "vitest";
 
 import { BundleError, type Manifest, type PinnedBundle, type TradeOverlay } from "../bundle";
@@ -816,5 +832,159 @@ describe("the gate's commit binding hands the stop home's reads into the sign-up
     expect(Object.hasOwn(binding, "writers")).toBe(false);
     expect(Object.hasOwn(binding, "settlers")).toBe(false);
     expect(stop.asked).toEqual([]);
+  });
+});
+
+// ---- the walk's chat read (T-1519) ------------------------------------------------------------------------------------
+
+/** The handle and chat commit-s1-01.json's turn carries (K-09 v1.5 default 135). */
+const SAM_HANDLE = "handle-sam";
+const SAM_CHAT_ID = "linq-chat-demo-sam";
+
+/** Turn 1 (commit-s1-01.json's JOIN) as the commit hands it to writesOf, pinned to K-01's bundle v0 skeleton. */
+type TurnOne = ReturnType<typeof turnOne>;
+
+/** Bundle v0 as a run pinned it, for turn 1: its id as commit-s1-01.json's turn names it, and flow A's skeleton graph. */
+function pinnedV0(turn: TurnOne): PinnedBundle {
+  const { hash, build } = turn.context.turn.bundleId;
+  const bundleId: BundleId = { hash, build };
+  return {
+    bundleId,
+    manifest: {
+      contract: "bundle.v1",
+      bundleId,
+      storage: { manifestKey: keyIn(bundleId, "manifest"), values: [] },
+    },
+    flow: (flow) =>
+      flow === "A" ? Promise.resolve(flowA()) : Promise.reject(new BundleError("notInBundle")),
+    trade: () => Promise.reject(new BundleError("notInBundle")),
+    reads: () => [],
+  };
+}
+
+/**
+ * K-05 v1.10 item 51 as readChatHandle answers it on the runtime side: the phone handle `holder` (its id, its number
+ * beside it) whose chat thread holds the chat id `held`, both fields null for any other chat id, or for every chat id
+ * when `holder` is null; each chat id it is asked for written down in `asked`.
+ */
+function chatRead(
+  holder: string | null,
+  asked: string[],
+  held = SAM_CHAT_ID,
+): (request: ChatHandleRequest) => Promise<ChatHandleAnswer | ErrorAnswer> {
+  return (request) => {
+    asked.push(request.linqChatId);
+    return Promise.resolve(
+      holder === null || request.linqChatId !== held
+        ? { handleId: null, handle: null }
+        : { handleId: holder, handle: { kind: "phone" as const, address: "+15555550100" } },
+    );
+  };
+}
+
+describe("the gate's commit binding hands in the walk's chat read, only where the reads bind it, so a returning number's JOIN reuses its own chat thread (T-1519)", () => {
+  /** fakeGateReads as it is (./test-support.ts): it binds no chat read. */
+  const baseReads = (): GateReads => fakeGateReads(fakeTurnRows()).reads;
+
+  /** Turn 1's writes through the commit's own writesOf over the binding realGate builds for it, over `reads`. */
+  async function turnOneOver(reads: GateReads | null) {
+    const turn = turnOne();
+    const { binding, bound } = bindingOver(reads, pinnedV0(turn));
+    const { ports } = turnCommitDeps(binding)(NOTHING_OPEN_AT);
+    return { turn, binding, bound, writes: await ports.writesOf(turn.part, turn.context, NOTHING_OPEN) };
+  }
+
+  it("bound, Sam's own chat thread holding the turn's chat: the binding carries the reads' own read, and turn 1 writes no thread row and no thread.created entry, gives thread and asks S1-02's question, the read asked once for the turn's chat id alone", async () => {
+    const asked: string[] = [];
+    const reads: GateReads = { ...baseReads(), readChatHandle: chatRead(SAM_HANDLE, asked) };
+    const { turn, binding, bound, writes } = await turnOneOver(reads);
+    const today = await turnOneOver(baseReads());
+
+    // The reads' own read, handed on as it is.
+    expect(binding.readChatHandle).toBe(reads.readChatHandle);
+    expect(requestTurnFields(turn.context.request).chatId).toBe(SAM_CHAT_ID);
+    expect(turn.context.turn.handleId).toBe(SAM_HANDLE);
+    // Asked once, for the turn's own chat id.
+    expect(asked).toEqual([SAM_CHAT_ID]);
+    // Today's writes but the thread: no row and no entry; S1-02's question and its quick reply as before.
+    expect(today.writes.state.map((write) => [write.op, write.table])).toEqual([["insert", "threads"]]);
+    expect(today.writes.stateEvents.map((entry) => entry.kind)).toEqual(["thread.created"]);
+    expect(writes).toEqual({ ...today.writes, state: [], stateEvents: [] });
+    expect(writes.gives).toEqual(["thread"]);
+    expect(writes.gives).toEqual(turn.exchange.given.stated.gives);
+    expect(writes.asks.map((ask) => ask.question.step)).toEqual(["S1-02"]);
+    expect(writes.messages.map((row) => row.openQuestionId)).toEqual(
+      writes.asks.map((ask) => ask.question.id),
+    );
+    // The chat id is in no write: its one home is the thread row, which already holds it. Nothing went past the pinned
+    // bundle to KV or to PostgreSQL's copy.
+    expect(JSON.stringify(writes)).not.toContain(SAM_CHAT_ID);
+    expect(bound.kvReads).toEqual([]);
+    expect(bound.calls).toEqual([]);
+  });
+
+  it("bound, no chat thread holding the turn's chat, or another handle's: S1-01 inserts the thread exactly as with no read bound, the read asked once each", async () => {
+    const today = await turnOneOver(baseReads());
+    for (const holder of [null, "handle-alex"]) {
+      const asked: string[] = [];
+      const { writes } = await turnOneOver({ ...baseReads(), readChatHandle: chatRead(holder, asked) });
+      expect(writes, String(holder)).toEqual(today.writes);
+      expect(asked, String(holder)).toEqual([SAM_CHAT_ID]);
+    }
+    const [thread] = today.writes.state;
+    expect(thread?.op === "insert" ? thread.values : null).toMatchObject({
+      handle_id: SAM_HANDLE,
+      kind: "chat",
+      linq_chat_id: SAM_CHAT_ID,
+    });
+  });
+
+  it("bound, the read answering an error: the walk fails closed with TurnFaceReadError naming the read and its code alone, never read as none", async () => {
+    const asked: string[] = [];
+    const failing = (request: ChatHandleRequest): Promise<ChatHandleAnswer | ErrorAnswer> => {
+      asked.push(request.linqChatId);
+      return Promise.resolve({ error: "transient" });
+    };
+    const thrown = await thrownBy(turnOneOver({ ...baseReads(), readChatHandle: failing }));
+
+    expect(thrown).toBeInstanceOf(TurnFaceReadError);
+    expect(thrown).toMatchObject({ read: "readChatHandle", code: "transient" });
+    expect(String(thrown)).not.toContain(SAM_CHAT_ID);
+    expect(asked).toEqual([SAM_CHAT_ID]);
+  });
+
+  it("left out: fakeGateReads as it is, and no reads at all, carry no chat read, and turn 1 inserts S1-01's thread with its entry, as before", async () => {
+    for (const reads of [baseReads(), null]) {
+      const { binding, writes } = await turnOneOver(reads);
+      expect(Object.hasOwn(binding, "readChatHandle")).toBe(false);
+      expect(binding.readChatHandle).toBeUndefined();
+      expect(writes.state.map((write) => write.table)).toEqual(["threads"]);
+      expect(writes.stateEvents.map((entry) => entry.kind)).toEqual(["thread.created"]);
+      expect(writes.gives).toEqual(["thread"]);
+    }
+  });
+
+  it("bound beside the question read, the kinds reads and the stop reads (staging's shape): each is handed on, and building the binding reads none of them", () => {
+    const asked: string[] = [];
+    const k05 = fakeK05();
+    const stop = recordedStop();
+    const questions = questionsOver();
+    const reads: GateReads = {
+      ...baseReads(),
+      questions: questions.questions,
+      kinds: { reads: kindsReadsOf(k05.k05) },
+      stop: { reads: stop.stop },
+      readChatHandle: chatRead(SAM_HANDLE, asked),
+    };
+    const { binding } = bindingOver(reads, pinnedV1().bundle);
+
+    expect(binding.readChatHandle).toBe(reads.readChatHandle);
+    expect(binding.questions).toBe(reads.questions);
+    expect(typeof binding.writers).toBe("function");
+    expect(typeof binding.settlers).toBe("function");
+    expect(asked).toEqual([]);
+    expect(k05.asked).toEqual([]);
+    expect(stop.asked).toEqual([]);
+    expect(questions.reads).toEqual([]);
   });
 });

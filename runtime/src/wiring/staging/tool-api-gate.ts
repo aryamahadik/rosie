@@ -93,6 +93,17 @@
 //                postgres.js puts a statement's values on its error; the call then fails closed with nothing written.
 //                What they read (a number, an address, a consent row) goes to readStop alone, never to a line or an
 //                error.
+//   readChatHandle  K-05 v1.10 item 51 (T-1519; ../real.ts GateReads.readChatHandle; DL-1048, DL-1051), the phone handle
+//                whose chat thread holds the turn's Linq chat id, which S1-01's walk asks once so a returning number's
+//                JOIN reuses the handle's own chat thread instead of inserting a second one (one-chat-per-handle): db/repo
+//                threads.ts readChatHandle on a runtime-side client of its own that the root's handle opens, guards and
+//                ends for that one read (part.db.runtime: HYPERDRIVE_JOB, rosie_worker_job, which inherits rosie_job:
+//                threads and handles are scoped none, and rosie_app holds no grant on either, 0012), as item 79 is,
+//                straight from the handle and never through the slots. db/repo runs it in its own read-only transaction,
+//                answers transient as K-05's error (which the turn face throws, failing the call closed) and throws any
+//                other database error scrubbed; the request is the chat id alone, copied as calls.ts copies it. The
+//                number it also answers is dropped by the turn face (walkChatsOf); neither it nor the chat id goes to a
+//                line or an error.
 //
 // The gate's one commitTurn (K-05 v1.1 item 1) is never this input's: it goes through the root's turn-row port, T-1395's
 // binding on the job side (./k05-turn.ts turnRows; critic_collisions N5), with ../real.ts's turn id check in front.
@@ -101,17 +112,17 @@
 // a gate call holds its Tool API client's one connection while each of its other calls (the bundle reads, the owner's
 // read, a seal, the commit on the runtime side; and, for an answer to S1-02's question, the catalog on a second Tool API
 // client, item 79 and S1-11's one trade overlay on the runtime side: T-1470; and the stop home's reads, each on the
-// runtime side: T-1516) opens and ends a client of its own, one after another, so it holds 2 connections at most; a
-// keyword door's call holds its runtime-side transaction's one connection the same way while its bundle reads, seal and
-// commit open theirs (T-1415), 2 at most too. At most 3 such calls, the gate's and the door's together, hold their call's
-// client at once, so the gates hold 6 at most, the Worker's limit (infra/spikes/hyperdrive-host/worker.mjs line 77); a
-// 4th waits for a slot before its client is opened, and nothing that holds a slot ever waits for one (the catalog's
-// client and the stop reads' take no slot), so no call waits for a connection another call holds while that call waits
-// for one.
+// runtime side: T-1516; and, for S1-01, item 51's chat read on the runtime side: T-1519) opens and ends a client of its
+// own, one after another, so it holds 2 connections at most; a keyword door's call holds its runtime-side transaction's
+// one connection the same way while its bundle reads, seal and commit open theirs (T-1415), 2 at most too. At most 3 such
+// calls, the gate's and the door's together, hold their call's client at once, so the gates hold 6 at most, the Worker's
+// limit (infra/spikes/hyperdrive-host/worker.mjs line 77); a 4th waits for a slot before its client is opened, and
+// nothing that holds a slot ever waits for one (the catalog's client, the stop reads' and the chat read's take no slot),
+// so no call waits for a connection another call holds while that call waits for one.
 //
 //   bound    staging, with both HYPERDRIVE_APP (the scope, the question read on it, and the catalog's own client) and
-//            HYPERDRIVE_JOB (the owner's read, the sealer, the keyword door, item 79, the stop reads and the commit)
-//            present. Only their presence is read as the root is built (DL-768): no connection
+//            HYPERDRIVE_JOB (the owner's read, the sealer, the keyword door, item 79, the stop reads, the chat read and the
+//            commit) present. Only their presence is read as the root is built (DL-768): no connection
 //            string, secret, KV or other binding. Each connection string is the handle's to read, and SEALING_WRAP_KEY
 //            the resolver's, at each call.
 //   unbound  any environment but staging, checked before anything else is read, or a binding missing: null, as the
@@ -135,7 +146,8 @@
 // or an error.
 //
 // pgCallScope, the door's pieces, pgWalkQuestions, kindsReadsOf, pgReadOnlySealer, messagesReaderOf and flagsReaderOf are
-// imported by their own files, as ./tool-api-rows.ts imports pgCallScope (critic_size N5): no change to @rosie/actions.
+// imported by their own files, as ./tool-api-rows.ts imports pgCallScope (critic_size N5): no change to @rosie/actions;
+// and db/repo's readChatHandle by its own file, as pgTurnCalls imports it (T-1519).
 
 import { flagsReaderOf } from "@rosie/actions/src/domain/flags/reads";
 import { messagesReaderOf } from "@rosie/actions/src/domain/messages-consent/reads";
@@ -167,6 +179,7 @@ import {
 } from "@rosie/db/repo/safety-reads";
 import type { Sql, Tx } from "@rosie/db/repo/scope";
 import type { WrappingKeys } from "@rosie/db/repo/sealing";
+import { readChatHandle } from "@rosie/db/repo/threads";
 import { readOpenHoldsIn } from "@rosie/db/repo/turn-face-reads";
 
 import { environmentOf } from "../picks";
@@ -199,8 +212,9 @@ export const GATE_CLIENTS_AT_ONCE = 3;
  * Each call's name on the handle: on its timing line, and on every error of the handle's that leaves it. The scope's and
  * the keyword door's are K-09's name for the call their transaction is opened for (the scope's on the Tool API's side,
  * the door's on the runtime side), the owner's K-05's, the sealer's its own (sealer.ts), the two kinds reads' K-05's
- * (T-1470: item 78 on the Tool API's side, item 79 on the runtime side), and the five stop reads' db/repo's own (T-1516,
- * each on the runtime side: the data-access call each StopHomeReads member makes).
+ * (T-1470: item 78 on the Tool API's side, item 79 on the runtime side), the five stop reads' db/repo's own (T-1516,
+ * each on the runtime side: the data-access call each StopHomeReads member makes), and the chat read's K-05's (T-1519:
+ * item 51, on the runtime side).
  */
 export const GATE_CALLS = Object.freeze({
   scope: "gateAndCommit",
@@ -214,6 +228,7 @@ export const GATE_CALLS = Object.freeze({
   stopPhoneOfHandle: "getPhoneByHandle",
   stopConsentsOfPersons: "listConsentsOfPersons",
   stopPersonIdsOfHandle: "listPersonIdsOfHandle",
+  chatHandle: "readChatHandle",
 } as const);
 
 /** A binding is present when the env holds a value for it; its connection string is never read here. */
@@ -352,6 +367,20 @@ function stopReadsOn(db: StagingDb): StopHomeReads {
 }
 
 /**
+ * K-05 v1.10 item 51's readChatHandle for S1-01's walk (T-1519; DL-1048, DL-1051; ../real.ts GateReads.readChatHandle):
+ * db/repo's read on a runtime-side client the handle opens, guards and ends for that one read (HYPERDRIVE_JOB,
+ * rosie_worker_job, which inherits rosie_job: threads and handles are scoped none, and rosie_app holds no grant on
+ * either, 0012), as item 79 is, straight from the handle, never through gateScope or the slots: the gate call that asks
+ * it already holds its own client and a slot. The request is the chat id alone, copied as pgTurnCalls copies it.
+ * db/repo answers transient as K-05's error, which the turn face throws (the call fails closed), and throws any other
+ * database error scrubbed; the handle's own errors leave as thrown. Nothing here logs the chat id or the number.
+ */
+function chatHandleReadOn(db: StagingDb): NonNullable<GateReads["readChatHandle"]> {
+  return (request) =>
+    db.runtime(GATE_CALLS.chatHandle, (sql) => readChatHandle(sql, { linqChatId: request.linqChatId }));
+}
+
+/**
  * The keyword door's one transaction for each call (T-1415): @rosie/actions' pgDoorRuntime over a runtime-side client
  * opened for that call (HYPERDRIVE_JOB, rosie_worker_job), which the handle guards first and ends once the transaction
  * has ended, taken only while one of the gate's slots is free. pgDoorRuntime checks the door's side and makes the
@@ -430,7 +459,8 @@ const asGateReads = (reads: GateReads<Tx, Sql>): GateReads => reads as GateReads
  * sharing one set of slots, and SafetyDeps.words from the one BundleSafety adapter; and, for an answer to S1-02's
  * question (T-1470), the walk's question read on the call's transaction and the kinds reads, the catalog on a Tool API
  * client of its own (no slot) and item 79 on a runtime-side one, and beside them the stop home's reads, each on a
- * runtime-side client of its own (T-1516; DL-1033 ruling 8). Null anywhere but staging (nothing read but ENVIRONMENT)
+ * runtime-side client of its own (T-1516; DL-1033 ruling 8); and, for S1-01's thread, K-05 v1.10 item 51's chat read on
+ * a runtime-side client of its own (T-1519; DL-1048). Null anywhere but staging (nothing read but ENVIRONMENT)
  * and while either binding is missing, so every gate fails closed, a keyword turn naming no business with the base's
  * noBusinessScope.
  */
@@ -452,6 +482,8 @@ export const stagingGateReads: (part: GatePart) => GateReads | null = ({ env, db
     kinds: { reads: kindsReadsOn(db) },
     // The stop reads S1-03's, S1-74's and S1-08's writers share (DL-1033 ruling 8, CQ-360's scope): on the runtime side.
     stop: { reads: stopReadsOn(db) },
+    // S1-01 reuses the turn's own handle's chat thread (T-1519; one-chat-per-handle): item 51 on the runtime side.
+    readChatHandle: chatHandleReadOn(db),
     ...(bundleSafety === null ? {} : { words: wordsOf(bundleSafety) }),
   });
 };

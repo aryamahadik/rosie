@@ -254,6 +254,11 @@ export interface CallDoublesOptions {
   /** The paging ports, for runCore's paging core actions and the base's paging handlers. Default: none bound. */
   readonly paging?: PagingDeps<unknown>;
   readonly scope?: TurnFaceCalls<unknown>["scope"];
+  /**
+   * The walk's chat read (T-1519: K-05 v1.10 item 51 readChatHandle, as TurnCommitBinding.readChatHandle takes it). Default:
+   * none bound, so S1-01's thread is inserted as commit-s1-01.json states it.
+   */
+  readonly readChatHandle?: TurnCommitBinding<unknown>["readChatHandle"];
 }
 
 /** A scope whose repo is no database, which records the business of each call. */
@@ -270,7 +275,7 @@ export function noDatabaseScope(businesses: string[] = []): TurnFaceCalls<unknow
  * The face's calls over the doubles: commit-s1-01.json's ids (its outcome id and turn key sam), K-05 v1.1's fake commit at
  * the fixture's now, T-318's world for the safety reads with T-317's and T-307's readers on it, the same-bytes sealer,
  * the barbershop's plug-in (no stop words), and who is told and the paging ports as given (T-1443): by default nobody is
- * told (NOT_TOLD_YET) and no paging port is bound.
+ * told (NOT_TOLD_YET) and no paging port is bound; and the walk's chat read as given (T-1519), none by default.
  */
 export function callDoubles(options: CallDoublesOptions = {}): CallDoubles {
   const world = options.world ?? safetyWorldOf();
@@ -294,6 +299,7 @@ export function callDoubles(options: CallDoublesOptions = {}): CallDoubles {
     },
     turnKey: () => SAM_KEY,
     ...(options.paging === undefined ? {} : { paging: options.paging }),
+    ...(options.readChatHandle === undefined ? {} : { readChatHandle: options.readChatHandle }),
   };
   const calls: TurnFaceCalls<unknown> = {
     scope: options.scope ?? noDatabaseScope(),
