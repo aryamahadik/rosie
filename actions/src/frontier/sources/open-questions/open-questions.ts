@@ -19,21 +19,31 @@
 //     (frontier_option_unusable);
 //   - each option's fields (the branch's answer fields; with none listed, the step's gives keys as text fields: the
 //     default K-02's context-s1-02.json shows for S1-02's "kinds") and its stakes from its own walk (bundle.ts);
+//   - a plain step with no card whose message carries buttons (S1-04: T-1478; K-09 README v1.11 defaults 179, 180 and
+//     188): one option per button, in order, from the bundle the question was asked under, when K-09's table
+//     (buttons.ts) lists that step's buttons word for word, all of them and in order: `label` and `branch` the button's
+//     words, `definition` and `fields` the table's, and stakes from the walk every answer takes (bundle.ts
+//     plainStepStakes: the step's gives, then the walk from its next). Such a step has no card to give (a K-01 card is a
+//     split's). A buttons step the table does not list so, or whose buttons cannot be read, is not offered
+//     (frontier_buttons_unlisted: fail closed); a step with no card that is a split, or that carries no buttons, is not
+//     offered (frontier_step_missing), as before;
 //   - the question in the context's open questions (its send time in the visit's zone, else the business's), and the
-//     step's full card once.
+//     step's full card once, when it has one.
 // The guard's open question ids that this business's read does not hold are logged (frontier_question_unread): another
 // business's question is read in its own business's call (K-05 v1.2 readTurnState: one business per call).
 //
 // The branch gates of T-292 (fact, switch and record gates on the branches below), hubs and doors (T-293), any-time rows
 // (T-294) and facts with the 60 cap (T-295) are other sources'. Never logged: a label, a definition or a name.
 
-import { findStep, ownStakes } from "../../assemble/bundle";
+import { findStep, ownStakes, plainStepStakes } from "../../assemble/bundle";
 import {
   bundleKey,
   type AnswerField,
   type BundleBranch,
   type BundleStep,
+  type BundleView,
   type DraftChoice,
+  type FlowView,
   type FrontierInput,
   type FrontierSource,
   type LogFields,
@@ -43,6 +53,7 @@ import {
   type StepCard,
   type Target,
 } from "../../assemble/types";
+import { buttonsOptionsOf, type ButtonsOption } from "./buttons";
 
 /** This source's slot name (registry.ts). */
 export const OPEN_QUESTIONS = "openQuestions";
@@ -73,7 +84,103 @@ function idsOf(row: OpenQuestionRow): LogFields {
 interface Asked {
   question: OpenQuestion;
   choices: DraftChoice[];
-  card: StepCard;
+  /** The step's full card; null for a plain step asked with buttons, which has none (a K-01 card is a split's). */
+  card: StepCard | null;
+}
+
+/** Where one open question's step was found: the bundle it was asked under, the flow graph holding it, and the step. */
+interface AskedAt {
+  row: OpenQuestionRow;
+  target: Target;
+  bundle: BundleView;
+  flow: FlowView;
+  step: BundleStep;
+}
+
+/** The options a split's card defines, one per message branch its Means lines define; a branch it cannot use is logged. */
+function cardChoices(at: AskedAt, card: StepCard["card"], input: FrontierInput): DraftChoice[] {
+  const { row, target, bundle, flow, step } = at;
+  const choices: DraftChoice[] = [];
+  for (const means of card.means) {
+    const branch = step.branches.find((each) => each.label === means.branch);
+    if (branch?.tag !== "message" || means.from === "none" || means.text === undefined) {
+      input.log.warn("frontier_option_unusable", idsOf(row));
+      continue;
+    }
+    const reasons = ownStakes(bundle, flow, step, branch);
+    choices.push({
+      kind: "option",
+      question: row.id,
+      branch: branch.label,
+      anytimeRow: null,
+      door: null,
+      hub: null,
+      label: branch.label,
+      definition: means.text,
+      step: row.step,
+      target,
+      fields: fieldsOf(step, branch),
+      stakes: reasons.length > 0 ? "high" : "low",
+      stakesFrom: reasons,
+    });
+  }
+  return choices;
+}
+
+/** Whether a step is a plain step with no card whose message carries buttons, readable or not (K-09 default 179). */
+function asksWithButtons(step: BundleStep): boolean {
+  const carries = step.buttons === null || (step.buttons !== undefined && step.buttons.length > 0);
+  return step.split === null && step.card === null && carries;
+}
+
+/**
+ * Each button of the step with the table's option for it, in the buttons' order; null when the buttons cannot be read,
+ * the table lists no such step, or the step's buttons are not the table's labels word for word, all of them and in the
+ * table's order (a button reworded, dropped, added or moved: the table no longer says what each one means, so none is
+ * offered on a guess, and every question the frontier offers keeps K-09's rule buttonsOptionChoices).
+ */
+function listedButtons(step: BundleStep, stepId: string): { button: string; option: ButtonsOption }[] | null {
+  const buttons = step.buttons ?? null;
+  const options = buttonsOptionsOf(stepId);
+  if (buttons === null || options === null) return null;
+  if (buttons.length !== options.length) return null;
+  const listed: { button: string; option: ButtonsOption }[] = [];
+  for (const [index, button] of buttons.entries()) {
+    const option = options[index];
+    if (option?.label !== button) return null;
+    listed.push({ button, option });
+  }
+  return listed;
+}
+
+/**
+ * The options of a plain step asked with buttons (K-09 README v1.11 defaults 179 and 180): one per button, in order, the
+ * button's words its label and branch, the table's definition and fields, and the stakes of the walk every answer takes;
+ * none when the table does not list the step's buttons so (listedButtons; logged by ids, never a label or a definition).
+ */
+function buttonsChoices(at: AskedAt, input: FrontierInput): DraftChoice[] {
+  const { row, target, bundle, flow, step } = at;
+  const listed = listedButtons(step, row.step);
+  if (listed === null) {
+    input.log.warn("frontier_buttons_unlisted", idsOf(row));
+    return [];
+  }
+  const reasons = plainStepStakes(bundle, flow, step);
+  return listed.map(({ button, option }) => ({
+    kind: "option",
+    question: row.id,
+    branch: button,
+    anytimeRow: null,
+    door: null,
+    hub: null,
+    label: button,
+    definition: option.definition,
+    step: row.step,
+    target,
+    fields: option.fields.map((field) => ({ ...field })),
+    stakes: reasons.length > 0 ? "high" : "low",
+    stakesFrom: reasons.map((reason) => ({ ...reason })),
+  }));
 }
 
 /** One open question's entry, options and card, or null when it is not offered (logged). */
@@ -95,35 +202,13 @@ function askedOf(row: OpenQuestionRow, input: FrontierInput): Asked | null {
   }
   const found = findStep(bundle, row.step, input.flow);
   const card = found?.step.card ?? null;
-  if (found === null || card === null) {
+  if (found === null || (card === null && !asksWithButtons(found.step))) {
     log.warn("frontier_step_missing", idsOf(row));
     return null;
   }
 
-  const choices: DraftChoice[] = [];
-  for (const means of card.means) {
-    const branch = found.step.branches.find((each) => each.label === means.branch);
-    if (branch?.tag !== "message" || means.from === "none" || means.text === undefined) {
-      log.warn("frontier_option_unusable", idsOf(row));
-      continue;
-    }
-    const reasons = ownStakes(bundle, found.flow, found.step, branch);
-    choices.push({
-      kind: "option",
-      question: row.id,
-      branch: branch.label,
-      anytimeRow: null,
-      door: null,
-      hub: null,
-      label: branch.label,
-      definition: means.text,
-      step: row.step,
-      target,
-      fields: fieldsOf(found.step, branch),
-      stakes: reasons.length > 0 ? "high" : "low",
-      stakesFrom: reasons,
-    });
-  }
+  const at: AskedAt = { row, target, bundle, flow: found.flow, step: found.step };
+  const choices = card === null ? buttonsChoices(at, input) : cardChoices(at, card, input);
   if (choices.length === 0) return null;
 
   const zone = target.visitAt?.zone ?? input.business.zone;
@@ -137,7 +222,7 @@ function askedOf(row: OpenQuestionRow, input: FrontierInput): Asked | null {
       askCount: row.askCount,
     },
     choices,
-    card: { step: row.step, card },
+    card: card === null ? null : { step: row.step, card },
   };
 }
 
@@ -153,7 +238,8 @@ export function offerOpenQuestions(input: FrontierInput): SourceOffer {
     const asked = askedOf(row, input);
     if (asked === null) continue;
     offer.openQuestions.push(asked.question);
-    if (!offer.cards.some((card) => card.step === asked.card.step)) offer.cards.push(asked.card);
+    const { card } = asked;
+    if (card !== null && !offer.cards.some((each) => each.step === card.step)) offer.cards.push(card);
     offer.choices.push(...asked.choices);
   }
   return offer;
