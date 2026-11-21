@@ -2651,7 +2651,7 @@ describe("seed-staging.sh runs roster-reset only when named, and hands it the ro
     assert.deepEqual(await snapshot(db.sql), before);
   });
 
-  it("after roster-owner, with S1-04 asked of the first roster phone, --set roster-reset from the caller's environment or from .dev.vars: its run alone gets the list, by name; the first source's run withdraws the question and gives the phone a fresh business (six rows), the second writes nothing; no number is shown", async () => {
+  it("after roster-owner, with S1-04 asked of the first roster phone, --set roster-reset from the caller's environment or from .dev.vars: its run alone gets the list, by name; the first source's run withdraws the question and gives the phone a fresh business (five rows), the second writes nothing; no number is shown", async () => {
     const seeded = fromEnv.seed({
       args: ["--set", ROSTER_SET],
       extra: { STAGING_DATABASE_URL: db.url, [ROSTER_NAME]: ROSTER_VALUE },
@@ -2666,8 +2666,8 @@ describe("seed-staging.sh runs roster-reset only when named, and hands it the ro
       assert.deepEqual(startedOf(result), [RESET_SET], what);
       assert.deepEqual(runsOf(result), [`${RESET_SET} into ${ON_STAGING}`], what);
       assert.match(result.stdout, IS_SET, what);
-      // Six tables, one row each for the one phone reset: the first source's run writes them, the second none.
-      const written = index === 0 ? 6 : 0;
+      // Five tables, one row each for the one phone reset: the first source's run writes them, the second none.
+      const written = index === 0 ? 5 : 0;
       assert.deepEqual(
         doneOf(result),
         [{ set: RESET_SET, rows: written, inserted: written, kept: 0 }],
