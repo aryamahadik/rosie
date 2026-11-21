@@ -14,6 +14,10 @@
 //     them on staging), the read-only settlers by step id (TurnCommitBinding.settlers: signUpSteps, S1-02's settler over
 //     the same kinds ports and one catalog read per walk shared with S1-02's writer), so the owner's words, not the option
 //     decide named, settle S1-02's branch. Left out, the walk is exactly as before;
+//   - askAgain (T-1505; K-09 v1.12 defaults 192 to 198): where the binding hands in the walk's question read
+//     (TurnCommitBinding.questions), the commit is handed the same read with the walk's turn key (CommitDeps.askAgain),
+//     so a turn whose parts decide ended in one question, with exactly one open question, sends that question again once
+//     with K-05 v1.21's raise of its ask count (commit/ask-again.ts). Left out, an asked turn writes nothing, as before;
 //   - runCore: T-1140's createRunCore({ safety: { reader, sealer, lines, stopWords, telling } }), built for each call:
 //       reader     K-05 v1.4's safety reads (T-1161): outcomeOfEvent, outcome, hold, holdOfOutcome, outboxRowWritten and
 //                  businessZone on the call's own transaction (rosie_app) with the call's own business; ownerOf through
@@ -86,6 +90,7 @@
 
 import type { CommitContext } from "../../../../runtime/src/actor";
 import type {
+  AskAgainDeps,
   CommitDeps,
   CommitPorts,
   CommitTurnContext,
@@ -676,7 +681,8 @@ type WalkAnswerDeps<Repo> = Pick<WalkDeps<Repo>, "questions" | "writers" | "sett
  * turn's pinned lines (built for each action: DL-864 note 4), and openHolds under the business `businessOf` names.
  * writesOf is handed the walk's question read, step writers and settlers only as `answers` names them, each only when
  * present (T-1468, T-1502): the turn face's binding's own, and none for the keyword door, whatever its binding object
- * carries.
+ * carries. The commit is handed that same question read, with the binding's turn key, as CommitDeps.askAgain (T-1505),
+ * only when `answers` names it, so the keyword door never sends a question again.
  */
 function commitDepsWith<Repo>(
   binding: Omit<TurnCommitBinding<Repo>, "safetyReads" | "questions" | "writers" | "settlers">,
@@ -694,6 +700,14 @@ function commitDepsWith<Repo>(
     ...(answers.settlers === undefined ? {} : { settlers: answers.settlers }),
   });
   const limitsOf = binding.limits ?? turnLimits;
+  // The asked turn's question read (T-1505; K-09 v1.12): the walk's own, with the walk's turn key, only where bound.
+  const askAgain: AskAgainDeps<Repo> | undefined =
+    answers.questions === undefined
+      ? undefined
+      : {
+          questions: answers.questions,
+          ...(binding.turnKey === undefined ? {} : { turnKey: binding.turnKey }),
+        };
   return (at) => {
     const runCore: CommitPorts<Repo>["runCore"] = async (action, turn, open) => {
       const lines = await pinnedSafetyLines(bundles, turn.turn.bundleId);
@@ -708,6 +722,7 @@ function commitDepsWith<Repo>(
         runCore,
         openHolds: openHoldsPort(at, binding.readOpenHolds, businessOf),
       },
+      ...(askAgain === undefined ? {} : { askAgain }),
     };
   };
 }
@@ -718,7 +733,8 @@ function commitDepsWith<Repo>(
  * recordStopOrStart and setRecordFlag answer notBuilt portNotWired (DL-877 C5); the paging port is the binding's own
  * (TurnCommitBinding.paging), none until the runtime binds it (T-1444). The walk's question read, step writers and
  * settlers are the binding's own too (TurnCommitBinding.questions, .writers and .settlers; T-1468, T-1502): with any left
- * out the walk runs without it, as before.
+ * out the walk runs without it, as before. Where the question read is bound, the commit reads an asked turn's one open
+ * question through it too (CommitDeps.askAgain; T-1505).
  */
 export function turnCommitDeps<Repo>(binding: TurnCommitBinding<Repo>): (at: CommitAt) => CommitDeps<Repo> {
   const { paging, questions, writers, settlers } = binding;

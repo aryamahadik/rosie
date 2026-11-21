@@ -24,6 +24,9 @@ import { describe, expect, it } from "vitest";
 
 import type { Span } from "../../../../runtime/src/trace";
 import type { GateAndCommitRequest } from "../../commit";
+import type { CoreFlagsDeps } from "../../commit/core";
+import type { WalkQuestions } from "../../commit/walk";
+import { NOT_TOLD_YET, PLUGIN_LISTS_NO_STOP_WORDS } from "../../domain/safety";
 import { BARBERSHOP, safetyWorldOf } from "../../domain/safety/test-support";
 import { BUNDLE_V0, fakeBundles, sampleBundle, withSteps } from "../../frontier/assemble/test-support";
 import type { Decided } from "../../gate/framework";
@@ -32,6 +35,7 @@ import { traceFor } from "../test-support";
 import { createToolApi } from "../tool-api";
 import { createToolApiValidator } from "../validator";
 import {
+  SAM_KEY,
   bundleV0,
   callDoubles,
   commitContextOf,
@@ -45,11 +49,14 @@ import {
 import {
   NOTHING_OPEN_AT,
   bundleStepCards,
+  keywordCommitDeps,
   openHoldsPort,
   pinnedSafetyLines,
   safetyReaderOf,
+  turnCommitDeps,
   type CommitAt,
   type SafetyReads,
+  type TurnCommitBinding,
 } from "./commit";
 import { TurnFaceReadError, TurnFaceRefusedError } from "./errors";
 import { callHandlers, createTurnFace, type GateAndCommitCallAnswer, type TurnFaceCalls } from "./turn-face";
@@ -538,5 +545,52 @@ describe("the pinned bundle's checked lines and limit 1's step cards (STATE note
     expect(await cards.step("S1-02")).toMatchObject({ id: "S1-02", section: 1, who: "san", to: "owner" });
     expect(await cards.step("A3-24")).toBeNull();
     expect(await bundleStepCards(fakeBundles())(BUNDLE_V0, "A").step("S1-02")).toBeNull();
+  });
+});
+
+// ---- T-1505: the asked turn's question read ------------------------------------------------------------------------------
+
+describe("the commit is handed the walk's question read and turn key for an asked turn, only where the read is bound (T-1505; K-09 v1.12)", () => {
+  const never = (): Promise<never> => Promise.reject(new Error("nothing is read or written here"));
+  /** A binding whose ports are never called here: building the deps reads nothing. */
+  function bindingOf(extra: Partial<TurnCommitBinding<unknown>> = {}): TurnCommitBinding<unknown> {
+    return {
+      bundles: bundleV0(),
+      commitTurn: never,
+      readOpenHolds: never,
+      safetyReads: safetyReadsOn(safetyWorldOf()),
+      sealer: { seal: never },
+      stopWords: PLUGIN_LISTS_NO_STOP_WORDS,
+      telling: NOT_TOLD_YET,
+      ...extra,
+    };
+  }
+  const questions: WalkQuestions = { liveQuestion: () => Promise.resolve(null) };
+
+  it("with the question read bound: the same read and the binding's turn key, or the turn's own id when it names none", () => {
+    const keyed = turnCommitDeps(bindingOf({ questions, turnKey: () => SAM_KEY }))(NOTHING_OPEN_AT);
+    expect(keyed.askAgain?.questions).toBe(questions);
+    expect(keyed.askAgain?.turnKey?.(commitContextOf(commitS101().request).turn)).toBe(SAM_KEY);
+    const unkeyed = turnCommitDeps(bindingOf({ questions }))(NOTHING_OPEN_AT);
+    expect(unkeyed.askAgain?.questions).toBe(questions);
+    expect(unkeyed.askAgain !== undefined && Object.hasOwn(unkeyed.askAgain, "turnKey")).toBe(false);
+  });
+
+  it("with no question read bound, and in the keyword door's commit whatever its binding carries: none, so an asked turn writes nothing", () => {
+    expect(Object.hasOwn(turnCommitDeps(bindingOf())(NOTHING_OPEN_AT), "askAgain")).toBe(false);
+    // The door's binding, carrying a question read all the same: K-05 v1.4's record reads in their no-business forms.
+    const doorBinding = {
+      ...bindingOf({ questions }),
+      safetyReads: {
+        outcomeOfEvent: never,
+        outcome: never,
+        hold: never,
+        holdOfOutcome: never,
+        outboxRowWritten: never,
+      },
+    };
+    expect(doorBinding.questions).toBe(questions);
+    const door = keywordCommitDeps(doorBinding, {} as CoreFlagsDeps<unknown>)(NOTHING_OPEN_AT);
+    expect(Object.hasOwn(door, "askAgain")).toBe(false);
   });
 });

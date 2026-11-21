@@ -13,6 +13,7 @@
 // closed while one is not built.
 
 import type * as K05 from "../../../contracts/generated/data-access/data-access.v1.1";
+import type * as K05V1dot21 from "../../../contracts/generated/data-access/data-access.v1.21";
 import type { Choice, GatedVerbPart, GateRequest, LimitRegistry, SetupKey } from "../gate/framework";
 import type { CallContext, ErrorsOf, RequestOf, ResponseOf } from "../tool-api";
 import type { TurnCommitRequest } from "./build";
@@ -25,7 +26,16 @@ export type CommitTurnRequest = K05.CommitTurnRequest;
 export type CommitTurnResponse = K05.CommitTurnResponse;
 /** K-05 v1.1 `commitTurn.errors`: refused, nothing written. */
 export type CommitTurnError = K05.CommitTurnErrors;
-export type CommitTurnAnswer = CommitTurnResponse | CommitTurnError;
+/**
+ * K-05 v1.21's one more refusal (README item 81.2; `openQuestionWrongStateError`): wrongState for an open question the
+ * request asks again that is not live at the version read. Only a request that asks a question again may answer it
+ * (K-05 v1.21 default 199; build.ts AskAgainCommitRequest), so a request that raises nothing answers v1.1's errors alone.
+ */
+export type AskAgainWrongState = K05V1dot21.OpenQuestionWrongStateError;
+/** What the commit's K-05 port answers: committed, v1.1's refusals, or, for a request that asks again, v1.21's wrongState. */
+export type CommitTurnAnswer = CommitTurnResponse | CommitTurnError | AskAgainWrongState;
+/** K-05 v1.21 `openQuestionAskAgain`: the question asked again, by its id and the version the turn read it at. */
+export type OpenQuestionAskAgain = K05V1dot21.OpenQuestionAskAgain;
 /** K-05 v1.1 `writes`. */
 export type Writes = K05.Writes;
 /** K-05 v1 `turn`: the turn row the commit writes, once, as committed. */
@@ -149,6 +159,26 @@ export interface UnitWrites {
    * For a part, the keys its step gives that these writes write (K-09 v1.5 `partResult.gives`); empty for a core action.
    */
   readonly gives: readonly SetupKey[];
+  /**
+   * The open question the unit asks again (K-09 v1.12 defaults 192 and 194; K-05 v1.21 item 81): its raise at the
+   * version the turn's live read gave, with what the raise's event-log entry names (K-05 v1.21 default 196). Optional, as
+   * `clocks` is: left out, the unit asks none again. Only the commit's own asked unit carries it (ask-again.ts), beside
+   * the one row that sends the question again; the commit writes the raise into K-05 v1.21's `openQuestions.askAgain`
+   * (build.ts).
+   */
+  readonly askAgain?: AskAgain;
+}
+
+/**
+ * An open question asked again (K-05 v1.21 item 81): the raise K-05 takes, and the question's step, business and ask
+ * count as the turn read them, for the raise's `open_question.asked_again` entry (K-05 v1.21 default 196: ask_count from
+ * the count read to one more, why the step).
+ */
+export interface AskAgain {
+  readonly raise: OpenQuestionAskAgain;
+  readonly step: string;
+  readonly businessId: string | null;
+  readonly askCount: number;
 }
 
 /** One core action run inside the turn: its result (K-09 v1.5 `coreResult`) and what it writes (none when refused). */
@@ -184,7 +214,9 @@ export interface CommitTurnContext<Repo = unknown> {
 
 /**
  * What the commit calls, each another task's:
- *   - commitTurn: K-05 v1.1 commitTurn (T-306 wires the database engineer's data-access call; tests use a fake);
+ *   - commitTurn: K-05 v1.1 commitTurn (T-306 wires the database engineer's data-access call; tests use a fake), from
+ *     T-1505 also K-05 v1.21's for a request that asks an open question again (build.ts TurnCommitRequest), which alone
+ *     may answer v1.21's wrongState (CommitTurnAnswer);
  *   - writesOf: what a passed part's choice writes (the walk after a choice, arch 03 line 191, and each step's writes);
  *   - runCore: one shared-core call made in the turn (K-09 v1.5 `coreAction`; M3b's calls), in the request's order;
  *   - openHolds: what is open on the turn's handle, read at commit time (OpenHolds: the safety holds and the turn's
@@ -208,10 +240,62 @@ export interface CommitPorts<Repo = unknown> {
   openHolds(turn: CommitTurnContext<Repo>): Promise<OpenHolds>;
 }
 
+/**
+ * An open question as the commit reads it on the call's transaction: the fields of K-05 v1.2 openQuestionRead it reads, so
+ * the rows db/repo/targets.ts reads (OpenQuestionRead, its version read from the row at targets.ts:564) bind as they are.
+ * The walk reads it to close an answered question (walk/writes.ts default 11); the commit reads it to send the turn's one
+ * open question again (ask-again.ts; K-09 v1.12 default 192 (d) and (e)), which needs its person, booking, read-back and
+ * ask count too (T-1505: widened with what openQuestionRead already answers).
+ */
+export interface LiveQuestion {
+  readonly id: string;
+  readonly step: string;
+  /** The business it is about (open_questions.business_id), or null before there is one. */
+  readonly businessId: string | null;
+  /** The booking it is about (open_questions.booking_id), or null for a question about no booking (S1-02). */
+  readonly bookingId: string | null;
+  /** The person it was asked of (open_questions.person_id), or null. */
+  readonly personId: string | null;
+  /** The options as they went out (K-04 open_questions.options); empty for a question asked with none (S1-02). */
+  readonly options: readonly unknown[];
+  /** The read-back an exact yes binds to (open_questions.readback), or null (S1-02). */
+  readonly readback: string | null;
+  /** How many times it has been asked (open_questions.ask_count, at least 1). */
+  readonly askCount: number;
+  /** The row's version, which a close or a raise compares and sets (K-05 v1 openQuestionClose.expectVersion; limit 4). */
+  readonly version: number;
+}
+
+/** Where the commit and its walk read a live open question: the call's transaction (walk/writes.ts default 11). */
+export interface LiveQuestions<Repo = unknown> {
+  /**
+   * The open question `openQuestionId` when it is live (waiting or open) and was sent to the handle `handleId`, as its
+   * row stands on the call's transaction `repo`; else null. Card F binds K-05 v1.2's read of a handle's live questions
+   * (db/repo/targets.ts liveOpenQuestionsOfHandle, as limit 3 reads them), whose rows carry their versions.
+   */
+  liveQuestion(repo: Repo, handleId: string, openQuestionId: string): Promise<LiveQuestion | null>;
+}
+
+/**
+ * What an asked turn needs to send its one open question again (K-09 v1.12 defaults 192 to 198; ask-again.ts): the live
+ * question read (the walk's own, handed in by the binding: commit/walk WalkDeps.questions) and default 131's turn key, for
+ * the row's id. It only reads, on the call's transaction, and is asked only when the turn's other conditions hold.
+ */
+export interface AskAgainDeps<Repo = unknown> {
+  readonly questions: LiveQuestions<Repo>;
+  /** Default 131's turn key, from the turn row. Default: the turn's own id. */
+  readonly turnKey?: (turn: TurnRow) => string;
+}
+
 /** What gateAndCommit runs with: limits 1 to 6 (../gate/limits.ts in the Worker) and the commit's ports. */
 export interface CommitDeps<Repo = unknown> {
   readonly limits: LimitRegistry<Repo>;
   readonly ports: CommitPorts<Repo>;
+  /**
+   * Where an asked turn reads its one open question to send it again (K-09 v1.12; T-1505), as the binding hands in the
+   * walk's question read. Left out, an asked turn writes nothing of its own, as before v1.12 (default 198's silence).
+   */
+  readonly askAgain?: AskAgainDeps<Repo>;
 }
 
 /** The gateAndCommit request, as the gate reads it. */
