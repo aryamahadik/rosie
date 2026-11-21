@@ -9,7 +9,7 @@
 //   - that person's sealing key, made as the gateway makes it at first sight (K-05 v1.2 item 29), under a wrapping key
 //     made for this run alone;
 //   - the 243 trade-file kinds as the kinds seed plans them from fixture set v1 (T-212);
-//   - the registry rows of bundle v0 as bundles/v0 publishes it (T-1146) and of bundle v1 (T-1460).
+//   - the registry row of bundle v2 as bundles/v2 holds it (T-1477), which both turns pin (T-1511, below).
 //
 // Who runs what. The turn face is handed two clients of this file's own, each statement's text written down (never a
 // value): `app`, whose connections run as rosie_app, 2 connections, and `job`, as rosie_job. The gate, the walk's question
@@ -19,18 +19,24 @@
 //
 // Real here: the Tool API base, the gate and limits 1 to 6 as registered (limit 1 given the pinned bundle's step cards),
 // the commit, T-1461's walk, the binding of T-1468 (pgTurnCalls' signUp: pgWalkQuestions and signUpStepWriters over
-// pgKindsReads, no stop port, and the trade port over bundle v1's own overlays), T-633's and T-634's writers, T-632's
+// pgKindsReads, no stop port, and the trade port over bundle v2's own overlays), T-633's and T-634's writers, T-632's
 // matcher, runCore with the safety service, compose input and finalize, every data-access call, row-level security and
-// the two application roles. Given: the bundles as the frontier's fake over bundles/v0's and bundles/v1's own files; the
-// decided texts, K-09's commit-s1-01.json and commit-s1-02.json as this owner sends them (no model is called); S1-04's
-// plan, written from compose input's own master text as a composer would give it. The send and its delivery receipt are
-// played by one delivered part written as actions/src/gate/limit-1/pg/sign-up.int.test.ts writes one, then K-05's own
-// armClock.
+// the two application roles. Given: the bundles as the frontier's fake over bundles/v2's own files; the decided texts,
+// K-09's commit-s1-01.json and commit-s1-02.json as this owner sends them (no model is called); S1-04's plan, written
+// from compose input's own master text as a composer would give it. The send and its delivery receipt are played by one
+// delivered part written as actions/src/gate/limit-1/pg/sign-up.int.test.ts writes one, then K-05's own armClock.
 //
-// The turns: turn 1, the JOIN, under bundle v0's id, opens S1-02's question; its row is composed, finalized and
-// delivered, and armClock moves the question to open at version 2. Turn 2, under bundle v1's id: with the stop port left
+// The turns: turn 1, the JOIN, under bundle v2's id, opens S1-02's question; its row is composed, finalized and
+// delivered, and armClock moves the question to open at version 2. Turn 2, under bundle v2's id: with the stop port left
 // out, "One isn't on the list yet" and "Not a service we book" each answer notBuilt and write nothing; then "All on the
 // list" with the words "Barbershop, plumbing, electrical" commits, and S1-04's row is composed and finalized.
+//
+// T-1511 (K-01 README default 19, T-1510; DL-1033 fault 1): this is the phone's own world, a person with no role at a
+// stand-in business head that carries the skeleton demo shop's name. Each row is read by its step's sign-up line as the
+// owner, on S1-02 and S1-04, neither of which needs business, so each first text opens with signUpOpener, S1-02's own
+// words, and never names the stand-in business. Bundles v0 and v1 hold no such line and would refuse those texts
+// (lineNotInBundle), so both turns pin bundle v2 (T-1477), which holds S1-01 to S1-04's six steps as bundle v1 does,
+// byte for byte, and bundle v1's trade overlays, byte for byte.
 //
 // T-1502 (K-09 README default 191; DL-1018 card 4): a second world, built the same way in a schema of its own, whose
 // binding also hands the walk S1-02's settler (pgTurnCalls' settleSignUp: signUpSteps, one catalog read per walk shared
@@ -59,16 +65,22 @@ import {
   snapshot,
   type CommitDatabase,
 } from "../../../commit/pg/test-support";
-import { bundleV1Id, commitS1_02, decidedOf, turnTwoOnV1 } from "../../../commit/walk/test-support";
+import { commitS1_02, decidedOf, turnTwoOnV1 } from "../../../commit/walk/test-support";
 import { NOT_TOLD_YET, PLUGIN_LISTS_NO_STOP_WORDS } from "../../../domain/safety";
-import { bundleIdOf, captureLog, checks, fakeBundles } from "../../../frontier/assemble/test-support";
+import { captureLog, checks, fakeBundles } from "../../../frontier/assemble/test-support";
 import type { DecidePart } from "../../../gate/framework";
 import { matcherOf, pgKindsReads } from "../../journey-1/kinds";
 import { GIFT_CARDS, PACK_HIKES } from "../../journey-1/kinds/test-support";
 import { PF_TEXT_KEYS } from "../../journey-1/plug-ins";
-import { overlayV1, tradesOverV1 } from "../../journey-1/plug-ins/test-support";
 import { fixture, traceFor } from "../../test-support";
-import { commitS101, composeS102, publishedBundleV0, publishedBundleV1 } from "../calls-test-support";
+import {
+  bundleV2Id,
+  commitS101,
+  composeS102,
+  overlayV2,
+  publishedBundleV2,
+  tradesOverV2,
+} from "../calls-test-support";
 import { NOTHING_OPEN_AT } from "../commit";
 import type { TurnFace } from "../turn-face";
 import { pgTurnCalls, pgTurnFace } from "./index";
@@ -97,8 +109,11 @@ const HANDLE = IDS.handleId;
 /** The Linq chat of the owner's texts, a stand-in in K-06's form. */
 const CHAT = "linq-chat-demo-roster-owner-1";
 
-const V0 = bundleIdOf(publishedBundleV0());
-const V1 = bundleV1Id();
+/** Bundle v2's id, which both turns pin (T-1511). */
+const V2 = bundleV2Id();
+
+/** S1-02's own first words, bundle v2's signUpOpener (K-01 README default 19). */
+const SIGN_UP_OPENER = "Hi! I'm Rosie, an automated assistant.";
 
 /** The turns, and the rows the walk names from each turn's own id (K-09 v1.5 default 131). */
 const TURN_1 = "turn-s1-01-roster-owner-1";
@@ -156,20 +171,21 @@ const TURN_1_NAMES = new Map<string, string>([
   ["outbox-s1-02-sam-1", ROW_1],
 ]);
 
-/** Turn 1: commit-s1-01.json's request as this owner sends it, pinned to bundle v0 as published. */
+/** Turn 1: commit-s1-01.json's request as this owner sends it, pinned to bundle v2. */
 function turnOne(): GateAndCommitRequest {
   const request = renamed(commitS101().request, TURN_1_NAMES);
   if (request.turn === null || request.input.kind !== "decided") throw new Error("turn 1 is a decided turn");
   const { decided } = request.input;
-  request.turn.bundleId = { ...V0 };
-  decided.context.bundleId = { ...V0 };
-  decided.decide.bundleId = { ...V0 };
+  request.turn.bundleId = { ...V2 };
+  decided.context.bundleId = { ...V2 };
+  decided.decide.bundleId = { ...V2 };
   decided.context.writer.people = [structuredClone(OWNER)];
   return request;
 }
 
 /**
- * Turn 2: commit-s1-02.json's request as this owner sends it, pinned to bundle v1 (T-1461's turnTwoOnV1), under the
+ * Turn 2: commit-s1-02.json's request as this owner sends it (T-1461's turnTwoOnV1), pinned to bundle v2 in v1's place
+ * (the turn's, the context's and decide's bundle; v2 holds S1-02, S1-11, S1-04, S1-03 and S1-74 as v1 does), under the
  * turn id `turnId`, answering S1-02's question as turn 1 stored it, its one part choosing `choiceId` (c-01 "All on the
  * list", c-02 "One isn't on the list yet", c-03 "Not a service we book") in decide's agreed parts and both reads, with
  * `words` as the text, the part's quote and its kinds field.
@@ -202,7 +218,11 @@ function turnTwo(turnId: string, choiceId: string, words: string): GateAndCommit
       ["oq-s1-02", QUESTION_1],
     ]),
   );
-  const { context } = decidedOf(request);
+  const { context, decide } = decidedOf(request);
+  if (request.turn === null) throw new Error("turn 2 carries its turn");
+  request.turn.bundleId = { ...V2 };
+  context.bundleId = { ...V2 };
+  decide.bundleId = { ...V2 };
   context.writer.people = [structuredClone(OWNER)];
   // The times, after turn 1's: the text, the question it answers as it went out, and the commit.
   context.texts[0].sentAt.utc = TEXT_2;
@@ -222,7 +242,7 @@ const sent = { app: [] as string[], job: [] as string[] };
 let face: TurnFace;
 /** The commit's moment and finalize's, set before each call. */
 const clock = { now: NOW_1, finalize: FINALIZED_1 };
-const trades = tradesOverV1();
+const trades = tradesOverV2();
 
 /** One world: its schema, its two clients with their statements written down, the trade port, and the face. */
 interface World {
@@ -230,7 +250,7 @@ interface World {
   readonly app: Sql;
   readonly job: Sql;
   readonly sent: { readonly app: string[]; readonly job: string[] };
-  readonly trades: ReturnType<typeof tradesOverV1>;
+  readonly trades: ReturnType<typeof tradesOverV2>;
   readonly face: TurnFace;
 }
 
@@ -248,15 +268,10 @@ interface WorldGiven {
 async function openWorld(given: WorldGiven): Promise<World> {
   const database = await openCommitDatabase(given.schema, JOB_POOL);
   const { sql } = database.db;
-  // The registry rows: bundle v0 as published, which turn 1 pins, and bundle v1, which turn 2 pins.
-  await sql`
-    insert into bundles (hash, build, manifest_key, built_at, published_at, active)
-    values (${V0.hash}, ${V0.build}, ${`bundle/${V0.hash}/${String(V0.build)}/manifest`},
-            '2026-11-10T08:00:00Z', '2026-11-10T08:05:00Z', false)
-  `;
+  // The registry row: bundle v2, which both turns pin.
   await sql`
     insert into bundles (hash, build, manifest_key, built_at)
-    values (${V1.hash}, ${V1.build}, ${`bundle/${V1.hash}/${String(V1.build)}/manifest`}, '2026-11-18T10:26:00Z')
+    values (${V2.hash}, ${V2.build}, ${`bundle/${V2.hash}/${String(V2.build)}/manifest`}, '2026-11-20T10:00:00Z')
   `;
   // The 243 trade-file kinds the kinds seed writes, planned from fixture set v1 (T-212's kindsPlanOf).
   const plan = kindsPlanOf(verifyFixtureSet(openFixtureSet()), verifyTradeSet(openTradeSet()));
@@ -291,7 +306,7 @@ async function openWorld(given: WorldGiven): Promise<World> {
   const runtime = database.client(RUNTIME_ROLE, `${given.name}-job`, JOB_POOL, (text) => {
     given.sent.job.push(text.trim());
   });
-  const bundles = fakeBundles(publishedBundleV0(), publishedBundleV1());
+  const bundles = fakeBundles(publishedBundleV2());
   const turnFace = pgTurnFace(runtime, {
     bundles,
     validator,
@@ -305,7 +320,7 @@ async function openWorld(given: WorldGiven): Promise<World> {
       now: () => new Date(clock.now),
       finalizeNow: () => clock.finalize,
       finalizeLog: () => undefined,
-      // T-1468's binding: items 78 and 79 on PostgreSQL, no stop port, and the trade port over bundle v1's overlays.
+      // T-1468's binding: items 78 and 79 on PostgreSQL, no stop port, and the trade port over bundle v2's overlays.
       signUp: {
         kinds: { reads: pgKindsReads(toolApi, runtime) },
         plugIns: { bundles: given.trades.bundles },
@@ -392,9 +407,18 @@ interface Finalized extends Json {
   };
 }
 
+/** The stand-in name the roster-owner seed gives the business head (the skeleton demo shop's), as the owner reads it. */
+async function standInName(db: CommitDatabase): Promise<string> {
+  const [row] = await db.db.sql<{ name: string }[]>`select name from businesses where id = ${BUSINESS}`;
+  if (row === undefined || row.name.trim() === "")
+    throw new Error("the roster-owner seed names its business head");
+  return row.name;
+}
+
 /**
- * Turn 1 in a world (the JOIN through the real turn face under bundle v0's id): S1-02's question opened; its row composed,
- * finalized and delivered; armClock moves the question to open at version 2. Answers the version it is open at.
+ * Turn 1 in a world (the JOIN through the real turn face under bundle v2's id): S1-02's question opened; its row composed,
+ * finalized (opening with signUpOpener, never the stand-in name) and delivered; armClock moves the question to open at
+ * version 2. Answers the version it is open at.
  */
 async function joinAndDeliver(world: World): Promise<number> {
   const { face: turnFace, cdb: database, job: runtime } = world;
@@ -411,7 +435,7 @@ async function joinAndDeliver(world: World): Promise<number> {
   });
   expect(await questionRow(QUESTION_1, database)).toEqual({ status: "waiting", version: 1, step: "S1-02" });
 
-  // Its row composed and finalized through the face, on bundle v0.
+  // Its row composed and finalized through the face, on bundle v2.
   const names = TURN_1_NAMES;
   const compose = renamed(composeS102().request, names);
   const composed = await turnFace.composeInput(structuredClone(compose), traceFor(compose).trace);
@@ -425,6 +449,12 @@ async function joinAndDeliver(world: World): Promise<number> {
     traceFor(finalize).trace,
   )) as unknown as Finalized;
   expect(finalized.outcome, JSON.stringify(finalized)).toBe("send");
+  // The person holds no role and is read by S1-02's sign-up line as the owner, on a step that does not need business:
+  // the first text opens with signUpOpener, S1-02's own words, and never names the stand-in business (T-1511).
+  expect(finalized.finalParts.fixedLines).toEqual(["signUpOpener", "optOutLine", "privacyLink"]);
+  const text = finalized.finalParts.sends[0]?.text ?? "";
+  expect(text.startsWith(`${SIGN_UP_OPENER} `)).toBe(true);
+  expect(text).not.toContain(await standInName(database));
   expect(await rowOf(database, "outbox_rows", ROW_1, ["state"])).toEqual({ version: 2, state: "checked" });
 
   // The send and its delivery receipt, played: one delivered part, as limit-1's sign-up test writes one, then K-05's
@@ -465,7 +495,7 @@ describe("an owner's whole second turn on local PostgreSQL: the gate as rosie_ap
   });
 
   it(
-    "turn 1: JOIN through the real turn face under bundle v0's id opens S1-02's question; its row is composed, finalized and delivered, and armClock moves the question to open at version 2",
+    "turn 1: JOIN through the real turn face under bundle v2's id opens S1-02's question; its row is composed, finalized with signUpOpener and delivered, and armClock moves the question to open at version 2",
     SLOW,
     async () => {
       openAt = await joinAndDeliver(main);
@@ -595,13 +625,13 @@ describe("an owner's whole second turn on local PostgreSQL: the gate as rosie_ap
           version: 1,
         })),
       );
-      // Exactly 11 text blocks, all the first pick's, each as bundle v1's barber overlay holds it.
+      // Exactly 11 text blocks, all the first pick's, each as bundle v2's barber overlay holds it.
       const texts = await sql<
         { picked_kind_id: string; pf_key: string; business_id: string | null; block: string }[]
       >`
         select picked_kind_id, pf_key, business_id, block from picked_kind_texts
       `;
-      const overlay = overlayV1("barber") as { pluginText: Record<string, string> };
+      const overlay = overlayV2("barber") as { pluginText: Record<string, string> };
       expect(texts).toHaveLength(11);
       expect(
         [...texts].sort(
@@ -615,7 +645,7 @@ describe("an owner's whole second turn on local PostgreSQL: the gate as rosie_ap
           block: overlay.pluginText[key],
         })),
       );
-      expect(trades.reads).toEqual([{ bundleId: V1, tradeId: "barber" }]);
+      expect(trades.reads).toEqual([{ bundleId: V2, tradeId: "barber" }]);
       // S1-04's question to the owner, waiting, its clock row, and one outbox row with no plan yet.
       const [asked] = await sql<Json[]>`
         select step, status, handle_id, person_id, business_id, options, version from open_questions
@@ -654,8 +684,8 @@ describe("an owner's whole second turn on local PostgreSQL: the gate as rosie_ap
           recipient_handle_id: HANDLE,
           recipient_person_id: PERSON,
           business_id: BUSINESS,
-          bundle_hash: V1.hash,
-          bundle_build: V1.build,
+          bundle_hash: V2.hash,
+          bundle_build: V2.build,
         },
       ]);
       expect(await footprint(cdb, TURN_2)).toMatchObject({ turns: 1, outbox: 1, questions: 1, effects: 0 });
@@ -693,7 +723,7 @@ describe("an owner's whole second turn on local PostgreSQL: the gate as rosie_ap
   );
 
   it(
-    "then composeInput and finalizeMessage for the committed S1-04 row on bundle v1 succeed: S1-04's line, the reader by the sign-up line, no option, and its final parts written",
+    "then composeInput and finalizeMessage for the committed S1-04 row on bundle v2 succeed: S1-04's line, the reader by the sign-up line, no option, signUpOpener, and its final parts written",
     SLOW,
     async () => {
       clock.finalize = FINALIZED_2;
@@ -708,8 +738,8 @@ describe("an owner's whole second turn on local PostgreSQL: the gate as rosie_ap
       };
       expect(composed, JSON.stringify(composed)).toMatchObject({ result: "compose" });
       expect(validator.check("composeInput", "response", composed)).toEqual([]);
-      // S1-04's line as bundle v1 holds it, for a reader with no role, read by the sign-up line's audience: the owner.
-      const step = (publishedBundleV1().flows.A as { steps: Record<string, { say: { text: string }[] }> })
+      // S1-04's line as bundle v2 holds it, for a reader with no role, read by the sign-up line's audience: the owner.
+      const step = (publishedBundleV2().flows.A as { steps: Record<string, { say: { text: string }[] }> })
         .steps["S1-04"];
       const line = step?.say[0]?.text ?? "";
       expect(line).not.toBe("");
@@ -759,11 +789,15 @@ describe("an owner's whole second turn on local PostgreSQL: the gate as rosie_ap
       // One text: the plan's line and its one question, each whole, inside the fixed lines code adds. This world holds
       // no phone row and no opener mark (the roster-owner seed writes none, and the send was played by a written part,
       // never by the outbox runner), so K-05's fixed-line facts read as before a first text, and the opener, the
-      // opt-out line and the privacy link ride again.
-      const lines = (finalized.finalParts.sends[0]?.text ?? "").split("\n");
-      expect(lines[0]?.endsWith(rest)).toBe(true);
+      // opt-out line and the privacy link ride again. The owner is read by S1-04's sign-up line, and S1-04 needs no
+      // business (it gives companies), so the opener is signUpOpener and the stand-in business is named nowhere (T-1511).
+      const text = finalized.finalParts.sends[0]?.text ?? "";
+      const lines = text.split("\n");
+      expect(lines[0]).toBe(`${SIGN_UP_OPENER} ${rest}`);
       expect(lines[1]).toBe(asks);
-      expect(finalized.finalParts.fixedLines).toEqual(["opener", "optOutLine", "privacyLink"]);
+      expect(finalized.finalParts.fixedLines).toEqual(["signUpOpener", "optOutLine", "privacyLink"]);
+      expect(text).not.toContain(await standInName(cdb));
+      expect(text).not.toContain("booking assistant for");
       // The final parts are written with the plan, by K-05's writePlan on the runtime side.
       expect(await rowOf(cdb, "outbox_rows", ROW_2, ["turn_id", "state", "final_parts"])).toEqual({
         version: 2,
@@ -786,7 +820,7 @@ const READS_KINDS = /\bfrom kinds\b/u;
 
 describe("with S1-02's settler bound, a decision naming c-02 for the owner's words still writes 'All on the list''s rows (T-1502)", () => {
   const settledSent = { app: [] as string[], job: [] as string[] };
-  const settledTrades = tradesOverV1();
+  const settledTrades = tradesOverV2();
   let settled: World;
   let openAt = 0;
 
@@ -879,7 +913,7 @@ describe("with S1-02's settler bound, a decision naming c-02 for the owner's wor
           business_id: null,
         })),
       );
-      expect(settledTrades.reads).toEqual([{ bundleId: V1, tradeId: "barber" }]);
+      expect(settledTrades.reads).toEqual([{ bundleId: V2, tradeId: "barber" }]);
       expect(await kindsRows(settled.cdb)).toEqual({
         kinds: 243,
         picked_kinds: 3,

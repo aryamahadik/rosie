@@ -1,5 +1,6 @@
 // Doubles for the fixed-line inserter's tests (T-314). Never imported by the Worker. The row is T-313's A7-17 row (Lee's
-// Barbershop's text to Alex M., the customer) and the finalize call runs through the Tool API base on T-313's fake repo;
+// Barbershop's text to Alex M., the customer), and for the sign-up opener (T-1511) T-313's S1-02 row (Sam, the owner,
+// before there is a business); the finalize call runs through the Tool API base on T-313's fake repo;
 // the send-state facts come from a double of this module's port. Names and values are the master's sample cast (Sam,
 // Lee's Barbershop, Alex M., Riley) and the shop's own words, never a real person (rule 9).
 
@@ -11,7 +12,7 @@ import type { CheckLists, FixedLine } from "../checks";
 import { contractFile, type RecordingRepo } from "../../tool-api/test-support";
 import type { CallContext } from "../../tool-api";
 import type { FinalParts, FinalizePorts, FinalizeRow, Send } from "../rewrite";
-import { a717Row, bundleLists, fakeRepo, type FakeRepo } from "../rewrite/test-support";
+import { a717Row, bundleLists, fakeRepo, s102Row, type FakeRepo } from "../rewrite/test-support";
 import { fixedLineInserter } from "./index";
 import type { AnsweredText, FixedLineFacts, FixedLinePorts } from "./types";
 
@@ -105,6 +106,45 @@ export function listsWithFirstText(): CheckLists {
   };
 }
 
+/**
+ * The sign-up opener, S1-02's own first words, as K-01 README default 19 states its line and bundle v2 carries it (T-1477;
+ * MASTER-FLOW-A.md:28): it names no business.
+ */
+export const SIGN_UP_OPENER = "Hi! I'm Rosie, an automated assistant.";
+export const SIGN_UP_OPENER_LINE: FixedLine = { id: "signUpOpener", text: SIGN_UP_OPENER, lang: "en" };
+
+/** The lists above with the sign-up opener added, as bundle v2 adds it after K-01 v1's lines (T-1477). */
+export function listsWithSignUpOpener(): CheckLists {
+  const lists = listsWithFirstText();
+  return {
+    keywords: lists.keywords,
+    fixedLines: { lines: [...lists.fixedLines.lines, SIGN_UP_OPENER_LINE] },
+  };
+}
+
+/** bundles/v2's manifest (T-1477), read as data: its shared lists hold the sign-up opener's line. */
+export function bundleV2Manifest(): { lists: { fixedLines: { lines: FixedLine[] } } } {
+  const file = path.join(REPO_ROOT, "bundles/v2/bundle/manifest.json");
+  return JSON.parse(readFileSync(file, "utf8")) as { lists: { fixedLines: { lines: FixedLine[] } } };
+}
+
+/**
+ * T-313's S1-02 row (finalize-pass.json's: Sam, the owner, before there is a business, so no business name anywhere;
+ * S1-02's master text as its fallback, which begins with the sign-up opener's words), with the lists above: K-01 v1's
+ * opener naming <business>, the first text's lines and the sign-up opener.
+ */
+export function signUpRow(
+  change: Partial<FinalizeRow> = {},
+  checks: Partial<FinalizeRow["checks"]> = {},
+): FinalizeRow {
+  const row = s102Row();
+  return {
+    ...row,
+    ...change,
+    checks: { ...row.checks, lists: listsWithSignUpOpener(), ...checks },
+  };
+}
+
 /** T-313's A7-17 row with the lists above, and any other change to its checks' context. */
 export function firstTextRow(
   change: Partial<FinalizeRow> = {},
@@ -124,6 +164,7 @@ export function firstTextRow(
  */
 export const FIRST_TEXT: FixedLineFacts = {
   textedAboutBusiness: false,
+  signUp: false,
   optOutLineDeliveredAt: null,
   lines: [],
   answeredTexts: [],
@@ -132,10 +173,17 @@ export const FIRST_TEXT: FixedLineFacts = {
 /** The second text: the first was delivered, with the opt-out line on it (phones.optout_line_delivered_at set). */
 export const SECOND_TEXT: FixedLineFacts = {
   textedAboutBusiness: true,
+  signUp: false,
   optOutLineDeliveredAt: "2026-10-23T13:00:21Z",
   lines: [],
   answeredTexts: [],
 };
+
+/**
+ * An owner's first sign-up text (K-01 README default 19): read by the sign-up line as the owner, on a step that does not
+ * need business, so the opener is signUpOpener; nothing texted before and no opt-out line delivered.
+ */
+export const SIGN_UP_FIRST_TEXT: FixedLineFacts = { ...FIRST_TEXT, signUp: true };
 
 /** A slot and the value it took, as K-03 v1's final parts hold it (`fact`: a slot of the vocabulary). */
 export type SlotValue = FinalParts["slotValues"][number];

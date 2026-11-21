@@ -11,7 +11,7 @@
 //
 //   - The JOIN as recording 2 names it (evt-sam-0000, test owner 1, Sam's chat): hops 1 to 9 once each; one compose span
 //     for the turn's one outbox row (S1-02, routine), its plan plan-s1-02.json's shape; the composer was given exactly
-//     recording 4's input (no miss), which carries no frontier; its one model call (Haiku, compose) carries bundles/v0's
+//     recording 4's input (no miss), which carries no frontier; its one model call (Haiku, compose) carries bundles/v2's
 //     pinned id and the turn id T-248's hash of evt-sam-0000, on the compose span and on its own portCall span (DL-357);
 //     compose input read the row once, under Lee's Barbershop's scope; the turn records the row's one fillAndChecks span
 //     and the Tool API base records none for compose input (DL-376). No span or log line (console.log, info, warn or
@@ -21,8 +21,11 @@
 //     model call.
 //
 // The Durable Objects' storage is not cleared between this file's tests, so each test's texts go to a handle no other test
-// uses, or to a fresh rig whose K-05 has seen nothing. Test values only (rule 9): the master's sample cast, the fictional
-// 555-01xx numbers and the fixtures' own words.
+// uses, or to a fresh rig whose K-05 has seen nothing. Test owner 1 holds no role, so the JOIN's S1-02 row is read by its
+// sign-up line as the owner and its first text opens with signUpOpener (K-01 README default 19; T-1511); the JOIN's rig
+// holds bundle v2 active, which carries the line (T-1477), and the turn pins it, as hops 10 to 12 do (T-1512): on bundle
+// v0 finalize would refuse the text and the reply would never end. Test values only (rule 9): the master's sample cast,
+// the fictional 555-01xx numbers and the fixtures' own words.
 import joinComposeInput from "@rosie/ai/recordings/composer-inputs/join-s1-02.json";
 import joinRunContext from "@rosie/ai/recordings/contexts/join-s1-01.json";
 import { HAIKU_MODEL } from "@rosie/ai/src/gateway/index";
@@ -43,10 +46,12 @@ import type { ComposeInput, MessagePlan } from "../turn/types";
 import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "./index";
 import {
   BUNDLE_V0,
+  BUNDLE_V2,
   fakeFlags,
   SAM_CHAT,
   skeletonFakes,
   TEST_OWNER_1,
+  testClock,
   watchGate,
   type LinqInboundEvent,
   type SignedWebhook,
@@ -261,10 +266,11 @@ interface Rig {
 
 /**
  * The root for "test" with the HandleActor namespace and its actor ports installed. Since T-561 joined finalize, the turn's
- * finalize calls go to the real finalize port, kept on the fake face on their way as the stand-in face kept them.
+ * finalize calls go to the real finalize port, kept on the fake face on their way as the stand-in face kept them. Bundle v2
+ * active, the JOIN's pin (T-1512).
  */
 function rig(log: MockInstance): Rig {
-  const fakes = skeletonFakes();
+  const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
   const root = testRoot(fakes, handleActors());
   const restoreRoot = root.install();
   const watched = watchGate(root, fakes.face);
@@ -327,7 +333,7 @@ afterEach(async () => {
 
 describe("hop 9 joined: compose input through @rosie/actions' turn face, and the composer returns that row's plan through @rosie/ai", () => {
   it(
-    "the JOIN: hops 1 to 9 once each; one compose span for the one outbox row (S1-02, routine), its plan plan-s1-02.json's shape; the composer was given recording 4's input exactly, with no frontier; its one model call carries bundle v0's pinned id and the JOIN's hashed turn id; compose input read the row once under Lee's Barbershop's scope; no span or log line (console.log, info, warn or error) holds a word, a number or the chat id, even inside a longer value",
+    "the JOIN: hops 1 to 9 once each; one compose span for the one outbox row (S1-02, routine), its plan plan-s1-02.json's shape; the composer was given recording 4's input exactly, with no frontier; its one model call carries bundle v2's pinned id and the JOIN's hashed turn id; compose input read the row once under Lee's Barbershop's scope; no span or log line (console.log, info, warn or error) holds a word, a number or the chat id, even inside a longer value",
     { timeout: TEST_MS },
     async () => {
       const fetch = vi.fn();
@@ -365,7 +371,7 @@ describe("hop 9 joined: compose input through @rosie/actions' turn face, and the
           outcome: "ok",
           error_code: null,
           turn_id: turnId,
-          bundle_id: BUNDLE_V0,
+          bundle_id: BUNDLE_V2,
           business_id: TEST_OWNER_1.businessId,
           got: {
             row,
@@ -397,7 +403,7 @@ describe("hop 9 joined: compose input through @rosie/actions' turn face, and the
         ).toEqual([[row, "composed", { row, channel: "imessage", copyOf: null, plan: PLAN_S1_02 }]]);
 
         // The compose span's one model call, and the AI gateway's own portCall span for it: Haiku, compose, at its
-        // first attempt, under bundles/v0's pinned id and the JOIN's hashed turn id (DL-357).
+        // first attempt, under bundles/v2's pinned id and the JOIN's hashed turn id (DL-357).
         expect(
           compose.model_calls?.map((call) => [call.model, call.role, call.purpose, call.outcome]),
         ).toEqual([[HAIKU_MODEL, "haiku", "compose", "ok"]]);
@@ -406,7 +412,7 @@ describe("hop 9 joined: compose input through @rosie/actions' turn face, and the
         );
         expect(
           composeCalls.map((span) => [span.bundle_id, span.turn_id, span.attempt, span.outcome]),
-        ).toEqual([[BUNDLE_V0, turnId, 1, "ok"]]);
+        ).toEqual([[BUNDLE_V2, turnId, 1, "ok"]]);
         // The same call on both: a sum of tokens or cost counts the portCall spans only (DL-357; CQ-174's default).
         expect(composeCalls[0]?.model_calls).toEqual(compose.model_calls);
 

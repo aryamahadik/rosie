@@ -2,9 +2,259 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 827, [`02d9e164`](https://github.com/aryamahadik/rosie/commit/02d9e164), 2026-11-21 07:55:12 UTC.
+- **Through:** commit 838, [`b17f005b`](https://github.com/aryamahadik/rosie/commit/b17f005b), 2026-11-21 12:57:57 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 838. docs: COMMIT\_HISTORY.md through commit 835 (1057240b, \#847) (\#849)
+
+- **Commit:** [`b17f005b`](https://github.com/aryamahadik/rosie/commit/b17f005b), by Arya Mahadik, 2026-11-21 12:57:57 UTC
+- **Pull request:** [#849](https://github.com/aryamahadik/rosie/pull/849) from `task/commit-history-201`, merged 2026-11-21 12:57:57 UTC. It squashed 1 branch commit:
+  - `e8f3dde` docs: COMMIT\_HISTORY.md through commit 835 (1057240b, \#847)
+- **Files changed:** 1 (+89 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +89 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 837. T-1509: db/repo builds K-05 v1.21's raise: commitTurn asks one live open question again (askAgain checked, locked beside the closes, versionChanged then wrongState, ask\_count and version raised after the closes), v1.20's answer type kept by an overload; checkFire throws on a firing that carries askAgain (DL-1030, DL-1045) (\#848)
+
+- **Commit:** [`fa5407db`](https://github.com/aryamahadik/rosie/commit/fa5407db), by Arya Mahadik, 2026-11-21 12:57:54 UTC
+- **Pull request:** [#848](https://github.com/aryamahadik/rosie/pull/848) from `task/T-1509`, merged 2026-11-21 12:57:54 UTC. It squashed 1 branch commit:
+  - `d11b5b4` T-1509: db/repo builds K-05 v1.21's raise: commitTurn asks one live o…
+- **Files changed:** 4 (+948 −10), by folder:
+  - `db/repo/` clocks.int.test.ts +54 −0, clocks.ts +7 −0, commit-turn-ask-again.int.test.ts +750 −0, commit-turn.ts +137 −10
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 836. T-1519: S1-01 reuses a number's existing chat thread; staging's gate binds the chat read (DL-1048, DL-1051, DL-1058) (\#850)
+
+- **Commit:** [`e4e114a4`](https://github.com/aryamahadik/rosie/commit/e4e114a4), by Arya Mahadik, 2026-11-21 12:57:50 UTC
+- **Pull request:** [#850](https://github.com/aryamahadik/rosie/pull/850) from `task/T-1519s`, merged 2026-11-21 12:57:51 UTC. It squashed 1 branch commit:
+  - `6c0db63` T-1519: S1-01 reuses a number's existing chat thread; staging's gate …
+- **Files changed:** 13 (+1364 −52), by folder:
+  - `actions/src/commit/walk/` index.ts +4 −1, test-support.ts +31 −0, thread.test.ts +210 −0, writes.ts +60 −6
+  - `actions/src/tool-api/turn-face/` calls-test-support.ts +7 −1, commit.test.ts +77 −0, commit.ts +65 −15
+  - `actions/src/tool-api/turn-face/pg/` calls.ts +7 −3, thread.int.test.ts +551 −0
+  - `runtime/src/wiring/` gate-binding.test.ts +178 −8, real.ts +27 −4
+  - `runtime/src/wiring/staging/` tool-api-gate.ts +45 −13, tool-api-gate.worker.test.ts +102 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+One commit holding task/T-1519's final tree (f7ce552a, QA, the database engineer and the security reviewer PASS) on main 1057240, so the train rebases cleanly.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 835. docs: COMMIT\_HISTORY.md through commit 832 (7e57119f, \#843) (\#847)
+
+- **Commit:** [`1057240b`](https://github.com/aryamahadik/rosie/commit/1057240b), by Arya Mahadik, 2026-11-21 10:43:42 UTC
+- **Pull request:** [#847](https://github.com/aryamahadik/rosie/pull/847) from `task/commit-history-200`, merged 2026-11-21 10:43:42 UTC. It squashed 1 branch commit:
+  - `3a21ff2` docs: COMMIT\_HISTORY.md through commit 832 (7e57119f, \#843)
+- **Files changed:** 1 (+64 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +64 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 834. T-1517: staging reset of one roster phone: questions closed, a fresh stand-in head, the actor reset entry (DL-1033, DL-1048) (\#845)
+
+- **Commit:** [`9a3b97e3`](https://github.com/aryamahadik/rosie/commit/9a3b97e3), by Arya Mahadik, 2026-11-21 10:43:38 UTC
+- **Pull request:** [#845](https://github.com/aryamahadik/rosie/pull/845) from `task/T-1517`, merged 2026-11-21 10:43:38 UTC. It squashed 4 branch commits:
+  - `17dbf51` T-1517: roster-reset seed set: withdraw a roster phone's live questio…
+  - `0126319` T-1517: ACTOR\_RESET\_LIST entry t1517-nov21 (allowList) under DL-1043,…
+  - `3b44c37` T-1517: the roster reset's fresh head writes no company\_kinds row (DL…
+  - `d37b196` T-1517: seed-staging case for roster-reset counts five rows in five t…
+- **Files changed:** 6 (+1806 −16), by folder:
+  - `db/seeds/` roster-reset.int.test.ts +854 −0, roster-reset.ts +632 −0
+  - `infra/ci/` seed-staging.test.mjs +267 −1
+  - `infra/scripts/` seed-staging.sh +32 −10
+  - `runtime/src/wiring/staging/` actor-reset.ts +3 −0, actor-reset.worker.test.ts +18 −5
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1517: roster-reset seed set: withdraw a roster phone's live questions, cancel their clocks and move its handle to a fresh stand-in business head, nothing deleted but the moved link; seed-staging.sh hands it the list; integration and script cases
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1517: ACTOR_RESET_LIST entry t1517-nov21 (allowList) under DL-1043, so the roster phone's actor drops texts sealed under the old person's key once; the worker test's pin of matches per allow-list number updated exactly for the second entry (10 list reads over 5 calls)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1517: the roster reset's fresh head writes no company_kinds row (DL-1048): no barber kind copied from the skeleton, so S1-02 names the new owner's kinds; company, person, business and business_setup rows stay; the int test checks no company_kinds row names the fresh business or company and readTurnParty still answers atBusiness
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1517: seed-staging case for roster-reset counts five rows in five tables (DL-1052): the fresh head no longer writes a company_kinds row; title, comment and the first run's count updated exactly, nothing loosened
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 833. T-1492: one-kind path, companies: S1-04's buttons settler and the S1-02 wrapper that places the one pick (DL-1033) (\#844)
+
+- **Commit:** [`9236784e`](https://github.com/aryamahadik/rosie/commit/9236784e), by Arya Mahadik, 2026-11-21 10:43:33 UTC
+- **Pull request:** [#844](https://github.com/aryamahadik/rosie/pull/844) from `task/T-1492`, merged 2026-11-21 10:43:33 UTC. It squashed 3 branch commits:
+  - `03c827e` T-1491: K-09 README default 199 and open gap 178 (no new version, fro…
+  - `f042e9c` T-1491: the walk asks a bound buttons settler (WalkDeps.buttonsSettle…
+  - `7653b88` T-1492: one-kind path: S1-02 wrapper places the one kept pick on its …
+- **Files changed:** 7 (+2402 −2), by folder:
+  - `actions/src/tool-api/journey-1/companies/` companies.int.test.ts +392 −0, errors.ts +93 −0, index.ts +40 −2, one-kind.test.ts +869 −0, one-kind.ts +525 −0, reads.ts +236 −0, test-support.ts +247 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1491: K-09 README default 199 and open gap 178 (no new version, from T-1515's card under DL-1041 item 4): S1-04's one-kind settler, WalkDeps.buttonsSettlers, asked once where the walk would stop at a plain step with buttons, after the rows before it; ask or rows; S1-04's count by kind; S1-08 needs the stop reads; the stand-in name before S1-09 (DL-1032, DL-1033 ruling 7)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1491: the walk asks a bound buttons settler (WalkDeps.buttonsSettlers, K-09 README default 199) once where it would stop at a plain step with buttons that no hold keeps back, after the rows before it; ask: the step asked as today; rows: written as walked (givesNotStep) and the walk goes on from its next (walk.ts Stretch.walkOn), holds re-checked, one loop check and MAX_WALK; refusal, throw or settledNotRows: nothing written; none bound: today's walk byte for byte; T-1502's settlers untouched
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1492: one-kind path: S1-02 wrapper places the one kept pick on its own insert (company kind first), S1-04 buttons settler recounts and gives companies, places a pick on file by update, asks for two or more; reads ports and helpers for T-1481; unit and PostgreSQL proofs
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 832. docs: COMMIT\_HISTORY.md through commit 829 (995f918f, \#842) (\#843)
+
+- **Commit:** [`7e57119f`](https://github.com/aryamahadik/rosie/commit/7e57119f), by Arya Mahadik, 2026-11-21 09:34:25 UTC
+- **Pull request:** [#843](https://github.com/aryamahadik/rosie/pull/843) from `task/commit-history-199`, merged 2026-11-21 09:34:25 UTC. It squashed 1 branch commit:
+  - `98e3375` docs: COMMIT\_HISTORY.md through commit 829 (995f918f, \#842)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 831. T-1491: one-kind path, the walk asks a bound buttons settler at a plain step with buttons; K-09 README default 199 (DL-1033, DL-1041) (\#840)
+
+- **Commit:** [`e4c2fbb4`](https://github.com/aryamahadik/rosie/commit/e4c2fbb4), by Arya Mahadik, 2026-11-21 09:34:21 UTC
+- **Pull request:** [#840](https://github.com/aryamahadik/rosie/pull/840) from `task/T-1491`, merged 2026-11-21 09:34:21 UTC. It squashed 2 branch commits:
+  - `03c827e` T-1491: K-09 README default 199 and open gap 178 (no new version, fro…
+  - `f042e9c` T-1491: the walk asks a bound buttons settler (WalkDeps.buttonsSettle…
+- **Files changed:** 8 (+1161 −45), by folder:
+  - `actions/src/commit/walk/` buttons.test.ts +698 −0, buttons.ts +111 −0, errors.ts +5 −2, index.ts +21 −3, test-support.ts +89 −0, walk.ts +50 −3, writes.ts +160 −36
+  - `contracts/tool-api/` README.md +27 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1491: K-09 README default 199 and open gap 178 (no new version, from T-1515's card under DL-1041 item 4): S1-04's one-kind settler, WalkDeps.buttonsSettlers, asked once where the walk would stop at a plain step with buttons, after the rows before it; ask or rows; S1-04's count by kind; S1-08 needs the stop reads; the stand-in name before S1-09 (DL-1032, DL-1033 ruling 7)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1491: the walk asks a bound buttons settler (WalkDeps.buttonsSettlers, K-09 README default 199) once where it would stop at a plain step with buttons that no hold keeps back, after the rows before it; ask: the step asked as today; rows: written as walked (givesNotStep) and the walk goes on from its next (walk.ts Stretch.walkOn), holds re-checked, one loop check and MAX_WALK; refusal, throw or settledNotRows: nothing written; none bound: today's walk byte for byte; T-1502's settlers untouched
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 830. T-1516: staging's gate binds the stop home's reads on the runtime side, and gateBindingOf hands them to the sign-up writers, so S1-03's and S1-74's messages are written (DL-1033 ruling 8; CQ-360) (\#837)
+
+- **Commit:** [`bd697d0f`](https://github.com/aryamahadik/rosie/commit/bd697d0f), by Arya Mahadik, 2026-11-21 09:34:17 UTC
+- **Pull request:** [#837](https://github.com/aryamahadik/rosie/pull/837) from `task/T-1516`, merged 2026-11-21 09:34:17 UTC. It squashed 1 branch commit:
+  - `e074ebe` T-1516: staging's gate binds the stop home's reads on the runtime sid…
+- **Files changed:** 4 (+574 −42), by folder:
+  - `runtime/src/wiring/` gate-binding.test.ts +285 −7, real.ts +49 −11
+  - `runtime/src/wiring/staging/` tool-api-gate.ts +87 −22, tool-api-gate.worker.test.ts +153 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+StopHomeReads from the runtime's MessagesReader and FlagsReader members over db/repo, each on a runtime-side client of its own, no slot, scrubbed errors; GateReads.stop; unit cases for 'One isn't on the list yet' and 'Not a service we book' bound and unbound; worker cases for the reads' clients and a failed read.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 829. docs: COMMIT\_HISTORY.md through commit 827 (02d9e164, \#839) (\#842)
+
+- **Commit:** [`995f918f`](https://github.com/aryamahadik/rosie/commit/995f918f), by Arya Mahadik, 2026-11-21 09:02:23 UTC
+- **Pull request:** [#842](https://github.com/aryamahadik/rosie/pull/842) from `task/commit-history-198`, merged 2026-11-21 09:02:23 UTC. It squashed 1 branch commit:
+  - `2d65072` docs: COMMIT\_HISTORY.md through commit 827 (02d9e164, \#839)
+- **Files changed:** 1 (+878 −826), by folder:
+  - `/` COMMIT\_HISTORY.md +878 −826
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 828. T-1508: K-05 v1.21: raise one live open question's ask count; the opener mark and opt-out delivery defaults (DL-1030, DL-1033, DL-1045) (\#841)
+
+- **Commit:** [`16ef4d60`](https://github.com/aryamahadik/rosie/commit/16ef4d60), by Arya Mahadik, 2026-11-21 09:02:19 UTC
+- **Pull request:** [#841](https://github.com/aryamahadik/rosie/pull/841) from `task/T-1508`, merged 2026-11-21 09:02:19 UTC. It squashed 2 branch commits:
+  - `a128ebc` T-1508: K-05 v1.21: commitTurn asks one live open question again, its…
+  - `ad5efd9` T-1508: round 2, K-05 v1.21 README only (DL-1045): default 202's stat…
+- **Files changed:** 9 (+2453 −13), by folder:
+  - `contracts/data-access/` README.md +128 −12, data-access.v1.21.schema.json +1731 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` commit-a7-03-alex-asks-again-defaulted.json +88 −0, commit-s1-02-sam-asks-again-stale.json +86 −0, commit-s1-02-sam-asks-again.json +93 −0, index.json +40 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-commit-s1-02-asks-again-and-closes.json +144 −0, refuse-commit-s1-02-asks-again-twice.json +141 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1508: K-05 v1.21: commitTurn asks one live open question again, its ask count and version raised by one (askAgain; versionChanged, wrongState; one raise a commit, none beside a close), the asked_again entry, and README defaults 192 to 205 with the opener mark, its read fallback and the opt-out delivery time (DL-1030, DL-1033)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1508: round 2, K-05 v1.21 README only (DL-1045): default 202's state filter in both branches of readFixedLineFacts (defaults 202 and 204, item 36, default 50, T-1513's line and its no-business proof); default 199 names db/repo's checkFire in clocks.ts as where a firing's askAgain is refused (T-1509 builds it) and the overload that keeps v1.20's answer type for a commit with no askAgain; open gap 100, a held or sending row counted before it goes
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 827. docs: COMMIT\_HISTORY.md through commit 825 (444c43f, \#836) (\#839)
 
@@ -18825,3 +19075,4 @@ Each was replaced by another pull request (a branch rebased or squashed under a 
 - [#589](https://github.com/aryamahadik/rosie/pull/589) T-054: K-09 Tool API v1.9 frozen with journey 7's 17 calls and the fee door, every v1.8 definition carried by reference (`task/T-054`, 2 branch commits, closed 2026-11-13 22:10:38 UTC)
 - [#614](https://github.com/aryamahadik/rosie/pull/614) T-1285: signInCheck and signOut's server side, every wrong-code answer the same with or without an account (ADR-016 card B2) (`task/T-1285`, 2 branch commits, closed 2026-11-14 08:45:15 UTC)
 - [#634](https://github.com/aryamahadik/rosie/pull/634) T-1397: staging binds the bundle-backed BundleSafety, with the safety read awaiting its bundle's checked lines (the audit's P3b) (`task/T-1397-r2`, 3 branch commits, closed 2026-11-15 02:06:24 UTC)
+- [#846](https://github.com/aryamahadik/rosie/pull/846) T-1519: S1-01 reuses a number's existing chat thread; staging's gate binds the chat read (DL-1048, DL-1051) (`task/T-1519`, 5 branch commits, closed 2026-11-21 12:13:08 UTC)

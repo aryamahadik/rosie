@@ -3,8 +3,8 @@
 // line is proven here until T-1149 moves the skeleton's local target into workerd (DL-332). The composition root is
 // composed for the test environment as hop 4's tests compose it (the HandleActor namespace, the skeleton flag on, the
 // actor's ports installed, K-05's turn-row calls handed in and the Tool API's gate stood in through them), now with the
-// two ports this hop joins fed by their K-05 doubles (./test-support.ts): the bundle port holding bundle v0 as bundles/v0
-// publishes it (RootOptions.bundleReads), and the targets port holding test owner 1's seeded rows (T-1148), which answers
+// two ports this hop joins fed by their K-05 doubles (./test-support.ts): the bundle port holding bundle v2 active as
+// bundles/v2 publishes it (RootOptions.bundleReads), and the targets port holding test owner 1's seeded rows (T-1148), which answers
 // for his handle as targets-first-text.json does (RootOptions.handleTargets; T-1148's integration test shows the seeded
 // rows give exactly that answer from the real handleTargets on local PostgreSQL). Each text goes in through
 // root.linqWebhook and through every joined hop once, in order, under its own trace id: signed by the Linq double and
@@ -14,7 +14,7 @@
 // words) and whose targets are the targets port's.
 //
 //   - JOIN from the seeded test owner (K-21 tp-01: Sam, the fictional 555-0100): hops 1 to 5 once each, in order, under
-//     one trace id and bundle v0's id; a guard span with no keyword and no target (the doors), its targets those of
+//     one trace id and bundle v2's id; a guard span with no keyword and no target (the doors), its targets those of
 //     targets-first-text.json (no role, no open question, no booking, no phone row), so the JOIN goes on to the frontier
 //     with no target. Then a bare HELP from the same phone takes the guard's code path: its keyword is help, no targets
 //     are read, nothing reaches the frontier, decide or the composer, and no model call comes after the guard. Its one
@@ -29,7 +29,10 @@
 // the frontier's scope and decide's deciders too, so the JOIN's turn runs on to its reply; that the JOIN went on with no target shows in the joined frontier's one read and in its answer, the sign-up
 // door, which it offers only when the guard's targets say noTarget with no role, open question or booking (T-1147). The
 // Durable Objects' storage is not cleared between this file's tests, so each test's texts go to a handle no other test
-// uses. Test values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and made-up words.
+// uses. Test owner 1 holds no role, so the JOIN's S1-02 row is read by its sign-up line as the owner and its first text
+// opens with signUpOpener (K-01 README default 19; T-1511); the bundle port holds bundle v2 active (T-1477), which carries
+// the line, as hops 10 to 12 do (T-1512): on bundle v0 finalize would refuse the text and the reply would never end.
+// Test values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and made-up words.
 import { HAIKU_MODEL } from "@rosie/ai/src/gateway/index";
 import targetsFirstText from "@rosie/contracts/data-access/fixtures/targets-first-text.json";
 import traceSkeleton from "@rosie/contracts/event-trace/fixtures/trace-skeleton.json";
@@ -45,13 +48,14 @@ import { checkHops, hopsOfTrace, leaks, spansOfLogLines, spansOfTrace } from "..
 import { flush, until } from "../turn/test-support";
 import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "./index";
 import {
-  BUNDLE_V0,
+  BUNDLE_V2,
   fakeFlags,
   HELP_TEXT,
   JOIN_TEXT,
   SAM_CHAT,
   skeletonFakes,
   TEST_OWNER_1,
+  testClock,
   withSamPhoneRow,
   type LinqInboundEvent,
   type SignedWebhook,
@@ -179,8 +183,9 @@ interface Rig {
  * ports installed; the gate (joined by T-559) fed its reads' doubles, its one commit through the root's turn-row port.
  */
 function rig(log: MockInstance, fed: { bundles?: boolean; targets?: boolean } = {}): Rig {
-  // Sam's phone row, so the turn's reply this test waits for is sent (limit 8 at send, joined by T-562).
-  const fakes = withSamPhoneRow(skeletonFakes());
+  // Sam's phone row, so the turn's reply this test waits for is sent (limit 8 at send, joined by T-562); bundle v2 active,
+  // the JOIN's pin (T-1512).
+  const fakes = withSamPhoneRow(skeletonFakes(testClock(), { bundle: BUNDLE_V2 }));
   const root = composeRoot({
     environment: "test",
     sets: { fake: fakes.ports },
@@ -292,10 +297,10 @@ describe("hop 5 joined: the guard's keyword list comes from the pinned bundle, a
 
         const join = run.traceOf(joinTrace);
         expectHopsOneToFive(join, joinTrace);
-        // One bundle id on every span: bundle v0's, as bundles/v0 publishes it, read at receipt and pinned for the turn
+        // One bundle id on every span: bundle v2's, as bundles/v2 publishes it, read at receipt and pinned for the turn
         // through the bundle port (its manifest from PostgreSQL's copy: the pool has no BUNDLES binding).
         expect(new Set(join.map((span) => JSON.stringify(span.bundle_id)))).toEqual(
-          new Set([JSON.stringify(BUNDLE_V0)]),
+          new Set([JSON.stringify(BUNDLE_V2)]),
         );
         expect(onlySpan(join, "lease")).toMatchObject({
           outcome: "ok",
@@ -305,10 +310,10 @@ describe("hop 5 joined: the guard's keyword list comes from the pinned bundle, a
         });
         expect(run.fakes.bundleReads.reads).toContainEqual({
           call: "readBundleValue",
-          key: `bundle/${BUNDLE_V0.hash}/${String(BUNDLE_V0.build)}/manifest`,
+          key: `bundle/${BUNDLE_V2.hash}/${String(BUNDLE_V2.build)}/manifest`,
         });
 
-        // The guard: JOIN is none of bundle v0's keywords, and the seeded test owner has no target, so the doors. Its span
+        // The guard: JOIN is none of bundle v2's keywords, and the seeded test owner has no target, so the doors. Its span
         // is trace-skeleton.json's guard span (labels and counts only).
         const skeletonGuard = SKELETON.spans.find((span) => span.hop === "guard");
         if (skeletonGuard === undefined) throw new Error("trace-skeleton.json has no guard span");
@@ -361,9 +366,9 @@ describe("hop 5 joined: the guard's keyword list comes from the pinned bundle, a
           ),
         ).toEqual([[[JOIN_EVENT, JOIN_TEXT]]]);
         // The turn went on through the joined gate and the stood-in hops after it, and committed its one row, under the
-        // pinned bundle v0.
+        // pinned bundle v2.
         expect([...run.fakes.turnRows.turns.values()].map((row) => [row.id, row.bundleId])).toEqual([
-          [joinTurn, BUNDLE_V0],
+          [joinTurn, BUNDLE_V2],
         ]);
         const joinCalls = run.fakes.face.log.length;
         const joinReads = run.fakes.models.calls.length;
@@ -390,7 +395,7 @@ describe("hop 5 joined: the guard's keyword list comes from the pinned bundle, a
           outcome: "ok",
           error_code: null,
           turn_id: helpTurn,
-          bundle_id: BUNDLE_V0,
+          bundle_id: BUNDLE_V2,
           got: { texts: 1 },
           decided: { keyword: ["help"], flagsVisit: false, toDecide: 0 },
         });

@@ -43,6 +43,19 @@
 // and the lock, the compare and the write use it; an answered handle id passed back where a request names a phones row
 // names no row, so the call throws and writes nothing (default 1).
 //
+// A question asked again (T-1509; K-05 v1.21 item 81 and defaults 192 to 199; DL-1030, DL-1045): a request whose
+// writes.openQuestions holds askAgain raises one live open question's ask count by one, with the turn's other writes.
+// checkRequest takes exactly one raise, its id and the version the turn read and no other field, with close empty, or
+// throws before the database is reached, naming the field alone (default 194; db/repo default 1). The question is locked
+// FOR UPDATE beside the closes and compared as an update (versionChanged, limit 4); then it must be live, waiting or open,
+// else wrongState with its status now, after an effect let go's (default 193). After the questions opened and closed, its
+// ask_count and version are each raised by one at the version read while it is live (default 192), and nothing else of it
+// moves (default 195); written names it at its new version, after the opens and closes (default 198). Its
+// open_question.asked_again entry is the request's own, written with the other entries (default 196). A request with no
+// askAgain runs statement for statement as before, and keeps v1.20's answer type: commitTurn's overloads give v1.21's
+// errors only to a request typed with askAgain given (default 199). A firing raises nothing: clocks.ts's checkFire throws
+// on one that carries askAgain (default 199).
+//
 // Scope (K-05 README "Scope": per write; T-191's roles): the call runs on the runtime side, as rosie_job, in one read
 // committed transaction that starts with no business scope. Before each write the scope is set to that write's own
 // business (set_config(..., true)), so row-level security holds each write to its business, and a turn touching two
@@ -148,6 +161,7 @@
 import type postgres from "postgres";
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.1";
 import type * as K05v117 from "../../contracts/generated/data-access/data-access.v1.17";
+import type * as K05v121 from "../../contracts/generated/data-access/data-access.v1.21";
 import { byteaFromText } from "./bytea";
 import { appendEvent, type EventEntry as LogEntry } from "./event-log";
 import { releaseIn } from "./reservations";
@@ -165,6 +179,31 @@ export type CommitTurnResponse = K05.CommitTurnResponse;
 /** K-05 v1.1 commitTurn.errors: refused, nothing written. */
 export type CommitTurnError = K05.CommitTurnErrors;
 export type CommitTurnOutcome = CommitTurnResponse | CommitTurnError;
+
+/**
+ * K-05 v1.21 commitTurn.request with writes.openQuestions.askAgain given (README item 81; T-1509): the turn asks one open
+ * question again, its ask count raised by one. Only a request typed so may answer v1.21's errors (default 199).
+ */
+export type CommitTurnAskAgainRequest = K05v121.CommitTurnRequest & {
+  readonly writes: { readonly openQuestions: { readonly askAgain: [K05v121.OpenQuestionAskAgain] } };
+};
+/** K-05 v1.21 commitTurn.errors: v1.1's, and wrongState for an open question asked again that is not live. */
+export type CommitTurnAskAgainError = K05v121.CommitTurnErrors;
+export type CommitTurnAskAgainOutcome = CommitTurnResponse | CommitTurnAskAgainError;
+
+/**
+ * A request that raises no question (writes.openQuestions.askAgain left out): v1.20's call, whose answer is v1.20's
+ * (README item 81; default 199), so a value typed with a raise never takes this answer type.
+ */
+interface RaisesNothing {
+  readonly writes: { readonly openQuestions: { readonly askAgain?: undefined } };
+}
+
+/** The open question a request asks again, as checkRequest checked it (README item 81). */
+interface Raise {
+  readonly id: string;
+  readonly expectVersion: number;
+}
 
 export interface CommitOptions {
   /** The commit's moment (K-05 `given.now`, the test's fake clock). Default: the transaction's now() on the database. */
@@ -225,9 +264,9 @@ const CALENDAR_PROVIDERS = new Set(["google", "microsoft"]);
 
 /** Thrown inside the transaction to roll it back and answer one of K-05's refusals. */
 class Refused extends Error {
-  readonly answer: CommitTurnError;
+  readonly answer: CommitTurnAskAgainError;
 
-  constructor(answer: CommitTurnError) {
+  constructor(answer: CommitTurnAskAgainError) {
     super("commitTurn refused");
     this.answer = answer;
   }
@@ -328,10 +367,36 @@ function checkTurn(turn: Row): void {
 }
 
 /**
- * What code checks before the database is reached (the schema's rules this layer relies on, and every name that reaches
- * SQL as an identifier), so a malformed request writes nothing and touches nothing.
+ * K-05 v1.21's raise (README item 81; T-1509): writes.openQuestions.askAgain left out (null: the call is v1.20's,
+ * statement for statement), or a list of exactly one raise, its id and the version the turn read and no other field, with
+ * openQuestions.close empty. Anything else throws before the database is reached, naming the field alone (default 194;
+ * db/repo default 1): a second raise, or a raise beside a close, contradicts itself, and no reload cures it.
  */
-function checkRequest(request: CommitTurnRequest): void {
+function raiseOf(questions: Row): Raise | null {
+  if (questions.askAgain === undefined) {
+    return null;
+  }
+  const [raise, ...more] = listOf(questions, "askAgain", "writes.openQuestions");
+  if (raise === undefined || more.length > 0) {
+    fail("writes.openQuestions.askAgain does not hold exactly one raise (K-05 v1.21 default 194)");
+  }
+  if (!isRecord(raise) || Object.keys(raise).some((field) => field !== "id" && field !== "expectVersion")) {
+    fail("writes.openQuestions.askAgain[] is not a raise: an id and an expectVersion alone");
+  }
+  assertId(raise.id, "writes.openQuestions.askAgain[].id");
+  assertVersion(raise.expectVersion, "writes.openQuestions.askAgain[].expectVersion");
+  if (listOf(questions, "close", "writes.openQuestions").length > 0) {
+    fail("writes.openQuestions.close is not empty beside askAgain (K-05 v1.21 default 194)");
+  }
+  return { id: raise.id, expectVersion: raise.expectVersion };
+}
+
+/**
+ * What code checks before the database is reached (the schema's rules this layer relies on, and every name that reaches
+ * SQL as an identifier), so a malformed request writes nothing and touches nothing. Answers the raise a v1.21 request
+ * carries (raiseOf), or null.
+ */
+function checkRequest(request: CommitTurnRequest): Raise | null {
   const raw: unknown = request;
   if (!isRecord(raw)) {
     fail("the request is not an object");
@@ -360,6 +425,7 @@ function checkRequest(request: CommitTurnRequest): void {
     listOf(lists, first, `writes.${group}`);
     listOf(lists, second, `writes.${group}`);
   }
+  const raise = raiseOf(objectField(writes, "openQuestions", "writes"));
   listOf(writes, "outboxRows", "writes");
   listOf(writes, "events", "writes");
   if (writes.effects !== undefined) {
@@ -407,6 +473,7 @@ function checkRequest(request: CommitTurnRequest): void {
       }
     }
   }
+  return raise;
 }
 
 // ---- the transaction's scope, set per write ---------------------------------------------------------------------------
@@ -489,6 +556,8 @@ interface Context extends RowWriter {
    * none (v1.16's answer).
    */
   readonly answerNames: ReadonlyMap<string, string>;
+  /** The open question the request asks again (K-05 v1.21 item 81; T-1509), or null: it raises none. */
+  readonly raise: Raise | null;
 }
 
 /**
@@ -1161,6 +1230,13 @@ async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise
     assertVersion(close.expectVersion, "openQuestions.close[].expectVersion");
     want("open_questions", close.id, "update", close.expectVersion);
   }
+  // The question a v1.21 request asks again (item 81; T-1509), beside the closes: locked FOR UPDATE with the commit's
+  // other rows in (table, row id) order and compared as an update, so a version moved since the turn read it answers
+  // versionChanged, each changed row listed once (default 7). One the request names that does not exist, or one this
+  // commit opens, is not there when the locks are taken, so its lock throws (default 1).
+  if (ctx.raise !== null) {
+    want("open_questions", ctx.raise.id, "update", ctx.raise.expectVersion);
+  }
   for (const cancel of writes.clockRows.cancel) {
     assertId(cancel.id, "clockRows.cancel[].id");
     assertVersion(cancel.expectVersion, "clockRows.cancel[].expectVersion");
@@ -1248,6 +1324,18 @@ async function lockAndCompare(ctx: Context, request: CommitTurnRequest): Promise
         rowId: letGo.effectId,
         state: row.state as K05.EffectState,
       });
+    }
+  }
+
+  // The question asked again must be live, waiting or open, at the version read; else wrongState with its status now,
+  // after versionChanged and an effect let go's (K-05 v1.21 item 81, step 2; default 193).
+  if (ctx.raise !== null) {
+    const status = locked("open_questions", ctx.raise.id).row.status;
+    if (status !== "waiting" && status !== "open") {
+      if (status !== "answered" && status !== "defaulted" && status !== "withdrawn") {
+        throw new Error("commitTurn: an open question to ask again has a status K-04 does not name");
+      }
+      throw new Refused({ error: "wrongState", table: "open_questions", rowId: ctx.raise.id, state: status });
     }
   }
 
@@ -1412,6 +1500,23 @@ async function writeOpenQuestions(
       throw new Error("commitTurn: an open question's close matched no row at its version");
     }
     out.written.push({ table: "open_questions", rowId: close.id, version: row.version });
+  }
+  // After the opens and closes, the question a v1.21 request asks again (item 81, step 3; T-1509): its ask count and its
+  // version each raised by one, at the version read and while it is live, under its business as locked; nothing else of
+  // it moves (default 195). written names it at its new version, after the opens and closes (default 198).
+  const raise = ctx.raise;
+  if (raise !== null) {
+    const locked = lockedRow(compared, "open_questions", raise.id);
+    await ctx.scope.to(locked.business);
+    const [row] = await tx<{ version: number }[]>`
+      update open_questions set ask_count = ask_count + 1, version = ${raise.expectVersion + 1}
+      where id = ${raise.id} and version = ${raise.expectVersion} and status in ('waiting', 'open')
+      returning version
+    `;
+    if (row === undefined) {
+      throw new Error("commitTurn: an open question asked again matched no live row at its version");
+    }
+    out.written.push({ table: "open_questions", rowId: raise.id, version: row.version });
   }
 }
 
@@ -2014,12 +2119,16 @@ async function repeatOf(tx: Sql, turnId: string): Promise<CommitTurnOutcome> {
   };
 }
 
-/** The whole commit inside the transaction `tx` (the runtime side, no scope at its start). */
+/**
+ * The whole commit inside the transaction `tx` (the runtime side, no scope at its start), with the raise checkRequest
+ * took from the request (null: it raises none).
+ */
 async function commitIn(
   tx: Sql,
   request: CommitTurnRequest,
+  raise: Raise | null,
   options: CommitOptions,
-): Promise<CommitTurnOutcome> {
+): Promise<CommitTurnAskAgainOutcome> {
   const { turn } = request;
   const now = await commitMoment(tx, options);
   const inserted = await tx<{ id: string }[]>`
@@ -2046,6 +2155,7 @@ async function commitIn(
     tables: new Map(),
     answerNames: answerNamesOf(request),
     namedUpdates: new Map(),
+    raise,
   };
   const compared = await lockAndCompare(ctx, request);
   const out: Written = { written: [], outboxRows: [], promoted: [], superseded: [], withdrawn: [] };
@@ -2178,15 +2288,32 @@ function scrubbed(error: unknown): unknown {
  * versionChanged's changed) named by its handle id; without the field the answer is v1.16's. Throws for a request it
  * cannot carry out (see the top of this file), a database error as CommitTurnDatabaseError; nothing is written then
  * either.
+ *
+ * Two overloads (K-05 v1.21 item 81 and default 199; T-1509): a request that asks an open question again
+ * (writes.openQuestions.askAgain given) may also answer v1.21's wrongState for that question, when it is not live; a
+ * request with no askAgain is v1.20's call and keeps v1.20's answer type, since a commit that raises nothing never answers
+ * that wrongState.
  */
 export async function commitTurn(
   sql: Sql,
-  request: CommitTurnRequest,
+  request: CommitTurnAskAgainRequest,
+  options?: CommitOptions,
+): Promise<CommitTurnAskAgainOutcome>;
+export async function commitTurn(
+  sql: Sql,
+  request: CommitTurnRequest & RaisesNothing,
+  options?: CommitOptions,
+): Promise<CommitTurnOutcome>;
+export async function commitTurn(
+  sql: Sql,
+  request: CommitTurnRequest | CommitTurnAskAgainRequest,
   options: CommitOptions = {},
-): Promise<CommitTurnOutcome> {
-  checkRequest(request);
+): Promise<CommitTurnAskAgainOutcome> {
+  const raise = checkRequest(request);
   try {
-    return await inRuntimeTransaction(sql, { readOnly: false }, (tx) => commitIn(tx, request, options));
+    return await inRuntimeTransaction(sql, { readOnly: false }, (tx) =>
+      commitIn(tx, request, raise, options),
+    );
   } catch (error) {
     if (error instanceof Refused) {
       return error.answer;

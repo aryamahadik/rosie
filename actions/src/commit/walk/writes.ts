@@ -22,6 +22,28 @@
 // branch, with the settled branch in the chosen one's place (its writers handed it as the branch chosen, the unit's why
 // naming it). A held answer asks no settler and writes nothing. With no settler bound the walk is exactly as above.
 //
+// A settled buttons step (T-1491; K-09 README default 199, from T-1515; DL-1033 ruling 7): where the walk would stop at a
+// plain step with no branches whose message has buttons (S1-04), a buttons settler is bound for that step
+// (WalkDeps.buttonsSettlers, buttons.ts; not T-1502's `settlers`, which stay split-only), and no hold keeps that step
+// back, the walk builds the rows before that step, then asks the settler once, handing it the call, the step, the turn
+// and the rows built so far. "ask": the step is asked exactly as default 10 asks it today. Rows: the step is written as
+// walked (a key it does not give is refused, givesNotStep) and the walk goes on from its next (walk.ts Stretch.walkOn),
+// holds re-checked for each later step, the loop check and MAX_WALK covering both stretches; each later stretch finds its
+// writers when it is reached. A refusal, a failed read or any other answer: nothing written (fail closed). With no
+// buttons settler bound for the step, the walk is today's, byte for byte.
+//
+// A returning number's chat thread (T-1519; DL-1048, from T-1517's round 2): K-04 holds one chat thread per handle across
+// every business (0005 threads_one_chat_per_handle; MC C1) and one thread per Linq chat id (threads_linq_chat_key), so
+// S1-01's insert for a handle that already has its chat (a re-JOIN, the user's phone after T-1517's roster reset, a
+// customer who later signs up) is refused by the database, commitTurn answers constraint and writes nothing, and JOIN
+// gets no reply. Where the binding hands in the chat read (WalkDeps.chats: K-05 v1.10 item 51's readChatHandle, on the
+// runtime side, since rosie_app holds no grant on threads: 0012), S1-01's thread write asks it once for the turn's Linq
+// chat id: when the handle whose chat thread holds that chat id is the turn's own, the handle's chat thread already
+// exists and is reused, so the walk writes no thread row and no `thread.created` entry, and the part still gives
+// `thread`, as a new thread's would (nothing the turn writes names the thread's id: K-05 v1 outboxRowNew has no thread);
+// for any other answer (no thread holds the chat id, or another handle's does) the thread is inserted exactly as before.
+// With no chat read bound, the thread is inserted exactly as before.
+//
 // It only reads (the pinned graph through its own port; the answered question and what each step writer reads, on the
 // call's transaction; the call's request) and has no outside effect, since a repeated turn runs it again before K-05
 // answers repeated (STATE note 1; types.ts CommitPorts). Nothing here logs; what it throws names faults, step ids and
@@ -30,7 +52,8 @@
 // What it writes, step by step (each journey's lane extends the writers; anything else is notBuilt, nothing written):
 //   - a plain step's gives with no writer bound: `thread` (S1-01) only, the handle's chat with Rosie's number (K-04
 //     threads: kind chat, no booking, the Linq chat id of the turn's last text, no reply address), with its
-//     `thread.created` entry, whose values name the kind alone, never the chat id (K-09 v1.5 defaults 134 and 135);
+//     `thread.created` entry, whose values name the kind alone, never the chat id (K-09 v1.5 defaults 134 and 135); or,
+//     where the chat read finds the handle's own chat thread holding the turn's chat id, no row and no entry (default 12);
 //   - the split it stops at, when Rosie asks it of the turn's own writer by text (S1-02): one open question (no options,
 //     no read-back, step 9's default clock: K-09 v1.5 default 134) with the card's safe default for its clock row, and
 //     one quick reply on the turn's service (defaults 132 and 133);
@@ -92,6 +115,23 @@
 //      handle, at the chosen step, of the call's business, read on the call's transaction; any other is refused. It is
 //      closed answered with no option id (K-05 v1 openQuestionClose.answeredOptionId null): S1-02 is asked with no
 //      options (K-09 v1.5 default 134), so none went out; one that went out with options is notBuilt (buttons).
+//  12. (T-1519) The handle's chat thread is found by the turn's Linq chat id (K-05 v1.10 item 51, readChatHandle: the
+//      phone handle whose chat thread holds it), the only frozen K-05 read that names a chat thread's handle before any
+//      outbox row exists (sendState, item 28, reads a handle's chat by an outbox row's id). The turn's own handle in the
+//      answer is the handle's chat thread for this very chat: it is reused, with no row written, no row read into
+//      versionsRead (a thread is never deleted, 0005's foreign keys restrict, and no call moves it to another handle), and
+//      the part's gives unchanged. Any other answer keeps today's insert: none (no thread holds the chat id), so the
+//      handle has no chat thread for it; or another handle's, which the database refuses (threads_linq_chat_key) as it
+//      did before. Not covered, and left as it was: a handle whose chat thread holds another chat id, or none yet, since
+//      no frozen K-05 read answers a handle's chat thread by the handle before an outbox row exists; its insert is still
+//      refused (threads_one_chat_per_handle). The read is asked only for a thread the walk would write: never for an
+//      email turn (threadByEmail) and never for a held step.
+//  13. (T-1491) A walk in stretches (K-09 README default 199) finds each stretch's writers when that stretch is reached:
+//      the first stretch's before anything is read, as default 9 says, and a later stretch's after the buttons settler
+//      answered rows. A step with no writer still refuses the part with nothing written: writesOf hands back no row until
+//      its whole walk is built, so the rows built before the refusal are dropped with it.
+//  14. (T-1491) A buttons settler is handed copies of the lists built so far, so what it does with them never changes
+//      the part's rows; the rows themselves are the writers' objects, read-only by contract (a settler writes nothing).
 
 import type { Choice, Decided, SetupKey } from "../../gate/framework";
 import { PROTECTIVE_STEPS, SAFETY_FLOW_STEPS, holdClassOf, isHeld, type HoldClass } from "../hold";
@@ -112,10 +152,11 @@ import type {
   UnitWrites,
   Why,
 } from "../types";
+import { buttonsAnswer, type ButtonsSettler, type ButtonsSettlers, type RowsBuilt } from "./buttons";
 import { WalkNotBuiltError, WalkRefusedError } from "./errors";
 import { flowGraphOf, flowOfStep, type FlowGraph, type FlowLetter, type GraphStep } from "./graph";
 import { isSplitStep, settledBranch, type StepSettler, type StepSettlers } from "./settle";
-import { walkFrom, type WalkStart, type Walked } from "./walk";
+import { walkStretchFrom, type Stretch, type WalkStart, type Walked } from "./walk";
 
 /** A bundle id as the turn row pins it (K-05 v1 turn.bundleId; K-01 v1 bundleId). */
 export interface BundleIdOf {
@@ -156,6 +197,20 @@ export interface WalkQuestions<Repo = unknown> {
    * (db/repo/targets.ts liveOpenQuestionsOfHandle, as limit 3 reads them), whose rows carry their versions.
    */
   liveQuestion(repo: Repo, handleId: string, openQuestionId: string): Promise<LiveQuestion | null>;
+}
+
+/**
+ * Where S1-01's thread write finds the handle's chat thread (T-1519; default 12): K-05 v1.10 item 51's readChatHandle,
+ * which the binding runs on the runtime side in a read-only transaction of its own (threads and handles are scoped none,
+ * and rosie_app holds no grant on either: 0012), never on the call's transaction.
+ */
+export interface WalkChats {
+  /**
+   * The id of the phone handle whose chat thread (K-04 threads of kind chat) holds the Linq chat id `linqChatId`
+   * (threads_linq_chat_key: one thread at most), or null when no chat thread of a phone handle holds it. The number the
+   * read also answers is never handed to the walk. A read that answers an error throws, and the call fails closed.
+   */
+  chatHandle(linqChatId: string): Promise<string | null>;
 }
 
 /** What one step's writer hands the walk: its rows in its own order, each list present (empty when it has none). */
@@ -223,6 +278,18 @@ export interface WalkDeps<Repo = unknown> {
    * question and that no hold keeps back. Left out, no settler is bound and the walk is exactly as before.
    */
   readonly settlers?: StepSettlers<Repo>;
+  /**
+   * The read-only buttons settlers by step id (K-09 README default 199; T-1491; buttons.ts), handed in as `settlers`
+   * is. The walk asks one only where it would stop at a plain step with no branches whose message has buttons (S1-04),
+   * bound for that step, that no hold keeps back: once, after the rows before that step are built. Left out, or binding
+   * none for that step, the walk is exactly as before.
+   */
+  readonly buttonsSettlers?: ButtonsSettlers<Repo>;
+  /**
+   * Where S1-01's thread write finds the handle's chat thread (T-1519; default 12), handed in as `questions` is. Left
+   * out, S1-01's thread is inserted exactly as before.
+   */
+  readonly chats?: WalkChats;
 }
 
 /** The service and Linq chat id of the turn's last text (K-09 v1.5 gateAndCommit.turn; default 135). */
@@ -392,6 +459,8 @@ interface WalkRun<Repo> {
   /** Where an answer reads its question (default 11); null for a walk from a step. */
   readonly questions: WalkQuestions<Repo> | null;
   readonly writers: StepWriters<Repo> | null;
+  /** Where S1-01's thread write finds the handle's chat thread (default 12); null when none is bound. */
+  readonly chats: WalkChats | null;
 }
 
 /** Who writes one step's rows: the writer bound to its id, or the walk itself (S1-01's thread, a question, or none). */
@@ -427,11 +496,23 @@ interface Built {
   readonly gives: SetupKey[];
 }
 
-/**
- * The rows of the steps a walk writes, in order. Every step's writer is found first, so a step with none refuses the part
- * before anything is read; the turn's service and chat id are read once, when a row needs them.
- */
-async function writeRows<Repo>(run: WalkRun<Repo>, writing: readonly Writing[]): Promise<Built> {
+/** The rows of one part, built stretch by stretch (default 199): every list, the row ids and the text source shared. */
+interface RowBuilder {
+  readonly built: Built;
+  /**
+   * Adds the rows of the steps a stretch writes, in order. Every step's writer is found first, so a step with none
+   * refuses the part before anything of the stretch is read; the turn's service and chat id are read once, when a row
+   * first needs them.
+   */
+  write(writing: readonly Writing[]): Promise<void>;
+  /** Adds a walked step's rows as its buttons settler answered them (default 199): a key its step does not give is refused. */
+  settled(step: GraphStep, rows: StepRows): void;
+  /** The rows built so far, each list a copy: what a buttons settler is handed (default 199). */
+  soFar(): RowsBuilt;
+}
+
+/** The row builder of one walk (rowBuilderOf's lists start empty). */
+function rowBuilderOf<Repo>(run: WalkRun<Repo>): RowBuilder {
   const built: Built = {
     versionsRead: [],
     state: [],
@@ -445,10 +526,18 @@ async function writeRows<Repo>(run: WalkRun<Repo>, writing: readonly Writing[]):
   let source: TextSource | undefined;
   const text = (): TextSource => (source ??= textSourceOf(context.request));
 
-  /** S1-01 gives thread: the handle's chat with Rosie's number, and its entry (defaults 134, 135; default 5). */
-  const thread = (step: GraphStep): void => {
+  /**
+   * S1-01 gives thread: the handle's chat with Rosie's number, and its entry (defaults 134, 135; default 5); or, where the
+   * chat read finds the handle's own chat thread holding the turn's chat id, that thread, reused with nothing written
+   * (default 12).
+   */
+  const thread = async (step: GraphStep): Promise<void> => {
     const { service, chatId } = text();
     if (!LINQ_SERVICES.includes(service)) throw new WalkNotBuiltError("threadByEmail", [step.id]);
+    if (run.chats !== null && (await run.chats.chatHandle(chatId)) === context.turn.handleId) {
+      if (!built.gives.includes(THREAD)) built.gives.push(THREAD);
+      return;
+    }
     const id = run.nextId("thread", step.id);
     built.state.push({
       op: "insert",
@@ -540,7 +629,21 @@ async function writeRows<Repo>(run: WalkRun<Repo>, writing: readonly Writing[]):
     built.closes.push({ id: row.id, expectVersion: row.version, status: "answered", answeredOptionId: null });
   };
 
-  /** A step's rows by its own writer (default 9), added in the walk's order; a key its step does not give is refused. */
+  /**
+   * A step's rows, by its own writer (default 9) or its buttons settler (default 199), added in the walk's order; a key
+   * its step does not give is refused.
+   */
+  const add = (step: GraphStep, rows: StepRows): void => {
+    const other = rows.gives.find((key) => !step.gives.includes(key));
+    if (other !== undefined) throw new WalkRefusedError("givesNotStep", [step.id, other]);
+    built.state.push(...rows.state);
+    built.stateEvents.push(...rows.stateEvents);
+    built.asks.push(...rows.asks);
+    built.messages.push(...rows.messages);
+    for (const key of rows.gives) if (!built.gives.includes(key)) built.gives.push(key);
+  };
+
+  /** A step's rows by its own writer (default 9). */
   const written = async (step: GraphStep, writer: StepWriter<Repo>): Promise<void> => {
     const rows = await writer({
       repo: context.repo,
@@ -556,31 +659,67 @@ async function writeRows<Repo>(run: WalkRun<Repo>, writing: readonly Writing[]):
         text,
       },
     });
-    const other = rows.gives.find((key) => !step.gives.includes(key));
-    if (other !== undefined) throw new WalkRefusedError("givesNotStep", [step.id, other]);
-    built.state.push(...rows.state);
-    built.stateEvents.push(...rows.stateEvents);
-    built.asks.push(...rows.asks);
-    built.messages.push(...rows.messages);
-    for (const key of rows.gives) if (!built.gives.includes(key)) built.gives.push(key);
+    add(step, rows);
   };
 
-  const planned = writing.map((each) => ({ each, by: writtenBy(run.writers, each) }));
-  for (const { each, by } of planned) {
-    const { step } = each;
-    if (each.as === "waits") throw new WalkNotBuiltError("waits", [step.id]);
-    if (each.as === "asks") {
-      asked(step);
-      continue;
+  const write = async (writing: readonly Writing[]): Promise<void> => {
+    const planned = writing.map((each) => ({ each, by: writtenBy(run.writers, each) }));
+    for (const { each, by } of planned) {
+      const { step } = each;
+      if (each.as === "waits") throw new WalkNotBuiltError("waits", [step.id]);
+      if (each.as === "asks") {
+        asked(step);
+        continue;
+      }
+      if (each.as === "answer") await answered(step);
+      if (by === "walk") {
+        for (const key of step.gives) if (key === THREAD) await thread(step);
+      } else {
+        await written(step, by);
+      }
     }
-    if (each.as === "answer") await answered(step);
-    if (by === "walk") {
-      for (const key of step.gives) if (key === THREAD) thread(step);
-    } else {
-      await written(step, by);
-    }
-  }
-  return built;
+  };
+
+  const soFar = (): RowsBuilt => ({
+    versionsRead: [...built.versionsRead],
+    state: [...built.state],
+    stateEvents: [...built.stateEvents],
+    asks: [...built.asks],
+    closes: [...built.closes],
+    messages: [...built.messages],
+    gives: [...built.gives],
+  });
+
+  return { built, write, settled: add, soFar };
+}
+
+/** A stretch's stop that a bound buttons settler may settle (default 199): its step, the settler and the walk on. */
+interface ButtonsSettling<Repo> {
+  readonly step: GraphStep;
+  readonly settler: ButtonsSettler<Repo>;
+  readonly walkOn: () => Stretch;
+}
+
+/**
+ * The buttons settler bound to the step a stretch stops at (default 199), when that step is a plain step with no
+ * branches whose message has buttons: null for any other stop, or when none is bound. Holds are the caller's to check.
+ */
+function buttonsSettlingOf<Repo>(deps: WalkDeps<Repo>, stretch: Stretch): ButtonsSettling<Repo> | null {
+  const { stop, walkOn } = stretch;
+  if (deps.buttonsSettlers === undefined || walkOn === null || stop.kind !== "asks") return null;
+  const { step } = stop;
+  if (step.split || step.branches.length > 0 || step.buttons === 0) return null;
+  const settler = deps.buttonsSettlers(step.id);
+  return settler === null ? null : { step, settler, walkOn };
+}
+
+/**
+ * Where what is open stops a stretch after a walked step (default 199: holds re-checked): the index of its first step
+ * whose rows the open holds or an unread text keep back, each step of its own class (none is the part's own), or null.
+ */
+function firstHeldOn(stepIds: readonly string[], open: OpenHolds): number | null {
+  const index = stepIds.findIndex((id) => isHeld(stepHoldClass(id), open.holds, open.unreadEventIds));
+  return index === -1 ? null : index;
 }
 
 /** The decided texts a turn read. */
@@ -614,16 +753,23 @@ interface Walking<Repo> {
   readonly choice: Choice;
   readonly graph: FlowGraph;
   readonly start: WalkStart;
-  readonly walked: Walked;
+  /** The walk's first stretch (walk.ts walkStretchFrom). */
+  readonly walked: Stretch;
   readonly questions: WalkQuestions<Repo> | null;
   readonly why: Why;
 }
 
-/** The part's writes from its walk: what is open stops the walk at its first routine row (STATE note 1). */
+/**
+ * The part's writes from its walk: what is open stops the walk at its first routine row (STATE note 1). Where a stretch
+ * stops at a plain step with buttons whose buttons settler is bound and no hold keeps that step back (default 199), the
+ * rows before the step are built and the settler is asked once: "ask" asks the step as today; rows write it as walked
+ * and the walk goes on, its next stretch's holds re-checked. Any other stretch is written as before.
+ */
 async function unitOf<Repo>(deps: WalkDeps<Repo>, walking: Walking<Repo>): Promise<UnitWrites> {
   const { part, context, open, choice, graph, start, walked, questions, why } = walking;
-  const writing = writingOf(graph, walked);
-  const heldAt = firstHeld(
+  let stretch: Stretch = walked;
+  let writing: readonly Writing[] = writingOf(graph, stretch);
+  let heldAt = firstHeld(
     writing.map((each) => each.step.id),
     holdClassOf(part.part, choice),
     open,
@@ -641,8 +787,40 @@ async function unitOf<Repo>(deps: WalkDeps<Repo>, walking: Walking<Repo>): Promi
     writerLane: writerLaneOf(graph, start),
     questions,
     writers: deps.writers ?? null,
+    chats: deps.chats ?? null,
   };
-  const built = await writeRows(run, heldAt === null ? writing : writing.slice(0, heldAt));
+  const rows = rowBuilderOf(run);
+  for (;;) {
+    const settling = heldAt === null ? buttonsSettlingOf(deps, stretch) : null;
+    if (settling === null) {
+      await rows.write(heldAt === null ? writing : writing.slice(0, heldAt));
+      break;
+    }
+    // The rows before the step (its asked entry is the stretch's last), then its settler, once.
+    const { step, settler, walkOn } = settling;
+    await rows.write(writing.slice(0, -1));
+    const settled = await buttonsAnswer(settler, {
+      repo: context.repo,
+      businessId: context.businessId,
+      step,
+      part,
+      choice,
+      turn: context,
+      rows: rows.soFar(),
+    });
+    if (settled === "ask") {
+      await rows.write(writing.slice(-1));
+      break;
+    }
+    rows.settled(step, settled);
+    stretch = walkOn();
+    writing = writingOf(graph, stretch);
+    heldAt = firstHeldOn(
+      writing.map((each) => each.step.id),
+      open,
+    );
+  }
+  const { built } = rows;
   return {
     why,
     versionsRead: built.versionsRead,
@@ -702,7 +880,7 @@ async function settledWrites<Repo>(deps: WalkDeps<Repo>, settling: Settling<Repo
     choice: { ...choice, branch },
     graph,
     start,
-    walked: walkFrom(graph, start),
+    walked: walkStretchFrom(graph, start),
     questions,
     why: { step: split.id, choice: branch },
   });
@@ -738,7 +916,7 @@ async function walkWrites<Repo>(
     }
   }
   const start = named ?? startOf(choice);
-  const walked = walkFrom(graph, start);
+  const walked = walkStretchFrom(graph, start);
   // An answer closes its question at the version the question's row is read at: with no read bound, it is not built.
   const questions = start.kind === "branch" ? questionsOf(deps, choice, start.step) : null;
   const why: Why = { step: choice.step, choice: choice.branch ?? choice.label };

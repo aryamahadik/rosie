@@ -26,7 +26,9 @@ import { NotBuiltError } from "../../tool-api/errors";
  *     it (closed, never sent there, or not the chosen step's), or the option names none (T-1461);
  *   - givesNotStep: a step's writer gave a key its step does not give (K-01 v1 step.gives; T-1461);
  *   - settledNotInBundle: a split's bound settler answered no label of that step's branches in the turn's pinned graph,
- *     word for word (K-09 README default 191; T-1502), so the walk has no branch to take.
+ *     word for word (K-09 README default 191; T-1502), so the walk has no branch to take;
+ *   - settledNotRows: a plain step's bound buttons settler answered neither "ask" nor rows in a step writer's shape
+ *     (K-09 README default 199; T-1491), so the walk can neither ask the step nor write it as walked.
  */
 export type WalkFault =
   | "flowNotInBundle"
@@ -42,7 +44,8 @@ export type WalkFault =
   | "noTurnKey"
   | "questionNotLive"
   | "givesNotStep"
-  | "settledNotInBundle";
+  | "settledNotInBundle"
+  | "settledNotRows";
 
 /** The walk refused the part: the whole turn is refused and nothing is written. */
 export class WalkRefusedError extends Error {

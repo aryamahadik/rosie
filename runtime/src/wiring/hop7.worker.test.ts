@@ -10,7 +10,11 @@
 //     to 6 once each, then one decideReads span: two reads, first and check, both Haiku, agreeing, and no re-read; both
 //     reads enter c-01, the sign-up door, with the quote JOIN and no field, as decide-s1-01-enter.json's reads do with its
 //     own text (the gate is handed exactly that result); the context decide was given is recording 2's, field for field,
-//     so every call was answered from it (DL-347).
+//     with bundle v2 pinned in bundle v0's place, so every call was answered from recording 2's reads on bundle v2 (DL-347;
+//     test-support's onBundleV2). Test owner 1 holds no role, so the JOIN's S1-02 row is read by its sign-up line as the
+//     owner and its first text opens with signUpOpener (K-01 README default 19; T-1511); the turn pins bundle v2, which
+//     carries the line (T-1477), as hops 10 to 12 do (T-1512): on bundle v0 finalize would refuse the text and the reply
+//     would never end.
 //   - decide-reads-disagree.json, through the root's decide port in the turn loop (the frontier and the gate stood in with
 //     the fixtures: no stored state gives A7-17 on bundle v0): the decideReads span (Sonnet's and Haiku's reads differ on
 //     the high-stakes part), then one reread span (one Sonnet re-read), then the gate is asked with that part as one
@@ -60,12 +64,13 @@ import {
 import type { DecideContext, DecideResult, GateAndCommitRequest } from "../turn/types";
 import { composeRoot, SKELETON_FLAG, type HandleActors, type Root, type RootOptions } from "./index";
 import {
-  BUNDLE_V0,
+  BUNDLE_V2,
   disagreeContext,
   fakeFlags,
   SAM_CHAT,
   skeletonFakes,
   TEST_OWNER_1,
+  testClock,
   watchGate,
   withSamPhoneRow,
   type LinqInboundEvent,
@@ -100,6 +105,14 @@ const JOIN_CONTEXT = joinRunContext as unknown as DecideContext & {
   }[];
 };
 const [JOIN_TEXT_OF_RECORDING] = JOIN_CONTEXT.texts;
+/**
+ * The JOIN run's context with bundle v2 pinned in bundle v0's place (T-1512): the context decide is given when the turn
+ * pins bundle v2, which holds S1-01 and flow A's routing byte for byte as bundle v0 does (test-support's onBundleV2).
+ */
+const JOIN_CONTEXT_ON_V2: DecideContext = {
+  ...(structuredClone(joinRunContext) as unknown as DecideContext),
+  bundleId: { hash: BUNDLE_V2.hash, build: BUNDLE_V2.build },
+};
 
 /** The fictional numbers this file's texts come from, in each form a number could leak in. */
 const CAST_NUMBERS = ["0100", "0101"].flatMap((line) => [
@@ -222,8 +235,9 @@ interface Rig {
  * hands it watched.
  */
 function rig(log: MockInstance, fed: { deciders?: boolean } = {}): Rig {
-  // Sam's phone row, so the turn's reply this test waits for is sent (limit 8 at send, joined by T-562).
-  const fakes = withSamPhoneRow(skeletonFakes());
+  // Sam's phone row, so the turn's reply this test waits for is sent (limit 8 at send, joined by T-562); bundle v2 active,
+  // the JOIN's pin (T-1512).
+  const fakes = withSamPhoneRow(skeletonFakes(testClock(), { bundle: BUNDLE_V2 }));
   const root = composeRoot({
     environment: "test",
     sets: { fake: fakes.ports },
@@ -350,10 +364,10 @@ describe("hop 7 joined: decide's two reads and its one Sonnet re-read through @r
         const trace = run.traceOf(traceId);
         expectHopsOneToSeven(trace, traceId);
 
-        // The context decide was given is recording 2's, field for field (DL-347): the run's own turn id, bundle v0 as
-        // published, the JOIN at its send time, and the frontier's one choice, c-01, the sign-up door.
+        // The context decide was given is recording 2's, field for field (DL-347), but for the pinned bundle: the run's own
+        // turn id, bundle v2 as published, the JOIN at its send time, and the frontier's one choice, c-01, the sign-up door.
         expect(turnId).toBe(JOIN_CONTEXT.turnId);
-        expect(run.fakes.decide.decideCalls).toEqual([joinRunContext]);
+        expect(run.fakes.decide.decideCalls).toEqual([JOIN_CONTEXT_ON_V2]);
         expect(JOIN_CONTEXT.choices).toMatchObject([
           { choiceId: "c-01", kind: "door", door: "signUp", stakes: "low" },
         ]);
@@ -365,7 +379,7 @@ describe("hop 7 joined: decide's two reads and its one Sonnet re-read through @r
           outcome: "ok",
           error_code: null,
           turn_id: turnId,
-          bundle_id: BUNDLE_V0,
+          bundle_id: BUNDLE_V2,
           business_id: TEST_OWNER_1.businessId,
           got: { choices: 1 },
           decided: {
@@ -402,7 +416,7 @@ describe("hop 7 joined: decide's two reads and its one Sonnet re-read through @r
         // Both reads enter c-01, the sign-up door, with the quote JOIN and no field: the result the gate was handed is
         // decide-s1-01-enter.json's with the run's own turn, bundle and text.
         const decided = gateRequestOf(run.gateCalls);
-        expect(decided.decide).toEqual(enterResultFor(JOIN_CONTEXT, "JOIN"));
+        expect(decided.decide).toEqual(enterResultFor(JOIN_CONTEXT_ON_V2, "JOIN"));
         expect(decided.decide.reads.map((read) => [read.model, read.role, read.output])).toEqual([
           [
             "haiku",
@@ -415,18 +429,20 @@ describe("hop 7 joined: decide's two reads and its one Sonnet re-read through @r
             { language: "en", parts: [{ verb: "enter", quote: "JOIN", choice: "c-01", fields: [] }] },
           ],
         ]);
-        expect(decided.context).toEqual(joinRunContext);
+        expect(decided.context).toEqual(JOIN_CONTEXT_ON_V2);
 
-        // Every decide call was answered from recording 2 as ai/recordings keys it, both reads alike; no miss.
+        // Every decide call was answered from recording 2's reads on bundle v2, keyed as ai/recordings keys a read (its
+        // context and role), both reads alike; no miss.
+        const onV2 = ["decide-s1-01-join-first-on-bundle-v2", "decide-s1-01-join-check-on-bundle-v2"];
         expect(run.fakes.decide.misses).toEqual([]);
         expect(run.fakes.decide.calls.map((call) => [call.model, call.step, call.recordings])).toEqual([
-          [HAIKU_MODEL, 1, ["decide-s1-01-join-first", "decide-s1-01-join-check"]],
-          [HAIKU_MODEL, 1, ["decide-s1-01-join-first", "decide-s1-01-join-check"]],
-          [HAIKU_MODEL, 2, ["decide-s1-01-join-first", "decide-s1-01-join-check"]],
-          [HAIKU_MODEL, 2, ["decide-s1-01-join-first", "decide-s1-01-join-check"]],
+          [HAIKU_MODEL, 1, onV2],
+          [HAIKU_MODEL, 1, onV2],
+          [HAIKU_MODEL, 2, onV2],
+          [HAIKU_MODEL, 2, onV2],
         ]);
         expect(run.fakes.decide.rereadCalls).toEqual([]);
-        expect(run.fakes.decide.asked).toEqual([`${BUNDLE_V0.hash}/${String(BUNDLE_V0.build)}`]);
+        expect(run.fakes.decide.asked).toEqual([`${BUNDLE_V2.hash}/${String(BUNDLE_V2.build)}`]);
         // The turn went on through the joined gate and committed its one row; no live call, no number or words in a span.
         expect([...run.fakes.turnRows.turns.keys()]).toEqual([turnId]);
         expect(fetch).not.toHaveBeenCalled();

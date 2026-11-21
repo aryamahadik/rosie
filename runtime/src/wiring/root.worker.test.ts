@@ -9,8 +9,11 @@
 // recorded-model double (./test-support.ts fakeSafetyModels, which holds each text these tests send); its model-call span
 // (a portCall to provider anthropic, one per try) sits in the text's trace beside the hops, is set aside from the hop
 // count as the actor's own receive span is, and is checked on its own. Since T-556 joined the bundle reads and the
-// guard's targets, the turn pins bundle v0 as bundles/v0 publishes it (./test-support.ts fakeBundleReads, a K-05
-// double), and the guard reads test owner 1's seeded targets (fakeHandleTargets, as targets-first-text.json answers).
+// guard's targets, the turn pins the active bundle (./test-support.ts fakeBundleReads, a K-05 double): bundle v2 as
+// bundles/v2 publishes it (T-1477), since Sam holds no role, so his turn's S1-02 row is read by its sign-up line as the
+// owner and its first text opens with signUpOpener, which bundle v2 carries (K-01 README default 19; T-1511, T-1512: on
+// bundle v0 finalize would refuse the text and nothing would be sent), and the guard reads test owner 1's seeded targets
+// (fakeHandleTargets, as targets-first-text.json answers).
 // Since T-557 joined the frontier, the turn's frontier is @rosie/actions' turn face over the bundle the turn pinned and
 // test owner 1's seeded stored state (fakeFrontierScope), whose Tool API base records the frontier span. Since T-558
 // joined decide, the turn's two reads go through @rosie/ai's decider over the recorded-model double (fakeDecideModels,
@@ -54,11 +57,12 @@ import { checkHops, hopsOfTrace, leaks, spansOfLogLines, spansOfTrace } from "..
 import { SAM, until } from "../turn/test-support";
 import { composeRoot, type HandleActors, type Root } from "./index";
 import {
-  BUNDLE_V0,
+  BUNDLE_V2,
   SAM_CHAT,
   SAM_TRADES_TEXT,
   samPhoneRow,
   skeletonFakes,
+  testClock,
   watchGate,
   type LinqInboundEvent,
   type SignedWebhook,
@@ -174,7 +178,7 @@ interface Run {
 }
 
 function rig(log: MockInstance): Run {
-  const fakes = skeletonFakes();
+  const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
   const root = composeRoot({
     environment: "test",
     sets: { fake: fakes.ports },
@@ -186,7 +190,7 @@ function rig(log: MockInstance): Run {
     // The chat-open port (T-1213) over the dispatch double: each text opens its number's chat before the actor.
     chatOpenCall: fakes.dispatch.openChat,
     safetyReaders: fakes.models.readers,
-    // The bundle and targets ports (T-556) on their K-05 doubles: bundle v0 as bundles/v0 publishes it is active.
+    // The bundle and targets ports (T-556) on their K-05 doubles: bundle v2 as bundles/v2 publishes it is active (T-1512).
     bundleReads: fakes.bundleReads.calls,
     handleTargets: fakes.handleTargets.call,
     // The frontier port (T-557) over its K-05 double: test owner 1's seeded rows, so the frontier's answer is turn 1's.
@@ -370,9 +374,9 @@ describe("through the composition root, every port on its fake: a text's webhook
         expect(run.fakes.decide.misses).toEqual([]);
         expect(run.fakes.composer.misses).toEqual([]);
 
-        // One bundle id: the root's active id at receipt is the one the turn pinned, on every span (bundle v0's).
+        // One bundle id: the root's active id at receipt is the one the turn pinned, on every span (bundle v2's).
         expect(new Set(trace.map((span) => JSON.stringify(span.bundle_id)))).toEqual(
-          new Set([JSON.stringify(BUNDLE_V0)]),
+          new Set([JSON.stringify(BUNDLE_V2)]),
         );
         // The gate request carries the text's trace id (one id from the webhook to the receipt).
         expect(run.gateCalls.map((call) => call.request.turn.traceId)).toEqual([traceId]);

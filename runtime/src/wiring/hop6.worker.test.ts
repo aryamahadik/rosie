@@ -6,15 +6,17 @@
 // call's business scope and its one frontier span; the frontier with main's sources, T-1147's sign-up door among them),
 // fed the frontier's scope over a K-05 v1.2 readTurnState double holding test owner 1's seeded rows (T-1148; T-315's
 // integration test shows the real readTurnState gives that answer on those rows on local PostgreSQL), and reading the
-// bundle the turn's run pinned (bundle v0 as bundles/v0 publishes it).
+// bundle the turn's run pinned (bundle v2 as bundles/v2 publishes it: test owner 1 holds no role, so the JOIN's S1-02 row
+// is read by its sign-up line as the owner and its first text opens with signUpOpener, K-01 README default 19, T-1511;
+// bundle v2 carries the line, T-1477, as hops 10 to 12 pin it, T-1512; on bundle v0 finalize would refuse the text).
 //
 //   - JOIN from the seeded test owner: hops 1 to 5 once each, in order, under one trace id; then the frontier from the
-//     Tool API: its span carries bundle v0's id, its one read of the stored state is test owner 1's under Lee's
+//     Tool API: its span carries bundle v2's id, its one read of the stored state is test owner 1's under Lee's
 //     Barbershop's scope (no role, open question, booking or phone row: an empty read), and the JOIN turn's choices equal
 //     build-frontier-s1-01.json's: one choice, c-01, the sign-up door to S1-01 (kind door, door signUp, label 'Business
 //     onboarding', low stakes, target Lee's Barbershop). The pool's BUNDLES namespace is empty, so the bundle part the
 //     frontier reads (flow/A) comes from PostgreSQL's copy, and the frontier span says so (got.bundleFrom).
-//   - With bundle v0 in KV, the same turn reads its parts from KV, and the span says so.
+//   - With bundle v2's manifest and flow A in KV, the same turn reads its parts from KV, and the span says so.
 //   - With no frontier scope handed in (the Worker until T-567): the frontier fails closed inside the Tool API base,
 //     before anything is read; nothing reaches decide or a commit.
 //   - Inside workerd the frontier port's checks are the prebuilt ones (T-1144): a call checks its request (a request K-09
@@ -34,7 +36,6 @@ import { reset, runDurableObjectAlarm } from "cloudflare:test";
 import { env, exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
-import bundleV0Kv from "../../../bundles/v0/bundle.kv.json";
 import { QUIET_MS, turnIdOf, type HandleActor } from "../actor";
 import { actorNameOf } from "../gateway";
 import { openTrace, type Hop, type Span, type Trace } from "../trace";
@@ -44,11 +45,14 @@ import type { BuildFrontierRequest, DecideContext } from "../turn/types";
 import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "./index";
 import {
   BUNDLE_V0,
+  BUNDLE_V2,
+  BUNDLE_V2_KV,
   fakeFlags,
   JOIN_TEXT,
   SAM_CHAT,
   skeletonFakes,
   TEST_OWNER_1,
+  testClock,
   withSamPhoneRow,
   type LinqInboundEvent,
   type SignedWebhook,
@@ -96,8 +100,8 @@ const FROM_KV = { kind: "phone", address: "+15555550105" };
 const OWNER_ACTOR = actorNameOf(TEST_OWNER_1.handle);
 const UNSCOPED_ACTOR = actorNameOf(UNSCOPED);
 
-/** Bundle v0's flow graph key (K-01 v1): the part the frontier reads through the turn's pinned bundle. */
-const FLOW_A_KEY = `bundle/${BUNDLE_V0.hash}/${String(BUNDLE_V0.build)}/flow/A`;
+/** Bundle v2's flow graph key (K-01 v1): the part the frontier reads through the turn's pinned bundle. */
+const FLOW_A_KEY = `bundle/${BUNDLE_V2.hash}/${String(BUNDLE_V2.build)}/flow/A`;
 
 function namespace(): Namespace {
   return (exports as unknown as { HandleActor: Namespace }).HandleActor;
@@ -184,8 +188,9 @@ interface Rig {
  * the gate (joined by T-559) fed its reads' doubles, its one commit through the root's turn-row port.
  */
 function rig(log: MockInstance, fed: { frontier?: boolean } = {}): Rig {
-  // Sam's phone row, so the turn's reply this test waits for is sent (limit 8 at send, joined by T-562).
-  const fakes = withSamPhoneRow(skeletonFakes());
+  // Sam's phone row, so the turn's reply this test waits for is sent (limit 8 at send, joined by T-562); bundle v2 active,
+  // the JOIN's pin (T-1512).
+  const fakes = withSamPhoneRow(skeletonFakes(testClock(), { bundle: BUNDLE_V2 }));
   const root = composeRoot({
     environment: "test",
     sets: { fake: fakes.ports },
@@ -331,13 +336,13 @@ afterEach(async () => {
 
 describe("hop 6 joined: the frontier from the Tool API, over the bundle the turn pinned and its stored state", () => {
   it(
-    "JOIN from the seeded test owner: hops 1 to 5 once each, then the frontier span under bundle v0's id, one read of test owner 1's stored state under Lee's Barbershop, and the JOIN turn's choices those of build-frontier-s1-01.json; with KV empty, the bundle part comes from PostgreSQL and the span says so",
+    "JOIN from the seeded test owner: hops 1 to 5 once each, then the frontier span under bundle v2's id, one read of test owner 1's stored state under Lee's Barbershop, and the JOIN turn's choices those of build-frontier-s1-01.json; with KV empty, the bundle part comes from PostgreSQL and the span says so",
     { timeout: TEST_MS },
     async () => {
       const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
       const run = rig(log);
       try {
-        // KV is empty: the pool's BUNDLES namespace holds no part of bundle v0.
+        // KV is empty: the pool's BUNDLES namespace holds no part of bundle v2.
         expect(await env.BUNDLES?.get(FLOW_A_KEY)).toBeNull();
         run.fakes.known(JOIN_EVENT);
         // Its turn's two decide reads (decide, joined by T-558, runs on the recorded-model double).
@@ -353,9 +358,9 @@ describe("hop 6 joined: the frontier from the Tool API, over the bundle the turn
 
         const join = run.traceOf(joinTrace);
         expectHopsOneToFive(join, joinTrace);
-        // One bundle id on every span: bundle v0's, as bundles/v0 publishes it (…/2, its id read from its manifest).
+        // One bundle id on every span: bundle v2's, as bundles/v2 publishes it (its id read from its manifest).
         expect(new Set(join.map((span) => JSON.stringify(span.bundle_id)))).toEqual(
-          new Set([JSON.stringify(BUNDLE_V0)]),
+          new Set([JSON.stringify(BUNDLE_V2)]),
         );
         // The pin read the manifest from PostgreSQL's copy at the turn's start: KV holds none of it.
         expect(onlySpan(join, "lease")).toMatchObject({
@@ -364,7 +369,7 @@ describe("hop 6 joined: the frontier from the Tool API, over the bundle the turn
           got: { texts: 1, manifestFrom: "postgres" },
         });
 
-        // The frontier from the Tool API: the base's span, after the guard's, on the turn's trace under bundle v0's id,
+        // The frontier from the Tool API: the base's span, after the guard's, on the turn's trace under bundle v2's id,
         // for Lee's Barbershop; its one bundle part, flow A, read through the turn's pinned bundle from PostgreSQL's copy
         // on KV's miss, and the span says so.
         const frontier = frontierSpanOf(join);
@@ -372,7 +377,7 @@ describe("hop 6 joined: the frontier from the Tool API, over the bundle the turn
           outcome: "ok",
           error_code: null,
           turn_id: joinTurn,
-          bundle_id: BUNDLE_V0,
+          bundle_id: BUNDLE_V2,
           business_id: TEST_OWNER_1.businessId,
           got: {
             toolCall: "buildFrontier",
@@ -434,11 +439,11 @@ describe("hop 6 joined: the frontier from the Tool API, over the bundle the turn
             },
           }),
         ]);
-        // The rest of the context is the JOIN turn's own, on bundle v0: its turn, its text and Sam as the writer, with
+        // The rest of the context is the JOIN turn's own, on bundle v2: its turn, its text and Sam as the writer, with
         // nothing else held (no open question, card, fact or earlier message).
         expect(context).toMatchObject({
           turnId: joinTurn,
-          bundleId: BUNDLE_V0,
+          bundleId: BUNDLE_V2,
           flow: "A",
           writer: TURN_ONE.outcome.context.writer,
           businessLanguage: "en",
@@ -452,9 +457,9 @@ describe("hop 6 joined: the frontier from the Tool API, over the bundle the turn
           (context.texts as { eventId: string; words: string }[]).map((text) => [text.eventId, text.words]),
         ).toEqual([[JOIN_EVENT, JOIN_TEXT]]);
 
-        // The turn went on through the stood-in hops and committed its one row, under the pinned bundle v0.
+        // The turn went on through the stood-in hops and committed its one row, under the pinned bundle v2.
         expect([...run.fakes.turnRows.turns.values()].map((row) => [row.id, row.bundleId])).toEqual([
-          [joinTurn, BUNDLE_V0],
+          [joinTurn, BUNDLE_V2],
         ]);
         expect(leaks(run.spans(), [...CAST_NUMBERS, JOIN_TEXT])).toEqual([]);
         expectOneFrontierSpan(join);
@@ -485,7 +490,7 @@ describe("hop 6 joined: the frontier from the Tool API, over the bundle the turn
         expect(frontierSpanOf(trace)).toMatchObject({
           outcome: "failed",
           error_code: "NoDatabaseError",
-          bundle_id: BUNDLE_V0,
+          bundle_id: BUNDLE_V2,
           got: { toolCall: "buildFrontier", callerKind: "turn", bundleParts: [], bundleFrom: [] },
           decided: { answered: "thrown" },
         });
@@ -504,12 +509,12 @@ describe("hop 6 joined: the frontier from the Tool API, over the bundle the turn
   );
 
   it(
-    "with bundle v0 in KV, the turn's pin and its frontier read their parts from KV, and the frontier span says so",
+    "with bundle v2's manifest and flow A in KV, the turn's pin and its frontier read their parts from KV, and the frontier span says so",
     { timeout: TEST_MS },
     async () => {
       const bundles = env.BUNDLES;
       if (bundles === undefined) throw new Error("the pool's staging environment binds BUNDLES (T-566)");
-      for (const part of bundleV0Kv) await bundles.put(part.key, part.value);
+      for (const part of BUNDLE_V2_KV) await bundles.put(part.key, part.value);
       const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
       const run = rig(log);
       try {
@@ -531,7 +536,7 @@ describe("hop 6 joined: the frontier from the Tool API, over the bundle the turn
         expect(onlySpan(trace, "lease")).toMatchObject({ outcome: "ok", got: { manifestFrom: "kv" } });
         expect(frontierSpanOf(trace)).toMatchObject({
           outcome: "ok",
-          bundle_id: BUNDLE_V0,
+          bundle_id: BUNDLE_V2,
           got: { toolCall: "buildFrontier", bundleParts: ["flow/A"], bundleFrom: ["kv"] },
         });
         expect(contextOf(run.fakes).choices).toEqual(TURN_ONE_CHOICES);
@@ -540,7 +545,7 @@ describe("hop 6 joined: the frontier from the Tool API, over the bundle the turn
         expectOneFrontierSpan(trace);
       } finally {
         run.restore();
-        for (const part of bundleV0Kv) await bundles.delete(part.key);
+        for (const part of BUNDLE_V2_KV) await bundles.delete(part.key);
       }
     },
   );

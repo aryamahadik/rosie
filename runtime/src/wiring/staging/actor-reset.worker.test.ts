@@ -56,10 +56,12 @@ import { flush } from "../../turn/test-support";
 import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "../index";
 import type { HandleSealingKeyCall } from "../real";
 import {
+  BUNDLE_V2,
   fakeFlags,
   SAM_CHAT,
   skeletonFakes,
   TEST_OWNER_1,
+  testClock,
   watchGate,
   type LinqInboundEvent,
   type SignedWebhook,
@@ -195,6 +197,8 @@ describe("the hook (stagingActorReset)", () => {
   });
 
   it("on staging: nothing read but ENVIRONMENT as it is made; tp-01's actor named by its roster id and each allow-list number's by its place, the list read at each call; any other actor named by none", () => {
+    /** T-1517's entry (DL-1043): the allow-list alone, after the first; it names each allow-list number again. */
+    const ROSTER_RESET_ENTRY = "t1517-nov21";
     const reads: string[] = [];
     const values: Record<string, unknown> = {
       ENVIRONMENT: "staging",
@@ -205,21 +209,32 @@ describe("the hook (stagingActorReset)", () => {
     if (hook === null) throw new Error("staging gives a hook");
 
     expect(hook.matches(OWNER_ACTOR)).toEqual([{ entry: FIRST_ENTRY, target: "tp-01" }]);
-    expect(hook.matches("phone:+15555550104")).toEqual([{ entry: FIRST_ENTRY, target: "allowList:2" }]);
-    expect(hook.matches("phone:+15555550103")).toEqual([{ entry: FIRST_ENTRY, target: "allowList:1" }]);
+    expect(hook.matches("phone:+15555550104")).toEqual([
+      { entry: FIRST_ENTRY, target: "allowList:2" },
+      { entry: ROSTER_RESET_ENTRY, target: "allowList:2" },
+    ]);
+    expect(hook.matches("phone:+15555550103")).toEqual([
+      { entry: FIRST_ENTRY, target: "allowList:1" },
+      { entry: ROSTER_RESET_ENTRY, target: "allowList:1" },
+    ]);
     expect(hook.matches("phone:+15555550105")).toEqual([]);
     expect(hook.matches("email:sam@example.com")).toEqual([]);
-    expect(reads.filter((read) => read === "STAGING_LINQ_ALLOWLIST")).toHaveLength(5);
+    // Five calls, each reading the list once for each of the two allow-list targets.
+    expect(reads.filter((read) => read === "STAGING_LINQ_ALLOWLIST")).toHaveLength(10);
 
     // Read at each call: a number taken off the list is no longer named; one put on it is.
     values.STAGING_LINQ_ALLOWLIST = "+15555550105";
     expect(hook.matches("phone:+15555550104")).toEqual([]);
-    expect(hook.matches("phone:+15555550105")).toEqual([{ entry: FIRST_ENTRY, target: "allowList:1" }]);
-    // tp-01's number on the list too: both targets name its actor.
+    expect(hook.matches("phone:+15555550105")).toEqual([
+      { entry: FIRST_ENTRY, target: "allowList:1" },
+      { entry: ROSTER_RESET_ENTRY, target: "allowList:1" },
+    ]);
+    // tp-01's number on the list too: every target names its actor, in the list's order.
     values.STAGING_LINQ_ALLOWLIST = TP01_NUMBER;
     expect(hook.matches(OWNER_ACTOR)).toEqual([
       { entry: FIRST_ENTRY, target: "tp-01" },
       { entry: FIRST_ENTRY, target: "allowList:1" },
+      { entry: ROSTER_RESET_ENTRY, target: "allowList:1" },
     ]);
   });
 
@@ -512,7 +527,10 @@ describe("a stuck tp-01 clears, and its next JOIN commits through the hop rig wi
     { timeout: TEST_MS },
     async () => {
       const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
-      const fakes = skeletonFakes();
+      // Bundle v2 active, the JOIN's pin (T-1512): tp-01 holds no role, so the JOIN's S1-02 row is read by its sign-up line
+      // as the owner and its first text opens with signUpOpener, which bundle v2 carries (K-01 README default 19; T-1511);
+      // on bundle v0 finalize would refuse the text and the part would never go.
+      const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
       await holdTp01(fakes);
 
       // The deploy: the rig's root is the test environment's, which never sets the hook, so staging's own hook (the list

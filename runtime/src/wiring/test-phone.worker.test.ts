@@ -54,10 +54,12 @@ import {
 } from "./index";
 import type { TestPhoneLine } from "./test-phone/line";
 import {
+  BUNDLE_V2,
   fakeFlags,
   SAM_CHAT,
   SAM_TRADES_TEXT,
   skeletonFakes,
+  testClock,
   withSamPhoneRow,
   type LinqInboundEvent,
   type SignedWebhook,
@@ -225,8 +227,11 @@ interface RigOptions {
 }
 
 async function rig(options: RigOptions = {}): Promise<Run> {
-  // Sam's phone row, so the turn's reply this test waits for is sent (limit 8 at send, joined by T-562).
-  const fakes = withSamPhoneRow(skeletonFakes());
+  // Sam's phone row, so the turn's reply this test waits for is sent (limit 8 at send, joined by T-562); bundle v2 active,
+  // the JOIN's pin (T-1512): Sam holds no role, so the turn's S1-02 row is read by its sign-up line as the owner and its
+  // first text opens with signUpOpener, which bundle v2 carries (K-01 README default 19; T-1511); on bundle v0 finalize
+  // would refuse the text and the reply would never end.
+  const fakes = withSamPhoneRow(skeletonFakes(testClock(), { bundle: BUNDLE_V2 }));
   const reads = await testPhoneReads();
   const line = countingLine(testPhoneLineOf(lineNamespace()), reads.reached);
   const testPhone: TestPhoneInputs =

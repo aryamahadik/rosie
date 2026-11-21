@@ -463,10 +463,11 @@ describe("open gap 172: words before the list stay in the first part (K-02 READM
     const parts = matcher.match(HAIRCUTS);
     // The split is at commas, semicolons and line breaks alone: "We do" stays in the first part, "and" splits nothing.
     expect(parts.map((part) => part.words)).toEqual(["We do haircuts", "beard trims and shaves"]);
-    // What the matcher reads of each (reported for the architect: open gap 172): "We do haircuts" is `which` (two kinds
-    // fit "haircut"), and "beard trims and shaves" is new work (no kind reaches the floor).
+    // What the matcher reads of each (reported for the architect: open gap 172): "We do haircuts" lists hair (T-1518,
+    // DL-1042: the matcher's everyday words read "haircuts" as Hair salon, where two kinds once fit "haircut"), and
+    // "beard trims and shaves" is new work (no kind reaches the floor).
     expect(parts.map((part) => [part.outcome, part.kinds.map((kind) => kind.kindId)])).toEqual([
-      ["which", ["hair", "hair-restoration"]],
+      ["listed", ["hair"]],
       ["new_work", []],
     ]);
     // "We do haircuts" reads as "haircuts" would alone: "we" and "do" are function words the matcher drops.
@@ -476,12 +477,23 @@ describe("open gap 172: words before the list stay in the first part (K-02 READM
     );
   });
 
-  it("settled through the walk with c-01 named, the whole text as the field's words: notBuilt (which), nothing written", async () => {
+  it("settled through the walk with c-01 named, the whole text as the field's words: 'One isn't on the list yet', hair listed and one kind drafted", async () => {
     const walk = settledWalk();
-    const error = await refusal(walk, "c-01", HAIRCUTS);
-    expect(error).toBeInstanceOf(KindsNotBuiltError);
-    expect(error).toMatchObject({ seam: "which", ids: ["S1-02"] });
-    expect(walk.settled).toEqual([error]);
-    expectNothingWritten(walk);
+    const { writes } = await answer(walk, "c-01", HAIRCUTS);
+    expect(walk.settled).toEqual([ONE_NOT_LISTED]);
+    expect(writes.why).toEqual({ step: "S1-02", choice: ONE_NOT_LISTED });
+    expect(stepsWritten(walk)).toEqual(["S1-02", "S1-03", "S1-11"]);
+    // "We do haircuts" a listed pick of hair, "beard trims and shaves" a drafted kind with its new-work pick of it.
+    const drafted = inserted(writes, "kinds");
+    expect(drafted).toHaveLength(1);
+    expect(drafted[0]).toMatchObject({ name: "beard trims and shaves", source: "new_work" });
+    expect(inserted(writes, "picked_kinds").map((row) => [row.words, row.outcome, row.kind_id])).toEqual([
+      ["We do haircuts", "listed", "hair"],
+      ["beard trims and shaves", "new_work", drafted[0]?.id],
+    ]);
+    expect(inserted(writes, "new_work_drafts")).toHaveLength(1);
+    // S1-03's message, then S1-04's question; S1-02's question closed.
+    expect(writes.messages.map((row) => row.id)).toEqual(["outbox-s1-03-sam-1", "outbox-s1-04-sam-1"]);
+    expect(writes.closes.map((close) => close.id)).toEqual(["oq-s1-02"]);
   });
 });

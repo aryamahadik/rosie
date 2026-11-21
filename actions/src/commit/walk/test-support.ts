@@ -8,6 +8,13 @@
 // rows (db/repo/targets.ts's type, so the rows card F binds fit the walk's port as they are), and stand-ins for the step
 // writers (T-633's and T-634's), each call written down. Their values come from K-09's commit-s1-01.json,
 // commit-s1-02.json, commit-s1-02-unmapped-end.json and match-kinds.json.
+//
+// T-1491 adds the one-kind path's test graph (bundle v1's flow A with S1-08 and S1-09 in K-01 v1's shape, from the
+// master's lines, since no bundle holds them until bundle v2), S1-08's writer's stand-in, and the stand-in rows of S1-04's
+// one-kind settler (T-1492's), from K-09's commit-s1-04.json.
+//
+// T-1519 adds the chat read's double (K-05 v1.10 item 51 readChatHandle as the walk's WalkChats port takes it: the handle
+// whose chat thread holds a chat id), each read written down; it never stands in for the walk.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -44,6 +51,7 @@ import type {
   StepWriterCall,
   StepWriters,
   WalkBundles,
+  WalkChats,
   WalkQuestions,
 } from "./index";
 
@@ -440,6 +448,33 @@ export function questionsOver(
 }
 
 // ---------------------------------------------------------------------------------------------------------------
+// The chat read (T-1519: K-05 v1.10 item 51 readChatHandle, the phone handle whose chat thread holds a Linq chat id)
+
+export interface FakeChats {
+  readonly chats: WalkChats;
+  /** Every chat id the read was asked for, in order. */
+  readonly reads: string[];
+}
+
+/**
+ * The chat read over one stored chat thread: `holder`, the handle whose chat thread holds the chat id `chatId`, answered
+ * for that chat id alone, and null for any other (no thread holds it), or for every chat id when `holder` is null. Each
+ * read is written down. Its values are commit-s1-01.json's (handle-sam, linq-chat-demo-sam) or the master's sample cast.
+ */
+export function chatsOver(holder: string | null, chatId = "linq-chat-demo-sam"): FakeChats {
+  const reads: string[] = [];
+  return {
+    reads,
+    chats: {
+      chatHandle(linqChatId) {
+        reads.push(linqChatId);
+        return Promise.resolve(linqChatId === chatId ? holder : null);
+      },
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------------------------------------------
 // Stand-ins for the step writers (S1-02, S1-03, S1-74: T-633's; S1-11 and S1-04: T-634's)
 
 /** One call a stand-in step writer was given, as a test reads it. */
@@ -547,4 +582,89 @@ export const tellingWriter: StepWriter<WalkTestRepo> = (call) => {
 /** The stand-ins by step id: S1-02's and S1-11's, and S1-03's and S1-74's messages (S1-04's question is the walk's). */
 export function allWriters(): Record<string, StepWriter<WalkTestRepo>> {
   return { "S1-02": s1_02Writer, "S1-11": s1_11Writer, "S1-03": tellingWriter, "S1-74": tellingWriter };
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1491: the one-kind path's test graph (K-09 README default 199), bundle v1's flow A with S1-08 and S1-09
+
+/** S1-09's safe default (MASTER-FLOW-A.md line 124), as its card states it in T-1491's test graph. */
+export const S1_09_SAFE_DEFAULT = "not yet an owner. Setup goes on, saved, and nothing goes live.";
+
+/** S1-09's three branches, by the master's Means lines (MASTER-FLOW-A.md lines 118 to 120). */
+export const S1_09_BRANCHES = [
+  "An owner; the listing matches",
+  "Helps run it; not an owner",
+  "No match, or already listed",
+];
+
+/**
+ * T-1491's test graph: bundle v1's flow A (S1-04 a plain step whose message carries three buttons, next S1-08), with the
+ * two steps no bundle holds until bundle v2 (T-1477) added in K-01 v1's shape, the fields the walk reads alone:
+ *   - S1-08 (MASTER-FLOW-A.md lines 101 to 111): Rosie lays out the plan to the owner by text, a message with no
+ *     question and no buttons; it needs companies and pf.rules, gives nothing and tells the owner; next S1-09;
+ *   - S1-09 (lines 112 to 129): a split Rosie asks the owner by text, its three message branches merging, with a card of
+ *     step 9's default clock and its safe default; it needs companies and gives business; next S1-10, which it does not
+ *     hold. Its message carries no buttons here: a split asked with buttons is not built yet (writes.ts default 10).
+ */
+export function flowAWithPlan(): GraphValue {
+  const graph = flowAV1();
+  graph.steps["S1-08"] = {
+    id: "S1-08",
+    section: 1,
+    who: "san",
+    to: "owner",
+    via: "msg",
+    title: "Lays out the plan",
+    say: [{ from: "san", to: "owner" }],
+    needs: ["companies", "pf.rules"],
+    gives: [],
+    tells: ["owner"],
+    next: "S1-09",
+  };
+  graph.steps["S1-09"] = {
+    id: "S1-09",
+    section: 1,
+    who: "san",
+    to: "owner",
+    via: "msg",
+    title: "Reads the card or listing; asks: an owner?",
+    say: [{ from: "san", to: "owner" }],
+    needs: ["companies"],
+    gives: ["business"],
+    tells: ["owner"],
+    type: "split",
+    branches: S1_09_BRANCHES.map((label) => ({
+      label,
+      tag: "message",
+      steps: [],
+      rejoinAt: null,
+      effects: [],
+      end: "merge",
+    })),
+    card: { clock: { from: "step9Default" }, safeDefault: S1_09_SAFE_DEFAULT },
+    next: "S1-10",
+  };
+  return graph;
+}
+
+/** The stand-ins by step id on T-1491's test graph: allWriters' and S1-08's message (T-1482's writer's stand-in). */
+export function planWriters(): Record<string, StepWriter<WalkTestRepo>> {
+  return { ...allWriters(), "S1-08": tellingWriter };
+}
+
+/** commit-s1-04.json as T-1491's stand-in settler reads it: the rows it states S1-04's answer writes. */
+interface CommitS1_04 {
+  given: { stated: { writes: { state: StateWrite[] } } };
+}
+
+/**
+ * A stand-in for the rows S1-04's one-kind settler answers (T-1492's): commit-s1-04.json's first stated state row, the
+ * plumber company kind under the roster owner's company (K-23 company_kinds, inserted), giving companies. It reads
+ * nothing, and is never the walk under test.
+ */
+export function s1_04SettledRows(): StepRows {
+  const { given } = fixture("commit-s1-04.json") as CommitS1_04;
+  const [first] = given.stated.writes.state;
+  if (first === undefined) throw new Error("commit-s1-04.json states its rows");
+  return { state: [first], stateEvents: [], gives: ["companies"], asks: [], messages: [] };
 }

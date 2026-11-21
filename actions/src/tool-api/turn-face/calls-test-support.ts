@@ -40,6 +40,7 @@ import {
   type FakeBundles,
 } from "../../frontier/assemble/test-support";
 import type { GatePart, GateTurn, LimitVerdict } from "../../gate/framework";
+import type { TradeRead, TradesDouble } from "../journey-1/plug-ins/test-support";
 import { contractFile, fixture } from "../test-support";
 import { CONTRACTS_DIR, formatProblems } from "../validator";
 import {
@@ -254,6 +255,11 @@ export interface CallDoublesOptions {
   /** The paging ports, for runCore's paging core actions and the base's paging handlers. Default: none bound. */
   readonly paging?: PagingDeps<unknown>;
   readonly scope?: TurnFaceCalls<unknown>["scope"];
+  /**
+   * The walk's chat read (T-1519: K-05 v1.10 item 51 readChatHandle, as TurnCommitBinding.readChatHandle takes it). Default:
+   * none bound, so S1-01's thread is inserted as commit-s1-01.json states it.
+   */
+  readonly readChatHandle?: TurnCommitBinding<unknown>["readChatHandle"];
 }
 
 /** A scope whose repo is no database, which records the business of each call. */
@@ -270,7 +276,7 @@ export function noDatabaseScope(businesses: string[] = []): TurnFaceCalls<unknow
  * The face's calls over the doubles: commit-s1-01.json's ids (its outcome id and turn key sam), K-05 v1.1's fake commit at
  * the fixture's now, T-318's world for the safety reads with T-317's and T-307's readers on it, the same-bytes sealer,
  * the barbershop's plug-in (no stop words), and who is told and the paging ports as given (T-1443): by default nobody is
- * told (NOT_TOLD_YET) and no paging port is bound.
+ * told (NOT_TOLD_YET) and no paging port is bound; and the walk's chat read as given (T-1519), none by default.
  */
 export function callDoubles(options: CallDoublesOptions = {}): CallDoubles {
   const world = options.world ?? safetyWorldOf();
@@ -294,6 +300,7 @@ export function callDoubles(options: CallDoublesOptions = {}): CallDoubles {
     },
     turnKey: () => SAM_KEY,
     ...(options.paging === undefined ? {} : { paging: options.paging }),
+    ...(options.readChatHandle === undefined ? {} : { readChatHandle: options.readChatHandle }),
   };
   const calls: TurnFaceCalls<unknown> = {
     scope: options.scope ?? noDatabaseScope(),
@@ -501,6 +508,63 @@ export function publishedBundleV1(): BundleDocument {
 export function rowUnderPublishedV0(row: OutboxRowRead = outboxRowS102()): OutboxRowRead {
   const bundleId = publishedBundleV0().manifest.bundleId as { hash: string; build: number };
   return { ...row, row: { ...row.row, bundleId } };
+}
+
+const BUNDLE_V2_DIR = new URL("../../../../bundles/v2/bundle/", import.meta.url);
+
+/** One of bundle v2's parts (bundles/v2/bundle/, T-1477), freshly parsed. */
+function bundleV2Part(file: string): Json {
+  return JSON.parse(readFileSync(new URL(file, BUNDLE_V2_DIR), "utf8")) as Json;
+}
+
+/**
+ * Bundle v2 as bundles/v2 holds it (T-1477): its manifest and flow A, bundle v1's six steps byte for byte plus S1-08 and
+ * S1-09, and the fixed lines with signUpOpener, the 16th (K-01 README default 19, T-1510). Its trade overlays are read
+ * through tradesOverV2.
+ */
+export function publishedBundleV2(): BundleDocument {
+  return { manifest: bundleV2Part("manifest.json"), flows: { A: bundleV2Part("flow/A.json") } };
+}
+
+/** Bundle v2's id, as its manifest names it (K-01 v1 manifest.bundleId). */
+export function bundleV2Id(): { hash: string; build: number } {
+  const { hash, build } = publishedBundleV2().manifest.bundleId as { hash: string; build: number };
+  return { hash, build };
+}
+
+/** The row read with its bundle bundle v2's id, so the row is read in it (the rest as given, K-05's fixture by default). */
+export function rowUnderBundleV2(row: OutboxRowRead = outboxRowS102()): OutboxRowRead {
+  return { ...row, row: { ...row.row, bundleId: bundleV2Id() } };
+}
+
+/** One trade's overlay in bundle v2 (K-01 v1's trade part), freshly parsed. */
+export function overlayV2(trade: string): Record<string, unknown> {
+  return bundleV2Part(`trade/${trade}.json`);
+}
+
+/**
+ * The trade port over bundle v2, as journey-1/plug-ins' tradesOverV1 is over bundle v1: the overlay of the trade asked
+ * for when the bundle id is bundle v2's and it holds that trade, else null. Each read hands over a fresh copy and is
+ * written down.
+ */
+export function tradesOverV2(): TradesDouble {
+  const pin = bundleV2Id();
+  const held = new Set(
+    readdirSync(new URL("trade/", BUNDLE_V2_DIR))
+      .filter((file) => file.endsWith(".json"))
+      .map((file) => file.slice(0, -".json".length)),
+  );
+  const reads: TradeRead[] = [];
+  return {
+    reads,
+    bundles: {
+      trade(bundleId, tradeId) {
+        reads.push({ bundleId: { hash: bundleId.hash, build: bundleId.build }, tradeId });
+        if (bundleId.hash !== pin.hash || bundleId.build !== pin.build) return Promise.resolve(null);
+        return Promise.resolve(held.has(tradeId) ? overlayV2(tradeId) : null);
+      },
+    },
+  };
 }
 
 // ---------------------------------------------------------------------------------------------------------------
