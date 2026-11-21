@@ -32,6 +32,18 @@
 // writers when it is reached. A refusal, a failed read or any other answer: nothing written (fail closed). With no
 // buttons settler bound for the step, the walk is today's, byte for byte.
 //
+// A returning number's chat thread (T-1519; DL-1048, from T-1517's round 2): K-04 holds one chat thread per handle across
+// every business (0005 threads_one_chat_per_handle; MC C1) and one thread per Linq chat id (threads_linq_chat_key), so
+// S1-01's insert for a handle that already has its chat (a re-JOIN, the user's phone after T-1517's roster reset, a
+// customer who later signs up) is refused by the database, commitTurn answers constraint and writes nothing, and JOIN
+// gets no reply. Where the binding hands in the chat read (WalkDeps.chats: K-05 v1.10 item 51's readChatHandle, on the
+// runtime side, since rosie_app holds no grant on threads: 0012), S1-01's thread write asks it once for the turn's Linq
+// chat id: when the handle whose chat thread holds that chat id is the turn's own, the handle's chat thread already
+// exists and is reused, so the walk writes no thread row and no `thread.created` entry, and the part still gives
+// `thread`, as a new thread's would (nothing the turn writes names the thread's id: K-05 v1 outboxRowNew has no thread);
+// for any other answer (no thread holds the chat id, or another handle's does) the thread is inserted exactly as before.
+// With no chat read bound, the thread is inserted exactly as before.
+//
 // It only reads (the pinned graph through its own port; the answered question and what each step writer reads, on the
 // call's transaction; the call's request) and has no outside effect, since a repeated turn runs it again before K-05
 // answers repeated (STATE note 1; types.ts CommitPorts). Nothing here logs; what it throws names faults, step ids and
@@ -40,7 +52,8 @@
 // What it writes, step by step (each journey's lane extends the writers; anything else is notBuilt, nothing written):
 //   - a plain step's gives with no writer bound: `thread` (S1-01) only, the handle's chat with Rosie's number (K-04
 //     threads: kind chat, no booking, the Linq chat id of the turn's last text, no reply address), with its
-//     `thread.created` entry, whose values name the kind alone, never the chat id (K-09 v1.5 defaults 134 and 135);
+//     `thread.created` entry, whose values name the kind alone, never the chat id (K-09 v1.5 defaults 134 and 135); or,
+//     where the chat read finds the handle's own chat thread holding the turn's chat id, no row and no entry (default 12);
 //   - the split it stops at, when Rosie asks it of the turn's own writer by text (S1-02): one open question (no options,
 //     no read-back, step 9's default clock: K-09 v1.5 default 134) with the card's safe default for its clock row, and
 //     one quick reply on the turn's service (defaults 132 and 133);
@@ -102,11 +115,22 @@
 //      handle, at the chosen step, of the call's business, read on the call's transaction; any other is refused. It is
 //      closed answered with no option id (K-05 v1 openQuestionClose.answeredOptionId null): S1-02 is asked with no
 //      options (K-09 v1.5 default 134), so none went out; one that went out with options is notBuilt (buttons).
-//  12. (T-1491) A walk in stretches (K-09 README default 199) finds each stretch's writers when that stretch is reached:
+//  12. (T-1519) The handle's chat thread is found by the turn's Linq chat id (K-05 v1.10 item 51, readChatHandle: the
+//      phone handle whose chat thread holds it), the only frozen K-05 read that names a chat thread's handle before any
+//      outbox row exists (sendState, item 28, reads a handle's chat by an outbox row's id). The turn's own handle in the
+//      answer is the handle's chat thread for this very chat: it is reused, with no row written, no row read into
+//      versionsRead (a thread is never deleted, 0005's foreign keys restrict, and no call moves it to another handle), and
+//      the part's gives unchanged. Any other answer keeps today's insert: none (no thread holds the chat id), so the
+//      handle has no chat thread for it; or another handle's, which the database refuses (threads_linq_chat_key) as it
+//      did before. Not covered, and left as it was: a handle whose chat thread holds another chat id, or none yet, since
+//      no frozen K-05 read answers a handle's chat thread by the handle before an outbox row exists; its insert is still
+//      refused (threads_one_chat_per_handle). The read is asked only for a thread the walk would write: never for an
+//      email turn (threadByEmail) and never for a held step.
+//  13. (T-1491) A walk in stretches (K-09 README default 199) finds each stretch's writers when that stretch is reached:
 //      the first stretch's before anything is read, as default 9 says, and a later stretch's after the buttons settler
 //      answered rows. A step with no writer still refuses the part with nothing written: writesOf hands back no row until
 //      its whole walk is built, so the rows built before the refusal are dropped with it.
-//  13. (T-1491) A buttons settler is handed copies of the lists built so far, so what it does with them never changes
+//  14. (T-1491) A buttons settler is handed copies of the lists built so far, so what it does with them never changes
 //      the part's rows; the rows themselves are the writers' objects, read-only by contract (a settler writes nothing).
 
 import type { Choice, Decided, SetupKey } from "../../gate/framework";
@@ -173,6 +197,20 @@ export interface WalkQuestions<Repo = unknown> {
    * (db/repo/targets.ts liveOpenQuestionsOfHandle, as limit 3 reads them), whose rows carry their versions.
    */
   liveQuestion(repo: Repo, handleId: string, openQuestionId: string): Promise<LiveQuestion | null>;
+}
+
+/**
+ * Where S1-01's thread write finds the handle's chat thread (T-1519; default 12): K-05 v1.10 item 51's readChatHandle,
+ * which the binding runs on the runtime side in a read-only transaction of its own (threads and handles are scoped none,
+ * and rosie_app holds no grant on either: 0012), never on the call's transaction.
+ */
+export interface WalkChats {
+  /**
+   * The id of the phone handle whose chat thread (K-04 threads of kind chat) holds the Linq chat id `linqChatId`
+   * (threads_linq_chat_key: one thread at most), or null when no chat thread of a phone handle holds it. The number the
+   * read also answers is never handed to the walk. A read that answers an error throws, and the call fails closed.
+   */
+  chatHandle(linqChatId: string): Promise<string | null>;
 }
 
 /** What one step's writer hands the walk: its rows in its own order, each list present (empty when it has none). */
@@ -247,6 +285,11 @@ export interface WalkDeps<Repo = unknown> {
    * none for that step, the walk is exactly as before.
    */
   readonly buttonsSettlers?: ButtonsSettlers<Repo>;
+  /**
+   * Where S1-01's thread write finds the handle's chat thread (T-1519; default 12), handed in as `questions` is. Left
+   * out, S1-01's thread is inserted exactly as before.
+   */
+  readonly chats?: WalkChats;
 }
 
 /** The service and Linq chat id of the turn's last text (K-09 v1.5 gateAndCommit.turn; default 135). */
@@ -416,6 +459,8 @@ interface WalkRun<Repo> {
   /** Where an answer reads its question (default 11); null for a walk from a step. */
   readonly questions: WalkQuestions<Repo> | null;
   readonly writers: StepWriters<Repo> | null;
+  /** Where S1-01's thread write finds the handle's chat thread (default 12); null when none is bound. */
+  readonly chats: WalkChats | null;
 }
 
 /** Who writes one step's rows: the writer bound to its id, or the walk itself (S1-01's thread, a question, or none). */
@@ -481,10 +526,18 @@ function rowBuilderOf<Repo>(run: WalkRun<Repo>): RowBuilder {
   let source: TextSource | undefined;
   const text = (): TextSource => (source ??= textSourceOf(context.request));
 
-  /** S1-01 gives thread: the handle's chat with Rosie's number, and its entry (defaults 134, 135; default 5). */
-  const thread = (step: GraphStep): void => {
+  /**
+   * S1-01 gives thread: the handle's chat with Rosie's number, and its entry (defaults 134, 135; default 5); or, where the
+   * chat read finds the handle's own chat thread holding the turn's chat id, that thread, reused with nothing written
+   * (default 12).
+   */
+  const thread = async (step: GraphStep): Promise<void> => {
     const { service, chatId } = text();
     if (!LINQ_SERVICES.includes(service)) throw new WalkNotBuiltError("threadByEmail", [step.id]);
+    if (run.chats !== null && (await run.chats.chatHandle(chatId)) === context.turn.handleId) {
+      if (!built.gives.includes(THREAD)) built.gives.push(THREAD);
+      return;
+    }
     const id = run.nextId("thread", step.id);
     built.state.push({
       op: "insert",
@@ -620,7 +673,7 @@ function rowBuilderOf<Repo>(run: WalkRun<Repo>): RowBuilder {
       }
       if (each.as === "answer") await answered(step);
       if (by === "walk") {
-        for (const key of step.gives) if (key === THREAD) thread(step);
+        for (const key of step.gives) if (key === THREAD) await thread(step);
       } else {
         await written(step, by);
       }
@@ -734,6 +787,7 @@ async function unitOf<Repo>(deps: WalkDeps<Repo>, walking: Walking<Repo>): Promi
     writerLane: writerLaneOf(graph, start),
     questions,
     writers: deps.writers ?? null,
+    chats: deps.chats ?? null,
   };
   const rows = rowBuilderOf(run);
   for (;;) {
