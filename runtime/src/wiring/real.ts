@@ -101,11 +101,13 @@
 //                anything is read, as it always has; in production the gate stays closed (./picks.ts).
 //                T-1470 (card F2; DL-961 card F, DL-994): where RootOptions.gateReads binds them, the commit's walk gets
 //                the question read an answer closes its question through (GateReads.questions, on the call's
-//                transaction) and the sign-up steps' read-only writers (GateReads.kinds: T-1468's signUpStepWriters,
-//                built for each call over the kinds reads and that call's own bundles), whose one trade overlay is the
-//                run's pinned bundle's (FrontierBundleReads.trade), never another bundle's. With neither bound (a
-//                test's doubles, staging unbound) every answer to an open question is notBuilt, as before; the keyword
-//                door gets neither.
+//                transaction) and the sign-up steps' read-only writers and S1-02's settler (GateReads.kinds: T-1502's
+//                signUpSteps, built for each call over the kinds reads and that call's own bundles; T-1503, DL-1018
+//                card 5), whose one trade overlay is the run's pinned bundle's (FrontierBundleReads.trade), never another
+//                bundle's; the settler and S1-02's writer share one catalog read per walk, so the owner's words, not the
+//                option decide named, settle S1-02's branch (K-09 README default 191). With neither bound (a test's
+//                doubles, staging unbound) every answer to an open question is notBuilt, as before; the keyword door gets
+//                neither, and no settler.
 //   composeInput T-560: K-09 composeInput through @rosie/actions' turn face (T-1141, createTurnFace with its calls: the
 //                Tool API base with K-09 v1.6's checks and the call's own business scope; T-309's compose input with
 //                T-1174's term facts over T-1141's row binding). Its reads are handed in by the root
@@ -215,7 +217,7 @@ import type { BusinessScope } from "@rosie/actions/src/tool-api/scope";
 import type { CallTrace } from "@rosie/actions/src/tool-api/tool-api";
 import {
   keywordCommitDeps,
-  signUpStepWriters,
+  signUpSteps,
   turnCommitDeps,
   type KeywordCommitBinding,
   type NoBusinessSafetyReads,
@@ -1621,9 +1623,10 @@ export interface GateReads<Repo = unknown, DoorRepo = unknown> {
   /**
    * What the sign-up steps' writers read with (T-1470; @rosie/actions' KindsWriterDeps, T-633): K-05 v1.19 items 78 and
    * 79, each on a client of its own beside the call's, and the stop home's reads where the runtime side binds them
-   * (left out, S1-03's and S1-74's messages answer notBuilt). Bound, realGate builds T-1468's signUpStepWriters over it
-   * for each call, with that call's own bundles as the trade-overlay port. Left out (a test's doubles), no step writer
-   * is bound, as before.
+   * (left out, S1-03's and S1-74's messages answer notBuilt). Bound, realGate builds T-1502's signUpSteps over it for
+   * each call, with that call's own bundles as the trade-overlay port: the sign-up steps' writers and S1-02's settler,
+   * over one catalog read per walk (T-1503; DL-1018 card 5; K-09 README default 191). Left out (a test's doubles), no
+   * step writer and no settler is bound, as before.
    */
   readonly kinds?: KindsWriterDeps;
 }
@@ -1723,9 +1726,10 @@ const NO_GATE_SCOPE: BusinessScope<unknown> = {
  * reads no words and checks nothing; a call whose trace is no pinned run's, and every call where the words carry no check
  * (production's closed gate, the test environment's reads), runs exactly as before.
  *
- * The walk's question read and the sign-up steps' writers (T-1470; gateBindingOf): bound only where the reads bind them
- * (GateReads.questions, GateReads.kinds), so an owner's answer to S1-02's question is written. What a writer throws leaves
- * the gate as thrown and fails the call closed: a failed item 78 or item 79 read is @rosie/actions' KindsReadError, whose
+ * The walk's question read, the sign-up steps' writers and S1-02's settler (T-1470, T-1503; gateBindingOf): bound only
+ * where the reads bind them (GateReads.questions, GateReads.kinds), so an owner's answer to S1-02's question is written,
+ * on the branch the owner's words settle (K-09 README default 191; DL-1018). What a settler or writer throws leaves the
+ * gate as thrown and fails the call closed: a failed item 78 or item 79 read is @rosie/actions' KindsReadError, whose
  * `answer` holds a SQLSTATE or a person's or a business's row id, so nothing here catches, wraps, logs or reports it (a
  * caller that reports it names its name, read and fault alone; the base's span takes an error's name only).
  */
@@ -1782,14 +1786,16 @@ export function realGate(inputs: GateInputs): GatePort {
  * its run pinned (`pinned`; null for a trace that is no pinned run's), else the bound bundle port (`bound`). Field by
  * field as realGate's header says: the root's turn-row port's commitTurn, the reads' open-holds read, safety reads and
  * sealer (each failing closed where no reads are bound), the barbershop plug-in's stop words, nobody told yet, and the
- * safety service's readers and words where the reads carry them. And, only where the reads bind them (T-1470):
+ * safety service's readers and words where the reads carry them. And, only where the reads bind them (T-1470, T-1503):
  *   - `questions`: the reads' own question read (GateReads.questions), handed on as it is;
- *   - `writers`: T-1468's signUpStepWriters over the reads' kinds ports (GateReads.kinds) and these same bundles as the
- *     trade-overlay port, built here for each call, so one kindsWriters and one createPlugInWriters serve one call's
- *     walk and S1-11's overlay is the pinned bundle's (FrontierBundleReads.trade). The step-id map is T-1468's own.
- * With either left out the binding carries no such field, and the commit behaves as before. It reads nothing and logs
- * nothing. Exported for its unit test alone (./gate-binding.test.ts): no rig walks a second turn, so the binding's own
- * fields are proven under Node.
+ *   - `writers` and `settlers`: T-1502's signUpSteps over the reads' kinds ports (GateReads.kinds) and these same bundles
+ *     as the trade-overlay port, built here for each call, so one kindsSteps and one createPlugInWriters serve one call's
+ *     walk, S1-02's settler and S1-02's writer share one catalog read (K-09 README default 191), and S1-11's overlay is
+ *     the pinned bundle's (FrontierBundleReads.trade). The writers are signUpStepWriters' step for step, and the settlers
+ *     S1-02's alone (DL-1018 card 5); the step-id maps are signUpSteps' own.
+ * With either left out the binding carries no such field (the kinds reads left out: neither `writers` nor `settlers`),
+ * and the commit behaves as before. It reads nothing and logs nothing. Exported for its unit test alone
+ * (./gate-binding.test.ts): no rig walks a second turn, so the binding's own fields are proven under Node.
  */
 export function gateBindingOf(
   inputs: GateInputs,
@@ -1816,9 +1822,7 @@ export function gateBindingOf(
       ...(words === undefined ? {} : { words }),
     },
     ...(reads?.questions === undefined ? {} : { questions: reads.questions }),
-    ...(reads?.kinds === undefined
-      ? {}
-      : { writers: signUpStepWriters<unknown>({ kinds: reads.kinds, plugIns: { bundles } }) }),
+    ...(reads?.kinds === undefined ? {} : signUpSteps<unknown>({ kinds: reads.kinds, plugIns: { bundles } })),
   };
 }
 
