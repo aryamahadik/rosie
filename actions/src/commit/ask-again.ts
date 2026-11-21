@@ -13,11 +13,14 @@
 //       any other verb ended in one question is not about it;
 //   (f) nothing open holds a routine reply back (default 195): every core action is a text's safety outcome, and
 //       isHeld("routine") is false on the holds and unread texts the commit holds after the core actions (a hold the
-//       turn's own safety outcome opens among them);
+//       turn's own safety outcome opens among them). A safety outcome that was refused opens no hold and holds no
+//       routine part back, so it does not silence the turn (default 198 does not list it);
 //   (g) the request's turn carries its service (K-09 v1.5 default 135), the row's channel;
 // and only then reads that question on the call's transaction (the walk's question read: AskAgainDeps.questions) for:
 //   (d) live (the read answers only a waiting or open question sent to the turn's handle), of the call's business, asked
-//       of the call's person, about no booking, stored with no options as sent and no read-back (default 193);
+//       of the call's person (its person_id the caller's personId, compared as they are: a caller with none meets it
+//       only on a question stored with none), about no booking, stored with no options as sent and no read-back
+//       (default 193);
 //   (e) asked once: ask_count 1 (default 194's cap: at 2 or more nothing is written).
 // When all hold it hands the commit one unit with no part answer: the outbox row default 192 states, as the walk writes
 // the row that first asked the question (walk/writes.ts `asked`): id `outbox-<the question's step>-<turn key>-1`
@@ -38,12 +41,7 @@
 //   1. The unit's why is the question's step alone (`{step}`, choice null), as K-05 v1.21's entry names it (its default
 //      196: why `{"step": <the question's step>}`) and its commit-s1-02-sam-asks-again.json logs both entries, the
 //      raise's and the row's; K-09 v1.12's "asked again" is the raise entry's kind, open_question.asked_again.
-//   2. A core action that is a text's safety outcome but was refused (its coreResult carries an error) counts as a core
-//      action other than the texts' safety outcomes (default 195), so the turn stays silent: the text's safety read is not
-//      known to have passed.
-//   3. The caller's person is K-09's `caller.personId`; a caller with none asks nobody again (the question must have
-//      been asked of the call's person: default 192 (d)).
-//   4. An empty turn key (a binding's fault, never a condition of default 192) refuses the turn (noTurnKey), as the walk
+//   2. An empty turn key (a binding's fault, never a condition of default 192) refuses the turn (noTurnKey), as the walk
 //      refuses one (walk/writes.ts noTurnKey), and is checked only once every condition holds.
 
 import type { Decided, GatedPart } from "../gate/framework";
@@ -119,11 +117,12 @@ function isAbout(decided: Decided, index: number, questionId: string): boolean {
   return choice?.kind === "option" && choice.question === questionId;
 }
 
-/** (f): every core action is a text's safety outcome, recorded (default 2), and nothing open holds a routine reply back. */
+/**
+ * (f): every core action is a text's safety outcome, recorded or refused (K-09 v1.12 defaults 192 (f) and 195: only a
+ * core action other than a text's safety outcome, or an open hold, silences), and nothing open holds a routine reply back.
+ */
 function nothingHolds(turn: AskedTurn): boolean {
-  const safetyOnly = turn.core.every(
-    ({ result }) => result.call === "recordSafetyOutcome" && result.error === null,
-  );
+  const safetyOnly = turn.core.every(({ result }) => result.call === "recordSafetyOutcome");
   return safetyOnly && !isHeld("routine", turn.open.holds, turn.open.unreadEventIds);
 }
 
@@ -157,13 +156,11 @@ function covered(
   turn: AskedTurn,
 ): question is LiveQuestion {
   const { context } = turn;
-  const personId = context.request.caller.personId;
   return (
     question !== null &&
     question.id === candidate.questionId &&
     question.businessId === context.businessId &&
-    personId !== null &&
-    question.personId === personId &&
+    question.personId === context.request.caller.personId &&
     question.bookingId === null &&
     question.options.length === 0 &&
     question.readback === null &&

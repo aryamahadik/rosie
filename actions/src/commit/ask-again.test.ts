@@ -649,19 +649,13 @@ describe("askAgainUnit: each condition of default 192", () => {
     }
   });
 
-  it("(f) an open hold, an unread text, a core action other than a text's safety outcome, or a refused safety outcome: nothing, nothing read", async () => {
+  it("(f) an open hold, an unread text, or a core action other than a text's safety outcome: nothing, nothing read", async () => {
     const stop = { ...askedCoreResult(), call: "recordStopOrStart" } as unknown as CoreResult;
-    const refused = {
-      ...askedCoreResult(),
-      response: null,
-      error: { error: "notBuilt" },
-    } as unknown as CoreResult;
     const hold: SafetyHold = { holdId: "hold-sam-0002", releaseRule: "after_safe", blocksBooking: true };
     for (const change of [
       { open: { holds: [hold], unreadEventIds: [] } },
       { open: { holds: [], unreadEventIds: ["evt-sam-0003"] } },
       { core: [askedCoreRun(), askedCoreRun(stop)] },
-      { core: [askedCoreRun(refused)] },
     ]) {
       const read = fakeRead();
       expect(await askAgainUnit(read.deps, askedTurn(change))).toBeNull();
@@ -669,6 +663,42 @@ describe("askAgainUnit: each condition of default 192", () => {
     }
     // No core action at all (a turn of texts whose safety outcomes ride elsewhere): nothing holds it back.
     expect(await askAgainUnit(fakeRead().deps, askedTurn({ core: [] }))).not.toBeNull();
+  });
+
+  it("(f) a text's safety outcome that was refused opens no hold and silences nothing: the row and the raise (defaults 192 (f) and 195)", async () => {
+    const refused = {
+      ...askedCoreResult(),
+      response: null,
+      error: { error: "notBuilt" },
+    } as unknown as CoreResult;
+    const read = fakeRead();
+    const unit = await askAgainUnit(read.deps, askedTurn({ core: [askedCoreRun(refused)] }));
+    if (unit === null) return fail();
+    expect(unit.answer).toBeNull();
+    expect(unit.writes.messages.map((row) => [row.id, row.sendClass, row.openQuestionId])).toEqual([
+      [ROW, "quick_reply", QUESTION],
+    ]);
+    expect(unit.writes.askAgain).toEqual({
+      raise: { id: QUESTION, expectVersion: 2 },
+      step: "S1-02",
+      businessId: BUSINESS,
+      askCount: 1,
+    });
+    expect(read.calls).toEqual([{ handleId: HANDLE, openQuestionId: QUESTION }]);
+    // Beside a recorded one, and under an open hold it is still held back as any turn is.
+    const beside = await askAgainUnit(
+      fakeRead().deps,
+      askedTurn({ core: [askedCoreRun(), askedCoreRun(refused)] }),
+    );
+    expect(beside?.writes.messages.map((row) => row.id)).toEqual([ROW]);
+    const hold: SafetyHold = { holdId: "hold-sam-0002", releaseRule: "after_safe", blocksBooking: true };
+    const held = fakeRead();
+    const under = askedTurn({
+      core: [askedCoreRun(refused)],
+      open: { holds: [hold], unreadEventIds: [] },
+    });
+    expect(await askAgainUnit(held.deps, under)).toBeNull();
+    expect(held.calls).toEqual([]);
   });
 
   it("(g) the turn's service is the row's channel; none, or one K-06 does not name: nothing, nothing read", async () => {
@@ -687,13 +717,43 @@ describe("askAgainUnit: each condition of default 192", () => {
     expect(await askAgainUnit(fakeRead().deps, askedTurn({}, noChat))).not.toBeNull();
   });
 
-  it("(d) and (e) on the read: another id answered, or no caller's person: nothing", async () => {
+  it("(d) and (e) on the read: another id answered, or a question asked of a person the caller is not: nothing", async () => {
     const wrongId = fakeRead();
     wrongId.deps.questions.liveQuestion = () => Promise.resolve({ ...storedQuestion(), id: "oq-other" });
     expect(await askAgainUnit(wrongId.deps, askedTurn())).toBeNull();
+    // A caller with no person is not the person S1-02 was asked of (person-sam).
     const nobody = askedRequest();
     (nobody.caller as unknown as Record<string, unknown>).personId = null;
     expect(await askAgainUnit(fakeRead().deps, askedTurn({}, nobody))).toBeNull();
+  });
+
+  it("(d) the question's person_id is the caller's personId, compared as they are: a caller with none whose question was stored with none gets the row and the raise", async () => {
+    const nobody = askedRequest();
+    (nobody.caller as unknown as Record<string, unknown>).personId = null;
+    const read = fakeRead({ ...storedQuestion(), personId: null });
+    const unit = await askAgainUnit(read.deps, askedTurn({}, nobody));
+    if (unit === null) return fail();
+    expect(unit.writes.messages).toEqual([
+      {
+        id: ROW,
+        recipientHandleId: HANDLE,
+        recipientPersonId: null,
+        businessId: BUSINESS,
+        bookingId: null,
+        channel: "imessage",
+        sendClass: "quick_reply",
+        openQuestionId: QUESTION,
+        copyOfRowId: null,
+        versionsRead: [],
+      },
+    ]);
+    expect(unit.writes.askAgain).toEqual({
+      raise: { id: QUESTION, expectVersion: 2 },
+      step: "S1-02",
+      businessId: BUSINESS,
+      askCount: 1,
+    });
+    expect(read.calls).toEqual([{ handleId: HANDLE, openQuestionId: QUESTION }]);
   });
 
   it("a read that fails is thrown as it is, so the call fails closed", async () => {
