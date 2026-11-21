@@ -20,7 +20,18 @@
 // its barber kind of work (read-outbox-row-s1-02-not-sensitive.json) gives compose-input-s1-02-v1.6.json's input word for
 // word, routine, and the JOIN row gives T-1175's recording 4 request; null, the field left out and true are on (gentle,
 // the display name); a row about a booking stays on; a read that fails is never read as on, off or null.
+//
+// T-1475 (DL-999, the S1-04 design ruling's card 6; K-05 v1.22 item 83): the row read is K-05 v1.22's, whose line may
+// come from the row itself. read-outbox-row-s1-08-sam.json's answer (S1-08's row, which asks no question, its line `from`
+// row) gives a compose row for S1-08, line 0, and a finalize row with question null and no ask-by, and it is read by the
+// reader mapping as S1-02's row is; read-outbox-row-s1-02-older-row.json's answer (`from` openQuestion) reads as
+// read-outbox-row-s1-02-no-kinds.json's does; a null line is still refused and a row whose question holds options is
+// still notBuilt. The skeleton the fixtures pin lists S1-08 and holds only S1-01 and S1-02, so these tests read S1-08 in
+// a copy of it that holds bundle v2's S1-08 (bundles/v2, T-1477: the master's step as compiled).
 
+import { readdirSync, readFileSync } from "node:fs";
+
+import Ajv2020 from "ajv/dist/2020.js";
 import { describe, expect, it } from "vitest";
 
 import { addressedAs } from "../../compose-input";
@@ -448,6 +459,549 @@ describe("the reader, mapped exactly as K-05 v1.5's rowReader (README item 44; D
     if (step === undefined) throw new Error("bundle v0 holds S1-02");
     expect(lineToOf(step, 0)).toBe("owner");
     expect(lineToOf(step, 1)).toBeNull();
+  });
+});
+
+describe("a row that carries its own line: K-05 v1.22's read (T-1475; README item 83; DL-999 card 6)", () => {
+  /** S1-08's one line to the owner, word for word (MASTER-FLOW-A.md line 109; bundle v2's flow A, S1-08 say[0].text). */
+  const PLAN_LINE = "Here's the plan. You can stop anytime: text MORE to pick up where you left off.";
+
+  const CONTRACTS = new URL("../../../../contracts/", import.meta.url);
+  const K05_V122 = "https://rosie.invalid/contracts/data-access/data-access.v1.22.schema.json";
+
+  /** Every contract schema under contracts/ (Ajv 2020-12, strict, as contracts:check runs them), loaded once. */
+  let schemas: Ajv2020 | undefined;
+
+  /** The problems K-05 v1.22's `$defs/<definition>` finds in `value`; empty when accepted. */
+  function v122Problems(definition: string, value: unknown): string[] {
+    if (schemas === undefined) {
+      schemas = new Ajv2020({ strict: true, strictRequired: false, allErrors: true });
+      const files = readdirSync(CONTRACTS, { recursive: true, encoding: "utf8" })
+        .filter((file) => file.endsWith(".schema.json") && !file.endsWith(".meta.schema.json"))
+        .filter((file) => !file.startsWith("generated") && !file.startsWith("scripts"))
+        .filter((file) => !file.includes("node_modules"));
+      for (const file of files) {
+        schemas.addSchema(JSON.parse(readFileSync(new URL(file, CONTRACTS), "utf8")) as object);
+      }
+    }
+    const validate = schemas.getSchema(`${K05_V122}#/$defs/${definition}`);
+    if (validate === undefined) throw new Error(`K-05 v1.22 has no ${definition}`);
+    if (validate(value)) return [];
+    return (validate.errors ?? []).map((error) => `${error.instancePath} ${error.message ?? ""}`.trim());
+  }
+
+  /** A K-05 readOutboxRow fixture's answer, freshly parsed, by its file name. */
+  function k05Read(file: string): OutboxRowRead {
+    return (contractFile(`data-access/fixtures/${file}`) as { outcome: OutboxRowRead }).outcome;
+  }
+
+  /**
+   * K-05 v1.22's read-outbox-row-s1-08-sam.json answer: S1-08's row to Sam, the owner, which asks no question and holds
+   * its own step and line, so its line is read from the row (item 83.1).
+   */
+  const outboxRowS108 = (): OutboxRowRead => k05Read("read-outbox-row-s1-08-sam.json");
+
+  /**
+   * K-05 v1.22's read-outbox-row-s1-02-older-row.json answer: turn 1's S1-02 row, written with neither column, so its
+   * line is read from the question it asks, as v1.3 reads it (item 83.2).
+   */
+  const outboxRowOlder = (): OutboxRowRead => k05Read("read-outbox-row-s1-02-older-row.json");
+
+  /**
+   * bundle-v0-skeleton.json (the pin of both fixtures' rows), a test's own copy, holding S1-08 too, as bundle v2 holds it
+   * (bundles/v2/bundle/flow/A.json, T-1477: the master's step as compiled), with a change when a test asks for one.
+   */
+  function skeletonWithS108(change: (step: Json) => void = () => undefined): BundleDocument {
+    const bundle = sampleBundle("bundle-v0-skeleton.json");
+    const v2 = JSON.parse(
+      readFileSync(new URL("../../../../bundles/v2/bundle/flow/A.json", import.meta.url), "utf8"),
+    ) as { steps: Record<string, Json | undefined> };
+    const step = v2.steps["S1-08"];
+    if (step === undefined) throw new Error("bundle v2 holds S1-08");
+    change(step);
+    (bundle.flows.A as { steps: Record<string, Json> }).steps["S1-08"] = step;
+    return bundle;
+  }
+
+  /** S1-08's card lines that name no slot, in the card's order (bundle v2's S1-08 say[0].elements.card.lines). */
+  const PLAN_TERMS = [
+    "Your business and your ID: about 3 minutes",
+    "Any license or document you want shown (optional)",
+    "No extra agreement for your work",
+    "Then the barbershop, live in about 15 minutes",
+    "Then your people",
+    "Nothing you tell me is asked twice",
+  ];
+
+  /** What limit 7 fills S1-08's row from: the business head alone, at the read's moment, with no ask-by. */
+  const S108_SOURCE = {
+    filledAt: "2026-10-19T18:20:04Z",
+    zones: { visit: null, business: "America/New_York" },
+    channel: "imessage",
+    // businessSensitive null (no kinds of work stored): on (default 67).
+    sensitive: true,
+    record: null,
+    facts: { business: { name: "Lee's Barbershop", displayName: "Lee's Barbershop" } },
+  };
+
+  /** A K-09 request of S1-02's fixtures, for S1-08's row and its turn. */
+  function forS108(request: Json): Json {
+    const turnId = outboxRowS108().row.turnId;
+    return {
+      ...request,
+      caller: { ...(request.caller as Json), turnId, requestId: turnId },
+      outboxRowId: outboxRowS108().outboxRowId,
+    };
+  }
+
+  /** finalize-pass.json's request for S1-08's row, its plan S1-08's one line and no question. */
+  function finalizeS108(): Json {
+    const row = outboxRowS108().outboxRowId;
+    return {
+      ...forS108(finalizeExchange().request),
+      plan: {
+        row,
+        channel: "imessage",
+        copyOf: null,
+        plan: {
+          formats: ["text"],
+          lines: [{ role: "first", text: PLAN_LINE }],
+          question: null,
+          pageType: null,
+          threadReplyTo: null,
+        },
+      },
+    };
+  }
+
+  it("read-outbox-row-s1-08-sam.json's answer, its line from the row and no question, gives a compose row for S1-08, line 0, with no ask-by", async () => {
+    const read = outboxRowS108();
+    expect(v122Problems("readOutboxRow.v1dot6Response", read)).toEqual([]);
+    expect(read.line).toEqual({ step: "S1-08", index: 0, from: "row" });
+    expect(read.row.openQuestionId).toBeNull();
+    expect(read.slotSource.question).toBeNull();
+
+    const doubles = rowDoubles({ row: read, bundle: skeletonWithS108() });
+    const row = await composeRowOf(doubles.binding, structuredClone(read));
+    expect(row).toEqual({
+      outboxRowId: "out-s1-08-sam",
+      turnId: "turn-s1-04-sam",
+      state: "planned",
+      hasPlan: false,
+      channel: "imessage",
+      copyOfRowId: null,
+      fixedLineId: null,
+      recipientHandleId: "handle-sam",
+      bundleId: read.row.bundleId,
+      flow: "A",
+      step: "S1-08",
+      line: 0,
+      role: "owner",
+      name: "Sam Lee",
+      way: "texts",
+      handlingLine: null,
+      language: "en",
+      source: S108_SOURCE,
+      claim: {},
+      factSlots: [],
+      conversation: [],
+      allowedFormats: ["text"],
+      allowedLinks: [],
+      options: [],
+      openQuestions: [],
+      inbound: null,
+      situation: { safetyOutcomes: [], about: [] },
+    });
+    expect(row.source.facts).not.toHaveProperty("askBy");
+    // Nothing is read but the row's own bundle, and nothing is written.
+    expect(doubles.reads).toEqual([]);
+    expect(doubles.plans).toEqual([]);
+  });
+
+  it("the same read gives a finalize row with question null and no ask-by: S1-08's step, its master line, its card's terms and its fallback", async () => {
+    const read = outboxRowS108();
+    const doubles = rowDoubles({ row: read, bundle: skeletonWithS108() });
+    const row = await finalizeRowOf(doubles.binding, structuredClone(read));
+    expect(row.question).toBeNull();
+    expect(row.source).toEqual(S108_SOURCE);
+    expect(row.source.facts).not.toHaveProperty("askBy");
+    expect(row).toMatchObject({
+      outboxRowId: "out-s1-08-sam",
+      version: 1,
+      state: "planned",
+      channel: "imessage",
+      finalParts: null,
+      fixedLineId: null,
+      step: "S1-08",
+      reader: "owner",
+      calendarFile: "none",
+      fallbackText: PLAN_LINE,
+    });
+    expect(row.checks).toMatchObject({
+      language: "en",
+      // Under the switch (businessSensitive null: on), the business a fixed line names is its display name.
+      businessName: "Lee's Barbershop",
+      options: [],
+      typedOptions: null,
+      readerName: "Sam",
+      masterText: PLAN_LINE,
+      terms: PLAN_TERMS,
+    });
+  });
+
+  it("through the face, S1-08's row reaches compose input: the input is S1-08's master line to Sam, the owner, with no open question", async () => {
+    const doubles = rowDoubles({ row: outboxRowS108(), bundle: skeletonWithS108() });
+    const request = forS108(composeExchange().request);
+    const answer = await faceOf(doubles).composeInput(structuredClone(request), traceFor(request).trace);
+    expect(validator.check("composeInput", "response", answer)).toEqual([]);
+    expect(answer).toMatchObject({
+      result: "compose",
+      input: {
+        row: "out-s1-08-sam",
+        turn: "turn-s1-04-sam",
+        masterText: { step: "S1-08", text: PLAN_LINE },
+        audience: { role: "owner", name: "Sam", way: "texts" },
+        channel: "imessage",
+        situation: "gentle",
+        options: [],
+        openQuestions: [],
+        inbound: null,
+      },
+    });
+    const { facts } = (answer as unknown as { input: { facts: { value: string }[] } }).input;
+    expect(facts.map((fact) => fact.value)).toEqual(PLAN_TERMS);
+    expect(doubles.reads).toEqual(["readOutboxRow out-s1-08-sam@biz-lees-barbershop"]);
+  });
+
+  it("through the face, S1-08's row reaches finalize: its plan is checked and written with nothing to withdraw", async () => {
+    // The two facts of a later text, as K-05's fixed-line-facts-texted-before.json answers them: an opener mark that
+    // names an earlier row, and the opt-out line delivered. So no fixed line is added to this row.
+    const textedBefore = (
+      contractFile("data-access/fixtures/fixed-line-facts-texted-before.json") as {
+        outcome: ReturnType<typeof firstTextFacts>;
+      }
+    ).outcome;
+    expect(textedBefore.textedAboutBusiness).toBe(true);
+    expect(textedBefore.optOutLineDeliveredAt).not.toBeNull();
+    const facts = {
+      ...firstTextFacts(),
+      textedAboutBusiness: textedBefore.textedAboutBusiness,
+      optOutLineDeliveredAt: textedBefore.optOutLineDeliveredAt,
+    };
+    const doubles = rowDoubles({ row: outboxRowS108(), facts, bundle: skeletonWithS108() });
+    const request = finalizeS108();
+    const called = await settle(
+      faceOf(doubles).finalizeMessage(structuredClone(request), traceFor(request).trace),
+    );
+    expect(called.thrown).toBeUndefined();
+    const answer = called.answer as unknown as Json;
+    expect(validator.check("finalizeMessage", "response", answer)).toEqual([]);
+    expect(answer).toMatchObject({ outcome: "send", questionWithdrawn: false, teamPageId: null });
+    // No fixed line is added, so the plan's one line goes as it is.
+    expect(answer.finalParts).toMatchObject({
+      row: "out-s1-08-sam",
+      sends: [{ kind: "words", text: PLAN_LINE, options: [] }],
+      fixedLines: [],
+    });
+    expect(doubles.plans).toHaveLength(1);
+    expect(doubles.plans[0]).toMatchObject({ outboxRowId: "out-s1-08-sam", expectVersion: 1 });
+    expect(doubles.plans[0]?.finalParts).toEqual(answer.finalParts);
+    expect(doubles.cancels).toEqual([]);
+    expect(doubles.reads).toEqual([
+      "readOutboxRow out-s1-08-sam@biz-lees-barbershop",
+      "readFixedLineFacts out-s1-08-sam@biz-lees-barbershop",
+    ]);
+  });
+
+  it("the reader mapping reads a line from the row exactly as one from its question: S1-08's row by Sam's owner role, by the sign-up line for Sam with no role, and refused as S1-02's row is (default 214)", async () => {
+    const given = rowReaderFixture("row-reader-s1-02-no-role.json").given;
+    const s108 = outboxRowS108();
+    const noRole: OutboxRowRead = { ...s108, recipient: { ...s108.recipient, roles: [] } };
+    /** S1-08 with its line from Rosie sent to another lane. */
+    const sayTo = (to: string): BundleDocument =>
+      skeletonWithS108((step) => {
+        step.say = (step.say as Json[]).map((message) => ({ ...message, to }));
+      });
+    const ownerByLine = { result: "reader", reader: "owner", from: "signUpLine", roleId: null };
+    const cases: {
+      label: string;
+      read: OutboxRowRead;
+      bundle?: BundleDocument;
+      section: number;
+      lineTo: string;
+      outcome: Json;
+    }[] = [
+      {
+        label: "Sam holds his owner role (the fixture's own recipient): read by the role, never by the line",
+        read: s108,
+        section: 1,
+        lineTo: "owner",
+        outcome: { result: "reader", reader: "owner", from: "roles", roleId: "role-sam-barber" },
+      },
+      {
+        label: "Sam with no role yet, a person, on S1-08's section 1 line to the owner: by the sign-up line",
+        read: noRole,
+        section: 1,
+        lineTo: "owner",
+        outcome: ownerByLine,
+      },
+      {
+        label: "no person on the row",
+        read: { ...noRole, recipient: { ...noRole.recipient, personId: null } },
+        section: 1,
+        lineTo: "owner",
+        outcome: { error: "noReader", why: "noRole" },
+      },
+      {
+        label: "a step outside section 1",
+        read: noRole,
+        bundle: skeletonWithS108((step) => {
+          step.section = 2;
+        }),
+        section: 2,
+        lineTo: "owner",
+        outcome: { error: "noReader", why: "noRole" },
+      },
+      {
+        label: "a line to no reader lane",
+        read: noRole,
+        bundle: sayTo("agent"),
+        section: 1,
+        lineTo: "agent",
+        outcome: { error: "noReader", why: "lineHasNoReader" },
+      },
+      {
+        label: "a cust line: read as the customer, never as the owner",
+        read: noRole,
+        bundle: sayTo("cust"),
+        section: 1,
+        lineTo: "cust",
+        outcome: { result: "reader", reader: "customer", from: "signUpLine", roleId: null },
+      },
+      {
+        label: "a role that reads as no one: never read by the line, though it goes to the owner",
+        read: {
+          ...s108,
+          recipient: {
+            ...s108.recipient,
+            roles: [{ roleId: "role-sam-own", role: "own_business", version: 1 }],
+          },
+        },
+        section: 1,
+        lineTo: "owner",
+        outcome: { error: "noReader", why: "roleReadsAsNoOne" },
+      },
+    ];
+    for (const each of cases) {
+      const bundle = each.bundle ?? skeletonWithS108();
+      const fromRow = await readingOf(each.read, bundle);
+      expect(fromRow.request, each.label).toEqual({
+        outboxRowId: "out-s1-08-sam",
+        bundleId: each.read.row.bundleId,
+        line: { step: "S1-08", index: 0, from: "row" },
+        recipient: { personId: each.read.recipient.personId, roles: each.read.recipient.roles },
+        flow: "A",
+        section: each.section,
+        lineTo: each.lineTo,
+      });
+      expect(fromRow.outcome, each.label).toEqual({ outboxRowId: "out-s1-08-sam", ...each.outcome });
+      // The exchange is one of K-05 v1.22's rowReader.exchange (v1.20's rules 0 to 7); v1.5's knows no line from the row.
+      const exchange = exchangeOf(given, fromRow.request, fromRow.outcome);
+      expect(v122Problems("rowReader.exchange", exchange), each.label).toEqual([]);
+      expect(rowReaderProblems(exchange), each.label).not.toEqual([]);
+      // Where the row is not read as the owner by the sign-up line, the schema refuses that reading of it.
+      if (each.outcome !== ownerByLine) {
+        const asOwner = exchangeOf(given, fromRow.request, { outboxRowId: "out-s1-08-sam", ...ownerByLine });
+        expect(v122Problems("rowReader.exchange", asOwner), each.label).not.toEqual([]);
+      }
+
+      // The same read with its line told as from its question: the same outcome, and the same request but `from`.
+      const line = each.read.line;
+      if (line === null) throw new Error("S1-08's row carries its line");
+      const fromQuestion = await readingOf({ ...each.read, line: { ...line, from: "openQuestion" } }, bundle);
+      expect(fromQuestion.outcome, each.label).toEqual(fromRow.outcome);
+      expect(fromQuestion.request, each.label).toEqual({
+        ...fromRow.request,
+        line: { step: "S1-08", index: 0, from: "openQuestion" },
+      });
+      expect(rowReaderProblems(exchangeOf(given, fromQuestion.request, fromQuestion.outcome))).toEqual([]);
+    }
+  });
+
+  it("the sign-up reading of S1-08's row to Sam with no role: compose input reads the owner, and nothing is stored or handed on as a role", async () => {
+    const s108 = outboxRowS108();
+    const read: OutboxRowRead = { ...s108, recipient: { ...s108.recipient, roles: [] } };
+    const doubles = rowDoubles({ row: read, bundle: skeletonWithS108() });
+    const row = await composeRowOf(doubles.binding, structuredClone(read));
+    expect(row).toMatchObject({ step: "S1-08", line: 0, role: "owner", name: "Sam Lee" });
+    expect((await finalizeRowOf(doubles.binding, structuredClone(read))).reader).toBe("owner");
+    expect(read.recipient.roles).toEqual([]);
+    expect(doubles.plans).toEqual([]);
+  });
+
+  it("the S1-02 row is unchanged: read-outbox-row-s1-02-older-row.json's answer, its line from its question, gives the compose and finalize rows read-outbox-row-s1-02-no-kinds.json's gives, but the moment", async () => {
+    const older = outboxRowOlder();
+    const noKinds = outboxRowNoKinds();
+    expect(v122Problems("readOutboxRow.v1dot6Response", older)).toEqual([]);
+    expect(older.line).toEqual({ step: "S1-02", index: 0, from: "openQuestion" });
+    expect(older).toEqual({ ...noKinds, readAt: older.readAt });
+    expect(older.readAt).not.toBe(noKinds.readAt);
+
+    const doubles = rowDoubles({ row: older });
+    const composed = await composeRowOf(doubles.binding, structuredClone(older));
+    const composedBefore = await composeRowOf(rowDoubles({ row: noKinds }).binding, structuredClone(noKinds));
+    expect(composed).toEqual({
+      ...composedBefore,
+      source: { ...composedBefore.source, filledAt: older.readAt },
+    });
+    expect(composed).toMatchObject({ step: "S1-02", line: 0, role: "owner" });
+
+    const finalized = await finalizeRowOf(doubles.binding, structuredClone(older));
+    const finalizedBefore = await finalizeRowOf(
+      rowDoubles({ row: noKinds }).binding,
+      structuredClone(noKinds),
+    );
+    expect(finalized).toEqual({
+      ...finalizedBefore,
+      source: { ...finalizedBefore.source, filledAt: older.readAt },
+    });
+    expect(finalized.question).toEqual({
+      openQuestionId: "oq-s1-02-sam-1",
+      openQuestionVersion: 1,
+      clockRowId: "clock-oq-s1-02-sam-1",
+      clockVersion: 1,
+    });
+  });
+
+  it("a row that asks a question and holds its own step and line (as the walk will stamp it) gives the rows its question's line gives: S1-02's, its question and clock row kept", async () => {
+    const fromQuestion = outboxRowS102();
+    const fromRow: OutboxRowRead = { ...fromQuestion, line: { step: "S1-02", index: 0, from: "row" } };
+    expect(fromQuestion.line).toEqual({ step: "S1-02", index: 0, from: "openQuestion" });
+    expect(v122Problems("readOutboxRow.v1dot6Response", fromRow)).toEqual([]);
+
+    const doubles = rowDoubles({ row: fromRow });
+    const before = rowDoubles().binding;
+    expect(await composeRowOf(doubles.binding, structuredClone(fromRow))).toEqual(
+      await composeRowOf(before, structuredClone(fromQuestion)),
+    );
+    const finalized = await finalizeRowOf(doubles.binding, structuredClone(fromRow));
+    expect(finalized).toEqual(await finalizeRowOf(before, structuredClone(fromQuestion)));
+    expect(finalized.question).toMatchObject({
+      openQuestionId: "oq-s1-02-sam-1",
+      clockRowId: "clock-oq-s1-02-sam-1",
+    });
+
+    // Through the face after turn 1: compose-input-s1-02-v1.6.json's input word for word, as from its question.
+    const face = await faceAfterTurnOne(doubles);
+    const { request, outcome } = composeExchange();
+    const answer = await face.composeInput(structuredClone(request), traceFor(request).trace);
+    expect(answer).toEqual({ result: "compose", input: outcome.input });
+  });
+
+  it("a null line is still refused, never guessed: a row that holds neither column and asks no question (read-outbox-row-no-question.json, frozen), and S1-08's row read with no line", async () => {
+    // A v1.3 answer (no switch), handed in as one only for its null line.
+    const frozen = k05Read("read-outbox-row-no-question.json");
+    expect(frozen.line).toBeNull();
+    expect(frozen.slotSource.question).toBeNull();
+    const s108NoLine: OutboxRowRead = { ...outboxRowS108(), line: null };
+    for (const read of [frozen, s108NoLine]) {
+      const { binding } = rowDoubles({ row: read, bundle: skeletonWithS108() });
+      const refusals: (() => Promise<unknown>)[] = [
+        () => composeRowOf(binding, structuredClone(read)),
+        () => finalizeRowOf(binding, structuredClone(read)),
+        () => readerOfRow(binding.bundles, structuredClone(read)),
+      ];
+      for (const refuse of refusals) {
+        const refused = await settle(refuse());
+        expect(refused.thrown).toBeInstanceOf(TurnFaceRefusedError);
+        expect(refused.thrown).toMatchObject({ fault: "noLine" });
+      }
+    }
+
+    // Through the face on S1-08's row with no line: compose input and finalize both fail closed, nothing written.
+    const doubles = rowDoubles({ row: s108NoLine, bundle: skeletonWithS108() });
+    const compose = forS108(composeExchange().request);
+    const composed = await settle(
+      faceOf(doubles).composeInput(structuredClone(compose), traceFor(compose).trace),
+    );
+    expect(composed.thrown).toMatchObject({ name: "TurnFaceRefusedError", fault: "noLine" });
+    const finalize = finalizeS108();
+    const finalized = await settle(
+      faceOf(doubles).finalizeMessage(structuredClone(finalize), traceFor(finalize).trace),
+    );
+    expect(finalized.thrown).toMatchObject({ name: "TurnFaceRefusedError", fault: "noLine" });
+    expect(doubles.plans).toEqual([]);
+    expect(doubles.reads).toEqual([
+      "readOutboxRow out-s1-08-sam@biz-lees-barbershop",
+      "readOutboxRow out-s1-08-sam@biz-lees-barbershop",
+    ]);
+  });
+
+  it("a line from the row is never guessed either: a step the row's bundle does not hold is refused (stepMissing), as the skeleton alone holds no S1-08", async () => {
+    const read = outboxRowS108();
+    const { binding } = rowDoubles({ row: read });
+    const refusals: (() => Promise<unknown>)[] = [
+      () => composeRowOf(binding, structuredClone(read)),
+      () => finalizeRowOf(binding, structuredClone(read)),
+    ];
+    for (const refuse of refusals) {
+      const refused = await settle(refuse());
+      expect(refused.thrown).toBeInstanceOf(TurnFaceRefusedError);
+      expect(refused.thrown).toMatchObject({ fault: "stepMissing" });
+    }
+    // An index S1-08 has no line from Rosie at: no role Sam holds reads it, and with no role the line has no reader.
+    const second: OutboxRowRead = { ...read, line: { step: "S1-08", index: 1, from: "row" } };
+    const byRole = await settle(
+      composeRowOf(rowDoubles({ row: second, bundle: skeletonWithS108() }).binding, structuredClone(second)),
+    );
+    expect(byRole.thrown).toMatchObject({
+      name: "TurnFaceRefusedError",
+      fault: "noReader",
+      why: "roleReadsAsNoOne",
+    });
+    const noRole: OutboxRowRead = { ...second, recipient: { ...second.recipient, roles: [] } };
+    const byLine = await settle(
+      composeRowOf(rowDoubles({ row: noRole, bundle: skeletonWithS108() }).binding, structuredClone(noRole)),
+    );
+    expect(byLine.thrown).toMatchObject({
+      name: "TurnFaceRefusedError",
+      fault: "noReader",
+      why: "lineHasNoReader",
+    });
+  });
+
+  it("a row whose question holds options is still notBuilt, whichever its line is read from (default 7): S1-02's row with options, its line from the row", async () => {
+    const withOptions = (from: "openQuestion" | "row"): OutboxRowRead =>
+      rowWith((row) => {
+        const question = row.slotSource.question;
+        if (question === null) throw new Error("S1-02's row asks its question");
+        return {
+          ...row,
+          line: { step: "S1-02", index: 0, from },
+          slotSource: {
+            ...row.slotSource,
+            question: { ...question, options: [{ id: "o-1", label: "1 Yes" }] },
+          },
+        };
+      });
+    for (const from of ["row", "openQuestion"] as const) {
+      const read = withOptions(from);
+      expect(v122Problems("readOutboxRow.v1dot6Response", read)).toEqual([]);
+      const compose = composeExchange().request;
+      const composed = await faceOf(rowDoubles({ row: read })).composeInput(
+        structuredClone(compose),
+        traceFor(compose).trace,
+      );
+      expect(composed, from).toEqual({ error: "notBuilt", call: "composeInput" });
+      const doubles = rowDoubles({ row: read, facts: firstTextFacts() });
+      const finalize = finalizeExchange().request;
+      const finalized = await faceOf(doubles).finalizeMessage(
+        structuredClone(finalize),
+        traceFor(finalize).trace,
+      );
+      expect(finalized, from).toEqual({ error: "notBuilt", call: "finalizeMessage" });
+      expect(doubles.plans).toEqual([]);
+    }
   });
 });
 
