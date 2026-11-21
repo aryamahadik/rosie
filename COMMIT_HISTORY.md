@@ -2,9 +2,63 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 835, [`1057240b`](https://github.com/aryamahadik/rosie/commit/1057240b), 2026-11-21 10:43:42 UTC.
+- **Through:** commit 838, [`b17f005b`](https://github.com/aryamahadik/rosie/commit/b17f005b), 2026-11-21 12:57:57 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 838. docs: COMMIT\_HISTORY.md through commit 835 (1057240b, \#847) (\#849)
+
+- **Commit:** [`b17f005b`](https://github.com/aryamahadik/rosie/commit/b17f005b), by Arya Mahadik, 2026-11-21 12:57:57 UTC
+- **Pull request:** [#849](https://github.com/aryamahadik/rosie/pull/849) from `task/commit-history-201`, merged 2026-11-21 12:57:57 UTC. It squashed 1 branch commit:
+  - `e8f3dde` docs: COMMIT\_HISTORY.md through commit 835 (1057240b, \#847)
+- **Files changed:** 1 (+89 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +89 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 837. T-1509: db/repo builds K-05 v1.21's raise: commitTurn asks one live open question again (askAgain checked, locked beside the closes, versionChanged then wrongState, ask\_count and version raised after the closes), v1.20's answer type kept by an overload; checkFire throws on a firing that carries askAgain (DL-1030, DL-1045) (\#848)
+
+- **Commit:** [`fa5407db`](https://github.com/aryamahadik/rosie/commit/fa5407db), by Arya Mahadik, 2026-11-21 12:57:54 UTC
+- **Pull request:** [#848](https://github.com/aryamahadik/rosie/pull/848) from `task/T-1509`, merged 2026-11-21 12:57:54 UTC. It squashed 1 branch commit:
+  - `d11b5b4` T-1509: db/repo builds K-05 v1.21's raise: commitTurn asks one live o…
+- **Files changed:** 4 (+948 −10), by folder:
+  - `db/repo/` clocks.int.test.ts +54 −0, clocks.ts +7 −0, commit-turn-ask-again.int.test.ts +750 −0, commit-turn.ts +137 −10
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 836. T-1519: S1-01 reuses a number's existing chat thread; staging's gate binds the chat read (DL-1048, DL-1051, DL-1058) (\#850)
+
+- **Commit:** [`e4e114a4`](https://github.com/aryamahadik/rosie/commit/e4e114a4), by Arya Mahadik, 2026-11-21 12:57:50 UTC
+- **Pull request:** [#850](https://github.com/aryamahadik/rosie/pull/850) from `task/T-1519s`, merged 2026-11-21 12:57:51 UTC. It squashed 1 branch commit:
+  - `6c0db63` T-1519: S1-01 reuses a number's existing chat thread; staging's gate …
+- **Files changed:** 13 (+1364 −52), by folder:
+  - `actions/src/commit/walk/` index.ts +4 −1, test-support.ts +31 −0, thread.test.ts +210 −0, writes.ts +60 −6
+  - `actions/src/tool-api/turn-face/` calls-test-support.ts +7 −1, commit.test.ts +77 −0, commit.ts +65 −15
+  - `actions/src/tool-api/turn-face/pg/` calls.ts +7 −3, thread.int.test.ts +551 −0
+  - `runtime/src/wiring/` gate-binding.test.ts +178 −8, real.ts +27 −4
+  - `runtime/src/wiring/staging/` tool-api-gate.ts +45 −13, tool-api-gate.worker.test.ts +102 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+One commit holding task/T-1519's final tree (f7ce552a, QA, the database engineer and the security reviewer PASS) on main 1057240, so the train rebases cleanly.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 835. docs: COMMIT\_HISTORY.md through commit 832 (7e57119f, \#843) (\#847)
 
@@ -19021,3 +19075,4 @@ Each was replaced by another pull request (a branch rebased or squashed under a 
 - [#589](https://github.com/aryamahadik/rosie/pull/589) T-054: K-09 Tool API v1.9 frozen with journey 7's 17 calls and the fee door, every v1.8 definition carried by reference (`task/T-054`, 2 branch commits, closed 2026-11-13 22:10:38 UTC)
 - [#614](https://github.com/aryamahadik/rosie/pull/614) T-1285: signInCheck and signOut's server side, every wrong-code answer the same with or without an account (ADR-016 card B2) (`task/T-1285`, 2 branch commits, closed 2026-11-14 08:45:15 UTC)
 - [#634](https://github.com/aryamahadik/rosie/pull/634) T-1397: staging binds the bundle-backed BundleSafety, with the safety read awaiting its bundle's checked lines (the audit's P3b) (`task/T-1397-r2`, 3 branch commits, closed 2026-11-15 02:06:24 UTC)
+- [#846](https://github.com/aryamahadik/rosie/pull/846) T-1519: S1-01 reuses a number's existing chat thread; staging's gate binds the chat read (DL-1048, DL-1051) (`task/T-1519`, 5 branch commits, closed 2026-11-21 12:13:08 UTC)
