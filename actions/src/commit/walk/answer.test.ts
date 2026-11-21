@@ -7,6 +7,12 @@
 // "One isn't on the list yet" reaches S1-03 and "Not a service we book" S1-74's end; a step that writes something with
 // no writer is refused with nothing returned; the same part twice gives the same writes; a hold stops the walk; no trade
 // overlay applies before a kind is known. T-1139's own cases stay in walk.test.ts, unchanged.
+//
+// T-1479: every row is as before plus its step and line (K-05 v1.22 item 82): S1-04's question's row names S1-04 and
+// line 0 (writes.ts default 15), each writer's row its writer's step and its place among that writer's rows (S1-03's and
+// S1-74's one row: line 0; default 16); the rows are held to K-05 v1.22's outboxRowNew and the built request to its
+// commitTurn.request. A writer's row naming another step is refused (rowNotStep); a line a writer names is kept; an
+// email copy names neither.
 
 import { describe, expect, it } from "vitest";
 
@@ -36,11 +42,14 @@ import {
   decidedOf,
   flowAV1,
   hold,
+  k05v122,
   questionsOver,
   requestTurnFields,
+  rowsWriter,
   s1_02QuestionRow,
   s1_02Writer,
   stepIn,
+  tellingWriter,
   tradeOverlayV1,
   turnTwoOnV1,
   writersOf,
@@ -218,9 +227,11 @@ describe("commit-s1-02.json's part on bundle v1: 'All on the list' is answered",
     );
     // S1-04's question to Sam at Lee's Barbershop (no options, no read-back, no versions read, step 9's default clock,
     // no safe default) and the quick reply asking it on his text's service: T-305's double of the same fixture, up to
-    // their row ids.
+    // their row ids, the row naming S1-04 and line 0 beside (K-05 v1.22 item 82; writes.ts default 15).
     expect(writes.asks.map(askUpToId)).toEqual(double.asks.map(askUpToId));
-    expect(writes.messages.map(rowUpToIds)).toEqual(double.messages.map(rowUpToIds));
+    expect(writes.messages.map(rowUpToIds)).toEqual(
+      double.messages.map((row) => ({ ...rowUpToIds(row), step: "S1-04", lineNo: 0 })),
+    );
     expect(writes.asks).toEqual([
       {
         question: {
@@ -250,6 +261,8 @@ describe("commit-s1-02.json's part on bundle v1: 'All on the list' is answered",
         openQuestionId: "oq-s1-04-sam-1",
         copyOfRowId: null,
         versionsRead: [],
+        step: "S1-04",
+        lineNo: 0,
       },
     ]);
     // oq-s1-02 closed answered, with no option id, at the version its row was read at, as the double closes it.
@@ -276,12 +289,12 @@ describe("commit-s1-02.json's part on bundle v1: 'All on the list' is answered",
     });
   });
 
-  it("writes each row in K-05's own shapes, and the question read's row is K-05 v1.2's openQuestionRead", async () => {
+  it("writes each row in K-05's own shapes (its outbox row K-05 v1.22's), and the question read's row is K-05 v1.2's openQuestionRead", async () => {
     const { writes } = await answer("c-01");
     const checks = contractChecks();
     for (const write of writes.state) expect(checks.k05("stateWrite", write)).toEqual([]);
     for (const ask of writes.asks) expect(checks.k05("openQuestionNew", ask.question)).toEqual([]);
-    for (const row of writes.messages) expect(checks.k05("outboxRowNew", row)).toEqual([]);
+    for (const row of writes.messages) expect(k05v122("outboxRowNew", row)).toEqual([]);
     for (const close of writes.closes) expect(checks.k05("openQuestionClose", close)).toEqual([]);
     for (const ref of writes.versionsRead) expect(checks.k05("rowRef", ref)).toEqual([]);
     expect(checks.k05("openQuestionRead", s1_02QuestionRow())).toEqual([]);
@@ -304,7 +317,7 @@ describe("commit-s1-02.json's part on bundle v1: 'All on the list' is answered",
       units: [{ writes, answer: { openQuestionId: "oq-s1-02", optionId: null, eventId: "evt-sam-0001" } }],
     });
     const checks = contractChecks();
-    expect(checks.k05("commitTurn.request", request)).toEqual([]);
+    expect(k05v122("commitTurn.request", request)).toEqual([]);
     const rows = eventLogRowsOf(request, exchange.request.now);
     for (const row of rows) expect(checks.k08("eventLogRow", row), String(row.id)).toEqual([]);
     expect(checks.k08("eventLogBatch", { rows })).toEqual([]);
@@ -354,10 +367,10 @@ describe("S1-02's branches on bundle v1, each walked step written by its own wri
     const { writes, calls, exchange } = await answer("c-02");
     expect(stepsWritten(calls)).toEqual(["S1-02", "S1-03", "S1-11"]);
     expect(writes.why).toEqual({ step: "S1-02", choice: "One isn't on the list yet" });
-    // S1-03's message (its writer's) goes before S1-04's question, in the walk's order.
-    expect(writes.messages.map((row) => [row.id, row.openQuestionId])).toEqual([
-      ["outbox-s1-03-sam-1", null],
-      ["outbox-s1-04-sam-1", "oq-s1-04-sam-1"],
+    // S1-03's message (its writer's) goes before S1-04's question, in the walk's order, each naming its step and line.
+    expect(writes.messages.map((row) => [row.id, row.openQuestionId, row.step, row.lineNo])).toEqual([
+      ["outbox-s1-03-sam-1", null, "S1-03", 0],
+      ["outbox-s1-04-sam-1", "oq-s1-04-sam-1", "S1-04", 0],
     ]);
     expect(writes.asks.map((ask) => ask.question.id)).toEqual(["oq-s1-04-sam-1"]);
     expect(writes.closes.map((close) => close.id)).toEqual(["oq-s1-02"]);
@@ -374,8 +387,8 @@ describe("S1-02's branches on bundle v1, each walked step written by its own wri
     });
     const { writes, calls } = await answer("c-03");
     expect(stepsWritten(calls)).toEqual(["S1-02", "S1-74"]);
-    expect(writes.messages.map((row) => [row.id, row.openQuestionId])).toEqual([
-      ["outbox-s1-74-sam-1", null],
+    expect(writes.messages.map((row) => [row.id, row.openQuestionId, row.step, row.lineNo])).toEqual([
+      ["outbox-s1-74-sam-1", null, "S1-74", 0],
     ]);
     expect(writes.asks).toEqual([]);
     expect(writes.closes.map((close) => close.id)).toEqual(["oq-s1-02"]);
@@ -457,6 +470,118 @@ describe("a walked step that writes something with no writer bound is refused, w
     const writers = { ...allWriters(), "S1-11": s1_02Writer };
     const { error } = await refusal("c-01", answerWalk({ writers }));
     expectRefused(error, "givesNotStep", ["S1-11", "kinds"]);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1479: a writer's rows carry the writer's own step, and their lines (writes.ts default 16; K-05 v1.22 item 82)
+
+describe("a writer's rows name the writer's own step and their lines (T-1479; writes.ts default 16)", () => {
+  /** S1-03's row as the telling stand-in writes it on turn 2's 'One isn't on the list yet', step and line left out. */
+  async function s1_03Row(): Promise<OutboxRowNew> {
+    const { writes } = await answer(
+      "c-02",
+      answerWalk({ writers: { ...allWriters(), "S1-03": tellingWriter } }),
+    );
+    const [row] = writes.messages;
+    if (row === undefined) throw new Error("S1-03 writes a row");
+    const fields: OutboxRowNew = { ...row };
+    Reflect.deleteProperty(fields, "step");
+    Reflect.deleteProperty(fields, "lineNo");
+    return fields;
+  }
+
+  /** Turn 2's 'One isn't on the list yet' with S1-03's writer handing back `rows` as given. */
+  async function withS1_03Rows(rows: readonly OutboxRowNew[]) {
+    return answer("c-02", answerWalk({ writers: { ...allWriters(), "S1-03": rowsWriter(rows) } }));
+  }
+
+  /** The rows S1-03's writer gave, as the walk wrote them: id, step and line. */
+  function s1_03Lines(writes: UnitWrites): (string | number | undefined)[][] {
+    return writes.messages
+      .filter((row) => row.openQuestionId === null)
+      .map((row) => [row.id, row.step, row.lineNo]);
+  }
+
+  it("a row that names no step or line takes the writer's step and its place among the writer's rows, from 0", async () => {
+    const row = await s1_03Row();
+    const { writes } = await withS1_03Rows([
+      { ...row, id: "outbox-s1-03-sam-1" },
+      { ...row, id: "outbox-s1-03-sam-2" },
+      { ...row, id: "outbox-s1-03-sam-3" },
+    ]);
+    expect(s1_03Lines(writes)).toEqual([
+      ["outbox-s1-03-sam-1", "S1-03", 0],
+      ["outbox-s1-03-sam-2", "S1-03", 1],
+      ["outbox-s1-03-sam-3", "S1-03", 2],
+    ]);
+    for (const each of writes.messages) expect(k05v122("outboxRowNew", each)).toEqual([]);
+  });
+
+  it("a line the writer names is kept, with its own step or none named; the others count their place", async () => {
+    const row = await s1_03Row();
+    const { writes } = await withS1_03Rows([
+      { ...row, id: "outbox-s1-03-sam-1", step: "S1-03", lineNo: 2 },
+      { ...row, id: "outbox-s1-03-sam-2" },
+      { ...row, id: "outbox-s1-03-sam-3", lineNo: 4 },
+    ]);
+    expect(s1_03Lines(writes)).toEqual([
+      ["outbox-s1-03-sam-1", "S1-03", 2],
+      ["outbox-s1-03-sam-2", "S1-03", 1],
+      ["outbox-s1-03-sam-3", "S1-03", 4],
+    ]);
+  });
+
+  it("an email copy names neither, and its place is not counted (K-05 v1.22 default 210)", async () => {
+    const row = await s1_03Row();
+    const { writes } = await withS1_03Rows([
+      { ...row, id: "outbox-s1-03-sam-1" },
+      { ...row, id: "outbox-s1-03-sam-2", channel: "email", copyOfRowId: "outbox-s1-03-sam-1", lineNo: 0 },
+      { ...row, id: "outbox-s1-03-sam-3" },
+    ]);
+    const [, copied] = writes.messages;
+    expect(copied).toBeDefined();
+    expect(Object.keys(copied ?? {})).not.toContain("step");
+    expect(Object.keys(copied ?? {})).not.toContain("lineNo");
+    expect(s1_03Lines(writes)).toEqual([
+      ["outbox-s1-03-sam-1", "S1-03", 0],
+      ["outbox-s1-03-sam-2", undefined, undefined],
+      ["outbox-s1-03-sam-3", "S1-03", 1],
+    ]);
+  });
+
+  it.each([
+    ["the step the walk stops at", "S1-04"],
+    ["the answered split", "S1-02"],
+    ["a step the bundle does not hold", "S1-08"],
+  ] as const)(
+    "a row naming another step (%s) is refused (rowNotStep), naming both steps, nothing written",
+    async (_, other) => {
+      const row = await s1_03Row();
+      const writers = { ...allWriters(), "S1-03": rowsWriter([{ ...row, step: other, lineNo: 0 }]) };
+      const { error, calls } = await refusal("c-02", answerWalk({ writers }));
+      expectRefused(error, "rowNotStep", ["S1-03", other]);
+      // S1-11's writer, after S1-03's, is never called: the part fails closed at S1-03's rows.
+      expect(stepsWritten(calls)).toEqual(["S1-02", "S1-03"]);
+    },
+  );
+
+  it("an email copy naming another step is refused as well (rowNotStep)", async () => {
+    const row = await s1_03Row();
+    const copied = { ...row, channel: "email" as const, copyOfRowId: "outbox-s1-03-sam-1", step: "S1-74" };
+    const writers = { ...allWriters(), "S1-03": rowsWriter([row, copied]) };
+    expectRefused((await refusal("c-02", answerWalk({ writers }))).error, "rowNotStep", ["S1-03", "S1-74"]);
+  });
+
+  it("the writer's own rows are left as it handed them: the walk writes its own copies", async () => {
+    const row = await s1_03Row();
+    const given = [{ ...row }];
+    const writer: StepWriter<WalkTestRepo> = () =>
+      Promise.resolve({ state: [], stateEvents: [], gives: [], asks: [], messages: given });
+    const { writes } = await answer("c-02", answerWalk({ writers: { ...allWriters(), "S1-03": writer } }));
+    expect(given).toEqual([row]);
+    expect(writes.messages[0]).not.toBe(given[0]);
+    expect(writes.messages[0]).toEqual({ ...row, step: "S1-03", lineNo: 0 });
   });
 });
 

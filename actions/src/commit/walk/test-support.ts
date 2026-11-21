@@ -15,9 +15,17 @@
 //
 // T-1519 adds the chat read's double (K-05 v1.10 item 51 readChatHandle as the walk's WalkChats port takes it: the handle
 // whose chat thread holds a chat id), each read written down; it never stands in for the walk.
+//
+// T-1479 adds K-05 v1.22's own schema (the walk's rows name their step and line: outboxRowNew, writes and
+// commitTurn.request as v1.22 restates them), bundle v2's compiled S1-08 and S1-09 (bundles/v2, T-1477) placed in
+// T-1491's test graph, and a stand-in writer that hands back rows as given, to show how the walk names their step and
+// line.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
+
+import type { ValidateFunction } from "ajv";
+import Ajv2020 from "ajv/dist/2020.js";
 
 import type { OpenQuestionRead } from "../../../../db/repo/targets";
 import { copy, gateRequest, modelFixture } from "../../gate/framework/test-support";
@@ -29,6 +37,7 @@ import type {
   GatedVerbPart,
   SetupKey,
 } from "../../gate/framework";
+import { formatProblems } from "../../tool-api";
 import { contractFile, fixture } from "../../tool-api/test-support";
 import { CONTRACTS_DIR } from "../../tool-api/validator";
 import { choiceOf } from "../hold";
@@ -604,7 +613,8 @@ export const S1_09_BRANCHES = [
  *     question and no buttons; it needs companies and pf.rules, gives nothing and tells the owner; next S1-09;
  *   - S1-09 (lines 112 to 129): a split Rosie asks the owner by text, its three message branches merging, with a card of
  *     step 9's default clock and its safe default; it needs companies and gives business; next S1-10, which it does not
- *     hold. Its message carries no buttons here: a split asked with buttons is not built yet (writes.ts default 10).
+ *     hold. Its message carries no buttons here, as before T-1479; flowAWithCompiledPlan places bundle v2's compiled
+ *     S1-09, whose message carries two buttons (writes.ts default 10).
  */
 export function flowAWithPlan(): GraphValue {
   const graph = flowAV1();
@@ -667,4 +677,82 @@ export function s1_04SettledRows(): StepRows {
   const [first] = given.stated.writes.state;
   if (first === undefined) throw new Error("commit-s1-04.json states its rows");
   return { state: [first], stateEvents: [], gives: ["companies"], asks: [], messages: [] };
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1479: K-05 v1.22 (a row's step and line), bundle v2's compiled S1-08 and S1-09, and a writer of given rows
+
+const DATA_ACCESS_V1_22_FILE = "data-access/data-access.v1.22.schema.json";
+const DATA_ACCESS_V1_22 = `https://rosie.invalid/contracts/${DATA_ACCESS_V1_22_FILE}`;
+
+/** Every file a schema's $refs name, relative to contracts/ (a $ref inside the schema itself names none). */
+function referencedFiles(file: string, schema: unknown): string[] {
+  if (Array.isArray(schema)) return schema.flatMap((item) => referencedFiles(file, item));
+  if (!isRecord(schema)) return [];
+  return Object.entries(schema).flatMap(([key, inner]) => {
+    if (key !== "$ref" || typeof inner !== "string") return referencedFiles(file, inner);
+    const target = inner.split("#")[0] ?? "";
+    return target === "" ? [] : [path.posix.join(path.posix.dirname(file), target)];
+  });
+}
+
+let v1dot22: ((definition: string, value: unknown) => string[]) | undefined;
+
+/**
+ * Problems K-05 v1.22 `$defs/<definition>` finds, one line each (a path and what it wants, never a value), on one strict
+ * Ajv 2020 instance holding data-access.v1.22.schema.json and every file its $refs reach (K-05 v1 to v1.21 among them),
+ * each once: outboxRowNew with its optional step and lineNo (both or neither), writes, commitTurn.request and
+ * commitTurn.rowLineExchange (README item 82).
+ */
+export function k05v122(definition: string, value: unknown): string[] {
+  if (v1dot22 === undefined) {
+    const ajv = new Ajv2020({ strict: true, strictRequired: false, allErrors: true });
+    const held = new Set<string>();
+    const queue = [DATA_ACCESS_V1_22_FILE];
+    for (let file = queue.shift(); file !== undefined; file = queue.shift()) {
+      if (held.has(file)) continue;
+      const schema = JSON.parse(readFileSync(path.join(CONTRACTS_DIR, ...file.split("/")), "utf8")) as object;
+      ajv.addSchema(schema);
+      held.add(file);
+      queue.push(...referencedFiles(file, schema));
+    }
+    v1dot22 = (name, checked) => {
+      const validate: ValidateFunction | undefined = ajv.getSchema(`${DATA_ACCESS_V1_22}#/$defs/${name}`);
+      if (validate === undefined) throw new Error(`no definition ${name}`);
+      return validate(checked) ? [] : formatProblems(validate.errors);
+    };
+  }
+  return v1dot22(definition, value);
+}
+
+/** One of bundle v2's parts (bundles/v2/bundle/, T-1477), freshly parsed. */
+function bundleV2Part(file: string): unknown {
+  const root = path.join(CONTRACTS_DIR, "..", "bundles", "v2", "bundle");
+  return JSON.parse(readFileSync(path.join(root, ...file.split("/")), "utf8")) as unknown;
+}
+
+/** Bundle v2's flow A graph, freshly parsed: the master's steps S1-01 to S1-09 as T-1477 compiled them. */
+export function flowAV2(): GraphValue {
+  return bundleV2Part("flow/A.json") as GraphValue;
+}
+
+/**
+ * T-1491's test graph with bundle v2's compiled S1-08 and S1-09 in place of its own (a double of S1-09's compiled shape,
+ * under bundle v1's pin): S1-09 a split whose message carries two buttons ("Yes, an owner", "No, I help run it"), its
+ * card's Clock step 9's default and its safe default MASTER-FLOW-A.md line 124's, as in flowAWithPlan.
+ */
+export function flowAWithCompiledPlan(): GraphValue {
+  const graph = flowAWithPlan();
+  const compiled = flowAV2();
+  for (const id of ["S1-08", "S1-09"]) graph.steps[id] = stepIn(compiled, id);
+  return graph;
+}
+
+/**
+ * A stand-in writer that hands back `messages` (and nothing else) as given, each a copy, to show how the walk names a
+ * writer's rows' step and line. It reads nothing.
+ */
+export function rowsWriter(messages: readonly OutboxRowNew[]): StepWriter<WalkTestRepo> {
+  return () =>
+    Promise.resolve({ state: [], stateEvents: [], gives: [], asks: [], messages: copy([...messages]) });
 }

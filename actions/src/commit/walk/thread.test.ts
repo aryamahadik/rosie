@@ -9,24 +9,35 @@
 //     is still the database's to refuse, as before.
 // Turn 1 is commit-s1-01.json's part on K-01's bundle-v0-skeleton.json (the walk's own fixtures, test-support.ts); the
 // read is the one double beside the bundles port, its values the fixture's (handle-sam, linq-chat-demo-sam) and the
-// master's sample cast.
+// master's sample cast. From T-1479 the quick reply is commit-s1-01.json's plus its step and line (S1-02, line 0: K-05
+// v1.22 item 82), and the built request is held to K-05 v1.22's commitTurn.request.
 
 import { describe, expect, it } from "vitest";
 
 import { buildCommitRequest } from "../build";
 import { contractChecks, eventLogRowsOf } from "../test-support";
-import type { OpenHolds, UnitWrites } from "../types";
+import type { OpenHolds, OutboxRowNew, UnitWrites } from "../types";
 import { WalkNotBuiltError, createWritesOf, type WalkChats } from "./index";
 import {
   NOTHING_OPEN,
   SAM,
   chatsOver,
   hold,
+  k05v122,
   requestTurnFields,
   skeletonBundles,
   turnOne,
   type WalkTestRepo,
 } from "./test-support";
+
+/** commit-s1-01.json's outbox rows as the walk writes them: each naming S1-02 and line 0 (writes.ts default 15). */
+function statedRowsLined(): OutboxRowNew[] {
+  return turnOne().exchange.given.stated.writes.outboxRows.map((row) => ({
+    ...row,
+    step: "S1-02",
+    lineNo: 0,
+  }));
+}
 
 /** The handle and chat commit-s1-01.json's turn carries (K-09 v1.5 default 135). */
 const HANDLE = "handle-sam";
@@ -74,7 +85,7 @@ describe("the handle's own chat thread holds the turn's chat id: S1-01 reuses it
       asks: writes.asks,
       closes: [],
       clockCancels: [],
-      messages: stated.outboxRows,
+      messages: statedRowsLined(),
       reservations: { confirm: [], release: [] },
       effects: { write: [], letGo: [] },
       gives: ["thread"],
@@ -88,7 +99,7 @@ describe("the handle's own chat thread holds the turn's chat id: S1-01 reuses it
     expect(requestTurnFields(exchange.request).chatId).toBe(CHAT);
   });
 
-  it("the rows the reuse leaves go into the commit's one K-05 request as they are: K-05 v1.1 and K-08 v1.1 take it, with no threads write and no entry of one", async () => {
+  it("the rows the reuse leaves go into the commit's one K-05 request as they are: K-05 v1.22 and K-08 v1.1 take it, with no threads write and no entry of one", async () => {
     const { exchange, context } = turnOne();
     const writes = await turnOneWith(chatsOver(HANDLE).chats);
     const request = buildCommitRequest({
@@ -99,7 +110,7 @@ describe("the handle's own chat thread holds the turn's chat id: S1-01 reuses it
       units: [{ writes, answer: null }],
     });
     const checks = contractChecks();
-    expect(checks.k05("commitTurn.request", request)).toEqual([]);
+    expect(k05v122("commitTurn.request", request)).toEqual([]);
     const rows = eventLogRowsOf(request, "2026-10-19T18:05:05Z");
     for (const row of rows) expect(checks.k08("eventLogRow", row), String(row.id)).toEqual([]);
     expect(checks.k08("eventLogBatch", { rows })).toEqual([]);
@@ -167,7 +178,7 @@ describe("the read is asked only for a thread the walk would write", () => {
     const { exchange } = turnOne();
     const writes = await turnOneWith(undefined);
     expect(writes.state).toEqual(exchange.given.stated.writes.state);
-    expect(writes.messages).toEqual(exchange.given.stated.writes.outboxRows);
+    expect(writes.messages).toEqual(statedRowsLined());
   });
 
   it("an email turn is not built before the read is asked", async () => {
