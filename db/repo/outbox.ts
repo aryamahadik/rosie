@@ -43,7 +43,12 @@
 //   writePlan      Locks the row. A row that holds a plan answers alreadyPlanned, checked before its version (after a
 //                  crash "only rows without a plan are composed": arch 11 line 576); else the version is compared and the
 //                  plan and the final parts (K-03 v1 rowPlan, finalParts) are written together, moving the row planned
-//                  (or stale) to checked.
+//                  (or stale) to checked. From K-05 v1.21 (defaults 200, 201 and 204; T-1513), in the same transaction
+//                  and after that update, a row with a business and a turn whose final parts' fixedLines hold an opener
+//                  (`opener` or `signUpOpener`) also writes K-04's opener mark: openers_sent (the row's recipient handle,
+//                  its business, its turn's committed_at, the row's id), on conflict do nothing, so the mark is written
+//                  once, naming the first row planned to carry an opener, and never moved. Nothing is written for it on
+//                  alreadyPlanned, versionChanged, notFound or a refusal. Its request and answer do not change.
 //   unplannedRows  A read: a turn's rows whose plan is null, in commit order (outbox_rows_unplanned_idx), so after a
 //                  crash only they are composed. A stale row is listed too (markRow stale cleared its plan: S13-57).
 //   claimOutbox    Recipients one at a time, earliest open commit_seq first, each under a transaction-level advisory lock
@@ -109,7 +114,12 @@
 //                  next try's part row under a new key (arch 01 line 65); `attempt` raises attempts for a retry under the
 //                  same key after a timeout. A second receipt, a second sent or a second failure for the same key changes
 //                  nothing and says repeated. Every mark that changes a part raises the row's version by one (K-07 "raising
-//                  the row's version").
+//                  the row's version"). From K-05 v1.21 (default 203; T-1513), a delivered receipt that moves a words part
+//                  to delivered now, on a row whose final parts' fixedLines hold `optOutLine`, also sets the recipient's
+//                  phone's optout_line_delivered_at to the receipt's time where it is null, version = version + 1, as the
+//                  call's last statement (the phone locked last); a repeat receipt, a delivered poll or link-card part, an
+//                  email row (no phones row), a row without the line and a second line-carrying delivery write nothing
+//                  there. phones.stopped is never touched. Its request and answer do not change.
 //   markPartV12    markPart, answering the row's state and version after the mark (v1.1 item 15: the dispatcher compares
 //                  them in its next markRow), and: failed may carry providerMessageId, stored in linq_message_id when the
 //                  part holds none, and with retry nextTryNotBefore, the provider's Retry-After, stored in the claim's
@@ -140,7 +150,10 @@
 // state the row or part stands in now.
 //
 // Locks: every call that writes a row's parts or its claim locks the outbox row first (FOR UPDATE), so two calls on one
-// row run one after the other and never wait on each other in a circle; renewClaim's phone read comes last. The safety
+// row run one after the other and never wait on each other in a circle; renewClaim's phone read comes last, and so does
+// markPart's opt-out write (K-05 v1.21 default 203), after the row and its parts, as commitTurn's (table, row id) order
+// takes outbox_rows before phones. writePlan's opener mark is an insert after the row's update: two writePlans of one
+// handle and business wait on the mark's key alone, never on each other's rows. The safety
 // claim takes the recipient's lock first, waiting for it, then its safety rows' locks; every other holder of that key
 // only tries it (default 129).
 //
@@ -148,7 +161,9 @@
 // rosie_job with no business scope (inRuntimeTransaction clears it; read committed for the writes, so a FOR SHARE read
 // that waited sees the row the other transaction committed), so the dispatcher's sweep sees every business's rows.
 // outbox_parts, outbox_claims and phones have no row-level security (the dispatcher alone reads and writes the first two,
-// and the runtime side alone reads phones: K-04, K-07).
+// and the runtime side alone reads phones: K-04, K-07). writePlan's opener mark is inserted under openers_sent_runtime
+// with no scope, and reads turns, which span businesses; rosie_job holds insert on openers_sent, select on turns and
+// update on phones (0012), so neither new write needs a grant or a migration (K-05 v1.21's freeze record).
 //
 // Answers: K-05 v1's responses and errors, and K-05 v1.1's wrongState for a move K-07 does not allow (default 1); the
 // v1.2 calls K-05 v1.2's, with v1.1's claimLost and notYet. A serialization failure, a deadlock (a renewal's with a STOP
@@ -272,6 +287,21 @@
 //      looks past a passed row, while it still counts as open in the earliest-open order (default 4), as a passed held
 //      or waiting row does. The safety claim (claimOutboxV114 with sendClass) is unchanged: it reads only safety rows,
 //      and parkTurn's row is a quick reply.
+//  27. writePlan's opener mark takes its sent_at from the row's turn's committed_at (K-05 v1.21 default 201), read in
+//      the insert's own statement (insert ... select from turns), so a turn that holds no committed_at, a parked turn's
+//      (turns_committed_has_time: only a committed turn has one), gives no row to insert and no mark is written: default
+//      201 gives no time for it, and a missing mark errs to the safe side (the opener rides again: RULES 1.11, 4.3).
+//      Nothing composes a parked turn's row today (default 26), so no such row reaches it; the guard keeps writePlan
+//      from failing on the not-null sent_at if one ever does.
+//  28. "Its final parts' fixedLines" (K-05 v1.21 defaults 200 and 203) are read from the value as written: writePlan's
+//      from the request's checked finalParts, the very value its update stores in final_parts, and markPart's from the
+//      row's stored final_parts, read under the row's lock. Final parts with no fixedLines list carry no line.
+//  29. "A words part" (K-05 v1.21 default 203) is a part try of kind words (outbox_parts.kind) of the row's words send
+//      (its final parts' send of kind words at that part's number), since the fixed-line inserter puts every line in
+//      the words send, which comes first (actions/src/finalize/fixed-lines/insert.ts withLines; arch 07 line 367). So a
+//      poll or link card's plain words retry (default 8), which carries the poll's words and not the line, writes
+//      nothing, as a delivered poll or link-card part writes nothing (default 203), and the line's time is never set
+//      before the send that carries it is delivered.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1";
 import type * as K05v11 from "../../contracts/generated/data-access/data-access.v1.1";
 import type * as K05v12 from "../../contracts/generated/data-access/data-access.v1.2";
@@ -531,6 +561,13 @@ const PART_KEY = /^.+\/[12]\/[1-9][0-9]*$/;
 const CHANNELS: ReadonlySet<string> = new Set<Channel>(["imessage", "rcs", "sms", "email"]);
 const SEND_KINDS: ReadonlySet<string> = new Set<SendKind>(["words", "poll", "linkCard", "tapback"]);
 const CALENDAR_FILES: ReadonlySet<string> = new Set(["none", "new", "move", "cancel"]);
+/**
+ * K-01's two opener ids, the opener and the sign-up opener (K-01 default 19, T-1510): a row whose final parts' fixedLines
+ * hold either carries Rosie's opener, and writePlan writes K-04's opener mark for it (K-05 v1.21 defaults 200 and 204).
+ */
+const OPENER_LINES: ReadonlySet<string> = new Set(["opener", "signUpOpener"]);
+/** K-01's STOP, HELP and rates line: its first delivery is the phone's optout_line_delivered_at (K-05 v1.21 default 203). */
+const OPT_OUT_LINES: ReadonlySet<string> = new Set(["optOutLine"]);
 
 /** A request a call cannot carry out: thrown before anything is written (or inside the transaction, rolling it back). */
 function fail(call: string, what: string): never {
@@ -539,6 +576,14 @@ function fail(call: string, what: string): never {
 
 function isRecord(value: unknown): value is Row {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/** Whether final parts, as stored or as checked, hold one of `lines` among their fixedLines; false when they hold none. */
+function carriesLine(finalParts: unknown, lines: ReadonlySet<string>): boolean {
+  if (!isRecord(finalParts) || !Array.isArray(finalParts.fixedLines)) {
+    return false;
+  }
+  return (finalParts.fixedLines as unknown[]).some((line) => typeof line === "string" && lines.has(line));
 }
 
 /** An opaque id (formats.v1 id): a non-empty string with no NUL, compared whole and never parsed (CQ-09). */
@@ -1134,12 +1179,23 @@ function portOf(channel: Channel): Port {
 
 // ---- writePlan (K-05 v1 item 2) -------------------------------------------------------------------------------------
 
+/** The row as writePlan reads it, locked: its state and version, the plan's code checks, and the opener mark's keys. */
+interface PlanRow {
+  state: RowState;
+  planned: boolean;
+  version: number;
+  channel: Channel;
+  copy_of_row_id: string | null;
+  recipient_handle_id: string;
+  business_id: string | null;
+  turn_id: string | null;
+}
+
 async function writePlanIn(tx: Sql, request: PlanChecked): Promise<WritePlanOutcome> {
   const { outboxRowId } = request;
-  const [row] = await tx<
-    { state: RowState; planned: boolean; version: number; channel: Channel; copy_of_row_id: string | null }[]
-  >`
-    select state, plan is not null as planned, version, channel, copy_of_row_id
+  const [row] = await tx<PlanRow[]>`
+    select state, plan is not null as planned, version, channel, copy_of_row_id, recipient_handle_id, business_id,
+           turn_id
     from outbox_rows where id = ${outboxRowId}
     for update
   `;
@@ -1170,6 +1226,20 @@ async function writePlanIn(tx: Sql, request: PlanChecked): Promise<WritePlanOutc
   `;
   if (written === undefined) {
     throw new Error("writePlan: the row moved while it was locked");
+  }
+  // K-05 v1.21 defaults 200, 201 and 204 (T-1513): the opener mark, after the update, only for a row with a business
+  // and a turn whose final parts (request.finalParts, the very value written into final_parts above) carry an opener.
+  // Written once (on conflict do nothing), so the first row planned to carry one is named and a later row never moves
+  // it; sent_at is the turn's committed_at, never now() (default 201). A turn with no committed_at (a parked turn's row)
+  // gives no time, so no mark (default 27).
+  if (row.business_id !== null && row.turn_id !== null && carriesLine(request.finalParts, OPENER_LINES)) {
+    await tx`
+      insert into openers_sent (handle_id, business_id, sent_at, outbox_row_id)
+      select ${row.recipient_handle_id}, ${row.business_id}, t.committed_at, ${outboxRowId}
+      from turns t
+      where t.id = ${row.turn_id} and t.committed_at is not null
+      on conflict (handle_id, business_id) do nothing
+    `;
   }
   return { result: "written", outboxRowId, version: written.version };
 }
@@ -1932,6 +2002,8 @@ interface MarkedRow {
   version: number;
   final_parts: unknown;
   open_question_id: string | null;
+  /** The phone the opt-out line's first delivery is written on (K-05 v1.21 default 203), by phones_handle_key. */
+  recipient_handle_id: string;
 }
 
 /** A part's change, worked out before anything is written. */
@@ -2140,7 +2212,9 @@ async function markPartIn(
   }
   // The row first, then its parts: the order claimOutbox locks them in, so the two never wait on each other in a circle.
   const [row] = await tx<MarkedRow[]>`
-    select id, state, version, final_parts, open_question_id from outbox_rows where id = ${found.rowId} for update
+    select id, state, version, final_parts, open_question_id, recipient_handle_id
+    from outbox_rows where id = ${found.rowId}
+    for update
   `;
   if (row === undefined) {
     throw new Error("markPart: a part's row is missing");
@@ -2282,6 +2356,24 @@ async function markPartIn(
   `;
   if (moved === undefined) {
     throw new Error("markPart: the row moved while it was locked");
+  }
+  // K-05 v1.21 default 203 (T-1513): a words part delivered now (a repeat returned above, writing nothing) of a row
+  // whose final parts carry the STOP, HELP and rates line sets the recipient's phone's optout_line_delivered_at to the
+  // receipt's time, only where it is null, so the first time stays and a second line-carrying delivery writes nothing.
+  // The version is raised by the statement (0002's enforce_version_raise refuses an update that does not raise it), and
+  // the phone is locked last, after the row and its parts, as renewClaim reads it last (default 15). Nothing of STOP is
+  // touched. An email handle has no phones row, so nothing is written for it.
+  if (
+    mark.outcome === "delivered" &&
+    change.to === "delivered" &&
+    part.kind === "words" &&
+    kinds[part.part_no - 1] === "words" &&
+    carriesLine(row.final_parts, OPT_OUT_LINES)
+  ) {
+    await tx`
+      update phones set optout_line_delivered_at = ${mark.at}, version = version + 1
+      where handle_id = ${row.recipient_handle_id} and optout_line_delivered_at is null
+    `;
   }
   return {
     answer: marked(false, firstDelivery, attempts, nextKey),

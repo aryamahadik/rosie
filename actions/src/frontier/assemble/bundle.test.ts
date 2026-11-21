@@ -6,7 +6,16 @@
 
 import { describe, expect, it } from "vitest";
 
-import { findStep, flowOfStep, flowViewOf, flowsListed, ownStakes, readBundle, readManifest } from "./bundle";
+import {
+  findStep,
+  flowOfStep,
+  flowViewOf,
+  flowsListed,
+  ownStakes,
+  plainStepStakes,
+  readBundle,
+  readManifest,
+} from "./bundle";
 import {
   BUNDLE_V0,
   MASTER_A5_01,
@@ -17,7 +26,9 @@ import {
   MASTER_A6_10_AS_WRITTEN,
   bundleIdOf,
   fakeBundles,
+  publishedBundle,
   sampleBundle,
+  withStepChanged,
   withSteps,
   type BundleDocument,
   type StepJson,
@@ -265,5 +276,138 @@ describe("each option's own walk (ownStakes; contracts/model README, 'Stakes')",
     expect(stakesOf(withSteps(MINI_A, [a601, MASTER_A6_03, MASTER_A6_10]), "A6-02", "1 Accept")).toEqual([
       UNKNOWN,
     ]);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1478: a plain step's buttons, and the walk of its answer (K-09 README v1.11 default 179)
+
+const V1 = publishedBundle("v1");
+const V2 = publishedBundle("v2");
+const S1_04_BUTTONS = ["Some share one", "All share one", "Each is its own"];
+
+type Message = Record<string, unknown>;
+
+/** The step's messages (K-01 v1 step.say), for a test to change. */
+function sayOf(step: Record<string, unknown>): Message[] {
+  if (!Array.isArray(step.say)) throw new Error("the step has no messages");
+  return step.say as Message[];
+}
+
+/** Rosie's first message of the step (K-01 v1 message.from "san"). */
+function rosiesMessage(step: Record<string, unknown>): Message {
+  const message = sayOf(step).find((each) => each.from === "san");
+  if (message === undefined) throw new Error("Rosie sends nothing in the step");
+  return message;
+}
+
+/** A bundle document's flow A's S1-04 answer stakes (plainStepStakes). */
+function s104Stakes(document: BundleDocument): StakesReason[] {
+  const { bundle, flow } = viewOf(document);
+  const step = flow.step("S1-04");
+  if (step === null) throw new Error("no S1-04");
+  return plainStepStakes(bundle, flow, step);
+}
+
+describe("T-1478: the button labels of the messages Rosie sends in a step (K-01 v1 message elements.buttons)", () => {
+  it("bundle v1's S1-04 is a plain step with no card and Rosie's three buttons, in order; the owner's reply adds none", () => {
+    const step = flowViewOf(V1.flows.A, "A")?.step("S1-04");
+    expect(step).toMatchObject({
+      split: null,
+      card: null,
+      branches: [],
+      gives: ["companies"],
+      next: "S1-08",
+      buttons: S1_04_BUTTONS,
+    });
+    // Bundle v2 keeps S1-04 byte for byte (K-09 default 188), so its buttons are the same, in the same order.
+    expect(flowViewOf(V2.flows.A, "A")?.step("S1-04")?.buttons).toEqual(S1_04_BUTTONS);
+  });
+
+  it("a step whose messages carry no buttons reads none; a split's own buttons are read as they are", () => {
+    const v2 = flowViewOf(V2.flows.A, "A");
+    for (const id of ["S1-01", "S1-02", "S1-03", "S1-74", "S1-11", "S1-08"]) {
+      expect(v2?.step(id)?.buttons, id).toEqual([]);
+    }
+    // S1-09 asks with buttons and is a split with its card: Rosie's two buttons, and not the owner's photos reply.
+    expect(v2?.step("S1-09")).toMatchObject({
+      split: "asks",
+      buttons: ["Yes, an owner", "No, I help run it"],
+    });
+  });
+
+  it("buttons on a message from anyone but Rosie add none", () => {
+    const document = withStepChanged(V1, "S1-04", (step) => {
+      const owner = sayOf(step).find((each) => each.from === "owner");
+      if (owner === undefined) throw new Error("no owner message");
+      owner.elements = { buttons: ["Plumbing", "Electrical"] };
+    });
+    expect(flowViewOf(document.flows.A, "A")?.step("S1-04")?.buttons).toEqual(S1_04_BUTTONS);
+  });
+
+  it("buttons the frontier cannot read as labels read null, never a guess: a lettered pair, a button with no words, buttons that are no list", () => {
+    const variants: [string, unknown][] = [
+      ["a lettered pair (K-01 button pair)", [...S1_04_BUTTONS.slice(0, 2), ["C", "Each is its own"]]],
+      ["a button with no words", [...S1_04_BUTTONS, ""]],
+      ["buttons that are no list", "Some share one"],
+    ];
+    for (const [why, buttons] of variants) {
+      const document = withStepChanged(V1, "S1-04", (step) => {
+        rosiesMessage(step).elements = { buttons };
+      });
+      expect(flowViewOf(document.flows.A, "A")?.step("S1-04")?.buttons, why).toBeNull();
+    }
+  });
+});
+
+describe("T-1478: the walk of a plain step's answer (plainStepStakes): its gives, then the walk from its next", () => {
+  it("bundle v1: S1-04 gives companies (no stake) and its next, S1-08, is a step the partial bundle does not hold: low", () => {
+    expect(s104Stakes(V1)).toEqual([]);
+  });
+
+  it("bundle v2: S1-04 walks on to S1-08, which only tells, and stops at S1-09's question, before it: low", () => {
+    expect(s104Stakes(V2)).toEqual([]);
+    // The walk passes S1-08: a charge on it would be met there.
+    const chargeAtS108 = withStepChanged(V2, "S1-08", (step) => {
+      step.effects = [{ kind: "charge", ref: "plan_fee", to: ["pay"] }];
+    });
+    expect(s104Stakes(chargeAtS108)).toEqual([{ why: "charge", step: "S1-08", ref: "plan_fee" }]);
+    // S1-09 asks (its three message branches), so the walk stops before it: what it gives is never met...
+    const s109Books = withStepChanged(V2, "S1-09", (step) => {
+      step.gives = ["booked"];
+    });
+    expect(s104Stakes(s109Books)).toEqual([]);
+    // ...while the same step as a plain one would be walked: S1-09 is where the walk stops because it asks.
+    const s109Plain = withStepChanged(s109Books, "S1-09", (step) => {
+      delete step.type;
+      delete step.branches;
+      delete step.card;
+    });
+    expect(s104Stakes(s109Plain)).toEqual([{ why: "booked", step: "S1-09", ref: "booked" }]);
+    // And S1-09's ask stops it in a full bundle too, so S1-10, which bundle v2 does not hold, is never reached.
+    expect(s104Stakes(withSteps(V2, [], false))).toEqual([]);
+  });
+
+  it("the step's own gives count: a money key written by the answer is high", () => {
+    const moneyAtS104 = withStepChanged(V1, "S1-04", (step) => {
+      step.gives = ["companies", "money_before"];
+    });
+    expect(s104Stakes(moneyAtS104)).toEqual([{ why: "money", step: "S1-04", ref: "money_before" }]);
+  });
+
+  it("a walk it cannot follow is unknown, the safer route: a missing step in a full bundle, a loop back to the asked step", () => {
+    // Bundle v1 as a full bundle: S1-08 is missing, a fault, not a step out of reach.
+    expect(s104Stakes(withSteps(V1, [], false))).toEqual([UNKNOWN]);
+    const loop = withStepChanged(V2, "S1-08", (step) => {
+      step.next = "S1-04";
+    });
+    expect(s104Stakes(loop)).toEqual([UNKNOWN]);
+  });
+
+  it("a plain step whose list ends with it and that no branch lists ends the journey there: nothing more to walk", () => {
+    const last = withStepChanged(V1, "S1-04", (step) => {
+      step.next = null;
+    });
+    expect(s104Stakes(withSteps(last, [], false))).toEqual([]);
   });
 });

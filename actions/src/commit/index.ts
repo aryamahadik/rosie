@@ -1,20 +1,25 @@
 // The one commit per turn (C-087, T-305): gateAndCommit's commit half on the policy gate (T-298), turning what may go into
 // one K-05 commitTurn request under the turn id. See commit.ts.
 
+export { ASKED_ONCE, askAgainUnit, type AskedTurn } from "./ask-again";
 export {
   EFFECT_KINDS,
   NOT_STATE_TABLES,
+  asksAgain,
   buildCommitRequest,
   checkUnits,
   effectView,
   questionClock,
   rowsNamedBy,
   type Answer,
+  type AskAgainCommitRequest,
   type BuildInput,
   type CommitUnit,
+  type PlainCommitRequest,
   type QuestionClock,
   type RowName,
   type TurnActor,
+  type TurnCommitRequest,
 } from "./build";
 export {
   GATE_RUNS,
@@ -42,6 +47,9 @@ export {
 } from "./hold";
 export type {
   Ask,
+  AskAgain,
+  AskAgainDeps,
+  AskAgainWrongState,
   BundleMismatch,
   ClockCancel,
   ClockNew,
@@ -63,7 +71,10 @@ export type {
   EventEntry,
   GateAndCommitAnswer,
   GateAndCommitRequest,
+  LiveQuestion,
+  LiveQuestions,
   OpenHolds,
+  OpenQuestionAskAgain,
   OpenQuestionClose,
   OpenQuestionNew,
   OutboxRowNew,

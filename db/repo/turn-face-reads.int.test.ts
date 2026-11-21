@@ -38,6 +38,11 @@
 // R1's (T-1280). They are its NOTED_ROWS, so the read meets the job row itself (DL-610). The tests at the end read, from
 // the statements the read sent, that it read that row alone and never its turn, for a job row of a business and one of
 // class safety too, and that the same row given a turn is read as any row.
+//
+// T-1513 (K-05 v1.21 defaults 202 and 204; DL-1033, DL-1045) adds, after the opener mark's test, the read past a mark
+// whose row never went and the no-business branch's state filter, each over every one of K-07's four ends of a row that
+// did not go, on this file's own world; writePlan's mark and the whole first-text flow are db/repo/outbox-first-lines's.
+// Every test above runs unchanged.
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
@@ -1885,6 +1890,131 @@ describe("readFixedLineFacts: one business's opener mark, never another's (item 
           nowOf(exchange),
         ),
       ).toEqual(exchange.outcome);
+    },
+  );
+});
+
+describe("readFixedLineFacts counts no earlier row that never went, in either branch (K-05 v1.21 defaults 202 and 204; T-1513)", () => {
+  /** K-07's ends of a row that did not go, or never will (default 202). */
+  const NEVER_WENT = ["withdrawn", "failed", "dropped_stopped", "superseded"] as const;
+  /** K-07's other row states: a mark naming a row in one answers as before v1.21 (open gap 100). */
+  const MAY_GO = [
+    "planned",
+    "checked",
+    "sending",
+    "sent",
+    "delivered",
+    "held",
+    "stale",
+    "waiting_chat",
+  ] as const;
+
+  /**
+   * A row to Alex, as the owner writes it, after every row the world holds (a later commit_seq): under turn-alex-first,
+   * or with no business under turn-alex-nobiz-2 (addNoBusinessRows first).
+   */
+  async function addAlexRow(
+    id: string,
+    businessId: string | null,
+    fixedLines: string[],
+    state: string,
+  ): Promise<void> {
+    await insertRow(db.sql, "outbox_rows", {
+      id,
+      turn_id: businessId === null ? "turn-alex-nobiz-2" : "turn-alex-first",
+      recipient_handle_id: "handle-alex",
+      recipient_person_id: "person-alex",
+      business_id: businessId,
+      channel: "imessage",
+      versions_read: [],
+      plan: { row: id },
+      final_parts: wordsParts(id, "Words as sent", fixedLines),
+      state,
+      bundle_hash: BUNDLE_HASH,
+      bundle_build: 1,
+      trace_id: `trace-${id}`,
+    });
+  }
+
+  async function stateOf(id: string, state: string): Promise<void> {
+    await db.sql`update outbox_rows set state = ${state}, version = version + 1 where id = ${id}`;
+  }
+
+  async function factsOf(outboxRowId: string, businessId: string | null): Promise<[boolean, string | null]> {
+    const facts = asFacts(await readFixedLineFacts(job, { outboxRowId, businessId }));
+    return [facts.textedAboutBusiness, facts.openerRowId];
+  }
+
+  it(
+    "with a business: a mark naming a row that ended so is read past to the earliest earlier row of the handle and business that carries an opener and did not; never another business's row or a row with none; a mark naming a row in any other state as before",
+    SLOW,
+    async () => {
+      // The mark names out-alex-first, delivered, which carries no opener in its final parts (K-04's seed); A7-03's
+      // row (out-a7-03-alex) was committed before it.
+      await given("fixed-line-facts-texted-before.json");
+      await addNoBusinessRows();
+      // After the marked row: the yoga studio's row and a row with no business, each carrying an opener and delivered,
+      // then the barbershop's own row carrying the sign-up opener, delivered, and a row still to compose.
+      await addAlexRow("out-t1513-yoga-opener", YOGA, ["opener"], "delivered");
+      await addAlexRow("out-t1513-nobiz-opener", null, ["opener"], "delivered");
+      await addAlexRow("out-t1513-barbershop-2nd", BARBERSHOP, ["signUpOpener", "privacyLink"], "delivered");
+      await addAlexRow("out-t1513-barbershop-3rd", BARBERSHOP, [], "planned");
+
+      for (const state of MAY_GO) {
+        await stateOf("out-alex-first", state);
+        expect(await factsOf("out-t1513-barbershop-3rd", BARBERSHOP), state).toEqual([
+          true,
+          "out-alex-first",
+        ]);
+        expect(await factsOf("out-a7-03-alex", BARBERSHOP), state).toEqual([true, "out-alex-first"]);
+      }
+      for (const state of NEVER_WENT) {
+        await stateOf("out-alex-first", state);
+        // The earliest earlier row of the barbershop that carries an opener and went.
+        expect(await factsOf("out-t1513-barbershop-3rd", BARBERSHOP), state).toEqual([
+          true,
+          "out-t1513-barbershop-2nd",
+        ]);
+        // No earlier one for the second row (the yoga studio's and the no-business row never count): it carries it.
+        expect(await factsOf("out-t1513-barbershop-2nd", BARBERSHOP), state).toEqual([false, null]);
+        // A row committed before the marked one finds none earlier either.
+        expect(await factsOf("out-a7-03-alex", BARBERSHOP), state).toEqual([false, null]);
+        // The marked row reads itself, as before.
+        expect(await factsOf("out-alex-first", BARBERSHOP), state).toEqual([false, "out-alex-first"]);
+        // The fallback's row ended so too: no row went, so the next row carries the opener.
+        await stateOf("out-t1513-barbershop-2nd", state);
+        expect(await factsOf("out-t1513-barbershop-3rd", BARBERSHOP), state).toEqual([false, null]);
+        await stateOf("out-t1513-barbershop-2nd", "delivered");
+      }
+    },
+  );
+
+  it(
+    "with no business: the earlier row is the earliest that carries either opener id and did not end so; a business's row never counts",
+    SLOW,
+    async () => {
+      await given("fixed-line-facts-texted-before.json");
+      // out-nobiz-alex carried the opener and was sent; out-nobiz-alex-later is the next row with no business.
+      await addNoBusinessRows();
+      await addAlexRow("out-t1513-barbershop-opener", BARBERSHOP, ["opener"], "delivered");
+      await addAlexRow("out-t1513-nobiz-sign-up", null, ["signUpOpener", "optOutLine"], "delivered");
+      await addAlexRow("out-t1513-nobiz-last", null, [], "planned");
+
+      for (const state of MAY_GO) {
+        await stateOf("out-nobiz-alex", state);
+        expect(await factsOf("out-nobiz-alex-later", null), state).toEqual([true, "out-nobiz-alex"]);
+        expect(await factsOf("out-t1513-nobiz-last", null), state).toEqual([true, "out-nobiz-alex"]);
+      }
+      for (const state of NEVER_WENT) {
+        await stateOf("out-nobiz-alex", state);
+        // The first row never went: the next row with no business carries the opener.
+        expect(await factsOf("out-nobiz-alex-later", null), state).toEqual([false, null]);
+        // The sign-up opener's row counts, as the opener's does (default 204).
+        expect(await factsOf("out-t1513-nobiz-last", null), state).toEqual([true, "out-t1513-nobiz-sign-up"]);
+        await stateOf("out-t1513-nobiz-sign-up", state);
+        expect(await factsOf("out-t1513-nobiz-last", null), state).toEqual([false, null]);
+        await stateOf("out-t1513-nobiz-sign-up", "delivered");
+      }
     },
   );
 });

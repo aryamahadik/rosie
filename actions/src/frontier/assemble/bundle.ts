@@ -1,6 +1,8 @@
-// The bundle as the frontier reads it (T-291; K-01 v1, contracts/bundle): steps, branches, cards and the always-on
-// prefix's hash, narrowed from the parsed KV values field by field, so a value that is not K-01's shape gives no step
-// rather than a wrong one. And each choice's stakes, from the walk K-02 v1's README states (contracts/model, "Stakes").
+// The bundle as the frontier reads it (T-291; K-01 v1, contracts/bundle): steps, branches, cards, the buttons of the
+// messages Rosie sends in a step (T-1478) and the always-on prefix's hash, narrowed from the parsed KV values field by
+// field, so a value that is not K-01's shape gives no step rather than a wrong one. And each choice's stakes, from the
+// walk K-02 v1's README states (contracts/model, "Stakes"): a split branch's (ownStakes), and a plain step's answer's
+// (plainStepStakes, T-1478).
 //
 // The frontier never runs a step: it reads the graph to list choices (arch 03 line 151: "code knows the few steps that
 // can apply right now"). Never logged: a step's words.
@@ -112,6 +114,32 @@ function splitOf(
   return message || branches.some((branch) => branch.tag === "clock") ? "asks" : "code";
 }
 
+/** Who Rosie is in a step's messages (K-01 v1 message.from), as the commit's walk reads it (commit/walk/graph.ts). */
+const ROSIE = "san";
+
+/**
+ * The button labels of the messages Rosie sends in a step (K-01 v1 step.say, each message's elements.buttons), in order
+ * (T-1478; K-09 README v1.11 default 179: "one K-02 option choice per button, in the buttons' order"). A message from
+ * anyone else, or with no buttons, adds none. Null when a message of Rosie's carries buttons that are not a list of
+ * labels, each with words: K-01's lettered pair (["C", "Neither works"]) is one, and the frontier never guesses which of
+ * its words stands for the button.
+ */
+function buttonsOf(say: unknown): string[] | null {
+  if (!Array.isArray(say)) return [];
+  const labels: string[] = [];
+  for (const message of say) {
+    if (!isRecord(message) || message.from !== ROSIE || !isRecord(message.elements)) continue;
+    const { buttons } = message.elements;
+    if (buttons === undefined) continue;
+    if (!Array.isArray(buttons)) return null;
+    for (const button of buttons) {
+      if (typeof button !== "string" || button === "") return null;
+      labels.push(button);
+    }
+  }
+  return labels;
+}
+
 function stepOf(id: string, value: unknown): BundleStep | null {
   if (!isRecord(value)) return null;
   if (value.id !== undefined && value.id !== id) return null;
@@ -128,6 +156,7 @@ function stepOf(id: string, value: unknown): BundleStep | null {
     branches,
     effects: effectsOf(value.effects),
     card: cardOf(value.card),
+    buttons: buttonsOf(value.say),
   };
 }
 
@@ -336,7 +365,7 @@ function stakesWalk(bundle: BundleView, flow: FlowView, start: string) {
       case "code":
         return [...stepReasons(step), ...step.branches.flatMap((branch) => down(step, branch))];
       case null:
-        return [...stepReasons(step), ...(step.next === null ? climb(step) : from(step.next))];
+        return [...stepReasons(step), ...onFrom(step)];
     }
   }
 
@@ -375,7 +404,12 @@ function stakesWalk(bundle: BundleView, flow: FlowView, start: string) {
     return after(holder.split, holder.branch);
   }
 
-  return { down };
+  /** On from a plain step: its next, or, where its list ends with it, where the branch holding it goes. */
+  function onFrom(step: BundleStep): StakesReason[] {
+    return step.next === null ? climb(step) : from(step.next);
+  }
+
+  return { down, onFrom };
 }
 
 /**
@@ -402,4 +436,18 @@ export function ownStakes(
   branch: BundleBranch,
 ): StakesReason[] {
   return settled([...givesReasons(step), ...stakesWalk(bundle, flow, step.id).down(step, branch)]);
+}
+
+/**
+ * Why an answer to a plain step's question is high (T-1478; K-09 README v1.11 default 179, "Difference 1": "the step's
+ * gives, then the walk from the step's next to the first step that asks, waits or ends"): a plain step asked with
+ * buttons has no branch, so every answer walks the same path, built as a split branch's is (ownStakes): the step's gives
+ * (written whichever button is picked), then the walk from its next, or, where its list ends with it, from where the
+ * branch holding it goes, by the same rules (a plain step counted, a split that asks or waits stops the path, a split
+ * code settles walked down every branch, a step a partial bundle does not hold not reachable, and a missing step, a loop
+ * or a walk too long in a full bundle unknown). Empty: low. S1-04 gives companies, which is no stake, and walks on to
+ * S1-08, which only tells, and stops at S1-09's question (bundle v2), or ends where bundle v1 does not hold S1-08.
+ */
+export function plainStepStakes(bundle: BundleView, flow: FlowView, step: BundleStep): StakesReason[] {
+  return settled([...givesReasons(step), ...stakesWalk(bundle, flow, step.id).onFrom(step)]);
 }
