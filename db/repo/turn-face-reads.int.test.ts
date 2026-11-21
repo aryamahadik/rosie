@@ -23,6 +23,15 @@
 // (checked, not assumed). The rows a v1.6 fixture's note says its database side writes itself, since no frozen seed holds
 // them (read-outbox-row-practice-sensitive.json's five), are written as its note lists them, after its seeds and chain.
 //
+// T-1476 (K-05 v1.22 item 83 and defaults 208 and 212): readOutboxRow answers a row's own stored step and line first
+// (`from` row), else its question's, else null, so its answers are checked against v1.22's readOutboxRow.v1dot6Response,
+// whose rowLine takes `from` row, and every answer whose line is not from the row against v1.6's as before. Each fixture
+// of the three reads is valid at its own version and at v1.22, and each listed before v1.22 at v1.6 too. v1.22's two
+// reads (read-outbox-row-s1-08-sam and read-outbox-row-s1-02-older-row) run after commit-s1-04-sam-lines, whose rows
+// db/repo's commitTurn writes with their pairs. Its section, after readOutboxRow's, reads a question row's own pair
+// against its question's, the order row, question, none, a stored step with no line_no (refused by K-04's CHECK, so made
+// in a transaction that drops it and rolls back), and the one select's columns.
+//
 // T-1279 (ADR-016 card R0; K-05 v1.13 item 65): a row with no turn, K-04 v1.1's job row, answers notFound before any turn
 // is read. read-outbox-row-sign-in-code.json's note lists the three rows its database side writes, Sam's sign-in code's
 // email row among them as send-sign-in-code-sam leaves it: no frozen seed holds a row with no turn, and sendSignInCode is
@@ -162,16 +171,35 @@ function schemaErrors(def: string, value: unknown, version = "v1.3"): string[] {
 
 /**
  * The outcome checked against the call's errors when it is one, else against the answer the call gives: v1.3's response
- * for readOpenHolds and readFixedLineFacts, and for readOutboxRow v1.6's readOutboxRow.v1dot6Response, which requires
- * businessSensitive (K-05 README "Consumers of v1.6": T-1197 checks every answer against it).
+ * for readOpenHolds and readFixedLineFacts, and for readOutboxRow v1.22's readOutboxRow.v1dot6Response, which requires
+ * businessSensitive and whose rowLine takes `from` row (K-05 README "Consumers of v1.22": T-1476), and v1.6's as well for
+ * every answer whose line is not from the row, which v1.6's rowLine refuses ("Consumers of v1.6": T-1197 checks every
+ * answer against it).
  */
 function outcomeErrors(call: string, outcome: unknown): string[] {
   const isError = typeof outcome === "object" && outcome !== null && "error" in outcome;
   if (call === "readOutboxRow") {
-    return schemaErrors(isError ? `${call}.errors` : `${call}.v1dot6Response`, outcome, "v1.6");
+    const def = isError ? `${call}.errors` : `${call}.v1dot6Response`;
+    const fromRow = (outcome as { line?: { from?: unknown } | null } | null)?.line?.from === "row";
+    return [...schemaErrors(def, outcome, "v1.22"), ...(fromRow ? [] : schemaErrors(def, outcome, "v1.6"))];
   }
   return schemaErrors(isError ? `${call}.errors` : `${call}.response`, outcome);
 }
+
+/** The minor number of a K-05 version ("v1.22": 22; "v1": 0). */
+const minorOf = (version: string): number => Number(version.split(".")[1] ?? "0");
+
+/**
+ * The versions an answer of the three reads is checked at, as an exchange: v1.22 (T-1476), and v1.6, as T-1197 checked
+ * every answer, for a fixture listed before v1.22, whose line is never from the row.
+ */
+const answerVersionsOf = (file: string): string[] =>
+  minorOf(versionOf(file)) >= 22 ? ["v1.22"] : ["v1.6", "v1.22"];
+
+/** The versions a fixture of the three reads is valid at: its own and each its answer is checked at. */
+const exchangeVersionsOf = (file: string): string[] => [
+  ...new Set([versionOf(file), ...answerVersionsOf(file)]),
+];
 
 function asHolds(outcome: unknown): ReadOpenHoldsResponse {
   if ((outcome as { result?: unknown }).result !== "openHolds") {
@@ -858,9 +886,9 @@ describe("the roles the reads run as (K-05 v1.3 items 34 to 36; T-191)", () => {
   });
 });
 
-describe("each fixture of the three reads, v1.3 to v1.6, gives its outcome (K-05 v1.3 items 34 to 36; v1.6 item 45)", () => {
+describe("each fixture of the three reads, v1.3 to v1.22, gives its outcome (K-05 v1.3 items 34 to 36; v1.6 item 45; v1.22 item 83)", () => {
   it(
-    "the index lists the three reads' sixteen exchanges, each valid at its own version and at v1.6",
+    "the index lists the three reads' eighteen exchanges, each valid at its own version and at v1.22, and each listed before v1.22 at v1.6",
     SLOW,
     () => {
       expect([...OPEN_HOLDS_FIXTURES].sort()).toEqual([
@@ -875,7 +903,9 @@ describe("each fixture of the three reads, v1.3 to v1.6, gives its outcome (K-05
         "read-outbox-row-practice-sensitive.json",
         "read-outbox-row-s1-02-no-kinds.json",
         "read-outbox-row-s1-02-not-sensitive.json",
+        "read-outbox-row-s1-02-older-row.json",
         "read-outbox-row-s1-02.json",
+        "read-outbox-row-s1-08-sam.json",
         "read-outbox-row-safety-line.json",
         "read-outbox-row-sign-in-code.json",
       ]);
@@ -893,11 +923,25 @@ describe("each fixture of the three reads, v1.3 to v1.6, gives its outcome (K-05
         "read-outbox-row-s1-02-no-kinds.json",
         "read-outbox-row-s1-02-not-sensitive.json",
       ]);
+      expect(
+        READ_FIXTURES.filter((file) => versionOf(file) === "v1.22").sort(),
+        "v1.22's two readOutboxRow exchanges",
+      ).toEqual(["read-outbox-row-s1-02-older-row.json", "read-outbox-row-s1-08-sam.json"]);
       for (const file of READ_FIXTURES) {
         const exchange = exchangeOf(file);
-        expect(schemaErrors(`${exchange.call}.exchange`, exchange, versionOf(file)), file).toEqual([]);
-        expect(schemaErrors(`${exchange.call}.exchange`, exchange, "v1.6"), `${file} at v1.6`).toEqual([]);
+        expect(exchangeVersionsOf(file)).toContain(versionOf(file));
+        expect(exchangeVersionsOf(file)).toContain("v1.22");
+        for (const version of exchangeVersionsOf(file)) {
+          expect(
+            schemaErrors(`${exchange.call}.exchange`, exchange, version),
+            `${file} at ${version}`,
+          ).toEqual([]);
+        }
       }
+      // v1.6's rowLine refuses `from` row, which is why S1-08's read is checked at v1.22 and not at v1.6.
+      expect(
+        schemaErrors("readOutboxRow.exchange", exchangeOf("read-outbox-row-s1-08-sam.json"), "v1.6"),
+      ).not.toEqual([]);
     },
   );
 
@@ -910,10 +954,12 @@ describe("each fixture of the three reads, v1.3 to v1.6, gives its outcome (K-05
         const outcome = await runRead(exchange);
         expect(outcome).toEqual(await answerOf(exchange));
         expect(outcomeErrors(exchange.call, outcome)).toEqual([]);
-        expect(
-          schemaErrors(`${exchange.call}.exchange`, { ...exchange, outcome }, "v1.6"),
-          "the exchange with the call's answer, at v1.6",
-        ).toEqual([]);
+        for (const version of answerVersionsOf(file)) {
+          expect(
+            schemaErrors(`${exchange.call}.exchange`, { ...exchange, outcome }, version),
+            `the exchange with the call's answer, at ${version}`,
+          ).toEqual([]);
+        }
       },
     );
   }
@@ -1265,6 +1311,201 @@ describe("readOutboxRow: one business's row and record, never another's (K-05 v1
         update outbox_rows set open_question_id = 'oq-yoga-alex', version = version + 1 where id = 'out-alex-first'
       `;
       await expect(readOutboxRow(job, ALEX_FIRST)).rejects.toThrow(BrokenRecordError);
+    },
+  );
+});
+
+describe("readOutboxRow answers the row's own step and line first, then its question's, then none (K-05 v1.22 item 83; T-1476)", () => {
+  const S1_08_SAM = "read-outbox-row-s1-08-sam.json";
+  const S1_08: ReadOutboxRowRequest = { outboxRowId: "out-s1-08-sam", businessId: BARBERSHOP };
+  const S1_09: ReadOutboxRowRequest = { outboxRowId: "out-s1-09-sam", businessId: BARBERSHOP };
+  const OLDER: ReadOutboxRowRequest = { outboxRowId: "outbox-s1-02-sam-1", businessId: BARBERSHOP };
+  /** The columns of outbox_rows readOutboxRow's one select of the row names: v1.3's, with v1.22's step and line_no. */
+  const ROW_COLUMNS = [
+    "booking_id",
+    "bundle_build",
+    "bundle_hash",
+    "business_id",
+    "channel",
+    "copy_of_row_id",
+    "final_parts",
+    "id",
+    "line_no",
+    "open_question_id",
+    "plan",
+    "recipient_handle_id",
+    "recipient_person_id",
+    "send_class",
+    "state",
+    "step",
+    "turn_id",
+    "version",
+  ];
+
+  /** One row read as rosie_job under the barbershop, checked against v1.22's answer (and v1.6's, unless from the row). */
+  async function rowOf(
+    request: ReadOutboxRowRequest,
+    exchange: Exchange,
+  ): Promise<ReadOutboxRowV1Dot6Response> {
+    const row = asRow(await readOutboxRow(job, request, nowOf(exchange)));
+    expect(outcomeErrors("readOutboxRow", row)).toEqual([]);
+    return row;
+  }
+
+  /** Sets a row's stored step and line_no as the tables' owner (K-04's CHECK holds: both or neither). */
+  async function storeLine(outboxRowId: string, step: string | null, lineNo: number | null): Promise<void> {
+    await db.sql`
+      update outbox_rows set step = ${step}, line_no = ${lineNo}, version = version + 1 where id = ${outboxRowId}
+    `;
+  }
+
+  /** The words of an SQL statement, lower case: its names and keywords. */
+  const sqlWordsOf = (statement: string): string[] =>
+    statement.toLowerCase().match(/[a-z_][a-z0-9_]*/g) ?? [];
+
+  it(
+    "commit-s1-04-sam-lines stored S1-08/0 on the row that asks nothing and S1-09/0 on the question row, and turn 1's older row neither; each reads from the row, or from its question",
+    SLOW,
+    async () => {
+      const exchange = await given(S1_08_SAM);
+      const stored = await db.sql<{ id: string; step: string | null; line_no: number | null }[]>`
+        select id, step, line_no from outbox_rows order by commit_seq
+      `;
+      expect(stored.map((row) => [row.id, row.step, row.line_no])).toEqual([
+        ["outbox-s1-02-sam-1", null, null],
+        ["out-s1-08-sam", "S1-08", 0],
+        ["out-s1-09-sam", "S1-09", 0],
+      ]);
+      const s1_08 = await rowOf(S1_08, exchange);
+      expect(s1_08).toEqual(exchange.outcome);
+      expect([s1_08.line, s1_08.slotSource.question]).toEqual([
+        { step: "S1-08", index: 0, from: "row" },
+        null,
+      ]);
+      const s1_09 = await rowOf(S1_09, exchange);
+      expect(s1_09.line).toEqual({ step: "S1-09", index: 0, from: "row" });
+      expect(s1_09.slotSource.question?.id).toBe("oq-s1-09-sam");
+      expect(s1_09.slotSource.question?.step).toBe("S1-09");
+      expect((await rowOf(OLDER, exchange)).line).toEqual({ step: "S1-02", index: 0, from: "openQuestion" });
+    },
+  );
+
+  it(
+    "a row that asks a question and stores its own pair answers its own, never its question's: S1-09's question row with its stored line moved to 1, then its step to another, answers each as stored (default 208)",
+    SLOW,
+    async () => {
+      const exchange = await given(S1_08_SAM);
+      await storeLine("out-s1-09-sam", "S1-09", 1);
+      const moved = await rowOf(S1_09, exchange);
+      expect(moved.line).toEqual({ step: "S1-09", index: 1, from: "row" });
+      expect(moved.slotSource.question?.step).toBe("S1-09");
+      await storeLine("out-s1-09-sam", "S1-08", 0);
+      const other = await rowOf(S1_09, exchange);
+      expect(other.line).toEqual({ step: "S1-08", index: 0, from: "row" });
+      // Never compared with the question it asks, which still reads as stored.
+      expect(other.slotSource.question?.step).toBe("S1-09");
+      expect(other.row.openQuestionId).toBe("oq-s1-09-sam");
+    },
+  );
+
+  it(
+    "the order is the row, then its question, then none: with its pair cleared, the question row reads its question's line 0 and the row that asks nothing reads null (defaults 48 and 212)",
+    SLOW,
+    async () => {
+      const exchange = await given(S1_08_SAM);
+      await storeLine("out-s1-09-sam", null, null);
+      await storeLine("out-s1-08-sam", null, null);
+      expect((await rowOf(S1_09, exchange)).line).toEqual({ step: "S1-09", index: 0, from: "openQuestion" });
+      const none = await rowOf(S1_08, exchange);
+      expect(none.line).toBeNull();
+      expect(none.slotSource.question).toBeNull();
+      // Turn 1's row asks S1-02's question; given a pair of its own it reads that instead.
+      await storeLine("outbox-s1-02-sam-1", "S1-02", 2);
+      expect((await rowOf(OLDER, exchange)).line).toEqual({ step: "S1-02", index: 2, from: "row" });
+    },
+  );
+
+  it(
+    "a stored step with no line_no, which K-04's outbox_rows_step_with_line refuses, is a broken record: refused whole, never a guessed index (default 2); the CHECK is dropped only inside a transaction that rolls back",
+    SLOW,
+    async () => {
+      const exchange = await given(S1_08_SAM);
+      await expect(
+        db.sql`update outbox_rows set line_no = null, version = version + 1 where id = 'out-s1-08-sam'`,
+      ).rejects.toMatchObject({ code: "23514", constraint_name: "outbox_rows_step_with_line" });
+      class RolledBack extends Error {
+        readonly thrown: unknown;
+
+        constructor(thrown: unknown) {
+          super("rolled back");
+          this.thrown = thrown;
+        }
+      }
+      const rolledBack = await db.sql
+        .begin(async (tx) => {
+          await tx`alter table outbox_rows drop constraint outbox_rows_step_with_line`;
+          await tx`update outbox_rows set line_no = null, version = version + 1 where id = 'out-s1-08-sam'`;
+          await setBusinessScope(tx, BARBERSHOP);
+          const thrown = await readOutboxRowIn(tx, S1_08, nowOf(exchange)).then(
+            () => null,
+            (error: unknown) => error,
+          );
+          throw new RolledBack(thrown);
+        })
+        .then(
+          () => null,
+          (error: unknown) => error,
+        );
+      expect(rolledBack).toBeInstanceOf(RolledBack);
+      const thrown = (rolledBack as RolledBack).thrown;
+      expect(thrown).toBeInstanceOf(BrokenRecordError);
+      const message = (thrown as Error).message;
+      expect(message).toBe("readOutboxRow: the row's stored step has no line_no");
+      for (const value of ["out-s1-08-sam", "S1-08", BARBERSHOP]) {
+        expect(message.includes(value), value).toBe(false);
+      }
+      // Rolled back: the CHECK and the row's pair are as they were.
+      const [check] = await db.sql<{ n: number }[]>`
+        select count(*)::int as n from pg_constraint c join pg_class t on t.oid = c.conrelid
+        join pg_namespace s on s.oid = t.relnamespace
+        where s.nspname = ${db.schema} and t.relname = 'outbox_rows' and c.conname = 'outbox_rows_step_with_line'
+      `;
+      expect(check?.n).toBe(1);
+      expect(await rowOf(S1_08, exchange)).toEqual(exchange.outcome);
+    },
+  );
+
+  it(
+    "the one select of outbox_rows names the listed columns alone, step and line_no among them, for a row with its pair, a question row and an older row; no statement of the read names a message's words, an address or a number",
+    SLOW,
+    async () => {
+      const exchange = await given(S1_08_SAM);
+      const columns = (
+        await db.sql<{ name: string }[]>`
+          select column_name as name from information_schema.columns
+          where table_schema = ${db.schema} and table_name = 'outbox_rows'
+        `
+      ).map((column) => column.name);
+      expect(columns).toEqual(
+        expect.arrayContaining(["step", "line_no", "job_id", "trace_id", "commit_seq"]),
+      );
+      for (const request of [S1_08, S1_09, OLDER]) {
+        sent.length = 0;
+        await rowOf(request, exchange);
+        const statements = [...sent];
+        const rowReads = statements.filter((statement) => /\bas\s+has_plan\b/i.test(statement));
+        expect(rowReads, request.outboxRowId).toHaveLength(1);
+        const named = new Set(sqlWordsOf(rowReads[0] ?? ""));
+        expect(columns.filter((column) => named.has(column)).sort(), request.outboxRowId).toEqual(
+          ROW_COLUMNS,
+        );
+        for (const statement of statements) {
+          const words = new Set(sqlWordsOf(statement));
+          for (const never of ["words", "address", "number", "sealed_words"]) {
+            expect(words.has(never), `${never}: ${statement}`).toBe(false);
+          }
+        }
+      }
     },
   );
 });

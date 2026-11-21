@@ -56,6 +56,17 @@
 // errors only to a request typed with askAgain given (default 199). A firing raises nothing: clocks.ts's checkFire throws
 // on one that carries askAgain (default 199).
 //
+// A row's own step and line (T-1476; K-05 v1.22 item 82 and defaults 206 to 213; K-04 core v1.2, migration 0039; DL-999,
+// DL-1073): each writes.outboxRows item may name step, the K-01 step whose line the row carries to its reader, and lineNo,
+// that line's index, both or neither. checkRequest takes both left out, or both given with the step in K-01's step id form
+// and the line an integer from 0 that the column holds, or throws before the database is reached, naming the field alone
+// (default 206; db/repo default 1; default 18 below): never written half, and never answered constraint. writeOutboxRows
+// inserts them as outbox_rows.step and line_no in the insert that writes the row's other columns, each the request's
+// value or null, so a row that names neither holds both null as before. Nothing else changes: no read, lock, compare,
+// entry or field of the answer. The step is not checked against the turn's bundle, the line against the step's lines, or
+// a row's step against its question's (defaults 208 and 209: the walk's, T-1479). A firing's rows are clocks.ts's and
+// carry neither (default 211).
+//
 // Scope (K-05 README "Scope": per write; T-191's roles): the call runs on the runtime side, as rosie_job, in one read
 // committed transaction that starts with no business scope. Before each write the scope is set to that write's own
 // business (set_config(..., true)), so row-level security holds each write to its business, and a turn touching two
@@ -134,6 +145,12 @@
 //      before (23503, or 23505 for a made row's id already taken), so nothing that committed before changes. K-05 item 1
 //      orders the turn row, then the locks and compares, then the writes, in one transaction; the outbox rows keep their
 //      commit order, and the effects still follow every state write (item 18).
+//  18. (T-1476) A row's lineNo above 2^31 - 1, the largest value K-04's integer line_no holds, throws in checkRequest
+//      with the other malformed lines (K-05 v1.22 default 207 sets no upper bound; the database engineer's note 1 on
+//      T-1474): the insert would fail with 22003, which is no constraint's answer, so the call would throw anyway, and
+//      this way it throws before any statement, as item 82 has every malformed line do. A step or lineNo given as
+//      undefined is left out, as a JSON request can only leave it out; given as null it is malformed (default 206: left
+//      out, never null).
 //
 // The setup tables (T-667; K-05 v1.18 item 77; DL-867, DL-911, DL-913): the state writes take every setup part's table
 // (K-22 to K-27, K-33, K-35) as any other domain table, an update naming the version it read. A table whose primary key is
@@ -162,6 +179,7 @@ import type postgres from "postgres";
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.1";
 import type * as K05v117 from "../../contracts/generated/data-access/data-access.v1.17";
 import type * as K05v121 from "../../contracts/generated/data-access/data-access.v1.21";
+import type * as K05v122 from "../../contracts/generated/data-access/data-access.v1.22";
 import { byteaFromText } from "./bytea";
 import { appendEvent, type EventEntry as LogEntry } from "./event-log";
 import { releaseIn } from "./reservations";
@@ -170,10 +188,20 @@ import { isNamedKey, rowNameSql, twoColumnKeyOf } from "./setup/row-names";
 import { inRuntimeTransaction, transientOrThrow, utc } from "./targets";
 
 /**
- * K-05 v1.1 commitTurn.request (the turn row, the versions read and every write), with K-05 v1.17's optional
- * answerPhoneRowsBy (item 71), which changes only what the call answers. Without it the request is v1.16's.
+ * K-05 v1.22 outboxRowNew (README item 82; T-1476): v1's ten fields, and the row's own step and lineNo, both or neither
+ * (checkRequest holds the rule the generated type leaves out). Left out, the row is v1's.
  */
-export type CommitTurnRequest = K05.CommitTurnRequest & Pick<K05v117.CommitTurnRequest, "answerPhoneRowsBy">;
+export type OutboxRowNew = K05v122.OutboxRowNew;
+
+/**
+ * K-05 v1.1 commitTurn.request (the turn row, the versions read and every write), with K-05 v1.17's optional
+ * answerPhoneRowsBy (item 71), which changes only what the call answers, and its outbox rows v1.22's (item 82; T-1476),
+ * each of which may name its step and line. Without answerPhoneRowsBy the request is v1.16's; a request whose rows name
+ * no step is v1.21's, so every caller's v1.1 request is one of these unchanged.
+ */
+export type CommitTurnRequest = Omit<K05.CommitTurnRequest, "writes"> & {
+  writes: Omit<K05.CommitTurnRequest["writes"], "outboxRows"> & { outboxRows: OutboxRowNew[] };
+} & Pick<K05v117.CommitTurnRequest, "answerPhoneRowsBy">;
 /** K-05 v1.1 commitTurn.response: committed; a repeated turn id answers the first commit with repeated true. */
 export type CommitTurnResponse = K05.CommitTurnResponse;
 /** K-05 v1.1 commitTurn.errors: refused, nothing written. */
@@ -182,10 +210,12 @@ export type CommitTurnOutcome = CommitTurnResponse | CommitTurnError;
 
 /**
  * K-05 v1.21 commitTurn.request with writes.openQuestions.askAgain given (README item 81; T-1509): the turn asks one open
- * question again, its ask count raised by one. Only a request typed so may answer v1.21's errors (default 199).
+ * question again, its ask count raised by one. Only a request typed so may answer v1.21's errors (default 199). Typed at
+ * v1.22, which restates v1.21's request with the raise kept (README item 82; T-1476), so the row that asks the question
+ * again may name its step and line; a v1.21 request is one of these unchanged.
  */
-export type CommitTurnAskAgainRequest = K05v121.CommitTurnRequest & {
-  readonly writes: { readonly openQuestions: { readonly askAgain: [K05v121.OpenQuestionAskAgain] } };
+export type CommitTurnAskAgainRequest = K05v122.CommitTurnRequest & {
+  readonly writes: { readonly openQuestions: { readonly askAgain: [K05v122.OpenQuestionAskAgain] } };
 };
 /** K-05 v1.21 commitTurn.errors: v1.1's, and wrongState for an open question asked again that is not live. */
 export type CommitTurnAskAgainError = K05v121.CommitTurnErrors;
@@ -261,6 +291,10 @@ const NAME = /^[a-z_][a-z0-9_]{0,62}$/;
 const BUNDLE_HASH = /^[0-9a-f]{64}$/;
 const CLOCK_KINDS = new Set(["question", "never_delivered", "saved_time", "step", "job"]);
 const CALENDAR_PROVIDERS = new Set(["google", "microsoft"]);
+/** K-01 v1's stepId form (K-05 v1.22 outboxRowNew.step), as K-04 v1.2's outbox_rows_step_form holds it (0039). */
+const STEP_ID = /^[SAB](1[0-3]|[1-9])-x?[0-9]{2,3}$/;
+/** The largest line index K-04 v1.2's line_no holds (PostgreSQL's integer): a larger one is refused (default 18). */
+const MAX_LINE_NO = 2_147_483_647;
 
 /** Thrown inside the transaction to roll it back and answer one of K-05's refusals. */
 class Refused extends Error {
@@ -392,6 +426,33 @@ function raiseOf(questions: Row): Raise | null {
 }
 
 /**
+ * K-05 v1.22's line of an outbox row (README item 82; T-1476): step and lineNo both left out (the row is v1.21's and
+ * holds both null), or both given, the step in K-01's step id form and the line an integer from 0 that line_no holds.
+ * One without the other, or either malformed, throws before the database is reached, naming the field alone (default
+ * 206; db/repo default 1; default 18), so a row is never written half and never answered constraint.
+ */
+function checkRowLine(row: Row): void {
+  const named = row.step !== undefined;
+  if (named !== (row.lineNo !== undefined)) {
+    fail(
+      named
+        ? "an outbox row names step without lineNo: both or neither (K-05 v1.22 default 206)"
+        : "an outbox row names lineNo without step: both or neither (K-05 v1.22 default 206)",
+    );
+  }
+  if (!named) {
+    return;
+  }
+  if (typeof row.step !== "string" || !STEP_ID.test(row.step)) {
+    fail("writes.outboxRows[].step is not a K-01 step id");
+  }
+  const line = row.lineNo;
+  if (typeof line !== "number" || !Number.isSafeInteger(line) || line < 0 || line > MAX_LINE_NO) {
+    fail("writes.outboxRows[].lineNo is not a line index (an integer from 0 to 2^31 - 1)");
+  }
+}
+
+/**
  * What code checks before the database is reached (the schema's rules this layer relies on, and every name that reaches
  * SQL as an identifier), so a malformed request writes nothing and touches nothing. Answers the raise a v1.21 request
  * carries (raiseOf), or null.
@@ -457,6 +518,7 @@ function checkRequest(request: CommitTurnRequest): Raise | null {
     if (Object.hasOwn(row, "plan") || Object.hasOwn(row, "finalParts")) {
       fail("an outbox row at the commit carries no plan: words are written into it after the commit");
     }
+    checkRowLine(row as unknown as Row);
   }
   if (writes.waitingChat !== undefined) {
     const waiting = objectField(writes, "waitingChat", "writes");
@@ -1605,6 +1667,11 @@ async function writeClockRows(
   }
 }
 
+/**
+ * The turn's outbox rows with no plan, in commit order, each under its own business. From K-05 v1.22 (item 82; T-1476)
+ * the one insert also writes the row's step and line_no, each the request's value or null (checkRequest has held them
+ * both or neither), so a row that names neither holds both null as before.
+ */
 async function writeOutboxRows(ctx: Context, request: CommitTurnRequest, out: Written): Promise<void> {
   const { tx, turn } = ctx;
   for (const outboxRow of request.writes.outboxRows) {
@@ -1621,12 +1688,13 @@ async function writeOutboxRows(ctx: Context, request: CommitTurnRequest, out: Wr
     const [row] = await tx<{ commit_seq: string | number }[]>`
       insert into outbox_rows (
         id, turn_id, recipient_handle_id, recipient_person_id, business_id, booking_id, channel, send_class,
-        versions_read, open_question_id, copy_of_row_id, bundle_hash, bundle_build, trace_id
+        versions_read, open_question_id, copy_of_row_id, bundle_hash, bundle_build, trace_id, step, line_no
       ) values (
         ${outboxRow.id}, ${turn.id}, ${outboxRow.recipientHandleId}, ${outboxRow.recipientPersonId},
         ${outboxRow.businessId}, ${outboxRow.bookingId}, ${outboxRow.channel}, ${outboxRow.sendClass},
         ${tx.json(outboxRow.versionsRead as unknown as Json)}, ${outboxRow.openQuestionId}, ${outboxRow.copyOfRowId},
-        ${turn.bundleId.hash}, ${turn.bundleId.build}, ${turn.traceId}
+        ${turn.bundleId.hash}, ${turn.bundleId.build}, ${turn.traceId}, ${outboxRow.step ?? null},
+        ${outboxRow.lineNo ?? null}
       )
       returning commit_seq
     `;
