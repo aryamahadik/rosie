@@ -489,6 +489,42 @@ function firstTextParts(row: string): Json {
   };
 }
 
+/**
+ * The final parts of a later text to Sam about the barbershop on `row`, once the JOIN's writePlan wrote the opener mark
+ * (K-05 v1.21 defaults 200 to 204; T-1513): the plan's words with no opener before them and no privacy link after, and
+ * the one line still owed, the STOP, HELP and rates line, which no delivery receipt has marked (Sam holds no phone row).
+ */
+function laterTextParts(row: string): Json {
+  return {
+    row,
+    channel: "imessage",
+    sends: [
+      {
+        kind: "words",
+        text: [PLANNED_WORDS, OPT_OUT_LINE].join("\n"),
+        calendarFile: "none",
+        options: [],
+        link: null,
+      },
+    ],
+    fixedLines: ["optOutLine"],
+    slotValues: [],
+    threadReplyTo: null,
+  };
+}
+
+/** K-04's opener mark for Sam at the barbershop, as the runtime side reads it: the row it names, or null for none. */
+function openerMarkRow(): Promise<string | null> {
+  return own.runtime("openerMarkRow", async (sql) => {
+    const rows = await sql<{ outbox_row_id: string }[]>`
+      select outbox_row_id from openers_sent
+      where handle_id = ${TEST_OWNER_1.handleId} and business_id = ${BARBERSHOP}
+    `;
+    if (rows.length > 1) throw new Error("openers_sent holds more than one mark for a handle and business");
+    return rows[0]?.outbox_row_id ?? null;
+  });
+}
+
 /** finalize-pass.json's plan, on `row`. */
 const planOn = (row: string): Json => ({ ...finalizePass.request.plan, row });
 
@@ -1145,6 +1181,8 @@ describe("through a root composed for staging: the three inputs on PostgreSQL, e
       const root = stagingRoot(fakes, made.inputs, handleActors());
       const turn = TURNS.join;
       expect(await storedRow(turn.row)).toMatchObject({ state: "planned", version: 1, plan: null });
+      // No row here has carried an opener yet (write-plan.json's final parts hold no fixed line): no mark.
+      expect(await openerMarkRow()).toBeNull();
       const restoreRoot = root.install();
       const watched = watchGate(root, fakes.face);
       try {
@@ -1234,6 +1272,9 @@ describe("through a root composed for staging: the three inputs on PostgreSQL, e
         expect(words[0]?.startsWith(`${OPENER} `)).toBe(true);
         expect(words.slice(-2)).toEqual([OPT_OUT_LINE, PRIVACY_LINK]);
         expect(text).not.toContain(TEST_OWNER_1_BUSINESS_NAME);
+        // writePlan wrote K-04's opener mark with the plan (K-05 v1.21 default 200; T-1513): Rosie's first text to Sam
+        // about the barbershop is this row.
+        expect(await openerMarkRow()).toBe(turn.row);
 
         // Each side's login: the turn's rows listed and each row call on the runtime side, each scope on the Tool
         // API's, every client ended; a call held its Tool API client while its runtime-side call ran (2 at once).
@@ -1378,6 +1419,11 @@ describe("two rows composed and two finalized side by side (critic_collisions N2
       const held = sideBySide(real);
       const root = stagingRoot(skeletonFakes(), stagingRowCalls({ env, db: held.db }));
       const turns = [TURNS.sideA, TURNS.sideB];
+      // The JOIN's test above finalized Rosie's first text to Sam about the barbershop, and its writePlan wrote the
+      // opener mark naming the JOIN's row, which stands checked (T-1513). Both rows here are later texts to the same
+      // handle and business, so each reads "texted before" whichever is finalized first.
+      expect(await openerMarkRow()).toBe(TURNS.join.row);
+      expect(await storedRow(TURNS.join.row)).toMatchObject({ state: "checked" });
 
       // Two compose inputs at once: each runtime-side read starts only once both Tool API clients are open.
       held.arm(turns.length);
@@ -1386,22 +1432,34 @@ describe("two rows composed and two finalized side by side (critic_collisions N2
       expect(composed).toEqual(turns.map((turn) => composedFor(turn, null)));
       expect(real.counts()).toMatchObject({ opened: 4, ended: 4, connectionsOpen: 0, connectionsPeak: 4 });
 
-      // Two finalizes at once, each making three runtime-side calls under its Tool API transaction.
+      // Two finalizes at once, each making three runtime-side calls under its Tool API transaction. Neither text is
+      // Rosie's first to Sam about the barbershop (the JOIN's mark): each carries the plan's words with no opener and
+      // no privacy link, and the STOP, HELP and rates line alone, which no delivery receipt has marked (K-05 v1.21
+      // defaults 200 to 204).
       held.arm(turns.length);
       const finalized = await Promise.all(turns.map((turn) => finalizeRow(root, turn)));
       expect(finalized).toMatchObject(turns.map(() => ({ outcome: "send", questionWithdrawn: false })));
       expect((finalized as { finalParts: unknown }[]).map((answer) => answer.finalParts)).toEqual(
-        turns.map((turn) => firstTextParts(turn.row)),
+        turns.map((turn) => laterTextParts(turn.row)),
       );
       for (const turn of turns) {
-        expect(await storedRow(turn.row)).toEqual({
+        const stored = await storedRow(turn.row);
+        expect(stored).toEqual({
           turn_id: turn.turnId,
           state: "checked",
           version: 2,
           plan: planOn(turn.row),
-          final_parts: firstTextParts(turn.row),
+          final_parts: laterTextParts(turn.row),
         });
+        // The words as stored: the plan's own, then the STOP, HELP and rates line last; no opener, no privacy link.
+        const text = String(
+          (stored?.final_parts as { sends: { text: string }[] } | undefined)?.sends[0]?.text,
+        );
+        expect(text.split("\n")).toEqual([...PLANNED_WORDS.split("\n"), OPT_OUT_LINE]);
+        expect([OPENER, PRIVACY_LINK].filter((line) => text.includes(line))).toEqual([]);
       }
+      // The mark is written once: neither later row moved it.
+      expect(await openerMarkRow()).toBe(TURNS.join.row);
 
       // All of it under the cap: 2 connections a call, 4 for two at once, never more.
       const counts = real.counts();

@@ -75,15 +75,18 @@
 //                (./real.ts realFinalize), over the bundle the turn's run pinned. What its reads and writes are fed comes
 //                from here: `fakeFinalizeData`, the Tool API's business scope and K-05 doubles over the rows the K-05
 //                commitTurn double wrote and test owner 1's seeded rows: readOutboxRow (as compose input's, with the plan
-//                the row holds once written), readFixedLineFacts (no phone row in the seed), writePlan (T-196's, keeping
-//                each row's plan and final parts) and cancelClock. The turn's finalize calls are kept on the fake face as
-//                the stand-in kept them, by `watchGate` when it is handed the face
+//                the row holds once written), readFixedLineFacts (K-04's opener mark with db/repo's fallback, and the
+//                phone row's opt-out time as the dispatcher's double holds it: K-05 v1.21 defaults 200 to 204, T-1514),
+//                writePlan (T-196's, keeping each row's plan and final parts, and writing the opener mark) and
+//                cancelClock. The turn's finalize calls are kept on the fake face as the stand-in kept them, by
+//                `watchGate` when it is handed the face
 //   outbox       joined (T-562): the root binds K-05 v1.2's claimOutboxV12, renewClaim, markPartV12 and markRowV12 through
 //   sendState    its real outbox port and K-05 v1.2 sendState through its real send-state port (./real.ts realOutbox,
 //                realSendState). What both are fed comes from here: `fakeDispatchData`, one K-05 double over the rows the
 //                K-05 commitTurn double wrote, the plans and final parts finalize wrote into them (`fakeFinalizeData`) and
 //                test owner 1's seeded rows (no phone row until his text opens his chat at receipt), answering as
-//                db/repo/outbox.ts and send-state.ts answer on them
+//                db/repo/outbox.ts and send-state.ts answer on them; a delivered words part carrying the STOP, HELP and
+//                rates line sets the phone row's opt-out time once (K-05 v1.21 default 203, T-1514)
 //   dataAccess   turn/test-support fakeRows (the commit's one row)
 //   linqSend     joined (T-563): the root binds K-11 sendPart through its real Linq send port (./real.ts realLinqSend).
 //                What it is fed comes from here: `FakeLinqLine`, @rosie/adapters' Linq double (T-411) behind a line that
@@ -2753,6 +2756,34 @@ export interface FakeFinalizeData {
   readonly cancels: CancelClockRequest[];
   /** The plan each row holds, by row id: what a writePlan wrote. */
   readonly plans: ReadonlyMap<string, StoredPlan>;
+  /**
+   * K-04 openers_sent as the double keeps it: the opener marks writePlan wrote, in the order written, one per handle and
+   * business, written once and never moved (K-05 v1.21 defaults 200, 201 and 204; db/repo/outbox.ts writePlanIn).
+   */
+  readonly openersSent: readonly OpenerMark[];
+  /**
+   * The dispatcher's side of the same K-04 (./test-support.ts fakeDispatchData), which readFixedLineFacts reads as
+   * db/repo's does: each row's K-07 state now (a mark's row, and each earlier row the fallback reads) and each handle's
+   * phone row (its optout_line_delivered_at). A rig that joins the outbox sets it (`skeletonFakes` does); while it is
+   * null there is no dispatcher, so each row stands as finalize left it (planned, or checked once it holds a plan) and no
+   * phone row is read.
+   */
+  dispatched: DispatchedWorld | null;
+}
+
+/** One K-04 openers_sent row as the double keeps it: Rosie's first text to a handle about a business, by its row. */
+export interface OpenerMark {
+  readonly handleId: string;
+  readonly businessId: string;
+  /** The turn's committed_at, never the write's own time (K-05 v1.21 default 201). */
+  readonly sentAt: string;
+  readonly outboxRowId: string;
+}
+
+/** What the fixed-line facts read of the dispatcher's double: a row's state now, and the phone rows by handle id. */
+export interface DispatchedWorld {
+  row(id: string): { readonly state: string } | null;
+  readonly phones: ReadonlyMap<string, { readonly optoutLineDeliveredAt: string | null }>;
 }
 
 /**
@@ -2763,19 +2794,49 @@ export interface FakeFinalizeData {
 const OPENERS: readonly string[] = OPENER_LINES;
 
 /**
+ * K-07's ends of a row that did not go, or never will (K-05 v1.21 default 202; db/repo/turn-face-reads.ts NEVER_WENT):
+ * such a row never counts as a text that went, and a mark naming one is read past. A row still planned, checked, held,
+ * waiting for its chat or sending counts (open gap 100).
+ */
+const NEVER_WENT: ReadonlySet<string> = new Set(["withdrawn", "failed", "dropped_stopped", "superseded"]);
+
+/** K-01's STOP, HELP and rates line, whose first delivery is the phone's optout_line_delivered_at (K-05 v1.21 default 203). */
+const OPT_OUT_LINE_ID = "optOutLine";
+
+/**
+ * Whether final parts hold one of `lines` among their fixedLines (db/repo/outbox.ts carriesLine): false when they hold no
+ * list.
+ */
+function carriesLine(finalParts: { readonly fixedLines?: unknown } | undefined, lines: readonly string[]): boolean {
+  const fixedLines: unknown = finalParts?.fixedLines;
+  return Array.isArray(fixedLines) && fixedLines.some((line) => typeof line === "string" && lines.includes(line));
+}
+
+/**
  * Finalize's K-05 calls (T-561; @rosie/actions' turn-face/pg/calls.ts pgRowData on PostgreSQL) as doubles over the rows the
  * K-05 commitTurn double wrote (`written`) and test owner 1's seeded rows, each answering as db/repo answers on those rows:
  *
  *   readOutboxRow       as fakeComposeReads' (T-1138, T-1197), the row holding no plan; once writePlan wrote one, the row
  *                       as K-07's checked moves it (state checked, its version raised, hasPlan, its final parts);
- *   readFixedLineFacts  K-05 v1.3 item 36 (T-1138), as fixed-line-facts-s1-02.json: Rosie has texted the handle about the
- *                       row's business only when another of its rows there holds final parts that carry an opener, either
- *                       id (K-04 openers_sent's mark, as the double keeps it; K-05 default 50 as T-1508 amends it); the
- *                       STOP, HELP and rates line was never delivered, since test owner 1's seed holds no phone row;
+ *   readFixedLineFacts  K-05 v1.3 item 36 (T-1138) as v1.21 reads it (defaults 202 and 204; T-1513's
+ *                       db/repo/turn-face-reads.ts readFixedLineFactsIn, statement for statement): with a business, the
+ *                       opener mark of the row's handle and business (`openersSent`): none, one naming this row, or one
+ *                       whose row is in any state but K-07's four ends of a row that did not go (withdrawn, failed,
+ *                       dropped_stopped, superseded) answers the mark's row (null for none); a mark whose row did not go
+ *                       is read past, to the earliest earlier row (a lower commit order) to the same handle and business
+ *                       whose final parts carry an opener, either id, and that is in none of those four states; with no
+ *                       business there is no mark, and that same earlier-row read answers. Rosie has texted the handle
+ *                       about the business when the row answered is another row than this one. The STOP, HELP and rates
+ *                       line's time is the handle's phone row's as the dispatcher's double holds it (`dispatched`), null
+ *                       with no phone row (test owner 1's seed holds none, T-1148);
  *   writePlan           K-05 v1 item 2 (T-196, db/repo/outbox.ts; write-plan.json, write-plan-repeat.json): the plan and
  *                       the final parts written together, the row checked and its version raised; alreadyPlanned when the
  *                       row holds a plan (checked before the version), versionChanged, notFound; a plan or final parts
- *                       of another row or channel refused (thrown), nothing written;
+ *                       of another row or channel refused (thrown), nothing written. A written row with a business,
+ *                       of a committed turn, whose final parts carry an opener, either id, also writes K-04's opener mark
+ *                       (K-05 v1.21 defaults 200, 201 and 204; db/repo/outbox.ts writePlanIn): its handle, its business,
+ *                       the turn's committed_at and the row, once per handle and business, so a later row never moves it;
+ *                       no mark with no business, on a repeat or on any refusal;
  *   cancelClock         K-05 v1 item 5 (cancel-clock.json): the question's clock row cancelled at its next version, as
  *                       K-05 answers it (the double keeps only that version; the question's withdrawal is not kept).
  *
@@ -2793,9 +2854,34 @@ export function fakeFinalizeData(
   const cancels: CancelClockRequest[] = [];
   const plans = new Map<string, StoredPlan>();
   const cancelled = new Map<string, number>();
+  const openersSent: OpenerMark[] = [];
   const outboxRow = (id: string): WrittenRow | undefined => written.rows.get("outbox_rows")?.get(id);
   const refusedWrite = (what: string): Promise<never> =>
     Promise.reject(new Error(`K-05 v1 refuses the writePlan request: ${what}`));
+  /** A row's business as K-04 holds it: its id, or null for a row with none. */
+  const businessOf = (row: WrittenRow): string | null =>
+    typeof row.values.businessId === "string" ? row.values.businessId : null;
+  /** A row's K-07 state now: the dispatcher's double's, or as finalize left it where no dispatcher is joined. */
+  const stateOf = (id: string): string =>
+    double.dispatched?.row(id)?.state ?? (plans.has(id) ? "checked" : "planned");
+  /**
+   * The earliest row to the handle at the business (with none: no business) committed before `row` (a lower commit order)
+   * whose final parts carry an opener, either id, and whose state is none of K-07's ends of a row that did not go; null
+   * when there is none (db/repo/turn-face-reads.ts earliestOpenerRow: the no-business read and the fallback, one read).
+   */
+  const earliestOpenerRow = (handleId: string, businessId: string | null, row: WrittenRow): string | null => {
+    const earlier = [...(written.rows.get("outbox_rows")?.values() ?? [])]
+      .filter(
+        (other) =>
+          other.values.recipientHandleId === handleId &&
+          businessOf(other) === businessId &&
+          Number(other.values.commitSeq) < Number(row.values.commitSeq) &&
+          carriesLine(plans.get(other.id)?.finalParts, OPENERS) &&
+          !NEVER_WENT.has(stateOf(other.id)),
+      )
+      .sort((a, b) => Number(a.values.commitSeq) - Number(b.values.commitSeq));
+    return earlier[0]?.id ?? null;
+  };
 
   const data: FinalizeData = {
     scope: scopeRecordedIn(scopes),
@@ -2823,32 +2909,38 @@ export function fakeFinalizeData(
         return Promise.resolve({ error: "notFound", table: "outbox_rows", rowId: request.outboxRowId });
       }
       const handleId = row.values.recipientHandleId;
-      if (handleId !== TEST_OWNER_1.handleId) {
+      if (typeof handleId !== "string" || handleId !== TEST_OWNER_1.handleId) {
         return Promise.reject(new Error("the skeleton's readFixedLineFacts double holds no other recipient"));
       }
-      const carriesOpener = (id: string): boolean => {
-        const fixedLines = plans.get(id)?.finalParts.fixedLines ?? [];
-        return OPENERS.some((opener) => fixedLines.includes(opener));
-      };
-      const opened = [...plans.keys()].find((id) => {
-        const other = outboxRow(id);
-        return (
-          id !== row.id &&
-          other?.values.recipientHandleId === handleId &&
-          other.values.businessId === request.businessId &&
-          carriesOpener(id)
-        );
-      });
+      const { businessId } = request;
+      let openerRowId: string | null;
+      if (businessId === null) {
+        // openers_sent holds no mark with no business: the earliest earlier row to the handle with none that carries an
+        // opener and did not end without going (K-05 v1.21 defaults 202 and 204).
+        openerRowId = earliestOpenerRow(handleId, null, row);
+      } else {
+        const mark = openersSent.find((sent) => sent.handleId === handleId && sent.businessId === businessId);
+        if (mark === undefined || mark.outboxRowId === row.id || !NEVER_WENT.has(stateOf(mark.outboxRowId))) {
+          openerRowId = mark?.outboxRowId ?? null;
+        } else {
+          // A mark whose row never went is read past, to the earliest earlier row that carries an opener and went (or
+          // may yet): never a state filter without this fallback, since the mark is written once (default 202).
+          openerRowId = earliestOpenerRow(handleId, businessId, row);
+        }
+      }
       const facts: FixedLineFactsRead & Record<string, unknown> = {
         result: "fixedLineFacts",
         outboxRowId: row.id,
-        businessId: request.businessId,
+        businessId,
         recipientHandleId: handleId,
         readAt: utcSeconds(now()),
-        textedAboutBusiness: opened !== undefined,
-        openerRowId: opened ?? (carriesOpener(row.id) ? row.id : null),
-        // Test owner 1's seed holds no phone row (T-1148): the line was never delivered to the number.
-        optOutLineDeliveredAt: null,
+        // Texted before: an opener went on another row. The mark naming this row means this row is the first text,
+        // which carries the opener whenever it is finalized (default 50).
+        textedAboutBusiness: openerRowId !== null && openerRowId !== row.id,
+        openerRowId,
+        // The handle's phone row's time, set by the first delivered words part carrying the line (default 203; the
+        // dispatcher's double's markPartV12); null with no phone row (test owner 1's seed holds none, T-1148).
+        optOutLineDeliveredAt: double.dispatched?.phones.get(handleId)?.optoutLineDeliveredAt ?? null,
       };
       return Promise.resolve(facts);
     },
@@ -2883,6 +2975,23 @@ export function fakeFinalizeData(
       if (plan.copyOf !== (row.values.copyOfRowId ?? null)) return refusedWrite("another copyOf");
       const version = row.version + 1;
       plans.set(id, { plan: structuredClone(plan), finalParts: structuredClone(finalParts), version });
+      // K-05 v1.21 defaults 200, 201 and 204 (db/repo/outbox.ts writePlanIn): the opener mark, after the row's write,
+      // only for a row with a business, of a committed turn (a parked turn holds no committed_at, so no mark: db/repo
+      // default 27), whose final parts as written carry an opener, either id. Written once per handle and business (on
+      // conflict do nothing), so the first row planned to carry one is named and a later row never moves it; its time is
+      // the turn's committed_at, never the write's own.
+      const businessId = businessOf(row);
+      const handleId = row.values.recipientHandleId;
+      const turn = written.turns.get(row.turnId);
+      if (
+        businessId !== null &&
+        typeof handleId === "string" &&
+        turn?.state === "committed" &&
+        carriesLine(finalParts, OPENERS) &&
+        !openersSent.some((sent) => sent.handleId === handleId && sent.businessId === businessId)
+      ) {
+        openersSent.push({ handleId, businessId, sentAt: turn.at, outboxRowId: id });
+      }
       return Promise.resolve({ result: "written", outboxRowId: id, version });
     },
     cancelClock(request): Promise<CancelClockAnswer> {
@@ -2915,7 +3024,18 @@ export function fakeFinalizeData(
       });
     },
   };
-  return { data, scopes, rowReads, factReads, writes, cancels, plans };
+  const double: FakeFinalizeData = {
+    data,
+    scopes,
+    rowReads,
+    factReads,
+    writes,
+    cancels,
+    plans,
+    openersSent,
+    dispatched: null,
+  };
+  return double;
 }
 
 // ---- @rosie/ai's composer over the recorded-model double (T-560) ----------------------------------------------------
@@ -3460,6 +3580,11 @@ export function seededHandles(seeded: readonly SeededHandle[] = [TEST_OWNER_1]):
  *                   and its version rises with each mark that changes a part; each answer states K-05 v1.9's
  *                   repeatedDelivery (item 48, mark-a7-03-delivered-repeat.json): on a delivered repeat, whether no try of
  *                   the row was delivered earlier (a tie counting as first) and the try's stored time; null on any other;
+ *                   a words part delivered now, of a row whose final parts carry the STOP, HELP and rates line, also sets
+ *                   the recipient's phone row's optout_line_delivered_at to the receipt's time where it is null, its
+ *                   version raised by one (K-05 v1.21 default 203; T-1513's markPartIn): once per phone, so a repeated
+ *                   receipt, a later line-carrying delivery, a poll or link-card part (or its plain words retry), a row
+ *                   without the line and a handle with no phone row each write nothing;
  *   markRowV12      K-05 items 4 and 16 (mark-held-for-text-hours.json, mark-waiting-chat.json): only a sending row,
  *                   compare-and-set on its version; waitingChat also lets the claim go;
  *   sendState       K-05 item 28 (send-state-owner.json's form): the row's state and version now, the recipient (test
@@ -3820,6 +3945,32 @@ export function fakeDispatchData(
     if (!repeated) {
       follow(state);
       state.version += 1;
+    }
+    // K-05 v1.21 default 203 (db/repo/outbox.ts markPartIn, its last statement, after the row and its parts): a words
+    // part delivered now (a repeat writes nothing) of a row whose final parts carry the STOP, HELP and rates line sets
+    // the recipient's phone row's optout_line_delivered_at to the receipt's time, only where it is null, and raises the
+    // phone's version by one, so the first time stays and a later line-carrying delivery writes nothing. A words part
+    // is a try of kind words of the row's words send (db/repo default 29): try 1 holds its send's kind and a later try
+    // goes plain, as words (default 8), so a poll or link card, and its plain words retry, write nothing. Nothing of
+    // STOP is touched, and a handle with no phone row (an email handle) gets none.
+    if (request.outcome === "delivered" && !repeated) {
+      const finalParts = plans.get(row.id)?.finalParts;
+      const sendKind = finalParts?.sends[part.partNo - 1]?.kind;
+      const tryKind = part.tryNo === 1 ? sendKind : "words";
+      const phone = phones.get(recipientOf(row));
+      if (
+        tryKind === "words" &&
+        sendKind === "words" &&
+        carriesLine(finalParts, [OPT_OUT_LINE_ID]) &&
+        phone !== undefined &&
+        phone.optoutLineDeliveredAt === null
+      ) {
+        phones.set(recipientOf(row), {
+          ...phone,
+          optoutLineDeliveredAt: storedUtc(request.at),
+          version: phone.version + 1,
+        });
+      }
     }
     return {
       result: "marked",
@@ -4841,6 +4992,9 @@ export function skeletonFakes(clock: TestClock = testClock(), options: SkeletonO
     () => clock.now(),
     (handleId) => handleKeys.handleOf(handleId),
   );
+  // One K-04 behind both doubles (T-1514): the fixed-line facts read each row's state and each phone row's opt-out time
+  // as the dispatcher's calls left them, as db/repo's read does (K-05 v1.21 defaults 202 and 203).
+  finalize.dispatched = dispatch;
   // The Linq send is joined (T-563): the Linq double behind a line that answers a moment after the send starts (DL-349).
   const linq = new FakeLinqLine(() => clock.utc());
   const retryQueue = fakeRetryQueue(() => clock.now());
