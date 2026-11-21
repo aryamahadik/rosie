@@ -295,13 +295,24 @@ describe("T-631's words rules, unchanged", () => {
   });
 });
 
-describe("T-631's method A, kept: the spike's 47 sample words give its table's A outcomes", () => {
-  it.each(SAMPLES.map((each) => [each.words, each] as const))("%s", (text, each) => {
-    const part = onePart(text);
-    const notBooked = each.group === "S1-02" && each.fits.length === 0;
-    expect({ outcome: part.outcome, kinds: part.kinds.map((kind) => kind.kindId) }).toEqual(
-      asMatchKinds(each.spikeA, notBooked),
-    );
+/** The one sample word whose outcome T-1518 moves (its Gives 3: "haircuts and salon: hair"; everyday.ts). */
+const MOVED_BY_T1518 = "haircut";
+
+describe("T-631's method A, kept: the spike's 47 sample words give its table's A outcomes, but the one T-1518 moves", () => {
+  it.each(SAMPLES.filter((each) => each.words !== MOVED_BY_T1518).map((each) => [each.words, each] as const))(
+    "%s",
+    (text, each) => {
+      const part = onePart(text);
+      const notBooked = each.group === "S1-02" && each.fits.length === 0;
+      expect({ outcome: part.outcome, kinds: part.kinds.map((kind) => kind.kindId) }).toEqual(
+        asMatchKinds(each.spikeA, notBooked),
+      );
+    },
+  );
+
+  it("'haircut' now lists Hair salon (T-1518 Gives 3), where the spike's A asked 'which?' with Hair restoration clinic", () => {
+    expect(sample(MOVED_BY_T1518).spikeA).toEqual({ outcome: "which", kinds: ["hair", "hair-restoration"] });
+    expect(brief(onePart(MOVED_BY_T1518))).toEqual({ words: "haircut", outcome: "listed", kinds: ["hair"] });
   });
 
   it("every kind offered carries its K-24 name", () => {
