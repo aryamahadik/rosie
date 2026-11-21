@@ -4,15 +4,26 @@
 // keyed on them); a card line that names a slot is never a term fact; a card that states no term gives none; the slot
 // facts first, then the terms in the card's order. And the lead's: default 137 beyond S1-02 (a card that mixes slotted
 // and plain lines, a step with no card), the generic source of gap 126, finalize's `terms` agreeing with compose input
-// on S1-02, and the reader addressed by the first word of the name (the seed's "Sam Lee" is "Sam"). Values come only
-// from the contracts' fixtures and the master's sample cast (rule 9).
+// on S1-02, and the reader addressed by the first word of the name (the seed's "Sam Lee" is "Sam").
+// T-1483 (K-09 README v1.11 default 186; DL-999, DL-1048): on bundle v2's S1-08 the term facts are exactly Rosie's four
+// fixed lines with their generic sources, each a line of S1-08's card as K-09's rules read a card, and the table is
+// K-09's S1_08_TERM_LINES; the agreement line, the first kind's line and the slotted line give none, nor does one of the
+// four worded otherwise or at another place; every other step keeps default 137, S1-02's four facts and
+// compose-input-s1-02-v1.6.json are unchanged, and K-09's termFactsFromCard and inputIsK03Fixture still pass on it.
+// Values come only from the contracts' fixtures, the bundles and the master's sample cast (rule 9).
+
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
 import { barberSource } from "../finalize/claim-check/test-support";
 import { S1_02_TERMS, s102Row as finalizeS102Row } from "../finalize/rewrite/test-support";
-import { fakeBundles } from "../frontier/assemble/test-support";
-import { S1_02_SOURCES, addressedAs, genericSource, type ComposeRow } from "./index";
+import { bundleIdOf, fakeBundles, type BundleDocument } from "../frontier/assemble/test-support";
+import { CONTRACTS_DIR } from "../tool-api/validator";
+import { S1_02_SOURCES, addressedAs, genericSource, termFactsOf, type ComposeRow } from "./index";
+import { S1_08_TERMS, isTermLine, type CardPlace } from "./term-facts";
 import {
   a614Step,
   alexRow,
@@ -54,6 +65,76 @@ const ALEX_SLOT_FACTS = [
   { slot: "svc.intext", value: "Haircut" },
   { slot: "day", value: "Sat Oct 24" },
 ];
+
+/** bundles/v2/bundle/: bundle v2's parts as card 8 (T-1477) cut them; its flow A holds S1-08's plan card. */
+const BUNDLE_V2 = path.join(CONTRACTS_DIR, "..", "bundles", "v2", "bundle");
+
+/** Bundle v2 as one document, its manifest and its flow A graph, freshly parsed (a test may change its copy). */
+function bundleV2(): BundleDocument {
+  const part = (file: string): Json =>
+    JSON.parse(readFileSync(path.join(BUNDLE_V2, ...file.split("/")), "utf8")) as Json;
+  return { manifest: part("manifest.json"), flows: { A: part("flow/A.json") } };
+}
+
+/** S1-08's plan card as bundle v2 writes it: its seven lines, in order (master-A.json S1-08, compiled). */
+const S1_08_CARD = [
+  "Your business and your ID: about 3 minutes",
+  "Any license or document you want shown (optional)",
+  "No extra agreement for your work",
+  "Then the barbershop, live in about 15 minutes",
+  "Then {{biz.name}}: plumbing, then electrical, about 5 minutes each",
+  "Then your people",
+  "Nothing you tell me is asked twice",
+];
+
+/** S1-08's term facts under default 186: the four fixed lines, each with its generic source (default 138). */
+const S1_08_FACTS = [
+  {
+    value: "Your business and your ID: about 3 minutes",
+    source: "S1-08's card, line 1 (K-01 flows.A.steps.S1-08.say[0].elements.card.lines[0])",
+  },
+  {
+    value: "Any license or document you want shown (optional)",
+    source: "S1-08's card, line 2 (K-01 flows.A.steps.S1-08.say[0].elements.card.lines[1])",
+  },
+  {
+    value: "Then your people",
+    source: "S1-08's card, line 6 (K-01 flows.A.steps.S1-08.say[0].elements.card.lines[5])",
+  },
+  {
+    value: "Nothing you tell me is asked twice",
+    source: "S1-08's card, line 7 (K-01 flows.A.steps.S1-08.say[0].elements.card.lines[6])",
+  },
+];
+
+/**
+ * S1-08's row to Sam, the owner, under bundle v2 (the S1-04 ruling's decision (h): S1-08 tells the owner the plan in one
+ * row to the turn's own handle, with no question): S1-02's row with S1-08's step, a row and turn of its own and the
+ * bundle's id. S1-08's line names no slot and the row is about none, so it has no slot fact.
+ */
+function s108Row(bundle: BundleDocument): ComposeRow {
+  return {
+    ...s102Row(),
+    outboxRowId: "outbox-s1-08-sam-1",
+    turnId: "turn-s1-04-sam",
+    bundleId: bundleIdOf(bundle),
+    step: "S1-08",
+    inbound: null,
+  };
+}
+
+/** K-09's named rules and tables (tool-api.rules.mjs) this file holds the code to, as `npm run contracts:check` reads them. */
+interface ToolApiRules {
+  S1_08_TERM_LINES: readonly { index: number; words: string }[];
+  cardLinesOf: (bundle: unknown, step: string) => unknown[] | undefined;
+  termFactsFromCard: (exchange: unknown) => string[];
+  inputIsK03Fixture: (exchange: unknown) => string[];
+}
+
+async function toolApiRules(): Promise<ToolApiRules> {
+  const file = path.join(CONTRACTS_DIR, "tool-api", "tool-api.rules.mjs");
+  return (await import(pathToFileURL(file).href)) as ToolApiRules;
+}
 
 describe("S1-02's four card terms, each with its source line word for word (defaults 137, 138; gap 126)", () => {
   it("the fixed table is input-s1-02-v1.1.json's four facts word for word, each S1-02's card line in bundle v0 at its place", () => {
@@ -166,6 +247,136 @@ describe("default 137 on other steps: a card line with no slot is a term fact, a
     expect(genericSource({ flow: "B", step: "B4-13", say: 2, line: 0 })).toBe(
       "B4-13's card, line 1 (K-01 flows.B.steps.B4-13.say[2].elements.card.lines[0])",
     );
+  });
+});
+
+describe("S1-08 on bundle v2: only Rosie's four fixed lines are term facts (K-09 v1.11 default 186; T-1483)", () => {
+  it("the table is K-09's S1_08_TERM_LINES, each line S1-08's card line in bundle v2 at its place", async () => {
+    const { S1_08_TERM_LINES } = await toolApiRules();
+    expect(S1_08_TERMS.map((entry) => ({ index: entry.line, words: entry.words }))).toStrictEqual(
+      S1_08_TERM_LINES.map((entry) => ({ index: entry.index, words: entry.words })),
+    );
+    const s108 = stepOf(bundleV2(), "S1-08");
+    expect(cardOf(s108, 0)).toStrictEqual(S1_08_CARD);
+    for (const entry of S1_08_TERMS) {
+      expect([entry.flow, entry.step, entry.say]).toStrictEqual(["A", "S1-08", 0]);
+      expect(cardOf(s108, entry.say)[entry.line]).toBe(entry.words);
+    }
+  });
+
+  it("compose input gives exactly the four lines, in the card's order, each with its generic source", async () => {
+    const bundle = bundleV2();
+    const input = inputOf(
+      await callComposeInput(requestFor("outbox-s1-08-sam-1"), {
+        row: s108Row(bundle),
+        bundles: fakeBundles(bundle),
+      }),
+    );
+    expect(input.facts).toStrictEqual(S1_08_FACTS);
+    expect(S1_08_FACTS.map((fact) => fact.source)).toStrictEqual(
+      S1_08_TERMS.map((entry) => genericSource(entry)),
+    );
+    // The withheld lines reach the composer nowhere: not as facts, nor in the master text (the message's words alone).
+    expect(input.masterText).toStrictEqual({
+      step: "S1-08",
+      text: "Here's the plan. You can stop anytime: text MORE to pick up where you left off.",
+    });
+    for (const withheld of S1_08_CARD.slice(2, 5)) expect(JSON.stringify(input)).not.toContain(withheld);
+    expect(JSON.stringify(input)).not.toContain("{{");
+  });
+
+  it("each fact is a line of S1-08's card that names no slot, as K-09's rules read a card, here in bundle v2", async () => {
+    const { cardLinesOf } = await toolApiRules();
+    const lines = cardLinesOf(bundleV2(), "S1-08");
+    expect(lines).toStrictEqual(S1_08_CARD);
+    for (const fact of S1_08_FACTS) {
+      expect(lines).toContain(fact.value);
+      expect(fact.value).not.toContain("{{");
+    }
+  });
+
+  it("the agreement line, the first kind's line and the slotted line give none, though default 137 alone takes two", () => {
+    const facts = S1_08_CARD.map((words, line) =>
+      isTermLine({ flow: "A", step: "S1-08", say: 0, line }, words),
+    );
+    expect(facts).toStrictEqual([true, true, false, false, false, true, true]);
+    // The same card on any other step keeps default 137: every line that names no slot, the story's two among them.
+    const other = S1_08_CARD.map((words, line) =>
+      isTermLine({ flow: "A", step: "A7-x02", say: 0, line }, words),
+    );
+    expect(other).toStrictEqual([true, true, true, true, false, true, true]);
+  });
+
+  it("one of the four worded otherwise gives none, and the other three keep their places and sources", async () => {
+    const bundle = bundleV2();
+    const card = cardOf(stepOf(bundle, "S1-08"), 0);
+    card[0] = "Your business and your ID: about 5 minutes";
+    const input = inputOf(
+      await callComposeInput(requestFor("outbox-s1-08-sam-1"), {
+        row: s108Row(bundle),
+        bundles: fakeBundles(bundle),
+      }),
+    );
+    expect(input.facts).toStrictEqual(S1_08_FACTS.slice(1));
+    expect(JSON.stringify(input)).not.toContain("about 5 minutes");
+  });
+
+  it("one of the four at another place gives none: another line, another message, another flow", async () => {
+    const bundle = bundleV2();
+    const card = cardOf(stepOf(bundle, "S1-08"), 0);
+    [card[5], card[6]] = [card[6], card[5]];
+    const input = inputOf(
+      await callComposeInput(requestFor("outbox-s1-08-sam-1"), {
+        row: s108Row(bundle),
+        bundles: fakeBundles(bundle),
+      }),
+    );
+    expect(input.facts).toStrictEqual(S1_08_FACTS.slice(0, 2));
+    const fixed = "Then your people";
+    expect(isTermLine({ flow: "A", step: "S1-08", say: 0, line: 5 }, fixed)).toBe(true);
+    expect(isTermLine({ flow: "A", step: "S1-08", say: 1, line: 5 }, fixed)).toBe(false);
+    expect(isTermLine({ flow: "B", step: "S1-08", say: 0, line: 5 }, fixed)).toBe(false);
+  });
+
+  it("the rule is exported for finalize: a line that is not words, empty, slotted or holding the opt-out line is none", () => {
+    const optOut = optOutLineOf(bundleV0());
+    const place: CardPlace = { flow: "A", step: "S1-08", say: 0, line: 5 };
+    expect(isTermLine(place, 42)).toBe(false);
+    expect(isTermLine(place, null)).toBe(false);
+    expect(isTermLine(place, "Then your people")).toBe(true);
+    expect(isTermLine(place, "Then your people", [optOut])).toBe(true);
+    expect(isTermLine({ ...place, step: "A7-x02" }, `Free to use. ${optOut}`, [optOut])).toBe(false);
+    expect(isTermLine({ ...place, step: "A7-x02" }, "   ")).toBe(false);
+    expect(isTermLine({ ...place, step: "A7-x02" }, "{{biz.name}}")).toBe(false);
+    // termFactsOf reads the same rule: on a master line it gives what isTermLine takes, with its source.
+    expect(
+      termFactsOf({
+        step: "S1-08",
+        text: "Here's the plan.",
+        pageTypes: [],
+        optOutLines: [optOut],
+        flow: "A",
+        say: 0,
+        cardLines: [...S1_08_CARD, null],
+      }),
+    ).toStrictEqual(S1_08_FACTS);
+  });
+
+  it("every other step is unchanged: bundle v2's S1-02 gives input-s1-02-v1.1.json's four facts", async () => {
+    const bundle = bundleV2();
+    const row: ComposeRow = { ...s102Row(), bundleId: bundleIdOf(bundle) };
+    const facts = await factsFor(row, bundle);
+    expect(facts).toStrictEqual((k03Fixture("input-s1-02-v1.1.json") as { facts: unknown }).facts);
+  });
+
+  it("compose-input-s1-02-v1.6.json is unchanged, and K-09's termFactsFromCard and inputIsK03Fixture pass on it", async () => {
+    const { termFactsFromCard, inputIsK03Fixture } = await toolApiRules();
+    const exchange = s102Exchange();
+    const answer = answerOf(await callComposeInput(exchange.request));
+    expect(answer).toStrictEqual(exchange.outcome);
+    const answered = { call: "composeInput", request: exchange.request, outcome: answer };
+    expect(termFactsFromCard(answered)).toStrictEqual([]);
+    expect(inputIsK03Fixture(answered)).toStrictEqual([]);
   });
 });
 
