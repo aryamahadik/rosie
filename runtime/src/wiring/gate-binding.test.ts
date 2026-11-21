@@ -491,7 +491,9 @@ describe("the gate's commit binding hands in S1-02's settler beside the sign-up 
       [3, "listed", "electrician"],
     ]);
     const blocks = overlayV1("barber").pluginText as Record<string, string>;
-    expect(inserts.filter((write) => write.table === "picked_kind_texts").map((write) => write.values)).toEqual(
+    expect(
+      inserts.filter((write) => write.table === "picked_kind_texts").map((write) => write.values),
+    ).toEqual(
       PF_TEXT_KEYS.map((key) => ({
         picked_kind_id: picks[0]?.id,
         pf_key: key,
