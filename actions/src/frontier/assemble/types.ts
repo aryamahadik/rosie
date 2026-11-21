@@ -128,6 +128,13 @@ export interface BundleStep {
   effects: BundleEffect[];
   /** The step card as the bundle holds it (K-01 v1 `card`, which K-02's stepCard reuses, v1's in v1.1), or null. */
   card: StepCard["card"] | null;
+  /**
+   * The button labels of the messages Rosie (`san`) sends in the step, in order (K-01 v1 message elements.buttons; T-1478):
+   * empty when they carry none; null when one carries buttons the frontier cannot read as labels (a lettered pair, a
+   * button with no words, or buttons that are not a list), so such a step is never offered on a guess. Left out only on a
+   * step code makes itself, which no message carries (the hubs-and-doors source's enter).
+   */
+  buttons?: string[] | null;
 }
 
 /** A split's branch whose own steps list a step (K-01 v1 branch.steps). */
@@ -211,6 +218,11 @@ export type FrontierEvent =
   | "frontier_step_missing"
   /** A card's branch with no definition (K-01 means from none) or no branch of that label: that option is not offered. */
   | "frontier_option_unusable"
+  /**
+   * An open question at a plain step whose message carries buttons that K-09's table (README v1.11 default 180) does not
+   * list, button for button, or whose buttons cannot be read as labels: not offered (fail closed; T-1478).
+   */
+  | "frontier_buttons_unlisted"
   /** An option naming an open question the frontier does not list (its source failed or left it out): not offered. */
   | "frontier_option_orphaned";
 

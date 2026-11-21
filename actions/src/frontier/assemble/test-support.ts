@@ -576,6 +576,36 @@ export const MASTER_A6_10_AS_WRITTEN: StepJson = {
   ],
 };
 
+// ---------------------------------------------------------------------------------------------------------------
+// The published bundles v1 and v2 (bundles/v1, T-1460; bundles/v2, T-1477), for S1-04's buttons question (T-1478)
+
+/** bundles/: the bundles as their cuts published them. */
+const BUNDLES_DIR = path.join(CONTRACTS_DIR, "..", "bundles");
+
+/**
+ * A published bundle's manifest and flow A, freshly parsed: bundle v1 (flow A's S1-01, S1-02, S1-03, S1-74, S1-11 and
+ * S1-04) or bundle v2 (bundle v1's six steps byte for byte, plus S1-08 and S1-09). Both are partial.
+ */
+export function publishedBundle(version: "v1" | "v2"): BundleDocument {
+  const read = (file: string): Json =>
+    JSON.parse(readFileSync(path.join(BUNDLES_DIR, version, "bundle", file), "utf8")) as Json;
+  return { manifest: read("manifest.json"), flows: { A: read(path.join("flow", "A.json")) } };
+}
+
+/** A bundle document (a fresh copy) whose flow A's step `stepId` is changed by `change` (a test's own variant). */
+export function withStepChanged(
+  document: BundleDocument,
+  stepId: string,
+  change: (step: Json) => void,
+): BundleDocument {
+  const copy = structuredClone(document);
+  const flow = copy.flows.A;
+  const step = isRecord(flow) && isRecord(flow.steps) ? flow.steps[stepId] : undefined;
+  if (!isRecord(step)) throw new Error(`the bundle holds no step ${stepId} in flow A`);
+  change(step);
+  return copy;
+}
+
 /** A sample bundle (a fresh copy) with more steps in its flow A, by id, and partial or not. */
 export function withSteps(
   document: BundleDocument,
