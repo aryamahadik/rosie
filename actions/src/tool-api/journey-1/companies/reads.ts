@@ -14,6 +14,11 @@
 //                  through K-05 v1.2 item 26 readTurnState's setup facts (T-667's homes; K-05 README's table for S1-04:
 //                  "kinds.facts and kind_flows.switches_on by id through readTurnState"), the rows `<kind id>`,
 //                  `<kind id>/A` and `<kind id>/B` (item 77's names), in one read. Handed the call's repo too.
+//   kindNames      (T-1481) K-24's catalog by id: each listed kind's kinds.name, through the same readTurnState setup
+//                  facts (db/repo/setup/fact-homes.ts: kinds' `name` column), the rows `<kind id>`, in one read, handed
+//                  the call's repo. S1-04's writer asks it for "Some share one" alone: K-09 README default 190 matches each
+//                  `shared_kinds` word against a pick's own words and its kind's name, and item 79 answers no kind's
+//                  name. No db/repo change: the home is T-667's. The catalog is never read again to pick a kind.
 //
 // Fails closed (K-05 README "Who reads them": "A notFound or transient answer ... throws and fails closed, never an empty
 // list"): companiesReadsOf throws K-05's error answers as CompaniesReadError carrying that answer, and an answer it cannot
@@ -73,6 +78,16 @@ export interface KindDefaultsRequest {
   readonly kindId: string;
 }
 
+/** Which listed kinds' names to read, for which turn (T-1481: S1-04's `shared_kinds` words are matched against them). */
+export interface KindNamesRequest {
+  /** The turn's handle (K-05 v1.2 readTurnState.request.handleId). */
+  readonly handleId: string;
+  /** The call's business, never a request value (CommitTurnContext.businessId). */
+  readonly businessId: string;
+  /** The listed kinds (trade files' ids), each named once. */
+  readonly kindIds: readonly string[];
+}
+
 /** A kind's facts and the switches on in each flow, for its company kind (K-23 company_kinds' three lists). */
 export interface KindDefaults {
   readonly facts: readonly string[];
@@ -88,6 +103,11 @@ export interface CompaniesReads<Repo = unknown> {
   businessKinds(repo: Repo, request: ReadBusinessKindsRequest): Promise<ReadBusinessKindsResponse>;
   /** K-24's catalog by id: a listed kind's facts and its switches in flows A and B, handed the call's repo. */
   kindDefaults(repo: Repo, request: KindDefaultsRequest): Promise<KindDefaults>;
+  /**
+   * K-24's catalog by id (T-1481): each listed kind's name (kinds.name), by kind id, in one read, handed the call's repo.
+   * S1-04's writer asks it only for "Some share one", to match `shared_kinds` (K-09 README default 190).
+   */
+  kindNames(repo: Repo, request: KindNamesRequest): Promise<ReadonlyMap<string, string>>;
 }
 
 /** The three K-05 reads as db/repo answers them: a response or K-05's error answer (a test hands in fakes). */
@@ -179,6 +199,36 @@ export function companiesReadsOf<Repo>(k05: CompaniesK05Reads<Repo>): CompaniesR
         throw new CompaniesReadError("readTurnState", "notWellFormed", null);
       }
       return { facts: factNames, switchesA: a, switchesB: b };
+    },
+    async kindNames(repo, request) {
+      const kindIds = [...new Set(request.kindIds)];
+      const names = new Map<string, string>();
+      if (kindIds.length === 0) return names;
+      const asked: FactRef[] = kindIds.map((kindId) => ({
+        key: "kind.name",
+        table: "kinds",
+        rowId: kindId,
+        column: "name",
+      }));
+      const outcome = await k05.readTurnState(repo, {
+        handleId: request.handleId,
+        businessId: request.businessId,
+        bookingIds: [],
+        facts: asked,
+      });
+      if ("error" in outcome) throw new CompaniesReadError("readTurnState", outcome.error, outcome);
+      for (const fact of asked) {
+        const found = outcome.facts.filter(
+          (each) => each.key === fact.key && each.table === fact.table && each.rowId === fact.rowId,
+        );
+        const value: unknown = found.length === 1 ? found[0]?.value : undefined;
+        // K-24 kinds.name is not null; a name that is no text, or a fact answered twice or never, is refused.
+        if (typeof value !== "string" || value.trim() === "") {
+          throw new CompaniesReadError("readTurnState", "notWellFormed", null);
+        }
+        names.set(fact.rowId, value);
+      }
+      return names;
     },
   };
 }
