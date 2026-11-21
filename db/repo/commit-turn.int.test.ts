@@ -23,6 +23,13 @@
 //
 // T-1417 (K-05 v1.17 item 71): a request that carries answerPhoneRowsBy "handleId" is answered with each phones row
 // named by its handle id; its section, at the end, checks those answers against v1.17's commitTurn.handleIdExchange.
+//
+// T-1476 (K-05 v1.22 item 82 and defaults 206 to 213): an outbox row may name its own step and lineNo, both or neither.
+// Every commit exchange above stores both null on each row it writes. The v1.22 commit fixtures are listed under
+// commitTurn.rowLineExchange, never in COMMIT_ENTRIES (v1.1's closed outboxRowNew refuses a step: default 213); the
+// section at the end selects them by that definition, checks commit-s1-04-sam-lines' rows against the same request with
+// neither field, and shows, through a client that records every statement it sends, that a half or malformed line
+// throws before any statement and that the one insert names the listed columns alone.
 import { readdirSync, readFileSync } from "node:fs";
 import { performance } from "node:perf_hooks";
 import { isDeepStrictEqual } from "node:util";
@@ -31,6 +38,7 @@ import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { resolvePrimaryUrl } from "./client";
 import {
+  type CommitOptions,
   commitTurn,
   CommitTurnDatabaseError,
   type CommitTurnOutcome,
@@ -632,13 +640,24 @@ describe("commitTurn: each K-05 commit fixture's request gives its response (K-0
           questions: request.writes.openQuestions.open.length,
           clocks: request.writes.clockRows.make.length,
         });
-        // Outbox rows with no plan yet, in K-04's first state (arch 01 lines 39 to 41).
-        const rows = await db.sql<{ id: string; state: string; plan: unknown; final_parts: unknown }[]>`
-        select id, state, plan, final_parts from outbox_rows where turn_id = ${request.turn.id} order by commit_seq
+        // Outbox rows with no plan yet, in K-04's first state (arch 01 lines 39 to 41), and, since no row of a v1 to
+        // v1.21 exchange names a step, with neither a step nor a line (K-05 v1.22 item 82; T-1476).
+        const rows = await db.sql<
+          {
+            id: string;
+            state: string;
+            plan: unknown;
+            final_parts: unknown;
+            step: string | null;
+            line_no: number | null;
+          }[]
+        >`
+        select id, state, plan, final_parts, step, line_no from outbox_rows
+        where turn_id = ${request.turn.id} order by commit_seq
       `;
-        expect(rows.map((row) => [row.id, row.state, row.plan, row.final_parts])).toEqual(
-          request.writes.outboxRows.map((row) => [row.id, "planned", null, null]),
-        );
+        expect(
+          rows.map((row) => [row.id, row.state, row.plan, row.final_parts, row.step, row.line_no]),
+        ).toEqual(request.writes.outboxRows.map((row) => [row.id, "planned", null, null, null, null]));
       },
     );
   }
@@ -2756,6 +2775,288 @@ describe("a state row naming a clock or outbox row of its own commit is written 
       }
       committed(await commitTurn(runtime, crisisHandOff(), { now }));
       expect(await dangerRows()).toEqual({ safety_outcomes: 1, hand_offs: 1, team_pages: 1 });
+    },
+  );
+});
+
+describe("commitTurn writes a row's own step and line, both or neither (K-05 v1.22 item 82; T-1476)", () => {
+  type Row = Record<string, unknown>;
+  const LINES = "commit-s1-04-sam-lines.json";
+  const HALF = "invalid/refuse-commit-s1-04-sam-step-without-line.json";
+  const TURN = "turn-s1-04-sam";
+  const V121_ID = schemaIdOf("v1.21");
+  const V122_ID = schemaIdOf("v1.22");
+  /** The v1.22 commits, by their definition (README "Consumers of v1.22": never COMMIT_ENTRIES; default 213). */
+  const ROW_LINE_ENTRIES = INDEX.filter((entry) => entry.def === "commitTurn.rowLineExchange");
+  /** The columns the commit's one insert of an outbox row names, in its order: v1's, then step and line_no. */
+  const INSERTED_COLUMNS = [
+    "id",
+    "turn_id",
+    "recipient_handle_id",
+    "recipient_person_id",
+    "business_id",
+    "booking_id",
+    "channel",
+    "send_class",
+    "versions_read",
+    "open_question_id",
+    "copy_of_row_id",
+    "bundle_hash",
+    "bundle_build",
+    "trace_id",
+    "step",
+    "line_no",
+  ];
+  /** Every statement `recording` sent, in order (postgres.js debug: the text, never the values). */
+  const sent: string[] = [];
+  /** A rosie_job client of this file's schema that records every statement it sends. */
+  let recording: Sql;
+
+  beforeAll(() => {
+    recording = postgres(resolvePrimaryUrl(), {
+      max: 2,
+      onnotice: () => undefined,
+      debug: (_connection: number, text: string) => {
+        sent.push(text);
+      },
+      connection: {
+        application_name: "rosie-t1476-lines",
+        search_path: `${db.schema}, public`,
+        role: RUNTIME_ROLE,
+      },
+    });
+  });
+
+  afterAll(async () => {
+    await recording.end({ timeout: 5 });
+  });
+
+  const nowOf = (exchange: Exchange): CommitOptions => ({ now: new Date(exchange.given.now) });
+
+  /** Each outbox row the turn wrote, every column as stored (read by the tables' owner), in commit order. */
+  async function storedRows(turnId: string): Promise<Row[]> {
+    return [
+      ...(await db.sql<Row[]>`select * from outbox_rows where turn_id = ${turnId} order by commit_seq`),
+    ];
+  }
+
+  /** A stored row without its step and line_no: every other column. */
+  function withoutLine(row: Row): Row {
+    const rest = { ...row };
+    delete rest.step;
+    delete rest.line_no;
+    return rest;
+  }
+
+  /** commit-s1-04-sam-lines' request with one of its rows changed. */
+  function withRow(index: number, change: (row: Row) => void): CommitTurnRequest {
+    const request = requestOf(LINES);
+    const row = request.writes.outboxRows[index];
+    if (row === undefined) {
+      throw new Error(`${LINES} has no row ${String(index)}`);
+    }
+    change(row as unknown as Row);
+    return request;
+  }
+
+  /** The column list of each outbox_rows insert among `statements`. */
+  function insertedColumnsOf(statements: readonly string[]): string[][] {
+    return statements
+      .map((statement) => /insert\s+into\s+outbox_rows\s*\(([^)]*)\)/i.exec(statement)?.[1])
+      .filter((list): list is string => list !== undefined)
+      .map((list) => list.split(",").map((column) => column.trim().toLowerCase()));
+  }
+
+  it("the index lists commit-s1-04-sam-lines and its refused twin under commitTurn.rowLineExchange at v1.22, and neither among COMMIT_ENTRIES", () => {
+    expect(ROW_LINE_ENTRIES.map((entry) => [entry.file, entry.version, entry.expect])).toEqual([
+      [LINES, "v1.22", "accept"],
+      [HALF, "v1.22", "refuse"],
+    ]);
+    expect(COMMIT_FIXTURES.filter((file) => file === LINES || file === HALF)).toEqual([]);
+    const lines = exchangeOf(LINES);
+    expect(schemaErrors("commitTurn.rowLineExchange", lines, V122_ID)).toEqual([]);
+    expect(schemaErrors("commitTurn.request", lines.request, V122_ID)).toEqual([]);
+    expect(answerErrors(lines.outcome, V122_ID)).toEqual([]);
+    // v1.1's closed outboxRowNew refuses a step (default 213), and so does the schema a row with one half of the pair.
+    expect(schemaErrors("commitTurn.request", lines.request, V11_ID)).not.toEqual([]);
+    const half = exchangeOf(HALF);
+    expect(schemaErrors("commitTurn.rowLineExchange", half, V122_ID)).not.toEqual([]);
+    expect(schemaErrors("commitTurn.request", half.request, V122_ID)).not.toEqual([]);
+  });
+
+  it(
+    "commit-s1-04-sam-lines answers its outcome after its given and stores S1-08/0 and S1-09/0 on its two rows, every other column as the same request with neither field (a v1.21 commit) writes it; a repeat writes nothing",
+    SLOW,
+    async () => {
+      // The same request with neither field: a v1.21 request, which writes both columns null.
+      const exchange = await given(LINES);
+      const plain = requestOf(LINES);
+      for (const row of plain.writes.outboxRows) {
+        delete row.step;
+        delete row.lineNo;
+      }
+      expect(schemaErrors("commitTurn.request", plain, V121_ID)).toEqual([]);
+      expect(await commitTurn(runtime, plain, nowOf(exchange))).toEqual(exchange.outcome);
+      const plainRows = await storedRows(TURN);
+      expect(plainRows.map((row) => [row.id, row.step, row.line_no])).toEqual([
+        ["out-s1-08-sam", null, null],
+        ["out-s1-09-sam", null, null],
+      ]);
+
+      await given(LINES);
+      const before = await snapshot();
+      const request = requestOf(LINES);
+      const outcome = await commitTurn(runtime, request, nowOf(exchange));
+      expect(outcome).toEqual(exchange.outcome);
+      expect(answerErrors(outcome)).toEqual([]);
+      expect(answerErrors(outcome, V122_ID)).toEqual([]);
+      expect(
+        schemaErrors("commitTurn.rowLineExchange", { ...exchange, outcome }, V122_ID),
+        "the exchange with the call's answer, at v1.22",
+      ).toEqual([]);
+      const rows = await storedRows(TURN);
+      expect(rows.map((row) => [row.id, row.step, row.line_no])).toEqual([
+        ["out-s1-08-sam", "S1-08", 0],
+        ["out-s1-09-sam", "S1-09", 0],
+      ]);
+      expect(rows.map(withoutLine)).toEqual(plainRows.map(withoutLine));
+      // The turn's footprint is the plain commit's: one turn, two rows, the question and its clock row, three entries.
+      expect(await footprint(TURN)).toEqual({
+        turns: 1,
+        outbox: 2,
+        events: 3,
+        effects: 0,
+        questions: 1,
+        clocks: 1,
+      });
+      expect(await snapshot()).not.toEqual(before);
+
+      // A repeat of the turn id answers the first commit and writes nothing (K-05 item 1).
+      const settled = await snapshot();
+      const repeat = committed(await commitTurn(runtime, requestOf(LINES), nowOf(exchange)));
+      expect(repeat).toEqual({
+        ...exchange.outcome,
+        repeated: true,
+        committed: { written: [], outboxRows: committed(outcome).committed.outboxRows, promoted: [] },
+      });
+      expect(await snapshot()).toEqual(settled);
+      expect((await storedRows(TURN)).map((row) => [row.id, row.step, row.line_no])).toEqual([
+        ["out-s1-08-sam", "S1-08", 0],
+        ["out-s1-09-sam", "S1-09", 0],
+      ]);
+    },
+  );
+
+  it(
+    "refuse-commit-s1-04-sam-step-without-line's request, a lineNo with no step and each malformed line throw before any statement reaches the database, naming the field alone; nothing is written",
+    SLOW,
+    async () => {
+      const exchange = await given(LINES);
+      const cases: [string, CommitTurnRequest, string][] = [
+        [
+          "the refused fixture: S1-08's row names step S1-08 and no lineNo",
+          structuredClone(exchangeOf(HALF).request) as unknown as CommitTurnRequest,
+          "commitTurn: an outbox row names step without lineNo: both or neither (K-05 v1.22 default 206)",
+        ],
+        [
+          "a lineNo with no step",
+          withRow(0, (row) => {
+            delete row.step;
+          }),
+          "commitTurn: an outbox row names lineNo without step: both or neither (K-05 v1.22 default 206)",
+        ],
+        [
+          "S1-09's row, a step with no lineNo, beside S1-08's whole pair",
+          withRow(1, (row) => {
+            delete row.lineNo;
+          }),
+          "commitTurn: an outbox row names step without lineNo: both or neither (K-05 v1.22 default 206)",
+        ],
+        ...(
+          [
+            ["a step of one digit after the dash", "S1-9"],
+            ["a step in lower case", "s1-08"],
+            ["a step of another section's form", "S14-08"],
+            ["a step with a trailing newline", "S1-08\n"],
+            ["a step that is null", null],
+            ["a step that is a number", 108],
+          ] as const
+        ).map(([what, step]): [string, CommitTurnRequest, string] => [
+          what,
+          withRow(0, (row) => {
+            row.step = step;
+          }),
+          "commitTurn: writes.outboxRows[].step is not a K-01 step id",
+        ]),
+        ...(
+          [
+            ["a negative lineNo", -1],
+            ["a lineNo that is not whole", 0.5],
+            ["a lineNo given as text", "0"],
+            ["a lineNo that is null", null],
+            ["a lineNo past the column's integer (default 18)", 2_147_483_648],
+            ["a lineNo past a safe integer", Number.MAX_SAFE_INTEGER + 1],
+          ] as const
+        ).map(([what, lineNo]): [string, CommitTurnRequest, string] => [
+          what,
+          withRow(1, (row) => {
+            row.lineNo = lineNo;
+          }),
+          "commitTurn: writes.outboxRows[].lineNo is not a line index (an integer from 0 to 2^31 - 1)",
+        ]),
+      ];
+      const before = await snapshot();
+      for (const [what, request, message] of cases) {
+        sent.length = 0;
+        const error = await commitTurn(recording, request, nowOf(exchange)).then(
+          () => null,
+          (thrown: unknown) => thrown,
+        );
+        expect(error, what).toBeInstanceOf(TypeError);
+        expect((error as Error).message, what).toBe(message);
+        expect(sent, `${what}: no statement reached the database`).toEqual([]);
+        expect(await snapshot(), what).toEqual(before);
+        expect(await footprint(TURN), what).toEqual(NO_FOOTPRINT);
+      }
+      // The largest line the column holds is a line: put right, the request commits through the same client.
+      sent.length = 0;
+      const widest = withRow(1, (row) => {
+        row.lineNo = 2_147_483_647;
+      });
+      expect(committed(await commitTurn(recording, widest, nowOf(exchange))).committed.outboxRows).toEqual(
+        committed(exchange.outcome as unknown as CommitTurnOutcome).committed.outboxRows,
+      );
+      expect(sent.length).toBeGreaterThan(0);
+      expect((await storedRows(TURN)).map((row) => [row.id, row.step, row.line_no])).toEqual([
+        ["out-s1-08-sam", "S1-08", 0],
+        ["out-s1-09-sam", "S1-09", 2_147_483_647],
+      ]);
+    },
+  );
+
+  it(
+    "the one insert of each outbox row names the listed columns alone, step and line_no last, for a request with the pair and for one with neither (the same statement, the two values null)",
+    SLOW,
+    async () => {
+      const exchange = await given(LINES);
+      sent.length = 0;
+      expect(await commitTurn(recording, requestOf(LINES), nowOf(exchange))).toEqual(exchange.outcome);
+      const withPair = insertedColumnsOf(sent);
+      expect(withPair).toEqual([INSERTED_COLUMNS, INSERTED_COLUMNS]);
+
+      await given(LINES);
+      const plain = requestOf(LINES);
+      for (const row of plain.writes.outboxRows) {
+        delete row.step;
+        delete row.lineNo;
+      }
+      sent.length = 0;
+      expect(await commitTurn(recording, plain, nowOf(exchange))).toEqual(exchange.outcome);
+      expect(insertedColumnsOf(sent)).toEqual(withPair);
+      // No statement of either commit names a message's words, an address or a number.
+      for (const statement of sent) {
+        expect(/\b(words|address|number)\b/i.test(statement), statement).toBe(false);
+      }
     },
   );
 });

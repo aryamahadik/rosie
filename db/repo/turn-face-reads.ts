@@ -9,15 +9,17 @@
 //                       names (safety_outcomes_event_key), in the request's order: a row the scope hides counts as
 //                       missing, so the read fails closed (default 44). A released hold is not open (default 45).
 //   readOutboxRow       an outbox row as compose input and finalize read it (item 35): the row (never its plan); its step
-//                       and line from the question it asks (line 0), or null for a row that asks none, never a guess
-//                       (default 48); its reader (the handle's kind, the person's stored name and language, their live
-//                       roles at the row's business, the phone's flags); the turn's texts by event id with their safety
-//                       results (never their words: default 47); the slot source K-04 holds (the business head, the
-//                       booking head, the question with its clock row); the row's business's sensitive switch (v1.6 item
-//                       45, T-1197: below); and the other questions still open with the reader, each with the words part
-//                       of the newest asking row that has gone (item 26's rule, default 41; default 51). A row of send
-//                       class safety answers fixedLineRow and nothing else (default 49). Every answer is v1.6's
-//                       readOutboxRow.v1dot6Response: businessSensitive is always stated, true, false or null.
+//                       and line, the row's own stored pair first (v1.22 item 83, T-1476: below), else from the question
+//                       it asks (line 0), else null for a row that asks none, never a guess (default 48); its reader
+//                       (the handle's kind, the person's stored name and language, their live roles at the row's
+//                       business, the phone's flags); the turn's texts by event id with their safety results (never
+//                       their words: default 47); the slot source K-04 holds (the business head, the booking head, the
+//                       question with its clock row); the row's business's sensitive switch (v1.6 item 45, T-1197:
+//                       below); and the other questions still open with the reader, each with the words part of the
+//                       newest asking row that has gone (item 26's rule, default 41; default 51). A row of send class
+//                       safety answers fixedLineRow and nothing else (default 49). Every answer is v1.22's
+//                       readOutboxRow.v1dot6Response (v1.6's, with the line from the row): businessSensitive is always
+//                       stated, true, false or null.
 //                       A row with no turn (K-04 v1.1's job row, such as a sign-in code's email row: turn_id null, a job
 //                       id in its place) answers notFound, table outbox_rows, as soon as the row is read: before its
 //                       send class, its reader, its turn or anything else, and nothing of it is returned (K-05 v1.13
@@ -72,6 +74,15 @@
 // input, so the unknown kinds are kept apart rather than folded into false. A read that fails is never an answer: it
 // fails the whole call, as every other read here does (transient, or thrown).
 //
+// The row's line (K-05 v1.22 item 83 and defaults 208 and 212; T-1476; DL-999 decision (e)): the one select of
+// outbox_rows also names step and line_no (K-04 core v1.2, migration 0039), and line is the row's own, its step with
+// index line_no and from "row", whenever it stores a step, whether or not it asks a question, never compared with its
+// question's step (default 208); else line 0 of the question it asks, from "openQuestion", as v1.3 reads it; else null
+// (default 48). So a row that stores neither, every row written before v1.22, reads as it did (default 212). A stored
+// step with no line_no, which K-04's outbox_rows_step_with_line makes impossible, throws BrokenRecordError (default 2),
+// never a guessed index. The two columns are a step id and an index (K-04 core v1.2 audience never): no words, address
+// or number is selected for them.
+//
 // Reads (arch 10 lines 504, 538): the primary, uncached, in one read-only transaction at repeatable read, so an answer is
 // one moment's. Ids are compared byte by byte (collate "C"), never parsed (CQ-09). A serialization failure, a deadlock or
 // a lost connection answers transient. Nothing here logs; an error names a call, a field, a table or a column, never a
@@ -96,7 +107,7 @@
 //      a mark whose row that read does not find (the scope hid it: a mark naming another business's row, which writePlan
 //      never writes) reads as a row in any other state, true and naming it, as before v1.21.
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1.3";
-import type * as K05v1dot6 from "../../contracts/generated/data-access/data-access.v1.6";
+import type * as K05v1dot22 from "../../contracts/generated/data-access/data-access.v1.22";
 import { transientOrScrubbed } from "./clocks";
 import {
   assertBusinessId,
@@ -130,15 +141,17 @@ export type ReadOpenHoldsOutcome = ReadOpenHoldsResponse | NotFoundError | Trans
 
 export type ReadOutboxRowRequest = K05.ReadOutboxRowRequest;
 /**
- * K-05 v1.6 readOutboxRow.v1dot6Response (item 45): the answer readOutboxRow gives, v1.3's fields (item 35) with
- * businessSensitive always stated, true, false or null.
+ * K-05 readOutboxRow.v1dot6Response (v1.6 item 45), typed at v1.22 (item 83; T-1476): the answer readOutboxRow gives,
+ * v1.3's fields (item 35) with businessSensitive always stated, true, false or null, and a line from the row itself
+ * (`from` row) or from the question it asks (`from` openQuestion), or null. v1.6's answer is a narrower form of it.
  */
-export type ReadOutboxRowV1Dot6Response = K05v1dot6.ReadOutboxRowV1Dot6Response;
+export type ReadOutboxRowV1Dot6Response = K05v1dot22.ReadOutboxRowV1Dot6Response;
 /**
- * K-05 v1.6 readOutboxRow.response: the same fields with businessSensitive optional, for a consumer that also reads a
- * v1.3 to v1.5 answer, which has none and reads as null, on (default 67). readOutboxRow itself always states it.
+ * K-05 readOutboxRow.response (v1.6), typed at v1.22: the same fields with businessSensitive optional, for a consumer
+ * that also reads a v1.3 to v1.5 answer, which has none and reads as null, on (default 67). readOutboxRow itself always
+ * states it.
  */
-export type ReadOutboxRowResponse = K05v1dot6.ReadOutboxRowResponse;
+export type ReadOutboxRowResponse = K05v1dot22.ReadOutboxRowResponse;
 /** K-05 v1.3 fixedLineRowError: a safety row, never composed nor finalized; nothing else is returned. */
 export type FixedLineRowError = K05.FixedLineRowError;
 export type ReadOutboxRowOutcome =
@@ -413,6 +426,10 @@ interface OutboxRowRow {
   bundle_hash: string;
   bundle_build: number;
   version: number;
+  /** The step whose line the row carries, or null (K-04 core v1.2; K-05 v1.22 item 83: read first). */
+  step: string | null;
+  /** That line's index, or null: with step, or not at all (K-04's outbox_rows_step_with_line). */
+  line_no: number | null;
 }
 
 /** A row a turn committed: the only kind the read goes on to read (K-05 v1.13 item 65; default 4). */
@@ -730,6 +747,21 @@ async function businessSensitiveOf(db: Db, businessId: string | null): Promise<B
 }
 
 /**
+ * The step and line the row carries to its reader (v1.22 item 83; see the top of this file): the row's own stored step
+ * and line_no whenever it stores a step (default 208), else line 0 of the question it asks (CQ-151 (a)'s default 2),
+ * else null for a row that asks none (default 48). A stored step with no line_no throws (default 2), never a guess.
+ */
+function lineOf(row: OutboxRowRow, question: SlotSource["question"]): ReadOutboxRowV1Dot6Response["line"] {
+  if (row.step !== null) {
+    if (row.line_no === null) {
+      throw new BrokenRecordError("readOutboxRow: the row's stored step has no line_no");
+    }
+    return { step: row.step, index: row.line_no, from: "row" };
+  }
+  return question === null ? null : { step: question.step, index: 0, from: "openQuestion" };
+}
+
+/**
  * An outbox row as compose input and finalize read it, inside the transaction `db`, which must already run on the
  * request's side as rosie_job: under the request's business scope (confirmed here by requireBusinessScope() before the
  * first read), or with businessId null on the runtime side, with no scope. It should be read-only at repeatable read.
@@ -746,7 +778,7 @@ export async function readOutboxRowIn(
   const [row] = await db<OutboxRowRow[]>`
     select id, turn_id, recipient_handle_id, recipient_person_id, business_id, booking_id, channel, send_class,
            open_question_id, copy_of_row_id, plan is not null as has_plan, final_parts, state, bundle_hash,
-           bundle_build, version
+           bundle_build, version, step, line_no
     from outbox_rows
     where id = ${outboxRowId} and business_id is not distinct from ${businessId}
   `;
@@ -768,6 +800,7 @@ export async function readOutboxRowIn(
   const recipient = await recipientOf(db, row);
   const answers = await answersOf(db, row);
   const slotSource = await slotSourceOf(db, row);
+  const line = lineOf(row, slotSource.question);
   const businessSensitive = await businessSensitiveOf(db, row.business_id);
   const openQuestions = await openQuestionsOf(db, row);
   return {
@@ -788,11 +821,9 @@ export async function readOutboxRowIn(
       hasPlan: row.has_plan,
       finalParts: row.final_parts,
     },
-    // The step that asks, line 0 (CQ-151 (a)'s default 2); a row that asks no question has none (default 48).
-    line:
-      slotSource.question === null
-        ? null
-        : { step: slotSource.question.step, index: 0, from: "openQuestion" },
+    // The row's own step and line first (v1.22 item 83), else the step that asks, line 0 (CQ-151 (a)'s default 2); a
+    // row that stores neither and asks no question has none (default 48).
+    line,
     recipient,
     answers,
     slotSource,
@@ -803,11 +834,11 @@ export async function readOutboxRowIn(
 
 /**
  * An outbox row as compose input and finalize read it (K-05 v1.3 item 35), with its business's sensitive switch (v1.6
- * item 45): one read-only transaction at repeatable read on the primary, uncached. Pass the runtime's client (rosie_job):
- * with a business the read runs under its scope, set and confirmed before the first read; with businessId null on the
- * runtime side. notFound when there is no such row, the scope hides it, or it has no turn (K-04 v1.1's job row: K-05
- * v1.13 item 65, before anything else of it is read); fixedLineRow for a safety row; transient on a serialization
- * failure, a deadlock or a lost connection. A request of the wrong shape throws a TypeError, a broken record a
+ * item 45) and its own stored line first (v1.22 item 83): one read-only transaction at repeatable read on the primary,
+ * uncached. Pass the runtime's client (rosie_job): with a business the read runs under its scope, set and confirmed
+ * before the first read; with businessId null on the runtime side. notFound when there is no such row, the scope hides
+ * it, or it has no turn (K-04 v1.1's job row: K-05 v1.13 item 65, before anything else of it is read); fixedLineRow for
+ * a safety row; transient on a serialization failure, a deadlock or a lost connection. A request of the wrong shape throws a TypeError, a broken record a
  * BrokenRecordError, and any other failed read its own error: never an answer, so never a switch read as off.
  */
 export async function readOutboxRow(
