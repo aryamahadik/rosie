@@ -475,13 +475,79 @@ async function given(file: string): Promise<Exchange> {
   return exchange;
 }
 
+/** The two opener ids, either of which makes a row default 202's fallback row (K-05 default 204). */
+const OPENER_IDS: readonly string[] = ["opener", "signUpOpener"];
+
+/**
+ * The row the opener mark on an answered row's handle and business names, as the tables' owner reads it, when that is
+ * another row committed after the row read (a higher commit_seq: K-05 default 215); else null.
+ */
+async function laterMarkOf(exchange: Exchange): Promise<string | null> {
+  const { outcome, request } = exchange;
+  if (exchange.call !== "readFixedLineFacts" || outcome.result !== "fixedLineFacts") {
+    return null;
+  }
+  if (typeof outcome.businessId !== "string" || typeof request.outboxRowId !== "string") {
+    return null;
+  }
+  const rowId = request.outboxRowId;
+  const [mark] = await db.sql<{ marked: string; later: boolean }[]>`
+    select m.outbox_row_id as marked, named.commit_seq > r.commit_seq as later
+    from outbox_rows r
+    join openers_sent m on m.handle_id = r.recipient_handle_id and m.business_id = r.business_id
+    join outbox_rows named on named.id = m.outbox_row_id
+    where r.id = ${rowId} and r.business_id = ${outcome.businessId}
+  `;
+  return mark !== undefined && mark.marked !== rowId && mark.later ? mark.marked : null;
+}
+
+/**
+ * A readFixedLineFacts fixture's outcome as K-05 default 215 answers it in the loaded world (T-1521; README default
+ * 215, "The frozen fixture it contradicts, and how a test compares with it"; DL-1089): where the mark names another row
+ * committed after the row read (laterMarkOf), textedAboutBusiness false and openerRowId null and nothing else changed,
+ * once the tables' owner has found no row of the handle and business committed before the row read whose final parts'
+ * fixedLines hold either opener id, whatever its state, so that the fallback finds none (one found is a broken test: no
+ * frozen world holds one); else the outcome, whole. Decided from the loaded world, never from the file's name: K-04's
+ * seeds commit fixed-line-facts-texted-before.json's row (out-a7-03-alex) before the row its mark names (out-alex-first).
+ */
+async function fixedLineAnswerOf(exchange: Exchange): Promise<Record<string, Json>> {
+  const marked = await laterMarkOf(exchange);
+  const rowId = exchange.request.outboxRowId;
+  if (marked === null || typeof rowId !== "string") {
+    return exchange.outcome;
+  }
+  const earlier = await db.sql<{ id: string; fixed_lines: Json }[]>`
+    select e.id, e.final_parts -> 'fixedLines' as fixed_lines
+    from outbox_rows r
+    join outbox_rows e on e.recipient_handle_id = r.recipient_handle_id and e.business_id = r.business_id
+    where r.id = ${rowId} and e.commit_seq < r.commit_seq
+    order by e.commit_seq
+  `;
+  const openers = earlier
+    .filter(
+      ({ fixed_lines: lines }) =>
+        Array.isArray(lines) && lines.some((line) => typeof line === "string" && OPENER_IDS.includes(line)),
+    )
+    .map(({ id }) => id);
+  if (openers.length > 0) {
+    throw new Error(
+      `its mark names ${marked}, committed after ${rowId}, and the fallback finds an earlier opener row (${openers.join(", ")}): no frozen world holds one, so this is a broken test`,
+    );
+  }
+  return { ...exchange.outcome, textedAboutBusiness: false, openerRowId: null };
+}
+
 /**
  * What a v1.6 call answers for a fixture's request in the fixture's world: the fixture's outcome; for an outbox row of a
  * fixture written before v1.6, which states no switch, that outcome with the switch v1.6 reads there (item 45): null,
- * since such a world holds no kind of work at all (checked here, as the tables' owner, whom no policy binds).
+ * since such a world holds no kind of work at all (checked here, as the tables' owner, whom no policy binds); for fixed-
+ * line facts, the outcome as K-05 default 215 reads the loaded world (fixedLineAnswerOf).
  */
 async function answerOf(exchange: Exchange): Promise<Record<string, Json>> {
   const { outcome } = exchange;
+  if (exchange.call === "readFixedLineFacts") {
+    return fixedLineAnswerOf(exchange);
+  }
   if (
     exchange.call !== "readOutboxRow" ||
     outcome.result !== "outboxRow" ||
@@ -1643,13 +1709,15 @@ describe("readFixedLineFacts: one business's opener mark, never another's (item 
       });
       const marked = asFacts(await readFixedLineFacts(job, request, nowOf(exchange)));
       expect([marked.textedAboutBusiness, marked.openerRowId]).toEqual([false, "out-yoga-alex"]);
+      // The fixture's own request reads as default 215 reads its world (fixedLineAnswerOf): the yoga studio's mark
+      // changes nothing of it.
       expect(
         await readFixedLineFacts(
           job,
           exchange.request as unknown as ReadFixedLineFactsRequest,
           nowOf(exchange),
         ),
-      ).toEqual(exchange.outcome);
+      ).toEqual(await answerOf(exchange));
     },
   );
 });
