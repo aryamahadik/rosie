@@ -5,25 +5,33 @@
 // double), now with the port this hop joins: finalize, @rosie/actions' turn face's finalizeMessage (T-1141: the Tool API
 // base with K-09's checks and the call's business scope; T-313's finalize with T-314's fixed-line inserter over T-1141's
 // row binding), over K-05 doubles of readOutboxRow, readFixedLineFacts, writePlan and cancelClock over the rows the commit
-// wrote and test owner 1's seeded rows (./test-support.ts fakeFinalizeData), on bundle v0 as bundles/v0 publishes it,
-// with T-1146's privacyLink line. The turn's finalize calls are watched on their way to the root's own (watchGate).
+// wrote and test owner 1's seeded rows (./test-support.ts fakeFinalizeData), with T-1146's privacyLink line. The turn's
+// finalize calls are watched on their way to the root's own (watchGate).
+//
+// Test owner 1 holds no role (T-1148), so the JOIN's S1-02 row is read by S1-02's sign-up line as the owner, on a step that
+// does not need business: its first text opens with signUpOpener, S1-02's own words, never with the business opener (K-01
+// README default 19; T-1511; DL-1033 fault 1). Bundle v0 has no such line, so finalize would refuse the text there (fail
+// closed); the turn pins bundle v2 as bundles/v2 publishes it (T-1477), which carries the line and holds S1-01 and S1-02
+// byte for byte as bundle v0 does (T-1512: the fakes hold bundle v2 active).
 //
 //   - The JOIN as recording 2 names it (evt-sam-0000, test owner 1, Sam's chat): hops 1 to 10 once each. The turn hands
 //     finalize K-09 v1 finalize-pass.json's plan in (plan-s1-02.json, recording 4's answer) on the run's own row. Finalize
 //     answers send at the first attempt, its seven message checks all passed as K-03 check-pass.json lists them, and its
-//     final parts are not finalize-pass.json's outcome (K-09 v1.5 open gap 121) but Q-30's: S13-01's opener first, filled
-//     with Lee's Barbershop, then the plan's words, the STOP, HELP and rates line, and the privacy link alone on the last
-//     line, each fixed line word for word as bundle v0 writes it. The plan and those final parts are written into the row
+//     final parts are not finalize-pass.json's outcome (K-09 v1.5 open gap 121) but Q-30's: signUpOpener first, then the
+//     plan's words, the STOP, HELP and rates line, and the privacy link alone on the last line, each fixed line word for
+//     word as bundle v2 writes it, and no business named. The plan and those final parts are written into the row
 //     together, once, after the commit (T-196's writePlan); finalize read the row and its fixed-line facts once each,
 //     under Lee's Barbershop's scope; the turn records the row's one fillAndChecks span and no rewriteOrFallback span, and
 //     the Tool API base records none (DL-376). No span or log line holds a word of the message, a number or the chat id.
 //   - A plan with a typed price (K-03 check-raw-price.json's): finalize's Values check fails it, so the row gets its one
 //     rewrite, told that check and its detail; the rewrite types the price again, so finalize runs the step's fallback
-//     text (S1-02's, as bundle v0 writes it) through the same checks, which pass, and the fallback's final parts are
-//     written with the rewrite's plan. The trace shows each: the fillAndChecks span (the rewrite asked, Values failed) and
-//     the rewriteOrFallback span (told Values, the rewrite planned, the fallback sent). @rosie/ai's composer refuses a typed
-//     price itself before finalize could see one (ai/src/composer/check.ts literalValue, for a plan and for a plan to fix),
-//     so a composer double that types it stands in for the AI layer here: finalize's Values check is the backstop shown.
+//     text (S1-02's, as bundle v2 writes it) through the same checks, which pass, and the fallback's final parts are
+//     written with the rewrite's plan. S1-02's fallback text already begins with signUpOpener's exact words, so finalize
+//     records the line's id and adds its words no second time (default 19, no doubles). The trace shows each: the
+//     fillAndChecks span (the rewrite asked, Values failed) and the rewriteOrFallback span (told Values, the rewrite
+//     planned, the fallback sent). @rosie/ai's composer refuses a typed price itself before finalize could see one
+//     (ai/src/composer/check.ts literalValue, for a plan and for a plan to fix), so a composer double that types it stands
+//     in for the AI layer here: finalize's Values check is the backstop shown.
 //
 // Each test runs the JOIN on a fresh rig, and the Durable Objects' storage is reset after each (as hop 8's tests run it).
 // Test values only (rule 9): the master's sample cast, the fictional 555-01xx numbers and the fixtures' own words.
@@ -49,14 +57,15 @@ import { flush } from "../turn/test-support";
 import type { CheckResult, FinalParts, FinalizeMessageResponse, MessagePlan } from "../turn/types";
 import { composeRoot, SKELETON_FLAG, type Composers, type HandleActors, type Root } from "./index";
 import {
-  BUNDLE_V0,
-  bundleV0FallbackText,
-  bundleV0FixedLine,
+  BUNDLE_V2,
+  bundleV2FallbackText,
+  bundleV2FixedLine,
   fakeFlags,
   SAM_CHAT,
   skeletonFakes,
   TEST_OWNER_1,
   TEST_OWNER_1_BUSINESS_NAME,
+  testClock,
   watchGate,
   type LinqInboundEvent,
   type SignedWebhook,
@@ -136,23 +145,30 @@ const CAST_NUMBERS = ["0100"].flatMap((line) => [`+1555555${line}`, `1555555${li
 
 const OWNER_ACTOR = actorNameOf(TEST_OWNER_1.handle);
 
-/** Bundle v0's opener, its <business> filled with the name limit 7 lets Sam see (the switch is off: biz.name). */
-const OPENER = bundleV0FixedLine("opener").replace("<business>", TEST_OWNER_1_BUSINESS_NAME);
-/** Q-30's lines as bundle v0 writes them: the STOP, HELP and rates line, then the privacy link. */
-const OPT_OUT_LINE = bundleV0FixedLine("optOutLine");
-const PRIVACY_LINK = bundleV0FixedLine("privacyLink");
-/** The fixed lines of Rosie's first text to a handle about one business, in the order finalize adds them. */
-const FIRST_TEXT_LINES = ["opener", "optOutLine", "privacyLink"];
+/** Bundle v2's sign-up opener, S1-02's own first words (K-01 README default 19): it names no business. */
+const OPENER = bundleV2FixedLine("signUpOpener");
+/** The business opener's words before its <business> (S13-01, bundle v2's `opener`): what Sam's sign-up text never says. */
+const BUSINESS_OPENER = bundleV2FixedLine("opener").replace(" <business>.", "");
+/** Q-30's lines as bundle v2 writes them: the STOP, HELP and rates line, then the privacy link. */
+const OPT_OUT_LINE = bundleV2FixedLine("optOutLine");
+const PRIVACY_LINK = bundleV2FixedLine("privacyLink");
+/** The fixed lines of Rosie's first sign-up text to the owner, in the order finalize adds them (default 19). */
+const FIRST_TEXT_LINES = ["signUpOpener", "optOutLine", "privacyLink"];
 
-/** The one words send of Rosie's first text: the opener before `words`, then Q-30's lines, the privacy link alone last. */
-function firstTextSend(words: string): Json {
+/** The one words send of Rosie's first text: `first` as its first line's words, then Q-30's lines, the link alone last. */
+function sendOf(first: string): Json {
   return {
     kind: "words",
-    text: [`${OPENER} ${words}`, OPT_OUT_LINE, PRIVACY_LINK].join("\n"),
+    text: [first, OPT_OUT_LINE, PRIVACY_LINK].join("\n"),
     calendarFile: "none",
     options: [],
     link: null,
   };
+}
+
+/** The one words send of Rosie's first text: the opener before `words`, then Q-30's lines, the privacy link alone last. */
+function firstTextSend(words: string): Json {
+  return sendOf(`${OPENER} ${words}`);
 }
 
 function namespace(): Namespace {
@@ -265,9 +281,12 @@ interface Rig {
   restore(): void;
 }
 
-/** The root for "test" with the HandleActor namespace, its actor ports installed and the turn's finalize calls watched. */
+/**
+ * The root for "test" with the HandleActor namespace, its actor ports installed and the turn's finalize calls watched;
+ * bundle v2 active, so the JOIN's turn pins it (T-1512).
+ */
 function rig(log: MockInstance, composers?: Composers): Rig {
-  const fakes = skeletonFakes();
+  const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
   const root = testRoot(fakes, handleActors(), composers);
   const restoreRoot = root.install();
   const watched = watchGate(root, fakes.face);
@@ -391,7 +410,7 @@ afterEach(async () => {
 
 describe("hop 10 joined: finalize through @rosie/actions' turn face fills slots and fixed lines, runs the claim check and the message checks, and writes the final parts", () => {
   it(
-    "the JOIN: hops 1 to 10 once each; finalize-pass.json's plan in, every message check passed (check-pass.json), and final parts holding S13-01's opener, the STOP, HELP and rates line and the privacy link alone on the last line, word for word as bundle v0 writes them, not finalize-pass.json's outcome; written into the row with the plan once, after the commit; one fillAndChecks span, the turn's; no span or log line holds a word, a number or the chat id",
+    "the JOIN under bundle v2: hops 1 to 10 once each; finalize-pass.json's plan in, every message check passed (check-pass.json), and final parts holding signUpOpener, the STOP, HELP and rates line and the privacy link alone on the last line, word for word as bundle v2 writes them, with no business named, not finalize-pass.json's outcome; written into the row with the plan once, after the commit; one fillAndChecks span, the turn's; no span or log line holds a word, a number or the chat id",
     { timeout: TEST_MS },
     async () => {
       const fetch = vi.fn();
@@ -459,10 +478,14 @@ describe("hop 10 joined: finalize through @rosie/actions' turn face fills slots 
         expect(answer.checks[0]?.checks).toEqual(ALL_PASSED);
         expect(answer.finalParts).toEqual(expectedParts);
         expect(answer).not.toEqual(FINALIZE_PASS.outcome);
-        // The words: the opener first, the privacy link alone on the last line, the STOP, HELP and rates line above it.
-        const lines = String((answer.finalParts?.sends[0] as Json | undefined)?.text).split("\n");
+        // The words: S1-02's own opener first, the privacy link alone on the last line, the STOP, HELP and rates line
+        // above it; neither the business opener's words nor the business's name anywhere (default 19).
+        const text = String((answer.finalParts?.sends[0] as Json | undefined)?.text);
+        const lines = text.split("\n");
         expect(lines[0]?.startsWith(`${OPENER} `)).toBe(true);
         expect(lines.slice(-2)).toEqual([OPT_OUT_LINE, PRIVACY_LINK]);
+        expect(text).not.toContain(BUSINESS_OPENER);
+        expect(text).not.toContain(TEST_OWNER_1_BUSINESS_NAME);
 
         // Written into the row with the plan, once, through T-196's writePlan, after the commit: the row is checked at
         // its next version, holding exactly what finalize answered.
@@ -489,7 +512,7 @@ describe("hop 10 joined: finalize through @rosie/actions' turn face fills slots 
           outcome: "ok",
           error_code: null,
           turn_id: turnId,
-          bundle_id: BUNDLE_V0,
+          bundle_id: BUNDLE_V2,
           business_id: TEST_OWNER_1.businessId,
           got: { row, attempt: "composed", calls: 1 },
           decided: {
@@ -548,7 +571,7 @@ describe("hop 10 joined: finalize through @rosie/actions' turn face fills slots 
   );
 
   it(
-    "a plan with a typed price (check-raw-price.json): Values fails, the one rewrite is told so, the rewrite types it again, then the step's fallback is checked and sent with Q-30's lines; the trace shows each, the fillAndChecks span and the rewriteOrFallback span",
+    "a plan with a typed price (check-raw-price.json): Values fails, the one rewrite is told so, the rewrite types it again, then the step's fallback is checked and sent with Q-30's lines, its own first words standing for signUpOpener (no doubles); the trace shows each, the fillAndChecks span and the rewriteOrFallback span",
     { timeout: TEST_MS },
     async () => {
       const fetch = vi.fn();
@@ -591,12 +614,15 @@ describe("hop 10 joined: finalize through @rosie/actions' turn face fills slots 
           },
         ]);
 
-        // 3. The rewrite types the price again: Values fails once more, so the step's fallback text (S1-02's, as bundle v0
-        // writes it) runs through the same checks, which all pass, and goes with Q-30's lines.
+        // 3. The rewrite types the price again: Values fails once more, so the step's fallback text (S1-02's, as bundle v2
+        // writes it) runs through the same checks, which all pass, and goes with Q-30's lines. It already begins with
+        // signUpOpener's exact words, so finalize records the line's id and adds the words no second time (default 19).
+        const fallback = bundleV2FallbackText("S1-02");
+        expect(fallback.startsWith(`${OPENER} `)).toBe(true);
         const fallbackParts: FinalParts = {
           row,
           channel: "imessage",
-          sends: [firstTextSend(bundleV0FallbackText("S1-02"))],
+          sends: [sendOf(fallback)],
           fixedLines: FIRST_TEXT_LINES,
           slotValues: [],
           threadReplyTo: null,
@@ -611,6 +637,8 @@ describe("hop 10 joined: finalize through @rosie/actions' turn face fills slots 
         });
         expect(rewritten?.checks[1]?.checks).toEqual(ALL_PASSED);
         expect(rewritten?.finalParts).toEqual(fallbackParts);
+        const sent = String((rewritten?.finalParts?.sends[0] as Json | undefined)?.text);
+        expect(sent.split(OPENER)).toHaveLength(2);
 
         // Written once, the fallback's final parts with the rewrite's plan, after the commit.
         expect(run.fakes.finalize.writes).toEqual([
@@ -624,7 +652,7 @@ describe("hop 10 joined: finalize through @rosie/actions' turn face fills slots 
           outcome: "refused",
           error_code: null,
           turn_id: turnId,
-          bundle_id: BUNDLE_V0,
+          bundle_id: BUNDLE_V2,
           got: { row, attempt: "composed", calls: 1 },
           decided: { outcome: "rewrite", failed: ["values"], fallback: false, fallbackFailed: [] },
           rows: [],
@@ -634,7 +662,7 @@ describe("hop 10 joined: finalize through @rosie/actions' turn face fills slots 
           outcome: "ok",
           error_code: null,
           turn_id: turnId,
-          bundle_id: BUNDLE_V0,
+          bundle_id: BUNDLE_V2,
           got: { row, attempt: "rewrite", told: ["values"], planned: true, calls: 1 },
           decided: {
             outcome: "send",
@@ -654,13 +682,7 @@ describe("hop 10 joined: finalize through @rosie/actions' turn face fills slots 
         expect(Date.parse(rewrite.at)).toBeGreaterThanOrEqual(Date.parse(checks.at));
 
         // No span holds the typed price, the plan's or the fallback's words, a number or the chat id.
-        const words = [
-          TYPED_SENTENCE,
-          TYPED_PRICE,
-          bundleV0FallbackText("S1-02"),
-          OPT_OUT_LINE,
-          PRIVACY_LINK,
-        ];
+        const words = [TYPED_SENTENCE, TYPED_PRICE, fallback, OPENER, OPT_OUT_LINE, PRIVACY_LINK];
         expect(leaks(run.spans(), [SAM_CHAT, ...CAST_NUMBERS, ...words])).toEqual([]);
         expect(fetch).not.toHaveBeenCalled();
       } finally {
