@@ -50,12 +50,14 @@ import { setTurnDeps } from "../turn/turn";
 import type { GateAndCommitAnswer, GateAndCommitRequest } from "../turn/types";
 import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "./index";
 import {
+  BUNDLE_V2,
   fakeFlags,
   JOIN_TEXT,
   SAM_CHAT,
   SAM_TRADES_TEXT,
   samPhoneRow,
   skeletonFakes,
+  testClock,
   type LinqInboundEvent,
   type SignedWebhook,
   type SkeletonFakes,
@@ -371,10 +373,12 @@ interface Rig {
 /**
  * The root for "test" with the HandleActor namespace and the skeleton flag on, every joined port fed its double as
  * ./root.worker.test.ts feeds them (so a recorded turn goes the JOIN run's way to its reply), its actor ports installed,
- * the read on arrival and the turn watched.
+ * the read on arrival and the turn watched. Bundle v2 active, the JOIN's pin (T-1512): the sender holds no role, so the
+ * turn's S1-02 row is read by its sign-up line as the owner and its first text opens with signUpOpener, which bundle v2
+ * carries (K-01 README default 19; T-1511); on bundle v0 finalize would refuse the text and the reply would never end.
  */
 function rig(log: MockInstance): Rig {
-  const fakes = skeletonFakes();
+  const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
   const root = composeRoot({
     environment: "test",
     sets: { fake: fakes.ports },
@@ -937,7 +941,7 @@ describe("a STOP's kept result (ADR-015 card B)", () => {
           { start: run.fakes.clock.now(), ids: idsOf(SAM.party) },
         );
         run.also(setDbOutageDeps(db.outageDeps));
-        // While PostgreSQL answers, a first turn pins bundle v0 (the actor copies its keyword list), commits and replies.
+        // While PostgreSQL answers, a first turn pins bundle v2 (the actor copies its keyword list), commits and replies.
         run.fakes.decide.recordTurn([prime]);
         await run.post(textOf(prime, handle, JOIN_TEXT));
         await run.settle(handle);

@@ -16,7 +16,10 @@
 // line, the whole turn from gate and commit through compose input to finalize, which writes the row's final parts: one
 // open question, its clock row and one outbox row with its final parts, all under one turn id and one trace id, nothing
 // written twice on replay. Finalize writes final parts only on a bundle that carries the privacy link (T-314; K-09 v1.5
-// open gap 121), so that turn is pinned to bundle v0 as bundles/v0 publishes it (T-1146), its own schema's registry row.
+// open gap 121) and, for this row to Sam with no role, read by S1-02's sign-up line as the owner on S1-02 (which does not
+// need business), the sign-up opener (K-01 README default 19, T-1510; T-1511), so that turn is pinned to bundle v2 as
+// bundles/v2 holds it (T-1477: S1-01 and S1-02 as bundle v0 as published holds them, T-1146), its own schema's registry
+// row; its first text opens with S1-02's own words, never the seed business's name.
 //
 // T-1190: the seed gives the barbershop its barber kind of work with no switch on (T-1197; CQ-185), so K-05 v1.6's
 // readOutboxRow reads the row's sensitive switch as false, and compose input gives compose-input-s1-02-v1.6.json's input
@@ -68,7 +71,7 @@ import {
   commitRequestAfter,
   commitS101,
   composeS102,
-  publishedBundleV0,
+  publishedBundleV2,
 } from "../calls-test-support";
 import { NOTHING_OPEN_AT } from "../commit";
 import { TurnFaceRefusedError } from "../errors";
@@ -231,14 +234,14 @@ describe("gateAndCommit for turn 1 on local PostgreSQL (T-1141)", () => {
   );
 });
 
-describe("the card's integration line: one turn from gate and commit to finalize's final parts, on PostgreSQL (bundle v0 as published)", () => {
-  /** This describe's own schema: T-1148's seed, Sam's key, and bundle v0 as published in the bundle registry. */
+describe("the card's integration line: one turn from gate and commit to finalize's final parts, on PostgreSQL (bundle v2)", () => {
+  /** This describe's own schema: T-1148's seed, Sam's key, and bundle v2 in the bundle registry. */
   let whole: CommitDatabase;
   let wholeFace: TurnFace;
-  const published: BundleDocument = publishedBundleV0();
+  const published: BundleDocument = publishedBundleV2();
   const bundleId = published.manifest.bundleId as { hash: string; build: number };
 
-  /** commit-s1-01.json's request, the turn pinned to bundle v0 as published: its turn's, context's and decide's id. */
+  /** commit-s1-01.json's request, the turn pinned to bundle v2: its turn's, context's and decide's id. */
   function pinnedRequest(): GateAndCommitRequest {
     const request = commitRequestAfter(undefined);
     if (request.turn === null || request.input.kind !== "decided")
@@ -338,10 +341,14 @@ describe("the card's integration line: one turn from gate and commit to finalize
       };
       expect(finalized.outcome).toBe("send");
       // T-1148's seed holds no phone row, so the opt-out line was never delivered: it rides with the opener and the link.
-      expect(finalized.finalParts.fixedLines).toEqual(["opener", "optOutLine", "privacyLink"]);
-      expect((finalized.finalParts.sends[0]?.text ?? "").split("\n").at(-1)).toBe(
-        "Privacy notice: rosfield.com/test/privacy",
-      );
+      // Sam holds no role and is read by S1-02's sign-up line as the owner, on a step that does not need business, so
+      // the opener is signUpOpener, S1-02's own words (K-01 README default 19), and the seed's business is named nowhere.
+      expect(finalized.finalParts.fixedLines).toEqual(["signUpOpener", "optOutLine", "privacyLink"]);
+      const text = finalized.finalParts.sends[0]?.text ?? "";
+      expect(text.startsWith("Hi! I'm Rosie, an automated assistant. ")).toBe(true);
+      expect(text).not.toContain("Lee's Barbershop");
+      expect(text).not.toContain("booking assistant for");
+      expect(text.split("\n").at(-1)).toBe("Privacy notice: rosfield.com/test/privacy");
 
       // One open question, its clock row, one outbox row with its final parts: each under the turn id.
       const rows = await footprint(whole, TURN);

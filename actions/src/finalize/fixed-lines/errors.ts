@@ -6,14 +6,16 @@
 /**
  * Why a row's fixed lines could not be added:
  *   - lineNotInBundle: the bundle holds no line of that id in the reader's language or in English (K-01 v1 fixedLine);
+ *     among them an owner's sign-up text on a bundle without signUpOpener (bundles v0, v1 and v1.1), which never falls
+ *     back to opener (K-01 README default 19);
  *   - lineWaitsForJay: the line's words wait for Jay (K-01 v1 status pendingJay; Q-01);
  *   - noBusiness: the line names <business> and the row has no business for it (the row read's businessName is null);
  *   - businessNotClaimed: the line names <business>, and the name limit 7 lets this reader see (biz.name, the display
  *     name under the sensitive switch: RULES 4.6, S13-22) is not the row read's businessName, the one the Fixed lines
  *     check fills it with (STATE note 26);
  *   - stopReplyLine: the port asked for stopReply, which no composed message carries (T-267's security note b);
- *   - firstTextLineListed: the port asked for the opener, the opt-out line or the privacy link, which only the first-text
- *     rule adds (RULES 4.3: "No other message carries it");
+ *   - firstTextLineListed: the port asked for an opener (opener or signUpOpener), the opt-out line or the privacy link,
+ *     which only the first-text rule adds (RULES 4.3: "No other message carries it");
  *   - lineListedTwice: the port asked for one line twice;
  *   - tapbackAlone: the parts are a tapback, which goes alone and carries no words (arch 07 line 391);
  *   - noRoomForWords: the parts have two sends and neither is the words, so a words send would make three (arch 07 line

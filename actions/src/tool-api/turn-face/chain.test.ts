@@ -1,9 +1,14 @@
 // T-1141's unit chain (ADR-013 section 6's T-1141 line; DL-322, which settles CQ-156 a): one turn's fixtures, each call's
 // output feeding the next, through one turn face: build-frontier-s1-01.json, then commit-s1-01.json (K-09 v1.5), then
 // compose-input-s1-02.json on that commit's row, outbox-s1-02-sam-1, then finalize with finalize-pass.json's plan, which on
-// bundle v0 (K-01 v1's bundle-v0-skeleton.json, the turn's pin) answers lineNotInBundle for privacyLink (T-314; K-09 v1.5
-// open gap 121), the chain's end on that pin; with the line (bundle v0 as bundles/v0 publishes it, T-1146), the final
-// parts carry the bundle's opener, the opt-out line and the privacy link (Q-30), not finalize-pass.json's outcome.
+// bundle v0 (K-01 v1's bundle-v0-skeleton.json, the turn's pin) is refused whole, the chain's end on that pin.
+//
+// T-1511 (K-01 README default 19, T-1510; DL-1033 fault 1): the row goes to Sam with no role, read by S1-02's sign-up
+// line as the owner, on S1-02, which does not need business, so its opener is signUpOpener, S1-02's own words. The
+// turn's pin holds neither that line nor privacyLink, and the refusal names the opener the row gets first
+// (lineNotInBundle: signUpOpener); it never falls back to opener. With the line (bundle v2 as bundles/v2 holds it,
+// T-1477, which holds S1-01 and S1-02 as bundle v0 as published does, T-1146), the final parts carry signUpOpener, the
+// opt-out line and the privacy link (Q-30), finalize-pass.json's own words, and never the business's name.
 //
 // Round 2 (DL-364, DL-365, DL-370): the frontier gives the fixture's whole frontier (T-1147), the gate passes the sign-up
 // door with commit-s1-01.json's six limit answers (T-1183), and the row, to Sam who holds no role yet, is read by S1-02's
@@ -36,9 +41,9 @@ import {
   composeS102,
   firstTextFacts,
   outboxRowTurnOne,
-  publishedBundleV0,
+  publishedBundleV2,
   rowDoubles,
-  rowUnderPublishedV0,
+  rowUnderBundleV2,
 } from "./calls-test-support";
 import { NOTHING_OPEN_AT } from "./commit";
 import { composeInputDeps, finalizeDeps, type OutboxRowRead, type RowData } from "./rows";
@@ -171,18 +176,22 @@ describe("one turn's fixtures chain through the turn face (K-09 v1.5 turn 1; ADR
     expect(composed).toEqual({ result: "compose", input: compose.outcome.input });
     expect(composed).toMatchObject({ input: { audience: { role: "owner", name: "Sam" } } });
 
-    // 4. Finalize with finalize-pass.json's plan on the same row: refused whole on the turn's pin (open gap 121), and
-    // nothing written.
+    // 4. Finalize with finalize-pass.json's plan on the same row: refused whole on the turn's pin, which holds no
+    // signUpOpener (default 19; nor privacyLink, open gap 121), and nothing written.
     const finalize = fixture("finalize-pass.json") as { request: Json };
     await expect(
       chain.face.finalizeMessage(structuredClone(finalize.request), traceFor(finalize.request).trace),
-    ).rejects.toMatchObject({ name: "FixedLineRefusedError", fault: "lineNotInBundle", line: "privacyLink" });
+    ).rejects.toMatchObject({
+      name: "FixedLineRefusedError",
+      fault: "lineNotInBundle",
+      line: "signUpOpener",
+    });
     expect(chain.rows.plans).toEqual([]);
   });
 
-  it("the same chain with the line, the row read in bundle v0 as published (T-1146): finalize sends, its final parts the bundle's opener, the opt-out line and the privacy link, written with the plan once", async () => {
-    const published = publishedBundleV0();
-    const row = rowUnderPublishedV0(outboxRowTurnOne());
+  it("the same chain with the line, the row read in bundle v2 (T-1477): finalize sends, its final parts signUpOpener (S1-02's own words), the opt-out line and the privacy link, never the business's name, written with the plan once", async () => {
+    const published = publishedBundleV2();
+    const row = rowUnderBundleV2(outboxRowTurnOne());
     const chain = chainOf(row, published);
     await frontierThenCommit(chain);
     expectReadOfCommit(chain, row);
@@ -205,15 +214,24 @@ describe("one turn's fixtures chain through the turn face (K-09 v1.5 turn 1; ADR
     )) as unknown as Json & { finalParts: { fixedLines: string[]; sends: { text: string }[] } };
     expect(validator.check("finalizeMessage", "response", answer)).toEqual([]);
     expect(answer.outcome).toBe("send");
-    expect(answer.finalParts.fixedLines).toEqual(["opener", "optOutLine", "privacyLink"]);
+    expect(answer.finalParts.fixedLines).toEqual(["signUpOpener", "optOutLine", "privacyLink"]);
     const fixed = (
       published.manifest.lists as { fixedLines: { lines: { id: string; lang: string; text: string }[] } }
     ).fixedLines.lines;
     const words = (id: string): string =>
       fixed.find((line) => line.id === id && line.lang === "en")?.text ?? "";
-    const lines = (answer.finalParts.sends[0]?.text ?? "").split("\n");
-    expect(lines[0]?.startsWith(words("opener").replace("<business>", "Lee's Barbershop"))).toBe(true);
+    const text = answer.finalParts.sends[0]?.text ?? "";
+    const lines = text.split("\n");
+    expect(words("signUpOpener")).toBe("Hi! I'm Rosie, an automated assistant.");
+    expect(lines[0]?.startsWith(`${words("signUpOpener")} `)).toBe(true);
     expect(lines.slice(-2)).toEqual([words("optOutLine"), words("privacyLink")]);
+    // The seed's business is named nowhere: the sign-up opener names no business (DL-1033 fault 1).
+    expect(text).not.toContain("Lee's Barbershop");
+    expect(text).not.toContain(words("opener").replace(" <business>.", ""));
+    // finalize-pass.json's final words, with the first text's two lines code adds after them (its outcome names the
+    // words "opener"; default 19 gives them their own id).
+    const stated = finalize.outcome as { finalParts: { sends: { text: string }[] } };
+    expect(lines.slice(0, -2).join("\n")).toBe(stated.finalParts.sends[0]?.text);
     expect(answer).not.toEqual(finalize.outcome);
     expect(chain.rows.plans.map((plan) => [plan.outboxRowId, plan.finalParts])).toEqual([
       [ROW, answer.finalParts],
@@ -221,7 +239,7 @@ describe("one turn's fixtures chain through the turn face (K-09 v1.5 turn 1; ADR
   });
 
   it("on the turn's one trace, the face's only span is the frontier's, the base's as before: gate and commit, compose input and finalize leave none, the turn records those hops itself (T-1193)", async () => {
-    const chain = chainOf(rowUnderPublishedV0(outboxRowTurnOne()), publishedBundleV0());
+    const chain = chainOf(rowUnderBundleV2(outboxRowTurnOne()), publishedBundleV2());
     const frontierExchange = s101Exchange();
     // Every request of the turn names the turn's trace: the frontier's, the commit's, compose input's and finalize's.
     const { trace, spans } = traceFor(frontierExchange.request);

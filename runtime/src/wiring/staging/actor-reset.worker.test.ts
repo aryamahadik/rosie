@@ -56,10 +56,12 @@ import { flush } from "../../turn/test-support";
 import { composeRoot, SKELETON_FLAG, type HandleActors, type Root } from "../index";
 import type { HandleSealingKeyCall } from "../real";
 import {
+  BUNDLE_V2,
   fakeFlags,
   SAM_CHAT,
   skeletonFakes,
   TEST_OWNER_1,
+  testClock,
   watchGate,
   type LinqInboundEvent,
   type SignedWebhook,
@@ -525,7 +527,10 @@ describe("a stuck tp-01 clears, and its next JOIN commits through the hop rig wi
     { timeout: TEST_MS },
     async () => {
       const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
-      const fakes = skeletonFakes();
+      // Bundle v2 active, the JOIN's pin (T-1512): tp-01 holds no role, so the JOIN's S1-02 row is read by its sign-up line
+      // as the owner and its first text opens with signUpOpener, which bundle v2 carries (K-01 README default 19; T-1511);
+      // on bundle v0 finalize would refuse the text and the part would never go.
+      const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
       await holdTp01(fakes);
 
       // The deploy: the rig's root is the test environment's, which never sets the hook, so staging's own hook (the list

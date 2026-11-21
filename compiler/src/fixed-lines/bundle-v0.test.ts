@@ -17,6 +17,10 @@ import {
   FIRST_TEXT_LINES,
   FixedLineRefusedError,
   insertFixedLines,
+  OPENER_LINE,
+  OPT_OUT_LINE,
+  PRIVACY_LINK_LINE,
+  SIGN_UP_OPENER_LINE,
 } from "../../../actions/src/finalize/fixed-lines";
 import {
   FIRST_TEXT,
@@ -102,12 +106,20 @@ describe("bundle v0 packs the fixed-lines module's list for staging", () => {
     expect(privacy?.source).toMatch(/^Q-30's default, for Jay to confirm before production/);
   });
 
-  it("holds words for each line a first text carries, in English, and optOutLine in Spanish", () => {
-    for (const id of FIRST_TEXT_LINES) {
-      expect(fixedLineWords(id, { ...firstTextRow({}, { lists: V0_LISTS }).checks }), id).toHaveProperty(
-        "words",
-      );
+  it("holds words for each line a first text carries, in English, and optOutLine in Spanish; no signUpOpener, which bundle v2 brings", () => {
+    // A first text carries the business opener, the opt-out line and the privacy link. FIRST_TEXT_LINES also lists
+    // signUpOpener (K-01 README default 19; T-1511), which an owner's sign-up text carries in the opener's place on
+    // bundle v2 (T-1477); bundle v0 holds no such line by design, so such a text pinned to it is refused (fail closed).
+    const context = { ...firstTextRow({}, { lists: V0_LISTS }).checks };
+    for (const id of [OPENER_LINE, OPT_OUT_LINE, PRIVACY_LINK_LINE]) {
+      expect(FIRST_TEXT_LINES, id).toContain(id);
+      expect(fixedLineWords(id, context), id).toHaveProperty("words");
     }
+    expect(FIRST_TEXT_LINES).toContain(SIGN_UP_OPENER_LINE);
+    expect(V0.lists.fixedLines.lines.filter((line) => line.id === SIGN_UP_OPENER_LINE)).toEqual([]);
+    expect(fixedLineWords(SIGN_UP_OPENER_LINE, context)).toEqual({
+      fault: `The fixed line ${SIGN_UP_OPENER_LINE} is not one of the bundle's fixed lines.`,
+    });
     expect(OPENER_V0).toBe(OPENER);
     expect(v0Words("optOutLine", "es")).toMatch(/^Responda STOP para no recibir más\./);
   });

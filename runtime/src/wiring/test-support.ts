@@ -32,7 +32,9 @@
 //                realBundles). What it is fed comes from here: `fakeBundleReads`, a K-05 double holding bundle v0 as
 //                bundles/v0 publishes it (bundle.kv.json: every part's key and its exact text, the bytes T-569's publish
 //                writes to KV and to PostgreSQL's copy), answering readActiveBundle in active-bundle.json's form with
-//                that bundle's id and readBundleValue in bundle-value-on-miss.json's
+//                that bundle's id and readBundleValue in bundle-value-on-miss.json's; it also holds bundle v2's manifest
+//                and flow A as bundles/v2 publishes them (T-1477), active where a test hands `skeletonFakes` bundle v2:
+//                an owner's sign-up turn that reaches finalize pins it (K-01 README default 19; T-1512)
 //   targets      joined (T-556): the root binds K-05 v1.2 handleTargets through its real targets port (./real.ts
 //                realTargets). What it is fed comes from here: `fakeHandleTargets`, a K-05 double holding test owner 1's
 //                seeded rows (T-1148, db/seeds/skeleton.ts: handle-sam at the fictional 555-0100, person-sam, no role, no
@@ -111,6 +113,7 @@ import type { FlagsReader } from "@rosie/actions/src/domain/flags/reads";
 import { NO_EVENT_SOURCES } from "@rosie/actions/src/domain/flags/stop-start";
 import type { MessagesReader } from "@rosie/actions/src/domain/messages-consent/reads";
 import type { StoredHold, StoredOutcome } from "@rosie/actions/src/domain/safety/ports";
+import { OPENER_LINES } from "@rosie/actions/src/finalize/fixed-lines/types";
 import type {
   CancelClockAnswer,
   CancelClockRequest,
@@ -205,6 +208,8 @@ import type {
 } from "@rosie/db/repo/targets";
 
 import bundleV0Kv from "../../../bundles/v0/bundle.kv.json";
+import bundleV2FlowA from "../../../bundles/v2/bundle/flow/A.json";
+import bundleV2Manifest from "../../../bundles/v2/bundle/manifest.json";
 import type { CommitContext, CommitTurnRef } from "../actor";
 import { turnIdOf } from "../actor/lease";
 import { BUNDLE_B } from "../bundle/test-support";
@@ -1071,7 +1076,7 @@ const BUNDLE_V0_PARTS: ReadonlyMap<string, string> = new Map(
   bundleV0Kv.map((part) => [part.key, part.value] as const),
 );
 
-/** The id bundle v0's published manifest names, under its own manifest key (its content hash, build 1). */
+/** The id a bundle's published manifest names, under its own manifest key (its content hash and build). */
 function bundleIdOfParts(parts: ReadonlyMap<string, string>): BundleId {
   for (const [key, text] of parts) {
     if (!key.endsWith("/manifest")) continue;
@@ -1086,7 +1091,7 @@ function bundleIdOfParts(parts: ReadonlyMap<string, string>): BundleId {
       return { hash, build };
     }
   }
-  throw new Error("bundles/v0 holds no manifest under its own bundle id");
+  throw new Error("the bundle's parts hold no manifest under its own bundle id");
 }
 
 /** A K-01 v1 key, spelled out here for the double: bundle/<hash>/<build>/<part>. */
@@ -1094,22 +1099,59 @@ function bundleKeyOf(bundleId: BundleId, part: string): string {
   return `bundle/${bundleId.hash}/${String(bundleId.build)}/${part}`;
 }
 
-/** Bundle v0's id, as bundles/v0 publishes it: the bundle the test environment's bundle port holds active. */
+/** Bundle v0's id, as bundles/v0 publishes it: the bundle the test environment's bundle port holds active by default. */
 export const BUNDLE_V0: BundleId = bundleIdOfParts(BUNDLE_V0_PARTS);
 
-/** One part of bundle v0 as bundles/v0 publishes it, parsed: its manifest, or a flow graph (flow/A). */
-function bundleV0Part(part: string): Record<string, unknown> {
-  const text = BUNDLE_V0_PARTS.get(bundleKeyOf(BUNDLE_V0, part));
-  if (text === undefined) throw new Error(`bundles/v0 publishes no ${part}`);
+/**
+ * Bundle v2's manifest and flow A by K-01 key, each its text byte for byte as bundles/v2 publishes it (T-1477): the two
+ * files bundles/v2/bundle/ holds are the compact JSON its bundle.kv.json carries under those two keys, so each part's
+ * text is its file's JSON written back, and the pin's size, sha256 and id checks read it as the publish wrote it. Its
+ * trade overlays (bundle.kv.json's other keys, 28 MB) are not held: no turn here reads one (S1-01 and S1-02 read none),
+ * and a read of one answers notFound, as for any key the copy does not hold.
+ */
+const BUNDLE_V2_PARTS: ReadonlyMap<string, string> = (() => {
+  const { hash, build } = bundleV2Manifest.bundleId;
+  return new Map([
+    [bundleKeyOf({ hash, build }, "manifest"), JSON.stringify(bundleV2Manifest)],
+    [bundleKeyOf({ hash, build }, "flow/A"), JSON.stringify(bundleV2FlowA)],
+  ]);
+})();
+
+/**
+ * Bundle v2's id, as bundles/v2 publishes it (T-1477): the bundle an owner's sign-up turn pins (DL-1033 ruling 2), whose
+ * fixed lines carry signUpOpener (K-01 README default 19); a test hands it to `skeletonFakes` to hold it active.
+ */
+export const BUNDLE_V2: BundleId = bundleIdOfParts(BUNDLE_V2_PARTS);
+
+/**
+ * Bundle v2's manifest and flow A in bundle.kv.json's form (each part's K-01 key and its exact text, as the double holds
+ * them above): what a test puts into the BUNDLES namespace to stand for bundle v2's publish to KV (T-1512, as bundles/v0's
+ * bundle.kv.json stands for bundle v0's). Its trade overlays are not among them, as above.
+ */
+export const BUNDLE_V2_KV: readonly { readonly key: string; readonly value: string }[] = [
+  ...BUNDLE_V2_PARTS,
+].map(([key, value]) => ({ key, value }));
+
+/** Every part the double's copy holds, by K-01 key: bundle v0's and bundle v2's, each as its bundle publishes it. */
+const BUNDLE_PARTS: ReadonlyMap<string, string> = new Map([...BUNDLE_V0_PARTS, ...BUNDLE_V2_PARTS]);
+
+/** Whether two bundle ids name the same bundle. */
+const sameBundle = (a: BundleId, b: BundleId): boolean => a.hash === b.hash && a.build === b.build;
+
+/** A bundle id as a message names it: v0 or v2, the two bundles the double holds. */
+const nameOfBundle = (bundleId: BundleId): string =>
+  sameBundle(bundleId, BUNDLE_V2) ? "bundles/v2" : "bundles/v0";
+
+/** One part of a bundle the double holds, parsed: its manifest, or a flow graph (flow/A). */
+function bundlePart(bundleId: BundleId, part: string): Record<string, unknown> {
+  const text = BUNDLE_PARTS.get(bundleKeyOf(bundleId, part));
+  if (text === undefined) throw new Error(`${nameOfBundle(bundleId)} publishes no ${part}`);
   return JSON.parse(text) as Record<string, unknown>;
 }
 
-/**
- * Bundle v0's fixed line `id` in `lang` (K-01 v1 lists.fixedLines), word for word as bundles/v0 publishes its manifest (its
- * <business> left as written): the words finalize adds to a row of a turn pinned to bundle v0 (T-314, T-1146).
- */
-export function bundleV0FixedLine(id: string, lang = "en"): string {
-  const lists = bundleV0Part("manifest").lists as
+/** A bundle's fixed line `id` in `lang` (K-01 v1 lists.fixedLines), word for word as its manifest holds it. */
+function fixedLineOf(bundleId: BundleId, id: string, lang: string): string {
+  const lists = bundlePart(bundleId, "manifest").lists as
     | {
         readonly fixedLines?: {
           readonly lines?: readonly { id: string; lang: string; text: string | null }[];
@@ -1117,17 +1159,46 @@ export function bundleV0FixedLine(id: string, lang = "en"): string {
       }
     | undefined;
   const text = lists?.fixedLines?.lines?.find((line) => line.id === id && line.lang === lang)?.text;
-  if (typeof text !== "string") throw new Error(`bundles/v0 holds no ${lang} fixed line ${id}`);
+  if (typeof text !== "string")
+    throw new Error(`${nameOfBundle(bundleId)} holds no ${lang} fixed line ${id}`);
   return text;
+}
+
+/** A step's fallback text in a bundle's flow A (K-01 v1 step.fallbackText), as the bundle publishes it. */
+function fallbackTextOf(bundleId: BundleId, stepId: string): string {
+  const steps = bundlePart(bundleId, "flow/A").steps as
+    Readonly<Record<string, { fallbackText?: unknown }>> | undefined;
+  const text = steps?.[stepId]?.fallbackText;
+  if (typeof text !== "string") {
+    throw new Error(`${nameOfBundle(bundleId)}'s flow A holds no fallback text for ${stepId}`);
+  }
+  return text;
+}
+
+/**
+ * Bundle v0's fixed line `id` in `lang` (K-01 v1 lists.fixedLines), word for word as bundles/v0 publishes its manifest (its
+ * <business> left as written): the words finalize adds to a row of a turn pinned to bundle v0 (T-314, T-1146).
+ */
+export function bundleV0FixedLine(id: string, lang = "en"): string {
+  return fixedLineOf(BUNDLE_V0, id, lang);
+}
+
+/**
+ * Bundle v2's fixed line `id` in `lang`, word for word as bundles/v2 publishes its manifest (T-1477): among them
+ * signUpOpener, S1-02's own first words, which finalize puts first on an owner's sign-up text (K-01 README default 19).
+ */
+export function bundleV2FixedLine(id: string, lang = "en"): string {
+  return fixedLineOf(BUNDLE_V2, id, lang);
 }
 
 /** A step's fallback text in bundle v0's flow A (K-01 v1 step.fallbackText), as bundles/v0 publishes it. */
 export function bundleV0FallbackText(stepId: string): string {
-  const steps = bundleV0Part("flow/A").steps as
-    Readonly<Record<string, { fallbackText?: unknown }>> | undefined;
-  const text = steps?.[stepId]?.fallbackText;
-  if (typeof text !== "string") throw new Error(`bundles/v0's flow A holds no fallback text for ${stepId}`);
-  return text;
+  return fallbackTextOf(BUNDLE_V0, stepId);
+}
+
+/** A step's fallback text in bundle v2's flow A, as bundles/v2 publishes it (T-1477). */
+export function bundleV2FallbackText(stepId: string): string {
+  return fallbackTextOf(BUNDLE_V2, stepId);
 }
 
 /** A K-01 value's kind, from its key's part: the manifest, a flow graph or a trade overlay. */
@@ -1146,7 +1217,7 @@ async function storedTextOf(key: string, text: string): Promise<StoredText> {
 }
 
 export interface FakeBundleReads {
-  /** What the root's real bundle port is fed (RootOptions.bundleReads): K-05's two reads over bundle v0's copy. */
+  /** What the root's real bundle port is fed (RootOptions.bundleReads): K-05's two reads over the double's copy. */
   readonly calls: BundleReadCalls;
   /** Every call, in order, with the key it asked for (null for readActiveBundle). */
   readonly reads: { readonly call: "readActiveBundle" | "readBundleValue"; readonly key: string | null }[];
@@ -1154,11 +1225,15 @@ export interface FakeBundleReads {
 
 /**
  * K-05 v1 item 7's readActiveBundle and readBundleValue as a double over PostgreSQL's copy of bundle v0, as bundles/v0
- * publishes it, with bundle v0 active: readActiveBundle answers in active-bundle.json's form with bundle v0's id and
+ * publishes it, and of bundle v2's manifest and flow A, as bundles/v2 publishes them (T-1477), with `active` active (bundle
+ * v0 unless a test hands bundle v2): readActiveBundle answers in active-bundle.json's form with that bundle's id and
  * manifest key (its activatedAt the fixture's); readBundleValue answers in bundle-value-on-miss.json's form, each value's
  * text byte for byte with its size and sha256 as the publish stores them, and notFound for a key the copy does not hold.
  */
-export function fakeBundleReads(): FakeBundleReads {
+export function fakeBundleReads(active: BundleId = BUNDLE_V0): FakeBundleReads {
+  if (!BUNDLE_PARTS.has(bundleKeyOf(active, "manifest"))) {
+    throw new Error("the bundle double holds bundles v0 and v2 only, so only one of them can be active");
+  }
   const reads: { call: "readActiveBundle" | "readBundleValue"; key: string | null }[] = [];
   return {
     reads,
@@ -1167,15 +1242,15 @@ export function fakeBundleReads(): FakeBundleReads {
         reads.push({ call: "readActiveBundle", key: null });
         const answer: ReadActiveBundleResult = {
           result: "active",
-          bundleId: { ...BUNDLE_V0 },
-          manifestKey: bundleKeyOf(BUNDLE_V0, "manifest"),
+          bundleId: { hash: active.hash, build: active.build },
+          manifestKey: bundleKeyOf(active, "manifest"),
           activatedAt: activeBundleJson.outcome.activatedAt,
         };
         return Promise.resolve(answer);
       },
       async readBundleValue(request): Promise<ReadBundleValueResult> {
         reads.push({ call: "readBundleValue", key: request.key });
-        const text = BUNDLE_V0_PARTS.get(request.key);
+        const text = BUNDLE_PARTS.get(request.key);
         if (text === undefined) return { error: "notFound", table: "bundle_values", rowId: request.key };
         return { result: "value", value: await storedTextOf(request.key, text) };
       },
@@ -2036,6 +2111,25 @@ function shippedDecideRecordings(): DecideRecording[] {
 }
 
 /**
+ * Recording 2's reads (the JOIN run's own, above) on the same context with bundle v2 pinned in bundle v0's place (T-1512;
+ * DL-1033: an owner's sign-up turn pins bundle v2): bundle v2 holds S1-01 and flow A's routing byte for byte as bundle v0
+ * does, so the frontier's context for the JOIN under bundle v2 is recording 2's but for the pinned id, and each read
+ * answers as recording 2's does (both enter c-01 with the quote JOIN). Bundle v2's decide prompt is decide-2, where v0's
+ * is decide-1: a request is keyed on its context and role, never its prompt, so these stand in for decide-2's reads of
+ * the JOIN, as `recordTurn`'s stand in for another turn's. Keyed on that context only, never on bundle v0's.
+ */
+function onBundleV2(recordings: readonly DecideRecording[]): DecideRecording[] {
+  return recordings.flatMap((recording) => {
+    const { context } = recording;
+    const pinned = isRecord(context) ? context.bundleId : undefined;
+    if (!isRecord(context) || !isRecord(pinned)) return [];
+    if (pinned.hash !== BUNDLE_V0.hash || pinned.build !== BUNDLE_V0.build) return [];
+    const onV2 = { ...structuredClone(context), bundleId: { hash: BUNDLE_V2.hash, build: BUNDLE_V2.build } };
+    return [{ ...recording, id: `${recording.id}-on-bundle-v2`, context: onV2 }];
+  });
+}
+
+/**
  * The context decide-reads-disagree.json's reads were made from, as the turn's own tests write it (../turn/test-support
  * a7_17Context): A7-17 ("Alex replies?") on K-01's bundle-mini-a, its options word for word, the fixture's turn id.
  */
@@ -2086,19 +2180,24 @@ function decideBundleOf(manifest: unknown, flows: CacheBundle["flows"]): DecideB
   };
 }
 
+/** The decide bundle of a bundle the double's copy holds: its manifest and its flow A graph, as the bundle publishes them. */
+function publishedDecideBundle(bundleId: BundleId): DecideBundle {
+  return decideBundleOf(bundlePart(bundleId, "manifest"), {
+    A: bundlePart(bundleId, "flow/A") as unknown as CacheFlow,
+  });
+}
+
 /**
  * The bundles the double builds a decider for: bundle v0 as bundles/v0 publishes it (its manifest, with its models,
- * routing policy and decide prompt, and its flow A graph: the bundle every skeleton turn pins), and K-01's bundle-mini-a
- * (decide-reads-disagree.json's).
+ * routing policy and decide prompt, and its flow A graph: the bundle a skeleton turn pins by default), bundle v2 as
+ * bundles/v2 publishes it (T-1477: decide-2, and the same S1-01 and S1-02 byte for byte: the bundle an owner's sign-up
+ * turn pins, DL-1033), and K-01's bundle-mini-a (decide-reads-disagree.json's).
  */
 function decideBundles(): ReadonlyMap<string, DecideBundle> {
-  const manifest = BUNDLE_V0_PARTS.get(bundleKeyOf(BUNDLE_V0, "manifest"));
-  const flowA = BUNDLE_V0_PARTS.get(bundleKeyOf(BUNDLE_V0, "flow/A"));
-  if (manifest === undefined || flowA === undefined)
-    throw new Error("bundles/v0 holds its manifest and flow A");
   const miniA = bundleMiniA as unknown as CacheBundle;
   return new Map([
-    [bundleTextOf(BUNDLE_V0), decideBundleOf(JSON.parse(manifest), { A: JSON.parse(flowA) as CacheFlow })],
+    [bundleTextOf(BUNDLE_V0), publishedDecideBundle(BUNDLE_V0)],
+    [bundleTextOf(BUNDLE_V2), publishedDecideBundle(BUNDLE_V2)],
     [bundleTextOf(BUNDLE_B), decideBundleOf(miniA.manifest, miniA.flows)],
   ]);
 }
@@ -2188,10 +2287,10 @@ export interface FakeDecideModels {
   saw(event: LinqInboundEvent): void;
   /**
    * Records the two reads of a turn over these texts (in arrival order), as recording 2 holds the JOIN run's: its context
-   * is the JOIN run's (test owner 1's stored state on bundle v0) with the turn's own id (T-248's hash of the event ids)
-   * and texts (as the Linq double signed them: their words and send times), and both Haiku reads enter c-01 with the
-   * first text's words as the quote (decide-s1-01-enter.json's). It may be called before the texts are sent: the
-   * recording is made at the first decide request after they are all signed.
+   * is the JOIN run's (test owner 1's stored state on bundle v0, or on bundle v2 where the double was made for it) with
+   * the turn's own id (T-248's hash of the event ids) and texts (as the Linq double signed them: their words and send
+   * times), and both Haiku reads enter c-01 with the first text's words as the quote (decide-s1-01-enter.json's). It may
+   * be called before the texts are sent: the recording is made at the first decide request after they are all signed.
    */
   recordTurn(eventIds: readonly string[]): void;
   /** Holds one more recording: a test's own read of a context (a refused one included, which the loader would refuse). */
@@ -2204,14 +2303,15 @@ export interface FakeDecideModels {
  * bundle-mini-a), calling a fake Messages API whose every answer comes from the recorded-model double (T-004's
  * createRecordedModel), keyed as its loader keys a decide recording: the run's own context and the read's role. It holds
  * ai/recordings' turn 1 recordings as they are (recording 2 is the JOIN run's, keyed on the ids the runtime produces;
- * DL-347), decide-reads-disagree.json's three reads on its context, and what a test records. Each decide read is told
+ * DL-347), recording 2's reads on bundle v2 (`onBundleV2`), decide-reads-disagree.json's three reads on its context, and
+ * what a test records, on `bundleId`'s stored state (bundle v0's unless a test hands bundle v2). Each decide read is told
  * apart by its role: on the re-read, the re-read's; else by the model the route asks for it (the bundle's policy for the
  * turn's stakes), and a request both reads ask alike (Haiku twice, one choice) is answered only when both reads' answers
  * are the same. A request with no recording is a miss: kept, with what differs, and answered 404, so the read fails
  * loudly, never with a made-up answer. The decider is watched only to know which context and read each request is for
  * (the double answers one decide or re-read at a time). The key is made up for each run, never Anthropic's.
  */
-export function fakeDecideModels(log: string[] = []): FakeDecideModels {
+export function fakeDecideModels(log: string[] = [], bundleId: BundleId = BUNDLE_V0): FakeDecideModels {
   const held = new Map<string, { output: unknown }>();
   const ids = new Map<string, string>();
   const recordings: DecideRecording[] = [];
@@ -2235,7 +2335,8 @@ export function fakeDecideModels(log: string[] = []): FakeDecideModels {
     ids.set(key, recording.id);
     recordings.push(recording);
   };
-  for (const recording of [...shippedDecideRecordings(), ...disagreeRecordings()]) hold(recording);
+  const shipped = shippedDecideRecordings();
+  for (const recording of [...shipped, ...onBundleV2(shipped), ...disagreeRecordings()]) hold(recording);
 
   const answered = (output: unknown): Response =>
     new Response(
@@ -2395,7 +2496,11 @@ export function fakeDecideModels(log: string[] = []): FakeDecideModels {
     return recording;
   };
   const holdRecordedTurns = async (): Promise<void> => {
-    const base = structuredClone(joinRunContextJson);
+    // The JOIN run's context on the bundle the double was made for: bundle v0's as recorded, or bundle v2's (onBundleV2).
+    const base = {
+      ...structuredClone(joinRunContextJson),
+      bundleId: { hash: bundleId.hash, build: bundleId.build },
+    };
     const zone = base.texts[0]?.sentAt.zone;
     if (zone === undefined) throw new Error("the JOIN run's context holds its text");
     for (const eventIds of turns.splice(0)) {
@@ -2650,8 +2755,12 @@ export interface FakeFinalizeData {
   readonly plans: ReadonlyMap<string, StoredPlan>;
 }
 
-/** K-01's opener (S13-01): a row whose final parts carry it is Rosie's first text to its handle about its business. */
-const OPENER = "opener";
+/**
+ * K-01's two openers by id: `opener` (S13-01) and `signUpOpener` (S1-02's own words on an owner's sign-up text, K-01 README
+ * default 19; T-1511's OPENER_LINES). A row whose final parts carry either is Rosie's first text to its handle about its
+ * business (K-05 default 50 as T-1508 amends it: an earlier row counts when it carries either id; DL-1033 ruling 4).
+ */
+const OPENERS: readonly string[] = OPENER_LINES;
 
 /**
  * Finalize's K-05 calls (T-561; @rosie/actions' turn-face/pg/calls.ts pgRowData on PostgreSQL) as doubles over the rows the
@@ -2660,9 +2769,9 @@ const OPENER = "opener";
  *   readOutboxRow       as fakeComposeReads' (T-1138, T-1197), the row holding no plan; once writePlan wrote one, the row
  *                       as K-07's checked moves it (state checked, its version raised, hasPlan, its final parts);
  *   readFixedLineFacts  K-05 v1.3 item 36 (T-1138), as fixed-line-facts-s1-02.json: Rosie has texted the handle about the
- *                       row's business only when another of its rows there holds final parts that carry the opener (K-04
- *                       openers_sent's mark, as the double keeps it); the STOP, HELP and rates line was never delivered,
- *                       since test owner 1's seed holds no phone row;
+ *                       row's business only when another of its rows there holds final parts that carry an opener, either
+ *                       id (K-04 openers_sent's mark, as the double keeps it; K-05 default 50 as T-1508 amends it); the
+ *                       STOP, HELP and rates line was never delivered, since test owner 1's seed holds no phone row;
  *   writePlan           K-05 v1 item 2 (T-196, db/repo/outbox.ts; write-plan.json, write-plan-repeat.json): the plan and
  *                       the final parts written together, the row checked and its version raised; alreadyPlanned when the
  *                       row holds a plan (checked before the version), versionChanged, notFound; a plan or final parts
@@ -2717,8 +2826,10 @@ export function fakeFinalizeData(
       if (handleId !== TEST_OWNER_1.handleId) {
         return Promise.reject(new Error("the skeleton's readFixedLineFacts double holds no other recipient"));
       }
-      const carriesOpener = (id: string): boolean =>
-        plans.get(id)?.finalParts.fixedLines.includes(OPENER) ?? false;
+      const carriesOpener = (id: string): boolean => {
+        const fixedLines = plans.get(id)?.finalParts.fixedLines ?? [];
+        return OPENERS.some((opener) => fixedLines.includes(opener));
+      };
       const opened = [...plans.keys()].find((id) => {
         const other = outboxRow(id);
         return (
@@ -2913,7 +3024,8 @@ function turnTextOf(body: Record<string, unknown>): string {
 /**
  * @rosie/ai's composer for each bundle (T-373's call, T-374's one rewrite and T-375's reader checks: the real composer,
  * its prompt layout and the AI gateway), over K-01's manifests (bundle v0 as bundles/v0 publishes it, with its composer
- * prompt), calling a fake Messages API whose every answer comes from the recorded-model double (T-004's
+ * prompt; bundle v2 as bundles/v2 publishes it, T-1477), calling a fake Messages API whose every answer comes from the
+ * recorded-model double (T-004's
  * createRecordedComposer), keyed as its loader keys a composer recording: the input's canonical JSON. It holds
  * ai/recordings' composer.v1.1.json recordings as they are (recording 4 is the JOIN run's S1-02 row, keyed on the ids the
  * runtime produces; DL-347) and what a test records. A call is answered only when its user message is exactly the tagged
@@ -4562,8 +4674,9 @@ export interface SkeletonFakes {
    */
   readonly turnRows: FakeTurnRows;
   /**
-   * K-05 v1 item 7's bundle reads as a double over bundle v0 as bundles/v0 publishes it, for the root's real bundle port
-   * (RootOptions.bundleReads: `bundleReads.calls`): every read, in order.
+   * K-05 v1 item 7's bundle reads as a double over bundle v0 as bundles/v0 publishes it and bundle v2's manifest and flow
+   * A, with the bundle the fakes were made for active (bundle v0 unless the test handed bundle v2), for the root's real
+   * bundle port (RootOptions.bundleReads: `bundleReads.calls`): every read, in order.
    */
   readonly bundleReads: FakeBundleReads;
   /**
@@ -4657,14 +4770,26 @@ export interface SkeletonFakes {
   known(eventId: string): void;
 }
 
+/** What a test may choose of the skeleton's fakes. */
+export interface SkeletonOptions {
+  /**
+   * The bundle the bundle double holds active, which each turn pins (T-249): bundle v0 by default; bundle v2 (BUNDLE_V2,
+   * T-1477) for a test whose turn reaches finalize on an owner's sign-up row, since finalize refuses that text on a bundle
+   * without signUpOpener (K-01 README default 19; T-1511, T-1512; DL-1033 ruling 2). Decide's double then reads the JOIN
+   * run's context on that bundle (`onBundleV2`, `recordTurn`).
+   */
+  readonly bundle?: BundleId;
+}
+
 /** Every port on its fake, answering the walking skeleton's turn for Sam (S1-02), on one test clock. */
-export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
+export function skeletonFakes(clock: TestClock = testClock(), options: SkeletonOptions = {}): SkeletonFakes {
+  const active = options.bundle ?? BUNDLE_V0;
   // Test owner 1's handle and person are the seed's (T-1148), with no key: the key call finds them and makes the key
   // (handle-key-person-no-key.json), so the handle id it answers is handle-sam, the one the turn and the dispatcher name.
   const handleKeys = fakeHandleKeys(() => clock.now(), [TEST_OWNER_1]);
   const models = fakeSafetyModels(skeletonSafetyDouble());
   const turnRows = fakeTurnRows();
-  const bundleReads = fakeBundleReads();
+  const bundleReads = fakeBundleReads(active);
   const handleTargets = fakeHandleTargets();
   const frontier = fakeFrontierScope(() => clock.utc());
   const gate = fakeGateReads(turnRows);
@@ -4676,7 +4801,7 @@ export function skeletonFakes(clock: TestClock = testClock()): SkeletonFakes {
   const timerFire = fakeTimerFire(() => clock.now());
 
   const face = fakeTurnFace();
-  const decide = fakeDecideModels(face.log);
+  const decide = fakeDecideModels(face.log, active);
   // Compose input and the composer are joined (T-560): their doubles log to the face's log as the stand-ins did.
   const compose = fakeComposeReads(turnRows, () => clock.now(), face.log);
   const composer = fakeComposerModels(face.log);

@@ -27,7 +27,12 @@ import { addressedAs } from "../../compose-input";
 import type { Role } from "../../domain/identity-access";
 import { readerOf } from "../../finalize/claim-check";
 import { FixedLineRefusedError } from "../../finalize/fixed-lines";
-import { fakeBundles, sampleBundle, type BundleDocument } from "../../frontier/assemble/test-support";
+import {
+  fakeBundles,
+  sampleBundle,
+  type BundleDocument,
+  type FakeBundles,
+} from "../../frontier/assemble/test-support";
 import { contractFile, fixture, traceFor } from "../test-support";
 import { createToolApi, type ToolApi } from "../tool-api";
 import { createToolApiValidator } from "../validator";
@@ -35,9 +40,11 @@ import {
   ROW_READER_ACCEPTED,
   ROW_READER_REFUSED,
   bundleOfRequest,
+  bundleV2Id,
   commitRequestAfter,
   composeS102,
   firstTextFacts,
+  fixedLineFactsS102,
   joinComposeInput,
   joinComposeRequest,
   joinHeldTurn,
@@ -47,11 +54,13 @@ import {
   outboxRowSwitchLeftOut,
   outboxRowTurnOne,
   publishedBundleV0,
+  publishedBundleV2,
   readOfRequest,
   rowCalls,
   rowDoubles,
   rowReaderFixture,
   rowReaderProblems,
+  rowUnderBundleV2,
   rowUnderPublishedV0,
   type RowDoubles,
 } from "./calls-test-support";
@@ -64,6 +73,7 @@ import {
   readerOfRow,
   safetyLinesFor,
   sensitiveOf,
+  signUpOf,
   type OutboxRowRead,
 } from "./rows";
 import { callHandlers, createTurnFace, type TurnFace } from "./turn-face";
@@ -792,5 +802,121 @@ describe("the sensitive switch: K-05 v1.6's businessSensitive for a row about no
       inbound: recording.inbound,
     }).toEqual(recording);
     expect(recording.situation).toBe("routine");
+  });
+});
+
+describe("the sign-up opener through the turn face: the switch from the row's own reading (T-1511; K-01 README default 19; DL-1033)", () => {
+  /** S1-02's sign-up opener words, bundle v2's 16th fixed line (T-1477). */
+  const SIGN_UP_OPENER = "Hi! I'm Rosie, an automated assistant.";
+  const NAMED_OPENER = "This is Rosie, the automated booking assistant for Lee's Barbershop.";
+
+  /** Bundle v2 (bundles/v2) with its S1-02 changed, a test's own copy. */
+  function v2WithS102(change: (step: Json) => void): BundleDocument {
+    const bundle = publishedBundleV2();
+    const step = (bundle.flows.A as { steps: Record<string, Json | undefined> }).steps["S1-02"];
+    if (step === undefined) throw new Error("bundle v2 holds S1-02");
+    change(step);
+    return bundle;
+  }
+
+  /** finalize-pass.json's request through the face on `row`, read in `bundle`, with K-05's fixed-line facts `facts`. */
+  async function finalizeOn(row: OutboxRowRead, bundle: BundleDocument, facts = fixedLineFactsS102()) {
+    const doubles = rowDoubles({ row, facts, bundle });
+    const { request } = finalizeExchange();
+    const called = await settle(
+      faceOf(doubles).finalizeMessage(structuredClone(request), traceFor(request).trace),
+    );
+    const answer = called.answer as
+      (Json & { finalParts: { fixedLines: string[]; sends: { text: string }[] } }) | undefined;
+    return { doubles, called, answer, text: answer?.finalParts.sends[0]?.text ?? "" };
+  }
+
+  it("signUpOf: true only for the owner read by the sign-up line on a step whose needs do not hold business (a step with no needs does not)", async () => {
+    const turnOne = outboxRowTurnOne();
+    const byLine = await readingOf(turnOne);
+    const byRole = await readingOf(outboxRowS102());
+    const custLine = await readingOf(turnOne, withSayTo(["cust"]));
+    const readings = [byLine, byRole, custLine].map((reading) => {
+      if ("error" in reading.outcome) throw new Error("each row is read");
+      return { outcome: reading.outcome, step: reading.step.step };
+    });
+    const [line, role, cust] = readings;
+    if (line === undefined || role === undefined || cust === undefined) throw new Error("three readings");
+    expect([line.outcome.from, line.outcome.reader]).toEqual(["signUpLine", "owner"]);
+    expect(line.step.needs).toEqual(["thread"]);
+
+    expect(signUpOf(line.outcome, line.step)).toBe(true);
+    expect(signUpOf(line.outcome, { ...line.step, needs: undefined })).toBe(true);
+    expect(signUpOf(line.outcome, { ...line.step, needs: [] })).toBe(true);
+    expect(signUpOf(line.outcome, { ...line.step, needs: ["companies", "business"] })).toBe(false);
+    // A reader by a role (the owner who holds the owner role) and a customer read by the line keep opener.
+    expect([role.outcome.from, role.outcome.reader]).toEqual(["roles", "owner"]);
+    expect(signUpOf(role.outcome, role.step)).toBe(false);
+    expect([cust.outcome.from, cust.outcome.reader]).toEqual(["signUpLine", "customer"]);
+    expect(signUpOf(cust.outcome, cust.step)).toBe(false);
+    expect(signUpOf({ ...line.outcome, reader: "staff" }, line.step)).toBe(false);
+  });
+
+  it("turn 1's row to Sam with no role, read by S1-02's sign-up line as the owner, on bundle v2: finalize-pass.json's plan opens with signUpOpener, fixedLines [signUpOpener, privacyLink], never the business's name; no read is added", async () => {
+    const bundle = publishedBundleV2();
+    const { doubles, called, answer, text } = await finalizeOn(rowUnderBundleV2(outboxRowTurnOne()), bundle);
+    expect(called.thrown).toBeUndefined();
+    expect(validator.check("finalizeMessage", "response", answer)).toEqual([]);
+    expect(answer?.outcome).toBe("send");
+    // fixed-line-facts-s1-02.json: the opt-out line was delivered before, so the ids go signUpOpener, then privacyLink.
+    expect(answer?.finalParts.fixedLines).toEqual(["signUpOpener", "privacyLink"]);
+    expect(text.startsWith(`${SIGN_UP_OPENER} `)).toBe(true);
+    expect(text.split("\n").at(-1)).toBe("Privacy notice: rosfield.com/test/privacy");
+    expect(text).not.toContain("Lee's Barbershop");
+    expect(text).not.toContain("booking assistant for");
+    expect(doubles.plans.map((plan) => plan.finalParts)).toEqual([answer?.finalParts]);
+    // The switch comes from the reading the call already made: K-05's two reads, and the bundle's manifest and flow A
+    // read once each, as for any row.
+    expect(doubles.reads).toEqual([
+      "readOutboxRow outbox-s1-02-sam-1@biz-lees-barbershop",
+      "readFixedLineFacts outbox-s1-02-sam-1@biz-lees-barbershop",
+    ]);
+    const { hash, build } = bundleV2Id();
+    expect((doubles.binding.bundles as FakeBundles).reads).toEqual([
+      `${hash}/${String(build)}/manifest`,
+      `${hash}/${String(build)}/flow/A`,
+    ]);
+
+    // Turn 1 on T-1148's seed (no phone row): the opt-out line rides between them.
+    const seeded = await finalizeOn(rowUnderBundleV2(outboxRowTurnOne()), bundle, firstTextFacts());
+    expect(seeded.answer?.finalParts.fixedLines).toEqual(["signUpOpener", "optOutLine", "privacyLink"]);
+    expect(seeded.text.startsWith(`${SIGN_UP_OPENER} `)).toBe(true);
+  });
+
+  it("the same row on a section 1 step that needs business keeps opener with the business's name (S1-77, S1-10: after S1-09)", async () => {
+    const needsBusiness = v2WithS102((step) => {
+      step.needs = ["thread", "business"];
+    });
+    const { answer, text } = await finalizeOn(rowUnderBundleV2(outboxRowTurnOne()), needsBusiness);
+    expect(answer?.outcome).toBe("send");
+    expect(answer?.finalParts.fixedLines).toEqual(["opener", "privacyLink"]);
+    expect(text.startsWith(`${NAMED_OPENER} `)).toBe(true);
+    expect(text).not.toContain(SIGN_UP_OPENER);
+  });
+
+  it("Sam holding his owner role, on bundle v2, keeps opener with the name: the switch is the reading, never the bundle", async () => {
+    const { answer, text } = await finalizeOn(rowUnderBundleV2(outboxRowS102()), publishedBundleV2());
+    expect(answer?.outcome).toBe("send");
+    expect(answer?.finalParts.fixedLines).toEqual(["opener", "privacyLink"]);
+    expect(text.startsWith(`${NAMED_OPENER} `)).toBe(true);
+    expect(text).not.toContain(SIGN_UP_OPENER);
+  });
+
+  it("on a pinned bundle without the line (bundle v0 as published), the sign-up row's text is refused whole (lineNotInBundle: signUpOpener), never opener in its place, and nothing is written", async () => {
+    const { doubles, called } = await finalizeOn(
+      rowUnderPublishedV0(outboxRowTurnOne()),
+      publishedBundleV0(),
+    );
+    expect(called.thrown).toBeInstanceOf(FixedLineRefusedError);
+    expect(called.thrown).toMatchObject({ fault: "lineNotInBundle", line: "signUpOpener" });
+    expect(doubles.plans).toEqual([]);
+    // The same bundle still sends a role-holder's first text with opener (above: T-1146's proof).
+    const role = await finalizeOn(rowUnderPublishedV0(outboxRowS102()), publishedBundleV0());
+    expect(role.answer?.finalParts.fixedLines).toEqual(["opener", "privacyLink"]);
   });
 });

@@ -28,8 +28,11 @@
 //     answers.texts (gateAndCommit's context.texts, held by the face for its turn: held.ts), only when answers.handleId
 //     is the recipient's (DL-326 note d), else none; never words read from the database;
 //   - finalize's question: the row's question with its clock row (a question with no clock row is refused: default 54);
-//   - the fixed lines' facts: readFixedLineFacts' two facts, readOutboxRow's answers.texts as read (T-1164), and the row's
-//     other lines: a K-01 safety line only on a row to the danger text's writer, never safetyAsk (DL-355).
+//   - the fixed lines' facts: readFixedLineFacts' two facts, readOutboxRow's answers.texts as read (T-1164), the row's
+//     other lines: a K-01 safety line only on a row to the danger text's writer, never safetyAsk (DL-355); and the
+//     sign-up switch (K-01 README default 19, T-1511: signUpOf), from the reading this call already made for the reader,
+//     kept beside the read: the owner read by the sign-up line on a step whose needs do not hold `business` opens with
+//     signUpOpener, every other row with opener. No other read, and no K-05 change.
 // Nothing here logs; a refusal names a fault, never a value.
 //
 // The sensitive switch (K-05 v1.6 item 45 and default 67; RULES 4.6; S13-22; T-1190, DL-391, DL-395, DL-402). It is
@@ -345,6 +348,8 @@ function termsOf(line: Json): string[] {
 interface RowView {
   readonly read: OutboxRowRead;
   readonly step: StepRead;
+  /** Item 44's reading of the row (K-05 v1.5 rowReader's outcome): by a role or by the sign-up line. */
+  readonly outcome: K05.RowReaderResponse;
   readonly stepId: string;
   readonly index: number;
   readonly reader: Reader;
@@ -402,6 +407,7 @@ async function viewOf(
   return {
     read,
     step,
+    outcome,
     stepId,
     index: read.line.index,
     reader,
@@ -524,9 +530,21 @@ function listsOf(manifest: Json): CheckLists {
   return { keywords: lists.keywords, fixedLines: lists.fixedLines } as CheckLists;
 }
 
-/** The finalize row of one read: item 35's table, then the defaults at the top. */
-export async function finalizeRowOf(binding: RowBinding, read: OutboxRowRead): Promise<FinalizeRow> {
-  const view = await viewOf(binding, read, "finalizeMessage");
+/**
+ * K-01 README default 19's switch (T-1510; DL-1033 fault 1; FixedLineFacts.signUp), from the reading this call already
+ * made of the row: (a) the reader is read by the sign-up line as the owner (rowReader's `from` signUpLine, `reader`
+ * owner), and (b) the row's step, as the row's own bundle holds it, does not need `business` (K-01 step.needs; a step
+ * with no needs does not). S1-09 gives business, so a step that needs it (S1-77, S1-10) comes after S1-09 and keeps the
+ * named opener. A reader by a role, staff or a customer read by the line, and a step that needs business: false.
+ */
+export function signUpOf(outcome: K05.RowReaderResponse, step: Json): boolean {
+  const needs: unknown[] = Array.isArray(step.needs) ? step.needs : [];
+  return outcome.from === "signUpLine" && outcome.reader === "owner" && !needs.includes("business");
+}
+
+/** The finalize row of one row view: item 35's table, then the defaults at the top. */
+function finalizeRowOfView(view: RowView): FinalizeRow {
+  const { read } = view;
   const question = read.slotSource.question;
   const clock = question?.clockRow ?? null;
   if (question !== null && clock === null) throw new TurnFaceRefusedError("noClockRow");
@@ -578,6 +596,11 @@ export async function finalizeRowOf(binding: RowBinding, read: OutboxRowRead): P
   return { ...row, checks: { ...row.checks, businessName: claimedBusiness(row) } };
 }
 
+/** The finalize row of one read: item 35's table, then the defaults at the top. */
+export async function finalizeRowOf(binding: RowBinding, read: OutboxRowRead): Promise<FinalizeRow> {
+  return finalizeRowOfView(await viewOf(binding, read, "finalizeMessage"));
+}
+
 /** Default 9: each danger outcome's K-01 line on a row to the danger text's writer; never safetyAsk, never a threat's. */
 export function safetyLinesFor(read: OutboxRowRead): string[] {
   if (read.answers.handleId !== read.recipient.handleId) return [];
@@ -593,14 +616,23 @@ export function safetyLinesFor(read: OutboxRowRead): string[] {
   return lines;
 }
 
+/** One call's row read with item 44's reading of it (rowReader's outcome and the step it was read from). */
+interface ReadRow {
+  readonly read: OutboxRowRead;
+  readonly outcome: K05.RowReaderResponse;
+  readonly step: Json;
+}
+
 /** Finalize's deps: readRow, the fixed lines' facts, writePlan and cancelClock over K-05, review items not built. */
 export function finalizeDeps<Repo>(binding: RowBinding): FinalizeDeps<Repo> {
-  // Each call's row read, for the fixed lines' facts of the same call (answers.texts as read: T-1164).
-  const reads = new WeakMap<CallContext<Repo>, OutboxRowRead>();
+  // Each call's row read and its reading, for the fixed lines' facts of the same call (answers.texts as read: T-1164;
+  // the sign-up switch from the reading the call already made: K-01 README default 19, T-1511), so no read is added.
+  const reads = new WeakMap<CallContext<Repo>, ReadRow>();
   const facts: FixedLinePorts<Repo> = {
     async readFixedLines(row, call): Promise<FixedLineFacts> {
-      const read = reads.get(call);
-      if (read?.outboxRowId !== row.outboxRowId) throw new FinalizeNotBuiltError("insertFixedLines");
+      const held = reads.get(call);
+      if (held?.read.outboxRowId !== row.outboxRowId) throw new FinalizeNotBuiltError("insertFixedLines");
+      const { read } = held;
       const answer = await binding.data.readFixedLineFacts({
         outboxRowId: row.outboxRowId,
         businessId: call.businessId,
@@ -608,6 +640,7 @@ export function finalizeDeps<Repo>(binding: RowBinding): FinalizeDeps<Repo> {
       if ("error" in answer) throw new TurnFaceReadError("readFixedLineFacts", answer.error);
       return {
         textedAboutBusiness: answer.textedAboutBusiness,
+        signUp: signUpOf(held.outcome, held.step),
         optOutLineDeliveredAt: answer.optOutLineDeliveredAt,
         lines: safetyLinesFor(read),
         answeredTexts: read.answers.texts,
@@ -621,8 +654,9 @@ export function finalizeDeps<Repo>(binding: RowBinding): FinalizeDeps<Repo> {
         if (read.error === "fixedLineRow") throw new FinalizeRefusedError("fixedLineRow");
         return rowErrorOf(read);
       }
-      reads.set(call, read);
-      return finalizeRowOf(binding, read);
+      const view = await viewOf(binding, read, "finalizeMessage");
+      reads.set(call, { read, outcome: view.outcome, step: view.step.step });
+      return finalizeRowOfView(view);
     },
     insertFixedLines: fixedLineInserter(facts),
     writePlan: (request) => binding.data.writePlan(request),
