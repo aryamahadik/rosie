@@ -493,4 +493,72 @@ export const EXCEPTIONS = [
       "bundle v1.1's KV bulk file, which holds its trade overlays compiled from the master's own trade text",
     ),
   ),
+
+  // Bundle v2 (T-1477, DL-999, DL-1033): every trade overlay of the compiler's whole build, so the same trades, each
+  // naming the same public line as bundle v1's copy, and its KV bulk file, which holds every overlay's bytes.
+  ...[
+    [
+      PUBLIC_LINES.poisonHelp,
+      [
+        "allergist",
+        "cardiologist",
+        "credit-counselor",
+        "dentist",
+        "dermatologist",
+        "doula",
+        "endocrinologist",
+        "ent",
+        "gastroenterologist",
+        "hair-restoration",
+        "iv-hydration",
+        "lactation",
+        "lawn",
+        "midwife",
+        "neurologist",
+        "ophthalmologist",
+        "optometrist",
+        "oral-surgeon",
+        "orthodontist",
+        "orthopedist",
+        "painter",
+        "pediatrician",
+        "pest",
+        "pharmacist",
+        "plastic-surgeon",
+        "pool",
+        "pressure",
+        "primary-care",
+        "psychic",
+        "senior-living",
+        "urgent-care",
+        "urologist",
+      ],
+    ],
+    [
+      PUBLIC_LINES.domesticViolence,
+      ["immigration-services", "lawyer", "mediator", "movers", "private-investigator"],
+    ],
+    [PUBLIC_LINES.elderFraud, ["advisor", "insurance"]],
+    [PUBLIC_LINES.housingCounseling, ["mortgage"]],
+  ].flatMap(([line, names]) =>
+    names.map((trade) =>
+      publicLine(
+        `bundles/v2/bundle/trade/${trade}.json`,
+        line,
+        "a trade overlay of bundle v2, compiled from the master's own trade text",
+      ),
+    ),
+  ),
+  ...[
+    PUBLIC_LINES.poisonHelp,
+    PUBLIC_LINES.domesticViolence,
+    PUBLIC_LINES.elderFraud,
+    PUBLIC_LINES.housingCounseling,
+  ].map((line) =>
+    publicLine(
+      "bundles/v2/bundle.kv.json",
+      line,
+      "bundle v2's KV bulk file, which holds its trade overlays compiled from the master's own trade text",
+    ),
+  ),
 ];
