@@ -2,9 +2,72 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 829, [`995f918f`](https://github.com/aryamahadik/rosie/commit/995f918f), 2026-11-21 09:02:23 UTC.
+- **Through:** commit 832, [`7e57119f`](https://github.com/aryamahadik/rosie/commit/7e57119f), 2026-11-21 09:34:25 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 832. docs: COMMIT\_HISTORY.md through commit 829 (995f918f, \#842) (\#843)
+
+- **Commit:** [`7e57119f`](https://github.com/aryamahadik/rosie/commit/7e57119f), by Arya Mahadik, 2026-11-21 09:34:25 UTC
+- **Pull request:** [#843](https://github.com/aryamahadik/rosie/pull/843) from `task/commit-history-199`, merged 2026-11-21 09:34:25 UTC. It squashed 1 branch commit:
+  - `98e3375` docs: COMMIT\_HISTORY.md through commit 829 (995f918f, \#842)
+- **Files changed:** 1 (+46 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +46 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 831. T-1491: one-kind path, the walk asks a bound buttons settler at a plain step with buttons; K-09 README default 199 (DL-1033, DL-1041) (\#840)
+
+- **Commit:** [`e4c2fbb4`](https://github.com/aryamahadik/rosie/commit/e4c2fbb4), by Arya Mahadik, 2026-11-21 09:34:21 UTC
+- **Pull request:** [#840](https://github.com/aryamahadik/rosie/pull/840) from `task/T-1491`, merged 2026-11-21 09:34:21 UTC. It squashed 2 branch commits:
+  - `03c827e` T-1491: K-09 README default 199 and open gap 178 (no new version, fro…
+  - `f042e9c` T-1491: the walk asks a bound buttons settler (WalkDeps.buttonsSettle…
+- **Files changed:** 8 (+1161 −45), by folder:
+  - `actions/src/commit/walk/` buttons.test.ts +698 −0, buttons.ts +111 −0, errors.ts +5 −2, index.ts +21 −3, test-support.ts +89 −0, walk.ts +50 −3, writes.ts +160 −36
+  - `contracts/tool-api/` README.md +27 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1491: K-09 README default 199 and open gap 178 (no new version, from T-1515's card under DL-1041 item 4): S1-04's one-kind settler, WalkDeps.buttonsSettlers, asked once where the walk would stop at a plain step with buttons, after the rows before it; ask or rows; S1-04's count by kind; S1-08 needs the stop reads; the stand-in name before S1-09 (DL-1032, DL-1033 ruling 7)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1491: the walk asks a bound buttons settler (WalkDeps.buttonsSettlers, K-09 README default 199) once where it would stop at a plain step with buttons that no hold keeps back, after the rows before it; ask: the step asked as today; rows: written as walked (givesNotStep) and the walk goes on from its next (walk.ts Stretch.walkOn), holds re-checked, one loop check and MAX_WALK; refusal, throw or settledNotRows: nothing written; none bound: today's walk byte for byte; T-1502's settlers untouched
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 830. T-1516: staging's gate binds the stop home's reads on the runtime side, and gateBindingOf hands them to the sign-up writers, so S1-03's and S1-74's messages are written (DL-1033 ruling 8; CQ-360) (\#837)
+
+- **Commit:** [`bd697d0f`](https://github.com/aryamahadik/rosie/commit/bd697d0f), by Arya Mahadik, 2026-11-21 09:34:17 UTC
+- **Pull request:** [#837](https://github.com/aryamahadik/rosie/pull/837) from `task/T-1516`, merged 2026-11-21 09:34:17 UTC. It squashed 1 branch commit:
+  - `e074ebe` T-1516: staging's gate binds the stop home's reads on the runtime sid…
+- **Files changed:** 4 (+574 −42), by folder:
+  - `runtime/src/wiring/` gate-binding.test.ts +285 −7, real.ts +49 −11
+  - `runtime/src/wiring/staging/` tool-api-gate.ts +87 −22, tool-api-gate.worker.test.ts +153 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+StopHomeReads from the runtime's MessagesReader and FlagsReader members over db/repo, each on a runtime-side client of its own, no slot, scrubbed errors; GateReads.stop; unit cases for 'One isn't on the list yet' and 'Not a service we book' bound and unbound; worker cases for the reads' clients and a failed read.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 829. docs: COMMIT\_HISTORY.md through commit 827 (02d9e164, \#839) (\#842)
 
