@@ -2,9 +2,53 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 821, [`c0176bf`](https://github.com/aryamahadik/rosie/commit/c0176bf), 2026-11-21 02:12:11 UTC.
+- **Through:** commit 823, [`5a30e70`](https://github.com/aryamahadik/rosie/commit/5a30e70), 2026-11-21 03:03:31 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 823. docs: COMMIT\_HISTORY.md through commit 821 (c0176bf, \#832) (\#834)
+
+- **Commit:** [`5a30e70`](https://github.com/aryamahadik/rosie/commit/5a30e70), by Arya Mahadik, 2026-11-21 03:03:31 UTC
+- **Pull request:** [#834](https://github.com/aryamahadik/rosie/pull/834) from `task/commit-history-195`, merged 2026-11-21 03:03:31 UTC. It squashed 1 branch commit:
+  - `9cd178a` docs: COMMIT\_HISTORY.md through commit 821 (c0176bf, \#832)
+- **Files changed:** 1 (+35 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +35 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 822. T-1473: migration 0039: outbox\_rows.step and line\_no (S1-04 design card 4) (\#833)
+
+- **Commit:** [`f57e919`](https://github.com/aryamahadik/rosie/commit/f57e919), by Arya Mahadik, 2026-11-21 03:03:28 UTC
+- **Pull request:** [#833](https://github.com/aryamahadik/rosie/pull/833) from `task/T-1473`, merged 2026-11-21 03:03:28 UTC. It squashed 2 branch commits:
+  - `3a49a17` T-1473: migration 0039, outbox\_rows.step and line\_no with K-04 v1.2's…
+  - `61b698f` T-1473: money.int's migration-name pin gains core\_outbox\_step\_line (0…
+- **Files changed:** 3 (+232 −3), by folder:
+  - `db/migrations/` 0039\_core\_outbox\_step\_line.sql +44 −0
+  - `db/repo/` money.int.test.ts +3 −1, outbox-schema.int.test.ts +185 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1473: migration 0039, outbox_rows.step and line_no with K-04 v1.2's three CHECKs; outbox-schema catalog pinned to core.v1.2.tables.json
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1473: money.int's migration-name pin gains core_outbox_step_line (0039), slice(-10) (DL-1034's grant, a pin-only edit as T-1457 and T-1463 made)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 821. docs: COMMIT\_HISTORY.md through commit 819 (1a1ce44, \#830) (\#832)
 
