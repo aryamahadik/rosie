@@ -1,0 +1,69 @@
+{
+  "call": "readOutboxRow",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json", "seed-phone-chat-open.json"],
+    "after": ["commit-s1-04-sam-lines.json"],
+    "now": "2026-10-19T18:20:04Z",
+    "note": "An older row, with neither column, beside rows that hold their own: turn 1's outbox-s1-02-sam-1, which commit-s1-01-sam wrote with no step and no line (as every row before v1.22, and every row of a caller not yet on it, is written), read under the barbershop's scope after commit-s1-04-sam-lines wrote S1-08's and S1-09's rows with theirs. The read answers it exactly as v1.6's read-outbox-row-s1-02-no-kinds.json does, every field the same but the moment: line from the question it asks, step S1-02 at index 0, from openQuestion (README item 83: the row's own pair first, else the question's as v1.3 does, else null), its question oq-s1-02-sam-1 still waiting at version 1 with its clock row, and businessSensitive null. No row is backfilled (README default 212; K-04 core v1.2 default 27). S1-09's question, opened since, is not listed among the questions still open with Sam, since its row has not gone (README default 51)."
+  },
+  "request": {
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "businessId": "biz-lees-barbershop"
+  },
+  "outcome": {
+    "result": "outboxRow",
+    "outboxRowId": "outbox-s1-02-sam-1",
+    "businessId": "biz-lees-barbershop",
+    "readAt": "2026-10-19T18:20:04Z",
+    "row": {
+      "turnId": "turn-s1-01-sam",
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "state": "planned",
+      "version": 1,
+      "channel": "imessage",
+      "sendClass": "quick_reply",
+      "bookingId": null,
+      "openQuestionId": "oq-s1-02-sam-1",
+      "copyOfRowId": null,
+      "hasPlan": false,
+      "finalParts": null
+    },
+    "line": { "step": "S1-02", "index": 0, "from": "openQuestion" },
+    "recipient": {
+      "handleId": "handle-sam",
+      "kind": "phone",
+      "personId": "person-sam",
+      "name": "Sam Lee",
+      "storedLanguage": "en",
+      "roles": [{ "roleId": "role-sam-barber", "role": "owner", "version": 1 }],
+      "phone": { "stopped": false, "chatOpen": true, "chatWay": "imessage", "pollVotedAt": null, "version": 2 }
+    },
+    "answers": {
+      "handleId": "handle-sam",
+      "texts": [{ "eventId": "evt-sam-s1-01", "outcomes": null, "tenses": null }]
+    },
+    "slotSource": {
+      "business": {
+        "id": "biz-lees-barbershop",
+        "name": "Lee's Barbershop",
+        "displayName": "Lee's Barbershop",
+        "timeZone": "America/New_York",
+        "version": 3
+      },
+      "booking": null,
+      "question": {
+        "id": "oq-s1-02-sam-1",
+        "step": "S1-02",
+        "status": "waiting",
+        "options": [],
+        "readback": null,
+        "clock": null,
+        "askCount": 1,
+        "version": 1,
+        "clockRow": { "id": "clock-oq-s1-02-sam-1", "state": "waiting", "dueAt": null, "dueZone": null, "version": 1 }
+      }
+    },
+    "businessSensitive": null,
+    "openQuestions": []
+  }
+}

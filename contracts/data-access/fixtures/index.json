@@ -3223,6 +3223,38 @@
       "expect": "refuse",
       "shows": "commit-s1-02-sam-asks-again with the question it asks again also closed, answered, in the same commit: a commit that asks a question again closes none, so a question is never raised and closed together (its one fault request.writes.openQuestions.close.0; put right, it is commit-s1-02-sam-asks-again)",
       "source": "ops/cards/T-1508.md ('a question raised and closed in the same commit is refused (say which refusal)'); K-09 v1.12 default 192 ('openQuestions opens and closes nothing') and refuse-s1-02-asked-question-closed.json; K-05 v1.21 item 81 and default 194"
+    },
+    {
+      "file": "commit-s1-04-sam-lines.json",
+      "version": "v1.22",
+      "def": "commitTurn.rowLineExchange",
+      "expect": "accept",
+      "shows": "The two rows S1-04's walk writes after it, each naming its own step and line: out-s1-08-sam (step S1-08, line 0), which asks no question, beside out-s1-09-sam (step S1-09, line 0), which asks S1-09's question, opened with its clock row in the same commit; the answer names the question and its clock row at version 1 and the rows at commitSeq 2 and 3, a row's step and line changing nothing in it",
+      "source": "ops/cards/T-1474.md (Gives 1; Fixtures: 'a commit that writes a no-question row (S1-08's, beside S1-09's question row)'); ops/reviews/s1-04-design/check-merge.json decision (e) and card 5; MASTER-FLOW-A S1-08 and S1-09; K-04 core v1.2 outbox_rows.step and line_no (migration 0039); K-09 v1.11 commit-s1-04.json; K-05 v1.22 item 82 and defaults 206 and 207"
+    },
+    {
+      "file": "read-outbox-row-s1-08-sam.json",
+      "version": "v1.22",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "S1-08's row, which asks no question, read after commit-s1-04-sam-lines: line from the row's own step and line (S1-08, index 0, from row) where v1.3 to v1.21 answered null, and slotSource.question null, so finalize's question is null for it",
+      "source": "ops/cards/T-1474.md (Gives 3 and 4; Fixtures: 'a read of that row (from row)'); K-05 README open gap 29 (closed) and default 48; ops/reviews/s1-04-design/check-merge.json decision (e) (turn-face-reads.ts:772-776 read the line only from the question); K-05 v1.22 item 83 and default 208"
+    },
+    {
+      "file": "read-outbox-row-s1-02-older-row.json",
+      "version": "v1.22",
+      "def": "readOutboxRow.exchange",
+      "expect": "accept",
+      "shows": "Turn 1's outbox-s1-02-sam-1, written before v1.22 with neither column, read beside the rows commit-s1-04-sam-lines wrote with theirs: unchanged, line from the question it asks (S1-02, index 0, from openQuestion), every field as v1.6's read-outbox-row-s1-02-no-kinds answers it but the moment",
+      "source": "ops/cards/T-1474.md (Gives 3: 'else the question's as v1.3 does'; Fixtures: 'an older row with neither column (unchanged, from openQuestion)'); K-05 v1.3 item 35 and default 48; K-04 core v1.2 default 27 (no backfill); K-05 v1.22 item 83 and default 212"
+    },
+    {
+      "file": "invalid/refuse-commit-s1-04-sam-step-without-line.json",
+      "version": "v1.22",
+      "def": "commitTurn.rowLineExchange",
+      "expect": "refuse",
+      "shows": "commit-s1-04-sam-lines with S1-08's row naming its step and no lineNo: a row names its step and line together or neither, so a half-named line is never written (its one fault request.writes.outboxRows.0, lineNo missing beside step; put right, it is commit-s1-04-sam-lines)",
+      "source": "ops/cards/T-1474.md (Gives 1: 'both or neither'; 'Refused: a step with no lineNo'); K-04 core v1.2 outbox_rows_step_with_line and refuse-outbox-row-step-without-line.json; DL-999 decision (e); K-05 v1.22 item 82 and default 206 (outboxRowNew dependentRequired)"
     }
   ]
 }
