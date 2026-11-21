@@ -2,9 +2,54 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 827, [`02d9e164`](https://github.com/aryamahadik/rosie/commit/02d9e164), 2026-11-21 07:55:12 UTC.
+- **Through:** commit 829, [`995f918f`](https://github.com/aryamahadik/rosie/commit/995f918f), 2026-11-21 09:02:23 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 829. docs: COMMIT\_HISTORY.md through commit 827 (02d9e164, \#839) (\#842)
+
+- **Commit:** [`995f918f`](https://github.com/aryamahadik/rosie/commit/995f918f), by Arya Mahadik, 2026-11-21 09:02:23 UTC
+- **Pull request:** [#842](https://github.com/aryamahadik/rosie/pull/842) from `task/commit-history-198`, merged 2026-11-21 09:02:23 UTC. It squashed 1 branch commit:
+  - `2d65072` docs: COMMIT\_HISTORY.md through commit 827 (02d9e164, \#839)
+- **Files changed:** 1 (+878 −826), by folder:
+  - `/` COMMIT\_HISTORY.md +878 −826
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 828. T-1508: K-05 v1.21: raise one live open question's ask count; the opener mark and opt-out delivery defaults (DL-1030, DL-1033, DL-1045) (\#841)
+
+- **Commit:** [`16ef4d60`](https://github.com/aryamahadik/rosie/commit/16ef4d60), by Arya Mahadik, 2026-11-21 09:02:19 UTC
+- **Pull request:** [#841](https://github.com/aryamahadik/rosie/pull/841) from `task/T-1508`, merged 2026-11-21 09:02:19 UTC. It squashed 2 branch commits:
+  - `a128ebc` T-1508: K-05 v1.21: commitTurn asks one live open question again, its…
+  - `ad5efd9` T-1508: round 2, K-05 v1.21 README only (DL-1045): default 202's stat…
+- **Files changed:** 9 (+2453 −13), by folder:
+  - `contracts/data-access/` README.md +128 −12, data-access.v1.21.schema.json +1731 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` commit-a7-03-alex-asks-again-defaulted.json +88 −0, commit-s1-02-sam-asks-again-stale.json +86 −0, commit-s1-02-sam-asks-again.json +93 −0, index.json +40 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-commit-s1-02-asks-again-and-closes.json +144 −0, refuse-commit-s1-02-asks-again-twice.json +141 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1508: K-05 v1.21: commitTurn asks one live open question again, its ask count and version raised by one (askAgain; versionChanged, wrongState; one raise a commit, none beside a close), the asked_again entry, and README defaults 192 to 205 with the opener mark, its read fallback and the opt-out delivery time (DL-1030, DL-1033)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1508: round 2, K-05 v1.21 README only (DL-1045): default 202's state filter in both branches of readFixedLineFacts (defaults 202 and 204, item 36, default 50, T-1513's line and its no-business proof); default 199 names db/repo's checkFire in clocks.ts as where a firing's askAgain is refused (T-1509 builds it) and the overload that keeps v1.20's answer type for a commit with no askAgain; open gap 100, a held or sending row counted before it goes
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 827. docs: COMMIT\_HISTORY.md through commit 825 (444c43f, \#836) (\#839)
 
