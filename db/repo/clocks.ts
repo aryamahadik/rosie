@@ -913,6 +913,13 @@ function checkFire(request: FireClockRequest): Date {
     listOf(call, lists, first, `writes.${group}`);
     listOf(call, lists, second, `writes.${group}`);
   }
+  // A firing raises nothing (K-05 v1.21 default 199; T-1509, DL-1045): fireClock.request keeps v1.1's writes, and a
+  // question is asked again only in a turn's commit. This call writes its questions in its own writeOpenQuestions, which
+  // reads no raise, so a firing whose openQuestions holds askAgain, with any value, is thrown here, naming the field
+  // alone, rather than written with the raise left out in silence.
+  if (Object.hasOwn(objectField(call, writes, "openQuestions", "writes"), "askAgain")) {
+    fail(call, "writes.openQuestions.askAgain is not a firing's: only a turn's commit asks a question again");
+  }
   const outboxRows = listOf(call, writes, "outboxRows", "writes");
   outboxRows.forEach((row) => {
     checkOutboxRowNew(call, row);
