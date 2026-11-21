@@ -18,6 +18,13 @@
 // It only reads the graph: what each step writes is writes.ts's. A step the pinned bundle does not hold is refused, never
 // guessed (K-01 README: "a step a bundle does not hold is not reachable"), with one documented default below.
 //
+// A walk in stretches (T-1491; K-09 README default 199): where a stretch stops at a plain step whose message carries
+// buttons, writes.ts may ask that step's bound buttons settler (buttons.ts) once the rows before it are built; when the
+// settler answers the step's rows, the walk goes on past it (Stretch.walkOn): the step counts as walked, and the next
+// stretch starts at its next as the walk on from any plain step does, under the same loop check and MAX_WALK, so a step
+// met again in a later stretch is refused (loop) and every stretch's steps count toward the one cap. walkFrom is the
+// first stretch alone, exactly as before.
+//
 // Defaults used (for ops/QUESTIONS.md):
 //   1. An ending branch's own step that the bundle does not hold, when one of the branch's message effects names it, is
 //      accounted for by that effect: the compiler reads a branch's effects from its own steps (a message per step that
@@ -74,6 +81,20 @@ export interface Walked {
   readonly stop: Stop;
 }
 
+/**
+ * One stretch of a walk (T-1491; K-09 README default 199): its own moves and where it stops, and the walk on past the
+ * stop when that is a plain step whose message carries buttons.
+ */
+export interface Stretch extends Walked {
+  /**
+   * The next stretch, once bound code settles the plain step this one stops at (its rows written as walked): from the
+   * step's next, as the walk goes on from any plain step walked (a list's end climbs as `climb` does), under this walk's
+   * loop check and MAX_WALK, so both stretches count as one walk. Null for any other stop. Called once: a second call
+   * meets the step's next again, a loop.
+   */
+  readonly walkOn: (() => Stretch) | null;
+}
+
 /** Default 1: an ending branch's message effect names the step the bundle does not hold. */
 function accountedFor(branch: GraphBranch, stepId: string): boolean {
   return (
@@ -84,7 +105,17 @@ function accountedFor(branch: GraphBranch, stepId: string): boolean {
 
 /** The walk from `start` along the graph, to where it stops. Throws WalkRefusedError or WalkNotBuiltError. */
 export function walkFrom(graph: FlowGraph, start: WalkStart): Walked {
-  const moves: Move[] = [];
+  const { moves, stop } = walkStretchFrom(graph, start);
+  return { moves, stop };
+}
+
+/**
+ * The walk's first stretch from `start` along the graph (walkFrom's moves and stop), with the walk on past a plain step
+ * with buttons it stops at (Stretch.walkOn). Throws WalkRefusedError or WalkNotBuiltError, here or on a walk on.
+ */
+export function walkStretchFrom(graph: FlowGraph, start: WalkStart): Stretch {
+  /** The moves of the stretch being walked: each stretch takes its own and leaves the next an empty list. */
+  let moves: Move[] = [];
   const walked = new Set<string>();
 
   /** One more step on the walk: refused when it comes back to a walked step or the walk runs past MAX_WALK. */
@@ -173,10 +204,26 @@ export function walkFrom(graph: FlowGraph, start: WalkStart): Walked {
     return after(holder.split, holder.branch);
   };
 
-  if (start.kind === "step") return { moves, stop: from(start.step) };
+  /**
+   * A stretch that has stopped at `stop`, with the moves walked since the stretch before it; one that stops at a plain
+   * step (its message carries buttons) can walk on from that step's next.
+   */
+  const stretch = (stop: Stop): Stretch => {
+    const own = moves;
+    moves = [];
+    if (stop.kind !== "asks" || stop.step.split) return { moves: own, stop, walkOn: null };
+    const settled = stop.step;
+    return {
+      moves: own,
+      stop,
+      walkOn: () => stretch(settled.next === null ? climb(settled) : from(settled.next)),
+    };
+  };
+
+  if (start.kind === "step") return stretch(from(start.step));
   const split = held(start.step);
   const branch = split.branches.find((each) => each.label === start.branch);
   if (branch === undefined) throw new WalkRefusedError("branchNotInBundle", [split.id]);
   enter(split.id);
-  return { moves, stop: take(split, branch) };
+  return stretch(take(split, branch));
 }
