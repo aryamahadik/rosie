@@ -8,6 +8,10 @@
 // of the shorter: "hair" starts "haircut") or both start with the same MIN_SHARED letters ("plumb" in "plumbing" and
 // "plumber"). A meeting that is not the same word weighs the share of the longer word they have in common, so
 // "electrical" meets "electrician" (8 of 11) more than "electronics" (6 of 11).
+//
+// T-1518 (DL-1042) adds two helpers and changes none of the above: wordKey, a text's words as one key, by which a part is
+// compared whole with a kind's own name and with the everyday words of everyday.ts; and partSpans, splitParts' parts with
+// their places in the text, so a kind's own name typed with its commas is read as one part (matcher.ts).
 
 /** Both words start with at least this many of the same letters. */
 export const MIN_SHARED = 5;
@@ -107,6 +111,15 @@ export function words(text: string): string[] {
 }
 
 /**
+ * A text's words as one key, in order (T-1518): what a kind's own name and an everyday word of the table (everyday.ts)
+ * are compared by, so case, plurals, function words and punctuation never matter ("Movers" and "mover"; "We do haircuts"
+ * and "haircut"; "OB/GYN" and "OB-GYN"). Empty when the text has no word.
+ */
+export function wordKey(text: string): string {
+  return words(text).join(" ");
+}
+
+/**
  * How a person's word meets a catalog word: 1 when they are the same; the share of the longer word they have in common
  * when one starts the other (at least MIN_WHOLE letters) or both start with MIN_SHARED of the same letters; else 0.
  */
@@ -131,4 +144,31 @@ export function splitParts(text: string): string[] {
     .split(/[,;\r\n]+/u)
     .map((part) => part.trim())
     .filter((part) => part !== "");
+}
+
+/** One part splitParts gives, with where it sits in the text: `text.slice(start, end)` is the part, as typed. */
+export interface PartSpan {
+  readonly part: string;
+  readonly start: number;
+  readonly end: number;
+}
+
+/**
+ * splitParts' parts, the same parts in the same order, each with its place in the text (T-1518), so the matcher can read
+ * a kind's own name typed with its commas ("Glass, window and door installer") as the one part it is.
+ */
+export function partSpans(text: string): PartSpan[] {
+  const spans: PartSpan[] = [];
+  let from = 0;
+  for (const separator of [...text.matchAll(/[,;\r\n]+/gu), null]) {
+    const to = separator === null ? text.length : separator.index;
+    const piece = text.slice(from, to);
+    const part = piece.trim();
+    if (part !== "") {
+      const start = from + piece.indexOf(part);
+      spans.push({ part, start, end: start + part.length });
+    }
+    if (separator !== null) from = separator.index + separator[0].length;
+  }
+  return spans;
 }

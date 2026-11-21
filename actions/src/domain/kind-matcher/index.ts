@@ -3,7 +3,8 @@
 // S1-03 drafts it) or not_booked (work Rosie never books, S1-74: nothing is set up). T-631's method A: plain text on K-24
 // v1's kinds.name, style and pattern, no model and no stored index. Pure: the caller hands in the kinds rows (K-24 v1
 // kinds, source trade_file) and holds the matcher per catalog; the production read of those rows is T-633's binding.
-// See matcher.ts, not-booked.ts and words.ts.
+// T-1518: a kind's own name lists that kind, and a table of everyday words lists the kind an owner means (everyday.ts).
+// See matcher.ts, not-booked.ts, words.ts and everyday.ts.
 
 export {
   createKindMatcher,
@@ -22,5 +23,17 @@ export {
   type MatchKindsResponse,
   type RankedKind,
 } from "./matcher";
+export { EVERYDAY_WORDS, type EverydayWord } from "./everyday";
 export { notBookedReason, type NotBookedReason } from "./not-booked";
-export { fold, meets, MIN_SHARED, MIN_WHOLE, plainTokens, splitParts, words } from "./words";
+export {
+  fold,
+  meets,
+  MIN_SHARED,
+  MIN_WHOLE,
+  partSpans,
+  plainTokens,
+  splitParts,
+  wordKey,
+  words,
+  type PartSpan,
+} from "./words";

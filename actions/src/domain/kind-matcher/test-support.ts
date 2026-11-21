@@ -7,6 +7,9 @@
 //   - The sample words of T-631's spike (actions/spikes/q42-kind-matcher/samples.mjs, copied here word for word with the
 //     kinds each fits by its step's words), and each one's outcome under method A in the spike's own table
 //     (FINDINGS.md "Each sample", the A column; "none" there is K-09's new_work or not_booked).
+//   - The texting guide's 1,344 inputs with the outcomes the matcher gave them before T-1518 (kinds-guide.json, built from
+//     ops/reviews/kinds-guide/kinds-matcher.json, DL-1042: every row reproduced by the matcher before T-1518's change).
+//     They are kind names and owner-style words for a kind of work, never a person or a phone number.
 // Every name in them is the master's sample cast or a fixture's demo shop (Sam Lee; Lee's Barbershop; Jordan; Lee Home
 // Services in Springfield), never a real person, and no phone number is used (rule 9).
 
@@ -393,6 +396,36 @@ export const SAMPLES: readonly Sample[] = [
     spikeA: which("tv-repair", "appliance"),
   },
 ];
+
+// ---- The texting guide's run (T-1518; DL-1042) ----------------------------------------------------------------------
+
+/**
+ * One input of the texting guide's run (ops/reviews/kinds-guide/kinds-matcher.json, copied as kinds-guide.json): the kind
+ * it was written for, the input as typed, and the outcome the matcher gave it before T-1518, as the guide records it.
+ */
+export interface GuideInput {
+  readonly kindId: string;
+  readonly text: string;
+  /** listed (one kind), which (two), new_work (none), or parts (parts that do not all list one kind). */
+  readonly outcome: string;
+  /** The kinds, closest first; for parts, each part as `outcome:kind,kind`. */
+  readonly kinds: readonly string[];
+}
+
+const GUIDE_FILE = fileURLToPath(new URL("./kinds-guide.json", import.meta.url));
+
+/** The guide's 1,344 inputs, in its order: by kind name, then the name, its lower case and its variants (variants.json). */
+export function guideInputs(): GuideInput[] {
+  const parsed = JSON.parse(readFileSync(GUIDE_FILE, "utf8")) as { inputs?: unknown };
+  if (!Array.isArray(parsed.inputs)) throw new Error("kinds-guide.json: no inputs");
+  return (parsed.inputs as unknown[]).map((row, index) => {
+    if (!Array.isArray(row) || row.length < 3 || !row.every((cell) => typeof cell === "string")) {
+      throw new Error(`kinds-guide.json: input ${String(index)} is not [kind id, text, outcome, ...kinds]`);
+    }
+    const [kindId, text, outcome, ...kinds] = row;
+    return { kindId: kindId ?? "", text: text ?? "", outcome: outcome ?? "", kinds };
+  });
+}
 
 /** The outcome K-09 matchKinds answers for a spike outcome: its "none" is new_work, unless the words are not booked. */
 export function asMatchKinds(
