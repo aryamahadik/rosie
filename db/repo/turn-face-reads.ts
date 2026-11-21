@@ -920,11 +920,18 @@ export async function readFixedLineFactsIn(
     // opener and did not end without going (K-05 v1.21 defaults 202 and 204).
     openerRowId = await earliestOpenerRow(db, handleId, null, outboxRowId);
   } else {
-    // The mark, and the state of the row it names, read under the scope and naming the business (K-05 v1.21 default
-    // 202). The mark's row is the business's own (writePlan names the row whose business it writes), and a mark always
-    // names a row (openers_sent_outbox_fk); a row the scope hid would read as one in any other state, as before v1.21.
-    const [mark] = await db<{ outbox_row_id: string; marked_state: string | null }[]>`
-      select s.outbox_row_id, m.state as marked_state
+    // The mark, and the state and commit order of the row it names, read under the scope and naming the business
+    // (K-05 v1.21 default 202; default 215). The mark's row is the business's own (writePlan names the row whose
+    // business it writes), and a mark always names a row (openers_sent_outbox_fk); a row the scope hid would read as one
+    // in any other state committed before this one (marked_later null), as before default 215.
+    const [mark] = await db<
+      { outbox_row_id: string; marked_state: string | null; marked_later: boolean | null }[]
+    >`
+      select s.outbox_row_id, m.state as marked_state,
+        m.commit_seq > (
+          select o.commit_seq from outbox_rows o
+          where o.id = ${outboxRowId} and o.business_id = ${businessId}
+        ) as marked_later
       from openers_sent s
       left join outbox_rows m on m.id = s.outbox_row_id and m.business_id = ${businessId}
       where s.handle_id = ${handleId} and s.business_id = ${businessId}
@@ -932,12 +939,14 @@ export async function readFixedLineFactsIn(
     if (
       mark === undefined ||
       mark.outbox_row_id === outboxRowId ||
-      !NEVER_WENT.has(mark.marked_state ?? "")
+      (!NEVER_WENT.has(mark.marked_state ?? "") && mark.marked_later !== true)
     ) {
       openerRowId = mark?.outbox_row_id ?? null;
     } else {
       // A mark whose row never went is read past, to the earliest earlier row that carries an opener and went (or may
-      // yet): never a state filter without this fallback, since the mark is written once (default 202).
+      // yet): never a state filter without this fallback, since the mark is written once (default 202). So is a mark
+      // naming a row committed after this one, whatever its state: rows go out in commit order, so the earliest row
+      // sent carries the opener and the privacy-notice link (default 215).
       openerRowId = await earliestOpenerRow(db, handleId, businessId, outboxRowId);
     }
   }

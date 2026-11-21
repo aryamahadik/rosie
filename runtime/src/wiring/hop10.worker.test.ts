@@ -863,10 +863,10 @@ describe("T-1514: finalize's K-05 doubles write the opener mark at writePlan and
     expect(finalize.openersSent).toEqual([mark]);
     // The mark names this row: it is the first text, and carries the opener whenever it is finalized (default 50).
     expect(await factsOf(fakes, b, business)).toEqual([false, b, null]);
-    // Any other row to the handle at the business reads "texted before", naming the mark's row, as db/repo answers
-    // while that row stands in a state that went or may yet go (whatever the two rows' commit order).
+    // A row committed after the mark's row reads "texted before", naming it, as db/repo answers while that row stands
+    // in a state that went or may yet go; a row committed before it reads the fallback, here none (default 215).
     expect(await factsOf(fakes, c, business)).toEqual([true, b, null]);
-    expect(await factsOf(fakes, a, business)).toEqual([true, b, null]);
+    expect(await factsOf(fakes, a, business)).toEqual([false, null, null]);
 
     // A later row carrying the other opener id never moves the mark, and a repeat (alreadyPlanned) writes nothing.
     expect(await planOwnRow(fakes, c, BUSINESS_FIRST_TEXT_LINES)).toEqual({
@@ -938,6 +938,44 @@ describe("T-1514: finalize's K-05 doubles write the opener mark at writePlan and
       ended.set(a, state);
       expect([state, ...(await factsOf(fakes, b, business))]).toEqual([state, true, a, null]);
     }
+  });
+
+  it("two first-text rows planned out of commit order (default 215): the earlier row reads past the mark naming the later one and carries the opener, the marked row reads itself, and a row committed after both reads the marked row; the earlier row reads so in every state of the marked row", async () => {
+    const fakes = skeletonFakes(testClock(), { bundle: BUNDLE_V2 });
+    const ended = endedRows(fakes);
+    const business = TEST_OWNER_1.businessId;
+    const a = await commitOwnRow(fakes, "a", business);
+    const b = await commitOwnRow(fakes, "b", business);
+
+    // The row committed later is planned first: it reads no mark, carries the opener and takes the mark.
+    expect(await factsOf(fakes, b, business)).toEqual([false, null, null]);
+    await planOwnRow(fakes, b, FIRST_TEXT_LINES);
+    expect(fakes.finalize.openersSent.map((mark) => mark.outboxRowId)).toEqual([b]);
+    // The earlier row, sent first by commit order, finds no earlier row past the mark: it carries the opener too.
+    expect(await factsOf(fakes, a, business)).toEqual([false, null, null]);
+    await planOwnRow(fakes, a, BUSINESS_FIRST_TEXT_LINES);
+    expect(fakes.finalize.openersSent.map((mark) => mark.outboxRowId)).toEqual([b]);
+    expect(await factsOf(fakes, a, business)).toEqual([false, null, null]);
+    // The marked row, read again, reads itself (default 50): an opener twice, the safe side.
+    expect(await factsOf(fakes, b, business)).toEqual([false, b, null]);
+    // A row committed after both reads the mark, which names a row committed before it.
+    const c = await commitOwnRow(fakes, "c", business);
+    expect(await factsOf(fakes, c, business)).toEqual([true, b, null]);
+
+    for (const state of MAY_YET_GO) {
+      ended.set(b, state);
+      expect([state, ...(await factsOf(fakes, a, business))]).toEqual([state, false, null, null]);
+      expect([state, ...(await factsOf(fakes, b, business))]).toEqual([state, false, b, null]);
+      expect([state, ...(await factsOf(fakes, c, business))]).toEqual([state, true, b, null]);
+    }
+    for (const state of NEVER_WENT) {
+      ended.set(b, state);
+      expect([state, ...(await factsOf(fakes, a, business))]).toEqual([state, false, null, null]);
+      expect([state, ...(await factsOf(fakes, b, business))]).toEqual([state, false, b, null]);
+      // The marked row never went: the later row falls back to the earlier one, which carries the opener (default 202).
+      expect([state, ...(await factsOf(fakes, c, business))]).toEqual([state, true, a, null]);
+    }
+    expect(fakes.finalize.openersSent.map((mark) => mark.outboxRowId)).toEqual([b]);
   });
 
   it("the row states are the dispatch double's own: a marked row the dispatcher withdrew (limit 8), and then one it dropped for STOP, are each read past", async () => {

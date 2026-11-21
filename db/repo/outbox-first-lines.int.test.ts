@@ -515,9 +515,31 @@ describe("writePlan writes K-04's opener mark, once (K-05 v1.21 defaults 200, 20
     const [mark] = marks;
     expect(ids).toContain(mark?.outbox_row_id);
     expect(mark).toEqual(markOf(String(mark?.outbox_row_id)));
-    // Every row but the marked one reads that it was texted before.
+    // The rows were added one by one, so their commit order is their ids' order.
+    const committed = await db.sql<{ id: string }[]>`
+      select id from outbox_rows where id in ${db.sql(ids)} order by commit_seq
+    `;
+    expect(committed.map(({ id }) => id)).toEqual(ids);
+    // K-05 default 215 ("Many first-text rows planned at once"): the marked row reads itself; each row committed after
+    // it reads it; the first row committed, when not the marked one, finds no earlier opener row and reads false; and
+    // each row between them reads the first row, the earliest with an opener. So the first row sent carries the opener.
+    const marked = String(mark?.outbox_row_id);
+    const m = ids.indexOf(marked);
+    const first = String(ids[0]);
+    const expected = ids.map((_, i): [boolean, string | null] => {
+      if (i === m) {
+        return [false, marked];
+      }
+      if (i > m) {
+        return [true, marked];
+      }
+      if (i === 0) {
+        return [false, null];
+      }
+      return [true, first];
+    });
     const facts = await Promise.all(ids.map((id) => factsOf(id)));
-    expect(facts.filter(([texted]) => !texted)).toEqual([[false, mark?.outbox_row_id]]);
+    expect(facts).toEqual(expected);
   });
 });
 
