@@ -1524,7 +1524,204 @@ export function buttonsAnswerCommit(exchange) {
   return problems;
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// v1.12 (T-1504): a turn that decide ended in one question sends its one open question again, once (README "v1.12").
+// Added beside the rules above, which stay as they are. Like v1.6's and v1.8's rules it reads only the contracts' own
+// files beside this one, synchronously: the fixtures an exchange runs after, for the stored row of the question it
+// sends again.
+
+/** A question asked this many times or more is not sent again: the turn stays silent (README v1.12 default 194). */
+export const ASKS_BEFORE_SILENT = 2;
+
+/** This folder's fixtures, which an exchange's given.after names. */
+const K09_FIXTURES = "tool-api/fixtures";
+
+/** Every string anywhere in a value, keys left out: a core result names its own rows somewhere in its response. */
+const stringsOf = (value) =>
+  typeof value === "string"
+    ? [value]
+    : Array.isArray(value)
+      ? value.flatMap(stringsOf)
+      : value !== null && typeof value === "object"
+        ? Object.values(value).flatMap(stringsOf)
+        : [];
+
+/**
+ * The stored row of the question `id` as a fixture the exchange runs after states it: a question that fixture's part
+ * opens, in K-05 v1 openQuestionNew's shape (given.stated.writes.openQuestions; README v1.5 default 136), with its
+ * options as sent and its read-back. Undefined when no such fixture states it: neither the schema nor the turn's context
+ * holds a question's options or read-back (K-02 v1 openQuestion), which T-1505's code reads live (K-05 v1.2
+ * openQuestionRead).
+ */
+function statedQuestionRow(exchange, id) {
+  for (const file of exchange.given?.after ?? []) {
+    let earlier;
+    try {
+      earlier = contractJson(`${K09_FIXTURES}/${file}`);
+    } catch {
+      continue;
+    }
+    const row = (earlier.given?.stated?.writes?.openQuestions ?? []).find((question) => question.id === id);
+    if (row !== undefined) return { file, row };
+  }
+  return undefined;
+}
+
+/**
+ * Why a turn whose parts decide ended in one question sends no question again (README v1.12 defaults 192 to 195 and
+ * 198), one reason a line; none when it sends its one open question again.
+ */
+function silentBecause(exchange, decide, asked) {
+  const { request, outcome } = exchange;
+  const context = request.input.decided.context;
+  const reasons = [];
+  if (decide.end !== undefined) reasons.push("the turn's unmapped end (CQ-199, CQ-203)");
+  if (request.input.planner !== null) reasons.push("a planner verb");
+  for (const result of outcome.parts ?? []) {
+    if (result.result === "asked" && !asked.includes(result.part)) {
+      reasons.push(`part ${result.part} is a part the gate passed that waits for the one question`);
+    }
+  }
+  for (const core of outcome.core ?? []) {
+    if (core.call !== "recordSafetyOutcome") reasons.push(`the core action ${core.call}`);
+    else if (core.response?.hold !== null && core.response?.hold !== undefined) reasons.push("a safety hold");
+  }
+  if (typeof request.turn?.service !== "string") reasons.push("the request's turn names no service");
+  const questions = context.openQuestions ?? [];
+  if (questions.length !== 1) return [...reasons, `${questions.length} open questions, not one`];
+  const [question] = questions;
+  const id = question.openQuestionId;
+  for (const at of asked) {
+    const { part } = decide.parts[at];
+    if (part.verb === "ask") {
+      if (part.questions.some((other) => other !== id))
+        reasons.push(`part ${at} asks about another question`);
+    } else if (part.verb === "choose") {
+      const choice = (context.choices ?? []).find((offered) => offered.choiceId === part.choice);
+      if (choice?.question !== id) reasons.push(`part ${at} chooses no option of ${id}`);
+    } else {
+      reasons.push(`part ${at}, ${part.verb}, is not about ${id}`);
+    }
+  }
+  if (question.target.bookingId !== null) reasons.push(`${id} is about a booking`);
+  if (question.target.businessId !== request.caller.businessId) reasons.push(`${id} is another business's`);
+  if (question.askCount >= ASKS_BEFORE_SILENT) reasons.push(`${id} was asked ${question.askCount} times`);
+  const stored = statedQuestionRow(exchange, id);
+  if (stored === undefined) {
+    reasons.push(`no fixture this exchange runs after states ${id}'s stored row`);
+    return reasons;
+  }
+  const { file, row } = stored;
+  if (row.options.length > 0) reasons.push(`${id} is stored with options (${file})`);
+  if (row.readback !== null) reasons.push(`${id} is stored with a read-back (${file})`);
+  if (row.handleId !== request.turn.handleId) reasons.push(`${id} went to another handle (${file})`);
+  if (row.businessId !== request.caller.businessId) reasons.push(`${id} is another business's (${file})`);
+  if (row.personId !== request.caller.personId) reasons.push(`${id} was asked of another person (${file})`);
+  if (row.bookingId !== null) reasons.push(`${id} is about a booking (${file})`);
+  return reasons;
+}
+
+/**
+ * askedResendsQuestion (v1.12; README defaults 192 to 198): on a first commit of decided texts in which decide ended a
+ * part in one question (the verb ask, or the part's outcome oneQuestion), each such part is answered asked with no limit
+ * run (actions/src/gate/framework/gate.ts default 2), and the answer opens, closes and charges nothing. The turn sends
+ * its one open question again exactly when every condition of default 192 holds as the exchange shows it: no unmapped
+ * end, no planner verb, no part the gate passed waiting, no core action but the texts' safety outcomes and no safety
+ * hold among them, a service on the turn, exactly one open question in the context, each asked part about it, the
+ * question about no booking, of the call's business, asked fewer than ASKS_BEFORE_SILENT times, and its stored row,
+ * stated by a fixture the exchange runs after, with no options and no read-back, sent to the turn's handle and asked of
+ * the call's person. Then the answer names exactly one outbox row that no core result names, in default 131's form for
+ * the question's step, and `written` names the question's row alone (its ask count raised, so its version moves:
+ * default 194). Otherwise the answer names no such row and does not write the question's row: the turn stays silent,
+ * as today. The schema takes a row, a raised count and a closed question on any committed answer and cannot see a
+ * question's stored row; this rule holds them to the turn.
+ */
+export function askedResendsQuestion(exchange) {
+  const decide = decideOf(exchange);
+  if (exchange.call !== "gateAndCommit" || decide === undefined) {
+    return ["askedResendsQuestion reads a gateAndCommit exchange on decided texts"];
+  }
+  const outcome = exchange.outcome ?? {};
+  if (outcome.result !== "committed" || outcome.repeated !== false) {
+    return ["askedResendsQuestion reads a first commit: committed, with repeated false"];
+  }
+  const asked = decide.parts.flatMap((entry, at) =>
+    entry.outcome === "oneQuestion" || entry.part?.verb === "ask" ? [at] : [],
+  );
+  if (asked.length === 0) {
+    return [
+      "askedResendsQuestion reads a turn with a part decide ended in one question (ask, or oneQuestion)",
+    ];
+  }
+  const parts = Array.isArray(outcome.parts) ? outcome.parts : [];
+  if (parts.some((result) => result.result !== "asked" && result.result !== "noAction")) {
+    return ["askedResendsQuestion reads a turn whose every part is answered asked or noAction"];
+  }
+  const problems = [];
+  for (const at of asked) {
+    const { part } = decide.parts[at];
+    const expected = {
+      part: at,
+      choiceId: part.verb === "choose" || part.verb === "enter" ? part.choice : null,
+      result: "asked",
+      limits: noLimitRun(),
+      stoppedBy: null,
+      gives: [],
+      dependsOnPart: null,
+    };
+    const answered = parts.find((result) => result.part === at);
+    if (!isDeepStrictEqual(answered, expected)) {
+      problems.push(
+        `parts[${at}] is not decide's part ${at} asked with no limit run: ${JSON.stringify(answered)}`,
+      );
+    }
+  }
+  const { opened = [], closed = [] } = outcome.openQuestions ?? {};
+  if (opened.length > 0 || closed.length > 0) {
+    problems.push(
+      `an asked turn opens and closes no question, but the answer opens [${opened.join(", ")}] and closes [${closed.join(", ")}]`,
+    );
+  }
+  if ((outcome.effects ?? []).length > 0) problems.push("an asked turn writes no effect");
+  const coreRows = new Set(stringsOf(outcome.core ?? []));
+  const sent = (outcome.written?.outboxRows ?? []).filter((row) => !coreRows.has(row.id));
+  const written = outcome.written?.written ?? [];
+  const questionIds = (exchange.request.input.decided.context.openQuestions ?? []).map(
+    (question) => question.openQuestionId,
+  );
+  const reasons = silentBecause(exchange, decide, asked);
+  if (reasons.length > 0) {
+    if (sent.length > 0) {
+      problems.push(
+        `the turn sends no question again (${reasons.join("; ")}), but the answer writes ${sent.map((row) => row.id).join(", ")}`,
+      );
+    }
+    const raised = written.filter((row) => row.table === "open_questions" && questionIds.includes(row.rowId));
+    if (raised.length > 0) {
+      problems.push(
+        `the turn raises no ask count (${reasons.join("; ")}), but written names ${raised.map((row) => row.rowId).join(", ")}`,
+      );
+    }
+    return problems;
+  }
+  const [question] = exchange.request.input.decided.context.openQuestions;
+  const id = question.openQuestionId;
+  const form = `outbox-${question.step.toLowerCase()}-`;
+  if (sent.length !== 1) {
+    problems.push(`the turn sends ${id} again in one outbox row, not ${sent.length}`);
+  } else if (!sent[0].id.startsWith(form)) {
+    problems.push(`${sent[0].id} is not named ${form}<turn key>-<n>, as a row that asks ${question.step} is`);
+  }
+  if (written.length !== 1 || written[0].table !== "open_questions" || written[0].rowId !== id) {
+    problems.push(
+      `written names ${id}'s row alone, its ask count raised, not [${written.map((row) => `${row.table}/${row.rowId}`).join(", ")}]`,
+    );
+  }
+  return problems;
+}
+
 export const rules = Object.freeze({
+  askedResendsQuestion,
   buttonsOptionChoices,
   buttonsAnswerCommit,
   statedOutcome,
