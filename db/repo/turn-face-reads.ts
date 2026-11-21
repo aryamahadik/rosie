@@ -817,9 +817,9 @@ export async function readOutboxRowIn(
  * An outbox row as compose input and finalize read it (K-05 v1.3 item 35), with its business's sensitive switch (v1.6
  * item 45) and its own stored line first (v1.22 item 83): one read-only transaction at repeatable read on the primary,
  * uncached. Pass the runtime's client (rosie_job): with a business the read runs under its scope, set and confirmed
- * before the first read; with businessId null on the runtime side. notFound when there is no such row, the scope hides it, or it has no turn (K-04 v1.1's job row: K-05
- * v1.13 item 65, before anything else of it is read); fixedLineRow for a safety row; transient on a serialization
- * failure, a deadlock or a lost connection. A request of the wrong shape throws a TypeError, a broken record a
+ * before the first read; with businessId null on the runtime side. notFound when there is no such row, the scope hides
+ * it, or it has no turn (K-04 v1.1's job row: K-05 v1.13 item 65, before anything else of it is read); fixedLineRow for
+ * a safety row; transient on a serialization failure, a deadlock or a lost connection. A request of the wrong shape throws a TypeError, a broken record a
  * BrokenRecordError, and any other failed read its own error: never an answer, so never a switch read as off.
  */
 export async function readOutboxRow(
