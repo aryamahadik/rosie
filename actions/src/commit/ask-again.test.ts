@@ -5,6 +5,12 @@
 // (commit-s1-01.json's S1-02 question, open at version 2, asked once). The conditions the base's validator cannot carry
 // (an unmapped end, a planner verb, a question no ask may name) are checked on askAgainUnit itself, which the commit runs
 // as it is. The PostgreSQL proof is actions/src/tool-api/turn-face/pg/sign-up.int.test.ts.
+//
+// T-1528 (K-09 README default 201 and open gap 179; DL-1133): a passed choose whose split's settler answers "ask" takes
+// the same path. End to end, the commit's writesOf is the real walk (walk/writes.ts createWritesOf) on bundle v0's S1-02
+// (the asked fixture's pin) with a stand-in settler, never a double of the walk or of the commit: the request is K-05's
+// commit-s1-02-sam-asks-again.json, byte for byte as decide's own ask gives it, and a second "ask" (ask count 2) writes
+// nothing, as T-1505's second miss. Default 192 (a) and (c) with the walk's note are checked on askAgainUnit itself.
 
 import { describe, expect, it } from "vitest";
 
@@ -15,6 +21,9 @@ import { contractFile, recordingHandlers, recordingScope, traceFor } from "../to
 import { askAgainUnit, type AskedTurn } from "./ask-again";
 import { asksAgain, buildCommitRequest, type CommitUnit, type TurnCommitRequest } from "./build";
 import { CommitRefusedError, gateAndCommit } from "./index";
+import { WalkRefusedError, createWritesOf, type StepSettler } from "./walk";
+import { SETTLER_ASKS, noteSettlerAsked } from "./walk/settle";
+import { skeletonBundles } from "./walk/test-support";
 import {
   contractChecks,
   doublePorts,
@@ -813,5 +822,291 @@ describe("build.ts: the raise in K-05 v1.21's openQuestions.askAgain (default 10
       expect(thrown).toBeInstanceOf(CommitRefusedError);
       expect(thrown).toMatchObject({ fault: "askAgainNotAlone" });
     }
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1528: a split settler's "ask" takes the re-send
+
+/**
+ * A choose of the asked fixture's choice `choiceId` (an option of its one question, unless `question` says otherwise)
+ * with no field: a bare tap, or a claim with no details.
+ */
+function settledChoose(choiceId = "c-01", question: string | null = QUESTION): DecidePart {
+  return {
+    verb: "choose",
+    quote: "A bit of everything",
+    question,
+    choice: choiceId,
+    fields: [],
+  } as unknown as DecidePart;
+}
+
+/** The asked fixture's request, its one part a choose of `choiceId` that both reads agree on (outcome go). */
+function settledRequest(choiceId = "c-01", question: string | null = QUESTION): GateAndCommitRequest {
+  return withPart(settledChoose(choiceId, question));
+}
+
+/**
+ * The commit's deps for the asked fixture's turn with the real walk as writesOf (bundle v0, the asked fixture's pin, with
+ * the question read and default 131's turn key) and S1-02's stand-in settler answering `answer` (or rejecting with it).
+ */
+function settledDeps(
+  read: FakeRead,
+  answer: unknown,
+  k05: K05Fake = askedK05(),
+): { deps: ReturnType<typeof askedDeps>; asks: string[] } {
+  const ported = askedDeps(read, { k05 });
+  const asks: string[] = [];
+  const settler: StepSettler = (call) => {
+    asks.push(call.step.id);
+    return answer instanceof Error ? Promise.reject(answer) : Promise.resolve(answer as string);
+  };
+  const writesOf = createWritesOf({
+    bundles: skeletonBundles().bundles,
+    turnKey: () => "sam-asked",
+    questions: read.deps.questions,
+    settlers: (stepId) => (stepId === "S1-02" ? settler : null),
+  });
+  return { deps: { ...ported, ports: { ...ported.ports, writesOf } }, asks };
+}
+
+/** What gateAndCommit threw for `request` on `deps`, or null when it answered. */
+async function thrownBy(request: GateAndCommitRequest, deps: CommitDeps): Promise<unknown> {
+  return gateAndCommit(request, callContext(BUSINESS), deps).then(
+    () => null,
+    (thrown: unknown) => thrown,
+  );
+}
+
+describe("T-1528: a passed choose whose split settler answers 'ask' sends the question again once, end to end", () => {
+  it("S1-02's settler answers 'ask': the walk writes nothing, and the commit sends K-05's commit-s1-02-sam-asks-again.json, byte for byte as decide's own ask does", async () => {
+    const read = fakeRead();
+    const { deps, asks } = settledDeps(read, SETTLER_ASKS);
+    const called = await callCommit(settledRequest(), deps);
+
+    // One K-05 v1.21 request, the re-sent row and the raise alone: no close, no question opened, no clock row.
+    expect(deps.k05.requests).toHaveLength(1);
+    const [request] = deps.k05.requests;
+    if (request === undefined) return fail();
+    expect(contractChecks().k05v121("commitTurn.request", request)).toEqual([]);
+    expect(request).toEqual(k05AsksAgainRequest());
+    expect(eventLogRowsOf(request, "2026-10-19T18:07:04Z").map((row) => row.kind)).toEqual([
+      "open_question.asked_again",
+      "outbox_row.created",
+    ]);
+    // The settler asked once; the question read once, by the re-send: the walk read none.
+    expect(asks).toEqual(["S1-02"]);
+    expect(read.calls).toEqual([{ handleId: HANDLE, openQuestionId: QUESTION }]);
+
+    // K-09 v1.12's written and openQuestions; the part answered as a passed part is (ask-again.ts default 3).
+    const outcome = askedOutcome();
+    expect(called.answer).toMatchObject({
+      result: "committed",
+      repeated: false,
+      written: outcome.written,
+      effects: [],
+      openQuestions: { opened: [], closed: [] },
+    });
+    expect((called.answer as typeof outcome).parts).toMatchObject([
+      { part: 0, choiceId: "c-01", result: "committed", stoppedBy: null, gives: [] },
+    ]);
+    expect(called.rows).toEqual([
+      { table: "open_questions", id: QUESTION },
+      { table: "outbox_rows", id: ROW },
+    ]);
+    // No word of the text in the request.
+    for (const words of wordsIn(decidedIn(settledRequest()))) {
+      expect(JSON.stringify(request)).not.toContain(words);
+    }
+  });
+
+  it.each(["c-01", "c-02", "c-03"])(
+    "%s named, settled 'ask': the same request, whichever of the question's options decide named",
+    async (choiceId) => {
+      const read = fakeRead();
+      const { deps } = settledDeps(read, SETTLER_ASKS);
+      await callCommit(settledRequest(choiceId), deps);
+      expect(deps.k05.requests).toEqual([k05AsksAgainRequest()]);
+    },
+  );
+
+  it("a second 'ask' for the same question (read at ask count 2): no row and no raise, nothing closed, as T-1505's second miss", async () => {
+    const read = fakeRead({ ...storedQuestion(), askCount: 2, version: 3 });
+    const { deps, asks } = settledDeps(read, SETTLER_ASKS);
+    const called = await callCommit(settledRequest(), deps);
+    expect(called.answer).toMatchObject({
+      result: "committed",
+      written: { written: [], outboxRows: [], promoted: [] },
+      openQuestions: { opened: [], closed: [] },
+    });
+    const [sent] = deps.k05.requests;
+    if (sent === undefined) return fail();
+    expect(asksAgain(sent as TurnCommitRequest)).toBe(false);
+    expect(sent.writes.outboxRows).toEqual([]);
+    expect(sent.writes.openQuestions).toEqual({ open: [], close: [] });
+    expect(sent.writes.events).toEqual([]);
+    expect(contractChecks().k05("commitTurn.request", sent)).toEqual([]);
+    expect(asks).toEqual(["S1-02"]);
+    expect(read.calls).toHaveLength(1);
+  });
+
+  it("a rerun after the first 'ask' reads ask count 2 and builds no row or raise; K-05 answers the first commit, so nothing is written twice", async () => {
+    const read = fakeRead();
+    const k05 = askedK05();
+    const { deps } = settledDeps(read, SETTLER_ASKS, k05);
+    await callCommit(settledRequest(), deps);
+    read.row = { ...storedQuestion(), askCount: 2, version: 3 };
+    const again = await callCommit(settledRequest(), deps);
+    expect(again.answer).toMatchObject({
+      result: "committed",
+      repeated: true,
+      written: { written: [], outboxRows: [{ id: ROW, commitSeq: 2 }], promoted: [] },
+    });
+    expect(asksAgain((k05.requests[1] ?? fail()) as TurnCommitRequest)).toBe(false);
+    expect(k05.commits).toHaveLength(1);
+  });
+
+  it("with no question read handed to the commit (CommitDeps.askAgain left out): the walk's 'ask' writes nothing and the turn stays silent", async () => {
+    const read = fakeRead();
+    const { deps } = settledDeps(read, SETTLER_ASKS);
+    const withoutAskAgain: CommitDeps = { limits: deps.limits, ports: deps.ports };
+    const answer = await gateAndCommit(settledRequest(), callContext(BUSINESS), withoutAskAgain);
+    expect(answer).toMatchObject({ result: "committed", written: { outboxRows: [] } });
+    const [sent] = deps.k05.requests;
+    expect(asksAgain((sent ?? fail()) as TurnCommitRequest)).toBe(false);
+    expect(sent?.writes.events).toEqual([]);
+    expect(read.calls).toEqual([]);
+  });
+
+  it("a label still walks as before (on bundle v0, 'All on the list' rejoins at S1-11, which v0 does not hold), an unknown label is still refused settledNotInBundle, and a throw still fails closed; nothing is sent", async () => {
+    const labelled = settledDeps(fakeRead(), "All on the list");
+    const walkedOn = await thrownBy(settledRequest(), labelled.deps);
+    expect(walkedOn).toBeInstanceOf(WalkRefusedError);
+    expect(walkedOn).toMatchObject({ fault: "stepNotInBundle", ids: ["S1-11"] });
+    expect(labelled.deps.k05.requests).toEqual([]);
+
+    for (const answered of ["Ask", "Maybe on the list", ""]) {
+      const read = fakeRead();
+      const unknown = settledDeps(read, answered);
+      const refused = await thrownBy(settledRequest(), unknown.deps);
+      expect(refused, answered).toBeInstanceOf(WalkRefusedError);
+      expect(refused, answered).toMatchObject({ fault: "settledNotInBundle", ids: ["S1-02"] });
+      expect(unknown.deps.k05.requests).toEqual([]);
+      expect(read.calls).toEqual([]);
+    }
+
+    const failed = new Error("the settler's read failed");
+    const throwing = settledDeps(fakeRead(), failed);
+    expect(await thrownBy(settledRequest(), throwing.deps)).toBe(failed);
+    expect(throwing.deps.k05.requests).toEqual([]);
+  });
+});
+
+/** The gate's answer for the fixture's one part as a passed choose of c-01, its limits as the fixture lists them. */
+function passedGated(): GatedPart[] {
+  return askedGated().map((part) => ({ ...part, choiceId: "c-01", result: "passed" as const }));
+}
+
+/** askedTurn on settledRequest(choiceId), the part passed, with the walk's note on its turn object for each of `noted`. */
+function settledTurn(
+  change: Partial<AskedTurn> = {},
+  noted: readonly number[] = [0],
+  request: GateAndCommitRequest = settledRequest(),
+): AskedTurn {
+  const turn = askedTurn({ gated: passedGated(), ...change }, request);
+  for (const index of noted) noteSettlerAsked(turn.context, index);
+  return turn;
+}
+
+describe("askAgainUnit: default 192 (a) and (c) with the walk's note of a settler's 'ask' (T-1528)", () => {
+  it("all hold, the noted part passed: the same unit as for a part decide ended in one question", async () => {
+    const read = fakeRead();
+    const unit = await askAgainUnit(read.deps, settledTurn());
+    expect(unit).not.toBeNull();
+    expect(unit).toEqual(await askAgainUnit(fakeRead().deps, askedTurn()));
+    expect(read.calls).toEqual([{ handleId: HANDLE, openQuestionId: QUESTION }]);
+  });
+
+  it("(a) a passed part with no note is not asked: nothing, nothing read", async () => {
+    const read = fakeRead();
+    expect(await askAgainUnit(read.deps, settledTurn({}, []))).toBeNull();
+    expect(read.calls).toEqual([]);
+  });
+
+  it("(a) the noted part beside a part that passed with no note, was stopped or depends on one, or either held: nothing, nothing read", async () => {
+    const [passed] = passedGated();
+    if (passed === undefined) return fail();
+    const second = (result: GatedPart["result"]): GatedPart => ({ ...passed, part: 1, result });
+    for (const change of [
+      { gated: [passed, second("passed")] },
+      { gated: [passed, second("stopped")] },
+      { gated: [passed, second("dependsOnStopped")] },
+      { gated: [passed, second("noAction")], held: new Set([1]) },
+      { gated: [passed], held: new Set([0]) },
+    ]) {
+      const read = fakeRead();
+      expect(await askAgainUnit(read.deps, settledTurn(change)), JSON.stringify(change.gated)).toBeNull();
+      expect(read.calls).toEqual([]);
+    }
+  });
+
+  it("(a) and (c) the noted part beside a part decide asked about the same question, or one that took no action: one unit", async () => {
+    const request = askedRequest();
+    const decided = decidedIn(request);
+    const [asked] = decided.decide.parts;
+    decided.decide.parts = [{ part: settledChoose(), outcome: "go" }, copy(asked)];
+    for (const each of decided.decide.reads) each.output.parts = [settledChoose(), copy(asked.part)];
+    const [passed] = passedGated();
+    const [askedPart] = askedGated();
+    if (passed === undefined || askedPart === undefined) return fail();
+    for (const second of [
+      { ...askedPart, part: 1 },
+      { ...askedPart, part: 1, result: "noAction" as const },
+    ]) {
+      const unit = await askAgainUnit(
+        fakeRead().deps,
+        settledTurn({ gated: [passed, second] }, [0], request),
+      );
+      expect(
+        unit?.writes.messages.map((row) => row.id),
+        second.result,
+      ).toEqual([ROW]);
+    }
+  });
+
+  it("(c) a noted choose of a door, not an option of the question, or a noted enter: nothing, nothing read", async () => {
+    const enter = withPart({
+      verb: "enter",
+      quote: "A bit of everything",
+      choice: "c-01",
+      fields: [],
+    } as unknown as DecidePart);
+    for (const request of [settledRequest("c-04", null), enter]) {
+      const read = fakeRead();
+      expect(await askAgainUnit(read.deps, settledTurn({}, [0], request))).toBeNull();
+      expect(read.calls).toEqual([]);
+    }
+  });
+
+  it("(e) the question asked twice already: nothing, the question read once; (f) a hold: nothing, nothing read", async () => {
+    const twice = fakeRead({ ...storedQuestion(), askCount: 2, version: 3 });
+    expect(await askAgainUnit(twice.deps, settledTurn())).toBeNull();
+    expect(twice.calls).toHaveLength(1);
+    const hold: SafetyHold = { holdId: "hold-sam-0002", releaseRule: "after_safe", blocksBooking: true };
+    const held = fakeRead();
+    expect(
+      await askAgainUnit(held.deps, settledTurn({ open: { holds: [hold], unreadEventIds: [] } })),
+    ).toBeNull();
+    expect(held.calls).toEqual([]);
+  });
+
+  it("a note on another turn object, even an equal one, is never read: nothing", async () => {
+    const turn = settledTurn({}, []);
+    const other = settledTurn({}, [0]);
+    expect(other.context).toEqual(turn.context);
+    const read = fakeRead();
+    expect(await askAgainUnit(read.deps, turn)).toBeNull();
+    expect(read.calls).toEqual([]);
   });
 });
