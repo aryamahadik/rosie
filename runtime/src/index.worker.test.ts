@@ -285,9 +285,9 @@ describe("GET {BASE_PATH}/privacy: the Worker serves T-1171's privacy notice, la
   it.each([
     "/test/privacy/",
     "/privacy",
-    "/test/Privacy",
+    "/test/Privacy/page",
     "/test/privacy/more",
-    "/test/privacy.html",
+    "/test/privacy.html/page",
     "/test/test/privacy",
     "/testprivacy",
   ])("keeps %s on staging the Worker's 404 JSON with the trace id, for GET and POST alike", async (path) => {
