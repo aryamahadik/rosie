@@ -20,7 +20,15 @@ import {
 
 const fixture = (file) => readJson(path.join(CONTRACTS_DIR, "model/fixtures", file));
 const index = () => fixture("index.json").fixtures;
-const bundled = (def) => bundleSchema({ schema: "model/model.v1.schema.json", def });
+const bundled = (def, schema = "model/model.v1.schema.json") => bundleSchema({ schema, def });
+const V1_3 = "model/model.v1.3.schema.json";
+/** K-02 v1.3's model-facing answer for each photo kind (README "v1.3", default 23: one schema a request). */
+const PHOTO_READS = Object.freeze({
+  cardOrListing: "photoReadCardOrListing",
+  priceList: "photoReadPriceList",
+  timetable: "photoReadTimetable",
+  schedule: "photoReadSchedule",
+});
 
 /** A one-object schema with the given property schema, for the negative cases. */
 const withProperty = (property) => ({
@@ -32,13 +40,17 @@ const withProperty = (property) => ({
 const errorsOf = (schema) => lintSchema(schema).errors.join("\n");
 
 describe("structured-subset lint on the repository", () => {
-  it("lists K-02's decide read, safety read and planner output", () => {
+  it("lists K-02's decide read, safety read and planner output, and K-02 v1.3's four photo-reading answers", () => {
     assert.deepEqual(
       MODEL_FACING.map(({ schema, def }) => `${schema}#${def}`),
       [
         "model/model.v1.schema.json#decideRead",
         "model/model.v1.schema.json#safetyRead",
         "model/model.v1.schema.json#plannerOutput",
+        "model/model.v1.3.schema.json#photoReadCardOrListing",
+        "model/model.v1.3.schema.json#photoReadPriceList",
+        "model/model.v1.3.schema.json#photoReadTimetable",
+        "model/model.v1.3.schema.json#photoReadSchedule",
       ],
     );
   });
@@ -54,8 +66,8 @@ describe("structured-subset lint on the repository", () => {
   });
 
   it("bundles every $ref into the schema's own $defs: no external $ref is left", () => {
-    for (const { def } of MODEL_FACING) {
-      const text = JSON.stringify(bundled(def));
+    for (const { schema, def } of MODEL_FACING) {
+      const text = JSON.stringify(bundleSchema({ schema, def }));
       assert.doesNotMatch(text, /schema\.json/, def);
       assert.doesNotMatch(text, /"\$(id|schema)"/, def);
       for (const ref of text.match(/"\$ref":"[^"]*"/g) ?? []) assert.match(ref, /"#\/\$defs\//, def);
@@ -72,7 +84,12 @@ describe("structured-subset lint on the repository", () => {
     const decide = ajv.compile(bundled("decideRead"));
     const safety = ajv.compile(bundled("safetyRead"));
     const planner = ajv.compile(bundled("plannerOutput"));
+    /** v1.3's bundled photo-reading answers, by definition name. */
+    const photo = Object.fromEntries(
+      Object.values(PHOTO_READS).map((def) => [def, ajv.compile(bundled(def, V1_3))]),
+    );
     let checked = 0;
+    let photoChecked = 0;
     for (const entry of index()) {
       const payload = fixture(entry.file);
       if (entry.def === "decideResult") {
@@ -89,9 +106,19 @@ describe("structured-subset lint on the repository", () => {
       } else if (entry.def === "plannerOutput") {
         assert.equal(planner(payload), entry.expect === "accept", entry.file);
         checked += 1;
+      } else if (entry.def === "photoReadResult" && entry.expect === "accept") {
+        // The answer the model gave, in the bundled schema of the request's kind alone (default 23).
+        assert.equal(payload.output.kind, payload.request.kind, entry.file);
+        const validate = photo[PHOTO_READS[payload.request.kind]];
+        assert.ok(validate(payload.output), `${entry.file}: ${JSON.stringify(validate.errors)}`);
+        photoChecked += 1;
+      } else if (Object.hasOwn(photo, entry.def)) {
+        assert.equal(photo[entry.def](payload), entry.expect === "accept", entry.file);
+        photoChecked += 1;
       }
     }
     assert.ok(checked >= 30, `only ${checked} payloads checked`);
+    assert.ok(photoChecked >= 8, `only ${photoChecked} photo-reading answers checked`);
   });
 });
 

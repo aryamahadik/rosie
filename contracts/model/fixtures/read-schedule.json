@@ -1,0 +1,30 @@
+{
+  "request": {
+    "kind": "schedule",
+    "file": "photo/2026-11-07/r2t8y4u0i6o1p7a3s9d5f1g6h2",
+    "sentAt": {
+      "utc": "2026-11-07T15:05:00Z",
+      "zone": "America/New_York"
+    }
+  },
+  "model": "sonnet",
+  "output": {
+    "kind": "schedule",
+    "outcome": "read",
+    "busy": [
+      {
+        "startsAt": {
+          "status": "read",
+          "value": { "utc": "2026-11-14T13:00:00Z", "zone": "America/New_York" },
+          "words": "Sat 11/14 8am"
+        },
+        "endsAt": {
+          "status": "read",
+          "value": { "utc": "2026-11-14T17:00:00Z", "zone": "America/New_York" },
+          "words": "12pm"
+        }
+      }
+    ]
+  },
+  "search": null
+}

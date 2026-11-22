@@ -1,0 +1,13 @@
+{
+  "kind": "priceList",
+  "outcome": "read",
+  "lines": [
+    {
+      "name": { "status": "read", "words": "Haircut" },
+      "priceKind": { "status": "read", "value": "one_price", "words": "$35" },
+      "price": { "status": "read", "value": { "cents": 3500, "currency": "USD" } },
+      "unit": { "status": "notShown" },
+      "length": { "status": "read", "value": 30, "words": "30 min" }
+    }
+  ]
+}
