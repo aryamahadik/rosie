@@ -33,7 +33,10 @@ import { NotBuiltError } from "../../tool-api/errors";
  *     (K-09 README default 199; T-1491), so the walk can neither ask the step nor write it as walked;
  *   - rowNotStep: a step's writer (or its buttons settler) gave an outbox row that names another step than its own
  *     (K-05 v1.22 item 82: a writer's rows carry the writer's own step; T-1479), so the row would carry another step's
- *     line to its reader.
+ *     line to its reader;
+ *   - eventKeyAtWalk: a step's writer (or its buttons settler) gave a key a turn never gives (walk.ts EVENT_ONLY_KEYS:
+ *     id_checked, given only by the ID upload on the secure page; K-09 README default 209; T-1532), naming the step and
+ *     the key alone.
  */
 export type WalkFault =
   | "flowNotInBundle"
@@ -51,7 +54,8 @@ export type WalkFault =
   | "givesNotStep"
   | "settledNotInBundle"
   | "settledNotRows"
-  | "rowNotStep";
+  | "rowNotStep"
+  | "eventKeyAtWalk";
 
 /** The walk refused the part: the whole turn is refused and nothing is written. */
 export class WalkRefusedError extends Error {

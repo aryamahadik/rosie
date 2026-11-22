@@ -25,6 +25,11 @@
 // K-09's commit-s1-04.json (the roster owner answers S1-04's question "All share one") pinned to bundle v2, S1-04's
 // question as K-05 v1.2 openQuestionRead reads its row, and a stand-in for S1-04's writer (T-1481's) that hands back the
 // fixture's stated state rows. None of them is the walk.
+//
+// T-1532 adds the wait at S1-10's doubles (K-09 README default 209): the bundles port over bundle v3 itself (bundles/v3,
+// T-1526), a turn answering S1-09 pinned to it, S1-09's question as K-05 v1.2 openQuestionRead reads its row, and
+// stand-ins for S1-09's writer (T-635a's) and S1-10's (S10-3's, not built), the latter giving mobile alone. None of them
+// is the walk.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -877,4 +882,113 @@ export const s1_04Writer: StepWriter<WalkTestRepo> = () => {
 /** The stand-ins by step id for an answered S1-04: S1-04's and S1-08's (T-1482's writer's stand-in: one quick reply). */
 export function buttonAnswerWriters(): Record<string, StepWriter<WalkTestRepo>> {
   return { "S1-04": s1_04Writer, "S1-08": tellingWriter };
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1532: bundle v3 (bundles/v3, T-1526) and the wait at S1-10 (K-09 README default 209)
+
+/** One of bundle v3's parts (bundles/v3/bundle/, T-1526), freshly parsed. */
+function bundleV3Part(file: string): unknown {
+  const root = path.join(CONTRACTS_DIR, "..", "bundles", "v3", "bundle");
+  return JSON.parse(readFileSync(path.join(root, ...file.split("/")), "utf8")) as unknown;
+}
+
+/** Bundle v3's id, as its manifest names it (K-01 v1 manifest.bundleId). */
+export function bundleV3Id(): BundleIdOf {
+  const { bundleId } = bundleV3Part("manifest.json") as { bundleId: BundleIdOf };
+  return { hash: bundleId.hash, build: bundleId.build };
+}
+
+/**
+ * Bundle v3's flow A graph, freshly parsed: bundle v2's eight steps byte for byte, plus S1-77, S1-76 and S1-10 as
+ * T-1526 compiled them (S1-10 a plain message step giving id_checked and mobile, next S1-75, which v3 does not hold).
+ */
+export function flowAV3(): GraphValue {
+  return bundleV3Part("flow/A.json") as GraphValue;
+}
+
+/** The bundles port over bundle v3: its flow graph for bundle v3's id (or `graphs`' own, given in its place), else null. */
+export function bundleV3Bundles(
+  graphs: Partial<Record<FlowLetter, unknown>> = { A: flowAV3() },
+): SkeletonBundles {
+  return pinnedBundles(bundleV3Id(), graphs);
+}
+
+/** S1-09's open question's id on the S1-09 turn (a stand-in id, as T-1528's s1_09Part names it). */
+export const S1_09_QUESTION = "oq-s1-09-sam";
+
+/**
+ * The turn answering S1-09 as the commit hands it to writesOf on bundle v3: commit-s1-02.json's request (Sam's turn,
+ * with the service and chat id of commit-s1-02-unmapped-end.json's same turn: default 135), pinned to bundle v3 (the
+ * turn's, the context's and decide's bundle), its one part an option of S1-09's question that names `branch` (one of
+ * S1_09_BRANCHES), as T-1528's s1_09Part moves turn 2's option to S1-09. Nothing in it is a person's but the fixture's.
+ */
+export function turnS1_09OnV3(branch: string): {
+  part: PassedPart;
+  context: CommitTurnContext<WalkTestRepo>;
+  choice: Choice;
+} {
+  const { request } = commitS1_02();
+  const same = fixture("commit-s1-02-unmapped-end.json") as { request: GateAndCommitRequest };
+  const given = requestTurnFields(same.request);
+  const turn = requestTurnFields(request);
+  turn.service = given.service;
+  turn.chatId = given.chatId;
+  const pin = bundleV3Id();
+  turn.bundleId = { ...pin };
+  const decided = decidedOf(request);
+  decided.context.bundleId = { ...pin };
+  decided.decide.bundleId = { ...pin };
+  const named = passedPartOf(request);
+  if (named.choice === null) throw new Error("commit-s1-02.json's part names an option");
+  const choice: Choice = { ...named.choice, step: "S1-09", question: S1_09_QUESTION, branch, label: branch };
+  return { part: { ...named, choice }, context: contextOf(request), choice };
+}
+
+/**
+ * S1-09's open question as K-05 v1.2 openQuestionRead reads its row on the S1-09 turn: S1-02's row (s1_02QuestionRow:
+ * Sam's, the business commit-s1-02.json names, no options, as writes.ts default 10 asks S1-09), at S1-09 under bundle
+ * v3, open at version 1.
+ */
+export function s1_09QuestionRow(): OpenQuestionRead {
+  return { ...s1_02QuestionRow(), id: S1_09_QUESTION, step: "S1-09", bundleId: bundleV3Id(), version: 1 };
+}
+
+/**
+ * A stand-in for S1-09's writer (T-635a's, default 204, which reads the typed name and the listing on the call's
+ * transaction): it gives business, as S1-09's gives name it, and writes no row. It reads nothing.
+ */
+export const s1_09Writer: StepWriter<WalkTestRepo> = () => {
+  const rows: StepRows = { state: [], stateEvents: [], gives: ["business"], asks: [], messages: [] };
+  return Promise.resolve(rows);
+};
+
+/**
+ * A stand-in for S1-10's writer (S10-3's, README default 210, not built): `mobile` alone, never id_checked, and one quick
+ * reply to the turn's own handle and person on the turn's service, about the call's business, naming line 2 (S1-10's
+ * secure-link line), with no question and no plan. It writes no accounts or page_links row and reads nothing.
+ */
+export const s1_10Writer: StepWriter<WalkTestRepo> = (call) => {
+  const { turn } = call.writer;
+  const { target } = call.choice;
+  const message: OutboxRowNew = {
+    id: call.writer.rowId("outbox"),
+    recipientHandleId: turn.turn.handleId,
+    recipientPersonId: turn.request.caller.personId,
+    businessId: target.businessId,
+    bookingId: target.bookingId,
+    channel: call.writer.text().service,
+    sendClass: "quick_reply",
+    openQuestionId: null,
+    copyOfRowId: null,
+    versionsRead: [],
+    lineNo: 2,
+  };
+  const rows: StepRows = { state: [], stateEvents: [], gives: ["mobile"], asks: [], messages: [message] };
+  return Promise.resolve(rows);
+};
+
+/** The stand-ins by step id on bundle v3 past S1-09: S1-09's, S1-76's message (tellingWriter) and S1-10's. S1-77 has none. */
+export function waitWriters(): Record<string, StepWriter<WalkTestRepo>> {
+  return { "S1-09": s1_09Writer, "S1-76": tellingWriter, "S1-10": s1_10Writer };
 }

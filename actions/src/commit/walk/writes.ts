@@ -50,6 +50,16 @@
 // stops the walk at its first routine row as for any answer (the close is the first), and no buttons settler is asked at
 // the answered step (default 199: the walk starts there, so it never stops there).
 //
+// The wait at an event step (T-1532; K-09 README default 209; S1-10 slice card S10-2, DL-1151): where the walk applies a
+// plain step whose gives hold a key a turn never gives (walk.ts EVENT_ONLY_KEYS: id_checked), it stops right after that
+// step (walk.ts waitsOnEvent) and its next is never read. The step is written as any walked step is, by its own writer
+// (default 9: S1-10's is S10-3's, T-636 re-scoped; with none bound the part is refused notBuilt, tells or gives, as
+// today), and the stop itself adds nothing (writingOf): no open question, no question row, no clock row. The part's rows
+// end with that step's, and it gives what its writer gave. A writer, or a buttons settler, that gives a key of the table
+// is refused (eventKeyAtWalk; default 21) with nothing written, so id_checked is never given at the walk. On bundle v3,
+// S1-09's owner branch writes S1-09's rows then S1-10's; its no-match branch S1-09's, S1-76's, then S1-10's; its helper
+// branch is refused at S1-77 (notBuilt, tells: README default 214), never stepNotInBundle at S1-75.
+//
 // A returning number's chat thread (T-1519; DL-1048, from T-1517's round 2): K-04 holds one chat thread per handle across
 // every business (0005 threads_one_chat_per_handle; MC C1) and one thread per Linq chat id (threads_linq_chat_key), so
 // S1-01's insert for a handle that already has its chat (a re-JOIN, the user's phone after T-1517's roster reset, a
@@ -195,6 +205,12 @@
 //      the question and checks default 192's conditions once every part is gated, so a settler's "ask" beside a part
 //      that passed and writes, or under a hold, is silent, as an asked part is there. Its row is the step's own line
 //      (K-09 v1.12 default 197; the README's open gap 183 keeps other words Jay's).
+//  21. (T-1532; README default 209) eventKeyAtWalk is checked before givesNotStep, for every writer's rows and every
+//      buttons settler's: a key of the event-only table is refused as eventKeyAtWalk whether its step gives it (S1-10)
+//      or not, since no writer ever gives one, and the refusal names the step and the first such key its rows give. A
+//      step the walk writes itself (S1-01's thread) gives no key of the table, so nothing else is checked. The rows of a
+//      walk that waits on an event are written exactly as those of a walk that ends its journey there would be: the
+//      walked steps' rows, in order, with nothing for the stop; holds stop it at its first routine row as for any walk.
 
 import type { Choice, Decided, SetupKey } from "../../gate/framework";
 import { PROTECTIVE_STEPS, SAFETY_FLOW_STEPS, holdClassOf, isHeld, type HoldClass } from "../hold";
@@ -221,7 +237,7 @@ import { buttonsAnswer, type ButtonsSettler, type ButtonsSettlers, type RowsBuil
 import { WalkNotBuiltError, WalkRefusedError } from "./errors";
 import { flowGraphOf, flowOfStep, type FlowGraph, type FlowLetter, type GraphStep } from "./graph";
 import { isSplitStep, noteSettlerAsked, settledBranch, type StepSettler, type StepSettlers } from "./settle";
-import { walkStretchFrom, type Stretch, type WalkStart, type Walked } from "./walk";
+import { eventKeysIn, walkStretchFrom, type Stretch, type WalkStart, type Walked } from "./walk";
 
 /** A bundle id as the turn row pins it (K-05 v1 turn.bundleId; K-01 v1 bundleId). */
 export interface BundleIdOf {
@@ -466,9 +482,11 @@ interface Writing {
 
 /**
  * The steps whose rows the walk writes, in order: an answer's step (its split, or the plain step whose button it
- * answers: T-1480), the steps walked, then the step it stops at. An answer writes each step of its chosen branch through
- * that step's writer, so a branch step the bundle does not hold (walk.ts default 1) is refused here, and an effect no
- * step writes is not built (effect).
+ * answers: T-1480), the steps walked, then the step it stops at when it asks or waits on a clock. A walk that waits on an
+ * event (waitsOnEvent: default 21) adds nothing for its stop: its step is the walk's last move, written by its own
+ * writer as any step walked, so no question, question row or clock row is made for it. An answer writes each step of
+ * its chosen branch through that step's writer, so a branch step the bundle does not hold (walk.ts default 1) is
+ * refused here, and an effect no step writes is not built (effect).
  */
 function writingOf(graph: FlowGraph, walked: Walked): Writing[] {
   const writing = walked.moves.map((move): Writing => {
@@ -721,10 +739,12 @@ function rowBuilderOf<Repo>(run: WalkRun<Repo>): RowBuilder {
 
   /**
    * A step's rows, by its own writer (default 9) or its buttons settler (default 199), added in the walk's order, each
-   * outbox row naming the step and its line (default 16); a key its step does not give, or a row naming another step,
-   * is refused.
+   * outbox row naming the step and its line (default 16); a key a turn never gives (default 21: eventKeyAtWalk), a key
+   * its step does not give, or a row naming another step, is refused.
    */
   const add = (step: GraphStep, rows: StepRows): void => {
+    const [event] = eventKeysIn(rows.gives);
+    if (event !== undefined) throw new WalkRefusedError("eventKeyAtWalk", [step.id, event]);
     const other = rows.gives.find((key) => !step.gives.includes(key));
     if (other !== undefined) throw new WalkRefusedError("givesNotStep", [step.id, other]);
     const messages = linedRows(step, rows.messages);
