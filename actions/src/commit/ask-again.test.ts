@@ -899,7 +899,7 @@ describe("T-1528: a passed choose whose split settler answers 'ask' sends the qu
     expect(asks).toEqual(["S1-02"]);
     expect(read.calls).toEqual([{ handleId: HANDLE, openQuestionId: QUESTION }]);
 
-    // K-09 v1.12's written and openQuestions; the part answered as a passed part is (ask-again.ts default 3).
+    // K-09 v1.12's written and openQuestions; the part answered `asked` (ask-again.ts default 3; open gap 179).
     const outcome = askedOutcome();
     expect(called.answer).toMatchObject({
       result: "committed",
@@ -909,7 +909,7 @@ describe("T-1528: a passed choose whose split settler answers 'ask' sends the qu
       openQuestions: { opened: [], closed: [] },
     });
     expect((called.answer as typeof outcome).parts).toMatchObject([
-      { part: 0, choiceId: "c-01", result: "committed", stoppedBy: null, gives: [] },
+      { part: 0, choiceId: "c-01", result: "asked", stoppedBy: null, gives: [] },
     ]);
     expect(called.rows).toEqual([
       { table: "open_questions", id: QUESTION },

@@ -52,10 +52,10 @@
 //      raise's and the row's; K-09 v1.12's "asked again" is the raise entry's kind, open_question.asked_again.
 //   2. An empty turn key (a binding's fault, never a condition of default 192) refuses the turn (noTurnKey), as the walk
 //      refuses one (walk/writes.ts noTurnKey), and is checked only once every condition holds.
-//   3. (T-1528) A part whose settler answered "ask" is answered as the commit answers any passed part (commit.ts:
-//      `committed`, with its limits as run and no key given), since commit.ts is not this card's: the README's open gap
-//      179 says `asked`, and its unit writes nothing, so only the part's result differs. Its row and raise are this
-//      file's one unit, built exactly as for a part decide ended in one question (the same id, row and entry).
+//   3. (T-1528, DL-1149) A part whose settler answered "ask" is answered `asked` (the README's open gap 179; K-09 v1's
+//      partResult: nothing changed), with its limits as run and no key given: commit.ts answers it as it answers a part
+//      waiting for the one question (its default 6), and its unit writes nothing. Its row and raise are this file's one
+//      unit, built exactly as for a part decide ended in one question (the same id, row and entry).
 
 import type { Decided, GatedPart } from "../gate/framework";
 import type { CommitUnit } from "./build";
