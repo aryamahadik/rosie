@@ -174,13 +174,23 @@ interface Owner {
   readonly trace2: string;
 }
 
+/** Places 1 to 4's numbers, each written whole, so the phone scan (T-1317) reads each as a fiction-range number. */
+const OWNER_NUMBERS: readonly string[] = ["+15555550181", "+15555550182", "+15555550183", "+15555550184"];
+
+/** The number of the owner at `place` (1 to 4). */
+function numberAt(place: number): string {
+  const number = OWNER_NUMBERS[place - 1];
+  if (number === undefined) throw new Error(`no owner number at place ${String(place)}`);
+  return number;
+}
+
 function ownerAt(place: number): Owner {
   const ids = rosterOwnerIds(place);
   const n = String(place);
   const turn1 = `turn-s1-01-one-kind-${n}`;
   return {
     place,
-    number: `+155555501${String(80 + place)}`,
+    number: numberAt(place),
     business: ids.businessId,
     company: ids.companyId,
     person: ids.personId,
