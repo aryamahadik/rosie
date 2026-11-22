@@ -2,9 +2,48 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 857, [`5b7b3bd5`](https://github.com/aryamahadik/rosie/commit/5b7b3bd5), 2026-11-22 00:25:54 UTC.
+- **Through:** commit 859, [`55946b1d`](https://github.com/aryamahadik/rosie/commit/55946b1d), 2026-11-22 01:13:14 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 859. docs: COMMIT\_HISTORY.md through commit 857 (5b7b3bd5, \#871) (\#873)
+
+- **Commit:** [`55946b1d`](https://github.com/aryamahadik/rosie/commit/55946b1d), by Arya Mahadik, 2026-11-22 01:13:14 UTC
+- **Pull request:** [#873](https://github.com/aryamahadik/rosie/pull/873) from `task/commit-history-211`, merged 2026-11-22 01:13:14 UTC. It squashed 1 branch commit:
+  - `6b56687` docs: COMMIT\_HISTORY.md through commit 857 (5b7b3bd5, \#871)
+- **Files changed:** 1 (+40 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +40 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 858. T-1521 parts 1, 1b and 2: K-05 default 215, the opener mark never drops the opener from a row sent before the row it names (DL-1083, DL-1084, DL-1089, DL-1091, DL-1104) (\#872)
+
+- **Commit:** [`ab0a1f09`](https://github.com/aryamahadik/rosie/commit/ab0a1f09), by Arya Mahadik, 2026-11-22 01:13:10 UTC
+- **Pull request:** [#872](https://github.com/aryamahadik/rosie/pull/872) from `task/T-1521s`, merged 2026-11-22 01:13:10 UTC. It squashed 1 branch commit:
+  - `e10a039` T-1521 parts 1, 1b and 2: K-05 default 215, the opener mark never dro…
+- **Files changed:** 7 (+384 −27), by folder:
+  - `contracts/data-access/` README.md +13 −5
+  - `db/repo/` outbox-first-lines.int.test.ts +24 −2, turn-face-reads.int.test.ts +197 −3, turn-face-reads.ts +16 −7
+  - `runtime/src/wiring/` hop10.worker.test.ts +41 −3, test-support.ts +14 −3
+  - `tests/contract/` data-access.v1.db-side.test.ts +79 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Part 1: K-05 README default 215, no new version: with a business, readFixedLineFacts reads a mark naming a row committed after the row read (a higher commit_seq) as default 202's fallback, so the earliest row sent carries the opener and the privacy-notice link; item 36, defaults 50 and 202 and open gap 99 point to it. Part 1b: the ruling on the frozen v1.3 fixture fixed-line-facts-texted-before.json, which stays as it is; a test that loads its world expects the fallback's textedAboutBusiness and openerRowId, checked as the tables' owner first. Part 2: readFixedLineFactsIn and the finalize double in runtime/src/wiring/test-support.ts follow it; out-a7-03-alex reads false and null; new out-of-commit-order cases in turn-face-reads.int.test.ts and hop10; the db-side contract test's and turn-face-reads.int.test.ts's answerOf map the fixture as ruled; outbox-first-lines.int.test.ts's 100 parallel writePlans expect every row's facts.
+
+Squashed onto main after K-05 v1.22 (#868): the README keeps v1.22's defaults 206 to 214 and its change-log line, then default 215's section and T-1521's two change-log lines.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 857. docs: COMMIT\_HISTORY.md through commit 855 (fb07f0c1, \#869) (\#871)
 
