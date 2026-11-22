@@ -92,8 +92,8 @@
 //                code; the handle's and db/repo's own errors as they are), since these db/repo calls catch nothing and
 //                postgres.js puts a statement's values on its error; the call then fails closed with nothing written.
 //                What they read (a number, an address, a consent row) goes to readStop alone, never to a line or an
-//                error. Beside `companies` (below) ../real.ts hands these same reads to S1-08's writer as its own
-//                (SignUpWriterDeps.plan.stop): no second stop binding.
+//                error. ../real.ts hands these same reads to S1-08's writer as its own (SignUpWriterDeps.plan.stop),
+//                wherever they are bound (T-1494, T-1485): no second stop binding.
 //   companies    the one-kind path's reads (T-1494, H2a; ../real.ts GateReads.companies; DL-1033, DL-1096, DL-1111; K-09
 //                README default 199), @rosie/actions' CompaniesReads through companiesReadsOf (T-1492), so a K-05 error
 //                answer is thrown as CompaniesReadError and never read as none; each read on a client of its own that the
@@ -115,6 +115,12 @@
 //                of these at a time. db/repo answers transient as K-05's error and throws any other database error
 //                scrubbed (the call's name and a SQLSTATE); the handle's own errors leave as thrown; nothing here catches,
 //                wraps or logs, and CompaniesReadError's `answer` (a SQLSTATE, a table or a row id) is never logged.
+//                T-1485 (H2b; DL-1122): ../real.ts hands these same reads to S1-04's own writer too (T-1481's, with
+//                SignUpWriterDeps.s1_04Writer and the party rule's flag off), for an owner's answer to an S1-04 that was
+//                asked: item 79 for the kept picks, item 72, then the catalog by id for each kind its company kind is
+//                written for (and kinds' names by id, under item 26's same call name, for "Some share one" alone), on the
+//                same clients and sides, one after another. A refused answer (a second company while the flag is off) is
+//                CompaniesRefusedError, thrown after its reads with nothing written, its message the fault alone.
 //   readChatHandle  K-05 v1.10 item 51 (T-1519; ../real.ts GateReads.readChatHandle; DL-1048, DL-1051), the phone handle
 //                whose chat thread holds the turn's Linq chat id, which S1-01's walk asks once so a returning number's
 //                JOIN reuses the handle's own chat thread instead of inserting a second one (one-chat-per-handle): db/repo
@@ -135,7 +141,8 @@
 // read, a seal, the commit on the runtime side; and, for an answer to S1-02's question, the catalog on a second Tool API
 // client, item 79 and S1-11's one trade overlay on the runtime side: T-1470; and the stop home's reads, each on the
 // runtime side: T-1516; and, for S1-01, item 51's chat read on the runtime side: T-1519; and, for a one-kind answer to
-// S1-02's question, item 79 and the catalog by id on the runtime side and item 72 on a second Tool API client: T-1494)
+// S1-02's question and for an answer to S1-04's question, item 79 and the catalog by id on the runtime side and item 72
+// on a second Tool API client: T-1494, T-1485)
 // opens and ends a client of its own, one after another, so it holds 2 connections at most; a keyword door's call holds
 // its runtime-side transaction's one connection the same way while its bundle reads, seal and commit open theirs
 // (T-1415), 2 at most too. At most 3 such
@@ -244,6 +251,7 @@ export const GATE_CLIENTS_AT_ONCE = 3;
  * each on the runtime side: the data-access call each StopHomeReads member makes), the chat read's K-05's (T-1519:
  * item 51, on the runtime side), and the one-kind path's K-05's (T-1494: item 79 under the kinds reads' own name, since
  * it is the same call on the same side; item 72 on the Tool API's side; item 26, the catalog by id, on the runtime side).
+ * S1-04's writer (T-1485) reads through the one-kind path's reads, so its calls go under those same three names.
  */
 export const GATE_CALLS = Object.freeze({
   scope: "gateAndCommit",
@@ -514,9 +522,9 @@ const asGateReads = (reads: GateReads<Tx, Sql>): GateReads => reads as GateReads
  * runtime-side client of its own (T-1516; DL-1033 ruling 8); and, for S1-01's thread, K-05 v1.10 item 51's chat read on
  * a runtime-side client of its own (T-1519; DL-1048); and, for a one-kind answer to S1-02's question, the one-kind path's
  * reads, item 79 and the catalog by id each on a runtime-side client of its own and item 72 on a Tool API client of its
- * own (T-1494; DL-1111). Null anywhere but staging (nothing read but ENVIRONMENT)
- * and while either binding is missing, so every gate fails closed, a keyword turn naming no business with the base's
- * noBusinessScope.
+ * own (T-1494; DL-1111), which S1-04's writer reads through too for an answer to S1-04's question (T-1485; DL-1122).
+ * Null anywhere but staging (nothing read but ENVIRONMENT) and while either binding is missing, so every gate fails
+ * closed, a keyword turn naming no business with the base's noBusinessScope.
  */
 export const stagingGateReads: (part: GatePart) => GateReads | null = ({ env, db, keys, bundleSafety }) => {
   if (environmentOf(env) !== "staging") return null;
@@ -536,7 +544,8 @@ export const stagingGateReads: (part: GatePart) => GateReads | null = ({ env, db
     kinds: { reads: kindsReadsOn(db) },
     // The stop reads S1-03's, S1-74's and S1-08's writers share (DL-1033 ruling 8, CQ-360's scope): on the runtime side.
     stop: { reads: stopReadsOn(db) },
-    // One kept kind of work is never asked S1-04 (T-1494; DL-1111): item 79, item 72 and the catalog by id, each its own.
+    // One kept kind of work is never asked S1-04 (T-1494; DL-1111), and an answer to an S1-04 that was asked is written
+    // (T-1485; DL-1122; the party rule's flag off): item 79, item 72 and the catalog by id, each its own.
     companies: companiesReadsOn(db),
     // S1-01 reuses the turn's own handle's chat thread (T-1519; one-chat-per-handle): item 51 on the runtime side.
     readChatHandle: chatHandleReadOn(db),

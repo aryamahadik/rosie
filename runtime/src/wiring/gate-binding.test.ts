@@ -37,31 +37,46 @@
 //      S1-02's settler, S1-02's writer inside the companies wrapper (item 79, item 72 and the catalog by id read once
 //      each), S1-11's writer, S1-04's buttons settler and S1-08's writer (the stop home read for the turn's own owner),
 //      every read of the binding one after another, and ends at S1-09's question with no S1-04 question; "Barbershop,
-//      plumbing, electrical" still asks S1-04 as without the path; with the one-kind reads left out the binding is
-//      T-1516's as it is (no buttons settler, no S1-08 writer, "Plumbing" asks S1-04); with them bound and no stop reads,
-//      "Plumbing" is refused at S1-08 with nothing returned; with no kinds reads they bind nothing and are never read.
+//      plumbing, electrical" still asks S1-04 as without the path; with the one-kind reads left out there is no buttons
+//      settler and no S1-04 writer, and "Plumbing" asks S1-04 as T-1516's binding does; with them bound and no stop reads,
+//      "Plumbing" is refused at S1-08 with nothing returned; with no kinds reads they bind nothing and are never read;
+//   g. S1-04's writer (T-1485, H2b; DL-1033, DL-1122; K-09 README defaults 181 to 185, 189, 190 and 199): staging's shape
+//      now also carries S1-04's own writer (T-1481's, with SignUpWriterDeps.s1_04Writer and the party rule's flag off),
+//      and no other S1-04 writer or settler; building the binding reads nothing; the "Plumbing" walk of f runs through
+//      that whole binding in the same order, never asking S1-04's writer, and ends at S1-09's question with no S1-04
+//      question. An answer to an S1-04 that was asked (commit-s1-04-some-share.json's turn on bundle v2, Sam's three
+//      picks on file): "They all share one company" (c-02) runs S1-04's writer, then S1-08's writer, never the buttons
+//      settler, closes the question at its version, places the three picks in the turn's company, then S1-08's row and
+//      S1-09's question, one read open at a time; Sam's own answer, which needs a second company, is refused
+//      (CompaniesRefusedError secondCompany) with nothing returned, the flag being off; with the one-kind reads left out
+//      there is no S1-04 writer (an answer to S1-04 is notBuilt, gives, before any read) while S1-08's writer stays bound
+//      beside the stop reads; with the stop reads left out there is no S1-08 writer (the answer is refused at S1-08,
+//      notBuilt, before any read).
 //
 // Under test, as they are: ./real.ts's binding and its bundles; @rosie/actions' turnCommitDeps, T-1461's walk on bundle
 // v1's flow A with T-1502's settler port, T-633's writers and T-1502's S1-02 settler with T-632's matcher, T-634's
 // writer, and T-590's readStop and mayText inside T-633's writers; and T-1519's walkChatsOf and S1-01's thread write;
 // for f, T-1491's buttons-settler walk on bundle v2's flow A, T-1492's one-kind wrapper and settler through
-// companiesReadsOf, and T-1482's S1-08 writer.
+// companiesReadsOf, and T-1482's S1-08 writer; for g, the same and T-1481's S1-04 writer through the walk's answered step.
 // Doubles, for ports only: the pinned bundle (bundle v1's own flow A and trade overlays, read from bundles/v1; for turn
 // 1, K-01's bundle-v0-skeleton.json's flow A), the bundle port (../bundle/test-support), the question read and K-05
 // items 78 and 79 (@rosie/actions' own doubles, as T-1468's unit test binds them), the stop home's reads (@rosie/actions'
 // own double over the frozen seeds, on the runtime side, as T-633's unit test binds them), K-05 item 51 (an answer as
 // readChatHandle gives it), and ./test-support's fakeGateReads as it is; for f, bundle v2 as a run pinned it (its own
 // manifest, flow A and trade overlays, read from bundles/v2) and items 79 and 72 and the catalog by id (@rosie/actions'
-// fakeCompaniesK05, as T-1493's unit test binds them). Test values only (rule 9): the contracts' fixtures, bundles v1 and
-// v2, the master's sample cast and a whole fiction-range 555-01xx number.
+// fakeCompaniesK05, as T-1493's unit test binds them); for g, Sam's three picks on file and S1-04's question row in
+// those same doubles, as T-1484's unit test gives them. Test values only (rule 9): the contracts' fixtures, bundles v1
+// and v2, the master's sample cast and a whole fiction-range 555-01xx number.
 import { BARBERSHOP } from "@rosie/actions/src/domain/safety/test-support";
 import {
   NOTHING_OPEN,
   bundleV1Id,
   commitS1_02,
+  contextOf,
   decidedOf,
   flowA,
   flowAV1,
+  passedPartOf,
   questionsOver,
   requestTurnFields,
   s1_02QuestionRow,
@@ -72,11 +87,17 @@ import {
 import { WalkNotBuiltError, type ButtonsSettler, type WalkQuestions } from "@rosie/actions/src/commit/walk";
 import type { StopHomeReads } from "@rosie/actions/src/homes/stop/reads";
 import { readsOn, seedWorld } from "@rosie/actions/src/homes/stop/test-support";
+import { CompaniesRefusedError } from "@rosie/actions/src/tool-api/journey-1/companies/errors";
 import { companiesReadsOf } from "@rosie/actions/src/tool-api/journey-1/companies/reads";
 import {
+  COMMIT_S1_04_SOME_SHARE,
   SAM_COMPANY,
   catalogDefaults,
   fakeCompaniesK05,
+  pickOnFile,
+  s1_04Exchange,
+  type AnswerField,
+  type CompaniesGiven,
 } from "@rosie/actions/src/tool-api/journey-1/companies/test-support";
 import { KindsNotBuiltError, KindsRefusedError } from "@rosie/actions/src/tool-api/journey-1/kinds/errors";
 import { kindsReadsOf } from "@rosie/actions/src/tool-api/journey-1/kinds/reads";
@@ -100,6 +121,8 @@ import {
   type ErrorAnswer,
 } from "@rosie/actions/src/tool-api/turn-face/commit";
 import { TurnFaceReadError } from "@rosie/actions/src/tool-api/turn-face/errors";
+import type { PickedKindRead } from "@rosie/db/repo/kinds-reads";
+import type { OpenQuestionRead } from "@rosie/db/repo/targets";
 import { describe, expect, it } from "vitest";
 
 import { BundleError, type Manifest, type PinnedBundle, type TradeOverlay } from "../bundle";
@@ -1088,20 +1111,24 @@ describe("the gate's commit binding hands in the one-kind path where the reads b
     readonly kinds?: boolean;
     readonly stop?: boolean;
     readonly companies?: boolean;
+    /** (T-1485) What the one-kind reads answer (default: Sam's company and its barber kind, no pick yet). */
+    readonly world?: CompaniesGiven;
+    /** (T-1485) The live questions the question read answers for Sam's handle (default: S1-02's). */
+    readonly questions?: readonly OpenQuestionRead[];
   }
 
   /**
    * The binding realGate builds for one call over staging's shape of reads (the question read with S1-02's question open,
    * the kinds reads over the 243 seeded kinds, the stop home's reads where Sam's mobile texts, and the one-kind reads
-   * with Sam's company of Lee's Barbershop and its barber kind on file, no pick yet), each read counted while open, the
-   * run's pinned bundle v2.
+   * with Sam's company of Lee's Barbershop and its barber kind on file, no pick yet, unless `world` and `questions` say
+   * otherwise), each read counted while open, the run's pinned bundle v2.
    */
   function oneKindBound(given: Given = {}) {
     const reads: OpenReads = { open: 0, peak: 0 };
     const k05 = fakeK05();
-    const companies = fakeCompaniesK05();
+    const companies = fakeCompaniesK05(given.world);
     const stop = recordedStop();
-    const questions = questionsOver();
+    const questions = given.questions === undefined ? questionsOver() : questionsOver(given.questions);
     const gateReads: GateReads = {
       ...baseReads(),
       questions: questions.questions,
@@ -1174,7 +1201,7 @@ describe("the gate's commit binding hands in the one-kind path where the reads b
     return { turn, context, writes: await ports.writesOf(turn.part, context, NOTHING_OPEN) };
   }
 
-  it("bound (staging's shape): the binding carries S1-04's buttons settler alone and S1-08's writer beside T-1516's writers and S1-02's settler; building it reads nothing", () => {
+  it("bound (staging's shape): the binding carries S1-04's buttons settler alone, S1-04's own writer (T-1485) and S1-08's writer beside T-1516's writers and S1-02's settler; building it reads nothing", () => {
     const { reads, k05, companies, stop, pinned, binding } = oneKindBound();
     const { buttonsSettlers, writers, settlers } = binding;
     if (buttonsSettlers === undefined || writers === undefined || settlers === undefined) {
@@ -1184,10 +1211,13 @@ describe("the gate's commit binding hands in the one-kind path where the reads b
     for (const stepId of ["S1-02", "S1-08", "S1-09", "s1-04", "", "__proto__"]) {
       expect(buttonsSettlers(stepId), stepId).toBeNull();
     }
-    for (const stepId of ["S1-02", "S1-03", "S1-74", "S1-11", "S1-08"]) {
+    // T-1485 (H2b): S1-04's own writer is bound beside the buttons settler (it was null under H2a).
+    for (const stepId of ["S1-02", "S1-03", "S1-74", "S1-11", "S1-04", "S1-08"]) {
       expect(typeof writers(stepId), stepId).toBe("function");
     }
-    for (const stepId of ["S1-01", "S1-04", "S1-09", ""]) expect(writers(stepId), stepId).toBeNull();
+    for (const stepId of ["S1-01", "S1-09", "s1-04", "", "__proto__"]) {
+      expect(writers(stepId), stepId).toBeNull();
+    }
     expect(typeof settlers("S1-02")).toBe("function");
     expect(settlers("S1-04")).toBeNull();
     // Building the binding read nothing.
@@ -1200,11 +1230,14 @@ describe("the gate's commit binding hands in the one-kind path where the reads b
 
   it("bound: 'Plumbing' on bundle v2 runs S1-02's settler, S1-02's writer inside the companies wrapper, S1-11's writer, S1-04's buttons settler and S1-08's writer, every read one after another, and ends at S1-09's question with no S1-04 question", async () => {
     const { reads, k05, companies, stop, pinned, binding, bound } = oneKindBound();
+    // T-1485 (H2b): the whole H1b binding, S1-04's own writer bound too (the architect's note b on T-1484).
+    expect(typeof binding.writers?.("S1-04")).toBe("function");
     const order: string[] = [];
 
     const { turn, writes } = await walkedOnV2(binding, "Plumbing", order);
 
-    // S1-02's settler and writer (the wrapper inside T-634's), S1-11's blocks, S1-04 settled, not asked, then S1-08.
+    // S1-02's settler and writer (the wrapper inside T-634's), S1-11's blocks, S1-04 settled, not asked, then S1-08:
+    // S1-04's writer is never asked on this walk.
     expect(order).toEqual(["settler S1-02", "writer S1-02", "writer S1-11", "buttons S1-04", "writer S1-08"]);
     // The catalog and item 79 for S1-02's writer; item 79, item 72 and the catalog by id for the one-kind pieces, each
     // once for the walk, for the call's business and the turn's person; the stop home for S1-08's writer alone (no S1-03
@@ -1298,10 +1331,12 @@ describe("the gate's commit binding hands in the one-kind path where the reads b
     expect(bound.writes).toEqual(today.writes);
   });
 
-  it("left out: the binding is T-1516's as it is (no buttons settler, no S1-08 writer), 'Plumbing' asks S1-04 as today, and no one-kind read is made", async () => {
+  it("left out: no buttons settler and no S1-04 writer, as T-1516's binding (S1-08's writer bound beside the stop reads since T-1485, which no walk reaches), 'Plumbing' asks S1-04 as today, and no one-kind read is made", async () => {
     const { companies, binding } = oneKindBound({ companies: false });
     expect(Object.hasOwn(binding, "buttonsSettlers")).toBe(false);
-    expect(binding.writers?.("S1-08")).toBeNull();
+    expect(binding.writers?.("S1-04")).toBeNull();
+    // T-1485: S1-08's writer is bound wherever the stop reads are (K-09 README default 189; commit.ts default 6).
+    expect(typeof binding.writers?.("S1-08")).toBe("function");
 
     const order: string[] = [];
     const { writes } = await walkedOnV2(binding, "Plumbing", order);
@@ -1332,5 +1367,226 @@ describe("the gate's commit binding hands in the one-kind path where the reads b
       expect(Object.hasOwn(binding, field), field).toBe(false);
     }
     expect(companies.asked).toEqual([]);
+  });
+
+  // ---- T-1485 (H2b): S1-04's writer for an answer to an S1-04 that was asked ---------------------------------------------
+
+  describe("staging's shape hands S1-04's writer its deps, the party rule's flag off, so an owner's answer to an S1-04 that was asked is written and walked on to S1-08's row and S1-09's question (T-1485)", () => {
+    const ALL_SHARE_ONE = "c-02";
+    const SOME_SHARE_ONE = "c-01";
+
+    /** A pick's 11 plug-in text blocks as item 79 answers them: in the pf keys' order, each at version 1, no business. */
+    const textsOf = (pickId: string): PickedKindRead["texts"] =>
+      // K-05 v1.19 types `texts` as a list of at most 11; the pf keys are exactly 11.
+      PF_TEXT_KEYS.map((key) => ({
+        rowId: `${pickId}/${key}`,
+        pfKey: key,
+        businessId: null,
+        version: 1,
+      })) as PickedKindRead["texts"];
+
+    /** Sam's three picks after commit-s1-02.json, none placed, the barbershop first with its 11 blocks. */
+    const samPicks = (): PickedKindRead[] => [
+      pickOnFile({
+        id: "pick-sam-barbershop",
+        words: "Barbershop",
+        kindId: "barber",
+        texts: textsOf("pick-sam-barbershop"),
+      }),
+      pickOnFile({ id: "pick-sam-plumbing", position: 2, words: "plumbing" }),
+      pickOnFile({ id: "pick-sam-electrical", position: 3, words: "electrical", kindId: "electrician" }),
+    ];
+
+    /**
+     * S1-04's question to Sam as the walk reads its row on the answering turn: commit-s1-04-some-share.json's
+     * oq-s1-04-sam, asked as the walk asks a plain step's buttons (no options, no read-back), open at version 1.
+     */
+    function samS1_04Row(): OpenQuestionRead {
+      const { request } = s1_04Exchange(COMMIT_S1_04_SOME_SHARE);
+      const [asked] = decidedOf(request).context.openQuestions;
+      if (asked === undefined)
+        throw new Error("commit-s1-04-some-share.json's context names S1-04's question");
+      return {
+        id: asked.openQuestionId,
+        businessId: asked.target.businessId,
+        bookingId: asked.target.bookingId,
+        personId: request.caller.personId,
+        turnId: "turn-s1-02-sam-kinds",
+        step: asked.step,
+        status: "open",
+        options: [],
+        readback: null,
+        versionsRead: [],
+        clock: null,
+        sentAt: asked.sentAt.utc,
+        pollId: asked.pollId,
+        askCount: asked.askCount,
+        bundleId: BUNDLE_V2,
+        version: 1,
+      };
+    }
+
+    /** Staging's shape over Sam's three picks on file and his S1-04 question open, each read counted while open. */
+    const answering = (given: Given = {}) =>
+      oneKindBound({ ...given, world: { picks: samPicks() }, questions: [samS1_04Row()] });
+
+    /**
+     * Sam's answer to S1-04 (commit-s1-04-some-share.json's turn, pinned to bundle v2, its one part choosing `choiceId`
+     * with `fields`) through the commit's own writesOf over the binding, each settler and writer it reaches in `order`.
+     */
+    function answeredOnV2(
+      binding: Bound,
+      choiceId: string,
+      fields: readonly AnswerField[],
+      order: string[] = [],
+    ) {
+      const { request } = s1_04Exchange(COMMIT_S1_04_SOME_SHARE, choiceId, fields);
+      requestTurnFields(request).bundleId = { ...BUNDLE_V2 };
+      const decided = decidedOf(request);
+      decided.context.bundleId = { ...BUNDLE_V2 };
+      decided.decide.bundleId = { ...BUNDLE_V2 };
+      const { ports } = turnCommitDeps(watchedOf(binding, order))(NOTHING_OPEN_AT);
+      return ports.writesOf(passedPartOf(request), contextOf(request), NOTHING_OPEN);
+    }
+
+    const shared = (words: string): AnswerField => ({ name: "shared_kinds", value: words, words });
+    const named = (words: string): AnswerField => ({ name: "company_name", value: words, words });
+    /** Sam's own answer (commit-s1-04-some-share.json): plumbing and electrical share Lee Home Services. */
+    const SAMS_ANSWER = [shared("Plumbing and electrical"), named("Lee Home Services")];
+
+    it("'They all share one company' (All share one): S1-04's writer, then S1-08's writer, never the buttons settler; the question closed at its version, Sam's three picks placed in his company under his business with the plumber and electrician company kinds first (barber kept), the barbershop's 11 blocks given the business, then S1-08's row and S1-09's question; every read one after another", async () => {
+      const { reads, k05, companies, stop, questions, binding } = answering();
+      const order: string[] = [];
+
+      const writes = await answeredOnV2(binding, ALL_SHARE_ONE, [], order);
+
+      expect(order).toEqual(["writer S1-04", "writer S1-08"]);
+      expect(questions.reads.map((read) => [read.handleId, read.openQuestionId])).toEqual([
+        ["handle-sam", "oq-s1-04-sam"],
+      ]);
+      expect(writes.closes).toEqual([
+        { id: "oq-s1-04-sam", expectVersion: 1, status: "answered", answeredOptionId: null },
+      ]);
+      expect(writes.state.map((write) => `${write.op} ${write.table}`)).toEqual([
+        "insert company_kinds",
+        "insert company_kinds",
+        "update picked_kinds",
+        "update picked_kinds",
+        "update picked_kinds",
+        ...PF_TEXT_KEYS.map(() => "update picked_kind_texts"),
+      ]);
+      const [plumber, electrician, ...rest] = writes.state;
+      for (const [write, kindId] of [
+        [plumber, "plumber"],
+        [electrician, "electrician"],
+      ] as const) {
+        const defaults = catalogDefaults(kindId);
+        expect(write, kindId).toEqual({
+          op: "insert",
+          table: "company_kinds",
+          values: {
+            company_id: SAM_COMPANY,
+            kind_id: kindId,
+            business_id: BARBERSHOP,
+            trade_name: null,
+            pf_facts: defaults.facts,
+            pf_switches_a: defaults.switchesA,
+            pf_switches_b: defaults.switchesB,
+          },
+        });
+      }
+      expect(rest.slice(0, 3)).toEqual(
+        ["pick-sam-barbershop", "pick-sam-plumbing", "pick-sam-electrical"].map((id) => ({
+          op: "update",
+          table: "picked_kinds",
+          key: { id },
+          expectVersion: 1,
+          set: { company_id: SAM_COMPANY, business_id: BARBERSHOP },
+        })),
+      );
+      expect(rest.slice(3)).toEqual(
+        PF_TEXT_KEYS.map((key) => ({
+          op: "update",
+          table: "picked_kind_texts",
+          key: { picked_kind_id: "pick-sam-barbershop", pf_key: key },
+          expectVersion: 1,
+          set: { business_id: BARBERSHOP },
+        })),
+      );
+      // No S1-04 question again: S1-08's row (no question), then S1-09's question and its row, their ids built from the
+      // answering turn's id (K-09 v1.5 default 131).
+      const key = String(requestTurnFields(s1_04Exchange(COMMIT_S1_04_SOME_SHARE).request).id);
+      expect(writes.asks.map((ask) => [ask.question.id, ask.question.step])).toEqual([
+        [`oq-s1-09-${key}-1`, "S1-09"],
+      ]);
+      expect(
+        writes.messages.map((row) => [row.id, row.step, row.lineNo, row.openQuestionId, row.sendClass]),
+      ).toEqual([
+        [`outbox-s1-08-${key}-1`, "S1-08", 0, null, "quick_reply"],
+        [`outbox-s1-09-${key}-1`, "S1-09", 0, `oq-s1-09-${key}-1`, "quick_reply"],
+      ]);
+      expect(writes.gives).toEqual(["companies"]);
+      // S1-04's writer read item 79 once, item 72 once and the catalog once for each kind it adds; the stop home for
+      // S1-08's writer alone; no kinds read; never two reads open at once.
+      expect(companies.asked.map((asked) => [asked.read, asked.request.businessId])).toEqual([
+        ["readPickedKinds", BARBERSHOP],
+        ["readBusinessKinds", BARBERSHOP],
+        ["readTurnState", BARBERSHOP],
+        ["readTurnState", BARBERSHOP],
+      ]);
+      expect(stop.asked).toEqual(SAM_STOP_READS);
+      expect(k05.asked).toEqual([]);
+      expect(reads.peak).toBe(1);
+      expect(reads.open).toBe(0);
+    });
+
+    it("Sam's own answer needs a second company: with the party rule's flag off, as staging hands it, it is refused (CompaniesRefusedError secondCompany, naming S1-04 alone) with nothing returned, before item 72 or S1-08 is reached", async () => {
+      const { companies, stop, binding } = answering();
+      const order: string[] = [];
+
+      const thrown = await thrownBy(answeredOnV2(binding, SOME_SHARE_ONE, SAMS_ANSWER, order));
+
+      expect(thrown).toBeInstanceOf(CompaniesRefusedError);
+      expect(thrown).toMatchObject({ name: "CompaniesRefusedError", fault: "secondCompany", ids: ["S1-04"] });
+      // The message names the fault and the step alone: none of the owner's words.
+      expect((thrown as Error).message).toBe(new CompaniesRefusedError("secondCompany", ["S1-04"]).message);
+      for (const words of ["Lee Home Services", "Plumbing and electrical"]) {
+        expect((thrown as Error).message).not.toContain(words);
+      }
+      expect(order).toEqual(["writer S1-04"]);
+      expect(companies.asked.map((asked) => asked.read)).not.toContain("readBusinessKinds");
+      expect(stop.asked).toEqual([]);
+    });
+
+    it("the one-kind reads left out: no S1-04 writer, so 'They all share one company' is notBuilt (gives) before any read; S1-08's writer stays bound beside the stop reads", async () => {
+      const { companies, questions, binding } = answering({ companies: false });
+      expect(binding.writers?.("S1-04")).toBeNull();
+      expect(typeof binding.writers?.("S1-08")).toBe("function");
+      const order: string[] = [];
+
+      const thrown = await thrownBy(answeredOnV2(binding, ALL_SHARE_ONE, [], order));
+
+      expect(thrown).toBeInstanceOf(WalkNotBuiltError);
+      expect(thrown).toMatchObject({ seam: "gives", ids: ["S1-04", "companies"] });
+      expect(order).toEqual([]);
+      expect(questions.reads).toEqual([]);
+      expect(companies.asked).toEqual([]);
+    });
+
+    it("the stop reads left out: S1-04's writer and no S1-08 writer, so 'They all share one company' is refused at S1-08 (notBuilt) before any read", async () => {
+      const { companies, stop, questions, binding } = answering({ stop: false });
+      expect(typeof binding.writers?.("S1-04")).toBe("function");
+      expect(binding.writers?.("S1-08")).toBeNull();
+      const order: string[] = [];
+
+      const thrown = await thrownBy(answeredOnV2(binding, ALL_SHARE_ONE, [], order));
+
+      expect(thrown).toBeInstanceOf(WalkNotBuiltError);
+      expect(thrown).toMatchObject({ ids: ["S1-08"] });
+      expect(order).toEqual([]);
+      expect(questions.reads).toEqual([]);
+      expect(companies.asked).toEqual([]);
+      expect(stop.asked).toEqual([]);
+    });
   });
 });
