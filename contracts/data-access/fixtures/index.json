@@ -3255,6 +3255,54 @@
       "expect": "refuse",
       "shows": "commit-s1-04-sam-lines with S1-08's row naming its step and no lineNo: a row names its step and line together or neither, so a half-named line is never written (its one fault request.writes.outboxRows.0, lineNo missing beside step; put right, it is commit-s1-04-sam-lines)",
       "source": "ops/cards/T-1474.md (Gives 1: 'both or neither'; 'Refused: a step with no lineNo'); K-04 core v1.2 outbox_rows_step_with_line and refuse-outbox-row-step-without-line.json; DL-999 decision (e); K-05 v1.22 item 82 and default 206 (outboxRowNew dependentRequired)"
+    },
+    {
+      "file": "park-turn-sam-refused-at-once.json",
+      "version": "v1.23",
+      "def": "parkTurn.lineExchange",
+      "expect": "accept",
+      "shows": "Sam's turn refused as final by the walk on try 1 (stepNotInBundle, S1-04) is parked at once, never resent or rerun: one transaction writes the turn parked with tries 1, K-37's parked_turns row for Rosie's team, his one row (quick_reply, no booking, question, copy or versions read) planned then checked at version 2 with K-01's passedOn line word for word as its only words, and the turn.parked entry with the refusal's labels; the answer names the row at commitSeq 1",
+      "source": "ops/cards/T-1531.md (Gives); ops/reviews/refusal-reply/rule-refusal.json rulings 1 to 3 (DL-1142, DL-1144); arch 11 line 576 (the park, applied sooner); arch 02 line 123 and S13-29 (passedOn); bundles/v2 manifest fixedLines passedOn and K-01 v1 fixed-lines.json; K-37 v1 parked_turns (0014); K-07 v1 moves (new) to planned and planned to checked; actions/src/commit/walk/errors.ts (stepNotInBundle); K-05 v1.23 item 84 and defaults 216 to 222"
+    },
+    {
+      "file": "park-turn-sam-refused-repeat.json",
+      "version": "v1.23",
+      "def": "parkTurn.lineExchange",
+      "expect": "accept",
+      "shows": "The same park sent again after its answer was lost writes nothing (no second turn, team record, row, entry or line) and answers the first park's time and row with repeated true",
+      "source": "K-05 v1 item 12 ('a parked turn answers repeated'); runtime/src/turn/park.ts (PARK_SENDS: a lost answer is sent once more as the same request); arch 10 line 508 (a retry never doubles an effect); K-05 v1.23 item 84 and default 223"
+    },
+    {
+      "file": "park-turn-maya-crash-with-line.json",
+      "version": "v1.23",
+      "def": "parkTurn.lineExchange",
+      "expect": "accept",
+      "shows": "A third crash before the commit parks Maya's turn as v1's park-turn.json does, with no reason, and now with the passedOn line in her one row, planned then checked, so it is sent like any checked row instead of passed unworded; the entry keeps v1's outage path",
+      "source": "ops/reviews/refusal-reply/rule-refusal.json card 7 ('The park after a third crash sends the same line'); ops/cards/T-1531.md (Gives: 'a park at tries 3 after crashes keeps today's meaning plus the line'); arch 11 line 576; K-05 v1 park-turn.json and README default 183; K-05 v1.23 item 84 and defaults 216, 218 and 222"
+    },
+    {
+      "file": "invalid/refuse-park-turn-sam-refused-no-reason.json",
+      "version": "v1.23",
+      "def": "parkTurn.lineExchange",
+      "expect": "refuse",
+      "shows": "park-turn-sam-refused-at-once with no reason on try 1: a turn parked before its third try was parked by a final refusal and names it (its one fault request.reason; put right, it is park-turn-sam-refused-at-once)",
+      "source": "ops/cards/T-1531.md ('parkTurn takes tries 1 to 3 and a reason'); ops/reviews/refusal-reply/rule-refusal.json ruling 2 ('a reason naming the refusal'); K-05 v1.23 item 84 and default 218 (parkTurn.lineRequest if and then)"
+    },
+    {
+      "file": "invalid/refuse-park-turn-sam-refused-line-reworded.json",
+      "version": "v1.23",
+      "def": "parkTurn.lineExchange",
+      "expect": "refuse",
+      "shows": "park-turn-sam-refused-at-once whose row tells Sam about the refused part in words of its own: the park's words are the passedOn line word for word and nothing else (its one fault request.outboxRows.0.finalParts.sends.0.text; put right, it is park-turn-sam-refused-at-once)",
+      "source": "ops/reviews/refusal-reply/rule-refusal.json rulings 2 ('the existing passedOn fixed line, word for word') and 3 ('Nothing of the refused part is written'); bundles/v2 manifest fixedLines passedOn; K-05 v1.23 item 84 and default 216 (parkedLineParts)"
+    },
+    {
+      "file": "invalid/refuse-park-turn-sam-refused-reason-words.json",
+      "version": "v1.23",
+      "def": "parkTurn.lineExchange",
+      "expect": "refuse",
+      "shows": "park-turn-sam-refused-at-once whose reason gives its fault in words: a reason is labels only, never words (its one fault request.reason.fault; put right, it is park-turn-sam-refused-at-once)",
+      "source": "ops/cards/T-1531.md ('a reason (a final refusal's label: from, fault, ids, labels only)'); ops/reviews/refusal-reply/rule-refusal.json ruling 3 ('all labels and ids'); K-08 v1 safeId; K-05 v1.23 item 84 and default 217 (parkReason)"
     }
   ]
 }

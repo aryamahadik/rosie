@@ -1,0 +1,90 @@
+{
+  "call": "parkTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-22T15:00:05Z",
+    "note": "park-turn-sam-refused-at-once whose row's words tell Sam about the refused part in words of their own: the park's words are K-01's passedOn line word for word, never other words and never anything of the refusal; refused (its one fault request.outboxRows.0.finalParts.sends.0.text; put right, it is park-turn-sam-refused-at-once)."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-sam-refused-1",
+      "handleId": "handle-sam",
+      "eventIds": ["evt-sam-0009"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-sam-0009",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "parkedAt": "2026-11-22T15:00:05Z",
+    "reason": { "from": "walk", "fault": "stepNotInBundle", "ids": ["S1-04"] },
+    "outboxRows": [
+      {
+        "id": "out-turn-sam-refused-1-parked",
+        "recipientHandleId": "handle-sam",
+        "recipientPersonId": "person-sam",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": null,
+        "channel": "imessage",
+        "sendClass": "quick_reply",
+        "openQuestionId": null,
+        "copyOfRowId": null,
+        "versionsRead": [],
+        "plan": {
+          "row": "out-turn-sam-refused-1-parked",
+          "channel": "imessage",
+          "copyOf": null,
+          "plan": {
+            "formats": ["text"],
+            "lines": [],
+            "question": null,
+            "pageType": null,
+            "threadReplyTo": null
+          }
+        },
+        "finalParts": {
+          "row": "out-turn-sam-refused-1-parked",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "I can't set up that step for your shop yet. Rosie's team will reply within 1 business day.",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": ["passedOn"],
+          "slotValues": [],
+          "threadReplyTo": null
+        }
+      }
+    ],
+    "events": [
+      {
+        "id": "log-turn-sam-refused-1-parked",
+        "kind": "turn.parked",
+        "zone": null,
+        "businessId": "biz-lees-barbershop",
+        "actorKind": "rosie",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "turns",
+        "rowId": "turn-sam-refused-1",
+        "oldValues": null,
+        "newValues": { "state": "parked", "tries": 1 },
+        "sealed": null,
+        "why": { "refused": { "from": "walk", "fault": "stepNotInBundle", "ids": ["S1-04"] } },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
+  },
+  "outcome": {
+    "result": "parked",
+    "turnId": "turn-sam-refused-1",
+    "parkedAt": "2026-11-22T15:00:05Z",
+    "outboxRows": [{ "id": "out-turn-sam-refused-1-parked", "commitSeq": 1 }],
+    "repeated": false
+  }
+}
