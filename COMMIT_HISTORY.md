@@ -2,9 +2,52 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 859, [`55946b1d`](https://github.com/aryamahadik/rosie/commit/55946b1d), 2026-11-22 01:13:14 UTC.
+- **Through:** commit 861, [`e5365c5b`](https://github.com/aryamahadik/rosie/commit/e5365c5b), 2026-11-22 01:56:55 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 861. docs: COMMIT\_HISTORY.md through commit 859 (55946b1d, \#873) (\#875)
+
+- **Commit:** [`e5365c5b`](https://github.com/aryamahadik/rosie/commit/e5365c5b), by Arya Mahadik, 2026-11-22 01:56:55 UTC
+- **Pull request:** [#875](https://github.com/aryamahadik/rosie/pull/875) from `task/commit-history-212`, merged 2026-11-22 01:56:56 UTC. It squashed 1 branch commit:
+  - `20d1811` docs: COMMIT\_HISTORY.md through commit 859 (55946b1d, \#873)
+- **Files changed:** 1 (+40 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +40 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 860. T-1522: QA's contract tests for K-05 v1.21 and v1.22 (schema and database sides) (\#874)
+
+- **Commit:** [`a68e1121`](https://github.com/aryamahadik/rosie/commit/a68e1121), by Arya Mahadik, 2026-11-22 01:56:51 UTC
+- **Pull request:** [#874](https://github.com/aryamahadik/rosie/pull/874) from `task/T-1522`, merged 2026-11-22 01:56:52 UTC. It squashed 2 branch commits:
+  - `bbe4eed` T-1522: K-05 v1.21's contract tests: the schema side (defs, fixtures,…
+  - `449ecbd` T-1522: K-05 v1.22's contract tests: the schema side (defs, fixtures,…
+- **Files changed:** 4 (+2982 −0), by folder:
+  - `tests/contract/` data-access.v1.21.db-side.test.ts +539 −0, data-access.v1.21.test.ts +871 −0, data-access.v1.22.db-side.test.ts +603 −0, data-access.v1.22.test.ts +969 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1522: K-05 v1.21's contract tests: the schema side (defs, fixtures, mends, unshown cases, raises, sides) and the database side (each exchange through db/repo's commitTurn, the raise at the version read, checkFire's refusal)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1522: K-05 v1.22's contract tests: the schema side (defs, fixtures, the mend, unshown cases, item 83's line against each read's world, sides) and the database side (commitTurn stores each row's pair, readOutboxRow reads from row or openQuestion, the half-named row thrown)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 859. docs: COMMIT\_HISTORY.md through commit 857 (5b7b3bd5, \#871) (\#873)
 
@@ -19504,3 +19547,4 @@ Each was replaced by another pull request (a branch rebased or squashed under a 
 - [#846](https://github.com/aryamahadik/rosie/pull/846) T-1519: S1-01 reuses a number's existing chat thread; staging's gate binds the chat read (DL-1048, DL-1051) (`task/T-1519`, 5 branch commits, closed 2026-11-21 12:13:08 UTC)
 - [#864](https://github.com/aryamahadik/rosie/pull/864) T-1474 + T-1475 + T-1476: K-05 v1.22, a row's step and line through the commit, the turn face and db/repo (S1-04 cards 5-7) (`task/T-1476`, 8 branch commits, closed 2026-11-21 22:37:07 UTC)
 - [#865](https://github.com/aryamahadik/rosie/pull/865) docs: COMMIT\_HISTORY.md through commit 851 (0cd5fcca, \#863) (`task/commit-history-207`, 1 branch commit, closed 2026-11-21 20:16:45 UTC)
+- [#878](https://github.com/aryamahadik/rosie/pull/878) docs: COMMIT\_HISTORY.md through commit 861 (e5365c5b, \#875) (`task/commit-history-213`, 1 branch commit, closed 2026-11-22 01:58:02 UTC)
