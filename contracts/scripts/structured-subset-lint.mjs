@@ -18,8 +18,9 @@
 //     One request carries one of these schemas, so each is held to them alone. Each $defs entry is counted once.
 //   - the root is an object.
 //
-// MODEL_FACING lists the schemas it checks: K-02's decide read, safety read and planner output. K-03's message plan
-// (T-012) joins the list in a follow-up once both have merged.
+// MODEL_FACING lists the schemas it checks: K-02's decide read, safety read and planner output, and K-02 v1.3's four
+// photo-reading answers (T-070; contracts/model/README.md "v1.3", "Model-facing: one schema a request"). K-03's message
+// plan (T-012) joins the list in a follow-up once both have merged.
 //
 // Usage: node scripts/structured-subset-lint.mjs [--contracts <dir>]   Exit code: 0 passed, 1 failed.
 
@@ -34,6 +35,26 @@ export const MODEL_FACING = Object.freeze([
   { schema: "model/model.v1.schema.json", def: "decideRead", what: "K-02 decide read (arch 03 line 183)" },
   { schema: "model/model.v1.schema.json", def: "safetyRead", what: "K-02 safety read (arch 03 line 183)" },
   { schema: "model/model.v1.schema.json", def: "plannerOutput", what: "K-02 planner (arch 06 line 291)" },
+  {
+    schema: "model/model.v1.3.schema.json",
+    def: "photoReadCardOrListing",
+    what: "K-02 v1.3 photo reading, a card or listing (S1-09)",
+  },
+  {
+    schema: "model/model.v1.3.schema.json",
+    def: "photoReadPriceList",
+    what: "K-02 v1.3 photo reading, a price list (S1-12)",
+  },
+  {
+    schema: "model/model.v1.3.schema.json",
+    def: "photoReadTimetable",
+    what: "K-02 v1.3 photo reading, a class timetable (S1-83)",
+  },
+  {
+    schema: "model/model.v1.3.schema.json",
+    def: "photoReadSchedule",
+    what: "K-02 v1.3 photo reading, a schedule (S1-24)",
+  },
 ]);
 
 /** Per-request limits across the structured schemas of one request (T-360 finding 2). */

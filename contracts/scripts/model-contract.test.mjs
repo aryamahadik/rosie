@@ -393,8 +393,8 @@ describe("K-02 v1 is frozen: the frozen-contract guard fails an edit", () => {
     };
   }
 
-  it("contracts/model/frozen.json freezes v1, v1.1 and v1.2", () => {
-    assert.deepEqual(readJson(path.join(MODEL, "frozen.json")), { frozen: ["v1", "v1.1", "v1.2"] });
+  it("contracts/model/frozen.json freezes v1, v1.1, v1.2 and v1.3", () => {
+    assert.deepEqual(readJson(path.join(MODEL, "frozen.json")), { frozen: ["v1", "v1.1", "v1.2", "v1.3"] });
   });
 
   it("fails an edit to model.v1.schema.json", (t) => {
@@ -424,10 +424,10 @@ describe("K-02 v1 is frozen: the frozen-contract guard fails an edit", () => {
     );
   });
 
-  it("passes adding a minor version and its fixtures beside the frozen v1, v1.1 and v1.2", (t) => {
+  it("passes adding a minor version and its fixtures beside the frozen v1, v1.1, v1.2 and v1.3", (t) => {
     const repo = modelRepo(t);
-    repo.add("model.v1.3.schema.json", "{}\n");
-    repo.add("fixtures/read-price-list.json", "{}\n");
+    repo.add("model.v1.4.schema.json", "{}\n");
+    repo.add("fixtures/sample-v1-4.json", "{}\n");
     const run = repo.guard();
     assert.equal(run.status, 0, run.stdout + run.stderr);
   });
