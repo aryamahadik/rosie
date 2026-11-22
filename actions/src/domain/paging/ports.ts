@@ -100,6 +100,12 @@ export interface StoredReviewItem {
   readonly subjectRowId: string | null;
   readonly turnId: string | null;
   readonly raisedByPersonId: string | null;
+  /**
+   * What the team checks, without private values (K-37 v1 review_items.summary, not null). Read by a decision on a
+   * listing_match item, which proves control only when it is one of the owner's sentences, compared whole (T-635a; K-09
+   * README default 205; review.ts default 30).
+   */
+  readonly summary: string;
   readonly openedAt: string;
   readonly dueAt: string;
   readonly state: "open" | "waiting" | "done";
