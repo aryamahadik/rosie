@@ -44,6 +44,9 @@
 // run on the call's transaction without a 42501 or a refusal. So the call's client needs a second connection beside the
 // call's (as item 78's read does: DL-931), and the runtime's client one more. The caller hands it in as
 // SignUpWriterDeps.companies, with S1-08's stop reads as SignUpWriterDeps.plan, and asks for signUpSteps (settleSignUp).
+// The same reads serve S1-04's writer (T-1484, H1b; T-1481's companiesWriter, which also reads kinds' names by id through
+// readTurnState on `runtime`), so an answer to an S1-04 that was asked is written in the turn's one commit; the party
+// rule's flag goes in as SignUpWriterDeps.partyRuleLive, off unless the caller sets it true.
 
 import {
   cancelClock,
@@ -198,16 +201,17 @@ export interface PgTurnCallsOptions {
    * side: journey-1/kinds reads.ts) with the stop home's reads where the runtime side binds them, and the pinned bundle's
    * trade overlays. Given, the commit binds the walk's question read on the call's transaction (pgWalkQuestions) and the
    * sign-up steps' writers, so an answer to S1-02's question is written. Left out, neither is bound, and every answer to
-   * an open question is notBuilt, as before. Its `companies` (pgCompaniesReads) and `plan` (S1-08's stop reads) are read
-   * only with `settleSignUp` (T-1493: signUpSteps alone binds them).
+   * an open question is notBuilt, as before. Its `companies` (pgCompaniesReads), `partyRuleLive` and `plan` (S1-08's
+   * stop reads) are read only with `settleSignUp` (T-1493, T-1484: signUpSteps alone binds them).
    */
   readonly signUp?: SignUpWriterDeps<Tx>;
   /**
    * Whether the walk is also handed S1-02's settler (T-1502; K-09 README default 191; ../commit signUpSteps): true, with
    * `signUp` given, binds the sign-up steps' writers and settlers together over one catalog read per walk, so the owner's
    * words settle S1-02's branch whichever option decide named, and, where `signUp` carries them (T-1493), the one-kind
-   * path (S1-02's one-kind wrapper and S1-04's buttons settler, from `signUp.companies`) and S1-08's writer (from
-   * `signUp.plan`). Left out or false, no settler is bound and the walk is as before; without `signUp` it binds nothing.
+   * path (S1-02's one-kind wrapper and S1-04's buttons settler, from `signUp.companies`), S1-04's writer (T-1484: from
+   * `signUp.companies`, with `signUp.partyRuleLive`) and S1-08's writer (from `signUp.plan`). Left out or false, no
+   * settler is bound and the walk is as before; without `signUp` it binds nothing.
    */
   readonly settleSignUp?: boolean;
   /** The wrapping key the sealer opens a person's data key with, read by name from the environment (T-182). */
