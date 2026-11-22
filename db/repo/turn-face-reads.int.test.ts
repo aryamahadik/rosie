@@ -51,6 +51,7 @@ import { seedSkeleton, TEST_OWNER_1 } from "../seeds/skeleton";
 import { resolvePrimaryUrl } from "./client";
 import { DataAccessDatabaseError } from "./clocks";
 import { commitTurn, type CommitTurnRequest } from "./commit-turn";
+import { writePlan, type WritePlanRequest } from "./outbox";
 import { BusinessScopeError, setBusinessScope, type Sql, type Tx, withBusiness } from "./scope";
 import { inRuntimeTransaction } from "./targets";
 import { createTestDatabase, type TestDatabase } from "./test-db";
@@ -502,13 +503,79 @@ async function given(file: string): Promise<Exchange> {
   return exchange;
 }
 
+/** The two opener ids, either of which makes a row default 202's fallback row (K-05 default 204). */
+const OPENER_IDS: readonly string[] = ["opener", "signUpOpener"];
+
+/**
+ * The row the opener mark on an answered row's handle and business names, as the tables' owner reads it, when that is
+ * another row committed after the row read (a higher commit_seq: K-05 default 215); else null.
+ */
+async function laterMarkOf(exchange: Exchange): Promise<string | null> {
+  const { outcome, request } = exchange;
+  if (exchange.call !== "readFixedLineFacts" || outcome.result !== "fixedLineFacts") {
+    return null;
+  }
+  if (typeof outcome.businessId !== "string" || typeof request.outboxRowId !== "string") {
+    return null;
+  }
+  const rowId = request.outboxRowId;
+  const [mark] = await db.sql<{ marked: string; later: boolean }[]>`
+    select m.outbox_row_id as marked, named.commit_seq > r.commit_seq as later
+    from outbox_rows r
+    join openers_sent m on m.handle_id = r.recipient_handle_id and m.business_id = r.business_id
+    join outbox_rows named on named.id = m.outbox_row_id
+    where r.id = ${rowId} and r.business_id = ${outcome.businessId}
+  `;
+  return mark !== undefined && mark.marked !== rowId && mark.later ? mark.marked : null;
+}
+
+/**
+ * A readFixedLineFacts fixture's outcome as K-05 default 215 answers it in the loaded world (T-1521; README default
+ * 215, "The frozen fixture it contradicts, and how a test compares with it"; DL-1089): where the mark names another row
+ * committed after the row read (laterMarkOf), textedAboutBusiness false and openerRowId null and nothing else changed,
+ * once the tables' owner has found no row of the handle and business committed before the row read whose final parts'
+ * fixedLines hold either opener id, whatever its state, so that the fallback finds none (one found is a broken test: no
+ * frozen world holds one); else the outcome, whole. Decided from the loaded world, never from the file's name: K-04's
+ * seeds commit fixed-line-facts-texted-before.json's row (out-a7-03-alex) before the row its mark names (out-alex-first).
+ */
+async function fixedLineAnswerOf(exchange: Exchange): Promise<Record<string, Json>> {
+  const marked = await laterMarkOf(exchange);
+  const rowId = exchange.request.outboxRowId;
+  if (marked === null || typeof rowId !== "string") {
+    return exchange.outcome;
+  }
+  const earlier = await db.sql<{ id: string; fixed_lines: Json }[]>`
+    select e.id, e.final_parts -> 'fixedLines' as fixed_lines
+    from outbox_rows r
+    join outbox_rows e on e.recipient_handle_id = r.recipient_handle_id and e.business_id = r.business_id
+    where r.id = ${rowId} and e.commit_seq < r.commit_seq
+    order by e.commit_seq
+  `;
+  const openers = earlier
+    .filter(
+      ({ fixed_lines: lines }) =>
+        Array.isArray(lines) && lines.some((line) => typeof line === "string" && OPENER_IDS.includes(line)),
+    )
+    .map(({ id }) => id);
+  if (openers.length > 0) {
+    throw new Error(
+      `its mark names ${marked}, committed after ${rowId}, and the fallback finds an earlier opener row (${openers.join(", ")}): no frozen world holds one, so this is a broken test`,
+    );
+  }
+  return { ...exchange.outcome, textedAboutBusiness: false, openerRowId: null };
+}
+
 /**
  * What a v1.6 call answers for a fixture's request in the fixture's world: the fixture's outcome; for an outbox row of a
  * fixture written before v1.6, which states no switch, that outcome with the switch v1.6 reads there (item 45): null,
- * since such a world holds no kind of work at all (checked here, as the tables' owner, whom no policy binds).
+ * since such a world holds no kind of work at all (checked here, as the tables' owner, whom no policy binds); for fixed-
+ * line facts, the outcome as K-05 default 215 reads the loaded world (fixedLineAnswerOf).
  */
 async function answerOf(exchange: Exchange): Promise<Record<string, Json>> {
   const { outcome } = exchange;
+  if (exchange.call === "readFixedLineFacts") {
+    return fixedLineAnswerOf(exchange);
+  }
   if (
     exchange.call !== "readOutboxRow" ||
     outcome.result !== "outboxRow" ||
@@ -1883,13 +1950,15 @@ describe("readFixedLineFacts: one business's opener mark, never another's (item 
       });
       const marked = asFacts(await readFixedLineFacts(job, request, nowOf(exchange)));
       expect([marked.textedAboutBusiness, marked.openerRowId]).toEqual([false, "out-yoga-alex"]);
+      // The fixture's own request reads as default 215 reads its world (fixedLineAnswerOf): the yoga studio's mark
+      // changes nothing of it.
       expect(
         await readFixedLineFacts(
           job,
           exchange.request as unknown as ReadFixedLineFactsRequest,
           nowOf(exchange),
         ),
-      ).toEqual(exchange.outcome);
+      ).toEqual(await answerOf(exchange));
     },
   );
 });
@@ -1966,7 +2035,8 @@ describe("readFixedLineFacts counts no earlier row that never went, in either br
           true,
           "out-alex-first",
         ]);
-        expect(await factsOf("out-a7-03-alex", BARBERSHOP), state).toEqual([true, "out-alex-first"]);
+        // A row committed before the marked one reads what the fallback finds, in every state (default 215): none.
+        expect(await factsOf("out-a7-03-alex", BARBERSHOP), state).toEqual([false, null]);
       }
       for (const state of NEVER_WENT) {
         await stateOf("out-alex-first", state);
@@ -2015,6 +2085,130 @@ describe("readFixedLineFacts counts no earlier row that never went, in either br
         expect(await factsOf("out-t1513-nobiz-last", null), state).toEqual([false, null]);
         await stateOf("out-t1513-nobiz-sign-up", "delivered");
       }
+    },
+  );
+});
+
+describe("readFixedLineFacts reads a mark naming a row committed after this one as the fallback, so the earliest row sent carries the opener (K-05 default 215; T-1521)", () => {
+  /** K-07's ends of a row that did not go, or never will (default 202). */
+  const ENDS = ["withdrawn", "failed", "dropped_stopped", "superseded"] as const;
+  /** K-07's other row states (open gap 100). */
+  const OTHER_STATES = [
+    "planned",
+    "checked",
+    "sending",
+    "sent",
+    "delivered",
+    "held",
+    "stale",
+    "waiting_chat",
+  ] as const;
+  /** The three lines of Rosie's first text to a number about a business (arch 07 line 361). */
+  const FIRST_TEXT_LINES = ["opener", "optOutLine", "privacyLink"];
+
+  /** A row to Alex at the yoga studio as a commit writes it (planned, no plan), after every row the world holds. */
+  async function addPlannedRow(id: string): Promise<void> {
+    await insertRow(db.sql, "outbox_rows", {
+      id,
+      turn_id: "turn-alex-first",
+      recipient_handle_id: "handle-alex",
+      recipient_person_id: "person-alex",
+      business_id: YOGA,
+      channel: "imessage",
+      versions_read: [],
+      bundle_hash: BUNDLE_HASH,
+      bundle_build: 1,
+      trace_id: `trace-${id}`,
+    });
+  }
+
+  /** db/repo's writePlan for the row, as finalize writes it (K-05 v1 item 2), its final parts carrying the first text's lines. */
+  async function planFirstText(id: string): Promise<void> {
+    const request = {
+      outboxRowId: id,
+      expectVersion: 1,
+      plan: {
+        row: id,
+        channel: "imessage",
+        copyOf: null,
+        plan: {
+          formats: ["text"],
+          lines: [{ role: "first", text: "Words as planned" }],
+          question: null,
+          pageType: null,
+          threadReplyTo: null,
+        },
+      },
+      finalParts: wordsParts(id, "Words as planned", FIRST_TEXT_LINES),
+    };
+    expect(await writePlan(job, request as unknown as WritePlanRequest)).toEqual({
+      result: "written",
+      outboxRowId: id,
+      version: 2,
+    });
+  }
+
+  /** The row the yoga studio's opener mark on Alex's handle names, as stored. */
+  async function markedRow(): Promise<string | undefined> {
+    const [mark] = await db.sql<{ outbox_row_id: string }[]>`
+      select outbox_row_id from openers_sent where handle_id = 'handle-alex' and business_id = ${YOGA}
+    `;
+    return mark?.outbox_row_id;
+  }
+
+  async function stateOf(id: string, state: string): Promise<void> {
+    await db.sql`update outbox_rows set state = ${state}, version = version + 1 where id = ${id}`;
+  }
+
+  async function factsOf(outboxRowId: string): Promise<[boolean, string | null]> {
+    const facts = asFacts(await readFixedLineFacts(job, { outboxRowId, businessId: YOGA }));
+    expect(outcomeErrors("readFixedLineFacts", facts)).toEqual([]);
+    return [facts.textedAboutBusiness, facts.openerRowId];
+  }
+
+  it(
+    "two first-text rows to one handle and business planned out of commit order: the earlier row carries the opener, the marked later row reads itself, and a row committed after both reads the marked row; the earlier row reads so in every state of the marked row",
+    SLOW,
+    async () => {
+      // Alex's handle holds the barbershop's mark (K-04's seed) and none of the yoga studio's.
+      await given("fixed-line-facts-texted-before.json");
+      expect(await markedRow()).toBeUndefined();
+      await addPlannedRow("out-t1521-earlier");
+      await addPlannedRow("out-t1521-later");
+
+      // The row committed later is planned first: it reads no mark, carries the opener and takes the mark.
+      expect(await factsOf("out-t1521-later")).toEqual([false, null]);
+      await planFirstText("out-t1521-later");
+      expect(await markedRow()).toBe("out-t1521-later");
+
+      // The earlier row, sent first by commit order, reads past the mark to the fallback, which finds no earlier row:
+      // not texted before, so it carries the opener and the privacy-notice link (under default 202 alone it read true).
+      expect(await factsOf("out-t1521-earlier")).toEqual([false, null]);
+      await planFirstText("out-t1521-earlier");
+      // Written once: the mark still names the row planned first.
+      expect(await markedRow()).toBe("out-t1521-later");
+      expect(await factsOf("out-t1521-earlier")).toEqual([false, null]);
+      // The marked row, read again, reads itself (default 50): an opener twice, the safe side.
+      expect(await factsOf("out-t1521-later")).toEqual([false, "out-t1521-later"]);
+
+      // A row committed after both reads the mark, which names a row committed before it: texted before.
+      await addPlannedRow("out-t1521-third");
+      expect(await factsOf("out-t1521-third")).toEqual([true, "out-t1521-later"]);
+
+      for (const state of OTHER_STATES) {
+        await stateOf("out-t1521-later", state);
+        expect(await factsOf("out-t1521-earlier"), state).toEqual([false, null]);
+        expect(await factsOf("out-t1521-later"), state).toEqual([false, "out-t1521-later"]);
+        expect(await factsOf("out-t1521-third"), state).toEqual([true, "out-t1521-later"]);
+      }
+      for (const state of ENDS) {
+        await stateOf("out-t1521-later", state);
+        expect(await factsOf("out-t1521-earlier"), state).toEqual([false, null]);
+        expect(await factsOf("out-t1521-later"), state).toEqual([false, "out-t1521-later"]);
+        // The marked row never went: the third row falls back to the earlier row, which carries the opener (default 202).
+        expect(await factsOf("out-t1521-third"), state).toEqual([true, "out-t1521-earlier"]);
+      }
+      expect(await markedRow()).toBe("out-t1521-later");
     },
   );
 });
