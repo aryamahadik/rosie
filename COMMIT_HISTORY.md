@@ -2,9 +2,60 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 896, [`a1b1731a`](https://github.com/aryamahadik/rosie/commit/a1b1731a), 2026-11-22 17:21:46 UTC.
+- **Through:** commit 898, [`29c5763c`](https://github.com/aryamahadik/rosie/commit/29c5763c), 2026-11-22 18:19:38 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 898. docs: COMMIT\_HISTORY.md through commit 896 (a1b1731a, \#913) (\#915)
+
+- **Commit:** [`29c5763c`](https://github.com/aryamahadik/rosie/commit/29c5763c), by Arya Mahadik, 2026-11-22 18:19:38 UTC
+- **Pull request:** [#915](https://github.com/aryamahadik/rosie/pull/915) from `task/commit-history-231`, merged 2026-11-22 18:19:38 UTC. It squashed 1 branch commit:
+  - `ef683d5` docs: COMMIT\_HISTORY.md through commit 896 (a1b1731a, \#913)
+- **Files changed:** 1 (+74 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +74 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 897. T-1534: staging serves the secure link's page (openLink with the made-form check, ROUTES = linkRoutes(), the honest S1-10 page) (DL-1153) (\#914)
+
+- **Commit:** [`47c77248`](https://github.com/aryamahadik/rosie/commit/47c77248), by Arya Mahadik, 2026-11-22 18:19:35 UTC
+- **Pull request:** [#914](https://github.com/aryamahadik/rosie/pull/914) from `task/T-1534`, merged 2026-11-22 18:19:35 UTC. It squashed 2 branch commits:
+  - `e255149` T-1534: staging's openLink joined (made-form check, page\_link\_for\_cod…
+  - `fbf6aa5` T-1534: staging's link page through the Worker on the gate rig's read…
+- **Files changed:** 15 (+1677 −32), by folder:
+  - `runtime/src/gateway/pages/` pages.worker.test.ts +1 −1
+  - `runtime/src/` index.worker.test.ts +6 −6
+  - `runtime/src/wiring/` open-link.test.ts +678 −0, open-link.ts +312 −0, open-link.worker.test.ts +460 −0, root.ts +20 −3
+  - `web/src/auth/` no-password.test.ts +1 −1
+  - `web/src/link/` honest.test.ts +160 −0, kinds.ts +3 −2, pages.ts +18 −2, routes.ts +7 −6
+  - `web/src/shell/` shell.test.ts +8 −8
+  - `web/src/staging/test-phone/parts/` staging-only.test.ts +1 −1
+  - `web/src/staging/test-phone/picker/` staging-only.test.ts +1 −1
+  - `web/src/staging/test-phone/send/` staging-only.test.ts +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1534: staging's openLink joined (made-form check, page_link_for_code by sha256, keys port not given, proof only from the link's own session), ROUTES = linkRoutes(), default 213's honest page, one-segment unknown test addresses moved to two segments
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1534: staging's link page through the Worker on the gate rig's reads (connectionsPeak 1, a live link in a rolled-back transaction), and index.worker.test.ts's two one-segment privacy near-misses moved to two segments
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 896. docs: COMMIT\_HISTORY.md through commit 893 (4d3257bc, \#910) (\#913)
 
