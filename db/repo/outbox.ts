@@ -276,13 +276,14 @@
 //  26. A parked turn's "nothing changed" row is passed by the ordinary walk, never a stop (T-1464; DL-967; K-05 README
 //      default 183): parkTurn writes it planned with no plan, and nothing composes it (runtime/src/turn/park.ts: the
 //      runtime never words that line; its words are a later card), so stopping there for commit order held every later
-//      row to that person for good (staging, Nov 18: a checked reply never claimed). The rule is PARKED_UNPLANNED: state
-//      planned, plan null and the row's turn parked, the turn read by the row's turn_id in the statement that reads the
-//      row, never locked (turns are written once, committed or parked: NQ-RT-3). Such a row is still read and locked
-//      FOR UPDATE with the recipient's other open rows, as a waiting_chat row is, so a writePlan that composes it waits
-//      for the walk, and a walk that waits for that writePlan reads the row as it then stands; it is passed, not listed
-//      in passedHeld, and never claimed, sent or counted toward `limit`. Every other planned row (a committed turn's
-//      row not yet composed, a row with no turn) and every stale row still stops the walk; a parked turn's row that
+//      row to that person for good (staging, Nov 18: a checked reply never claimed). The rule is unplannedPassed's
+//      parked half (default 30 adds its other half): state planned, plan null and the row's turn parked, the turn read
+//      by the row's turn_id in the statement that reads the row, never locked (turns are written once, committed or
+//      parked: NQ-RT-3). Such a row is still read and locked FOR UPDATE with the recipient's other open rows, as a
+//      waiting_chat row is, so a writePlan that composes it waits for the walk, and a walk that waits for that writePlan
+//      reads the row as it then stands; it is passed, not listed in passedHeld, and never claimed, sent or counted
+//      toward `limit`. Every other planned row (a committed turn's row not yet composed whose turn committed inside
+//      default 30's window, a row with no turn) and every stale row still stops the walk; a parked turn's row that
 //      holds a plan is walked as today. The sweep (claimableRecipients, claimableRecipientsV12) looks past it as it
 //      looks past a passed row, while it still counts as open in the earliest-open order (default 4), as a passed held
 //      or waiting row does. The safety claim (claimOutboxV114 with sendClass) is unchanged: it reads only safety rows,
@@ -302,6 +303,23 @@
 //      poll or link card's plain words retry (default 8), which carries the poll's words and not the line, writes
 //      nothing, as a delivered poll or link-card part writes nothing (default 203), and the line's time is never set
 //      before the send that carries it is delivered.
+//  30. A committed turn's row left with no plan once its reply has been given up is passed as default 26's row is
+//      (T-1536; DL-1164, DL-1165; K-05 README default 225, beside 183): planned, plan null and the row's turn committed
+//      with committed_at at or before the claim's own now (request.now) less REPLY_GIVE_UP_WINDOW_MS, 10 minutes. A live
+//      reply holds its row at most MAX_TRIES x LEASE_MS = 3 minutes (runtime/src/actor/lease.ts lines 97 to 99); after
+//      the third lapse the lease gives the reply up (lapseOf's giveUp) and nothing returns to the row (no sweep composes
+//      it, and unplannedRows is per turn), so stopping there held every later row to that person for good (the user's
+//      phone, Nov 22: a checked reply waited behind a JOIN turn's row whose compose was refused three times). The rule
+//      is one fragment, unplannedPassed(tx, now), with the bound computed from the claim's now and sent as a parameter,
+//      read in the ordinary walk's statement and in both sweeps' (claimableRecipients, claimableRecipientsV12), the turn
+//      read by the row's turn_id and never locked, as default 26's. Such a row is read and locked with the recipient's
+//      other open rows, passed, not listed in passedHeld, never claimed, sent or counted toward `limit`, and nothing is
+//      written to it. A committed turn's row inside the window still stops the walk, as a row with no turn and a stale
+//      row do; a row that gets a plan later is walked as before (writePlan moves it to checked). The safety claim
+//      (claimOutboxV114 with sendClass) is unchanged: it never reads this fragment. The known risk (default 225): while
+//      PostgreSQL is down a held turn counts no tries (T-270), so a row composed after a long outage can go after a
+//      later row to the same person: out of order, never lost or sent twice.
+import type postgres from "postgres";
 import type * as K05 from "../../contracts/generated/data-access/data-access.v1";
 import type * as K05v11 from "../../contracts/generated/data-access/data-access.v1.1";
 import type * as K05v12 from "../../contracts/generated/data-access/data-access.v1.2";
@@ -1338,19 +1356,34 @@ interface PartRow {
 const PART_COLUMNS = "part_no, try_no, idempotency_key, attempts, kind, state, linq_message_id, delivered_at";
 
 /**
- * Whether the statement's outbox row `r` is a parked turn's "nothing changed" row (T-1464, DL-967; default 26):
- * planned with no plan, its turn parked (K-04 turns.state), the turn read by the row's turn_id in the same statement and
- * never locked. parkTurn writes that row so and nothing composes it (runtime/src/turn/park.ts), so the ordinary walk
- * passes it and the sweep looks past it. A row with no turn (a job row) is no parked turn's.
+ * The reply give-up window (K-05 README default 225; T-1536, DL-1165; default 30): a row still planned with no plan
+ * whose turn committed at or before the claim's now less this is a given-up reply's, which nothing composes. 10
+ * minutes, standing until Jay answers: a live reply holds its row at most MAX_TRIES x LEASE_MS = 3 minutes
+ * (runtime/src/actor/lease.ts lines 97 to 99).
  */
-const PARKED_UNPLANNED =
-  "(r.state = 'planned' and r.plan is null" +
-  " and exists (select 1 from turns t where t.id = r.turn_id and t.state = 'parked'))";
+const REPLY_GIVE_UP_WINDOW_MS = 10 * 60_000;
 
-/** An open row as the ordinary walk reads it (items 3 and 13): with whether it is a parked turn's unplanned row. */
+/**
+ * Whether the statement's outbox row `r` is a row the claim passes with no plan (defaults 26 and 30): planned with no
+ * plan, and its turn (K-04 turns.state, read by the row's turn_id in the same statement and never locked) either parked
+ * (T-1464, DL-967: parkTurn writes that row so and nothing composes it, runtime/src/turn/park.ts) or committed with
+ * committed_at at or before `now` less REPLY_GIVE_UP_WINDOW_MS (T-1536: its reply given up, so nothing composes it
+ * either). `now` is the claim's own time (request.now); the bound is sent as a parameter. The ordinary walk passes such a
+ * row and the sweep looks past it. A row with no turn (a job row) is never one.
+ */
+function unplannedPassed(tx: Sql, now: Date): postgres.Fragment {
+  const givenUpBy = new Date(now.getTime() - REPLY_GIVE_UP_WINDOW_MS);
+  return tx`(r.state = 'planned' and r.plan is null and exists (
+    select 1 from turns t
+    where t.id = r.turn_id
+      and (t.state = 'parked' or (t.state = 'committed' and t.committed_at <= ${givenUpBy}))
+  ))`;
+}
+
+/** An open row as the ordinary walk reads it (items 3 and 13): with whether it is passed with no plan. */
 interface WalkRow extends OpenRow {
-  /** PARKED_UNPLANNED, read in the walk's own statement: passed and not reported, as a waiting_chat row is. */
-  parked_unplanned: boolean;
+  /** unplannedPassed, read in the walk's own statement: passed and not reported, as a waiting_chat row is. */
+  unplanned_passed: boolean;
 }
 
 /** A held row whose held_until is still ahead (default 4: none counts as due). */
@@ -1360,9 +1393,9 @@ function heldAhead(row: { state: RowState; held_until: Date | null }, now: Date)
 
 /**
  * The sweep's recipients (no recipient named): those whose first open row that is not passed (a held row not yet due, a
- * waiting row, a parked turn's unplanned row: default 26) is claimable, so a recipient whose walk would stop at once is
- * not locked; earliest open commit_seq first (default 4). A read without locks: each walk reads its rows again under its
- * recipient's lock.
+ * waiting row, a parked turn's unplanned row or a given-up reply's: defaults 26 and 30) is claimable, so a recipient
+ * whose walk would stop at once is not locked; earliest open commit_seq first (default 4). A read without locks: each
+ * walk reads its rows again under its recipient's lock.
  */
 async function claimableRecipients(tx: Sql, now: Date): Promise<string[]> {
   const rows = await tx<{ recipient_handle_id: string }[]>`
@@ -1372,7 +1405,7 @@ async function claimableRecipients(tx: Sql, now: Date): Promise<string[]> {
       from outbox_rows r
       where (r.state in ('planned', 'checked', 'sending', 'stale')
              or (r.state = 'held' and (r.held_until is null or r.held_until <= ${now})))
-        and not ${tx.unsafe(PARKED_UNPLANNED)}
+        and not ${unplannedPassed(tx, now)}
       order by r.recipient_handle_id, r.commit_seq
     ) as f
     join (
@@ -1388,9 +1421,9 @@ async function claimableRecipients(tx: Sql, now: Date): Promise<string[]> {
 }
 
 /**
- * The v1.2 sweep's recipients: as claimableRecipients (a parked turn's unplanned row passed too: default 26), and a
- * recipient whose first open row that is not passed is a sending row whose claim lapsed or that has no claim row (K-05
- * v1.1 item 13; default 20).
+ * The v1.2 sweep's recipients: as claimableRecipients (a parked turn's unplanned row and a given-up reply's passed too:
+ * defaults 26 and 30), and a recipient whose first open row that is not passed is a sending row whose claim lapsed or
+ * that has no claim row (K-05 v1.1 item 13; default 20).
  */
 async function claimableRecipientsV12(tx: Sql, now: Date): Promise<string[]> {
   const rows = await tx<{ recipient_handle_id: string }[]>`
@@ -1402,7 +1435,7 @@ async function claimableRecipientsV12(tx: Sql, now: Date): Promise<string[]> {
       left join outbox_claims c on c.outbox_row_id = r.id
       where (r.state in ('planned', 'checked', 'sending', 'stale')
              or (r.state = 'held' and (r.held_until is null or r.held_until <= ${now})))
-        and not ${tx.unsafe(PARKED_UNPLANNED)}
+        and not ${unplannedPassed(tx, now)}
       order by r.recipient_handle_id, r.commit_seq
     ) as f
     join (
@@ -1650,7 +1683,7 @@ async function walkRecipient(
   const rows = await tx<WalkRow[]>`
     select r.id, r.commit_seq, r.state, r.held_until, r.version, r.recipient_person_id, r.business_id, r.booking_id,
            r.open_question_id, r.channel, r.send_class, r.versions_read, r.final_parts, r.trace_id, r.email_purpose,
-           r.not_after, ${tx.unsafe(PARKED_UNPLANNED)} as parked_unplanned
+           r.not_after, ${unplannedPassed(tx, request.now)} as unplanned_passed
     from outbox_rows r
     where r.recipient_handle_id = ${recipientHandleId} and r.state in ${tx(OPEN_STATES)}
     order by r.commit_seq
@@ -1660,9 +1693,10 @@ async function walkRecipient(
     if (taken.length >= request.limit) {
       return;
     }
-    // A waiting_chat row waits for the chat, not the dispatcher (K-07). A parked turn's "nothing changed" row has no
-    // plan, and nothing composes it (park.ts): never claimed, sent or counted, it holds no later row back (default 26).
-    if (row.state === "waiting_chat" || row.parked_unplanned) {
+    // A waiting_chat row waits for the chat, not the dispatcher (K-07). A parked turn's "nothing changed" row, and a
+    // committed turn's row whose reply was given up, have no plan and nothing composes them (park.ts; the lease's
+    // giveUp): never claimed, sent or counted, they hold no later row back (defaults 26 and 30).
+    if (row.state === "waiting_chat" || row.unplanned_passed) {
       continue;
     }
     if (heldAhead(row, request.now)) {
