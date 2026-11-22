@@ -167,7 +167,7 @@ describe("a known route renders a page with lang, a main landmark and a skip lin
 
 describe("an unknown path gives a 404 page showing the trace id", () => {
   it.each([
-    "/test/unknown",
+    "/test/unknown/page",
     "/test",
     "/test/",
     "/test/privacy/",
@@ -194,7 +194,7 @@ describe("an unknown path gives a 404 page showing the trace id", () => {
 
   it("shows a new trace id, the one in x-trace-id, when the request brings none", async () => {
     const { shell } = testShell();
-    const response = await shell.fetch(get("/test/unknown"));
+    const response = await shell.fetch(get("/test/unknown/page"));
     const traceId = response.headers.get("x-trace-id") ?? "";
     expect(traceId).toMatch(UUID);
     expect(await response.text()).toContain(referenceLine(traceId));
@@ -204,7 +204,7 @@ describe("an unknown path gives a 404 page showing the trace id", () => {
     const { shell } = testShell();
     for (const given of ["<b>dummy-id</b>", "not-a-trace-id", `${TRACE_ID}0`, ""]) {
       const response = await shell.fetch(
-        get("/test/dummy-unknown-address?q=dummy-query", { "x-trace-id": given }),
+        get("/test/dummy-unknown-address/page?q=dummy-query", { "x-trace-id": given }),
       );
       const traceId = response.headers.get("x-trace-id") ?? "";
       expect(traceId, given).toMatch(UUID);
@@ -247,10 +247,10 @@ describe("every page response carries x-trace-id (a valid incoming one echoed) a
       route: "example.hello",
     },
     { name: "a form's POST", path: "/test/example/form", method: "POST", status: 200, route: "example.form" },
-    { name: "an unknown path", path: "/test/unknown", method: "GET", status: 404, route: "notFound" },
+    { name: "an unknown path", path: "/test/unknown/page", method: "GET", status: 404, route: "notFound" },
     {
       name: "a POST to an unknown path",
-      path: "/test/unknown",
+      path: "/test/unknown/page",
       method: "POST",
       status: 404,
       route: "notFound",
@@ -341,7 +341,7 @@ describe("every page response carries x-trace-id (a valid incoming one echoed) a
   it("gives each request its own id and its own line", async () => {
     const { shell, lines } = testShell();
     const first = await shell.fetch(get("/test/privacy"));
-    const second = await shell.fetch(get("/test/unknown"));
+    const second = await shell.fetch(get("/test/unknown/page"));
     const ids = [first.headers.get("x-trace-id"), second.headers.get("x-trace-id")];
     expect(ids[0]).not.toBe(ids[1]);
     expect(lines().map((line) => [line.trace_id, line.route, line.status])).toEqual([
@@ -403,7 +403,7 @@ describe("serve: null for an address no route takes, so a Worker with routes of 
   it("gives null and logs nothing for an unknown path, a path outside BASE_PATH and a :name path's near misses", () => {
     const { shell, rawLines } = testShell({ modules: [EXAMPLE] });
     for (const path of [
-      "/test/unknown",
+      "/test/unknown/page",
       "/privacy",
       "/test",
       "/test/",
@@ -431,7 +431,7 @@ describe("serve: null for an address no route takes, so a Worker with routes of 
 describe("methods: HEAD rides with GET, and any method a route does not take gets the 405 page", () => {
   it("gives HEAD the GET answer's status and headers with no body", async () => {
     const { shell } = testShell({ modules: [EXAMPLE] });
-    for (const path of ["/test/privacy", "/test/example/hello", "/test/unknown"]) {
+    for (const path of ["/test/privacy", "/test/example/hello", "/test/unknown/page"]) {
       const got = await shell.fetch(get(path, { "x-trace-id": TRACE_ID }));
       const head = await shell.fetch(
         new Request(`https://${TEST_LINK_HOST}${path}`, {

@@ -53,7 +53,7 @@ async function expectAbsent(modules: readonly RouteModule[] | undefined, vars: W
   });
   expect(config.staging).toBe(false);
   const unknown = await shell.fetch(
-    get(`${config.basePath}/dummy-unknown-address`, { "x-trace-id": TRACE_ID }),
+    get(`${config.basePath}/dummy-unknown-address/page`, { "x-trace-id": TRACE_ID }),
   );
   expect(unknown.status).toBe(404);
   const asked = requestsTo(config);

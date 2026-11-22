@@ -39,6 +39,9 @@
 //     which posts through the Linq route above; and the three sign-in calls (T-1289, ./sign-in.ts; ADR-016 card D),
 //     T-1282's and T-1285's handlers over K-05's sign-in calls and the hashing port, whose code's send wakes the
 //     dispatcher once for the code row's recipient after the answer, in the request's waitUntil (ADR-016 section 2);
+//     and openLink (T-1534, ./open-link.ts; K-09 README default 212), a signed link's server side over staging's reads
+//     (RootOptions.openLink: the code's made form checked before any hash or read, page_link_for_code by its sha256, S1-10's
+//     keys port bound to "not given", proof only from the link's own person's session, each read on a client of its own);
 //     every other page call stays unconfigured (503).
 //
 // The Worker (runtime/src/index.ts) takes its gateway from `workerRoot(env)`: the real set (./real.ts, what the joins
@@ -184,6 +187,7 @@ import {
   type StoppedFlagRead,
   type TurnRowCalls,
 } from "./real";
+import { openLinkPage, stagingOpenLink, type OpenLinkInputs } from "./open-link";
 import { RowTraces } from "./row-traces";
 import { signInPages, type SignInInputs } from "./sign-in";
 import { skeletonLinqRoute, type ReleaseFlags } from "./skeleton";
@@ -418,6 +422,13 @@ export interface RootOptions {
    * null (production, until journey 1's flag: ADR-016 open point 9), the three calls stay unconfigured (503).
    */
   readonly signIn?: SignInInputs | null;
+  /**
+   * What staging's openLink reads (T-1534; ./open-link.ts; K-09 README default 212): page_link_for_code by the code's
+   * sha256, S1-10's keys port, session_for_token by the token's sha256 and the business's public name, each on a client of
+   * its own. Bound into the gateway's page entry only where ENVIRONMENT is staging, beside the sign-in calls; left out or
+   * null (production, and staging with no HYPERDRIVE_JOB), openLink stays unconfigured (503).
+   */
+  readonly openLink?: OpenLinkInputs | null;
   /**
    * What the actor's copies reach outside the actor (../actor/copies/types.ts CopyDeps: the live safety timers' reload and
    * the stopped flag's re-read), which `install()` sets for the isolate with the actor's other ports (`setCopyDeps`):
@@ -841,12 +852,14 @@ export function composeRoot(options: RootOptions): Root {
     skeletonLinqRoute(request, { gateway, flags, where });
   const testPhone = options.testPhone ?? null;
   const signIn = options.signIn ?? null;
+  const openLink = options.openLink ?? null;
   const copies = options.copies ?? null;
   const onStaging = options.vars.ENVIRONMENT === "staging";
 
   // The page calls the root joins, on staging only: the test-phone page's two (T-1186), which anywhere else the page
-  // entry refuses first; and the three sign-in calls (T-1289), which anywhere else stay unconfigured. Every other call
-  // stays unconfigured (503).
+  // entry refuses first; the three sign-in calls (T-1289) and openLink (T-1534), which anywhere else stay unconfigured.
+  // Every other call stays unconfigured (503): signedUpload, finishUpload, codeStart and codeCheck among them (the upload
+  // is not open, D4; the email code is left off, D5: K-09 README default 212).
   const joinedPages: Partial<PageHandlers> = {
     ...(testPhone !== null && onStaging
       ? testPhonePages({
@@ -866,6 +879,7 @@ export function composeRoot(options: RootOptions): Root {
         })
       : {}),
     ...(signIn !== null && onStaging ? signInPages({ inputs: signIn, wake: signInWake, log }) : {}),
+    ...(openLink !== null && onStaging ? { openLink: openLinkPage(openLink) } : {}),
   };
 
   const gateway: GatewayDeps = {
@@ -1020,7 +1034,8 @@ export interface WorkerSecrets {
  * each null until that part binds it. While an input is null its port fails closed as before: every seal fails and the
  * gateway answers 503 with nothing written, no turn's bundle is pinned, no frontier runs, no safety read, decide or
  * compose reaches a model, nothing commits, no row is composed, finalized or sent, nothing is armed, the test-phone
- * page's calls and the sign-in calls stay unconfigured, the copies' sources stay unwired, and with no release flags
+ * page's calls and the sign-in calls stay unconfigured (openLink too, wherever ./open-link.ts stagingOpenLink binds no
+ * reads: anywhere but staging, or with no HYPERDRIVE_JOB), the copies' sources stay unwired, and with no release flags
  * handed in (until T-1393 binds T-185's flag read, DL-356) the skeleton flag reads off and `linqWebhook` answers 404.
  * Rosie's number for HELP's reply is staging's own hand-off (./staging/options.ts stagingRosieNumber, T-1412): a reader of
  * ROSIE_NUMBER called at each use, never read here; production hands none yet, so HELP's row there gets no words.
@@ -1052,6 +1067,8 @@ export function workerRoot(env: Cloudflare.Env & WorkerSecrets): Root {
     ...stagingOptions(env, { db }),
     // Rosie's number for HELP's reply (T-1412): on staging a reader of ROSIE_NUMBER, called at each use; none elsewhere.
     rosieNumber: stagingRosieNumber(env),
+    // openLink's reads (T-1534; ./open-link.ts): on staging with HYPERDRIVE_JOB bound, over the root's handle; else none.
+    openLink: stagingOpenLink({ env, db }),
   });
   workerRoots.set(env, root);
   return root;
