@@ -68,8 +68,8 @@
 //     the one entry it appends, or nothing written. A v1.9 markPart answer is judged by markPart.v1dot9Response, which
 //     states repeatedDelivery and the row always (REPEAT), and the outbox then holds what it gives (MARKS): a repeat
 //     wrote nothing, the row is the answer's, a recorded delivery is the part try's at the receipt's time, and the
-//     delivery a repeat names is the part try's as stored, the row's first by the stored times. Four answers are
-//     compared otherwise, each with what a later version adds, never with a field dropped: db/repo answers a
+//     delivery a repeat names is the part try's as stored, the row's first by the stored times. Five answers are
+//     compared otherwise, four each with what a later version adds, never with a field dropped: db/repo answers a
 //     readOutboxRow exchange of a version before v1.6 as v1.6 does, which always states businessSensitive (SWITCH), so
 //     its answer is the fixture's outcome, whole, with businessSensitive null and nothing else changed (the exchange's
 //     world holds no kind of work, checked before the read), valid at v1.6, whose readOutboxRow.v1dot6Response is a
@@ -79,7 +79,13 @@
 //     before the read), valid at v1.16, whose readOutboxRowWritten.v1dot16Response is a v1.16 answer; a v1.1 claim a
 //     chain runs first is answered as v1.2 does, each claimed row naming its port (PORT),
 //     valid at v1.2; and a mark of a version before v1.9 a chain runs first is answered as v1.9 does, its outcome with
-//     repeatedDelivery null and nothing else changed (REPEAT: none of them repeats a delivery), valid at v1.9;
+//     repeatedDelivery null and nothing else changed (REPEAT: none of them repeats a delivery), valid at v1.9; and one
+//     as a README default reads its world: a readFixedLineFacts exchange whose loaded world's opener mark names another
+//     row committed after the row read (a higher commit_seq) is answered as K-05 default 215 does (LATER_MARK; T-1521,
+//     DL-1089), its outcome with textedAboutBusiness false and openerRowId null and nothing else changed, once the
+//     tables' owner has found that mark and no row of the handle and business committed before the row read whose
+//     final parts hold an opener (one found is a broken test), valid at its own version: v1.3's
+//     fixed-line-facts-texted-before, whose K-04 seeds commit its row (out-a7-03-alex) before the marked one;
 //   - each refused request: the db/repo call refuses it before any statement reaches the database, so nothing is read or
 //     written; a refused request its fixture holds in an exchange (REQUEST_TWINS: v1.10's
 //     refuse-question-facts-caller-business, a facts request naming a business beside the question, and v1.11's
@@ -2204,6 +2210,72 @@ async function runExchange(exchange: Exchange, call = callOf(exchange.call)): Pr
 }
 
 /**
+ * K-05 default 215 (T-1521; README default 215, "The frozen fixture it contradicts, and how a test compares with it";
+ * DL-1089): with a business, readFixedLineFacts reads a mark naming another row whose commit_seq is higher than the row
+ * read's as default 202's fallback, the earliest row to the handle and business with a lower commit_seq whose final
+ * parts' fixedLines hold an opener (opener or signUpOpener: default 204) and that did not end without going. K-04's
+ * seeds load v1.3's fixed-line-facts-texted-before.json with its row (out-a7-03-alex) committed before the row its mark
+ * names (out-alex-first), so where the loaded world's mark names such a later row, the answer is the outcome with
+ * textedAboutBusiness false and openerRowId null, every other field as the fixture states it, at the exchange's own
+ * version, with no field added. The test decides it from the loaded world, never from the file's name, as the tables'
+ * owner, whom no policy binds; a world where the fallback would find a row (no frozen fixture's) is a broken test.
+ */
+const LATER_MARK = { call: "readFixedLineFacts", result: "fixedLineFacts" } as const;
+
+/** The two opener ids, either of which makes a row the fallback's (default 204). */
+const OPENER_IDS: readonly string[] = ["opener", "signUpOpener"];
+
+/**
+ * The row the opener mark on an answered row's handle and business names, as the tables' owner reads it, when that is
+ * another row committed after the row read (a higher commit_seq: default 215); else null.
+ */
+async function laterMarkOf(exchange: Exchange): Promise<string | null> {
+  const { outcome, request } = exchange;
+  if (exchange.call !== LATER_MARK.call || outcome.result !== LATER_MARK.result) return null;
+  if (typeof outcome.businessId !== "string") return null;
+  const rowId = textOf(request.outboxRowId, "a fixed-line facts request's row");
+  const [mark] = await db.sql<{ marked: string; later: boolean }[]>`
+    select m.outbox_row_id as marked, named.commit_seq > r.commit_seq as later
+    from outbox_rows r
+    join openers_sent m on m.handle_id = r.recipient_handle_id and m.business_id = r.business_id
+    join outbox_rows named on named.id = m.outbox_row_id
+    where r.id = ${rowId} and r.business_id = ${outcome.businessId}
+  `;
+  return mark !== undefined && mark.marked !== rowId && mark.later ? mark.marked : null;
+}
+
+/**
+ * A readFixedLineFacts exchange's outcome as default 215 answers it in the loaded world (LATER_MARK): where the mark
+ * names another row committed after the row read, textedAboutBusiness false and openerRowId null and nothing else
+ * changed, once the tables' owner has found no row of the handle and business committed before the row read whose final
+ * parts' fixedLines hold either opener id, whatever its state, so that the fallback finds none; else the outcome, whole.
+ */
+async function fixedLineAnswerOf(entry: FixtureEntry, exchange: Exchange): Promise<Record<string, Json>> {
+  const marked = await laterMarkOf(exchange);
+  if (marked === null) return exchange.outcome;
+  const rowId = textOf(exchange.request.outboxRowId, `${entry.file}'s row`);
+  const earlier = await db.sql<{ id: string; fixed_lines: Json }[]>`
+    select e.id, e.final_parts -> 'fixedLines' as fixed_lines
+    from outbox_rows r
+    join outbox_rows e on e.recipient_handle_id = r.recipient_handle_id and e.business_id = r.business_id
+    where r.id = ${rowId} and e.commit_seq < r.commit_seq
+    order by e.commit_seq
+  `;
+  const openers = earlier
+    .filter(
+      ({ fixed_lines: lines }) =>
+        Array.isArray(lines) && lines.some((line) => typeof line === "string" && OPENER_IDS.includes(line)),
+    )
+    .map(({ id }) => id);
+  if (openers.length > 0) {
+    throw new Error(
+      `${entry.file}: its mark names ${marked}, committed after ${rowId}, and the fallback finds an earlier opener row (${openers.join(", ")}): no frozen world holds one, so this is a broken test`,
+    );
+  }
+  return { ...exchange.outcome, textedAboutBusiness: false, openerRowId: null };
+}
+
+/**
  * What db/repo answers an exchange in its world: the fixture's outcome, compared whole; where it adds the port
  * (addsPort), that outcome with each claimed row's port and nothing else changed; where it adds what a mark repeats
  * (addsRepeat), that outcome with repeatedDelivery null and nothing else changed; where it adds the recipient and class
@@ -2212,7 +2284,9 @@ async function runExchange(exchange: Exchange, call = callOf(exchange.call)): Pr
  * checked here as the tables' owner; where it adds the switch (addsSwitch), that outcome with businessSensitive null and
  * nothing else changed, never with the field dropped from db/repo's answer. Null is item 45's answer for a business
  * with no kinds of work, and the world of such an exchange holds none (K-04's seeds hold no company_kinds row), which
- * is checked here, as the tables' owner, whom no policy binds.
+ * is checked here, as the tables' owner, whom no policy binds. A readFixedLineFacts exchange is answered as default 215
+ * reads its world (fixedLineAnswerOf): where its mark names another row committed after the row read, the outcome with
+ * the fallback's textedAboutBusiness and openerRowId, and else the outcome, whole.
  */
 async function answerOf(entry: FixtureEntry, exchange: Exchange): Promise<Record<string, Json>> {
   if (addsPort(entry, exchange)) {
@@ -2248,6 +2322,7 @@ async function answerOf(entry: FixtureEntry, exchange: Exchange): Promise<Record
     }
     return answer;
   }
+  if (exchange.call === LATER_MARK.call) return fixedLineAnswerOf(entry, exchange);
   if (!addsSwitch(entry, exchange)) return exchange.outcome;
   expect(Object.hasOwn(exchange.outcome, SWITCH.field), `${entry.file}'s outcome states no switch`).toBe(
     false,
