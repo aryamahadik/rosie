@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 881, [`34f0aaa9`](https://github.com/aryamahadik/rosie/commit/34f0aaa9), 2026-11-22 10:30:04 UTC.
+- **Through:** commit 883, [`cd705187`](https://github.com/aryamahadik/rosie/commit/cd705187), 2026-11-22 11:42:06 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 883. docs: COMMIT\_HISTORY.md through commit 881 (34f0aaa9, \#898) (\#900)
+
+- **Commit:** [`cd705187`](https://github.com/aryamahadik/rosie/commit/cd705187), by Arya Mahadik, 2026-11-22 11:42:06 UTC
+- **Pull request:** [#900](https://github.com/aryamahadik/rosie/pull/900) from `task/commit-history-224`, merged 2026-11-22 11:42:07 UTC. It squashed 1 branch commit:
+  - `38b6f2a` docs: COMMIT\_HISTORY.md through commit 881 (34f0aaa9, \#898)
+- **Files changed:** 1 (+51 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +51 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 882. T-1525: K-09 README defaults 200-208 for S1-09 on the text path (its settler, read-only writer, S1-76's writer, a partial answer, the split and apostrophe fold, a helper's claim never an owner's), rounds 1-2 squashed onto main (DL-1124, DL-1133) (\#899)
+
+- **Commit:** [`27923be6`](https://github.com/aryamahadik/rosie/commit/27923be6), by Arya Mahadik, 2026-11-22 11:42:02 UTC
+- **Pull request:** [#899](https://github.com/aryamahadik/rosie/pull/899) from `task/T-1525s`, merged 2026-11-22 11:42:03 UTC. It squashed 1 branch commit:
+  - `dc863f8` T-1525: K-09 README defaults 200-208 for S1-09 on the text path (its …
+- **Files changed:** 1 (+55 −1), by folder:
+  - `contracts/tool-api/` README.md +55 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 881. docs: COMMIT\_HISTORY.md through commit 878 (ce8caf77, \#895) (\#898)
 
