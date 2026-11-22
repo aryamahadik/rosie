@@ -12,6 +12,9 @@
 // T-1479: S1-08's row (T-1482's planWriter's stand-in) names S1-08 and line 0, S1-09's question's row S1-09 and line 0
 // (K-05 v1.22 item 82; writes.ts defaults 15 and 16), held to K-05 v1.22; and S1-09 as bundle v2 compiles it, a split
 // whose message carries two buttons, is asked with its card's safe default and no options (writes.ts default 10).
+//
+// T-1480: an option named at S1-04 with one of its buttons now answers S1-04 (K-09 README default 181): the walk starts
+// there and never stops there, so no buttons settler is asked; button-answer.test.ts holds its cases.
 
 import { describe, expect, it } from "vitest";
 
@@ -664,9 +667,13 @@ describe("when the walk asks no buttons settler", () => {
     const today = await refusal(buttonsWalk({ noButtons: true }), "c-01", atS1_04);
     const walk = buttonsWalk();
     const bound = await refusal(walk, "c-01", atS1_04);
-    expectRefused(today, "branchNotInBundle", ["S1-04"]);
+    // T-1480: "All share one" is one of S1-04's buttons, so the option answers S1-04 (default 181) and the walk starts
+    // there; planWriters binds no S1-04 writer, so the part is refused before anything is read (notBuilt, gives).
+    expect(today).toBeInstanceOf(WalkNotBuiltError);
+    expect(today).toMatchObject({ seam: "gives", ids: ["S1-04", "companies"] });
     expect(bound).toEqual(today);
     expect(walk.asks).toEqual([]);
+    expect(walk.log).toEqual([]);
   });
 
   it("a part that enters a step (turn 1's sign-up door, on bundle v0) stops at S1-02, a split: no buttons settler asked, whatever is bound", async () => {

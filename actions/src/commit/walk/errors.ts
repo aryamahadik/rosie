@@ -12,6 +12,8 @@ import { NotBuiltError } from "../../tool-api/errors";
  *     bundle does not hold is not reachable"), an answer's branch step that walk.ts default 1 lets the path end past
  *     among them, since an answer writes each step of its branch through that step's writer (T-1461);
  *   - branchNotInBundle: the part chose a branch its step does not have in the pinned bundle, or a step with no branches;
+ *     or, answering a plain step's buttons question (T-1480; K-09 README defaults 181 and 188), a label that is none of
+ *     that step's button labels in the pinned bundle, word for word;
  *   - pathNotInBundle: where a list ends, the walk cannot tell where the path goes (the split whose branch lists the step
  *     is not in the bundle, or two branches list it);
  *   - stepNotWellFormed: a step the walk reads is not K-01 v1's shape (an asked step with no card among them);
