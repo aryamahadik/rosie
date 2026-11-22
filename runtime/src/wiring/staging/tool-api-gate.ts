@@ -92,7 +92,29 @@
 //                code; the handle's and db/repo's own errors as they are), since these db/repo calls catch nothing and
 //                postgres.js puts a statement's values on its error; the call then fails closed with nothing written.
 //                What they read (a number, an address, a consent row) goes to readStop alone, never to a line or an
-//                error.
+//                error. Beside `companies` (below) ../real.ts hands these same reads to S1-08's writer as its own
+//                (SignUpWriterDeps.plan.stop): no second stop binding.
+//   companies    the one-kind path's reads (T-1494, H2a; ../real.ts GateReads.companies; DL-1033, DL-1096, DL-1111; K-09
+//                README default 199), @rosie/actions' CompaniesReads through companiesReadsOf (T-1492), so a K-05 error
+//                answer is thrown as CompaniesReadError and never read as none; each read on a client of its own that the
+//                root's handle opens, guards and ends for that one read, straight from the handle and never through the
+//                slots, as item 78's client, while the call's own client is held; each db/repo's standalone read in a
+//                read-only transaction of its own, never the call's (the call's repo it is handed is not read through):
+//                  item 79  K-05 v1.19 readPickedKinds on a runtime-side client (part.db.runtime: HYPERDRIVE_JOB,
+//                           rosie_worker_job), as `kinds` reads it, at repeatable read: the owner's picks so far and the
+//                           companies, from which the turn's company is found;
+//                  item 72  K-05 v1.18 readBusinessKinds on a second Tool API client (part.db.toolApi: HYPERDRIVE_APP,
+//                           rosie_worker_app), in its own read-only transaction at repeatable read under the call's
+//                           business (db/repo/catalog-reads.ts refuses any other: the call's own transaction is read-write,
+//                           and its client's one connection is the call's: ./db.ts CONNECTIONS_PER_CLIENT is 1);
+//                  catalog  K-05 v1.2 item 26 readTurnState with T-667's setup homes (K-24's kinds.facts and
+//                           kind_flows.switches_on by id) on a runtime-side client (part.db.runtime: HYPERDRIVE_JOB,
+//                           rosie_worker_job): item 26 is rosie_job's, and it reads the turn's handle, on which rosie_app
+//                           holds no grant (0012).
+//                T-1492's pieces await each read before the next (one-kind.ts), so the call holds its own client and one
+//                of these at a time. db/repo answers transient as K-05's error and throws any other database error
+//                scrubbed (the call's name and a SQLSTATE); the handle's own errors leave as thrown; nothing here catches,
+//                wraps or logs, and CompaniesReadError's `answer` (a SQLSTATE, a table or a row id) is never logged.
 //   readChatHandle  K-05 v1.10 item 51 (T-1519; ../real.ts GateReads.readChatHandle; DL-1048, DL-1051), the phone handle
 //                whose chat thread holds the turn's Linq chat id, which S1-01's walk asks once so a returning number's
 //                JOIN reuses the handle's own chat thread instead of inserting a second one (one-chat-per-handle): db/repo
@@ -112,17 +134,19 @@
 // a gate call holds its Tool API client's one connection while each of its other calls (the bundle reads, the owner's
 // read, a seal, the commit on the runtime side; and, for an answer to S1-02's question, the catalog on a second Tool API
 // client, item 79 and S1-11's one trade overlay on the runtime side: T-1470; and the stop home's reads, each on the
-// runtime side: T-1516; and, for S1-01, item 51's chat read on the runtime side: T-1519) opens and ends a client of its
-// own, one after another, so it holds 2 connections at most; a keyword door's call holds its runtime-side transaction's
-// one connection the same way while its bundle reads, seal and commit open theirs (T-1415), 2 at most too. At most 3 such
+// runtime side: T-1516; and, for S1-01, item 51's chat read on the runtime side: T-1519; and, for a one-kind answer to
+// S1-02's question, item 79 and the catalog by id on the runtime side and item 72 on a second Tool API client: T-1494)
+// opens and ends a client of its own, one after another, so it holds 2 connections at most; a keyword door's call holds
+// its runtime-side transaction's one connection the same way while its bundle reads, seal and commit open theirs
+// (T-1415), 2 at most too. At most 3 such
 // calls, the gate's and the door's together, hold their call's client at once, so the gates hold 6 at most, the Worker's
 // limit (infra/spikes/hyperdrive-host/worker.mjs line 77); a 4th waits for a slot before its client is opened, and
-// nothing that holds a slot ever waits for one (the catalog's client, the stop reads' and the chat read's take no slot),
-// so no call waits for a connection another call holds while that call waits for one.
+// nothing that holds a slot ever waits for one (the catalog's client, item 72's, the stop reads', the one-kind reads' and
+// the chat read's take no slot), so no call waits for a connection another call holds while that call waits for one.
 //
-//   bound    staging, with both HYPERDRIVE_APP (the scope, the question read on it, and the catalog's own client) and
-//            HYPERDRIVE_JOB (the owner's read, the sealer, the keyword door, item 79, the stop reads, the chat read and the
-//            commit) present. Only their presence is read as the root is built (DL-768): no connection
+//   bound    staging, with both HYPERDRIVE_APP (the scope, the question read on it, and the catalog's and item 72's own
+//            clients) and HYPERDRIVE_JOB (the owner's read, the sealer, the keyword door, item 79, the catalog by id, the
+//            stop reads, the chat read and the commit) present. Only their presence is read as the root is built (DL-768): no connection
 //            string, secret, KV or other binding. Each connection string is the handle's to read, and SEALING_WRAP_KEY
 //            the resolver's, at each call.
 //   unbound  any environment but staging, checked before anything else is read, or a binding missing: null, as the
@@ -145,14 +169,16 @@
 // line. No word of a text or a fixed line, no number, address, key, wrapping key's value, token or hash is in a log line
 // or an error.
 //
-// pgCallScope, the door's pieces, pgWalkQuestions, kindsReadsOf, pgReadOnlySealer, messagesReaderOf and flagsReaderOf are
-// imported by their own files, as ./tool-api-rows.ts imports pgCallScope (critic_size N5): no change to @rosie/actions;
-// and db/repo's readChatHandle by its own file, as pgTurnCalls imports it (T-1519).
+// pgCallScope, the door's pieces, pgWalkQuestions, kindsReadsOf, companiesReadsOf, pgReadOnlySealer, messagesReaderOf and
+// flagsReaderOf are imported by their own files, as ./tool-api-rows.ts imports pgCallScope (critic_size N5): no change to
+// @rosie/actions; and db/repo's readChatHandle, readBusinessKinds and readTurnState by their own files, as pgTurnCalls
+// and pgCompaniesK05Reads import them (T-1519, T-1494).
 
 import { flagsReaderOf } from "@rosie/actions/src/domain/flags/reads";
 import { messagesReaderOf } from "@rosie/actions/src/domain/messages-consent/reads";
 import type { StopHomeReads } from "@rosie/actions/src/homes/stop/reads";
 import { NotBuiltError } from "@rosie/actions/src/tool-api/errors";
+import { companiesReadsOf, type CompaniesReads } from "@rosie/actions/src/tool-api/journey-1/companies/reads";
 import { kindsReadsOf, type KindsReads } from "@rosie/actions/src/tool-api/journey-1/kinds/reads";
 import type { BusinessScope, ScopeCall } from "@rosie/actions/src/tool-api/scope";
 import type { SafetyReads } from "@rosie/actions/src/tool-api/turn-face/commit";
@@ -166,6 +192,7 @@ import {
 } from "@rosie/actions/src/tool-api/turn-face/pg/calls";
 import { pgReadOnlySealer } from "@rosie/actions/src/tool-api/turn-face/pg/sealer";
 import type { WordsSealer } from "@rosie/actions/src/domain/safety";
+import { readBusinessKinds } from "@rosie/db/repo/catalog-reads";
 import { scrubbed } from "@rosie/db/repo/clocks";
 import { readKindCatalog, readPickedKinds } from "@rosie/db/repo/kinds-reads";
 import {
@@ -179,6 +206,7 @@ import {
 } from "@rosie/db/repo/safety-reads";
 import type { Sql, Tx } from "@rosie/db/repo/scope";
 import type { WrappingKeys } from "@rosie/db/repo/sealing";
+import { readTurnState } from "@rosie/db/repo/setup/turn-state";
 import { readChatHandle } from "@rosie/db/repo/threads";
 import { readOpenHoldsIn } from "@rosie/db/repo/turn-face-reads";
 
@@ -213,8 +241,9 @@ export const GATE_CLIENTS_AT_ONCE = 3;
  * the keyword door's are K-09's name for the call their transaction is opened for (the scope's on the Tool API's side,
  * the door's on the runtime side), the owner's K-05's, the sealer's its own (sealer.ts), the two kinds reads' K-05's
  * (T-1470: item 78 on the Tool API's side, item 79 on the runtime side), the five stop reads' db/repo's own (T-1516,
- * each on the runtime side: the data-access call each StopHomeReads member makes), and the chat read's K-05's (T-1519:
- * item 51, on the runtime side).
+ * each on the runtime side: the data-access call each StopHomeReads member makes), the chat read's K-05's (T-1519:
+ * item 51, on the runtime side), and the one-kind path's K-05's (T-1494: item 79 under the kinds reads' own name, since
+ * it is the same call on the same side; item 72 on the Tool API's side; item 26, the catalog by id, on the runtime side).
  */
 export const GATE_CALLS = Object.freeze({
   scope: "gateAndCommit",
@@ -223,6 +252,8 @@ export const GATE_CALLS = Object.freeze({
   seal: "seal",
   kindCatalog: "readKindCatalog",
   pickedKinds: "readPickedKinds",
+  businessKinds: "readBusinessKinds",
+  kindsById: "readTurnState",
   stopHandle: "getHandle",
   stopHandleIdsOfPerson: "listHandleIdsOfPerson",
   stopPhoneOfHandle: "getPhoneByHandle",
@@ -330,6 +361,27 @@ function kindsReadsOn(db: StagingDb): KindsReads {
   return kindsReadsOf({
     readKindCatalog: (request) => db.toolApi(GATE_CALLS.kindCatalog, (sql) => readKindCatalog(sql, request)),
     readPickedKinds: (request) => db.runtime(GATE_CALLS.pickedKinds, (sql) => readPickedKinds(sql, request)),
+  });
+}
+
+/**
+ * The one-kind path's reads (T-1494; DL-1111; @rosie/actions' companiesReadsOf over CompaniesK05Reads, T-1492), each on a
+ * client of its own that the handle opens, guards and ends for that one read, straight from the handle, never through
+ * gateScope or the slots (the gate call that asks one already holds its own client and a slot), each db/repo's standalone
+ * read in a read-only transaction of its own, so the call's repo they are handed is never read through:
+ *   - item 79, the owner's picks and companies, on a runtime-side client (HYPERDRIVE_JOB, rosie_worker_job);
+ *   - item 72, the business's company kinds, on a second Tool API client (HYPERDRIVE_APP, rosie_worker_app);
+ *   - the catalog by id (item 26 readTurnState with the setup homes), on a runtime-side client (rosie_worker_job).
+ * T-1492's pieces await one read before the next, so the call holds its own client and one of these at a time. A K-05
+ * error answer is thrown by companiesReadsOf as CompaniesReadError, and whatever the handle or db/repo throws leaves as
+ * thrown (db/repo's scrubbed: the call's name and a SQLSTATE); nothing here catches or logs either.
+ */
+function companiesReadsOn(db: StagingDb): CompaniesReads<Tx> {
+  return companiesReadsOf<Tx>({
+    readPickedKinds: (request) => db.runtime(GATE_CALLS.pickedKinds, (sql) => readPickedKinds(sql, request)),
+    readBusinessKinds: (_tx, request) =>
+      db.toolApi(GATE_CALLS.businessKinds, (sql) => readBusinessKinds(sql, request)),
+    readTurnState: (_tx, request) => db.runtime(GATE_CALLS.kindsById, (sql) => readTurnState(sql, request)),
   });
 }
 
@@ -460,7 +512,9 @@ const asGateReads = (reads: GateReads<Tx, Sql>): GateReads => reads as GateReads
  * question (T-1470), the walk's question read on the call's transaction and the kinds reads, the catalog on a Tool API
  * client of its own (no slot) and item 79 on a runtime-side one, and beside them the stop home's reads, each on a
  * runtime-side client of its own (T-1516; DL-1033 ruling 8); and, for S1-01's thread, K-05 v1.10 item 51's chat read on
- * a runtime-side client of its own (T-1519; DL-1048). Null anywhere but staging (nothing read but ENVIRONMENT)
+ * a runtime-side client of its own (T-1519; DL-1048); and, for a one-kind answer to S1-02's question, the one-kind path's
+ * reads, item 79 and the catalog by id each on a runtime-side client of its own and item 72 on a Tool API client of its
+ * own (T-1494; DL-1111). Null anywhere but staging (nothing read but ENVIRONMENT)
  * and while either binding is missing, so every gate fails closed, a keyword turn naming no business with the base's
  * noBusinessScope.
  */
@@ -482,6 +536,8 @@ export const stagingGateReads: (part: GatePart) => GateReads | null = ({ env, db
     kinds: { reads: kindsReadsOn(db) },
     // The stop reads S1-03's, S1-74's and S1-08's writers share (DL-1033 ruling 8, CQ-360's scope): on the runtime side.
     stop: { reads: stopReadsOn(db) },
+    // One kept kind of work is never asked S1-04 (T-1494; DL-1111): item 79, item 72 and the catalog by id, each its own.
+    companies: companiesReadsOn(db),
     // S1-01 reuses the turn's own handle's chat thread (T-1519; one-chat-per-handle): item 51 on the runtime side.
     readChatHandle: chatHandleReadOn(db),
     ...(bundleSafety === null ? {} : { words: wordsOf(bundleSafety) }),
