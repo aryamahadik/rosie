@@ -677,9 +677,13 @@ const CLAIMS: Readonly<Record<number, (facts: Facts) => Promise<void>>> = {
     expect(rowsIn("clock_rows").map((row) => [row.id, row.values.state, row.values.due ?? null])).toEqual([
       [`clock-oq-s1-02-${facts.turnId}-1`, "waiting", null],
     ]);
-    // 1 outbox row: the JOIN event's service, quick_reply, the question's id, no plan.
+    // 1 outbox row: the JOIN event's service, quick_reply, the question's id, no plan; the walk's stamp names the
+    // stopped step S1-02 and its line 0 (T-1479).
     expect(rowsIn("outbox_rows").map((row) => [row.id, row.values])).toEqual([
-      [`outbox-s1-02-${facts.turnId}-1`, { ...asRun(stated.outboxRows[0]), commitSeq: 1 }],
+      [
+        `outbox-s1-02-${facts.turnId}-1`,
+        { ...asRun(stated.outboxRows[0]), step: "S1-02", lineNo: 0, commitSeq: 1 },
+      ],
     ]);
     expect(rowsIn("outbox_rows")[0]?.values).toMatchObject({
       channel: JOIN.service,

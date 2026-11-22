@@ -26,7 +26,8 @@
 // rowsNamedBy names the rows one unit's writes write, by table and id, so the commit's answer can tell a core action's
 // rows from the parts' (commit.ts default 9; K-09 v1.5 default 134).
 //
-// The request is K-05 v1.17's (T-1419; K-05 README item 71; the architect's ruling on CQ-342, DL-876, DL-877): every
+// The request is K-05 v1.17's (T-1419; K-05 README item 71; the architect's ruling on CQ-342, DL-876, DL-877), as K-05
+// v1.22 keeps it (default 11: v1.22's request, whose outbox rows may name their step and line): every
 // turn's commit sets answerPhoneRowsBy to handleId, so every row reference K-05 answers (committed.written,
 // committed.waitingChat and versionChanged's changed) names a phones row by its handle id (K-04 phones.handle_id), never
 // by its number, and the turn's span, the stillChanged rows and K-09's written carry no number (commit.ts). It changes
@@ -67,8 +68,9 @@
 //      same, and the call's span keeps them.
 //   9. Every request sets answerPhoneRowsBy, whatever it writes, a repeat and a reload's second request among them
 //      (K-05 v1.17 README "Who calls commitTurn": "Sets the field on every request, from T-1419"; its T-1419 line: "never
-//      on some"), so no answer of a turn's commit names a phones row by its number. The request's type is K-05 v1.17's
-//      generated one with the field required (TurnCommitRequest), so the type check holds every built request to it.
+//      on some"), so no answer of a turn's commit names a phones row by its number. The request's type is the generated
+//      one with the field required (TurnCommitRequest: K-05 v1.17's, from T-1479 v1.22's, which keeps v1.17's field by
+//      reference: default 11), so the type check holds every built request to it.
 //  10. (T-1505) A unit that asks an open question again (UnitWrites.askAgain: ask-again.ts, K-09 v1.12 defaults 192 and
 //      194) puts its raise in K-05 v1.21's `openQuestions.askAgain` (README item 81), so the request is K-05 v1.21's
 //      with the raise given (AskAgainCommitRequest); every other request stays K-05 v1.17's, byte for byte, with no
@@ -78,9 +80,17 @@
 //      unit's opened questions and before its outbox rows, as K-05 v1.21's commit-s1-02-sam-asks-again.json lists it.
 //      One raise a request and none beside a close (item 81.5): checkUnits refuses either (askAgainNotAlone) before
 //      anything is sent, as K-05's schema and db/repo's checkRequest would.
+//  11. (T-1479; K-05 v1.22 item 82; DL-1093) Every request is K-05 v1.22's commitTurn.request, which only restates
+//      v1.21's to take v1.22's outboxRowNew: an outbox row may name the step whose line it carries and that line's index
+//      (`step` and `lineNo`, both or neither), as the walk writes every row it writes (walk/writes.ts defaults 15 and
+//      16). checkUnits takes both as outbox-row fields, as K-05 v1.22's closed outboxRowNew does, so a walk row is never
+//      refused outboxRowWithPlan; a plan or final parts still are. Both-or-neither and the line's form are K-05 v1.22's
+//      schema rules, which db/repo's checkRequest holds before any statement (T-1476), so a half-named row is refused
+//      whole there, nothing written. A request whose rows name no step is v1.21's, and one that also raises nothing
+//      is v1.17's, byte for byte (README "v1.22": every v1 to v1.21 exchange is a v1.22 exchange), so default 9's
+//      answerPhoneRowsBy and default 10's raise are kept as v1.17 and v1.21 hold them.
 
-import type * as K05V1dot17 from "../../../contracts/generated/data-access/data-access.v1.17";
-import type * as K05V1dot21 from "../../../contracts/generated/data-access/data-access.v1.21";
+import type * as K05V1dot22 from "../../../contracts/generated/data-access/data-access.v1.22";
 import { CommitRefusedError } from "./errors";
 import type {
   ClockNew,
@@ -93,30 +103,43 @@ import type {
   StateWrite,
   TurnRow,
   UnitWrites,
-  Writes,
 } from "./types";
 
 /**
- * A turn's K-05 request that asks no question again: K-05 v1.17 `commitTurn.request` (T-1418), v1.1's turn row, versions
- * read and writes (each by reference to v1.1's own definition, so types.ts's CommitTurnRequest holds the same three) with
- * answerPhoneRowsBy, required here: every turn's commit sets it (default 9). A K-05 port typed by v1.1 takes it as it is.
+ * A turn's K-05 request that asks no question again: K-05 v1.22 `commitTurn.request` (T-1474; default 11), v1.1's turn
+ * row and versions read, v1.22's writes (v1.1's lists, each outbox row v1.22's outboxRowNew, which may name its step and
+ * line) and v1.17's answerPhoneRowsBy, required here: every turn's commit sets it (default 9). Its writes carry no
+ * `askAgain` (v1.22 keeps v1.21's optional raise; left out here, as db/repo's RaisesNothing holds a request that raises
+ * nothing), so with no row naming a step it is K-05 v1.17's request, byte for byte; a K-05 port typed by v1.1 takes it
+ * as it is.
  */
-export type PlainCommitRequest = K05V1dot17.CommitTurnRequest &
-  Required<Pick<K05V1dot17.CommitTurnRequest, "answerPhoneRowsBy">>;
+export type PlainCommitRequest = K05V1dot22.CommitTurnRequest &
+  Required<Pick<K05V1dot22.CommitTurnRequest, "answerPhoneRowsBy">> & {
+    readonly writes: { readonly openQuestions: { readonly askAgain?: undefined } };
+  };
 
 /**
- * A turn's K-05 request that asks one open question again (default 10; T-1505): K-05 v1.21 `commitTurn.request` with
- * `writes.openQuestions.askAgain` given, its one raise (README item 81), and answerPhoneRowsBy required (default 9). Its
- * shape is db/repo's CommitTurnAskAgainRequest (K-05 v1.21 default 199), so the K-05 port sends it on that overload and
- * it alone may answer v1.21's wrongState (types.ts CommitTurnAnswer).
+ * A turn's K-05 request that asks one open question again (default 10; T-1505): K-05 v1.22 `commitTurn.request`
+ * (default 11) with `writes.openQuestions.askAgain` given, its one raise (v1.21's, which v1.22 keeps: README item 81),
+ * and answerPhoneRowsBy required (default 9). Its shape is db/repo's CommitTurnAskAgainRequest (K-05 v1.21 default 199),
+ * so the K-05 port sends it on that overload and it alone may answer v1.21's wrongState (types.ts CommitTurnAnswer).
  */
-export type AskAgainCommitRequest = K05V1dot21.CommitTurnRequest &
-  Required<Pick<K05V1dot21.CommitTurnRequest, "answerPhoneRowsBy">> & {
+export type AskAgainCommitRequest = K05V1dot22.CommitTurnRequest &
+  Required<Pick<K05V1dot22.CommitTurnRequest, "answerPhoneRowsBy">> & {
     readonly writes: { readonly openQuestions: { readonly askAgain: [OpenQuestionAskAgain] } };
   };
 
-/** The turn's one K-05 request: one that asks no question again (K-05 v1.17), or one that asks one again (K-05 v1.21). */
+/**
+ * The turn's one K-05 request, K-05 v1.22's (default 11): one that asks no question again, or one that asks one again
+ * (K-05 v1.21's raise).
+ */
 export type TurnCommitRequest = PlainCommitRequest | AskAgainCommitRequest;
+
+/**
+ * K-05 v1.22 `writes` as the commit builds them: the lists the request carries, each outbox row v1.22's outboxRowNew
+ * (default 11), and no raise until one is added (buildCommitRequest).
+ */
+type RequestWrites = PlainCommitRequest["writes"];
 
 /** Whether a turn's request asks an open question again: its writes carry K-05 v1.21's `openQuestions.askAgain`. */
 export function asksAgain(request: TurnCommitRequest): request is AskAgainCommitRequest {
@@ -124,8 +147,9 @@ export function asksAgain(request: TurnCommitRequest): request is AskAgainCommit
 }
 
 /**
- * What every turn's commit asks K-05 v1.17 for (README item 71; default 9): every row reference its answer names, a
- * phones row by its handle id. The field's one value (data-access.v1.17.schema.json commitTurn.request).
+ * What every turn's commit asks K-05 for (v1.17 README item 71, which v1.22 keeps by reference; default 9): every row
+ * reference its answer names, a phones row by its handle id. The field's one value (data-access.v1.17.schema.json
+ * commitTurn.request).
  */
 export const ANSWER_PHONE_ROWS_BY: TurnCommitRequest["answerPhoneRowsBy"] = "handleId";
 
@@ -162,7 +186,10 @@ export const NOT_STATE_TABLES: readonly string[] = [
   "sealing_keys",
 ];
 
-/** The fields of K-05 v1 outboxRowNew: an outbox row at the commit carries these and nothing else (no plan, no final parts). */
+/**
+ * The fields of K-05 v1.22 outboxRowNew: an outbox row at the commit carries these and nothing else (no plan, no final
+ * parts). v1's ten, and v1.22's step and lineNo (default 11; README item 82), which the walk writes on its rows.
+ */
 const OUTBOX_ROW_FIELDS: readonly string[] = [
   "id",
   "recipientHandleId",
@@ -174,6 +201,8 @@ const OUTBOX_ROW_FIELDS: readonly string[] = [
   "openQuestionId",
   "copyOfRowId",
   "versionsRead",
+  "step",
+  "lineNo",
 ];
 
 /** The answer a part gave to the open question its choice belongs to (K-08 v1 approvalAnswer). */
@@ -321,7 +350,8 @@ function onceEach(ids: readonly string[]): void {
 
 /**
  * What code checks before anything is sent (fail closed: the whole turn is refused, nothing written): the state writes'
- * tables, plan-free outbox rows, every effect row on its own key, every unit's own clock row readable (default 7), no
+ * tables, plan-free outbox rows (K-05 v1.22's fields alone, a row's step and line among them: default 11), every effect
+ * row on its own key, every unit's own clock row readable (default 7), no
  * row id given twice in one list, every clock row the request makes in one, and at most one question asked again, never
  * beside a close (default 10).
  */
@@ -483,8 +513,8 @@ function addRead(reads: RowRef[], seen: Set<string>, row: RowRef): void {
 function writeUnit(
   input: BuildInput,
   unit: CommitUnit,
-  writes: Writes,
-  effects: Required<Writes>["effects"],
+  writes: RequestWrites,
+  effects: Required<RequestWrites>["effects"],
   raises: OpenQuestionAskAgain[],
 ): void {
   const { writes: unitWrites, answer } = unit;
@@ -660,14 +690,15 @@ function writeUnit(
 /**
  * The turn's one K-05 commitTurn request: the turn row (K-05's seven fields of the request's turn: k05TurnRow), every row
  * read, and every unit's writes in order (its own clock rows among them) with the rows the commit owns and the event-log
- * entries, asking K-05 v1.17 to answer every phones row by its handle id (default 9). The rows read are the units' own
+ * entries, asking K-05 to answer every phones row by its handle id (default 9). The request is K-05 v1.22's (default 11):
+ * each outbox row as its unit wrote it, its step and line with it when it names them. The rows read are the units' own
  * reads, never a row an answer named. Checks the units first (checkUnits): a fault refuses the whole turn. A unit that
- * asks a question again makes it K-05 v1.21's request, its raise in `openQuestions.askAgain` (default 10); with none,
- * the request is K-05 v1.17's as before, with no `askAgain` key.
+ * asks a question again puts its raise in `openQuestions.askAgain` (K-05 v1.21's, default 10); with none, the request
+ * has no `askAgain` key, as before.
  */
 export function buildCommitRequest(input: BuildInput): TurnCommitRequest {
   checkUnits(input.units);
-  const writes: Writes = {
+  const writes: RequestWrites = {
     state: [],
     openQuestions: { open: [], close: [] },
     clockRows: { make: [], cancel: [] },
@@ -675,7 +706,7 @@ export function buildCommitRequest(input: BuildInput): TurnCommitRequest {
     reservations: { confirm: [], release: [] },
     events: [],
   };
-  const effects: Required<Writes>["effects"] = { write: [], letGo: [] };
+  const effects: Required<RequestWrites>["effects"] = { write: [], letGo: [] };
   const versionsRead: RowRef[] = [];
   const seenReads = new Set<string>();
   const raises: OpenQuestionAskAgain[] = [];

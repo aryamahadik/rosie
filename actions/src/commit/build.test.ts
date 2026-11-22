@@ -562,6 +562,65 @@ describe("buildCommitRequest writes a unit's own clock rows as given, once, each
 });
 
 // ---------------------------------------------------------------------------------------------------------------
+// buildCommitRequest: an outbox row's step and line (T-1479; build.ts default 11; K-05 v1.22 item 82)
+
+describe("buildCommitRequest takes an outbox row's step and line as K-05 v1.22's outboxRowNew (T-1479; build.ts default 11)", () => {
+  /**
+   * commit-s1-01.json's walk double, its one row naming S1-02 and line 0, as the walk stamps the row asking the step it
+   * stops at (walk/writes.ts default 15).
+   */
+  function linedS101Writes(): UnitWrites {
+    const writes = s101Writes();
+    return { ...writes, messages: writes.messages.map((row) => ({ ...row, step: "S1-02", lineNo: 0 })) };
+  }
+
+  const buildWith = (writes: UnitWrites) =>
+    buildCommitRequest({
+      turn: requestTurn(),
+      zone: "America/New_York",
+      businessId: "biz-lees-barbershop",
+      actor: { personId: "person-sam", roleAt: () => null },
+      units: [
+        { writes: s101CoreRun().writes, answer: null },
+        { writes, answer: null },
+      ],
+    });
+
+  it("a row naming its step and line is written as given, never refused outboxRowWithPlan, and K-05 v1.22 takes the request", () => {
+    const [row] = stated().writes.outboxRows;
+    if (row === undefined) throw new Error("commit-s1-01.json states one outbox row");
+    const built = buildWith(linedS101Writes());
+
+    expect(built.writes.outboxRows).toEqual([{ ...row, step: "S1-02", lineNo: 0 }]);
+    expect(contractChecks().k05("commitTurn.request", built)).toEqual([]);
+    // The row's entry is as before: its step and line are the row's, never its entry's values.
+    const entries = built.writes.events.filter((entry) => entry.tableName === "outbox_rows");
+    expect(entries.map((entry) => [entry.rowId, entry.newValues])).toEqual([
+      [row.id, { state: "planned", channel: row.channel, send_class: row.sendClass }],
+    ]);
+    // With neither, the same request but for the row's two fields (README default 206).
+    const plain = buildWith(s101Writes());
+    expect(plain.writes.outboxRows).toEqual([row]);
+    expect({ ...plain, writes: { ...plain.writes, outboxRows: built.writes.outboxRows } }).toEqual(built);
+  });
+
+  it("a row with a plan beside its step and line is still refused outboxRowWithPlan, before anything is built", () => {
+    const writes = linedS101Writes();
+    const [row] = writes.messages;
+    if (row === undefined) throw new Error("the walk double carries one outbox row");
+    const planned = { ...row, plan: [] } as unknown as OutboxRowNew;
+    let refused: unknown = null;
+    try {
+      buildWith({ ...writes, messages: [planned] });
+    } catch (error) {
+      refused = error;
+    }
+    expect(refused).toBeInstanceOf(CommitRefusedError);
+    expect(refused).toMatchObject({ fault: "outboxRowWithPlan", ids: [row.id] });
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
 // commit-s1-01.json through the Tool API
 
 describe("commit-s1-01.json through the Tool API: K-09 v1.5's validator passes it and the commit writes K-05's turn row", () => {
