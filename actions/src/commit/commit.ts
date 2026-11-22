@@ -41,7 +41,8 @@
 // Defaults used (for ops/QUESTIONS.md), beside build.ts's and hold.ts's:
 //   5. A part the holds keep back is answered `held`, its limits notChecked: no limit ran for it (K-09 v1 valueFailsWords).
 //   6. A passed part that waits for the one question on its booking (CQ-73) is answered `asked` (K-09 v1 partResult: decide
-//      ended it in one question; nothing changed), with the limits it passed.
+//      ended it in one question; nothing changed), with the limits it passed. So is a passed part whose split settler
+//      answered "ask" (T-1528; walk/settle.ts settlerAskedParts), which wrote nothing (K-09 README open gap 179).
 //   7. A repeat answers what this run gated for each part, with nothing written: written as K-05 returns it (no rows,
 //      the first commit's outbox rows), and no effects or questions, since the repeat's body may differ from the first's
 //      (K-05 v1: "whatever the repeat's body"). The caller reads `repeated` first: no part of a repeat committed anything
@@ -101,6 +102,7 @@ import {
   type TurnCommitRequest,
 } from "./build";
 import { askAgainUnit } from "./ask-again";
+import { settlerAskedParts } from "./walk/settle";
 import { CommitNotBuiltError, CommitRefusedError } from "./errors";
 import { askedBookings, bookingKey, bundleMismatchOf, checkTurn, choiceOf, heldParts } from "./hold";
 import type {
@@ -373,7 +375,11 @@ async function gateAndCommitOnce<Repo>(
     }
     const writes = await ports.writesOf(passed, context, copy(open));
     units.push({ writes, answer: answerOf(decided, passed, writes) });
-    parts.push(partResultOf(gated, writes.gives));
+    // A split settler's "ask" wrote nothing: the part is answered `asked`, with the limits it passed (default 6).
+    const settlerAsked = settlerAskedParts(context).has(gated.part);
+    parts.push(
+      settlerAsked ? partResultOf({ ...gated, result: "asked" }) : partResultOf(gated, writes.gives),
+    );
   }
 
   // An asked turn's one row: its one open question sent again, with its ask count raised (K-09 v1.12; ask-again.ts).

@@ -33,9 +33,18 @@
 // condition never throws. A rerun runs it again before K-05 answers `repeated` (K-05 v1 item 1): it reads ask_count 2 by
 // then and builds no unit, and K-05 answers the first commit whatever the body, so nothing is written twice.
 //
-// It only reads (the request, what the commit holds, and the one question read) and has no outside effect. Nothing here
-// logs; what it throws names a fault, never a person's words: the unit's why names the step alone, and no word of the
-// texts or of decide's `unclear` goes into the row (default 197: the row holds no words at commit).
+// A split settler's "ask" (T-1528; K-09 README default 201 and open gap 179, carded by DL-1133, DL-1138): a part the gate
+// passed whose walk asked its split's bound settler, which answered "ask" (walk/settle.ts SETTLER_ASKS), wrote nothing
+// and was noted on the turn object by the walk (walk/settle.ts settlerAskedParts). Default 192 (a) and (c) take such a
+// part as a part decide ended in one question: in (a) it counts as asked, beside parts asked the same way or `noAction`,
+// and in (c) it is about the open question its option names, as a `oneQuestion` choose is. Conditions (b), (d) to (g)
+// are unchanged, so the step's own question is sent again once with its own line (default 197), and a second "ask" for
+// it, read at ask count 2, writes nothing (default 194's cap), as a second asked text does. A passed part the walk did
+// not note is not asked, as before.
+//
+// It only reads (the request, what the commit holds, the walk's note and the one question read) and has no outside
+// effect. Nothing here logs; what it throws names a fault, never a person's words: the unit's why names the step alone,
+// and no word of the texts or of decide's `unclear` goes into the row (default 197: the row holds no words at commit).
 //
 // Defaults used (for ops/QUESTIONS.md):
 //   1. The unit's why is the question's step alone (`{step}`, choice null), as K-05 v1.21's entry names it (its default
@@ -43,6 +52,10 @@
 //      raise's and the row's; K-09 v1.12's "asked again" is the raise entry's kind, open_question.asked_again.
 //   2. An empty turn key (a binding's fault, never a condition of default 192) refuses the turn (noTurnKey), as the walk
 //      refuses one (walk/writes.ts noTurnKey), and is checked only once every condition holds.
+//   3. (T-1528, DL-1149) A part whose settler answered "ask" is answered `asked` (the README's open gap 179; K-09 v1's
+//      partResult: nothing changed), with its limits as run and no key given: commit.ts answers it as it answers a part
+//      waiting for the one question (its default 6), and its unit writes nothing. Its row and raise are this file's one
+//      unit, built exactly as for a part decide ended in one question (the same id, row and entry).
 
 import type { Decided, GatedPart } from "../gate/framework";
 import type { CommitUnit } from "./build";
@@ -58,6 +71,7 @@ import type {
   TurnRow,
   UnitWrites,
 } from "./types";
+import { settlerAskedParts } from "./walk/settle";
 import { SERVICES } from "./walk/writes";
 
 /**
@@ -89,12 +103,16 @@ interface Candidate {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** (a): a part the gate answered `asked` for decide's one question, every other `noAction`, none held; null otherwise. */
-function askedParts(turn: AskedTurn): number[] | null {
+/**
+ * (a): a part the gate answered `asked` for decide's one question, or a passed part whose split's settler answered "ask"
+ * (`settled`: T-1528), every other `noAction`, none held; null otherwise.
+ */
+function askedParts(turn: AskedTurn, settled: ReadonlySet<number>): number[] | null {
   const asked: number[] = [];
   for (const gated of turn.gated) {
     if (turn.held.has(gated.part)) return null;
-    if (gated.result === "asked") asked.push(gated.part);
+    const settlerAsked = gated.result === "passed" && settled.has(gated.part);
+    if (gated.result === "asked" || settlerAsked) asked.push(gated.part);
     else if (gated.result !== "noAction") return null;
   }
   return asked.length === 0 ? null : asked;
@@ -106,13 +124,17 @@ function endsUnmapped(decided: Decided): boolean {
   return isRecord(decide) && Object.hasOwn(decide, "end");
 }
 
-/** (c): the part at `index`, ended in one question, is about the open question `questionId`. */
-function isAbout(decided: Decided, index: number, questionId: string): boolean {
+/**
+ * (c): the part at `index`, ended in one question, is about the open question `questionId`; a choose whose split's
+ * settler answered "ask" (`settled`: T-1528) is, when its option is one of that question's, as a `oneQuestion` one is.
+ */
+function isAbout(decided: Decided, index: number, questionId: string, settled: ReadonlySet<number>): boolean {
   const entry = decided.decide.parts[index];
   if (entry === undefined) return false;
   const { part } = entry;
   if (part.verb === "ask") return part.questions.every((id) => id === questionId);
-  if (entry.outcome !== "oneQuestion" || part.verb !== "choose") return false;
+  const endedAsked = entry.outcome === "oneQuestion" || settled.has(index);
+  if (!endedAsked || part.verb !== "choose") return false;
   const choice = choiceOf(decided, part);
   return choice?.kind === "option" && choice.question === questionId;
 }
@@ -138,12 +160,14 @@ function candidateOf(turn: AskedTurn): Candidate | null {
   const { request } = turn.context;
   if (request.input.kind !== "decided" || request.input.planner !== null) return null;
   const { decided } = request.input;
-  const asked = askedParts(turn);
+  // The parts whose split settler answered "ask", as the walk noted them on this turn object (T-1528).
+  const settled = settlerAskedParts(turn.context);
+  const asked = askedParts(turn, settled);
   if (asked === null || endsUnmapped(decided)) return null;
   const [only, ...more] = decided.context.openQuestions;
   if (only === undefined || more.length > 0) return null;
   const questionId = only.openQuestionId;
-  if (!asked.every((index) => isAbout(decided, index, questionId))) return null;
+  if (!asked.every((index) => isAbout(decided, index, questionId, settled))) return null;
   if (!nothingHolds(turn)) return null;
   const channel = serviceOf(request);
   return channel === null ? null : { questionId, channel };
