@@ -2,9 +2,48 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 853, [`26ce5441`](https://github.com/aryamahadik/rosie/commit/26ce5441), 2026-11-21 23:13:29 UTC.
+- **Through:** commit 855, [`fb07f0c1`](https://github.com/aryamahadik/rosie/commit/fb07f0c1), 2026-11-21 23:41:01 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 855. docs: COMMIT\_HISTORY.md through commit 853 (26ce5441, \#867) (\#869)
+
+- **Commit:** [`fb07f0c1`](https://github.com/aryamahadik/rosie/commit/fb07f0c1), by Arya Mahadik, 2026-11-21 23:41:01 UTC
+- **Pull request:** [#869](https://github.com/aryamahadik/rosie/pull/869) from `task/commit-history-209`, merged 2026-11-21 23:41:02 UTC. It squashed 1 branch commit:
+  - `bc19b54` docs: COMMIT\_HISTORY.md through commit 853 (26ce5441, \#867)
+- **Files changed:** 1 (+45 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +45 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 854. T-1474 + T-1475 + T-1476: K-05 v1.22, a row's step and line through the commit, the turn face and db/repo (S1-04 cards 5-7; DL-999, DL-1071, DL-1077, DL-1085, DL-1093) (\#868)
+
+- **Commit:** [`b3eba0af`](https://github.com/aryamahadik/rosie/commit/b3eba0af), by Arya Mahadik, 2026-11-21 23:40:57 UTC
+- **Pull request:** [#868](https://github.com/aryamahadik/rosie/pull/868) from `task/T-1476s`, merged 2026-11-21 23:40:58 UTC. It squashed 1 branch commit:
+  - `7799667` T-1474 + T-1475 + T-1476: K-05 v1.22, a row's step and line through t…
+- **Files changed:** 15 (+2790 −74), by folder:
+  - `actions/src/tool-api/turn-face/` rows.test.ts +561 −0, rows.ts +28 −13
+  - `contracts/data-access/` README.md +87 −8, data-access.v1.22.schema.json +938 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` commit-s1-04-sam-lines.json +161 −0, index.json +32 −0, read-outbox-row-s1-02-older-row.json +69 −0, read-outbox-row-s1-08-sam.json +59 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-commit-s1-04-sam-step-without-line.json +160 −0
+  - `db/repo/` commit-turn.int.test.ts +307 −6, commit-turn.ts +75 −7, turn-face-reads.int.test.ts +252 −11, turn-face-reads.ts +58 −27
+  - `runtime/src/wiring/staging/` keyword-door.worker.test.ts +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Squash of task/T-1476 (00900a7a: T-1474's b0d6fa28 content, T-1475, T-1476 rounds 1-3, with main 0cd5fcca merged) onto origin/main, one commit (DL-1065). Round 3 QA PASS on 00900a7a (whole suite, test:e2e, the phone scan, the whole lint); round 1's architect and security reviewer PASS; T-1474's QA and three reviews PASS.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 853. docs: COMMIT\_HISTORY.md through commit 851 (0cd5fcca, \#863) (\#867)
 
