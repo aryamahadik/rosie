@@ -2,9 +2,51 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 861, [`e5365c5b`](https://github.com/aryamahadik/rosie/commit/e5365c5b), 2026-11-22 01:56:55 UTC.
+- **Through:** commit 863, [`1b7127cb`](https://github.com/aryamahadik/rosie/commit/1b7127cb), 2026-11-22 02:33:20 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 863. docs: COMMIT\_HISTORY.md through commit 861 (e5365c5b, \#875) (\#879)
+
+- **Commit:** [`1b7127cb`](https://github.com/aryamahadik/rosie/commit/1b7127cb), by Arya Mahadik, 2026-11-22 02:33:20 UTC
+- **Pull request:** [#879](https://github.com/aryamahadik/rosie/pull/879) from `task/commit-history-214`, merged 2026-11-22 02:33:21 UTC. It squashed 1 branch commit:
+  - `d18736a` docs: COMMIT\_HISTORY.md through commit 861 (e5365c5b, \#875)
+- **Files changed:** 1 (+45 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +45 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 862. T-1480: walk part 2: answering a plain step's buttons option closes its question, writes its gives and walks on (S1-04 design card 11; K-09 README default 181; DL-999, DL-1106) (\#876)
+
+- **Commit:** [`8c2a4e7d`](https://github.com/aryamahadik/rosie/commit/8c2a4e7d), by Arya Mahadik, 2026-11-22 02:33:16 UTC
+- **Pull request:** [#876](https://github.com/aryamahadik/rosie/pull/876) from `task/T-1480`, merged 2026-11-22 02:33:17 UTC. It squashed 1 branch commit:
+  - `716a31e` T-1480: walk part 2: answering a plain step's buttons option closes i…
+- **Files changed:** 7 (+980 −26), by folder:
+  - `actions/src/commit/walk/` button-answer.test.ts +718 −0, buttons.test.ts +8 −1, errors.ts +2 −0, graph.ts +36 −7, test-support.ts +122 −0, walk.ts +38 −3, writes.ts +56 −15
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+graph.ts keeps the button labels of Rosie's messages (buttonLabels), read as the
+frontier reads them (T-1478). An option at a step the pinned graph holds as no
+split starts the walk as a button answer: its branch must be one of the step's
+labels word for word, else branchNotInBundle with nothing read. The walk closes
+the live question at its row's version (answeredOptionId null), writes the step
+as an answer (its gives through its writer, its message not again) and walks on
+from its next. button-answer.test.ts proves commit-s1-04.json's rows on bundle
+v2. One buttons.test.ts case now expects notBuilt (gives) for an S1-04 button
+answer with no S1-04 writer, where it expected branchNotInBundle before.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 861. docs: COMMIT\_HISTORY.md through commit 859 (55946b1d, \#873) (\#875)
 
