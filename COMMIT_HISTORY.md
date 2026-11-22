@@ -2,9 +2,59 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 878, [`ce8caf77`](https://github.com/aryamahadik/rosie/commit/ce8caf77), 2026-11-22 09:43:35 UTC.
+- **Through:** commit 881, [`34f0aaa9`](https://github.com/aryamahadik/rosie/commit/34f0aaa9), 2026-11-22 10:30:04 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 881. docs: COMMIT\_HISTORY.md through commit 878 (ce8caf77, \#895) (\#898)
+
+- **Commit:** [`34f0aaa9`](https://github.com/aryamahadik/rosie/commit/34f0aaa9), by Arya Mahadik, 2026-11-22 10:30:04 UTC
+- **Pull request:** [#898](https://github.com/aryamahadik/rosie/pull/898) from `task/commit-history-223`, merged 2026-11-22 10:30:05 UTC. It squashed 1 branch commit:
+  - `e4ded6a` docs: COMMIT\_HISTORY.md through commit 878 (ce8caf77, \#895)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 880. T-1485 (H2b): staging's gate hands S1-04's writer its deps, the party rule's flag off, and S1-08's stop reads wherever bound; unit cases for the whole H1b binding, worker cases for a multi-kind owner's S1-04 answer and the refused two-company answer (DL-1122) (\#897)
+
+- **Commit:** [`acf3494f`](https://github.com/aryamahadik/rosie/commit/acf3494f), by Arya Mahadik, 2026-11-22 10:30:00 UTC
+- **Pull request:** [#897](https://github.com/aryamahadik/rosie/pull/897) from `task/T-1485`, merged 2026-11-22 10:30:01 UTC. It squashed 1 branch commit:
+  - `2a1f3d7` T-1485 (H2b): staging's gate hands S1-04's writer its deps, the party…
+- **Files changed:** 5 (+1002 −118), by folder:
+  - `runtime/src/wiring/` gate-binding.test.ts +272 −16, real.ts +73 −36
+  - `runtime/src/wiring/staging/` tool-api-gate.seed.ts +88 −33, tool-api-gate.ts +16 −7, tool-api-gate.worker.test.ts +553 −26
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 879. T-1527: Workers Logs store no request URL: wrangler.jsonc's observability keeps the Worker's own console lines with logs.invocation\_logs false and redact\_query\_string true (K-21 README:168; DL-1130), at the top level, which env.staging and env.production inherit whole (wrangler's inheritable()); wrangler-config.test.mjs checks the block each section deploys, the comment in place, and refuses copies that store invocation logs, keep query strings, turn on traces or turn logs off (\#896)
+
+- **Commit:** [`450767ef`](https://github.com/aryamahadik/rosie/commit/450767ef), by Arya Mahadik, 2026-11-22 10:29:56 UTC
+- **Pull request:** [#896](https://github.com/aryamahadik/rosie/pull/896) from `task/T-1527`, merged 2026-11-22 10:29:56 UTC. It squashed 1 branch commit:
+  - `a18a901` T-1527: Workers Logs store no request URL: wrangler.jsonc's observabi…
+- **Files changed:** 2 (+139 −1), by folder:
+  - `infra/ci/` wrangler-config.test.mjs +127 −0
+  - `/` wrangler.jsonc +12 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 878. docs: COMMIT\_HISTORY.md through commit 876 (b0eaa560, \#893) (\#895)
 
