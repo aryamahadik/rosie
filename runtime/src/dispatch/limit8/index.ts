@@ -1,4 +1,4 @@
-// Limit 8 at send (T-259, T-1099, T-1283; C-125, C-241). See limit8.ts.
+// Limit 8 at send (T-259, T-1099, T-1283, T-1538; C-125, C-241). See limit8.ts.
 
 export {
   CUSTOMER_OPENS,
@@ -10,6 +10,7 @@ export {
   isSafety,
   isSmsPort,
   isStopReply,
+  questionClosed,
   stopStands,
   versionsChanged,
   yesAfterStop,

@@ -28,7 +28,10 @@
 //      text rule: an email row skips it and goes on to the checks below (T-1283; ADR-016 section 3).
 //   3. A safety line and a stop reply then go at any hour, with no check of versions.
 //   4. Stale: a row whose read versions changed is composed again from today's record (S13-57), or withdrawn when its
-//      booking or question has closed.
+//      booking or question has closed. A row that asks a question no longer open (answered, defaulted or withdrawn) is
+//      withdrawn whether or not a read version moved (T-1538; K-07 README's withdrawn): the send state reads the question
+//      from its own row at send (K-05 item 28 closed.question), while the row's versionsRead may not name it, as a walked
+//      step's asking row names none (Nov 22: a question the roster reset withdrew was asked again, so S1-02 went twice).
 //   5. Text hours: only a routine row waits for them. 9am to 8pm in the visit's zone, else the business's (CQ-05); the
 //      owner and team from 8am (RULES 4.3). A reply in the same turn (Q-15's default) and a visit happening now go at
 //      any hour. The staging test phone's override opens the hours on staging only (BP 9.4). A sign-in code's row is a
@@ -160,6 +163,15 @@ export function yesAfterStop(row: ClaimedRow, state: SendState): YesAfterStop {
 export const stopStands = (row: ClaimedRow, state: SendState): boolean =>
   isEmailRow(row) ? emailStopped(state) !== false : state.stopped && !yesAfterStop(row, state).lifts;
 
+/**
+ * Whether the row asks a question that is no longer open (T-1538): it names one (K-05 claimedRow.openQuestionId, the
+ * question the row asks: K-05 item 26, "the outbox rows that ask it") and the send state says that question has closed,
+ * answered, defaulted or withdrawn (K-05 item 28 closed.question; default 32), as read from the question's own row at
+ * send. Never from the row's versionsRead, which need not name its question: asking a closed question again is no reply.
+ */
+export const questionClosed = (row: ClaimedRow, state: SendState): boolean =>
+  row.openQuestionId !== null && state.closed.question;
+
 /** The row's read versions that moved: any not found in the current versions, or found at another version. */
 export function versionsChanged(row: ClaimedRow, state: SendState): boolean {
   return row.versionsRead.some((read) => {
@@ -219,6 +231,10 @@ export function decideLimit8(input: Limit8Input): Limit8Decision {
 
   if (isSafety(row)) return { action: "send", reason: "safety", overrideOptout: false };
   if (isStopReply(row)) return { action: "send", reason: "stopReply", overrideOptout: false };
+
+  // A row asking a question that has closed is withdrawn unsent, its read versions moved or not (T-1538; K-07 README's
+  // withdrawn): the question's own state at send decides, never only a version the row may not have read.
+  if (questionClosed(row, state)) return { action: "mark", outcome: "withdrawn", heldUntil: null };
 
   if (versionsChanged(row, state)) {
     const closed =

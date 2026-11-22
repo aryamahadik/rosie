@@ -6,9 +6,10 @@
 import { describe, expect, it } from "vitest";
 
 import { checkTextHours, instantOfLocal } from "./text-hours";
-import { runDispatch, type DispatchDeps } from "../dispatcher";
+import { handleDeliveryReceipt, runDispatch, type DispatchDeps } from "../dispatcher";
 import {
   FakeClock,
+  FakeClockArming,
   FakeLinq,
   FakeOutboxStore,
   FakeRecipients,
@@ -17,7 +18,7 @@ import {
   words,
   type SeedRow,
 } from "../test-support";
-import type { Span } from "../../trace";
+import { openTrace, type Span } from "../../trace";
 import type { ChatTarget } from "../types";
 
 const BEN: ChatTarget = { to: "+15555550102", chatId: "linq-chat-demo-ben", service: "imessage" };
@@ -286,6 +287,133 @@ describe("a stale row is composed again, or withdrawn when its booking closed", 
     const report = await runDispatch(t.deps());
 
     expect(report.rows.map((row) => row.outcome)).toEqual(["sent"]);
+  });
+});
+
+describe("a row whose open question was withdrawn before its claim is withdrawn unsent (T-1538; DL-1171)", () => {
+  // Nov 22: the 19:36Z turn's S1-02 row (checked, asking its question, reading no versions, as the walk writes it) waited
+  // behind a stuck row; at 21:53Z the roster reset withdrew its question (version raised by one) and cancelled its clock;
+  // at 21:54Z the claim passed the stuck row. The new JOIN's turn had written its own S1-02 row behind it.
+  const AT = "2026-11-22T21:54:00.000Z";
+  const OLD_ROW = "outbox-s1-02-turn-sam-1936-1";
+  const OLD_QUESTION = "oq-s1-02-turn-sam-1936";
+  const NEW_ROW = "outbox-s1-02-turn-sam-2154-1";
+  const NEW_QUESTION = "oq-s1-02-turn-sam-2154";
+  const s102 = (id: string, question: string, commitSeq: number): SeedRow => ({
+    id,
+    recipient: "handle-sam",
+    commitSeq,
+    sendClass: "quick_reply",
+    openQuestionId: question,
+    versionsRead: [],
+    sends: [words(`S1-02's question (${String(commitSeq)}).`)],
+  });
+  const QUESTION_CLOSED = { booking: false, question: true } as const;
+
+  /** The receipt's own trace, as the gateway opens it (the bundle id a stand-in of the right shape). */
+  const receiptTrace = (): ReturnType<typeof openTrace> =>
+    openTrace({
+      openedBy: "providerWebhook",
+      bundleId: { hash: "0123456789abcdef".repeat(4), build: 1 },
+      sink: () => undefined,
+    });
+
+  it("withdraws the old row unsent at the claim (no part sent, no clock arm), and the new row goes behind it", async () => {
+    const t = setup([s102(OLD_ROW, OLD_QUESTION, 1), s102(NEW_ROW, NEW_QUESTION, 2)], AT);
+    // The reset withdrew the old row's question; the new row's question is open (each row's own send-state read).
+    t.state.forRow(OLD_ROW, { closed: QUESTION_CLOSED });
+
+    const report = await runDispatch(t.deps("staging"));
+
+    expect(report.rows.map((row) => [row.outboxRowId, row.outcome, row.partsSent])).toEqual([
+      [OLD_ROW, "withdrawn", 0],
+      [NEW_ROW, "sent", 1],
+    ]);
+    expect(t.linq.requests.map((request) => request.text)).toEqual(["S1-02's question (2)."]);
+    expect(t.store.rowMarks.map((mark) => mark.request)).toEqual([
+      { outboxRowId: OLD_ROW, expectVersion: 4, outcome: "withdrawn", heldUntil: null, at: AT },
+    ]);
+    expect(t.store.row(OLD_ROW).state).toBe("withdrawn");
+    // No part of the old row was sent or recorded: no message id for a receipt to name, so no clock can arm on it.
+    expect(t.store.tries(OLD_ROW).map((part) => [part.key, part.state, part.messageId])).toEqual([
+      [`${OLD_ROW}/1/1`, "pending", null],
+    ]);
+    expect(t.store.marks.map((mark) => ("idempotencyKey" in mark ? mark.idempotencyKey : null))).toEqual([
+      `${NEW_ROW}/1/1`,
+    ]);
+    expect(t.store.renewals.map((renewal) => renewal.request.outboxRowId)).toEqual([NEW_ROW]);
+    expect(
+      t.spans
+        .filter((span) => span.hop === "dispatch")
+        .map((span) => [span.rows?.[0]?.id, span.outcome, span.limits, span.decided?.result ?? null]),
+    ).toEqual([
+      [OLD_ROW, "dropped", [{ limit: 8, result: "fail", outcome: "withdrawn" }], "withdrawn"],
+      [NEW_ROW, "ok", [{ limit: 8, result: "pass", outcome: null }], "sent"],
+    ]);
+
+    // The new row's receipt arms its own question's clock, and only that one.
+    const arming = new FakeClockArming();
+    const delivered = await handleDeliveryReceipt(
+      { store: t.store, clockArming: arming, trace: receiptTrace() },
+      { providerMessageId: "linq-msg-test-0001", partKey: `${NEW_ROW}/1/1`, at: AT },
+    );
+    expect(delivered).toMatchObject({ result: "delivered", outboxRowId: NEW_ROW, firstDelivery: true });
+    expect(arming.delivered.map((part) => [part.outboxRowId, part.openQuestionId])).toEqual([
+      [NEW_ROW, NEW_QUESTION],
+    ]);
+
+    // The withdrawn row is finished: no later run claims or sends it.
+    t.clock.advance(3_600_000);
+    expect((await runDispatch(t.deps("staging"))).claimed).toBe(0);
+    expect(t.linq.requests).toHaveLength(1);
+  });
+
+  it("sends the same row as today while its question is still open, and its receipt arms that question's clock", async () => {
+    const t = setup([s102(OLD_ROW, OLD_QUESTION, 1)], AT);
+
+    const report = await runDispatch(t.deps("staging"));
+
+    expect(report.rows.map((row) => [row.outboxRowId, row.outcome, row.partsSent])).toEqual([
+      [OLD_ROW, "sent", 1],
+    ]);
+    expect(t.store.rowMarks).toEqual([]);
+    const arming = new FakeClockArming();
+    await handleDeliveryReceipt(
+      { store: t.store, clockArming: arming, trace: receiptTrace() },
+      { providerMessageId: "linq-msg-test-0001", partKey: `${OLD_ROW}/1/1`, at: AT },
+    );
+    expect(arming.delivered.map((part) => [part.outboxRowId, part.openQuestionId])).toEqual([
+      [OLD_ROW, OLD_QUESTION],
+    ]);
+  });
+
+  it("withdraws a held routine row whose question closed while it was held, when its hour comes", async () => {
+    const t = setup(
+      [{ ...s102(OLD_ROW, OLD_QUESTION, 1), sendClass: "routine", heldUntil: NINE_NY }],
+      NINE_NY,
+    );
+    t.state.forRow(OLD_ROW, { closed: QUESTION_CLOSED });
+
+    const report = await runDispatch(t.deps());
+
+    expect(report.rows.map((row) => [row.outcome, row.partsSent])).toEqual([["withdrawn", 0]]);
+    expect(t.linq.requests).toEqual([]);
+  });
+
+  it("a question that closes after the first part is out lets the second part go: a row goes whole", async () => {
+    const t = setup(
+      [{ ...s102(OLD_ROW, OLD_QUESTION, 1), sends: [words("First part."), words("Second part.")] }],
+      AT,
+    );
+    t.linq.beforeAnswer = (): Promise<void> => {
+      t.state.forRow(OLD_ROW, { closed: QUESTION_CLOSED });
+      return Promise.resolve();
+    };
+
+    const report = await runDispatch(t.deps("staging"));
+
+    expect(report.rows.map((row) => [row.outcome, row.partsSent])).toEqual([["sent", 2]]);
+    expect(t.linq.requests.map((request) => request.text)).toEqual(["First part.", "Second part."]);
   });
 });
 
