@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 868, [`dbbef0f6`](https://github.com/aryamahadik/rosie/commit/dbbef0f6), 2026-11-22 04:44:39 UTC.
+- **Through:** commit 870, [`3a747ad3`](https://github.com/aryamahadik/rosie/commit/3a747ad3), 2026-11-22 06:09:03 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 870. docs: COMMIT\_HISTORY.md through commit 868 (dbbef0f6, \#885) (\#887)
+
+- **Commit:** [`3a747ad3`](https://github.com/aryamahadik/rosie/commit/3a747ad3), by Arya Mahadik, 2026-11-22 06:09:03 UTC
+- **Pull request:** [#887](https://github.com/aryamahadik/rosie/pull/887) from `task/commit-history-218`, merged 2026-11-22 06:09:03 UTC. It squashed 1 branch commit:
+  - `7cf1888` docs: COMMIT\_HISTORY.md through commit 868 (dbbef0f6, \#885)
+- **Files changed:** 1 (+64 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +64 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 869. T-1520: one-kind path, S1-03's draft takes the business its one pick was placed under: oneKind.wrapDraft around T-633's S1-03 writer (draftElsewhere refusal, defaults O8-O11; T-633 default 9 superseded for the one-kind case), bound in signUpSteps beside S1-02's wrap only with the companies reads; unit, binding and integration cases (item 79 answers the draft beside its pick) (DL-1056, DL-1076) (\#886)
+
+- **Commit:** [`a95b7c0f`](https://github.com/aryamahadik/rosie/commit/a95b7c0f), by Arya Mahadik, 2026-11-22 06:08:59 UTC
+- **Pull request:** [#886](https://github.com/aryamahadik/rosie/pull/886) from `task/T-1520`, merged 2026-11-22 06:09:00 UTC. It squashed 1 branch commit:
+  - `b4576ca` T-1520: one-kind path, S1-03's draft takes the business its one pick …
+- **Files changed:** 7 (+539 −28), by folder:
+  - `actions/src/tool-api/journey-1/companies/` companies.int.test.ts +137 −7, errors.ts +13 −4, index.ts +6 −0, one-kind.test.ts +244 −3, one-kind.ts +90 −5
+  - `actions/src/tool-api/turn-face/` commit.test.ts +43 −6, commit.ts +6 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 868. docs: COMMIT\_HISTORY.md through commit 865 (da57739e, \#882) (\#885)
 
