@@ -2,9 +2,58 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 870, [`3a747ad3`](https://github.com/aryamahadik/rosie/commit/3a747ad3), 2026-11-22 06:09:03 UTC.
+- **Through:** commit 872, [`f4d265d2`](https://github.com/aryamahadik/rosie/commit/f4d265d2), 2026-11-22 07:36:50 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 872. docs: COMMIT\_HISTORY.md through commit 870 (3a747ad3, \#887) (\#889)
+
+- **Commit:** [`f4d265d2`](https://github.com/aryamahadik/rosie/commit/f4d265d2), by Arya Mahadik, 2026-11-22 07:36:50 UTC
+- **Pull request:** [#889](https://github.com/aryamahadik/rosie/pull/889) from `task/commit-history-219`, merged 2026-11-22 07:36:51 UTC. It squashed 1 branch commit:
+  - `7d6e97d` docs: COMMIT\_HISTORY.md through commit 870 (3a747ad3, \#887)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 871. T-1484 (H1b): the turn face binds S1-04's writer for an answered S1-04, behind its own dep with the party flag off by default; S1-08's plan bound whenever given (DL-1121) (\#888)
+
+- **Commit:** [`473badbd`](https://github.com/aryamahadik/rosie/commit/473badbd), by Arya Mahadik, 2026-11-22 07:36:47 UTC
+- **Pull request:** [#888](https://github.com/aryamahadik/rosie/pull/888) from `task/T-1484`, merged 2026-11-22 07:36:47 UTC. It squashed 3 branch commits:
+  - `233823c` T-1484: signUpSteps binds S1-04's writer (companiesWriter) from the c…
+  - `3ab3158` T-1484: integration proof on local PostgreSQL: an answered S1-04 ('Al…
+  - `33b6d24` T-1484: S1-04's writer needs its own dep, SignUpWriterDeps.s1\_04Write…
+- **Files changed:** 5 (+1831 −43), by folder:
+  - `actions/src/tool-api/turn-face/` commit.test.ts +406 −7, commit.ts +97 −32, index.ts +1 −0
+  - `actions/src/tool-api/turn-face/pg/` calls.ts +9 −4, s1-04-answer.int.test.ts +1318 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1484: signUpSteps binds S1-04's writer (companiesWriter) from the companies reads with SignUpWriterDeps.partyRuleLive, off unless true; default 6 restated (plan binds S1-08 whenever given); unit cases for an answered S1-04 on bundle v2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1484: integration proof on local PostgreSQL: an answered S1-04 ('All share one' in words) closes the question, places the picks, writes S1-08's row and asks S1-09; the party flag off refuses Sam's two-company answer, on lands it; the user's phone (one pick, S1-04 asked under bundle v1) is placed under v2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1484: S1-04's writer needs its own dep, SignUpWriterDeps.s1_04Writer (with the party flag), beside the companies reads, so staging's H2a binding (companies alone) keeps H1a's writers until H2b; S1_04WriterDeps exported; unit and integration cases follow, H1a's binding refusing an answered S1-04
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 870. docs: COMMIT\_HISTORY.md through commit 868 (dbbef0f6, \#885) (\#887)
 
