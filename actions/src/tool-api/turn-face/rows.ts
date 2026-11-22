@@ -83,6 +83,14 @@
 //      K-09 v1.6's fixedLineRow answer names the row's fixed line by its id, which K-05's error does not give, so it is
 //      never guessed. A row whose bundle or step is missing is refused before a reader is looked for (K-05 v1.5
 //      rowReader.errors; bundleMissing, stepMissing), so compose input never reaches its masterLineMissing for it.
+//  15. (T-1533; K-09 README default 211; DL-1167 (4)) S1-10's secure link goes in here, not in compose input or finalize:
+//      S1-10's line 2 (say[4]) names no link slot, so the row the face holds a link for (RowBinding.links, held.ts
+//      HeldLinks, by the row's own id) gets it as its source's links.secure fact, which compose input keeps among the
+//      allowed links only where limit 7 shows it (compose-input/build.ts linksOf) and finalize's link.secure filler
+//      fills (finalize/slots/fillers.ts), and link.secure among its allowed links beside those its master line names.
+//      Every other row, and the same row once the link is let go or was never held (a replay, a run that stopped before
+//      its finalize), has neither, so a plan that writes the slot leaves it unfilled and one that writes any link fails
+//      the Values check: the sample rosfield.com/v/s01 is never sent.
 
 import type * as K05 from "../../../../contracts/generated/data-access/data-access.v1.22";
 import { NotBuiltError } from "../errors";
@@ -180,7 +188,22 @@ export interface RowBinding {
   readonly now?: () => string;
   /** Told one note per finalize attempt (labels only). Default: finalize's own JSON line. */
   readonly log?: FinalizeDeps["log"];
+  /**
+   * The secure links the face holds for finalize, by outbox row id (T-1533; held.ts HeldLinks; K-09 README default 211):
+   * a row with a held link gets it as its link.secure fact and link.secure among its allowed links. Omitted: no row has
+   * one.
+   */
+  readonly links?: HeldLinkReads;
 }
+
+/** The face's hold of S1-10's secure links as the row bindings read it (held.ts HeldLinks.of). */
+export interface HeldLinkReads {
+  /** The link held for the outbox row `outboxRowId`, or null. Never logged. */
+  of(outboxRowId: string): string | null;
+}
+
+/** The link slot S1-10's line 2 carries, filled from the face's hold (K-03 link.secure; finalize LinkFacts.secure). */
+const SECURE_LINK_SLOT = "link.secure";
 
 // ---- the row, as both calls read it ---------------------------------------------------------------------------------
 
@@ -391,6 +414,8 @@ interface RowView {
   readonly role: Role;
   readonly master: string;
   readonly optOutLines: readonly string[];
+  /** Default 15: the secure link the face holds for this row (its link.secure fact), or null. Never logged. */
+  readonly secure: string | null;
   readonly source: SlotSource;
   readonly language: string;
   /** The reader's name as the row read gives it (K-04 persons.name): ComposeRow.name, which compose input addresses. */
@@ -439,6 +464,8 @@ async function viewOf(
       ? { askBy: { utc: clock.dueAt, zone: clock.dueZone } }
       : {};
   const held = binding.held.of(read.row.turnId);
+  // Default 15: S1-10's secure link, only for the row the face holds it for (T-1533; held.ts HeldLinks).
+  const secure = binding.links?.of(read.outboxRowId) ?? null;
   return {
     read,
     step,
@@ -449,6 +476,7 @@ async function viewOf(
     role,
     master: withoutOptOutLine(line.text, optOutLines),
     optOutLines,
+    secure,
     source: {
       filledAt: read.readAt,
       zones: { visit: null, business: business.timeZone },
@@ -456,7 +484,11 @@ async function viewOf(
       // K-05 v1.6 item 45: the business's switch, off only when readOutboxRow answers exactly false (see the top).
       sensitive: sensitiveOf(read),
       record: null,
-      facts: { business: { name: business.name, displayName: business.displayName }, ...askBy },
+      facts: {
+        business: { name: business.name, displayName: business.displayName },
+        ...askBy,
+        ...(secure === null ? {} : { links: { secure } }),
+      },
     },
     language: held?.language ?? read.recipient.storedLanguage ?? "en",
     storedName: read.recipient.name,
@@ -489,7 +521,10 @@ function outcomesOf(read: OutboxRowRead): string[] {
 /** The compose row of one read: item 35's table, then the defaults at the top. */
 export async function composeRowOf(binding: RowBinding, read: OutboxRowRead): Promise<ComposeRow> {
   const view = await viewOf(binding, read, "composeInput");
-  const links = slotsIn(view.master).filter((slot) => LINK_SLOTS.has(slot));
+  const named = slotsIn(view.master).filter((slot) => LINK_SLOTS.has(slot));
+  // Default 15: the row the face holds a secure link for may carry it, though its master line names no link slot.
+  const links =
+    view.secure === null || named.includes(SECURE_LINK_SLOT) ? named : [...named, SECURE_LINK_SLOT];
   return {
     outboxRowId: read.outboxRowId,
     turnId: read.row.turnId,

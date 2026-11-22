@@ -35,6 +35,7 @@ import Ajv2020 from "ajv/dist/2020.js";
 import { describe, expect, it } from "vitest";
 
 import { addressedAs } from "../../compose-input";
+import { flowAV3 } from "../../commit/walk/test-support";
 import type { Role } from "../../domain/identity-access";
 import { readerOf } from "../../finalize/claim-check";
 import { FixedLineRefusedError } from "../../finalize/fixed-lines";
@@ -77,6 +78,7 @@ import {
 } from "./calls-test-support";
 import { NOTHING_OPEN_AT } from "./commit";
 import { TurnFaceReadError, TurnFaceRefusedError } from "./errors";
+import { HeldLinks } from "./held";
 import {
   composeRowOf,
   finalizeRowOf,
@@ -1544,5 +1546,77 @@ describe("the sign-up opener through the turn face: the switch from the row's ow
     // The same bundle still sends a role-holder's first text with opener (above: T-1146's proof).
     const role = await finalizeOn(rowUnderPublishedV0(outboxRowS102()), publishedBundleV0());
     expect(role.answer?.finalParts.fixedLines).toEqual(["opener", "privacyLink"]);
+  });
+});
+
+describe("S1-10's secure link from the face's hold: the link.secure fact and allowed link for its row alone (T-1533; default 15)", () => {
+  /** S1-10's line 2 row of turn 1: S1-02's row's answer moved to the row's own step and line (K-05 v1.22 item 83). */
+  function s1_10Read(outboxRowId = "outbox-s1-10-sam-1"): OutboxRowRead {
+    const read = structuredClone(outboxRowS102());
+    return {
+      ...read,
+      outboxRowId,
+      row: { ...read.row, openQuestionId: null },
+      line: { step: "S1-10", index: 2, from: "row" },
+      slotSource: { ...read.slotSource, question: null },
+      openQuestions: [],
+    };
+  }
+
+  /** bundle-v0-skeleton.json (the row's pin), a test's own copy, holding bundle v3's S1-10 (T-1526) as compiled. */
+  function skeletonWithS110(): BundleDocument {
+    const bundle = sampleBundle("bundle-v0-skeleton.json");
+    const step = (flowAV3() as unknown as { steps: Record<string, Json | undefined> }).steps["S1-10"];
+    if (step === undefined) throw new Error("bundle v3 holds S1-10");
+    (bundle.flows.A as { steps: Record<string, Json> }).steps["S1-10"] = step;
+    return bundle;
+  }
+
+  /** A made-up link under staging's place, held for `rowId` the way the face holds it after a fresh commit. */
+  const LINK = `https://rosfield.com/test/${"0123456789abcdef".repeat(2)}`;
+  function heldFor(rowId: string): HeldLinks {
+    const links = new HeldLinks();
+    links.stage("turn-s1-01-sam", rowId, LINK);
+    links.keep("turn-s1-01-sam", [rowId]);
+    return links;
+  }
+
+  it("the row the link is held for gets it as links.secure and link.secure among its allowed links; S1-10's master line names none", async () => {
+    const doubles = rowDoubles({ row: s1_10Read(), bundle: skeletonWithS110() });
+    const binding = { ...doubles.binding, links: heldFor("outbox-s1-10-sam-1") };
+    const row = await composeRowOf(binding, s1_10Read());
+    expect(row).toMatchObject({ step: "S1-10", line: 2, role: "owner", allowedLinks: ["link.secure"] });
+    expect(row.source.facts.links).toEqual({ secure: LINK });
+    const finalized = await finalizeRowOf(binding, s1_10Read());
+    expect(finalized.step).toBe("S1-10");
+    expect(finalized.source.facts.links).toEqual({ secure: LINK });
+    // The link is a slot's value, never one of the facts the checks read as a code-supplied fact of the master line.
+    expect(JSON.stringify(finalized.checks.facts)).not.toContain(LINK);
+    expect(finalized.checks.masterText).toBe(
+      "This is Rosie, an automated assistant, setting up {{biz.name}}. Your secure ID upload is below. These texts are only about your business on Rosie.",
+    );
+  });
+
+  it("with no link held, or one held for another row, the row has no link fact and no allowed link", async () => {
+    const doubles = rowDoubles({ row: s1_10Read(), bundle: skeletonWithS110() });
+    for (const binding of [
+      doubles.binding,
+      { ...doubles.binding, links: new HeldLinks() },
+      { ...doubles.binding, links: heldFor("outbox-s1-10-sam-2") },
+    ]) {
+      const row = await composeRowOf(binding, s1_10Read());
+      expect(row.allowedLinks).toEqual([]);
+      expect(row.source.facts).not.toHaveProperty("links");
+      const finalized = await finalizeRowOf(binding, s1_10Read());
+      expect(finalized.source.facts).not.toHaveProperty("links");
+    }
+  });
+
+  it("another row of the same turn (S1-02's) never gets the link held for S1-10's row", async () => {
+    const doubles = rowDoubles();
+    const binding = { ...doubles.binding, links: heldFor("outbox-s1-10-sam-1") };
+    const row = await composeRowOf(binding, structuredClone(outboxRowS102()));
+    expect(row.allowedLinks).toEqual([]);
+    expect(row.source.facts).not.toHaveProperty("links");
   });
 });
