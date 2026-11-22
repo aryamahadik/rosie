@@ -2,9 +2,45 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 887, [`4abb09b1`](https://github.com/aryamahadik/rosie/commit/4abb09b1), 2026-11-22 12:46:35 UTC.
+- **Through:** commit 889, [`8fdd2876`](https://github.com/aryamahadik/rosie/commit/8fdd2876), 2026-11-22 13:18:43 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 889. docs: COMMIT\_HISTORY.md through commit 887 (4abb09b1, \#905) (\#906)
+
+- **Commit:** [`8fdd2876`](https://github.com/aryamahadik/rosie/commit/8fdd2876), by Arya Mahadik, 2026-11-22 13:18:43 UTC
+- **Pull request:** [#906](https://github.com/aryamahadik/rosie/pull/906) from `task/commit-history-227`, merged 2026-11-22 13:18:44 UTC. It squashed 1 branch commit:
+  - `7c06dba` docs: COMMIT\_HISTORY.md through commit 887 (4abb09b1, \#905)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 888. T-1526: bundle v3, bundle v2's eight steps byte for byte plus S1-77, S1-76 and S1-10 (decide-2, v2's models, routing and fixed lines), published locally; check.mjs prints S1-09's options and branches and the new steps' shapes; phone-scan entries for v3's overlays and KV file (\#903)
+
+- **Commit:** [`3436d790`](https://github.com/aryamahadik/rosie/commit/3436d790), by Arya Mahadik, 2026-11-22 13:18:39 UTC
+- **Pull request:** [#903](https://github.com/aryamahadik/rosie/pull/903) from `task/T-1526`, merged 2026-11-22 13:18:40 UTC. It squashed 1 branch commit:
+  - `a3fe4f8` T-1526: bundle v3, bundle v2's eight steps byte for byte plus S1-77, …
+- **Files changed:** 252 (+1721 −0), by folder:
+  - `bundles/v3/` build.mjs +409 −0, bundle.kv.json +1 −0, check.mjs +763 −0, check.test.mjs +200 −0, models.json +17 −0, prompts.json +18 −0
+  - `bundles/v3/bundle/flow/` A.json +1 −0
+  - `bundles/v3/bundle/` manifest.json +1 −0
+  - `bundles/v3/bundle/trade/` aba.json +1 −0, acupuncturist.json +1 −0, addiction.json +1 −0, advisor.json +1 −0, airport-shuttle.json +1 −0, allergist.json +1 −0, appliance.json +1 −0, appraiser.json +1 −0, aquarium.json +1 −0, architect.json +1 −0, art-appraiser.json +1 −0, art-classes.json +1 −0, auto-body.json +1 −0, auto-glass.json +1 −0, auto-repair.json +1 −0, axe-throwing.json +1 −0, baker.json +1 −0, band.json +1 −0, barber.json +1 −0, bike-repair.json +1 −0, biohazard.json +1 −0, boarding.json +1 −0, boat-repair.json +1 −0, camp.json +1 −0, cardiologist.json +1 −0, carpet.json +1 −0, caterer.json +1 −0, chef.json +1 −0, chimney.json +1 −0, chiropractor.json +1 −0, cleaner.json +1 −0, climbing-gym.json +1 −0, closets.json +1 −0, clown.json +1 −0, coach.json +1 −0, coding-classes.json +1 −0, college-admissions.json +1 −0, comedian.json +1 −0, commercial-cleaning.json +1 −0, concierge.json +1 −0, concrete.json +1 −0, contractor.json +1 −0, cooking-classes.json +1 −0, cpa.json +1 −0, cpr-training.json +1 −0, credit-counselor.json +1 −0, dance.json +1 −0, daycare.json +1 −0, deck.json +1 −0, demolition.json +1 −0, dentist.json +1 −0, dermatologist.json +1 −0, detailing.json +1 −0, dietitian.json +1 −0, dj.json +1 −0, dog-trainer.json +1 −0, dog-walker.json +1 −0, doula.json +1 −0, driving-school.json +1 −0, drywall.json +1 −0, duct-cleaning.json +1 −0, electrician.json +1 −0, endocrinologist.json +1 −0, energy-audit.json +1 −0, enrichment.json +1 −0, ent.json +1 −0, escape-room.json +1 −0, estate-sale.json +1 −0, esthetician.json +1 −0, event-staffing.json +1 −0, excavation.json +1 −0, face-painter.json +1 −0, farrier.json +1 −0, fence.json +1 −0, fertility.json +1 −0, fishing-charter.json +1 −0, flight-school.json +1 −0, flooring.json +1 −0, florist.json +1 −0, food-truck.json +1 −0, foundation.json +1 −0, funeral.json +1 −0, garage-door.json +1 −0, gastroenterologist.json +1 −0, glass-doors.json +1 −0, golf-instructor.json +1 −0, groomer.json +1 −0, gunsmith.json +1 −0, gutters.json +1 −0, gym.json +1 −0, gymnastics.json +1 −0, hair-restoration.json +1 −0, hair.json +1 −0, handyman.json +1 −0, hearing.json +1 −0, holiday-lights.json +1 −0, home-care.json +1 −0, home-engineer.json +1 −0, home-stager.json +1 −0, horse-riding.json +1 −0, hunting-guide.json +1 −0, hvac.json +1 −0, hypnotherapist.json +1 −0, image-consultant.json +1 −0, imaging.json +1 −0, immigration-services.json +1 −0, inspector.json +1 −0, instrument-repair.json +1 −0, insulation.json +1 −0, insurance.json +1 −0, interior.json +1 −0, irrigation.json +1 −0, iv-hydration.json +1 −0, junk.json +1 −0, lab.json +1 −0, lactation.json +1 −0, language-school.json +1 −0, lash-brow.json +1 −0, laundry.json +1 −0, lawn.json +1 −0, lawyer.json +1 −0, limo.json +1 −0, locksmith.json +1 −0, magician.json +1 −0, makeup.json +1 −0, martial-arts.json +1 −0, masonry.json +1 −0, massage.json +1 −0, matchmaker.json +1 −0, mediator.json +1 −0, medical-transport.json +1 −0, medspa.json +1 −0, midwife.json +1 −0, mini-golf.json +1 −0, mortgage.json +1 −0, motorcycle.json +1 −0, movers.json +1 −0, music.json +1 −0, nails.json +1 −0, naturopath.json +1 −0, neurologist.json +1 −0, notary.json +1 −0, obgyn.json +1 −0, occupational-therapist.json +1 −0, officiant.json +1 −0, ophthalmologist.json +1 −0, optometrist.json +1 −0, oral-surgeon.json +1 −0, organizer.json +1 −0, orthodontist.json +1 −0, orthopedist.json +1 −0, pain-management.json +1 −0, painter.json +1 −0, party-characters.json +1 −0, paving.json +1 −0, pediatrician.json +1 −0, personal-shopper.json +1 −0, pest.json +1 −0, pet-cremation.json +1 −0, pet-rehab.json +1 −0, pet-sitter.json +1 −0, pet-taxi.json +1 −0, pet-waste.json +1 −0, pharmacist.json +1 −0, photographer.json +1 −0, physical-therapist.json +1 −0, piano-tuner.json +1 −0, pilates.json +1 −0, planner.json +1 −0, plastic-surgeon.json +1 −0, plumber.json +1 −0, pmu.json +1 −0, podiatrist.json +1 −0, pool-builder.json +1 −0, pool.json +1 −0, pressure.json +1 −0, primary-care.json +1 −0, private-investigator.json +1 −0, property-manager.json +1 −0, psychiatrist.json +1 −0, psychic.json +1 −0, radon.json +1 −0, realtor.json +1 −0, recording-studio.json +1 −0, reiki.json +1 −0, rentals.json +1 −0, repair-shop.json +1 −0, restaurant.json +1 −0, restoration.json +1 −0, roofer.json +1 −0, rv-repair.json +1 −0, security.json +1 −0, senior-living.json +1 −0, senior-move.json +1 −0, septic.json +1 −0, sharpening.json +1 −0, shoe-repair.json +1 −0, shooting.json +1 −0, siding.json +1 −0, sitter.json +1 −0, ski-instructor.json +1 −0, sleep-clinic.json +1 −0, small-engine.json +1 −0, snow.json +1 −0, spa.json +1 −0, speech-therapist.json +1 −0, sports-coach.json +1 −0, sports-medicine.json +1 −0, spray-tan.json +1 −0, surf-school.json +1 −0, surveyor.json +1 −0, swim.json +1 −0, tailor.json +1 −0, tattoo.json +1 −0, tax.json +1 −0, teeth-whitening.json +1 −0, tennis-coach.json +1 −0, therapist.json +1 −0, tires.json +1 −0, tours.json +1 −0, towing.json +1 −0, trainer.json +1 −0, trampoline-park.json +1 −0, translator.json +1 −0, travel-agent.json +1 −0, tree.json +1 −0, tutor.json +1 −0, tv-repair.json +1 −0, upholstery.json +1 −0, urgent-care.json +1 −0, urologist.json +1 −0, valet.json +1 −0, vehicle-inspection.json +1 −0, vehicle-wrap.json +1 −0, vet.json +1 −0, watch-jewelry.json +1 −0, weight-loss.json +1 −0, well-pump.json +1 −0, wellness-studio.json +1 −0, wildlife.json +1 −0, window-tint.json +1 −0, windows.json +1 −0, yoga.json +1 −0
+  - `infra/ci/` phone-scan-exceptions.mjs +68 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 887. docs: COMMIT\_HISTORY.md through commit 885 (12bc99d2, \#902) (\#905)
 
