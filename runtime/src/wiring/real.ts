@@ -116,6 +116,15 @@
 //                .readChatHandle: on staging on a runtime-side client of its own), it goes into the commit binding as it
 //                is (TurnCommitBinding.readChatHandle), so S1-01 reuses the chat thread the turn's own handle already
 //                holds for the turn's chat id instead of inserting a second one; left out, S1-01 inserts, as before.
+//                T-1494 (H2a; DL-1033, DL-1096, DL-1111; K-09 README default 199): where the reads also bind the one-kind
+//                path's reads (GateReads.companies: item 79, item 72 and K-24's catalog by id, each in a read-only
+//                transaction of its own beside the call's, never on it; on staging each on a client of its own), they go
+//                into the sign-up steps' deps beside the kinds reads (SignUpWriterDeps.companies), and the stop home's reads
+//                go in again as S1-08's own (SignUpWriterDeps.plan.stop, the same StopHomeReads, no second binding), so
+//                S1-02 is bound through T-1492's one-kind wrapper, S1-04's buttons settler from the same instance reaches
+//                the walk (TurnCommitBinding.buttonsSettlers) and S1-08's writer is bound: an owner with exactly one kept
+//                kind of work is never asked S1-04, and the walk goes on to S1-08's row and S1-09's question (on a bundle
+//                that holds them: bundle v2). Left out, the binding is T-1503's and T-1516's, as before.
 //   composeInput T-560: K-09 composeInput through @rosie/actions' turn face (T-1141, createTurnFace with its calls: the
 //                Tool API base with K-09 v1.6's checks and the call's own business scope; T-309's compose input with
 //                T-1174's term facts over T-1141's row binding). Its reads are handed in by the root
@@ -220,6 +229,7 @@ import type {
   FlowLetter as FrontierFlow,
 } from "@rosie/actions/src/frontier/assemble/types";
 import type { StopHomeReads } from "@rosie/actions/src/homes/stop/reads";
+import type { CompaniesReads } from "@rosie/actions/src/tool-api/journey-1/companies/reads";
 import type { KindsWriterDeps } from "@rosie/actions/src/tool-api/journey-1/kinds/writers";
 import type { PlugInBundles } from "@rosie/actions/src/tool-api/journey-1/plug-ins/writer";
 import type { BusinessScope } from "@rosie/actions/src/tool-api/scope";
@@ -231,6 +241,7 @@ import {
   type KeywordCommitBinding,
   type NoBusinessSafetyReads,
   type SafetyReads,
+  type SignUpWriterDeps,
   type TurnCommitBinding,
 } from "@rosie/actions/src/tool-api/turn-face/commit";
 import {
@@ -1638,13 +1649,28 @@ export interface GateReads<Repo = unknown, DoorRepo = unknown> {
    */
   readonly kinds?: KindsWriterDeps;
   /**
-   * The stop home's reads (T-1516; DL-1033 ruling 8; CQ-360; GateStopReads), which S1-03's, S1-74's and later S1-08's
+   * The stop home's reads (T-1516; DL-1033 ruling 8; CQ-360; GateStopReads), which S1-03's, S1-74's and S1-08's
    * writers read the owner's contact with. Bound beside `kinds`, gateBindingOf hands them into the sign-up steps' deps
-   * (SignUpWriterDeps' kinds.stop), so those messages are written when the stop home lets Rosie text. Left out (a test's
+   * (SignUpWriterDeps' kinds.stop, and beside `companies` S1-08's own plan.stop too: T-1494), so those messages are
+   * written when the stop home lets Rosie text. Left out (a test's
    * doubles, any binding with no runtime side), the kinds reads go on as they are handed, and S1-03's and S1-74's
    * messages answer notBuilt (stopNotWired), as before; bound with no `kinds`, nothing reads them.
    */
   readonly stop?: GateStopReads;
+  /**
+   * The one-kind path's reads (T-1494, H2a; DL-1033, DL-1096, DL-1111; K-09 README default 199 items (1) to (5);
+   * @rosie/actions' CompaniesReads, T-1492, through companiesReadsOf, so a K-05 error answer is thrown, never read as
+   * none): item 79, item 72 and K-24's catalog by id, each in a read-only transaction of its own beside the call's and
+   * never on it (item 72 refuses a transaction that is not read only, and the catalog by id reads the turn's handle, on
+   * which rosie_app holds no grant), so the call's repo they are handed is never read through. Bound beside `kinds`,
+   * gateBindingOf hands them into the sign-up steps' deps (SignUpWriterDeps.companies), and, where `stop` is bound too,
+   * the same stop reads as S1-08's own (SignUpWriterDeps.plan.stop): S1-02 through T-1492's one-kind wrapper, S1-04's
+   * buttons settler from the same instance, and S1-08's writer, so an owner with exactly one kept kind of work is never
+   * asked S1-04 and the walk goes on to S1-08's row and S1-09's question. Bound with no `stop`, a walk that reaches S1-08
+   * is refused (notBuilt) with nothing written. Left out (a test's doubles), the binding is T-1503's and T-1516's, as
+   * before; bound with no `kinds`, nothing reads them.
+   */
+  readonly companies?: CompaniesReads<Repo>;
   /**
    * K-05 v1.10 item 51's readChatHandle (T-1519; DL-1048, DL-1051; @rosie/actions' TurnCommitBinding.readChatHandle):
    * the phone handle whose chat thread holds a Linq chat id, read on the runtime side (rosie_job: threads and handles are
@@ -1767,10 +1793,13 @@ const NO_GATE_SCOPE: BusinessScope<unknown> = {
  * The walk's question read, the sign-up steps' writers and S1-02's settler (T-1470, T-1503; gateBindingOf): bound only
  * where the reads bind them (GateReads.questions, GateReads.kinds), so an owner's answer to S1-02's question is written,
  * on the branch the owner's words settle (K-09 README default 191; DL-1018), with S1-03's or S1-74's message where the
- * stop home's reads are bound too (GateReads.stop; T-1516, DL-1033 ruling 8). What a settler or writer throws leaves the
- * gate as thrown and fails the call closed: a failed item 78 or item 79 read is @rosie/actions' KindsReadError, whose
- * `answer` holds a SQLSTATE or a person's or a business's row id, so nothing here catches, wraps, logs or reports it (a
- * caller that reports it names its name, read and fault alone; the base's span takes an error's name only).
+ * stop home's reads are bound too (GateReads.stop; T-1516, DL-1033 ruling 8); and, where the one-kind path's reads are
+ * bound as well (GateReads.companies; T-1494, DL-1111), an owner with exactly one kept kind of work is walked past S1-04
+ * to S1-08's row and S1-09's question. What a settler or writer throws leaves the gate as thrown and fails the call
+ * closed: a failed item 78 or item 79 read is @rosie/actions' KindsReadError, and a failed item 79, item 72 or catalog
+ * read of the one-kind path its CompaniesReadError, whose `answer` holds a SQLSTATE or a person's or a business's row id,
+ * so nothing here catches, wraps, logs or reports either (a caller that reports one names its name, read and fault
+ * alone; the base's span takes an error's name only).
  *
  * The walk's chat read (T-1519; DL-1048, DL-1051): where the reads bind K-05 v1.10 item 51's readChatHandle
  * (GateReads.readChatHandle), S1-01 reuses the chat thread the turn's own handle holds for the turn's chat id, so a
@@ -1838,14 +1867,21 @@ export function realGate(inputs: GateInputs): GatePort {
  *     the pinned bundle's (FrontierBundleReads.trade). The writers are signUpStepWriters' step for step, and the settlers
  *     S1-02's alone (DL-1018 card 5); the step-id maps are signUpSteps' own;
  *   - the stop home's reads (GateReads.stop; T-1516, DL-1033 ruling 8), handed into those same writers' deps as
- *     SignUpWriterDeps' kinds.stop, the one field S1-03's, S1-74's and later S1-08's writers share (signUpKindsOf);
+ *     SignUpWriterDeps' kinds.stop, the one field S1-03's and S1-74's writers share (signUpKindsOf);
+ *   - the one-kind path (GateReads.companies; T-1494, H2a; DL-1033, DL-1096, DL-1111; K-09 README default 199): the
+ *     reads handed into those same deps as SignUpWriterDeps.companies, and the stop home's reads again as S1-08's own,
+ *     SignUpWriterDeps.plan.stop (the same StopHomeReads; CQ-360), so signUpSteps builds one createOneKind for the call,
+ *     binds S1-02 through its wrapper and S1-08's writer, and gives `buttonsSettlers` (S1-04's alone), spread into the
+ *     binding beside `writers` and `settlers` (signUpOneKindOf);
  *   - `readChatHandle`: the reads' own K-05 v1.10 item 51 read (GateReads.readChatHandle; T-1519, DL-1048), handed on as
  *     it is, which S1-01's walk asks for the turn's chat id through the turn face's walkChatsOf.
- * With any left out the binding carries no such field (the kinds reads left out: neither `writers` nor `settlers`;
- * the stop reads left out: the kinds reads as they are handed, so S1-03 and S1-74 answer notBuilt; the chat read left
- * out: S1-01 inserts its thread), and the commit behaves as before. It reads nothing and logs nothing. Exported for its
- * unit test alone
- * (./gate-binding.test.ts): no rig walks a second turn, so the binding's own fields are proven under Node.
+ * With any left out the binding carries no such field (the kinds reads left out: neither `writers` nor `settlers` nor
+ * `buttonsSettlers`; the stop reads left out: the kinds reads as they are handed, so S1-03 and S1-74 answer notBuilt, and
+ * no S1-08 writer; the one-kind reads left out: no `buttonsSettlers`, S1-02 bound as T-1503 binds it and no S1-08
+ * writer, T-1516's binding as it is; the chat read left out: S1-01 inserts its thread), and the commit behaves as before.
+ * It reads nothing and logs nothing. Exported for its unit test alone
+ * (./gate-binding.test.ts): the binding's own fields are proven there under Node, the walk on staging's reads in
+ * ./staging/tool-api-gate.worker.test.ts.
  */
 export function gateBindingOf(
   inputs: GateInputs,
@@ -1874,7 +1910,11 @@ export function gateBindingOf(
     ...(reads?.questions === undefined ? {} : { questions: reads.questions }),
     ...(reads?.kinds === undefined
       ? {}
-      : signUpSteps<unknown>({ kinds: signUpKindsOf(reads.kinds, reads.stop), plugIns: { bundles } })),
+      : signUpSteps<unknown>({
+          kinds: signUpKindsOf(reads.kinds, reads.stop),
+          plugIns: { bundles },
+          ...signUpOneKindOf(reads.companies, reads.stop),
+        })),
     ...(reads?.readChatHandle === undefined ? {} : { readChatHandle: reads.readChatHandle }),
   };
 }
@@ -1885,6 +1925,22 @@ export function gateBindingOf(
  */
 function signUpKindsOf(kinds: KindsWriterDeps, stop: GateStopReads | undefined): KindsWriterDeps {
   return stop === undefined ? kinds : { ...kinds, stop: stop.reads };
+}
+
+/**
+ * The one-kind path's deps for one call (T-1494; DL-1111): the reads' one-kind reads (GateReads.companies) as
+ * SignUpWriterDeps.companies and, where the stop home's reads are bound too, those same reads as S1-08's own
+ * (SignUpWriterDeps.plan.stop); nothing where the one-kind reads are left out. S1-08's writer is bound only beside the
+ * one-kind path: until S1-04 has a writer (H1b) no other walk reaches S1-08, so with the one-kind reads left out the
+ * deps are T-1516's exactly. With no stop reads the one-kind reads go in alone, and a walk that reaches S1-08 is refused
+ * (notBuilt: no writer there) with nothing written.
+ */
+function signUpOneKindOf(
+  companies: CompaniesReads | undefined,
+  stop: GateStopReads | undefined,
+): Pick<SignUpWriterDeps, "companies" | "plan"> {
+  if (companies === undefined) return {};
+  return stop === undefined ? { companies } : { companies, plan: { stop: stop.reads } };
 }
 
 /**

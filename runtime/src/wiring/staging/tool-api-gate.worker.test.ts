@@ -70,11 +70,25 @@
 //     (rosie_worker_job) named readChatHandle on its timing line, 2 connections at most, nothing written; through the
 //     pool's own HYPERDRIVE_JOB the read fails with its call's name and SQLSTATE alone. A returning number's JOIN through
 //     the walk is ../gate-binding.test.ts's and the turn face's PostgreSQL proof (pg/thread.int.test.ts).
+//   - T-1494 (H2a; DL-1033, DL-1096, DL-1111), the one-kind path's reads the gate binds beside the kinds and stop reads,
+//     in the roster-owner world staging's real phone texts in (the seed runs db/seeds/roster-owner.ts as it is for one
+//     fiction-range number): the gate holds `companies`, CompaniesReads' four members; inside one held scope item 79 and
+//     the catalog by id are read on runtime-side clients (rosie_worker_job) and item 72 on a second Tool API client
+//     (rosie_worker_app), one after another, 2 connections at most, nothing written; a failed item 79 read is
+//     CompaniesReadError as thrown, and no line holds its row id. Then the walk itself, on bundle v2 (its registry row
+//     seeded, the run's pinned bundle its own manifest, flow A and plumber's overlay as bundles/v2 holds them): the
+//     roster owner's one-kind "Plumbing" to S1-02's question, through realGate over staging's gate reads and the root's
+//     turn-row port, commits once: S1-02's question answered, one listed pick placed under the owner's company and
+//     business with plumber's company kind beside the barber one, its 11 text blocks under that business, S1-08's row
+//     (step S1-08, line 0, no question), S1-09's question and its row, and no S1-04 question or row; every call on its
+//     side, one after another, 2 connections at most (connectionsPeak, against ./db.ts CONNECTIONS_PER_CLIENT, 1).
 // Test values only (rule 9): the master's sample cast, the fixtures' ids and words, whole fiction-range 555-01xx numbers,
 // made-up ids, and the seed's made-up wrapping key.
 import { KEYED_SAFETY_IDS } from "@rosie/actions/src/domain/safety/ids";
 import { readStop, type StopHomeReads } from "@rosie/actions/src/homes/stop/reads";
 import { NotBuiltError } from "@rosie/actions/src/tool-api/errors";
+import { CompaniesReadError } from "@rosie/actions/src/tool-api/journey-1/companies/errors";
+import type { CompaniesReads } from "@rosie/actions/src/tool-api/journey-1/companies/reads";
 import { KindsReadError } from "@rosie/actions/src/tool-api/journey-1/kinds/errors";
 import { TurnFaceReadError, TurnFaceRefusedError } from "@rosie/actions/src/tool-api/turn-face/errors";
 import businessOwnerPhoneFirst from "@rosie/contracts/data-access/fixtures/business-owner-phone-first.json";
@@ -83,6 +97,8 @@ import readOpenHoldsOtherBusiness from "@rosie/contracts/data-access/fixtures/re
 import readSafetyOutcomeOfEventS101 from "@rosie/contracts/data-access/fixtures/read-safety-outcome-of-event-s1-01.json";
 import safetyBusinessOwnLine from "@rosie/contracts/model/fixtures/safety-business-own-line.json";
 import commitS101 from "@rosie/contracts/tool-api/fixtures/commit-s1-01.json";
+import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
+import commitS102UnmappedEnd from "@rosie/contracts/tool-api/fixtures/commit-s1-02-unmapped-end.json";
 import { readActiveBundle } from "@rosie/db/repo/bundles";
 import { DataAccessDatabaseError } from "@rosie/db/repo/clocks";
 import type { Sql } from "@rosie/db/repo/scope";
@@ -91,15 +107,21 @@ import { runInDurableObject } from "cloudflare:test";
 import { env as poolEnv, exports } from "cloudflare:workers";
 import { afterEach, beforeEach, describe, expect, inject, it, vi } from "vitest";
 
+import bundleV2FlowA from "../../../../bundles/v2/bundle/flow/A.json";
+import bundleV2Manifest from "../../../../bundles/v2/bundle/manifest.json";
+import plumberV2 from "../../../../bundles/v2/bundle/trade/plumber.json";
 import type { HandleActor } from "../../actor";
 import { turnIdOf } from "../../actor/lease";
 import {
+  BundleError,
   BundlePins,
   setBundleDeps,
   type BundleDeps,
   type BundleKv,
+  type Manifest,
   type PinnedBundle,
   type PinRequest,
+  type TradeOverlay,
   type TurnPin,
 } from "../../bundle";
 import { openTrace, type BundleId, type Span, type TraceContext } from "../../trace";
@@ -122,12 +144,15 @@ import {
   ASK_RECORD,
   ASKED,
   BARBERSHOP,
+  BUNDLE_V2_ID,
   CATALOG,
   NO_KEY,
   NO_WRAP_KEY,
+  ONE_KIND,
   OTHER_BUSINESS_RECORD,
   SAM,
   SAM_EMAIL,
+  seededKindDefaults,
   SIDE_BY_SIDE,
   SIX_AT_ONCE,
   TEST_WRAP_KEY,
@@ -817,11 +842,9 @@ function heldOpen(db: StagingDb): HeldOpen {
 // ---- the secrets no line may hold -----------------------------------------------------------------------------------
 
 /** Every number of this file's handles, in each form a number could leak in (each whole number as it is, then cut). */
-const NUMBER_FORMS = [SAM, ...SIDE_BY_SIDE, ...SIX_AT_ONCE, NO_WRAP_KEY, NO_KEY].flatMap(({ number }) => [
-  number,
-  number.slice(1),
-  number.slice(2),
-]);
+const NUMBER_FORMS = [SAM, ...SIDE_BY_SIDE, ...SIX_AT_ONCE, NO_WRAP_KEY, NO_KEY, ONE_KIND].flatMap(
+  ({ number }) => [number, number.slice(1), number.slice(2)],
+);
 
 /** The words a text, a read or a seal holds here, and the fixed lines' words bundle v0 holds. */
 const WORDS = [
@@ -830,6 +853,8 @@ const WORDS = [
   ).decided.context.texts.map((text) => text.words),
   ...safetyBusinessOwnLine.read.labels.map((label) => label.evidence),
   "t1398 words to seal",
+  // T-1494: the one-kind owner's text.
+  "Plumbing",
   ...["safetyAsk", "safetyEmergency", "safetyCrisis", "outage"].map((id) => bundleV0FixedLine(id)),
 ];
 
@@ -879,6 +904,8 @@ describe("this file's database: the walking skeleton's rows, the made-up key's r
     const keyed = [
       SAM.personId,
       ...[...SIDE_BY_SIDE, ...SIX_AT_ONCE, NO_WRAP_KEY].map((each) => each.personId),
+      // T-1494: the roster owner's, made at its first sight after the roster-owner set ran.
+      ONE_KIND.personId,
     ];
     expect(stored.keys).toEqual(
       keyed.sort().map((personId) => ({ person_id: personId, wrapping_key_name: WRAP_KEY_NAME })),
@@ -931,6 +958,7 @@ describe("built on staging: the six pieces, and nothing read but the environment
     expect(testEnv.names).toEqual(["ENVIRONMENT", "HYPERDRIVE_JOB", "HYPERDRIVE_APP"]);
     expect([testEnv.job?.reads.n, testEnv.app?.reads.n]).toEqual([0, 0]);
     expect(Object.keys(reads ?? {}).sort()).toEqual([
+      "companies",
       "keywordDoor",
       "kinds",
       "questions",
@@ -941,6 +969,13 @@ describe("built on staging: the six pieces, and nothing read but the environment
       "sealer",
       "stop",
       "words",
+    ]);
+    // T-1494: the one-kind path's reads (item 79, item 72 and the catalog by id), CompaniesReads' four members exactly.
+    expect(Object.keys(reads?.companies ?? {}).sort()).toEqual([
+      "businessKinds",
+      "kindDefaults",
+      "kindNames",
+      "pickedKinds",
     ]);
     // T-1519: the walk's chat read (K-05 v1.10 item 51), one function.
     expect(typeof reads?.readChatHandle).toBe("function");
@@ -969,6 +1004,7 @@ describe("built on staging: the six pieces, and nothing read but the environment
     ]);
     // No adapter: the words are left out, the safety service's own default (notBuilt for a line that asks).
     expect(Object.keys(stagingGateReads({ ...part, bundleSafety: null }) ?? {}).sort()).toEqual([
+      "companies",
       "keywordDoor",
       "kinds",
       "questions",
@@ -1019,8 +1055,10 @@ describe("built on staging: the six pieces, and nothing read but the environment
     if (gate === null) throw new Error("the gate is bound with both bindings");
     expect(gate.words?.fixedLine("safetyAsk")).toEqual({ id: "safetyAsk", text: "t1398 stand-in words" });
     expect(gate.words?.fixedLine("safetyCrisis")).toBeNull();
-    // Nothing else of its input but the six pieces, T-1470's two, T-1516's stop reads and T-1519's chat read.
+    // Nothing else of its input but the six pieces, T-1470's two, T-1516's stop reads, T-1519's chat read and T-1494's
+    // one-kind reads.
     expect(Object.keys(gate).sort()).toEqual([
+      "companies",
       "keywordDoor",
       "kinds",
       "questions",
@@ -2541,6 +2579,400 @@ describe("the walk's chat read, as the gate binds it for S1-01 (T-1519)", () => 
     expect(db.counts()).toMatchObject({ opened: 1, ended: 1, connectionsOpen: 0 });
     expect(await rowCounts()).toEqual(before);
   });
+});
+
+// ---- the one-kind path (T-1494) -----------------------------------------------------------------------------------
+//
+// The one-kind path's reads as the gate binds them beside the kinds and stop reads, each read from inside a held scope as
+// T-1492's pieces ask them, in the roster-owner world the seed made for ONE_KIND; then the walk of that owner's one-kind
+// "Plumbing" to its S1-02 question on bundle v2, through realGate over staging's gate reads and the root's turn-row port.
+
+/** The gate's one-kind reads, as stagingOptions gave them. */
+function oneKindReadsOf(gate: GateReads): CompaniesReads {
+  const { companies } = gate;
+  if (companies === undefined) throw new Error("staging's gate binds the one-kind path's reads");
+  return companies;
+}
+
+/**
+ * Bundle v2 as a run pinned it, from bundles/v2's own files (T-1477): its manifest and flow A, and plumber's trade overlay,
+ * BundleError notInBundle for any other trade (as the pin answers one its manifest does not list), each trade asked for
+ * written down. The pin itself is the actor's (../../bundle): this file's database holds bundle v0 active, so the real
+ * pin would pin v0; an owner's sign-up turn pins bundle v2 once staging is deployed with it (DL-1111).
+ */
+function pinnedV2(): { readonly bundle: PinnedBundle; readonly asked: string[] } {
+  const asked: string[] = [];
+  const bundle: PinnedBundle = {
+    bundleId: { ...BUNDLE_V2_ID },
+    manifest: structuredClone(bundleV2Manifest) as unknown as Manifest,
+    flow: (flow) =>
+      flow === "A"
+        ? Promise.resolve(structuredClone(bundleV2FlowA) as Readonly<Record<string, unknown>>)
+        : Promise.reject(new BundleError("notInBundle")),
+    trade(tradeId) {
+      asked.push(tradeId);
+      return tradeId === "plumber"
+        ? Promise.resolve(structuredClone(plumberV2) as unknown as TradeOverlay)
+        : Promise.reject(new BundleError("notInBundle"));
+    },
+    reads: () => [],
+  };
+  return { bundle, asked };
+}
+
+/** K-09 v1.5 commit-s1-02.json's request, and commit-s1-02-unmapped-end.json's turn: the same turn with its service and chat. */
+const S1_02_REQUEST = (commitS102 as unknown as { readonly request: Json }).request;
+const S1_02_TURN = (commitS102UnmappedEnd as unknown as { readonly request: { readonly turn: Json } }).request
+  .turn;
+
+/** A copy of `value` with each whole string that `names` holds replaced by its new name. */
+function renamed<T>(value: T, names: ReadonlyMap<string, string>): T {
+  const walk = (each: unknown): unknown => {
+    if (typeof each === "string") return names.get(each) ?? each;
+    if (Array.isArray(each)) return each.map(walk);
+    if (isRecord(each))
+      return Object.fromEntries(Object.entries(each).map(([key, inner]) => [key, walk(inner)]));
+    return each;
+  };
+  return walk(value) as T;
+}
+
+/** A decided part as commit-s1-02.json writes it: choosing an option of S1-02's question, with the owner's words. */
+interface ChoosingPart {
+  verb: string;
+  quote: string;
+  choice: string | null;
+  fields: { name: string; value: unknown; words: string }[];
+}
+
+/** commit-s1-02.json's request, as this file changes it. */
+type OneKindRequest = Json & {
+  turn: Json;
+  now: string;
+  input: {
+    decided: {
+      context: Json & {
+        bundleId: unknown;
+        writer: { people: unknown[] };
+        texts: { words: string; sentAt: { utc: string } }[];
+        openQuestions: { sentAt: { utc: string } }[];
+        recentMessages: { sentAt: { utc: string } }[];
+      };
+      decide: Json & {
+        bundleId: unknown;
+        parts: { part: ChoosingPart }[];
+        reads: { output: { parts: ChoosingPart[] } }[];
+      };
+    };
+  };
+};
+
+/** The one-kind owner's text, and the moments of its turn: after S1-02's question went out (ONE_KIND.sentAt). */
+const ONE_KIND_TEXT = {
+  eventId: "evt-t1494-plumbing",
+  sentAt: "2026-10-19T18:07:00Z",
+  now: "2026-10-19T18:07:06Z",
+};
+
+/**
+ * The one-kind owner's answer to its S1-02 question: commit-s1-02.json's request (as the turn face's one-kind proof sends
+ * it: T-1493's pg/one-kind.int.test.ts) under the turn id the lease hashes from its one event id, on a trace of its own,
+ * the turn, its context and decide's result pinned to bundle v2; every id of Sam's swapped for the owner's, the question
+ * the seed's; its one part choosing "All on the list" (c-01) in decide's agreed parts and both reads, with `words` as the
+ * text, the part's quote and its kinds field; its writer the owner as the frontier names a person with no name and no
+ * role; and the moments after the question went out.
+ */
+async function oneKindGate(words: string): Promise<GateCall> {
+  const turnId = await turnIdOf([ONE_KIND_TEXT.eventId]);
+  const trace = openTrace({
+    openedBy: "textWebhook",
+    bundleId: { ...BUNDLE_V2_ID },
+    sink: (span) => SPANS.push(span),
+  });
+  trace.setTurn(turnId);
+  const names = new Map<string, string>([
+    [BARBERSHOP, ONE_KIND.businessId],
+    [SAM.personId, ONE_KIND.personId],
+    [SAM.handleId, ONE_KIND.handleId],
+    [SAM.number, ONE_KIND.number],
+    [SAM_CHAT, ONE_KIND.chatId],
+    ["turn-s1-02-sam-kinds", turnId],
+    ["trace-sam-0001", trace.traceId],
+    ["evt-sam-0001", ONE_KIND_TEXT.eventId],
+    ["oq-s1-02", ONE_KIND.questionId],
+  ]);
+  const request = renamed(
+    { ...structuredClone(S1_02_REQUEST), turn: structuredClone(S1_02_TURN) },
+    names,
+  ) as OneKindRequest;
+  const { context, decide } = request.input.decided;
+  const choose = (part: ChoosingPart): void => {
+    part.choice = "c-01";
+    part.quote = words;
+    for (const field of part.fields) {
+      if (field.name !== "kinds") continue;
+      field.value = words;
+      field.words = words;
+    }
+  };
+  for (const entry of decide.parts) choose(entry.part);
+  for (const read of decide.reads) for (const part of read.output.parts) choose(part);
+  const [text] = context.texts;
+  if (text === undefined) throw new Error("commit-s1-02.json's context holds the owner's text");
+  text.words = words;
+  text.sentAt.utc = ONE_KIND_TEXT.sentAt;
+  for (const question of context.openQuestions) question.sentAt.utc = ONE_KIND.sentAt;
+  for (const message of context.recentMessages) message.sentAt.utc = ONE_KIND.sentAt;
+  request.turn.bundleId = { ...BUNDLE_V2_ID };
+  context.bundleId = { ...BUNDLE_V2_ID };
+  decide.bundleId = { ...BUNDLE_V2_ID };
+  context.writer.people = [{ personId: ONE_KIND.personId, name: "", roles: [], language: null }];
+  request.now = ONE_KIND_TEXT.now;
+  return { request, turnId, trace };
+}
+
+/** Rows as plain objects (postgres.js's result lists carry fields of their own). */
+const plainRows = (rows: readonly Json[]): Json[] => rows.map((row) => ({ ...row }));
+
+/** What the one-kind owner's turn `turnId` left, as the runtime side reads it with no scope. */
+function oneKindRows(turnId: string): Promise<Json> {
+  return own.runtime("oneKindRows", async (sql) => ({
+    answered: plainRows(
+      await sql<Json[]>`select status, step from open_questions where id = ${ONE_KIND.questionId}`,
+    ),
+    questions: plainRows(
+      await sql<Json[]>`
+      select id, step, status, business_id, person_id from open_questions where turn_id = ${turnId}
+      order by id collate "C"
+    `,
+    ),
+    outbox: plainRows(
+      await sql<Json[]>`
+      select id, step, line_no, open_question_id, send_class, recipient_handle_id, business_id, plan from outbox_rows
+      where turn_id = ${turnId} order by id collate "C"
+    `,
+    ),
+    picks: plainRows(
+      await sql<Json[]>`
+      select id, kind_id, outcome, company_id, business_id from picked_kinds
+      where owner_person_id = ${ONE_KIND.personId} order by id collate "C"
+    `,
+    ),
+    companyKinds: plainRows(
+      await sql<Json[]>`
+      select kind_id, business_id, pf_facts, pf_switches_a, pf_switches_b from company_kinds
+      where company_id = ${ONE_KIND.companyId} order by kind_id collate "C"
+    `,
+    ),
+    texts: plainRows(
+      await sql<Json[]>`
+      select t.business_id, count(*)::int as n from picked_kind_texts t
+      join picked_kinds p on p.id = t.picked_kind_id
+      where p.owner_person_id = ${ONE_KIND.personId} group by t.business_id
+    `,
+    ),
+  }));
+}
+
+describe("the one-kind path's reads, and a one-kind answer walked past S1-04 to S1-08's row and S1-09's question on staging's gate (T-1494)", () => {
+  it("one gate alone: inside its held scope item 79 is read on a runtime-side client (rosie_worker_job), item 72 on a second Tool API client (rosie_worker_app) and the catalog by id on a runtime-side client, each named on its timing line, one after another; 2 connections at most, opened equal to ended, nothing written", async () => {
+    const before = await rowCounts();
+    const { gate, written, db } = rootOver(envOf());
+    const reads = oneKindReadsOf(gate);
+    const login = DB_SIDES.toolApi.login;
+    const { businessId, personId, handleId } = ONE_KIND;
+
+    const read = await gate.scope.withBusiness(businessId, async (repo) => {
+      const first = await whoOn(repo);
+      const picked = await reads.pickedKinds({ businessId, personId });
+      const kinds = await reads.businessKinds(repo, { businessId });
+      const plumber = await reads.kindDefaults(repo, { handleId, businessId, kindId: "plumber" });
+      // The scope's own transaction answers again after every read: its client was held throughout.
+      return { first, picked, kinds, plumber, last: await whoOn(repo) };
+    });
+
+    expect(read.first).toEqual({ session_login: login, current_login: login, scope: businessId });
+    expect(read.last).toEqual(read.first);
+    // Item 79: no pick yet, and the owner's company at its business as the roster-owner set wrote it.
+    expect(read.picked).toMatchObject({ result: "pickedKinds", businessId, personId, picks: [] });
+    expect(read.picked.companies).toEqual([
+      expect.objectContaining({ id: ONE_KIND.companyId, businessId, ownerPersonId: personId }),
+    ]);
+    // Item 72: the company's one kind of work on file, barber, under the business.
+    expect(read.kinds.kinds.map((kind) => [kind.companyId, kind.kindId, kind.businessId])).toEqual([
+      [ONE_KIND.companyId, "barber", businessId],
+    ]);
+    // The catalog by id: plumber's facts and its switches in flows A and B, as this database holds them.
+    expect(read.plumber).toEqual(seededKindDefaults("plumber"));
+
+    // The scope's client first; then item 79's and the catalog's on the runtime side, item 72's on the Tool API's.
+    expect(callsOf(written)).toEqual([
+      onApp(GATE_CALLS.scope),
+      onJob(GATE_CALLS.pickedKinds),
+      onApp(GATE_CALLS.businessKinds),
+      onJob(GATE_CALLS.kindsById),
+    ]);
+    expect([GATE_CALLS.businessKinds, GATE_CALLS.kindsById]).toEqual(["readBusinessKinds", "readTurnState"]);
+    expect(written.map((line) => line.trace_id)).toEqual([null, null, null, null]);
+    // One after another beside the held scope: never more than the scope's connection and one read's.
+    expect(db.counts()).toMatchObject({
+      opened: 4,
+      ended: 4,
+      connectionsOpen: 0,
+      connectionsPeak: 2 * CONNECTIONS_PER_CLIENT,
+    });
+    expect(await rowCounts()).toEqual(before);
+  });
+
+  it("a failed item 79 read (a person this database does not hold) rejects with CompaniesReadError as thrown, its message the read and the fault alone; the scope's client is ended, nothing is written and no line holds that row id", async () => {
+    const before = await rowCounts();
+    const { gate, written, db } = rootOver(envOf());
+    const reads = oneKindReadsOf(gate);
+
+    const thrown = await rejectionOf(
+      gate.scope.withBusiness(ONE_KIND.businessId, () =>
+        reads.pickedKinds({ businessId: ONE_KIND.businessId, personId: NOBODY }),
+      ),
+    );
+
+    expect(thrown).toBeInstanceOf(CompaniesReadError);
+    expect(thrown).toMatchObject({ name: "CompaniesReadError", read: "readPickedKinds", fault: "notFound" });
+    expect((thrown as Error).message).toBe(
+      new CompaniesReadError("readPickedKinds", "notFound", null).message,
+    );
+    expect((thrown as Error).message).not.toContain(NOBODY);
+    // K-05's own answer rides on the error (never logged): the table and the row it did not find.
+    expect((thrown as CompaniesReadError).answer).toEqual({
+      error: "notFound",
+      table: "persons",
+      rowId: NOBODY,
+    });
+
+    expect(callsOf(written)).toEqual([onApp(GATE_CALLS.scope), onJob(GATE_CALLS.pickedKinds)]);
+    expect(db.counts()).toMatchObject({ opened: 2, ended: 2, connectionsOpen: 0 });
+    for (const line of lines) expect(line, "a line holds the row id").not.toContain(NOBODY);
+    expect(await rowCounts()).toEqual(before);
+  });
+
+  it(
+    "the walk: the roster owner's 'Plumbing' on bundle v2, through realGate over staging's gate reads, commits once: S1-02's question answered, the one pick placed under the owner's company and business with plumber's company kind, its 11 blocks under that business, S1-08's row, S1-09's question and its row, no S1-04 question or row; every call one after another, 2 connections at most",
+    { timeout: TEST_MS },
+    async () => {
+      const before = await rowCounts();
+      const testEnv = envOf();
+      const rooted = rootOver(testEnv);
+      // Staging's gate reads with no adapter: the text's record is No, whose line is none, so no word is asked and no
+      // check reads bundle v2 (its values are not in this database: the pinned bundle is the test's, above).
+      const reads = stagingGateReads({
+        env: testEnv.env,
+        db: rooted.db,
+        keys: sealingWrapKeys(testEnv.env),
+        bundleSafety: null,
+      });
+      if (reads === null) throw new Error("the gate is bound with both bindings");
+      const call = await oneKindGate("Plumbing");
+      const pinned = pinnedV2();
+      const key = call.turnId;
+
+      const answer = await pinnedGate({ root: rooted.root, reads }, call, pinned.bundle);
+
+      expect(answer, JSON.stringify(answer)).toMatchObject({
+        result: "committed",
+        turnId: key,
+        repeated: false,
+        openQuestions: { opened: [`oq-s1-09-${key}-1`], closed: [ONE_KIND.questionId] },
+      });
+      // S1-11 read plumber's overlay once, from the pinned bundle.
+      expect(pinned.asked).toEqual(["plumber"]);
+
+      const plumber = seededKindDefaults("plumber");
+      expect(await oneKindRows(key)).toEqual({
+        answered: [{ status: "answered", step: "S1-02" }],
+        // S1-09's question alone: no S1-04 question.
+        questions: [
+          {
+            id: `oq-s1-09-${key}-1`,
+            step: "S1-09",
+            status: "waiting",
+            business_id: ONE_KIND.businessId,
+            person_id: ONE_KIND.personId,
+          },
+        ],
+        // S1-08's row (its step and line, no question), then S1-09's: no S1-04 row; each planned after the commit.
+        outbox: [
+          {
+            id: `outbox-s1-08-${key}-1`,
+            step: "S1-08",
+            line_no: 0,
+            open_question_id: null,
+            send_class: "quick_reply",
+            recipient_handle_id: ONE_KIND.handleId,
+            business_id: ONE_KIND.businessId,
+            plan: null,
+          },
+          {
+            id: `outbox-s1-09-${key}-1`,
+            step: "S1-09",
+            line_no: 0,
+            open_question_id: `oq-s1-09-${key}-1`,
+            send_class: "quick_reply",
+            recipient_handle_id: ONE_KIND.handleId,
+            business_id: ONE_KIND.businessId,
+            plan: null,
+          },
+        ],
+        // The one listed pick, placed on its own insert under the owner's company and business.
+        picks: [
+          {
+            id: `pick-s1-02-${key}-1`,
+            kind_id: "plumber",
+            outcome: "listed",
+            company_id: ONE_KIND.companyId,
+            business_id: ONE_KIND.businessId,
+          },
+        ],
+        // Plumber's company kind beside the barber one the roster-owner set wrote, with the catalog's facts and switches.
+        companyKinds: [
+          expect.objectContaining({ kind_id: "barber", business_id: ONE_KIND.businessId }),
+          {
+            kind_id: "plumber",
+            business_id: ONE_KIND.businessId,
+            pf_facts: plumber.facts,
+            pf_switches_a: plumber.switchesA,
+            pf_switches_b: plumber.switchesB,
+          },
+        ],
+        // S1-11's 11 text blocks, every one under the business.
+        texts: [{ business_id: ONE_KIND.businessId, n: 11 }],
+      });
+
+      // Every call on its own client and side, one after another, the scope's held throughout.
+      expect(callsOf(rooted.written)).toEqual([
+        onApp(GATE_CALLS.scope),
+        onJob(GATE_CALLS.seal),
+        onApp(GATE_CALLS.kindCatalog),
+        onJob(GATE_CALLS.pickedKinds),
+        onJob(GATE_CALLS.pickedKinds),
+        onApp(GATE_CALLS.businessKinds),
+        onJob(GATE_CALLS.kindsById),
+        onJob(GATE_CALLS.stopHandle),
+        onJob(GATE_CALLS.stopHandleIdsOfPerson),
+        onJob(GATE_CALLS.stopPhoneOfHandle),
+        onJob(GATE_CALLS.stopPersonIdsOfHandle),
+        onJob(GATE_CALLS.stopConsentsOfPersons),
+        onJob("commitTurn"),
+      ]);
+      const counts = rooted.db.counts();
+      expect(counts).toMatchObject({ connectionsOpen: 0, connectionsPeak: 2 * CONNECTIONS_PER_CLIENT });
+      expect(counts.ended).toBe(counts.opened);
+      // The turn row, S1-09's question and its clock row, the two outbox rows and the text's record.
+      await expectCountsAfter(
+        before,
+        { turns: 1, open_questions: 1, clock_rows: 1, outbox_rows: 2, safety_outcomes: 1 },
+        "grows",
+      );
+    },
+  );
 });
 
 // ---- production ---------------------------------------------------------------------------------------------------
