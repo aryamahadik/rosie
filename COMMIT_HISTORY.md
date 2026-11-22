@@ -2,9 +2,72 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 865, [`da57739e`](https://github.com/aryamahadik/rosie/commit/da57739e), 2026-11-22 04:12:56 UTC.
+- **Through:** commit 868, [`dbbef0f6`](https://github.com/aryamahadik/rosie/commit/dbbef0f6), 2026-11-22 04:44:39 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 868. docs: COMMIT\_HISTORY.md through commit 865 (da57739e, \#882) (\#885)
+
+- **Commit:** [`dbbef0f6`](https://github.com/aryamahadik/rosie/commit/dbbef0f6), by Arya Mahadik, 2026-11-22 04:44:39 UTC
+- **Pull request:** [#885](https://github.com/aryamahadik/rosie/pull/885) from `task/commit-history-217`, merged 2026-11-22 04:44:40 UTC. It squashed 1 branch commit:
+  - `a27b967` docs: COMMIT\_HISTORY.md through commit 865 (da57739e, \#882)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 867. T-1494 (H2a): staging's gate hands the one-kind reads, S1-08's stop reads and S1-04's settler to signUpSteps (DL-1115) (\#884)
+
+- **Commit:** [`b26cd00f`](https://github.com/aryamahadik/rosie/commit/b26cd00f), by Arya Mahadik, 2026-11-22 04:44:36 UTC
+- **Pull request:** [#884](https://github.com/aryamahadik/rosie/pull/884) from `task/T-1494s`, merged 2026-11-22 04:44:36 UTC. It squashed 2 branch commits:
+  - `201f6e0` T-1493: one-kind path, turn face (H1a rounds 1-3, squashed onto main)…
+  - `8b9873f` T-1494 (H2a): staging's gate hands the one-kind reads, S1-08's stop r…
+- **Files changed:** 5 (+1089 −55), by folder:
+  - `runtime/src/wiring/` gate-binding.test.ts +346 −5, real.ts +69 −13
+  - `runtime/src/wiring/staging/` tool-api-gate.seed.ts +165 −16, tool-api-gate.ts +71 −15, tool-api-gate.worker.test.ts +438 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1493: one-kind path, turn face (H1a rounds 1-3, squashed onto main): signUpSteps binds S1-02 through T-1492's wrapper, S1-04's buttons settler and S1-08's writer from the deps handed in; finalize's terms from isTermLine; pgCompaniesReads; the one-kind integration test, owner 4's S1-08 row now opening with signUpOpener as K-05 README default 215 rules (DL-1075, DL-1112, DL-1116)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1494 (H2a): staging's gate hands the one-kind reads, S1-08's stop reads and S1-04's buttons settler to signUpSteps (DL-1033, DL-1096, DL-1111, DL-1115)
+
+H2a's own commit 88e8fbda applied onto the squashed H1a (task/T-1493s, 201f6e0a), one commit (DL-1065); its five runtime files are identical to 88e8fbda. QA, the architect, the action-layer engineer and the security reviewer PASS on 88e8fbda (whole suite, the whole test:e2e, the Workers wiring, the whole lint).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 866. T-1493: one-kind path, turn face (H1a rounds 1-3, squashed onto main): signUpSteps binds S1-02 through T-1492's wrapper, S1-04's buttons settler and S1-08's writer from the deps handed in; finalize's terms from isTermLine; pgCompaniesReads; the one-kind integration test, owner 4's S1-08 row now opening with signUpOpener as K-05 README default 215 rules (DL-1075, DL-1112, DL-1116) (\#883)
+
+- **Commit:** [`55f6ca5c`](https://github.com/aryamahadik/rosie/commit/55f6ca5c), by Arya Mahadik, 2026-11-22 04:44:32 UTC
+- **Pull request:** [#883](https://github.com/aryamahadik/rosie/pull/883) from `task/T-1493s`, merged 2026-11-22 04:44:33 UTC. It squashed 1 branch commit:
+  - `201f6e0` T-1493: one-kind path, turn face (H1a rounds 1-3, squashed onto main)…
+- **Files changed:** 9 (+1604 −55), by folder:
+  - `actions/src/tool-api/turn-face/` commit.test.ts +232 −1, commit.ts +123 −33, index.ts +1 −0, rows.test.ts +68 −3, rows.ts +39 −12
+  - `actions/src/tool-api/turn-face/pg/` calls.ts +31 −6, index.ts +1 −0, one-kind.int.test.ts +1085 −0, test-support.ts +24 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 865. docs: COMMIT\_HISTORY.md through commit 863 (1b7127cb, \#879) (\#882)
 
