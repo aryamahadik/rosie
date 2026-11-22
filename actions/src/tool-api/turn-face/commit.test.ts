@@ -23,31 +23,50 @@
 // T-1519 (DL-1048): with the walk's chat read bound (TurnCommitBinding.readChatHandle, K-05 v1.10 item 51), a turn 1 whose
 // chat Sam's own chat thread already holds commits S1-02's question with no thread written; one whose chat no thread
 // holds commits exactly as commit-s1-01.json states it; an error answer fails the call closed.
+//
+// T-1493 (H1a; K-09 README default 199; DL-1033, DL-1075): signUpSteps, given the one-kind path's reads (`companies`) and
+// S1-08's own stop reads (`plan`), binds S1-02 through T-1492's one-kind wrapper inside T-634's, S1-04's buttons settler
+// from the same instance (TurnCommitBinding.buttonsSettlers, handed to the walk) and S1-08's writer (T-1482); left out,
+// the object is today's, field for field. On the walk the binding hands writesOf, over bundle v2 and the doubles of
+// items 78, 79 and 72, the catalog by id, the stop home and the trade overlays: "Plumbing" walks S1-04 without asking it,
+// to S1-08's row and S1-09's question; "Barbershop, plumbing, electrical" still asks S1-04; with S1-08's stop reads left
+// out the walk is refused with nothing returned. The integration test (pg/one-kind.int.test.ts) commits it for real.
 
 import { describe, expect, it } from "vitest";
 
 import type { Span } from "../../../../runtime/src/trace";
 import type { GateAndCommitRequest } from "../../commit";
 import type { CoreFlagsDeps } from "../../commit/core";
-import type { WalkQuestions } from "../../commit/walk";
+import { WalkNotBuiltError, type WalkQuestions } from "../../commit/walk";
+import { NOTHING_OPEN, commitS1_02, questionsOver } from "../../commit/walk/test-support";
 import { NOT_TOLD_YET, PLUGIN_LISTS_NO_STOP_WORDS } from "../../domain/safety";
 import { BARBERSHOP, safetyWorldOf } from "../../domain/safety/test-support";
 import { BUNDLE_V0, fakeBundles, sampleBundle, withSteps } from "../../frontier/assemble/test-support";
 import type { Decided } from "../../gate/framework";
+import { readsOn, seedWorld } from "../../homes/stop/test-support";
 import { NotBuiltError } from "../errors";
+import { companiesReadsOf } from "../journey-1/companies";
+import { SAM_COMPANY, catalogDefaults, fakeCompaniesK05 } from "../journey-1/companies/test-support";
+import { kindsReadsOf } from "../journey-1/kinds";
+import { fakeK05, turnWithWords } from "../journey-1/kinds/test-support";
+import { PlanNotBuiltError } from "../journey-1/plan";
+import { PF_TEXT_KEYS } from "../journey-1/plug-ins";
 import { traceFor } from "../test-support";
 import { createToolApi } from "../tool-api";
 import { createToolApiValidator } from "../validator";
 import {
   SAM_KEY,
   bundleV0,
+  bundleV2Id,
   callDoubles,
   commitContextOf,
   commitRequestAfter,
   commitS101,
   limitOneOnTurnOne,
   openHoldsOn,
+  publishedBundleV2,
   safetyReadsOn,
+  tradesOverV2,
   type OpenHoldsRead,
 } from "./calls-test-support";
 import {
@@ -57,10 +76,12 @@ import {
   openHoldsPort,
   pinnedSafetyLines,
   safetyReaderOf,
+  signUpSteps,
   turnCommitDeps,
   walkChatsOf,
   type CommitAt,
   type SafetyReads,
+  type SignUpWriterDeps,
   type TurnCommitBinding,
 } from "./commit";
 import { TurnFaceReadError, TurnFaceRefusedError } from "./errors";
@@ -669,5 +690,215 @@ describe("the commit is handed the walk's question read and turn key for an aske
     expect(doorBinding.questions).toBe(questions);
     const door = keywordCommitDeps(doorBinding, {} as CoreFlagsDeps<unknown>)(NOTHING_OPEN_AT);
     expect(Object.hasOwn(door, "askAgain")).toBe(false);
+  });
+});
+
+// ---- T-1493: the one-kind path on the turn face's binding ----------------------------------------------------------------
+
+describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer, bound from the deps handed in (T-1493, H1a)", () => {
+  const never = (): Promise<never> => Promise.reject(new Error("nothing is read or written here"));
+
+  /** Which of the new deps a case hands in: the companies reads, and S1-08's deps with or without the stop reads. */
+  interface NewDeps {
+    readonly companies?: boolean;
+    readonly plan?: "withStop" | "noStop";
+  }
+
+  /** The sign-up steps' deps over the doubles (items 78 and 79, item 72 and the catalog, the stop home, bundle v2's overlays). */
+  function signUpOver(given: NewDeps = {}) {
+    const k05 = fakeK05();
+    const companies = fakeCompaniesK05();
+    const trades = tradesOverV2();
+    const stop = readsOn(seedWorld(), null);
+    const deps: SignUpWriterDeps = {
+      kinds: { reads: kindsReadsOf(k05.k05) },
+      plugIns: { bundles: trades.bundles },
+      ...(given.companies === true ? { companies: companiesReadsOf(companies.k05) } : {}),
+      ...(given.plan === undefined ? {} : { plan: given.plan === "withStop" ? { stop } : {} }),
+    };
+    return { deps, k05, companies, trades };
+  }
+
+  /** The turn face's binding over `deps` on bundle v2, its ports never called but the walk's, the sign-up steps spread in. */
+  function bindingOver(deps: SignUpWriterDeps): TurnCommitBinding<unknown> {
+    return {
+      bundles: fakeBundles(publishedBundleV2()),
+      commitTurn: never,
+      readOpenHolds: never,
+      safetyReads: safetyReadsOn(safetyWorldOf()),
+      sealer: { seal: never },
+      stopWords: PLUGIN_LISTS_NO_STOP_WORDS,
+      telling: NOT_TOLD_YET,
+      turnKey: () => SAM_KEY,
+      questions: questionsOver().questions,
+      ...signUpSteps<unknown>(deps),
+    };
+  }
+
+  /** What the walk turnCommitDeps hands writesOf answers for turn 2's "All on the list" with `words`, pinned to bundle v2. */
+  async function walked(deps: SignUpWriterDeps, words: string) {
+    const turn = turnWithWords("c-01", words);
+    const context = { ...turn.context, turn: { ...turn.context.turn, bundleId: bundleV2Id() } };
+    return turnCommitDeps(bindingOver(deps))(NOTHING_OPEN_AT).ports.writesOf(
+      turn.part,
+      context,
+      NOTHING_OPEN,
+    );
+  }
+
+  it("with neither new dep the object is today's, field for field: writers and settlers alone, no buttons settler, no writer at S1-08", () => {
+    const { deps, k05, trades } = signUpOver();
+    const steps = signUpSteps<unknown>(deps);
+    expect(Object.keys(steps).sort()).toEqual(["settlers", "writers"]);
+    expect(steps.writers("S1-08")).toBeNull();
+    expect(steps.settlers("S1-04")).toBeNull();
+    // A binding that spreads it carries no buttonsSettlers field, so the walk is handed none.
+    expect(Object.hasOwn(bindingOver(deps), "buttonsSettlers")).toBe(false);
+    expect(k05.asked).toEqual([]);
+    expect(trades.reads).toEqual([]);
+  });
+
+  it("with the companies reads and S1-08's deps: S1-04's buttons settler alone, S1-08's writer, S1-02's settler and the other writers as before; building them reads nothing", () => {
+    const { deps, k05, companies, trades } = signUpOver({ companies: true, plan: "withStop" });
+    const steps = signUpSteps<unknown>(deps);
+    expect(Object.keys(steps).sort()).toEqual(["buttonsSettlers", "settlers", "writers"]);
+    expect(typeof steps.buttonsSettlers?.("S1-04")).toBe("function");
+    for (const stepId of ["S1-02", "S1-08", "S1-09", "s1-04", "", "constructor", "__proto__"]) {
+      expect(steps.buttonsSettlers?.(stepId), stepId).toBeNull();
+    }
+    for (const stepId of ["S1-02", "S1-03", "S1-74", "S1-11", "S1-08"]) {
+      expect(typeof steps.writers(stepId), stepId).toBe("function");
+    }
+    for (const stepId of ["S1-01", "S1-04", "S1-09", "toString", "__proto__"]) {
+      expect(steps.writers(stepId), stepId).toBeNull();
+    }
+    expect(typeof steps.settlers("S1-02")).toBe("function");
+    expect(steps.settlers("S1-04")).toBeNull();
+    expect(Object.hasOwn(bindingOver(deps), "buttonsSettlers")).toBe(true);
+    expect(k05.asked).toEqual([]);
+    expect(companies.asked).toEqual([]);
+    expect(trades.reads).toEqual([]);
+  });
+
+  it("each new dep binds its own piece: the companies reads alone give S1-04's settler and no S1-08 writer; S1-08's deps alone give its writer and no buttons settler", () => {
+    const companiesOnly = signUpSteps<unknown>(signUpOver({ companies: true }).deps);
+    expect(typeof companiesOnly.buttonsSettlers?.("S1-04")).toBe("function");
+    expect(companiesOnly.writers("S1-08")).toBeNull();
+    const planOnly = signUpSteps<unknown>(signUpOver({ plan: "withStop" }).deps);
+    expect(Object.hasOwn(planOnly, "buttonsSettlers")).toBe(false);
+    expect(typeof planOnly.writers("S1-08")).toBe("function");
+  });
+
+  it("the walk turnCommitDeps hands writesOf: 'Plumbing' walks S1-04 without asking it, the one pick placed with its company kind first, S1-11's blocks under the business, S1-08's row, then S1-09's question", async () => {
+    const { deps, companies } = signUpOver({ companies: true, plan: "withStop" });
+    const writes = await walked(deps, "Plumbing");
+    expect(writes.closes.map((close) => [close.id, close.status])).toEqual([["oq-s1-02", "answered"]]);
+    expect(writes.state.map((write) => `${write.op} ${write.table}`)).toEqual([
+      "insert company_kinds",
+      "insert picked_kinds",
+      ...PF_TEXT_KEYS.map(() => "insert picked_kind_texts"),
+    ]);
+    const plumber = catalogDefaults("plumber");
+    const [kind, pick, ...texts] = writes.state;
+    expect(kind).toEqual({
+      op: "insert",
+      table: "company_kinds",
+      values: {
+        company_id: SAM_COMPANY,
+        kind_id: "plumber",
+        business_id: BARBERSHOP,
+        trade_name: null,
+        pf_facts: plumber.facts,
+        pf_switches_a: plumber.switchesA,
+        pf_switches_b: plumber.switchesB,
+      },
+    });
+    expect(pick).toMatchObject({
+      op: "insert",
+      table: "picked_kinds",
+      values: {
+        id: "pick-s1-02-sam-1",
+        kind_id: "plumber",
+        outcome: "listed",
+        company_id: SAM_COMPANY,
+        business_id: BARBERSHOP,
+      },
+    });
+    for (const text of texts) {
+      expect(text).toMatchObject({ values: { picked_kind_id: "pick-s1-02-sam-1", business_id: BARBERSHOP } });
+    }
+    // No S1-04 question: S1-09's alone, and two rows, S1-08's (no question) then S1-09's, each with its step and line 0.
+    expect(writes.asks.map((ask) => [ask.question.id, ask.question.step])).toEqual([
+      ["oq-s1-09-sam-1", "S1-09"],
+    ]);
+    expect(
+      writes.messages.map((row) => [row.id, row.step, row.lineNo, row.openQuestionId, row.sendClass]),
+    ).toEqual([
+      ["outbox-s1-08-sam-1", "S1-08", 0, null, "quick_reply"],
+      ["outbox-s1-09-sam-1", "S1-09", 0, "oq-s1-09-sam-1", "quick_reply"],
+    ]);
+    expect(writes.gives).toEqual([...commitS1_02().given.stated.gives, "companies"]);
+    // The one-kind pieces read item 79 once for the walk, item 72 once and the catalog once, each for Sam at his business.
+    expect(companies.asked.map((asked) => asked.read)).toEqual([
+      "readPickedKinds",
+      "readBusinessKinds",
+      "readTurnState",
+    ]);
+  });
+
+  it("'Barbershop, plumbing, electrical' still asks S1-04 with the one-kind path bound, its picks unplaced, as without it; and without the companies reads 'Plumbing' asks S1-04 as today", async () => {
+    const bound = await walked(
+      signUpOver({ companies: true, plan: "withStop" }).deps,
+      "Barbershop, plumbing, electrical",
+    );
+    const today = await walked(signUpOver().deps, "Barbershop, plumbing, electrical");
+    expect(bound.asks.map((ask) => ask.question.step)).toEqual(["S1-04"]);
+    expect(bound).toEqual(today);
+    expect(
+      bound.state.flatMap((write) =>
+        write.op === "insert" && write.table === "picked_kinds"
+          ? [[write.values.company_id, write.values.business_id]]
+          : [],
+      ),
+    ).toEqual([
+      [null, null],
+      [null, null],
+      [null, null],
+    ]);
+    const plumbingToday = await walked(signUpOver({ plan: "withStop" }).deps, "Plumbing");
+    expect(plumbingToday.asks.map((ask) => ask.question.step)).toEqual(["S1-04"]);
+    expect(plumbingToday.messages.map((row) => row.step)).toEqual(["S1-04"]);
+  });
+
+  it("with S1-08's stop reads left out, 'Plumbing' is refused with nothing returned: no S1-08 deps (no writer at S1-08) or S1-08's deps without the stop reads (stopNotWired)", async () => {
+    await expect(walked(signUpOver({ companies: true }).deps, "Plumbing")).rejects.toBeInstanceOf(
+      WalkNotBuiltError,
+    );
+    const noStop = walked(signUpOver({ companies: true, plan: "noStop" }).deps, "Plumbing");
+    await expect(noStop).rejects.toBeInstanceOf(PlanNotBuiltError);
+    await expect(noStop).rejects.toMatchObject({ seam: "stopNotWired", ids: ["S1-08"] });
+  });
+
+  it("the keyword door's commit hands the walk no buttons settler, whatever its binding object carries", async () => {
+    const { deps, companies } = signUpOver({ companies: true, plan: "withStop" });
+    const binding = bindingOver(deps);
+    expect(Object.hasOwn(binding, "buttonsSettlers")).toBe(true);
+    const doorBinding = {
+      ...binding,
+      safetyReads: {
+        outcomeOfEvent: never,
+        outcome: never,
+        hold: never,
+        holdOfOutcome: never,
+        outboxRowWritten: never,
+      },
+    };
+    const door = keywordCommitDeps(doorBinding, {} as CoreFlagsDeps<unknown>)(NOTHING_OPEN_AT);
+    const turn = turnWithWords("c-01", "Plumbing");
+    const context = { ...turn.context, turn: { ...turn.context.turn, bundleId: bundleV2Id() } };
+    await expect(door.ports.writesOf(turn.part, context, NOTHING_OPEN)).rejects.toBeInstanceOf(
+      WalkNotBuiltError,
+    );
+    expect(companies.asked).toEqual([]);
   });
 });
