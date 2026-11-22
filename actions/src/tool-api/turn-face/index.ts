@@ -22,6 +22,7 @@ export {
   type NoBusinessSafetyReads,
   type OpenHoldsAnswer,
   type OpenHoldsRequest,
+  type S1_04WriterDeps,
   type SafetyReads,
   type SignUpSteps,
   type SignUpWriterDeps,
