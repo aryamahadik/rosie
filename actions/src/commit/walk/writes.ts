@@ -21,6 +21,10 @@
 // before it walks, and never reads the option decide named to find it: from there the walk is the walk of a chosen
 // branch, with the settled branch in the chosen one's place (its writers handed it as the branch chosen, the unit's why
 // naming it). A held answer asks no settler and writes nothing. With no settler bound the walk is exactly as above.
+// A settler's "ask" (T-1528; K-09 README default 201 and open gap 179; settle.ts SETTLER_ASKS): the walk reads and writes
+// nothing more for the part (no branch read from the graph, no question read, no close, no writer, no row), hands back a
+// unit that writes nothing, and notes the part on the turn (settle.ts noteSettlerAsked), so the commit's re-send
+// (../ask-again.ts) sends the step's open question again once, as for a part decide ended in one question (default 20).
 //
 // A settled buttons step (T-1491; K-09 README default 199, from T-1515; DL-1033 ruling 7): where the walk would stop at a
 // plain step with no branches whose message has buttons (S1-04), a buttons settler is bound for that step
@@ -185,6 +189,12 @@
 //      still notBuilt (buttons) at its close (default 11; K-09 README default 187's option ids are a later card).
 //  19. (T-1480) An answered plain step that gives nothing writes no row of its own and needs no writer, as any step
 //      that writes nothing (default 9): only its question is closed, and the walk goes on from its next.
+//  20. (T-1528) A settled answer whose settler answers "ask" writes nothing, and its why names the step alone (choice
+//      null), as a settled answer held back does (default 6), since no branch was settled; its words go nowhere. The
+//      walk sends nothing itself: the re-sent row and the raise are the commit's own unit (../ask-again.ts), which reads
+//      the question and checks default 192's conditions once every part is gated, so a settler's "ask" beside a part
+//      that passed and writes, or under a hold, is silent, as an asked part is there. Its row is the step's own line
+//      (K-09 v1.12 default 197; the README's open gap 183 keeps other words Jay's).
 
 import type { Choice, Decided, SetupKey } from "../../gate/framework";
 import { PROTECTIVE_STEPS, SAFETY_FLOW_STEPS, holdClassOf, isHeld, type HoldClass } from "../hold";
@@ -210,7 +220,7 @@ import type {
 import { buttonsAnswer, type ButtonsSettler, type ButtonsSettlers, type RowsBuilt } from "./buttons";
 import { WalkNotBuiltError, WalkRefusedError } from "./errors";
 import { flowGraphOf, flowOfStep, type FlowGraph, type FlowLetter, type GraphStep } from "./graph";
-import { isSplitStep, settledBranch, type StepSettler, type StepSettlers } from "./settle";
+import { isSplitStep, noteSettlerAsked, settledBranch, type StepSettler, type StepSettlers } from "./settle";
 import { walkStretchFrom, type Stretch, type WalkStart, type Walked } from "./walk";
 
 /** A bundle id as the turn row pins it (K-05 v1 turn.bundleId; K-01 v1 bundleId). */
@@ -807,7 +817,10 @@ function firstHeldOn(stepIds: readonly string[], open: OpenHolds): number | null
 /** The decided texts a turn read. */
 type DecidedTexts = Decided["context"]["texts"];
 
-/** A unit that writes nothing, with its why: a settled answer whose first row is held back (default 191). */
+/**
+ * A unit that writes nothing, with its why: a settled answer whose first row is held back (default 191), or whose
+ * settler answered "ask" (default 20).
+ */
 function nothingWritten(why: Why): UnitWrites {
   return {
     why,
@@ -934,7 +947,8 @@ interface Settling<Repo> {
 
 /**
  * A settled answer (default 191): the question read is bound (else notBuilt, nothing asked); a held answer asks no
- * settler and writes nothing; else the settler is asked once, its label checked against the split's branches in the
+ * settler and writes nothing; else the settler is asked once. "ask" (default 20): nothing more is read or written, and
+ * the part is noted on the turn for the commit's re-send. Else its label is checked against the split's branches in the
  * pinned graph, and the walk of that branch is written, each writer handed it as the branch chosen.
  */
 async function settledWrites<Repo>(deps: WalkDeps<Repo>, settling: Settling<Repo>): Promise<UnitWrites> {
@@ -945,7 +959,7 @@ async function settledWrites<Repo>(deps: WalkDeps<Repo>, settling: Settling<Repo
   if (firstHeld([split.id], holdClassOf(part.part, choice), open) === 0) {
     return nothingWritten({ step: split.id, choice: null });
   }
-  const branch = await settledBranch(settling.settler, {
+  const settled = await settledBranch(settling.settler, {
     repo: context.repo,
     businessId: context.businessId,
     step: split,
@@ -953,6 +967,12 @@ async function settledWrites<Repo>(deps: WalkDeps<Repo>, settling: Settling<Repo
     choice,
     turn: context,
   });
+  // The words cannot settle the branch (T-1528): no branch, no close, no writer, no row; the commit asks again.
+  if (settled.kind === "ask") {
+    noteSettlerAsked(context, part.index);
+    return nothingWritten({ step: split.id, choice: null });
+  }
+  const { branch } = settled;
   const start: WalkStart = { kind: "branch", step: split.id, branch };
   return unitOf(deps, {
     part,

@@ -5,6 +5,11 @@
 // a held answer asks no settler; a settler bound at a step with no branches is never asked; with no settler bound the
 // walk is exactly today's. Proved on bundle v1 with T-1461's doubles (the bundle port, the question read, the stand-in
 // writers) and a stand-in settler, never a double of the walk. S1-02's own settler is journey-1/kinds' (settle.test.ts).
+//
+// T-1528 (K-09 README default 201 and open gap 179; DL-1133): a settler's reserved "ask" writes nothing for the step or
+// after it, closes nothing, reads nothing more, and notes the part on the turn for the commit's re-send (ask-again.ts,
+// proved end to end in ../ask-again.test.ts); any other spelling is still refused, a throw still fails closed. Proved on
+// bundle v1's S1-02 and on T-1491's test graph with bundle v2's compiled S1-09.
 
 import { describe, expect, it } from "vitest";
 
@@ -20,13 +25,17 @@ import {
   type WalkDeps,
   type WalkFault,
 } from "./index";
+import { SETTLER_ASKS, settlerAskedParts } from "./settle";
 import {
   NOTHING_OPEN,
+  S1_09_BRANCHES,
   SAM,
   allWriters,
   branchIn,
   bundleV1Bundles,
+  decidedOf,
   flowAV1,
+  flowAWithCompiledPlan,
   hold,
   questionsOver,
   skeletonBundles,
@@ -363,4 +372,150 @@ describe("when the walk asks no settler", () => {
       expect(none.asks).toEqual([]);
     },
   );
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1528: a settler's "ask"
+
+/** S1-09's owner's branch, by its Means line (MASTER-FLOW-A.md line 118), as T-1491's test graph and bundle v2 hold it. */
+const OWNER = "An owner; the listing matches";
+
+/** Turn 2's part on T-1491's test graph, its option moved to S1-09's question (a stand-in id: nothing reads it on "ask"). */
+function s1_09Part(): { part: PassedPart; context: ReturnType<typeof turnTwoOnV1>["context"] } {
+  const turn = turnTwoOnV1("c-01");
+  const choice: Choice = {
+    ...turn.choice,
+    step: "S1-09",
+    question: "oq-s1-09-sam",
+    branch: OWNER,
+    label: OWNER,
+  };
+  return { part: { ...turn.part, choice }, context: turn.context };
+}
+
+describe("a settler's 'ask' (T-1528): nothing written for the step or after it, no close, the part noted for the commit's re-send", () => {
+  it.each(["c-01", "c-02", "c-03"])(
+    "%s named, settled 'ask': no branch read, no question read, no writer, no row; its why the step alone; the part noted on the turn",
+    async (choiceId) => {
+      const walk = settledWalk({ answer: SETTLER_ASKS });
+      const { writes, context, part } = await answer(walk, choiceId);
+      expectNothingWritten(writes);
+      expect(writes.why).toEqual({ step: "S1-02", choice: null });
+      expect(writes.closes).toEqual([]);
+      // The settler alone: the graph was read once (to find the split), then nothing else.
+      expect(walk.log).toEqual(["settle S1-02"]);
+      expect(walk.reads).toHaveLength(1);
+      expect(walk.questionReads).toEqual([]);
+      expect(walk.wrote).toEqual([]);
+      expect([...settlerAskedParts(context)]).toEqual([part.index]);
+    },
+  );
+
+  it("on T-1491's test graph, bundle v2's compiled S1-09 (a split with three message branches): 'ask' writes nothing for S1-09 or after it, while a label walks on", async () => {
+    const asked = settledWalk({ answer: "ask", graph: flowAWithCompiledPlan(), settledAt: ["S1-09"] });
+    const { part, context } = s1_09Part();
+    const writes = await asked.writesOf(part, context, NOTHING_OPEN);
+    expectNothingWritten(writes);
+    expect(writes.why).toEqual({ step: "S1-09", choice: null });
+    const [ask] = asked.asks;
+    expect(asked.asks).toHaveLength(1);
+    expect(ask?.step.id).toBe("S1-09");
+    expect(ask?.step.split).toBe(true);
+    expect(ask?.step.branches.map((branch) => branch.label)).toEqual(S1_09_BRANCHES);
+    expect(asked.log).toEqual(["settle S1-09"]);
+    expect([...settlerAskedParts(context)]).toEqual([0]);
+
+    // The owner's label instead: the walk goes on from S1-09 to S1-10, which the graph does not hold, so it is refused
+    // there (README default 204) with nothing written and nothing noted.
+    const labelled = settledWalk({ answer: OWNER, graph: flowAWithCompiledPlan(), settledAt: ["S1-09"] });
+    const other = s1_09Part();
+    const error = await labelled.writesOf(other.part, other.context, NOTHING_OPEN).then(
+      () => null,
+      (thrown: unknown) => thrown,
+    );
+    expectRefused(error, "stepNotInBundle", ["S1-10"]);
+    expect(labelled.wrote).toEqual([]);
+    expect(settlerAskedParts(other.context).size).toBe(0);
+  });
+
+  it("a label still settles as before: today's walk of that branch, and nothing noted", async () => {
+    const today = await answer(settledWalk({ noSettlers: true }), "c-01");
+    const walk = settledWalk({ answer: ALL });
+    const { writes, context } = await answer(walk, "c-02");
+    expect(writes).toEqual(today.writes);
+    expect(walk.log).toEqual(["settle S1-02", "question", "write S1-02", "write S1-11"]);
+    expect(settlerAskedParts(context).size).toBe(0);
+  });
+
+  it.each(["Ask", "ASK", " ask", "ask ", "asks", "ask again"])(
+    "%j is neither 'ask' nor a label: refused (settledNotInBundle), naming the step alone, and nothing noted",
+    async (answered) => {
+      const walk = settledWalk({ answer: answered });
+      const turn = turnTwoOnV1("c-01");
+      const error = await walk.writesOf(turn.part, turn.context, NOTHING_OPEN).then(
+        () => null,
+        (thrown: unknown) => thrown,
+      );
+      expectRefused(error, "settledNotInBundle", ["S1-02"]);
+      expect(walk.wrote).toEqual([]);
+      expect(walk.questionReads).toEqual([]);
+      expect(settlerAskedParts(turn.context).size).toBe(0);
+    },
+  );
+
+  it("a settler that throws still fails closed: the walk rejects with what it threw, nothing noted", async () => {
+    const thrown = new Error("the settler's read failed");
+    const walk = settledWalk({ answer: thrown });
+    const turn = turnTwoOnV1("c-01");
+    const error = await walk.writesOf(turn.part, turn.context, NOTHING_OPEN).then(
+      () => null,
+      (rejected: unknown) => rejected,
+    );
+    expect(error).toBe(thrown);
+    expect(walk.wrote).toEqual([]);
+    expect(settlerAskedParts(turn.context).size).toBe(0);
+  });
+
+  it("a held answer asks no settler, so a settler that would answer 'ask' notes nothing", async () => {
+    const walk = settledWalk({ answer: SETTLER_ASKS });
+    const { writes, context } = await answer(walk, "c-01", { holds: [hold()], unreadEventIds: [] });
+    expectNothingWritten(writes);
+    expect(walk.log).toEqual([]);
+    expect(settlerAskedParts(context).size).toBe(0);
+  });
+
+  it("with no question read bound, the answer is notBuilt before the settler: nothing noted", async () => {
+    const walk = settledWalk({ answer: SETTLER_ASKS, noQuestions: true });
+    const turn = turnTwoOnV1("c-01");
+    const error = await walk.writesOf(turn.part, turn.context, NOTHING_OPEN).then(
+      () => null,
+      (thrown: unknown) => thrown,
+    );
+    expect(error).toBeInstanceOf(WalkNotBuiltError);
+    expect(walk.asks).toEqual([]);
+    expect(settlerAskedParts(turn.context).size).toBe(0);
+  });
+
+  it("the note is the turn object's own: the part's index, once however often it is walked, and never another turn's", async () => {
+    const walk = settledWalk({ answer: SETTLER_ASKS });
+    const turn = turnTwoOnV1("c-01");
+    const second: PassedPart = { ...turn.part, index: 1 };
+    const first = await walk.writesOf(second, turn.context, NOTHING_OPEN);
+    const again = await walk.writesOf(second, turn.context, NOTHING_OPEN);
+    expect(again).toEqual(first);
+    expect([...settlerAskedParts(turn.context)]).toEqual([1]);
+    // An equal turn object the walk never saw holds no note; a copy handed out cannot change the note.
+    const other = turnTwoOnV1("c-01");
+    expect(other.context).toEqual(turn.context);
+    expect(settlerAskedParts(other.context).size).toBe(0);
+    (settlerAskedParts(turn.context) as Set<number>).add(7);
+    expect([...settlerAskedParts(turn.context)]).toEqual([1]);
+  });
+
+  it("the unit carries none of the owner's words", async () => {
+    const asked = await answer(settledWalk({ answer: SETTLER_ASKS }), "c-01");
+    const { texts } = decidedOf(asked.context.request).context;
+    expect(texts.length).toBeGreaterThan(0);
+    for (const text of texts) expect(JSON.stringify(asked.writes)).not.toContain(text.words);
+  });
 });
