@@ -5,6 +5,12 @@
 // folder's wrapper and settler, never a double: only the K-05 reads (items 79 and 72, readTurnState's catalog facts) are
 // doubles, as db/repo answers them. Where a case needs S1-02's rows in a shape T-633's writer never gives (a malformed
 // pick, another person's, two picks of one kind, none inserted), a stand-in S1-02 writer gives them.
+//
+// T-1520 (DL-1056, DL-1076): S1-03 is bound as H1a now binds it, through the same instance's draft wrapper
+// (oneKind.wrapDraft), so a one-kind "One isn't on the list yet" walk's draft takes its pick's business; a two-kind walk's
+// drafts, and a walk with no one-kind wrapper, keep S1-03's rows byte for byte; a draft that would land under another
+// business than the call's is refused. Where a case needs S1-03's rows in a shape T-633's writer never gives (a draft
+// that names a business, a draft for another pick), a stand-in S1-03 writer gives them.
 
 import { describe, expect, it } from "vitest";
 
@@ -14,9 +20,11 @@ import type { StateWrite } from "../../../commit/types";
 import {
   createWritesOf,
   flowGraphOf,
+  textSourceOf,
   type ButtonsSettlerCall,
   type StepRows,
   type StepWriter,
+  type StepWriterCall,
 } from "../../../commit/walk";
 import {
   NOTHING_OPEN,
@@ -63,6 +71,7 @@ import {
   SAM_PERSON,
   catalogDefaults,
   fakeCompaniesK05,
+  graphStep,
   pickOnFile,
   samCompanies,
   seedCompanyKinds,
@@ -85,6 +94,10 @@ interface Given extends CompaniesGiven {
   readonly outer?: (rows: StepRows) => StepRows;
   /** Another step the wrapped S1-02 writer is bound to as well (a binding's fault). */
   readonly wrappedAt?: string;
+  /** A stand-in for T-633's S1-03 writer, in its place under the draft wrapper (T-1520). */
+  readonly s1_03?: StepWriter<WalkTestRepo>;
+  /** Bind the draft wrapper on S1-03 alone: S1-02's writer unwrapped and no settler (a walk with no one-kind wrapper). */
+  readonly draftOnly?: boolean;
 }
 
 /** Item 78's 243 seeded kinds (T-212), planned once for the file: T-633's writer's catalog double. */
@@ -99,8 +112,21 @@ function walkOf(given: Given = {}) {
   const trades = tradesOverV1();
   const plugIns = createPlugInWriters<WalkTestRepo>({ bundles: trades.bundles });
   const oneKind = createOneKind<WalkTestRepo>({ reads: companiesReadsOf(companies.k05) });
-  const bound = given.oneKind !== false;
-  const seen: { inner?: StepRows; wrapped?: StepRows } = {};
+  const bound = given.oneKind !== false && given.draftOnly !== true;
+  const seen: { inner?: StepRows; wrapped?: StepRows; draftInner?: StepRows; draftWrapped?: StepRows } = {};
+  // S1-03 through the same instance's draft wrapper, as H1a binds it (T-1520), its writer's rows and the wrapper's kept.
+  const innerDraft = given.s1_03 ?? writers["S1-03"];
+  const recordedDraft: StepWriter<WalkTestRepo> = async (call) => {
+    const rows = await innerDraft(call);
+    seen.draftInner = rows;
+    return rows;
+  };
+  const drafting = given.oneKind === false ? recordedDraft : oneKind.wrapDraft(recordedDraft);
+  const s1_03: StepWriter<WalkTestRepo> = async (call) => {
+    const rows = await drafting(call);
+    seen.draftWrapped = rows;
+    return rows;
+  };
   const inner = given.s1_02 ?? writers["S1-02"];
   const recorded: StepWriter<WalkTestRepo> = async (call) => {
     const rows = await inner(call);
@@ -116,7 +142,7 @@ function walkOf(given: Given = {}) {
   const s1_02 = plugIns.kinds(outer);
   const byStep: Record<string, StepWriter<WalkTestRepo>> = {
     "S1-02": s1_02,
-    "S1-03": writers["S1-03"],
+    "S1-03": s1_03,
     "S1-74": writers["S1-74"],
     "S1-11": plugIns.plugIns,
     "S1-08": tellingWriter,
@@ -865,5 +891,220 @@ describe("the reads and the helpers T-1481 reuses", () => {
       switchesA: ["cancelright", "planbill"],
       switchesB: ["cancelright", "planbill"],
     });
+  });
+});
+
+describe("S1-03's draft on the one-kind path: it takes the business its one pick was placed under (T-1520)", () => {
+  /** The new_work_drafts inserts in `state`, each as its pick and its business. */
+  function draftsOf(state: readonly StateWrite[]): unknown[][] {
+    return state.flatMap((write) =>
+      write.op === "insert" && write.table === "new_work_drafts"
+        ? [[write.values.picked_kind_id, write.values.business_id]]
+        : [],
+    );
+  }
+
+  /** A new_work_drafts insert as T-633's writer writes one, for the pick given, naming the business given. */
+  function draftRow(n: number, pickId: string, businessId: string | null): StateWrite {
+    return {
+      op: "insert",
+      table: "new_work_drafts",
+      values: {
+        id: `draft-stand-in-${String(n)}`,
+        picked_kind_id: pickId,
+        business_id: businessId,
+        state: "drafting",
+        drafted_at: "2026-10-19T14:05:06Z",
+      },
+    };
+  }
+
+  /** A stand-in S1-03 writer: the drafts given, and no other row. It reads nothing. */
+  function draftsStandIn(state: readonly StateWrite[]): StepWriter<WalkTestRepo> {
+    return () => Promise.resolve({ state: [...state], stateEvents: [], gives: [], asks: [], messages: [] });
+  }
+
+  /** The walk's call of `stepId`'s writer for turn 2's "One isn't on the list yet", on the turn given (one walk). */
+  function callAt(
+    stepId: string,
+    turn: ReturnType<typeof turnWithWords> = turnWithWords(ONE_NEW, PACK_HIKES),
+  ): StepWriterCall<WalkTestRepo> {
+    const { part, context } = turn;
+    if (part.choice === null) throw new Error("the part names an offered choice");
+    return {
+      repo: context.repo,
+      step: graphStep(stepId),
+      part,
+      choice: part.choice,
+      writer: {
+        turn: context,
+        why: { step: "S1-02", choice: part.choice.branch },
+        zone: "America/New_York",
+        writerLane: "owner",
+        rowId: (kind) => `${kind}-${stepId.toLowerCase()}-sam-1`,
+        text: () => textSourceOf(context.request),
+      },
+    };
+  }
+
+  it("a one-kind 'One isn't on the list yet' walk's draft insert carries the pick's business, every other value as S1-03's writer gave it", async () => {
+    const walk = walkOf();
+    const { writes, context } = await answer(walk, ONE_NEW, PACK_HIKES);
+    const [, , pick, draft] = writes.state;
+    expect(pick).toMatchObject({
+      op: "insert",
+      table: "picked_kinds",
+      values: { id: "pick-s1-02-sam-1", company_id: SAM_COMPANY, business_id: SAM_BUSINESS },
+    });
+    expect(draft).toEqual({
+      op: "insert",
+      table: "new_work_drafts",
+      values: {
+        id: "draft-s1-03-sam-1",
+        picked_kind_id: "pick-s1-02-sam-1",
+        business_id: SAM_BUSINESS,
+        state: "drafting",
+        drafted_at: context.request.now,
+      },
+    });
+    // T-633's writer drafted it with no business (its default 9); the wrapper changed that one value.
+    const [drafted] = walk.seen.draftInner?.state ?? [];
+    if (drafted?.op !== "insert") throw new Error("S1-03's writer inserts the draft");
+    expect(drafted.values.business_id).toBeNull();
+    expect(draft).toEqual({ ...drafted, values: { ...drafted.values, business_id: SAM_BUSINESS } });
+    // S1-03's message to the owner goes back as its writer gave it; S1-04 is walked, S1-09 asked.
+    expect(walk.seen.draftWrapped?.messages).toBe(walk.seen.draftInner?.messages);
+    expect(writes.messages.map((row) => row.id)).toEqual([
+      "outbox-s1-03-sam-1",
+      "outbox-s1-08-sam-1",
+      "outbox-s1-09-sam-1",
+    ]);
+    expect(stepsAsked(writes)).toEqual(["S1-09"]);
+    const checks = contractChecks();
+    for (const write of writes.state) expect(checks.k05("stateWrite", write)).toEqual([]);
+    // The draft wrapper reads nothing: item 79 and item 72 once each, the S1-02 wrapper's, as before.
+    expect(walk.companies.asked.map((each) => each.read)).toEqual(["readPickedKinds", "readBusinessKinds"]);
+  });
+
+  it("a two-kind walk's drafts stay business_id null: a kind on file beside the drafted one, the very rows S1-03's writer answered", async () => {
+    const walk = walkOf({ picks: [earlierPick()] });
+    const { writes } = await answer(walk, ONE_NEW, PACK_HIKES);
+    expect(walk.seen.draftWrapped).toBe(walk.seen.draftInner);
+    expect(draftsOf(writes.state)).toEqual([["pick-s1-02-sam-1", null]]);
+    expect(stepsAsked(writes)).toEqual(["S1-04"]);
+    const { writes: unbound } = await answer(
+      walkOf({ picks: [earlierPick()], oneKind: false }),
+      ONE_NEW,
+      PACK_HIKES,
+    );
+    expect(writes).toEqual(unbound);
+  });
+
+  it("a two-kind walk's drafts stay business_id null: a listed kind and a drafted one in one answer", async () => {
+    const words = `Plumbing, ${PACK_HIKES}`;
+    const walk = walkOf();
+    const { writes } = await answer(walk, ONE_NEW, words);
+    expect(walk.seen.draftWrapped).toBe(walk.seen.draftInner);
+    expect(draftsOf(writes.state)).toEqual([["pick-s1-02-sam-2", null]]);
+    expect(
+      writes.state.flatMap((write) =>
+        write.op === "insert" && write.table === "picked_kinds" ? [write.values.business_id] : [],
+      ),
+    ).toEqual([null, null]);
+    expect(stepsAsked(writes)).toEqual(["S1-04"]);
+    const { writes: unbound } = await answer(walkOf({ oneKind: false }), ONE_NEW, words);
+    expect(writes).toEqual(unbound);
+  });
+
+  it("no placement (a walk with no one-kind wrapper, or an instance whose wrapper placed nothing for the walk): S1-03's rows byte for byte", async () => {
+    const walk = walkOf({ draftOnly: true });
+    const { writes } = await answer(walk, ONE_NEW, PACK_HIKES);
+    expect(walk.seen.draftWrapped).toBe(walk.seen.draftInner);
+    expect(draftsOf(writes.state)).toEqual([["pick-s1-02-sam-1", null]]);
+    expect(stepsAsked(writes)).toEqual(["S1-04"]);
+    const { writes: unbound } = await answer(walkOf({ oneKind: false }), ONE_NEW, PACK_HIKES);
+    expect(writes).toEqual(unbound);
+    expect(walk.companies.asked).toEqual([]);
+    // Called alone, with no S1-02 call on the instance for that turn: the very object S1-03's writer answered.
+    const rows: StepRows = {
+      state: [draftRow(1, "pick-s1-02-sam-1", null)],
+      stateEvents: [],
+      gives: [],
+      asks: [],
+      messages: [],
+    };
+    const fresh = createOneKind<WalkTestRepo>({ reads: companiesReadsOf(fakeCompaniesK05().k05) });
+    expect(await fresh.wrapDraft(() => Promise.resolve(rows))(callAt("S1-03"))).toBe(rows);
+  });
+
+  it("only the placed pick's draft takes the business: a draft for another pick goes back as given, one already under the business keeps it", async () => {
+    const other = draftRow(2, "pick-sam-other", null);
+    const walk = walkOf({
+      s1_03: draftsStandIn([draftRow(1, "pick-s1-02-sam-1", null), other]),
+    });
+    const { writes } = await answer(walk, ONE_NEW, PACK_HIKES);
+    expect(draftsOf(writes.state)).toEqual([
+      ["pick-s1-02-sam-1", SAM_BUSINESS],
+      ["pick-sam-other", null],
+    ]);
+    expect(walk.seen.draftWrapped?.state[1]).toBe(other);
+    const already = walkOf({ s1_03: draftsStandIn([draftRow(1, "pick-s1-02-sam-1", SAM_BUSINESS)]) });
+    const { writes: kept } = await answer(already, ONE_NEW, PACK_HIKES);
+    expect(draftsOf(kept.state)).toEqual([["pick-s1-02-sam-1", SAM_BUSINESS]]);
+  });
+
+  it("draftElsewhere: a draft for the placed pick naming another business is refused, and the walk writes nothing", async () => {
+    const walk = walkOf({
+      s1_03: draftsStandIn([draftRow(1, "pick-s1-02-sam-1", "biz-lee-home-services")]),
+    });
+    const thrown = await refusal(walk, ONE_NEW, PACK_HIKES);
+    expect(faultOf(thrown)).toBe("draftElsewhere");
+    expect((thrown as CompaniesRefusedError).ids).toEqual(["S1-03"]);
+  });
+
+  it("draftElsewhere: a draft for a pick placed under another business than the call's is refused, nothing returned", async () => {
+    const oneKind = createOneKind<WalkTestRepo>({ reads: companiesReadsOf(fakeCompaniesK05().k05) });
+    const turn = turnWithWords(ONE_NEW, PACK_HIKES);
+    const pick = standInPick({
+      id: "pick-a",
+      outcome: "new_work",
+      kind_id: "new-aaaaaaaaaaaaaaaa",
+      words: PACK_HIKES,
+    });
+    const placed = await oneKind.wrap(standIn([pick]))(callAt("S1-02", turn));
+    expect(
+      placed.state.map((write) => [write.table, write.op === "insert" ? write.values.business_id : null]),
+    ).toEqual([
+      ["company_kinds", SAM_BUSINESS],
+      ["picked_kinds", SAM_BUSINESS],
+    ]);
+    const s1_03 = oneKind.wrapDraft(draftsStandIn([draftRow(1, "pick-a", null)]));
+    const drafted = await s1_03(callAt("S1-03", turn));
+    expect(draftsOf(drafted.state)).toEqual([["pick-a", SAM_BUSINESS]]);
+    // The same walk's S1-03 call now under another business than the one the pick was placed under.
+    (turn.context as { businessId: string }).businessId = "biz-lee-home-services";
+    const thrown = await s1_03(callAt("S1-03", turn)).then(
+      () => null,
+      (error: unknown) => error,
+    );
+    expect(faultOf(thrown)).toBe("draftElsewhere");
+  });
+
+  it("wrongStep: the draft wrapper's writer called for another step than S1-03, before S1-03's writer runs", async () => {
+    const oneKind = createOneKind<WalkTestRepo>({ reads: companiesReadsOf(fakeCompaniesK05().k05) });
+    let called = false;
+    const inner: StepWriter<WalkTestRepo> = (call) => {
+      called = true;
+      return draftsStandIn([])(call);
+    };
+    const thrown = await oneKind
+      .wrapDraft(inner)(callAt("S1-02"))
+      .then(
+        () => null,
+        (error: unknown) => error,
+      );
+    expect(faultOf(thrown)).toBe("wrongStep");
+    expect((thrown as CompaniesRefusedError).ids).toEqual(["S1-03", "S1-02"]);
+    expect(called).toBe(false);
   });
 });

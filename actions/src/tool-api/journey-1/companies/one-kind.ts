@@ -17,6 +17,16 @@
 //             the version it was read at (with its text, draft and block rows, which gain the same business). Two or
 //             more: "ask", and the walk asks S1-04 as today. None: refused. The recount and the wrapper's placement
 //             disagreeing refuses, with nothing written.
+//   wrapDraft a wrapper around T-633's S1-03 writer (T-1520; DL-1056, DL-1076; T-1492's handoff), bound beside `wrap`
+//             from the same instance (turn-face/commit.ts signUpSteps: oneKind.wrapDraft(kindsWriters["S1-03"])). On
+//             "One isn't on the list yet" the walk reaches S1-03 after S1-02, and T-633's writer drafts the new_work pick
+//             with no business, written when a pick never had one (kinds/writers.ts default 9). When `wrap` placed this
+//             walk's one pick, each draft S1-03's rows insert for that pick takes the pick's business_id, so
+//             new_work_drafts_pick_business_fk holds it to its pick's (K-24 v1), and item 79, which joins a draft to its
+//             pick under the same business_id (db/repo/kinds-reads.ts, K-05 v1.19 default 180), answers the draft beside
+//             its pick, for the review item and the checklist that read it. Any other row goes back unchanged; with no
+//             placement remembered for the walk and part (two or more kinds, or a walk with no one-kind wrapper), S1-03's
+//             rows go back as the very object its writer answered.
 //
 // How the pick takes its company in the same commit. The company itself is on file (the turn's company: default 182, the
 // caller's person's own company whose business is the call's business), so no companies row is written. The commit locks
@@ -60,6 +70,24 @@
 //       bound through the wrapper wherever the settler is bound, as T-634's S1-11 writer needs its `kinds` wrapper.
 //   O7. Item 79 is asked for the call's business and the turn's person (CommitTurnContext.businessId and the request's
 //       caller), never a request value; a pick the walk's rows insert for another person is refused (notOwnPick).
+//   O8. (T-1520) The draft wrapper changes only a new_work_drafts insert whose picked_kind_id is the pick `wrap` placed
+//       for the same walk and part: its business_id becomes the business that pick was placed under (the call's), every
+//       other value as S1-03's writer gave it. T-633's default 9 ("The draft has no business, as its pick") is superseded
+//       for this one-kind case alone: the draft still takes its pick's business, which here is the call's. With no
+//       placement the draft keeps no business, as its pick, exactly as default 9 says. Its review item is not this
+//       card's: newWorkReviewPlan (the checklist card's) still names no business (default 9's second half), and T-319's
+//       write-back check (domain/paging/review.ts default 29) checks nothing when neither the call nor the item names one.
+//   O9. No placement remembered for the walk and part (S1-02's writer was not called through this instance's `wrap` in
+//       the walk: a binding that binds the draft wrapper without it), or one that placed nothing (two or more kinds
+//       counted, or no kept pick inserted): S1-03's rows go back as the very object its writer answered. A placement
+//       whose pick no draft row names gives the same.
+//   O10. A draft insert for the placed pick that would land under another business than the call's is refused
+//       (draftElsewhere), never moved: the placement's business is not the call's (CommitTurnContext.businessId of the
+//       S1-03 call), or the insert already names a business other than the placement's. One that names the placement's
+//       own business already is kept with it.
+//   O11. The draft wrapper reads nothing (the placement is this instance's memory of the walk, never a K-05 read) and
+//       logs nothing; it calls S1-03's writer first, so its own refusals (notAnswered, the stop home's notBuilt) leave as
+//       thrown, and S1-03's messages and every other list go back as its writer gave them.
 
 import type { ReadPickedKindsResponse, PickedKindRead } from "../../../../../db/repo/kinds-reads";
 import type { ReadBusinessKindsResponse } from "../../../../../db/repo/catalog-reads";
@@ -78,6 +106,12 @@ import {
 /** The step whose writer the wrapper wraps (S1-02 gives kinds). */
 export const S1_02 = "S1-02";
 
+/** The step whose writer the draft wrapper wraps (S1-03 drafts new work; T-1520). */
+export const S1_03 = "S1-03";
+
+/** K-24 v1's table of new-work drafts, the rows S1-03's writer inserts. */
+const NEW_WORK_DRAFTS = "new_work_drafts";
+
 /** The step the settler settles (S1-04 gives companies; K-01 v1 step.gives). */
 export const S1_04 = "S1-04";
 
@@ -90,10 +124,18 @@ export interface OneKindDeps<Repo = unknown> {
   readonly reads: CompaniesReads<Repo>;
 }
 
-/** The wrapper around S1-02's writer and S1-04's buttons settler, from one createOneKind instance per binding. */
+/**
+ * The wrapper around S1-02's writer, S1-04's buttons settler and the wrapper around S1-03's writer, from one createOneKind
+ * instance per binding.
+ */
 export interface OneKind<Repo = unknown> {
   /** S1-02's writer (T-633's), wrapped: the one kept pick placed on its own insert; any other count, rows unchanged. */
   readonly wrap: (writer: StepWriter<Repo>) => StepWriter<Repo>;
+  /**
+   * S1-03's writer (T-633's), wrapped (T-1520): each draft for the pick `wrap` placed in this walk takes that pick's
+   * business; any other row unchanged; with no placement, S1-03's rows as its writer answered them.
+   */
+  readonly wrapDraft: (writer: StepWriter<Repo>) => StepWriter<Repo>;
   /** S1-04's buttons settler: rows that give companies for one kept kind, "ask" for two or more, refused for none. */
   readonly settler: ButtonsSettler<Repo>;
   /** The buttons settlers by step id for WalkDeps.buttonsSettlers: S1-04's settler, and none at any other step. */
@@ -134,6 +176,8 @@ interface Placed {
   readonly pickId: string;
   readonly kindId: string;
   readonly companyId: string;
+  /** The business it placed the pick under: the call's (CommitTurnContext.businessId of S1-02's call). */
+  readonly businessId: string;
   /** Whether it put the kind's company_kinds insert before the pick's (false: item 72 showed it on file). */
   readonly companyKind: boolean;
 }
@@ -391,9 +435,34 @@ function checkPlaced(
 }
 
 /**
- * The one-kind wrapper and S1-04's one-kind settler over `deps` (the top of this file), sharing one walk's reads and
- * placement. Each reads only through `deps.reads`; what it throws (CompaniesRefusedError, CompaniesReadError, or the
- * wrapped writer's own refusal) fails the call closed with nothing written.
+ * S1-03's `state` with each new_work_drafts insert for the placed pick given the business that pick was placed under
+ * (default O8), every other row the very object given; refused (draftElsewhere; default O10) when such an insert would
+ * land under another business than the call's `businessId`. Null when no insert is for the placed pick (default O9).
+ */
+function draftsPlaced(state: readonly StateWrite[], placed: Placed, businessId: string): StateWrite[] | null {
+  const draftOfPick = (write: StateWrite): boolean =>
+    write.op === "insert" && write.table === NEW_WORK_DRAFTS && write.values.picked_kind_id === placed.pickId;
+  if (!state.some(draftOfPick)) return null;
+  return state.map((write): StateWrite => {
+    if (write.op !== "insert" || !draftOfPick(write)) return write;
+    const named = write.values.business_id;
+    const elsewhere = named !== undefined && named !== null && named !== placed.businessId;
+    if (placed.businessId !== businessId || elsewhere) {
+      throw new CompaniesRefusedError("draftElsewhere", [S1_03]);
+    }
+    return {
+      op: "insert",
+      table: NEW_WORK_DRAFTS,
+      values: { ...write.values, business_id: placed.businessId },
+    };
+  });
+}
+
+/**
+ * The one-kind wrapper, S1-04's one-kind settler and the draft wrapper over `deps` (the top of this file), sharing one
+ * walk's reads and placement. Each reads only through `deps.reads` (the draft wrapper reads nothing); what it throws
+ * (CompaniesRefusedError, CompaniesReadError, or the wrapped writer's own refusal) fails the call closed with nothing
+ * written.
  */
 export function createOneKind<Repo = unknown>(deps: OneKindDeps<Repo>): OneKind<Repo> {
   const { reads } = deps;
@@ -484,6 +553,7 @@ export function createOneKind<Repo = unknown>(deps: OneKindDeps<Repo>): OneKind<
           pickId: only.id,
           kindId: only.kindId,
           companyId: company.id,
+          businessId: turn.businessId,
           companyKind: companyKind !== null,
         },
       });
@@ -541,5 +611,20 @@ export function createOneKind<Repo = unknown>(deps: OneKindDeps<Repo>): OneKind<
 
   const buttonsSettlers: ButtonsSettlers<Repo> = (stepId) => (stepId === S1_04 ? settler : null);
 
-  return { wrap, settler, buttonsSettlers };
+  const wrapDraft =
+    (writer: StepWriter<Repo>): StepWriter<Repo> =>
+    async (call) => {
+      if (call.step.id !== S1_03) throw new CompaniesRefusedError("wrongStep", [S1_03, call.step.id]);
+      const rows = await writer(call);
+      const { turn } = call.writer;
+      // Default O9: no placement remembered for this walk and part, or one that placed nothing: the rows as answered.
+      const placed = placements.get(turn)?.get(call.part.index)?.placed ?? null;
+      if (placed === null) return rows;
+      const state = draftsPlaced(rows.state, placed, turn.businessId);
+      if (state === null) return rows;
+      const drafted: StepRows = { ...rows, state };
+      return drafted;
+    };
+
+  return { wrap, settler, buttonsSettlers, wrapDraft };
 }

@@ -1,6 +1,6 @@
-// What journey 1's companies folder throws (T-1492; T-1481). Each message names a read, a step, a fault or a code: never
-// the owner's words, an id, a number, a K-05 answer or the turn's chat id (K-08 v1 README line 75; DL-935: never log a
-// read's answer raw). A throw inside a step writer or a buttons settler fails the call closed with nothing written (the
+// What journey 1's companies folder throws (T-1492; T-1481; T-1520). Each message names a read, a step, a fault or a code:
+// never the owner's words, an id, a number, a K-05 answer or the turn's chat id (K-08 v1 README line 75; DL-935: never log
+// a read's answer raw). A throw inside a step writer or a buttons settler fails the call closed with nothing written (the
 // walk: actions/src/commit/walk/writes.ts and buttons.ts; the Tool API base rolls the call's transaction back).
 
 import type { NotFoundError, TransientError } from "../../../../../db/repo/targets";
@@ -61,6 +61,11 @@ export class CompaniesReadError extends Error {
  *     without the wrapper, or S1-04 reached by a walk that did not walk S1-02);
  *   - placementDisagrees: the settler's recount and the wrapper's placement disagree (another count, another pick, or the
  *     rows built no longer hold the placed insert and its company kind as the wrapper left them).
+ * And why the draft wrapper refused (T-1520; one-kind.ts wrapDraft), beside wrongStep (its writer called for another step
+ * than S1-03):
+ *   - draftElsewhere: a new_work_drafts insert S1-03's rows give for the pick the one-kind wrapper placed in this walk
+ *     would land under another business than the call's: that pick was placed under another business than the call's, or
+ *     the insert already names another business than the pick's.
  * And why S1-04's writer refused (T-1481; K-09 README defaults 182 to 184 and 190), beside wrongStep, noPerson, noKeptPick,
  * noTurnCompany and twoPicksOneKind above, which it shares (its wrongStep: called for another step than S1-04):
  *   - unknownBranch: the choice's branch is none of S1-04's three buttons, word for word;
@@ -84,6 +89,7 @@ export type CompaniesFault =
   | "placedElsewhere"
   | "notPlaced"
   | "placementDisagrees"
+  | "draftElsewhere"
   | "unknownBranch"
   | "noSharedKinds"
   | "secondSharedGroup"
@@ -93,7 +99,10 @@ export type CompaniesFault =
   | "alreadyPlaced"
   | "secondCompany";
 
-/** The one-kind wrapper or settler, or S1-04's writer, refused: the whole call is refused and nothing is written. */
+/**
+ * The one-kind wrapper, settler or draft wrapper, or S1-04's writer, refused: the whole call is refused and nothing is
+ * written.
+ */
 export class CompaniesRefusedError extends Error {
   override name = "CompaniesRefusedError";
   readonly fault: CompaniesFault;

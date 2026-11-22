@@ -11,6 +11,11 @@
 // helpers T-1481's S1-04 writer reuses are exported here too: turnCompanyOf, companyKindOnFile, companyKindInsert and
 // draftedDefaults.
 //
+// T-1520 (DL-1056, DL-1076; T-1492's handoff) adds `wrapDraft` to the same instance: a wrapper around T-633's S1-03
+// writer, so on a one-kind "One isn't on the list yet" the draft takes the business its one pick was placed under, and
+// item 79 answers it beside its pick. The turn face binds S1-03 as oneKind.wrapDraft(kindsWriters["S1-03"]) beside the
+// S1-02 binding, only where the one-kind path is bound.
+//
 // T-1481 (T-634 part 2a; K-09 README defaults 182 to 184 and 190; card 12 of the S1-04 design ruling) builds S1-04's
 // read-only step writer for an answered S1-04 (default 181's walk): companiesWriter (writer.ts), a StepWriter that places
 // the caller's person's kept picks in the groups "Some share one", "All share one" or "Each is its own" gives, reading
@@ -32,6 +37,7 @@ export {
 export {
   COMPANIES,
   S1_02,
+  S1_03,
   S1_04,
   companyKindInsert,
   createOneKind,
