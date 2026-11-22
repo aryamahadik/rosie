@@ -29,7 +29,8 @@
 //   4. what the schema leaves to the test (README "Producers and consumers", its "Contract test" line; "Opening hours"),
 //      read from the fixtures, each also run on a damaged copy the schema still accepts, to show that it fires: each
 //      opening-hours span opens before it closes, in day and time order, and no two spans of a day overlap; a found
-//      listing's reference is the one asked; each candidate is listed once and is its own listing's fields; a span's got
+//      listing's reference is the one asked; candidates come best first (schema search.found: the provider's order, so
+//      part 5 compares the double's answers in order); each candidate is its own listing's fields; a span's got
 //      and decided are its exchange's (candidates the number of candidates, listing the first one's reference, photos
 //      the number of photos; an error's code and no decided); the error fixtures share their requests with answer
 //      fixtures; span-search.json is K-08 v1's span-places-call.json; no span holds a name, address, phone, website,
@@ -39,14 +40,15 @@
 //      and each error the schema defines), then the answer again; noMatch for any other search and notFound for any
 //      other reference; never a rating, a review or another field the port never gives, nor a refused fixture's outcome;
 //      one span per call, which search.span or details.span accepts and whose got and decided are its call's, rebuilding
-//      the span fixtures from their traces; no console line, and no span log line holding a name, address, phone,
-//      website, category, town, photo text or photo credit. Each check is shown firing on a damaged double.
+//      the span fixtures from their traces; no console line and no span log line holding a name, address, phone,
+//      website, category, town, photo text or photo credit (a line of ids and outcomes passes, ADR-0009:17). Each check
+//      is shown firing on a damaged double.
 //   Not here (SIDE_CHECKS): the real adapter's side (T-435, after J-16: recorded vendor samples), and the consumers'
 //   sides (T-635a's lookup and setup steps, C-187's registration screens, C-120's photo text).
 
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { isDeepStrictEqual } from "node:util";
+import { inspect, isDeepStrictEqual } from "node:util";
 
 import type { ValidateFunction } from "ajv";
 import Ajv2020 from "ajv/dist/2020.js";
@@ -599,7 +601,7 @@ export function checkHours(hours: readonly HoursSpan[] | null): string[] {
   return problems;
 }
 
-/** One exchange: a found listing's reference is the one asked, with its hours as above; each candidate listed once. */
+/** One exchange: a found listing's reference is the one asked, with its hours as above. */
 export function checkExchange(exchange: Exchange): string[] {
   const problems: string[] = [];
   const listing = listingOf(exchange.outcome);
@@ -608,9 +610,6 @@ export function checkExchange(exchange: Exchange): string[] {
       problems.push(`details of ${exchange.request.listingRef} found the listing ${listing.listingRef}`);
     problems.push(...checkHours(listing.openingHours));
   }
-  const refs = candidatesOf(exchange.outcome).map((candidate) => candidate.listingRef);
-  for (const ref of new Set(refs.filter((candidate, k) => refs.indexOf(candidate) !== k)))
-    problems.push(`the listing ${ref} is a candidate more than once`);
   return problems;
 }
 
@@ -1087,9 +1086,25 @@ export async function checkDoubleNever(make: MakeDouble): Promise<string[]> {
 const LOG = { level: "info", environment: "staging", version: "test-sha" } as const;
 
 /**
+ * What one console call prints, each argument in full: a string as it is, any other value whole (ADR-0009:17: a log
+ * line is an object passed to console.log), so a word nested deep in it is still seen.
+ */
+function printed(args: readonly unknown[]): string {
+  return args
+    .map((arg) =>
+      typeof arg === "string"
+        ? arg
+        : inspect(arg, { depth: null, maxArrayLength: null, maxStringLength: null, breakLength: Infinity }),
+    )
+    .join(" ");
+}
+
+/**
  * README "Spans" and "No name, address, phone or words in a span or log": each call writes one span, which search.span
- * or details.span accepts and whose got and decided are its call's; the double writes no console line, and no span's
- * log line holds a name, address, phone, website, category, town, photo text or photo credit.
+ * or details.span accepts and whose got and decided are its call's; no console line the double writes, and no span's
+ * log line, holds a name, address, phone, website, category, town, photo text or photo credit (README "Contract test":
+ * "no log line holds a name, address, phone, town, photo text or photo credit"; a line of ids and outcomes is allowed,
+ * ADR-0009:17).
  */
 export async function checkDoubleSpans(make: MakeDouble): Promise<string[]> {
   const problems: string[] = [];
@@ -1140,8 +1155,11 @@ export async function checkDoubleSpans(make: MakeDouble): Promise<string[]> {
     }
     for (const line of checkWords(written.join("\n"), wordsOf(asked)))
       problems.push(`a span log line ${line}`);
-    const lines = spies.reduce((sum, spy) => sum + spy.mock.calls.length, 0);
-    if (lines > 0) problems.push(`the double wrote ${String(lines)} console line(s)`);
+    const consoleLines = spies.flatMap((spy) =>
+      spy.mock.calls.map((args: readonly unknown[]) => printed(args)),
+    );
+    for (const line of checkWords(consoleLines.join("\n"), wordsOf(asked)))
+      problems.push(`a console line ${line}`);
   } finally {
     for (const spy of spies) spy.mockRestore();
   }
@@ -1451,7 +1469,7 @@ describe("port-places.v1 fixtures: removing a required field, or adding an unkno
 // 4. What the schema leaves to the test, read from the fixtures
 
 describe("port-places.v1 fixtures: what the schema leaves to the test", () => {
-  it("holds for every accepted exchange fixture: hours in order with no overlap, the listing asked, each candidate once", () => {
+  it("holds for every accepted exchange fixture: hours in order with no overlap, the listing asked", () => {
     const files = acceptedEntries.filter((entry) => defIs(entry, ".exchange")).map((entry) => entry.file);
     expect(files.length).toBeGreaterThan(0);
     for (const file of files) expect(checkExchange(exchangeOf(file)), file).toEqual([]);
@@ -1550,19 +1568,12 @@ describe("port-places.v1 fixtures: what the schema leaves to the test", () => {
     expect(checkExchange(touching)).toEqual([]);
   });
 
-  it("fires on damaged copies the schema still accepts: another listing found, a candidate twice or not its listing", () => {
+  it("fires on damaged copies the schema still accepts: another listing found, a candidate not its listing", () => {
     const other = exchangeOf("details.json");
     setAt(other, ["request", "listingRef"], "places-demo-yoga-studio");
     expect(v1Def("details.exchange")(other)).toBe(true);
     expect(checkExchange(other)).toEqual([
       "details of places-demo-yoga-studio found the listing places-demo-lees-barbershop",
-    ]);
-    const twice = exchangeOf("search-by-name.json");
-    const candidates = getAt(twice, ["outcome", "candidates"]) as unknown[];
-    candidates.push(structuredClone(candidates[0]));
-    expect(v1Def("search.exchange")(twice)).toBe(true);
-    expect(checkExchange(twice)).toEqual([
-      "the listing places-demo-lees-barbershop is a candidate more than once",
     ]);
     const renamed = exchangeOf("search-yoga-studio.json");
     setAt(renamed, ["outcome", "candidates", 0, "website"], null);
@@ -1688,7 +1699,7 @@ describe("port-places.v1 producer side: the Places double", () => {
     expect(await checkDoubleNever(makeDouble)).toEqual([]);
   });
 
-  it("writes one span per call that its def accepts, with its call's got and decided, and no console or span line holds words", async () => {
+  it("writes one span per call that its def accepts, with its call's got and decided, and no console line or span line holds words", async () => {
     expect(await checkDoubleSpans(makeDouble)).toEqual([]);
   });
 
@@ -1751,7 +1762,7 @@ describe("port-places.v1 producer side: the Places double", () => {
     expect(lines).toContain("badRequest set before a details: the call did not return it");
   });
 
-  it("fires on a double whose spans miscount the candidates, or that writes a console line", async () => {
+  it("fires on a double whose spans miscount the candidates, or whose console line holds words, not one of ids and outcomes", async () => {
     const miscounting = damaged((real) => ({
       spans: () =>
         real.spans().map((span) => {
@@ -1773,9 +1784,32 @@ describe("port-places.v1 producer side: the Places double", () => {
         return real.search(request, call);
       },
     }));
-    expect(
-      (await checkDoubleSpans(chatty)).filter((line) => /^the double wrote \d+ console line/.test(line)),
-    ).toHaveLength(1);
+    const chattyLines = await checkDoubleSpans(chatty);
+    expect(chattyLines.length).toBeGreaterThan(0);
+    for (const line of chattyLines) expect(line).toMatch(/^a console line holds "/);
+    expect(chattyLines).toContain('a console line holds "Springfield"');
+    // The words are found in an object passed to console, however deep (Node's own print stops at depth 2).
+    const nested = damaged((real) => ({
+      search: (request, call) => {
+        console.error({ msg: "places search", a: { b: { c: { request } } } });
+        return real.search(request, call);
+      },
+    }));
+    expect(await checkDoubleSpans(nested)).toContain('a console line holds "Springfield"');
+    // A console line of ids and outcomes only, as ADR-0009:17 allows, passes, though it is an object with one inside.
+    const plain = damaged((real) => ({
+      search: async (request, call) => {
+        const outcome = await real.search(request, call);
+        console.log({
+          level: "info",
+          msg: "places search",
+          step: call?.step ?? null,
+          outcome: { call: "search", result: "result" in outcome ? outcome.result : outcome.error },
+        });
+        return outcome;
+      },
+    }));
+    expect(await checkDoubleSpans(plain)).toEqual([]);
   });
 });
 
