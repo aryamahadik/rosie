@@ -2,9 +2,52 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 891, [`2e6b60f8`](https://github.com/aryamahadik/rosie/commit/2e6b60f8), 2026-11-22 15:26:34 UTC.
+- **Through:** commit 893, [`4d3257bc`](https://github.com/aryamahadik/rosie/commit/4d3257bc), 2026-11-22 16:31:01 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 893. docs: COMMIT\_HISTORY.md through commit 891 (2e6b60f8, \#908) (\#910)
+
+- **Commit:** [`4d3257bc`](https://github.com/aryamahadik/rosie/commit/4d3257bc), by Arya Mahadik, 2026-11-22 16:31:01 UTC
+- **Pull request:** [#910](https://github.com/aryamahadik/rosie/pull/910) from `task/commit-history-229`, merged 2026-11-22 16:31:01 UTC. It squashed 1 branch commit:
+  - `f1b6b66` docs: COMMIT\_HISTORY.md through commit 891 (2e6b60f8, \#908)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 892. T-1530: K-09 README defaults 209-215, S1-10 at the walk (the wait, the writer, the secure link, staging's openLink, the honest page) and S1-77 on bundle v3 (DL-1143, DL-1149) (\#909)
+
+- **Commit:** [`12b95228`](https://github.com/aryamahadik/rosie/commit/12b95228), by Arya Mahadik, 2026-11-22 16:30:57 UTC
+- **Pull request:** [#909](https://github.com/aryamahadik/rosie/pull/909) from `task/T-1530`, merged 2026-11-22 16:30:57 UTC. It squashed 2 branch commits:
+  - `5904b86` T-1530: K-09 README defaults 209-215 and open gaps 194-203: S1-10 at …
+  - `e6f8a90` T-1530: round 2 (DL-1149): default 212 (3) names the read of S1-10's …
+- **Files changed:** 1 (+48 −3), by folder:
+  - `contracts/tool-api/` README.md +48 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1530: K-09 README defaults 209-215 and open gaps 194-203: S1-10 at the walk (a walked step whose gives hold id_checked ends the walk after its own rows, no question, no clock; S1-10's writer takes the chat's number as the mobile, one text with a secure link, never id_checked, a helper's own sign-in alone), the secure link (32-hex code, page_links row, 7 days, handed to the slot filler in the turn face's memory), staging's openLink (made form first), the honest page, S1-77 on bundle v3 (the walk must ask it; a K-01 minor version owed; refused meanwhile) and S1-75's control item carrying the claim (DL-1125, DL-1143)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1530: round 2 (DL-1149): default 212 (3) names the read of S1-10's keys on this slice (all of S1-10's gives, id_checked included; the link person's id_uploads sign_up row on the runtime side, then accounts' proven mobile; readSetup not built, so staging binds the port to not given until open gap 201's read is frozen), openLink's connection rule (one client at a time, 2 at most, no gate slot), open gap 201 adds the keys read, step (5)'s business-name read and S10-3's accounts reads on the runtime side, and default 210 quotes S1-10's line 2 whole as bundle v3's say[4] carries it
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 891. docs: COMMIT\_HISTORY.md through commit 889 (8fdd2876, \#906) (\#908)
 
