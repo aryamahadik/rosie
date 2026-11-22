@@ -436,3 +436,130 @@ describe("wrangler.jsonc HandleActor binding", () => {
     assert.throws(brokenCopy((c) => c.env.staging.migrations.pop()));
   });
 });
+
+// Workers Logs never store a request URL (T-1527; T-512's security note; DL-1130): a signed link's path is its code
+// (A4-42), the sign-in offer carries it in ?link=<code> (T-520), and a link's code never enters a log (K-21
+// README:168). Observability stays on for the Worker's own console lines, stored (D-000 reads them by trace id), with
+// no invocation log (logs.invocation_logs false: Cloudflare's per-request log, which stores the URL), query strings
+// redacted from any URL still kept, and no traces (a span holds the URL too). wrangler passes observability down whole
+// (wrangler-dist's inheritable()): an environment with no block of its own gets the top level's, and one with its own
+// gets that block alone, never merged. So each section is checked on the block wrangler deploys for it.
+const SECTIONS = [
+  ["the top level", (c) => c],
+  ["env.staging", (c) => c.env.staging],
+  ["env.production", (c) => c.env.production],
+];
+
+/** The observability block wrangler deploys for a section: its own when it sets one, else the top level's. */
+const observabilityOf = (cfg, section) =>
+  section === cfg ? cfg.observability : (section.observability ?? cfg.observability);
+
+function checkObservability(cfg) {
+  for (const [where, pick] of SECTIONS) {
+    const o = observabilityOf(cfg, pick(cfg));
+    assert.equal(o?.enabled, true, `${where} keeps observability on`);
+    assert.equal(o.logs?.enabled, true, `${where} keeps its own console lines`);
+    assert.notEqual(o.logs.persist, false, `${where} stores its own console lines`);
+    assert.equal(o.logs.invocation_logs, false, `${where} stores no invocation log`);
+    assert.equal(o.redact_query_string, true, `${where} redacts query strings`);
+    assert.notEqual(o.traces?.enabled, true, `${where} turns on no traces`);
+  }
+}
+
+describe("wrangler.jsonc Workers Logs store no request URL (T-1527)", () => {
+  it("keeps observability on with invocation_logs false and redact_query_string true, at the top level and as env.staging and env.production get it", () => {
+    checkObservability(config);
+    assert.deepEqual(config.observability, {
+      enabled: true,
+      redact_query_string: true,
+      logs: { enabled: true, invocation_logs: false },
+    });
+    // Neither environment sets its own block, so each gets the top level's whole (wrangler's inheritable()).
+    assert.equal(config.env.staging.observability, undefined);
+    assert.equal(config.env.production.observability, undefined);
+  });
+
+  it("says why in place, in the comment right above the one observability block: K-21 README:168 and DL-1130", () => {
+    assert.equal(raw.split('"observability"').length - 1, 1, "wrangler.jsonc has one observability block");
+    const lines = raw.split("\n");
+    const at = lines.findIndex((line) => /^\s*"observability": \{$/.test(line));
+    let start = at;
+    while (start > 0 && /^\s*\/\//.test(lines[start - 1])) start--;
+    const comment = lines.slice(start, at).join(" ");
+    for (const says of ["K-21 README:168", "DL-1130", "T-1527", "invocation_logs", "redact_query_string"]) {
+      assert.ok(comment.includes(says), `the comment above observability names ${says}`);
+    }
+  });
+
+  it("accepts an in-memory copy whose env.staging sets its own block with both keys", () => {
+    const copy = structuredClone(config);
+    copy.env.staging.observability = structuredClone(config.observability);
+    checkObservability(copy);
+  });
+
+  it("rejects an in-memory copy that stores invocation logs, keeps query strings, turns on traces or turns logs off, in any section", () => {
+    const broken = (change) => {
+      const copy = structuredClone(config);
+      change(copy);
+      return () => checkObservability(copy);
+    };
+    for (const [where, pick] of SECTIONS) {
+      const own = (change) =>
+        broken((c) => {
+          const section = pick(c);
+          section.observability = structuredClone(c.observability);
+          change(section.observability);
+        });
+      // An assertion's error reads "AssertionError [ERR_ASSERTION]: <message>" on its first line, and the message is
+      // the check's alone.
+      const at = (what) => new RegExp(`: ${where.replace(".", "\\.")} ${what}$`, "m");
+      assert.throws(
+        own((o) => (o.logs.invocation_logs = true)),
+        at("stores no invocation log"),
+      );
+      assert.throws(
+        own((o) => delete o.logs.invocation_logs),
+        at("stores no invocation log"),
+      );
+      assert.throws(
+        own((o) => (o.redact_query_string = false)),
+        at("redacts query strings"),
+      );
+      assert.throws(
+        own((o) => delete o.redact_query_string),
+        at("redacts query strings"),
+      );
+      assert.throws(
+        own((o) => (o.traces = { enabled: true })),
+        at("turns on no traces"),
+      );
+      assert.throws(
+        own((o) => (o.logs.persist = false)),
+        at("stores its own console lines"),
+      );
+      assert.throws(
+        own((o) => (o.logs.enabled = false)),
+        at("keeps its own console lines"),
+      );
+      assert.throws(
+        own((o) => (o.enabled = false)),
+        at("keeps observability on"),
+      );
+    }
+    // The block as it was before T-1527, `enabled` alone, which stores an invocation log per request.
+    assert.throws(
+      broken((c) => (c.observability = { enabled: true })),
+      /: the top level keeps its own console lines$/m,
+    );
+    // An environment's own block replaces the top level's whole: one with only `enabled` drops both keys.
+    assert.throws(
+      broken((c) => (c.env.staging.observability = { enabled: true })),
+      /: env\.staging keeps its own console lines$/m,
+    );
+    // With no block anywhere, the top level fails first.
+    assert.throws(
+      broken((c) => delete c.observability),
+      /: the top level keeps observability on$/m,
+    );
+  });
+});
