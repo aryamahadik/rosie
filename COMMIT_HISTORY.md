@@ -2,9 +2,82 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 893, [`4d3257bc`](https://github.com/aryamahadik/rosie/commit/4d3257bc), 2026-11-22 16:31:01 UTC.
+- **Through:** commit 896, [`a1b1731a`](https://github.com/aryamahadik/rosie/commit/a1b1731a), 2026-11-22 17:21:46 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 896. docs: COMMIT\_HISTORY.md through commit 893 (4d3257bc, \#910) (\#913)
+
+- **Commit:** [`a1b1731a`](https://github.com/aryamahadik/rosie/commit/a1b1731a), by Arya Mahadik, 2026-11-22 17:21:46 UTC
+- **Pull request:** [#913](https://github.com/aryamahadik/rosie/pull/913) from `task/commit-history-230`, merged 2026-11-22 17:21:47 UTC. It squashed 1 branch commit:
+  - `4d6bec6` docs: COMMIT\_HISTORY.md through commit 893 (4d3257bc, \#910)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 895. T-1531: K-05 v1.23, parkTurn takes tries 1-3, a final refusal's reason, the parked\_turns row and the passedOn line (DL-1144, DL-1148) (\#912)
+
+- **Commit:** [`ab4235eb`](https://github.com/aryamahadik/rosie/commit/ab4235eb), by Arya Mahadik, 2026-11-22 17:21:43 UTC
+- **Pull request:** [#912](https://github.com/aryamahadik/rosie/pull/912) from `task/T-1531`, merged 2026-11-22 17:21:43 UTC. It squashed 2 branch commits:
+  - `33e6fc5` T-1531: K-05 v1.23, parkTurn takes tries 1 to 3 and a final refusal's…
+  - `77dd010` T-1531: round 2, the producers-and-consumers bullet for v1.23 names o…
+- **Files changed:** 10 (+1517 −6), by folder:
+  - `contracts/data-access/` README.md +85 −5, data-access.v1.23.schema.json +844 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` index.json +48 −0, park-turn-maya-crash-with-line.json +89 −0, park-turn-sam-refused-at-once.json +90 −0, park-turn-sam-refused-repeat.json +90 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-park-turn-sam-refused-line-reworded.json +90 −0, refuse-park-turn-sam-refused-no-reason.json +89 −0, refuse-park-turn-sam-refused-reason-words.json +90 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1531: K-05 v1.23, parkTurn takes tries 1 to 3 and a final refusal's labels, writes K-37 parked_turns and carries the passedOn line in its one row (planned then checked); 3 accepted and 3 refused fixtures, README version record, frozen.json
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1531: round 2, the producers-and-consumers bullet for v1.23 names only C-180, C-124 and C-152; C-194 (not a v1.23 consumer, reads parked_turns as before) moves to the Consumers of v1.23 prose (DL-1148)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 894. T-1528: a split step's settler may answer "ask": nothing written, the part answered asked, the question sent again once (DL-1133, DL-1149) (\#911)
+
+- **Commit:** [`ceba0efc`](https://github.com/aryamahadik/rosie/commit/ceba0efc), by Arya Mahadik, 2026-11-22 17:21:39 UTC
+- **Pull request:** [#911](https://github.com/aryamahadik/rosie/pull/911) from `task/T-1528`, merged 2026-11-22 17:21:40 UTC. It squashed 2 branch commits:
+  - `fa8b96a` T-1528: a split step's settler may answer "ask": the walk writes noth…
+  - `92b4dd1` T-1528: a part whose split settler answered "ask" is answered asked (…
+- **Files changed:** 6 (+577 −24), by folder:
+  - `actions/src/commit/` ask-again.test.ts +295 −0, ask-again.ts +35 −11, commit.ts +8 −2
+  - `actions/src/commit/walk/` settle.test.ts +155 −0, settle.ts +60 −7, writes.ts +24 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1528: a split step's settler may answer "ask": the walk writes nothing for the part and notes it on the turn, and the commit's re-send (ask-again.ts) takes it as default 192 takes an asked part, so the step's question is sent again once and a second "ask" (ask count 2) writes nothing; other answers still settledNotInBundle, a throw still fails closed (K-09 README default 201, open gap 179; DL-1133)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1528: a part whose split settler answered "ask" is answered asked (K-09 README open gap 179, default 198; tool-api.v1 schema: asked means nothing changed), with the gate's limits as run, as commit.ts answers a waiting part; ask-again.test.ts expects asked; ask-again.ts default 3 restated (DL-1149)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 893. docs: COMMIT\_HISTORY.md through commit 891 (2e6b60f8, \#908) (\#910)
 
