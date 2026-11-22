@@ -102,8 +102,8 @@ export interface ComposeOk {
 }
 
 /**
- * A typed refusal, never a plan: the input, refused before any call (stage "input"), or the model's answer, refused
- * before it leaves the AI layer (stage "plan"). Problems name checks and places, never words.
+ * A typed refusal, never a plan to send: the input, refused before any call (stage "input"), or the model's answer,
+ * refused before it leaves the AI layer (stage "plan"). Problems name checks and places, never words.
  */
 export interface ComposeRefused {
   readonly status: "refused";
@@ -111,6 +111,13 @@ export interface ComposeRefused {
   readonly problems: readonly ComposeProblem[];
   /** The model calls made: none for a refused input. */
   readonly modelCalls: readonly ModelCall[];
+  /**
+   * The plan refused, only at stage "plan" when every problem is a reader check's (./rewrite readerProblemsOnly: the
+   * relay's quote, sensitive work, the tone, the language; T-1535, DL-1159): a whole K-03 plan that keeps to its formats
+   * and its facts, which the turn hands to the one rewrite, told those problems, and never sends. Absent for any other
+   * refusal. In memory only: the refusal's JSON leaves it out, so a refusal written anywhere holds no word of it.
+   */
+  readonly plan?: MessagePlan;
 }
 
 /** The call failed on both models (the gateway's typed `modelsDown`); what follows is T-271's. */

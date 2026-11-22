@@ -2198,6 +2198,18 @@ function composerAnswerOf(answer: ComposeAnswer | RewriteAnswer): ComposerAnswer
     case "modelsDown":
       return { error: MODELS_DOWN, modelCalls: answer.modelCalls };
     case "refused":
+      // A plan the reader checks alone refused carries itself (T-1535, DL-1159): it goes on with its stage and its
+      // problems (checks and places) for the turn's one rewrite, as the same plan in the turn's form. Any other refusal
+      // goes back as its label alone.
+      if ("plan" in answer) {
+        return {
+          error: refusedCode(answer.problems),
+          stage: answer.stage,
+          problems: answer.problems,
+          plan: answer.plan as unknown as MessagePlan,
+          modelCalls: answer.modelCalls,
+        };
+      }
       return { error: refusedCode(answer.problems), modelCalls: answer.modelCalls };
     case "useFallback":
       return { error: USE_FALLBACK, modelCalls: answer.modelCalls };
@@ -2225,7 +2237,9 @@ function toldOf(failed: RewriteRequest["failed"]): Told[] {
  *
  *   compose  ok           {result: "planned", plan, modelCalls}: K-03's plan, checked against its input by the AI layer
  *            refused      {error: the first refusing check (frontier, input, literalValue, ...), modelCalls}: an input
- *                         carrying the frontier is refused before any call (refuse-frontier-in-input.json)
+ *                         carrying the frontier is refused before any call (refuse-frontier-in-input.json); a plan the
+ *                         reader checks alone refused also gives {stage: "plan", problems, plan} for the turn's one
+ *                         rewrite (T-1535, DL-1159), the plan in memory only
  *            modelsDown   {error: "modelsDown", modelCalls}
  *   rewrite  the request as T-374's handoff maps it: {input, plan, attempt: "composed", told: the failed checks with their
  *            details}, the plan the composer gave, never the final parts; its answers as compose's, and 'use the fallback'
@@ -2234,8 +2248,8 @@ function toldOf(failed: RewriteRequest["failed"]): Told[] {
  * Each model call writes its own portCall span into the turn's trace (the AI gateway's, one per attempt: labels and
  * counts only); the turn records the compose and rewriteOrFallback spans with the model calls each answer carries (DL-357:
  * a sum of cost or tokens counts the portCall spans only). No composer bound, or one that cannot be built: the call fails
- * before any model call. Nothing here logs or writes a span: an input's and a plan's words go to the model only, never
- * into a span, a log or an error.
+ * before any model call. Nothing here logs or writes a span: an input's and a plan's words go to the model only (and a
+ * plan the reader checks refused back to the turn, for its one rewrite), never into a span, a log or an error.
  */
 export function realComposer(inputs: ComposerInputs): TurnComposer {
   const built = new Map<string, Promise<Composer>>();

@@ -16,7 +16,8 @@
 //      its formats from the row's allowedFormats; no number, date or price typed in its words, in digits or in words,
 //      that no fact of the row, a slot fact or a term fact, holds; then what its reader must read (T-375, ./relay): a
 //      relayed sender quoted through {{relay.quote}} once, never typed; on a gentle row no sample service or name and
-//      no "!"; its words in the row's language. Any failure is a typed refusal, never a plan.
+//      no "!"; its words in the row's language. Any failure is a typed refusal, never a plan to send. A refusal for the
+//      reader's checks alone carries the plan it refused, in memory only, for the turn's one rewrite (T-1535, DL-1159).
 //
 // Rows of one turn are composed side by side by calling compose once per row (each call is independent). An email copy
 // takes its text row's plan instead of a call (arch 07 line 397); filling slots, fixed lines and the message checks are
@@ -32,6 +33,7 @@ import { sameBundleId } from "../cache/bundle";
 import { GatewayConfigError, type GatewayEffort, type ModelRole } from "../gateway";
 import { inputProblems, planAgainstInput } from "./check";
 import { composeInputText } from "./prompt";
+import { readerProblemsOnly } from "./rewrite/request";
 import { createRewrite } from "./rewrite/rewrite";
 import { PLAN_SCHEMA } from "./schema";
 import type {
@@ -40,6 +42,7 @@ import type {
   ComposeInput,
   Composer,
   ComposerOptions,
+  ComposeRefused,
   MessagePlan,
 } from "./types";
 
@@ -47,6 +50,18 @@ import type {
 export const COMPOSE_ROLE: ModelRole = "haiku";
 /** `output_config.effort`, pinned so the cached prefix is read call after call (T-364); "low" is what the spikes measured. */
 export const COMPOSE_EFFORT: GatewayEffort = "low";
+
+/**
+ * A refusal at stage plan for the reader checks alone, with the plan it refused (T-1535, DL-1159): the turn's one rewrite
+ * is given that plan, told those checks and their places. The plan rides in memory only: the refusal's JSON is the
+ * refusal without it (a non-enumerable toJSON, which neither a structured clone nor an equality check sees), so a refusal
+ * written into a log line or a span still names checks and places, never words (K-08 README line 75).
+ */
+function withRefusedPlan(refused: ComposeRefused, plan: MessagePlan): ComposeRefused {
+  const carried: ComposeRefused = { ...refused, plan };
+  Object.defineProperty(carried, "toJSON", { value: () => refused, enumerable: false });
+  return carried;
+}
 
 /**
  * Builds the composer for one bundle: its id, its two model ids and its prompt layout. Refuses, before any call, a
@@ -80,8 +95,17 @@ export function createComposer(options: ComposerOptions): Composer {
         return { status: "modelsDown", failures: answer.failures, modelCalls: answer.modelCalls };
 
       const problems = planAgainstInput(answer.output, input);
-      if (problems.length > 0)
-        return { status: "refused", stage: "plan", problems, modelCalls: answer.modelCalls };
+      if (problems.length > 0) {
+        const refused: ComposeRefused = {
+          status: "refused",
+          stage: "plan",
+          problems,
+          modelCalls: answer.modelCalls,
+        };
+        return readerProblemsOnly(problems)
+          ? withRefusedPlan(refused, answer.output as MessagePlan)
+          : refused;
+      }
       return {
         status: "ok",
         plan: answer.output as MessagePlan,

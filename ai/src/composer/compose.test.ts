@@ -54,6 +54,7 @@ import {
   type RecordedInput,
   type RowAnswer,
 } from "./test-support";
+import { HI_PLAN, S1_02_GENTLE_INPUT } from "./rewrite/test-support";
 
 const globalFetch = vi.fn(() => {
   throw new Error("no network in a composer test: the global fetch was called");
@@ -302,6 +303,42 @@ describe("a typed refusal, never a plan", () => {
       problems: [{ check: "holdSlot", at: "lines[1].text" }],
     });
     expect(answer).not.toHaveProperty("plan");
+  });
+
+  it("a plan refused for the reader checks alone carries the plan it refused, for the turn's one rewrite (T-1535, DL-1159): S1-02's 'Hi!' on a gentle row is refused for its tone at lines[0].text with that plan, which the refusal's JSON leaves out; a refusal for any other check carries none", async () => {
+    const { answer, api } = await composeRow(S1_02_GENTLE_INPUT, HI_PLAN);
+    expect(api.calls).toHaveLength(1);
+    const tone = [{ check: "tone", at: "lines[0].text" }];
+    expect(answer).toEqual({
+      status: "refused",
+      stage: "plan",
+      problems: tone,
+      plan: HI_PLAN,
+      modelCalls: expect.any(Array) as unknown,
+    });
+    // In memory, the plan travels (a structured clone keeps it); written out, the refusal names a check and a place alone.
+    expect(structuredClone(answer)).toEqual(answer);
+    expect(JSON.parse(JSON.stringify(answer))).toEqual({
+      status: "refused",
+      stage: "plan",
+      problems: tone,
+      modelCalls: expect.any(Array) as unknown,
+    });
+    for (const words of ["Hi!", "Rosie", "automated", "What kinds of work"])
+      expect(JSON.stringify(answer)).not.toContain(words);
+
+    // The same line with a number typed in it: refused for that literal, before any reader check, so no plan rides.
+    const typed = {
+      ...HI_PLAN,
+      lines: [{ role: "first", text: "Hi! I'm Rosie, an automated assistant for 15 kinds of work." }],
+    };
+    const literal = await composeRow(S1_02_GENTLE_INPUT, typed);
+    expect(literal.answer).toEqual({
+      status: "refused",
+      stage: "plan",
+      problems: [{ check: "literalValue", at: "lines[0].text", kind: "number" }],
+      modelCalls: expect.any(Array) as unknown,
+    });
   });
 
   it("an answer that is not a K-03 plan is refused: not an object, a field missing or too many, a line role or slot K-03 does not have", async () => {
