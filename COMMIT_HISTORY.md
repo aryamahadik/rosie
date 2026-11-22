@@ -2,9 +2,124 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 868, [`dbbef0f6`](https://github.com/aryamahadik/rosie/commit/dbbef0f6), 2026-11-22 04:44:39 UTC.
+- **Through:** commit 874, [`201c025d`](https://github.com/aryamahadik/rosie/commit/201c025d), 2026-11-22 08:21:05 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 874. docs: COMMIT\_HISTORY.md through commit 872 (f4d265d2, \#889) (\#891)
+
+- **Commit:** [`201c025d`](https://github.com/aryamahadik/rosie/commit/201c025d), by Arya Mahadik, 2026-11-22 08:21:05 UTC
+- **Pull request:** [#891](https://github.com/aryamahadik/rosie/pull/891) from `task/commit-history-220`, merged 2026-11-22 08:21:05 UTC. It squashed 1 branch commit:
+  - `7fd28de` docs: COMMIT\_HISTORY.md through commit 872 (f4d265d2, \#889)
+- **Files changed:** 1 (+50 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +50 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 873. T-1524: deploy-staging.sh's default bundle folder is bundles/v2 (T-1477's bundle, the one-kind path; DL-1123), so a deploy without --bundle never switches staging back to bundle v0; header line, default's comment and usage line say so; --bundle and --bundle= unchanged. Tests: the default case publishes and activates v2's id and keys, --bundle bundles/v2 publishes the same, --bundle and --bundle= bundles/v1.1 still publish v1.1, the usage line names bundles/v2; the undo cases expect v2's id (\#890)
+
+- **Commit:** [`b2e6a8e9`](https://github.com/aryamahadik/rosie/commit/b2e6a8e9), by Arya Mahadik, 2026-11-22 08:21:01 UTC
+- **Pull request:** [#890](https://github.com/aryamahadik/rosie/pull/890) from `task/T-1524`, merged 2026-11-22 08:21:01 UTC. It squashed 1 branch commit:
+  - `950079e` T-1524: deploy-staging.sh's default bundle folder is bundles/v2 (T-14…
+- **Files changed:** 2 (+97 −15), by folder:
+  - `infra/ci/` deploy-staging.test.mjs +90 −11
+  - `infra/scripts/` deploy-staging.sh +7 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 872. docs: COMMIT\_HISTORY.md through commit 870 (3a747ad3, \#887) (\#889)
+
+- **Commit:** [`f4d265d2`](https://github.com/aryamahadik/rosie/commit/f4d265d2), by Arya Mahadik, 2026-11-22 07:36:50 UTC
+- **Pull request:** [#889](https://github.com/aryamahadik/rosie/pull/889) from `task/commit-history-219`, merged 2026-11-22 07:36:51 UTC. It squashed 1 branch commit:
+  - `7d6e97d` docs: COMMIT\_HISTORY.md through commit 870 (3a747ad3, \#887)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 871. T-1484 (H1b): the turn face binds S1-04's writer for an answered S1-04, behind its own dep with the party flag off by default; S1-08's plan bound whenever given (DL-1121) (\#888)
+
+- **Commit:** [`473badbd`](https://github.com/aryamahadik/rosie/commit/473badbd), by Arya Mahadik, 2026-11-22 07:36:47 UTC
+- **Pull request:** [#888](https://github.com/aryamahadik/rosie/pull/888) from `task/T-1484`, merged 2026-11-22 07:36:47 UTC. It squashed 3 branch commits:
+  - `233823c` T-1484: signUpSteps binds S1-04's writer (companiesWriter) from the c…
+  - `3ab3158` T-1484: integration proof on local PostgreSQL: an answered S1-04 ('Al…
+  - `33b6d24` T-1484: S1-04's writer needs its own dep, SignUpWriterDeps.s1\_04Write…
+- **Files changed:** 5 (+1831 −43), by folder:
+  - `actions/src/tool-api/turn-face/` commit.test.ts +406 −7, commit.ts +97 −32, index.ts +1 −0
+  - `actions/src/tool-api/turn-face/pg/` calls.ts +9 −4, s1-04-answer.int.test.ts +1318 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1484: signUpSteps binds S1-04's writer (companiesWriter) from the companies reads with SignUpWriterDeps.partyRuleLive, off unless true; default 6 restated (plan binds S1-08 whenever given); unit cases for an answered S1-04 on bundle v2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1484: integration proof on local PostgreSQL: an answered S1-04 ('All share one' in words) closes the question, places the picks, writes S1-08's row and asks S1-09; the party flag off refuses Sam's two-company answer, on lands it; the user's phone (one pick, S1-04 asked under bundle v1) is placed under v2
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1484: S1-04's writer needs its own dep, SignUpWriterDeps.s1_04Writer (with the party flag), beside the companies reads, so staging's H2a binding (companies alone) keeps H1a's writers until H2b; S1_04WriterDeps exported; unit and integration cases follow, H1a's binding refusing an answered S1-04
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 870. docs: COMMIT\_HISTORY.md through commit 868 (dbbef0f6, \#885) (\#887)
+
+- **Commit:** [`3a747ad3`](https://github.com/aryamahadik/rosie/commit/3a747ad3), by Arya Mahadik, 2026-11-22 06:09:03 UTC
+- **Pull request:** [#887](https://github.com/aryamahadik/rosie/pull/887) from `task/commit-history-218`, merged 2026-11-22 06:09:03 UTC. It squashed 1 branch commit:
+  - `7cf1888` docs: COMMIT\_HISTORY.md through commit 868 (dbbef0f6, \#885)
+- **Files changed:** 1 (+64 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +64 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 869. T-1520: one-kind path, S1-03's draft takes the business its one pick was placed under: oneKind.wrapDraft around T-633's S1-03 writer (draftElsewhere refusal, defaults O8-O11; T-633 default 9 superseded for the one-kind case), bound in signUpSteps beside S1-02's wrap only with the companies reads; unit, binding and integration cases (item 79 answers the draft beside its pick) (DL-1056, DL-1076) (\#886)
+
+- **Commit:** [`a95b7c0f`](https://github.com/aryamahadik/rosie/commit/a95b7c0f), by Arya Mahadik, 2026-11-22 06:08:59 UTC
+- **Pull request:** [#886](https://github.com/aryamahadik/rosie/pull/886) from `task/T-1520`, merged 2026-11-22 06:09:00 UTC. It squashed 1 branch commit:
+  - `b4576ca` T-1520: one-kind path, S1-03's draft takes the business its one pick …
+- **Files changed:** 7 (+539 −28), by folder:
+  - `actions/src/tool-api/journey-1/companies/` companies.int.test.ts +137 −7, errors.ts +13 −4, index.ts +6 −0, one-kind.test.ts +244 −3, one-kind.ts +90 −5
+  - `actions/src/tool-api/turn-face/` commit.test.ts +43 −6, commit.ts +6 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 868. docs: COMMIT\_HISTORY.md through commit 865 (da57739e, \#882) (\#885)
 

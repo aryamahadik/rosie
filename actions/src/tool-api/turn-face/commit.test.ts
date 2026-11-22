@@ -34,22 +34,49 @@
 //
 // T-1520 (DL-1056, DL-1076): S1-03 is bound through the same instance's draft wrapper beside S1-02's binding, so a
 // one-kind "One isn't on the list yet" drafts under the pick's business; without the companies reads, as today.
+//
+// T-1484 (H1b; K-09 README defaults 181 to 185 and 190; DL-1033, DL-1121): the same companies reads, with S1-04's writer's
+// own deps (SignUpWriterDeps.s1_04Writer and its party rule's flag), also bind S1-04's own writer (T-1481's
+// companiesWriter), so on the walk the binding hands writesOf, an answered S1-04 (commit-s1-04-some-share.json's turn,
+// pinned to bundle v2) closes its question at its version, places Sam's kept picks and walks on to S1-08's row and
+// S1-09's question: "All share one" in his one company; his own "Some share one" refused (secondCompany) with the flag off
+// and commit-s1-04-some-share.json's rows with it on; one kept pick on file placed by its update. With no S1-04 writer
+// bound (no companies reads, no s1_04Writer, or the companies reads alone), an answered S1-04 is notBuilt as today.
 
 import { describe, expect, it } from "vitest";
 
+import type { PickedKindRead } from "../../../../db/repo/kinds-reads";
+import type { OpenQuestionRead } from "../../../../db/repo/targets";
 import type { Span } from "../../../../runtime/src/trace";
 import type { GateAndCommitRequest } from "../../commit";
 import type { CoreFlagsDeps } from "../../commit/core";
 import { WalkNotBuiltError, type WalkQuestions } from "../../commit/walk";
-import { NOTHING_OPEN, commitS1_02, questionsOver } from "../../commit/walk/test-support";
+import {
+  NOTHING_OPEN,
+  commitS1_02,
+  contextOf,
+  decidedOf,
+  passedPartOf,
+  questionsOver,
+  requestTurnFields,
+} from "../../commit/walk/test-support";
 import { NOT_TOLD_YET, PLUGIN_LISTS_NO_STOP_WORDS } from "../../domain/safety";
 import { BARBERSHOP, safetyWorldOf } from "../../domain/safety/test-support";
 import { BUNDLE_V0, fakeBundles, sampleBundle, withSteps } from "../../frontier/assemble/test-support";
 import type { Decided } from "../../gate/framework";
 import { readsOn, seedWorld } from "../../homes/stop/test-support";
 import { NotBuiltError } from "../errors";
-import { companiesReadsOf } from "../journey-1/companies";
-import { SAM_COMPANY, catalogDefaults, fakeCompaniesK05 } from "../journey-1/companies/test-support";
+import { CompaniesRefusedError, companiesReadsOf } from "../journey-1/companies";
+import {
+  COMMIT_S1_04_SOME_SHARE,
+  SAM_COMPANY,
+  catalogDefaults,
+  fakeCompaniesK05,
+  pickOnFile,
+  s1_04Exchange,
+  type AnswerField,
+  type CompaniesGiven,
+} from "../journey-1/companies/test-support";
 import { kindsReadsOf } from "../journey-1/kinds";
 import { PACK_HIKES, fakeK05, turnWithWords } from "../journey-1/kinds/test-support";
 import { PlanNotBuiltError } from "../journey-1/plan";
@@ -79,10 +106,12 @@ import {
   openHoldsPort,
   pinnedSafetyLines,
   safetyReaderOf,
+  signUpStepWriters,
   signUpSteps,
   turnCommitDeps,
   walkChatsOf,
   type CommitAt,
+  type S1_04WriterDeps,
   type SafetyReads,
   type SignUpWriterDeps,
   type TurnCommitBinding,
@@ -709,25 +738,36 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
     readonly companies?: boolean;
     readonly plan?: "withStop" | "noStop";
     readonly kindsStop?: boolean;
+    /** (T-1484) What items 79 and 72 answer (default: the doubles' own, no pick on file). */
+    readonly world?: CompaniesGiven;
+    /** (T-1484) S1-04's writer's own deps (the party rule's flag), handed in as given; left out, not handed in. */
+    readonly s1_04Writer?: S1_04WriterDeps;
   }
 
   /** The sign-up steps' deps over the doubles (items 78 and 79, item 72 and the catalog, the stop home, bundle v2's overlays). */
   function signUpOver(given: NewDeps = {}) {
     const k05 = fakeK05();
-    const companies = fakeCompaniesK05();
+    const companies = fakeCompaniesK05(given.world);
     const trades = tradesOverV2();
     const stop = readsOn(seedWorld(), null);
     const deps: SignUpWriterDeps = {
       kinds: { reads: kindsReadsOf(k05.k05), ...(given.kindsStop === true ? { stop } : {}) },
       plugIns: { bundles: trades.bundles },
       ...(given.companies === true ? { companies: companiesReadsOf(companies.k05) } : {}),
+      ...(given.s1_04Writer === undefined ? {} : { s1_04Writer: given.s1_04Writer }),
       ...(given.plan === undefined ? {} : { plan: given.plan === "withStop" ? { stop } : {} }),
     };
     return { deps, k05, companies, trades };
   }
 
-  /** The turn face's binding over `deps` on bundle v2, its ports never called but the walk's, the sign-up steps spread in. */
-  function bindingOver(deps: SignUpWriterDeps): TurnCommitBinding<unknown> {
+  /**
+   * The turn face's binding over `deps` on bundle v2, its ports never called but the walk's, the sign-up steps spread in;
+   * the walk's question read over S1-02's question unless another is given.
+   */
+  function bindingOver(
+    deps: SignUpWriterDeps,
+    questions: WalkQuestions = questionsOver().questions,
+  ): TurnCommitBinding<unknown> {
     return {
       bundles: fakeBundles(publishedBundleV2()),
       commitTurn: never,
@@ -737,7 +777,7 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
       stopWords: PLUGIN_LISTS_NO_STOP_WORDS,
       telling: NOT_TOLD_YET,
       turnKey: () => SAM_KEY,
-      questions: questionsOver().questions,
+      questions,
       ...signUpSteps<unknown>(deps),
     };
   }
@@ -761,6 +801,7 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
     const steps = signUpSteps<unknown>(deps);
     expect(Object.keys(steps).sort()).toEqual(["settlers", "writers"]);
     expect(steps.writers("S1-08")).toBeNull();
+    expect(steps.writers("S1-04")).toBeNull();
     expect(steps.settlers("S1-04")).toBeNull();
     // A binding that spreads it carries no buttonsSettlers field, so the walk is handed none.
     expect(Object.hasOwn(bindingOver(deps), "buttonsSettlers")).toBe(false);
@@ -794,9 +835,11 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
     const companiesOnly = signUpSteps<unknown>(signUpOver({ companies: true }).deps);
     expect(typeof companiesOnly.buttonsSettlers?.("S1-04")).toBe("function");
     expect(companiesOnly.writers("S1-08")).toBeNull();
+    expect(companiesOnly.writers("S1-04")).toBeNull();
     const planOnly = signUpSteps<unknown>(signUpOver({ plan: "withStop" }).deps);
     expect(Object.hasOwn(planOnly, "buttonsSettlers")).toBe(false);
     expect(typeof planOnly.writers("S1-08")).toBe("function");
+    expect(planOnly.writers("S1-04")).toBeNull();
   });
 
   it("the walk turnCommitDeps hands writesOf: 'Plumbing' walks S1-04 without asking it, the one pick placed with its company kind first, S1-11's blocks under the business, S1-08's row, then S1-09's question", async () => {
@@ -937,5 +980,361 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
       WalkNotBuiltError,
     );
     expect(companies.asked).toEqual([]);
+  });
+
+  // ---- T-1484 (H1b): S1-04's writer for an answered S1-04 ----------------------------------------------------------------
+
+  describe("S1-04's writer, bound from the same companies reads with its own deps (s1_04Writer), takes an answer to an S1-04 that was asked (T-1484, H1b; K-09 README defaults 181 to 185 and 190)", () => {
+    const ALL = "c-02";
+    const SOME = "c-01";
+    const EACH = "c-03";
+
+    /** A pick's 11 plug-in text blocks as item 79 answers them: in the pf keys' order, each at version 1, no business. */
+    const textsOf = (pickId: string): PickedKindRead["texts"] =>
+      // K-05 v1.19 types `texts` as a list of at most 11; the pf keys are exactly 11.
+      PF_TEXT_KEYS.map((key) => ({
+        rowId: `${pickId}/${key}`,
+        pfKey: key,
+        businessId: null,
+        version: 1,
+      })) as PickedKindRead["texts"];
+
+    /** Sam's three picks after commit-s1-02.json (commit-s1-04-some-share.json's note), the barbershop first with its blocks. */
+    const samPicks = (): PickedKindRead[] => [
+      pickOnFile({
+        id: "pick-sam-barbershop",
+        words: "Barbershop",
+        kindId: "barber",
+        texts: textsOf("pick-sam-barbershop"),
+      }),
+      pickOnFile({ id: "pick-sam-plumbing", position: 2, words: "plumbing" }),
+      pickOnFile({ id: "pick-sam-electrical", position: 3, words: "electrical", kindId: "electrician" }),
+    ];
+
+    /** One kept pick on file, S1-04 asked of it all the same (the user's phone, rule-onekind.json's fault (3)). */
+    const onePick = (): PickedKindRead[] => [
+      pickOnFile({ id: "pick-sam-plumbing", texts: textsOf("pick-sam-plumbing") }),
+    ];
+
+    /** Sam's answer to S1-04, commit-s1-04-some-share.json's turn pinned to bundle v2, with the button and fields given. */
+    function answerOnV2(choiceId: string, fields?: readonly AnswerField[]) {
+      const { request } = s1_04Exchange(COMMIT_S1_04_SOME_SHARE, choiceId, fields);
+      const pin = bundleV2Id();
+      requestTurnFields(request).bundleId = { ...pin };
+      const decided = decidedOf(request);
+      decided.context.bundleId = { ...pin };
+      decided.decide.bundleId = { ...pin };
+      return { part: passedPartOf(request), context: contextOf(request) };
+    }
+
+    /**
+     * S1-04's question to Sam as the walk reads its row on the answering turn: commit-s1-04-some-share.json's
+     * oq-s1-04-sam, asked as the walk asks a plain step's buttons (no options, no read-back, no versions read), open at
+     * version 1 (the fixture's note).
+     */
+    function samS1_04Row(): OpenQuestionRead {
+      const { request } = s1_04Exchange(COMMIT_S1_04_SOME_SHARE);
+      const [asked] = decidedOf(request).context.openQuestions;
+      if (asked === undefined)
+        throw new Error("commit-s1-04-some-share.json's context names S1-04's question");
+      return {
+        id: asked.openQuestionId,
+        businessId: asked.target.businessId,
+        bookingId: asked.target.bookingId,
+        personId: request.caller.personId,
+        turnId: "turn-s1-02-sam-kinds",
+        step: asked.step,
+        status: "open",
+        options: [],
+        readback: null,
+        versionsRead: [],
+        clock: null,
+        sentAt: asked.sentAt.utc,
+        pollId: asked.pollId,
+        askCount: asked.askCount,
+        bundleId: bundleV2Id(),
+        version: 1,
+      };
+    }
+
+    /** What the walk turnCommitDeps hands writesOf answers for Sam's S1-04 answer, with the question reads it made. */
+    function answered(deps: SignUpWriterDeps, choiceId: string, fields?: readonly AnswerField[]) {
+      const asked = questionsOver([samS1_04Row()], "handle-sam");
+      const turn = answerOnV2(choiceId, fields);
+      const writing = turnCommitDeps(bindingOver(deps, asked.questions))(NOTHING_OPEN_AT).ports.writesOf(
+        turn.part,
+        turn.context,
+        NOTHING_OPEN,
+      );
+      return { writing, questionReads: asked.reads };
+    }
+
+    const shared = (words: string): AnswerField => ({ name: "shared_kinds", value: words, words });
+    const named = (words: string): AnswerField => ({ name: "company_name", value: words, words });
+    /** Sam's own answer (commit-s1-04-some-share.json): plumbing and electrical share Lee Home Services. */
+    const SAMS_ANSWER = [shared("Plumbing and electrical"), named("Lee Home Services")];
+
+    /** The ids S1-08's row and S1-09's question and row take after S1-04 (default 131, turn key sam). */
+    const AFTER_S1_04 = {
+      steps: [
+        ["outbox-s1-08-sam-1", "S1-08", 0, null, "quick_reply"],
+        ["outbox-s1-09-sam-1", "S1-09", 0, "oq-s1-09-sam-1", "quick_reply"],
+      ],
+      asks: [["oq-s1-09-sam-1", "S1-09"]],
+    };
+
+    it("S1-04's writer is bound only with the companies reads and s1_04Writer both: with the companies reads alone (staging's binding since H2a) or s1_04Writer alone, none; the other writers, the settlers and the buttons settler are as without it; building it reads nothing", () => {
+      const { deps, k05, companies, trades } = signUpOver({
+        companies: true,
+        s1_04Writer: {},
+        plan: "withStop",
+      });
+      const steps = signUpSteps<unknown>(deps);
+      expect(Object.keys(steps).sort()).toEqual(["buttonsSettlers", "settlers", "writers"]);
+      for (const stepId of ["S1-02", "S1-03", "S1-74", "S1-11", "S1-04", "S1-08"]) {
+        expect(typeof steps.writers(stepId), stepId).toBe("function");
+      }
+      for (const stepId of ["S1-01", "S1-09", "s1-04", "toString", "__proto__"]) {
+        expect(steps.writers(stepId), stepId).toBeNull();
+      }
+      expect(typeof steps.buttonsSettlers?.("S1-04")).toBe("function");
+      expect(typeof steps.settlers("S1-02")).toBe("function");
+      expect(steps.settlers("S1-04")).toBeNull();
+      expect(k05.asked).toEqual([]);
+      expect(companies.asked).toEqual([]);
+      expect(trades.reads).toEqual([]);
+      // The flag on binds the same steps.
+      const on = signUpSteps<unknown>(
+        signUpOver({ companies: true, s1_04Writer: { partyRuleLive: true } }).deps,
+      );
+      expect(typeof on.writers("S1-04")).toBe("function");
+      expect(on.writers("S1-08")).toBeNull();
+      for (const given of [
+        { companies: true, plan: "withStop" },
+        { companies: true },
+        { s1_04Writer: {}, plan: "withStop" },
+        { s1_04Writer: { partyRuleLive: true } },
+      ] as const) {
+        expect(
+          signUpSteps<unknown>(signUpOver(given).deps).writers("S1-04"),
+          JSON.stringify(given),
+        ).toBeNull();
+      }
+    });
+
+    it("'All share one' with the flag left out: the question closed at its version, Sam's three picks placed in his company under his business, the plumber and electrician company kinds first (barber kept), his barbershop's 11 blocks given the business, then S1-08's row and S1-09's question; the settler is never asked", async () => {
+      const { deps, companies } = signUpOver({
+        companies: true,
+        s1_04Writer: {},
+        plan: "withStop",
+        world: { picks: samPicks() },
+      });
+      const { writing, questionReads } = answered(deps, ALL, []);
+      const writes = await writing;
+      expect(writes.closes).toEqual([
+        { id: "oq-s1-04-sam", expectVersion: 1, status: "answered", answeredOptionId: null },
+      ]);
+      expect(questionReads.map((read) => [read.handleId, read.openQuestionId])).toEqual([
+        ["handle-sam", "oq-s1-04-sam"],
+      ]);
+      expect(writes.state.map((write) => `${write.op} ${write.table}`)).toEqual([
+        "insert company_kinds",
+        "insert company_kinds",
+        "update picked_kinds",
+        "update picked_kinds",
+        "update picked_kinds",
+        ...PF_TEXT_KEYS.map(() => "update picked_kind_texts"),
+      ]);
+      const [plumber, electrician, ...rest] = writes.state;
+      for (const [write, kindId] of [
+        [plumber, "plumber"],
+        [electrician, "electrician"],
+      ] as const) {
+        const defaults = catalogDefaults(kindId);
+        expect(write, kindId).toEqual({
+          op: "insert",
+          table: "company_kinds",
+          values: {
+            company_id: SAM_COMPANY,
+            kind_id: kindId,
+            business_id: BARBERSHOP,
+            trade_name: null,
+            pf_facts: defaults.facts,
+            pf_switches_a: defaults.switchesA,
+            pf_switches_b: defaults.switchesB,
+          },
+        });
+      }
+      expect(rest.slice(0, 3)).toEqual(
+        ["pick-sam-barbershop", "pick-sam-plumbing", "pick-sam-electrical"].map((id) => ({
+          op: "update",
+          table: "picked_kinds",
+          key: { id },
+          expectVersion: 1,
+          set: { company_id: SAM_COMPANY, business_id: BARBERSHOP },
+        })),
+      );
+      expect(rest.slice(3)).toEqual(
+        PF_TEXT_KEYS.map((key) => ({
+          op: "update",
+          table: "picked_kind_texts",
+          key: { picked_kind_id: "pick-sam-barbershop", pf_key: key },
+          expectVersion: 1,
+          set: { business_id: BARBERSHOP },
+        })),
+      );
+      expect(writes.asks.map((ask) => [ask.question.id, ask.question.step])).toEqual(AFTER_S1_04.asks);
+      expect(
+        writes.messages.map((row) => [row.id, row.step, row.lineNo, row.openQuestionId, row.sendClass]),
+      ).toEqual(AFTER_S1_04.steps);
+      expect(writes.gives).toEqual(["companies"]);
+      // S1-04's writer read item 79 once, item 72 once and the catalog once for each kind it adds: never the settler's
+      // reads (which would refuse, notPlaced, with no wrapper's placement for this walk).
+      expect(companies.asked.map((read) => read.read)).toEqual([
+        "readPickedKinds",
+        "readBusinessKinds",
+        "readTurnState",
+        "readTurnState",
+      ]);
+    });
+
+    it("Sam's own answer ('Some share one': plumbing and electrical share Lee Home Services) needs a second company: with the flag left out or false it is refused (secondCompany) with nothing returned; with it on, the rows are commit-s1-04-some-share.json's, then S1-08's row and S1-09's question", async () => {
+      for (const s1_04Writer of [{}, { partyRuleLive: false }]) {
+        const { deps, companies } = signUpOver({
+          companies: true,
+          s1_04Writer,
+          plan: "withStop",
+          world: { picks: samPicks() },
+        });
+        const refused = answered(deps, SOME, SAMS_ANSWER).writing;
+        await expect(refused, JSON.stringify(s1_04Writer)).rejects.toBeInstanceOf(CompaniesRefusedError);
+        await expect(refused, JSON.stringify(s1_04Writer)).rejects.toMatchObject({
+          fault: "secondCompany",
+          ids: ["S1-04"],
+        });
+        // Refused once the groups are known: before item 72 or the catalog's facts are read.
+        expect(companies.asked.map((read) => read.read)).not.toContain("readBusinessKinds");
+      }
+      const { deps } = signUpOver({
+        companies: true,
+        s1_04Writer: { partyRuleLive: true },
+        plan: "withStop",
+        world: { picks: samPicks() },
+      });
+      const writes = await answered(deps, SOME, SAMS_ANSWER).writing;
+      expect(writes.state).toEqual(s1_04Exchange(COMMIT_S1_04_SOME_SHARE).given.stated.writes.state);
+      expect(writes.closes.map((close) => [close.id, close.status])).toEqual([["oq-s1-04-sam", "answered"]]);
+      expect(writes.asks.map((ask) => [ask.question.id, ask.question.step])).toEqual(AFTER_S1_04.asks);
+      expect(
+        writes.messages.map((row) => [row.id, row.step, row.lineNo, row.openQuestionId, row.sendClass]),
+      ).toEqual(AFTER_S1_04.steps);
+      // "Each is its own" with the flag on: three companies, the turn's own and two new ones with no business.
+      const each = await answered(
+        signUpOver({
+          companies: true,
+          s1_04Writer: { partyRuleLive: true },
+          plan: "withStop",
+          world: { picks: samPicks() },
+        }).deps,
+        EACH,
+        [],
+      ).writing;
+      expect(
+        each.state.flatMap((write) =>
+          write.op === "insert" && write.table === "companies"
+            ? [[write.values.id, write.values.business_id]]
+            : [],
+        ),
+      ).toEqual([
+        ["company-s1-04-sam-1", null],
+        ["company-s1-04-sam-2", null],
+      ]);
+    });
+
+    it("one kept pick on file with S1-04 asked of it all the same (the user's phone): 'All share one' places it by an update at its version, its company kind first, its 11 blocks given the business, then S1-08's plan row and S1-09's question", async () => {
+      const { deps } = signUpOver({
+        companies: true,
+        s1_04Writer: {},
+        plan: "withStop",
+        world: { picks: onePick() },
+      });
+      const writes = await answered(deps, ALL, []).writing;
+      expect(writes.closes.map((close) => [close.id, close.status, close.expectVersion])).toEqual([
+        ["oq-s1-04-sam", "answered", 1],
+      ]);
+      const plumber = catalogDefaults("plumber");
+      expect(writes.state).toEqual([
+        {
+          op: "insert",
+          table: "company_kinds",
+          values: {
+            company_id: SAM_COMPANY,
+            kind_id: "plumber",
+            business_id: BARBERSHOP,
+            trade_name: null,
+            pf_facts: plumber.facts,
+            pf_switches_a: plumber.switchesA,
+            pf_switches_b: plumber.switchesB,
+          },
+        },
+        {
+          op: "update",
+          table: "picked_kinds",
+          key: { id: "pick-sam-plumbing" },
+          expectVersion: 1,
+          set: { company_id: SAM_COMPANY, business_id: BARBERSHOP },
+        },
+        ...PF_TEXT_KEYS.map((key) => ({
+          op: "update",
+          table: "picked_kind_texts",
+          key: { picked_kind_id: "pick-sam-plumbing", pf_key: key },
+          expectVersion: 1,
+          set: { business_id: BARBERSHOP },
+        })),
+      ]);
+      expect(writes.asks.map((ask) => [ask.question.id, ask.question.step])).toEqual(AFTER_S1_04.asks);
+      expect(
+        writes.messages.map((row) => [row.id, row.step, row.lineNo, row.openQuestionId, row.sendClass]),
+      ).toEqual(AFTER_S1_04.steps);
+    });
+
+    it("with no S1-04 writer bound (no companies reads, no s1_04Writer, or the companies reads alone as staging's binding since H2a) an answered S1-04 is notBuilt (gives) as today, before any read; with the writer and no S1-08 deps it is notBuilt too (no writer at S1-08), before any read", async () => {
+      for (const given of [
+        { plan: "withStop" },
+        {},
+        { companies: true, plan: "withStop" },
+        { s1_04Writer: {}, plan: "withStop" },
+      ] as const) {
+        const { deps, companies } = signUpOver({ ...given, world: { picks: samPicks() } });
+        const { writing, questionReads } = answered(deps, ALL, []);
+        await expect(writing, JSON.stringify(given)).rejects.toBeInstanceOf(WalkNotBuiltError);
+        await expect(writing, JSON.stringify(given)).rejects.toMatchObject({
+          seam: "gives",
+          ids: ["S1-04", "companies"],
+        });
+        expect(questionReads, JSON.stringify(given)).toEqual([]);
+        expect(companies.asked, JSON.stringify(given)).toEqual([]);
+      }
+      const { deps, companies } = signUpOver({
+        companies: true,
+        s1_04Writer: {},
+        world: { picks: samPicks() },
+      });
+      const { writing, questionReads } = answered(deps, ALL, []);
+      await expect(writing).rejects.toBeInstanceOf(WalkNotBuiltError);
+      await expect(writing).rejects.toMatchObject({ ids: ["S1-08"] });
+      expect(questionReads).toEqual([]);
+      expect(companies.asked).toEqual([]);
+    });
+
+    it("signUpStepWriters binds no S1-04 writer, whatever its deps carry (default 6)", () => {
+      const { deps } = signUpOver({
+        companies: true,
+        s1_04Writer: { partyRuleLive: true },
+        plan: "withStop",
+      });
+      expect(signUpStepWriters<unknown>(deps)("S1-04")).toBeNull();
+      expect(signUpStepWriters<unknown>(deps)("S1-08")).toBeNull();
+    });
   });
 });
