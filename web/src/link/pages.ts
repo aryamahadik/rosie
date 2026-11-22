@@ -5,7 +5,10 @@
 //                business's public name and its sections' names. Without proof it offers the sign-in for the link's own
 //                account, both ways, and shows no time and nothing on file for anyone. With proof it says the reader is
 //                signed in and when the link lapses. The sections' contents are each page type's own (T-515, the journey
-//                lanes, S10-8), never this page's.
+//                lanes), never this page's. A page kind whose sections are not open yet shows its honest lines in their
+//                place (HONEST_LINES): S1-10's setupIdCheck, whose upload is not open (K-09 README default 213; D4 and
+//                D5 of the S1-10 ruling; T-1534), with or without proof, and with no upload control, form, script or
+//                email step.
 //   expiredPage  a plain page for an unknown, lapsed or ended link (K-21 v1 linkExpired: one answer for all three), with
 //                no field of the old page, so a guessed or stale code learns nothing. The same bytes for every code.
 //   notOpenedPage  K-21 v1 transient or bookingPaused: nothing was read; try again. No field of the page either.
@@ -19,7 +22,7 @@ import { instantOf } from "../auth/cookies";
 import type { WebConfig } from "../shell/config";
 import { escapeHtml } from "../shell/frame";
 import type { RoutePage } from "../shell/route";
-import { PAGE_KIND_WORDS, SECTION_WORDS } from "./kinds";
+import { PAGE_KIND_WORDS, SECTION_WORDS, type PageKind } from "./kinds";
 import type { LinkView } from "./view";
 
 /** The words of the sign-in offer on a link's page without proof (FS line 701; S13-45). */
@@ -35,6 +38,17 @@ export const SIGNED_IN_WORDS = "You are signed in.";
 
 /** The heading over a page's sections. */
 export const SECTIONS_HEADING = "On this page";
+
+/**
+ * The lines a page kind shows in place of its sections' contents while they are not open (K-09 README default 213):
+ * S1-10's setupIdCheck, whose ID upload is not open on this slice (D4: "Jay decides the wording; a plain default stands
+ * meanwhile"). The first is the S1-10 ruling's own ("a page that says plainly the upload is not open yet"), the second
+ * S1-10's safe default as C10 words it, said to the owner. They name no person, no time and nothing on file, and promise
+ * nothing that nothing keeps. A kind with no entry shows none.
+ */
+export const HONEST_LINES: Readonly<Partial<Record<PageKind, readonly string[]>>> = {
+  setupIdCheck: ["The ID upload is not open yet.", "Nothing goes live until your ID is uploaded."],
+};
 
 /** The expired page's words: the same for an unknown, a lapsed and an ended link. */
 export const EXPIRED_WORDS = {
@@ -76,6 +90,7 @@ export function openedPage(config: WebConfig, code: string, view: LinkView): Rou
           ...view.sections.map((section) => `<li>${escapeHtml(SECTION_WORDS[section])}</li>`),
           "</ul>",
         ];
+  const honest = (HONEST_LINES[view.pageKind] ?? []).map(p);
   const until = view.proven && view.expiresAt !== null ? timeTag(view.expiresAt) : null;
   const after = view.proven
     ? [
@@ -94,6 +109,7 @@ export function openedPage(config: WebConfig, code: string, view: LinkView): Rou
     p(kind.purpose),
     ...(view.proven ? [p(SIGNED_IN_WORDS)] : []),
     ...sections,
+    ...honest,
     ...after,
   ].join("\n");
   return { title: kind.title, main };

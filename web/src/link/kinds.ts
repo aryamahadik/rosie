@@ -27,9 +27,10 @@ export interface PageKindWords {
 
 /** Each page kind's words (K-21 v1 pageKind's description names what each one is). */
 export const PAGE_KIND_WORDS: Readonly<Record<PageKind, PageKindWords>> = {
-  // S1-10's secure page: the ID upload and the owner's email (MC C9, C10).
+  // S1-10's secure page: the ID upload and the owner's email (MC C9, C10). Its title is S1-10's card title as C10 words
+  // it (compiler/src/corrections/c10.ts S1_10_LINES; K-09 README default 213; T-1534).
   setupIdCheck: {
-    title: "Secure ID check",
+    title: "Secure ID upload",
     purpose: "This secure page is for the ID check in this business's setup with Rosie.",
   },
   // S1-77's owner link: the owner's own ID check, "Are you an owner of this business?", the email, the preview, the

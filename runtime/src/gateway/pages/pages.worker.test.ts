@@ -506,7 +506,7 @@ describe("the edge's own answers", () => {
   );
 
   it.each([
-    "/test/page-api",
+    "/test/v1/page-api",
     "/test/page-api/",
     "/test/page-api/unknownCall",
     "/test/page-api/readListing",
