@@ -20,6 +20,11 @@
 // commitTurn.request as v1.22 restates them), bundle v2's compiled S1-08 and S1-09 (bundles/v2, T-1477) placed in
 // T-1491's test graph, and a stand-in writer that hands back rows as given, to show how the walk names their step and
 // line.
+//
+// T-1480 adds the answered buttons step's doubles (K-09 README default 181): the bundles port over bundle v2 itself,
+// K-09's commit-s1-04.json (the roster owner answers S1-04's question "All share one") pinned to bundle v2, S1-04's
+// question as K-05 v1.2 openQuestionRead reads its row, and a stand-in for S1-04's writer (T-1481's) that hands back the
+// fixture's stated state rows. None of them is the walk.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -755,4 +760,121 @@ export function flowAWithCompiledPlan(): GraphValue {
 export function rowsWriter(messages: readonly OutboxRowNew[]): StepWriter<WalkTestRepo> {
   return () =>
     Promise.resolve({ state: [], stateEvents: [], gives: [], asks: [], messages: copy([...messages]) });
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1480: an answered buttons step (K-09 README default 181), commit-s1-04.json on bundle v2
+
+export const COMMIT_S1_04 = "commit-s1-04.json";
+
+/** The turn key commit-s1-04.json's ids are built from (K-09 v1.5 default 131: the fixture's stand-in, roster). */
+export const ROSTER = "roster";
+
+/** The handle commit-s1-04.json's turn and S1-04's question name (a fictional one: the fixture's note). */
+export const ROSTER_HANDLE = "handle-roster-owner-1";
+
+/** commit-s1-04.json as the answered buttons step's tests read it: what it states, its request and its outcome. */
+export interface CommitS1_04Exchange {
+  given: { stated: { step: string; gives: SetupKey[]; writes: StatedWrites } };
+  request: GateAndCommitRequest;
+  outcome: {
+    parts: { choiceId: string; gives: SetupKey[] }[];
+    written: {
+      written: { table: string; rowId: string; version: number }[];
+      outboxRows: { id: string; commitSeq: number }[];
+    };
+    openQuestions: { opened: string[]; closed: string[] };
+  };
+}
+
+/** commit-s1-04.json, freshly parsed. */
+export function commitS1_04(): CommitS1_04Exchange {
+  return fixture(COMMIT_S1_04) as CommitS1_04Exchange;
+}
+
+/** Bundle v2's id, as its manifest names it (K-01 v1 manifest.bundleId). */
+export function bundleV2Id(): BundleIdOf {
+  const { bundleId } = bundleV2Part("manifest.json") as { bundleId: BundleIdOf };
+  return { hash: bundleId.hash, build: bundleId.build };
+}
+
+/** The bundles port over bundle v2: its flow graph for bundle v2's id (or `graphs`' own, given in its place), else null. */
+export function bundleV2Bundles(
+  graphs: Partial<Record<FlowLetter, unknown>> = { A: flowAV2() },
+): SkeletonBundles {
+  return pinnedBundles(bundleV2Id(), graphs);
+}
+
+/**
+ * The turn that answers S1-04 as the commit hands it to writesOf on bundle v2: commit-s1-04.json's request (the roster
+ * owner's "They all share one company"), pinned to bundle v2 (the turn's, the context's and decide's bundle: v2 keeps
+ * S1-04's buttons byte for byte from v1, K-09 README default 188, and holds S1-08 and S1-09), its one part choosing
+ * `choiceId`: c-01 "Some share one", c-02 "All share one" (the fixture's own) or c-03 "Each is its own".
+ */
+export function turnS1_04OnV2(choiceId = "c-02"): {
+  exchange: CommitS1_04Exchange;
+  part: PassedPart;
+  context: CommitTurnContext<WalkTestRepo>;
+  choice: Choice;
+} {
+  const exchange = commitS1_04();
+  const { request } = exchange;
+  const pin = bundleV2Id();
+  requestTurnFields(request).bundleId = { ...pin };
+  const decided = decidedOf(request);
+  decided.context.bundleId = { ...pin };
+  decided.decide.bundleId = { ...pin };
+  const [entry] = decided.decide.parts;
+  if (entry.part.verb !== "choose") throw new Error("commit-s1-04.json's part chooses");
+  entry.part.choice = choiceId;
+  const part = passedPartOf(request);
+  if (part.choice === null) throw new Error(`commit-s1-04.json offers ${choiceId}`);
+  return { exchange, part, context: contextOf(request), choice: part.choice };
+}
+
+/**
+ * S1-04's open question as K-05 v1.2 openQuestionRead reads its row on the answering turn: the id, business, step and
+ * send commit-s1-04.json's context names (oq-s1-04-roster-1, asked once at 14:05:10, as text), asked of the turn's
+ * person as the walk asks a plain step's buttons question (writes.ts default 10: no options, no read-back, no versions
+ * read, step 9's default clock), under bundle v2, open at version 1 (the fixture's note). The turn that asked it is a
+ * stand-in id: the fixture names none, and the walk reads none.
+ */
+export function s1_04QuestionRow(): OpenQuestionRead {
+  const { request } = commitS1_04();
+  const [asked] = decidedOf(request).context.openQuestions;
+  if (asked === undefined) throw new Error("commit-s1-04.json's context names S1-04's question");
+  return {
+    id: asked.openQuestionId,
+    businessId: asked.target.businessId,
+    bookingId: asked.target.bookingId,
+    personId: request.caller.personId,
+    turnId: "turn-s1-02-roster",
+    step: asked.step,
+    status: "open",
+    options: [],
+    readback: null,
+    versionsRead: [],
+    clock: null,
+    sentAt: asked.sentAt.utc,
+    pollId: asked.pollId,
+    askCount: asked.askCount,
+    bundleId: bundleV2Id(),
+    version: 1,
+  };
+}
+
+/**
+ * A stand-in for S1-04's writer (T-1481's, which places the owner's kept picks by the button chosen): commit-s1-04.json's
+ * stated state rows for "All share one" (two company kinds, both picks placed, the first pick's eleven text rows given
+ * the business), giving companies, with no event-log entry (K-09 README default 182) and no message. It reads nothing.
+ */
+export const s1_04Writer: StepWriter<WalkTestRepo> = () => {
+  const { state } = commitS1_04().given.stated.writes;
+  const rows: StepRows = { state, stateEvents: [], gives: ["companies"], asks: [], messages: [] };
+  return Promise.resolve(rows);
+};
+
+/** The stand-ins by step id for an answered S1-04: S1-04's and S1-08's (T-1482's writer's stand-in: one quick reply). */
+export function buttonAnswerWriters(): Record<string, StepWriter<WalkTestRepo>> {
+  return { "S1-04": s1_04Writer, "S1-08": tellingWriter };
 }

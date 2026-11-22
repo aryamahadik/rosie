@@ -25,6 +25,14 @@
 // met again in a later stretch is refused (loop) and every stretch's steps count toward the one cap. walkFrom is the
 // first stretch alone, exactly as before.
 //
+// A plain step's button answered (T-1480; K-09 README default 181; the S1-04 design ruling's card 11, DL-999): an open
+// question's option at a step that is no split starts the walk at that step (WalkStart "button", which writes.ts gives
+// an option once it reads the step in the turn's pinned graph). Its branch must be one of the step's button labels in
+// that graph, word for word (graph.ts buttonLabels), else the part is refused (branchNotInBundle) with nothing walked.
+// The step is applied as answered (a step move naming the button: writes.ts closes its question and writes its gives,
+// never its message again), and the walk goes on from its next, as from any plain step walked, so it never stops at the
+// answered step and no buttons settler is asked there (default 199).
+//
 // Defaults used (for ops/QUESTIONS.md):
 //   1. An ending branch's own step that the bundle does not hold, when one of the branch's message effects names it, is
 //      accounted for by that effect: the compiler reads a branch's effects from its own steps (a message per step that
@@ -36,6 +44,9 @@
 //      that step's writer), so this default tells where the path goes, never what it writes.
 //   2. A step with its own gate (K-01 v1 step.when) is not walked yet: its gate reads the path, the plug-in and the
 //      record (notBuilt). A chosen branch's own gate was the frontier's to read when it offered the branch.
+//   3. (T-1480) The answered plain step's own gate is not read again, as an answered split's is not: the step was asked
+//      before (the walk asks no gated step: default 2), and the frontier offered its buttons. Every step after it is
+//      visited as any step walked is, its gate included.
 
 import { WalkNotBuiltError, WalkRefusedError } from "./errors";
 import type { FlowGraph, GraphBranch, GraphStep } from "./graph";
@@ -48,12 +59,20 @@ export type WalkStart =
   /** A step entered: a door's, an any-time row's or a search entry's step (K-02 v1 choice.step). */
   | { readonly kind: "step"; readonly step: string }
   /** A branch chosen at a split: an open question's option or a hub's case (K-02 v1 choice.step and choice.branch). */
-  | { readonly kind: "branch"; readonly step: string; readonly branch: string };
+  | { readonly kind: "branch"; readonly step: string; readonly branch: string }
+  /**
+   * A plain step's button answered (T-1480; K-09 README default 181): an open question's option at a step that is no
+   * split, its branch one of that step's button labels, word for word (K-02 v1 choice.step and choice.branch).
+   */
+  | { readonly kind: "button"; readonly step: string; readonly branch: string };
 
 /** What the walk applies, in order. */
 export type Move =
-  /** A plain step walked, on a list or on a chosen branch: its own writes apply. */
-  | { readonly kind: "step"; readonly step: GraphStep }
+  /**
+   * A plain step walked, on a list or on a chosen branch: its own writes apply. On the step a button start answers
+   * (T-1480), `answered` names the button: its question is closed and its gives written, its message not sent again.
+   */
+  | { readonly kind: "step"; readonly step: GraphStep; readonly answered?: string }
   /** A branch taken: its effects apply (its own steps follow it, each a move of its own). */
   | { readonly kind: "branch"; readonly split: GraphStep; readonly branch: GraphBranch };
 
@@ -220,7 +239,23 @@ export function walkStretchFrom(graph: FlowGraph, start: WalkStart): Stretch {
     };
   };
 
+  /**
+   * A plain step's button answered (default 181): refused unless the step is no split and the branch is one of its
+   * button labels in the pinned graph, word for word; else applied as answered, and the walk goes on from its next (a
+   * list's end climbs, as for any plain step walked), so it never stops at the answered step.
+   */
+  const answer = (id: string, button: string): Stop => {
+    const answered = held(id);
+    if (answered.split || !answered.buttonLabels.includes(button)) {
+      throw new WalkRefusedError("branchNotInBundle", [answered.id]);
+    }
+    enter(answered.id);
+    moves.push({ kind: "step", step: answered, answered: button });
+    return answered.next === null ? climb(answered) : from(answered.next);
+  };
+
   if (start.kind === "step") return stretch(from(start.step));
+  if (start.kind === "button") return stretch(answer(start.step, start.branch));
   const split = held(start.step);
   const branch = split.branches.find((each) => each.label === start.branch);
   if (branch === undefined) throw new WalkRefusedError("branchNotInBundle", [split.id]);
