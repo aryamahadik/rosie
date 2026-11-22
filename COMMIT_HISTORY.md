@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 900, [`18a75528`](https://github.com/aryamahadik/rosie/commit/18a75528), 2026-11-22 19:31:51 UTC.
+- **Through:** commit 902, [`171fa84e`](https://github.com/aryamahadik/rosie/commit/171fa84e), 2026-11-22 20:03:50 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 902. docs: COMMIT\_HISTORY.md through commit 900 (18a75528, \#917) (\#919)
+
+- **Commit:** [`171fa84e`](https://github.com/aryamahadik/rosie/commit/171fa84e), by Arya Mahadik, 2026-11-22 20:03:50 UTC
+- **Pull request:** [#919](https://github.com/aryamahadik/rosie/pull/919) from `task/commit-history-233`, merged 2026-11-22 20:03:51 UTC. It squashed 1 branch commit:
+  - `5f452e2` docs: COMMIT\_HISTORY.md through commit 900 (18a75528, \#917)
+- **Files changed:** 1 (+60 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +60 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 901. T-1532: the walk waits at an event step (README default 209): EVENT\_ONLY\_KEYS (id\_checked), the waitsOnEvent stop after a walked plain step's own rows (its next never read, no question, no clock), eventKeyAtWalk in add(); proofs on test graphs and bundle v3 from S1-09's three branches (\#918)
+
+- **Commit:** [`1ceb957b`](https://github.com/aryamahadik/rosie/commit/1ceb957b), by Arya Mahadik, 2026-11-22 20:03:46 UTC
+- **Pull request:** [#918](https://github.com/aryamahadik/rosie/pull/918) from `task/T-1532`, merged 2026-11-22 20:03:47 UTC. It squashed 1 branch commit:
+  - `b4af246` T-1532: the walk waits at an event step (README default 209): EVENT\_O…
+- **Files changed:** 6 (+818 −12), by folder:
+  - `actions/src/commit/walk/` errors.ts +6 −2, event-wait.test.ts +619 −0, index.ts +5 −2, test-support.ts +114 −0, walk.ts +48 −2, writes.ts +26 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 900. docs: COMMIT\_HISTORY.md through commit 898 (29c5763c, \#915) (\#917)
 
