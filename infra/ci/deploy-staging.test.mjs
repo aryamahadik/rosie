@@ -23,7 +23,22 @@ import {
   releaseRoot,
   v0WithBuild,
 } from "./release-harness.mjs";
-import { cleanEnv, namedIn, program, spies, tempDir, whereHeld } from "./script-harness.mjs";
+import { REPO, cleanEnv, namedIn, program, spies, tempDir, whereHeld } from "./script-harness.mjs";
+
+/** A folder of this repository's bundles/: its bundle id ("<hash>/<build>") and its parts' keys, the manifest's first. */
+const bundleOf = (folder) => {
+  const manifest = JSON.parse(
+    readFileSync(path.join(REPO, "bundles", folder, "bundle", "manifest.json"), "utf8"),
+  );
+  return {
+    id: `${manifest.bundleId.hash}/${manifest.bundleId.build}`,
+    keys: [manifest.storage.manifestKey, ...manifest.storage.values.map((value) => value.key)],
+  };
+};
+// deploy-staging.sh's default bundle folder (T-1524; DL-1123): bundles/v2, T-1477's bundle, the one-kind path. And
+// bundles/v1.1, a folder --bundle names on purpose.
+const V2 = bundleOf("v2");
+const V1_1 = bundleOf("v1.1");
 
 const SHA = "5690000000000000000000000000000000000569";
 const LIVE = "00000000-0000-4000-8000-000000000569";
@@ -67,6 +82,10 @@ describe("deploy-staging.sh: steps 3 and 4", () => {
       .map((line) => line.replace(/^\[[^\]]+\] /, ""))
       .filter((line) => /^(step \d\/4|undo:|rollback:|check:|deploy-staging:)/.test(line));
   const kvPuts = (calls) => calls.filter((call) => call.tool === "kv");
+  /** The keys of each KV bulk put among the calls. */
+  const keysPut = (calls) => kvPuts(calls).map((put) => put.entries.map((entry) => entry.key));
+  /** Step 3's line when it publishes bundles/v2 (as the default or named): it names the folder. */
+  const PUBLISH_V2 = /^step 3\/4 bundle: publish .+\/bundles\/v2, then switch the active bundle id$/;
 
   it("without STAGING_DATABASE_URL: steps 1, 3 and 4 are skipped with a notice; the code and the check run", () => {
     const result = deploy([]);
@@ -86,11 +105,16 @@ describe("deploy-staging.sh: steps 3 and 4", () => {
     assert.deepEqual(kvPuts(rig.calls()), []);
   });
 
-  it("with the staging database: bundles/v0 is published and made active, then the staging flag set is applied", async () => {
+  it("with the staging database and no --bundle: bundles/v2 (T-1477's bundle, the one-kind path; DL-1123), never bundle v0, is published and made active, then the staging flag set is applied", async () => {
+    assert.notEqual(V2.id, V0_ID, "bundles/v2 and bundles/v0 hold the same bundle");
     const callsBefore = rig.calls().length;
     const result = deploy([], { STAGING_DATABASE_URL: db.url });
     assert.equal(result.status, 0, result.output);
     const lines = steps(result.stdout);
+    assert.ok(
+      lines.some((line) => PUBLISH_V2.test(line)),
+      lines.join("\n"),
+    );
     const order = [
       "step 1/4 migrate: done",
       "step 2/4 code: done",
@@ -105,15 +129,13 @@ describe("deploy-staging.sh: steps 3 and 4", () => {
       order.every((at, k) => at >= 0 && (k === 0 || at > order[k - 1])),
       lines.join("\n"),
     );
-    assert.match(result.stdout, new RegExp(`active bundle id: none -> ${V0_ID} \\(K-05 setActiveBundle\\)`));
+    assert.match(result.stdout, new RegExp(`active bundle id: none -> ${V2.id} \\(K-05 setActiveBundle\\)`));
     assert.match(result.stdout, /flags: skeleton: on \(a new global row, version 1\)/);
-    assert.equal(await readActive(db.sql), V0_ID);
+    assert.equal(await readActive(db.sql), V2.id);
     assert.equal(await skeleton(), "on");
-    const puts = kvPuts(rig.calls().slice(callsBefore));
-    assert.deepEqual(
-      puts.map((put) => put.entries.map((entry) => entry.key)),
-      [V0_KEYS],
-    );
+    const puts = keysPut(rig.calls().slice(callsBefore));
+    assert.deepEqual(puts, [V2.keys]);
+    assert.ok(!puts.flat().some((key) => V0_KEYS.includes(key)), "a key of bundle v0 was put");
   });
 
   it("a failed check undoes steps 4 and 3: the flag goes off again and the bundle id goes back", async () => {
@@ -134,7 +156,7 @@ describe("deploy-staging.sh: steps 3 and 4", () => {
       "check: FAILED",
       "deploy-staging: FAILED (exit 1) after step 2 started",
       "undo: flag skeleton off again (step 4 turned it on)",
-      `undo: the active bundle id goes back to ${build2.id} (step 3 switched it to ${V0_ID})`,
+      `undo: the active bundle id goes back to ${build2.id} (step 3 switched it to ${V2.id})`,
       `rollback: nothing to roll back, staging still runs ${LIVE}`,
     ].map((start) => lines.findIndex((line) => line.startsWith(start)));
     assert.ok(
@@ -173,6 +195,63 @@ describe("deploy-staging.sh: steps 3 and 4", () => {
     assert.match(result.stdout, new RegExp(`active bundle id: ${build2.id}, already active`));
     assert.equal(await readActive(db.sql), build2.id);
     assert.equal(await skeleton(), "on");
+  });
+
+  it("--bundle bundles/v2 publishes the same folder as the default: the same bundle id made active, the same keys put (T-1524)", async () => {
+    assert.equal(await readActive(db.sql), build2.id);
+    const callsBefore = rig.calls().length;
+    const result = deploy(["--bundle", "bundles/v2"], { STAGING_DATABASE_URL: db.url });
+    assert.equal(result.status, 0, result.output);
+    const lines = steps(result.stdout);
+    assert.ok(
+      lines.some((line) => PUBLISH_V2.test(line)),
+      lines.join("\n"),
+    );
+    assert.match(
+      result.stdout,
+      new RegExp(`active bundle id: ${build2.id} -> ${V2.id} \\(K-05 setActiveBundle\\)`),
+    );
+    assert.equal(await readActive(db.sql), V2.id);
+    assert.deepEqual(keysPut(rig.calls().slice(callsBefore)), [V2.keys]);
+  });
+
+  it("--bundle bundles/v1.1 and --bundle=bundles/v1.1 still publish the folder named, not the default (T-1524)", async () => {
+    assert.notEqual(V1_1.id, V2.id, "bundles/v1.1 and bundles/v2 hold the same bundle");
+    for (const [args, before] of [
+      [["--bundle", "bundles/v1.1"], V2.id],
+      [["--bundle=bundles/v1.1"], V1_1.id],
+    ]) {
+      const what = args.join(" ");
+      const callsBefore = rig.calls().length;
+      const result = deploy(args, { STAGING_DATABASE_URL: db.url });
+      assert.equal(result.status, 0, `${what}: ${result.output}`);
+      const lines = steps(result.stdout);
+      assert.ok(
+        lines.some((line) =>
+          /^step 3\/4 bundle: publish .+\/bundles\/v1\.1, then switch the active bundle id$/.test(line),
+        ),
+        `${what}: ${lines.join("\n")}`,
+      );
+      const switched =
+        before === V1_1.id
+          ? `active bundle id: ${V1_1.id}, already active (K-05 setActiveBundle: repeated)`
+          : `active bundle id: ${before} -> ${V1_1.id} (K-05 setActiveBundle)`;
+      assert.ok(result.stdout.includes(switched), `${what}: ${result.stdout}`);
+      assert.equal(await readActive(db.sql), V1_1.id, what);
+      assert.deepEqual(keysPut(rig.calls().slice(callsBefore)), [V1_1.keys], what);
+    }
+  });
+
+  it("an unknown argument is refused with the usage line, which names the default bundles/v2, before anything runs (T-1524)", () => {
+    const callsBefore = rig.calls().length;
+    const result = deploy(["--bundles", "bundles/v2"], { STAGING_DATABASE_URL: db.url });
+    assert.equal(result.status, 1, result.output);
+    assert.equal(
+      result.stderr,
+      "deploy-staging.sh: usage: deploy-staging.sh [--bundle <bundle folder>] (default: bundles/v2)\n",
+    );
+    assert.equal(result.stdout, "");
+    assert.equal(rig.calls().length, callsBefore);
   });
 
   it("refuses --env production (and any --env) before anything runs", () => {
@@ -763,7 +842,7 @@ describe("deploy-staging.sh hands the staging database's URL to the commands tha
     const lines = stepLines(result.stdout);
     assert.ok(lines.includes("undo: flag skeleton off again (step 4 turned it on)"), lines.join("\n"));
     assert.ok(
-      lines.includes(`undo: the active bundle id goes back to ${build2.id} (step 3 switched it to ${V0_ID})`),
+      lines.includes(`undo: the active bundle id goes back to ${build2.id} (step 3 switched it to ${V2.id})`),
       lines.join("\n"),
     );
     assert.equal(await readActive(db.sql), build2.id);
