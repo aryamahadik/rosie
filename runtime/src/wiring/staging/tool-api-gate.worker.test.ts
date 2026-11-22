@@ -82,12 +82,28 @@
 //     business with plumber's company kind beside the barber one, its 11 text blocks under that business, S1-08's row
 //     (step S1-08, line 0, no question), S1-09's question and its row, and no S1-04 question or row; every call on its
 //     side, one after another, 2 connections at most (connectionsPeak, against ./db.ts CONNECTIONS_PER_CLIENT, 1).
+//   - T-1485 (H2b; DL-1033, DL-1122), S1-04's writer bound on staging's gate, the party rule's flag off: the seed's second
+//     roster owner (place 2 of the same set) answers its S1-02 question with "Barbershop, plumbing, electrical" on bundle
+//     v2 through realGate, which asks S1-04 (three picks, none placed, barber's overlay read once); its S1-04 row's send
+//     is played on the runtime side (one delivered part, then K-05's armClock), so the question is open at version 2.
+//     Sam's own two-company answer ("Plumbing and electrical share Lee Home Services", commit-s1-04-some-share.json)
+//     then fails closed inside the Tool API base: realGate rejects with CompaniesRefusedError secondCompany, its message
+//     and fields labels alone, after one scope, its seal, item 79 and the kinds' names by id (item 26), with no item 72,
+//     no S1-08 read, no commit sent and nothing written, the
+//     question still open, and no line holding the owner's words or number. "They all share one company"
+//     (commit-s1-04.json) then commits once: S1-04's question answered at its version, the three picks placed under the
+//     owner's company and business, plumber's and electrician's company kinds beside barber's, the barbershop's 11
+//     blocks given the business, S1-08's row and S1-09's question and its row; every call on its side, one after another,
+//     2 connections at most.
 // Test values only (rule 9): the master's sample cast, the fixtures' ids and words, whole fiction-range 555-01xx numbers,
 // made-up ids, and the seed's made-up wrapping key.
 import { KEYED_SAFETY_IDS } from "@rosie/actions/src/domain/safety/ids";
 import { readStop, type StopHomeReads } from "@rosie/actions/src/homes/stop/reads";
 import { NotBuiltError } from "@rosie/actions/src/tool-api/errors";
-import { CompaniesReadError } from "@rosie/actions/src/tool-api/journey-1/companies/errors";
+import {
+  CompaniesReadError,
+  CompaniesRefusedError,
+} from "@rosie/actions/src/tool-api/journey-1/companies/errors";
 import type { CompaniesReads } from "@rosie/actions/src/tool-api/journey-1/companies/reads";
 import { KindsReadError } from "@rosie/actions/src/tool-api/journey-1/kinds/errors";
 import { TurnFaceReadError, TurnFaceRefusedError } from "@rosie/actions/src/tool-api/turn-face/errors";
@@ -99,8 +115,10 @@ import safetyBusinessOwnLine from "@rosie/contracts/model/fixtures/safety-busine
 import commitS101 from "@rosie/contracts/tool-api/fixtures/commit-s1-01.json";
 import commitS102 from "@rosie/contracts/tool-api/fixtures/commit-s1-02.json";
 import commitS102UnmappedEnd from "@rosie/contracts/tool-api/fixtures/commit-s1-02-unmapped-end.json";
+import commitS104 from "@rosie/contracts/tool-api/fixtures/commit-s1-04.json";
+import commitS104SomeShare from "@rosie/contracts/tool-api/fixtures/commit-s1-04-some-share.json";
 import { readActiveBundle } from "@rosie/db/repo/bundles";
-import { DataAccessDatabaseError } from "@rosie/db/repo/clocks";
+import { armClock, DataAccessDatabaseError } from "@rosie/db/repo/clocks";
 import type { Sql } from "@rosie/db/repo/scope";
 import { SealingError, unsealText } from "@rosie/db/repo/sealing";
 import { runInDurableObject } from "cloudflare:test";
@@ -109,6 +127,8 @@ import { afterEach, beforeEach, describe, expect, inject, it, vi } from "vitest"
 
 import bundleV2FlowA from "../../../../bundles/v2/bundle/flow/A.json";
 import bundleV2Manifest from "../../../../bundles/v2/bundle/manifest.json";
+import barberV2 from "../../../../bundles/v2/bundle/trade/barber.json";
+import electricianV2 from "../../../../bundles/v2/bundle/trade/electrician.json";
 import plumberV2 from "../../../../bundles/v2/bundle/trade/plumber.json";
 import type { HandleActor } from "../../actor";
 import { turnIdOf } from "../../actor/lease";
@@ -146,6 +166,7 @@ import {
   BARBERSHOP,
   BUNDLE_V2_ID,
   CATALOG,
+  MULTI_KIND,
   NO_KEY,
   NO_WRAP_KEY,
   ONE_KIND,
@@ -842,9 +863,15 @@ function heldOpen(db: StagingDb): HeldOpen {
 // ---- the secrets no line may hold -----------------------------------------------------------------------------------
 
 /** Every number of this file's handles, in each form a number could leak in (each whole number as it is, then cut). */
-const NUMBER_FORMS = [SAM, ...SIDE_BY_SIDE, ...SIX_AT_ONCE, NO_WRAP_KEY, NO_KEY, ONE_KIND].flatMap(
-  ({ number }) => [number, number.slice(1), number.slice(2)],
-);
+const NUMBER_FORMS = [
+  SAM,
+  ...SIDE_BY_SIDE,
+  ...SIX_AT_ONCE,
+  NO_WRAP_KEY,
+  NO_KEY,
+  ONE_KIND,
+  MULTI_KIND,
+].flatMap(({ number }) => [number, number.slice(1), number.slice(2)]);
 
 /** The words a text, a read or a seal holds here, and the fixed lines' words bundle v0 holds. */
 const WORDS = [
@@ -855,6 +882,11 @@ const WORDS = [
   "t1398 words to seal",
   // T-1494: the one-kind owner's text.
   "Plumbing",
+  // T-1485: the multi-kind owner's three texts, and the company name the refused one gives.
+  "Barbershop, plumbing, electrical",
+  "They all share one company",
+  "Plumbing and electrical share Lee Home Services",
+  "Lee Home Services",
   ...["safetyAsk", "safetyEmergency", "safetyCrisis", "outage"].map((id) => bundleV0FixedLine(id)),
 ];
 
@@ -874,6 +906,9 @@ function expectNoSecrets(texts: readonly string[]): void {
     TEST_WRAP_KEY,
     SAM_CHAT,
     ...[...SIDE_BY_SIDE, ...SIX_AT_ONCE].map((texter) => texter.chatId),
+    // T-1485: the roster owners' chat ids too.
+    ONE_KIND.chatId,
+    MULTI_KIND.chatId,
     ...SEALED,
   ];
   for (const text of texts) {
@@ -906,6 +941,8 @@ describe("this file's database: the walking skeleton's rows, the made-up key's r
       ...[...SIDE_BY_SIDE, ...SIX_AT_ONCE, NO_WRAP_KEY].map((each) => each.personId),
       // T-1494: the roster owner's, made at its first sight after the roster-owner set ran.
       ONE_KIND.personId,
+      // T-1485: the second roster owner's, made the same way.
+      MULTI_KIND.personId,
     ];
     expect(stored.keys).toEqual(
       keyed.sort().map((personId) => ({ person_id: personId, wrapping_key_name: WRAP_KEY_NAME })),
@@ -2674,32 +2711,60 @@ const ONE_KIND_TEXT = {
   now: "2026-10-19T18:07:06Z",
 };
 
-/**
- * The one-kind owner's answer to its S1-02 question: commit-s1-02.json's request (as the turn face's one-kind proof sends
- * it: T-1493's pg/one-kind.int.test.ts) under the turn id the lease hashes from its one event id, on a trace of its own,
- * the turn, its context and decide's result pinned to bundle v2; every id of Sam's swapped for the owner's, the question
- * the seed's; its one part choosing "All on the list" (c-01) in decide's agreed parts and both reads, with `words` as the
- * text, the part's quote and its kinds field; its writer the owner as the frontier names a person with no name and no
- * role; and the moments after the question went out.
- */
-async function oneKindGate(words: string): Promise<GateCall> {
-  const turnId = await turnIdOf([ONE_KIND_TEXT.eventId]);
+/** A roster owner of the seed's whose S1-02 question is live (ONE_KIND, MULTI_KIND): its ids, number, chat and question. */
+interface RosterAsked {
+  readonly businessId: string;
+  readonly companyId: string;
+  readonly personId: string;
+  readonly handleId: string;
+  readonly number: string;
+  readonly chatId: string;
+  readonly questionId: string;
+  readonly sentAt: string;
+}
+
+/** One text of an owner's turn: its event id, when it was sent, and the turn's moment. */
+interface OwnerText {
+  readonly eventId: string;
+  readonly sentAt: string;
+  readonly now: string;
+}
+
+/** A trace of its own under bundle v2, set to the turn, its spans kept. */
+function tracedOnV2(turnId: string): TraceContext {
   const trace = openTrace({
     openedBy: "textWebhook",
     bundleId: { ...BUNDLE_V2_ID },
     sink: (span) => SPANS.push(span),
   });
   trace.setTurn(turnId);
+  return trace;
+}
+
+/** The one-kind owner's answer to its S1-02 question (s1_02Gate). */
+const oneKindGate = (words: string): Promise<GateCall> => s1_02Gate(ONE_KIND, ONE_KIND_TEXT, words);
+
+/**
+ * A roster owner's answer to its S1-02 question: commit-s1-02.json's request (as the turn face's one-kind proof sends
+ * it: T-1493's pg/one-kind.int.test.ts) under the turn id the lease hashes from its one event id, on a trace of its own,
+ * the turn, its context and decide's result pinned to bundle v2; every id of Sam's swapped for the owner's, the question
+ * the seed's; its one part choosing "All on the list" (c-01) in decide's agreed parts and both reads, with `words` as the
+ * text, the part's quote and its kinds field; its writer the owner as the frontier names a person with no name and no
+ * role; and the moments after the question went out.
+ */
+async function s1_02Gate(owner: RosterAsked, said: OwnerText, words: string): Promise<GateCall> {
+  const turnId = await turnIdOf([said.eventId]);
+  const trace = tracedOnV2(turnId);
   const names = new Map<string, string>([
-    [BARBERSHOP, ONE_KIND.businessId],
-    [SAM.personId, ONE_KIND.personId],
-    [SAM.handleId, ONE_KIND.handleId],
-    [SAM.number, ONE_KIND.number],
-    [SAM_CHAT, ONE_KIND.chatId],
+    [BARBERSHOP, owner.businessId],
+    [SAM.personId, owner.personId],
+    [SAM.handleId, owner.handleId],
+    [SAM.number, owner.number],
+    [SAM_CHAT, owner.chatId],
     ["turn-s1-02-sam-kinds", turnId],
     ["trace-sam-0001", trace.traceId],
-    ["evt-sam-0001", ONE_KIND_TEXT.eventId],
-    ["oq-s1-02", ONE_KIND.questionId],
+    ["evt-sam-0001", said.eventId],
+    ["oq-s1-02", owner.questionId],
   ]);
   const request = renamed(
     { ...structuredClone(S1_02_REQUEST), turn: structuredClone(S1_02_TURN) },
@@ -2720,14 +2785,14 @@ async function oneKindGate(words: string): Promise<GateCall> {
   const [text] = context.texts;
   if (text === undefined) throw new Error("commit-s1-02.json's context holds the owner's text");
   text.words = words;
-  text.sentAt.utc = ONE_KIND_TEXT.sentAt;
-  for (const question of context.openQuestions) question.sentAt.utc = ONE_KIND.sentAt;
-  for (const message of context.recentMessages) message.sentAt.utc = ONE_KIND.sentAt;
+  text.sentAt.utc = said.sentAt;
+  for (const question of context.openQuestions) question.sentAt.utc = owner.sentAt;
+  for (const message of context.recentMessages) message.sentAt.utc = owner.sentAt;
   request.turn.bundleId = { ...BUNDLE_V2_ID };
   context.bundleId = { ...BUNDLE_V2_ID };
   decide.bundleId = { ...BUNDLE_V2_ID };
-  context.writer.people = [{ personId: ONE_KIND.personId, name: "", roles: [], language: null }];
-  request.now = ONE_KIND_TEXT.now;
+  context.writer.people = [{ personId: owner.personId, name: "", roles: [], language: null }];
+  request.now = said.now;
   return { request, turnId, trace };
 }
 
@@ -2954,6 +3019,468 @@ describe("the one-kind path's reads, and a one-kind answer walked past S1-04 to 
         onJob(GATE_CALLS.pickedKinds),
         onJob(GATE_CALLS.pickedKinds),
         onApp(GATE_CALLS.businessKinds),
+        onJob(GATE_CALLS.kindsById),
+        onJob(GATE_CALLS.stopHandle),
+        onJob(GATE_CALLS.stopHandleIdsOfPerson),
+        onJob(GATE_CALLS.stopPhoneOfHandle),
+        onJob(GATE_CALLS.stopPersonIdsOfHandle),
+        onJob(GATE_CALLS.stopConsentsOfPersons),
+        onJob("commitTurn"),
+      ]);
+      const counts = rooted.db.counts();
+      expect(counts).toMatchObject({ connectionsOpen: 0, connectionsPeak: 2 * CONNECTIONS_PER_CLIENT });
+      expect(counts.ended).toBe(counts.opened);
+      // The turn row, S1-09's question and its clock row, the two outbox rows and the text's record.
+      await expectCountsAfter(
+        before,
+        { turns: 1, open_questions: 1, clock_rows: 1, outbox_rows: 2, safety_outcomes: 1 },
+        "grows",
+      );
+    },
+  );
+});
+
+// ---- S1-04's writer (T-1485) --------------------------------------------------------------------------------------
+//
+// An answer to an S1-04 that was asked, on staging's gate with S1-04's writer bound (the party rule's flag off), in the
+// roster-owner world: the seed's second roster owner (MULTI_KIND) answers its S1-02 question with three kinds on bundle
+// v2, so S1-04 is asked; its row's send is played (one delivered part, then K-05's own armClock at the receipt, on the
+// runtime side), so the question is open; then Sam's own two-company answer is refused, and "They all share one company"
+// commits, each through realGate over staging's gate reads and the root's turn-row port.
+
+/** Bundle v2 as a run pinned it (as pinnedV2 above), holding barber's, plumber's and electrician's overlays. */
+function pinnedV2Kinds(): { readonly bundle: PinnedBundle; readonly asked: string[] } {
+  const asked: string[] = [];
+  const overlays = new Map<string, unknown>([
+    ["barber", barberV2],
+    ["plumber", plumberV2],
+    ["electrician", electricianV2],
+  ]);
+  const bundle: PinnedBundle = {
+    bundleId: { ...BUNDLE_V2_ID },
+    manifest: structuredClone(bundleV2Manifest) as unknown as Manifest,
+    flow: (flow) =>
+      flow === "A"
+        ? Promise.resolve(structuredClone(bundleV2FlowA) as Readonly<Record<string, unknown>>)
+        : Promise.reject(new BundleError("notInBundle")),
+    trade(tradeId) {
+      asked.push(tradeId);
+      const overlay = overlays.get(tradeId);
+      return overlay === undefined
+        ? Promise.reject(new BundleError("notInBundle"))
+        : Promise.resolve(structuredClone(overlay) as TradeOverlay);
+    },
+    reads: () => [],
+  };
+  return { bundle, asked };
+}
+
+/** The multi-kind owner's texts and the moments of its turns, each after the question it answers went out. */
+const MULTI_KIND_TEXTS = {
+  kinds: { eventId: "evt-t1485-kinds", sentAt: "2026-10-19T18:07:00Z", now: "2026-10-19T18:07:06Z" },
+  twoCompanies: {
+    eventId: "evt-t1485-two-companies",
+    sentAt: "2026-10-19T18:09:00Z",
+    now: "2026-10-19T18:09:06Z",
+  },
+  allShareOne: {
+    eventId: "evt-t1485-all-share-one",
+    sentAt: "2026-10-19T18:11:00Z",
+    now: "2026-10-19T18:11:06Z",
+  },
+} as const;
+
+/** S1-04's row's send, played: sent, delivered, and the clock's due time at the receipt (a day on). */
+const S1_04_SEND = {
+  sentAt: "2026-10-19T18:07:08Z",
+  deliveredAt: "2026-10-19T18:07:09Z",
+  dueAt: "2026-10-20T18:07:09Z",
+} as const;
+
+/** The owner's three kinds (commit-s1-02.json's words), and the two answers to S1-04 (K-09's two S1-04 fixtures). */
+const THREE_KINDS = "Barbershop, plumbing, electrical";
+const ALL_SHARE_ONE_WORDS = "They all share one company";
+const TWO_COMPANIES_WORDS = "Plumbing and electrical share Lee Home Services";
+
+/** K-09 v1.11's two S1-04 commit fixtures: the roster owner's "All share one" (c-02) and Sam's "Some share one" (c-01). */
+const S1_04_FIXTURES = {
+  allShareOne: {
+    request: (commitS104 as unknown as { readonly request: Json }).request,
+    words: ALL_SHARE_ONE_WORDS,
+    names: {
+      business: "biz-roster-owner-1",
+      person: "person-roster-owner-1",
+      handle: "handle-roster-owner-1",
+      number: "+15555550150",
+      chat: "linq-chat-demo-roster",
+      turn: "turn-s1-04-roster",
+      trace: "trace-roster-0002",
+      event: "evt-roster-0002",
+      question: "oq-s1-04-roster-1",
+    },
+  },
+  twoCompanies: {
+    request: (commitS104SomeShare as unknown as { readonly request: Json }).request,
+    words: TWO_COMPANIES_WORDS,
+    names: {
+      business: BARBERSHOP,
+      person: SAM.personId,
+      handle: SAM.handleId,
+      number: SAM.number,
+      chat: SAM_CHAT,
+      turn: "turn-s1-04-sam",
+      trace: "trace-sam-0002",
+      event: "evt-sam-0002",
+      question: "oq-s1-04-sam",
+    },
+  },
+} as const;
+
+/** An S1-04 commit fixture's request, as this file changes it. */
+type S1_04Request = Json & {
+  turn: Json;
+  now: string;
+  input: {
+    decided: {
+      context: Json & {
+        bundleId: unknown;
+        writer: { people: unknown[] };
+        texts: { words: string; sentAt: { utc: string } }[];
+        openQuestions: { sentAt: { utc: string } }[];
+        recentMessages: { sentAt: { utc: string } }[];
+      };
+      decide: Json & { bundleId: unknown };
+    };
+  };
+};
+
+/** S1-04's question and row the multi-kind owner's S1-02 answer opens (K-09 v1.5 default 131: from its turn's id). */
+async function multiKindS1_04(): Promise<{
+  readonly questionId: string;
+  readonly rowId: string;
+  readonly turnId: string;
+}> {
+  const turnId = await turnIdOf([MULTI_KIND_TEXTS.kinds.eventId]);
+  return { questionId: `oq-s1-04-${turnId}-1`, rowId: `outbox-s1-04-${turnId}-1`, turnId };
+}
+
+/**
+ * The multi-kind owner's answer to the S1-04 question its S1-02 answer opened: the fixture's request (its own words and
+ * choice, as K-09 accepted it) under the turn id the lease hashes from `said`'s one event id, on a trace of its own, the
+ * turn, its context and decide's result pinned to bundle v2; every id of the fixture's owner swapped for this owner's, its
+ * question S1-04's; its writer the owner as the frontier names a person with no name and no role; and the moments after
+ * S1-04's question went out.
+ */
+async function s1_04Gate(which: keyof typeof S1_04_FIXTURES, said: OwnerText): Promise<GateCall> {
+  const { request: base, words, names } = S1_04_FIXTURES[which];
+  const turnId = await turnIdOf([said.eventId]);
+  const trace = tracedOnV2(turnId);
+  const s1_04 = await multiKindS1_04();
+  const request = renamed(
+    structuredClone(base),
+    new Map<string, string>([
+      [names.business, MULTI_KIND.businessId],
+      [names.person, MULTI_KIND.personId],
+      [names.handle, MULTI_KIND.handleId],
+      [names.number, MULTI_KIND.number],
+      [names.chat, MULTI_KIND.chatId],
+      [names.turn, turnId],
+      [names.trace, trace.traceId],
+      [names.event, said.eventId],
+      [names.question, s1_04.questionId],
+    ]),
+  ) as S1_04Request;
+  const { context, decide } = request.input.decided;
+  const [text] = context.texts;
+  if (text?.words !== words) throw new Error(`the ${which} fixture's context holds the owner's text`);
+  text.sentAt.utc = said.sentAt;
+  for (const question of context.openQuestions) question.sentAt.utc = S1_04_SEND.sentAt;
+  for (const message of context.recentMessages) message.sentAt.utc = S1_04_SEND.sentAt;
+  request.turn.bundleId = { ...BUNDLE_V2_ID };
+  context.bundleId = { ...BUNDLE_V2_ID };
+  decide.bundleId = { ...BUNDLE_V2_ID };
+  context.writer.people = [{ personId: MULTI_KIND.personId, name: "", roles: [], language: null }];
+  request.now = said.now;
+  return { request, turnId, trace };
+}
+
+/** Staging's gate reads over a root of the test's own, with no adapter (as the T-1494 walk builds them), and that root. */
+function stagingGateOver(testEnv: TestEnv): { readonly rooted: Rooted; readonly reads: GateReads } {
+  const rooted = rootOver(testEnv);
+  const reads = stagingGateReads({
+    env: testEnv.env,
+    db: rooted.db,
+    keys: sealingWrapKeys(testEnv.env),
+    bundleSafety: null,
+  });
+  if (reads === null) throw new Error("the gate is bound with both bindings");
+  return { rooted, reads };
+}
+
+/** What the multi-kind owner's picks, company kinds and S1-04 question hold, as the runtime side reads them. */
+function multiKindRows(questionId: string): Promise<Json> {
+  return own.runtime("multiKindRows", async (sql) => ({
+    question: plainRows(
+      await sql<Json[]>`select step, status, version from open_questions where id = ${questionId}`,
+    ),
+    picks: plainRows(
+      await sql<Json[]>`
+      select id, kind_id, outcome, company_id, business_id from picked_kinds
+      where owner_person_id = ${MULTI_KIND.personId} order by id collate "C"
+    `,
+    ),
+    companies: plainRows(
+      await sql<Json[]>`
+      select id, business_id from companies where owner_person_id = ${MULTI_KIND.personId} order by id collate "C"
+    `,
+    ),
+    companyKinds: plainRows(
+      await sql<Json[]>`
+      select kind_id, business_id from company_kinds where company_id = ${MULTI_KIND.companyId}
+      order by kind_id collate "C"
+    `,
+    ),
+    texts: plainRows(
+      await sql<Json[]>`
+      select t.business_id, count(*)::int as n from picked_kind_texts t
+      join picked_kinds p on p.id = t.picked_kind_id
+      where p.owner_person_id = ${MULTI_KIND.personId} group by t.business_id
+    `,
+    ),
+  }));
+}
+
+describe("an answer to an S1-04 that was asked, on staging's gate with S1-04's writer bound and the party rule's flag off (T-1485)", () => {
+  it(
+    "the multi-kind owner's 'Barbershop, plumbing, electrical' on bundle v2 asks S1-04 (three picks, none placed); its row's send is played, so the question is open at version 2",
+    { timeout: TEST_MS },
+    async () => {
+      const before = await rowCounts();
+      const { rooted, reads } = stagingGateOver(envOf());
+      const call = await s1_02Gate(MULTI_KIND, MULTI_KIND_TEXTS.kinds, THREE_KINDS);
+      const pinned = pinnedV2Kinds();
+      const s1_04 = await multiKindS1_04();
+      expect(call.turnId).toBe(s1_04.turnId);
+
+      const answer = await pinnedGate({ root: rooted.root, reads }, call, pinned.bundle);
+
+      expect(answer, JSON.stringify(answer)).toMatchObject({
+        result: "committed",
+        turnId: call.turnId,
+        repeated: false,
+        openQuestions: { opened: [s1_04.questionId], closed: [MULTI_KIND.questionId] },
+      });
+      // S1-11 read the first kind's overlay once, barber's, from the pinned bundle.
+      expect(pinned.asked).toEqual(["barber"]);
+      expect(await multiKindRows(s1_04.questionId)).toEqual({
+        question: [{ step: "S1-04", status: "waiting", version: 1 }],
+        picks: ["barber", "plumber", "electrician"].map((kindId, index) => ({
+          id: `pick-s1-02-${call.turnId}-${String(index + 1)}`,
+          kind_id: kindId,
+          outcome: "listed",
+          company_id: null,
+          business_id: null,
+        })),
+        companies: [{ id: MULTI_KIND.companyId, business_id: MULTI_KIND.businessId }],
+        companyKinds: [{ kind_id: "barber", business_id: MULTI_KIND.businessId }],
+        texts: [{ business_id: null, n: 11 }],
+      });
+      await expectCountsAfter(
+        before,
+        { turns: 1, open_questions: 1, clock_rows: 1, outbox_rows: 1, safety_outcomes: 1 },
+        "grows",
+      );
+
+      // S1-04's row's send, played on the runtime side: one delivered part, the row delivered, then K-05's own armClock.
+      await own.runtime("deliverS1_04", async (sql) => {
+        await sql`
+          insert into outbox_parts (
+            outbox_row_id, part_no, try_no, idempotency_key, attempts, kind, linq_message_id, state, sent_at, delivered_at
+          ) values (
+            ${s1_04.rowId}, 1, 1, ${`${s1_04.rowId}/1/1`}, 1, 'words', ${`linq-msg-${s1_04.rowId}`}, 'delivered',
+            ${S1_04_SEND.sentAt}, ${S1_04_SEND.deliveredAt}
+          )
+        `;
+        await sql`update outbox_rows set state = 'delivered', version = version + 1 where id = ${s1_04.rowId}`;
+      });
+      const armed = await own.runtime("armClock", (sql) =>
+        armClock(sql, {
+          openQuestionId: s1_04.questionId,
+          deliveredAt: S1_04_SEND.deliveredAt,
+          dueAt: S1_04_SEND.dueAt,
+          dueZone: "America/New_York",
+        }),
+      );
+      expect(armed).toMatchObject({ result: "armed", repeated: false });
+      expect((await multiKindRows(s1_04.questionId)).question).toEqual([
+        { step: "S1-04", status: "open", version: 2 },
+      ]);
+    },
+  );
+
+  it(
+    "Sam's own two-company answer ('Plumbing and electrical share Lee Home Services') with the flag off fails closed inside the Tool API base: realGate rejects with CompaniesRefusedError secondCompany (labels only), never a K-09 answer, sent once and never retried by the gate; nothing written, the question still open at version 2, no line holding the owner's words or number",
+    { timeout: TEST_MS },
+    async () => {
+      const before = await rowCounts();
+      const s1_04 = await multiKindS1_04();
+      const rowsBefore = await multiKindRows(s1_04.questionId);
+      const { rooted, reads } = stagingGateOver(envOf());
+      const call = await s1_04Gate("twoCompanies", MULTI_KIND_TEXTS.twoCompanies);
+      const pinned = pinnedV2Kinds();
+      const commits: unknown[] = [];
+
+      const thrown = await rejectionOf(
+        realGate({
+          reads,
+          commitTurn: (request) => {
+            commits.push(request);
+            return rooted.root.ports.turnRow.commitTurn(request);
+          },
+          bundles: () => rooted.root.ports.bundles,
+          pinnedOf: (trace) => (trace === call.trace ? pinned.bundle : null),
+        }).gateAndCommit(call.request as never, NOTHING_OPEN, call.trace),
+      );
+
+      // What the base hands back: the writer's refusal, thrown as it came (the base answers no K-09 error for it).
+      expect(thrown).toBeInstanceOf(CompaniesRefusedError);
+      expect(thrown).toMatchObject({ name: "CompaniesRefusedError", fault: "secondCompany", ids: ["S1-04"] });
+      expect((thrown as Error).message).toBe(new CompaniesRefusedError("secondCompany", ["S1-04"]).message);
+      expect(Object.keys(thrown as Error).sort()).toEqual(["fault", "ids", "name"]);
+      for (const text of textsOf(thrown)) {
+        for (const secret of [
+          TWO_COMPANIES_WORDS,
+          "Lee Home Services",
+          "Plumbing and electrical",
+          MULTI_KIND.number,
+          MULTI_KIND.number.slice(1),
+          MULTI_KIND.personId,
+          MULTI_KIND.handleId,
+          MULTI_KIND.chatId,
+        ]) {
+          expect(text, "the refusal holds the owner's words or an id").not.toContain(secret);
+        }
+      }
+      // Sent once, never again by the gate: one scope, its seal, S1-04's writer's item 79 and the kinds' names by id
+      // (item 26, for "Some share one"'s words), refused once the groups are known: no item 72, no S1-08, no commit.
+      expect(commits).toEqual([]);
+      expect(callsOf(rooted.written)).toEqual([
+        onApp(GATE_CALLS.scope),
+        onJob(GATE_CALLS.seal),
+        onJob(GATE_CALLS.pickedKinds),
+        onJob(GATE_CALLS.kindsById),
+      ]);
+      expect(pinned.asked).toEqual([]);
+      const counts = rooted.db.counts();
+      expect(counts).toMatchObject({ connectionsOpen: 0, connectionsPeak: 2 * CONNECTIONS_PER_CLIENT });
+      expect(counts.ended).toBe(counts.opened);
+      // Nothing written: the counts, the picks, the company kinds and the question as they were.
+      expect(await rowCounts()).toEqual(before);
+      expect(await multiKindRows(s1_04.questionId)).toEqual(rowsBefore);
+      expect(rowsBefore.question).toEqual([{ step: "S1-04", status: "open", version: 2 }]);
+      // Labels only: no line of the test's holds the owner's words or number.
+      for (const line of lines) {
+        for (const secret of [TWO_COMPANIES_WORDS, "Lee Home Services", MULTI_KIND.number]) {
+          expect(line, "a line holds the owner's words or number").not.toContain(secret);
+        }
+      }
+    },
+  );
+
+  it(
+    "'They all share one company' on bundle v2, through realGate over staging's gate reads, commits once: S1-04's question closed at its version, the three picks placed under the owner's company and business, plumber's and electrician's company kinds beside barber's, the barbershop's 11 blocks given the business, S1-08's row, S1-09's question and its row; every call one after another, 2 connections at most",
+    { timeout: TEST_MS },
+    async () => {
+      const before = await rowCounts();
+      const s1_04 = await multiKindS1_04();
+      const { rooted, reads } = stagingGateOver(envOf());
+      const call = await s1_04Gate("allShareOne", MULTI_KIND_TEXTS.allShareOne);
+      const pinned = pinnedV2Kinds();
+      const key = call.turnId;
+
+      const answer = await pinnedGate({ root: rooted.root, reads }, call, pinned.bundle);
+
+      expect(answer, JSON.stringify(answer)).toMatchObject({
+        result: "committed",
+        turnId: key,
+        repeated: false,
+        openQuestions: { opened: [`oq-s1-09-${key}-1`], closed: [s1_04.questionId] },
+      });
+      // No trade overlay is read: S1-11 is not walked again.
+      expect(pinned.asked).toEqual([]);
+      expect(await multiKindRows(s1_04.questionId)).toEqual({
+        question: [{ step: "S1-04", status: "answered", version: 3 }],
+        picks: ["barber", "plumber", "electrician"].map((kindId, index) => ({
+          id: `pick-s1-02-${s1_04.turnId}-${String(index + 1)}`,
+          kind_id: kindId,
+          outcome: "listed",
+          company_id: MULTI_KIND.companyId,
+          business_id: MULTI_KIND.businessId,
+        })),
+        // The turn's own company alone: no second company.
+        companies: [{ id: MULTI_KIND.companyId, business_id: MULTI_KIND.businessId }],
+        companyKinds: ["barber", "electrician", "plumber"].map((kindId) => ({
+          kind_id: kindId,
+          business_id: MULTI_KIND.businessId,
+        })),
+        texts: [{ business_id: MULTI_KIND.businessId, n: 11 }],
+      });
+      const rows = await own.runtime("multiKindTurn", async (sql) => ({
+        questions: plainRows(
+          await sql<Json[]>`
+          select id, step, status, business_id, person_id from open_questions where turn_id = ${key}
+          order by id collate "C"
+        `,
+        ),
+        outbox: plainRows(
+          await sql<Json[]>`
+          select id, step, line_no, open_question_id, send_class, recipient_handle_id, business_id, plan from outbox_rows
+          where turn_id = ${key} order by id collate "C"
+        `,
+        ),
+      }));
+      expect(rows).toEqual({
+        questions: [
+          {
+            id: `oq-s1-09-${key}-1`,
+            step: "S1-09",
+            status: "waiting",
+            business_id: MULTI_KIND.businessId,
+            person_id: MULTI_KIND.personId,
+          },
+        ],
+        outbox: [
+          {
+            id: `outbox-s1-08-${key}-1`,
+            step: "S1-08",
+            line_no: 0,
+            open_question_id: null,
+            send_class: "quick_reply",
+            recipient_handle_id: MULTI_KIND.handleId,
+            business_id: MULTI_KIND.businessId,
+            plan: null,
+          },
+          {
+            id: `outbox-s1-09-${key}-1`,
+            step: "S1-09",
+            line_no: 0,
+            open_question_id: `oq-s1-09-${key}-1`,
+            send_class: "quick_reply",
+            recipient_handle_id: MULTI_KIND.handleId,
+            business_id: MULTI_KIND.businessId,
+            plan: null,
+          },
+        ],
+      });
+
+      // Every call on its own client and side, one after another, the scope's held throughout: the seal; S1-04's
+      // writer's item 79, item 72 and the catalog by id for each company kind it writes; S1-08's stop reads; the commit.
+      expect(callsOf(rooted.written)).toEqual([
+        onApp(GATE_CALLS.scope),
+        onJob(GATE_CALLS.seal),
+        onJob(GATE_CALLS.pickedKinds),
+        onApp(GATE_CALLS.businessKinds),
+        onJob(GATE_CALLS.kindsById),
         onJob(GATE_CALLS.kindsById),
         onJob(GATE_CALLS.stopHandle),
         onJob(GATE_CALLS.stopHandleIdsOfPerson),
