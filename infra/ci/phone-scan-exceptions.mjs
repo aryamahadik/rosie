@@ -561,4 +561,72 @@ export const EXCEPTIONS = [
       "bundle v2's KV bulk file, which holds its trade overlays compiled from the master's own trade text",
     ),
   ),
+
+  // Bundle v3 (T-1526, DL-1128): bundle v2's trade overlays byte for byte, so the same trades, each naming the same
+  // public line as bundle v2's copy, and its KV bulk file, which holds every overlay's bytes.
+  ...[
+    [
+      PUBLIC_LINES.poisonHelp,
+      [
+        "allergist",
+        "cardiologist",
+        "credit-counselor",
+        "dentist",
+        "dermatologist",
+        "doula",
+        "endocrinologist",
+        "ent",
+        "gastroenterologist",
+        "hair-restoration",
+        "iv-hydration",
+        "lactation",
+        "lawn",
+        "midwife",
+        "neurologist",
+        "ophthalmologist",
+        "optometrist",
+        "oral-surgeon",
+        "orthodontist",
+        "orthopedist",
+        "painter",
+        "pediatrician",
+        "pest",
+        "pharmacist",
+        "plastic-surgeon",
+        "pool",
+        "pressure",
+        "primary-care",
+        "psychic",
+        "senior-living",
+        "urgent-care",
+        "urologist",
+      ],
+    ],
+    [
+      PUBLIC_LINES.domesticViolence,
+      ["immigration-services", "lawyer", "mediator", "movers", "private-investigator"],
+    ],
+    [PUBLIC_LINES.elderFraud, ["advisor", "insurance"]],
+    [PUBLIC_LINES.housingCounseling, ["mortgage"]],
+  ].flatMap(([line, names]) =>
+    names.map((trade) =>
+      publicLine(
+        `bundles/v3/bundle/trade/${trade}.json`,
+        line,
+        "a trade overlay of bundle v3, bundle v2's byte for byte, compiled from the master's own trade text",
+      ),
+    ),
+  ),
+  ...[
+    PUBLIC_LINES.poisonHelp,
+    PUBLIC_LINES.domesticViolence,
+    PUBLIC_LINES.elderFraud,
+    PUBLIC_LINES.housingCounseling,
+  ].map((line) =>
+    publicLine(
+      "bundles/v3/bundle.kv.json",
+      line,
+      "bundle v3's KV bulk file, which holds its trade overlays compiled from the master's own trade text",
+    ),
+  ),
 ];
