@@ -35,12 +35,13 @@
 // T-1520 (DL-1056, DL-1076): S1-03 is bound through the same instance's draft wrapper beside S1-02's binding, so a
 // one-kind "One isn't on the list yet" drafts under the pick's business; without the companies reads, as today.
 //
-// T-1484 (H1b; K-09 README defaults 181 to 185 and 190; DL-1033, DL-1121): the same companies reads also bind S1-04's own
-// writer (T-1481's companiesWriter) with SignUpWriterDeps.partyRuleLive, so on the walk the binding hands writesOf, an
-// answered S1-04 (commit-s1-04-some-share.json's turn, pinned to bundle v2) closes its question at its version, places
-// Sam's kept picks and walks on to S1-08's row and S1-09's question: "All share one" in his one company; his own "Some
-// share one" refused (secondCompany) with the flag off and commit-s1-04-some-share.json's rows with it on; one kept pick on
-// file placed by its update. With the companies reads left out, an answered S1-04 is notBuilt as today.
+// T-1484 (H1b; K-09 README defaults 181 to 185 and 190; DL-1033, DL-1121): the same companies reads, with S1-04's writer's
+// own deps (SignUpWriterDeps.s1_04Writer and its party rule's flag), also bind S1-04's own writer (T-1481's
+// companiesWriter), so on the walk the binding hands writesOf, an answered S1-04 (commit-s1-04-some-share.json's turn,
+// pinned to bundle v2) closes its question at its version, places Sam's kept picks and walks on to S1-08's row and
+// S1-09's question: "All share one" in his one company; his own "Some share one" refused (secondCompany) with the flag off
+// and commit-s1-04-some-share.json's rows with it on; one kept pick on file placed by its update. With no S1-04 writer
+// bound (no companies reads, no s1_04Writer, or the companies reads alone), an answered S1-04 is notBuilt as today.
 
 import { describe, expect, it } from "vitest";
 
@@ -110,6 +111,7 @@ import {
   turnCommitDeps,
   walkChatsOf,
   type CommitAt,
+  type S1_04WriterDeps,
   type SafetyReads,
   type SignUpWriterDeps,
   type TurnCommitBinding,
@@ -738,8 +740,8 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
     readonly kindsStop?: boolean;
     /** (T-1484) What items 79 and 72 answer (default: the doubles' own, no pick on file). */
     readonly world?: CompaniesGiven;
-    /** (T-1484) The party rule's flag, handed in as given; left out, not handed in. */
-    readonly partyRuleLive?: boolean;
+    /** (T-1484) S1-04's writer's own deps (the party rule's flag), handed in as given; left out, not handed in. */
+    readonly s1_04Writer?: S1_04WriterDeps;
   }
 
   /** The sign-up steps' deps over the doubles (items 78 and 79, item 72 and the catalog, the stop home, bundle v2's overlays). */
@@ -752,7 +754,7 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
       kinds: { reads: kindsReadsOf(k05.k05), ...(given.kindsStop === true ? { stop } : {}) },
       plugIns: { bundles: trades.bundles },
       ...(given.companies === true ? { companies: companiesReadsOf(companies.k05) } : {}),
-      ...(given.partyRuleLive === undefined ? {} : { partyRuleLive: given.partyRuleLive }),
+      ...(given.s1_04Writer === undefined ? {} : { s1_04Writer: given.s1_04Writer }),
       ...(given.plan === undefined ? {} : { plan: given.plan === "withStop" ? { stop } : {} }),
     };
     return { deps, k05, companies, trades };
@@ -807,7 +809,7 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
     expect(trades.reads).toEqual([]);
   });
 
-  it("with the companies reads and S1-08's deps: S1-04's buttons settler alone, S1-04's writer (T-1484), S1-08's writer, S1-02's settler and the other writers as before; building them reads nothing", () => {
+  it("with the companies reads and S1-08's deps: S1-04's buttons settler alone, S1-08's writer, S1-02's settler and the other writers as before; building them reads nothing", () => {
     const { deps, k05, companies, trades } = signUpOver({ companies: true, plan: "withStop" });
     const steps = signUpSteps<unknown>(deps);
     expect(Object.keys(steps).sort()).toEqual(["buttonsSettlers", "settlers", "writers"]);
@@ -815,11 +817,10 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
     for (const stepId of ["S1-02", "S1-08", "S1-09", "s1-04", "", "constructor", "__proto__"]) {
       expect(steps.buttonsSettlers?.(stepId), stepId).toBeNull();
     }
-    // T-1484 (H1b): S1-04 now has its own writer beside its settler, from the same companies reads.
-    for (const stepId of ["S1-02", "S1-03", "S1-74", "S1-11", "S1-04", "S1-08"]) {
+    for (const stepId of ["S1-02", "S1-03", "S1-74", "S1-11", "S1-08"]) {
       expect(typeof steps.writers(stepId), stepId).toBe("function");
     }
-    for (const stepId of ["S1-01", "S1-09", "s1-04", "toString", "__proto__"]) {
+    for (const stepId of ["S1-01", "S1-04", "S1-09", "toString", "__proto__"]) {
       expect(steps.writers(stepId), stepId).toBeNull();
     }
     expect(typeof steps.settlers("S1-02")).toBe("function");
@@ -834,7 +835,7 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
     const companiesOnly = signUpSteps<unknown>(signUpOver({ companies: true }).deps);
     expect(typeof companiesOnly.buttonsSettlers?.("S1-04")).toBe("function");
     expect(companiesOnly.writers("S1-08")).toBeNull();
-    expect(typeof companiesOnly.writers("S1-04")).toBe("function");
+    expect(companiesOnly.writers("S1-04")).toBeNull();
     const planOnly = signUpSteps<unknown>(signUpOver({ plan: "withStop" }).deps);
     expect(Object.hasOwn(planOnly, "buttonsSettlers")).toBe(false);
     expect(typeof planOnly.writers("S1-08")).toBe("function");
@@ -983,7 +984,7 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
 
   // ---- T-1484 (H1b): S1-04's writer for an answered S1-04 ----------------------------------------------------------------
 
-  describe("S1-04's writer, bound from the same companies reads, takes an answer to an S1-04 that was asked (T-1484, H1b; K-09 README defaults 181 to 185 and 190)", () => {
+  describe("S1-04's writer, bound from the same companies reads with its own deps (s1_04Writer), takes an answer to an S1-04 that was asked (T-1484, H1b; K-09 README defaults 181 to 185 and 190)", () => {
     const ALL = "c-02";
     const SOME = "c-01";
     const EACH = "c-03";
@@ -1082,9 +1083,49 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
       asks: [["oq-s1-09-sam-1", "S1-09"]],
     };
 
+    it("S1-04's writer is bound only with the companies reads and s1_04Writer both: with the companies reads alone (staging's binding since H2a) or s1_04Writer alone, none; the other writers, the settlers and the buttons settler are as without it; building it reads nothing", () => {
+      const { deps, k05, companies, trades } = signUpOver({
+        companies: true,
+        s1_04Writer: {},
+        plan: "withStop",
+      });
+      const steps = signUpSteps<unknown>(deps);
+      expect(Object.keys(steps).sort()).toEqual(["buttonsSettlers", "settlers", "writers"]);
+      for (const stepId of ["S1-02", "S1-03", "S1-74", "S1-11", "S1-04", "S1-08"]) {
+        expect(typeof steps.writers(stepId), stepId).toBe("function");
+      }
+      for (const stepId of ["S1-01", "S1-09", "s1-04", "toString", "__proto__"]) {
+        expect(steps.writers(stepId), stepId).toBeNull();
+      }
+      expect(typeof steps.buttonsSettlers?.("S1-04")).toBe("function");
+      expect(typeof steps.settlers("S1-02")).toBe("function");
+      expect(steps.settlers("S1-04")).toBeNull();
+      expect(k05.asked).toEqual([]);
+      expect(companies.asked).toEqual([]);
+      expect(trades.reads).toEqual([]);
+      // The flag on binds the same steps.
+      const on = signUpSteps<unknown>(
+        signUpOver({ companies: true, s1_04Writer: { partyRuleLive: true } }).deps,
+      );
+      expect(typeof on.writers("S1-04")).toBe("function");
+      expect(on.writers("S1-08")).toBeNull();
+      for (const given of [
+        { companies: true, plan: "withStop" },
+        { companies: true },
+        { s1_04Writer: {}, plan: "withStop" },
+        { s1_04Writer: { partyRuleLive: true } },
+      ] as const) {
+        expect(
+          signUpSteps<unknown>(signUpOver(given).deps).writers("S1-04"),
+          JSON.stringify(given),
+        ).toBeNull();
+      }
+    });
+
     it("'All share one' with the flag left out: the question closed at its version, Sam's three picks placed in his company under his business, the plumber and electrician company kinds first (barber kept), his barbershop's 11 blocks given the business, then S1-08's row and S1-09's question; the settler is never asked", async () => {
       const { deps, companies } = signUpOver({
         companies: true,
+        s1_04Writer: {},
         plan: "withStop",
         world: { picks: samPicks() },
       });
@@ -1158,16 +1199,16 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
     });
 
     it("Sam's own answer ('Some share one': plumbing and electrical share Lee Home Services) needs a second company: with the flag left out or false it is refused (secondCompany) with nothing returned; with it on, the rows are commit-s1-04-some-share.json's, then S1-08's row and S1-09's question", async () => {
-      for (const partyRuleLive of [undefined, false]) {
+      for (const s1_04Writer of [{}, { partyRuleLive: false }]) {
         const { deps, companies } = signUpOver({
           companies: true,
+          s1_04Writer,
           plan: "withStop",
           world: { picks: samPicks() },
-          ...(partyRuleLive === undefined ? {} : { partyRuleLive }),
         });
         const refused = answered(deps, SOME, SAMS_ANSWER).writing;
-        await expect(refused, String(partyRuleLive)).rejects.toBeInstanceOf(CompaniesRefusedError);
-        await expect(refused, String(partyRuleLive)).rejects.toMatchObject({
+        await expect(refused, JSON.stringify(s1_04Writer)).rejects.toBeInstanceOf(CompaniesRefusedError);
+        await expect(refused, JSON.stringify(s1_04Writer)).rejects.toMatchObject({
           fault: "secondCompany",
           ids: ["S1-04"],
         });
@@ -1176,9 +1217,9 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
       }
       const { deps } = signUpOver({
         companies: true,
+        s1_04Writer: { partyRuleLive: true },
         plan: "withStop",
         world: { picks: samPicks() },
-        partyRuleLive: true,
       });
       const writes = await answered(deps, SOME, SAMS_ANSWER).writing;
       expect(writes.state).toEqual(s1_04Exchange(COMMIT_S1_04_SOME_SHARE).given.stated.writes.state);
@@ -1189,8 +1230,12 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
       ).toEqual(AFTER_S1_04.steps);
       // "Each is its own" with the flag on: three companies, the turn's own and two new ones with no business.
       const each = await answered(
-        signUpOver({ companies: true, plan: "withStop", world: { picks: samPicks() }, partyRuleLive: true })
-          .deps,
+        signUpOver({
+          companies: true,
+          s1_04Writer: { partyRuleLive: true },
+          plan: "withStop",
+          world: { picks: samPicks() },
+        }).deps,
         EACH,
         [],
       ).writing;
@@ -1207,7 +1252,12 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
     });
 
     it("one kept pick on file with S1-04 asked of it all the same (the user's phone): 'All share one' places it by an update at its version, its company kind first, its 11 blocks given the business, then S1-08's plan row and S1-09's question", async () => {
-      const { deps } = signUpOver({ companies: true, plan: "withStop", world: { picks: onePick() } });
+      const { deps } = signUpOver({
+        companies: true,
+        s1_04Writer: {},
+        plan: "withStop",
+        world: { picks: onePick() },
+      });
       const writes = await answered(deps, ALL, []).writing;
       expect(writes.closes.map((close) => [close.id, close.status, close.expectVersion])).toEqual([
         ["oq-s1-04-sam", "answered", 1],
@@ -1248,23 +1298,41 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
       ).toEqual(AFTER_S1_04.steps);
     });
 
-    it("with the companies reads left out (S1-08's deps alone, or none) an answered S1-04 is notBuilt as today, before any read; with them and no S1-08 deps it is notBuilt too (no writer at S1-08), before any read", async () => {
-      for (const given of [{ plan: "withStop" }, {}, { companies: true }] as const) {
+    it("with no S1-04 writer bound (no companies reads, no s1_04Writer, or the companies reads alone as staging's binding since H2a) an answered S1-04 is notBuilt (gives) as today, before any read; with the writer and no S1-08 deps it is notBuilt too (no writer at S1-08), before any read", async () => {
+      for (const given of [
+        { plan: "withStop" },
+        {},
+        { companies: true, plan: "withStop" },
+        { s1_04Writer: {}, plan: "withStop" },
+      ] as const) {
         const { deps, companies } = signUpOver({ ...given, world: { picks: samPicks() } });
         const { writing, questionReads } = answered(deps, ALL, []);
         await expect(writing, JSON.stringify(given)).rejects.toBeInstanceOf(WalkNotBuiltError);
+        await expect(writing, JSON.stringify(given)).rejects.toMatchObject({
+          seam: "gives",
+          ids: ["S1-04", "companies"],
+        });
         expect(questionReads, JSON.stringify(given)).toEqual([]);
         expect(companies.asked, JSON.stringify(given)).toEqual([]);
       }
-      const { deps } = signUpOver({ plan: "withStop", world: { picks: samPicks() } });
-      await expect(answered(deps, ALL, []).writing).rejects.toMatchObject({
-        seam: "gives",
-        ids: ["S1-04", "companies"],
+      const { deps, companies } = signUpOver({
+        companies: true,
+        s1_04Writer: {},
+        world: { picks: samPicks() },
       });
+      const { writing, questionReads } = answered(deps, ALL, []);
+      await expect(writing).rejects.toBeInstanceOf(WalkNotBuiltError);
+      await expect(writing).rejects.toMatchObject({ ids: ["S1-08"] });
+      expect(questionReads).toEqual([]);
+      expect(companies.asked).toEqual([]);
     });
 
     it("signUpStepWriters binds no S1-04 writer, whatever its deps carry (default 6)", () => {
-      const { deps } = signUpOver({ companies: true, plan: "withStop", partyRuleLive: true });
+      const { deps } = signUpOver({
+        companies: true,
+        s1_04Writer: { partyRuleLive: true },
+        plan: "withStop",
+      });
       expect(signUpStepWriters<unknown>(deps)("S1-04")).toBeNull();
       expect(signUpStepWriters<unknown>(deps)("S1-08")).toBeNull();
     });

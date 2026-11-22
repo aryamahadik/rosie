@@ -25,7 +25,8 @@
 //
 // Real here: the Tool API base, the gate and limits 1 to 6, the commit, the walk (T-1461, T-1479, T-1480, T-1491), the
 // binding of T-1493 and T-1484 (pgTurnCalls with settleSignUp: signUpSteps over pgKindsReads, the trade port over the
-// bundles' own overlays, pgCompaniesReads, S1-08's stop reads and, for the second owner, the party rule's flag), T-633's,
+// bundles' own overlays, pgCompaniesReads, S1-04's writer's deps (s1_04Writer, with the party rule's flag on for the
+// second owner) and S1-08's stop reads), T-633's,
 // T-634's, T-1492's, T-1481's and T-1482's code, T-632's matcher, runCore with the safety service, compose input and
 // finalize, claimOutbox, every data-access call, row-level security and the two application roles. Given: the bundles as
 // the frontier's fake over bundles/v2's and bundles/v1's own files; the decided texts, K-09's commit-s1-01.json,
@@ -33,13 +34,15 @@
 // plans, written from compose input's own master text and term facts as a composer would give them. Each send is played
 // by one delivered part as pg/one-kind.int.test.ts plays one, then K-05's own armClock.
 //
-// The faces: `face`, the whole binding (the companies reads, S1-08's deps with the stop reads, the party flag left out);
-// `partyFace`, the same with the party flag on; and `beforeFace`, T-1503's binding with no companies reads and no S1-08
-// deps (staging's before H2a), which asks S1-04 of an owner with one kind and refuses an answer to it (notBuilt).
+// The faces: `face`, the whole binding (the companies reads, S1-04's writer's deps with the party flag left out, S1-08's
+// deps with the stop reads); `partyFace`, the same with the party flag on; `h1aFace`, H1a's binding (the companies reads
+// and S1-08's deps, no s1_04Writer: staging's since T-1494, H2a), which refuses an answer to S1-04 (notBuilt); and
+// `beforeFace`, T-1503's binding with no companies reads and no S1-08 deps (staging's before H2a), which asks S1-04 of an
+// owner with one kind and refuses an answer to it (notBuilt).
 //
 // The owners:
-//   1. "Barbershop, plumbing, electrical" opens S1-04 under bundle v2. Through beforeFace, "They all share one company"
-//      is refused with nothing written. Through face it is one commit: S1-04's question closed at its version; the three
+//   1. "Barbershop, plumbing, electrical" opens S1-04 under bundle v2. Through beforeFace and h1aFace, "They all share one
+//      company" is refused with nothing written. Through face it is one commit: S1-04's question closed at its version; the three
 //      picks placed under the roster company and its business; the barbershop's 11 text blocks given that business;
 //      plumber and electrician company kinds beside the barber one; S1-08's row (step S1-08, line 0, no question);
 //      S1-09's question and its row; no statement of rosie_app on a table that spans businesses (so none could answer
@@ -439,11 +442,19 @@ const trades: PlugInBundles = {
 };
 
 /** Which binding a face hands in (the top of this file). */
-type FaceKind = "whole" | "party" | "before";
+type FaceKind = "whole" | "party" | "h1a" | "before";
 
 let face: TurnFace;
 let partyFace: TurnFace;
+let h1aFace: TurnFace;
 let beforeFace: TurnFace;
+
+/** S1-04's writer's deps a face hands in: the party flag off (left out) or on; none for H1a's binding. */
+function s1_04WriterOf(kind: FaceKind): Pick<SignUpWriterDeps<Tx>, "s1_04Writer"> {
+  if (kind === "whole") return { s1_04Writer: {} };
+  if (kind === "party") return { s1_04Writer: { partyRuleLive: true } };
+  return {};
+}
 
 /** A face over this world's two clients with the binding `kind` names (the top of this file). */
 function faceOf(kind: FaceKind): TurnFace {
@@ -455,8 +466,8 @@ function faceOf(kind: FaceKind): TurnFace {
       ? {}
       : {
           companies: pgCompaniesReads(app, job),
+          ...s1_04WriterOf(kind),
           plan: { stop: pgStopReads(job) },
-          ...(kind === "party" ? { partyRuleLive: true } : {}),
         }),
   };
   return pgTurnFace(job, {
@@ -527,6 +538,7 @@ beforeAll(async () => {
   });
   face = faceOf("whole");
   partyFace = faceOf("party");
+  h1aFace = faceOf("h1a");
   beforeFace = faceOf("before");
 }, 240_000);
 
@@ -906,15 +918,23 @@ describe("an owner's 'All share one' in words to an S1-04 that was asked places 
   );
 
   it(
-    "with the companies reads left out (T-1503's binding), the answer is refused (notBuilt) with nothing written and S1-04's question left open",
+    "with no S1-04 writer bound (T-1503's binding with no companies reads, or H1a's with the companies reads and no s1_04Writer), the answer is refused (notBuilt) with nothing written and S1-04's question left open",
     SLOW,
     async () => {
-      const turnId = `${FIRST.turn3}-no-companies`;
       const before = { core: await snapshot(cdb), kinds: await kindsRows() };
-      const { answer: refused } = await answer(FIRST, "allShareOne", beforeFace, turnId);
-      expect(refused).toEqual({ error: "notBuilt", call: "gateAndCommit" });
-      expect(await footprint(cdb, turnId)).toEqual(NO_FOOTPRINT);
-      expect(await questionRow(FIRST.question2)).toEqual({ status: "open", version: openAt, step: "S1-04" });
+      for (const [turnId, through] of [
+        [`${FIRST.turn3}-no-companies`, beforeFace],
+        [`${FIRST.turn3}-h1a`, h1aFace],
+      ] as const) {
+        const { answer: refused } = await answer(FIRST, "allShareOne", through, turnId);
+        expect(refused, turnId).toEqual({ error: "notBuilt", call: "gateAndCommit" });
+        expect(await footprint(cdb, turnId), turnId).toEqual(NO_FOOTPRINT);
+        expect(await questionRow(FIRST.question2), turnId).toEqual({
+          status: "open",
+          version: openAt,
+          step: "S1-04",
+        });
+      }
       expect({ core: await snapshot(cdb), kinds: await kindsRows() }).toEqual(before);
     },
   );

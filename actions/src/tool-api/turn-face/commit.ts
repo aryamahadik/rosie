@@ -21,11 +21,12 @@
 //     README default 199; DL-1033, DL-1075), the read-only buttons settlers by step id (TurnCommitBinding.buttonsSettlers:
 //     signUpSteps' S1-04 one-kind settler, T-1492's), so an owner who names exactly one kind of work is never asked S1-04:
 //     the walk settles S1-04 and goes on to S1-08's row and S1-09's question. Left out, S1-04 is asked as before. And,
-//     where the wiring hands signUpSteps the same companies reads (T-1484, H1b; K-09 README defaults 181 to 185 and 190;
-//     DL-1033, DL-1121), S1-04's own writer by step id (T-1481's companiesWriter) among TurnCommitBinding.writers, so an
-//     owner's answer to an S1-04 that was asked ("All share one", in words or by its button) closes the question, places
-//     the kept picks in the companies the button gives (a second company only with the party rule's flag on) and walks
-//     on to S1-08's row and S1-09's question. Left out, an answered S1-04 is notBuilt (gives), as before;
+//     where the wiring hands signUpSteps the same companies reads and S1-04's writer's own deps (T-1484, H1b; K-09 README
+//     defaults 181 to 185 and 190; DL-1033, DL-1121: SignUpWriterDeps.s1_04Writer, with the party rule's flag), S1-04's
+//     own writer by step id (T-1481's companiesWriter) among TurnCommitBinding.writers, so an owner's answer to an S1-04
+//     that was asked ("All share one", in words or by its button) closes the question, places the kept picks in the
+//     companies the button gives (a second company only with the flag on) and walks on to S1-08's row and S1-09's
+//     question. Left out, an answered S1-04 is notBuilt (gives), as before;
 //   - askAgain (T-1505; K-09 v1.12 defaults 192 to 198): where the binding hands in the walk's question read
 //     (TurnCommitBinding.questions), the commit is handed the same read with the walk's turn key (CommitDeps.askAgain),
 //     so a turn whose parts decide ended in one question, with exactly one open question, sends that question again once
@@ -99,17 +100,20 @@
 //      domain/safety/record.ts lineRows) and tells no owner, and the owner's and zone's reads need one. So the door's lines
 //      answer notBuilt for every outcome but No, before any line row is planned; No sends no line, and the outage line is
 //      the bundle's, as the business-scoped binding's.
-//   6. (T-1493; restated by T-1484, H1b) signUpSteps' two new deps are independent of each other. `companies` binds, from
-//      the same reads, S1-02's one-kind wrapper and S1-04's buttons settler together, from one createOneKind instance
-//      (never one without the other: T-1492's default O6), and S1-04's own writer (T-1481's companiesWriter over those
-//      reads, with SignUpWriterDeps.partyRuleLive, read only beside `companies`). `plan` binds S1-08's writer alone,
-//      whenever it is given, with or without `companies`: S1-08 is reached both by a one-kind S1-02 answer (the settler)
-//      and by an answered S1-04 (its writer), so a caller hands `plan` wherever it binds S1-08's stop reads, not only
-//      beside `companies` (H1a's and H2a's reviewers' note: runtime/src/wiring/real.ts signUpOneKindOf is H2b's to
-//      change). With `companies` and no `plan`, either walk reaches S1-08 with no writer and is refused (notBuilt) with
-//      nothing written, as with `plan` and no stop reads; with `plan` and no `companies`, S1-04 has neither settler nor
-//      writer, so it is asked as before and an answer to it is notBuilt. signUpStepWriters reads none of the three: it
-//      binds no settler, and a wrapper bound without its settler would place a pick and still ask S1-04.
+//   6. (T-1493; restated by T-1484, H1b) signUpSteps' new deps are independent of each other. `companies` binds S1-02's
+//      one-kind wrapper and S1-04's buttons settler together, from one createOneKind instance (never one without the
+//      other: T-1492's default O6). `s1_04Writer` (T-1484) binds S1-04's own writer, T-1481's companiesWriter over those
+//      same `companies` reads, with the party rule's flag it carries, and is read only beside `companies` (with no reads
+//      there is nothing to write with, so S1-04 gets no writer). It is a dep of its own, not `companies` alone, so a
+//      binding that hands `companies` and not it (staging's since T-1494, H2a) keeps H1a's writers, step for step, until
+//      its own card hands it in (H2b, T-1485: runtime/src/wiring/real.ts). `plan` binds S1-08's writer alone, whenever it
+//      is given, with or without `companies`: S1-08 is reached both by a one-kind S1-02 answer (the settler) and by an
+//      answered S1-04 (its writer), so a caller hands `plan` wherever it binds S1-08's stop reads, not only beside
+//      `companies` (H1a's and H2a's reviewers' note: real.ts signUpOneKindOf, H2b's to change). With `companies` and no
+//      `plan`, either walk reaches S1-08 with no writer and is refused (notBuilt) with nothing written, as with `plan` and
+//      no stop reads; without `companies` and `s1_04Writer`, S1-04 has no writer, so an answer to it is notBuilt, as
+//      before. signUpStepWriters reads none of them: it binds no settler, and a wrapper bound without its settler would
+//      place a pick and still ask S1-04.
 
 import type { CommitContext } from "../../../../runtime/src/actor";
 import type {
@@ -381,10 +385,24 @@ export type KeywordCommitBinding<Repo> = Omit<
 // ---- the sign-up steps' read-only writers (T-1468) -------------------------------------------------------------------
 
 /**
+ * S1-04's writer's own deps beside the companies reads (T-1484, H1b; journey-1/companies CompaniesWriterDeps without its
+ * reads, which are SignUpWriterDeps.companies): the party rule's flag.
+ */
+export interface S1_04WriterDeps {
+  /**
+   * Whether the party rule is live (K-09 README default 184; open gap 149): true lets an S1-04 answer write a second
+   * company ("Some share one" or "Each is its own" whose groups come to more than one company); left out, or anything but
+   * true, it is off, and such an answer is refused (CompaniesRefusedError secondCompany) with nothing written and the
+   * question left open. Staging leaves it off until K-05's party version and its db/repo read are live (cards 17 to 19).
+   */
+  readonly partyRuleLive?: boolean;
+}
+
+/**
  * What the sign-up steps' writers read with: the kinds folder's ports (T-633) and the plug-in folder's (T-634), and,
  * for signUpSteps alone (T-1493, H1a; T-1484, H1b), the one-kind path's reads (T-1492), which S1-04's writer (T-1481)
- * reads through too, with the party rule's flag, and S1-08's writer's own deps (T-1482). `Repo` is the call's repo, which
- * the companies reads are handed (item 72 and the catalog by id and names).
+ * reads through too, given its own deps, and S1-08's writer's own deps (T-1482). `Repo` is the call's repo, which the
+ * companies reads are handed (item 72 and the catalog by id and names).
  */
 export interface SignUpWriterDeps<Repo = unknown> {
   /**
@@ -400,20 +418,20 @@ export interface SignUpWriterDeps<Repo = unknown> {
    * 79, item 72 and K-24's catalog by id and names, each answer or a thrown error). Given, signUpSteps builds one
    * createOneKind over them per call and binds S1-02 as T-634's `kinds` wrapper around T-1492's one-kind wrapper around
    * T-633's writer, and S1-04's buttons settler from the same instance (SignUpSteps.buttonsSettlers), so an owner with
-   * exactly one kept kind of work is never asked S1-04; and (T-1484, H1b) S1-04's own writer over the same reads
-   * (T-1481's companiesWriter, with `partyRuleLive`), so an S1-04 that was asked takes its answer (K-09 README default
-   * 181). Left out, none of them: S1-02 is bound as before, S1-04 is asked, and an answer to it is notBuilt.
-   * signUpStepWriters never reads it (it binds no settler, so a placed pick with S1-04 still asked could never happen).
+   * exactly one kept kind of work is never asked S1-04; and, with `s1_04Writer` too (T-1484, H1b), S1-04's own writer
+   * over the same reads. Left out, none of them: S1-02 is bound as before, S1-04 is asked, and an answer to it is
+   * notBuilt. signUpStepWriters never reads it (it binds no settler, so a placed pick with S1-04 still asked could never
+   * happen).
    */
   readonly companies?: CompaniesReads<Repo>;
   /**
-   * Whether the party rule is live (T-1484, H1b; K-09 README default 184; open gap 149), for S1-04's writer alone, read
-   * only beside `companies`: true lets an S1-04 answer write a second company ("Some share one" or "Each is its own"
-   * whose groups come to more than one company); left out, or anything but true, it is off, and such an answer is refused
-   * (CompaniesRefusedError secondCompany) with nothing written and the question left open. Staging leaves it off until
-   * K-05's party version and its db/repo read are live (cards 17 to 19).
+   * S1-04's writer's own deps (T-1484, H1b; K-09 README defaults 181 to 185 and 190; default 6), read only beside
+   * `companies`. Given (`{}` included), signUpSteps binds T-1481's companiesWriter at S1-04 over the `companies` reads,
+   * with the party rule's flag off unless `partyRuleLive` is exactly true, so an answer to an S1-04 that was asked closes
+   * it at its version, places the caller's kept picks in the companies its button gives and walks on to S1-08. Left out,
+   * or with `companies` left out, no writer is bound at S1-04, as before: an answered S1-04 is notBuilt (gives).
    */
-  readonly partyRuleLive?: boolean;
+  readonly s1_04Writer?: S1_04WriterDeps;
   /**
    * S1-08's writer's own deps (T-1493; T-1482's PlanWriterDeps; K-09 README defaults 189 and 199 item (5)): the stop
    * home's reads S1-08's writer rules its one quick reply with, a field of S1-08's own beside `kinds.stop`, which S1-03's
@@ -440,8 +458,8 @@ export interface SignUpWriterDeps<Repo = unknown> {
  * It reads nothing and logs nothing. What a writer throws leaves as thrown and fails the call closed: a failed item 78
  * or item 79 read is KindsReadError, whose `answer` holds a SQLSTATE or a person's or a business's row id, so nothing
  * here catches, wraps or reports it (a caller that reports it names its name, read and fault alone). The one-kind path,
- * S1-04's writer and S1-08's writer (SignUpWriterDeps.companies, .partyRuleLive and .plan) are signUpSteps' alone: this
- * map never reads them.
+ * S1-04's writer and S1-08's writer (SignUpWriterDeps.companies, .s1_04Writer and .plan) are signUpSteps' alone: this map
+ * never reads them.
  */
 export function signUpStepWriters<Repo>(deps: SignUpWriterDeps<Repo>): StepWriters<Repo> {
   return stepWritersOf(kindsWriters<Repo>(deps.kinds), createPlugInWriters<Repo>(deps.plugIns));
@@ -511,17 +529,18 @@ export interface SignUpSteps<Repo> {
  *     from one instance, sharing one walk's reads and placement), S1-02 bound as
  *     plugIns.kinds(oneKind.wrap(kinds.writers["S1-02"])), so the one kept pick is placed on its own insert and S1-11's
  *     blocks take its business, S1-03 as oneKind.wrapDraft(kinds.writers["S1-03"]) (T-1520), so the draft for that
- *     pick takes its business too, and `buttonsSettlers` = oneKind.buttonsSettlers (S1-04's settler alone); and (T-1484,
- *     H1b; K-09 README defaults 181 to 185 and 190; DL-1121) S1-04's own writer, companiesWriter({ reads: companies,
- *     partyRuleLive }) (T-1481), over the same reads (item 79, item 72, the catalog by id and kinds' names by id), so an
- *     answer to an S1-04 that was asked closes it at its version, places the caller's kept picks in the companies its
- *     button gives and walks on to S1-08 (the walk never asks the settler for an answered S1-04: default 199). The party
- *     rule's flag is on only when `partyRuleLive` is exactly true, so with it left out an answer that needs a second
- *     company is refused (secondCompany) with nothing written;
+ *     pick takes its business too, and `buttonsSettlers` = oneKind.buttonsSettlers (S1-04's settler alone);
+ *   - with `companies` and `s1_04Writer` (T-1484, H1b; K-09 README defaults 181 to 185 and 190; DL-1121): S1-04's own
+ *     writer, companiesWriter({ reads: companies, partyRuleLive }) (T-1481), over the same reads (item 79, item 72, the
+ *     catalog by id and kinds' names by id), so an answer to an S1-04 that was asked closes it at its version, places the
+ *     caller's kept picks in the companies its button gives and walks on to S1-08 (the walk never asks the settler for
+ *     an answered S1-04: default 199). The party rule's flag is on only when s1_04Writer.partyRuleLive is exactly true,
+ *     so otherwise an answer that needs a second company is refused (secondCompany) with nothing written. With
+ *     `companies` and no `s1_04Writer`, no writer at S1-04: H1a's writers, step for step (default 6);
  *   - with `plan`: S1-08's writer, planWriter(plan) (T-1482), at S1-08, with or without `companies` (default 6).
- * With both left out, the object is today's, field for field: `writers` and `settlers` alone, no `buttonsSettlers` key,
- * no writer at S1-04 or S1-08. Building them reads nothing and logs nothing. What a settler or writer throws leaves as
- * thrown and fails the call closed, as signUpStepWriters says.
+ * With all three left out, the object is today's, field for field: `writers` and `settlers` alone, no `buttonsSettlers`
+ * key, no writer at S1-04 or S1-08. Building them reads nothing and logs nothing. What a settler or writer throws leaves
+ * as thrown and fails the call closed, as signUpStepWriters says.
  */
 export function signUpSteps<Repo>(deps: SignUpWriterDeps<Repo>): SignUpSteps<Repo> {
   const kinds = kindsSteps<Repo>(deps.kinds);
@@ -530,15 +549,15 @@ export function signUpSteps<Repo>(deps: SignUpWriterDeps<Repo>): SignUpSteps<Rep
     ["S1-02", kinds.settlers["S1-02"]],
   ]);
   const settlers: StepSettlers<Repo> = (stepId) => settled.get(stepId) ?? null;
-  const { companies, plan } = deps;
+  const { companies, s1_04Writer, plan } = deps;
   if (companies === undefined && plan === undefined) {
     return { writers: stepWritersOf(kinds.writers, plugIns), settlers };
   }
   const oneKind = companies === undefined ? null : createOneKind<Repo>({ reads: companies });
   const s1_04 =
-    companies === undefined
+    companies === undefined || s1_04Writer === undefined
       ? null
-      : companiesWriter<Repo>({ reads: companies, partyRuleLive: deps.partyRuleLive === true });
+      : companiesWriter<Repo>({ reads: companies, partyRuleLive: s1_04Writer.partyRuleLive === true });
   return {
     writers: stepWritersOf(kinds.writers, plugIns, { oneKind, companies: s1_04, plan }),
     settlers,
