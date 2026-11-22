@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 889, [`8fdd2876`](https://github.com/aryamahadik/rosie/commit/8fdd2876), 2026-11-22 13:18:43 UTC.
+- **Through:** commit 891, [`2e6b60f8`](https://github.com/aryamahadik/rosie/commit/2e6b60f8), 2026-11-22 15:26:34 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 891. docs: COMMIT\_HISTORY.md through commit 889 (8fdd2876, \#906) (\#908)
+
+- **Commit:** [`2e6b60f8`](https://github.com/aryamahadik/rosie/commit/2e6b60f8), by Arya Mahadik, 2026-11-22 15:26:34 UTC
+- **Pull request:** [#908](https://github.com/aryamahadik/rosie/pull/908) from `task/commit-history-228`, merged 2026-11-22 15:26:34 UTC. It squashed 1 branch commit:
+  - `1ba094b` docs: COMMIT\_HISTORY.md through commit 889 (8fdd2876, \#906)
+- **Files changed:** 1 (+37 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +37 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 890. T-635a: S1-09's settler (default 201) over the K-15 port with default 202's fold, three split tries and wordsOf hold, the optional banned-word port (default 206), S1-09's read-only writer (default 204: the typed name, business\_setup only when none is on file, the read-back on an owner's match only), S1-76's writer (default 205: its row and one listing\_match review item with six fixed summaries, exported from listing/summary.ts), and paging's writeBackOf proving control on a listing check only for an owner's sentence (StoredReviewItem.summary) (\#907)
+
+- **Commit:** [`17aba4f8`](https://github.com/aryamahadik/rosie/commit/17aba4f8), by Arya Mahadik, 2026-11-22 15:26:30 UTC
+- **Pull request:** [#907](https://github.com/aryamahadik/rosie/pull/907) from `task/T-635a`, merged 2026-11-22 15:26:30 UTC. It squashed 1 branch commit:
+  - `33dd12a` T-635a: S1-09's settler (default 201) over the K-15 port with default…
+- **Files changed:** 14 (+2774 −2), by folder:
+  - `actions/src/domain/paging/` ports.ts +6 −0, review.test.ts +187 −0, review.ts +12 −0, test-support.ts +1 −0
+  - `actions/src/tool-api/journey-1/listing/` errors.ts +122 −0, index.ts +107 −2, listing.int.test.ts +314 −0, listing.test.ts +837 −0, lookup.ts +203 −0, reads.ts +173 −0, settle.ts +221 −0, summary.ts +55 −0, test-support.ts +260 −0, writers.ts +276 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 889. docs: COMMIT\_HISTORY.md through commit 887 (4abb09b1, \#905) (\#906)
 
