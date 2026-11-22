@@ -31,6 +31,9 @@
 // items 78, 79 and 72, the catalog by id, the stop home and the trade overlays: "Plumbing" walks S1-04 without asking it,
 // to S1-08's row and S1-09's question; "Barbershop, plumbing, electrical" still asks S1-04; with S1-08's stop reads left
 // out the walk is refused with nothing returned. The integration test (pg/one-kind.int.test.ts) commits it for real.
+//
+// T-1520 (DL-1056, DL-1076): S1-03 is bound through the same instance's draft wrapper beside S1-02's binding, so a
+// one-kind "One isn't on the list yet" drafts under the pick's business; without the companies reads, as today.
 
 import { describe, expect, it } from "vitest";
 
@@ -48,7 +51,7 @@ import { NotBuiltError } from "../errors";
 import { companiesReadsOf } from "../journey-1/companies";
 import { SAM_COMPANY, catalogDefaults, fakeCompaniesK05 } from "../journey-1/companies/test-support";
 import { kindsReadsOf } from "../journey-1/kinds";
-import { fakeK05, turnWithWords } from "../journey-1/kinds/test-support";
+import { PACK_HIKES, fakeK05, turnWithWords } from "../journey-1/kinds/test-support";
 import { PlanNotBuiltError } from "../journey-1/plan";
 import { PF_TEXT_KEYS } from "../journey-1/plug-ins";
 import { traceFor } from "../test-support";
@@ -698,10 +701,14 @@ describe("the commit is handed the walk's question read and turn key for an aske
 describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer, bound from the deps handed in (T-1493, H1a)", () => {
   const never = (): Promise<never> => Promise.reject(new Error("nothing is read or written here"));
 
-  /** Which of the new deps a case hands in: the companies reads, and S1-08's deps with or without the stop reads. */
+  /**
+   * Which of the new deps a case hands in: the companies reads, and S1-08's deps with or without the stop reads; and
+   * whether the kinds deps carry the stop reads S1-03's message is ruled with (T-1520's case walks S1-03).
+   */
   interface NewDeps {
     readonly companies?: boolean;
     readonly plan?: "withStop" | "noStop";
+    readonly kindsStop?: boolean;
   }
 
   /** The sign-up steps' deps over the doubles (items 78 and 79, item 72 and the catalog, the stop home, bundle v2's overlays). */
@@ -711,7 +718,7 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
     const trades = tradesOverV2();
     const stop = readsOn(seedWorld(), null);
     const deps: SignUpWriterDeps = {
-      kinds: { reads: kindsReadsOf(k05.k05) },
+      kinds: { reads: kindsReadsOf(k05.k05), ...(given.kindsStop === true ? { stop } : {}) },
       plugIns: { bundles: trades.bundles },
       ...(given.companies === true ? { companies: companiesReadsOf(companies.k05) } : {}),
       ...(given.plan === undefined ? {} : { plan: given.plan === "withStop" ? { stop } : {} }),
@@ -735,9 +742,12 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
     };
   }
 
-  /** What the walk turnCommitDeps hands writesOf answers for turn 2's "All on the list" with `words`, pinned to bundle v2. */
-  async function walked(deps: SignUpWriterDeps, words: string) {
-    const turn = turnWithWords("c-01", words);
+  /**
+   * What the walk turnCommitDeps hands writesOf answers for turn 2 choosing `choiceId` (default c-01, "All on the list")
+   * with `words`, pinned to bundle v2.
+   */
+  async function walked(deps: SignUpWriterDeps, words: string, choiceId = "c-01") {
+    const turn = turnWithWords(choiceId, words);
     const context = { ...turn.context, turn: { ...turn.context.turn, bundleId: bundleV2Id() } };
     return turnCommitDeps(bindingOver(deps))(NOTHING_OPEN_AT).ports.writesOf(
       turn.part,
@@ -868,6 +878,33 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
     const plumbingToday = await walked(signUpOver({ plan: "withStop" }).deps, "Plumbing");
     expect(plumbingToday.asks.map((ask) => ask.question.step)).toEqual(["S1-04"]);
     expect(plumbingToday.messages.map((row) => row.step)).toEqual(["S1-04"]);
+  });
+
+  it("S1-03 bound through the same instance's draft wrapper (T-1520): a one-kind 'One isn't on the list yet' drafts under the pick's business; without the companies reads, with no business, as today", async () => {
+    const draftsOf = (writes: Awaited<ReturnType<typeof walked>>): unknown[][] =>
+      writes.state.flatMap((write) =>
+        write.op === "insert" && write.table === "new_work_drafts"
+          ? [[write.values.picked_kind_id, write.values.business_id]]
+          : [],
+      );
+    const bound = await walked(
+      signUpOver({ companies: true, plan: "withStop", kindsStop: true }).deps,
+      PACK_HIKES,
+      "c-02",
+    );
+    expect(bound.asks.map((ask) => ask.question.step)).toEqual(["S1-09"]);
+    expect(
+      bound.state.flatMap((write) =>
+        write.op === "insert" && write.table === "picked_kinds"
+          ? [[write.values.id, write.values.company_id, write.values.business_id]]
+          : [],
+      ),
+    ).toEqual([["pick-s1-02-sam-1", SAM_COMPANY, BARBERSHOP]]);
+    expect(draftsOf(bound)).toEqual([["pick-s1-02-sam-1", BARBERSHOP]]);
+    expect(bound.messages.map((row) => row.step)).toEqual(["S1-03", "S1-08", "S1-09"]);
+    const today = await walked(signUpOver({ plan: "withStop", kindsStop: true }).deps, PACK_HIKES, "c-02");
+    expect(today.asks.map((ask) => ask.question.step)).toEqual(["S1-04"]);
+    expect(draftsOf(today)).toEqual([["pick-s1-02-sam-1", null]]);
   });
 
   it("with S1-08's stop reads left out, 'Plumbing' is refused with nothing returned: no S1-08 deps (no writer at S1-08) or S1-08's deps without the stop reads (stopNotWired)", async () => {

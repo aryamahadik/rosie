@@ -427,7 +427,8 @@ interface OneKindWriters<Repo> {
 
 /**
  * signUpStepWriters' step-id map over one kindsWriters and one createPlugInWriters; with `added` (signUpSteps, T-1493),
- * S1-02's writer inside T-1492's one-kind wrapper inside T-634's `kinds` wrapper, and S1-08's writer, each where given.
+ * S1-02's writer inside T-1492's one-kind wrapper inside T-634's `kinds` wrapper, S1-03's inside the same instance's
+ * draft wrapper (T-1520), and S1-08's writer, each where given.
  */
 function stepWritersOf<Repo>(
   kinds: KindsWriters<Repo>,
@@ -436,9 +437,10 @@ function stepWritersOf<Repo>(
 ): StepWriters<Repo> {
   const { oneKind, plan } = added;
   const s1_02 = oneKind === null ? kinds["S1-02"] : oneKind.wrap(kinds["S1-02"]);
+  const s1_03 = oneKind === null ? kinds["S1-03"] : oneKind.wrapDraft(kinds["S1-03"]);
   const entries: [string, StepWriter<Repo>][] = [
     ["S1-02", plugIns.kinds(s1_02)],
-    ["S1-03", kinds["S1-03"]],
+    ["S1-03", s1_03],
     ["S1-74", kinds["S1-74"]],
     [S1_11, plugIns.plugIns],
   ];
@@ -472,7 +474,8 @@ export interface SignUpSteps<Repo> {
  *   - with `companies`: one createOneKind({ reads: companies }) per call (T-1492's handoff: the wrapper and the settler
  *     from one instance, sharing one walk's reads and placement), S1-02 bound as
  *     plugIns.kinds(oneKind.wrap(kinds.writers["S1-02"])), so the one kept pick is placed on its own insert and S1-11's
- *     blocks take its business, and `buttonsSettlers` = oneKind.buttonsSettlers (S1-04's settler alone);
+ *     blocks take its business, S1-03 as oneKind.wrapDraft(kinds.writers["S1-03"]) (T-1520), so the draft for that
+ *     pick takes its business too, and `buttonsSettlers` = oneKind.buttonsSettlers (S1-04's settler alone);
  *   - with `plan`: S1-08's writer, planWriter(plan) (T-1482), at S1-08.
  * With both left out, the object is today's, field for field: `writers` and `settlers` alone, no `buttonsSettlers` key.
  * Building them reads nothing and logs nothing. What a settler or writer throws leaves as thrown and fails the call
