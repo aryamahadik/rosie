@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 876, [`b0eaa560`](https://github.com/aryamahadik/rosie/commit/b0eaa560), 2026-11-22 08:59:12 UTC.
+- **Through:** commit 878, [`ce8caf77`](https://github.com/aryamahadik/rosie/commit/ce8caf77), 2026-11-22 09:43:35 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 878. docs: COMMIT\_HISTORY.md through commit 876 (b0eaa560, \#893) (\#895)
+
+- **Commit:** [`ce8caf77`](https://github.com/aryamahadik/rosie/commit/ce8caf77), by Arya Mahadik, 2026-11-22 09:43:35 UTC
+- **Pull request:** [#895](https://github.com/aryamahadik/rosie/pull/895) from `task/commit-history-222`, merged 2026-11-22 09:43:35 UTC. It squashed 1 branch commit:
+  - `d1a81a1` docs: COMMIT\_HISTORY.md through commit 876 (b0eaa560, \#893)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 877. T-512: signed-link opener and expired-link page in web/src/link: linkRoutes() GET /:code sends openLink with the envelope alone (new request id, trace id, session cookie's token or null, the code); the page shows the page kind, the business's public name and section names, and the sign-in (both ways) without proof; proof only from a sent session of the link's own person (refuse-link-as-proof shaped answers shown as proof none); linkExpired gives one plain expired page (410) with no field of the old page; transient and bookingPaused a 503 page. ROUTES stays empty until the tests that use one-segment addresses as unknown move (report names them) (\#894)
+
+- **Commit:** [`c46c3f52`](https://github.com/aryamahadik/rosie/commit/c46c3f52), by Arya Mahadik, 2026-11-22 09:43:31 UTC
+- **Pull request:** [#894](https://github.com/aryamahadik/rosie/pull/894) from `task/T-512`, merged 2026-11-22 09:43:32 UTC. It squashed 1 branch commit:
+  - `bbf43d6` T-512: signed-link opener and expired-link page in web/src/link: link…
+- **Files changed:** 8 (+893 −3), by folder:
+  - `web/src/link/` kinds.ts +78 −0, open.test.ts +363 −0, open.ts +62 −0, pages.ts +114 −0, routes.ts +8 −3, test-support.ts +95 −0, view.test.ts +111 −0, view.ts +62 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 876. docs: COMMIT\_HISTORY.md through commit 874 (201c025d, \#891) (\#893)
 
