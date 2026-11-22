@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 874, [`201c025d`](https://github.com/aryamahadik/rosie/commit/201c025d), 2026-11-22 08:21:05 UTC.
+- **Through:** commit 876, [`b0eaa560`](https://github.com/aryamahadik/rosie/commit/b0eaa560), 2026-11-22 08:59:12 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 876. docs: COMMIT\_HISTORY.md through commit 874 (201c025d, \#891) (\#893)
+
+- **Commit:** [`b0eaa560`](https://github.com/aryamahadik/rosie/commit/b0eaa560), by Arya Mahadik, 2026-11-22 08:59:12 UTC
+- **Pull request:** [#893](https://github.com/aryamahadik/rosie/pull/893) from `task/commit-history-221`, merged 2026-11-22 08:59:12 UTC. It squashed 1 branch commit:
+  - `ee136e5` docs: COMMIT\_HISTORY.md through commit 874 (201c025d, \#891)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 875. T-434: the Google Places double (K-15 v1): search and details for the three demo listings, noMatch and notFound otherwise, never a rating or review; the test-only error setting and the portCall spans; tests against every K-15 v1 fixture (\#892)
+
+- **Commit:** [`b3d6897c`](https://github.com/aryamahadik/rosie/commit/b3d6897c), by Arya Mahadik, 2026-11-22 08:59:08 UTC
+- **Pull request:** [#892](https://github.com/aryamahadik/rosie/pull/892) from `task/T-434`, merged 2026-11-22 08:59:08 UTC. It squashed 1 branch commit:
+  - `38dff74` T-434: the Google Places double (K-15 v1): search and details for the…
+- **Files changed:** 6 (+1470 −0), by folder:
+  - `adapters/src/places/double/` double.test.ts +764 −0, double.ts +294 −0, index.ts +12 −0, types.ts +173 −0, validate.ts +103 −0, world.ts +124 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 874. docs: COMMIT\_HISTORY.md through commit 872 (f4d265d2, \#889) (\#891)
 
