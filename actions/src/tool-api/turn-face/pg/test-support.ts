@@ -15,9 +15,17 @@
 //      first text.
 // So each business's call has its own business head, and only Lee's Barbershop's is turn 1's. Values come only from the
 // contracts' fixtures and the master's sample cast (rule 9).
+//
+// pgStopReads (T-1493): the stop home's reads on the runtime side of a local database, for S1-08's writer
+// (SignUpWriterDeps.plan.stop), each member the runtime's own reader's over db/repo (T-307's messagesReaderOf, T-317's
+// flagsReaderOf) on a rosie_job client, as staging's gate binds them over its own runtime client (T-1516).
 
+import type { Sql } from "../../../../../db/repo/scope";
 import { seedSkeleton, TEST_OWNER_1, type SkeletonSeedResult } from "../../../../../db/seeds/skeleton";
 import { openCommitDatabase, seed, type CommitDatabase } from "../../../commit/pg/test-support";
+import { flagsReaderOf } from "../../../domain/flags";
+import { messagesReaderOf } from "../../../domain/messages-consent";
+import type { StopHomeReads } from "../../../homes/stop";
 import { s101Exchange } from "../test-support";
 
 export const BARBERSHOP = TEST_OWNER_1.businessId;
@@ -59,4 +67,20 @@ export async function openTurnFaceDatabase(
     await cdb.close();
     throw error;
   }
+}
+
+/**
+ * The stop home's five reads (homes/stop StopHomeReads) on `runtime`, a client whose connections run as rosie_job (the top
+ * of this file): each one data-access call of its own, on the runtime side, with no business scope.
+ */
+export function pgStopReads(runtime: Sql): StopHomeReads {
+  const messages = messagesReaderOf(runtime);
+  const flags = flagsReaderOf(runtime);
+  return {
+    handle: (handleId) => messages.handle(handleId),
+    handleIdsOfPerson: (personId) => messages.handleIdsOfPerson(personId),
+    phoneOfHandle: (handleId) => messages.phoneOfHandle(handleId),
+    consentsOfPersons: (personIds) => messages.consentsOfPersons(personIds),
+    personIdsOfHandle: (handleId) => flags.personIdsOfHandle(handleId),
+  };
 }
