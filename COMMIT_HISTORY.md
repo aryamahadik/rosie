@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 902, [`171fa84e`](https://github.com/aryamahadik/rosie/commit/171fa84e), 2026-11-22 20:03:50 UTC.
+- **Through:** commit 904, [`313f2c6b`](https://github.com/aryamahadik/rosie/commit/313f2c6b), 2026-11-22 21:04:04 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 904. docs: COMMIT\_HISTORY.md through commit 902 (171fa84e, \#919) (\#921)
+
+- **Commit:** [`313f2c6b`](https://github.com/aryamahadik/rosie/commit/313f2c6b), by Arya Mahadik, 2026-11-22 21:04:04 UTC
+- **Pull request:** [#921](https://github.com/aryamahadik/rosie/pull/921) from `task/commit-history-234`, merged 2026-11-22 21:04:05 UTC. It squashed 1 branch commit:
+  - `e66d70e` docs: COMMIT\_HISTORY.md through commit 902 (171fa84e, \#919)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 903. T-1536: the claim passes a committed turn's row left with no plan once its reply was given up (K-05 README default 225 beside 183; outbox.ts default 30, a 10-minute window from the claim's now in the walk and both sweeps; DL-1165) (\#920)
+
+- **Commit:** [`0396348d`](https://github.com/aryamahadik/rosie/commit/0396348d), by Arya Mahadik, 2026-11-22 21:03:59 UTC
+- **Pull request:** [#920](https://github.com/aryamahadik/rosie/pull/920) from `task/T-1536`, merged 2026-11-22 21:04:00 UTC. It squashed 1 branch commit:
+  - `0c240a5` T-1536: the claim passes a committed turn's row left with no plan onc…
+- **Files changed:** 3 (+316 −37), by folder:
+  - `contracts/data-access/` README.md +5 −1
+  - `db/repo/` outbox.int.test.ts +248 −7, outbox.ts +63 −29
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 902. docs: COMMIT\_HISTORY.md through commit 900 (18a75528, \#917) (\#919)
 
