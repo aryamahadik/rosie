@@ -80,6 +80,57 @@ export const TYPED_TIME_PLAN: MessagePlan = {
   threadReplyTo: null,
 };
 
+/**
+ * S1-02's first text after a JOIN whose safety read hit its deadline (T-1535; DL-1157): K-09's compose-input-s1-02.json
+ * input with code's tag gentle (a safety outcome other than No: arch 07 line 357, "gentle, no '!'") and a JOIN as its
+ * inbound; its master line is bundle v2's S1-02 line, which begins "Hi! I'm Rosie". The master's sample cast (rule 9).
+ */
+export const S1_02_GENTLE_INPUT: ComposeInput = {
+  row: "outbox-s1-02-sam-1",
+  turn: "turn-s1-01-sam",
+  conversation: [],
+  masterText: {
+    step: "S1-02",
+    text: "Hi! I'm Rosie, an automated assistant. I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you. What kinds of work do you do? Just type them.",
+  },
+  facts: [],
+  audience: { role: "owner", name: "Sam", way: "texts", handlingLine: null },
+  language: "en",
+  channel: "imessage",
+  situation: "gentle",
+  allowedFormats: ["text"],
+  allowedLinks: [],
+  options: [],
+  pageTypes: [],
+  openQuestions: [],
+  inbound: { text: "JOIN", sentAt: { utc: "2026-10-19T18:05:00Z", zone: "America/New_York" } },
+};
+
+/** The composed plan that keeps the master line's "!": on a gentle row the tone check refuses it at lines[0].text. */
+export const HI_PLAN: MessagePlan = {
+  formats: ["text"],
+  lines: [
+    {
+      role: "first",
+      text: "Hi! I'm Rosie, an automated assistant. I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you.",
+    },
+  ],
+  question: { text: "What kinds of work do you do? Just type them.", optionIds: [] },
+  pageType: null,
+  threadReplyTo: null,
+};
+
+/** The one rewrite's plan: the same line, its meaning and order kept, with no "!". */
+export const HI_GENTLE_PLAN: MessagePlan = {
+  ...HI_PLAN,
+  lines: [
+    {
+      role: "first",
+      text: "Hi, I'm Rosie, an automated assistant. I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you.",
+    },
+  ],
+};
+
 /** The user message a call sent: the per-turn part (T-364's layout). */
 export function userOf(call: FakeCall | undefined): string {
   const messages = call?.body.messages as { content: string }[] | undefined;

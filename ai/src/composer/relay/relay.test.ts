@@ -97,11 +97,15 @@ function turnOf(api: FakeCachingApi): string {
   return messages?.[0]?.content ?? "";
 }
 
-/** The plan refused before it leaves the AI layer, for exactly these problems. */
-const refusedFor = (problems: { check: string; at: string }[]): unknown => ({
+/**
+ * The plan refused before it leaves the AI layer, for exactly these problems; each is a reader check's, so the refusal
+ * carries the plan it refused, for the turn's one rewrite (T-1535, DL-1159).
+ */
+const refusedFor = (problems: { check: string; at: string }[], plan: MessagePlan): unknown => ({
   status: "refused",
   stage: "plan",
   problems,
+  plan,
   modelCalls: expect.any(Array) as unknown,
 });
 
@@ -219,7 +223,7 @@ describe("a relayed sender is quoted in a code-filled slot (arch 07 line 359; A7
     for (const [what, input, variant, problems] of cases) {
       expect(contract.validate("plan", variant), what).toEqual([]);
       const { answer, api } = await composeRow(input, variant);
-      expect(answer, what).toEqual(refusedFor(problems));
+      expect(answer, what).toEqual(refusedFor(problems, variant));
       expect(api.calls, what).toHaveLength(1);
       expect(JSON.stringify(answer), what).not.toMatch(/son|shop|cut|Alex/u);
     }
@@ -278,7 +282,7 @@ describe("translated, with the original kept (S13-37: 'Messages to and from staf
     for (const [what, variant, problems] of cases) {
       expect(contract.validate("plan", variant), what).toEqual([]);
       const refused = await composeRow(RELAY_INTO_ENGLISH, variant);
-      expect(refused.answer, what).toEqual(refusedFor(problems));
+      expect(refused.answer, what).toEqual(refusedFor(problems, variant));
       expect(JSON.stringify(refused.answer), what).not.toMatch(/estacionamiento|parking|tienda/u);
     }
   });
@@ -296,7 +300,7 @@ describe("translated, with the original kept (S13-37: 'Messages to and from staf
 
     const untranslated = withLine(plan, 1, "In English, they ask if they can bring their dog.");
     const refused = await composeRow(RELAY_INTO_SPANISH, untranslated);
-    expect(refused.answer).toEqual(refusedFor([{ check: "language", at: "lines[1].text" }]));
+    expect(refused.answer).toEqual(refusedFor([{ check: "language", at: "lines[1].text" }], untranslated));
   });
 });
 
@@ -312,10 +316,13 @@ describe("the language of the text, else the stored language (arch 06 line 341; 
 
     const english = await composeRow(SPANISH_TEXT, ENGLISH_PLAN);
     expect(english.answer).toEqual(
-      refusedFor([
-        { check: "language", at: "lines[0].text" },
-        { check: "language", at: "lines[2].text" },
-      ]),
+      refusedFor(
+        [
+          { check: "language", at: "lines[0].text" },
+          { check: "language", at: "lines[2].text" },
+        ],
+        ENGLISH_PLAN,
+      ),
     );
     expect(english.api.calls).toHaveLength(1);
   });
@@ -327,10 +334,13 @@ describe("the language of the text, else the stored language (arch 06 line 341; 
     expect(planOf(answer)).toEqual(SPANISH_PLAN);
     const english = await composeRow(STORED_SPANISH, ENGLISH_PLAN);
     expect(english.answer).toEqual(
-      refusedFor([
-        { check: "language", at: "lines[0].text" },
-        { check: "language", at: "lines[2].text" },
-      ]),
+      refusedFor(
+        [
+          { check: "language", at: "lines[0].text" },
+          { check: "language", at: "lines[2].text" },
+        ],
+        ENGLISH_PLAN,
+      ),
     );
   });
 
@@ -340,10 +350,13 @@ describe("the language of the text, else the stored language (arch 06 line 341; 
     expect(planOf(answer)).toEqual(ENGLISH_PLAN);
     const spanish = await composeRow(ENGLISH_TEXT, SPANISH_PLAN);
     expect(spanish.answer).toEqual(
-      refusedFor([
-        { check: "language", at: "lines[0].text" },
-        { check: "language", at: "lines[2].text" },
-      ]),
+      refusedFor(
+        [
+          { check: "language", at: "lines[0].text" },
+          { check: "language", at: "lines[2].text" },
+        ],
+        SPANISH_PLAN,
+      ),
     );
   });
 });
@@ -393,7 +406,7 @@ describe("sensitive work: 'your visit', no service, initials (S13-22; RULES 4.6)
       const variant = withLine(recorded, 0, text);
       expect(contract.validate("plan", variant), what).toEqual([]);
       const { answer } = await composeRow(SENSITIVE_WITH_SAMPLES, variant);
-      expect(answer, what).toEqual(refusedFor([{ check: "sensitiveWork", at: "lines[0].text" }]));
+      expect(answer, what).toEqual(refusedFor([{ check: "sensitiveWork", at: "lines[0].text" }], variant));
       expect(JSON.stringify(answer), what).not.toMatch(/session|therapy|Alex/u);
     }
     // Why the words after '|' matter: under the switch the filler writes them in place of the service.
@@ -429,7 +442,7 @@ describe("sensitive work: 'your visit', no service, initials (S13-22; RULES 4.6)
       "Reminder: your First session is {{day}} at {{visit.time}} with {{pro.name}}.",
     );
     const refused = await composeRow(SENSITIVE_REMINDER, named);
-    expect(refused.answer).toEqual(refusedFor([{ check: "sensitiveWork", at: "lines[0].text" }]));
+    expect(refused.answer).toEqual(refusedFor([{ check: "sensitiveWork", at: "lines[0].text" }], named));
   });
 });
 
@@ -446,7 +459,7 @@ describe("tone follows code's situation tag (arch 07 line 357)", () => {
     ];
     for (const [variant, at] of sensitiveCases) {
       const { answer } = await composeRow(SENSITIVE, variant);
-      expect(answer, at).toEqual(refusedFor([{ check: "tone", at }]));
+      expect(answer, at).toEqual(refusedFor([{ check: "tone", at }], variant));
     }
 
     // A6-14's confirmation row as C-090 tags it in a turn with a safety outcome other than No: gentle.
@@ -461,7 +474,7 @@ describe("tone follows code's situation tag (arch 07 line 357)", () => {
       "You're booked at {{biz.name}}! Give this code at the chair when you arrive: {{visit.code}}",
     );
     expect((await composeRow(grief, exclaimed)).answer).toEqual(
-      refusedFor([{ check: "tone", at: "lines[0].text" }]),
+      refusedFor([{ check: "tone", at: "lines[0].text" }], exclaimed),
     );
     expect(planOf((await composeRow(confirmation, exclaimed)).answer)).toEqual(exclaimed);
 
@@ -470,7 +483,7 @@ describe("tone follows code's situation tag (arch 07 line 357)", () => {
     expect(planOf((await composeRow(gentleSpanish, SPANISH_PLAN)).answer)).toEqual(SPANISH_PLAN);
     const opened = withLine(SPANISH_PLAN, 0, "¡{{biz.name}} aún no ha respondido a tu solicitud.");
     expect((await composeRow(gentleSpanish, opened)).answer).toEqual(
-      refusedFor([{ check: "tone", at: "lines[0].text" }]),
+      refusedFor([{ check: "tone", at: "lines[0].text" }], opened),
     );
   });
 });

@@ -21,12 +21,30 @@ import planConfirmationA614 from "../../../contracts/message-plan/fixtures/plan-
 import planEmailCopy from "../../../contracts/message-plan/fixtures/plan-email-copy.json";
 import planS102 from "../../../contracts/message-plan/fixtures/plan-s1-02.json";
 import decideS102 from "../../../contracts/model/fixtures/decide-s1-02-choose.json";
+import bundleV0 from "../../../contracts/bundle/fixtures/bundle-v0-skeleton.json";
+import { createPromptCache, type CacheBundle } from "@rosie/ai/src/cache/index";
+import { createComposer } from "@rosie/ai/src/composer/compose";
+import {
+  COMPOSER_PROMPT,
+  composeInputText,
+  type ComposeInput as AiComposeInput,
+  type MessagePlan as AiMessagePlan,
+} from "@rosie/ai/src/composer/prompt";
+import { fakeTurnApi, userOf } from "@rosie/ai/src/composer/rewrite/test-support";
+import { rewriteTurnText } from "@rosie/ai/src/composer/rewrite/turn";
+import {
+  PLACES_JOINER as AI_PLACES_JOINER,
+  READER_CHECKS as AI_READER_CHECKS,
+} from "@rosie/ai/src/composer/rewrite/types";
+import { HAIKU_MODEL, KEY_VARIABLE, type GatewayBundle } from "@rosie/ai/src/gateway/index";
 import { BUNDLE_A, WHOLE_A } from "../bundle/test-support";
 import { fakeKeyStore } from "../gateway/test-support";
 import { setGuardDeps, setReplyDeps } from "../guard";
 import { fakeCore as fakeReplyCore, phone } from "../guard/replies/test-support";
 import { fakeTargets } from "../guard/test-support";
 import { openTrace, spanProblems, type Span } from "../trace";
+import { realComposer } from "../wiring/real";
+import { PLACES_JOINER, READER_CHECKS } from "./compose";
 import {
   composeCommitted,
   runTurnLoop,
@@ -63,6 +81,7 @@ import {
 } from "./test-support";
 import type {
   ComposeInput,
+  ComposerAnswer,
   CoreResult,
   FinalizeMessageAnswer,
   FinalizeMessageRequest,
@@ -75,6 +94,22 @@ import type {
 
 const keys = fakeKeyStore();
 const restores: (() => void)[] = [];
+
+/**
+ * K-01's bundle v0 (bundle A: the bundle the second half's trace pins), as @rosie/ai's composer is built on it: its id
+ * and two model ids, and its prompt layout with T-372's composer prompt packed in, as the compiler packs it (C-072).
+ */
+const V0_BUNDLE = bundleV0 as unknown as CacheBundle & {
+  readonly manifest: CacheBundle["manifest"] & { readonly models: GatewayBundle["models"] };
+};
+const V0_PROMPTS = createPromptCache({
+  manifest: {
+    bundleId: V0_BUNDLE.manifest.bundleId,
+    prompts: { ...V0_BUNDLE.manifest.prompts, composer: COMPOSER_PROMPT },
+    partial: true,
+  },
+  flows: V0_BUNDLE.flows,
+});
 
 afterEach(() => {
   while (restores.length > 0) restores.pop()?.();
@@ -535,6 +570,407 @@ describe("finalize with at most one rewrite, then the fallback, then the passed-
     ]) {
       expect(logged).not.toContain(words);
     }
+  });
+});
+
+describe("a plan the composer's own reader checks refused gets the one rewrite, told only what failed (T-1535; DL-1157)", () => {
+  /**
+   * S1-02's row after the user's JOIN of 16:35Z Nov 22: the safety read hit its deadline, so code tagged the row gentle
+   * (arch 07 line 357: "gentle, no '!'"); its master line (compose-input-s1-02.json's, bundle v2's) begins "Hi! I'm Rosie".
+   */
+  const GENTLE_INPUT: ComposeInput = {
+    ...structuredClone(composeInputS102.outcome.input),
+    situation: "gentle",
+    inbound: { text: "JOIN", sentAt: { utc: "2026-10-19T18:05:00Z", zone: "America/New_York" } },
+  };
+  /** The composer's plan keeping the master line's "!", which its tone check refuses at lines[0].text. */
+  const HI_PLAN = {
+    formats: ["text"],
+    lines: [
+      {
+        role: "first",
+        text: "Hi! I'm Rosie, an automated assistant. I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you.",
+      },
+    ],
+    question: { text: "What kinds of work do you do? Just type them.", optionIds: [] },
+    pageType: null,
+    threadReplyTo: null,
+  };
+  /** The one rewrite's plan: the same line with no "!". */
+  const GENTLE_PLAN = {
+    ...HI_PLAN,
+    lines: [
+      {
+        role: "first",
+        text: "Hi, I'm Rosie, an automated assistant. I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you.",
+      },
+    ],
+  };
+  const TONE = [{ check: "tone", at: "lines[0].text" }];
+
+  /**
+   * A refused compose as the composer port answers it: the first refusing check as its label, with @rosie/ai's refusal
+   * (its stage, its problems as checks and places and, for the reader checks alone, the plan it refused) and its model
+   * calls. Recorded answers only: no model is called. Some cases give a malformed problem or plan on purpose, so the
+   * answer is built untyped and the turn's own reading of it is what is tested.
+   */
+  const refused = (stage: string, problems: unknown[], plan?: unknown): ComposerAnswer =>
+    ({
+      error: (problems[0] as { check: string }).check,
+      stage,
+      problems,
+      ...(plan === undefined ? {} : { plan: structuredClone(plan) }),
+      modelCalls: [...ONE_COMPOSE],
+    }) as unknown as ComposerAnswer;
+
+  function gentleRow(input: ComposeInput = GENTLE_INPUT): Second {
+    const s = secondHalf({ caller: S1_01_CALLER, handleId: "handle-sam", outboxRows: [S1_02_ROW] });
+    s.reply.rows.unplanned = () => ({ result: "rows", rows: [unplannedRow(S1_02_ROW, 1, "handle-sam")] });
+    s.face.composeInput = () => ({ result: "compose", input });
+    s.reply.composer.compose = () => refused("plan", TONE, HI_PLAN);
+    s.reply.composer.rewrite = () => planned(GENTLE_PLAN, ONE_REWRITE);
+    s.face.finalize = (request) => sentAnswer(request);
+    return s;
+  }
+
+  it("the runtime's reader checks and places' joiner are @rosie/ai's", () => {
+    expect(READER_CHECKS).toEqual([...AI_READER_CHECKS]);
+    expect(PLACES_JOINER).toBe(AI_PLACES_JOINER);
+  });
+
+  it("a gentle row whose plan keeps S1-02's 'Hi!' (refused: tone at lines[0].text): one rewrite told only tone at that place, its plan finalized with attempt rewrite and sent once, composerCalls 2; no plan with '!' reaches finalize", async () => {
+    const s = gentleRow();
+
+    const report = await s.run();
+
+    expect(s.reply.composer.composeCalls).toEqual([GENTLE_INPUT]);
+    expect(s.reply.composer.rewriteCalls).toEqual([
+      { input: GENTLE_INPUT, plan: HI_PLAN, failed: [{ check: "tone", detail: "lines[0].text" }] },
+    ]);
+    // One finalize, for the rewrite's plan; the refused plan never reaches it.
+    expect(s.face.finalizeCalls).toEqual([
+      {
+        caller: S1_01_CALLER,
+        outboxRowId: S1_02_ROW,
+        expectVersion: 1,
+        attempt: "rewrite",
+        plan: { row: S1_02_ROW, channel: "imessage", copyOf: null, plan: GENTLE_PLAN },
+      },
+    ]);
+    expect(JSON.stringify(s.face.finalizeCalls)).not.toContain("!");
+    expect(report.rows).toEqual([
+      {
+        outboxRowId: S1_02_ROW,
+        result: "send",
+        copyOf: null,
+        composerCalls: 2,
+        rewrite: true,
+        finalizeCalls: 1,
+        finalParts: expect.objectContaining({ row: S1_02_ROW, fixedLines: [] }) as unknown,
+        questionWithdrawn: false,
+        teamPageId: null,
+        errorCode: null,
+      },
+    ]);
+    expect(report.rows[0]?.finalParts?.sends).toHaveLength(1);
+    expect(JSON.stringify(report.rows[0]?.finalParts)).not.toContain("!");
+    expect(s.log).toEqual([
+      "unplannedRows",
+      `composeInput:${S1_02_ROW}`,
+      `compose:${S1_02_ROW}`,
+      `compose:${S1_02_ROW}:answered`,
+      `rewrite:${S1_02_ROW}`,
+      `rewrite:${S1_02_ROW}:answered`,
+      `finalize:rewrite:${S1_02_ROW}`,
+      "wake",
+    ]);
+    expect(s.reply.dispatcher.wakes).toEqual([
+      { turnId: S1_01_CALLER.turnId, handleId: "handle-sam", outboxRowIds: [S1_02_ROW] },
+    ]);
+  });
+
+  it("its spans record the refused compose and the rewrite as a finalize rewrite's are recorded: labels, counts and ids only, never the plan's words or a place", async () => {
+    const s = gentleRow();
+
+    await s.run();
+
+    expect(s.spans.map((span) => span.hop)).toEqual(["compose", "rewriteOrFallback"]);
+    for (const span of s.spans) {
+      expect(spanProblems(span)).toEqual([]);
+      expect(span.turn_id).toBe(S1_01_CALLER.turnId);
+    }
+    const [compose, rewrite] = s.spans;
+    expect(compose).toMatchObject({ outcome: "refused", error_code: "tone", model_calls: ONE_COMPOSE });
+    expect(compose?.got).toMatchObject({ row: S1_02_ROW, situation: "gentle" });
+    expect(compose?.decided).toBeUndefined();
+    expect(rewrite).toMatchObject({
+      outcome: "ok",
+      model_calls: ONE_REWRITE,
+      rows: [{ table: "outbox_rows", id: S1_02_ROW }],
+    });
+    expect(rewrite?.got).toEqual({
+      row: S1_02_ROW,
+      attempt: "rewrite",
+      told: ["tone"],
+      planned: true,
+      calls: 1,
+    });
+    expect(rewrite?.decided).toMatchObject({ outcome: "send", failed: [], fallback: false });
+    const logged = JSON.stringify(s.spans);
+    for (const words of ["Hi!", "Hi,", "automated assistant", "What kinds of work", "lines[0]", "JOIN", "{{"])
+      expect(logged).not.toContain(words);
+  });
+
+  it.each([
+    [
+      "keeps the '!' (the tone check refuses it too: 'use the fallback')",
+      { error: "useFallback", modelCalls: [...ONE_REWRITE] },
+      "useFallback",
+    ],
+    ["cannot be made (its models are down)", { error: "modelsDown", modelCalls: [] }, "modelsDown"],
+    ["is refused before any call", { error: "told", modelCalls: [] }, "told"],
+  ])(
+    "a rewrite that %s ends the row left with nothing sent: no finalize, never the refused plan",
+    async (_what, answer, code) => {
+      const s = gentleRow();
+      s.reply.composer.rewrite = () => answer;
+
+      const report = await s.run();
+
+      expect(s.reply.composer.rewriteCalls).toHaveLength(1);
+      expect(s.face.finalizeCalls).toEqual([]);
+      expect(s.reply.rows.writes).toEqual([]);
+      expect(report.rows).toEqual([
+        {
+          outboxRowId: S1_02_ROW,
+          result: "left",
+          copyOf: null,
+          composerCalls: 2,
+          rewrite: true,
+          finalizeCalls: 0,
+          finalParts: null,
+          questionWithdrawn: false,
+          teamPageId: null,
+          errorCode: code,
+        },
+      ]);
+      const rewrite = s.spans.find((span) => span.hop === "rewriteOrFallback");
+      expect(rewrite).toMatchObject({ error_code: code, rows: [] });
+      expect(rewrite?.got).toMatchObject({ told: ["tone"], planned: false, calls: 0 });
+      expect(spanProblems(rewrite)).toEqual([]);
+      // The dispatcher is still woken once; the row holds no plan, so nothing goes for it.
+      expect(s.reply.dispatcher.wakes).toHaveLength(1);
+    },
+  );
+
+  it("a rewrite whose plan finalize's checks then miss goes on as any rewrite does: finalize runs the step's fallback in the same call (K-09 README default 11), never a second rewrite", async () => {
+    const s = gentleRow();
+    // finalize-passed-on.json's answer, on this row: the rewrite and the step's fallback both missed.
+    s.face.finalize = (request) => {
+      const answer = structuredClone(finalizePassedOn.outcome);
+      return { ...answer, finalParts: { ...answer.finalParts, row: request.outboxRowId } } as never;
+    };
+
+    const report = await s.run();
+
+    expect(s.reply.composer.rewriteCalls).toHaveLength(1);
+    expect(s.face.finalizeCalls.map((request) => request.attempt)).toEqual(["rewrite"]);
+    expect(report.rows[0]).toMatchObject({
+      result: "passedOn",
+      composerCalls: 2,
+      rewrite: true,
+      finalizeCalls: 1,
+      questionWithdrawn: true,
+    });
+  });
+
+  it.each([
+    [
+      "at stage input (refuse-frontier-in-input.json's check)",
+      refused("input", [{ check: "frontier", at: "frontier" }]),
+      "frontier",
+    ],
+    [
+      "at stage plan for a literal (a number no fact holds)",
+      refused("plan", [{ check: "literalValue", at: "lines[0].text", kind: "number" }]),
+      "literalValue",
+    ],
+    [
+      "at stage plan for a format, even with a plan beside it",
+      refused("plan", [{ check: "formatNotAllowed", at: "formats[1]" }], HI_PLAN),
+      "formatNotAllowed",
+    ],
+    [
+      "at stage plan for a reader check and a literal together (not the reader checks alone)",
+      refused("plan", [...TONE, { check: "literalValue", at: "lines[0].text", kind: "number" }], HI_PLAN),
+      "tone",
+    ],
+    ["for tone with no plan to rewrite", refused("plan", TONE), "tone"],
+    ["for tone with no stage", { error: "tone", modelCalls: [...ONE_COMPOSE] }, "tone"],
+    ["for tone with a plan that is no K-03 plan", refused("plan", TONE, { lines: "Hi!" }), "tone"],
+    ["for tone at no place", refused("plan", [{ check: "tone" }], HI_PLAN), "tone"],
+  ] as [string, ComposerAnswer, string][])(
+    "a compose refused %s ends as before: left, no rewrite, no finalize",
+    async (_what, answer, code) => {
+      const s = gentleRow();
+      s.reply.composer.compose = () => answer;
+
+      const report = await s.run();
+
+      expect(s.reply.composer.rewriteCalls).toEqual([]);
+      expect(s.face.finalizeCalls).toEqual([]);
+      expect(report.rows).toEqual([
+        expect.objectContaining({
+          result: "left",
+          errorCode: code,
+          composerCalls: 1,
+          rewrite: false,
+          finalizeCalls: 0,
+        }),
+      ]);
+      expect(s.spans.map((span) => span.hop)).toEqual(["compose"]);
+    },
+  );
+
+  it("a routine row is unchanged: the same 'Hi!' plan passes compose and goes to finalize as composed, one composer call, no rewrite", async () => {
+    const routine: ComposeInput = { ...GENTLE_INPUT, situation: "routine" };
+    const s = gentleRow(routine);
+    s.reply.composer.compose = () => planned(HI_PLAN);
+
+    const report = await s.run();
+
+    expect(s.reply.composer.rewriteCalls).toEqual([]);
+    expect(s.face.finalizeCalls.map((request) => [request.attempt, request.plan.plan])).toEqual([
+      ["composed", HI_PLAN],
+    ]);
+    expect(report.rows[0]).toMatchObject({
+      result: "send",
+      composerCalls: 1,
+      rewrite: false,
+      finalizeCalls: 1,
+    });
+    expect(s.spans.map((span) => span.hop)).toEqual(["compose", "fillAndChecks"]);
+  });
+
+  describe("end to end through the staging wiring's composer port (DL-1159): ../wiring/real.ts realComposer over @rosie/ai's composer, its checks and its rewrite, the model answers recorded", () => {
+    /** What the one rewrite is told for HI_PLAN on the gentle row: the tone check and its one place. */
+    const TOLD = [{ check: "tone" as const, detail: "lines[0].text" }];
+    const COMPOSE_TURN = composeInputText(GENTLE_INPUT as unknown as AiComposeInput);
+    const REWRITE_TURN = rewriteTurnText(
+      GENTLE_INPUT as unknown as AiComposeInput,
+      HI_PLAN as unknown as AiMessagePlan,
+      TOLD,
+    );
+
+    /**
+     * The gentle row's second half with the turn's composer calls going through the staging port to @rosie/ai's real
+     * composer on bundle v0 (the bundle the turn's trace pins), over a fake Messages API that answers the compose call
+     * with the recorded `composed` plan and the rewrite call with the recorded `rewritten` plan, each only for exactly the
+     * user message that call must send; any other request fails its attempt. No model is called.
+     */
+    function wiredGentleRow(composed: unknown, rewritten: unknown) {
+      const api = fakeTurnApi((turn) => {
+        if (turn === COMPOSE_TURN) return structuredClone(composed);
+        if (turn === REWRITE_TURN) return structuredClone(rewritten);
+        throw new Error("no recorded answer for this request");
+      });
+      const composer = createComposer({
+        bundle: { bundleId: V0_BUNDLE.manifest.bundleId, models: V0_BUNDLE.manifest.models },
+        prompts: V0_PROMPTS,
+        env: { [KEY_VARIABLE]: `made-up-${crypto.randomUUID()}` },
+        fetch: api.fetch,
+      });
+      const port = realComposer({ composers: () => composer });
+      const portSpans: Span[] = [];
+      const portTrace = openTrace({
+        openedBy: "textWebhook",
+        bundleId: BUNDLE_A,
+        sink: (span) => portSpans.push(span),
+      });
+      portTrace.setTurn(S1_01_CALLER.turnId);
+      const s = gentleRow();
+      s.reply.composer.compose = (input) => port.compose(input, portTrace);
+      s.reply.composer.rewrite = (request) => port.rewrite(request, portTrace);
+      return { s, api, portSpans };
+    }
+
+    it("the composer's recorded answer keeps S1-02's 'Hi!' (refused: tone at lines[0].text) and the recorded rewrite drops it: the refused plan reaches the turn, the one rewrite is told only tone at that place, its plan is finalized with attempt rewrite and sent once, composerCalls 2; no plan with '!' reaches finalize, and no span holds a plan's word", async () => {
+      const { s, api, portSpans } = wiredGentleRow(HI_PLAN, GENTLE_PLAN);
+
+      const report = await s.run();
+
+      // Two model calls, both Haiku: the compose call, then the one rewrite, each sent exactly its recorded message.
+      expect(api.calls.map((call) => [call.model, call.status])).toEqual([
+        [HAIKU_MODEL, 200],
+        [HAIKU_MODEL, 200],
+      ]);
+      expect(api.calls.map((call) => userOf(call))).toEqual([COMPOSE_TURN, REWRITE_TURN]);
+      expect(s.reply.composer.rewriteCalls).toEqual([
+        { input: GENTLE_INPUT, plan: HI_PLAN, failed: [{ check: "tone", detail: "lines[0].text" }] },
+      ]);
+      expect(s.face.finalizeCalls).toEqual([
+        {
+          caller: S1_01_CALLER,
+          outboxRowId: S1_02_ROW,
+          expectVersion: 1,
+          attempt: "rewrite",
+          plan: { row: S1_02_ROW, channel: "imessage", copyOf: null, plan: GENTLE_PLAN },
+        },
+      ]);
+      expect(JSON.stringify(s.face.finalizeCalls)).not.toContain("!");
+      expect(report.rows).toEqual([
+        expect.objectContaining({
+          outboxRowId: S1_02_ROW,
+          result: "send",
+          composerCalls: 2,
+          rewrite: true,
+          finalizeCalls: 1,
+          errorCode: null,
+        }),
+      ]);
+      expect(report.rows[0]?.finalParts?.sends).toHaveLength(1);
+      expect(JSON.stringify(report.rows[0]?.finalParts)).not.toContain("!");
+      expect(s.reply.dispatcher.wakes).toEqual([
+        { turnId: S1_01_CALLER.turnId, handleId: "handle-sam", outboxRowIds: [S1_02_ROW] },
+      ]);
+
+      // The turn's spans carry the real model calls' labels; the AI gateway's portCall spans, one per call, likewise.
+      const [compose, rewrite] = s.spans;
+      expect(s.spans.map((span) => span.hop)).toEqual(["compose", "rewriteOrFallback"]);
+      for (const span of s.spans) expect(spanProblems(span)).toEqual([]);
+      expect(compose).toMatchObject({ outcome: "refused", error_code: "tone" });
+      expect(compose?.model_calls?.map((call) => [call.purpose, call.outcome])).toEqual([["compose", "ok"]]);
+      expect(rewrite).toMatchObject({ outcome: "ok" });
+      expect(rewrite?.model_calls?.map((call) => [call.purpose, call.outcome])).toEqual([["rewrite", "ok"]]);
+      expect(rewrite?.got).toMatchObject({ attempt: "rewrite", told: ["tone"], planned: true, calls: 1 });
+      expect(portSpans.map((span) => [span.hop, span.provider, span.outcome])).toEqual([
+        ["portCall", "anthropic", "ok"],
+        ["portCall", "anthropic", "ok"],
+      ]);
+      const logged = JSON.stringify([...s.spans, ...portSpans]);
+      for (const words of ["Hi!", "Hi,", "automated assistant", "What kinds of work", "lines[0]", "JOIN"])
+        expect(logged).not.toContain(words);
+    });
+
+    it("a recorded rewrite that keeps the '!' is refused by the composer's own check ('use the fallback'): the row ends left with nothing sent, composerCalls 2, no finalize", async () => {
+      const { s, api } = wiredGentleRow(HI_PLAN, HI_PLAN);
+
+      const report = await s.run();
+
+      expect(api.calls.map((call) => userOf(call))).toEqual([COMPOSE_TURN, REWRITE_TURN]);
+      expect(s.face.finalizeCalls).toEqual([]);
+      expect(s.reply.rows.writes).toEqual([]);
+      expect(report.rows).toEqual([
+        expect.objectContaining({
+          result: "left",
+          composerCalls: 2,
+          rewrite: true,
+          finalizeCalls: 0,
+          finalParts: null,
+          errorCode: "useFallback",
+        }),
+      ]);
+    });
   });
 });
 

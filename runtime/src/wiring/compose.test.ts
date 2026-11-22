@@ -205,6 +205,48 @@ describe("the composer bound to @rosie/ai: one call per row", () => {
     ).rejects.toThrow(new NoComposerError());
   });
 
+  it("a plan the reader checks alone refused reaches the turn with its plan (T-1535, DL-1159): recording 4's row tagged gentle, answered with a plan that keeps 'Hi!', gives the tone label with stage plan, the check and its place, and the plan refused, beside its one Haiku call; a plan refused for a literal gives its label alone, as before; no span holds a word of either plan", async () => {
+    const { models, port, spans, traceFor } = run();
+    const [first, fact] = PLAN_S1_02.lines;
+    if (first === undefined || fact === undefined) throw new Error("plan-s1-02.json has two lines");
+    // The safety read's deadline passed, so code tagged the row gentle (arch 07 line 357: "gentle, no '!'").
+    const gentle = { ...structuredClone(JOIN_INPUT), situation: "gentle" } as ComposeInput;
+    const hi: MessagePlan = { ...PLAN_S1_02, lines: [{ ...first, text: `Hi! ${first.text}` }, fact] };
+    models.hold({ id: "t-1535-gentle-hi", input: gentle, plan: hi });
+    const problem = { ...structuredClone(JOIN_INPUT), situation: "problem" } as ComposeInput;
+    const typed: MessagePlan = {
+      ...PLAN_S1_02,
+      lines: [{ ...first, text: "Setup takes 20 minutes." }, fact],
+    };
+    models.hold({ id: "t-1535-typed-literal", input: problem, plan: typed });
+    const haikuCompose = [[HAIKU_MODEL, "compose", "ok"]];
+    const labelsOf = (answer: ComposerAnswer): unknown[] =>
+      callsOf(answer).map((call) => [call.model, call.purpose, call.outcome]);
+
+    const refused = await port.compose(gentle, traceFor(gentle));
+    expect({ ...refused, modelCalls: labelsOf(refused) }).toEqual({
+      error: "tone",
+      stage: "plan",
+      problems: [{ check: "tone", at: "lines[0].text" }],
+      plan: hi,
+      modelCalls: haikuCompose,
+    });
+
+    const literal = await port.compose(problem, traceFor(problem));
+    expect({ ...literal, modelCalls: labelsOf(literal) }).toEqual({
+      error: "literalValue",
+      modelCalls: haikuCompose,
+    });
+    expect(models.misses).toEqual([]);
+    expect(models.calls.map((call) => call.recording)).toEqual(["t-1535-gentle-hi", "t-1535-typed-literal"]);
+    // The spans: the AI gateway's portCall per attempt, labels and counts only; never a word of either plan.
+    expect(spans.filter((span) => !modelCall(span))).toEqual([]);
+    expect(spans).toHaveLength(2);
+    const words = JSON.stringify(spans);
+    for (const text of ["Hi!", "I'll set up", "20 minutes", "kinds of work", "lines[0]"])
+      expect(words).not.toContain(text);
+  });
+
   it("a composer that cannot be built is not kept: the next call asks again", async () => {
     const models = fakeComposerModels();
     let builds = 0;

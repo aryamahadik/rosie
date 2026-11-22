@@ -34,7 +34,10 @@ import { GATEWAY_BUNDLE, KEY, composerOn, recordedInput } from "../test-support"
 import { REWRITE_TASK, type RewriteAnswer, type RewriteRequest } from "./index";
 import {
   A7_17_INPUT,
+  HI_GENTLE_PLAN,
+  HI_PLAN,
   ONE_QUESTION_PLAN,
+  S1_02_GENTLE_INPUT,
   TWO_QUESTIONS_PLAN,
   TYPED_TIME_PLAN,
   fakeTurnApi,
@@ -358,6 +361,82 @@ describe("never a second rewrite: a rewrite that fails is 'use the fallback', an
     ]);
     expect(answer.modelCalls).toHaveLength(3);
     expect(answer).not.toHaveProperty("plan");
+  });
+});
+
+describe("a plan compose's own reader checks refused gets the one rewrite, checked as every plan is (T-1535; DL-1157)", () => {
+  const TONE_TOLD = [{ check: "tone", detail: "lines[0].text" }] as const;
+
+  it("S1-02's 'Hi!' on a gentle row: compose refuses it for tone at lines[0].text; the one rewrite, told only that, answers without the '!' and is given; two model calls in all", async () => {
+    const api = fakeTurnApi((turn) => (isRewriteTurn(turn) ? HI_GENTLE_PLAN : HI_PLAN));
+    const composer = composerOn(api.fetch);
+    const trace = newTrace();
+
+    // 1. Compose: the model keeps the master line's "!", and the composer's tone check refuses the plan (as on the user's
+    //    phone, 16:35Z Nov 22: error_code tone).
+    const composed = await composer.compose(S1_02_GENTLE_INPUT, { trace });
+    expect(composed).toMatchObject({
+      status: "refused",
+      stage: "plan",
+      problems: [{ check: "tone", at: "lines[0].text" }],
+    });
+    expect(api.calls).toHaveLength(1);
+
+    // 2. The one rewrite of that plan, told the reader check and its place, and nothing else.
+    const rewritten = await composer.rewrite(
+      { input: S1_02_GENTLE_INPUT, plan: HI_PLAN, attempt: "composed", told: [...TONE_TOLD] },
+      { trace },
+    );
+    expect(rewritten).toMatchObject({ status: "ok", model: HAIKU_MODEL, attempt: 1, fallback: false });
+    expect(planOf(rewritten)).toEqual(HI_GENTLE_PLAN);
+    expect(api.calls).toHaveLength(2);
+    const turn = userOf(api.calls[1]);
+    expect(
+      turn.startsWith(
+        `${composeInputText(S1_02_GENTLE_INPUT)}\n<plan_to_fix>${planText(HI_PLAN)}</plan_to_fix>\n`,
+      ),
+    ).toBe(true);
+    expect(failedChecksIn(turn)).toEqual([["Tone", "lines[0].text"]]);
+    expect(turn.endsWith(`</failed_checks>\n\n${REWRITE_TASK}`)).toBe(true);
+    expect(callsOf(trace.spans).map((call) => [call.purpose, call.model])).toEqual([
+      ["compose", HAIKU_MODEL],
+      ["rewrite", HAIKU_MODEL],
+    ]);
+    for (const span of trace.spans) {
+      expect(spanProblems(span)).toEqual([]);
+      expect(schemaErrors("span", span)).toEqual([]);
+    }
+    for (const words of ["Hi!", "Hi,", "an automated assistant", "lines[0].text", "JOIN"])
+      expect(JSON.stringify(trace.toTrace())).not.toContain(words);
+  });
+
+  it("a rewrite that keeps the '!' is refused by the same tone check: 'use the fallback' after its one call, never a plan; models down is modelsDown", async () => {
+    const request = {
+      input: S1_02_GENTLE_INPUT,
+      plan: HI_PLAN,
+      attempt: "composed",
+      told: [...TONE_TOLD],
+    } satisfies RewriteRequest;
+    const api = fakeTurnApi(() => HI_PLAN);
+    const answer = await composerOn(api.fetch).rewrite(request);
+    expect(answer).toEqual({
+      status: "useFallback",
+      why: "rewriteRefused",
+      problems: [{ check: "tone", at: "lines[0].text" }],
+      modelCalls: expect.any(Array) as unknown,
+    });
+    expect(api.calls).toHaveLength(1);
+    expect(answer).not.toHaveProperty("plan");
+    expect(JSON.stringify(answer)).not.toContain("Hi!");
+
+    const down = await composerOn(
+      fakeTurnApi(
+        () => HI_GENTLE_PLAN,
+        () => 529,
+      ).fetch,
+    ).rewrite(request);
+    expect(down.status).toBe("modelsDown");
+    expect(down).not.toHaveProperty("plan");
   });
 });
 
