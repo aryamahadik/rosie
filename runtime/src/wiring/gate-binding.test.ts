@@ -30,21 +30,35 @@
 //      already holds writes no thread row and no thread.created entry, still gives thread and asks S1-02's question, the
 //      read asked once for the turn's chat id; a chat no thread holds, and one another handle's thread holds, insert the
 //      thread as with no read bound; an error answer fails the walk closed (TurnFaceReadError); with the read left out
-//      (fakeGateReads as it is, no reads at all) the binding carries no such field and S1-01 inserts, as before.
+//      (fakeGateReads as it is, no reads at all) the binding carries no such field and S1-01 inserts, as before;
+//   f. the one-kind path (T-1494, H2a; DL-1033, DL-1096, DL-1111; K-09 README default 199): with GateReads.companies bound
+//      beside the kinds reads and the stop reads (staging's shape), the binding carries S1-04's buttons settler alone and
+//      S1-08's writer, so a one-kind S1-02 answer ("Plumbing") on bundle v2, through the commit's own writesOf, runs
+//      S1-02's settler, S1-02's writer inside the companies wrapper (item 79, item 72 and the catalog by id read once
+//      each), S1-11's writer, S1-04's buttons settler and S1-08's writer (the stop home read for the turn's own owner),
+//      every read of the binding one after another, and ends at S1-09's question with no S1-04 question; "Barbershop,
+//      plumbing, electrical" still asks S1-04 as without the path; with the one-kind reads left out the binding is
+//      T-1516's as it is (no buttons settler, no S1-08 writer, "Plumbing" asks S1-04); with them bound and no stop reads,
+//      "Plumbing" is refused at S1-08 with nothing returned; with no kinds reads they bind nothing and are never read.
 //
 // Under test, as they are: ./real.ts's binding and its bundles; @rosie/actions' turnCommitDeps, T-1461's walk on bundle
 // v1's flow A with T-1502's settler port, T-633's writers and T-1502's S1-02 settler with T-632's matcher, T-634's
-// writer, and T-590's readStop and mayText inside T-633's writers; and T-1519's walkChatsOf and S1-01's thread write.
+// writer, and T-590's readStop and mayText inside T-633's writers; and T-1519's walkChatsOf and S1-01's thread write;
+// for f, T-1491's buttons-settler walk on bundle v2's flow A, T-1492's one-kind wrapper and settler through
+// companiesReadsOf, and T-1482's S1-08 writer.
 // Doubles, for ports only: the pinned bundle (bundle v1's own flow A and trade overlays, read from bundles/v1; for turn
 // 1, K-01's bundle-v0-skeleton.json's flow A), the bundle port (../bundle/test-support), the question read and K-05
 // items 78 and 79 (@rosie/actions' own doubles, as T-1468's unit test binds them), the stop home's reads (@rosie/actions'
 // own double over the frozen seeds, on the runtime side, as T-633's unit test binds them), K-05 item 51 (an answer as
-// readChatHandle gives it), and ./test-support's fakeGateReads as it is. Test values only (rule 9): the contracts'
-// fixtures, bundle v1, the master's sample cast and a whole fiction-range 555-01xx number.
+// readChatHandle gives it), and ./test-support's fakeGateReads as it is; for f, bundle v2 as a run pinned it (its own
+// manifest, flow A and trade overlays, read from bundles/v2) and items 79 and 72 and the catalog by id (@rosie/actions'
+// fakeCompaniesK05, as T-1493's unit test binds them). Test values only (rule 9): the contracts' fixtures, bundles v1 and
+// v2, the master's sample cast and a whole fiction-range 555-01xx number.
 import { BARBERSHOP } from "@rosie/actions/src/domain/safety/test-support";
 import {
   NOTHING_OPEN,
   bundleV1Id,
+  commitS1_02,
   decidedOf,
   flowA,
   flowAV1,
@@ -55,9 +69,15 @@ import {
   turnOne,
   turnTwoOnV1,
 } from "@rosie/actions/src/commit/walk/test-support";
-import type { WalkQuestions } from "@rosie/actions/src/commit/walk";
+import { WalkNotBuiltError, type ButtonsSettler, type WalkQuestions } from "@rosie/actions/src/commit/walk";
 import type { StopHomeReads } from "@rosie/actions/src/homes/stop/reads";
 import { readsOn, seedWorld } from "@rosie/actions/src/homes/stop/test-support";
+import { companiesReadsOf } from "@rosie/actions/src/tool-api/journey-1/companies/reads";
+import {
+  SAM_COMPANY,
+  catalogDefaults,
+  fakeCompaniesK05,
+} from "@rosie/actions/src/tool-api/journey-1/companies/test-support";
 import { KindsNotBuiltError, KindsRefusedError } from "@rosie/actions/src/tool-api/journey-1/kinds/errors";
 import { kindsReadsOf } from "@rosie/actions/src/tool-api/journey-1/kinds/reads";
 import {
@@ -67,6 +87,11 @@ import {
   turnWithWords,
 } from "@rosie/actions/src/tool-api/journey-1/kinds/test-support";
 import { PF_TEXT_KEYS } from "@rosie/actions/src/tool-api/journey-1/plug-ins/plug-in";
+import {
+  bundleV2Id,
+  overlayV2,
+  publishedBundleV2,
+} from "@rosie/actions/src/tool-api/turn-face/calls-test-support";
 import {
   NOTHING_OPEN_AT,
   turnCommitDeps,
@@ -991,5 +1016,321 @@ describe("the gate's commit binding hands in the walk's chat read, only where th
     expect(k05.asked).toEqual([]);
     expect(stop.asked).toEqual([]);
     expect(questions.reads).toEqual([]);
+  });
+});
+
+// ---- the one-kind path (T-1494) -----------------------------------------------------------------------------------------
+
+/** Bundle v2's id, as its manifest names it: the bundle the run pinned in the one-kind cases (T-1477; DL-1111). */
+const BUNDLE_V2: BundleId = bundleV2Id();
+
+/**
+ * Bundle v2 as a run pinned it: its own manifest and flow A (bundle v1's six steps plus S1-08 and S1-09), and for each
+ * trade bundles/v2's own overlay of barber, plumber and electrician, BundleError notInBundle for any other, each trade
+ * asked for written down.
+ */
+function pinnedV2(): PinnedV1 {
+  const asked: string[] = [];
+  const held = new Set(["barber", "plumber", "electrician"]);
+  const published = publishedBundleV2();
+  const flowAV2 = published.flows.A as Readonly<Record<string, unknown>>;
+  const bundle: PinnedBundle = {
+    bundleId: BUNDLE_V2,
+    manifest: published.manifest as unknown as Manifest,
+    flow: (flow) =>
+      flow === "A" ? Promise.resolve(flowAV2) : Promise.reject(new BundleError("notInBundle")),
+    trade(tradeId) {
+      asked.push(tradeId);
+      return held.has(tradeId)
+        ? Promise.resolve(overlayV2(tradeId) as unknown as TradeOverlay)
+        : Promise.reject(new BundleError("notInBundle"));
+    },
+    reads: () => [],
+  };
+  return { bundle, asked };
+}
+
+/** How many of the binding's reads are open at once, across every port they are counted on (each its own connection). */
+interface OpenReads {
+  open: number;
+  peak: number;
+}
+
+type ReadPort = (...args: never[]) => Promise<unknown>;
+
+/** `ports` with each of its functions counted in `reads` from its call until its answer settles, handed on unchanged. */
+function countedPorts<T extends object>(ports: T, reads: OpenReads): T {
+  const entries = Object.entries(ports).map(([name, port]: [string, unknown]): [string, unknown] => {
+    if (typeof port !== "function") return [name, port];
+    const read = port as ReadPort;
+    return [
+      name,
+      async (...args: never[]) => {
+        reads.open += 1;
+        reads.peak = Math.max(reads.peak, reads.open);
+        try {
+          return await read(...args);
+        } finally {
+          reads.open -= 1;
+        }
+      },
+    ];
+  });
+  return Object.fromEntries(entries) as T;
+}
+
+describe("the gate's commit binding hands in the one-kind path where the reads bind it, so an owner with one kept kind of work is never asked S1-04 and gets S1-08's row and S1-09's question (T-1494)", () => {
+  /** fakeGateReads as it is (./test-support.ts): it binds none of the sign-up reads. */
+  const baseReads = (): GateReads => fakeGateReads(fakeTurnRows()).reads;
+
+  /** Which of staging's sign-up reads a case binds beside the question read: each is bound unless set false. */
+  interface Given {
+    readonly kinds?: boolean;
+    readonly stop?: boolean;
+    readonly companies?: boolean;
+  }
+
+  /**
+   * The binding realGate builds for one call over staging's shape of reads (the question read with S1-02's question open,
+   * the kinds reads over the 243 seeded kinds, the stop home's reads where Sam's mobile texts, and the one-kind reads
+   * with Sam's company of Lee's Barbershop and its barber kind on file, no pick yet), each read counted while open, the
+   * run's pinned bundle v2.
+   */
+  function oneKindBound(given: Given = {}) {
+    const reads: OpenReads = { open: 0, peak: 0 };
+    const k05 = fakeK05();
+    const companies = fakeCompaniesK05();
+    const stop = recordedStop();
+    const questions = questionsOver();
+    const gateReads: GateReads = {
+      ...baseReads(),
+      questions: questions.questions,
+      ...(given.kinds === false ? {} : { kinds: { reads: kindsReadsOf(countedPorts(k05.k05, reads)) } }),
+      ...(given.stop === false ? {} : { stop: { reads: countedPorts(stop.stop, reads) } }),
+      ...(given.companies === false
+        ? {}
+        : { companies: companiesReadsOf(countedPorts(companies.k05, reads)) }),
+    };
+    const pinned = pinnedV2();
+    return {
+      reads,
+      k05,
+      companies,
+      stop,
+      questions,
+      pinned,
+      gateReads,
+      ...bindingOver(gateReads, pinned.bundle),
+    };
+  }
+
+  type Bound = ReturnType<typeof oneKindBound>["binding"];
+
+  /** The binding's own settlers, writers and buttons settlers, each call written down in `order`, handed on unchanged. */
+  function watchedOf(binding: Bound, order: string[]): Bound {
+    const { settlers, writers, buttonsSettlers } = binding;
+    if (settlers === undefined || writers === undefined) {
+      throw new Error("the binding carries the sign-up writers and S1-02's settler");
+    }
+    return {
+      ...binding,
+      settlers: (stepId) => {
+        const settler = settlers(stepId);
+        if (settler === null) return null;
+        return (call) => {
+          order.push(`settler ${call.step.id}`);
+          return settler(call);
+        };
+      },
+      writers: (stepId) => {
+        const writer = writers(stepId);
+        if (writer === null) return null;
+        return (call) => {
+          order.push(`writer ${call.step.id}`);
+          return writer(call);
+        };
+      },
+      ...(buttonsSettlers === undefined
+        ? {}
+        : {
+            buttonsSettlers: (stepId: string) => {
+              const settler = buttonsSettlers(stepId);
+              if (settler === null) return null;
+              return (call: Parameters<ButtonsSettler>[0]) => {
+                order.push(`buttons ${call.step.id}`);
+                return settler(call);
+              };
+            },
+          }),
+    };
+  }
+
+  /** A part naming c-01 ("All on the list") for `words`, pinned to bundle v2, through the commit's own writesOf. */
+  async function walkedOnV2(binding: Bound, words: string, order: string[] = []) {
+    const turn = turnWithWords("c-01", words);
+    expect(decidedOf(turn.context.request).context.texts.map((text) => text.words)).toEqual([words]);
+    const context = { ...turn.context, turn: { ...turn.context.turn, bundleId: { ...BUNDLE_V2 } } };
+    const { ports } = turnCommitDeps(watchedOf(binding, order))(NOTHING_OPEN_AT);
+    return { turn, context, writes: await ports.writesOf(turn.part, context, NOTHING_OPEN) };
+  }
+
+  it("bound (staging's shape): the binding carries S1-04's buttons settler alone and S1-08's writer beside T-1516's writers and S1-02's settler; building it reads nothing", () => {
+    const { reads, k05, companies, stop, pinned, binding } = oneKindBound();
+    const { buttonsSettlers, writers, settlers } = binding;
+    if (buttonsSettlers === undefined || writers === undefined || settlers === undefined) {
+      throw new Error("the binding carries the one-kind path");
+    }
+    expect(typeof buttonsSettlers("S1-04")).toBe("function");
+    for (const stepId of ["S1-02", "S1-08", "S1-09", "s1-04", "", "__proto__"]) {
+      expect(buttonsSettlers(stepId), stepId).toBeNull();
+    }
+    for (const stepId of ["S1-02", "S1-03", "S1-74", "S1-11", "S1-08"]) {
+      expect(typeof writers(stepId), stepId).toBe("function");
+    }
+    for (const stepId of ["S1-01", "S1-04", "S1-09", ""]) expect(writers(stepId), stepId).toBeNull();
+    expect(typeof settlers("S1-02")).toBe("function");
+    expect(settlers("S1-04")).toBeNull();
+    // Building the binding read nothing.
+    expect(reads.peak).toBe(0);
+    expect(k05.asked).toEqual([]);
+    expect(companies.asked).toEqual([]);
+    expect(stop.asked).toEqual([]);
+    expect(pinned.asked).toEqual([]);
+  });
+
+  it("bound: 'Plumbing' on bundle v2 runs S1-02's settler, S1-02's writer inside the companies wrapper, S1-11's writer, S1-04's buttons settler and S1-08's writer, every read one after another, and ends at S1-09's question with no S1-04 question", async () => {
+    const { reads, k05, companies, stop, pinned, binding, bound } = oneKindBound();
+    const order: string[] = [];
+
+    const { turn, writes } = await walkedOnV2(binding, "Plumbing", order);
+
+    // S1-02's settler and writer (the wrapper inside T-634's), S1-11's blocks, S1-04 settled, not asked, then S1-08.
+    expect(order).toEqual(["settler S1-02", "writer S1-02", "writer S1-11", "buttons S1-04", "writer S1-08"]);
+    // The catalog and item 79 for S1-02's writer; item 79, item 72 and the catalog by id for the one-kind pieces, each
+    // once for the walk, for the call's business and the turn's person; the stop home for S1-08's writer alone (no S1-03
+    // or S1-74 message is walked); never two reads open at once.
+    expect(k05.asked).toEqual([
+      { read: "readKindCatalog" },
+      { read: "readPickedKinds", request: { businessId: BARBERSHOP, personId: "person-sam" } },
+    ]);
+    expect(companies.asked.map((asked) => [asked.read, asked.request.businessId])).toEqual([
+      ["readPickedKinds", BARBERSHOP],
+      ["readBusinessKinds", BARBERSHOP],
+      ["readTurnState", BARBERSHOP],
+    ]);
+    expect(stop.asked).toEqual(SAM_STOP_READS);
+    expect(reads.peak).toBe(1);
+    expect(reads.open).toBe(0);
+    // The trade once, plumber's, from the pinned bundle v2 and nowhere else.
+    expect(pinned.asked).toEqual(["plumber"]);
+    expect(bound.kvReads).toEqual([]);
+    expect(bound.calls).toEqual([]);
+
+    // The one pick placed on its own insert under Sam's company and the call's business, its company kind first (the
+    // barber one is on file, plumber's is not), then S1-11's 11 blocks of plumber under that business.
+    expect(writes.closes.map((close) => [close.id, close.status])).toEqual([["oq-s1-02", "answered"]]);
+    expect(writes.state.map((write) => `${write.op} ${write.table}`)).toEqual([
+      "insert company_kinds",
+      "insert picked_kinds",
+      ...PF_TEXT_KEYS.map(() => "insert picked_kind_texts"),
+    ]);
+    const plumber = catalogDefaults("plumber");
+    const [kind, pick, ...texts] = writes.state;
+    expect(kind).toEqual({
+      op: "insert",
+      table: "company_kinds",
+      values: {
+        company_id: SAM_COMPANY,
+        kind_id: "plumber",
+        business_id: BARBERSHOP,
+        trade_name: null,
+        pf_facts: plumber.facts,
+        pf_switches_a: plumber.switchesA,
+        pf_switches_b: plumber.switchesB,
+      },
+    });
+    const pickId = `pick-s1-02-${turn.context.turn.id}-1`;
+    expect(pick).toMatchObject({
+      op: "insert",
+      table: "picked_kinds",
+      values: {
+        id: pickId,
+        kind_id: "plumber",
+        outcome: "listed",
+        company_id: SAM_COMPANY,
+        business_id: BARBERSHOP,
+      },
+    });
+    const blocks = overlayV2("plumber").pluginText as Record<string, string>;
+    expect(texts.map((text) => (text.op === "insert" ? text.values : null))).toEqual(
+      PF_TEXT_KEYS.map((key) => ({
+        picked_kind_id: pickId,
+        pf_key: key,
+        business_id: BARBERSHOP,
+        block: blocks[key],
+      })),
+    );
+
+    // No S1-04 question: S1-08's row (no question, step S1-08, line 0), then S1-09's question and its row.
+    const key = turn.context.turn.id;
+    expect(writes.asks.map((ask) => [ask.question.id, ask.question.step])).toEqual([
+      [`oq-s1-09-${key}-1`, "S1-09"],
+    ]);
+    expect(
+      writes.messages.map((row) => [row.id, row.step, row.lineNo, row.openQuestionId, row.sendClass]),
+    ).toEqual([
+      [`outbox-s1-08-${key}-1`, "S1-08", 0, null, "quick_reply"],
+      [`outbox-s1-09-${key}-1`, "S1-09", 0, `oq-s1-09-${key}-1`, "quick_reply"],
+    ]);
+    expect(writes.gives).toEqual([...commitS1_02().given.stated.gives, "companies"]);
+  });
+
+  it("bound: 'Barbershop, plumbing, electrical' still asks S1-04, its writes those of the binding with the one-kind reads left out", async () => {
+    const order: string[] = [];
+    const bound = await walkedOnV2(oneKindBound().binding, "Barbershop, plumbing, electrical", order);
+    const today = await walkedOnV2(
+      oneKindBound({ companies: false }).binding,
+      "Barbershop, plumbing, electrical",
+    );
+
+    expect(order).toEqual(["settler S1-02", "writer S1-02", "writer S1-11", "buttons S1-04"]);
+    expect(bound.writes.asks.map((ask) => ask.question.step)).toEqual(["S1-04"]);
+    expect(bound.writes).toEqual(today.writes);
+  });
+
+  it("left out: the binding is T-1516's as it is (no buttons settler, no S1-08 writer), 'Plumbing' asks S1-04 as today, and no one-kind read is made", async () => {
+    const { companies, binding } = oneKindBound({ companies: false });
+    expect(Object.hasOwn(binding, "buttonsSettlers")).toBe(false);
+    expect(binding.writers?.("S1-08")).toBeNull();
+
+    const order: string[] = [];
+    const { writes } = await walkedOnV2(binding, "Plumbing", order);
+
+    expect(order).toEqual(["settler S1-02", "writer S1-02", "writer S1-11"]);
+    expect(writes.asks.map((ask) => ask.question.step)).toEqual(["S1-04"]);
+    expect(writes.messages.map((row) => row.step)).toEqual(["S1-04"]);
+    expect(writes.state.map((write) => write.table)).not.toContain("company_kinds");
+    expect(companies.asked).toEqual([]);
+  });
+
+  it("bound with no stop reads: S1-04's buttons settler and no S1-08 writer, so 'Plumbing' is refused at S1-08 (notBuilt) with nothing returned", async () => {
+    const { binding, stop } = oneKindBound({ stop: false });
+    expect(typeof binding.buttonsSettlers?.("S1-04")).toBe("function");
+    expect(binding.writers?.("S1-08")).toBeNull();
+
+    const order: string[] = [];
+    const thrown = await thrownBy(walkedOnV2(binding, "Plumbing", order));
+
+    expect(thrown).toBeInstanceOf(WalkNotBuiltError);
+    expect(order).toEqual(["settler S1-02", "writer S1-02", "writer S1-11", "buttons S1-04"]);
+    expect(stop.asked).toEqual([]);
+  });
+
+  it("bound with no kinds reads: no writer, no settler and no buttons settler, and the one-kind reads are never read", () => {
+    const { binding, companies } = oneKindBound({ kinds: false });
+    for (const field of ["writers", "settlers", "buttonsSettlers"]) {
+      expect(Object.hasOwn(binding, field), field).toBe(false);
+    }
+    expect(companies.asked).toEqual([]);
   });
 });
