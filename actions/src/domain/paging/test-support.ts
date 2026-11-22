@@ -260,6 +260,7 @@ export function applyPagingWrites(world: PagingWorld, writes: PagingWrites): voi
           subjectRowId: textOrNull(v.subject_row_id),
           turnId: textOrNull(v.turn_id),
           raisedByPersonId: textOrNull(v.raised_by_person_id),
+          summary: text(v.summary),
           openedAt: text(v.opened_at),
           dueAt: text(v.due_at),
           state: "open",
