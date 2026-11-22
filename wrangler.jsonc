@@ -8,9 +8,20 @@
   "main": "runtime/src/index.ts",
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat"],
-  // Workers Logs: where D-000's traces are read (search a trace id).
+  // Workers Logs: where D-000's traces are read (search a trace id). They keep the Worker's own console lines (each
+  // span and log line: trace id, label, status) and never a request's URL (T-1527; T-512's security note; DL-1130): a
+  // signed link's path is its code (A4-42) and the sign-in offer carries it in ?link=<code> (T-520), and a link's code
+  // never enters a log (K-21 README:168). So invocation_logs is false (no per-request invocation log, which stores the
+  // URL), redact_query_string drops the query from any URL still kept, and traces stay off (their default). wrangler
+  // passes observability down whole: env.staging and env.production set none and get this block (an environment's own
+  // block would replace it, not merge with it).
   "observability": {
     "enabled": true,
+    "redact_query_string": true,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": false,
+    },
   },
   "workers_dev": true,
   // Needed for branch previews (wrangler versions upload --preview-alias).
