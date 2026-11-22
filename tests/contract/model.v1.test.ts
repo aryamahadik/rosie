@@ -520,7 +520,16 @@ export function checkHandOffs(value: DecideV12 | Planner): string[] {
 // The schema, one validator for everything (the harness's strict Ajv 2020-12 setup, with every error kept)
 
 const ajv = new Ajv2020({ strict: true, strictRequired: false, allErrors: true });
-for (const folder of [path.join(CONTRACTS_ROOT, "common"), path.join(CONTRACTS_ROOT, "bundle"), MODEL_DIR]) {
+// K-02 v1.3 (photo reading) $refs K-13's object key (../port-files) and K-15's search request (../port-places), and
+// both of those schemas $ref K-08's definitions (../event-trace).
+for (const folder of [
+  path.join(CONTRACTS_ROOT, "common"),
+  path.join(CONTRACTS_ROOT, "bundle"),
+  path.join(CONTRACTS_ROOT, "event-trace"),
+  path.join(CONTRACTS_ROOT, "port-files"),
+  path.join(CONTRACTS_ROOT, "port-places"),
+  MODEL_DIR,
+]) {
   for (const entry of readdirSync(folder, { withFileTypes: true })) {
     if (entry.isFile() && entry.name.endsWith(".schema.json"))
       ajv.addSchema(readJson(path.join(folder, entry.name)) as object);
@@ -553,8 +562,12 @@ const accepts = (def: string, value: unknown, version = "v1"): boolean => valida
 // The harness checks the schema only: an entry that names a `rule` passes the schema and is refused by the rule, so the
 // harness reports it as accepted-but-marked-refuse. Those entries are checked below by the rule; every other entry must
 // be ok in the harness.
-// The model schema $refs K-01's definitions (../bundle) and the shared formats, so both folders are shared schemas.
-const report = checkContractFixtures("model", { sharedFolders: ["common", "bundle"] });
+// The model schema $refs K-01's definitions (../bundle) and the shared formats, so both folders are shared schemas;
+// v1.3 also $refs K-13's object key (../port-files) and K-15's search request (../port-places), which $ref K-08's
+// definitions (../event-trace).
+const report = checkContractFixtures("model", {
+  sharedFolders: ["common", "bundle", "event-trace", "port-files", "port-places"],
+});
 const ruled = (entry: RuleEntry): boolean => entry.rule !== undefined;
 const accepted = index.fixtures.filter((entry) => entry.expect === "accept");
 const refusedBySchema = index.fixtures.filter((entry) => entry.expect === "refuse" && !ruled(entry));

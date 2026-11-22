@@ -1,0 +1,31 @@
+{
+  "request": {
+    "kind": "cardOrListing",
+    "file": "photo/2026-10-19/s3f8k2m6q1v9x4c7n0b5h2j8d3",
+    "sentAt": {
+      "utc": "2026-10-19T14:12:00Z",
+      "zone": "America/New_York"
+    }
+  },
+  "model": "sonnet",
+  "output": {
+    "kind": "cardOrListing",
+    "outcome": "read",
+    "name": {
+      "status": "read",
+      "words": "Lee's Barbershop LLC"
+    },
+    "address": {
+      "status": "read",
+      "words": "88 Elm St, Springfield"
+    },
+    "phone": {
+      "status": "read",
+      "words": "(555) 010-0177"
+    }
+  },
+  "search": {
+    "by": "photoText",
+    "text": "Lee's Barbershop LLC, 88 Elm St, Springfield, (555) 010-0177"
+  }
+}

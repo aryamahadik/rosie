@@ -21,6 +21,8 @@
 //                           as K-03 says; the refused fixtures are refused before or after the one call;
 //   K-03 slotVocabulary, rowPlan   the vocabulary the composer's checks read; an email copy reuses its text row's plan;
 //   K-03 finalParts, checkResult   the action layer's documents (C-088 to C-093), checked only where they meet the plan.
+//   K-02 v1.3               photo reading (T-070): no stage here reads a photo until T-669 builds C-120, so its nine
+//                           entries are left out by name (RUN_VERSIONS, LEFT_OUT_V1_3) and given no verdict.
 //
 // Every model answer comes from the double, asked through its call log (./double-transport.ts), or, for a refused
 // fixture, is that fixture's own answer, which the double's loader refuses to hold; the global fetch is stubbed to fail
@@ -186,6 +188,25 @@ const REFUSED_ROWS: Readonly<
 > = {
   "composer-s1-02": { pair: "invalid/refuse-plan-s1-02-on-v1-input.json", problems: S1_02_LITERALS },
 };
+
+/**
+ * The K-02 versions this run gives a verdict for. K-02 v1.3 (T-070, photo reading) is left out by name: photo reading
+ * (C-120) has no reader until T-669, where v1.3's entries join this run, so no verdict is invented for a photo answer
+ * nothing produces yet (contracts/model/README.md "v1.3", "Who reads v1.3").
+ */
+const RUN_VERSIONS: readonly string[] = ["v1", "v1.1", "v1.2"];
+/** K-02 v1.3's index entries, each left out of this run for RUN_VERSIONS' reason. */
+const LEFT_OUT_V1_3: readonly string[] = [
+  "read-card-to-places-query.json",
+  "unreadable-photo.json",
+  "read-price-list.json",
+  "read-price-list-field-unreadable.json",
+  "read-timetable.json",
+  "read-schedule.json",
+  "invalid/refuse-field-without-source-words.json",
+  "invalid/refuse-unknown-photo-kind.json",
+  "invalid/refuse-timetable-with-spots.json",
+];
 
 /** The definitions none of this card's four stages gives, and whose they are. */
 const NOT_A_STAGE: Readonly<Record<string, string>> = {
@@ -1197,11 +1218,17 @@ describe("the double's call log is the run's only transport, and every fixture i
   });
 
   it("every K-02 fixture (v1, v1.1 and v1.2) and every K-03 v1 fixture came out as its index says: each accepted one given or taken, but for those WAITING and NOT_A_STAGE name; each refused one refused", () => {
-    const k02 = model.fixtures.entries.map((entry) => ({
-      key: `K-02 ${entry.file}`,
-      def: entry.def ?? "",
-      expect: entry.expect,
-    }));
+    // K-02 v1.3's nine entries are left out by name, and nothing else is (RUN_VERSIONS).
+    const leftOut = model.fixtures.entries.filter((entry) => !RUN_VERSIONS.includes(entry.version));
+    expect(sorted(leftOut.map((entry) => entry.file))).toEqual(sorted(LEFT_OUT_V1_3));
+    expect(new Set(leftOut.map((entry) => entry.version))).toEqual(new Set(["v1.3"]));
+    const k02 = model.fixtures.entries
+      .filter((entry) => RUN_VERSIONS.includes(entry.version))
+      .map((entry) => ({
+        key: `K-02 ${entry.file}`,
+        def: entry.def ?? "",
+        expect: entry.expect,
+      }));
     const k03 = (
       planFixture("index.json") as {
         fixtures: { file: string; version: string; def: string; expect: string }[];
