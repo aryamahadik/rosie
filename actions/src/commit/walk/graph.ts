@@ -6,6 +6,13 @@
 // not reachable"). A step it holds whose fields the walk reads are not K-01 v1's shape is refused too
 // (stepNotWellFormed), never read in part. Only the fields the walk reads are narrowed; the words (say, more, does) are
 // never kept, so nothing here can carry them into a row or an error.
+//
+// The button labels of the messages Rosie sends (T-1480; K-09 README default 181) are kept beside their count: an answer
+// to a plain step's buttons question names one of them, word for word, and the walk checks it here, in the turn's pinned
+// graph. They are read as the frontier reads them (frontier/assemble/bundle.ts buttonsOf, T-1478), so the walk takes
+// exactly the labels the frontier offers: a button that is no label with words (K-01 v1's lettered pair, such as
+// ["C", "Neither works"]) leaves the step with none, since the frontier then offers none and never guesses which of a
+// pair's words stands for the button. Labels are bundle words, never a person's, and never reach a row or an error.
 
 import { WalkRefusedError } from "./errors";
 
@@ -65,6 +72,11 @@ export interface GraphStep {
   readonly tells: readonly string[];
   /** How many buttons the messages Rosie sends in it carry (K-01 v1 message elements.buttons). */
   readonly buttons: number;
+  /**
+   * The labels of those buttons, word for word, in the order sent (T-1480; K-09 README default 181): empty when there
+   * are none, or when any of them is not a label with words (a lettered pair), as the frontier then offers none (T-1478).
+   */
+  readonly buttonLabels: readonly string[];
   /** The next step on its own list, or null where the list ends (K-01 v1 step.next). */
   readonly next: string | null;
   readonly card: GraphCard | null;
@@ -164,12 +176,23 @@ function cardOf(value: unknown, stepId: string): GraphCard | null {
   return { safeDefault: optionalText(value.safeDefault, stepId), clock: clockOf(value.clock, stepId) };
 }
 
-/** The buttons on the messages Rosie (`san`) sends in the step (K-01 v1 message elements.buttons). */
-function buttonsOf(value: unknown, stepId: string): number {
-  if (value === undefined) return 0;
+/** The buttons on the messages Rosie sends in a step: how many, and their labels (GraphStep.buttonLabels). */
+interface Buttons {
+  readonly count: number;
+  readonly labels: readonly string[];
+}
+
+/**
+ * The buttons on the messages Rosie (`san`) sends in the step (K-01 v1 message elements.buttons): every one counted, and
+ * their labels in order, or none when any is not a label with words (T-1480: as frontier/assemble/bundle.ts reads them).
+ */
+function buttonsOf(value: unknown, stepId: string): Buttons {
+  if (value === undefined) return { count: 0, labels: [] };
   if (!Array.isArray(value)) throw notWellFormed(stepId);
   const messages: unknown[] = value;
-  let buttons = 0;
+  let count = 0;
+  const labels: string[] = [];
+  let allLabels = true;
   for (const message of messages) {
     if (!isRecord(message) || !isText(message.from)) throw notWellFormed(stepId);
     const { elements } = message;
@@ -178,9 +201,13 @@ function buttonsOf(value: unknown, stepId: string): number {
     if (elements.buttons === undefined) continue;
     if (!Array.isArray(elements.buttons)) throw notWellFormed(stepId);
     const listed: unknown[] = elements.buttons;
-    buttons += listed.length;
+    count += listed.length;
+    for (const button of listed) {
+      if (isText(button)) labels.push(button);
+      else allLabels = false;
+    }
   }
-  return buttons;
+  return { count, labels: allLabels ? labels : [] };
 }
 
 function stepOf(id: string, value: unknown): GraphStep {
@@ -194,6 +221,7 @@ function stepOf(id: string, value: unknown): GraphStep {
     throw notWellFormed(id);
   }
   const listed: unknown[] = Array.isArray(value.branches) ? value.branches : [];
+  const buttons = buttonsOf(value.say, id);
   return {
     id,
     who: value.who,
@@ -204,7 +232,8 @@ function stepOf(id: string, value: unknown): GraphStep {
     branches: listed.map((branch) => branchOf(branch, id)),
     gives: textsOf(value.gives, id, true),
     tells: textsOf(value.tells, id, true),
-    buttons: buttonsOf(value.say, id),
+    buttons: buttons.count,
+    buttonLabels: buttons.labels,
     next: stepRef(value.next, id),
     card: cardOf(value.card, id),
   };
