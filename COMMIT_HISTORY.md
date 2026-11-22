@@ -2,9 +2,68 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 898, [`29c5763c`](https://github.com/aryamahadik/rosie/commit/29c5763c), 2026-11-22 18:19:38 UTC.
+- **Through:** commit 900, [`18a75528`](https://github.com/aryamahadik/rosie/commit/18a75528), 2026-11-22 19:31:51 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 900. docs: COMMIT\_HISTORY.md through commit 898 (29c5763c, \#915) (\#917)
+
+- **Commit:** [`18a75528`](https://github.com/aryamahadik/rosie/commit/18a75528), by Arya Mahadik, 2026-11-22 19:31:51 UTC
+- **Pull request:** [#917](https://github.com/aryamahadik/rosie/pull/917) from `task/commit-history-232`, merged 2026-11-22 19:31:51 UTC. It squashed 1 branch commit:
+  - `fd007dc` docs: COMMIT\_HISTORY.md through commit 898 (29c5763c, \#915)
+- **Files changed:** 1 (+52 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +52 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 899. T-1535: a plan the composer's own check refuses gets the one rewrite, told only what failed, instead of leaving the reader silent (DL-1157, DL-1159) (\#916)
+
+- **Commit:** [`845c5bfe`](https://github.com/aryamahadik/rosie/commit/845c5bfe), by Arya Mahadik, 2026-11-22 19:31:46 UTC
+- **Pull request:** [#916](https://github.com/aryamahadik/rosie/pull/916) from `task/T-1535`, merged 2026-11-22 19:31:47 UTC. It squashed 2 branch commits:
+  - `f3c9352` T-1535: a plan the composer's reader checks refused takes the one rew…
+  - `5838410` T-1535: a plan the reader checks alone refused reaches the turn with …
+- **Files changed:** 17 (+1157 −71), by folder:
+  - `ai/src/composer/` compose.test.ts +37 −0, compose.ts +27 −3, types.ts +9 −2
+  - `ai/src/composer/relay/` relay.test.ts +35 −22
+  - `ai/src/composer/rewrite/` index.ts +11 −1, request.test.ts +163 −0, request.ts +58 −13, rewrite.test.ts +79 −0, rewrite.ts +2 −0, test-support.ts +51 −0, turn.ts +24 −5, types.ts +43 −11
+  - `runtime/src/turn/` compose.ts +115 −11, compose.worker.test.ts +436 −0, types.ts +8 −0
+  - `runtime/src/wiring/` compose.test.ts +42 −0, real.ts +17 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1535: a plan the composer's reader checks refused takes the one rewrite, told only those checks and their places
+
+The rewrite request (ai/src/composer/rewrite) takes a plan whose only problems are the reader checks' (check 4
+narrowed) with a told of exactly those checks, each with exactly its places; the turn (runtime/src/turn/compose.ts)
+takes the one rewrite on a compose refused at stage plan for reader checks alone, then finalize with attempt rewrite;
+a rewrite with no plan (refused, useFallback, modelsDown) leaves the row, never the refused plan.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1535: a plan the reader checks alone refused reaches the turn with its plan, so the one rewrite runs on staging (DL-1159)
+
+ComposeRefused carries the plan it refused when the stage is plan and every problem is a reader check's (in memory
+only: its JSON leaves the plan out); runtime/src/wiring/real.ts composerAnswerOf passes stage, problems and plan beside
+the label for that refusal alone, and ComposeFailed types them as optional. relay.test.ts's refusedFor expectations add
+the plan. Proved end to end in compose.worker.test.ts through realComposer over the real composer: a gentle S1-02 row
+whose recorded answer keeps Hi! is rewritten once (told tone at lines[0].text), finalized with attempt rewrite and sent
+once, composerCalls 2; a rewrite that keeps the ! leaves the row with nothing sent.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 898. docs: COMMIT\_HISTORY.md through commit 896 (a1b1731a, \#913) (\#915)
 
