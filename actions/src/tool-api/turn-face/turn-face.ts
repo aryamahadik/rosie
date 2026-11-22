@@ -12,6 +12,10 @@
 //      openHolds port joins with K-05's read (commit.ts).
 //   3. composeInput (T-1141): T-309's compose input over the committed row (rows.ts).
 //   4. finalizeMessage (T-1141): T-313's finalize with T-314's fixed lines over the same row (rows.ts).
+// S1-10's secure link rides between calls 2 and 4 in the face's memory alone (T-1533; held.ts HeldLinks; K-09 README
+// default 211; DL-1167 (3)): gateAndCommit drops the turn's staged links before and after its gate runs and holds those
+// of the rows a committed answer with repeated false lists; finalizeMessage lets a row's link go once it answers send,
+// sendAndLog or passedOn.
 // Calls 2 to 4 run under the Tool API's own business scope (`calls.scope`: rosie_app on PostgreSQL, never the frontier's
 // rosie_job scope: T-315's security note b), and each K-05 call that needs the runtime side runs in a transaction of its
 // own (STATE note 59). Without `calls`, each of them answers notBuilt and nothing is read (fail closed).
@@ -60,7 +64,7 @@ import {
 } from "../tool-api";
 import { createToolApiValidator, type ToolApiValidator } from "../validator";
 import type { CommitAt } from "./commit";
-import { heldTurnOf, type HeldTurns } from "./held";
+import { heldTurnOf, type HeldLinks, type HeldTurns } from "./held";
 
 /** What buildFrontier answers through the turn face: K-09's response or one of its errors, or the base's refusal. */
 export type BuildFrontierCallAnswer = AnswerOf<"buildFrontier"> | BaseRefusal;
@@ -113,6 +117,14 @@ export interface TurnFaceCalls<Repo> {
    * given an inbound text.
    */
   readonly held?: HeldTurns;
+  /**
+   * Where the face holds S1-10's secure link between the turn's commit and its row's finalize (T-1533; held.ts
+   * HeldLinks; K-09 README default 211): S1-10's writer stages it (the binding hands the writer this same object as its
+   * LinkStage), the face moves it into the hold only on a committed answer with repeated false, and lets it go once the
+   * row's finalize answered send, sendAndLog or passedOn; finalize's row binding reads it (rows.ts RowBinding.links).
+   * Omitted: nothing is staged, held or let go.
+   */
+  readonly links?: HeldLinks;
   /**
    * The paging service's ports for its six calls made alone on this base (T-1443; pagingHandlers): its reads (the
    * runtime's PagingReader: T-1444), ids, ENVIRONMENT, staging's roster, its commit with no turn and its clock. Omitted:
@@ -208,18 +220,33 @@ export function createTurnFace<Repo extends FrontierRepo, CallRepo = unknown>(
     buildFrontier: (request, trace) =>
       frontier.call("buildFrontier", request, trace) as Promise<BuildFrontierCallAnswer>,
     async gateAndCommit(request, at, trace) {
-      const answer = (await callsApi(at).call(
-        "gateAndCommit",
-        request,
-        trace,
-        TURN_RECORDS_GATE,
-      )) as GateAndCommitCallAnswer;
-      // A committed turn (first or repeated): its texts and language, as the runtime handed them, held for its rows.
-      if ("result" in answer && answer.result === "committed") {
-        const held = heldTurnOf(request);
-        if (held !== null && held.turnId === answer.turnId) calls?.held?.hold(held.turnId, held.turn);
+      // S1-10's secure link (held.ts HeldLinks): nothing staged for the turn before its gate runs, and nothing after.
+      const links = calls?.links;
+      const turnId = turnIdOf(request);
+      if (turnId !== null) links?.dropStaged(turnId);
+      try {
+        const answer = (await callsApi(at).call(
+          "gateAndCommit",
+          request,
+          trace,
+          TURN_RECORDS_GATE,
+        )) as GateAndCommitCallAnswer;
+        // A committed turn (first or repeated): its texts and language, as the runtime handed them, held for its rows.
+        if ("result" in answer && answer.result === "committed") {
+          const held = heldTurnOf(request);
+          if (held !== null && held.turnId === answer.turnId) calls?.held?.hold(held.turnId, held.turn);
+          // Only a fresh commit's links are held, each for a row the commit wrote (K-05 v1 item 1: a repeat wrote none).
+          if (turnId !== null && answer.turnId === turnId && !answer.repeated) {
+            links?.keep(
+              turnId,
+              answer.written.outboxRows.map((row) => row.id),
+            );
+          }
+        }
+        return answer;
+      } finally {
+        if (turnId !== null) links?.dropStaged(turnId);
       }
-      return answer;
     },
     composeInput: (request, trace) =>
       steady.call(
@@ -228,12 +255,39 @@ export function createTurnFace<Repo extends FrontierRepo, CallRepo = unknown>(
         trace,
         TURN_RECORDS_FILL_AND_CHECKS,
       ) as Promise<ComposeInputCallAnswer>,
-    finalizeMessage: (request, trace) =>
-      steady.call(
+    async finalizeMessage(request, trace) {
+      const answer = (await steady.call(
         "finalizeMessage",
         request,
         trace,
         TURN_RECORDS_FILL_AND_CHECKS,
-      ) as Promise<FinalizeCallAnswer>,
+      )) as FinalizeCallAnswer;
+      // The row's secure link goes once its finalize has answered for good (held.ts HeldLinks); a rewrite keeps it.
+      const rowId = outboxRowIdOf(request);
+      if (rowId !== null && "outcome" in answer && LETS_LINK_GO.includes(answer.outcome)) {
+        calls?.links?.letGo(rowId);
+      }
+      return answer;
+    },
   };
+}
+
+/** The finalize outcomes after which a row's held link is let go (K-09 README default 211): every one but rewrite. */
+const LETS_LINK_GO: readonly string[] = ["send", "sendAndLog", "passedOn"];
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+/** The turn id a gateAndCommit request names (K-09 v1.5 gateAndCommit.turn.id), or null when it names none. */
+function turnIdOf(request: unknown): string | null {
+  if (!isRecord(request) || !isRecord(request.turn)) return null;
+  const { id } = request.turn;
+  return typeof id === "string" && id !== "" ? id : null;
+}
+
+/** The outbox row a finalizeMessage request names (K-09 v1 finalizeMessage.outboxRowId), or null. */
+function outboxRowIdOf(request: unknown): string | null {
+  if (!isRecord(request)) return null;
+  const { outboxRowId } = request;
+  return typeof outboxRowId === "string" && outboxRowId !== "" ? outboxRowId : null;
 }
