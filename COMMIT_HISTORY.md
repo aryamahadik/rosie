@@ -2,9 +2,48 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 855, [`fb07f0c1`](https://github.com/aryamahadik/rosie/commit/fb07f0c1), 2026-11-21 23:41:01 UTC.
+- **Through:** commit 857, [`5b7b3bd5`](https://github.com/aryamahadik/rosie/commit/5b7b3bd5), 2026-11-22 00:25:54 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 857. docs: COMMIT\_HISTORY.md through commit 855 (fb07f0c1, \#869) (\#871)
+
+- **Commit:** [`5b7b3bd5`](https://github.com/aryamahadik/rosie/commit/5b7b3bd5), by Arya Mahadik, 2026-11-22 00:25:54 UTC
+- **Pull request:** [#871](https://github.com/aryamahadik/rosie/pull/871) from `task/commit-history-210`, merged 2026-11-22 00:25:54 UTC. It squashed 1 branch commit:
+  - `c3f5d30` docs: COMMIT\_HISTORY.md through commit 855 (fb07f0c1, \#869)
+- **Files changed:** 1 (+40 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +40 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 856. T-1479: walk part 1: every outbox row carries its step and line, and a split that carries buttons is asked (S1-04 design card 10; DL-999, DL-1086, DL-1093, DL-1097, DL-1100) (\#870)
+
+- **Commit:** [`0f8c7ca3`](https://github.com/aryamahadik/rosie/commit/0f8c7ca3), by Arya Mahadik, 2026-11-22 00:25:50 UTC
+- **Pull request:** [#870](https://github.com/aryamahadik/rosie/pull/870) from `task/T-1479s`, merged 2026-11-22 00:25:51 UTC. It squashed 1 branch commit:
+  - `fbc0a44` T-1479: walk part 1: every outbox row carries its step and line, and …
+- **Files changed:** 16 (+626 −141), by folder:
+  - `actions/src/commit/` build.test.ts +59 −0, build.ts +61 −30, test-support.ts +46 −55, types.ts +7 −1
+  - `actions/src/commit/walk/` answer.test.ts +136 −11, buttons.test.ts +61 −6, errors.ts +9 −4, test-support.ts +89 −1, thread.test.ts +17 −6, walk.test.ts +50 −11, writes.ts +59 −10
+  - `actions/src/tool-api/journey-1/kinds/` kinds.test.ts +10 −1
+  - `actions/src/tool-api/journey-1/plan/` plan.test.ts +3 −0
+  - `runtime/src/wiring/` gate-binding.test.ts +6 −1, hop8.worker.test.ts +7 −2
+  - `tests/e2e/skeleton/` skeleton.worker.test.ts +6 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Squash of task/T-1479 (3add78b8, rounds 1-4, built on the v1.22 chain with main merged) onto origin/main, one commit (DL-1065). The chain's own files took main's side (now on main via #868); T-1479's 16 files are identical to 3add78b8. QA PASS on 3add78b8 (whole suite, the whole test:e2e, the Workers wiring, the whole lint); the architect PASS on round 2.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 855. docs: COMMIT\_HISTORY.md through commit 853 (26ce5441, \#867) (\#869)
 
