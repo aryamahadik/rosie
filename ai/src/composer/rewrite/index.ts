@@ -1,21 +1,31 @@
 // The composer's one rewrite (T-374, C-118): the request's checks (request.ts), how it reads to the model (turn.ts) and
 // the call (rewrite.ts), which createComposer gives as the composer's `rewrite`.
 
-export { checkRequest, planToFixProblems, toldProblems, type RequestChecked } from "./request";
+export {
+  checkRequest,
+  planToFixProblems,
+  readerProblemsOnly,
+  toldProblems,
+  type RequestChecked,
+} from "./request";
 export { createRewrite, type Rewrite, type RewriteDeps } from "./rewrite";
 export {
   CHECK_WORDS,
   FIXED_LINES_RULE,
   MONEY_RULE,
+  READER_CHECK_WORDS,
   REWRITE_TAGS,
   REWRITE_TASK,
   failedChecksText,
   rewriteTurnText,
 } from "./turn";
 export {
+  PLACES_JOINER,
+  READER_CHECKS,
   REWRITE_REFUSALS,
   type CheckName,
   type FailedAttempt,
+  type ReaderCheck,
   type RewriteAnswer,
   type RewriteDown,
   type RewriteOk,

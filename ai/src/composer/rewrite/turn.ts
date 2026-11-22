@@ -6,18 +6,20 @@
 //
 //   the row's input, exactly as compose sent it (composeInputText: every value escaped as data, S13-54 rule 67)
 //   <plan_to_fix>     the plan that failed, as the composer returned it, with its slots (planText), as data
-//   <failed_checks>   one <failed_check> per told check: its name in arch 07's words, and its detail as data
+//   <failed_checks>   one <failed_check> per told check: its name in arch 07's words (a reader check's, T-1535: by its
+//                     rule's name in the composer prompt), and its detail as data
 //   the rewrite task  code's own words, outside every tag: what to do, the two rules that bind the rewrite, and what
 //                     follows a second failure
 //
-// What failed comes from the told alone (rewriteTold, T-313; STATE note 35): never a raw check detail, a filled value or
-// the final parts it checked. The two rules: the opt-out line, like every fixed line, is code's (T-314, the fixed-line
+// What failed comes from the told alone (rewriteTold, T-313; STATE note 35; for a plan the reader checks refused, those
+// checks and their places: T-1535): never a raw check detail, a filled value or the final parts it checked. The two rules: the opt-out line, like every fixed line, is code's (T-314, the fixed-line
 // inserter; DL-245: never the model's, never a bundle message's plainText), and the model never writes its own money
 // sentence (STATE note 56, DL-182: money sentences are the record's rows, filled by T-310, or the master's own words).
 
 import { dataElement, parentElement } from "../../context/tags";
 import { composeInputText, planText, type ComposeInput, type MessagePlan } from "../prompt";
-import type { CheckName, Told } from "./types";
+import { CHECK_NAMES } from "../schema";
+import type { CheckName, ReaderCheck, Told } from "./types";
 
 /** Each check by its name in arch 07's table (lines 405 to 417; line 417 names Fixed lines, Shape and Format). */
 export const CHECK_WORDS: Readonly<Record<CheckName, string>> = Object.freeze({
@@ -29,6 +31,23 @@ export const CHECK_WORDS: Readonly<Record<CheckName, string>> = Object.freeze({
   lengthAndReading: "Length and reading",
   format: "Format",
 });
+
+/**
+ * Each reader check (T-375; ./types.ts READER_CHECKS) by the composer prompt's name for its rule (rule 9's relay quote,
+ * rule 11's sensitive work, rule 8's tone; the language of <language>), for a plan the reader checks refused (T-1535).
+ */
+export const READER_CHECK_WORDS: Readonly<Record<ReaderCheck, string>> = Object.freeze({
+  relayQuote: "Relay quote",
+  sensitiveWork: "Sensitive work",
+  tone: "Tone",
+  language: "Language",
+});
+
+const isCheckName = (check: Told["check"]): check is CheckName => CHECK_NAMES.includes(check);
+
+/** A told check's name as the model reads it: arch 07's for a K-03 check, the prompt's rule for a reader check. */
+const checkWords = (check: Told["check"]): string =>
+  isCheckName(check) ? CHECK_WORDS[check] : READER_CHECK_WORDS[check];
 
 /** The two tags the rewrite adds after the row's input, in order. */
 export const REWRITE_TAGS = ["plan_to_fix", "failed_checks"] as const;
@@ -54,7 +73,7 @@ export function failedChecksText(told: readonly Told[]): string {
   return parentElement(
     "failed_checks",
     {},
-    told.map((each) => dataElement("failed_check", { name: CHECK_WORDS[each.check] }, each.detail)),
+    told.map((each) => dataElement("failed_check", { name: checkWords(each.check) }, each.detail)),
   );
 }
 

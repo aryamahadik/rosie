@@ -20,6 +20,12 @@
 //          rewrite. A rewrite the models cannot make (the AI gateway's `modelsDown`: T-271, arch 06 line 293) sends the
 //          composed plan as the rewrite attempt, unchanged, so its miss stands and the step's fallback runs; never the
 //          outage line, which is only for a text whose turn has not committed.
+//        - a plan the composer's own reader checks refused (T-1535, DL-1157: compose refused at stage plan with the
+//          reader checks' problems alone, such as S1-02's "Hi!" on a gentle row, arch 07 line 357): the same one
+//          rewrite, told only those checks, each with the places it failed at (arch 02 line 123; arch 07 line 417),
+//          then finalizeMessage with attempt rewrite, as above. The refused plan never reaches finalize: a rewrite with
+//          no plan (refused, 'use the fallback', or its models down) leaves the row, nothing sent. A compose refused at
+//          stage input, or at stage plan for any other check (shape, format, a literal), leaves the row, as before.
 //        - emailCopy: no composer call and no finalize call. Once its text row's final parts are written in this run, the
 //          copy takes that row's plan (copyOf the text row, its own row, channel email: plan-email-copy.json) and its final
 //          parts (its own row and channel) through K-05 v1 `writePlan`. The email's own parts (the automated-assistant
@@ -49,6 +55,7 @@ import type {
   GateCommitted,
   MessagePlan,
   OutboxChannel,
+  RewriteRequest,
   RowPlan,
   TurnCaller,
   TurnDeps,
@@ -232,11 +239,52 @@ function composeInputOf(
   return refusedOf(answer);
 }
 
+/**
+ * The AI layer's reader checks (T-375; @rosie/ai composer/rewrite READER_CHECKS): the last stage of its own check on a
+ * plan, which runs only on a whole plan that keeps to its formats and its facts (T-1535).
+ */
+export const READER_CHECKS: readonly string[] = ["relayQuote", "sensitiveWork", "tone", "language"];
+/** What joins two places in a reader check's detail (@rosie/ai composer/rewrite PLACES_JOINER): "lines[0].text, question.text". */
+export const PLACES_JOINER = ", ";
+
+/** One failed check as the one rewrite is told it (K-09 README default 32): a label and its detail; never logged. */
+type Failed = RewriteRequest["failed"][number];
+
+/**
+ * A plan the composer refused for its reader checks alone (T-1535): the plan, kept in memory only, and what the one rewrite
+ * is told, each check once with the places it failed at.
+ */
+interface ReaderRefused {
+  readonly plan: MessagePlan;
+  readonly failed: readonly Failed[];
+}
+
 /** What a composer call gave: the plan, or why there is none (a label); and the model calls it reported. */
 interface Planned {
   readonly plan: MessagePlan | null;
   readonly code: string | null;
   readonly modelCalls: ModelCall[];
+  /** For a compose refused at stage plan for reader checks alone, what its one rewrite needs (T-1535); else null. */
+  readonly readerRefused: ReaderRefused | null;
+}
+
+/**
+ * A refused composer answer's plan and reader problems, when the refusal is at stage plan and each problem is a reader
+ * check's with its place: each check told once, with each place it failed at once, in the order the composer named them.
+ * Null for any other refusal (stage input; shape, format or literal problems), or one that carries no whole plan.
+ */
+function readerRefusedOf(value: Record<string, unknown>): ReaderRefused | null {
+  const { stage, problems, plan } = value;
+  if (stage !== "plan" || !isPlan(plan) || !Array.isArray(problems) || problems.length === 0) return null;
+  const places = new Map<string, string[]>();
+  for (const problem of problems as unknown[]) {
+    if (!isRecord(problem) || !oneOf(READER_CHECKS, problem.check) || !isId(problem.at)) return null;
+    const at = places.get(problem.check) ?? [];
+    if (!at.includes(problem.at)) at.push(problem.at);
+    places.set(problem.check, at);
+  }
+  const failed = [...places].map(([check, at]): Failed => ({ check, detail: at.join(PLACES_JOINER) }));
+  return { plan, failed };
 }
 
 function isPlan(value: unknown): value is MessagePlan {
@@ -256,12 +304,15 @@ function modelCallsOf(value: unknown): ModelCall[] {
 /** A composer call's answer as a plan, or why there is none. */
 async function planOf(call: () => Promise<unknown>): Promise<Planned> {
   const answer = await settled(call);
-  if (answer.lost) return { plan: null, code: "noAnswer", modelCalls: [] };
+  if (answer.lost) return { plan: null, code: "noAnswer", modelCalls: [], readerRefused: null };
   const value = answer.value;
-  if (!isRecord(value)) return { plan: null, code: "badAnswer", modelCalls: [] };
+  if (!isRecord(value)) return { plan: null, code: "badAnswer", modelCalls: [], readerRefused: null };
   const modelCalls = modelCallsOf(value.modelCalls);
-  if (value.result === "planned" && isPlan(value.plan)) return { plan: value.plan, code: null, modelCalls };
-  return { plan: null, code: value.result === "planned" ? "badAnswer" : codeOf(value.error), modelCalls };
+  if (value.result === "planned") {
+    const plan = isPlan(value.plan) ? value.plan : null;
+    return { plan, code: plan === null ? "badAnswer" : null, modelCalls, readerRefused: null };
+  }
+  return { plan: null, code: codeOf(value.error), modelCalls, readerRefused: readerRefusedOf(value) };
 }
 
 function isCheckResult(value: unknown): value is CheckResult {
@@ -492,7 +543,10 @@ async function composeRow(turn: CommittedTurn, row: UnplannedOutboxRow, textOf: 
 
 type Timer = ReturnType<TraceContext["start"]>;
 
-/** The composer's plan, finalize with attempt composed, and at most one rewrite with finalize again. */
+/**
+ * The composer's plan, finalize with attempt composed, and at most one rewrite with finalize again; or, for a plan the
+ * composer's reader checks refused, that one rewrite first (T-1535).
+ */
 async function composeAndFinalize(
   turn: CommittedTurn,
   row: UnplannedOutboxRow,
@@ -502,13 +556,16 @@ async function composeAndFinalize(
   const planned = await planOf(() => turn.set.composer.compose(input, turn.trace));
   recordCompose(turn, composeSpan, row, input, planned);
   const composed = planned.plan;
-  if (composed === null) return ended(row, "left", planned.code, { composerCalls: 1 });
+  if (composed === null) {
+    if (planned.readerRefused !== null) return rewriteReaderRefused(turn, row, input, planned.readerRefused);
+    return ended(row, "left", planned.code, { composerCalls: 1 });
+  }
 
   const plan: RowPlan = { row: row.outboxRowId, channel: row.channel, copyOf: null, plan: composed };
   const checksSpan = turn.trace.start("fillAndChecks");
   const first = await finalize(turn, row, "composed", plan);
   recordChecks(turn, checksSpan, row, first.answer, first.calls);
-  let finalizeCalls = first.calls;
+  const finalizeCalls = first.calls;
   if (isRefused(first.answer)) return endedBy(row, first.answer, { composerCalls: 1, finalizeCalls });
   if (first.answer.outcome !== "rewrite") {
     return written(row, plan, first.answer, { composerCalls: 1, finalizeCalls });
@@ -532,14 +589,61 @@ async function composeAndFinalize(
     return ended(row, "left", refused.refused, { ...facts, finalizeCalls });
   }
   const rewrittenPlan: RowPlan = rewritten.plan === null ? plan : { ...plan, plan: rewritten.plan };
-  const second = await finalize(turn, row, "rewrite", rewrittenPlan);
-  finalizeCalls += second.calls;
+  return finalizeRewrite(turn, row, rewriteSpan, failed, rewritten, rewrittenPlan, {
+    ...facts,
+    finalizeCalls,
+  });
+}
+
+/**
+ * A plan the composer's own reader checks refused (T-1535; DL-1157): the one rewrite, told only those checks and their
+ * places (arch 02 line 123; arch 07 line 417), then finalize with attempt rewrite, as after finalize's own rewrite. The
+ * refused plan is never finalized, since it failed what its reader must read (a gentle row's "!"): a rewrite with no plan,
+ * refused, 'use the fallback' or its models down, leaves the row with nothing sent.
+ */
+async function rewriteReaderRefused(
+  turn: CommittedTurn,
+  row: UnplannedOutboxRow,
+  input: ComposeInput,
+  refused: ReaderRefused,
+): Promise<RowWork> {
+  const rewriteSpan = turn.trace.start("rewriteOrFallback");
+  const { failed } = refused;
+  const rewritten = await planOf(() =>
+    turn.set.composer.rewrite({ input, plan: refused.plan, failed }, turn.trace),
+  );
+  const facts: RowFacts = { composerCalls: 2, rewrite: true, finalizeCalls: 0 };
+  if (rewritten.plan === null) {
+    const left: Refused = { refused: rewritten.code ?? "badAnswer", answer: null };
+    recordRewrite(turn, rewriteSpan, row, failed, rewritten, left, 0);
+    return ended(row, "left", left.refused, facts);
+  }
+  const plan: RowPlan = { row: row.outboxRowId, channel: row.channel, copyOf: null, plan: rewritten.plan };
+  return finalizeRewrite(turn, row, rewriteSpan, failed, rewritten, plan, facts);
+}
+
+/**
+ * The one rewrite's plan through finalize with attempt rewrite, which runs the step's fallback and the passed-on line
+ * itself (K-09 README default 11), and the rewrite's rewriteOrFallback span. `facts.finalizeCalls` counts the row's
+ * finalize calls before this one.
+ */
+async function finalizeRewrite(
+  turn: CommittedTurn,
+  row: UnplannedOutboxRow,
+  span: Timer,
+  failed: readonly Failed[],
+  rewritten: Planned,
+  plan: RowPlan,
+  facts: RowFacts,
+): Promise<RowWork> {
+  const second = await finalize(turn, row, "rewrite", plan);
+  const finalizeCalls = (facts.finalizeCalls ?? 0) + second.calls;
   // Never a second rewrite: a rewrite answered "rewrite" again is not K-09's (the fallback is code's, in the same call).
   const last: FinalWritten | Refused =
     isRefused(second.answer) || second.answer.outcome !== "rewrite" ? second.answer : BAD_ANSWER;
-  recordRewrite(turn, rewriteSpan, row, failed, rewritten, last, second.calls);
+  recordRewrite(turn, span, row, failed, rewritten, last, second.calls);
   if (isRefused(last)) return endedBy(row, last, { ...facts, finalizeCalls });
-  return written(row, rewrittenPlan, last, { ...facts, finalizeCalls });
+  return written(row, plan, last, { ...facts, finalizeCalls });
 }
 
 /** One finalizeMessage, sent once more when it answers transient or its answer is lost; with how many calls it took. */

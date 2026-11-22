@@ -5,21 +5,44 @@
 // attempt missed, in K-03's order, with its detail, every filled value written as its {{slot}} (DL-158 ruling c). That is
 // the whole of what the model is told about the failure (K-09 v1 finalizeMessage.response.checks: "for the one rewrite,
 // C-118 sends the model only each failed check and its detail"; STATE note 35): never the final parts it checked, whose
-// slot values the composer never got, and never a raw check detail. The shapes are written by hand, as the rest of the
-// composer's are (./prompt/types.ts): the generated contract types are git-ignored (ADR-005) and the Worker must not
-// depend on them; the tests hold them to K-03 and to rewriteTold itself.
+// slot values the composer never got, and never a raw check detail. A plan the AI layer's own reader checks refused
+// (compose refused at stage "plan" for reader checks alone: T-1535, DL-1157; arch 02 line 123, arch 07 line 417) never
+// reached finalize; its one rewrite is told those reader checks, each with the places it failed at, and nothing else.
+// The shapes are written by hand, as the rest of the composer's are (./prompt/types.ts): the generated contract types
+// are git-ignored (ADR-005) and the Worker must not depend on them; the tests hold them to K-03 and to rewriteTold.
 
 import type { AttemptFailure, ModelCall } from "../../gateway";
 import type { ComposeInput, MessagePlan } from "../prompt";
-import type { ComposeOk, ComposeProblem } from "../types";
+import type { ComposeOk, ComposeProblem, RefusalCheck } from "../types";
 
 /** A check on every message (K-03 `checkName`; arch 07 lines 405 to 417), as the told names it. */
 export type CheckName =
   "fixedLines" | "values" | "oneQuestion" | "neverInMessage" | "shape" | "lengthAndReading" | "format";
 
-/** One failed check as the rewrite is told it (rewriteTold's `Told`): the check and its detail, no filled value in it. */
+/**
+ * The reader's checks (T-375, ../relay/check.ts readerProblems), the last stage of the AI layer's own check on a plan
+ * (../check.ts planAgainstInput), in their order there: the relay's quote, sensitive work, the tone and the language. A
+ * plan refused for these alone (compose refused at stage "plan", T-1535; DL-1157) is a whole K-03 plan that keeps to its
+ * formats and its facts, so it gets the one rewrite, told those problems, as a plan finalize's checks missed does.
+ */
+export const READER_CHECKS = [
+  "relayQuote",
+  "sensitiveWork",
+  "tone",
+  "language",
+] as const satisfies readonly RefusalCheck[];
+export type ReaderCheck = (typeof READER_CHECKS)[number];
+
+/** What a told names a place by in a reader check's detail, between two places (T-1535): "lines[0].text, question.text". */
+export const PLACES_JOINER = ", ";
+
+/**
+ * One failed check as the rewrite is told it, no filled value in it: a K-03 check with its detail, as rewriteTold's `Told`
+ * gives it for finalize's check result; or, for a plan the AI layer's reader checks refused (T-1535), a reader check with
+ * the places it failed at as its detail (named by check and field, nothing else), joined by PLACES_JOINER.
+ */
 export interface Told {
-  readonly check: CheckName;
+  readonly check: CheckName | ReaderCheck;
   readonly detail: string;
 }
 
@@ -34,11 +57,17 @@ export type FailedAttempt = "composed" | "rewrite";
 export interface RewriteRequest {
   /** The row's K-03 v1.1 composer input, the same one the plan was composed from (checked again, as compose checks it). */
   readonly input: ComposeInput;
-  /** The plan that failed, as the composer returned it, with its slots (never the final parts, whose slots are filled). */
+  /**
+   * The plan that failed, as the composer returned it, with its slots (never the final parts, whose slots are filled):
+   * one finalize's checks missed, or one the AI layer's reader checks alone refused (T-1535).
+   */
   readonly plan: MessagePlan;
-  /** The attempt whose check result the told comes from. */
+  /** The attempt whose check result the told comes from (`composed` for a plan the reader checks refused). */
   readonly attempt: FailedAttempt;
-  /** What rewriteTold gives for that check result: each failed check, at most once, with its detail. */
+  /**
+   * What failed, each check at most once: what rewriteTold gives for finalize's check result (K-03 checks); or, for a
+   * plan the reader checks refused, exactly the reader checks it fails, each with its places.
+   */
   readonly told: readonly Told[];
 }
 
@@ -49,8 +78,11 @@ export interface RewriteRequest {
  *   request    the request is not an object, or has a field besides input, plan, attempt and told (such as the final
  *              parts a check result holds, whose slot values the composer never got);
  *   planToFix  the plan to fix is not a plan the composer could have returned for this input: not a K-03 v1 plan, or
- *              with a format or a literal value the input does not allow (check.ts planAgainstInput);
- *   told       the told is not a list of failed checks, each a K-03 check name, at most once, with a detail in words.
+ *              with a format or a literal value the input does not allow (check.ts planAgainstInput); a plan whose
+ *              only problems are reader checks' is not refused here (T-1535);
+ *   told       the told is not a list of failed checks, each a K-03 check name, at most once, with a detail in words;
+ *              or, for a plan the reader checks refuse, not exactly those reader checks, each once, with the places
+ *              it fails at as its detail.
  */
 export const REWRITE_REFUSALS = ["attempt", "request", "planToFix", "told"] as const;
 export type RewriteRefusal = (typeof REWRITE_REFUSALS)[number];

@@ -19,14 +19,21 @@ import {
 } from "../index";
 import { COMPOSER_PROMPT_VERSION } from "../prompt";
 import { PROMPTS, composerOn, readJson, withComposerPrompt, V0 } from "../test-support";
+import { planAgainstInput } from "../check";
+import { REFUSAL_CHECKS } from "../types";
 import {
   CHECK_WORDS,
   FIXED_LINES_RULE,
   MONEY_RULE,
+  PLACES_JOINER,
+  READER_CHECKS,
+  READER_CHECK_WORDS,
   REWRITE_REFUSALS,
   REWRITE_TAGS,
   REWRITE_TASK,
   checkRequest,
+  planToFixProblems,
+  readerProblemsOnly,
   rewriteTurnText,
   toldProblems,
   type RewriteRequest,
@@ -34,7 +41,10 @@ import {
 } from "./index";
 import {
   A7_17_INPUT,
+  HI_GENTLE_PLAN,
+  HI_PLAN,
   ONE_QUESTION_PLAN,
+  S1_02_GENTLE_INPUT,
   TWO_QUESTIONS_PLAN,
   TYPED_TIME_PLAN,
   fakeTurnApi,
@@ -245,6 +255,159 @@ describe("a request the composer cannot rewrite is refused before any call, nami
       expect(answer).toEqual({ status: "useFallback", why: "rewriteFailed", problems: [], modelCalls: [] });
     expect(api.calls).toHaveLength(0);
     expect(checkRequest({ attempt: "rewrite" })).toEqual({ kind: "secondFailure" });
+  });
+});
+
+describe("a plan the composer's own reader checks refused takes the one rewrite, told exactly those checks and their places (T-1535; DL-1157)", () => {
+  const TONE_TOLD: Told[] = [{ check: "tone", detail: "lines[0].text" }];
+  /** S1-02's plan with "!" in its line and a service slot whose words after "|" the master line does not give. */
+  const TWO_READER_CHECKS_PLAN: MessagePlan = {
+    ...HI_PLAN,
+    question: { text: "What kinds of work do you do, like {{svc.intext|massage}}?", optionIds: [] },
+  };
+  const gentle = (changes: Record<string, unknown> = {}): RewriteRequest =>
+    request({ input: S1_02_GENTLE_INPUT, plan: HI_PLAN, told: TONE_TOLD, ...changes });
+
+  it("the reader checks are planAgainstInput's last stage, in its order; S1-02's 'Hi!' on a gentle row fails tone alone, at lines[0].text", () => {
+    expect([...READER_CHECKS]).toEqual(["relayQuote", "sensitiveWork", "tone", "language"]);
+    for (const check of READER_CHECKS) expect(REFUSAL_CHECKS).toContain(check);
+    expect(Object.keys(READER_CHECK_WORDS)).toEqual([...READER_CHECKS]);
+    expect(planAgainstInput(HI_PLAN, S1_02_GENTLE_INPUT)).toEqual([{ check: "tone", at: "lines[0].text" }]);
+    expect(readerProblemsOnly(planAgainstInput(HI_PLAN, S1_02_GENTLE_INPUT))).toBe(true);
+    // On a routine row the same plan passes; the rewrite's plan passes on the gentle row.
+    expect(planAgainstInput(HI_PLAN, { ...S1_02_GENTLE_INPUT, situation: "routine" })).toEqual([]);
+    expect(planAgainstInput(HI_GENTLE_PLAN, S1_02_GENTLE_INPUT)).toEqual([]);
+    expect(planAgainstInput(TWO_READER_CHECKS_PLAN, S1_02_GENTLE_INPUT)).toEqual([
+      { check: "sensitiveWork", at: "question.text" },
+      { check: "tone", at: "lines[0].text" },
+    ]);
+    expect(readerProblemsOnly([])).toBe(false);
+    expect(readerProblemsOnly([{ check: "literalValue", at: "lines[0].text", kind: "number" }])).toBe(false);
+  });
+
+  it("check 4 narrowed: a plan whose only problems are the reader checks' is taken with a told of exactly those checks and places, unchanged", () => {
+    expect(checkRequest(gentle())).toEqual({
+      kind: "rewrite",
+      request: { input: S1_02_GENTLE_INPUT, plan: HI_PLAN, attempt: "composed", told: TONE_TOLD },
+    });
+    expect(planToFixProblems(HI_PLAN, S1_02_GENTLE_INPUT)).toEqual([]);
+    // Two reader checks, each told once, with its places; the places in any order.
+    const told: Told[] = [
+      { check: "tone", detail: "lines[0].text" },
+      { check: "sensitiveWork", detail: "question.text" },
+    ];
+    expect(checkRequest(gentle({ plan: TWO_READER_CHECKS_PLAN, told }))).toMatchObject({ kind: "rewrite" });
+    const both: MessagePlan = {
+      ...HI_PLAN,
+      question: { text: "What kinds of work do you do!", optionIds: [] },
+    };
+    for (const detail of ["lines[0].text, question.text", "question.text, lines[0].text"])
+      expect(checkRequest(gentle({ plan: both, told: [{ check: "tone", detail }] })), detail).toMatchObject({
+        kind: "rewrite",
+      });
+  });
+
+  const cases: [string, () => unknown, unknown][] = [
+    [
+      "a reader-refused plan told a K-03 check, which finalize never ran on it",
+      () => gentle({ told: TWO_QUESTIONS_TOLD }),
+      [{ check: "told", at: "told[0]" }],
+    ],
+    [
+      "a reader told with words in its detail, not its place",
+      () => gentle({ told: [{ check: "tone", detail: 'lines[0].text holds "Hi!"' }] }),
+      [{ check: "told", at: "told[0]" }],
+    ],
+    [
+      "a reader told naming a place the check did not fail at",
+      () => gentle({ told: [{ check: "tone", detail: "question.text" }] }),
+      [{ check: "told", at: "told[0]" }],
+    ],
+    [
+      "a reader told naming one of two places the check failed at",
+      () =>
+        gentle({
+          plan: { ...HI_PLAN, question: { text: "What kinds of work do you do!", optionIds: [] } },
+          told: [{ check: "tone", detail: "lines[0].text" }],
+        }),
+      [{ check: "told", at: "told[0]" }],
+    ],
+    [
+      "a reader told naming a place twice",
+      () => gentle({ told: [{ check: "tone", detail: "lines[0].text, lines[0].text" }] }),
+      [{ check: "told", at: "told[0]" }],
+    ],
+    [
+      "a reader check the plan passes, beside the one it fails",
+      () => gentle({ told: [...TONE_TOLD, { check: "language", detail: "lines[0].text" }] }),
+      [{ check: "told", at: "told[1]" }],
+    ],
+    [
+      "a reader check told twice",
+      () => gentle({ told: [...TONE_TOLD, ...TONE_TOLD] }),
+      [{ check: "told", at: "told[1]" }],
+    ],
+    [
+      "a reader told that leaves one of the plan's two failed reader checks out",
+      () => gentle({ plan: TWO_READER_CHECKS_PLAN }),
+      [{ check: "told", at: "told" }],
+    ],
+    ["an empty told for a reader-refused plan", () => gentle({ told: [] }), [{ check: "told", at: "told" }]],
+    [
+      "a reader told for a plan that passes the reader checks (the rewrite's own plan)",
+      () => gentle({ plan: HI_GENTLE_PLAN }),
+      [{ check: "told", at: "told[0]" }],
+    ],
+    [
+      "a plan with '!' that also types a number no fact holds: the literal stage fails first, so it is refused as before",
+      () =>
+        gentle({
+          plan: {
+            ...HI_PLAN,
+            lines: [{ role: "first", text: "Hi! It takes about 15 minutes to set up your business." }],
+          },
+        }),
+      [
+        { check: "planToFix", at: "plan.lines[0].text" },
+        { check: "told", at: "told[0]" },
+      ],
+    ],
+    [
+      "a plan with '!' and a format this phone does not allow: refused as before",
+      () => gentle({ plan: { ...HI_PLAN, formats: ["text", "poll"] } }),
+      [
+        { check: "planToFix", at: "plan.formats[1]" },
+        { check: "told", at: "told[0]" },
+      ],
+    ],
+  ];
+
+  it.each(cases)("refused before any call: %s", async (_what, make, problems) => {
+    const api = fakeTurnApi(() => HI_GENTLE_PLAN);
+    const answer = await composerOn(api.fetch).rewrite(make() as RewriteRequest);
+    expect(answer).toEqual({ status: "refused", stage: "request", problems, modelCalls: [] });
+    expect(api.calls).toHaveLength(0);
+    for (const words of ["Hi!", "Rosie", "15 minutes", "massage"])
+      expect(JSON.stringify(answer)).not.toContain(words);
+  });
+
+  it("the told reads by the rule's name, its places as data; the rest of the per-turn part is as for any rewrite", () => {
+    const turn = rewriteTurnText(S1_02_GENTLE_INPUT, HI_PLAN, [
+      { check: "tone", detail: "lines[0].text" },
+      { check: "sensitiveWork", detail: "question.text" },
+    ]);
+    expect(turn).toContain(
+      '<failed_checks>\n<failed_check name="Tone">lines[0].text</failed_check>\n<failed_check name="Sensitive work">question.text</failed_check>\n</failed_checks>',
+    );
+    expect(turn.startsWith(`${composeInputText(S1_02_GENTLE_INPUT)}\n<plan_to_fix>`)).toBe(true);
+    expect(turn.endsWith(`</failed_checks>\n\n${REWRITE_TASK}`)).toBe(true);
+    expect(READER_CHECK_WORDS).toEqual({
+      relayQuote: "Relay quote",
+      sensitiveWork: "Sensitive work",
+      tone: "Tone",
+      language: "Language",
+    });
+    expect(PLACES_JOINER).toBe(", ");
   });
 });
 

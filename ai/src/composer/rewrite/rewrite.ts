@@ -4,6 +4,8 @@
 //
 //   1. The request is checked before any call (request.ts). A told from the one rewrite's own failure is the second
 //      failure: 'use the fallback' (why rewriteFailed), with no call, so there is never a third model call for a row.
+//      The plan to fix is one finalize's checks missed, or one compose's own reader checks refused (T-1535, DL-1157: a
+//      gentle row's "!"), told those reader checks and their places; it is still the row's one rewrite.
 //   2. One call through the AI gateway (T-361) with T-364's layout, purpose `rewrite`: the composer's own cached system
 //      prompt, unchanged, then the per-turn part (turn.ts): the row's input as compose sent it, the plan to fix and the
 //      failed checks, each as data, and code's rewrite task with its two rules (fixed lines are code's; never a money
