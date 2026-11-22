@@ -4,6 +4,7 @@
 export { pgFrontierRepo, pgFrontierScope, pgTurnFace } from "./frontier";
 export {
   pgCallScope,
+  pgCompaniesReads,
   pgDoorFlags,
   pgDoorRuntime,
   pgKeywordDoor,
