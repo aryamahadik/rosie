@@ -1,0 +1,15 @@
+{
+  "kind": "timetable",
+  "outcome": "read",
+  "classes": [
+    {
+      "name": { "status": "read", "words": "Hot Flow class" },
+      "weekday": { "status": "read", "value": 6, "words": "Sat" },
+      "startsAt": { "status": "read", "value": "10:00", "words": "10am" },
+      "endsAt": { "status": "read", "value": "11:00", "words": "11am" },
+      "teacher": { "status": "read", "words": "Maya" },
+      "room": { "status": "read", "words": "Studio room" },
+      "spots": { "status": "read", "value": 12, "words": "12 spots" }
+    }
+  ]
+}

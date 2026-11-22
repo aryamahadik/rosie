@@ -1,0 +1,34 @@
+{
+  "request": {
+    "kind": "timetable",
+    "file": "photo/2026-10-20/g5h1j7k3l9z2x6c4v8b0n1m5q7",
+    "sentAt": {
+      "utc": "2026-10-20T15:00:00Z",
+      "zone": "America/New_York"
+    }
+  },
+  "model": "sonnet",
+  "output": {
+    "kind": "timetable",
+    "outcome": "read",
+    "classes": [
+      {
+        "name": { "status": "read", "words": "Hot Flow class" },
+        "weekday": { "status": "read", "value": 6, "words": "Sat" },
+        "startsAt": { "status": "read", "value": "10:00", "words": "10am" },
+        "endsAt": { "status": "read", "value": "11:00", "words": "11am" },
+        "teacher": { "status": "read", "words": "Maya" },
+        "room": { "status": "read", "words": "Studio room" }
+      },
+      {
+        "name": { "status": "read", "words": "Hot Flow class" },
+        "weekday": { "status": "read", "value": 3, "words": "Wed" },
+        "startsAt": { "status": "read", "value": "18:00", "words": "6pm" },
+        "endsAt": { "status": "read", "value": "19:00", "words": "7pm" },
+        "teacher": { "status": "read", "words": "Theo" },
+        "room": { "status": "notShown" }
+      }
+    ]
+  },
+  "search": null
+}

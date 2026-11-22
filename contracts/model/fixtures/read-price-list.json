@@ -1,0 +1,81 @@
+{
+  "request": {
+    "kind": "priceList",
+    "file": "photo/2026-10-19/l4q9p2r7c6e1s8u3n0k5m2v9x3",
+    "sentAt": {
+      "utc": "2026-10-19T14:20:00Z",
+      "zone": "America/New_York"
+    }
+  },
+  "model": "sonnet",
+  "output": {
+    "kind": "priceList",
+    "outcome": "read",
+    "lines": [
+      {
+        "name": { "status": "read", "words": "Haircut" },
+        "priceKind": { "status": "read", "value": "one_price", "words": "$35" },
+        "price": { "status": "read", "value": { "cents": 3500, "currency": "USD" }, "words": "$35" },
+        "unit": { "status": "notShown" },
+        "length": { "status": "read", "value": 30, "words": "30 min" }
+      },
+      {
+        "name": { "status": "read", "words": "Skin fade" },
+        "priceKind": { "status": "read", "value": "one_price", "words": "$40" },
+        "price": { "status": "read", "value": { "cents": 4000, "currency": "USD" }, "words": "$40" },
+        "unit": { "status": "notShown" },
+        "length": { "status": "read", "value": 45, "words": "45 min" }
+      },
+      {
+        "name": { "status": "read", "words": "Beard trim" },
+        "priceKind": { "status": "read", "value": "one_price", "words": "$20" },
+        "price": { "status": "read", "value": { "cents": 2000, "currency": "USD" }, "words": "$20" },
+        "unit": { "status": "notShown" },
+        "length": { "status": "read", "value": 15, "words": "15 min" }
+      },
+      {
+        "name": { "status": "read", "words": "Kids cut" },
+        "priceKind": { "status": "read", "value": "one_price", "words": "$25" },
+        "price": { "status": "read", "value": { "cents": 2500, "currency": "USD" }, "words": "$25" },
+        "unit": { "status": "notShown" },
+        "length": { "status": "read", "value": 30, "words": "30 min" }
+      },
+      {
+        "name": { "status": "read", "words": "Signature cut and shave" },
+        "priceKind": { "status": "read", "value": "one_price", "words": "$55" },
+        "price": { "status": "read", "value": { "cents": 5500, "currency": "USD" }, "words": "$55" },
+        "unit": { "status": "notShown" },
+        "length": { "status": "read", "value": 60, "words": "60 min" }
+      },
+      {
+        "name": { "status": "read", "words": "Groom's package" },
+        "priceKind": { "status": "read", "value": "one_price", "words": "$140" },
+        "price": { "status": "read", "value": { "cents": 14000, "currency": "USD" }, "words": "$140" },
+        "unit": { "status": "notShown" },
+        "length": { "status": "read", "value": 150, "words": "2½ hrs" }
+      },
+      {
+        "name": { "status": "read", "words": "Color and cut" },
+        "priceKind": { "status": "notShown" },
+        "price": { "status": "read", "value": "fromPhotos", "words": "From photos" },
+        "unit": { "status": "notShown" },
+        "length": { "status": "notShown" }
+      },
+      {
+        "name": { "status": "read", "words": "Color correction" },
+        "priceKind": { "status": "notShown" },
+        "price": { "status": "read", "value": "atVisit", "words": "At the chair" },
+        "unit": { "status": "notShown" },
+        "length": { "status": "notShown" }
+      },
+      {
+        "name": { "status": "read", "words": "Style consult" },
+        "priceKind": { "status": "read", "value": "one_price", "words": "Free" },
+        "price": { "status": "read", "value": { "cents": 0, "currency": "USD" }, "words": "Free" },
+        "unit": { "status": "notShown" },
+        "length": { "status": "read", "value": 15, "words": "15 min" }
+      }
+    ]
+  },
+  "search": null
+}

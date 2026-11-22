@@ -1,0 +1,701 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/model/model.v1.3.schema.json",
+  "title": "Model v1.3",
+  "description": "K-02 v1.3, a minor version that only adds (T-070; 02-contracts K-02 'Photo reading', planned as v1.1 at F14 and numbered v1.3 because v1.1 and v1.2 are frozen for other changes; S1-09 design ruling card P5, ops/reviews/s1-09-design/rule-s1-09.json; DL-1134; README 'v1.3'): photo reading (C-120). Code asks it to read one owner's photo, by its K-13 file reference and the kind the step asked for (a card or listing, S1-09; a price list, S1-12; a class timetable, S1-83; a schedule, S1-24); the model answers in that kind's own schema, every value with the words on the photo it was read from, or marks a field it could not read, or the whole photo as unreadable; code builds the read-back from the words, and each value re-parses from the read-back the owner said yes to (limit 6, arch 06 line 309). Every v1.2 definition is here under its own name by $ref to model.v1.2.schema.json, frozen and unchanged, so every v1, v1.1 and v1.2 payload is a v1.3 payload; the photo-reading definitions are new and no earlier definition changes. The four photoRead<kind> definitions are model-facing and stay inside the structured-outputs subset (02-contracts section 2 item 7; README 'v1.3', 'Model-facing'). Owner: the architect.",
+  "$defs": {
+    "language": { "$ref": "model.v1.2.schema.json#/$defs/language" },
+    "nonEmptyText": { "$ref": "model.v1.2.schema.json#/$defs/nonEmptyText" },
+    "stakes": { "$ref": "model.v1.2.schema.json#/$defs/stakes" },
+    "choiceKind": { "$ref": "model.v1.2.schema.json#/$defs/choiceKind" },
+    "stakesReason": { "$ref": "model.v1.2.schema.json#/$defs/stakesReason" },
+    "target": { "$ref": "model.v1.2.schema.json#/$defs/target" },
+    "choice": { "$ref": "model.v1.2.schema.json#/$defs/choice" },
+    "openQuestion": { "$ref": "model.v1.2.schema.json#/$defs/openQuestion" },
+    "stepCard": { "$ref": "model.v1.2.schema.json#/$defs/stepCard" },
+    "factValue": { "$ref": "model.v1.2.schema.json#/$defs/factValue" },
+    "fact": { "$ref": "model.v1.2.schema.json#/$defs/fact" },
+    "attachment": { "$ref": "model.v1.2.schema.json#/$defs/attachment" },
+    "text": { "$ref": "model.v1.2.schema.json#/$defs/text" },
+    "person": { "$ref": "model.v1.2.schema.json#/$defs/person" },
+    "recentMessage": { "$ref": "model.v1.2.schema.json#/$defs/recentMessage" },
+    "context": { "$ref": "model.v1.2.schema.json#/$defs/context" },
+    "fieldValue": { "$ref": "model.v1.2.schema.json#/$defs/fieldValue" },
+    "field": { "$ref": "model.v1.2.schema.json#/$defs/field" },
+    "quote": { "$ref": "model.v1.2.schema.json#/$defs/quote" },
+    "choose": { "$ref": "model.v1.2.schema.json#/$defs/choose" },
+    "enter": { "$ref": "model.v1.2.schema.json#/$defs/enter" },
+    "ask": { "$ref": "model.v1.2.schema.json#/$defs/ask" },
+    "noneFits": { "$ref": "model.v1.2.schema.json#/$defs/noneFits" },
+    "passOn": { "$ref": "model.v1.2.schema.json#/$defs/passOn" },
+    "handOffAbout": { "$ref": "model.v1.2.schema.json#/$defs/handOffAbout" },
+    "handOff": { "$ref": "model.v1.2.schema.json#/$defs/handOff" },
+    "redact": { "$ref": "model.v1.2.schema.json#/$defs/redact" },
+    "noOp": { "$ref": "model.v1.2.schema.json#/$defs/noOp" },
+    "decidePart": { "$ref": "model.v1.2.schema.json#/$defs/decidePart" },
+    "decideRead": { "$ref": "model.v1.2.schema.json#/$defs/decideRead" },
+    "read": { "$ref": "model.v1.2.schema.json#/$defs/read" },
+    "refusedRead": { "$ref": "model.v1.2.schema.json#/$defs/refusedRead" },
+    "resultPart": { "$ref": "model.v1.2.schema.json#/$defs/resultPart" },
+    "decideResult": { "$ref": "model.v1.2.schema.json#/$defs/decideResult" },
+    "contextAndDecide": { "$ref": "model.v1.2.schema.json#/$defs/contextAndDecide" },
+    "safetyOutcome": { "$ref": "model.v1.2.schema.json#/$defs/safetyOutcome" },
+    "tense": { "$ref": "model.v1.2.schema.json#/$defs/tense" },
+    "safetyLabel": { "$ref": "model.v1.2.schema.json#/$defs/safetyLabel" },
+    "safetyRead": { "$ref": "model.v1.2.schema.json#/$defs/safetyRead" },
+    "safetyResult": { "$ref": "model.v1.2.schema.json#/$defs/safetyResult" },
+    "plannerAnswer": { "$ref": "model.v1.2.schema.json#/$defs/plannerAnswer" },
+    "plannerAsk": { "$ref": "model.v1.2.schema.json#/$defs/plannerAsk" },
+    "plannerPassOn": { "$ref": "model.v1.2.schema.json#/$defs/plannerPassOn" },
+    "plannerHandOff": { "$ref": "model.v1.2.schema.json#/$defs/plannerHandOff" },
+    "plannerLogGap": { "$ref": "model.v1.2.schema.json#/$defs/plannerLogGap" },
+    "plannerOutput": { "$ref": "model.v1.2.schema.json#/$defs/plannerOutput" },
+
+    "photoKind": {
+      "title": "PhotoKind",
+      "description": "v1.3: what the step asked the owner to photograph, one kind per step (02-contracts K-02 'the kind, one of'; 01-inventory C-120): cardOrListing, a business card, a sign, a website or a Google listing (S1-09: 'Send a photo of your business card, sign, website or Google listing'; S1-38's second company, 'its own listing ... as at S1-09'); priceList, the owner's price board or list (S1-12); timetable, a class timetable (S1-83); schedule, the owner's schedule of jobs already booked (S1-24: 'Or Sam sends a photo of the schedule'). The kind is the step's, not what the photo looks like: S1-09 asks for any of its four in one text, so a card, a sign, a website and a listing are one kind with one output (README v1.3 default 17).",
+      "type": "string",
+      "enum": ["cardOrListing", "priceList", "timetable", "schedule"]
+    },
+    "photoFile": {
+      "title": "PhotoFile",
+      "description": "v1.3: the photo's K-13 file reference, its object key (02-contracts K-02 'a K-13 file reference (the object key of a photo that came in by Linq or a signed upload)'; K-13 v1 README 'The object key'): a photo key (photo/..., written by serverWrite from a texted photo, K-13 server-write-linq-photo.json, or given on a page, K-21 cardPhoto, profilePhoto or schedulePhoto), or a price-list key (priceList/..., K-21 pricePhoto) for the price-list kind alone (photoReadRequest). C-120 reads its bytes with K-13's serverRead (server-read-photo.json). Never shown to a browser and never in a span or a log (K-13 v1).",
+      "type": "string",
+      "$ref": "../port-files/port-files.v1.schema.json#/$defs/objectKey",
+      "pattern": "^(photo|priceList)/"
+    },
+    "photoReadRequest": {
+      "title": "PhotoReadRequest",
+      "description": "v1.3: what code hands photo reading (C-120) for one photo: the kind the step asked for, the photo's file reference and when it was sent (02-contracts K-02 'Input: a K-13 file reference ... and the kind'). The bytes are not here: C-120 reads them by the reference (K-13 serverRead). Not model-facing.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "The kind the step asked for (photoKind).",
+          "$ref": "#/$defs/photoKind"
+        },
+        "file": {
+          "description": "The photo's file reference (photoFile).",
+          "$ref": "#/$defs/photoFile"
+        },
+        "sentAt": {
+          "description": "When the photo was sent by text (its K-06 event's send time) or given on a page, with the business's zone; a date on a schedule resolves from it in that zone, as a text's dates do (arch 06 line 309, limit 6; S13-03; K-02 v1 text.sentAt; README v1.3 default 21).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/time"
+        }
+      },
+      "required": ["kind", "file", "sentAt"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "file": {
+          "description": "A price-list key (K-21 pricePhoto) is read only as a price list; every other kind reads a photo key.",
+          "if": {
+            "properties": {
+              "file": {
+                "description": "K-13 v1 README 'K-21's purposes'.",
+                "type": "string",
+                "pattern": "^priceList/"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "kind": { "description": "S1-12.", "const": "priceList" }
+            }
+          }
+        }
+      }
+    },
+
+    "photoNotRead": {
+      "title": "PhotoNotRead",
+      "description": "v1.3: a field the model has no words for, so it carries no value (S1-12: 'asks about anything it can't read. It never makes up a price'; 02-contracts K-02 'An unreadable marker ... per field'; 'The output never carries a price, time or name with no words behind it'): unreadable, the photo shows it but it cannot be read (blurred, cut off, covered); notShown, the photo does not show it at all (README v1.3 default 19). Code asks about either one, or leaves it out until the owner says (S1-12's safe default: 'that line is left out until Sam says'). Model-facing.",
+      "type": "object",
+      "properties": {
+        "status": {
+          "description": "unreadable or notShown (README v1.3 default 19).",
+          "type": "string",
+          "enum": ["unreadable", "notShown"]
+        }
+      },
+      "required": ["status"],
+      "additionalProperties": false
+    },
+    "photoTextField": {
+      "title": "PhotoTextField",
+      "description": "v1.3: a field whose value is text, exactly as the photo writes it: a business name, an address, a phone, a service or class name, a unit, a teacher, a room. Its words are its value, as written on the photo, never tidied, reworded or completed, so the read-back shows what the owner's own photo says (S1-09's read-back: 'Lee's Barbershop LLC / 88 Elm St, Springfield / (555) 010-0177'); code re-parses any typed value from them (a phone into E.164, K-23 v1; limit 6). Or photoNotRead. Model-facing.",
+      "anyOf": [
+        {
+          "title": "PhotoTextRead",
+          "type": "object",
+          "properties": {
+            "status": { "description": "Read from the photo.", "const": "read" },
+            "words": {
+              "description": "The words on the photo, exactly as written (02-contracts K-02 'Each field carries the words on the photo it was read from, so code can build the read-back from them').",
+              "$ref": "#/$defs/nonEmptyText"
+            }
+          },
+          "required": ["status", "words"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/photoNotRead" }
+      ]
+    },
+    "photoPriceKindField": {
+      "title": "PhotoPriceKindField",
+      "description": "v1.3: a price-list line's price kind (S1-12: 'Each service gets a price kind: one price, per hour, per unit, or set by the customer's answers'; the form's 'Price kind'), as K-25 v1 services.price_kind spells it: one_price, per_hour, per_unit or by_answers; with the words it was read from, usually the price's own ('$35' is one price, '$120 an hour' per hour). Or photoNotRead. Model-facing.",
+      "anyOf": [
+        {
+          "title": "PhotoPriceKindRead",
+          "type": "object",
+          "properties": {
+            "status": { "description": "Read from the photo.", "const": "read" },
+            "value": {
+              "description": "K-25 v1 services.price_kind.",
+              "type": "string",
+              "enum": ["one_price", "per_hour", "per_unit", "by_answers"]
+            },
+            "words": {
+              "description": "The words on the photo the price kind is read from; code re-parses it from them (limit 6).",
+              "$ref": "#/$defs/nonEmptyText"
+            }
+          },
+          "required": ["status", "value", "words"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/photoNotRead" }
+      ]
+    },
+    "photoPriceField": {
+      "title": "PhotoPriceField",
+      "description": "v1.3: a price-list line's price (the form's 'Price'; K-25 v1 price_rules), with the words it was read from: an amount in whole cents with its currency (CQ-09; a line the list calls free is 0: S1-12 'A service the list calls free is set as free'), or a price the line says is set later, fromPhotos, atVisit or freeEstimate (S1-12: 'It can also be priced from the customer's photos, at the visit, or a free estimate'; S1-13's card: 'Color and cut · From photos', 'Color correction · At the chair'). Or photoNotRead: never a price with no words behind it (S1-12: 'Never: make up a price'). Model-facing.",
+      "anyOf": [
+        {
+          "title": "PhotoPriceRead",
+          "type": "object",
+          "properties": {
+            "status": { "description": "Read from the photo.", "const": "read" },
+            "value": {
+              "description": "The amount (CQ-09: whole cents with a currency code); code re-parses it from the words (limit 6).",
+              "$ref": "../common/formats.v1.schema.json#/$defs/money"
+            },
+            "words": {
+              "description": "The words on the photo, such as '$35' or 'Free'.",
+              "$ref": "#/$defs/nonEmptyText"
+            }
+          },
+          "required": ["status", "value", "words"],
+          "additionalProperties": false
+        },
+        {
+          "title": "PhotoPriceLater",
+          "type": "object",
+          "properties": {
+            "status": { "description": "Read from the photo.", "const": "read" },
+            "value": {
+              "description": "The price is set later: fromPhotos, from the customer's photos first (K-25 v1 service_money.path price part photos); atVisit, at the visit (price part visit); freeEstimate, a free estimate (S1-12; K-25 v1 has no price part for it: README v1.3 open gaps).",
+              "type": "string",
+              "enum": ["fromPhotos", "atVisit", "freeEstimate"]
+            },
+            "words": {
+              "description": "The words on the photo, such as 'From photos' or 'At the chair'.",
+              "$ref": "#/$defs/nonEmptyText"
+            }
+          },
+          "required": ["status", "value", "words"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/photoNotRead" }
+      ]
+    },
+    "photoMinutesField": {
+      "title": "PhotoMinutesField",
+      "description": "v1.3: a price-list line's time it takes, in whole minutes (the form's 'Time it takes'; FS row V04 'Length | minutes'; K-25 v1 services.length), with the words it was read from, such as '30 min'. Or photoNotRead (a board that shows no times). Model-facing.",
+      "anyOf": [
+        {
+          "title": "PhotoMinutesRead",
+          "type": "object",
+          "properties": {
+            "status": { "description": "Read from the photo.", "const": "read" },
+            "value": {
+              "description": "Whole minutes (FS row V04); code re-parses it from the words (limit 6).",
+              "type": "integer"
+            },
+            "words": { "description": "The words on the photo.", "$ref": "#/$defs/nonEmptyText" }
+          },
+          "required": ["status", "value", "words"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/photoNotRead" }
+      ]
+    },
+    "photoWeekdayField": {
+      "title": "PhotoWeekdayField",
+      "description": "v1.3: a class's day of the week, ISO numbers 1 (Monday) to 7 (Sunday) as K-27 v1 classes.weekday holds it (S1-83: 'Each class gets its day and time'), with the words it was read from, such as 'Sat'. Or photoNotRead. Model-facing.",
+      "anyOf": [
+        {
+          "title": "PhotoWeekdayRead",
+          "type": "object",
+          "properties": {
+            "status": { "description": "Read from the photo.", "const": "read" },
+            "value": {
+              "description": "K-27 v1 classes.weekday: 1 Monday to 7 Sunday.",
+              "type": "integer",
+              "enum": [1, 2, 3, 4, 5, 6, 7]
+            },
+            "words": { "description": "The words on the photo.", "$ref": "#/$defs/nonEmptyText" }
+          },
+          "required": ["status", "value", "words"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/photoNotRead" }
+      ]
+    },
+    "photoTimeOfDayField": {
+      "title": "PhotoTimeOfDayField",
+      "description": "v1.3: a class's start or end each week, a local time of day HH:MM in the business's zone, as K-27 v1 classes.starts_at and ends_at hold it (S1-83: 'its day and time'), with the words it was read from, such as '10am'. Or photoNotRead. Model-facing.",
+      "anyOf": [
+        {
+          "title": "PhotoTimeOfDayRead",
+          "type": "object",
+          "properties": {
+            "status": { "description": "Read from the photo.", "const": "read" },
+            "value": {
+              "description": "HH:MM on a 24-hour clock (K-27 v1 classes.starts_at, ends_at: 'a local time of day ... such as 10:00').",
+              "type": "string",
+              "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+            },
+            "words": { "description": "The words on the photo.", "$ref": "#/$defs/nonEmptyText" }
+          },
+          "required": ["status", "value", "words"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/photoNotRead" }
+      ]
+    },
+    "photoTimeField": {
+      "title": "PhotoTimeField",
+      "description": "v1.3: a busy time's start or end, an instant with the business's zone (CQ-09; K-27 v1 busy_blocks.during, time_zone: 'for a photo, the zone its times were read back in (the business's)'), resolved from the photo's words and the request's sentAt in that zone (limit 6), with the words it was read from, such as 'Sat Nov 14 8:00'. Or photoNotRead. Model-facing.",
+      "anyOf": [
+        {
+          "title": "PhotoTimeRead",
+          "type": "object",
+          "properties": {
+            "status": { "description": "Read from the photo.", "const": "read" },
+            "value": {
+              "description": "The instant in UTC with the business's zone (CQ-09); code re-parses it from the words and sentAt (limit 6).",
+              "$ref": "../common/formats.v1.schema.json#/$defs/time"
+            },
+            "words": {
+              "description": "The words on the photo, never what the job is (S1-24).",
+              "$ref": "#/$defs/nonEmptyText"
+            }
+          },
+          "required": ["status", "value", "words"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/photoNotRead" }
+      ]
+    },
+    "photoOutcome": {
+      "title": "PhotoOutcome",
+      "description": "v1.3: read, the photo shows the kind asked for and its fields were read (some may still be photoNotRead); unreadable, the whole photo cannot be read as that kind, so no field is read (S1-09: 'A photo that can't be read: Rosie asks for the business name'; 02-contracts K-02 'An unreadable marker, for the whole photo'; README v1.3 default 18). Model-facing.",
+      "type": "string",
+      "enum": ["read", "unreadable"]
+    },
+    "photoPriceListLine": {
+      "title": "PhotoPriceListLine",
+      "description": "v1.3: one line of the owner's price list, one service, with the form's columns (S1-12: 'On the secure page: Service, Price kind, Price, Time it takes') under the names K-25 v1's service rows use (02-contracts K-02 'the field names K-25's service rows use'), and the unit a per-unit price counts (K-25 v1 services.unit). Matching the line to a kind of work is code's (S1-12: 'Each line is matched to Rosie's known kinds of work'; C-130). Model-facing.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The service's name (K-25 services.name; the form's 'Service').",
+          "$ref": "#/$defs/photoTextField"
+        },
+        "priceKind": { "description": "K-25 services.price_kind.", "$ref": "#/$defs/photoPriceKindField" },
+        "price": { "description": "The price (K-25 price_rules).", "$ref": "#/$defs/photoPriceField" },
+        "unit": {
+          "description": "For a per-unit price, what one unit is, as the list words it, such as 'night' (K-25 services.unit); notShown for any other line.",
+          "$ref": "#/$defs/photoTextField"
+        },
+        "length": {
+          "description": "The time it takes (K-25 services.length).",
+          "$ref": "#/$defs/photoMinutesField"
+        }
+      },
+      "required": ["name", "priceKind", "price", "unit", "length"],
+      "additionalProperties": false
+    },
+    "photoTimetableClass": {
+      "title": "PhotoTimetableClass",
+      "description": "v1.3: one class on the timetable that meets each week (K-27 v1 classes): its name as the timetable gives it (code matches it to a service, K-27 classes.service_id), its day and time, who teaches and the room (S1-83: 'Each class gets its day and time, who teaches and the room'). Never the spots Rosie can book or the fewest it needs to run: those are asked of the owner, never read (S1-83's question; K-27 v1 classes.seats and minimum: 'asked of the owner, never read from a photo'; refuse-timetable-with-spots.json). A class that meets on several days is one entry a day. Model-facing.",
+      "type": "object",
+      "properties": {
+        "name": { "description": "The class's name on the timetable.", "$ref": "#/$defs/photoTextField" },
+        "weekday": { "description": "K-27 classes.weekday.", "$ref": "#/$defs/photoWeekdayField" },
+        "startsAt": { "description": "K-27 classes.starts_at.", "$ref": "#/$defs/photoTimeOfDayField" },
+        "endsAt": { "description": "K-27 classes.ends_at.", "$ref": "#/$defs/photoTimeOfDayField" },
+        "teacher": {
+          "description": "Who teaches it, as the timetable names them (K-27 classes.teacher_resource_id, matched by code).",
+          "$ref": "#/$defs/photoTextField"
+        },
+        "room": {
+          "description": "The room, as the timetable names it (K-27 classes.room_resource_id, matched by code).",
+          "$ref": "#/$defs/photoTextField"
+        }
+      },
+      "required": ["name", "weekday", "startsAt", "endsAt", "teacher", "room"],
+      "additionalProperties": false
+    },
+    "photoBusyTime": {
+      "title": "PhotoBusyTime",
+      "description": "v1.3: one time the schedule shows as taken, start and end only (S1-24: 'Rosie sees only when Sam is busy, never what the job is'; arch 05 line 261: 'start, end and source, never its title'; K-27 v1 busy_blocks, which has no column for a title). It blocks only on the owner's yes to its read-back (arch 05 line 263; limit 6). Model-facing.",
+      "type": "object",
+      "properties": {
+        "startsAt": {
+          "description": "When the busy time starts (K-27 busy_blocks.during, its start).",
+          "$ref": "#/$defs/photoTimeField"
+        },
+        "endsAt": {
+          "description": "When it ends (K-27 busy_blocks.during, its end).",
+          "$ref": "#/$defs/photoTimeField"
+        }
+      },
+      "required": ["startsAt", "endsAt"],
+      "additionalProperties": false
+    },
+    "photoReadCardOrListing": {
+      "title": "PhotoReadCardOrListing",
+      "description": "v1.3, model-facing: what the model answers for a card, sign, website or listing photo (S1-09): the business name, address and phone the read-back shows (S1-09: 'Here's what I read ... / Lee's Barbershop LLC / 88 Elm St, Springfield / (555) 010-0177'; 02-contracts K-02 'card or listing, the business name, address and phone the read-back shows'), each as written on the photo. Code forms K-15's search by photo text from their words (photoReadResult.search). Never a banned profession word hidden here: the caller hides it from the read-back (S1-09; S13-11).",
+      "type": "object",
+      "properties": {
+        "kind": { "description": "S1-09.", "const": "cardOrListing" },
+        "outcome": { "$ref": "#/$defs/photoOutcome" },
+        "name": { "description": "The business name (K-23 v1 B01).", "$ref": "#/$defs/photoTextField" },
+        "address": { "description": "The address (K-23 v1 locations).", "$ref": "#/$defs/photoTextField" },
+        "phone": {
+          "description": "The listing phone (K-23 v1 B04), as written; code re-parses it into E.164.",
+          "$ref": "#/$defs/photoTextField"
+        }
+      },
+      "required": ["kind", "outcome", "name", "address", "phone"],
+      "additionalProperties": false
+    },
+    "photoReadPriceList": {
+      "title": "PhotoReadPriceList",
+      "description": "v1.3, model-facing: what the model answers for a price-list photo (S1-12: 'Rosie reads the owner's own list into services'): one line per service, in the photo's order. No read-back here: the money card shows the prices (S1-12; S1-13).",
+      "type": "object",
+      "properties": {
+        "kind": { "description": "S1-12.", "const": "priceList" },
+        "outcome": { "$ref": "#/$defs/photoOutcome" },
+        "lines": {
+          "description": "The lines, in the photo's order (K-25 services.position follows it).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/photoPriceListLine" }
+        }
+      },
+      "required": ["kind", "outcome", "lines"],
+      "additionalProperties": false
+    },
+    "photoReadTimetable": {
+      "title": "PhotoReadTimetable",
+      "description": "v1.3, model-facing: what the model answers for a class timetable photo (S1-83: 'The owner sends a photo of the class schedule, and Rosie reads it back'): one entry per class a week.",
+      "type": "object",
+      "properties": {
+        "kind": { "description": "S1-83.", "const": "timetable" },
+        "outcome": { "$ref": "#/$defs/photoOutcome" },
+        "classes": {
+          "description": "The classes, in the photo's order.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/photoTimetableClass" }
+        }
+      },
+      "required": ["kind", "outcome", "classes"],
+      "additionalProperties": false
+    },
+    "photoReadSchedule": {
+      "title": "PhotoReadSchedule",
+      "description": "v1.3, model-facing: what the model answers for a schedule photo (S1-24: 'Or Sam sends a photo of the schedule'; arch 05 line 263: 'a photo of the schedule that Rosie reads back; its times block on the owner's yes'): the busy times, start and end only.",
+      "type": "object",
+      "properties": {
+        "kind": { "description": "S1-24.", "const": "schedule" },
+        "outcome": { "$ref": "#/$defs/photoOutcome" },
+        "busy": {
+          "description": "The busy times, in the photo's order.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/photoBusyTime" }
+        }
+      },
+      "required": ["kind", "outcome", "busy"],
+      "additionalProperties": false
+    },
+    "photoRead": {
+      "title": "PhotoRead",
+      "description": "v1.3: the model's answer for one photo, in the schema of the kind asked for. Each request carries the one schema its kind names (README v1.3 'Model-facing'), so this union is the shape a stored answer, a recording or a gold label takes, not a schema the model is sent.",
+      "anyOf": [
+        { "$ref": "#/$defs/photoReadCardOrListing" },
+        { "$ref": "#/$defs/photoReadPriceList" },
+        { "$ref": "#/$defs/photoReadTimetable" },
+        { "$ref": "#/$defs/photoReadSchedule" }
+      ]
+    },
+    "photoSearch": {
+      "title": "PhotoSearch",
+      "description": "v1.3: K-15 v1's search by the text read from a photo of a card, sign or listing (port-places search.request, by photoText; S1-09 'It reads the photo and checks the public listing'; 02-contracts K-02 'which also form the text for K-15's search by photo text'). Code forms the text from the card's words, never the model: the words of name, address and phone that were read, in that order, joined by a comma and a space (README v1.3 default 20), so S1-09's sample gives exactly 'Lee's Barbershop LLC, 88 Elm St, Springfield, (555) 010-0177', the request the Places double answers (K-15 search-by-photo-text.json; adapters/src/places/double/world.ts).",
+      "type": "object",
+      "$ref": "../port-places/port-places.v1.schema.json#/$defs/search.request",
+      "properties": {
+        "by": { "description": "K-15 v1 SearchByPhotoText.", "const": "photoText" }
+      },
+      "required": ["by"]
+    },
+    "photoReadResult": {
+      "title": "PhotoReadResult",
+      "description": "v1.3: what photo reading (C-120) hands back for one photo, to the journey 1 call that asked (C-074: S1-09, S1-12, S1-24, S1-83): the request, the model that answered, its answer in the kind's schema, and for a card or listing that was read, the K-15 search the call runs. One read: the owner's yes to the read-back is the check (limit 6; README v1.3 default 22). A failed call (an outage, a refusal, max_tokens) is no result: the gateway's rules apply (arch 06 line 293; README 'Model-facing schemas' item 5). Not model-facing.",
+      "type": "object",
+      "properties": {
+        "request": { "$ref": "#/$defs/photoReadRequest" },
+        "model": {
+          "description": "The model that answered (contracts/bundle modelRole); which one reads each kind is the spike's (T-668).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/modelRole"
+        },
+        "output": {
+          "description": "The model's answer, in the schema of the request's kind.",
+          "$ref": "#/$defs/photoRead"
+        },
+        "search": {
+          "description": "For a card or listing that was read, K-15's search by photo text formed from its words (photoSearch); null otherwise, an unreadable photo included (S1-09: then 'Rosie asks for the business name', and the search is by name and town).",
+          "anyOf": [{ "$ref": "#/$defs/photoSearch" }, { "type": "null" }]
+        }
+      },
+      "required": ["request", "model", "output", "search"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "output": {
+          "description": "The answer is in the request's kind; an unreadable photo reads no field; a read list holds at least one entry; a read card holds at least one field read (README v1.3 'What the schema refuses').",
+          "allOf": [
+            {
+              "description": "A card or listing is answered as one.",
+              "if": {
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "cardOrListing" } },
+                    "required": ["kind"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "cardOrListing" } },
+                    "required": ["kind"]
+                  }
+                }
+              }
+            },
+            {
+              "description": "A price list is answered as one.",
+              "if": {
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "priceList" } },
+                    "required": ["kind"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "priceList" } },
+                    "required": ["kind"]
+                  }
+                }
+              }
+            },
+            {
+              "description": "A timetable is answered as one.",
+              "if": {
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "timetable" } },
+                    "required": ["kind"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "timetable" } },
+                    "required": ["kind"]
+                  }
+                }
+              }
+            },
+            {
+              "description": "A schedule is answered as one.",
+              "if": {
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "schedule" } },
+                    "required": ["kind"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "schedule" } },
+                    "required": ["kind"]
+                  }
+                }
+              }
+            },
+            {
+              "description": "An unreadable photo reads no field and no entry (S1-09; README v1.3 default 18).",
+              "if": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": { "outcome": { "const": "unreadable" } },
+                    "required": ["outcome"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "object",
+                        "properties": { "status": { "enum": ["unreadable", "notShown"] } }
+                      },
+                      "address": {
+                        "type": "object",
+                        "properties": { "status": { "enum": ["unreadable", "notShown"] } }
+                      },
+                      "phone": {
+                        "type": "object",
+                        "properties": { "status": { "enum": ["unreadable", "notShown"] } }
+                      },
+                      "lines": { "type": "array", "maxItems": 0 },
+                      "classes": { "type": "array", "maxItems": 0 },
+                      "busy": { "type": "array", "maxItems": 0 }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "description": "A photo read as a list holds at least one entry; a list with none is an unreadable photo (README v1.3 default 18).",
+              "if": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": { "outcome": { "const": "read" } },
+                    "required": ["outcome"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": {
+                      "lines": { "type": "array", "minItems": 1 },
+                      "classes": { "type": "array", "minItems": 1 },
+                      "busy": { "type": "array", "minItems": 1 }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "description": "A card or listing read holds at least one of its three fields read; with none it is an unreadable photo (README v1.3 default 18).",
+              "if": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "cardOrListing" }, "outcome": { "const": "read" } },
+                    "required": ["kind", "outcome"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "object",
+                            "properties": { "status": { "const": "read" } },
+                            "required": ["status"]
+                          }
+                        },
+                        "required": ["name"]
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "address": {
+                            "type": "object",
+                            "properties": { "status": { "const": "read" } },
+                            "required": ["status"]
+                          }
+                        },
+                        "required": ["address"]
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "phone": {
+                            "type": "object",
+                            "properties": { "status": { "const": "read" } },
+                            "required": ["status"]
+                          }
+                        },
+                        "required": ["phone"]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "search": {
+          "description": "The K-15 search is there exactly when a card or listing was read (S1-09: 'It reads the photo and checks the public listing'); an unreadable photo or any other kind has none.",
+          "if": {
+            "properties": {
+              "output": {
+                "type": "object",
+                "properties": { "kind": { "const": "cardOrListing" }, "outcome": { "const": "read" } },
+                "required": ["kind", "outcome"]
+              }
+            },
+            "required": ["output"]
+          },
+          "then": {
+            "properties": {
+              "search": { "description": "photoSearch.", "type": "object" }
+            }
+          },
+          "else": {
+            "properties": {
+              "search": { "description": "No search.", "type": "null" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

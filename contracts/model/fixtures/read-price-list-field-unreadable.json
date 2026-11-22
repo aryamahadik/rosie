@@ -1,0 +1,39 @@
+{
+  "request": {
+    "kind": "priceList",
+    "file": "priceList/2026-10-19/h3n8c5v2x7m4k9q1t6b0p3r8s5",
+    "sentAt": {
+      "utc": "2026-10-19T14:41:00Z",
+      "zone": "America/New_York"
+    }
+  },
+  "model": "sonnet",
+  "output": {
+    "kind": "priceList",
+    "outcome": "read",
+    "lines": [
+      {
+        "name": { "status": "read", "words": "Haircut" },
+        "priceKind": { "status": "read", "value": "one_price", "words": "$35" },
+        "price": { "status": "read", "value": { "cents": 3500, "currency": "USD" }, "words": "$35" },
+        "unit": { "status": "notShown" },
+        "length": { "status": "notShown" }
+      },
+      {
+        "name": { "status": "read", "words": "Skin fade" },
+        "priceKind": { "status": "unreadable" },
+        "price": { "status": "unreadable" },
+        "unit": { "status": "notShown" },
+        "length": { "status": "notShown" }
+      },
+      {
+        "name": { "status": "read", "words": "Beard trim" },
+        "priceKind": { "status": "read", "value": "one_price", "words": "$20" },
+        "price": { "status": "read", "value": { "cents": 2000, "currency": "USD" }, "words": "$20" },
+        "unit": { "status": "notShown" },
+        "length": { "status": "notShown" }
+      }
+    ]
+  },
+  "search": null
+}

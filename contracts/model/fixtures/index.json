@@ -257,6 +257,54 @@
       "source": "README 'v1.2' defaults 12 to 15; CQ-162 (a) and its default; T-370 default 5 and its RereadUnmapped (refused first, check, reread; end oneQuestion); arch 02 line 119; arch 06 line 289; Q-41"
     },
     {
+      "file": "read-card-to-places-query.json",
+      "version": "v1.3",
+      "def": "photoReadResult",
+      "expect": "accept",
+      "shows": "Photo reading (v1.3) of Sam's photo of the shop front at S1-09 (a sign, kind cardOrListing): the business name, address and phone, each with the words on the photo, which the read-back shows ('Lee's Barbershop LLC / 88 Elm St, Springfield / (555) 010-0177'), and the K-15 search by photo text that code forms from those words, 'Lee's Barbershop LLC, 88 Elm St, Springfield, (555) 010-0177', exactly the request the Places double answers (K-15 search-by-photo-text.json).",
+      "source": "README 'v1.3' defaults 17 and 20; 02-contracts K-02 'Photo reading' and its fixture list; S1-09 (its sample: 'Yes, I'm an owner / [photo: Shop front]' and the read-back); K-15 v1 search.request (photoText) and search-by-photo-text.json; K-13 v1 objectKey"
+    },
+    {
+      "file": "unreadable-photo.json",
+      "version": "v1.3",
+      "def": "photoReadResult",
+      "expect": "accept",
+      "shows": "A photo sent at S1-09 that cannot be read as a card, sign, website or listing: outcome unreadable, no field read, and no K-15 search, so Rosie asks for the business name and the search is by name and town.",
+      "source": "README 'v1.3' default 18; S1-09 ('A photo that can't be read: Rosie asks for the business name'); 02-contracts K-02 ('An unreadable marker, for the whole photo')"
+    },
+    {
+      "file": "read-price-list.json",
+      "version": "v1.3",
+      "def": "photoReadResult",
+      "expect": "accept",
+      "shows": "Sam's price board texted at S1-12 (the photo K-13's server-write-linq-photo.json stored and server-read-photo.json reads), read line by line in the form's columns under K-25's names: name, price kind, price, unit and time it takes, each with its words; the services of S1-13's money card as read, a free line at 0 cents, 'From photos' and 'At the chair' as prices set later, and the times the board does not show marked notShown.",
+      "source": "README 'v1.3' default 19; S1-12 ('Service, Price kind, Price, Time it takes'; 'It can also be priced from the customer's photos, at the visit'; 'A service the list calls free is set as free'); S1-13's card (A to I); K-25 v1 services (name, price_kind, unit, length) and seed-services-price-list.json; K-06 v1 photo.json; K-13 v1 server-read-photo.json"
+    },
+    {
+      "file": "read-price-list-field-unreadable.json",
+      "version": "v1.3",
+      "def": "photoReadResult",
+      "expect": "accept",
+      "shows": "The price list Sam adds on the registration page (K-13's priceList key from upload-price-list-photo.json): the skin fade's price cannot be read, so its price and price kind are unreadable, never made up, and Rosie asks about it; the board shows no times (notShown).",
+      "source": "README 'v1.3' default 19; S1-12 ('asks about anything it can't read. It never makes up a price'; 'Never: make up a price'); 02-contracts K-02 ('An unreadable marker ... per field'); K-13 v1 upload-price-list-photo.json"
+    },
+    {
+      "file": "read-timetable.json",
+      "version": "v1.3",
+      "def": "photoReadResult",
+      "expect": "accept",
+      "shows": "The yoga studio's class timetable at S1-83: each class's name, day, start and end, who teaches and the room, the Saturday Hot Flow class with Maya in the Studio room as K-27's seed holds it, and a Wednesday class whose room the timetable does not name; never the spots or the fewest to run, which are asked.",
+      "source": "README 'v1.3'; S1-83 ('Each class gets its day and time, who teaches and the room'); K-27 v1 classes and seed-session-seats.json; fixture set v1 test-kit/shops/yoga.json (Maya and Theo, the Hot Flow class)"
+    },
+    {
+      "file": "read-schedule.json",
+      "version": "v1.3",
+      "def": "photoReadResult",
+      "expect": "accept",
+      "shows": "Sam's photo of the movers' schedule at S1-24: one busy time, Saturday Nov 14 from 8am to 12pm in the business's zone, start and end only, never what the job is; it blocks once Sam says yes to its read-back, as K-27's seed photo block shows.",
+      "source": "README 'v1.3' default 21; S1-24 ('Or Sam sends a photo of the schedule'; 'never what the job is'); arch 05 lines 261 and 263; K-27 v1 busy_blocks and seed-busy-block.json (busy-sam-movers-photo-sat-nov-14)"
+    },
+    {
       "file": "invalid/refuse-unknown-verb.json",
       "version": "v1",
       "def": "decideRead",
@@ -313,6 +361,30 @@
       "expect": "refuse",
       "shows": "The first Haiku read is refused (part 0 unmapped); the check read and the Sonnet re-read both choose 'All on the list' with Sam's kinds, and the result lets that part go. On a turn with a refused read no part goes, agreed parts included, so v1.2's schema refuses it; with the part's outcome oneQuestion it is accepted. The named rules hold on the pair.",
       "source": "README 'v1.2' defaults 12 and 14; CQ-162 (a)'s default; T-370 default 5 ('Any refused read ... ends the whole turn in one question with nothing changed, agreed parts included')"
+    },
+    {
+      "file": "invalid/refuse-field-without-source-words.json",
+      "version": "v1.3",
+      "def": "photoReadPriceList",
+      "expect": "refuse",
+      "shows": "A price-list answer whose haircut price is read as $35 with no words behind it: the model-facing schema refuses it, since a value carries the words on the photo it came from; with the words '$35' it is accepted.",
+      "source": "S1-12 ('Never: make up a price'); 02-contracts K-02 ('The output never carries a price, time or name with no words behind it'); arch 06 line 309 (limit 6)"
+    },
+    {
+      "file": "invalid/refuse-unknown-photo-kind.json",
+      "version": "v1.3",
+      "def": "photoReadRequest",
+      "expect": "refuse",
+      "shows": "A photo-reading request for the kind idDocument, which is none of the four: an ID is accepted as given on the secure page, so photo reading has no ID kind; with the kind cardOrListing it is accepted.",
+      "source": "02-contracts K-02 ('the kind, one of: card or listing ..., price list ..., class timetable ..., schedule'); MC C10; K-22 v1 id_uploads; K-13 v1 kinds"
+    },
+    {
+      "file": "invalid/refuse-timetable-with-spots.json",
+      "version": "v1.3",
+      "def": "photoReadTimetable",
+      "expect": "refuse",
+      "shows": "A timetable answer that reads 12 spots for the Saturday Hot Flow class: the spots Rosie can book and the fewest to run are asked of the owner, never read, so the model-facing schema has no field for them and refuses it; without spots it is accepted.",
+      "source": "S1-83 ('How many spots Rosie can book'; the owner is asked); 02-contracts K-02 ('never the spots or the minimum, which the owner is asked for'); K-27 v1 classes.seats and minimum"
     }
   ]
 }

@@ -1,0 +1,25 @@
+{
+  "request": {
+    "kind": "cardOrListing",
+    "file": "photo/2026-10-19/w7e2r9t4y1u6i3o8p5a0s2d7f4",
+    "sentAt": {
+      "utc": "2026-10-19T14:12:00Z",
+      "zone": "America/New_York"
+    }
+  },
+  "model": "sonnet",
+  "output": {
+    "kind": "cardOrListing",
+    "outcome": "unreadable",
+    "name": {
+      "status": "unreadable"
+    },
+    "address": {
+      "status": "unreadable"
+    },
+    "phone": {
+      "status": "unreadable"
+    }
+  },
+  "search": null
+}
