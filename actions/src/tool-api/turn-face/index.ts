@@ -39,6 +39,7 @@ export {
 export { TurnFaceReadError, TurnFaceRefusedError, type TurnFaceFault } from "./errors";
 export {
   pgCallScope,
+  pgCompaniesReads,
   pgDoorFlags,
   pgDoorRuntime,
   pgFrontierRepo,

@@ -523,14 +523,23 @@ describe("a row that carries its own line: K-05 v1.22's read (T-1475; README ite
     return bundle;
   }
 
-  /** S1-08's card lines that name no slot, in the card's order (bundle v2's S1-08 say[0].elements.card.lines). */
+  /**
+   * S1-08's terms (T-1493, from T-1483's isTermLine; K-09 README v1.11 default 186): Rosie's four fixed lines of bundle
+   * v2's S1-08 card (say[0].elements.card.lines 0, 1, 5 and 6), in the card's order, exactly the term facts compose input
+   * gives the composer.
+   */
   const PLAN_TERMS = [
     "Your business and your ID: about 3 minutes",
     "Any license or document you want shown (optional)",
-    "No extra agreement for your work",
-    "Then the barbershop, live in about 15 minutes",
     "Then your people",
     "Nothing you tell me is asked twice",
+  ];
+
+  /** S1-08's card lines that are never terms (default 186): the sample story's two, and the sample company's slotted one. */
+  const WITHHELD = [
+    "No extra agreement for your work",
+    "Then the barbershop, live in about 15 minutes",
+    "Then {{biz.name}}: plumbing, then electrical, about 5 minutes each",
   ];
 
   /** What limit 7 fills S1-08's row from: the business head alone, at the read's moment, with no ask-by. */
@@ -647,6 +656,62 @@ describe("a row that carries its own line: K-05 v1.22's read (T-1475; README ite
       masterText: PLAN_LINE,
       terms: PLAN_TERMS,
     });
+    // T-1493 (moved from T-1484; default 186): finalize's terms and its term facts are isTermLine's, compose input's
+    // own rule, so they are exactly the four fixed lines compose input gives the composer, and no withheld line.
+    expect(row.checks.facts.filter((fact) => fact.slot === "term").map((fact) => fact.value)).toEqual(
+      PLAN_TERMS,
+    );
+    for (const line of WITHHELD) {
+      expect(row.checks.terms, line).not.toContain(line);
+      expect(JSON.stringify(row.checks.facts), line).not.toContain(line);
+    }
+  });
+
+  it("finalize's terms are compose input's term facts on S1-08 (T-1493; default 186): a plan stating the four lines is sent; one stating a withheld line is sent back to be rewritten, nothing written", async () => {
+    const textedBefore = (
+      contractFile("data-access/fixtures/fixed-line-facts-texted-before.json") as {
+        outcome: ReturnType<typeof firstTextFacts>;
+      }
+    ).outcome;
+    const facts = {
+      ...firstTextFacts(),
+      textedAboutBusiness: textedBefore.textedAboutBusiness,
+      optOutLineDeliveredAt: textedBefore.optOutLineDeliveredAt,
+    };
+    /** finalize-pass.json's request for S1-08's row, its plan the master line then `more`, and no question. */
+    const planned = (more: readonly string[]): Json => {
+      const request = finalizeS108();
+      const plan = (request.plan as Json).plan as Json;
+      plan.lines = [{ role: "first", text: PLAN_LINE }, ...more.map((text) => ({ role: "fact", text }))];
+      return request;
+    };
+
+    // The four term lines, each stated word for word: the Values check finds "3" in a term fact, and the text goes.
+    const four = rowDoubles({ row: outboxRowS108(), facts, bundle: skeletonWithS108() });
+    const sent = await settle(
+      faceOf(four).finalizeMessage(structuredClone(planned(PLAN_TERMS)), traceFor(planned([])).trace),
+    );
+    expect(sent.thrown).toBeUndefined();
+    const answer = sent.answer as unknown as { outcome: string; finalParts: { sends: { text: string }[] } };
+    expect(answer.outcome, JSON.stringify(answer)).toBe("send");
+    const text = answer.finalParts.sends[0]?.text ?? "";
+    for (const line of PLAN_TERMS) expect(text, line).toContain(line);
+    for (const line of WITHHELD) expect(text, line).not.toContain(line);
+    expect(four.plans).toHaveLength(1);
+
+    // A withheld line stated as a term: "15" is no fact (it was one before T-1493, when every slotless card line was a
+    // term), so the Values check blocks the composed attempt, which goes back to be rewritten, and nothing is written.
+    const withheld = rowDoubles({ row: outboxRowS108(), facts, bundle: skeletonWithS108() });
+    const refused = await settle(
+      faceOf(withheld).finalizeMessage(
+        structuredClone(planned(["Then the barbershop, live in about 15 minutes"])),
+        traceFor(planned([])).trace,
+      ),
+    );
+    expect(refused.thrown).toBeUndefined();
+    expect(refused.answer, JSON.stringify(refused.answer)).toMatchObject({ outcome: "rewrite" });
+    expect(withheld.plans).toEqual([]);
+    expect(withheld.cancels).toEqual([]);
   });
 
   it("through the face, S1-08's row reaches compose input: the input is S1-08's master line to Sam, the owner, with no open question", async () => {

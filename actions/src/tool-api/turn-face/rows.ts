@@ -62,8 +62,15 @@
 //   7. Rows about a booking, rows with no business and rows with options are refused here (each answers notBuilt): the
 //      booking's record and calendar file (open gaps 30 and 35), a row with no business's zone, and the options' text
 //      form until the handle has voted (arch 07 line 379) are not read yet. The skeleton's row has none of them.
-//   8. The step's links are the link slots its master line names; its terms the lines of its card that name no slot
-//      (K-03 v1.1 term facts; CQ-86's default), given to the checks as facts labelled "term" (T-313's own form).
+//   8. The step's links are the link slots its master line names; its terms the lines of its card that compose input's
+//      own rule takes (T-1493, moved here from T-1484; K-09 README v1.11 default 186; compose-input/term-facts.ts
+//      isTermLine, T-1483), given to the checks as facts labelled "term" (T-313's own form): each line of the card of the
+//      reader's message, at its place (the flow the step is read in, the message's place in the step's `say`, the line's
+//      on the card), that is words, names no slot (K-03 v1.1 term facts; CQ-86's default) and holds no opt-out line of the
+//      row's bundle; and on S1-08 only Rosie's four fixed lines, word for word at their places (S1_08_TERMS), never the
+//      sample story's agreement and first-kind lines nor the sample company's slotted one. So one rule decides what a term
+//      is, and finalize's terms are exactly the term facts compose input gave the composer; a withheld line is never
+//      replaced by other words.
 //   9. The danger text's writer's row carries each danger outcome's K-01 line once (crisis words: safetyCrisis; an
 //      emergency and every other danger outcome: safetyEmergency; Unsure: safetyCrisis, which also gives 911, since the
 //      read does not say its danger words' kind); a threat's writer gets none (S13-10).
@@ -89,6 +96,7 @@ import {
 } from "../../compose-input";
 import type { InboundText } from "../../compose-input/types";
 import { optOutLinesOf, withoutOptOutLine, READER_LANES, ROSIE_LANE } from "../../compose-input/master-line";
+import { isTermLine, type CardPlace } from "../../compose-input/term-facts";
 import { FIXED_LINE_OF } from "../../commit/core";
 import { claimFacts, readerOf, type Reader } from "../../finalize/claim-check";
 import type { CheckLists } from "../../finalize/checks";
@@ -210,13 +218,19 @@ async function stepOf(bundles: ComposeBundles, read: OutboxRowRead, stepId: stri
   throw new TurnFaceRefusedError("stepMissing");
 }
 
+/** The step's messages from Rosie to a reader's lane, in its `say` order, each with its place in the step's `say`. */
+function placedLinesTo(step: Json, reader: Reader): { readonly message: Json; readonly say: number }[] {
+  const say: unknown[] = Array.isArray(step.say) ? step.say : [];
+  return say.flatMap((message, index): { message: Json; say: number }[] =>
+    isRecord(message) && message.from === ROSIE_LANE && message.to === READER_LANES[reader]
+      ? [{ message, say: index }]
+      : [],
+  );
+}
+
 /** The step's messages from Rosie to a reader's lane, in its `say` order. */
 function linesTo(step: Json, reader: Reader): Json[] {
-  const say: unknown[] = Array.isArray(step.say) ? step.say : [];
-  return say.filter(
-    (message): message is Json =>
-      isRecord(message) && message.from === ROSIE_LANE && message.to === READER_LANES[reader],
-  );
+  return placedLinesTo(step, reader).map((placed) => placed.message);
 }
 
 // ---- the reader: K-05 v1.5 rowReader (README item 44; defaults 62 to 65) ---------------------------------------------
@@ -351,12 +365,18 @@ const LINK_SLOTS: ReadonlySet<string> = new Set(
   VOCABULARY.filter((slot) => slot.kind === "link").map((slot) => slot.name),
 );
 
-/** Default 8: the lines of the step's card on the reader's line that name no slot. */
-function termsOf(line: Json): string[] {
+/**
+ * Default 8: the lines of the card of the reader's message (`line`, at `at`: its flow, step and place in `say`) that
+ * compose input's rule takes as terms (isTermLine, under the bundle's opt-out lines `optOutLines`), word for word, in the
+ * card's order.
+ */
+function termsOf(line: Json, at: Omit<CardPlace, "line">, optOutLines: readonly string[]): string[] {
   const elements = isRecord(line.elements) ? line.elements : {};
   const card = isRecord(elements.card) ? elements.card : {};
   const lines: unknown[] = Array.isArray(card.lines) ? card.lines : [];
-  return lines.filter((each): each is string => typeof each === "string" && !each.includes("{{"));
+  return lines.flatMap((words, index): string[] =>
+    isTermLine({ ...at, line: index }, words, optOutLines) ? [words] : [],
+  );
 }
 
 /** What both calls take from one row read, checked: the row, its step and reader, its source and its words. */
@@ -563,8 +583,15 @@ function finalizeRowOfView(view: RowView): FinalizeRow {
   const question = read.slotSource.question;
   const clock = question?.clockRow ?? null;
   if (question !== null && clock === null) throw new TurnFaceRefusedError("noClockRow");
-  const line = linesTo(view.step.step, view.reader)[view.index] ?? {};
-  const terms = termsOf(line);
+  const placed = placedLinesTo(view.step.step, view.reader)[view.index];
+  const terms =
+    placed === undefined
+      ? []
+      : termsOf(
+          placed.message,
+          { flow: view.step.flow, step: view.stepId, say: placed.say },
+          view.optOutLines,
+        );
   const claim = { reader: view.reader };
   const masterFacts = claimFacts(
     slotsIn(view.master).filter((slot): slot is SlotName => !LINK_SLOTS.has(slot)),
