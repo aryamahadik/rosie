@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 872, [`f4d265d2`](https://github.com/aryamahadik/rosie/commit/f4d265d2), 2026-11-22 07:36:50 UTC.
+- **Through:** commit 874, [`201c025d`](https://github.com/aryamahadik/rosie/commit/201c025d), 2026-11-22 08:21:05 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 874. docs: COMMIT\_HISTORY.md through commit 872 (f4d265d2, \#889) (\#891)
+
+- **Commit:** [`201c025d`](https://github.com/aryamahadik/rosie/commit/201c025d), by Arya Mahadik, 2026-11-22 08:21:05 UTC
+- **Pull request:** [#891](https://github.com/aryamahadik/rosie/pull/891) from `task/commit-history-220`, merged 2026-11-22 08:21:05 UTC. It squashed 1 branch commit:
+  - `7fd28de` docs: COMMIT\_HISTORY.md through commit 872 (f4d265d2, \#889)
+- **Files changed:** 1 (+50 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +50 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 873. T-1524: deploy-staging.sh's default bundle folder is bundles/v2 (T-1477's bundle, the one-kind path; DL-1123), so a deploy without --bundle never switches staging back to bundle v0; header line, default's comment and usage line say so; --bundle and --bundle= unchanged. Tests: the default case publishes and activates v2's id and keys, --bundle bundles/v2 publishes the same, --bundle and --bundle= bundles/v1.1 still publish v1.1, the usage line names bundles/v2; the undo cases expect v2's id (\#890)
+
+- **Commit:** [`b2e6a8e9`](https://github.com/aryamahadik/rosie/commit/b2e6a8e9), by Arya Mahadik, 2026-11-22 08:21:01 UTC
+- **Pull request:** [#890](https://github.com/aryamahadik/rosie/pull/890) from `task/T-1524`, merged 2026-11-22 08:21:01 UTC. It squashed 1 branch commit:
+  - `950079e` T-1524: deploy-staging.sh's default bundle folder is bundles/v2 (T-14…
+- **Files changed:** 2 (+97 −15), by folder:
+  - `infra/ci/` deploy-staging.test.mjs +90 −11
+  - `infra/scripts/` deploy-staging.sh +7 −4
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 872. docs: COMMIT\_HISTORY.md through commit 870 (3a747ad3, \#887) (\#889)
 
