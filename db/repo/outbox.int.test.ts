@@ -38,6 +38,12 @@
 // changed" row (outbox.ts default 26): the ordinary claim and the sweep pass a row that is planned with no plan and whose
 // turn is parked, which nothing composes, where every other planned or stale row still stops them. Every test above
 // runs unchanged.
+//
+// T-1536 (DL-1165) adds, after those and before the last test, the tests of the walk past a committed turn's row left
+// with no plan once its reply was given up (outbox.ts default 30; K-05 README default 225): the ordinary claim and the
+// sweep pass such a row when its turn committed 10 minutes or more before the claim's now, and it still stops them
+// inside that window. Maya's world takes three more options for them (another committed turn of hers as a step, a row
+// written under it, and a park at a time of its own); every test above runs unchanged.
 import { readdirSync, readFileSync } from "node:fs";
 import Ajv2020 from "ajv/dist/2020.js";
 import postgres from "postgres";
@@ -4919,9 +4925,21 @@ function parkRequestFor(turnId: string, parkedAt: string): ParkTurnRequest {
   };
 }
 
-/** One step of Maya's world, in commit order: a park (of PARKED_TURNS' turn at that index), or one row of hers. */
+/**
+ * One step of Maya's world, in commit order: a park (of PARKED_TURNS' turn at that index), another committed turn of hers
+ * (T-1536), or one row of hers.
+ */
 type MayaStep =
-  | { readonly park: 0 | 1 }
+  | {
+      readonly park: 0 | 1;
+      /** T-1536: parked at this time, in place of PARKED_AT's. */
+      readonly at?: string;
+    }
+  | {
+      /** T-1536: another committed turn of hers, committed at `at` (it writes no row of its own). */
+      readonly commit: string;
+      readonly at: string;
+    }
   | {
       readonly row: string;
       readonly state: "planned" | "checked" | "stale";
@@ -4929,6 +4947,8 @@ type MayaStep =
       readonly noTurn?: true;
       /** Else a quick reply, as the parked row is. */
       readonly sendClass?: "safety";
+      /** T-1536: written under this committed turn of hers (a commit step before it), in place of MAYA_TURN. */
+      readonly turn?: string;
     };
 
 /** A row's version as the calls leave it: written planned, checked by writePlan, stale after its claim and markRow. */
@@ -4936,9 +4956,10 @@ const STEP_VERSION = { planned: 1, checked: 2, stale: 4 } as const;
 
 /**
  * Maya's world: park-turn.json's K-04 seeds and her committed turn, then each step in commit order. A park runs the
- * real parkTurn (its row planned with no plan, its turn parked); a row is written as the tables' owner, under her
- * committed turn or with no turn: planned as a commit writes it, checked as writePlan leaves it, or stale as markRow
- * stale leaves it (no plan, no final parts).
+ * real parkTurn (its row planned with no plan, its turn parked); another committed turn of hers is written as the tables'
+ * owner, as commitTurn leaves it (T-1536); a row is written as the tables' owner, under her committed turn, another
+ * committed turn of hers, or with no turn: planned as a commit writes it, checked as writePlan leaves it, or stale as
+ * markRow stale leaves it (no plan, no final parts).
  */
 async function mayaWorld(steps: readonly MayaStep[]): Promise<void> {
   await reset();
@@ -4956,7 +4977,7 @@ async function mayaWorld(steps: readonly MayaStep[]): Promise<void> {
   for (const step of steps) {
     if ("park" in step) {
       const turnId = PARKED_TURNS[step.park];
-      expect(await parkTurn(runtime, parkRequestFor(turnId, PARKED_AT[step.park]))).toMatchObject({
+      expect(await parkTurn(runtime, parkRequestFor(turnId, step.at ?? PARKED_AT[step.park]))).toMatchObject({
         result: "parked",
         turnId,
         outboxRows: [{ id: parkedRowOf(turnId) }],
@@ -4964,8 +4985,21 @@ async function mayaWorld(steps: readonly MayaStep[]): Promise<void> {
       });
       continue;
     }
+    if ("commit" in step) {
+      await insertRow(db.sql, "turns", {
+        id: step.commit,
+        handle_id: MAYA_HANDLE,
+        event_ids: [`evt-${step.commit}`],
+        state: "committed",
+        bundle_hash: BUNDLE_HASH,
+        bundle_build: 1,
+        trace_id: `trace-${step.commit}`,
+        committed_at: step.at,
+      });
+      continue;
+    }
     const { row: id, state } = step;
-    const turnId = step.noTurn === true ? null : MAYA_TURN;
+    const turnId = step.noTurn === true ? null : (step.turn ?? MAYA_TURN);
     const composed = state === "checked";
     await insertRow(db.sql, "outbox_rows", {
       id,
@@ -5169,6 +5203,213 @@ describe('the walk passes a parked turn\'s "nothing changed" row, which nothing 
       expect(answer.passedHeld).toEqual([]);
       expect(await otherClassesNow()).toEqual(others);
       await parkedRowsAsWritten(PARKED_ROWS);
+    },
+  );
+});
+
+// ==== T-1536: the walk passes a committed turn's row left with no plan once its reply was given up (DL-1165) =========
+//
+// A committed turn's reply is composed under its lease, and after the third lapse (MAX_TRIES x LEASE_MS, 3 minutes:
+// runtime/src/actor/lease.ts lines 97 to 99) the reply is given up and nothing returns to a row it left with no plan. On
+// the user's phone, Nov 22, a JOIN turn's row was left so and a later turn's checked reply waited behind it for good
+// (DL-1164). K-05 README default 225 (outbox.ts default 30): a row planned with no plan whose turn is committed with
+// committed_at at or before the claim's now less 10 minutes is passed by the ordinary walk and the sweep, as default
+// 183's parked turn's row is: never claimed, sent, listed or counted toward `limit`, and nothing written to it. Inside
+// the window it still stops the walk. Each world is Maya's (above), her earlier turn committed at the time a test names.
+
+/** Maya's earlier committed turn, whose reply was given up, and the one row it left with no plan. */
+const GIVEN_UP_TURN = "turn-maya-0003";
+const GIVEN_UP_ROW = "out-maya-given-up";
+/** MAYA_NOW less K-05 default 225's 10 minutes: a turn committed at or before it has had its reply given up. */
+const WINDOW_EDGE = "2026-11-07T15:55:00Z";
+/** Long past the window: when the user's JOIN turn of the Nov 22 case had long been given up. */
+const LONG_AGO = "2026-11-07T15:20:00Z";
+
+/** Maya's earlier turn, committed at `at`, and its row as the commit wrote it (a quick reply, planned with no plan). */
+const givenUpAt = (at: string): MayaStep[] => [
+  { commit: GIVEN_UP_TURN, at },
+  { row: GIVEN_UP_ROW, state: "planned", turn: GIVEN_UP_TURN },
+];
+
+/** Maya's own claim and the sweep at `now`, at `limit`. */
+const mayaClaimsAt = (now: string, limit: number): ClaimOutboxRequest[] => [
+  { claimer: "dispatcher-1", recipientHandleId: MAYA_HANDLE, now, limit },
+  { claimer: "dispatcher-1", now, limit },
+];
+
+/** The given-up row as its commit wrote it, and its turn as committed: nothing written to either. */
+async function givenUpUntouched(who: string): Promise<void> {
+  await parkedRowsAsWritten([GIVEN_UP_ROW]);
+  const [turn] = await db.sql<{ state: string; version: number; tries: number }[]>`
+    select state, version, tries from turns where id = ${GIVEN_UP_TURN}
+  `;
+  expect(turn, who).toEqual({ state: "committed", version: 1, tries: 1 });
+}
+
+describe("the walk passes a committed turn's row left with no plan once its reply was given up (T-1536; DL-1165)", () => {
+  for (const { name, run } of ORDINARY_CLAIMS) {
+    it(
+      `${name}: behind a row whose turn committed 10 minutes or more before the claim's now, Maya's claim and the ` +
+        "sweep take her later checked reply at limit 1, and the old row is passed, unlisted and untouched",
+      SLOW,
+      async () => {
+        for (const at of [LONG_AGO, WINDOW_EDGE]) {
+          for (const request of mayaClaims(1)) {
+            const who = `${at}, ${request.recipientHandleId ?? "the sweep"}`;
+            await mayaWorld([...givenUpAt(at), { row: MAYA_REPLY, state: "checked" }]);
+            const answer = await run(request);
+            expect(
+              answer.claimed.map((row) => [row.outboxRowId, row.version, row.commitSeq]),
+              who,
+            ).toEqual([[MAYA_REPLY, 3, 2]]);
+            expect(answer.passedHeld, who).toEqual([]);
+            expect(await rowNow(MAYA_REPLY), who).toEqual({ state: "sending", version: 3, held_until: null });
+            await givenUpUntouched(who);
+          }
+        }
+      },
+    );
+  }
+
+  it(
+    "a row whose turn committed inside the window still stops the walk and the sweep, at every version, a " +
+      "millisecond inside it included; nothing is written",
+    SLOW,
+    async () => {
+      for (const at of ["2026-11-07T15:55:00.001Z", "2026-11-07T16:04:00Z"]) {
+        await mayaWorld([...givenUpAt(at), { row: MAYA_REPLY, state: "checked" }]);
+        const before = await everythingNow();
+        for (const { name, run } of ORDINARY_CLAIMS) {
+          for (const request of mayaClaims(10)) {
+            const who = `${name}, ${request.recipientHandleId ?? "the sweep"}, ${at}`;
+            expect(await run(request), who).toEqual(NOTHING_CLAIMED);
+          }
+        }
+        expect(await everythingNow(), at).toEqual(before);
+        await givenUpUntouched(at);
+      }
+    },
+  );
+
+  it(
+    "the window is read from each claim's own now: the row that held the reply back at 16:05 is passed by a claim " +
+      "at 16:14, 10 minutes after its turn's commit",
+    SLOW,
+    async () => {
+      for (const { name, run } of ORDINARY_CLAIMS) {
+        for (const request of mayaClaimsAt("2026-11-07T16:14:00Z", 1)) {
+          const who = `${name}, ${request.recipientHandleId ?? "the sweep"}`;
+          await mayaWorld([...givenUpAt("2026-11-07T16:04:00Z"), { row: MAYA_REPLY, state: "checked" }]);
+          for (const early of mayaClaims(10)) {
+            expect(await run(early), who).toEqual(NOTHING_CLAIMED);
+          }
+          const answer = await run(request);
+          expect(
+            answer.claimed.map((row) => [row.outboxRowId, row.version, row.commitSeq]),
+            who,
+          ).toEqual([[MAYA_REPLY, 3, 2]]);
+          expect(answer.passedHeld, who).toEqual([]);
+          await givenUpUntouched(who);
+        }
+      }
+    },
+  );
+
+  it(
+    "a parked turn's row is passed as default 183 says, whenever it was parked, beside a given-up reply's row; a " +
+      "committed turn's row inside the window still stops the walk after both",
+    SLOW,
+    async () => {
+      const passed: readonly MayaStep[] = [
+        { park: 0, at: "2026-11-07T16:04:30Z" },
+        ...givenUpAt(LONG_AGO),
+        { park: 1 },
+      ];
+      for (const { name, run } of ORDINARY_CLAIMS) {
+        for (const request of mayaClaims(1)) {
+          const who = `${name}, ${request.recipientHandleId ?? "the sweep"}`;
+          await mayaWorld([...passed, { row: MAYA_REPLY, state: "checked" }]);
+          const answer = await run(request);
+          expect(
+            answer.claimed.map((row) => [row.outboxRowId, row.version, row.commitSeq]),
+            who,
+          ).toEqual([[MAYA_REPLY, 3, 4]]);
+          expect(answer.passedHeld, who).toEqual([]);
+          await parkedRowsAsWritten(PARKED_ROWS);
+          await givenUpUntouched(who);
+        }
+      }
+
+      await mayaWorld([
+        ...passed,
+        { row: "out-maya-composing", state: "planned" },
+        { row: MAYA_REPLY, state: "checked" },
+      ]);
+      const before = await everythingNow();
+      for (const { name, run } of ORDINARY_CLAIMS) {
+        for (const request of mayaClaims(10)) {
+          expect(await run(request), `${name}, ${request.recipientHandleId ?? "the sweep"}`).toEqual(
+            NOTHING_CLAIMED,
+          );
+        }
+      }
+      expect(await everythingNow()).toEqual(before);
+    },
+  );
+
+  it(
+    "a given-up reply's row that gets a plan later is walked as before: composed by writePlan, it is claimed first, " +
+      "in commit order",
+    SLOW,
+    async () => {
+      for (const { name, run } of ORDINARY_CLAIMS) {
+        for (const request of mayaClaims(10)) {
+          const who = `${name}, ${request.recipientHandleId ?? "the sweep"}`;
+          await mayaWorld([...givenUpAt(LONG_AGO), { row: MAYA_REPLY, state: "checked" }]);
+          expect(await plan(planRequest(GIVEN_UP_ROW, 1, [WORDS])), who).toEqual({
+            result: "written",
+            outboxRowId: GIVEN_UP_ROW,
+            version: 2,
+          });
+          const answer = await run(request);
+          expect(
+            answer.claimed.map((row) => [row.outboxRowId, row.version, row.commitSeq]),
+            who,
+          ).toEqual([
+            [GIVEN_UP_ROW, 3, 1],
+            [MAYA_REPLY, 3, 2],
+          ]);
+          expect(answer.passedHeld, who).toEqual([]);
+        }
+      }
+    },
+  );
+
+  it(
+    "the safety claim is unchanged: it reads only Maya's safety rows, so it claims her danger line, and neither a " +
+      "given-up reply's row nor any other row of another class is touched",
+    SLOW,
+    async () => {
+      await mayaWorld([
+        ...givenUpAt(LONG_AGO),
+        { row: "out-maya-composing", state: "planned" },
+        { row: MAYA_REPLY, state: "checked" },
+        { row: "out-maya-danger", state: "checked", sendClass: "safety" },
+      ]);
+      const others = await otherClassesNow();
+      const answer = await claimV114({
+        claimer: "dispatcher-safety",
+        recipientHandleId: MAYA_HANDLE,
+        now: MAYA_NOW,
+        limit: 10,
+        sendClass: "safety",
+      });
+      expect(
+        answer.claimed.map((row) => [row.outboxRowId, row.version, row.commitSeq, row.sendClass]),
+      ).toEqual([["out-maya-danger", 3, 4, "safety"]]);
+      expect(answer.passedHeld).toEqual([]);
+      expect(await otherClassesNow()).toEqual(others);
+      await givenUpUntouched("the safety claim");
     },
   );
 });
