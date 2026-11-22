@@ -38,6 +38,12 @@
 //                 not active: bundle v0 stays this database's one active bundle), and S1-02's question to that owner,
 //                 live at that business under bundle v2, written as the one above is. A one-kind "Plumbing" to it is the
 //                 test's own turn.
+//   multi-kind    (T-1485; DL-1122) a second roster owner, the same set's place 2 in the same run (biz-roster-owner-2,
+//                 company-roster-owner-2 with the barber kind of work, its person and handle), at a whole fiction-range
+//                 number of this seed's own, that person's key made at first sight under the made-up key, and S1-02's
+//                 question to it, live at its business under bundle v2, written as the one-kind owner's is. Its answer
+//                 naming three kinds ("Barbershop, plumbing, electrical"), which asks S1-04, and its answers to S1-04 are
+//                 the test's own turns.
 //
 // Everything but the roster-owner set (its own transaction as rosie_job, as it runs on staging) and the bundle's registry
 // row (the connecting login, as a publish writes it) is written in one transaction as the runtime side's role, rosie_job,
@@ -455,19 +461,54 @@ export const ONE_KIND = {
   version: 2,
 } as const;
 
-/** The roster-owner set run as it is for the one-kind owner's number alone; refused unless it answers place 1's ids. */
-async function seedOneKindOwner(sql: Sql): Promise<void> {
+/**
+ * (T-1485; DL-1122) The roster owner at place 2 (rosterOwnerIds(2)), texting from a whole fiction-range number of this
+ * seed's own, with its Linq chat (a stand-in in K-06's form), and its S1-02 question, live at its business under bundle
+ * v2, written as the one-kind owner's is: the owner whose S1-02 answer names three kinds of work (the test's own first
+ * turn), so S1-04 is asked of it, then answered in words. `version` is the S1-02 question row's: 2, raised once.
+ */
+export const MULTI_KIND = {
+  number: "+15555550179",
+  businessId: "biz-roster-owner-2",
+  companyId: "company-roster-owner-2",
+  personId: "person-roster-owner-2",
+  handleId: "handle-roster-owner-2",
+  chatId: "linq-chat-t1485-multi-kind",
+  turnId: "turn-t1485-asked",
+  eventId: "evt-t1485-asked",
+  traceId: "trace-t1485-asked",
+  questionId: "oq-s1-02-t1485-asked-1",
+  outboxRowId: "outbox-s1-02-t1485-asked-1",
+  messageId: "linq-msg-t1485-asked-0001",
+  committedAt: "2026-10-19T18:05:05Z",
+  sentAt: "2026-10-19T18:05:07Z",
+  deliveredAt: "2026-10-19T18:05:08Z",
+  version: 2,
+} as const;
+
+/** The roster owners this seed asks the roster-owner set for, in their places on its list (from 1). */
+const ROSTER_OWNERS = [ONE_KIND, MULTI_KIND] as const;
+
+/**
+ * The roster-owner set run as it is for the one-kind owner's number and the multi-kind owner's, in that order (T-1485
+ * adds the second); refused unless it answers place 1's ids for the first and place 2's for the second.
+ */
+async function seedRosterOwners(sql: Sql): Promise<void> {
   const { ALLOWLIST_VARIABLE, seedRosterOwner } = await import("../../../../db/seeds/roster-owner");
-  const seeded = await seedRosterOwner(sql, { env: { [ALLOWLIST_VARIABLE]: ONE_KIND.number } });
-  const [owner] = seeded.owners;
-  if (
-    seeded.owners.length !== 1 ||
-    owner?.businessId !== ONE_KIND.businessId ||
-    owner.companyId !== ONE_KIND.companyId ||
-    owner.personId !== ONE_KIND.personId ||
-    owner.handleId !== ONE_KIND.handleId
-  ) {
-    throw new Error("the tool-api-gate seed: the roster-owner set did not give place 1's ids");
+  const list = ROSTER_OWNERS.map((owner) => owner.number).join(",");
+  const seeded = await seedRosterOwner(sql, { env: { [ALLOWLIST_VARIABLE]: list } });
+  const gave = (owner: (typeof ROSTER_OWNERS)[number], index: number): boolean => {
+    const answered = seeded.owners[index];
+    return (
+      answered?.place === index + 1 &&
+      answered.businessId === owner.businessId &&
+      answered.companyId === owner.companyId &&
+      answered.personId === owner.personId &&
+      answered.handleId === owner.handleId
+    );
+  };
+  if (seeded.owners.length !== ROSTER_OWNERS.length || !ROSTER_OWNERS.every(gave)) {
+    throw new Error("the tool-api-gate seed: the roster-owner set did not give places 1 and 2's ids");
   }
 }
 
@@ -503,13 +544,13 @@ export async function seed(sql: Sql): Promise<void> {
     throw new Error("the tool-api-gate seed: this database holds no one active bundle");
   }
 
-  // T-1494: bundle v2's registry row, not active, as a publish writes it (the connecting login); and the roster owner at
-  // place 1, the roster-owner set as it is, in its own transaction as rosie_job.
+  // T-1494: bundle v2's registry row, not active, as a publish writes it (the connecting login); and the roster owners at
+  // places 1 and 2 (T-1485 adds place 2), the roster-owner set as it is, in its own transaction as rosie_job.
   await sql`
     insert into bundles (hash, build, manifest_key, built_at)
     values (${BUNDLE_V2_ID.hash}, ${BUNDLE_V2_ID.build}, ${BUNDLE_V2_MANIFEST_KEY}, ${BUNDLE_V2_BUILT_AT}::timestamptz)
   `;
-  await seedOneKindOwner(sql);
+  await seedRosterOwners(sql);
 
   await sql.begin(async (tx) => {
     await tx.unsafe("set local role rosie_job");
@@ -552,24 +593,38 @@ export async function seed(sql: Sql): Promise<void> {
 
     // T-1494: the catalog by id's kind_flows; the one-kind owner's key at first sight; its S1-02 question, on bundle v2.
     for (const row of KIND_FLOW_ROWS) await insertRow(tx, row);
-    // Its handle and person are the roster-owner set's, so this sight makes the person's key alone.
-    const oneKind = await handleSealingKeyIn(tx, SEED_KEYS, {
-      handle: { kind: "phone", address: ONE_KIND.number },
-      newHandleId: "handle-t1494-unused",
-      newPersonId: "person-t1494-unused",
-      wrappingKeyName: WRAP_KEY_NAME,
-    });
-    const oneKindOutcome = oneKind.outcome;
-    if (
-      !("result" in oneKindOutcome) ||
-      oneKindOutcome.handleId !== ONE_KIND.handleId ||
-      oneKindOutcome.personId !== ONE_KIND.personId ||
-      oneKindOutcome.created.handle ||
-      oneKindOutcome.created.person ||
-      !oneKindOutcome.created.key
-    ) {
-      throw new Error("the tool-api-gate seed: the one-kind owner's sight did not make its key alone");
-    }
+    await rosterOwnerSight(tx, ONE_KIND, "t1494");
     await writeLiveQuestion(tx, ONE_KIND, ONE_KIND.businessId, BUNDLE_V2_ID);
+    // T-1485: the multi-kind owner's key at first sight and its S1-02 question, on bundle v2, as the one-kind owner's.
+    await rosterOwnerSight(tx, MULTI_KIND, "t1485");
+    await writeLiveQuestion(tx, MULTI_KIND, MULTI_KIND.businessId, BUNDLE_V2_ID);
   });
+}
+
+/**
+ * A roster owner's first sight (K-05 v1.2 item 29) under the made-up key: its handle and person are the roster-owner
+ * set's, so this sight makes the person's key alone; refused unless it did. `tag` names the unused ids it is handed.
+ */
+async function rosterOwnerSight(
+  tx: Tx,
+  owner: { readonly number: string; readonly handleId: string; readonly personId: string },
+  tag: string,
+): Promise<void> {
+  const sight = await handleSealingKeyIn(tx, SEED_KEYS, {
+    handle: { kind: "phone", address: owner.number },
+    newHandleId: `handle-${tag}-unused`,
+    newPersonId: `person-${tag}-unused`,
+    wrappingKeyName: WRAP_KEY_NAME,
+  });
+  const { outcome } = sight;
+  if (
+    !("result" in outcome) ||
+    outcome.handleId !== owner.handleId ||
+    outcome.personId !== owner.personId ||
+    outcome.created.handle ||
+    outcome.created.person ||
+    !outcome.created.key
+  ) {
+    throw new Error("the tool-api-gate seed: a roster owner's sight did not make its key alone");
+  }
 }
