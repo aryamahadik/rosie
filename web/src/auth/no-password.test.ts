@@ -52,7 +52,7 @@ async function servedPages(): Promise<{ what: string; html: string }[]> {
       `${environment} sign-in from a link`,
       shell.fetch(get(`${config.basePath}/sign-in?link=dummy-link-01`)),
     );
-    await keep(`${environment} 404`, shell.fetch(get(`${config.basePath}/unknown`)));
+    await keep(`${environment} 404`, shell.fetch(get(`${config.basePath}/unknown/page`)));
     for (const status of [403, 404, 405, 413, 500] satisfies ErrorStatus[])
       pages.push({
         what: `${environment} error ${String(status)}`,

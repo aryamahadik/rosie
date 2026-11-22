@@ -88,7 +88,7 @@ describe("GET {BASE_PATH}/health", () => {
 
   it("answers every other path with 404 JSON that carries the trace id", async () => {
     captureLogLines();
-    for (const path of ["/health", "/test", "/test/health/extra", "/test/unknown"]) {
+    for (const path of ["/health", "/test", "/test/health/extra", "/test/unknown/page"]) {
       const response = get(path, TRACE_ID);
 
       expect(response.status).toBe(404);
@@ -285,9 +285,9 @@ describe("GET {BASE_PATH}/privacy: the Worker serves T-1171's privacy notice, la
   it.each([
     "/test/privacy/",
     "/privacy",
-    "/test/Privacy",
+    "/test/Privacy/page",
     "/test/privacy/more",
-    "/test/privacy.html",
+    "/test/privacy.html/page",
     "/test/test/privacy",
     "/testprivacy",
   ])("keeps %s on staging the Worker's 404 JSON with the trace id, for GET and POST alike", async (path) => {
@@ -438,7 +438,7 @@ describe("health, the webhook doors, the page entry and the 404 answer as before
     async (method) => {
       const logLines = captureLogLines();
 
-      const sent = await sentOf(send("/test/unknown", { method, headers: { ...READER } }));
+      const sent = await sentOf(send("/test/unknown/page", { method, headers: { ...READER } }));
 
       expect(sent).toEqual({
         status: 404,
@@ -755,7 +755,7 @@ describe("the Worker hands a page request to the web shell (T-1234): the shell's
     "/test/example/hello/",
     "/test/Example/hello",
     "/example/hello",
-    "/test/unknown",
+    "/test/unknown/page",
     "/test/",
     "/test",
   ])(
@@ -1192,7 +1192,7 @@ describe("a page request the shell itself cannot answer gets a plain 500 with it
       },
     });
 
-    for (const path of ["/test/example/one", "/test/privacy", "/test/unknown"]) {
+    for (const path of ["/test/example/one", "/test/privacy", "/test/unknown/page"]) {
       const response = await ask(made, path, { headers: READER });
 
       expect(await sentOf(response), path).toEqual(pageFailedSent(TRACE_ID));
