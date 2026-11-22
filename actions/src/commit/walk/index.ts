@@ -6,8 +6,9 @@
 // branch from the owner's words, never the option decide named; T-1503 binds S1-02's). T-1491 adds `buttonsSettlers`
 // (K-09 README default 199: a plain step with buttons that bound code settles is walked, not asked; T-1492 builds S1-04's
 // one-kind settler, T-1493 binds it). T-1519 adds `chats` (K-05 v1.10 item 51's readChatHandle: S1-01 reuses the
-// handle's own chat thread for the turn's chat instead of inserting a second one). See writes.ts, buttons.ts, settle.ts
-// and walk.ts.
+// handle's own chat thread for the turn's chat instead of inserting a second one). T-1532 adds the wait at an event step
+// (K-09 README default 209: EVENT_ONLY_KEYS, the stop waitsOnEvent and the refusal eventKeyAtWalk; nothing to bind). See
+// writes.ts, buttons.ts, settle.ts and walk.ts.
 
 export {
   buttonsAnswer,
@@ -38,7 +39,9 @@ export {
   type GraphStep,
 } from "./graph";
 export {
+  EVENT_ONLY_KEYS,
   MAX_WALK,
+  eventKeysIn,
   walkFrom,
   walkStretchFrom,
   type Move,

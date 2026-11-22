@@ -6,6 +6,9 @@
 //   - a plain step is walked (its own writes apply: its gives) and the walk goes on to its next;
 //   - a plain step whose message carries buttons asks someone, its question being those buttons (T-1461; DL-965's lead
 //     note: S1-04 in bundle v1), so the walk stops there and never walks past it; one with no buttons is walked on;
+//   - a plain step walked whose gives hold a key only an event gives (T-1532; K-09 README default 209: EVENT_ONLY_KEYS,
+//     id_checked alone) is walked as any plain step is, and the walk stops right after it, waiting on that event
+//     (waitsOnEvent): its next is not read in that turn;
 //   - a split stops the walk: one with a message branch asks someone, one with a clock branch waits on a clock; one whose
 //     branches are all lookups is settled by code from a field it reads, which the walk does not read yet (notBuilt);
 //   - a chosen branch is taken (its effects apply: what the choice causes, read by the compiler from the branch's own
@@ -33,6 +36,19 @@
 // never its message again), and the walk goes on from its next, as from any plain step walked, so it never stops at the
 // answered step and no buttons settler is asked there (default 199).
 //
+// The wait at an event step (T-1532; K-09 README default 209; S1-10 slice card S10-2, DL-1151): a table lists the keys
+// a turn never gives (EVENT_ONLY_KEYS: id_checked alone, given only when the owner's ID upload lands on the secure page,
+// never in a chat: MASTER-FLOW-A line 183, MC C10). Where the walk applies as a move a plain step with no gate and no
+// buttons (on a list, on a chosen branch, or in a later stretch after a buttons settler's: default 199) whose gives in
+// the pinned graph hold a key of the table, the step is walked as any plain step is (its rows by its own writer:
+// writes.ts default 9), and the walk stops right after it: the stop waitsOnEvent, naming the step and the table's keys it
+// gives (arch 03 line 191: "waits on a clock or event"). Its next is never read in that turn, so a next the bundle does
+// not hold (S1-75 in bundle v3) is neither reached nor refused; every step the walk does reach is still read from the
+// pinned graph, and one the bundle does not hold is still refused (stepNotInBundle). The stop asks no one and starts no
+// clock: writes.ts writes no question, question row or clock row for it, and a stretch that stops there has no walk on.
+// The rule reads only the step's own gives and this table, the same for every bundle and step, and only ends a walk
+// earlier, never later. A writer never gives a key of the table (writes.ts: eventKeyAtWalk).
+//
 // Defaults used (for ops/QUESTIONS.md):
 //   1. An ending branch's own step that the bundle does not hold, when one of the branch's message effects names it, is
 //      accounted for by that effect: the compiler reads a branch's effects from its own steps (a message per step that
@@ -47,12 +63,34 @@
 //   3. (T-1480) The answered plain step's own gate is not read again, as an answered split's is not: the step was asked
 //      before (the walk asks no gated step: default 2), and the frontier offered its buttons. Every step after it is
 //      visited as any step walked is, its gate included.
+//   4. (T-1532) The wait applies only where default 209 says, at a plain step with no gate and no buttons the walk
+//      applies as a move. A gated step is still notBuilt (default 2), a split or a plain step with buttons still stops the
+//      walk as it did (asks or waits), and the step a button start answers (default 181) or a buttons settler writes as
+//      walked (default 199) carries buttons, so the walk goes on from it as before; their writers still never give a key
+//      of the table (writes.ts: eventKeyAtWalk), so none of them gives id_checked either.
+//   5. (T-1532) The stop names the table's keys the step gives in the order its gives list them (S1-10: id_checked), and
+//      the walk reads nothing else of the event: who sends it and what writes it are the call's that gives the key
+//      (README default 209: K-21 finishUpload), not the walk's.
 
 import { WalkNotBuiltError, WalkRefusedError } from "./errors";
 import type { FlowGraph, GraphBranch, GraphStep } from "./graph";
 
 /** The most steps one walk follows before it is refused (walkTooLong): far past any path the master holds. */
 export const MAX_WALK = 64;
+
+/**
+ * The keys a turn never gives (T-1532; K-09 README default 209): each given only by an event outside any chat, so a
+ * walked plain step whose gives hold one ends the walk (waitsOnEvent) and no writer may give one (eventKeyAtWalk).
+ * `id_checked` alone: given only when the owner's ID upload lands on the secure page (K-21 v1 finishUpload; K-22 v1
+ * id_uploads), never in a chat (MASTER-FLOW-A line 183; MC C10). A key joins only by a later README default naming its
+ * source.
+ */
+export const EVENT_ONLY_KEYS: readonly string[] = ["id_checked"];
+
+/** The keys of the event-only table (EVENT_ONLY_KEYS) that `gives` holds, in the order `gives` lists them. */
+export function eventKeysIn(gives: readonly string[]): string[] {
+  return gives.filter((key) => EVENT_ONLY_KEYS.includes(key));
+}
 
 /** Where a choice starts the walk. */
 export type WalkStart =
@@ -85,6 +123,12 @@ export type Stop =
   | { readonly kind: "asks"; readonly step: GraphStep }
   /** A split a clock settles (a clock branch, no message branch). */
   | { readonly kind: "waits"; readonly step: GraphStep }
+  /**
+   * A plain step walked whose gives hold a key only an event gives (T-1532; K-09 README default 209): the step is the
+   * walk's last move, its rows by its own writer; the walk waits on the event, its next not read. No question goes out
+   * and no clock starts. `keys`: the table's keys the step gives (EVENT_ONLY_KEYS).
+   */
+  | { readonly kind: "waitsOnEvent"; readonly step: GraphStep; readonly keys: readonly string[] }
   /** An ending branch: the path stops with its end text. */
   | {
       readonly kind: "ends";
@@ -159,7 +203,8 @@ export function walkStretchFrom(graph: FlowGraph, start: WalkStart): Stretch {
 
   /**
    * One step entered: where it stops the walk (a split, or a plain step whose message carries buttons: its question is
-   * those buttons), or null when it is walked, applied as a move.
+   * those buttons), or null when it is walked, applied as a move. A step walked whose gives hold a key of the event-only
+   * table is applied as a move and then stops the walk (waitsOnEvent: default 209), so its next is never read.
    */
   const visit = (entered: GraphStep): Stop | null => {
     enter(entered.id);
@@ -167,7 +212,8 @@ export function walkStretchFrom(graph: FlowGraph, start: WalkStart): Stretch {
     if (entered.split) return atSplit(entered);
     if (entered.buttons > 0) return { kind: "asks", step: entered };
     moves.push({ kind: "step", step: entered });
-    return null;
+    const keys = eventKeysIn(entered.gives);
+    return keys.length === 0 ? null : { kind: "waitsOnEvent", step: entered, keys };
   };
 
   /** From step `id` along its own list (each step's next), each plain step applied, to where the walk stops. */
