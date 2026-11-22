@@ -2,9 +2,47 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 883, [`cd705187`](https://github.com/aryamahadik/rosie/commit/cd705187), 2026-11-22 11:42:06 UTC.
+- **Through:** commit 885, [`12bc99d2`](https://github.com/aryamahadik/rosie/commit/12bc99d2), 2026-11-22 12:14:03 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 885. docs: COMMIT\_HISTORY.md through commit 883 (cd705187, \#900) (\#902)
+
+- **Commit:** [`12bc99d2`](https://github.com/aryamahadik/rosie/commit/12bc99d2), by Arya Mahadik, 2026-11-22 12:14:03 UTC
+- **Pull request:** [#902](https://github.com/aryamahadik/rosie/pull/902) from `task/commit-history-225`, merged 2026-11-22 12:14:04 UTC. It squashed 1 branch commit:
+  - `089f6a9` docs: COMMIT\_HISTORY.md through commit 883 (cd705187, \#900)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 884. T-070: freeze K-02 v1.3, the model's contract adds photo reading (a K-13 file key and the kind in; typed card or listing, price list, timetable and schedule answers with an unreadable outcome; the card's search text equals the Places double's), with the granted test lines G1-G5; rounds 1-2 squashed onto main (DL-1134, DL-1136) (\#901)
+
+- **Commit:** [`10c5f2eb`](https://github.com/aryamahadik/rosie/commit/10c5f2eb), by Arya Mahadik, 2026-11-22 12:14:00 UTC
+- **Pull request:** [#901](https://github.com/aryamahadik/rosie/pull/901) from `task/T-070s`, merged 2026-11-22 12:14:00 UTC. It squashed 1 branch commit:
+  - `fa611a6` T-070: freeze K-02 v1.3, the model's contract adds photo reading (a K…
+- **Files changed:** 19 (+1243 −26), by folder:
+  - `ai/src/fixtures-run/` fixtures-run.test.ts +32 −5
+  - `ai/src/recorded-double/` recorded-double.test.ts +4 −2
+  - `contracts/model/` README.md +82 −4, frozen.json +1 −1, model.v1.3.schema.json +701 −0
+  - `contracts/model/fixtures/` index.json +72 −0, read-card-to-places-query.json +31 −0, read-price-list-field-unreadable.json +39 −0, read-price-list.json +81 −0, read-schedule.json +30 −0, read-timetable.json +34 −0, unreadable-photo.json +25 −0
+  - `contracts/model/fixtures/invalid/` refuse-field-without-source-words.json +13 −0, refuse-timetable-with-spots.json +15 −0, refuse-unknown-photo-kind.json +8 −0
+  - `contracts/scripts/` model-contract.test.mjs +5 −5, structured-subset-lint.mjs +23 −2, structured-subset-lint.test.mjs +31 −4
+  - `tests/contract/` model.v1.test.ts +16 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 883. docs: COMMIT\_HISTORY.md through commit 881 (34f0aaa9, \#898) (\#900)
 
