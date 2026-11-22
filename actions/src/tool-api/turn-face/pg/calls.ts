@@ -34,6 +34,16 @@
 // Open, for a later card: the door's transaction waits for the bundles, the sealer and commitTurn between its own
 // statements, and no close watch keeps a statement off its connection if that connection closes meanwhile (T-1367's guard
 // is withBusiness's, which needs a business; the frontier's watches its own repo only).
+//
+// The one-kind path's reads on PostgreSQL (T-1493, H1a; K-09 README default 199 item (4); T-1492's CompaniesReads):
+// pgCompaniesReads binds item 79 and K-24's catalog by id (readTurnState's setup facts) on `runtime` (rosie_job) and item
+// 72 on `toolApi` (rosie_app), each in a read-only transaction of its own beside the call's (T-1492's
+// pgCompaniesK05Reads), handed the call's transaction as CompaniesReads' repo and never reading through it: item 72 runs
+// only in a read-only transaction at repeatable read (db/repo/catalog-reads.ts enterSide), which the call's own read-write
+// transaction is not, and readTurnState reads the turn's handle, on which rosie_app holds no grant (0012), so neither can
+// run on the call's transaction without a 42501 or a refusal. So the call's client needs a second connection beside the
+// call's (as item 78's read does: DL-931), and the runtime's client one more. The caller hands it in as
+// SignUpWriterDeps.companies, with S1-08's stop reads as SignUpWriterDeps.plan, and asks for signUpSteps (settleSignUp).
 
 import {
   cancelClock,
@@ -69,6 +79,7 @@ import { messagesReaderOf } from "../../../domain/messages-consent";
 import type { PagingDeps } from "../../../domain/paging";
 import type { StopWords, TellingPort } from "../../../domain/safety";
 import type { FrontierBundles } from "../../../frontier";
+import { companiesReadsOf, pgCompaniesK05Reads, type CompaniesReads } from "../../journey-1/companies";
 import type { BusinessScope, ScopeCall } from "../../scope";
 import type { SpanRefusedReport } from "../../tool-api";
 import type { ToolApiValidator } from "../../validator";
@@ -167,6 +178,17 @@ export function pgWalkQuestions<Repo extends Sql | Tx>(): WalkQuestions<Repo> {
   };
 }
 
+/**
+ * The one-kind path's reads on PostgreSQL (T-1493; the top of this file), for SignUpWriterDeps.companies: T-1492's
+ * pgCompaniesK05Reads through companiesReadsOf, so a K-05 error answer is thrown as CompaniesReadError and never read as
+ * none. Item 79 and the catalog by id run on `runtime` (rosie_job), item 72 on `toolApi` (rosie_app), each in a read-only
+ * transaction of its own; the call's transaction, handed in as the repo, is never read through. `toolApi` must never be
+ * a client of one connection whose transaction the call holds.
+ */
+export function pgCompaniesReads(toolApi: Sql, runtime: Sql): CompaniesReads<Tx> {
+  return companiesReadsOf<Tx>(pgCompaniesK05Reads(toolApi, runtime));
+}
+
 export interface PgTurnCallsOptions {
   /** The bundles, read under their ids (KV, or PostgreSQL's copy on a miss): the frontier's port. */
   readonly bundles: FrontierBundles;
@@ -176,14 +198,16 @@ export interface PgTurnCallsOptions {
    * side: journey-1/kinds reads.ts) with the stop home's reads where the runtime side binds them, and the pinned bundle's
    * trade overlays. Given, the commit binds the walk's question read on the call's transaction (pgWalkQuestions) and the
    * sign-up steps' writers, so an answer to S1-02's question is written. Left out, neither is bound, and every answer to
-   * an open question is notBuilt, as before.
+   * an open question is notBuilt, as before. Its `companies` (pgCompaniesReads) and `plan` (S1-08's stop reads) are read
+   * only with `settleSignUp` (T-1493: signUpSteps alone binds them).
    */
-  readonly signUp?: SignUpWriterDeps;
+  readonly signUp?: SignUpWriterDeps<Tx>;
   /**
    * Whether the walk is also handed S1-02's settler (T-1502; K-09 README default 191; ../commit signUpSteps): true, with
    * `signUp` given, binds the sign-up steps' writers and settlers together over one catalog read per walk, so the owner's
-   * words settle S1-02's branch whichever option decide named. Left out or false, no settler is bound and the walk is as
-   * before; without `signUp` it binds nothing.
+   * words settle S1-02's branch whichever option decide named, and, where `signUp` carries them (T-1493), the one-kind
+   * path (S1-02's one-kind wrapper and S1-04's buttons settler, from `signUp.companies`) and S1-08's writer (from
+   * `signUp.plan`). Left out or false, no settler is bound and the walk is as before; without `signUp` it binds nothing.
    */
   readonly settleSignUp?: boolean;
   /** The wrapping key the sealer opens a person's data key with, read by name from the environment (T-182). */
@@ -265,8 +289,9 @@ function pgCommitBinding<Repo extends Sql | Tx>(
 export function pgTurnCalls(runtime: Sql, toolApi: Sql, options: PgTurnCallsOptions): TurnFaceCalls<Tx> {
   const { paging, signUp } = options;
   // The walk's question read, the sign-up steps' writers and, where asked, their settlers are this binding's own (T-1468,
-  // T-1502), never pgCommitBinding's, which the keyword door shares; and so is the walk's chat read (T-1519), K-05 v1.10
-  // item 51 on the runtime side in a read-only transaction of its own, so S1-01 reuses a handle's own chat thread.
+  // T-1502), never pgCommitBinding's, which the keyword door shares; and so are, where signUpSteps gives it (T-1493: the
+  // signUp deps carry `companies`), S1-04's buttons settler, and the walk's chat read (T-1519), K-05 v1.10 item 51 on
+  // the runtime side in a read-only transaction of its own, so S1-01 reuses a handle's own chat thread.
   const binding: TurnCommitBinding<Tx> = {
     ...pgCommitBinding<Tx>(runtime, options),
     readChatHandle: (request) => readChatHandle(runtime, { linqChatId: request.linqChatId }),

@@ -17,7 +17,10 @@
 //     (T-1519; DL-1048), K-05 v1.10 item 51's readChatHandle on the runtime side (TurnCommitBinding.readChatHandle), which
 //     the walk asks for the turn's Linq chat id, handed only the handle id it answers (walkChatsOf, never the number), so
 //     S1-01 reuses the handle's own chat thread for that chat instead of inserting a second one (commit/walk writes.ts
-//     default 12). Left out, S1-01's thread is inserted as before;
+//     default 12). Left out, S1-01's thread is inserted as before. And, where the wiring binds them (T-1493, H1a; K-09
+//     README default 199; DL-1033, DL-1075), the read-only buttons settlers by step id (TurnCommitBinding.buttonsSettlers:
+//     signUpSteps' S1-04 one-kind settler, T-1492's), so an owner who names exactly one kind of work is never asked S1-04:
+//     the walk settles S1-04 and goes on to S1-08's row and S1-09's question. Left out, S1-04 is asked as before;
 //   - askAgain (T-1505; K-09 v1.12 defaults 192 to 198): where the binding hands in the walk's question read
 //     (TurnCommitBinding.questions), the commit is handed the same read with the walk's turn key (CommitDeps.askAgain),
 //     so a turn whose parts decide ended in one question, with exactly one open question, sends that question again once
@@ -91,6 +94,11 @@
 //      domain/safety/record.ts lineRows) and tells no owner, and the owner's and zone's reads need one. So the door's lines
 //      answer notBuilt for every outcome but No, before any line row is planned; No sends no line, and the outage line is
 //      the bundle's, as the business-scoped binding's.
+//   6. (T-1493) signUpSteps' two new deps are independent of each other: `companies` binds S1-02's one-kind wrapper and
+//      S1-04's buttons settler together, from one createOneKind instance (never one without the other: T-1492's default
+//      O6), and `plan` binds S1-08's writer alone. With `companies` and no `plan`, a one-kind walk reaches S1-08 with no
+//      writer and is refused (notBuilt) with nothing written, as with `plan` and no stop reads. signUpStepWriters reads
+//      neither: it binds no settler, and a wrapper bound without its settler would place a pick and still ask S1-04.
 
 import type { CommitContext } from "../../../../runtime/src/actor";
 import type {
@@ -106,6 +114,7 @@ import type {
 import { createRunCore, type CoreDeps, type CoreFlagsDeps, type CoreSafetyDeps } from "../../commit/core";
 import {
   createWritesOf,
+  type ButtonsSettlers,
   type StepSettler,
   type StepSettlers,
   type StepWriter,
@@ -137,7 +146,9 @@ import { limit4 } from "../../gate/limit-4";
 import { limit5 } from "../../gate/limit-5";
 import { limit6 } from "../../gate/limit-6";
 import { NotBuiltError } from "../errors";
+import { createOneKind, type CompaniesReads, type OneKind } from "../journey-1/companies";
 import { kindsSteps, kindsWriters, type KindsWriterDeps, type KindsWriters } from "../journey-1/kinds";
+import { PLAN_STEP, planWriter, type PlanWriterDeps } from "../journey-1/plan";
 import { createPlugInWriters, S1_11, type PlugInDeps, type PlugInWriters } from "../journey-1/plug-ins";
 import { TurnFaceReadError, TurnFaceRefusedError } from "./errors";
 
@@ -319,6 +330,14 @@ export interface TurnCommitBinding<Repo> {
    */
   readonly settlers?: StepSettlers<Repo>;
   /**
+   * The walk's read-only buttons settlers by step id (T-1493, H1a; K-09 README default 199; commit/walk
+   * WalkDeps.buttonsSettlers): signUpSteps' S1-04 one-kind settler (T-1492's), built from the same createOneKind instance
+   * as the wrapper around S1-02's writer, so the settler and the wrapper share one walk's reads and placement. The walk asks
+   * one only where it would stop at a plain step with buttons (S1-04) and no hold keeps that step back. Left out, no
+   * buttons settler is bound and S1-04 is asked exactly as before.
+   */
+  readonly buttonsSettlers?: ButtonsSettlers<Repo>;
+  /**
    * K-05 v1.10 item 51's readChatHandle (T-1519; DL-1048): the phone handle whose chat thread holds a Linq chat id, read on
    * the runtime side (rosie_job, no business scope, a read-only transaction of its own: threads and handles are scoped
    * none, and rosie_app holds no grant on either), never on the call's transaction. The walk asks it once for the turn's
@@ -332,28 +351,50 @@ export interface TurnCommitBinding<Repo> {
 /**
  * What the keyword door's commit binds (keywordCommitDeps; T-1413): the turn face's binding, with K-05 v1.4's record
  * reads in their no-business forms in place of the business-scoped seven, no paging port (the top of this file), and no
- * question read, step writers, settlers or chat read (T-1468, T-1502, T-1519): a keyword turn carries no part, so the
- * door's commit never walks.
+ * question read, step writers, settlers, buttons settlers or chat read (T-1468, T-1502, T-1493, T-1519): a keyword turn
+ * carries no part, so the door's commit never walks.
  */
 export type KeywordCommitBinding<Repo> = Omit<
   TurnCommitBinding<Repo>,
-  "safetyReads" | "paging" | "questions" | "writers" | "settlers" | "readChatHandle"
+  "safetyReads" | "paging" | "questions" | "writers" | "settlers" | "buttonsSettlers" | "readChatHandle"
 > & {
   readonly safetyReads: NoBusinessSafetyReads<Repo>;
 };
 
 // ---- the sign-up steps' read-only writers (T-1468) -------------------------------------------------------------------
 
-/** What the sign-up steps' writers read with: the kinds folder's ports (T-633) and the plug-in folder's (T-634). */
-export interface SignUpWriterDeps {
+/**
+ * What the sign-up steps' writers read with: the kinds folder's ports (T-633) and the plug-in folder's (T-634), and,
+ * for signUpSteps alone (T-1493, H1a), the one-kind path's reads (T-1492) and S1-08's writer's own deps (T-1482).
+ * `Repo` is the call's repo, which the companies reads are handed (item 72 and the catalog by id).
+ */
+export interface SignUpWriterDeps<Repo = unknown> {
   /**
    * Items 78 and 79, and the stop home's reads when the runtime side binds them (journey-1/kinds KindsWriterDeps). With
    * `stop` left out, S1-03's and S1-74's messages answer notBuilt, so "One isn't on the list yet" and "Not a service we
-   * book" write nothing.
+   * book" write nothing. S1-08's writer never reads this `stop`: it has its own (`plan`; CQ-360).
    */
   readonly kinds: KindsWriterDeps;
   /** The pinned bundle's trade overlays (journey-1/plug-ins PlugInDeps). */
   readonly plugIns: PlugInDeps;
+  /**
+   * The one-kind path's reads (T-1493; K-09 README default 199 items (1) to (4); journey-1/companies CompaniesReads: item
+   * 79, item 72 and K-24's catalog by id, each answer or a thrown error). Given, signUpSteps builds one createOneKind over
+   * them per call and binds S1-02 as T-634's `kinds` wrapper around T-1492's one-kind wrapper around T-633's writer, and
+   * S1-04's buttons settler from the same instance (SignUpSteps.buttonsSettlers), so an owner with exactly one kept kind
+   * of work is never asked S1-04. Left out, neither: S1-02 is bound as before and S1-04 is asked. signUpStepWriters never
+   * reads it (it binds no settler, so a placed pick with S1-04 still asked could never happen).
+   */
+  readonly companies?: CompaniesReads<Repo>;
+  /**
+   * S1-08's writer's own deps (T-1493; T-1482's PlanWriterDeps; K-09 README defaults 189 and 199 item (5)): the stop
+   * home's reads S1-08's writer rules its one quick reply with, a field of S1-08's own beside `kinds.stop`, which S1-03's
+   * and S1-74's writers keep as they are (CQ-360). Given, signUpSteps binds planWriter(plan) at S1-08; with its `stop`
+   * left out that writer answers notBuilt (stopNotWired), so a walk that reaches S1-08 is refused with nothing written.
+   * Left out, no writer is bound at S1-08, as before, and a walk that reaches it is refused the same way (notBuilt: S1-08
+   * tells the owner). signUpStepWriters never reads it.
+   */
+  readonly plan?: PlanWriterDeps;
 }
 
 /**
@@ -369,27 +410,53 @@ export interface SignUpWriterDeps {
  *     itself, and refuses any other step that writes something (notBuilt).
  * It reads nothing and logs nothing. What a writer throws leaves as thrown and fails the call closed: a failed item 78
  * or item 79 read is KindsReadError, whose `answer` holds a SQLSTATE or a person's or a business's row id, so nothing
- * here catches, wraps or reports it (a caller that reports it names its name, read and fault alone).
+ * here catches, wraps or reports it (a caller that reports it names its name, read and fault alone). The one-kind path
+ * and S1-08's writer (SignUpWriterDeps.companies and .plan) are signUpSteps' alone: this map never reads them.
  */
-export function signUpStepWriters<Repo>(deps: SignUpWriterDeps): StepWriters<Repo> {
+export function signUpStepWriters<Repo>(deps: SignUpWriterDeps<Repo>): StepWriters<Repo> {
   return stepWritersOf(kindsWriters<Repo>(deps.kinds), createPlugInWriters<Repo>(deps.plugIns));
 }
 
-/** signUpStepWriters' step-id map over one kindsWriters and one createPlugInWriters. */
-function stepWritersOf<Repo>(kinds: KindsWriters<Repo>, plugIns: PlugInWriters<Repo>): StepWriters<Repo> {
-  const bound: ReadonlyMap<string, StepWriter<Repo>> = new Map<string, StepWriter<Repo>>([
-    ["S1-02", plugIns.kinds(kinds["S1-02"])],
+/** What signUpSteps adds to the step-id map (T-1493): S1-02's one-kind wrapper and S1-08's writer, each where given. */
+interface OneKindWriters<Repo> {
+  /** The one createOneKind instance of the call, whose wrapper goes around S1-02's writer; null: none. */
+  readonly oneKind: OneKind<Repo> | null;
+  /** S1-08's writer's deps; undefined: no writer at S1-08. */
+  readonly plan: PlanWriterDeps | undefined;
+}
+
+/**
+ * signUpStepWriters' step-id map over one kindsWriters and one createPlugInWriters; with `added` (signUpSteps, T-1493),
+ * S1-02's writer inside T-1492's one-kind wrapper inside T-634's `kinds` wrapper, and S1-08's writer, each where given.
+ */
+function stepWritersOf<Repo>(
+  kinds: KindsWriters<Repo>,
+  plugIns: PlugInWriters<Repo>,
+  added: OneKindWriters<Repo> = { oneKind: null, plan: undefined },
+): StepWriters<Repo> {
+  const { oneKind, plan } = added;
+  const s1_02 = oneKind === null ? kinds["S1-02"] : oneKind.wrap(kinds["S1-02"]);
+  const entries: [string, StepWriter<Repo>][] = [
+    ["S1-02", plugIns.kinds(s1_02)],
     ["S1-03", kinds["S1-03"]],
     ["S1-74", kinds["S1-74"]],
     [S1_11, plugIns.plugIns],
-  ]);
+  ];
+  if (plan !== undefined) entries.push([PLAN_STEP, planWriter<Repo>(plan)]);
+  const bound: ReadonlyMap<string, StepWriter<Repo>> = new Map<string, StepWriter<Repo>>(entries);
   return (stepId) => bound.get(stepId) ?? null;
 }
 
-/** The sign-up steps' writers and settlers, for TurnCommitBinding.writers and .settlers (signUpSteps). */
+/**
+ * The sign-up steps' writers and settlers, for TurnCommitBinding.writers and .settlers (signUpSteps), and, where the
+ * one-kind path is bound (T-1493), S1-04's buttons settler for TurnCommitBinding.buttonsSettlers: a binding that spreads
+ * this object into itself carries each field this object has, and none it lacks.
+ */
 export interface SignUpSteps<Repo> {
   readonly writers: StepWriters<Repo>;
   readonly settlers: StepSettlers<Repo>;
+  /** S1-04's one-kind settler by step id (T-1492's buttonsSettlers); present only with SignUpWriterDeps.companies. */
+  readonly buttonsSettlers?: ButtonsSettlers<Repo>;
 }
 
 /**
@@ -400,19 +467,33 @@ export interface SignUpSteps<Repo> {
  *   - writers: signUpStepWriters' map, step for step (S1-02's writer inside T-634's wrapper; S1-03, S1-74, S1-11; null
  *     for any other id), the kinds writers being kindsSteps' own;
  *   - settlers: S1-02's settler for S1-02, and null for any other step id, S1-04 among them (default 191 never asks a
- *     settler at a step with no branches: T-1491's own version binds S1-04's).
+ *     settler at a step with no branches: S1-04's is a buttons settler, below).
+ * And the one-kind path (T-1493, H1a; K-09 README default 199; DL-1033, DL-1075), from the deps the caller hands in:
+ *   - with `companies`: one createOneKind({ reads: companies }) per call (T-1492's handoff: the wrapper and the settler
+ *     from one instance, sharing one walk's reads and placement), S1-02 bound as
+ *     plugIns.kinds(oneKind.wrap(kinds.writers["S1-02"])), so the one kept pick is placed on its own insert and S1-11's
+ *     blocks take its business, and `buttonsSettlers` = oneKind.buttonsSettlers (S1-04's settler alone);
+ *   - with `plan`: S1-08's writer, planWriter(plan) (T-1482), at S1-08.
+ * With both left out, the object is today's, field for field: `writers` and `settlers` alone, no `buttonsSettlers` key.
  * Building them reads nothing and logs nothing. What a settler or writer throws leaves as thrown and fails the call
- * closed, as signUpStepWriters says.
+ * closed, as signUpStepWriters says. No S1-04 writer is bound here (H1b's, T-1484): an answered S1-04 is notBuilt.
  */
-export function signUpSteps<Repo>(deps: SignUpWriterDeps): SignUpSteps<Repo> {
+export function signUpSteps<Repo>(deps: SignUpWriterDeps<Repo>): SignUpSteps<Repo> {
   const kinds = kindsSteps<Repo>(deps.kinds);
   const plugIns = createPlugInWriters<Repo>(deps.plugIns);
   const settled: ReadonlyMap<string, StepSettler<Repo>> = new Map<string, StepSettler<Repo>>([
     ["S1-02", kinds.settlers["S1-02"]],
   ]);
+  const settlers: StepSettlers<Repo> = (stepId) => settled.get(stepId) ?? null;
+  const { companies, plan } = deps;
+  if (companies === undefined && plan === undefined) {
+    return { writers: stepWritersOf(kinds.writers, plugIns), settlers };
+  }
+  const oneKind = companies === undefined ? null : createOneKind<Repo>({ reads: companies });
   return {
-    writers: stepWritersOf(kinds.writers, plugIns),
-    settlers: (stepId) => settled.get(stepId) ?? null,
+    writers: stepWritersOf(kinds.writers, plugIns, { oneKind, plan }),
+    settlers,
+    ...(oneKind === null ? {} : { buttonsSettlers: oneKind.buttonsSettlers }),
   };
 }
 
@@ -718,21 +799,28 @@ export function walkChatsOf(read: NonNullable<TurnCommitBinding<unknown>["readCh
 
 // ---- the commit's deps for one call -----------------------------------------------------------------------------------
 
-/** The walk's question read, step writers, settlers and chat read as a binding names them: each present only when bound. */
-type WalkAnswerDeps<Repo> = Pick<WalkDeps<Repo>, "questions" | "writers" | "settlers" | "chats">;
+/**
+ * The walk's question read, step writers, settlers, buttons settlers and chat read as a binding names them: each present
+ * only when bound.
+ */
+type WalkAnswerDeps<Repo> = Pick<
+  WalkDeps<Repo>,
+  "questions" | "writers" | "settlers" | "buttonsSettlers" | "chats"
+>;
 
 /**
  * The commit's deps over one binding: the limits, writesOf and commitTurn as bound, runCore with the core's deps for the
  * turn's pinned lines (built for each action: DL-864 note 4), and openHolds under the business `businessOf` names.
- * writesOf is handed the walk's question read, step writers, settlers and chat read only as `answers` names them, each
- * only when present (T-1468, T-1502, T-1519): the turn face's binding's own, and none for the keyword door, whatever its
- * binding object carries. The commit is handed that same question read, with the binding's turn key, as
- * CommitDeps.askAgain (T-1505), only when `answers` names it, so the keyword door never sends a question again.
+ * writesOf is handed the walk's question read, step writers, settlers, buttons settlers and chat read only as `answers`
+ * names them, each only when present (T-1468, T-1502, T-1493, T-1519): the turn face's binding's own, and none for the
+ * keyword door, whatever its binding object carries. The commit is handed that same question read, with the binding's
+ * turn key, as CommitDeps.askAgain (T-1505), only when `answers` names it, so the keyword door never sends a question
+ * again.
  */
 function commitDepsWith<Repo>(
   binding: Omit<
     TurnCommitBinding<Repo>,
-    "safetyReads" | "questions" | "writers" | "settlers" | "readChatHandle"
+    "safetyReads" | "questions" | "writers" | "settlers" | "buttonsSettlers" | "readChatHandle"
   >,
   answers: WalkAnswerDeps<Repo>,
   coreDeps: (lines: SafetyLines, turn: CommitTurnContext<Repo>) => CoreDeps<Repo>,
@@ -746,6 +834,7 @@ function commitDepsWith<Repo>(
     ...(answers.questions === undefined ? {} : { questions: answers.questions }),
     ...(answers.writers === undefined ? {} : { writers: answers.writers }),
     ...(answers.settlers === undefined ? {} : { settlers: answers.settlers }),
+    ...(answers.buttonsSettlers === undefined ? {} : { buttonsSettlers: answers.buttonsSettlers }),
     ...(answers.chats === undefined ? {} : { chats: answers.chats }),
   });
   const limitsOf = binding.limits ?? turnLimits;
@@ -781,17 +870,18 @@ function commitDepsWith<Repo>(
  * openHolds and commitTurn as the top of this file binds them. No flags port is bound, so in this business-scoped commit
  * recordStopOrStart and setRecordFlag answer notBuilt portNotWired (DL-877 C5); the paging port is the binding's own
  * (TurnCommitBinding.paging), none until the runtime binds it (T-1444). The walk's question read, step writers,
- * settlers and chat read are the binding's own too (TurnCommitBinding.questions, .writers, .settlers and
- * .readChatHandle through walkChatsOf; T-1468, T-1502, T-1519): with any left out the walk runs without it, as before.
- * Where the question read is bound, the commit reads an asked turn's one open question through it too
- * (CommitDeps.askAgain; T-1505).
+ * settlers, buttons settlers and chat read are the binding's own too (TurnCommitBinding.questions, .writers, .settlers,
+ * .buttonsSettlers and .readChatHandle through walkChatsOf; T-1468, T-1502, T-1493, T-1519): with any left out the walk
+ * runs without it, as before. Where the question read is bound, the commit reads an asked turn's one open question
+ * through it too (CommitDeps.askAgain; T-1505).
  */
 export function turnCommitDeps<Repo>(binding: TurnCommitBinding<Repo>): (at: CommitAt) => CommitDeps<Repo> {
-  const { paging, questions, writers, settlers, readChatHandle } = binding;
+  const { paging, questions, writers, settlers, buttonsSettlers, readChatHandle } = binding;
   const answers: WalkAnswerDeps<Repo> = {
     ...(questions === undefined ? {} : { questions }),
     ...(writers === undefined ? {} : { writers }),
     ...(settlers === undefined ? {} : { settlers }),
+    ...(buttonsSettlers === undefined ? {} : { buttonsSettlers }),
     ...(readChatHandle === undefined ? {} : { chats: walkChatsOf(readChatHandle) }),
   };
   return commitDepsWith(binding, answers, (lines, turn) => ({
@@ -813,7 +903,7 @@ export function turnCommitDeps<Repo>(binding: TurnCommitBinding<Repo>): (at: Com
  * forms, the door's lines (default 5), the flags port `flags` the door binds over its own transaction (DL-872 item 4:
  * reader, messagesReader, ids, events, by name; runCore answers notBuilt portNotWired with any one missing), the safety
  * service's T-317 and T-307 readers set to the same two (DL-877 C1), and openHolds with no business. The walk gets no
- * question read, no step writer, no settler and no chat read here (T-1468, T-1502, T-1519).
+ * question read, no step writer, no settler, no buttons settler and no chat read here (T-1468, T-1502, T-1493, T-1519).
  */
 export function keywordCommitDeps<Repo>(
   binding: KeywordCommitBinding<Repo>,
