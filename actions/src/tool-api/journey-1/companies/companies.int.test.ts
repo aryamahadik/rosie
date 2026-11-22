@@ -20,6 +20,12 @@
 // S1-09's question; read back through readPickedKinds (item 79) and readBusinessKinds (item 72), the barber company kind
 // kept as seeded. And the pick left unplaced by a walk that asked S1-04 (the path before this card) is placed by the next
 // one-kind walk, by an update at the version read, its eleven text blocks given the business in the same commit.
+//
+// T-1520 (DL-1056, DL-1076): S1-03 is bound as H1a binds it, T-633's writer inside the same instance's draft wrapper,
+// with the stop home's reads its message is ruled with (the frozen seeds' double, as kinds.int.test.ts binds them). A
+// one-kind "One isn't on the list yet" lands in one transaction with every foreign key holding: the drafted kind, its
+// company kind, the placed pick and its draft under the pick's business (new_work_drafts_pick_business_fk); read back
+// through item 79, the draft is answered beside its pick.
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -40,8 +46,9 @@ import {
   tellingWriter,
   type WalkTestRepo,
 } from "../../../commit/walk/test-support";
+import { readsOn, seedWorld } from "../../../homes/stop/test-support";
 import { kindsWriters, pgKindsReads } from "../kinds";
-import { turnWithWords } from "../kinds/test-support";
+import { PACK_HIKES, turnWithWords } from "../kinds/test-support";
 import { createPlugInWriters, PF_TEXT_KEYS } from "../plug-ins";
 import { tradesOverV1 } from "../plug-ins/test-support";
 import { companiesReadsOf, createOneKind, pgCompaniesK05Reads } from "./index";
@@ -85,12 +92,18 @@ interface Walked {
 }
 
 /**
- * Turn 2 answering "All on the list" with `words`, its turn row's id `turnId` and turn key `turnKey`, walked on T-1491's
- * test graph with the writers H1a binds over PostgreSQL's reads; with `oneKind` false, the walk before this card (S1-04
- * asked, S1-02's writer unwrapped).
+ * Turn 2 choosing `choiceId` (default c-01, "All on the list") with `words`, its turn row's id `turnId` and turn key
+ * `turnKey`, walked on T-1491's test graph with the writers H1a binds over PostgreSQL's reads; with `oneKind` false, the
+ * walk before this card (S1-04 asked, S1-02's and S1-03's writers unwrapped).
  */
-async function walked(words: string, turnId: string, turnKey: string, oneKind = true): Promise<Walked> {
-  const turn = turnWithWords("c-01", words);
+async function walked(
+  words: string,
+  turnId: string,
+  turnKey: string,
+  oneKind = true,
+  choiceId = "c-01",
+): Promise<Walked> {
+  const turn = turnWithWords(choiceId, words);
   const context: CommitTurnContext<WalkTestRepo> = {
     ...turn.context,
     turn: { ...turn.context.turn, id: turnId },
@@ -103,12 +116,16 @@ async function walked(words: string, turnId: string, turnKey: string, oneKind = 
       rows.set(stepId, got);
       return got;
     };
-  const kinds = kindsWriters<WalkTestRepo>({ reads: pgKindsReads(cdb.toolApi, cdb.runtime) });
+  const kinds = kindsWriters<WalkTestRepo>({
+    reads: pgKindsReads(cdb.toolApi, cdb.runtime),
+    stop: readsOn(seedWorld(), null),
+  });
   const plugIns = createPlugInWriters<WalkTestRepo>({ bundles: tradesOverV1().bundles });
   const placing = createOneKind<WalkTestRepo>({
     reads: companiesReadsOf(pgCompaniesK05Reads(cdb.toolApi, cdb.runtime)),
   });
   const s1_02 = oneKind ? placing.wrap(kinds["S1-02"]) : kinds["S1-02"];
+  const s1_03 = oneKind ? placing.wrapDraft(kinds["S1-03"]) : kinds["S1-03"];
   const settler: ButtonsSettler<WalkTestRepo> = async (call) => {
     const got = await placing.settler(call);
     rows.set("S1-04", got);
@@ -116,6 +133,7 @@ async function walked(words: string, turnId: string, turnKey: string, oneKind = 
   };
   const byStep: Record<string, StepWriter<WalkTestRepo>> = {
     "S1-02": plugIns.kinds(kept("S1-02", s1_02)),
+    "S1-03": kept("S1-03", s1_03),
     "S1-11": kept("S1-11", plugIns.plugIns),
     "S1-08": kept("S1-08", tellingWriter),
   };
@@ -213,6 +231,17 @@ async function picksWithKinds() {
     left join companies c on c.id = p.company_id
     where p.owner_person_id = ${SAM_PERSON}
     order by p.id
+  `;
+}
+
+/** Every draft of Sam's picks with its pick's business (new_work_drafts_pick_business_fk's two sides). */
+async function draftsWithPicks() {
+  return cdb.db.sql<Record<string, unknown>[]>`
+    select d.id, d.picked_kind_id, d.business_id, d.state, d.version, p.business_id as pick_business_id
+    from new_work_drafts d
+    join picked_kinds p on p.id = d.picked_kind_id
+    where p.owner_person_id = ${SAM_PERSON}
+    order by d.id
   `;
 }
 
@@ -387,6 +416,107 @@ describe("the one-kind commit on PostgreSQL", () => {
       const [read] = (await picksOnFile()).picks;
       expect(read).toMatchObject({ companyId: SAM_COMPANY, businessId: SAM_BUSINESS, version: 2 });
       expect(read?.texts).toHaveLength(11);
+    },
+  );
+
+  it(
+    "a one-kind 'One isn't on the list yet' lands in one transaction with every foreign key holding, its draft under the pick's business, answered by item 79 beside its pick (T-1520)",
+    SLOW,
+    async () => {
+      await fresh();
+      const { context, writes, rows } = await walked(
+        PACK_HIKES,
+        "turn-s1-02-sam-one-new",
+        "sam-one-new",
+        true,
+        "c-02",
+      );
+      expect(writes.asks.map((ask) => ask.question.step)).toEqual(["S1-09"]);
+      const [drafted] = writes.state;
+      if (drafted?.op !== "insert" || drafted.table !== "kinds")
+        throw new Error("S1-02 drafts the kind first");
+      const kindId = String(drafted.values.id);
+      // S1-03's draft as the draft wrapper hands it on: under the business its one pick was placed under.
+      const s1_03 = rows.get("S1-03");
+      expect(s1_03 === "ask" ? s1_03 : s1_03?.state).toEqual([
+        {
+          op: "insert",
+          table: "new_work_drafts",
+          values: {
+            id: "draft-s1-03-sam-one-new-1",
+            picked_kind_id: "pick-s1-02-sam-one-new-1",
+            business_id: SAM_BUSINESS,
+            state: "drafting",
+            drafted_at: context.request.now,
+          },
+        },
+      ]);
+
+      const answer = await committed(context, landable(writes));
+      expect(answer).toMatchObject({
+        result: "committed",
+        turnId: "turn-s1-02-sam-one-new",
+        repeated: false,
+      });
+      if (!("committed" in answer)) throw new Error("the commit wrote");
+      expect(answer.committed.written.slice(0, 4)).toEqual([
+        { table: "kinds", rowId: kindId, version: 1 },
+        { table: "company_kinds", rowId: `${SAM_COMPANY}/${kindId}`, version: 1 },
+        { table: "picked_kinds", rowId: "pick-s1-02-sam-one-new-1", version: 1 },
+        { table: "new_work_drafts", rowId: "draft-s1-03-sam-one-new-1", version: 1 },
+      ]);
+      expect(answer.committed.outboxRows.map((row) => row.id)).toEqual([
+        "outbox-s1-03-sam-one-new-1",
+        "outbox-s1-08-sam-one-new-1",
+        "outbox-s1-09-sam-one-new-1",
+      ]);
+
+      // Every foreign key holds: the pick's company kind and company are its business's, the draft's business its pick's.
+      expect(await picksWithKinds()).toEqual([
+        {
+          id: "pick-s1-02-sam-one-new-1",
+          kind_id: kindId,
+          company_id: SAM_COMPANY,
+          business_id: SAM_BUSINESS,
+          version: 1,
+          kind_business_id: SAM_BUSINESS,
+          company_business_id: SAM_BUSINESS,
+        },
+      ]);
+      expect(await draftsWithPicks()).toEqual([
+        {
+          id: "draft-s1-03-sam-one-new-1",
+          picked_kind_id: "pick-s1-02-sam-one-new-1",
+          business_id: SAM_BUSINESS,
+          state: "drafting",
+          version: 1,
+          pick_business_id: SAM_BUSINESS,
+        },
+      ]);
+
+      // Read back through item 79 (readPickedKinds, as rosie_job): the draft answered beside its pick, under the business.
+      const onFile = await picksOnFile();
+      expect(onFile.picks).toHaveLength(1);
+      const [read] = onFile.picks;
+      expect(read).toMatchObject({
+        id: "pick-s1-02-sam-one-new-1",
+        ownerPersonId: SAM_PERSON,
+        position: 1,
+        words: PACK_HIKES,
+        outcome: "new_work",
+        kindId,
+        companyId: SAM_COMPANY,
+        businessId: SAM_BUSINESS,
+        version: 1,
+        texts: [],
+        draft: {
+          id: "draft-s1-03-sam-one-new-1",
+          businessId: SAM_BUSINESS,
+          state: "drafting",
+          version: 1,
+          blocks: [],
+        },
+      });
     },
   );
 });
