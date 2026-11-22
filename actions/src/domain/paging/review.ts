@@ -24,9 +24,17 @@
 //      546; the security reviewer's note c on round 1): the caller's business, else the item's. A row of another business,
 //      or of none while the call has one, is refused (otherBusiness: nothing is written); with neither, nothing is
 //      checked (Rosie's team on an item about no business). The business is read with the version the write compares.
+//  30. (T-635a; K-09 README default 205, DL-1133 Fix 1; MASTER-FLOW-A line 139: "It goes live only once an owner joins
+//      with their own ID check and confirms", line 149: "Never: count the helper's yes as the owner's") A listing check's
+//      done decision takes controlProven true only when the item's summary is one of the owner's three sentences S1-76's
+//      writer writes, compared whole with the sentences the listing code exports (journey-1/listing/summary.ts), never
+//      by reading its words. On any other listing_match item (a helper's sentence, or any other summary) controlProven
+//      true is refused (writeBackNotForKind), with nothing written; controlProven false is taken as before (the item is
+//      done and nothing is written back). This narrows default 21 for a listing check alone; control (S1-75) is as before.
 
 import type { RowRef, StateWrite } from "../../commit";
 import type { ErrorsOf, RequestOf, ResponseOf } from "../../tool-api";
+import { isOwnerListingSummary } from "../../tool-api/journey-1/listing/summary";
 import { PagingRefusedError } from "./errors";
 import type { PagingPlan, PagingPorts } from "./page";
 import type { ReviewKind, StoredReviewItem } from "./ports";
@@ -178,6 +186,10 @@ function writeBackOf(item: StoredReviewItem, decision: Done, now: string): Write
       if (back?.table !== "business_setup" || subject === null) return "refused";
       if (item.subjectTable !== "business_setup" && item.subjectTable !== "businesses") return "refused";
       if (item.businessId !== null && item.businessId !== subject) return "refused";
+      // Default 30: a listing check proves control only on an owner's claim, its summary compared whole.
+      if (item.kind === "listing_match" && back.controlProven && !isOwnerListingSummary(item.summary)) {
+        return "refused";
+      }
       return {
         table: "business_setup",
         key: { business_id: subject },
