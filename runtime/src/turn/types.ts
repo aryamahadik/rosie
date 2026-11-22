@@ -461,6 +461,14 @@ export interface Composed {
 export interface ComposeFailed {
   readonly error: string;
   readonly modelCalls?: readonly ModelCall[];
+  /**
+   * For a plan the composer's reader checks alone refused (T-1535, DL-1159: compose refused at stage "plan" for the
+   * relay's quote, sensitive work, the tone or the language), what the one rewrite is given: the stage, each problem as a
+   * check and a place, and the plan refused, kept in memory only and never sent. Absent for any other failure.
+   */
+  readonly stage?: string;
+  readonly problems?: readonly { readonly check: string; readonly at: string }[];
+  readonly plan?: MessagePlan;
 }
 
 export type ComposerAnswer = Composed | ComposeFailed;

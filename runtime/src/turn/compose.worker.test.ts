@@ -21,16 +21,29 @@ import planConfirmationA614 from "../../../contracts/message-plan/fixtures/plan-
 import planEmailCopy from "../../../contracts/message-plan/fixtures/plan-email-copy.json";
 import planS102 from "../../../contracts/message-plan/fixtures/plan-s1-02.json";
 import decideS102 from "../../../contracts/model/fixtures/decide-s1-02-choose.json";
+import bundleV0 from "../../../contracts/bundle/fixtures/bundle-v0-skeleton.json";
+import { createPromptCache, type CacheBundle } from "@rosie/ai/src/cache/index";
+import { createComposer } from "@rosie/ai/src/composer/compose";
+import {
+  COMPOSER_PROMPT,
+  composeInputText,
+  type ComposeInput as AiComposeInput,
+  type MessagePlan as AiMessagePlan,
+} from "@rosie/ai/src/composer/prompt";
+import { fakeTurnApi, userOf } from "@rosie/ai/src/composer/rewrite/test-support";
+import { rewriteTurnText } from "@rosie/ai/src/composer/rewrite/turn";
 import {
   PLACES_JOINER as AI_PLACES_JOINER,
   READER_CHECKS as AI_READER_CHECKS,
 } from "@rosie/ai/src/composer/rewrite/types";
+import { HAIKU_MODEL, KEY_VARIABLE, type GatewayBundle } from "@rosie/ai/src/gateway/index";
 import { BUNDLE_A, WHOLE_A } from "../bundle/test-support";
 import { fakeKeyStore } from "../gateway/test-support";
 import { setGuardDeps, setReplyDeps } from "../guard";
 import { fakeCore as fakeReplyCore, phone } from "../guard/replies/test-support";
 import { fakeTargets } from "../guard/test-support";
 import { openTrace, spanProblems, type Span } from "../trace";
+import { realComposer } from "../wiring/real";
 import { PLACES_JOINER, READER_CHECKS } from "./compose";
 import {
   composeCommitted,
@@ -81,6 +94,22 @@ import type {
 
 const keys = fakeKeyStore();
 const restores: (() => void)[] = [];
+
+/**
+ * K-01's bundle v0 (bundle A: the bundle the second half's trace pins), as @rosie/ai's composer is built on it: its id
+ * and two model ids, and its prompt layout with T-372's composer prompt packed in, as the compiler packs it (C-072).
+ */
+const V0_BUNDLE = bundleV0 as unknown as CacheBundle & {
+  readonly manifest: CacheBundle["manifest"] & { readonly models: GatewayBundle["models"] };
+};
+const V0_PROMPTS = createPromptCache({
+  manifest: {
+    bundleId: V0_BUNDLE.manifest.bundleId,
+    prompts: { ...V0_BUNDLE.manifest.prompts, composer: COMPOSER_PROMPT },
+    partial: true,
+  },
+  flows: V0_BUNDLE.flows,
+});
 
 afterEach(() => {
   while (restores.length > 0) restores.pop()?.();
@@ -582,7 +611,8 @@ describe("a plan the composer's own reader checks refused gets the one rewrite, 
   /**
    * A refused compose as the composer port answers it: the first refusing check as its label, with @rosie/ai's refusal
    * (its stage, its problems as checks and places and, for the reader checks alone, the plan it refused) and its model
-   * calls. Recorded answers only: no model is called.
+   * calls. Recorded answers only: no model is called. Some cases give a malformed problem or plan on purpose, so the
+   * answer is built untyped and the turn's own reading of it is what is tested.
    */
   const refused = (stage: string, problems: unknown[], plan?: unknown): ComposerAnswer =>
     ({
@@ -591,7 +621,7 @@ describe("a plan the composer's own reader checks refused gets the one rewrite, 
       problems,
       ...(plan === undefined ? {} : { plan: structuredClone(plan) }),
       modelCalls: [...ONE_COMPOSE],
-    }) as ComposerAnswer;
+    }) as unknown as ComposerAnswer;
 
   function gentleRow(input: ComposeInput = GENTLE_INPUT): Second {
     const s = secondHalf({ caller: S1_01_CALLER, handleId: "handle-sam", outboxRows: [S1_02_ROW] });
@@ -820,6 +850,127 @@ describe("a plan the composer's own reader checks refused gets the one rewrite, 
       finalizeCalls: 1,
     });
     expect(s.spans.map((span) => span.hop)).toEqual(["compose", "fillAndChecks"]);
+  });
+
+  describe("end to end through the staging wiring's composer port (DL-1159): ../wiring/real.ts realComposer over @rosie/ai's composer, its checks and its rewrite, the model answers recorded", () => {
+    /** What the one rewrite is told for HI_PLAN on the gentle row: the tone check and its one place. */
+    const TOLD = [{ check: "tone" as const, detail: "lines[0].text" }];
+    const COMPOSE_TURN = composeInputText(GENTLE_INPUT as unknown as AiComposeInput);
+    const REWRITE_TURN = rewriteTurnText(
+      GENTLE_INPUT as unknown as AiComposeInput,
+      HI_PLAN as unknown as AiMessagePlan,
+      TOLD,
+    );
+
+    /**
+     * The gentle row's second half with the turn's composer calls going through the staging port to @rosie/ai's real
+     * composer on bundle v0 (the bundle the turn's trace pins), over a fake Messages API that answers the compose call
+     * with the recorded `composed` plan and the rewrite call with the recorded `rewritten` plan, each only for exactly the
+     * user message that call must send; any other request fails its attempt. No model is called.
+     */
+    function wiredGentleRow(composed: unknown, rewritten: unknown) {
+      const api = fakeTurnApi((turn) => {
+        if (turn === COMPOSE_TURN) return structuredClone(composed);
+        if (turn === REWRITE_TURN) return structuredClone(rewritten);
+        throw new Error("no recorded answer for this request");
+      });
+      const composer = createComposer({
+        bundle: { bundleId: V0_BUNDLE.manifest.bundleId, models: V0_BUNDLE.manifest.models },
+        prompts: V0_PROMPTS,
+        env: { [KEY_VARIABLE]: `made-up-${crypto.randomUUID()}` },
+        fetch: api.fetch,
+      });
+      const port = realComposer({ composers: () => composer });
+      const portSpans: Span[] = [];
+      const portTrace = openTrace({
+        openedBy: "textWebhook",
+        bundleId: BUNDLE_A,
+        sink: (span) => portSpans.push(span),
+      });
+      portTrace.setTurn(S1_01_CALLER.turnId);
+      const s = gentleRow();
+      s.reply.composer.compose = (input) => port.compose(input, portTrace);
+      s.reply.composer.rewrite = (request) => port.rewrite(request, portTrace);
+      return { s, api, portSpans };
+    }
+
+    it("the composer's recorded answer keeps S1-02's 'Hi!' (refused: tone at lines[0].text) and the recorded rewrite drops it: the refused plan reaches the turn, the one rewrite is told only tone at that place, its plan is finalized with attempt rewrite and sent once, composerCalls 2; no plan with '!' reaches finalize, and no span holds a plan's word", async () => {
+      const { s, api, portSpans } = wiredGentleRow(HI_PLAN, GENTLE_PLAN);
+
+      const report = await s.run();
+
+      // Two model calls, both Haiku: the compose call, then the one rewrite, each sent exactly its recorded message.
+      expect(api.calls.map((call) => [call.model, call.status])).toEqual([
+        [HAIKU_MODEL, 200],
+        [HAIKU_MODEL, 200],
+      ]);
+      expect(api.calls.map((call) => userOf(call))).toEqual([COMPOSE_TURN, REWRITE_TURN]);
+      expect(s.reply.composer.rewriteCalls).toEqual([
+        { input: GENTLE_INPUT, plan: HI_PLAN, failed: [{ check: "tone", detail: "lines[0].text" }] },
+      ]);
+      expect(s.face.finalizeCalls).toEqual([
+        {
+          caller: S1_01_CALLER,
+          outboxRowId: S1_02_ROW,
+          expectVersion: 1,
+          attempt: "rewrite",
+          plan: { row: S1_02_ROW, channel: "imessage", copyOf: null, plan: GENTLE_PLAN },
+        },
+      ]);
+      expect(JSON.stringify(s.face.finalizeCalls)).not.toContain("!");
+      expect(report.rows).toEqual([
+        expect.objectContaining({
+          outboxRowId: S1_02_ROW,
+          result: "send",
+          composerCalls: 2,
+          rewrite: true,
+          finalizeCalls: 1,
+          errorCode: null,
+        }),
+      ]);
+      expect(report.rows[0]?.finalParts?.sends).toHaveLength(1);
+      expect(JSON.stringify(report.rows[0]?.finalParts)).not.toContain("!");
+      expect(s.reply.dispatcher.wakes).toEqual([
+        { turnId: S1_01_CALLER.turnId, handleId: "handle-sam", outboxRowIds: [S1_02_ROW] },
+      ]);
+
+      // The turn's spans carry the real model calls' labels; the AI gateway's portCall spans, one per call, likewise.
+      const [compose, rewrite] = s.spans;
+      expect(s.spans.map((span) => span.hop)).toEqual(["compose", "rewriteOrFallback"]);
+      for (const span of s.spans) expect(spanProblems(span)).toEqual([]);
+      expect(compose).toMatchObject({ outcome: "refused", error_code: "tone" });
+      expect(compose?.model_calls?.map((call) => [call.purpose, call.outcome])).toEqual([["compose", "ok"]]);
+      expect(rewrite).toMatchObject({ outcome: "ok" });
+      expect(rewrite?.model_calls?.map((call) => [call.purpose, call.outcome])).toEqual([["rewrite", "ok"]]);
+      expect(rewrite?.got).toMatchObject({ attempt: "rewrite", told: ["tone"], planned: true, calls: 1 });
+      expect(portSpans.map((span) => [span.hop, span.provider, span.outcome])).toEqual([
+        ["portCall", "anthropic", "ok"],
+        ["portCall", "anthropic", "ok"],
+      ]);
+      const logged = JSON.stringify([...s.spans, ...portSpans]);
+      for (const words of ["Hi!", "Hi,", "automated assistant", "What kinds of work", "lines[0]", "JOIN"])
+        expect(logged).not.toContain(words);
+    });
+
+    it("a recorded rewrite that keeps the '!' is refused by the composer's own check ('use the fallback'): the row ends left with nothing sent, composerCalls 2, no finalize", async () => {
+      const { s, api } = wiredGentleRow(HI_PLAN, HI_PLAN);
+
+      const report = await s.run();
+
+      expect(api.calls.map((call) => userOf(call))).toEqual([COMPOSE_TURN, REWRITE_TURN]);
+      expect(s.face.finalizeCalls).toEqual([]);
+      expect(s.reply.rows.writes).toEqual([]);
+      expect(report.rows).toEqual([
+        expect.objectContaining({
+          result: "left",
+          composerCalls: 2,
+          rewrite: true,
+          finalizeCalls: 0,
+          finalParts: null,
+          errorCode: "useFallback",
+        }),
+      ]);
+    });
   });
 });
 
