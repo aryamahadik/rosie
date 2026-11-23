@@ -25,7 +25,9 @@
 //
 // Accessible (RULES 4.11, 01-inventory C-185: WCAG 2.1 AA): each page has its heading, each control its label, a problem
 // is announced (an alert, and a title starting "Error:"), and every page is a form or a link with no script, so it works
-// by keyboard alone. There is no CAPTCHA. No source gives these pages' words; they are plain stand-ins (D4 of the S1-10
+// by keyboard alone. The read-back is the review and the yes the confirmation before anything is saved (WCAG 3.3.4). The
+// read-back's end time is the server's (K-21 README default 6: 10 minutes); the page says it up front, and after it the
+// way back answers again for a fresh read-back. There is no CAPTCHA. No source gives these pages' words; they are plain stand-ins (D4 of the S1-10
 // ruling, DL-1125: Jay decides a page's wording).
 
 import { startHref } from "../../auth/pages";
