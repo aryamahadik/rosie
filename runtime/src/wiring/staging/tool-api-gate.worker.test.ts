@@ -95,6 +95,20 @@
 //     owner's company and business, plumber's and electrician's company kinds beside barber's, the barbershop's 11
 //     blocks given the business, S1-08's row and S1-09's question and its row; every call on its side, one after another,
 //     2 connections at most.
+//   - T-1540 (S1-09 design card 8 extended to S1-10; DL-1179), S1-09's, S1-76's and S1-10's ports the gate binds beside
+//     the kinds, stop and one-kind reads (`listing`: GateListingReads' five members; LINK_HOST and BASE_PATH read at each
+//     gate call, never as the root is built), in the roster-owner world: the seed's third and fourth roster owners, each
+//     with its phone row as the gateway's receipt leaves it and S1-09's question live at its business under bundle v3.
+//     The third answers with the demo listing ("Lee's Barbershop in Springfield, I'm the owner") through realGate over
+//     staging's gate reads, the root's turn-row port, one HeldLinks and the gate's clock: one commit, S1-09's question
+//     answered, the typed name written, the read-back row (S1-09, line 1), an accounts row (the chat's number), one
+//     page_links row holding the code's sha256 alone, S1-10's row (line 2), no question and no clock (the walk waits),
+//     and the HeldLinks holding https://rosfield.com/test/<32 hex> for S1-10's row. The fourth answers with a made-up
+//     name and town: S1-76's row and one listing_match review item (Claim: owner. Reason: no listing.) through the
+//     listing paging reader, then S1-10's rows. Every call on its side, one after another, 2 connections at most; no line
+//     holds the words, a number, a link or a code. Then the listing paging reader inside a held scope: the review item
+//     only under its own business, the head's version and zone of the scope's business alone, another business's refused
+//     or none with no client opened. T-1494's "Plumbing" walk and T-1485's walks run unchanged with the ports bound.
 // Test values only (rule 9): the master's sample cast, the fixtures' ids and words, whole fiction-range 555-01xx numbers,
 // made-up ids, and the seed's made-up wrapping key.
 import { KEYED_SAFETY_IDS } from "@rosie/actions/src/domain/safety/ids";
@@ -106,7 +120,9 @@ import {
 } from "@rosie/actions/src/tool-api/journey-1/companies/errors";
 import type { CompaniesReads } from "@rosie/actions/src/tool-api/journey-1/companies/reads";
 import { KindsReadError } from "@rosie/actions/src/tool-api/journey-1/kinds/errors";
+import { listingSummaryOf } from "@rosie/actions/src/tool-api/journey-1/listing/summary";
 import { TurnFaceReadError, TurnFaceRefusedError } from "@rosie/actions/src/tool-api/turn-face/errors";
+import { HeldLinks } from "@rosie/actions/src/tool-api/turn-face/held";
 import businessOwnerPhoneFirst from "@rosie/contracts/data-access/fixtures/business-owner-phone-first.json";
 import businessZoneBarbershop from "@rosie/contracts/data-access/fixtures/business-zone-barbershop.json";
 import readOpenHoldsOtherBusiness from "@rosie/contracts/data-access/fixtures/read-open-holds-other-business.json";
@@ -130,6 +146,8 @@ import bundleV2Manifest from "../../../../bundles/v2/bundle/manifest.json";
 import barberV2 from "../../../../bundles/v2/bundle/trade/barber.json";
 import electricianV2 from "../../../../bundles/v2/bundle/trade/electrician.json";
 import plumberV2 from "../../../../bundles/v2/bundle/trade/plumber.json";
+import bundleV3FlowA from "../../../../bundles/v3/bundle/flow/A.json";
+import bundleV3Manifest from "../../../../bundles/v3/bundle/manifest.json";
 import type { HandleActor } from "../../actor";
 import { turnIdOf } from "../../actor/lease";
 import {
@@ -153,6 +171,7 @@ import { bundleOf, V0_FLOW_A, withoutWords, type SeedBundle } from "./bundle-saf
 import { CONNECTIONS_PER_CLIENT, DB_SIDES, dbHandle } from "./db";
 import { NO_RECEIPT_INPUTS } from "./k05-receipt";
 import { NO_TURN_CALL_INPUTS } from "./k05-turn";
+import { ListingPagingScopeError } from "./listing-paging";
 import { NO_MODEL_READER_INPUTS } from "./models";
 import { NO_STAGING_INPUTS, stagingOptions, type StagingBuilders, type StagingInputs } from "./options";
 import { stagingDb, type StagingDb, type StagingEnv } from "./part";
@@ -165,7 +184,10 @@ import {
   ASKED,
   BARBERSHOP,
   BUNDLE_V2_ID,
+  BUNDLE_V3_ID,
   CATALOG,
+  LISTING_OWNER,
+  MADE_UP_OWNER,
   MULTI_KIND,
   NO_KEY,
   NO_WRAP_KEY,
@@ -314,6 +336,8 @@ function envOf(options: EnvOptions = {}): TestEnv {
   const values: Record<string, unknown> = {
     ENVIRONMENT: options.environment ?? "staging",
     BASE_PATH: "/test",
+    // T-1540: staging's link host (wrangler.jsonc vars), which the listing ports read at each gate call, never as built.
+    LINK_HOST: "rosfield.com",
     DB_SCHEMA: "",
     GIT_SHA: "test-sha",
     ...(options.wrapKey === false ? {} : { [WRAP_KEY_NAME]: TEST_WRAP_KEY }),
@@ -871,6 +895,9 @@ const NUMBER_FORMS = [
   NO_KEY,
   ONE_KIND,
   MULTI_KIND,
+  // T-1540: the two S1-09 owners.
+  LISTING_OWNER,
+  MADE_UP_OWNER,
 ].flatMap(({ number }) => [number, number.slice(1), number.slice(2)]);
 
 /** The words a text, a read or a seal holds here, and the fixed lines' words bundle v0 holds. */
@@ -887,8 +914,17 @@ const WORDS = [
   "They all share one company",
   "Plumbing and electrical share Lee Home Services",
   "Lee Home Services",
+  // T-1540: the S1-09 owners' texts, and the names and towns they give.
+  "Lee's Barbershop in Springfield, I'm the owner",
+  "Springfield",
+  "Maple Corner Cuts, Riverton",
+  "Maple Corner Cuts",
+  "Riverton",
   ...["safetyAsk", "safetyEmergency", "safetyCrisis", "outage"].map((id) => bundleV0FixedLine(id)),
 ];
+
+/** (T-1540) The secure links' codes S1-10's writer minted in this file's tests: none may reach a line. */
+const LINK_CODES: string[] = [];
 
 /** The sealed values read back in this file's tests, as base64 and hex: none may reach a line. */
 const SEALED: string[] = [];
@@ -909,6 +945,11 @@ function expectNoSecrets(texts: readonly string[]): void {
     // T-1485: the roster owners' chat ids too.
     ONE_KIND.chatId,
     MULTI_KIND.chatId,
+    // T-1540: the S1-09 owners' chat ids, a secure link's start, and every code S1-10's writer minted.
+    LISTING_OWNER.chatId,
+    MADE_UP_OWNER.chatId,
+    "https://rosfield.com/test/",
+    ...LINK_CODES,
     ...SEALED,
   ];
   for (const text of texts) {
@@ -943,6 +984,9 @@ describe("this file's database: the walking skeleton's rows, the made-up key's r
       ONE_KIND.personId,
       // T-1485: the second roster owner's, made the same way.
       MULTI_KIND.personId,
+      // T-1540: the two S1-09 owners', made the same way.
+      LISTING_OWNER.personId,
+      MADE_UP_OWNER.personId,
     ];
     expect(stored.keys).toEqual(
       keyed.sort().map((personId) => ({ person_id: personId, wrapping_key_name: WRAP_KEY_NAME })),
@@ -998,6 +1042,7 @@ describe("built on staging: the six pieces, and nothing read but the environment
       "companies",
       "keywordDoor",
       "kinds",
+      "listing",
       "questions",
       "readChatHandle",
       "readOpenHolds",
@@ -1007,6 +1052,26 @@ describe("built on staging: the six pieces, and nothing read but the environment
       "stop",
       "words",
     ]);
+    // T-1540: S1-09's, S1-76's and S1-10's ports, GateListingReads' five members exactly; LINK_HOST and BASE_PATH are
+    // read at each gate call, never as the root is built (the names read above).
+    expect(Object.keys(reads?.listing ?? {}).sort()).toEqual([
+      "linkPlace",
+      "mobileId",
+      "paging",
+      "places",
+      "reads",
+    ]);
+    expect(Object.keys(reads?.listing?.reads ?? {}).sort()).toEqual([
+      "businessHead",
+      "setupOnFile",
+      "turnCompany",
+    ]);
+    expect(Object.keys(reads?.listing?.mobileId ?? {}).sort()).toEqual([
+      "account",
+      "turnCompany",
+      "turnHandle",
+    ]);
+    expect(Object.keys(reads?.listing?.paging ?? {})).toEqual(["reader"]);
     // T-1494: the one-kind path's reads (item 79, item 72 and the catalog by id), CompaniesReads' four members exactly.
     expect(Object.keys(reads?.companies ?? {}).sort()).toEqual([
       "businessKinds",
@@ -1044,6 +1109,7 @@ describe("built on staging: the six pieces, and nothing read but the environment
       "companies",
       "keywordDoor",
       "kinds",
+      "listing",
       "questions",
       "readChatHandle",
       "readOpenHolds",
@@ -1092,12 +1158,13 @@ describe("built on staging: the six pieces, and nothing read but the environment
     if (gate === null) throw new Error("the gate is bound with both bindings");
     expect(gate.words?.fixedLine("safetyAsk")).toEqual({ id: "safetyAsk", text: "t1398 stand-in words" });
     expect(gate.words?.fixedLine("safetyCrisis")).toBeNull();
-    // Nothing else of its input but the six pieces, T-1470's two, T-1516's stop reads, T-1519's chat read and T-1494's
-    // one-kind reads.
+    // Nothing else of its input but the six pieces, T-1470's two, T-1516's stop reads, T-1519's chat read, T-1494's
+    // one-kind reads and T-1540's listing ports.
     expect(Object.keys(gate).sort()).toEqual([
       "companies",
       "keywordDoor",
       "kinds",
+      "listing",
       "questions",
       "readChatHandle",
       "readOpenHolds",
@@ -3500,6 +3567,568 @@ describe("an answer to an S1-04 that was asked, on staging's gate with S1-04's w
       );
     },
   );
+});
+
+// ---- S1-09, S1-76 and S1-10 (T-1540) --------------------------------------------------------------------------------
+//
+// An owner's answer to S1-09 on staging's gate, with staging's listing ports bound (T-1540; DL-1179), in the roster-owner
+// world: the seed's third roster owner answers its live S1-09 question with the demo listing, its fourth with a made-up
+// name and town, each on bundle v3 through realGate over staging's gate reads, the root's turn-row port, one HeldLinks
+// (the root's, as realPorts makes it for staging's shape) and the gate's clock. Then the listing paging reader's three
+// reads, inside a held scope, under the turn's business alone.
+
+/** Bundle v3 as a run pinned it, from bundles/v3's own files (T-1526): its manifest and flow A; no trade is read here. */
+function pinnedV3(): { readonly bundle: PinnedBundle; readonly asked: string[] } {
+  const asked: string[] = [];
+  const bundle: PinnedBundle = {
+    bundleId: { ...BUNDLE_V3_ID },
+    manifest: structuredClone(bundleV3Manifest) as unknown as Manifest,
+    flow: (flow) =>
+      flow === "A"
+        ? Promise.resolve(structuredClone(bundleV3FlowA) as Readonly<Record<string, unknown>>)
+        : Promise.reject(new BundleError("notInBundle")),
+    trade(tradeId) {
+      asked.push(tradeId);
+      return Promise.reject(new BundleError("notInBundle"));
+    },
+    reads: () => [],
+  };
+  return { bundle, asked };
+}
+
+/** S1-09 as bundle v3 compiles it: its question's line (say[0]) and its card's Means lines, in the card's order. */
+const S1_09_V3 = ((): {
+  readonly say: readonly { readonly text: string }[];
+  readonly card: { readonly means: readonly { readonly branch: string; readonly text: string }[] };
+} => {
+  const { steps } = bundleV3FlowA as unknown as {
+    readonly steps: Partial<
+      Record<
+        string,
+        {
+          readonly say: readonly { readonly text: string }[];
+          readonly card: { readonly means: readonly { readonly branch: string; readonly text: string }[] };
+        }
+      >
+    >;
+  };
+  const step = steps["S1-09"];
+  if (step === undefined) throw new Error("bundle v3's flow A holds S1-09");
+  return step;
+})();
+
+/** An S1-09 owner of the seed's (LISTING_OWNER, MADE_UP_OWNER): its ids, number, chat and live S1-09 question. */
+type S1_09Owner = typeof LISTING_OWNER | typeof MADE_UP_OWNER;
+
+/** The S1-09 owners' texts and the moments of their turns: after S1-09's question went out (the seed's sentAt). */
+const S1_09_TEXTS = {
+  listing: { eventId: "evt-t1540-listing", sentAt: "2026-10-19T18:09:00Z", now: "2026-10-19T18:09:06Z" },
+  madeUp: { eventId: "evt-t1540-made-up", sentAt: "2026-10-19T18:09:00Z", now: "2026-10-19T18:09:06Z" },
+} as const;
+
+/** The gate's clock on those turns (GateInputs.now): S1-10's link is issued at its second and lapses 7 days on. */
+const S1_09_GATE_NOW = Date.parse("2026-10-19T18:09:06Z");
+
+/** The owners' words: the ruling's demo listing (K-09 README default 208), and a made-up name and town no listing holds. */
+const DEMO_LISTING_WORDS = "Lee's Barbershop in Springfield, I'm the owner";
+const MADE_UP_LISTING_WORDS = "Maple Corner Cuts, Riverton";
+
+/** S1-09's branch an owner's claim names (bundle v3's label, word for word): the frontier's first option, c-01. */
+const OWNER_MATCHES = "An owner; the listing matches";
+
+/** commit-s1-04.json's request, as this file changes it into an answer to S1-09. */
+type S1_09Request = Json & {
+  turn: Json;
+  now: string;
+  input: {
+    decided: {
+      context: Json & {
+        bundleId: unknown;
+        writer: { people: unknown[] };
+        texts: { words: string; sentAt: { utc: string } }[];
+        openQuestions: { step: string; target: Json; sentAt: { utc: string } }[];
+        choices: Json[];
+        recentMessages: { words: string; sentAt: { utc: string } }[];
+      };
+      decide: Json & { bundleId: unknown; stakes: string; reads: Json[]; parts: Json[] };
+    };
+  };
+};
+
+/**
+ * S1-09's three options for `owner`'s question as staging's frontier offers them to decide (K-09 README default 200;
+ * frontier open-questions.ts cardChoices over bundle v3's S1-09): one per branch in the card's order, its label the
+ * branch word for word and its definition the branch's Means line, each listing `business` (id), low (bundle v3 holds no
+ * step after S1-10, so no walk names a stake), ids c-01 to c-03 in that order.
+ */
+function s1_09Choices(owner: S1_09Owner, target: Json): Json[] {
+  return S1_09_V3.card.means.map((means, index) => ({
+    question: owner.questionId,
+    branch: means.branch,
+    anytimeRow: null,
+    door: null,
+    hub: null,
+    fields: [{ name: "business", type: "id" }],
+    stakes: "low",
+    stakesFrom: [],
+    choiceId: `c-0${String(index + 1)}`,
+    kind: "option",
+    label: means.branch,
+    definition: means.text,
+    step: "S1-09",
+    target: structuredClone(target),
+  }));
+}
+
+/** A trace of its own under bundle v3, set to the turn, its spans kept. */
+function tracedOnV3(turnId: string): TraceContext {
+  const trace = openTrace({
+    openedBy: "textWebhook",
+    bundleId: { ...BUNDLE_V3_ID },
+    sink: (span) => SPANS.push(span),
+  });
+  trace.setTurn(turnId);
+  return trace;
+}
+
+/**
+ * An S1-09 owner's answer to its live S1-09 question: commit-s1-04.json's request (as T-1537's PostgreSQL proof sends
+ * it) under the turn id the lease hashes from `said`'s one event id, on a trace of its own, the turn, its context and
+ * decide's result pinned to bundle v3; every id of the fixture's roster owner swapped for this owner's, its question
+ * S1-09's (the context's open question at S1-09, sent when the seed sent it, its options S1-09's three); its one part
+ * choosing c-01 ("An owner; the listing matches") with `words` as the text, the part's quote and its `business` field's
+ * words and value (default 200), in decide's agreed parts and both reads; its writer the owner as the frontier names a
+ * person with no name and no role; and the moments after the question went out.
+ */
+async function s1_09Gate(
+  owner: S1_09Owner,
+  said: { readonly eventId: string; readonly sentAt: string; readonly now: string },
+  words: string,
+): Promise<GateCall> {
+  const { request: base, names } = S1_04_FIXTURES.allShareOne;
+  const turnId = await turnIdOf([said.eventId]);
+  const trace = tracedOnV3(turnId);
+  const request = renamed(
+    structuredClone(base),
+    new Map<string, string>([
+      [names.business, owner.businessId],
+      [names.person, owner.personId],
+      [names.handle, owner.handleId],
+      [names.number, owner.number],
+      [names.chat, owner.chatId],
+      [names.turn, turnId],
+      [names.trace, trace.traceId],
+      [names.event, said.eventId],
+      [names.question, owner.questionId],
+    ]),
+  ) as S1_09Request;
+  const { context, decide } = request.input.decided;
+  const [text] = context.texts;
+  const [asked] = context.openQuestions;
+  const [question] = S1_09_V3.say;
+  if (text === undefined || asked === undefined || question === undefined) {
+    throw new Error("commit-s1-04.json's context holds the owner's text and its open question");
+  }
+  text.words = words;
+  text.sentAt.utc = said.sentAt;
+  asked.step = "S1-09";
+  asked.sentAt.utc = owner.sentAt;
+  context.choices = s1_09Choices(owner, asked.target);
+  for (const message of context.recentMessages) {
+    message.words = question.text;
+    message.sentAt.utc = owner.sentAt;
+  }
+  context.writer.people = [{ personId: owner.personId, name: "", roles: [], language: null }];
+  request.turn.bundleId = { ...BUNDLE_V3_ID };
+  context.bundleId = { ...BUNDLE_V3_ID };
+  decide.bundleId = { ...BUNDLE_V3_ID };
+  const chosen = context.choices.find((choice) => choice.branch === OWNER_MATCHES);
+  if (chosen?.choiceId !== "c-01") throw new Error("the frontier's first S1-09 option is the owner's claim");
+  const part = {
+    verb: "choose",
+    quote: words,
+    question: owner.questionId,
+    choice: chosen.choiceId,
+    fields: [{ name: "business", value: words, words }],
+  };
+  decide.stakes = "low";
+  decide.reads = decide.reads.map((read) => ({
+    ...read,
+    output: { language: "en", parts: [structuredClone(part)] },
+  }));
+  decide.parts = [{ part: structuredClone(part), outcome: "go" }];
+  request.now = said.now;
+  return { request, turnId, trace };
+}
+
+/**
+ * One gateAndCommit through realGate over staging's gate reads (with the listing ports), the root's turn-row port and
+ * bundle port, the run's pinned bundle v3, `links` as the root's one HeldLinks and the gate's clock.
+ */
+function listingGate(
+  rooted: Rooted,
+  reads: GateReads,
+  call: GateCall,
+  pinned: PinnedBundle,
+  links: HeldLinks,
+): Promise<unknown> {
+  return realGate({
+    reads,
+    commitTurn: (request) => rooted.root.ports.turnRow.commitTurn(request),
+    bundles: () => rooted.root.ports.bundles,
+    pinnedOf: (trace) => (trace === call.trace ? pinned : null),
+    links,
+    now: () => S1_09_GATE_NOW,
+  }).gateAndCommit(call.request as never, NOTHING_OPEN, call.trace);
+}
+
+/** What an S1-09 owner's turn `turnId` left, as the runtime side reads it with no scope. */
+function s1_09Rows(owner: S1_09Owner, turnId: string): Promise<Json> {
+  return own.runtime("s1_09Rows", async (sql) => ({
+    question: plainRows(
+      await sql<Json[]>`select step, status from open_questions where id = ${owner.questionId}`,
+    ),
+    asked: plainRows(await sql<Json[]>`select id from open_questions where turn_id = ${turnId}`),
+    head: plainRows(
+      await sql<
+        Json[]
+      >`select name, display_name, status, version from businesses where id = ${owner.businessId}`,
+    ),
+    setup: plainRows(
+      await sql<
+        Json[]
+      >`select business_id, version from business_setup where business_id = ${owner.businessId}`,
+    ),
+    outbox: plainRows(
+      await sql<Json[]>`
+      select id, step, line_no, open_question_id, send_class, recipient_handle_id, recipient_person_id, business_id,
+             bundle_hash, bundle_build, plan
+      from outbox_rows where turn_id = ${turnId} order by commit_seq
+    `,
+    ),
+    accounts: plainRows(
+      await sql<Json[]>`
+      select person_id, mobile, mobile_proven_at, email, email_proven_at from accounts where person_id = ${owner.personId}
+    `,
+    ),
+    links: plainRows(
+      await sql<Json[]>`
+      select id, business_id, person_id, purpose, step_id, code_sha256, sent_to_handle_id, issued_at, expires_at, ended_at
+      from page_links where person_id = ${owner.personId}
+    `,
+    ),
+    reviewItems: plainRows(
+      await sql<Json[]>`
+      select id, kind, business_id, subject_table, subject_row_id, turn_id, raised_by_person_id, summary, state
+      from review_items where business_id = ${owner.businessId}
+    `,
+    ),
+  }));
+}
+
+/** An S1-09 owner's business head's version, as the runtime side reads it with no scope. */
+async function headVersionOf(owner: S1_09Owner): Promise<number> {
+  const [head] = await own.runtime(
+    "headVersion",
+    (sql) => sql<{ version: number }[]>`select version from businesses where id = ${owner.businessId}`,
+  );
+  if (head === undefined) throw new Error("the roster-owner set wrote the owner's business head");
+  return head.version;
+}
+
+/** The plain sha256 of a code, as S1-10's page_links row holds it. */
+async function sha256Of(text: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+/** The calls readStop makes for the turn's own owner, each on the runtime side, in its order (T-1516). */
+const STOP_CALLS: readonly CallOn[] = [
+  onJob(GATE_CALLS.stopHandle),
+  onJob(GATE_CALLS.stopHandleIdsOfPerson),
+  onJob(GATE_CALLS.stopPhoneOfHandle),
+  onJob(GATE_CALLS.stopPersonIdsOfHandle),
+  onJob(GATE_CALLS.stopConsentsOfPersons),
+];
+
+describe("an owner's answer to S1-09 on staging's gate with the listing ports bound, on bundle v3: S1-09's rows and S1-10's, and the walk waits (T-1540)", () => {
+  it(
+    "the demo listing ('Lee's Barbershop in Springfield, I'm the owner'), through realGate over staging's gate reads, commits once: S1-09's question answered, the typed name written, the read-back row, an accounts row, one page_links row holding the code's sha256 alone, S1-10's row, no question and no clock; the root's HeldLinks holds https://rosfield.com/test/<32 hex> for S1-10's row; every call one after another, 2 connections at most",
+    { timeout: TEST_MS },
+    async () => {
+      const before = await rowCounts();
+      const { rooted, reads } = stagingGateOver(envOf());
+      const owner = LISTING_OWNER;
+      const call = await s1_09Gate(owner, S1_09_TEXTS.listing, DEMO_LISTING_WORDS);
+      const pinned = pinnedV3();
+      const links = new HeldLinks();
+      const key = call.turnId;
+      const headVersion = await headVersionOf(owner);
+
+      const answer = await listingGate(rooted, reads, call, pinned.bundle, links);
+
+      expect(answer, JSON.stringify(answer)).toMatchObject({
+        result: "committed",
+        turnId: key,
+        repeated: false,
+        openQuestions: { opened: [], closed: [owner.questionId] },
+      });
+      const rows = await s1_09Rows(owner, key);
+      expect(rows.question).toEqual([{ step: "S1-09", status: "answered" }]);
+      // The walk waits at S1-10 (K-09 README default 209): no question opened, and no clock (the counts below).
+      expect(rows.asked).toEqual([]);
+      // The owner's typed name, as typed, on both names, at the version read; S1-09 writes no status (the seeded head's
+      // own stands: open gap 188).
+      expect(rows.head).toEqual([
+        {
+          name: "Lee's Barbershop",
+          display_name: "Lee's Barbershop",
+          status: expect.any(String) as unknown,
+          version: headVersion + 1,
+        },
+      ]);
+      expect(rows.setup).toEqual([{ business_id: owner.businessId, version: 1 }]);
+      // The read-back (S1-09, line 1), then S1-10's text (line 2), each to the owner, no question and no plan yet.
+      const toOwner = (id: string, step: string, line: number): Json => ({
+        id,
+        step,
+        line_no: line,
+        open_question_id: null,
+        send_class: "quick_reply",
+        recipient_handle_id: owner.handleId,
+        recipient_person_id: owner.personId,
+        business_id: owner.businessId,
+        bundle_hash: BUNDLE_V3_ID.hash,
+        bundle_build: BUNDLE_V3_ID.build,
+        plan: null,
+      });
+      expect(rows.outbox).toEqual([
+        toOwner(`outbox-s1-09-${key}-1`, "S1-09", 1),
+        toOwner(`outbox-s1-10-${key}-1`, "S1-10", 2),
+      ]);
+      // The chat's own number as the mobile, proven by the owner's text (default 210); no email.
+      expect(rows.accounts).toEqual([
+        {
+          person_id: owner.personId,
+          mobile: owner.number,
+          mobile_proven_at: new Date(S1_09_TEXTS.listing.sentAt),
+          email: null,
+          email_proven_at: null,
+        },
+      ]);
+      // The secure link (default 211): staged by S1-10's writer, kept by the gate face for the fresh commit's own row.
+      const link = links.of(`outbox-s1-10-${key}-1`) ?? "";
+      expect(link).toMatch(/^https:\/\/rosfield\.com\/test\/[0-9a-f]{32}$/u);
+      const code = link.slice(link.lastIndexOf("/") + 1);
+      LINK_CODES.push(code);
+      expect(links.size).toBe(1);
+      expect(links.stagedTurns).toBe(0);
+      expect(rows.links).toEqual([
+        {
+          id: `link-s1-10-${key}-1`,
+          business_id: owner.businessId,
+          person_id: owner.personId,
+          purpose: "setup_id_check",
+          step_id: "S1-10",
+          code_sha256: await sha256Of(code),
+          sent_to_handle_id: owner.handleId,
+          issued_at: new Date("2026-10-19T18:09:06Z"),
+          expires_at: new Date("2026-10-26T18:09:06Z"),
+          ended_at: null,
+        },
+      ]);
+      // No S1-76 here: no review item.
+      expect(rows.reviewItems).toEqual([]);
+      expect(pinned.asked).toEqual([]);
+
+      // Every call on its own client and side, one after another, the scope's held throughout: S1-09's writer's item 79
+      // and item 26 reads and the read-back's stop reads, then S1-10's writer's and its text's.
+      expect(callsOf(rooted.written)).toEqual([
+        onApp(GATE_CALLS.scope),
+        onJob(GATE_CALLS.seal),
+        onJob(GATE_CALLS.pickedKinds),
+        onJob(GATE_CALLS.kindsById),
+        onJob(GATE_CALLS.kindsById),
+        ...STOP_CALLS,
+        onJob(GATE_CALLS.pickedKinds),
+        onJob(GATE_CALLS.kindsById),
+        onJob(GATE_CALLS.kindsById),
+        ...STOP_CALLS,
+        onJob("commitTurn"),
+      ]);
+      const counts = rooted.db.counts();
+      expect(counts).toMatchObject({ connectionsOpen: 0, connectionsPeak: 2 * CONNECTIONS_PER_CLIENT });
+      expect(counts.ended).toBe(counts.opened);
+      // The turn row, the two outbox rows and the text's record: no question and no clock row.
+      await expectCountsAfter(before, { turns: 1, outbox_rows: 2, safety_outcomes: 1 }, "grows");
+      // Labels only: no line of the test's holds the owner's words, number, link or code.
+      for (const line of lines) {
+        for (const secret of [DEMO_LISTING_WORDS, "Springfield", owner.number, link, code]) {
+          expect(line, "a line holds the owner's words, number, link or code").not.toContain(secret);
+        }
+      }
+    },
+  );
+
+  it(
+    "a made-up name and town ('Maple Corner Cuts, Riverton'), through realGate over staging's gate reads, commits once: the typed name written, S1-76's row and one listing_match review item (Claim: owner. Reason: no listing.) through the listing paging reader, then S1-10's rows; no read-back; every call one after another, 2 connections at most",
+    { timeout: TEST_MS },
+    async () => {
+      const before = await rowCounts();
+      const { rooted, reads } = stagingGateOver(envOf());
+      const owner = MADE_UP_OWNER;
+      const call = await s1_09Gate(owner, S1_09_TEXTS.madeUp, MADE_UP_LISTING_WORDS);
+      const pinned = pinnedV3();
+      const links = new HeldLinks();
+      const key = call.turnId;
+      const headVersion = await headVersionOf(owner);
+
+      const answer = await listingGate(rooted, reads, call, pinned.bundle, links);
+
+      expect(answer, JSON.stringify(answer)).toMatchObject({
+        result: "committed",
+        turnId: key,
+        repeated: false,
+        openQuestions: { opened: [], closed: [owner.questionId] },
+      });
+      const rows = await s1_09Rows(owner, key);
+      expect(rows.question).toEqual([{ step: "S1-09", status: "answered" }]);
+      expect(rows.asked).toEqual([]);
+      expect(rows.head).toMatchObject([
+        { name: "Maple Corner Cuts", display_name: "Maple Corner Cuts", version: headVersion + 1 },
+      ]);
+      expect(rows.outbox).toMatchObject([
+        { id: `outbox-s1-76-${key}-1`, step: "S1-76", line_no: 0, open_question_id: null, plan: null },
+        { id: `outbox-s1-10-${key}-1`, step: "S1-10", line_no: 2, open_question_id: null, plan: null },
+      ]);
+      // One team review item through T-319's openReviewItemCore, read through the listing paging reader: a listing check
+      // of the owner's business, raised by the owner, its summary the fixed sentence (labels, no private value).
+      expect(rows.reviewItems).toEqual([
+        {
+          id: expect.any(String) as unknown,
+          kind: "listing_match",
+          business_id: owner.businessId,
+          subject_table: "businesses",
+          subject_row_id: owner.businessId,
+          turn_id: key,
+          raised_by_person_id: owner.personId,
+          summary: listingSummaryOf("owner", "noListing"),
+          state: "open",
+        },
+      ]);
+      const link = links.of(`outbox-s1-10-${key}-1`) ?? "";
+      expect(link).toMatch(/^https:\/\/rosfield\.com\/test\/[0-9a-f]{32}$/u);
+      const code = link.slice(link.lastIndexOf("/") + 1);
+      LINK_CODES.push(code);
+      expect(rows.links).toMatchObject([{ id: `link-s1-10-${key}-1`, code_sha256: await sha256Of(code) }]);
+      expect(rows.accounts).toMatchObject([{ person_id: owner.personId, mobile: owner.number }]);
+
+      // S1-09's writer's reads (no read-back, so no stop read for it), S1-76's message's stop reads and its review
+      // item's three paging reads, then S1-10's writer's reads and its text's stop reads.
+      expect(callsOf(rooted.written)).toEqual([
+        onApp(GATE_CALLS.scope),
+        onJob(GATE_CALLS.seal),
+        onJob(GATE_CALLS.pickedKinds),
+        onJob(GATE_CALLS.kindsById),
+        onJob(GATE_CALLS.kindsById),
+        ...STOP_CALLS,
+        onJob(GATE_CALLS.reviewItem),
+        onJob(GATE_CALLS.businessRow),
+        onJob(GATE_CALLS.businessZone),
+        onJob(GATE_CALLS.pickedKinds),
+        onJob(GATE_CALLS.kindsById),
+        onJob(GATE_CALLS.kindsById),
+        ...STOP_CALLS,
+        onJob("commitTurn"),
+      ]);
+      const counts = rooted.db.counts();
+      expect(counts).toMatchObject({ connectionsOpen: 0, connectionsPeak: 2 * CONNECTIONS_PER_CLIENT });
+      expect(counts.ended).toBe(counts.opened);
+      await expectCountsAfter(before, { turns: 1, outbox_rows: 2, safety_outcomes: 1 }, "grows");
+      for (const line of lines) {
+        for (const secret of [
+          MADE_UP_LISTING_WORDS,
+          "Riverton",
+          "Maple Corner Cuts",
+          owner.number,
+          link,
+          code,
+        ]) {
+          expect(line, "a line holds the owner's words, number, link or code").not.toContain(secret);
+        }
+      }
+    },
+  );
+
+  it("the listing paging reader, inside a held scope: the review item by id only under its own business, the business head's version and zone of the scope's business alone, another business's refused or none with no client opened; each read on a runtime-side client of its own (rosie_worker_job), 2 connections at most, nothing written", async () => {
+    const before = await rowCounts();
+    const { gate, written, db } = rootOver(envOf());
+    const reader = gate.listing?.paging.reader;
+    if (reader === undefined) throw new Error("staging's gate binds the listing paging reader");
+    const owner = MADE_UP_OWNER;
+    const [item] = (await s1_09Rows(owner, "none")).reviewItems as { id: string }[];
+    if (item === undefined) throw new Error("the made-up answer above opened its review item");
+    const headVersion = await headVersionOf(owner);
+
+    const read = await gate.scope.withBusiness(owner.businessId, async (repo) => {
+      const paging = reader(repo);
+      return {
+        item: await paging.reviewItem(item.id),
+        none: await paging.reviewItem("review-item-t1540-none"),
+        head: await paging.row("businesses", owner.businessId),
+        other: await paging.row("businesses", LISTING_OWNER.businessId),
+        zone: await paging.businessZone(owner.businessId),
+        otherZone: await rejectionOf(paging.businessZone(LISTING_OWNER.businessId)),
+        otherTable: await rejectionOf(paging.row("business_setup", owner.businessId)),
+      };
+    });
+    // Under another business's scope, the same item is no row of that business's.
+    const elsewhere = await gate.scope.withBusiness(LISTING_OWNER.businessId, (repo) =>
+      reader(repo).reviewItem(item.id),
+    );
+
+    expect(read.item).toMatchObject({
+      id: item.id,
+      kind: "listing_match",
+      businessId: owner.businessId,
+      subjectTable: "businesses",
+      subjectRowId: owner.businessId,
+      summary: listingSummaryOf("owner", "noListing"),
+      state: "open",
+      version: 1,
+    });
+    expect(read.item?.openedAt).toMatch(UTC_INSTANT);
+    expect(read.none).toBeNull();
+    expect(read.head).toEqual({ version: headVersion, businessId: owner.businessId });
+    expect(read.other).toBeNull();
+    expect(read.zone).toEqual(expect.any(String));
+    expect(read.otherZone).toBeInstanceOf(ListingPagingScopeError);
+    expect(read.otherTable).toBeInstanceOf(NotBuiltError);
+    expect(elsewhere).toBeNull();
+
+    // The scope's client first, then one runtime-side client a read: none for another business or another table.
+    expect(callsOf(written)).toEqual([
+      onApp(GATE_CALLS.scope),
+      onJob(GATE_CALLS.reviewItem),
+      onJob(GATE_CALLS.reviewItem),
+      onJob(GATE_CALLS.businessRow),
+      onJob(GATE_CALLS.businessZone),
+      onApp(GATE_CALLS.scope),
+      onJob(GATE_CALLS.reviewItem),
+    ]);
+    expect([GATE_CALLS.reviewItem, GATE_CALLS.businessRow, GATE_CALLS.businessZone]).toEqual([
+      "readReviewItem",
+      "readBusinessRow",
+      "readBusinessZone",
+    ]);
+    expect(db.counts()).toMatchObject({
+      opened: 7,
+      ended: 7,
+      connectionsOpen: 0,
+      connectionsPeak: 2 * CONNECTIONS_PER_CLIENT,
+    });
+    expect(await rowCounts()).toEqual(before);
+  });
 });
 
 // ---- production ---------------------------------------------------------------------------------------------------

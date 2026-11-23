@@ -132,6 +132,33 @@
 //                other database error scrubbed; the request is the chat id alone, copied as calls.ts copies it. The
 //                number it also answers is dropped by the turn face (walkChatsOf); neither it nor the chat id goes to a
 //                line or an error.
+//   listing      S1-09's, S1-76's and S1-10's ports (T-1540, S1-09 design card 8 extended to S1-10; DL-1179; K-09 README
+//                defaults 201 to 211; ../real.ts GateListingReads), which ../real.ts hands the sign-up steps beside the
+//                kinds, stop and one-kind reads, with the gate's clock and the root's one HeldLinks:
+//                  places     T-434's Places double (@rosie/adapters' createPlacesDouble), a new one for each gate call, so
+//                             no request or span it keeps in memory outlives the call: while J-16 is open, staging's
+//                             Places port is the double, bound here alone, and staging's sender texts only the allow-listed
+//                             phones (T-416's guard) and the test phones (K-09 README default 208). It makes no network
+//                             call, reads no key and logs nothing.
+//                  reads      S1-09's writer's reads (@rosie/actions' listingReadsOf): item 79 (readPickedKinds) and item 26
+//                             with T-667's setup homes (readTurnState: the business head's and business_setup's versions),
+//                             each on a runtime-side client of its own (part.db.runtime: HYPERDRIVE_JOB, rosie_worker_job),
+//                             as the one-kind path reads them and under the same two names, db/repo's standalone reads in
+//                             read-only transactions of their own, never the call's.
+//                  mobileId   S1-10's writer's reads (@rosie/actions' mobileIdReadsOf) over the same two reads: item 79 and
+//                             item 26 (the turn's handle, its phone row's number, the caller's accounts row).
+//                  paging     S1-76's review item's paging reader (./listing-paging.ts), which answers reviewItem (with its
+//                             summary), row("businesses", id) and businessZone under the turn's business alone (the gate
+//                             call's own scope, read from its transaction), each on a runtime-side client of its own, and
+//                             refuses every other read (DL-972's note; not T-1444's whole binding).
+//                  linkPlace  the Worker's LINK_HOST and BASE_PATH, read at each gate call (never as the root is built):
+//                             https://rosfield.com/test/<code> on staging (K-09 README default 211); a host or base path
+//                             that is not a link's is refused by S1-10's writer before any code is drawn.
+//                Each read is awaited before the next (the walk's writers, one after another; openReviewItem's three
+//                reads in turn), so the call holds its own client and one of these at a time. A K-05 error answer is
+//                thrown (ListingReadError, MobileIdReadError, ListingPagingReadError), whatever the handle or db/repo
+//                throws leaves as thrown or scrubbed, and nothing here catches, wraps or logs: no name, town, number,
+//                code or link reaches a line or an error.
 //
 // The gate's one commitTurn (K-05 v1.1 item 1) is never this input's: it goes through the root's turn-row port, T-1395's
 // binding on the job side (./k05-turn.ts turnRows; critic_collisions N5), with ../real.ts's turn id check in front.
@@ -142,20 +169,22 @@
 // client, item 79 and S1-11's one trade overlay on the runtime side: T-1470; and the stop home's reads, each on the
 // runtime side: T-1516; and, for S1-01, item 51's chat read on the runtime side: T-1519; and, for a one-kind answer to
 // S1-02's question and for an answer to S1-04's question, item 79 and the catalog by id on the runtime side and item 72
-// on a second Tool API client: T-1494, T-1485)
+// on a second Tool API client: T-1494, T-1485; and, for an answer to S1-09's question, item 79 and item 26 for S1-09's
+// and S1-10's writers and the listing paging reader's three reads, each on the runtime side: T-1540)
 // opens and ends a client of its own, one after another, so it holds 2 connections at most; a keyword door's call holds
 // its runtime-side transaction's one connection the same way while its bundle reads, seal and commit open theirs
 // (T-1415), 2 at most too. At most 3 such
 // calls, the gate's and the door's together, hold their call's client at once, so the gates hold 6 at most, the Worker's
 // limit (infra/spikes/hyperdrive-host/worker.mjs line 77); a 4th waits for a slot before its client is opened, and
-// nothing that holds a slot ever waits for one (the catalog's client, item 72's, the stop reads', the one-kind reads' and
-// the chat read's take no slot), so no call waits for a connection another call holds while that call waits for one.
+// nothing that holds a slot ever waits for one (the catalog's client, item 72's, the stop reads', the one-kind reads', the
+// chat read's and the listing reads' take no slot), so no call waits for a connection another call holds while that call
+// waits for one.
 //
 //   bound    staging, with both HYPERDRIVE_APP (the scope, the question read on it, and the catalog's and item 72's own
 //            clients) and HYPERDRIVE_JOB (the owner's read, the sealer, the keyword door, item 79, the catalog by id, the
-//            stop reads, the chat read and the commit) present. Only their presence is read as the root is built (DL-768): no connection
-//            string, secret, KV or other binding. Each connection string is the handle's to read, and SEALING_WRAP_KEY
-//            the resolver's, at each call.
+//            stop reads, the chat read, the listing reads and the commit) present. Only their presence is read as the root is
+//            built (DL-768): no connection string, secret, KV or other binding. Each connection string is the handle's to
+//            read, SEALING_WRAP_KEY the resolver's, and LINK_HOST and BASE_PATH the listing ports', at each call.
 //   unbound  any environment but staging, checked before anything else is read, or a binding missing: null, as the
 //            Worker's root has always handed, so every gate fails closed inside the Tool API base before anything is read
 //            or written (../real.ts NO_GATE_SCOPE: NoDatabaseError naming gateAndCommit; a keyword turn naming no business
@@ -176,17 +205,21 @@
 // line. No word of a text or a fixed line, no number, address, key, wrapping key's value, token or hash is in a log line
 // or an error.
 //
-// pgCallScope, the door's pieces, pgWalkQuestions, kindsReadsOf, companiesReadsOf, pgReadOnlySealer, messagesReaderOf and
-// flagsReaderOf are imported by their own files, as ./tool-api-rows.ts imports pgCallScope (critic_size N5): no change to
-// @rosie/actions; and db/repo's readChatHandle, readBusinessKinds and readTurnState by their own files, as pgTurnCalls
-// and pgCompaniesK05Reads import them (T-1519, T-1494).
+// pgCallScope, the door's pieces, pgWalkQuestions, kindsReadsOf, companiesReadsOf, listingReadsOf, mobileIdReadsOf,
+// pgReadOnlySealer, messagesReaderOf and flagsReaderOf are imported by their own files, as ./tool-api-rows.ts imports
+// pgCallScope (critic_size N5): no change to @rosie/actions; db/repo's readChatHandle, readBusinessKinds and readTurnState
+// by their own files, as pgTurnCalls and pgCompaniesK05Reads import them (T-1519, T-1494); and the Places double by
+// @rosie/adapters' places/double export (T-1540).
 
+import { createPlacesDouble } from "@rosie/adapters/places/double";
 import { flagsReaderOf } from "@rosie/actions/src/domain/flags/reads";
 import { messagesReaderOf } from "@rosie/actions/src/domain/messages-consent/reads";
 import type { StopHomeReads } from "@rosie/actions/src/homes/stop/reads";
 import { NotBuiltError } from "@rosie/actions/src/tool-api/errors";
 import { companiesReadsOf, type CompaniesReads } from "@rosie/actions/src/tool-api/journey-1/companies/reads";
 import { kindsReadsOf, type KindsReads } from "@rosie/actions/src/tool-api/journey-1/kinds/reads";
+import { listingReadsOf, type ListingK05Reads } from "@rosie/actions/src/tool-api/journey-1/listing/reads";
+import { mobileIdReadsOf } from "@rosie/actions/src/tool-api/journey-1/mobile-id/reads";
 import type { BusinessScope, ScopeCall } from "@rosie/actions/src/tool-api/scope";
 import type { SafetyReads } from "@rosie/actions/src/tool-api/turn-face/commit";
 import type { DoorRuntime } from "@rosie/actions/src/tool-api/turn-face/door";
@@ -221,12 +254,14 @@ import { environmentOf } from "../picks";
 import {
   NoStateReadError,
   type BundleSafetyLines,
+  type GateListingReads,
   type GateReads,
   type GateWords,
   type KeywordDoorReads,
 } from "../real";
 import { BundleRefusedError } from "./bundle-safety";
-import type { StagingDb, StagingPart } from "./part";
+import { LISTING_PAGING_CALLS, listingPagingReader } from "./listing-paging";
+import type { StagingDb, StagingEnv, StagingPart } from "./part";
 
 /** What T-1398's builder is handed (DL-757): the env, the root's handle, the resolver and the one BundleSafety adapter. */
 export interface GatePart extends StagingPart {
@@ -251,7 +286,10 @@ export const GATE_CLIENTS_AT_ONCE = 3;
  * each on the runtime side: the data-access call each StopHomeReads member makes), the chat read's K-05's (T-1519:
  * item 51, on the runtime side), and the one-kind path's K-05's (T-1494: item 79 under the kinds reads' own name, since
  * it is the same call on the same side; item 72 on the Tool API's side; item 26, the catalog by id, on the runtime side).
- * S1-04's writer (T-1485) reads through the one-kind path's reads, so its calls go under those same three names.
+ * S1-04's writer (T-1485) reads through the one-kind path's reads, so its calls go under those same three names. S1-09's
+ * and S1-10's writers (T-1540) read item 79 and item 26 under the one-kind path's two names (the same calls on the same
+ * side), and the listing paging reader's three reads go under ./listing-paging.ts's names (item 43's K-05 name for the
+ * zone; its own for the review item and the business head's version).
  */
 export const GATE_CALLS = Object.freeze({
   scope: "gateAndCommit",
@@ -268,6 +306,9 @@ export const GATE_CALLS = Object.freeze({
   stopConsentsOfPersons: "listConsentsOfPersons",
   stopPersonIdsOfHandle: "listPersonIdsOfHandle",
   chatHandle: "readChatHandle",
+  reviewItem: LISTING_PAGING_CALLS.reviewItem,
+  businessRow: LISTING_PAGING_CALLS.businessRow,
+  businessZone: LISTING_PAGING_CALLS.businessZone,
 } as const);
 
 /** A binding is present when the env holds a value for it; its connection string is never read here. */
@@ -441,6 +482,29 @@ function chatHandleReadOn(db: StagingDb): NonNullable<GateReads["readChatHandle"
 }
 
 /**
+ * S1-09's, S1-76's and S1-10's ports (T-1540; ../real.ts GateListingReads): a new Places double for each gate call;
+ * item 79 and item 26 for S1-09's writer (listingReadsOf) and S1-10's (mobileIdReadsOf), each on a runtime-side client
+ * of its own (HYPERDRIVE_JOB, rosie_worker_job) under the one-kind path's two names, straight from the handle, never
+ * through gateScope or the slots; S1-76's paging reader over the gate call's own scope (./listing-paging.ts); and the
+ * link's host and base path, read from the env at each call. A K-05 error answer is thrown by listingReadsOf and
+ * mobileIdReadsOf as their read errors, and whatever the handle or db/repo throws leaves as thrown; nothing here catches
+ * or logs either.
+ */
+function listingOn(env: StagingEnv, db: StagingDb): GateListingReads<Tx> {
+  const k05: ListingK05Reads<Tx> = {
+    readPickedKinds: (request) => db.runtime(GATE_CALLS.pickedKinds, (sql) => readPickedKinds(sql, request)),
+    readTurnState: (_tx, request) => db.runtime(GATE_CALLS.kindsById, (sql) => readTurnState(sql, request)),
+  };
+  return {
+    places: () => createPlacesDouble(),
+    reads: listingReadsOf(k05),
+    paging: { reader: (tx) => listingPagingReader(db, tx) },
+    mobileId: mobileIdReadsOf(k05),
+    linkPlace: () => ({ host: env.LINK_HOST ?? "", basePath: env.BASE_PATH }),
+  };
+}
+
+/**
  * The keyword door's one transaction for each call (T-1415): @rosie/actions' pgDoorRuntime over a runtime-side client
  * opened for that call (HYPERDRIVE_JOB, rosie_worker_job), which the handle guards first and ends once the transaction
  * has ended, taken only while one of the gate's slots is free. pgDoorRuntime checks the door's side and makes the
@@ -522,7 +586,9 @@ const asGateReads = (reads: GateReads<Tx, Sql>): GateReads => reads as GateReads
  * runtime-side client of its own (T-1516; DL-1033 ruling 8); and, for S1-01's thread, K-05 v1.10 item 51's chat read on
  * a runtime-side client of its own (T-1519; DL-1048); and, for a one-kind answer to S1-02's question, the one-kind path's
  * reads, item 79 and the catalog by id each on a runtime-side client of its own and item 72 on a Tool API client of its
- * own (T-1494; DL-1111), which S1-04's writer reads through too for an answer to S1-04's question (T-1485; DL-1122).
+ * own (T-1494; DL-1111), which S1-04's writer reads through too for an answer to S1-04's question (T-1485; DL-1122);
+ * and, for an answer to S1-09's question, S1-09's, S1-76's and S1-10's ports (T-1540; DL-1179): the Places double, item
+ * 79 and item 26 and the listing paging reader, each read on a runtime-side client of its own, and the link's place.
  * Null anywhere but staging (nothing read but ENVIRONMENT) and while either binding is missing, so every gate fails
  * closed, a keyword turn naming no business with the base's noBusinessScope.
  */
@@ -549,6 +615,9 @@ export const stagingGateReads: (part: GatePart) => GateReads | null = ({ env, db
     companies: companiesReadsOn(db),
     // S1-01 reuses the turn's own handle's chat thread (T-1519; one-chat-per-handle): item 51 on the runtime side.
     readChatHandle: chatHandleReadOn(db),
+    // An owner's answer to S1-09 settles its branch and writes S1-09's, S1-76's and S1-10's rows (T-1540; DL-1179): the
+    // Places double while J-16 is open (default 208), item 79 and item 26, and the listing paging reader, each its own.
+    listing: listingOn(env, db),
     ...(bundleSafety === null ? {} : { words: wordsOf(bundleSafety) }),
   });
 };

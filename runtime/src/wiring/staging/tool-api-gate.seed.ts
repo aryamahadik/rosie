@@ -44,6 +44,14 @@
 //                 question to it, live at its business under bundle v2, written as the one-kind owner's is. Its answer
 //                 naming three kinds ("Barbershop, plumbing, electrical"), which asks S1-04, and its answers to S1-04 are
 //                 the test's own turns.
+//   S1-09         (T-1540; DL-1179) two more roster owners, the same set's places 3 and 4 in the same run
+//                 (biz-roster-owner-3 and -4, each with its setup row, its company and the barber kind of work, its person
+//                 and handle), each at a whole fiction-range number of this seed's own, each person's key made at first
+//                 sight under the made-up key, each number's phone row as the gateway's receipt of a first text leaves it
+//                 (K-05 v1.7 openChatOnText: chat open, nothing else set), the row S1-10's writer takes the chat's number
+//                 from; the registry row of bundle v3 as bundles/v3 holds it (not active); and S1-09's question to each,
+//                 live at its business under bundle v3, written as the S1-02 questions above are. The owner at place 3
+//                 answers with the demo listing, the owner at place 4 with a made-up name and town: the test's own turns.
 //
 // Everything but the roster-owner set (its own transaction as rosie_job, as it runs on staging) and the bundle's registry
 // row (the connecting login, as a publish writes it) is written in one transaction as the runtime side's role, rosie_job,
@@ -55,6 +63,7 @@
 // and the roster-owner set are loaded at `seed`, in Node, since db/seeds reads its fixture set from disk as it loads.
 import { KEYED_SAFETY_IDS } from "../../../../actions/src/domain/safety/ids";
 import bundleV2Manifest from "../../../../bundles/v2/bundle/manifest.json";
+import bundleV3Manifest from "../../../../bundles/v3/bundle/manifest.json";
 import seedBusinessHead from "../../../../contracts/db-schema/core/fixtures/seed-business-head.json";
 import seedPersonRoles from "../../../../contracts/db-schema/core/fixtures/seed-person-roles.json";
 import seedKindsSample from "../../../../contracts/db-schema/kinds-of-work/fixtures/seed-kinds-sample.json";
@@ -353,7 +362,7 @@ export const ASKED = {
   version: 2,
 } as const;
 
-/** An owner whose S1-02 question is live: its handle and person, the turn that asked, the question and its outbox row. */
+/** An owner whose question is live: its handle and person, the turn that asked, the question and its outbox row. */
 interface AskedOwner {
   readonly handleId: string;
   readonly personId: string;
@@ -379,15 +388,17 @@ async function writeAskedQuestion(tx: Tx, bundleId: BundleId): Promise<void> {
 }
 
 /**
- * An owner's live S1-02 question at `businessId` under `bundleId`: the committed turn; S1-02's question (no options, no
- * read-back, nothing read, no clock named); its outbox row, delivered, with its one part; then the question made open
- * with its version raised once, as K-05 armClock leaves it at the first delivery receipt.
+ * An owner's live question at `step` (S1-02 unless named: T-1540 asks S1-09) at `businessId` under `bundleId`: the
+ * committed turn; the question (no options, no read-back, nothing read, no clock named, as the walk asks a split by text:
+ * writes.ts default 10); its outbox row, delivered, with its one part; then the question made open with its version
+ * raised once, as K-05 armClock leaves it at the first delivery receipt.
  */
 async function writeLiveQuestion(
   tx: Tx,
   asked: AskedOwner,
   businessId: string,
   bundleId: BundleId,
+  step = "S1-02",
 ): Promise<void> {
   await tx`
     insert into turns (
@@ -402,7 +413,7 @@ async function writeLiveQuestion(
       id, turn_id, handle_id, person_id, business_id, booking_id, step, options, readback, versions_read, bundle_hash,
       bundle_build, clock, ask_count, status
     ) values (
-      ${asked.questionId}, ${asked.turnId}, ${asked.handleId}, ${asked.personId}, ${businessId}, null, 'S1-02',
+      ${asked.questionId}, ${asked.turnId}, ${asked.handleId}, ${asked.personId}, ${businessId}, null, ${step},
       ${tx.json([])}, null, ${tx.json([])}, ${bundleId.hash}, ${bundleId.build}, null, 1, 'waiting'
     )
   `;
@@ -486,12 +497,70 @@ export const MULTI_KIND = {
   version: 2,
 } as const;
 
-/** The roster owners this seed asks the roster-owner set for, in their places on its list (from 1). */
-const ROSTER_OWNERS = [ONE_KIND, MULTI_KIND] as const;
+/** (T-1540) Bundle v3's id and manifest key, as bundles/v3 publishes it (T-1526): the bundle the S1-09 owners' turns pin. */
+export const BUNDLE_V3_ID: BundleId = {
+  hash: bundleV3Manifest.bundleId.hash,
+  build: bundleV3Manifest.bundleId.build,
+};
+const BUNDLE_V3_MANIFEST_KEY = `bundle/${BUNDLE_V3_ID.hash}/${String(BUNDLE_V3_ID.build)}/manifest`;
+const BUNDLE_V3_BUILT_AT = "2026-11-22T10:00:00Z";
+
+/** When the S1-09 owners' numbers first texted Rosie (the gateway's receipt: the phone row's chat_open_at). */
+const S1_09_CHAT_OPENED_AT = "2026-10-19T18:05:00Z";
 
 /**
- * The roster-owner set run as it is for the one-kind owner's number and the multi-kind owner's, in that order (T-1485
- * adds the second); refused unless it answers place 1's ids for the first and place 2's for the second.
+ * (T-1540; DL-1179) The roster owner at place 3 (rosterOwnerIds(3)), texting from a whole fiction-range number of this
+ * seed's own, with its Linq chat (a stand-in in K-06's form), its phone row, and S1-09's question, live at its business
+ * under bundle v3: the owner who answers with the demo listing (the test's own turn). `version` is the question row's: 2.
+ */
+export const LISTING_OWNER = {
+  number: "+15555550180",
+  businessId: "biz-roster-owner-3",
+  companyId: "company-roster-owner-3",
+  personId: "person-roster-owner-3",
+  handleId: "handle-roster-owner-3",
+  chatId: "linq-chat-t1540-listing",
+  turnId: "turn-t1540-listing-asked",
+  eventId: "evt-t1540-listing-asked",
+  traceId: "trace-t1540-listing-asked",
+  questionId: "oq-s1-09-t1540-listing-asked-1",
+  outboxRowId: "outbox-s1-09-t1540-listing-asked-1",
+  messageId: "linq-msg-t1540-listing-asked-0001",
+  committedAt: "2026-10-19T18:07:06Z",
+  sentAt: "2026-10-19T18:07:08Z",
+  deliveredAt: "2026-10-19T18:07:09Z",
+  version: 2,
+} as const;
+
+/**
+ * (T-1540) The roster owner at place 4 (rosterOwnerIds(4)), written as the owner at place 3 is: the owner who answers with
+ * a made-up name and town (the test's own turn), which takes S1-76's person check.
+ */
+export const MADE_UP_OWNER = {
+  number: "+15555550181",
+  businessId: "biz-roster-owner-4",
+  companyId: "company-roster-owner-4",
+  personId: "person-roster-owner-4",
+  handleId: "handle-roster-owner-4",
+  chatId: "linq-chat-t1540-made-up",
+  turnId: "turn-t1540-made-up-asked",
+  eventId: "evt-t1540-made-up-asked",
+  traceId: "trace-t1540-made-up-asked",
+  questionId: "oq-s1-09-t1540-made-up-asked-1",
+  outboxRowId: "outbox-s1-09-t1540-made-up-asked-1",
+  messageId: "linq-msg-t1540-made-up-asked-0001",
+  committedAt: "2026-10-19T18:07:06Z",
+  sentAt: "2026-10-19T18:07:08Z",
+  deliveredAt: "2026-10-19T18:07:09Z",
+  version: 2,
+} as const;
+
+/** The roster owners this seed asks the roster-owner set for, in their places on its list (from 1). */
+const ROSTER_OWNERS = [ONE_KIND, MULTI_KIND, LISTING_OWNER, MADE_UP_OWNER] as const;
+
+/**
+ * The roster-owner set run as it is for the one-kind owner's number, the multi-kind owner's and the two S1-09 owners', in
+ * that order (T-1485 adds the second, T-1540 the third and fourth); refused unless it answers each place's own ids.
  */
 async function seedRosterOwners(sql: Sql): Promise<void> {
   const { ALLOWLIST_VARIABLE, seedRosterOwner } = await import("../../../../db/seeds/roster-owner");
@@ -508,7 +577,7 @@ async function seedRosterOwners(sql: Sql): Promise<void> {
     );
   };
   if (seeded.owners.length !== ROSTER_OWNERS.length || !ROSTER_OWNERS.every(gave)) {
-    throw new Error("the tool-api-gate seed: the roster-owner set did not give places 1 and 2's ids");
+    throw new Error("the tool-api-gate seed: the roster-owner set did not give each place's own ids");
   }
 }
 
@@ -549,6 +618,11 @@ export async function seed(sql: Sql): Promise<void> {
   await sql`
     insert into bundles (hash, build, manifest_key, built_at)
     values (${BUNDLE_V2_ID.hash}, ${BUNDLE_V2_ID.build}, ${BUNDLE_V2_MANIFEST_KEY}, ${BUNDLE_V2_BUILT_AT}::timestamptz)
+  `;
+  // T-1540: bundle v3's registry row, not active, as a publish writes it; the S1-09 owners' turns pin it.
+  await sql`
+    insert into bundles (hash, build, manifest_key, built_at)
+    values (${BUNDLE_V3_ID.hash}, ${BUNDLE_V3_ID.build}, ${BUNDLE_V3_MANIFEST_KEY}, ${BUNDLE_V3_BUILT_AT}::timestamptz)
   `;
   await seedRosterOwners(sql);
 
@@ -598,6 +672,19 @@ export async function seed(sql: Sql): Promise<void> {
     // T-1485: the multi-kind owner's key at first sight and its S1-02 question, on bundle v2, as the one-kind owner's.
     await rosterOwnerSight(tx, MULTI_KIND, "t1485");
     await writeLiveQuestion(tx, MULTI_KIND, MULTI_KIND.businessId, BUNDLE_V2_ID);
+    // T-1540: the S1-09 owners' keys at first sight, their phone rows as the gateway's receipt leaves them, and S1-09's
+    // question to each, on bundle v3.
+    for (const [owner, tag] of [
+      [LISTING_OWNER, "t1540-listing"],
+      [MADE_UP_OWNER, "t1540-made-up"],
+    ] as const) {
+      await rosterOwnerSight(tx, owner, tag);
+      await tx`
+        insert into phones (number, handle_id, chat_open, chat_open_at, chat_way)
+        values (${owner.number}, ${owner.handleId}, true, ${S1_09_CHAT_OPENED_AT}::timestamptz, 'imessage')
+      `;
+      await writeLiveQuestion(tx, owner, owner.businessId, BUNDLE_V3_ID, "S1-09");
+    }
   });
 }
 

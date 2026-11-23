@@ -135,6 +135,16 @@
 //                bound, go in as S1-08's own wherever they are bound (SignUpWriterDeps.plan.stop, the same StopHomeReads,
 //                no second binding), with or without the one-kind reads, since both a one-kind S1-02 answer and an
 //                answered S1-04 walk on to S1-08; left out, no S1-08 writer.
+//                T-1540 (S1-09 design card 8 extended to S1-10; DL-1179; K-09 README defaults 201 to 211; the turn face's
+//                commit.ts default 7): where the reads also bind S1-09's, S1-76's and S1-10's ports (GateReads.listing) beside
+//                the kinds, stop and one-kind reads, and the root holds S1-10's secure links (GateInputs.links: one HeldLinks
+//                per root), they go into the sign-up steps' deps (SignUpWriterDeps.listing): a fresh Places port for each
+//                call, S1-09's and S1-10's K-05 reads, the same stop reads, the paging ports of S1-76's review item, and the
+//                link's host and base path (read at each call), the gate's clock and the root's HeldLinks as its stage; and
+//                that one HeldLinks is the gate face's links too. So an owner's answer to S1-09 settles its branch from the
+//                owner's typed words, writes the read-back or S1-76's row and review item, then S1-10's accounts row, link
+//                row and text, and the walk waits. Left out (production, a test's doubles), S1-09 has no settler and no
+//                writer, as before.
 //   composeInput T-560: K-09 composeInput through @rosie/actions' turn face (T-1141, createTurnFace with its calls: the
 //                Tool API base with K-09 v1.6's checks and the call's own business scope; T-309's compose input with
 //                T-1174's term facts over T-1141's row binding). Its reads are handed in by the root
@@ -144,6 +154,9 @@
 //                the one the turn's run pinned (as the gate's), and its inbound text the words the turn's gate request
 //                handed in, held by the gate port's face (one HeldTurns per root). The turn records the row's
 //                fillAndChecks span; the face tells the base so (TURN_RECORDS_FILL_AND_CHECKS), and the base records none.
+//                T-1540: where the root holds S1-10's secure links (one HeldLinks per root, only where the gate's reads
+//                bind the listing ports), its row binding reads them too (RowBinding.links), so S1-10's row lists
+//                link.secure among its allowed links.
 //   composer     T-560: @rosie/ai's composer (T-373 createComposer, with T-374's one rewrite and T-375's reader checks;
 //                C-118), one per bundle for both, handed in by the root (RootOptions.composers): in a test, over a fake
 //                Messages API answered by the recorded-model double (T-1175's recording 4 for the JOIN run); in the
@@ -164,7 +177,9 @@
 //                the final parts go into the row together through writePlan, after the commit, or the row gets its one
 //                rewrite, then the step's fallback, inside the same calls. The turn records the row's fillAndChecks and
 //                rewriteOrFallback spans; the face tells the base so (TURN_RECORDS_FILL_AND_CHECKS), and the base records
-//                none (T-1193; DL-376).
+//                none (T-1193; DL-376). T-1540: where the root holds S1-10's secure links, its row binding reads them
+//                (finalize's link.secure, for that row alone) and its face lets a row's link go once that row's finalize
+//                has answered send, sendAndLog or passedOn (TurnFaceCalls.links): the same HeldLinks as the gate's.
 //   outbox       T-562: the dispatcher's claim and marks, and the receipt door's mark, over K-05 v1.2's four outbox calls
 //                (T-1135, db/repo/outbox.ts: claimOutboxV12, renewClaim, markPartV12 and markRowV12, each called as
 //                (sql, request) as rosie_job; never T-196's v1 claimOutbox, markPart or markRow beside them: a v1 claim
@@ -226,6 +241,7 @@ import type { CoreFlagsDeps } from "@rosie/actions/src/commit/core";
 import type { WalkQuestions } from "@rosie/actions/src/commit/walk";
 import type { FlagsReader } from "@rosie/actions/src/domain/flags/reads";
 import type { MessagesReader } from "@rosie/actions/src/domain/messages-consent/reads";
+import type { PagingDeps } from "@rosie/actions/src/domain/paging";
 import {
   NOT_TOLD_YET,
   PLUGIN_LISTS_NO_STOP_WORDS,
@@ -241,6 +257,10 @@ import type {
 import type { StopHomeReads } from "@rosie/actions/src/homes/stop/reads";
 import type { CompaniesReads } from "@rosie/actions/src/tool-api/journey-1/companies/reads";
 import type { KindsWriterDeps } from "@rosie/actions/src/tool-api/journey-1/kinds/writers";
+import type { ListingSearch } from "@rosie/actions/src/tool-api/journey-1/listing/lookup";
+import type { ListingReads } from "@rosie/actions/src/tool-api/journey-1/listing/reads";
+import type { LinkPlace } from "@rosie/actions/src/tool-api/journey-1/mobile-id/link";
+import type { MobileIdReads } from "@rosie/actions/src/tool-api/journey-1/mobile-id/reads";
 import type { PlugInBundles } from "@rosie/actions/src/tool-api/journey-1/plug-ins/writer";
 import type { BusinessScope } from "@rosie/actions/src/tool-api/scope";
 import type { CallTrace } from "@rosie/actions/src/tool-api/tool-api";
@@ -261,7 +281,7 @@ import {
   type KeywordDoor,
 } from "@rosie/actions/src/tool-api/turn-face/door";
 import type { FinalizeNote } from "@rosie/actions/src/finalize/rewrite/types";
-import { HeldTurns } from "@rosie/actions/src/tool-api/turn-face/held";
+import { HeldLinks, HeldTurns } from "@rosie/actions/src/tool-api/turn-face/held";
 import {
   composeInputDeps,
   finalizeDeps,
@@ -520,14 +540,14 @@ export interface RealInputs {
   /**
    * What the gate and commit reads and commits through (T-559): its reads with their database bound (null where none is
    * bound: the Worker until T-567), the root's turn-row port's commitTurn, and the bundles it reads (as the frontier's).
-   * Left out, every gate fails closed.
+   * Left out, every gate fails closed. The held turns, S1-10's secure links and the gate's clock are realPorts' own.
    */
-  readonly gate?: Omit<GateInputs, "held"> | undefined;
+  readonly gate?: Omit<GateInputs, "held" | "links" | "now"> | undefined;
   /**
    * What compose input reads (T-560): its reads with their database bound (null where none is bound: the Worker until
    * T-567) and the bundles it reads (as the gate's). Left out, every compose input fails closed.
    */
-  readonly composeInput?: Omit<ComposeInputInputs, "held"> | undefined;
+  readonly composeInput?: Omit<ComposeInputInputs, "held" | "links"> | undefined;
   /**
    * @rosie/ai's composer for each bundle (T-560): null or left out where none can be built (the Worker, until its bundle's
    * manifest and the model key can be read there), so every compose and rewrite fails closed.
@@ -537,7 +557,7 @@ export interface RealInputs {
    * What finalize reads and writes (T-561): its calls with their database bound (null where none is bound: the Worker
    * until T-567) and the bundles it reads (as compose input's). Left out, every finalize fails closed.
    */
-  readonly finalize?: Omit<FinalizeInputs, "held" | "now"> | undefined;
+  readonly finalize?: Omit<FinalizeInputs, "held" | "now" | "links"> | undefined;
   /**
    * K-05 v1.2's four outbox calls with their database bound (T-562), and v1.14's claim beside them where it is bound
    * (T-1356): null or left out where none is bound (the Worker until T-567), so every claim and mark fails closed and
@@ -573,6 +593,12 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
   // per root, the isolate's own and bounded, shared by the gate port, the compose-input port (the rows' inbound text) and
   // the finalize port (the reader's language).
   const held = new HeldTurns();
+  // S1-10's secure links (T-1540; held.ts HeldLinks; K-09 README default 211): one hold per root, only where the gate's
+  // reads bind the listing ports, handed to the gate port (its face's links and S1-10's writer's stage), the compose-input
+  // port (its rows' links) and the finalize port (its rows' links and its face's links), so the link a fresh commit
+  // staged reaches that row's finalize and is let go there. Left out, none of the three holds links, as before.
+  const links = heldLinksFor(inputs.gate?.reads ?? null);
+  const linksIn = links === undefined ? {} : { links };
   return {
     linqVerify: linqVerify(inputs),
     sealing: realSealing({ handleKey: inputs.handleKey ?? null }),
@@ -600,12 +626,15 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
         pinnedOf: () => null,
       }),
       held,
+      ...linksIn,
+      now: inputs.now,
     }),
     composeInput: realComposeInput({
       reads: inputs.composeInput?.reads ?? null,
       bundles: inputs.composeInput?.bundles ?? (() => bundles),
       pinnedOf: inputs.composeInput?.pinnedOf ?? (() => null),
       held,
+      ...linksIn,
     }),
     composer: realComposer({ composers: inputs.composers ?? null }),
     finalize: realFinalize({
@@ -613,6 +642,7 @@ export function realPorts(inputs: RealInputs): Partial<Ports> {
       bundles: inputs.finalize?.bundles ?? (() => bundles),
       pinnedOf: inputs.finalize?.pinnedOf ?? (() => null),
       held,
+      ...linksIn,
       now: inputs.now,
     }),
     outbox: realOutbox({ calls: inputs.outbox ?? null }),
@@ -1693,6 +1723,40 @@ export interface GateReads<Repo = unknown, DoorRepo = unknown> {
    * number it also answers is dropped by the turn face (walkChatsOf), and neither it nor the chat id is logged.
    */
   readonly readChatHandle?: NonNullable<TurnCommitBinding<Repo>["readChatHandle"]>;
+  /**
+   * S1-09's, S1-76's and S1-10's ports (T-1540, S1-09 design card 8 extended to S1-10; DL-1179; K-09 README defaults 201
+   * to 211; GateListingReads). Bound beside `kinds`, `stop` and `companies`, and with the root holding S1-10's secure
+   * links (GateInputs.links), gateBindingOf hands them into the sign-up steps' deps (SignUpWriterDeps.listing) with the
+   * same stop reads, the gate's clock and that HeldLinks, so S1-09's settler and the S1-09, S1-76 and S1-10 writers are
+   * bound together over one walk's readings (the turn face's commit.ts default 7). Left out (production, a test's
+   * doubles), or with any of the other three or the links left out, S1-09 has no settler and none of the three writers is
+   * bound, as before: a decided S1-09 answer is refused (notBuilt) with nothing written.
+   */
+  readonly listing?: GateListingReads<Repo>;
+}
+
+/**
+ * S1-09's, S1-76's and S1-10's ports as the gate binds them (T-1540; @rosie/actions' SignUpListingDeps, T-1537, but for
+ * the stop reads, the clock and the stage, which gateBindingOf adds): each read a port the binding hands in, with no
+ * default, so nothing here reads by itself.
+ *   places     a Places port (K-15 search) for one gate call, made at each call (realGate builds one binding a call), so
+ *              nothing it keeps (the double keeps each request and span in memory) outlives the call. While J-16 is open
+ *              it is T-434's double, bound on staging's gate alone (K-09 README default 208).
+ *   reads      S1-09's writer's reads (journey-1/listing ListingReads): item 79 and item 26, each in a read-only
+ *              transaction of its own beside the call's (on staging, each on a runtime-side client of its own).
+ *   paging     S1-76's review item's paging ports, whose reader answers reviewItem (with its summary), row("businesses",
+ *              id) and businessZone under the turn's business alone, and refuses every other read (DL-972's note; not
+ *              T-1444's whole binding).
+ *   mobileId   S1-10's writer's reads (journey-1/mobile-id MobileIdReads): the same item 79 and item 26.
+ *   linkPlace  where S1-10's link points: the Worker's LINK_HOST and BASE_PATH, read at each call, never a constant
+ *              (K-09 README default 211).
+ */
+export interface GateListingReads<Repo = unknown> {
+  readonly places: () => ListingSearch;
+  readonly reads: ListingReads<Repo>;
+  readonly paging: PagingDeps<Repo>;
+  readonly mobileId: MobileIdReads<Repo>;
+  readonly linkPlace: () => LinkPlace;
 }
 
 /**
@@ -1760,6 +1824,18 @@ export interface GateInputs {
    * Left out, nothing is held, so no row is given an inbound text.
    */
   readonly held?: HeldTurns;
+  /**
+   * S1-10's secure links (T-1540; held.ts HeldLinks; K-09 README default 211): the root's one hold (realPorts makes it
+   * only where the reads bind the listing ports), handed to S1-10's writer as its stage and to the gate face as its
+   * links, so a fresh commit's link is kept for its row and anything else staged is dropped; the compose-input and
+   * finalize ports hold the same object. Left out, the listing ports are not bound and the face holds no links.
+   */
+  readonly links?: HeldLinks;
+  /**
+   * Epoch milliseconds: the gate's clock (realPorts hands it the root's), read once per S1-10 write as its link's
+   * issued_at (K-09 README default 211). Left out, the Worker's own clock.
+   */
+  readonly now?: () => number;
 }
 
 /** The scope where no database is bound: each gate fails closed before anything is read or written, inside the base. */
@@ -1820,6 +1896,13 @@ const NO_GATE_SCOPE: BusinessScope<unknown> = {
  * (GateReads.readChatHandle), S1-01 reuses the chat thread the turn's own handle holds for the turn's chat id, so a
  * returning number's JOIN gets S1-02's question instead of the one-chat-per-handle constraint; an error answer fails the
  * call closed (the turn face's TurnFaceReadError, naming the read and its code alone). Left out, S1-01 inserts, as before.
+ *
+ * S1-09, S1-76 and S1-10 (T-1540; DL-1179; gateBindingOf): where the reads bind the listing ports beside the kinds, stop
+ * and one-kind reads and the root holds S1-10's secure links (GateInputs.links), each call's binding carries S1-09's
+ * settler and the three writers, and the face holds that same HeldLinks as its links: the link S1-10's writer staged is
+ * kept only for a fresh commit's own row (and dropped on a refusal, a throw or a repeat), for the finalize port to fill
+ * and let go. Nothing here logs a name, a town, a number, a code or a link; what a settler or writer throws leaves as
+ * thrown, as above.
  */
 export function realGate(inputs: GateInputs): GatePort {
   let validator: ToolApiValidator | null = null;
@@ -1858,6 +1941,8 @@ export function realGate(inputs: GateInputs): GatePort {
           commit: turnCommitDeps(binding),
           // A committed turn's texts and language, as the request hands them in, held for its rows (compose input).
           ...(inputs.held === undefined ? {} : { held: inputs.held }),
+          // S1-10's secure links (T-1540): the root's one hold, the stage S1-10's writer was handed in this binding.
+          ...(inputs.links === undefined ? {} : { links: inputs.links }),
         },
       });
       const answer = await face.gateAndCommit(request, at, trace);
@@ -1894,12 +1979,17 @@ export function realGate(inputs: GateInputs): GatePort {
  *     without the one-kind reads, since a one-kind S1-02 answer and an answered S1-04 both walk on to S1-08
  *     (signUpOneKindOf);
  *   - `readChatHandle`: the reads' own K-05 v1.10 item 51 read (GateReads.readChatHandle; T-1519, DL-1048), handed on as
- *     it is, which S1-01's walk asks for the turn's chat id through the turn face's walkChatsOf.
+ *     it is, which S1-01's walk asks for the turn's chat id through the turn face's walkChatsOf;
+ *   - S1-09, S1-76 and S1-10 (GateReads.listing; T-1540, DL-1179; K-09 README defaults 201 to 211), only where the kinds,
+ *     stop and one-kind reads are bound too and the root holds S1-10's secure links (GateInputs.links): the listing
+ *     ports handed into those same deps as SignUpWriterDeps.listing (signUpListingOf), so signUpSteps binds S1-09's
+ *     settler among `settlers` and the S1-09, S1-76 and S1-10 writers among `writers`, over one walk's readings.
  * With any left out the binding carries no such field (the kinds reads left out: neither `writers` nor `settlers` nor
  * `buttonsSettlers`; the stop reads left out: the kinds reads as they are handed, so S1-03 and S1-74 answer notBuilt, and
  * no S1-08 writer; the one-kind reads left out: no `buttonsSettlers`, S1-02 bound as T-1503 binds it and no S1-04
- * writer, so an answer to S1-04 is notBuilt, as T-1516's binding; the chat read left out: S1-01 inserts its thread), and
- * the commit behaves as before.
+ * writer, so an answer to S1-04 is notBuilt, as T-1516's binding; the chat read left out: S1-01 inserts its thread; the
+ * listing ports, the links or any of the three reads they ride on left out: no S1-09 settler and no S1-09, S1-76 or
+ * S1-10 writer), and the commit behaves as before.
  * It reads nothing and logs nothing. Exported for its unit test alone
  * (./gate-binding.test.ts): the binding's own fields are proven there under Node, the walk on staging's reads in
  * ./staging/tool-api-gate.worker.test.ts.
@@ -1935,8 +2025,71 @@ export function gateBindingOf(
           kinds: signUpKindsOf(reads.kinds, reads.stop),
           plugIns: { bundles },
           ...signUpOneKindOf(reads.companies, reads.stop),
+          ...signUpListingOf(reads, inputs),
         })),
     ...(reads?.readChatHandle === undefined ? {} : { readChatHandle: reads.readChatHandle }),
+  };
+}
+
+/**
+ * Whether S1-09's, S1-76's and S1-10's ports ride on this binding's reads (T-1540): the listing ports, and the kinds,
+ * stop and one-kind reads beside them (staging's shape). It reads nothing.
+ */
+function bindsListing(reads: GateReads | null): reads is GateReads & {
+  readonly kinds: KindsWriterDeps;
+  readonly stop: GateStopReads;
+  readonly companies: CompaniesReads;
+  readonly listing: GateListingReads;
+} {
+  if (reads === null) return false;
+  return (
+    reads.listing !== undefined &&
+    reads.kinds !== undefined &&
+    reads.stop !== undefined &&
+    reads.companies !== undefined
+  );
+}
+
+/**
+ * The root's one hold of S1-10's secure links (T-1540; held.ts HeldLinks): a new one where the gate's reads bind the
+ * listing ports (bindsListing), which realPorts hands the gate, compose-input and finalize ports alike; undefined where
+ * they do not, so none of the three holds links, as before. It reads nothing.
+ */
+export function heldLinksFor(reads: GateReads | null): HeldLinks | undefined {
+  return bindsListing(reads) ? new HeldLinks() : undefined;
+}
+
+/**
+ * S1-09's, S1-76's and S1-10's deps for one call (T-1540, S1-09 design card 8 extended to S1-10; DL-1179; K-09 README
+ * defaults 201 to 211; the turn face's commit.ts default 7), only where the reads bind the listing ports beside the
+ * kinds, stop and one-kind reads (bindsListing) and the root holds S1-10's secure links (GateInputs.links):
+ *   - places: a fresh Places port, made here for this one call (GateListingReads.places);
+ *   - reads, paging and mobileId.reads: the listing ports as they are handed;
+ *   - stop: the stop home's reads (GateReads.stop), the same StopHomeReads S1-03's, S1-74's and S1-08's writers read, no
+ *     second binding;
+ *   - mobileId.link: the link's host and base path as GateListingReads.linkPlace answers them for this call, the gate's
+ *     clock (GateInputs.now, as a Date at each read) and the root's HeldLinks as its stage, the same object the gate face
+ *     holds as its links and the compose-input and finalize ports' rows read.
+ * Otherwise nothing, so signUpSteps binds no S1-09 settler and none of the three writers. It reads no database, and logs
+ * nothing.
+ */
+function signUpListingOf(reads: GateReads, inputs: GateInputs): Pick<SignUpWriterDeps, "listing"> {
+  const stage = inputs.links;
+  if (stage === undefined || !bindsListing(reads)) return {};
+  const { listing, stop } = reads;
+  const clock = inputs.now ?? Date.now;
+  const { host, basePath } = listing.linkPlace();
+  return {
+    listing: {
+      places: listing.places(),
+      reads: listing.reads,
+      stop: stop.reads,
+      paging: listing.paging,
+      mobileId: {
+        reads: listing.mobileId,
+        link: { host, basePath, now: () => new Date(clock()), stage },
+      },
+    },
   };
 }
 
@@ -2070,6 +2223,12 @@ export interface ComposeInputInputs {
    * shares one): a committed turn's row gets the words of the text it replies to as its inbound text, sent as they are.
    */
   readonly held: HeldTurns;
+  /**
+   * S1-10's secure links (T-1540; held.ts HeldLinks): the root's one hold, the gate port's (realPorts shares one). A row
+   * the gate face holds a link for gets it as its link.secure fact and link.secure among its allowed links (rows.ts
+   * default 15). Left out, no row has one, as before.
+   */
+  readonly links?: HeldLinks;
 }
 
 /** The scope where no database is bound: each compose input fails closed before anything is read, inside the base. */
@@ -2129,7 +2288,13 @@ export function realComposeInput(inputs: ComposeInputInputs): ComposeInputPort {
       validator ??= createToolApiValidator();
       const reads = inputs.reads;
       const bundles = new FrontierBundleReads(inputs.pinnedOf(trace), inputs.bundles());
-      const rows: RowBinding = { data: composeRowData(reads), bundles, held: inputs.held };
+      const rows: RowBinding = {
+        data: composeRowData(reads),
+        bundles,
+        held: inputs.held,
+        // S1-10's secure link (T-1540): the row the gate face holds one for lists link.secure among its allowed links.
+        ...(inputs.links === undefined ? {} : { links: inputs.links }),
+      };
       const face = createTurnFace<FrontierRepo>({
         // The frontier is its own port's: this face's frontier is never called.
         scope: NO_FRONTIER_SCOPE,
@@ -2326,6 +2491,12 @@ export interface FinalizeInputs {
   readonly held: HeldTurns;
   /** Epoch milliseconds: the root's clock, for when a passed-on message's question is withdrawn (cancelClock's `at`). */
   readonly now: () => number;
+  /**
+   * S1-10's secure links (T-1540; held.ts HeldLinks): the root's one hold, the gate port's (realPorts shares one). A row
+   * the gate face holds a link for has it filled as link.secure (rows.ts default 15), and the face lets it go once that
+   * row's finalize has answered send, sendAndLog or passedOn. Left out, no row has one, as before.
+   */
+  readonly links?: HeldLinks;
 }
 
 /** The scope where no database is bound: each finalize fails closed before anything is read or written, inside the base. */
@@ -2415,6 +2586,8 @@ export function realFinalize(inputs: FinalizeInputs): FinalizePort {
         held: inputs.held,
         now: () => utcSecondsOf(inputs.now()),
         log: finalizeNoteOn(trace),
+        // S1-10's secure link (T-1540): filled as link.secure for the row the gate face holds it for, that row alone.
+        ...(inputs.links === undefined ? {} : { links: inputs.links }),
       };
       const face = createTurnFace<FrontierRepo>({
         // The frontier is its own port's: this face's frontier is never called.
@@ -2425,6 +2598,8 @@ export function realFinalize(inputs: FinalizeInputs): FinalizePort {
           scope: data?.scope ?? NO_FINALIZE_SCOPE,
           commit: NO_FINALIZE_COMMIT,
           finalize: finalizeDeps(rows),
+          // The face that lets a row's link go once its finalize has answered for good (held.ts HeldLinks).
+          ...(inputs.links === undefined ? {} : { links: inputs.links }),
         },
       });
       const answer = await face.finalizeMessage(request, trace);
