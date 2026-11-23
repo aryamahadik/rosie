@@ -2,9 +2,41 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 915, [`c4a3cd22`](https://github.com/aryamahadik/rosie/commit/c4a3cd22), 2026-11-23 07:28:49 UTC.
+- **Through:** commit 917, [`98a0d99f`](https://github.com/aryamahadik/rosie/commit/98a0d99f), 2026-11-23 08:14:15 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 917. docs: COMMIT\_HISTORY.md through commit 915 (c4a3cd22, \#933) (\#935)
+
+- **Commit:** [`98a0d99f`](https://github.com/aryamahadik/rosie/commit/98a0d99f), by Arya Mahadik, 2026-11-23 08:14:15 UTC
+- **Pull request:** [#935](https://github.com/aryamahadik/rosie/pull/935) from `task/commit-history-240`, merged 2026-11-23 08:14:16 UTC. It squashed 1 branch commit:
+  - `7083811` docs: COMMIT\_HISTORY.md through commit 915 (c4a3cd22, \#933)
+- **Files changed:** 1 (+61 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +61 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 916. T-1542: parkTurn takes K-05 v1.23's lineRequest beside v1's form: the turn parked at tries 1-3, K-37's row with default 220's summary, the passedOn row planned then checked at version 2, the entry; a repeat answers its first park in either form (DL-1185) (\#934)
+
+- **Commit:** [`74e384c4`](https://github.com/aryamahadik/rosie/commit/74e384c4), by Arya Mahadik, 2026-11-23 08:14:11 UTC
+- **Pull request:** [#934](https://github.com/aryamahadik/rosie/pull/934) from `task/T-1542`, merged 2026-11-23 08:14:12 UTC. It squashed 1 branch commit:
+  - `5e596ae` T-1542: parkTurn takes K-05 v1.23's lineRequest beside v1's form: the…
+- **Files changed:** 3 (+1415 −50), by folder:
+  - `db/repo/` park.int.test.ts +518 −7, park.test.ts +522 −0, park.ts +375 −43
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 915. docs: COMMIT\_HISTORY.md through commit 912 (f0de9f45, \#930) (\#933)
 
