@@ -2,9 +2,64 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 917, [`98a0d99f`](https://github.com/aryamahadik/rosie/commit/98a0d99f), 2026-11-23 08:14:15 UTC.
+- **Through:** commit 920, [`d4fabf68`](https://github.com/aryamahadik/rosie/commit/d4fabf68), 2026-11-23 09:16:29 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 920. docs: COMMIT\_HISTORY.md through commit 917 (98a0d99f, \#935) (\#937)
+
+- **Commit:** [`d4fabf68`](https://github.com/aryamahadik/rosie/commit/d4fabf68), by Arya Mahadik, 2026-11-23 09:16:29 UTC
+- **Pull request:** [#937](https://github.com/aryamahadik/rosie/pull/937) from `task/commit-history-241`, merged 2026-11-23 09:16:29 UTC. It squashed 1 branch commit:
+  - `2540fc1` docs: COMMIT\_HISTORY.md through commit 917 (98a0d99f, \#935)
+- **Files changed:** 1 (+33 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +33 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 919. T-1541: the staging deploy's default bundle is bundles/v3 (T-1526's bundle v3: v2's steps plus S1-77, S1-76 and S1-10; DL-1179); header step 3, the default's comment and the usage line say so; --bundle and --bundle= unchanged; the default case expects v3's manifest id with no v2 or v0 key, --bundle bundles/v2 still publishes v2 (\#928)
+
+- **Commit:** [`e9ee0ee0`](https://github.com/aryamahadik/rosie/commit/e9ee0ee0), by Arya Mahadik, 2026-11-23 09:16:24 UTC
+- **Pull request:** [#928](https://github.com/aryamahadik/rosie/pull/928) from `task/T-1541`, merged 2026-11-23 09:16:25 UTC. It squashed 1 branch commit:
+  - `07616ae` T-1541: the staging deploy's default bundle is bundles/v3 (T-1526's b…
+- **Files changed:** 2 (+31 −22), by folder:
+  - `infra/ci/` deploy-staging.test.mjs +24 −16
+  - `infra/scripts/` deploy-staging.sh +7 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 918. T-1540: staging's gate hands signUpSteps the S1-09 and S1-10 deps (card 8, DL-1179), squashed onto main (DL-1199) (\#936)
+
+- **Commit:** [`0519487d`](https://github.com/aryamahadik/rosie/commit/0519487d), by Arya Mahadik, 2026-11-23 09:16:20 UTC
+- **Pull request:** [#936](https://github.com/aryamahadik/rosie/pull/936) from `task/T-1540s`, merged 2026-11-23 09:16:21 UTC. It squashed 1 branch commit:
+  - `94bda92` T-1540: staging's gate hands signUpSteps the S1-09 and S1-10 deps (ca…
+- **Files changed:** 8 (+2044 −39), by folder:
+  - `adapters/` package.json +2 −1
+  - `runtime/src/wiring/` gate-binding.test.ts +550 −4, real.ts +185 −10
+  - `runtime/src/wiring/staging/` listing-paging.test.ts +286 −0, listing-paging.ts +212 −0, tool-api-gate.seed.ts +96 −9, tool-api-gate.ts +82 −13, tool-api-gate.worker.test.ts +631 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+real.ts adds GateReads.listing and GateInputs.links/now; gateBindingOf hands SignUpWriterDeps.listing only when the kinds, stop, one-kind and listing reads are all bound and the root holds links. One HeldLinks per root goes to the gate face, compose and finalize. tool-api-gate.ts binds a new Places double per call and the listing and mobile-id reads over items 79 and 26, each on its own runtime client; staging/listing-paging.ts is a narrow, business-scoped PagingReader (reviewItem, own business row, businessZone; every other read notBuilt). adapters/package.json exports ./places/double.
+
+Judged on b0b5433d (built on T-1537's 6d30a3d5, identical to main's 005a54f1): QA, the security reviewer and the action-layer engineer PASS.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 917. docs: COMMIT\_HISTORY.md through commit 915 (c4a3cd22, \#933) (\#935)
 
