@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 908, [`4bcb06fa`](https://github.com/aryamahadik/rosie/commit/4bcb06fa), 2026-11-23 01:42:57 UTC.
+- **Through:** commit 910, [`4fe3a470`](https://github.com/aryamahadik/rosie/commit/4fe3a470), 2026-11-23 03:05:02 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 910. docs: COMMIT\_HISTORY.md through commit 908 (4bcb06fa, \#925) (\#927)
+
+- **Commit:** [`4fe3a470`](https://github.com/aryamahadik/rosie/commit/4fe3a470), by Arya Mahadik, 2026-11-23 03:05:02 UTC
+- **Pull request:** [#927](https://github.com/aryamahadik/rosie/pull/927) from `task/commit-history-237`, merged 2026-11-23 03:05:02 UTC. It squashed 1 branch commit:
+  - `c139252` docs: COMMIT\_HISTORY.md through commit 908 (4bcb06fa, \#925)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 909. T-1537: the turn face binds S1-09's settler and the S1-09, S1-76 and S1-10 writers over one walk's readings (SignUpWriterDeps.listing; the settler's "ask" as SETTLER\_ASKS; no banned-word read, no link generator handed on), pgTurnCalls takes the link's HeldLinks as the face's links and the rows' links; unit proofs and the integration world on bundle v3 (\#926)
+
+- **Commit:** [`005a54f1`](https://github.com/aryamahadik/rosie/commit/005a54f1), by Arya Mahadik, 2026-11-23 03:04:58 UTC
+- **Pull request:** [#926](https://github.com/aryamahadik/rosie/pull/926) from `task/T-1537`, merged 2026-11-23 03:04:58 UTC. It squashed 1 branch commit:
+  - `6d30a3d` T-1537: the turn face binds S1-09's settler and the S1-09, S1-76 and …
+- **Files changed:** 5 (+1832 −25), by folder:
+  - `actions/src/tool-api/turn-face/` commit.test.ts +349 −2, commit.ts +151 −18, index.ts +5 −1
+  - `actions/src/tool-api/turn-face/pg/` calls.ts +19 −4, s1-09-answer.int.test.ts +1308 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 908. docs: COMMIT\_HISTORY.md through commit 906 (52fbac2a, \#923) (\#925)
 
