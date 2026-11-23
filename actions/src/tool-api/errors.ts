@@ -5,7 +5,13 @@
 // base answers those in the contract's error shape (02-contracts section 2 item 2: "Each is a JSON object with its own
 // 'error' code") with codes of its own. Nothing is read or written for any of them: each is answered before the business
 // scope opens, or (notBuilt) inside it, rolled back. README of this package, defaults; a K-09 minor version may adopt them.
+//
+// K-09 v1.13 (T-1539; README "v1.13", defaults 216 to 219) adopts notBuilt as K-09's own, in the same shape, and adds
+// turnRefused, gateAndCommit's answer for a final fault of the six fault lists T-1529's ruling 1 classes, labels alone;
+// both are final. The base answers turnRefused from T-1551 (refusal.ts; tool-api.ts), with the call's transaction rolled
+// back, so nothing is written for it either.
 
+import type * as K09V113 from "../../../contracts/generated/tool-api/tool-api.v1.13";
 import type { CallName } from "./calls";
 
 /** The name is no call of K-09 v1. The name itself is not echoed: it is the caller's text. */
@@ -31,17 +37,41 @@ export interface NoBusinessScopeRefusal {
   call: CallName;
 }
 
-/** The call is registered but its handler is not built yet (each call's logic is T-291 onward). */
+/**
+ * The call is registered but its handler, or a seam it reaches, is not built yet (each call's logic is T-291 onward). K-09
+ * v1.13's notBuiltError from v1.13 (README default 219): final, in the same shape.
+ */
 export interface NotBuiltRefusal {
   error: "notBuilt";
   call: CallName;
 }
 
-export type BaseRefusal =
-  UnknownCallRefusal | InvalidRequestRefusal | NoBusinessScopeRefusal | NotBuiltRefusal;
+/**
+ * K-09 v1.13's turnRefused (`$defs/turnRefusedError`; README defaults 216 and 217; T-1551): gateAndCommit's answer for a
+ * final fault of the six fault lists, in place of the throw. `from` names the list, `fault` is its label as its error
+ * carries it, and `ids` are that error's labels (a read's: the read's name), each once, in their order. Each value is a
+ * K-08 v1 safeId, the three labels K-05 v1.23's parkReason takes field for field. Nothing was written: the call's
+ * transaction was rolled back, and the open question stays at its version. Only gateAndCommit answers it.
+ */
+export type TurnRefusal = K09V113.TurnRefusedError;
 
-/** The base's own error codes; no K-09 v1 call answers one of them. */
-export const BASE_REFUSAL_CODES = ["unknownCall", "invalidRequest", "noBusinessScope", "notBuilt"] as const;
+/** The six fault lists a turnRefused names (K-09 v1.13 `turnRefusedError.from`). */
+export type RefusalFrom = TurnRefusal["from"];
+
+export type BaseRefusal =
+  UnknownCallRefusal | InvalidRequestRefusal | NoBusinessScopeRefusal | NotBuiltRefusal | TurnRefusal;
+
+/**
+ * The base's own error codes: no K-09 v1 to v1.12 call answers one of them. From K-09 v1.13, gateAndCommit's errors also
+ * hold notBuilt (naming gateAndCommit) and turnRefused, which the base answers for its handler.
+ */
+export const BASE_REFUSAL_CODES = [
+  "unknownCall",
+  "invalidRequest",
+  "noBusinessScope",
+  "notBuilt",
+  "turnRefused",
+] as const;
 
 export function isBaseRefusal(value: unknown): value is BaseRefusal {
   return (

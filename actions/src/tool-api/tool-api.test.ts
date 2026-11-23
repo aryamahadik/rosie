@@ -11,13 +11,37 @@
 // T-1193's proofs (DL-376): a caller that records the call's hop itself says so (CallOptions.callerRecordsHop), and then
 // the base records no span for the call, while its answer, its handler, its scope and every error are exactly as without
 // it; an option naming any other hop, an empty one or none changes nothing, so every call records its span as before.
+//
+// T-1551's proofs (T-1529's ruling, its card 5; K-09 v1.13 README defaults 216 to 219): through the base, gateAndCommit
+// answers every final fault of the six fault lists turnRefused {from, fault, ids}, labels only, its transaction rolled
+// back so nothing of the refused part is written, and its span names the answer and the fault alone; every transient
+// fault, and any throw of another list, is still thrown as today; no other call answers turnRefused; T-1529's two cases
+// and v1.13's notBuilt answer their v1.13 fixtures' outcomes; a repeated id and an id that is no label are left out; and
+// a turn holding a STOP gets an answer, not a throw, for its refused decided commit, so its core-only commit follows at
+// once, which the base never answers turnRefused and runs as before.
 
 import { describe, expect, it } from "vitest";
 
 import type { Hop, Span } from "../../../runtime/src/trace";
 import type { Tx } from "../../../db/repo/scope";
+import { CommitRefusedError, type CommitFault } from "../commit/errors";
+import { WalkRefusedError, type WalkFault } from "../commit/walk/errors";
 import { CALL_HOPS, CALL_NAMES, hopOf, type CallName, type CallerKind } from "./calls";
-import { NotBuiltError, ToolApiContractError } from "./errors";
+import { NotBuiltError, ToolApiContractError, isBaseRefusal, type RefusalFrom } from "./errors";
+import {
+  CompaniesReadError,
+  CompaniesRefusedError,
+  type CompaniesFault,
+  type CompaniesReadFault,
+} from "./journey-1/companies/errors";
+import {
+  KindsReadError,
+  KindsRefusedError,
+  type KindsFault,
+  type KindsReadFault,
+} from "./journey-1/kinds/errors";
+import { PlugInRefusedError } from "./journey-1/plug-ins/errors";
+import { FAULT_CLASSES, REFUSAL_FROMS, type FaultRule } from "./refusal";
 import { businessScopeOf } from "./scope";
 import {
   BUNDLE,
@@ -838,6 +862,350 @@ describe("a caller that records the call's hop itself (CallOptions, T-1193): no 
       expect(plain.hop, call).toBe(hopOf(call, callerOf(request)?.kind as CallerKind | undefined));
       expect(untimed(onlySpan(await spansOf({}))), call).toEqual(untimed(plain));
     }
+  });
+});
+
+// ---- T-1551: a final fault answers turnRefused (K-09 v1.13) ----------------------------------------------------------
+
+/** A made-up person's row id: no fixture, seed or request holds it. */
+const MADE_UP_ROW = "person-t1551-made-up-4b9d";
+/** A SQLSTATE no id, time or hash here holds. */
+const SQLSTATE = "40P01";
+/** The ids each list's error is made with: two labels, a repeat, a fiction number and a person's name. */
+const IDS_GIVEN = ["S1-04", "S1-08", "S1-04", "15555550131", "Sam Lee"] as const;
+/** What turnRefused keeps of them: each label once, in order. */
+const IDS_KEPT = ["S1-04", "S1-08"];
+/** What no answer, span or report of a refusal may hold. */
+const NEVER_SAID = ["15555550131", "Sam Lee", MADE_UP_ROW, SQLSTATE, "nothing was written"];
+
+/** An error of the list `from` with `fault`, as its code throws it (a read's names its read). */
+function faultError(from: RefusalFrom, fault: string): Error {
+  switch (from) {
+    case "walk":
+      return new WalkRefusedError(fault as WalkFault, IDS_GIVEN);
+    case "commit":
+      return new CommitRefusedError(fault as CommitFault, IDS_GIVEN);
+    case "companies":
+      return new CompaniesRefusedError(fault as CompaniesFault, IDS_GIVEN);
+    case "kinds":
+      return new KindsRefusedError(fault as KindsFault, IDS_GIVEN);
+    case "kindsRead":
+      return new KindsReadError("readKindCatalog", fault as KindsReadFault, {
+        error: "notFound",
+        table: "persons",
+        rowId: MADE_UP_ROW,
+      });
+    case "companiesRead":
+      return new CompaniesReadError("readBusinessKinds", fault as CompaniesReadFault, {
+        error: "transient",
+        sqlstate: SQLSTATE,
+      });
+  }
+}
+
+/** The ids turnRefused names for faultError's error of the list `from`. */
+function keptIds(from: RefusalFrom): string[] {
+  if (from === "kindsRead") return ["readKindCatalog"];
+  if (from === "companiesRead") return ["readBusinessKinds"];
+  return IDS_KEPT;
+}
+
+/** Every fault of the six lists with its class in refusal.ts (refusal.test.ts holds the classes to T-1529's ruling 1). */
+const EVERY_FAULT: readonly { from: RefusalFrom; fault: string; rule: FaultRule }[] = REFUSAL_FROMS.flatMap(
+  (from) => Object.entries(FAULT_CLASSES[from]).map(([fault, rule]) => ({ from, fault, rule })),
+);
+
+/** How one call through a fresh base settled, what its scope recorded and the spans it left. */
+async function settle(
+  call: CallName,
+  request: unknown,
+  answer: (request: unknown, context: CallContext<RecordingRepo>) => unknown,
+  options?: CallOptions,
+) {
+  const { api, scope, seen } = setup(call, answer);
+  const { trace, spans } = traceFor(request);
+  const settled = await api.call(call, structuredClone(request), trace, options).then(
+    (answered) => ({ answered, thrown: undefined as unknown }),
+    (thrown: unknown) => ({ answered: undefined, thrown }),
+  );
+  return { ...settled, events: scope.events, seen, spans };
+}
+
+describe("gateAndCommit answers every final fault of the six lists turnRefused, labels only, with nothing written (T-1551)", () => {
+  const commit = fixture("commit-s1-02.json") as Exchange;
+
+  it("covers every fault of the six lists: 60 final, 5 transient and kinds' reviewRefused by its ids", () => {
+    expect(EVERY_FAULT.filter(({ rule }) => rule === "final")).toHaveLength(60);
+    expect(
+      EVERY_FAULT.filter(({ rule }) => rule === "transient").map(({ from, fault }) => `${from}:${fault}`),
+    ).toEqual([
+      "walk:questionNotLive",
+      "commit:wrongState",
+      "commit:stillChanged",
+      "kindsRead:transient",
+      "companiesRead:transient",
+    ]);
+    expect(EVERY_FAULT.filter(({ rule }) => rule === "transientWhenIdsCarryTransient")).toEqual([
+      { from: "kinds", fault: "reviewRefused", rule: "transientWhenIdsCarryTransient" },
+    ]);
+  });
+
+  for (const { from, fault, rule } of EVERY_FAULT) {
+    if (rule === "transient") {
+      it(`${from}: ${fault} (transient) is thrown as today, rolled back, its span failed naming the error's class alone`, async () => {
+        const error = faultError(from, fault);
+        const ran = await settle("gateAndCommit", commit.request, () => {
+          throw error;
+        });
+        expect(ran.thrown).toBe(error);
+        expect(ran.answered).toBeUndefined();
+        expect(ran.events.map((event) => event.what)).toEqual(["begin", "scope", "read", "rollback"]);
+        const span = onlySpan(ran.spans);
+        expect(span).toMatchObject({
+          outcome: "failed",
+          error_code: error.name,
+          decided: { answered: "thrown" },
+        });
+        expect(validator.checkSpan(span)).toEqual([]);
+      });
+      continue;
+    }
+    it(`${from}: ${fault} (final) answers turnRefused with its labels, rolled back, its span refused naming the fault`, async () => {
+      const ran = await settle("gateAndCommit", commit.request, () => {
+        throw faultError(from, fault);
+      });
+      expect(ran.thrown).toBeUndefined();
+      expect(ran.answered).toEqual({ error: "turnRefused", from, fault, ids: keptIds(from) });
+      expect(isBaseRefusal(ran.answered)).toBe(true);
+      // The handler ran inside its scope and its transaction was rolled back: nothing of the refused part was written.
+      expect(ran.seen).toHaveLength(1);
+      expect(ran.events.map((event) => event.what)).toEqual(["begin", "scope", "read", "rollback"]);
+      const span = onlySpan(ran.spans);
+      expect(span).toMatchObject({ hop: "gate", outcome: "refused", error_code: "turnRefused" });
+      expect(span.decided).toEqual({ answered: "turnRefused", from, fault });
+      expect(span.rows).toBeUndefined();
+      expect(validator.checkSpan(span)).toEqual([]);
+      for (const said of [JSON.stringify(ran.answered), JSON.stringify(span)]) {
+        for (const secret of NEVER_SAID) expect(said, secret).not.toContain(secret);
+      }
+    });
+  }
+
+  it("kinds' reviewRefused: thrown while its ids carry openReviewItem's transient, answered turnRefused with any other code", async () => {
+    const transient = new KindsRefusedError("reviewRefused", ["S1-03", "transient"]);
+    const thrown = await settle("gateAndCommit", commit.request, () => {
+      throw transient;
+    });
+    expect(thrown.thrown).toBe(transient);
+    expect(thrown.events.at(-1)).toEqual({ what: "rollback" });
+    const final = await settle("gateAndCommit", commit.request, () => {
+      throw new KindsRefusedError("reviewRefused", ["S1-03", "notFound"]);
+    });
+    expect(final.answered).toEqual({
+      error: "turnRefused",
+      from: "kinds",
+      fault: "reviewRefused",
+      ids: ["S1-03", "notFound"],
+    });
+    expect(final.events.at(-1)).toEqual({ what: "rollback" });
+  });
+
+  it("a repeated id and an id that is no label are left out; an error naming none answers no id", async () => {
+    const ran = await settle("gateAndCommit", commit.request, () => {
+      throw new CompaniesRefusedError("sharedWordTwoPicks", [
+        "S1-04",
+        "+15555550131",
+        "S1-04",
+        "Plumbing and electrical",
+      ]);
+    });
+    expect(ran.answered).toEqual({
+      error: "turnRefused",
+      from: "companies",
+      fault: "sharedWordTwoPicks",
+      ids: ["S1-04"],
+    });
+    const none = await settle("gateAndCommit", commit.request, () => {
+      throw new WalkRefusedError("notDecided");
+    });
+    expect(none.answered).toEqual({ error: "turnRefused", from: "walk", fault: "notDecided", ids: [] });
+  });
+
+  it("a throw of a list the ruling does not class, a contract fault or an unknown throw is thrown as today (open gap 204)", async () => {
+    const throws: [Error, string][] = [
+      [new PlugInRefusedError("noPicks"), "PlugInRefusedError"],
+      [new TypeError("Sam Lee at +15555550131 broke it"), "TypeError"],
+    ];
+    for (const [error, name] of throws) {
+      const ran = await settle("gateAndCommit", commit.request, () => {
+        throw error;
+      });
+      expect(ran.thrown, name).toBe(error);
+      expect(ran.events.at(-1), name).toEqual({ what: "rollback" });
+      expect(onlySpan(ran.spans), name).toMatchObject({ outcome: "failed", error_code: name });
+    }
+    const outside = await settle("gateAndCommit", commit.request, () => ({
+      error: "turnRefused",
+      from: "walk",
+    }));
+    expect(outside.thrown).toBeInstanceOf(ToolApiContractError);
+    // notBuilt is answered as before (K-09 v1.13 default 219: adopted as K-09's own, in the same shape).
+    const notBuilt = await settle("gateAndCommit", commit.request, () => {
+      throw new NotBuiltError("gateAndCommit");
+    });
+    expect(notBuilt.answered).toEqual({ error: "notBuilt", call: "gateAndCommit" });
+  });
+
+  it("only gateAndCommit answers turnRefused (README v1.13 default 216): every other call throws a final fault as today", async () => {
+    const final = (): never => {
+      throw new CompaniesRefusedError("secondCompany", ["S1-04"]);
+    };
+    for (const call of [
+      "buildFrontier",
+      "matchKinds",
+      "composeInput",
+      "finalizeMessage",
+      "setRecordFlag",
+    ] as const) {
+      const request = VALID[call];
+      if (request === undefined) throw new Error(`K-09 v1 has an accepted ${call} request`);
+      const ran = await settle(call, request, final);
+      expect(ran.thrown, call).toBeInstanceOf(CompaniesRefusedError);
+      expect(ran.events.at(-1), call).toEqual({ what: "rollback" });
+    }
+    const kinds = await settle("matchKinds", VALID.matchKinds, () => {
+      throw new KindsReadError("readPickedKinds", "notFound", null);
+    });
+    expect(kinds.thrown).toBeInstanceOf(KindsReadError);
+  });
+
+  it("with the turn face's option (the caller records the gate hop) the answer is the same, and the base leaves no span", async () => {
+    const throwSecond = (): never => {
+      throw new CompaniesRefusedError("secondCompany", ["S1-04"]);
+    };
+    const plain = await settle("gateAndCommit", commit.request, throwSecond);
+    const opted = await settle("gateAndCommit", commit.request, throwSecond, { callerRecordsHop: "gate" });
+    expect(opted.answered).toEqual(plain.answered);
+    expect(opted.answered).toEqual({
+      error: "turnRefused",
+      from: "companies",
+      fault: "secondCompany",
+      ids: ["S1-04"],
+    });
+    expect(opted.events).toEqual(plain.events);
+    expect(onlySpan(plain.spans).error_code).toBe("turnRefused");
+    expect(opted.spans).toEqual([]);
+  });
+});
+
+describe("K-09 v1.13's gateAndCommit fixtures: what the base answers for T-1529's two cases and for notBuilt (T-1551)", () => {
+  const cases: { file: string; thrown: () => Error }[] = [
+    // companies/writer.ts line 290: a second company while the party rule's flag is off, naming S1-04 alone.
+    {
+      file: "commit-s1-04-refused-second-company.json",
+      thrown: () => new CompaniesRefusedError("secondCompany", ["S1-04"]),
+    },
+    // The walk reaches S1-04, which the turn's pinned bundle does not hold.
+    {
+      file: "commit-s1-02-refused-step-not-in-bundle.json",
+      thrown: () => new WalkRefusedError("stepNotInBundle", ["S1-04"]),
+    },
+    // S1-08's writer bound without stop reads: a seam not built, answered notBuilt naming gateAndCommit.
+    { file: "commit-s1-04-not-built.json", thrown: () => new NotBuiltError("gateAndCommit") },
+  ];
+
+  for (const { file, thrown } of cases) {
+    it(`${file}: the base answers the fixture's outcome, with nothing written and the question left open`, async () => {
+      const exchange = fixture(file) as Exchange;
+      expect(exchange.call).toBe("gateAndCommit");
+      expect(validator.check("gateAndCommit", "request", exchange.request)).toEqual([]);
+      const ran = await settle("gateAndCommit", exchange.request, () => {
+        throw thrown();
+      });
+      expect(ran.answered).toEqual(exchange.outcome);
+      expect(ran.seen).toEqual([
+        {
+          call: "gateAndCommit",
+          request: exchange.request,
+          businessId: callerOf(exchange.request)?.businessId,
+        },
+      ]);
+      expect(ran.events.map((event) => event.what)).toEqual(["begin", "scope", "read", "rollback"]);
+      const error = (exchange.outcome as { error: string }).error;
+      expect(onlySpan(ran.spans)).toMatchObject({ outcome: "refused", error_code: error });
+    });
+  }
+});
+
+describe("a turn holding a STOP: its refused decided commit is answered, so its core-only commit follows as before (T-1551)", () => {
+  const refused = fixture("commit-s1-02-refused-step-not-in-bundle.json") as Exchange;
+  const stop = fixture("stop-recorded.json") as Exchange;
+  const turnCaller = callerOf(refused.request) ?? {};
+  const stopCore = (stop.request.core as Json[]).find((action) => action.call === "recordStopOrStart");
+  if (stopCore === undefined) throw new Error("stop-recorded.json holds the STOP's core action");
+  /** The STOP's core action under `caller`, as the runtime's turn hands it (turn.ts coreOf). */
+  const stopUnder = (caller: Json): Json => ({
+    call: "recordStopOrStart",
+    request: { ...(stopCore.request as Json), caller },
+  });
+  /** The decided commit with the STOP riding in it, under the turn's caller (K-09 README default 10). */
+  const decidedWithStop: Json = { ...refused.request, core: [stopUnder(turnCaller)] };
+  /** The STOP's core-only commit under the keyword texts' caller, which names no business (turn.ts keywordCaller). */
+  const keywordCaller = { ...turnCaller, businessId: null };
+  const coreOnlyStop: Json = {
+    ...refused.request,
+    caller: keywordCaller,
+    input: { kind: "coreOnly" },
+    core: [stopUnder(keywordCaller)],
+  };
+  /** The same core-only commit under the turn's business, which the base itself runs. */
+  const coreOnlyScoped: Json = { ...coreOnlyStop, caller: turnCaller, core: [stopUnder(turnCaller)] };
+
+  it("the decided commit answers turnRefused, the STOP's action rolled back with it; the core-only commit is never answered turnRefused", async () => {
+    for (const request of [decidedWithStop, coreOnlyStop, coreOnlyScoped]) {
+      expect(validator.check("gateAndCommit", "request", request)).toEqual([]);
+    }
+    const scope = recordingScope();
+    const seen: HandlerCall[] = [];
+    // The walk refuses the decided part as final; a core-only commit commits the STOP, as K-05 would.
+    const api = createToolApi({
+      validator,
+      scope,
+      handlers: recordingHandlers(
+        "gateAndCommit",
+        (request) => {
+          if ((request as { input: { kind: string } }).input.kind === "decided") {
+            throw new WalkRefusedError("stepNotInBundle", ["S1-04"]);
+          }
+          return stop.outcome;
+        },
+        seen,
+      ),
+    });
+    const callOnce = async (request: Json) => {
+      scope.events.length = 0;
+      seen.length = 0;
+      const { trace } = traceFor(request);
+      const answer = await api.call("gateAndCommit", structuredClone(request), trace, {
+        callerRecordsHop: "gate",
+      });
+      return { answer, events: scope.events.map((event) => event.what), ran: seen.length };
+    };
+
+    // 1. The decided commit: an answer, not a throw, so the runtime goes straight to the STOP's core-only commit
+    //    (turn.ts commitKeywords) with no resend; its transaction, the STOP's action in it, is rolled back.
+    const first = await callOnce(decidedWithStop);
+    expect(first.answer).toEqual(refused.outcome);
+    expect(first.events).toEqual(["begin", "scope", "read", "rollback"]);
+    // 2. The STOP's own core-only commit names no business: the keyword door's (door.ts), which the base never runs, as
+    //    before; it is never answered turnRefused, and nothing of the refusal before it is held.
+    const second = await callOnce(coreOnlyStop);
+    expect(second.answer).toEqual({ error: "noBusinessScope", call: "gateAndCommit" });
+    expect(second.ran).toBe(0);
+    // 3. A core-only commit under the turn's business the base runs commits, as it did before any refusal.
+    const third = await callOnce(coreOnlyScoped);
+    expect(third.answer).toEqual(stop.outcome);
+    expect(third.events).toEqual(["begin", "scope", "read", "commit"]);
   });
 });
 
