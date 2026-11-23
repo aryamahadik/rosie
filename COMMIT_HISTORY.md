@@ -2,9 +2,43 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 910, [`4fe3a470`](https://github.com/aryamahadik/rosie/commit/4fe3a470), 2026-11-23 03:05:02 UTC.
+- **Through:** commit 912, [`f0de9f45`](https://github.com/aryamahadik/rosie/commit/f0de9f45), 2026-11-23 03:44:17 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 912. docs: COMMIT\_HISTORY.md through commit 910 (4fe3a470, \#927) (\#930)
+
+- **Commit:** [`f0de9f45`](https://github.com/aryamahadik/rosie/commit/f0de9f45), by Arya Mahadik, 2026-11-23 03:44:17 UTC
+- **Pull request:** [#930](https://github.com/aryamahadik/rosie/pull/930) from `task/commit-history-238`, merged 2026-11-23 03:44:17 UTC. It squashed 1 branch commit:
+  - `5731bdb` docs: COMMIT\_HISTORY.md through commit 910 (4fe3a470, \#927)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 911. T-1539: freeze K-09 v1.13, the turnRefused answer for a final refusal and notBuilt adopted as final (labels in safeId form, the final and transient classification, a STOP's core-only commit kept before any park, park at once only before the commit), rounds 1-2 squashed onto main (DL-1174, DL-1177) (\#929)
+
+- **Commit:** [`03472f2a`](https://github.com/aryamahadik/rosie/commit/03472f2a), by Arya Mahadik, 2026-11-23 03:44:12 UTC
+- **Pull request:** [#929](https://github.com/aryamahadik/rosie/pull/929) from `task/T-1539s`, merged 2026-11-23 03:44:13 UTC. It squashed 1 branch commit:
+  - `5bcd0fe` T-1539: freeze K-09 v1.13, the turnRefused answer for a final refusal…
+- **Files changed:** 17 (+793 −5), by folder:
+  - `contracts/tool-api/` README.md +50 −3, frozen.json +15 −1, tool-api.v1.13.schema.json +701 −0
+  - `contracts/tool-api/fixtures/` commit-s1-02-refused-step-not-in-bundle.json +1 −0, commit-s1-04-not-built.json +1 −0, commit-s1-04-refused-second-company.json +1 −0, index.json +14 −1
+  - `contracts/tool-api/fixtures/invalid/` refuse-not-built-other-call.json +1 −0, refuse-turn-refused-commit-still-changed.json +1 −0, refuse-turn-refused-fault-words.json +1 −0, refuse-turn-refused-from-unclassified.json +1 −0, refuse-turn-refused-id-number.json +1 −0, refuse-turn-refused-ids-twice.json +1 −0, refuse-turn-refused-read-transient.json +1 −0, refuse-turn-refused-review-transient.json +1 −0, refuse-turn-refused-transient-fault.json +1 −0, refuse-turn-refused-with-words.json +1 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 910. docs: COMMIT\_HISTORY.md through commit 908 (4bcb06fa, \#925) (\#927)
 
