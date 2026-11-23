@@ -2,9 +2,69 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 912, [`f0de9f45`](https://github.com/aryamahadik/rosie/commit/f0de9f45), 2026-11-23 03:44:17 UTC.
+- **Through:** commit 915, [`c4a3cd22`](https://github.com/aryamahadik/rosie/commit/c4a3cd22), 2026-11-23 07:28:49 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 915. docs: COMMIT\_HISTORY.md through commit 912 (f0de9f45, \#930) (\#933)
+
+- **Commit:** [`c4a3cd22`](https://github.com/aryamahadik/rosie/commit/c4a3cd22), by Arya Mahadik, 2026-11-23 07:28:49 UTC
+- **Pull request:** [#933](https://github.com/aryamahadik/rosie/pull/933) from `task/commit-history-239`, merged 2026-11-23 07:28:49 UTC. It squashed 1 branch commit:
+  - `b3bf046` docs: COMMIT\_HISTORY.md through commit 912 (f0de9f45, \#930)
+- **Files changed:** 1 (+35 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +35 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 914. T-437: files port (K-13 v1) and its in-memory double: signed uploads by kind and owner, leading-bytes check, short read links only on the caller's viewer token with one view record per link, server writes and reads, delete for erasure only, every object private (\#932)
+
+- **Commit:** [`e01a9b8d`](https://github.com/aryamahadik/rosie/commit/e01a9b8d), by Arya Mahadik, 2026-11-23 07:28:45 UTC
+- **Pull request:** [#932](https://github.com/aryamahadik/rosie/pull/932) from `task/T-437`, merged 2026-11-23 07:28:45 UTC. It squashed 1 branch commit:
+  - `4a2575d` T-437: files port (K-13 v1) and its in-memory double: signed uploads …
+- **Files changed:** 11 (+4017 −0), by folder:
+  - `adapters/src/files/double/` double.test.ts +1500 −0, double.ts +656 −0, index.ts +2 −0
+  - `adapters/src/files/port/` index.ts +8 −0, keys.ts +127 −0, port.test.ts +597 −0, rules.ts +145 −0, sniff.ts +73 −0, span.ts +213 −0, types.ts +345 −0, validate.ts +351 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 913. T-514: the page answer kit: answer, read-back, exact yes, typed-name signature (sign-up gate A3) (\#931)
+
+- **Commit:** [`60bfed97`](https://github.com/aryamahadik/rosie/commit/60bfed97), by Arya Mahadik, 2026-11-23 07:28:40 UTC
+- **Pull request:** [#931](https://github.com/aryamahadik/rosie/pull/931) from `task/T-514`, merged 2026-11-23 07:28:40 UTC. It squashed 2 branch commits:
+  - `e341e76` T-514: page answer kit: the answer form (question, option, fields), t…
+  - `9324d61` T-514: the kit's parts tested on their own (form, answer, request, ye…
+- **Files changed:** 9 (+3066 −0), by folder:
+  - `web/src/components/answer/` access.test.ts +446 −0, errors.test.ts +372 −0, html.ts +55 −0, kit.test.ts +526 −0, kit.ts +465 −0, parts.test.ts +286 −0, question-form.ts +453 −0, read-back.ts +160 −0, test-support.ts +303 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-514: page answer kit: the answer form (question, option, fields), the read-back with its exact yes and a typed name to sign, accessible, no CAPTCHA, with its tests on the shell over the Tool API mock
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-514: the kit's parts tested on their own (form, answer, request, yes), and the WCAG 3.3.4 and read-back end time notes
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 912. docs: COMMIT\_HISTORY.md through commit 910 (4fe3a470, \#927) (\#930)
 
