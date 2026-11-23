@@ -1,0 +1,136 @@
+{
+  "id": "S1-12",
+  "section": 1,
+  "lines": [
+    "1.4"
+  ],
+  "who": "owner",
+  "to": "san",
+  "via": "msg",
+  "title": "Sends the price list as a photo",
+  "does": "Rosie reads the owner's own list into services, and asks about anything it can't read. It never makes up a price.",
+  "more": [
+    "Each service gets a price kind: one price, per hour, per unit, or set by the customer's answers.",
+    "It can also be priced from the customer's photos, set at the visit, or a free estimate.",
+    "Extras can be added: a travel fee, an after-hours price, materials at cost and a tax rate.",
+    "Or Sam fills in the form in the chat: Apple's Forms in iMessage, or a WhatsApp Flow.",
+    "Wedding party grooming is never one list price. Each party is different, so it's priced from photos of the looks."
+  ],
+  "say": [
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "Now your mobile barbering services and prices. Send a photo of your price list, or fill in the form.",
+      "elements": {
+        "card": {
+          "title": "Mobile barbering prices",
+          "lines": [
+            "One row per service"
+          ],
+          "button": "Fill in the form",
+          "link": "rosfield.com/f/s01"
+        },
+        "form": [
+          "Service",
+          "Price kind",
+          "Price",
+          "Time it takes"
+        ]
+      },
+      "plainText": "Now your mobile barbering services and prices. Send a photo of your price list, or fill in the form.\nMobile barbering prices\nOne row per service\nFill in the form: rosfield.com/f/s01\nOn the secure page: Service, Price kind, Price, Time it takes."
+    },
+    {
+      "from": "owner",
+      "to": "san",
+      "text": "",
+      "elements": {
+        "photos": [
+          "Mobile barbering price list"
+        ]
+      },
+      "plainText": "[photo: Mobile barbering price list]"
+    },
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "Here's what I read.",
+      "elements": {
+        "list": {
+          "head": [
+            "Service",
+            "Price"
+          ],
+          "rows": [
+            [
+              "Travel fee",
+              "{{fee}}, part of each home visit's price"
+            ],
+            [
+              "Home grooming visit (cut, beard trim, hot towel)",
+              "{{price}}"
+            ],
+            [
+              "Groom's cut at home",
+              "{{price}}"
+            ],
+            [
+              "Hair design",
+              "Priced at the visit"
+            ],
+            [
+              "Wedding party grooming",
+              "Priced from the customer's photos"
+            ],
+            [
+              "Office visit (cuts for up to 3)",
+              "{{change.price}}"
+            ],
+            [
+              "Extra time",
+              "{{change.price}} an hour, 1-hour minimum"
+            ]
+          ]
+        },
+        "buttons": [
+          "That's right",
+          "Change something"
+        ]
+      },
+      "plainText": "Here's what I read.\nA) Travel fee · {{fee}}, part of each home visit's price\nB) Home grooming visit (cut, beard trim, hot towel) · {{price}}\nC) Groom's cut at home · {{price}}\nD) Hair design · Priced at the visit\nE) Wedding party grooming · Priced from the customer's photos\nF) Office visit (cuts for up to 3) · {{change.price}}\nG) Extra time · {{change.price}} an hour, 1-hour minimum\nReply 1 That's right, 2 Change something."
+    },
+    {
+      "from": "owner",
+      "to": "san",
+      "text": "1",
+      "plainText": "1"
+    }
+  ],
+  "needs": [
+    "business",
+    "pf.services",
+    "license"
+  ],
+  "gives": [
+    "services"
+  ],
+  "tells": [
+    "owner"
+  ],
+  "fallbackText": "Now your services and prices. Send a photo of your price list, or fill in the form.",
+  "pageTypes": [
+    "form",
+    "link"
+  ],
+  "next": "S1-43",
+  "stop": {
+    "asksByWords": {
+      "answerFields": [
+        {
+          "name": "services",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  "lint": []
+}
