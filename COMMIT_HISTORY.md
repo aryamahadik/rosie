@@ -2,9 +2,85 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 906, [`52fbac2a`](https://github.com/aryamahadik/rosie/commit/52fbac2a), 2026-11-22 22:43:16 UTC.
+- **Through:** commit 910, [`4fe3a470`](https://github.com/aryamahadik/rosie/commit/4fe3a470), 2026-11-23 03:05:02 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 910. docs: COMMIT\_HISTORY.md through commit 908 (4bcb06fa, \#925) (\#927)
+
+- **Commit:** [`4fe3a470`](https://github.com/aryamahadik/rosie/commit/4fe3a470), by Arya Mahadik, 2026-11-23 03:05:02 UTC
+- **Pull request:** [#927](https://github.com/aryamahadik/rosie/pull/927) from `task/commit-history-237`, merged 2026-11-23 03:05:02 UTC. It squashed 1 branch commit:
+  - `c139252` docs: COMMIT\_HISTORY.md through commit 908 (4bcb06fa, \#925)
+- **Files changed:** 1 (+44 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +44 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 909. T-1537: the turn face binds S1-09's settler and the S1-09, S1-76 and S1-10 writers over one walk's readings (SignUpWriterDeps.listing; the settler's "ask" as SETTLER\_ASKS; no banned-word read, no link generator handed on), pgTurnCalls takes the link's HeldLinks as the face's links and the rows' links; unit proofs and the integration world on bundle v3 (\#926)
+
+- **Commit:** [`005a54f1`](https://github.com/aryamahadik/rosie/commit/005a54f1), by Arya Mahadik, 2026-11-23 03:04:58 UTC
+- **Pull request:** [#926](https://github.com/aryamahadik/rosie/pull/926) from `task/T-1537`, merged 2026-11-23 03:04:58 UTC. It squashed 1 branch commit:
+  - `6d30a3d` T-1537: the turn face binds S1-09's settler and the S1-09, S1-76 and …
+- **Files changed:** 5 (+1832 −25), by folder:
+  - `actions/src/tool-api/turn-face/` commit.test.ts +349 −2, commit.ts +151 −18, index.ts +5 −1
+  - `actions/src/tool-api/turn-face/pg/` calls.ts +19 −4, s1-09-answer.int.test.ts +1308 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 908. docs: COMMIT\_HISTORY.md through commit 906 (52fbac2a, \#923) (\#925)
+
+- **Commit:** [`4bcb06fa`](https://github.com/aryamahadik/rosie/commit/4bcb06fa), by Arya Mahadik, 2026-11-23 01:42:57 UTC
+- **Pull request:** [#925](https://github.com/aryamahadik/rosie/pull/925) from `task/commit-history-236`, merged 2026-11-23 01:42:57 UTC. It squashed 1 branch commit:
+  - `5153731` docs: COMMIT\_HISTORY.md through commit 906 (52fbac2a, \#923)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 907. T-1538: a row whose open question was withdrawn before its claim is withdrawn unsent; a passed-on row still goes (DL-1174, DL-1177) (\#924)
+
+- **Commit:** [`4e8664d0`](https://github.com/aryamahadik/rosie/commit/4e8664d0), by Arya Mahadik, 2026-11-23 01:42:52 UTC
+- **Pull request:** [#924](https://github.com/aryamahadik/rosie/pull/924) from `task/T-1538`, merged 2026-11-23 01:42:52 UTC. It squashed 2 branch commits:
+  - `a2c1af8` T-1538: limit 8 withdraws a row unsent when the question it asks has …
+  - `e3c7c14` T-1538: limit 8's closed-question check passes a passed-on row (its o…
+- **Files changed:** 4 (+458 −4), by folder:
+  - `runtime/src/dispatch/limit8/` index.ts +2 −1, limit8.test.ts +235 −0, limit8.ts +29 −1, limit8.worker.test.ts +192 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1538: limit 8 withdraws a row unsent when the question it asks has closed, its read versions moved or not (the send state's closed.question; a walked step's asking row reads no versions, so the Nov 22 S1-02 row whose question the reset withdrew was sent)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1538: limit 8's closed-question check passes a passed-on row (its own finalize wrote the passedOn line and withdrew its question in one transaction), so the line still goes once with no clock to arm; every other row naming a closed question is withdrawn as before (K-07 README default 1; arch 02 line 123; DL-1176)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 906. docs: COMMIT\_HISTORY.md through commit 904 (313f2c6b, \#921) (\#923)
 
