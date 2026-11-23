@@ -12,6 +12,7 @@
     "./email/resend-send": "./src/email/resend-send/index.ts",
     "./linq/double-webhooks": "./src/linq/double-webhooks/index.ts",
     "./linq/send": "./src/linq/send/index.ts",
-    "./linq/roster": "./src/linq/roster/index.ts"
+    "./linq/roster": "./src/linq/roster/index.ts",
+    "./places/double": "./src/places/double/index.ts"
   }
 }
