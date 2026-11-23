@@ -1,0 +1,33 @@
+{
+  "after": ["seed-company-two-kinds.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services"
+    },
+    "action": "insert",
+    "table": "business_setup",
+    "values": {
+      "business_id": "biz-lee-home-services",
+      "listing_phone": null,
+      "listing_email": null,
+      "website": null,
+      "about": null,
+      "profile_confirmed_at": null,
+      "stripe_account_id": null,
+      "no_money": false,
+      "terms_accepted_at": null,
+      "terms_accepted_by_person_id": null,
+      "control_proven_at": null,
+      "control_proven_via": null,
+      "version": 1,
+      "signup_claim": "unknown",
+      "claimed_by_person_id": "person-sam"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["business_setup_signup_claim_known"]
+    }
+  }
+}
