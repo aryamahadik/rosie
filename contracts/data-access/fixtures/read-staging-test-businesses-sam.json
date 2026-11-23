@@ -1,0 +1,16 @@
+{
+  "call": "readStagingTestBusinesses",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-23T15:30:00Z",
+    "note": "On staging, K-21 v1.4 testReviewItems (card E10) passes the numbers staging lets Rosie text, here tp-01's and tp-02's fiction-range numbers. Sam holds the live owner role of Lee Home Services and his K-22 account mobile is tp-01's number, so that business is a test business; no other business's live owner has an account mobile among the numbers. Only business ids are answered."
+  },
+  "request": {
+    "numbers": ["+15555550100", "+15555550101"]
+  },
+  "outcome": {
+    "result": "testBusinesses",
+    "businessIds": ["biz-lee-home-services"]
+  }
+}

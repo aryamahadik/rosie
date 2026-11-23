@@ -1,0 +1,17 @@
+{
+  "call": "liveTextSignInCode",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": ["start-sign-in-text-sam.json"],
+    "now": "2026-11-23T14:58:40Z",
+    "note": "Sam texts the page's ready text from handle-sam 40 seconds after start-sign-in-text-sam wrote code-sam-text-1 (sign_in, channel text, sent_to_handle_id handle-sam, unused, expiring 15:08:00). The turn's guard reads the text as a code-only text, by its shape alone, and asks for the handle's live text code before the gate; the turn's one commit then carries K-09 v1 proveCode with this code id and the text's code, checked only by K-22 check_proof_code, its tries counted. The answer names the code's id, never its hash."
+  },
+  "request": {
+    "handleId": "handle-sam"
+  },
+  "outcome": {
+    "result": "live",
+    "handleId": "handle-sam",
+    "codeId": "code-sam-text-1"
+  }
+}

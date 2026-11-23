@@ -1,0 +1,25 @@
+{
+  "call": "readSignUpKeys",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-23T15:02:12Z",
+    "note": "Sam (person-sam, test owner 1's person at tp-01's number, handle-sam) has signed the ID upload page in by his ready text, which proved his account mobile at 14:58:41 (K-22 accounts: mobile +15555550100, mobile_proven_at set; K-04 phones: +15555550100 with handle_id handle-sam), and has uploaded his ID: one K-22 id_uploads row, upload-sam-id, purpose sign_up, uploaded at 15:02:10, its object key sealed under his key. The rows beyond K-04's seed are written by the test as noted. The event turn's binding reads his keys after finishUpload hands the event, and A12 and E10 name his actor from mobile.handleId through readHandle (K-05 v1.10 item 50). The object key is never read."
+  },
+  "request": {
+    "personId": "person-sam"
+  },
+  "outcome": {
+    "result": "signUpKeys",
+    "personId": "person-sam",
+    "idUpload": {
+      "uploadId": "upload-sam-id",
+      "uploadedAt": "2026-11-23T15:02:10Z"
+    },
+    "mobile": {
+      "number": "+15555550100",
+      "provenAt": "2026-11-23T14:58:41Z",
+      "handleId": "handle-sam"
+    }
+  }
+}

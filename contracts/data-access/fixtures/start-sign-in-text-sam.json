@@ -1,0 +1,33 @@
+{
+  "call": "startSignIn",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-23T14:58:00Z",
+    "note": "Sam opens S1-10's ID upload page from his link and picks the text way with his own mobile, tp-01's number. K-22 holds his account (person-sam, mobile +15555550100, whose K-04 phones row names handle-sam: the number has texted Rosie, so it is a phone she knows), no start of this request, no pause and no cap reached. Rules 0 to 5 pass as for email; the one account is found by its mobile; the same transaction writes the attempt and the code row code-sam-text-1 (purpose sign_in, channel text, sent_to_handle_id handle-sam, person_id person-sam, business_id null, the code's keyed hash, sent_at 14:58:00, expires_at 15:08:00). The page call then answers attemptId, expiresAt and its own ready text carrying the code, which never reached the database; no code is texted to anyone."
+  },
+  "request": {
+    "id": "sia-sam-text-1",
+    "attemptId": "attempt-sam-text-1",
+    "requestSha256": "1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f809",
+    "deviceSha256": "2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a",
+    "contact": {
+      "kind": "mobile",
+      "number": "+15555550100"
+    },
+    "contactHash": "3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b",
+    "hashKeyName": "PROOF_CODE_HASH_KEY",
+    "way": "text",
+    "codeId": "code-sam-text-1",
+    "codeHash": "4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c"
+  },
+  "outcome": {
+    "result": "started",
+    "id": "sia-sam-text-1",
+    "attemptId": "attempt-sam-text-1",
+    "expiresAt": "2026-11-23T15:08:00Z",
+    "repeated": false,
+    "personId": "person-sam",
+    "codeId": "code-sam-text-1"
+  }
+}

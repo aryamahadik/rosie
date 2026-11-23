@@ -1,0 +1,23 @@
+{
+  "call": "readPendingUpload",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-23T15:02:11Z",
+    "note": "Sam's ID upload page asked signedUpload for one sign_up file, and finishUpload's checkUpload read a JPEG from its leading bytes; the server kept the upload id upload-sam-id bound to Sam, no business (a sign_up ID is his for every company), purpose sign_up, image/jpeg and the object key sealed under his key (where it is kept: README open gap 107). The event turn's gate reads it by the event's ref before it writes S1-10's id_uploads row with these sealed bytes as they are."
+  },
+  "request": {
+    "uploadId": "upload-sam-id"
+  },
+  "outcome": {
+    "result": "pendingUpload",
+    "upload": {
+      "uploadId": "upload-sam-id",
+      "personId": "person-sam",
+      "businessId": null,
+      "purpose": "sign_up",
+      "contentType": "image/jpeg",
+      "objectKey": "\\x5ea1ed0b1ec70a1b2c3d"
+    }
+  }
+}
