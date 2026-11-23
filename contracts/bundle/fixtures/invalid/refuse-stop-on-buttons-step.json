@@ -1,0 +1,63 @@
+{
+  "id": "S1-04",
+  "section": 1,
+  "lines": [
+    "1.1",
+    "1.15"
+  ],
+  "who": "san",
+  "to": "owner",
+  "via": "msg",
+  "title": "Asks which kinds of work share a company",
+  "does": "Asked only when Sam names more than one kind of work. Sam taps 1: plumbing and electrical share Lee Home Services, and the barbershop is its own company.",
+  "more": [
+    "One company is one business, listed under each of its kinds of work. Each listing shows only its own licenses and people.",
+    "Each kind of work may keep its own trade name, like Lee Plumbing and Lee Electric.",
+    "A separate company is a second business on the same login. It has its own listing, control check, Stripe, licenses, terms and monthly bill.",
+    "The ID, mobile, calendar and bill card carry over, never asked twice.",
+    "Means 'Each is its own': no two kinds of work share a tax number.",
+    "Safe default: saved, with one reminder. Nothing goes live until Sam answers."
+  ],
+  "say": [
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "Which of your kinds of work share one company, with one tax number? Each one can still keep its own business name.",
+      "elements": {
+        "buttons": [
+          "Some share one",
+          "All share one",
+          "Each is its own"
+        ]
+      },
+      "plainText": "Which of your kinds of work share one company, with one tax number? Each one can still keep its own business name.\nReply 1 Some share one, 2 All share one, 3 Each is its own."
+    },
+    {
+      "from": "owner",
+      "to": "san",
+      "text": "1 Plumbing and electrical share {{biz.name}}",
+      "plainText": "1 Plumbing and electrical share {{biz.name}}"
+    }
+  ],
+  "rule": "Rosie's decision: one company is one business, listed under each of its kinds of work. A separate company is a second business on the same login. Why: money, licenses and the bill follow the company.",
+  "needs": [
+    "kinds"
+  ],
+  "gives": [
+    "companies"
+  ],
+  "tells": [
+    "owner"
+  ],
+  "fallbackText": "Which of your kinds of work share one company, with one tax number? Each one can still keep its own business name.",
+  "pageTypes": [],
+  "next": "S1-08",
+  "stop": {
+    "asksByWords": {
+      "answerFields": []
+    }
+  },
+  "lint": [
+    "unknown-slot"
+  ]
+}

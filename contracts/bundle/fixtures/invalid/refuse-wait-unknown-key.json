@@ -1,0 +1,107 @@
+{
+  "id": "S1-10",
+  "section": 1,
+  "lines": [
+    "1.3",
+    "1.2"
+  ],
+  "who": "san",
+  "to": "owner",
+  "via": "msg",
+  "title": "Checks the owner's mobile and ID, once",
+  "does": "Rosie asks for the one mobile only they use, and asks them to text Rosie from it. That text proves the phone; opening a link never does. Their ID is an upload on the secure page, accepted as given.",
+  "more": [
+    "Skipped on a plain text, where the number comes with the chat.",
+    "The line check runs on it. A landline or shared line can't be the sign-in. It can only be the line customers call (S1-21).",
+    "The secure page also asks one owner email, for notices, sign-in recovery and answers by email.",
+    "The email is proven with a code sent to it, typed on the page. Until then it isn't used.",
+    "It's where Rosie writes if the owner texts STOP (S13-32).",
+    "Never suggest the number on the card or the listing.",
+    "The owner uploads a photo or file of an ID document on the secure page. Any document is accepted as given, with no check.",
+    "An ID-check service comes later, behind a switch that stays off for now.",
+    "The page reads aloud and works by keyboard. The details can be said on a call instead.",
+    "Rosie never asks for a Social Security number. Stripe may, on its own page.",
+    "The result comes back at S1-32.",
+    "A later number change needs a signed-in session and a new ID check (S11-52).",
+    "On the helper path it sets only the helper's own sign-in. The owner's comes from S1-77's link.",
+    "Never: take an ID photo in the chat.",
+    "Safe default: no ID uploaded yet, and nothing goes live."
+  ],
+  "say": [
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "You're texting me in Apple Messages, which doesn't share your number. Which mobile do only you use? It becomes your sign-in.",
+      "plainText": "You're texting me in Apple Messages, which doesn't share your number. Which mobile do only you use? It becomes your sign-in."
+    },
+    {
+      "from": "owner",
+      "to": "san",
+      "text": "{{biz.phone}}",
+      "plainText": "{{biz.phone}}"
+    },
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "Please text me from that mobile. Your text proves the phone is yours.",
+      "plainText": "Please text me from that mobile. Your text proves the phone is yours."
+    },
+    {
+      "from": "owner",
+      "to": "san",
+      "text": "Texting you from that mobile now",
+      "plainText": "Texting you from that mobile now"
+    },
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "This is Rosie, an automated assistant, setting up {{biz.name}}. Your secure ID upload is below. These texts are only about your business on Rosie.",
+      "elements": {
+        "card": {
+          "title": "Secure ID upload",
+          "lines": [
+            "Upload a photo or file of your ID",
+            "Done once, for every company",
+            "One email, for notices, sign-in help and answers by email"
+          ],
+          "button": "Open secure page",
+          "link": "rosfield.com/v/s01"
+        },
+        "form": [
+          "ID photo or file"
+        ],
+        "stop": true
+      },
+      "plainText": "This is Rosie, an automated assistant, setting up {{biz.name}}. Your secure ID upload is below. These texts are only about your business on Rosie.\nSecure ID upload\nUpload a photo or file of your ID\nDone once, for every company\nOne email, for notices, sign-in help and answers by email\nOpen secure page: rosfield.com/v/s01\nOn the secure page: ID photo or file.\nReply STOP to opt out. Msg & data rates may apply. Reply HELP for help."
+    }
+  ],
+  "needs": [
+    "business"
+  ],
+  "gives": [
+    "id_checked",
+    "mobile"
+  ],
+  "tells": [
+    "owner"
+  ],
+  "reads": [
+    "stop"
+  ],
+  "fallbackText": "You're texting me in Apple Messages, which doesn't share your number. Which mobile do only you use? It becomes your sign-in.",
+  "pageTypes": [
+    "form",
+    "link"
+  ],
+  "next": "S1-75",
+  "stop": {
+    "waitsOnEvent": {
+      "keys": [
+        "mobile"
+      ]
+    }
+  },
+  "lint": [
+    "unknown-slot"
+  ]
+}

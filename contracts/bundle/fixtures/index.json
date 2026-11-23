@@ -156,6 +156,78 @@
       "expect": "refuse",
       "shows": "Journey 1, its 45 section 1 steps listed, marked to ship while it lists the failing step S1-37, is refused",
       "source": "arch 12 line 592 ('A journey with a failing step does not ship'); Q-17; Q-14; S1-37 in master-A.json and master-B.json; 02-contracts K-09 v1 'Journey 1'"
+    },
+    {
+      "file": "stop-wait-s1-10.json",
+      "version": "v1.1",
+      "def": "step",
+      "expect": "accept",
+      "shows": "S1-10 as bundle v3 compiles it (a plain step with no buttons that gives id_checked and mobile), byte for byte but for stop: waitsOnEvent on id_checked, so the walk applies it and stops right after it, waiting on the ID upload",
+      "source": "bundles/v3/bundle/flow/A.json S1-10 (T-1526); ruling T-1543 card B1 (ops/reviews/signup-remainder/rule-rest.json); K-09 README default 209; MC C10; MASTER-FLOW-A lines 183 and 188; K-21 v1 finishUpload"
+    },
+    {
+      "file": "stop-ask-s1-77.json",
+      "version": "v1.1",
+      "def": "step",
+      "expect": "accept",
+      "shows": "S1-77 as bundle v3 compiles it after C9 (line 0 'What's the owner's name and mobile? ...', no buttons), byte for byte but for stop: asksByWords with no answer field, since no source names the fields of the helper's answer yet (README default 22)",
+      "source": "bundles/v3/bundle/flow/A.json S1-77 (T-1526); compiler/src/corrections/c9.ts; ruling T-1543 card B1 and R2; K-09 README default 214 and open gap 194; MASTER-FLOW-A line 140"
+    },
+    {
+      "file": "flow-a-v3-with-stops.json",
+      "version": "v1.1",
+      "def": "flowGraph",
+      "expect": "accept",
+      "shows": "Bundle v3's flow A graph byte for byte but for the two stops above (S1-10 waitsOnEvent, S1-77 asksByWords): a v1.1 flow graph whose contract value stays bundle.v1, the shape bundle v4 gives those eleven steps",
+      "source": "bundles/v3/bundle/flow/A.json (T-1526); ruling T-1543 cards B1 and B5, default R34"
+    },
+    {
+      "file": "invalid/refuse-stop-on-buttons-step.json",
+      "version": "v1.1",
+      "def": "step",
+      "expect": "refuse",
+      "shows": "S1-04 as bundle v3 compiles it, whose line from Rosie carries buttons, with stop asksByWords: a step whose buttons ask cannot also ask by words; with its buttons taken off it is accepted",
+      "source": "bundles/v3/bundle/flow/A.json S1-04; ruling T-1543 card B1; actions/src/commit/walk/graph.ts and actions/src/frontier/assemble/bundle.ts buttonsOf"
+    },
+    {
+      "file": "invalid/refuse-stop-both-kinds.json",
+      "version": "v1.1",
+      "def": "step",
+      "expect": "refuse",
+      "shows": "S1-77 of bundle v3 with a stop holding both asksByWords and waitsOnEvent: a stop is one kind; with waitsOnEvent dropped it is stop-ask-s1-77.json, accepted",
+      "source": "bundles/v3/bundle/flow/A.json S1-77; ruling T-1543 card B1 ('either asksByWords or waitsOnEvent')"
+    },
+    {
+      "file": "invalid/refuse-wait-unknown-key.json",
+      "version": "v1.1",
+      "def": "step",
+      "expect": "refuse",
+      "shows": "S1-10 of bundle v3 waiting on mobile, a key a turn gives (S1-10's writer gives it at the walk), not a key only an event gives; with id_checked in its place it is stop-wait-s1-10.json, accepted",
+      "source": "bundles/v3/bundle/flow/A.json S1-10; K-09 README defaults 209 and 210; ruling T-1543 card B1"
+    },
+    {
+      "file": "invalid/refuse-stop-on-split.json",
+      "version": "v1.1",
+      "def": "step",
+      "expect": "refuse",
+      "shows": "S1-02 of bundle v3, a split whose message branches ask, with stop asksByWords: a stop is a plain step's; without it S1-02 is accepted",
+      "source": "bundles/v3/bundle/flow/A.json S1-02; ruling T-1543 card B1 ('how a plain step stops the walk') and R1; arch 03 line 161"
+    },
+    {
+      "file": "invalid/refuse-wait-key-not-given.json",
+      "version": "v1.1",
+      "def": "step",
+      "expect": "refuse",
+      "shows": "S1-77 of bundle v3, which gives nothing, waiting on id_checked: a step waits only on a key it gives; given id_checked it is accepted",
+      "source": "bundles/v3/bundle/flow/A.json S1-77; K-09 README default 209 (the step's gives hold the key)"
+    },
+    {
+      "file": "invalid/refuse-ask-at-event-step.json",
+      "version": "v1.1",
+      "def": "step",
+      "expect": "refuse",
+      "shows": "S1-10 of bundle v3, which gives id_checked, with stop asksByWords: no answer to a question gives a key only an event gives, so such a step waits; with waitsOnEvent on id_checked instead it is accepted",
+      "source": "bundles/v3/bundle/flow/A.json S1-10; K-09 README default 209 ('a writer never gives a table key'); MC C10"
     }
   ]
 }

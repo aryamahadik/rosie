@@ -1,0 +1,158 @@
+{
+  "id": "S1-02",
+  "section": 1,
+  "lines": [
+    "1.1",
+    "1.17"
+  ],
+  "who": "san",
+  "to": "owner",
+  "via": "msg",
+  "title": "Asks what work Sam does, and checks each one",
+  "does": "Sam types the kinds of work in any words. Each one brings its own plug-in: its services, its questions for customers and its license rules.",
+  "more": [
+    "Rosie matches Sam's words to the closest kinds of work, and Sam picks. A pick-list helps.",
+    "The first kind named is set up first. Sam can pick another.",
+    "Means 'One isn't on the list yet': a service with a visit that Rosie has no plug-in for.",
+    "Means 'Not a service we book': goods with no visit, delivery only, renting a thing alone, or work the law bars.",
+    "Gift cards are never set up either.",
+    "Never: set up any of those.",
+    "Safe default: draft it as new work, offline until Rosie's team reviews it."
+  ],
+  "say": [
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "Hi! I'm Rosie, an automated assistant. I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you. What kinds of work do you do? Just type them.",
+      "elements": {
+        "card": {
+          "title": "Setting up with Rosie",
+          "lines": [
+            "About 15 minutes for your first kind of work",
+            "About 5 minutes for each one after",
+            "Free to use",
+            "$2 a booking, counted at its check-in or DONE, explained before you go live"
+          ]
+        },
+        "stop": true
+      },
+      "plainText": "Hi! I'm Rosie, an automated assistant. I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you. What kinds of work do you do? Just type them.\nSetting up with Rosie\nAbout 15 minutes for your first kind of work\nAbout 5 minutes for each one after\nFree to use\n$2 a booking, counted at its check-in or DONE, explained before you go live\nReply STOP to opt out. Msg & data rates may apply. Reply HELP for help."
+    },
+    {
+      "from": "owner",
+      "to": "san",
+      "text": "Barbershop, plumbing, electrical",
+      "plainText": "Barbershop, plumbing, electrical"
+    }
+  ],
+  "needs": [
+    "thread"
+  ],
+  "gives": [
+    "kinds"
+  ],
+  "tells": [
+    "owner"
+  ],
+  "reads": [
+    "stop"
+  ],
+  "type": "split",
+  "q": "Is each one on Rosie's list?",
+  "branches": [
+    {
+      "label": "All on the list",
+      "tag": "message",
+      "steps": [],
+      "rejoinAt": "S1-11",
+      "answerFields": [
+        {
+          "name": "kinds",
+          "type": "text"
+        }
+      ],
+      "effects": [],
+      "end": "merge"
+    },
+    {
+      "label": "One isn't on the list yet",
+      "tag": "message",
+      "steps": [
+        "S1-03"
+      ],
+      "rejoinAt": "S1-11",
+      "answerFields": [
+        {
+          "name": "kinds",
+          "type": "text"
+        }
+      ],
+      "effects": [
+        {
+          "kind": "message",
+          "ref": "S1-03",
+          "to": [
+            "owner"
+          ]
+        }
+      ],
+      "end": "merge"
+    },
+    {
+      "label": "Not a service we book",
+      "tag": "message",
+      "steps": [
+        "S1-74"
+      ],
+      "rejoinAt": null,
+      "answerFields": [],
+      "effects": [
+        {
+          "kind": "message",
+          "ref": "S1-74",
+          "to": [
+            "owner"
+          ]
+        }
+      ],
+      "end": "end",
+      "endText": "Not a service Rosie books: nothing is set up, and Rosie's team sees it. Other work goes on."
+    }
+  ],
+  "card": {
+    "question": "Is each one on Rosie's list?",
+    "means": [
+      {
+        "branch": "All on the list",
+        "text": "A plug-in holds what one kind of work needs.",
+        "from": "firstSentence"
+      },
+      {
+        "branch": "One isn't on the list yet",
+        "text": "a service with a visit that Rosie has no plug-in for.",
+        "from": "meansLine"
+      },
+      {
+        "branch": "Not a service we book",
+        "text": "goods with no visit, delivery only, renting a thing alone, or work the law bars.",
+        "from": "meansLine"
+      }
+    ],
+    "never": [
+      "Never: set up any of those."
+    ],
+    "clock": {
+      "from": "step9Default"
+    },
+    "safeDefault": "draft it as new work, offline until Rosie's team reviews it."
+  },
+  "fallbackText": "Hi! I'm Rosie, an automated assistant. I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you. What kinds of work do you do? Just type them.",
+  "pageTypes": [],
+  "next": "S1-11",
+  "stop": {
+    "asksByWords": {
+      "answerFields": []
+    }
+  },
+  "lint": []
+}

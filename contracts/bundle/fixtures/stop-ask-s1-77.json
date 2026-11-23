@@ -1,0 +1,111 @@
+{
+  "id": "S1-77",
+  "section": 1,
+  "lines": [
+    "1.2",
+    "1.3"
+  ],
+  "who": "san",
+  "to": "owner",
+  "via": "msg",
+  "title": "Asks the owner to join and confirm",
+  "does": "Someone who helps run the business may finish setup. It goes live only once an owner joins with their own ID upload and confirms.",
+  "more": [
+    "The helper fills in the owner's name and mobile on one card, and gets the owner's own link and QR to pass on.",
+    "Rosie never texts the owner first. The owner's own text from that link opens their chat.",
+    "The owner gets one link: their own ID upload, as at S1-10, and 'Are you an owner of this business?'",
+    "It also asks one email, for notices, sign-in recovery and answers by email.",
+    "The email is proven with a code sent to it, typed on the page. Until then it isn't used.",
+    "Control is still proven at S1-75. Until then, everything is saved and offline.",
+    "Once the owner confirms, they pick the helper's role: staff or office manager.",
+    "The owner's link also shows the preview (S1-29) and what Rosfield costs: About us, photos, the money card and the kept rules.",
+    "It also shows the Stripe account money lands in (S1-27).",
+    "The owner's confirm covers them. Any change waits for the owner.",
+    "Never: count the helper's yes as the owner's, or text the owner before the owner texts Rosie.",
+    "Safe default: offline and saved, with one reminder to the helper after 24 hours."
+  ],
+  "say": [
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "What's the owner's name and mobile? You'll get their own link and QR to pass on.",
+      "elements": {
+        "card": {
+          "title": "The owner of {{biz.name}}",
+          "lines": [
+            "Their name",
+            "Their mobile"
+          ]
+        },
+        "as": "{{name.staff}}"
+      },
+      "plainText": "What's the owner's name and mobile? You'll get their own link and QR to pass on.\nThe owner of {{biz.name}}\nTheir name\nTheir mobile"
+    },
+    {
+      "from": "owner",
+      "to": "san",
+      "text": "1 {{owner.name}}, {{biz.phone}}",
+      "elements": {
+        "as": "{{name.staff}}"
+      },
+      "plainText": "1 {{owner.name}}, {{biz.phone}}"
+    },
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "Here's the owner's own link and QR. Pass it on: their text from it opens their chat with Rosie.",
+      "elements": {
+        "as": "{{name.staff}}"
+      },
+      "plainText": "Here's the owner's own link and QR. Pass it on: their text from it opens their chat with Rosie."
+    },
+    {
+      "from": "owner",
+      "to": "san",
+      "text": "[ready text] Hey, I'm the owner. Code 4829",
+      "plainText": "[ready text] Hey, I'm the owner. Code 4829"
+    },
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "This is Rosie, the automated booking assistant for {{biz.name}}. {{name.staff}} is setting up {{biz.name}} on Rosie and named you as the owner. Upload your ID and confirm here.",
+      "elements": {
+        "card": {
+          "title": "Confirm you own {{biz.name}}",
+          "lines": [
+            "Your own ID upload, accepted as given",
+            "One email, for notices, sign-in help and answers by email",
+            "Stripe · {{biz.name}}: money lands in your own account",
+            "Nothing goes live until you confirm"
+          ],
+          "button": "Upload ID and confirm",
+          "link": "rosfield.com/v/o02"
+        },
+        "stop": true
+      },
+      "plainText": "This is Rosie, the automated booking assistant for {{biz.name}}. {{name.staff}} is setting up {{biz.name}} on Rosie and named you as the owner. Upload your ID and confirm here.\nConfirm you own {{biz.name}}\nYour own ID upload, accepted as given\nOne email, for notices, sign-in help and answers by email\nStripe · {{biz.name}}: money lands in your own account\nNothing goes live until you confirm\nUpload ID and confirm: rosfield.com/v/o02\nReply STOP to opt out. Msg & data rates may apply. Reply HELP for help."
+    }
+  ],
+  "needs": [
+    "business"
+  ],
+  "tells": [
+    "owner"
+  ],
+  "reads": [
+    "stop"
+  ],
+  "fallbackText": "What's the owner's name and mobile? You'll get their own link and QR to pass on.",
+  "pageTypes": [
+    "link"
+  ],
+  "next": null,
+  "stop": {
+    "asksByWords": {
+      "answerFields": []
+    }
+  },
+  "lint": [
+    "unknown-slot"
+  ]
+}
