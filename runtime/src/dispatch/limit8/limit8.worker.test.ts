@@ -18,6 +18,8 @@ import {
   words,
   type SeedRow,
 } from "../test-support";
+import { clockArming } from "../../clocks/arming";
+import { wireArming } from "../../clocks/arming-support";
 import { openTrace, type Span } from "../../trace";
 import type { ChatTarget } from "../types";
 
@@ -414,6 +416,66 @@ describe("a row whose open question was withdrawn before its claim is withdrawn 
 
     expect(report.rows.map((row) => [row.outcome, row.partsSent])).toEqual([["sent", 2]]);
     expect(t.linq.requests.map((request) => request.text)).toEqual(["First part.", "Second part."]);
+  });
+
+  it("sends a passed-on asking row once, whose own finalize withdrew its question, and its receipt arms no clock (DL-1176)", async () => {
+    // finalizeMessage's passOn wrote K-01's passedOn line as the row's final parts and, in the same transaction, withdrew
+    // the row's own question with its clock row (K-05 cancelClock). open_question_id stays set, so the send state reads
+    // the question closed. The line goes like any checked row (K-07 README default 1; arch 02 line 123).
+    const PASSED_ON = "I've passed this on. Rosie's team will reply within 1 business day.";
+    const CLOCK_ROW = `clock-${OLD_QUESTION}`;
+    const t = setup(
+      [{ ...s102(OLD_ROW, OLD_QUESTION, 1), sends: [words(PASSED_ON)], fixedLines: ["passedOn"] }],
+      AT,
+    );
+    t.state.forRow(OLD_ROW, { closed: QUESTION_CLOSED });
+
+    const report = await runDispatch(t.deps("staging"));
+
+    expect(report.rows.map((row) => [row.outboxRowId, row.outcome, row.partsSent])).toEqual([
+      [OLD_ROW, "sent", 1],
+    ]);
+    expect(t.linq.requests.map((request) => request.text)).toEqual([PASSED_ON]);
+    expect(t.store.rowMarks).toEqual([]);
+    expect(
+      t.spans
+        .filter((span) => span.hop === "dispatch")
+        .map((span) => [span.rows?.[0]?.id, span.outcome, span.limits]),
+    ).toEqual([[OLD_ROW, "ok", [{ limit: 8, result: "pass", outcome: null }]]]);
+
+    // The receipt goes to the real clock arming. The question's clock row was cancelled with the question, so K-05
+    // armClock answers clockClosed: no clock arms, no question opens and no actor is told.
+    const wired = wireArming();
+    wired.data.make({
+      clockRowId: CLOCK_ROW,
+      kind: "question",
+      openQuestionId: OLD_QUESTION,
+      handleId: "handle-sam",
+    });
+    wired.data.move(CLOCK_ROW, "cancelled", AT);
+    wired.facts.facts.set(OLD_QUESTION, {
+      openQuestionId: OLD_QUESTION,
+      clockLine: null,
+      businessZone: null,
+      visit: null,
+      neverDelivered: null,
+    });
+    const delivered = await handleDeliveryReceipt(
+      { store: t.store, clockArming: clockArming(wired.options), trace: receiptTrace() },
+      { providerMessageId: "linq-msg-test-0001", partKey: `${OLD_ROW}/1/1`, at: AT },
+    );
+    expect(delivered).toMatchObject({ result: "delivered", outboxRowId: OLD_ROW, firstDelivery: true });
+    expect(wired.data.armAnswers).toEqual([
+      { error: "clockClosed", clockRowId: CLOCK_ROW, state: "cancelled" },
+    ]);
+    expect(wired.data.rowOf(CLOCK_ROW).state).toBe("cancelled");
+    expect(wired.data.openedQuestions).toEqual([]);
+    expect(wired.actors.syncs).toEqual([]);
+
+    // Sent once: no later run claims or sends it again.
+    t.clock.advance(3_600_000);
+    expect((await runDispatch(t.deps("staging"))).claimed).toBe(0);
+    expect(t.linq.requests).toHaveLength(1);
   });
 });
 

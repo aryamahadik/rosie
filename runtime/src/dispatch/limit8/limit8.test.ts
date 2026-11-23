@@ -147,6 +147,44 @@ describe("a row whose open question closed before its claim is withdrawn unsent 
   });
 });
 
+describe("a passed-on row still goes, though its own finalize withdrew its question (DL-1176)", () => {
+  // finalizeMessage's passOn writes K-01's passedOn line as the row's final parts and withdraws the row's own question
+  // (K-05 cancelClock) in the same transaction; open_question_id stays set, so at send the question reads closed. The line
+  // goes like any checked row (K-07 README default 1; arch 02 line 123), and with the question withdrawn no clock arms.
+  const passedOnRow = (fixedLines: readonly string[] = ["passedOn"]): ClaimedRow =>
+    s102Row({
+      finalParts: {
+        ...s102Row().finalParts,
+        sends: [
+          {
+            kind: "words",
+            text: "I've passed this on. Rosie's team will reply within 1 business day.",
+            calendarFile: "none",
+            options: [],
+            link: null,
+          },
+        ],
+        fixedLines,
+      },
+    });
+  const state = samState({ closed: QUESTION_CLOSED });
+  const SENT = { action: "send", reason: "sameTurn", overrideOptout: false };
+
+  it("sends the passed-on S1-02 row whose question its finalize withdrew, as a same-turn reply", () => {
+    expect(questionClosed(passedOnRow(), state)).toBe(false);
+    expect(decide({ row: passedOnRow(), state })).toEqual(SENT);
+    // With another fixed line beside it (an opener the finalize added), it goes the same way.
+    expect(decide({ row: passedOnRow(["opener", "passedOn"]), state })).toEqual(SENT);
+  });
+
+  it("still withdraws a row naming a closed question whose fixed lines are not the passed-on line", () => {
+    const opener = passedOnRow(["opener"]);
+
+    expect(questionClosed(opener, state)).toBe(true);
+    expect(decide({ row: opener, state })).toEqual(WITHDRAWN);
+  });
+});
+
 describe("limit 8's order is unchanged around the question check (T-1538)", () => {
   const state = (overrides: Partial<SendState> = {}): SendState =>
     samState({ closed: QUESTION_CLOSED, ...overrides });

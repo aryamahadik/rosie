@@ -32,6 +32,9 @@
 //      withdrawn whether or not a read version moved (T-1538; K-07 README's withdrawn): the send state reads the question
 //      from its own row at send (K-05 item 28 closed.question), while the row's versionsRead may not name it, as a walked
 //      step's asking row names none (Nov 22: a question the roster reset withdrew was asked again, so S1-02 went twice).
+//      A passed-on row is not withdrawn by that check: its own finalize wrote K-01's passedOn line as its final parts and
+//      withdrew its question in the same transaction, and the line goes like any checked row, with no clock to arm (K-07
+//      README default 1; arch 02 line 123; DL-1176).
 //   5. Text hours: only a routine row waits for them. 9am to 8pm in the visit's zone, else the business's (CQ-05); the
 //      owner and team from 8am (RULES 4.3). A reply in the same turn (Q-15's default) and a visit happening now go at
 //      any hour. The staging test phone's override opens the hours on staging only (BP 9.4). A sign-in code's row is a
@@ -78,6 +81,13 @@ export const STAFF_OPENS = "08:00";
 export const isStopReply = (row: ClaimedRow): boolean => row.finalParts.fixedLines.includes("stopReply");
 
 export const isSafety = (row: ClaimedRow): boolean => row.sendClass === "safety";
+
+/**
+ * A passed-on row: K-01's fixed line `passedOn` in its final parts (K-07 README default 1: `checked`, with that line, not
+ * a state of its own). Its finalize withdrew the question it asks in the same transaction (K-05 cancelClock; arch 02 line
+ * 123: "the question is withdrawn, so no clock arms").
+ */
+export const isPassedOn = (row: ClaimedRow): boolean => row.finalParts.fixedLines.includes("passedOn");
 
 /**
  * A send by an SMS port is refused (refuse-sms-channel.json: `port` "sms"; DL-012). A row on the `sms` channel through the
@@ -168,9 +178,10 @@ export const stopStands = (row: ClaimedRow, state: SendState): boolean =>
  * question the row asks: K-05 item 26, "the outbox rows that ask it") and the send state says that question has closed,
  * answered, defaulted or withdrawn (K-05 item 28 closed.question; default 32), as read from the question's own row at
  * send. Never from the row's versionsRead, which need not name its question: asking a closed question again is no reply.
+ * Never for a passed-on row, whose own finalize closed its question when it wrote the line (DL-1176): that line still goes.
  */
 export const questionClosed = (row: ClaimedRow, state: SendState): boolean =>
-  row.openQuestionId !== null && state.closed.question;
+  row.openQuestionId !== null && state.closed.question && !isPassedOn(row);
 
 /** The row's read versions that moved: any not found in the current versions, or found at another version. */
 export function versionsChanged(row: ClaimedRow, state: SendState): boolean {
@@ -233,7 +244,8 @@ export function decideLimit8(input: Limit8Input): Limit8Decision {
   if (isStopReply(row)) return { action: "send", reason: "stopReply", overrideOptout: false };
 
   // A row asking a question that has closed is withdrawn unsent, its read versions moved or not (T-1538; K-07 README's
-  // withdrawn): the question's own state at send decides, never only a version the row may not have read.
+  // withdrawn): the question's own state at send decides, never only a version the row may not have read. A passed-on row
+  // goes on: its own finalize withdrew its question when it wrote the line (DL-1176).
   if (questionClosed(row, state)) return { action: "mark", outcome: "withdrawn", heldUntil: null };
 
   if (versionsChanged(row, state)) {
