@@ -1,0 +1,1576 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/bundle/bundle.v1.1.schema.json",
+  "title": "Bundle v1.1",
+  "description": "K-01 v1.1, a minor version of the step-graph bundle format (T-1544; ruling T-1543 card B1, ops/reviews/signup-remainder/rule-rest.json, defaults R2 and R34; DL-1191; contracts/bundle/README.md section 'v1.1'). It only adds to v1 (bundle.v1.schema.json, frozen and unchanged, referred to here): every v1 definition is here under its own name, the unchanged ones by reference, so every v1 document is a v1.1 document. It adds one optional step field, stop, which says how a plain step stops the walk: asksByWords (its own line 0 asks its reader, with no buttons) or waitsOnEvent (the walk stops right after it, waiting on an event that gives the listed keys). step is restated with it, and flowGraph, overlayOp, tradeFlow, tradeOverlay and the root are restated only so that the steps they hold are v1.1's. The manifest, every flow graph and every trade overlay keep the contract value 'bundle.v1' (R34), so a consumer that checks it reads a v1.1 bundle unchanged. Owner: the architect.",
+  "type": "object",
+  "properties": {
+    "manifest": {
+      "$ref": "#/$defs/manifest"
+    },
+    "flows": {
+      "description": "The master graph of each flow in the bundle, by flow letter (02-contracts K-01 'The master graph, per flow'; SPEC-master 1: flow A, the customer comes to the business; flow B, the business goes to the customer). A sample bundle may hold one flow (bundle v0: S1-01 and S1-02 in flow A, D-007).",
+      "type": "object",
+      "properties": {
+        "A": {
+          "$ref": "#/$defs/flowGraph"
+        },
+        "B": {
+          "$ref": "#/$defs/flowGraph"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "trades": {
+      "description": "One compiled overlay per trade, by trade id (Q-34 default; MC 1: 'The 243 trades', engine/work/prof/<id>.json). A sample bundle may hold one trade or none.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/tradeId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/tradeOverlay"
+      }
+    }
+  },
+  "required": ["manifest", "flows", "trades"],
+  "additionalProperties": false,
+  "$defs": {
+    "sha256": {
+      "$ref": "bundle.v1.schema.json#/$defs/sha256"
+    },
+    "flowLetter": {
+      "$ref": "bundle.v1.schema.json#/$defs/flowLetter"
+    },
+    "stepId": {
+      "$ref": "bundle.v1.schema.json#/$defs/stepId"
+    },
+    "lineId": {
+      "$ref": "bundle.v1.schema.json#/$defs/lineId"
+    },
+    "tradeId": {
+      "$ref": "bundle.v1.schema.json#/$defs/tradeId"
+    },
+    "lane": {
+      "$ref": "bundle.v1.schema.json#/$defs/lane"
+    },
+    "via": {
+      "$ref": "bundle.v1.schema.json#/$defs/via"
+    },
+    "name": {
+      "$ref": "bundle.v1.schema.json#/$defs/name"
+    },
+    "price": {
+      "$ref": "bundle.v1.schema.json#/$defs/price"
+    },
+    "before": {
+      "$ref": "bundle.v1.schema.json#/$defs/before"
+    },
+    "after": {
+      "$ref": "bundle.v1.schema.json#/$defs/after"
+    },
+    "combo": {
+      "$ref": "bundle.v1.schema.json#/$defs/combo"
+    },
+    "varyKey": {
+      "$ref": "bundle.v1.schema.json#/$defs/varyKey"
+    },
+    "stringList": {
+      "$ref": "bundle.v1.schema.json#/$defs/stringList"
+    },
+    "pair": {
+      "$ref": "bundle.v1.schema.json#/$defs/pair"
+    },
+    "table": {
+      "$ref": "bundle.v1.schema.json#/$defs/table"
+    },
+    "elements": {
+      "$ref": "bundle.v1.schema.json#/$defs/elements"
+    },
+    "button": {
+      "$ref": "bundle.v1.schema.json#/$defs/button"
+    },
+    "guardKeyword": {
+      "$ref": "bundle.v1.schema.json#/$defs/guardKeyword"
+    },
+    "keywordText": {
+      "$ref": "bundle.v1.schema.json#/$defs/keywordText"
+    },
+    "keywordButton": {
+      "$ref": "bundle.v1.schema.json#/$defs/keywordButton"
+    },
+    "messagesWithKeywordButton": {
+      "$ref": "bundle.v1.schema.json#/$defs/messagesWithKeywordButton"
+    },
+    "messagesWithUnknownSlot": {
+      "$ref": "bundle.v1.schema.json#/$defs/messagesWithUnknownSlot"
+    },
+    "chatList": {
+      "$ref": "bundle.v1.schema.json#/$defs/chatList"
+    },
+    "message": {
+      "$ref": "bundle.v1.schema.json#/$defs/message"
+    },
+    "messages": {
+      "$ref": "bundle.v1.schema.json#/$defs/messages"
+    },
+    "gate": {
+      "$ref": "bundle.v1.schema.json#/$defs/gate"
+    },
+    "bookingValues": {
+      "$ref": "bundle.v1.schema.json#/$defs/bookingValues"
+    },
+    "sets": {
+      "$ref": "bundle.v1.schema.json#/$defs/sets"
+    },
+    "path": {
+      "$ref": "bundle.v1.schema.json#/$defs/path"
+    },
+    "wordsPatch": {
+      "$ref": "bundle.v1.schema.json#/$defs/wordsPatch"
+    },
+    "vary": {
+      "$ref": "bundle.v1.schema.json#/$defs/vary"
+    },
+    "clock": {
+      "$ref": "bundle.v1.schema.json#/$defs/clock"
+    },
+    "card": {
+      "$ref": "bundle.v1.schema.json#/$defs/card"
+    },
+    "answerField": {
+      "$ref": "bundle.v1.schema.json#/$defs/answerField"
+    },
+    "effect": {
+      "$ref": "bundle.v1.schema.json#/$defs/effect"
+    },
+    "branch": {
+      "$ref": "bundle.v1.schema.json#/$defs/branch"
+    },
+    "pluginSlot": {
+      "$ref": "bundle.v1.schema.json#/$defs/pluginSlot"
+    },
+    "step": {
+      "title": "Step",
+      "description": "One step of a flow, compiled (SPEC-master 4; 02-contracts K-01 'each step (id, section, who, to, via, title, needs, gives, tells) with its card'). Authoring fields are left out (MC R2: src, prop). A step that fails a lint rule says so in lint, and the schema refuses a step that shows a failure its lint does not list (arch 12 line 592; T-010). v1.1 (T-1544) adds stop, how a plain step stops the walk (contracts/bundle/README.md section 'v1.1'); a step with stop is a plain step whose messages from Rosie carry no button.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The step id (SPEC-master 4 'id').",
+          "$ref": "#/$defs/stepId"
+        },
+        "section": {
+          "description": "Its section, 1 to 13, in the order of engine/design/LINES.md (master-A.json and master-B.json 'sec'; SPEC-master 1).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 13
+        },
+        "lines": {
+          "description": "The LINES.md lines it covers (SPEC-master 4 'line').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lineId"
+          }
+        },
+        "kind": {
+          "description": "rule: a section 13 node, a rule every step follows, not a step in time (SPEC-master 4 'kind'). These are the always-on rules (arch 03 line 181).",
+          "type": "string",
+          "const": "rule"
+        },
+        "who": {
+          "description": "Who acts (SPEC-master 4 'who').",
+          "$ref": "#/$defs/lane"
+        },
+        "to": {
+          "description": "Who it is for, when someone is (SPEC-master 4 'to').",
+          "$ref": "#/$defs/lane"
+        },
+        "as": {
+          "description": "The one named person on a shared lane (SPEC-master 4 'as'). An illustration (MC C6).",
+          "type": "string"
+        },
+        "via": {
+          "description": "How it happens (SPEC-master 4 'via').",
+          "$ref": "#/$defs/via"
+        },
+        "t": {
+          "description": "When it happens in the sample story (SPEC-master 4 't', 5g). An illustration (MC C6).",
+          "type": "string"
+        },
+        "title": {
+          "description": "The title (SPEC-master 4 'title').",
+          "type": "string"
+        },
+        "does": {
+          "description": "What it does (SPEC-master 4 'does').",
+          "type": "string"
+        },
+        "more": {
+          "description": "Detail lines, one rule per line, holding the Means, Never and Silence lines and 'judgment rule N' pointers (SPEC-master 4 'more', 5k). Every 'judgment rule N' must resolve to rule 1 to 67 (MC R6).",
+          "$ref": "#/$defs/stringList"
+        },
+        "say": {
+          "description": "The messages it sends (SPEC-master 4 'say').",
+          "$ref": "#/$defs/messages"
+        },
+        "rule": {
+          "description": "A 'Rosie's rule: ... Why: ...' box (SPEC-master 4 'rule').",
+          "type": "string"
+        },
+        "form": {
+          "description": "A screen as label and value pairs (SPEC-prof 3 'Screens').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pair"
+          }
+        },
+        "table": {
+          "description": "A screen table (SPEC-prof 3 'Screens').",
+          "$ref": "#/$defs/table"
+        },
+        "needs": {
+          "description": "The keys it uses; it may only need what an earlier step gave on every path to it (SPEC-master 4 'needs'; BP 3.5: runtime data, not build edges).",
+          "$ref": "#/$defs/stringList"
+        },
+        "gives": {
+          "description": "The keys it gives (SPEC-master 4 'gives'; 02-contracts section 8 names each key's contract field).",
+          "$ref": "#/$defs/stringList"
+        },
+        "tells": {
+          "description": "Who gets a message in this step (SPEC-master 4 'tells').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lane"
+          }
+        },
+        "reads": {
+          "description": "The record homes it reads, such as stop or contact (master-A.json and master-B.json steps[].reads; the names of the routing tables' homes, master-A.json and master-B.json record.homes; 02-contracts K-01).",
+          "$ref": "#/$defs/stringList"
+        },
+        "when": {
+          "description": "The step's own gate: where it fails the step and its branches are skipped (SPEC-master 5d, 5i).",
+          "$ref": "#/$defs/gate"
+        },
+        "vary": {
+          "$ref": "#/$defs/vary"
+        },
+        "slot": {
+          "$ref": "#/$defs/pluginSlot"
+        },
+        "text": {
+          "description": "The step id the source part names in its 'text' field, kept as written (master-A.json and master-B.json; the source parts A36.json and B36.json, where a flow B step names its flow A twin).",
+          "$ref": "#/$defs/stepId"
+        },
+        "visit": {
+          "description": "The visit's day and time in the sample story, where the master states one on the step (master-A.json and master-B.json 'visit'). An illustration (MC C6).",
+          "type": "string"
+        },
+        "took": {
+          "description": "The stamp that the step reads what the booking took, from the money step on: the flow letter, or false where the master stops it (lib.js stampFlow line 898; overlay-core.js line 804).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/flowLetter"
+            },
+            {
+              "type": "boolean",
+              "const": false
+            }
+          ]
+        },
+        "ev": {
+          "description": "The stamp that the step reads the event groups: the flow letter (overlay-core.js lines 167 and 932).",
+          "$ref": "#/$defs/flowLetter"
+        },
+        "rec": {
+          "description": "The stamp that the step reads the record of this flow: the flow letter (master-A.json and master-B.json 'rec'; overlay-core.js line 1120).",
+          "$ref": "#/$defs/flowLetter"
+        },
+        "wr": {
+          "description": "false: the step reads the record without what was written later (overlay-core.js lines 804 and 1765).",
+          "type": "boolean",
+          "const": false
+        },
+        "timing": {
+          "description": "The stamp that the step's time slots follow the booking's timing: the flow letter (lib.js stampFlow line 918; SPEC-master 5h, the time-slot paragraph).",
+          "$ref": "#/$defs/flowLetter"
+        },
+        "amounts": {
+          "description": "The flow's amount table, stamped on a step with an amount slot (lib.js stampFlow line 909). Illustrations; live amounts come from the business's data (MC C6).",
+          "$ref": "#/$defs/amountTable"
+        },
+        "layerLines": {
+          "description": "The ids of the flow's layer lines stamped on this step (master-A.json and master-B.json 'layerAdd'; lib.js stampFlow line 906; overlay-core.js line 810). The lines themselves are in the flow's layerLines.",
+          "type": "array",
+          "items": {
+            "description": "One layer line id, one of the flow's layerLines[].id (master-A.json and master-B.json steps[].layerAdd and layerLines; SPEC-master 5e and its FIX7 amendments: contactchanged is gone).",
+            "type": "string",
+            "enum": ["private", "privatecall", "textsonly", "emailonly"]
+          }
+        },
+        "type": {
+          "description": "split: a decision with a question and branches (SPEC-master 4 'type'). Left out on a plain step.",
+          "type": "string",
+          "const": "split"
+        },
+        "q": {
+          "description": "A split's question (SPEC-master 4 'q').",
+          "type": "string"
+        },
+        "branches": {
+          "description": "A split's branches (SPEC-master 4 'branches').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/branch"
+          }
+        },
+        "card": {
+          "$ref": "#/$defs/card"
+        },
+        "fallbackText": {
+          "description": "The step's fallback text: its master line with slots filled, used when the composer's rewrite fails (arch 02 line 123; 02-contracts K-01). Jay's reviewed text replaces it once it exists (arch 02 line 123).",
+          "type": "string"
+        },
+        "pageTypes": {
+          "description": "The page types the step allows; the composer's plan picks one or none (arch 01 line 97; K-03).",
+          "$ref": "#/$defs/stringList"
+        },
+        "next": {
+          "description": "The next step on this step's own list (its section's main path, or its branch), in master-A.json and master-B.json order; null at the end of the list, where the enclosing branch's end or rejoinAt decides (SPEC-master 4: 'Steps in a section are the main path'; arch 03 line 191).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/stepId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stop": {
+          "description": "How this plain step stops the walk where the walk enters it (v1.1, T-1544; ruling T-1543 card B1; arch 03 line 191). Set only by the compiler (C9, C10 and its one rule), never by a trade's op; read the same way by every graph consumer (the walk, the frontier, the gold-set generator, parity). Left out, the step stops the walk as under v1: its buttons ask, and K-09 README default 209's table holds for a step that gives an event key.",
+          "$ref": "#/$defs/stop"
+        },
+        "judgmentRules": {
+          "description": "The judgment rules the step's lines, card and branches point to ('judgment rule N' pointers, SPEC-master 5k), by number, each resolving to rule N of the flow's judgmentRules (MC R6). A number outside 1 to 67 is refused (02-contracts K-01, refuse-judgment-rule-out-of-range).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/judgmentRuleNumber"
+          },
+          "uniqueItems": true
+        },
+        "walk": {
+          "description": "The steps the lint's loop rule followed from this step, in order, through relative t references and flow-switch ends, up to a fixed time or an end (Q-39 default: 'a cycle through relative t references or flow-switch ends'; SPEC-master 5g: a relative time must 'never loop'; arch 03 line 191: 'The compiler rejects loops'). A step that comes back makes the walk a loop, and the step fails the lint rule loop. Left out when the step has no relative time and no flow switch.",
+          "type": "array",
+          "items": {
+            "description": "One step on the walk (Q-39; SPEC-master 5g).",
+            "$ref": "#/$defs/stepId"
+          }
+        },
+        "lint": {
+          "description": "The lint rules this step fails, each once; empty when it passes (arch 12 line 592: 'The lint fails a step when ...'). A journey with a failing step does not ship (arch 12 line 592; Q-17), and the manifest's lint summary counts these. The schema refuses a step whose own fields show a failure of no-safe-default-or-clock, choice-without-definition, lookup-without-field, loop, guard-keyword-button, unknown-slot or judgment-rule-out-of-range that this list does not name; the other failures (a lookup source missing on some path, a loop across steps, the record's own lint) are the compiler's to find (C-065 to C-070).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lintRule"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": ["id", "section", "lines", "who", "via", "title", "does", "pageTypes", "next", "lint"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "say": {
+          "description": "With messages: a guard-keyword button needs guard-keyword-button in lint (arch 12 line 592; Q-14), and an unknown slot needs unknown-slot (02-contracts K-01).",
+          "if": {
+            "type": "object",
+            "required": ["say"],
+            "properties": {
+              "say": {
+                "$ref": "#/$defs/messagesWithKeywordButton"
+              }
+            }
+          },
+          "then": {
+            "required": ["lint"],
+            "properties": {
+              "lint": {
+                "description": "The step's lint list names guard-keyword-button (arch 12 line 592; Q-14).",
+                "type": "array",
+                "contains": {
+                  "description": "The rule guard-keyword-button (arch 12 line 592; Q-14).",
+                  "const": "guard-keyword-button"
+                }
+              }
+            },
+            "if": {
+              "type": "object",
+              "required": ["say"],
+              "properties": {
+                "say": {
+                  "$ref": "#/$defs/messagesWithUnknownSlot"
+                }
+              }
+            },
+            "then": {
+              "required": ["lint"],
+              "properties": {
+                "lint": {
+                  "description": "The step's lint list names unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                  "type": "array",
+                  "contains": {
+                    "description": "The rule unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                    "const": "unknown-slot"
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "if": {
+              "type": "object",
+              "required": ["say"],
+              "properties": {
+                "say": {
+                  "$ref": "#/$defs/messagesWithUnknownSlot"
+                }
+              }
+            },
+            "then": {
+              "required": ["lint"],
+              "properties": {
+                "lint": {
+                  "description": "The step's lint list names unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                  "type": "array",
+                  "contains": {
+                    "description": "The rule unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                    "const": "unknown-slot"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "vary": {
+          "description": "With variants: the same two checks on each variant's say and addSay (SPEC-master 5f; arch 12 line 592; 02-contracts K-01).",
+          "if": {
+            "type": "object",
+            "required": ["vary"],
+            "properties": {
+              "vary": {
+                "description": "Some variant of the step shows a guard-keyword button (arch 12 line 592) (SPEC-master 5 item 1, 5f: say and addSay).",
+                "type": "object",
+                "not": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "description": "A variant whose say or addSay shows a guard-keyword button (arch 12 line 592) (SPEC-master 5f).",
+                    "not": {
+                      "type": "object",
+                      "anyOf": [
+                        {
+                          "required": ["say"],
+                          "properties": {
+                            "say": {
+                              "$ref": "#/$defs/messagesWithKeywordButton"
+                            }
+                          }
+                        },
+                        {
+                          "required": ["addSay"],
+                          "properties": {
+                            "addSay": {
+                              "$ref": "#/$defs/messagesWithKeywordButton"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "required": ["lint"],
+            "properties": {
+              "lint": {
+                "description": "The step's lint list names guard-keyword-button (arch 12 line 592; Q-14).",
+                "type": "array",
+                "contains": {
+                  "description": "The rule guard-keyword-button (arch 12 line 592; Q-14).",
+                  "const": "guard-keyword-button"
+                }
+              }
+            },
+            "if": {
+              "type": "object",
+              "required": ["vary"],
+              "properties": {
+                "vary": {
+                  "description": "Some variant of the step shows an unknown slot (02-contracts K-01) (SPEC-master 5 item 1, 5f: say and addSay).",
+                  "type": "object",
+                  "not": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "description": "A variant whose say or addSay shows an unknown slot (02-contracts K-01) (SPEC-master 5f).",
+                      "not": {
+                        "type": "object",
+                        "anyOf": [
+                          {
+                            "required": ["say"],
+                            "properties": {
+                              "say": {
+                                "$ref": "#/$defs/messagesWithUnknownSlot"
+                              }
+                            }
+                          },
+                          {
+                            "required": ["addSay"],
+                            "properties": {
+                              "addSay": {
+                                "$ref": "#/$defs/messagesWithUnknownSlot"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "required": ["lint"],
+              "properties": {
+                "lint": {
+                  "description": "The step's lint list names unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                  "type": "array",
+                  "contains": {
+                    "description": "The rule unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                    "const": "unknown-slot"
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "if": {
+              "type": "object",
+              "required": ["vary"],
+              "properties": {
+                "vary": {
+                  "description": "Some variant of the step shows an unknown slot (02-contracts K-01) (SPEC-master 5 item 1, 5f: say and addSay).",
+                  "type": "object",
+                  "not": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "description": "A variant whose say or addSay shows an unknown slot (02-contracts K-01) (SPEC-master 5f).",
+                      "not": {
+                        "type": "object",
+                        "anyOf": [
+                          {
+                            "required": ["say"],
+                            "properties": {
+                              "say": {
+                                "$ref": "#/$defs/messagesWithUnknownSlot"
+                              }
+                            }
+                          },
+                          {
+                            "required": ["addSay"],
+                            "properties": {
+                              "addSay": {
+                                "$ref": "#/$defs/messagesWithUnknownSlot"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "required": ["lint"],
+              "properties": {
+                "lint": {
+                  "description": "The step's lint list names unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                  "type": "array",
+                  "contains": {
+                    "description": "The rule unknown-slot (02-contracts K-01; overlay-core.js line 1508).",
+                    "const": "unknown-slot"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "card": {
+          "description": "With a card: no safe default and no clock needs no-safe-default-or-clock in lint; a branch with no definition needs choice-without-definition (arch 12 line 592).",
+          "if": {
+            "type": "object",
+            "required": ["card"],
+            "properties": {
+              "card": {
+                "description": "A card with neither a safe default nor a clock (arch 12 line 592; arch 03 line 181).",
+                "type": "object",
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": ["safeDefault"]
+                    },
+                    {
+                      "required": ["clock"]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "then": {
+            "required": ["lint"],
+            "properties": {
+              "lint": {
+                "description": "The step's lint list names no-safe-default-or-clock (arch 12 line 592).",
+                "type": "array",
+                "contains": {
+                  "description": "The rule no-safe-default-or-clock (arch 12 line 592).",
+                  "const": "no-safe-default-or-clock"
+                }
+              }
+            },
+            "if": {
+              "type": "object",
+              "required": ["card"],
+              "properties": {
+                "card": {
+                  "description": "A card with a branch that has no definition (arch 12 line 592).",
+                  "type": "object",
+                  "required": ["means"],
+                  "properties": {
+                    "means": {
+                      "description": "Its definitions, one per branch (arch 12 line 592).",
+                      "type": "array",
+                      "contains": {
+                        "description": "A branch with no definition (arch 12 line 592).",
+                        "type": "object",
+                        "required": ["from"],
+                        "properties": {
+                          "from": {
+                            "description": "none: no Means line and no first sentence (arch 12 line 592).",
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "required": ["lint"],
+              "properties": {
+                "lint": {
+                  "description": "The step's lint list names choice-without-definition (arch 12 line 592).",
+                  "type": "array",
+                  "contains": {
+                    "description": "The rule choice-without-definition (arch 12 line 592).",
+                    "const": "choice-without-definition"
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "if": {
+              "type": "object",
+              "required": ["card"],
+              "properties": {
+                "card": {
+                  "description": "A card with a branch that has no definition (arch 12 line 592).",
+                  "type": "object",
+                  "required": ["means"],
+                  "properties": {
+                    "means": {
+                      "description": "Its definitions, one per branch (arch 12 line 592).",
+                      "type": "array",
+                      "contains": {
+                        "description": "A branch with no definition (arch 12 line 592).",
+                        "type": "object",
+                        "required": ["from"],
+                        "properties": {
+                          "from": {
+                            "description": "none: no Means line and no first sentence (arch 12 line 592).",
+                            "const": "none"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "required": ["lint"],
+              "properties": {
+                "lint": {
+                  "description": "The step's lint list names choice-without-definition (arch 12 line 592).",
+                  "type": "array",
+                  "contains": {
+                    "description": "The rule choice-without-definition (arch 12 line 592).",
+                    "const": "choice-without-definition"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "branches": {
+          "description": "With branches: a lookup that does not name its field needs lookup-without-field in lint (arch 12 line 592; Q-39).",
+          "if": {
+            "type": "object",
+            "required": ["branches"],
+            "properties": {
+              "branches": {
+                "description": "The split's branches (SPEC-master 4).",
+                "type": "array",
+                "contains": {
+                  "description": "A lookup branch that does not name the field it reads (arch 12 line 592; Q-39).",
+                  "type": "object",
+                  "required": ["tag"],
+                  "properties": {
+                    "tag": {
+                      "description": "lookup: code settles it (arch 03 line 161).",
+                      "const": "lookup"
+                    }
+                  },
+                  "not": {
+                    "required": ["reads"]
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "required": ["lint"],
+            "properties": {
+              "lint": {
+                "description": "The step's lint list names lookup-without-field (arch 12 line 592; Q-39).",
+                "type": "array",
+                "contains": {
+                  "description": "The rule lookup-without-field (arch 12 line 592; Q-39).",
+                  "const": "lookup-without-field"
+                }
+              }
+            }
+          }
+        },
+        "walk": {
+          "description": "With a walk: a walk that comes back to a step needs loop in lint (arch 12 line 592; Q-39; arch 03 line 191).",
+          "if": {
+            "type": "object",
+            "required": ["walk"],
+            "properties": {
+              "walk": {
+                "description": "A walk that comes back to a step (Q-39; SPEC-master 5g; arch 03 line 191).",
+                "type": "array",
+                "not": {
+                  "uniqueItems": true
+                }
+              }
+            }
+          },
+          "then": {
+            "required": ["lint"],
+            "properties": {
+              "lint": {
+                "description": "The step's lint list names loop (arch 12 line 592; Q-39; arch 03 line 191).",
+                "type": "array",
+                "contains": {
+                  "description": "The rule loop (arch 12 line 592; Q-39; arch 03 line 191).",
+                  "const": "loop"
+                }
+              }
+            }
+          }
+        },
+        "more": {
+          "description": "With more lines: a 'judgment rule N' outside 1 to 67 needs judgment-rule-out-of-range in lint (MC R6).",
+          "if": {
+            "type": "object",
+            "required": ["more"],
+            "properties": {
+              "more": {
+                "description": "The step's more lines (SPEC-master 4, 5k).",
+                "type": "array",
+                "contains": {
+                  "description": "A 'judgment rule N' pointer with N outside 1 to 67 (MC R6; SPEC-master 5k).",
+                  "type": "string",
+                  "pattern": "[Jj]udgment rules? (0|6[89]|[7-9][0-9]|[1-9][0-9]{2,})([^0-9]|$)"
+                }
+              }
+            }
+          },
+          "then": {
+            "required": ["lint"],
+            "properties": {
+              "lint": {
+                "description": "The step's lint list names judgment-rule-out-of-range (MC R6).",
+                "type": "array",
+                "contains": {
+                  "description": "The rule judgment-rule-out-of-range (MC R6).",
+                  "const": "judgment-rule-out-of-range"
+                }
+              }
+            }
+          }
+        },
+        "stop": {
+          "description": "With a stop (v1.1): the step is a plain step (no type, no branches) whose messages from Rosie carry no button, in its say or in any variant's say or addSay; asksByWords needs a line to ask by and is never set on a step that gives an event key; each waitsOnEvent key is one the step gives (ruling T-1543 card B1; K-09 README defaults 209 and 214).",
+          "not": {
+            "description": "A split, or a step whose messages from Rosie carry a button (README section 'v1.1').",
+            "anyOf": [
+              {
+                "required": ["type"]
+              },
+              {
+                "required": ["branches"]
+              },
+              {
+                "required": ["say"],
+                "properties": {
+                  "say": {
+                    "$ref": "#/$defs/messagesWithButtons"
+                  }
+                }
+              },
+              {
+                "required": ["vary"],
+                "properties": {
+                  "vary": {
+                    "description": "Some variant of the step whose say or addSay carries a button from Rosie (SPEC-master 5 item 1, 5f).",
+                    "type": "object",
+                    "not": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "description": "A variant whose say or addSay carries a button from Rosie (SPEC-master 5f).",
+                        "not": {
+                          "type": "object",
+                          "anyOf": [
+                            {
+                              "required": ["say"],
+                              "properties": {
+                                "say": {
+                                  "$ref": "#/$defs/messagesWithButtons"
+                                }
+                              }
+                            },
+                            {
+                              "required": ["addSay"],
+                              "properties": {
+                                "addSay": {
+                                  "$ref": "#/$defs/messagesWithButtons"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "if": {
+            "type": "object",
+            "required": ["stop"],
+            "properties": {
+              "stop": {
+                "description": "A stop that asks by words.",
+                "type": "object",
+                "required": ["asksByWords"]
+              }
+            }
+          },
+          "then": {
+            "required": ["say"],
+            "properties": {
+              "say": {
+                "description": "At least one message: line 0 is the question asked (R2).",
+                "type": "array",
+                "minItems": 1
+              },
+              "gives": {
+                "description": "No key only an event gives: such a step waits on its event instead (K-09 README default 209).",
+                "type": "array",
+                "not": {
+                  "contains": {
+                    "$ref": "#/$defs/eventKey"
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "if": {
+              "type": "object",
+              "required": ["stop"],
+              "properties": {
+                "stop": {
+                  "description": "A stop that waits on id_checked.",
+                  "type": "object",
+                  "required": ["waitsOnEvent"],
+                  "properties": {
+                    "waitsOnEvent": {
+                      "type": "object",
+                      "required": ["keys"],
+                      "properties": {
+                        "keys": {
+                          "description": "The keys, id_checked among them.",
+                          "type": "array",
+                          "contains": {
+                            "const": "id_checked"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "required": ["gives"],
+              "properties": {
+                "gives": {
+                  "description": "The step gives id_checked, the key it waits on (MASTER-FLOW-A line 188: S1-10 gives id_checked).",
+                  "type": "array",
+                  "contains": {
+                    "const": "id_checked"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "stop": {
+      "title": "StepStop",
+      "description": "How a plain step stops the walk (v1.1, T-1544): asksByWords or waitsOnEvent, exactly one, as the step's own field (ruling T-1543 card B1; R2; K-09 README defaults 209 and 214; arch 03 line 191: 'the first step that asks someone, waits on a clock or event, or ends the journey'). Not the message element stop (the opt-out marker, SPEC-master 5j) and not the STOP keyword.",
+      "oneOf": [
+        {
+          "title": "AsksByWordsStop",
+          "description": "The step asks its reader by its own words (asksByWords).",
+          "type": "object",
+          "properties": {
+            "asksByWords": {
+              "$ref": "#/$defs/asksByWords"
+            }
+          },
+          "required": ["asksByWords"],
+          "additionalProperties": false
+        },
+        {
+          "title": "WaitsOnEventStop",
+          "description": "The step waits on an event (waitsOnEvent).",
+          "type": "object",
+          "properties": {
+            "waitsOnEvent": {
+              "$ref": "#/$defs/waitsOnEvent"
+            }
+          },
+          "required": ["waitsOnEvent"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "asksByWords": {
+      "title": "AsksByWords",
+      "description": "The step asks its reader by its own words, with no buttons: its line 0 is Rosie's question to its reader (S1-77 as C9 corrects it: 'What's the owner's name and mobile? ...'; S1-12, S1-23 and S1-61 by the compiler's rule: a plain owner -> san step whose line 0 is Rosie's question to the owner with no buttons). Where the walk enters it as a move it stops there, the step asked: an open question with no options, asked of its reader, its question row naming the step and line 0, the step's later lines not written in that turn; the answer starts the walk at that step, applied as answered (its writer: its gives and its later lines), then its next (ruling T-1543 R2 and R30; K-09 README default 214 and open gap 194, which v1.1 closes).",
+      "type": "object",
+      "properties": {
+        "answerFields": {
+          "description": "The fields the answer to the step's question carries, each with its type, as a branch's answerFields do (02-contracts K-01), typed from the step's gives (S1-12 services, S1-23 and S1-61 license). The frontier offers one K-02 option choice for the step's open question with these fields (R2; K-09 README default 116's shape). Empty where no source names the answer's fields yet (S1-77: README default 22).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/wordsAnswerField"
+          }
+        }
+      },
+      "required": ["answerFields"],
+      "additionalProperties": false
+    },
+    "wordsAnswerField": {
+      "title": "WordsAnswerField",
+      "description": "A field the answer to an asks-by-words question carries: v1's answerField without the type choice, since the question has no options for a choice to name (R2: 'an open question with no options'; v1 answerField.type: 'choice, one of the open question's option ids').",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The field's name: a gives key of the step, such as license, or a record value (as v1 answerField.name; SPEC-master 4 'gives').",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.]*$"
+        },
+        "type": {
+          "description": "Its value type: text, integer or boolean; money, time, zone or id as the shared formats write them (contracts/common/formats.v1.schema.json, CQ-09), as v1 answerField.type less choice.",
+          "type": "string",
+          "enum": ["text", "integer", "boolean", "money", "time", "zone", "id"]
+        }
+      },
+      "required": ["name", "type"],
+      "additionalProperties": false
+    },
+    "waitsOnEvent": {
+      "title": "WaitsOnEvent",
+      "description": "The step waits on an event: where the walk applies it as a move, its rows by its own writer, the walk stops right after it, its next not read in that turn, and writes no open question, question row or clock row for the stop; no writer gives a listed key (eventKeyAtWalk). The walk goes on from the step's next only in the turn of the event that gives the keys (K-09 README default 209, read from the step's own field rather than from that default's table; ruling T-1543 R3 and R35; arch 03 line 191: 'waits on a clock or event'). S1-10 waits on id_checked (MC C10).",
+      "type": "object",
+      "properties": {
+        "keys": {
+          "description": "The keys the event gives, each once, each a key the step's gives hold (v1 step.gives) and one no turn gives (eventKey).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eventKey"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": ["keys"],
+      "additionalProperties": false
+    },
+    "eventKey": {
+      "title": "EventKey",
+      "description": "A key only an event gives, never a turn: id_checked, given only when the owner's ID upload lands on the secure page (K-21 v1 finishUpload: 'for an ID document, S1-10 is written'; K-22 v1 id_uploads, a sign_up row; MASTER-FLOW-A line 183: 'Never: take an ID photo in the chat'; MC C10; K-09 README default 209's table). control_proven, which K-09 v1.14's event table adds, is waited on at a split by its reach settler (S1-32; ruling T-1543 R1 and R22), never by a plain step's stop, so it is not listed here. A key joins this list only by a minor version.",
+      "type": "string",
+      "enum": ["id_checked"]
+    },
+    "messagesWithButtons": {
+      "title": "MessagesWithButtons",
+      "description": "Messages of which at least one, sent by Rosie (from san), carries a button, as the walk and the frontier count a step's buttons (actions/src/commit/walk/graph.ts and actions/src/frontier/assemble/bundle.ts, buttonsOf: Rosie's messages alone). Used only by the step's stop check (v1.1).",
+      "type": "array",
+      "contains": {
+        "description": "A message from Rosie that carries at least one button (SPEC-master 4 'buttons').",
+        "type": "object",
+        "required": ["from", "elements"],
+        "properties": {
+          "from": {
+            "description": "Rosie (SPEC-master 4; MC R1: san is Rosie).",
+            "const": "san"
+          },
+          "elements": {
+            "description": "Its chat elements (SPEC-master 4).",
+            "type": "object",
+            "required": ["buttons"],
+            "properties": {
+              "buttons": {
+                "description": "Its buttons, at least one (SPEC-master 4 'buttons').",
+                "type": "array",
+                "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "amountValues": {
+      "$ref": "bundle.v1.schema.json#/$defs/amountValues"
+    },
+    "amountTable": {
+      "$ref": "bundle.v1.schema.json#/$defs/amountTable"
+    },
+    "serviceId": {
+      "$ref": "bundle.v1.schema.json#/$defs/serviceId"
+    },
+    "service": {
+      "$ref": "bundle.v1.schema.json#/$defs/service"
+    },
+    "slotRow": {
+      "$ref": "bundle.v1.schema.json#/$defs/slotRow"
+    },
+    "slotRows": {
+      "$ref": "bundle.v1.schema.json#/$defs/slotRows"
+    },
+    "namedSlot": {
+      "$ref": "bundle.v1.schema.json#/$defs/namedSlot"
+    },
+    "homes": {
+      "$ref": "bundle.v1.schema.json#/$defs/homes"
+    },
+    "record": {
+      "$ref": "bundle.v1.schema.json#/$defs/record"
+    },
+    "masterMoney": {
+      "$ref": "bundle.v1.schema.json#/$defs/masterMoney"
+    },
+    "dimChoices": {
+      "$ref": "bundle.v1.schema.json#/$defs/dimChoices"
+    },
+    "catalogEntry": {
+      "$ref": "bundle.v1.schema.json#/$defs/catalogEntry"
+    },
+    "layerLine": {
+      "$ref": "bundle.v1.schema.json#/$defs/layerLine"
+    },
+    "section": {
+      "$ref": "bundle.v1.schema.json#/$defs/section"
+    },
+    "anytimeRow": {
+      "$ref": "bundle.v1.schema.json#/$defs/anytimeRow"
+    },
+    "judgmentRule": {
+      "$ref": "bundle.v1.schema.json#/$defs/judgmentRule"
+    },
+    "judgmentRuleNumber": {
+      "$ref": "bundle.v1.schema.json#/$defs/judgmentRuleNumber"
+    },
+    "judgmentRules": {
+      "$ref": "bundle.v1.schema.json#/$defs/judgmentRules"
+    },
+    "anytimeTable": {
+      "$ref": "bundle.v1.schema.json#/$defs/anytimeTable"
+    },
+    "routingTables": {
+      "$ref": "bundle.v1.schema.json#/$defs/routingTables"
+    },
+    "flowGraph": {
+      "title": "FlowGraph",
+      "description": "One KV value: the master graph of one flow, compiled from engine/work/master/master-<flow>.json with Master Corrections applied (02-contracts K-01 'The master graph, per flow'; MC 1, 3; arch 12 line 592). Stored under kvKey .../flow/<flow> (arch 10 line 536). Restated in v1.1 only so that its steps are v1.1's (stop); its contract value stays 'bundle.v1' (R34).",
+      "type": "object",
+      "properties": {
+        "contract": {
+          "description": "This contract, as v1 names it: 'bundle.v1' in a v1.1 value too, since v1.1 only adds an optional step field (ruling T-1543 default R34), so a consumer that checks it (runtime/src/bundle/values.ts, actions/src/compose-input/master-line.ts, actions/src/commit/walk/graph.ts) reads a v1.1 value unchanged (ADR-005; contracts/README.md convention 1).",
+          "type": "string",
+          "const": "bundle.v1"
+        },
+        "flow": {
+          "description": "The flow (SPEC-master 1).",
+          "$ref": "#/$defs/flowLetter"
+        },
+        "sections": {
+          "description": "The 13 sections in order, with their main paths (SPEC-master 1 and 4).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/section"
+          },
+          "minItems": 13,
+          "maxItems": 13
+        },
+        "steps": {
+          "description": "Every step of the flow, branch steps included, by id (SPEC-master 4: 'Branch steps get ids too').",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/stepId"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/step"
+          }
+        },
+        "tookAt": {
+          "description": "The money step from which what the booking took is read (master-A.json and master-B.json 'took': A5-04 in flow A; lib.js stampFlow line 893).",
+          "$ref": "#/$defs/stepId"
+        },
+        "money": {
+          "$ref": "#/$defs/masterMoney"
+        },
+        "amounts": {
+          "description": "The flow's example amount table (master-A.json and master-B.json 'amounts'; SPEC-master 5h). Illustrations (MC C6).",
+          "$ref": "#/$defs/amountTable"
+        },
+        "switches": {
+          "description": "Every switch a trade may turn on, by name: overlay-core.js SWITCHES with master-A.json and master-B.json header switches, such as verify, which stays off (SPEC-master 5b; MC C4).",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/catalogEntry"
+          }
+        },
+        "facts": {
+          "description": "Every fact a trade may list, by name: overlay-core.js FACT_LIST with master-A.json and master-B.json header facts (SPEC-master 5d).",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/catalogEntry"
+          }
+        },
+        "layerLines": {
+          "description": "The flow's layer lines (master-A.json and master-B.json layerLines).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/layerLine"
+          }
+        },
+        "record": {
+          "$ref": "#/$defs/record"
+        },
+        "routing": {
+          "$ref": "#/$defs/routingTables"
+        }
+      },
+      "required": [
+        "contract",
+        "flow",
+        "sections",
+        "steps",
+        "tookAt",
+        "money",
+        "amounts",
+        "switches",
+        "facts",
+        "layerLines",
+        "record",
+        "routing"
+      ],
+      "additionalProperties": false
+    },
+    "pluginText": {
+      "$ref": "bundle.v1.schema.json#/$defs/pluginText"
+    },
+    "tradeSettings": {
+      "$ref": "bundle.v1.schema.json#/$defs/tradeSettings"
+    },
+    "tradeMoney": {
+      "$ref": "bundle.v1.schema.json#/$defs/tradeMoney"
+    },
+    "overlayOp": {
+      "title": "OverlayOp",
+      "description": "One overlay op, in the trade file's order (SPEC-prof 3 'ops'; overlay-core.js apply() lines 1815 to 1856). Compiled: added steps are compiled steps; fields overlay-core ignores are left out; C8's void offs are dropped (MC C8: offs of S1-32, S2-22, S11-48, S11-57 citing D96 in 12 trades, and of S11-50, S13-11, S13-15, S2-11 in the trades it names); every other off stays. Restated in v1.1 only so that the steps it holds are v1.1's (stop).",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "description": "off: a master step, or one branch by its label, this trade never uses (SPEC-prof 3; overlay-core.js line 1848).",
+              "type": "string",
+              "const": "off"
+            },
+            "at": {
+              "description": "The master step (SPEC-prof 3 'at').",
+              "$ref": "#/$defs/stepId"
+            },
+            "label": {
+              "description": "The branch label, matched exactly (SPEC-prof 3; SPEC-master 5d).",
+              "type": "string"
+            },
+            "why": {
+              "description": "Why (SPEC-prof 3: 'say why'; overlay-core.js line 1849).",
+              "type": "string"
+            }
+          },
+          "required": ["op", "at", "why"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "description": "words: the trade's own words for a master step, field by field (SPEC-prof 3; overlay-core.js line 1822).",
+              "type": "string",
+              "const": "words"
+            },
+            "at": {
+              "$ref": "#/$defs/stepId"
+            },
+            "does": {
+              "$ref": "bundle.v1.schema.json#/$defs/wordsPatch/properties/does"
+            },
+            "more": {
+              "$ref": "bundle.v1.schema.json#/$defs/wordsPatch/properties/more"
+            },
+            "say": {
+              "$ref": "bundle.v1.schema.json#/$defs/wordsPatch/properties/say"
+            },
+            "rule": {
+              "$ref": "bundle.v1.schema.json#/$defs/wordsPatch/properties/rule"
+            },
+            "t": {
+              "$ref": "bundle.v1.schema.json#/$defs/wordsPatch/properties/t"
+            },
+            "form": {
+              "$ref": "bundle.v1.schema.json#/$defs/wordsPatch/properties/form"
+            },
+            "table": {
+              "$ref": "bundle.v1.schema.json#/$defs/wordsPatch/properties/table"
+            },
+            "title": {
+              "description": "A new title (SPEC-prof 3: a words op may set the title, since Oct 25).",
+              "type": "string"
+            },
+            "who": {
+              "description": "A new who (SPEC-prof 3).",
+              "$ref": "#/$defs/lane"
+            },
+            "to": {
+              "description": "A new to (SPEC-prof 3).",
+              "$ref": "#/$defs/lane"
+            },
+            "vary": {
+              "description": "The trade's words for some paths, merged field by field into the master's variant of the same key (SPEC-prof 3; overlay-core.js line 1825).",
+              "$ref": "#/$defs/vary"
+            }
+          },
+          "required": ["op", "at"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "description": "more: extra detail lines, added to the base and every variant that sets more (SPEC-prof 3; overlay-core.js line 1827).",
+              "type": "string",
+              "const": "more"
+            },
+            "at": {
+              "$ref": "#/$defs/stepId"
+            },
+            "more": {
+              "description": "The lines added (SPEC-prof 3: { \"op\": \"more\", \"at\": \"A8-03\", \"more\": [\"...\"] }).",
+              "$ref": "#/$defs/stringList"
+            }
+          },
+          "required": ["op", "at", "more"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "description": "after or before: the trade's own steps, inserted after or before a master step (SPEC-prof 3; overlay-core.js line 1831).",
+              "type": "string",
+              "enum": ["after", "before"]
+            },
+            "at": {
+              "$ref": "#/$defs/stepId"
+            },
+            "first": {
+              "description": "The first inserted main-path step; the rest follow by next, and the last one's next is the step that followed in the master (overlay-core.js line 1838).",
+              "$ref": "#/$defs/stepId"
+            },
+            "steps": {
+              "description": "Every step the op adds, branch steps included, compiled (SPEC-prof 3: 'Same step format as the master').",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/step"
+              },
+              "minItems": 1
+            }
+          },
+          "required": ["op", "at", "first", "steps"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "description": "branch: a new branch on a master decision (SPEC-prof 3; overlay-core.js line 1841).",
+              "type": "string",
+              "const": "branch"
+            },
+            "at": {
+              "description": "The master split (overlay-core.js line 1842: it must be a decision).",
+              "$ref": "#/$defs/stepId"
+            },
+            "branch": {
+              "$ref": "#/$defs/branch"
+            },
+            "steps": {
+              "description": "The branch's steps, compiled (overlay-core.js line 1844).",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/step"
+              }
+            }
+          },
+          "required": ["op", "at", "branch", "steps"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "tradeFlow": {
+      "title": "TradeFlow",
+      "description": "What one trade changes in one flow (SPEC-prof 3; 02-contracts K-01 'One compiled overlay per trade'). Restated in v1.1 only so that the steps it holds are v1.1's (stop).",
+      "type": "object",
+      "properties": {
+        "switches": {
+          "description": "The switches on in this flow, resolved from pf.switches (a per-flow value { A, B } split per flow), with no2 derived from the trade's choice at the $2 split S1-62 (SPEC-master 5j; SPEC-prof 3 'No $2'; MC R3). Every switch left out is off (SPEC-master 5b).",
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/name"
+          },
+          "additionalProperties": {
+            "description": "true: the switch is on in this flow for this trade (engine/work/prof/<id>.json pf.switches; SPEC-prof 3; SPEC-master 5b).",
+            "type": "boolean"
+          }
+        },
+        "settings": {
+          "$ref": "#/$defs/tradeSettings"
+        },
+        "money": {
+          "$ref": "#/$defs/tradeMoney"
+        },
+        "rename": {
+          "description": "The trade's rename pairs for this flow, in order, longer phrases first (SPEC-prof 3 'rename'; overlay-core.js line 1800). Their right sides are illustrations (MC C6).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pair"
+          }
+        },
+        "slotRows": {
+          "description": "The trade's own record slot rows for this flow, laid before the master's, slot by slot (the trade file's slots.<flow>; overlay-core.js profRecord line 1867). Empty when it has none.",
+          "$ref": "#/$defs/slotRows"
+        },
+        "ops": {
+          "description": "The trade's ops for this flow, in order (SPEC-prof 3 'ops').",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/overlayOp"
+          }
+        }
+      },
+      "required": ["switches", "settings", "money", "rename", "slotRows", "ops"],
+      "additionalProperties": false
+    },
+    "tradeOverlay": {
+      "title": "TradeOverlay",
+      "description": "One KV value: one trade's compiled overlay (Q-34 default; 02-contracts K-01: facts, switches and settings as typed values with C5's fills, the 11 free-text pf blocks stored whole, money per flow, steps and branches turned off with C8's void list applied, words per path, added steps and branches, renames, and the trade's own slot rows; SPEC-prof 3 and 8; overlay-core.js apply(), lines 1794 to 1866). Authoring fields are left out (MC R2: notes, basis, keep, from, splitsKept, keep_why), as are the sample cast, names and story (MC C6). Stored under kvKey .../trade/<id> (arch 10 line 536). Restated in v1.1 only so that its steps are v1.1's (stop); its contract value stays 'bundle.v1' (R34).",
+      "type": "object",
+      "properties": {
+        "contract": {
+          "description": "This contract, as v1 names it: 'bundle.v1' in a v1.1 value too, since v1.1 only adds an optional step field (ruling T-1543 default R34), so a consumer that checks it (runtime/src/bundle/values.ts, actions/src/compose-input/master-line.ts, actions/src/commit/walk/graph.ts) reads a v1.1 value unchanged (ADR-005; contracts/README.md convention 1).",
+          "type": "string",
+          "const": "bundle.v1"
+        },
+        "trade": {
+          "description": "Who the trade is (SPEC-prof 3: id, name, style, pattern).",
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/tradeId"
+            },
+            "name": {
+              "description": "Its name, such as Barber (SPEC-prof 3 'name').",
+              "type": "string"
+            },
+            "style": {
+              "description": "Its style, such as Chair (SPEC-prof 3 'style').",
+              "type": "string"
+            },
+            "pattern": {
+              "description": "Its booking pattern (SPEC-prof 2 item 5 and 8).",
+              "type": "string",
+              "enum": [
+                "fix",
+                "urgent",
+                "project",
+                "service",
+                "dropoff",
+                "chair",
+                "clinic",
+                "class",
+                "event",
+                "consult",
+                "table"
+              ]
+            }
+          },
+          "required": ["id", "name", "style", "pattern"],
+          "additionalProperties": false
+        },
+        "facts": {
+          "description": "The facts the trade lists, or null when it lists none (SPEC-prof 3 'Plug-in facts'; MC R3). C5's fill applies: insurance lists video, forms, firststeps and documents.",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/name"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pluginText": {
+          "$ref": "#/$defs/pluginText"
+        },
+        "flows": {
+          "description": "What the trade changes in each flow; every trade writes both (SPEC-prof 1: 'Write BOTH flows in full').",
+          "type": "object",
+          "properties": {
+            "A": {
+              "$ref": "#/$defs/tradeFlow"
+            },
+            "B": {
+              "$ref": "#/$defs/tradeFlow"
+            }
+          },
+          "required": ["A", "B"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["contract", "trade", "facts", "pluginText", "flows"],
+      "additionalProperties": false
+    },
+    "kvKey": {
+      "$ref": "bundle.v1.schema.json#/$defs/kvKey"
+    },
+    "storedValue": {
+      "$ref": "bundle.v1.schema.json#/$defs/storedValue"
+    },
+    "inputFile": {
+      "$ref": "bundle.v1.schema.json#/$defs/inputFile"
+    },
+    "keywords": {
+      "$ref": "bundle.v1.schema.json#/$defs/keywords"
+    },
+    "fixedLine": {
+      "$ref": "bundle.v1.schema.json#/$defs/fixedLine"
+    },
+    "fixedLines": {
+      "$ref": "bundle.v1.schema.json#/$defs/fixedLines"
+    },
+    "keyMapEntry": {
+      "$ref": "bundle.v1.schema.json#/$defs/keyMapEntry"
+    },
+    "keyMap": {
+      "$ref": "bundle.v1.schema.json#/$defs/keyMap"
+    },
+    "outOfScopeTarget": {
+      "$ref": "bundle.v1.schema.json#/$defs/outOfScopeTarget"
+    },
+    "outOfScopeMarker": {
+      "$ref": "bundle.v1.schema.json#/$defs/outOfScopeMarker"
+    },
+    "outOfScope": {
+      "$ref": "bundle.v1.schema.json#/$defs/outOfScope"
+    },
+    "sharedLists": {
+      "$ref": "bundle.v1.schema.json#/$defs/sharedLists"
+    },
+    "prompt": {
+      "$ref": "bundle.v1.schema.json#/$defs/prompt"
+    },
+    "modelRole": {
+      "$ref": "bundle.v1.schema.json#/$defs/modelRole"
+    },
+    "readPair": {
+      "$ref": "bundle.v1.schema.json#/$defs/readPair"
+    },
+    "lintRule": {
+      "$ref": "bundle.v1.schema.json#/$defs/lintRule"
+    },
+    "lintFailure": {
+      "$ref": "bundle.v1.schema.json#/$defs/lintFailure"
+    },
+    "journeyGate": {
+      "$ref": "bundle.v1.schema.json#/$defs/journeyGate"
+    },
+    "lintReport": {
+      "$ref": "bundle.v1.schema.json#/$defs/lintReport"
+    },
+    "manifest": {
+      "$ref": "bundle.v1.schema.json#/$defs/manifest"
+    }
+  }
+}
