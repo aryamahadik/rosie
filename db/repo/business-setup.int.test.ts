@@ -2,6 +2,12 @@
 // business_faqs, locations, places_or_things and new_booking_pauses) against local PostgreSQL (`npm run db:up`;
 // `npm run test:integration -- db/repo/business-setup`). The schema comes from migrating a fresh test schema.
 //
+// T-1553 (migration 0040; K-23 v1.1 gap 1): the migrations are compared with K-23 v1.1's table list, the whole part,
+// which restates v1 and keeps every part of it (README default 8; a test below shows v1.1 loosens none of v1); the
+// trigger list holds v1.1's rule 8 trigger business_setup_claim_set_once beside each <table>_version_raised; the index
+// holds v1's ten entries as before and v1.1's three refused rows, each refused by the database for its one reason and
+// passing once that fault is put right; and rule 8's "written once" is shown for both application roles.
+//
 // The test's connection is the migrations' role, which owns the tables and is not bound by row-level security. A check
 // made as the Tool API (rosie_app, K-05 scope business) or the runtime side (rosie_job: the commit's per-write scope,
 // the clock sweep, sign-up's turns before there is a business) runs in its own transaction under SET LOCAL ROLE, scoped
@@ -105,8 +111,17 @@ interface IndexEntry {
 
 const readJson = (url: URL): unknown => JSON.parse(readFileSync(url, "utf8"));
 
-const TABLES = (readJson(new URL("business-setup.v1.tables.json", PART_DIR)) as { tables: ContractTable[] })
+/** K-23 v1's table list, which v1.1 restates (README default 8): read to show that v1.1 keeps every part of it. */
+const V1_TABLES = (
+  readJson(new URL("business-setup.v1.tables.json", PART_DIR)) as { tables: ContractTable[] }
+).tables;
+/** The table list the migrations must produce: K-23 v1.1's, the whole part (migration 0040; v1.1 gap 1). */
+const TABLES = (readJson(new URL("business-setup.v1.1.tables.json", PART_DIR)) as { tables: ContractTable[] })
   .tables;
+/** README rule 8's trigger body (v1.1), word for word as the README gives it. */
+const RULE_8_BODY = /Its body, in K-30's form: `([^`]+)`/u.exec(
+  readFileSync(new URL("README.md", PART_DIR), "utf8"),
+)?.[1];
 const INDEX = (readJson(new URL("index.json", FIXTURES_DIR)) as { fixtures: IndexEntry[] }).fixtures;
 const SEEDS = INDEX.filter((entry) => entry.expect === "accept").map((entry) => entry.file);
 
@@ -120,7 +135,7 @@ const CORE_SEEDS = (
 function tableOf(name: string): ContractTable {
   const table = TABLES.find((candidate) => candidate.name === name);
   if (table === undefined) {
-    throw new Error(`K-23 v1 lists no table ${name}`);
+    throw new Error(`K-23 v1.1 lists no table ${name}`);
   }
   return table;
 }
@@ -436,6 +451,7 @@ afterAll(async () => {
   await db.drop();
 });
 
+// Its title keeps v1's name; since T-1553 its table list is v1.1's, which restates v1 (the test below that names both).
 describe("the migration against the frozen table list (K-23 v1 business setup)", () => {
   /** The table list's types as format_type prints them; the others print as the list writes them. */
   const typeNames: Record<string, string> = {
@@ -450,6 +466,50 @@ describe("the migration against the frozen table list (K-23 v1 business setup)",
         [table.rowLevelSecurity.scope, table.rowLevelSecurity.column, table.versioned, table.versionColumn],
         table.name,
       ).toEqual(["business", "business_id", true, "version"]);
+    }
+  });
+
+  it("v1.1 restates v1 and loosens none of it (README default 8): the other eight tables word for word; business_setup keeps v1's thirteen columns in order, its two foreign keys and its six checks word for word, and adds signup_claim and claimed_by_person_id after them (text, null, no default), business_setup_claimed_by_fk and the two checks", () => {
+    expect(TABLES.map((table) => table.name)).toEqual(V1_TABLES.map((table) => table.name));
+    for (const v1 of V1_TABLES) {
+      const v11 = tableOf(v1.name);
+      if (v1.name !== "business_setup") {
+        expect(v11, v1.name).toEqual(v1);
+        continue;
+      }
+      expect(v11.columns.slice(0, v1.columns.length)).toEqual(v1.columns);
+      expect(
+        v11.columns
+          .slice(v1.columns.length)
+          .map((column) => [column.name, column.type, column.null, column.default]),
+      ).toEqual([
+        ["signup_claim", "text", true, undefined],
+        ["claimed_by_person_id", "text", true, undefined],
+      ]);
+      expect([v11.primaryKey, v11.rowLevelSecurity, v11.versioned, v11.versionColumn]).toEqual([
+        v1.primaryKey,
+        v1.rowLevelSecurity,
+        v1.versioned,
+        v1.versionColumn,
+      ]);
+      expect(v11.foreignKeys.slice(0, v1.foreignKeys.length)).toEqual(v1.foreignKeys);
+      expect(v11.foreignKeys.slice(v1.foreignKeys.length)).toEqual([
+        {
+          name: "business_setup_claimed_by_fk",
+          columns: ["claimed_by_person_id"],
+          references: { table: "persons", columns: ["id"] },
+          onDelete: "restrict",
+        },
+      ]);
+      const v1Checks = v1.checks ?? [];
+      expect((v11.checks ?? []).slice(0, v1Checks.length)).toEqual(v1Checks);
+      expect(
+        (v11.checks ?? []).slice(v1Checks.length).map((check) => [check.name, check.expression]),
+      ).toEqual([
+        ["business_setup_signup_claim_known", "signup_claim is null or signup_claim in ('owner', 'helper')"],
+        ["business_setup_claim_with_person", "(signup_claim is null) = (claimed_by_person_id is null)"],
+      ]);
+      expect([v11.unique, v11.indexes]).toEqual([v1.unique, v1.indexes]);
     }
   });
 
@@ -578,7 +638,7 @@ describe("the migration against the frozen table list (K-23 v1 business setup)",
     expect(own.indexes.locations_map_point_idx).toBe("USING gist (map_point)");
   });
 
-  it("all nine raise their version on every update (0002's rule): <table>_version_raised, and no other trigger", async () => {
+  it("all nine raise their version on every update (0002's rule): <table>_version_raised; business_setup also has v1.1 rule 8's business_setup_claim_set_once, which fires first (name order); and no other trigger", async () => {
     const triggers = await db.sql<{ table: string; name: string; definition: string }[]>`
       select c.relname as table, t.tgname as name, pg_get_triggerdef(t.oid) as definition
       from pg_trigger t join pg_class c on c.oid = t.tgrelid
@@ -586,14 +646,49 @@ describe("the migration against the frozen table list (K-23 v1 business setup)",
       order by 1, 2
     `;
     expect(triggers.map((trigger) => [trigger.table, trigger.name])).toEqual(
-      OWN_TABLES.map((table) => [table, `${table}_version_raised`]),
+      OWN_TABLES.flatMap((table) =>
+        table === "business_setup"
+          ? [
+              [table, "business_setup_claim_set_once"],
+              [table, `${table}_version_raised`],
+            ]
+          : [[table, `${table}_version_raised`]],
+      ),
     );
     for (const trigger of triggers) {
       expect(trigger.definition, trigger.name).toContain("BEFORE UPDATE ON");
       expect(trigger.definition, trigger.name).toContain(
-        "FOR EACH ROW EXECUTE FUNCTION enforce_version_raise()",
+        trigger.name === "business_setup_claim_set_once"
+          ? "FOR EACH ROW EXECUTE FUNCTION business_setup_claim_set_once()"
+          : "FOR EACH ROW EXECUTE FUNCTION enforce_version_raise()",
       );
     }
+  });
+
+  it("rule 8's function (v1.1) is named after its trigger, as 0028's booking_details_set_once(): plpgsql, security invoker, no config of its own, the migrations' role's, and its body is README rule 8's word for word", async () => {
+    const [fn] = await db.sql<
+      {
+        language: string;
+        definer: boolean;
+        owner: string;
+        me: string;
+        config: string[] | null;
+        body: string;
+      }[]
+    >`
+      select l.lanname as language, p.prosecdef as definer, pg_get_userbyid(p.proowner) as owner,
+             current_user as me, p.proconfig as config, p.prosrc as body
+      from pg_proc p join pg_language l on l.oid = p.prolang
+      where p.pronamespace = ${db.schema}::regnamespace and p.proname = 'business_setup_claim_set_once'
+    `;
+    expect([fn?.language, fn?.definer, fn?.owner === fn?.me, fn?.config]).toEqual([
+      "plpgsql",
+      false,
+      true,
+      null,
+    ]);
+    expect(RULE_8_BODY).toBeDefined();
+    expect((fn?.body ?? "").replace(/\s+/gu, " ").trim()).toBe(`begin ${RULE_8_BODY ?? "?"} end;`);
   });
 
   it("row-level security is on for all nine, in T-191's pattern: 0012's two policies on business_id, <table>_tool_api for rosie_app and <table>_runtime for rosie_job; none forced", async () => {
@@ -731,12 +826,21 @@ describe("the seed fixtures load (fixtures/index.json): the four of 02-contracts
     places_or_things: 3,
   };
 
-  it("the index lists the six seeds (the card's four among them) and four refused rows, all K-23 v1 on its own tables", () => {
+  it("the index lists the six seeds (the card's four among them) and four refused rows, all K-23 v1 on its own tables; and v1.1's three refused rows on business_setup, with no accepted v1.1 entry (README default 9)", () => {
+    const v1 = INDEX.filter((entry) => entry.version === "v1");
+    const v11 = INDEX.filter((entry) => entry.version === "v1.1");
     expect([...SEEDS].sort()).toEqual(
       [...CARD_SEEDS, "seed-location-travel-centre.json", "seed-new-booking-pause.json"].sort(),
     );
     expect(
-      INDEX.filter((entry) => entry.expect === "refuse")
+      v1
+        .filter((entry) => entry.expect === "accept")
+        .map((entry) => entry.file)
+        .sort(),
+    ).toEqual([...SEEDS].sort());
+    expect(
+      v1
+        .filter((entry) => entry.expect === "refuse")
         .map((entry) => entry.file)
         .sort(),
     ).toEqual([
@@ -745,7 +849,14 @@ describe("the seed fixtures load (fixtures/index.json): the four of 02-contracts
       "invalid/refuse-second-open-pause.json",
       "invalid/refuse-travel-centre-without-address.json",
     ]);
-    expect(INDEX.every((entry) => entry.version === "v1" && OWN_TABLES.includes(entry.table))).toBe(true);
+    expect(v1).toHaveLength(10);
+    expect(v1.every((entry) => OWN_TABLES.includes(entry.table))).toBe(true);
+    expect(v11.map((entry) => [entry.file, entry.table, entry.expect]).sort()).toEqual([
+      ["invalid/refuse-signup-claim-second-write.json", "business_setup", "refuse"],
+      ["invalid/refuse-signup-claim-unknown-word.json", "business_setup", "refuse"],
+      ["invalid/refuse-signup-claim-without-person.json", "business_setup", "refuse"],
+    ]);
+    expect(INDEX).toHaveLength(v1.length + v11.length);
   });
 
   for (const file of SEEDS) {
@@ -1091,31 +1202,95 @@ describe("row-level security per business on the nine tables, every K-04 v1 and 
   });
 });
 
-/** Each refused fixture with its one fault removed: K-23's README names the row that passes once it is fixed. */
-const REFUSED_CASES: { file: string; fixed: Values; without: string }[] = [
+/**
+ * Loads a fixture as loadFixtures does, with `change` made to its own rows of `table` (never its after chain's): the
+ * row on file put right, where a refused fixture's one fault is in that row rather than in the refused action.
+ */
+async function loadFixtureChanged(file: string, table: string, change: Values): Promise<void> {
+  const rows = fixtureRows(new URL(file, FIXTURES_DIR), new Set());
+  const ownFrom = rows.length - fixtureFile(file).rows.length;
+  const changed = rows.map((row, i) =>
+    i >= ownFrom && row.table === table ? { table, values: { ...row.values, ...change } } : row,
+  );
+  expect(changed.filter((row, i) => row !== rows[i]).length, file).toBeGreaterThan(0);
+  await committedAs(RUNTIME, async (tx) => {
+    for (const row of changed) {
+      await insertRow(tx, row.table, row.values);
+    }
+  });
+}
+
+/**
+ * Each refused fixture with its one fault removed: K-23's README names the row that passes once it is fixed. `fixed`
+ * changes the refused action; `onFile`, the fixture's own row on file the action meets (v1.1's second write: the same
+ * update on the row with no claim on file); `stored`, what the passing action stores beside its business.
+ */
+const REFUSED_CASES: {
+  file: string;
+  business: string;
+  scopeName: string;
+  fixed: Values;
+  onFile?: Values;
+  stored?: Values;
+  without: string;
+}[] = [
   {
     file: "invalid/refuse-photo-customer-without-yes.json",
+    business: BARBERSHOP,
+    scopeName: "Lee's Barbershop",
     fixed: { written_yes_confirmed_at: "2026-10-20T15:00:00Z" },
     without: "the same photo with the owner's confirmation of that customer's written yes",
   },
   {
     file: "invalid/refuse-second-open-pause.json",
+    business: BARBERSHOP,
+    scopeName: "Lee's Barbershop",
     fixed: { resumed_at: "2026-10-27T14:00:00Z", resumed_by_person_id: "person-sam" },
     without: "the same pause with RESUME's time and who resumed it",
   },
   {
     file: "invalid/refuse-nomoney-fact-without-switch.json",
+    business: BARBERSHOP,
+    scopeName: "Lee's Barbershop",
     fixed: { pf_switches_a: ["nomoney"] },
     without: "the same update that also turns the nomoney switch on",
   },
   {
     file: "invalid/refuse-travel-centre-without-address.json",
+    business: BARBERSHOP,
+    scopeName: "Lee's Barbershop",
     fixed: { travel_centre_address: "88 Elm St, Springfield" },
     without: "the same second shop with its centre's address",
   },
+  // K-23 v1.1 (README section "v1.1", "Refused rows (v1.1)"): Lee Home Services and Sam, S1-09's writer's StepRow.
+  {
+    file: "invalid/refuse-signup-claim-unknown-word.json",
+    business: HOME_SERVICES,
+    scopeName: "Lee Home Services",
+    fixed: { signup_claim: "owner" },
+    stored: { signup_claim: "owner", claimed_by_person_id: "person-sam", version: 1 },
+    without: "the same setup row with the claim owner",
+  },
+  {
+    file: "invalid/refuse-signup-claim-without-person.json",
+    business: HOME_SERVICES,
+    scopeName: "Lee Home Services",
+    fixed: { claimed_by_person_id: "person-sam" },
+    stored: { signup_claim: "owner", claimed_by_person_id: "person-sam", version: 1 },
+    without: "the same setup row naming person-sam as the person who claimed it",
+  },
+  {
+    file: "invalid/refuse-signup-claim-second-write.json",
+    business: HOME_SERVICES,
+    scopeName: "Lee Home Services",
+    fixed: {},
+    onFile: { signup_claim: null, claimed_by_person_id: null },
+    stored: { signup_claim: "helper", claimed_by_person_id: "person-sam", version: 2 },
+    without: "the same update on the seed row with no claim on file, which sets the claim once",
+  },
 ];
 
-for (const { file, fixed, without } of REFUSED_CASES) {
+for (const { file, business, scopeName, fixed, onFile, stored, without } of REFUSED_CASES) {
   describe(`${file}: refused for its one reason, as the Tool API side`, () => {
     const { refused } = refusedOf(file);
     const attempt =
@@ -1137,21 +1312,148 @@ for (const { file, fixed, without } of REFUSED_CASES) {
       await loadFixtures([file]);
     }, 60_000);
 
-    it(`the fixture: the Tool API scoped to Lee's Barbershop ${refused.action}s into ${refused.table}; refused by ${refused.expect.constraintOneOf?.join(" or ") ?? "?"} (${refused.expect.sqlstate ?? "?"}), never by privilege`, async () => {
+    it(`the fixture: the Tool API scoped to ${scopeName} ${refused.action}s into ${refused.table}; refused by ${refused.expect.constraintOneOf?.join(" or ") ?? "?"} (${refused.expect.sqlstate ?? "?"}), never by privilege`, async () => {
       expect([
         refused.role,
         refused.scope?.businessId,
         ["insert", "update"].includes(refused.action),
-      ]).toEqual(["toolApi", BARBERSHOP, true]);
-      const outcome = await refusal(as(TOOL_API, BARBERSHOP, attempt({})));
+      ]).toEqual(["toolApi", business, true]);
+      const outcome = await refusal(as(TOOL_API, business, attempt({})));
       expect(outcome.code).toBe(refused.expect.sqlstate);
       expect(refused.expect.constraintOneOf).toContain(outcome.constraint);
     });
 
     it(`without its one fault (${without}) the same ${refused.action} passes`, async () => {
-      const done = await as(TOOL_API, BARBERSHOP, attempt(fixed));
+      if (onFile !== undefined) {
+        // The row on file put right: the fixture loaded again with its own row so changed.
+        await reset();
+        await loadFixtureChanged(file, refused.table, onFile);
+      }
+      const done = await as(TOOL_API, business, attempt(fixed));
       expect(done).toHaveLength(1);
-      expect(done[0]).toMatchObject({ business_id: BARBERSHOP });
+      expect(done[0]).toMatchObject({ business_id: business, ...(stored ?? {}) });
     });
   });
 }
+
+describe("K-23 v1.1 rule 8: the sign-up claim is written once, for both application roles (business_setup_claim_set_once, 23514)", () => {
+  /** The fixture whose own row is v1.1's seed row: Lee Home Services' setup row with Sam's owner claim on file. */
+  const SECOND_WRITE = "invalid/refuse-signup-claim-second-write.json";
+  /** S1-09's writer's StepRow is written by the Tool API under the business's scope, or the runtime side per write. */
+  const WRITERS: { role: Role; scope: string }[] = [
+    { role: TOOL_API, scope: HOME_SERVICES },
+    { role: RUNTIME, scope: HOME_SERVICES },
+  ];
+  const updateSetup =
+    (businessId: string, set: Values) =>
+    (tx: Tx): Promise<Record<string, unknown>[]> =>
+      tx<Record<string, unknown>[]>`
+        update business_setup set ${tx(columnValues(tx, "business_setup", set))}
+        where business_id = ${businessId}
+        returning signup_claim, claimed_by_person_id, website, version
+      `;
+
+  beforeAll(async () => {
+    await reset();
+    await loadFixtures([SECOND_WRITE]);
+  }, 60_000);
+
+  it("the seed row is on file as the fixture gives it: Sam's owner claim, version 1", async () => {
+    await expectStored({ table: "business_setup", values: valuesOf(SECOND_WRITE, "business_setup") });
+  });
+
+  it("once the claim is on file, a change to it or to its person, or clearing either, is refused (23514, business_setup_claim_set_once), before the version rule is read", async () => {
+    const changes: Values[] = [
+      { signup_claim: "helper", version: 2 },
+      { claimed_by_person_id: "person-alex", version: 2 },
+      { signup_claim: "helper", claimed_by_person_id: "person-alex", version: 2 },
+      { signup_claim: null, claimed_by_person_id: null, version: 2 },
+      { signup_claim: null, version: 2 },
+      { claimed_by_person_id: null, version: 2 },
+      { signup_claim: "helper", website: "https://example.com", version: 2 },
+      // The version kept as well: rule 8's trigger fires first (name order), so its refusal is the one given.
+      { signup_claim: "helper" },
+    ];
+    for (const { role, scope } of WRITERS) {
+      for (const set of changes) {
+        const outcome = await refusal(as(role, scope, updateSetup(HOME_SERVICES, set)));
+        expect([outcome.code, outcome.constraint], `${role}: ${JSON.stringify(set)}`).toEqual([
+          "23514",
+          "business_setup_claim_set_once",
+        ]);
+      }
+    }
+  });
+
+  it("an update that leaves both as they are passes: another column, or the same two values written again; the claim stays Sam's owner claim", async () => {
+    for (const { role, scope } of WRITERS) {
+      expect(
+        await as(role, scope, updateSetup(HOME_SERVICES, { website: "https://example.com", version: 2 })),
+        role,
+      ).toEqual([
+        {
+          signup_claim: "owner",
+          claimed_by_person_id: "person-sam",
+          website: "https://example.com",
+          version: 2,
+        },
+      ]);
+      expect(
+        await as(
+          role,
+          scope,
+          updateSetup(HOME_SERVICES, {
+            signup_claim: "owner",
+            claimed_by_person_id: "person-sam",
+            version: 2,
+          }),
+        ),
+        role,
+      ).toEqual([{ signup_claim: "owner", claimed_by_person_id: "person-sam", website: null, version: 2 }]);
+    }
+  });
+
+  it("a row with no claim on file takes one by one update, and then never another; an insert is not the trigger's (the primary key refuses a second row, 23505)", async () => {
+    for (const role of ROLES) {
+      const setOnce = async (tx: Tx): Promise<Record<string, unknown>[]> => {
+        await insertRow(tx, "business_setup", { business_id: BARBERSHOP });
+        return updateSetup(BARBERSHOP, {
+          signup_claim: "owner",
+          claimed_by_person_id: "person-sam",
+          version: 2,
+        })(tx);
+      };
+      expect(await as(role, BARBERSHOP, setOnce), role).toEqual([
+        { signup_claim: "owner", claimed_by_person_id: "person-sam", website: null, version: 2 },
+      ]);
+      const setTwice = async (tx: Tx): Promise<Record<string, unknown>[]> => {
+        await setOnce(tx);
+        return updateSetup(BARBERSHOP, { signup_claim: "helper", version: 3 })(tx);
+      };
+      const again = await refusal(as(role, BARBERSHOP, setTwice));
+      expect([again.code, again.constraint], role).toEqual(["23514", "business_setup_claim_set_once"]);
+      const second = await refusal(
+        as(role, HOME_SERVICES, (tx) =>
+          insertReturning(tx, "business_setup", {
+            ...valuesOf(SECOND_WRITE, "business_setup"),
+            signup_claim: "helper",
+          }),
+        ),
+      );
+      expect([second.code, second.constraint], role).toEqual(["23505", "business_setup_pkey"]);
+    }
+  });
+
+  it("the claim's person is one of persons: business_setup_claimed_by_fk refuses another (23503)", async () => {
+    const outcome = await refusal(
+      as(RUNTIME, BARBERSHOP, (tx) =>
+        insertReturning(tx, "business_setup", {
+          business_id: BARBERSHOP,
+          signup_claim: "owner",
+          claimed_by_person_id: "person-nobody",
+        }),
+      ),
+    );
+    expect([outcome.code, outcome.constraint]).toEqual(["23503", "business_setup_claimed_by_fk"]);
+  });
+});

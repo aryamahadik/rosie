@@ -256,10 +256,10 @@ async function openChat(runtime: Sql, handleId: string, tag: string): Promise<Op
 }
 
 /**
- * K-23 v1 business_setup's row, every column, as the set writes it for a business (T-1462): its business_id alone, and
+ * K-23 v1.1 business_setup's row, every column, as the set writes it for a business (T-1462): its business_id alone, and
  * every other column null or its default (no_money false, version 1). So control is not proven (control_proven_at and
  * control_proven_via null), and it holds no contact value (listing phone or email, website), no About us or profile,
- * no Stripe account and no terms.
+ * no Stripe account, no terms and no sign-up claim (signup_claim and claimed_by_person_id null).
  */
 function setupRowOf(businessId: string): Record<string, unknown> {
   return {
@@ -276,6 +276,8 @@ function setupRowOf(businessId: string): Record<string, unknown> {
     control_proven_at: null,
     control_proven_via: null,
     version: 1,
+    signup_claim: null,
+    claimed_by_person_id: null,
   };
 }
 

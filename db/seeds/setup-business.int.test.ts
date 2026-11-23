@@ -347,6 +347,9 @@ describe("the setup seed, loaded from fixture set v1 after the core seed", () =>
         control_proven_at: null,
         control_proven_via: null,
         version: 1,
+        // K-23 v1.1 (migration 0040): no sign-up claim kept.
+        signup_claim: null,
+        claimed_by_person_id: null,
       }))
       .sort((a, b) => (a.business_id < b.business_id ? -1 : 1));
     expect(sorted(rows.map((row) => String(row.business_id)))).toEqual(
