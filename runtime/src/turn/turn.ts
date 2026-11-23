@@ -41,8 +41,11 @@
 //   DL-521, as built; K-09 v1.13 default 218): its keyword texts still commit core-only on that run, under the keyword
 //   texts' own caller, the one further gateAndCommit a turn makes after a final answer, and if that does not commit either
 //   it keeps today's path. A transient answer, a throw and any other refusal keep today's path too: one resend, a rerun at
-//   each lapse up to three tries, then the crash park, whose row carries the same line (card 7). After the commit nothing
-//   parks: a final answer of composeInput or finalizeMessage is step 7's (./compose.ts).
+//   each lapse up to three tries, then the crash park, whose row carries the same line (card 7), but for a turn whose texts
+//   hold or may hold a stop word, whose STOP never committed: that turn is parked in v1's form with its row unworded, so
+//   the line never goes to a number whose STOP is in the turn (default 218; ./park.ts `stopMayBeIn`, reading the texts
+//   against the keyword list each run keeps for its pinned bundle: `keepPinnedKeywords`). After the commit nothing parks:
+//   a final answer of composeInput or finalizeMessage is step 7's (./compose.ts).
 //
 //   7. Reply (T-252, ./compose.ts; arch 02 step 7, line 123): once the turn has committed, each row the commit wrote is
 //      composed, the rows in parallel (compose input, the composer, finalize with at most one rewrite, the fallback and
@@ -53,7 +56,7 @@
 // Fails closed: a run that cannot finish one of steps 1 to 6 commits nothing and ends, but for the keyword texts step 3
 // commits core-only and a final answer parks the turn at once; the lease reruns the turn from its sealed texts when its
 // 60 s lapse, and parks it after a third lapse with no commit (T-253, ./park.ts: K-05 v1.23 parkTurn, its one row with
-// the passedOn line, the dispatcher woken). Never
+// the passedOn line unless the turn holds or may hold a stop word, the dispatcher woken). Never
 // logged or put in a span: a text's words, a plan's words, a number, a key (K-08 README line 79); the spans hold counts,
 // labels and ids only.
 //
@@ -125,7 +128,7 @@ import { isLabel, type Outcome, type SpanFacts, type TraceContext } from "../tra
 import type { LimitResult, ModelCall, RowRef } from "../trace/types";
 import { composeCommitted, type ComposeReport } from "./compose";
 import { withKeywordCommit } from "./keywords";
-import { parkAtOnce, parkThroughRows } from "./park";
+import { keepKeywords, parkAtOnce, parkThroughRows } from "./park";
 import type {
   BuildFrontierRequest,
   CoreAction,
@@ -408,6 +411,7 @@ function noteModelsDown(run: Run, answer: DecideAnswer): void {
  * cannot finish ends the run with nothing committed (`notCommitted`, its label).
  */
 export async function runTurnLoop(turn: LeasedTurn): Promise<TurnOutcome> {
+  keepPinnedKeywords(turn);
   const set = deps;
   if (set === null) return notCommitted(null, "unwired");
   const first = turn.entries[0];
@@ -491,6 +495,19 @@ export async function runTurnLoop(turn: LeasedTurn): Promise<TurnOutcome> {
   return parkIfFinal(run, await runFrom(run, guarded));
 }
 
+/**
+ * Keeps the keyword list of the bundle this run was pinned to (./park.ts `keepKeywords`), so a crash park of the turn reads
+ * its texts for a stop word as the guard reads them (K-09 v1.13 default 218; DL-1211). A run handed no readable bundle
+ * keeps nothing, and the crash park then reads the turn as unsure.
+ */
+function keepPinnedKeywords(turn: LeasedTurn): void {
+  try {
+    keepKeywords(turn.bundleId, turn.bundle.manifest);
+  } catch {
+    // Nothing kept: the crash park reads such a turn as one that may hold a stop word.
+  }
+}
+
 /** Steps 3 to 6 of one run, from its guarded texts, and how the run ended (before any park at once). */
 async function runFrom(run: Run, guarded: GuardResult<OpenedText>): Promise<TurnOutcome> {
   const { opened, safety } = run;
@@ -550,7 +567,8 @@ export async function runTurn(turn: LeasedTurn): Promise<void> {
 
 /**
  * The turn loop as the lease's hooks: D-017 hands them to `setLeaseHooks` (and `turnReplyCore` to `setReplyDeps`). The park
- * after a third lapse with no commit goes through the turn's K-05 face (T-253, ./park.ts).
+ * after a third lapse with no commit goes through the turn's K-05 face (T-253, ./park.ts), with the passedOn line only for
+ * a turn whose texts it read and found no stop word in (K-09 v1.13 default 218; DL-1211).
  */
 export const turnHooks: Required<LeaseHooks> = {
   runTurn,

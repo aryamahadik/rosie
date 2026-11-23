@@ -24,7 +24,7 @@ import safetyCrisisWords from "../../../contracts/model/fixtures/safety-crisis-w
 import safetyEmergencyNow from "../../../contracts/model/fixtures/safety-emergency-now.json";
 import safetyThreat from "../../../contracts/model/fixtures/safety-threat.json";
 import safetyTimeoutDangerWord from "../../../contracts/model/fixtures/safety-timeout-danger-word.json";
-import type { CommitContext, InboxEntry, LeasedTurn } from "../actor";
+import type { CommitContext, InboxEntry, LeasedTurn, ParkingTurn } from "../actor";
 import { BUNDLE_A, BUNDLE_B, WHOLE_A, WHOLE_B } from "../bundle/test-support";
 import { prepareHandoff, type HandleRef, type InboundEvent } from "../gateway";
 import { fakeKeyStore } from "../gateway/test-support";
@@ -33,7 +33,7 @@ import { fakeCore as fakeReplyCore, phone, ROSIE_NUMBER, type FakeRow } from "..
 import { fakeTargets } from "../guard/test-support";
 import type { SafetyResult } from "../safety/types";
 import { spanProblems, type BundleId } from "../trace";
-import { KEYWORD_RUNS, runTurnLoop, setTurnDeps, turnReplyCore, type TurnOutcome } from "./index";
+import { KEYWORD_RUNS, runTurnLoop, setTurnDeps, turnHooks, turnReplyCore, type TurnOutcome } from "./index";
 import { PASSED_ON_LINE, parkedRowId } from "./park";
 import {
   ALEX,
@@ -2347,6 +2347,87 @@ describe("a final answer before the commit parks the turn at once (K-09 v1.13 de
     expect(kinds.slice(1).every((kind) => kind === "coreOnly")).toBe(true);
     expect(setup.reply.rows.parks).toEqual([]);
     expect(answersOf(setup.t)).not.toContain("turnParked");
+  });
+
+  /** What the lease's crash park is handed for this run's turn (../actor ParkingTurn), as lease.ts builds it. */
+  const parkingOf = (turn: LeasedTurn): ParkingTurn => ({
+    turnId: turn.turnId,
+    eventIds: [...turn.eventIds],
+    entries: turn.entries,
+    traceId: turn.traceId,
+    joinedTraceIds: [...turn.joinedTraceIds],
+    tries: turn.tries,
+    bundleId: turn.bundleId,
+    trace: turn.trace,
+  });
+
+  /** A row with its plan and final parts left out: v1's outboxRowNew (park-turn.json's row). */
+  const withoutWords = (row: object): Record<string, unknown> =>
+    Object.fromEntries(Object.entries(row).filter(([key]) => key !== "plan" && key !== "finalParts"));
+
+  it("that STOP turn's third try ends with its STOP not committed, and the lease's crash park (turnHooks.park) parks it in v1's form with its row unworded: no passedOn line to a number whose STOP is in the turn (K-09 v1.13 default 218; DL-1211); a turn with no stop word, crashed the same way, still gets the line", async () => {
+    const setup = await besideKeyword("STOP");
+    const refusing = setup.face.gate;
+    setup.face.gate = (request, index) =>
+      request.input.kind === "decided" && refusing !== null
+        ? refusing(request, index)
+        : { error: "transient", sqlstate: "40001" };
+    const third: LeasedTurn = { ...setup.t.turn, tries: 3 };
+
+    const outcome = await runTurnLoop(third);
+    expect(outcome).toMatchObject({ result: "notCommitted", why: "notRecorded" });
+    expect(setup.core.phones.get(SAM_PHONE)?.stopped).toBe(false);
+    expect(setup.reply.rows.parks).toEqual([]);
+
+    // The third lapse with no commit: the lease's park hook.
+    const parkedAt = commitS102.request.now;
+    expect(await turnHooks.park(parkingOf(third))).toEqual({ result: "parked", parkedAt, repeated: false });
+
+    const lineForm = samPark(3, REFUSED, parkedAt) as ParkTurnLineRequest;
+    const eventIds = [S1_02_TEXT.eventId, "evt-sam-0003"];
+    expect(setup.reply.rows.parks).toEqual([
+      {
+        turn: { ...lineForm.turn, eventIds },
+        parkedAt,
+        outboxRows: [withoutWords(lineForm.outboxRows[0])],
+        events: lineForm.events.map((entry) => ({
+          ...entry,
+          why: { outage: "third crash before the commit" },
+        })),
+      },
+    ]);
+    const sent = JSON.stringify(setup.reply.rows.parks);
+    for (const words of [PASSED_ON_LINE, "passedOn", "STOP", S1_02_TEXT.body])
+      expect(sent).not.toContain(words);
+    expect(setup.reply.dispatcher.wakes).toEqual([
+      { turnId: TURN, handleId: "handle-sam", outboxRowIds: [parkedRowId(TURN)] },
+    ]);
+    expect(setup.t.spans.at(-1)?.decided).toMatchObject({ parked: true, atOnce: false, line: false });
+    restoreAll();
+
+    // The same crash with no stop word in the turn: the crash park's row carries the passedOn line (card 7).
+    const plain = await samRun();
+    plain.face.gate = answersInTurn({ error: "transient", sqlstate: "40001" });
+    const plainThird: LeasedTurn = { ...plain.t.turn, tries: 3 };
+    expect(await runTurnLoop(plainThird)).toMatchObject({ result: "notCommitted", why: "transient" });
+    expect(await turnHooks.park(parkingOf(plainThird))).toMatchObject({ result: "parked", repeated: false });
+    const [parked] = plain.reply.rows.parks;
+    const plainForm = samPark(3, REFUSED, PARKED_AT) as ParkTurnLineRequest;
+    expect(plain.reply.rows.parks).toEqual([
+      {
+        turn: plainForm.turn,
+        parkedAt: PARKED_AT,
+        outboxRows: plainForm.outboxRows,
+        events: plainForm.events.map((entry) => ({
+          ...entry,
+          why: { outage: "third crash before the commit" },
+        })),
+      },
+    ]);
+    expect((parked as ParkTurnLineRequest).outboxRows[0].finalParts.sends).toEqual([
+      { kind: "words", text: PASSED_ON_LINE, calendarFile: "none", options: [], link: null },
+    ]);
+    expect(plain.t.spans.at(-1)?.decided).toMatchObject({ parked: true, atOnce: false, line: true });
   });
 
   it("HELP or START beside a decided text whose decided request answers turnRefused: one gateAndCommit, none on the replies' reruns, then the turn is parked at once", async () => {

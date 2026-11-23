@@ -572,8 +572,9 @@ export interface EventEntry {
 
 /**
  * K-05 v1 `parkTurn.request` (park-turn.json): the turn with tries 3, when it was parked, the one "nothing changed" row
- * (at most one; written with no plan, so the runtime never words it) and its event-log entries. The runtime no longer
- * sends it (T-1552: every park is v1.23's `ParkTurnLineRequest`); K-05 still takes it.
+ * (at most one; written with no plan, so the runtime never words it) and its event-log entries. The runtime sends it only
+ * for a crash park of a turn whose texts hold or may hold a stop word, so no line is written for it (T-1552 round 2; K-09
+ * v1.13 default 218); every other park is v1.23's `ParkTurnLineRequest`. K-05 v1.23 item 84 still takes it.
  */
 export interface ParkTurnV1Request {
   turn: CommitTurnRef;
@@ -621,7 +622,10 @@ export interface ParkTurnLineRequest {
   events: EventEntry[];
 }
 
-/** K-05 v1.23 `parkTurn.request`: v1's form or v1.23's (the runtime sends v1.23's alone, T-1552). */
+/**
+ * K-05 v1.23 `parkTurn.request`: v1's form or v1.23's (the runtime sends v1's only for a crash park of a turn that holds or
+ * may hold a stop word, T-1552).
+ */
 export type ParkTurnRequest = ParkTurnV1Request | ParkTurnLineRequest;
 
 /** K-05 v1 `parkTurn.response`: parked; a repeat writes nothing and returns the first result with `repeated` true. */

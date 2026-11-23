@@ -55,12 +55,13 @@ import {
 import type { PlannedSend } from "../dispatch/types";
 import { actorNameOf, durableObjectActor, type ActorNamespace, type HandleActorRpc } from "../gateway";
 import { fakeKeyStore } from "../gateway/test-support";
-import { setGuardDeps } from "../guard";
+import { setGuardDeps, setReplyDeps } from "../guard";
+import { fakeCore as fakeReplyCore, phone, ROSIE_NUMBER } from "../guard/replies/test-support";
 import { fakeTargets } from "../guard/test-support";
 import { fixtureBundle, harness, type Harness } from "../safety/test-support";
 import type { RecordSafetyOutcomeResponse, SafetyResult } from "../safety/types";
 import { spanProblems, type Span } from "../trace";
-import { parkedRowId, setTurnDeps, turnHooks } from "./index";
+import { parkedRowId, setTurnDeps, turnHooks, turnReplyCore } from "./index";
 import { PASSED_ON_LINE } from "./park";
 import {
   MAYA,
@@ -818,6 +819,23 @@ function parkRequestFor(turnId: string): ParkTurnRequest {
 }
 
 /**
+ * parkRequestFor's request in v1's form (K-05 item 12, park-turn.json's, which v1.23's item 84 still takes): its one row
+ * with no plan and no final parts, so no line is written; tries 3, no reason, v1's outage why.
+ */
+function unwordedParkFor(turnId: string): ParkTurnRequest {
+  const request = parkRequestFor(turnId) as ParkTurnLineRequest;
+  const unworded = Object.fromEntries(
+    Object.entries(request.outboxRows[0]).filter(([key]) => key !== "plan" && key !== "finalParts"),
+  );
+  return {
+    turn: request.turn,
+    parkedAt: request.parkedAt,
+    outboxRows: [unworded as never],
+    events: request.events,
+  };
+}
+
+/**
  * K-05 parkTurn as the turn's doubles answer it (park-turn.json's answer, then repeated), and the row it writes: the park's
  * one row, given the words its request carries (its final parts), so the dispatcher sends what K-05 stored.
  */
@@ -955,6 +973,75 @@ describe("three crashes before the commit", { timeout: SLOW_MS }, () => {
         const lines = log.mock.calls.map((call) => String(call[0])).join("\n");
         for (const secret of [MAYA_WORDS, MAYA.handle.address, PASSED_ON_LINE]) {
           expect(lines).not.toContain(secret);
+        }
+      },
+    );
+  });
+
+  it("a turn holding STOP whose STOP never commits (its core-only gateAndCommit answers transient on every try) is parked after its third lapse in v1's form, its row unworded: the person who texted STOP gets no passedOn line (K-09 v1.13 default 218: card 7 keeps the rule for a turn whose STOP never committed; DL-1211)", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const turnId = await turnIdOf([MAYA_TEXT.eventId]);
+    await withRig(
+      MAYA,
+      {
+        answers: { [MAYA_TEXT.eventId]: safetyNoFor(MAYA_TEXT.eventId) },
+        times: [parkTurn.request.parkedAt],
+        outbox: [],
+        turnRows: [],
+      },
+      async (rig) => {
+        // The keyword texts' replies commit through the turn's own commit (T-267's turnReplyCore), over Maya's phone.
+        const core = fakeReplyCore(parkTurn.request.parkedAt, [
+          phone(MAYA.handle.address, "handle-maya", "person-maya", 3),
+        ]);
+        const restore = setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER });
+        try {
+          // Every gateAndCommit answers transient: the STOP's core-only commit never goes through, on any try.
+          rig.face.gate = () => ({ error: "transient", sqlstate: "40001" });
+
+          await arrive(MAYA, MAYA_TEXT.eventId, "STOP", MAYA_TEXT.sentAt);
+          await rig.tick(3000);
+          const triesSent = (): number[] => rig.face.gateCalls.map((call) => call.request.turn.tries);
+          await until(() => triesSent().includes(1), "try 1's core-only commit");
+          await rig.tick(LEASE_MS);
+          await until(() => triesSent().includes(2), "try 2's core-only commit");
+          await rig.tick(LEASE_MS);
+          await until(() => triesSent().includes(3), "try 3's core-only commit");
+          expect(await rig.actor.readTurns()).toMatchObject([{ turnId, state: "leased", tries: 3 }]);
+
+          // The third lapse with no commit parks the turn: in v1's form, its one row to Maya's handle unworded.
+          await rig.tick(LEASE_MS);
+          await until(() => rig.reply.rows.parks.length === 1, "the crash park");
+          await rig.settle();
+          expect(rig.face.gateCalls.every((call) => call.request.input.kind === "coreOnly")).toBe(true);
+          expect(rig.reply.rows.parks).toEqual([unwordedParkFor(turnId)]);
+          const [row] = rig.reply.rows.parks[0]?.outboxRows ?? [];
+          expect(Object.keys(row ?? {}).sort()).toEqual(
+            Object.keys(parkTurn.request.outboxRows[0] ?? {}).sort(),
+          );
+          expect(await rig.actor.readTurns()).toMatchObject([
+            { turnId, state: "parked", tries: 3, leaseUntil: null, committedAt: null },
+          ]);
+
+          // No line to the number whose STOP is in the turn: the row has no words, and nothing went to Linq.
+          expect(rig.wakes).toEqual([
+            { turnId, handleId: "handle-maya", outboxRowIds: [parkedRowId(turnId)] },
+          ]);
+          expect(rig.linq.requests).toEqual([]);
+          expect(JSON.stringify(rig.reply.rows.parks)).not.toContain(PASSED_ON_LINE);
+
+          // The park's span says its row carries no line; no log line holds the words, the line or the number.
+          const parkSpans = log.mock.calls
+            .map((call) => JSON.parse(String(call[0])) as Json)
+            .filter((line) => line.msg === "span" && line.turn_id === turnId && line.hop === "lease")
+            .filter((span) => (span.decided as Json | undefined)?.parked !== undefined);
+          expect(parkSpans.map((span) => span.decided)).toEqual([
+            { parked: true, atOnce: false, line: false, repeated: false, woken: true, sends: 1 },
+          ]);
+          const lines = log.mock.calls.map((call) => String(call[0])).join("\n");
+          for (const secret of [PASSED_ON_LINE, MAYA.handle.address]) expect(lines).not.toContain(secret);
+        } finally {
+          restore();
         }
       },
     );
