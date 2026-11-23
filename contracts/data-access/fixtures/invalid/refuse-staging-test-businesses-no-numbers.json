@@ -1,16 +1,16 @@
 {
   "call": "readStagingTestBusinesses",
   "given": {
-    "k04Seeds": ["seed-person-roles.json"],
+    "k04Seeds": ["seed-business-head.json"],
     "after": [],
     "now": "2026-11-23T15:30:00Z",
-    "note": "read-staging-test-businesses-sam asked with no numbers: a list with none names no test business, and a binding whose allow-list failed to load must fail closed before the read, never read the whole table. Refused for its one fault, request.numbers; put right, it is read-staging-test-businesses-sam."
+    "note": "read-staging-test-businesses-sam, with the same given (the rows its note lists) and outcome, asked with no numbers: a list with none names no test business, and a binding whose allow-list failed to load must fail closed before the read, never read the whole table. Refused for its one fault, request.numbers; put right, it is read-staging-test-businesses-sam."
   },
   "request": {
     "numbers": []
   },
   "outcome": {
     "result": "testBusinesses",
-    "businessIds": ["biz-lee-home-services"]
+    "businessIds": ["biz-lees-barbershop"]
   }
 }

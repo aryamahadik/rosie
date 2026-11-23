@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://rosie.invalid/contracts/data-access/data-access.v1.24.schema.json",
   "title": "DataAccessV1dot24",
-  "description": "K-05 v1.24, a minor version of the data-access calls (T-1549: the ruling T-1543's card A9, ops/reviews/signup-remainder/rule-rest.json; DL-1194): the runtime-side reads the rest of journey 1's sign-up by text needs, and the text way of a sign-in. It only adds to v1.23 (data-access.v1.23.schema.json, frozen and unchanged, referred to here, which refers on to every earlier version down to v1): every v1.23 definition is here under its own name, by reference, and none changes but the three it restates, startSignIn.request (v1.13's form, or v1.24's startSignIn.textRequest), startSignIn.response (v1.13's started or paused, or v1.24's startSignIn.textStarted) and startSignIn.exchange (to refer to v1.24's request and response; the errors v1.14's, by reference), so every v1 to v1.23 exchange is a v1.24 exchange. Added, each on the runtime side as rosie_job in a read-only transaction of its own, 1 connection, never on or beside a Tool API call's transaction (README items 85 to 92): readSignUpKeys (S1-10's keys by person: README item 85), readPendingUpload (the pending upload by its upload id: item 86), openReviewItemsOf (a business's open K-37 review items of one kind, never the summary: item 88), readStagingTestBusinesses (the businesses whose owner's account mobile is one of the numbers given: item 89), startSignIn.textRequest, startSignIn.textStarted and startSignIn.textExchange (the text way of a sign-in's start: item 90), and liveTextSignInCode (the id of a handle's live sign-in code that went by text, never its hash: item 91). Item 87 (item 26 reads the K-23 v1.1 claim as facts) and item 92 (a handle's phone service) add no call. No column, grant, index or migration is added. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "description": "K-05 v1.24, a minor version of the data-access calls (T-1549: the ruling T-1543's card A9, ops/reviews/signup-remainder/rule-rest.json; DL-1194): the runtime-side reads the rest of journey 1's sign-up by text needs, and the text way of a sign-in. It only adds to v1.23 (data-access.v1.23.schema.json, frozen and unchanged, referred to here, which refers on to every earlier version down to v1): every v1.23 definition is here under its own name, by reference, and none changes but the three it restates, startSignIn.request (v1.13's form, or v1.24's startSignIn.textRequest), startSignIn.response (v1.13's started or paused, or v1.24's startSignIn.textStarted) and startSignIn.exchange (to refer to v1.24's request and response; the errors v1.14's, by reference), so every v1 to v1.23 exchange is a v1.24 exchange. Added, each on the runtime side as rosie_job, its own read-only transaction on its own connection, beside a Tool API call's transaction and never on it, 1 connection, so a gate call holds 2 connections at most (README items 85 to 92, default 226; card B11): readSignUpKeys (S1-10's keys by person, as one moment: README item 85), readPendingUpload (the pending upload by its upload id: item 86), openReviewItemsOf (a business's open K-37 review items of one kind, never the summary: item 88), readStagingTestBusinesses (the businesses named by a K-23 company whose owner's account mobile is one of the numbers given, never by a role: item 89), startSignIn.textRequest, startSignIn.textStarted and startSignIn.textExchange (the text way of a sign-in's start: item 90), and liveTextSignInCode (the id of a handle's live sign-in code that went by text, never its hash: item 91). Item 87 (item 26 reads the K-23 v1.1 claim as facts) and item 92 (a handle's phone service) add no call. No column, grant, index or migration is added. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
   "anyOf": [
     { "$ref": "#/$defs/commitTurn.exchange" },
     { "$ref": "#/$defs/writePlan.exchange" },
@@ -816,7 +816,7 @@
     },
     "readSignUpKeys.request": {
       "title": "ReadSignUpKeysRequest",
-      "description": "S1-10's keys by person (README item 85; K-09 open gap 201; card A9 item 1): the person whose sign-up the event turn walks on from S1-10 for (the link's own person). Role and scope: rosie_job on the runtime side, with no business scope (accounts, id_uploads and phones are scoped none: K-22, K-04), a read-only transaction of its own on the primary, 1 connection, never on or beside a Tool API call's transaction. Repeat: safe, a read. Time budget: none in the sources. New in v1.24.",
+      "description": "S1-10's keys by person (README item 85; K-09 open gap 201; card A9 item 1): the person whose sign-up the event turn walks on from S1-10 for (the link's own person). Role and scope: rosie_job on the runtime side, with no business scope (accounts, id_uploads and phones are scoped none: K-22, K-04), its own read-only transaction on its own connection on the primary, beside a Tool API call's transaction and never on it, 1 connection; its three tables read as one moment, by a single statement or in one transaction at repeatable read (README item 85). Repeat: safe, a read. Time budget: none in the sources. New in v1.24.",
       "type": "object",
       "properties": {
         "personId": { "description": "K-04 persons.id.", "$ref": "#/$defs/id" }
@@ -826,7 +826,7 @@
     },
     "readSignUpKeys.response": {
       "title": "ReadSignUpKeysResponse",
-      "description": "The person's S1-10 keys, from one read-only transaction (README item 85): idUpload, the person's one sign_up upload (K-22 id_uploads_one_sign_up), or null with none; mobile, the account's proven mobile with its handle id, or null when the person has no account, no mobile or a mobile not proven. A person with no row anywhere answers both null, never an error, so the read never tells whether a person exists. New in v1.24.",
+      "description": "The person's S1-10 keys, read as one moment (a single statement, or one read-only transaction at repeatable read: README item 85): idUpload, the person's one sign_up upload (K-22 id_uploads_one_sign_up), or null with none; mobile, the account's proven mobile with its handle id, or null when the person has no account, no mobile or a mobile not proven. A person with no row anywhere answers both null, never an error, so the read never tells whether a person exists. New in v1.24.",
       "type": "object",
       "properties": {
         "result": { "const": "signUpKeys" },
@@ -884,7 +884,7 @@
           "pattern": "^(image|application)/[a-z0-9.+-]+$"
         },
         "objectKey": {
-          "description": "The R2 object key, sealed under the person's key (K-22 id_uploads.object_key, sealedBy person_id), never in plain words (refuse-pending-upload-plain-object-key). The event turn copies these bytes into its id_uploads insert as they are.",
+          "description": "The R2 object key, sealed under the person's key (K-22 id_uploads.object_key, sealedBy person_id), never in plain words (refuse-pending-upload-plain-object-key). The event turn copies these bytes, in this \\x form, into its id_uploads insert's values.object_key as they are, which commitTurn writes into the bytea column as the bytes they spell (README default 233; never v1's sealedValues, the event-log entry's field).",
           "$ref": "#/$defs/sealedBytes"
         }
       },
@@ -893,7 +893,7 @@
     },
     "readPendingUpload.request": {
       "title": "ReadPendingUploadRequest",
-      "description": "The pending upload by its upload id (README item 86; card A9 item 2), read by the event turn's gate (card A11, bound by B11) before it writes S1-10's id_uploads row. Role and scope: rosie_job on the runtime side, with no business scope, a read-only transaction of its own on the primary, 1 connection, never on or beside a Tool API call's transaction. Repeat: safe, a read. Time budget: inside the event turn's gate (arch 04 line 223). New in v1.24.",
+      "description": "The pending upload by its upload id (README item 86; card A9 item 2), read by the event turn's gate (card A11, bound by B11) before it writes S1-10's id_uploads row. Role and scope: rosie_job on the runtime side, with no business scope, its own read-only transaction on its own connection on the primary, beside a Tool API call's transaction and never on it, 1 connection. Repeat: safe, a read. Time budget: inside the event turn's gate (arch 04 line 223). New in v1.24.",
       "type": "object",
       "properties": {
         "uploadId": {
@@ -986,7 +986,7 @@
     },
     "openReviewItemsOf.request": {
       "title": "OpenReviewItemsOfRequest",
-      "description": "A business's open review items of one kind (README item 88; card A9 item 4): S1-75's check of an open listing_match item (card B8), and staging's review list (card E10). Role and scope: rosie_job on the runtime side (K-37 rule 2: no Tool API role reads review_items; actions/src/domain/paging/ports.ts line 178), with no business scope, every statement naming the request's business, a read-only transaction of its own on the primary beside the call's and never on it, 1 connection. Repeat: safe, a read. Time budget: inside the gate (arch 04 line 223) for B8; none in the sources for E10. New in v1.24.",
+      "description": "A business's open review items of one kind (README item 88; card A9 item 4): S1-75's check of an open listing_match item (card B8), and staging's review list (card E10). Role and scope: rosie_job on the runtime side (K-37 rule 2: no Tool API role reads review_items; actions/src/domain/paging/ports.ts line 178), with no business scope, every statement naming the request's business, its own read-only transaction on its own connection on the primary, beside a Tool API call's transaction and never on it, 1 connection. Repeat: safe, a read. Time budget: inside the gate (arch 04 line 223) for B8; none in the sources for E10. New in v1.24.",
       "type": "object",
       "properties": {
         "businessId": { "$ref": "#/$defs/id" },
@@ -1033,7 +1033,7 @@
     },
     "readStagingTestBusinesses.request": {
       "title": "ReadStagingTestBusinessesRequest",
-      "description": "Staging's test businesses (README item 89; card A9 item 5; K-21 v1.4 testReviewItems, card E10): the numbers given are the ones staging lets Rosie text, STAGING_LINQ_ALLOWLIST and the roster's test phones, read by name at run time and never committed, printed or logged. Role and scope: rosie_job on the runtime side, unscoped (person_roles, accounts and businesses read across businesses), a read-only transaction of its own on the primary, 1 connection. Served on staging alone: production's binding never calls it. Repeat: safe, a read. Time budget: none in the sources. New in v1.24.",
+      "description": "Staging's test businesses (README item 89; card A9 item 5; K-21 v1.4 testReviewItems, card E10): the numbers given are the ones staging lets Rosie text, STAGING_LINQ_ALLOWLIST and the roster's test phones, read by name at run time and never committed, printed or logged. Role and scope: rosie_job on the runtime side, unscoped (K-23 companies and K-22 accounts read across businesses, the scope confirmed empty; never person_roles), its own read-only transaction on its own connection on the primary, beside a Tool API call's transaction and never on it, 1 connection. Served on staging alone: production's binding never calls it. Repeat: safe, a read. Time budget: none in the sources. New in v1.24.",
       "type": "object",
       "properties": {
         "numbers": {
@@ -1049,7 +1049,7 @@
     },
     "readStagingTestBusinesses.response": {
       "title": "ReadStagingTestBusinessesResponse",
-      "description": "The ids of the businesses whose live owner role (K-04 person_roles, role owner, ended_at null) is held by a person whose K-22 account mobile is one of the numbers, in id order, each once; none is an empty list (README item 89, default 232). Ids alone: no number, person, name or role is answered. New in v1.24.",
+      "description": "The business ids that K-23 companies name (business_id set) whose owner_person_id is a person whose K-22 accounts.mobile is one of the numbers, in id order, each once; none is an empty list (README item 89, default 232). The owner is the company's, as K-05 v1.11 item 52 reads it, never a K-04 person_roles owner role, which no sign-up step writes and no staging test business holds (README open gaps 58 and 95). Ids alone: no number, person, name or role is answered. New in v1.24.",
       "type": "object",
       "properties": {
         "result": { "const": "testBusinesses" },
@@ -1083,7 +1083,7 @@
     },
     "liveTextSignInCode.request": {
       "title": "LiveTextSignInCodeRequest",
-      "description": "The live text sign-in code of a handle (README item 91; card A9 item 6; R29), read by the turn's guard when a text of the ready text's exact shape comes from the turn's own handle, before the gate and never in its slot. Role and scope: rosie_job on the runtime side through HYPERDRIVE_JOB (ADR-016 section 6), with no business scope (proof_codes' runtime side), a read-only transaction of its own on the primary, 1 connection, never in one transaction with a Tool API call. Repeat: safe, a read. Time budget: inside the turn's reads, before the gate. New in v1.24.",
+      "description": "The live text sign-in code of a handle (README item 91; card A9 item 6; R29), read by the turn's guard when a text of the ready text's exact shape comes from the turn's own handle, before the gate and never in its slot. Role and scope: rosie_job on the runtime side through HYPERDRIVE_JOB (ADR-016 section 6), with no business scope (proof_codes' runtime side), its own read-only transaction on its own connection on the primary, 1 connection, never in one transaction with a Tool API call (card A9 item 6's words for README default 226). Repeat: safe, a read. Time budget: inside the turn's reads, before the gate. New in v1.24.",
       "type": "object",
       "properties": {
         "handleId": {

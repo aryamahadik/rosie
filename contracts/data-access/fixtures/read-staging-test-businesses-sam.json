@@ -1,16 +1,16 @@
 {
   "call": "readStagingTestBusinesses",
   "given": {
-    "k04Seeds": ["seed-person-roles.json"],
+    "k04Seeds": ["seed-business-head.json"],
     "after": [],
     "now": "2026-11-23T15:30:00Z",
-    "note": "On staging, K-21 v1.4 testReviewItems (card E10) passes the numbers staging lets Rosie text, here tp-01's and tp-02's fiction-range numbers. Sam holds the live owner role of Lee Home Services and his K-22 account mobile is tp-01's number, so that business is a test business; no other business's live owner has an account mobile among the numbers. Only business ids are answered."
+    "note": "On staging, K-21 v1.4 testReviewItems (card E10) passes the numbers staging lets Rosie text, here tp-01's and tp-02's fiction-range numbers. K-04's seed-business-head.json gives three businesses (biz-lees-barbershop, biz-yoga-studio and biz-movers) and no person, handle or role. This exchange's database side then writes exactly these rows, in this order, every column not named taking its default: persons person-sam (name 'Sam Lee', language null) and person-maya (name 'Maya', language 'en'); handles handle-sam (phone, +15555550100) and handle-maya (phone, +15555550104); person_handles (person-sam, handle-sam) and (person-maya, handle-maya); phones +15555550100 (handle_id handle-sam) and +15555550104 (handle_id handle-maya); K-22 accounts person-sam (mobile +15555550100, mobile_proven_at null) and person-maya (mobile +15555550104, mobile_proven_at null); K-23 companies company-lees-barbershop (owner_person_id person-sam, name \"Lee's Barbershop LLC\", business_id biz-lees-barbershop) and company-yoga-studio (owner_person_id person-maya, name 'Yoga Studio LLC', business_id biz-yoga-studio); and K-04 person_roles role-sam-movers (person-sam, biz-movers, role owner, ended_at null). So biz-lees-barbershop is answered: its company's owner, Sam, has an account mobile among the numbers (not proven yet: default 232), though no one holds its live owner role, as a roster test business stands (db/seeds/roster-owner.ts; open gap 58). biz-yoga-studio is not: its company's owner, Maya, has an account mobile that is not among the numbers. biz-movers is not, though Sam holds its live owner role: no company names it, and item 89 never reads a role. No account holds tp-02's number, so it names no business. Only business ids are answered."
   },
   "request": {
     "numbers": ["+15555550100", "+15555550101"]
   },
   "outcome": {
     "result": "testBusinesses",
-    "businessIds": ["biz-lee-home-services"]
+    "businessIds": ["biz-lees-barbershop"]
   }
 }

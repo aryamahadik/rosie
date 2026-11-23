@@ -3381,8 +3381,8 @@
       "version": "v1.24",
       "def": "readStagingTestBusinesses.exchange",
       "expect": "accept",
-      "shows": "Staging's test businesses: the businesses whose live owner's account mobile is one of the numbers given, as ids alone, for K-21 v1.4 testReviewItems",
-      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 5, cards A8 and E10, R28 and R33; STAGING_LINQ_ALLOWLIST (T-416); K-22 v1 accounts; K-04 v1 person_roles; K-05 v1.24 item 89 and defaults 226 and 232"
+      "shows": "Staging's test businesses: the businesses a K-23 company names whose owner's account mobile is one of the numbers given, as ids alone, for K-21 v1.4 testReviewItems; a business with no live owner role is answered by its company, and a live owner role with no company of that owner is never read",
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 5, cards A8 and E10, R28 and R33; STAGING_LINQ_ALLOWLIST (T-416); K-23 v1 companies (owner_person_id); K-22 v1 accounts; db/seeds/roster-owner.ts lines 73 and 496 to 497; K-05 v1.11 item 52 and defaults 98 and 99; K-05 open gaps 58 and 95; K-05 v1.24 item 89 and defaults 226 and 232"
     },
     {
       "file": "invalid/refuse-staging-test-businesses-no-numbers.json",
