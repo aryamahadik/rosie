@@ -420,9 +420,12 @@ describe("every effect row carries an idempotency key", () => {
       ),
     });
     const request = copy(gateExchange(S1_02).request);
-    await expect(api.call("gateAndCommit", request, traceFor(request).trace)).rejects.toBeInstanceOf(
-      CommitRefusedError,
-    );
+    await expect(api.call("gateAndCommit", request, traceFor(request).trace)).resolves.toEqual({
+      error: "turnRefused",
+      from: "commit",
+      fault: "effectWithoutKey",
+      ids: ["eff-alex-grooms-deposit"],
+    });
     expect(whats(scope.events).at(-1)).toBe("rollback");
     expect(deps.k05.requests).toEqual([]);
 

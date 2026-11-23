@@ -82,7 +82,6 @@ import { bundleV1Id, decidedOf, turnTwoOnV1 } from "../../../commit/walk/test-su
 import { NOT_TOLD_YET, PLUGIN_LISTS_NO_STOP_WORDS } from "../../../domain/safety";
 import { captureLog, checks, fakeBundles } from "../../../frontier/assemble/test-support";
 import type { DecidePart } from "../../../gate/framework";
-import { CompaniesRefusedError } from "../../journey-1/companies";
 import { catalogDefaults } from "../../journey-1/companies/test-support";
 import { pgKindsReads } from "../../journey-1/kinds";
 import { PF_TEXT_KEYS, type PlugInBundles } from "../../journey-1/plug-ins";
@@ -1107,8 +1106,12 @@ describe("Sam's own answer needs a second company: refused with the party flag o
       const turnId = `${SECOND.turn3}-party-off`;
       const before = { core: await snapshot(cdb), kinds: await kindsRows() };
       const refused = answer(SECOND, "samsAnswer", face, turnId);
-      await expect(refused).rejects.toBeInstanceOf(CompaniesRefusedError);
-      await expect(refused).rejects.toMatchObject({ fault: "secondCompany", ids: ["S1-04"] });
+      await expect(refused.then((got) => got.answer)).resolves.toEqual({
+        error: "turnRefused",
+        from: "companies",
+        fault: "secondCompany",
+        ids: ["S1-04"],
+      });
       expect(await footprint(cdb, turnId)).toEqual(NO_FOOTPRINT);
       expect(await questionRow(SECOND.question2)).toEqual({ status: "open", version: openAt, step: "S1-04" });
       expect({ core: await snapshot(cdb), kinds: await kindsRows() }).toEqual(before);
