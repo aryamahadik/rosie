@@ -52,6 +52,19 @@
 //      there is no S1-04 writer (an answer to S1-04 is notBuilt, gives, before any read) while S1-08's writer stays bound
 //      beside the stop reads; with the stop reads left out there is no S1-08 writer (the answer is refused at S1-08,
 //      notBuilt, before any read).
+//   h. S1-09, S1-76 and S1-10 (T-1540, S1-09 design card 8 extended to S1-10; DL-1179; K-09 README defaults 201 to 211):
+//      staging's shape with the listing ports (GateReads.listing) and the root's HeldLinks (GateInputs.links) carries
+//      S1-09's settler beside S1-02's and the S1-09, S1-76 and S1-10 writers beside the others; building the binding
+//      reads nothing (the Places port is made once for the call and never searched; no K-05 read, no paging reader, no
+//      stop read), and two calls make two Places ports. Left out (no listing ports, no links, or the kinds, stop or
+//      one-kind reads they ride on), the binding is today's: no S1-09 settler and none of the three writers, and the
+//      listing ports are never asked. On bundle v3 through the commit's own writesOf: the ruling's words ("Lee's
+//      Barbershop in Springfield, I'm the owner") run S1-09's settler, S1-09's writer and S1-10's writer, one read open at
+//      a time, and S1-10's link is staged in the root's own HeldLinks under the gate's clock and the link place the
+//      ports answered (https://rosfield.com/test/<32 hex>, its sha256 the page_links row's); a made-up name and town
+//      write S1-76's row and one listing_match review item through the listing paging reader. heldLinksFor makes the
+//      root's one hold only for staging's shape; and the finalize port lets a row's held link go once that row's finalize
+//      sent, the compose-input port lists link.secure among that row's allowed links, each only when handed the links.
 //
 // Under test, as they are: ./real.ts's binding and its bundles; @rosie/actions' turnCommitDeps, T-1461's walk on bundle
 // v1's flow A with T-1502's settler port, T-633's writers and T-1502's S1-02 settler with T-632's matcher, T-634's
@@ -70,21 +83,28 @@
 import { BARBERSHOP } from "@rosie/actions/src/domain/safety/test-support";
 import {
   NOTHING_OPEN,
+  S1_09_QUESTION,
   bundleV1Id,
+  bundleV3Id,
   commitS1_02,
   contextOf,
   decidedOf,
   flowA,
   flowAV1,
+  flowAV3,
   passedPartOf,
   questionsOver,
   requestTurnFields,
   s1_02QuestionRow,
+  s1_09QuestionRow,
   tradeOverlayV1,
   turnOne,
+  turnS1_09OnV3,
   turnTwoOnV1,
 } from "@rosie/actions/src/commit/walk/test-support";
+import type { PassedPart } from "@rosie/actions/src/commit";
 import { WalkNotBuiltError, type ButtonsSettler, type WalkQuestions } from "@rosie/actions/src/commit/walk";
+import { pagingWorld, readerOn } from "@rosie/actions/src/domain/paging/test-support";
 import type { StopHomeReads } from "@rosie/actions/src/homes/stop/reads";
 import { readsOn, seedWorld } from "@rosie/actions/src/homes/stop/test-support";
 import { CompaniesRefusedError } from "@rosie/actions/src/tool-api/journey-1/companies/errors";
@@ -107,6 +127,25 @@ import {
   fakeK05,
   turnWithWords,
 } from "@rosie/actions/src/tool-api/journey-1/kinds/test-support";
+import {
+  OWNER_MATCHES,
+  listingSummaryOf,
+  type ListingSearch,
+} from "@rosie/actions/src/tool-api/journey-1/listing";
+import { listingReadsOf } from "@rosie/actions/src/tool-api/journey-1/listing/reads";
+import {
+  DEMO_NAME,
+  MADE_UP_NAME,
+  MADE_UP_WORDS,
+  RULING_WORDS,
+  fakeListingK05,
+} from "@rosie/actions/src/tool-api/journey-1/listing/test-support";
+import { mobileIdReadsOf } from "@rosie/actions/src/tool-api/journey-1/mobile-id/reads";
+import {
+  BASE_PATH,
+  LINK_HOST,
+  fakeMobileIdK05,
+} from "@rosie/actions/src/tool-api/journey-1/mobile-id/test-support";
 import { PF_TEXT_KEYS } from "@rosie/actions/src/tool-api/journey-1/plug-ins/plug-in";
 import {
   bundleV2Id,
@@ -121,16 +160,39 @@ import {
   type ErrorAnswer,
 } from "@rosie/actions/src/tool-api/turn-face/commit";
 import { TurnFaceReadError } from "@rosie/actions/src/tool-api/turn-face/errors";
+import { HeldLinks, HeldTurns } from "@rosie/actions/src/tool-api/turn-face/held";
+import { createPlacesDouble } from "@rosie/adapters/places/double";
+import commitS101Sam from "@rosie/contracts/data-access/fixtures/commit-s1-01-sam.json";
+import finalizePass from "@rosie/contracts/tool-api/fixtures/finalize-pass.json";
+import type { CommitTurnRequest } from "@rosie/db/repo/commit-turn";
 import type { PickedKindRead } from "@rosie/db/repo/kinds-reads";
 import type { OpenQuestionRead } from "@rosie/db/repo/targets";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
+import bundleV3Manifest from "../../../bundles/v3/bundle/manifest.json";
 import { BundleError, type Manifest, type PinnedBundle, type TradeOverlay } from "../bundle";
 import { BUNDLE_A, fakeBundles, keyIn, type FakeBundles } from "../bundle/test-support";
-import type { BundleId } from "../trace";
+import { openTrace, type BundleId } from "../trace";
+import type { ComposeInputRequest, FinalizeMessageRequest } from "../turn/types";
 import { flush } from "../turn/test-support";
-import { gateBindingOf, type GateInputs, type GateReads } from "./real";
-import { fakeGateReads, fakeTurnRows } from "./test-support";
+import {
+  gateBindingOf,
+  heldLinksFor,
+  realBundles,
+  realComposeInput,
+  realFinalize,
+  realGate,
+  type GateInputs,
+  type GateListingReads,
+  type GateReads,
+} from "./real";
+import {
+  fakeBundleReads,
+  fakeComposeReads,
+  fakeFinalizeData,
+  fakeGateReads,
+  fakeTurnRows,
+} from "./test-support";
 
 /** Bundle v1's id, as its manifest names it: the bundle the run pinned in every case here. */
 const BUNDLE_V1: BundleId = bundleV1Id();
@@ -1588,5 +1650,489 @@ describe("the gate's commit binding hands in the one-kind path where the reads b
       expect(companies.asked).toEqual([]);
       expect(stop.asked).toEqual([]);
     });
+  });
+});
+
+// ---- S1-09, S1-76 and S1-10 (T-1540) --------------------------------------------------------------------------------------
+
+/** Bundle v3's id, as its manifest names it: the bundle the run pinned in the S1-09 cases (T-1526; DL-1179). */
+const BUNDLE_V3: BundleId = bundleV3Id();
+
+/** Bundle v3 as a run pinned it: its own manifest and flow A (bundle v2's eight steps, S1-76, S1-77 and S1-10). */
+function pinnedV3(): PinnedBundle {
+  return {
+    bundleId: BUNDLE_V3,
+    manifest: structuredClone(bundleV3Manifest) as unknown as Manifest,
+    flow: (flow) =>
+      flow === "A" ? Promise.resolve(flowAV3()) : Promise.reject(new BundleError("notInBundle")),
+    trade: () => Promise.reject(new BundleError("notInBundle")),
+    reads: () => [],
+  };
+}
+
+/** The gate's clock in the S1-09 cases (GateInputs.now): S1-10's link is issued at its second. */
+const GATE_NOW = Date.parse("2026-10-19T14:05:06.789Z");
+
+/** The plain sha256 of a code, as S1-10's page_links row must hold it. */
+async function sha256Of(text: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+describe("the gate's commit binding hands in S1-09's settler and the S1-09, S1-76 and S1-10 writers where staging's reads bind the listing ports and the root holds S1-10's links (T-1540)", () => {
+  /** fakeGateReads as it is (./test-support.ts): it binds none of the sign-up reads. */
+  const baseReads = (): GateReads => fakeGateReads(fakeTurnRows()).reads;
+
+  /** Which of staging's reads a case binds, and whether the root holds S1-10's links: each unless set false. */
+  interface Given {
+    readonly kinds?: boolean;
+    readonly stop?: boolean;
+    readonly companies?: boolean;
+    readonly listing?: boolean;
+    readonly links?: boolean;
+  }
+
+  /** What the listing ports' makers were asked for while the binding was built and walked. */
+  interface Made {
+    places: number;
+    linkPlaces: number;
+    readonly readers: unknown[];
+  }
+
+  /**
+   * The binding realGate builds for one call over staging's shape of reads with the listing ports (the question read with
+   * S1-09's question open, the kinds, stop and one-kind reads, and the listing ports: a Places double made at each call,
+   * the K-05 reads of S1-09's and S1-10's writers over @rosie/actions' doubles, T-319's paging world as the listing
+   * paging reader with the barbershop's head at version 3, and staging's link place), the root's HeldLinks and the gate's
+   * clock, each read counted while open, the run's pinned bundle v3.
+   */
+  function listingBound(given: Given = {}) {
+    const reads: OpenReads = { open: 0, peak: 0 };
+    const k05 = fakeK05();
+    const companies = fakeCompaniesK05();
+    const stop = recordedStop();
+    const questions = questionsOver([s1_09QuestionRow()]);
+    const listingK05 = fakeListingK05();
+    const mobile = fakeMobileIdK05();
+    const world = pagingWorld();
+    world.rows.set(`businesses/${BARBERSHOP}`, { version: 3, businessId: BARBERSHOP });
+    const reader = readerOn(world);
+    const made: Made = { places: 0, linkPlaces: 0, readers: [] };
+    const searches: unknown[] = [];
+    const listing: GateListingReads = {
+      places: () => {
+        made.places += 1;
+        const double = createPlacesDouble({ now: () => "2026-10-19T14:08:04Z" });
+        const search: ListingSearch["search"] = (request) => {
+          searches.push(structuredClone(request));
+          return double.search(request);
+        };
+        return countedPorts({ search }, reads);
+      },
+      reads: listingReadsOf(countedPorts(listingK05.k05, reads)),
+      paging: {
+        reader: (repo) => {
+          made.readers.push(repo);
+          return countedPorts(reader, reads);
+        },
+      },
+      mobileId: mobileIdReadsOf(countedPorts(mobile.k05, reads)),
+      linkPlace: () => {
+        made.linkPlaces += 1;
+        return { host: LINK_HOST, basePath: BASE_PATH };
+      },
+    };
+    const gateReads: GateReads = {
+      ...baseReads(),
+      questions: questions.questions,
+      ...(given.kinds === false ? {} : { kinds: { reads: kindsReadsOf(countedPorts(k05.k05, reads)) } }),
+      ...(given.stop === false ? {} : { stop: { reads: countedPorts(stop.stop, reads) } }),
+      ...(given.companies === false
+        ? {}
+        : { companies: companiesReadsOf(countedPorts(companies.k05, reads)) }),
+      ...(given.listing === false ? {} : { listing }),
+    };
+    const links = new HeldLinks();
+    const bound = fakeBundles();
+    const inputs: GateInputs = {
+      ...inputsOf(gateReads, bound),
+      ...(given.links === false ? {} : { links }),
+      now: () => GATE_NOW,
+    };
+    return {
+      reads,
+      k05,
+      companies,
+      stop,
+      questions,
+      listingK05,
+      mobile,
+      reader,
+      made,
+      searches,
+      links,
+      gateReads,
+      inputs,
+      bound,
+      binding: gateBindingOf(inputs, pinnedV3(), bound.deps),
+    };
+  }
+
+  type Bound = ReturnType<typeof listingBound>["binding"];
+
+  /** The binding's own settlers and writers, each call written down in `order`, handed on unchanged. */
+  function watched(binding: Bound, order: string[]): Bound {
+    const { settlers, writers } = binding;
+    if (settlers === undefined || writers === undefined) {
+      throw new Error("the binding carries the sign-up writers and settlers");
+    }
+    return {
+      ...binding,
+      settlers: (stepId) => {
+        const settler = settlers(stepId);
+        if (settler === null) return null;
+        return (call) => {
+          order.push(`settler ${call.step.id}`);
+          return settler(call);
+        };
+      },
+      writers: (stepId) => {
+        const writer = writers(stepId);
+        if (writer === null) return null;
+        return (call) => {
+          order.push(`writer ${call.step.id}`);
+          return writer(call);
+        };
+      },
+    };
+  }
+
+  /**
+   * Sam's answer to S1-09 on bundle v3 (the walk's own test turn: commit-s1-02.json's moved to S1-09's question), naming
+   * "An owner; the listing matches", its `business` field's words `words`, through the commit's own writesOf over the
+   * binding, each settler and writer it reaches in `order`.
+   */
+  async function answeredOnV3(binding: Bound, words: string, order: string[] = []) {
+    const turn = turnS1_09OnV3(OWNER_MATCHES);
+    const fields = [{ name: "business", value: words, words }];
+    const part = { ...turn.part, part: { ...turn.part.part, fields } } as PassedPart;
+    const { ports } = turnCommitDeps(watched(binding, order))(NOTHING_OPEN_AT);
+    return { context: turn.context, writes: await ports.writesOf(part, turn.context, NOTHING_OPEN) };
+  }
+
+  const consoleNames = ["log", "info", "warn", "error", "debug"] as const;
+  let spies: MockInstance[] = [];
+
+  beforeEach(() => {
+    spies = consoleNames.map((name) => vi.spyOn(console, name).mockImplementation(() => undefined));
+  });
+
+  afterEach(() => {
+    // Nothing logs a name, a town, a number, a code or a link: the binding and the walk log nothing at all.
+    for (const spy of spies) expect(spy).not.toHaveBeenCalled();
+    for (const spy of spies) spy.mockRestore();
+  });
+
+  it("bound (staging's shape, the root's HeldLinks): S1-09's settler beside S1-02's and the S1-09, S1-76 and S1-10 writers beside the others; building it reads nothing: one Places port made for the call and never searched, the link place read once, no K-05, paging or stop read", () => {
+    const run = listingBound();
+    const { settlers, writers } = run.binding;
+    if (settlers === undefined || writers === undefined)
+      throw new Error("the binding carries the sign-up steps");
+    expect(typeof settlers("S1-09")).toBe("function");
+    expect(typeof settlers("S1-02")).toBe("function");
+    for (const stepId of ["S1-76", "S1-10", "S1-77", "S1-04", "__proto__"]) {
+      expect(settlers(stepId), stepId).toBeNull();
+    }
+    for (const stepId of ["S1-02", "S1-03", "S1-74", "S1-11", "S1-04", "S1-08", "S1-09", "S1-76", "S1-10"]) {
+      expect(typeof writers(stepId), stepId).toBe("function");
+    }
+    for (const stepId of ["S1-01", "S1-77", "S1-75", "toString", "__proto__"]) {
+      expect(writers(stepId), stepId).toBeNull();
+    }
+    expect(typeof run.binding.buttonsSettlers?.("S1-04")).toBe("function");
+    // Building the binding read nothing.
+    expect(run.made).toEqual({ places: 1, linkPlaces: 1, readers: [] });
+    expect(run.searches).toEqual([]);
+    expect(run.reads.peak).toBe(0);
+    expect(run.listingK05.asked).toEqual([]);
+    expect(run.mobile.asked).toEqual([]);
+    expect(run.k05.asked).toEqual([]);
+    expect(run.companies.asked).toEqual([]);
+    expect(run.stop.asked).toEqual([]);
+    expect(run.questions.reads).toEqual([]);
+    expect(run.reader.asked).toEqual([]);
+    expect(run.links.stagedTurns).toBe(0);
+    expect(run.links.size).toBe(0);
+  });
+
+  it("each call makes its own Places port: two bindings over the same reads ask for two, so nothing one call's double keeps reaches the next", () => {
+    const run = listingBound();
+    gateBindingOf(run.inputs, pinnedV3(), run.bound.deps);
+    gateBindingOf(run.inputs, pinnedV3(), run.bound.deps);
+    expect(run.made.places).toBe(3);
+    expect(run.made.linkPlaces).toBe(3);
+    expect(run.searches).toEqual([]);
+  });
+
+  it.each([
+    ["the listing ports left out (production, a test's doubles)", { listing: false }],
+    ["the root holding no links", { links: false }],
+    ["the stop reads left out", { stop: false }],
+    ["the one-kind reads left out", { companies: false }],
+  ] as const)(
+    "left out, today's binding: %s gives no S1-09 settler and no S1-09, S1-76 or S1-10 writer, and the listing ports are never asked",
+    (_name, given: Given) => {
+      const run = listingBound(given);
+      const { settlers, writers } = run.binding;
+      if (settlers === undefined || writers === undefined)
+        throw new Error("the kinds reads still bind the writers");
+      expect(settlers("S1-09")).toBeNull();
+      expect(typeof settlers("S1-02")).toBe("function");
+      for (const stepId of ["S1-09", "S1-76", "S1-10"]) expect(writers(stepId), stepId).toBeNull();
+      expect(run.made).toEqual({ places: 0, linkPlaces: 0, readers: [] });
+    },
+  );
+
+  it("left out with no kinds reads: no writer and no settler at all, and the listing ports are never asked", () => {
+    const run = listingBound({ kinds: false });
+    for (const field of ["writers", "settlers", "buttonsSettlers"]) {
+      expect(Object.hasOwn(run.binding, field), field).toBe(false);
+    }
+    expect(run.made).toEqual({ places: 0, linkPlaces: 0, readers: [] });
+  });
+
+  it("bound: the ruling's words on bundle v3 run S1-09's settler, S1-09's writer and S1-10's writer, one read open at a time, close S1-09's question and write the typed name, the setup row, the read-back, then S1-10's accounts row, link row and text, and wait; the link is staged in the root's own HeldLinks under the gate's clock and the ports' link place", async () => {
+    const run = listingBound();
+    const order: string[] = [];
+
+    const { context, writes } = await answeredOnV3(run.binding, RULING_WORDS, order);
+
+    expect(order).toEqual(["settler S1-09", "writer S1-09", "writer S1-10"]);
+    const key = context.turn.id;
+    expect(writes.closes.map((close) => close.id)).toEqual([S1_09_QUESTION]);
+    expect(writes.asks).toEqual([]);
+    expect(writes.gives).toEqual(["business", "mobile"]);
+    expect(writes.state.map((write) => [write.op, write.table])).toEqual([
+      ["update", "businesses"],
+      ["insert", "business_setup"],
+      ["insert", "accounts"],
+      ["insert", "page_links"],
+    ]);
+    expect(writes.state[0]).toMatchObject({ set: { name: DEMO_NAME, display_name: DEMO_NAME } });
+    expect(writes.messages.map((row) => [row.id, row.step, row.lineNo, row.openQuestionId])).toEqual([
+      [`outbox-s1-09-${key}-1`, "S1-09", 1, null],
+      [`outbox-s1-10-${key}-1`, "S1-10", 2, null],
+    ]);
+    // One search, from this call's own Places double: the ruling's try (1), the demo listing.
+    expect(run.searches).toEqual([{ by: "nameAndTown", name: DEMO_NAME, town: "Springfield" }]);
+    // Every read of the binding one after another; no S1-76 here, so no paging reader is made.
+    expect(run.reads.peak).toBe(1);
+    expect(run.reads.open).toBe(0);
+    expect(run.made.readers).toEqual([]);
+    // The plain link waits in the root's own HeldLinks for the turn, until the gate face keeps it for a fresh commit.
+    expect(run.links.stagedTurns).toBe(1);
+    expect(run.links.size).toBe(0);
+    run.links.keep(key, [`outbox-s1-10-${key}-1`]);
+    const link = run.links.of(`outbox-s1-10-${key}-1`) ?? "";
+    expect(link).toMatch(/^https:\/\/rosfield\.com\/test\/[0-9a-f]{32}$/u);
+    const code = link.slice(link.lastIndexOf("/") + 1);
+    const pageLink = writes.state[3];
+    if (pageLink?.op !== "insert") throw new Error("S1-10's writer gives a page_links row");
+    expect(pageLink.values).toMatchObject({
+      id: `link-s1-10-${key}-1`,
+      purpose: "setup_id_check",
+      step_id: "S1-10",
+      issued_at: "2026-10-19T14:05:06Z",
+      expires_at: "2026-10-26T14:05:06Z",
+    });
+    expect(pageLink.values.code_sha256).toBe(await sha256Of(code));
+    // Nothing of the link or its code is in what the commit is handed, but the code's hash.
+    expect(JSON.stringify(writes)).not.toContain(code);
+  });
+
+  it("bound: a made-up name and town write S1-09's rows, S1-76's row and one listing_match review item (Claim: owner. Reason: no listing.) through the listing paging reader, made once on the call's own repo, then S1-10's rows; no read-back", async () => {
+    const run = listingBound();
+    const order: string[] = [];
+
+    const { context, writes } = await answeredOnV3(run.binding, MADE_UP_WORDS, order);
+
+    expect(order).toEqual(["settler S1-09", "writer S1-09", "writer S1-76", "writer S1-10"]);
+    expect(writes.state.map((write) => [write.op, write.table])).toEqual([
+      ["update", "businesses"],
+      ["insert", "business_setup"],
+      ["insert", "review_items"],
+      ["insert", "accounts"],
+      ["insert", "page_links"],
+    ]);
+    expect(writes.state[0]).toMatchObject({ set: { name: MADE_UP_NAME, display_name: MADE_UP_NAME } });
+    expect(writes.state[2]).toMatchObject({
+      values: {
+        kind: "listing_match",
+        business_id: BARBERSHOP,
+        subject_table: "businesses",
+        subject_row_id: BARBERSHOP,
+        summary: listingSummaryOf("owner", "noListing"),
+      },
+    });
+    expect(writes.messages.map((row) => [row.step, row.lineNo])).toEqual([
+      ["S1-76", 0],
+      ["S1-10", 2],
+    ]);
+    expect(writes.asks).toEqual([]);
+    // The reader made once, on the call's own repo; its three reads in openReviewItem's order, one at a time.
+    expect(run.made.readers).toEqual([context.repo]);
+    expect(run.reader.asked).toEqual(["reviewItem", "row", "businessZone"]);
+    expect(run.reads.peak).toBe(1);
+  });
+});
+
+describe("the root's one HeldLinks (T-1540): made only for staging's shape, and the same hold the compose-input and finalize ports read and the gate and finalize faces keep and let go", () => {
+  /** finalize-pass.json's row, the turn it names, and the moment its call runs at. */
+  const ROW = finalizePass.request.outboxRowId;
+  const TURN = finalizePass.request.caller.turnId;
+  const NOW = finalizePass.given.now;
+  /** A link in S1-10's made form, at staging's place (a stand-in code: 32 lowercase hex characters). */
+  const HELD_LINK = `https://${LINK_HOST}${BASE_PATH}/${"ab".repeat(16)}`;
+
+  /** A HeldLinks holding a link for finalize-pass.json's row, as the gate face keeps one after a fresh commit. */
+  function holding(): HeldLinks {
+    const links = new HeldLinks();
+    links.stage(TURN, ROW, HELD_LINK);
+    links.keep(TURN, [ROW]);
+    expect(links.of(ROW)).toBe(HELD_LINK);
+    return links;
+  }
+
+  /** The K-05 doubles after commit-s1-01-sam.json's commit under bundle v2 (as ./finalize.test.ts sets them up). */
+  async function committedWorld() {
+    const turnRows = fakeTurnRows();
+    const bundleReads = fakeBundleReads(BUNDLE_V2);
+    const commit = structuredClone(commitS101Sam.request) as unknown as CommitTurnRequest;
+    const committed = await turnRows.calls.commitTurn({
+      ...commit,
+      turn: { ...commit.turn, bundleId: { hash: BUNDLE_V2.hash, build: BUNDLE_V2.build } },
+    });
+    if (!("result" in committed)) throw new Error("commit-s1-01-sam.json's commit was not taken");
+    return { turnRows, bundleReads };
+  }
+
+  /** A trace of its own under bundle v2, set to the row's turn. */
+  function rowTrace() {
+    const trace = openTrace({ openedBy: "textWebhook", bundleId: BUNDLE_V2, sink: () => undefined });
+    trace.setTurn(TURN);
+    return trace;
+  }
+
+  it("heldLinksFor: a new hold for staging's shape with the listing ports, none for any other reads", () => {
+    const k05 = fakeK05();
+    const searches: unknown[] = [];
+    const listing: GateListingReads = {
+      places: () => ({
+        search: (request) => {
+          searches.push(request);
+          return Promise.reject(new Error("never searched"));
+        },
+      }),
+      reads: listingReadsOf(fakeListingK05().k05),
+      paging: { reader: () => readerOn(pagingWorld()) },
+      mobileId: mobileIdReadsOf(fakeMobileIdK05().k05),
+      linkPlace: () => ({ host: LINK_HOST, basePath: BASE_PATH }),
+    };
+    /** Staging's shape of reads with the listing ports, but for the one read named. */
+    const shaped = (leftOut: "kinds" | "stop" | "companies" | "listing" | null): GateReads => ({
+      ...fakeGateReads(fakeTurnRows()).reads,
+      ...(leftOut === "kinds" ? {} : { kinds: { reads: kindsReadsOf(k05.k05) } }),
+      ...(leftOut === "stop" ? {} : { stop: { reads: recordedStop().stop } }),
+      ...(leftOut === "companies" ? {} : { companies: companiesReadsOf(fakeCompaniesK05().k05) }),
+      ...(leftOut === "listing" ? {} : { listing }),
+    });
+    const first = heldLinksFor(shaped(null));
+    expect(first).toBeInstanceOf(HeldLinks);
+    expect(heldLinksFor(shaped(null))).not.toBe(first);
+    for (const leftOut of ["kinds", "stop", "companies", "listing"] as const) {
+      expect(heldLinksFor(shaped(leftOut)), leftOut).toBeUndefined();
+    }
+    expect(heldLinksFor(fakeGateReads(fakeTurnRows()).reads)).toBeUndefined();
+    expect(heldLinksFor(null)).toBeUndefined();
+    expect(k05.asked).toEqual([]);
+    expect(searches).toEqual([]);
+  });
+
+  it("the gate port handed the root's links holds them as its face's links: what was staged for the call's turn is dropped as its gate runs (here failing closed, no reads bound); with none handed, nothing touches the hold", async () => {
+    for (const handed of [true, false]) {
+      const links = new HeldLinks();
+      const { request } = commitS1_02();
+      const turnId = String(requestTurnFields(request).id);
+      links.stage(turnId, "outbox-s1-10-stand-in-1", HELD_LINK);
+      const port = realGate({ ...inputsOf(null, fakeBundles()), ...(handed ? { links } : {}) });
+      const trace = openTrace({ openedBy: "textWebhook", bundleId: BUNDLE_V3, sink: () => undefined });
+      trace.setTurn(turnId);
+
+      await thrownBy(port.gateAndCommit(structuredClone(request) as never, NOTHING_OPEN_AT, trace));
+
+      expect(links.stagedTurns, String(handed)).toBe(handed ? 0 : 1);
+      expect(links.size, String(handed)).toBe(0);
+    }
+  });
+
+  it("the finalize port handed the root's links fills the row's held link (finalize answers send) and its face lets the link go; with none handed, the hold keeps it", async () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+    try {
+      for (const handed of [true, false]) {
+        const { turnRows, bundleReads } = await committedWorld();
+        const finalize = fakeFinalizeData(turnRows, () => Date.parse(NOW));
+        const links = holding();
+        const trace = rowTrace();
+        const request = structuredClone(finalizePass.request) as unknown as FinalizeMessageRequest;
+        const port = realFinalize({
+          data: finalize.data,
+          bundles: () => realBundles({ calls: bundleReads.calls }),
+          pinnedOf: () => null,
+          held: new HeldTurns(),
+          now: () => Date.parse(NOW),
+          ...(handed ? { links } : {}),
+        });
+
+        const answer = await port.finalizeMessage(
+          { ...request, caller: { ...request.caller, traceId: trace.traceId } },
+          trace,
+        );
+
+        expect(answer, String(handed)).toMatchObject({ outcome: "send" });
+        expect(links.of(ROW), String(handed)).toBe(handed ? null : HELD_LINK);
+      }
+    } finally {
+      info.mockRestore();
+    }
+  });
+
+  it("the compose-input port handed the root's links lists link.secure among the row's allowed links; with none handed, it does not", async () => {
+    for (const handed of [true, false]) {
+      const { turnRows, bundleReads } = await committedWorld();
+      const compose = fakeComposeReads(turnRows, () => Date.parse(NOW));
+      const links = holding();
+      const trace = rowTrace();
+      const port = realComposeInput({
+        reads: compose.reads,
+        bundles: () => realBundles({ calls: bundleReads.calls }),
+        pinnedOf: () => null,
+        held: new HeldTurns(),
+        ...(handed ? { links } : {}),
+      });
+      const request = {
+        caller: { ...finalizePass.request.caller, traceId: trace.traceId },
+        outboxRowId: ROW,
+      } as unknown as ComposeInputRequest;
+
+      const answer = (await port.composeInput(request, trace)) as unknown as {
+        readonly result: string;
+        readonly input: { readonly allowedLinks: readonly string[] };
+      };
+
+      expect(answer.result, String(handed)).toBe("compose");
+      expect(answer.input.allowedLinks.includes("link.secure"), String(handed)).toBe(handed);
+      // Compose input never lets a link go: only finalize's face does.
+      expect(links.of(ROW)).toBe(HELD_LINK);
+    }
   });
 });
