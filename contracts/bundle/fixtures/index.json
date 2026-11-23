@@ -194,8 +194,8 @@
       "version": "v1.1",
       "def": "step",
       "expect": "refuse",
-      "shows": "S1-04 as bundle v3 compiles it, whose line from Rosie carries buttons, with stop asksByWords: a step whose buttons ask cannot also ask by words; with its buttons taken off it is accepted",
-      "source": "bundles/v3/bundle/flow/A.json S1-04; ruling T-1543 card B1; actions/src/commit/walk/graph.ts and actions/src/frontier/assemble/bundle.ts buttonsOf"
+      "shows": "S1-04 as bundle v3 compiles it, whose only line from Rosie, its line 0, carries reply buttons, with stop asksByWords: a step whose line 0 asks by buttons has no line to ask by words; with its buttons taken off it is accepted",
+      "source": "bundles/v3/bundle/flow/A.json S1-04; ruling T-1543 card B1; T-1544 Lead note 2 (DL-1209: the rule reads line 0); actions/src/commit/walk/graph.ts and actions/src/frontier/assemble/bundle.ts buttonsOf"
     },
     {
       "file": "invalid/refuse-stop-both-kinds.json",
@@ -244,6 +244,22 @@
       "expect": "refuse",
       "shows": "S1-23 asking by words with its license field typed choice: an open question with no options has no option id for a choice to name; typed text it is stop-ask-s1-23.json, accepted",
       "source": "the compiler's whole build flow A S1-23 (as stop-ask-s1-23.json); ruling T-1543 R2 ('an open question with no options'); K-01 v1 answerField.type"
+    },
+    {
+      "file": "stop-ask-s1-12-read-back.json",
+      "version": "v1.1",
+      "def": "step",
+      "expect": "accept",
+      "shows": "S1-12 as the compiler's whole build compiles it in flow B, with barber's flow B words op laid over it (its more and say in place of the master's, every other field the master's): line 0 is Rosie's ask with only a card's own button ('Fill in the form'), and line 2, 'Here's what I read.' with 'That's right' and 'Change something', is a read-back of the photo answer; with stop asksByWords and one answer field, services of type text, it is accepted: the read-back keeps the stop",
+      "source": "the compiler's whole build (npm run cli -w @rosie/compiler -- build, run 2026-11-23 for T-1544 round 3) flow B S1-12; bundles/v3/bundle/trade/barber.json flows.B.ops[0], barber's only op at S1-12 in flow B; T-1544 Lead note 2 (DL-1209); ruling T-1543 R2, R10, R32 and R39"
+    },
+    {
+      "file": "invalid/refuse-ask-line-zero-button.json",
+      "version": "v1.1",
+      "def": "step",
+      "expect": "refuse",
+      "shows": "stop-ask-s1-12-read-back.json with barber's read-back buttons ('That's right', 'Change something') also on line 0, as a trade's words op that put a reply button on a stop step's line 0 would give it: no line from Rosie is left without a reply button to ask by, so asksByWords is refused; with line 0's buttons taken off it is stop-ask-s1-12-read-back.json, accepted",
+      "source": "stop-ask-s1-12-read-back.json; bundles/v3/bundle/trade/barber.json flows.B.ops[0] (the buttons' words); T-1544 Lead note 2 (DL-1209: the compiler refuses a words op that puts a reply button on a stop step's line 0)"
     }
   ]
 }

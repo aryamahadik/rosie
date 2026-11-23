@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://rosie.invalid/contracts/bundle/bundle.v1.1.schema.json",
   "title": "Bundle v1.1",
-  "description": "K-01 v1.1, a minor version of the step-graph bundle format (T-1544; ruling T-1543 card B1, ops/reviews/signup-remainder/rule-rest.json, defaults R2 and R34; DL-1191; contracts/bundle/README.md section 'v1.1'). It only adds to v1 (bundle.v1.schema.json, frozen and unchanged, referred to here): every v1 definition is here under its own name, the unchanged ones by reference, so every v1 document is a v1.1 document. It adds one optional step field, stop, which says how a plain step stops the walk: asksByWords (its own line 0 asks its reader, with no buttons) or waitsOnEvent (the walk stops right after it, waiting on an event that gives the listed keys). step is restated with it, and flowGraph, overlayOp, tradeFlow, tradeOverlay and the root are restated only so that the steps they hold are v1.1's. The manifest, every flow graph and every trade overlay keep the contract value 'bundle.v1' (R34), so a consumer that checks it reads a v1.1 bundle unchanged. Owner: the architect.",
+  "description": "K-01 v1.1, a minor version of the step-graph bundle format (T-1544; ruling T-1543 card B1, ops/reviews/signup-remainder/rule-rest.json, defaults R2 and R34; DL-1191; contracts/bundle/README.md section 'v1.1'). It only adds to v1 (bundle.v1.schema.json, frozen and unchanged, referred to here): every v1 definition is here under its own name, the unchanged ones by reference, so every v1 document is a v1.1 document. It adds one optional step field, stop, which says how a plain step stops the walk: asksByWords (its own line 0 asks its reader, with no reply button; a later line from Rosie with buttons is a read-back of the answer) or waitsOnEvent (the walk stops right after it, waiting on an event that gives the listed keys). step is restated with it, and flowGraph, overlayOp, tradeFlow, tradeOverlay and the root are restated only so that the steps they hold are v1.1's. The manifest, every flow graph and every trade overlay keep the contract value 'bundle.v1' (R34), so a consumer that checks it reads a v1.1 bundle unchanged. Owner: the architect.",
   "type": "object",
   "properties": {
     "manifest": {
@@ -152,7 +152,7 @@
     },
     "step": {
       "title": "Step",
-      "description": "One step of a flow, compiled (SPEC-master 4; 02-contracts K-01 'each step (id, section, who, to, via, title, needs, gives, tells) with its card'). Authoring fields are left out (MC R2: src, prop). A step that fails a lint rule says so in lint, and the schema refuses a step that shows a failure its lint does not list (arch 12 line 592; T-010). v1.1 (T-1544) adds stop, how a plain step stops the walk (contracts/bundle/README.md section 'v1.1'); a step with stop is a plain step whose messages from Rosie carry no button.",
+      "description": "One step of a flow, compiled (SPEC-master 4; 02-contracts K-01 'each step (id, section, who, to, via, title, needs, gives, tells) with its card'). Authoring fields are left out (MC R2: src, prop). A step that fails a lint rule says so in lint, and the schema refuses a step that shows a failure its lint does not list (arch 12 line 592; T-010). v1.1 (T-1544) adds stop, how a plain step stops the walk (contracts/bundle/README.md section 'v1.1'); a step with stop is a plain step: one that asks by words asks by a line from Rosie with no reply button (its line 0), and one that waits carries no reply button from Rosie at all.",
       "type": "object",
       "properties": {
         "id": {
@@ -346,7 +346,7 @@
           ]
         },
         "stop": {
-          "description": "How this plain step stops the walk where the walk enters it (v1.1, T-1544; ruling T-1543 card B1; arch 03 line 191). Set only by the compiler (C9, C10 and its one rule), never by a trade's op; read the same way by every graph consumer (the walk, the frontier, the gold-set generator, parity). Left out, the step stops the walk as under v1: its buttons ask, and K-09 README default 209's table holds for a step that gives an event key.",
+          "description": "How this plain step stops the walk where the walk enters it (v1.1, T-1544; ruling T-1543 card B1; T-1544 Lead note 2, DL-1209; arch 03 line 191). Set only by the compiler (C9, C10 and its one rule, which reads the step's ask, its line 0: a plain owner -> san msg step whose line 0 is Rosie's and holds no reply button, variants counted), in the masters and in each compiled trade flow (the master plus that trade's ops). A trade's op never sets or clears it: a trade's words op keeps the master step's stop, and the compiler refuses a words op that puts a reply button on a stop step's line 0 (README section 'v1.1', default 26). Read the same way by every graph consumer (the walk, the frontier, the gold-set generator, parity). Left out, the step stops the walk as under v1: its buttons ask, and K-09 README default 209's table holds for a step that gives an event key.",
           "$ref": "#/$defs/stop"
         },
         "judgmentRules": {
@@ -824,59 +824,15 @@
           }
         },
         "stop": {
-          "description": "With a stop (v1.1): the step is a plain step (no type, no branches) whose messages from Rosie carry no button, in its say or in any variant's say or addSay; asksByWords needs a line to ask by and is never set on a step that gives an event key; each waitsOnEvent key is one the step gives (ruling T-1543 card B1; K-09 README defaults 209 and 214).",
+          "description": "With a stop (v1.1): the step is a plain step (no type, no branches). asksByWords: on every path the step holds a line from Rosie (from san) with no reply button, the line it asks by (in its say, and in each variant's own say), and it never gives an event key. That this line is line 0 is the compiler's rule and the contract test's check, since the schema cannot read a line by its place (README section 'v1.1'); a later line from Rosie that carries buttons is a read-back of the answer and keeps the stop (T-1544 Lead note 2, DL-1209; ruling T-1543 R32 and R39). waitsOnEvent: no message from Rosie carries a reply button, on any line or path (the step asks nothing, so it has nothing to read back), and each key is one the step gives. A reply button is one of a message's own buttons (elements.buttons); a card's own button or link is not one (ruling T-1543 card B1; K-09 README defaults 209 and 214).",
           "not": {
-            "description": "A split, or a step whose messages from Rosie carry a button (README section 'v1.1').",
+            "description": "A split (README section 'v1.1').",
             "anyOf": [
               {
                 "required": ["type"]
               },
               {
                 "required": ["branches"]
-              },
-              {
-                "required": ["say"],
-                "properties": {
-                  "say": {
-                    "$ref": "#/$defs/messagesWithButtons"
-                  }
-                }
-              },
-              {
-                "required": ["vary"],
-                "properties": {
-                  "vary": {
-                    "description": "Some variant of the step whose say or addSay carries a button from Rosie (SPEC-master 5 item 1, 5f).",
-                    "type": "object",
-                    "not": {
-                      "type": "object",
-                      "additionalProperties": {
-                        "description": "A variant whose say or addSay carries a button from Rosie (SPEC-master 5f).",
-                        "not": {
-                          "type": "object",
-                          "anyOf": [
-                            {
-                              "required": ["say"],
-                              "properties": {
-                                "say": {
-                                  "$ref": "#/$defs/messagesWithButtons"
-                                }
-                              }
-                            },
-                            {
-                              "required": ["addSay"],
-                              "properties": {
-                                "addSay": {
-                                  "$ref": "#/$defs/messagesWithButtons"
-                                }
-                              }
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  }
-                }
               }
             ]
           },
@@ -895,9 +851,21 @@
             "required": ["say"],
             "properties": {
               "say": {
-                "description": "At least one message: line 0 is the question asked (R2).",
-                "type": "array",
-                "minItems": 1
+                "description": "A line from Rosie with no reply button to ask by: by the compiler's rule, line 0, the question asked (R2). A later line from Rosie with buttons is a read-back (R32).",
+                "$ref": "#/$defs/messagesWithAnAsk"
+              },
+              "vary": {
+                "description": "Each variant that sets its own say asks the same way (SPEC-master 5f: a variant's say replaces the step's, and its addSay adds lines after them, so a button there is a later line's).",
+                "type": "object",
+                "additionalProperties": {
+                  "description": "A variant: its own say, where it has one, holds a line from Rosie with no reply button (SPEC-master 5f).",
+                  "type": "object",
+                  "properties": {
+                    "say": {
+                      "$ref": "#/$defs/messagesWithAnAsk"
+                    }
+                  }
+                }
               },
               "gives": {
                 "description": "No key only an event gives: such a step waits on its event instead (K-09 README default 209).",
@@ -911,6 +879,55 @@
             }
           },
           "else": {
+            "not": {
+              "description": "A step whose messages from Rosie carry a reply button, in its say or in any variant's say or addSay: a step that waits asks nothing (README section 'v1.1').",
+              "anyOf": [
+                {
+                  "required": ["say"],
+                  "properties": {
+                    "say": {
+                      "$ref": "#/$defs/messagesWithButtons"
+                    }
+                  }
+                },
+                {
+                  "required": ["vary"],
+                  "properties": {
+                    "vary": {
+                      "description": "Some variant of the step whose say or addSay carries a reply button from Rosie (SPEC-master 5 item 1, 5f).",
+                      "type": "object",
+                      "not": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "description": "A variant whose say or addSay carries a reply button from Rosie (SPEC-master 5f).",
+                          "not": {
+                            "type": "object",
+                            "anyOf": [
+                              {
+                                "required": ["say"],
+                                "properties": {
+                                  "say": {
+                                    "$ref": "#/$defs/messagesWithButtons"
+                                  }
+                                }
+                              },
+                              {
+                                "required": ["addSay"],
+                                "properties": {
+                                  "addSay": {
+                                    "$ref": "#/$defs/messagesWithButtons"
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            },
             "if": {
               "type": "object",
               "required": ["stop"],
@@ -985,11 +1002,11 @@
     },
     "asksByWords": {
       "title": "AsksByWords",
-      "description": "The step asks its reader by its own words, with no buttons: its line 0 is Rosie's question to its reader (S1-77 as C9 corrects it: 'What's the owner's name and mobile? ...'; S1-12, S1-23 and S1-61 by the compiler's rule: a plain owner -> san step whose line 0 is Rosie's question to the owner with no buttons). Where the walk enters it as a move it stops there, the step asked: an open question with no options, asked of its reader, its question row naming the step and line 0, the step's later lines not written in that turn; the answer starts the walk at that step, applied as answered (its writer: its gives and its later lines), then its next (ruling T-1543 R2 and R30; K-09 README default 214 and open gap 194, which v1.1 closes).",
+      "description": "The step asks its reader by its own words: its line 0 is Rosie's question to its reader and holds no reply button, on every path (S1-77 as C9 corrects it: 'What's the owner's name and mobile? ...'; S1-12, S1-23 and S1-61 by the compiler's rule: a plain owner -> san msg step whose line 0 is Rosie's and holds no reply button, variants counted; T-1544 Lead note 2, DL-1209). A card's own button or link on line 0 (S1-12's 'Fill in the form') is not a reply button. Where the walk enters it as a move it stops there, the step asked: an open question with no options, asked of its reader, its question row naming the step and line 0, the step's later lines not written in that turn; the answer starts the walk at that step, applied as answered (its writer: its gives and its later lines), then its next (ruling T-1543 R2 and R30; K-09 README default 214 and open gap 194, which v1.1 closes). A later line from Rosie in the step that carries buttons (a trade's 'Here's what I read.' with 'That's right' and 'Change something' at S1-12) is a read-back of the typed or photo answer: the step keeps its stop, and the read-back is answered as one, its question's id the choiceId, which a typed change there carries (R32, R39); it is never refused for its buttons.",
       "type": "object",
       "properties": {
         "answerFields": {
-          "description": "The fields the answer to the step's question carries, each with its type, as a branch's answerFields do (02-contracts K-01), typed from the step's gives (S1-12 services, S1-23 and S1-61 license). The frontier offers one K-02 option choice for the step's open question with these fields (R2; K-09 README default 116's shape). Empty where no source names the answer's fields yet (S1-77: README default 22).",
+          "description": "The fields the answer to the step's question carries, each with its type, as a branch's answerFields do (02-contracts K-01), typed from the step's gives (S1-12 services, typed on the slice by ruling T-1543 R10, and S1-23 and S1-61 license, each of type text; T-1544 Lead note 2). The frontier offers one K-02 option choice for the step's open question with these fields (R2; K-09 README default 116's shape). Empty where no source names the answer's fields yet (S1-77: README default 22).",
           "type": "array",
           "items": {
             "$ref": "#/$defs/wordsAnswerField"
@@ -1044,10 +1061,10 @@
     },
     "messagesWithButtons": {
       "title": "MessagesWithButtons",
-      "description": "Messages of which at least one, sent by Rosie (from san), carries a button, as the walk and the frontier count a step's buttons (actions/src/commit/walk/graph.ts and actions/src/frontier/assemble/bundle.ts, buttonsOf: Rosie's messages alone). Used only by the step's stop check (v1.1).",
+      "description": "Messages of which at least one, sent by Rosie (from san), carries a reply button, as the walk and the frontier count a step's buttons (actions/src/commit/walk/graph.ts and actions/src/frontier/assemble/bundle.ts, buttonsOf: Rosie's messages alone, their own buttons element; a card's own button or link is not one). Used only by the stop check of a step that waits (v1.1, waitsOnEvent).",
       "type": "array",
       "contains": {
-        "description": "A message from Rosie that carries at least one button (SPEC-master 4 'buttons').",
+        "description": "A message from Rosie that carries at least one reply button (SPEC-master 4 'buttons').",
         "type": "object",
         "required": ["from", "elements"],
         "properties": {
@@ -1064,6 +1081,38 @@
                 "description": "Its buttons, at least one (SPEC-master 4 'buttons').",
                 "type": "array",
                 "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "messagesWithAnAsk": {
+      "title": "MessagesWithAnAsk",
+      "description": "Messages of which at least one, sent by Rosie (from san), carries no reply button: a line to ask by words (v1.1, asksByWords; T-1544 Lead note 2, DL-1209). Used only by the stop check of a step that asks by words. It does not say which line that is: that it is line 0, Rosie's with no reply button on every path, is the compiler's rule and the contract test's check, since a check by place needs an open prefixItems, which the contract check's strict Ajv refuses (strictTuples), and whose generated type is wider (ADR-005; README section 'v1.1').",
+      "type": "array",
+      "contains": {
+        "description": "A message from Rosie with no reply button (SPEC-master 4 'buttons'; a card's own button or link is not one).",
+        "type": "object",
+        "required": ["from"],
+        "properties": {
+          "from": {
+            "description": "Rosie (SPEC-master 4; MC R1: san is Rosie).",
+            "const": "san"
+          },
+          "elements": {
+            "description": "Its chat elements, with no button of its own (SPEC-master 4).",
+            "type": "object",
+            "not": {
+              "description": "A buttons element with at least one button (SPEC-master 4 'buttons').",
+              "type": "object",
+              "required": ["buttons"],
+              "properties": {
+                "buttons": {
+                  "description": "Its buttons, at least one (SPEC-master 4 'buttons').",
+                  "type": "array",
+                  "minItems": 1
+                }
               }
             }
           }
