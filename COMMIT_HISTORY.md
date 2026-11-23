@@ -2,9 +2,42 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 904, [`313f2c6b`](https://github.com/aryamahadik/rosie/commit/313f2c6b), 2026-11-22 21:04:04 UTC.
+- **Through:** commit 906, [`52fbac2a`](https://github.com/aryamahadik/rosie/commit/52fbac2a), 2026-11-22 22:43:16 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 906. docs: COMMIT\_HISTORY.md through commit 904 (313f2c6b, \#921) (\#923)
+
+- **Commit:** [`52fbac2a`](https://github.com/aryamahadik/rosie/commit/52fbac2a), by Arya Mahadik, 2026-11-22 22:43:16 UTC
+- **Pull request:** [#923](https://github.com/aryamahadik/rosie/pull/923) from `task/commit-history-235`, merged 2026-11-22 22:43:16 UTC. It squashed 1 branch commit:
+  - `0171bf0` docs: COMMIT\_HISTORY.md through commit 904 (313f2c6b, \#921)
+- **Files changed:** 1 (+34 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +34 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 905. T-1533: S1-10's writer at the walk (accounts row, page\_links row, line 2 row; helper's sign-in alone; claimUnknown, noNumberInChat, noPhoneRow, mobileOnFile) and the secure link's minting (32-hex code, sha256 only, 7 days), held by the turn face from a fresh commit only and filled as link.secure for its row alone (DL-1167) (\#922)
+
+- **Commit:** [`ca895709`](https://github.com/aryamahadik/rosie/commit/ca895709), by Arya Mahadik, 2026-11-22 22:43:12 UTC
+- **Pull request:** [#922](https://github.com/aryamahadik/rosie/pull/922) from `task/T-1533`, merged 2026-11-22 22:43:12 UTC. It squashed 1 branch commit:
+  - `ecd29ca` T-1533: S1-10's writer at the walk (accounts row, page\_links row, lin…
+- **Files changed:** 14 (+2805 −19), by folder:
+  - `actions/src/tool-api/journey-1/mobile-id/` errors.ts +109 −0, index.ts +87 −2, link-hold.test.ts +470 −0, link.ts +90 −0, mobile-id.int.test.ts +371 −0, mobile-id.test.ts +660 −0, reads.ts +200 −0, test-support.ts +182 −0, writer.ts +289 −0
+  - `actions/src/tool-api/turn-face/` held.test.ts +86 −0, held.ts +81 −0, rows.test.ts +74 −0, rows.ts +37 −2, turn-face.ts +69 −15
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 904. docs: COMMIT\_HISTORY.md through commit 902 (171fa84e, \#919) (\#921)
 
