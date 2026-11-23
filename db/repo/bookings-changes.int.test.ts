@@ -885,6 +885,7 @@ describe("the migration against the frozen table list (K-30 v1): part 1's five t
     // ordered by name so this part's function stays first, and stays exact.
     expect(functions.map((fn) => [fn.name, fn.language, fn.definer, fn.owner === fn.me, fn.config])).toEqual([
       ["booking_details_set_once", "plpgsql", false, true, null],
+      ["business_setup_claim_set_once", "plpgsql", false, true, null],
       ["money_set_once", "plpgsql", false, true, null],
     ]);
     const body = oneLine(functions[0]?.body);
