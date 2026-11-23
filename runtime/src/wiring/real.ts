@@ -975,8 +975,11 @@ export function realTurnRow(inputs: { readonly calls: TurnRowCalls | null }): Tu
       const calls = inputs.calls;
       if (calls === null) throw new NoDatabaseError("parkTurn");
       await checkTurnId("parkTurn", request.turn);
-      // The same K-05 v1 parkTurn exchange in two hand-written forms: the runtime's (../turn/types.ts, which the park
-      // builds and reads) and the generated one db/repo/park.ts takes and answers.
+      // The same K-05 parkTurn exchange in two hand-written forms: the runtime's (../turn/types.ts, which the park
+      // builds and reads: since T-1552 always v1.23's lineRequest, the passedOn line's row with its plan and final parts,
+      // at once on a final answer with its reason or after a third crash with none) and the generated one
+      // db/repo/park.ts takes and answers (v1.23's ParkTurnRequest: v1's form or the lineRequest), which checks it
+      // before any statement (item 84). The request goes across as it is: no field is added, dropped or reworded here.
       const answer = await calls.parkTurn(request as unknown as K05ParkTurnRequest);
       return answer as unknown as ParkTurnAnswer;
     },

@@ -30,6 +30,20 @@
 //      `valueFailsWords` refusal before the re-read (K-09 README default 25) sends the turn to the re-read, then to the
 //      gate again; an answer lost on the way (`noAnswer`) or a `transient` one is sent again once, as the same request.
 //
+//   A final answer before the commit (T-1552; K-09 v1.13 defaults 216 to 220; T-1529's ruling, cards 6 and 7): when
+//   gateAndCommit answers `turnRefused` or `notBuilt`, or buildFrontier answers `notBuilt` (a `turnRefused` from it read
+//   the same way), no other try can change it, so the call is never sent again and the turn is not left to the lease's
+//   reruns: once the run has ended with nothing committed, the turn is parked at once (./park.ts `parkAtOnce`: K-05 v1.23
+//   parkTurn on the try the lease counted, the answer's labels as its reason, field for field, and one row to the turn's
+//   own handle carrying K-01's passedOn line), and the lease is told it is parked (`endParked`), which frees the inbox for
+//   the next turn. A turn holding no stop word makes no further gateAndCommit after a final answer: the replies' later
+//   commits are answered `finalAnswer` here, with nothing sent. A turn holding a stop word is never parked at once (DL-508,
+//   DL-521, as built; K-09 v1.13 default 218): its keyword texts still commit core-only on that run, under the keyword
+//   texts' own caller, the one further gateAndCommit a turn makes after a final answer, and if that does not commit either
+//   it keeps today's path. A transient answer, a throw and any other refusal keep today's path too: one resend, a rerun at
+//   each lapse up to three tries, then the crash park, whose row carries the same line (card 7). After the commit nothing
+//   parks: a final answer of composeInput or finalizeMessage is step 7's (./compose.ts).
+//
 //   7. Reply (T-252, ./compose.ts; arch 02 step 7, line 123): once the turn has committed, each row the commit wrote is
 //      composed, the rows in parallel (compose input, the composer, finalize with at most one rewrite, the fallback and
 //      the passed-on line inside finalize), an email copy takes its text row's plan with no composer call, a fixed
@@ -37,8 +51,9 @@
 //      run that has the turn now does it.
 //
 // Fails closed: a run that cannot finish one of steps 1 to 6 commits nothing and ends, but for the keyword texts step 3
-// commits core-only; the lease reruns the turn from its sealed texts when its 60 s lapse, and parks it after a third
-// lapse with no commit (T-253, ./park.ts: K-05 v1 parkTurn, its one "nothing changed" row, the dispatcher woken). Never
+// commits core-only and a final answer parks the turn at once; the lease reruns the turn from its sealed texts when its
+// 60 s lapse, and parks it after a third lapse with no commit (T-253, ./park.ts: K-05 v1.23 parkTurn, its one row with
+// the passedOn line, the dispatcher woken). Never
 // logged or put in a span: a text's words, a plan's words, a number, a key (K-08 README line 79); the spans hold counts,
 // labels and ids only.
 //
@@ -74,6 +89,8 @@ import type {
   CommitTurnRequest,
   LeasedTurn,
   LeaseHooks,
+  ParkAnswer,
+  ParkingTurn,
 } from "../actor";
 import {
   actorNameOf,
@@ -108,7 +125,7 @@ import { isLabel, type Outcome, type SpanFacts, type TraceContext } from "../tra
 import type { LimitResult, ModelCall, RowRef } from "../trace/types";
 import { composeCommitted, type ComposeReport } from "./compose";
 import { withKeywordCommit } from "./keywords";
-import { parkThroughRows } from "./park";
+import { parkAtOnce, parkThroughRows } from "./park";
 import type {
   BuildFrontierRequest,
   CoreAction,
@@ -118,6 +135,7 @@ import type {
   DecideResult,
   GateAndCommitRequest,
   GateCommitted,
+  ParkReason,
   PartResult,
   RecordSafetyOutcomeAction,
   RereadWhy,
@@ -177,9 +195,17 @@ export interface TurnNotCommitted {
   readonly replies: RepliesResult<OpenedText> | null;
   /**
    * Set when the AI gateway reported the models down (decide or the one re-read answered `modelsDown`) and nothing
-   * committed: who waits, for the AI-down path's outage line and retries (T-271, ../outage/ai).
+   * committed: who waits, for the AI-down path's outage line and retries (T-271, ../outage/ai). Never beside
+   * `parkedAtOnce`: a turn with a final answer waits on no model.
    */
   readonly aiDown?: WaitingTurn;
+  /**
+   * Set when a call made before the commit gave a final answer (K-09 v1.13 default 218) in a turn holding no stop word:
+   * the reason the turn was parked with at once (labels only), and what the park answered: parked (first or repeated),
+   * alreadyCommitted, or why it could not be done now, when the lease's lapse reruns the turn, which meets the same final
+   * answer and parks again (T-1552).
+   */
+  readonly parkedAtOnce?: { readonly reason: ParkReason; readonly answer: ParkAnswer };
 }
 
 export type TurnOutcome = TurnCommitted | TurnNotCommitted;
@@ -214,6 +240,26 @@ function gateCommitOf(request: CommitTurnRequest): GateCommit | null {
   return writes.request.turn.id === request.turn.id ? writes : null;
 }
 
+/**
+ * What the turn hands the lease's commit, in `writes`, once K-05 parkTurn has answered parked for the turn at once
+ * (`endParked`, T-1552): the turn id and when it was parked. The commit hook answers it K-05 commitTurn's `turnParked`
+ * without any call (K-05 v1 commitTurn.errors: a parked turn never commits), so the lease ends the turn as parked. Only
+ * carriers this module made are taken (a WeakSet).
+ */
+interface ParkedCommit {
+  readonly via: "parked";
+  readonly turnId: string;
+  readonly parkedAt: string;
+}
+
+const parkedCarriers = new WeakSet<ParkedCommit>();
+
+function parkedCommitOf(request: CommitTurnRequest): ParkedCommit | null {
+  const writes = request.writes as ParkedCommit;
+  if (typeof writes !== "object" || !parkedCarriers.has(writes)) return null;
+  return writes.turnId === request.turn.id ? writes : null;
+}
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
@@ -238,12 +284,15 @@ function isToolApiError(value: unknown): value is ToolApiError {
  * The lease's commit hook (`LeaseHooks.commit`): K-09 gateAndCommit through the Tool API, with the lease's CommitContext
  * passed on unchanged. A committed answer goes back to the lease as committed (its turn finishes and the next turn may
  * open), with K-09's answer in `committed`; an error goes back as it came (nothing written). A throw is the lease's
- * `noAnswer`: the turn may have committed, so the same request is sent again.
+ * `noAnswer`: the turn may have committed, so the same request is sent again. A turn the run has just parked at once
+ * (`endParked`) is answered `turnParked` with no call, as K-05's commitTurn answers a parked turn: the lease then ends it.
  */
 export async function commitThroughToolApi(
   request: CommitTurnRequest,
   at: CommitContext,
 ): Promise<CommitTurnAnswer> {
+  const parked = parkedCommitOf(request);
+  if (parked !== null) return { error: "turnParked", turnId: parked.turnId, parkedAt: parked.parkedAt };
   const carrier = gateCommitOf(request);
   if (carrier === null) return { error: "notGateAndCommit" };
   const set = deps;
@@ -289,9 +338,15 @@ interface Run {
   modelsDown: boolean;
   /**
    * True when one of the turn's keyword texts is a stop word: no outage line goes to the handle (T-271), and the keyword
-   * texts never wait for the decided part, committing core-only on the run that cannot make it (DL-508, DL-521).
+   * texts never wait for the decided part, committing core-only on the run that cannot make it (DL-508, DL-521). Such a
+   * turn is never parked at once (K-09 v1.13 default 218).
    */
   readonly stopAsked: boolean;
+  /**
+   * The first final answer a call made before the commit gave on this run, as the park's reason (`finalReasonOf`; K-09
+   * v1.13 default 218), or null. Once set, a turn holding no stop word sends no further gateAndCommit and parks at once.
+   */
+  final: ParkReason | null;
 }
 
 /**
@@ -431,8 +486,14 @@ export async function runTurnLoop(turn: LeasedTurn): Promise<TurnOutcome> {
     committedCaller: null,
     modelsDown: false,
     stopAsked: guarded.keywords.some((found) => found.keyword.kind === "stop"),
+    final: null,
   };
+  return parkIfFinal(run, await runFrom(run, guarded));
+}
 
+/** Steps 3 to 6 of one run, from its guarded texts, and how the run ended (before any park at once). */
+async function runFrom(run: Run, guarded: GuardResult<OpenedText>): Promise<TurnOutcome> {
+  const { opened, safety } = run;
   const { keywords, onward } = guarded;
   // Keyword texts alone: their own core-only turn, which never waits on the frontier, decide or a re-read (default 35).
   if (onward === null) return keywordTurn(run, keywords, null);
@@ -463,7 +524,11 @@ export async function runTurnLoop(turn: LeasedTurn): Promise<TurnOutcome> {
   }
 
   const prepared = await prepareDecided(run, texts, onward.targets);
-  if ("result" in prepared) return keywordsAtOnce ? keywordTurn(run, keywords, null) : prepared;
+  // A final frontier answer in a turn holding no stop word: no gateAndCommit follows, and the turn parks at once
+  // (K-09 v1.13 default 218). A STOP's keyword texts still commit core-only on this run.
+  if ("result" in prepared) {
+    return keywordsAtOnce && !parksAtOnce(run) ? keywordTurn(run, keywords, null) : prepared;
+  }
   // Keyword texts beside decided ones ride in the same one commit (K-09 README default 10).
   if (keywords.length > 0) return keywordTurn(run, keywords, prepared);
   return outcomeOf(run, await commitDecided(run, prepared, []), null);
@@ -492,6 +557,108 @@ export const turnHooks: Required<LeaseHooks> = {
   commit: commitThroughToolApi,
   park: (turn) => parkThroughRows(deps, turn),
 };
+
+// ---- a final answer before the commit (T-1552; K-09 v1.13 defaults 216 to 220) ---------------------------------------
+
+/** The calls made before the commit whose final answer parks the turn at once (K-09 v1.13 default 218). */
+type BeforeCommitCall = "buildFrontier" | "gateAndCommit";
+
+/** K-09 v1.13's final refusal (`turnRefusedError`, default 216). */
+const TURN_REFUSED = "turnRefused";
+/** K-09 v1.13's `notBuiltError`, final (default 219). */
+const NOT_BUILT = "notBuilt";
+/** What a commit the run would send after a final answer is answered here, with nothing sent (default 218). */
+const FINAL_ANSWER = "finalAnswer";
+
+/**
+ * The park's reason for a final answer of a call made before the commit (K-09 v1.13 default 218), or null for any other
+ * answer, which keeps today's path (one resend of a transient or a lost answer, then the lease's reruns). `turnRefused`:
+ * its `from`, `fault` and `ids` field for field (K-05 v1.23 parkReason, default 217), the ids that are labels, each once,
+ * the first kept (default 216: the base leaves any other out); an answer whose `from` or `fault` is no label, or whose
+ * `ids` is no list, is none K-09 gives, so it is read as a refusal like any other, never final. `notBuilt`: `{from:
+ * "toolApi", fault: "notBuilt", ids: [the call it names]}`, or the call made when it names none that is a label.
+ */
+function finalReasonOf(call: BeforeCommitCall, answer: unknown): ParkReason | null {
+  if (!isRecord(answer)) return null;
+  if (answer.error === TURN_REFUSED) {
+    const { from, fault, ids } = answer;
+    if (!isLabel(from) || !isLabel(fault) || !Array.isArray(ids)) return null;
+    return { from, fault, ids: [...new Set((ids as unknown[]).filter(isLabel))] };
+  }
+  if (answer.error === NOT_BUILT) {
+    return { from: "toolApi", fault: NOT_BUILT, ids: [isLabel(answer.call) ? answer.call : call] };
+  }
+  return null;
+}
+
+/** Keeps the run's first final answer, as the park's reason. */
+function noteFinal(run: Run, call: BeforeCommitCall, answer: unknown): void {
+  if (run.final !== null) return;
+  run.final = finalReasonOf(call, answer);
+}
+
+/**
+ * True once the run has had a final answer and the turn holds no stop word: it sends no further gateAndCommit and parks
+ * at once (K-09 v1.13 default 218). A turn holding a stop word keeps DL-508 and DL-521 as built: its keyword texts commit
+ * core-only on the run, and it is never parked at once.
+ */
+function parksAtOnce(run: Run): boolean {
+  return run.final !== null && !run.stopAsked;
+}
+
+/** What the park is handed for this run's turn (../actor ParkingTurn): the turn on the try the lease counted. */
+function parkingOf(turn: LeasedTurn): ParkingTurn {
+  return {
+    turnId: turn.turnId,
+    eventIds: [...turn.eventIds],
+    entries: turn.entries,
+    traceId: turn.traceId,
+    joinedTraceIds: [...turn.joinedTraceIds],
+    tries: turn.tries,
+    bundleId: turn.bundleId,
+    trace: turn.trace,
+  };
+}
+
+/**
+ * Parks the turn at once when its run ended with nothing committed after a final answer and the turn holds no stop word
+ * (K-09 v1.13 default 218; ./park.ts `parkAtOnce`), then tells the lease (`endParked`). A run no longer the turn's parks
+ * nothing: the run that has the turn now meets the same answer, or the lease's own park comes. The outcome keeps how the
+ * run ended and says what the park answered; it never sends the turn down the AI-down path (no `aiDown`).
+ */
+async function parkIfFinal(run: Run, outcome: TurnOutcome): Promise<TurnOutcome> {
+  const reason = run.final;
+  if (outcome.result !== "notCommitted" || reason === null || run.stopAsked || replaced(run.turn)) {
+    return outcome;
+  }
+  const answer = await parkAtOnce(run.set, parkingOf(run.turn), reason);
+  if ("result" in answer && !replaced(run.turn)) await endParked(run, answer.parkedAt);
+  return {
+    result: "notCommitted",
+    why: outcome.why,
+    gateCalls: outcome.gateCalls,
+    replies: outcome.replies,
+    parkedAtOnce: { reason, answer },
+  };
+}
+
+/**
+ * Tells the lease the turn is parked (T-1552), through the lease's own commit: K-05 parkTurn answered parked for this turn
+ * id, so K-05 commitTurn answers it `turnParked` from now on (K-05 v1 commitTurn.errors), and the commit hook answers that
+ * for this carrier with no call at all (`commitThroughToolApi`): no gateAndCommit goes after a final answer. On
+ * `turnParked` the lease ends the turn as parked, releases its lease and opens the next turn (../actor/lease.ts `commit`),
+ * so the lease runs the turn no more. Not taken (the lease refused, or failed): the lease's lapse reruns the turn, whose
+ * final answer parks it again (K-05 answers repeated) or whose commit K-05 answers turnParked.
+ */
+async function endParked(run: Run, parkedAt: string): Promise<void> {
+  const carrier: ParkedCommit = { via: "parked", turnId: run.turn.turnId, parkedAt };
+  parkedCarriers.add(carrier);
+  try {
+    await run.turn.commit({ turn: run.ref, versionsRead: [], writes: carrier });
+  } catch {
+    // Not taken: the lapse reruns the turn, as above.
+  }
+}
 
 // ---- 1. opening the texts ---------------------------------------------------------------------------------------
 
@@ -693,7 +860,8 @@ async function keywordTurn(
         bundle: turn.bundle,
         trace: turn.trace,
       });
-      if (!last.rerun) break;
+      // After a final answer a turn holding no stop word commits nothing more on this run: it parks at once.
+      if (!last.rerun || parksAtOnce(run)) break;
     }
     return last;
   });
@@ -831,6 +999,8 @@ async function buildFrontier(run: Run, request: BuildFrontierRequest): Promise<D
   if (isToolApiError(answer)) {
     const code = codeOf(answer.error);
     finish(span, { outcome: failedOrRefused(code), ...businessOf(run), got, errorCode: code });
+    // A final answer (notBuilt; a turnRefused read the same way) parks the turn at once (K-09 v1.13 default 218).
+    noteFinal(run, "buildFrontier", answer);
     return code;
   }
   const context = isRecord(answer) ? answer.context : undefined;
@@ -1066,11 +1236,14 @@ async function sendWithResend(run: Run, request: GateAndCommitRequest): Promise<
 
 /**
  * One gateAndCommit through the lease (`LeasedTurn.commit`), with its gate and commit spans. A run that is no longer the
- * turn's sends nothing: a lapsed turn's rerun has the turn now, and a replaced turn's texts are in its restart. The run
- * replies after its commit, so the lease holds a committed turn until the reply has ended (T-253).
+ * turn's sends nothing: a lapsed turn's rerun has the turn now, and a replaced turn's texts are in its restart. Nor does a
+ * run that has had a final answer in a turn holding no stop word (`finalAnswer`: K-09 v1.13 default 218, never sent
+ * again; the turn parks at once). The run replies after its commit, so the lease holds a committed turn until the reply
+ * has ended (T-253).
  */
 async function sendCommit(run: Run, request: GateAndCommitRequest): Promise<Sent> {
   if (replaced(run.turn)) return { kind: "refused", error: "replaced", answer: null, request };
+  if (parksAtOnce(run)) return { kind: "refused", error: FINAL_ANSWER, answer: null, request };
   run.gateCalls += 1;
   const gateSpan = run.trace.start("gate");
   const commitSpan = run.trace.start("commit");
@@ -1111,6 +1284,8 @@ async function sendCommit(run: Run, request: GateAndCommitRequest): Promise<Sent
   const outcome = failedOrRefused(code);
   finish(gateSpan, { outcome, ...businessOf(run), got, limits: NOT_CHECKED, errorCode: code });
   finish(commitSpan, { outcome, ...businessOf(run), got, errorCode: code });
+  // A final answer (turnRefused or notBuilt) is never sent again: the turn parks at once, unless it holds a stop word.
+  noteFinal(run, "gateAndCommit", answer);
   return { kind: "refused", error: code, answer, request };
 }
 

@@ -10,7 +10,8 @@
 //   - K-03 v1 (contracts/message-plan): the composer's input, the plan, the plan a row stores (`rowPlan`), the final
 //     parts and the check result (T-252);
 //   - K-05 v1 item 2 (contracts/data-access, "write a plan"): `unplannedRows` and `writePlan` (T-252); item 12 ("park a
-//     turn"): `parkTurn`, with its outbox row and event-log entry shapes (T-253);
+//     turn"): `parkTurn`, with its outbox row and event-log entry shapes (T-253), and v1.23 item 84's form of it, the
+//     reason and the passedOn line's row (T-1552);
 //   - K-08 v1: the model calls a decide stage or the composer reports for its span.
 //
 // Every outside call is a port (`TurnDeps`), set once per Worker isolate and joined at D-017 (T-552 onward): the Tool
@@ -571,14 +572,57 @@ export interface EventEntry {
 
 /**
  * K-05 v1 `parkTurn.request` (park-turn.json): the turn with tries 3, when it was parked, the one "nothing changed" row
- * (at most one; written with no plan, so the runtime never words it) and its event-log entries.
+ * (at most one; written with no plan, so the runtime never words it) and its event-log entries. The runtime no longer
+ * sends it (T-1552: every park is v1.23's `ParkTurnLineRequest`); K-05 still takes it.
  */
-export interface ParkTurnRequest {
+export interface ParkTurnV1Request {
   turn: CommitTurnRef;
   parkedAt: string;
   outboxRows: OutboxRowNew[];
   events: EventEntry[];
 }
+
+/**
+ * K-05 v1.23 `parkReason` (item 84, default 217): a final refusal's labels, K-09 v1.13 `turnRefused`'s three fields field
+ * for field (or default 218's for `notBuilt`: from `toolApi`, fault `notBuilt`, the call's name), each a K-08 `safeId`,
+ * the ids each once. Never words, a number or an address.
+ */
+export interface ParkReason {
+  from: string;
+  fault: string;
+  ids: string[];
+}
+
+/**
+ * K-05 v1.23 `parkedRowNew` (default 219): v1's outboxRowNew, a quick reply to the turn's own handle about no booking,
+ * asking no question, decided on no versions, with its plan (`parkedLinePlan`: text alone, no lines) and its final parts
+ * (`parkedLineParts`: one words send of K-01's passedOn line, word for word, `fixedLines` ["passedOn"]), each naming the
+ * row and its channel.
+ */
+export interface ParkedRowNew extends OutboxRowNew {
+  bookingId: null;
+  sendClass: "quick_reply";
+  openQuestionId: null;
+  copyOfRowId: null;
+  plan: RowPlan;
+  finalParts: FinalParts;
+}
+
+/**
+ * K-05 v1.23 `parkTurn.lineRequest` (item 84): the turn with tries 1 to 3 (as the lease counted them), when it was parked,
+ * the final refusal's reason (required before the third try; none for a crash after its third), exactly one row carrying
+ * the passedOn line, and its event-log entries (one turn.parked, default 222).
+ */
+export interface ParkTurnLineRequest {
+  turn: CommitTurnRef;
+  parkedAt: string;
+  reason?: ParkReason;
+  outboxRows: [ParkedRowNew];
+  events: EventEntry[];
+}
+
+/** K-05 v1.23 `parkTurn.request`: v1's form or v1.23's (the runtime sends v1.23's alone, T-1552). */
+export type ParkTurnRequest = ParkTurnV1Request | ParkTurnLineRequest;
 
 /** K-05 v1 `parkTurn.response`: parked; a repeat writes nothing and returns the first result with `repeated` true. */
 export interface ParkTurnResponse {
@@ -598,7 +642,8 @@ export type ParkTurnAnswer = ParkTurnResponse | ToolApiError;
 /**
  * K-05 v1's plan calls as the turn reaches them (the database engineer's C-152, T-196; joined at D-017). The finalize call
  * writes a composed row's plan itself; the turn writes only an email copy's, which takes its text row's plan. The park
- * after a third crash before the commit (T-253) is K-05 v1 item 12's `parkTurn` (T-197 builds it).
+ * after a third crash before the commit (T-253), and at once on a final answer before the commit (T-1552), is K-05 v1.23
+ * item 84's `parkTurn` (T-197, T-1542 build it).
  */
 export interface TurnRows {
   unplannedRows(request: { turnId: string }): Promise<RowsAnswer>;
