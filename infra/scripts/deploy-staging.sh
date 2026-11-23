@@ -10,9 +10,9 @@
 #     without the catalog), stops the deploy there with nothing deployed: step 2 never started, so nothing rolls back;
 #  2. code: wrangler deploy --env staging --var GIT_SHA:<sha>, with --var ROSIE_NUMBER:<number> when that is set
 #     in E.164 form (below), flags off;
-#  3. bundle: publish-bundle.sh publishes the bundle folder --bundle names (default bundles/v2, T-1477's bundle v2,
-#     the one-kind path; DL-1123): PostgreSQL's copy, the KV bulk file into the BUNDLES namespace, then the active
-#     bundle id (T-569);
+#  3. bundle: publish-bundle.sh publishes the bundle folder --bundle names (default bundles/v3, T-1526's bundle v3:
+#     v2's steps plus S1-77, S1-76 and S1-10, where S1-09's answer walks; DL-1179): PostgreSQL's copy, the KV bulk
+#     file into the BUNDLES namespace, then the active bundle id (T-569);
 #  4. flags: flags.sh applies the staging flag set, infra/flags/staging.json, which turns the skeleton flag on
 #     (production's set has it off; T-569);
 #  then check:staging.
@@ -70,9 +70,10 @@ database_url="${STAGING_DATABASE_URL:-}"
 unset -v ROSIE_NUMBER STAGING_DATABASE_URL DATABASE_URL DATABASE_REPLICA_URL
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-# T-1477's bundle v2, the one-kind path (DL-1123): a deploy without --bundle never switches staging back to bundle v0
+# T-1526's bundle v3 (DL-1179): bundle v2's steps (T-1477, the one-kind path; DL-1123) plus S1-77, S1-76 and S1-10,
+# the steps S1-09's answer walks to, so a deploy without --bundle never switches staging back to bundle v2 or v0
 # (D-017's, T-163). --bundle names another bundle folder.
-bundle_dir="$ROOT/bundles/v2"
+bundle_dir="$ROOT/bundles/v3"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --bundle)
@@ -89,7 +90,7 @@ while [[ $# -gt 0 ]]; do
         "only from the protected release job, after Jay or the CTO acts from his own login (build prompt 5.4)"
       ;;
     *)
-      die "usage: deploy-staging.sh [--bundle <bundle folder>] (default: bundles/v2)"
+      die "usage: deploy-staging.sh [--bundle <bundle folder>] (default: bundles/v3)"
       ;;
   esac
 done
