@@ -26,7 +26,15 @@
 //     own writer by step id (T-1481's companiesWriter) among TurnCommitBinding.writers, so an owner's answer to an S1-04
 //     that was asked ("All share one", in words or by its button) closes the question, places the kept picks in the
 //     companies the button gives (a second company only with the flag on) and walks on to S1-08's row and S1-09's
-//     question. Left out, an answered S1-04 is notBuilt (gives), as before;
+//     question. Left out, an answered S1-04 is notBuilt (gives), as before. And, where the wiring hands signUpSteps the
+//     listing deps (T-1537, S1-09 design card 7 extended to S1-10; DL-1171; K-09 README defaults 201 to 211:
+//     SignUpWriterDeps.listing, with the Places port, S1-09's and S1-10's K-05 reads, the stop reads, the paging ports
+//     and the secure link's port whose stage is the face's HeldLinks), S1-09's settler among TurnCommitBinding.settlers
+//     and the S1-09, S1-76 and S1-10 writers among TurnCommitBinding.writers, all four over one walk's readings (T-635a's
+//     walkReadings, as T-1533's mobileIdSteps builds them), so an owner's typed details settle S1-09's branch, write
+//     the typed name, the read-back or S1-76's row and review item, and S1-10's accounts row, link row and text, and
+//     the walk waits at S1-10 (T-1532); words with no details or no town answer "ask", so S1-09 is sent again once
+//     (T-1528, default 7). Left out, S1-09 has no settler and none of the three writers is bound, as before;
 //   - askAgain (T-1505; K-09 v1.12 defaults 192 to 198): where the binding hands in the walk's question read
 //     (TurnCommitBinding.questions), the commit is handed the same read with the walk's turn key (CommitDeps.askAgain),
 //     so a turn whose parts decide ended in one question, with exactly one open question, sends that question again once
@@ -114,6 +122,16 @@
 //      no stop reads; without `companies` and `s1_04Writer`, S1-04 has no writer, so an answer to it is notBuilt, as
 //      before. signUpStepWriters reads none of them: it binds no settler, and a wrapper bound without its settler would
 //      place a pick and still ask S1-04.
+//   7. (T-1537; K-09 README defaults 201, 203 (a) and (c), 207; open gap 179; T-1528's handoff (1)) signUpSteps' `listing`
+//      binds S1-09's settler, S1-09's and S1-76's writers (T-635a) and S1-10's writer (T-1533) together over one
+//      walkReadings, or none of them; it is independent of `companies`, `s1_04Writer` and `plan` (default 6), and
+//      signUpStepWriters never reads it (a writer with no settler refuses notSettled or claimUnknown). S1-09's settler is
+//      T-635a's s1_09Settler over those readings, but for the reading's "ask" (no details, or a name with no town), which
+//      it answers as the walk's reserved SETTLER_ASKS instead of refusing listingNeedsDetails: default 201 has the
+//      binding change for T-1528, and listing/settle.ts keeps the reading's three outcomes so only the binding changes.
+//      The banned-word read is never handed in (default 206; open gap 187), and the secure link's generator is never
+//      handed in either, so the code is always crypto.getRandomValues' (link.ts WEB_CRYPTO_FILL; T-1533's security note
+//      a): the binding copies the link's host, base path, clock and stage alone.
 
 import type { CommitContext } from "../../../../runtime/src/actor";
 import type {
@@ -138,6 +156,7 @@ import {
   type WalkDeps,
   type WalkQuestions,
 } from "../../commit/walk";
+import { SETTLER_ASKS } from "../../commit/walk/settle";
 import type { PagingDeps } from "../../domain/paging";
 import type {
   OwnerContact,
@@ -160,6 +179,7 @@ import { limit3 } from "../../gate/limit-3";
 import { limit4 } from "../../gate/limit-4";
 import { limit5 } from "../../gate/limit-5";
 import { limit6 } from "../../gate/limit-6";
+import type { StopHomeReads } from "../../homes/stop";
 import { NotBuiltError } from "../errors";
 import {
   S1_04,
@@ -169,9 +189,17 @@ import {
   type OneKind,
 } from "../journey-1/companies";
 import { kindsSteps, kindsWriters, type KindsWriterDeps, type KindsWriters } from "../journey-1/kinds";
+import type { ListingSearch } from "../journey-1/listing/lookup";
+import type { ListingReads } from "../journey-1/listing/reads";
+import { S1_09, S1_76, s1_09Settler, walkReadings } from "../journey-1/listing/settle";
+import { listingWriters } from "../journey-1/listing/writers";
+import type { LinkPlace } from "../journey-1/mobile-id/link";
+import type { MobileIdReads } from "../journey-1/mobile-id/reads";
+import { MOBILE_ID_STEP, mobileIdWriter } from "../journey-1/mobile-id/writer";
 import { PLAN_STEP, planWriter, type PlanWriterDeps } from "../journey-1/plan";
 import { createPlugInWriters, S1_11, type PlugInDeps, type PlugInWriters } from "../journey-1/plug-ins";
 import { TurnFaceReadError, TurnFaceRefusedError } from "./errors";
+import type { HeldLinks } from "./held";
 
 type Json = Record<string, unknown>;
 
@@ -442,6 +470,62 @@ export interface SignUpWriterDeps<Repo = unknown> {
    * the owner). signUpStepWriters never reads it.
    */
   readonly plan?: PlanWriterDeps;
+  /**
+   * S1-09's, S1-76's and S1-10's deps (T-1537; S1-09 design card 7 extended to S1-10, DL-1171; K-09 README defaults 201
+   * to 211; default 7), handed in together. Given, signUpSteps binds S1-09's settler and the S1-09, S1-76 and S1-10
+   * writers over one walk's readings, so the owner's typed details, not the option decide named, settle S1-09's branch
+   * (the Places lookup alone says whether the listing matches), the walk writes S1-09's and S1-76's rows and S1-10's,
+   * and waits at S1-10 (T-1532), and words that give no details or no town are asked again once (T-1528). Left out,
+   * S1-09 has no settler and none of the three writers is bound, as before: a decided S1-09 answer is refused (notBuilt)
+   * with nothing written. signUpStepWriters never reads it.
+   */
+  readonly listing?: SignUpListingDeps<Repo>;
+}
+
+/**
+ * S1-10's secure link's port as the turn face binds it (T-1537; K-09 README default 211; T-1533's handoff): the Worker's
+ * LINK_HOST and BASE_PATH, the writer's clock, and the face's own HeldLinks as the stage, the same object the caller hands
+ * the face as TurnFaceCalls.links and the row bindings as RowBinding.links (pg/calls.ts pgTurnCalls takes it from here),
+ * so the code a fresh commit wrote reaches finalize's link.secure and nothing else. No generator is taken: the code is
+ * always crypto.getRandomValues' (default 7).
+ */
+export interface SignUpLinkDeps extends LinkPlace {
+  /** The writer's clock, read once per S1-10 write: the link's issued_at (default 211). */
+  readonly now: () => Date;
+  /** The face's hold (held.ts HeldLinks): S1-10's writer stages the plain link in it, by its turn and outbox row. */
+  readonly stage: HeldLinks;
+}
+
+/**
+ * What S1-09's settler and the S1-09, S1-76 and S1-10 writers read with, every port required (T-1537; default 7), each
+ * named in its own file (journey-1/listing, journey-1/mobile-id). `Repo` is the call's repo, which the item 26 reads are
+ * handed (and never read through on PostgreSQL: pgListingReads and pgMobileIdReads run as rosie_job beside the call's).
+ */
+export interface SignUpListingDeps<Repo = unknown> {
+  /**
+   * K-15's search (T-434's PlacesPort), which S1-09's settler alone reads, at most three searches a part (default 202).
+   * While J-16 is open, staging's is the double, on allow-listed phones only (default 208).
+   */
+  readonly places: ListingSearch;
+  /** S1-09's writer's reads: item 79 and item 26 (journey-1/listing pgListingReads(runtime): rosie_job). */
+  readonly reads: ListingReads<Repo>;
+  /**
+   * The stop home's reads, bound on the runtime side: S1-09's read-back, S1-76's message and S1-10's text are each
+   * written only where mayText lets Rosie text this owner (default 189).
+   */
+  readonly stop: StopHomeReads;
+  /**
+   * T-319's paging ports for S1-76's one listing_match review item: a reader that answers reviewItem (with its summary),
+   * row("businesses", id) and businessZone, and the ids (default: the Worker's keyed ids).
+   */
+  readonly paging: PagingDeps<Repo>;
+  /** S1-10's writer's own ports (T-1533). */
+  readonly mobileId: {
+    /** Item 79 and item 26 (journey-1/mobile-id pgMobileIdReads(runtime): the same K-05 reads as `reads`'). */
+    readonly reads: MobileIdReads<Repo>;
+    /** The secure link's port, its stage the face's HeldLinks. */
+    readonly link: SignUpLinkDeps;
+  };
 }
 
 /**
@@ -458,16 +542,16 @@ export interface SignUpWriterDeps<Repo = unknown> {
  * It reads nothing and logs nothing. What a writer throws leaves as thrown and fails the call closed: a failed item 78
  * or item 79 read is KindsReadError, whose `answer` holds a SQLSTATE or a person's or a business's row id, so nothing
  * here catches, wraps or reports it (a caller that reports it names its name, read and fault alone). The one-kind path,
- * S1-04's writer and S1-08's writer (SignUpWriterDeps.companies, .s1_04Writer and .plan) are signUpSteps' alone: this map
- * never reads them.
+ * S1-04's writer, S1-08's writer and the listing's settler and writers (SignUpWriterDeps.companies, .s1_04Writer, .plan
+ * and .listing) are signUpSteps' alone: this map never reads them.
  */
 export function signUpStepWriters<Repo>(deps: SignUpWriterDeps<Repo>): StepWriters<Repo> {
   return stepWritersOf(kindsWriters<Repo>(deps.kinds), createPlugInWriters<Repo>(deps.plugIns));
 }
 
 /**
- * What signUpSteps adds to the step-id map (T-1493, T-1484): S1-02's one-kind wrapper, S1-04's writer and S1-08's writer,
- * each where given.
+ * What signUpSteps adds to the step-id map (T-1493, T-1484, T-1537): S1-02's one-kind wrapper, S1-04's writer, S1-08's
+ * writer and the listing's three writers, each where given.
  */
 interface OneKindWriters<Repo> {
   /** The one createOneKind instance of the call, whose wrapper goes around S1-02's writer; null: none. */
@@ -476,19 +560,22 @@ interface OneKindWriters<Repo> {
   readonly companies: StepWriter<Repo> | null;
   /** S1-08's writer's deps; undefined: no writer at S1-08. */
   readonly plan: PlanWriterDeps | undefined;
+  /** S1-09's, S1-76's and S1-10's writers over one walk's readings (T-1537, default 7); null: none of them. */
+  readonly listing: ListingStepsBound<Repo> | null;
 }
 
 /**
  * signUpStepWriters' step-id map over one kindsWriters and one createPlugInWriters; with `added` (signUpSteps, T-1493,
- * T-1484), S1-02's writer inside T-1492's one-kind wrapper inside T-634's `kinds` wrapper, S1-03's inside the same
- * instance's draft wrapper (T-1520), S1-04's writer (T-1481) and S1-08's writer, each where given.
+ * T-1484, T-1537), S1-02's writer inside T-1492's one-kind wrapper inside T-634's `kinds` wrapper, S1-03's inside the same
+ * instance's draft wrapper (T-1520), S1-04's writer (T-1481), S1-08's writer and the S1-09, S1-76 and S1-10 writers, each
+ * where given.
  */
 function stepWritersOf<Repo>(
   kinds: KindsWriters<Repo>,
   plugIns: PlugInWriters<Repo>,
-  added: OneKindWriters<Repo> = { oneKind: null, companies: null, plan: undefined },
+  added: OneKindWriters<Repo> = { oneKind: null, companies: null, plan: undefined, listing: null },
 ): StepWriters<Repo> {
-  const { oneKind, companies, plan } = added;
+  const { oneKind, companies, plan, listing } = added;
   const s1_02 = oneKind === null ? kinds["S1-02"] : oneKind.wrap(kinds["S1-02"]);
   const s1_03 = oneKind === null ? kinds["S1-03"] : oneKind.wrapDraft(kinds["S1-03"]);
   const entries: [string, StepWriter<Repo>][] = [
@@ -499,8 +586,48 @@ function stepWritersOf<Repo>(
   ];
   if (companies !== null) entries.push([S1_04, companies]);
   if (plan !== undefined) entries.push([PLAN_STEP, planWriter<Repo>(plan)]);
+  if (listing !== null) entries.push(...listing.writers);
   const bound: ReadonlyMap<string, StepWriter<Repo>> = new Map<string, StepWriter<Repo>>(entries);
   return (stepId) => bound.get(stepId) ?? null;
+}
+
+/** S1-09's settler and the S1-09, S1-76 and S1-10 writers of one call, over one walk's readings (default 7). */
+interface ListingStepsBound<Repo> {
+  readonly settler: StepSettler<Repo>;
+  readonly writers: readonly [string, StepWriter<Repo>][];
+}
+
+/**
+ * S1-09's settler and the S1-09, S1-76 and S1-10 writers over `deps` and one walkReadings (default 7), as T-1533's
+ * mobileIdSteps builds them, with the settler answering the reading's "ask" as SETTLER_ASKS (T-1528). It copies from
+ * `deps` only the ports each piece reads: no banned-word read, and the link's host, base path, clock and stage with no
+ * generator. Building them reads nothing and logs nothing.
+ */
+function listingStepsOf<Repo>(deps: SignUpListingDeps<Repo>): ListingStepsBound<Repo> {
+  const { places, reads, stop, paging, mobileId } = deps;
+  const readings = walkReadings<Repo>({ places });
+  const listing = listingWriters<Repo>({ reads, stop, paging }, readings);
+  const { host, basePath, now, stage } = mobileId.link;
+  const s1_10 = mobileIdWriter<Repo>(
+    { reads: mobileId.reads, stop, link: { host, basePath, now, stage } },
+    readings,
+  );
+  const settle = s1_09Settler<Repo>(readings);
+  const settler: StepSettler<Repo> = async (call) => {
+    // Another step is s1_09Settler's own refusal (wrongStep), before anything is read.
+    if (call.step.id !== S1_09) return settle(call);
+    // The reading is read once per turn object and part: s1_09Settler then answers its branch, or refuses as it does.
+    const reading = await readings.read(call);
+    return reading.outcome === "ask" ? SETTLER_ASKS : settle(call);
+  };
+  return {
+    settler,
+    writers: [
+      [S1_09, listing[S1_09]],
+      [S1_76, listing[S1_76]],
+      [MOBILE_ID_STEP, s1_10],
+    ],
+  };
 }
 
 /**
@@ -538,19 +665,25 @@ export interface SignUpSteps<Repo> {
  *     so otherwise an answer that needs a second company is refused (secondCompany) with nothing written. With
  *     `companies` and no `s1_04Writer`, no writer at S1-04: H1a's writers, step for step (default 6);
  *   - with `plan`: S1-08's writer, planWriter(plan) (T-1482), at S1-08, with or without `companies` (default 6).
- * With all three left out, the object is today's, field for field: `writers` and `settlers` alone, no `buttonsSettlers`
- * key, no writer at S1-04 or S1-08. Building them reads nothing and logs nothing. What a settler or writer throws leaves
- * as thrown and fails the call closed, as signUpStepWriters says.
+ * And S1-09 (T-1537; S1-09 design card 7 extended to S1-10, DL-1171; K-09 README defaults 201 to 211; default 7):
+ *   - with `listing`: one walkReadings per call, over which S1-09's settler (settlers, beside S1-02's) and the S1-09,
+ *     S1-76 and S1-10 writers (writers) are bound together, so S1-10's writer reads the claim from S1-09's own reading
+ *     of the same turn object; the settler answers "ask" (SETTLER_ASKS) where the reading does, so the commit sends
+ *     S1-09's question again once (T-1528). With or without the other deps (default 7).
+ * With all four left out, the object is today's, field for field: `writers` and `settlers` alone, no `buttonsSettlers`
+ * key, no writer at S1-04, S1-08, S1-09, S1-76 or S1-10 and no settler at S1-09. Building them reads nothing and logs
+ * nothing. What a settler or writer throws leaves as thrown and fails the call closed, as signUpStepWriters says.
  */
 export function signUpSteps<Repo>(deps: SignUpWriterDeps<Repo>): SignUpSteps<Repo> {
   const kinds = kindsSteps<Repo>(deps.kinds);
   const plugIns = createPlugInWriters<Repo>(deps.plugIns);
-  const settled: ReadonlyMap<string, StepSettler<Repo>> = new Map<string, StepSettler<Repo>>([
-    ["S1-02", kinds.settlers["S1-02"]],
-  ]);
-  const settlers: StepSettlers<Repo> = (stepId) => settled.get(stepId) ?? null;
   const { companies, s1_04Writer, plan } = deps;
-  if (companies === undefined && plan === undefined) {
+  const listing = deps.listing === undefined ? null : listingStepsOf<Repo>(deps.listing);
+  const settledEntries: [string, StepSettler<Repo>][] = [["S1-02", kinds.settlers["S1-02"]]];
+  if (listing !== null) settledEntries.push([S1_09, listing.settler]);
+  const settled: ReadonlyMap<string, StepSettler<Repo>> = new Map<string, StepSettler<Repo>>(settledEntries);
+  const settlers: StepSettlers<Repo> = (stepId) => settled.get(stepId) ?? null;
+  if (companies === undefined && plan === undefined && listing === null) {
     return { writers: stepWritersOf(kinds.writers, plugIns), settlers };
   }
   const oneKind = companies === undefined ? null : createOneKind<Repo>({ reads: companies });
@@ -559,7 +692,7 @@ export function signUpSteps<Repo>(deps: SignUpWriterDeps<Repo>): SignUpSteps<Rep
       ? null
       : companiesWriter<Repo>({ reads: companies, partyRuleLive: s1_04Writer.partyRuleLive === true });
   return {
-    writers: stepWritersOf(kinds.writers, plugIns, { oneKind, companies: s1_04, plan }),
+    writers: stepWritersOf(kinds.writers, plugIns, { oneKind, companies: s1_04, plan, listing }),
     settlers,
     ...(oneKind === null ? {} : { buttonsSettlers: oneKind.buttonsSettlers }),
   };

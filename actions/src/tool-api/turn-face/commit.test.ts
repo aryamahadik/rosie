@@ -42,24 +42,41 @@
 // S1-09's question: "All share one" in his one company; his own "Some share one" refused (secondCompany) with the flag off
 // and commit-s1-04-some-share.json's rows with it on; one kept pick on file placed by its update. With no S1-04 writer
 // bound (no companies reads, no s1_04Writer, or the companies reads alone), an answered S1-04 is notBuilt as today.
+//
+// T-1537 (S1-09 design card 7 extended to S1-10; DL-1171; commit.ts default 7): signUpSteps, given the listing deps (the
+// Places double, the K-05 reads' doubles of S1-09's and S1-10's writers, the stop home, T-319's paging world and the link
+// at staging's place with a HeldLinks as its stage), binds S1-09's settler and the S1-09, S1-76 and S1-10 writers together;
+// left out, the object is today's. On the walk the binding hands writesOf over bundle v3 (bundles/v3, T-1526) and S1-09's
+// question: the ruling's demo words (straight and curly apostrophe) write S1-09's rows and the read-back, then S1-10's,
+// and wait; a real-looking name and town take S1-76 first; no details or no town answer "ask" (the commit's one re-send);
+// a helper with a match is refused notBuilt (tells) at S1-77; and a generator on the link's port is never handed on.
+// Nothing logs. The integration test (pg/s1-09-answer.int.test.ts) commits the whole path on PostgreSQL.
 
-import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
 
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
+
+import { createPlacesDouble } from "../../../../adapters/src/places/double";
 import type { PickedKindRead } from "../../../../db/repo/kinds-reads";
 import type { OpenQuestionRead } from "../../../../db/repo/targets";
 import type { Span } from "../../../../runtime/src/trace";
-import type { GateAndCommitRequest } from "../../commit";
+import type { GateAndCommitRequest, PassedPart } from "../../commit";
 import type { CoreFlagsDeps } from "../../commit/core";
 import { WalkNotBuiltError, type WalkQuestions } from "../../commit/walk";
+import { settlerAskedParts } from "../../commit/walk/settle";
 import {
   NOTHING_OPEN,
+  S1_09_QUESTION,
   commitS1_02,
   contextOf,
   decidedOf,
   passedPartOf,
   questionsOver,
   requestTurnFields,
+  s1_09QuestionRow,
+  turnS1_09OnV3,
 } from "../../commit/walk/test-support";
+import { pagingWorld, readerOn } from "../../domain/paging/test-support";
 import { NOT_TOLD_YET, PLUGIN_LISTS_NO_STOP_WORDS } from "../../domain/safety";
 import { BARBERSHOP, safetyWorldOf } from "../../domain/safety/test-support";
 import { BUNDLE_V0, fakeBundles, sampleBundle, withSteps } from "../../frontier/assemble/test-support";
@@ -79,6 +96,30 @@ import {
 } from "../journey-1/companies/test-support";
 import { kindsReadsOf } from "../journey-1/kinds";
 import { PACK_HIKES, fakeK05, turnWithWords } from "../journey-1/kinds/test-support";
+import {
+  HELPS_RUN_IT,
+  OWNER_MATCHES,
+  listingReadsOf,
+  listingSummaryOf,
+  type ListingSearch,
+} from "../journey-1/listing";
+import {
+  DEMO_NAME,
+  MADE_UP_NAME,
+  MADE_UP_WORDS,
+  RULING_WORDS,
+  RULING_WORDS_CURLY,
+  fakeListingK05,
+} from "../journey-1/listing/test-support";
+import { LINK_CODE_FORM, mobileIdReadsOf } from "../journey-1/mobile-id";
+import {
+  BASE_PATH,
+  COUNTING_CODE,
+  COUNTING_FILL,
+  LINK_HOST,
+  LINK_NOW,
+  fakeMobileIdK05,
+} from "../journey-1/mobile-id/test-support";
 import { PlanNotBuiltError } from "../journey-1/plan";
 import { PF_TEXT_KEYS } from "../journey-1/plug-ins";
 import { traceFor } from "../test-support";
@@ -113,10 +154,12 @@ import {
   type CommitAt,
   type S1_04WriterDeps,
   type SafetyReads,
+  type SignUpLinkDeps,
   type SignUpWriterDeps,
   type TurnCommitBinding,
 } from "./commit";
 import { TurnFaceReadError, TurnFaceRefusedError } from "./errors";
+import { HeldLinks } from "./held";
 import { callHandlers, createTurnFace, type GateAndCommitCallAnswer, type TurnFaceCalls } from "./turn-face";
 
 type Json = Record<string, unknown>;
@@ -1336,5 +1379,309 @@ describe("signUpSteps with the one-kind path: S1-04's settler and S1-08's writer
       expect(signUpStepWriters<unknown>(deps)("S1-04")).toBeNull();
       expect(signUpStepWriters<unknown>(deps)("S1-08")).toBeNull();
     });
+  });
+});
+
+// ---- T-1537: S1-09's settler and the S1-09, S1-76 and S1-10 writers (S1-09 design card 7 extended to S1-10) -------------
+
+describe("signUpSteps with the listing deps: S1-09's settler and the S1-09, S1-76 and S1-10 writers, bound together from the deps handed in (T-1537; default 7)", () => {
+  const never = (): Promise<never> => Promise.reject(new Error("nothing is read or written here"));
+
+  /** Bundle v3 as bundles/v3 holds it (T-1526): its manifest and flow A, S1-09's three branches, S1-76, S1-77 and S1-10. */
+  function publishedBundleV3() {
+    const read = (file: string): Json =>
+      JSON.parse(
+        readFileSync(new URL(`../../../../bundles/v3/bundle/${file}`, import.meta.url), "utf8"),
+      ) as Json;
+    return { manifest: read("manifest.json"), flows: { A: read("flow/A.json") } };
+  }
+
+  /** What a case hands the listing deps, and what each double saw. */
+  interface ListingRun {
+    readonly deps: SignUpWriterDeps;
+    readonly links: HeldLinks;
+    readonly searches: unknown[];
+    readonly listing: ReturnType<typeof fakeListingK05>;
+    readonly mobile: ReturnType<typeof fakeMobileIdK05>;
+    readonly kinds: ReturnType<typeof fakeK05>;
+  }
+
+  /**
+   * The sign-up steps' deps over the doubles, with the listing deps (the Places double, the K-05 reads of S1-09's and
+   * S1-10's writers, the stop home over the frozen seeds, T-319's paging world with the barbershop's head, and the link at
+   * staging's place with a HeldLinks as its stage) unless `listing` is false; `link` replaces the link's port as given.
+   */
+  function listingOver(listing = true, link?: (links: HeldLinks) => SignUpLinkDeps): ListingRun {
+    const kinds = fakeK05();
+    const listingK05 = fakeListingK05();
+    const mobile = fakeMobileIdK05();
+    const links = new HeldLinks();
+    const searches: unknown[] = [];
+    const double = createPlacesDouble({ now: () => "2026-10-19T14:08:04Z" });
+    const places: ListingSearch = {
+      search(request) {
+        searches.push(structuredClone(request));
+        return double.search(request);
+      },
+    };
+    const paging = pagingWorld();
+    paging.rows.set(`businesses/${BARBERSHOP}`, { version: 3, businessId: BARBERSHOP });
+    const reader = readerOn(paging);
+    const deps: SignUpWriterDeps = {
+      kinds: { reads: kindsReadsOf(kinds.k05) },
+      plugIns: { bundles: tradesOverV2().bundles },
+      ...(listing
+        ? {
+            listing: {
+              places,
+              reads: listingReadsOf(listingK05.k05),
+              stop: readsOn(seedWorld(), null),
+              paging: { reader: () => reader },
+              mobileId: {
+                reads: mobileIdReadsOf(mobile.k05),
+                link: link?.(links) ?? {
+                  host: LINK_HOST,
+                  basePath: BASE_PATH,
+                  now: () => LINK_NOW,
+                  stage: links,
+                },
+              },
+            },
+          }
+        : {}),
+    };
+    return { deps, links, searches, listing: listingK05, mobile, kinds };
+  }
+
+  /** The turn face's binding over `deps` on bundle v3, its ports never called but the walk's; S1-09's question open. */
+  function bindingOver(deps: SignUpWriterDeps): TurnCommitBinding<unknown> {
+    return {
+      bundles: fakeBundles(publishedBundleV3()),
+      commitTurn: never,
+      readOpenHolds: never,
+      safetyReads: safetyReadsOn(safetyWorldOf()),
+      sealer: { seal: never },
+      stopWords: PLUGIN_LISTS_NO_STOP_WORDS,
+      telling: NOT_TOLD_YET,
+      turnKey: () => SAM_KEY,
+      questions: questionsOver([s1_09QuestionRow()]).questions,
+      ...signUpSteps<unknown>(deps),
+    };
+  }
+
+  /** Sam's answer to S1-09 on bundle v3 naming `branch`, its `business` field's words `words` (left out when null). */
+  function v3Answer(branch: string, words: string | null) {
+    const turn = turnS1_09OnV3(branch);
+    const fields = words === null ? [] : [{ name: "business", value: words, words }];
+    const part = { ...turn.part, part: { ...turn.part.part, fields } } as PassedPart;
+    return { part, context: turn.context };
+  }
+
+  /** What the walk turnCommitDeps hands writesOf answers for that answer. */
+  function walkedV3(run: ListingRun, branch: string, words: string | null) {
+    const { part, context } = v3Answer(branch, words);
+    const writing = turnCommitDeps(bindingOver(run.deps))(NOTHING_OPEN_AT).ports.writesOf(
+      part,
+      context,
+      NOTHING_OPEN,
+    );
+    return { writing, part, context };
+  }
+
+  const sha256 = async (text: string): Promise<string> => {
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  };
+
+  const consoleNames = ["log", "info", "warn", "error", "debug"] as const;
+  let spies: MockInstance[] = [];
+
+  beforeEach(() => {
+    spies = consoleNames.map((name) => vi.spyOn(console, name).mockImplementation(() => undefined));
+  });
+
+  afterEach(() => {
+    // Nothing logs a name, a town, a number, a code or a link: nothing logs at all.
+    for (const spy of spies) expect(spy).not.toHaveBeenCalled();
+    for (const spy of spies) spy.mockRestore();
+  });
+
+  it("with the listing deps left out the object is today's, field for field: no settler at S1-09, no writer at S1-09, S1-76 or S1-10; and signUpStepWriters binds none of them whatever its deps carry", () => {
+    const today = listingOver(false);
+    const steps = signUpSteps<unknown>(today.deps);
+    expect(Object.keys(steps).sort()).toEqual(["settlers", "writers"]);
+    expect(steps.settlers("S1-09")).toBeNull();
+    for (const stepId of ["S1-09", "S1-76", "S1-10", "S1-77"])
+      expect(steps.writers(stepId), stepId).toBeNull();
+    expect(typeof steps.settlers("S1-02")).toBe("function");
+
+    const bound = listingOver();
+    const writers = signUpStepWriters<unknown>(bound.deps);
+    for (const stepId of ["S1-09", "S1-76", "S1-10"]) expect(writers(stepId), stepId).toBeNull();
+    expect(bound.searches).toEqual([]);
+  });
+
+  it("with the listing deps: S1-09's settler beside S1-02's, the three writers beside the others, no buttons settler; building them reads nothing", () => {
+    const run = listingOver();
+    const steps = signUpSteps<unknown>(run.deps);
+    expect(Object.keys(steps).sort()).toEqual(["settlers", "writers"]);
+    expect(typeof steps.settlers("S1-09")).toBe("function");
+    expect(typeof steps.settlers("S1-02")).toBe("function");
+    for (const stepId of ["S1-76", "S1-10", "S1-04", "S1-77", "__proto__"]) {
+      expect(steps.settlers(stepId), stepId).toBeNull();
+    }
+    for (const stepId of ["S1-02", "S1-03", "S1-74", "S1-11", "S1-09", "S1-76", "S1-10"]) {
+      expect(typeof steps.writers(stepId), stepId).toBe("function");
+    }
+    for (const stepId of ["S1-01", "S1-04", "S1-08", "S1-77", "S1-75", "toString"]) {
+      expect(steps.writers(stepId), stepId).toBeNull();
+    }
+    expect(run.searches).toEqual([]);
+    expect(run.listing.asked).toEqual([]);
+    expect(run.mobile.asked).toEqual([]);
+    expect(run.kinds.asked).toEqual([]);
+    expect(run.links.stagedTurns).toBe(0);
+  });
+
+  it("the listing deps sit beside the one-kind path's: with the companies reads and S1-08's deps too, every piece is bound", () => {
+    const run = listingOver();
+    const stop = readsOn(seedWorld(), null);
+    const steps = signUpSteps<unknown>({
+      ...run.deps,
+      companies: companiesReadsOf(fakeCompaniesK05().k05),
+      s1_04Writer: {},
+      plan: { stop },
+    });
+    expect(Object.keys(steps).sort()).toEqual(["buttonsSettlers", "settlers", "writers"]);
+    for (const stepId of ["S1-04", "S1-08", "S1-09", "S1-76", "S1-10"]) {
+      expect(typeof steps.writers(stepId), stepId).toBe("function");
+    }
+    expect(typeof steps.settlers("S1-09")).toBe("function");
+  });
+
+  for (const [label, words] of [
+    ["straight", RULING_WORDS],
+    ["curly", RULING_WORDS_CURLY],
+  ] as const) {
+    it(`the walk on bundle v3: "Lee's Barbershop in Springfield, I'm the owner" (${label} apostrophe) closes S1-09's question, writes the typed name, the setup row and the read-back, then S1-10's accounts row, link row and text, and waits: no question, no clock`, async () => {
+      const run = listingOver();
+      const { writing, context } = walkedV3(run, OWNER_MATCHES, words);
+      const writes = await writing;
+      expect(writes.closes.map((close) => close.id)).toEqual([S1_09_QUESTION]);
+      expect(writes.asks).toEqual([]);
+      expect(writes.gives).toEqual(["business", "mobile"]);
+      expect(writes.state.map((write) => [write.op, write.table])).toEqual([
+        ["update", "businesses"],
+        ["insert", "business_setup"],
+        ["insert", "accounts"],
+        ["insert", "page_links"],
+      ]);
+      expect(writes.state[0]).toMatchObject({ set: { name: DEMO_NAME, display_name: DEMO_NAME } });
+      expect(writes.messages.map((row) => [row.id, row.step, row.lineNo, row.openQuestionId])).toEqual([
+        ["outbox-s1-09-sam-1", "S1-09", 1, null],
+        ["outbox-s1-10-sam-1", "S1-10", 2, null],
+      ]);
+      // One search, the ruling's try (1): the double's demo listing, its apostrophe folded.
+      expect(run.searches).toEqual([{ by: "nameAndTown", name: DEMO_NAME, town: "Springfield" }]);
+      // The plain link waits in the face's own HeldLinks for the turn, until a fresh commit keeps it.
+      expect(run.links.stagedTurns).toBe(1);
+      expect(run.links.size).toBe(0);
+      run.links.keep(context.turn.id, ["outbox-s1-10-sam-1"]);
+      const link = run.links.of("outbox-s1-10-sam-1") ?? "";
+      expect(link).toMatch(/^https:\/\/rosfield\.com\/test\/[0-9a-f]{32}$/);
+      const pageLink = writes.state[3];
+      if (pageLink?.op !== "insert") throw new Error("S1-10's writer gives a page_links row");
+      expect(pageLink.values).toMatchObject({
+        id: "link-s1-10-sam-1",
+        purpose: "setup_id_check",
+        step_id: "S1-10",
+      });
+      expect(pageLink.values.code_sha256).toBe(await sha256(link.slice(link.lastIndexOf("/") + 1)));
+      // Nothing of the link or the code is in the unit the commit is handed, but its hash.
+      expect(JSON.stringify(writes)).not.toContain(link.slice(link.lastIndexOf("/") + 1));
+    });
+  }
+
+  it("a real-looking name and town: S1-09's rows, S1-76's row and one review item (Claim: owner. Reason: no listing.), then S1-10's rows; no read-back", async () => {
+    const run = listingOver();
+    const writes = await walkedV3(run, OWNER_MATCHES, MADE_UP_WORDS).writing;
+    expect(writes.state.map((write) => [write.op, write.table])).toEqual([
+      ["update", "businesses"],
+      ["insert", "business_setup"],
+      ["insert", "review_items"],
+      ["insert", "accounts"],
+      ["insert", "page_links"],
+    ]);
+    expect(writes.state[0]).toMatchObject({ set: { name: MADE_UP_NAME, display_name: MADE_UP_NAME } });
+    expect(writes.state[2]).toMatchObject({
+      values: { kind: "listing_match", summary: listingSummaryOf("owner", "noListing") },
+    });
+    expect(writes.messages.map((row) => [row.step, row.lineNo])).toEqual([
+      ["S1-76", 0],
+      ["S1-10", 2],
+    ]);
+    expect(writes.asks).toEqual([]);
+  });
+
+  it("'I'm the owner' alone, and a name with no town: the settler answers \"ask\", so nothing is read or written for the part and the part is noted for the commit's one re-send (T-1528)", async () => {
+    for (const words of [null, "Lee's Barbershop"]) {
+      const run = listingOver();
+      const { writing, part, context } = walkedV3(run, OWNER_MATCHES, words);
+      const writes = await writing;
+      expect(writes, String(words)).toMatchObject({
+        state: [],
+        stateEvents: [],
+        asks: [],
+        closes: [],
+        messages: [],
+        gives: [],
+      });
+      expect(settlerAskedParts(context).has(part.index), String(words)).toBe(true);
+      expect(run.searches, String(words)).toEqual([]);
+      expect(run.listing.asked, String(words)).toEqual([]);
+      expect(run.mobile.asked, String(words)).toEqual([]);
+      expect(run.links.stagedTurns, String(words)).toBe(0);
+    }
+  });
+
+  it("a helper with a match: refused notBuilt (tells) at S1-77, which has no writer (default 214), with no K-05 read, no row and no link", async () => {
+    const run = listingOver();
+    const { writing } = walkedV3(run, HELPS_RUN_IT, RULING_WORDS);
+    const error = await writing.then(
+      () => "answered",
+      (thrown: unknown) => thrown,
+    );
+    expect(error).toBeInstanceOf(WalkNotBuiltError);
+    expect(error).toMatchObject({ seam: "tells", ids: ["S1-77"] });
+    expect(run.listing.asked).toEqual([]);
+    expect(run.mobile.asked).toEqual([]);
+    expect(run.links.stagedTurns).toBe(0);
+  });
+
+  it("with the listing deps left out, an S1-09 answer on bundle v3 is refused notBuilt with nothing read, as today", async () => {
+    const run = listingOver(false);
+    const { writing } = walkedV3(run, OWNER_MATCHES, RULING_WORDS);
+    await expect(writing).rejects.toBeInstanceOf(WalkNotBuiltError);
+    expect(run.searches).toEqual([]);
+  });
+
+  it("the binding never hands S1-10's writer a generator: a link port that carries one still mints from crypto.getRandomValues (default 7)", async () => {
+    const run = listingOver(true, (links) => {
+      // A port object as a caller might build it, a generator on it (the type has none, so it is a plain object here).
+      const port = {
+        host: LINK_HOST,
+        basePath: BASE_PATH,
+        now: () => LINK_NOW,
+        stage: links,
+        fill: COUNTING_FILL,
+      };
+      return port;
+    });
+    const { writing, context } = walkedV3(run, OWNER_MATCHES, RULING_WORDS);
+    await writing;
+    run.links.keep(context.turn.id, ["outbox-s1-10-sam-1"]);
+    const link = run.links.of("outbox-s1-10-sam-1") ?? "";
+    expect(link.slice(link.lastIndexOf("/") + 1)).toMatch(LINK_CODE_FORM);
+    expect(link).not.toContain(COUNTING_CODE);
   });
 });

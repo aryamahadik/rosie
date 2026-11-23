@@ -48,6 +48,15 @@
 // readTurnState on `runtime`) where the caller also hands in SignUpWriterDeps.s1_04Writer, so an answer to an S1-04 that
 // was asked is written in the turn's one commit; its party rule's flag (s1_04Writer.partyRuleLive) is off unless the
 // caller sets it true.
+//
+// S1-09, S1-76 and S1-10 on PostgreSQL (T-1537; S1-09 design card 7 extended to S1-10, DL-1171; ../commit.ts default 7):
+// the caller hands SignUpWriterDeps.listing in and asks for signUpSteps (settleSignUp): the Places port, S1-09's reads
+// and S1-10's (journey-1/listing pgListingReads and journey-1/mobile-id pgMobileIdReads on `runtime`: item 79 and item
+// 26 as rosie_job, each in a read-only transaction of its own beside the call's, one at a time), the stop reads, the
+// paging ports for S1-76's review item, and the secure link's port, whose stage is a HeldLinks of the caller's. That one
+// HeldLinks is then this binding's TurnFaceCalls.links (the face stages, keeps and lets go S1-10's link: turn-face.ts)
+// and its RowBinding.links (finalize's link.secure: rows.ts default 15), taken from the deps themselves so the three can
+// never be different objects. Without `listing` (or without settleSignUp) no links are bound, as before.
 
 import {
   cancelClock,
@@ -202,8 +211,9 @@ export interface PgTurnCallsOptions {
    * side: journey-1/kinds reads.ts) with the stop home's reads where the runtime side binds them, and the pinned bundle's
    * trade overlays. Given, the commit binds the walk's question read on the call's transaction (pgWalkQuestions) and the
    * sign-up steps' writers, so an answer to S1-02's question is written. Left out, neither is bound, and every answer to
-   * an open question is notBuilt, as before. Its `companies` (pgCompaniesReads), `s1_04Writer` and `plan` (S1-08's stop
-   * reads) are read only with `settleSignUp` (T-1493, T-1484: signUpSteps alone binds them).
+   * an open question is notBuilt, as before. Its `companies` (pgCompaniesReads), `s1_04Writer`, `plan` (S1-08's stop
+   * reads) and `listing` (T-1537: S1-09's, S1-76's and S1-10's ports, its link's stage the face's HeldLinks) are read
+   * only with `settleSignUp` (T-1493, T-1484, T-1537: signUpSteps alone binds them).
    */
   readonly signUp?: SignUpWriterDeps<Tx>;
   /**
@@ -211,8 +221,9 @@ export interface PgTurnCallsOptions {
    * `signUp` given, binds the sign-up steps' writers and settlers together over one catalog read per walk, so the owner's
    * words settle S1-02's branch whichever option decide named, and, where `signUp` carries them (T-1493), the one-kind
    * path (S1-02's one-kind wrapper and S1-04's buttons settler, from `signUp.companies`), S1-04's writer (T-1484: from
-   * `signUp.companies` with `signUp.s1_04Writer`) and S1-08's writer (from `signUp.plan`). Left out or false, no settler
-   * is bound and the walk is as before; without `signUp` it binds nothing.
+   * `signUp.companies` with `signUp.s1_04Writer`), S1-08's writer (from `signUp.plan`) and S1-09's settler with the
+   * S1-09, S1-76 and S1-10 writers (T-1537: from `signUp.listing`, whose link's stage becomes the face's links). Left out
+   * or false, no settler is bound and the walk is as before; without `signUp` it binds nothing.
    */
   readonly settleSignUp?: boolean;
   /** The wrapping key the sealer opens a person's data key with, read by name from the environment (T-182). */
@@ -312,12 +323,15 @@ export function pgTurnCalls(runtime: Sql, toolApi: Sql, options: PgTurnCallsOpti
         }),
   };
   const held = new HeldTurns();
+  // S1-10's secure link (T-1537): the one HeldLinks S1-10's writer stages into, only where signUpSteps binds that writer.
+  const links = options.settleSignUp === true ? signUp?.listing?.mobileId.link.stage : undefined;
   const rows: RowBinding = {
     data: pgRowData(runtime),
     bundles: options.bundles,
     held,
     ...(options.finalizeNow === undefined ? {} : { now: options.finalizeNow }),
     ...(options.finalizeLog === undefined ? {} : { log: options.finalizeLog }),
+    ...(links === undefined ? {} : { links }),
   };
   return {
     scope: pgCallScope(toolApi),
@@ -325,6 +339,7 @@ export function pgTurnCalls(runtime: Sql, toolApi: Sql, options: PgTurnCallsOpti
     compose: composeInputDeps<Tx>(rows),
     finalize: finalizeDeps<Tx>(rows),
     held,
+    ...(links === undefined ? {} : { links }),
     ...(paging === undefined ? {} : { paging }),
   };
 }
