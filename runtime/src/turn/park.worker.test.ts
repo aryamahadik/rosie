@@ -390,7 +390,7 @@ describe("the crash park never writes the passedOn line to a number whose STOP i
     expect(request).toEqual(unwordedFor(parked.turn));
     // v1's form, as park-turn.json writes it: no reason, and the row's fields v1's alone.
     expect("reason" in request).toBe(false);
-    expect(Object.keys(request.outboxRows[0] ?? {}).sort()).toEqual(
+    expect(Object.keys(request.outboxRows[0]).sort()).toEqual(
       Object.keys(parkTurn.request.outboxRows[0] ?? {}).sort(),
     );
     expect(() => {

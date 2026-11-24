@@ -1007,7 +1007,9 @@ describe("three crashes before the commit", { timeout: SLOW_MS }, () => {
           await until(() => triesSent().includes(2), "try 2's core-only commit");
           await rig.tick(LEASE_MS);
           await until(() => triesSent().includes(3), "try 3's core-only commit");
-          expect(await rig.actor.readTurns()).toMatchObject([{ turnId, state: "leased", tries: 3 }]);
+          // Its first commit call marked the turn committing, and the lease keeps it so (sticky: the call may have gone
+          // through); a lapse reruns a committing turn the same as a leased one, and parks it after the third try.
+          expect(await rig.actor.readTurns()).toMatchObject([{ turnId, state: "committing", tries: 3 }]);
 
           // The third lapse with no commit parks the turn: in v1's form, its one row to Maya's handle unworded.
           await rig.tick(LEASE_MS);
