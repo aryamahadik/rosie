@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://rosie.invalid/contracts/data-access/data-access.v1.24.schema.json",
   "title": "DataAccessV1dot24",
-  "description": "K-05 v1.24, a minor version of the data-access calls (T-1549: the ruling T-1543's card A9, ops/reviews/signup-remainder/rule-rest.json; DL-1194): the runtime-side reads the rest of journey 1's sign-up by text needs, and the text way of a sign-in. It only adds to v1.23 (data-access.v1.23.schema.json, frozen and unchanged, referred to here, which refers on to every earlier version down to v1): every v1.23 definition is here under its own name, by reference, and none changes but the three it restates, startSignIn.request (v1.13's form, or v1.24's startSignIn.textRequest), startSignIn.response (v1.13's started or paused, or v1.24's startSignIn.textStarted) and startSignIn.exchange (to refer to v1.24's request and response; the errors v1.14's, by reference), so every v1 to v1.23 exchange is a v1.24 exchange. Added, each on the runtime side as rosie_job, its own read-only transaction on its own connection, beside a Tool API call's transaction and never on it, 1 connection, so a gate call holds 2 connections at most (README items 85 to 92, default 226; card B11): readSignUpKeys (S1-10's keys by person, as one moment: README item 85), readPendingUpload (the pending upload by its upload id: item 86), openReviewItemsOf (a business's open K-37 review items of one kind, never the summary: item 88), readStagingTestBusinesses (the businesses named by a K-23 company whose owner's account mobile is one of the numbers given, never by a role: item 89), startSignIn.textRequest, startSignIn.textStarted and startSignIn.textExchange (the text way of a sign-in's start: item 90), and liveTextSignInCode (the id of a handle's live sign-in code that went by text, never its hash: item 91). Item 87 (item 26 reads the K-23 v1.1 claim as facts) and item 92 (a handle's phone service) add no call. No column, grant, index or migration is added. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "description": "K-05 v1.24, a minor version of the data-access calls (T-1549: the ruling T-1543's card A9, ops/reviews/signup-remainder/rule-rest.json; DL-1194): the runtime-side reads the rest of journey 1's sign-up by text needs, and the text way of a sign-in. It only adds to v1.23 (data-access.v1.23.schema.json, frozen and unchanged, referred to here, which refers on to every earlier version down to v1): every v1.23 definition is here under its own name, by reference, and none changes but the three it restates, startSignIn.request (v1.13's form, or v1.24's startSignInText.request), startSignIn.response (v1.13's started or paused, or v1.24's startSignInText.started) and startSignIn.exchange (to refer to v1.24's request and response; the errors v1.14's, by reference), so every v1 to v1.23 exchange is a v1.24 exchange. Added, each on the runtime side as rosie_job, its own read-only transaction on its own connection, beside a Tool API call's transaction and never on it, 1 connection, so a gate call holds 2 connections at most (README items 85 to 92, default 226; card B11): readSignUpKeys (S1-10's keys by person, as one moment: README item 85), readPendingUpload (the pending upload by its upload id: item 86), openReviewItemsOf (a business's open K-37 review items of one kind, never the summary: item 88), readStagingTestBusinesses (the businesses named by a K-23 company whose owner's account mobile is one of the numbers given, never by a role: item 89), startSignInText.request, startSignInText.started and startSignInText.exchange (the text way of a sign-in's start: item 90), and liveTextSignInCode (the id of a handle's live sign-in code that went by text, never its hash: item 91). Item 87 (item 26 reads the K-23 v1.1 claim as facts) and item 92 (a handle's phone service) add no call. No column, grant, index or migration is added. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
   "anyOf": [
     { "$ref": "#/$defs/commitTurn.exchange" },
     { "$ref": "#/$defs/writePlan.exchange" },
@@ -512,7 +512,7 @@
     "sha256Hex": { "$ref": "data-access.v1.23.schema.json#/$defs/sha256Hex" },
     "hashKeyName": { "$ref": "data-access.v1.23.schema.json#/$defs/hashKeyName" },
     "signInContact": { "$ref": "data-access.v1.23.schema.json#/$defs/signInContact" },
-    "startSignIn.textRequest": {
+    "startSignInText.request": {
       "title": "StartSignInTextRequest",
       "description": "A sign-in's start by the text way, before the page answers (README item 90; R29; MC C9; K-21 v1 signInStart's way text and fixture sign-in-from-link-by-text; K-22 v1.2 sign_in_attempts.way, which admits text). v1.13's request (startSignIn.request: the same ids, hashes, key name and no time) with way text, a mobile contact alone, and the code the page's ready text will carry, as its keyed hash and the id of its K-22 proof_codes row: the page call makes the code (6 digits from a cryptographically secure generator, as for email) and puts it only in its own answer's ready text, never in this request, a span or a log. Role and scope: v1.13's (rosie_job on the runtime side through HYPERDRIVE_JOB, ADR-016 section 6; rosie.business_id set empty, rosie.person_id unset), its own transaction, 1 connection, never in one transaction with a Tool API call. Rules 0 to 5 run as for email (README item 58), the account found by its mobile; with exactly one account the same transaction writes the code row, channel text, to that mobile's handle (README item 90, default 229). Repeat: safe, keyed by requestSha256: a repeat answers the first attempt and writes nothing. New in v1.24.",
       "type": "object",
@@ -571,14 +571,14 @@
     },
     "startSignIn.request": {
       "title": "StartSignInRequest",
-      "description": "A sign-in's start (README items 58 and 90): v1.13's form (way email, unchanged) or v1.24's (startSignIn.textRequest: way text, a mobile contact, the code's id and keyed hash). The two never overlap: their way differs. Changed in v1.24.",
+      "description": "A sign-in's start (README items 58 and 90): v1.13's form (way email, unchanged) or v1.24's (startSignInText.request: way text, a mobile contact, the code's id and keyed hash). The two never overlap: their way differs. Changed in v1.24.",
       "anyOf": [
         { "$ref": "data-access.v1.23.schema.json#/$defs/startSignIn.request" },
-        { "$ref": "#/$defs/startSignIn.textRequest" }
+        { "$ref": "#/$defs/startSignInText.request" }
       ]
     },
     "startSignIn.started": { "$ref": "data-access.v1.23.schema.json#/$defs/startSignIn.started" },
-    "startSignIn.textStarted": {
+    "startSignInText.started": {
       "title": "StartSignInTextStarted",
       "description": "Started by the text way (README item 90): v1.13's started answer (the attempt's id, attemptId, expiresAt, repeated and personId, each as v1.13 states it) with codeId, the K-22 proof_codes row this start wrote, for the server only, never the page or a span. personId and codeId are given together: exactly one account whose mobile is the contact, on a start that is not a repeat; both null with no account, two or more, and on every repeat (refuse-start-sign-in-text-repeat-names-code). The page gets attemptId, expiresAt and its own ready text, the same with or without an account; the page call answers its ready text only on a start that is not repeated, so the ready text is answered once (default 230). New in v1.24.",
       "type": "object",
@@ -617,10 +617,10 @@
     "startSignIn.paused": { "$ref": "data-access.v1.23.schema.json#/$defs/startSignIn.paused" },
     "startSignIn.response": {
       "title": "StartSignInResponse",
-      "description": "Started or paused (README items 58 and 90): v1.13's started or paused, or v1.24's startSignIn.textStarted, which alone names codeId, so the three never overlap. Changed in v1.24.",
+      "description": "Started or paused (README items 58 and 90): v1.13's started or paused, or v1.24's startSignInText.started, which alone names codeId, so the three never overlap. Changed in v1.24.",
       "oneOf": [
         { "$ref": "#/$defs/startSignIn.started" },
-        { "$ref": "#/$defs/startSignIn.textStarted" },
+        { "$ref": "#/$defs/startSignInText.started" },
         { "$ref": "#/$defs/startSignIn.paused" }
       ]
     },
@@ -640,18 +640,18 @@
       "required": ["call", "given", "request", "outcome"],
       "additionalProperties": false
     },
-    "startSignIn.textExchange": {
+    "startSignInText.exchange": {
       "title": "StartSignInTextExchange",
-      "description": "The exchange of a start by the text way: startSignIn.exchange narrowed by allOf to startSignIn.textRequest, answered textStarted, paused or an error. The v1.24 sign-in fixtures are listed under this definition, so the loops that select startSignIn.exchange (db/repo/sign-in-send.int.test.ts and the database side) never meet them before db/repo's text way (card A17) merges; it is the definition A17's answers and A15's requests are checked against. New in v1.24.",
+      "description": "The exchange of a start by the text way: startSignIn.exchange narrowed by allOf to startSignInText.request, answered startSignInText.started, paused or an error. Its call is startSignIn (startSignIn.exchange's const), so the root, which names startSignIn.exchange, takes it: startSignInText names a narrowing of startSignIn's definitions (request, started, exchange), not a call. The v1.24 sign-in fixtures, accepted and refused, are listed under this definition, whose name starts with no startSignIn. or sendSignInCode. (README default 236), so the loops that select startSignIn.exchange or every startSignIn.* and sendSignInCode.* definition (db/repo/sign-in-send.int.test.ts lines 136 to 144, and the database side by version) never meet them before db/repo's text way (card A17) merges; it is the definition A17's answers and A15's requests are checked against. New in v1.24.",
       "allOf": [
         { "$ref": "#/$defs/startSignIn.exchange" },
         {
           "type": "object",
           "properties": {
-            "request": { "$ref": "#/$defs/startSignIn.textRequest" },
+            "request": { "$ref": "#/$defs/startSignInText.request" },
             "outcome": {
               "anyOf": [
-                { "$ref": "#/$defs/startSignIn.textStarted" },
+                { "$ref": "#/$defs/startSignInText.started" },
                 { "$ref": "#/$defs/startSignIn.paused" },
                 { "$ref": "#/$defs/startSignIn.errors" }
               ]

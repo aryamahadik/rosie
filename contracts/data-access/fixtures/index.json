@@ -3395,7 +3395,7 @@
     {
       "file": "start-sign-in-text-sam.json",
       "version": "v1.24",
-      "def": "startSignIn.textExchange",
+      "def": "startSignInText.exchange",
       "expect": "accept",
       "shows": "A sign-in started by the text way for the account's own mobile: rules 0 to 5 as for email, and in the same transaction the code row (sign_in, channel text, to the mobile's handle, its keyed hash only); the page answers its own ready text once, and no code is texted",
       "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 6 and R29; MC C9; K-21 v1 signInStart way text and sign-in-from-link-by-text; K-22 v1 proof_codes and v1.2 sign_in_attempts.way; ADR-016 section 6; db/repo/sign-in-send.ts lines 295 to 296; K-05 v1.24 item 90 and defaults 229 and 230"
@@ -3403,7 +3403,7 @@
     {
       "file": "start-sign-in-text-no-account.json",
       "version": "v1.24",
-      "def": "startSignIn.textExchange",
+      "def": "startSignInText.exchange",
       "expect": "accept",
       "shows": "The text way for a mobile no account holds: the attempt with no person and no code row, answered to the page exactly as with an account",
       "source": "ops/reviews/signup-remainder/rule-rest.json card A15 ('the start answers the same with or without an account'); K-05 v1.13 item 58 rule 4; K-05 v1.24 item 90 and default 229"
@@ -3411,26 +3411,26 @@
     {
       "file": "invalid/refuse-start-sign-in-text-plain-code.json",
       "version": "v1.24",
-      "def": "startSignIn.textExchange",
+      "def": "startSignInText.exchange",
       "expect": "refuse",
       "shows": "start-sign-in-text-sam whose request carries the code itself: only its keyed hash reaches the database (its one fault request.code; put right, it is start-sign-in-text-sam)",
-      "source": "BP rule 7; K-22 v1 proof_codes.code_hash ('never the code'); K-05 v1.24 item 90 (startSignIn.textRequest)"
+      "source": "BP rule 7; K-22 v1 proof_codes.code_hash ('never the code'); K-05 v1.24 item 90 (startSignInText.request)"
     },
     {
       "file": "invalid/refuse-start-sign-in-text-repeat-names-code.json",
       "version": "v1.24",
-      "def": "startSignIn.textExchange",
+      "def": "startSignInText.exchange",
       "expect": "refuse",
       "shows": "start-sign-in-text-sam answered as a repeat that still names its person and code row: a repeat names neither, so the ready text is answered once (its one fault outcome.repeated; put right, it is start-sign-in-text-sam)",
-      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 6 ('the ready text answered once'); K-05 v1.13 startSignIn.started (a repeat names no person); K-05 v1.24 item 90 and default 230 (startSignIn.textStarted)"
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 6 ('the ready text answered once'); K-05 v1.13 startSignIn.started (a repeat names no person); K-05 v1.24 item 90 and default 230 (startSignInText.started)"
     },
     {
       "file": "invalid/refuse-start-sign-in-text-email-contact.json",
       "version": "v1.24",
-      "def": "startSignIn.textExchange",
+      "def": "startSignInText.exchange",
       "expect": "refuse",
       "shows": "start-sign-in-text-sam started by the text way for an email: the text way serves the account's own mobile alone (its one fault request.contact; put right, it is start-sign-in-text-sam)",
-      "source": "ops/reviews/signup-remainder/rule-rest.json R29 ('sent from the account's own mobile'); MC C9; K-05 v1.24 item 90 (startSignIn.textRequest)"
+      "source": "ops/reviews/signup-remainder/rule-rest.json R29 ('sent from the account's own mobile'); MC C9; K-05 v1.24 item 90 (startSignInText.request)"
     },
     {
       "file": "live-text-sign-in-code-sam.json",
