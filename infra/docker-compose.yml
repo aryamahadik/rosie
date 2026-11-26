@@ -1,13 +1,19 @@
 # Local PostgreSQL 17 with PostGIS (factory spec 4, ADR-006). Start: npm run db:up. Stop: npm run db:down.
 # Shell: npm run db:psql. DATABASE_URL=postgres://rosie:rosie@127.0.0.1:54329/rosie (local only, not a secret).
+#
+# The image runs natively on the Apple-silicon build Mac (T-1560, DL-1220). The official postgis/postgis:17-3.5 is
+# published for amd64 only, and under Docker Desktop's emulation it crashed six times Nov 23-24 under heavy parallel
+# load. imresamu/postgis:17-3.5-bookworm, a community build with an arm64 image (PostgreSQL 17.6, PostGIS 3.5.3), is
+# T-1125's named fallback (infra/spikes/postgis-emulation/FINDINGS.md). CI keeps the official image (ci.yml and
+# merge-check.yml): the same PostgreSQL 17 and PostGIS 3.5, other patch versions.
 name: rosie
 
 services:
   rosie-pg:
-    image: postgis/postgis:17-3.5
-    # The image is published for amd64 only; Docker Desktop runs it under emulation on Apple silicon.
-    platform: linux/amd64
+    image: imresamu/postgis:17-3.5-bookworm
     container_name: rosie-pg
+    # DL-358: 512 locks per transaction, set here so the setting no longer lives only in a data volume (ALTER SYSTEM).
+    command: ["postgres", "-c", "max_locks_per_transaction=512"]
     environment:
       POSTGRES_DB: rosie
       POSTGRES_USER: rosie
@@ -15,7 +21,8 @@ services:
     ports:
       - "127.0.0.1:54329:5432"
     volumes:
-      - rosie-pg-data:/var/lib/postgresql/data
+      # A new volume for the native image; the emulated image's rosie-pg-data stays untouched as a fallback.
+      - rosie-pg-data-arm64:/var/lib/postgresql/data
     healthcheck:
       # TCP, so it passes only after first-start setup is done (setup runs on the Unix socket alone).
       test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U rosie -d rosie"]
@@ -25,4 +32,4 @@ services:
       start_period: 10s
 
 volumes:
-  rosie-pg-data:
+  rosie-pg-data-arm64:

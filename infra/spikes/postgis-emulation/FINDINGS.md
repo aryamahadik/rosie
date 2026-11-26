@@ -37,6 +37,12 @@ The CI column comes from merge-check run 42344823865 on this branch (Nov 7 2026)
 
 The arm64 image is a fallback that needs the CTO's OK and a later release-engineer task. Running integration tests only in the merge check is not needed.
 
+### Addendum, Nov 24 2026 (T-1560, DL-1220): the build Mac moves to the arm64 image
+
+- Under heavy parallel load (five workflows at once, the Workers test rigs, the 1,000-parallel tests) the emulated image crashed six times Nov 23-24: each time one server process "exited with exit code 2" with no error before it, followed by a recovery of 8 to 25 minutes (DL-1206, DL-1207, DL-1216, DL-1218, DL-1220). This spike measured one connection and no parallel writers (see Limits), so it could not see this.
+- The local build Mac now runs the arm64 image, `imresamu/postgis:17-3.5-bookworm`, natively (`infra/docker-compose.yml`, DL-1220): no platform line, `max_locks_per_transaction=512` on its command line (DL-358), and a new volume, `rosie-pg-data-arm64`. The emulated image's volume, `rosie-pg-data`, is left untouched as a fallback.
+- CI keeps the official `postgis/postgis:17-3.5`: PostGIS 3.5.2 there and 3.5.3 locally (PostgreSQL 17.5 and 17.6), the same major and minor versions.
+
 ## Limits
 
 - This was a small data set, one connection and no parallel writers.
