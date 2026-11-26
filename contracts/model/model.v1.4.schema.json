@@ -1,0 +1,486 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/model/model.v1.4.schema.json",
+  "title": "Model v1.4",
+  "description": "K-02 v1.4, a minor version that only adds (T-1546; the sign-up ruling T-1543's card C2, ops/reviews/signup-remainder/rule-rest.json, with its defaults R10, R12, R15, R31, R32, R38, R39 and the lead's round-4 ruling DL-1194; DL-1191; README 'v1.4'): decide's typed fields for three sign-up steps, each value with the owner's own words it comes from. S1-12's typed price lines (line.<n>.service, price_kind, amount, length), S1-13's edits by letter on the money card (edit.<n>.letter, place, before, amount, after) and S1-21's rule edits (rule.<n>.row, value). They are fields of a choose part, in K-02 v1's field shape (name, value, words) on a choice that lists them as K-01 answerFields, so the model-facing decideRead does not change: the model answers in v1's decideRead, and the structured-outputs lint still checks v1's. What v1.4 adds is the field names, the type each value takes, and what a decide result and a pair must hold for them (typedField, typedPart, typedDecide, decideResult, contextAndDecide), with two new named rules (contracts/model/model.rules.mjs: typedValueInWords, letterOnCard). Every v1.3 definition is here under its own name by $ref to model.v1.3.schema.json, frozen and unchanged, except decideResult and contextAndDecide, which v1.4 narrows only for fields whose names are v1.4's, and photoSearch and photoReadResult, which v1.4 restates word for word with nothing changed (README v1.4, 'v1.3's photo result restated'), so every v1, v1.1, v1.2 and v1.3 payload is a v1.4 payload. Owner: the architect.",
+  "$defs": {
+    "language": { "$ref": "model.v1.3.schema.json#/$defs/language" },
+    "nonEmptyText": { "$ref": "model.v1.3.schema.json#/$defs/nonEmptyText" },
+    "stakes": { "$ref": "model.v1.3.schema.json#/$defs/stakes" },
+    "choiceKind": { "$ref": "model.v1.3.schema.json#/$defs/choiceKind" },
+    "stakesReason": { "$ref": "model.v1.3.schema.json#/$defs/stakesReason" },
+    "target": { "$ref": "model.v1.3.schema.json#/$defs/target" },
+    "choice": { "$ref": "model.v1.3.schema.json#/$defs/choice" },
+    "openQuestion": { "$ref": "model.v1.3.schema.json#/$defs/openQuestion" },
+    "stepCard": { "$ref": "model.v1.3.schema.json#/$defs/stepCard" },
+    "factValue": { "$ref": "model.v1.3.schema.json#/$defs/factValue" },
+    "fact": { "$ref": "model.v1.3.schema.json#/$defs/fact" },
+    "attachment": { "$ref": "model.v1.3.schema.json#/$defs/attachment" },
+    "text": { "$ref": "model.v1.3.schema.json#/$defs/text" },
+    "person": { "$ref": "model.v1.3.schema.json#/$defs/person" },
+    "recentMessage": { "$ref": "model.v1.3.schema.json#/$defs/recentMessage" },
+    "context": { "$ref": "model.v1.3.schema.json#/$defs/context" },
+    "fieldValue": { "$ref": "model.v1.3.schema.json#/$defs/fieldValue" },
+    "field": { "$ref": "model.v1.3.schema.json#/$defs/field" },
+    "quote": { "$ref": "model.v1.3.schema.json#/$defs/quote" },
+    "choose": { "$ref": "model.v1.3.schema.json#/$defs/choose" },
+    "enter": { "$ref": "model.v1.3.schema.json#/$defs/enter" },
+    "ask": { "$ref": "model.v1.3.schema.json#/$defs/ask" },
+    "noneFits": { "$ref": "model.v1.3.schema.json#/$defs/noneFits" },
+    "passOn": { "$ref": "model.v1.3.schema.json#/$defs/passOn" },
+    "handOffAbout": { "$ref": "model.v1.3.schema.json#/$defs/handOffAbout" },
+    "handOff": { "$ref": "model.v1.3.schema.json#/$defs/handOff" },
+    "redact": { "$ref": "model.v1.3.schema.json#/$defs/redact" },
+    "noOp": { "$ref": "model.v1.3.schema.json#/$defs/noOp" },
+    "decidePart": { "$ref": "model.v1.3.schema.json#/$defs/decidePart" },
+    "decideRead": { "$ref": "model.v1.3.schema.json#/$defs/decideRead" },
+    "read": { "$ref": "model.v1.3.schema.json#/$defs/read" },
+    "refusedRead": { "$ref": "model.v1.3.schema.json#/$defs/refusedRead" },
+    "resultPart": { "$ref": "model.v1.3.schema.json#/$defs/resultPart" },
+    "safetyOutcome": { "$ref": "model.v1.3.schema.json#/$defs/safetyOutcome" },
+    "tense": { "$ref": "model.v1.3.schema.json#/$defs/tense" },
+    "safetyLabel": { "$ref": "model.v1.3.schema.json#/$defs/safetyLabel" },
+    "safetyRead": { "$ref": "model.v1.3.schema.json#/$defs/safetyRead" },
+    "safetyResult": { "$ref": "model.v1.3.schema.json#/$defs/safetyResult" },
+    "plannerAnswer": { "$ref": "model.v1.3.schema.json#/$defs/plannerAnswer" },
+    "plannerAsk": { "$ref": "model.v1.3.schema.json#/$defs/plannerAsk" },
+    "plannerPassOn": { "$ref": "model.v1.3.schema.json#/$defs/plannerPassOn" },
+    "plannerHandOff": { "$ref": "model.v1.3.schema.json#/$defs/plannerHandOff" },
+    "plannerLogGap": { "$ref": "model.v1.3.schema.json#/$defs/plannerLogGap" },
+    "plannerOutput": { "$ref": "model.v1.3.schema.json#/$defs/plannerOutput" },
+    "photoKind": { "$ref": "model.v1.3.schema.json#/$defs/photoKind" },
+    "photoFile": { "$ref": "model.v1.3.schema.json#/$defs/photoFile" },
+    "photoReadRequest": { "$ref": "model.v1.3.schema.json#/$defs/photoReadRequest" },
+    "photoNotRead": { "$ref": "model.v1.3.schema.json#/$defs/photoNotRead" },
+    "photoTextField": { "$ref": "model.v1.3.schema.json#/$defs/photoTextField" },
+    "photoPriceKindField": { "$ref": "model.v1.3.schema.json#/$defs/photoPriceKindField" },
+    "photoPriceField": { "$ref": "model.v1.3.schema.json#/$defs/photoPriceField" },
+    "photoMinutesField": { "$ref": "model.v1.3.schema.json#/$defs/photoMinutesField" },
+    "photoWeekdayField": { "$ref": "model.v1.3.schema.json#/$defs/photoWeekdayField" },
+    "photoTimeOfDayField": { "$ref": "model.v1.3.schema.json#/$defs/photoTimeOfDayField" },
+    "photoTimeField": { "$ref": "model.v1.3.schema.json#/$defs/photoTimeField" },
+    "photoOutcome": { "$ref": "model.v1.3.schema.json#/$defs/photoOutcome" },
+    "photoPriceListLine": { "$ref": "model.v1.3.schema.json#/$defs/photoPriceListLine" },
+    "photoTimetableClass": { "$ref": "model.v1.3.schema.json#/$defs/photoTimetableClass" },
+    "photoBusyTime": { "$ref": "model.v1.3.schema.json#/$defs/photoBusyTime" },
+    "photoReadCardOrListing": { "$ref": "model.v1.3.schema.json#/$defs/photoReadCardOrListing" },
+    "photoReadPriceList": { "$ref": "model.v1.3.schema.json#/$defs/photoReadPriceList" },
+    "photoReadTimetable": { "$ref": "model.v1.3.schema.json#/$defs/photoReadTimetable" },
+    "photoReadSchedule": { "$ref": "model.v1.3.schema.json#/$defs/photoReadSchedule" },
+    "photoRead": { "$ref": "model.v1.3.schema.json#/$defs/photoRead" },
+    "photoSearch": {
+      "title": "PhotoSearch",
+      "description": "v1.3's photoSearch, restated word for word with nothing changed (README v1.4, 'v1.3's photo result restated'): K-15 v1's search by the text read from a photo of a card, sign or listing (port-places search.request, by photoText; README v1.3 default 20). It is restated rather than given by $ref to v1.3 because the contract type generator (json-schema-to-typescript, contracts/scripts/gen-types.mjs) cannot follow v1.3's photoSearch, a $ref with narrowing keywords beside it, from another file: it then reads K-15's own local $refs against the wrong file.",
+      "type": "object",
+      "$ref": "../port-places/port-places.v1.schema.json#/$defs/search.request",
+      "properties": {
+        "by": { "description": "K-15 v1 SearchByPhotoText.", "const": "photoText" }
+      },
+      "required": ["by"]
+    },
+    "photoReadResult": {
+      "title": "PhotoReadResult",
+      "description": "v1.3's photoReadResult, restated word for word with nothing changed but that its $refs name this file's definitions, which are v1.3's (README v1.4, 'v1.3's photo result restated'; the reason is photoSearch's): what photo reading (C-120) hands back for one photo, to the journey 1 call that asked (C-074: S1-09, S1-12, S1-24, S1-83): the request, the model that answered, its answer in the kind's schema, and for a card or listing that was read, the K-15 search the call runs. One read: the owner's yes to the read-back is the check (limit 6; README v1.3 default 22). A failed call (an outage, a refusal, max_tokens) is no result: the gateway's rules apply (arch 06 line 293; README 'Model-facing schemas' item 5). Not model-facing.",
+      "type": "object",
+      "properties": {
+        "request": { "$ref": "#/$defs/photoReadRequest" },
+        "model": {
+          "description": "The model that answered (contracts/bundle modelRole); which one reads each kind is the spike's (T-668).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/modelRole"
+        },
+        "output": {
+          "description": "The model's answer, in the schema of the request's kind.",
+          "$ref": "#/$defs/photoRead"
+        },
+        "search": {
+          "description": "For a card or listing that was read, K-15's search by photo text formed from its words (photoSearch); null otherwise, an unreadable photo included (S1-09: then 'Rosie asks for the business name', and the search is by name and town).",
+          "anyOf": [{ "$ref": "#/$defs/photoSearch" }, { "type": "null" }]
+        }
+      },
+      "required": ["request", "model", "output", "search"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "output": {
+          "description": "The answer is in the request's kind; an unreadable photo reads no field; a read list holds at least one entry; a read card holds at least one field read (README v1.3 'What the schema refuses').",
+          "allOf": [
+            {
+              "description": "A card or listing is answered as one.",
+              "if": {
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "cardOrListing" } },
+                    "required": ["kind"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "cardOrListing" } },
+                    "required": ["kind"]
+                  }
+                }
+              }
+            },
+            {
+              "description": "A price list is answered as one.",
+              "if": {
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "priceList" } },
+                    "required": ["kind"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "priceList" } },
+                    "required": ["kind"]
+                  }
+                }
+              }
+            },
+            {
+              "description": "A timetable is answered as one.",
+              "if": {
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "timetable" } },
+                    "required": ["kind"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "timetable" } },
+                    "required": ["kind"]
+                  }
+                }
+              }
+            },
+            {
+              "description": "A schedule is answered as one.",
+              "if": {
+                "properties": {
+                  "request": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "schedule" } },
+                    "required": ["kind"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "schedule" } },
+                    "required": ["kind"]
+                  }
+                }
+              }
+            },
+            {
+              "description": "An unreadable photo reads no field and no entry (S1-09; README v1.3 default 18).",
+              "if": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": { "outcome": { "const": "unreadable" } },
+                    "required": ["outcome"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "object",
+                        "properties": { "status": { "enum": ["unreadable", "notShown"] } }
+                      },
+                      "address": {
+                        "type": "object",
+                        "properties": { "status": { "enum": ["unreadable", "notShown"] } }
+                      },
+                      "phone": {
+                        "type": "object",
+                        "properties": { "status": { "enum": ["unreadable", "notShown"] } }
+                      },
+                      "lines": { "type": "array", "maxItems": 0 },
+                      "classes": { "type": "array", "maxItems": 0 },
+                      "busy": { "type": "array", "maxItems": 0 }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "description": "A photo read as a list holds at least one entry; a list with none is an unreadable photo (README v1.3 default 18).",
+              "if": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": { "outcome": { "const": "read" } },
+                    "required": ["outcome"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": {
+                      "lines": { "type": "array", "minItems": 1 },
+                      "classes": { "type": "array", "minItems": 1 },
+                      "busy": { "type": "array", "minItems": 1 }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "description": "A card or listing read holds at least one of its three fields read; with none it is an unreadable photo (README v1.3 default 18).",
+              "if": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "properties": { "kind": { "const": "cardOrListing" }, "outcome": { "const": "read" } },
+                    "required": ["kind", "outcome"]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "output": {
+                    "type": "object",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "object",
+                            "properties": { "status": { "const": "read" } },
+                            "required": ["status"]
+                          }
+                        },
+                        "required": ["name"]
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "address": {
+                            "type": "object",
+                            "properties": { "status": { "const": "read" } },
+                            "required": ["status"]
+                          }
+                        },
+                        "required": ["address"]
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "phone": {
+                            "type": "object",
+                            "properties": { "status": { "const": "read" } },
+                            "required": ["status"]
+                          }
+                        },
+                        "required": ["phone"]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "search": {
+          "description": "The K-15 search is there exactly when a card or listing was read (S1-09: 'It reads the photo and checks the public listing'); an unreadable photo or any other kind has none.",
+          "if": {
+            "properties": {
+              "output": {
+                "type": "object",
+                "properties": { "kind": { "const": "cardOrListing" }, "outcome": { "const": "read" } },
+                "required": ["kind", "outcome"]
+              }
+            },
+            "required": ["output"]
+          },
+          "then": {
+            "properties": {
+              "search": { "description": "photoSearch.", "type": "object" }
+            }
+          },
+          "else": {
+            "properties": {
+              "search": { "description": "No search.", "type": "null" }
+            }
+          }
+        }
+      }
+    },
+
+    "typedFieldName": {
+      "title": "TypedFieldName",
+      "description": "v1.4: the name of a typed field, <family>.<n>.<field>, where n counts the family's groups from 1 in the text's order (README v1.4 defaults 25 and 27). line, S1-12's typed price lines, at most 20, each with service, price_kind, amount and length (S1-12: 'Service, Price kind, Price, Time it takes'; 'Or Sam ... types the prices'); edit, S1-13's edits by letter, at most 10, each with letter, place, before, amount and after (S1-13 line 337: 'Send only what's different, by letter'; line 316, 'Where'; line 320, 'Before, one way per service'; line 324, 'After'); rule, S1-21's rule edits, at most 5, each with row and value (S1-21 line 851: 'Sam keeps them, unticks one, or taps one to change it'). K-01 v1's answerField name pattern admits each name, so a choice lists them as answerFields (K-09 default 116's shape; ruling T-1543 R31).",
+      "type": "string",
+      "pattern": "^(line\\.([1-9]|1[0-9]|20)\\.(service|price_kind|amount|length)|edit\\.([1-9]|10)\\.(letter|place|before|amount|after)|rule\\.[1-5]\\.(row|value))$"
+    },
+    "typedField": {
+      "title": "TypedField",
+      "description": "v1.4: what a field of K-02 v1's shape must hold when its name begins with line., edit. or rule.: a name of the three families (typedFieldName), and the value its type gives. amount is money (K-01 answerField type money; CQ-09), which limit 6 re-parses from its words (arch 06 line 309); every other typed field is text (K-01 type text), whose value is its words, character for character, never a K-25 value, a tidied word or a correction (README v1.4 default 26; K-02 README default 24 for id fields), so limit 6's text re-parse passes it and code reads the meaning from the words. edit.<n>.letter is one letter, as typed. A field whose name is none of the three families is v1's, and this definition says nothing of it.",
+      "type": "object",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "description": "A family's prefix.",
+                "type": "string",
+                "pattern": "^(line|edit|rule)\\."
+              }
+            },
+            "required": ["name"]
+          },
+          "then": {
+            "properties": { "name": { "$ref": "#/$defs/typedFieldName" } }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "description": "The money fields.",
+                "type": "string",
+                "pattern": "^(line|edit)\\.[0-9]+\\.amount$"
+              }
+            },
+            "required": ["name"]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "description": "A price: whole cents with its currency (CQ-09); a line the owner calls free is 0 (S1-12: 'A service the list calls free is set as free').",
+                "$ref": "../common/formats.v1.schema.json#/$defs/money"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "description": "The text fields.",
+                "type": "string",
+                "pattern": "^(line\\.[0-9]+\\.(service|price_kind|length)|edit\\.[0-9]+\\.(letter|place|before|after)|rule\\.[0-9]+\\.(row|value))$"
+              }
+            },
+            "required": ["name"]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "description": "The field's words, character for character (README v1.4 default 26).",
+                "$ref": "#/$defs/nonEmptyText"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "description": "The card's letter.",
+                "type": "string",
+                "pattern": "^edit\\.[0-9]+\\.letter$"
+              }
+            },
+            "required": ["name"]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "description": "One letter of S1-13's card, as typed (line 337: 'A) Haircut · $35 / B) Skin fade · $40 ...').",
+                "type": "string",
+                "pattern": "^[A-Za-z]$"
+              },
+              "words": { "description": "The letter as typed.", "type": "string", "pattern": "^[A-Za-z]$" }
+            }
+          }
+        }
+      ]
+    },
+    "typedPart": {
+      "title": "TypedPart",
+      "description": "v1.4: a decide part whose fields, if it carries any, each hold typedField. A part with no fields (ask, none_fits, pass_on, hand_off, redact, no_op) passes as it is.",
+      "type": "object",
+      "properties": {
+        "fields": {
+          "description": "Each field, held to typedField (README v1.4).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/typedField" }
+        }
+      }
+    },
+    "typedDecide": {
+      "title": "TypedDecide",
+      "description": "v1.4: a decide result whose every part, in each read's output and in the parts handed to the gate, holds typedPart. A refused read (v1.2) has no output and passes as it is.",
+      "type": "object",
+      "properties": {
+        "reads": {
+          "description": "The reads (K-02 v1 decideResult.reads).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "output": {
+                "description": "A K-02 read's output.",
+                "type": "object",
+                "properties": {
+                  "parts": {
+                    "description": "Its parts.",
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/typedPart" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parts": {
+          "description": "The parts handed to the gate (K-02 v1 decideResult.parts).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": { "part": { "$ref": "#/$defs/typedPart" } }
+          }
+        }
+      }
+    },
+    "decideResult": {
+      "title": "DecideResult",
+      "description": "What decide returns to the gate for one turn, as v1.3 (v1.2's, with refused reads and an unmapped turn's end), with one narrowing: every field whose name is one of v1.4's typed fields holds typedField (README v1.4). A result with no such field is exactly v1.3's, so every earlier decide result is a v1.4 result.",
+      "allOf": [{ "$ref": "model.v1.3.schema.json#/$defs/decideResult" }, { "$ref": "#/$defs/typedDecide" }]
+    },
+    "contextAndDecide": {
+      "title": "ContextAndDecide",
+      "description": "A context with the decide result made from it, as the gate reads them together (C-080; arch 03 line 185), as v1.3, with one change: the decide result is v1.4's. The two named rules of v1 hold across the pair as before (optionOffered, quoteInText), and v1.4 adds two (contracts/model/model.rules.mjs; README v1.4): typedValueInWords (each typed text field's value is its words, character for character, and each typed amount is the number its words write) and letterOnCard (each edit's letter is one the card shows, a fact card.<letter> of the context). Every v1, v1.1, v1.2 and v1.3 pair is a v1.4 pair.",
+      "type": "object",
+      "properties": {
+        "context": { "$ref": "#/$defs/context" },
+        "decide": { "$ref": "#/$defs/decideResult" }
+      },
+      "required": ["context", "decide"],
+      "additionalProperties": false
+    }
+  }
+}
