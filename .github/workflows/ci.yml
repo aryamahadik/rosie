@@ -27,7 +27,8 @@ jobs:
     # T-1430 (DL-905): the suite outgrew 20 minutes. This job took 19m13s on main in run 43873100250, then the timeout
     # cancelled runs 43880559558 and 43880572601 at 20m16s and 20m12s. 45 is merge-check.yml's own: its merge-check
     # job runs these steps too.
-    timeout-minutes: 45
+    # T-1564 (DL-1235): 75, merge-check.yml's own again, after train 342's merge check was cut at 45 minutes.
+    timeout-minutes: 75
     # T-1119: merge-check.yml's postgis service, so the CI script tests below find a PostgreSQL here as they do in
     # the merge-check (T-1111's local-merge-check tests make and drop databases of their own on it).
     services:
