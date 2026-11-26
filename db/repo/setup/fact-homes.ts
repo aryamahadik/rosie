@@ -4,8 +4,8 @@
 //
 // A fact names its home: a table, the row's name (K-05 rowId) and a column. K-04 core's homes are db/repo/turn-state.ts's
 // FACT_HOMES; these are the eight setup parts' that journeys 1 and 2 write and the frontier reads: K-22 v1 to v1.3
-// (people and access), K-23 v1 (business setup), K-24 v1 (kinds of work), K-25 v1 (services and prices), K-26 v1
-// (rules), K-27 v1 (availability), K-33 v1 (platform billing) and K-35 v1 (documents and licenses). Each is a versioned
+// (people and access), K-23 v1 and v1.1 (business setup), K-24 v1 (kinds of work), K-25 v1 (services and prices),
+// K-26 v1 (rules), K-27 v1 (availability), K-33 v1 (platform billing) and K-35 v1 (documents and licenses). Each is a versioned
 // table of its part's frozen table list (contracts/db-schema/<part>/), so a fact is compared and set by its row's version
 // (limit 4), with every column the list gives and its type as the list spells it, so no read is built from a request's
 // words alone. The integration test holds this list to the frozen ones.
@@ -214,7 +214,11 @@ export const SETUP_FACT_HOMES: Readonly<Record<string, SetupFactHome>> = Object.
     version: "integer",
   }),
 
-  // ---- K-23 business setup (0019) ----
+  // ---- K-23 business setup (0019; v1.1's two claim columns, 0040) ----
+  // signup_claim and claimed_by_person_id (K-23 v1.1, migration 0040; K-05 v1.24 item 87, T-1561): S1-09's claim, read
+  // as facts by item 26 on the runtime side as pgListingK05Reads runs it (rosie_job), written once by a business_setup
+  // StepRow through stateWrite (business_setup_claim_set_once refuses a second write, 23514). Audience never (K-23 v1.1
+  // default 14): code's label for S1-75's control item, never in a text.
   business_setup: home(SETUP, ["business_id"], BY_BUSINESS, {
     business_id: "text",
     listing_phone: "text",
@@ -229,6 +233,8 @@ export const SETUP_FACT_HOMES: Readonly<Record<string, SetupFactHome>> = Object.
     control_proven_at: "timestamptz",
     control_proven_via: "text",
     version: "integer",
+    signup_claim: "text",
+    claimed_by_person_id: "text",
   }),
   flow_defaults: home(SETUP, ["business_id", "flow"], BY_BUSINESS, {
     business_id: "text",
