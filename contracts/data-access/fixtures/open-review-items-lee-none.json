@@ -1,0 +1,19 @@
+{
+  "call": "openReviewItemsOf",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-23T15:02:12Z",
+    "note": "As open-review-items-lee-listing-match, asked for kind control before S1-75 has opened one: no item of that business and kind is open or waiting, so the list is empty, never an error. An item of another business, or one done, is never answered."
+  },
+  "request": {
+    "businessId": "biz-lee-home-services",
+    "kind": "control"
+  },
+  "outcome": {
+    "result": "openReviewItems",
+    "businessId": "biz-lee-home-services",
+    "kind": "control",
+    "items": []
+  }
+}

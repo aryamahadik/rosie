@@ -1,0 +1,33 @@
+{
+  "call": "startSignIn",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-23T14:58:00Z",
+    "note": "As start-sign-in-text-sam, for a mobile no K-22 account holds (+15555550199, a fiction-range number). Rules 0 to 3 pass, rule 4 finds no account, and the attempt is written with no person; no code row is written, since no handle is the account's own. The page gets attemptId, expiresAt and a ready text exactly as with an account, so the answer never tells whether an account exists; a text of it proves nothing."
+  },
+  "request": {
+    "id": "sia-unknown-text-1",
+    "attemptId": "attempt-unknown-text-1",
+    "requestSha256": "5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d",
+    "deviceSha256": "2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a",
+    "contact": {
+      "kind": "mobile",
+      "number": "+15555550199"
+    },
+    "contactHash": "6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e",
+    "hashKeyName": "PROOF_CODE_HASH_KEY",
+    "way": "text",
+    "codeId": "code-unknown-text-1",
+    "codeHash": "4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c"
+  },
+  "outcome": {
+    "result": "started",
+    "id": "sia-unknown-text-1",
+    "attemptId": "attempt-unknown-text-1",
+    "expiresAt": "2026-11-23T15:08:00Z",
+    "repeated": false,
+    "personId": null,
+    "codeId": null
+  }
+}

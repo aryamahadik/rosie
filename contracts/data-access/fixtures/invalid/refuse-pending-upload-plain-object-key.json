@@ -1,0 +1,23 @@
+{
+  "call": "readPendingUpload",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-23T15:02:11Z",
+    "note": "read-pending-upload-sam-id whose answer gives the object key in plain words: the key is kept and passed only sealed under the person's key (K-22 id_uploads.object_key, sealedBy person_id), so erasing the key erases the way to the file. Refused for its one fault, outcome.upload.objectKey; put right, it is read-pending-upload-sam-id."
+  },
+  "request": {
+    "uploadId": "upload-sam-id"
+  },
+  "outcome": {
+    "result": "pendingUpload",
+    "upload": {
+      "uploadId": "upload-sam-id",
+      "personId": "person-sam",
+      "businessId": null,
+      "purpose": "sign_up",
+      "contentType": "image/jpeg",
+      "objectKey": "id/person-sam/upload-sam-id.jpg"
+    }
+  }
+}

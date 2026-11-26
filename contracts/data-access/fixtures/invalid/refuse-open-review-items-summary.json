@@ -1,0 +1,28 @@
+{
+  "call": "openReviewItemsOf",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-23T15:02:12Z",
+    "note": "open-review-items-lee-listing-match whose item also carries its summary: the summary is Rosie's team's words for the team console alone (K-37 rule 2), and a check or a decision needs only the item's id, kind, state, version and who raised it. Refused for its one fault, outcome.items.0.summary; put right, it is open-review-items-lee-listing-match."
+  },
+  "request": {
+    "businessId": "biz-lee-home-services",
+    "kind": "listing_match"
+  },
+  "outcome": {
+    "result": "openReviewItems",
+    "businessId": "biz-lee-home-services",
+    "kind": "listing_match",
+    "items": [
+      {
+        "id": "review-lee-listing-match",
+        "kind": "listing_match",
+        "state": "open",
+        "version": 1,
+        "raisedByPersonId": "person-sam",
+        "summary": "The listing Sam named does not match a business on file. Check it before it goes live."
+      }
+    ]
+  }
+}
