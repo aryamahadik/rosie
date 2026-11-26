@@ -82,7 +82,9 @@
 // answering for, the commit is not sent (`transient`, nothing written), so no live turn's word lands before an older stop.
 //
 // An event's turn (T-1563; ruling T-1543 card A18; K-09 v1.14 defaults 221 to 233; ./event-door.ts): an event the actor's
-// door stored is queued here on its own (`queueEvent`, lease_events), never in a batch, and runs as a turn of its own: its
+// door stored is queued here on its own (`queueEvent`: a lease_batches row of its own, its batch id the negative of its
+// inbox seq, so it never meets a batch window's id and the actor keeps no new table), never in a batch of texts, and runs
+// as a turn of its own: its
 // one entry, its turn id `turnIdOf([eventId])`, its trace the hand-off's own (entries[0].traceId), no joined trace. One
 // turn at a time per handle, in arrival order (the inbox's seq): an event waits behind a running turn, which it never
 // restarts, and the text batches that wait behind it wait for its turn to end, never restarting it. A running turn of
@@ -478,30 +480,29 @@ export function createLeaseTables(sql: SqlStorage): void {
   sql.exec(
     "CREATE TABLE IF NOT EXISTS lease_commit_handles (turn_id TEXT PRIMARY KEY, handle_id TEXT NOT NULL)",
   );
-  // Every event the actor's door stored (A18), once, by its inbox seq: the turn that took it, or null while it waits.
-  sql.exec(
-    `CREATE TABLE IF NOT EXISTS lease_events (
-       event_id TEXT PRIMARY KEY,
-       seq INTEGER NOT NULL,
-       turn_id TEXT,
-       seen_ms INTEGER NOT NULL
-     )`,
-  );
   createScheduleTable(sql);
 }
 
+/**
+ * An event's row in lease_batches (A18): its batch id the negative of its inbox seq. A batch window's ids start at 1 and
+ * rise (batch.ts, AUTOINCREMENT), and an inbox seq is never reused, so the two never meet.
+ */
+const eventBatchIdOf = (seq: number): number => -seq;
+
 /** One waiting unit: a closed batch of texts, or an event, which is a turn of its own (A18). */
-type Waiting =
-  { kind: "batch"; batchId: number; items: Item[] } | { kind: "event"; eventId: string; items: Item[] };
+interface Waiting {
+  batchId: number;
+  items: Item[];
+}
 
 const firstSeqOf = (unit: Waiting): number => unit.items[0]?.seq ?? 0;
 
 /** The waiting batches of texts ahead of the first waiting event, in order: those a turn of texts may take (A18). */
-function leadingBatches(waiting: readonly Waiting[]): { batchId: number; items: Item[] }[] {
-  const batches: { batchId: number; items: Item[] }[] = [];
+function leadingBatches(waiting: readonly Waiting[]): Waiting[] {
+  const batches: Waiting[] = [];
   for (const unit of waiting) {
-    if (unit.kind === "event") break;
-    batches.push({ batchId: unit.batchId, items: unit.items });
+    if (isEventTurn(unit.items)) break;
+    batches.push(unit);
   }
   return batches;
 }
@@ -528,7 +529,7 @@ interface Snapshot {
 
 /**
  * What the waiting units do: open a turn (`replaces` null, restart 0) or replace the running one (restart 1 or 2), with
- * the batches it takes (`batchIds`) or the one event it runs (`eventId`, A18).
+ * the units it takes (`batchIds`: batches of texts, or one event's row, A18).
  */
 interface Plan {
   items: Item[];
@@ -536,7 +537,6 @@ interface Plan {
   /** What lease_turns.restart is written as for the turn the plan opens. */
   restart: 0 | 1 | 2;
   batchIds: number[];
-  eventId: string | null;
 }
 
 export interface LeaseHost {
@@ -659,13 +659,15 @@ export class TurnLease {
 
   /**
    * Queues an event the actor's door has just stored (A18) for a turn of its own, by its inbox seq, inside the caller's
-   * storage transaction (the door's write and this are one step): once per event id. Its turn opens with `kick`.
+   * storage transaction (the door's write and this are one step): once, as a lease_batches row of its own whose batch id
+   * is the negative of that seq (`eventBatchIdOf`) and whose one item is the event's. Its turn opens with `kick`.
    */
   queueEvent(seq: number, eventId: string): void {
+    const item: Item = { seq, eventId, event: true };
     this.sql.exec(
-      "INSERT OR IGNORE INTO lease_events (event_id, seq, turn_id, seen_ms) VALUES (?, ?, NULL, ?)",
-      eventId,
-      seq,
+      "INSERT OR IGNORE INTO lease_batches (batch_id, items, turn_id, seen_ms) VALUES (?, ?, NULL, ?)",
+      eventBatchIdOf(seq),
+      JSON.stringify([item]),
       actorClock().now(),
     );
     this.syncSchedule();
@@ -712,13 +714,6 @@ export class TurnLease {
           turnId,
           JSON.stringify(plan.batchIds),
         );
-        if (plan.eventId !== null) {
-          this.sql.exec(
-            "UPDATE lease_events SET turn_id = ? WHERE turn_id IS NULL AND event_id = ?",
-            turnId,
-            plan.eventId,
-          );
-        }
         if (plan.replaces === null) {
           // The table's one row: a second lease cannot be written beside a held one (the insert would fail).
           this.sql.exec(
@@ -748,24 +743,12 @@ export class TurnLease {
   private snapshot(): Snapshot {
     const lease = this.leaseRow();
     const turn = lease === undefined ? undefined : this.turnRow(lease.turn_id);
-    const batches = this.sql
+    // In arrival order: a batch by its first text's seq, an event by its own (A18). Without events this is batch order.
+    const waiting = this.sql
       .exec<WaitingRow>("SELECT batch_id, items FROM lease_batches WHERE turn_id IS NULL ORDER BY batch_id")
       .toArray()
-      .map((row): Waiting => ({
-        kind: "batch",
-        batchId: row.batch_id,
-        items: JSON.parse(row.items) as Item[],
-      }));
-    const events = this.sql
-      .exec<{ event_id: string; seq: number }>("SELECT event_id, seq FROM lease_events WHERE turn_id IS NULL")
-      .toArray()
-      .map((row): Waiting => ({
-        kind: "event",
-        eventId: row.event_id,
-        items: [{ seq: row.seq, eventId: row.event_id, event: true }],
-      }));
-    // In arrival order: a batch by its first text's seq, an event by its own (A18).
-    const waiting = [...batches, ...events].sort((a, b) => firstSeqOf(a) - firstSeqOf(b));
+      .map((row): Waiting => ({ batchId: row.batch_id, items: JSON.parse(row.items) as Item[] }))
+      .sort((a, b) => firstSeqOf(a) - firstSeqOf(b));
     const leading = leadingBatches(waiting);
     // Only a leased turn of texts that has used its one restart can take the second: the host is asked only while such a
     // turn holds the lease and batches wait ahead of any event (planOf still leaves one that is left for the park).
@@ -1298,12 +1281,7 @@ export class TurnLease {
       else scheduleEntry(this.sql, SCHEDULE_LEASE, lease.until_ms);
       return;
     }
-    const waiting = this.sql
-      .exec(
-        `SELECT 1 FROM lease_batches WHERE turn_id IS NULL
-         UNION ALL SELECT 1 FROM lease_events WHERE turn_id IS NULL LIMIT 1`,
-      )
-      .toArray();
+    const waiting = this.sql.exec("SELECT 1 FROM lease_batches WHERE turn_id IS NULL LIMIT 1").toArray();
     if (wired && waiting.length > 0) scheduleEntry(this.sql, SCHEDULE_LEASE, now);
     else unscheduleEntry(this.sql, SCHEDULE_LEASE);
   }
@@ -1358,18 +1336,14 @@ export class TurnLease {
       .exec<{ items: string }>("SELECT items FROM lease_batches WHERE turn_id IS NULL ORDER BY batch_id")
       .toArray();
     for (const row of [...turns, ...waiting]) items.push(...(JSON.parse(row.items) as Item[]));
-    const events = this.sql
-      .exec<{ event_id: string; seq: number }>("SELECT event_id, seq FROM lease_events WHERE turn_id IS NULL")
-      .toArray();
-    for (const row of events) items.push({ seq: row.seq, eventId: row.event_id, event: true });
     return [...new Set(bySeq(items).map((item) => item.eventId))];
   }
 
-  /** The batch ids that wait for the next turn, in order. */
+  /** The batch ids that wait for the next turn, in order (a batch window's; an event waiting is no batch: A18). */
   waiting(): number[] {
     return this.sql
       .exec<{ batch_id: number }>(
-        "SELECT batch_id FROM lease_batches WHERE turn_id IS NULL ORDER BY batch_id",
+        "SELECT batch_id FROM lease_batches WHERE turn_id IS NULL AND batch_id > 0 ORDER BY batch_id",
       )
       .toArray()
       .map((row) => row.batch_id);
@@ -1414,23 +1388,16 @@ function planOf(state: Snapshot, now: number): Plan | null {
   const first = state.waiting[0];
   if (first === undefined) return null;
   const live = state.lease;
-  if (live === null && first.kind === "event") {
-    return { items: [...first.items], replaces: null, restart: 0, batchIds: [], eventId: first.eventId };
+  if (live === null && isEventTurn(first.items)) {
+    return { items: [...first.items], replaces: null, restart: 0, batchIds: [first.batchId] };
   }
   const leading = leadingBatches(state.waiting);
   const waitingItems = leading.flatMap((batch) => batch.items);
   const batchIds = leading.map((batch) => batch.batchId);
-  if (live === null)
-    return { items: bySeq(waitingItems), replaces: null, restart: 0, batchIds, eventId: null };
+  if (live === null) return { items: bySeq(waitingItems), replaces: null, restart: 0, batchIds };
   const stuck = live.tries >= MAX_TRIES && live.untilMs <= now;
   if (live.state !== "leased" || stuck || isEventTurn(live.items) || leading.length === 0) return null;
   const restart = live.restart === 0 ? 1 : live.restart === 1 && state.stopWaiting ? 2 : null;
   if (restart === null) return null;
-  return {
-    items: bySeq([...live.items, ...waitingItems]),
-    replaces: live.turnId,
-    restart,
-    batchIds,
-    eventId: null,
-  };
+  return { items: bySeq([...live.items, ...waitingItems]), replaces: live.turnId, restart, batchIds };
 }
