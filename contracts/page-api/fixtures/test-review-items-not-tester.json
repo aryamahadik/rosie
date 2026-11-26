@@ -1,0 +1,20 @@
+{
+  "call": "testReviewItems",
+  "given": {
+    "now": "2026-10-20T14:05:00Z",
+    "environment": "staging",
+    "after": ["sign-in-done.json"],
+    "note": "K-21 v1.4: Sam, signed in on staging with his own session, opens the staging review page. He is neither a listed tester (K-22 v1.3 staging_testers) nor on Rosie's team, so the call reads nothing and answers notTester, as testRoster does: an owner never decides the review of his own business."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-staging-review-sam-0001",
+      "traceId": "trace-page-sam-0101",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": null
+    }
+  },
+  "outcome": {
+    "error": "notTester"
+  }
+}

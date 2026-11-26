@@ -9,7 +9,13 @@
 // value is a fixture's placeholder (rule 9).
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { isPageError, type OutcomeOf, type PageCall, type RequestOf } from "../../client/calls";
+import {
+  isPageError,
+  type KnownCall,
+  type KnownOutcomeOf,
+  type OutcomeOf,
+  type RequestOf,
+} from "../../client/calls";
 import { mockTransport, type MockTransport } from "../../client/test-support";
 import { readWebConfig } from "../../shell/config";
 import { REFERENCE_LABEL, renderErrorPage } from "../../shell/error-pages";
@@ -57,7 +63,10 @@ const ANSWER_IN_PRODUCTION = "fire-now-in-production.json";
 /** The same request's answer on staging. */
 const FIRED_ON_STAGING = "fire-now.json";
 
-/** K-21 v1's staging-only calls (contracts/page-api/README.md, "Staging only"). */
+/**
+ * K-21's staging-only calls (contracts/page-api/README.md, "Staging only"): v1's six and v1.4's two review calls
+ * (T-1548; T-1565), in the order of v1.4's `$defs/stagingOnlyCall`.
+ */
 const STAGING_ONLY_CALLS = [
   "testRoster",
   "testPhoneSend",
@@ -65,20 +74,24 @@ const STAGING_ONLY_CALLS = [
   "testClockRows",
   "fireNow",
   "textHoursOverride",
-] as const satisfies readonly PageCall[];
+  "testReviewItems",
+  "testDecideReviewItem",
+] as const satisfies readonly KnownCall[];
 type StagingOnlyCall = (typeof STAGING_ONLY_CALLS)[number];
 
 /**
- * Each staging-only call's refusal, as K-21 v1 types that call's outcome: this stops compiling if one of them loses
- * its stagingOnly error.
+ * Each staging-only call's refusal, as K-21 types that call's outcome (v1's calls by v1, v1.4's by v1.4): this stops
+ * compiling if one of them loses its stagingOnly error.
  */
-const REFUSALS: { [C in StagingOnlyCall]: Extract<OutcomeOf<C>, { error: "stagingOnly" }> } = {
+const REFUSALS: { [C in StagingOnlyCall]: Extract<KnownOutcomeOf<C>, { error: "stagingOnly" }> } = {
   testRoster: { error: "stagingOnly" },
   testPhoneSend: { error: "stagingOnly" },
   testPhoneParts: { error: "stagingOnly" },
   testClockRows: { error: "stagingOnly" },
   fireNow: { error: "stagingOnly" },
   textHoursOverride: { error: "stagingOnly" },
+  testReviewItems: { error: "stagingOnly" },
+  testDecideReviewItem: { error: "stagingOnly" },
 };
 
 const FIRE_NOW_PATH = "/console/team/example-fire-now";
@@ -273,5 +286,20 @@ describe("isStagingOnlyRefusal: the server's refusal of a staging-only call, and
       expect(STAGING_ONLY_CALLS as readonly string[], row.file).toContain(exchange.call);
     }
     expect(refusals).toContain(ANSWER_IN_PRODUCTION);
+  });
+
+  it("knows K-21 v1.4's staging-only calls, its two review calls among them, and finds their stagingOnly answers in production", () => {
+    const schema = readJson("../page-api.v1.4.schema.json") as {
+      $defs: { stagingOnlyCall: { enum: string[] } };
+    };
+    expect([...STAGING_ONLY_CALLS]).toEqual(schema.$defs.stagingOnlyCall.enum);
+    for (const file of ["test-review-items-in-production.json", "test-decide-review-in-production.json"]) {
+      expect(rowOf(file), file).toMatchObject({ version: "v1.4", expect: "accept" });
+      const exchange = exchangeOf(file);
+      expect(exchange.given.environment, file).toBe("production");
+      expect(exchange.outcome, file).toEqual({ error: STAGING_ONLY_ERROR });
+      expect(isStagingOnlyRefusal(exchange.outcome), file).toBe(true);
+      expect(isStagingOnlyRefusal(REFUSALS[exchange.call as StagingOnlyCall]), file).toBe(true);
+    }
   });
 });

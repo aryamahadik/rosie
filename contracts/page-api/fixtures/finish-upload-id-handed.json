@@ -1,0 +1,24 @@
+{
+  "call": "finishUpload",
+  "given": {
+    "now": "2026-10-19T14:31:00Z",
+    "environment": "staging",
+    "after": ["upload-id-document.json"],
+    "note": "K-21 v1.4 (ruling T-1543 card A8 (1)): Sam's ID photo reached the signed address at 14:30:41, on S1-10's page, signed in as the link's own person. After K-13 v1 checkUpload takes its size and type, the page entry hands the event {key id_checked, step S1-10, ref upload-sam-id-1} to Sam's chat handle actor (named from his account mobile's handle id, K-05 v1.24 item 1, and K-05 v1.10 item 50 readHandle, through the gateway's actorNameOf) and answers accepted once the actor holds it. This call commits nothing: the event turn (K-09 v1.14 gateAndCommit with input event) writes S1-10's sign_up id_uploads row, with the object key read by the upload id and sealed, then S1-75's rows and the next question to Sam by text. The object key, the event's id and the handle never leave the server. The same page as upload-id-finished.json (v1's answer, through saveSetupStep), on another request: one upload gets one of the two answers, never both."
+  },
+  "request": {
+    "page": {
+      "requestId": "req-secure-sam-0016",
+      "traceId": "trace-page-sam-0016",
+      "sessionToken": "placeholder-session-token-sam-0001",
+      "linkCode": "s01-placeholder-sam"
+    },
+    "uploadId": "upload-sam-id-1"
+  },
+  "outcome": {
+    "result": "accepted",
+    "uploadId": "upload-sam-id-1",
+    "purpose": "idDocument",
+    "event": { "key": "id_checked", "step": "S1-10", "ref": "upload-sam-id-1" }
+  }
+}

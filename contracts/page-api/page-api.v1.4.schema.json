@@ -1,0 +1,748 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/page-api/page-api.v1.4.schema.json",
+  "title": "PageApiV1dot4",
+  "description": "K-21 v1.4, a minor version for the text slice of journey 1's sign-up (T-1548; the architect's ruling T-1543, card A8, ops/reviews/signup-remainder/rule-rest.json; DL-1194). It only adds to v1.3 (page-api.v1.3.schema.json, frozen by T-062 and unchanged, referred to here, which refers to v1.2, v1.1 and v1): every v1, v1.1, v1.2 and v1.3 definition is here under its own name, all but four by reference; callName and stagingOnlyCall take only the two new names, finishUpload.response takes one more answer beside v1's (accepted: the ID upload's event handed to its person's chat handle actor), and finishUpload.exchange is restated only to take it. So every v1, v1.1, v1.2 and v1.3 exchange is a v1.4 exchange. Added: (1) finishUpload's event hand-off: for the link's own person's session, after K-13 v1 checkUpload, the page entry hands the event {key id_checked, step S1-10, ref the upload id} to that person's chat handle actor and answers accepted once the actor holds it; the commit follows in the event turn (K-09 v1.14's input event), and a repeat answers the first; (2) two staging-only calls, as testRoster: testReviewItems (the open review items of staging's test businesses, plain columns only: K-37 v1 rule 4) and testDecideReviewItem (one decided at the version read through K-09 v1 decideReviewItem with caller.kind console and the test console's member: K-05 v1.12 default 105; K-21 default 2), each for a signed-in listed tester (K-22 v1.3 staging_testers) or a team member; production answers stagingOnly, and an item of any other business notTestBusiness. teamConsole, teamAcknowledgePage and teamDecideReviewItem stay a live K-36 v1 team_page_recipients row's alone (README lines 95, 97, 151; default 2). The text slice's registration links and the text way of signInStart are README lines only: v1's calls, no new shape (README section 'v1.4'). A request still never names the person or the business it acts for. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    { "$ref": "#/$defs/openLink.exchange" },
+    { "$ref": "#/$defs/signInStart.exchange" },
+    { "$ref": "#/$defs/signInCheck.exchange" },
+    { "$ref": "#/$defs/signOut.exchange" },
+    { "$ref": "#/$defs/codeStart.exchange" },
+    { "$ref": "#/$defs/codeCheck.exchange" },
+    { "$ref": "#/$defs/readRegistration.exchange" },
+    { "$ref": "#/$defs/answerOnPage.exchange" },
+    { "$ref": "#/$defs/confirmOnPage.exchange" },
+    { "$ref": "#/$defs/signedUpload.exchange" },
+    { "$ref": "#/$defs/finishUpload.exchange" },
+    { "$ref": "#/$defs/stripeOnboardingStart.exchange" },
+    { "$ref": "#/$defs/stripeOnboardingReturn.exchange" },
+    { "$ref": "#/$defs/billCard.exchange" },
+    { "$ref": "#/$defs/calendarConnectStart.exchange" },
+    { "$ref": "#/$defs/calendarConnectReturn.exchange" },
+    { "$ref": "#/$defs/readStaffPage.exchange" },
+    { "$ref": "#/$defs/teamConsole.exchange" },
+    { "$ref": "#/$defs/teamAcknowledgePage.exchange" },
+    { "$ref": "#/$defs/teamDecideReviewItem.exchange" },
+    { "$ref": "#/$defs/testRoster.exchange" },
+    { "$ref": "#/$defs/testPhoneSend.exchange" },
+    { "$ref": "#/$defs/testPhoneParts.exchange" },
+    { "$ref": "#/$defs/testClockRows.exchange" },
+    { "$ref": "#/$defs/fireNow.exchange" },
+    { "$ref": "#/$defs/textHoursOverride.exchange" },
+    { "$ref": "#/$defs/readListing.exchange" },
+    { "$ref": "#/$defs/startBookingRequest.exchange" },
+    { "$ref": "#/$defs/bookingCheckStart.exchange" },
+    { "$ref": "#/$defs/bookingCheckCode.exchange" },
+    { "$ref": "#/$defs/bookingService.exchange" },
+    { "$ref": "#/$defs/bookingPrice.exchange" },
+    { "$ref": "#/$defs/bookingTimes.exchange" },
+    { "$ref": "#/$defs/bookingPick.exchange" },
+    { "$ref": "#/$defs/bookingSecureLink.exchange" },
+    { "$ref": "#/$defs/bookingReadBack.exchange" },
+    { "$ref": "#/$defs/bookingConfirm.exchange" },
+    { "$ref": "#/$defs/secureRead.exchange" },
+    { "$ref": "#/$defs/secureReadBack.exchange" },
+    { "$ref": "#/$defs/secureConfirm.exchange" },
+    { "$ref": "#/$defs/secureUpload.exchange" },
+    { "$ref": "#/$defs/readQuotes.exchange" },
+    { "$ref": "#/$defs/quoteReadBack.exchange" },
+    { "$ref": "#/$defs/quoteConfirm.exchange" },
+    { "$ref": "#/$defs/moneyStep.exchange" },
+    { "$ref": "#/$defs/moneyCard.exchange" },
+    { "$ref": "#/$defs/moneyYes.exchange" },
+    { "$ref": "#/$defs/moneyReadBack.exchange" },
+    { "$ref": "#/$defs/moneyConfirm.exchange" },
+    { "$ref": "#/$defs/documentRead.exchange" },
+    { "$ref": "#/$defs/documentSign.exchange" },
+    { "$ref": "#/$defs/readDocuments.exchange" },
+    { "$ref": "#/$defs/readOwnerAsks.exchange" },
+    { "$ref": "#/$defs/ownerAskReadBack.exchange" },
+    { "$ref": "#/$defs/ownerAskConfirm.exchange" },
+    { "$ref": "#/$defs/testReviewItems.exchange" },
+    { "$ref": "#/$defs/testDecideReviewItem.exchange" }
+  ],
+  "$defs": {
+    "id": { "$ref": "page-api.v1.3.schema.json#/$defs/id" },
+    "nullableId": { "$ref": "page-api.v1.3.schema.json#/$defs/nullableId" },
+    "utc": { "$ref": "page-api.v1.3.schema.json#/$defs/utc" },
+    "nullableUtc": { "$ref": "page-api.v1.3.schema.json#/$defs/nullableUtc" },
+    "version": { "$ref": "page-api.v1.3.schema.json#/$defs/version" },
+    "rowRef": { "$ref": "page-api.v1.3.schema.json#/$defs/rowRef" },
+    "traceId": { "$ref": "page-api.v1.3.schema.json#/$defs/traceId" },
+    "stepId": { "$ref": "page-api.v1.3.schema.json#/$defs/stepId" },
+    "opaqueToken": { "$ref": "page-api.v1.3.schema.json#/$defs/opaqueToken" },
+    "linkCode": { "$ref": "page-api.v1.3.schema.json#/$defs/linkCode" },
+    "httpsUrl": { "$ref": "page-api.v1.3.schema.json#/$defs/httpsUrl" },
+    "page": { "$ref": "page-api.v1.3.schema.json#/$defs/page" },
+    "linkPage": { "$ref": "page-api.v1.3.schema.json#/$defs/linkPage" },
+    "signedInPage": { "$ref": "page-api.v1.3.schema.json#/$defs/signedInPage" },
+    "signedInLinkPage": { "$ref": "page-api.v1.3.schema.json#/$defs/signedInLinkPage" },
+    "given": { "$ref": "page-api.v1.3.schema.json#/$defs/given" },
+    "signInNeededError": { "$ref": "page-api.v1.3.schema.json#/$defs/signInNeededError" },
+    "linkExpiredError": { "$ref": "page-api.v1.3.schema.json#/$defs/linkExpiredError" },
+    "notTeamError": { "$ref": "page-api.v1.3.schema.json#/$defs/notTeamError" },
+    "notTesterError": { "$ref": "page-api.v1.3.schema.json#/$defs/notTesterError" },
+    "stagingOnlyError": { "$ref": "page-api.v1.3.schema.json#/$defs/stagingOnlyError" },
+    "notTestPhoneError": { "$ref": "page-api.v1.3.schema.json#/$defs/notTestPhoneError" },
+    "notTestHandleError": { "$ref": "page-api.v1.3.schema.json#/$defs/notTestHandleError" },
+    "providerUnavailableError": { "$ref": "page-api.v1.3.schema.json#/$defs/providerUnavailableError" },
+    "notAllowedError": { "$ref": "page-api.v1.3.schema.json#/$defs/notAllowedError" },
+    "bookingPausedError": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingPausedError" },
+    "transientError": { "$ref": "page-api.v1.3.schema.json#/$defs/transientError" },
+    "versionChangedError": { "$ref": "page-api.v1.3.schema.json#/$defs/versionChangedError" },
+    "pageKind": { "$ref": "page-api.v1.3.schema.json#/$defs/pageKind" },
+    "pageSection": { "$ref": "page-api.v1.3.schema.json#/$defs/pageSection" },
+    "pageQuestion": { "$ref": "page-api.v1.3.schema.json#/$defs/pageQuestion" },
+    "readBack": { "$ref": "page-api.v1.3.schema.json#/$defs/readBack" },
+    "servedSetupStep": { "$ref": "page-api.v1.3.schema.json#/$defs/servedSetupStep" },
+    "uploadPurpose": { "$ref": "page-api.v1.3.schema.json#/$defs/uploadPurpose" },
+    "uploadRefusedErrors": { "$ref": "page-api.v1.3.schema.json#/$defs/uploadRefusedErrors" },
+    "calendarProvider": { "$ref": "page-api.v1.3.schema.json#/$defs/calendarProvider" },
+    "textHours": { "$ref": "page-api.v1.3.schema.json#/$defs/textHours" },
+    "textHoursOverrideState": { "$ref": "page-api.v1.3.schema.json#/$defs/textHoursOverrideState" },
+    "shownPhoto": { "$ref": "page-api.v1.3.schema.json#/$defs/shownPhoto" },
+    "registrationPreview": { "$ref": "page-api.v1.3.schema.json#/$defs/registrationPreview" },
+    "registrationSummary": { "$ref": "page-api.v1.3.schema.json#/$defs/registrationSummary" },
+    "stagingOnlyCall": {
+      "title": "StagingOnlyCall",
+      "description": "The calls that exist on staging only and answer stagingOnly in production (BP 9.4): v1's six (page-api.v1.schema.json stagingOnlyCall, unchanged) and v1.4's two, testReviewItems and testDecideReviewItem, only by new enum values (README section 'v1.4', default 79).",
+      "type": "string",
+      "enum": [
+        "testRoster",
+        "testPhoneSend",
+        "testPhoneParts",
+        "testClockRows",
+        "fireNow",
+        "textHoursOverride",
+        "testReviewItems",
+        "testDecideReviewItem"
+      ]
+    },
+    "callName": {
+      "title": "PageCallName",
+      "description": "Every call v1.4 holds: v1.3's (page-api.v1.3.schema.json callName, unchanged) and the two v1.4 adds (testReviewItems, testDecideReviewItem), only by new enum values. Each has <call>.request, <call>.response, <call>.errors and <call>.exchange under $defs (02-contracts section 2 item 2). Both are staging-only (stagingOnlyCall).",
+      "type": "string",
+      "enum": [
+        "openLink",
+        "signInStart",
+        "signInCheck",
+        "signOut",
+        "codeStart",
+        "codeCheck",
+        "readRegistration",
+        "answerOnPage",
+        "confirmOnPage",
+        "signedUpload",
+        "finishUpload",
+        "stripeOnboardingStart",
+        "stripeOnboardingReturn",
+        "billCard",
+        "calendarConnectStart",
+        "calendarConnectReturn",
+        "readStaffPage",
+        "teamConsole",
+        "teamAcknowledgePage",
+        "teamDecideReviewItem",
+        "testRoster",
+        "testPhoneSend",
+        "testPhoneParts",
+        "testClockRows",
+        "fireNow",
+        "textHoursOverride",
+        "readListing",
+        "startBookingRequest",
+        "bookingCheckStart",
+        "bookingCheckCode",
+        "bookingService",
+        "bookingPrice",
+        "bookingTimes",
+        "bookingPick",
+        "bookingSecureLink",
+        "bookingReadBack",
+        "bookingConfirm",
+        "secureRead",
+        "secureReadBack",
+        "secureConfirm",
+        "secureUpload",
+        "readQuotes",
+        "quoteReadBack",
+        "quoteConfirm",
+        "moneyStep",
+        "moneyCard",
+        "moneyYes",
+        "moneyReadBack",
+        "moneyConfirm",
+        "documentRead",
+        "documentSign",
+        "readDocuments",
+        "readOwnerAsks",
+        "ownerAskReadBack",
+        "ownerAskConfirm",
+        "testReviewItems",
+        "testDecideReviewItem"
+      ]
+    },
+
+    "openLink.request": { "$ref": "page-api.v1.3.schema.json#/$defs/openLink.request" },
+    "openLink.response": { "$ref": "page-api.v1.3.schema.json#/$defs/openLink.response" },
+    "openLink.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/openLink.errors" },
+    "openLink.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/openLink.exchange" },
+    "signInStart.request": { "$ref": "page-api.v1.3.schema.json#/$defs/signInStart.request" },
+    "signInStart.response": { "$ref": "page-api.v1.3.schema.json#/$defs/signInStart.response" },
+    "signInStart.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/signInStart.errors" },
+    "signInStart.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/signInStart.exchange" },
+    "signInCheck.request": { "$ref": "page-api.v1.3.schema.json#/$defs/signInCheck.request" },
+    "signInCheck.response": { "$ref": "page-api.v1.3.schema.json#/$defs/signInCheck.response" },
+    "signInCheck.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/signInCheck.errors" },
+    "signInCheck.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/signInCheck.exchange" },
+    "signOut.request": { "$ref": "page-api.v1.3.schema.json#/$defs/signOut.request" },
+    "signOut.response": { "$ref": "page-api.v1.3.schema.json#/$defs/signOut.response" },
+    "signOut.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/signOut.errors" },
+    "signOut.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/signOut.exchange" },
+    "codeStart.request": { "$ref": "page-api.v1.3.schema.json#/$defs/codeStart.request" },
+    "codeStart.response": { "$ref": "page-api.v1.3.schema.json#/$defs/codeStart.response" },
+    "codeStart.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/codeStart.errors" },
+    "codeStart.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/codeStart.exchange" },
+    "codeCheck.request": { "$ref": "page-api.v1.3.schema.json#/$defs/codeCheck.request" },
+    "codeCheck.response": { "$ref": "page-api.v1.3.schema.json#/$defs/codeCheck.response" },
+    "codeCheck.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/codeCheck.errors" },
+    "codeCheck.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/codeCheck.exchange" },
+    "readRegistration.request": { "$ref": "page-api.v1.3.schema.json#/$defs/readRegistration.request" },
+    "readRegistration.response": { "$ref": "page-api.v1.3.schema.json#/$defs/readRegistration.response" },
+    "readRegistration.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/readRegistration.errors" },
+    "readRegistration.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/readRegistration.exchange" },
+    "answerOnPage.request": { "$ref": "page-api.v1.3.schema.json#/$defs/answerOnPage.request" },
+    "answerOnPage.response": { "$ref": "page-api.v1.3.schema.json#/$defs/answerOnPage.response" },
+    "answerOnPage.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/answerOnPage.errors" },
+    "answerOnPage.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/answerOnPage.exchange" },
+    "confirmOnPage.request": { "$ref": "page-api.v1.3.schema.json#/$defs/confirmOnPage.request" },
+    "confirmOnPage.response": { "$ref": "page-api.v1.3.schema.json#/$defs/confirmOnPage.response" },
+    "confirmOnPage.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/confirmOnPage.errors" },
+    "confirmOnPage.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/confirmOnPage.exchange" },
+    "signedUpload.request": { "$ref": "page-api.v1.3.schema.json#/$defs/signedUpload.request" },
+    "signedUpload.response": { "$ref": "page-api.v1.3.schema.json#/$defs/signedUpload.response" },
+    "signedUpload.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/signedUpload.errors" },
+    "signedUpload.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/signedUpload.exchange" },
+    "finishUpload.request": { "$ref": "page-api.v1.3.schema.json#/$defs/finishUpload.request" },
+    "idCheckedEvent": {
+      "title": "IdCheckedEvent",
+      "description": "The event finishUpload hands to the person's chat handle actor for an ID document (ruling T-1543 card A8 (1); K-09 v1.14's input event, whose eventId the page entry makes and never shows): key id_checked, the key S1-10 gives (K-09 v1 id-upload-confirmed.json gives id_checked); step S1-10, the step that waits for it (K-09 v1.14: id_checked waits at S1-10 while the upload came through a live setupIdCheck link of the event's person and business and no sign_up id_uploads row is on file); ref, the upload id the page holds, the same as the answer's uploadId (the contract test checks the two are equal). The object key is never in the event: the event turn reads it by the upload id and seals it (K-05 v1.24 item 2). Never a key, an object key or a link in a span or a log.",
+      "type": "object",
+      "properties": {
+        "key": { "const": "id_checked" },
+        "step": { "const": "S1-10" },
+        "ref": { "$ref": "#/$defs/id" }
+      },
+      "required": ["key", "step", "ref"],
+      "additionalProperties": false
+    },
+    "uploadHandedOn": {
+      "title": "UploadHandedOn",
+      "description": "v1.4's answer for an ID document (README section 'v1.4', default 80): the file is stored, K-13 v1 checkUpload took its size and type, and the event idCheckedEvent is held by the person's chat handle actor, which runs it as a turn of its own (K-09 v1.14 gateAndCommit with input event; the runtime's event door). Nothing is committed by this call: S1-10's sign_up id_uploads row, S1-75's rows and the next question are the event turn's commit, which follows, and the owner hears what comes next by text. A repeat with the same uploadId answers this answer again and hands nothing more (the actor drops a known event id; the event turn writes once). Only idDocument's upload is handed on; every other purpose keeps v1's stored answer with served null.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "accepted" },
+        "uploadId": { "$ref": "#/$defs/id" },
+        "purpose": { "const": "idDocument" },
+        "event": { "$ref": "#/$defs/idCheckedEvent" }
+      },
+      "required": ["result", "uploadId", "purpose", "event"],
+      "additionalProperties": false
+    },
+    "finishUpload.response": {
+      "title": "FinishUploadResponse",
+      "description": "v1's answer (page-api.v1.3.schema.json finishUpload.response, unchanged: stored, with S1-10's saveSetupStep write for an ID document or served null for any other purpose), or v1.4's for an ID document: accepted, the event handed to the person's chat handle actor and its commit to follow in the event turn (uploadHandedOn). On v1.4 the page entry answers an ID document's upload with accepted (README section 'v1.4', default 80); one upload gets one of the two, never both.",
+      "anyOf": [
+        { "$ref": "page-api.v1.3.schema.json#/$defs/finishUpload.response" },
+        { "$ref": "#/$defs/uploadHandedOn" }
+      ]
+    },
+    "finishUpload.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/finishUpload.errors" },
+    "finishUpload.exchange": {
+      "title": "FinishUploadExchange",
+      "description": "One finishUpload request with its outcome: v1's exchange with v1.4's finishUpload.response, which takes the accepted answer beside v1's.",
+      "type": "object",
+      "properties": {
+        "call": { "const": "finishUpload" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/finishUpload.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/finishUpload.response" }, { "$ref": "#/$defs/finishUpload.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "stripeOnboardingStart.request": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/stripeOnboardingStart.request"
+    },
+    "stripeOnboardingStart.response": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/stripeOnboardingStart.response"
+    },
+    "stripeOnboardingStart.errors": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/stripeOnboardingStart.errors"
+    },
+    "stripeOnboardingStart.exchange": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/stripeOnboardingStart.exchange"
+    },
+    "stripeOnboardingReturn.request": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/stripeOnboardingReturn.request"
+    },
+    "stripeOnboardingReturn.response": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/stripeOnboardingReturn.response"
+    },
+    "stripeOnboardingReturn.errors": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/stripeOnboardingReturn.errors"
+    },
+    "stripeOnboardingReturn.exchange": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/stripeOnboardingReturn.exchange"
+    },
+    "billCard.request": { "$ref": "page-api.v1.3.schema.json#/$defs/billCard.request" },
+    "billCard.response": { "$ref": "page-api.v1.3.schema.json#/$defs/billCard.response" },
+    "billCard.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/billCard.errors" },
+    "billCard.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/billCard.exchange" },
+    "calendarConnectStart.request": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/calendarConnectStart.request"
+    },
+    "calendarConnectStart.response": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/calendarConnectStart.response"
+    },
+    "calendarConnectStart.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/calendarConnectStart.errors" },
+    "calendarConnectStart.exchange": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/calendarConnectStart.exchange"
+    },
+    "calendarConnectReturn.request": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/calendarConnectReturn.request"
+    },
+    "calendarConnectReturn.response": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/calendarConnectReturn.response"
+    },
+    "calendarConnectReturn.errors": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/calendarConnectReturn.errors"
+    },
+    "calendarConnectReturn.exchange": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/calendarConnectReturn.exchange"
+    },
+    "readStaffPage.request": { "$ref": "page-api.v1.3.schema.json#/$defs/readStaffPage.request" },
+    "readStaffPage.response": { "$ref": "page-api.v1.3.schema.json#/$defs/readStaffPage.response" },
+    "readStaffPage.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/readStaffPage.errors" },
+    "readStaffPage.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/readStaffPage.exchange" },
+    "teamConsole.request": { "$ref": "page-api.v1.3.schema.json#/$defs/teamConsole.request" },
+    "teamConsole.response": { "$ref": "page-api.v1.3.schema.json#/$defs/teamConsole.response" },
+    "teamConsole.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/teamConsole.errors" },
+    "teamConsole.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/teamConsole.exchange" },
+    "teamAcknowledgePage.request": { "$ref": "page-api.v1.3.schema.json#/$defs/teamAcknowledgePage.request" },
+    "teamAcknowledgePage.response": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/teamAcknowledgePage.response"
+    },
+    "teamAcknowledgePage.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/teamAcknowledgePage.errors" },
+    "teamAcknowledgePage.exchange": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/teamAcknowledgePage.exchange"
+    },
+    "teamDecideReviewItem.request": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/teamDecideReviewItem.request"
+    },
+    "teamDecideReviewItem.response": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/teamDecideReviewItem.response"
+    },
+    "teamDecideReviewItem.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/teamDecideReviewItem.errors" },
+    "teamDecideReviewItem.exchange": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/teamDecideReviewItem.exchange"
+    },
+    "testRoster.request": { "$ref": "page-api.v1.3.schema.json#/$defs/testRoster.request" },
+    "testRoster.response": { "$ref": "page-api.v1.3.schema.json#/$defs/testRoster.response" },
+    "testRoster.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/testRoster.errors" },
+    "testRoster.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/testRoster.exchange" },
+    "testPhoneSend.request": { "$ref": "page-api.v1.3.schema.json#/$defs/testPhoneSend.request" },
+    "testPhoneSend.response": { "$ref": "page-api.v1.3.schema.json#/$defs/testPhoneSend.response" },
+    "testPhoneSend.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/testPhoneSend.errors" },
+    "testPhoneSend.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/testPhoneSend.exchange" },
+    "testPhoneParts.request": { "$ref": "page-api.v1.3.schema.json#/$defs/testPhoneParts.request" },
+    "testPhoneParts.response": { "$ref": "page-api.v1.3.schema.json#/$defs/testPhoneParts.response" },
+    "testPhoneParts.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/testPhoneParts.errors" },
+    "testPhoneParts.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/testPhoneParts.exchange" },
+    "testClockRows.request": { "$ref": "page-api.v1.3.schema.json#/$defs/testClockRows.request" },
+    "testClockRows.response": { "$ref": "page-api.v1.3.schema.json#/$defs/testClockRows.response" },
+    "testClockRows.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/testClockRows.errors" },
+    "testClockRows.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/testClockRows.exchange" },
+    "fireNow.request": { "$ref": "page-api.v1.3.schema.json#/$defs/fireNow.request" },
+    "fireNow.response": { "$ref": "page-api.v1.3.schema.json#/$defs/fireNow.response" },
+    "fireNow.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/fireNow.errors" },
+    "fireNow.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/fireNow.exchange" },
+    "textHoursOverride.request": { "$ref": "page-api.v1.3.schema.json#/$defs/textHoursOverride.request" },
+    "textHoursOverride.response": { "$ref": "page-api.v1.3.schema.json#/$defs/textHoursOverride.response" },
+    "textHoursOverride.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/textHoursOverride.errors" },
+    "textHoursOverride.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/textHoursOverride.exchange" },
+
+    "listingCode": { "$ref": "page-api.v1.3.schema.json#/$defs/listingCode" },
+    "publicPage": { "$ref": "page-api.v1.3.schema.json#/$defs/publicPage" },
+    "notListedError": { "$ref": "page-api.v1.3.schema.json#/$defs/notListedError" },
+    "cannotBookHereError": { "$ref": "page-api.v1.3.schema.json#/$defs/cannotBookHereError" },
+    "notTakingNewBookingsError": { "$ref": "page-api.v1.3.schema.json#/$defs/notTakingNewBookingsError" },
+    "safetyFirstError": { "$ref": "page-api.v1.3.schema.json#/$defs/safetyFirstError" },
+    "goOnSafetyLine": { "$ref": "page-api.v1.3.schema.json#/$defs/goOnSafetyLine" },
+    "pageWordsSwap": { "$ref": "page-api.v1.3.schema.json#/$defs/pageWordsSwap" },
+    "localDate": { "$ref": "page-api.v1.3.schema.json#/$defs/localDate" },
+    "money": { "$ref": "page-api.v1.3.schema.json#/$defs/money" },
+    "currency": { "$ref": "page-api.v1.3.schema.json#/$defs/currency" },
+    "listedPrice": { "$ref": "page-api.v1.3.schema.json#/$defs/listedPrice" },
+    "listedWay": { "$ref": "page-api.v1.3.schema.json#/$defs/listedWay" },
+    "listedLength": { "$ref": "page-api.v1.3.schema.json#/$defs/listedLength" },
+    "listedService": { "$ref": "page-api.v1.3.schema.json#/$defs/listedService" },
+    "listedLocation": { "$ref": "page-api.v1.3.schema.json#/$defs/listedLocation" },
+    "listedDocument": { "$ref": "page-api.v1.3.schema.json#/$defs/listedDocument" },
+    "listedPhoto": { "$ref": "page-api.v1.3.schema.json#/$defs/listedPhoto" },
+    "listedFaq": { "$ref": "page-api.v1.3.schema.json#/$defs/listedFaq" },
+    "readListing.request": { "$ref": "page-api.v1.3.schema.json#/$defs/readListing.request" },
+    "readListing.response": { "$ref": "page-api.v1.3.schema.json#/$defs/readListing.response" },
+    "readListing.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/readListing.errors" },
+    "readListing.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/readListing.exchange" },
+    "startBookingRequest.request": { "$ref": "page-api.v1.3.schema.json#/$defs/startBookingRequest.request" },
+    "startBookingRequest.response": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/startBookingRequest.response"
+    },
+    "startBookingRequest.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/startBookingRequest.errors" },
+    "startBookingRequest.exchange": {
+      "$ref": "page-api.v1.3.schema.json#/$defs/startBookingRequest.exchange"
+    },
+    "bookingCheckStart.request": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingCheckStart.request" },
+    "bookingCheckStart.response": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingCheckStart.response" },
+    "bookingCheckStart.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingCheckStart.errors" },
+    "bookingCheckStart.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingCheckStart.exchange" },
+    "bookingCheckCode.request": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingCheckCode.request" },
+    "bookingCheckCode.response": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingCheckCode.response" },
+    "bookingCheckCode.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingCheckCode.errors" },
+    "bookingCheckCode.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingCheckCode.exchange" },
+
+    "during": { "$ref": "page-api.v1.3.schema.json#/$defs/during" },
+    "zone": { "$ref": "page-api.v1.3.schema.json#/$defs/zone" },
+    "phoneNumber": { "$ref": "page-api.v1.3.schema.json#/$defs/phoneNumber" },
+    "emailAddress": { "$ref": "page-api.v1.3.schema.json#/$defs/emailAddress" },
+    "optionPrice": { "$ref": "page-api.v1.3.schema.json#/$defs/optionPrice" },
+    "wrongDetailsError": { "$ref": "page-api.v1.3.schema.json#/$defs/wrongDetailsError" },
+    "mobileRequiredError": { "$ref": "page-api.v1.3.schema.json#/$defs/mobileRequiredError" },
+    "geoUnavailableError": { "$ref": "page-api.v1.3.schema.json#/$defs/geoUnavailableError" },
+    "quoteStateError": { "$ref": "page-api.v1.3.schema.json#/$defs/quoteStateError" },
+    "readBackChangedError": { "$ref": "page-api.v1.3.schema.json#/$defs/readBackChangedError" },
+    "readBackExpiredError": { "$ref": "page-api.v1.3.schema.json#/$defs/readBackExpiredError" },
+    "fieldsInvalidError": { "$ref": "page-api.v1.3.schema.json#/$defs/fieldsInvalidError" },
+    "uploadNotFoundError": { "$ref": "page-api.v1.3.schema.json#/$defs/uploadNotFoundError" },
+    "requestNotFoundError": { "$ref": "page-api.v1.3.schema.json#/$defs/requestNotFoundError" },
+    "stepFirstError": { "$ref": "page-api.v1.3.schema.json#/$defs/stepFirstError" },
+    "cantTakeItError": { "$ref": "page-api.v1.3.schema.json#/$defs/cantTakeItError" },
+    "requestEndedError": { "$ref": "page-api.v1.3.schema.json#/$defs/requestEndedError" },
+    "timeTakenError": { "$ref": "page-api.v1.3.schema.json#/$defs/timeTakenError" },
+    "noMoreTimeError": { "$ref": "page-api.v1.3.schema.json#/$defs/noMoreTimeError" },
+    "notThisPageError": { "$ref": "page-api.v1.3.schema.json#/$defs/notThisPageError" },
+    "requestPage": { "$ref": "page-api.v1.3.schema.json#/$defs/requestPage" },
+    "secureLinkCode": { "$ref": "page-api.v1.3.schema.json#/$defs/secureLinkCode" },
+    "secureLinkPage": { "$ref": "page-api.v1.3.schema.json#/$defs/secureLinkPage" },
+    "timeShown": { "$ref": "page-api.v1.3.schema.json#/$defs/timeShown" },
+    "timesCard": { "$ref": "page-api.v1.3.schema.json#/$defs/timesCard" },
+    "linkGiven": { "$ref": "page-api.v1.3.schema.json#/$defs/linkGiven" },
+    "authorityKind": { "$ref": "page-api.v1.3.schema.json#/$defs/authorityKind" },
+    "authorityAsk": { "$ref": "page-api.v1.3.schema.json#/$defs/authorityAsk" },
+    "pageAsk": { "$ref": "page-api.v1.3.schema.json#/$defs/pageAsk" },
+    "pageAnswer": { "$ref": "page-api.v1.3.schema.json#/$defs/pageAnswer" },
+    "requestShown": { "$ref": "page-api.v1.3.schema.json#/$defs/requestShown" },
+    "quoteWaiting": { "$ref": "page-api.v1.3.schema.json#/$defs/quoteWaiting" },
+    "bookingService.request": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingService.request" },
+    "bookingService.response": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingService.response" },
+    "bookingService.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingService.errors" },
+    "bookingService.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingService.exchange" },
+    "bookingPrice.request": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingPrice.request" },
+    "bookingPrice.response": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingPrice.response" },
+    "bookingPrice.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingPrice.errors" },
+    "bookingPrice.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingPrice.exchange" },
+    "bookingTimes.request": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingTimes.request" },
+    "bookingTimes.response": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingTimes.response" },
+    "bookingTimes.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingTimes.errors" },
+    "bookingTimes.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingTimes.exchange" },
+    "bookingPick.request": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingPick.request" },
+    "bookingPick.response": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingPick.response" },
+    "bookingPick.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingPick.errors" },
+    "bookingPick.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingPick.exchange" },
+    "bookingSecureLink.request": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingSecureLink.request" },
+    "bookingSecureLink.response": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingSecureLink.response" },
+    "bookingSecureLink.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingSecureLink.errors" },
+    "bookingSecureLink.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingSecureLink.exchange" },
+    "bookingChange": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingChange" },
+    "bookingReadBack.request": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingReadBack.request" },
+    "bookingReadBack.response": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingReadBack.response" },
+    "bookingReadBack.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingReadBack.errors" },
+    "bookingReadBack.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingReadBack.exchange" },
+    "bookingConfirm.request": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingConfirm.request" },
+    "bookingConfirm.response": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingConfirm.response" },
+    "bookingServed": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingServed" },
+    "bookingConfirm.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingConfirm.errors" },
+    "bookingConfirm.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/bookingConfirm.exchange" },
+    "secureRead.request": { "$ref": "page-api.v1.3.schema.json#/$defs/secureRead.request" },
+    "secureRead.response": { "$ref": "page-api.v1.3.schema.json#/$defs/secureRead.response" },
+    "secureRead.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/secureRead.errors" },
+    "secureRead.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/secureRead.exchange" },
+    "secureChange": { "$ref": "page-api.v1.3.schema.json#/$defs/secureChange" },
+    "secureReadBack.request": { "$ref": "page-api.v1.3.schema.json#/$defs/secureReadBack.request" },
+    "secureReadBack.response": { "$ref": "page-api.v1.3.schema.json#/$defs/secureReadBack.response" },
+    "secureReadBack.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/secureReadBack.errors" },
+    "secureReadBack.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/secureReadBack.exchange" },
+    "secureConfirm.request": { "$ref": "page-api.v1.3.schema.json#/$defs/secureConfirm.request" },
+    "secureConfirm.response": { "$ref": "page-api.v1.3.schema.json#/$defs/secureConfirm.response" },
+    "secureServed": { "$ref": "page-api.v1.3.schema.json#/$defs/secureServed" },
+    "secureConfirm.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/secureConfirm.errors" },
+    "secureConfirm.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/secureConfirm.exchange" },
+    "secureUpload.request": { "$ref": "page-api.v1.3.schema.json#/$defs/secureUpload.request" },
+    "secureUpload.response": { "$ref": "page-api.v1.3.schema.json#/$defs/secureUpload.response" },
+    "secureUpload.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/secureUpload.errors" },
+    "secureUpload.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/secureUpload.exchange" },
+    "readQuotes.request": { "$ref": "page-api.v1.3.schema.json#/$defs/readQuotes.request" },
+    "readQuotes.response": { "$ref": "page-api.v1.3.schema.json#/$defs/readQuotes.response" },
+    "readQuotes.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/readQuotes.errors" },
+    "readQuotes.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/readQuotes.exchange" },
+    "quoteChange": { "$ref": "page-api.v1.3.schema.json#/$defs/quoteChange" },
+    "quoteReadBack.request": { "$ref": "page-api.v1.3.schema.json#/$defs/quoteReadBack.request" },
+    "quoteReadBack.response": { "$ref": "page-api.v1.3.schema.json#/$defs/quoteReadBack.response" },
+    "quoteReadBack.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/quoteReadBack.errors" },
+    "quoteReadBack.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/quoteReadBack.exchange" },
+    "quoteConfirm.request": { "$ref": "page-api.v1.3.schema.json#/$defs/quoteConfirm.request" },
+    "quoteConfirm.response": { "$ref": "page-api.v1.3.schema.json#/$defs/quoteConfirm.response" },
+    "quoteConfirm.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/quoteConfirm.errors" },
+    "quoteConfirm.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/quoteConfirm.exchange" },
+
+    "moneyBranch": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyBranch" },
+    "cardShown": { "$ref": "page-api.v1.3.schema.json#/$defs/cardShown" },
+    "clientSecret": { "$ref": "page-api.v1.3.schema.json#/$defs/clientSecret" },
+    "stripeAccountId": { "$ref": "page-api.v1.3.schema.json#/$defs/stripeAccountId" },
+    "notOfferedError": { "$ref": "page-api.v1.3.schema.json#/$defs/notOfferedError" },
+    "creditsShortError": { "$ref": "page-api.v1.3.schema.json#/$defs/creditsShortError" },
+    "cardNotReadyError": { "$ref": "page-api.v1.3.schema.json#/$defs/cardNotReadyError" },
+    "holdEndedError": { "$ref": "page-api.v1.3.schema.json#/$defs/holdEndedError" },
+    "documentFirstError": { "$ref": "page-api.v1.3.schema.json#/$defs/documentFirstError" },
+    "noCardNeededError": { "$ref": "page-api.v1.3.schema.json#/$defs/noCardNeededError" },
+    "noDocumentError": { "$ref": "page-api.v1.3.schema.json#/$defs/noDocumentError" },
+    "moneyTimeTakenError": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyTimeTakenError" },
+    "payLinkCode": { "$ref": "page-api.v1.3.schema.json#/$defs/payLinkCode" },
+    "payLinkPage": { "$ref": "page-api.v1.3.schema.json#/$defs/payLinkPage" },
+    "moneyLineShown": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyLineShown" },
+    "creditOffer": { "$ref": "page-api.v1.3.schema.json#/$defs/creditOffer" },
+    "buyOffer": { "$ref": "page-api.v1.3.schema.json#/$defs/buyOffer" },
+    "planOffer": { "$ref": "page-api.v1.3.schema.json#/$defs/planOffer" },
+    "documentState": { "$ref": "page-api.v1.3.schema.json#/$defs/documentState" },
+    "moneyStepShown": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyStepShown" },
+    "moneyStepChangedError": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyStepChangedError" },
+    "moneyStep.request": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyStep.request" },
+    "moneyStep.response": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyStep.response" },
+    "moneyStep.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyStep.errors" },
+    "moneyStep.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyStep.exchange" },
+    "moneyCard.request": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyCard.request" },
+    "moneyCard.response": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyCard.response" },
+    "moneyCard.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyCard.errors" },
+    "moneyCard.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyCard.exchange" },
+    "moneyYes.request": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyYes.request" },
+    "moneyYes.response": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyYes.response" },
+    "moneyYes.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyYes.errors" },
+    "moneyYes.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyYes.exchange" },
+    "moneyChange": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyChange" },
+    "moneyReadBack.request": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyReadBack.request" },
+    "moneyReadBack.response": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyReadBack.response" },
+    "moneyReadBack.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyReadBack.errors" },
+    "moneyReadBack.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyReadBack.exchange" },
+    "moneyConfirm.request": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyConfirm.request" },
+    "moneyConfirm.response": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyConfirm.response" },
+    "moneyServed": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyServed" },
+    "moneyConfirm.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyConfirm.errors" },
+    "moneyConfirm.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/moneyConfirm.exchange" },
+    "documentLanguage": { "$ref": "page-api.v1.3.schema.json#/$defs/documentLanguage" },
+    "builtDocumentKind": { "$ref": "page-api.v1.3.schema.json#/$defs/builtDocumentKind" },
+    "documentRead.request": { "$ref": "page-api.v1.3.schema.json#/$defs/documentRead.request" },
+    "documentRead.response": { "$ref": "page-api.v1.3.schema.json#/$defs/documentRead.response" },
+    "documentRead.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/documentRead.errors" },
+    "documentRead.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/documentRead.exchange" },
+    "documentSign.request": { "$ref": "page-api.v1.3.schema.json#/$defs/documentSign.request" },
+    "documentSign.response": { "$ref": "page-api.v1.3.schema.json#/$defs/documentSign.response" },
+    "documentSign.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/documentSign.errors" },
+    "documentSign.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/documentSign.exchange" },
+    "documentListed": { "$ref": "page-api.v1.3.schema.json#/$defs/documentListed" },
+    "readDocuments.request": { "$ref": "page-api.v1.3.schema.json#/$defs/readDocuments.request" },
+    "readDocuments.response": { "$ref": "page-api.v1.3.schema.json#/$defs/readDocuments.response" },
+    "readDocuments.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/readDocuments.errors" },
+    "readDocuments.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/readDocuments.exchange" },
+    "ownerAskWaiting": { "$ref": "page-api.v1.3.schema.json#/$defs/ownerAskWaiting" },
+    "readOwnerAsks.request": { "$ref": "page-api.v1.3.schema.json#/$defs/readOwnerAsks.request" },
+    "readOwnerAsks.response": { "$ref": "page-api.v1.3.schema.json#/$defs/readOwnerAsks.response" },
+    "readOwnerAsks.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/readOwnerAsks.errors" },
+    "readOwnerAsks.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/readOwnerAsks.exchange" },
+    "ownerAskReadBack.request": { "$ref": "page-api.v1.3.schema.json#/$defs/ownerAskReadBack.request" },
+    "ownerAskReadBack.response": { "$ref": "page-api.v1.3.schema.json#/$defs/ownerAskReadBack.response" },
+    "ownerAskReadBack.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/ownerAskReadBack.errors" },
+    "ownerAskReadBack.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/ownerAskReadBack.exchange" },
+    "ownerAskConfirm.request": { "$ref": "page-api.v1.3.schema.json#/$defs/ownerAskConfirm.request" },
+    "ownerAskConfirm.response": { "$ref": "page-api.v1.3.schema.json#/$defs/ownerAskConfirm.response" },
+    "ownerAskConfirm.errors": { "$ref": "page-api.v1.3.schema.json#/$defs/ownerAskConfirm.errors" },
+    "ownerAskConfirm.exchange": { "$ref": "page-api.v1.3.schema.json#/$defs/ownerAskConfirm.exchange" },
+
+    "notTestBusinessError": {
+      "title": "NotTestBusinessError",
+      "description": "The review item named is not an open item of one of staging's test businesses (a business whose owner's mobile is on STAGING_LINQ_ALLOWLIST or is a roster test phone: K-05 v1.24 item 5), or no such item exists: one answer for both, so a tester learns nothing of any other business's queue (README default 81). Nothing was read beyond the check, and nothing was written or decided.",
+      "type": "object",
+      "properties": {
+        "error": { "const": "notTestBusiness" },
+        "reviewItemId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["error", "reviewItemId"],
+      "additionalProperties": false
+    },
+    "testReviewItem": {
+      "title": "TestReviewItem",
+      "description": "One open review item of a staging test business, as testReviewItems lists it: plain columns only (K-37 v1 rule 4), never the summary, the outcome or a person's words, as K-05 v1.24 item 4 reads them (id, kind, version and raised_by, never the summary) with the item's business. Its id and version are what testDecideReviewItem sends back (limit 4).",
+      "type": "object",
+      "properties": {
+        "reviewItemId": {
+          "description": "K-37 v1 review_items.id.",
+          "$ref": "#/$defs/id"
+        },
+        "version": {
+          "description": "K-37 v1 review_items.version as read; testDecideReviewItem sends it back as expectVersion.",
+          "$ref": "#/$defs/version"
+        },
+        "kind": {
+          "description": "K-37 v1 review_items.kind, as K-09 v1 openReviewItem names the kinds.",
+          "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/openReviewItem.request/properties/kind"
+        },
+        "businessId": {
+          "description": "K-37 v1 review_items.business_id: always a staging test business (K-05 v1.24 item 5).",
+          "$ref": "#/$defs/id"
+        },
+        "raisedByPersonId": {
+          "description": "K-37 v1 review_items.raised_by_person_id: the owner setting up who asked for the review (S1-75, S1-76), or null when Rosie raised it.",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["reviewItemId", "version", "kind", "businessId", "raisedByPersonId"],
+      "additionalProperties": false
+    },
+    "testReviewItems.request": {
+      "title": "TestReviewItemsRequest",
+      "description": "Staging only (BP 9.4; ruling T-1543 card A8 (3); R33): list the open review items of staging's test businesses, so a listed tester can decide one with testDecideReviewItem, as Rosie's team would (S1-75 'Rosie's team checks'; S1-76). Read-only. Who may call: as testRoster, a signed-in listed tester (K-22 v1.3 staging_testers, read by K-05 v1.15's readTesterStanding) or a person on Rosie's team, on staging; in production it answers stagingOnly and reads nothing. Binds: the person is the session's; the test businesses are staging's (K-05 v1.24 item 5: a business whose owner's mobile is on STAGING_LINQ_ALLOWLIST or is a roster test phone), never a browser value; the items are read on the runtime side, unscoped, one read at a time (K-05 v1.24 items 5 then 4; K-37 v1 rule 2), never through teamConsole. Reads: the primary, uncached. Repeat: safe: a read. Time budget: none in the sources.",
+      "type": "object",
+      "properties": { "page": { "$ref": "#/$defs/signedInPage" } },
+      "required": ["page"],
+      "additionalProperties": false
+    },
+    "testReviewItems.response": {
+      "title": "TestReviewItems",
+      "description": "The open review items of staging's test businesses, each with its id and current version, plain columns only (K-37 v1 rule 4). Empty when none is open. No item of any other business is ever listed.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "testReviewItems" },
+        "reviewItems": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/testReviewItem" }
+        }
+      },
+      "required": ["result", "reviewItems"],
+      "additionalProperties": false
+    },
+    "testReviewItems.errors": {
+      "title": "TestReviewItemsErrors",
+      "description": "Nothing was read.",
+      "anyOf": [
+        { "$ref": "#/$defs/stagingOnlyError" },
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notTesterError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "testReviewItems.exchange": {
+      "title": "TestReviewItemsExchange",
+      "description": "One testReviewItems request with its outcome. Staging only: run in production, its outcome is stagingOnly and nothing else (BP 9.4: 'Never in production'; refuse-test-review-items-in-production.json).",
+      "type": "object",
+      "properties": {
+        "call": { "const": "testReviewItems" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/testReviewItems.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/testReviewItems.response" },
+            { "$ref": "#/$defs/testReviewItems.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "given": {
+            "type": "object",
+            "properties": { "environment": { "const": "production" } },
+            "required": ["environment"]
+          }
+        },
+        "required": ["given"]
+      },
+      "then": {
+        "properties": { "outcome": { "$ref": "#/$defs/stagingOnlyError" } }
+      }
+    },
+    "testDecideReviewItem.request": {
+      "title": "TestDecideReviewItemRequest",
+      "description": "Staging only (BP 9.4; ruling T-1543 card A8 (3); R33): decide one open review item of a staging test business, or set it waiting, at the version testReviewItems read. Served by K-09 v1 decideReviewItem with caller.kind console and the test console's member (K-05 v1.12 default 105: staging's check tester, a live K-36 v1 team_page_recipients row; K-21 default 2), never the tester's own person, who holds no team row: as Fire now runs the alarm's own path, the decision runs the team's own call, and a done decision writes its typed write-back in the same commit (K-23 v1 control_proven_via team_check), never read from the outcome's words (arch 02 line 139). Never a page sent (BP 9.4). The page reads the decision back before it sends it (FS line 630). Who may call: as testRoster, a signed-in listed tester (K-22 v1.3 staging_testers) or a person on Rosie's team, on staging; in production stagingOnly. Binds: the person is the session's; the item is the row named, which must be an open item of a staging test business (K-05 v1.24 items 5 and 4, on the runtime side, one read at a time, before the decision), else notTestBusiness; the request never names a business or a person. Traced: the decision's K-08 entry names the test console's member as its actor, and the call's pageRequest span names the tester's session by its K-22 sessions id (never its token or its sha256), so who decided on staging can be traced (Q-R2-1). Reads: the primary, uncached. Repeat: safe: a decided item answers K-09's repeated with its first decision. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "page": { "$ref": "#/$defs/signedInPage" },
+        "reviewItemId": { "$ref": "#/$defs/id" },
+        "expectVersion": { "$ref": "#/$defs/version" },
+        "decision": {
+          "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/decideReviewItem.request/properties/decision"
+        }
+      },
+      "required": ["page", "reviewItemId", "expectVersion", "decision"],
+      "additionalProperties": false
+    },
+    "testDecideReviewItem.response": {
+      "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/decideReviewItem.response"
+    },
+    "testDecideReviewItem.errors": {
+      "title": "TestDecideReviewItemErrors",
+      "description": "Nothing was written or decided.",
+      "anyOf": [
+        { "$ref": "#/$defs/stagingOnlyError" },
+        { "$ref": "#/$defs/signInNeededError" },
+        { "$ref": "#/$defs/notTesterError" },
+        { "$ref": "#/$defs/notTestBusinessError" },
+        { "$ref": "../tool-api/tool-api.v1.schema.json#/$defs/decideReviewItem.errors" }
+      ]
+    },
+    "testDecideReviewItem.exchange": {
+      "title": "TestDecideReviewItemExchange",
+      "description": "One testDecideReviewItem request with its outcome. Staging only: run in production, its outcome is stagingOnly and nothing else (BP 9.4: 'Never in production'; refuse-test-decide-review-in-production.json).",
+      "type": "object",
+      "properties": {
+        "call": { "const": "testDecideReviewItem" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/testDecideReviewItem.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/testDecideReviewItem.response" },
+            { "$ref": "#/$defs/testDecideReviewItem.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "given": {
+            "type": "object",
+            "properties": { "environment": { "const": "production" } },
+            "required": ["environment"]
+          }
+        },
+        "required": ["given"]
+      },
+      "then": {
+        "properties": { "outcome": { "$ref": "#/$defs/stagingOnlyError" } }
+      }
+    }
+  }
+}
