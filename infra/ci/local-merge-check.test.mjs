@@ -169,7 +169,7 @@ describe("local-merge-check: the step list is merge-check.yml's, read from the f
     );
     const sha = WORKFLOW.replace("run: npm run lint\n", "run: npm run lint -- ${{ github.sha }}\n");
     assert.throws(() => readWorkflow(sha), /the context github/);
-    const timeout = "    timeout-minutes: 45\n";
+    const timeout = "    timeout-minutes: 75\n";
     const container = WORKFLOW.replace(timeout, `${timeout}    container: node:22\n`);
     assert.throws(() => readWorkflow(container), /the key container/);
   });

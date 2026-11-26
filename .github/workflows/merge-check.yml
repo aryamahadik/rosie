@@ -33,7 +33,8 @@ jobs:
   merge-check:
     name: merge check
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # T-1564 (DL-1235): 45 cut train 342 at 45 min, 13.5 min into integration (train 341 took 36); the suite grows.
+    timeout-minutes: 75
     services:
       postgres:
         image: postgis/postgis:17-3.5
