@@ -49,12 +49,17 @@ const pairTwo = () => ({
 
 describe("K-02 named rules (model.rules.mjs)", () => {
   it("exports exactly the rules the index names", () => {
-    assert.deepEqual(Object.keys(rules).sort(), ["optionOffered", "quoteInText"]);
+    assert.deepEqual(Object.keys(rules).sort(), [
+      "letterOnCard",
+      "optionOffered",
+      "quoteInText",
+      "typedValueInWords",
+    ]);
     const named = fixture("index.json")
       .fixtures.filter((entry) => entry.rule !== undefined)
       .map((entry) => entry.rule)
       .sort();
-    assert.deepEqual(named, ["optionOffered", "quoteInText"]);
+    assert.deepEqual(named, ["letterOnCard", "optionOffered", "quoteInText", "typedValueInWords"]);
   });
 
   it("passes the accepted contexts with the decide results made from them", () => {
@@ -393,8 +398,10 @@ describe("K-02 v1 is frozen: the frozen-contract guard fails an edit", () => {
     };
   }
 
-  it("contracts/model/frozen.json freezes v1, v1.1, v1.2 and v1.3", () => {
-    assert.deepEqual(readJson(path.join(MODEL, "frozen.json")), { frozen: ["v1", "v1.1", "v1.2", "v1.3"] });
+  it("contracts/model/frozen.json freezes v1, v1.1, v1.2, v1.3 and v1.4", () => {
+    assert.deepEqual(readJson(path.join(MODEL, "frozen.json")), {
+      frozen: ["v1", "v1.1", "v1.2", "v1.3", "v1.4"],
+    });
   });
 
   it("fails an edit to model.v1.schema.json", (t) => {
@@ -424,10 +431,10 @@ describe("K-02 v1 is frozen: the frozen-contract guard fails an edit", () => {
     );
   });
 
-  it("passes adding a minor version and its fixtures beside the frozen v1, v1.1, v1.2 and v1.3", (t) => {
+  it("passes adding a minor version and its fixtures beside the frozen v1, v1.1, v1.2, v1.3 and v1.4", (t) => {
     const repo = modelRepo(t);
-    repo.add("model.v1.4.schema.json", "{}\n");
-    repo.add("fixtures/sample-v1-4.json", "{}\n");
+    repo.add("model.v1.5.schema.json", "{}\n");
+    repo.add("fixtures/sample-v1-5.json", "{}\n");
     const run = repo.guard();
     assert.equal(run.status, 0, run.stdout + run.stderr);
   });
