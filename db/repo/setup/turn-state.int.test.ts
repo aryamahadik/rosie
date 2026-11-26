@@ -75,7 +75,12 @@ const readJson = (url: URL): unknown => JSON.parse(readFileSync(url, "utf8"));
 const fromHex = (hex: string): Uint8Array =>
   Uint8Array.from((hex.match(/../g) ?? []).map((pair) => parseInt(pair, 16)));
 
-/** Each setup part's frozen table lists (K-22's four together make the part at v1.3). */
+/**
+ * Each setup part's frozen table lists (K-22's four together make the part at v1.3). K-23's is v1.1's alone (T-1561):
+ * v1.1 restates all nine of v1's tables with v1's columns unchanged and adds business_setup's two claim columns (K-23
+ * v1.1 README default 8; migration 0040), so it is the whole part, as db/repo/business-setup.int.test.ts reads it; read
+ * beside v1's, each of its tables would be counted twice.
+ */
 const PART_LISTS: Readonly<Record<string, readonly string[]>> = {
   "people-access": [
     "people-access.v1.tables.json",
@@ -83,7 +88,7 @@ const PART_LISTS: Readonly<Record<string, readonly string[]>> = {
     "people-access.v1.2.tables.json",
     "people-access.v1.3.tables.json",
   ],
-  "business-setup": ["business-setup.v1.tables.json"],
+  "business-setup": ["business-setup.v1.1.tables.json"],
   "kinds-of-work": ["kinds-of-work.v1.tables.json"],
   "services-prices": ["services-prices.v1.tables.json"],
   rules: ["rules.v1.tables.json"],
@@ -961,4 +966,59 @@ describe("readTurnState with setup facts (T-667)", () => {
       }),
     ).rejects.toThrow(/business scope/);
   });
+
+  it(
+    "reads the K-23 v1.1 claim as two facts as rosie_job (K-05 v1.24 item 87; T-1561): a claim on file with its person and version, a row with none as two nulls, another business's row never",
+    SLOW,
+    async () => {
+      const [who] = await runtime<{ role: string }[]>`select current_user as role`;
+      expect(who?.role).toBe(RUNTIME_ROLE);
+      const claim = (businessId: string): FactRef[] => [
+        { key: "claim", table: "business_setup", rowId: businessId, column: "signup_claim" },
+        { key: "claimedBy", table: "business_setup", rowId: businessId, column: "claimed_by_person_id" },
+      ];
+      // The movers' setup row as S1-09's writer inserts it with an owner's claim (K-05 v1.24 item 87, card B15: in the
+      // insert when no row is on file), written here by the tables' owner and removed when the case ends.
+      await db.sql`
+        insert into business_setup (business_id, signup_claim, claimed_by_person_id)
+        values (${MOVERS}, 'owner', 'person-sam')
+      `;
+      try {
+        const claimed = await readTurnState(runtime, requestOf(MOVERS, claim(MOVERS)));
+        expect(outcomeErrors(claimed)).toEqual([]);
+        expect(
+          asTurnState(claimed).facts.map((fact) => [
+            fact.key,
+            fact.table,
+            fact.rowId,
+            fact.value,
+            fact.version,
+          ]),
+        ).toEqual([
+          ["claim", "business_setup", MOVERS, "owner", 1],
+          ["claimedBy", "business_setup", MOVERS, "person-sam", 1],
+        ]);
+        // The barbershop's seed row keeps no claim: both facts null, at the row's version.
+        const unclaimed = await readTurnState(runtime, requestOf(BARBERSHOP, claim(BARBERSHOP)));
+        expect(outcomeErrors(unclaimed)).toEqual([]);
+        expect(asTurnState(unclaimed).facts.map((fact) => [fact.key, fact.value, fact.version])).toEqual([
+          ["claim", null, 4],
+          ["claimedBy", null, 4],
+        ]);
+        // Under another business, or with none, the movers' row is not found.
+        expect(await readTurnState(runtime, requestOf(YOGA, claim(MOVERS)))).toEqual({
+          error: "notFound",
+          table: "business_setup",
+          rowId: MOVERS,
+        });
+        expect(await readTurnState(runtime, requestOf(null, claim(MOVERS)))).toEqual({
+          error: "notFound",
+          table: "business_setup",
+          rowId: MOVERS,
+        });
+      } finally {
+        await db.sql`delete from business_setup where business_id = ${MOVERS}`;
+      }
+    },
+  );
 });
