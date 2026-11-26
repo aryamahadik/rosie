@@ -1186,4 +1186,127 @@ describe("commitTurn with the setup tables as write targets (T-667)", () => {
       expect(open.map((row) => row.name)).toEqual([...BUSINESS_UNHELD_TABLES].sort());
     },
   );
+
+  it(
+    "writes the K-23 v1.1 claim once through a business_setup StepRow (K-05 v1.24 item 87; T-1561): the update at the version read, then a second write answered constraint (business_setup_claim_set_once, 23514) with nothing written; a write that leaves it as it is passes",
+    SLOW,
+    async () => {
+      const claimNow = async (businessId: string): Promise<unknown> => {
+        const [row] = await db.sql<{ signup_claim: string | null; claimed_by_person_id: string | null }[]>`
+          select signup_claim, claimed_by_person_id from business_setup where business_id = ${businessId}
+        `;
+        return row;
+      };
+      // S1-09's writer's update at the version item 26 read (card B15: the update when a row is on file).
+      const claimed = await commit(
+        turnOf("turn-t1561-claim", [
+          {
+            op: "update",
+            table: "business_setup",
+            key: { business_id: BARBERSHOP },
+            expectVersion: 4,
+            set: { signup_claim: "owner", claimed_by_person_id: "person-sam" },
+          },
+        ] as unknown as StateWrite[]),
+      );
+      expect(answerErrors(claimed)).toEqual([]);
+      expect(claimed).toMatchObject({
+        result: "committed",
+        repeated: false,
+        committed: { written: [{ table: "business_setup", rowId: BARBERSHOP, version: 5 }] },
+      });
+      expect(await claimNow(BARBERSHOP)).toEqual({
+        signup_claim: "owner",
+        claimed_by_person_id: "person-sam",
+      });
+      // A second write of the claim, at the version now on file, is refused by rule 8's trigger: constraint, nothing
+      // written, the turn not recorded.
+      const second = await commit(
+        turnOf("turn-t1561-claim-again", [
+          {
+            op: "update",
+            table: "business_setup",
+            key: { business_id: BARBERSHOP },
+            expectVersion: 5,
+            set: { signup_claim: "helper", claimed_by_person_id: "person-sam" },
+          },
+        ] as unknown as StateWrite[]),
+      );
+      expect(answerErrors(second)).toEqual([]);
+      expect(second).toEqual({
+        error: "constraint",
+        sqlstate: "23514",
+        constraint: "business_setup_claim_set_once",
+      });
+      expect(await turnWritten("turn-t1561-claim-again")).toBe(false);
+      expect(await versionNow("business_setup", BARBERSHOP)).toBe(5);
+      expect(await claimNow(BARBERSHOP)).toEqual({
+        signup_claim: "owner",
+        claimed_by_person_id: "person-sam",
+      });
+      // Clearing it is a change too.
+      const cleared = await commit(
+        turnOf("turn-t1561-claim-cleared", [
+          {
+            op: "update",
+            table: "business_setup",
+            key: { business_id: BARBERSHOP },
+            expectVersion: 5,
+            set: { signup_claim: null, claimed_by_person_id: null },
+          },
+        ] as unknown as StateWrite[]),
+      );
+      expect(cleared).toEqual({
+        error: "constraint",
+        sqlstate: "23514",
+        constraint: "business_setup_claim_set_once",
+      });
+      expect(await versionNow("business_setup", BARBERSHOP)).toBe(5);
+      // A later write of another column leaves the claim as it is, and passes.
+      const later = await commit(
+        turnOf("turn-t1561-after-claim", [{ ...SHOP_NO_MONEY, expectVersion: 5 } as unknown as StateWrite]),
+      );
+      expect(later).toMatchObject({
+        result: "committed",
+        committed: { written: [{ table: "business_setup", rowId: BARBERSHOP, version: 6 }] },
+      });
+      expect(await claimNow(BARBERSHOP)).toEqual({
+        signup_claim: "owner",
+        claimed_by_person_id: "person-sam",
+      });
+      // The insert when no row is on file (the movers have none): the claim is written with the row, once.
+      const inserted = await commit(
+        turnOf("turn-t1561-claim-insert", [
+          {
+            op: "insert",
+            table: "business_setup",
+            values: { business_id: MOVERS, signup_claim: "helper", claimed_by_person_id: "person-alex" },
+          },
+        ] as unknown as StateWrite[]),
+      );
+      expect(answerErrors(inserted)).toEqual([]);
+      expect(inserted).toMatchObject({
+        result: "committed",
+        committed: { written: [{ table: "business_setup", rowId: MOVERS, version: 1 }] },
+      });
+      expect(await claimNow(MOVERS)).toEqual({ signup_claim: "helper", claimed_by_person_id: "person-alex" });
+      const insertedAgain = await commit(
+        turnOf("turn-t1561-claim-insert-again", [
+          {
+            op: "update",
+            table: "business_setup",
+            key: { business_id: MOVERS },
+            expectVersion: 1,
+            set: { signup_claim: "owner", claimed_by_person_id: "person-sam" },
+          },
+        ] as unknown as StateWrite[]),
+      );
+      expect(insertedAgain).toEqual({
+        error: "constraint",
+        sqlstate: "23514",
+        constraint: "business_setup_claim_set_once",
+      });
+      expect(await claimNow(MOVERS)).toEqual({ signup_claim: "helper", claimed_by_person_id: "person-alex" });
+    },
+  );
 });
