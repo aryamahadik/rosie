@@ -42,6 +42,17 @@
 // it, read at ask count 2, writes nothing (default 194's cap), as a second asked text does. A passed part the walk did
 // not note is not asked, as before.
 //
+// A text that fits nothing (T-1559; K-09 default 192 (a) widened by T-1557 item 3, the lead's ruling; DL-1214; the Nov 23
+// phone test's text 4): a part decide ended `none_fits` with outcome go, which the gate answers `noAction` with no limit
+// run (gate.ts default 2), counts as asked in (a), beside parts asked the same way or `noAction`, and in (c) it is about
+// the context's one open question: K-02's none_fits names no question (its quote and why alone), and (c) already needs
+// exactly one in the context. So at ask count 1 the question is sent once more (S13-25 rule 16: "Ask once, plainly ...
+// try once more"), the same one row and raise as for an asked part, held back by default 195 as any; at 2 or more nothing
+// is written here (default 194's cap), and the runtime's park passes the turn on (T-1557 item 2, T-1558). Conditions (b)
+// and (d) to (g) are unchanged. A none_fits part the gate answered `asked` (outcome oneQuestion) is (c)'s "part of any
+// other verb ended in one question", not about it, as before; a no_op or redact part alone is never asked. The part's
+// own answer stays `noAction` (K-09 v1 partResult): only the turn's one row and raise are added.
+//
 // It only reads (the request, what the commit holds, the walk's note and the one question read) and has no outside
 // effect. Nothing here logs; what it throws names a fault, never a person's words: the unit's why names the step alone,
 // and no word of the texts or of decide's `unclear` goes into the row (default 197: the row holds no words at commit).
@@ -56,6 +67,9 @@
 //      partResult: nothing changed), with its limits as run and no key given: commit.ts answers it as it answers a part
 //      waiting for the one question (its default 6), and its unit writes nothing. Its row and raise are this file's one
 //      unit, built exactly as for a part decide ended in one question (the same id, row and entry).
+//   4. (T-1559, DL-1214) Only a none_fits part answered `noAction` (outcome go) is widened in, as the card names it; one
+//      ended in one question (outcome oneQuestion, answered `asked`) keeps (c)'s rule for a verb other than ask or choose,
+//      not about the question, until T-1159's re-read gives such a part a ruling of its own.
 
 import type { Decided, GatedPart } from "../gate/framework";
 import type { CommitUnit } from "./build";
@@ -103,19 +117,33 @@ interface Candidate {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+/** A part the gate answered `noAction` that decide ended `none_fits` (T-1559: default 192 (a) widened). */
+function fitsNothing(decided: Decided, gated: GatedPart): boolean {
+  return gated.result === "noAction" && decided.decide.parts[gated.part]?.part.verb === "none_fits";
+}
+
+/** (a)'s asked parts: those (c) checks against the open question, and the none_fits ones, about it by (c) alone. */
+interface AskedParts {
+  readonly asked: readonly number[];
+  readonly noneFits: readonly number[];
+}
+
 /**
- * (a): a part the gate answered `asked` for decide's one question, or a passed part whose split's settler answered "ask"
- * (`settled`: T-1528), every other `noAction`, none held; null otherwise.
+ * (a): a part the gate answered `asked` for decide's one question, a passed part whose split's settler answered "ask"
+ * (`settled`: T-1528), or a none_fits part the gate answered `noAction` (T-1559), every other `noAction`, none held; null
+ * otherwise.
  */
-function askedParts(turn: AskedTurn, settled: ReadonlySet<number>): number[] | null {
+function askedParts(turn: AskedTurn, decided: Decided, settled: ReadonlySet<number>): AskedParts | null {
   const asked: number[] = [];
+  const noneFits: number[] = [];
   for (const gated of turn.gated) {
     if (turn.held.has(gated.part)) return null;
     const settlerAsked = gated.result === "passed" && settled.has(gated.part);
     if (gated.result === "asked" || settlerAsked) asked.push(gated.part);
+    else if (fitsNothing(decided, gated)) noneFits.push(gated.part);
     else if (gated.result !== "noAction") return null;
   }
-  return asked.length === 0 ? null : asked;
+  return asked.length === 0 && noneFits.length === 0 ? null : { asked, noneFits };
 }
 
 /** (b): decide's result carries no unmapped end (K-02 v1.2 `end`, which K-09 v1.5's type does not name). */
@@ -162,12 +190,13 @@ function candidateOf(turn: AskedTurn): Candidate | null {
   const { decided } = request.input;
   // The parts whose split settler answered "ask", as the walk noted them on this turn object (T-1528).
   const settled = settlerAskedParts(turn.context);
-  const asked = askedParts(turn, settled);
-  if (asked === null || endsUnmapped(decided)) return null;
+  const parts = askedParts(turn, decided, settled);
+  if (parts === null || endsUnmapped(decided)) return null;
   const [only, ...more] = decided.context.openQuestions;
   if (only === undefined || more.length > 0) return null;
   const questionId = only.openQuestionId;
-  if (!asked.every((index) => isAbout(decided, index, questionId, settled))) return null;
+  // A none_fits part names no question, so with exactly one open question it is about that one (T-1559).
+  if (!parts.asked.every((index) => isAbout(decided, index, questionId, settled))) return null;
   if (!nothingHolds(turn)) return null;
   const channel = serviceOf(request);
   return channel === null ? null : { questionId, channel };

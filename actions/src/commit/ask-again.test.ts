@@ -1110,3 +1110,300 @@ describe("askAgainUnit: default 192 (a) and (c) with the walk's note of a settle
     expect(read.calls).toEqual([]);
   });
 });
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1559: a text that fits nothing at a question asked once (default 192 (a) widened; T-1557 item 3; DL-1214)
+
+/** A part decide ended none_fits: its quote the asked fixture's text, its why (K-02 v1 none_fits: quote and why alone). */
+const NONE_FITS: DecidePart = {
+  verb: "none_fits",
+  quote: "A bit of everything",
+  why: "No offered choice is about this text.",
+} as unknown as DecidePart;
+
+/** The asked fixture's request, its one part (and each read's) the none_fits part, outcome go. */
+function noneFitsRequest(): GateAndCommitRequest {
+  return withPart(copy(NONE_FITS));
+}
+
+/** The asked fixture's request with decide's agreed parts (and each read's) `entries`, in order. */
+function withParts(entries: readonly [PartEntry, ...PartEntry[]]): GateAndCommitRequest {
+  const request = askedRequest();
+  const decided = decidedIn(request);
+  const [first, ...rest] = entries;
+  decided.decide.parts = [copy(first), ...rest.map((entry) => copy(entry))];
+  for (const each of decided.decide.reads) {
+    each.output.parts = [copy(first.part), ...rest.map((entry) => copy(entry.part))];
+  }
+  return request;
+}
+
+/** One of decide's agreed parts with its outcome (K-02 v1 resultPart). */
+interface PartEntry {
+  readonly part: DecidePart;
+  readonly outcome: "go" | "oneQuestion";
+}
+
+/** The gate's answer for a part at `part` that took no action (no_op, redact or none_fits): no limit run. */
+function noActionGated(part = 0): GatedPart {
+  const [asked] = askedGated();
+  if (asked === undefined) return fail();
+  return { ...asked, part, choiceId: null, result: "noAction" };
+}
+
+/** askedTurn on noneFitsRequest(), its one part answered noAction, with `change` applied. */
+function noneFitsTurn(change: Partial<AskedTurn> = {}, request = noneFitsRequest()): AskedTurn {
+  return askedTurn({ gated: [noActionGated()], ...change }, request);
+}
+
+/** K-09's answer to the none_fits turn: the asked fixture's, its one part answered noAction, `written` as given. */
+function noneFitsOutcome(written = askedOutcome().written): ReturnType<typeof askedOutcome> {
+  const outcome = askedOutcome();
+  return { ...outcome, parts: outcome.parts.map((part) => ({ ...part, result: "noAction" })), written };
+}
+
+describe("T-1559: a none_fits part about the one open question, asked once, sends that question once more, end to end", () => {
+  it("at ask_count 1: the same K-05 v1.21 request as an asked part's, one quick_reply row and the raise; the part still answered noAction", async () => {
+    const read = fakeRead();
+    const deps = askedDeps(read, { k05: askedK05() });
+    const called = await callCommit(noneFitsRequest(), deps);
+
+    // K-09's answer: the part noAction (K-09 v1 partResult), the row named and the question at its version after the raise.
+    expect(called.answer).toEqual(noneFitsOutcome());
+    expect(validator.check("gateAndCommit", "response", called.answer)).toEqual([]);
+    // One request, byte for byte K-05's commit-s1-02-sam-asks-again.json at this chain's version: one row, one raise.
+    expect(deps.k05.requests).toHaveLength(1);
+    const [request] = deps.k05.requests;
+    if (request === undefined) return fail();
+    expect(contractChecks().k05v121("commitTurn.request", request)).toEqual([]);
+    expect(request).toEqual(k05AsksAgainRequest());
+    expect(request.writes.outboxRows.map((row) => [row.id, row.sendClass, row.openQuestionId])).toEqual([
+      [ROW, "quick_reply", QUESTION],
+    ]);
+    expect(request.writes.clockRows).toEqual({ make: [], cancel: [] });
+    expect(deps.k05.commits).toHaveLength(1);
+    expect(read.calls).toEqual([{ handleId: HANDLE, openQuestionId: QUESTION }]);
+    // No word of the text or of decide's why in the request.
+    for (const words of [...wordsIn(decidedIn(noneFitsRequest())), "No offered choice is about this text."]) {
+      expect(JSON.stringify(request)).not.toContain(words);
+    }
+    expect(called.rows).toEqual([
+      { table: "open_questions", id: QUESTION },
+      { table: "outbox_rows", id: ROW },
+    ]);
+  });
+
+  it("at ask_count 2 (asked again already): no row and no raise, the question read once; the part noAction", async () => {
+    for (const askCount of [2, 3]) {
+      const read = fakeRead({ ...storedQuestion(), askCount, version: askCount + 1 });
+      const deps = askedDeps(read, { k05: askedK05() });
+      await expectSilent(
+        noneFitsRequest(),
+        deps,
+        noneFitsOutcome({ written: [], outboxRows: [], promoted: [] }),
+      );
+      expect(read.calls, String(askCount)).toHaveLength(1);
+      expect(deps.k05.commits).toHaveLength(1);
+    }
+  });
+
+  it("a rerun reads ask_count 2 and builds neither row nor raise; K-05 answers the first commit, so nothing is written twice", async () => {
+    const read = fakeRead();
+    const k05 = askedK05();
+    const deps = askedDeps(read, { k05 });
+    await callCommit(noneFitsRequest(), deps);
+    read.row = { ...storedQuestion(), askCount: 2, version: 3 };
+    const again = await callCommit(noneFitsRequest(), deps);
+    expect(again.answer).toEqual({
+      ...noneFitsOutcome(),
+      repeated: true,
+      written: { written: [], outboxRows: [{ id: ROW, commitSeq: 2 }], promoted: [] },
+    });
+    const second = k05.requests[1] ?? fail();
+    expect(asksAgain(second as TurnCommitRequest)).toBe(false);
+    expect(second.writes.outboxRows).toEqual([]);
+    expect(k05.commits).toHaveLength(1);
+    expect(again.rows).toBeUndefined();
+  });
+
+  it("two open questions in the context, or none: no row, and nothing is read", async () => {
+    const two = noneFitsRequest();
+    const { context } = decidedIn(two);
+    const [only] = context.openQuestions;
+    if (only === undefined) return fail();
+    context.openQuestions.push({ ...copy(only), openQuestionId: "oq-s1-02-sam-2" });
+    const none = noneFitsRequest();
+    decidedIn(none).context.openQuestions = [];
+    for (const request of [two, none]) {
+      const read = fakeRead();
+      const deps = askedDeps(read, { k05: askedK05() });
+      await expectSilent(request, deps, noneFitsOutcome({ written: [], outboxRows: [], promoted: [] }));
+      expect(read.calls).toEqual([]);
+    }
+  });
+
+  it("an open safety hold or an unread text holds the row back (default 195): no row, and nothing is read", async () => {
+    const hold: SafetyHold = { holdId: "hold-sam-threat", releaseRule: "never", blocksBooking: true };
+    for (const doubles of [{ holds: [hold] }, { unread: ["evt-sam-0003"] }]) {
+      const read = fakeRead();
+      const deps = askedDeps(read, { k05: askedK05(), ...doubles });
+      const called = await callCommit(noneFitsRequest(), deps);
+      expect(called.answer).toMatchObject({ result: "committed", written: { outboxRows: [] } });
+      expect(asksAgain((deps.k05.requests[0] ?? fail()) as TurnCommitRequest)).toBe(false);
+      expect(read.calls).toEqual([]);
+    }
+  });
+});
+
+describe("askAgainUnit: default 192 (a) and (c) with a none_fits part (T-1559)", () => {
+  it("all hold: the same unit as for a part decide ended in one question", async () => {
+    const read = fakeRead();
+    const unit = await askAgainUnit(read.deps, noneFitsTurn());
+    expect(unit).not.toBeNull();
+    expect(unit).toEqual(await askAgainUnit(fakeRead().deps, askedTurn()));
+    expect(read.calls).toEqual([{ handleId: HANDLE, openQuestionId: QUESTION }]);
+  });
+
+  it("(e) at ask count 2 or more: nothing, the question read once", async () => {
+    for (const askCount of [2, 3]) {
+      const read = fakeRead({ ...storedQuestion(), askCount, version: askCount + 1 });
+      expect(await askAgainUnit(read.deps, noneFitsTurn())).toBeNull();
+      expect(read.calls).toHaveLength(1);
+    }
+  });
+
+  it("(a) beside a part that passed (committed), was stopped, depends on a stopped part, or either held: nothing, nothing read", async () => {
+    const request = withParts([
+      { part: copy(NONE_FITS), outcome: "go" },
+      {
+        part: {
+          verb: "choose",
+          quote: "A bit of everything",
+          choice: "c-01",
+          fields: [],
+        } as unknown as DecidePart,
+        outcome: "go",
+      },
+    ]);
+    const [asked] = askedGated();
+    if (asked === undefined) return fail();
+    const second = (result: GatedPart["result"]): GatedPart => ({
+      ...asked,
+      part: 1,
+      choiceId: "c-01",
+      result,
+    });
+    for (const change of [
+      { gated: [noActionGated(), second("passed")] },
+      { gated: [noActionGated(), second("stopped")] },
+      { gated: [noActionGated(), second("dependsOnStopped")] },
+      { gated: [noActionGated(), noActionGated(1)], held: new Set([1]) },
+      { gated: [noActionGated()], held: new Set([0]) },
+    ]) {
+      const read = fakeRead();
+      expect(
+        await askAgainUnit(read.deps, noneFitsTurn(change, request)),
+        JSON.stringify(change.gated),
+      ).toBeNull();
+      expect(read.calls).toEqual([]);
+    }
+  });
+
+  it("(a) and (c) beside an ask about the one open question, or beside a no_op: one unit", async () => {
+    const [askEntry] = decidedIn(askedRequest()).decide.parts;
+    const noOp = { verb: "no_op", quote: "A bit of everything" } as unknown as DecidePart;
+    const [asked] = askedGated();
+    if (asked === undefined) return fail();
+    for (const [name, entries, gated] of [
+      [
+        "ask",
+        [{ part: copy(NONE_FITS), outcome: "go" as const }, copy(askEntry)],
+        [noActionGated(), { ...asked, part: 1 }],
+      ],
+      [
+        "no_op",
+        [
+          { part: copy(NONE_FITS), outcome: "go" as const },
+          { part: noOp, outcome: "go" as const },
+        ],
+        [noActionGated(), noActionGated(1)],
+      ],
+    ] as const) {
+      const unit = await askAgainUnit(
+        fakeRead().deps,
+        noneFitsTurn({ gated: [...gated] }, withParts(entries)),
+      );
+      expect(
+        unit?.writes.messages.map((row) => row.id),
+        name,
+      ).toEqual([ROW]);
+    }
+  });
+
+  it("(c) beside an ask about another question: nothing, nothing read", async () => {
+    const other = {
+      verb: "ask",
+      quote: "A bit of everything",
+      questions: ["oq-s1-04-sam"],
+      unclear: "Which kinds?",
+    } as unknown as DecidePart;
+    const [asked] = askedGated();
+    if (asked === undefined) return fail();
+    const request = withParts([
+      { part: copy(NONE_FITS), outcome: "go" },
+      { part: other, outcome: "go" },
+    ]);
+    const read = fakeRead();
+    expect(
+      await askAgainUnit(
+        read.deps,
+        noneFitsTurn({ gated: [noActionGated(), { ...asked, part: 1 }] }, request),
+      ),
+    ).toBeNull();
+    expect(read.calls).toEqual([]);
+  });
+
+  it("a no_op or a redact part alone takes no action and is never asked: nothing, nothing read", async () => {
+    for (const part of [
+      { verb: "no_op", quote: "A bit of everything" },
+      { verb: "redact", quote: "A bit of everything" },
+    ] as unknown as DecidePart[]) {
+      const read = fakeRead();
+      expect(await askAgainUnit(read.deps, noneFitsTurn({}, withPart(part))), part.verb).toBeNull();
+      expect(read.calls).toEqual([]);
+    }
+  });
+
+  it("a none_fits part ended in one question (answered asked) is not about the question, as before: nothing, nothing read", async () => {
+    const [asked] = askedGated();
+    if (asked === undefined) return fail();
+    const read = fakeRead();
+    const turn = noneFitsTurn({ gated: [asked] }, withPart(copy(NONE_FITS), "oneQuestion"));
+    expect(await askAgainUnit(read.deps, turn)).toBeNull();
+    expect(read.calls).toEqual([]);
+  });
+
+  it("(b), (f) and (g) as for any asked part: an unmapped end, a planner verb, an open hold, an unread text, a stop, no service: nothing, nothing read", async () => {
+    const ended = noneFitsRequest();
+    (decidedIn(ended).decide as unknown as Record<string, unknown>).end = "oneQuestion";
+    const planned = noneFitsRequest();
+    (planned.input as unknown as Record<string, unknown>).planner = { output: {}, parts: [0] };
+    const unserved = noneFitsRequest();
+    (unserved.turn as unknown as Record<string, unknown>).service = "fax";
+    const stop = { ...askedCoreResult(), call: "recordStopOrStart" } as unknown as CoreResult;
+    const hold: SafetyHold = { holdId: "hold-sam-0002", releaseRule: "after_safe", blocksBooking: true };
+    const turns = [
+      noneFitsTurn({}, ended),
+      noneFitsTurn({}, planned),
+      noneFitsTurn({}, unserved),
+      noneFitsTurn({ open: { holds: [hold], unreadEventIds: [] } }),
+      noneFitsTurn({ open: { holds: [], unreadEventIds: ["evt-sam-0003"] } }),
+      noneFitsTurn({ core: [askedCoreRun(), askedCoreRun(stop)] }),
+    ];
+    for (const [index, turn] of turns.entries()) {
+      const read = fakeRead();
+      expect(await askAgainUnit(read.deps, turn), String(index)).toBeNull();
+      expect(read.calls).toEqual([]);
+    }
+  });
+});
