@@ -2,9 +2,71 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 936, [`cef0c4ff`](https://github.com/aryamahadik/rosie/commit/cef0c4ff), 2026-11-26 10:23:05 UTC.
+- **Through:** commit 939, [`11032c16`](https://github.com/aryamahadik/rosie/commit/11032c16), 2026-11-26 14:11:43 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 939. docs: COMMIT\_HISTORY.md through commit 936 (cef0c4ff, \#954) (\#957)
+
+- **Commit:** [`11032c16`](https://github.com/aryamahadik/rosie/commit/11032c16), by Arya Mahadik, 2026-11-26 14:11:43 UTC
+- **Pull request:** [#957](https://github.com/aryamahadik/rosie/pull/957) from `task/commit-history-247`, merged 2026-11-26 14:11:43 UTC. It squashed 1 branch commit:
+  - `f6c5cf6` docs: COMMIT\_HISTORY.md through commit 936 (cef0c4ff, \#954)
+- **Files changed:** 1 (+53 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +53 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 938. T-1562: the walk takes K-01 v1.1's stop field (asksByWords, waitsOnEvent), asks reach settlers before a split and writes a settled move as walked, asks owner-lane steps of the owner, and starts from an event or the resume of K-09 v1.14 default 235 (ruling T-1543 card B6, the sign-up critical path; DL-1230, DL-1242); squashed onto main (\#956)
+
+- **Commit:** [`c06ce557`](https://github.com/aryamahadik/rosie/commit/c06ce557), by Arya Mahadik, 2026-11-26 14:11:38 UTC
+- **Pull request:** [#956](https://github.com/aryamahadik/rosie/pull/956) from `task/T-1562s`, merged 2026-11-26 14:11:38 UTC. It squashed 1 branch commit:
+  - `1f28d18` T-1562: the walk takes K-01 v1.1's stop field (asksByWords, waitsOnEv…
+- **Files changed:** 9 (+1764 −76), by folder:
+  - `actions/src/commit/walk/` errors.ts +10 −4, event-wait.test.ts +1 −1, graph.ts +87 −1, index.ts +26 −2, reach.ts +89 −0, test-support.ts +333 −0, text-path.test.ts +751 −0, walk.ts +218 −29, writes.ts +249 −39
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+actions/src/commit/walk/** only (9 files; T-1544's commits it carried are already on main as 4639552). Verdicts on b942cbf: QA PASS (walk unit 365, whole unit 10542, hop8 worker 4/4, turn-face pg and journey-1 int 155, typecheck, format, eslint, guard:tests, the phone scan); the action-layer engineer PASS.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 937. T-1559: a text that fits nothing at a question asked once gets the question asked once more (\#955)
+
+- **Commit:** [`2c53e7a5`](https://github.com/aryamahadik/rosie/commit/2c53e7a5), by Arya Mahadik, 2026-11-26 14:11:33 UTC
+- **Pull request:** [#955](https://github.com/aryamahadik/rosie/pull/955) from `task/T-1559`, merged 2026-11-26 14:11:33 UTC. It squashed 2 branch commits:
+  - `df5bd0f` T-1559: a none\_fits part about the one open question counts as asked …
+  - `93d387d` T-1559: a none\_fits part ended in one question (outcome oneQuestion, …
+- **Files changed:** 3 (+931 −9), by folder:
+  - `actions/src/commit/` ask-again.test.ts +518 −0, ask-again.ts +39 −9
+  - `actions/src/tool-api/turn-face/pg/` sign-up.int.test.ts +374 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1559: a none_fits part about the one open question counts as asked under K-09 default 192 (a) (T-1557 item 3, DL-1214): at ask count 1 the question is sent once more with its raise, at 2 or more nothing; unit tests and a fourth PostgreSQL world in sign-up.int.test.ts
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1559: a none_fits part ended in one question (outcome oneQuestion, answered asked) also counts as asked under K-09 default 192 (a) and is about the one open question under (c) (DL-1227; K-09 default 222 as T-1557 round 2 words it): at ask count 1 one ask-again row and the raise, at 2 or more nothing; default 4 dropped, its test inverted, unit tests and a fifth PostgreSQL world in sign-up.int.test.ts
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 936. docs: COMMIT\_HISTORY.md through commit 933 (bf628f8f, \#951) (\#954)
 
