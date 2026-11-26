@@ -2,9 +2,114 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 939, [`11032c16`](https://github.com/aryamahadik/rosie/commit/11032c16), 2026-11-26 14:11:43 UTC.
+- **Through:** commit 944, [`d0766cb2`](https://github.com/aryamahadik/rosie/commit/d0766cb2), 2026-11-26 14:49:52 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 944. docs: COMMIT\_HISTORY.md through commit 939 (11032c16, \#957) (\#962)
+
+- **Commit:** [`d0766cb2`](https://github.com/aryamahadik/rosie/commit/d0766cb2), by Arya Mahadik, 2026-11-26 14:49:52 UTC
+- **Pull request:** [#962](https://github.com/aryamahadik/rosie/pull/962) from `task/commit-history-248`, merged 2026-11-26 14:49:52 UTC. It squashed 1 branch commit:
+  - `4bf164b` docs: COMMIT\_HISTORY.md through commit 939 (11032c16, \#957)
+- **Files changed:** 1 (+63 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +63 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 943. T-1561: K-05 v1.24 runtime-side reads in db/repo (readSignUpKeys, openReviewItemsOf, readStagingTestBusinesses), business\_setup's claim columns in the setup fact homes, K-23 v1.1 pin and the claim's read and write-once proofs (\#961)
+
+- **Commit:** [`8a31aec5`](https://github.com/aryamahadik/rosie/commit/8a31aec5), by Arya Mahadik, 2026-11-26 14:49:46 UTC
+- **Pull request:** [#961](https://github.com/aryamahadik/rosie/pull/961) from `task/T-1561`, merged 2026-11-26 14:49:47 UTC. It squashed 1 branch commit:
+  - `cdd4536` T-1561: K-05 v1.24 runtime-side reads in db/repo (readSignUpKeys, ope…
+- **Files changed:** 12 (+2100 −5), by folder:
+  - `db/repo/` open-review-items.int.test.ts +414 −0, open-review-items.test.ts +83 −0, open-review-items.ts +123 −0, sign-up-keys.int.test.ts +523 −0, sign-up-keys.test.ts +66 −0, sign-up-keys.ts +128 −0, staging-test-businesses.int.test.ts +385 −0, staging-test-businesses.test.ts +81 −0, staging-test-businesses.ts +103 −0
+  - `db/repo/setup/` commit-setup.int.test.ts +123 −0, fact-homes.ts +9 −3, turn-state.int.test.ts +62 −2
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 942. T-1558: the runtime passes on a decided turn that fits nothing, or a question asked twice and still unclear, at once with the passedOn line (K-09 defaults 221 and 223, round 2), with runFrom passing the keyword count into prepareDecided (\#960)
+
+- **Commit:** [`601c4d71`](https://github.com/aryamahadik/rosie/commit/601c4d71), by Arya Mahadik, 2026-11-26 14:49:42 UTC
+- **Pull request:** [#960](https://github.com/aryamahadik/rosie/pull/960) from `task/T-1558`, merged 2026-11-26 14:49:43 UTC. It squashed 1 branch commit:
+  - `03ecda0` T-1558: the runtime passes on a decided turn that fits nothing, or a …
+- **Files changed:** 2 (+604 −12), by folder:
+  - `runtime/src/turn/` turn.ts +145 −5, turn.worker.test.ts +459 −7
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 941. T-1548 + T-1565: K-21 v1.4 (the upload's event hand-off, the text slice's links, staging's two review calls) with the web client knowing those calls as staging-only refusals; squashed onto main (ruling card A8; DL-1194, DL-1236, DL-1245) (\#959)
+
+- **Commit:** [`07bf0d1e`](https://github.com/aryamahadik/rosie/commit/07bf0d1e), by Arya Mahadik, 2026-11-26 14:49:38 UTC
+- **Pull request:** [#959](https://github.com/aryamahadik/rosie/pull/959) from `task/T-1565s`, merged 2026-11-26 14:49:38 UTC. It squashed 1 branch commit:
+  - `7836b4b` T-1548 + T-1565: K-21 v1.4 (the upload's event hand-off, the text sli…
+- **Files changed:** 21 (+1312 −9), by folder:
+  - `contracts/page-api/` README.md +94 −1, frozen.json +1 −1, page-api.v1.4.schema.json +748 −0
+  - `contracts/page-api/fixtures/` finish-upload-id-handed-repeat.json +24 −0, finish-upload-id-handed.json +24 −0, index.json +15 −1, test-decide-review-in-production.json +27 −0, test-decide-review-item.json +33 −0, test-decide-review-not-test-business.json +28 −0, test-review-items-in-production.json +20 −0, test-review-items-not-tester.json +20 −0, test-review-items.json +29 −0
+  - `contracts/page-api/fixtures/invalid/` refuse-finish-upload-handed-photo.json +24 −0, refuse-test-decide-review-in-production.json +33 −0, refuse-test-decide-review-names-business.json +16 −0, refuse-test-decide-review-without-session.json +15 −0, refuse-test-review-items-in-production.json +29 −0, refuse-test-review-items-with-summary.json +30 −0
+  - `web/src/client/` calls.ts +24 −0, client.test.ts +44 −0
+  - `web/src/staging/guard/` refusal.test.ts +34 −6
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+contracts/page-api/** (K-21 v1.4, additive) and web/src/client/calls.ts, client.test.ts, staging/guard/refusal.test.ts. Verdicts on 6a5ff38 (T-1565 on T-1548): QA PASS (web unit 283, whole unit 10334, contracts 986/407, guards, the phone scan); the security reviewer PASS; the runtime engineer PASS.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 940. T-1554: K-05 v1.25, the event turn's waiting reads and turnCommitted (\#958)
+
+- **Commit:** [`d6b6386d`](https://github.com/aryamahadik/rosie/commit/d6b6386d), by Arya Mahadik, 2026-11-26 14:49:34 UTC
+- **Pull request:** [#958](https://github.com/aryamahadik/rosie/pull/958) from `task/T-1554`, merged 2026-11-26 14:49:34 UTC. It squashed 3 branch commits:
+  - `885a1b2` T-1554: freeze K-05 v1.25: liveStepLinkOf (a live page link by person…
+  - `255e4b7` T-1554: rebased onto main after T-1549's squash (\#945): the freeze re…
+  - `1acad48` T-1554: round 2 (DL-1240): item 93 names the expand-only page\_links (…
+- **Files changed:** 30 (+3445 −4), by folder:
+  - `contracts/data-access/` README.md +69 −3, data-access.v1.25.schema.json +2628 −0, frozen.json +2 −1
+  - `contracts/data-access/fixtures/` business-status-demo-owner-live.json +17 −0, business-status-demo-owner-offline.json +17 −0, business-status-unknown.json +16 −0, index.json +208 −0, live-step-link-demo-owner-none.json +22 −0, live-step-link-demo-owner-s1-10.json +25 −0, live-step-link-demo-owner-upload-before-lapse.json +25 −0, read-upload-finished-demo-owner.json +17 −0, read-upload-finished-unknown.json +16 −0, review-item-demo-control-not-proven.json +27 −0, review-item-demo-control-open.json +24 −0, review-item-demo-control-proven.json +27 −0, review-item-demo-listing-match-proven.json +27 −0, review-item-unknown.json +16 −0, turn-committed-alex.json +17 −0, turn-committed-none.json +16 −0, turn-committed-parked.json +17 −0, waiting-step-demo-owner-none.json +18 −0, waiting-step-demo-owner-s1-10-held.json +21 −0, waiting-step-demo-owner-s1-10.json +21 −0, waiting-step-demo-owner-s1-32.json +21 −0
+  - `contracts/data-access/fixtures/invalid/` refuse-business-status-unknown-word.json +17 −0, refuse-live-step-link-code-hash.json +26 −0, refuse-review-item-summary.json +28 −0, refuse-turn-committed-outbox-rows.json +21 −0, refuse-upload-finished-object-key.json +18 −0, refuse-waiting-step-key-of-other-step.json +21 −0
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+* T-1554: freeze K-05 v1.25: liveStepLinkOf (a live page link by person, business, purpose and step at a time the caller names), readUploadFinishedAt (the pending upload's finished time), reviewItemById (a review item by id with its decision and controlProven, never the summary), turnCommitted (committed, parked or none), readWaitingStep (the waiting step with its key, home open gap 109) and readBusinessStatus; 20 accepted and 6 refused fixtures; defaults 237 to 245, open gap 109; K-09 v1.14 open gaps 212 and 215 answered
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1554: rebased onto main after T-1549's squash (#945): the freeze record and the v1.25 change-log row say v1.24 merged first, in place of built on its branch
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* T-1554: round 2 (DL-1240): item 93 names the expand-only page_links (person_id, business_id, purpose, step_id) index the v1.25 build's migration adds, since page_links_person_live_idx cannot serve 'ended_at is null or ended_at > at'; the database engineer's entry, the freeze record and the change-log row say so; the v1.25 db-side test seeds the demo-owner fixtures' FK parents; A10's and A11's tests pin decided_at = control_proven_at from one value
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 939. docs: COMMIT\_HISTORY.md through commit 936 (cef0c4ff, \#954) (\#957)
 
