@@ -515,7 +515,7 @@ describe("the one re-read (Q-41: one Sonnet re-read, then one question; never a 
     expect(t.spans.find((span) => span.hop === "commit")?.error_code).toBe("valueFailsWords");
   });
 
-  it("nothing fits: meaning search adds the closest entries (closest-entries.json) and the one re-read runs on them", async () => {
+  it("nothing fits: meaning search adds the closest entries (closest-entries.json) and the one re-read runs on them; still none_fits with no open question and no planner, the turn is passed on at once (K-09 default 221; T-1558)", async () => {
     const { t, face, ai } = await setUp({
       who: ALEX,
       turnId: "turn-alex-gift-card",
@@ -558,7 +558,7 @@ describe("the one re-read (Q-41: one Sonnet re-read, then one question; never a 
         openQuestions: { opened: [], closed: [] },
       }) as never;
 
-    committed(await runTurnLoop(t.turn));
+    const outcome = await runTurnLoop(t.turn);
 
     expect(face.searchCalls).toEqual([closestEntriesFixture.request]);
     expect(ai.rereadCalls).toHaveLength(1);
@@ -566,11 +566,16 @@ describe("the one re-read (Q-41: one Sonnet re-read, then one question; never a 
       why: "noneFits",
       context: closestEntriesFixture.outcome.context,
     });
-    const request = requestsOf(face)[0];
-    if (request?.input.kind !== "decided") throw new Error("not a decided turn");
-    expect(request.input.decided.context).toEqual(closestEntriesFixture.outcome.context);
-    expect(request.input.decided.decide).toEqual(stillNoneFits);
-    expect(request.input.planner).toBeNull();
+    // The re-read on the entries still answers none_fits, the context holds no open question and the planner is not
+    // built: no gateAndCommit, and the turn is parked at once with the passedOn line (the searched context reaching the
+    // gate is shown at ask count 1 in T-1558's tests below).
+    expect(face.gateCalls).toEqual([]);
+    expect(outcome).toMatchObject({
+      result: "notCommitted",
+      why: "passedOnNoneFits",
+      gateCalls: 0,
+      parkedAtOnce: { reason: { from: "decide", fault: "noneFits", ids: [] }, answer: { result: "parked" } },
+    });
     expect(t.spans.find((span) => span.hop === "search")).toMatchObject({
       outcome: "ok",
       got: { quotes: 1, choices: 1 },
@@ -2470,5 +2475,452 @@ describe("a final answer before the commit parks the turn at once (K-09 v1.13 de
     expect(busy.reply.rows.parks).toHaveLength(2);
     expect(busy.reply.dispatcher.wakes).toEqual([]);
     expect(answersOf(busy.t)).toEqual(["turnRefused"]);
+  });
+});
+
+describe("a decided turn that fits nothing, or a question asked twice and still unclear, is passed on at once, not left silent (K-09 README defaults 221 and 223, round 2; DL-1214, DL-1227; T-1558)", () => {
+  const TURN = commitS102.request.turn.id;
+  const TRACE = commitS102.request.turn.traceId;
+  const SAM_PHONE = "+15555550100";
+  const PARKED_AT = parkTurnSamRefused.request.parkedAt;
+  const QUOTE = S1_02_TEXT.body;
+  const [QUESTION] = buildFrontierS102.outcome.context.openQuestions;
+  if (QUESTION === undefined) throw new Error("build-frontier-s1-02.json has no open question");
+  const NONE_FITS = { from: "decide", fault: "noneFits", ids: ["S1-02"] };
+  const NONE_FITS_NO_QUESTION = { from: "decide", fault: "noneFits", ids: [] as string[] };
+  const ASKED_TWICE = { from: "decide", fault: "askedTwice", ids: ["S1-02"] };
+
+  type Part = DecideResult["parts"][number];
+  type Outcome = Part["outcome"];
+  type Reason = typeof NONE_FITS;
+
+  const noneFits = (outcome: Outcome = "go"): Part => ({
+    part: { verb: "none_fits", quote: QUOTE, why: "No offered choice is about this." },
+    outcome,
+  });
+  const noOp = (outcome: Outcome = "go"): Part => ({ part: { verb: "no_op", quote: QUOTE }, outcome });
+  const ask = (questions: string[], outcome: Outcome = "oneQuestion"): Part => ({
+    part: { verb: "ask", quote: QUOTE, questions, unclear: "Which kinds of work?" },
+    outcome,
+  });
+  const enter = (outcome: Outcome): Part => ({
+    part: { verb: "enter", quote: QUOTE, choice: "c-04", fields: [] },
+    outcome,
+  });
+  /** decide-s1-02-choose.json's part (S1-02's option c-01), or another choice, with this outcome. */
+  const choose = (outcome: Outcome, choice = "c-01"): Part => {
+    const [part] = structuredClone(decideS102.parts);
+    if (part === undefined) throw new Error("decide-s1-02-choose.json has no part");
+    return { part: { ...part.part, choice }, outcome };
+  };
+
+  /** decide-s1-02-choose.json's result for Sam's turn with these parts (and agreed, re-read, or an unmapped end). */
+  const samDecided = (parts: Part[], over: Record<string, unknown> = {}): DecideResult => ({
+    ...(structuredClone(decideS102) as unknown as DecideResult),
+    parts,
+    ...over,
+  });
+
+  /**
+   * build-frontier-s1-02.json's answer with S1-02's one open question asked `askCount` times; null: no open question;
+   * `several`: S1-02's and a second one.
+   */
+  function frontierAt(askCount: number | null, several = false): ReturnType<FakeTurnFace["frontier"]> {
+    const answer = structuredClone(buildFrontierS102.outcome);
+    const one = { ...QUESTION, askCount: askCount ?? 1 };
+    const second = { ...QUESTION, openQuestionId: "oq-s1-04", step: "S1-04", askCount: 1 };
+    const questions = askCount === null ? [] : several ? [one, second] : [one];
+    return { ...answer, context: { ...answer.context, openQuestions: questions } };
+  }
+
+  /** A committed answer with no part and no row: what the gate answers a turn it commits as today, silent. */
+  const quietCommit = (request: GateAndCommitRequest): never =>
+    ({
+      result: "committed",
+      turnId: request.turn.id,
+      committedAt: request.now,
+      repeated: false,
+      parts: [],
+      planner: null,
+      core: [],
+      written: { written: [], outboxRows: [], promoted: [] },
+      effects: [],
+      openQuestions: { opened: [], closed: [] },
+    }) as never;
+
+  /** Sam's text on this run: the frontier at `askCount`, decide answering `parts`, the gate committing quietly. */
+  async function samTurn(
+    parts: Part[],
+    askCount: number | null,
+    spec: { several?: boolean; context?: CommitContext; over?: Record<string, unknown> } = {},
+  ): Promise<Setup> {
+    const setup = await setUp({
+      who: SAM,
+      turnId: TURN,
+      traceId: TRACE,
+      texts: [S1_02_TEXT],
+      times: [buildFrontierS102.request.now, PARKED_AT],
+      targets: SAM_S1_02_TARGETS,
+      ...(spec.context === undefined ? {} : { context: spec.context }),
+    });
+    setup.face.frontier = () => frontierAt(askCount, spec.several === true);
+    setup.ai.decide = () => decided(samDecided(parts, spec.over));
+    setup.face.gate = quietCommit;
+    return setup;
+  }
+
+  /** park-turn-sam-refused-at-once.json's request for Sam's turn on try 1, with `reason`: one passedOn row to his handle. */
+  function samPark(reason: Reason): ParkTurnRequest {
+    const fixture = parkTurnSamRefused.request;
+    const request = JSON.parse(
+      JSON.stringify(fixture).replaceAll(fixture.turn.id, TURN),
+    ) as ParkTurnLineRequest;
+    return {
+      ...request,
+      turn: { ...request.turn, eventIds: [S1_02_TEXT.eventId], traceId: TRACE, bundleId: BUNDLE_A, tries: 1 },
+      parkedAt: PARKED_AT,
+      reason,
+      events: request.events.map((entry) => ({
+        ...entry,
+        newValues: { state: "parked", tries: 1 },
+        why: { refused: reason },
+      })),
+    };
+  }
+
+  const restoreAll = (): void => {
+    restores.splice(0).forEach((restore) => {
+      restore();
+    });
+  };
+
+  /** Each answer the lease's commit gave the run, by its error code ("committed" for a commit). */
+  const answersOf = (t: TestTurn): string[] =>
+    t.commits.map((sent) => ("error" in sent.answer ? sent.answer.error : "committed"));
+
+  /** The run was passed on: no gateAndCommit, parked at once with `reason` and its one passedOn row to Sam's handle. */
+  function expectPassedOn(
+    setup: Setup,
+    outcome: TurnOutcome,
+    why: string,
+    reason: Reason,
+    label: string,
+  ): void {
+    const { t, face, reply } = setup;
+    expect(outcome, label).toEqual({
+      result: "notCommitted",
+      why,
+      gateCalls: 0,
+      replies: null,
+      parkedAtOnce: { reason, answer: { result: "parked", parkedAt: PARKED_AT, repeated: false } },
+    });
+    expect(face.gateCalls, label).toEqual([]);
+    expect(reply.rows.parks, label).toEqual([samPark(reason)]);
+    const [row] = (reply.rows.parks[0] as ParkTurnLineRequest).outboxRows;
+    expect(row.recipientHandleId, label).toBe(SAM.party.handleId);
+    expect(row.finalParts.sends, label).toEqual([
+      { kind: "words", text: PASSED_ON_LINE, calendarFile: "none", options: [], link: null },
+    ]);
+    expect(row.finalParts.fixedLines, label).toEqual(["passedOn"]);
+    expect(reply.dispatcher.wakes, label).toEqual([
+      { turnId: TURN, handleId: SAM.party.handleId, outboxRowIds: [parkedRowId(TURN)] },
+    ]);
+    expect(answersOf(t), label).toEqual(["turnParked"]);
+    expect(t.replied.count, label).toBe(0);
+    expect(t.spans.at(-1)?.decided, label).toMatchObject({
+      parked: true,
+      atOnce: true,
+      ...reason,
+      repeated: false,
+      woken: true,
+      sends: 1,
+    });
+    for (const span of t.spans) expect(spanProblems(span), label).toEqual([]);
+    const logged = JSON.stringify(t.spans);
+    for (const words of [QUOTE, PASSED_ON_LINE, "passed this on", SAM_PHONE])
+      expect(logged, label).not.toContain(words);
+  }
+
+  /** The run went to the gate as today: one gateAndCommit with the decided input, committed, and nothing parked. */
+  function expectAsToday(setup: Setup, outcome: TurnOutcome, label: string): void {
+    expect(outcome.result, label).toBe("committed");
+    expect("parkedAtOnce" in outcome, label).toBe(false);
+    expect(
+      requestsOf(setup.face).map((request) => request.input.kind),
+      label,
+    ).toEqual(["decided"]);
+    expect(setup.reply.rows.parks, label).toEqual([]);
+    expect(answersOf(setup.t), label).toEqual(["committed"]);
+  }
+
+  it("none_fits at ask count 2 parks at once with one passedOn row to the turn's own handle, whatever left it unsettled: meaning search answering an error or no answer, its entries the noneFits re-read still answers none_fits on, or no search because a disagreed re-read spent the turn's one re-read (default 221 (b))", async () => {
+    const cases: Record<string, { set: (setup: Setup) => void; searches: number; rereads: string[] }> = {
+      indexUnavailable: { set: () => undefined, searches: 1, rereads: [] },
+      notBuilt: {
+        set: ({ face }) => {
+          face.search = () => ({ error: "notBuilt", call: "closestEntries" });
+        },
+        searches: 1,
+        rereads: [],
+      },
+      noAnswer: {
+        set: ({ face }) => {
+          face.search = () => {
+            throw new Error("the turn face is closed");
+          };
+        },
+        searches: 1,
+        rereads: [],
+      },
+      stillNoneFits: {
+        set: ({ face, ai }) => {
+          face.search = (request) => ({ context: structuredClone(request.context), added: ["A3-51"] });
+          ai.reread = () => decided(samDecided([noneFits()], { reread: true }), ONE_REREAD);
+        },
+        searches: 1,
+        rereads: ["noneFits"],
+      },
+      rereadSpent: {
+        set: ({ ai }) => {
+          ai.decide = () => decided(samDecided([noneFits()], { agreed: false }));
+          ai.reread = () => decided(samDecided([noneFits()], { reread: true }), ONE_REREAD);
+        },
+        searches: 0,
+        rereads: ["disagreed"],
+      },
+    };
+    for (const [label, { set, searches, rereads }] of Object.entries(cases)) {
+      const setup = await samTurn([noneFits()], 2);
+      set(setup);
+
+      const outcome = await runTurnLoop(setup.t.turn);
+
+      expectPassedOn(setup, outcome, "passedOnNoneFits", NONE_FITS, label);
+      expect(setup.face.searchCalls, label).toHaveLength(searches);
+      expect(
+        setup.ai.rereadCalls.map((call) => call.why),
+        label,
+      ).toEqual(rereads);
+      restoreAll();
+    }
+  });
+
+  it("none_fits beside no_op or redact, with no open question, several, or one asked three times, parks the same way; the reason names the one question's step, or none", async () => {
+    const redact: Part = { part: { verb: "redact", quote: QUOTE }, outcome: "go" };
+    const cases: [string, number | null, boolean, Reason][] = [
+      ["no open question", null, false, NONE_FITS_NO_QUESTION],
+      ["several open questions", 1, true, NONE_FITS_NO_QUESTION],
+      ["asked three times", 3, false, NONE_FITS],
+    ];
+    for (const [label, askCount, several, reason] of cases) {
+      const setup = await samTurn([noneFits(), noOp(), redact], askCount, { several });
+      const outcome = await runTurnLoop(setup.t.turn);
+      expectPassedOn(setup, outcome, "passedOnNoneFits", reason, label);
+      restoreAll();
+    }
+  });
+
+  it("a question asked twice and still unclear parks as askedTwice: an ask about it (or naming none), a none_fits or enter part with outcome oneQuestion, a choose of its option ended in one question, alone or beside parts that do nothing (default 223)", async () => {
+    const cases: Record<string, Part[]> = {
+      askAboutIt: [ask([QUESTION.openQuestionId])],
+      askNamingNone: [ask([], "go")],
+      noneFitsOneQuestion: [noneFits("oneQuestion")],
+      enterOneQuestion: [enter("oneQuestion")],
+      chooseOneQuestion: [choose("oneQuestion")],
+      besideNothingToDo: [ask([QUESTION.openQuestionId]), noneFits(), noOp()],
+    };
+    for (const [label, parts] of Object.entries(cases)) {
+      const setup = await samTurn(parts, 2, { over: { reread: true } });
+      const outcome = await runTurnLoop(setup.t.turn);
+      expectPassedOn(setup, outcome, "passedOnAskedTwice", ASKED_TWICE, label);
+      expect(setup.face.searchCalls, label).toEqual([]);
+      restoreAll();
+    }
+  });
+
+  it("at ask count 1 nothing is parked: none_fits, an ask about the question and a none_fits with outcome oneQuestion go to the gate as today, whose commit asks once more (defaults 222 and 194; T-1559)", async () => {
+    const cases: Record<string, { parts: Part[]; over: Record<string, unknown> }> = {
+      noneFits: { parts: [noneFits()], over: {} },
+      ask: { parts: [ask([QUESTION.openQuestionId])], over: { reread: true } },
+      noneFitsOneQuestion: { parts: [noneFits("oneQuestion")], over: { reread: true } },
+    };
+    for (const [label, { parts, over }] of Object.entries(cases)) {
+      const setup = await samTurn(parts, 1, { over });
+      const outcome = await runTurnLoop(setup.t.turn);
+      expectAsToday(setup, outcome, label);
+      expect(requestsOf(setup.face)[0]?.input).toMatchObject({
+        planner: null,
+        decided: { decide: { parts } },
+      });
+      restoreAll();
+    }
+
+    // Meaning search adds an entry and the noneFits re-read still answers none_fits: the searched context and the
+    // re-read's result reach the gate, the planner null, as before T-1558.
+    const searched = await samTurn([noneFits()], 1);
+    const entry = { ...closestEntriesFixture.outcome.context.choices[1], choiceId: "c-06" };
+    searched.face.search = (request) => ({
+      context: { ...structuredClone(request.context), choices: [...request.context.choices, entry] },
+      added: ["A3-51"],
+    });
+    const still = samDecided([noneFits()], { reread: true });
+    searched.ai.reread = () => decided(still, ONE_REREAD);
+    expectAsToday(searched, await runTurnLoop(searched.t.turn), "searched");
+    const request = requestsOf(searched.face)[0];
+    if (request?.input.kind !== "decided") throw new Error("not a decided turn");
+    expect(request.input.decided.context.choices.at(-1)).toEqual(entry);
+    expect(request.input.decided.decide).toEqual(still);
+    expect(request.input.planner).toBeNull();
+    expect(searched.ai.rereadCalls.map((call) => call.why)).toEqual(["noneFits"]);
+  });
+
+  it("no_op alone stays silent, and none_fits beside a committed part commits as today, at ask count 2 and with no open question", async () => {
+    const cases: Record<string, Part[]> = {
+      noOpAlone: [noOp()],
+      besideCommitted: [choose("go"), noneFits()],
+    };
+    for (const [label, parts] of Object.entries(cases)) {
+      for (const askCount of [2, null]) {
+        const setup = await samTurn(parts, askCount);
+        const outcome = await runTurnLoop(setup.t.turn);
+        expectAsToday(setup, outcome, `${label} at ${String(askCount)}`);
+        restoreAll();
+      }
+    }
+  });
+
+  it("at ask count 2, a part not about the one open question, or an unmapped end, goes to the gate as today: an ask naming another question, a choose of no option of it, a no_op ended in one question, and none of them beside several open questions", async () => {
+    const cases: Record<string, { parts: Part[]; over?: Record<string, unknown>; several?: boolean }> = {
+      askOther: { parts: [ask(["oq-s1-04"])] },
+      chooseNoOption: { parts: [choose("oneQuestion", "c-05")] },
+      noOpOneQuestion: { parts: [noOp("oneQuestion")] },
+      unmappedEnd: { parts: [ask([QUESTION.openQuestionId])], over: { end: "oneQuestion" } },
+      severalQuestions: { parts: [noneFits("oneQuestion")], several: true },
+    };
+    for (const [label, { parts, over, several }] of Object.entries(cases)) {
+      const setup = await samTurn(parts, 2, { over: { reread: true, ...over }, several: several === true });
+      const outcome = await runTurnLoop(setup.t.turn);
+      expectAsToday(setup, outcome, label);
+      restoreAll();
+    }
+  });
+
+  /**
+   * Sam's none_fits at ask count 2 beside his keyword text `word`: a keyword text's core action goes to T-267's shared-core
+   * double over Sam's phone, behind the gate, after the records; with `refuseDecided`, a decided request is refused.
+   */
+  async function besideKeyword(
+    word: "STOP" | "START" | "HELP",
+    refuseDecided = false,
+  ): Promise<Setup & { core: ReturnType<typeof fakeReplyCore> }> {
+    const setup = await setUp({
+      who: SAM,
+      turnId: TURN,
+      traceId: TRACE,
+      texts: [S1_02_TEXT, { eventId: "evt-sam-0003", body: word, sentAt: "2026-10-19T14:05:02Z" }],
+      times: [buildFrontierS102.request.now, commitS102.request.now],
+      targets: SAM_S1_02_TARGETS,
+    });
+    setup.face.frontier = () => frontierAt(2);
+    setup.ai.decide = () => decided(samDecided([noneFits()]));
+    const core = fakeReplyCore(commitS102.request.now, [phone(SAM_PHONE, "handle-sam", "person-sam", 3)]);
+    setup.face.gate = async (request) => {
+      if (refuseDecided && request.input.kind === "decided")
+        return { error: "versionChanged", table: "clock_rows", rowId: "clock-s1-02-sam" };
+      const records = request.core.filter((action) => action.call === "recordSafetyOutcome");
+      const answer = await core.core.commitCore({
+        caller: request.caller as never,
+        actions: request.core.slice(records.length) as never,
+      });
+      if ("error" in answer) return answer;
+      const outcome = structuredClone(commitS102.outcome);
+      return {
+        ...outcome,
+        parts: [],
+        core: [...records.map(() => outcome.core[0]), ...answer.core],
+      } as never;
+    };
+    restores.push(setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER }));
+    return { ...setup, core };
+  }
+
+  it("HELP or START beside none_fits at ask count 2 commits as today, the decided input in its one commit: HELP's fixed reply and the START record are never lost to a park (default 221 (d), the skeptic's correction)", async () => {
+    for (const word of ["HELP", "START"] as const) {
+      const setup = await besideKeyword(word);
+      const outcome = committed(await runTurnLoop(setup.t.turn));
+      expect(
+        requestsOf(setup.face).map((request) => request.input.kind),
+        word,
+      ).toEqual(["decided"]);
+      expect(
+        outcome.replies?.replies.map((one) => [one.keyword.kind, one.outcome]),
+        word,
+      ).toEqual([[word.toLowerCase(), "replied"]]);
+      expect(setup.reply.rows.parks, word).toEqual([]);
+      expect(answersOf(setup.t), word).toEqual(["committed"]);
+      restoreAll();
+    }
+  });
+
+  it("a STOP beside none_fits at ask count 2 is never parked: it commits with the decided input, or core-only on the run when the gate refuses the decided request (DL-508, DL-521)", async () => {
+    for (const refuseDecided of [false, true]) {
+      const label = refuseDecided ? "refused" : "committed";
+      const setup = await besideKeyword("STOP", refuseDecided);
+      const outcome = committed(await runTurnLoop(setup.t.turn));
+      expect(
+        requestsOf(setup.face).map((request) => request.input.kind),
+        label,
+      ).toEqual(refuseDecided ? ["decided", "coreOnly"] : ["decided"]);
+      expect(setup.core.phones.get(SAM_PHONE)?.stopped, label).toBe(true);
+      expect(
+        outcome.replies?.replies.map((one) => [one.outcome, one.line, one.stopped]),
+        label,
+      ).toEqual([["replied", "stopReply", true]]);
+      expect(setup.reply.rows.parks, label).toEqual([]);
+      expect(JSON.stringify(setup.reply.rows), label).not.toContain(PASSED_ON_LINE);
+      restoreAll();
+    }
+  });
+
+  it("an open safety hold, a text read as danger or a text whose read timed out: no park, the turn goes to the gate as today; a text with no result: the run ends noSafetyResult as today, with nothing parked (default 221 (f))", async () => {
+    const hold = {
+      eventId: "evt-sam-0000",
+      holdId: "hold-sam-0000",
+      rule: "after_safe",
+      outcomes: ["An emergency"],
+      blocksBooking: true,
+    } as CommitContext["holds"][number];
+    const reads: Record<string, (setup: Setup) => void> = {
+      openHold: () => undefined,
+      danger: ({ facts }) => {
+        facts.safety.set(S1_02_TEXT.eventId, {
+          ...(structuredClone(safetyEmergencyNow) as SafetyResult),
+          eventId: S1_02_TEXT.eventId,
+        });
+      },
+      timedOut: ({ facts }) => {
+        facts.safety.set(S1_02_TEXT.eventId, { ...safetyNoFor(S1_02_TEXT.eventId), timedOut: true });
+      },
+    };
+    for (const [label, set] of Object.entries(reads)) {
+      for (const parts of [[noneFits()], [ask([QUESTION.openQuestionId])]]) {
+        const context = label === "openHold" ? { holds: [hold], unread: [] } : undefined;
+        const setup = await samTurn(parts, 2, {
+          over: { reread: true },
+          ...(context === undefined ? {} : { context }),
+        });
+        set(setup);
+        const outcome = await runTurnLoop(setup.t.turn);
+        expectAsToday(setup, outcome, `${label} ${parts[0]?.part.verb ?? ""}`);
+        restoreAll();
+      }
+    }
+
+    const missing = await samTurn([noneFits()], 2);
+    missing.facts.safety.delete(S1_02_TEXT.eventId);
+    const outcome = await runTurnLoop(missing.t.turn);
+    expect(outcome).toEqual({ result: "notCommitted", why: "noSafetyResult", gateCalls: 0, replies: null });
+    expect(missing.face.frontierCalls).toEqual([]);
+    expect(missing.reply.rows.parks).toEqual([]);
   });
 });

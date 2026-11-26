@@ -47,6 +47,18 @@
 //   against the keyword list each run keeps for its pinned bundle: `keepPinnedKeywords`). After the commit nothing parks:
 //   a final answer of composeInput or finalizeMessage is step 7's (./compose.ts).
 //
+//   A decided turn passed on before the commit (T-1558; K-09 README defaults 221 and 223, round 2, DL-1227; DL-1214):
+//   while the planner and meaning search are unbuilt, a decided turn that fits nothing, or that answers a question asked
+//   twice and still unclear, would commit with no row and go silent. At the end of step 5 (`passOnOf`), such a turn sets
+//   the run's final reason and ends not committed, so it is parked at once as above, with the passedOn line to the turn's
+//   own handle and no gateAndCommit: `{decide, noneFits, [the one open question's step] or []}` (`passedOnNoneFits`) when
+//   every part is none_fits, no_op or redact with outcome go and one is none_fits, and the context holds no open question,
+//   several, or one asked twice or more; `{decide, askedTwice, [its step]}` (`passedOnAskedTwice`) when every other part
+//   is such a part and at least one ended in one question about the context's one open question, asked twice or more,
+//   with no unmapped end. Never in a turn holding any keyword text (a STOP, a START or HELP: `runFrom` passes their count),
+//   while a safety hold is open, beside a text read as danger, or beside a text whose safety result is missing or timed
+//   out; what the run cannot read of these keeps the line back.
+//
 //   7. Reply (T-252, ./compose.ts; arch 02 step 7, line 123): once the turn has committed, each row the commit wrote is
 //      composed, the rows in parallel (compose input, the composer, finalize with at most one rewrite, the fallback and
 //      the passed-on line inside finalize), an email copy takes its text row's plan with no composer call, a fixed
@@ -206,7 +218,8 @@ export interface TurnNotCommitted {
    * Set when a call made before the commit gave a final answer (K-09 v1.13 default 218) in a turn holding no stop word:
    * the reason the turn was parked with at once (labels only), and what the park answered: parked (first or repeated),
    * alreadyCommitted, or why it could not be done now, when the lease's lapse reruns the turn, which meets the same final
-   * answer and parks again (T-1552).
+   * answer and parks again (T-1552). Set too for a decided turn passed on before the commit (T-1558; K-09 defaults 221
+   * and 223), its `why` then `passedOnNoneFits` or `passedOnAskedTwice`.
    */
   readonly parkedAtOnce?: { readonly reason: ParkReason; readonly answer: ParkAnswer };
 }
@@ -540,9 +553,10 @@ async function runFrom(run: Run, guarded: GuardResult<OpenedText>): Promise<Turn
     return keywordsAtOnce ? keywordTurn(run, keywords, null) : notCommitted(run, onward.errorCode);
   }
 
-  const prepared = await prepareDecided(run, texts, onward.targets);
+  const prepared = await prepareDecided(run, texts, onward.targets, keywords.length);
   // A final frontier answer in a turn holding no stop word: no gateAndCommit follows, and the turn parks at once
-  // (K-09 v1.13 default 218). A STOP's keyword texts still commit core-only on this run.
+  // (K-09 v1.13 default 218). A STOP's keyword texts still commit core-only on this run. A decided turn passed on
+  // (`passOnOf`, K-09 defaults 221 and 223) holds no keyword text, so it is handed back as it is and parks at once too.
   if ("result" in prepared) {
     return keywordsAtOnce && !parksAtOnce(run) ? keywordTurn(run, keywords, null) : prepared;
   }
@@ -946,11 +960,15 @@ function isReplyResult(value: unknown): value is ReplyCoreResult {
 
 // ---- 4 and 5. frontier, decide, re-read ---------------------------------------------------------------------------
 
-/** The decided input for the gate (steps 4 and 5), or how the run ended. */
+/**
+ * The decided input for the gate (steps 4 and 5), or how the run ended. `keywords` is how many keyword texts the guard
+ * found in the turn (a STOP, a START or HELP), which only a turn of none may be passed on (K-09 default 221 (d)).
+ */
 async function prepareDecided(
   run: Run,
   texts: TurnText[],
   targets: BuildFrontierRequest["targets"],
+  keywords: number,
 ): Promise<DecidedInput | TurnNotCommitted> {
   const frontier = await buildFrontier(run, {
     caller: { ...run.caller },
@@ -988,7 +1006,129 @@ async function prepareDecided(
     }
   }
   if (replaced(run.turn)) return notCommitted(run, "replaced");
-  return { kind: "decided", decided: { context, decide: decided }, planner: null };
+  const input: DecidedInput = { kind: "decided", decided: { context, decide: decided }, planner: null };
+  // A turn that fits nothing, or answers a question asked twice, no planner settles: passed on at once (T-1558).
+  const passOn = passOnOf(run, input, keywords);
+  if (passOn === null) return input;
+  run.final ??= passOn.reason;
+  return notCommitted(run, passOn.why);
+}
+
+// ---- a decided turn passed on before the commit (T-1558; K-09 README defaults 221 and 223, round 2; DL-1227) ----------
+
+/** The not-committed `why` labels of a decided turn passed on at once (DL-1227). */
+const PASSED_ON_NONE_FITS = "passedOnNoneFits";
+const PASSED_ON_ASKED_TWICE = "passedOnAskedTwice";
+/** Default 194's cap: a question asked this many times is never sent again by the commit (K-02 v1 `askCount`). */
+const ASKED_TWICE = 2;
+/** The verbs that, with outcome go, neither commit, ask, stop nor hold (K-09 default 221 (a); gate.ts default 2). */
+const NOTHING_TO_DO = new Set(["none_fits", "no_op", "redact"]);
+/** The verbs whose part with outcome oneQuestion names no question (K-09 defaults 222 and 223 (a), round 2). */
+const NAMES_NO_QUESTION = new Set(["none_fits", "enter"]);
+
+/** Why a decided turn is passed on: its not-committed label and the park's reason (labels only). */
+interface PassOn {
+  readonly why: string;
+  readonly reason: ParkReason;
+}
+
+/** The context's one open question, as far as the pass-on reads it (K-02 v1 `openQuestion`). */
+interface OneQuestion {
+  readonly openQuestionId: string;
+  readonly step: string;
+  readonly askCount: number;
+}
+
+/**
+ * The context's open questions (K-02 v1 `context.openQuestions`): the one when there is exactly one, else none; null
+ * when they cannot be read (no list, or the one question with no id, no step that is a label or no whole ask count).
+ */
+function openQuestionsOf(context: DecideContext): { only: OneQuestion | null } | null {
+  const questions = context.openQuestions;
+  if (!Array.isArray(questions)) return null;
+  if (questions.length !== 1) return { only: null };
+  const only: unknown = questions[0];
+  if (!isRecord(only) || !isText(only.openQuestionId) || !isLabel(only.step)) return null;
+  const { askCount } = only;
+  if (typeof askCount !== "number" || !Number.isInteger(askCount)) return null;
+  return { only: { openQuestionId: only.openQuestionId, step: only.step, askCount } };
+}
+
+/** A part that neither commits, is asked, stops nor is held: none_fits, no_op or redact with outcome go. */
+const nothingToDo = (entry: DecideResult["parts"][number]): boolean =>
+  entry.outcome === "go" && NOTHING_TO_DO.has(entry.part.verb);
+
+/**
+ * True when decide ended the part in one question about the context's one open question (K-09 default 192 (c), widened
+ * by defaults 222 and 223 (a)): an `ask` that names no other question; a `choose` with outcome oneQuestion whose choice
+ * is one of that question's options; a `none_fits` or `enter` with outcome oneQuestion, which names no question.
+ */
+function askedAbout(
+  context: DecideContext,
+  entry: DecideResult["parts"][number],
+  questionId: string,
+): boolean {
+  const { part } = entry;
+  if (part.verb === "ask") {
+    const questions = part.questions;
+    return Array.isArray(questions) && (questions as unknown[]).every((id) => id === questionId);
+  }
+  if (entry.outcome !== "oneQuestion") return false;
+  if (NAMES_NO_QUESTION.has(part.verb)) return true;
+  if (part.verb !== "choose") return false;
+  const choice = context.choices.find((each) => each.choiceId === part.choice);
+  return choice?.kind === "option" && choice.question === questionId;
+}
+
+/**
+ * K-09 default 221 (d) and (f), which both defaults read: the turn holds no keyword text at all, no safety hold is open
+ * (the holds the lease read at this run's start), and every text the safety read reads has its result, neither timed out
+ * nor read as danger (a danger outcome opens a hold; a missing or timed-out result is a text not read yet). What cannot be
+ * read is taken as holding the line back.
+ */
+function lineMayGo(run: Run, keywords: number): boolean {
+  if (keywords !== 0 || run.stopAsked) return false;
+  const holds: unknown = run.turn.holds;
+  if (!Array.isArray(holds) || holds.length > 0) return false;
+  return run.opened.every((text) => {
+    if (!text.readable) return true;
+    const result = run.safety.get(text.eventId);
+    return result !== undefined && !result.timedOut && !isDanger(result);
+  });
+}
+
+/**
+ * Why a decided turn, as step 5 left it (after meaning search and any re-read; `planner` null), is passed on at once
+ * before the commit, or null when it goes to the gate as today.
+ *
+ * - Default 221 (`passedOnNoneFits`): (a) every part is none_fits, no_op or redact with outcome go, and one is none_fits;
+ *   (b) holds whenever (a) does here, since no entry from meaning search settled the part (it gave none, failed, did not
+ *   run because the turn's one re-read was spent, or the noneFits re-read still answers none_fits); (c) `planner` is null;
+ *   (d) and (f) (`lineMayGo`); (e) the context holds no open question, several, or one with ask count 2 or more. The
+ *   reason names the one open question's step, or none.
+ * - Default 223 (`passedOnAskedTwice`): (a) at least one part ended in one question about the context's one open question
+ *   (`askedAbout`), and every other part is such a part or one that does nothing; (b) no unmapped end (K-02 v1.2 `end`)
+ *   and `planner` null; (c) exactly one open question, with ask count 2 or more; (d) and (f). The reason names its step.
+ *
+ * The two never both hold: 221 (a) admits no `ask` and no outcome oneQuestion, which 223 (a) needs.
+ */
+function passOnOf(run: Run, input: DecidedInput, keywords: number): PassOn | null {
+  if (!lineMayGo(run, keywords)) return null;
+  const { context, decide } = input.decided;
+  const questions = openQuestionsOf(context);
+  if (questions === null) return null;
+  const { only } = questions;
+  const parts = decide.parts;
+  if (parts.every(nothingToDo)) {
+    if (!parts.some((entry) => entry.part.verb === "none_fits")) return null;
+    if (only !== null && only.askCount < ASKED_TWICE) return null;
+    const ids = only === null ? [] : [only.step];
+    return { why: PASSED_ON_NONE_FITS, reason: { from: "decide", fault: "noneFits", ids } };
+  }
+  if (only === null || only.askCount < ASKED_TWICE || Object.hasOwn(decide, "end")) return null;
+  const asked = parts.filter((entry) => askedAbout(context, entry, only.openQuestionId));
+  if (asked.length === 0 || asked.length + parts.filter(nothingToDo).length !== parts.length) return null;
+  return { why: PASSED_ON_ASKED_TWICE, reason: { from: "decide", fault: "askedTwice", ids: [only.step] } };
 }
 
 function isContextOf(value: unknown, turnId: string): value is DecideContext {
