@@ -13,6 +13,20 @@
 // exactly the labels the frontier offers: a button that is no label with words (K-01 v1's lettered pair, such as
 // ["C", "Neither works"]) leaves the step with none, since the frontier then offers none and never guesses which of a
 // pair's words stands for the button. Labels are bundle words, never a person's, and never reach a row or an error.
+//
+// The stop field (T-1562; K-01 v1.1 `step.stop`, contracts/bundle README section v1.1, defaults 20 to 27; ruling T-1543
+// card B6 (e)): a plain step may carry how it stops the walk, `asksByWords { answerFields }` or `waitsOnEvent { keys }`,
+// exactly one, read per step from the turn's pinned graph (GraphStep.stop) and read before the step's buttons (walk.ts).
+// A step with no `stop` is read as K-01 v1 reads it (K-01 v1.1 default 21), so bundles v0 to v3 read as before. An
+// asks-by-words step's ask is its line 0, Rosie's with no reply button; a later line from Rosie that carries buttons is
+// a read-back (R32, R38; T-1544 Lead note 2, DL-1209), never the first ask's labels, so such a step keeps no button
+// labels (GraphStep.buttonLabels is empty), and an answer naming a read-back's button never answers its first ask. The
+// contract value stays "bundle.v1" (R34), so flowGraphOf's contract check is unchanged. A stop on a split, a stop with
+// both kinds or neither, or a kind not in K-01 v1.1's shape is refused (stepNotWellFormed), never read in part.
+//
+// Line 0 (T-1562; R30, K-09 README default 229): who sends the step's first `say` line and to whom (GraphStep.firstLine),
+// so the walk's ask can tell an owner -> san step whose line 0 is Rosie's to that owner (S1-12, S1-23, S1-61, S1-21,
+// S1-24, S1-29). Only its two lanes are kept, never its words.
 
 import { WalkRefusedError } from "./errors";
 
@@ -54,6 +68,28 @@ export interface GraphCard {
   readonly clock: { readonly from: string; readonly text: string | null } | null;
 }
 
+/** K-01 v1.1 `wordsAnswerField`: a field an asks-by-words answer carries, with its type (never `choice`). */
+export interface WordsAnswerField {
+  readonly name: string;
+  readonly type: string;
+}
+
+/**
+ * K-01 v1.1 `step.stop`, as the walk reads it (T-1562): how a plain step stops the walk.
+ *   - asksByWords: its line 0 asks its reader with no reply button; the walk stops there with an open question with no
+ *     options (K-09 README default 228), and the answer carries `answerFields`;
+ *   - waitsOnEvent: the walk stops right after the step, waiting on the event that gives `keys` (default 209).
+ */
+export type StepStop =
+  | { readonly kind: "asksByWords"; readonly answerFields: readonly WordsAnswerField[] }
+  | { readonly kind: "waitsOnEvent"; readonly keys: readonly string[] };
+
+/** Who sends a step's line 0 and to whom (K-01 v1 message `from` and `to`), never its words. */
+export interface LineLanes {
+  readonly from: string;
+  readonly to: string | null;
+}
+
 /** K-01 v1 `step`, as the walk reads it. */
 export interface GraphStep {
   readonly id: string;
@@ -80,6 +116,14 @@ export interface GraphStep {
   /** The next step on its own list, or null where the list ends (K-01 v1 step.next). */
   readonly next: string | null;
   readonly card: GraphCard | null;
+  /**
+   * How the plain step stops the walk (K-01 v1.1 `step.stop`; T-1562), left out when the step carries no stop: then it
+   * stops as under K-01 v1 (K-09 README default 209's table and default 214). An asks-by-words step keeps no button
+   * labels: a later line's buttons are a read-back's (R38).
+   */
+  readonly stop?: StepStop;
+  /** Who sends the step's line 0 (its first `say` line) and to whom; left out when it has none (R30). */
+  readonly firstLine?: LineLanes;
 }
 
 /** A split's branch whose own steps list a step. */
@@ -210,6 +254,43 @@ function buttonsOf(value: unknown, stepId: string): Buttons {
   return { count, labels: allLabels ? labels : [] };
 }
 
+/** Line 0's two lanes (K-01 v1 message `from`, `to`), or undefined when the step has no line; the words never kept. */
+function firstLineOf(value: unknown, stepId: string): LineLanes | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const messages: unknown[] = value;
+  const [first] = messages;
+  if (first === undefined) return undefined;
+  if (!isRecord(first) || !isText(first.from)) throw notWellFormed(stepId);
+  return { from: first.from, to: optionalText(first.to, stepId) };
+}
+
+function answerFieldOf(value: unknown, stepId: string): WordsAnswerField {
+  if (!isRecord(value) || !isText(value.name) || !isText(value.type) || value.type === "choice") {
+    throw notWellFormed(stepId);
+  }
+  return { name: value.name, type: value.type };
+}
+
+/**
+ * K-01 v1.1 `step.stop` (T-1562): one kind as its one key, on a plain step only; undefined when the step has none. Any
+ * other shape is refused (stepNotWellFormed): a split's stop, both kinds or neither, or a kind's own fields malformed.
+ */
+function stopOf(value: unknown, stepId: string, split: boolean): StepStop | undefined {
+  if (value === undefined) return undefined;
+  if (split || !isRecord(value) || Object.keys(value).length !== 1) throw notWellFormed(stepId);
+  const { asksByWords, waitsOnEvent } = value;
+  if (isRecord(asksByWords) && Array.isArray(asksByWords.answerFields)) {
+    const listed: unknown[] = asksByWords.answerFields;
+    return { kind: "asksByWords", answerFields: listed.map((field) => answerFieldOf(field, stepId)) };
+  }
+  if (isRecord(waitsOnEvent)) {
+    const keys = textsOf(waitsOnEvent.keys, stepId, false);
+    if (keys.length === 0) throw notWellFormed(stepId);
+    return { kind: "waitsOnEvent", keys };
+  }
+  throw notWellFormed(stepId);
+}
+
 function stepOf(id: string, value: unknown): GraphStep {
   if (!isRecord(value) || value.id !== id || !isText(value.who) || !isText(value.via))
     throw notWellFormed(id);
@@ -222,6 +303,8 @@ function stepOf(id: string, value: unknown): GraphStep {
   }
   const listed: unknown[] = Array.isArray(value.branches) ? value.branches : [];
   const buttons = buttonsOf(value.say, id);
+  const stop = stopOf(value.stop, id, split);
+  const firstLine = firstLineOf(value.say, id);
   return {
     id,
     who: value.who,
@@ -233,9 +316,12 @@ function stepOf(id: string, value: unknown): GraphStep {
     gives: textsOf(value.gives, id, true),
     tells: textsOf(value.tells, id, true),
     buttons: buttons.count,
-    buttonLabels: buttons.labels,
+    // An asks-by-words step's later buttons are a read-back's, never its first ask's labels (R38).
+    buttonLabels: stop?.kind === "asksByWords" ? [] : buttons.labels,
     next: stepRef(value.next, id),
     card: cardOf(value.card, id),
+    ...(stop === undefined ? {} : { stop }),
+    ...(firstLine === undefined ? {} : { firstLine }),
   };
 }
 

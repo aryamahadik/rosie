@@ -7,8 +7,12 @@
 // (K-09 README default 199: a plain step with buttons that bound code settles is walked, not asked; T-1492 builds S1-04's
 // one-kind settler, T-1493 binds it). T-1519 adds `chats` (K-05 v1.10 item 51's readChatHandle: S1-01 reuses the
 // handle's own chat thread for the turn's chat instead of inserting a second one). T-1532 adds the wait at an event step
-// (K-09 README default 209: EVENT_ONLY_KEYS, the stop waitsOnEvent and the refusal eventKeyAtWalk; nothing to bind). See
-// writes.ts, buttons.ts, settle.ts and walk.ts.
+// (K-09 README default 209: EVENT_ONLY_KEYS, the stop waitsOnEvent and the refusal eventKeyAtWalk; nothing to bind).
+// T-1562 (ruling T-1543 card B6; K-01 v1.1's stop; K-09 v1.14 defaults 223 and 226 to 229, 234 and 235) adds the stop
+// field (graph.ts GraphStep.stop: asks-by-words stops and answers), `reachSettlers` (reach.ts: a split code settles where
+// the walk reaches it, before atSplit), owner-lane asks and answers, the event table with control_proven (EVENT_TABLE),
+// and the waiting-step starts (WalkStart "event" and "resume", with the writer call open to them: OpenStepWriter), which
+// A11 makes; this card binds none of them. See writes.ts, buttons.ts, reach.ts, settle.ts and walk.ts.
 
 export {
   buttonsAnswer,
@@ -19,6 +23,14 @@ export {
   type RowsBuilt,
 } from "./buttons";
 export { WalkNotBuiltError, WalkRefusedError, type WalkFault, type WalkSeam } from "./errors";
+export {
+  REACH_ASKS,
+  REACH_WAITS,
+  reachAnswer,
+  type ReachSettler,
+  type ReachSettlerCall,
+  type ReachSettlers,
+} from "./reach";
 export {
   isSplitStep,
   settledBranch,
@@ -37,16 +49,25 @@ export {
   type GraphCard,
   type GraphEffect,
   type GraphStep,
+  type LineLanes,
+  type StepStop,
+  type WordsAnswerField,
 } from "./graph";
 export {
   EVENT_ONLY_KEYS,
+  EVENT_TABLE,
   MAX_WALK,
   eventKeysIn,
+  waitingKeyAt,
   walkFrom,
   walkStretchFrom,
+  type EventWait,
   type Move,
+  type ReachAnswer,
   type Stop,
   type Stretch,
+  type WaitingStart,
+  type WalkOptions,
   type WalkStart,
   type Walked,
 } from "./walk";
@@ -57,6 +78,9 @@ export {
   textSourceOf,
   type BundleIdOf,
   type LiveQuestion,
+  type OpenStepWriter,
+  type OpenStepWriterCall,
+  type StartedWriterCall,
   type StepRows,
   type StepWriter,
   type StepWriterCall,
