@@ -7,7 +7,9 @@
 //     finalize-passed-on.json);
 //   - K-02 v1's decide and re-read (`fakeDecide`): the decide-*.json results, with the model calls a stage reports;
 //   - the second half's ports (`fakeReply`, T-252): the composer (K-03 plans, with its model calls), K-05 v1's
-//     unplannedRows and writePlan, and the dispatcher's wake; and K-05 v1's parkTurn as park-turn.json answers it (T-253);
+//     unplannedRows and writePlan, and the dispatcher's wake; and K-05 parkTurn as park-turn.json answers it (T-253), in
+//     either form, a v1.23 request first held to item 84's checks as db/repo/park.ts holds it, its row's plan and final
+//     parts to park-turn-sam-refused-at-once.json's, word for word (T-1552);
 //   - the handle's directory and a clock of the fixtures' `now` values (`turnDeps`), and the safety results (safety-no.json
 //     under each text's event id: `FakeFacts.safety`), which a test turn's `resultsOf` answers as the lease answers it from
 //     the actor's kept results (ADR-015 section 3);
@@ -20,6 +22,7 @@
 // frozen fixtures' ids; phones in the fictional 555-01xx range (rule 9).
 
 import buildFrontierS102 from "../../../contracts/tool-api/fixtures/build-frontier-s1-02.json";
+import parkTurnSamRefused from "../../../contracts/data-access/fixtures/park-turn-sam-refused-at-once.json";
 import parkTurn from "../../../contracts/data-access/fixtures/park-turn.json";
 import textImessage from "../../../contracts/inbound-event/fixtures/text-imessage.json";
 import safetyNo from "../../../contracts/model/fixtures/safety-no.json";
@@ -28,7 +31,7 @@ import { manifestOf, type Manifest, type PinnedBundle } from "../bundle";
 import { prepareHandoff, type HandleRef, type InboundEvent, type SealingKeyStore } from "../gateway";
 import type { HandleTargetsAnswer, Role, TargetRole } from "../guard";
 import type { SafetyResult } from "../safety/types";
-import { openTrace, type BundleId, type Span } from "../trace";
+import { isLabel, openTrace, type BundleId, type Span } from "../trace";
 import type { ModelCall } from "../trace/types";
 import { commitThroughToolApi } from "./turn";
 import type {
@@ -533,16 +536,80 @@ export interface FakeRows {
   write: (request: WriteRowPlanRequest) => WriteRowPlanAnswer;
   /**
    * What parkTurn answers (a throw: no answer). Unset by a test: park-turn.json's outcome for the request's own turn,
-   * parked once, then the first result again with `repeated` (K-05 v1 item 12).
+   * parked once, then the first result again with `repeated` (K-05 v1 item 12; v1.23 default 223), after K-05 v1.23 item
+   * 84's checks (`checkParkRequest`).
    */
   park: (request: ParkTurnRequest) => ParkTurnAnswer;
   readonly log: string[];
 }
 
-/** K-05 v1 parkTurn as park-turn.json answers it, for whichever turn asks: parked once per turn id, then repeated. */
+/** The fixture's row, whose plan and final parts every v1.23 park's row holds but for its own id and channel. */
+const SAM_PARKED_ROW = parkTurnSamRefused.request.outboxRows[0];
+
+/** A JSON value with each object's keys in order, so two values compare by what they hold. */
+function sorted(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sorted);
+  if (typeof value !== "object" || value === null) return value;
+  return Object.fromEntries(
+    Object.entries(value)
+      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+      .map(([key, item]) => [key, sorted(item)]),
+  );
+}
+
+const sameJson = (a: unknown, b: unknown): boolean => JSON.stringify(sorted(a)) === JSON.stringify(sorted(b));
+
+/** K-05's refusal of a request it cannot carry out, before any statement: a TypeError naming the field alone. */
+function refuse(what: string): never {
+  throw new TypeError(`parkTurn: ${what}`);
+}
+
+/**
+ * K-05 v1.23 item 84's checks on a request in v1.23's form (one that names a reason, or whose row holds a plan or final
+ * parts: db/repo/park.ts default 4), as db/repo/park.ts makes them before any statement, thrown as a TypeError naming the
+ * field: tries 1 to 3; a reason of three labels with its ids each once, required before the third try; exactly one row
+ * to the turn's own handle, a quick reply about no booking, asking no question, on no versions read; its plan and final
+ * parts park-turn-sam-refused-at-once.json's, word for word (the passedOn line), but for the row's own id and channel. A
+ * request in v1's form passes as K-05 v1 takes it.
+ */
+export function checkParkRequest(request: ParkTurnRequest): void {
+  const rows: readonly Record<string, unknown>[] = request.outboxRows as never;
+  const lineForm = "reason" in request || rows.some((row) => "plan" in row || "finalParts" in row);
+  if (!lineForm) return;
+  const { tries } = request.turn;
+  if (![1, 2, 3].includes(tries)) refuse("turn.tries");
+  const reason = "reason" in request ? request.reason : undefined;
+  if (reason === undefined && tries !== 3) refuse("reason");
+  if (reason !== undefined) {
+    if (Object.keys(reason).sort().join() !== "fault,from,ids") refuse("reason");
+    if (!isLabel(reason.from)) refuse("reason.from");
+    if (!isLabel(reason.fault)) refuse("reason.fault");
+    if (!Array.isArray(reason.ids) || !reason.ids.every((id) => isLabel(id))) refuse("reason.ids");
+    if (new Set(reason.ids).size !== reason.ids.length) refuse("reason.ids");
+  }
+  const [row] = rows;
+  if (rows.length !== 1 || row === undefined) refuse("outboxRows");
+  if (row.recipientHandleId !== request.turn.handleId) refuse("outboxRows[0].recipientHandleId");
+  if (row.sendClass !== "quick_reply") refuse("outboxRows[0].sendClass");
+  for (const field of ["bookingId", "openQuestionId", "copyOfRowId"]) {
+    if (row[field] !== null) refuse(`outboxRows[0].${field}`);
+  }
+  if (!sameJson(row.versionsRead, [])) refuse("outboxRows[0].versionsRead");
+  const own = { row: row.id, channel: row.channel };
+  if (!sameJson(row.plan, { ...SAM_PARKED_ROW?.plan, ...own })) refuse("outboxRows[0].plan");
+  if (!sameJson(row.finalParts, { ...SAM_PARKED_ROW?.finalParts, ...own })) {
+    refuse("outboxRows[0].finalParts");
+  }
+}
+
+/**
+ * K-05 parkTurn as park-turn.json answers it, for whichever turn asks: parked once per turn id, then repeated, after K-05
+ * v1.23 item 84's checks (`checkParkRequest`, which throws for a request K-05 throws on).
+ */
 export function parkTurnFixture(): (request: ParkTurnRequest) => ParkTurnAnswer {
   const first = new Map<string, ParkTurnResponse>();
   return (request) => {
+    checkParkRequest(request);
     const known = first.get(request.turn.id);
     if (known !== undefined) return { ...structuredClone(known), repeated: true };
     const answer: ParkTurnResponse = {

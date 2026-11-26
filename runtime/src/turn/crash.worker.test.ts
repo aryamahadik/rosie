@@ -10,7 +10,8 @@
 // cut off (`state.abort` after its storage is synced, as T-1088's resume tests and T-248's restart test do: what the
 // instance awaited lived only in memory; its storage and its alarm stay). A run cut off waits on a promise that never
 // settles and on no timer, so nothing of it runs after the cut. K-05's doubles keep one plan per row, the first written
-// (writePlan's alreadyPlanned), and park a turn once (park-turn.json, then `repeated`). Doubles answer the K-09, K-02,
+// (writePlan's alreadyPlanned), and park a turn once (park-turn.json's answer, then `repeated`), writing the park's row
+// with the words its v1.23 request carries (T-1552: the passedOn line). Doubles answer the K-09, K-02,
 // K-03 and K-05 fixtures with the running turn's own ids (the lease hashes the turn id from the event ids: CQ-09; the trace
 // id is the text's). Test values only: the master's sample cast and the fixtures' ids, test words, phones in the
 // fictional 555-01xx range (rule 9).
@@ -19,9 +20,11 @@ import { exports } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import buildFrontierS102 from "../../../contracts/tool-api/fixtures/build-frontier-s1-02.json";
+import commitRefused from "../../../contracts/tool-api/fixtures/commit-s1-02-refused-step-not-in-bundle.json";
 import commitS102 from "../../../contracts/tool-api/fixtures/commit-s1-02.json";
 import composeInputS102 from "../../../contracts/tool-api/fixtures/compose-input-s1-02.json";
 import batchTurnAfterArrival from "../../../contracts/tool-api/fixtures/j3-safety-arrival-batch-turn.json";
+import parkTurnMayaCrash from "../../../contracts/data-access/fixtures/park-turn-maya-crash-with-line.json";
 import parkTurn from "../../../contracts/data-access/fixtures/park-turn.json";
 import planS102 from "../../../contracts/message-plan/fixtures/plan-s1-02.json";
 import decideS102 from "../../../contracts/model/fixtures/decide-s1-02-choose.json";
@@ -52,12 +55,14 @@ import {
 import type { PlannedSend } from "../dispatch/types";
 import { actorNameOf, durableObjectActor, type ActorNamespace, type HandleActorRpc } from "../gateway";
 import { fakeKeyStore } from "../gateway/test-support";
-import { setGuardDeps } from "../guard";
+import { setGuardDeps, setReplyDeps } from "../guard";
+import { fakeCore as fakeReplyCore, phone, ROSIE_NUMBER } from "../guard/replies/test-support";
 import { fakeTargets } from "../guard/test-support";
 import { fixtureBundle, harness, type Harness } from "../safety/test-support";
 import type { RecordSafetyOutcomeResponse, SafetyResult } from "../safety/types";
 import { spanProblems, type Span } from "../trace";
-import { parkedRowId, setTurnDeps, turnHooks } from "./index";
+import { parkedRowId, setTurnDeps, turnHooks, turnReplyCore } from "./index";
+import { PASSED_ON_LINE } from "./park";
 import {
   MAYA,
   SAM,
@@ -88,6 +93,7 @@ import type {
   FinalizeMessageRequest,
   FinalParts,
   GateAndCommitAnswer,
+  ParkTurnLineRequest,
   ParkTurnRequest,
   TurnDeps,
   TurnParty,
@@ -794,22 +800,59 @@ const MAYA_TEXT = {
   sentAt: "2026-11-07T15:16:00Z",
 };
 const MAYA_WORDS = "Test words: can I move to the 6pm class?";
-/** Stand-in words for the "nothing changed" row: K-05 writes that row, and the runtime never words it. */
-const NOTHING_CHANGED = "Test words: the nothing-changed line K-05's row holds.";
 
-/** park-turn.json's request for the running turn: its turn id, the text's trace id, and the ids fixed by its turn id. */
+/**
+ * park-turn-maya-crash-with-line.json's request (K-05 v1.23 item 84, T-1529's ruling card 7) for the running turn: its turn
+ * id and the ids fixed by it, the text's event and trace ids, the pinned bundle and the park's time; tries 3, no reason,
+ * v1's outage why, and the one row to Maya's own handle carrying the passedOn line.
+ */
 function parkRequestFor(turnId: string): ParkTurnRequest {
-  const fixture = structuredClone(parkTurn.request) as unknown as ParkTurnRequest;
+  const fixture = parkTurnMayaCrash.request;
+  const request = JSON.parse(
+    JSON.stringify(fixture).replaceAll(fixture.turn.id, turnId),
+  ) as ParkTurnLineRequest;
   return {
-    ...fixture,
-    turn: { ...fixture.turn, id: turnId, traceId: TRACE },
-    outboxRows: fixture.outboxRows.map((row) => ({ ...row, id: parkedRowId(turnId) })),
-    events: fixture.events.map((entry) => ({ ...entry, id: `log-${turnId}-parked`, rowId: turnId })),
+    ...request,
+    turn: { ...request.turn, eventIds: [MAYA_TEXT.eventId], traceId: TRACE, bundleId: BUNDLE_V0 },
+    parkedAt: parkTurn.request.parkedAt,
+  };
+}
+
+/**
+ * parkRequestFor's request in v1's form (K-05 item 12, park-turn.json's, which v1.23's item 84 still takes): its one row
+ * with no plan and no final parts, so no line is written; tries 3, no reason, v1's outage why.
+ */
+function unwordedParkFor(turnId: string): ParkTurnRequest {
+  const request = parkRequestFor(turnId) as ParkTurnLineRequest;
+  const unworded = Object.fromEntries(
+    Object.entries(request.outboxRows[0]).filter(([key]) => key !== "plan" && key !== "finalParts"),
+  );
+  return {
+    turn: request.turn,
+    parkedAt: request.parkedAt,
+    outboxRows: [unworded as never],
+    events: request.events,
+  };
+}
+
+/**
+ * K-05 parkTurn as the turn's doubles answer it (park-turn.json's answer, then repeated), and the row it writes: the park's
+ * one row, given the words its request carries (its final parts), so the dispatcher sends what K-05 stored.
+ */
+function parkWriting(rig: Rig): (request: ParkTurnRequest) => ReturnType<FakeReply["rows"]["park"]> {
+  const k05 = parkTurnFixture();
+  return (request) => {
+    const answer = k05(request);
+    if ("result" in answer && !answer.repeated) {
+      const [row] = (request as ParkTurnLineRequest).outboxRows;
+      rig.outbox.recompose(row.id, row.finalParts.sends as PlannedSend[], []);
+    }
+    return answer;
   };
 }
 
 describe("three crashes before the commit", { timeout: SLOW_MS }, () => {
-  it("park the turn (park-turn.json): a park K-05 cannot take now is tried again, the next text starts a new turn, and the person gets exactly one 'nothing changed' line", async () => {
+  it("park the turn (park-turn-maya-crash-with-line.json): a park K-05 cannot take now is tried again, the next text starts a new turn, and the person gets exactly one passedOn line", async () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
     const turnId = await turnIdOf([MAYA_TEXT.eventId]);
     const rowId = parkedRowId(turnId);
@@ -828,16 +871,14 @@ describe("three crashes before the commit", { timeout: SLOW_MS }, () => {
         answerFrontier(rig);
         // Every run of every turn hangs in decide: no commit ever comes.
         rig.ai.decide = () => never();
-        // K-05 parkTurn (park-turn.json): the first try meets two transient answers; on the next, the park goes through
-        // but its answer is lost on the way, and the same request sent again answers repeated. K-05 writes the one row.
-        const k05 = parkTurnFixture();
+        // K-05 parkTurn (v1.23's crash park with the line): the first try meets two transient answers; on the next, the
+        // park goes through but its answer is lost on the way, and the same request sent again answers repeated. K-05
+        // writes the one row, with the words the request carries.
+        const k05 = parkWriting(rig);
         rig.reply.rows.park = (request) => {
           const sends = rig.reply.rows.parks.length;
           if (sends <= 2) return { error: "transient", sqlstate: "40001" };
           const answer = k05(request);
-          if ("result" in answer && !answer.repeated) {
-            rig.outbox.recompose(rowId, [words(NOTHING_CHANGED)], []);
-          }
           if (sends === 3) throw new Error("the answer was lost");
           return answer;
         };
@@ -889,11 +930,13 @@ describe("three crashes before the commit", { timeout: SLOW_MS }, () => {
           tries: 1,
         });
 
-        // The person got exactly one "nothing changed" line: the dispatcher, woken once for the park's row, sent it once.
+        // The person got exactly one line, K-01's passedOn line word for word (card 7): the dispatcher, woken once for the
+        // park's row, sent it once, to Maya's own handle's chat.
         expect(rig.wakes).toEqual([{ turnId, handleId: "handle-maya", outboxRowIds: [rowId] }]);
         expect(rig.linq.requests.map((request) => [request.idempotencyKey, request.text])).toEqual([
-          [`${rowId}/1/1`, NOTHING_CHANGED],
+          [`${rowId}/1/1`, PASSED_ON_LINE],
         ]);
+        expect(rig.linq.requests[0]).toMatchObject({ chatId: CHATS["handle-maya"].chatId });
         expect(rig.outbox.row(rowId)).toMatchObject({ state: "sent" });
 
         // Nothing parks again, and no second line goes.
@@ -907,10 +950,15 @@ describe("three crashes before the commit", { timeout: SLOW_MS }, () => {
           .filter((line) => line.msg === "span" && line.turn_id === turnId && line.hop === "lease");
         const parkSpans = spans.filter((span) => (span.decided as Json | undefined)?.parked !== undefined);
         expect(
-          parkSpans.map((span) => [span.outcome, (span.decided as Json).parked, span.error_code]),
+          parkSpans.map((span) => [
+            span.outcome,
+            (span.decided as Json).parked,
+            (span.decided as Json).atOnce,
+            span.error_code,
+          ]),
         ).toEqual([
-          ["failed", false, "transient"],
-          ["ok", true, null],
+          ["failed", false, false, "transient"],
+          ["ok", true, false, null],
         ]);
         for (const span of parkSpans) {
           const fields = Object.fromEntries(
@@ -923,7 +971,80 @@ describe("three crashes before the commit", { timeout: SLOW_MS }, () => {
           { table: "outbox_rows", id: rowId },
         ]);
         const lines = log.mock.calls.map((call) => String(call[0])).join("\n");
-        for (const secret of [MAYA_WORDS, MAYA.handle.address]) expect(lines).not.toContain(secret);
+        for (const secret of [MAYA_WORDS, MAYA.handle.address, PASSED_ON_LINE]) {
+          expect(lines).not.toContain(secret);
+        }
+      },
+    );
+  });
+
+  it("a turn holding STOP whose STOP never commits (its core-only gateAndCommit answers transient on every try) is parked after its third lapse in v1's form, its row unworded: the person who texted STOP gets no passedOn line (K-09 v1.13 default 218: card 7 keeps the rule for a turn whose STOP never committed; DL-1211)", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const turnId = await turnIdOf([MAYA_TEXT.eventId]);
+    await withRig(
+      MAYA,
+      {
+        answers: { [MAYA_TEXT.eventId]: safetyNoFor(MAYA_TEXT.eventId) },
+        times: [parkTurn.request.parkedAt],
+        outbox: [],
+        turnRows: [],
+      },
+      async (rig) => {
+        // The keyword texts' replies commit through the turn's own commit (T-267's turnReplyCore), over Maya's phone.
+        const core = fakeReplyCore(parkTurn.request.parkedAt, [
+          phone(MAYA.handle.address, "handle-maya", "person-maya", 3),
+        ]);
+        const restore = setReplyDeps({ core: turnReplyCore, rows: core.rows, rosieNumber: ROSIE_NUMBER });
+        try {
+          // Every gateAndCommit answers transient: the STOP's core-only commit never goes through, on any try.
+          rig.face.gate = () => ({ error: "transient", sqlstate: "40001" });
+
+          await arrive(MAYA, MAYA_TEXT.eventId, "STOP", MAYA_TEXT.sentAt);
+          await rig.tick(3000);
+          const triesSent = (): number[] => rig.face.gateCalls.map((call) => call.request.turn.tries);
+          await until(() => triesSent().includes(1), "try 1's core-only commit");
+          await rig.tick(LEASE_MS);
+          await until(() => triesSent().includes(2), "try 2's core-only commit");
+          await rig.tick(LEASE_MS);
+          await until(() => triesSent().includes(3), "try 3's core-only commit");
+          // Its first commit call marked the turn committing, and the lease keeps it so (sticky: the call may have gone
+          // through); a lapse reruns a committing turn the same as a leased one, and parks it after the third try.
+          expect(await rig.actor.readTurns()).toMatchObject([{ turnId, state: "committing", tries: 3 }]);
+
+          // The third lapse with no commit parks the turn: in v1's form, its one row to Maya's handle unworded.
+          await rig.tick(LEASE_MS);
+          await until(() => rig.reply.rows.parks.length === 1, "the crash park");
+          await rig.settle();
+          expect(rig.face.gateCalls.every((call) => call.request.input.kind === "coreOnly")).toBe(true);
+          expect(rig.reply.rows.parks).toEqual([unwordedParkFor(turnId)]);
+          const [row] = rig.reply.rows.parks[0]?.outboxRows ?? [];
+          expect(Object.keys(row ?? {}).sort()).toEqual(
+            Object.keys(parkTurn.request.outboxRows[0] ?? {}).sort(),
+          );
+          expect(await rig.actor.readTurns()).toMatchObject([
+            { turnId, state: "parked", tries: 3, leaseUntil: null, committedAt: null },
+          ]);
+
+          // No line to the number whose STOP is in the turn: the row has no words, and nothing went to Linq.
+          expect(rig.wakes).toEqual([
+            { turnId, handleId: "handle-maya", outboxRowIds: [parkedRowId(turnId)] },
+          ]);
+          expect(rig.linq.requests).toEqual([]);
+          expect(JSON.stringify(rig.reply.rows.parks)).not.toContain(PASSED_ON_LINE);
+
+          // The park's span says its row carries no line; no log line holds the words, the line or the number.
+          const parkSpans = log.mock.calls
+            .map((call) => JSON.parse(String(call[0])) as Json)
+            .filter((line) => line.msg === "span" && line.turn_id === turnId && line.hop === "lease")
+            .filter((span) => (span.decided as Json | undefined)?.parked !== undefined);
+          expect(parkSpans.map((span) => span.decided)).toEqual([
+            { parked: true, atOnce: false, line: false, repeated: false, woken: true, sends: 1 },
+          ]);
+          const lines = log.mock.calls.map((call) => String(call[0])).join("\n");
+          for (const secret of [PASSED_ON_LINE, MAYA.handle.address]) expect(lines).not.toContain(secret);
+        } finally {
+          restore();
+        }
       },
     );
   });
@@ -976,3 +1097,95 @@ describe("three crashes before the commit", { timeout: SLOW_MS }, () => {
     );
   });
 });
+
+// ---- a final answer before the commit (T-1552) ------------------------------------------------------------------------
+
+describe(
+  "a final answer before the commit (K-09 v1.13 default 218; T-1529's ruling card 6)",
+  { timeout: SLOW_MS },
+  () => {
+    it("parks the turn at once through the real lease: no resend and no rerun, the lease released at once so the next text opens its own turn, and the person gets the passedOn line exactly once", async () => {
+      const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+      const turnId = await turnIdOf(["evt-sam-0001"]);
+      const rowId = parkedRowId(turnId);
+      const WORDS = "Barbershop, plumbing, electrical";
+      await withRig(
+        SAM,
+        {
+          answers: {
+            "evt-sam-0001": safetyNoFor("evt-sam-0001"),
+            "evt-sam-0002": safetyNoFor("evt-sam-0002"),
+          },
+          times: [commitS102.request.now],
+          outbox: [{ id: rowId, recipient: "handle-sam", commitSeq: 1, sends: [], sendClass: "quick_reply" }],
+          turnRows: [],
+        },
+        async (rig) => {
+          answerFrontier(rig);
+          // The refused turn decides; the next turn's run hangs in decide (it never reaches the gate).
+          rig.ai.decide = (context) => (context.turnId === turnId ? decideFor(context.turnId) : never());
+          // The walk reaches a step the pinned bundle lacks: commit-s1-02-refused-step-not-in-bundle.json's final answer.
+          rig.face.gate = () => structuredClone(commitRefused.outcome);
+          rig.reply.rows.park = parkWriting(rig);
+
+          await arrive(SAM, "evt-sam-0001", WORDS, "2026-10-19T14:05:00Z");
+          await rig.tick(3000);
+          await until(() => rig.wakes.length === 1, "the park's wake");
+          await rig.settle();
+
+          // One gateAndCommit, never sent again; the turn parked on try 1 with the refusal's labels, the lease released.
+          expect(rig.face.gateCalls.map((call) => [call.request.turn.id, call.request.turn.tries])).toEqual([
+            [turnId, 1],
+          ]);
+          expect(rig.reply.rows.parks).toHaveLength(1);
+          expect(rig.reply.rows.parks[0]).toMatchObject({
+            turn: { id: turnId, handleId: "handle-sam", tries: 1 },
+            reason: { from: "walk", fault: "stepNotInBundle", ids: ["S1-04"] },
+            outboxRows: [{ id: rowId, recipientHandleId: "handle-sam", sendClass: "quick_reply" }],
+            events: [{ why: { refused: { from: "walk", fault: "stepNotInBundle", ids: ["S1-04"] } } }],
+          });
+          expect(await rig.actor.readTurns()).toEqual([
+            {
+              turnId,
+              eventIds: ["evt-sam-0001"],
+              state: "parked",
+              restart: false,
+              tries: 1,
+              leaseUntil: null,
+              committedAt: null,
+            },
+          ]);
+          // The person got the passedOn line once, to his own chat.
+          expect(rig.wakes).toEqual([{ turnId, handleId: "handle-sam", outboxRowIds: [rowId] }]);
+          expect(
+            rig.linq.requests.map((request) => [request.idempotencyKey, request.text, request.chatId]),
+          ).toEqual([[`${rowId}/1/1`, PASSED_ON_LINE, CHATS["handle-sam"].chatId]]);
+
+          // The inbox is free at once: the next text opens its own turn, with no lapse to wait for.
+          await arrive(SAM, "evt-sam-0002", "Test words: and lawn care", "2026-10-19T14:05:30Z");
+          await rig.tick(3000);
+          await until(() => rig.ai.decideCalls.length === 2, "the next turn's decide");
+          const next = await turnIdOf(["evt-sam-0002"]);
+          expect(await rig.actor.readTurns()).toMatchObject([
+            { turnId, state: "parked", tries: 1, leaseUntil: null },
+            { turnId: next, eventIds: ["evt-sam-0002"], state: "leased", tries: 1, restart: false },
+          ]);
+
+          // The parked turn never reruns: a lapse later (the next turn's, which reruns it) its decide, its gate and its park
+          // are still the one each.
+          await rig.tick(LEASE_MS);
+          await until(() => rig.ai.decideCalls.length === 3, "the next turn's rerun");
+          expect(rig.ai.decideCalls.map((context) => context.turnId)).toEqual([turnId, next, next]);
+          expect(rig.face.gateCalls).toHaveLength(1);
+          expect(rig.reply.rows.parks).toHaveLength(1);
+          expect(rig.linq.requests).toHaveLength(1);
+
+          // No log line holds the texts' words, the line's words or the number.
+          const lines = log.mock.calls.map((call) => String(call[0])).join("\n");
+          for (const secret of [WORDS, PASSED_ON_LINE, SAM.handle.address])
+            expect(lines).not.toContain(secret);
+        },
+      );
+    });
+  },
+);
