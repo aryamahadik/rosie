@@ -79,6 +79,30 @@
       "expect": "refuse",
       "shows": "The second shop's travel centre given as a map pin with no address is refused (CHECK locations_travel_centre_with_address, SQLSTATE 23514), so the owner's pages can always show and read back a centre as an address; the same row with travel_centre_address set passes",
       "source": "FS row L02 ('a centre and a distance', type 'address + miles'); FS row B03 ('address + map pin'); FS line 630 (every change read back)"
+    },
+    {
+      "file": "invalid/refuse-signup-claim-unknown-word.json",
+      "version": "v1.1",
+      "table": "business_setup",
+      "expect": "refuse",
+      "shows": "Lee Home Services' setup row written by S1-09's writer with the claim 'unknown', S1-75's label for no claim kept (K-09 README default 215 (a)), which this column holds as null, is refused (CHECK business_setup_signup_claim_known, SQLSTATE 23514); the same row with the claim 'owner' passes",
+      "source": "S1-09 ('Reply 1 Yes, an owner, 2 No, I help run it'); K-09 README defaults 201 and 215 (a), open gap 200; the ruling T-1543 card B13 ('an unknown claim word')"
+    },
+    {
+      "file": "invalid/refuse-signup-claim-without-person.json",
+      "version": "v1.1",
+      "table": "business_setup",
+      "expect": "refuse",
+      "shows": "Lee Home Services' setup row written with Sam's claim 'owner' but naming no person who claimed it is refused (CHECK business_setup_claim_with_person, SQLSTATE 23514); the same row with claimed_by_person_id person-sam passes",
+      "source": "K-09 README open gap 200 ('owner or helper, with the person who claimed it'); the ruling T-1543 card B13 ('a claim without its person')"
+    },
+    {
+      "file": "invalid/refuse-signup-claim-second-write.json",
+      "version": "v1.1",
+      "table": "business_setup",
+      "expect": "refuse",
+      "shows": "The seed row of v1.1: Lee Home Services' setup row as S1-09's writer inserts it after Sam's 'Lee Home Services in Springfield, I'm the owner', with the claim kept (owner, Sam) and every other column at its default. A second write of the claim, Sam's later answer read as helper, is refused (trigger business_setup_claim_set_once, SQLSTATE 23514); the same update on the row with no claim on file passes, setting the claim once",
+      "source": "S1-09; K-09 README defaults 201 and 204 (S1-09's writer inserts the setup row when none is on file), 215 (c), open gap 200; the ruling T-1543 card B13 and R6 ('written once'; 'a second write'), card B15 ('a second answer overwrites nothing')"
     }
   ]
 }

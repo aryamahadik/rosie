@@ -216,9 +216,9 @@ async function openQuestion(sql: Sql, handleId: string, personId: string, busine
 }
 
 /**
- * K-23 v1 business_setup's row, every column, as the roster-owner set writes it for a business (T-1462) and this set
+ * K-23 v1.1 business_setup's row, every column, as the roster-owner set writes it for a business (T-1462) and this set
  * does: its business_id alone, and every other column null or its default (no_money false, version 1). So control is
- * not proven, and it holds no contact value, no About us or profile, no Stripe account and no terms.
+ * not proven, and it holds no contact value, no About us or profile, no Stripe account, no terms and no sign-up claim.
  */
 function setupRowOf(businessId: string): Record<string, unknown> {
   return {
@@ -235,6 +235,8 @@ function setupRowOf(businessId: string): Record<string, unknown> {
     control_proven_at: null,
     control_proven_via: null,
     version: 1,
+    signup_claim: null,
+    claimed_by_person_id: null,
   };
 }
 
