@@ -71,6 +71,52 @@
 //   5. (T-1532) The stop names the table's keys the step gives in the order its gives list them (S1-10: id_checked), and
 //      the walk reads nothing else of the event: who sends it and what writes it are the call's that gives the key
 //      (README default 209: K-21 finishUpload), not the walk's.
+//
+// The text path's walk (T-1562; ruling T-1543 card B6 with K-01 v1.1's stop and K-09 v1.14 defaults 223 and 226 to 229,
+// 234 and 235):
+//
+//   - the stop field (K-01 v1.1; default 228): a plain step's own `stop` is read before its buttons. An asks-by-words
+//     step stops the walk asked (an "asks" stop: an open question with no options, writes.ts default 10's way), even
+//     where a later line from Rosie carries buttons (a read-back's: R38), and no buttons settler is asked there. A
+//     waits-on-event step is walked as a move and stops the walk right after it, waitsOnEvent naming the field's keys
+//     (default 209's stop, read from the field). A step with no `stop` keeps default 209's table and default 214.
+//   - the event table (default 223): EVENT_ONLY_KEYS, still a list of keys, holds id_checked and control_proven, each
+//     with its one waiting step beside it (EVENT_TABLE: id_checked at S1-10, control_proven at S1-32), so no writer gives
+//     either (writes.ts eventKeyAtWalk), and a reach settler's "wait" at S1-32 stops waitsOnEvent on control_proven.
+//   - reach settlers (default 227; R1): where the walk reaches a split for which its caller says a reach settler is
+//     bound (WalkOptions.reaches), it stops there before atSplit (a "reaches" stop) and its stretch takes the settler's
+//     answer once (Stretch.reach): a branch label of that split, word for word, is taken as walked (the branch move
+//     `reached`: writes.ts writes the split as a walked step, never as an answer), then its steps and where it goes, as
+//     for a chosen branch; "wait", only at a split the event table lists, stops waitsOnEvent on that split's key with no
+//     move of it; "ask" stops the walk asking that split (an "asks" stop, asked as writes.ts asks any step it stops at);
+//     a label the split lacks, or "wait" at a split the table does not list, is refused (settledNotInBundle). With no
+//     reach settler bound the split stops as today (atSplit).
+//   - an asks-by-words answer (defaults 228 and 116; WalkStart "words"): the walk starts at that step, applied as
+//     answered (a step move whose `answered` is null: writes.ts closes its question and writes its gives and its later
+//     lines through its writer), then goes on from its next, as from any plain step walked.
+//   - the waiting-step starts (defaults 226, 234 (1) and 235; WalkStart "event" and "resume"): the start names the
+//     waiting step and its key, which must be a pair of the event table (else eventKeyAtWalk). From a waiting plain step
+//     (S1-10) the walk goes on from its next with no move of the step, so nothing of it is written again; at a waiting
+//     split (S1-32) it stops "reaches" again where a reach settler is bound (else as today, atSplit), and goes on from the
+//     branch the settler answers, or waits again (waitsOnEvent, nothing written). The step's own gate is not read again,
+//     as an answered step's is not (default 3): the walk stopped at it before. Which turn makes these starts, and the
+//     writer lane, zone, service and business they carry, are A11's (writes.ts writerLaneOf).
+//
+// Defaults used (T-1562, for ops/QUESTIONS.md), after T-1532's:
+//   6. A reach settler's "ask" stops the walk asking the split itself (an "asks" stop, whatever its branches' tags), so
+//      the split is asked as writes.ts's asked() asks any step: S1-75 (san -> owner by text, with its card) is asked of
+//      the owner; S1-32 (san -> out) is refused there, notBuilt recipient, as K-09 v1.14 default 225 says. "Today's
+//      stop" (R1) read as atSplit would make S1-32's "ask" notBuilt lookup instead, against default 225.
+//   7. "wait" and "ask" are reserved at every split, as settle.ts default 1 reserves "ask": no bundle holds a branch
+//      labelled either. "wait" at a split the event table does not list is a label that split lacks (settledNotInBundle).
+//   8. An event or resume start whose key and step are not a pair of the event table is refused, with nothing walked:
+//      the walk never starts past a step that does not wait on that key. Its fault is eventKeyAtWalk, naming the step and
+//      the key alone: the walk's fault list is K-09 v1.13 default 217's, each classed in tool-api/refusal.ts (outside
+//      this card), so the start takes the event table's own final fault rather than a new one. (The gate never makes
+//      such a start: the event input pairs them, `refuse-event-step-outside-table.json`, and the resume reads the
+//      walk's own waiting step: A11.)
+//   9. A waits-on-event field names the keys it lists (K-01 v1.1 `eventKey`: id_checked), in its order; the table is
+//      read only for a step with no field, so a field's stop never falls back to the table.
 
 import { WalkNotBuiltError, WalkRefusedError } from "./errors";
 import type { FlowGraph, GraphBranch, GraphStep } from "./graph";
@@ -78,19 +124,52 @@ import type { FlowGraph, GraphBranch, GraphStep } from "./graph";
 /** The most steps one walk follows before it is refused (walkTooLong): far past any path the master holds. */
 export const MAX_WALK = 64;
 
+/** One row of the event table (K-09 README default 223): a key only an event gives, and the one step that waits for it. */
+export interface EventWait {
+  readonly key: string;
+  readonly step: string;
+}
+
 /**
- * The keys a turn never gives (T-1532; K-09 README default 209): each given only by an event outside any chat, so a
- * walked plain step whose gives hold one ends the walk (waitsOnEvent) and no writer may give one (eventKeyAtWalk).
- * `id_checked` alone: given only when the owner's ID upload lands on the secure page (K-21 v1 finishUpload; K-22 v1
- * id_uploads), never in a chat (MASTER-FLOW-A line 183; MC C10). A key joins only by a later README default naming its
- * source.
+ * The event table (T-1562; K-09 v1.14 README default 223, from default 209's): each key a turn never gives, with the one
+ * step that waits for it.
+ *   - `id_checked` waits at S1-10: given only when the owner's ID upload lands on the secure page (K-21 v1 finishUpload;
+ *     K-22 v1 id_uploads), never in a chat (MASTER-FLOW-A line 183; MC C10);
+ *   - `control_proven` waits at S1-32: given only by Rosie's team's done decision that proves control (K-09 v1
+ *     decideReviewItem; defaults 205 and 215), waited on where S1-32's reach settler answers "wait" (default 227).
+ * A key joins only by a later version naming its source and its waiting step.
  */
-export const EVENT_ONLY_KEYS: readonly string[] = ["id_checked"];
+export const EVENT_TABLE: readonly EventWait[] = [
+  { key: "id_checked", step: "S1-10" },
+  { key: "control_proven", step: "S1-32" },
+];
+
+/**
+ * The keys a turn never gives (T-1532; K-09 README default 209, widened by v1.14 default 223): each given only by an
+ * event outside any chat, so a walked plain step with no stop field whose gives hold one ends the walk (waitsOnEvent),
+ * and no writer may give one (eventKeyAtWalk). The event table's keys, in its order.
+ */
+export const EVENT_ONLY_KEYS: readonly string[] = EVENT_TABLE.map((row) => row.key);
 
 /** The keys of the event-only table (EVENT_ONLY_KEYS) that `gives` holds, in the order `gives` lists them. */
 export function eventKeysIn(gives: readonly string[]): string[] {
   return gives.filter((key) => EVENT_ONLY_KEYS.includes(key));
 }
+
+/** The key the event table has wait at step `stepId` (default 223), or null when no key waits there. */
+export function waitingKeyAt(stepId: string): string | null {
+  return EVENT_TABLE.find((row) => row.step === stepId)?.key ?? null;
+}
+
+/**
+ * A waiting step's start (T-1562; K-09 v1.14 defaults 226, 234 (1) and 235): the walk goes on from the step that waits
+ * on `key`, its key now given. A11 makes these starts; the walk only walks them.
+ */
+export type WaitingStart =
+  /** An event turn's start: the event's own step, key and ref (K-09 v1.14 `gateAndCommit.event`). */
+  | { readonly kind: "event"; readonly step: string; readonly key: string; readonly ref: string }
+  /** The handle's next turn resuming a walk held at the step, its key now on file (default 235): no ref. */
+  | { readonly kind: "resume"; readonly step: string; readonly key: string };
 
 /** Where a choice starts the walk. */
 export type WalkStart =
@@ -102,33 +181,58 @@ export type WalkStart =
    * A plain step's button answered (T-1480; K-09 README default 181): an open question's option at a step that is no
    * split, its branch one of that step's button labels, word for word (K-02 v1 choice.step and choice.branch).
    */
-  | { readonly kind: "button"; readonly step: string; readonly branch: string };
+  | { readonly kind: "button"; readonly step: string; readonly branch: string }
+  /**
+   * An asks-by-words step answered (T-1562; K-09 v1.14 default 228): an open question's option in default 116's shape
+   * at a step whose stop in the pinned graph is asksByWords (K-01 v1.1). No label: the answer carries its fields.
+   */
+  | { readonly kind: "words"; readonly step: string }
+  /** A waiting step's start (WaitingStart): an event's or a resume's, made by A11. */
+  | WaitingStart;
 
 /** What the walk applies, in order. */
 export type Move =
   /**
    * A plain step walked, on a list or on a chosen branch: its own writes apply. On the step a button start answers
-   * (T-1480), `answered` names the button: its question is closed and its gives written, its message not sent again.
+   * (T-1480), `answered` names the button: its question is closed and its gives written, its message not sent again. On
+   * the step an asks-by-words answer starts at (T-1562), `answered` is null: its question is closed, and its gives and
+   * its later lines are written, its line 0 not sent again.
    */
-  | { readonly kind: "step"; readonly step: GraphStep; readonly answered?: string }
-  /** A branch taken: its effects apply (its own steps follow it, each a move of its own). */
-  | { readonly kind: "branch"; readonly split: GraphStep; readonly branch: GraphBranch };
+  | { readonly kind: "step"; readonly step: GraphStep; readonly answered?: string | null }
+  /**
+   * A branch taken: its effects apply (its own steps follow it, each a move of its own). `reached` (T-1562; default 227)
+   * when a reach settler answered it where the walk reached the split: the split is written as walked, never as an
+   * answer (no question closed, its tells kept); left out for a chosen branch.
+   */
+  | {
+      readonly kind: "branch";
+      readonly split: GraphStep;
+      readonly branch: GraphBranch;
+      readonly reached?: true;
+    };
 
 /** Where the walk stops. */
 export type Stop =
   /**
-   * A step that asks someone: a split with a message branch, or a plain step whose message carries buttons (T-1461). Its
-   * question goes out, and the walk waits for the answer.
+   * A step that asks someone: a split with a message branch, a plain step whose message carries buttons (T-1461), a
+   * plain step whose stop is asksByWords (T-1562), or a split whose reach settler answered "ask". Its question goes out,
+   * and the walk waits for the answer.
    */
   | { readonly kind: "asks"; readonly step: GraphStep }
   /** A split a clock settles (a clock branch, no message branch). */
   | { readonly kind: "waits"; readonly step: GraphStep }
   /**
-   * A plain step walked whose gives hold a key only an event gives (T-1532; K-09 README default 209): the step is the
-   * walk's last move, its rows by its own writer; the walk waits on the event, its next not read. No question goes out
-   * and no clock starts. `keys`: the table's keys the step gives (EVENT_ONLY_KEYS).
+   * The walk waits on an event (T-1532; K-09 README default 209; T-1562): a plain step walked whose stop is waitsOnEvent,
+   * or, with no stop field, whose gives hold a key of the table, is the walk's last move, its rows by its own writer, its
+   * next not read; or a split whose reach settler answered "wait" (default 227), with no move of it. No question goes
+   * out and no clock starts. `keys`: the field's keys, the table's keys the step gives, or the split's table key.
    */
   | { readonly kind: "waitsOnEvent"; readonly step: GraphStep; readonly keys: readonly string[] }
+  /**
+   * A split reached for which a reach settler is bound (T-1562; default 227): the walk asks the settler before atSplit
+   * and takes its answer through the stretch's `reach`. Nothing of the split is written for the stop itself.
+   */
+  | { readonly kind: "reaches"; readonly step: GraphStep }
   /** An ending branch: the path stops with its end text. */
   | {
       readonly kind: "ends";
@@ -156,6 +260,26 @@ export interface Stretch extends Walked {
    * meets the step's next again, a loop.
    */
   readonly walkOn: (() => Stretch) | null;
+  /**
+   * The next stretch once the split this one stops at ("reaches") is answered by its reach settler (T-1562; default
+   * 227): a branch taken as walked and walked on, a wait, or an ask. Null for any other stop. Called once.
+   */
+  readonly reach: ((answer: ReachAnswer) => Stretch) | null;
+}
+
+/** A reach settler's answer, as the walk takes it (T-1562; K-09 v1.14 default 227; reach.ts checks it first). */
+export type ReachAnswer =
+  /** A branch label of the split, word for word: taken as walked. */
+  | { readonly kind: "branch"; readonly label: string }
+  /** Only at a split the event table lists (S1-32): the walk waits on its key, nothing written. */
+  | { readonly kind: "wait" }
+  /** The split is asked, as the walk asks any step it stops at. */
+  | { readonly kind: "ask" };
+
+/** What the walk's caller tells it of the graph's splits (T-1562). */
+export interface WalkOptions {
+  /** Whether a reach settler is bound for the split `stepId` (default 227). Left out, none is. */
+  readonly reaches?: (stepId: string) => boolean;
 }
 
 /** Default 1: an ending branch's message effect names the step the bundle does not hold. */
@@ -167,16 +291,18 @@ function accountedFor(branch: GraphBranch, stepId: string): boolean {
 }
 
 /** The walk from `start` along the graph, to where it stops. Throws WalkRefusedError or WalkNotBuiltError. */
-export function walkFrom(graph: FlowGraph, start: WalkStart): Walked {
-  const { moves, stop } = walkStretchFrom(graph, start);
+export function walkFrom(graph: FlowGraph, start: WalkStart, options: WalkOptions = {}): Walked {
+  const { moves, stop } = walkStretchFrom(graph, start, options);
   return { moves, stop };
 }
 
 /**
  * The walk's first stretch from `start` along the graph (walkFrom's moves and stop), with the walk on past a plain step
- * with buttons it stops at (Stretch.walkOn). Throws WalkRefusedError or WalkNotBuiltError, here or on a walk on.
+ * with buttons it stops at (Stretch.walkOn), or past a split a reach settler answers (Stretch.reach). Throws
+ * WalkRefusedError or WalkNotBuiltError, here or on a later stretch.
  */
-export function walkStretchFrom(graph: FlowGraph, start: WalkStart): Stretch {
+export function walkStretchFrom(graph: FlowGraph, start: WalkStart, options: WalkOptions = {}): Stretch {
+  const reaches = options.reaches ?? (() => false);
   /** The moves of the stretch being walked: each stretch takes its own and leaves the next an empty list. */
   let moves: Move[] = [];
   const walked = new Set<string>();
@@ -201,18 +327,26 @@ export function walkStretchFrom(graph: FlowGraph, start: WalkStart): Stretch {
     throw new WalkNotBuiltError("lookup", [split.id]);
   };
 
+  /** A split stops the walk: a reach settler bound for it is asked first (default 227), else atSplit. */
+  const atReachedSplit = (split: GraphStep): Stop =>
+    reaches(split.id) ? { kind: "reaches", step: split } : atSplit(split);
+
   /**
-   * One step entered: where it stops the walk (a split, or a plain step whose message carries buttons: its question is
-   * those buttons), or null when it is walked, applied as a move. A step walked whose gives hold a key of the event-only
-   * table is applied as a move and then stops the walk (waitsOnEvent: default 209), so its next is never read.
+   * One step entered: where it stops the walk (a split; a plain step whose stop asks by words, or, with none, whose
+   * message carries buttons: its question is those buttons), or null when it is walked, applied as a move. A step walked
+   * whose stop waits on an event, or, with no stop field, whose gives hold a key of the event-only table, is applied as a
+   * move and then stops the walk (waitsOnEvent: default 209), so its next is never read.
    */
   const visit = (entered: GraphStep): Stop | null => {
     enter(entered.id);
     if (entered.gated) throw new WalkNotBuiltError("stepGate", [entered.id]);
-    if (entered.split) return atSplit(entered);
-    if (entered.buttons > 0) return { kind: "asks", step: entered };
+    if (entered.split) return atReachedSplit(entered);
+    // The step's own stop is read before its buttons (K-01 v1.1; default 228): a later line's buttons are a read-back's.
+    const { stop } = entered;
+    if (stop?.kind === "asksByWords") return { kind: "asks", step: entered };
+    if (stop === undefined && entered.buttons > 0) return { kind: "asks", step: entered };
     moves.push({ kind: "step", step: entered });
-    const keys = eventKeysIn(entered.gives);
+    const keys = stop?.kind === "waitsOnEvent" ? stop.keys : eventKeysIn(entered.gives);
     return keys.length === 0 ? null : { kind: "waitsOnEvent", step: entered, keys };
   };
 
@@ -240,8 +374,8 @@ export function walkStretchFrom(graph: FlowGraph, start: WalkStart): Stretch {
    * A branch taken: its effects, then its own steps in order, each walked as a step on a list is (what a plain one writes
    * is what the branch's effects name, which the compiler reads from it: T-1461), then where the branch goes.
    */
-  const take = (split: GraphStep, branch: GraphBranch): Stop => {
-    moves.push({ kind: "branch", split, branch });
+  const take = (split: GraphStep, branch: GraphBranch, reached = false): Stop => {
+    moves.push(reached ? { kind: "branch", split, branch, reached } : { kind: "branch", split, branch });
     for (const id of branch.steps) {
       const own = graph.step(id);
       if (own === null) {
@@ -276,13 +410,66 @@ export function walkStretchFrom(graph: FlowGraph, start: WalkStart): Stretch {
   const stretch = (stop: Stop): Stretch => {
     const own = moves;
     moves = [];
-    if (stop.kind !== "asks" || stop.step.split) return { moves: own, stop, walkOn: null };
+    if (stop.kind === "reaches") return { moves: own, stop, walkOn: null, reach: reachOn(stop.step) };
+    // An asks-by-words step is asked, never settled by a buttons settler (default 228).
+    if (stop.kind !== "asks" || stop.step.split || stop.step.stop !== undefined) {
+      return { moves: own, stop, walkOn: null, reach: null };
+    }
     const settled = stop.step;
     return {
       moves: own,
       stop,
       walkOn: () => stretch(settled.next === null ? climb(settled) : from(settled.next)),
+      reach: null,
     };
+  };
+
+  /**
+   * A reached split's answer (default 227): a branch label of it, word for word, taken as walked and walked on; "wait",
+   * only at a split the event table lists, a waitsOnEvent stop on its key with no move of it; "ask", the split asked.
+   * Anything else is refused (settledNotInBundle), naming the split alone.
+   */
+  const reachOn =
+    (split: GraphStep) =>
+    (answer: ReachAnswer): Stretch => {
+      if (answer.kind === "ask") return stretch({ kind: "asks", step: split });
+      if (answer.kind === "wait") {
+        const key = waitingKeyAt(split.id);
+        if (key === null) throw new WalkRefusedError("settledNotInBundle", [split.id]);
+        return stretch({ kind: "waitsOnEvent", step: split, keys: [key] });
+      }
+      const branch = split.branches.find((each) => each.label === answer.label);
+      if (branch === undefined) throw new WalkRefusedError("settledNotInBundle", [split.id]);
+      return stretch(take(split, branch, true));
+    };
+
+  /**
+   * A waiting step's start (defaults 226 and 235): refused unless its key and step are a pair of the event table; from
+   * a waiting plain step, on from its next with no move of it; at a waiting split, its reach settler asked again (else
+   * as today). The step is entered, so a walk that comes back to it is a loop.
+   */
+  const resume = (start: WaitingStart): Stop => {
+    if (!EVENT_TABLE.some((row) => row.key === start.key && row.step === start.step)) {
+      throw new WalkRefusedError("eventKeyAtWalk", [start.step, start.key]);
+    }
+    const waiting = held(start.step);
+    enter(waiting.id);
+    if (waiting.split) return atReachedSplit(waiting);
+    return waiting.next === null ? climb(waiting) : from(waiting.next);
+  };
+
+  /**
+   * An asks-by-words step answered (default 228): refused unless the pinned graph holds it as a plain step whose stop is
+   * asksByWords; else applied as answered, and the walk goes on from its next, as for a button answered.
+   */
+  const answerWords = (id: string): Stop => {
+    const answered = held(id);
+    if (answered.split || answered.stop?.kind !== "asksByWords") {
+      throw new WalkRefusedError("branchNotInBundle", [answered.id]);
+    }
+    enter(answered.id);
+    moves.push({ kind: "step", step: answered, answered: null });
+    return answered.next === null ? climb(answered) : from(answered.next);
   };
 
   /**
@@ -302,6 +489,8 @@ export function walkStretchFrom(graph: FlowGraph, start: WalkStart): Stretch {
 
   if (start.kind === "step") return stretch(from(start.step));
   if (start.kind === "button") return stretch(answer(start.step, start.branch));
+  if (start.kind === "words") return stretch(answerWords(start.step));
+  if (start.kind === "event" || start.kind === "resume") return stretch(resume(start));
   const split = held(start.step);
   const branch = split.branches.find((each) => each.label === start.branch);
   if (branch === undefined) throw new WalkRefusedError("branchNotInBundle", [split.id]);

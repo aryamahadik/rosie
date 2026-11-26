@@ -30,6 +30,15 @@
 // T-1526), a turn answering S1-09 pinned to it, S1-09's question as K-05 v1.2 openQuestionRead reads its row, and
 // stand-ins for S1-09's writer (T-635a's) and S1-10's (S10-3's, not built), the latter giving mobile alone. None of them
 // is the walk.
+//
+// T-1562 adds the text path's test graph (ruling T-1543 card B6; K-01 v1.1's stop; K-09 v1.14 defaults 223 and 226 to
+// 229): bundle v3's flow A with the sign-up steps after S1-10 that no bundle holds until bundle v4 (B5), placed in K-01
+// v1.1's shape with the fields the walk reads alone, their lanes, branches and gives from MASTER-FLOW-A (master-A.json):
+// S1-75, S1-71 (with S1-72), S1-60 (with S1-23 and S1-61), S1-12, S1-21, S1-24, S1-29, S1-32, S1-35 (with the text-path
+// correction's added one-kind branch, rejoining at S1-50: R23), S1-50 and S1-79. S1-23 and S1-12 are K-01 v1.1's own
+// fixtures (stop-ask-s1-23.json; stop-ask-s1-12-read-back.json, whose later line from Rosie carries the read-back's
+// buttons). Words are never read by the walk, so the added steps carry none. Stand-in reach settlers and writers answer
+// as the ruling's defaults say (R4, R7, R8, R22, R23), each call written down; none of them is the walk.
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -65,6 +74,8 @@ import type {
 import type {
   BundleIdOf,
   FlowLetter,
+  ReachSettler,
+  ReachSettlers,
   StepRows,
   StepWriter,
   StepWriterCall,
@@ -991,4 +1002,326 @@ export const s1_10Writer: StepWriter<WalkTestRepo> = (call) => {
 /** The stand-ins by step id on bundle v3 past S1-09: S1-09's, S1-76's message (tellingWriter) and S1-10's. S1-77 has none. */
 export function waitWriters(): Record<string, StepWriter<WalkTestRepo>> {
   return { "S1-09": s1_09Writer, "S1-76": tellingWriter, "S1-10": s1_10Writer };
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-1562: the text path's test graph (ruling T-1543 card B6; K-01 v1.1's stop; K-09 v1.14 defaults 223, 226 to 229)
+
+/** S1-09's owner branch (MASTER-FLOW-A.md line 118), the first of S1_09_BRANCHES. */
+const S1_09_OWNER = "An owner; the listing matches";
+
+/** S1-75's branches (MASTER-FLOW-A lines 191 to 199; master-A.json S1-75). */
+export const S1_75_BRANCHES = ["Code to the listed phone or email", "Rosie's team checks"] as const;
+/** S1-71's branches (master-A.json S1-71). */
+export const S1_71_BRANCHES = ["1 No agreement needed", "2 Yes: sign it now"] as const;
+/** S1-60's branches (master-A.json S1-60). */
+export const S1_60_BRANCHES = ["1 A license", "2 No license: registration only"] as const;
+/** S1-29's branches (master-A.json S1-29). */
+export const S1_29_BRANCHES = ["1 Nothing left to sign", "2 Left unsigned"] as const;
+/** S1-32's branches (master-A.json S1-32). */
+export const S1_32_BRANCHES = [
+  "Confirmed in minutes",
+  "The ID doesn't match",
+  "The number isn't found",
+] as const;
+/** S1-35's branches, with the one-kind branch the text-path correction adds, rejoining at S1-50 (R23; card B3). */
+export const S1_35_BRANCHES = ["1 Start now", "2 Later, or no reply", "One kind: nothing to offer"] as const;
+
+/** One line of a step's say, as K-01 v1 writes it, with no words: who sends it, to whom, and its reply buttons. */
+function lineOf(from: string, to: string, buttons?: readonly string[]): Record<string, unknown> {
+  return buttons === undefined ? { from, to } : { from, to, elements: { buttons: [...buttons] } };
+}
+
+/** A K-01 v1 branch of a split, in the fields the walk reads. */
+function branchOf(
+  label: string,
+  tag: "message" | "lookup",
+  steps: readonly string[] = [],
+  rejoinAt: string | null = null,
+): Record<string, unknown> {
+  const effects = steps.map((ref) => ({ kind: "message", ref, to: ["owner"] }));
+  return { label, tag, steps: [...steps], rejoinAt, effects, end: "merge" };
+}
+
+/** A card with step 9's default clock and the safe default given (the master's Safe default line). */
+function cardOf(safeDefault: string): Record<string, unknown> {
+  return { clock: { from: "step9Default" }, safeDefault };
+}
+
+/** One of K-01 v1.1's bundle fixtures (contracts/bundle/fixtures/), freshly parsed, with its next set. */
+function bundleFixtureStep(file: string, next: string | null): Record<string, unknown> {
+  const step = contractFile(`bundle/fixtures/${file}`) as Record<string, unknown>;
+  return { ...step, next };
+}
+
+/**
+ * The text path's test graph: bundle v3's flow A (S1-01 to S1-10, S1-76 and S1-77 as T-1526 compiled them) with the
+ * steps after S1-10, in K-01 v1.1's shape, on the main path of section 1 as bundle v3 lists it:
+ *   - S1-75, a split Rosie asks the owner by msg, with a card, its two branches tagged lookup (settled by code: R1, R4);
+ *   - S1-71 and S1-60, splits code settles (via auto), all lookup; S1-71's "2 Yes: sign it now" holds S1-72 (owner ->
+ *     san by page, R7), S1-60's branches S1-23 and S1-61, each owner -> san by msg asking by words (K-01 v1.1 asksByWords
+ *     with the license field: stop-ask-s1-23.json's S1-23);
+ *   - S1-12, owner -> san by msg asking by words, whose line 2 from Rosie carries the read-back's buttons
+ *     (stop-ask-s1-12-read-back.json), then S1-21 (owner -> san by msg, line 0 Rosie's with "Keep them" and "Change
+ *     one"), S1-24 (owner -> san by page, line 0 Rosie's with three buttons) and S1-29 (an owner -> san split by page,
+ *     line 0 Rosie's with "Go live", with a card), each giving its master gives;
+ *   - S1-32, a split code settles (san -> out, via auto), its branches lookup, with no card (R22);
+ *   - S1-35, a split Rosie asks the owner by msg, with a card, and the added branch "One kind: nothing to offer" tagged
+ *     lookup rejoining at S1-50 (R23), giving live; then S1-50 and S1-79, Rosie's lines to the owner, where journey 1's
+ *     main path ends.
+ */
+export function flowARest(): GraphValue {
+  const graph = flowAV3();
+  const owner = "owner";
+  graph.steps["S1-75"] = {
+    id: "S1-75",
+    who: "san",
+    to: owner,
+    via: "msg",
+    say: [lineOf("san", owner), lineOf(owner, "san"), lineOf("san", owner)],
+    gives: [],
+    tells: [owner],
+    type: "split",
+    branches: S1_75_BRANCHES.map((label) => branchOf(label, "lookup")),
+    card: cardOf("Rosie's team checks, and that company stays offline until then."),
+    next: "S1-71",
+  };
+  graph.steps["S1-71"] = {
+    id: "S1-71",
+    who: "san",
+    via: "auto",
+    gives: [],
+    tells: [],
+    type: "split",
+    branches: [branchOf(S1_71_BRANCHES[0], "lookup"), branchOf(S1_71_BRANCHES[1], "lookup", ["S1-72"])],
+    next: "S1-60",
+  };
+  graph.steps["S1-72"] = {
+    id: "S1-72",
+    who: owner,
+    to: "san",
+    via: "page",
+    say: [lineOf("san", owner), lineOf(owner, "san")],
+    gives: [],
+    tells: [owner],
+    next: null,
+  };
+  graph.steps["S1-60"] = {
+    id: "S1-60",
+    who: "san",
+    via: "auto",
+    gives: [],
+    tells: [],
+    type: "split",
+    branches: [
+      branchOf(S1_60_BRANCHES[0], "lookup", ["S1-23"]),
+      branchOf(S1_60_BRANCHES[1], "lookup", ["S1-61"]),
+    ],
+    next: "S1-12",
+  };
+  graph.steps["S1-23"] = bundleFixtureStep("stop-ask-s1-23.json", null);
+  graph.steps["S1-61"] = { ...bundleFixtureStep("stop-ask-s1-23.json", null), id: "S1-61" };
+  graph.steps["S1-12"] = bundleFixtureStep("stop-ask-s1-12-read-back.json", "S1-21");
+  graph.steps["S1-21"] = {
+    id: "S1-21",
+    who: owner,
+    to: "san",
+    via: "msg",
+    say: [lineOf("san", owner, ["Keep them", "Change one"]), lineOf(owner, "san"), lineOf("san", owner)],
+    gives: ["booking_rules", "price_oks"],
+    tells: [owner],
+    next: "S1-24",
+  };
+  graph.steps["S1-24"] = {
+    id: "S1-24",
+    who: owner,
+    to: "san",
+    via: "page",
+    say: [
+      lineOf("san", owner, ["Connect it", "Send a photo", "None booked yet"]),
+      lineOf(owner, "san"),
+      lineOf("san", owner),
+    ],
+    gives: ["calendar"],
+    tells: [owner],
+    next: "S1-29",
+  };
+  graph.steps["S1-29"] = {
+    id: "S1-29",
+    who: owner,
+    to: "san",
+    via: "page",
+    say: [lineOf("san", owner, ["Go live"]), lineOf(owner, "san")],
+    gives: ["terms", "bill_card"],
+    tells: [owner],
+    type: "split",
+    branches: [
+      branchOf(S1_29_BRANCHES[0], "message"),
+      { ...branchOf(S1_29_BRANCHES[1], "message"), end: "end", endText: "That work stays offline, saved." },
+    ],
+    card: cardOf("that work stays offline, saved."),
+    next: "S1-32",
+  };
+  graph.steps["S1-32"] = {
+    id: "S1-32",
+    who: "san",
+    to: "out",
+    via: "auto",
+    gives: [],
+    tells: [],
+    type: "split",
+    branches: [
+      branchOf(S1_32_BRANCHES[0], "lookup"),
+      branchOf(S1_32_BRANCHES[1], "lookup", ["S1-52"]),
+      branchOf(S1_32_BRANCHES[2], "lookup", ["S1-33"]),
+    ],
+    next: "S1-35",
+  };
+  graph.steps["S1-35"] = {
+    id: "S1-35",
+    who: "san",
+    to: owner,
+    via: "msg",
+    say: [lineOf("san", owner, ["Start now", "Later"]), lineOf(owner, "san")],
+    gives: ["live"],
+    tells: [owner],
+    type: "split",
+    branches: [
+      branchOf(S1_35_BRANCHES[0], "message"),
+      branchOf(S1_35_BRANCHES[1], "message"),
+      branchOf(S1_35_BRANCHES[2], "lookup", [], "S1-50"),
+    ],
+    card: cardOf("it stays offline, saved."),
+    next: "S1-38",
+  };
+  for (const id of ["S1-50", "S1-79"]) {
+    graph.steps[id] = {
+      id,
+      who: "san",
+      to: owner,
+      via: "msg",
+      say: [lineOf("san", owner)],
+      gives: [],
+      tells: [owner],
+      next: id === "S1-50" ? "S1-79" : null,
+    };
+  }
+  return graph;
+}
+
+/**
+ * flowARest with S1-09's owner branch rejoining at S1-75 in place of S1-10, so a turn answering S1-09 reaches S1-75 as
+ * the event start reaches it from S1-10's next (A11 makes that start; walk.ts's own proof walks it from S1-10).
+ */
+export function flowARestPastTheWait(): GraphValue {
+  const graph = flowARest();
+  branchIn(graph, "S1-09", S1_09_OWNER).rejoinAt = "S1-75";
+  return graph;
+}
+
+/** One call a stand-in reach settler was given, as a test reads it: the step, and whether a part or choice came. */
+export interface ReachCall {
+  readonly stepId: string;
+  readonly businessId: string;
+  readonly keys: readonly string[];
+  readonly rowsSoFar: number;
+  readonly givesSoFar: readonly string[];
+}
+
+export interface FakeReachSettlers {
+  readonly reachSettlers: ReachSettlers<WalkTestRepo>;
+  /** Every call, in order. */
+  readonly calls: ReachCall[];
+}
+
+/**
+ * Stand-in reach settlers `bound` by step id, each answering as given (a label, "wait", "ask", or anything to refuse), or
+ * running its own code; each call written down before it answers: the call's own keys (no part and no choice: default
+ * 227), and how many rows and keys were built before it.
+ */
+export function reachSettlersOf(
+  bound: Readonly<Record<string, string | ReachSettler<WalkTestRepo>>>,
+): FakeReachSettlers {
+  const calls: ReachCall[] = [];
+  const byStep = new Map(Object.entries(bound));
+  return {
+    calls,
+    reachSettlers: (stepId) => {
+      const answer = byStep.get(stepId);
+      if (answer === undefined) return null;
+      return (call) => {
+        calls.push({
+          stepId: call.step.id,
+          businessId: call.businessId,
+          keys: Object.keys(call).sort(),
+          rowsSoFar: call.rows.state.length + call.rows.messages.length + call.rows.asks.length,
+          givesSoFar: [...call.rows.gives],
+        });
+        return typeof answer === "string" ? Promise.resolve(answer) : answer(call);
+      };
+    },
+  };
+}
+
+/** A stand-in writer that gives `gives` and one telling row (tellingWriter's), as a step that gives and tells writes. */
+export function givingTellingWriter(gives: readonly SetupKey[]): StepWriter<WalkTestRepo> {
+  return async (call) => {
+    const told = await tellingWriter(call);
+    return { ...told, gives: [...gives] };
+  };
+}
+
+/** A stand-in writer that gives `gives` and writes no row: an answered buttons step's (its message went out when asked). */
+export function givingOnlyWriter(gives: readonly SetupKey[]): StepWriter<WalkTestRepo> {
+  return () => Promise.resolve({ state: [], stateEvents: [], gives: [...gives], asks: [], messages: [] });
+}
+
+/**
+ * The stand-in writers on the text path's test graph past S1-09, each giving its step's gives: a step written as walked
+ * or answered by words writes one telling row too (its later line), a buttons step or split answered its gives alone.
+ */
+export function restWriters(): Record<string, StepWriter<WalkTestRepo>> {
+  return {
+    "S1-09": s1_09Writer,
+    "S1-75": tellingWriter,
+    "S1-72": tellingWriter,
+    "S1-23": givingTellingWriter(["license"]),
+    "S1-61": givingTellingWriter(["license"]),
+    "S1-12": givingTellingWriter(["services"]),
+    "S1-21": givingOnlyWriter(["booking_rules", "price_oks"]),
+    "S1-24": givingOnlyWriter(["calendar"]),
+    "S1-29": givingOnlyWriter(["terms", "bill_card"]),
+    "S1-35": givingTellingWriter(["live"]),
+    "S1-50": tellingWriter,
+    "S1-79": tellingWriter,
+  };
+}
+
+/**
+ * An open question of the text path's test graph as K-05 v1.2 openQuestionRead reads its row: S1-09's row
+ * (s1_09QuestionRow: Sam's, the business commit-s1-02.json names, no options, no read-back) at `step`, with the id
+ * `id`, open at version 1, as the walk asks it (writes.ts default 10).
+ */
+export function questionRowAt(step: string, id: string): OpenQuestionRead {
+  return { ...s1_09QuestionRow(), id, step };
+}
+
+/**
+ * A turn answering an open question of the text path's test graph on bundle v3's pin (turnS1_09OnV3's request): its one
+ * part an option of that question at `step`. With `branch` it names that branch (a split's, or a button's label); with
+ * none it is default 116's shape for an asks-by-words question (K-09 v1.14 default 228; card B7): its choiceId and its
+ * question the open question's id, its branch and label the question's own words standing in for a label.
+ */
+export function turnAnswering(
+  step: string,
+  question: string,
+  branch?: string,
+): { part: PassedPart; context: CommitTurnContext<WalkTestRepo>; choice: Choice } {
+  const turn = turnS1_09OnV3(S1_09_OWNER);
+  const words = "the step's question, as asked";
+  const choice: Choice =
+    branch === undefined
+      ? { ...turn.choice, choiceId: question, step, question, branch: words, label: words }
+      : { ...turn.choice, step, question, branch, label: branch };
+  return { part: { ...turn.part, choice }, context: turn.context, choice };
 }

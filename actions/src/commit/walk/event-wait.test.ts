@@ -164,7 +164,7 @@ function givingWriter(gives: readonly SetupKey[]): StepWriter<WalkTestRepo> {
 
 describe("walk.ts: a walked plain step that gives id_checked ends the walk after it (waitsOnEvent)", () => {
   it("the table holds id_checked alone, and a step's table keys are read in its gives' order", () => {
-    expect(EVENT_ONLY_KEYS).toEqual([ID_CHECKED]);
+    expect(EVENT_ONLY_KEYS).toEqual([ID_CHECKED, "control_proven"]);
     expect(eventKeysIn(["mobile", ID_CHECKED])).toEqual([ID_CHECKED]);
     expect(eventKeysIn(["mobile", "thread", "business"])).toEqual([]);
   });
