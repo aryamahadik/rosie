@@ -1,7 +1,8 @@
 // The emitter's validation (T-149): K-01 v1 through the one validator (Ajv 8, its 2020-12 class, strict mode), with the
-// schema read from contracts/ and never copied. Every fixture of contracts/bundle/fixtures/index.json gets the verdict
-// the index gives it, so each refused fixture is refused by the emitter's validation; and the per-step lint marks name
-// exactly the rule each refused step shows.
+// schema read from contracts/ and never copied. Every K-01 v1 fixture of contracts/bundle/fixtures/index.json gets the
+// verdict the index gives it, so each refused fixture is refused by the emitter's validation; and the per-step lint
+// marks name exactly the rule each refused step shows. The index is shared by every version of K-01 (v1 and v1.1),
+// each entry naming its version, so these checks select v1's entries (DL-125, DL-153).
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
@@ -19,6 +20,7 @@ const FIXTURES = new URL("../../../contracts/bundle/fixtures/", import.meta.url)
 
 interface Entry {
   file: string;
+  version: string;
   def?: string;
   expect: "accept" | "refuse";
   shows: string;
@@ -28,7 +30,10 @@ function fixture(file: string): Record<string, unknown> {
   return JSON.parse(readFileSync(new URL(file, FIXTURES), "utf8")) as Record<string, unknown>;
 }
 
-const entries = (fixture("index.json") as { fixtures: Entry[] }).fixtures;
+/** K-01 v1's entries of the shared index: the emitter's validation is v1's. */
+const entries = (fixture("index.json") as { fixtures: Entry[] }).fixtures.filter(
+  (entry) => entry.version === "v1",
+);
 const refused = entries.filter((entry) => entry.expect === "refuse");
 const accepted = entries.filter((entry) => entry.expect === "accept");
 

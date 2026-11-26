@@ -1,0 +1,64 @@
+{
+  "id": "S1-23",
+  "section": 1,
+  "lines": [
+    "1.9"
+  ],
+  "who": "owner",
+  "to": "san",
+  "via": "msg",
+  "title": "Adds a license, if the business wants (optional)",
+  "does": "Add any license, insurance or document you want shown (optional). Rosie shows it as you gave it and doesn't check it. Skipping is fine.",
+  "more": [
+    "Insurance or a bond may be added here too, the same way (optional).",
+    "Each person may add their own license after their invite (optional), by text or a call, or on the secure page.",
+    "How licenses show: S13-11.",
+    "Never: let a license stand for control (S1-75), say Rosie checked it, or make it required.",
+    "Safe default: nothing added, and the work goes on."
+  ],
+  "say": [
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "Want to add any license, insurance or document to show customers? It's optional: I show it as you give it and don't check it. Send it, or say skip.",
+      "plainText": "Want to add any license, insurance or document to show customers? It's optional: I show it as you give it and don't check it. Send it, or say skip."
+    },
+    {
+      "from": "owner",
+      "to": "san",
+      "text": "BS20981",
+      "plainText": "BS20981"
+    },
+    {
+      "from": "san",
+      "to": "owner",
+      "text": "Thanks. It shows as you gave it; Rosie doesn't check it. Let's keep going.",
+      "plainText": "Thanks. It shows as you gave it; Rosie doesn't check it. Let's keep going."
+    }
+  ],
+  "rule": "Rosie's rule: a license, insurance or document is optional, shown as given and never checked; nothing waits on it. Each person is offered once the owner says yes. Why: Rosie can't vouch for a paper, so it never claims to.",
+  "needs": [
+    "pf.license",
+    "business"
+  ],
+  "gives": [
+    "license"
+  ],
+  "tells": [
+    "owner"
+  ],
+  "fallbackText": "Want to add any license, insurance or document to show customers? It's optional: I show it as you give it and don't check it. Send it, or say skip.",
+  "pageTypes": [],
+  "next": null,
+  "stop": {
+    "asksByWords": {
+      "answerFields": [
+        {
+          "name": "license",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  "lint": []
+}
