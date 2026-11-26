@@ -1,0 +1,27 @@
+{
+  "call": "openReviewItemsOf",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-23T15:02:12Z",
+    "note": "Lee Home Services (biz-lee-home-services) was set up by Sam from a listing the Places double did not match, so S1-76 opened one K-37 review item for Rosie's team: review-lee-listing-match, kind listing_match, state open, version 1, raised by Sam, its summary a plain sentence for the team. S1-75's reach settler (card B8) reads it on the runtime side before writing any row, and finds it, so no S1-75 row is written. The summary is never read."
+  },
+  "request": {
+    "businessId": "biz-lee-home-services",
+    "kind": "listing_match"
+  },
+  "outcome": {
+    "result": "openReviewItems",
+    "businessId": "biz-lee-home-services",
+    "kind": "listing_match",
+    "items": [
+      {
+        "id": "review-lee-listing-match",
+        "kind": "listing_match",
+        "state": "open",
+        "version": 1,
+        "raisedByPersonId": "person-sam"
+      }
+    ]
+  }
+}

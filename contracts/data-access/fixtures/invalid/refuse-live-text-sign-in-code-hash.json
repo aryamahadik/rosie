@@ -1,0 +1,18 @@
+{
+  "call": "liveTextSignInCode",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": ["start-sign-in-text-sam.json"],
+    "now": "2026-11-23T14:58:40Z",
+    "note": "live-text-sign-in-code-sam whose answer also gives the code's keyed hash: the code is checked only by K-22 check_proof_code inside K-09 proveCode, its tries counted (RULES 6.2), never compared outside it, so its hash never leaves the database. Refused for its one fault, outcome.codeHash; put right, it is live-text-sign-in-code-sam."
+  },
+  "request": {
+    "handleId": "handle-sam"
+  },
+  "outcome": {
+    "result": "live",
+    "handleId": "handle-sam",
+    "codeId": "code-sam-text-1",
+    "codeHash": "4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c"
+  }
+}

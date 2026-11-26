@@ -1,0 +1,16 @@
+{
+  "call": "readPendingUpload",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-23T15:02:11Z",
+    "note": "No upload is kept under upload-never-came (none was signed, or its file never came): the answer is none, as K-21 v1's uploadNotFound answers both alike, and the event turn writes nothing."
+  },
+  "request": {
+    "uploadId": "upload-never-came"
+  },
+  "outcome": {
+    "result": "none",
+    "uploadId": "upload-never-came"
+  }
+}

@@ -3303,6 +3303,158 @@
       "expect": "refuse",
       "shows": "park-turn-sam-refused-at-once whose reason gives its fault in words: a reason is labels only, never words (its one fault request.reason.fault; put right, it is park-turn-sam-refused-at-once)",
       "source": "ops/cards/T-1531.md ('a reason (a final refusal's label: from, fault, ids, labels only)'); ops/reviews/refusal-reply/rule-refusal.json ruling 3 ('all labels and ids'); K-08 v1 safeId; K-05 v1.23 item 84 and default 217 (parkReason)"
+    },
+    {
+      "file": "read-sign-up-keys-sam.json",
+      "version": "v1.24",
+      "def": "readSignUpKeys.exchange",
+      "expect": "accept",
+      "shows": "S1-10's keys by person on the runtime side: Sam's sign_up upload (its id and time, never its object key) and his proven account mobile with its handle id, which readHandle takes to name his actor",
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 1 and round 4's runtime note 1; K-09 open gap 201 and default 209; K-22 v1 id_uploads (id_uploads_one_sign_up) and accounts; migration 0004 line 41 (phones.handle_id); K-05 v1.10 item 50; K-05 v1.24 item 85 and defaults 226 and 227"
+    },
+    {
+      "file": "read-sign-up-keys-before-upload.json",
+      "version": "v1.24",
+      "def": "readSignUpKeys.exchange",
+      "expect": "accept",
+      "shows": "Before the upload the ID key is not given: idUpload null beside the proven mobile, never an error",
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 1; K-22 v1 id_uploads; K-05 v1.24 item 85 and default 227"
+    },
+    {
+      "file": "invalid/refuse-sign-up-keys-object-key.json",
+      "version": "v1.24",
+      "def": "readSignUpKeys.exchange",
+      "expect": "refuse",
+      "shows": "read-sign-up-keys-sam whose answer carries the upload's sealed object key: the key stays on the secure page (its one fault outcome.idUpload.objectKey; put right, it is read-sign-up-keys-sam)",
+      "source": "K-22 v1 id_uploads.object_key (audience secure-page-only, sealedBy person_id); MC C10; RULES 4.5; K-05 v1.24 item 85 (signUpIdUpload)"
+    },
+    {
+      "file": "read-pending-upload-sam-id.json",
+      "version": "v1.24",
+      "def": "readPendingUpload.exchange",
+      "expect": "accept",
+      "shows": "The pending upload by its upload id on the runtime side: Sam, no business, sign_up, image/jpeg and the object key sealed under his key, which the event turn copies into S1-10's id_uploads row as it is",
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 2; K-21 README line 143 (an upload id the server binds to its key, person, business and purpose); K-13 README line 104; K-22 v1 id_uploads; K-05 v1 stateWrite; K-05 v1.24 item 86, defaults 226 and 233, open gap 107"
+    },
+    {
+      "file": "read-pending-upload-unknown.json",
+      "version": "v1.24",
+      "def": "readPendingUpload.exchange",
+      "expect": "accept",
+      "shows": "An upload id with nothing kept answers none, one answer whether it was never signed or its file never came, and the event writes nothing",
+      "source": "K-21 v1 uploadNotFound ('one answer for both'); K-05 v1.24 item 86"
+    },
+    {
+      "file": "invalid/refuse-pending-upload-plain-object-key.json",
+      "version": "v1.24",
+      "def": "readPendingUpload.exchange",
+      "expect": "refuse",
+      "shows": "read-pending-upload-sam-id whose object key is in plain words: it is passed only sealed under the person's key (its one fault outcome.upload.objectKey; put right, it is read-pending-upload-sam-id)",
+      "source": "K-22 v1 id_uploads.object_key (sealedBy person_id); arch 01 line 93; K-05 v1.12 sealedBytes; K-05 v1.24 item 86 (pendingUpload)"
+    },
+    {
+      "file": "open-review-items-lee-listing-match.json",
+      "version": "v1.24",
+      "def": "openReviewItemsOf.exchange",
+      "expect": "accept",
+      "shows": "A business's open listing_match item on the runtime side, with its id, kind, state, version and who raised it, never its summary: S1-75's check finds it and writes no row",
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 4 and card B8; K-37 v1 review_items and rule 2; actions/src/domain/paging/ports.ts line 178; K-05 v1.24 item 88 and defaults 226 and 228"
+    },
+    {
+      "file": "open-review-items-lee-none.json",
+      "version": "v1.24",
+      "def": "openReviewItemsOf.exchange",
+      "expect": "accept",
+      "shows": "No open or waiting item of the business and kind: an empty list, never an error",
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 4; K-05 v1.24 item 88 and default 228"
+    },
+    {
+      "file": "invalid/refuse-open-review-items-summary.json",
+      "version": "v1.24",
+      "def": "openReviewItemsOf.exchange",
+      "expect": "refuse",
+      "shows": "open-review-items-lee-listing-match whose item carries its summary: never the summary (its one fault outcome.items.0.summary; put right, it is open-review-items-lee-listing-match)",
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 4 ('never the summary'); K-37 v1 rule 2 and review_items.summary; K-05 v1.24 item 88 (openReviewItem)"
+    },
+    {
+      "file": "read-staging-test-businesses-sam.json",
+      "version": "v1.24",
+      "def": "readStagingTestBusinesses.exchange",
+      "expect": "accept",
+      "shows": "Staging's test businesses: the businesses a K-23 company names whose owner's account mobile is one of the numbers given, as ids alone, for K-21 v1.4 testReviewItems; a business with no live owner role is answered by its company, and a live owner role with no company of that owner is never read",
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 5, cards A8 and E10, R28 and R33; STAGING_LINQ_ALLOWLIST (T-416); K-23 v1 companies (owner_person_id); K-22 v1 accounts; db/seeds/roster-owner.ts lines 73 and 496 to 497; K-05 v1.11 item 52 and defaults 98 and 99; K-05 open gaps 58 and 95; K-05 v1.24 item 89 and defaults 226 and 232"
+    },
+    {
+      "file": "invalid/refuse-staging-test-businesses-no-numbers.json",
+      "version": "v1.24",
+      "def": "readStagingTestBusinesses.exchange",
+      "expect": "refuse",
+      "shows": "read-staging-test-businesses-sam asked with no numbers: an empty list names no test business (its one fault request.numbers; put right, it is read-staging-test-businesses-sam)",
+      "source": "ops/reviews/signup-remainder/rule-rest.json R28 (only allow-listed phones and their test businesses); BP 9.4; K-05 v1.24 item 89 (readStagingTestBusinesses.request)"
+    },
+    {
+      "file": "start-sign-in-text-sam.json",
+      "version": "v1.24",
+      "def": "startSignInText.exchange",
+      "expect": "accept",
+      "shows": "A sign-in started by the text way for the account's own mobile: rules 0 to 5 as for email, and in the same transaction the code row (sign_in, channel text, to the mobile's handle, its keyed hash only); the page answers its own ready text once, and no code is texted",
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 6 and R29; MC C9; K-21 v1 signInStart way text and sign-in-from-link-by-text; K-22 v1 proof_codes and v1.2 sign_in_attempts.way; ADR-016 section 6; db/repo/sign-in-send.ts lines 295 to 296; K-05 v1.24 item 90 and defaults 229 and 230"
+    },
+    {
+      "file": "start-sign-in-text-no-account.json",
+      "version": "v1.24",
+      "def": "startSignInText.exchange",
+      "expect": "accept",
+      "shows": "The text way for a mobile no account holds: the attempt with no person and no code row, answered to the page exactly as with an account",
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A15 ('the start answers the same with or without an account'); K-05 v1.13 item 58 rule 4; K-05 v1.24 item 90 and default 229"
+    },
+    {
+      "file": "invalid/refuse-start-sign-in-text-plain-code.json",
+      "version": "v1.24",
+      "def": "startSignInText.exchange",
+      "expect": "refuse",
+      "shows": "start-sign-in-text-sam whose request carries the code itself: only its keyed hash reaches the database (its one fault request.code; put right, it is start-sign-in-text-sam)",
+      "source": "BP rule 7; K-22 v1 proof_codes.code_hash ('never the code'); K-05 v1.24 item 90 (startSignInText.request)"
+    },
+    {
+      "file": "invalid/refuse-start-sign-in-text-repeat-names-code.json",
+      "version": "v1.24",
+      "def": "startSignInText.exchange",
+      "expect": "refuse",
+      "shows": "start-sign-in-text-sam answered as a repeat that still names its person and code row: a repeat names neither, so the ready text is answered once (its one fault outcome.repeated; put right, it is start-sign-in-text-sam)",
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 6 ('the ready text answered once'); K-05 v1.13 startSignIn.started (a repeat names no person); K-05 v1.24 item 90 and default 230 (startSignInText.started)"
+    },
+    {
+      "file": "invalid/refuse-start-sign-in-text-email-contact.json",
+      "version": "v1.24",
+      "def": "startSignInText.exchange",
+      "expect": "refuse",
+      "shows": "start-sign-in-text-sam started by the text way for an email: the text way serves the account's own mobile alone (its one fault request.contact; put right, it is start-sign-in-text-sam)",
+      "source": "ops/reviews/signup-remainder/rule-rest.json R29 ('sent from the account's own mobile'); MC C9; K-05 v1.24 item 90 (startSignInText.request)"
+    },
+    {
+      "file": "live-text-sign-in-code-sam.json",
+      "version": "v1.24",
+      "def": "liveTextSignInCode.exchange",
+      "expect": "accept",
+      "shows": "The turn's guard finds the id of the handle's live text sign-in code on the runtime side, never its hash; the turn's proveCode then checks the text's code by K-22 check_proof_code alone",
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 6, cards A15 and A16 and R29; K-21 README lines 112 and 120; K-22 v1 proof_codes; RULES 6.2; ADR-016 section 6; K-05 v1.24 item 91 and defaults 226 and 231"
+    },
+    {
+      "file": "live-text-sign-in-code-none.json",
+      "version": "v1.24",
+      "def": "liveTextSignInCode.exchange",
+      "expect": "accept",
+      "shows": "An expired text code is no live code: none, the same answer as for a used code or none written, and the text goes on as any text",
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 6 ('none for no live code, a used or expired one') and R29; RULES 6.2 (10 minutes); K-05 v1.24 item 91 and default 231"
+    },
+    {
+      "file": "invalid/refuse-live-text-sign-in-code-hash.json",
+      "version": "v1.24",
+      "def": "liveTextSignInCode.exchange",
+      "expect": "refuse",
+      "shows": "live-text-sign-in-code-sam whose answer gives the code's keyed hash: its id alone, never its hash (its one fault outcome.codeHash; put right, it is live-text-sign-in-code-sam)",
+      "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 6 ('never its hash'); K-22 v1 proof_codes.code_hash; K-05 v1.2 secretColumn; K-05 v1.24 item 91 (liveTextSignInCode.live)"
     }
   ]
 }

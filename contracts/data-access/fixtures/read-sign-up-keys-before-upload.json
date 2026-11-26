@@ -1,0 +1,22 @@
+{
+  "call": "readSignUpKeys",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-23T15:00:30Z",
+    "note": "As read-sign-up-keys-sam, before the upload: Sam's account mobile is proven (K-22 accounts: mobile +15555550100, mobile_proven_at 14:58:41) and no id_uploads row is his yet, so S1-10's ID key is not given and idUpload is null, never an error."
+  },
+  "request": {
+    "personId": "person-sam"
+  },
+  "outcome": {
+    "result": "signUpKeys",
+    "personId": "person-sam",
+    "idUpload": null,
+    "mobile": {
+      "number": "+15555550100",
+      "provenAt": "2026-11-23T14:58:41Z",
+      "handleId": "handle-sam"
+    }
+  }
+}

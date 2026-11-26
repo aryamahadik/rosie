@@ -1,0 +1,16 @@
+{
+  "call": "liveTextSignInCode",
+  "given": {
+    "k04Seeds": ["seed-person-roles.json"],
+    "after": ["start-sign-in-text-sam.json"],
+    "now": "2026-11-23T15:08:30Z",
+    "note": "As live-text-sign-in-code-sam, read after code-sam-text-1 expired at 15:08:00: no live text code is the handle's, so the answer is none, the same answer and statement as for a used code or none written, and the text goes on as any text does."
+  },
+  "request": {
+    "handleId": "handle-sam"
+  },
+  "outcome": {
+    "result": "none",
+    "handleId": "handle-sam"
+  }
+}
