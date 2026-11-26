@@ -1,0 +1,205 @@
+{
+  "context": {
+    "turnId": "turn-s1-21-sam-change-one",
+    "bundleId": {
+      "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+      "build": 1
+    },
+    "flow": "A",
+    "texts": [
+      {
+        "eventId": "evt-sam-0121",
+        "kind": "text",
+        "words": "2 make the cancel 12 hours",
+        "sentAt": { "utc": "2026-10-19T15:20:00Z", "zone": "America/New_York" },
+        "attachments": [],
+        "poll": null,
+        "tapback": null
+      }
+    ],
+    "writer": {
+      "handle": "+15555550100",
+      "people": [
+        {
+          "personId": "person-sam",
+          "name": "Sam Lee",
+          "roles": [{ "role": "owner", "businessId": "biz-lees-barbershop" }],
+          "language": "en"
+        }
+      ]
+    },
+    "businessLanguage": "en",
+    "openQuestions": [
+      {
+        "openQuestionId": "oq-s1-21",
+        "step": "S1-21",
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        },
+        "sentAt": { "utc": "2026-10-19T15:18:00Z", "zone": "America/New_York" },
+        "pollId": null,
+        "askCount": 1
+      }
+    ],
+    "choices": [
+      {
+        "choiceId": "c-01",
+        "kind": "option",
+        "label": "Keep them",
+        "definition": "Each kept one becomes Sam's own rule.",
+        "step": "S1-21",
+        "question": "oq-s1-21",
+        "branch": "Keep them",
+        "anytimeRow": null,
+        "door": null,
+        "hub": null,
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        },
+        "fields": [],
+        "stakes": "low",
+        "stakesFrom": []
+      },
+      {
+        "choiceId": "c-02",
+        "kind": "option",
+        "label": "Change one",
+        "definition": "Sam keeps them, unticks one, or taps one to change it.",
+        "step": "S1-21",
+        "question": "oq-s1-21",
+        "branch": "Change one",
+        "anytimeRow": null,
+        "door": null,
+        "hub": null,
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        },
+        "fields": [
+          { "name": "rule.1.row", "type": "text" },
+          { "name": "rule.1.value", "type": "text" },
+          { "name": "rule.2.row", "type": "text" },
+          { "name": "rule.2.value", "type": "text" },
+          { "name": "rule.3.row", "type": "text" },
+          { "name": "rule.3.value", "type": "text" },
+          { "name": "rule.4.row", "type": "text" },
+          { "name": "rule.4.value", "type": "text" },
+          { "name": "rule.5.row", "type": "text" },
+          { "name": "rule.5.value", "type": "text" }
+        ],
+        "stakes": "low",
+        "stakesFrom": []
+      },
+      {
+        "choiceId": "c-03",
+        "kind": "anytime",
+        "label": "Danger or crisis",
+        "definition": "Every message and every call is checked before any answer, every time, by meaning.",
+        "step": "A3-22",
+        "question": null,
+        "branch": null,
+        "anytimeRow": "danger-or-crisis",
+        "door": null,
+        "hub": null,
+        "target": {
+          "businessId": "biz-lees-barbershop",
+          "businessName": "Lee's Barbershop",
+          "bookingId": null,
+          "visitAt": null
+        },
+        "fields": [],
+        "stakes": "low",
+        "stakesFrom": []
+      }
+    ],
+    "cards": [],
+    "facts": [],
+    "alwaysOn": {
+      "flow": "A",
+      "prefixSha256": "18d7f9c761c1f58436d2e3e9148b64386221b1d0affa33a8c7b0226c06b6ebea"
+    },
+    "recentMessages": [
+      {
+        "from": "rosie",
+        "sentAt": { "utc": "2026-10-19T15:18:00Z", "zone": "America/New_York" },
+        "words": "Here are the rules businesses like yours often set. Your call: keep them, or change any. They become your own rules. You follow your state's rules for your trade. Rosie doesn't check licenses. / Hours · From your Google listing / Cancel · Free until 24 hours before. After that, or a no-show: a $20 fee ($40 for the Groom's package), only if a card, a deposit or the full price was taken and you say yes / Same-day and new customers · Ask you first / Price OKs · Color quotes come to you first. Board prices never need one / Reply 1 Keep them, 2 Change one."
+      }
+    ],
+    "meaningSearch": null
+  },
+  "decide": {
+    "turnId": "turn-s1-21-sam-change-one",
+    "bundleId": {
+      "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+      "build": 1
+    },
+    "stakes": "low",
+    "routing": { "first": "haiku", "second": "haiku" },
+    "reads": [
+      {
+        "model": "haiku",
+        "role": "first",
+        "output": {
+          "language": "en",
+          "parts": [
+            {
+              "verb": "choose",
+              "quote": "2 make the cancel 12 hours",
+              "question": "oq-s1-21",
+              "choice": "c-02",
+              "fields": [
+                { "name": "rule.1.row", "value": "cancel", "words": "cancel" },
+                { "name": "rule.1.value", "value": "12 hours", "words": "12 hours" }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "model": "haiku",
+        "role": "check",
+        "output": {
+          "language": "en",
+          "parts": [
+            {
+              "verb": "choose",
+              "quote": "2 make the cancel 12 hours",
+              "question": "oq-s1-21",
+              "choice": "c-02",
+              "fields": [
+                { "name": "rule.1.row", "value": "cancel", "words": "cancel" },
+                { "name": "rule.1.value", "value": "12 hours", "words": "12 hours" }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "agreed": true,
+    "reread": false,
+    "language": "en",
+    "parts": [
+      {
+        "part": {
+          "verb": "choose",
+          "quote": "2 make the cancel 12 hours",
+          "question": "oq-s1-21",
+          "choice": "c-02",
+          "fields": [
+            { "name": "rule.1.row", "value": "cancel", "words": "cancel" },
+            { "name": "rule.1.value", "value": "12 hours", "words": "12 hours" }
+          ]
+        },
+        "outcome": "go"
+      }
+    ]
+  }
+}

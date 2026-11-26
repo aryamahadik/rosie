@@ -101,5 +101,111 @@ export function quoteInText({ context, decide }) {
   return problems;
 }
 
+// ---- v1.4 (T-1546): typed fields for S1-12, S1-13 and S1-21 (README "v1.4") -----------------------------------------
+
+/**
+ * The typed fields' families (README v1.4 defaults 25 to 27): the step each serves, how many groups a part may hold,
+ * and each group's fields in the order a part gives them. A group's first field is its key.
+ */
+export const TYPED_FAMILIES = Object.freeze({
+  line: Object.freeze({
+    step: "S1-12",
+    cap: 20,
+    fields: Object.freeze(["service", "price_kind", "amount", "length"]),
+  }),
+  edit: Object.freeze({
+    step: "S1-13",
+    cap: 10,
+    fields: Object.freeze(["letter", "place", "before", "amount", "after"]),
+  }),
+  rule: Object.freeze({ step: "S1-21", cap: 5, fields: Object.freeze(["row", "value"]) }),
+});
+
+const TYPED_NAME = /^(line|edit|rule)\.([1-9][0-9]?)\.([a-z_]+)$/;
+
+/** A typed field's family, group number and field, or undefined for a name that is none of v1.4's. */
+export function typedFieldOf(name) {
+  const match = TYPED_NAME.exec(name);
+  if (match === null) return undefined;
+  const family = TYPED_FAMILIES[match[1]];
+  const group = Number(match[2]);
+  if (group > family.cap || !family.fields.includes(match[3])) return undefined;
+  return { family: match[1], group, field: match[3] };
+}
+
+/**
+ * The cents a price's words write: the first number in them (1,200 and 12.50 included), or 0 for words that call it
+ * free with no number (S1-12: "A service the list calls free is set as free"); undefined when they write neither. The
+ * plain case of limit 6's money re-parse (actions/src/values/money.ts), which stays the full one at runtime.
+ */
+export function centsInWords(words) {
+  const number = /(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d{1,2}))?/.exec(words);
+  if (number !== null) {
+    const whole = Number(number[1].replaceAll(",", ""));
+    const cents = number[2] === undefined ? 0 : Number(number[2].padEnd(2, "0"));
+    return whole * 100 + cents;
+  }
+  return /\bfree\b/i.test(words) ? 0 : undefined;
+}
+
+/**
+ * typedValueInWords (v1.4): in every choose or enter part, each typed text field's value is its words, character for
+ * character, and each typed amount is the number its words write, in cents. Sources: arch 03 line 185 ("code ... re-parses
+ * every value from its words"); arch 06 line 309 (limit 6); S1-12 ("Never: make up a price"); README v1.4 default 26.
+ */
+export function typedValueInWords({ decide }) {
+  const problems = [];
+  for (const { where, part } of partsOf(decide)) {
+    if (part.verb !== "choose" && part.verb !== "enter") continue;
+    for (const field of part.fields) {
+      const typed = typedFieldOf(field.name);
+      if (typed === undefined) continue;
+      if (typed.field === "amount") {
+        const cents = centsInWords(field.words);
+        if (cents === undefined) {
+          problems.push(`${where}: the words "${field.words}" of the field ${field.name} write no amount`);
+        } else if (field.value?.cents !== cents) {
+          problems.push(
+            `${where}: the field ${field.name} is ${String(field.value?.cents)} cents, but its words "${field.words}" write ${cents}`,
+          );
+        }
+      } else if (field.value !== field.words) {
+        problems.push(
+          `${where}: the value of the field ${field.name} is not its words "${field.words}", character for character`,
+        );
+      }
+    }
+  }
+  return problems;
+}
+
+/**
+ * letterOnCard (v1.4): every edit's letter is one S1-13's card shows, which the context gives as the fact card.<letter>
+ * (README v1.4 default 28). Sources: S1-13 line 337 ("Send only what's different, by letter"; the card's "A) Haircut ...
+ * I) Style consult"); arch 06 line 333 (code hands decide what it may choose).
+ */
+export function letterOnCard({ context, decide }) {
+  const problems = [];
+  const letters = new Set(
+    context.facts
+      .map((fact) => /^card\.([a-z])$/.exec(fact.name))
+      .filter((match) => match !== null)
+      .map((match) => match[1]),
+  );
+  for (const { where, part } of partsOf(decide)) {
+    if (part.verb !== "choose" && part.verb !== "enter") continue;
+    for (const field of part.fields) {
+      if (typedFieldOf(field.name)?.field !== "letter") continue;
+      const letter = String(field.value).toLowerCase();
+      if (!letters.has(letter)) {
+        problems.push(
+          `${where}: the letter ${String(field.value)} of the field ${field.name} is not on the card (no fact card.${letter})`,
+        );
+      }
+    }
+  }
+  return problems;
+}
+
 /** The named rules, by the name a fixtures/index.json entry gives in "rule". */
-export const rules = Object.freeze({ optionOffered, quoteInText });
+export const rules = Object.freeze({ optionOffered, quoteInText, typedValueInWords, letterOnCard });

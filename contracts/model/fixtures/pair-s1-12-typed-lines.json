@@ -1,0 +1,287 @@
+{
+  "context": {
+    "turnId": "turn-s1-12-sam-typed-prices",
+    "bundleId": {
+      "hash": "22d734f465f32f953c926384a825e36d37ccb577b3fbe134debfd96a0667e72a",
+      "build": 1
+    },
+    "flow": "B",
+    "texts": [
+      {
+        "eventId": "evt-sam-0112",
+        "kind": "text",
+        "words": "Drain clearing 179, water heater flush 150, leak repair priced at the visit",
+        "sentAt": { "utc": "2026-10-19T14:40:00Z", "zone": "America/New_York" },
+        "attachments": [],
+        "poll": null,
+        "tapback": null
+      }
+    ],
+    "writer": {
+      "handle": "+15555550100",
+      "people": [
+        {
+          "personId": "person-sam",
+          "name": "Sam Lee",
+          "roles": [{ "role": "owner", "businessId": "biz-lee-home-services" }],
+          "language": "en"
+        }
+      ]
+    },
+    "businessLanguage": "en",
+    "openQuestions": [
+      {
+        "openQuestionId": "oq-s1-12",
+        "step": "S1-12",
+        "target": {
+          "businessId": "biz-lee-home-services",
+          "businessName": "Lee Home Services",
+          "bookingId": null,
+          "visitAt": null
+        },
+        "sentAt": { "utc": "2026-10-19T14:38:00Z", "zone": "America/New_York" },
+        "pollId": null,
+        "askCount": 1
+      }
+    ],
+    "choices": [
+      {
+        "choiceId": "oq-s1-12",
+        "kind": "option",
+        "label": "Now your services and prices. Send a photo of your price board, or fill in the form.",
+        "definition": "Rosie reads the owner's own list into services, and asks about anything it can't read.",
+        "step": "S1-12",
+        "question": "oq-s1-12",
+        "branch": "Now your services and prices. Send a photo of your price board, or fill in the form.",
+        "anytimeRow": null,
+        "door": null,
+        "hub": null,
+        "target": {
+          "businessId": "biz-lee-home-services",
+          "businessName": "Lee Home Services",
+          "bookingId": null,
+          "visitAt": null
+        },
+        "fields": [
+          { "name": "line.1.service", "type": "text" },
+          { "name": "line.1.price_kind", "type": "text" },
+          { "name": "line.1.amount", "type": "money" },
+          { "name": "line.1.length", "type": "text" },
+          { "name": "line.2.service", "type": "text" },
+          { "name": "line.2.price_kind", "type": "text" },
+          { "name": "line.2.amount", "type": "money" },
+          { "name": "line.2.length", "type": "text" },
+          { "name": "line.3.service", "type": "text" },
+          { "name": "line.3.price_kind", "type": "text" },
+          { "name": "line.3.amount", "type": "money" },
+          { "name": "line.3.length", "type": "text" },
+          { "name": "line.4.service", "type": "text" },
+          { "name": "line.4.price_kind", "type": "text" },
+          { "name": "line.4.amount", "type": "money" },
+          { "name": "line.4.length", "type": "text" },
+          { "name": "line.5.service", "type": "text" },
+          { "name": "line.5.price_kind", "type": "text" },
+          { "name": "line.5.amount", "type": "money" },
+          { "name": "line.5.length", "type": "text" },
+          { "name": "line.6.service", "type": "text" },
+          { "name": "line.6.price_kind", "type": "text" },
+          { "name": "line.6.amount", "type": "money" },
+          { "name": "line.6.length", "type": "text" },
+          { "name": "line.7.service", "type": "text" },
+          { "name": "line.7.price_kind", "type": "text" },
+          { "name": "line.7.amount", "type": "money" },
+          { "name": "line.7.length", "type": "text" },
+          { "name": "line.8.service", "type": "text" },
+          { "name": "line.8.price_kind", "type": "text" },
+          { "name": "line.8.amount", "type": "money" },
+          { "name": "line.8.length", "type": "text" },
+          { "name": "line.9.service", "type": "text" },
+          { "name": "line.9.price_kind", "type": "text" },
+          { "name": "line.9.amount", "type": "money" },
+          { "name": "line.9.length", "type": "text" },
+          { "name": "line.10.service", "type": "text" },
+          { "name": "line.10.price_kind", "type": "text" },
+          { "name": "line.10.amount", "type": "money" },
+          { "name": "line.10.length", "type": "text" },
+          { "name": "line.11.service", "type": "text" },
+          { "name": "line.11.price_kind", "type": "text" },
+          { "name": "line.11.amount", "type": "money" },
+          { "name": "line.11.length", "type": "text" },
+          { "name": "line.12.service", "type": "text" },
+          { "name": "line.12.price_kind", "type": "text" },
+          { "name": "line.12.amount", "type": "money" },
+          { "name": "line.12.length", "type": "text" },
+          { "name": "line.13.service", "type": "text" },
+          { "name": "line.13.price_kind", "type": "text" },
+          { "name": "line.13.amount", "type": "money" },
+          { "name": "line.13.length", "type": "text" },
+          { "name": "line.14.service", "type": "text" },
+          { "name": "line.14.price_kind", "type": "text" },
+          { "name": "line.14.amount", "type": "money" },
+          { "name": "line.14.length", "type": "text" },
+          { "name": "line.15.service", "type": "text" },
+          { "name": "line.15.price_kind", "type": "text" },
+          { "name": "line.15.amount", "type": "money" },
+          { "name": "line.15.length", "type": "text" },
+          { "name": "line.16.service", "type": "text" },
+          { "name": "line.16.price_kind", "type": "text" },
+          { "name": "line.16.amount", "type": "money" },
+          { "name": "line.16.length", "type": "text" },
+          { "name": "line.17.service", "type": "text" },
+          { "name": "line.17.price_kind", "type": "text" },
+          { "name": "line.17.amount", "type": "money" },
+          { "name": "line.17.length", "type": "text" },
+          { "name": "line.18.service", "type": "text" },
+          { "name": "line.18.price_kind", "type": "text" },
+          { "name": "line.18.amount", "type": "money" },
+          { "name": "line.18.length", "type": "text" },
+          { "name": "line.19.service", "type": "text" },
+          { "name": "line.19.price_kind", "type": "text" },
+          { "name": "line.19.amount", "type": "money" },
+          { "name": "line.19.length", "type": "text" },
+          { "name": "line.20.service", "type": "text" },
+          { "name": "line.20.price_kind", "type": "text" },
+          { "name": "line.20.amount", "type": "money" },
+          { "name": "line.20.length", "type": "text" }
+        ],
+        "stakes": "low",
+        "stakesFrom": []
+      },
+      {
+        "choiceId": "c-01",
+        "kind": "door",
+        "label": "An unclear owner text or HELP",
+        "definition": "Nothing changes on a text Rosie can't act on for sure.",
+        "step": "S11-21",
+        "question": null,
+        "branch": null,
+        "anytimeRow": null,
+        "door": "unclearOwnerOrHelp",
+        "hub": null,
+        "target": {
+          "businessId": "biz-lee-home-services",
+          "businessName": "Lee Home Services",
+          "bookingId": null,
+          "visitAt": null
+        },
+        "fields": [],
+        "stakes": "low",
+        "stakesFrom": []
+      },
+      {
+        "choiceId": "c-02",
+        "kind": "anytime",
+        "label": "Danger or crisis",
+        "definition": "Every message and every call is checked before any answer, every time, by meaning.",
+        "step": "B3-17",
+        "question": null,
+        "branch": null,
+        "anytimeRow": "danger-or-crisis",
+        "door": null,
+        "hub": null,
+        "target": {
+          "businessId": "biz-lee-home-services",
+          "businessName": "Lee Home Services",
+          "bookingId": null,
+          "visitAt": null
+        },
+        "fields": [],
+        "stakes": "low",
+        "stakesFrom": []
+      }
+    ],
+    "cards": [],
+    "facts": [],
+    "alwaysOn": {
+      "flow": "B",
+      "prefixSha256": "18d7f9c761c1f58436d2e3e9148b64386221b1d0affa33a8c7b0226c06b6ebea"
+    },
+    "recentMessages": [
+      {
+        "from": "rosie",
+        "sentAt": { "utc": "2026-10-19T14:38:00Z", "zone": "America/New_York" },
+        "words": "Now your services and prices. Send a photo of your price board, or fill in the form."
+      }
+    ],
+    "meaningSearch": null
+  },
+  "decide": {
+    "turnId": "turn-s1-12-sam-typed-prices",
+    "bundleId": {
+      "hash": "22d734f465f32f953c926384a825e36d37ccb577b3fbe134debfd96a0667e72a",
+      "build": 1
+    },
+    "stakes": "low",
+    "routing": { "first": "haiku", "second": "haiku" },
+    "reads": [
+      {
+        "model": "haiku",
+        "role": "first",
+        "output": {
+          "language": "en",
+          "parts": [
+            {
+              "verb": "choose",
+              "quote": "Drain clearing 179, water heater flush 150, leak repair priced at the visit",
+              "question": "oq-s1-12",
+              "choice": "oq-s1-12",
+              "fields": [
+                { "name": "line.1.service", "value": "Drain clearing", "words": "Drain clearing" },
+                { "name": "line.1.amount", "value": { "cents": 17900, "currency": "USD" }, "words": "179" },
+                { "name": "line.2.service", "value": "water heater flush", "words": "water heater flush" },
+                { "name": "line.2.amount", "value": { "cents": 15000, "currency": "USD" }, "words": "150" },
+                { "name": "line.3.service", "value": "leak repair", "words": "leak repair" },
+                { "name": "line.3.price_kind", "value": "priced at the visit", "words": "priced at the visit" }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "model": "haiku",
+        "role": "check",
+        "output": {
+          "language": "en",
+          "parts": [
+            {
+              "verb": "choose",
+              "quote": "Drain clearing 179, water heater flush 150, leak repair priced at the visit",
+              "question": "oq-s1-12",
+              "choice": "oq-s1-12",
+              "fields": [
+                { "name": "line.1.service", "value": "Drain clearing", "words": "Drain clearing" },
+                { "name": "line.1.amount", "value": { "cents": 17900, "currency": "USD" }, "words": "179" },
+                { "name": "line.2.service", "value": "water heater flush", "words": "water heater flush" },
+                { "name": "line.2.amount", "value": { "cents": 15000, "currency": "USD" }, "words": "150" },
+                { "name": "line.3.service", "value": "leak repair", "words": "leak repair" },
+                { "name": "line.3.price_kind", "value": "priced at the visit", "words": "priced at the visit" }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "agreed": true,
+    "reread": false,
+    "language": "en",
+    "parts": [
+      {
+        "part": {
+          "verb": "choose",
+          "quote": "Drain clearing 179, water heater flush 150, leak repair priced at the visit",
+          "question": "oq-s1-12",
+          "choice": "oq-s1-12",
+          "fields": [
+            { "name": "line.1.service", "value": "Drain clearing", "words": "Drain clearing" },
+            { "name": "line.1.amount", "value": { "cents": 17900, "currency": "USD" }, "words": "179" },
+            { "name": "line.2.service", "value": "water heater flush", "words": "water heater flush" },
+            { "name": "line.2.amount", "value": { "cents": 15000, "currency": "USD" }, "words": "150" },
+            { "name": "line.3.service", "value": "leak repair", "words": "leak repair" },
+            { "name": "line.3.price_kind", "value": "priced at the visit", "words": "priced at the visit" }
+          ]
+        },
+        "outcome": "go"
+      }
+    ]
+  }
+}

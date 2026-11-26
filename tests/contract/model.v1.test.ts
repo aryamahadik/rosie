@@ -586,7 +586,12 @@ describe("model.v1 fixtures: the index and the count", () => {
   it("accepts every entry marked accept and refuses every entry marked refuse, by the schema or by its rule", () => {
     expect(report.passes).toBe(accepted.length);
     expect(report.refusals).toBe(refusedBySchema.length);
-    expect(refusedByRule.map((entry) => entry.rule)).toEqual(["optionOffered", "quoteInText"]);
+    expect(refusedByRule.map((entry) => entry.rule)).toEqual([
+      "optionOffered",
+      "quoteInText",
+      "typedValueInWords",
+      "letterOnCard",
+    ]);
     for (const result of report.entries) {
       const entry = must(index.fixtures.find((candidate) => candidate.file === result.file));
       if (ruled(entry)) {

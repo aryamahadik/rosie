@@ -305,6 +305,30 @@
       "source": "README 'v1.3' default 21; S1-24 ('Or Sam sends a photo of the schedule'; 'never what the job is'); arch 05 lines 261 and 263; K-27 v1 busy_blocks and seed-busy-block.json (busy-sam-movers-photo-sat-nov-14)"
     },
     {
+      "file": "pair-s1-12-typed-lines.json",
+      "version": "v1.4",
+      "def": "contextAndDecide",
+      "expect": "accept",
+      "shows": "S1-12's typed price lines (v1.4): Sam types 'Drain clearing 179, water heater flush 150, leak repair priced at the visit' for Lee Home Services; the one typed choice (K-09 default 116's shape: its id the open question's) lists line.1 to line.20, and both Haiku reads choose it with three lines: each service with its words, 179 and 150 as money with their words, and the leak repair's price kind as its words 'priced at the visit' with no amount, so no price is made up. The four named rules hold on the pair.",
+      "source": "README 'v1.4' defaults 25 to 27 and 29; ruling T-1543 card C2 and step S1-12 ('Drain clearing 179, water heater flush 150, leak repair priced at the visit'), R10; S1-12 ('Service, Price kind, Price, Time it takes'; 'It can also be priced from the customer's photos, at the visit'; 'Never: make up a price'); K-09 README default 116; arch 03 lines 183 and 185; arch 06 line 309"
+    },
+    {
+      "file": "pair-s1-13-edits-by-letter.json",
+      "version": "v1.4",
+      "def": "contextAndDecide",
+      "expect": "accept",
+      "shows": "S1-13's edits by letter (v1.4) on the master's money card for Lee's Barbershop, A to I given as the facts card.a to card.i: Sam's 'E paid when they book. A at their home too, 75, paid when they book' is one choose of the typed choice 'What's different, by letter' with two edits, E with what's taken when they book, and A at their home, $75, paid when they book, each value its words (the amount money). The four named rules hold on the pair.",
+      "source": "README 'v1.4' defaults 25 to 28 and 30; ruling T-1543 card C2, R12, R31, R38 and DL-1194; S1-13 line 337 (the card) and line 351 (the owner's answer on the path before:none+after:none); K-25 v1 service_money.place and path"
+    },
+    {
+      "file": "pair-s1-21-rule-edit.json",
+      "version": "v1.4",
+      "def": "contextAndDecide",
+      "expect": "accept",
+      "shows": "S1-21's rule edit (v1.4): on the tap list without the phone-line row, Sam's '2 make the cancel 12 hours' chooses 'Change one' with one rule edit, its row 'cancel' and its new value '12 hours', each the owner's own words. The four named rules hold on the pair.",
+      "source": "README 'v1.4' defaults 25 to 27 and 31; ruling T-1543 cards C2 and D2 ('make the cancel 12 hours' gives that row's edit), R15, R31, R38; S1-21 lines 851 and 886; C-236"
+    },
+    {
       "file": "invalid/refuse-unknown-verb.json",
       "version": "v1",
       "def": "decideRead",
@@ -385,6 +409,24 @@
       "expect": "refuse",
       "shows": "A timetable answer that reads 12 spots for the Saturday Hot Flow class: the spots Rosie can book and the fewest to run are asked of the owner, never read, so the model-facing schema has no field for them and refuses it; without spots it is accepted.",
       "source": "S1-83 ('How many spots Rosie can book'; the owner is asked); 02-contracts K-02 ('never the spots or the minimum, which the owner is asked for'); K-27 v1 classes.seats and minimum"
+    },
+    {
+      "file": "invalid/refuse-typed-amount-not-in-words.json",
+      "version": "v1.4",
+      "def": "contextAndDecide",
+      "rule": "typedValueInWords",
+      "expect": "refuse",
+      "shows": "pair-s1-12-typed-lines.json with the drain clearing's amount read as $189 from the words '179': a price not in the owner's words. The pair is valid JSON Schema and the other three named rules hold, so typedValueInWords alone refuses it; with 17900 cents it is accepted.",
+      "source": "S1-12 ('Never: make up a price'); ruling T-1543 card C3 ('never a price not in the words'); arch 03 line 185; arch 06 line 309 (limit 6); README 'v1.4' default 26"
+    },
+    {
+      "file": "invalid/refuse-edit-unknown-letter.json",
+      "version": "v1.4",
+      "def": "contextAndDecide",
+      "rule": "letterOnCard",
+      "expect": "refuse",
+      "shows": "pair-s1-13-edits-by-letter.json with Sam's first edit on the letter K, which the card (A to I, the facts card.a to card.i) does not show. The pair is valid JSON Schema and the other three named rules hold, so letterOnCard alone refuses it; with E it is accepted.",
+      "source": "S1-13 line 337 ('Send only what's different, by letter'; A to I); ruling T-1543 card C2 ('an unknown letter'); README 'v1.4' default 28"
     }
   ]
 }
