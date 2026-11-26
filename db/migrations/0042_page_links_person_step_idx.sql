@@ -1,0 +1,12 @@
+-- T-1573: page_links_person_step_idx (K-22 v1.4, frozen: contracts/db-schema/people-access,
+-- people-access.v1.4.tables.json's page_links and its README's rule 12; K-05 v1.25 item 93; DL-1240, DL-1243, DL-1250).
+-- K-05 item 93 (liveStepLinkOf) finds a person's link at one business, purpose and step that is live at a time the
+-- caller names (ended_at null or after it, expires_at after it), an ended link included, which v1.1's partial
+-- page_links_person_live_idx (ended_at is null) cannot serve. A btree on the request's four keys in item 93's order, not
+-- partial; the ended_at and expires_at conditions are checked on that person's few rows. page_links_person_live_idx
+-- stays, and nothing else of rule 8 changes.
+-- Expand only: one index on an existing table, built concurrently so writes go on while it is built. It is the file's
+-- only statement, as rule 12 states it: PostgreSQL refuses CREATE INDEX CONCURRENTLY inside a transaction, and the
+-- runner runs a file of only such statements outside one (infra/scripts/migrate.mjs; the migration guard needs no
+-- marker for it, DL-061), as 0033's outbox_rows_job_idx. It needs 0020's page_links, so it runs after 0020.
+create index concurrently page_links_person_step_idx on page_links (person_id, business_id, purpose, step_id);

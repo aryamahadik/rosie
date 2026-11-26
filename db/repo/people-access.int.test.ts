@@ -4,7 +4,11 @@
 // migrating a fresh test schema. T-1278 adds K-22 v1.2's sign_in_attempts with README rule 9 (migration 0034): its
 // list, its table class, its seed and refused rows, and its three calls. T-1402 adds K-22 v1.3's staging_testers with
 // README rule 10 (migration 0036): its list, its table class (rule 9's, with the runtime side's UPDATE a column grant
-// of removed_at and version), its seed and refused rows, and its grants as rule 10 lists them.
+// of removed_at and version), its seed and refused rows, and its grants as rule 10 lists them. T-1573 adds K-22 v1.4's
+// pending_uploads with README rule 11 (migration 0041): its list, its table class (scoped by business on a business_id
+// that may be null, with 0012's runtime policy alone, the Tool API holding no grant and the runtime side's UPDATE a
+// column grant of finished_at), its seed and refused rows, and its grants; and v1.4's page_links, v1.1's restated with
+// page_links_person_step_idx (README rule 12, migration 0042), which the catalog is compared with in place of v1.1's.
 //
 // The test's connection is the migrations' role, which owns the tables and is not bound by row-level security. A check
 // made as the Tool API (rosie_app) or the runtime side (rosie_job) runs in its own transaction under SET LOCAL ROLE,
@@ -32,7 +36,10 @@ const RUNTIME = "rosie_job";
 type Role = typeof TOOL_API | typeof RUNTIME;
 const ROLES: readonly Role[] = [TOOL_API, RUNTIME];
 const PRIVILEGES = ["SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "REFERENCES", "TRIGGER"];
-/** The thirteen tables of K-22 v1, v1.1, v1.2 and v1.3, in code-unit order (as PostgreSQL orders a relation's name). */
+/**
+ * The fourteen tables of K-22 v1, v1.1, v1.2, v1.3 and v1.4, in code-unit order (as PostgreSQL orders a relation's
+ * name).
+ */
 const OWN_TABLES = [
   "accounts",
   "contact_changes",
@@ -40,6 +47,7 @@ const OWN_TABLES = [
   "id_uploads",
   "on_call",
   "page_links",
+  "pending_uploads",
   "proof_codes",
   "sessions",
   "sign_in_attempts",
@@ -69,6 +77,11 @@ const RUNTIME_ONLY = ["accounts", "id_uploads"];
  * given by mistake would still show the Tool API no row (README rule 9, v1.2; rule 10, v1.3).
  */
 const RUNTIME_POLICY_ONLY = ["sign_in_attempts", "staging_testers"];
+/**
+ * Scoped by business_id, which may be null (README default 30), with no Tool API grant at all and 0012's runtime policy
+ * alone (README rule 11, v1.4): kept apart from BUSINESS_SCOPED, whose rows the Tool API reads in its scope.
+ */
+const RUNTIME_SCOPED = ["pending_uploads"];
 /** The tables every update of which raises the version (README rule 2), each with a one-column key. */
 const VERSIONED = [
   "accounts",
@@ -164,12 +177,13 @@ interface IndexEntry {
 
 const readJson = (url: URL): unknown => JSON.parse(readFileSync(url, "utf8"));
 
-const TABLES = [
-  ...(readJson(new URL("people-access.v1.tables.json", PART_DIR)) as { tables: ContractTable[] }).tables,
-  ...(readJson(new URL("people-access.v1.1.tables.json", PART_DIR)) as { tables: ContractTable[] }).tables,
-  ...(readJson(new URL("people-access.v1.2.tables.json", PART_DIR)) as { tables: ContractTable[] }).tables,
-  ...(readJson(new URL("people-access.v1.3.tables.json", PART_DIR)) as { tables: ContractTable[] }).tables,
-];
+const tablesOf = (version: string): ContractTable[] =>
+  (readJson(new URL(`people-access.${version}.tables.json`, PART_DIR)) as { tables: ContractTable[] }).tables;
+/** v1.1's list, which holds page_links alone; v1.4 restates it whole with one index more (README rule 12). */
+const V1_1_TABLES = tablesOf("v1.1");
+const V1_4_TABLES = tablesOf("v1.4");
+/** The part at v1.4: v1's, v1.2's, v1.3's and v1.4's lists, page_links as v1.4 gives it (README section "v1.4"). */
+const TABLES = [...tablesOf("v1"), ...tablesOf("v1.2"), ...tablesOf("v1.3"), ...V1_4_TABLES];
 const INDEX = (readJson(new URL("index.json", FIXTURES_DIR)) as { fixtures: IndexEntry[] }).fixtures;
 const SEEDS = INDEX.filter((entry) => entry.expect === "accept").map((entry) => entry.file);
 
@@ -183,7 +197,7 @@ const CORE_SEEDS = (
 function tableOf(name: string): ContractTable {
   const table = TABLES.find((candidate) => candidate.name === name);
   if (table === undefined) {
-    throw new Error(`K-22 v1.1 lists no table ${name}`);
+    throw new Error(`K-22 v1.4 lists no table ${name}`);
   }
   return table;
 }
@@ -226,6 +240,8 @@ const PAGE_LINK_END = ["ended_at", "ended_why", "ended_by_contact_change_id", "v
  * start.
  */
 const STAGING_TESTER_END = ["removed_at", "version"];
+/** What the runtime side may update of a pending upload (README rule 11): its finished time alone. */
+const PENDING_UPLOAD_FINISH = ["finished_at"];
 
 const fixtureFile = (file: string): FixtureFile => readJson(new URL(file, FIXTURES_DIR)) as FixtureFile;
 
@@ -283,7 +299,7 @@ const standIn = (label: string): string => createHash("sha256").update(label).di
 const plus = (iso: string, minutes: number): string =>
   new Date(new Date(iso).getTime() + minutes * 60_000).toISOString();
 
-/** Every K-22 row of the eleven seeds and their chains, in load order. */
+/** Every K-22 row of the twelve seeds and their chains, in load order. */
 const SEED_ROWS = ((): FixtureRow[] => {
   const seen = new Set<string>();
   return SEEDS.flatMap((file) => fixtureRows(new URL(file, FIXTURES_DIR), seen)).filter((row) =>
@@ -553,7 +569,7 @@ async function loadFixtures(files: readonly string[], own = true): Promise<Recor
 /** What is loaded now, so checks that share a state load it once. */
 let loadedState = "";
 
-/** Every K-04 v1 seed and every K-22 seed to v1.3 with its chain (K-23's and K-29's seeds among them). */
+/** Every K-04 v1 seed and every K-22 seed to v1.4 with its chain (K-23's and K-29's seeds among them). */
 async function loadEverySeed(): Promise<void> {
   if (loadedState !== "every seed") {
     await reset();
@@ -663,17 +679,17 @@ afterAll(async () => {
   await db.drop();
 });
 
-describe("the migration against the frozen table lists (K-22 v1, v1.1, v1.2 and v1.3)", () => {
+describe("the migration against the frozen table lists (K-22 v1, v1.1, v1.2, v1.3 and v1.4)", () => {
   /** The table list's types as format_type prints them; the others print as the list writes them. */
   const typeNames: Record<string, string> = {
     timestamptz: "timestamp with time zone",
     time: "time without time zone",
   };
 
-  it("the four lists name thirteen tables: seven scoped by business on business_id, six scoped none; ten versioned", () => {
+  it("the lists (v1's, v1.2's, v1.3's and v1.4's, page_links as v1.4 restates v1.1's) name fourteen tables: eight scoped by business on business_id, six scoped none; ten versioned", () => {
     expect(TABLES.map((table) => table.name).sort()).toEqual(OWN_TABLES);
     for (const table of TABLES) {
-      const scoped = BUSINESS_SCOPED.includes(table.name);
+      const scoped = BUSINESS_SCOPED.includes(table.name) || RUNTIME_SCOPED.includes(table.name);
       expect([table.rowLevelSecurity.scope, table.rowLevelSecurity.column], table.name).toEqual(
         scoped ? ["business", "business_id"] : ["none", undefined],
       );
@@ -682,8 +698,29 @@ describe("the migration against the frozen table lists (K-22 v1, v1.1, v1.2 and 
       );
     }
     expect([...PERSON_BOUND, ...RUNTIME_ONLY, ...RUNTIME_POLICY_ONLY].sort()).toEqual(
-      OWN_TABLES.filter((table) => !BUSINESS_SCOPED.includes(table)),
+      OWN_TABLES.filter((table) => !BUSINESS_SCOPED.includes(table) && !RUNTIME_SCOPED.includes(table)),
     );
+  });
+
+  it("v1.4 restates v1.1's page_links whole (README default 36): every column, key, constraint and index of v1.1's entry as it is, plus page_links_person_step_idx on (person_id, business_id, purpose, step_id), not partial; only the description, the source and that index differ", () => {
+    expect(V1_1_TABLES.map((table) => table.name)).toEqual(["page_links"]);
+    expect(V1_4_TABLES.map((table) => table.name)).toEqual(["pending_uploads", "page_links"]);
+    const [v11] = V1_1_TABLES;
+    const v14 = V1_4_TABLES.find((table) => table.name === "page_links");
+    const rest = (table: ContractTable | undefined): Record<string, unknown> =>
+      Object.fromEntries(
+        Object.entries(table ?? {}).filter(([key]) => !["description", "source", "indexes"].includes(key)),
+      );
+    expect(Object.keys(rest(v11)).length).toBeGreaterThan(5);
+    expect(rest(v14)).toEqual(rest(v11));
+    expect(v14?.indexes).toEqual([
+      ...(v11?.indexes ?? []),
+      {
+        name: "page_links_person_step_idx",
+        columns: ["person_id", "business_id", "purpose", "step_id"],
+        why: expect.any(String) as unknown as string,
+      },
+    ]);
   });
 
   for (const table of TABLES) {
@@ -835,11 +872,13 @@ describe("the migration against the frozen table lists (K-22 v1, v1.1, v1.2 and 
       ["id_uploads.object_key", "person_id", "bytea"],
       ["emergency_contacts.name", "person_id", "bytea"],
       ["emergency_contacts.mobile", "person_id", "bytea"],
+      // v1.4 (README rule 11; T-1573): a pending upload's object key, sealed as id_uploads' is.
+      ["pending_uploads.object_key", "person_id", "bytea"],
     ]);
     // The tables hold exactly the listed columns (checked above), so nothing beside the sealed form holds the value.
-    for (const table of ["id_uploads", "emergency_contacts"]) {
+    for (const table of ["id_uploads", "emergency_contacts", "pending_uploads"]) {
       const bytea = columnsOf(table).filter((column) => typeOf.get(`${table}.${column}`) === "bytea");
-      expect(bytea, table).toEqual(table === "id_uploads" ? ["object_key"] : ["name", "mobile"]);
+      expect(bytea, table).toEqual(table === "emergency_contacts" ? ["name", "mobile"] : ["object_key"]);
     }
   });
 
@@ -863,6 +902,48 @@ describe("the migration against the frozen table lists (K-22 v1, v1.1, v1.2 and 
     const names = rows.map((row) => row.name);
     expect(names.filter((name) => name === "staging_testers")).toHaveLength(1);
     expect(names.indexOf("staging_testers")).toBeGreaterThan(names.indexOf("sign_in_attempts"));
+  });
+
+  it("v1.4's pending_uploads and page_links_person_step_idx are recorded in schema_migrations under those names, in that order, after staging_testers (T-1573)", async () => {
+    const rows = await db.sql<{ name: string }[]>`select name from schema_migrations order by version`;
+    const names = rows.map((row) => row.name);
+    for (const name of ["pending_uploads", "page_links_person_step_idx"]) {
+      expect(
+        names.filter((candidate) => candidate === name),
+        name,
+      ).toHaveLength(1);
+    }
+    expect(names.indexOf("pending_uploads")).toBeGreaterThan(names.indexOf("staging_testers"));
+    expect(names.indexOf("page_links_person_step_idx")).toBeGreaterThan(names.indexOf("pending_uploads"));
+  });
+
+  it("page_links_person_step_idx (README rule 12) is a valid, ready btree on (person_id, business_id, purpose, step_id), not partial and not unique, beside page_links_person_live_idx", async () => {
+    const [index] = await db.sql<
+      {
+        valid: boolean;
+        ready: boolean;
+        unique: boolean;
+        partial: boolean;
+        method: string;
+        definition: string;
+      }[]
+    >`
+      select i.indisvalid as valid, i.indisready as ready, i.indisunique as unique, i.indpred is not null as partial,
+             am.amname as method, pg_get_indexdef(i.indexrelid) as definition
+      from pg_index i join pg_class c on c.oid = i.indexrelid join pg_am am on am.oid = c.relam
+      where i.indexrelid = ${`${db.schema}.page_links_person_step_idx`}::regclass
+    `;
+    const { definition, ...flags } = index ?? { definition: "" };
+    expect(flags).toEqual({ valid: true, ready: true, unique: false, partial: false, method: "btree" });
+    expect(definition).toMatch(
+      /^CREATE INDEX page_links_person_step_idx ON \S+ USING btree \(person_id, business_id, purpose, step_id\)$/,
+    );
+    const own = await definitionsOf(db.sql, `${db.schema}.page_links`);
+    expect(Object.keys(own.indexes).sort()).toEqual([
+      "page_links_code_key",
+      "page_links_person_live_idx",
+      "page_links_person_step_idx",
+    ]);
   });
 });
 
@@ -948,7 +1029,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     order by tablename, policyname
   `;
 
-  it("row-level security is on for the seven business-scoped tables, the two bound to the call's person, sign_in_attempts (rule 9) and staging_testers (rule 10); off for accounts and id_uploads (no Tool API grant); none forced", async () => {
+  it("row-level security is on for the eight business-scoped tables (pending_uploads among them: rule 11), the two bound to the call's person, sign_in_attempts (rule 9) and staging_testers (rule 10); off for accounts and id_uploads (no Tool API grant); none forced", async () => {
     const flags = await db.sql<{ name: string; on: boolean; forced: boolean }[]>`
       select relname as name, relrowsecurity as on, relforcerowsecurity as forced from pg_class
       where relnamespace = ${db.schema}::regnamespace and relname in ${db.sql(OWN_TABLES)}
@@ -959,7 +1040,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     );
   });
 
-  it("each table's policies, by name, role and command: 0012's two on the five plain tables; one per command for the Tool API and 0012's runtime policy on contact_changes and page_links; the person-bound ones on proof_codes and sessions, and every row for the runtime side; on sign_in_attempts and staging_testers the runtime side's one alone (rules 9 and 10)", async () => {
+  it("each table's policies, by name, role and command: 0012's two on the five plain tables; one per command for the Tool API and 0012's runtime policy on contact_changes and page_links; the person-bound ones on proof_codes and sessions, and every row for the runtime side; on sign_in_attempts, staging_testers and pending_uploads the runtime side's one alone (rules 9, 10 and 11)", async () => {
     const own = (await policiesIn(db.sql, db.schema)).filter((policy) => OWN_TABLES.includes(policy.table));
     const shape = own.map((policy) => [
       policy.table,
@@ -977,6 +1058,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
         ...BUSINESS_SCOPED.filter((table) => !PLAIN_SCOPED.includes(table)),
         ...PERSON_BOUND,
         ...RUNTIME_POLICY_ONLY,
+        ...RUNTIME_SCOPED,
       ].map((table) => [table, `${table}_runtime`, "PERMISSIVE", [RUNTIME], "ALL"]),
       ...RULE_POLICIES.map((policy) => [policy.table, policy.name, "PERMISSIVE", [TOOL_API], policy.command]),
     ];
@@ -987,7 +1069,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     expect(order(shape)).toEqual(order(expected));
   });
 
-  it("the plain tables' policies, and the runtime policies of contact_changes and page_links, are 0012's word for word (read from outbox_rows', which key on business_id); proof_codes', sessions', sign_in_attempts' and staging_testers' runtime policies admit every row", async () => {
+  it("the plain tables' policies, and the runtime policies of contact_changes, page_links and pending_uploads (rule 11), are 0012's word for word (read from outbox_rows', which key on business_id); proof_codes', sessions', sign_in_attempts' and staging_testers' runtime policies admit every row", async () => {
     const all = await policiesIn(db.sql, db.schema);
     const core = all.filter((policy) => policy.table === "outbox_rows");
     const of = (name: string): [string | null, string | null] => {
@@ -1000,7 +1082,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
       expect(of(`${table}_runtime`), table).toEqual([coreRuntime?.using, coreRuntime?.check]);
       expect(of(`${table}_tool_api`), table).toEqual([coreTool?.using, coreTool?.check]);
     }
-    for (const table of ["contact_changes", "page_links"]) {
+    for (const table of ["contact_changes", "page_links", ...RUNTIME_SCOPED]) {
       expect(of(`${table}_runtime`), table).toEqual([coreRuntime?.using, coreRuntime?.check]);
     }
     for (const table of [...PERSON_BOUND, ...RUNTIME_POLICY_ONLY]) {
@@ -1034,7 +1116,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     expect(expressions(own)).toEqual(expressions(listed));
   });
 
-  it("table grants (DL-149, each to its named reader: the migration's header): both roles on the five plain tables and contact_changes; the runtime side alone on accounts, id_uploads and sign_in_attempts (rule 9: the Tool API none) and in full on proof_codes, sessions and page_links; on staging_testers the runtime side's SELECT and INSERT, its UPDATE a column grant (rule 10: the Tool API none); the Tool API's table grant there only INSERT on sessions; no delete, truncate, references or trigger; nothing to PUBLIC", async () => {
+  it("table grants (DL-149, each to its named reader: the migration's header): both roles on the five plain tables and contact_changes; the runtime side alone on accounts, id_uploads and sign_in_attempts (rule 9: the Tool API none) and in full on proof_codes, sessions and page_links; on staging_testers and pending_uploads the runtime side's SELECT and INSERT, its UPDATE a column grant (rules 10 and 11: the Tool API none); the Tool API's table grant there only INSERT on sessions; no delete, truncate, references or trigger; nothing to PUBLIC", async () => {
     const held = await db.sql<{ role: string; table: string; privilege: string }[]>`
       select r.role, c.relname as table, p.privilege
       from unnest(${[...ROLES]}::text[]) as r(role)
@@ -1062,6 +1144,8 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
         id_uploads: once,
         on_call: full,
         page_links: full,
+        // README rule 11 (v1.4): its UPDATE of finished_at alone is a column grant (the next check).
+        pending_uploads: once,
         proof_codes: full,
         sessions: full,
         sign_in_attempts: full,
@@ -1088,7 +1172,7 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     expect(others).toEqual([]);
   });
 
-  it("column grants (rules 5, 8 and 10): the Tool API reads every proof_codes column but code_hash and inserts a send's ten; reads every sessions column but the two hashes and updates four; reads every page_links column but code_sha256, inserts an issue's nine and updates the end; the runtime side updates staging_testers' removed_at and version alone (rule 10); no other column grant (none on sign_in_attempts: rule 9; none of the Tool API's on staging_testers: rule 10), and no hash readable", async () => {
+  it("column grants (rules 5, 8, 10 and 11): the Tool API reads every proof_codes column but code_hash and inserts a send's ten; reads every sessions column but the two hashes and updates four; reads every page_links column but code_sha256, inserts an issue's nine and updates the end; the runtime side updates staging_testers' removed_at and version alone (rule 10) and pending_uploads' finished_at alone (rule 11); no other column grant (none on sign_in_attempts: rule 9; none of the Tool API's on staging_testers or pending_uploads: rules 10 and 11), and no hash readable", async () => {
     const granted = await db.sql<{ table: string; column: string; grantee: string; privilege: string }[]>`
       select c.relname as table, a.attname as column,
              case when g.grantee = 0 then 'PUBLIC' else pg_get_userbyid(g.grantee) end as grantee,
@@ -1109,7 +1193,11 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
       ["page_links", "UPDATE", PAGE_LINK_END],
     ];
     // README rule 10 (v1.3): the runtime side's UPDATE of a listing's end and version, its one column grant here.
-    const runtimeWant: [string, string, string[]][] = [["staging_testers", "UPDATE", STAGING_TESTER_END]];
+    // README rule 11 (v1.4): the runtime side's UPDATE of a pending upload's finished_at, its one column grant there.
+    const runtimeWant: [string, string, string[]][] = [
+      ["staging_testers", "UPDATE", STAGING_TESTER_END],
+      ["pending_uploads", "UPDATE", PENDING_UPLOAD_FINISH],
+    ];
     expect(granted.map((row) => `${row.table} ${row.column} ${row.grantee} ${row.privilege}`).sort()).toEqual(
       [
         ...want.flatMap(([table, privilege, columns]) =>
@@ -1123,21 +1211,31 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
     expect(PROOF_CODE_READ).toHaveLength(14);
     expect(SESSION_READ).toHaveLength(10);
     expect(PAGE_LINK_READ).toHaveLength(12);
-    // has_column_privilege agrees for staging_testers, column by column in the table's order: the runtime side updates
-    // removed_at and version alone, and the Tool API holds no privilege on any of its columns.
-    const listingColumns = await db.sql<{ role: string; column: string; privilege: string }[]>`
-      select r.role, a.attname as column, p.privilege
-      from unnest(${[...ROLES]}::text[]) as r(role)
-        cross join pg_attribute a
-        cross join unnest(${["SELECT", "INSERT", "UPDATE", "REFERENCES"]}::text[]) as p(privilege)
-      where a.attrelid = ${`${db.schema}.staging_testers`}::regclass and a.attnum > 0 and not a.attisdropped
-        and has_column_privilege(r.role, a.attrelid, a.attnum, p.privilege)
-      order by 1, a.attnum, 3
-    `;
-    expect(listingColumns.filter((row) => row.role === TOOL_API)).toEqual([]);
-    expect(
-      listingColumns.filter((row) => row.privilege === "UPDATE").map((row) => `${row.role} ${row.column}`),
-    ).toEqual(STAGING_TESTER_END.map((column) => `${RUNTIME} ${column}`));
+    // has_column_privilege agrees for staging_testers and pending_uploads, column by column in the table's order: the
+    // runtime side updates removed_at and version alone, and finished_at alone, and the Tool API holds no privilege on
+    // any of their columns.
+    for (const [table, updates] of [
+      ["staging_testers", STAGING_TESTER_END],
+      ["pending_uploads", PENDING_UPLOAD_FINISH],
+    ] as const) {
+      const runtimeColumns = await db.sql<{ role: string; column: string; privilege: string }[]>`
+        select r.role, a.attname as column, p.privilege
+        from unnest(${[...ROLES]}::text[]) as r(role)
+          cross join pg_attribute a
+          cross join unnest(${["SELECT", "INSERT", "UPDATE", "REFERENCES"]}::text[]) as p(privilege)
+        where a.attrelid = ${`${db.schema}.${table}`}::regclass and a.attnum > 0 and not a.attisdropped
+          and has_column_privilege(r.role, a.attrelid, a.attnum, p.privilege)
+        order by 1, a.attnum, 3
+      `;
+      expect(
+        runtimeColumns.filter((row) => row.role === TOOL_API),
+        table,
+      ).toEqual([]);
+      expect(
+        runtimeColumns.filter((row) => row.privilege === "UPDATE").map((row) => `${row.role} ${row.column}`),
+        table,
+      ).toEqual(updates.map((column) => `${RUNTIME} ${column}`));
+    }
     const hashes = await db.sql<{ readable: boolean }[]>`
       select has_column_privilege(${TOOL_API}, (${db.schema} || '.' || t.name)::regclass, t.col, 'SELECT') as readable
       from (values ('proof_codes', 'code_hash'), ('sessions', 'token_sha256'), ('sessions', 'device_sha256'),
@@ -1318,11 +1416,12 @@ describe("row-level security, policies and grants in the catalog (T-191's patter
   });
 });
 
-describe("the seed fixtures load (fixtures/index.json): the six of 02-contracts' K-22 row, and on_call's, contact_changes', v1.1's page_links', v1.2's sign_in_attempts' and v1.3's staging_testers'", () => {
+describe("the seed fixtures load (fixtures/index.json): the six of 02-contracts' K-22 row, and on_call's, contact_changes', v1.1's page_links', v1.2's sign_in_attempts', v1.3's staging_testers' and v1.4's pending_uploads'", () => {
   /**
-   * The K-22 rows the eleven seeds give together, per table: every table gets rows. v1.2's seed-sign-in-attempt adds
+   * The K-22 rows the twelve seeds give together, per table: every table gets rows. v1.2's seed-sign-in-attempt adds
    * two of Sam's sign-in codes, the session the first started, and three attempts (T-1278). v1.3's seed-staging-tester
-   * adds Tester One's and Tester Two's accounts, sign-in codes and sessions, and their two listings (T-1402).
+   * adds Tester One's and Tester Two's accounts, sign-in codes and sessions, and their two listings (T-1402). v1.4's
+   * seed-pending-upload adds Sam's two pending uploads, the sign_up one finished and the re_check one not (T-1573).
    */
   const SEEDED = {
     accounts: 3,
@@ -1331,6 +1430,7 @@ describe("the seed fixtures load (fixtures/index.json): the six of 02-contracts'
     id_uploads: 1,
     on_call: 3,
     page_links: 4,
+    pending_uploads: 2,
     proof_codes: 9,
     sessions: 5,
     sign_in_attempts: 3,
@@ -1340,13 +1440,14 @@ describe("the seed fixtures load (fixtures/index.json): the six of 02-contracts'
     team_powers: 1,
   };
 
-  it("the index lists eleven seeds (the card's six among them) and forty-two refused rows (25 of v1, 6 of v1.1, 6 of v1.2, 5 of v1.3), all on K-22's own tables", () => {
+  it("the index lists twelve seeds (the card's six among them) and forty-eight refused rows (25 of v1, 6 of v1.1, 6 of v1.2, 5 of v1.3, 6 of v1.4), all on K-22's own tables", () => {
     expect([...SEEDS].sort()).toEqual(
       [
         ...CARD_SEEDS,
         "seed-contact-change.json",
         "seed-on-call.json",
         "seed-page-link.json",
+        "seed-pending-upload.json",
         "seed-sign-in-attempt.json",
         "seed-staging-tester.json",
       ].sort(),
@@ -1356,7 +1457,8 @@ describe("the seed fixtures load (fixtures/index.json): the six of 02-contracts'
     expect(refused.filter((entry) => entry.version === "v1.1")).toHaveLength(6);
     expect(refused.filter((entry) => entry.version === "v1.2")).toHaveLength(6);
     expect(refused.filter((entry) => entry.version === "v1.3")).toHaveLength(5);
-    expect(refused).toHaveLength(42);
+    expect(refused.filter((entry) => entry.version === "v1.4")).toHaveLength(6);
+    expect(refused).toHaveLength(48);
     expect(INDEX.every((entry) => OWN_TABLES.includes(entry.table))).toBe(true);
   });
 
@@ -1382,7 +1484,7 @@ describe("the seed fixtures load (fixtures/index.json): the six of 02-contracts'
     );
   }
 
-  it("all eleven insert together, each after chain once, and no table is left empty", SLOW, async () => {
+  it("all twelve insert together, each after chain once, and no table is left empty", SLOW, async () => {
     await reset();
     loadedState = "";
     const loaded = await loadFixtures(SEEDS);
@@ -2343,6 +2445,42 @@ const REFUSED_CASES: { file: string; why?: Why; fixed: Fixed[] }[] = [
       },
     ],
   },
+  // v1.4 (README rule 11; T-1573): each passes once its one fault is put right, as the README's "Seeds and refused rows
+  // (v1.4)" says.
+  {
+    file: "invalid/refuse-pending-upload-purpose-unknown.json",
+    fixed: [{ label: "the same row with re_check", change: { purpose: "re_check" }, rows: 1 }],
+  },
+  {
+    file: "invalid/refuse-pending-upload-finished-before-created.json",
+    fixed: [{ label: "the same update at 09:02", change: { finished_at: "2026-10-30T09:02:00Z" }, rows: 1 }],
+  },
+  {
+    file: "invalid/refuse-pending-upload-tool-api-read.json",
+    why: "privilege",
+    fixed: [runtimeSide],
+  },
+  {
+    file: "invalid/refuse-pending-upload-written-by-tool-api.json",
+    why: "privilege",
+    fixed: [runtimeSide],
+  },
+  {
+    file: "invalid/refuse-pending-upload-key-replaced.json",
+    why: "privilege",
+    fixed: [
+      {
+        label: "the same update setting finished_at to 09:02 in place of object_key",
+        drop: ["object_key"],
+        change: { finished_at: "2026-10-30T09:02:00Z" },
+        rows: 1,
+      },
+    ],
+  },
+  {
+    file: "invalid/refuse-pending-upload-other-business-read.json",
+    fixed: [{ label: "the barbershop's own scope", scope: { businessId: BARBERSHOP }, rows: 1 }, runtimeSide],
+  },
 ];
 
 const roleOf = (role: Refused["role"]): Role => (role === "toolApi" ? TOOL_API : RUNTIME);
@@ -2383,8 +2521,8 @@ function actionOf(refused: Refused, fix: Fixed | null) {
   };
 }
 
-describe("every refused fixture is refused for its one reason, and passes without it (README rules 4, 5, 8, 9 and 10 and the CHECKs)", () => {
-  it("the cases cover the index's forty-two refused fixtures, each once", () => {
+describe("every refused fixture is refused for its one reason, and passes without it (README rules 4, 5, 8, 9, 10 and 11 and the CHECKs)", () => {
+  it("the cases cover the index's forty-eight refused fixtures, each once", () => {
     expect(REFUSED_CASES.map((entry) => entry.file).sort()).toEqual(
       INDEX.filter((entry) => entry.expect === "refuse")
         .map((entry) => entry.file)
@@ -3408,6 +3546,92 @@ describe("staging's testers (rule 10, v1.3; T-1402): the runtime side lists a pe
   });
 });
 
+describe("pending uploads (rule 11, v1.4; T-1573): the runtime side makes, reads and finishes an upload, by business under a scope; the Tool API reaches none", () => {
+  beforeAll(loadEverySeed, 120_000);
+
+  it("seed-pending-upload's sign_up upload holds seed-owner-id-upload's sealed object key, media type and finished time (the row the event turn copies from it); the re_check one, at the barbershop, never came", async () => {
+    const rows = await db.sql<
+      { id: string; business: string | null; sameKey: boolean; sameType: boolean; sameTime: boolean | null }[]
+    >`
+      select p.id, p.business_id as business, p.object_key = u.object_key as "sameKey",
+             p.content_type = u.content_type as "sameType", p.finished_at = u.uploaded_at as "sameTime"
+      from pending_uploads p join id_uploads u on u.person_id = p.person_id and u.purpose = 'sign_up'
+      where p.person_id = ${SAM}
+      order by p.id
+    `;
+    expect(rows).toEqual([
+      { id: "upload-sam-id-sign-up", business: null, sameKey: true, sameType: true, sameTime: true },
+      { id: "upload-sam-re-check", business: BARBERSHOP, sameKey: false, sameType: false, sameTime: null },
+    ]);
+  });
+
+  it("the Tool API is refused every read and write of pending_uploads (42501), in a sign-in call, in Sam's own call and in his call scoped to the barbershop; the runtime side with no scope reads both uploads", async () => {
+    const pending: Values = {
+      ...valuesOf("seed-pending-upload.json", "pending_uploads", 1),
+      id: "upload-probe-tool-api",
+    };
+    const actions: [string, (tx: Tx) => Promise<unknown>][] = [
+      ["select", (tx) => countRows(tx, "pending_uploads")],
+      ["insert", (tx) => insertRow(tx, "pending_uploads", pending)],
+      [
+        "update",
+        (tx) => tx`
+          update pending_uploads set finished_at = '2026-10-30T09:02:00Z' where id = 'upload-sam-re-check'
+        `,
+      ],
+      ["delete", (tx) => tx`delete from pending_uploads where id = 'upload-sam-re-check'`],
+    ];
+    const scopes: (Scope | null)[] = [null, { personId: SAM }, { businessId: BARBERSHOP, personId: SAM }];
+    for (const scope of scopes) {
+      for (const [label, action] of actions) {
+        const refused = await refusal(as(TOOL_API, scope, action));
+        expect([refused.code, refused.message], `${label} ${JSON.stringify(scope)}`).toEqual([
+          "42501",
+          "permission denied for table pending_uploads",
+        ]);
+      }
+    }
+    expect(await as(RUNTIME, null, (tx) => countRows(tx, "pending_uploads"))).toBe(2);
+  });
+
+  it("the runtime side makes an upload with no business and finishes it once where finished_at is null (a repeat changes no row); under the barbershop's scope it sees the barbershop's upload alone, and the yoga studio's sees none; deleting or truncating is refused (42501)", async () => {
+    const answer = await as(RUNTIME, null, async (tx) => {
+      const made = await insertRow(tx, "pending_uploads", {
+        ...valuesOf("seed-pending-upload.json", "pending_uploads", 0),
+        id: "upload-probe-sam-sign-up-2",
+        finished_at: null,
+      });
+      const finish = async (): Promise<number> =>
+        (
+          await tx`
+            update pending_uploads set finished_at = '2026-10-19T14:12:00Z'
+            where id = 'upload-probe-sam-sign-up-2' and finished_at is null
+          `
+        ).count;
+      const first = await finish();
+      const again = await finish();
+      return { made, first, again };
+    });
+    expect(answer).toEqual({ made: 1, first: 1, again: 0 });
+    const idsUnder = (business: string): Promise<string[]> =>
+      as(RUNTIME, { businessId: business }, async (tx) =>
+        (await tx<{ id: string }[]>`select id from pending_uploads order by id`).map((row) => row.id),
+      );
+    expect(await idsUnder(BARBERSHOP)).toEqual(["upload-sam-re-check"]);
+    expect(await idsUnder(YOGA_STUDIO)).toEqual([]);
+    for (const [label, statement] of [
+      ["deleted", "delete from pending_uploads where id = 'upload-sam-re-check'"],
+      ["truncated", "truncate pending_uploads"],
+    ]) {
+      const refused = await refusal(as(RUNTIME, null, (tx) => tx.unsafe(statement ?? "")));
+      expect([refused.code, refused.message], label).toEqual([
+        "42501",
+        "permission denied for table pending_uploads",
+      ]);
+    }
+  });
+});
+
 describe("row-level security per business on the seven business-scoped tables, every K-04 v1 and K-22 v1.1 seed loaded", () => {
   beforeAll(loadEverySeed, 120_000);
 
@@ -3449,7 +3673,7 @@ describe("row-level security per business on the seven business-scoped tables, e
     },
   );
 
-  it("the Tool API writes only its scope's rows: another business's insert is refused (42501), its update finds no row, a row cannot move to another business; neither role deletes a row of the thirteen", async () => {
+  it("the Tool API writes only its scope's rows: another business's insert is refused (42501), its update finds no row, a row cannot move to another business; neither role deletes a row of the fourteen", async () => {
     const skill = {
       ...valuesOf("seed-staff-joined.json", "staff_skills", 1),
       id: "skill-jordan-electrician-2",
