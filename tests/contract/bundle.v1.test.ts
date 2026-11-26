@@ -18,6 +18,11 @@
 //      fixtures. Each check is also run on a damaged copy to show that it fires.
 //   What needs a producer or consumer side is on SIDE_CHECKS, not checked here (a lookup's field sourced on every
 //   path and a loop across steps are the compiler's own lint: C-065 to C-070).
+//
+// K-01 is frozen at v1 and v1.1 (T-1544), and fixtures/index.json lists both versions' fixtures, each entry naming its
+// version. The T-003 harness still checks every entry against the schema its own `version` names, and part 1's counts
+// cover the whole shared index; the checks that read an entry against v1's schema read v1's entries only, selected by
+// `version` (DL-125, DL-153). v1.1's own part is QA's task (tests/contract/bundle.v1.1.test.ts).
 
 import { createHash } from "node:crypto";
 import { readFileSync, readdirSync } from "node:fs";
@@ -42,6 +47,8 @@ function readJson(file: string): unknown {
 }
 
 const index = readJson(path.join(FIXTURES_DIR, "index.json")) as { fixtures: FixtureEntry[] };
+/** v1's entries of the shared index (v1 and v1.1 list their fixtures in it): the v1 checks read these. */
+const entries = index.fixtures.filter((entry) => entry.version === "v1");
 const fixture = (file: string): unknown => readJson(path.join(FIXTURES_DIR, ...file.split("/")));
 
 /** A value a fixture must hold; the fixtures are checked against the schema first, so a miss is a broken test. */
@@ -443,6 +450,7 @@ function requiredOf(entry: FixtureEntry): string[] {
 // 1. Every fixture of the index, checked by the T-003 harness
 
 const report = describeContractFixtures("bundle");
+const v1Results = report.entries.filter((result) => result.version === "v1");
 
 describe("bundle.v1 fixtures: the index and the count", () => {
   it("checks as many fixtures as fixtures/index.json lists, none left out", () => {
@@ -461,11 +469,13 @@ describe("bundle.v1 fixtures: the index and the count", () => {
   });
 
   it("holds the accepted bundles, manifest and shared lists, and refused steps and a refused journey gate", () => {
-    const files = index.fixtures.map((entry) => entry.file);
+    const files = entries.map((entry) => entry.file);
     for (const file of [...acceptedBundles, "manifest.json", "lint-report.json"])
       expect(files).toContain(file);
-    expect(index.fixtures.some((entry) => entry.expect === "refuse")).toBe(true);
-    expect(index.fixtures.every((entry) => entry.version === "v1")).toBe(true);
+    expect(entries.some((entry) => entry.expect === "refuse")).toBe(true);
+    // Every entry read against v1's schema below is v1's: the harness checked each against bundle.v1.schema.json.
+    expect(v1Results.map((result) => result.file)).toEqual(files);
+    expect(v1Results.map((result) => result.schema)).toEqual(entries.map(() => SCHEMA_FILE));
   });
 });
 
@@ -473,7 +483,7 @@ describe("bundle.v1 fixtures: the index and the count", () => {
 // 2. The schema is not vacuous
 
 describe("bundle.v1 fixtures: removing a required field makes an accepted fixture refused", () => {
-  for (const entry of index.fixtures.filter((candidate) => candidate.expect === "accept")) {
+  for (const entry of entries.filter((candidate) => candidate.expect === "accept")) {
     it(`${entry.file}${entry.def === undefined ? " (the whole bundle)" : ` (${entry.def})`}`, () => {
       const validate = validatorFor(entry);
       const original = fixture(entry.file) as Record<string, unknown>;
