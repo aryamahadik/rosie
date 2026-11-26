@@ -2,9 +2,61 @@
 
 Every commit on `main`, newest first, numbered as GitHub counts them (the first commit is 1). Each shows the pull request it merged, the branch commits that pull request squashed into it, the files it changed and the rest of its message. The pull requests closed without merging come last.
 
-- **Through:** commit 933, [`bf628f8f`](https://github.com/aryamahadik/rosie/commit/bf628f8f), 2026-11-26 09:42:40 UTC.
+- **Through:** commit 936, [`cef0c4ff`](https://github.com/aryamahadik/rosie/commit/cef0c4ff), 2026-11-26 10:23:05 UTC.
 - **Merges:** `main` has 0 merge commits. Every pull request is squash-merged into one commit, after QA, its reviews and one green merge-check.
 - **Updates:** the build regenerates this file after each merge (`scratch/build/lead/commit-history.mjs`). Each update is itself a commit, so it appears in the next update.
+
+## 936. docs: COMMIT\_HISTORY.md through commit 933 (bf628f8f, \#951) (\#954)
+
+- **Commit:** [`cef0c4ff`](https://github.com/aryamahadik/rosie/commit/cef0c4ff), by Arya Mahadik, 2026-11-26 10:23:05 UTC
+- **Pull request:** [#954](https://github.com/aryamahadik/rosie/pull/954) from `task/commit-history-246`, merged 2026-11-26 10:23:06 UTC. It squashed 1 branch commit:
+  - `83286da` docs: COMMIT\_HISTORY.md through commit 933 (bf628f8f, \#951)
+- **Files changed:** 1 (+121 −1), by folder:
+  - `/` COMMIT\_HISTORY.md +121 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 935. T-1557: README defaults from the Nov 23 phone test, numbered after K-09 v1.14: an id field's value is its words and S1-09's span (K-02 default 24; closes K-09 open gap 180); a turn that fits nothing, or a question asked twice and still unclear, is passed on, never left silent (K-09 defaults 236-238, open gaps 217-218); squashed onto main (DL-1214, DL-1227, DL-1233, DL-1238) (\#952)
+
+- **Commit:** [`df2bde85`](https://github.com/aryamahadik/rosie/commit/df2bde85), by Arya Mahadik, 2026-11-26 10:23:01 UTC
+- **Pull request:** [#952](https://github.com/aryamahadik/rosie/pull/952) from `task/T-1557s`, merged 2026-11-26 10:23:01 UTC. It squashed 1 branch commit:
+  - `e312f8c` T-1557: README defaults from the Nov 23 phone test, numbered after K-…
+- **Files changed:** 2 (+54 −4), by folder:
+  - `contracts/model/` README.md +19 −1
+  - `contracts/tool-api/` README.md +35 −3
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Verdicts: round 2 QA PASS and the runtime engineer PASS (eeabe9e); round 1 the action-layer engineer PASS; round 3 (b1fc96c, the renumber only) QA PASS. Both files equal the judged branch's.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
+
+## 934. T-1564: merge check and CI job limits 45 to 75 minutes, each with a DL-1235 comment; the local-merge-check test's pin follows (\#953)
+
+- **Commit:** [`a77a4eed`](https://github.com/aryamahadik/rosie/commit/a77a4eed), by Arya Mahadik, 2026-11-26 10:22:56 UTC
+- **Pull request:** [#953](https://github.com/aryamahadik/rosie/pull/953) from `task/T-1564`, merged 2026-11-26 10:22:56 UTC. It squashed 1 branch commit:
+  - `cea2c4e` T-1564: merge check and CI job limits 45 to 75 minutes, each with a D…
+- **Files changed:** 3 (+5 −3), by folder:
+  - `.github/workflows/` ci.yml +2 −1, merge-check.yml +2 −1
+  - `infra/ci/` local-merge-check.test.mjs +1 −1
+
+<details><summary>The commit message below its subject line</summary>
+
+~~~text
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+~~~
+
+</details>
 
 ## 933. docs: COMMIT\_HISTORY.md through commit 929 (12c7067b, \#946) (\#951)
 
