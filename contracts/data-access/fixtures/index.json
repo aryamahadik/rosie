@@ -3455,6 +3455,214 @@
       "expect": "refuse",
       "shows": "live-text-sign-in-code-sam whose answer gives the code's keyed hash: its id alone, never its hash (its one fault outcome.codeHash; put right, it is live-text-sign-in-code-sam)",
       "source": "ops/reviews/signup-remainder/rule-rest.json card A9 item 6 ('never its hash'); K-22 v1 proof_codes.code_hash; K-05 v1.2 secretColumn; K-05 v1.24 item 91 (liveTextSignInCode.live)"
+    },
+    {
+      "file": "live-step-link-demo-owner-s1-10.json",
+      "version": "v1.25",
+      "def": "liveStepLinkOf.exchange",
+      "expect": "accept",
+      "shows": "The live setupIdCheck link of the event's person and business at S1-10, read on the runtime side at the upload's own finished time: its id, purpose, step and lapse, never its code's hash or a URL",
+      "source": "ops/cards/T-1554.md Gives (1) and Lead note 1; K-09 v1.14 default 224 id_checked (1) and open gap 215 (1); K-22 v1.1 page_links (page_links_purpose_step); actions/src/tool-api/journey-1/mobile-id/writer.ts (2); K-05 v1.25 item 93 and defaults 237 and 238"
+    },
+    {
+      "file": "live-step-link-demo-owner-upload-before-lapse.json",
+      "version": "v1.25",
+      "def": "liveStepLinkOf.exchange",
+      "expect": "accept",
+      "shows": "An upload finished before its link lapsed, read after the lapse: the link checked at the upload's finished time is still live, so the upload is never lost to the lapse",
+      "source": "ops/cards/T-1554.md Lead note 1 ('the link checked at a time the caller names'); K-09 v1.14 default 224 id_checked (1) (round 3, the action-layer engineer's note (c), DL-1223); K-05 v1.25 item 93"
+    },
+    {
+      "file": "live-step-link-demo-owner-none.json",
+      "version": "v1.25",
+      "def": "liveStepLinkOf.exchange",
+      "expect": "accept",
+      "shows": "An upload finished after the link lapsed: no link was live at that time, none, the same answer as for a link never issued or ended before it",
+      "source": "ops/cards/T-1554.md Gives (1) ('neither ended nor lapsed, or none'); K-09 v1.14 default 224; K-05 v1.25 item 93"
+    },
+    {
+      "file": "invalid/refuse-live-step-link-code-hash.json",
+      "version": "v1.25",
+      "def": "liveStepLinkOf.exchange",
+      "expect": "refuse",
+      "shows": "live-step-link-demo-owner-s1-10 whose link carries its code's sha256: never the link's secret (its one fault outcome.link.codeSha256; put right, it is live-step-link-demo-owner-s1-10)",
+      "source": "ops/cards/T-1554.md Gives (1) ('never the link's secret or URL'); K-22 v1.1 page_links.code_sha256; K-05 v1.25 item 93 (liveStepLink)"
+    },
+    {
+      "file": "read-upload-finished-demo-owner.json",
+      "version": "v1.25",
+      "def": "readUploadFinishedAt.exchange",
+      "expect": "accept",
+      "shows": "The pending upload's finished time by its upload id, which v1.24's readPendingUpload does not give: the time the link is checked at and S1-10's id_uploads row takes as uploaded_at",
+      "source": "ops/cards/T-1554.md Lead note 1 ('the upload's finished time by upload id if K-05 v1.24 item 2 lacks it'); K-09 v1.14 defaults 224 and 225 and open gap 215 (1); K-22 v1 id_uploads.uploaded_at (not null); K-05 v1.24 item 86 and open gap 107; K-05 v1.25 item 94 and default 239"
+    },
+    {
+      "file": "read-upload-finished-unknown.json",
+      "version": "v1.25",
+      "def": "readUploadFinishedAt.exchange",
+      "expect": "accept",
+      "shows": "An upload id with nothing kept answers none, as item 86 does",
+      "source": "K-21 v1 uploadNotFound ('one answer for both'); K-05 v1.24 item 86; K-05 v1.25 item 94"
+    },
+    {
+      "file": "invalid/refuse-upload-finished-object-key.json",
+      "version": "v1.25",
+      "def": "readUploadFinishedAt.exchange",
+      "expect": "refuse",
+      "shows": "read-upload-finished-demo-owner whose answer carries the object key: the finished time alone (its one fault outcome.objectKey; put right, it is read-upload-finished-demo-owner)",
+      "source": "K-22 v1 id_uploads.object_key (sealedBy person_id, audience secure-page-only); K-05 v1.24 item 86; K-05 v1.25 item 94 (readUploadFinishedAt.finished)"
+    },
+    {
+      "file": "review-item-demo-control-proven.json",
+      "version": "v1.25",
+      "def": "reviewItemById.exchange",
+      "expect": "accept",
+      "shows": "A control review item by its id on the runtime side, done, its decision proving control (the business_setup control written by that decision), raised by the event's person, never its summary",
+      "source": "ops/cards/T-1554.md Gives (2); K-09 v1.14 default 224 control_proven (1) and open gap 215 (2); K-37 v1 review_items and rule 2; actions/src/domain/paging/review.ts lines 197 and 273; K-23 v1 business_setup; K-05 open gap 92; K-05 v1.25 item 95 and default 240"
+    },
+    {
+      "file": "review-item-demo-listing-match-proven.json",
+      "version": "v1.25",
+      "def": "reviewItemById.exchange",
+      "expect": "accept",
+      "shows": "A listing_match item on the owner's claim, done proving control: controlProven answered as for a control item",
+      "source": "ops/cards/T-1554.md Lead note 1 ('controlProven also for a listing_match item'); K-09 v1.14 open gap 215 (2) (round 3, note (a)) and default 205; actions/src/domain/paging/review.ts default 30; K-05 v1.25 item 95 and default 240"
+    },
+    {
+      "file": "review-item-demo-control-not-proven.json",
+      "version": "v1.25",
+      "def": "reviewItemById.exchange",
+      "expect": "accept",
+      "shows": "A control item done with no control proven: controlProven false, so its event is not waiting",
+      "source": "ops/cards/T-1554.md Gives (2); actions/src/domain/paging/review.ts line 197 (no write-back when controlProven is false); K-05 v1.25 item 95 and default 240"
+    },
+    {
+      "file": "review-item-demo-control-open.json",
+      "version": "v1.25",
+      "def": "reviewItemById.exchange",
+      "expect": "accept",
+      "shows": "An open item: no decided time and no decision",
+      "source": "K-37 v1 review_items_done_has_time; K-05 v1.25 item 95 (reviewItemRead)"
+    },
+    {
+      "file": "review-item-unknown.json",
+      "version": "v1.25",
+      "def": "reviewItemById.exchange",
+      "expect": "accept",
+      "shows": "No review item has the id: none",
+      "source": "ops/cards/T-1554.md Gives (2); K-05 v1.25 item 95"
+    },
+    {
+      "file": "invalid/refuse-review-item-summary.json",
+      "version": "v1.25",
+      "def": "reviewItemById.exchange",
+      "expect": "refuse",
+      "shows": "review-item-demo-control-proven whose item carries its summary: never the summary (its one fault outcome.item.summary; put right, it is review-item-demo-control-proven)",
+      "source": "ops/cards/T-1554.md Gives (2) ('never the summary'); K-37 v1 rule 2 and review_items.summary; K-05 v1.25 item 95 (reviewItemRead)"
+    },
+    {
+      "file": "turn-committed-alex.json",
+      "version": "v1.25",
+      "def": "turnCommitted.exchange",
+      "expect": "accept",
+      "shows": "A committed turn by its id on the runtime side: its id and commit time, the first commit's that commitTurn answers a repeat with",
+      "source": "ops/cards/T-1554.md Gives (3); K-09 v1.14 default 222 and open gaps 212 and 215 (3); K-04 v1 turns (primary key, turns_committed_has_time); migration 0012 (turns: rosie_job alone); K-05 v1 item 1; K-05 v1.25 item 96 and default 241"
+    },
+    {
+      "file": "turn-committed-parked.json",
+      "version": "v1.25",
+      "def": "turnCommitted.exchange",
+      "expect": "accept",
+      "shows": "A parked turn by its id: parked with its time, never committed",
+      "source": "K-04 v1 turns (turns_parked_has_time); K-05 v1 items 1 and 12; K-05 v1.25 item 96 and default 241"
+    },
+    {
+      "file": "turn-committed-none.json",
+      "version": "v1.25",
+      "def": "turnCommitted.exchange",
+      "expect": "accept",
+      "shows": "An event turn before its first commit: none, so the gate reads waiting next",
+      "source": "ops/cards/T-1554.md Gives (3); K-09 v1.14 defaults 222 and 224; K-05 v1.25 item 96"
+    },
+    {
+      "file": "invalid/refuse-turn-committed-outbox-rows.json",
+      "version": "v1.25",
+      "def": "turnCommitted.exchange",
+      "expect": "refuse",
+      "shows": "turn-committed-alex answered with the first commit's outbox rows: the read answers no more than whether and when (its one fault outcome.outboxRows; put right, it is turn-committed-alex)",
+      "source": "K-09 v1.14 default 222 ('the read need answer no more than that'); K-05 v1.25 item 96 (turnCommitted.committed)"
+    },
+    {
+      "file": "waiting-step-demo-owner-s1-10.json",
+      "version": "v1.25",
+      "def": "readWaitingStep.exchange",
+      "expect": "accept",
+      "shows": "The walk waits at S1-10 on id_checked from its own record of the stop, the key not yet on file",
+      "source": "ops/cards/T-1554.md Lead note 1 (read (4)); K-09 v1.14 defaults 209 and 235 and open gap 215 (5); K-22 v1 id_uploads_one_sign_up; K-05 v1.25 item 97 and open gap 109"
+    },
+    {
+      "file": "waiting-step-demo-owner-s1-10-held.json",
+      "version": "v1.25",
+      "def": "readWaitingStep.exchange",
+      "expect": "accept",
+      "shows": "After a held event turn wrote S1-10's sign_up row and the walk did not move: still waiting at S1-10, the key now on file, so the next turn resumes",
+      "source": "K-09 v1.14 defaults 233 and 235 and commit-event-id-checked-held.json; K-05 v1.25 item 97 and open gap 109"
+    },
+    {
+      "file": "waiting-step-demo-owner-s1-32.json",
+      "version": "v1.25",
+      "def": "readWaitingStep.exchange",
+      "expect": "accept",
+      "shows": "The walk waits at S1-32 on control_proven, the control the team's decision wrote now on file",
+      "source": "K-09 v1.14 defaults 223, 227 and 235; K-23 v1 business_setup.control_proven_at and control_proven_via; K-05 v1.25 item 97 and open gap 109"
+    },
+    {
+      "file": "waiting-step-demo-owner-none.json",
+      "version": "v1.25",
+      "def": "readWaitingStep.exchange",
+      "expect": "accept",
+      "shows": "A walk that walked on from its event step waits at none: none, so nothing resumes",
+      "source": "K-09 v1.14 default 235 ('or none when the walk is waiting at no event step'); K-05 v1.25 item 97 and open gap 109"
+    },
+    {
+      "file": "invalid/refuse-waiting-step-key-of-other-step.json",
+      "version": "v1.25",
+      "def": "readWaitingStep.exchange",
+      "expect": "refuse",
+      "shows": "waiting-step-demo-owner-s1-10-held answered with control_proven at S1-10: each event step waits for its own key (its one fault outcome.key; put right, it is waiting-step-demo-owner-s1-10-held)",
+      "source": "K-09 v1.14 default 223 (the event table); K-05 v1.25 item 97 (readWaitingStep.waiting)"
+    },
+    {
+      "file": "business-status-demo-owner-offline.json",
+      "version": "v1.25",
+      "def": "readBusinessStatus.exchange",
+      "expect": "accept",
+      "shows": "A business's K-04 status on the runtime side: offline, not live, so S1-32 may still wait",
+      "source": "ops/cards/T-1554.md Lead note 1 (read (5)); K-09 v1.14 default 224 control_proven (3) and open gap 215 (4); K-04 v1 businesses.status; K-05 v1.25 item 98"
+    },
+    {
+      "file": "business-status-demo-owner-live.json",
+      "version": "v1.25",
+      "def": "readBusinessStatus.exchange",
+      "expect": "accept",
+      "shows": "A business made live: live, so a control event for it is not waiting",
+      "source": "K-09 v1.14 default 224 control_proven (3) and commit-event-control-proven.json; K-04 v1 businesses_status_known; K-05 v1.25 item 98"
+    },
+    {
+      "file": "business-status-unknown.json",
+      "version": "v1.25",
+      "def": "readBusinessStatus.exchange",
+      "expect": "accept",
+      "shows": "No business has the id: none, never a guessed status",
+      "source": "K-05 v1.25 item 98"
+    },
+    {
+      "file": "invalid/refuse-business-status-unknown-word.json",
+      "version": "v1.25",
+      "def": "readBusinessStatus.exchange",
+      "expect": "refuse",
+      "shows": "business-status-demo-owner-offline answered with a status K-04 does not know (its one fault outcome.status; put right, it is business-status-demo-owner-offline)",
+      "source": "K-04 v1 businesses_status_known (offline, saved, live); K-05 v1.25 item 98 (readBusinessStatus.found)"
     }
   ]
 }

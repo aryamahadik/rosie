@@ -1,0 +1,16 @@
+{
+  "call": "readBusinessStatus",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-20T15:12:03Z",
+    "note": "No K-04 businesses row has the id: none, never a guessed status."
+  },
+  "request": {
+    "businessId": "biz-demo-owner-9"
+  },
+  "outcome": {
+    "result": "none",
+    "businessId": "biz-demo-owner-9"
+  }
+}

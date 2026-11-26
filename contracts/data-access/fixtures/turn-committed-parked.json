@@ -1,0 +1,17 @@
+{
+  "call": "turnCommitted",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["park-turn.json"],
+    "now": "2026-11-07T15:20:10Z",
+    "note": "After park-turn parked Maya's turn turn-maya-0004 at 15:20:00, its K-04 turns row is parked: it never commits, and commitTurn answers its id turnParked (item 1), so the read says so rather than none."
+  },
+  "request": {
+    "turnId": "turn-maya-0004"
+  },
+  "outcome": {
+    "result": "parked",
+    "turnId": "turn-maya-0004",
+    "parkedAt": "2026-11-07T15:20:00Z"
+  }
+}

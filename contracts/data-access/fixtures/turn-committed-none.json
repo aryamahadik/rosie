@@ -1,0 +1,16 @@
+{
+  "call": "turnCommitted",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json"],
+    "after": [],
+    "now": "2026-10-19T14:31:05Z",
+    "note": "The demo owner's upload event turn (K-09 v1.14 commit-event-id-checked.json) before its first commit: no K-04 turns row has its id, turn-event-demo-up, so the read answers none and the gate goes on to read waiting from the key's own source (K-09 v1.14 defaults 222 and 224)."
+  },
+  "request": {
+    "turnId": "turn-event-demo-up"
+  },
+  "outcome": {
+    "result": "none",
+    "turnId": "turn-event-demo-up"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "call": "reviewItemById",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-20T15:12:03Z",
+    "note": "The demo owner's world (as K-09 v1.14's commit-event-control-proven.json): the upload's event turn wrote S1-75's K-37 control item review-s1-75-demo-up-1 (business biz-demo-owner, subject business_setup biz-demo-owner, raised by person-demo-owner), and the user, as Rosie's team on staging, decided it done proving control through K-09 decideReviewItem at 2026-10-20T15:12:00Z, which wrote in one commit the item's state done, decided_at, decided_by_person_id and outcome, and biz-demo-owner's K-23 business_setup control_proven_at 2026-10-20T15:12:00Z with control_proven_via team_check (actions/src/domain/paging/review.ts lines 197 and 273). The rows are written by the test as noted. The control event's gate reads the item by its id, the event's ref: done, its control proven, raised by the event's person. The summary is never read."
+  },
+  "request": {
+    "reviewItemId": "review-s1-75-demo-up-1"
+  },
+  "outcome": {
+    "result": "reviewItem",
+    "item": {
+      "id": "review-s1-75-demo-up-1",
+      "businessId": "biz-demo-owner",
+      "kind": "control",
+      "state": "done",
+      "raisedByPersonId": "person-demo-owner",
+      "decidedAt": "2026-10-20T15:12:00Z",
+      "decision": {
+        "outcome": "Control proven by Rosie's team.",
+        "controlProven": true
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "call": "readWaitingStep",
+  "given": {
+    "k04Seeds": [],
+    "after": [],
+    "now": "2026-10-19T14:32:00Z",
+    "note": "The world of K-09 v1.14's commit-event-id-checked.json after its commit: the upload's event turn walked on from S1-10 to S1-23 and ended the walk's record of the stop at S1-10 in that commit (README open gap 109's record, written by the test once its home is ruled), so the walk waits at no event step and the read answers none: the owner's next turn resumes nothing."
+  },
+  "request": {
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner"
+  },
+  "outcome": {
+    "result": "none",
+    "personId": "person-demo-owner",
+    "businessId": "biz-demo-owner"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "call": "turnCommitted",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["commit-first.json"],
+    "now": "2026-11-07T15:06:40Z",
+    "note": "After commit-first committed Alex's turn turn-alex-book-1 at 15:06:30, the read finds its K-04 turns row committed and answers its id and commit time, the first commit's turn id and time that commitTurn answers a repeat with (commit-repeat-same-turn). Its outbox rows are not read: a gate that finds the turn committed sends the request to commitTurn, which answers the repeat in full (K-09 v1.14 default 222)."
+  },
+  "request": {
+    "turnId": "turn-alex-book-1"
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-alex-book-1",
+    "committedAt": "2026-11-07T15:06:30Z"
+  }
+}

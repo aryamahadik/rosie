@@ -1,0 +1,2628 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/data-access/data-access.v1.25.schema.json",
+  "title": "DataAccessV1dot25",
+  "description": "K-05 v1.25, a minor version of the data-access calls (T-1554; DL-1210, widened by DL-1223 and DL-1228): the reads K-09 v1.14's event turn needs to answer a repeat and to read waiting from the key's own source, and the resume start's read (K-09 v1.14 defaults 222, 224 and 235; its open gaps 212 and 215 (1) to (5)). It only adds to v1.24 (data-access.v1.24.schema.json, frozen and unchanged, referred to here, which refers on to every earlier version down to v1): every v1.24 definition is here under its own name, by reference, and none is restated, so every v1 to v1.24 exchange is a v1.25 exchange. Added, each on the runtime side as rosie_job, its own read-only transaction on its own connection on the primary, beside a Tool API call's transaction and never on it, 1 connection, as v1.24 words its reads, so a gate call holds 2 connections at most (README items 93 to 98, default 237; card B11): liveStepLinkOf (the live page link of a person and business at a step, checked at a time the caller names, never its code's hash or a URL: item 93), readUploadFinishedAt (the pending upload's finished time by its upload id, which v1.24's readPendingUpload does not give: item 94), reviewItemById (a K-37 review item by id with its decision, controlProven for a control or listing_match item, never the summary: item 95), turnCommitted (whether a turn with this id has committed, and when, or was parked: item 96), readWaitingStep (the person and business's waiting step with its key and whether that key is on file, from the walk's own record: item 97, whose home no frozen table holds, README open gap 109) and readBusinessStatus (K-04 businesses.status: item 98). No column, grant, index or migration is added. Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/commitTurn.exchange"
+    },
+    {
+      "$ref": "#/$defs/writePlan.exchange"
+    },
+    {
+      "$ref": "#/$defs/unplannedRows.exchange"
+    },
+    {
+      "$ref": "#/$defs/claimOutbox.exchange"
+    },
+    {
+      "$ref": "#/$defs/markPart.exchange"
+    },
+    {
+      "$ref": "#/$defs/markRow.exchange"
+    },
+    {
+      "$ref": "#/$defs/armClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/cancelClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/dueClocks.exchange"
+    },
+    {
+      "$ref": "#/$defs/fireClock.exchange"
+    },
+    {
+      "$ref": "#/$defs/reserve.exchange"
+    },
+    {
+      "$ref": "#/$defs/release.exchange"
+    },
+    {
+      "$ref": "#/$defs/extend.exchange"
+    },
+    {
+      "$ref": "#/$defs/readActiveBundle.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBundleValue.exchange"
+    },
+    {
+      "$ref": "#/$defs/publishBundleCopy.exchange"
+    },
+    {
+      "$ref": "#/$defs/setActiveBundle.exchange"
+    },
+    {
+      "$ref": "#/$defs/parkTurn.exchange"
+    },
+    {
+      "$ref": "#/$defs/renewClaim.exchange"
+    },
+    {
+      "$ref": "#/$defs/dispatcherGivesUp.exchange"
+    },
+    {
+      "$ref": "#/$defs/claimEffects.exchange"
+    },
+    {
+      "$ref": "#/$defs/recordEffectResult.exchange"
+    },
+    {
+      "$ref": "#/$defs/serviceBack.exchange"
+    },
+    {
+      "$ref": "#/$defs/recordProviderEvent.exchange"
+    },
+    {
+      "$ref": "#/$defs/reconciliationRefund.exchange"
+    },
+    {
+      "$ref": "#/$defs/writeAllSet.exchange"
+    },
+    {
+      "$ref": "#/$defs/readTurnState.exchange"
+    },
+    {
+      "$ref": "#/$defs/handleTargets.exchange"
+    },
+    {
+      "$ref": "#/$defs/sendState.exchange"
+    },
+    {
+      "$ref": "#/$defs/handleSealingKey.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOpenHolds.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOutboxRow.exchange"
+    },
+    {
+      "$ref": "#/$defs/readFixedLineFacts.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyOutcomeOfEvent.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyOutcome.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyHold.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSafetyHoldOfOutcome.exchange"
+    },
+    {
+      "$ref": "#/$defs/readOutboxRowWritten.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessOwner.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessZone.exchange"
+    },
+    {
+      "$ref": "#/$defs/rowReader.exchange"
+    },
+    {
+      "$ref": "#/$defs/openChatOnText.exchange"
+    },
+    {
+      "$ref": "#/$defs/readQuestionFacts.exchange"
+    },
+    {
+      "$ref": "#/$defs/readHandle.exchange"
+    },
+    {
+      "$ref": "#/$defs/readChatHandle.exchange"
+    },
+    {
+      "$ref": "#/$defs/readTurnParty.exchange"
+    },
+    {
+      "$ref": "#/$defs/readTesterStanding.exchange"
+    },
+    {
+      "$ref": "#/$defs/readRosterPhone.exchange"
+    },
+    {
+      "$ref": "#/$defs/readPhoneState.exchange"
+    },
+    {
+      "$ref": "#/$defs/readLiveTimers.exchange"
+    },
+    {
+      "$ref": "#/$defs/readStoppedFlag.exchange"
+    },
+    {
+      "$ref": "#/$defs/startSignIn.exchange"
+    },
+    {
+      "$ref": "#/$defs/sendSignInCode.exchange"
+    },
+    {
+      "$ref": "#/$defs/proveSignIn.exchange"
+    },
+    {
+      "$ref": "#/$defs/endSession.exchange"
+    },
+    {
+      "$ref": "#/$defs/personStanding.exchange"
+    },
+    {
+      "$ref": "#/$defs/signInEntries.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessKinds.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessServices.exchange"
+    },
+    {
+      "$ref": "#/$defs/readServiceWays.exchange"
+    },
+    {
+      "$ref": "#/$defs/readServicePriceRules.exchange"
+    },
+    {
+      "$ref": "#/$defs/readTermsSources.exchange"
+    },
+    {
+      "$ref": "#/$defs/readKindCatalog.exchange"
+    },
+    {
+      "$ref": "#/$defs/readPickedKinds.exchange"
+    },
+    {
+      "$ref": "#/$defs/readSignUpKeys.exchange"
+    },
+    {
+      "$ref": "#/$defs/readPendingUpload.exchange"
+    },
+    {
+      "$ref": "#/$defs/openReviewItemsOf.exchange"
+    },
+    {
+      "$ref": "#/$defs/readStagingTestBusinesses.exchange"
+    },
+    {
+      "$ref": "#/$defs/liveTextSignInCode.exchange"
+    },
+    {
+      "$ref": "#/$defs/liveStepLinkOf.exchange"
+    },
+    {
+      "$ref": "#/$defs/readUploadFinishedAt.exchange"
+    },
+    {
+      "$ref": "#/$defs/reviewItemById.exchange"
+    },
+    {
+      "$ref": "#/$defs/turnCommitted.exchange"
+    },
+    {
+      "$ref": "#/$defs/readWaitingStep.exchange"
+    },
+    {
+      "$ref": "#/$defs/readBusinessStatus.exchange"
+    }
+  ],
+  "$defs": {
+    "id": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/id"
+    },
+    "nullableId": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/nullableId"
+    },
+    "utc": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/utc"
+    },
+    "nullableUtc": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/nullableUtc"
+    },
+    "zone": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/zone"
+    },
+    "bundleId": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/bundleId"
+    },
+    "phoneNumber": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/phoneNumber"
+    },
+    "tableName": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/tableName"
+    },
+    "version": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/version"
+    },
+    "sqlstate": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sqlstate"
+    },
+    "rowRef": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/rowRef"
+    },
+    "changedRow": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/changedRow"
+    },
+    "during": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/during"
+    },
+    "given": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/given"
+    },
+    "transientError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/transientError"
+    },
+    "notFoundError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/notFoundError"
+    },
+    "versionChangedError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/versionChangedError"
+    },
+    "constraintError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/constraintError"
+    },
+    "turn": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/turn"
+    },
+    "stateWrite": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/stateWrite"
+    },
+    "stateTable": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/stateTable"
+    },
+    "openQuestionNew": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openQuestionNew"
+    },
+    "openQuestionClose": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openQuestionClose"
+    },
+    "openQuestionAskAgain": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openQuestionAskAgain"
+    },
+    "clockKind": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/clockKind"
+    },
+    "clockNew": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/clockNew"
+    },
+    "clockCancel": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/clockCancel"
+    },
+    "channel": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/channel"
+    },
+    "sendClass": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sendClass"
+    },
+    "outboxRowNew": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/outboxRowNew"
+    },
+    "reservationConfirm": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/reservationConfirm"
+    },
+    "reservationLetGo": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/reservationLetGo"
+    },
+    "sealedValues": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sealedValues"
+    },
+    "eventEntry": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/eventEntry"
+    },
+    "writes": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/writes"
+    },
+    "outboxRowWritten": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/outboxRowWritten"
+    },
+    "promotion": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/promotion"
+    },
+    "skippedInLine": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/skippedInLine"
+    },
+    "commitResult": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/commitResult"
+    },
+    "reservationLostError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/reservationLostError"
+    },
+    "phoneRowByHandleId": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/phoneRowByHandleId"
+    },
+    "commitTurn.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/commitTurn.request"
+    },
+    "commitTurn.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/commitTurn.response"
+    },
+    "openQuestionWrongStateError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openQuestionWrongStateError"
+    },
+    "commitTurn.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/commitTurn.errors"
+    },
+    "commitTurn.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/commitTurn.exchange"
+    },
+    "commitTurn.handleIdExchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/commitTurn.handleIdExchange"
+    },
+    "commitTurn.askAgainExchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/commitTurn.askAgainExchange"
+    },
+    "commitTurn.rowLineExchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/commitTurn.rowLineExchange"
+    },
+    "writePlan.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/writePlan.request"
+    },
+    "writePlan.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/writePlan.response"
+    },
+    "writePlan.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/writePlan.errors"
+    },
+    "writePlan.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/writePlan.exchange"
+    },
+    "unplannedRows.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/unplannedRows.request"
+    },
+    "unplannedRows.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/unplannedRows.response"
+    },
+    "unplannedRows.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/unplannedRows.errors"
+    },
+    "unplannedRows.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/unplannedRows.exchange"
+    },
+    "claimOutbox.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/claimOutbox.request"
+    },
+    "claimedPart": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/claimedPart"
+    },
+    "claimedRow": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/claimedRow"
+    },
+    "claimOutbox.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/claimOutbox.response"
+    },
+    "claimOutbox.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/claimOutbox.errors"
+    },
+    "claimOutbox.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/claimOutbox.exchange"
+    },
+    "markPart.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/markPart.request"
+    },
+    "repeatedDelivery": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/repeatedDelivery"
+    },
+    "markPart.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/markPart.response"
+    },
+    "markPart.v1dot9Response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/markPart.v1dot9Response"
+    },
+    "markPart.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/markPart.errors"
+    },
+    "markPart.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/markPart.exchange"
+    },
+    "markRow.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/markRow.request"
+    },
+    "markRow.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/markRow.response"
+    },
+    "markRow.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/markRow.errors"
+    },
+    "markRow.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/markRow.exchange"
+    },
+    "armClock.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/armClock.request"
+    },
+    "armedClock": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/armedClock"
+    },
+    "armClock.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/armClock.response"
+    },
+    "armClock.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/armClock.errors"
+    },
+    "armClock.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/armClock.exchange"
+    },
+    "cancelClock.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/cancelClock.request"
+    },
+    "cancelClock.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/cancelClock.response"
+    },
+    "cancelClock.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/cancelClock.errors"
+    },
+    "cancelClock.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/cancelClock.exchange"
+    },
+    "dueClocks.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/dueClocks.request"
+    },
+    "dueClock": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/dueClock"
+    },
+    "dueClocks.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/dueClocks.response"
+    },
+    "dueClocks.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/dueClocks.errors"
+    },
+    "dueClocks.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/dueClocks.exchange"
+    },
+    "fireClock.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/fireClock.request"
+    },
+    "fireClock.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/fireClock.response"
+    },
+    "fireClock.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/fireClock.errors"
+    },
+    "fireClock.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/fireClock.exchange"
+    },
+    "door": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/door"
+    },
+    "savedFor": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/savedFor"
+    },
+    "reserve.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/reserve.request"
+    },
+    "reserve.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/reserve.response"
+    },
+    "reserve.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/reserve.errors"
+    },
+    "reserve.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/reserve.exchange"
+    },
+    "release.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/release.request"
+    },
+    "release.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/release.response"
+    },
+    "release.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/release.errors"
+    },
+    "release.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/release.exchange"
+    },
+    "extend.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/extend.request"
+    },
+    "extend.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/extend.response"
+    },
+    "extend.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/extend.errors"
+    },
+    "extend.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/extend.exchange"
+    },
+    "readActiveBundle.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readActiveBundle.request"
+    },
+    "readActiveBundle.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readActiveBundle.response"
+    },
+    "readActiveBundle.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readActiveBundle.errors"
+    },
+    "readActiveBundle.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readActiveBundle.exchange"
+    },
+    "storedText": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/storedText"
+    },
+    "readBundleValue.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBundleValue.request"
+    },
+    "readBundleValue.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBundleValue.response"
+    },
+    "readBundleValue.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBundleValue.errors"
+    },
+    "readBundleValue.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBundleValue.exchange"
+    },
+    "publishBundleCopy.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/publishBundleCopy.request"
+    },
+    "publishBundleCopy.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/publishBundleCopy.response"
+    },
+    "publishBundleCopy.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/publishBundleCopy.errors"
+    },
+    "publishBundleCopy.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/publishBundleCopy.exchange"
+    },
+    "setActiveBundle.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/setActiveBundle.request"
+    },
+    "setActiveBundle.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/setActiveBundle.response"
+    },
+    "setActiveBundle.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/setActiveBundle.errors"
+    },
+    "setActiveBundle.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/setActiveBundle.exchange"
+    },
+    "parkReason": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/parkReason"
+    },
+    "parkedLinePlan": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/parkedLinePlan"
+    },
+    "parkedLineParts": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/parkedLineParts"
+    },
+    "parkedRowNew": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/parkedRowNew"
+    },
+    "parkTurn.lineRequest": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/parkTurn.lineRequest"
+    },
+    "parkTurn.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/parkTurn.request"
+    },
+    "parkTurn.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/parkTurn.response"
+    },
+    "parkTurn.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/parkTurn.errors"
+    },
+    "parkTurn.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/parkTurn.exchange"
+    },
+    "parkTurn.lineExchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/parkTurn.lineExchange"
+    },
+    "wrongStateError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/wrongStateError"
+    },
+    "claimLostError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/claimLostError"
+    },
+    "effectNew": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/effectNew"
+    },
+    "effectLetGo": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/effectLetGo"
+    },
+    "effectWrites": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/effectWrites"
+    },
+    "waitingChatWrites": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/waitingChatWrites"
+    },
+    "followUpRow": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/followUpRow"
+    },
+    "renewClaim.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/renewClaim.request"
+    },
+    "renewClaim.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/renewClaim.response"
+    },
+    "renewClaim.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/renewClaim.errors"
+    },
+    "renewClaim.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/renewClaim.exchange"
+    },
+    "dispatcherGivesUp.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/dispatcherGivesUp.request"
+    },
+    "dispatcherGivesUp.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/dispatcherGivesUp.response"
+    },
+    "dispatcherGivesUp.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/dispatcherGivesUp.errors"
+    },
+    "dispatcherGivesUp.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/dispatcherGivesUp.exchange"
+    },
+    "claimEvent": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/claimEvent"
+    },
+    "claimedEffect": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/claimedEffect"
+    },
+    "claimEffects.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/claimEffects.request"
+    },
+    "claimEffects.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/claimEffects.response"
+    },
+    "claimEffects.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/claimEffects.errors"
+    },
+    "claimEffects.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/claimEffects.exchange"
+    },
+    "serviceBack.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/serviceBack.request"
+    },
+    "serviceBack.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/serviceBack.response"
+    },
+    "serviceBack.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/serviceBack.errors"
+    },
+    "serviceBack.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/serviceBack.exchange"
+    },
+    "recordEffectResult.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/recordEffectResult.request"
+    },
+    "recordEffectResult.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/recordEffectResult.response"
+    },
+    "recordEffectResult.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/recordEffectResult.errors"
+    },
+    "recordEffectResult.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/recordEffectResult.exchange"
+    },
+    "recordProviderEvent.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/recordProviderEvent.request"
+    },
+    "recordProviderEvent.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/recordProviderEvent.response"
+    },
+    "recordProviderEvent.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/recordProviderEvent.errors"
+    },
+    "recordProviderEvent.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/recordProviderEvent.exchange"
+    },
+    "reconciliationRefund.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/reconciliationRefund.request"
+    },
+    "reconciliationRefund.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/reconciliationRefund.response"
+    },
+    "reconciliationRefund.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/reconciliationRefund.errors"
+    },
+    "reconciliationRefund.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/reconciliationRefund.exchange"
+    },
+    "writeAllSet.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/writeAllSet.request"
+    },
+    "writeAllSet.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/writeAllSet.response"
+    },
+    "writeAllSet.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/writeAllSet.errors"
+    },
+    "writeAllSet.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/writeAllSet.exchange"
+    },
+    "columnName": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/columnName"
+    },
+    "factTable": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/factTable"
+    },
+    "secretColumn": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/secretColumn"
+    },
+    "role": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/role"
+    },
+    "phoneFlags": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/phoneFlags"
+    },
+    "phoneRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/phoneRead"
+    },
+    "openQuestionRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openQuestionRead"
+    },
+    "bookingHead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/bookingHead"
+    },
+    "factRef": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/factRef"
+    },
+    "factValue": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/factValue"
+    },
+    "pauseRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/pauseRead"
+    },
+    "consentRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/consentRead"
+    },
+    "unknownFactError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/unknownFactError"
+    },
+    "readTurnState.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTurnState.request"
+    },
+    "readTurnState.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTurnState.response"
+    },
+    "readTurnState.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTurnState.errors"
+    },
+    "readTurnState.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTurnState.exchange"
+    },
+    "handleTargets.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/handleTargets.request"
+    },
+    "handleTargets.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/handleTargets.response"
+    },
+    "handleTargets.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/handleTargets.errors"
+    },
+    "handleTargets.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/handleTargets.exchange"
+    },
+    "textsConsentRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/textsConsentRead"
+    },
+    "textsConsentV1dot8": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/textsConsentV1dot8"
+    },
+    "sendState.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sendState.request"
+    },
+    "sendState.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sendState.response"
+    },
+    "sendState.v1dot8Response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sendState.v1dot8Response"
+    },
+    "sendState.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sendState.errors"
+    },
+    "sendState.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sendState.exchange"
+    },
+    "handleSealingKey.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/handleSealingKey.request"
+    },
+    "handleSealingKey.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/handleSealingKey.response"
+    },
+    "handleSealingKey.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/handleSealingKey.errors"
+    },
+    "handleSealingKey.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/handleSealingKey.exchange"
+    },
+    "releaseRule": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/releaseRule"
+    },
+    "openHold": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openHold"
+    },
+    "readOpenHolds.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readOpenHolds.request"
+    },
+    "readOpenHolds.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readOpenHolds.response"
+    },
+    "readOpenHolds.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readOpenHolds.errors"
+    },
+    "readOpenHolds.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readOpenHolds.exchange"
+    },
+    "rowLine": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/rowLine"
+    },
+    "answeredText": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/answeredText"
+    },
+    "rowRecipient": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/rowRecipient"
+    },
+    "businessHeadRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/businessHeadRead"
+    },
+    "rowQuestion": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/rowQuestion"
+    },
+    "questionAsSent": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/questionAsSent"
+    },
+    "fixedLineRowError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/fixedLineRowError"
+    },
+    "businessSensitive": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/businessSensitive"
+    },
+    "readOutboxRow.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readOutboxRow.request"
+    },
+    "readOutboxRow.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readOutboxRow.response"
+    },
+    "readOutboxRow.v1dot6Response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readOutboxRow.v1dot6Response"
+    },
+    "readOutboxRow.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readOutboxRow.errors"
+    },
+    "readOutboxRow.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readOutboxRow.exchange"
+    },
+    "readFixedLineFacts.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readFixedLineFacts.request"
+    },
+    "readFixedLineFacts.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readFixedLineFacts.response"
+    },
+    "readFixedLineFacts.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readFixedLineFacts.errors"
+    },
+    "readFixedLineFacts.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readFixedLineFacts.exchange"
+    },
+    "nullableTurnId": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/nullableTurnId"
+    },
+    "storedOutcome": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/storedOutcome"
+    },
+    "storedHold": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/storedHold"
+    },
+    "ownerContact": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/ownerContact"
+    },
+    "moreThanOneOwnerError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/moreThanOneOwnerError"
+    },
+    "readSafetyOutcomeOfEvent.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyOutcomeOfEvent.request"
+    },
+    "readSafetyOutcomeOfEvent.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyOutcomeOfEvent.response"
+    },
+    "readSafetyOutcomeOfEvent.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyOutcomeOfEvent.errors"
+    },
+    "readSafetyOutcomeOfEvent.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyOutcomeOfEvent.exchange"
+    },
+    "readSafetyOutcome.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyOutcome.request"
+    },
+    "readSafetyOutcome.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyOutcome.response"
+    },
+    "readSafetyOutcome.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyOutcome.errors"
+    },
+    "readSafetyOutcome.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyOutcome.exchange"
+    },
+    "readSafetyHold.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyHold.request"
+    },
+    "readSafetyHold.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyHold.response"
+    },
+    "readSafetyHold.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyHold.errors"
+    },
+    "readSafetyHold.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyHold.exchange"
+    },
+    "readSafetyHoldOfOutcome.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyHoldOfOutcome.request"
+    },
+    "readSafetyHoldOfOutcome.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyHoldOfOutcome.response"
+    },
+    "readSafetyHoldOfOutcome.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyHoldOfOutcome.errors"
+    },
+    "readSafetyHoldOfOutcome.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSafetyHoldOfOutcome.exchange"
+    },
+    "readOutboxRowWritten.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readOutboxRowWritten.request"
+    },
+    "readOutboxRowWritten.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readOutboxRowWritten.response"
+    },
+    "readOutboxRowWritten.v1dot16Response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readOutboxRowWritten.v1dot16Response"
+    },
+    "readOutboxRowWritten.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readOutboxRowWritten.errors"
+    },
+    "readOutboxRowWritten.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readOutboxRowWritten.exchange"
+    },
+    "readBusinessOwner.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessOwner.request"
+    },
+    "readBusinessOwner.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessOwner.response"
+    },
+    "readBusinessOwner.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessOwner.errors"
+    },
+    "readBusinessOwner.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessOwner.exchange"
+    },
+    "readBusinessZone.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessZone.request"
+    },
+    "readBusinessZone.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessZone.response"
+    },
+    "readBusinessZone.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessZone.errors"
+    },
+    "readBusinessZone.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessZone.exchange"
+    },
+    "businessOwnerState": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/businessOwnerState"
+    },
+    "rowReader.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/rowReader.request"
+    },
+    "rowReader.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/rowReader.response"
+    },
+    "noReaderError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/noReaderError"
+    },
+    "rowReader.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/rowReader.errors"
+    },
+    "rowReader.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/rowReader.exchange"
+    },
+    "rowReader.ownerExchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/rowReader.ownerExchange"
+    },
+    "textService": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/textService"
+    },
+    "chatPhoneOpen": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/chatPhoneOpen"
+    },
+    "chatPhoneStopped": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/chatPhoneStopped"
+    },
+    "chatOpenValues": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/chatOpenValues"
+    },
+    "chatClosedValues": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/chatClosedValues"
+    },
+    "chatOpenedEvent": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/chatOpenedEvent"
+    },
+    "notAPhoneError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/notAPhoneError"
+    },
+    "openChatOnText.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openChatOnText.request"
+    },
+    "openChatOnText.inserted": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openChatOnText.inserted"
+    },
+    "openChatOnText.opened": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openChatOnText.opened"
+    },
+    "openChatOnText.alreadyOpen": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openChatOnText.alreadyOpen"
+    },
+    "openChatOnText.stopped": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openChatOnText.stopped"
+    },
+    "openChatOnText.repeated": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openChatOnText.repeated"
+    },
+    "openChatOnText.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openChatOnText.response"
+    },
+    "openChatOnText.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openChatOnText.errors"
+    },
+    "openChatOnText.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openChatOnText.exchange"
+    },
+    "questionVisit": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/questionVisit"
+    },
+    "neverDeliveredRow": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/neverDeliveredRow"
+    },
+    "readQuestionFacts.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readQuestionFacts.request"
+    },
+    "readQuestionFacts.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readQuestionFacts.response"
+    },
+    "readQuestionFacts.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readQuestionFacts.errors"
+    },
+    "readQuestionFacts.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readQuestionFacts.exchange"
+    },
+    "readHandle.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readHandle.request"
+    },
+    "readHandle.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readHandle.response"
+    },
+    "readHandle.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readHandle.errors"
+    },
+    "readHandle.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readHandle.exchange"
+    },
+    "chatPhoneHandle": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/chatPhoneHandle"
+    },
+    "readChatHandle.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readChatHandle.request"
+    },
+    "readChatHandle.found": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readChatHandle.found"
+    },
+    "readChatHandle.unknown": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readChatHandle.unknown"
+    },
+    "readChatHandle.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readChatHandle.response"
+    },
+    "readChatHandle.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readChatHandle.errors"
+    },
+    "readChatHandle.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readChatHandle.exchange"
+    },
+    "readTurnParty.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTurnParty.request"
+    },
+    "readTurnParty.atBusiness": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTurnParty.atBusiness"
+    },
+    "readTurnParty.noBusiness": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTurnParty.noBusiness"
+    },
+    "readTurnParty.unknown": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTurnParty.unknown"
+    },
+    "readTurnParty.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTurnParty.response"
+    },
+    "businessUndecidedError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/businessUndecidedError"
+    },
+    "readTurnParty.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTurnParty.errors"
+    },
+    "readTurnParty.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTurnParty.exchange"
+    },
+    "tokenSha256": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/tokenSha256"
+    },
+    "readTesterStanding.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTesterStanding.request"
+    },
+    "readTesterStanding.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTesterStanding.response"
+    },
+    "readTesterStanding.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTesterStanding.errors"
+    },
+    "readTesterStanding.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTesterStanding.exchange"
+    },
+    "emailOnFile": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/emailOnFile"
+    },
+    "rosterPhone": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/rosterPhone"
+    },
+    "readRosterPhone.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readRosterPhone.request"
+    },
+    "readRosterPhone.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readRosterPhone.response"
+    },
+    "readRosterPhone.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readRosterPhone.errors"
+    },
+    "readRosterPhone.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readRosterPhone.exchange"
+    },
+    "phoneStateOpen": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/phoneStateOpen"
+    },
+    "phoneStateStopped": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/phoneStateStopped"
+    },
+    "chatLinkRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/chatLinkRead"
+    },
+    "readPhoneState.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPhoneState.request"
+    },
+    "readPhoneState.noRow": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPhoneState.noRow"
+    },
+    "readPhoneState.row": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPhoneState.row"
+    },
+    "readPhoneState.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPhoneState.response"
+    },
+    "readPhoneState.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPhoneState.errors"
+    },
+    "readPhoneState.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPhoneState.exchange"
+    },
+    "sealedBytes": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sealedBytes"
+    },
+    "liveTimer": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/liveTimer"
+    },
+    "readLiveTimers.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readLiveTimers.request"
+    },
+    "readLiveTimers.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readLiveTimers.response"
+    },
+    "readLiveTimers.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readLiveTimers.errors"
+    },
+    "readLiveTimers.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readLiveTimers.exchange"
+    },
+    "readStoppedFlag.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readStoppedFlag.request"
+    },
+    "readStoppedFlag.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readStoppedFlag.response"
+    },
+    "phoneNotFoundError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/phoneNotFoundError"
+    },
+    "readStoppedFlag.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readStoppedFlag.errors"
+    },
+    "readStoppedFlag.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readStoppedFlag.exchange"
+    },
+    "noTurnError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/noTurnError"
+    },
+    "sha256Hex": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sha256Hex"
+    },
+    "hashKeyName": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/hashKeyName"
+    },
+    "signInContact": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/signInContact"
+    },
+    "startSignInText.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/startSignInText.request"
+    },
+    "startSignIn.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/startSignIn.request"
+    },
+    "startSignIn.started": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/startSignIn.started"
+    },
+    "startSignInText.started": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/startSignInText.started"
+    },
+    "startSignIn.paused": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/startSignIn.paused"
+    },
+    "startSignIn.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/startSignIn.response"
+    },
+    "startSignIn.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/startSignIn.errors"
+    },
+    "startSignIn.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/startSignIn.exchange"
+    },
+    "startSignInText.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/startSignInText.exchange"
+    },
+    "codeRowPlan": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/codeRowPlan"
+    },
+    "codeFinalParts": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/codeFinalParts"
+    },
+    "sendSignInCode.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sendSignInCode.request"
+    },
+    "sendSignInCode.sent": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sendSignInCode.sent"
+    },
+    "sendSignInCode.repeated": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sendSignInCode.repeated"
+    },
+    "sendSignInCode.notSent": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sendSignInCode.notSent"
+    },
+    "sendSignInCode.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sendSignInCode.response"
+    },
+    "sendSignInCode.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sendSignInCode.errors"
+    },
+    "sendSignInCode.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/sendSignInCode.exchange"
+    },
+    "proveSignIn.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/proveSignIn.request"
+    },
+    "proveSignIn.signedIn": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/proveSignIn.signedIn"
+    },
+    "proveSignIn.secondProofNeeded": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/proveSignIn.secondProofNeeded"
+    },
+    "proveSignIn.alreadySignedIn": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/proveSignIn.alreadySignedIn"
+    },
+    "proveSignIn.wrong": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/proveSignIn.wrong"
+    },
+    "proveSignIn.paused": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/proveSignIn.paused"
+    },
+    "proveSignIn.expired": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/proveSignIn.expired"
+    },
+    "proveSignIn.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/proveSignIn.response"
+    },
+    "attemptNotFoundError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/attemptNotFoundError"
+    },
+    "proveSignIn.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/proveSignIn.errors"
+    },
+    "proveSignIn.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/proveSignIn.exchange"
+    },
+    "endSession.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/endSession.request"
+    },
+    "endSession.ended": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/endSession.ended"
+    },
+    "endSession.repeated": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/endSession.repeated"
+    },
+    "endSession.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/endSession.response"
+    },
+    "endSession.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/endSession.errors"
+    },
+    "endSession.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/endSession.exchange"
+    },
+    "personStanding.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/personStanding.request"
+    },
+    "signedInRole": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/signedInRole"
+    },
+    "personStanding.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/personStanding.response"
+    },
+    "personStanding.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/personStanding.errors"
+    },
+    "personStanding.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/personStanding.exchange"
+    },
+    "signInEntryAsk": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/signInEntryAsk"
+    },
+    "signInEntries.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/signInEntries.request"
+    },
+    "signInEntries.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/signInEntries.response"
+    },
+    "signInEntries.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/signInEntries.errors"
+    },
+    "signInEntries.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/signInEntries.exchange"
+    },
+    "currency": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/currency"
+    },
+    "catalogFlow": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/catalogFlow"
+    },
+    "spanMinutes": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/spanMinutes"
+    },
+    "nullableSpanMinutes": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/nullableSpanMinutes"
+    },
+    "clockTime": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/clockTime"
+    },
+    "nullableClockTime": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/nullableClockTime"
+    },
+    "nullableCents": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/nullableCents"
+    },
+    "kindId": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/kindId"
+    },
+    "pluginName": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/pluginName"
+    },
+    "moneyPath": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/moneyPath"
+    },
+    "companyKindRowId": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/companyKindRowId"
+    },
+    "kindFlowRowId": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/kindFlowRowId"
+    },
+    "flowDefaultRowId": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/flowDefaultRowId"
+    },
+    "businessSetupRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/businessSetupRead"
+    },
+    "kindFlowRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/kindFlowRead"
+    },
+    "businessKindRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/businessKindRead"
+    },
+    "serviceRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/serviceRead"
+    },
+    "wayRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/wayRead"
+    },
+    "priceConditionsRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/priceConditionsRead"
+    },
+    "priceRuleRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/priceRuleRead"
+    },
+    "priceTieRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/priceTieRead"
+    },
+    "flowDefaultRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/flowDefaultRead"
+    },
+    "dayRange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/dayRange"
+    },
+    "ownerRuleRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/ownerRuleRead"
+    },
+    "priceOkLimitRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/priceOkLimitRead"
+    },
+    "catalogBusinessNotFoundError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/catalogBusinessNotFoundError"
+    },
+    "readBusinessKinds.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessKinds.request"
+    },
+    "readBusinessKinds.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessKinds.response"
+    },
+    "readBusinessKinds.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessKinds.errors"
+    },
+    "readBusinessKinds.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessKinds.exchange"
+    },
+    "readBusinessServices.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessServices.request"
+    },
+    "readBusinessServices.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessServices.response"
+    },
+    "readBusinessServices.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessServices.errors"
+    },
+    "readBusinessServices.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readBusinessServices.exchange"
+    },
+    "readServiceWays.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readServiceWays.request"
+    },
+    "readServiceWays.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readServiceWays.response"
+    },
+    "readServiceWays.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readServiceWays.errors"
+    },
+    "readServiceWays.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readServiceWays.exchange"
+    },
+    "readServicePriceRules.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readServicePriceRules.request"
+    },
+    "readServicePriceRules.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readServicePriceRules.response"
+    },
+    "readServicePriceRules.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readServicePriceRules.errors"
+    },
+    "readServicePriceRules.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readServicePriceRules.exchange"
+    },
+    "readTermsSources.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTermsSources.request"
+    },
+    "readTermsSources.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTermsSources.response"
+    },
+    "readTermsSources.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTermsSources.errors"
+    },
+    "readTermsSources.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readTermsSources.exchange"
+    },
+    "kindPattern": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/kindPattern"
+    },
+    "kindCatalogRow": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/kindCatalogRow"
+    },
+    "readKindCatalog.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readKindCatalog.request"
+    },
+    "readKindCatalog.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readKindCatalog.response"
+    },
+    "readKindCatalog.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readKindCatalog.errors"
+    },
+    "readKindCatalog.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readKindCatalog.exchange"
+    },
+    "pickOutcome": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/pickOutcome"
+    },
+    "pfKey": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/pfKey"
+    },
+    "pickTextRowId": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/pickTextRowId"
+    },
+    "draftBlockRowId": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/draftBlockRowId"
+    },
+    "pickTextRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/pickTextRead"
+    },
+    "draftBlockRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/draftBlockRead"
+    },
+    "newWorkDraftRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/newWorkDraftRead"
+    },
+    "pickedKindRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/pickedKindRead"
+    },
+    "companyRead": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/companyRead"
+    },
+    "pickedKindsNotFoundError": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/pickedKindsNotFoundError"
+    },
+    "readPickedKinds.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPickedKinds.request"
+    },
+    "readPickedKinds.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPickedKinds.response"
+    },
+    "readPickedKinds.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPickedKinds.errors"
+    },
+    "readPickedKinds.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPickedKinds.exchange"
+    },
+    "signUpIdUpload": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/signUpIdUpload"
+    },
+    "signUpMobile": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/signUpMobile"
+    },
+    "readSignUpKeys.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSignUpKeys.request"
+    },
+    "readSignUpKeys.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSignUpKeys.response"
+    },
+    "readSignUpKeys.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSignUpKeys.errors"
+    },
+    "readSignUpKeys.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readSignUpKeys.exchange"
+    },
+    "pendingUpload": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/pendingUpload"
+    },
+    "readPendingUpload.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPendingUpload.request"
+    },
+    "readPendingUpload.found": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPendingUpload.found"
+    },
+    "readPendingUpload.none": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPendingUpload.none"
+    },
+    "readPendingUpload.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPendingUpload.response"
+    },
+    "readPendingUpload.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPendingUpload.errors"
+    },
+    "readPendingUpload.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readPendingUpload.exchange"
+    },
+    "reviewItemKind": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/reviewItemKind"
+    },
+    "openReviewItem": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openReviewItem"
+    },
+    "openReviewItemsOf.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openReviewItemsOf.request"
+    },
+    "openReviewItemsOf.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openReviewItemsOf.response"
+    },
+    "openReviewItemsOf.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openReviewItemsOf.errors"
+    },
+    "openReviewItemsOf.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/openReviewItemsOf.exchange"
+    },
+    "readStagingTestBusinesses.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readStagingTestBusinesses.request"
+    },
+    "readStagingTestBusinesses.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readStagingTestBusinesses.response"
+    },
+    "readStagingTestBusinesses.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readStagingTestBusinesses.errors"
+    },
+    "readStagingTestBusinesses.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/readStagingTestBusinesses.exchange"
+    },
+    "liveTextSignInCode.request": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/liveTextSignInCode.request"
+    },
+    "liveTextSignInCode.live": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/liveTextSignInCode.live"
+    },
+    "liveTextSignInCode.none": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/liveTextSignInCode.none"
+    },
+    "liveTextSignInCode.response": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/liveTextSignInCode.response"
+    },
+    "liveTextSignInCode.errors": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/liveTextSignInCode.errors"
+    },
+    "liveTextSignInCode.exchange": {
+      "$ref": "data-access.v1.24.schema.json#/$defs/liveTextSignInCode.exchange"
+    },
+    "stepId": {
+      "title": "StepId",
+      "description": "A step id of the master as K-04 open_questions_step_form takes it (S1-10, S1-32, S2-06). New in v1.25.",
+      "type": "string",
+      "pattern": "^[SAB](1[0-3]|[1-9])-x?[0-9]{2,3}$"
+    },
+    "pageLinkPurpose": {
+      "title": "PageLinkPurpose",
+      "description": "K-22 v1.1 page_links.purpose (page_links_purpose_known). New in v1.25.",
+      "enum": ["setup_id_check", "owner_confirm", "registration", "staff_page"]
+    },
+    "liveStepLink": {
+      "title": "LiveStepLink",
+      "description": "A K-22 v1.1 page_links row as liveStepLinkOf gives it (README item 93): its id, purpose, step_id and expires_at alone. Never code_sha256 (refuse-live-step-link-code-hash), a URL, the code, sent_to_handle_id, issued_at or the end's columns: the link's secret stays with the page call that made it. New in v1.25.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "K-22 page_links.id.",
+          "$ref": "#/$defs/id"
+        },
+        "purpose": {
+          "$ref": "#/$defs/pageLinkPurpose"
+        },
+        "step": {
+          "description": "K-22 page_links.step_id.",
+          "$ref": "#/$defs/stepId"
+        },
+        "expiresAt": {
+          "description": "K-22 page_links.expires_at.",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["id", "purpose", "step", "expiresAt"],
+      "additionalProperties": false
+    },
+    "liveStepLinkOf.request": {
+      "title": "LiveStepLinkOfRequest",
+      "description": "The live page link of one person and one business at one step with its purpose, live at the time the caller names (README item 93; K-09 v1.14 default 224 id_checked (1) and open gap 215 (1)). For id_checked the caller names the upload's own finished time (item 94), never the turn's, so an upload finished before its link lapsed is still waiting when its turn runs after the lapse. The purpose and step pair as K-22 page_links_purpose_step pairs them. Role and scope: rosie_job on the runtime side, with no business scope, every statement naming the request's business, its own read-only transaction on its own connection on the primary, beside a Tool API call's transaction and never on it, 1 connection. Repeat: safe, a read. Time budget: inside the event turn's gate (arch 04 line 223). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "personId": {
+          "description": "K-22 page_links.person_id: the event's person.",
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "K-22 page_links.business_id: the event's business.",
+          "$ref": "#/$defs/id"
+        },
+        "purpose": {
+          "$ref": "#/$defs/pageLinkPurpose"
+        },
+        "step": {
+          "description": "K-22 page_links.step_id.",
+          "$ref": "#/$defs/stepId"
+        },
+        "at": {
+          "description": "The time the link must be live at: ended_at null or after it, and expires_at after it (README item 93).",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["personId", "businessId", "purpose", "step", "at"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "purpose": {
+                "const": "setup_id_check"
+              }
+            },
+            "required": ["purpose"]
+          },
+          "then": {
+            "properties": {
+              "step": {
+                "const": "S1-10"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "purpose": {
+                "const": "owner_confirm"
+              }
+            },
+            "required": ["purpose"]
+          },
+          "then": {
+            "properties": {
+              "step": {
+                "const": "S1-77"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "purpose": {
+                "const": "staff_page"
+              }
+            },
+            "required": ["purpose"]
+          },
+          "then": {
+            "properties": {
+              "step": {
+                "const": "S2-06"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "purpose": {
+                "const": "registration"
+              }
+            },
+            "required": ["purpose"]
+          },
+          "then": {
+            "properties": {
+              "step": {
+                "type": "string",
+                "pattern": "^S1-[0-9]{2}$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "liveStepLinkOf.live": {
+      "title": "LiveStepLinkOfLive",
+      "description": "The link live at the time named: the newest by issued_at, then id, of the person's links at that business, purpose and step whose ended_at is null or after the time and whose expires_at is after it (README item 93, default 238). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "live"
+        },
+        "link": {
+          "$ref": "#/$defs/liveStepLink"
+        }
+      },
+      "required": ["result", "link"],
+      "additionalProperties": false
+    },
+    "liveStepLinkOf.none": {
+      "title": "LiveStepLinkOfNone",
+      "description": "No link of the person at that business, purpose and step was live at the time named: none was issued, it had ended, or it had lapsed, one answer for each (README item 93). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "none"
+        },
+        "personId": {
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "$ref": "#/$defs/id"
+        },
+        "step": {
+          "$ref": "#/$defs/stepId"
+        }
+      },
+      "required": ["result", "personId", "businessId", "step"],
+      "additionalProperties": false
+    },
+    "liveStepLinkOf.response": {
+      "title": "LiveStepLinkOfResponse",
+      "description": "Live or none (README item 93). New in v1.25.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/liveStepLinkOf.live"
+        },
+        {
+          "$ref": "#/$defs/liveStepLinkOf.none"
+        }
+      ]
+    },
+    "liveStepLinkOf.errors": {
+      "title": "LiveStepLinkOfErrors",
+      "description": "transient alone: the same request may be sent again. New in v1.25.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "liveStepLinkOf.exchange": {
+      "title": "LiveStepLinkOfExchange",
+      "description": "One liveStepLinkOf request with its outcome. New in v1.25.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "liveStepLinkOf"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/liveStepLinkOf.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/liveStepLinkOf.response"
+            },
+            {
+              "$ref": "#/$defs/liveStepLinkOf.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "readUploadFinishedAt.request": {
+      "title": "ReadUploadFinishedAtRequest",
+      "description": "The pending upload's finished time by its upload id (README item 94; K-09 v1.14 default 224 id_checked (1) and open gap 215 (1): 'if K-05 v1.24 item (2) as frozen gives no finished time for the pending upload, that time by the upload id beside it'; v1.24's pendingUpload has none). Read from where signedUpload keeps the pending upload, item 86's home (README open gap 107). Role and scope: as item 86, rosie_job on the runtime side, with no business scope, its own read-only transaction on its own connection on the primary, beside a Tool API call's transaction and never on it, 1 connection. Repeat: safe, a read. Time budget: inside the event turn's gate (arch 04 line 223). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "uploadId": {
+          "description": "The event's ref, as item 86 takes it.",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["uploadId"],
+      "additionalProperties": false
+    },
+    "readUploadFinishedAt.finished": {
+      "title": "ReadUploadFinishedAtFinished",
+      "description": "The time finishUpload recorded once K-13 checkUpload passed (K-21 finishUpload), the time S1-10's id_uploads row takes as uploaded_at (K-09 v1.14 defaults 224 and 225; README default 239). Its time alone: never the object key, the person or the media type, which item 86 gives. New in v1.25.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "finished"
+        },
+        "uploadId": {
+          "$ref": "#/$defs/id"
+        },
+        "finishedAt": {
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["result", "uploadId", "finishedAt"],
+      "additionalProperties": false
+    },
+    "readUploadFinishedAt.none": {
+      "title": "ReadUploadFinishedAtNone",
+      "description": "Nothing is kept under the id, or its file never came (one answer for both, as item 86's none). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "none"
+        },
+        "uploadId": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["result", "uploadId"],
+      "additionalProperties": false
+    },
+    "readUploadFinishedAt.response": {
+      "title": "ReadUploadFinishedAtResponse",
+      "description": "Finished or none (README item 94). New in v1.25.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/readUploadFinishedAt.finished"
+        },
+        {
+          "$ref": "#/$defs/readUploadFinishedAt.none"
+        }
+      ]
+    },
+    "readUploadFinishedAt.errors": {
+      "title": "ReadUploadFinishedAtErrors",
+      "description": "transient alone: the same request may be sent again. New in v1.25.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readUploadFinishedAt.exchange": {
+      "title": "ReadUploadFinishedAtExchange",
+      "description": "One readUploadFinishedAt request with its outcome. New in v1.25.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readUploadFinishedAt"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readUploadFinishedAt.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readUploadFinishedAt.response"
+            },
+            {
+              "$ref": "#/$defs/readUploadFinishedAt.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "reviewItemDecision": {
+      "title": "ReviewItemDecision",
+      "description": "A done review item's decision as reviewItemById gives it (README item 95): K-37 review_items.outcome, a plain description with no private value (K-37 rule 4), and controlProven, whether that decision proved control, for a control or a listing_match item, null for any other kind. The item row holds no controlProven: it is true exactly when the K-23 business_setup row its write-back names (review_items.subject_row_id, its subject_table business_setup or businesses) holds control_proven_via team_check and control_proven_at equal to the item's decided_at, the two values K-09 decideReviewItem writes in one commit from one time (actions/src/domain/paging/review.ts lines 197 and 273), and false otherwise (README default 240). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "description": "K-37 review_items.outcome.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "controlProven": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["outcome", "controlProven"],
+      "additionalProperties": false
+    },
+    "reviewItemControlDecision": {
+      "title": "ReviewItemControlDecision",
+      "description": "A done control or listing_match item's decision (README item 95): reviewItemDecision with controlProven a boolean. New in v1.25.",
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "controlProven": {
+          "type": "boolean"
+        }
+      },
+      "required": ["outcome", "controlProven"],
+      "additionalProperties": false
+    },
+    "reviewItemOtherDecision": {
+      "title": "ReviewItemOtherDecision",
+      "description": "A done item's decision of any kind but control and listing_match (README item 95): reviewItemDecision with controlProven null, since no other kind's decision proves control (K-09 default 215 (b), default 205). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "controlProven": {
+          "type": "null"
+        }
+      },
+      "required": ["outcome", "controlProven"],
+      "additionalProperties": false
+    },
+    "reviewItemRead": {
+      "title": "ReviewItemRead",
+      "description": "One K-37 review item as reviewItemById gives it (README item 95): its id, business, kind, state, raised_by_person_id, decided_at and decision. Never summary (refuse-review-item-summary), subject_table, subject_row_id, turn_id, opened_at, due_at, wait_until, decided_by_person_id or version: the summary is Rosie's team's words for the team console alone (K-37 rule 2). decidedAt and decision are set exactly when the state is done (K-37 review_items_done_has_time); controlProven is a boolean exactly for a done control or listing_match item. New in v1.25.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "K-37 review_items.id.",
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "K-37 review_items.business_id, or null.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "kind": {
+          "$ref": "#/$defs/reviewItemKind"
+        },
+        "state": {
+          "description": "K-37 review_items.state.",
+          "enum": ["open", "waiting", "done"]
+        },
+        "raisedByPersonId": {
+          "description": "K-37 review_items.raised_by_person_id, or null when Rosie raised it.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "decidedAt": {
+          "description": "K-37 review_items.decided_at.",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "decision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/reviewItemDecision"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["id", "businessId", "kind", "state", "raisedByPersonId", "decidedAt", "decision"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "done"
+              }
+            },
+            "required": ["state"]
+          },
+          "then": {
+            "properties": {
+              "decidedAt": {
+                "$ref": "#/$defs/utc"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "decidedAt": {
+                "type": "null"
+              },
+              "decision": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "done"
+              },
+              "kind": {
+                "enum": ["control", "listing_match"]
+              }
+            },
+            "required": ["state", "kind"]
+          },
+          "then": {
+            "properties": {
+              "decision": {
+                "$ref": "#/$defs/reviewItemControlDecision"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "done"
+              },
+              "kind": {
+                "not": {
+                  "enum": ["control", "listing_match"]
+                }
+              }
+            },
+            "required": ["state", "kind"]
+          },
+          "then": {
+            "properties": {
+              "decision": {
+                "$ref": "#/$defs/reviewItemOtherDecision"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "reviewItemById.request": {
+      "title": "ReviewItemByIdRequest",
+      "description": "A K-37 review item by its id with its decision (README item 95; K-09 v1.14 default 224 control_proven (1) and open gap 215 (2); README open gap 92's 'no K-05 call reads a review item by id yet'). Read by the event turn's gate for a control_proven event, whose ref is the item's id. Role and scope: rosie_job on the runtime side (K-37 rule 2: no Tool API role reads review_items), with no business scope, its own read-only transaction on its own connection on the primary, beside a Tool API call's transaction and never on it, 1 connection, the item and its write-back's business_setup row read as one moment (one statement, or one transaction at repeatable read). Repeat: safe, a read. Time budget: inside the event turn's gate (arch 04 line 223). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "reviewItemId": {
+          "description": "K-37 review_items.id: the event's ref.",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["reviewItemId"],
+      "additionalProperties": false
+    },
+    "reviewItemById.found": {
+      "title": "ReviewItemByIdFound",
+      "description": "The item (README item 95). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "reviewItem"
+        },
+        "item": {
+          "$ref": "#/$defs/reviewItemRead"
+        }
+      },
+      "required": ["result", "item"],
+      "additionalProperties": false
+    },
+    "reviewItemById.none": {
+      "title": "ReviewItemByIdNone",
+      "description": "No review item has the id (README item 95). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "none"
+        },
+        "reviewItemId": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["result", "reviewItemId"],
+      "additionalProperties": false
+    },
+    "reviewItemById.response": {
+      "title": "ReviewItemByIdResponse",
+      "description": "Found or none (README item 95). New in v1.25.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/reviewItemById.found"
+        },
+        {
+          "$ref": "#/$defs/reviewItemById.none"
+        }
+      ]
+    },
+    "reviewItemById.errors": {
+      "title": "ReviewItemByIdErrors",
+      "description": "transient alone: the same request may be sent again. New in v1.25.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "reviewItemById.exchange": {
+      "title": "ReviewItemByIdExchange",
+      "description": "One reviewItemById request with its outcome. New in v1.25.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "reviewItemById"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/reviewItemById.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/reviewItemById.response"
+            },
+            {
+              "$ref": "#/$defs/reviewItemById.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "turnCommitted.request": {
+      "title": "TurnCommittedRequest",
+      "description": "Whether a turn with this id has committed (README item 96; K-09 v1.14 default 222 and open gaps 212 and 215 (3)): the gate asks it before it reads anything of an event's source, and a committed turn then goes to commitTurn, which answers a repeated turn id with the first commit whatever the repeat's body (item 1). Role and scope: rosie_job on the runtime side (K-04 turns is scoped none, and rosie_app holds no grant on it: migration 0012), with no business scope, its own read-only transaction on its own connection on the primary, beside a Tool API call's transaction and never on it, 1 connection; one statement on turns by its primary key. Repeat: safe, a read. Time budget: inside the gate (arch 04 line 223). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "turnId": {
+          "description": "K-04 turns.id: the turn's id, the hash of its one event id.",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["turnId"],
+      "additionalProperties": false
+    },
+    "turnCommitted.committed": {
+      "title": "TurnCommittedCommitted",
+      "description": "A turns row with this id is committed: its id and committed_at, the first commit's turn id and commit time that commitTurn answers a repeat with (README item 96). Never its outbox rows, writes or event ids: the read need answer no more (K-09 v1.14 default 222). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "committed"
+        },
+        "turnId": {
+          "$ref": "#/$defs/id"
+        },
+        "committedAt": {
+          "description": "K-04 turns.committed_at.",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["result", "turnId", "committedAt"],
+      "additionalProperties": false
+    },
+    "turnCommitted.parked": {
+      "title": "TurnCommittedParked",
+      "description": "A turns row with this id is parked (item 12): it never commits, and commitTurn answers it turnParked (README item 96, default 241). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "parked"
+        },
+        "turnId": {
+          "$ref": "#/$defs/id"
+        },
+        "parkedAt": {
+          "description": "K-04 turns.parked_at.",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["result", "turnId", "parkedAt"],
+      "additionalProperties": false
+    },
+    "turnCommitted.none": {
+      "title": "TurnCommittedNone",
+      "description": "No committed or parked turns row has this id (README item 96, default 241). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "none"
+        },
+        "turnId": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["result", "turnId"],
+      "additionalProperties": false
+    },
+    "turnCommitted.response": {
+      "title": "TurnCommittedResponse",
+      "description": "Committed, parked or none (README item 96). New in v1.25.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/turnCommitted.committed"
+        },
+        {
+          "$ref": "#/$defs/turnCommitted.parked"
+        },
+        {
+          "$ref": "#/$defs/turnCommitted.none"
+        }
+      ]
+    },
+    "turnCommitted.errors": {
+      "title": "TurnCommittedErrors",
+      "description": "transient alone: the same request may be sent again. New in v1.25.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "turnCommitted.exchange": {
+      "title": "TurnCommittedExchange",
+      "description": "One turnCommitted request with its outcome. New in v1.25.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "turnCommitted"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/turnCommitted.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/turnCommitted.response"
+            },
+            {
+              "$ref": "#/$defs/turnCommitted.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "readWaitingStep.request": {
+      "title": "ReadWaitingStepRequest",
+      "description": "The person and business's waiting step with its key (README item 97; K-09 v1.14 default 235 and open gap 215 (5)): the event step the person's walk at the business last stopped at waitsOnEvent, from the walk's own record, never inferred from the key's source alone, and whether that key is now on file. The record of the stop is in no frozen table (README open gap 109): this is the read's shape, and its home is the record that gap names. Role and scope: rosie_job on the runtime side, with no business scope, every statement naming the request's business, its own read-only transaction on its own connection on the primary, beside a Tool API call's transaction and never on it, 1 connection, the stop and its key read as one moment (one statement, or one transaction at repeatable read). Repeat: safe, a read. Time budget: inside the gate (arch 04 line 223). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "personId": {
+          "description": "The turn's caller person.",
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "description": "The turn's caller business.",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["personId", "businessId"],
+      "additionalProperties": false
+    },
+    "readWaitingStep.waiting": {
+      "title": "ReadWaitingStepWaiting",
+      "description": "The walk waits at an event step (README item 97): S1-10 on id_checked or S1-32 on control_proven (K-09 v1.14 default 223's event table), and keyOnFile, whether that key is now on file: for id_checked the person's sign_up K-22 id_uploads row (id_uploads_one_sign_up), for control_proven the business's K-23 business_setup row holding control_proven_at with control_proven_via team_check (K-09 v1.14 default 235). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "waiting"
+        },
+        "personId": {
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "$ref": "#/$defs/id"
+        },
+        "step": {
+          "enum": ["S1-10", "S1-32"]
+        },
+        "key": {
+          "enum": ["id_checked", "control_proven"]
+        },
+        "keyOnFile": {
+          "type": "boolean"
+        }
+      },
+      "required": ["result", "personId", "businessId", "step", "key", "keyOnFile"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "step": {
+                "const": "S1-10"
+              }
+            },
+            "required": ["step"]
+          },
+          "then": {
+            "properties": {
+              "key": {
+                "const": "id_checked"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "step": {
+                "const": "S1-32"
+              }
+            },
+            "required": ["step"]
+          },
+          "then": {
+            "properties": {
+              "key": {
+                "const": "control_proven"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "readWaitingStep.none": {
+      "title": "ReadWaitingStepNone",
+      "description": "The person's walk at the business waits at no event step: it never stopped at one, or the commit that walked on from it ended the stop (README item 97). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "none"
+        },
+        "personId": {
+          "$ref": "#/$defs/id"
+        },
+        "businessId": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["result", "personId", "businessId"],
+      "additionalProperties": false
+    },
+    "readWaitingStep.response": {
+      "title": "ReadWaitingStepResponse",
+      "description": "Waiting or none (README item 97). New in v1.25.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/readWaitingStep.waiting"
+        },
+        {
+          "$ref": "#/$defs/readWaitingStep.none"
+        }
+      ]
+    },
+    "readWaitingStep.errors": {
+      "title": "ReadWaitingStepErrors",
+      "description": "transient alone: the same request may be sent again. New in v1.25.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readWaitingStep.exchange": {
+      "title": "ReadWaitingStepExchange",
+      "description": "One readWaitingStep request with its outcome. New in v1.25.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readWaitingStep"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readWaitingStep.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readWaitingStep.response"
+            },
+            {
+              "$ref": "#/$defs/readWaitingStep.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "readBusinessStatus.request": {
+      "title": "ReadBusinessStatusRequest",
+      "description": "A business's status (README item 98; K-09 v1.14 default 224 control_proven (3) and open gap 215 (4)): K-04 businesses.status by its id. Role and scope: rosie_job on the runtime side, with no business scope, the statement naming the request's business by its primary key, its own read-only transaction on its own connection on the primary, beside a Tool API call's transaction and never on it, 1 connection. Repeat: safe, a read. Time budget: inside the event turn's gate (arch 04 line 223). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "businessId": {
+          "description": "K-04 businesses.id: the caller's business.",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["businessId"],
+      "additionalProperties": false
+    },
+    "readBusinessStatus.found": {
+      "title": "ReadBusinessStatusFound",
+      "description": "The business's status, K-04 businesses_status_known: offline, saved or live; its status alone (README item 98). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "businessStatus"
+        },
+        "businessId": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "enum": ["offline", "saved", "live"]
+        }
+      },
+      "required": ["result", "businessId", "status"],
+      "additionalProperties": false
+    },
+    "readBusinessStatus.none": {
+      "title": "ReadBusinessStatusNone",
+      "description": "No businesses row has the id (README item 98). New in v1.25.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "none"
+        },
+        "businessId": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": ["result", "businessId"],
+      "additionalProperties": false
+    },
+    "readBusinessStatus.response": {
+      "title": "ReadBusinessStatusResponse",
+      "description": "Found or none (README item 98). New in v1.25.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/readBusinessStatus.found"
+        },
+        {
+          "$ref": "#/$defs/readBusinessStatus.none"
+        }
+      ]
+    },
+    "readBusinessStatus.errors": {
+      "title": "ReadBusinessStatusErrors",
+      "description": "transient alone: the same request may be sent again. New in v1.25.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "readBusinessStatus.exchange": {
+      "title": "ReadBusinessStatusExchange",
+      "description": "One readBusinessStatus request with its outcome. New in v1.25.",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "readBusinessStatus"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/readBusinessStatus.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/readBusinessStatus.response"
+            },
+            {
+              "$ref": "#/$defs/readBusinessStatus.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    }
+  }
+}
