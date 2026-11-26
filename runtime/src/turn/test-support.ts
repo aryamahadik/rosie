@@ -726,10 +726,17 @@ export interface FakeFacts {
   readonly times: string[];
   /** Each event id a test turn's run asked a result for, in order. */
   readonly asked: string[];
+  /**
+   * What the directory's service read answers for every handle (T-1563; K-05 v1.2 readTurnState phone.chatWay): iMessage
+   * unless a test sets another, null (no phone row) or a function that throws (the read could not be made).
+   */
+  chatWay: string | null | (() => never);
+  /** Each handle id the service read was asked for, in order. */
+  readonly chatWayReads: string[];
 }
 
 export function fakeFacts(party: TurnParty | null, times: string[]): FakeFacts {
-  return { party, safety: new Map(), times, asked: [] };
+  return { party, safety: new Map(), times, asked: [], chatWay: "imessage", chatWayReads: [] };
 }
 
 /**
@@ -752,6 +759,11 @@ export function turnDeps(
     dispatcher: dispatcherOf(reply.dispatcher),
     directory: {
       partyOf: () => Promise.resolve(facts.party),
+      chatWayOf({ handleId }) {
+        facts.chatWayReads.push(handleId);
+        const way = facts.chatWay;
+        return typeof way === "function" ? Promise.reject(new Error("no read")) : Promise.resolve(way);
+      },
     },
     keys,
     toolApi: turnFaceOf(face),

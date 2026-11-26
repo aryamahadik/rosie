@@ -5042,7 +5042,11 @@ export function skeletonFakes(clock: TestClock = testClock(), options: SkeletonO
       // Who the handle is. Each text's safety result is no state read (ADR-015; T-1264): each run reads its texts' results
       // through its leased turn, from what the real read on arrival (`models`) kept in the real actor's storage.
       turn: {
-        directory: { partyOf: () => Promise.resolve(SAM.party) },
+        // The handle's phone service an event's turn reads (T-1563; K-05 v1.2 readTurnState phone.chatWay): iMessage.
+        directory: {
+          partyOf: () => Promise.resolve(SAM.party),
+          chatWayOf: () => Promise.resolve("imessage"),
+        },
       },
     },
     turnFace: {

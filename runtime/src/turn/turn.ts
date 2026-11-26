@@ -81,6 +81,21 @@
 // decided parts follow them (C-087). After the commit no outage line goes: a model call that fails then takes step 7's
 // path for its row (./compose.ts).
 //
+// An event's turn (T-1563; ruling T-1543 card A18; K-09 v1.14 defaults 221 to 235; `runEventTurn`): a turn whose one
+// entry is an event the actor's door stored (the owner's ID upload landing, `id_checked` at S1-10; Rosie's team's decision
+// proving control, `control_proven` at S1-32) runs without steps 1 to 5's texts: no guard, frontier, decide or safety
+// result. The directory's party names the handle and gives the caller (its business and person, never the hand-off's),
+// the event's sealed key, step and ref are opened with the handle's key, and the handle's phone service (the directory's
+// `chatWayOf`, K-05 v1.2 readTurnState `phone.chatWay`) and the party's zone are read once, at the turn's first run, and
+// kept sealed on the event's entry, so a rerun carries the first run's (default 222). A null or non-Linq service runs
+// nothing: the event is dropped, logged by label alone (open gap 214's default). Then one gateAndCommit with input event
+// (no core action, one event id, no joined trace, neither service nor chat id on its turn) through the lease with reply,
+// and step 7 for every row its commit wrote, as any turn's (default 231: compose input holds no inbound text, the gate
+// request having no decided texts). `eventNotWaiting` is final: the event is dropped, nothing parked or sent (default
+// 230). `turnRefused` or `notBuilt` parks at once, a third lapse parks with the passedOn line, as for any turn (R36). A
+// held answer (committed with no row, default 233) is a commit like any other. Never through ClockDeps or fireOnce.
+// Spans name the key and the step as labels; the ref, an object key and a person never appear in a span or a log.
+//
 // Not here: the planner after meaning search (C-117: `planner` is null); the safety read (T-246); wiring the real Tool
 // API, AI, K-05 and dispatcher calls into the ports (D-017, T-552 onward).
 
@@ -90,11 +105,21 @@ import type {
   CommitTurnAnswer,
   CommitTurnRef,
   CommitTurnRequest,
+  InboxEntry,
   LeasedTurn,
   LeaseHooks,
   ParkAnswer,
   ParkingTurn,
 } from "../actor";
+import {
+  isEventEntry,
+  openEventBody,
+  openEventFirsts,
+  sealEventFirsts,
+  type EventBody,
+  type EventFirsts,
+  type EventInboxEntry,
+} from "../actor/event-door";
 import {
   actorNameOf,
   openWords,
@@ -416,6 +441,8 @@ export async function runTurnLoop(turn: LeasedTurn): Promise<TurnOutcome> {
   if (set === null) return notCommitted(null, "unwired");
   const first = turn.entries[0];
   if (first === undefined) return notCommitted(null, "noTexts");
+  // An event's turn (A18): no texts, so none of steps 2 to 5.
+  if (isEventEntry(first)) return runEventTurn(turn, set, first);
   const handle = first.event.handle;
 
   let party: TurnParty | null;
@@ -678,6 +705,188 @@ async function endParked(run: Run, parkedAt: string): Promise<void> {
   }
 }
 
+// ---- an event's turn (T-1563; ruling T-1543 card A18; K-09 v1.14 defaults 221 to 235) ------------------------------
+
+/** The services an event's turn may carry (K-09 v1.14 `gateAndCommit.event` service): Linq's, the person's own mobile's. */
+const EVENT_SERVICES: ReadonlySet<string> = new Set(["imessage", "rcs", "sms"]);
+
+/** K-09 v1.14's refusal of an event its step is not waiting for (default 224): final (default 230). */
+const EVENT_NOT_WAITING = "eventNotWaiting";
+
+/** Why an event's turn found no service to run with (open gap 214's default): it runs nothing and is dropped. */
+const NO_SERVICE = "noService";
+
+/**
+ * Writes one log line for an event dropped with nothing run, written or sent (K-09 v1.14 open gap 214's default; default
+ * 230): labels alone (why, the key, the step, the turn and its trace), never the ref, a person or a value.
+ */
+function logDropped(turn: LeasedTurn, why: string, body: EventBody): void {
+  const line = {
+    level: "info",
+    msg: "eventTurnDropped",
+    why,
+    key: body.key,
+    step: body.step,
+    turn_id: turn.turnId,
+    trace_id: turn.traceId,
+  };
+  console.log(JSON.stringify(line));
+}
+
+/**
+ * Ends an event's turn with nothing committed (`eventNotWaiting`, or no service): the lease drops it, so the next turn
+ * opens and the event is never run again (a known event id stays dropped at the door), and one log line says so. A run no
+ * longer the turn's drops nothing: the run that has the turn now meets the same answer.
+ */
+async function dropEvent(turn: LeasedTurn, why: string, body: EventBody): Promise<void> {
+  if (replaced(turn)) return;
+  try {
+    await turn.drop?.();
+  } catch {
+    // Not dropped: the lapse reruns the turn, which meets the same answer and drops it.
+  }
+  logDropped(turn, why, body);
+}
+
+/**
+ * The event turn's service and zone (default 222): the first run's, kept sealed on the event's entry; or, at the first
+ * run, the handle's phone service through the directory (`chatWayOf`) and the party's zone, sealed and kept once (the box
+ * kept first answers every run). NO_SERVICE when the handle has no Linq service (none read, a null, or another way); any
+ * other label when the values cannot be read or kept now (the lease's lapse runs the turn again).
+ */
+async function eventFirstsOf(
+  turn: LeasedTurn,
+  set: TurnDeps,
+  entry: EventInboxEntry,
+  key: SealingKey,
+  party: TurnParty,
+): Promise<EventFirsts | string> {
+  const kept = entry.event.firsts;
+  if (kept !== undefined) {
+    try {
+      return await openEventFirsts(entry.event, kept, key);
+    } catch {
+      return "unopened";
+    }
+  }
+  const directory = set.directory;
+  let service: unknown = null;
+  if (directory.chatWayOf !== undefined) {
+    try {
+      service = await directory.chatWayOf({ handleId: party.handleId });
+    } catch {
+      return "noServiceRead";
+    }
+  }
+  if (typeof service !== "string" || !EVENT_SERVICES.has(service)) return NO_SERVICE;
+  const keep = turn.keepEventFirsts;
+  if (keep === undefined) return "unwired";
+  try {
+    const box = await sealEventFirsts(entry.event, key, { service, zone: party.zone });
+    return await openEventFirsts(entry.event, keep(box), key);
+  } catch {
+    return "notKept";
+  }
+}
+
+/**
+ * One run of an event's turn (A18; see the header): the directory's party, the event opened, its service and zone, then
+ * one gateAndCommit with input event through the lease with reply, and step 7 for every row its commit wrote. Never
+ * throws for an outside failure: a step that cannot finish ends the run with nothing committed (the lease reruns the
+ * turn at its lapse, and parks it with the passedOn line after a third); a final answer parks it at once; an event not
+ * waiting, or a handle with no Linq service, is dropped.
+ */
+async function runEventTurn(turn: LeasedTurn, set: TurnDeps, entry: EventInboxEntry): Promise<TurnOutcome> {
+  const handle = entry.event.handle;
+  let party: TurnParty | null;
+  try {
+    party = await set.directory.partyOf({ actorName: actorNameOf(handle), handle });
+  } catch {
+    return notCommitted(null, "noDirectory");
+  }
+  if (party === null) return notCommitted(null, "unknownHandle");
+  if (replaced(turn)) return notCommitted(null, "replaced");
+
+  let key: SealingKey;
+  let body: EventBody;
+  try {
+    key = await set.keys.getOrCreateKey(handle);
+    body = await openEventBody(entry.event, key);
+  } catch {
+    return notCommitted(null, "unopened");
+  }
+  if (replaced(turn)) return notCommitted(null, "replaced");
+
+  const firsts = await eventFirstsOf(turn, set, entry, key, party);
+  if (replaced(turn)) return notCommitted(null, "replaced");
+  if (firsts === NO_SERVICE) {
+    await dropEvent(turn, NO_SERVICE, body);
+    return notCommitted(null, NO_SERVICE);
+  }
+  if (typeof firsts === "string") return notCommitted(null, firsts);
+
+  const eventId = entry.event.eventId;
+  const caller: TurnCaller = {
+    kind: "turn",
+    turnId: turn.turnId,
+    requestId: turn.turnId,
+    businessId: party.businessId,
+    personId: party.personId,
+    traceId: turn.traceId,
+  };
+  const run: Run = {
+    turn,
+    set,
+    handle,
+    party,
+    opened: [],
+    safety: new Map(),
+    caller,
+    // One event id, no joined trace, and neither a service nor a chat id on the turn (K-09 v1.14 default 221).
+    ref: {
+      id: turn.turnId,
+      handleId: party.handleId,
+      eventIds: [eventId],
+      bundleId: { hash: turn.bundleId.hash, build: turn.bundleId.build },
+      traceId: turn.traceId,
+      joinedTraceIds: [],
+      tries: turn.tries,
+    },
+    trace: turn.trace,
+    gateCalls: 0,
+    rereadRan: false,
+    keywordCommits: 0,
+    committed: null,
+    committedCaller: null,
+    modelsDown: false,
+    stopAsked: false,
+    final: null,
+  };
+  const sent = await sendWithResend(run, {
+    caller: { ...caller },
+    turn: run.ref,
+    input: {
+      kind: "event",
+      eventId,
+      key: body.key,
+      step: body.step,
+      ref: body.ref,
+      service: firsts.service,
+      zone: firsts.zone,
+    },
+    core: [],
+    now: set.now(),
+  });
+  // Committed (first, repeated, or held with no row): step 7 for every row with no plan, as any turn's.
+  if (sent.kind === "committed") return finishCommitted(run, sent.answer, null);
+  if (sent.error === EVENT_NOT_WAITING) {
+    await dropEvent(turn, EVENT_NOT_WAITING, body);
+    return notCommitted(run, sent.error);
+  }
+  // turnRefused or notBuilt: parked at once, as any turn (default 230); anything else is left to the lease's lapse.
+  return parkIfFinal(run, notCommitted(run, sent.error));
+}
+
 // ---- 1. opening the texts ---------------------------------------------------------------------------------------
 
 /**
@@ -689,7 +898,10 @@ async function endParked(run: Run, parkedAt: string): Promise<void> {
 async function openTexts(turn: LeasedTurn, set: TurnDeps, zone: string): Promise<OpenedText[]> {
   const keys = new Map<string, SealingKey>();
   const opened: OpenedText[] = [];
-  for (const entry of turn.entries) {
+  // A turn of texts holds texts alone: an event's entry is a turn of its own (A18), so none is here.
+  const texts = turn.entries.filter((entry): entry is InboxEntry => !isEventEntry(entry));
+  if (texts.length !== turn.entries.length) throw new Error("an event among a turn's texts");
+  for (const entry of texts) {
     const event = entry.event;
     let box: SealedWords | null = null;
     if (event.sealed !== null) {
@@ -1274,6 +1486,8 @@ async function sendCommit(run: Run, request: GateAndCommitRequest): Promise<Sent
   const input = request.input;
   const got: SpanFacts = {
     input: input.kind,
+    // An event's key and step, as labels (A18): never its ref.
+    ...(input.kind === "event" ? { key: input.key, step: input.step } : {}),
     parts: input.kind === "decided" ? input.decided.decide.parts.length : 0,
     core: request.core.length,
     reread: input.kind === "decided" && input.decided.decide.reread,
