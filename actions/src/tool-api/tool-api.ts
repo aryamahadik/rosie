@@ -17,7 +17,14 @@
 //      handler never runs; a call whose errors have no transient gets the start's failure thrown, scrubbed;
 //   6. the handler's answer must pass `$defs/<call>.response`, or `$defs/<call>.errors`, which the contract says are
 //      "Refused, nothing written", so an error answer rolls the transaction back; an answer that passes neither is the
-//      handler's fault, rolled back and thrown (ToolApiContractError), never passed on;
+//      handler's fault, rolled back and thrown (ToolApiContractError), never passed on. A handler that throws has its
+//      transaction rolled back too: a NotBuiltError naming the call is answered notBuilt, and, for gateAndCommit alone,
+//      a final fault of the six fault lists T-1529's ruling 1 classes is answered K-09 v1.13's turnRefused {from, fault,
+//      ids}, labels only (refusal.ts; README v1.13 defaults 216 and 217; T-1551), so nothing of the refused part is
+//      written and the runtime parks the turn at once instead of retrying it. A transient fault of those lists (the
+//      walk's questionNotLive, the commit's wrongState and stillChanged, a read's transient, kinds' reviewRefused carrying
+//      transient) and any other throw is thrown as before, so the runtime resends and reruns it. Both answers are the
+//      base's own, as the other refusals here are, never held to the handler's v1.5 checks;
 //   7. the span, when step 1 opened one, records the outcome: the trace id and bundle id are the trace's, the handle is
 //      the trace's handle id, and what the span got and decided are labels and counts only (the call, the caller's kind,
 //      what was answered), so no phone number and no person's words can reach it (K-08 v1 "Never the raw number or
@@ -59,6 +66,7 @@ import {
   type RequestOf,
 } from "./calls";
 import { NotBuiltError, ToolApiContractError, type BaseRefusal } from "./errors";
+import { turnRefusalOf } from "./refusal";
 import type { BusinessScope, ScopeCall } from "./scope";
 import type { CallPart, LaneChecks, ToolApiValidator } from "./validator";
 
@@ -398,6 +406,8 @@ interface Ending {
   answered: string;
   errorCode: string | null;
   problems?: number;
+  /** A turnRefused answer's list and fault (refusal.ts), each a label: what the span names of the refusal, never an id. */
+  refusal?: { from: string; fault: string };
 }
 
 export function createToolApi<Repo>(options: ToolApiOptions<Repo>): ToolApi {
@@ -493,6 +503,7 @@ export function createToolApi<Repo>(options: ToolApiOptions<Repo>): ToolApi {
         const decided: SpanFacts = {
           answered: ending.answered,
           ...(ending.problems === undefined ? {} : { problems: ending.problems }),
+          ...(ending.refusal === undefined ? {} : { from: ending.refusal.from, fault: ending.refusal.fault }),
         };
         const gateLimits = hop === "gate" ? LIMITS_NOT_CHECKED : undefined;
         const limits = notes.limits.length > 0 ? notes.limits : gateLimits;
@@ -595,6 +606,18 @@ export function createToolApi<Repo>(options: ToolApiOptions<Repo>): ToolApi {
         if (entry.isNotBuilt(error)) {
           const refusal: LaneRefusal = { error: "notBuilt", call };
           return refuse(refusal);
+        }
+        // A final fault of the six lists (K-09 v1.13; refusal.ts), gateAndCommit's alone (README default 216): answered
+        // turnRefused, labels only, its transaction already rolled back by the scope, so nothing of it was written.
+        const turnRefused = call === "gateAndCommit" ? turnRefusalOf(error) : null;
+        if (turnRefused !== null) {
+          finish({
+            outcome: "refused",
+            answered: turnRefused.error,
+            errorCode: turnRefused.error,
+            refusal: { from: turnRefused.from, fault: turnRefused.fault },
+          });
+          return turnRefused;
         }
         if (error instanceof ToolApiContractError || error instanceof LaneContractError) {
           finish({

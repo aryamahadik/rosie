@@ -798,9 +798,11 @@ describe("hop 8 joined: the gate and one commit through @rosie/actions' turn fac
         now: () => Date.now(),
       });
 
-      await expect(root.turn.toolApi.gateAndCommit(request, at, trace)).rejects.toMatchObject({
-        name: "WalkRefusedError",
+      await expect(root.turn.toolApi.gateAndCommit(request, at, trace)).resolves.toEqual({
+        error: "turnRefused",
+        from: "walk",
         fault: "noServiceOrChatId",
+        ids: [],
       });
       expect(fakes.turnRows.commits).toEqual([]);
       expect(countsOf(fakes)).toEqual({ turns: 0, eventLog: 0 });
