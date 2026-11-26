@@ -1720,6 +1720,132 @@ export function askedResendsQuestion(exchange) {
   return problems;
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// v1.14 (T-1547): the event turn (README "v1.14"). Added beside the rules above, which stay as they are. Like v1.12's
+// rule it reads only the contracts' own files beside this one, synchronously: the fixtures an exchange runs after, for
+// the first hand-off of an event it repeats.
+
+/** The event exchanges among the fixtures `exchange` runs after (given.after), each with its file. */
+function earlierEvents(exchange) {
+  const found = [];
+  for (const file of exchange.given?.after ?? []) {
+    let earlier;
+    try {
+      earlier = contractJson(`${K09_FIXTURES}/${file}`);
+    } catch {
+      continue;
+    }
+    if (earlier.call === "gateAndCommit" && earlier.request?.input?.kind === "event") {
+      found.push({ file, earlier });
+    }
+  }
+  return found;
+}
+
+/** A turn as the commit keys it: every field but its tries, which a rerun raises (K-05 v1 turn.tries). */
+const turnKeyOf = (turn) => Object.fromEntries(Object.entries(turn ?? {}).filter(([key]) => key !== "tries"));
+
+/**
+ * Why a repeat of an event's first hand-off (`first`, from `file`) is not one, one reason a line; none when it is. A
+ * repeat carries the first's event, turn (its tries aside), caller and service and zone, and is answered as the first
+ * commit coming back: committed, repeated true, the first's turn id, commit time and outbox rows, nothing written,
+ * no effect and no question opened or closed (README v1.14 default 222; K-05 v1 commitTurn).
+ */
+function repeatProblems(exchange, first, file) {
+  const { request, outcome } = exchange;
+  const problems = [];
+  if (!isDeepStrictEqual(request.input, first.request.input)) {
+    problems.push(
+      `a repeat of ${request.input.eventId} carries its first hand-off's key, step, ref, service and zone (${file})`,
+    );
+  }
+  if (!isDeepStrictEqual(turnKeyOf(request.turn), turnKeyOf(first.request.turn))) {
+    problems.push(`a repeat of ${request.input.eventId} runs as its first hand-off's turn (${file})`);
+  }
+  if (!isDeepStrictEqual(request.caller, first.request.caller)) {
+    problems.push(`a repeat of ${request.input.eventId} is called as its first hand-off was (${file})`);
+  }
+  const firstOutcome = first.outcome ?? {};
+  const answered =
+    outcome?.result === "committed" &&
+    outcome.repeated === true &&
+    outcome.turnId === firstOutcome.turnId &&
+    outcome.committedAt === firstOutcome.committedAt &&
+    isDeepStrictEqual(outcome.written?.written, []) &&
+    isDeepStrictEqual(outcome.written?.outboxRows, firstOutcome.written?.outboxRows) &&
+    isDeepStrictEqual(outcome.effects, []) &&
+    isDeepStrictEqual(outcome.openQuestions, { opened: [], closed: [] });
+  if (!answered) {
+    problems.push(
+      `a repeat of ${request.input.eventId} is answered as its first commit coming back: repeated, nothing written (${file})`,
+    );
+  }
+  return problems;
+}
+
+/**
+ * eventTurn (v1.14; README defaults 221, 222, 224 and 232): a gateAndCommit exchange on an event is a turn of its own
+ * on the person's own chat handle: called as its turn (caller.kind turn, caller.turnId and requestId the turn's id),
+ * its one event id the event's, its trace the caller's, and its fixture states the event's own source
+ * (given.eventSource). A repeat (a fixture the exchange runs after hands the same event id) carries the first's request
+ * and is answered as the first commit coming back, whatever its source reads now. A first hand-off commits only when
+ * the source has its step waiting and is the turn's own person, handle and business, and is answered eventNotWaiting,
+ * naming the event's key and step, exactly when it does not. The schema holds the event's shape, its key's step, a
+ * turn with no text and an answer with no part; it cannot compare the event with the turn, its source or a fixture
+ * the exchange runs after.
+ */
+export function eventTurn(exchange) {
+  const request = exchange.request ?? {};
+  const input = request.input;
+  if (exchange.call !== "gateAndCommit" || input?.kind !== "event") {
+    return ["eventTurn reads a gateAndCommit exchange on an event"];
+  }
+  const { caller, turn } = request;
+  const problems = [];
+  if (turn === null || turn === undefined || !isDeepStrictEqual(turn.eventIds, [input.eventId])) {
+    problems.push("an event turn's one event id is its event's");
+  }
+  if (caller.kind !== "turn" || caller.turnId !== turn?.id || caller.requestId !== turn?.id) {
+    problems.push("an event turn is called as its turn, keyed by its id");
+  }
+  if (turn?.traceId !== caller.traceId) problems.push("an event turn's trace is the hand-off's own");
+  const source = exchange.given?.eventSource;
+  if (source === undefined) return [...problems, "an event's fixture states its source (given.eventSource)"];
+  const outcome = exchange.outcome ?? {};
+  const [repeated] = earlierEvents(exchange).filter(
+    ({ earlier }) => earlier.request.input.eventId === input.eventId,
+  );
+  if (repeated !== undefined)
+    return [...problems, ...repeatProblems(exchange, repeated.earlier, repeated.file)];
+  const own =
+    source.personId === caller.personId &&
+    source.handleId === turn?.handleId &&
+    source.businessId === caller.businessId;
+  if (outcome.result === "committed") {
+    if (outcome.repeated !== false || outcome.turnId !== turn?.id) {
+      problems.push("a first hand-off commits under its turn's id, never as a repeat");
+    }
+    if (!source.waiting) {
+      problems.push(
+        `${input.step} is not waiting for ${input.key} (given.eventSource), so the event is refused eventNotWaiting`,
+      );
+    }
+    if (!own) {
+      problems.push(
+        "the event's source is another person's, handle's or business's than the turn's, so it is refused eventNotWaiting",
+      );
+    }
+  } else if (outcome.error === "eventNotWaiting") {
+    if (outcome.key !== input.key || outcome.step !== input.step) {
+      problems.push("eventNotWaiting names the event's own key and step");
+    }
+    if (source.waiting && own) {
+      problems.push(`${input.step} waits for ${input.key} on the turn's own handle, so the event commits`);
+    }
+  }
+  return problems;
+}
+
 export const rules = Object.freeze({
   askedResendsQuestion,
   buttonsOptionChoices,
@@ -1737,4 +1863,5 @@ export const rules = Object.freeze({
   inputIsK03Fixture,
   unmappedEndAsked,
   journeySevenGivesNone,
+  eventTurn,
 });
